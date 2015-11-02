@@ -1,0 +1,15 @@
+URI.DisableResources
+TYPE: bool
+VERSION: 4.2.0
+DEFAULT: false
+--DESCRIPTION--
+<p>
+    Disables embedding resources, essentially meaning no pictures. You can
+    still link to them though. See %URI.DisableExternalResources for why
+    this might be a good idea.
+</p>
+<p>
+    <em>Note:</em> While this directive has been available since 1.3.0,
+    it didn't actually start doing anything until 4.2.0.
+</p>
+--# vim: et sw=4 sts=4

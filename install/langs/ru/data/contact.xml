@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<entity_contact>
+  <contact id="Webmaster" name="Вебмастер">
+    <description>Если на сайте возникнут технические проблемы</description>
+  </contact>
+  <contact id="Customer_service" name="Клиентская служба">
+    <description>По всем вопросам касательно товаров или заказов</description>
+  </contact>
+</entity_contact>

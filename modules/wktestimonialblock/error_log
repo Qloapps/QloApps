@@ -1,0 +1,2 @@
+[23-Sep-2015 17:46:15 Asia/Kolkata] PHP Fatal error:  Uncaught Table 'sumit_db_13.ps_htl_testimonial_block_data' doesn't exist<br /><br /><pre>DELETE FROM `ps_htl_testimonial_block_data` WHERE id=3</pre>
+  thrown in /home/sumit/public_html/html/ps-hotel-reservation-system/classes/db/Db.php on line 765

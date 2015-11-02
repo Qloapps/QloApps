@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<localizationPack name="Georgia" version="1.0">
+	<currencies>
+		<currency name="Lari" iso_code="GEL" iso_code_num="981" sign="ლ" blank="1" conversion_rate="2.46684" format="2" decimals="1" />
+	</currencies>
+	<languages>
+		<language iso_code="ka" />
+	</languages>
+	<taxes>
+		<tax id="1" name="დღგ GE 18%" rate="18" />
+		
+		<taxRulesGroup name="GE Standard Rate (18%)">
+			<taxRule iso_code_country="ge" id_tax="1" />
+		</taxRulesGroup>
+	</taxes>
+	<units>
+		<unit type="weight" value="kg" />
+		<unit type="volume" value="L" />
+		<unit type="short_distance" value="cm" />
+		<unit type="base_distance" value="m" />
+		<unit type="long_distance" value="km" />
+	</units>
+</localizationPack>

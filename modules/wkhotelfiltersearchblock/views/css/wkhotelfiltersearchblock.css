@@ -1,0 +1,94 @@
+.margin-lr-0
+{
+    margin-left: 0px;
+    margin-right: 0px;
+}
+
+.margin-top-7
+{
+    margin-top: 7px;
+}
+
+.margin-btm-15
+{
+    margin-bottom: 15px;
+}
+
+#filter_search_block
+{
+    background-color: #F2F2F2;
+    border: 1px solid #CCCCCC;
+}
+
+.filter_header:after
+{
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-top: 10px solid #404040;
+    content: "";
+    display: inline-block;
+    left: 50%;
+    margin-left: -5px;
+    position: absolute;
+    z-index: 100;
+}
+
+.filter_header
+{
+    float: left;
+    width: 100%;
+    background-color: #404040;
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.filter_header div
+{
+    padding: 0px 10px;
+}
+
+.filter_header p
+{
+    font-size: 16px;
+    color: #FFFFFF;
+    font-weight: 400;
+    font-family: 'PT Serif', serif;
+    margin-top: 10px;
+    text-align: center;
+}
+
+.field_label
+{
+    font-size: 13px;
+    color: #9A9A9A;
+    font-weight: 700;
+    font-family: 'PT Serif', serif;
+}
+
+.filter_search_btn
+{
+    font-size: 17px;
+    color: #FFFFFF;
+    font-weight: 700;
+    font-family: 'PT Serif', serif;
+    text-align: center;
+    background-color: #BF9958;
+    margin-bottom: 15px;
+}
+
+.filter_search_btn:hover, .filter_search_btn:focus .filter_search_btn:active
+{
+    color: #FFFFFF;
+}
+
+#hotel_location, #check_in_time, #check_out_time
+{
+    background-color: #FFFFFF;
+}
+
+.htl_nm_cont .hotel_cat_id_btn
+{
+    height: 39px !important;
+    padding: 0 !important;
+    width: 100% !important;
+}

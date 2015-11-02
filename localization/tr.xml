@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<localizationPack name="Turkey" version="1.0">
+	<currencies>
+		<currency name="Lira" iso_code="TRY" iso_code_num="949" sign="TL" blank="1" conversion_rate="1.97638" format="2" decimals="1" />
+	</currencies>
+	<languages>
+		<language iso_code="tr" />
+	</languages>
+	<taxes>
+		<tax id="1" name="KDV TR 18%" rate="18" />
+		<tax id="2" name="KDV TR 8%" rate="8" />
+		<tax id="3" name="KDV TR 1%" rate="1" />
+		
+		<taxRulesGroup name="TR Standard Rate (18%)">
+			<taxRule iso_code_country="tr" id_tax="1" />
+		</taxRulesGroup>
+		
+		<taxRulesGroup name="TR Reduced Rate (8%)">
+			<taxRule iso_code_country="tr" id_tax="2" />
+		</taxRulesGroup>
+		
+		<taxRulesGroup name="TR Super Reduced Rate (1%)">
+			<taxRule iso_code_country="tr" id_tax="3" />
+		</taxRulesGroup>
+	</taxes>
+	<units>
+		<unit type="weight" value="kg" />
+		<unit type="volume" value="L" />
+		<unit type="short_distance" value="cm" />
+		<unit type="base_distance" value="m" />
+		<unit type="long_distance" value="km" />
+	</units>
+</localizationPack>

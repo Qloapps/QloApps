@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<localizationPack name="Mexico" version="1.0">
+	<currencies>
+		<currency name="Peso" iso_code="MXN" iso_code_num="484" sign="$" blank="1" conversion_rate="17.1304" format="2" decimals="1" />
+	</currencies>
+	<languages>
+		<language iso_code="mx" />
+		<language iso_code="es" />
+	</languages>
+	<taxes>
+		<tax id="1" name="IVA MX 16%" rate="16" />
+		<tax id="2" name="IVA MX 11%" rate="11" />
+		
+		<taxRulesGroup name="MX Standard Rate (16%)">
+			<taxRule iso_code_country="mx" id_tax="1" />
+		</taxRulesGroup>
+		
+		<taxRulesGroup name="MX Reduced Rate (11%)">
+			<taxRule iso_code_country="mx" id_tax="2" />
+		</taxRulesGroup>
+	</taxes>
+	<units>
+		<unit type="weight" value="kg" />
+		<unit type="volume" value="L" />
+		<unit type="short_distance" value="in" />
+		<unit type="base_distance" value="ft" />
+		<unit type="long_distance" value="mi" />
+	</units>
+</localizationPack>

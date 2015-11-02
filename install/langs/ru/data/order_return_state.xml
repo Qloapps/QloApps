@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<entity_order_return_state>
+  <order_return_state id="Waiting_for_confirmation">
+    <name>Ожидает подтверждения</name>
+  </order_return_state>
+  <order_return_state id="Waiting_for_package">
+    <name>Ожидает посылки</name>
+  </order_return_state>
+  <order_return_state id="Package_received">
+    <name>Посылка получена</name>
+  </order_return_state>
+  <order_return_state id="Return_denied">
+    <name>Возврат отклонен</name>
+  </order_return_state>
+  <order_return_state id="Return_completed">
+    <name>Возврат осуществлен</name>
+  </order_return_state>
+</entity_order_return_state>

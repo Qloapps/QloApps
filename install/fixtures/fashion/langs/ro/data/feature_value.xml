@@ -1,0 +1,102 @@
+<?xml version="1.0"?>
+<entity_feature_value>
+  <feature_value id="Polyester">
+    <value>Poliester</value>
+  </feature_value>
+  <feature_value id="Wool">
+    <value>Lână</value>
+  </feature_value>
+  <feature_value id="Viscose">
+    <value>Viscoză</value>
+  </feature_value>
+  <feature_value id="Elastane">
+    <value>Elastan</value>
+  </feature_value>
+  <feature_value id="Cotton">
+    <value>Bumbac</value>
+  </feature_value>
+  <feature_value id="Silk">
+    <value>Mătase</value>
+  </feature_value>
+  <feature_value id="Suede">
+    <value>Velur</value>
+  </feature_value>
+  <feature_value id="Straw">
+    <value>Croșet</value>
+  </feature_value>
+  <feature_value id="Leather">
+    <value>Piele</value>
+  </feature_value>
+  <feature_value id="Classic">
+    <value>Clasic</value>
+  </feature_value>
+  <feature_value id="Casual">
+    <value>Casual</value>
+  </feature_value>
+  <feature_value id="Military">
+    <value>Militar</value>
+  </feature_value>
+  <feature_value id="Girly">
+    <value>Adolescentin</value>
+  </feature_value>
+  <feature_value id="Rock">
+    <value>Rock</value>
+  </feature_value>
+  <feature_value id="Basic">
+    <value>Simplu</value>
+  </feature_value>
+  <feature_value id="Dressy">
+    <value>Elegant</value>
+  </feature_value>
+  <feature_value id="Short_Sleeve">
+    <value>Mâneci scurte</value>
+  </feature_value>
+  <feature_value id="Colorful_Dress">
+    <value>Culori vii</value>
+  </feature_value>
+  <feature_value id="Short_Dress">
+    <value>Rochie scurtă</value>
+  </feature_value>
+  <feature_value id="Midi_Dress">
+    <value>Rochie midi</value>
+  </feature_value>
+  <feature_value id="Maxi_Dress">
+    <value>Rochie maxi</value>
+  </feature_value>
+  <feature_value id="2_75_in">
+    <value>6,98 cm</value>
+  </feature_value>
+  <feature_value id="2_06_in">
+    <value>5,2 cm</value>
+  </feature_value>
+  <feature_value id="49_2_g">
+    <value>49,2 g</value>
+  </feature_value>
+  <feature_value id="0_26_in">
+    <value>0,66 cm</value>
+  </feature_value>
+  <feature_value id="1_07_in">
+    <value>2,72 cm</value>
+  </feature_value>
+  <feature_value id="1_62_in">
+    <value>4,1 cm</value>
+  </feature_value>
+  <feature_value id="15_5_g">
+    <value>15,5 g</value>
+  </feature_value>
+  <feature_value id="0_41_in_clip_included">
+    <value>1 cm (clip inclus)</value>
+  </feature_value>
+  <feature_value id="4_33_in">
+    <value>11 cm</value>
+  </feature_value>
+  <feature_value id="2_76_in">
+    <value>7 cm</value>
+  </feature_value>
+  <feature_value id="120g">
+    <value>120g</value>
+  </feature_value>
+  <feature_value id="0_31_in">
+    <value>0.79 cm</value>
+  </feature_value>
+</entity_feature_value>

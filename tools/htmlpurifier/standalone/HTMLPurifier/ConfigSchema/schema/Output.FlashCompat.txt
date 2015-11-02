@@ -1,0 +1,11 @@
+Output.FlashCompat
+TYPE: bool
+VERSION: 4.1.0
+DEFAULT: false
+--DESCRIPTION--
+<p>
+  If true, HTML Purifier will generate Internet Explorer compatibility
+  code for all object code.  This is highly recommended if you enable
+  %HTML.SafeObject.
+</p>
+--# vim: et sw=4 sts=4

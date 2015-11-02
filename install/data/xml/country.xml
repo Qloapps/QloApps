@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity_country>
+  <fields id="iso_code">
+    <field name="id_zone" relation="zone"/>
+    <field name="iso_code"/>
+    <field name="call_prefix"/>
+    <field name="active"/>
+    <field name="contains_states"/>
+    <field name="need_identification_number"/>
+    <field name="need_zip_code"/>
+    <field name="zip_code_format"/>
+    <field name="display_tax_label"/>
+  </fields>
+  <entities>
+    <country id="DE" id_zone="Europe" iso_code="DE" call_prefix="49" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="NNNNN" display_tax_label="1"/>
+    <country id="AT" id_zone="Europe" iso_code="AT" call_prefix="43" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="NNNN" display_tax_label="1"/>
+    <country id="BE" id_zone="Europe" iso_code="BE" call_prefix="32" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="NNNN" display_tax_label="1"/>
+    <country id="CA" id_zone="North_America" iso_code="CA" call_prefix="1" active="1" contains_states="1" need_identification_number="0" need_zip_code="1" zip_code_format="LNL NLN" display_tax_label="0"/>
+    <country id="CN" id_zone="Asia" iso_code="CN" call_prefix="86" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="NNNNNN" display_tax_label="1"/>
+    <country id="ES" id_zone="Europe" iso_code="ES" call_prefix="34" active="1" contains_states="0" need_identification_number="1" need_zip_code="1" zip_code_format="NNNNN" display_tax_label="1"/>
+    <country id="FI" id_zone="Europe" iso_code="FI" call_prefix="358" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="NNNNN" display_tax_label="1"/>
+    <country id="FR" id_zone="Europe" iso_code="FR" call_prefix="33" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="NNNNN" display_tax_label="1"/>
+    <country id="GR" id_zone="Europe" iso_code="GR" call_prefix="30" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="NNNNN" display_tax_label="1"/>
+    <country id="IT" id_zone="Europe" iso_code="IT" call_prefix="39" active="1" contains_states="1" need_identification_number="0" need_zip_code="1" zip_code_format="NNNNN" display_tax_label="1"/>
+    <country id="JP" id_zone="Asia" iso_code="JP" call_prefix="81" active="1" contains_states="1" need_identification_number="0" need_zip_code="1" zip_code_format="NNN-NNNN" display_tax_label="1"/>
+    <country id="LU" id_zone="Europe" iso_code="LU" call_prefix="352" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="NNNN" display_tax_label="1"/>
+    <country id="NL" id_zone="Europe" iso_code="NL" call_prefix="31" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="NNNN LL" display_tax_label="1"/>
+    <country id="PL" id_zone="Europe" iso_code="PL" call_prefix="48" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="NN-NNN" display_tax_label="1"/>
+    <country id="PT" id_zone="Europe" iso_code="PT" call_prefix="351" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="NNNN-NNN" display_tax_label="1"/>
+    <country id="CZ" id_zone="Europe" iso_code="CZ" call_prefix="420" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="NNN NN" display_tax_label="1"/>
+    <country id="GB" id_zone="Europe" iso_code="GB" call_prefix="44" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="SE" id_zone="Europe" iso_code="SE" call_prefix="46" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="NNN NN" display_tax_label="1"/>
+    <country id="CH" id_zone="Europe_out_E_U" iso_code="CH" call_prefix="41" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="NNNN" display_tax_label="1"/>
+    <country id="DK" id_zone="Europe" iso_code="DK" call_prefix="45" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="NNNN" display_tax_label="1"/>
+    <country id="US" id_zone="North_America" iso_code="US" call_prefix="1" active="1" contains_states="1" need_identification_number="0" need_zip_code="1" zip_code_format="NNNNN" display_tax_label="0"/>
+    <country id="HK" id_zone="Asia" iso_code="HK" call_prefix="852" active="1" contains_states="0" need_identification_number="0" need_zip_code="0" zip_code_format="" display_tax_label="1"/>
+    <country id="NO" id_zone="Europe_out_E_U" iso_code="NO" call_prefix="47" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="NNNN" display_tax_label="1"/>
+    <country id="AU" id_zone="Oceania" iso_code="AU" call_prefix="61" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="NNNN" display_tax_label="1"/>
+    <country id="SG" id_zone="Asia" iso_code="SG" call_prefix="65" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="NNNNNN" display_tax_label="1"/>
+    <country id="IE" id_zone="Europe" iso_code="IE" call_prefix="353" active="1" contains_states="0" need_identification_number="0" need_zip_code="0" zip_code_format="" display_tax_label="1"/>
+    <country id="NZ" id_zone="Oceania" iso_code="NZ" call_prefix="64" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="NNNN" display_tax_label="1"/>
+    <country id="KR" id_zone="Asia" iso_code="KR" call_prefix="82" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="NNN-NNN" display_tax_label="1"/>
+    <country id="IL" id_zone="Asia" iso_code="IL" call_prefix="972" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="NNNNNNN" display_tax_label="1"/>
+    <country id="ZA" id_zone="Africa" iso_code="ZA" call_prefix="27" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="NNNN" display_tax_label="1"/>
+    <country id="NG" id_zone="Africa" iso_code="NG" call_prefix="234" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="CI" id_zone="Africa" iso_code="CI" call_prefix="225" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="TG" id_zone="Africa" iso_code="TG" call_prefix="228" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="BO" id_zone="South_America" iso_code="BO" call_prefix="591" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="MU" id_zone="Africa" iso_code="MU" call_prefix="230" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="RO" id_zone="Europe" iso_code="RO" call_prefix="40" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="NNNNNN" display_tax_label="1"/>
+    <country id="SK" id_zone="Europe" iso_code="SK" call_prefix="421" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="NNN NN" display_tax_label="1"/>
+    <country id="DZ" id_zone="Africa" iso_code="DZ" call_prefix="213" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="NNNNN" display_tax_label="1"/>
+    <country id="AS" id_zone="North_America" iso_code="AS" call_prefix="0" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="AD" id_zone="Europe_out_E_U" iso_code="AD" call_prefix="376" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="CNNN" display_tax_label="1"/>
+    <country id="AO" id_zone="Africa" iso_code="AO" call_prefix="244" active="1" contains_states="0" need_identification_number="0" need_zip_code="0" zip_code_format="" display_tax_label="1"/>
+    <country id="AI" id_zone="Central_America_Antilla" iso_code="AI" call_prefix="0" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="AG" id_zone="North_America" iso_code="AG" call_prefix="0" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="AR" id_zone="South_America" iso_code="AR" call_prefix="54" active="1" contains_states="1" need_identification_number="0" need_zip_code="1" zip_code_format="LNNNN" display_tax_label="1"/>
+    <country id="AM" id_zone="Asia" iso_code="AM" call_prefix="374" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="NNNN" display_tax_label="1"/>
+    <country id="AW" id_zone="Central_America_Antilla" iso_code="AW" call_prefix="297" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="AZ" id_zone="Asia" iso_code="AZ" call_prefix="994" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="CNNNN" display_tax_label="1"/>
+    <country id="BS" id_zone="North_America" iso_code="BS" call_prefix="0" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="BH" id_zone="Asia" iso_code="BH" call_prefix="973" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="BD" id_zone="Asia" iso_code="BD" call_prefix="880" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="NNNN" display_tax_label="1"/>
+    <country id="BB" id_zone="North_America" iso_code="BB" call_prefix="0" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="CNNNNN" display_tax_label="1"/>
+    <country id="BY" id_zone="Europe_out_E_U" iso_code="BY" call_prefix="0" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="NNNNNN" display_tax_label="1"/>
+    <country id="BZ" id_zone="Central_America_Antilla" iso_code="BZ" call_prefix="501" active="1" contains_states="0" need_identification_number="0" need_zip_code="0" zip_code_format="" display_tax_label="1"/>
+    <country id="BJ" id_zone="Africa" iso_code="BJ" call_prefix="229" active="1" contains_states="0" need_identification_number="0" need_zip_code="0" zip_code_format="" display_tax_label="1"/>
+    <country id="BM" id_zone="North_America" iso_code="BM" call_prefix="0" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="BT" id_zone="Asia" iso_code="BT" call_prefix="975" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="BW" id_zone="Africa" iso_code="BW" call_prefix="267" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="BR" id_zone="South_America" iso_code="BR" call_prefix="55" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="NNNNN-NNN" display_tax_label="1"/>
+    <country id="BN" id_zone="Asia" iso_code="BN" call_prefix="673" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="LLNNNN" display_tax_label="1"/>
+    <country id="BF" id_zone="Africa" iso_code="BF" call_prefix="226" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="MM" id_zone="Asia" iso_code="MM" call_prefix="95" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="BI" id_zone="Africa" iso_code="BI" call_prefix="257" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="KH" id_zone="Asia" iso_code="KH" call_prefix="855" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="NNNNN" display_tax_label="1"/>
+    <country id="CM" id_zone="Africa" iso_code="CM" call_prefix="237" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="CV" id_zone="Africa" iso_code="CV" call_prefix="238" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="NNNN" display_tax_label="1"/>
+    <country id="CF" id_zone="Africa" iso_code="CF" call_prefix="236" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="TD" id_zone="Africa" iso_code="TD" call_prefix="235" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="CL" id_zone="South_America" iso_code="CL" call_prefix="56" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="NNN-NNNN" display_tax_label="1"/>
+    <country id="CO" id_zone="South_America" iso_code="CO" call_prefix="57" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="NNNNNN" display_tax_label="1"/>
+    <country id="KM" id_zone="Africa" iso_code="KM" call_prefix="269" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="CD" id_zone="Africa" iso_code="CD" call_prefix="242" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="CG" id_zone="Africa" iso_code="CG" call_prefix="243" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="CR" id_zone="Central_America_Antilla" iso_code="CR" call_prefix="506" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="NNNNN" display_tax_label="1"/>
+    <country id="HR" id_zone="Europe_out_E_U" iso_code="HR" call_prefix="385" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="NNNNN" display_tax_label="1"/>
+    <country id="CU" id_zone="Central_America_Antilla" iso_code="CU" call_prefix="53" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="CY" id_zone="Europe" iso_code="CY" call_prefix="357" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="NNNN" display_tax_label="1"/>
+    <country id="DJ" id_zone="Africa" iso_code="DJ" call_prefix="253" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="DM" id_zone="Central_America_Antilla" iso_code="DM" call_prefix="0" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="DO" id_zone="Central_America_Antilla" iso_code="DO" call_prefix="0" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="TL" id_zone="Asia" iso_code="TL" call_prefix="670" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="EC" id_zone="South_America" iso_code="EC" call_prefix="593" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="CNNNNNN" display_tax_label="1"/>
+    <country id="EG" id_zone="Africa" iso_code="EG" call_prefix="20" active="1" contains_states="0" need_identification_number="0" need_zip_code="0" zip_code_format="" display_tax_label="1"/>
+    <country id="SV" id_zone="Central_America_Antilla" iso_code="SV" call_prefix="503" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="GQ" id_zone="Africa" iso_code="GQ" call_prefix="240" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="ER" id_zone="Africa" iso_code="ER" call_prefix="291" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="EE" id_zone="Europe" iso_code="EE" call_prefix="372" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="NNNNN" display_tax_label="1"/>
+    <country id="ET" id_zone="Africa" iso_code="ET" call_prefix="251" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="FK" id_zone="Central_America_Antilla" iso_code="FK" call_prefix="0" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="LLLL NLL" display_tax_label="1"/>
+    <country id="FO" id_zone="Europe_out_E_U" iso_code="FO" call_prefix="298" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="FJ" id_zone="Oceania" iso_code="FJ" call_prefix="679" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="GA" id_zone="Africa" iso_code="GA" call_prefix="241" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="GM" id_zone="Africa" iso_code="GM" call_prefix="220" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="GE" id_zone="Asia" iso_code="GE" call_prefix="995" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="NNNN" display_tax_label="1"/>
+    <country id="GH" id_zone="Africa" iso_code="GH" call_prefix="233" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="GD" id_zone="Central_America_Antilla" iso_code="GD" call_prefix="0" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="GL" id_zone="Europe_out_E_U" iso_code="GL" call_prefix="299" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="GI" id_zone="Europe_out_E_U" iso_code="GI" call_prefix="350" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="GP" id_zone="Central_America_Antilla" iso_code="GP" call_prefix="590" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="GU" id_zone="Oceania" iso_code="GU" call_prefix="0" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="GT" id_zone="Central_America_Antilla" iso_code="GT" call_prefix="502" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="GG" id_zone="Europe_out_E_U" iso_code="GG" call_prefix="0" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="LLN NLL" display_tax_label="1"/>
+    <country id="GN" id_zone="Africa" iso_code="GN" call_prefix="224" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="GW" id_zone="Africa" iso_code="GW" call_prefix="245" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="GY" id_zone="South_America" iso_code="GY" call_prefix="592" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="HT" id_zone="Central_America_Antilla" iso_code="HT" call_prefix="509" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="HM" id_zone="Oceania" iso_code="HM" call_prefix="0" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="VA" id_zone="Europe_out_E_U" iso_code="VA" call_prefix="379" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="NNNNN" display_tax_label="1"/>
+    <country id="HN" id_zone="Central_America_Antilla" iso_code="HN" call_prefix="504" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="IS" id_zone="Europe_out_E_U" iso_code="IS" call_prefix="354" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="NNN" display_tax_label="1"/>
+    <country id="IN" id_zone="Asia" iso_code="IN" call_prefix="91" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="NNN NNN" display_tax_label="1"/>
+    <country id="ID" id_zone="Asia" iso_code="ID" call_prefix="62" active="1" contains_states="1" need_identification_number="0" need_zip_code="1" zip_code_format="NNNNN" display_tax_label="1"/>
+    <country id="IR" id_zone="Asia" iso_code="IR" call_prefix="98" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="NNNNN-NNNNN" display_tax_label="1"/>
+    <country id="IQ" id_zone="Asia" iso_code="IQ" call_prefix="964" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="NNNNN" display_tax_label="1"/>
+    <country id="IM" id_zone="Europe_out_E_U" iso_code="IM" call_prefix="0" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="CN NLL" display_tax_label="1"/>
+    <country id="JM" id_zone="Central_America_Antilla" iso_code="JM" call_prefix="0" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="JE" id_zone="Europe_out_E_U" iso_code="JE" call_prefix="0" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="CN NLL" display_tax_label="1"/>
+    <country id="JO" id_zone="Asia" iso_code="JO" call_prefix="962" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="KZ" id_zone="Asia" iso_code="KZ" call_prefix="7" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="NNNNNN" display_tax_label="1"/>
+    <country id="KE" id_zone="Africa" iso_code="KE" call_prefix="254" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="KI" id_zone="Oceania" iso_code="KI" call_prefix="686" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="KP" id_zone="Asia" iso_code="KP" call_prefix="850" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="KW" id_zone="Asia" iso_code="KW" call_prefix="965" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="KG" id_zone="Asia" iso_code="KG" call_prefix="996" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="LA" id_zone="Asia" iso_code="LA" call_prefix="856" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="LV" id_zone="Europe" iso_code="LV" call_prefix="371" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="C-NNNN" display_tax_label="1"/>
+    <country id="LB" id_zone="Asia" iso_code="LB" call_prefix="961" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="LS" id_zone="Africa" iso_code="LS" call_prefix="266" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="LR" id_zone="Africa" iso_code="LR" call_prefix="231" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="LY" id_zone="Africa" iso_code="LY" call_prefix="218" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="LI" id_zone="Europe" iso_code="LI" call_prefix="423" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="NNNN" display_tax_label="1"/>
+    <country id="LT" id_zone="Europe" iso_code="LT" call_prefix="370" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="NNNNN" display_tax_label="1"/>
+    <country id="MO" id_zone="Asia" iso_code="MO" call_prefix="853" active="1" contains_states="0" need_identification_number="0" need_zip_code="0" zip_code_format="" display_tax_label="1"/>
+    <country id="MK" id_zone="Europe_out_E_U" iso_code="MK" call_prefix="389" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="MG" id_zone="Africa" iso_code="MG" call_prefix="261" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="MW" id_zone="Africa" iso_code="MW" call_prefix="265" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="MY" id_zone="Asia" iso_code="MY" call_prefix="60" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="NNNNN" display_tax_label="1"/>
+    <country id="MV" id_zone="Asia" iso_code="MV" call_prefix="960" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="ML" id_zone="Africa" iso_code="ML" call_prefix="223" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="MT" id_zone="Europe" iso_code="MT" call_prefix="356" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="LLL NNNN" display_tax_label="1"/>
+    <country id="MH" id_zone="Oceania" iso_code="MH" call_prefix="692" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="MQ" id_zone="Central_America_Antilla" iso_code="MQ" call_prefix="596" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="MR" id_zone="Africa" iso_code="MR" call_prefix="222" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="HU" id_zone="Europe" iso_code="HU" call_prefix="36" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="NNNN" display_tax_label="1"/>
+    <country id="YT" id_zone="Africa" iso_code="YT" call_prefix="262" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="MX" id_zone="North_America" iso_code="MX" call_prefix="52" active="1" contains_states="1" need_identification_number="1" need_zip_code="1" zip_code_format="NNNNN" display_tax_label="1"/>
+    <country id="FM" id_zone="Oceania" iso_code="FM" call_prefix="691" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="MD" id_zone="Europe_out_E_U" iso_code="MD" call_prefix="373" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="C-NNNN" display_tax_label="1"/>
+    <country id="MC" id_zone="Europe_out_E_U" iso_code="MC" call_prefix="377" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="980NN" display_tax_label="1"/>
+    <country id="MN" id_zone="Asia" iso_code="MN" call_prefix="976" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="ME" id_zone="Europe_out_E_U" iso_code="ME" call_prefix="382" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="NNNNN" display_tax_label="1"/>
+    <country id="MS" id_zone="Central_America_Antilla" iso_code="MS" call_prefix="0" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="MA" id_zone="Africa" iso_code="MA" call_prefix="212" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="NNNNN" display_tax_label="1"/>
+    <country id="MZ" id_zone="Africa" iso_code="MZ" call_prefix="258" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="NA" id_zone="Africa" iso_code="NA" call_prefix="264" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="NR" id_zone="Oceania" iso_code="NR" call_prefix="674" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="NP" id_zone="Asia" iso_code="NP" call_prefix="977" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="AN" id_zone="Central_America_Antilla" iso_code="AN" call_prefix="599" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="NC" id_zone="Oceania" iso_code="NC" call_prefix="687" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="NI" id_zone="Central_America_Antilla" iso_code="NI" call_prefix="505" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="NNNNNN" display_tax_label="1"/>
+    <country id="NE" id_zone="Africa" iso_code="NE" call_prefix="227" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="NU" id_zone="Oceania" iso_code="NU" call_prefix="683" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="NF" id_zone="Oceania" iso_code="NF" call_prefix="0" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="MP" id_zone="Oceania" iso_code="MP" call_prefix="0" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="OM" id_zone="Asia" iso_code="OM" call_prefix="968" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="PK" id_zone="Asia" iso_code="PK" call_prefix="92" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="PW" id_zone="Oceania" iso_code="PW" call_prefix="680" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="PS" id_zone="Asia" iso_code="PS" call_prefix="0" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="PA" id_zone="Central_America_Antilla" iso_code="PA" call_prefix="507" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="NNNNNN" display_tax_label="1"/>
+    <country id="PG" id_zone="Oceania" iso_code="PG" call_prefix="675" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="PY" id_zone="South_America" iso_code="PY" call_prefix="595" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="PE" id_zone="South_America" iso_code="PE" call_prefix="51" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="PH" id_zone="Asia" iso_code="PH" call_prefix="63" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="NNNN" display_tax_label="1"/>
+    <country id="PN" id_zone="Oceania" iso_code="PN" call_prefix="0" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="LLLL NLL" display_tax_label="1"/>
+    <country id="PR" id_zone="Central_America_Antilla" iso_code="PR" call_prefix="0" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="NNNNN" display_tax_label="1"/>
+    <country id="QA" id_zone="Asia" iso_code="QA" call_prefix="974" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="RE" id_zone="Africa" iso_code="RE" call_prefix="262" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="RU" id_zone="Europe_out_E_U" iso_code="RU" call_prefix="7" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="NNNNNN" display_tax_label="1"/>
+    <country id="RW" id_zone="Africa" iso_code="RW" call_prefix="250" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="BL" id_zone="Central_America_Antilla" iso_code="BL" call_prefix="0" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="KN" id_zone="Central_America_Antilla" iso_code="KN" call_prefix="0" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="LC" id_zone="Central_America_Antilla" iso_code="LC" call_prefix="0" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="MF" id_zone="Central_America_Antilla" iso_code="MF" call_prefix="0" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="PM" id_zone="Central_America_Antilla" iso_code="PM" call_prefix="508" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="VC" id_zone="Central_America_Antilla" iso_code="VC" call_prefix="0" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="WS" id_zone="Oceania" iso_code="WS" call_prefix="685" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="SM" id_zone="Europe_out_E_U" iso_code="SM" call_prefix="378" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="NNNNN" display_tax_label="1"/>
+    <country id="ST" id_zone="Africa" iso_code="ST" call_prefix="239" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="SA" id_zone="Asia" iso_code="SA" call_prefix="966" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="SN" id_zone="Africa" iso_code="SN" call_prefix="221" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="RS" id_zone="Europe_out_E_U" iso_code="RS" call_prefix="381" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="NNNNN" display_tax_label="1"/>
+    <country id="SC" id_zone="Africa" iso_code="SC" call_prefix="248" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="SL" id_zone="Africa" iso_code="SL" call_prefix="232" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="SI" id_zone="Europe" iso_code="SI" call_prefix="386" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="C-NNNN" display_tax_label="1"/>
+    <country id="SB" id_zone="Oceania" iso_code="SB" call_prefix="677" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="SO" id_zone="Africa" iso_code="SO" call_prefix="252" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="GS" id_zone="Central_America_Antilla" iso_code="GS" call_prefix="0" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="LLLL NLL" display_tax_label="1"/>
+    <country id="LK" id_zone="Asia" iso_code="LK" call_prefix="94" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="NNNNN" display_tax_label="1"/>
+    <country id="SD" id_zone="Africa" iso_code="SD" call_prefix="249" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="SR" id_zone="Central_America_Antilla" iso_code="SR" call_prefix="597" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="SJ" id_zone="Europe_out_E_U" iso_code="SJ" call_prefix="0" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="SZ" id_zone="Africa" iso_code="SZ" call_prefix="268" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="SY" id_zone="Asia" iso_code="SY" call_prefix="963" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="TW" id_zone="Asia" iso_code="TW" call_prefix="886" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="NNNNN" display_tax_label="1"/>
+    <country id="TJ" id_zone="Asia" iso_code="TJ" call_prefix="992" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="TZ" id_zone="Africa" iso_code="TZ" call_prefix="255" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="TH" id_zone="Asia" iso_code="TH" call_prefix="66" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="NNNNN" display_tax_label="1"/>
+    <country id="TK" id_zone="Oceania" iso_code="TK" call_prefix="690" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="TO" id_zone="Oceania" iso_code="TO" call_prefix="676" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="TT" id_zone="South_America" iso_code="TT" call_prefix="0" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="TN" id_zone="Africa" iso_code="TN" call_prefix="216" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="TR" id_zone="Europe_out_E_U" iso_code="TR" call_prefix="90" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="NNNNN" display_tax_label="1"/>
+    <country id="TM" id_zone="Asia" iso_code="TM" call_prefix="993" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="TC" id_zone="Central_America_Antilla" iso_code="TC" call_prefix="0" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="LLLL NLL" display_tax_label="1"/>
+    <country id="TV" id_zone="Oceania" iso_code="TV" call_prefix="688" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="UG" id_zone="Africa" iso_code="UG" call_prefix="256" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="UA" id_zone="Europe" iso_code="UA" call_prefix="380" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="NNNNN" display_tax_label="1"/>
+    <country id="AE" id_zone="Asia" iso_code="AE" call_prefix="971" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="UY" id_zone="South_America" iso_code="UY" call_prefix="598" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="UZ" id_zone="Asia" iso_code="UZ" call_prefix="998" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="VU" id_zone="Oceania" iso_code="VU" call_prefix="678" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="VE" id_zone="South_America" iso_code="VE" call_prefix="58" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="VN" id_zone="Asia" iso_code="VN" call_prefix="84" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="NNNNNN" display_tax_label="1"/>
+    <country id="VG" id_zone="North_America" iso_code="VG" call_prefix="0" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="CNNNN" display_tax_label="1"/>
+    <country id="VI" id_zone="North_America" iso_code="VI" call_prefix="0" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="WF" id_zone="Oceania" iso_code="WF" call_prefix="681" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="EH" id_zone="Africa" iso_code="EH" call_prefix="0" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="YE" id_zone="Asia" iso_code="YE" call_prefix="967" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="ZM" id_zone="Africa" iso_code="ZM" call_prefix="260" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="ZW" id_zone="Africa" iso_code="ZW" call_prefix="263" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="AL" id_zone="Europe_out_E_U" iso_code="AL" call_prefix="355" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="NNNN" display_tax_label="1"/>
+    <country id="AF" id_zone="Asia" iso_code="AF" call_prefix="93" active="1" contains_states="0" need_identification_number="0" need_zip_code="0" zip_code_format="" display_tax_label="1"/>
+    <country id="AQ" id_zone="Oceania" iso_code="AQ" call_prefix="0" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="BA" id_zone="Europe" iso_code="BA" call_prefix="387" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="BV" id_zone="Oceania" iso_code="BV" call_prefix="0" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="IO" id_zone="Oceania" iso_code="IO" call_prefix="0" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="LLLL NLL" display_tax_label="1"/>
+    <country id="BG" id_zone="Europe" iso_code="BG" call_prefix="359" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="NNNN" display_tax_label="1"/>
+    <country id="KY" id_zone="Central_America_Antilla" iso_code="KY" call_prefix="0" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="CX" id_zone="Asia" iso_code="CX" call_prefix="0" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="CC" id_zone="Asia" iso_code="CC" call_prefix="0" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="CK" id_zone="Oceania" iso_code="CK" call_prefix="682" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="GF" id_zone="South_America" iso_code="GF" call_prefix="594" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="PF" id_zone="Oceania" iso_code="PF" call_prefix="689" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="TF" id_zone="Oceania" iso_code="TF" call_prefix="0" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="" display_tax_label="1"/>
+    <country id="AX" id_zone="Europe_out_E_U" iso_code="AX" call_prefix="0" active="1" contains_states="0" need_identification_number="0" need_zip_code="1" zip_code_format="NNNNN" display_tax_label="1"/>
+  </entities>
+</entity_country>

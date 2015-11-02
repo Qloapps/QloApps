@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity_tab>
+  <tab id="Dashboard" name="לוח מחוונים"/>
+  <tab id="CMS_Pages" name="עמודי תוכן"/>
+  <tab id="CMS_Categories" name="קטגוריות עמודות תוכן"/>
+  <tab id="Combinations_Generator" name="מחולל צירופים"/>
+  <tab id="Search" name="חפש"/>
+  <tab id="Login" name="כניסה"/>
+  <tab id="Shops" name="חנויות"/>
+  <tab id="Shop_URLs" name="קישורי החנות"/>
+  <tab id="Catalog" name="קטלוג"/>
+  <tab id="Orders" name="הזמנות"/>
+  <tab id="Customers" name="לקוחות"/>
+  <tab id="Price_Rules" name="כללי תמחור"/>
+  <tab id="Shipping" name="משלוחים"/>
+  <tab id="Localization" name="לוקליזיה"/>
+  <tab id="Modules" name="מודולים"/>
+  <tab id="Preferences" name="העדפות"/>
+  <tab id="Advanced_Parameters" name="פרמטרים מתקדמים"/>
+  <tab id="Administration" name="ניהול"/>
+  <tab id="Stats" name="סטטיסטיקות"/>
+  <tab id="Stock" name="מלאי"/>
+  <tab id="Products" name="מוצרים"/>
+  <tab id="Categories" name="קטגוריות"/>
+  <tab id="Monitoring" name="בקרה"/>
+  <tab id="Attributes_and_Values" name="מאפייני מוצר"/>
+  <tab id="Features" name="תכונות מוצר"/>
+  <tab id="Manufacturers" name="יצרנים"/>
+  <tab id="Suppliers" name="ספקים"/>
+  <tab id="Tags" name="תגיות"/>
+  <tab id="Attachments" name="קבצים מצורפים"/>
+  <tab id="Orders_1" name="הזמנות"/>
+  <tab id="Invoices" name="חשבוניות"/>
+  <tab id="Merchandise_Returns" name="החזרת מוצרים"/>
+  <tab id="Delivery_Slips" name="שוברי משלוח"/>
+  <tab id="Credit_Slips" name="שוברי זיכוי"/>
+  <tab id="Statuses" name="סטטוסי הזמנה ומלאי"/>
+  <tab id="Order_Messages" name="תבניות עבור הודעות הזמנה"/>
+  <tab id="Customers_1" name="לקוחות"/>
+  <tab id="Addresses" name="כתובות"/>
+  <tab id="Groups" name="קבוצות"/>
+  <tab id="Shopping_Carts" name="עגלות קניה"/>
+  <tab id="Customer_Service" name="שירות לקוחות"/>
+  <tab id="Contacts" name="ממשקי יצירת קשר"/>
+  <tab id="Titles" name="תארים/כותרות"/>
+  <tab id="Outstanding" name="יוצאי דופן"/>
+  <tab id="Cart_Rules" name="כללי עגלת קניות"/>
+  <tab id="Catalog_Price_Rules" name="כללי תמחור עבור קטלוג המוצרים"/>
+  <tab id="Marketing" name="שיווק"/>
+  <tab id="Shipping_1" name="העדפות"/>
+  <tab id="Carriers" name="מובילים"/>
+  <tab id="Localization_1" name="לוקליזציה"/>
+  <tab id="Languages" name="שפות"/>
+  <tab id="Zones" name="איזורים"/>
+  <tab id="Countries" name="ארצות"/>
+  <tab id="States" name="מדינות"/>
+  <tab id="Currencies" name="מטבעות"/>
+  <tab id="Taxes" name="מיסים"/>
+  <tab id="Tax_Rules" name="כללי מס"/>
+  <tab id="Translations" name="תרגומים"/>
+  <tab id="Modules_1" name="מודולים"/>
+  <tab id="Modules_Themes_Catalog" name="קטלוג מודולים וערכות עיצוב"/>
+  <tab id="Positions" name="מיקומים"/>
+  <tab id="Payment" name="תשלום"/>
+  <tab id="General" name="כללי"/>
+  <tab id="Orders_2" name="הזמנות"/>
+  <tab id="Products_1" name="מוצרים"/>
+  <tab id="Customers_2" name="לקוחות"/>
+  <tab id="Themes" name="ערכות עיצוב"/>
+  <tab id="SEO_URLs" name="כתובות וקידום אתרים"/>
+  <tab id="CMS" name="עמודי תוכן"/>
+  <tab id="Images" name="תמונות"/>
+  <tab id="Store_Contacts" name="פרטי יצירת קשר"/>
+  <tab id="Search_1" name="חפש"/>
+  <tab id="Maintenance" name="תחזוקה"/>
+  <tab id="Geolocation" name="מיקום גיאוגרפי"/>
+  <tab id="Configuration_Information" name="מידע תצורה"/>
+  <tab id="Performance" name="ביצועים"/>
+  <tab id="E-mail" name="מיילים"/>
+  <tab id="Multistore" name="ריבוי חנויות"/>
+  <tab id="CSV_Import" name="יבוא קבצי CSV"/>
+  <tab id="DB_Backup" name="גיבוי מסד נתונים"/>
+  <tab id="SQL_Manager" name="ניהול SQL"/>
+  <tab id="Logs" name="קובצי לוג"/>
+  <tab id="Webservice" name="שירות רשת"/>
+  <tab id="Preferences_1" name="העדפות"/>
+  <tab id="Quick_Access" name="גישה מהירה"/>
+  <tab id="Employees" name="עובדים"/>
+  <tab id="Profiles" name="פרופילים"/>
+  <tab id="Permissions" name="הרשאות"/>
+  <tab id="Menus" name="תפריטים"/>
+  <tab id="Stats_1" name="סטטיסטיקות"/>
+  <tab id="Search_Engines" name="מנועי חיפוש"/>
+  <tab id="Referrers" name="הפניות"/>
+  <tab id="Warehouses" name="מחסנים"/>
+  <tab id="Stock_Management" name="ניהול מלאי"/>
+  <tab id="Stock_Movement" name="תנועות מלאי"/>
+  <tab id="Instant_Stock_Status" name="מצב מלאי מיידי"/>
+  <tab id="Stock_Coverage" name="זמינות מלאי"/>
+  <tab id="Supply_orders" name="הזמנות אספקה"/>
+  <tab id="Configuration" name="הגדרות"/>
+  <tab id="CarrierWizard" name="מובילים"/>
+</entity_tab>

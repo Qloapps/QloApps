@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<entity_risk>
+  <risk id="None" name="Нет"/>
+  <risk id="Low" name="Низкий"/>
+  <risk id="Medium" name="Средний"/>
+  <risk id="High" name="Высокий"/>
+</entity_risk>

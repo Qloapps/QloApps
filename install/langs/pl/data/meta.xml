@@ -1,0 +1,165 @@
+<?xml version="1.0"?>
+<entity_meta>
+  <meta id="404" id_shop="1">
+    <title>Błąd 404</title>
+    <description>Nie można odnaleźć strony</description>
+    <keywords>błąd, 404, nie znaleziono </keywords>
+    <url_rewrite>nie-znaleziono-strony</url_rewrite>
+  </meta>
+  <meta id="best-sales" id_shop="1">
+    <title>Najczęściej kupowane</title>
+    <description>Nasze najlepsze sprzedaże</description>
+    <keywords>Najczęściej kupowane</keywords>
+    <url_rewrite>najczesciej-kupowane</url_rewrite>
+  </meta>
+  <meta id="contact" id_shop="1">
+    <title>Skontaktuj się z nami</title>
+    <description>Skorzystaj z formularza kontaktowego</description>
+    <keywords>kontakt,e-mail</keywords>
+    <url_rewrite>kontakt</url_rewrite>
+  </meta>
+  <meta id="index" id_shop="1">
+    <title/>
+    <description>Sklep na oprogramowaniu PrestaShop</description>
+    <keywords>sklep, prestashop</keywords>
+    <url_rewrite/>
+  </meta>
+  <meta id="manufacturer" id_shop="1">
+    <title>Producenci</title>
+    <description>Lista producentów</description>
+    <keywords>producent</keywords>
+    <url_rewrite>producenci</url_rewrite>
+  </meta>
+  <meta id="new-products" id_shop="1">
+    <title>Nowe produkty</title>
+    <description>Nasze nowe produkty</description>
+    <keywords>nowe, produkty</keywords>
+    <url_rewrite>nowe-produkty</url_rewrite>
+  </meta>
+  <meta id="password" id_shop="1">
+    <title>Przypomnienie hasła</title>
+    <description>Wpisz swój adres e-mail w celu uzyskania nowego hasła</description>
+    <keywords>przypomnienie, hasło, e-mail, nowy</keywords>
+    <url_rewrite>odzyskiwanie-hasla</url_rewrite>
+  </meta>
+  <meta id="prices-drop" id_shop="1">
+    <title>Promocje</title>
+    <description>Produkty w promocji</description>
+    <keywords>promocje, specjalne, spadek ceny</keywords>
+    <url_rewrite>promocje</url_rewrite>
+  </meta>
+  <meta id="sitemap" id_shop="1">
+    <title>Mapa strony</title>
+    <description>Zagubiłeś się? Znajdź to, czego szukasz!</description>
+    <keywords>mapa strony</keywords>
+    <url_rewrite>mapa-strony</url_rewrite>
+  </meta>
+  <meta id="supplier" id_shop="1">
+    <title>Dostawcy</title>
+    <description>Lista dostawców</description>
+    <keywords>dostawca</keywords>
+    <url_rewrite>dostawcy</url_rewrite>
+  </meta>
+  <meta id="address" id_shop="1">
+    <title>Adres</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>adres</url_rewrite>
+  </meta>
+  <meta id="addresses" id_shop="1">
+    <title>Adresy</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>adresy</url_rewrite>
+  </meta>
+  <meta id="authentication" id_shop="1">
+    <title>Logowanie</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>logowanie</url_rewrite>
+  </meta>
+  <meta id="cart" id_shop="1">
+    <title>Koszyk</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>koszyk</url_rewrite>
+  </meta>
+  <meta id="discount" id_shop="1">
+    <title>Rabaty</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>rabaty</url_rewrite>
+  </meta>
+  <meta id="history" id_shop="1">
+    <title>Historia zamówień</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>historia-zamowien</url_rewrite>
+  </meta>
+  <meta id="identity" id_shop="1">
+    <title>Dane osobiste</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>dane-osobiste</url_rewrite>
+  </meta>
+  <meta id="my-account" id_shop="1">
+    <title>Moje konto</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>moje-konto</url_rewrite>
+  </meta>
+  <meta id="order-follow" id_shop="1">
+    <title>Śledzenie zamówienia</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>sledzenie-zamowienia</url_rewrite>
+  </meta>
+  <meta id="order-slip" id_shop="1">
+    <title>Pokwitowania</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>pokwitowania</url_rewrite>
+  </meta>
+  <meta id="order" id_shop="1">
+    <title>Zamówienie</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>zamowienie</url_rewrite>
+  </meta>
+  <meta id="search" id_shop="1">
+    <title>Szukaj</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>szukaj</url_rewrite>
+  </meta>
+  <meta id="stores" id_shop="1">
+    <title>sklepy</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>sklepy</url_rewrite>
+  </meta>
+  <meta id="order-opc" id_shop="1">
+    <title>Zamówienie</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>szybkie-zakupy</url_rewrite>
+  </meta>
+  <meta id="guest-tracking" id_shop="1">
+    <title>Śledzenie zamówień gości</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>sledzenie-zamowienia-gosc</url_rewrite>
+  </meta>
+  <meta id="order-confirmation" id_shop="1">
+    <title>Potwierdzenie zamówienia</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>potwierdzenie-zamowienia</url_rewrite>
+  </meta>
+  <meta id="products-comparison" id_shop="1">
+    <title>Products Comparison</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>products-comparison</url_rewrite>
+  </meta>
+</entity_meta>

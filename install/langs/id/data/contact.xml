@@ -1,0 +1,9 @@
+<?xml version='1.0'?>
+<entity_contact>
+  <contact id='Webmaster' name='Webmaster'>
+    <description>Jika terdapat masalah teknis di website kami</description>
+  </contact>
+  <contact id='Customer_service' name='Customer service'>
+    <description>Untuk pertanyaan seputar produk dan pembelian</description>
+  </contact>
+</entity_contact>

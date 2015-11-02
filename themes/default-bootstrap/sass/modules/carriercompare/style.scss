@@ -1,0 +1,88 @@
+@import '../../_theme_variables';
+#compare_shipping {
+
+	.form-group {
+		line-height:normal;
+		margin-bottom:10px;
+
+		label {margin-bottom:6px;}
+
+		.form-control {
+			width:263px;
+		}
+
+		&.last {
+			margin-bottom:20px;
+			input {margin-bottom:3px;}
+		}
+	}
+
+	.table {
+		background:$light-background;
+
+		thead {
+
+			tr {
+
+				th {
+					background:$light-background;
+					padding:4px 10px 3px 10px;
+				}
+			}
+		}
+		tbody {
+
+			td {
+				margin:0;
+
+				&.carrier_action {
+					width:54px;
+					padding-left:0;
+					padding-right:0;
+					text-align:center;
+
+					input {
+						margin:0;
+					}
+				}
+			}
+		}
+	}
+}
+#availableCarriers {
+
+	.table {
+		margin-bottom:20px;
+	}
+}
+#compare_shipping ul#carriercompare_errors_list {
+	color: red;
+}
+#compare_shipping_form { padding-bottom:20px;}
+#compare_shipping ul#carriercompare_errors_list li {
+	margin-left: 30px;
+	text-decoration: none;
+	list-style: none;
+}
+
+#SE_AjaxDisplay
+{
+	text-align: center;
+	display: none;
+}
+
+#SE_AjaxDisplay img
+{
+	width: 15px;
+}
+.SE_SubmitRefreshCard {
+
+	button {
+		float:left;
+
+		&#carriercompare_submit {
+			margin-right:10px;
+		}
+	}
+}
+#carriercompare_errors {display:none;}

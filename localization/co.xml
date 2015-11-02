@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<localizationPack name="Colombia" version="1.0">
+	<currencies>
+		<currency name="Peso" iso_code="COP" iso_code_num="170" sign="$" blank="1" conversion_rate="2457.29" format="2" decimals="1" />
+	</currencies>
+	<languages>
+		<language iso_code="es" />
+	</languages>
+	<taxes>
+		<tax id="1" name="IVA CO 16%" rate="16" />
+		
+		<taxRulesGroup name="CO Standard Rate (16%)">
+			<taxRule iso_code_country="co" id_tax="1" />
+		</taxRulesGroup>
+	</taxes>
+	<units>
+		<unit type="weight" value="kg" />
+		<unit type="volume" value="L" />
+		<unit type="short_distance" value="cm" />
+		<unit type="base_distance" value="m" />
+		<unit type="long_distance" value="km" />
+	</units>
+	<states>
+		<state name="Amazonas" iso_code="AMA" zone="South America" country="CO"/>
+		<state name="Antioquia" iso_code="ANT" zone="South America" country="CO"/>
+		<state name="Arauca" iso_code="ARA" zone="South America" country="CO"/>
+		<state name="Atlantico" iso_code="ATL" zone="South America" country="CO"/>
+		<state name="Bolivar" iso_code="BOL" zone="South America" country="CO"/>
+		<state name="Boyaca" iso_code="BOY" zone="South America" country="CO"/>
+		<state name="Caldas" iso_code="CAL" zone="South America" country="CO"/>
+		<state name="Caqueta" iso_code="CAQ" zone="South America" country="CO"/>
+		<state name="Casanare" iso_code="CAS" zone="South America" country="CO"/>
+		<state name="Cauca" iso_code="CAU" zone="South America" country="CO"/>
+		<state name="Cesar" iso_code="CES" zone="South America" country="CO"/>
+		<state name="Choco" iso_code="CHO" zone="South America" country="CO"/>
+		<state name="Cordoba" iso_code="COR" zone="South America" country="CO"/>
+		<state name="Cundinamarca" iso_code="CUN" zone="South America" country="CO"/>
+		<state name="Distrito Capital" iso_code="DC" zone="South America" country="CO"/>
+		<state name="Guainia" iso_code="GUA" zone="South America" country="CO"/>
+		<state name="Guaviare" iso_code="GUV" zone="South America" country="CO"/>
+		<state name="Huila" iso_code="HUI" zone="South America" country="CO"/>
+		<state name="La Guajira" iso_code="LAG" zone="South America" country="CO"/>
+		<state name="Magdalena" iso_code="MAG" zone="South America" country="CO"/>
+		<state name="Meta" iso_code="MET" zone="South America" country="CO"/>
+		<state name="Nariño" iso_code="NAR" zone="South America" country="CO"/>
+		<state name="Norte de Santander" iso_code="NSA" zone="South America" country="CO"/>
+		<state name="Putumayo" iso_code="PUT" zone="South America" country="CO"/>
+		<state name="Quindio" iso_code="QUI" zone="South America" country="CO"/>
+		<state name="Risaralda" iso_code="RIS" zone="South America" country="CO"/>
+		<state name="San Andres y Providencia" iso_code="SAP" zone="South America" country="CO"/>
+		<state name="Santander" iso_code="SAN" zone="South America" country="CO"/>
+		<state name="Sucre" iso_code="SUC" zone="South America" country="CO"/>
+		<state name="Tolima" iso_code="TOL" zone="South America" country="CO"/>
+		<state name="Valle del Cauca" iso_code="VAC" zone="South America" country="CO"/>
+		<state name="Vaupes" iso_code="VAU" zone="South America" country="CO"/>
+		<state name="Vichada" iso_code="VID" zone="South America" country="CO"/>
+	</states>
+</localizationPack>

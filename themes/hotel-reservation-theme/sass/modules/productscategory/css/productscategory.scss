@@ -1,0 +1,26 @@
+@import "compass";
+@import "theme_variables";
+
+#productscategory_list {
+		.product-name{
+			margin-bottom: 5px;
+			a{
+				font-size: 15px;
+				line-height: 18px;
+				color: $product-name-color;
+				&:hover{
+					color: $product-name-hover-color;
+				}
+			}
+		}
+		.exclusive span{
+			font-size: 13px;
+			line-height: 18px;
+			padding: 2px 8px 3px;
+			text-decoration: none;
+			&:focus,
+			&:active{
+				text-decoration: none;
+			}
+		}
+}

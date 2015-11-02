@@ -1,0 +1,93 @@
+.margin-top-50
+{
+    margin-top: 50px;
+}
+
+.contact-header
+{
+    font-size: 45px;
+    color: #252525;
+    font-weight: 400;
+    font-family: parisienne;
+    margin-bottom: 20px;
+}
+
+.contact-desc
+{
+    font-size: 15px;
+    color: #252525;
+    font-weight: 400;
+    font-family: 'PT Serif', serif;
+    margin-bottom: 15px;
+    line-height: 25px;
+}
+
+.contact-subdiv p
+{
+    font-size: 15px;
+    color: #404040;
+    font-weight: 400;
+    font-family: 'PT Serif', serif;
+}
+
+.contact-subdiv p i
+{
+    color: #bf9958;
+}
+
+.cont_icon_map
+{
+    font-size: 22px;
+    margin-right: 15px;
+}
+
+.cont_icon_phone
+{
+    font-size: 25px;
+    margin-right: 17px;
+}
+
+.cont_icon_enve
+{
+    font-size: 15px;
+    margin-right: 14px;
+}
+
+.contact_input
+{
+    border-color: #bf9958;
+    color: #9a9a9a;
+    font-family: "PT Serif",serif;
+    font-size: 16px;
+    font-weight: 600;
+    height: 47px;
+    margin-bottom: 20px;
+    padding: 10px;
+}
+
+.contact_textarea
+{
+    border-color: #bf9958;
+    color: #9a9a9a;
+    font-family: "PT Serif",serif;
+    height: 150px !important;
+    margin-bottom: 20px;
+    padding: 10px;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.contact_btn
+{
+    background-color: #bf9958;
+    color: #ffffff;
+    font-family: "PT Serif",serif;
+    font-size: 18px;
+    font-weight: 600;
+    padding: 10px 45px;
+}
+
+.contact_btn:hover, .contact_btn:focus, .contact_btn:active
+{
+    color: #ffffff;
+}

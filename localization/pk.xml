@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<localizationPack name="Pakistan" version="1.0">
+	
+	<languages>
+		<language iso_code="ur"/>
+		<language iso_code="en"/>
+	</languages>
+	
+	<currencies>
+		<currency name="Rupee" iso_code="PKR" iso_code_num="586" sign="₨" blank="1" conversion_rate="117.289" format="2" decimals="1" />
+	</currencies>
+	<taxes>
+		<tax id="1" name="GST PK 16%" rate="16" />
+		<tax id="2" name="GST PK 1%" rate="1" />
+		
+		<taxRulesGroup name="PK Standard Rate (16%)">
+			<taxRule iso_code_country="pk" id_tax="1" />
+		</taxRulesGroup>
+		
+		<taxRulesGroup name="PK Reduced Rate (1%)">
+			<taxRule iso_code_country="pk" id_tax="2" />
+		</taxRulesGroup>
+	</taxes>
+	<units>
+		<unit type="weight" value="kg" />
+		<unit type="volume" value="L" />
+		<unit type="short_distance" value="in" />
+		<unit type="base_distance" value="ft" />
+		<unit type="long_distance" value="mi" />
+	</units>
+</localizationPack>

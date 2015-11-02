@@ -1,0 +1,75 @@
+<?xml version='1.0'?>
+<entity_category>
+  <category id='Women' id_shop='1'>
+    <name>Dames</name>
+    <description>&lt;p&gt;&lt;strong&gt;Hier vindt u alle modecollecties voor dames.&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;In deze categorie vindt u alle basics voor in uw garderobe en nog veel meer:&lt;/p&gt;&lt;p&gt;schoenen, accessoires, bedrukte T-shirts, vrouwelijke jurken, jeans voor dames!&lt;/p&gt;</description>
+    <link_rewrite>dames</link_rewrite>
+    <meta_title/>
+    <meta_keywords/>
+    <meta_description/>
+  </category>
+  <category id='Tops' id_shop='1'>
+    <name>Tops</name>
+    <description>&lt;p&gt;Keuze uit T-shirts, tops, blouses, korte mouwen, lange mouwen, tank tops, 3/4 mouwen en nog veel meer.&lt;/p&gt;&lt;p&gt;Vind de beste snit!&lt;/p&gt;</description>
+    <link_rewrite>tops</link_rewrite>
+    <meta_title/>
+    <meta_keywords/>
+    <meta_description/>
+  </category>
+  <category id='T-shirts' id_shop='1'>
+    <name>T-shirts</name>
+    <description>&lt;p&gt;De &apos;must have&apos; van uw garderobe, ontdek alle kleuren,&lt;/p&gt;&lt;p&gt;vormen en stijlen van onze collectie!&lt;/p&gt;</description>
+    <link_rewrite>t-shirts</link_rewrite>
+    <meta_title/>
+    <meta_keywords/>
+    <meta_description/>
+  </category>
+  <category id='Tops_1' id_shop='1'>
+    <name>Tops</name>
+    <description>Kies uw top uit ons ruime aanbod.</description>
+    <link_rewrite>top</link_rewrite>
+    <meta_title/>
+    <meta_keywords/>
+    <meta_description/>
+  </category>
+  <category id='Blouses' id_shop='1'>
+    <name>Blouses</name>
+    <description>Combineer uw favoriete blouses met de juiste accessoires voor de perfecte look.</description>
+    <link_rewrite>blouse</link_rewrite>
+    <meta_title/>
+    <meta_keywords/>
+    <meta_description/>
+  </category>
+  <category id='Dresses' id_shop='1'>
+    <name>Jurken</name>
+    <description>&lt;p&gt;Ontdek uw favoriete jurk in ons ruim aanbod avond-, zomer- en casual jurken!&lt;/p&gt;&lt;p&gt;We hebben jurken voor elke dag, elke stijl en elke gelegenheid.&lt;/p&gt;</description>
+    <link_rewrite>jurken</link_rewrite>
+    <meta_title/>
+    <meta_keywords/>
+    <meta_description/>
+  </category>
+  <category id='Casual_Dresses' id_shop='1'>
+    <name>Casual Jurken</name>
+    <description>&lt;p&gt;U bent op zoek naar een casual jurk? Bekijk&lt;/p&gt;&lt;p&gt;onze jurkenselectie, er zit vast iets voor u tussen.&lt;/p&gt;</description>
+    <link_rewrite>casual-jurken</link_rewrite>
+    <meta_title/>
+    <meta_keywords/>
+    <meta_description/>
+  </category>
+  <category id='Evening_Dresses' id_shop='1'>
+    <name>Avondjurken</name>
+    <description>Blader door onze verschillende jurken en kies de perfecte jurk voor een onvergetelijke avond!</description>
+    <link_rewrite>avondjurken</link_rewrite>
+    <meta_title/>
+    <meta_keywords/>
+    <meta_description/>
+  </category>
+  <category id='Summer_Dresses' id_shop='1'>
+    <name>Zomerjurken</name>
+    <description>Korte jurk, lange jurk, zijde jurk, bedrukte jurk, u vindt vast en zeker de perfecte zomerjurk.</description>
+    <link_rewrite>zomerjurken</link_rewrite>
+    <meta_title/>
+    <meta_keywords/>
+    <meta_description/>
+  </category>
+</entity_category>

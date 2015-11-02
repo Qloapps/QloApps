@@ -1,0 +1,10 @@
+Attr.DefaultTextDir
+TYPE: string
+DEFAULT: 'ltr'
+--DESCRIPTION--
+Defines the default text direction (ltr or rtl) of the document being
+parsed.  This generally is the same as the value of the dir attribute in
+HTML, or ltr if that is not specified.
+--ALLOWED--
+'ltr', 'rtl'
+--# vim: et sw=4 sts=4

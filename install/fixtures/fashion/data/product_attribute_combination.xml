@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity_product_attribute_combination>
+  <fields primary="id_attribute, id_product_attribute">
+    <field name="id_attribute" relation="attribute"/>
+    <field name="id_product_attribute" relation="product_attribute"/>
+  </fields>
+  <entities>
+    <product_attribute_combination id="product_attribute_combination_1_1" id_attribute="S" id_product_attribute="product_attribute_1"/>
+    <product_attribute_combination id="product_attribute_combination_13_1" id_attribute="Orange" id_product_attribute="product_attribute_1"/>
+    <product_attribute_combination id="product_attribute_combination_1_2" id_attribute="S" id_product_attribute="product_attribute_2"/>
+    <product_attribute_combination id="product_attribute_combination_14_2" id_attribute="Blue" id_product_attribute="product_attribute_2"/>
+    <product_attribute_combination id="product_attribute_combination_2_3" id_attribute="M" id_product_attribute="product_attribute_3"/>
+    <product_attribute_combination id="product_attribute_combination_13_3" id_attribute="Orange" id_product_attribute="product_attribute_3"/>
+    <product_attribute_combination id="product_attribute_combination_2_4" id_attribute="M" id_product_attribute="product_attribute_4"/>
+    <product_attribute_combination id="product_attribute_combination_14_4" id_attribute="Blue" id_product_attribute="product_attribute_4"/>
+    <product_attribute_combination id="product_attribute_combination_3_5" id_attribute="L" id_product_attribute="product_attribute_5"/>
+    <product_attribute_combination id="product_attribute_combination_13_5" id_attribute="Orange" id_product_attribute="product_attribute_5"/>
+    <product_attribute_combination id="product_attribute_combination_3_6" id_attribute="L" id_product_attribute="product_attribute_6"/>
+    <product_attribute_combination id="product_attribute_combination_14_6" id_attribute="Blue" id_product_attribute="product_attribute_6"/>
+    <product_attribute_combination id="product_attribute_combination_1_7" id_attribute="S" id_product_attribute="product_attribute_7"/>
+    <product_attribute_combination id="product_attribute_combination_11_7" id_attribute="Black" id_product_attribute="product_attribute_7"/>
+    <product_attribute_combination id="product_attribute_combination_1_8" id_attribute="S" id_product_attribute="product_attribute_8"/>
+    <product_attribute_combination id="product_attribute_combination_8_8" id_attribute="White" id_product_attribute="product_attribute_8"/>
+    <product_attribute_combination id="product_attribute_combination_2_9" id_attribute="M" id_product_attribute="product_attribute_9"/>
+    <product_attribute_combination id="product_attribute_combination_11_9" id_attribute="Black" id_product_attribute="product_attribute_9"/>
+    <product_attribute_combination id="product_attribute_combination_2_10" id_attribute="M" id_product_attribute="product_attribute_10"/>
+    <product_attribute_combination id="product_attribute_combination_8_10" id_attribute="White" id_product_attribute="product_attribute_10"/>
+    <product_attribute_combination id="product_attribute_combination_3_11" id_attribute="L" id_product_attribute="product_attribute_11"/>
+    <product_attribute_combination id="product_attribute_combination_11_11" id_attribute="Black" id_product_attribute="product_attribute_11"/>
+    <product_attribute_combination id="product_attribute_combination_3_12" id_attribute="L" id_product_attribute="product_attribute_12"/>
+    <product_attribute_combination id="product_attribute_combination_8_12" id_attribute="White" id_product_attribute="product_attribute_12"/>
+    <product_attribute_combination id="product_attribute_combination_1_13" id_attribute="S" id_product_attribute="product_attribute_13"/>
+    <product_attribute_combination id="product_attribute_combination_13_13" id_attribute="Orange" id_product_attribute="product_attribute_13"/>
+    <product_attribute_combination id="product_attribute_combination_2_14" id_attribute="M" id_product_attribute="product_attribute_14"/>
+    <product_attribute_combination id="product_attribute_combination_13_14" id_attribute="Orange" id_product_attribute="product_attribute_14"/>
+    <product_attribute_combination id="product_attribute_combination_3_15" id_attribute="L" id_product_attribute="product_attribute_15"/>
+    <product_attribute_combination id="product_attribute_combination_13_15" id_attribute="Orange" id_product_attribute="product_attribute_15"/>
+    <product_attribute_combination id="product_attribute_combination_1_16" id_attribute="S" id_product_attribute="product_attribute_16"/>
+    <product_attribute_combination id="product_attribute_combination_7_16" id_attribute="Beige" id_product_attribute="product_attribute_16"/>
+    <product_attribute_combination id="product_attribute_combination_2_17" id_attribute="M" id_product_attribute="product_attribute_17"/>
+    <product_attribute_combination id="product_attribute_combination_7_17" id_attribute="Beige" id_product_attribute="product_attribute_17"/>
+    <product_attribute_combination id="product_attribute_combination_3_18" id_attribute="L" id_product_attribute="product_attribute_18"/>
+    <product_attribute_combination id="product_attribute_combination_7_18" id_attribute="Beige" id_product_attribute="product_attribute_18"/>
+    <product_attribute_combination id="product_attribute_combination_1_19" id_attribute="S" id_product_attribute="product_attribute_19"/>
+    <product_attribute_combination id="product_attribute_combination_16_19" id_attribute="Yellow" id_product_attribute="product_attribute_19"/>
+    <product_attribute_combination id="product_attribute_combination_1_20" id_attribute="S" id_product_attribute="product_attribute_20"/>
+    <product_attribute_combination id="product_attribute_combination_14_20" id_attribute="Blue" id_product_attribute="product_attribute_20"/>
+    <product_attribute_combination id="product_attribute_combination_1_21" id_attribute="S" id_product_attribute="product_attribute_21"/>
+    <product_attribute_combination id="product_attribute_combination_13_21" id_attribute="Orange" id_product_attribute="product_attribute_21"/>
+    <product_attribute_combination id="product_attribute_combination_1_22" id_attribute="S" id_product_attribute="product_attribute_22"/>
+    <product_attribute_combination id="product_attribute_combination_11_22" id_attribute="Black" id_product_attribute="product_attribute_22"/>
+    <product_attribute_combination id="product_attribute_combination_2_23" id_attribute="M" id_product_attribute="product_attribute_23"/>
+    <product_attribute_combination id="product_attribute_combination_16_23" id_attribute="Yellow" id_product_attribute="product_attribute_23"/>
+    <product_attribute_combination id="product_attribute_combination_2_24" id_attribute="M" id_product_attribute="product_attribute_24"/>
+    <product_attribute_combination id="product_attribute_combination_14_24" id_attribute="Blue" id_product_attribute="product_attribute_24"/>
+    <product_attribute_combination id="product_attribute_combination_2_25" id_attribute="M" id_product_attribute="product_attribute_25"/>
+    <product_attribute_combination id="product_attribute_combination_13_25" id_attribute="Orange" id_product_attribute="product_attribute_25"/>
+    <product_attribute_combination id="product_attribute_combination_2_26" id_attribute="M" id_product_attribute="product_attribute_26"/>
+    <product_attribute_combination id="product_attribute_combination_11_26" id_attribute="Black" id_product_attribute="product_attribute_26"/>
+    <product_attribute_combination id="product_attribute_combination_3_27" id_attribute="L" id_product_attribute="product_attribute_27"/>
+    <product_attribute_combination id="product_attribute_combination_16_27" id_attribute="Yellow" id_product_attribute="product_attribute_27"/>
+    <product_attribute_combination id="product_attribute_combination_3_28" id_attribute="L" id_product_attribute="product_attribute_28"/>
+    <product_attribute_combination id="product_attribute_combination_14_28" id_attribute="Blue" id_product_attribute="product_attribute_28"/>
+    <product_attribute_combination id="product_attribute_combination_3_29" id_attribute="L" id_product_attribute="product_attribute_29"/>
+    <product_attribute_combination id="product_attribute_combination_13_29" id_attribute="Orange" id_product_attribute="product_attribute_29"/>
+    <product_attribute_combination id="product_attribute_combination_3_30" id_attribute="L" id_product_attribute="product_attribute_30"/>
+    <product_attribute_combination id="product_attribute_combination_11_30" id_attribute="Black" id_product_attribute="product_attribute_30"/>
+    <product_attribute_combination id="product_attribute_combination_1_31" id_attribute="S" id_product_attribute="product_attribute_31"/>
+    <product_attribute_combination id="product_attribute_combination_16_31" id_attribute="Yellow" id_product_attribute="product_attribute_31"/>
+    <product_attribute_combination id="product_attribute_combination_2_32" id_attribute="M" id_product_attribute="product_attribute_32"/>
+    <product_attribute_combination id="product_attribute_combination_16_32" id_attribute="Yellow" id_product_attribute="product_attribute_32"/>
+    <product_attribute_combination id="product_attribute_combination_3_33" id_attribute="L" id_product_attribute="product_attribute_33"/>
+    <product_attribute_combination id="product_attribute_combination_16_33" id_attribute="Yellow" id_product_attribute="product_attribute_33"/>
+    <product_attribute_combination id="product_attribute_combination_1_34" id_attribute="S" id_product_attribute="product_attribute_34"/>
+    <product_attribute_combination id="product_attribute_combination_16_34" id_attribute="Yellow" id_product_attribute="product_attribute_34"/>
+    <product_attribute_combination id="product_attribute_combination_2_35" id_attribute="M" id_product_attribute="product_attribute_35"/>
+    <product_attribute_combination id="product_attribute_combination_16_35" id_attribute="Yellow" id_product_attribute="product_attribute_35"/>
+    <product_attribute_combination id="product_attribute_combination_3_36" id_attribute="L" id_product_attribute="product_attribute_36"/>
+    <product_attribute_combination id="product_attribute_combination_16_36" id_attribute="Yellow" id_product_attribute="product_attribute_36"/>
+    <product_attribute_combination id="product_attribute_combination_1_37" id_attribute="S" id_product_attribute="product_attribute_37"/>
+    <product_attribute_combination id="product_attribute_combination_15_37" id_attribute="Green" id_product_attribute="product_attribute_37"/>
+    <product_attribute_combination id="product_attribute_combination_2_38" id_attribute="M" id_product_attribute="product_attribute_38"/>
+    <product_attribute_combination id="product_attribute_combination_15_38" id_attribute="Green" id_product_attribute="product_attribute_38"/>
+    <product_attribute_combination id="product_attribute_combination_3_39" id_attribute="L" id_product_attribute="product_attribute_39"/>
+    <product_attribute_combination id="product_attribute_combination_15_39" id_attribute="Green" id_product_attribute="product_attribute_39"/>
+    <product_attribute_combination id="product_attribute_combination_1_40" id_attribute="S" id_product_attribute="product_attribute_40"/>
+    <product_attribute_combination id="product_attribute_combination_8_40" id_attribute="White" id_product_attribute="product_attribute_40"/>
+    <product_attribute_combination id="product_attribute_combination_2_41" id_attribute="M" id_product_attribute="product_attribute_41"/>
+    <product_attribute_combination id="product_attribute_combination_8_41" id_attribute="White" id_product_attribute="product_attribute_41"/>
+    <product_attribute_combination id="product_attribute_combination_3_42" id_attribute="L" id_product_attribute="product_attribute_42"/>
+    <product_attribute_combination id="product_attribute_combination_8_42" id_attribute="White" id_product_attribute="product_attribute_42"/>
+    <product_attribute_combination id="product_attribute_combination_1_43" id_attribute="S" id_product_attribute="product_attribute_43"/>
+    <product_attribute_combination id="product_attribute_combination_24_43" id_attribute="Pink" id_product_attribute="product_attribute_43"/>
+    <product_attribute_combination id="product_attribute_combination_2_44" id_attribute="M" id_product_attribute="product_attribute_44"/>
+    <product_attribute_combination id="product_attribute_combination_24_44" id_attribute="Pink" id_product_attribute="product_attribute_44"/>
+    <product_attribute_combination id="product_attribute_combination_3_45" id_attribute="L" id_product_attribute="product_attribute_45"/>
+    <product_attribute_combination id="product_attribute_combination_24_45" id_attribute="Pink" id_product_attribute="product_attribute_45"/>
+  </entities>
+</entity_product_attribute_combination>

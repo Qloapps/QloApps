@@ -1,0 +1,313 @@
+.search_block_container .dropdown-toggle
+{
+  background-color: #f2f2f2;
+  width: 100%;
+  border-color: #d6d4d4;
+  color: #000;
+  padding: 0px!important;
+  height: 40px;
+}
+.caret_div
+{
+  float: right;
+  height: 100%;
+  width: 40px;
+  background-color: #bf9958;
+}
+.caret_div .caret
+{
+  margin-top: 15px;
+}
+.check_out_time_div
+{
+  padding-right: 0px;
+}
+.check_in_time_div
+{
+  padding-left: 0px;
+}
+#check_in_time
+{
+  background-color: #f2f2f2;
+  height: 40px!important;
+}
+#check_out_time
+{
+  background-color: #f2f2f2;
+  height: 40px!important;
+}
+
+#hotel_location
+{
+  padding-left: 0px;
+  background-color: #f2f2f2;
+  height: 40px!important;
+}
+
+.num_adults_div
+{
+  padding-left: 0px;
+}
+.num_children_div
+{
+  padding-right: 0px;
+}
+#num_adults
+{
+  background-color: #f2f2f2;
+  height: 40px!important;
+}
+#num_children
+{
+  background-color: #f2f2f2;
+  height: 40px!important;
+}
+
+.search_block_container
+{
+  margin-bottom: 40px;
+  margin-top: 60px;
+}
+.outer_div
+{
+  background-image: url("../../img/black-opacity-5.png");
+  margin-top: 150px;
+  padding: 15px;
+}
+.inner_div
+{
+    background-color: black;
+    height: auto;
+    opacity: 0.9;
+    padding: 10px;
+}
+
+#hotel_cat_name
+{
+  font-size:14px;
+  font-family: 'PT Serif', serif;
+  padding-left: 10px;
+  padding-top: 10px;
+}
+
+#hotel_location
+{
+  padding-left: 10px;
+}
+
+.search-heading
+{
+  font-size:18px;
+  font-family: 'PT Serif', serif;
+  font-weight:700;
+  padding-left: 15px;
+}
+.block_heading
+{
+  color: #ffffff;
+  font-size: 37px;
+  text-align: center;
+  font-family: parisienne;
+  padding-top: 20px;
+  padding-left: 30px;
+  padding-right: 30px;
+  line-height: 38px;
+}
+.block_description
+{
+  color: #ffffff;
+  font-size: 17px;
+  text-align: center;
+  font-family: 'PT Serif', serif;
+  font-weight:400;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  padding-left: 30px;
+  padding-right: 30px;
+  line-height: 20px;
+}
+.search_block
+{
+    background-color: white;
+    width: 100%;
+    margin-right: 20px;
+    padding: 20px;
+}
+/*#search_room_submit
+{
+  background-color:#BF9958;
+  padding-left: 30px;
+  padding-right: 30px;
+  padding-top: 15px;
+  padding-bottom: 15px;
+  color:#ffffff;
+  font-size:18px;
+  font-family: 'PT Serif', serif;
+  font-weight:400;
+}*/
+#make_booking_btn
+{
+  background-color:#BF9958;
+  width: 155px;
+  height: 50px;
+  color:#ffffff;
+  font-size:18px;
+  font-family: 'PT Serif', serif;
+  font-weight:400;
+}
+#make_booking_btn_div
+{
+  margin-top: 20px;
+  text-align: center;
+}
+.search_block_container label
+{
+  color:#252525;
+  font-size:15px;
+  font-family: 'PT Serif', serif;
+  font-weight:400;
+}
+
+.hotel_dropdown_ul
+{
+  font-size: 14px;
+  font-weight: 400;
+  top: 37px;
+  padding: 0px;
+  width: 100%;
+  border-bottom: 1px solid #cccccc;
+  border-left: 1px solid #cccccc;
+  border-right: 1px solid #cccccc;
+  max-height: 145px;
+  overflow-y: auto;
+}
+
+.location_search_results_ul
+{
+  background: #ffffff none repeat scroll 0 0;
+  display: block;
+  position: absolute;
+  width: 100%;
+  z-index: 122222;
+  border-bottom: 1px solid #cccccc;
+  border-left: 1px solid #cccccc;
+  border-right: 1px solid #cccccc;
+  max-height: 145px;
+  overflow-y: auto;
+}
+
+.location_search_results_ul li, .hotel_dropdown_ul li
+{
+  background-color: #fff;
+  color: #333333;
+  cursor: default;
+  font-size: 13px;
+  list-style: outside none none;
+  padding: 9px;
+}
+
+.location_search_results_ul li:hover, .location_search_results_ul li:focus, .location_search_results_ul li:active, .hotel_dropdown_ul li:hover, .hotel_dropdown_ul li:focus, .hotel_dropdown_ul li:active
+{
+  background-color: #BF9958;
+  color: #FFFFFF;
+} 
+
+.ui-datepicker-header
+{
+  background: none;
+  border: none;
+}
+.hotel_location_div
+{
+  position: relative;
+}
+
+
+/*datepicker on search css*/
+.ui-datepicker-year {
+    font-family: 'PT Serif', serif;
+    font-size: 18px;
+    font-weight: 400;
+    color: #404040;
+}
+
+.ui-datepicker-month {
+    color: #404040;
+    font-family: 'PT Serif', serif;
+    font-size: 18px;
+    font-weight: 400;
+}
+.ui-datepicker-calendar thead th {
+    color: #bf9958;
+    font-family: 'PT Serif', serif;
+    font-size: 13px;
+    font-weight: 400 !important;
+}
+
+.ui-datepicker-unselectable
+{
+  color: #9A9A9A!important;
+  font-family: 'PT Serif', serif;
+  font-size: 13px;
+  font-weight: 400 !important;
+}
+
+.ui-datepicker-calendar .ui-state-default
+{
+  text-align: center!important;
+  color: #404040!important;
+  font-family: 'PT Serif', serif;
+  font-size: 13px;
+  font-weight: 400 !important;
+  border: none!important;
+  background: none !important;
+}
+
+.ui-datepicker-header .ui-icon-circle-triangle-w
+{
+  border: none!important;
+  background-position: -97px 1px;
+}
+
+.ui-datepicker-header .ui-icon-circle-triangle-e
+{
+  border: none!important;
+  background-position: -33px 1px;
+}
+
+/*.ui-state-hover
+{
+  cursor: pointer;
+  border: none!important;
+  background: none !important;
+}*/
+
+.ui-datepicker-calendar .ui-state-highlight
+{
+  border-radius: 50%;
+  background-color: #BF9958!important;
+}
+
+@media (max-width: 992px) {
+  .outer_div
+  {
+    margin-top: 5px;
+  }
+  .search_block
+  {
+    margin-top: 10px;
+  }
+}
+
+.search_block_container label.calender-icon-cont
+{
+  color: #FFFFFF;
+}
+
+@media (max-width: 768px) {
+  .search_block_container 
+  {
+    margin-bottom: 20px;
+    margin-top: 30px;
+  }
+}

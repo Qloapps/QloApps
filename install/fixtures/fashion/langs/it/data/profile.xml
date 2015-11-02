@@ -1,0 +1,12 @@
+<?xml version='1.0'?>
+<entity_profile>
+  <profile id='Logistician'>
+    <name>Responsabile logistica</name>
+  </profile>
+  <profile id='Translator'>
+    <name>Traduttore</name>
+  </profile>
+  <profile id='Salesman'>
+    <name>Commesso</name>
+  </profile>
+</entity_profile>

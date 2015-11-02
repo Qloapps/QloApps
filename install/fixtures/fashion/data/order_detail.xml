@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity_order_detail>
+  <fields class="OrderDetail">
+    <field name="id_order" relation="orders"/>
+    <field name="id_order_invoice"/>
+    <field name="id_warehouse"/>
+    <field name="id_shop"/>
+    <field name="product_id" relation="product"/>
+    <field name="product_attribute_id" relation="product_attribute"/>
+    <field name="product_name"/>
+    <field name="product_quantity"/>
+    <field name="product_quantity_in_stock"/>
+    <field name="product_quantity_refunded"/>
+    <field name="product_quantity_return"/>
+    <field name="product_quantity_reinjected"/>
+    <field name="product_price"/>
+    <field name="reduction_percent"/>
+    <field name="reduction_amount"/>
+    <field name="reduction_amount_tax_incl"/>
+    <field name="reduction_amount_tax_excl"/>
+    <field name="group_reduction"/>
+    <field name="product_quantity_discount"/>
+    <field name="product_ean13"/>
+    <field name="product_upc"/>
+    <field name="product_reference"/>
+    <field name="product_supplier_reference"/>
+    <field name="product_weight"/>
+    <field name="tax_computation_method"/>
+    <field name="tax_name"/>
+    <field name="tax_rate"/>
+    <field name="ecotax"/>
+    <field name="ecotax_tax_rate"/>
+    <field name="discount_quantity_applied"/>
+    <field name="download_hash"/>
+    <field name="download_nb"/>
+    <field name="download_deadline"/>
+    <field name="total_price_tax_incl"/>
+    <field name="total_price_tax_excl"/>
+    <field name="unit_price_tax_incl"/>
+    <field name="unit_price_tax_excl"/>
+    <field name="total_shipping_price_tax_incl"/>
+    <field name="total_shipping_price_tax_excl"/>
+    <field name="purchase_supplier_price"/>
+    <field name="original_product_price"/>
+  </fields>
+  <entities>
+    <order_detail id="order_detail_1" id_order="1" id_order_invoice="0" id_warehouse="0" id_shop="1" product_id="Blouse" product_attribute_id="product_attribute_10" product_quantity="1" product_quantity_in_stock="1" product_quantity_refunded="0" product_quantity_return="0" product_quantity_reinjected="0" product_price="26.999852" reduction_percent="0.00" reduction_amount="0.000000" reduction_amount_tax_incl="0.000000" reduction_amount_tax_excl="0.000000" group_reduction="0.00" product_quantity_discount="0.000000" product_ean13="" product_upc="" product_reference="demo_2" product_supplier_reference="" product_weight="0.000000" tax_computation_method="0" tax_name="" tax_rate="0.000" ecotax="0.000000" ecotax_tax_rate="0.000" discount_quantity_applied="0" download_nb="0" download_deadline="0000-00-00 00:00:00" total_price_tax_incl="27.000000" total_price_tax_excl="27.000000" unit_price_tax_incl="27.000000" unit_price_tax_excl="27.000000" total_shipping_price_tax_incl="0.000000" total_shipping_price_tax_excl="0.000000" purchase_supplier_price="0.000000" original_product_price="26.999852">
+      <product_name>Blouse - Color : White, Size : M</product_name>
+      <download_hash/>
+    </order_detail>
+    <order_detail id="order_detail_2" id_order="1" id_order_invoice="0" id_warehouse="0" id_shop="1" product_id="Printed_Dress" product_attribute_id="product_attribute_13" product_quantity="1" product_quantity_in_stock="1" product_quantity_refunded="0" product_quantity_return="0" product_quantity_reinjected="0" product_price="25.999852" reduction_percent="0.00" reduction_amount="0.000000" reduction_amount_tax_incl="0.000000" reduction_amount_tax_excl="0.000000" group_reduction="0.00" product_quantity_discount="0.000000" product_ean13="" product_upc="" product_reference="demo_3" product_supplier_reference="" product_weight="0.000000" tax_computation_method="0" tax_name="" tax_rate="0.000" ecotax="0.000000" ecotax_tax_rate="0.000" discount_quantity_applied="0" download_nb="0" download_deadline="0000-00-00 00:00:00" total_price_tax_incl="26.000000" total_price_tax_excl="26.000000" unit_price_tax_incl="26.000000" unit_price_tax_excl="26.000000" total_shipping_price_tax_incl="0.000000" total_shipping_price_tax_excl="0.000000" purchase_supplier_price="0.000000" original_product_price="25.999852">
+      <product_name>Printed Dress - Color : Orange, Size : S</product_name>
+      <download_hash/>
+    </order_detail>
+    <order_detail id="order_detail_3" id_order="2" id_order_invoice="0" id_warehouse="0" id_shop="1" product_id="Blouse" product_attribute_id="product_attribute_10" product_quantity="1" product_quantity_in_stock="1" product_quantity_refunded="0" product_quantity_return="0" product_quantity_reinjected="0" product_price="26.999852" reduction_percent="0.00" reduction_amount="0.000000" reduction_amount_tax_incl="0.000000" reduction_amount_tax_excl="0.000000" group_reduction="0.00" product_quantity_discount="0.000000" product_ean13="" product_upc="" product_reference="demo_2" product_supplier_reference="" product_weight="0.000000" tax_computation_method="0" tax_name="" tax_rate="0.000" ecotax="0.000000" ecotax_tax_rate="0.000" discount_quantity_applied="0" download_nb="0" download_deadline="0000-00-00 00:00:00" total_price_tax_incl="27.000000" total_price_tax_excl="27.000000" unit_price_tax_incl="27.000000" unit_price_tax_excl="27.000000" total_shipping_price_tax_incl="0.000000" total_shipping_price_tax_excl="0.000000" purchase_supplier_price="0.000000" original_product_price="26.999852">
+      <product_name>Blouse - Color : White, Size : M</product_name>
+      <download_hash/>
+    </order_detail>
+    <order_detail id="order_detail_4" id_order="2" id_order_invoice="0" id_warehouse="0" id_shop="1" product_id="Printed_Summer_Dress_1" product_attribute_id="product_attribute_32" product_quantity="1" product_quantity_in_stock="1" product_quantity_refunded="0" product_quantity_return="0" product_quantity_reinjected="0" product_price="30.502569" reduction_percent="0.00" reduction_amount="0.000000" reduction_amount_tax_incl="0.000000" reduction_amount_tax_excl="0.000000" group_reduction="0.00" product_quantity_discount="0.000000" product_ean13="" product_upc="" product_reference="demo_6" product_supplier_reference="" product_weight="0.000000" tax_computation_method="0" tax_name="" tax_rate="0.000" ecotax="0.000000" ecotax_tax_rate="0.000" discount_quantity_applied="0" download_nb="0" download_deadline="0000-00-00 00:00:00" total_price_tax_incl="30.500000" total_price_tax_excl="30.500000" unit_price_tax_incl="30.500000" unit_price_tax_excl="30.500000" total_shipping_price_tax_incl="0.000000" total_shipping_price_tax_excl="0.000000" purchase_supplier_price="0.000000" original_product_price="30.502569">
+      <product_name>Printed Summer Dress - Color : Yellow, Size : M</product_name>
+      <download_hash/>
+    </order_detail>
+    <order_detail id="order_detail_5" id_order="2" id_order_invoice="0" id_warehouse="0" id_shop="1" product_id="Printed_Chiffon_Dress" product_attribute_id="product_attribute_34" product_quantity="1" product_quantity_in_stock="1" product_quantity_refunded="0" product_quantity_return="0" product_quantity_reinjected="0" product_price="20.501236" reduction_percent="20.00" reduction_amount="0.000000" reduction_amount_tax_incl="0.000000" reduction_amount_tax_excl="0.000000" group_reduction="0.00" product_quantity_discount="17.400000" product_ean13="" product_upc="" product_reference="demo_7" product_supplier_reference="" product_weight="0.000000" tax_computation_method="0" tax_name="" tax_rate="0.000" ecotax="0.000000" ecotax_tax_rate="0.000" discount_quantity_applied="0" download_nb="0" download_deadline="0000-00-00 00:00:00" total_price_tax_incl="16.400000" total_price_tax_excl="16.400000" unit_price_tax_incl="16.400000" unit_price_tax_excl="16.400000" total_shipping_price_tax_incl="0.000000" total_shipping_price_tax_excl="0.000000" purchase_supplier_price="0.000000" original_product_price="20.501236">
+      <product_name>Printed Chiffon Dress - Color : Yellow, Size : S</product_name>
+      <download_hash/>
+    </order_detail>
+    <order_detail id="order_detail_6" id_order="3" id_order_invoice="0" id_warehouse="0" id_shop="1" product_id="Faded_Short_Sleeve_T-shirts" product_attribute_id="product_attribute_1" product_quantity="1" product_quantity_in_stock="1" product_quantity_refunded="0" product_quantity_return="0" product_quantity_reinjected="0" product_price="16.510000" reduction_percent="0.00" reduction_amount="0.000000" reduction_amount_tax_incl="0.000000" reduction_amount_tax_excl="0.000000" group_reduction="0.00" product_quantity_discount="0.000000" product_ean13="" product_upc="" product_reference="demo_1" product_supplier_reference="" product_weight="0.000000" tax_computation_method="0" tax_name="" tax_rate="0.000" ecotax="0.000000" ecotax_tax_rate="0.000" discount_quantity_applied="0" download_nb="0" download_deadline="0000-00-00 00:00:00" total_price_tax_incl="16.510000" total_price_tax_excl="16.510000" unit_price_tax_incl="16.510000" unit_price_tax_excl="16.510000" total_shipping_price_tax_incl="0.000000" total_shipping_price_tax_excl="0.000000" purchase_supplier_price="0.000000" original_product_price="16.510000">
+      <product_name>Faded Short Sleeve T-shirts - Color : Orange, Size : S</product_name>
+      <download_hash/>
+    </order_detail>
+    <order_detail id="order_detail_7" id_order="3" id_order_invoice="0" id_warehouse="0" id_shop="1" product_id="Blouse" product_attribute_id="product_attribute_10" product_quantity="1" product_quantity_in_stock="1" product_quantity_refunded="0" product_quantity_return="0" product_quantity_reinjected="0" product_price="26.999852" reduction_percent="0.00" reduction_amount="0.000000" reduction_amount_tax_incl="0.000000" reduction_amount_tax_excl="0.000000" group_reduction="0.00" product_quantity_discount="0.000000" product_ean13="" product_upc="" product_reference="demo_2" product_supplier_reference="" product_weight="0.000000" tax_computation_method="0" tax_name="" tax_rate="0.000" ecotax="0.000000" ecotax_tax_rate="0.000" discount_quantity_applied="0" download_nb="0" download_deadline="0000-00-00 00:00:00" total_price_tax_incl="27.000000" total_price_tax_excl="27.000000" unit_price_tax_incl="27.000000" unit_price_tax_excl="27.000000" total_shipping_price_tax_incl="0.000000" total_shipping_price_tax_excl="0.000000" purchase_supplier_price="0.000000" original_product_price="26.999852">
+      <product_name>Blouse - Color : White, Size : M</product_name>
+      <download_hash/>
+    </order_detail>
+    <order_detail id="order_detail_8" id_order="3" id_order_invoice="0" id_warehouse="0" id_shop="1" product_id="Printed_Summer_Dress_1" product_attribute_id="product_attribute_32" product_quantity="1" product_quantity_in_stock="1" product_quantity_refunded="0" product_quantity_return="0" product_quantity_reinjected="0" product_price="30.502569" reduction_percent="0.00" reduction_amount="0.000000" reduction_amount_tax_incl="0.000000" reduction_amount_tax_excl="0.000000" group_reduction="0.00" product_quantity_discount="0.000000" product_ean13="" product_upc="" product_reference="demo_6" product_supplier_reference="" product_weight="0.000000" tax_computation_method="0" tax_name="" tax_rate="0.000" ecotax="0.000000" ecotax_tax_rate="0.000" discount_quantity_applied="0" download_nb="0" download_deadline="0000-00-00 00:00:00" total_price_tax_incl="30.500000" total_price_tax_excl="30.500000" unit_price_tax_incl="30.500000" unit_price_tax_excl="30.500000" total_shipping_price_tax_incl="0.000000" total_shipping_price_tax_excl="0.000000" purchase_supplier_price="0.000000" original_product_price="30.502569">
+      <product_name>Printed Summer Dress - Color : Yellow, Size : M</product_name>
+      <download_hash/>
+    </order_detail>
+    <order_detail id="order_detail_9" id_order="4" id_order_invoice="0" id_warehouse="0" id_shop="1" product_id="Faded_Short_Sleeve_T-shirts" product_attribute_id="product_attribute_1" product_quantity="1" product_quantity_in_stock="1" product_quantity_refunded="0" product_quantity_return="0" product_quantity_reinjected="0" product_price="16.510000" reduction_percent="0.00" reduction_amount="0.000000" reduction_amount_tax_incl="0.000000" reduction_amount_tax_excl="0.000000" group_reduction="0.00" product_quantity_discount="0.000000" product_ean13="" product_upc="" product_reference="demo_1" product_supplier_reference="" product_weight="0.000000" tax_computation_method="0" tax_name="" tax_rate="0.000" ecotax="0.000000" ecotax_tax_rate="0.000" discount_quantity_applied="0" download_nb="0" download_deadline="0000-00-00 00:00:00" total_price_tax_incl="16.510000" total_price_tax_excl="16.510000" unit_price_tax_incl="16.510000" unit_price_tax_excl="16.510000" total_shipping_price_tax_incl="0.000000" total_shipping_price_tax_excl="0.000000" purchase_supplier_price="0.000000" original_product_price="16.510000">
+      <product_name>Faded Short Sleeve T-shirts - Color : Orange, Size : S</product_name>
+      <download_hash/>
+    </order_detail>
+    <order_detail id="order_detail_10" id_order="4" id_order_invoice="0" id_warehouse="0" id_shop="1" product_id="Printed_Dress" product_attribute_id="product_attribute_13" product_quantity="1" product_quantity_in_stock="1" product_quantity_refunded="0" product_quantity_return="0" product_quantity_reinjected="0" product_price="25.999852" reduction_percent="0.00" reduction_amount="0.000000" reduction_amount_tax_incl="0.000000" reduction_amount_tax_excl="0.000000" group_reduction="0.00" product_quantity_discount="0.000000" product_ean13="" product_upc="" product_reference="demo_3" product_supplier_reference="" product_weight="0.000000" tax_computation_method="0" tax_name="" tax_rate="0.000" ecotax="0.000000" ecotax_tax_rate="0.000" discount_quantity_applied="0" download_nb="0" download_deadline="0000-00-00 00:00:00" total_price_tax_incl="26.000000" total_price_tax_excl="26.000000" unit_price_tax_incl="26.000000" unit_price_tax_excl="26.000000" total_shipping_price_tax_incl="0.000000" total_shipping_price_tax_excl="0.000000" purchase_supplier_price="0.000000" original_product_price="25.999852">
+      <product_name>Printed Dress - Color : Orange, Size : S</product_name>
+      <download_hash/>
+    </order_detail>
+    <order_detail id="order_detail_11" id_order="4" id_order_invoice="0" id_warehouse="0" id_shop="1" product_id="Printed_Summer_Dress" product_attribute_id="product_attribute_19" product_quantity="1" product_quantity_in_stock="1" product_quantity_refunded="0" product_quantity_return="0" product_quantity_reinjected="0" product_price="30.506321" reduction_percent="5.00" reduction_amount="0.000000" reduction_amount_tax_incl="0.000000" reduction_amount_tax_excl="0.000000" group_reduction="0.00" product_quantity_discount="29.980000" product_ean13="" product_upc="" product_reference="demo_5" product_supplier_reference="" product_weight="0.000000" tax_computation_method="0" tax_name="" tax_rate="0.000" ecotax="0.000000" ecotax_tax_rate="0.000" discount_quantity_applied="0" download_nb="0" download_deadline="0000-00-00 00:00:00" total_price_tax_incl="28.980000" total_price_tax_excl="28.980000" unit_price_tax_incl="28.980000" unit_price_tax_excl="28.980000" total_shipping_price_tax_incl="0.000000" total_shipping_price_tax_excl="0.000000" purchase_supplier_price="0.000000" original_product_price="30.506321">
+      <product_name>Printed Summer Dress - Color : Yellow, Size : S</product_name>
+      <download_hash/>
+    </order_detail>
+    <order_detail id="order_detail_12" id_order="4" id_order_invoice="0" id_warehouse="0" id_shop="1" product_id="Printed_Chiffon_Dress" product_attribute_id="product_attribute_34" product_quantity="1" product_quantity_in_stock="1" product_quantity_refunded="0" product_quantity_return="0" product_quantity_reinjected="0" product_price="20.501236" reduction_percent="20.00" reduction_amount="0.000000" reduction_amount_tax_incl="0.000000" reduction_amount_tax_excl="0.000000" group_reduction="0.00" product_quantity_discount="17.400000" product_ean13="" product_upc="" product_reference="demo_7" product_supplier_reference="" product_weight="0.000000" tax_computation_method="0" tax_name="" tax_rate="0.000" ecotax="0.000000" ecotax_tax_rate="0.000" discount_quantity_applied="0" download_nb="0" download_deadline="0000-00-00 00:00:00" total_price_tax_incl="16.400000" total_price_tax_excl="16.400000" unit_price_tax_incl="16.400000" unit_price_tax_excl="16.400000" total_shipping_price_tax_incl="0.000000" total_shipping_price_tax_excl="0.000000" purchase_supplier_price="0.000000" original_product_price="20.501236">
+      <product_name>Printed Chiffon Dress - Color : Yellow, Size : S</product_name>
+      <download_hash/>
+    </order_detail>
+    <order_detail id="order_detail_13" id_order="5" id_order_invoice="0" id_warehouse="0" id_shop="1" product_id="Faded_Short_Sleeve_T-shirts" product_attribute_id="product_attribute_1" product_quantity="1" product_quantity_in_stock="1" product_quantity_refunded="0" product_quantity_return="0" product_quantity_reinjected="0" product_price="16.510000" reduction_percent="0.00" reduction_amount="0.000000" reduction_amount_tax_incl="0.000000" reduction_amount_tax_excl="0.000000" group_reduction="0.00" product_quantity_discount="0.000000" product_ean13="" product_upc="" product_reference="demo_1" product_supplier_reference="" product_weight="0.000000" tax_computation_method="0" tax_name="" tax_rate="0.000" ecotax="0.000000" ecotax_tax_rate="0.000" discount_quantity_applied="0" download_nb="0" download_deadline="0000-00-00 00:00:00" total_price_tax_incl="16.510000" total_price_tax_excl="16.510000" unit_price_tax_incl="16.510000" unit_price_tax_excl="16.510000" total_shipping_price_tax_incl="0.000000" total_shipping_price_tax_excl="0.000000" purchase_supplier_price="0.000000" original_product_price="16.510000">
+      <product_name>Faded Short Sleeve T-shirts - Color : Orange, Size : S</product_name>
+      <download_hash/>
+    </order_detail>
+    <order_detail id="order_detail_14" id_order="5" id_order_invoice="0" id_warehouse="0" id_shop="1" product_id="Blouse" product_attribute_id="product_attribute_7" product_quantity="1" product_quantity_in_stock="1" product_quantity_refunded="0" product_quantity_return="0" product_quantity_reinjected="0" product_price="26.999852" reduction_percent="0.00" reduction_amount="0.000000" reduction_amount_tax_incl="0.000000" reduction_amount_tax_excl="0.000000" group_reduction="0.00" product_quantity_discount="0.000000" product_ean13="" product_upc="" product_reference="demo_2" product_supplier_reference="" product_weight="0.000000" tax_computation_method="0" tax_name="" tax_rate="0.000" ecotax="0.000000" ecotax_tax_rate="0.000" discount_quantity_applied="0" download_nb="0" download_deadline="0000-00-00 00:00:00" total_price_tax_incl="27.000000" total_price_tax_excl="27.000000" unit_price_tax_incl="27.000000" unit_price_tax_excl="27.000000" total_shipping_price_tax_incl="0.000000" total_shipping_price_tax_excl="0.000000" purchase_supplier_price="0.000000" original_product_price="26.999852">
+      <product_name>Blouse - Color : Black, Size : S</product_name>
+      <download_hash/>
+    </order_detail>
+    <order_detail id="order_detail_15" id_order="5" id_order_invoice="0" id_warehouse="0" id_shop="1" product_id="Printed_Dress" product_attribute_id="product_attribute_13" product_quantity="1" product_quantity_in_stock="1" product_quantity_refunded="0" product_quantity_return="0" product_quantity_reinjected="0" product_price="25.999852" reduction_percent="0.00" reduction_amount="0.000000" reduction_amount_tax_incl="0.000000" reduction_amount_tax_excl="0.000000" group_reduction="0.00" product_quantity_discount="0.000000" product_ean13="" product_upc="" product_reference="demo_3" product_supplier_reference="" product_weight="0.000000" tax_computation_method="0" tax_name="" tax_rate="0.000" ecotax="0.000000" ecotax_tax_rate="0.000" discount_quantity_applied="0" download_nb="0" download_deadline="0000-00-00 00:00:00" total_price_tax_incl="26.000000" total_price_tax_excl="26.000000" unit_price_tax_incl="26.000000" unit_price_tax_excl="26.000000" total_shipping_price_tax_incl="0.000000" total_shipping_price_tax_excl="0.000000" purchase_supplier_price="0.000000" original_product_price="25.999852">
+      <product_name>Printed Dress - Color : Orange, Size : S</product_name>
+      <download_hash/>
+    </order_detail>
+  </entities>
+</entity_order_detail>

@@ -1,0 +1,10 @@
+Olá {firstname} {lastname},
+
+Aqui estão os seus dados para iniciar sessão na loja {shop_name}:
+
+Palavra-passe: {passwd}
+Endereço de e-mail: {email}
+
+{shop_name} - {shop_url}
+
+{shop_url} powered by PrestaShop™

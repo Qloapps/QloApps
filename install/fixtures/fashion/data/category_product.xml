@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity_category_product>
+  <fields primary="id_category, id_product">
+    <field name="id_category" relation="category"/>
+    <field name="id_product" relation="product"/>
+    <field name="position"/>
+  </fields>
+  <entities>
+    <category_product id="category_product_2_1" id_category="2" id_product="Faded_Short_Sleeve_T-shirts" position="0"/>
+    <category_product id="category_product_2_2" id_category="2" id_product="Blouse" position="1"/>
+    <category_product id="category_product_2_3" id_category="2" id_product="Printed_Dress" position="2"/>
+    <category_product id="category_product_2_4" id_category="2" id_product="Printed_Dress_1" position="3"/>
+    <category_product id="category_product_2_5" id_category="2" id_product="Printed_Summer_Dress" position="4"/>
+    <category_product id="category_product_2_6" id_category="2" id_product="Printed_Summer_Dress_1" position="5"/>
+    <category_product id="category_product_2_7" id_category="2" id_product="Printed_Chiffon_Dress" position="6"/>
+    <category_product id="category_product_3_1" id_category="Women" id_product="Faded_Short_Sleeve_T-shirts" position="0"/>
+    <category_product id="category_product_3_2" id_category="Women" id_product="Blouse" position="1"/>
+    <category_product id="category_product_3_3" id_category="Women" id_product="Printed_Dress" position="2"/>
+    <category_product id="category_product_3_4" id_category="Women" id_product="Printed_Dress_1" position="3"/>
+    <category_product id="category_product_3_5" id_category="Women" id_product="Printed_Summer_Dress" position="4"/>
+    <category_product id="category_product_3_6" id_category="Women" id_product="Printed_Summer_Dress_1" position="5"/>
+    <category_product id="category_product_3_7" id_category="Women" id_product="Printed_Chiffon_Dress" position="6"/>
+    <category_product id="category_product_4_1" id_category="Tops" id_product="Faded_Short_Sleeve_T-shirts" position="0"/>
+    <category_product id="category_product_4_2" id_category="Tops" id_product="Blouse" position="1"/>
+    <category_product id="category_product_5_1" id_category="T-shirts" id_product="Faded_Short_Sleeve_T-shirts" position="0"/>
+    <category_product id="category_product_7_2" id_category="Blouses" id_product="Blouse" position="0"/>
+    <category_product id="category_product_8_3" id_category="Dresses" id_product="Printed_Dress" position="0"/>
+    <category_product id="category_product_8_4" id_category="Dresses" id_product="Printed_Dress_1" position="1"/>
+    <category_product id="category_product_8_5" id_category="Dresses" id_product="Printed_Summer_Dress" position="2"/>
+    <category_product id="category_product_8_6" id_category="Dresses" id_product="Printed_Summer_Dress_1" position="3"/>
+    <category_product id="category_product_8_7" id_category="Dresses" id_product="Printed_Chiffon_Dress" position="4"/>
+    <category_product id="category_product_9_3" id_category="Casual_Dresses" id_product="Printed_Dress" position="0"/>
+    <category_product id="category_product_10_4" id_category="Evening_Dresses" id_product="Printed_Dress_1" position="0"/>
+    <category_product id="category_product_11_5" id_category="Summer_Dresses" id_product="Printed_Summer_Dress" position="0"/>
+    <category_product id="category_product_11_6" id_category="Summer_Dresses" id_product="Printed_Summer_Dress_1" position="1"/>
+    <category_product id="category_product_11_7" id_category="Summer_Dresses" id_product="Printed_Chiffon_Dress" position="2"/>
+  </entities>
+</entity_category_product>

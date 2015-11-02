@@ -1,0 +1,10 @@
+سلام {firstname} {lastname},
+
+اطلاعات ورود شما به سایت {shop_name}:
+
+رمزعبور: {passwd}
+آدرس ایمیل: {email}
+
+{shop_name} - {shop_url}
+
+{shop_url} powered by PrestaShop™

@@ -1,0 +1,81 @@
+<?xml version='1.0'?>
+<entity_category>
+  <category id='Women' id_shop='1'>
+    <name>Femmes</name>
+    <description>&lt;p&gt;&lt;strong&gt;Vous trouverez ici toutes les collections mode pour femmes.&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Cette catégorie regroupe tous les basiques de votre garde-robe et bien plus encore :&lt;/p&gt;
+&lt;p&gt;chaussures, accessoires, T-shirts imprimés, robes élégantes et jeans pour femmes !&lt;/p&gt;</description>
+    <link_rewrite>femmes</link_rewrite>
+    <meta_title/>
+    <meta_keywords/>
+    <meta_description/>
+  </category>
+  <category id='Tops' id_shop='1'>
+    <name>Tops</name>
+    <description>&lt;p&gt;Choisissez parmi une large sélection de T-shirts à manches courtes, longues ou 3/4, de tops, de débardeurs, de chemisiers et bien plus encore.&lt;/p&gt;
+&lt;p&gt;Trouvez la coupe qui vous va le mieux !&lt;/p&gt;</description>
+    <link_rewrite>tops</link_rewrite>
+    <meta_title/>
+    <meta_keywords/>
+    <meta_description/>
+  </category>
+  <category id='T-shirts' id_shop='1'>
+    <name>T-shirts</name>
+    <description>&lt;p&gt;Les must have de votre garde-robe : découvrez les divers modèles ainsi que les différentes&lt;/p&gt;
+&lt;p&gt;coupes et couleurs de notre collection !&lt;/p&gt;</description>
+    <link_rewrite>t-shirts</link_rewrite>
+    <meta_title/>
+    <meta_keywords/>
+    <meta_description/>
+  </category>
+  <category id='Tops_1' id_shop='1'>
+    <name>Tops</name>
+    <description>Choisissez le top qui vous va le mieux, parmi une large sélection.</description>
+    <link_rewrite>top</link_rewrite>
+    <meta_title/>
+    <meta_keywords/>
+    <meta_description/>
+  </category>
+  <category id='Blouses' id_shop='1'>
+    <name>Chemisiers</name>
+    <description>Coordonnez vos accessoires à vos chemisiers préférés, pour un look parfait.</description>
+    <link_rewrite>chemisiers</link_rewrite>
+    <meta_title/>
+    <meta_keywords/>
+    <meta_description/>
+  </category>
+  <category id='Dresses' id_shop='1'>
+    <name>Robes</name>
+    <description>&lt;p&gt;Trouvez votre nouvelle pièce préférée parmi une large sélection de robes décontractées, d&apos;été et de soirée !&lt;/p&gt;
+&lt;p&gt;Nous avons des robes pour tous les styles et toutes les occasions.&lt;/p&gt;</description>
+    <link_rewrite>robes</link_rewrite>
+    <meta_title/>
+    <meta_keywords/>
+    <meta_description/>
+  </category>
+  <category id='Casual_Dresses' id_shop='1'>
+    <name>Robes décontractées</name>
+    <description>&lt;p&gt;Vous cherchez une robe pour la vie de tous les jours ? Découvrez&lt;/p&gt;
+&lt;p&gt;notre sélection de robes et trouvez celle qui vous convient.&lt;/p&gt;</description>
+    <link_rewrite>robes-decontractees</link_rewrite>
+    <meta_title/>
+    <meta_keywords/>
+    <meta_description/>
+  </category>
+  <category id='Evening_Dresses' id_shop='1'>
+    <name>Robes de soirée</name>
+    <description>Trouvez la robe parfaite pour une soirée inoubliable !</description>
+    <link_rewrite>robes-soiree</link_rewrite>
+    <meta_title/>
+    <meta_keywords/>
+    <meta_description/>
+  </category>
+  <category id='Summer_Dresses' id_shop='1'>
+    <name>Robes d&apos;été</name>
+    <description>Courte, longue, en soie ou imprimée, trouvez votre robe d&apos;été idéale !</description>
+    <link_rewrite>robes-ete</link_rewrite>
+    <meta_title/>
+    <meta_keywords/>
+    <meta_description/>
+  </category>
+</entity_category>

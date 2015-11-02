@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<entity_cms>
+  <cms id="Delivery">
+    <meta_title>Доставка</meta_title>
+    <meta_description>Сроки и условия доставки</meta_description>
+    <meta_keywords>условия, доставка, сроки, отправка, упаковка</meta_keywords>
+    <content>&lt;h2&gt;Доставка и возврат&lt;/h2&gt;&lt;h3&gt;Отправка Вашего товара&lt;/h3&gt;&lt;p&gt;Отправка товара осуществляется через 2 дня после получения оплаты и отправляются через UPS с отслеживанием местоположения посылки и отгрузки без обязательной подписи. При выборе доставки через UPS Extra с обязательной подписью, с Вас будет взиматься дополнительная плата. Перед  выбором способа доставки, просим связаться с нами. Вне зависимости от выбранного Вами способа оплаты, Вы сможете отслеживать состояние Вашего заказа онлайн.&lt;/p&gt;&lt;p&gt;Стоимость доставки включает в себя расходы на обработку, упаковку и почтовые расходы. Затраты на обработку фиксированы, в то время как расходы на транспортировку могут варьироваться в зависимости от веса посылки. Мы советуем Вам объединять заказы. Мы не сможем объединить два отдельных заказа и доставка будет расчитана для каждого из них. Отправка товара будет на Вашей ответственности, но мы позаботимся о сохранности хрупких грузов.&lt;br /&gt;&lt;br /&gt;Коробки оптимального размера и с хорошим кровнем защиты.&lt;/p&gt;</content>
+    <link_rewrite>delivery</link_rewrite>
+  </cms>
+  <cms id="Legal_Notice">
+    <meta_title>Правовое положение</meta_title>
+    <meta_description>Правовое положениe</meta_description>
+    <meta_keywords>правовое положение, права</meta_keywords>
+    <content>&lt;h2&gt;Правовое положение&lt;/h2&gt;&lt;p&gt;Производство:&lt;/p&gt;&lt;p&gt;Этот сайт был создан на &lt;a href="http://www.prestashop.com"&gt;PrestaShop&lt;/a&gt;&amp;trade; ПО с открытым доступом &lt;/p&gt;</content>
+    <link_rewrite>legal-notice</link_rewrite>
+  </cms>
+  <cms id="Terms_and_conditions_of_use">
+    <meta_title>Порядок и условия использования</meta_title>
+    <meta_description>Порядок и условия использования</meta_description>
+    <meta_keywords>условия, порядок, использование, продажа</meta_keywords>
+    <content>&lt;h2&gt;Порядок и условия использования&lt;/h2&gt;&lt;h3&gt;Правило 1&lt;/h3&gt;&lt;p&gt;Прочитайте правило 1 &lt;/p&gt;&#xD;
+&lt;h3&gt;Правило 2&lt;/h3&gt;&lt;p&gt; Прочитайте правило 2 &lt;/p&gt;&#xD;
+&lt;h3&gt;Правило 3&lt;/h3&gt;&lt;p&gt;Прочитайте правило 3 &lt;/p&gt;</content>
+    <link_rewrite>terms-and-conditions-of-use</link_rewrite>
+  </cms>
+  <cms id="About_us">
+    <meta_title>О компании</meta_title>
+    <meta_description>Информация о компании</meta_description>
+    <meta_keywords>о нас, информация</meta_keywords>
+    <content>&lt;h2&gt;О компании&lt;/h2&gt;&#xD;
+&lt;h3&gt;Наша компания&lt;/h3&gt;&lt;p&gt;Наша компания&lt;/p&gt;&#xD;
+&lt;h3&gt;Наша команда&lt;/h3&gt;&lt;p&gt;Наша команда&lt;/p&gt;&#xD;
+&lt;h3&gt;Информация&lt;/h3&gt;&lt;p&gt;Информация&lt;/p&gt;</content>
+    <link_rewrite>about-us</link_rewrite>
+  </cms>
+  <cms id="Secure_payment">
+    <meta_title>Безопасность платежей</meta_title>
+    <meta_description>Безопасность платежей</meta_description>
+    <meta_keywords>безопасный платеж, ssl, visa, mastercard, paypal</meta_keywords>
+    <content>&lt;h2&gt;Безопасность платежей&lt;/h2&gt;&#xD;
+&lt;h3&gt;Безопасный платеж&lt;/h3&gt;&lt;p&gt;С использованием SSL&lt;/p&gt;&#xD;
+&lt;h3&gt;Использование Visa/Mastercard/Paypal&lt;/h3&gt;&lt;p&gt;Об этом сервисе&lt;/p&gt;</content>
+    <link_rewrite>secure-payment</link_rewrite>
+  </cms>
+</entity_cms>

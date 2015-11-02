@@ -1,0 +1,193 @@
+#header
+	z-index: 20
+#header_infos
+	@extend .navbar
+	@extend .navbar-inverse
+	@extend .navbar-fixed-top
+	height: 36px !important
+	.navbar-header
+		width: 100%
+
+#header_shopversion
+	@extend .navbar-brand
+	font-size: 1.3em !important
+	position: relative
+	height: 36px
+	background: url('#{$img-path}/prestashop-avatar-header_shopname.png') no-repeat top left
+	background-size: auto 36px
+	padding-left: 140px !important
+	@include margin(0, 5px, 0, 0)
+	#shop_version
+		font-size: 10px
+	@media (max-width: $screen-xs)
+		display: none
+#header_shopname
+	@extend .navbar-brand
+	text-decoration: none
+
+#header_notifs_icon_wrapper
+	@extend .nav
+	@extend .navbar-nav
+	@extend .hidden-xs
+	min-width: 170px
+	> li > a
+		height: 36px
+		display: block
+		color: white
+		&:hover i
+			color: white
+	> li > a > i
+		font-size: $icon-size-base
+		vertical-align: middle
+	.notifs
+		width: 40px
+		position: relative
+	.notifs_badge
+		@extend .badge
+		position: absolute
+		font-size: 10px !important
+		top: 2px
+		padding: 0 5px !important
+		display: none
+		z-index: 10
+		@include right(-3px)
+	.notifs_dropdown
+		background-color: white
+		border: none
+		@include box-shadow(rgba(black,0.7) 0 0 10px)
+		.notifs_panel
+			width: 300px
+			.notifs_panel_header
+				h3
+					padding: 10px
+					font-size: 1.3em
+					margin: 0
+					border-bottom: solid 1px #CCCCCC
+			.notifs_panel_footer
+				padding: 10px
+				text-align: center
+			.list_notif
+				a
+					display: block
+					text-decoration: none
+					padding: 5px
+					border-bottom: solid 1px #CCCCCC
+				.no_notifs
+					@extend .text-muted
+					display: block
+					padding: 15px
+					border-bottom: solid 1px #CCCCCC
+#header_nav_toggle
+	background-color: black
+	border: none
+	color: white
+	display: none
+#header_employee_box
+	@extend .nav
+	@extend .navbar-nav
+	margin: 0 !important
+	@include ltr
+		@extend .navbar-right
+	@include rtl
+		@extend .navbar-left
+	@media (max-width: $screen-sm)
+		@include float(right)
+		> li
+			display: inline-block
+			@include float(left)
+	span.string-long
+		@media (max-width: $screen-lg)
+			display: none
+	span.string-short
+		display: none
+		@media (max-width: $screen-lg)
+			display: inline-block
+	a img
+		@include margin-right(5px)
+	#header_foaccess
+		display: inline-block
+		i
+			font-size: 1.2em
+	.maintenance-mode
+		color: $contrasted-light-default
+		cursor: default
+		display: inline-block
+		margin-left: -13px
+		.label-tooltip
+			padding: 9px 0
+			color: $brand-warning
+#employee_infos
+	.employee_name
+		position: relative
+		@include ltr
+			padding-right: 40px !important
+		@include rtl
+			padding-left: 40px !important
+	.employee_avatar_small
+		.img-thumbnail
+			@include border-radius(0)
+		@include avatar(36px, 0px)
+		position: absolute
+		top: 0px
+		@include right(0)
+	img
+		border: none
+		padding: 0
+#employee_links
+	i
+		font-size: $icon-size-base
+	@media (max-width: $screen-sm)
+		position: fixed !important
+		top: 36px !important
+		width: 100% !important
+		height: 100% !important
+		background-color: #383F50 !important
+		@include ltr
+			left: 0 !important
+		@include rtl
+			right: 0 !important
+		li
+			color: white
+			font-size: 1.2em
+			text-transform: uppercase
+			i
+				font-size: 1.3em
+				color: $brand-primary
+	.version
+		color: darken(white,40%)
+		text-align: center
+		font-size: 0.9em
+		padding: 0 0 3px 0
+		sup
+			font-size: 0.7em
+
+#header_quick
+	@extend .nav
+	@extend .navbar-nav
+	@include ltr
+		@extend .navbar-left
+	@include rtl
+		@extend .navbar-right
+	@extend .hidden-xs
+	@extend .hidden-sm
+
+#header_shop
+	@extend .nav
+	@extend .navbar-nav
+	@include ltr
+		@extend .navbar-left
+	@include rtl
+		@extend .navbar-right
+
+#ajax_running
+	position: absolute
+	height: 35px
+	width: 35px
+	top: 0
+	background-color: rgba(black,.4)
+	text-align: center
+	@include left(0)
+	i
+		font-size: 20px
+		color: rgba(white,.6)
+		line-height: 35px

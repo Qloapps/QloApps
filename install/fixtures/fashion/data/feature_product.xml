@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<entity_feature_product>
+  <fields primary="id_feature,id_product">
+    <field name="id_feature"/>
+    <field name="id_product"/>
+    <field name="id_feature_value"/>
+  </fields>
+  <entities>
+    <feature_product id="feature_product_5_6" id_feature="5" id_product="6" id_feature_value="1"/>
+    <feature_product id="feature_product_5_7" id_feature="5" id_product="7" id_feature_value="1"/>
+    <feature_product id="feature_product_5_4" id_feature="5" id_product="4" id_feature_value="3"/>
+    <feature_product id="feature_product_5_5" id_feature="5" id_product="5" id_feature_value="3"/>
+    <feature_product id="feature_product_5_1" id_feature="5" id_product="1" id_feature_value="5"/>
+    <feature_product id="feature_product_5_2" id_feature="5" id_product="2" id_feature_value="5"/>
+    <feature_product id="feature_product_5_3" id_feature="5" id_product="3" id_feature_value="5"/>
+    <feature_product id="feature_product_6_1" id_feature="6" id_product="1" id_feature_value="11"/>
+    <feature_product id="feature_product_6_2" id_feature="6" id_product="2" id_feature_value="11"/>
+    <feature_product id="feature_product_6_5" id_feature="6" id_product="5" id_feature_value="11"/>
+    <feature_product id="feature_product_6_3" id_feature="6" id_product="3" id_feature_value="13"/>
+    <feature_product id="feature_product_6_6" id_feature="6" id_product="6" id_feature_value="13"/>
+    <feature_product id="feature_product_6_7" id_feature="6" id_product="7" id_feature_value="13"/>
+    <feature_product id="feature_product_6_4" id_feature="6" id_product="4" id_feature_value="16"/>
+    <feature_product id="feature_product_7_1" id_feature="7" id_product="1" id_feature_value="17"/>
+    <feature_product id="feature_product_7_2" id_feature="7" id_product="2" id_feature_value="17"/>
+    <feature_product id="feature_product_7_3" id_feature="7" id_product="3" id_feature_value="18"/>
+    <feature_product id="feature_product_7_4" id_feature="7" id_product="4" id_feature_value="19"/>
+    <feature_product id="feature_product_7_6" id_feature="7" id_product="6" id_feature_value="19"/>
+    <feature_product id="feature_product_7_7" id_feature="7" id_product="7" id_feature_value="20"/>
+    <feature_product id="feature_product_7_5" id_feature="7" id_product="5" id_feature_value="21"/>
+  </entities>
+</entity_feature_product>

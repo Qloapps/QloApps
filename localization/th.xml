@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<localizationPack name="Thailand" version="1.0">
+	<currencies>
+		<currency name="Baht" iso_code="THB" iso_code_num="978" sign="฿" blank="1" conversion_rate="41.4441" format="2" decimals="1" />
+	</currencies>
+	<languages>
+		<language iso_code="th" />
+	</languages>
+	<taxes>
+		<tax id="1" name="VAT TH 7%" rate="7" />
+		
+		<taxRulesGroup name="TH Standard Rate (7%)">
+			<taxRule iso_code_country="th" id_tax="1" />
+		</taxRulesGroup>
+	</taxes>
+	<units>
+		<unit type="weight" value="kg" />
+		<unit type="volume" value="L" />
+		<unit type="base_distance" value="wah" />
+	</units>
+</localizationPack>

@@ -1,0 +1,67 @@
+.tab-pane {
+	float: 			left;
+	position:		relative;
+	width:			928px;
+}
+
+.tab-pane-tax {
+	float: 			left;
+	position:		relative;
+	width:			900px;
+}
+
+.tab-row .tab {
+	text-align:		center;
+	font-weight:	bold;
+	display:		inline;
+	margin:			0;
+	float:			left;
+	padding:		2px 8px 3px 8px;
+	background:		#EFEFEF;
+	z-index:		1;
+	white-space:	nowrap;
+	position:		relative;
+	font-size:		1.1em;
+}
+
+.tab-row .tab.selected {
+	border:			1px solid #ccc;
+	border-bottom:	0;
+	background:		#FFF6D3;
+	z-index:		3;
+	padding:		2px 25px 4px 25px;
+	margin:			1px -3px -3px 0px;
+	top:			-2px;
+}
+
+.tab-page {
+	clear:			both;
+	border:			1px solid #ccc;
+	background:		#FFFFF0;
+	z-index:		2;
+	position:		relative;
+	padding:		10px;
+}
+
+.tab-page table tr td.col-left {
+	width: 			150px;
+	vertical-align: top;
+}
+
+.tab-page table tr td p {
+	margin:			0.5em 0 0 0;
+	padding:		0 0 0.5em 0;
+	color:			#7F7F7F;
+	font-size:		0.95em;
+}
+
+.tab-page table tr td p.block {
+	display: block;
+	clear: both;
+}
+
+.tab-row {
+	z-index:		1;
+	white-space:	nowrap;
+}
+

@@ -1,0 +1,20 @@
+HTML.ForbiddenElements
+TYPE: lookup
+VERSION: 3.1.0
+DEFAULT: array()
+--DESCRIPTION--
+<p>
+    This was, perhaps, the most requested feature ever in HTML
+    Purifier. Please don't abuse it! This is the logical inverse of
+    %HTML.AllowedElements, and it will override that directive, or any
+    other directive.
+</p>
+<p>
+    If possible, %HTML.Allowed is recommended over this directive, because it
+    can sometimes be difficult to tell whether or not you've forbidden all of
+    the behavior you would like to disallow. If you forbid <code>img</code>
+    with the expectation of preventing images on your site, you'll be in for
+    a nasty surprise when people start using the <code>background-image</code>
+    CSS property.
+</p>
+--# vim: et sw=4 sts=4

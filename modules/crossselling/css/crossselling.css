@@ -1,0 +1,35 @@
+#crossselling h2.productscategory_h2 {
+	margin:40px 0 20px 0;
+	padding:10px 0;
+	border-bottom:1px solid #ccc;
+	font-size:18px;
+	color:#333
+}
+
+#crossselling {overflow:auto}
+
+#crossselling ul {list-style-type:none}
+#crossselling li {
+	float:left;
+}
+#crossselling li a.lnk_img {display:block}
+#crossselling li a img {border:1px solid #ccc}
+#crossselling li p.product_name {text-align:center}
+
+#crossselling_list {
+	float: left;
+	overflow: hidden;
+	width: 100%;
+}
+
+#crossselling_scroll_left,
+ #crossselling_scroll_right {
+	background: url('../img/thumbs_left.gif') no-repeat center;
+	text-indent: -3000px;
+	display: block;
+	width: 9px;
+	height: 18px;
+	float: left;
+	margin-top: 30px
+}
+#crossselling_scroll_right { background-image: url('../img/thumbs_right.gif') }

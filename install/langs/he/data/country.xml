@@ -1,0 +1,735 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity_country>
+  <country id="UG">
+    <name>אוגנדה</name>
+  </country>
+  <country id="UZ">
+    <name>אוזבקיסטן</name>
+  </country>
+  <country id="AX">
+    <name>אולנד</name>
+  </country>
+  <country id="AT">
+    <name>אוסטריה</name>
+  </country>
+  <country id="AU">
+    <name>אוסטרליה</name>
+  </country>
+  <country id="UA">
+    <name>אוקראינה</name>
+  </country>
+  <country id="UY">
+    <name>אורוגוואי</name>
+  </country>
+  <country id="AZ">
+    <name>אזרבייג'ן</name>
+  </country>
+  <country id="AE">
+    <name>איחוד האמירויות הערביות</name>
+  </country>
+  <country id="IT">
+    <name>איטליה</name>
+  </country>
+  <country id="GS">
+    <name>איי ג'ורג'יה הדרומית ואיי סנדוויץ' הדרומיים</name>
+  </country>
+  <country id="VG">
+    <name>איי הבתולה הבריטיים</name>
+  </country>
+  <country id="VI">
+    <name>איי הבתולה של ארצות הברית</name>
+  </country>
+  <country id="TC">
+    <name>איי טרקס וקייקוס</name>
+  </country>
+  <country id="MP">
+    <name>איי מריאנה הצפוניים</name>
+  </country>
+  <country id="MH">
+    <name>איי מרשל</name>
+  </country>
+  <country id="FK">
+    <name>איי פוקלנד</name>
+  </country>
+  <country id="FO">
+    <name>איי פארו</name>
+  </country>
+  <country id="CK">
+    <name>איי קוק</name>
+  </country>
+  <country id="CC">
+    <name>איי קוקוס</name>
+  </country>
+  <country id="KY">
+    <name>איי קיימן</name>
+  </country>
+  <country id="SB">
+    <name>איי שלמה</name>
+  </country>
+  <country id="ID">
+    <name>אינדונזיה</name>
+  </country>
+  <country id="IS">
+    <name>איסלנד</name>
+  </country>
+  <country id="IE">
+    <name>אירלנד</name>
+  </country>
+  <country id="IR">
+    <name>אירן</name>
+  </country>
+  <country id="SV">
+    <name>אל סלוודור</name>
+  </country>
+  <country id="AL">
+    <name>אלבניה</name>
+  </country>
+  <country id="DZ">
+    <name>אלג'יריה</name>
+  </country>
+  <country id="AI">
+    <name>אנגווילה</name>
+  </country>
+  <country id="AO">
+    <name>אנגולה</name>
+  </country>
+  <country id="AD">
+    <name>אנדורה</name>
+  </country>
+  <country id="AQ">
+    <name>אנטארקטיקה</name>
+  </country>
+  <country id="AG">
+    <name>אנטיגואה וברבודה</name>
+  </country>
+  <country id="EE">
+    <name>אסטוניה</name>
+  </country>
+  <country id="AF">
+    <name>אפגניסטן</name>
+  </country>
+  <country id="EC">
+    <name>אקוודור</name>
+  </country>
+  <country id="AR">
+    <name>ארגנטינה</name>
+  </country>
+  <country id="US">
+    <name>ארה"ב</name>
+  </country>
+  <country id="AW">
+    <name>ארובה</name>
+  </country>
+  <country id="ER">
+    <name>אריתריאה</name>
+  </country>
+  <country id="AM">
+    <name>ארמניה</name>
+  </country>
+  <country id="ET">
+    <name>אתיופיה</name>
+  </country>
+  <country id="BS">
+    <name>בהאמה</name>
+  </country>
+  <country id="BT">
+    <name>בהוטן</name>
+  </country>
+  <country id="BV">
+    <name>בובה (אי)</name>
+  </country>
+  <country id="BW">
+    <name>בוטסואנה</name>
+  </country>
+  <country id="BG">
+    <name>בולגריה</name>
+  </country>
+  <country id="BO">
+    <name>בוליביה</name>
+  </country>
+  <country id="BA">
+    <name>בוסניה והרצגובינה</name>
+  </country>
+  <country id="BI">
+    <name>בורונדי</name>
+  </country>
+  <country id="MM">
+    <name>בורמה (מיאנמר)</name>
+  </country>
+  <country id="BF">
+    <name>בורקינה פאסו</name>
+  </country>
+  <country id="BH">
+    <name>בחריין</name>
+  </country>
+  <country id="BY">
+    <name>בלארוס</name>
+  </country>
+  <country id="BE">
+    <name>בלגיה</name>
+  </country>
+  <country id="BZ">
+    <name>בליז</name>
+  </country>
+  <country id="BD">
+    <name>בנגלדש</name>
+  </country>
+  <country id="BJ">
+    <name>בנין</name>
+  </country>
+  <country id="BB">
+    <name>ברבדוס</name>
+  </country>
+  <country id="BN">
+    <name>ברוניי</name>
+  </country>
+  <country id="BR">
+    <name>ברזיל</name>
+  </country>
+  <country id="GB">
+    <name>בריטניה</name>
+  </country>
+  <country id="BM">
+    <name>ברמודה</name>
+  </country>
+  <country id="GE">
+    <name>גאורגיה</name>
+  </country>
+  <country id="GH">
+    <name>גאנה</name>
+  </country>
+  <country id="GA">
+    <name>גבון</name>
+  </country>
+  <country id="GT">
+    <name>גואטמלה</name>
+  </country>
+  <country id="GU">
+    <name>גואם</name>
+  </country>
+  <country id="GP">
+    <name>גוואדלופ</name>
+  </country>
+  <country id="GY">
+    <name>גיאנה</name>
+  </country>
+  <country id="GI">
+    <name>גיברלטר</name>
+  </country>
+  <country id="GN">
+    <name>גינאה</name>
+  </country>
+  <country id="GW">
+    <name>גינאה ביסאו</name>
+  </country>
+  <country id="GQ">
+    <name>גינאה המשוונית</name>
+  </country>
+  <country id="GF">
+    <name>גיאנה הצרפתית</name>
+  </country>
+  <country id="GM">
+    <name>גמביה</name>
+  </country>
+  <country id="GL">
+    <name>גרינלנד</name>
+  </country>
+  <country id="DE">
+    <name>גרמניה</name>
+  </country>
+  <country id="GD">
+    <name>גרנדה</name>
+  </country>
+  <country id="GG">
+    <name>גרנזי</name>
+  </country>
+  <country id="DJ">
+    <name>ג'יבוטי</name>
+  </country>
+  <country id="JM">
+    <name>ג'מייקה</name>
+  </country>
+  <country id="JE">
+    <name>ג'רזי</name>
+  </country>
+  <country id="DM">
+    <name>דומיניקה</name>
+  </country>
+  <country id="DK">
+    <name>דנמרק</name>
+  </country>
+  <country id="ZA">
+    <name>דרום אפריקה</name>
+  </country>
+  <country id="KR">
+    <name>דרום קוריאה</name>
+  </country>
+  <country id="HM">
+    <name>האי הרד ואיי מקדונלד</name>
+  </country>
+  <country id="CX">
+    <name>האי כריסטמס</name>
+  </country>
+  <country id="IM">
+    <name>האי מאן</name>
+  </country>
+  <country id="HT">
+    <name>האיטי</name>
+  </country>
+  <country id="AN">
+    <name>האנטילים ההולנדיים</name>
+  </country>
+  <country id="TF">
+    <name>הארצות הדרומיות והאנטארקטיות של צרפת</name>
+  </country>
+  <country id="IN">
+    <name>הודו</name>
+  </country>
+  <country id="NL">
+    <name>הולנד</name>
+  </country>
+  <country id="HK">
+    <name>הונג קונג</name>
+  </country>
+  <country id="HU">
+    <name>הונגריה</name>
+  </country>
+  <country id="HN">
+    <name>הונדורס</name>
+  </country>
+  <country id="IO">
+    <name>הטריטוריה הבריטית באוקיינוס ההודי</name>
+  </country>
+  <country id="CF">
+    <name>הרפובליקה במרכז אפריקאית</name>
+  </country>
+  <country id="DO">
+    <name>הרפובליקה הדומיניקנית</name>
+  </country>
+  <country id="CD">
+    <name>הרפובליקה הדמוקרטית של קונגו (זאיר)</name>
+  </country>
+  <country id="WF">
+    <name>ואליס ופוטונה</name>
+  </country>
+  <country id="VU">
+    <name>ונואטו</name>
+  </country>
+  <country id="VE">
+    <name>ונצואלה</name>
+  </country>
+  <country id="VN">
+    <name>וייטנאם</name>
+  </country>
+  <country id="VA">
+    <name>וותיקן</name>
+  </country>
+  <country id="ZM">
+    <name>זמביה</name>
+  </country>
+  <country id="ZW">
+    <name>זימבבואה</name>
+  </country>
+  <country id="CI">
+    <name>חוף השנהב</name>
+  </country>
+  <country id="TW">
+    <name>טאיוואן</name>
+  </country>
+  <country id="TV">
+    <name>טובאלו</name>
+  </country>
+  <country id="TJ">
+    <name>טג'יקיסטן</name>
+  </country>
+  <country id="TG">
+    <name>טוגו</name>
+  </country>
+  <country id="TO">
+    <name>טונגה</name>
+  </country>
+  <country id="TK">
+    <name>טוקלאו</name>
+  </country>
+  <country id="TR">
+    <name>טורקיה</name>
+  </country>
+  <country id="TM">
+    <name>טורקמניסטן</name>
+  </country>
+  <country id="TZ">
+    <name>טנזניה</name>
+  </country>
+  <country id="TT">
+    <name>טרינידד וטובגו</name>
+  </country>
+  <country id="GR">
+    <name>יוון</name>
+  </country>
+  <country id="JP">
+    <name>יפן</name>
+  </country>
+  <country id="JO">
+    <name>ירדן</name>
+  </country>
+  <country id="IL">
+    <name>ישראל</name>
+  </country>
+  <country id="KW">
+    <name>כווית</name>
+  </country>
+  <country id="CV">
+    <name>כף ורדה</name>
+  </country>
+  <country id="LA">
+    <name>לאוס</name>
+  </country>
+  <country id="LB">
+    <name>לבנון</name>
+  </country>
+  <country id="LY">
+    <name>לוב</name>
+  </country>
+  <country id="LU">
+    <name>לוקסמבורג</name>
+  </country>
+  <country id="LV">
+    <name>לטביה</name>
+  </country>
+  <country id="LR">
+    <name>ליבריה</name>
+  </country>
+  <country id="LT">
+    <name>ליטא</name>
+  </country>
+  <country id="LI">
+    <name>ליכטנשטיין</name>
+  </country>
+  <country id="LS">
+    <name>לסוטו</name>
+  </country>
+  <country id="MR">
+    <name>מאוריטניה</name>
+  </country>
+  <country id="MU">
+    <name>מאוריציוס</name>
+  </country>
+  <country id="ML">
+    <name>מאלי</name>
+  </country>
+  <country id="MG">
+    <name>מדגסקר</name>
+  </country>
+  <country id="PS">
+    <name>מדינה פלסטינית</name>
+  </country>
+  <country id="MZ">
+    <name>מוזמביק</name>
+  </country>
+  <country id="MD">
+    <name>מולדובה</name>
+  </country>
+  <country id="MN">
+    <name>מונגוליה</name>
+  </country>
+  <country id="MS">
+    <name>מונטסראט</name>
+  </country>
+  <country id="ME">
+    <name>מונטנגרו</name>
+  </country>
+  <country id="MC">
+    <name>מונקו</name>
+  </country>
+  <country id="TL">
+    <name>מזרח טימור</name>
+  </country>
+  <country id="YT">
+    <name>מיוט</name>
+  </country>
+  <country id="FM">
+    <name>מיקרונזיה</name>
+  </country>
+  <country id="MW">
+    <name>מלאווי</name>
+  </country>
+  <country id="MV">
+    <name>מלדיביים</name>
+  </country>
+  <country id="MY">
+    <name>מלזיה</name>
+  </country>
+  <country id="MT">
+    <name>מלטה</name>
+  </country>
+  <country id="EG">
+    <name>מצרים</name>
+  </country>
+  <country id="MO">
+    <name>מקאו</name>
+  </country>
+  <country id="MK">
+    <name>מקדוניה</name>
+  </country>
+  <country id="MX">
+    <name>מקסיקו</name>
+  </country>
+  <country id="MA">
+    <name>מרוקו</name>
+  </country>
+  <country id="MQ">
+    <name>מרטיניק</name>
+  </country>
+  <country id="NR">
+    <name>נאורו</name>
+  </country>
+  <country id="NO">
+    <name>נורבגיה</name>
+  </country>
+  <country id="NF">
+    <name>נורפוק (אי)</name>
+  </country>
+  <country id="NG">
+    <name>ניגריה</name>
+  </country>
+  <country id="NZ">
+    <name>ניו זילנד</name>
+  </country>
+  <country id="NU">
+    <name>ניואה</name>
+  </country>
+  <country id="NE">
+    <name>ניז'ר</name>
+  </country>
+  <country id="NI">
+    <name>ניקרגואה</name>
+  </country>
+  <country id="NA">
+    <name>נמיביה</name>
+  </country>
+  <country id="NP">
+    <name>נפאל</name>
+  </country>
+  <country id="ST">
+    <name>סאו טומה ופרינסיפה</name>
+  </country>
+  <country id="SJ">
+    <name>סבאלברד ויאן מאיין</name>
+  </country>
+  <country id="EH">
+    <name>סהרה המערבית</name>
+  </country>
+  <country id="SD">
+    <name>סודאן</name>
+  </country>
+  <country id="SZ">
+    <name>סווזילנד</name>
+  </country>
+  <country id="SO">
+    <name>סומליה</name>
+  </country>
+  <country id="SY">
+    <name>סוריה</name>
+  </country>
+  <country id="SR">
+    <name>סורינאם</name>
+  </country>
+  <country id="SL">
+    <name>סיירה לאונה</name>
+  </country>
+  <country id="SC">
+    <name>סיישל</name>
+  </country>
+  <country id="SG">
+    <name>סינגפור</name>
+  </country>
+  <country id="CN">
+    <name>סין</name>
+  </country>
+  <country id="SK">
+    <name>סלובקיה</name>
+  </country>
+  <country id="SI">
+    <name>סלובניה</name>
+  </country>
+  <country id="WS">
+    <name>סמואה</name>
+  </country>
+  <country id="AS">
+    <name>סמואה_האמריקנית</name>
+  </country>
+  <country id="BL">
+    <name>סן ברתלמי</name>
+  </country>
+  <country id="MF">
+    <name>סן מרטן</name>
+  </country>
+  <country id="PM">
+    <name>סן פייר ומיקלון</name>
+  </country>
+  <country id="SN">
+    <name>סנגל</name>
+  </country>
+  <country id="VC">
+    <name>סנט וינסנט והגרנדינים</name>
+  </country>
+  <country id="LC">
+    <name>סנט לוסיה</name>
+  </country>
+  <country id="SM">
+    <name>סן מרינו</name>
+  </country>
+  <country id="KN">
+    <name>סנט קיטס ונוויס</name>
+  </country>
+  <country id="ES">
+    <name>ספרד</name>
+  </country>
+  <country id="RS">
+    <name>סרביה</name>
+  </country>
+  <country id="LK">
+    <name>סרי לנקה</name>
+  </country>
+  <country id="OM">
+    <name>עומאן</name>
+  </country>
+  <country id="IQ">
+    <name>עירק</name>
+  </country>
+  <country id="SA">
+    <name>ערב הסעודית</name>
+  </country>
+  <country id="PR">
+    <name>פוארטו ריקו</name>
+  </country>
+  <country id="PL">
+    <name>פולין</name>
+  </country>
+  <country id="PF">
+    <name>פולינזיה הצרפתית</name>
+  </country>
+  <country id="PT">
+    <name>פורטוגל</name>
+  </country>
+  <country id="FJ">
+    <name>פיג'י</name>
+  </country>
+  <country id="PN">
+    <name>פיטקרן</name>
+  </country>
+  <country id="PH">
+    <name>פיליפינים</name>
+  </country>
+  <country id="FI">
+    <name>פינלנד</name>
+  </country>
+  <country id="PW">
+    <name>פלא</name>
+  </country>
+  <country id="PA">
+    <name>פנמה</name>
+  </country>
+  <country id="PG">
+    <name>פפואה גינאה החדשה</name>
+  </country>
+  <country id="PK">
+    <name>פקיסטן</name>
+  </country>
+  <country id="PY">
+    <name>פרגוואי</name>
+  </country>
+  <country id="PE">
+    <name>פרו</name>
+  </country>
+  <country id="FR">
+    <name>צרפת</name>
+  </country>
+  <country id="TD">
+    <name>צ'אד</name>
+  </country>
+  <country id="CL">
+    <name>צ'ילה</name>
+  </country>
+  <country id="CZ">
+    <name>צ'כיה</name>
+  </country>
+  <country id="CU">
+    <name>קובה</name>
+  </country>
+  <country id="CO">
+    <name>קולומביה</name>
+  </country>
+  <country id="KM">
+    <name>קומורו</name>
+  </country>
+  <country id="CG">
+    <name>קונגו</name>
+  </country>
+  <country id="CR">
+    <name>קוסטה ריקה</name>
+  </country>
+  <country id="KP">
+    <name>קוריאה הצפונית</name>
+  </country>
+  <country id="KZ">
+    <name>קזחסטן</name>
+  </country>
+  <country id="QA">
+    <name>קטאר</name>
+  </country>
+  <country id="KG">
+    <name>קירגיזסטן</name>
+  </country>
+  <country id="KI">
+    <name>קיריבטי</name>
+  </country>
+  <country id="NC">
+    <name>קלדוניה החדשה</name>
+  </country>
+  <country id="KH">
+    <name>קמבודיה</name>
+  </country>
+  <country id="CM">
+    <name>קמרון</name>
+  </country>
+  <country id="CA">
+    <name>קנדה</name>
+  </country>
+  <country id="KE">
+    <name>קניה</name>
+  </country>
+  <country id="CY">
+    <name>קפריסין</name>
+  </country>
+  <country id="HR">
+    <name>קרואטיה</name>
+  </country>
+  <country id="RE">
+    <name>ראוניון</name>
+  </country>
+  <country id="RW">
+    <name>רואנדה</name>
+  </country>
+  <country id="RO">
+    <name>רומניה</name>
+  </country>
+  <country id="RU">
+    <name>רוסיה</name>
+  </country>
+  <country id="SE">
+    <name>שוודיה</name>
+  </country>
+  <country id="CH">
+    <name>שוויץ</name>
+  </country>
+  <country id="TH">
+    <name>תאילנד</name>
+  </country>
+  <country id="YE">
+    <name>תימן</name>
+  </country>
+  <country id="TN">
+    <name>תוניסיה</name>
+  </country>
+</entity_country>

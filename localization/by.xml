@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<localizationPack name="Belarus">
+  <currencies>
+    <currency name="Belarusian ruble" iso_code="BYR" iso_code_num="974" sign="&#x440;." blank="0" conversion_rate="1.000000" format="2" decimals="0"/>
+  </currencies>
+  <languages>
+    <language iso_code="ru"/>
+  </languages>
+  <taxes>
+    <taxRulesGroup name="&#x41F;&#x414;&#x412; 20%">
+      <taxRule iso_code_country="by" behavior="0" id_tax="65"/>
+    </taxRulesGroup>
+    <taxRulesGroup name="&#x41F;&#x414;&#x412; 10%">
+      <taxRule iso_code_country="by" behavior="0" id_tax="66"/>
+    </taxRulesGroup>
+    <taxRulesGroup name="&#x41F;&#x414;&#x412; 0.5%">
+      <taxRule iso_code_country="by" behavior="0" id_tax="67"/>
+    </taxRulesGroup>
+    <tax id="65" name="&#x41F;&#x414;&#x412; 20%" rate="20.000"/>
+    <tax id="66" name="&#x41F;&#x414;&#x412; 10%" rate="10.000"/>
+    <tax id="67" name="&#x41F;&#x414;&#x412; 0.5%" rate="0.500"/>
+  </taxes>
+  <units>
+    <unit type="weight" value="kg"/>
+    <unit type="volume" value="L"/>
+    <unit type="short_distance" value="cm"/>
+    <unit type="base_distance" value="m"/>
+    <unit type="long_distance" value="km"/>
+  </units>
+</localizationPack>

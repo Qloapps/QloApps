@@ -1,0 +1,11 @@
+HTML.XHTML
+TYPE: bool
+DEFAULT: true
+VERSION: 1.1.0
+DEPRECATED-VERSION: 1.7.0
+DEPRECATED-USE: HTML.Doctype
+--DESCRIPTION--
+Determines whether or not output is XHTML 1.0 or HTML 4.01 flavor.
+--ALIASES--
+Core.XHTML
+--# vim: et sw=4 sts=4

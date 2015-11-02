@@ -1,0 +1,9 @@
+URI.UnescapeCharacters
+TYPE: string/null
+DEFAULT: NULL
+--DESCRIPTION--
+
+<p>
+    Defines characters that won't be escape by HTMLPurifier_URI.
+</p>
+--# vim: et sw=4 sts=4

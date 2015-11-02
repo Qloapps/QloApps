@@ -1,0 +1,65 @@
+#content {
+	margin: 20px;
+}
+
+#cronjobs_toolbar {
+	margin-top: 20px !important;
+}
+
+#cronjobs-logo {
+	margin: 6px 15px 3px 0;
+}
+
+.alert {
+	border-left: 1px solid;
+	border-right: 1px solid;
+}
+
+.alert-warning {
+	border: 1px solid #9e6014 !important;
+	background: #FEEFB3 !important;
+}
+
+.alert-info {
+	border: 1px solid #00529B !important;
+	background: #BDE5F8 !important;
+}
+
+.alert-success {
+	border: 1px solid #4F8A10 !important;
+	background: #DFF2BF !important;
+}
+
+.panel {
+	padding: 15px;
+	border: 1px solid #eee;
+	text-align: justify;
+}
+
+.panel h3 {
+	margin-top: 0;
+}
+
+.margin-form label {
+	text-align: left;
+	margin-bottom: 0;
+	padding-top: 2px;
+	line-height: 20px;
+	float: none !important;
+}
+
+.margin-form input {
+	margin: 5px 5px 0 0;
+	vertical-align: top;
+}
+
+.bootstrap form .tab-pane:first-child .panel {
+	border-top-left-radius: 0;
+}
+.bootstrap #cronjobs-logo {
+	margin-right: 4px;
+}
+
+input[name="task"] {
+	width: 80%;
+}

@@ -1,0 +1,10 @@
+ID;Active (0/1);Titles ID (Mr = 1, Ms = 2, else 0);Email *;Password *;Birthday (yyyy-mm-dd);Last Name *;First Name *;Newsletter (0/1);Opt-in (0/1);Groups (x,y,z...);Default group ID
+1;1;1;Peter.Pan@prestashop.com;123456789;1987-04-02;Pan;Peter;1;0;Customer;Customer
+2;1;2;Wendy.Moira.Darling@prestashop.com;123456789;1989-11-12;Darling;Wendy Moira;1;0;Customer;Customer
+3;1;2;Tiger.Lily@prestashop.com;123456789;1982-02-28;Lily;Tiger;1;0;Customer;Customer
+4;1;1;James.Hook@prestashop.com;123456789;1952-12-04;Hook;James;0;1;Customer, Carribean;Carribean
+5;1;2;Tinker.Bell@prestashop.com;123456789;1900-01-01;Bell;Tinker;1;1;Customer;Customer
+6;1;1;Bob.Smee@prestashop.com;123456789;1971-10-21;Smee;Bob;1;1;Customer;Customer
+7;1;1;Tictac.Crocodile@prestashop.com;123456789;1991-09-27;Crocodile;Tictac;0;0;Customer, Carribean;Carribean
+8;1;1;Jack.Banning@prestashop.com;123456789;2003-07-05;Banning;Jack;0;0;Kids;Kids
+9;0;2;Maggie.Banning@prestashop.com;123456789;2006-02-27;Banning;Maggie;0;0;Kids;Kids

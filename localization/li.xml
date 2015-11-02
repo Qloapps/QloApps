@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<localizationPack name="Liechtenstein" version="1.0">
+	<currencies>
+		<currency name="Franc" iso_code="CHF" iso_code_num="756" sign="CHF" blank="1" conversion_rate="1.34183" format="2" decimals="1" />
+	</currencies>
+	<languages>
+		<language iso_code="de" />
+	</languages>
+	<taxes>
+		<tax id="1" name="TVA CH 8%" rate="8" />
+		<tax id="2" name="TVA CH 3.8%" rate="3.8" />
+		<tax id="3" name="TVA CH 2.5%" rate="2.5" />
+		
+		<taxRulesGroup name="CH Standard Rate (8%)">
+			<taxRule iso_code_country="li" id_tax="1" />
+		</taxRulesGroup>
+		
+		<taxRulesGroup name="CH Reduced Rate (3.8%)">
+			<taxRule iso_code_country="li" id_tax="2" />
+		</taxRulesGroup>
+		
+		<taxRulesGroup name="CH Super Reduced Rate (2.5%)">
+			<taxRule iso_code_country="li" id_tax="3" />
+		</taxRulesGroup>
+	</taxes>
+	<units>
+		<unit type="weight" value="kg" />
+		<unit type="volume" value="L" />
+		<unit type="short_distance" value="cm" />
+		<unit type="base_distance" value="m" />
+		<unit type="long_distance" value="km" />
+	</units>
+</localizationPack>

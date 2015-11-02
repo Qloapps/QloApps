@@ -1,0 +1,4 @@
+2014-03-31 12:12:00 +0200	// Typo.
+2014-03-27 17:16:48 +0100	/ MO statsbestcustomers : min ps_versions_compliancy modified (1.5.6.1 => 1.6)
+2014-03-24 15:22:38 +0100	/ MO statsbestcustomers : ps_versions_compliancy added
+2014-03-20 14:35:57 +0100	Initial commit

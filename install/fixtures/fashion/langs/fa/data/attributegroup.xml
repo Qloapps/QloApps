@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<list_attributegroup>
+    <attributegroup id="Size">
+        <name><![CDATA[اندازه]]></name>
+    </attributegroup>
+    <attributegroup id="Size_public">
+        <name><![CDATA[اندازه]]></name>
+    </attributegroup>
+    <attributegroup id="color">
+        <name><![CDATA[رنگ]]></name>
+    </attributegroup>
+    <attributegroup id="color_public">
+        <name><![CDATA[رنگ]]></name>
+    </attributegroup>
+    <attributegroup id="Shoes_Size">
+        <name><![CDATA[اندازه کفش]]></name>
+    </attributegroup>
+    <attributegroup id="Shoes_Size_public">
+        <name><![CDATA[اندازه]]></name>
+    </attributegroup>
+</list_attributegroup>

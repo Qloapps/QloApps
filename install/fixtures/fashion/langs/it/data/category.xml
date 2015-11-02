@@ -1,0 +1,81 @@
+<?xml version='1.0'?>
+<entity_category>
+  <category id='Women' id_shop='1'>
+    <name>Donna</name>
+    <description>&lt;p&gt;&lt;strong&gt;Qui troverete tutte le collezioni moda donna.&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Questa categoria comprende tutti i capi base del vostro guardaroba e molto altro:&lt;/p&gt;
+&lt;p&gt;scarpe, accessori, T-shirt stampate, abiti femminili, jeans da donna!&lt;/p&gt;</description>
+    <link_rewrite>donna</link_rewrite>
+    <meta_title/>
+    <meta_keywords/>
+    <meta_description/>
+  </category>
+  <category id='Tops' id_shop='1'>
+    <name>Top</name>
+    <description>&lt;p&gt;Scegliete tra T-shirt, top, camicette, maniche corte, maniche lunghe, canottiere, maniche a 3/4 e altro.&lt;/p&gt;
+&lt;p&gt;Trovate il modello più adatto a voi!&lt;/p&gt;</description>
+    <link_rewrite>top</link_rewrite>
+    <meta_title/>
+    <meta_keywords/>
+    <meta_description/>
+  </category>
+  <category id='T-shirts' id_shop='1'>
+    <name>T-shirt</name>
+    <description>&lt;p&gt;Il must del vostro guardaroba, date un&apos;occhiata ai vari colori,&lt;/p&gt;
+&lt;p&gt;forme e modelli della nostra collezione!&lt;/p&gt;</description>
+    <link_rewrite>tshirt</link_rewrite>
+    <meta_title/>
+    <meta_keywords/>
+    <meta_description/>
+  </category>
+  <category id='Tops_1' id_shop='1'>
+    <name>Top</name>
+    <description>Scegliete il capo più adatto a voi nell&apos;ampia varietà di top proposta.</description>
+    <link_rewrite>top</link_rewrite>
+    <meta_title/>
+    <meta_keywords/>
+    <meta_description/>
+  </category>
+  <category id='Blouses' id_shop='1'>
+    <name>Camicette</name>
+    <description>Abbinate le vostre camicette preferite agli accessori giusti per un look perfetto.</description>
+    <link_rewrite>camicette</link_rewrite>
+    <meta_title/>
+    <meta_keywords/>
+    <meta_description/>
+  </category>
+  <category id='Dresses' id_shop='1'>
+    <name>Abiti</name>
+    <description>&lt;p&gt;Trovate il vostro abbigliamento preferito nella nostra ampia scelta di abiti da sera, casual o estivi!&lt;/p&gt;
+&lt;p&gt;Proponiamo abiti per tutti i giorni, tutti gli stili e tutte le occasioni.&lt;/p&gt;</description>
+    <link_rewrite>abiti</link_rewrite>
+    <meta_title/>
+    <meta_keywords/>
+    <meta_description/>
+  </category>
+  <category id='Casual_Dresses' id_shop='1'>
+    <name>Abiti casual</name>
+    <description>&lt;p&gt;State cercando un abito per tutti i giorni? Date un&apos;occhiata alla&lt;/p&gt;
+&lt;p&gt;nostra selezione di abiti per trovare quello adatto a voi.&lt;/p&gt;</description>
+    <link_rewrite>abiti-casual</link_rewrite>
+    <meta_title/>
+    <meta_keywords/>
+    <meta_description/>
+  </category>
+  <category id='Evening_Dresses' id_shop='1'>
+    <name>Abiti da sera</name>
+    <description>Curiosate tra i nostri abiti per scegliere il capo perfetto per una serata indimenticabile!</description>
+    <link_rewrite>abiti-da-sera</link_rewrite>
+    <meta_title/>
+    <meta_keywords/>
+    <meta_description/>
+  </category>
+  <category id='Summer_Dresses' id_shop='1'>
+    <name>Abiti estivi</name>
+    <description>Abito corto, abito lungo, abito in seta, abito stampato... qui troverete l&apos;abito perfetto per l&apos;estate.</description>
+    <link_rewrite>abiti-estivi</link_rewrite>
+    <meta_title/>
+    <meta_keywords/>
+    <meta_description/>
+  </category>
+</entity_category>

@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<localizationPack name="Panama">
+  <currencies>
+    <currency name="Dollar" iso_code="USD" iso_code_num="840" sign="$" blank="0" conversion_rate="1.000000" format="1" decimals="1"/>
+  </currencies>
+  <languages>
+    <language iso_code="es"/>
+  </languages>
+  <taxes>
+    <taxRulesGroup name="ITBMS 7%">
+      <taxRule iso_code_country="pa" behavior="0" id_tax="74"/>
+    </taxRulesGroup>
+    <taxRulesGroup name="ITBMS 0%">
+      <taxRule iso_code_country="pa" behavior="0" id_tax="75"/>
+    </taxRulesGroup>
+    <tax id="74" name="ITBMS 7%" rate="7.000"/>
+    <tax id="75" name="ITBMS 0%" rate="0.000"/>
+  </taxes>
+  <units>
+    <unit type="weight" value="kg"/>
+    <unit type="volume" value="L"/>
+    <unit type="short_distance" value="cm"/>
+    <unit type="base_distance" value="m"/>
+    <unit type="long_distance" value="km"/>
+  </units>
+</localizationPack>

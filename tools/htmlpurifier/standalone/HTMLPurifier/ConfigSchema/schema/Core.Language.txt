@@ -1,0 +1,10 @@
+Core.Language
+TYPE: string
+VERSION: 2.0.0
+DEFAULT: 'en'
+--DESCRIPTION--
+
+ISO 639 language code for localizable things in HTML Purifier to use,
+which is mainly error reporting. There is currently only an English (en)
+translation, so this directive is currently useless.
+--# vim: et sw=4 sts=4

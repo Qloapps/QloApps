@@ -1,0 +1,324 @@
+/* RTL styles for RTL languages (Persian, Arabic or Hebrew) */
+/* Created by Danoosh Miralayi - Presta-shop.ir - */
+body{
+	font:normal 12px/16px Tahoma, Arial, Helvetica, sans-serif;
+	direction: rtl;
+}
+caption,th{
+	text-align:right;
+}
+#loaderSpace{
+	right: 0;
+	left: auto;
+}
+div#loader{
+	margin: 450px 440px 0 0;
+}
+div#leftpannel{
+	float:right;
+}
+div#sheets{
+	float:right;
+}
+div#buttons{
+	margin:0 295px 0 0;
+}
+#btNext{
+	float:left;
+}
+#sheets ul{
+	margin-right: 15px;
+	margin-left: auto;
+}
+div.field{
+	background:url(img/bg_field.png) repeat-x 0 0 transparent;
+}
+div.field div.contentinput label{
+	margin-left: 10px;
+	margin-right: auto;
+}
+div.field .userInfos{
+	float: left;
+}
+.okBlock{
+	padding:20px 38px 20px 20px;
+}
+.errorBlock{
+	padding:20px 38px 20px 20px;
+}
+.errorTxt{
+	float: right;
+	padding: 1px 38px 1px 0;
+}
+.infosBlock{
+	padding:14px 20px 14px 25px;
+}
+.warnBlock{
+	padding:14px 35px 14px 25px;
+}
+#header #headerLinks{
+	float:left;
+}
+#header #headerLinks li{
+	background:transparent url(img/bg-li-headerLinks.png) no-repeat left 2px;
+}
+#header #headerLinks #phone_block{
+	padding:0 46px 0 0;
+}
+#header #headerLinks #phone_block div{
+	padding:7px 0 8px 15px;
+	background:transparent url(img/bg-phone_block.png) no-repeat left top;
+}
+#header #PrestaShopLogo{
+	float:right;
+	margin:5px 10px 0 0;
+}
+#header #infosSup{
+	float:right;
+	margin:10px 50px 0 0;
+}
+ol#tabs li{
+	padding:9px 16px 9px 0;
+}
+.sheet .contentTitle{
+	right:0;
+	left: auto;
+	padding:15px 38px 10px 25px;
+}
+.sheet .contentTitle .stepList{
+	left:20px;
+	right: auto;
+}
+.sheet .contentTitle .stepList li{
+	float:right;
+	margin:0 5px 0 0;
+}
+#sheet_system #req_bt_refresh{
+	float:left;
+}
+#sheet_system #btTestDB{
+	float:left;
+}
+ul#optional li.fail{
+	background:#f8eba8 url(img/pict_error.png) no-repeat 1% 8px;
+    padding-left: 20px;
+}
+#mailSMTPParam p{
+	background:url(img/bg_field.png) repeat-x 0 0 transparent;
+}
+#formCheckSQL p#dbResultCheck.errorBlock{
+	padding: 20px 38px 20px 20px;
+}
+#formCheckSQL p#dbResultCheck.okBlock{
+	padding:20px 38px 20px 20px;
+}
+#contentInfosNotification{
+	padding-right:190px;
+	padding-left: 0;
+}
+#inputFileLogo{
+	margin-right:190px;
+	margin-left: auto;
+}
+.blockInfoEnd{
+	float:right;
+	margin:34px 0 22px 20px;
+}
+.blockInfoEnd.last{
+	margin-left:0;
+	margin-right: auto;
+}
+.blockInfoEnd img{
+	float:right;
+	margin:0 0 5px 10px;
+}
+.blockInfoEnd a.FO{
+	float:left;
+	padding:0 10px 0 0;
+}
+.blockInfoEnd a.FO span{
+	padding:0 0 0 32px;
+	background:#00aff0;
+}
+ul#optional_update li.fail{
+	background:#f8f8f8 url(img/pict_error.png) no-repeat 0 8px;
+}
+ul#optional_update li.ok{
+	background:#f8f8f8 url(img/pict_ok.png) no-repeat 0 10px;
+}
+#sheet_require_update #req_bt_refresh_update{
+	float:left;
+}
+#sheet_configure div.field label.aligned{
+	float: right;
+}
+#sheet_configure div.field div.contentinput{
+	float: right;
+}
+#progress_bar .installing{
+	padding-right: 36px;
+	padding-left: 0;
+}
+#progress_bar ol{
+	margin-right: 20px;
+	margin-left: auto;
+}
+#progress_bar ol.process_list li.success{
+	padding-right: 18px;
+	padding-left: 0;
+}
+#progress_bar ol.process_list li.fail{
+	padding-right: 18px;
+	padding-left: 0;
+}
+#error_process{
+	margin-right: 37px;
+	margin-left: auto;
+}
+#error_process p{
+	margin-right: 20px;
+	margin-left: auto;
+}
+#sheets ul.chzn-results{
+	margin-right: 5px;
+	margin-left: auto;
+}
+.chosen-container .chosen-drop{
+	right: -9999px;
+	left: auto;
+}
+.chosen-container.chosen-with-drop .chosen-drop{
+	right: 0;
+	left: auto;
+}
+.chosen-container-single .chosen-single{
+	padding: 0 8px 0 0;
+}
+.chosen-container-single .chosen-single span{
+	margin-left: 26px;
+	margin-right: auto;
+}
+.chosen-container-single .chosen-single-with-deselect span{
+	margin-left: 38px;
+	margin-right: auto;
+}
+.chosen-container-single .chosen-single abbr{
+	left: 26px;
+	right: auto;
+}
+.chosen-container-single .chosen-single div{
+	left: 0;
+	right: auto;
+}
+.chosen-container-single .chosen-search input[type="text"]{
+	padding: 4px 5px 4px 20px;
+}
+.chosen-container-single .chosen-drop{
+	border-radius: 0 4px 4px 0;
+}
+.chosen-container-single.chosen-container-single-nosearch .chosen-search{
+	right: -9999px;
+	left: auto;
+}
+.chosen-container .chosen-results{
+	margin: 0 0 4px 4px;
+	padding: 0 4px 0 0;
+}
+.chosen-container .chosen-results li.group-option{
+	padding-right: 15px;
+	padding-left: 0;
+}
+.chosen-container-multi .chosen-choices li{
+	float: right;
+}
+.chosen-container-multi .chosen-choices li.search-choice{
+	margin: 3px 5px 3px 0;
+	padding: 3px 5px 3px 20px;
+}
+.chosen-container-multi .chosen-choices li.search-choice .search-choice-close{
+	left: 3px;
+	right: auto;
+}
+.chosen-container-multi .chosen-choices li.search-choice-disabled{
+	padding-left: 5px;
+}
+.chosen-container-active.chosen-with-drop .chosen-single div{
+	border-right: none;
+}
+.chosen-rtl{
+	text-align: left;
+}
+.chosen-rtl .chosen-single{
+	padding: 0 0 0 8px;
+}
+.chosen-rtl .chosen-single span{
+	margin-left: 0;
+	margin-right: 26px;
+}
+.chosen-rtl .chosen-single-with-deselect span{
+	margin-right: 38px;
+	margin-left: auto;
+}
+.chosen-rtl .chosen-single div{
+	left: auto;
+	right: 3px;
+}
+.chosen-rtl .chosen-single abbr{
+	left: auto;
+	right: 26px;
+}
+.chosen-rtl .chosen-choices li{
+	float: left;
+}
+.chosen-rtl .chosen-choices li.search-choice{
+	margin: 3px 0 3px 5px;
+	padding: 3px 19px 3px 5px;
+}
+.chosen-rtl .chosen-choices li.search-choice .search-choice-close{
+	left: auto;
+	right: 4px;
+}
+.chosen-rtl .chosen-drop{
+	right: 9999px;
+	left: auto;
+}
+.chosen-rtl.chosen-container-single .chosen-results{
+	margin: 0 4px 4px 0;
+	padding: 0 0 0 4px;
+}
+.chosen-rtl .chosen-results li.group-option{
+	padding-left: 15px;
+	padding-right: 0;
+}
+.chosen-rtl.chosen-container-active.chosen-with-drop .chosen-single div{
+	border-left: none;
+}
+.chosen-rtl .chosen-search input[type="text"]{
+	padding: 4px 20px 4px 5px;
+}
+@media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min-resolution: 144dpi)
+{
+	.chosen-container .chosen-results-scroll-up span{
+		background-image: url('img/chosen-sprite@2x.png') !important;
+		background-size: 52px 37px !important;
+		background-repeat: no-repeat !important;
+	}
+}
+.btn-facebook, .btn-twitter, .btn-google-plus, .btn-pinterest, .btn-linkedin{
+	padding: 4px 4px 4px 8px;
+}
+.btn-facebook i, .btn-twitter i, .btn-google-plus i, .btn-pinterest i, .btn-linkedin i{
+	margin-left: 4px;
+	margin-right: auto;
+}
+/* fix background */
+#progress_bar ol.process_list li.success,#header #headerLinks #phone_block, #loaderSpace, ol#tabs li.finished, ol#tabs li.selected, ol#tabs li.configuring{
+    background-position-x: right;
+}
+/* fix some styles */
+#set_license{
+	float: right !important;
+}
+ol#tabs li.selected {
+	background: url(img/bg-li-tabs-rtl.png) no-repeat 98% 15px;
+}

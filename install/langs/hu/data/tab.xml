@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity_tab>
+  <tab id="Dashboard" name="Vezérlőpult"/>
+  <tab id="CMS_Pages" name="CMS Pages"/>
+  <tab id="CMS_Categories" name="CMS Categories"/>
+  <tab id="Combinations_Generator" name="Combinations Generator"/>
+  <tab id="Search" name="Keresés"/>
+  <tab id="Login" name="Login"/>
+  <tab id="Shops" name="Boltok"/>
+  <tab id="Shop_URLs" name="Shop URLs"/>
+  <tab id="Catalog" name="Katalógus"/>
+  <tab id="Orders" name="Rendelések"/>
+  <tab id="Customers" name="Vásárlók"/>
+  <tab id="Price_Rules" name="Price Rules"/>
+  <tab id="Shipping" name="Szállítás"/>
+  <tab id="Localization" name="Localization"/>
+  <tab id="Modules" name="Modules and Services"/>
+  <tab id="Preferences" name="Preferences"/>
+  <tab id="Advanced_Parameters" name="Advanced Parameters"/>
+  <tab id="Administration" name="Adminisztráció"/>
+  <tab id="Stats" name="Statisztika"/>
+  <tab id="Stock" name="Készlet"/>
+  <tab id="Products" name="Termék"/>
+  <tab id="Categories" name="Kategóriák"/>
+  <tab id="Monitoring" name="Monitoring"/>
+  <tab id="Attributes_and_Values" name="Product Attributes"/>
+  <tab id="Features" name="Product Features"/>
+  <tab id="Manufacturers" name="Gyártók"/>
+  <tab id="Suppliers" name="Beszállítók"/>
+  <tab id="Tags" name="Címkék"/>
+  <tab id="Attachments" name="Csatolmányok"/>
+  <tab id="Orders_1" name="Rendelések"/>
+  <tab id="Invoices" name="Számlák"/>
+  <tab id="Merchandise_Returns" name="Áru visszatérítések"/>
+  <tab id="Delivery_Slips" name="Delivery Slips"/>
+  <tab id="Credit_Slips" name="Credit Slips"/>
+  <tab id="Statuses" name="Statuses"/>
+  <tab id="Order_Messages" name="Order Messages"/>
+  <tab id="Customers_1" name="Vásárlók"/>
+  <tab id="Addresses" name="Címek"/>
+  <tab id="Groups" name="Csoportok"/>
+  <tab id="Shopping_Carts" name="Shopping Carts"/>
+  <tab id="Customer_Service" name="Customer Service"/>
+  <tab id="Contacts" name="Kapcsolatok"/>
+  <tab id="Titles" name="Titles"/>
+  <tab id="Outstanding" name="Outstanding"/>
+  <tab id="Cart_Rules" name="Kosárszabályok"/>
+  <tab id="Catalog_Price_Rules" name="Catalog Price Rules"/>
+  <tab id="Marketing" name="Marketing"/>
+  <tab id="Shipping_1" name="Preferences"/>
+  <tab id="Carriers" name="Szállítók"/>
+  <tab id="Localization_1" name="Localization"/>
+  <tab id="Languages" name="Nyelvek"/>
+  <tab id="Zones" name="Zónák"/>
+  <tab id="Countries" name="Országok"/>
+  <tab id="States" name="Megyék"/>
+  <tab id="Currencies" name="Pénznemek"/>
+  <tab id="Taxes" name="Adók"/>
+  <tab id="Tax_Rules" name="Adószabályok"/>
+  <tab id="Translations" name="Translations"/>
+  <tab id="Modules_1" name="Modules and Services"/>
+  <tab id="Modules_Themes_Catalog" name="Modules &amp; Themes Catalog"/>
+  <tab id="Positions" name="Positions"/>
+  <tab id="Payment" name="Fizetés"/>
+  <tab id="General" name="Általános"/>
+  <tab id="Orders_2" name="Rendelések"/>
+  <tab id="Products_1" name="Termék"/>
+  <tab id="Customers_2" name="Vásárlók"/>
+  <tab id="Themes" name="Themes"/>
+  <tab id="SEO_URLs" name="SEO &amp; URLs"/>
+  <tab id="CMS" name="CMS"/>
+  <tab id="Images" name="Képek"/>
+  <tab id="Store_Contacts" name="Store Contacts"/>
+  <tab id="Search_1" name="Keresés"/>
+  <tab id="Maintenance" name="Maintenance"/>
+  <tab id="Geolocation" name="Geolocation"/>
+  <tab id="Configuration_Information" name="Configuration Information"/>
+  <tab id="Performance" name="Teljesítmény"/>
+  <tab id="E-mail" name="E-mail"/>
+  <tab id="Multistore" name="Multi"/>
+  <tab id="CSV_Import" name="CSV Import"/>
+  <tab id="DB_Backup" name="DB Backup"/>
+  <tab id="SQL_Manager" name="SQL Manager"/>
+  <tab id="Logs" name="Logs"/>
+  <tab id="Webservice" name="Webservice"/>
+  <tab id="Preferences_1" name="Preferences"/>
+  <tab id="Quick_Access" name="Gyors elérés"/>
+  <tab id="Employees" name="Alkalmazottak"/>
+  <tab id="Profiles" name="Profiles"/>
+  <tab id="Permissions" name="Jogosultságok"/>
+  <tab id="Menus" name="Menük"/>
+  <tab id="Stats_1" name="Statisztika"/>
+  <tab id="Search_Engines" name="Search Engines"/>
+  <tab id="Referrers" name="Ajánlók"/>
+  <tab id="Warehouses" name="Raktárak"/>
+  <tab id="Stock_Management" name="Stock Management"/>
+  <tab id="Stock_Movement" name="Stock Movement"/>
+  <tab id="Instant_Stock_Status" name="Instant Stock Status"/>
+  <tab id="Stock_Coverage" name="Stock Coverage"/>
+  <tab id="Supply_orders" name="Supply orders"/>
+  <tab id="Configuration" name="Configuration"/>
+  <tab id="CarrierWizard" name="Szállító"/>
+</entity_tab>

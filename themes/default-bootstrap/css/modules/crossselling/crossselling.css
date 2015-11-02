@@ -1,0 +1,17 @@
+#crossselling_list .product-name {
+  margin-bottom: 5px; }
+  #crossselling_list .product-name a {
+    font-size: 15px;
+    line-height: 18px;
+    color: #3a3939; }
+    #crossselling_list .product-name a:hover {
+      color: #515151; }
+#crossselling_list .exclusive span {
+  font-size: 13px;
+  line-height: 18px;
+  padding: 2px 8px 3px;
+  text-decoration: none; }
+  #crossselling_list .exclusive span:focus, #crossselling_list .exclusive span:active {
+    text-decoration: none; }
+
+/*# sourceMappingURL=crossselling.css.map */

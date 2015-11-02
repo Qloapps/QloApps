@@ -1,0 +1,12 @@
+Core.CollectErrors
+TYPE: bool
+VERSION: 2.0.0
+DEFAULT: false
+--DESCRIPTION--
+
+Whether or not to collect errors found while filtering the document. This
+is a useful way to give feedback to your users. <strong>Warning:</strong>
+Currently this feature is very patchy and experimental, with lots of
+possible error messages not yet implemented. It will not cause any
+problems, but it may not help your users either.
+--# vim: et sw=4 sts=4

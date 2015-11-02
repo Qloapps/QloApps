@@ -1,0 +1,65 @@
+.tree-panel-heading-controls
+	line-height: 2.2em
+	font-size: 1.1em
+	//text-transform: uppercase
+	color: $brand-primary
+	i
+		font-size: $icon-size-base
+.tree
+	list-style: none
+	@include padding(0, 0, 0, 20px)
+	input
+		vertical-align: baseline
+		margin-right: 4px
+		line-height: normal
+	i
+		font-size: $icon-size-base
+	.tree-item-name, .tree-folder-name
+		padding: 2px 5px
+		@include border-radius(4px)
+		label
+			font-weight: 400
+		&:hover
+			background-color: #eee
+			cursor: pointer
+	.tree-selected
+		color: white
+		background-color: $brand-primary
+		&:hover
+			background-color: darken($brand-primary,5%)
+		i.tree-dot
+			background-color: white
+	i.tree-dot
+		display: inline-block
+		position: relative
+		width: 6px
+		height: 6px
+		margin: 0 4px
+		background-color: #ccc
+		@include border-radius(6px)
+	.tree-item-disable, .tree-folder-name-disable
+		color: #ccc
+		&:hover
+			color: #ccc
+			background-color: none
+.tree-actions
+	display: inline-block
+
+.tree-panel-heading-controls
+	margin: -20px -20px 20px
+	padding: 5px
+	border-bottom: solid 1px #DFDFDF
+
+.tree-actions
+	.twitter-typeahead
+		@include padding(0,0,0,4px)
+		position: relative
+		top: 1px
+	.tt-hint
+		left: 4px !important
+		color: #ccc
+
+.tree-panel-label-title
+	font-weight: 400
+	margin: 0
+	@include padding(0, 0, 0, 8px)

@@ -1,0 +1,165 @@
+<?xml version="1.0"?>
+<entity_meta>
+  <meta id="404" id_shop="1">
+    <title>Eroare 404</title>
+    <description>Această pagină nu putut fi găsită</description>
+    <keywords/>
+    <url_rewrite>pagina-negasita</url_rewrite>
+  </meta>
+  <meta id="best-sales" id_shop="1">
+    <title>Cele mai cumpărate</title>
+    <description>Produsele noastre cele mai cumpărate</description>
+    <keywords/>
+    <url_rewrite>cele-mai-cumparate</url_rewrite>
+  </meta>
+  <meta id="contact" id_shop="1">
+    <title>Contactați-ne</title>
+    <description>Folosiți formularul pentru a ne contacta</description>
+    <keywords/>
+    <url_rewrite>contact</url_rewrite>
+  </meta>
+  <meta id="index" id_shop="1">
+    <title/>
+    <description>Magazin motorizat de PrestaShop</description>
+    <keywords/>
+    <url_rewrite/>
+  </meta>
+  <meta id="manufacturer" id_shop="1">
+    <title>Mărci</title>
+    <description>Lista mărcilor</description>
+    <keywords/>
+    <url_rewrite>marci</url_rewrite>
+  </meta>
+  <meta id="new-products" id_shop="1">
+    <title>Produse noi</title>
+    <description>Cele mai noi dintre produsele noastre</description>
+    <keywords/>
+    <url_rewrite>produse-noi</url_rewrite>
+  </meta>
+  <meta id="password" id_shop="1">
+    <title>Recuperarea parolei</title>
+    <description>Introduceți adresa de e-mail folosită la înregistrare pentru putea primi un mesaj cu o nouă parolă</description>
+    <keywords/>
+    <url_rewrite>recuperare-parola</url_rewrite>
+  </meta>
+  <meta id="prices-drop" id_shop="1">
+    <title>Reduceri de preț</title>
+    <description>Ofertele nostre speciale</description>
+    <keywords/>
+    <url_rewrite>reduceri-de-pret</url_rewrite>
+  </meta>
+  <meta id="sitemap" id_shop="1">
+    <title>Sitemap</title>
+    <description>V-ați rătăcit? Găsiți ceea ce căutați</description>
+    <keywords/>
+    <url_rewrite>sitemap</url_rewrite>
+  </meta>
+  <meta id="supplier" id_shop="1">
+    <title>Furnizori</title>
+    <description>Lista furnizorilor</description>
+    <keywords/>
+    <url_rewrite>furnizori</url_rewrite>
+  </meta>
+  <meta id="address" id_shop="1">
+    <title>Adresa</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>adresa</url_rewrite>
+  </meta>
+  <meta id="addresses" id_shop="1">
+    <title>Adrese</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>adrese</url_rewrite>
+  </meta>
+  <meta id="authentication" id_shop="1">
+    <title>Autentificare</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>autentificare</url_rewrite>
+  </meta>
+  <meta id="cart" id_shop="1">
+    <title>Coșul de cumpărături</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>cos</url_rewrite>
+  </meta>
+  <meta id="discount" id_shop="1">
+    <title>Reducere</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>reducere</url_rewrite>
+  </meta>
+  <meta id="history" id_shop="1">
+    <title>Istoricul comenzilor</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>istoric-comenzi</url_rewrite>
+  </meta>
+  <meta id="identity" id_shop="1">
+    <title>Identitate</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>identitate</url_rewrite>
+  </meta>
+  <meta id="my-account" id_shop="1">
+    <title>Contul meu</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>contul-meu</url_rewrite>
+  </meta>
+  <meta id="order-follow" id_shop="1">
+    <title>Returnări</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>returnari</url_rewrite>
+  </meta>
+  <meta id="order-slip" id_shop="1">
+    <title>Bon de comandă</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>bon-de-comanda</url_rewrite>
+  </meta>
+  <meta id="order" id_shop="1">
+    <title>Comandă</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>comanda</url_rewrite>
+  </meta>
+  <meta id="search" id_shop="1">
+    <title>Căutare</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>cautare</url_rewrite>
+  </meta>
+  <meta id="stores" id_shop="1">
+    <title>Magazine</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>magazine</url_rewrite>
+  </meta>
+  <meta id="order-opc" id_shop="1">
+    <title>Comandă</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>comanda-rapida</url_rewrite>
+  </meta>
+  <meta id="guest-tracking" id_shop="1">
+    <title>Urmărire pentru oaspeți</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>urmarire-pentru-oaspeti</url_rewrite>
+  </meta>
+  <meta id="order-confirmation" id_shop="1">
+    <title>Confirmarea comenzii</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>confirmare-comanda</url_rewrite>
+  </meta>
+  <meta id="products-comparison" id_shop="1">
+    <title>Comparație între produse</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>comparare-produse</url_rewrite>
+  </meta>
+</entity_meta>

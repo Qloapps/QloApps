@@ -1,0 +1,19 @@
+<?xml version='1.0'?>
+<entity_category>
+  <category id='Root' id_shop='1'>
+    <name>Racine</name>
+    <description/>
+    <link_rewrite>racine</link_rewrite>
+    <meta_title/>
+    <meta_keywords/>
+    <meta_description/>
+  </category>
+  <category id='Home' id_shop='1'>
+    <name>Accueil</name>
+    <description/>
+    <link_rewrite>accueil</link_rewrite>
+    <meta_title/>
+    <meta_keywords/>
+    <meta_description/>
+  </category>
+</entity_category>

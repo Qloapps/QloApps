@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity_order_return_state>
+  <order_return_state id="Waiting_for_confirmation">
+    <name>ממתין לאישור</name>
+  </order_return_state>
+  <order_return_state id="Waiting_for_package">
+    <name>ממתין לחבילה</name>
+  </order_return_state>
+  <order_return_state id="Package_received">
+    <name>חבילה התקבלה</name>
+  </order_return_state>
+  <order_return_state id="Return_denied">
+    <name>החזר סורב</name>
+  </order_return_state>
+  <order_return_state id="Return_completed">
+    <name>החזר הושלם</name>
+  </order_return_state>
+</entity_order_return_state>

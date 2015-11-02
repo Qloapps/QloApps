@@ -1,0 +1,55 @@
+/* Block specials */
+#special_block_right p {
+	padding-bottom:0;
+	font-weight:bold;
+	text-align:right
+}
+
+#special_block_right p.title_block, #special_block_right h4  {
+	padding:6px 11px;
+	text-align:left
+}
+#special_block_right .products li {
+	padding:15px 0;
+	width: 130px;
+	border:none;
+}
+#special_block_right li .s_title_block, #special_block_right li h5 {
+	padding:0 0 3px 0;
+	font-size:12px;
+	text-align:left;
+}
+#special_block_right .products li a {
+	padding:0;
+	background:none
+}
+#special_block_right li.product_image {
+	padding-right:10px;
+	width:62px;
+}
+
+#special_block_right .products span.price-discount {
+	font-size:14px;
+	text-decoration:line-through
+}
+#special_block_right .products span.reduction {
+	display:block;
+	float:right;
+	padding:0 0 0 10px;
+	font-weight:bold;
+	font-size:12px;
+	color:#fff;
+	background:url(../img/bg_reduction.png) no-repeat 0 0
+}
+#special_block_right .products span.reduction span {
+	display:block;
+	padding:1px 5px 1px 0;
+	background:url(../img/bg_reduction.png) no-repeat 100% 0
+}
+#special_block_right .products span.price {
+	display:block;
+	padding:3px 0 0 0;
+	font-weight:bold;
+	font-size:14px;
+	color:#900
+}

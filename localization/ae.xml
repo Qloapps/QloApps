@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<localizationPack name="United Arab Emirates">
+  <currencies>
+    <currency name="United Arab Emirates dirham" iso_code="AED" iso_code_num="784" sign="AED" blank="1" conversion_rate="1.000000" format="1" decimals="0"/>
+  </currencies>
+  <languages>
+    <language iso_code="en"/>
+    <language iso_code="ar"/>
+  </languages>
+  <taxes/>
+  <units>
+    <unit type="weight" value="kg"/>
+    <unit type="volume" value="L"/>
+    <unit type="short_distance" value="cm"/>
+    <unit type="base_distance" value="m"/>
+    <unit type="long_distance" value="km"/>
+  </units>
+</localizationPack>

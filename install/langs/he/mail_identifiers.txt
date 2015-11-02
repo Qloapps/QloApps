@@ -1,0 +1,10 @@
+היי {firstname} {lastname},
+
+הנה פרטי ההתחברות שלך לחשבונך באתר של {shop_name}:
+
+סיסמה: {passwd}
+כתובת מייל: {email}
+
+{shop_name} - {shop_url}
+
+{shop_url} מופעל באמצעות פרסטהשופ™

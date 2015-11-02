@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity_tab>
+  <tab id="CarrierWizard" name="Carrier"/>
+  <tab id="Dashboard" name="Dashboard"/>
+  <tab id='Home' name='হোম /বাসা'/>
+  <tab id='CMS_Pages' name='বিষয় বাবস্থাপনা পক্রিয়া পাতা'/>
+  <tab id='CMS_Categories' name='বিষয় বাবস্থাপনা পক্রিয়ার প্রকার'/>
+  <tab id='Combinations_Generator' name='সম্ভব্য সম্মিলন তৈরি কারক'/>
+  <tab id='Search' name='অনুসন্ধান করুন'/>
+  <tab id='Login' name='প্রবেশ করুন'/>
+  <tab id='Shops' name='দোকান'/>
+  <tab id='Shop_URLs' name='দোকান এর ইউ আর ল'/>
+  <tab id='Catalog' name='মূল্য সূচী'/>
+  <tab id='Orders' name='ফরমায়েশ'/>
+  <tab id='Customers' name='গ্রাহকরা'/>
+  <tab id='Price_Rules' name='বিক্রয় এর শর্ত'/>
+  <tab id='Shipping' name='স্থানান্তর'/>
+  <tab id='Localization' name='অবস্থিত করন'/>
+  <tab id='Modules' name='মডিউল'/>
+  <tab id='Preferences' name='পছন্দ'/>
+  <tab id='Advanced_Parameters' name='উচ্চতর মাপকাঠি'/>
+  <tab id='Administration' name='প্রশাসন'/>
+  <tab id='Stats' name='পরিসংখ্যান'/>
+  <tab id='Stock' name='স্টক'/>
+  <tab id='Products' name='পণ্য সমূহ'/>
+  <tab id='Categories' name='শ্রেণি'/>
+  <tab id='Monitoring' name='নিয়ন্ত্রণ'/>
+  <tab id='Attributes_and_Values' name='বিভাগসমূহ এবং মান'/>
+  <tab id='Features' name='বৈশিষ্ট্য'/>
+  <tab id='Manufacturers' name='উত্পাদক'/>
+  <tab id='Suppliers' name='সরবরাহকারি'/>
+  <tab id='Tags' name='ট্যাগ'/>
+  <tab id='Attachments' name='সংযুক্তিসমূহ'/>
+  <tab id='Orders_1' name='ফরমায়েশ'/>
+  <tab id='Invoices' name='চালান'/>
+  <tab id='Merchandise_Returns' name='পণ্যদ্রব্য ফেরত'/>
+  <tab id='Delivery_Slips' name='বিতরন রশিদ'/>
+  <tab id='Credit_Slips' name='বকেয়া বিল'/>
+  <tab id='Statuses' name='অবস্থা'/>
+  <tab id='Order_Messages' name='অর্ডার এর মাসাআজ'/>
+  <tab id='Customers_1' name='গ্রাহকরা'/>
+  <tab id='Addresses' name='ঠিকানা'/>
+  <tab id='Groups' name='দল'/>
+  <tab id='Shopping_Carts' name='ক্রয় ঝুড়ি'/>
+  <tab id='Customer_Service' name='গ্রাহক সেবা'/>
+  <tab id='Contacts' name='যোগাযোগ'/>
+  <tab id='Titles' name='শিরোনাম'/>
+  <tab id='Outstanding' name='অসাধারণ'/>
+  <tab id='Cart_Rules' name='ক্রয় এর শর্ত'/>
+  <tab id='Catalog_Price_Rules' name='মূল্য সূচী'/>
+  <tab id='Marketing' name='বাযারজাতকরন'/>
+  <tab id='Shipping_1' name='পছন্দ'/>
+  <tab id='Carriers' name='বাহক'/>
+  <tab id='Localization_1' name='অবস্থিত করন'/>
+  <tab id='Languages' name='ভাষা'/>
+  <tab id='Zones' name='এলাকা'/>
+  <tab id='Countries' name='দেশ সমূহ'/>
+  <tab id='States' name='প্রদেশ'/>
+  <tab id='Currencies' name='মুদ্রা'/>
+  <tab id='Taxes' name='শুল্ক'/>
+  <tab id='Tax_Rules' name='শুল্ক নিয়ম'/>
+  <tab id='Translations' name='অনুবাদ'/>
+  <tab id='Modules_1' name='মডিউল'/>
+  <tab id='Modules_Themes_Catalog' name='মডিউল এবং থইম ক্যাটআলগ'/>
+  <tab id='Positions' name='অবস্থান'/>
+  <tab id='Payment' name='পরিশোধ'/>
+  <tab id='General' name='সাধারণ'/>
+  <tab id='Orders_2' name='ফরমায়েশ'/>
+  <tab id='Products_1' name='পণ্য সমূহ'/>
+  <tab id='Customers_2' name='গ্রাহকরা'/>
+  <tab id='Themes' name='বিষয়বস্তু'/>
+  <tab id='SEO_URLs' name='সি ই ও  এবং ইউ আর ল'/>
+  <tab id='CMS' name='বিষয় বাবস্থাপনা পক্রিয়া'/>
+  <tab id='Images' name='চিত্র'/>
+  <tab id='Store_Contacts' name='দোকান এর যোগাযোগ নম্বার'/>
+  <tab id='Search_1' name='অনুসন্ধান করুন'/>
+  <tab id='Maintenance' name='রক্ষণাবেক্ষণ'/>
+  <tab id='Geolocation' name='অবস্থান'/>
+  <tab id='Configuration_Information' name='মান নির্ধারক তথ্য'/>
+  <tab id='Performance' name='সম্পাদন'/>
+  <tab id='E-mail' name='ই মেইল'/>
+  <tab id='Multistore' name='মাল্টি স্টোর'/>
+  <tab id='CSV_Import' name='কারেক্টের সেপারেট ভ্যালূ আমদানি'/>
+  <tab id='DB_Backup' name='ডাঁটা বেইজ ব্যাক আপ'/>
+  <tab id='SQL_Manager' name='এস কিউ এল বাবস্ত্যাপক'/>
+  <tab id='Logs' name='তথ্য বই'/>
+  <tab id='Webservice' name='ওয়েব সেবা'/>
+  <tab id='Preferences_1' name='পছন্দ'/>
+  <tab id='Quick_Access' name='দ্রুত প্রবেশ'/>
+  <tab id='Employees' name='কর্মচারী'/>
+  <tab id='Profiles' name='প্রোফাইল'/>
+  <tab id='Permissions' name='অনুমতি'/>
+  <tab id='Menus' name='মেনু'/>
+  <tab id='Stats_1' name='পরিসংখ্যান'/>
+  <tab id='Search_Engines' name='অনুসন্ধান যন্ত্র'/>
+  <tab id='Referrers' name='রেফারেন্সে'/>
+  <tab id='Warehouses' name='গুদাম ঘর'/>
+  <tab id='Stock_Management' name='স্টক বাবস্থাপনা'/>
+  <tab id='Stock_Movement' name='স্টক মুভমেন্ট'/>
+  <tab id='Instant_Stock_Status' name='বরতমানে স্টক এর অবস্থা'/>
+  <tab id='Stock_Coverage' name='স্টক কভারেজ'/>
+  <tab id='Supply_orders' name='সরবরাহ আদেশ'/>
+  <tab id='Configuration' name='মান নির্ধারণ'/>
+</entity_tab>

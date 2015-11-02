@@ -1,0 +1,8 @@
+2014-04-22 18:56:57 +0200	// Changelog updated
+2014-04-01 14:17:21 +0200	// blockcategories new module version
+2014-03-27 11:46:01 +0100	// follow up #PSCSX-1405 again
+2014-03-27 11:18:52 +0100	// follow up #PSCSX-1405
+2014-03-26 17:37:53 +0100	[-] MO : Blockcategories, Fix bug #PSCSX-1405, could not assign current category
+2014-03-24 11:43:28 +0100	/ MO blockcategories : ps_versions_compliancy modified (1.5.6.1 => 1.6)
+2014-03-24 11:01:30 +0100	/ MO blockcategories : ps_versions_compliancy added
+2014-03-20 14:20:45 +0100	Initial commit

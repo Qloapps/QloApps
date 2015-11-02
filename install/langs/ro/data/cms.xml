@@ -1,0 +1,81 @@
+<?xml version="1.0"?>
+<entity_cms>
+  <cms id="Delivery">
+    <meta_title>Livrare</meta_title>
+    <meta_description>Termenii și condițiile noaste de livrare</meta_description>
+    <meta_keywords>conditii, livrare, intarziere, expediere, ambalaj</meta_keywords>
+  <content>&lt;h2&gt;Expedieri și returnări&lt;/h2&gt;&lt;h3&gt;Expedierea pachetului dumneavoastră&lt;/h3&gt;&lt;p&gt;Pachetele sunt în general trimise în 2 zile de la primirea plății și sunt expediate prin UPS cu urmărire și livrare fără semnătură. Dacă preferați livrarea prin UPS Extra cu semnătură obligatorie, va fi aplicat un cost adițional, astfel că vă rugăm să ne contactați înainte de a alege această metodă. Orice metodă alegeți, veți avea o legătură pentru urmărirea online a pachetului dumneavoastră.&lt;/p&gt;&lt;p&gt;Costul livrării include costul procesării și ambalării, cât și costurile poștale. Costul procesării este fix, în timp ce costul transportului poate varia în funcție de greutatea totală a pachetului. Vă sfătuim să vă grupați toate articolele într-o singură comandă. Noi nu putem grupa comenzi distincte plasate separat, astfel că fiecăreia i se vor aplica costuril de livrareand shipping fees will apply to each of them. Riscurile aferente livrării cad în responsabilitatea dumneavoastră, dar luăm măsuri speciale pentru a proteja obiectele fragile.&lt;br /&gt;&lt;br /&gt;Cutiile sunt generos dimensionate și articolele dumneavoatră sunt bine protejate.&lt;/p&gt;</content>
+    <link_rewrite>livrare</link_rewrite>
+  </cms>
+  <cms id="Legal_Notice">
+    <meta_title>Notificare legală</meta_title>
+    <meta_description>Notificare legală</meta_description>
+    <meta_keywords>notificare, legala, acreditari</meta_keywords>
+    <content>&lt;h2&gt;Legale&lt;/h2&gt;&lt;h3&gt;Acreditări&lt;/h3&gt;&lt;p&gt;Concept și producție:&lt;/p&gt;&lt;p&gt;Acest magazin online a fost creat folosind &lt;a href="http://www.prestashop.com"&gt;aplicația de comerț electronic PrestaShop&lt;/a&gt;,răsfoiți &lt;a href="http://www.prestashop.com/blog/en/"&gt;blogul despre comerț electronic al PrestaShop&lt;/a&gt; pentru noutăți și sfaturi despre vânzarea online și administrarea unui site de comerț electronic.&lt;/p&gt;</content>
+    <link_rewrite>notificare-legala</link_rewrite>
+  </cms>
+  <cms id="Terms_and_conditions_of_use">
+    <meta_title>Termeni și condiții de utilizare</meta_title>
+    <meta_description>Termenii și condițiile noastre de utilizare</meta_description>
+    <meta_keywords>conditii, termeni, utilizare, vanzare</meta_keywords>
+    <content>&lt;h1 class=&quot;page-heading&quot;&gt;Termeni și condiții de utilizare&lt;/h1&gt;
+&lt;h3 class=&quot;page-subheading&quot;&gt;Rule 1&lt;/h3&gt;
+&lt;p class=&quot;bottom-indent&quot;&gt;Lorem ipsum dolor sit amet conse ctetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.&lt;/p&gt;
+&lt;h3 class=&quot;page-subheading&quot;&gt;Rule 2&lt;/h3&gt;
+&lt;p class=&quot;bottom-indent&quot;&gt;Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet conse ctetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam&amp;#1102;&lt;/p&gt;
+&lt;h3 class=&quot;page-subheading&quot;&gt;Rule 3&lt;/h3&gt;
+&lt;p class=&quot;bottom-indent&quot;&gt;Tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet conse ctetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam&amp;#1102;&lt;/p&gt;</content>
+    <link_rewrite>termeni-si-conditii-de-utilizare</link_rewrite>
+  </cms>
+  <cms id="About_us">
+    <meta_title>Despre noi</meta_title>
+    <meta_description>Aflați mai multe despre noi</meta_description>
+    <meta_keywords>despre noi, informatii</meta_keywords>
+    <content>&lt;h1 class=&quot;page-heading bottom-indent&quot;&gt;Despre noi&lt;/h1&gt;
+&lt;div class=&quot;row&quot;&gt;
+&lt;div class=&quot;col-xs-12 col-sm-4&quot;&gt;
+&lt;div class=&quot;cms-block&quot;&gt;
+&lt;h3 class=&quot;page-subheading&quot;&gt;Firma noastră&lt;/h3&gt;
+&lt;p&gt;&lt;strong class=&quot;dark&quot;&gt;Lorem ipsum dolor sit amet conse ctetur adipisicing elit, sed do eiusmod tempor incididun.&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Lorem ipsum dolor sit amet conse ctetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam. Lorem ipsum dolor sit amet conse ctetur adipisicing elit.&lt;/p&gt;
+&lt;ul class=&quot;list-1&quot;&gt;
+&lt;li&gt;&lt;em class=&quot;icon-ok&quot;&gt;&lt;/em&gt;Produse de cea mai bună calitate&lt;/li&gt;
+&lt;li&gt;&lt;em class=&quot;icon-ok&quot;&gt;&lt;/em&gt;Cele mai bune servicii pentru clienții noștri&lt;/li&gt;
+&lt;li&gt;&lt;em class=&quot;icon-ok&quot;&gt;&lt;/em&gt;Garanție cu banii înapoi în 30 de zile&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;col-xs-12 col-sm-4&quot;&gt;
+&lt;div class=&quot;cms-box&quot;&gt;
+&lt;h3 class=&quot;page-subheading&quot;&gt;Our team&lt;/h3&gt;
+&lt;img title=&quot;cms-img&quot; src=&quot;../img/cms/cms-img.jpg&quot; alt=&quot;cms-img&quot; width=&quot;370&quot; height=&quot;192&quot; /&gt;
+&lt;p&gt;&lt;strong class=&quot;dark&quot;&gt;Lorem set sint occaecat cupidatat non &lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;col-xs-12 col-sm-4&quot;&gt;
+&lt;div class=&quot;cms-box&quot;&gt;
+&lt;h3 class=&quot;page-subheading&quot;&gt;Recomandări&lt;/h3&gt;
+&lt;div class=&quot;testimonials&quot;&gt;
+&lt;div class=&quot;inner&quot;&gt;&lt;span class=&quot;before&quot;&gt;“&lt;/span&gt;Lorem ipsum dolor sit amet conse ctetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim.&lt;span class=&quot;after&quot;&gt;”&lt;/span&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;strong class=&quot;dark&quot;&gt;Lorem ipsum dolor sit&lt;/strong&gt;&lt;/p&gt;
+&lt;div class=&quot;testimonials&quot;&gt;
+&lt;div class=&quot;inner&quot;&gt;&lt;span class=&quot;before&quot;&gt;“&lt;/span&gt;Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet conse ctetur adipisicing elit. Lorem ipsum dolor sit amet conse ctetur adipisicing elit, sed do eiusmod.&lt;span class=&quot;after&quot;&gt;”&lt;/span&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;strong class=&quot;dark&quot;&gt;Ipsum dolor sit&lt;/strong&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;</content>
+    <link_rewrite>despre-noi</link_rewrite>
+  </cms>
+  <cms id="Secure_payment">
+    <meta_title>Plăți securizate</meta_title>
+    <meta_description>Mijloacele noastre de plată securizată</meta_description>
+    <meta_keywords>plata securizata, ssl, visa, mastercard, paypal</meta_keywords>
+    <content>&lt;h2&gt;Plăți securizate&lt;/h2&gt;&#xD;
+&lt;h3&gt;Plata noastră securizată&lt;/h3&gt;&lt;p&gt;With SSL&lt;/p&gt;&#xD;
+&lt;h3&gt;Folosind Visa/Mastercard/Paypal&lt;/h3&gt;&lt;p&gt;Despre aceste servicii&lt;/p&gt;</content>
+    <link_rewrite>plati-securizate</link_rewrite>
+  </cms>
+</entity_cms>

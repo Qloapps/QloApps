@@ -1,0 +1,111 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+	<title><?php echo $this->l('PrestaShop Installation Assistant') ?></title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<meta http-equiv="Cache-Control" content="no-cache, must-revalidate" />
+	<meta http-equiv="Pragma" content="no-cache" />
+	<meta http-equiv="Cache" content="no store" />
+	<meta http-equiv="Expires" content="-1" />
+	<meta name="robots" content="noindex" />
+	<link rel="shortcut icon" href="theme/img/favicon.ico" />
+	<link rel="stylesheet" type="text/css" media="all" href="theme/view.css" />
+	<?php if ( ($this->language->getLanguage()->getMetaInformation('is_rtl')) == 'true'): ?>
+		<link rel="stylesheet" type="text/css" media="all" href="theme/rtl.css" />
+	<?php endif; ?>
+	<script type="text/javascript" src="../js/jquery/jquery-1.11.0.min.js"></script>
+	<script type="text/javascript" src="../js/jquery/plugins/jquery.chosen.js"></script>
+	<script type="text/javascript" src="theme/js/install.js"></script>
+	<script type="text/javascript" src="//www.prestashop.com/js/user-assistance.js"></script>
+	<?php if (file_exists(_PS_INSTALL_PATH_.'theme/js/'.$this->step.'.js')): ?>
+		<script type="text/javascript" src="theme/js/<?php echo $this->step ?>.js"></script>
+	<?php endif; ?>
+	<script type="text/javascript">
+		var ps_base_uri = '<?php echo addslashes(__PS_BASE_URI__) ?>';
+	</script>
+</head>
+
+<body>
+<div id="container">
+
+<!-- Header -->
+<div id="header" class="clearfix">
+	<ul id="headerLinks">
+		<li class="lnk_forum"><a href="<?php echo $this->getForumLink() ?>" target="_blank"><?php echo $this->l('Forum') ?></a></li>
+		<li class="lnk_forum"><a href="<?php echo $this->getSupportLink() ?>" target="_blank"><?php echo $this->l('Support') ?></a></li>
+		<li class="lnk_forum"><a href="<?php echo $this->getDocumentationLink() ?>" target="_blank"><?php echo $this->l('Documentation') ?></a></li>
+		<li class="lnk_blog last"><a href="<?php echo $this->getBlogLink() ?>" target="_blank"><?php echo $this->l('Blog') ?></a></li>
+		<!--
+		<?php if ($this->getPhone()): ?>
+			<li id="phone_block" class="last">
+				<div><span><?php echo $this->l('Contact us!') ?></span><br /><?php echo $this->getPhone() ?></div>
+			</li>
+		<?php endif; ?>
+		-->
+	</ul>
+
+	<div id="PrestaShopLogo">PrestaShop</div>
+</div>
+
+<!-- Ajax loader animation -->
+<div id="loaderSpace">
+	<div id="loader">&nbsp;</div>
+</div>
+
+<!--This comment is necessary!
+
+	Purpose is to make some strings available for translation, 
+	that would not be 'seen' by the translations parser otherwise.
+	
+	$this->l('menu_welcome');
+	$this->l('menu_license');
+	$this->l('menu_system');
+	$this->l('menu_configure');
+	$this->l('menu_database');
+	$this->l('menu_process');
+
+-->
+
+<!-- List of steps -->
+<div id="leftpannel">
+	<ol id="tabs">
+		<?php foreach ($this->getSteps() as $step): ?>
+			<?php if ($this->step == $step): ?>
+				<li class="selected"><?php echo $this->l('menu_'.$step) ?></li>
+			<?php elseif ($this->isStepFinished($step)): ?>
+				<li class="finished"><a href="index.php?step=<?php echo $step ?>"><?php echo $this->l('menu_'.$step) ?></a></li>
+			<?php elseif ($step == $this->getLastStep()): ?>
+				<li class="configuring"><a href="index.php?step=<?php echo $step ?>"><?php echo $this->l('menu_'.$step) ?></a></li>
+			<?php else: ?>
+				<li><?php echo $this->l('menu_'.$step) ?></li>
+			<?php endif; ?>
+		<?php endforeach; ?>
+	</ol>
+	<?php if (@fsockopen('api.prestashop.com', 80, $errno, $errst, 3)): ?>
+		<iframe scrolling="no" style="height:210px;width:200px;border:none;margin-top:20px" id="iframe_help"
+			src="https://api.prestashop.com/iframe/install.php?step=<?php echo $this->step ?>&lang=<?php echo $this->language->getLanguageIso() ?><?php if (isset($this->session->shop_country)) echo '&country='.$this->session->shop_country; ?>">
+			<p><?php echo $this->l('Contact us!') ?><br /><?php echo $this->getPhone() ?></p>
+		</iframe>
+	<?php endif; ?>
+</div>
+
+<!-- Page content -->
+<form id="mainForm" action="index.php" method="post">
+<div id="sheets" class="sheet shown">
+	<div id="sheet_<?php echo $this->step ?>" class="sheet shown clearfix">
+	<div class="contentTitle">
+		<h1><?php echo $this->l('Installation Assistant') ?></h1>
+		<ul id="stepList_1" class="stepList clearfix">
+			<?php foreach ($this->getSteps() as $step): ?>
+				<li <?php if ($this->isStepFinished($step)): ?>class="ok"<?php endif; ?>><?php echo $this->l('menu_'.$this->step) ?></li>
+			<?php endforeach; ?>
+		</ul>
+	</div>
+	<noscript>
+		<h4 class="errorBlock" style="margin-bottom:10px">
+			<?php echo $this->l('To install PrestaShop, you need to have JavaScript enabled in your browser.') ?>
+			<a href="<?php echo $this->l('http://enable-javascript.com/') ?>" target="_blank">
+				<img src="theme/img/help.png" style="height:16px;width:16px" />
+			</a>
+		</h4>
+	</noscript>

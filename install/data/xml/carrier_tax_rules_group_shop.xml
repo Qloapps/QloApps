@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<entity_carrier_tax_rules_group_shop>
+  <fields primary="id_carrier,id_tax_rules_group,id_shop">
+    <field name="id_carrier" relation="carrier"/>
+    <field name="id_tax_rules_group"/>
+    <field name="id_shop"/>
+  </fields>
+  <entities>
+    <carrier_tax_rules_group_shop id="carrier_tax_rules_group_shop_1_1_1" id_carrier="carrier_1" id_tax_rules_group="1" id_shop="1"/>
+  </entities>
+</entity_carrier_tax_rules_group_shop>

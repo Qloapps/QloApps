@@ -1,0 +1,10 @@
+2014-04-22 18:57:01 +0200	// Changelog updated
+2014-04-07 10:12:29 +0200	[-] MO : blockcmsinfo - Encoding restitution issue #PSCSX-1554 fixed
+2014-03-31 17:59:54 +0200	[-] MO : blockcmsinfo : now only show current shop custom block
+2014-03-24 17:23:58 +0100	// backquotes
+2014-03-24 17:05:05 +0100	// blockcmsinfo : displa & secu fix
+2014-03-24 12:30:34 +0100	Merge branch 'master' of https://github.com/PrestaShop/blockcmsinfo
+2014-03-24 12:28:49 +0100	// blockcmsinfo : missing buttons
+2014-03-24 11:43:28 +0100	/ MO blockcmsinfo : ps_versions_compliancy modified (1.5.6.1 => 1.6)
+2014-03-24 11:01:40 +0100	/ MO blockcmsinfo : ps_versions_compliancy added
+2014-03-20 14:21:06 +0100	Initial commit

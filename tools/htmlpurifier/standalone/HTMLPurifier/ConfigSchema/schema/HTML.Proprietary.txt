@@ -1,0 +1,12 @@
+HTML.Proprietary
+TYPE: bool
+VERSION: 3.1.0
+DEFAULT: false
+--DESCRIPTION--
+<p>
+    Whether or not to allow proprietary elements and attributes in your
+    documents, as per <code>HTMLPurifier_HTMLModule_Proprietary</code>.
+    <strong>Warning:</strong> This can cause your documents to stop
+    validating!
+</p>
+--# vim: et sw=4 sts=4

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+    <script type="text/javascript" src="colorpic.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="style.min.css" />
+    <title>Colorpicker</title>
+  </head>
+  <body>
+    
+    <div id="main">
+        <div id="color-picker" class="cp-default">
+            <div class="picker-wrapper">
+                <div id="picker" class="picker"></div>
+                <div id="picker-indicator" class="picker-indicator"></div>
+            </div>
+            <div class="slide-wrapper">
+                <div id="slide" class="slide"></div>
+                <div id="slide-indicator" class="slide-indicator"></div>
+            </div>
+        </div>
+        <div class="left">
+            <div id="colorSelector">
+                <div id="selector1" class="selector" onclick="setColor(this)" style="background-color: #FFFFFF;"></div>
+                <div id="selector2" class="selector" onclick="setColor(this)" style="background-color: #D4D4D4;"></div>
+                <div id="selector3" class="selector" onclick="setColor(this)" style="background-color: #9B9B9B;"></div>
+                <div id="selector4" class="selector" onclick="setColor(this)" style="background-color: #4A4A4A;"></div>
+                <div id="selector5" class="selector" onclick="setColor(this)" style="background-color: #000000;"></div>
+                <div id="selector6" class="selector" onclick="setColor(this)" style="background-color: #D0131A;"></div>
+                <div id="selector7" class="selector" onclick="setColor(this)" style="background-color: #F5A623;"></div>
+                <div id="selector8" class="selector" onclick="setColor(this)" style="background-color: #FBE32A;"></div>
+                <div id="selector9" class="selector" onclick="setColor(this)" style="background-color: #7DD321;"></div>
+                <div id="selector10" class="selector" onclick="setColor(this)" style="background-color: #228E53;"></div>
+                <div id="selector11" class="selector" onclick="setColor(this)" style="background-color: #2CA0FD;"></div>
+                <div id="selector12" class="selector" onclick="setColor(this)" style="background-color: #2446A2;"></div>
+                <div id="selector13" class="selector" onclick="setColor(this)" style="background-color: #9028FE;"></div>
+            </div>
+            <div class="io">
+                <label>HEX</label>
+                <input id="hex" type="text" value="" />
+                <br/>
+                <label>R:</label>
+                <input id="rgb_r" type="number" value="" />
+                <label>G:</label>
+                <input id="rgb_g" type="number" value="" />
+                <label>B:</label>
+                <input id="rgb_b" type="number" value="" />
+            </div>
+            <div id="color"></div>
+            <div class="right">
+                <a id="cancel" class="btn cancel" href="#">Cancel</a>
+                <a id="submit2" class="btn submit" href="#">Back Color</a>
+                <a id="submit" class="btn submit" href="#">Text Color</a>
+            </div>
+        </div>
+    </div>
+    <script src="include.min.js?v1"></script>
+  </body>
+</html>

@@ -1,0 +1,11 @@
+URI.DefinitionRev
+TYPE: int
+VERSION: 2.1.0
+DEFAULT: 1
+--DESCRIPTION--
+
+<p>
+    Revision identifier for your custom definition. See
+    %HTML.DefinitionRev for details.
+</p>
+--# vim: et sw=4 sts=4

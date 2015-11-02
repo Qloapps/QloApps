@@ -1,0 +1,3 @@
+2014-04-22 18:57:08 +0200	// Changelog updated
+2014-03-24 17:47:06 +0100	/ MO blockcurrencies : ps_versions_compliancy added
+2014-03-20 14:22:35 +0100	Initial commit

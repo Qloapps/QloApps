@@ -1,0 +1,27 @@
+<?xml version='1.0'?>
+<entity_stock_mvt_reason>
+  <stock_mvt_reason id='Increase'>
+    <name>বৃদ্ধি </name>
+  </stock_mvt_reason>
+  <stock_mvt_reason id='Decrease'>
+    <name>হ্রাস </name>
+  </stock_mvt_reason>
+  <stock_mvt_reason id='Customer_Order'>
+    <name>ক্রেতা অর্ডার </name>
+  </stock_mvt_reason>
+  <stock_mvt_reason id='Regulation_following_an_inventory_of_stock'>
+    <name>পণ্য স্টক এর নিয়ম</name>
+  </stock_mvt_reason>
+  <stock_mvt_reason id='Regulation_following_an_inventory_of_stock_1'>
+    <name>পণ্য স্টক এর নিয়ম</name>
+  </stock_mvt_reason>
+  <stock_mvt_reason id='Transfer_to_another_warehouse'>
+    <name>অন্য গুদামে পাঠান </name>
+  </stock_mvt_reason>
+  <stock_mvt_reason id='Transfer_from_another_warehouse'>
+    <name>অন্য গুদাম ত্থেকে আনুন </name>
+  </stock_mvt_reason>
+  <stock_mvt_reason id='Supply_Order'>
+    <name>সরবরাহ আদেশ </name>
+  </stock_mvt_reason>
+</entity_stock_mvt_reason>

@@ -1,0 +1,80 @@
+<?xml version="1.0"?>
+<entity_product>
+  <product id="Faded_Short_Sleeve_T-shirts" id_shop="1">
+    <description>&lt;p&gt;Fashion has been creating well-designed collections since 2010. The brand offers feminine designs delivering stylish separates and statement dresses which has since evolved into a full ready-to-wear collection in which every item is a vital part of a woman's wardrobe. The result? Cool, easy, chic looks with youthful elegance and unmistakable signature style. All the beautiful pieces are made in Italy and manufactured with the greatest attention. Now Fashion extends to a range of accessories including shoes, hats, belts and more!&lt;/p&gt;</description>
+    <description_short>&lt;p&gt;Faded short sleeve t-shirt with high neckline. Soft and stretchy material for a comfortable fit. Accessorize with a straw hat and you're ready for summer!&lt;/p&gt;</description_short>
+    <link_rewrite>faded-short-sleeve-tshirts</link_rewrite>
+    <meta_description/>
+    <meta_keywords/>
+    <meta_title/>
+    <name>Faded Short Sleeve T-shirts</name>
+    <available_now>In stock</available_now>
+    <available_later/>
+  </product>
+  <product id="Blouse" id_shop="1">
+    <description>&lt;p&gt;Fashion has been creating well-designed collections since 2010. The brand offers feminine designs delivering stylish separates and statement dresses which has since evolved into a full ready-to-wear collection in which every item is a vital part of a woman's wardrobe. The result? Cool, easy, chic looks with youthful elegance and unmistakable signature style. All the beautiful pieces are made in Italy and manufactured with the greatest attention. Now Fashion extends to a range of accessories including shoes, hats, belts and more!&lt;/p&gt;</description>
+    <description_short>&lt;p&gt;Short sleeved blouse with feminine draped sleeve detail.&lt;/p&gt;</description_short>
+    <link_rewrite>blouse</link_rewrite>
+    <meta_description/>
+    <meta_keywords/>
+    <meta_title/>
+    <name>Blouse</name>
+    <available_now>In stock</available_now>
+    <available_later/>
+  </product>
+  <product id="Printed_Dress" id_shop="1">
+    <description>&lt;p&gt;Fashion has been creating well-designed collections since 2010. The brand offers feminine designs delivering stylish separates and statement dresses which has since evolved into a full ready-to-wear collection in which every item is a vital part of a woman's wardrobe. The result? Cool, easy, chic looks with youthful elegance and unmistakable signature style. All the beautiful pieces are made in Italy and manufactured with the greatest attention. Now Fashion extends to a range of accessories including shoes, hats, belts and more!&lt;/p&gt;</description>
+    <description_short>&lt;p&gt;100% cotton double printed dress. Black and white striped top and orange high waisted skater skirt bottom.&lt;/p&gt;</description_short>
+    <link_rewrite>printed-dress</link_rewrite>
+    <meta_description/>
+    <meta_keywords/>
+    <meta_title/>
+    <name>Printed Dress</name>
+    <available_now>In stock</available_now>
+    <available_later/>
+  </product>
+  <product id="Printed_Dress_1" id_shop="1">
+    <description>&lt;p&gt;Fashion has been creating well-designed collections since 2010. The brand offers feminine designs delivering stylish separates and statement dresses which has since evolved into a full ready-to-wear collection in which every item is a vital part of a woman's wardrobe. The result? Cool, easy, chic looks with youthful elegance and unmistakable signature style. All the beautiful pieces are made in Italy and manufactured with the greatest attention. Now Fashion extends to a range of accessories including shoes, hats, belts and more!&lt;/p&gt;</description>
+    <description_short>&lt;p&gt;Printed evening dress with straight sleeves with black thin waist belt and ruffled linings.&lt;/p&gt;</description_short>
+    <link_rewrite>printed-dress</link_rewrite>
+    <meta_description/>
+    <meta_keywords/>
+    <meta_title/>
+    <name>Printed Dress</name>
+    <available_now>In stock</available_now>
+    <available_later/>
+  </product>
+  <product id="Printed_Summer_Dress" id_shop="1">
+    <description>&lt;p&gt;Fashion has been creating well-designed collections since 2010. The brand offers feminine designs delivering stylish separates and statement dresses which has since evolved into a full ready-to-wear collection in which every item is a vital part of a woman's wardrobe. The result? Cool, easy, chic looks with youthful elegance and unmistakable signature style. All the beautiful pieces are made in Italy and manufactured with the greatest attention. Now Fashion extends to a range of accessories including shoes, hats, belts and more!&lt;/p&gt;</description>
+    <description_short>&lt;p&gt;Long printed dress with thin adjustable straps. V-neckline and wiring under the bust with ruffles at the bottom of the dress.&lt;/p&gt;</description_short>
+    <link_rewrite>printed-summer-dress</link_rewrite>
+    <meta_description/>
+    <meta_keywords/>
+    <meta_title/>
+    <name>Printed Summer Dress</name>
+    <available_now>In stock</available_now>
+    <available_later/>
+  </product>
+  <product id="Printed_Summer_Dress_1" id_shop="1">
+    <description>&lt;p&gt;Fashion has been creating well-designed collections since 2010. The brand offers feminine designs delivering stylish separates and statement dresses which has since evolved into a full ready-to-wear collection in which every item is a vital part of a woman's wardrobe. The result? Cool, easy, chic looks with youthful elegance and unmistakable signature style. All the beautiful pieces are made in Italy and manufactured with the greatest attention. Now Fashion extends to a range of accessories including shoes, hats, belts and more!&lt;/p&gt;</description>
+    <description_short>&lt;p&gt;Sleeveless knee-length chiffon dress. V-neckline with elastic under the bust lining.&lt;/p&gt;</description_short>
+    <link_rewrite>printed-summer-dress</link_rewrite>
+    <meta_description/>
+    <meta_keywords/>
+    <meta_title/>
+    <name>Printed Summer Dress</name>
+    <available_now>In stock</available_now>
+    <available_later/>
+  </product>
+  <product id="Printed_Chiffon_Dress" id_shop="1">
+    <description>&lt;p&gt;Fashion has been creating well-designed collections since 2010. The brand offers feminine designs delivering stylish separates and statement dresses which has since evolved into a full ready-to-wear collection in which every item is a vital part of a woman's wardrobe. The result? Cool, easy, chic looks with youthful elegance and unmistakable signature style. All the beautiful pieces are made in Italy and manufactured with the greatest attention. Now Fashion extends to a range of accessories including shoes, hats, belts and more!&lt;/p&gt;</description>
+    <description_short>&lt;p&gt;Printed chiffon knee length dress with tank straps. Deep v-neckline.&lt;/p&gt;</description_short>
+    <link_rewrite>printed-chiffon-dress</link_rewrite>
+    <meta_description/>
+    <meta_keywords/>
+    <meta_title/>
+    <name>Printed Chiffon Dress</name>
+    <available_now>In stock</available_now>
+    <available_later/>
+  </product>
+</entity_product>

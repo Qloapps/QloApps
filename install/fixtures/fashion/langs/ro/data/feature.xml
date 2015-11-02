@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<entity_feature>
+  <feature id="Height">
+    <name>Înălțime</name>
+  </feature>
+  <feature id="Width">
+    <name>Lățime</name>
+  </feature>
+  <feature id="Depth">
+    <name>Adâncime</name>
+  </feature>
+  <feature id="Weight">
+    <name>Greutate</name>
+  </feature>
+  <feature id="Compositions">
+    <name>Material</name>
+  </feature>
+  <feature id="Styles">
+    <name>Stil</name>
+  </feature>
+  <feature id="Properties">
+    <name>Proprietăți</name>
+  </feature>
+</entity_feature>

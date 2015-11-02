@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity_attribute_group>
+  <fields id="name" class="AttributeGroup">
+    <field name="is_color_group"/>
+    <field name="group_type"/>
+  </fields>
+  <entities>
+    <attribute_group id="Size" is_color_group="0" group_type="select"/>
+    <attribute_group id="Shoes_Size" is_color_group="0" group_type="select"/>
+    <attribute_group id="Color" is_color_group="1" group_type="color"/>
+  </entities>
+</entity_attribute_group>

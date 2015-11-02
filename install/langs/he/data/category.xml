@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity_category>
+  <category id="Root" id_shop="1">
+    <name>ראשי</name>
+    <description/>
+    <link_rewrite>ראשי</link_rewrite>
+    <meta_title/>
+    <meta_keywords/>
+    <meta_description/>
+  </category>
+  <category id="Home" id_shop="1">
+    <name>בית</name>
+    <description/>
+    <link_rewrite>בית</link_rewrite>
+    <meta_title/>
+    <meta_keywords/>
+    <meta_description/>
+  </category>
+</entity_category>

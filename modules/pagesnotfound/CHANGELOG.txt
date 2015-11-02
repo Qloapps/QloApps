@@ -1,0 +1,3 @@
+2014-04-17 11:35:25 +0200	Bug fix (PS 1.5): ps_version_compliancy removed
+2014-03-24 15:22:14 +0100	/ MO pagesnotfound : ps_versions_compliancy added
+2014-03-20 14:35:27 +0100	Initial commit

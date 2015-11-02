@@ -1,0 +1,21 @@
+<?xml version='1.0'?>
+<entity_supply_order_state>
+  <supply_order_state id='supply_order_state_1'>
+    <name>১-তইরি আগাচ্ছে</name>
+  </supply_order_state>
+  <supply_order_state id='supply_order_state_2'>
+    <name>২-অর্ডার যাচাই হয়েছে  </name>
+  </supply_order_state>
+  <supply_order_state id='supply_order_state_3'>
+    <name>৩- রিসিপট অপেক্ষমান </name>
+  </supply_order_state>
+  <supply_order_state id='supply_order_state_4'>
+    <name>৪-অর্ডার আংশিক রিসিভ হয়েছে </name>
+  </supply_order_state>
+  <supply_order_state id='supply_order_state_5'>
+    <name>৫- অর্ডার সম্পূর্ণ রিসিভ হয়েছে</name>
+  </supply_order_state>
+  <supply_order_state id='supply_order_state_6'>
+    <name>৬- অর্ডার বাতিল </name>
+  </supply_order_state>
+</entity_supply_order_state>

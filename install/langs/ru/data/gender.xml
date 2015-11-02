@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<entity_gender>
+  <gender id="Mr" name="Г-н"/>
+  <gender id="Mrs" name="Г-жа"/>
+</entity_gender>

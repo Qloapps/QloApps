@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity_product_attribute>
+  <fields class="Combination">
+    <field name="id_product" relation="product"/>
+    <field name="reference"/>
+    <field name="supplier_reference"/>
+    <field name="location"/>
+    <field name="ean13"/>
+    <field name="upc"/>
+    <field name="wholesale_price"/>
+    <field name="price"/>
+    <field name="ecotax"/>
+    <field name="quantity"/>
+    <field name="weight"/>
+    <field name="unit_price_impact"/>
+    <field name="default_on"/>
+    <field name="minimal_quantity"/>
+    <field name="available_date"/>
+  </fields>
+  <entities>
+    <product_attribute id="product_attribute_1" id_product="Faded_Short_Sleeve_T-shirts" reference="" supplier_reference="" ean13="" upc="" wholesale_price="0.000000" price="0.000000" ecotax="0.000000" quantity="100" weight="0.000000" unit_price_impact="0.00" default_on="1" minimal_quantity="1" available_date="0000-00-00">
+      <location/>
+    </product_attribute>
+    <product_attribute id="product_attribute_2" id_product="Faded_Short_Sleeve_T-shirts" reference="" supplier_reference="" ean13="" upc="" wholesale_price="0.000000" price="0.000000" ecotax="0.000000" quantity="100" weight="0.000000" unit_price_impact="0.00" default_on="0" minimal_quantity="1" available_date="0000-00-00">
+      <location/>
+    </product_attribute>
+    <product_attribute id="product_attribute_3" id_product="Faded_Short_Sleeve_T-shirts" reference="" supplier_reference="" ean13="" upc="" wholesale_price="0.000000" price="0.000000" ecotax="0.000000" quantity="100" weight="0.000000" unit_price_impact="0.00" default_on="0" minimal_quantity="1" available_date="0000-00-00">
+      <location/>
+    </product_attribute>
+    <product_attribute id="product_attribute_4" id_product="Faded_Short_Sleeve_T-shirts" reference="" supplier_reference="" ean13="" upc="" wholesale_price="0.000000" price="0.000000" ecotax="0.000000" quantity="100" weight="0.000000" unit_price_impact="0.00" default_on="0" minimal_quantity="1" available_date="0000-00-00">
+      <location/>
+    </product_attribute>
+    <product_attribute id="product_attribute_5" id_product="Faded_Short_Sleeve_T-shirts" reference="" supplier_reference="" ean13="" upc="" wholesale_price="0.000000" price="0.000000" ecotax="0.000000" quantity="100" weight="0.000000" unit_price_impact="0.00" default_on="0" minimal_quantity="1" available_date="0000-00-00">
+      <location/>
+    </product_attribute>
+    <product_attribute id="product_attribute_6" id_product="Faded_Short_Sleeve_T-shirts" reference="" supplier_reference="" ean13="" upc="" wholesale_price="0.000000" price="0.000000" ecotax="0.000000" quantity="100" weight="0.000000" unit_price_impact="0.00" default_on="0" minimal_quantity="1" available_date="0000-00-00">
+      <location/>
+    </product_attribute>
+    <product_attribute id="product_attribute_7" id_product="Blouse" reference="" supplier_reference="" ean13="" upc="" wholesale_price="0.000000" price="0.000000" ecotax="0.000000" quantity="100" weight="0.000000" unit_price_impact="0.00" default_on="1" minimal_quantity="1" available_date="0000-00-00">
+      <location/>
+    </product_attribute>
+    <product_attribute id="product_attribute_8" id_product="Blouse" reference="" supplier_reference="" ean13="" upc="" wholesale_price="0.000000" price="0.000000" ecotax="0.000000" quantity="100" weight="0.000000" unit_price_impact="0.00" default_on="0" minimal_quantity="1" available_date="0000-00-00">
+      <location/>
+    </product_attribute>
+    <product_attribute id="product_attribute_9" id_product="Blouse" reference="" supplier_reference="" ean13="" upc="" wholesale_price="0.000000" price="0.000000" ecotax="0.000000" quantity="100" weight="0.000000" unit_price_impact="0.00" default_on="0" minimal_quantity="1" available_date="0000-00-00">
+      <location/>
+    </product_attribute>
+    <product_attribute id="product_attribute_10" id_product="Blouse" reference="" supplier_reference="" ean13="" upc="" wholesale_price="0.000000" price="0.000000" ecotax="0.000000" quantity="100" weight="0.000000" unit_price_impact="0.00" default_on="0" minimal_quantity="1" available_date="0000-00-00">
+      <location/>
+    </product_attribute>
+    <product_attribute id="product_attribute_11" id_product="Blouse" reference="" supplier_reference="" ean13="" upc="" wholesale_price="0.000000" price="0.000000" ecotax="0.000000" quantity="100" weight="0.000000" unit_price_impact="0.00" default_on="0" minimal_quantity="1" available_date="0000-00-00">
+      <location/>
+    </product_attribute>
+    <product_attribute id="product_attribute_12" id_product="Blouse" reference="" supplier_reference="" ean13="" upc="" wholesale_price="0.000000" price="0.000000" ecotax="0.000000" quantity="100" weight="0.000000" unit_price_impact="0.00" default_on="0" minimal_quantity="1" available_date="0000-00-00">
+      <location/>
+    </product_attribute>
+    <product_attribute id="product_attribute_13" id_product="Printed_Dress" reference="" supplier_reference="" ean13="" upc="" wholesale_price="0.000000" price="0.000000" ecotax="0.000000" quantity="100" weight="0.000000" unit_price_impact="0.00" default_on="1" minimal_quantity="1" available_date="0000-00-00">
+      <location/>
+    </product_attribute>
+    <product_attribute id="product_attribute_14" id_product="Printed_Dress" reference="" supplier_reference="" ean13="" upc="" wholesale_price="0.000000" price="0.000000" ecotax="0.000000" quantity="100" weight="0.000000" unit_price_impact="0.00" default_on="0" minimal_quantity="1" available_date="0000-00-00">
+      <location/>
+    </product_attribute>
+    <product_attribute id="product_attribute_15" id_product="Printed_Dress" reference="" supplier_reference="" ean13="" upc="" wholesale_price="0.000000" price="0.000000" ecotax="0.000000" quantity="100" weight="0.000000" unit_price_impact="0.00" default_on="0" minimal_quantity="1" available_date="0000-00-00">
+      <location/>
+    </product_attribute>
+    <product_attribute id="product_attribute_16" id_product="Printed_Dress_1" reference="" supplier_reference="" ean13="" upc="" wholesale_price="0.000000" price="0.000000" ecotax="0.000000" quantity="100" weight="0.000000" unit_price_impact="0.00" default_on="1" minimal_quantity="1" available_date="0000-00-00">
+      <location/>
+    </product_attribute>
+    <product_attribute id="product_attribute_17" id_product="Printed_Dress_1" reference="" supplier_reference="" ean13="" upc="" wholesale_price="0.000000" price="0.000000" ecotax="0.000000" quantity="100" weight="0.000000" unit_price_impact="0.00" default_on="0" minimal_quantity="1" available_date="0000-00-00">
+      <location/>
+    </product_attribute>
+    <product_attribute id="product_attribute_18" id_product="Printed_Dress_1" reference="" supplier_reference="" ean13="" upc="" wholesale_price="0.000000" price="0.000000" ecotax="0.000000" quantity="100" weight="0.000000" unit_price_impact="0.00" default_on="0" minimal_quantity="1" available_date="0000-00-00">
+      <location/>
+    </product_attribute>
+    <product_attribute id="product_attribute_19" id_product="Printed_Summer_Dress" reference="" supplier_reference="" ean13="" upc="" wholesale_price="0.000000" price="0.000000" ecotax="0.000000" quantity="100" weight="0.000000" unit_price_impact="0.00" default_on="1" minimal_quantity="1" available_date="0000-00-00">
+      <location/>
+    </product_attribute>
+    <product_attribute id="product_attribute_20" id_product="Printed_Summer_Dress" reference="" supplier_reference="" ean13="" upc="" wholesale_price="0.000000" price="0.000000" ecotax="0.000000" quantity="100" weight="0.000000" unit_price_impact="0.00" default_on="0" minimal_quantity="1" available_date="0000-00-00">
+      <location/>
+    </product_attribute>
+    <product_attribute id="product_attribute_21" id_product="Printed_Summer_Dress" reference="" supplier_reference="" ean13="" upc="" wholesale_price="0.000000" price="0.000000" ecotax="0.000000" quantity="100" weight="0.000000" unit_price_impact="0.00" default_on="0" minimal_quantity="1" available_date="0000-00-00">
+      <location/>
+    </product_attribute>
+    <product_attribute id="product_attribute_22" id_product="Printed_Summer_Dress" reference="" supplier_reference="" ean13="" upc="" wholesale_price="0.000000" price="0.000000" ecotax="0.000000" quantity="100" weight="0.000000" unit_price_impact="0.00" default_on="0" minimal_quantity="1" available_date="0000-00-00">
+      <location/>
+    </product_attribute>
+    <product_attribute id="product_attribute_23" id_product="Printed_Summer_Dress" reference="" supplier_reference="" ean13="" upc="" wholesale_price="0.000000" price="0.000000" ecotax="0.000000" quantity="100" weight="0.000000" unit_price_impact="0.00" default_on="0" minimal_quantity="1" available_date="0000-00-00">
+      <location/>
+    </product_attribute>
+    <product_attribute id="product_attribute_24" id_product="Printed_Summer_Dress" reference="" supplier_reference="" ean13="" upc="" wholesale_price="0.000000" price="0.000000" ecotax="0.000000" quantity="100" weight="0.000000" unit_price_impact="0.00" default_on="0" minimal_quantity="1" available_date="0000-00-00">
+      <location/>
+    </product_attribute>
+    <product_attribute id="product_attribute_25" id_product="Printed_Summer_Dress" reference="" supplier_reference="" ean13="" upc="" wholesale_price="0.000000" price="0.000000" ecotax="0.000000" quantity="100" weight="0.000000" unit_price_impact="0.00" default_on="0" minimal_quantity="1" available_date="0000-00-00">
+      <location/>
+    </product_attribute>
+    <product_attribute id="product_attribute_26" id_product="Printed_Summer_Dress" reference="" supplier_reference="" ean13="" upc="" wholesale_price="0.000000" price="0.000000" ecotax="0.000000" quantity="100" weight="0.000000" unit_price_impact="0.00" default_on="0" minimal_quantity="1" available_date="0000-00-00">
+      <location/>
+    </product_attribute>
+    <product_attribute id="product_attribute_27" id_product="Printed_Summer_Dress" reference="" supplier_reference="" ean13="" upc="" wholesale_price="0.000000" price="0.000000" ecotax="0.000000" quantity="100" weight="0.000000" unit_price_impact="0.00" default_on="0" minimal_quantity="1" available_date="0000-00-00">
+      <location/>
+    </product_attribute>
+    <product_attribute id="product_attribute_28" id_product="Printed_Summer_Dress" reference="" supplier_reference="" ean13="" upc="" wholesale_price="0.000000" price="0.000000" ecotax="0.000000" quantity="100" weight="0.000000" unit_price_impact="0.00" default_on="0" minimal_quantity="1" available_date="0000-00-00">
+      <location/>
+    </product_attribute>
+    <product_attribute id="product_attribute_29" id_product="Printed_Summer_Dress" reference="" supplier_reference="" ean13="" upc="" wholesale_price="0.000000" price="0.000000" ecotax="0.000000" quantity="100" weight="0.000000" unit_price_impact="0.00" default_on="0" minimal_quantity="1" available_date="0000-00-00">
+      <location/>
+    </product_attribute>
+    <product_attribute id="product_attribute_30" id_product="Printed_Summer_Dress" reference="" supplier_reference="" ean13="" upc="" wholesale_price="0.000000" price="0.000000" ecotax="0.000000" quantity="100" weight="0.000000" unit_price_impact="0.00" default_on="0" minimal_quantity="1" available_date="0000-00-00">
+      <location/>
+    </product_attribute>
+    <product_attribute id="product_attribute_31" id_product="Printed_Summer_Dress_1" reference="" supplier_reference="" ean13="" upc="" wholesale_price="0.000000" price="0.000000" ecotax="0.000000" quantity="100" weight="0.000000" unit_price_impact="0.00" default_on="1" minimal_quantity="1" available_date="0000-00-00">
+      <location/>
+    </product_attribute>
+    <product_attribute id="product_attribute_32" id_product="Printed_Summer_Dress_1" reference="" supplier_reference="" ean13="" upc="" wholesale_price="0.000000" price="0.000000" ecotax="0.000000" quantity="100" weight="0.000000" unit_price_impact="0.00" default_on="0" minimal_quantity="1" available_date="0000-00-00">
+      <location/>
+    </product_attribute>
+    <product_attribute id="product_attribute_33" id_product="Printed_Summer_Dress_1" reference="" supplier_reference="" ean13="" upc="" wholesale_price="0.000000" price="0.000000" ecotax="0.000000" quantity="100" weight="0.000000" unit_price_impact="0.00" default_on="0" minimal_quantity="1" available_date="0000-00-00">
+      <location/>
+    </product_attribute>
+    <product_attribute id="product_attribute_34" id_product="Printed_Chiffon_Dress" reference="" supplier_reference="" ean13="" upc="" wholesale_price="0.000000" price="0.000000" ecotax="0.000000" quantity="100" weight="0.000000" unit_price_impact="0.00" default_on="1" minimal_quantity="1" available_date="0000-00-00">
+      <location/>
+    </product_attribute>
+    <product_attribute id="product_attribute_35" id_product="Printed_Chiffon_Dress" reference="" supplier_reference="" ean13="" upc="" wholesale_price="0.000000" price="0.000000" ecotax="0.000000" quantity="100" weight="0.000000" unit_price_impact="0.00" default_on="0" minimal_quantity="1" available_date="0000-00-00">
+      <location/>
+    </product_attribute>
+    <product_attribute id="product_attribute_36" id_product="Printed_Chiffon_Dress" reference="" supplier_reference="" ean13="" upc="" wholesale_price="0.000000" price="0.000000" ecotax="0.000000" quantity="100" weight="0.000000" unit_price_impact="0.00" default_on="0" minimal_quantity="1" available_date="0000-00-00">
+      <location/>
+    </product_attribute>
+    <product_attribute id="product_attribute_37" id_product="Printed_Chiffon_Dress" reference="" supplier_reference="" ean13="" upc="" wholesale_price="0.000000" price="0.000000" ecotax="0.000000" quantity="0" weight="0.000000" unit_price_impact="0.00" default_on="0" minimal_quantity="1" available_date="0000-00-00">
+      <location/>
+    </product_attribute>
+    <product_attribute id="product_attribute_38" id_product="Printed_Chiffon_Dress" reference="" supplier_reference="" ean13="" upc="" wholesale_price="0.000000" price="0.000000" ecotax="0.000000" quantity="0" weight="0.000000" unit_price_impact="0.00" default_on="0" minimal_quantity="1" available_date="0000-00-00">
+      <location/>
+    </product_attribute>
+    <product_attribute id="product_attribute_39" id_product="Printed_Chiffon_Dress" reference="" supplier_reference="" ean13="" upc="" wholesale_price="6.150000" price="0.000000" ecotax="0.000000" quantity="0" weight="0.000000" unit_price_impact="0.00" default_on="0" minimal_quantity="1" available_date="0000-00-00">
+      <location/>
+    </product_attribute>
+    <product_attribute id="product_attribute_40" id_product="Printed_Summer_Dress_1" reference="" supplier_reference="" ean13="" upc="" wholesale_price="0.000000" price="0.000000" ecotax="0.000000" quantity="0" weight="0.000000" unit_price_impact="0.00" default_on="0" minimal_quantity="1" available_date="0000-00-00">
+      <location/>
+    </product_attribute>
+    <product_attribute id="product_attribute_41" id_product="Printed_Summer_Dress_1" reference="" supplier_reference="" ean13="" upc="" wholesale_price="0.000000" price="0.000000" ecotax="0.000000" quantity="0" weight="0.000000" unit_price_impact="0.00" default_on="0" minimal_quantity="1" available_date="0000-00-00">
+      <location/>
+    </product_attribute>
+    <product_attribute id="product_attribute_42" id_product="Printed_Summer_Dress_1" reference="" supplier_reference="" ean13="" upc="" wholesale_price="0.000000" price="0.000000" ecotax="0.000000" quantity="0" weight="0.000000" unit_price_impact="0.00" default_on="0" minimal_quantity="1" available_date="0000-00-00">
+      <location/>
+    </product_attribute>
+    <product_attribute id="product_attribute_43" id_product="Printed_Dress_1" reference="" supplier_reference="" ean13="" upc="" wholesale_price="0.000000" price="0.000000" ecotax="0.000000" quantity="0" weight="0.000000" unit_price_impact="0.00" default_on="0" minimal_quantity="1" available_date="0000-00-00">
+      <location/>
+    </product_attribute>
+    <product_attribute id="product_attribute_44" id_product="Printed_Dress_1" reference="" supplier_reference="" ean13="" upc="" wholesale_price="0.000000" price="0.000000" ecotax="0.000000" quantity="0" weight="0.000000" unit_price_impact="0.00" default_on="0" minimal_quantity="1" available_date="0000-00-00">
+      <location/>
+    </product_attribute>
+    <product_attribute id="product_attribute_45" id_product="Printed_Dress_1" reference="" supplier_reference="" ean13="" upc="" wholesale_price="0.000000" price="0.000000" ecotax="0.000000" quantity="0" weight="0.000000" unit_price_impact="0.00" default_on="0" minimal_quantity="1" available_date="0000-00-00">
+      <location/>
+    </product_attribute>
+  </entities>
+</entity_product_attribute>

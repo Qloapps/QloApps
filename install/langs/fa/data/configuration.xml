@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<entity_configuration>
+  <configuration id="PS_INVOICE_PREFIX">
+    <value>#FA</value>
+  </configuration>
+  <configuration id="PS_DELIVERY_PREFIX">
+    <value>#TA</value>
+  </configuration>
+  <configuration id="PS_RETURN_PREFIX">
+    <value>#RE</value>
+  </configuration>
+  <configuration id="PS_SEARCH_BLACKLIST">
+    <value>و|یا|با|در|یک|روی|به|برای|تا|که</value>
+  </configuration>
+  <configuration id="PS_META_KEYWORDS">
+    <value>0</value>
+  </configuration>
+  <configuration id="PS_CUSTOMER_SERVICE_SIGNATURE">
+    <value>مشتری عزیز,&#xD;
+&#xD;
+پیروز باشید,&#xD;
+خدمات مشتریان</value>
+  </configuration>
+  <configuration id="PS_ALLOW_ACCENTED_CHARS_URL" name="PS_ALLOW_ACCENTED_CHARS_URL">
+    <value>1</value>
+  </configuration>
+</entity_configuration>

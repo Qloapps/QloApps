@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<localizationPack name="Nigeria">
+  <currencies>
+    <currency name="Nigerian naira" iso_code="NGN" iso_code_num="566" sign="&#x20A6;" blank="1" conversion_rate="1.000000" format="1" decimals="0"/>
+  </currencies>
+  <languages>
+    <language iso_code="en"/>
+  </languages>
+  <taxes>
+    <taxRulesGroup name="Nigeria Standard Rate 5%">
+      <taxRule iso_code_country="ng" behavior="0" id_tax="72"/>
+    </taxRulesGroup>
+    <taxRulesGroup name="Nigeria Reduced Rate 0%">
+      <taxRule iso_code_country="ng" behavior="0" id_tax="73"/>
+    </taxRulesGroup>
+    <tax id="72" name="Nigeria Standard VAT 5%" rate="5.000"/>
+    <tax id="73" name="Nigeria Reduced VAT 0%" rate="0.000"/>
+  </taxes>
+  <units>
+    <unit type="weight" value="kg"/>
+    <unit type="volume" value="L"/>
+    <unit type="short_distance" value="cm"/>
+    <unit type="base_distance" value="m"/>
+    <unit type="long_distance" value="km"/>
+  </units>
+</localizationPack>

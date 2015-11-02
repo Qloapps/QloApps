@@ -1,0 +1,35 @@
+/* Block Viewed Products */
+#viewed-products_block_left .products li {
+	padding:10px 0;
+	border-bottom:1px dotted #ccc;
+}
+#viewed-products_block_left .products li.last_item {
+	padding-bottom:0;
+	border:none;
+}
+
+#viewed-products_block_left .content_img {
+	float:left;
+}
+#viewed-products_block_left .text_desc {
+	float:left;
+	margin-left: 10px;
+   width: 130px;
+}
+#viewed-products_block_left li .text_desc .s_title_block, #viewed-products_block_left li .text_desc h5 {
+	padding:0 0 5px 0;
+	font-size:12px;
+	color:#333;
+	font-weight: bold;
+}
+
+#viewed-products_block_left li .text_desc .s_title_block a, #viewed-products_block_left li .text_desc h5 a {
+	color:#333;
+}
+#viewed-products_block_left li .text_desc p,
+#viewed-products_block_left li .text_desc p a {
+	padding-bottom:0;
+	line-height:14px;
+	color:#666
+}
+

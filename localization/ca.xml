@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<localizationPack name="Canada" version="1.0">
+	<currencies>
+		<currency name="Dollar (CAD)" iso_code="CAD" iso_code_num="124" sign="CAD$" blank="0" conversion_rate="1.40054" format="1" decimals="1" />
+	</currencies>
+	<languages>
+		<language iso_code="en" />
+		<language iso_code="qc" />
+	</languages>
+	<states>
+		<state name="Alberta" iso_code="AB" country="CA" zone="North America" />
+		<state name="British Columbia" iso_code="BC" country="CA" zone="North America" />
+		<state name="Manitoba" iso_code="MB" country="CA" zone="North America" />
+		<state name="New Brunswick" iso_code="NB" country="CA" zone="North America" />
+		<state name="Newfoundland" iso_code="NL" country="CA" zone="North America" />
+		<state name="Northwest Territories" iso_code="NT" country="CA" zone="North America" />
+		<state name="Nova Scotia" iso_code="NS" country="CA" zone="North America" />
+		<state name="Nunavut" iso_code="NU" country="CA" zone="North America" />
+		<state name="Ontario" iso_code="ON" country="CA" zone="North America" />
+		<state name="Prince Edward Island" iso_code="PE" country="CA" zone="North America" />
+		<state name="Quebec" iso_code="QC" country="CA" zone="North America" />
+		<state name="Saskatchewan" iso_code="SK" country="CA" zone="North America" />
+		<state name="Yukon" iso_code="YT" country="CA" zone="North America" />
+	</states>
+	<taxes>
+		<tax id="1" name="CA 5%" rate="5" />
+		<tax id="3" name="CA-BC 7%" rate="7" />
+		<tax id="4" name="CA-MB 8%" rate="8" />
+		<tax id="5" name="CA-NB 8%" rate="8" />
+		<tax id="6" name="CA-NL 8%" rate="8" />
+		<tax id="8" name="CA-NS 10%" rate="10" />
+		<tax id="10" name="CA-ON 8%" rate="8" />
+		<tax id="11" name="CA-PE 9%" rate="9" />
+		<tax id="12" name="CA-QC 9.975%" rate="9.975" />
+		<tax id="13" name="CA-SK 5%" rate="5" />
+
+		<taxRulesGroup name="CA Standard Rate">
+			<taxRule iso_code_country="ca" id_tax="1" />
+			<taxRule iso_code_country="ca" iso_code_state="bc" id_tax="3" behavior="1" />
+			<taxRule iso_code_country="ca" iso_code_state="mb" id_tax="4" behavior="1" />
+			<taxRule iso_code_country="ca" iso_code_state="nb" id_tax="5" behavior="1" />
+			<taxRule iso_code_country="ca" iso_code_state="nl" id_tax="6" behavior="1" />
+			<taxRule iso_code_country="ca" iso_code_state="ns" id_tax="8" behavior="1" />
+			<taxRule iso_code_country="ca" iso_code_state="on" id_tax="10" behavior="1" />
+			<taxRule iso_code_country="ca" iso_code_state="pe" id_tax="11" behavior="1" />
+			<taxRule iso_code_country="ca" iso_code_state="qc" id_tax="12" behavior="1" />
+			<taxRule iso_code_country="ca" iso_code_state="sk" id_tax="13" behavior="1" />
+		</taxRulesGroup>
+	</taxes>
+	<units>
+		<unit type="weight" value="kg" />
+		<unit type="volume" value="L" />
+		<unit type="short_distance" value="in" />
+		<unit type="base_distance" value="ft" />
+		<unit type="long_distance" value="mi" />
+	</units>
+	<configurations>
+		<configuration name="PS_TAX_DISPLAY" value="1" />
+	</configurations>
+	<group_default price_display_method="1" />
+</localizationPack>

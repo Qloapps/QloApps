@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<localizationPack name="Jersey" version="1.0">
+	<currencies>
+		<currency name="Pound" iso_code="GBP" iso_code_num="826" sign="£" blank="1" conversion_rate="0.865759" format="1" decimals="1" />
+	</currencies>
+	<languages>
+		<language iso_code="fr" />
+		<language iso_code="en" />
+	</languages>
+	<taxes>
+		<tax id="1" name="GST JE 5%" rate="5" />
+		
+		<taxRulesGroup name="JE Standard Rate (5%)">
+			<taxRule iso_code_country="je" id_tax="1" />
+		</taxRulesGroup>
+	</taxes>
+	<units>
+		<unit type="weight" value="kg" />
+		<unit type="volume" value="L" />
+		<unit type="short_distance" value="cm" />
+		<unit type="base_distance" value="m" />
+		<unit type="long_distance" value="km" />
+	</units>
+</localizationPack>

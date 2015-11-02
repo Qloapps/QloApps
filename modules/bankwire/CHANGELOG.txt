@@ -1,0 +1,4 @@
+2014-04-22 18:56:46 +0200	// Changelog updated
+2014-04-17 11:59:23 +0200	// version compliancy
+2014-03-24 15:16:08 +0100	/ MO bankwire : ps_versions_compliancy added
+2014-03-20 14:19:09 +0100	Initial commit

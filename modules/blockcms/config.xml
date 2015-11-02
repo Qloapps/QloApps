@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<module>
+	<name>blockcms</name>
+	<displayName><![CDATA[CMS block]]></displayName>
+	<version><![CDATA[2.1.1]]></version>
+	<description><![CDATA[Adds a block with several CMS links.]]></description>
+	<author><![CDATA[PrestaShop]]></author>
+	<tab><![CDATA[front_office_features]]></tab>
+	<is_configurable>1</is_configurable>
+	<need_instance>0</need_instance>
+	<limited_countries></limited_countries>
+</module>

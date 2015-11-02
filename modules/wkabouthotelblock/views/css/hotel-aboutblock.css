@@ -1,0 +1,76 @@
+#abouthotelcontent
+{
+  margin-top: 50px;
+}
+.why_hotel_heading
+{
+  color: #252525;
+  font-size: 37px;
+  text-align: center;
+  font-family: parisienne;
+  line-height: 50px;
+}
+.about_hotel_heading
+{
+  padding-bottom: 5px;
+  padding-top: 5px;
+  color: #252525;
+  font-size: 28px;
+  text-align: center;
+  font-family: 'PT Serif', serif;
+  font-weight:400;
+}
+.why_hotel_content
+{
+  color: #252525;
+  font-size: 16px;
+  text-align: center;
+  font-family: 'PT Serif', serif;
+  font-weight:400;
+  word-spacing: 3px;
+  line-height: 24px;
+  letter-spacing: 1px;
+  margin-bottom: 40px;
+  padding: 0px 210px;
+}
+.about_hotel_content
+{
+  color: #252525;
+  line-height: 24px;
+  font-size: 16px;
+  text-align: center;
+  font-family: 'PT Serif', serif;
+  font-weight:400;
+  word-spacing: 3px;
+  letter-spacing: 1px;
+  margin-bottom: 50px;
+  padding: 0px 120px;
+}
+.abt_htl_hr
+{
+  background-color:#BF9958;
+  height:1px;
+  width:50%
+}
+
+@media screen and (max-width: 992px) {
+  .why_hotel_content, .about_hotel_content
+  {
+    padding: 0px;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  /*.why_hotel_heading
+  {
+    font-size: 26px;
+  }
+  .why_hotel_content, .about_hotel_content
+  {
+    font-size: 14px;
+  }
+  .about_hotel_heading
+  {
+    font-size: 15px;
+  }*/
+}

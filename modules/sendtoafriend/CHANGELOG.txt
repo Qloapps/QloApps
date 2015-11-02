@@ -1,0 +1,4 @@
+2014-03-28 11:50:51 +0100	// MO : min ps_versions_compliancy modified (1.5 => 1.6)
+2014-03-25 19:09:51 +0100	[*] BO : Retrocompatibility with old theme ajax query
+2014-03-24 18:26:48 +0100	/ MO sendtoafriend : ps_versions_compliancy added
+2014-03-21 10:55:23 +0100	Initial commit

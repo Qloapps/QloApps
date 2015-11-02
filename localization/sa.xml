@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<localizationPack name="Saudi Arabia" version="1.0">
+	<currencies>
+		<currency name="Riyal" iso_code="SAR" iso_code_num="682" sign="﷼" blank="1" conversion_rate="5.10682" format="2" decimals="1" />
+	</currencies>
+	<languages>
+		<language iso_code="ar" />
+	</languages>
+	<units>
+		<unit type="weight" value="kg" />
+		<unit type="volume" value="L" />
+		<unit type="short_distance" value="in" />
+		<unit type="base_distance" value="ft" />
+		<unit type="long_distance" value="mi" />
+	</units>
+</localizationPack>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<localizationPack name="Hong Kong" version="1.0">
+	<currencies>
+		<currency name="Hong Kong Dollar" iso_code="HKD" iso_code_num="344" sign="$" blank="1" conversion_rate="11.0512" format="2" decimals="1" />
+	</currencies>
+	<languages>
+		<language iso_code="zh" />
+	</languages>
+	<units>
+		<unit type="weight" value="市制" />
+		<unit type="volume" value="市升" />
+		<unit type="short_distance" value="分" />
+		<unit type="base_distance" value="寸" />
+		<unit type="long_distance" value="尺" />
+	</units>
+</localizationPack>

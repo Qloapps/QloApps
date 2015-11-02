@@ -1,0 +1,5 @@
+<?xml version='1.0'?>
+<entity_gender>
+  <gender id='Mr' name='M'/>
+  <gender id='Mrs' name='Mme'/>
+</entity_gender>

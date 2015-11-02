@@ -1,0 +1,75 @@
+<?xml version='1.0'?>
+<entity_attribute>
+  <attribute id='S'>
+    <name>S</name>
+  </attribute>
+  <attribute id='M'>
+    <name>M</name>
+  </attribute>
+  <attribute id='L'>
+    <name>L</name>
+  </attribute>
+  <attribute id='One_size'>
+    <name>Taille unique</name>
+  </attribute>
+  <attribute id='Grey'>
+    <name>Gris</name>
+  </attribute>
+  <attribute id='Taupe'>
+    <name>Taupe</name>
+  </attribute>
+  <attribute id='Beige'>
+    <name>Beige</name>
+  </attribute>
+  <attribute id='White'>
+    <name>Blanc</name>
+  </attribute>
+  <attribute id='Off_White'>
+    <name>Blanc cassé</name>
+  </attribute>
+  <attribute id='Red'>
+    <name>Rouge</name>
+  </attribute>
+  <attribute id='Black'>
+    <name>Noir</name>
+  </attribute>
+  <attribute id='Camel'>
+    <name>Camel</name>
+  </attribute>
+  <attribute id='Orange'>
+    <name>Orange</name>
+  </attribute>
+  <attribute id='Blue'>
+    <name>Bleu</name>
+  </attribute>
+  <attribute id='Green'>
+    <name>Vert</name>
+  </attribute>
+  <attribute id='Yellow'>
+    <name>Jaune</name>
+  </attribute>
+  <attribute id='Brown'>
+    <name>Marron</name>
+  </attribute>
+  <attribute id='35'>
+    <name>35</name>
+  </attribute>
+  <attribute id='36'>
+    <name>36</name>
+  </attribute>
+  <attribute id='37'>
+    <name>37</name>
+  </attribute>
+  <attribute id='38'>
+    <name>38</name>
+  </attribute>
+  <attribute id='39'>
+    <name>39</name>
+  </attribute>
+  <attribute id='40'>
+    <name>40</name>
+  </attribute>
+  <attribute id='Pink'>
+    <name>Rose</name>
+  </attribute>
+</entity_attribute>

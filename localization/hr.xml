@@ -1,0 +1,87 @@
+<?xml version="1.0"?>
+<localizationPack name="Croatia">
+  <currencies>
+    <currency name="Croatian Kuna" iso_code="HRK" iso_code_num="191" sign="kn" blank="1" conversion_rate="1.000000" format="2" decimals="1"/>
+  </currencies>
+  <languages>
+    <language iso_code="hr"/>
+  </languages>
+  <taxes>
+    <tax id="82" name="USt. AT 20%" rate="20" auto-generated="1" from-eu-tax-group="virtual"/>
+    <tax id="83" name="TVA BE 21%" rate="21" auto-generated="1" from-eu-tax-group="virtual"/>
+    <tax id="84" name="&#x414;&#x414;&#x421; BG 20%" rate="20" auto-generated="1" from-eu-tax-group="virtual"/>
+    <tax id="85" name="&#x3A6;&#x3A0;&#x391; CY 19%" rate="19" auto-generated="1" from-eu-tax-group="virtual"/>
+    <tax id="86" name="DPH CZ 21%" rate="21" auto-generated="1" from-eu-tax-group="virtual"/>
+    <tax id="87" name="MwSt. DE 19%" rate="19" auto-generated="1" from-eu-tax-group="virtual"/>
+    <tax id="88" name="moms DK 25%" rate="25" auto-generated="1" from-eu-tax-group="virtual"/>
+    <tax id="89" name="km EE 20%" rate="20" auto-generated="1" from-eu-tax-group="virtual"/>
+    <tax id="90" name="IVA ES 21%" rate="21" auto-generated="1" from-eu-tax-group="virtual"/>
+    <tax id="91" name="ALV FI 24%" rate="24" auto-generated="1" from-eu-tax-group="virtual"/>
+    <tax id="92" name="TVA FR 20%" rate="20" auto-generated="1" from-eu-tax-group="virtual"/>
+    <tax id="93" name="VAT UK 20%" rate="20.0" auto-generated="1" from-eu-tax-group="virtual"/>
+    <tax id="94" name="&#x3A6;&#x3A0;&#x391; GR 23%" rate="23" auto-generated="1" from-eu-tax-group="virtual"/>
+    <tax id="95" name="&#xC1;FA HU 27%" rate="27" auto-generated="1" from-eu-tax-group="virtual"/>
+    <tax id="96" name="VAT IE 23%" rate="23" auto-generated="1" from-eu-tax-group="virtual"/>
+    <tax id="97" name="IVA IT 22%" rate="22" auto-generated="1" from-eu-tax-group="virtual"/>
+    <tax id="98" name="PVM LT 21%" rate="21" auto-generated="1" from-eu-tax-group="virtual"/>
+    <tax id="99" name="TVA LU 17%" rate="17" auto-generated="1" from-eu-tax-group="virtual"/>
+    <tax id="100" name="PVN LV 21%" rate="21" auto-generated="1" from-eu-tax-group="virtual"/>
+    <tax id="101" name="VAT MT 18%" rate="18" auto-generated="1" from-eu-tax-group="virtual"/>
+    <tax id="102" name="BTW NL 21%" rate="21" auto-generated="1" from-eu-tax-group="virtual"/>
+    <tax id="103" name="PTU PL 23%" rate="23" auto-generated="1" from-eu-tax-group="virtual"/>
+    <tax id="104" name="IVA PT 23%" rate="23" auto-generated="1" from-eu-tax-group="virtual"/>
+    <tax id="105" name="TVA RO 24%" rate="24" auto-generated="1" from-eu-tax-group="virtual"/>
+    <tax id="106" name="Moms SE 25%" rate="25" auto-generated="1" from-eu-tax-group="virtual"/>
+    <tax id="107" name="DDV SI 22%" rate="22" auto-generated="1" from-eu-tax-group="virtual"/>
+    <tax id="108" name="DPH SK 20%" rate="20" auto-generated="1" from-eu-tax-group="virtual"/>
+    <taxRulesGroup name="Croatia PDV 5%">
+      <taxRule iso_code_country="hr" behavior="0" id_tax="81"/>
+    </taxRulesGroup>
+    <taxRulesGroup name="Croatia PDV 25%">
+      <taxRule iso_code_country="hr" behavior="0" id_tax="79"/>
+    </taxRulesGroup>
+    <taxRulesGroup name="Croatia PDV 10%">
+      <taxRule iso_code_country="hr" behavior="0" id_tax="80"/>
+    </taxRulesGroup>
+    <tax id="79" name="Croatia PDV 25%" rate="25.000" eu-tax-group="virtual"/>
+    <tax id="80" name="Croatia PDV 10%" rate="10.000"/>
+    <tax id="81" name="Croatia PDV 5%" rate="5.000"/>
+    <taxRulesGroup name="EU VAT For Virtual Products" auto-generated="1" eu-tax-group="virtual">
+      <taxRule iso_code_country="hr" id_tax="79"/>
+      <taxRule iso_code_country="at" id_tax="82"/>
+      <taxRule iso_code_country="be" id_tax="83"/>
+      <taxRule iso_code_country="bg" id_tax="84"/>
+      <taxRule iso_code_country="cy" id_tax="85"/>
+      <taxRule iso_code_country="cz" id_tax="86"/>
+      <taxRule iso_code_country="de" id_tax="87"/>
+      <taxRule iso_code_country="dk" id_tax="88"/>
+      <taxRule iso_code_country="ee" id_tax="89"/>
+      <taxRule iso_code_country="es" id_tax="90"/>
+      <taxRule iso_code_country="fi" id_tax="91"/>
+      <taxRule iso_code_country="fr" id_tax="92"/>
+      <taxRule iso_code_country="gb" id_tax="93"/>
+      <taxRule iso_code_country="gr" id_tax="94"/>
+      <taxRule iso_code_country="hu" id_tax="95"/>
+      <taxRule iso_code_country="ie" id_tax="96"/>
+      <taxRule iso_code_country="it" id_tax="97"/>
+      <taxRule iso_code_country="lt" id_tax="98"/>
+      <taxRule iso_code_country="lu" id_tax="99"/>
+      <taxRule iso_code_country="lv" id_tax="100"/>
+      <taxRule iso_code_country="mt" id_tax="101"/>
+      <taxRule iso_code_country="nl" id_tax="102"/>
+      <taxRule iso_code_country="pl" id_tax="103"/>
+      <taxRule iso_code_country="pt" id_tax="104"/>
+      <taxRule iso_code_country="ro" id_tax="105"/>
+      <taxRule iso_code_country="se" id_tax="106"/>
+      <taxRule iso_code_country="si" id_tax="107"/>
+      <taxRule iso_code_country="sk" id_tax="108"/>
+    </taxRulesGroup>
+  </taxes>
+  <units>
+    <unit type="weight" value="kg"/>
+    <unit type="volume" value="L"/>
+    <unit type="short_distance" value="cm"/>
+    <unit type="base_distance" value="m"/>
+    <unit type="long_distance" value="km"/>
+  </units>
+</localizationPack>

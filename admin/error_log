@@ -1,0 +1,4 @@
+[13-Oct-2015 16:44:08 Asia/Kolkata] PHP Warning:  imagepng(/home/sumit/public_html/html/Hotel-Management/img/rf/8.jpg): failed to open stream: No such file or directory in /home/sumit/public_html/html/Hotel-Management/classes/ImageManager.php on line 533
+[13-Oct-2015 16:44:55 Asia/Kolkata] PHP Warning:  imagepng(/home/sumit/public_html/html/Hotel-Management/img/rf/9.jpg): failed to open stream: No such file or directory in /home/sumit/public_html/html/Hotel-Management/classes/ImageManager.php on line 533
+[13-Oct-2015 17:16:16 Asia/Kolkata] PHP Warning:  Division by zero in /home/sumit/public_html/html/Hotel-Management/controllers/admin/AdminStatsController.php on line 599
+[13-Oct-2015 17:24:15 Asia/Kolkata] PHP Warning:  Division by zero in /home/sumit/public_html/html/Hotel-Management/controllers/admin/AdminStatsController.php on line 599

@@ -1,0 +1,80 @@
+<?xml version='1.0'?>
+<entity_product>
+  <product id='Faded_Short_Sleeve_T-shirts' id_shop='1'>
+    <description>&lt;p&gt;Fashion propose des vêtements de qualité depuis 2010. La marque propose une gamme féminine composée d&apos;élégants vêtements à coordonner et de robes originales et offre désormais une collection complète de prêt-à-porter, regroupant toutes les pièces qu&apos;une femme doit avoir dans sa garde-robe. Fashion se distingue avec des looks à la fois cool, simples et rafraîchissants, alliant élégance et chic, pour un style reconnaissable entre mille. Chacune des magnifiques pièces de la collection est fabriquée avec le plus grand soin en Italie. Fashion enrichit son offre avec une gamme d&apos;accessoires incluant chaussures, chapeaux, ceintures et bien plus encore !&lt;/p&gt;</description>
+    <description_short>&lt;p&gt;T-shirt délavé à manches courtes et col rond. Matière douce et extensible pour un confort inégalé. Pour un look estival, portez-le avec un chapeau de paille !&lt;/p&gt;</description_short>
+    <link_rewrite>t-shirt-delave-manches-courtes</link_rewrite>
+    <meta_description/>
+    <meta_keywords/>
+    <meta_title/>
+    <name>T-shirt délavé à manches courtes</name>
+    <available_now>En stock</available_now>
+    <available_later/>
+  </product>
+  <product id='Blouse' id_shop='1'>
+    <description>&lt;p&gt;Fashion propose des vêtements de qualité depuis 2010. La marque propose une gamme féminine composée d&apos;élégants vêtements à coordonner et de robes originales et offre désormais une collection complète de prêt-à-porter, regroupant toutes les pièces qu&apos;une femme doit avoir dans sa garde-robe. Fashion se distingue avec des looks à la fois cool, simples et rafraîchissants, alliant élégance et chic, pour un style reconnaissable entre mille. Chacune des magnifiques pièces de la collection est fabriquée avec le plus grand soin en Italie. Fashion enrichit son offre avec une gamme d&apos;accessoires incluant chaussures, chapeaux, ceintures et bien plus encore !&lt;/p&gt;</description>
+    <description_short>&lt;p&gt;Chemisier à manches courtes drapées, pour un style féminin et élégant.&lt;/p&gt;</description_short>
+    <link_rewrite>chemisier</link_rewrite>
+    <meta_description/>
+    <meta_keywords/>
+    <meta_title/>
+    <name>Chemisier</name>
+    <available_now>En stock</available_now>
+    <available_later/>
+  </product>
+  <product id='Printed_Dress' id_shop='1'>
+    <description>&lt;p&gt;Fashion propose des vêtements de qualité depuis 2010. La marque propose une gamme féminine composée d&apos;élégants vêtements à coordonner et de robes originales et offre désormais une collection complète de prêt-à-porter, regroupant toutes les pièces qu&apos;une femme doit avoir dans sa garde-robe. Fashion se distingue avec des looks à la fois cool, simples et rafraîchissants, alliant élégance et chic, pour un style reconnaissable entre mille. Chacune des magnifiques pièces de la collection est fabriquée avec le plus grand soin en Italie. Fashion enrichit son offre avec une gamme d&apos;accessoires incluant chaussures, chapeaux, ceintures et bien plus encore !&lt;/p&gt;</description>
+    <description_short>&lt;p&gt;Robe imprimée 100 % coton. Haut rayé noir et blanc et bas composé d&apos;une jupe patineuse taille haute.&lt;/p&gt;</description_short>
+    <link_rewrite>robe-imprimee</link_rewrite>
+    <meta_description/>
+    <meta_keywords/>
+    <meta_title/>
+    <name>Robe imprimée</name>
+    <available_now>En stock</available_now>
+    <available_later/>
+  </product>
+  <product id='Printed_Dress_1' id_shop='1'>
+    <description>&lt;p&gt;Fashion propose des vêtements de qualité depuis 2010. La marque propose une gamme féminine composée d&apos;élégants vêtements à coordonner et de robes originales et offre désormais une collection complète de prêt-à-porter, regroupant toutes les pièces qu&apos;une femme doit avoir dans sa garde-robe. Fashion se distingue avec des looks à la fois cool, simples et rafraîchissants, alliant élégance et chic, pour un style reconnaissable entre mille. Chacune des magnifiques pièces de la collection est fabriquée avec le plus grand soin en Italie. Fashion enrichit son offre avec une gamme d&apos;accessoires incluant chaussures, chapeaux, ceintures et bien plus encore !&lt;/p&gt;</description>
+    <description_short>&lt;p&gt;Robe de soirée imprimée à manches droites et volants, avec fine ceinture noire à la taille.&lt;/p&gt;</description_short>
+    <link_rewrite>robe-imprimee</link_rewrite>
+    <meta_description/>
+    <meta_keywords/>
+    <meta_title/>
+    <name>Robe imprimée</name>
+    <available_now>En stock</available_now>
+    <available_later/>
+  </product>
+  <product id='Printed_Summer_Dress' id_shop='1'>
+    <description>&lt;p&gt;Fashion propose des vêtements de qualité depuis 2010. La marque propose une gamme féminine composée d&apos;élégants vêtements à coordonner et de robes originales et offre désormais une collection complète de prêt-à-porter, regroupant toutes les pièces qu&apos;une femme doit avoir dans sa garde-robe. Fashion se distingue avec des looks à la fois cool, simples et rafraîchissants, alliant élégance et chic, pour un style reconnaissable entre mille. Chacune des magnifiques pièces de la collection est fabriquée avec le plus grand soin en Italie. Fashion enrichit son offre avec une gamme d&apos;accessoires incluant chaussures, chapeaux, ceintures et bien plus encore !&lt;/p&gt;</description>
+    <description_short>&lt;p&gt;Longue robe imprimée à fines bretelles réglables. Décolleté en V et armature sous la poitrine. Volants au bas de la robe.&lt;/p&gt;</description_short>
+    <link_rewrite>robe-ete-imprimee</link_rewrite>
+    <meta_description/>
+    <meta_keywords/>
+    <meta_title/>
+    <name>Robe d&apos;été imprimée</name>
+    <available_now>En stock</available_now>
+    <available_later/>
+  </product>
+  <product id='Printed_Summer_Dress_1' id_shop='1'>
+    <description>&lt;p&gt;Fashion propose des vêtements de qualité depuis 2010. La marque propose une gamme féminine composée d&apos;élégants vêtements à coordonner et de robes originales et offre désormais une collection complète de prêt-à-porter, regroupant toutes les pièces qu&apos;une femme doit avoir dans sa garde-robe. Fashion se distingue avec des looks à la fois cool, simples et rafraîchissants, alliant élégance et chic, pour un style reconnaissable entre mille. Chacune des magnifiques pièces de la collection est fabriquée avec le plus grand soin en Italie. Fashion enrichit son offre avec une gamme d&apos;accessoires incluant chaussures, chapeaux, ceintures et bien plus encore !&lt;/p&gt;</description>
+    <description_short>&lt;p&gt;Robe en mousseline sans manches, longueur genoux. Décolleté en V avec élastique sous la poitrine.&lt;/p&gt;</description_short>
+    <link_rewrite>robe-ete-imprimee</link_rewrite>
+    <meta_description/>
+    <meta_keywords/>
+    <meta_title/>
+    <name>Robe d&apos;été imprimée</name>
+    <available_now>En stock</available_now>
+    <available_later/>
+  </product>
+  <product id='Printed_Chiffon_Dress' id_shop='1'>
+    <description>&lt;p&gt;Fashion propose des vêtements de qualité depuis 2010. La marque propose une gamme féminine composée d&apos;élégants vêtements à coordonner et de robes originales et offre désormais une collection complète de prêt-à-porter, regroupant toutes les pièces qu&apos;une femme doit avoir dans sa garde-robe. Fashion se distingue avec des looks à la fois cool, simples et rafraîchissants, alliant élégance et chic, pour un style reconnaissable entre mille. Chacune des magnifiques pièces de la collection est fabriquée avec le plus grand soin en Italie. Fashion enrichit son offre avec une gamme d&apos;accessoires incluant chaussures, chapeaux, ceintures et bien plus encore !&lt;/p&gt;</description>
+    <description_short>&lt;p&gt;Robe en mousseline imprimée à bretelles, longueur genoux. Profond décolleté en V.&lt;/p&gt;</description_short>
+    <link_rewrite>robe-mousseline-imprimee</link_rewrite>
+    <meta_description/>
+    <meta_keywords/>
+    <meta_title/>
+    <name>Robe en mousseline imprimée</name>
+    <available_now>En stock</available_now>
+    <available_later/>
+  </product>
+</entity_product>

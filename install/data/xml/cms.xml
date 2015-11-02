@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity_cms>
+  <fields id="meta_title" class="CMS">
+    <field name="id_cms_category" relation="cms_category"/>
+    <field name="active"/>
+  </fields>
+  <entities>
+    <cms id="Delivery" id_cms_category="Home" active="1"/>
+    <cms id="Legal_Notice" id_cms_category="Home" active="1"/>
+    <cms id="Terms_and_conditions_of_use" id_cms_category="Home" active="1"/>
+    <cms id="About_us" id_cms_category="Home" active="1"/>
+    <cms id="Secure_payment" id_cms_category="Home" active="1"/>
+  </entities>
+</entity_cms>

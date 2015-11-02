@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<localizationPack name="India" version="1.0">
+	
+	<languages>
+	    <language iso_code="en" />
+        </languages>
+	
+	<currencies>
+		<currency name="Indian Rupee" iso_code="INR" iso_code_num="356" sign="₹" blank="1" conversion_rate="60.748205" format="1" decimals="1" />
+	</currencies>
+	<taxes>
+		<tax id="1" name="VAT IN 12.5%" rate="12.5" />
+		<tax id="2" name="VAT IN 4%" rate="4" />
+		<tax id="3" name="VAT IN 1%" rate="1" />
+		
+		<taxRulesGroup name="IN Standard Rate (12.5%)">
+			<taxRule iso_code_country="in" id_tax="1" />
+		</taxRulesGroup>
+		
+		<taxRulesGroup name="IN Reduced Rate (4%)">
+			<taxRule iso_code_country="in" id_tax="2" />
+		</taxRulesGroup>
+		
+		<taxRulesGroup name="IN Super Reduced Rate (1%)">
+			<taxRule iso_code_country="in" id_tax="3" />
+		</taxRulesGroup>
+	</taxes>
+	<states>
+		<state name="Andhra Pradesh" iso_code="AP" country="IN" zone="Asia" tax_behavior="0" />
+		<state name="Arunāchal Pradesh" iso_code="AR" country="IN" zone="Asia" tax_behavior="0" />
+		<state name="Assam" iso_code="AS" country="IN" zone="Asia" tax_behavior="0" />
+		<state name="Bihār" iso_code="BR" country="IN" zone="Asia" tax_behavior="0" />
+		<state name="Chhattīsgarh" iso_code="CT" country="IN" zone="Asia" tax_behavior="0" />
+		<state name="Goa" iso_code="GA" country="IN" zone="Asia" tax_behavior="0" />
+		<state name="Gujarāt" iso_code="GJ" country="IN" zone="Asia" tax_behavior="0" />
+		<state name="Haryāna" iso_code="HR" country="IN" zone="Asia" tax_behavior="0" />
+		<state name="Himāchal Pradesh" iso_code="HP" country="IN" zone="Asia" tax_behavior="0" />
+		<state name="Jammu and Kashmīr" iso_code="JK" country="IN" zone="Asia" tax_behavior="0" />
+		<state name="Jharkhand" iso_code="JH" country="IN" zone="Asia" tax_behavior="0" />
+		<state name="Karnātaka" iso_code="KA" country="IN" zone="Asia" tax_behavior="0" />
+		<state name="Kerala" iso_code="KL" country="IN" zone="Asia" tax_behavior="0" />
+		<state name="Madhya Pradesh" iso_code="MP" country="IN" zone="Asia" tax_behavior="0" />
+		<state name="Mahārāshtra" iso_code="MH" country="IN" zone="Asia" tax_behavior="0" />
+		<state name="Manipur" iso_code="MN" country="IN" zone="Asia" tax_behavior="0" />
+		<state name="Meghālaya" iso_code="ML" country="IN" zone="Asia" tax_behavior="0" />
+		<state name="Mizoram" iso_code="MZ" country="IN" zone="Asia" tax_behavior="0" />
+		<state name="Nāgāland" iso_code="NL" country="IN" zone="Asia" tax_behavior="0" />
+		<state name="Orissa" iso_code="OR" country="IN" zone="Asia" tax_behavior="0" />
+		<state name="Punjab" iso_code="PB" country="IN" zone="Asia" tax_behavior="0" />
+		<state name="Rājasthān" iso_code="RJ" country="IN" zone="Asia" tax_behavior="0" />
+		<state name="Sikkim" iso_code="SK" country="IN" zone="Asia" tax_behavior="0" />
+		<state name="Tamil Nādu" iso_code="TN" country="IN" zone="Asia" tax_behavior="0" />
+		<state name="Tripura" iso_code="TR" country="IN" zone="Asia" tax_behavior="0" />
+		<state name="Uttaranchal" iso_code="UL" country="IN" zone="Asia" tax_behavior="0" />
+		<state name="Uttar Pradesh" iso_code="UP" country="IN" zone="Asia" tax_behavior="0" />
+		<state name="West Bengal" iso_code="WB" country="IN" zone="Asia" tax_behavior="0" />
+		<state name="Andaman and Nicobar Islands" iso_code="AN" country="IN" zone="Asia" tax_behavior="0" />
+		<state name="Chandīgarh" iso_code="CH" country="IN" zone="Asia" tax_behavior="0" />
+		<state name="Dādra and Nagar Haveli" iso_code="DN" country="IN" zone="Asia" tax_behavior="0" />
+		<state name="Damān and Diu" iso_code="DD" country="IN" zone="Asia" tax_behavior="0" />
+		<state name="Delhi" iso_code="DL" country="IN" zone="Asia" tax_behavior="0" />
+		<state name="Lakshadweep" iso_code="LD" country="IN" zone="Asia" tax_behavior="0" />
+		<state name="Pondicherry" iso_code="PY" country="IN" zone="Asia" tax_behavior="0" />
+	</states>
+	<units>
+		<unit type="weight" value="kg" />
+		<unit type="volume" value="L" />
+		<unit type="short_distance" value="cm" />
+		<unit type="base_distance" value="m" />
+		<unit type="long_distance" value="km" />
+	</units>
+</localizationPack>

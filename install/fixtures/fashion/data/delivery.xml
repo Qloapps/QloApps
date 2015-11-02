@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity_delivery>
+  <fields class="Delivery" sql="a.id_carrier &gt; 1" null="1">
+    <field name="id_shop"/>
+    <field name="id_shop_group"/>
+    <field name="id_carrier" relation="carrier"/>
+    <field name="id_range_price" relation="range_price"/>
+    <field name="id_range_weight" relation="range_weight"/>
+    <field name="id_zone" relation="zone"/>
+    <field name="price"/>
+  </fields>
+  <entities>
+    <delivery id="delivery_1" id_shop="" id_shop_group="" id_carrier="My_carrier" id_range_price="" id_range_weight="range_weight_1" id_zone="Europe" price="5.000000"/>
+    <delivery id="delivery_2" id_shop="" id_shop_group="" id_carrier="My_carrier" id_range_price="" id_range_weight="range_weight_1" id_zone="North_America" price="5.000000"/>
+    <delivery id="delivery_4" id_shop="" id_shop_group="" id_carrier="My_carrier" id_range_price="range_price_1" id_range_weight="" id_zone="Europe" price="5.000000"/>
+    <delivery id="delivery_5" id_shop="" id_shop_group="" id_carrier="My_carrier" id_range_price="range_price_1" id_range_weight="" id_zone="North_America" price="5.000000"/>
+  </entities>
+</entity_delivery>

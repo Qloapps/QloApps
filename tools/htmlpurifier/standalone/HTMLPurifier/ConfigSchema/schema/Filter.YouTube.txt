@@ -1,0 +1,16 @@
+Filter.YouTube
+TYPE: bool
+VERSION: 3.1.0
+DEFAULT: false
+--DESCRIPTION--
+<p>
+  <strong>Warning:</strong> Deprecated in favor of %HTML.SafeObject and
+  %Output.FlashCompat (turn both on to allow YouTube videos and other
+  Flash content).
+</p>
+<p>
+  This directive enables YouTube video embedding in HTML Purifier. Check
+  <a href="http://htmlpurifier.org/docs/enduser-youtube.html">this document
+  on embedding videos</a> for more information on what this filter does.
+</p>
+--# vim: et sw=4 sts=4

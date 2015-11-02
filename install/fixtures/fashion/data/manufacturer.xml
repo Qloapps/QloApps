@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity_manufacturer>
+  <fields id="name" class="Manufacturer" image="m">
+    <field name="name"/>
+    <field name="active"/>
+  </fields>
+  <entities>
+    <manufacturer id="Fashion_Manufacturer" active="1">
+      <name>Fashion Manufacturer</name>
+    </manufacturer>
+  </entities>
+</entity_manufacturer>

@@ -1,0 +1,8 @@
+2014-04-22 18:57:19 +0200	// Changelog updated
+2014-04-16 16:18:13 +0200	// Code cleaning
+2014-04-16 16:08:43 +0200	[-] BO : Bug #, Set category if multi-store active and employee has only one shop
+2014-03-24 12:22:19 +0100	Merge branch 'master' of https://github.com/PrestaShop/blocklink
+2014-03-24 11:43:28 +0100	/ MO blocklink : ps_versions_compliancy modified (1.5.6.1 => 1.6)
+2014-03-24 11:02:36 +0100	// MO blocklink/ : ps_versions_compliancy added
+2014-03-21 18:36:19 +0100	[-] Add column names in SQL insert into
+2014-03-20 14:22:49 +0100	Initial commit

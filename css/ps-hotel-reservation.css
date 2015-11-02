@@ -1,0 +1,254 @@
+/* ---- AdminProducts (Booking) by webkul---- */
+
+.margin-leftrgt-0
+{
+	margin-left: 0px !important;
+	margin-right: 0px !important;
+}
+
+.no_border
+{
+	border: none !important;
+}
+.hr_style
+{
+	border-color: #c7d6db !important;
+    margin: 10px 0 !important;
+}
+
+.padding-top-btm-30
+{
+	padding-bottom: 30px;
+	padding-top: 30px;
+}
+
+.bg-green
+{
+	background-color: #7EC77B;
+}
+
+.bg-yellow
+{
+	background-color: #DCC635;
+}
+
+.bg-red
+{
+	background-color: #CD5D5D;
+}
+
+.bg-gray
+{
+	background-color: #C2C2C2;
+}
+
+.htl_date_header
+{
+	background-color: #2EACCE;
+	color: #FFFFFF;
+	border-top-left-radius: 4px;
+	border-top-right-radius: 4px;
+	padding-bottom: 15px;
+    padding-top: 15px;
+    margin-bottom: -2px;
+}
+
+.htl_date_disp
+{
+	font-size: 105px;
+	color: #FFFFFF;
+	font-weight: 300;
+	font-family: inherit;
+	margin-bottom: 0px !important;
+	line-height: 100px;
+}
+
+.htl_month_disp
+{
+	font-size: 18px;
+	color: #FFFFFF;
+	font-weight: 400;
+	font-family: inherit;	
+	margin-left: 7px !important;
+}
+
+.hotel_date .ui-datepicker
+{
+	border: 1px solid #c7d6db;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    width: 100%;
+}
+
+.hotel_date .ui-datepicker-header
+{
+	border: medium none;
+}
+
+.hotel_date .ui-datepicker-next:hover, .hotel_date .ui-datepicker-next:focus, .hotel_date .ui-datepicker-next:active, .hotel_date .ui-datepicker-prev:hover, .hotel_date .ui-datepicker-prev:focus, .hotel_date .ui-datepicker-prev:active
+{
+	outline: none;
+}
+
+.hotel_date .ui-datepicker-prev span
+{
+	background-position: -97px 0;
+}
+
+.hotel_date .ui-datepicker-next span
+{
+	background-position: -33px 0;
+}
+
+.htl_room_data_cont
+{
+	border: 1px solid #C7D6DB;
+	border-radius: 4px;
+	padding: 15px !important;
+}
+
+.htl_room_cat_data
+{
+	border-right: 1px solid #C7D6DB;
+	text-align: center;
+	padding-bottom: 30px;
+	padding-top: 30px;
+}
+
+.room_cat_header
+{
+	font-size: 15px;
+	color: #252525;
+	font-weight: 400;
+	text-transform: capitalize;
+}
+
+.room_cat_data
+{
+	line-height: 85px;
+	font-size: 105px;
+	color: #252525;
+	font-weight: 300;
+}
+
+.color_indicate
+{
+	width: 40px;
+	height: 40px;
+	border-radius: 50%;
+	float: left;
+}
+
+.indi_label
+{
+	color: #252525;
+    display: block !important;
+    font-size: 14px;
+    font-weight: 400;
+    margin-left: 3px;
+    text-transform: capitalize;
+    transform: translate(4px, 6px) !important;
+}
+
+.indi_cont
+{
+	margin: 20px 0px;
+}
+/* ---- AdminProducts (Booking) ---- */
+
+/*booking Information*/
+
+.hotel_date .margin-leftrgt-0
+{
+    margin-left: 0px !important;
+    margin-right: 0px !important;
+}
+
+.hotel_date .no_border
+{
+    border: none !important;
+}
+.hotel_date .ui-datepicker
+{
+    border: 1px solid #c7d6db;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    width: 100%;
+}
+
+/*.hotel_date .ui-state-active
+{
+    border-radius: 50%;
+}*/
+
+.hotel_date .ui-datepicker td
+{
+    padding: 7px!important;
+}
+
+.hotel_date .ui-state-default
+{
+    border: none!important;
+    text-align: center!important;
+}
+
+.hotel_date .ui-datepicker-header
+{
+    border: medium none;
+}
+
+.hotel_date .ui-datepicker-next:hover, .hotel_date .ui-datepicker-next:focus, .hotel_date .ui-datepicker-next:active, .hotel_date .ui-datepicker-prev:hover, .hotel_date .ui-datepicker-prev:focus, .hotel_date .ui-datepicker-prev:active
+{
+    outline: none;
+}
+
+.ui-datepicker-prev span
+{
+    background-position: -97px 0;
+}
+
+.ui-datepicker-next span
+{
+    background-position: -33px 0;
+}
+
+.default_available .ui-state-default
+{
+    background-color: #7ec77b!important;
+    height: 40px;
+    color: #ffffff;
+}
+
+.default_part_available .ui-state-default
+{
+    background-color: #dcc635!important;
+    height: 40px;
+    color: #ffffff;
+}
+
+.default_unavailable .ui-state-default
+{
+    background-color: #cd5d5d!important;
+    height: 40px;
+    color: #ffffff;
+}
+
+.ui-datepicker-today
+{
+    background-color:#008abd;
+}
+
+.available
+{
+    background-color: #7ec77b;
+}
+
+.part_available
+{
+    background-color: #dcc635;
+}
+
+.unavailable
+{
+    background-color: #cd5d5d;
+}

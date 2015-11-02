@@ -1,0 +1,12 @@
+<?xml version='1.0'?>
+<entity_order_message>
+  <order_message id='Delay'>
+    <name>Atraso</name>
+    <message>Olá,
+
+Infelizmente uma peça do seu pedido está indisponível no momento. Isso pode ocasionar um leve atraso na entrega.
+Queira aceitar nossas desculpas e tenha a certeza de que estamos fazendo o possível para remediar esta situação.
+
+Atenciosamente,</message>
+  </order_message>
+</entity_order_message>

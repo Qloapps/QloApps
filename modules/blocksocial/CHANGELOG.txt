@@ -1,0 +1,6 @@
+2014-04-22 18:57:46 +0200	// Changelog updated
+2014-03-26 17:55:24 +0100	Show youtube, google+ and Pinterest links
+2014-03-26 17:34:00 +0100	install and uninstall default values fixed
+2014-03-24 11:43:29 +0100	/ MO blocksocial : ps_versions_compliancy modified (1.5.6.1 => 1.6)
+2014-03-24 11:03:56 +0100	// MO blocksocial/ : ps_versions_compliancy added
+2014-03-20 14:25:27 +0100	Initial commit

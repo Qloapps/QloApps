@@ -1,0 +1,136 @@
+#testimonial_block
+{
+  padding-top: 50px;
+}
+.hotel_testimonial_heading
+{
+  color: #252525;
+  font-size: 37px;
+  text-align: center;
+  font-family: parisienne;
+  line-height: 40px;
+  margin-bottom: 10px;
+}
+
+.testimonial_container
+{
+  padding-bottom: 5px;
+  padding-top: 5px;
+  color: #252525;
+  font-size: 28px;
+  text-align: center;
+  font-family: 'PT Serif', serif;
+  font-weight:400;
+}
+.rating_div
+{
+  margin-bottom: 30px;
+}
+.person_image
+{
+  margin-bottom: 30px;
+}
+.testimonial_content
+{
+  color: #777777;
+  font-size: 18px;
+  text-align: center;
+  font-family: 'PT Serif', serif;
+  font-weight:400;
+}
+.hotel_testimonial_content
+{
+  color: #252525;
+  padding-right: 210px;
+  padding-left: 210px;
+  padding-top: 20px;
+  font-size: 16px;
+  text-align: center;
+  font-family: 'PT Serif', serif;
+  font-weight:400;
+  word-spacing: 3px;
+  letter-spacing: 1px;
+  padding: 0 100px;
+  word-wrap: break-word
+  line-height: 20px;
+}
+.testi_block_content
+{
+  letter-spacing: 1px;
+  line-height: 30px;
+}
+.testimonial_block_content_container
+{
+  padding-top: 70px;
+}
+.gap-line
+{
+  background-color: #999;
+  height: 1px;
+  margin-top: 50px;
+}
+
+.slideview {
+    width: 100%;
+    height: 100%;
+    background: #eaeaea;
+    min-height: 550px!important;
+  }
+   
+  .slide {
+    width: 100%;
+    height: 100%;
+  }
+   
+  article {
+    background: #fff;
+    height: 100%;
+  }
+
+.slideview-pagination-item
+{
+  background-color: #ffffff!important;
+  box-shadow: 0 0 0 2px rgb(191, 153, 88);
+  border: 3px solid #ffffff!important;
+  height:20px!important;
+  width: 20px!important;
+}
+
+.slideview-pagination
+{
+  bottom: 0px!important;
+}
+
+.slideview-pagination-active
+{
+  background-color: #bf9958!important;
+}
+
+.slideview-prev
+{
+  left: 5px!important;
+  top: 60%!important;
+  color: #bf9958!important;
+}
+
+.slideview-next
+{
+  right: 5px!important;
+  top: 60%!important;
+  color: #bf9958!important;  
+}
+
+.testimonial_person_name
+{
+  color: #bf9958;
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 5px;
+  padding-top: 25px;
+}
+.testimonial_person_desig
+{
+  color: #777777;
+  font-size: 16px;
+  font-weight: 400;
+}

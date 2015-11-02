@@ -1,0 +1,16 @@
+Core.AllowHostnameUnderscore
+TYPE: bool
+VERSION: 4.6.0
+DEFAULT: false
+--DESCRIPTION--
+<p>
+    By RFC 1123, underscores are not permitted in host names.
+    (This is in contrast to the specification for DNS, RFC
+    2181, which allows underscores.)
+    However, most browsers do the right thing when faced with
+    an underscore in the host name, and so some poorly written
+    websites are written with the expectation this should work.
+    Setting this parameter to true relaxes our allowed character
+    check so that underscores are permitted.
+</p>
+--# vim: et sw=4 sts=4

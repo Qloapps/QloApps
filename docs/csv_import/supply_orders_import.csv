@@ -1,0 +1,5 @@
+ID;Supplier ID *;Lang ID;Warehouse ID *;Currency ID *;Supply Order Reference *;Delivery Date (Y-M-D)*;Discount Rate;Template
+1;1;1;1;1;Ref Apple 01;2013-11-01;;
+2;3;1;1;1;Nippon Electronic Import;2013-11-01;;
+3;2;1;1;1;Shure Online Store;2013-11-01;;
+4;1;1;2;2;Ref Apple 02;2013-11-01;;

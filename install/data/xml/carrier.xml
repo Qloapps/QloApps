@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity_carrier>
+  <fields id="name" class="Carrier" sql="a.id_carrier = 1">
+    <field name="id_reference"/>
+    <field name="id_tax_rules_group"/>
+    <field name="name"/>
+    <field name="url"/>
+    <field name="active"/>
+    <field name="shipping_handling"/>
+    <field name="range_behavior"/>
+    <field name="is_free"/>
+    <field name="shipping_external"/>
+    <field name="need_range"/>
+    <field name="shipping_method"/>
+    <field name="max_width"/>
+    <field name="max_height"/>
+    <field name="max_depth"/>
+    <field name="max_weight"/>
+    <field name="grade"/>
+  </fields>
+  <entities>
+    <carrier id="carrier_1" id_reference="1" id_tax_rules_group="0" active="1" shipping_handling="0" range_behavior="0" is_free="1" shipping_external="0" need_range="0" shipping_method="0" max_width="0" max_height="0" max_depth="0" max_weight="0" grade="0">
+      <name>0</name>
+      <url/>
+    </carrier>
+  </entities>
+</entity_carrier>

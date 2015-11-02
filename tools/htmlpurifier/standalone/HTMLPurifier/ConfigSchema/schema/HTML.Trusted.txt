@@ -1,0 +1,9 @@
+HTML.Trusted
+TYPE: bool
+VERSION: 2.0.0
+DEFAULT: false
+--DESCRIPTION--
+Indicates whether or not the user input is trusted or not. If the input is
+trusted, a more expansive set of allowed tags and attributes will be used.
+See also %CSS.Trusted.
+--# vim: et sw=4 sts=4

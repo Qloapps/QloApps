@@ -1,0 +1,9 @@
+<?xml version='1.0'?>
+<entity_contact>
+  <contact id='Webmaster' name='Webmaster'>
+    <description>Se ocorrer algum problema técnico neste site</description>
+  </contact>
+  <contact id='Customer_service' name='Serviço ao cliente'>
+    <description>Para qualquer pergunta sobre um produto, um pedido</description>
+  </contact>
+</entity_contact>

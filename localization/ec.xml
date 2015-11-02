@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<localizationPack name="Ecuador" version="1.0">
+	<currencies>
+		<currency name="Dollar" iso_code="USD" iso_code_num="840" sign="$" blank="0" conversion_rate="1.36550" format="1" decimals="1" />
+	</currencies>
+	<languages>
+		<language iso_code="es" />
+	</languages>
+	<taxes>
+		<tax id="1" name="IVA EC 12%" rate="12" />
+		
+		<taxRulesGroup name="EC Standard Rate (12%)">
+			<taxRule iso_code_country="ec" id_tax="1" />
+		</taxRulesGroup>
+	</taxes>
+	<units>
+		<unit type="weight" value="kg" />
+		<unit type="volume" value="L" />
+		<unit type="short_distance" value="cm" />
+		<unit type="base_distance" value="m" />
+		<unit type="long_distance" value="km" />
+	</units>
+</localizationPack>

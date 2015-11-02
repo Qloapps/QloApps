@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<localizationPack name="Venezuela" version="1.0">
+	<currencies>
+		<currency name="Bolívar fuerte" iso_code="VEF" iso_code_num="937" sign="Bs" blank="1" conversion_rate="5.84819" format="2" decimals="1" />
+	</currencies>
+	<languages>
+		<language iso_code="es" />
+	</languages>
+	<taxes>
+		<tax id="1" name="IVA VE 12%" rate="12" />
+		<tax id="2" name="IVA VE 11%" rate="11" />
+		
+		<taxRulesGroup name="VE Standard Rate (12%)">
+			<taxRule iso_code_country="ve" id_tax="1" />
+		</taxRulesGroup>
+		
+		<taxRulesGroup name="VE Reduced Rate (11%)">
+			<taxRule iso_code_country="ve" id_tax="2" />
+		</taxRulesGroup>
+	</taxes>
+	<units>
+		<unit type="weight" value="kg" />
+		<unit type="volume" value="L" />
+		<unit type="short_distance" value="in" />
+		<unit type="base_distance" value="ft" />
+		<unit type="long_distance" value="mi" />
+	</units>
+</localizationPack>

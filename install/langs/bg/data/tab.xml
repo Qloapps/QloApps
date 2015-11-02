@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity_tab>
+  <tab id="Dashboard" name="Табло"/>
+  <tab id="CMS_Pages" name="СУС страници"/>
+  <tab id="CMS_Categories" name="СУС категории"/>
+  <tab id="Combinations_Generator" name="Генератор на комбинации"/>
+  <tab id="Search" name="Търсене"/>
+  <tab id="Login" name="Вход"/>
+  <tab id="Shops" name="Магазини"/>
+  <tab id="Shop_URLs" name="Адреси (URL) на магазина"/>
+  <tab id="Catalog" name="Каталог"/>
+  <tab id="Orders" name="Поръчки"/>
+  <tab id="Customers" name="Клиенти"/>
+  <tab id="Price_Rules" name="Ценови условия"/>
+  <tab id="Shipping" name="Доставка"/>
+  <tab id="Localization" name="Локализация"/>
+  <tab id="Modules" name="Модули"/>
+  <tab id="Preferences" name="Предпочитания"/>
+  <tab id="Advanced_Parameters" name="За напреднали"/>
+  <tab id="Administration" name="Администрация"/>
+  <tab id="Stats" name="Статистика"/>
+  <tab id="Stock" name="Стока"/>
+  <tab id="Products" name="Продукти"/>
+  <tab id="Categories" name="Категории"/>
+  <tab id="Monitoring" name="Мониторинг"/>
+  <tab id="Attributes_and_Values" name="Атрибути на продукт"/>
+  <tab id="Features" name="Характеристики на продукт"/>
+  <tab id="Manufacturers" name="Производители"/>
+  <tab id="Suppliers" name="Доставчици"/>
+  <tab id="Tags" name="Етикети"/>
+  <tab id="Attachments" name="Прикачени"/>
+  <tab id="Orders_1" name="Поръчки"/>
+  <tab id="Invoices" name="фактури"/>
+  <tab id="Merchandise_Returns" name="Връщане на стоки"/>
+  <tab id="Delivery_Slips" name="Товарителници"/>
+  <tab id="Credit_Slips" name="Кредитни известия"/>
+  <tab id="Statuses" name="Статуси"/>
+  <tab id="Order_Messages" name="Съобщения при поръчка"/>
+  <tab id="Customers_1" name="Клиенти"/>
+  <tab id="Addresses" name="Адреси"/>
+  <tab id="Groups" name="Групи"/>
+  <tab id="Shopping_Carts" name="Колички за пазаруване"/>
+  <tab id="Customer_Service" name="Обслужване на клиенти"/>
+  <tab id="Contacts" name="Контакт"/>
+  <tab id="Titles" name="Заглавия"/>
+  <tab id="Outstanding" name="Отличаващи се"/>
+  <tab id="Cart_Rules" name="Règles panier"/>
+  <tab id="Catalog_Price_Rules" name="Правила за цените в каталога"/>
+  <tab id="Marketing" name="Маркетинг"/>
+  <tab id="Shipping_1" name="Предпочитания"/>
+  <tab id="Carriers" name="Превозвачи"/>
+  <tab id="Localization_1" name="Локализация"/>
+  <tab id="Languages" name="Езици"/>
+  <tab id="Zones" name="Зони"/>
+  <tab id="Countries" name="Страни"/>
+  <tab id="States" name="Области"/>
+  <tab id="Currencies" name="Валути"/>
+  <tab id="Taxes" name="Данъци"/>
+  <tab id="Tax_Rules" name="Данъчни правила"/>
+  <tab id="Translations" name="Преводи"/>
+  <tab id="Modules_1" name="Модули и услуги"/>
+  <tab id="Modules_Themes_Catalog" name="Каталог с модули и теми"/>
+  <tab id="Positions" name="Разположение"/>
+  <tab id="Payment" name="Плащане"/>
+  <tab id="General" name="Общи настройки"/>
+  <tab id="Orders_2" name="Поръчки"/>
+  <tab id="Products_1" name="Продукти"/>
+  <tab id="Customers_2" name="Клиенти"/>
+  <tab id="Themes" name="Теми"/>
+  <tab id="SEO_URLs" name="Оптимизация и адреси (URL)"/>
+  <tab id="CMS" name="СУС"/>
+  <tab id="Images" name="Снимки"/>
+  <tab id="Store_Contacts" name="Контакти на магазина"/>
+  <tab id="Search_1" name="Търсене"/>
+  <tab id="Maintenance" name="Поддръжка"/>
+  <tab id="Geolocation" name="Местоположение"/>
+  <tab id="Configuration_Information" name="Инф-я за конфигурацията"/>
+  <tab id="Performance" name="Производителност"/>
+  <tab id="E-mail" name="E-mail"/>
+  <tab id="Multistore" name="Multiboutique"/>
+  <tab id="CSV_Import" name="Импортиране на CSV"/>
+  <tab id="DB_Backup" name="Архив на БД"/>
+  <tab id="SQL_Manager" name="SQL мениджър"/>
+  <tab id="Logs" name="Логове"/>
+  <tab id="Webservice" name="Уеб-обслужване"/>
+  <tab id="Preferences_1" name="Предпочитания"/>
+  <tab id="Quick_Access" name="Бърз достъп"/>
+  <tab id="Employees" name="Служители"/>
+  <tab id="Profiles" name="Профили"/>
+  <tab id="Permissions" name="Права"/>
+  <tab id="Menus" name="Менюта"/>
+  <tab id="Stats_1" name="Статистика"/>
+  <tab id="Search_Engines" name="Търсачки"/>
+  <tab id="Referrers" name="Реферали"/>
+  <tab id="Warehouses" name="Складове"/>
+  <tab id="Stock_Management" name="Управление на наличности"/>
+  <tab id="Stock_Movement" name="Движение на стоки"/>
+  <tab id="Instant_Stock_Status" name="Статус на наличностите"/>
+  <tab id="Stock_Coverage" name="Резервни наличности"/>
+  <tab id="Supply_orders" name="Заявки за доставка"/>
+  <tab id="Configuration" name="Настройка"/>
+  <tab id="CarrierWizard" name="Превозвач"/>
+</entity_tab>

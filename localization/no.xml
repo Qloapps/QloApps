@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<localizationPack name="Norway" version="1.0">
+	<currencies>
+		<currency name="Krone" iso_code="NOK" iso_code_num="578" sign="kr" blank="1" conversion_rate="7.97791" format="2" decimals="1" />
+	</currencies>
+	<languages>
+		<language iso_code="no" />
+	</languages>
+	<taxes>
+		<tax id="1" name="MVA NO 25%" rate="25" />
+		<tax id="2" name="MVA NO 15%" rate="15" />
+		<tax id="3" name="MVA NO 8%" rate="8" />
+		
+		<taxRulesGroup name="NO Standard Rate (25%)">
+			<taxRule iso_code_country="no" id_tax="1" />
+		</taxRulesGroup>
+		
+		<taxRulesGroup name="NO Reduced Rate (15%)">
+			<taxRule iso_code_country="no" id_tax="2" />
+		</taxRulesGroup>
+		
+		<taxRulesGroup name="NO Super Reduced Rate (8%)">
+			<taxRule iso_code_country="no" id_tax="3" />
+		</taxRulesGroup>
+	</taxes>
+	<units>
+		<unit type="weight" value="kg" />
+		<unit type="volume" value="L" />
+		<unit type="short_distance" value="cm" />
+		<unit type="base_distance" value="m" />
+		<unit type="long_distance" value="km" />
+	</units>
+</localizationPack>

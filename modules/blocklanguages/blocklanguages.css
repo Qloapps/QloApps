@@ -1,0 +1,58 @@
+/* block top languages */
+#header_right #languages_block_top {
+	float:right;
+	margin: 0;
+	padding:2px 6px 1px 6px;
+	-moz-border-bottom-right-radius: 3px;
+	-moz-border-bottom-left-radius: 3px;
+	-webkit-border-bottom-right-radius: 3px;
+	-webkit-border-bottom-left-radius: 3px;
+	border-bottom-right-radius: 3px;
+	border-bottom-left-radius: 3px;
+	background: none repeat scroll 0 0 #000;
+}
+#header_right #languages_block_top p {
+	clear: left;
+	padding-right:20px;
+	font: 11px Arial,Verdana,sans-serif;
+	color: #ccc;
+	text-align: right;
+	background: url("img/block_languages_top_p_bg.png") no-repeat scroll right 1px transparent;
+}
+#languages_block_top ul#first-languages li {
+	float: left;
+	margin-right: 3px
+}
+#languages_block_top ul#first-languages li.selected_language {
+	float: left;
+}
+/*languages with jquery*/
+#countries {
+	cursor: pointer;
+	position: relative;
+	top: 1px;
+}
+#countries p {
+	position: relative;
+	top: 0;
+	padding: 0;
+}
+#countries p img {
+	padding-left: 5px;
+}
+#countries .countries_ul{
+	display:none;
+	z-index: 10000;
+	padding:10px;
+	list-style-type:none;
+}
+#countries .countries_ul_hover{
+	display:block;
+	z-index: 5000;
+	position:absolute;
+	right:6px;
+	padding:5px 10px;
+	height:auto;
+	width:20px;
+	background:#000000;
+}

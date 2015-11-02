@@ -1,0 +1,329 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity_hook>
+  <fields id="name">
+    <field name="name"/>
+    <field name="title"/>
+    <field name="description"/>
+    <field name="live_edit"/>
+  </fields>
+  <entities>
+    <hook id="displayPayment" live_edit="1">
+      <name>displayPayment</name><title>Payment</title><description>This hook displays new elements on the payment page</description>
+    </hook>
+    <hook id="actionValidateOrder" live_edit="0">
+      <name>actionValidateOrder</name><title>New orders</title><description/>
+    </hook>
+    <hook id="displayMaintenance" live_edit="0">
+      <name>displayMaintenance</name><title>Maintenance Page</title><description>This hook displays new elements on the maintenance page</description>
+    </hook>
+    <hook id="actionPaymentConfirmation" live_edit="0">
+      <name>actionPaymentConfirmation</name><title>Payment confirmation</title><description>This hook displays new elements after the payment is validated</description>
+    </hook>
+    <hook id="displayPaymentReturn" live_edit="0">
+      <name>displayPaymentReturn</name><title>Payment return</title><description/>
+    </hook>
+    <hook id="actionUpdateQuantity" live_edit="0">
+      <name>actionUpdateQuantity</name><title>Quantity update</title><description>Quantity is updated only when a customer effectively places their order</description>
+    </hook>
+    <hook id="displayRightColumn" live_edit="1">
+      <name>displayRightColumn</name><title>Right column blocks</title><description>This hook displays new elements in the right-hand column</description>
+    </hook>
+    <hook id="displayLeftColumn" live_edit="1">
+      <name>displayLeftColumn</name><title>Left column blocks</title><description>This hook displays new elements in the left-hand column</description>
+    </hook>
+    <hook id="displayHome" live_edit="1">
+      <name>displayHome</name><title>Homepage content</title><description>This hook displays new elements on the homepage</description>
+    </hook>
+    <hook id="Header" live_edit="0">
+      <name>Header</name><title>Pages html head section</title><description>This hook adds additional elements in the head section of your pages (head section of html)</description>
+    </hook>
+    <hook id="actionCartSave" live_edit="0">
+      <name>actionCartSave</name><title>Cart creation and update</title><description>This hook is displayed when a product is added to the cart or if the cart's content is modified</description>
+    </hook>
+    <hook id="actionAuthentication" live_edit="0">
+      <name>actionAuthentication</name><title>Successful customer authentication</title><description>This hook is displayed after a customer successfully signs in</description>
+    </hook>
+    <hook id="actionProductAdd" live_edit="0">
+      <name>actionProductAdd</name><title>Product creation</title><description>This hook is displayed after a product is created</description>
+    </hook>
+    <hook id="actionProductUpdate" live_edit="0">
+      <name>actionProductUpdate</name><title>Product update</title><description>This hook is displayed after a product has been updated</description>
+    </hook>
+    <hook id="displayTop" live_edit="0">
+      <name>displayTop</name><title>Top of pages</title><description>This hook displays additional elements at the top of your pages</description>
+    </hook>
+    <hook id="displayRightColumnProduct" live_edit="0">
+      <name>displayRightColumnProduct</name><title>New elements on the product page (right column)</title><description>This hook displays new elements in the right-hand column of the product page</description>
+    </hook>
+    <hook id="actionProductDelete" live_edit="0">
+      <name>actionProductDelete</name><title>Product deletion</title><description>This hook is called when a product is deleted</description>
+    </hook>
+    <hook id="displayFooterProduct" live_edit="1">
+      <name>displayFooterProduct</name><title>Product footer</title><description>This hook adds new blocks under the product's description</description>
+    </hook>
+    <hook id="displayInvoice" live_edit="0">
+      <name>displayInvoice</name><title>Invoice</title><description>This hook displays new blocks on the invoice (order)</description>
+    </hook>
+    <hook id="actionOrderStatusUpdate" live_edit="0">
+      <name>actionOrderStatusUpdate</name><title>Order status update - Event</title><description>This hook launches modules when the status of an order changes.</description>
+    </hook>
+    <hook id="displayAdminOrder" live_edit="0">
+      <name>displayAdminOrder</name><title>Display new elements in the Back Office, tab AdminOrder</title><description>This hook launches modules when the AdminOrder tab is displayed in the Back Office</description>
+    </hook>
+    <hook id="displayAdminOrderTabOrder" live_edit="0">
+      <name>displayAdminOrderTabOrder</name><title>Display new elements in Back Office, AdminOrder, panel Order</title><description>This hook launches modules when the AdminOrder tab is displayed in the Back Office and extends / override Order panel tabs</description>
+    </hook>
+    <hook id="displayAdminOrderTabShip" live_edit="0">
+      <name>displayAdminOrderTabShip</name><title>Display new elements in Back Office, AdminOrder, panel Shipping</title><description>This hook launches modules when the AdminOrder tab is displayed in the Back Office and extends / override Shipping panel tabs</description>
+    </hook>
+    <hook id="displayAdminOrderContentOrder" live_edit="0">
+      <name>displayAdminOrderContentOrder</name><title>Display new elements in Back Office, AdminOrder, panel Order</title><description>This hook launches modules when the AdminOrder tab is displayed in the Back Office and extends / override Order panel content</description>
+    </hook>
+    <hook id="displayAdminOrderContentShip" live_edit="0">
+      <name>displayAdminOrderContentShip</name><title>Display new elements in Back Office, AdminOrder, panel Shipping</title><description>This hook launches modules when the AdminOrder tab is displayed in the Back Office and extends / override Shipping panel content</description>
+    </hook>
+    <hook id="displayFooter" live_edit="0">
+      <name>displayFooter</name><title>Footer</title><description>This hook displays new blocks in the footer</description>
+    </hook>
+    <hook id="displayPDFInvoice" live_edit="0">
+      <name>displayPDFInvoice</name><title>PDF Invoice</title><description>This hook allows you to display additional information on PDF invoices</description>
+    </hook>
+    <hook id="displayInvoiceLegalFreeText" live_edit="0">
+      <name>displayInvoiceLegalFreeText</name><title>PDF Invoice - Legal Free Text</title><description>This hook allows you to modify the legal free text on PDF invoices</description>
+    </hook>
+    <hook id="displayAdminCustomers" live_edit="0">
+      <name>displayAdminCustomers</name><title>Display new elements in the Back Office, tab AdminCustomers</title><description>This hook launches modules when the AdminCustomers tab is displayed in the Back Office</description>
+    </hook>
+    <hook id="displayOrderConfirmation" live_edit="0">
+      <name>displayOrderConfirmation</name><title>Order confirmation page</title><description>This hook is called within an order's confirmation page</description>
+    </hook>
+    <hook id="actionCustomerAccountAdd" live_edit="0">
+      <name>actionCustomerAccountAdd</name><title>Successful customer account creation</title><description>This hook is called when a new customer creates an account successfully</description>
+    </hook>
+    <hook id="displayCustomerAccount" live_edit="0">
+      <name>displayCustomerAccount</name><title>Customer account displayed in Front Office</title><description>This hook displays new elements on the customer account page</description>
+    </hook>
+    <hook id="displayCustomerIdentityForm" live_edit="0">
+      <name>displayCustomerIdentityForm</name><title>Customer identity form displayed in Front Office</title><description>This hook displays new elements on the form to update a customer identity</description>
+    </hook>
+    <hook id="actionOrderSlipAdd" live_edit="0">
+      <name>actionOrderSlipAdd</name><title>Order slip creation</title><description>This hook is called when a new credit slip is added regarding client order</description>
+    </hook>
+    <hook id="displayProductTab" live_edit="0">
+      <name>displayProductTab</name><title>Tabs on product page</title><description>This hook is called on the product page's tab</description>
+    </hook>
+    <hook id="displayProductTabContent" live_edit="0">
+      <name>displayProductTabContent</name><title>Tabs content on the product page</title><description>This hook is called on the product page's tab</description>
+    </hook>
+    <hook id="displayShoppingCartFooter" live_edit="0">
+      <name>displayShoppingCartFooter</name><title>Shopping cart footer</title><description>This hook displays some specific information on the shopping cart's page</description>
+    </hook>
+    <hook id="displayCustomerAccountForm" live_edit="0">
+      <name>displayCustomerAccountForm</name><title>Customer account creation form</title><description>This hook displays some information on the form to create a customer account</description>
+    </hook>
+    <hook id="displayAdminStatsModules" live_edit="0">
+      <name>displayAdminStatsModules</name><title>Stats - Modules</title><description/>
+    </hook>
+    <hook id="displayAdminStatsGraphEngine" live_edit="0">
+      <name>displayAdminStatsGraphEngine</name><title>Graph engines</title><description/>
+    </hook>
+    <hook id="actionOrderReturn" live_edit="0">
+      <name>actionOrderReturn</name><title>Returned product</title><description>This hook is displayed when a customer returns a product </description>
+    </hook>
+    <hook id="displayProductButtons" live_edit="0">
+      <name>displayProductButtons</name><title>Product page actions</title><description>This hook adds new action buttons on the product page</description>
+    </hook>
+    <hook id="displayBackOfficeHome" live_edit="0">
+      <name>displayBackOfficeHome</name><title>Administration panel homepage</title><description>This hook is displayed on the admin panel's homepage</description>
+    </hook>
+    <hook id="displayAdminStatsGridEngine" live_edit="0">
+      <name>displayAdminStatsGridEngine</name><title>Grid engines</title><description/>
+    </hook>
+    <hook id="actionWatermark" live_edit="0">
+      <name>actionWatermark</name><title>Watermark</title><description/>
+    </hook>
+    <hook id="actionProductCancel" live_edit="0">
+      <name>actionProductCancel</name><title>Product cancelled</title><description>This hook is called when you cancel a product in an order</description>
+    </hook>
+    <hook id="displayLeftColumnProduct" live_edit="0">
+      <name>displayLeftColumnProduct</name><title>New elements on the product page (left column)</title><description>This hook displays new elements in the left-hand column of the product page</description>
+    </hook>
+    <hook id="actionProductOutOfStock" live_edit="0">
+      <name>actionProductOutOfStock</name><title>Out-of-stock product</title><description>This hook displays new action buttons if a product is out of stock</description>
+    </hook>
+    <hook id="actionProductAttributeUpdate" live_edit="0">
+      <name>actionProductAttributeUpdate</name><title>Product attribute update</title><description>This hook is displayed when a product's attribute is updated</description>
+    </hook>
+    <hook id="displayCarrierList" live_edit="0">
+      <name>displayCarrierList</name><title>Extra carrier (module mode)</title><description/>
+    </hook>
+    <hook id="displayShoppingCart" live_edit="0">
+      <name>displayShoppingCart</name><title>Shopping cart - Additional button</title><description>This hook displays new action buttons within the shopping cart</description>
+    </hook>
+    <hook id="actionSearch" live_edit="0">
+      <name>actionSearch</name><title>Search</title><description/>
+    </hook>
+    <hook id="displayBeforePayment" live_edit="0">
+      <name>displayBeforePayment</name><title>Redirect during the order process</title><description>This hook redirects the user to the module instead of displaying payment modules</description>
+    </hook>
+    <hook id="actionCarrierUpdate" live_edit="0">
+      <name>actionCarrierUpdate</name><title>Carrier Update</title><description>This hook is called when a carrier is updated</description>
+    </hook>
+    <hook id="actionOrderStatusPostUpdate" live_edit="0">
+      <name>actionOrderStatusPostUpdate</name><title>Post update of order status</title><description/>
+    </hook>
+    <hook id="displayCustomerAccountFormTop" live_edit="0">
+      <name>displayCustomerAccountFormTop</name><title>Block above the form for create an account</title><description>This hook is displayed above the customer's account creation form</description>
+    </hook>
+    <hook id="displayBackOfficeHeader" live_edit="0">
+      <name>displayBackOfficeHeader</name><title>Administration panel header</title><description>This hook is displayed in the header of the admin panel</description>
+    </hook>
+    <hook id="displayBackOfficeTop" live_edit="0">
+      <name>displayBackOfficeTop</name><title>Administration panel hover the tabs</title><description>This hook is displayed on the roll hover of the tabs within the admin panel</description>
+    </hook>
+    <hook id="displayBackOfficeFooter" live_edit="0">
+      <name>displayBackOfficeFooter</name><title>Administration panel footer</title><description>This hook is displayed within the admin panel's footer</description>
+    </hook>
+    <hook id="actionProductAttributeDelete" live_edit="0">
+      <name>actionProductAttributeDelete</name><title>Product attribute deletion</title><description>This hook is displayed when a product's attribute is deleted</description>
+    </hook>
+    <hook id="actionCarrierProcess" live_edit="0">
+      <name>actionCarrierProcess</name><title>Carrier process</title><description/>
+    </hook>
+    <hook id="actionOrderDetail" live_edit="0">
+      <name>actionOrderDetail</name><title>Order detail</title><description>This hook is used to set the follow-up in Smarty when an order's detail is called</description>
+    </hook>
+    <hook id="displayBeforeCarrier" live_edit="0">
+      <name>displayBeforeCarrier</name><title>Before carriers list</title><description>This hook is displayed before the carrier list in Front Office</description>
+    </hook>
+    <hook id="displayOrderDetail" live_edit="0">
+      <name>displayOrderDetail</name><title>Order detail</title><description>This hook is displayed within the order's details in Front Office</description>
+    </hook>
+    <hook id="actionPaymentCCAdd" live_edit="0">
+      <name>actionPaymentCCAdd</name><title>Payment CC added</title><description/>
+    </hook>
+    <hook id="displayProductComparison" live_edit="0">
+      <name>displayProductComparison</name><title>Extra product comparison</title><description/>
+    </hook>
+    <hook id="actionCategoryAdd" live_edit="0">
+      <name>actionCategoryAdd</name><title>Category creation</title><description>This hook is displayed when a category is created</description>
+    </hook>
+    <hook id="actionCategoryUpdate" live_edit="0">
+      <name>actionCategoryUpdate</name><title>Category modification</title><description>This hook is displayed when a category is modified</description>
+    </hook>
+    <hook id="actionCategoryDelete" live_edit="0">
+      <name>actionCategoryDelete</name><title>Category deletion</title><description>This hook is displayed when a category is deleted</description>
+    </hook>
+    <hook id="actionBeforeAuthentication" live_edit="0">
+      <name>actionBeforeAuthentication</name><title>Before authentication</title><description>This hook is displayed before the customer's authentication</description>
+    </hook>
+    <hook id="displayPaymentTop" live_edit="0">
+      <name>displayPaymentTop</name><title>Top of payment page</title><description>This hook is displayed at the top of the payment page</description>
+    </hook>
+    <hook id="actionHtaccessCreate" live_edit="0">
+      <name>actionHtaccessCreate</name><title>After htaccess creation</title><description>This hook is displayed after the htaccess creation</description>
+    </hook>
+    <hook id="actionAdminMetaSave" live_edit="0">
+      <name>actionAdminMetaSave</name><title>After saving the configuration in AdminMeta</title><description>This hook is displayed after saving the configuration in AdminMeta</description>
+    </hook>
+    <hook id="displayAttributeGroupForm" live_edit="0">
+      <name>displayAttributeGroupForm</name><title>Add fields to the form 'attribute group'</title><description>This hook adds fields to the form 'attribute group'</description>
+    </hook>
+    <hook id="actionAttributeGroupSave" live_edit="0">
+      <name>actionAttributeGroupSave</name><title>Saving an attribute group</title><description>This hook is called while saving an attributes group</description>
+    </hook>
+    <hook id="actionAttributeGroupDelete" live_edit="0">
+      <name>actionAttributeGroupDelete</name><title>Deleting attribute group</title><description>This hook is called while deleting an attributes  group</description>
+    </hook>
+    <hook id="displayFeatureForm" live_edit="0">
+      <name>displayFeatureForm</name><title>Add fields to the form 'feature'</title><description>This hook adds fields to the form 'feature'</description>
+    </hook>
+    <hook id="actionFeatureSave" live_edit="0">
+      <name>actionFeatureSave</name><title>Saving attributes' features</title><description>This hook is called while saving an attributes features</description>
+    </hook>
+    <hook id="actionFeatureDelete" live_edit="0">
+      <name>actionFeatureDelete</name><title>Deleting attributes' features</title><description>This hook is called while deleting an attributes features</description>
+    </hook>
+    <hook id="actionProductSave" live_edit="0">
+      <name>actionProductSave</name><title>Saving products</title><description>This hook is called while saving products</description>
+    </hook>
+    <hook id="actionProductListOverride" live_edit="0">
+      <name>actionProductListOverride</name><title>Assign a products list to a category</title><description>This hook assigns a products list to a category</description>
+    </hook>
+    <hook id="displayAttributeGroupPostProcess" live_edit="0">
+      <name>displayAttributeGroupPostProcess</name><title>On post-process in admin attribute group</title><description>This hook is called on post-process in admin attribute group</description>
+    </hook>
+    <hook id="displayFeaturePostProcess" live_edit="0">
+      <name>displayFeaturePostProcess</name><title>On post-process in admin feature</title><description>This hook is called on post-process in admin feature</description>
+    </hook>
+    <hook id="displayFeatureValueForm" live_edit="0">
+      <name>displayFeatureValueForm</name><title>Add fields to the form 'feature value'</title><description>This hook adds fields to the form 'feature value'</description>
+    </hook>
+    <hook id="displayFeatureValuePostProcess" live_edit="0">
+      <name>displayFeatureValuePostProcess</name><title>On post-process in admin feature value</title><description>This hook is called on post-process in admin feature value</description>
+    </hook>
+    <hook id="actionFeatureValueDelete" live_edit="0">
+      <name>actionFeatureValueDelete</name><title>Deleting attributes' features' values</title><description>This hook is called while deleting an attributes features value</description>
+    </hook>
+    <hook id="actionFeatureValueSave" live_edit="0">
+      <name>actionFeatureValueSave</name><title>Saving an attributes features value</title><description>This hook is called while saving an attributes features value</description>
+    </hook>
+    <hook id="displayAttributeForm" live_edit="0">
+      <name>displayAttributeForm</name><title>Add fields to the form 'attribute value'</title><description>This hook adds fields to the form 'attribute value'</description>
+    </hook>
+    <hook id="actionAttributePostProcess" live_edit="0">
+      <name>actionAttributePostProcess</name><title>On post-process in admin feature value</title><description>This hook is called on post-process in admin feature value</description>
+    </hook>
+    <hook id="actionAttributeDelete" live_edit="0">
+      <name>actionAttributeDelete</name><title>Deleting an attributes features value</title><description>This hook is called while deleting an attributes features value</description>
+    </hook>
+    <hook id="actionAttributeSave" live_edit="0">
+      <name>actionAttributeSave</name><title>Saving an attributes features value</title><description>This hook is called while saving an attributes features value</description>
+    </hook>
+    <hook id="actionTaxManager" live_edit="0">
+      <name>actionTaxManager</name><title>Tax Manager Factory</title><description/>
+    </hook>
+    <hook id="displayMyAccountBlock" live_edit="0">
+      <name>displayMyAccountBlock</name><title>My account block</title><description>This hook displays extra information within the 'my account' block"</description>
+    </hook>
+    <hook id="actionModuleInstallBefore" live_edit="0">
+      <name>actionModuleInstallBefore</name><title>actionModuleInstallBefore</title><description></description>
+    </hook>
+    <hook id="actionModuleInstallAfter" live_edit="0">
+      <name>actionModuleInstallAfter</name><title>actionModuleInstallAfter</title><description></description>
+    </hook>
+    <hook id="displayHomeTab" live_edit="1">
+      <name>displayHomeTab</name><title>Home Page Tabs</title><description>This hook displays new elements on the homepage tabs</description>
+    </hook>
+    <hook id="displayHomeTabContent" live_edit="1">
+      <name>displayHomeTabContent</name><title>Home Page Tabs Content</title><description>This hook displays new elements on the homepage tabs content</description>
+    </hook>
+    <hook id="displayTopColumn" live_edit="1">
+      <name>displayTopColumn</name><title>Top column blocks</title><description>This hook displays new elements in the top of columns</description>
+    </hook>
+    <hook id="displayBackOfficeCategory" live_edit="0">
+      <name>displayBackOfficeCategory</name><title>Display new elements in the Back Office, tab AdminCategories</title><description>This hook launches modules when the AdminCategories tab is displayed in the Back Office</description>
+    </hook>
+    <hook id="displayProductListFunctionalButtons" live_edit="0">
+      <name>displayProductListFunctionalButtons</name><title>Display new elements in the Front Office, products list</title><description>This hook launches modules when the products list is displayed in the Front Office</description>
+    </hook>
+    <hook id="displayNav" live_edit="1">
+      <name>displayNav</name><title>Navigation</title><description></description>
+    </hook>
+    <hook id="displayOverrideTemplate" live_edit="0">
+      <name>displayOverrideTemplate</name><title>Change the default template of current controller</title><description></description>
+    </hook>
+    <hook id="actionAdminLoginControllerSetMedia" live_edit="0">
+      <name>actionAdminLoginControllerSetMedia</name><title>Set media on admin login page header</title><description>This hook is called after adding media to admin login page header</description>
+    </hook>
+    <hook id="actionOrderEdited" live_edit="0">
+      <name>actionOrderEdited</name><title>Order edited</title><description>This hook is called when an order is edited.</description>
+    </hook>
+    <hook id="actionEmailAddBeforeContent" live_edit="0">
+      <name>actionEmailAddBeforeContent</name><title>Add extra content before mail content</title><description>This hook is called just before fetching mail template</description>
+    </hook>
+    <hook id="actionEmailAddAfterContent" live_edit="0">
+      <name>actionEmailAddAfterContent</name><title>Add extra content after mail content</title><description>This hook is called just after fetching mail template</description>
+    </hook>
+  </entities>
+</entity_hook>

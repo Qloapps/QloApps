@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<localizationPack name="New Zealand" version="1.0">
+	<currencies>
+		<currency name="Dollar" iso_code="NZD" iso_code_num="554" sign="$" blank="1" conversion_rate="1.85560" format="2" decimals="1" />
+	</currencies>
+	<taxes>
+		<tax id="1" name="GST NZ 15%" rate="15" />
+		
+		<taxRulesGroup name="NZ Standard Rate (15%)">
+			<taxRule iso_code_country="nz" id_tax="1" />
+		</taxRulesGroup>
+	</taxes>
+	<units>
+		<unit type="weight" value="kg" />
+		<unit type="volume" value="L" />
+		<unit type="short_distance" value="in" />
+		<unit type="base_distance" value="ft" />
+		<unit type="long_distance" value="mi" />
+	</units>
+	<languages>
+		<language iso_code="en"/>
+	</languages>
+</localizationPack>

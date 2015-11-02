@@ -1,0 +1,56 @@
+.footable {
+  width: 100%; }
+  .footable.breakpoint > tbody > tr.footable-detail-show > td {
+    border-bottom: none; }
+    .footable.breakpoint > tbody > tr.footable-detail-show > td > span.footable-toggle:before {
+      font-family: "FontAwesome";
+      content: ""; }
+  .footable.breakpoint > tbody > tr:hover:not(.footable-row-detail) {
+    cursor: pointer; }
+  .footable.breakpoint > tbody > tr > td.footable-cell-detail {
+    background: #eee;
+    border-top: none; }
+  .footable.breakpoint > tbody > tr > td > span.footable-toggle {
+    display: inline-block;
+    font-family: "FontAwesome";
+    speak: none;
+    font-style: normal;
+    font-weight: normal;
+    font-variant: normal;
+    text-transform: none;
+    -webkit-font-smoothing: antialiased;
+    padding-right: 5px;
+    font-size: 14px; }
+    .footable.breakpoint > tbody > tr > td > span.footable-toggle:before {
+      font-family: "FontAwesome";
+      content: ""; }
+  .footable.breakpoint.toggle-medium > tbody > tr > td > span.footable-toggle {
+    font-size: 18px; }
+  .footable.breakpoint.toggle-large > tbody > tr > td > span.footable-toggle {
+    font-size: 24px; }
+  .footable .footable-row-detail-inner {
+    display: table; }
+  .footable .footable-row-detail-row {
+    display: table-row;
+    line-height: 1.5em; }
+  .footable .footable-row-detail-group {
+    display: block;
+    line-height: 2em;
+    font-size: 1.2em;
+    font-weight: bold; }
+  .footable .footable-row-detail-name {
+    display: table-cell;
+    font-weight: bold;
+    padding-right: 0.5em; }
+  .footable .footable-row-detail-value {
+    display: table-cell; }
+  .footable .footable-sortable .footable-sort-indicator:after {
+    float: right;
+    margin: 0px 0px 0 0;
+    content: "";
+    font-family: "FontAwesome";
+    display: block; }
+  .footable .footable-sortable.footable-sorted .footable-sort-indicator:after {
+    content: ""; }
+  .footable .footable-sortable.footable-sorted-desc .footable-sort-indicator:after {
+    content: ""; }

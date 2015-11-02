@@ -1,0 +1,14 @@
+HTML.MaxImgLength
+TYPE: int/null
+DEFAULT: 1200
+VERSION: 3.1.1
+--DESCRIPTION--
+<p>
+ This directive controls the maximum number of pixels in the width and
+ height attributes in <code>img</code> tags. This is
+ in place to prevent imagecrash attacks, disable with null at your own risk.
+ This directive is similar to %CSS.MaxImgLength, and both should be
+ concurrently edited, although there are
+ subtle differences in the input format (the HTML max is an integer).
+</p>
+--# vim: et sw=4 sts=4

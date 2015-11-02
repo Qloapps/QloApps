@@ -1,0 +1,10 @@
+Buna {firstname} {lastname},
+
+Iata datele necesare pentru autentificare la {shop_name}:
+
+Parola: {passwd}
+Adresa de e-mail: {email}
+
+{shop_name} - {shop_url}
+
+{shop_url} motorizat de PrestaShop™

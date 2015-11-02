@@ -1,0 +1,11 @@
+Cache.SerializerPermissions
+TYPE: int
+VERSION: 4.3.0
+DEFAULT: 0755
+--DESCRIPTION--
+
+<p>
+    Directory permissions of the files and directories created inside
+    the DefinitionCache/Serializer or other custom serializer path.
+</p>
+--# vim: et sw=4 sts=4

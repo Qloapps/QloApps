@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<language>
+	<name><![CDATA[עברית (Hebrew)]]></name>
+	<language_code>he</language_code>
+	<date_format_lite>d/m/Y</date_format_lite>
+	<date_format_full>d/m/Y H:i:s</date_format_full>
+	<is_rtl>true</is_rtl>
+	<allow_accented_chars_url>true</allow_accented_chars_url>
+</language>

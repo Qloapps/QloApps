@@ -1,0 +1,21 @@
+@import "compass";
+@import "theme_variables";
+.header_user_info {
+	float: right;
+	border-left: 1px solid #515151;
+	border-right: 1px solid #515151;
+	a {
+		color: $light-text-color;
+		font-weight: bold;
+		display: block;
+		padding: 8px 9px 11px 8px;
+		cursor: pointer;
+		line-height:18px;
+		@media (max-width: $screen-xs - 1) {
+			font-size: 11px;
+		}
+		&:hover, &.active {
+			background: #2b2b2b;
+		}
+	}
+}

@@ -1,0 +1,10 @@
+2014-04-22 16:25:49 +0200	// dashtrends: Better translatability.
+2014-04-14 14:51:09 +0200	[-] MO : Dashtrends - FixBug #PSCSX-1742
+2014-04-03 10:17:09 +0200	// fix date
+2014-04-01 16:33:15 +0200	[*] MO : Dashboard trends - FixBug PSCSX-1517
+2014-04-01 15:48:49 +0200	[-] MO : Dashtrends - FixBug #PSCSX-1527 - Wrong date
+2014-03-31 16:50:35 +0200	// Missing correct color on dashtrends init
+2014-03-31 16:47:09 +0200	// Fix dashtrends init
+2014-03-29 14:14:48 +0100	[-] MO : Dashtrends - FixBug #PSCSX-984 - Set units for all graphs
+2014-03-24 15:45:38 +0100	/ MO dashtrends : ps_versions_compliancy added
+2014-03-20 14:32:31 +0100	Initial commit

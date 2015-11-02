@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity_tab>
+  <tab id="Dashboard" name="Tablou de bord"/>
+  <tab id="CMS_Pages" name="Pagini CMS"/>
+  <tab id="CMS_Categories" name="Categorii CMS"/>
+  <tab id="Combinations_Generator" name="Generator de combinații"/>
+  <tab id="Search" name="Căutare"/>
+  <tab id="Login" name="Autentificare"/>
+  <tab id="Shops" name="Magazine"/>
+  <tab id="Shop_URLs" name="Adrese URL ale magazinului"/>
+  <tab id="Catalog" name="Catalog"/>
+  <tab id="Orders" name="Comenzi"/>
+  <tab id="Customers" name="Clienți"/>
+  <tab id="Price_Rules" name="Reguli de preț"/>
+  <tab id="Shipping" name="Livrare"/>
+  <tab id="Localization" name="Localizare"/>
+  <tab id="Modules" name="Module"/>
+  <tab id="Preferences" name="Preferințe"/>
+  <tab id="Advanced_Parameters" name="Parametri avansați"/>
+  <tab id="Administration" name="Administrare"/>
+  <tab id="Stats" name="Statistici"/>
+  <tab id="Stock" name="Stocuri"/>
+  <tab id="Products" name="Produse"/>
+  <tab id="Categories" name="Categorii"/>
+  <tab id="Monitoring" name="Monitorizare"/>
+  <tab id="Attributes_and_Values" name="Atribute de produs"/>
+  <tab id="Features" name="Caracteristici de produs"/>
+  <tab id="Manufacturers" name="Producători"/>
+  <tab id="Suppliers" name="Furnizori"/>
+  <tab id="Tags" name="Etichete"/>
+  <tab id="Attachments" name="Fișiere anexate"/>
+  <tab id="Orders_1" name="Comenzi"/>
+  <tab id="Invoices" name="Facturi"/>
+  <tab id="Merchandise_Returns" name="Returnări de marfă"/>
+  <tab id="Delivery_Slips" name="Avize de expediție"/>
+  <tab id="Credit_Slips" name="Note de credit"/>
+  <tab id="Statuses" name="Stadii"/>
+  <tab id="Order_Messages" name="Mesaje la comenzi"/>
+  <tab id="Customers_1" name="Clienți"/>
+  <tab id="Addresses" name="Adrese"/>
+  <tab id="Groups" name="Grupuri"/>
+  <tab id="Shopping_Carts" name="Coșuri de cumpărături"/>
+  <tab id="Customer_Service" name="Asistență pentru clienți"/>
+  <tab id="Contacts" name="Persoane de contact"/>
+  <tab id="Titles" name="Moduri de adresare"/>
+  <tab id="Outstanding" name="În desfășurare"/>
+  <tab id="Cart_Rules" name="Reguli de coș"/>
+  <tab id="Catalog_Price_Rules" name="Reguli de preț de catalog"/>
+  <tab id="Marketing" name="Marketing"/>
+  <tab id="Shipping_1" name="Preferințe"/>
+  <tab id="Carriers" name="Curieri"/>
+  <tab id="Localization_1" name="Localizare"/>
+  <tab id="Languages" name="Limbi"/>
+  <tab id="Zones" name="Zone"/>
+  <tab id="Countries" name="Țări"/>
+  <tab id="States" name="Județe, state, comitate"/>
+  <tab id="Currencies" name="Monede"/>
+  <tab id="Taxes" name="Taxe"/>
+  <tab id="Tax_Rules" name="Reguli de taxare"/>
+  <tab id="Translations" name="Traduceri"/>
+  <tab id="Modules_1" name="Module și servicii"/>
+  <tab id="Modules_Themes_Catalog" name="Catalog de teme și module"/>
+  <tab id="Positions" name="Poziții"/>
+  <tab id="Payment" name="Plată"/>
+  <tab id="General" name="Generale"/>
+  <tab id="Orders_2" name="Comenzi"/>
+  <tab id="Products_1" name="Produse"/>
+  <tab id="Customers_2" name="Clienți"/>
+  <tab id="Themes" name="Teme"/>
+  <tab id="SEO_URLs" name="SEO și adrese URL"/>
+  <tab id="CMS" name="CMS"/>
+  <tab id="Images" name="Imagini"/>
+  <tab id="Store_Contacts" name="Informații de contact"/>
+  <tab id="Search_1" name="Căutare"/>
+  <tab id="Maintenance" name="Întreținere"/>
+  <tab id="Geolocation" name="Geolocație"/>
+  <tab id="Configuration_Information" name="Informații despre configurație"/>
+  <tab id="Performance" name="Performanță"/>
+  <tab id="E-mail" name="E-mail"/>
+  <tab id="Multistore" name="Magazine multiple"/>
+  <tab id="CSV_Import" name="Import CSV"/>
+  <tab id="DB_Backup" name="Creare backup pentru baza de date"/>
+  <tab id="SQL_Manager" name="Administrare SQL"/>
+  <tab id="Logs" name="Jurnale"/>
+  <tab id="Webservice" name="Servicii web"/>
+  <tab id="Preferences_1" name="Preferințe"/>
+  <tab id="Quick_Access" name="Access rapid"/>
+  <tab id="Employees" name="Angajați"/>
+  <tab id="Profiles" name="Profiluri"/>
+  <tab id="Permissions" name="Permisiuni"/>
+  <tab id="Menus" name="Meniuri"/>
+  <tab id="Stats_1" name="Statistici"/>
+  <tab id="Search_Engines" name="Motoare de căutare"/>
+  <tab id="Referrers" name="Referenți"/>
+  <tab id="Warehouses" name="Depozite"/>
+  <tab id="Stock_Management" name="Administrarea stocurilor"/>
+  <tab id="Stock_Movement" name="Mișcări de stocuri"/>
+  <tab id="Instant_Stock_Status" name="Situația curentă a stocurilor"/>
+  <tab id="Stock_Coverage" name="Capacitatea de acoperire a stocurilor"/>
+  <tab id="Supply_orders" name="Comenzi de aprovizionare"/>
+  <tab id="Configuration" name="Configurație"/>
+  <tab id="CarrierWizard" name="Curier"/>
+</entity_tab>

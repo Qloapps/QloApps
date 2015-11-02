@@ -1,0 +1,51 @@
+/*********************************************************************
+					Maintenance Page Styles
+**********************************************************************/
+#body {
+  background-color: #F7F7F7; }
+
+#maintenance {
+  margin: 50px 0 0 0;
+  background-color: #fff;
+  -moz-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3); }
+  @media (min-width: 1200px) {
+    #maintenance {
+      margin: 126px 0 0 0;
+      padding: 50px; } }
+  #maintenance .logo {
+    margin: 0 0 31px 0;
+    text-align: center; }
+  #maintenance h1 {
+    font: 24px "Open Sans", sans-serif;
+    color: #333;
+    padding: 0 0 14px 0;
+    margin: 0 0 19px 0; }
+  #maintenance #message {
+    font: 14px "Open Sans", sans-serif;
+    padding: 0 0 0 18px;
+    color: #555454;
+    text-align: center; }
+
+.container {
+  padding-right: 15px;
+  padding-left: 15px;
+  margin-right: auto;
+  margin-left: auto; }
+
+@media (min-width: 768px) {
+  .container {
+    width: 500px; } }
+@media (min-width: 992px) {
+  .container {
+    width: 500px; } }
+@media (min-width: 1200px) {
+  .container {
+    width: 500px; } }
+@media only screen and (min-width: 1200px) {
+  .container {
+    padding-left: 0;
+    padding-right: 0; } }
+
+/*# sourceMappingURL=maintenance.css.map */

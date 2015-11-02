@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity_address>
+  <fields id="alias" class="Address">
+    <field name="id_country" relation="country"/>
+    <field name="id_state" relation="state"/>
+    <field name="id_customer" relation="customer"/>
+    <field name="id_manufacturer" relation="manufacturer"/>
+    <field name="id_supplier" relation="supplier"/>
+    <field name="id_warehouse"/>
+    <field name="alias"/>
+    <field name="company"/>
+    <field name="lastname"/>
+    <field name="firstname"/>
+    <field name="address1"/>
+    <field name="address2"/>
+    <field name="postcode"/>
+    <field name="city"/>
+    <field name="other"/>
+    <field name="phone"/>
+    <field name="phone_mobile"/>
+    <field name="vat_number"/>
+    <field name="dni"/>
+    <field name="active"/>
+  </fields>
+  <entities>
+    <address id="Mon_adresse" id_country="FR" id_state="" id_customer="John" id_manufacturer="" id_supplier="" id_warehouse="0" alias="Mon adresse" lastname="DOE" firstname="John" postcode="75002" phone="0102030405" phone_mobile="" vat_number="" dni="" active="1">
+      <company>My Company</company>
+      <address1>16, Main street</address1>
+      <address2>2nd floor</address2>
+      <city>Paris </city>
+      <other/>
+    </address>
+    <address id="supplier" id_country="US" id_state="NY" id_customer="" id_manufacturer="" id_supplier="Fashion_Supplier" id_warehouse="0" alias="supplier" lastname="supplier" firstname="supplier" postcode="10153" phone="(212) 336-1440" phone_mobile="" vat_number="" dni="" active="1">
+      <company>Fashion</company>
+      <address1>767 Fifth Ave.</address1>
+      <address2/>
+      <city>New York</city>
+      <other/>
+    </address>
+    <address id="supplier" id_country="US" id_state="NY" id_customer="" id_manufacturer="Fashion_Manufacturer" id_supplier="" id_warehouse="0" alias="manufacturer" lastname="manufacturer" firstname="manufacturer" postcode="10154" phone="(212) 336-1666" phone_mobile="" vat_number="" dni="" active="1">
+      <company>Fashion</company>
+      <address1>767 Fifth Ave.</address1>
+      <address2/>
+      <city>New York</city>
+      <other/>
+    </address>
+    <address id="My_address" id_country="US" id_state="FL" id_customer="John" id_manufacturer="" id_supplier="" id_warehouse="0" alias="My address" lastname="DOE" firstname="John" postcode="33133" phone="0102030405" phone_mobile="" vat_number="" dni="" active="1">
+      <company>My Company</company>
+      <address1>16, Main street</address1>
+      <address2>2nd floor</address2>
+      <city>Miami</city>
+      <other/>
+    </address>
+  </entities>
+</entity_address>

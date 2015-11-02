@@ -1,0 +1,7 @@
+HTML.Nofollow
+TYPE: bool
+VERSION: 4.3.0
+DEFAULT: FALSE
+--DESCRIPTION--
+If enabled, nofollow rel attributes are added to all outgoing links.
+--# vim: et sw=4 sts=4

@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+<entity_order_state>
+  <order_state id="Awaiting_cheque_payment">
+    <name>A aguardar pagamento por cheque</name>
+    <template>cheque</template>
+  </order_state>
+  <order_state id="Payment_accepted">
+    <name>Pagamento aceite</name>
+    <template>payment</template>
+  </order_state>
+  <order_state id="Preparation_in_progress">
+    <name>Prepara&#231;&#227;o em curso</name>
+    <template>preparation</template>
+  </order_state>
+  <order_state id="Shipped">
+    <name>Enviado</name>
+    <template>shipped</template>
+  </order_state>
+  <order_state id="Delivered">
+    <name>Entregue</name>
+    <template/>
+  </order_state>
+  <order_state id="Canceled">
+    <name>Cancelado</name>
+    <template>order_canceled</template>
+  </order_state>
+  <order_state id="Refund">
+    <name>Reembolsado</name>
+    <template>refund</template>
+  </order_state>
+  <order_state id="Payment_error">
+    <name>Erro de pagamento</name>
+    <template>payment_error</template>
+  </order_state>
+  <order_state id="On_backorder_paid">
+    <name>Sem stock (Pagamento aceite)</name>
+    <template>outofstock</template>
+  </order_state>
+  <order_state id="On_backorder_unpaid">
+    <name>Sem stock</name>
+    <template>outofstock</template>
+  </order_state>
+  <order_state id="Awaiting_bank_wire_payment">
+    <name>A aguardar tranfer&#234;ncia banc&#225;ria</name>
+    <template>bankwire</template>
+  </order_state>
+  <order_state id="Awaiting_PayPal_payment">
+    <name>A aguardar pagamento por PayPal</name>
+    <template/>
+  </order_state>
+  <order_state id="Payment_remotely_accepted">
+    <name>Pagamento remoto aceite</name>
+    <template>payment</template>
+  </order_state>
+  <order_state id="Awaiting_cod_validation">
+    <name>Awaiting cod validation</name>
+    <template>cashondelivery</template>
+  </order_state>
+</entity_order_state>

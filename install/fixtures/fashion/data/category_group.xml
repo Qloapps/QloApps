@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<entity_category_group>
+  <fields primary="id_category, id_group" sql="a.id_category &gt; 1">
+    <field name="id_category" relation="category"/>
+    <field name="id_group" relation="group"/>
+  </fields>
+  <entities>
+    <category_group id="category_group_2_0" id_category="Home" id_group=""/>
+    <category_group id="category_group_2_1" id_category="Home" id_group="Visitor"/>
+    <category_group id="category_group_2_2" id_category="Home" id_group="Guest"/>
+    <category_group id="category_group_2_3" id_category="Home" id_group="Customer"/>
+    <category_group id="category_group_3_1" id_category="Women" id_group="Visitor"/>
+    <category_group id="category_group_3_2" id_category="Women" id_group="Guest"/>
+    <category_group id="category_group_3_3" id_category="Women" id_group="Customer"/>
+    <category_group id="category_group_4_1" id_category="Tops" id_group="Visitor"/>
+    <category_group id="category_group_4_2" id_category="Tops" id_group="Guest"/>
+    <category_group id="category_group_4_3" id_category="Tops" id_group="Customer"/>
+    <category_group id="category_group_5_1" id_category="T-shirts" id_group="Visitor"/>
+    <category_group id="category_group_5_2" id_category="T-shirts" id_group="Guest"/>
+    <category_group id="category_group_5_3" id_category="T-shirts" id_group="Customer"/>
+    <category_group id="category_group_6_1" id_category="Tops_1" id_group="Visitor"/>
+    <category_group id="category_group_6_2" id_category="Tops_1" id_group="Guest"/>
+    <category_group id="category_group_6_3" id_category="Tops_1" id_group="Customer"/>
+    <category_group id="category_group_7_1" id_category="Blouses" id_group="Visitor"/>
+    <category_group id="category_group_7_2" id_category="Blouses" id_group="Guest"/>
+    <category_group id="category_group_7_3" id_category="Blouses" id_group="Customer"/>
+    <category_group id="category_group_8_1" id_category="Dresses" id_group="Visitor"/>
+    <category_group id="category_group_8_2" id_category="Dresses" id_group="Guest"/>
+    <category_group id="category_group_8_3" id_category="Dresses" id_group="Customer"/>
+    <category_group id="category_group_9_1" id_category="Casual_Dresses" id_group="Visitor"/>
+    <category_group id="category_group_9_2" id_category="Casual_Dresses" id_group="Guest"/>
+    <category_group id="category_group_9_3" id_category="Casual_Dresses" id_group="Customer"/>
+    <category_group id="category_group_10_1" id_category="Evening_Dresses" id_group="Visitor"/>
+    <category_group id="category_group_10_2" id_category="Evening_Dresses" id_group="Guest"/>
+    <category_group id="category_group_10_3" id_category="Evening_Dresses" id_group="Customer"/>
+    <category_group id="category_group_11_1" id_category="Summer_Dresses" id_group="Visitor"/>
+    <category_group id="category_group_11_2" id_category="Summer_Dresses" id_group="Guest"/>
+    <category_group id="category_group_11_3" id_category="Summer_Dresses" id_group="Customer"/>
+  </entities>
+</entity_category_group>

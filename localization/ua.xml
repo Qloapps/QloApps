@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<localizationPack name="Ukraine" version="1.0">
+	<currencies>
+		<currency name="Гривна" iso_code="UAH" iso_code_num="980" sign="₴" blank="1" conversion_rate="1" format="2" decimals="1" />
+		<currency name="Евро" iso_code="EUR" iso_code_num="978" sign="€" blank="1" conversion_rate="0.09396" format="2" decimals="1" />
+		<currency name="Доллар" iso_code="USD" iso_code_num="840" sign="$" blank="0" conversion_rate="0.12315" format="1" decimals="1" />
+	</currencies>
+	<languages>
+		<language iso_code="uk" />
+	</languages>
+	<taxes>
+		<tax id="1" name="НДС 20%" rate="20" />
+		
+		<taxRulesGroup name="НДС (20%)">
+			<taxRule iso_code_country="ua" id_tax="1" />
+		</taxRulesGroup>
+	</taxes>
+	<states>
+		<state name="Винницкая область" iso_code="05" country="UA" zone="Europe" />
+		<state name="Волынская область" iso_code="07" country="UA" zone="Europe" />
+		<state name="Днепропетровская область" iso_code="12" country="UA" zone="Europe" />
+		<state name="Донецкая область" iso_code="14" country="UA" zone="Europe" />
+		<state name="Житомирская область" iso_code="18" country="UA" zone="Europe" />
+		<state name="Закарпатская область" iso_code="21" country="UA" zone="Europe" />
+		<state name="Запорожская область" iso_code="23" country="UA" zone="Europe" />
+		<state name="Ивано-Франковская область" iso_code="26" country="UA" zone="Europe" />
+		<state name="Киевская область" iso_code="32" country="UA" zone="Europe" />
+		<state name="Кировоградская область" iso_code="35" country="UA" zone="Europe" />
+		<state name="Луганская область" iso_code="09" country="UA" zone="Europe" />
+		<state name="Львовская область" iso_code="46" country="UA" zone="Europe" />
+		<state name="Николаевская область" iso_code="48" country="UA" zone="Europe" />
+		<state name="Одесская область" iso_code="51" country="UA" zone="Europe" />
+		<state name="Полтавская область" iso_code="53" country="UA" zone="Europe" />
+		<state name="Ровненская область" iso_code="19" country="UA" zone="Europe" />
+		<state name="Сумская область" iso_code="59" country="UA" zone="Europe" />
+		<state name="Тернопольская область" iso_code="61" country="UA" zone="Europe" />
+		<state name="Харьковская область" iso_code="63" country="UA" zone="Europe" />
+		<state name="Херсонская область" iso_code="65" country="UA" zone="Europe" />
+		<state name="Хмельницкая область" iso_code="68" country="UA" zone="Europe" />
+		<state name="Черкасская область" iso_code="71" country="UA" zone="Europe" />
+		<state name="Черниговская область" iso_code="74" country="UA" zone="Europe" />
+		<state name="Черновицкая область" iso_code="77" country="UA" zone="Europe" />
+		<state name="Автономная Республика Крым" iso_code="43" country="UA" zone="Europe" />
+	</states>
+	<units>
+		<unit type="weight" value="кг" />
+		<unit type="volume" value="л" />
+		<unit type="short_distance" value="см" />
+		<unit type="base_distance" value="м" />
+		<unit type="long_distance" value="км" />
+	</units>
+</localizationPack>

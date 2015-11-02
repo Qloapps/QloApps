@@ -1,0 +1,275 @@
+.margin-lr-0
+{
+    margin-left: 0px;
+    margin-right: 0px; 
+}
+
+
+.cat_cont
+{
+    margin: 0px;
+    background-color: #F2F2F2;
+    border: 1px solid  #CCCCCC;
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+.margin-top-7
+{
+    margin-top: 7px;
+}
+
+.top_filter_cont
+{
+    margin-bottom: 15px;
+}
+
+.sort_by
+{
+    font-size: 16px;
+    color: #505050;
+    font-weight: 700;
+    font-family: 'PT Serif', serif;
+    text-align: left;
+    margin-top: 8px;
+}
+
+.disp_type_cont
+{
+    text-align: center;
+    margin-top: 10px;
+}
+
+.filter_dw_cont button
+{
+    width: 100%;
+    text-align: left;
+    box-shadow: 0px 1px 6px #828282;
+}
+
+.display_type
+{
+    background-position: 25px 170px;
+    display: inline-block;
+    height: 18px;
+    width: 18px;
+    margin-right: 10px;
+}
+
+.room_cont
+{
+    border-top: 1px solid #ffffff;
+    padding-top: 30px;
+    margin-bottom: 30px;
+}
+
+.rm_heading
+{
+    font-size: 20px;
+    color: #3C3C3C;
+    font-weight: 700;
+    font-family: 'PT Serif', serif;
+}
+
+.rm_desc
+{
+    font-size: 16px;
+    color: #3C3C3C;
+    font-weight: 400;
+    font-family: 'PT Serif', serif;
+    margin-bottom: 10px;
+}
+
+.rm_desc p
+{
+    display: inline;
+}
+
+.rm_desc a
+{
+    text-decoration: none;
+    color: #BF9958;
+    
+}
+
+.capa_txt
+{
+    font-size: 15px;
+    color: #3C3C3C;
+    font-weight: 700;
+    font-family: 'PT Serif', serif;
+}
+
+.capa_data
+{
+    font-size: 15px;
+    color: #3C3C3C;
+    font-weight: 400;
+    font-family: 'PT Serif', serif;
+}
+
+.rm_review_cont
+{
+    margin-bottom: 15px;
+}
+
+.rm_ratting_yes
+{
+    background-position: -2px 18px;
+    display: inline-block;
+    height: 18px;
+    width: 24px;
+}
+
+.rm_ratting_no
+{
+    background-position: 26px 18px;
+    display: inline-block;
+    height: 18px;
+    width: 24px;
+}
+
+.rm_review
+{
+    margin-left: 10px;
+    font-size: 14px;
+    color: #777777;
+    font-weight: 400;
+    font-family: 'PT Serif', serif;
+}
+
+.rm_amenities_cont
+{
+    background-color: white;
+    border-bottom: 1px solid #cccccc;
+    border-top: 1px solid #cccccc;
+    margin-bottom: 15px;
+    padding: 10px;
+    clear: both;
+}
+
+.rm_left
+{
+    color: red;
+    font-size: 12px;
+    font-weight: 700;
+    padding-top: 5px;
+}
+
+.rm_amen
+{
+    height: 24px;
+    width: 24px;
+    display: inline-block;
+    margin-right: 10px;
+    margin-bottom: 10px;
+}
+
+.rm_price_val
+{
+    font-size: 30px;
+    color: #3C3C3C;
+    font-weight: 700;
+    font-family: 'PT Serif', serif;
+    clear: both;
+}
+
+.rm_price_txt
+{
+    padding-top: 6px;
+    font-size: 12px;
+    color: #3C3C3C;
+    font-weight: 700;
+    font-family: 'PT Serif', serif;
+}
+
+.rm_book_btn
+{
+    background-color: #BF9958;
+    text-align: center;
+    font-size: 17px;
+    color: #777777;
+    font-weight: 700;
+    font-family: 'PT Serif', serif;
+    padding: 15px 20px;
+    color: #FFFFFF;
+}
+
+.rm_book_btn:active, .rm_book_btn:focus, .rm_book_btn:hover
+{
+    color: #FFFFFF;
+}
+.rm_price_cont
+{
+    margin-top: 10px; 
+}
+.rm_qty_cont
+{
+    width: 120px;
+    margin-right: 15px;
+}
+.qty_txt
+{
+    font-size: 15px;
+    font-weight: 700;
+    color: #3C3C3C;
+    float: left;
+    transform: translate(0px, 15px);
+}
+.qty_sec_cont
+{
+    width: 80px;
+    margin: 0px 0px 0px 5px;
+    float: left;
+}
+
+.qty_input_cont
+{
+    width: 57px;
+    float: left;
+}
+.qty_input_cont input
+{
+    color: #3c3c3c;
+    font-size: 20px;
+    height: 57px;
+    padding: 1px 10px;
+}
+
+.qty_direction
+{
+    width: 22px;
+    float: left;
+}
+
+.qty_direction a
+{
+    margin-bottom: 2.8px;
+    margin-top: 3px;
+    margin-left: 2px;
+    padding: 1px 4px;
+}
+
+.display-inline
+{
+    display: inline-block;
+}
+/* quantity_wanted */
+#cat_rm_quantity_wanted input {
+  width: 78px;
+  height: 27px;
+  padding: 0 6px;
+  float: left;
+  border: 1px solid #d6d4d4;
+  line-height: 27px; }
+/*#quantity_wanted_p .btn {
+  float: left;
+  margin-left: 3px; }*/
+  #cat_rm_quantity_wanted .button-minus {
+  float: left;
+  margin-right: 5px;
+  padding-top: 3px;}
+  #cat_rm_quantity_wanted .button-plus {
+  float: left;
+  margin-left: 5px;
+  padding-top: 3px;}

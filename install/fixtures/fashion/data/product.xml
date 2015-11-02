@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity_product>
+  <fields id="name" class="Product">
+    <field name="id_supplier" relation="supplier"/>
+    <field name="id_manufacturer" relation="manufacturer"/>
+    <field name="id_category_default" relation="category"/>
+    <field name="on_sale"/>
+    <field name="online_only"/>
+    <field name="ean13"/>
+    <field name="upc"/>
+    <field name="ecotax"/>
+    <field name="quantity"/>
+    <field name="minimal_quantity"/>
+    <field name="price"/>
+    <field name="wholesale_price"/>
+    <field name="unity"/>
+    <field name="unit_price_ratio"/>
+    <field name="additional_shipping_cost"/>
+    <field name="reference"/>
+    <field name="supplier_reference"/>
+    <field name="location"/>
+    <field name="width"/>
+    <field name="height"/>
+    <field name="depth"/>
+    <field name="weight"/>
+    <field name="out_of_stock"/>
+    <field name="quantity_discount"/>
+    <field name="customizable"/>
+    <field name="uploadable_files"/>
+    <field name="text_fields"/>
+    <field name="active"/>
+    <field name="redirect_type"/>
+    <field name="id_product_redirected"/>
+    <field name="available_for_order"/>
+    <field name="available_date"/>
+    <field name="condition"/>
+    <field name="show_price"/>
+    <field name="indexed"/>
+    <field name="cache_is_pack"/>
+    <field name="cache_has_attachments"/>
+    <field name="is_virtual"/>
+    <field name="cache_default_attribute"/>
+    <field name="advanced_stock_management"/>
+  </fields>
+  <entities>
+    <product id="Faded_Short_Sleeve_T-shirts" id_supplier="Fashion_Supplier" id_manufacturer="Fashion_Manufacturer" id_category_default="T-shirts" on_sale="0" online_only="0" ean13="0" upc="" ecotax="0.000000" quantity="0" minimal_quantity="1" price="16.510000" wholesale_price="4.950000" unit_price_ratio="0.000000" additional_shipping_cost="0.00" reference="demo_1" supplier_reference="" width="0.000000" height="0.000000" depth="0.000000" weight="0.000000" out_of_stock="2" quantity_discount="0" customizable="0" uploadable_files="0" text_fields="0" active="1" redirect_type="404" id_product_redirected="0" available_for_order="1" available_date="0000-00-00" condition="new" show_price="1" indexed="1" cache_is_pack="0" cache_has_attachments="0" is_virtual="0" cache_default_attribute="1" advanced_stock_management="0">
+      <unity/>
+      <location/>
+    </product>
+    <product id="Blouse" id_supplier="Fashion_Supplier" id_manufacturer="Fashion_Manufacturer" id_category_default="Blouses" on_sale="0" online_only="0" ean13="0" upc="" ecotax="0.000000" quantity="0" minimal_quantity="1" price="26.999852" wholesale_price="8.100000" unit_price_ratio="0.000000" additional_shipping_cost="0.00" reference="demo_2" supplier_reference="" width="0.000000" height="0.000000" depth="0.000000" weight="0.000000" out_of_stock="2" quantity_discount="0" customizable="0" uploadable_files="0" text_fields="0" active="1" redirect_type="404" id_product_redirected="0" available_for_order="1" available_date="0000-00-00" condition="new" show_price="1" indexed="1" cache_is_pack="0" cache_has_attachments="0" is_virtual="0" cache_default_attribute="7" advanced_stock_management="0">
+      <unity/>
+      <location/>
+    </product>
+    <product id="Printed_Dress" id_supplier="Fashion_Supplier" id_manufacturer="Fashion_Manufacturer" id_category_default="Casual_Dresses" on_sale="0" online_only="0" ean13="0" upc="" ecotax="0.000000" quantity="0" minimal_quantity="1" price="25.999852" wholesale_price="7.800000" unit_price_ratio="0.000000" additional_shipping_cost="0.00" reference="demo_3" supplier_reference="" width="0.000000" height="0.000000" depth="0.000000" weight="0.000000" out_of_stock="2" quantity_discount="0" customizable="0" uploadable_files="0" text_fields="0" active="1" redirect_type="404" id_product_redirected="0" available_for_order="1" available_date="0000-00-00" condition="new" show_price="1" indexed="1" cache_is_pack="0" cache_has_attachments="0" is_virtual="0" cache_default_attribute="13" advanced_stock_management="0">
+      <unity/>
+      <location/>
+    </product>
+    <product id="Printed_Dress_1" id_supplier="Fashion_Supplier" id_manufacturer="Fashion_Manufacturer" id_category_default="Evening_Dresses" on_sale="0" online_only="0" ean13="0" upc="" ecotax="0.000000" quantity="0" minimal_quantity="1" price="50.994153" wholesale_price="15.300000" unit_price_ratio="0.000000" additional_shipping_cost="0.00" reference="demo_4" supplier_reference="" width="0.000000" height="0.000000" depth="0.000000" weight="0.000000" out_of_stock="2" quantity_discount="0" customizable="0" uploadable_files="0" text_fields="0" active="1" redirect_type="404" id_product_redirected="0" available_for_order="1" available_date="0000-00-00" condition="new" show_price="1" indexed="1" cache_is_pack="0" cache_has_attachments="0" is_virtual="0" cache_default_attribute="16" advanced_stock_management="0">
+      <unity/>
+      <location/>
+    </product>
+    <product id="Printed_Summer_Dress" id_supplier="Fashion_Supplier" id_manufacturer="Fashion_Manufacturer" id_category_default="Summer_Dresses" on_sale="0" online_only="0" ean13="0" upc="" ecotax="0.000000" quantity="0" minimal_quantity="1" price="30.506321" wholesale_price="9.150000" unit_price_ratio="0.000000" additional_shipping_cost="0.00" reference="demo_5" supplier_reference="" width="0.000000" height="0.000000" depth="0.000000" weight="0.000000" out_of_stock="2" quantity_discount="0" customizable="0" uploadable_files="0" text_fields="0" active="1" redirect_type="404" id_product_redirected="0" available_for_order="1" available_date="0000-00-00" condition="new" show_price="1" indexed="1" cache_is_pack="0" cache_has_attachments="0" is_virtual="0" cache_default_attribute="19" advanced_stock_management="0">
+      <unity/>
+      <location/>
+    </product>
+    <product id="Printed_Summer_Dress_1" id_supplier="Fashion_Supplier" id_manufacturer="Fashion_Manufacturer" id_category_default="Summer_Dresses" on_sale="0" online_only="0" ean13="0" upc="" ecotax="0.000000" quantity="0" minimal_quantity="1" price="30.502569" wholesale_price="9.150000" unit_price_ratio="0.000000" additional_shipping_cost="0.00" reference="demo_6" supplier_reference="" width="0.000000" height="0.000000" depth="0.000000" weight="0.000000" out_of_stock="2" quantity_discount="0" customizable="0" uploadable_files="0" text_fields="0" active="1" redirect_type="404" id_product_redirected="0" available_for_order="1" available_date="0000-00-00" condition="new" show_price="1" indexed="1" cache_is_pack="0" cache_has_attachments="0" is_virtual="0" cache_default_attribute="31" advanced_stock_management="0">
+      <unity/>
+      <location/>
+    </product>
+    <product id="Printed_Chiffon_Dress" id_supplier="Fashion_Supplier" id_manufacturer="Fashion_Manufacturer" id_category_default="Summer_Dresses" on_sale="0" online_only="0" ean13="0" upc="" ecotax="0.000000" quantity="0" minimal_quantity="1" price="20.501236" wholesale_price="6.150000" unit_price_ratio="0.000000" additional_shipping_cost="0.00" reference="demo_7" supplier_reference="" width="0.000000" height="0.000000" depth="0.000000" weight="0.000000" out_of_stock="2" quantity_discount="0" customizable="0" uploadable_files="0" text_fields="0" active="1" redirect_type="404" id_product_redirected="0" available_for_order="1" available_date="0000-00-00" condition="new" show_price="1" indexed="1" cache_is_pack="0" cache_has_attachments="0" is_virtual="0" cache_default_attribute="34" advanced_stock_management="0">
+      <unity/>
+      <location/>
+    </product>
+  </entities>
+</entity_product>

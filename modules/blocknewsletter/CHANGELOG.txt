@@ -1,0 +1,13 @@
+2014-04-22 18:57:30 +0200	// Changelog updated
+2014-04-18 17:47:09 +0200	// Add search form
+2014-04-18 15:54:32 +0200	[*] Merged PR #3 from @marcinsz101
+2014-04-17 18:39:21 +0200	// Refacto and add pagination
+2014-04-15 12:09:00 +0200	// Set counter value in list header
+2014-04-14 18:17:44 +0200	[-] Bug #PSCSX-1263, Fix retrocompat before HelperList modification
+2014-04-14 17:06:27 +0200	[*] BO : Bug #PSCSX-1263, redone list and export function
+2014-03-31 12:03:21 +0200	// changed icon
+2014-03-31 11:19:29 +0200	// updated English emails
+2014-03-27 17:20:02 +0100	[*] MO : blocknewsletter : added list of visitor who have registered to the newsletter (through inscription or blocknewsletter)
+2014-03-24 11:43:28 +0100	/ MO blocknewsletter : ps_versions_compliancy modified (1.5.6.1 => 1.6)
+2014-03-24 11:03:09 +0100	/ MO blocknewsletter : ps_versions_compliancy added
+2014-03-20 14:23:11 +0100	Initial commit

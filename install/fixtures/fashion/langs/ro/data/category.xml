@@ -1,0 +1,81 @@
+<?xml version="1.0"?>
+<entity_category>
+  <category id="Women" id_shop="1">
+    <name>Femei</name>
+    <description>&lt;p&gt;&lt;strong&gt;Veți găsi aici toate colecțiile de modă pentru femei.&lt;/strong&gt;&lt;/p&gt;&#xD;
+&lt;p&gt;Această categorie include bazele garderobei dumneavoastră și mult mai mult de atât:&lt;/p&gt;&#xD;
+&lt;p&gt;încălțăminte, accesorii, tricouri imprimate, rochii, blugi pentru femei!&lt;/p&gt;</description>
+    <link_rewrite>femei</link_rewrite>
+    <meta_title/>
+    <meta_keywords/>
+    <meta_description/>
+  </category>
+  <category id="Tops" id_shop="1">
+    <name>Topuri</name>
+    <description>&lt;p&gt;Alegeți dintre tricouri, topuri, bluze, mâneci scurte, mâneci lungi, maiouri, mâneci 3/4 și altele.&lt;/p&gt;&#xD;
+&lt;p&gt;Găsiți modelul care vi se potrivește cel mai bine!&lt;/p&gt;</description>
+    <link_rewrite>topuri</link_rewrite>
+    <meta_title/>
+    <meta_keywords/>
+    <meta_description/>
+  </category>
+  <category id="T-shirts" id_shop="1">
+    <name>Tricouri</name>
+    <description>&lt;p&gt;Baza garderobei dumneavoastră, examinați culorile, formele și stilurile&lt;/p&gt;&#xD;
+&lt;p&gt;diverse ale colecției noastre!&lt;/p&gt;</description>
+    <link_rewrite>tricouri</link_rewrite>
+    <meta_title/>
+    <meta_keywords/>
+    <meta_description/>
+  </category>
+  <category id="Tops_1" id_shop="1">
+    <name>Topuri</name>
+    <description>Alegeți topul care vi se potrivește cel mai bine din larga gamă de topuri pe care o avem. </description>
+    <link_rewrite>top</link_rewrite>
+    <meta_title/>
+    <meta_keywords/>
+    <meta_description/>
+  </category>
+  <category id="Blouses" id_shop="1">
+    <name>Bluze</name>
+    <description>Puneți în valoare bluzele dumneavoastră cu accesoriile potrivite pentru un aspect perfect.</description>
+    <link_rewrite>bluze</link_rewrite>
+    <meta_title/>
+    <meta_keywords/>
+    <meta_description/>
+  </category>
+  <category id="Dresses" id_shop="1">
+    <name>Rochii</name>
+    <description>&lt;p&gt;Găsiți rochiile dumneavoastră favorite din larga noastră gamă de rochii de vară, casual sau de seară!&lt;/p&gt;&#xD;
+&lt;p&gt;Vă oferim rochii pentru orice zi, orice stil și orice ocazie.&lt;/p&gt;</description>
+    <link_rewrite>rochii</link_rewrite>
+    <meta_title/>
+    <meta_keywords/>
+    <meta_description/>
+  </category>
+  <category id="Casual_Dresses" id_shop="1">
+    <name>Rochii casual</name>
+    <description>&lt;p&gt;Căutați o rochie de purtat în fiecare zi? Aruncți o privire la&lt;/p&gt;&#xD;
+&lt;p&gt;selecția noastră de rochii pentru a găsi una care vi se potrivește.&lt;/p&gt;</description>
+    <link_rewrite>rochii-casual</link_rewrite>
+    <meta_title/>
+    <meta_keywords/>
+    <meta_description/>
+  </category>
+  <category id="Evening_Dresses" id_shop="1">
+    <name>Rochii de seară</name>
+    <description>Cercetați diversele noastre rochii și alegeți rochia perfectă pentru o seară de neuitat!</description>
+    <link_rewrite>rochii-de-seara</link_rewrite>
+    <meta_title/>
+    <meta_keywords/>
+    <meta_description/>
+  </category>
+  <category id="Summer_Dresses" id_shop="1">
+    <name>Rochii de vară</name>
+    <description>Rochii scurte, rochii lungi, rochii de mătase, rochii imprimate, veți găsi rochia de vară perfectă.</description>
+    <link_rewrite>rochii-de-vara</link_rewrite>
+    <meta_title/>
+    <meta_keywords/>
+    <meta_description/>
+  </category>
+</entity_category>

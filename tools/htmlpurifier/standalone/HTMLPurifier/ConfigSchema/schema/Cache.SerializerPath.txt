@@ -1,0 +1,13 @@
+Cache.SerializerPath
+TYPE: string/null
+VERSION: 2.0.0
+DEFAULT: NULL
+--DESCRIPTION--
+
+<p>
+    Absolute path with no trailing slash to store serialized definitions in.
+    Default is within the
+    HTML Purifier library inside DefinitionCache/Serializer. This
+    path must be writable by the webserver.
+</p>
+--# vim: et sw=4 sts=4

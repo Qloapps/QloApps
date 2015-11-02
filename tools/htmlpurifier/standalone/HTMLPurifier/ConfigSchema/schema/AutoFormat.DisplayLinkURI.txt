@@ -1,0 +1,11 @@
+AutoFormat.DisplayLinkURI
+TYPE: bool
+VERSION: 3.2.0
+DEFAULT: false
+--DESCRIPTION--
+<p>
+  This directive turns on the in-text display of URIs in &lt;a&gt; tags, and disables
+  those links. For example, <a href="http://example.com">example</a> becomes
+  example (<a>http://example.com</a>).
+</p>
+--# vim: et sw=4 sts=4

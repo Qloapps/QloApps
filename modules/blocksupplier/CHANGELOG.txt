@@ -1,0 +1,4 @@
+2014-04-22 18:57:53 +0200	// Changelog updated
+2014-03-24 11:43:29 +0100	/ MO blocksupplier : ps_versions_compliancy modified (1.5.6.1 => 1.6)
+2014-03-24 11:04:13 +0100	/ MO blocksupplier : ps_versions_compliancy added
+2014-03-20 14:26:54 +0100	Initial commit

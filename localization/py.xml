@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<localizationPack name="Paraguay" version="1.0">
+	<currencies>
+		<currency name="Guaraní" iso_code="PYG" iso_code_num="600" sign="Gs" blank="1" conversion_rate="6547.98" format="2" decimals="1" />
+	</currencies>
+	<languages>
+		<language iso_code="es" />
+	</languages>
+	<taxes>
+		<tax id="1" name="IVA PY 10%" rate="10" />
+		<tax id="2" name="IVA PY 5%" rate="5" />
+		
+		<taxRulesGroup name="PY Standard Rate (10%)">
+			<taxRule iso_code_country="py" id_tax="1" />
+		</taxRulesGroup>
+		
+		<taxRulesGroup name="PY Reduced Rate (5%)">
+			<taxRule iso_code_country="py" id_tax="2" />
+		</taxRulesGroup>
+	</taxes>
+	<units>
+		<unit type="weight" value="kg" />
+		<unit type="volume" value="L" />
+		<unit type="short_distance" value="in" />
+		<unit type="base_distance" value="ft" />
+		<unit type="long_distance" value="mi" />
+	</units>
+</localizationPack>

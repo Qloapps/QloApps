@@ -1,0 +1,14 @@
+URI.Disable
+TYPE: bool
+VERSION: 1.3.0
+DEFAULT: false
+--DESCRIPTION--
+
+<p>
+    Disables all URIs in all forms. Not sure why you'd want to do that
+    (after all, the Internet's founded on the notion of a hyperlink).
+</p>
+
+--ALIASES--
+Attr.DisableURI
+--# vim: et sw=4 sts=4

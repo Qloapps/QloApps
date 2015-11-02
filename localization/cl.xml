@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<localizationPack name="Chile" version="1.0">
+	<currencies>
+		<currency name="Peso" iso_code="CLP" iso_code_num="152" sign="$" blank="1" conversion_rate="658.996" format="2" decimals="1" />
+	</currencies>
+	<languages>
+		<language iso_code="es" />
+	</languages>
+	<taxes>
+		<tax id="1" name="IVA CL 19%" rate="19" />
+		
+		<taxRulesGroup name="CL Standard Rate (19%)">
+			<taxRule iso_code_country="cl" id_tax="1" />
+		</taxRulesGroup>
+	</taxes>
+	<units>
+		<unit type="weight" value="kg" />
+		<unit type="volume" value="L" />
+		<unit type="short_distance" value="cm" />
+		<unit type="base_distance" value="m" />
+		<unit type="long_distance" value="km" />
+	</units>
+</localizationPack>

@@ -1,0 +1,45 @@
+<?xml version='1.0'?>
+<entity_cms>
+  <cms id='Delivery'>
+    <meta_title>বিতরন</meta_title>
+    <meta_description>বিতরনের শর্ত সমূহ</meta_description>
+    <meta_keywords>conditions, delivery, delay, shipment, pack</meta_keywords>
+    <content>&lt;h2&gt;বিলি এবং ফেরত&lt;/h2&gt;&lt;h3&gt;আপনার প্যাক বিলিt&lt;/h3&gt;&lt;p&gt;প্যাকেজ সাধারণত পেমেন্ট প্রাপ্তির পর 2 দিনের মধ্যে প্রেষিত হয় এবং স্বাক্ষর ছাড়াই ট্র্যাকিং এবং ড্রপ অফ সঙ্গে ইউ.পি. মাধ্যমে প্রেরণ করা হয়. আপনি প্রয়োজনীয় স্বাক্ষর সঙ্গে অতিরিক্ত ইউ.পি. দ্বারা ডেলিভারি পছন্দ করেন, একটি অতিরিক্ত খরচ প্রয়োগ করা হবে, তাই এই পদ্ধতি চয়ন করার আগে আমাদের সাথে যোগাযোগ করুন. আপনি যেটা পছন্দ চালান, আমরা আপনাকে আপনার প্যাকেজ অনলাইন ট্র্যাক একটি লিঙ্ক প্রদান করা হবে.&lt;/p&gt;&lt;p&gt;শিপিং ফি ফি হিসেবে ডাকমাসুল খরচ সামলাচ্ছে ও প্যাকিং অন্তর্ভুক্ত. পরিবহন ফি চালানের মোট ওজন অনুযায়ী পরিবর্তন হওয়ার সম্ভাবনা রয়েছে, যেহেতু সামলাচ্ছে ফি, সংশোধন করা হয়. আমরা এক করার জন্য আপনার আইটেম গ্রুপে আপনাকে উপদেশ. আমরা আলাদা আলাদাভাবে স্থাপিত দুটি স্বতন্ত্র আদেশ গ্রুপ করতে পারবে না, এবং শিপিং ফি তাদের প্রতিটি ক্ষেত্রে প্রযোজ্য হবে. আপনার প্যাকেজ আপনার নিজের ঝুঁকিতে প্রেষিত করা হবে, কিন্তু ভঙ্গুর বস্তুর রক্ষা বিশেষ যত্ন নেওয়া হয়.&lt;br /&gt;&lt;br /&gt;বক্সগুলিতে যা আছে পর্যাপ্তভাবে মাপের এবং আপনার আইটেম ভাল সুরক্ষিত হয়.&lt;/p&gt;</content>
+    <link_rewrite>delivery</link_rewrite>
+  </cms>
+  <cms id='Legal_Notice'>
+    <meta_title>আইনি বিজ্ঞপ্তি</meta_title>
+    <meta_description>আইনি বিজ্ঞপ্তি</meta_description>
+    <meta_keywords>notice, legal, credits</meta_keywords>
+    <content>&lt;h2&gt;আইনগত&lt;/h2&gt;&lt;h3&gt;বকেয়া&lt;/h3&gt;&lt;p&gt;ধারনা এবং উৎপাদন:&lt;/p&gt;&lt;p&gt;এই ওয়েব সাইট টি ব্যাবহার করে তৈরি&lt;a href=&quot;http://www.prestashop.com&quot;&gt;PrestaShop&lt;/a&gt;&amp;trade; open-source software.&lt;/p&gt;</content>
+    <link_rewrite>legal-notice</link_rewrite>
+  </cms>
+  <cms id='Terms_and_conditions_of_use'>
+    <meta_title>ব্যাবহারের শর্ত </meta_title>
+    <meta_description>আমাদের ব্যাবহারের শর্ত </meta_description>
+    <meta_keywords>conditions, terms, use, sell</meta_keywords>
+    <content>&lt;h2&gt;আপনার জন্য ব্যাবহারের শর্ত&lt;/h2&gt;&lt;h3&gt;নিয়ম ১&lt;/h3&gt;&lt;p&gt;এখানে নিয়ম ১ content&lt;/p&gt;
+&lt;h3&gt;নিয়ম২&lt;/h3&gt;&lt;p&gt;এখানে নিয়ম২&lt;/p&gt;
+&lt;h3&gt;নিয়ম ৩&lt;/h3&gt;&lt;p&gt;এখানে নিয়ম৩ content&lt;/p&gt;</content>
+    <link_rewrite>terms-and-conditions-of-use</link_rewrite>
+  </cms>
+  <cms id='About_us'>
+    <meta_title>আমাদের সম্পর্কে</meta_title>
+    <meta_description>আমাদের সম্পর্কে আরও জানুন</meta_description>
+    <meta_keywords>about us, informations</meta_keywords>
+    <content>&lt;h2&gt;আমাদের সম্পর্কে&lt;/h2&gt;
+&lt;h3&gt;আমাদের কোম্পানি&lt;/h3&gt;&lt;p&gt;Our company&lt;/p&gt;
+&lt;h3&gt;আমাদের টিম&lt;/h3&gt;&lt;p&gt;Our team&lt;/p&gt;
+&lt;h3&gt;তথ্য&lt;/h3&gt;&lt;p&gt;Informations&lt;/p&gt;</content>
+    <link_rewrite>about-us</link_rewrite>
+  </cms>
+  <cms id='Secure_payment'>
+    <meta_title> নিরাপদ পরিশোধ</meta_title>
+    <meta_description>আমাদের নিরাপদ পরিশোধ পদ্ধতি</meta_description>
+    <meta_keywords>secure payment, ssl, visa, mastercard, paypal</meta_keywords>
+    <content>&lt;h2&gt;নিরাপদ পরিশোধ&lt;/h2&gt;
+&lt;h3&gt;আমাদের নিরাপদ পরিশোধ&lt;/h3&gt;&lt;p&gt;With SSL&lt;/p&gt;
+&lt;h3&gt;ব্যাবহার করে Visa/Mastercard/Paypal&lt;/h3&gt;&lt;p&gt;এই সেবা সম্পর্কে&lt;/p&gt;</content>
+    <link_rewrite>secure-payment</link_rewrite>
+  </cms>
+</entity_cms>

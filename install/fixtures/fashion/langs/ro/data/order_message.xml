@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<entity_order_message>
+  <order_message id="Delay">
+    <name>Întârziere</name>
+    <message>Bună,
+
+Din nefericire, un articol din comanda dumneavoastră are momentan stocul epuizat. Aceasta poate cauza o mică întârziere a livrării.
+Vă rugăm să acceptați scuzele noastre și vă asigurăm că muncim din răsputeri pentru a remedia acest inconvenient.
+
+Toate cele bune,</message>
+  </order_message>
+</entity_order_message>

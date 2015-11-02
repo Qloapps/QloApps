@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<localizationPack name="Bolivia" version="1.0">
+	<currencies>
+		<currency name="Boliviano" iso_code="BOB" iso_code_num="068" sign="$b" blank="1" conversion_rate="9.57620" format="2" decimals="1" />
+	</currencies>
+	<languages>
+		<language iso_code="es" />
+	</languages>
+	<taxes>
+		<tax id="1" name="IVA BO 13%" rate="13" />
+		
+		<taxRulesGroup name="BO Standard rate (13%)">
+			<taxRule iso_code_country="bo" id_tax="1" />
+		</taxRulesGroup>
+	</taxes>
+	<units>
+		<unit type="weight" value="kg" />
+		<unit type="volume" value="L" />
+		<unit type="short_distance" value="cm" />
+		<unit type="base_distance" value="m" />
+		<unit type="long_distance" value="km" />
+	</units>
+</localizationPack>

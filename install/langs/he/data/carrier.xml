@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity_carrier>
+  <carrier id="carrier_1" id_shop="1">
+    <delay>אסוף הזמנה בחנות</delay>
+  </carrier>
+</entity_carrier>

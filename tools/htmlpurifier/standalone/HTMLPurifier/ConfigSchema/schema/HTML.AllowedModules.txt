@@ -1,0 +1,20 @@
+HTML.AllowedModules
+TYPE: lookup/null
+VERSION: 2.0.0
+DEFAULT: NULL
+--DESCRIPTION--
+
+<p>
+    A doctype comes with a set of usual modules to use. Without having
+    to mucking about with the doctypes, you can quickly activate or
+    disable these modules by specifying which modules you wish to allow
+    with this directive. This is most useful for unit testing specific
+    modules, although end users may find it useful for their own ends.
+</p>
+<p>
+    If you specify a module that does not exist, the manager will silently
+    fail to use it, so be careful! User-defined modules are not affected
+    by this directive. Modules defined in %HTML.CoreModules are not
+    affected by this directive.
+</p>
+--# vim: et sw=4 sts=4

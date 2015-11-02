@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity_customer>
+  <fields id="firstname" class="Customer">
+    <field name="id_gender" relation="gender"/>
+    <field name="id_default_group"/>
+    <field name="firstname"/>
+    <field name="lastname"/>
+    <field name="email"/>
+    <field name="passwd"/>
+    <field name="last_passwd_gen"/>
+    <field name="birthday"/>
+    <field name="newsletter"/>
+    <field name="ip_registration_newsletter"/>
+    <field name="newsletter_date_add"/>
+    <field name="optin"/>
+    <field name="secure_key"/>
+    <field name="note"/>
+    <field name="active"/>
+    <field name="is_guest"/>
+  </fields>
+  <entities>
+    <customer id="John" id_gender="1" id_default_group="3" firstname="John" lastname="DOE" passwd="b7d897d438f634f23548b32a2d7e8983" last_passwd_gen="2013-12-13 02:19:15" birthday="1970-01-15" newsletter="1" ip_registration_newsletter="" newsletter_date_add="2013-12-13 08:19:15" optin="1" secure_key="b44a6d9efd7a0076a0fbce6b15eaf3b1" active="1" is_guest="0">
+      <email>pub@prestashop.com</email>
+      <note/>
+    </customer>
+  </entities>
+</entity_customer>

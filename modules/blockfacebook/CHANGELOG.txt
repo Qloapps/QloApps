@@ -1,0 +1,11 @@
+2014-04-22 18:57:13 +0200	// Changelog updated
+2014-04-01 16:41:02 +0200	// fix bracket missing && ++version
+2014-04-01 14:13:46 +0200	Merge pull request #1 from f31n/patch-1
+2014-03-29 23:49:00 +0300	// full url is required for blockFacebook
+2014-03-28 09:56:54 +0100	logic in php
+2014-03-28 09:48:56 +0100	Update blockfacebook.tpl
+2014-03-25 21:21:01 +0100	accepting full url and only name
+2014-03-25 18:31:27 +0100	bug @ v0.1 didn't work on prestashop 1.6.0.5
+2014-03-24 11:43:28 +0100	/ MO blockfacebook : ps_versions_compliancy modified (1.5.6.1 => 1.6)
+2014-03-24 11:02:17 +0100	// MO blockfacebook/ : ps_versions_compliancy added
+2014-03-20 14:22:40 +0100	Initial commit

@@ -1,0 +1,11 @@
+Hola {firstname} {lastname},
+
+Tu información personal en {shop_name} es:
+
+* Contraseña: {passwd}
+* Email: {email}
+
+{shop_name} - {shop_url}
+
+
+{shop_url} desarrollado por PrestaShop®

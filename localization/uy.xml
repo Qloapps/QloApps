@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<localizationPack name="Uruguay" version="1.0">
+	<currencies>
+		<currency name="Peso" iso_code="UYU" iso_code_num="858" sign="$U" blank="1" conversion_rate="27.5471" format="1" decimals="1" />
+	</currencies>
+	<languages>
+		<language iso_code="es" />
+	</languages>
+	<taxes>
+		<tax id="1" name="IVA UY 22%" rate="22" />
+		<tax id="2" name="IVA UY 10%" rate="10" />
+		
+		<taxRulesGroup name="UY Standard Rate (22%)">
+			<taxRule iso_code_country="uy" id_tax="1" />
+		</taxRulesGroup>
+		
+		<taxRulesGroup name="UY Reduced Rate (10%)">
+			<taxRule iso_code_country="uy" id_tax="2" />
+		</taxRulesGroup>
+	</taxes>
+	<units>
+		<unit type="weight" value="kg" />
+		<unit type="volume" value="L" />
+		<unit type="short_distance" value="in" />
+		<unit type="base_distance" value="ft" />
+		<unit type="long_distance" value="mi" />
+	</units>
+</localizationPack>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity_cms_category>
+  <fields id="name" class="CMSCategory">
+    <field name="id_parent" relation="cms_category"/>
+    <field name="active"/>
+  </fields>
+  <entities>
+    <cms_category id="Home" id_parent="" active="1"/>
+  </entities>
+</entity_cms_category>

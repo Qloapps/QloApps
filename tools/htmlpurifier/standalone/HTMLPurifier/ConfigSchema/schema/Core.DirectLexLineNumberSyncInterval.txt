@@ -1,0 +1,17 @@
+Core.DirectLexLineNumberSyncInterval
+TYPE: int
+VERSION: 2.0.0
+DEFAULT: 0
+--DESCRIPTION--
+
+<p>
+  Specifies the number of tokens the DirectLex line number tracking
+  implementations should process before attempting to resyncronize the
+  current line count by manually counting all previous new-lines. When
+  at 0, this functionality is disabled. Lower values will decrease
+  performance, and this is only strictly necessary if the counting
+  algorithm is buggy (in which case you should report it as a bug).
+  This has no effect when %Core.MaintainLineNumbers is disabled or DirectLex is
+  not being used.
+</p>
+--# vim: et sw=4 sts=4

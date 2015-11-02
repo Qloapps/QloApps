@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<localizationPack name="Australia" version="1.0">
+	<languages>
+		<language iso_code="en"/>
+	</languages>
+	
+	<currencies>
+		<currency name="Dollar" iso_code="AUD" iso_code_num="036" sign="$" blank="0" conversion_rate="1.40554" format="1" decimals="1" />
+	</currencies>
+	<taxes>
+		<tax id="1" name="GST AU 10%" rate="10" />
+		<taxRulesGroup name="AU Standard rate (10%)">
+			<taxRule iso_code_country="au" id_tax="1" />
+		</taxRulesGroup>
+	</taxes>
+	<states>
+		<state name="Australian Capital Territory" iso_code="ACT" country="AU" zone="Oceania" tax_behavior="0" />
+		<state name="Victoria" iso_code="VIC" country="AU" zone="Oceania" tax_behavior="0" />
+		<state name="Tasmania" iso_code="TAS" country="AU" zone="Oceania" tax_behavior="0" />
+		<state name="New South Wales" iso_code="NSW" country="AU" zone="Oceania" tax_behavior="0" />
+		<state name="Northern Territory" iso_code="NT" country="AU" zone="Oceania" tax_behavior="0" />
+		<state name="Queensland" iso_code="QLD" country="AU" zone="Oceania" tax_behavior="0" />
+		<state name="South Australia" iso_code="SA" country="AU" zone="Oceania" tax_behavior="0" />
+		<state name="Western Australia" iso_code="WA" country="AU" zone="Oceania" tax_behavior="0" />
+	</states>
+	<units>
+		<unit type="weight" value="kg" />
+		<unit type="volume" value="L" />
+		<unit type="short_distance" value="cm" />
+		<unit type="base_distance" value="m" />
+		<unit type="long_distance" value="km" />
+	</units>
+</localizationPack>
+

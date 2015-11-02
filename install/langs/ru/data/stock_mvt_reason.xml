@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<entity_stock_mvt_reason>
+  <stock_mvt_reason id="Increase">
+    <name>Приход</name>
+  </stock_mvt_reason>
+  <stock_mvt_reason id="Decrease">
+    <name>Расход</name>
+  </stock_mvt_reason>
+  <stock_mvt_reason id="Customer_Order">
+    <name>Заказ покупателя</name>
+  </stock_mvt_reason>
+  <stock_mvt_reason id="Regulation_following_an_inventory_of_stock">
+    <name>Регулирование после инвентаризации</name>
+  </stock_mvt_reason>
+  <stock_mvt_reason id="Regulation_following_an_inventory_of_stock_1">
+    <name>Регулирование после инвентаризации</name>
+  </stock_mvt_reason>
+  <stock_mvt_reason id="Transfer_to_another_warehouse">
+    <name>Передача на другой склад</name>
+  </stock_mvt_reason>
+  <stock_mvt_reason id="Transfer_from_another_warehouse">
+    <name>Передача с другого склада</name>
+  </stock_mvt_reason>
+  <stock_mvt_reason id="Supply_Order">
+    <name>Заказ на поставку</name>
+  </stock_mvt_reason>
+</entity_stock_mvt_reason>

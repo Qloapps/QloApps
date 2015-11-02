@@ -1,0 +1,18 @@
+Core.AggressivelyFixLt
+TYPE: bool
+VERSION: 2.1.0
+DEFAULT: true
+--DESCRIPTION--
+<p>
+    This directive enables aggressive pre-filter fixes HTML Purifier can
+    perform in order to ensure that open angled-brackets do not get killed
+    during parsing stage. Enabling this will result in two preg_replace_callback
+    calls and at least two preg_replace calls for every HTML document parsed;
+    if your users make very well-formed HTML, you can set this directive false.
+    This has no effect when DirectLex is used.
+</p>
+<p>
+    <strong>Notice:</strong> This directive's default turned from false to true
+    in HTML Purifier 3.2.0.
+</p>
+--# vim: et sw=4 sts=4

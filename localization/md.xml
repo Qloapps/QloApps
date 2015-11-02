@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<localizationPack name="Moldova" version="1.0">
+	<currencies>
+		<currency name="Lei" iso_code="MDL" iso_code_num="498" sign="MDL" blank="1" conversion_rate="16.1774" format="2" decimals="1" />
+	</currencies>
+	<languages>
+		<language iso_code="ro" />
+		<language iso_code="ru" />
+		<language iso_code="uk" />
+	</languages>
+	<taxes>
+		<tax id="1" name="TVA MD 20%" rate="20" />
+		<tax id="2" name="TVA MD 8%" rate="8" />
+		<tax id="3" name="TVA MD 5%" rate="5" />
+		
+		<taxRulesGroup name="MD Standard Rate (20%)">
+			<taxRule iso_code_country="md" id_tax="1" />
+		</taxRulesGroup>
+		
+		<taxRulesGroup name="MD Reduced Rate (8%)">
+			<taxRule iso_code_country="md" id_tax="2" />
+		</taxRulesGroup>
+		
+		<taxRulesGroup name="MD Super Reduced Rate (5%)">
+			<taxRule iso_code_country="md" id_tax="3" />
+		</taxRulesGroup>
+	</taxes>
+	<units>
+		<unit type="weight" value="kg" />
+		<unit type="volume" value="L" />
+		<unit type="short_distance" value="in" />
+		<unit type="base_distance" value="ft" />
+		<unit type="long_distance" value="mi" />
+	</units>
+</localizationPack>

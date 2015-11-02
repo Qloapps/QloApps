@@ -1,0 +1,44 @@
+Open Source Links
+Submitted by Michael Tiemann on Tue, 2006-09-19 03:53. ::
+There are many resources (good and bad) on the web offering information, advice, and interpretation concerning Open Source. The following are references that we, the OSI Board, have found useful, either for informing ourselves or for helping others begin their education about open source. And as you explore these links, be mindful of these words attributed to the Buddha, "Believe nothing, no matter where you read it, or who said it, no matter if I have said it, unless it agrees with your own reason and your own common sense..."
+
+Rich References
+
+    * Open Source on Wikipedia. Note that Wikipedia itself is implemented using MediaWiki software, which is covered by the GNU GPL, a popular license that is both a free software license and also approved by the OSI as an Open Source license.
+    * David Wheeler's Why OSS? Just look at the numbers!
+    * David Wheeler's References
+    * The Free, Libre, and Open Source Software (FLOSS) Surveys and reports.
+    * The Economic impact of FLOSS on innovation and competitiveness of the EU ICT sector, published 20 November 2006 by UNU-Merit. (Also linked from our Research page). 
+
+Books
+
+    * The Cathedral and the Bazaar (online and book), Eric S. Raymond, 1997
+    * Open Sources: Voices from the Open Source Revolution, Chris DiBona, Sam Ockman, and Mark Stone, 1999
+    * Open Sources 2.0: The Continuing Evolution, Chris DiBona, Mark Stone, and Danese Cooper, 2005
+    * The Success of Open Source, Steven Weber, 2004
+    * Producing Open Source Software, Karl Fogel, 2005
+    * Open Source Licensing, Larry Rosen, 2004
+    * Collaborative Ownership and the Digital Economy, Rishab Aiyer Ghosh, 2005 
+
+Open Source Software
+
+    * The Free Software Directory Lists over 5,000 packages. (Yes, Free Software is also Open Source Software)
+    * sourceforge.net Lists over 120,000 projects in varying stages of development. Mainly for developers. The public sourceforge.net site only hosts projects covered by an OSI-approved license.
+    * freshmeat.net Lists over 60,000 new releases of Open Source packages. Mainly for people who want to download the latest releases from developers. freshmeat.net strongly prefers software covered by an OSI-approved license (but will host non-open source software in exchange for a fee). 
+
+Open Source Conferences and User Groups
+
+    * OSCON. Note that O'Reilly Media put on many other conferences, most of which have strong open source components and/or constitutents.
+    * FOSS4G. Free and Open Source Geospatial Information Systems conference.
+    * Blender Conference. There are other regional versions of this conference that can be found at the blender.org website.
+    * The Ottawa Linux Symposium. A premier event for hackers to discuss implementation experiences and chart the future of Linux.
+    * The Wizards of OS conference in Berlin.
+    * The FISL conference in Porto Alegre, Brazil.
+    * The FOSSSL conference (and other events) in Colombo, Sri Lanka.
+    * There are hundreds of conferences per year all over the world that advertise "Open Source" as a topic. Alas, these have varying degrees of quality and felicity and the OSI does not vouch for (nor recommend against) the ones not listed in this section. Check to see whether an OSI-affiliated speaker is listed as presenting if you wish to hear the OSI's thoughts or positions.
+    * User groups tend to focus on software or groups of software used in a particular context: Linux users in Northern Virginia (NOVALUG), PostgreSQL users in Dubai (EMIRPUG), GIS developers and users who formed the Indian Chapter of OSGeo, or the dozens of topic-specific users of the R package and its extensions. There are many thousands of user groups, and the best way to find the one that's right for you is to search the web, find the mailing lists, and make contact. 
+
+Packaged Open Source Software
+
+Hundreds, if not thousands, of companies now sell commercially packaged and supported open source software. While many open source software packages do run on proprietary systems (Apache is quite popular on all operating systems platforms), Linux distributions provide a complete (and in some cases, exclusively) open source environment suitable for hand-held, desktop, server, and high-end enterprise/cluster/mainframe use.
+The OSI website is built with and runs exclusively open source software, including Apache (web server), Drupal (content management and blogs), the PHP scripting language, the MySQL database, to name a few of the more well-known packages. 

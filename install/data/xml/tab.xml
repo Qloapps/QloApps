@@ -1,0 +1,310 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity_tab>
+  <fields id="name" ordersql="a.id_parent, a.position" image="t">
+    <field name="id_parent" relation="tab"/>
+    <field name="class_name"/>
+    <field name="active"/>
+  </fields>
+  <entities>
+    <tab id="Dashboard" id_parent="" active="1" hide_host_mode="0">
+      <class_name>AdminDashboard</class_name>
+    </tab>
+    <tab id="CMS_Pages" id_parent="-1" active="1" hide_host_mode="0">
+      <class_name>AdminCms</class_name>
+    </tab>
+    <tab id="CMS_Categories" id_parent="-1" active="1" hide_host_mode="0">
+      <class_name>AdminCmsCategories</class_name>
+    </tab>
+    <tab id="Combinations_Generator" id_parent="-1" active="1" hide_host_mode="0">
+      <class_name>AdminAttributeGenerator</class_name>
+    </tab>
+    <tab id="Search" id_parent="-1" active="1" hide_host_mode="0">
+      <class_name>AdminSearch</class_name>
+    </tab>
+    <tab id="Login" id_parent="-1" active="1" hide_host_mode="0">
+      <class_name>AdminLogin</class_name>
+    </tab>
+    <tab id="Shops" id_parent="-1" active="1" hide_host_mode="0">
+      <class_name>AdminShop</class_name>
+    </tab>
+    <tab id="Shop_URLs" id_parent="-1" active="1" hide_host_mode="0">
+      <class_name>AdminShopUrl</class_name>
+    </tab>
+    <tab id="Catalog" id_parent="" active="1" hide_host_mode="0">
+      <class_name>AdminCatalog</class_name>
+    </tab>
+    <tab id="Orders" id_parent="" active="1" hide_host_mode="0">
+      <class_name>AdminParentOrders</class_name>
+    </tab>
+    <tab id="Customers" id_parent="" active="1" hide_host_mode="0">
+      <class_name>AdminParentCustomer</class_name>
+    </tab>
+    <tab id="Price_Rules" id_parent="" active="1" hide_host_mode="0">
+      <class_name>AdminPriceRule</class_name>
+    </tab>
+    <tab id="Modules" id_parent="" active="1" hide_host_mode="0">
+      <class_name>AdminParentModules</class_name>
+    </tab>
+    <tab id="Shipping" id_parent="" active="1" hide_host_mode="0">
+      <class_name>AdminParentShipping</class_name>
+    </tab>
+    <tab id="Localization" id_parent="" active="1" hide_host_mode="0">
+      <class_name>AdminParentLocalization</class_name>
+    </tab>
+    <tab id="Preferences" id_parent="" active="1" hide_host_mode="0">
+      <class_name>AdminParentPreferences</class_name>
+    </tab>
+    <tab id="Advanced_Parameters" id_parent="" active="1" hide_host_mode="0">
+      <class_name>AdminTools</class_name>
+    </tab>
+    <tab id="Administration" id_parent="" active="1" hide_host_mode="0">
+      <class_name>AdminAdmin</class_name>
+    </tab>
+    <tab id="Stats" id_parent="" active="1" hide_host_mode="0">
+      <class_name>AdminParentStats</class_name>
+    </tab>
+    <tab id="Stock" id_parent="" active="1" hide_host_mode="0">
+      <class_name>AdminStock</class_name>
+    </tab>
+    <tab id="Products" id_parent="Catalog" active="1" hide_host_mode="0">
+      <class_name>AdminProducts</class_name>
+    </tab>
+    <tab id="Categories" id_parent="Catalog" active="1" hide_host_mode="0">
+      <class_name>AdminCategories</class_name>
+    </tab>
+    <tab id="Monitoring" id_parent="Catalog" active="1" hide_host_mode="0">
+      <class_name>AdminTracking</class_name>
+    </tab>
+    <tab id="Attributes_and_Values" id_parent="Catalog" active="1" hide_host_mode="0">
+      <class_name>AdminAttributesGroups</class_name>
+    </tab>
+    <tab id="Features" id_parent="Catalog" active="1" hide_host_mode="0">
+      <class_name>AdminFeatures</class_name>
+    </tab>
+    <tab id="Manufacturers" id_parent="Catalog" active="1" hide_host_mode="0">
+      <class_name>AdminManufacturers</class_name>
+    </tab>
+    <tab id="Suppliers" id_parent="Catalog" active="1" hide_host_mode="0">
+      <class_name>AdminSuppliers</class_name>
+    </tab>
+    <tab id="Tags" id_parent="Catalog" active="1" hide_host_mode="0">
+      <class_name>AdminTags</class_name>
+    </tab>
+    <tab id="Attachments" id_parent="Catalog" active="1" hide_host_mode="0">
+      <class_name>AdminAttachments</class_name>
+    </tab>
+    <tab id="Orders_1" id_parent="Orders" active="1" hide_host_mode="0">
+      <class_name>AdminOrders</class_name>
+    </tab>
+    <tab id="Invoices" id_parent="Orders" active="1" hide_host_mode="0">
+      <class_name>AdminInvoices</class_name>
+    </tab>
+    <tab id="Merchandise_Returns" id_parent="Orders" active="1" hide_host_mode="0">
+      <class_name>AdminReturn</class_name>
+    </tab>
+    <tab id="Delivery_Slips" id_parent="Orders" active="1" hide_host_mode="0">
+      <class_name>AdminDeliverySlip</class_name>
+    </tab>
+    <tab id="Credit_Slips" id_parent="Orders" active="1" hide_host_mode="0">
+      <class_name>AdminSlip</class_name>
+    </tab>
+    <tab id="Statuses" id_parent="Orders" active="1" hide_host_mode="0">
+      <class_name>AdminStatuses</class_name>
+    </tab>
+    <tab id="Order_Messages" id_parent="Orders" active="1" hide_host_mode="0">
+      <class_name>AdminOrderMessage</class_name>
+    </tab>
+    <tab id="Customers_1" id_parent="Customers" active="1" hide_host_mode="0">
+      <class_name>AdminCustomers</class_name>
+    </tab>
+    <tab id="Addresses" id_parent="Customers" active="1" hide_host_mode="0">
+      <class_name>AdminAddresses</class_name>
+    </tab>
+    <tab id="Groups" id_parent="Customers" active="1" hide_host_mode="0">
+      <class_name>AdminGroups</class_name>
+    </tab>
+    <tab id="Shopping_Carts" id_parent="Customers" active="1" hide_host_mode="0">
+      <class_name>AdminCarts</class_name>
+    </tab>
+    <tab id="Customer_Service" id_parent="Customers" active="1" hide_host_mode="0">
+      <class_name>AdminCustomerThreads</class_name>
+    </tab>
+    <tab id="Contacts" id_parent="Customers" active="1" hide_host_mode="0">
+      <class_name>AdminContacts</class_name>
+    </tab>
+    <tab id="Titles" id_parent="Customers" active="1" hide_host_mode="0">
+      <class_name>AdminGenders</class_name>
+    </tab>
+    <tab id="Outstanding" id_parent="Customers" active="0" hide_host_mode="0">
+      <class_name>AdminOutstanding</class_name>
+    </tab>
+    <tab id="Cart_Rules" id_parent="Price_Rules" active="1" hide_host_mode="0">
+      <class_name>AdminCartRules</class_name>
+    </tab>
+    <tab id="Catalog_Price_Rules" id_parent="Price_Rules" active="1" hide_host_mode="0">
+      <class_name>AdminSpecificPriceRule</class_name>
+    </tab>
+    <tab id="Marketing" id_parent="Price_Rules" active="1" hide_host_mode="0">
+      <class_name>AdminMarketing</class_name>
+    </tab>
+	<tab id="Carriers" id_parent="Shipping" active="1" hide_host_mode="0">
+      <class_name>AdminCarriers</class_name>
+	</tab>
+    <tab id="Shipping_1" id_parent="Shipping" active="1" hide_host_mode="0">
+      <class_name>AdminShipping</class_name>
+    </tab>
+    <tab id="CarrierWizard" id_parent="Shipping" active="1" hide_host_mode="0">
+      <class_name>AdminCarrierWizard</class_name>
+    </tab>
+    <tab id="Localization_1" id_parent="Localization" active="1" hide_host_mode="0">
+      <class_name>AdminLocalization</class_name>
+    </tab>
+    <tab id="Languages" id_parent="Localization" active="1" hide_host_mode="0">
+      <class_name>AdminLanguages</class_name>
+    </tab>
+    <tab id="Zones" id_parent="Localization" active="1" hide_host_mode="0">
+      <class_name>AdminZones</class_name>
+    </tab>
+    <tab id="Countries" id_parent="Localization" active="1" hide_host_mode="0">
+      <class_name>AdminCountries</class_name>
+    </tab>
+    <tab id="States" id_parent="Localization" active="1" hide_host_mode="0">
+      <class_name>AdminStates</class_name>
+    </tab>
+    <tab id="Currencies" id_parent="Localization" active="1" hide_host_mode="0">
+      <class_name>AdminCurrencies</class_name>
+    </tab>
+    <tab id="Taxes" id_parent="Localization" active="1" hide_host_mode="0">
+      <class_name>AdminTaxes</class_name>
+    </tab>
+    <tab id="Tax_Rules" id_parent="Localization" active="1" hide_host_mode="0">
+      <class_name>AdminTaxRulesGroup</class_name>
+    </tab>
+    <tab id="Translations" id_parent="Localization" active="1" hide_host_mode="0">
+      <class_name>AdminTranslations</class_name>
+    </tab>
+    <tab id="Modules_1" id_parent="Modules" active="1" hide_host_mode="0">
+      <class_name>AdminModules</class_name>
+    </tab>
+    <tab id="Modules_Themes_Catalog" id_parent="Modules" active="1" hide_host_mode="0">
+      <class_name>AdminAddonsCatalog</class_name>
+    </tab>
+    <tab id="Positions" id_parent="Modules" active="1" hide_host_mode="0">
+      <class_name>AdminModulesPositions</class_name>
+    </tab>
+    <tab id="Payment" id_parent="Modules" active="1" hide_host_mode="0">
+      <class_name>AdminPayment</class_name>
+    </tab>
+    <tab id="General" id_parent="Preferences" active="1" hide_host_mode="0">
+      <class_name>AdminPreferences</class_name>
+    </tab>
+    <tab id="Orders_2" id_parent="Preferences" active="1" hide_host_mode="0">
+      <class_name>AdminOrderPreferences</class_name>
+    </tab>
+    <tab id="Products_1" id_parent="Preferences" active="1" hide_host_mode="0">
+      <class_name>AdminPPreferences</class_name>
+    </tab>
+    <tab id="Customers_2" id_parent="Preferences" active="1" hide_host_mode="0">
+      <class_name>AdminCustomerPreferences</class_name>
+    </tab>
+    <tab id="Themes" id_parent="Preferences" active="1" hide_host_mode="0">
+      <class_name>AdminThemes</class_name>
+    </tab>
+    <tab id="SEO_URLs" id_parent="Preferences" active="1" hide_host_mode="0">
+      <class_name>AdminMeta</class_name>
+    </tab>
+    <tab id="CMS" id_parent="Preferences" active="1" hide_host_mode="0">
+      <class_name>AdminCmsContent</class_name>
+    </tab>
+    <tab id="Images" id_parent="Preferences" active="1" hide_host_mode="0">
+      <class_name>AdminImages</class_name>
+    </tab>
+    <tab id="Store_Contacts" id_parent="Preferences" active="1" hide_host_mode="0">
+      <class_name>AdminStores</class_name>
+    </tab>
+    <tab id="Search_1" id_parent="Preferences" active="1" hide_host_mode="0">
+      <class_name>AdminSearchConf</class_name>
+    </tab>
+    <tab id="Maintenance" id_parent="Preferences" active="1" hide_host_mode="0">
+      <class_name>AdminMaintenance</class_name>
+    </tab>
+    <tab id="Geolocation" id_parent="Preferences" active="1" hide_host_mode="0">
+      <class_name>AdminGeolocation</class_name>
+    </tab>
+    <tab id="Configuration_Information" id_parent="Advanced_Parameters" active="1" hide_host_mode="0">
+      <class_name>AdminInformation</class_name>
+    </tab>
+    <tab id="Performance" id_parent="Advanced_Parameters" active="1" hide_host_mode="0">
+      <class_name>AdminPerformance</class_name>
+    </tab>
+    <tab id="E-mail" id_parent="Advanced_Parameters" active="1" hide_host_mode="0">
+      <class_name>AdminEmails</class_name>
+    </tab>
+    <tab id="Multistore" id_parent="Advanced_Parameters" active="0" hide_host_mode="0">
+      <class_name>AdminShopGroup</class_name>
+    </tab>
+    <tab id="CSV_Import" id_parent="Advanced_Parameters" active="1" hide_host_mode="0">
+      <class_name>AdminImport</class_name>
+    </tab>
+    <tab id="DB_Backup" id_parent="Advanced_Parameters" active="1" hide_host_mode="0">
+      <class_name>AdminBackup</class_name>
+    </tab>
+    <tab id="SQL_Manager" id_parent="Advanced_Parameters" active="1" hide_host_mode="0">
+      <class_name>AdminRequestSql</class_name>
+    </tab>
+    <tab id="Logs" id_parent="Advanced_Parameters" active="1" hide_host_mode="0">
+      <class_name>AdminLogs</class_name>
+    </tab>
+    <tab id="Webservice" id_parent="Advanced_Parameters" active="1" hide_host_mode="0">
+      <class_name>AdminWebservice</class_name>
+    </tab>
+    <tab id="Preferences_1" id_parent="Administration" active="1" hide_host_mode="0">
+      <class_name>AdminAdminPreferences</class_name>
+    </tab>
+    <tab id="Quick_Access" id_parent="Administration" active="1" hide_host_mode="0">
+      <class_name>AdminQuickAccesses</class_name>
+    </tab>
+    <tab id="Employees" id_parent="Administration" active="1" hide_host_mode="0">
+      <class_name>AdminEmployees</class_name>
+    </tab>
+    <tab id="Profiles" id_parent="Administration" active="1" hide_host_mode="0">
+      <class_name>AdminProfiles</class_name>
+    </tab>
+    <tab id="Permissions" id_parent="Administration" active="1" hide_host_mode="0">
+      <class_name>AdminAccess</class_name>
+    </tab>
+    <tab id="Menus" id_parent="Administration" active="1" hide_host_mode="0">
+      <class_name>AdminTabs</class_name>
+    </tab>
+    <tab id="Stats_1" id_parent="Stats" active="1" hide_host_mode="0">
+      <class_name>AdminStats</class_name>
+    </tab>
+    <tab id="Search_Engines" id_parent="Stats" active="1" hide_host_mode="0">
+      <class_name>AdminSearchEngines</class_name>
+    </tab>
+    <tab id="Referrers" id_parent="Stats" active="1" hide_host_mode="0">
+      <class_name>AdminReferrers</class_name>
+    </tab>
+    <tab id="Warehouses" id_parent="Stock" active="1" hide_host_mode="0">
+      <class_name>AdminWarehouses</class_name>
+    </tab>
+    <tab id="Stock_Management" id_parent="Stock" active="1" hide_host_mode="0">
+      <class_name>AdminStockManagement</class_name>
+    </tab>
+    <tab id="Stock_Movement" id_parent="Stock" active="1" hide_host_mode="0">
+      <class_name>AdminStockMvt</class_name>
+    </tab>
+    <tab id="Instant_Stock_Status" id_parent="Stock" active="1" hide_host_mode="0">
+      <class_name>AdminStockInstantState</class_name>
+    </tab>
+    <tab id="Stock_Coverage" id_parent="Stock" active="1" hide_host_mode="0">
+      <class_name>AdminStockCover</class_name>
+    </tab>
+    <tab id="Supply_orders" id_parent="Stock" active="1" hide_host_mode="0">
+      <class_name>AdminSupplyOrders</class_name>
+    </tab>
+    <tab id="Configuration" id_parent="Stock" active="1" hide_host_mode="0">
+      <class_name>AdminStockConfiguration</class_name>
+    </tab>
+  </entities>
+</entity_tab>

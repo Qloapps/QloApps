@@ -1,0 +1,165 @@
+<?xml version='1.0'?>
+<entity_meta>
+  <meta id='404' id_shop='1'>
+    <title>Erro 404</title>
+    <description>A página não foi encontrada</description>
+    <keywords>error, 404, not found</keywords>
+    <url_rewrite>página-não-encontrada</url_rewrite>
+  </meta>
+  <meta id='best-sales' id_shop='1'>
+    <title>Melhores vendas</title>
+    <description>Nossas melhores vendas</description>
+    <keywords>best sales</keywords>
+    <url_rewrite>melhores-vendas</url_rewrite>
+  </meta>
+  <meta id='contact' id_shop='1'>
+    <title>Entrar em contato conosco</title>
+    <description>Preencha o formulário para entrar em contato conosco</description>
+    <keywords>contact, form, e-mail</keywords>
+    <url_rewrite>entrar-em-contato-conosco</url_rewrite>
+  </meta>
+  <meta id='index' id_shop='1'>
+    <title/>
+    <description>Loja desenvolvida pela PrestaShop</description>
+    <keywords>shop, prestashop</keywords>
+    <url_rewrite/>
+  </meta>
+  <meta id='manufacturer' id_shop='1'>
+    <title>Fabricantes</title>
+    <description>Lista de fabricantes</description>
+    <keywords>manufacturer</keywords>
+    <url_rewrite>fabricantes</url_rewrite>
+  </meta>
+  <meta id='new-products' id_shop='1'>
+    <title>Novos produtos</title>
+    <description>Nossos novos produtos</description>
+    <keywords>new, products</keywords>
+    <url_rewrite>novos-produtos</url_rewrite>
+  </meta>
+  <meta id='password' id_shop='1'>
+    <title>Esqueceu a senha?</title>
+    <description>Digite o seu e-mail pessoal para se inscrever para receber um e-mail com uma nova senha</description>
+    <keywords>forgot, password, e-mail, new, reset</keywords>
+    <url_rewrite>recuperar-senha</url_rewrite>
+  </meta>
+  <meta id='prices-drop' id_shop='1'>
+    <title>Preços em queda</title>
+    <description>Nossos produtos especiais</description>
+    <keywords>special, prices drop</keywords>
+    <url_rewrite>preços-em-queda</url_rewrite>
+  </meta>
+  <meta id='sitemap' id_shop='1'>
+    <title>Mapa do site</title>
+    <description>Perdido(a)? Encontre o que procura</description>
+    <keywords>sitemap</keywords>
+    <url_rewrite>mapa do site</url_rewrite>
+  </meta>
+  <meta id='supplier' id_shop='1'>
+    <title>Fornecedores</title>
+    <description>Lista de fornecedores</description>
+    <keywords>supplier</keywords>
+    <url_rewrite>fornecedor</url_rewrite>
+  </meta>
+  <meta id='address' id_shop='1'>
+    <title>Endereço</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>endereço</url_rewrite>
+  </meta>
+  <meta id='addresses' id_shop='1'>
+    <title>Endereços</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>endereços</url_rewrite>
+  </meta>
+  <meta id='authentication' id_shop='1'>
+    <title>Login</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>login</url_rewrite>
+  </meta>
+  <meta id='cart' id_shop='1'>
+    <title>Carrinho</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>carrinho</url_rewrite>
+  </meta>
+  <meta id='discount' id_shop='1'>
+    <title>Desconto</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>desconto</url_rewrite>
+  </meta>
+  <meta id='history' id_shop='1'>
+    <title>Histórico de pedidos</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>histórico-de-pedidos</url_rewrite>
+  </meta>
+  <meta id='identity' id_shop='1'>
+    <title>Identificação</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>identificação</url_rewrite>
+  </meta>
+  <meta id='my-account' id_shop='1'>
+    <title>Minha conta</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>minha-conta</url_rewrite>
+  </meta>
+  <meta id='order-follow' id_shop='1'>
+    <title>Acompanhar meu pedido</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>acompanhar-meu-pedido</url_rewrite>
+  </meta>
+  <meta id='order-slip' id_shop='1'>
+    <title>Nota do pedido</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>nota-do-pedido</url_rewrite>
+  </meta>
+  <meta id='order' id_shop='1'>
+    <title>Pedido</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>pedido</url_rewrite>
+  </meta>
+  <meta id='search' id_shop='1'>
+    <title>Procurar</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>procurar</url_rewrite>
+  </meta>
+  <meta id='stores' id_shop='1'>
+    <title>Lojas</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>lojas</url_rewrite>
+  </meta>
+  <meta id='order-opc' id_shop='1'>
+    <title>Pedido</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>pedido-imediato</url_rewrite>
+  </meta>
+  <meta id='guest-tracking' id_shop='1'>
+    <title>Acompanhamento do convidado</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>acompanhamento-do-convidado</url_rewrite>
+  </meta>
+  <meta id='order-confirmation' id_shop='1'>
+    <title>Confirmação do pedido</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>confirmação-do-pedido</url_rewrite>
+  </meta>
+  <meta id='products-comparison' id_shop='1'>
+    <title>Comparação de produtos</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>comparação-de-produtos</url_rewrite>
+  </meta>
+</entity_meta>

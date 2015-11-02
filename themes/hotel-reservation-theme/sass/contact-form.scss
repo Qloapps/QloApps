@@ -1,0 +1,73 @@
+@import "compass";
+@import "theme_variables";
+
+/**************************************************************************
+					Contact Page Styles
+**************************************************************************/
+
+.contact-title {
+	margin: -5px 0 0px 0;
+	line-height: 23px;
+	i {
+		font-size: 23px;
+		color: #c0c0c0;
+		padding: 0 8px 0 0;
+	}
+}
+
+.contact-form-box {
+	padding: 23px 0 0 0;
+	margin: 0 0 30px 0;
+	background: url(../img/contact-form.png) repeat-x $light-background;
+	@include box-shadow(rgba(black, 0.17) 0px 5px 13px);
+	fieldset {
+		padding: 0 19px 21px 19px;
+		background: url(../img/form-contact-shadow.png) center bottom no-repeat;
+		background-size: contain;
+	}
+	label {
+		margin: 0 0 6px 0;
+	}
+	.page-subheading {
+		padding-left: 0px;
+		border: none;
+		margin-bottom: 0;
+	}
+
+	.col-md-3 {
+		padding-left: 0;
+		@media (max-width: $screen-sm-max) { // max 991px
+			padding-right: 0;
+		}
+	}
+	.col-md-9 {
+		padding-right: 0;
+		@media (max-width: $screen-sm-max) { // max 991px
+			padding-left: 0;
+		}
+	}
+	#desc_contact0 {
+		display: none;
+	}
+	.form-group {
+		margin-bottom: 7px;
+	}
+	textarea {
+		height: 257px;
+	}
+	.submit {
+		margin-top: 13px;
+	}
+	select.form-control {
+		max-width: 270px;
+		width: 100%;
+	}
+	input.form-control {
+		max-width: 270px;
+	}
+	@media (min-width: $screen-md) and (max-width: $screen-md-max) {// min 992px max 1199px
+		div.uploader span.filename {
+			width: 114px;
+		}
+	}
+}

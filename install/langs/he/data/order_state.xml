@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity_order_state>
+  <order_state id="Awaiting_cheque_payment">
+    <name>בהמתנה לתשלום באמצעות שיק</name>
+    <template>cheque</template>
+  </order_state>
+  <order_state id="Payment_accepted">
+    <name>התקבל תשלום</name>
+    <template>payment</template>
+  </order_state>
+  <order_state id="Preparation_in_progress">
+    <name>בתהליך אריזה</name>
+    <template>preparation</template>
+  </order_state>
+  <order_state id="Shipped">
+    <name>נשלחה ללקוח</name>
+    <template>shipped</template>
+  </order_state>
+  <order_state id="Delivered">
+    <name>התקבלה על ידי הלקוח</name>
+    <template/>
+  </order_state>
+  <order_state id="Canceled">
+    <name>הזמנה בוטלה</name>
+    <template>order_canceled</template>
+  </order_state>
+  <order_state id="Refund">
+    <name>החזר כספי</name>
+    <template>refund</template>
+  </order_state>
+  <order_state id="Payment_error">
+    <name>שגיאת תשלום</name>
+    <template>payment_error</template>
+  </order_state>
+  <order_state id="On_backorder_paid">
+     <name>בהמתנה למלאי (שולם)</name>
+     <template>outofstock</template>
+  </order_state>
+  <order_state id="On_backorder_unpaid">
+     <name>בהמתנה למלאי (עוד לא שולם)</name>
+     <template>outofstock</template>
+  </order_state>
+  <order_state id="Awaiting_bank_wire_payment">
+    <name>בהמתנה לתשלום באמצעות העברה בנקאית</name>
+    <template>bankwire</template>
+  </order_state>
+  <order_state id="Awaiting_PayPal_payment">
+    <name>בהמתנה לתשלום באמצעות פייפל</name>
+    <template/>
+  </order_state>
+  <order_state id="Payment_remotely_accepted">
+    <name>התקבל תשלום מרחוק</name>
+    <template>payment</template>
+  </order_state>
+  <order_state id="Awaiting_cod_validation">
+    <name>Awaiting cod validation</name>
+    <template>cashondelivery</template>
+  </order_state>
+</entity_order_state>

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<localizationPack name="Iran" version="1.0">
+	<currencies>
+		<currency name="Rial" iso_code="IRR" iso_code_num="364" sign="ریال" blank="1" conversion_rate="1.00" format="4" decimals="0" />
+	</currencies>
+	<states>
+		<state name="آذربایجان شرقی" iso_code="01" country="IR" zone="Asia" />
+		<state name="آذربایجان غربی" iso_code="02" country="IR" zone="Asia" />
+		<state name="اردبیل" iso_code="03" country="IR" zone="Asia" />
+		<state name="البرز" iso_code="32" country="IR" zone="Asia" />
+		<state name="اصفهان" iso_code="04" country="IR" zone="Asia" />
+		<state name="ایلام" iso_code="05" country="IR" zone="Asia" />
+		<state name="بوشهر" iso_code="06" country="IR" zone="Asia" />
+		<state name="تهران" iso_code="07" country="IR" zone="Asia" />
+		<state name="چهارمحال و بختیاری" iso_code="08" country="IR" zone="Asia" />
+		<state name="خراسان جنوبی" iso_code="29" country="IR" zone="Asia" />
+		<state name="خراسان رضوی" iso_code="30" country="IR" zone="Asia" />
+		<state name="خراسان شمالی" iso_code="31" country="IR" zone="Asia" />
+		<state name="خوزستان" iso_code="10" country="IR" zone="Asia" />
+		<state name="زنجان" iso_code="11" country="IR" zone="Asia" />
+		<state name="سمنان" iso_code="12" country="IR" zone="Asia" />
+		<state name="سیستان و بلوچستان" iso_code="13" country="IR" zone="Asia" />
+		<state name="فارس" iso_code="14" country="IR" zone="Asia" />
+		<state name="قزوین" iso_code="28" country="IR" zone="Asia" />
+		<state name="قم" iso_code="26" country="IR" zone="Asia" />
+		<state name="کردستان" iso_code="16" country="IR" zone="Asia" />
+		<state name="کرمان" iso_code="15" country="IR" zone="Asia" />
+		<state name="کرمانشاه" iso_code="17" country="IR" zone="Asia" />
+		<state name="کهگیلویه و بویراحمد" iso_code="18" country="IR" zone="Asia" />
+		<state name="گلستان" iso_code="27" country="IR" zone="Asia" />
+		<state name="گیلان" iso_code="19" country="IR" zone="Asia" />
+		<state name="لرستان" iso_code="20" country="IR" zone="Asia" />
+		<state name="مازندران" iso_code="21" country="IR" zone="Asia" />
+		<state name="مرکزی" iso_code="22" country="IR" zone="Asia" />
+		<state name="هرمزگان" iso_code="23" country="IR" zone="Asia" />
+		<state name="همدان" iso_code="24" country="IR" zone="Asia" />
+		<state name="یزد" iso_code="25" country="IR" zone="Asia" />
+	</states>
+	<languages>
+		<language iso_code="fa" is_rtl="1" name="پارسی (Persian)" />
+	</languages>
+	<taxes>
+		<tax id="1" name="8% مالیات بر ارزش افزوده" rate="8" />
+		
+		<taxRulesGroup name="IR VAT(8%)">
+			<taxRule iso_code_country="ir" id_tax="1" />
+		</taxRulesGroup>
+	</taxes>
+	<units>
+		<unit type="weight" value="گرم" />
+		<unit type="volume" value="لیتر" />
+		<unit type="short_distance" value="سانتی‌متر" />
+		<unit type="base_distance" value="متر" />
+		<unit type="long_distance" value="کیلومتر" />
+	</units>
+	<configurations>
+		<configuration name="PS_TAX_DISPLAY" value="0" />
+	</configurations>
+	<group_default price_display_method="1" />
+</localizationPack>

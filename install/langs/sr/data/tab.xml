@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity_tab>
+  <tab id="Dashboard" name="Kontrolna tabla"/>
+  <tab id="CMS_Pages" name="CMS stranice"/>
+  <tab id="CMS_Categories" name="CMS kategorije"/>
+  <tab id="Combinations_Generator" name="Generator kombinacija"/>
+  <tab id="Search" name="Pronađi"/>
+  <tab id="Login" name="Ulogujte se"/>
+  <tab id="Shops" name="Prodavnice"/>
+  <tab id="Shop_URLs" name="linkovi prodavnice"/>
+  <tab id="Catalog" name="Katalog"/>
+  <tab id="Orders" name="Porudžbine"/>
+  <tab id="Customers" name="Kupci"/>
+  <tab id="Price_Rules" name="Pravila cene"/>
+  <tab id="Shipping" name="Isporuka"/>
+  <tab id="Localization" name="Lokalizacija"/>
+  <tab id="Modules" name="Modules and Services"/>
+  <tab id="Preferences" name="Postavke"/>
+  <tab id="Advanced_Parameters" name="Napredne postavke"/>
+  <tab id="Administration" name="Administracija"/>
+  <tab id="Stats" name="Statistika"/>
+  <tab id="Stock" name="Zalihe"/>
+  <tab id="Products" name="proizvodi"/>
+  <tab id="Categories" name="Kategorije"/>
+  <tab id="Monitoring" name="Praćenje"/>
+  <tab id="Attributes_and_Values" name="Osobine proizvoda"/>
+  <tab id="Features" name="Funkcije proizvoda"/>
+  <tab id="Manufacturers" name="Proizvođači"/>
+  <tab id="Suppliers" name="Dobavljači"/>
+  <tab id="Tags" name="Tagovi"/>
+  <tab id="Attachments" name="Prilozi"/>
+  <tab id="Orders_1" name="Porudžbine"/>
+  <tab id="Invoices" name="Fakture"/>
+  <tab id="Merchandise_Returns" name="Povraćaj robe"/>
+  <tab id="Delivery_Slips" name="Komadi dostave"/>
+  <tab id="Credit_Slips" name="Komadi kredita"/>
+  <tab id="Statuses" name="Statusi"/>
+  <tab id="Order_Messages" name="Poruke porudžbina"/>
+  <tab id="Customers_1" name="Kupci"/>
+  <tab id="Addresses" name="Adrese"/>
+  <tab id="Groups" name="Grupe"/>
+  <tab id="Shopping_Carts" name="Šoping korpe"/>
+  <tab id="Customer_Service" name="Podrška/pomoć"/>
+  <tab id="Contacts" name="Kontakti"/>
+  <tab id="Titles" name="Društveni naslovi"/>
+  <tab id="Outstanding" name="Izvanredno"/>
+  <tab id="Cart_Rules" name="Pravila korpe"/>
+  <tab id="Catalog_Price_Rules" name="Pravilnik cena u katalogu"/>
+  <tab id="Marketing" name="Marketing"/>
+  <tab id="Shipping_1" name="Postavke"/>
+  <tab id="Carriers" name="Dostavljači"/>
+  <tab id="Localization_1" name="Lokalizacija"/>
+  <tab id="Languages" name="Jezici"/>
+  <tab id="Zones" name="Zone"/>
+  <tab id="Countries" name="Države"/>
+  <tab id="States" name="Države"/>
+  <tab id="Currencies" name="Valute"/>
+  <tab id="Taxes" name="Porezi"/>
+  <tab id="Tax_Rules" name="Poreksa pravila"/>
+  <tab id="Translations" name="Prevodi"/>
+  <tab id="Modules_1" name="Modules and Services"/>
+  <tab id="Modules_Themes_Catalog" name="Katalog tema i modula"/>
+  <tab id="Positions" name="Pozicije"/>
+  <tab id="Payment" name="Plaćanje"/>
+  <tab id="General" name="Opšte"/>
+  <tab id="Orders_2" name="Porudžbine"/>
+  <tab id="Products_1" name="proizvodi"/>
+  <tab id="Customers_2" name="Kupci"/>
+  <tab id="Themes" name="Teme"/>
+  <tab id="SEO_URLs" name="SEO i linkovi"/>
+  <tab id="CMS" name="CMS"/>
+  <tab id="Images" name="Slike"/>
+  <tab id="Store_Contacts" name="Sačuvaj kontakte"/>
+  <tab id="Search_1" name="Pronađi"/>
+  <tab id="Maintenance" name="Održavanje"/>
+  <tab id="Geolocation" name="Lokacija"/>
+  <tab id="Configuration_Information" name="Informacije o konfiguraciji"/>
+  <tab id="Performance" name="Performanse"/>
+  <tab id="E-mail" name="E-pošta"/>
+  <tab id="Multistore" name="Lanac prodavnica"/>
+  <tab id="CSV_Import" name="CSV Uvoz"/>
+  <tab id="DB_Backup" name="DB rezervna kopija"/>
+  <tab id="SQL_Manager" name="SQL Manager"/>
+  <tab id="Logs" name="Zapisi"/>
+  <tab id="Webservice" name="Veb servis"/>
+  <tab id="Preferences_1" name="Postavke"/>
+  <tab id="Quick_Access" name="Brzi pristup"/>
+  <tab id="Employees" name="Zaposleni"/>
+  <tab id="Profiles" name="Profili"/>
+  <tab id="Permissions" name="Dozvole"/>
+  <tab id="Menus" name="Meniji"/>
+  <tab id="Stats_1" name="Statistika"/>
+  <tab id="Search_Engines" name="Pretraživači"/>
+  <tab id="Referrers" name="Preporuke"/>
+  <tab id="Warehouses" name="Magacini"/>
+  <tab id="Stock_Management" name="Upravljanje zalihama"/>
+  <tab id="Stock_Movement" name="Premeštanje zaliha"/>
+  <tab id="Instant_Stock_Status" name="Trenutno stanje zaliha"/>
+  <tab id="Stock_Coverage" name="Pokrivenost zalihama"/>
+  <tab id="Supply_orders" name="Snabdevanje narudžbina"/>
+  <tab id="Configuration" name="Konfiguracija"/>
+  <tab id="CarrierWizard" name="Dostavljač"/>
+</entity_tab>

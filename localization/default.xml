@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<localizationPack name="Default" version="1.0">
+	<currencies>
+		<currency name="Euro" iso_code="EUR" iso_code_num="978" sign="€" blank="1" conversion_rate="1.00" format="2" decimals="1" />
+		<currency name="Dollar" iso_code="USD" iso_code_num="840" sign="$" blank="0" conversion_rate="1.31153" format="1" decimals="1" />
+	</currencies>
+	<languages>
+		<language iso_code="en" />
+	</languages>
+
+	<units>
+		<unit type="weight" value="kg" />
+		<unit type="volume" value="L" />
+		<unit type="short_distance" value="cm" />
+		<unit type="base_distance" value="m" />
+		<unit type="long_distance" value="km" />
+	</units>
+</localizationPack>
+

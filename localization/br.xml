@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<localizationPack name="Brazil" version="1.0">
+	<currencies>
+		<currency name="Real" iso_code="BRL" iso_code_num="986" sign="R$" blank="1" conversion_rate="2.31583" format="3" decimals="1" />
+	</currencies>
+	<languages>
+		<language iso_code="br" />
+	</languages>
+	<taxes>
+		<tax id="1" name="IPI BR 12%" rate="12" />
+		<tax id="2" name="ICMS BR 25%" rate="25" />
+		<tax id="3" name="ISS BR 5%" rate="5" />
+
+		<taxRulesGroup name="BR ICMS (25%)">
+			<taxRule iso_code_country="br" id_tax="2" />
+		</taxRulesGroup>
+
+		<taxRulesGroup name="BR IPI (12%)">
+			<taxRule iso_code_country="br" id_tax="1" />
+		</taxRulesGroup>
+
+		<taxRulesGroup name="BR ISS (5%)">
+			<taxRule iso_code_country="br" id_tax="3" />
+		</taxRulesGroup>
+	</taxes>
+	<states>
+		<state name="Acre" iso_code="AC" country="BR" zone="South America" />
+		<state name="Alagoas" iso_code="AL" country="BR" zone="South America" />
+		<state name="Amapá" iso_code="AP" country="BR" zone="South America" />
+		<state name="Amazonas" iso_code="AM" country="BR" zone="South America" />
+		<state name="Bahia" iso_code="BA" country="BR" zone="South America" />
+		<state name="Ceará" iso_code="CE" country="BR" zone="South America" />
+		<state name="Distrito Federal" iso_code="DF" country="BR" zone="South America" />
+		<state name="Espírito Santo" iso_code="ES" country="BR" zone="South America" />
+		<state name="Goiás" iso_code="GO" country="BR" zone="South America" />
+		<state name="Maranhão" iso_code="MA" country="BR" zone="South America" />
+		<state name="Mato Grosso" iso_code="MT" country="BR" zone="South America" />
+		<state name="Mato Grosso do Sul" iso_code="MS" country="BR" zone="South America" />
+		<state name="Minas Gerais" iso_code="MG" country="BR" zone="South America" />
+		<state name="Pará" iso_code="PA" country="BR" zone="South America" />
+		<state name="Paraíba" iso_code="PB" country="BR" zone="South America" />
+		<state name="Paraná" iso_code="PR" country="BR" zone="South America" />
+		<state name="Pernambuco" iso_code="PE" country="BR" zone="South America" />
+		<state name="Piauí" iso_code="PI" country="BR" zone="South America" />
+		<state name="Rio de Janeiro" iso_code="RJ" country="BR" zone="South America" />
+		<state name="Rio Grande do Norte" iso_code="RN" country="BR" zone="South America" />
+		<state name="Rio Grande do Sul" iso_code="RS" country="BR" zone="South America" />
+		<state name="Rondônia" iso_code="RO" country="BR" zone="South America" />
+		<state name="Roraima" iso_code="RR" country="BR" zone="South America" />
+		<state name="Santa Catarina" iso_code="SC" country="BR" zone="South America" />
+		<state name="São Paulo" iso_code="SP" country="BR" zone="South America" />
+		<state name="Sergipe" iso_code="SE" country="BR" zone="South America" />
+		<state name="Tocantins" iso_code="TO" country="BR" zone="South America" />
+	</states>
+	<units>
+		<unit type="weight" value="kg" />
+		<unit type="volume" value="L" />
+		<unit type="short_distance" value="cm" />
+		<unit type="base_distance" value="m" />
+		<unit type="long_distance" value="km" />
+	</units>
+</localizationPack>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity_supply_order_state>
+  <supply_order_state id="supply_order_state_1">
+    <name>1 - יצירה בתהליך</name>
+  </supply_order_state>
+  <supply_order_state id="supply_order_state_2">
+    <name>2 - הזמנה אומתה</name>
+  </supply_order_state>
+  <supply_order_state id="supply_order_state_3">
+    <name>3 - בהמתנה לקבלה</name>
+  </supply_order_state>
+  <supply_order_state id="supply_order_state_4">
+    <name>4 - הזמנה התקבלה באופן חלקי</name>
+  </supply_order_state>
+  <supply_order_state id="supply_order_state_5">
+    <name>5 - הזמנה התקבלה בשלמותה</name>
+  </supply_order_state>
+  <supply_order_state id="supply_order_state_6">
+    <name>6 - הזמנה בוטלה</name>
+  </supply_order_state>
+</entity_supply_order_state>

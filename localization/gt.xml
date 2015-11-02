@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<localizationPack name="Guatemala" version="1.0">
+	<currencies>
+		<currency name="Quetzal" iso_code="GTQ" iso_code_num="320" sign="Q" blank="1" conversion_rate="11.0988" format="2" decimals="1" />
+	</currencies>
+	<languages>
+		<language iso_code="es" />
+	</languages>
+	<taxes>
+		<tax id="1" name="IVA GT 12%" rate="12" />
+		
+		<taxRulesGroup name="GT Standard Rate (12%)">
+			<taxRule iso_code_country="gt" id_tax="1" />
+		</taxRulesGroup>
+	</taxes>
+	<units>
+		<unit type="weight" value="kg" />
+		<unit type="volume" value="L" />
+		<unit type="short_distance" value="in" />
+		<unit type="base_distance" value="ft" />
+		<unit type="long_distance" value="mi" />
+	</units>
+</localizationPack>

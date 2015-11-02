@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<entity_category_group>
+  <fields primary="id_category, id_group" sql="a.id_category = 1">
+    <field name="id_category" relation="category"/>
+    <field name="id_group" relation="group"/>
+  </fields>
+  <entities>
+    <category_group id="category_group_1_1" id_category="Home" id_group="Visitor"/>
+    <category_group id="category_group_1_2" id_category="Home" id_group="Guest"/>
+    <category_group id="category_group_1_3" id_category="Home" id_group="Customer"/>
+  </entities>
+</entity_category_group>

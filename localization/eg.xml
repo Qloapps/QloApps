@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<localizationPack name="Egypt" version="1.0">
+	<currencies>
+		<currency name="Pound" iso_code="EGP" iso_code_num="818" sign="£" blank="1" conversion_rate="7.77518" format="1" decimals="1" />
+	</currencies>
+	<languages>
+		<language iso_code="ar" />
+	</languages>
+	<taxes>
+		<tax id="1" name="VAT EG 10%" rate="10" />
+		<tax id="2" name="VAT EG 15%" rate="15" />
+		
+		<taxRulesGroup name="EG Standard Rate (10%)">
+			<taxRule iso_code_country="eg" id_tax="1" />
+		</taxRulesGroup>
+        
+        <taxRulesGroup name="EG Communication Services (15%)">
+			<taxRule iso_code_country="eg" id_tax="2" />
+		</taxRulesGroup>
+	</taxes>
+	<units>
+		<unit type="weight" value="kg" />
+		<unit type="volume" value="L" />
+		<unit type="short_distance" value="in" />
+		<unit type="base_distance" value="ft" />
+		<unit type="long_distance" value="mi" />
+	</units>
+</localizationPack>

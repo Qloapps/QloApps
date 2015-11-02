@@ -1,0 +1,103 @@
+.layered_filter_cont
+{
+	border: 1px solid #CCCCCC;
+	background-color: #F2F2F2;
+	margin-top: 20px;
+}
+
+.layered_filter_cont div.layered_filter_heading
+{
+	background-color: #404040;
+	padding: 10px;
+}
+.layered_filter_cont div.layered_filter_heading span
+{
+	font-size: 16px;
+	color: #FFFFFF;
+	font-weight: 700; 
+}
+
+.lf_sub_cont
+{
+	padding: 10px;
+	max-height: 200px;
+    overflow-y: auto;
+}
+
+.layered_filt
+{
+	margin-bottom: 5px;
+}
+
+.ratting_img_style
+{
+    height: 19px;
+    width: 105px;
+    transform:translate(0px, 8px);
+}
+.ratting_5
+{
+    background-position: 106px 94px;
+}
+.ratting_4
+{
+	background-position: 106px 74px;
+}
+.ratting_3
+{
+	background-position: 106px 55px;
+}
+.ratting_2
+{
+	background-position: 106px 36px;
+}
+.ratting_1
+{
+	background-position: 106px 19px;
+}
+
+.filters_name, .price_filter_subcont span
+{
+	font-size: 14px;
+	color: #8D8D8D;
+	font-weight: 700;
+}
+
+.layered_filt div.checker
+{
+	display: inline-block;
+}
+
+.layered_filt span.filters_name, .layered_filt span.ratting_img_style
+{
+	display: inline-block;
+}
+
+#filter_price_silder
+{
+	margin-top: 15px;
+}
+
+#filter_price_silder .ui-slider-range
+{
+	background-color: #bf9958;
+    background-image: none;
+}
+
+#filter_price_silder .ui-slider-handle
+{
+	background-color: #FFFFFF;
+    background-image: none;
+    border-color: #bebbbb;
+    border-radius: 50%;
+    outline: none;
+}
+
+.clear_filter
+{
+	cursor: pointer;
+	color: #a9a9a9 !important;
+    font-size: 12px !important;
+    font-weight: normal !important;
+    text-decoration: underline;
+}

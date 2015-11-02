@@ -1,0 +1,500 @@
+$widthSidebarNav: 210px
+$widthSidebarSubmenu: 200px
+$menu-item-size: 34px
+$min-height: 850px
+
+#nav-sidebar
+	position: fixed
+	width: $widthSidebarNav
+	height: 100%
+	z-index: 500
+	background-color: $main-color
+	@include left(0)
+	ul.menu
+		margin: 0
+		padding: 0
+		list-style: none !important
+		li.searchtab
+			padding: 14px 7px
+			height: 55px
+			position: relative
+			background-color: $main-color
+			#bo_query
+				@include border-radius(0, 55px, 55px, 0)
+				color: $main-color
+				background-color: white
+				border: 1px solid transparent !important
+				@include box-shadow(none)
+				@include transition(none)
+			.input-group-btn
+				@include border-radius(55px, 0, 0, 55px)
+				.btn
+					@include border-radius(55px, 0, 0, 55px)
+					@include box-shadow(none)
+				.btn-default
+					@include box-shadow(none)
+					border: 1px solid transparent !important
+			.form-group.focus-search
+				position: absolute
+				width: 400px
+				height: 55px
+				z-index: 900
+				top: 0
+				background-color: $main-color
+				@include left(0)
+				@include padding(14px, 13px, 0, 7px)
+				#bo_query
+					width: 100%
+				.input-group-btn
+					@include border-radius(55px, 0, 0, 55px)
+					.btn
+						@include border-radius(55px, 0, 0, 55px)
+						@include box-shadow(none)
+					.btn-default
+						@include box-shadow(none)
+			.clear_search
+				position: absolute
+				top: 6px
+				z-index: 10
+				@include right(8px)
+			i
+				font-size: $icon-size-base
+		li.maintab
+			position: relative
+			ul.submenu
+				display: none
+				padding: 0px
+				background-color: #363A41
+				li
+					list-style: none !important
+					a
+						color: $sidebar-menu-color
+						display: block
+						padding: 4px 8px
+						@media (min-height: $min-height)
+							padding: 8px 8px
+							min-height: 34px
+						background-color: $main-color
+						&:hover
+							color: $sidebar-menu-hover-color
+							text-decoration: none
+							background-color: $sidebar-menu-bg-hover-color
+			a
+				white-space: nowrap
+				text-overflow: ellipsis
+				overflow: hidden
+			> a.title
+				display: block
+				position: relative
+				padding: 0 .35em
+				height: $menu-item-size
+				background-color: $main-color
+				color: $sidebar-menu-color
+				line-height: $menu-item-size
+				text-decoration: none
+				@include transition-property(background-color)
+				@include transition-duration(0.2s)
+				@include transition-timing-function(ease-out)
+				i
+					vertical-align: middle
+					margin-top: -5px
+					color: $sidebar-menu-color
+					@include transition-property(color)
+					@include transition-duration(0.4s)
+					@include transition-timing-function(ease-out)
+				span
+					padding-left: 10px
+			&.hover, &:hover:not(.hover)
+				> a.title
+					color: $sidebar-menu-hover-color
+					background-color: $sidebar-menu-bg-hover-color
+					i
+						color: $sidebar-menu-hover-color
+			&.hover:not(.active)
+				&:before
+					content: ''
+					width: 0
+					height: 0
+					border-style: solid
+					border-width: 8px 10px 8px 0
+					border-color: transparent $main-color transparent transparent
+					background-color: transparent
+					margin-top: 6px
+					@media (min-height: $min-height)
+						margin-top: 10px
+					position: absolute
+					z-index: 1
+					right: 0
+			&.hover
+				ul.submenu
+					position: absolute
+					display: block
+					width: $widthSidebarSubmenu
+					top: 0
+					z-index: 600
+					@include left($widthSidebarNav)
+			&:last-child > a.title
+				border-bottom: none
+			&.active
+				a, li.active a
+					color: $sidebar-menu-active-color
+					&.title
+						border-right: 3px solid #fff
+						background-color: $sidebar-menu-bg-hover-color
+					i
+						color: $sidebar-menu-active-color
+				@media (min-height: $min-height)
+					ul.submenu
+						body:not(.page-sidebar-closed) &
+							display: block
+							margin-left: 35px
+							@include border-left(1px solid $sidebar-menu-bg-hover-color)
+							a
+								color: $sidebar-menu-color
+								padding: 8px 8px
+								&:hover
+									color: $sidebar-menu-hover-color
+									background-color: $sidebar-menu-bg-hover-color
+									text-decoration: none
+							li.active a
+								color: $sidebar-menu-active-color
+								position: relative
+
+	@media (max-width: $screen-phone)
+		display: none
+
+@media (max-height: $min-height)
+	body:not(.page-sidebar-closed)
+		#nav-sidebar ul.menu li.maintab > a.title
+			font-size: 12px
+			height: 28px
+			line-height: 28px
+			i
+				vertical-align: baseline
+				width: 18px
+				font-size: $icon-size-base
+				@include text-align(right)
+		#nav-sidebar ul.menu li.maintab ul.submenu
+			@include padding(1px, 1px, 0, 1px)
+			li a
+				padding: 0 6px
+				height: 27px
+				line-height: 27px
+		#nav-sidebar ul.menu li.maintab.active ul.submenu
+			display: none
+		#nav-sidebar ul.menu li.maintab.active.hover ul.submenu
+			position: absolute
+			display: block
+			width: 200px
+			z-index: 600
+			@include left($widthSidebarNav)
+			top: 0
+
+.page-sidebar
+	#content
+		@include margin-left($widthSidebarNav)
+
+.page-sidebar-closed
+	#nav-sidebar
+		overflow: visible
+		width: 50px
+		ul.submenu
+			display: none!important
+			position: relative
+			top: $menu-item-size
+			padding-top: 0!important
+		li.searchtab
+			color: rgba(white,.5)
+			&:hover
+				cursor: pointer
+				color: white
+			&.search-expanded
+				width: 400px
+				background-color: darken($main-color,5%)
+				@include padding(14px, 13px, 0, 7px)
+				&:before
+					display: none
+				form .form-group
+					display: block
+		li.maintab.active ul.submenu
+			border: none!important
+		a.title
+			text-align: center
+			> span
+				display: none
+		> ul > li.maintab:hover
+			width: 250px!important
+			position: relative
+			z-index: 500
+			a.title
+				@include text-align(left)
+				> span
+					display: inline-block
+			ul.submenu
+				position: absolute!important
+				display: block!important
+				top: $menu-item-size!important
+				width: 200px!important
+				@include rtl
+					right: 50px
+				@include ltr
+					left: 50px
+	#content
+		@include margin-left(55px)
+		@media (max-width: $screen-phone)
+			@include margin-left(0)
+	.submenu_expand
+		display: none
+
+#nav-topbar
+	position: fixed
+	height: 30px
+	top: 36px
+	width: 100%
+	z-index: 600
+	background-color: white
+	border: solid 1px white
+	@include padding(0, 40px, 0, 0)
+	ul.menu
+		margin: 0
+		padding: 0
+		display: block
+		list-style: none
+		li.maintab
+			border-right: solid 1px #E6E6E6
+		li.maintab:last-child
+			border: none
+		li.searchtab
+			width: 200px
+			@include margin-right(5px)
+			@include float(right)
+		li.maintab, li.subtab
+			height: 28px
+			padding: 0
+			margin: 0
+			list-style: none
+			position: relative
+			@include float(left)
+			> a
+				display: block
+				line-height: 27px
+				color: lighten($main-color,20%)
+				padding: 0 6px
+				margin: 0
+				font-size: 12px
+				i
+					margin: 0
+					width: 15px
+					color: lighten($main-color,10%)
+					background-color: transparent
+					font-size: 14px
+			&.active, &:hover
+				background-color: $brand-primary
+				> a
+					text-decoration: none
+					color: contrast-color($main-color, white, #333)
+					i
+						color: white
+
+		li.expanded > ul.submenu
+			display: block
+		ul.submenu
+			background-color: white
+			display: none
+			position: absolute
+			margin: 0
+			padding: 0
+			@include left(0)
+			top: 28px
+			width: 200px!important
+			@include box-shadow(rgba(black,0.3) 0 2px 4px)
+			> li
+				width: 200px
+				padding: 0
+				list-style: none
+				&:last-child > a
+					border: none
+				> a
+					display: block
+					@include padding(4px, 5px, 4px, 10px)
+					border-bottom: solid 1px #E6E6E6
+					&:hover
+						color: white
+						background-color: $brand-primary
+						text-decoration: none
+				&.active a
+					color: contrast-color($brand-primary, white, #333)
+					background-color: $brand-primary
+					border-bottom: solid 1px darken($brand-primary,10%)
+	#ellipsistab
+		display: block
+		width: 40px
+		height: 28px
+		padding: 0
+		margin: 0
+		position: absolute
+		@include right(0)
+		> a
+			text-align: center
+			font-size: 14px
+			line-height: 30px
+			color: $main-color
+			cursor: pointer
+		ul#ellipsis_submenu
+			@include right(0)
+			left: inherit
+			a.title
+				padding: 0 8px
+				@include text-align(left)
+			li.subtab.expanded > ul
+				top: 0
+				@include left(-200px)
+	.menu-collapse
+		display: none
+
+#nav-mobile
+	position: fixed
+	top: 0
+	width: 35px
+	height: 35px
+	z-index: 1100
+	@include left(0)
+	&.expanded
+		width: 100%
+		height: 100%
+		top: 35px
+		.menu-collapse
+			top: -35px
+			position: absolute
+			z-index: 1200
+			@include left(0)
+	ul.menu
+		position: absolute
+		display: none
+		width: 100%
+		height: 100%
+		background-color: rgba(black,0.8)
+		padding: 0
+		border-top: 1px black solid
+		list-style: none
+		@include margin(0, 0, 100px, 0)
+		@include transition(all 0.35s ease-out)
+		@include animate(fadeInLeft, 0.3s)
+		> li.searchtab
+			padding: 15px
+			position: relative
+			@include box-shadow(rgba(black,0.1) 0 -3px 0 0 inset)
+			#bo_query
+				color: $main-color
+				background-color: lighten($main-color,60%)
+			.form-group
+				margin: 0
+			.clear_search
+				position: absolute
+				top: 5px
+				@include right(5px)
+		> li
+			background: $main-color
+			position: relative
+			> a
+				display: block
+				height: $menu-item-size
+				line-height: $menu-item-size
+				position: relative
+				border-bottom: 1px solid darken($main-color,10%)
+				font-size: 12px
+				color: mix($main-color, contrast-color($main-color, white, #333), 30%)
+				background-color: $main-color
+				text-transform: uppercase
+				text-decoration: none
+				@include padding(0, 0, 0, 10px)
+				@include transition-property(background-color)
+				@include transition-duration(0.4s)
+				@include transition-timing-function(ease-out)
+				i
+					color: rgba(white,.6)
+					vertical-align: middle
+					@include transition-property(color)
+					@include transition-duration(0.4s)
+					@include transition-timing-function(ease-out)
+				&:hover
+					background-color: lighten($main-color,10%)
+					color: white
+					i
+						color: white
+			> a > i
+				display: inline-block
+				height: $menu-item-size
+				width: $menu-item-size
+				font-size: 20px
+				line-height: $menu-item-size
+				color: white
+				text-align: center
+	ul.submenu
+		display: none
+	#nav-mobile-submenu
+		a:not(#nav-mobile-submenu-back)
+			font-size: 1.2em
+			text-transform: none
+			@include padding-left(50px)
+	a#nav-mobile-submenu-back
+		background-color: darken($main-color,5%)
+		font-size: 1.5em
+	ul.menu.menu-close
+		@include animate(fadeOutLeft, 0.2s)
+	.menu-collapse
+		color: white
+		background-color: black
+		width: 35px
+		height: 35px
+		text-align: center
+		line-height: 1.3em
+
+.menu-collapse
+	cursor: pointer
+	height: 54px
+	width: 100%
+	font-size: 2em
+	text-align: center
+	line-height: 55px
+	display: block
+	color: #BEBEBE
+
+.mobile-nav
+	#content
+		h2.page-title
+			@include padding-left(10px!important)
+		h4.page-subtitle
+			@include left(10px!important)
+		ul.page-breadcrumb
+			@include left(10px!important)
+
+.page-topbar:not(.mobile-nav)
+	#main
+		padding-top: 64px
+	#content
+		@include margin-left(0)
+		.page-head
+			top: 66px
+		.page-title
+			@include padding-left(75px)
+		.page-subtitle
+			@include left(75px)
+		.page-breadcrumb
+			@include left(75px)
+
+.page-sidebar-closed:not(.nav-topbar):not(.mobile-nav)
+	.searchtab
+		&:before
+			z-index: 1000
+			position: absolute
+			top: 16px
+			display: block
+			width: 28px
+			height: 28px
+			@include left(14px)
+			@extend .icon
+			@extend .icon-2x
+			@extend .icon-search
+		.form-group
+			display: none

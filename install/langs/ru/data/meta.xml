@@ -1,0 +1,159 @@
+<?xml version="1.0"?>
+<entity_meta>
+  <meta id="404" id_shop="1">
+    <title> Ошибка 404</title>
+    <description>Эта страница не может быть найдена</description>
+    <keywords>ошибка, 404,не найдена</keywords>
+    <url_rewrite>page-not-found</url_rewrite>
+  </meta>
+  <meta id="best-sales" id_shop="1">
+    <title>Лидеры продаж</title>
+    <description>Наши лидеры продаж</description>
+    <keywords>лидеры продаж</keywords>
+    <url_rewrite>best-sales</url_rewrite>
+  </meta>
+  <meta id="contact" id_shop="1">
+    <title>Cвяжитесь с нами</title>
+    <description>Используйте нашу контактнвю форму, чтобы связаться с нами</description>
+    <keywords>контакты, связаться с нами, e-mail</keywords>
+    <url_rewrite>contact-us</url_rewrite>
+  </meta>
+  <meta id="index" id_shop="1">
+    <title/>
+    <description>Магазин создан на PrestaShop</description>
+    <keywords>магазин, prestashop</keywords>
+    <url_rewrite/>
+  </meta>
+  <meta id="manufacturer" id_shop="1">
+    <title>Произволители</title>
+    <description>Список производителей</description>
+    <keywords>производители</keywords>
+    <url_rewrite>manufacturers</url_rewrite>
+  </meta>
+  <meta id="new-products" id_shop="1">
+    <title>Новинки</title>
+    <description>Наши новинки</description>
+    <keywords>новинки</keywords>
+    <url_rewrite>new-products</url_rewrite>
+  </meta>
+  <meta id="password" id_shop="1">
+    <title>Забыли свой пароль?</title>
+    <description>Введите адрес электронной почты, использованный при регистрации, и мы отправим на него ваш логин и новый пароль</description>
+    <keywords>забыли пароль, e-mail, новый пароль,восстановить пароль</keywords>
+    <url_rewrite>password-recovery</url_rewrite>
+  </meta>
+  <meta id="prices-drop" id_shop="1">
+    <title>Снижение цен</title>
+    <description>Наши скидки</description>
+    <keywords>снижение цен, распродажи</keywords>
+    <url_rewrite>prices-drop</url_rewrite>
+  </meta>
+  <meta id="sitemap" id_shop="1">
+    <title>Карта сайта</title>
+    <description>Потерялись? Найдите то, что ищете</description>
+    <keywords>карта сайта</keywords>
+    <url_rewrite>sitemap</url_rewrite>
+  </meta>
+  <meta id="supplier" id_shop="1">
+    <title>Поставщики</title>
+    <description>Список поставщиков</description>
+    <keywords>поставщик</keywords>
+    <url_rewrite>supplier</url_rewrite>
+  </meta>
+  <meta id="address" id_shop="1">
+    <title>Адрес</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>address</url_rewrite>
+  </meta>
+  <meta id="addresses" id_shop="1">
+    <title>Адреса</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>addresses</url_rewrite>
+  </meta>
+  <meta id="authentication" id_shop="1">
+    <title>Аутентификация</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>authentication</url_rewrite>
+  </meta>
+  <meta id="cart" id_shop="1">
+    <title>Торговые точки</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>cart</url_rewrite>
+  </meta>
+  <meta id="discount" id_shop="1">
+    <title>Скидки</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>discount</url_rewrite>
+  </meta>
+  <meta id="history" id_shop="1">
+    <title>История заказа</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>order-history</url_rewrite>
+  </meta>
+  <meta id="identity" id_shop="1">
+    <title>Идентификация</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>identity</url_rewrite>
+  </meta>
+  <meta id="my-account" id_shop="1">
+    <title>Мой аккаунт</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>my-account</url_rewrite>
+  </meta>
+  <meta id="order-follow" id_shop="1">
+    <title>Отслеживание заказа</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>order-follow</url_rewrite>
+  </meta>
+  <meta id="order-slip" id_shop="1">
+    <title>Бланк заказа</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>order-slip</url_rewrite>
+  </meta>
+  <meta id="order" id_shop="1">
+    <title>Заказ</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>order</url_rewrite>
+  </meta>
+  <meta id="search" id_shop="1">
+    <title>Поиск</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>search</url_rewrite>
+  </meta>
+  <meta id="stores" id_shop="1">
+    <title>Магазины</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>stores</url_rewrite>
+  </meta>
+  <meta id="order-opc" id_shop="1">
+    <title>Быстрый заказ</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>quick-order</url_rewrite>
+  </meta>
+  <meta id="guest-tracking" id_shop="1">
+    <title>Отслеживание посещений</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>guest-tracking</url_rewrite>
+  </meta>
+  <meta id="products-comparison" id_shop="1">
+    <title>Products Comparison</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>products-comparison</url_rewrite>
+  </meta>
+</entity_meta>

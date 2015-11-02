@@ -1,0 +1,358 @@
+// Typography
+// -------------------------
+$rtl-font-family-sans-serif: "Helvetica Neue", Helvetica, Arial, sans-serif
+$rtl-font-family-serif: Georgia, "Times New Roman", Times, serif
+$rtl-font-family-base: $rtl-font-family-sans-serif
+$rtl-headings-font-family: $rtl-font-family-base
+
+body
+	direction: rtl
+	font-family: $rtl-font-family-base
+
+// Headings
+// -------------------------
+h1, h2, h3, h4, h5, h6,
+.h1, .h2, .h3, .h4, .h5, .h6
+	font-family: $rtl-headings-font-family
+
+// Brand/project name
+.navbar-brand
+	float: right
+	@media (min-width: $grid-float-breakpoint)
+		.navbar > .container &
+			margin-right: -$navbar-padding-horizontal
+			margin-left: 0
+
+// Navbar heading
+//
+// Groups `.navbar-brand` and `.navbar-toggle` into a single component for easy
+// styling of responsive aspects.
+.navbar-header
+	@media (min-width: $grid-float-breakpoint)
+		float: right
+
+// Navbar toggle
+//
+// Custom button for toggling the `.navbar-collapse`, powered by the collapse
+// JavaScript plugin.
+
+.navbar-toggle
+	float: left
+	margin-left: $navbar-padding-horizontal
+
+.navbar-collapse
+	@media (min-width: $grid-float-breakpoint)
+		width: auto
+		border-top: 0
+		box-shadow: none
+		.navbar-nav.navbar-right:last-child
+			margin-right: 0
+
+// Navbar form
+//
+// Extension of the `.form-inline` with some extra flavor for optimum display in
+// our navbars.
+
+.navbar-form
+	margin-left: -$navbar-padding-horizontal
+	margin-right: -$navbar-padding-horizontal
+
+// Text in navbars
+//
+// Add a class to make any element properly align itself vertically within the navbars.
+
+.navbar-text
+	float: right
+	@media (min-width: $grid-float-breakpoint)
+		margin-left: $navbar-padding-horizontal
+		margin-right: $navbar-padding-horizontal
+
+// Navbar nav links
+//
+// Builds on top of the `.nav` components with it's own modifier class to make
+// the nav the full height of the horizontal nav (above 768px).
+
+.navbar-nav
+	@media (max-width: $screen-xs-max)
+		// Dropdowns get custom display when collapsed
+		.open .dropdown-menu
+			> li > a,
+			.dropdown-header
+				padding: 5px 25px 5px 15px
+
+	// Uncollapse the nav
+	@media (min-width: $grid-float-breakpoint)
+		float: right
+		> li
+			float: right
+
+.nav-justified
+	width: 100%
+	> li
+		float: none
+		> a
+			text-align: center
+			margin-bottom: 5px
+
+	@media (min-width: $screen-sm-min)
+		> li
+			display: table-cell
+			width: 1%
+			> a
+				margin-bottom: 0
+
+// Tabs
+// -------------------------
+
+// Give the tabs something to sit on
+.nav-tabs
+	border-bottom: 1px solid $nav-tabs-border-color
+	> li
+		float: right
+		// Make the list-items overlay the bottom border
+		margin-bottom: -1px
+
+		// Actual tabs (as links)
+		> a
+			margin-right: -2px
+			border-radius: $border-radius-base $border-radius-base 0 0
+
+	// pulling this in mainly for less shorthand
+	&.nav-justified 
+		@extend .nav-justified
+		@extend .nav-tabs-justified
+
+.nav-tabs-justified
+	> li > a
+		// Override margin from .nav-tabs
+		margin-left: 0
+	@media (min-width: $screen-sm-min)
+		> li > a
+			border-radius: $border-radius-base $border-radius-base 0 0
+			color:blue
+
+// progress-bar
+// Bar of progress
+.progress-bar
+	float: right
+
+// Alerts
+
+// Dismissable alerts
+//
+// Expand the right padding and account for the close button's positioning.
+
+.alert-dismissable
+	// Adjust close link position
+	.close
+		font-family: $font-family-base
+		top: -2px
+		left: 21px
+		right: 0px
+
+//
+// Close icons
+// --------------------------------------------------
+
+.close
+	font-family: $font-family-base
+	float: left
+
+//
+// Dropdown menus
+// --------------------------------------------------
+
+
+// Dropdown arrow/caret
+.caret
+	margin-right: 2px
+
+// The dropdown menu (ul)
+.dropdown-menu
+	right: 0
+	float: left
+	left: auto
+
+	// Aligns the dropdown menu to left
+	&.pull-left
+		left: 0
+		float: right
+		right: auto
+
+// Left aligned dropdowns
+.pull-left > .dropdown-menu
+	left: 0
+	float: right
+	right: auto
+
+// Right aligned menus need alt position
+.navbar-nav.pull-left > li > .dropdown-menu,
+.navbar-nav > li > .dropdown-menu.pull-left
+	right: auto
+	left: 0
+
+// Justified navbar
+.nav-tabs-justified
+	> li > a
+		margin-left: 0
+
+// Give the tabs something to sit on
+.nav-tabs
+	> li
+		float: right
+		// Actual tabs (as links)
+		> a
+			margin-left: 2px
+
+// Pills
+// -------------------------
+.nav-pills
+	> li
+		float: right
+		// Links rendered as pills
+		> a
+			border-radius: $nav-pills-border-radius
+		+ li
+			margin-right: 2px
+			margin-left: 0px
+
+// Stacked pills
+.nav-stacked
+	> li
+		float: none
+		+ li
+			margin-right: 0 // no need for this gap between nav items
+
+// Base nav class
+
+.nav
+	padding-right: 0 // Override default ul/ol
+
+
+// Justified nav links
+// -------------------------
+
+.nav-tabs.nav-justified,
+.nav-pills.nav-justified
+	width: 100%
+	> li
+		float: none!important
+		> a
+			text-align: center
+			margin-bottom: 5px
+
+	> .dropdown .dropdown-menu
+		top: auto
+		left: auto
+
+	@media (min-width: $screen-sm-min)
+		> li
+			display: table-cell
+			width: 1%
+			> a
+				margin-bottom: 0
+
+.nav-tabs.nav-justified > li > a
+	color: $link-color
+
+
+// Reverse input group round corners in RTL
+
+// Reset rounded corners
+.input-group .form-control:first-child,
+.input-group-addon:first-child,
+.input-group-btn:first-child > .btn,
+.input-group-btn:first-child > .dropdown-toggle,
+.input-group-btn:last-child > .btn:not(:last-child):not(.dropdown-toggle)
+	@include border-right-radius($border-radius-base)
+	@include border-left-radius(0)
+
+.input-group-addon:first-child
+	border-right: 1px solid $input-group-addon-border-color
+	border-left: 0px
+
+.input-group .form-control:last-child,
+.input-group-addon:last-child,
+.input-group-btn:last-child > .btn,
+.input-group-btn:last-child > .dropdown-toggle,
+.input-group-btn:first-child > .btn:not(:first-child)
+	@include border-left-radius($border-radius-base)
+	@include border-right-radius(0)
+
+.input-group-addon:last-child
+	border-left: 1px solid $input-group-addon-border-color
+	border-right: 0px
+
+// Button input groups
+// -------------------------
+.input-group-btn
+	// Negative margin to only have a 1px border between the two
+	&:first-child > .btn
+		margin-left: -1px
+	&:last-child > .btn
+		margin-right: -1px
+
+.input-group-btn > .btn
+	position: relative
+	// Jankily prevent input button groups from wrapping
+	+ .btn
+		margin-right: -4px
+	// Bring the "active" button to the front
+	&:hover,
+	&:active
+		z-index: 2
+
+.radio,
+.checkbox
+	padding-right: 20px
+
+.radio input[type="radio"],
+.radio-inline input[type="radio"],
+.checkbox input[type="checkbox"],
+.checkbox-inline input[type="checkbox"]
+	float: right
+	margin-right: -20px
+
+.radio-inline + .radio-inline,
+.checkbox-inline + .checkbox-inline
+	margin-right: 10px // space out consecutive inline controls
+
+.form-inline
+	// Remove default margin on radios/checkboxes that were used for stacking, and
+	// then undo the floating of radios and checkboxes to match (which also avoids
+	// a bug in WebKit: https://github.com/twbs/bootstrap/issues/1969).
+	.radio,
+	.checkbox
+		padding-right: 0
+	.radio input[type="radio"],
+	.checkbox input[type="checkbox"]
+		margin-right: 0
+
+// Horizontal forms
+//
+.form-horizontal
+	// Only right align form labels here when the columns stop stacking
+	@media (min-width: $screen-sm-min)
+		.control-label
+			text-align: left
+
+// Popovers
+// -------------------------
+.popover.top, 
+.popover.bottom
+	direction:ltr
+
+.popover.top .popover-title, 
+.popover.top .popover-content,
+.popover.bottom .popover-title, 
+.popover.bottom .popover-content
+	direction: rtl
+	text-align: right
+
+// Tables
+// -----------------
+th
+	text-align: right
+
+.list-group
+	padding-right: 0

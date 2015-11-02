@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity_feature>
+  <fields id="name" class="Feature">
+    <field name="position"/>
+  </fields>
+  <entities>
+    <feature id="Height" position="0"/>
+    <feature id="Width" position="1"/>
+    <feature id="Depth" position="2"/>
+    <feature id="Weight" position="3"/>
+    <feature id="Compositions" position="4"/>
+    <feature id="Styles" position="5"/>
+    <feature id="Properties" position="6"/>
+  </entities>
+</entity_feature>

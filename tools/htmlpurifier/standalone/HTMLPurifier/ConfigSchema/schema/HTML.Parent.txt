@@ -1,0 +1,12 @@
+HTML.Parent
+TYPE: string
+VERSION: 1.3.0
+DEFAULT: 'div'
+--DESCRIPTION--
+
+<p>
+    String name of element that HTML fragment passed to library will be
+    inserted in.  An interesting variation would be using span as the
+    parent element, meaning that only inline tags would be allowed.
+</p>
+--# vim: et sw=4 sts=4

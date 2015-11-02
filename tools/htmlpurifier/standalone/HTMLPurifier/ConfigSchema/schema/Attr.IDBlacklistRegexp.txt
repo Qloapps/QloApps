@@ -1,0 +1,9 @@
+Attr.IDBlacklistRegexp
+TYPE: string/null
+VERSION: 1.6.0
+DEFAULT: NULL
+--DESCRIPTION--
+PCRE regular expression to be matched against all IDs. If the expression is
+matches, the ID is rejected. Use this with care: may cause significant
+degradation. ID matching is done after all other validation.
+--# vim: et sw=4 sts=4

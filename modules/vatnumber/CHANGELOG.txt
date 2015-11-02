@@ -1,0 +1,7 @@
+2014-04-18 17:05:53 +0200	// update version for release
+2014-04-18 16:55:22 +0200	[-] Fix retrocompat PrestaShop 1.5
+2014-04-17 11:40:40 +0200	Bug fix (PS 1.5): ps_version_compliancy removed
+2014-03-25 11:47:05 +0100	Merge branch 'master' of https://github.com/PrestaShop/vatnumber
+2014-03-24 16:07:23 +0100	// Typo.
+2014-03-24 15:23:12 +0100	/ MO vatnumber : ps_versions_compliancy added
+2014-03-20 14:41:47 +0100	Initial commit

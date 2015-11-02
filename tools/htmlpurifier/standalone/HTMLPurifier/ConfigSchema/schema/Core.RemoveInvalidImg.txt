@@ -1,0 +1,12 @@
+Core.RemoveInvalidImg
+TYPE: bool
+DEFAULT: true
+VERSION: 1.3.0
+--DESCRIPTION--
+
+<p>
+  This directive enables pre-emptive URI checking in <code>img</code>
+  tags, as the attribute validation strategy is not authorized to
+  remove elements from the document. Revert to pre-1.3.0 behavior by setting to false.
+</p>
+--# vim: et sw=4 sts=4

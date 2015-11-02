@@ -1,0 +1,19 @@
+HTML.AllowedAttributes
+TYPE: lookup/null
+VERSION: 1.3.0
+DEFAULT: NULL
+--DESCRIPTION--
+
+<p>
+    If HTML Purifier's attribute set is unsatisfactory, overload it!
+    The syntax is "tag.attr" or "*.attr" for the global attributes
+    (style, id, class, dir, lang, xml:lang).
+</p>
+<p>
+    <strong>Warning:</strong> If another directive conflicts with the
+    elements here, <em>that</em> directive will win and override. For
+    example, %HTML.EnableAttrID will take precedence over *.id in this
+    directive.  You must set that directive to true before you can use
+    IDs at all.
+</p>
+--# vim: et sw=4 sts=4

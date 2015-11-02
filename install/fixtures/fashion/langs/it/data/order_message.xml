@@ -1,0 +1,12 @@
+<?xml version='1.0'?>
+<entity_order_message>
+  <order_message id='Delay'>
+    <name>Ritardo</name>
+    <message>Buongiorno,
+
+purtroppo un articolo che hai ordinato è momentaneamente esaurito. Potrebbe pertanto verificarsi un leggero ritardo nella consegna.
+Scusandoci per l&apos;inconveniente, ti assicuriamo che stiamo facendo del nostro meglio per risolverlo.
+
+Cordiali saluti,</message>
+  </order_message>
+</entity_order_message>

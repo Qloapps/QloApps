@@ -1,0 +1,11 @@
+HTML.Attr.Name.UseCDATA
+TYPE: bool
+DEFAULT: false
+VERSION: 4.0.0
+--DESCRIPTION--
+The W3C specification DTD defines the name attribute to be CDATA, not ID, due
+to limitations of DTD.  In certain documents, this relaxed behavior is desired,
+whether it is to specify duplicate names, or to specify names that would be
+illegal IDs (for example, names that begin with a digit.) Set this configuration
+directive to true to use the relaxed parsing rules.
+--# vim: et sw=4 sts=4

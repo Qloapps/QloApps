@@ -1,0 +1,6 @@
+2014-04-22 18:58:15 +0200	// Changelog updated
+2014-04-16 14:41:07 +0200	// Add link for Total Subscriber
+2014-04-14 15:17:25 +0200	[-] MO : Dashactivity - Improvement #PSCSX-582
+2014-04-07 14:20:47 +0200	[-] MO : dashactivity - FixBug #PSCSX-1467 online user
+2014-03-24 15:21:03 +0100	/ MO dashactivity : ps_versions_compliancy added
+2014-03-20 14:32:23 +0100	Initial commit

@@ -1,0 +1,6 @@
+<?xml version='1.0'?>
+<entity_group>
+  <group id='Visitor' name='দর্শক '/>
+  <group id='Guest' name='অতিত্থি'/>
+  <group id='Customer' name='গ্রাহক '/>
+</entity_group>

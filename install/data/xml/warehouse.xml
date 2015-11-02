@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity_warehouse>
+  <fields id="name" class="Warehouse">
+    <field name="id_currency"/>
+    <field name="id_address" relation="address"/>
+    <field name="id_employee" relation="employee"/>
+    <field name="reference"/>
+    <field name="name"/>
+    <field name="management_type"/>
+  </fields>
+  <entities/>
+</entity_warehouse>

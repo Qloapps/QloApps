@@ -1,0 +1,8 @@
+Hallo {firstname} {lastname},
+ 
+Ihre persönlichen Login-Daten
+ 
+Kennwort: {passwd}
+E-Mail-Adresse: {email}
+ 
+{shop_name} powered with PrestaShop™

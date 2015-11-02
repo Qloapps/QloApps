@@ -1,0 +1,1 @@
+tinymce.PluginManager.add("colorpicker",function(e){function t(){e.focus(true);var t="Color Picker";win=e.windowManager.open({title:t,file:tinyMCE.baseURL+"/plugins/colorpicker/index.html?v1",width:570,height:240,inline:1,resizable:true,maximizable:true})}e.addButton("colorpicker",{image:tinyMCE.baseURL+"/plugins/colorpicker/color.png",tooltip:"Color Picker",onclick:t})})

@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<entity_contact>
+  <contact id="Webmaster" name="網站管理員">
+    <description>如果在網站發現了技術性問題</description>
+  </contact>
+  <contact id="Customer_service" name="客戶服務">
+    <description>任何關於產品、訂單的問題</description>
+  </contact>
+</entity_contact>

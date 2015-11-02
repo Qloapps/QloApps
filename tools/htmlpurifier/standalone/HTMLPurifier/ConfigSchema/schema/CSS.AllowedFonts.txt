@@ -1,0 +1,12 @@
+CSS.AllowedFonts
+TYPE: lookup/null
+VERSION: 4.3.0
+DEFAULT: NULL
+--DESCRIPTION--
+<p>
+    Allows you to manually specify a set of allowed fonts.  If
+    <code>NULL</code>, all fonts are allowed.  This directive
+    affects generic names (serif, sans-serif, monospace, cursive,
+    fantasy) as well as specific font families.
+</p>
+--# vim: et sw=4 sts=4

@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity_tab>
+  <tab id="Dashboard" name="Skydelis"/>
+  <tab id="CMS_Pages" name="TVS puslapiai"/>
+  <tab id="CMS_Categories" name="TVS kategorijos"/>
+  <tab id="Combinations_Generator" name="Kombinacijų generatorius"/>
+  <tab id="Search" name="Paieška"/>
+  <tab id="Login" name="Prisijungimas"/>
+  <tab id="Shops" name="Parduotuvės"/>
+  <tab id="Shop_URLs" name="Parduotuvių nuorodos"/>
+  <tab id="Catalog" name="Katalogas"/>
+  <tab id="Orders" name="Užsakymai"/>
+  <tab id="Customers" name="Klientai"/>
+  <tab id="Price_Rules" name="Kainos taisyklės"/>
+  <tab id="Shipping" name="Pristatymas"/>
+  <tab id="Localization" name="Lokalizacija"/>
+  <tab id="Modules" name="Moduliai"/>
+  <tab id="Preferences" name="Nustatymai"/>
+  <tab id="Advanced_Parameters" name="Išplėstiniai parametrai"/>
+  <tab id="Administration" name="Administracija"/>
+  <tab id="Stats" name="Statistika"/>
+  <tab id="Stock" name="Likutis"/>
+  <tab id="Products" name="Prekės"/>
+  <tab id="Categories" name="Kategorijos"/>
+  <tab id="Monitoring" name="Kontrolė"/>
+  <tab id="Attributes_and_Values" name="Prekės savybė"/>
+  <tab id="Features" name="Prekės ypatybė"/>
+  <tab id="Manufacturers" name="Gamintojai"/>
+  <tab id="Suppliers" name="Tiekėjai"/>
+  <tab id="Tags" name="Žymos:"/>
+  <tab id="Attachments" name="Priedai"/>
+  <tab id="Orders_1" name="Užsakymai"/>
+  <tab id="Invoices" name="Sąskaitos"/>
+  <tab id="Merchandise_Returns" name="Prekių grąžinimai"/>
+  <tab id="Delivery_Slips" name="Važtaražščiai"/>
+  <tab id="Credit_Slips" name="Grąžinimo kuponai"/>
+  <tab id="Statuses" name="Būsenos"/>
+  <tab id="Order_Messages" name="Užsakymo pranešimai"/>
+  <tab id="Customers_1" name="Klientai"/>
+  <tab id="Addresses" name="Adresai"/>
+  <tab id="Groups" name="Grupės"/>
+  <tab id="Shopping_Carts" name="Prekių krepšeliai"/>
+  <tab id="Customer_Service" name="Klientų aptarnavimas"/>
+  <tab id="Contacts" name="Kontaktai"/>
+  <tab id="Titles" name="Kreipiniai"/>
+  <tab id="Outstanding" name="Neapmokėta"/>
+  <tab id="Cart_Rules" name="Krepšelio taisyklės"/>
+  <tab id="Catalog_Price_Rules" name="Katalogo kainų taisyklės"/>
+  <tab id="Marketing" name="Marketingas"/>
+  <tab id="Shipping_1" name="Nustatymai"/>
+  <tab id="Carriers" name="Kurjeriai"/>
+  <tab id="Localization_1" name="Lokalizacija"/>
+  <tab id="Languages" name="Kalbos"/>
+  <tab id="Zones" name="Zonos"/>
+  <tab id="Countries" name="Šalys"/>
+  <tab id="States" name="Valstijos"/>
+  <tab id="Currencies" name="Valiutos"/>
+  <tab id="Taxes" name="Mokesčiai"/>
+  <tab id="Tax_Rules" name="Mokesčių taisyklės"/>
+  <tab id="Translations" name="Vertimai"/>
+  <tab id="Modules_1" name="Moduliai ir paslaugos"/>
+  <tab id="Modules_Themes_Catalog" name="Modulių ir temų katalogas"/>
+  <tab id="Positions" name="Pozicijos"/>
+  <tab id="Payment" name="Mokėjimas"/>
+  <tab id="General" name="Pagrindiniai"/>
+  <tab id="Orders_2" name="Užsakymai"/>
+  <tab id="Products_1" name="Prekės"/>
+  <tab id="Customers_2" name="Klientai"/>
+  <tab id="Themes" name="Temos"/>
+  <tab id="SEO_URLs" name="SEO ir nuorodos"/>
+  <tab id="CMS" name="TVS"/>
+  <tab id="Images" name="Vaizdai"/>
+  <tab id="Store_Contacts" name="Parduotuvės kontaktai"/>
+  <tab id="Search_1" name="Paieška"/>
+  <tab id="Maintenance" name="Priežiūra"/>
+  <tab id="Geolocation" name="Geo lokacija"/>
+  <tab id="Configuration_Information" name="Konfigūracijos informacija"/>
+  <tab id="Performance" name="Našumas"/>
+  <tab id="E-mail" name="El. paštas"/>
+  <tab id="Multistore" name="MultiParduotuvė"/>
+  <tab id="CSV_Import" name="CSV importas"/>
+  <tab id="DB_Backup" name="DB atsarg. kopija"/>
+  <tab id="SQL_Manager" name="SQL valdymas"/>
+  <tab id="Logs" name="Įvykių žurnalas"/>
+  <tab id="Webservice" name="Webservice'as"/>
+  <tab id="Preferences_1" name="Nustatymai"/>
+  <tab id="Quick_Access" name="Greita prieiga"/>
+  <tab id="Employees" name="Darbuotojai"/>
+  <tab id="Profiles" name="Profiliai"/>
+  <tab id="Permissions" name="Leidimai"/>
+  <tab id="Menus" name="Meniu"/>
+  <tab id="Stats_1" name="Statistika"/>
+  <tab id="Search_Engines" name="Paieškos varikliai"/>
+  <tab id="Referrers" name="Referentai"/>
+  <tab id="Warehouses" name="Entrepôts"/>
+  <tab id="Stock_Management" name="Atsargų valdymas"/>
+  <tab id="Stock_Movement" name="Atsargų judėjimas"/>
+  <tab id="Instant_Stock_Status" name="Atsargų suvestinė"/>
+  <tab id="Stock_Coverage" name="Atsargų planavimas"/>
+  <tab id="Supply_orders" name="Tiekėjų užsakymai"/>
+  <tab id="Configuration" name="Konfigūracija"/>
+  <tab id="CarrierWizard" name="Vežėjas"/>
+</entity_tab>

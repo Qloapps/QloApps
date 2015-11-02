@@ -1,0 +1,344 @@
+//
+// bootstrap-chosen.scss
+//
+// An alternate stylesheet for Chosen (http://harvesthq.github.com/chosen/).
+// This one is supposed to integrate better with Bootstrap.
+//
+// Submit bugfixes to: http://github.com/alxlit/bootstrap-chosen
+//
+
+$chosen-background: $input-bg
+$chosen-border: $input-border
+$chosen-border-radius: $input-border-radius
+$chosen-multi-border-radius: 0
+$chosen-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075)
+$chosen-drop-border: $gray-light
+$chosen-drop-box-shadow: 0 8px 8px rgba(0, 0, 0, .25)
+$chosen-drop-zindex: 1060
+$chosen-focus-border: rgba(82, 168, 236, .8)
+$chosen-focus-box-shadow: 0 1px 1px rgba(0, 0, 0, .075) inset, 0 0 8px rgba(82, 168, 236, .6)
+$chosen-focus-transition: border linear .2s, box-shadow linear .2s
+$chosen-height: $input-height-base
+$chosen-multi-height: $input-height-base + 6px
+$chosen-sprite-path: '../img/chosen-sprite.png'
+
+.chosen-select
+	width: 100%
+.chosen-select-deselect
+	width: 100%
+
+.chosen-container
+	display: inline-block
+	font-size: $font-size-base
+	position: relative
+	vertical-align: middle
+	.chosen-drop
+		background: $chosen-background
+		border: 1px solid $chosen-drop-border
+		border-top-color: lighten($chosen-drop-border, 25%)
+		margin-top: -1px
+		position: absolute
+		top: 100%
+		z-index: $chosen-drop-zindex
+		@include left(-9000px)
+		@include border-bottom-radius($chosen-border-radius)
+		@include box-shadow($chosen-drop-box-shadow)
+	&.chosen-with-drop .chosen-drop
+		@include left(0)
+		@include right(0)
+	.chosen-results
+		color: $gray
+		max-height: 240px
+		position: relative
+		overflow-x: hidden
+		overflow-y: auto
+		-webkit-overflow-scrolling: touch
+		@include padding(0, 0, 0, 4px)
+		@include margin(0, 4px, 4px, 0)
+		li
+			display: none
+			line-height: $line-height-base
+			list-style: none
+			margin: 0
+			padding: 5px 6px
+			em
+				background: #feffde
+				font-style: normal
+			&.group-result
+				display: list-item
+				cursor: default
+				color: #999
+				font-weight: bold
+			&.group-option
+				@include padding-left(15px)
+			&.active-result
+				cursor: pointer
+				display: list-item
+			&.highlighted
+				background-color: $link-color
+				color: white
+				em
+					background: transparent
+			&.disabled-result
+				display: list-item
+				color: $gray-light
+		.no-results
+			background: $gray-lighter
+			display: list-item
+	.chosen-results-scroll
+		background: white
+		margin: 0 4px
+		position: absolute
+		text-align: center
+		width: 321px
+		z-index: 1
+		span
+			display: inline-block
+			height: $line-height-base
+			text-indent: -5000px
+			width: 9px
+	.chosen-results-scroll-down
+		bottom: 0
+		span
+			background: url($chosen-sprite-path) no-repeat -4px -3px
+
+	.chosen-results-scroll-up
+		span
+			background: url($chosen-sprite-path) no-repeat -22px -3px
+
+.chosen-container-single
+	.chosen-single
+		background-color: $chosen-background
+		border: 1px solid $chosen-border
+		color: $gray
+		display: block
+		height: $chosen-height
+		overflow: hidden
+		line-height: $chosen-height
+		position: relative
+		text-decoration: none
+		white-space: nowrap
+		@include padding(0, 0, 0, 8px)
+		@include box-shadow($chosen-box-shadow)
+		@include border-radius($input-border-radius)
+		&:hover
+			text-decoration: none
+			cursor: pointer
+		&:span
+			display: block
+			@include margin-right(26px)
+			@include text-overflow()
+		&:abbr
+			background: url($chosen-sprite-path) right top no-repeat
+			display: block
+			font-size: 1px
+			height: 10px
+			position: absolute
+			top: ($chosen-height - 10px) / 2
+			width: 12px
+			@include right(26px)
+			&:hover
+				background-position: right -11px
+		&.chosen-disabled .chosen-single abbr:hover
+			background-position: right 2px
+		div
+			display: block
+			height: 100%
+			position: absolute
+			top: 0
+			width: 18px
+			@include right(0)
+			b
+				@extend .icon
+				@extend .icon-caret-down
+				font-size: 14px
+				text-align: center
+				line-height: 28px
+				display: block
+				height: 100%
+				width: 100%
+	.chosen-default
+		color: $gray-light
+	.chosen-search
+		margin: 0
+		padding: 3px 4px
+		position: relative
+		white-space: nowrap
+		z-index: $zindex-dropdown
+		overflow: hidden
+		input
+			border: 1px solid $chosen-border
+			margin: 1px 0
+			width: 100%
+			@include padding(4px, 20px, 4px, 4px)
+			@include border-top-radius($chosen-border-radius)
+			@include border-bottom-radius($chosen-border-radius)
+			@include box-shadow($chosen-box-shadow)
+	.chosen-search:before
+		@extend .icon
+		@extend .icon-search
+		color: $brand-primary
+		position: absolute
+		font-size: 14px
+		text-align: center
+		display: block
+		line-height: 22px
+		height: 22px
+		width: 22px
+		top: 7px
+		@include right(7px)
+
+	.chosen-drop
+		margin-top: -1px
+		-webkit-background-clip: padding-box
+		-moz-background-clip: padding
+		background-clip: padding-box
+		@include border-bottom-radius($chosen-border-radius)
+
+.chosen-container-single-nosearch
+	.chosen-search
+		input
+			position: absolute
+			@include left(-9000px)
+
+.chosen-container-multi
+	.chosen-choices
+		background-color: $chosen-background
+		border: 1px solid $chosen-border
+		cursor: text
+		height: auto !important
+		height: 1%
+		margin: 0
+		overflow: hidden
+		padding: 0
+		position: relative
+		@include border-top-radius($chosen-multi-border-radius)
+		@include border-bottom-radius($chosen-multi-border-radius)
+		@include box-shadow($chosen-box-shadow)
+		li
+			list-style: none
+			@include float(left)
+		.search-field
+			margin: 0
+			padding: 0
+			white-space: nowrap
+			input
+				background: transparent !important
+				border: 0 !important
+				color: $gray
+				height: $chosen-multi-height - 8px
+				margin: 0
+				padding: 4px
+				outline: 0
+				@include box-shadow(none)
+			.default
+				color: #999
+		.search-choice
+			-webkit-background-clip: padding-box
+			-moz-background-clip: padding
+			background-clip: padding-box
+			background-color: $gray-lighter
+			border: 1px solid $chosen-border
+			color: $gray-dark
+			cursor: default
+			line-height: 13px
+			position: relative
+			@include margin(6px, 0, 3px, 5px)
+			@include padding(3px, 20px, 3px, 5px)
+			@include border-top-radius($chosen-border-radius)
+			@include border-bottom-radius($chosen-border-radius)
+			@include gradient-vertical(white, $gray-lighter)
+			@include box-shadow($chosen-box-shadow)
+			.search-choice-close
+				background: url($chosen-sprite-path) right top no-repeat
+				display: block
+				font-size: 1px
+				height: 10px
+				position: absolute
+				top: 5px
+				width: 12px
+				@include right(4px)
+				&:hover
+					background-position: right -11px
+		.search-choice-focus
+			background: #d4d4d4
+			.search-choice-close
+				background-position: right -11px
+	.chosen-results
+		margin: 0
+		padding: 0
+	.chosen-drop
+		.result-selected
+			display: none
+
+.chosen-container-active
+	.chosen-single
+		border: 1px solid $chosen-focus-border
+		@include box-shadow($chosen-focus-box-shadow)
+		@include transition($chosen-focus-transition)
+
+	&.chosen-with-drop .chosen-single
+		background-color: $gray-lighter
+		border: 1px solid $chosen-focus-border
+		@include box-shadow($chosen-focus-box-shadow)
+		@include transition($chosen-focus-transition)
+		div
+			background: transparent
+			@include border-left(none)
+			b
+				background-position: -18px 7px
+	.chosen-choices
+		border: 1px solid $chosen-focus-border
+		@include border-bottom-radius(0)
+		@include box-shadow($chosen-focus-box-shadow)
+		@include transition($chosen-focus-transition)
+		.search-field input
+			color: #111 !important
+
+.chosen-disabled
+	cursor: default
+	opacity: 0.5 !important
+	.chosen-single
+		cursor: default
+	.chosen-choices .search-choice .search-choice-close
+		cursor: default
+
+.chosen-rtl
+	text-align: right
+	.chosen-single
+		padding: 0 8px 0 0
+		overflow: visible
+		span
+			margin-left: 26px
+			margin-right: 0
+			direction: rtl
+		div
+			left: 7px
+			right: auto
+		abbr
+			left: 26px
+			right: auto
+	.chosen-choices
+		.search-field input
+			direction: rtl
+		li
+			float: right
+		.search-choice
+			margin: 6px 5px 3px 0
+			padding: 3px 5px 3px 19px
+			.search-choice-close
+				background-position: right top
+				left: 4px
+				right: auto
+	&.chosen-container-single .chosen-results
+		margin: 0 0 4px 4px
+		padding: 0 4px 0 0
+	.chosen-results .group-option
+		padding-left: 0
+		padding-right: 15px
+	&.chosen-container-active.chosen-with-drop .chosen-single div
+		border-right: none
+	.chosen-search input
+		background: url($chosen-sprite-path) no-repeat -28px -20px, $chosen-background
+		direction: rtl
+		padding: 4px 5px 4px 20px

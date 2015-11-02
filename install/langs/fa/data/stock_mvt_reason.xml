@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<entity_stock_mvt_reason>
+    <stock_mvt_reason id="Increase">
+        <name>افزایش</name>
+    </stock_mvt_reason>
+    <stock_mvt_reason id="Decrease">
+        <name>کاهش</name>
+    </stock_mvt_reason>
+    <stock_mvt_reason id="Customer_Order">
+        <name>سفارش مشتری</name>
+    </stock_mvt_reason>
+    <stock_mvt_reason id="Regulation_following_an_inventory_of_stock">
+        <name>تنظیم بر اساس موجودی انبار</name>
+    </stock_mvt_reason>
+    <stock_mvt_reason id="Regulation_following_an_inventory_of_stock_1">
+        <name>تنظیم بر اساس موجودی انبار</name>
+    </stock_mvt_reason>
+    <stock_mvt_reason id="Transfer_to_another_warehouse">
+        <name>انتقال به انبار دیگر</name>
+    </stock_mvt_reason>
+    <stock_mvt_reason id="Transfer_from_another_warehouse">
+        <name>انتقال از انبار دیگر</name>
+    </stock_mvt_reason>
+    <stock_mvt_reason id="Supply_Order">
+        <name>تهیه سفارش</name>
+    </stock_mvt_reason>
+</entity_stock_mvt_reason>

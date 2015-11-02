@@ -1,0 +1,4 @@
+2014-04-22 18:56:48 +0200	// Changelog updated
+2014-04-15 17:23:48 +0200	[*] MO : blockadvertising - Changed the way images are stocked to avoid overwrite on update
+2014-03-24 10:44:25 +0100	// MO BlockAdvertising : ps_versions_compliancy added
+2014-03-20 14:19:12 +0100	Initial commit

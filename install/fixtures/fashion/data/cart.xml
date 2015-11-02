@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity_cart>
+  <fields class="Cart">
+    <field name="id_carrier" relation="carrier"/>
+    <field name="delivery_option"/>
+    <field name="id_address_delivery" relation="address"/>
+    <field name="id_address_invoice" relation="address"/>
+    <field name="id_currency"/>
+    <field name="id_customer" relation="customer"/>
+    <field name="id_guest" relation="guest"/>
+    <field name="secure_key"/>
+    <field name="recyclable"/>
+    <field name="gift"/>
+    <field name="gift_message"/>
+    <field name="allow_seperated_package"/>
+    <field name="id_shop"/>
+    <field name="id_shop_group"/>
+  </fields>
+  <entities>
+    <cart id="cart_1" id_carrier="My_carrier" id_address_delivery="My_address" id_address_invoice="My_address" id_currency="1" id_customer="John" id_guest="2" secure_key="b44a6d9efd7a0076a0fbce6b15eaf3b1" recyclable="0" gift="0" allow_seperated_package="0" id_shop="1" id_shop_group="1">
+      <delivery_option>a:1:{i:3;s:2:"2,";}</delivery_option>
+      <gift_message/>
+    </cart>
+    <cart id="cart_2" id_carrier="My_carrier" id_address_delivery="My_address" id_address_invoice="My_address" id_currency="1" id_customer="John" id_guest="guest_1" secure_key="b44a6d9efd7a0076a0fbce6b15eaf3b1" recyclable="0" gift="0" allow_seperated_package="0" id_shop="1" id_shop_group="1">
+      <delivery_option>a:1:{i:3;s:2:"2,";}</delivery_option>
+      <gift_message/>
+    </cart>
+    <cart id="cart_3" id_carrier="My_carrier" id_address_delivery="My_address" id_address_invoice="My_address" id_currency="1" id_customer="John" id_guest="guest_1" secure_key="b44a6d9efd7a0076a0fbce6b15eaf3b1" recyclable="0" gift="0" allow_seperated_package="0" id_shop="1" id_shop_group="1">
+      <delivery_option>a:1:{i:3;s:2:"2,";}</delivery_option>
+      <gift_message/>
+    </cart>
+    <cart id="cart_4" id_carrier="My_carrier" id_address_delivery="My_address" id_address_invoice="My_address" id_currency="1" id_customer="John" id_guest="guest_1" secure_key="b44a6d9efd7a0076a0fbce6b15eaf3b1" recyclable="0" gift="0" allow_seperated_package="0" id_shop="1" id_shop_group="1">
+      <delivery_option>a:1:{i:3;s:2:"2,";}</delivery_option>
+      <gift_message/>
+    </cart>
+    <cart id="cart_5" id_carrier="My_carrier" id_address_delivery="My_address" id_address_invoice="My_address" id_currency="1" id_customer="John" id_guest="guest_1" secure_key="b44a6d9efd7a0076a0fbce6b15eaf3b1" recyclable="0" gift="0" allow_seperated_package="0" id_shop="1" id_shop_group="1">
+      <delivery_option>a:1:{i:3;s:2:"2,";}</delivery_option>
+      <gift_message/>
+    </cart>
+  </entities>
+</entity_cart>

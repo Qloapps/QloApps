@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity_tab>
+  <tab id="Dashboard" name="پیشخوان"/>
+  <tab id="CMS_Pages" name="صفحات مدیریت محتوا"/>
+  <tab id="CMS_Categories" name="شاخه های مدیریت محتوا"/>
+  <tab id="Combinations_Generator" name="ترکیب ساز"/>
+  <tab id="Search" name="جستجو"/>
+  <tab id="Login" name="ورود"/>
+  <tab id="Shops" name="فروشگاه‌ها"/>
+  <tab id="Shop_URLs" name="URL‌های فروشگاه"/>
+  <tab id="Catalog" name="کاتالوگ"/>
+  <tab id="Orders" name="سفارش‌ها"/>
+  <tab id="Customers" name="مشتریان"/>
+  <tab id="Price_Rules" name="قوانین فیمت گذاری"/>
+  <tab id="Shipping" name="ارسال"/>
+  <tab id="Localization" name="بومی سازی"/>
+  <tab id="Modules" name="ماژول‌ها"/>
+  <tab id="Preferences" name="تنظیمات"/>
+  <tab id="Advanced_Parameters" name="پارامترهای پیشرفته"/>
+  <tab id="Administration" name="مدیریت"/>
+  <tab id="Stats" name="آمارها"/>
+  <tab id="Stock" name="موجودی"/>
+  <tab id="Products" name="محصولات"/>
+  <tab id="Categories" name="شاخه‌ها"/>
+  <tab id="Monitoring" name="بازرسی"/>
+  <tab id="Attributes_and_Values" name="مشخصه‌های محصول"/>
+  <tab id="Features" name="ویژگی‌ها"/>
+  <tab id="Manufacturers" name="تولید کننده‌ها"/>
+  <tab id="Suppliers" name="فراهم کننده‌ها"/>
+  <tab id="Tags" name="برچسب‌ها"/>
+  <tab id="Attachments" name="پیوست‌ها"/>
+  <tab id="Orders_1" name="سفارش‌ها"/>
+  <tab id="Invoices" name="صورت حساب‌ها"/>
+  <tab id="Merchandise_Returns" name="بازگشت‌های کالا"/>
+  <tab id="Delivery_Slips" name="رسیدهای تحویل"/>
+  <tab id="Credit_Slips" name="رسیدهای اعتبار"/>
+  <tab id="Statuses" name="وضعیت‌ها"/>
+  <tab id="Order_Messages" name="پیام‌های سفارش"/>
+  <tab id="Customers_1" name="مشتریان"/>
+  <tab id="Addresses" name="آدرس‌ها"/>
+  <tab id="Groups" name="گروه‌ها"/>
+  <tab id="Shopping_Carts" name="سبدهای خرید"/>
+  <tab id="Customer_Service" name="خدمات مشتریان"/>
+  <tab id="Contacts" name="تماس‌ها"/>
+  <tab id="Titles" name="عنوان‌ها"/>
+  <tab id="Outstanding" name="وصول نشده‌ها"/>
+  <tab id="Cart_Rules" name="قوانین سبد خرید"/>
+  <tab id="Catalog_Price_Rules" name="قوانین قیمت گذاری کاتالوگ"/>
+  <tab id="Marketing" name="بازاریابی"/>
+  <tab id="Shipping_1" name="تنظیمات"/>
+  <tab id="Carriers" name="حامل‌ها"/>
+  <tab id="Localization_1" name="بومی سازی"/>
+  <tab id="Languages" name="زبان‌ها"/>
+  <tab id="Zones" name="منطقه‌ها"/>
+  <tab id="Countries" name="کشورها"/>
+  <tab id="States" name="استان‌ها"/>
+  <tab id="Currencies" name="ارزها"/>
+  <tab id="Taxes" name="مالیات"/>
+  <tab id="Tax_Rules" name="قوانین مالیاتی"/>
+  <tab id="Translations" name="ترجمه‌ها"/>
+  <tab id="Modules_1" name="ماژول ها و سرویس ها"/>
+  <tab id="Modules_Themes_Catalog" name="کاتالوگ ماژول‌ها و قالب‌ها"/>
+  <tab id="Positions" name="جایگاه‌ها"/>
+  <tab id="Payment" name="پرداخت"/>
+  <tab id="General" name="عمومی"/>
+  <tab id="Orders_2" name="سفارش‌ها"/>
+  <tab id="Products_1" name="محصولات"/>
+  <tab id="Customers_2" name="مشتریان"/>
+  <tab id="Themes" name="قالب‌ها"/>
+  <tab id="SEO_URLs" name="سئو و URLها"/>
+  <tab id="CMS" name="مدیریت محتوا"/>
+  <tab id="Images" name="تصاویر"/>
+  <tab id="Store_Contacts" name="تماس‌های مغازه"/>
+  <tab id="Search_1" name="جستجو"/>
+  <tab id="Maintenance" name="تعمیرات"/>
+  <tab id="Geolocation" name="موقعیت مکانی"/>
+  <tab id="Configuration_Information" name="اطلاعات پیکربندی"/>
+  <tab id="Performance" name="کارایی"/>
+  <tab id="E-mail" name="ایمیل"/>
+  <tab id="Multistore" name="چند فروشگاهی"/>
+  <tab id="CSV_Import" name="واردسازی CSV"/>
+  <tab id="DB_Backup" name="پشتیبان پایگاه داده"/>
+  <tab id="SQL_Manager" name="مدیریت SQL"/>
+  <tab id="Logs" name="گزارش‌ها"/>
+  <tab id="Webservice" name="وب سرویس"/>
+  <tab id="Preferences_1" name="تنظیمات"/>
+  <tab id="Quick_Access" name="دسترسی سریع"/>
+  <tab id="Employees" name="کارمندان"/>
+  <tab id="Profiles" name="پروفایل‌ها"/>
+  <tab id="Permissions" name="دسترسی‌ها"/>
+  <tab id="Menus" name="منوها"/>
+  <tab id="Stats_1" name="آمارها"/>
+  <tab id="Search_Engines" name="موتورهای جستجو"/>
+  <tab id="Referrers" name="ارجاع دهندگان"/>
+  <tab id="Warehouses" name="انبارها"/>
+  <tab id="Stock_Management" name="مدیریت موجودی"/>
+  <tab id="Stock_Movement" name="انتقال موجودی"/>
+  <tab id="Instant_Stock_Status" name="وضعیت آنی موجودی"/>
+  <tab id="Stock_Coverage" name="پوشش موجودی"/>
+  <tab id="Supply_orders" name="تهیه سفارش‌ها"/>
+  <tab id="Configuration" name="پیکربندی"/>
+  <tab id="CarrierWizard" name="حامل"/>
+</entity_tab>

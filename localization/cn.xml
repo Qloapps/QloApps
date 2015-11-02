@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<localizationPack name="China" version="1.0">
+	<currencies>
+		<currency name="Yuan" iso_code="CNY" iso_code_num="156" sign="¥" blank="1" conversion_rate="9.13916" format="1" decimals="1" />
+	</currencies>
+	<languages>
+		<language iso_code="tw" />
+		<language iso_code="zh" />
+	</languages>
+	<taxes>
+		<tax id="1" name="增值税 CN 17%" rate="17" />
+		<tax id="2" name="增值税 CN 13%" rate="13" />
+		<tax id="3" name="增值税 CN 6%" rate="6" />
+		<tax id="4" name="增值税 CN 3%" rate="3" />
+		
+		<taxRulesGroup name="CN Standard Rate (17%)">
+			<taxRule iso_code_country="cn" id_tax="1" />
+		</taxRulesGroup>
+		
+		<taxRulesGroup name="CN Reduced Rate (13%)">
+			<taxRule iso_code_country="cn" id_tax="2" />
+		</taxRulesGroup>
+        
+        <taxRulesGroup name="CN Super Reduced Rate (6%)">
+			<taxRule iso_code_country="cn" id_tax="3" />
+		</taxRulesGroup>
+		
+		<taxRulesGroup name="CN Super Reduced Rate (3%)">
+			<taxRule iso_code_country="cn" id_tax="4" />
+		</taxRulesGroup>
+	</taxes>
+	<states>
+		<state name="Beijing" iso_code="11" country="CN" zone="Asia" tax_behavior="0" />
+		<state name="Chongqing" iso_code="50" country="CN" zone="Asia" tax_behavior="0" />
+		<state name="Shanghai" iso_code="31" country="CN" zone="Asia" tax_behavior="0" />
+		<state name="Tianjin" iso_code="12" country="CN" zone="Asia" tax_behavior="0" />
+		<state name="Anhui" iso_code="34" country="CN" zone="Asia" tax_behavior="0" />
+		<state name="Fujian" iso_code="35" country="CN" zone="Asia" tax_behavior="0" />
+		<state name="Gansu" iso_code="62" country="CN" zone="Asia" tax_behavior="0" />
+		<state name="Guangdong" iso_code="44" country="CN" zone="Asia" tax_behavior="0" />
+		<state name="Guizhou" iso_code="52" country="CN" zone="Asia" tax_behavior="0" />
+		<state name="Hainan" iso_code="46" country="CN" zone="Asia" tax_behavior="0" />
+		<state name="Hebei" iso_code="13" country="CN" zone="Asia" tax_behavior="0" />
+		<state name="Heilongjiang" iso_code="23" country="CN" zone="Asia" tax_behavior="0" />
+		<state name="Henan" iso_code="41" country="CN" zone="Asia" tax_behavior="0" />
+		<state name="Hubei" iso_code="42" country="CN" zone="Asia" tax_behavior="0" />
+		<state name="Hunan" iso_code="43" country="CN" zone="Asia" tax_behavior="0" />
+		<state name="Jiangsu" iso_code="32" country="CN" zone="Asia" tax_behavior="0" />
+		<state name="Jiangxi" iso_code="36" country="CN" zone="Asia" tax_behavior="0" />
+		<state name="Jilin" iso_code="22" country="CN" zone="Asia" tax_behavior="0" />
+		<state name="Liaoning" iso_code="21" country="CN" zone="Asia" tax_behavior="0" />
+		<state name="Qinghai" iso_code="63" country="CN" zone="Asia" tax_behavior="0" />
+		<state name="Shaanxi" iso_code="61" country="CN" zone="Asia" tax_behavior="0" />
+		<state name="Shandong" iso_code="37" country="CN" zone="Asia" tax_behavior="0" />
+		<state name="Shanxi" iso_code="14" country="CN" zone="Asia" tax_behavior="0" />
+		<state name="Sichuan" iso_code="51" country="CN" zone="Asia" tax_behavior="0" />
+		<state name="Taiwan" iso_code="71" country="CN" zone="Asia" tax_behavior="0" />
+		<state name="Yunnan" iso_code="53" country="CN" zone="Asia" tax_behavior="0" />
+		<state name="Guangxi" iso_code="45" country="CN" zone="Asia" tax_behavior="0" />
+		<state name="Neimenggu" iso_code="15" country="CN" zone="Asia" tax_behavior="0" />
+		<state name="Ningxia" iso_code="64" country="CN" zone="Asia" tax_behavior="0" />
+		<state name="Xinjiang" iso_code="65" country="CN" zone="Asia" tax_behavior="0" />
+		<state name="Xizang" iso_code="54" country="CN" zone="Asia" tax_behavior="0" />
+		<state name="Xianggang" iso_code="91" country="CN" zone="Asia" tax_behavior="0" />
+		<state name="Aomen" iso_code="92" country="CN" zone="Asia" tax_behavior="0" />
+		<state name="Zhejiang" iso_code="33" country="CN" zone="Asia" tax_behavior="0" />
+	</states>
+	<units>
+		<unit type="weight" value="市制" />
+		<unit type="volume" value="市升" />
+		<unit type="short_distance" value="市厘" />
+		<unit type="base_distance" value="里" />
+		<unit type="long_distance" value="市里" />
+	</units>
+</localizationPack>

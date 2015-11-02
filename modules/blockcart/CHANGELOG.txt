@@ -1,0 +1,5 @@
+2014-04-22 18:56:55 +0200	// Changelog updated
+2014-03-26 10:01:27 +0100	[-] MO : removed cart rule description from the name in the blockcart
+2014-03-24 11:43:28 +0100	/ MO blockcart : ps_versions_compliancy modified (1.5.6.1 => 1.6)
+2014-03-24 11:01:26 +0100	/ MO blockcart : ps_versions_compliancy added
+2014-03-20 14:20:42 +0100	Initial commit

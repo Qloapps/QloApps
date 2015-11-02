@@ -1,0 +1,80 @@
+<?xml version='1.0'?>
+<entity_product>
+  <product id='Faded_Short_Sleeve_T-shirts' id_shop='1'>
+    <description>&lt;p&gt;Fashion lleva diseñando colecciones increíbles desde 2010. La marca ofrece diseños femeninos, con elegantes prendas para combinar y las últimas tendencias en vestidos. Las colecciones han evolucionado hacia una línea prêt-à-porter en la que cada elemento resulta indispensable en el fondo de armario de una mujer. ¿El resultado? Looks frescos, sencillos y muy chic, con una elegancia juvenil y un estilo único e inconfundible. Todas las prendas se confeccionan en Italia, prestando atención hasta al más mínimo detalle. Ahora Fashion ha ampliado su catálogo para incluir todo tipo de complementos: ¡zapatos, sombreros, cinturones y mucho más! &lt;/ p&gt;</description>
+    <description_short>&lt;p&gt;Camiseta de manga corta con efecto desteñido  y escote cerrado. Material suave y elástico para un ajuste cómodo. ¡Combínala con un sombrero de paja y estarás lista para el verano!&lt;/p&gt;</description_short>
+    <link_rewrite>camiseta-destenida-manga-corta</link_rewrite>
+    <meta_description/>
+    <meta_keywords/>
+    <meta_title/>
+    <name>Camiseta efecto desteñido de manga corta</name>
+    <available_now>En stock</available_now>
+    <available_later/>
+  </product>
+  <product id='Blouse' id_shop='1'>
+    <description>&lt;p&gt;Fashion lleva diseñando colecciones increíbles desde 2010. La marca ofrece diseños femeninos, con elegantes prendas para combinar y las últimas tendencias en vestidos. Las colecciones han evolucionado hacia una línea prêt-à-porter en la que cada elemento resulta indispensable en el fondo de armario de una mujer. ¿El resultado? Looks frescos, sencillos y muy chic, con una elegancia juvenil y un estilo único e inconfundible. Todas las prendas se confeccionan en Italia, prestando atención hasta al más mínimo detalle. Ahora Fashion ha ampliado su catálogo para incluir todo tipo de complementos: ¡zapatos, sombreros, cinturones y mucho más! &lt;/ p&gt;</description>
+    <description_short>&lt;p&gt;Blusa de manga corta con detalle drapeado muy femenino en la manga.&lt;/p&gt;</description_short>
+    <link_rewrite>blusa</link_rewrite>
+    <meta_description/>
+    <meta_keywords/>
+    <meta_title/>
+    <name>Blusa</name>
+    <available_now>En stock</available_now>
+    <available_later/>
+  </product>
+  <product id='Printed_Dress' id_shop='1'>
+    <description>&lt;p&gt;Fashion lleva diseñando colecciones increíbles desde 2010. La marca ofrece diseños femeninos, con elegantes prendas para combinar y las últimas tendencias en vestidos. Las colecciones han evolucionado hacia una línea prêt-à-porter en la que cada elemento resulta indispensable en el fondo de armario de una mujer. ¿El resultado? Looks frescos, sencillos y muy chic, con una elegancia juvenil y un estilo único e inconfundible. Todas las prendas se confeccionan en Italia,prestando atención hasta al más mínimo detalle. Ahora Fashion ha ampliado su catálogo para incluir todo tipo de complementos: ¡zapatos, sombreros, cinturones y mucho más! &lt;/ p&gt;</description>
+    <description_short>&lt;p&gt;Vestido doble estampado 100% algodón. Top de rayas negras y blancas y falda skater naranja de cintura alta.&lt;/p&gt;</description_short>
+    <link_rewrite>vestido-estampado</link_rewrite>
+    <meta_description/>
+    <meta_keywords/>
+    <meta_title/>
+    <name>Vestido estampado</name>
+    <available_now>En stock</available_now>
+    <available_later/>
+  </product>
+  <product id='Printed_Dress_1' id_shop='1'>
+    <description>&lt;p&gt;Fashion lleva diseñando increíbles colecciones desde 2010. La marca ofrece diseños femeninos, con elegantes prendas para combinar y las últimas tendencias en vestidos. Las colecciones han evolucionado hacia una línea prêt-à-porter en la que cada elemento resulta indispensable en el fondo de armario de una mujer. ¿El resultado? Looks frescos, sencillos y muy chic, con una elegancia juvenil y un estilo único e inconfundible. Todas las prendas se confeccionan en Italia, prestando atención hasta al más mínimo detalle. Ahora Fashion ha ampliado su catálogo para incluir todo tipo de complementos: ¡zapatos, sombreros, cinturones y mucho más! &lt;/ p&gt;</description>
+    <description_short>&lt;p&gt;Vestido de noche estampado con mangas rectas, cinturón negro y volantes.&lt;/p&gt;</description_short>
+    <link_rewrite>vestido-estampado</link_rewrite>
+    <meta_description/>
+    <meta_keywords/>
+    <meta_title/>
+    <name>Vestido estampado</name>
+    <available_now>En stock</available_now>
+    <available_later/>
+  </product>
+  <product id='Printed_Summer_Dress' id_shop='1'>
+    <description>&lt;p&gt;Fashion lleva diseñando increíbles colecciones desde 2010. La marca ofrece diseños femeninos, con elegantes prendas para combinar y las últimas tendencias en vestidos. Las colecciones han evolucionado hacia una línea prêt-à-porter en la que cada elemento resulta indispensable en el fondo de armario de una mujer. ¿El resultado? Looks frescos, sencillos y muy chic, con una elegancia juvenil y un estilo único e inconfundible. Todas las prendas se confeccionan en Italia, prestando atención hasta al más mínimo detalle. Ahora Fashion ha ampliado su catálogo para incluir todo tipo de complementos: ¡zapatos, sombreros, cinturones y mucho más! &lt;/ p&gt;</description>
+    <description_short>&lt;p&gt;Vestido largo estampado con tirantes finos ajustables. Escote en V, fruncido debajo del pecho y volantes en la parte inferior del vestido.&lt;/p&gt;</description_short>
+    <link_rewrite>vestido-verano-estampado</link_rewrite>
+    <meta_description/>
+    <meta_keywords/>
+    <meta_title/>
+    <name>Vestido de verano estampado</name>
+    <available_now>En stock</available_now>
+    <available_later/>
+  </product>
+  <product id='Printed_Summer_Dress_1' id_shop='1'>
+    <description>&lt;p&gt;Fashion lleva diseñando increíbles colecciones desde 2010. La marca ofrece diseños femeninos, con elegantes prendas para combinar y las últimas tendencias en vestidos. Las colecciones han evolucionado hacia una línea prêt-à-porter en la que cada elemento resulta indispensable en el fondo de armario de una mujer. ¿El resultado? Looks frescos, sencillos y muy chic, con una elegancia juvenil y un estilo único e inconfundible. Todas las prendas se confeccionan en Italia, prestando atención hasta al más mínimo detalle. Ahora Fashion ha ampliado su catálogo para incluir todo tipo de complementos: ¡zapatos, sombreros, cinturones y mucho más! &lt;/ p&gt;</description>
+    <description_short>&lt;p&gt;Vestido sin mangas de gasa hasta la rodilla. Escote en V con elástico debajo del pecho.&lt;/p&gt;</description_short>
+    <link_rewrite>vestido-verano-estampado</link_rewrite>
+    <meta_description/>
+    <meta_keywords/>
+    <meta_title/>
+    <name>Vestido de verano estampado</name>
+    <available_now>En stock</available_now>
+    <available_later/>
+  </product>
+  <product id='Printed_Chiffon_Dress' id_shop='1'>
+    <description>&lt;p&gt;Fashion lleva diseñando increíbles colecciones desde 2010. La marca ofrece diseños femeninos, con elegantes prendas para combinar y las últimas tendencias en vestidos. Las colecciones han evolucionado hacia una línea prêt-à-porter en la que cada elemento resulta indispensable en el fondo de armario de una mujer. ¿El resultado? Looks frescos, sencillos y muy chic, con una elegancia juvenil y un estilo único e inconfundible. Todas las prendas se confeccionan en Italia, yprestando atención hasta al más mínimo detalle. Ahora Fashion ha ampliado su catálogo para incluir todo tipo de complementos: ¡zapatos, sombreros, cinturones y mucho más! &lt;/ p&gt;</description>
+    <description_short>&lt;p&gt;Vestido sin mangas hasta la rodilla, tejido de gasa estampado. Escote pronunciado.&lt;/p&gt;</description_short>
+    <link_rewrite>vestido-estampado-gasa</link_rewrite>
+    <meta_description/>
+    <meta_keywords/>
+    <meta_title/>
+    <name>Vestido de gasa estampado</name>
+    <available_now>En stock</available_now>
+    <available_later/>
+  </product>
+</entity_product>

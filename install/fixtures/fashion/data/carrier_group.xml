@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity_carrier_group>
+  <fields primary="id_carrier, id_group" sql="a.id_carrier &gt; 1">
+    <field name="id_carrier" relation="carrier"/>
+    <field name="id_group" relation="group"/>
+  </fields>
+  <entities>
+    <carrier_group id="carrier_group_2_1" id_carrier="My_carrier" id_group="Visitor"/>
+    <carrier_group id="carrier_group_2_2" id_carrier="My_carrier" id_group="Guest"/>
+    <carrier_group id="carrier_group_2_3" id_carrier="My_carrier" id_group="Customer"/>
+  </entities>
+</entity_carrier_group>

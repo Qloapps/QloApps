@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<theme>
+	<version value="1.4">
+		<ccc available="true" />
+		<guest_checkout available="true" />
+		<one_page_checkout available="true" />
+		<store_locator available="true" />
+	</version>
+</theme>

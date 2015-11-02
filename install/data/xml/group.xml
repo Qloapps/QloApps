@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity_group>
+  <fields id="name" class="Group">
+    <field name="reduction"/>
+    <field name="price_display_method"/>
+    <field name="show_prices"/>
+  </fields>
+  <entities>
+    <group id="Visitor" reduction="0.00" price_display_method="0" show_prices="1"/>
+    <group id="Guest" reduction="0.00" price_display_method="0" show_prices="1"/>
+    <group id="Customer" reduction="0.00" price_display_method="0" show_prices="1"/>
+  </entities>
+</entity_group>

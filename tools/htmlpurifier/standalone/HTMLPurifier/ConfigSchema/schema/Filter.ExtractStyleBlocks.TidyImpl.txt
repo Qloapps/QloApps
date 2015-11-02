@@ -1,0 +1,16 @@
+Filter.ExtractStyleBlocks.TidyImpl
+TYPE: mixed/null
+VERSION: 3.1.0
+DEFAULT: NULL
+ALIASES: FilterParam.ExtractStyleBlocksTidyImpl
+--DESCRIPTION--
+<p>
+  If left NULL, HTML Purifier will attempt to instantiate a <code>csstidy</code>
+  class to use for internal cleaning. This will usually be good enough.
+</p>
+<p>
+  However, for trusted user input, you can set this to <code>false</code> to
+  disable cleaning. In addition, you can supply your own concrete implementation
+  of Tidy's interface to use, although I don't know why you'd want to do that.
+</p>
+--# vim: et sw=4 sts=4

@@ -1,0 +1,81 @@
+<?xml version='1.0'?>
+<entity_cms>
+  <cms id='Delivery'>
+    <meta_title>Consegna</meta_title>
+    <meta_description>I nostri termini e condizioni di consegna</meta_description>
+    <meta_keywords>condizioni, consegna, ritardo, spedizione, pacco</meta_keywords>
+    <content>&lt;h2&gt;Spedizioni e resi&lt;/h2&gt;&lt;h3&gt;La spedizione del vostro pacco&lt;/h3&gt;&lt;p&gt;I pacchi sono generalmente inviati entro 2 giorni dal ricevimento del pagamento e vengono spediti tramite UPS con tracciatura e consegna senza firma. Se preferite una consegna con UPS Extra con richiesta di firma, verrà applicato un costo aggiuntivo, quindi vi preghiamo di contattarci prima di scegliere questo metodo. Qualsiasi tipo di spedizione scegliate, vi forniremo un link per tracciare il vostro pacco online.&lt;/p&gt;&lt;p&gt;Le spese di spedizione comprendono gli oneri di gestione e imballaggio e le spese postali. I costi di gestione sono fissi, mentre i costi di trasporto variano a seconda del peso totale della spedizione. Vi consigliamo di raggruppare i vostri articoli in un unico ordine. Non ci è possibile raggruppare due ordini distinti effettuati separatamente, pertanto le spese di spedizione saranno addebitate per ognuno di essi. Il vostro pacco sarà inviato a vostro rischio, ma viene prestata un&apos;attenzione particolare in caso di oggetti fragili.&lt;br /&gt;&lt;br /&gt;Le scatole hanno dimensioni adeguatamente ampie e i vostri articoli son ben protetti.&lt;/p&gt;</content>
+    <link_rewrite>consegna</link_rewrite>
+  </cms>
+  <cms id='Legal_Notice'>
+    <meta_title>Note legali</meta_title>
+    <meta_description>Note legali</meta_description>
+    <meta_keywords>note, legali, crediti</meta_keywords>
+    <content>&lt;h2&gt;Note legali&lt;/h2&gt;&lt;h3&gt;Crediti&lt;/h3&gt;&lt;p&gt;Ideazione e realizzazione:&lt;/p&gt;&lt;p&gt;Questo negozio online è stato creato usando &lt;a href=&quot;http://www.prestashop.com&quot;&gt;il software PrestaShop Shopping Cart&lt;/a&gt;. Visitate il blog di e-commerce di PrestaShop &lt;a href=&quot;http://www.prestashop.com/blog/en/&quot;&gt;&lt;/a&gt; per avere notizie e consigli su come vendere online e gestire il vostro sito web di e-commerce.&lt;/p&gt;</content>
+    <link_rewrite>note-legali</link_rewrite>
+  </cms>
+  <cms id='Terms_and_conditions_of_use'>
+    <meta_title>Termini e condizioni d&apos;uso</meta_title>
+    <meta_description>I nostri termini e condizioni d&apos;uso</meta_description>
+    <meta_keywords>condizioni, termini, uso, vendita</meta_keywords>
+    <content>&lt;h1 class=&quot;page-heading&quot;&gt;Termini e condizioni d&apos;uso&lt;/h1&gt;
+&lt;h3 class=&quot;page-subheading&quot;&gt;Regola 1&lt;/h3&gt;
+&lt;p class=&quot;bottom-indent&quot;&gt;Lorem ipsum dolor sit amet conse ctetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.&lt;/p&gt;
+&lt;h3 class=&quot;page-subheading&quot;&gt;Regola 2&lt;/h3&gt;
+&lt;p class=&quot;bottom-indent&quot;&gt;Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet conse ctetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam&amp;#1102;&lt;/p&gt;
+&lt;h3 class=&quot;page-subheading&quot;&gt;Regola 3&lt;/h3&gt;
+&lt;p class=&quot;bottom-indent&quot;&gt;Tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet conse ctetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam&amp;#1102;&lt;/p&gt;</content>
+    <link_rewrite>termini-e-condizioni-di-uso</link_rewrite>
+  </cms>
+  <cms id='About_us'>
+    <meta_title>Chi siamo</meta_title>
+    <meta_description>Scoprite chi siamo</meta_description>
+    <meta_keywords>chi siamo, informazioni</meta_keywords>
+    <content>&lt;h1 class=&quot;page-heading bottom-indent&quot;&gt;Chi siamo&lt;/h1&gt;
+&lt;div class=&quot;row&quot;&gt;
+&lt;div class=&quot;col-xs-12 col-sm-4&quot;&gt;
+&lt;div class=&quot;cms-block&quot;&gt;
+&lt;h3 class=&quot;page-subheading&quot;&gt;La nostra azienda&lt;/h3&gt;
+&lt;p&gt;&lt;strong class=&quot;dark&quot;&gt;Lorem ipsum dolor sit amet conse ctetur adipisicing elit, sed do eiusmod tempor incididun.&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Lorem ipsum dolor sit amet conse ctetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam. Lorem ipsum dolor sit amet conse ctetur adipisicing elit.&lt;/p&gt;
+&lt;ul class=&quot;list-1&quot;&gt;
+&lt;li&gt;&lt;em class=&quot;icon-ok&quot;&gt;&lt;/em&gt;Prodotti della massima qualità&lt;/li&gt;
+&lt;li&gt;&lt;em class=&quot;icon-ok&quot;&gt;&lt;/em&gt;Un ottimo servizio clienti&lt;/li&gt;
+&lt;li&gt;&lt;em class=&quot;icon-ok&quot;&gt;&lt;/em&gt;Garanzia di rimborso entro 30 giorni&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;col-xs-12 col-sm-4&quot;&gt;
+&lt;div class=&quot;cms-box&quot;&gt;
+&lt;h3 class=&quot;page-subheading&quot;&gt;Il nostro team&lt;/h3&gt;
+&lt;img title=&quot;cms-img&quot; src=&quot;../img/cms/cms-img.jpg&quot; alt=&quot;cms-img&quot; width=&quot;370&quot; height=&quot;192&quot; /&gt;
+&lt;p&gt;&lt;strong class=&quot;dark&quot;&gt;Lorem set sint occaecat cupidatat non &lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;col-xs-12 col-sm-4&quot;&gt;
+&lt;div class=&quot;cms-box&quot;&gt;
+&lt;h3 class=&quot;page-subheading&quot;&gt;Testimonial&lt;/h3&gt;
+&lt;div class=&quot;testimonials&quot;&gt;
+&lt;div class=&quot;inner&quot;&gt;&lt;span class=&quot;before&quot;&gt;“&lt;/span&gt;Lorem ipsum dolor sit amet conse ctetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim.&lt;span class=&quot;after&quot;&gt;”&lt;/span&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;strong class=&quot;dark&quot;&gt;Lorem ipsum dolor sit&lt;/strong&gt;&lt;/p&gt;
+&lt;div class=&quot;testimonials&quot;&gt;
+&lt;div class=&quot;inner&quot;&gt;&lt;span class=&quot;before&quot;&gt;“&lt;/span&gt;Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet conse ctetur adipisicing elit. Lorem ipsum dolor sit amet conse ctetur adipisicing elit, sed do eiusmod.&lt;span class=&quot;after&quot;&gt;”&lt;/span&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;strong class=&quot;dark&quot;&gt;Ipsum dolor sit&lt;/strong&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;</content>
+    <link_rewrite>chi-siamo</link_rewrite>
+  </cms>
+  <cms id='Secure_payment'>
+    <meta_title>Pagamento sicuro</meta_title>
+    <meta_description>Il nostro metodo di pagamento sicuro</meta_description>
+    <meta_keywords>pagamento sicuro, ssl, visa, mastercard, paypal</meta_keywords>
+    <content>&lt;h2&gt;Pagamento sicuro&lt;/h2&gt;
+&lt;h3&gt;Il nostro pagamento sicuro&lt;/h3&gt;&lt;p&gt;Con SSL&lt;/p&gt;
+&lt;h3&gt;Usare Visa/MasterCard/PayPal&lt;/h3&gt;&lt;p&gt;Informazioni su questo servizio&lt;/p&gt;</content>
+    <link_rewrite>pagamento-sicuro</link_rewrite>
+  </cms>
+</entity_cms>

@@ -1,0 +1,165 @@
+<?xml version='1.0'?>
+<entity_meta>
+  <meta id='404' id_shop='1'>
+    <title>404 fout</title>
+    <description>We hebben de pagina niet gevonden</description>
+    <keywords>error, 404, not found</keywords>
+    <url_rewrite>pagina-niet-gevonden</url_rewrite>
+  </meta>
+  <meta id='best-sales' id_shop='1'>
+    <title>Best verkochte artikelen</title>
+    <description>Onze best verkochte artikelen</description>
+    <keywords>best sales</keywords>
+    <url_rewrite>best-verkochte-artikelen</url_rewrite>
+  </meta>
+  <meta id='contact' id_shop='1'>
+    <title>Contact met ons opnemen</title>
+    <description>Neem contact met ons op via ons formulier</description>
+    <keywords>contact, form, e-mail</keywords>
+    <url_rewrite>contact-met-ons-opnemen</url_rewrite>
+  </meta>
+  <meta id='index' id_shop='1'>
+    <title/>
+    <description>Winkel gerund met behulp van PrestaShop</description>
+    <keywords>shop, prestashop</keywords>
+    <url_rewrite/>
+  </meta>
+  <meta id='manufacturer' id_shop='1'>
+    <title>Fabrikanten</title>
+    <description>Lijst met fabrikanten</description>
+    <keywords>manufacturer</keywords>
+    <url_rewrite>fabrikanten</url_rewrite>
+  </meta>
+  <meta id='new-products' id_shop='1'>
+    <title>Nieuwe producten</title>
+    <description>Onze nieuwe producten</description>
+    <keywords>new, products</keywords>
+    <url_rewrite>nieuwe-producten</url_rewrite>
+  </meta>
+  <meta id='password' id_shop='1'>
+    <title>Uw wachtwoord vergeten</title>
+    <description>Voer het e-mailadres in dat u heeft gebruikt voor uw aanmelding om een e-mail met een nieuw wachtwoord te ontvangen</description>
+    <keywords>forgot, password, e-mail, new, reset</keywords>
+    <url_rewrite>wachtwoord-opvragen</url_rewrite>
+  </meta>
+  <meta id='prices-drop' id_shop='1'>
+    <title>Prijsverlaging</title>
+    <description>Onze speciale producten</description>
+    <keywords>special, prices drop</keywords>
+    <url_rewrite>prijs-verlaging</url_rewrite>
+  </meta>
+  <meta id='sitemap' id_shop='1'>
+    <title>Sitemap</title>
+    <description>De weg kwijt? Vinden wat u zoekt</description>
+    <keywords>sitemap</keywords>
+    <url_rewrite>sitemap</url_rewrite>
+  </meta>
+  <meta id='supplier' id_shop='1'>
+    <title>Leveranciers</title>
+    <description>Lijst met leveranciers</description>
+    <keywords>supplier</keywords>
+    <url_rewrite>leverancier</url_rewrite>
+  </meta>
+  <meta id='address' id_shop='1'>
+    <title>Adres</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>adres</url_rewrite>
+  </meta>
+  <meta id='addresses' id_shop='1'>
+    <title>Adressen</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>adressen</url_rewrite>
+  </meta>
+  <meta id='authentication' id_shop='1'>
+    <title>Login</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>login</url_rewrite>
+  </meta>
+  <meta id='cart' id_shop='1'>
+    <title>Winkelmandje</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>winkelmandje</url_rewrite>
+  </meta>
+  <meta id='discount' id_shop='1'>
+    <title>Korting</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>korting</url_rewrite>
+  </meta>
+  <meta id='history' id_shop='1'>
+    <title>Besteloverzicht</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>bestel-overzicht</url_rewrite>
+  </meta>
+  <meta id='identity' id_shop='1'>
+    <title>Identiteit</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>identiteit</url_rewrite>
+  </meta>
+  <meta id='my-account' id_shop='1'>
+    <title>Mijn account</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>mijn-account</url_rewrite>
+  </meta>
+  <meta id='order-follow' id_shop='1'>
+    <title>Bestelling volgen</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>bestelling-volgen</url_rewrite>
+  </meta>
+  <meta id='order-slip' id_shop='1'>
+    <title>Bestelbon</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>bestel-bon</url_rewrite>
+  </meta>
+  <meta id='order' id_shop='1'>
+    <title>Bestelling</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>bestelling</url_rewrite>
+  </meta>
+  <meta id='search' id_shop='1'>
+    <title>Zoeken</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>zoeken</url_rewrite>
+  </meta>
+  <meta id='stores' id_shop='1'>
+    <title>Winkels</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>winkels</url_rewrite>
+  </meta>
+  <meta id='order-opc' id_shop='1'>
+    <title>Bestelling</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>snel bestellen</url_rewrite>
+  </meta>
+  <meta id='guest-tracking' id_shop='1'>
+    <title>Gast traceren</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>gast traceren</url_rewrite>
+  </meta>
+  <meta id='order-confirmation' id_shop='1'>
+    <title>Orderbevestiging</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>order-bevestiging</url_rewrite>
+  </meta>
+  <meta id='products-comparison' id_shop='1'>
+    <title>Productvergelijking</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>product-vergelijking</url_rewrite>
+  </meta>
+</entity_meta>

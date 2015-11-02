@@ -1,0 +1,75 @@
+<?xml version="1.0"?>
+<entity_attribute>
+  <attribute id="S">
+    <name>S</name>
+  </attribute>
+  <attribute id="M">
+    <name>M</name>
+  </attribute>
+  <attribute id="L">
+    <name>L</name>
+  </attribute>
+  <attribute id="One_size">
+    <name>One size</name>
+  </attribute>
+  <attribute id="Grey">
+    <name>Grey</name>
+  </attribute>
+  <attribute id="Taupe">
+    <name>Taupe</name>
+  </attribute>
+  <attribute id="Beige">
+    <name>Beige</name>
+  </attribute>
+  <attribute id="White">
+    <name>White</name>
+  </attribute>
+  <attribute id="Off_White">
+    <name>Off White</name>
+  </attribute>
+  <attribute id="Red">
+    <name>Red</name>
+  </attribute>
+  <attribute id="Black">
+    <name>Black</name>
+  </attribute>
+  <attribute id="Camel">
+    <name>Camel</name>
+  </attribute>
+  <attribute id="Orange">
+    <name>Orange</name>
+  </attribute>
+  <attribute id="Blue">
+    <name>Blue</name>
+  </attribute>
+  <attribute id="Green">
+    <name>Green</name>
+  </attribute>
+  <attribute id="Yellow">
+    <name>Yellow</name>
+  </attribute>
+  <attribute id="Brown">
+    <name>Brown</name>
+  </attribute>
+  <attribute id="35">
+    <name>35</name>
+  </attribute>
+  <attribute id="36">
+    <name>36</name>
+  </attribute>
+  <attribute id="37">
+    <name>37</name>
+  </attribute>
+  <attribute id="38">
+    <name>38</name>
+  </attribute>
+  <attribute id="39">
+    <name>39</name>
+  </attribute>
+  <attribute id="40">
+    <name>40</name>
+  </attribute>
+  <attribute id="Pink">
+    <name>Pink</name>
+  </attribute>
+</entity_attribute>

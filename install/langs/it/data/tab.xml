@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity_tab>
+  <tab id="Addresses" name="Indirizzi"/>
+  <tab id="Administration" name="Amministrazione"/>
+  <tab id="Advanced_Parameters" name="Parametri Avanzati"/>
+  <tab id="Attachments" name="Documenti allegati"/>
+  <tab id="Attributes_and_Values" name="Attributi e Valori"/>
+  <tab id="Carriers" name="Mezzi di spedizione"/>
+  <tab id="Cart_Rules" name="Regole carrello"/>
+  <tab id="Catalog" name="Catalogo"/>
+  <tab id="Catalog_Price_Rules" name="Regole Catalogo Prezzi"/>
+  <tab id="Categories" name="Categorie"/>
+  <tab id="CMS" name="CMS"/>
+  <tab id="CMS_Categories" name="Categorie CMS"/>
+  <tab id="CMS_Pages" name="Pagine CMS"/>
+  <tab id="Combinations_Generator" name="Generatore di combinazioni"/>
+  <tab id="Configuration" name="Configurazione"/>
+  <tab id="Configuration_Information" name="Informazioni"/>
+  <tab id="Contacts" name="Contatti"/>
+  <tab id="Countries" name="Nazione"/>
+  <tab id="Credit_Slips" name="Note di credito"/>
+  <tab id="CSV_Import" name="Importo CVS"/>
+  <tab id="Currencies" name="Valute"/>
+  <tab id="Customer_Service" name="Servizio clienti"/>
+  <tab id="Customers" name="Clienti"/>
+  <tab id="Customers_2" name="Clienti"/>
+  <tab id="Customers_1" name="Clienti"/>
+  <tab id="DB_Backup" name="Backup DB"/>
+  <tab id="Delivery_Slips" name="Note di Consegna"/>
+  <tab id="E-mail" name="E-mail"/>
+  <tab id="Employees" name="Dipendenti"/>
+  <tab id="Features" name="Caratt."/>
+  <tab id="General" name="Generale"/>
+  <tab id="Geolocation" name="Geolocalizzazione"/>
+  <tab id="Groups" name="Gruppi"/>
+  <tab id="Dashboard" name="Dashboard"/>
+  <tab id="Images" name="Immagini"/>
+  <tab id="Instant_Stock_Status" name="Stato dello stock Istantaneo"/>
+  <tab id="Invoices" name="Fatture"/>
+  <tab id="Languages" name="Lingue"/>
+  <tab id="Localization" name="Localizzazione"/>
+  <tab id="Localization_1" name="Localizzazione"/>
+  <tab id="Login" name="Login"/>
+  <tab id="Logs" name="Archivi"/>
+  <tab id="Maintenance" name="Manutenzione"/>
+  <tab id="Manufacturers" name="Produttori"/>
+  <tab id="Marketing" name="Marketing"/>
+  <tab id="Menus" name="Tabs"/>
+  <tab id="Merchandise_Returns" name="Restituzione prodotto"/>
+  <tab id="Modules_1" name="Moduli e Servizi"/>
+  <tab id="Modules" name="Moduli"/>
+  <tab id="Modules_Themes_Catalog" name="Catalogo Moduli e temi"/>
+  <tab id="Monitoring" name="Monitoraggio"/>
+  <tab id="Multistore" name="Multi-negozio"/>
+  <tab id="Order_Messages" name="Messaggi predefiniti"/>
+  <tab id="Orders_2" name="Ordini"/>
+  <tab id="Orders" name="Ordini"/>
+  <tab id="Orders_1" name="Ordini"/>
+  <tab id="Outstanding" name="In sospeso"/>
+  <tab id="Payment" name="Pagamento"/>
+  <tab id="Performance" name="Prestazioni"/>
+  <tab id="Permissions" name="Permessi"/>
+  <tab id="Positions" name="Posizioni"/>
+  <tab id="Preferences_1" name="Preferenze"/>
+  <tab id="Preferences" name="Preferenze"/>
+  <tab id="Price_Rules" name="Regole Prezzi"/>
+  <tab id="Products_1" name="Prodotti"/>
+  <tab id="Products" name="Prodotti"/>
+  <tab id="Profiles" name="Profili"/>
+  <tab id="Quick_Access" name="Accesso veloce"/>
+  <tab id="Referrers" name="Affiliati"/>
+  <tab id="Search_1" name="Cerca"/>
+  <tab id="Search" name="Cerca"/>
+  <tab id="Search_Engines" name="Motori di ricerca"/>
+  <tab id="SEO_URLs" name="URL e SEO"/>
+  <tab id="Shipping" name="Spedizione"/>
+  <tab id="Shipping_1" name="Preferenze"/>
+  <tab id="Shop_URLs" name="URLs negozi"/>
+  <tab id="Shopping_Carts" name="Carrello"/>
+  <tab id="Shops" name="Negozi associati"/>
+  <tab id="SQL_Manager" name="Manager SQL"/>
+  <tab id="States" name="Stati"/>
+  <tab id="Stats" name="Statistiche"/>
+  <tab id="Stats_1" name="Statistiche"/>
+  <tab id="Statuses" name="Stati"/>
+  <tab id="Stock" name="Magazzino"/>
+  <tab id="Stock_Coverage" name="Copertura Stock"/>
+  <tab id="Stock_Management" name="Gestione dello Stock"/>
+  <tab id="Stock_Movement" name="Movimento magazzino"/>
+  <tab id="Store_Contacts" name="Contatti del negozio"/>
+  <tab id="Suppliers" name="Fornitori"/>
+  <tab id="Supply_orders" name="Ordini fornitura"/>
+  <tab id="Tags" name="Tag"/>
+  <tab id="Tax_Rules" name="Regole"/>
+  <tab id="Taxes" name="Tasse"/>
+  <tab id="Themes" name="Temi"/>
+  <tab id="Titles" name="Titoli"/>
+  <tab id="Translations" name="Traduzioni"/>
+  <tab id="Warehouses" name="Magazzino"/>
+  <tab id="Webservice" name="Webservice"/>
+  <tab id="Zones" name="Zone"/>
+  <tab id="CarrierWizard" name="Carrier"/>
+</entity_tab>

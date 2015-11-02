@@ -1,0 +1,17 @@
+id;Alias*;Active (0/1);Customer e-mail*;Customer ID;Manufacturer;Supplier;Company;Lastname*;Firstname*;Address 1*;Address 2;Zipcode*;City*;Country*;State;Other;Phone;Mobile Phone;VAT number;DNI
+1;Peter.Pan / New York;1;Peter.Pan@prestashop.com;;;;;Pan;Peter;360W, 42nd Street;;12001;New York;United States;New York;;01 02 03 04 05;06 02 03 04 05;;;
+2;Wendy.Moira.Darling / New York;1;Wendy.Moira.Darling@prestashop.com;;;;;Darling;Wendy Moira;360W, 42nd Street;;12001;New York;United States;New York;;01 02 03 04 05;06 02 03 04 05;;;
+3;Wendy.Moira.Darling / London;1;Wendy.Moira.Darling@prestashop.com;;;;;Darling;Wendy Moira;Lansdowne road 50 London;Kensington;W11;London;United Kingdom;;;01 02 03 04 05;06 02 03 04 05;;;
+4;Tiger.Lily / Arizona;1;Tiger.Lily@prestashop.com;;;;;Lily;Tiger;Brackin Ranch Road;;86001;Flagstaff;United States;Arizona;;01 02 03 04 05;06 02 03 04 05;;;
+5;Tiger.Lily / Le Chesnay;1;Tiger.Lily@prestashop.com;;;;;Lily;Tiger;53 passage des pas sages;;78150;Le Chesnay;France;;;01 02 03 04 05;06 02 03 04 05;;;
+6;James.Hook / Home;1;James.Hook@prestashop.com;;;;;Hook;James;Mass Gravesite;P.O. Box 007;2101;Cayman Brac;Cayman Islands;;;01 02 03 04 05;06 02 03 04 05;;;
+7;James Hook / Pro;1;James.Hook@prestashop.com;;;;Räuber Schätze GmBH;Hook;James;12 Leipziger Platz;;13505;Berlin;Germany;;;01 02 03 04 05;06 02 03 04 05;;;
+8;Tinker.Bell / Napaiiri;1;Tinker.Bell@prestashop.com;;;;Santa Clauss Inc.;Bell;Tinker;Tähtikuja 1;;96930;Napapiiri;Finland;;;01 02 03 04 05;06 02 03 04 05;;;
+9;Smee / Fiji;1;Bob.Smee@prestashop.com;;;;;Smee;Bob;Cross Island rd 321;Vanua Levu;;Savusavu;Fiji;;;01 02 03 04 05;06 02 03 04 05;;;
+10;Smee / Portland;1;Bob.Smee@prestashop.com;;;;Lattice Semiconductor;Smee;Bob;5555 NE Moore Ct;;97124;Hillsboro;United States;Oregon;;01 02 03 04 05;06 02 03 04 05;;;
+11;Tictac Crocodile / Home;1;Tictac.Crocodile@prestashop.com;;;;;Crocodile;Tictac;Old State Rd 4A;Saddlebunch keys;33040;Bay Point;United States;Florida;Beware the Shark :);01 02 03 04 05;06 02 03 04 05;;;
+12;Apple / address1;1;;;Apple;;;Doe;John;1–6 Infinite Loop;;95014;Cupertino;United States;California;;01 02 03 04 05;06 02 03 04 05;;;
+13;Shure / address1;1;;;Shure;;;Non-Doe;John;5800W Touhy Avenue;;60714;Niles;United States;Illinois;;01 02 03 04 05;06 02 03 04 05;;;
+14;Shure / address2;1;;;Shure;;;Schuss-mayer;Kurt;Jakob-Dieffenbacher-Str. 12;;75031;Eppingen;Germany;;;01 02 03 04 05;06 02 03 04 05;;;
+15;UPS / address1;1;;;;U.P.S;;Austin;Steve;55NE Glenlake Parkway;;30328;Atlanta;United States;Georgia;;01 02 03 04 05;06 02 03 04 05;;;
+16;FedEX / address1;1;;;;FedEX;;Noland;Chuck;3640 Hacks Cross Rd;;32125;Memphis;United States;Tennessee;;01 02 03 04 05;06 02 03 04 05;;;

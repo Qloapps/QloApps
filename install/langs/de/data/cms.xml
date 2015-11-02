@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<entity_cms>
+  <cms id="Delivery">
+    <meta_title>Lieferung</meta_title>
+    <meta_description>Unsere Lieferbedingungen</meta_description>
+    <meta_keywords>Bedingungen, Lieferung, Frist, Versand, Verpackung</meta_keywords>
+    <content>&lt;h2&gt;Versand und R&#xFC;cknahme&lt;/h2&gt;&lt;h3&gt;Ihre Versandverpackung&lt;/h3&gt;&lt;p&gt;Pakete werden normalerweise 2 Tage nach Zahlungseingang mit UPS mit Bestellverfolgem&#xF6;glichkeit und Ablieferung ohne Unterschrift geliefert. Wenn Sie lieber eine UPS-Sendung per Einschreiben erhalten m&#xF6;chten, entstehen zus&#xE4;tzliche Kosten. Bitte kontaktieren Sie uns, bevor Sie dieses Liefermethode w&#xE4;hlen. Wir senden Ihnen einen Link f&#xFC;r die Bestellverfolgung unabh&#xE4;ngig davon, welche Liefermethode Sie w&#xE4;hlen.&lt;/p&gt;&lt;p&gt;Die Versandkosten beinhalten Lade- und Verpackungsgeb&#xFC;hren sowie die Portokosten. Die Verladegeb&#xFC;hren stehen fest, wobei Transportkosten schwanken, je nach Gesamtgewicht des Pakets. Wir raten Ihnen, mehrere Artikel in einer Bestellung zusammenzufassen. Wir k&#xF6;nnen zwei verschiedene Bestellungen nicht zusammenlegen, und die Versandkosten werden separat f&#xFC;r jede Bestellung gerechnet. Ihr Paket wird auf Ihr Risiko versandt, aber zerbrechliche Ware wird besonders sorgsam behandelt.&lt;br /&gt;&lt;br /&gt;Die Versandschachteln sind weit geschnitten und ihre Ware wird gut gesch&#xFC;tzt verpackt.&lt;/p&gt;</content>
+    <link_rewrite>Lieferung</link_rewrite>
+  </cms>
+  <cms id="Legal_Notice">
+    <meta_title>Rechtliche Hinweise</meta_title>
+    <meta_description>Rechtliche Hinweise</meta_description>
+    <meta_keywords>Hinweise, rechtlich, Gutscheine</meta_keywords>
+    <content>&lt;h2&gt;Legal&lt;/h2&gt;&lt;h3&gt;Credits&lt;/h3&gt;&lt;p&gt;Konzept und Gestaltung:&lt;/p&gt;&lt;p&gt;Diese Webseite wurde hergestellt unter Verwendung von &lt;a href="http://www.prestashop.com"&gt;PrestaShop&lt;/a&gt;&amp;trade; open-source software.&lt;/p&gt;</content>
+    <link_rewrite>rechtliche-hinweise</link_rewrite>
+  </cms>
+  <cms id="Terms_and_conditions_of_use">
+    <meta_title>Allgemeine Nutzungsbedingungen</meta_title>
+    <meta_description>Unsere allgemeinen Nutzungsbedingungen</meta_description>
+    <meta_keywords>Voraussetzungen, Bedingungen, nutzen, verkaufen</meta_keywords>
+    <content>&lt;h2&gt;Your terms and conditions of use&lt;/h2&gt;&lt;h3&gt;Rule 1&lt;/h3&gt;&lt;p&gt;Here is the rule 1 content&lt;/p&gt;&#xD;
+&lt;h3&gt;Rule 2&lt;/h3&gt;&lt;p&gt;Here is the rule 2 content&lt;/p&gt;&#xD;
+&lt;h3&gt;Rule 3&lt;/h3&gt;&lt;p&gt;Here is the rule 3 content&lt;/p&gt;</content>
+    <link_rewrite>allgemeine-nutzungsbedingungen</link_rewrite>
+  </cms>
+  <cms id="About_us">
+    <meta_title>&#xDC;ber uns</meta_title>
+    <meta_description>Learn more about us</meta_description>
+    <meta_keywords>&#xFC;ber uns, Informationen</meta_keywords>
+    <content>&lt;h2&gt;About us&lt;/h2&gt;&#xD;
+&lt;h3&gt;Our company&lt;/h3&gt;&lt;p&gt;Our company&lt;/p&gt;&#xD;
+&lt;h3&gt;Our team&lt;/h3&gt;&lt;p&gt;Our team&lt;/p&gt;&#xD;
+&lt;h3&gt;Informations&lt;/h3&gt;&lt;p&gt;Informations&lt;/p&gt;</content>
+    <link_rewrite>uber-uns</link_rewrite>
+  </cms>
+  <cms id="Secure_payment">
+    <meta_title>Sichere Zahlung</meta_title>
+    <meta_description>Unsere Sicherheits-Zahlungsmethoden</meta_description>
+    <meta_keywords>Sichere Zahlung, SSL, Visa, MasterCard, PayPal</meta_keywords>
+    <content>&lt;h2&gt;Secure payment&lt;/h2&gt;&#xD;
+&lt;h3&gt;Our secure payment&lt;/h3&gt;&lt;p&gt;With SSL&lt;/p&gt;&#xD;
+&lt;h3&gt;Using Visa/Mastercard/Paypal&lt;/h3&gt;&lt;p&gt;About this services&lt;/p&gt;</content>
+    <link_rewrite>sichere-zahlung</link_rewrite>
+  </cms>
+</entity_cms>

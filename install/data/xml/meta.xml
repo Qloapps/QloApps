@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity_meta>
+	<fields id="page">
+		<field name="page"/>
+	</fields>
+	<entities>
+		<meta id="404">
+			<page>pagenotfound</page>
+			<configurable>1</configurable>
+		</meta>
+		<meta id="best-sales">
+			<page>best-sales</page>
+			<configurable>1</configurable>
+		</meta>
+		<meta id="contact">
+			<page>contact</page>
+			<configurable>1</configurable>
+		</meta>
+		<meta id="index">
+			<page>index</page>
+			<configurable>1</configurable>
+		</meta>
+		<meta id="manufacturer">
+			<page>manufacturer</page>
+			<configurable>1</configurable>
+		</meta>
+		<meta id="new-products">
+			<page>new-products</page>
+			<configurable>1</configurable>
+		</meta>
+		<meta id="password">
+			<page>password</page>
+			<configurable>1</configurable>
+		</meta>
+		<meta id="prices-drop">
+			<page>prices-drop</page>
+			<configurable>1</configurable>
+		</meta>
+		<meta id="sitemap">
+			<page>sitemap</page>
+			<configurable>1</configurable>
+		</meta>
+		<meta id="supplier">
+			<page>supplier</page>
+			<configurable>1</configurable>
+		</meta>
+		<meta id="address">
+			<page>address</page>
+			<configurable>1</configurable>
+		</meta>
+		<meta id="addresses">
+			<page>addresses</page>
+			<configurable>1</configurable>
+		</meta>
+		<meta id="authentication">
+			<page>authentication</page>
+			<configurable>1</configurable>
+		</meta>
+		<meta id="cart">
+			<page>cart</page>
+			<configurable>1</configurable>
+		</meta>
+		<meta id="discount">
+			<page>discount</page>
+			<configurable>1</configurable>
+		</meta>
+		<meta id="history">
+			<page>history</page>
+			<configurable>1</configurable>
+		</meta>
+		<meta id="identity">
+			<page>identity</page>
+			<configurable>1</configurable>
+		</meta>
+		<meta id="my-account">
+			<page>my-account</page>
+			<configurable>1</configurable>
+		</meta>
+		<meta id="order-follow">
+			<page>order-follow</page>
+			<configurable>1</configurable>
+		</meta>
+		<meta id="order-slip">
+			<page>order-slip</page>
+			<configurable>1</configurable>
+		</meta>
+		<meta id="order">
+			<page>order</page>
+			<configurable>1</configurable>
+		</meta>
+		<meta id="search">
+			<page>search</page>
+			<configurable>1</configurable>
+		</meta>
+		<meta id="stores">
+			<page>stores</page>
+			<configurable>1</configurable>
+		</meta>
+		<meta id="order-opc">
+			<page>order-opc</page>
+			<configurable>1</configurable>
+		</meta>
+		<meta id="guest-tracking">
+			<page>guest-tracking</page>
+			<configurable>1</configurable>
+		</meta>
+		<meta id="order-confirmation">
+			<page>order-confirmation</page>
+			<configurable>1</configurable>
+		</meta>
+		<meta id="product">
+			<page>product</page>
+			<configurable>0</configurable>
+		</meta>
+		<meta id="category">
+			<page>category</page>
+			<configurable>0</configurable>
+		</meta>
+		<meta id="cms">
+			<page>cms</page>
+			<configurable>0</configurable>
+		</meta>
+		<meta id="module-cheque-payment">
+			<page>module-cheque-payment</page>
+			<configurable>0</configurable>
+		</meta>
+		<meta id="module-cheque-validation">
+			<page>module-cheque-validation</page>
+			<configurable>0</configurable>
+		</meta>
+		<meta id="module-bankwire-validation">
+			<page>module-bankwire-validation</page>
+			<configurable>0</configurable>
+		</meta>
+		<meta id="module-bankwire-payment">
+			<page>module-bankwire-payment</page>
+			<configurable>0</configurable>
+		</meta>
+		<meta id="module-cashondelivery-validation">
+			<page>module-cashondelivery-validation</page>
+			<configurable>0</configurable>
+		</meta>
+		<meta id="products-comparison">
+			<page>products-comparison</page>
+			<configurable>1</configurable>
+		</meta>
+	</entities>
+</entity_meta>

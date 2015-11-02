@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<module>
+	<name>onboarding</name>
+	<displayName><![CDATA[OnBoarding]]></displayName>
+	<version><![CDATA[1.0.1]]></version>
+	<description><![CDATA[The OnBoarding module greets first-time users to their PrestaShop back-office: through a small playful interface, it shows the user how to launch his/her shop in several easy steps.]]></description>
+	<author><![CDATA[PrestaShop]]></author>
+	<tab><![CDATA[administration]]></tab>
+	<is_configurable>0</is_configurable>
+	<need_instance>1</need_instance>
+	<limited_countries></limited_countries>
+</module>

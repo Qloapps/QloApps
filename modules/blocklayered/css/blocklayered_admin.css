@@ -1,0 +1,53 @@
+.table-filter-templates, .table-configurations {
+	width: 100%;
+}
+
+.table-configurations td {
+	padding: 10px;
+}
+
+.table-configurations .label {
+	text-align: right;
+	font-weight: bold;
+	width: 30%;
+	vertical-align: top;
+}
+
+.help-block {
+	font-weight: normal;
+	font-style: italic;
+	font-size: 11px;
+}
+
+.text-right {
+	text-align: right;
+}
+
+.text-left {
+	text-align: left;
+}
+
+.filter_panel header {
+	margin-bottom: 10px;
+	font-weight: bold;
+}
+
+.filter_list {
+	background-color: #fff;
+	padding-top: 1px;
+	padding-bottom: 1px;
+}
+
+.filter_list_item {
+	background-color: #E9E9E9;
+	margin: 5px;
+}
+
+.filter_list_item td {
+	white-space: nowrap;
+}
+
+.filter_list_item .filter-title {
+	font-weight: bold;
+	width: 100%;
+}

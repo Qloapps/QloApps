@@ -1,0 +1,6 @@
+<?xml version='1.0'?>
+<entity_carrier>
+  <carrier id='My_carrier' id_shop='1'>
+    <delay>Livraison le lendemain !</delay>
+  </carrier>
+</entity_carrier>

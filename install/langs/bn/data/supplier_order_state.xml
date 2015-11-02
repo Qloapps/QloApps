@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<entity_supplier_order_state>
+	<supplier_order_state id='creation_in_progress'>
+		<name>তইরির উন্নতি</name>
+	</supplier_order_state>
+	<supplier_order_state id='Order_validated'>
+		<name>অর্ডার যাচাই হয়েছে  </name>
+	</supplier_order_state>
+	<supplier_order_state id='Pending_receipt'>
+		<name>অপেক্ষমান রিসিপট</name>
+	</supplier_order_state>
+	<supplier_order_state id='Order_received_in_part'>
+		<name>অর্ডার আংশিক রিসিভ হয়েছে </name>
+	</supplier_order_state>
+	<supplier_order_state id='Order_received_completely'>
+		<name>অর্ডার সম্পূর্ণ রিসিভ হয়েছে</name>
+	</supplier_order_state>
+	<supplier_order_state id='order_fenced'>
+		<name>অর্ডার অ্যাটকে আছে</name>
+	</supplier_order_state>
+</entity_supplier_order_state>

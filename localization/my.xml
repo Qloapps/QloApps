@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<localizationPack name="Malaysia">
+  <currencies>
+    <currency name="Ringgit" iso_code="MYR" iso_code_num="458" sign="RM" blank="0" conversion_rate="1.000000" format="1" decimals="1"/>
+  </currencies>
+  <languages>
+    <language iso_code="ms"/>
+  </languages>
+  <taxes>
+    <taxRulesGroup name="Malaysia Sales Tax Standard Rate">
+      <taxRule iso_code_country="my" behavior="0" id_tax="60"/>
+    </taxRulesGroup>
+    <taxRulesGroup name="Malaysia Sales Tax Reduced Rate">
+      <taxRule iso_code_country="my" behavior="0" id_tax="61"/>
+    </taxRulesGroup>
+    <taxRulesGroup name="Malaysia Service Tax">
+      <taxRule iso_code_country="my" behavior="0" id_tax="62"/>
+    </taxRulesGroup>
+    <tax id="60" name="Malaysia Sales Tax Standard Rate" rate="10.000"/>
+    <tax id="61" name="Malaysia Sales Tax Reduced Rate" rate="5.000"/>
+    <tax id="62" name="Malaysia Service Tax" rate="6.000"/>
+  </taxes>
+  <states>
+    <state name="W.P Kuala Lumpur" iso_code="MY-14" country="MY" zone="Asia" tax_behavior="0" />
+    <state name="W.P Labuan" iso_code="MY-15" country="MY" zone="Asia" tax_behavior="0" />
+    <state name="W.P Putrajaya" iso_code="MY-16" country="MY" zone="Asia" tax_behavior="0" />
+    <state name="Johor" iso_code="MY-01" country="MY" zone="Asia" tax_behavior="0" />
+    <state name="Kedah" iso_code="MY-02" country="MY" zone="Asia" tax_behavior="0" />
+    <state name="Kelantan" iso_code="MY-03" country="MY" zone="Asia" tax_behavior="0" />
+    <state name="Melaka" iso_code="MY-04" country="MY" zone="Asia" tax_behavior="0" />
+    <state name="Negeri Sembilan" iso_code="MY-05" country="MY" zone="Asia" tax_behavior="0" />
+    <state name="Pahang" iso_code="MY-06" country="MY" zone="Asia" tax_behavior="0" />
+    <state name="Perak" iso_code="MY-08" country="MY" zone="Asia" tax_behavior="0" />
+    <state name="Perlis" iso_code="MY-09" country="MY" zone="Asia" tax_behavior="0" />
+    <state name="Pulau Pinang" iso_code="MY-07" country="MY" zone="Asia" tax_behavior="0" />
+    <state name="Sabah" iso_code="MY-12" country="MY" zone="Asia" tax_behavior="0" />
+    <state name="Sarawak" iso_code="MY-13" country="MY" zone="Asia" tax_behavior="0" />
+    <state name="Selangor" iso_code="MY-10" country="MY" zone="Asia" tax_behavior="0" />
+    <state name="Terengganu" iso_code="MY-11" country="MY" zone="Asia" tax_behavior="0" />
+  </states>
+  <units>
+    <unit type="weight" value="kg"/>
+    <unit type="volume" value="L"/>
+    <unit type="short_distance" value="cm"/>
+    <unit type="base_distance" value="m"/>
+    <unit type="long_distance" value="km"/>
+  </units>
+</localizationPack>

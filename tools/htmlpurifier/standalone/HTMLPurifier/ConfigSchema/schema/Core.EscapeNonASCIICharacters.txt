@@ -1,0 +1,13 @@
+Core.EscapeNonASCIICharacters
+TYPE: bool
+VERSION: 1.4.0
+DEFAULT: false
+--DESCRIPTION--
+This directive overcomes a deficiency in %Core.Encoding by blindly
+converting all non-ASCII characters into decimal numeric entities before
+converting it to its native encoding. This means that even characters that
+can be expressed in the non-UTF-8 encoding will be entity-ized, which can
+be a real downer for encodings like Big5. It also assumes that the ASCII
+repetoire is available, although this is the case for almost all encodings.
+Anyway, use UTF-8!
+--# vim: et sw=4 sts=4

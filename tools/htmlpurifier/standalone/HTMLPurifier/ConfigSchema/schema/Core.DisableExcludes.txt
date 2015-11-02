@@ -1,0 +1,14 @@
+Core.DisableExcludes
+TYPE: bool
+DEFAULT: false
+VERSION: 4.5.0
+--DESCRIPTION--
+<p>
+  This directive disables SGML-style exclusions, e.g. the exclusion of
+  <code>&lt;object&gt;</code> in any descendant of a
+  <code>&lt;pre&gt;</code> tag.  Disabling excludes will allow some
+  invalid documents to pass through HTML Purifier, but HTML Purifier
+  will also be less likely to accidentally remove large documents during
+  processing.
+</p>
+--# vim: et sw=4 sts=4

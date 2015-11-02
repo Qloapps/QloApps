@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<localizationPack name="Spain" version="1.0">
+  <currencies>
+    <currency name="Euro" iso_code="EUR" iso_code_num="978" sign="€" blank="1" conversion_rate="1.00" format="2" decimals="1"/>
+  </currencies>
+  <languages>
+    <language iso_code="ca"/>
+    <language iso_code="es"/>
+    <language iso_code="gl"/>
+  </languages>
+  <taxes>
+    <tax id="1" name="IVA ES 21%" rate="21" eu-tax-group="virtual"/>
+    <tax id="2" name="IVA ES 10%" rate="10"/>
+    <tax id="3" name="IVA ES 4%" rate="4"/>
+    <tax id="4" name="USt. AT 20%" rate="20" auto-generated="1" from-eu-tax-group="virtual"/>
+    <tax id="5" name="TVA BE 21%" rate="21" auto-generated="1" from-eu-tax-group="virtual"/>
+    <tax id="6" name="ДДС BG 20%" rate="20" auto-generated="1" from-eu-tax-group="virtual"/>
+    <tax id="7" name="ΦΠΑ CY 19%" rate="19" auto-generated="1" from-eu-tax-group="virtual"/>
+    <tax id="8" name="DPH CZ 21%" rate="21" auto-generated="1" from-eu-tax-group="virtual"/>
+    <tax id="9" name="MwSt. DE 19%" rate="19" auto-generated="1" from-eu-tax-group="virtual"/>
+    <tax id="10" name="moms DK 25%" rate="25" auto-generated="1" from-eu-tax-group="virtual"/>
+    <tax id="11" name="km EE 20%" rate="20" auto-generated="1" from-eu-tax-group="virtual"/>
+    <tax id="12" name="ALV FI 24%" rate="24" auto-generated="1" from-eu-tax-group="virtual"/>
+    <tax id="13" name="TVA FR 20%" rate="20" auto-generated="1" from-eu-tax-group="virtual"/>
+    <tax id="14" name="VAT UK 20%" rate="20.0" auto-generated="1" from-eu-tax-group="virtual"/>
+    <tax id="15" name="ΦΠΑ GR 23%" rate="23" auto-generated="1" from-eu-tax-group="virtual"/>
+    <tax id="16" name="Croatia PDV 25%" rate="25.000" auto-generated="1" from-eu-tax-group="virtual"/>
+    <tax id="17" name="ÁFA HU 27%" rate="27" auto-generated="1" from-eu-tax-group="virtual"/>
+    <tax id="18" name="VAT IE 23%" rate="23" auto-generated="1" from-eu-tax-group="virtual"/>
+    <tax id="19" name="IVA IT 22%" rate="22" auto-generated="1" from-eu-tax-group="virtual"/>
+    <tax id="20" name="PVM LT 21%" rate="21" auto-generated="1" from-eu-tax-group="virtual"/>
+    <tax id="21" name="TVA LU 17%" rate="17" auto-generated="1" from-eu-tax-group="virtual"/>
+    <tax id="22" name="PVN LV 21%" rate="21" auto-generated="1" from-eu-tax-group="virtual"/>
+    <tax id="23" name="VAT MT 18%" rate="18" auto-generated="1" from-eu-tax-group="virtual"/>
+    <tax id="24" name="BTW NL 21%" rate="21" auto-generated="1" from-eu-tax-group="virtual"/>
+    <tax id="25" name="PTU PL 23%" rate="23" auto-generated="1" from-eu-tax-group="virtual"/>
+    <tax id="26" name="IVA PT 23%" rate="23" auto-generated="1" from-eu-tax-group="virtual"/>
+    <tax id="27" name="TVA RO 24%" rate="24" auto-generated="1" from-eu-tax-group="virtual"/>
+    <tax id="28" name="Moms SE 25%" rate="25" auto-generated="1" from-eu-tax-group="virtual"/>
+    <tax id="29" name="DDV SI 22%" rate="22" auto-generated="1" from-eu-tax-group="virtual"/>
+    <tax id="30" name="DPH SK 20%" rate="20" auto-generated="1" from-eu-tax-group="virtual"/>
+    <taxRulesGroup name="ES Standard rate (21%)">
+      <taxRule iso_code_country="be" id_tax="1"/>
+      <taxRule iso_code_country="bg" id_tax="1"/>
+      <taxRule iso_code_country="cz" id_tax="1"/>
+      <taxRule iso_code_country="dk" id_tax="1"/>
+      <taxRule iso_code_country="de" id_tax="1"/>
+      <taxRule iso_code_country="ee" id_tax="1"/>
+      <taxRule iso_code_country="gr" id_tax="1"/>
+      <taxRule iso_code_country="es" id_tax="1"/>
+      <taxRule iso_code_country="fr" id_tax="1"/>
+      <taxRule iso_code_country="ie" id_tax="1"/>
+      <taxRule iso_code_country="it" id_tax="1"/>
+      <taxRule iso_code_country="cy" id_tax="1"/>
+      <taxRule iso_code_country="lv" id_tax="1"/>
+      <taxRule iso_code_country="lt" id_tax="1"/>
+      <taxRule iso_code_country="lu" id_tax="1"/>
+      <taxRule iso_code_country="hu" id_tax="1"/>
+      <taxRule iso_code_country="mt" id_tax="1"/>
+      <taxRule iso_code_country="nl" id_tax="1"/>
+      <taxRule iso_code_country="at" id_tax="1"/>
+      <taxRule iso_code_country="pl" id_tax="1"/>
+      <taxRule iso_code_country="pt" id_tax="1"/>
+      <taxRule iso_code_country="ro" id_tax="1"/>
+      <taxRule iso_code_country="si" id_tax="1"/>
+      <taxRule iso_code_country="sk" id_tax="1"/>
+      <taxRule iso_code_country="fi" id_tax="1"/>
+      <taxRule iso_code_country="se" id_tax="1"/>
+      <taxRule iso_code_country="uk" id_tax="1"/>
+    </taxRulesGroup>
+    <taxRulesGroup name="ES Reduced Rate (10%)">
+      <taxRule iso_code_country="be" id_tax="2"/>
+      <taxRule iso_code_country="bg" id_tax="2"/>
+      <taxRule iso_code_country="cz" id_tax="2"/>
+      <taxRule iso_code_country="dk" id_tax="2"/>
+      <taxRule iso_code_country="de" id_tax="2"/>
+      <taxRule iso_code_country="ee" id_tax="2"/>
+      <taxRule iso_code_country="gr" id_tax="2"/>
+      <taxRule iso_code_country="es" id_tax="2"/>
+      <taxRule iso_code_country="fr" id_tax="2"/>
+      <taxRule iso_code_country="ie" id_tax="2"/>
+      <taxRule iso_code_country="it" id_tax="2"/>
+      <taxRule iso_code_country="cy" id_tax="2"/>
+      <taxRule iso_code_country="lv" id_tax="2"/>
+      <taxRule iso_code_country="lt" id_tax="2"/>
+      <taxRule iso_code_country="lu" id_tax="2"/>
+      <taxRule iso_code_country="hu" id_tax="2"/>
+      <taxRule iso_code_country="mt" id_tax="2"/>
+      <taxRule iso_code_country="nl" id_tax="2"/>
+      <taxRule iso_code_country="at" id_tax="2"/>
+      <taxRule iso_code_country="pl" id_tax="2"/>
+      <taxRule iso_code_country="pt" id_tax="2"/>
+      <taxRule iso_code_country="ro" id_tax="2"/>
+      <taxRule iso_code_country="si" id_tax="2"/>
+      <taxRule iso_code_country="sk" id_tax="2"/>
+      <taxRule iso_code_country="fi" id_tax="2"/>
+      <taxRule iso_code_country="se" id_tax="2"/>
+      <taxRule iso_code_country="uk" id_tax="2"/>
+    </taxRulesGroup>
+    <taxRulesGroup name="ES Super Reduced Rate (4%)">
+      <taxRule iso_code_country="be" id_tax="3"/>
+      <taxRule iso_code_country="bg" id_tax="3"/>
+      <taxRule iso_code_country="cz" id_tax="3"/>
+      <taxRule iso_code_country="dk" id_tax="3"/>
+      <taxRule iso_code_country="de" id_tax="3"/>
+      <taxRule iso_code_country="ee" id_tax="3"/>
+      <taxRule iso_code_country="gr" id_tax="3"/>
+      <taxRule iso_code_country="es" id_tax="3"/>
+      <taxRule iso_code_country="fr" id_tax="3"/>
+      <taxRule iso_code_country="ie" id_tax="3"/>
+      <taxRule iso_code_country="it" id_tax="3"/>
+      <taxRule iso_code_country="cy" id_tax="3"/>
+      <taxRule iso_code_country="lv" id_tax="3"/>
+      <taxRule iso_code_country="lt" id_tax="3"/>
+      <taxRule iso_code_country="lu" id_tax="3"/>
+      <taxRule iso_code_country="hu" id_tax="3"/>
+      <taxRule iso_code_country="mt" id_tax="3"/>
+      <taxRule iso_code_country="nl" id_tax="3"/>
+      <taxRule iso_code_country="at" id_tax="3"/>
+      <taxRule iso_code_country="pl" id_tax="3"/>
+      <taxRule iso_code_country="pt" id_tax="3"/>
+      <taxRule iso_code_country="ro" id_tax="3"/>
+      <taxRule iso_code_country="si" id_tax="3"/>
+      <taxRule iso_code_country="sk" id_tax="3"/>
+      <taxRule iso_code_country="fi" id_tax="3"/>
+      <taxRule iso_code_country="se" id_tax="3"/>
+      <taxRule iso_code_country="uk" id_tax="3"/>
+    </taxRulesGroup>
+    <taxRulesGroup name="ES Foodstuff Rate (4%)">
+      <taxRule iso_code_country="be" id_tax="3"/>
+      <taxRule iso_code_country="bg" id_tax="3"/>
+      <taxRule iso_code_country="cz" id_tax="3"/>
+      <taxRule iso_code_country="dk" id_tax="3"/>
+      <taxRule iso_code_country="de" id_tax="3"/>
+      <taxRule iso_code_country="ee" id_tax="3"/>
+      <taxRule iso_code_country="gr" id_tax="3"/>
+      <taxRule iso_code_country="es" id_tax="3"/>
+      <taxRule iso_code_country="fr" id_tax="3"/>
+      <taxRule iso_code_country="ie" id_tax="3"/>
+      <taxRule iso_code_country="it" id_tax="3"/>
+      <taxRule iso_code_country="cy" id_tax="3"/>
+      <taxRule iso_code_country="lv" id_tax="3"/>
+      <taxRule iso_code_country="lt" id_tax="3"/>
+      <taxRule iso_code_country="lu" id_tax="3"/>
+      <taxRule iso_code_country="hu" id_tax="3"/>
+      <taxRule iso_code_country="mt" id_tax="3"/>
+      <taxRule iso_code_country="nl" id_tax="3"/>
+      <taxRule iso_code_country="at" id_tax="3"/>
+      <taxRule iso_code_country="pl" id_tax="3"/>
+      <taxRule iso_code_country="pt" id_tax="3"/>
+      <taxRule iso_code_country="ro" id_tax="3"/>
+      <taxRule iso_code_country="si" id_tax="3"/>
+      <taxRule iso_code_country="sk" id_tax="3"/>
+      <taxRule iso_code_country="fi" id_tax="3"/>
+      <taxRule iso_code_country="se" id_tax="3"/>
+      <taxRule iso_code_country="uk" id_tax="3"/>
+    </taxRulesGroup>
+    <taxRulesGroup name="ES Books Rate (4%)">
+      <taxRule iso_code_country="be" id_tax="3"/>
+      <taxRule iso_code_country="bg" id_tax="3"/>
+      <taxRule iso_code_country="cz" id_tax="3"/>
+      <taxRule iso_code_country="dk" id_tax="3"/>
+      <taxRule iso_code_country="de" id_tax="3"/>
+      <taxRule iso_code_country="ee" id_tax="3"/>
+      <taxRule iso_code_country="gr" id_tax="3"/>
+      <taxRule iso_code_country="es" id_tax="3"/>
+      <taxRule iso_code_country="fr" id_tax="3"/>
+      <taxRule iso_code_country="ie" id_tax="3"/>
+      <taxRule iso_code_country="it" id_tax="3"/>
+      <taxRule iso_code_country="cy" id_tax="3"/>
+      <taxRule iso_code_country="lv" id_tax="3"/>
+      <taxRule iso_code_country="lt" id_tax="3"/>
+      <taxRule iso_code_country="lu" id_tax="3"/>
+      <taxRule iso_code_country="hu" id_tax="3"/>
+      <taxRule iso_code_country="mt" id_tax="3"/>
+      <taxRule iso_code_country="nl" id_tax="3"/>
+      <taxRule iso_code_country="at" id_tax="3"/>
+      <taxRule iso_code_country="pl" id_tax="3"/>
+      <taxRule iso_code_country="pt" id_tax="3"/>
+      <taxRule iso_code_country="ro" id_tax="3"/>
+      <taxRule iso_code_country="si" id_tax="3"/>
+      <taxRule iso_code_country="sk" id_tax="3"/>
+      <taxRule iso_code_country="fi" id_tax="3"/>
+      <taxRule iso_code_country="se" id_tax="3"/>
+      <taxRule iso_code_country="uk" id_tax="3"/>
+    </taxRulesGroup>
+    <taxRulesGroup name="EU VAT For Virtual Products" auto-generated="1" eu-tax-group="virtual">
+      <taxRule iso_code_country="es" id_tax="1"/>
+      <taxRule iso_code_country="at" id_tax="4"/>
+      <taxRule iso_code_country="be" id_tax="5"/>
+      <taxRule iso_code_country="bg" id_tax="6"/>
+      <taxRule iso_code_country="cy" id_tax="7"/>
+      <taxRule iso_code_country="cz" id_tax="8"/>
+      <taxRule iso_code_country="de" id_tax="9"/>
+      <taxRule iso_code_country="dk" id_tax="10"/>
+      <taxRule iso_code_country="ee" id_tax="11"/>
+      <taxRule iso_code_country="fi" id_tax="12"/>
+      <taxRule iso_code_country="fr" id_tax="13"/>
+      <taxRule iso_code_country="gb" id_tax="14"/>
+      <taxRule iso_code_country="gr" id_tax="15"/>
+      <taxRule iso_code_country="hr" id_tax="16"/>
+      <taxRule iso_code_country="hu" id_tax="17"/>
+      <taxRule iso_code_country="ie" id_tax="18"/>
+      <taxRule iso_code_country="it" id_tax="19"/>
+      <taxRule iso_code_country="lt" id_tax="20"/>
+      <taxRule iso_code_country="lu" id_tax="21"/>
+      <taxRule iso_code_country="lv" id_tax="22"/>
+      <taxRule iso_code_country="mt" id_tax="23"/>
+      <taxRule iso_code_country="nl" id_tax="24"/>
+      <taxRule iso_code_country="pl" id_tax="25"/>
+      <taxRule iso_code_country="pt" id_tax="26"/>
+      <taxRule iso_code_country="ro" id_tax="27"/>
+      <taxRule iso_code_country="se" id_tax="28"/>
+      <taxRule iso_code_country="si" id_tax="29"/>
+      <taxRule iso_code_country="sk" id_tax="30"/>
+    </taxRulesGroup>
+  </taxes>
+  <units>
+    <unit type="weight" value="kg"/>
+    <unit type="volume" value="L"/>
+    <unit type="short_distance" value="cm"/>
+    <unit type="base_distance" value="m"/>
+    <unit type="long_distance" value="km"/>
+  </units>
+  <states>
+    <state name="A Coruña" iso_code="ES-C" country="ES" zone="Europe"/>
+    <state name="Álava" iso_code="ES-VI" country="ES" zone="Europe"/>
+    <state name="Albacete" iso_code="ES-AB" country="ES" zone="Europe"/>
+    <state name="Alacant" iso_code="ES-A" country="ES" zone="Europe"/>
+    <state name="Almería" iso_code="ES-AL" country="ES" zone="Europe"/>
+    <state name="Asturias" iso_code="ES-O" country="ES" zone="Europe"/>
+    <state name="Ávila" iso_code="ES-AV" country="ES" zone="Europe"/>
+    <state name="Badajoz" iso_code="ES-BA" country="ES" zone="Europe"/>
+    <state name="Balears" iso_code="ES-PM" country="ES" zone="Europe"/>
+    <state name="Barcelona" iso_code="ES-B" country="ES" zone="Europe"/>
+    <state name="Burgos" iso_code="ES-BU" country="ES" zone="Europe"/>
+    <state name="Cáceres" iso_code="ES-CC" country="ES" zone="Europe"/>
+    <state name="Cádiz" iso_code="ES-CA" country="ES" zone="Europe"/>
+    <state name="Cantabria" iso_code="ES-S" country="ES" zone="Europe"/>
+    <state name="Castelló" iso_code="ES-CS" country="ES" zone="Europe"/>
+    <state name="Ciudad Real" iso_code="ES-CR" country="ES" zone="Europe"/>
+    <state name="Córdoba" iso_code="ES-CO" country="ES" zone="Europe"/>
+    <state name="Cuenca" iso_code="ES-CU" country="ES" zone="Europe"/>
+    <state name="Girona" iso_code="ES-GI" country="ES" zone="Europe"/>
+    <state name="Granada" iso_code="ES-GR" country="ES" zone="Europe"/>
+    <state name="Guadalajara" iso_code="ES-GU" country="ES" zone="Europe"/>
+    <state name="Gipuzkoa" iso_code="ES-SS" country="ES" zone="Europe"/>
+    <state name="Huelva" iso_code="ES-H" country="ES" zone="Europe"/>
+    <state name="Huesca" iso_code="ES-HU" country="ES" zone="Europe"/>
+    <state name="Jaén" iso_code="ES-J" country="ES" zone="Europe"/>
+    <state name="La Rioja" iso_code="ES-LO" country="ES" zone="Europe"/>
+    <state name="Las Palmas" iso_code="ES-GC" country="ES" zone="Europe"/>
+    <state name="León" iso_code="ES-LE" country="ES" zone="Europe"/>
+    <state name="Lleida" iso_code="ES-L" country="ES" zone="Europe"/>
+    <state name="Lugo" iso_code="ES-LU" country="ES" zone="Europe"/>
+    <state name="Madrid" iso_code="ES-M" country="ES" zone="Europe"/>
+    <state name="Málaga" iso_code="ES-MA" country="ES" zone="Europe"/>
+    <state name="Murcia" iso_code="ES-MU" country="ES" zone="Europe"/>
+    <state name="Nafarroa" iso_code="ES-NA" country="ES" zone="Europe"/>
+    <state name="Ourense" iso_code="ES-OR" country="ES" zone="Europe"/>
+    <state name="Palencia" iso_code="ES-P" country="ES" zone="Europe"/>
+    <state name="Pontevedra" iso_code="ES-PO" country="ES" zone="Europe"/>
+    <state name="Salamanca" iso_code="ES-SA" country="ES" zone="Europe"/>
+    <state name="Santa Cruz de Tenerife" iso_code="ES-TF" country="ES" zone="Europe"/>
+    <state name="Segovia" iso_code="ES-SG" country="ES" zone="Europe"/>
+    <state name="Sevilla" iso_code="ES-SE" country="ES" zone="Europe"/>
+    <state name="Soria" iso_code="ES-SO" country="ES" zone="Europe"/>
+    <state name="Tarragona" iso_code="ES-T" country="ES" zone="Europe"/>
+    <state name="Teruel" iso_code="ES-TE" country="ES" zone="Europe"/>
+    <state name="Toledo" iso_code="ES-TO" country="ES" zone="Europe"/>
+    <state name="València" iso_code="ES-V" country="ES" zone="Europe"/>
+    <state name="Valladolid" iso_code="ES-VA" country="ES" zone="Europe"/>
+    <state name="Bizkaia" iso_code="ES-BI" country="ES" zone="Europe"/>
+    <state name="Zamora" iso_code="ES-ZA" country="ES" zone="Europe"/>
+    <state name="Zaragoza" iso_code="ES-Z" country="ES" zone="Europe"/>
+    <state name=" Ceuta" iso_code="ES-CE" country="ES" zone="Europe"/>
+    <state name=" Melilla" iso_code="ES-ML" country="ES" zone="Europe"/>
+  </states>
+</localizationPack>

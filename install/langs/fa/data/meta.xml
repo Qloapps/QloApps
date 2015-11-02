@@ -1,0 +1,165 @@
+<?xml version="1.0"?>
+<entity_meta>
+  <meta id="404" id_shop="1">
+    <title>404 error</title>
+    <description>صفحه مورد نظر پیدا نشد</description>
+    <keywords/>
+    <url_rewrite>page-not-found</url_rewrite>
+  </meta>
+  <meta id="best-sales" id_shop="1">
+    <title>پرفروش ترین ها</title>
+    <description>پرفروش ترین محصولات ما</description>
+    <keywords/>
+    <url_rewrite>best-sales</url_rewrite>
+  </meta>
+  <meta id="contact" id_shop="1">
+    <title>ارتباط با ما</title>
+    <description>برای ارتباط با ما از این فرم استفاده کنید</description>
+    <keywords/>
+    <url_rewrite>contact-us</url_rewrite>
+  </meta>
+  <meta id="index" id_shop="1">
+    <title/>
+    <description>فروشگاه قدرت گرفته از پرستاشاپ</description>
+    <keywords/>
+    <url_rewrite/>
+  </meta>
+  <meta id="manufacturer" id_shop="1">
+    <title>تولید کننده ها</title>
+    <description>لیست تولید کننده ها</description>
+    <keywords/>
+    <url_rewrite>manufacturers</url_rewrite>
+  </meta>
+  <meta id="new-products" id_shop="1">
+    <title>محصولات جدید</title>
+    <description>جدیدترین محصولات ما</description>
+    <keywords/>
+    <url_rewrite>new-products</url_rewrite>
+  </meta>
+  <meta id="password" id_shop="1">
+    <title>فراموشی گذرواژه</title>
+    <description>برای دریافت رمز عبور خود توسط ایمیل میتوانید پست الکترونیکی که با آن ثبت نام کرده بودید را وارد کنید</description>
+    <keywords/>
+    <url_rewrite>password-recovery</url_rewrite>
+  </meta>
+  <meta id="prices-drop" id_shop="1">
+    <title>کاهش قیمت ها</title>
+    <description>محصولات ویژه ما</description>
+    <keywords/>
+    <url_rewrite>prices-drop</url_rewrite>
+  </meta>
+  <meta id="sitemap" id_shop="1">
+    <title>نقشه سایت</title>
+    <description>گمشده اید؟ آنچه را که به دنبالش هستید پیدا کنید</description>
+    <keywords/>
+    <url_rewrite>sitemap</url_rewrite>
+  </meta>
+  <meta id="supplier" id_shop="1">
+    <title>تامین کننده ها</title>
+    <description>لیست تامین کننده ها</description>
+    <keywords/>
+    <url_rewrite>supplier</url_rewrite>
+  </meta>
+  <meta id="address" id_shop="1">
+    <title>آدرس</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>address</url_rewrite>
+  </meta>
+  <meta id="addresses" id_shop="1">
+    <title>آدرس‌ها</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>addresses</url_rewrite>
+  </meta>
+  <meta id="authentication" id_shop="1">
+    <title>ورود</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>login</url_rewrite>
+  </meta>
+  <meta id="cart" id_shop="1">
+    <title>سبد خرید</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>cart</url_rewrite>
+  </meta>
+  <meta id="discount" id_shop="1">
+    <title>تخفیف</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>discount</url_rewrite>
+  </meta>
+  <meta id="history" id_shop="1">
+    <title>تاریخچه سفارش</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>order-history</url_rewrite>
+  </meta>
+  <meta id="identity" id_shop="1">
+    <title>مشخصات</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>identity</url_rewrite>
+  </meta>
+  <meta id="my-account" id_shop="1">
+    <title>حساب من</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>my-account</url_rewrite>
+  </meta>
+  <meta id="order-follow" id_shop="1">
+    <title>پیگیری سفارش</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>order-follow</url_rewrite>
+  </meta>
+  <meta id="order-slip" id_shop="1">
+    <title>رسید سفارش</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>order-slip</url_rewrite>
+  </meta>
+  <meta id="order" id_shop="1">
+    <title>سفارش</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>order</url_rewrite>
+  </meta>
+  <meta id="search" id_shop="1">
+    <title>جستجو</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>search</url_rewrite>
+  </meta>
+  <meta id="stores" id_shop="1">
+    <title>مغازه‌ها</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>stores</url_rewrite>
+  </meta>
+  <meta id="order-opc" id_shop="1">
+    <title>سفارش</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>quick-order</url_rewrite>
+  </meta>
+  <meta id="guest-tracking" id_shop="1">
+    <title>پیگیری مهمان</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>guest-tracking</url_rewrite>
+  </meta>
+  <meta id="order-confirmation" id_shop="1">
+    <title>تأیید سفارش</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>order-confirmation</url_rewrite>
+  </meta>
+  <meta id="products-comparison" id_shop="1">
+    <title>مقایسه محصولات</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>products-comparison</url_rewrite>
+  </meta>
+</entity_meta>

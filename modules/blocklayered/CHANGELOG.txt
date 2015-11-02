@@ -1,0 +1,17 @@
+2014-04-22 18:57:17 +0200	// Changelog updated
+2014-04-17 15:49:24 +0200	[-] MO : Blocklayered - FixBug #PSCSX-1505
+2014-04-17 12:21:18 +0200	[-] MO : Blocklayered - FixBug #PSCSX-1337
+2014-04-08 10:29:23 +0200	// blocklayered: better wording.
+2014-04-03 15:24:10 +0200	// Update version
+2014-04-03 15:23:10 +0200	[-] BO : BlockLayered - FixBug #PSCSX-1399 pagination problem
+2014-03-27 18:22:40 +0100	// update version number
+2014-03-27 11:57:03 +0100	Merge pull request #2 from xBorderie/patch-1
+2014-03-27 11:51:19 +0100	[*] MO : a string you can actually translate.
+2014-03-27 11:51:15 +0100	// Fix wrong backquote in SQL
+2014-03-24 17:53:22 +0100	// MO blocklayered : Removed ps_version_compliancy duplicate
+2014-03-24 12:21:34 +0100	Merge branch 'master' of https://github.com/PrestaShop/blocklayered
+2014-03-24 11:43:28 +0100	/ MO blocklayered : ps_versions_compliancy modified (1.5.6.1 => 1.6)
+2014-03-24 11:02:30 +0100	/ MO blocklayered : ps_versions_compliancy added
+2014-03-21 18:39:28 +0100	[-] Add column names in SQL insert into
+2014-03-20 16:54:45 +0100	// Two forgotten periods in blocklayered 1.6 template.
+2014-03-20 14:22:46 +0100	Initial commit

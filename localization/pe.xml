@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<localizationPack name="Peru">
+  <currencies>
+    <currency name="Nuevo Sol" iso_code="PEN" iso_code_num="604" sign="S/." blank="1" conversion_rate="2.784499" format="1" decimals="0"/>
+  </currencies>
+  <languages>
+    <language iso_code="es"/>
+  </languages>
+  <taxes>
+    <taxRulesGroup name="Peru IGV + IPM">
+      <taxRule iso_code_country="pe" behavior="1" id_tax="53"/>
+      <taxRule iso_code_country="pe" behavior="1" id_tax="54"/>
+    </taxRulesGroup>
+    <tax id="53" name="Impuesto General a la Ventas" rate="18.000"/>
+    <tax id="54" name="Impuesto de Promocion Municipal" rate="2.000"/>
+  </taxes>
+  <units>
+    <unit type="weight" value="kg"/>
+    <unit type="volume" value="L"/>
+    <unit type="short_distance" value="cm"/>
+    <unit type="base_distance" value="m"/>
+    <unit type="long_distance" value="km"/>
+  </units>
+</localizationPack>

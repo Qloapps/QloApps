@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<localizationPack name="Singapore" version="1.0">
+	<currencies>
+		<currency name="Dollar" iso_code="SGD" iso_code_num="702" sign="$" blank="1" conversion_rate="1.79109" format="1" decimals="1" />
+	</currencies>
+	<languages>
+		<language iso_code="en" />
+		<language iso_code="ms" />
+		<language iso_code="zh" />
+	</languages>
+	<taxes>
+		<tax id="1" name="GST SG 7%" rate="7" />
+		
+		<taxRulesGroup name="SG Standard Rate (7%)">
+			<taxRule iso_code_country="sg" id_tax="1" />
+		</taxRulesGroup>
+	</taxes>
+	<units>
+		<unit type="weight" value="kg"/>
+	    <unit type="volume" value="L"/>
+	    <unit type="short_distance" value="cm"/>
+	    <unit type="base_distance" value="m"/>
+	    <unit type="long_distance" value="km"/>
+	</units>
+</localizationPack>

@@ -1,0 +1,18 @@
+<?xml version='1.0'?>
+<entity_order_return_state>
+  <order_return_state id='Waiting_for_confirmation'>
+    <name>Menunggu konfirmasi</name>
+  </order_return_state>
+  <order_return_state id='Waiting_for_package'>
+    <name>Menunggu paket</name>
+  </order_return_state>
+  <order_return_state id='Package_received'>
+    <name>Paket diterima</name>
+  </order_return_state>
+  <order_return_state id='Return_denied'>
+    <name>Retur ditolak</name>
+  </order_return_state>
+  <order_return_state id='Return_completed'>
+    <name>Retur berhasil</name>
+  </order_return_state>
+</entity_order_return_state>
