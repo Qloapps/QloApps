@@ -1,17 +1,17 @@
-<?php /* Smarty version Smarty-3.1.19, created on 2015-11-02 20:02:47
+<?php /* Smarty version Smarty-3.1.19, created on 2015-11-05 18:44:59
          compiled from "/home/sumit/public_html/html/ps-hotel-reservation-system/admin/themes/default/template/layout-ajax.tpl" */ ?>
-<?php /*%%SmartyHeaderCode:10560312435637740f355fe0-36469992%%*/if(!defined('SMARTY_DIR')) exit('no direct access allowed');
+<?php /*%%SmartyHeaderCode:803767280563b5653960645-69652295%%*/if(!defined('SMARTY_DIR')) exit('no direct access allowed');
 $_valid = $_smarty_tpl->decodeProperties(array (
   'file_dependency' => 
   array (
     '8c49a06e51109ef16a45d832ed1b5d676724c9dd' => 
     array (
       0 => '/home/sumit/public_html/html/ps-hotel-reservation-system/admin/themes/default/template/layout-ajax.tpl',
-      1 => 1446454904,
+      1 => 1446729261,
       2 => 'file',
     ),
   ),
-  'nocache_hash' => '10560312435637740f355fe0-36469992',
+  'nocache_hash' => '803767280563b5653960645-69652295',
   'function' => 
   array (
   ),
@@ -33,9 +33,9 @@ $_valid = $_smarty_tpl->decodeProperties(array (
   ),
   'has_nocache_code' => false,
   'version' => 'Smarty-3.1.19',
-  'unifunc' => 'content_5637740f439477_14953240',
+  'unifunc' => 'content_563b5653a0f7a5_01025327',
 ),false); /*/%%SmartyHeaderCode%%*/?>
-<?php if ($_valid && !is_callable('content_5637740f439477_14953240')) {function content_5637740f439477_14953240($_smarty_tpl) {?>
+<?php if ($_valid && !is_callable('content_563b5653a0f7a5_01025327')) {function content_563b5653a0f7a5_01025327($_smarty_tpl) {?>
 <?php if (isset($_smarty_tpl->tpl_vars['json']->value)) {?>
 {<?php if (isset($_smarty_tpl->tpl_vars['status']->value)&&is_string($_smarty_tpl->tpl_vars['status']->value)&&trim($_smarty_tpl->tpl_vars['status']->value)!='') {?><?php $_smarty_tpl->tpl_vars['hasresult'] = new Smarty_variable('ok', null, 0);?>"status" : "<?php echo $_smarty_tpl->tpl_vars['status']->value;?>
 "<?php }?><?php if (isset($_smarty_tpl->tpl_vars['confirmations']->value)&&count($_smarty_tpl->tpl_vars['confirmations']->value)>0) {?><?php if ($_smarty_tpl->tpl_vars['hasresult']->value=='ok') {?>,<?php }?><?php $_smarty_tpl->tpl_vars['hasresult'] = new Smarty_variable('ok', null, 0);?>"confirmations" : <?php echo $_smarty_tpl->tpl_vars['confirmations']->value;?>

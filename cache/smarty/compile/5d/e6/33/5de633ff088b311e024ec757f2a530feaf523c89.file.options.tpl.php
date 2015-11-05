@@ -1,17 +1,17 @@
-<?php /* Smarty version Smarty-3.1.19, created on 2015-11-02 20:02:41
+<?php /* Smarty version Smarty-3.1.19, created on 2015-11-05 18:44:54
          compiled from "/home/sumit/public_html/html/ps-hotel-reservation-system/admin/themes/default/template/helpers/options/options.tpl" */ ?>
-<?php /*%%SmartyHeaderCode:125199073556377409824e83-02043571%%*/if(!defined('SMARTY_DIR')) exit('no direct access allowed');
+<?php /*%%SmartyHeaderCode:219343580563b564e02b5e2-82796765%%*/if(!defined('SMARTY_DIR')) exit('no direct access allowed');
 $_valid = $_smarty_tpl->decodeProperties(array (
   'file_dependency' => 
   array (
     '5de633ff088b311e024ec757f2a530feaf523c89' => 
     array (
       0 => '/home/sumit/public_html/html/ps-hotel-reservation-system/admin/themes/default/template/helpers/options/options.tpl',
-      1 => 1446455061,
+      1 => 1446729262,
       2 => 'file',
     ),
   ),
-  'nocache_hash' => '125199073556377409824e83-02043571',
+  'nocache_hash' => '219343580563b564e02b5e2-82796765',
   'function' => 
   array (
   ),
@@ -47,9 +47,9 @@ $_valid = $_smarty_tpl->decodeProperties(array (
   ),
   'has_nocache_code' => false,
   'version' => 'Smarty-3.1.19',
-  'unifunc' => 'content_56377409b7f7c1_36743970',
+  'unifunc' => 'content_563b564e396761_25055472',
 ),false); /*/%%SmartyHeaderCode%%*/?>
-<?php if ($_valid && !is_callable('content_56377409b7f7c1_36743970')) {function content_56377409b7f7c1_36743970($_smarty_tpl) {?><?php if (!is_callable('smarty_function_counter')) include '/home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/plugins/function.counter.php';
+<?php if ($_valid && !is_callable('content_563b564e396761_25055472')) {function content_563b564e396761_25055472($_smarty_tpl) {?><?php if (!is_callable('smarty_function_counter')) include '/home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/plugins/function.counter.php';
 if (!is_callable('smarty_modifier_escape')) include '/home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/plugins/modifier.escape.php';
 if (!is_callable('smarty_modifier_replace')) include '/home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/plugins/modifier.replace.php';
 ?>

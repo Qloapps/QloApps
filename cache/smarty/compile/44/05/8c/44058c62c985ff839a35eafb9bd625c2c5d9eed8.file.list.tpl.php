@@ -1,17 +1,17 @@
-<?php /* Smarty version Smarty-3.1.19, created on 2015-11-02 20:02:41
+<?php /* Smarty version Smarty-3.1.19, created on 2015-11-05 18:44:53
          compiled from "/home/sumit/public_html/html/ps-hotel-reservation-system/admin/themes/default/template/helpers/shops_list/list.tpl" */ ?>
-<?php /*%%SmartyHeaderCode:2031022622563774096a8cc4-32934389%%*/if(!defined('SMARTY_DIR')) exit('no direct access allowed');
+<?php /*%%SmartyHeaderCode:1784498460563b564de78407-53571966%%*/if(!defined('SMARTY_DIR')) exit('no direct access allowed');
 $_valid = $_smarty_tpl->decodeProperties(array (
   'file_dependency' => 
   array (
     '44058c62c985ff839a35eafb9bd625c2c5d9eed8' => 
     array (
       0 => '/home/sumit/public_html/html/ps-hotel-reservation-system/admin/themes/default/template/helpers/shops_list/list.tpl',
-      1 => 1446455062,
+      1 => 1446729263,
       2 => 'file',
     ),
   ),
-  'nocache_hash' => '2031022622563774096a8cc4-32934389',
+  'nocache_hash' => '1784498460563b564de78407-53571966',
   'function' => 
   array (
   ),
@@ -32,9 +32,9 @@ $_valid = $_smarty_tpl->decodeProperties(array (
   ),
   'has_nocache_code' => false,
   'version' => 'Smarty-3.1.19',
-  'unifunc' => 'content_56377409704a53_19761608',
+  'unifunc' => 'content_563b564ded47c0_00105048',
 ),false); /*/%%SmartyHeaderCode%%*/?>
-<?php if ($_valid && !is_callable('content_56377409704a53_19761608')) {function content_56377409704a53_19761608($_smarty_tpl) {?>
+<?php if ($_valid && !is_callable('content_563b564ded47c0_00105048')) {function content_563b564ded47c0_00105048($_smarty_tpl) {?>
 <a href="javascript:void(0)" class="dropdown-toggle" data-toggle="dropdown"><?php echo $_smarty_tpl->tpl_vars['current_shop_name']->value;?>
  <i class="icon-caret-down"></i></a><ul class="dropdown-menu"><li<?php if (!isset($_smarty_tpl->tpl_vars['current_shop_value']->value)||$_smarty_tpl->tpl_vars['current_shop_value']->value=='') {?> class="active"<?php }?>><a href="<?php echo htmlspecialchars($_smarty_tpl->tpl_vars['url']->value, ENT_QUOTES, 'UTF-8', true);?>
 "><?php echo smartyTranslate(array('s'=>'All shops'),$_smarty_tpl);?>

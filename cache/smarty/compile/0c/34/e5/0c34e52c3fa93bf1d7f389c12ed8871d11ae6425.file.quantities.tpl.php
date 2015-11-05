@@ -1,17 +1,17 @@
-<?php /* Smarty version Smarty-3.1.19, created on 2015-11-02 20:02:45
+<?php /* Smarty version Smarty-3.1.19, created on 2015-11-05 18:44:58
          compiled from "/home/sumit/public_html/html/ps-hotel-reservation-system/admin/themes/default/template/controllers/products/quantities.tpl" */ ?>
-<?php /*%%SmartyHeaderCode:18246339625637740dbdd3e4-98728021%%*/if(!defined('SMARTY_DIR')) exit('no direct access allowed');
+<?php /*%%SmartyHeaderCode:1159310417563b56522eac64-26566761%%*/if(!defined('SMARTY_DIR')) exit('no direct access allowed');
 $_valid = $_smarty_tpl->decodeProperties(array (
   'file_dependency' => 
   array (
     '0c34e52c3fa93bf1d7f389c12ed8871d11ae6425' => 
     array (
       0 => '/home/sumit/public_html/html/ps-hotel-reservation-system/admin/themes/default/template/controllers/products/quantities.tpl',
-      1 => 1446455063,
+      1 => 1446729264,
       2 => 'file',
     ),
   ),
-  'nocache_hash' => '18246339625637740dbdd3e4-98728021',
+  'nocache_hash' => '1159310417563b56522eac64-26566761',
   'function' => 
   array (
   ),
@@ -38,9 +38,9 @@ $_valid = $_smarty_tpl->decodeProperties(array (
   ),
   'has_nocache_code' => false,
   'version' => 'Smarty-3.1.19',
-  'unifunc' => 'content_5637740dd42fd7_03094657',
+  'unifunc' => 'content_563b565244df08_71918763',
 ),false); /*/%%SmartyHeaderCode%%*/?>
-<?php if ($_valid && !is_callable('content_5637740dd42fd7_03094657')) {function content_5637740dd42fd7_03094657($_smarty_tpl) {?>
+<?php if ($_valid && !is_callable('content_563b565244df08_71918763')) {function content_563b565244df08_71918763($_smarty_tpl) {?>
 
 <?php if (isset($_smarty_tpl->tpl_vars['product']->value->id)) {?>
 	<div id="product-quantities" class="panel product-tab">

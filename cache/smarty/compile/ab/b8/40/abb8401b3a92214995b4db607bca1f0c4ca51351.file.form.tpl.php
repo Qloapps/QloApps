@@ -1,17 +1,17 @@
-<?php /* Smarty version Smarty-3.1.19, created on 2015-11-02 20:02:44
+<?php /* Smarty version Smarty-3.1.19, created on 2015-11-05 18:44:57
          compiled from "/home/sumit/public_html/html/ps-hotel-reservation-system/admin/themes/default/template/controllers/orders/form.tpl" */ ?>
-<?php /*%%SmartyHeaderCode:18023558745637740c99a775-26201780%%*/if(!defined('SMARTY_DIR')) exit('no direct access allowed');
+<?php /*%%SmartyHeaderCode:2101216670563b56511dd074-99525539%%*/if(!defined('SMARTY_DIR')) exit('no direct access allowed');
 $_valid = $_smarty_tpl->decodeProperties(array (
   'file_dependency' => 
   array (
     'abb8401b3a92214995b4db607bca1f0c4ca51351' => 
     array (
       0 => '/home/sumit/public_html/html/ps-hotel-reservation-system/admin/themes/default/template/controllers/orders/form.tpl',
-      1 => 1446455064,
+      1 => 1446729264,
       2 => 'file',
     ),
   ),
-  'nocache_hash' => '18023558745637740c99a775-26201780',
+  'nocache_hash' => '2101216670563b56511dd074-99525539',
   'function' => 
   array (
   ),
@@ -46,9 +46,9 @@ $_valid = $_smarty_tpl->decodeProperties(array (
   ),
   'has_nocache_code' => false,
   'version' => 'Smarty-3.1.19',
-  'unifunc' => 'content_5637740cbda638_92231029',
+  'unifunc' => 'content_563b5651423323_53503470',
 ),false); /*/%%SmartyHeaderCode%%*/?>
-<?php if ($_valid && !is_callable('content_5637740cbda638_92231029')) {function content_5637740cbda638_92231029($_smarty_tpl) {?>
+<?php if ($_valid && !is_callable('content_563b5651423323_53503470')) {function content_563b5651423323_53503470($_smarty_tpl) {?>
 <script type="text/javascript">
 	var id_cart = <?php echo intval($_smarty_tpl->tpl_vars['cart']->value->id);?>
 ;
@@ -1207,11 +1207,17 @@ $_smarty_tpl->tpl_vars['id_order_state']->_loop = true;
 			$('#addresses_err').show().html('<?php echo smartyTranslate(array('s'=>'You must add at least one address to process the order.'),$_smarty_tpl);?>
 ');
 			$('#address_delivery, #address_invoice').hide();
+
+			//by webkul (if there is no address then order can not be created)
+			$("button[name=\"submitAddOrder\"]").attr("disabled", "disabled");
 		}
 		else
 		{
 			$('#addresses_err').hide();
 			$('#address_delivery, #address_invoice').show();
+
+			//by webkul
+			$("button[name=\"submitAddOrder\"]").removeAttr("disabled");
 		}
 
 		$('#id_address_delivery').html(addresses_delivery_options);
@@ -1659,7 +1665,7 @@ $_smarty_tpl->tpl_vars['lang']->_loop = true;
 		<div id="addresses_err" class="alert alert-warning" style="display:none;"></div>
 
 		<div class="row">
-			<div id="address_delivery" class="col-lg-6">
+			<div id="address_delivery" class="col-xs-6 col-sm-6">
 				<h4>
 					<i class="icon-map-marker"></i>
 					<?php echo smartyTranslate(array('s'=>'Customer Address'),$_smarty_tpl);?>

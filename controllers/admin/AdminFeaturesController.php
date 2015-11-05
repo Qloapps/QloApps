@@ -595,11 +595,11 @@ class AdminFeaturesControllerCore extends AdminController
 			if(isset($_FILES['logo']))
 				$this->validAddFeatureImage($_FILES['logo']);
 
-			$img_path = _PS_IMG_DIR_.'rf/'.$obj_feature->id.'.jpg';
+			$img_path = _PS_IMG_DIR_.'rf/'.$obj_feature->id.'.png';
 			
 			if (isset($_FILES['logo']))
 			{
-				$current_file = _PS_TMP_IMG_DIR_.'feature_mini_'.$obj_feature->id.'_'.$this->context->shop->id.'.jpg';
+				$current_file = _PS_TMP_IMG_DIR_.'feature_mini_'.$obj_feature->id.'_'.$this->context->shop->id.'.png';
 				if (file_exists($current_file))
 					unlink($current_file);
 
@@ -609,7 +609,7 @@ class AdminFeaturesControllerCore extends AdminController
 			$obj_feature_value->id_feature = $obj_feature->id;
 			
 			foreach (Language::getLanguages(true) as $lang)
-	            $obj_feature_value->value[$lang['id_lang']] = $obj_feature->id.'.jpg';
+	            $obj_feature_value->value[$lang['id_lang']] = $obj_feature->id.'.png';
 	        
 	        $obj_feature_value->save();
 		}

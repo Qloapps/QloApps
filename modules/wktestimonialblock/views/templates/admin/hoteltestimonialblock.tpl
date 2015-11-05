@@ -49,7 +49,7 @@
 									{if isset($data.testimonial_image)}
 										<img height="50px" width="50px" src="{$module_dir}wktestimonialblock/views/img/{$data.testimonial_image}">
 									{else}
-										<img height="50px" width="50px" src="{$module_dir}wktestimonialblock/views/img/default.jpg">
+										<img height="50px" width="50px" src="{$module_dir}wktestimonialblock/views/img/default.png">
 									{/if}
 								{/if}
 								</div>

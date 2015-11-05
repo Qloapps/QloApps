@@ -1,4 +1,4 @@
-<?php /* Smarty version Smarty-3.1.19, created on 2015-11-02 10:48:41
+<?php /* Smarty version Smarty-3.1.19, created on 2015-11-05 19:12:30
          compiled from "/home/sumit/public_html/html/ps-hotel-reservation-system/modules/gamification/views/templates/hook/notification_bt.tpl" */ ?>
 <?php /*%%SmartyHeaderCode:107134431056376ee74f14e6-25968010%%*/if(!defined('SMARTY_DIR')) exit('no direct access allowed');
 $_valid = $_smarty_tpl->decodeProperties(array (
@@ -7,7 +7,7 @@ $_valid = $_smarty_tpl->decodeProperties(array (
     'ac5de87ca54db7d3d7adca81948bebb2e27c9294' => 
     array (
       0 => '/home/sumit/public_html/html/ps-hotel-reservation-system/modules/gamification/views/templates/hook/notification_bt.tpl',
-      1 => 1446477736,
+      1 => 1446730819,
       2 => 'file',
     ),
   ),

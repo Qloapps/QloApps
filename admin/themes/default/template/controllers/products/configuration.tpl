@@ -14,6 +14,7 @@
 			</label>
 			<div class="col-sm-4">
 				<input type="text" class="form-control" value="{$htl_full_info['hotel_name']}" readonly>
+				<input type="hidden" name="id_hotel" value="{$htl_room_type['id_hotel']}">
 			</div>
 		{else}
 			<label class="control-label col-sm-2" for="hotel_place">

@@ -73,7 +73,7 @@
 	<td align="center" class="titleblock" style="padding:7px 0">
 		<font size="2" face="Open-sans, sans-serif" color="#555454">
 			<span class="title" style="font-weight:500;font-size:28px;text-transform:uppercase;line-height:33px">Hi {firstname} {lastname},</span><br/>
-			<span class="subtitle" style="font-weight:500;font-size:16px;text-transform:uppercase;line-height:25px">Thank you for selecting our hotel!</span>
+			<span class="subtitle" style="font-weight:500;font-size:16px;text-transform:uppercase;line-height:25px">Thank you for shopping with {shop_name}!</span>
 		</font>
 	</td>
 </tr>
@@ -105,19 +105,15 @@
 		<font size="2" face="Open-sans, sans-serif" color="#555454">
 			<table class="table table-recap" bgcolor="#ffffff" style="width:100%;border-collapse:collapse"><!-- Title -->
 				<tr>
-					<tr>
-					<th bgcolor="#f8f8f8" style="border:1px solid #D6D4D4;background-color: #fbfbfb;color: #333;font-family: Arial;font-size: 13px;padding: 10px;">Room Image</th>
-					<th bgcolor="#f8f8f8" style="border:1px solid #D6D4D4;background-color: #fbfbfb;color: #333;font-family: Arial;font-size: 13px;padding: 10px;">Room Description</th>
-					<th bgcolor="#f8f8f8" style="border:1px solid #D6D4D4;background-color: #fbfbfb;color: #333;font-family: Arial;font-size: 13px;padding: 10px;" width="17%">Room Capcity</th>
-					<th bgcolor="#f8f8f8" style="border:1px solid #D6D4D4;background-color: #fbfbfb;color: #333;font-family: Arial;font-size: 13px;padding: 10px;">Unit Price</th>
-					<th bgcolor="#f8f8f8" style="border:1px solid #D6D4D4;background-color: #fbfbfb;color: #333;font-family: Arial;font-size: 13px;padding: 10px;" width="17%">Rooms Qty</th>
-					<th bgcolor="#f8f8f8" style="border:1px solid #D6D4D4;background-color: #fbfbfb;color: #333;font-family: Arial;font-size: 13px;padding: 10px;" width="17%">Check-in Date</th>
-					<th bgcolor="#f8f8f8" style="border:1px solid #D6D4D4;background-color: #fbfbfb;color: #333;font-family: Arial;font-size: 13px;padding: 10px;" width="17%">Check-out Date</th>
-					<th bgcolor="#f8f8f8" style="border:1px solid #D6D4D4;background-color: #fbfbfb;color: #333;font-family: Arial;font-size: 13px;padding: 10px;" width="17%">Total</th>
+					<th bgcolor="#f8f8f8" style="border:1px solid #D6D4D4;background-color: #fbfbfb;color: #333;font-family: Arial;font-size: 13px;padding: 10px;">Reference</th>
+					<th bgcolor="#f8f8f8" style="border:1px solid #D6D4D4;background-color: #fbfbfb;color: #333;font-family: Arial;font-size: 13px;padding: 10px;">Product</th>
+					<th bgcolor="#f8f8f8" style="border:1px solid #D6D4D4;background-color: #fbfbfb;color: #333;font-family: Arial;font-size: 13px;padding: 10px;" width="17%">Unit price</th>
+					<th bgcolor="#f8f8f8" style="border:1px solid #D6D4D4;background-color: #fbfbfb;color: #333;font-family: Arial;font-size: 13px;padding: 10px;">Quantity</th>
+					<th bgcolor="#f8f8f8" style="border:1px solid #D6D4D4;background-color: #fbfbfb;color: #333;font-family: Arial;font-size: 13px;padding: 10px;" width="17%">Total price</th>
 				</tr>
 				<tr>
 					<td colspan="5" style="border:1px solid #D6D4D4;text-align:center;color:#777;padding:7px 0">
-						&nbsp;&nbsp;{cart_booking_data_html} 
+						&nbsp;&nbsp;{products} 
 					</td>
 				</tr>
 				<tr>
@@ -132,7 +128,7 @@
 								<td width="10" style="color:#333;padding:0">&nbsp;</td>
 								<td align="right" style="color:#333;padding:0">
 									<font size="2" face="Open-sans, sans-serif" color="#555454">
-										<strong>Total Rooms Cost</strong>
+										<strong>Products</strong>
 									</font>
 								</td>
 								<td width="10" style="color:#333;padding:0">&nbsp;</td>
@@ -181,7 +177,7 @@
 						</table>
 					</td>
 				</tr>
-				<!-- <tr class="conf_body">
+				<tr class="conf_body">
 					<td bgcolor="#f8f8f8" colspan="4" style="border:1px solid #D6D4D4;color:#333;padding:7px 0">
 						<table class="table" style="width:100%;border-collapse:collapse">
 							<tr>
@@ -208,8 +204,8 @@
 							</tr>
 						</table>
 					</td>
-				</tr> -->
-				<!-- <tr class="conf_body">
+				</tr>
+				<tr class="conf_body">
 					<td bgcolor="#f8f8f8" colspan="4" style="border:1px solid #D6D4D4;color:#333;padding:7px 0">
 						<table class="table" style="width:100%;border-collapse:collapse">
 							<tr>
@@ -236,7 +232,7 @@
 							</tr>
 						</table>
 					</td>
-				</tr> -->
+				</tr>
 				<tr class="conf_body">
 					<td bgcolor="#f8f8f8" colspan="4" style="border:1px solid #D6D4D4;color:#333;padding:7px 0">
 						<table class="table" style="width:100%;border-collapse:collapse">
@@ -298,7 +294,7 @@
 		</font>
 	</td>
 </tr>
-<!-- <tr>
+<tr>
 	<td class="box" style="border:1px solid #D6D4D4;background-color:#f8f8f8;padding:7px 0">
 		<table class="table" style="width:100%">
 			<tr>
@@ -317,7 +313,7 @@
 			</tr>
 		</table>
 	</td>
-</tr> -->
+</tr>
 <tr>
 	<td class="space_footer" style="padding:0!important">&nbsp;</td>
 </tr>
@@ -325,7 +321,7 @@
 	<td style="padding:7px 0">
 		<table class="table" style="width:100%">
 			<tr>
-				<!-- <td class="box address" width="310" style="border:1px solid #D6D4D4;background-color:#f8f8f8;padding:7px 0">
+				<td class="box address" width="310" style="border:1px solid #D6D4D4;background-color:#f8f8f8;padding:7px 0">
 					<table class="table" style="width:100%">
 						<tr>
 							<td width="10" style="padding:7px 0">&nbsp;</td>
@@ -342,7 +338,7 @@
 							<td width="10" style="padding:7px 0">&nbsp;</td>
 						</tr>
 					</table>
-				</td> -->
+				</td>
 				<td width="20" class="space_address" style="padding:7px 0">&nbsp;</td>
 				<td class="box address" width="310" style="border:1px solid #D6D4D4;background-color:#f8f8f8;padding:7px 0">
 					<table class="table" style="width:100%">
@@ -351,7 +347,7 @@
 							<td style="padding:7px 0">
 								<font size="2" face="Open-sans, sans-serif" color="#555454">
 									<p data-html-only="1" style="border-bottom:1px solid #D6D4D4;margin:3px 0 7px;text-transform:uppercase;font-weight:500;font-size:18px;padding-bottom:10px">
-										Customer address									</p>
+										Billing address									</p>
 									<span data-html-only="1" style="color:#777">
 										{invoice_block_html}
 									</span>

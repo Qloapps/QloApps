@@ -130,7 +130,6 @@ class HotelReservationSystem extends Module
         $this->installTab('AdminHotelConfigurationSetting', 'Settings', 'AdminHotelReservationSystemManagement');
         $this->installTab('AdminAddHotel', 'Add Hotel', 'AdminHotelReservationSystemManagement');
         $this->installTab('AdminHotelFeatures', 'Manage Hotel Features', 'AdminHotelReservationSystemManagement');
-        $this->installTab('AdminOrderRoomStatus', 'Manage Ordered Room Status', 'AdminHotelReservationSystemManagement');
         return true;
     }
 
@@ -138,7 +137,7 @@ class HotelReservationSystem extends Module
     {
         //from setting tab
         $home_banner_default_title = $this->l('Four Lessons Hotel Greshon Palace');
-        $home_banner_default_content = $this->l('what is your hotel\'s best dish? describe in detail. An prepare one we want to taste it once. what is your hotel\'s best dish? ');
+        $home_banner_default_content = $this->l('Tofu helvetica leggings tattooed. Skateboard blue bottle green juice, brooklyn cardigan kitsch fap narwhal organic flexitarian.');
 
         Configuration::updateValue('WK_HOTEL_LOCATION_ENABLE', 1);
         Configuration::updateValue('WK_ROOM_LEFT_WARNING_NUMBER', 10);
@@ -238,7 +237,7 @@ class HotelReservationSystem extends Module
 
     public function deletePrestashopDefaultCategories()
     {
-        /*$all_root_childrean_categories = Category::getAllCategoriesName();
+        $all_root_childrean_categories = Category::getAllCategoriesName();
         foreach ($all_root_childrean_categories as $cat_key => $cat_value)
         {
             if ($cat_value['id_category'] > 2)
@@ -246,7 +245,7 @@ class HotelReservationSystem extends Module
                 $obj_category = new Category($cat_value['id_category']);
                 $obj_category->delete();
             }
-        }*/
+        }
         return true;
     }
 
@@ -263,7 +262,7 @@ class HotelReservationSystem extends Module
 
     public function createHotelRoomDefaultFeatures()
     {
-        $htl_room_ftrs = array('Wi-Fi','Restaurant', 'Room Service', 'Power BackUp', 'Refrigerator', 'News Paper');
+        $htl_room_ftrs = array('Wi-Fi', 'News Paper', 'Power BackUp', 'Refrigerator','Restaurant', 'Room Service', 'Gym');
         $pos = 0;
         foreach ($htl_room_ftrs as $room_ftr_k => $room_ftr_v)
         {
@@ -278,18 +277,229 @@ class HotelReservationSystem extends Module
                 $obj_feature_value->id_feature = $obj_feature->id;
                 
                 foreach (Language::getLanguages(true) as $lang)
-                    $obj_feature_value->value[$lang['id_lang']] = $obj_feature->id.'.jpg';
+                    $obj_feature_value->value[$lang['id_lang']] = $obj_feature->id.'.png';
                 
                 $obj_feature_value->save();
                 if ($obj_feature_value->id)
                 {
-                    if (file_exists(_PS_IMG_DIR_.'rf/'.$pos.'.jpg'))
-                        rename(_PS_IMG_DIR_.'rf/'.$pos.'.jpg', _PS_IMG_DIR_.'rf/'.$obj_feature->id.'.jpg');
+                    if (file_exists(_PS_IMG_DIR_.'rf/'.$pos.'.png'))
+                        rename(_PS_IMG_DIR_.'rf/'.$pos.'.png', _PS_IMG_DIR_.'rf/'.$obj_feature->id.'.png');
                 }
             }
             $pos++;
         }
         return true;
+    }
+
+    public function createDummyDataForProject()
+    {
+        //delete privious products of prestashop
+        $all_products = Product::getSimpleProducts(Configuration::get('PS_LANG_DEFAULT'));
+        foreach ($all_products as $key_pro => $value_pro)
+        {
+            $obj_product = new Product($value_pro['id_product']);
+            $obj_product->delete();
+        }
+        // first add a hotel.................
+        $def_cont_id = Country::getDefaultCountryId();
+        $obj_hotel_info = new HotelBranchInformation();
+        $obj_hotel_info->active = 1;
+        $obj_hotel_info->hotel_name = "The Hotel Prime";
+        $obj_hotel_info->phone = 0123456789;
+        $obj_hotel_info->email = "prime@htl.com";
+        $obj_hotel_info->check_in = '12:00';
+        $obj_hotel_info->check_out = '12:00';
+        $obj_hotel_info->short_description = $this->l('Nice place to stay');
+        $obj_hotel_info->description = $this->l('Nice place to stay');
+        $obj_hotel_info->rating = 3;
+        $obj_hotel_info->city = 'Nainital';
+        $states = State::getStatesByIdCountry($def_cont_id);
+        $state_id = $states[0]['id_state'];
+        $obj_hotel_info->state_id = $state_id;
+        $obj_hotel_info->country_id = $def_cont_id;
+        $obj_hotel_info->zipcode = 263001;
+        $obj_hotel_info->policies = $this->l('1. intelligentsia tattooed pop-up salvia asymmetrical mixtape meggings tousled ramps VHS cred. 2. intelligentsia tattooed pop-up salvia asymmetrical mixtape meggings tousled ramps VHS cred. 3. intelligentsia tattooed pop-up salvia asymmetrical mixtape meggings tousled ramps VHS cred. 4. intelligentsia tattooed pop-up salvia asymmetrical mixtape meggings tousled ramps VHS cred.');
+        $obj_hotel_info->address = 'Near post office, Mallital, Nainital';
+        $obj_hotel_info->save();
+
+        $htl_id = $obj_hotel_info->id;
+
+        $grp_ids = array();
+        $obj_grp = new Group();
+        $data_grp_ids = $obj_grp->getGroups(1, $id_shop = false);
+
+        foreach ($data_grp_ids as $key => $value)
+        {
+            $grp_ids[] = $value['id_group'];
+        }
+        $country_name = (new Country())->getNameById(Configuration::get('PS_LANG_DEFAULT'),$def_cont_id);
+        $cat_country = $this->addCategory($country_name, false, $grp_ids);
+
+        if ($cat_country)
+        {
+            $states = State::getStatesByIdCountry($def_cont_id);
+            $state_name = $states[0]['name'];
+            $cat_state = $this->addCategory($state_name, $cat_country, $grp_ids);
+        }
+        if ($cat_state)
+            $cat_city = $this->addCategory('DefCity', $cat_state, $grp_ids);
+        if ($cat_city)
+            $cat_hotel = $this->addCategory('The Hotel Prime', $cat_city, $grp_ids, 1, $htl_id);
+        if ($cat_hotel)
+        {
+            $obj_hotel_info = new HotelBranchInformation($htl_id);
+            $obj_hotel_info->id_category = $cat_hotel;
+            $obj_hotel_info->save();
+        }
+
+        $branch_ftr_ids = array(1, 2, 4, 7, 8, 9, 11, 12, 14, 16, 17, 18, 21);
+        foreach ($branch_ftr_ids as $key_ftr => $value_ftr)
+        {
+            $htl_ftr_obj = new HotelBranchFeatures();
+            $htl_ftr_obj->id_hotel = $htl_id;
+            $htl_ftr_obj->feature_id = $value_ftr;
+            $htl_ftr_obj->save();
+        }
+
+        $prod_arr = array('Delux Rooms', 'Executive Rooms', 'luxury Rooms');
+        $img_num = 1;
+        foreach ($prod_arr as $key_prod => $value_prod)
+        {
+            // Add Product
+            $product = new Product();
+            $product->name = array();
+            $product->description = array();
+            $product->description_short = array();
+            $product->link_rewrite = array();
+            foreach (Language::getLanguages(true) as $lang)
+            {
+                $product->name[$lang['id_lang']] = $value_prod;
+                $product->description[$lang['id_lang']] = $this->l('Fashion axe kogi yuccie, ramps shabby chic direct trade before they sold out distillery bicycle rights. Slow-carb +1 quinoa VHS. +1 brunch trust fund, meggings chartreuse sustainable everyday carry tumblr hoodie tacos tilde ramps post-ironic fixie.');
+                $product->description_short[$lang['id_lang']] = $this->l('Fashion axe kogi yuccie, ramps shabby chic direct trade before they sold out distillery bicycle rights. Slow-carb +1 quinoa VHS. +1 brunch trust fund, meggings chartreuse sustainable everyday carry tumblr hoodie tacos tilde ramps post-ironic fixie.');
+                $product->link_rewrite[$lang['id_lang']] = Tools::link_rewrite('Super Delux Rooms');
+            }
+            $product->id_shop_default = Context::getContext()->shop->id;
+            $product->id_category_default = 2;
+            $product->price = 1000;
+            $product->active = 1;
+            $product->quantity = 99999999;
+            $product->is_virtual = 1;
+            $product->indexed = 1;
+            $product->save();
+            $product_id = $product->id;
+
+            Search::indexation(Tools::link_rewrite($value_prod),$product_id);
+            
+            $product->addToCategories(2);
+            
+            StockAvailable::updateQuantity($product_id, null, 99999999);
+
+            //image upload for products
+            $count = 0;
+            $have_cover = false;
+            $old_path = _PS_MODULE_DIR_.$this->name.'/views/img/prod_imgs/'.$img_num.'.png';
+            $image_obj = new Image();
+            $image_obj->id_product = $product_id;
+            $image_obj->position = Image::getHighestPosition($product_id) + 1;
+
+            if ($count == 0)
+            {
+                if (!$have_cover)
+                    $image_obj->cover = 1;
+            }
+            else
+                $image_obj->cover = 0;
+
+            $image_obj->add();
+            $new_path = $image_obj->getPathForCreation();
+            $imagesTypes = ImageType::getImagesTypes('products');
+            
+            foreach ($imagesTypes as $image_type)
+                ImageManager::resize($old_path, $new_path.'-'.$image_type['name'].'.jpg', $image_type['width'],$image_type['height']);
+            
+            ImageManager::resize($old_path,$new_path.'.jpg');
+
+            for ($k=1; $k<=5; $k++)
+            {
+                $htl_room_info_obj = new HotelRoomInformation();
+                $htl_room_info_obj->id_product = $product_id;
+                $htl_room_info_obj->id_hotel = $htl_id;
+                $htl_room_info_obj->room_num = 'A'.$i.'-10'.$k;
+                $htl_room_info_obj->id_status = 1;
+                $htl_room_info_obj->floor = 'first';
+                $htl_room_info_obj->save();
+            }
+
+            $htl_rm_type = new HotelRoomType();
+            $htl_rm_type->id_product = $product_id;
+            $htl_rm_type->id_hotel = $htl_id;
+            $htl_rm_type->adult = 2;
+            $htl_rm_type->children = 2;
+            $htl_rm_type->save();
+            $img_num++;
+
+            // Add features to the product
+            $ftr_arr = array(0=>8, 1=>9, 2=>10, 3=>11);
+            $ftr_val_arr = array(0=>34, 1=>35, 2=>36, 3=>37);
+            foreach ($ftr_arr as $key_htl_ftr => $val_htl_ftr)
+            {
+                $product->addFeaturesToDB($val_htl_ftr, $ftr_val_arr[$key_htl_ftr]);
+            }
+        }
+        return true;
+    }
+
+    public function addCategory($name, $parent_cat=false, $group_ids, $ishotel=false, $hotel_id=false)
+    {
+        if (!$parent_cat)
+            $parent_cat = Category::getRootCategory()->id;
+
+        if ($ishotel && $hotel_id)
+        {
+            $cat_id_hotel = Db::getInstance()->getValue('SELECT `id_category` FROM `'._DB_PREFIX_.'htl_branch_info` WHERE id='.$hotel_id);
+            if ($cat_id_hotel)
+            {
+                $obj_cat = new Category($cat_id_hotel);
+                $obj_cat->name = array();
+                $obj_cat->description = array();
+                $obj_cat->link_rewrite = array();
+
+                foreach (Language::getLanguages(true) as $lang)
+                {
+                    $obj_cat->name[$lang['id_lang']] = $name;
+                    $obj_cat->description[$lang['id_lang']] = $this->l('this category are for hotels only');
+                    $obj_cat->link_rewrite[$lang['id_lang']] = $this->l(Tools::link_rewrite($name));
+                }
+                $obj_cat->id_parent = $parent_cat;
+                $obj_cat->groupBox = $group_ids;
+                $obj_cat->save();
+                $cat_id = $obj_cat->id;
+                return $cat_id;
+            }
+        }
+        $check_category_exists = Category::searchByNameAndParentCategoryId($this->context->language->id, $name, $parent_cat);
+
+        if ($check_category_exists)
+            return $check_category_exists['id_category'];
+        else
+        {
+            $obj = new Category();
+            $obj->name = array();
+            $obj->description = array();
+            $obj->link_rewrite = array();
+
+            foreach (Language::getLanguages(true) as $lang)
+            {
+                $obj->name[$lang['id_lang']] = $name;
+                $obj->description[$lang['id_lang']] = $this->l('this category are for hotels only');
+                $obj->link_rewrite[$lang['id_lang']] = $this->l(Tools::link_rewrite($name));
+            }
+            $obj->id_parent = $parent_cat;
+            $obj->groupBox = $group_ids;
+            $obj->add();
+            $cat_id = $obj->id;
+            return $cat_id;
+        }
     }
 
     public function installTab($class_name,$tab_name,$tab_parent_name=false) 
@@ -336,6 +546,7 @@ class HotelReservationSystem extends Module
             || !$this->insertHotelRoomsStatus()
             || !$this->insertHotelOrderStatus()
             || !$this->insertHotelRoomAllotmentType()
+            || !$this->createDummyDataForProject()
             || !$this->registerHook('actionValidateOrder')
             || !$this->registerHook('displayBackOfficeHeader')
             || !$this->registerHook('actionProductDelete')

@@ -30,7 +30,7 @@
                                         {if isset($data.testimonial_image) && $data.testimonial_image}
                                             <img height="85px" width="85px" src="{$module_dir}views/img/{$data.testimonial_image}">
                                         {else}
-                                            <img height="85px" width="85px" src="{$module_dir}views/img/default.jpg">
+                                            <img height="85px" width="85px" src="{$module_dir}views/img/default.png">
                                         {/if}
                                     </div>
                                     <div class="col-sm-3 text-left">

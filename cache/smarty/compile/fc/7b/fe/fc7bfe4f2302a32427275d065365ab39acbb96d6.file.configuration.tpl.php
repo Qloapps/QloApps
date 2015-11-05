@@ -1,17 +1,17 @@
-<?php /* Smarty version Smarty-3.1.19, created on 2015-11-02 20:02:46
+<?php /* Smarty version Smarty-3.1.19, created on 2015-11-05 18:44:58
          compiled from "/home/sumit/public_html/html/ps-hotel-reservation-system/admin/themes/default/template/controllers/products/configuration.tpl" */ ?>
-<?php /*%%SmartyHeaderCode:12770800715637740e542155-03463403%%*/if(!defined('SMARTY_DIR')) exit('no direct access allowed');
+<?php /*%%SmartyHeaderCode:616263667563b5652b903e7-12574736%%*/if(!defined('SMARTY_DIR')) exit('no direct access allowed');
 $_valid = $_smarty_tpl->decodeProperties(array (
   'file_dependency' => 
   array (
     'fc7bfe4f2302a32427275d065365ab39acbb96d6' => 
     array (
       0 => '/home/sumit/public_html/html/ps-hotel-reservation-system/admin/themes/default/template/controllers/products/configuration.tpl',
-      1 => 1446455063,
+      1 => 1446729264,
       2 => 'file',
     ),
   ),
-  'nocache_hash' => '12770800715637740e542155-03463403',
+  'nocache_hash' => '616263667563b5652b903e7-12574736',
   'function' => 
   array (
   ),
@@ -30,9 +30,9 @@ $_valid = $_smarty_tpl->decodeProperties(array (
   ),
   'has_nocache_code' => false,
   'version' => 'Smarty-3.1.19',
-  'unifunc' => 'content_5637740e5db773_49461614',
+  'unifunc' => 'content_563b5652c2a5d6_20147975',
 ),false); /*/%%SmartyHeaderCode%%*/?>
-<?php if ($_valid && !is_callable('content_5637740e5db773_49461614')) {function content_5637740e5db773_49461614($_smarty_tpl) {?><?php if (isset($_smarty_tpl->tpl_vars['product']->value->id)) {?>
+<?php if ($_valid && !is_callable('content_563b5652c2a5d6_20147975')) {function content_563b5652c2a5d6_20147975($_smarty_tpl) {?><?php if (isset($_smarty_tpl->tpl_vars['product']->value->id)) {?>
 <div id="product-configuration" class="panel product-tab">
 	<input type="hidden" name="submitted_tabs[]" value="Configuration" />
 	<h3 class="tab"> <i class="icon-AdminAdmin"></i> <?php echo smartyTranslate(array('s'=>'Configuration','mod'=>'hotelreservationsystem'),$_smarty_tpl);?>
@@ -52,6 +52,8 @@ $_valid = $_smarty_tpl->decodeProperties(array (
 			<div class="col-sm-4">
 				<input type="text" class="form-control" value="<?php echo $_smarty_tpl->tpl_vars['htl_full_info']->value['hotel_name'];?>
 " readonly>
+				<input type="hidden" name="id_hotel" value="<?php echo $_smarty_tpl->tpl_vars['htl_room_type']->value['id_hotel'];?>
+">
 			</div>
 		<?php } else { ?>
 			<label class="control-label col-sm-2" for="hotel_place">

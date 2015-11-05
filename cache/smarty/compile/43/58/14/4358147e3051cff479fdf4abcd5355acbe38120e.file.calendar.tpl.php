@@ -1,17 +1,17 @@
-<?php /* Smarty version Smarty-3.1.19, created on 2015-11-02 20:02:41
+<?php /* Smarty version Smarty-3.1.19, created on 2015-11-05 18:44:54
          compiled from "/home/sumit/public_html/html/ps-hotel-reservation-system/admin/themes/default/template/helpers/calendar/calendar.tpl" */ ?>
-<?php /*%%SmartyHeaderCode:174145078456377409d75223-44418515%%*/if(!defined('SMARTY_DIR')) exit('no direct access allowed');
+<?php /*%%SmartyHeaderCode:296742675563b564e5994a4-68474412%%*/if(!defined('SMARTY_DIR')) exit('no direct access allowed');
 $_valid = $_smarty_tpl->decodeProperties(array (
   'file_dependency' => 
   array (
     '4358147e3051cff479fdf4abcd5355acbe38120e' => 
     array (
       0 => '/home/sumit/public_html/html/ps-hotel-reservation-system/admin/themes/default/template/helpers/calendar/calendar.tpl',
-      1 => 1446455061,
+      1 => 1446729263,
       2 => 'file',
     ),
   ),
-  'nocache_hash' => '174145078456377409d75223-44418515',
+  'nocache_hash' => '296742675563b564e5994a4-68474412',
   'function' => 
   array (
   ),
@@ -29,9 +29,9 @@ $_valid = $_smarty_tpl->decodeProperties(array (
   ),
   'has_nocache_code' => false,
   'version' => 'Smarty-3.1.19',
-  'unifunc' => 'content_56377409e3f951_29734305',
+  'unifunc' => 'content_563b564e664925_33485502',
 ),false); /*/%%SmartyHeaderCode%%*/?>
-<?php if ($_valid && !is_callable('content_56377409e3f951_29734305')) {function content_56377409e3f951_29734305($_smarty_tpl) {?><div id="datepicker" class="row row-padding-top hide">
+<?php if ($_valid && !is_callable('content_563b564e664925_33485502')) {function content_563b564e664925_33485502($_smarty_tpl) {?><div id="datepicker" class="row row-padding-top hide">
 	<div class="col-lg-12">
 		<div class="daterangepicker-days">
 			<div class="row">

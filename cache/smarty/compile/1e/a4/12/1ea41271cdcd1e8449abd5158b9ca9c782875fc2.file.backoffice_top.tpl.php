@@ -1,4 +1,4 @@
-<?php /* Smarty version Smarty-3.1.19, created on 2015-11-02 10:46:34
+<?php /* Smarty version Smarty-3.1.19, created on 2015-11-05 19:11:01
          compiled from "/home/sumit/public_html/html/ps-hotel-reservation-system/modules/onboarding/views/templates/hook/backoffice_top.tpl" */ ?>
 <?php /*%%SmartyHeaderCode:142341177956376ee13e8bb6-60472501%%*/if(!defined('SMARTY_DIR')) exit('no direct access allowed');
 $_valid = $_smarty_tpl->decodeProperties(array (
@@ -7,7 +7,7 @@ $_valid = $_smarty_tpl->decodeProperties(array (
     '1ea41271cdcd1e8449abd5158b9ca9c782875fc2' => 
     array (
       0 => '/home/sumit/public_html/html/ps-hotel-reservation-system/modules/onboarding/views/templates/hook/backoffice_top.tpl',
-      1 => 1446477744,
+      1 => 1446730827,
       2 => 'file',
     ),
   ),

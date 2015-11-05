@@ -1,17 +1,17 @@
-<?php /* Smarty version Smarty-3.1.19, created on 2015-11-02 20:02:46
+<?php /* Smarty version Smarty-3.1.19, created on 2015-11-05 18:44:58
          compiled from "/home/sumit/public_html/html/ps-hotel-reservation-system/admin/themes/default/template/controllers/tax_rules/helpers/list/list_content.tpl" */ ?>
-<?php /*%%SmartyHeaderCode:14415605835637740e8d7ef3-15440460%%*/if(!defined('SMARTY_DIR')) exit('no direct access allowed');
+<?php /*%%SmartyHeaderCode:601263267563b5652f2cd14-36453870%%*/if(!defined('SMARTY_DIR')) exit('no direct access allowed');
 $_valid = $_smarty_tpl->decodeProperties(array (
   'file_dependency' => 
   array (
     '3648b0d4730a4f5a7dab1ee17f1ffd850cb82d45' => 
     array (
       0 => '/home/sumit/public_html/html/ps-hotel-reservation-system/admin/themes/default/template/controllers/tax_rules/helpers/list/list_content.tpl',
-      1 => 1446455072,
+      1 => 1446729266,
       2 => 'file',
     ),
   ),
-  'nocache_hash' => '14415605835637740e8d7ef3-15440460',
+  'nocache_hash' => '601263267563b5652f2cd14-36453870',
   'function' => 
   array (
   ),
@@ -48,9 +48,9 @@ $_valid = $_smarty_tpl->decodeProperties(array (
   ),
   'has_nocache_code' => false,
   'version' => 'Smarty-3.1.19',
-  'unifunc' => 'content_5637740ea761b9_55845957',
+  'unifunc' => 'content_563b5653172d23_57999905',
 ),false); /*/%%SmartyHeaderCode%%*/?>
-<?php if ($_valid && !is_callable('content_5637740ea761b9_55845957')) {function content_5637740ea761b9_55845957($_smarty_tpl) {?><?php if (!is_callable('smarty_modifier_regex_replace')) include '/home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/plugins/modifier.regex_replace.php';
+<?php if ($_valid && !is_callable('content_563b5653172d23_57999905')) {function content_563b5653172d23_57999905($_smarty_tpl) {?><?php if (!is_callable('smarty_modifier_regex_replace')) include '/home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/plugins/modifier.regex_replace.php';
 ?>
 <tbody>
 	<?php  $_smarty_tpl->tpl_vars['tr'] = new Smarty_Variable; $_smarty_tpl->tpl_vars['tr']->_loop = false;

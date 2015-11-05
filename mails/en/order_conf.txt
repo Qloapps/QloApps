@@ -3,32 +3,41 @@
 
 Hi {firstname} {lastname},
 
-Thank you for selecting our hotel! 
+Thank you for shopping with {shop_name}! 
 
 ORDER: {order_name} Placed on {date}
 
 PAYMENT: {payment} 		 
 
-Room Image
-Room Description
-Room Capcity
-Unit Price
-Rooms Qty
-Check-in Date
-Check-out Date
-Total
+REFERENCE
+
+PRODUCT
+
+UNIT PRICE
+
+QUANTITY
+
+TOTAL PRICE
 
 {products_txt} 
 
 {discounts} 
 
-Total Rooms Cost 
+PRODUCTS 
 
 {total_products} 
 
 DISCOUNTS 
 
 {total_discounts} 
+
+GIFT-WRAPPING 
+
+{total_wrapping} 
+
+SHIPPING 
+
+{total_shipping} 
 
 TOTAL TAX PAID 
 

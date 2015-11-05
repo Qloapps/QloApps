@@ -210,3 +210,198 @@ Stack trace:
 #2 /home/sumit/public_html/html/ps-hotel-reservation-system/install/controllers/http/smarty_compile.php(42): Smarty->compileAllTemplates('.tpl', false)
 #3 /home/sumit/public_html/html/ps-hotel-reservation-system/install/classes/controllerHttp.php(96): require_once('/home/sumit/pub...')
 #4 /home/sumit/p in /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/sysplugins/smarty_internal_utility.php on line 68
+[03-Nov-2015 18:57:23 Asia/Calcutta] PHP Fatal error:  Uncaught exception 'UnexpectedValueException' with message 'RecursiveDirectoryIterator::__construct(/home/sumit/public_html/html/ps-hotel-reservation-system/themes/hotel-theme/): failed to open dir: No such file or directory' in /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/sysplugins/smarty_internal_utility.php:68
+Stack trace:
+#0 /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/sysplugins/smarty_internal_utility.php(68): RecursiveDirectoryIterator->__construct('/home/sumit/pub...')
+#1 /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/Smarty.class.php(1440): Smarty_Internal_Utility::compileAllTemplates('.tpl', false, 0, NULL, Object(SmartyCustom))
+#2 /home/sumit/public_html/html/ps-hotel-reservation-system/install/controllers/http/smarty_compile.php(42): Smarty->compileAllTemplates('.tpl', false)
+#3 /home/sumit/public_html/html/ps-hotel-reservation-system/install/classes/controllerHttp.php(96): require_once('/home/sumit/pub...')
+#4 /home/sumit/p in /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/sysplugins/smarty_internal_utility.php on line 68
+[03-Nov-2015 18:57:27 Asia/Calcutta] PHP Fatal error:  Uncaught exception 'UnexpectedValueException' with message 'RecursiveDirectoryIterator::__construct(/home/sumit/public_html/html/ps-hotel-reservation-system/themes/hotel-theme/): failed to open dir: No such file or directory' in /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/sysplugins/smarty_internal_utility.php:68
+Stack trace:
+#0 /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/sysplugins/smarty_internal_utility.php(68): RecursiveDirectoryIterator->__construct('/home/sumit/pub...')
+#1 /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/Smarty.class.php(1440): Smarty_Internal_Utility::compileAllTemplates('.tpl', false, 0, NULL, Object(SmartyCustom))
+#2 /home/sumit/public_html/html/ps-hotel-reservation-system/install/controllers/http/smarty_compile.php(42): Smarty->compileAllTemplates('.tpl', false)
+#3 /home/sumit/public_html/html/ps-hotel-reservation-system/install/classes/controllerHttp.php(96): require_once('/home/sumit/pub...')
+#4 /home/sumit/p in /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/sysplugins/smarty_internal_utility.php on line 68
+[03-Nov-2015 18:58:08 Asia/Calcutta] PHP Fatal error:  Uncaught exception 'UnexpectedValueException' with message 'RecursiveDirectoryIterator::__construct(/home/sumit/public_html/html/ps-hotel-reservation-system/themes/hotel-theme/): failed to open dir: No such file or directory' in /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/sysplugins/smarty_internal_utility.php:68
+Stack trace:
+#0 /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/sysplugins/smarty_internal_utility.php(68): RecursiveDirectoryIterator->__construct('/home/sumit/pub...')
+#1 /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/Smarty.class.php(1440): Smarty_Internal_Utility::compileAllTemplates('.tpl', false, 0, NULL, Object(SmartyCustom))
+#2 /home/sumit/public_html/html/ps-hotel-reservation-system/install/controllers/http/smarty_compile.php(42): Smarty->compileAllTemplates('.tpl', false)
+#3 /home/sumit/public_html/html/ps-hotel-reservation-system/install/classes/controllerHttp.php(96): require_once('/home/sumit/pub...')
+#4 /home/sumit/p in /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/sysplugins/smarty_internal_utility.php on line 68
+[03-Nov-2015 08:29:58 US/Eastern] PHP Warning:  Invalid argument supplied for foreach() in /home/sumit/public_html/html/ps-hotel-reservation-system/modules/hotelreservationsystem/hotelreservationsystem.php on line 299
+[03-Nov-2015 08:29:58 US/Eastern] PHP Fatal error:  Uncaught exception 'PrestaShopException' with message 'Property HotelBranchInformation->state_id is not valid' in /home/sumit/public_html/html/ps-hotel-reservation-system/classes/ObjectModel.php:909
+Stack trace:
+#0 /home/sumit/public_html/html/ps-hotel-reservation-system/classes/ObjectModel.php(246): ObjectModelCore->validateFields()
+#1 /home/sumit/public_html/html/ps-hotel-reservation-system/classes/ObjectModel.php(487): ObjectModelCore->getFields()
+#2 /home/sumit/public_html/html/ps-hotel-reservation-system/classes/ObjectModel.php(445): ObjectModelCore->add(true, false)
+#3 /home/sumit/public_html/html/ps-hotel-reservation-system/modules/hotelreservationsystem/hotelreservationsystem.php(322): ObjectModelCore->save()
+#4 /home/sumit/public_html/html/ps-hotel-reservation-system/modules/hotelreservationsystem/hotelreservationsystem.php(499): HotelReservationSystem->createDummyDataForProject()
+#5 /home/sumit/public_html/html/ps-hotel-reservation-system/install/models/install.php(687): HotelReservationSystem->inst in /home/sumit/public_html/html/ps-hotel-reservation-system/classes/ObjectModel.php on line 909
+[03-Nov-2015 19:07:43 Asia/Calcutta] PHP Fatal error:  Uncaught exception 'UnexpectedValueException' with message 'RecursiveDirectoryIterator::__construct(/home/sumit/public_html/html/ps-hotel-reservation-system/themes/hotel-theme/): failed to open dir: No such file or directory' in /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/sysplugins/smarty_internal_utility.php:68
+Stack trace:
+#0 /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/sysplugins/smarty_internal_utility.php(68): RecursiveDirectoryIterator->__construct('/home/sumit/pub...')
+#1 /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/Smarty.class.php(1440): Smarty_Internal_Utility::compileAllTemplates('.tpl', false, 0, NULL, Object(SmartyCustom))
+#2 /home/sumit/public_html/html/ps-hotel-reservation-system/install/controllers/http/smarty_compile.php(42): Smarty->compileAllTemplates('.tpl', false)
+#3 /home/sumit/public_html/html/ps-hotel-reservation-system/install/classes/controllerHttp.php(96): require_once('/home/sumit/pub...')
+#4 /home/sumit/p in /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/sysplugins/smarty_internal_utility.php on line 68
+[03-Nov-2015 19:07:47 Asia/Calcutta] PHP Fatal error:  Uncaught exception 'UnexpectedValueException' with message 'RecursiveDirectoryIterator::__construct(/home/sumit/public_html/html/ps-hotel-reservation-system/themes/hotel-theme/): failed to open dir: No such file or directory' in /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/sysplugins/smarty_internal_utility.php:68
+Stack trace:
+#0 /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/sysplugins/smarty_internal_utility.php(68): RecursiveDirectoryIterator->__construct('/home/sumit/pub...')
+#1 /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/Smarty.class.php(1440): Smarty_Internal_Utility::compileAllTemplates('.tpl', false, 0, NULL, Object(SmartyCustom))
+#2 /home/sumit/public_html/html/ps-hotel-reservation-system/install/controllers/http/smarty_compile.php(42): Smarty->compileAllTemplates('.tpl', false)
+#3 /home/sumit/public_html/html/ps-hotel-reservation-system/install/classes/controllerHttp.php(96): require_once('/home/sumit/pub...')
+#4 /home/sumit/p in /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/sysplugins/smarty_internal_utility.php on line 68
+[03-Nov-2015 19:07:49 Asia/Calcutta] PHP Fatal error:  Uncaught exception 'UnexpectedValueException' with message 'RecursiveDirectoryIterator::__construct(/home/sumit/public_html/html/ps-hotel-reservation-system/themes/hotel-theme/): failed to open dir: No such file or directory' in /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/sysplugins/smarty_internal_utility.php:68
+Stack trace:
+#0 /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/sysplugins/smarty_internal_utility.php(68): RecursiveDirectoryIterator->__construct('/home/sumit/pub...')
+#1 /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/Smarty.class.php(1440): Smarty_Internal_Utility::compileAllTemplates('.tpl', false, 0, NULL, Object(SmartyCustom))
+#2 /home/sumit/public_html/html/ps-hotel-reservation-system/install/controllers/http/smarty_compile.php(42): Smarty->compileAllTemplates('.tpl', false)
+#3 /home/sumit/public_html/html/ps-hotel-reservation-system/install/classes/controllerHttp.php(96): require_once('/home/sumit/pub...')
+#4 /home/sumit/p in /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/sysplugins/smarty_internal_utility.php on line 68
+[03-Nov-2015 08:39:40 US/Eastern] PHP Fatal error:  Uncaught exception 'PrestaShopException' with message 'Property HotelBranchInformation->state_id is not valid' in /home/sumit/public_html/html/ps-hotel-reservation-system/classes/ObjectModel.php:909
+Stack trace:
+#0 /home/sumit/public_html/html/ps-hotel-reservation-system/classes/ObjectModel.php(246): ObjectModelCore->validateFields()
+#1 /home/sumit/public_html/html/ps-hotel-reservation-system/classes/ObjectModel.php(487): ObjectModelCore->getFields()
+#2 /home/sumit/public_html/html/ps-hotel-reservation-system/classes/ObjectModel.php(445): ObjectModelCore->add(true, false)
+#3 /home/sumit/public_html/html/ps-hotel-reservation-system/modules/hotelreservationsystem/hotelreservationsystem.php(322): ObjectModelCore->save()
+#4 /home/sumit/public_html/html/ps-hotel-reservation-system/modules/hotelreservationsystem/hotelreservationsystem.php(499): HotelReservationSystem->createDummyDataForProject()
+#5 /home/sumit/public_html/html/ps-hotel-reservation-system/install/models/install.php(687): HotelReservationSystem->inst in /home/sumit/public_html/html/ps-hotel-reservation-system/classes/ObjectModel.php on line 909
+[03-Nov-2015 19:11:01 Asia/Calcutta] PHP Fatal error:  Uncaught exception 'UnexpectedValueException' with message 'RecursiveDirectoryIterator::__construct(/home/sumit/public_html/html/ps-hotel-reservation-system/themes/hotel-theme/): failed to open dir: No such file or directory' in /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/sysplugins/smarty_internal_utility.php:68
+Stack trace:
+#0 /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/sysplugins/smarty_internal_utility.php(68): RecursiveDirectoryIterator->__construct('/home/sumit/pub...')
+#1 /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/Smarty.class.php(1440): Smarty_Internal_Utility::compileAllTemplates('.tpl', false, 0, NULL, Object(SmartyCustom))
+#2 /home/sumit/public_html/html/ps-hotel-reservation-system/install/controllers/http/smarty_compile.php(42): Smarty->compileAllTemplates('.tpl', false)
+#3 /home/sumit/public_html/html/ps-hotel-reservation-system/install/classes/controllerHttp.php(96): require_once('/home/sumit/pub...')
+#4 /home/sumit/p in /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/sysplugins/smarty_internal_utility.php on line 68
+[03-Nov-2015 08:42:53 US/Eastern] PHP Fatal error:  Uncaught exception 'PrestaShopException' with message 'Property HotelBranchInformation->state_id is not valid' in /home/sumit/public_html/html/ps-hotel-reservation-system/classes/ObjectModel.php:909
+Stack trace:
+#0 /home/sumit/public_html/html/ps-hotel-reservation-system/classes/ObjectModel.php(246): ObjectModelCore->validateFields()
+#1 /home/sumit/public_html/html/ps-hotel-reservation-system/classes/ObjectModel.php(487): ObjectModelCore->getFields()
+#2 /home/sumit/public_html/html/ps-hotel-reservation-system/classes/ObjectModel.php(445): ObjectModelCore->add(true, false)
+#3 /home/sumit/public_html/html/ps-hotel-reservation-system/modules/hotelreservationsystem/hotelreservationsystem.php(322): ObjectModelCore->save()
+#4 /home/sumit/public_html/html/ps-hotel-reservation-system/modules/hotelreservationsystem/hotelreservationsystem.php(500): HotelReservationSystem->createDummyDataForProject()
+#5 /home/sumit/public_html/html/ps-hotel-reservation-system/install/models/install.php(687): HotelReservationSystem->inst in /home/sumit/public_html/html/ps-hotel-reservation-system/classes/ObjectModel.php on line 909
+[03-Nov-2015 19:13:41 Asia/Calcutta] PHP Fatal error:  Uncaught exception 'UnexpectedValueException' with message 'RecursiveDirectoryIterator::__construct(/home/sumit/public_html/html/ps-hotel-reservation-system/themes/hotel-theme/): failed to open dir: No such file or directory' in /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/sysplugins/smarty_internal_utility.php:68
+Stack trace:
+#0 /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/sysplugins/smarty_internal_utility.php(68): RecursiveDirectoryIterator->__construct('/home/sumit/pub...')
+#1 /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/Smarty.class.php(1440): Smarty_Internal_Utility::compileAllTemplates('.tpl', false, 0, NULL, Object(SmartyCustom))
+#2 /home/sumit/public_html/html/ps-hotel-reservation-system/install/controllers/http/smarty_compile.php(42): Smarty->compileAllTemplates('.tpl', false)
+#3 /home/sumit/public_html/html/ps-hotel-reservation-system/install/classes/controllerHttp.php(96): require_once('/home/sumit/pub...')
+#4 /home/sumit/p in /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/sysplugins/smarty_internal_utility.php on line 68
+[03-Nov-2015 19:15:07 Asia/Calcutta] PHP Fatal error:  Uncaught exception 'UnexpectedValueException' with message 'RecursiveDirectoryIterator::__construct(/home/sumit/public_html/html/ps-hotel-reservation-system/themes/hotel-theme/): failed to open dir: No such file or directory' in /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/sysplugins/smarty_internal_utility.php:68
+Stack trace:
+#0 /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/sysplugins/smarty_internal_utility.php(68): RecursiveDirectoryIterator->__construct('/home/sumit/pub...')
+#1 /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/Smarty.class.php(1440): Smarty_Internal_Utility::compileAllTemplates('.tpl', false, 0, NULL, Object(SmartyCustom))
+#2 /home/sumit/public_html/html/ps-hotel-reservation-system/install/controllers/http/smarty_compile.php(42): Smarty->compileAllTemplates('.tpl', false)
+#3 /home/sumit/public_html/html/ps-hotel-reservation-system/install/classes/controllerHttp.php(96): require_once('/home/sumit/pub...')
+#4 /home/sumit/p in /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/sysplugins/smarty_internal_utility.php on line 68
+[03-Nov-2015 08:46:39 US/Eastern] PHP Parse error:  syntax error, unexpected ';' in /home/sumit/public_html/html/ps-hotel-reservation-system/modules/hotelreservationsystem/hotelreservationsystem.php on line 319
+[03-Nov-2015 19:17:10 Asia/Calcutta] PHP Fatal error:  Uncaught exception 'UnexpectedValueException' with message 'RecursiveDirectoryIterator::__construct(/home/sumit/public_html/html/ps-hotel-reservation-system/themes/hotel-theme/): failed to open dir: No such file or directory' in /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/sysplugins/smarty_internal_utility.php:68
+Stack trace:
+#0 /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/sysplugins/smarty_internal_utility.php(68): RecursiveDirectoryIterator->__construct('/home/sumit/pub...')
+#1 /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/Smarty.class.php(1440): Smarty_Internal_Utility::compileAllTemplates('.tpl', false, 0, NULL, Object(SmartyCustom))
+#2 /home/sumit/public_html/html/ps-hotel-reservation-system/install/controllers/http/smarty_compile.php(42): Smarty->compileAllTemplates('.tpl', false)
+#3 /home/sumit/public_html/html/ps-hotel-reservation-system/install/classes/controllerHttp.php(96): require_once('/home/sumit/pub...')
+#4 /home/sumit/p in /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/sysplugins/smarty_internal_utility.php on line 68
+[03-Nov-2015 19:18:22 Asia/Calcutta] PHP Fatal error:  Uncaught exception 'UnexpectedValueException' with message 'RecursiveDirectoryIterator::__construct(/home/sumit/public_html/html/ps-hotel-reservation-system/themes/hotel-theme/): failed to open dir: No such file or directory' in /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/sysplugins/smarty_internal_utility.php:68
+Stack trace:
+#0 /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/sysplugins/smarty_internal_utility.php(68): RecursiveDirectoryIterator->__construct('/home/sumit/pub...')
+#1 /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/Smarty.class.php(1440): Smarty_Internal_Utility::compileAllTemplates('.tpl', false, 0, NULL, Object(SmartyCustom))
+#2 /home/sumit/public_html/html/ps-hotel-reservation-system/install/controllers/http/smarty_compile.php(42): Smarty->compileAllTemplates('.tpl', false)
+#3 /home/sumit/public_html/html/ps-hotel-reservation-system/install/classes/controllerHttp.php(96): require_once('/home/sumit/pub...')
+#4 /home/sumit/p in /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/sysplugins/smarty_internal_utility.php on line 68
+[05-Nov-2015 13:51:51 Asia/Calcutta] PHP Fatal error:  Uncaught exception 'UnexpectedValueException' with message 'RecursiveDirectoryIterator::__construct(/home/sumit/public_html/html/ps-hotel-reservation-system/themes/hotel-theme/): failed to open dir: No such file or directory' in /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/sysplugins/smarty_internal_utility.php:68
+Stack trace:
+#0 /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/sysplugins/smarty_internal_utility.php(68): RecursiveDirectoryIterator->__construct('/home/sumit/pub...')
+#1 /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/Smarty.class.php(1440): Smarty_Internal_Utility::compileAllTemplates('.tpl', false, 0, NULL, Object(SmartyCustom))
+#2 /home/sumit/public_html/html/ps-hotel-reservation-system/install/controllers/http/smarty_compile.php(42): Smarty->compileAllTemplates('.tpl', false)
+#3 /home/sumit/public_html/html/ps-hotel-reservation-system/install/classes/controllerHttp.php(96): require_once('/home/sumit/pub...')
+#4 /home/sumit/p in /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/sysplugins/smarty_internal_utility.php on line 68
+[05-Nov-2015 13:53:18 Asia/Calcutta] PHP Fatal error:  Uncaught exception 'UnexpectedValueException' with message 'RecursiveDirectoryIterator::__construct(/home/sumit/public_html/html/ps-hotel-reservation-system/themes/hotel-theme/): failed to open dir: No such file or directory' in /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/sysplugins/smarty_internal_utility.php:68
+Stack trace:
+#0 /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/sysplugins/smarty_internal_utility.php(68): RecursiveDirectoryIterator->__construct('/home/sumit/pub...')
+#1 /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/Smarty.class.php(1440): Smarty_Internal_Utility::compileAllTemplates('.tpl', false, 0, NULL, Object(SmartyCustom))
+#2 /home/sumit/public_html/html/ps-hotel-reservation-system/install/controllers/http/smarty_compile.php(42): Smarty->compileAllTemplates('.tpl', false)
+#3 /home/sumit/public_html/html/ps-hotel-reservation-system/install/classes/controllerHttp.php(96): require_once('/home/sumit/pub...')
+#4 /home/sumit/p in /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/sysplugins/smarty_internal_utility.php on line 68
+[05-Nov-2015 13:53:22 Asia/Calcutta] PHP Fatal error:  Uncaught exception 'UnexpectedValueException' with message 'RecursiveDirectoryIterator::__construct(/home/sumit/public_html/html/ps-hotel-reservation-system/themes/hotel-theme/): failed to open dir: No such file or directory' in /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/sysplugins/smarty_internal_utility.php:68
+Stack trace:
+#0 /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/sysplugins/smarty_internal_utility.php(68): RecursiveDirectoryIterator->__construct('/home/sumit/pub...')
+#1 /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/Smarty.class.php(1440): Smarty_Internal_Utility::compileAllTemplates('.tpl', false, 0, NULL, Object(SmartyCustom))
+#2 /home/sumit/public_html/html/ps-hotel-reservation-system/install/controllers/http/smarty_compile.php(42): Smarty->compileAllTemplates('.tpl', false)
+#3 /home/sumit/public_html/html/ps-hotel-reservation-system/install/classes/controllerHttp.php(96): require_once('/home/sumit/pub...')
+#4 /home/sumit/p in /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/sysplugins/smarty_internal_utility.php on line 68
+[05-Nov-2015 03:25:30 US/Eastern] PHP Warning:  Function <b>getDefaultCountryId()</b> is deprecated in <b>/home/sumit/public_html/html/ps-hotel-reservation-system/modules/hotelreservationsystem/hotelreservationsystem.php</b> on line <b>305</b><br /> in /home/sumit/public_html/html/ps-hotel-reservation-system/classes/Tools.php on line 2699
+[05-Nov-2015 15:53:36 Asia/Calcutta] PHP Fatal error:  Uncaught exception 'UnexpectedValueException' with message 'RecursiveDirectoryIterator::__construct(/home/sumit/public_html/html/ps-hotel-reservation-system/themes/hotel-theme/): failed to open dir: No such file or directory' in /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/sysplugins/smarty_internal_utility.php:68
+Stack trace:
+#0 /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/sysplugins/smarty_internal_utility.php(68): RecursiveDirectoryIterator->__construct('/home/sumit/pub...')
+#1 /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/Smarty.class.php(1440): Smarty_Internal_Utility::compileAllTemplates('.tpl', false, 0, NULL, Object(SmartyCustom))
+#2 /home/sumit/public_html/html/ps-hotel-reservation-system/install/controllers/http/smarty_compile.php(42): Smarty->compileAllTemplates('.tpl', false)
+#3 /home/sumit/public_html/html/ps-hotel-reservation-system/install/classes/controllerHttp.php(96): require_once('/home/sumit/pub...')
+#4 /home/sumit/p in /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/sysplugins/smarty_internal_utility.php on line 68
+[05-Nov-2015 15:54:15 Asia/Calcutta] PHP Fatal error:  Uncaught exception 'UnexpectedValueException' with message 'RecursiveDirectoryIterator::__construct(/home/sumit/public_html/html/ps-hotel-reservation-system/themes/hotel-theme/): failed to open dir: No such file or directory' in /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/sysplugins/smarty_internal_utility.php:68
+Stack trace:
+#0 /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/sysplugins/smarty_internal_utility.php(68): RecursiveDirectoryIterator->__construct('/home/sumit/pub...')
+#1 /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/Smarty.class.php(1440): Smarty_Internal_Utility::compileAllTemplates('.tpl', false, 0, NULL, Object(SmartyCustom))
+#2 /home/sumit/public_html/html/ps-hotel-reservation-system/install/controllers/http/smarty_compile.php(42): Smarty->compileAllTemplates('.tpl', false)
+#3 /home/sumit/public_html/html/ps-hotel-reservation-system/install/classes/controllerHttp.php(96): require_once('/home/sumit/pub...')
+#4 /home/sumit/p in /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/sysplugins/smarty_internal_utility.php on line 68
+[05-Nov-2015 15:54:21 Asia/Calcutta] PHP Fatal error:  Uncaught exception 'UnexpectedValueException' with message 'RecursiveDirectoryIterator::__construct(/home/sumit/public_html/html/ps-hotel-reservation-system/themes/hotel-theme/): failed to open dir: No such file or directory' in /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/sysplugins/smarty_internal_utility.php:68
+Stack trace:
+#0 /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/sysplugins/smarty_internal_utility.php(68): RecursiveDirectoryIterator->__construct('/home/sumit/pub...')
+#1 /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/Smarty.class.php(1440): Smarty_Internal_Utility::compileAllTemplates('.tpl', false, 0, NULL, Object(SmartyCustom))
+#2 /home/sumit/public_html/html/ps-hotel-reservation-system/install/controllers/http/smarty_compile.php(42): Smarty->compileAllTemplates('.tpl', false)
+#3 /home/sumit/public_html/html/ps-hotel-reservation-system/install/classes/controllerHttp.php(96): require_once('/home/sumit/pub...')
+#4 /home/sumit/p in /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/sysplugins/smarty_internal_utility.php on line 68
+[05-Nov-2015 15:54:49 Asia/Calcutta] PHP Fatal error:  Uncaught exception 'UnexpectedValueException' with message 'RecursiveDirectoryIterator::__construct(/home/sumit/public_html/html/ps-hotel-reservation-system/themes/hotel-theme/): failed to open dir: No such file or directory' in /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/sysplugins/smarty_internal_utility.php:68
+Stack trace:
+#0 /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/sysplugins/smarty_internal_utility.php(68): RecursiveDirectoryIterator->__construct('/home/sumit/pub...')
+#1 /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/Smarty.class.php(1440): Smarty_Internal_Utility::compileAllTemplates('.tpl', false, 0, NULL, Object(SmartyCustom))
+#2 /home/sumit/public_html/html/ps-hotel-reservation-system/install/controllers/http/smarty_compile.php(42): Smarty->compileAllTemplates('.tpl', false)
+#3 /home/sumit/public_html/html/ps-hotel-reservation-system/install/classes/controllerHttp.php(96): require_once('/home/sumit/pub...')
+#4 /home/sumit/p in /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/sysplugins/smarty_internal_utility.php on line 68
+[05-Nov-2015 15:54:57 Asia/Calcutta] PHP Fatal error:  Uncaught exception 'UnexpectedValueException' with message 'RecursiveDirectoryIterator::__construct(/home/sumit/public_html/html/ps-hotel-reservation-system/themes/hotel-theme/): failed to open dir: No such file or directory' in /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/sysplugins/smarty_internal_utility.php:68
+Stack trace:
+#0 /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/sysplugins/smarty_internal_utility.php(68): RecursiveDirectoryIterator->__construct('/home/sumit/pub...')
+#1 /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/Smarty.class.php(1440): Smarty_Internal_Utility::compileAllTemplates('.tpl', false, 0, NULL, Object(SmartyCustom))
+#2 /home/sumit/public_html/html/ps-hotel-reservation-system/install/controllers/http/smarty_compile.php(42): Smarty->compileAllTemplates('.tpl', false)
+#3 /home/sumit/public_html/html/ps-hotel-reservation-system/install/classes/controllerHttp.php(96): require_once('/home/sumit/pub...')
+#4 /home/sumit/p in /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/sysplugins/smarty_internal_utility.php on line 68
+[05-Nov-2015 15:55:10 Asia/Calcutta] PHP Fatal error:  Uncaught exception 'UnexpectedValueException' with message 'RecursiveDirectoryIterator::__construct(/home/sumit/public_html/html/ps-hotel-reservation-system/themes/hotel-theme/): failed to open dir: No such file or directory' in /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/sysplugins/smarty_internal_utility.php:68
+Stack trace:
+#0 /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/sysplugins/smarty_internal_utility.php(68): RecursiveDirectoryIterator->__construct('/home/sumit/pub...')
+#1 /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/Smarty.class.php(1440): Smarty_Internal_Utility::compileAllTemplates('.tpl', false, 0, NULL, Object(SmartyCustom))
+#2 /home/sumit/public_html/html/ps-hotel-reservation-system/install/controllers/http/smarty_compile.php(42): Smarty->compileAllTemplates('.tpl', false)
+#3 /home/sumit/public_html/html/ps-hotel-reservation-system/install/classes/controllerHttp.php(96): require_once('/home/sumit/pub...')
+#4 /home/sumit/p in /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/sysplugins/smarty_internal_utility.php on line 68
+[05-Nov-2015 15:55:45 Asia/Calcutta] PHP Fatal error:  Uncaught exception 'UnexpectedValueException' with message 'RecursiveDirectoryIterator::__construct(/home/sumit/public_html/html/ps-hotel-reservation-system/themes/hotel-theme/): failed to open dir: No such file or directory' in /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/sysplugins/smarty_internal_utility.php:68
+Stack trace:
+#0 /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/sysplugins/smarty_internal_utility.php(68): RecursiveDirectoryIterator->__construct('/home/sumit/pub...')
+#1 /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/Smarty.class.php(1440): Smarty_Internal_Utility::compileAllTemplates('.tpl', false, 0, NULL, Object(SmartyCustom))
+#2 /home/sumit/public_html/html/ps-hotel-reservation-system/install/controllers/http/smarty_compile.php(42): Smarty->compileAllTemplates('.tpl', false)
+#3 /home/sumit/public_html/html/ps-hotel-reservation-system/install/classes/controllerHttp.php(96): require_once('/home/sumit/pub...')
+#4 /home/sumit/p in /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/sysplugins/smarty_internal_utility.php on line 68
+[05-Nov-2015 16:35:37 Asia/Calcutta] PHP Fatal error:  Uncaught exception 'UnexpectedValueException' with message 'RecursiveDirectoryIterator::__construct(/home/sumit/public_html/html/ps-hotel-reservation-system/themes/hotel-theme/): failed to open dir: No such file or directory' in /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/sysplugins/smarty_internal_utility.php:68
+Stack trace:
+#0 /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/sysplugins/smarty_internal_utility.php(68): RecursiveDirectoryIterator->__construct('/home/sumit/pub...')
+#1 /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/Smarty.class.php(1440): Smarty_Internal_Utility::compileAllTemplates('.tpl', false, 0, NULL, Object(SmartyCustom))
+#2 /home/sumit/public_html/html/ps-hotel-reservation-system/install/controllers/http/smarty_compile.php(42): Smarty->compileAllTemplates('.tpl', false)
+#3 /home/sumit/public_html/html/ps-hotel-reservation-system/install/classes/controllerHttp.php(96): require_once('/home/sumit/pub...')
+#4 /home/sumit/p in /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/sysplugins/smarty_internal_utility.php on line 68
+[05-Nov-2015 16:35:41 Asia/Calcutta] PHP Fatal error:  Uncaught exception 'UnexpectedValueException' with message 'RecursiveDirectoryIterator::__construct(/home/sumit/public_html/html/ps-hotel-reservation-system/themes/hotel-theme/): failed to open dir: No such file or directory' in /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/sysplugins/smarty_internal_utility.php:68
+Stack trace:
+#0 /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/sysplugins/smarty_internal_utility.php(68): RecursiveDirectoryIterator->__construct('/home/sumit/pub...')
+#1 /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/Smarty.class.php(1440): Smarty_Internal_Utility::compileAllTemplates('.tpl', false, 0, NULL, Object(SmartyCustom))
+#2 /home/sumit/public_html/html/ps-hotel-reservation-system/install/controllers/http/smarty_compile.php(42): Smarty->compileAllTemplates('.tpl', false)
+#3 /home/sumit/public_html/html/ps-hotel-reservation-system/install/classes/controllerHttp.php(96): require_once('/home/sumit/pub...')
+#4 /home/sumit/p in /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/sysplugins/smarty_internal_utility.php on line 68
+[05-Nov-2015 16:36:47 Asia/Calcutta] PHP Fatal error:  Uncaught exception 'UnexpectedValueException' with message 'RecursiveDirectoryIterator::__construct(/home/sumit/public_html/html/ps-hotel-reservation-system/themes/hotel-theme/): failed to open dir: No such file or directory' in /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/sysplugins/smarty_internal_utility.php:68
+Stack trace:
+#0 /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/sysplugins/smarty_internal_utility.php(68): RecursiveDirectoryIterator->__construct('/home/sumit/pub...')
+#1 /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/Smarty.class.php(1440): Smarty_Internal_Utility::compileAllTemplates('.tpl', false, 0, NULL, Object(SmartyCustom))
+#2 /home/sumit/public_html/html/ps-hotel-reservation-system/install/controllers/http/smarty_compile.php(42): Smarty->compileAllTemplates('.tpl', false)
+#3 /home/sumit/public_html/html/ps-hotel-reservation-system/install/classes/controllerHttp.php(96): require_once('/home/sumit/pub...')
+#4 /home/sumit/p in /home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/sysplugins/smarty_internal_utility.php on line 68

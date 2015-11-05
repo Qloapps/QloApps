@@ -1,17 +1,17 @@
-<?php /* Smarty version Smarty-3.1.19, created on 2015-11-02 20:02:45
+<?php /* Smarty version Smarty-3.1.19, created on 2015-11-05 18:44:57
          compiled from "/home/sumit/public_html/html/ps-hotel-reservation-system/admin/themes/default/template/controllers/products/booking.tpl" */ ?>
-<?php /*%%SmartyHeaderCode:13623630005637740d5612e7-22428210%%*/if(!defined('SMARTY_DIR')) exit('no direct access allowed');
+<?php /*%%SmartyHeaderCode:1988242429563b5651bd4be8-86462146%%*/if(!defined('SMARTY_DIR')) exit('no direct access allowed');
 $_valid = $_smarty_tpl->decodeProperties(array (
   'file_dependency' => 
   array (
     '728a5e527711032b1e2860a7912eee810e23b278' => 
     array (
       0 => '/home/sumit/public_html/html/ps-hotel-reservation-system/admin/themes/default/template/controllers/products/booking.tpl',
-      1 => 1446455063,
+      1 => 1446729264,
       2 => 'file',
     ),
   ),
-  'nocache_hash' => '13623630005637740d5612e7-22428210',
+  'nocache_hash' => '1988242429563b5651bd4be8-86462146',
   'function' => 
   array (
   ),
@@ -33,9 +33,9 @@ $_valid = $_smarty_tpl->decodeProperties(array (
   ),
   'has_nocache_code' => false,
   'version' => 'Smarty-3.1.19',
-  'unifunc' => 'content_5637740d6413f3_10307439',
+  'unifunc' => 'content_563b5651cc65d4_99752368',
 ),false); /*/%%SmartyHeaderCode%%*/?>
-<?php if ($_valid && !is_callable('content_5637740d6413f3_10307439')) {function content_5637740d6413f3_10307439($_smarty_tpl) {?><?php if (!is_callable('smarty_modifier_date_format')) include '/home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/plugins/modifier.date_format.php';
+<?php if ($_valid && !is_callable('content_563b5651cc65d4_99752368')) {function content_563b5651cc65d4_99752368($_smarty_tpl) {?><?php if (!is_callable('smarty_modifier_date_format')) include '/home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/plugins/modifier.date_format.php';
 ?><?php if (isset($_smarty_tpl->tpl_vars['product']->value->id)&&isset($_smarty_tpl->tpl_vars['htl_config']->value)) {?>
 	<div id="product-configuration" class="panel product-tab">
 		<input type="hidden" name="submitted_tabs[]" value="Booking"/>

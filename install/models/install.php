@@ -621,6 +621,10 @@ class InstallModelInstall extends InstallAbstractModel
                 'cheque',
                 'blockcurrencies',
                 'blocklanguages',
+                'dashactivity',
+                'dashtrends',
+                'dashgoals',
+                'dashproducts',
                 );
         }
         return $modules;

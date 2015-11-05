@@ -63,7 +63,7 @@ class WkTestimonialBlock extends Module
                     {
                         $obj_testimonial_data_img = new WkHotelTestimonialData($obj_testimonial_data->id);
 
-                        $image_name = $obj_testimonial_data->id.'.jpg';
+                        $image_name = $obj_testimonial_data->id.'.png';
                         ImageManager::resize($_FILES['testimonial_image']['tmp_name'][$key], $testimonial_img_path.$image_name);
 
                         $obj_testimonial_data_img->testimonial_image = $image_name;
@@ -110,8 +110,8 @@ class WkTestimonialBlock extends Module
 
     public function insertDefaultHotelTestimonialsEntries()
     {
-        $designations = array(0 => 'DC Comics CEO', 1 => 'DC Comics CEO', 2 => 'DC Comics CEO');
-        $images = array(0 => '1.jpg', 1 => '2.jpg', 2 => '3.jpg');
+        $designations = array(0 => 'Eon Comics CEO', 1 => 'Ken Comics Kal', 2 => 'Jan Comics Joe');
+        $images = array(0 => '1.png', 1 => '2.png', 2 => '3.png');
         $names = array(0 => 'Calrk Kent', 1 => 'Calrk Kent', 2 => 'Calrk Kent');
         $testimonial_description = array(
             0 => $this->l('Fap put a bird on it next level, sustainable disrupt polaroid flannel Helvetica Kickstarter quinoa bicycle rights narwhal wolf Fap put a bird on it next level. '),

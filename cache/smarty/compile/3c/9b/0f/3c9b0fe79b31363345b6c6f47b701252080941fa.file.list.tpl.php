@@ -1,17 +1,17 @@
-<?php /* Smarty version Smarty-3.1.19, created on 2015-11-02 20:02:41
+<?php /* Smarty version Smarty-3.1.19, created on 2015-11-05 18:44:54
          compiled from "/home/sumit/public_html/html/ps-hotel-reservation-system/admin/themes/default/template/helpers/modules_list/list.tpl" */ ?>
-<?php /*%%SmartyHeaderCode:1640470900563774097c2ee9-85537340%%*/if(!defined('SMARTY_DIR')) exit('no direct access allowed');
+<?php /*%%SmartyHeaderCode:1900979310563b564e000424-25353432%%*/if(!defined('SMARTY_DIR')) exit('no direct access allowed');
 $_valid = $_smarty_tpl->decodeProperties(array (
   'file_dependency' => 
   array (
     '3c9b0fe79b31363345b6c6f47b701252080941fa' => 
     array (
       0 => '/home/sumit/public_html/html/ps-hotel-reservation-system/admin/themes/default/template/helpers/modules_list/list.tpl',
-      1 => 1446455061,
+      1 => 1446729263,
       2 => 'file',
     ),
   ),
-  'nocache_hash' => '1640470900563774097c2ee9-85537340',
+  'nocache_hash' => '1900979310563b564e000424-25353432',
   'function' => 
   array (
   ),
@@ -24,9 +24,9 @@ $_valid = $_smarty_tpl->decodeProperties(array (
   ),
   'has_nocache_code' => false,
   'version' => 'Smarty-3.1.19',
-  'unifunc' => 'content_563774098226e8_10678107',
+  'unifunc' => 'content_563b564e029bf3_83794377',
 ),false); /*/%%SmartyHeaderCode%%*/?>
-<?php if ($_valid && !is_callable('content_563774098226e8_10678107')) {function content_563774098226e8_10678107($_smarty_tpl) {?><?php if (!is_callable('smarty_function_counter')) include '/home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/plugins/function.counter.php';
+<?php if ($_valid && !is_callable('content_563b564e029bf3_83794377')) {function content_563b564e029bf3_83794377($_smarty_tpl) {?><?php if (!is_callable('smarty_function_counter')) include '/home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/plugins/function.counter.php';
 if (!is_callable('smarty_function_cycle')) include '/home/sumit/public_html/html/ps-hotel-reservation-system/tools/smarty/plugins/function.cycle.php';
 ?>
 <div class="panel">

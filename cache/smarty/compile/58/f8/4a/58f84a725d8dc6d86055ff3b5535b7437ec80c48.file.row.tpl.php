@@ -1,17 +1,17 @@
-<?php /* Smarty version Smarty-3.1.19, created on 2015-11-02 20:02:41
+<?php /* Smarty version Smarty-3.1.19, created on 2015-11-05 18:44:53
          compiled from "/home/sumit/public_html/html/ps-hotel-reservation-system/admin/themes/default/template/helpers/kpi/row.tpl" */ ?>
-<?php /*%%SmartyHeaderCode:1068701049563774097abb08-21796944%%*/if(!defined('SMARTY_DIR')) exit('no direct access allowed');
+<?php /*%%SmartyHeaderCode:1066686390563b564df2bb02-05718754%%*/if(!defined('SMARTY_DIR')) exit('no direct access allowed');
 $_valid = $_smarty_tpl->decodeProperties(array (
   'file_dependency' => 
   array (
     '58f84a725d8dc6d86055ff3b5535b7437ec80c48' => 
     array (
       0 => '/home/sumit/public_html/html/ps-hotel-reservation-system/admin/themes/default/template/helpers/kpi/row.tpl',
-      1 => 1446455061,
+      1 => 1446729262,
       2 => 'file',
     ),
   ),
-  'nocache_hash' => '1068701049563774097abb08-21796944',
+  'nocache_hash' => '1066686390563b564df2bb02-05718754',
   'function' => 
   array (
   ),
@@ -23,9 +23,9 @@ $_valid = $_smarty_tpl->decodeProperties(array (
   ),
   'has_nocache_code' => false,
   'version' => 'Smarty-3.1.19',
-  'unifunc' => 'content_563774097bd938_85258070',
+  'unifunc' => 'content_563b564df3da90_63665682',
 ),false); /*/%%SmartyHeaderCode%%*/?>
-<?php if ($_valid && !is_callable('content_563774097bd938_85258070')) {function content_563774097bd938_85258070($_smarty_tpl) {?>
+<?php if ($_valid && !is_callable('content_563b564df3da90_63665682')) {function content_563b564df3da90_63665682($_smarty_tpl) {?>
 <div class="panel kpi-container">
 	<div class="kpi-refresh"><button class="close refresh" type="button" onclick="refresh_kpis();"><i class="process-icon-refresh" style="font-size:1em"></i></button></div>
 	<div class="row">
