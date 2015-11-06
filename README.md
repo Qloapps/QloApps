@@ -5,10 +5,10 @@ Hotel Commerce is Hotel Booking  & Reservarion system . Using this you can  easi
 
 Demo
 --------
-FrontEnd : http://prestashop.webkul.com/hotel-reservation/
-Backend : http://prestashop.webkul.com/hotel-reservation/adminhtl/
-username : demo@demo.com
-Password : demodemo
+FrontEnd : http://prestashop.webkul.com/hotel-reservation/ </br>
+Backend : http://prestashop.webkul.com/hotel-reservation/adminhtl/ </br>
+username : demo@demo.com </br>
+Password : demodemo </br>
 
 
 
