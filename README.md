@@ -30,7 +30,7 @@ Once the files in the HotelCommerce  archive have been decompressed and uploaded
 Getting support
 --------
 If you need help using PrestaShop 1.6, contact the PrestaShop support team: support@webkul.com
-or raise ticket at https://webkul.com/ticket/scp
+or raise ticket at https://webkul.com/ticket/
 
 Webkul is known for his proactive support and already developed more than 100+ plugins on prestashop and more than 700+ plugins on other opensource platforms.
 
