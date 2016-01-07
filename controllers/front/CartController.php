@@ -147,6 +147,41 @@ class CartControllerCore extends FrontController
                 $this->context->cart->update();
             }
         }
+
+        if (Module::isInstalled('hotelreservationsystem')) 
+        {
+            require_once (_PS_MODULE_DIR_.'hotelreservationsystem/define.php');
+            
+            $id_cart = $this->context->cart->id;
+            $id_product = (int)$this->id_product;
+            $date_from = Tools::getValue('dateFrom');
+            $date_to = Tools::getValue('dateTo');
+            
+            $obj_room_type = new HotelRoomType();
+            $room_info_by_id_product = $obj_room_type->getRoomTypeInfoByIdProduct($id_product);
+
+            $obj_htl_cart_booking_data = new HotelCartBookingData();
+            $result = $obj_htl_cart_booking_data->deleteCartBookingDataOnRemoveFromBlockCart($id_cart, $id_product);
+            
+            if ($room_info_by_id_product)
+            {
+                $id_hotel = $room_info_by_id_product['id_hotel'];
+
+                if ($id_hotel)
+                {
+                    $obj_booking_dtl = new HotelBookingDetail();
+                    $hotel_room_data = $obj_booking_dtl->DataForFrontSearch($date_from, $date_to, $id_hotel, $id_product, 1);
+                    if ($hotel_room_data)
+                        $total_available_rooms = $hotel_room_data['stats']['num_avail'];
+                }
+            }
+
+            if ($result)
+                $this->context->cookie->avail_rooms = $total_available_rooms;
+            // else
+            //     die(Tools::jsonEncode(array('status'=>'failed')));
+        }
+
         $removed = CartRule::autoRemoveFromCart();
         CartRule::autoAddToCart();
         if (count($removed) && (int)Tools::getValue('allow_refresh')) {
@@ -216,6 +251,50 @@ class CartControllerCore extends FrontController
     protected function processChangeProductInCart()
     {
         $mode = (Tools::getIsset('update') && $this->id_product) ? 'update' : 'add';
+
+        $date_from = Tools::getValue('dateFrom');
+        $date_to = Tools::getValue('dateTo');
+
+        $id_cart = $this->context->cart->id;
+        $id_guest = $this->context->cart->id_guest;
+
+        /*
+        *   By Webkul
+        *   This code is to check available quantity of Room before adding it to cart.
+        */
+        if (Module::isInstalled('hotelreservationsystem')) 
+        {
+            require_once (_PS_MODULE_DIR_.'hotelreservationsystem/define.php');
+
+            $obj_booking_detail = new HotelBookingDetail();
+            $num_days = $obj_booking_detail->getNumberOfDays($date_from, $date_to);
+
+            $req_rm = $this->qty;
+            $this->qty = $this->qty * (int)$num_days;
+
+            $obj_room_type = new HotelRoomType();
+            $room_info_by_id_product = $obj_room_type->getRoomTypeInfoByIdProduct($this->id_product);
+
+            if ($room_info_by_id_product)
+            {
+                $id_hotel = $room_info_by_id_product['id_hotel'];
+
+                if ($id_hotel)
+                {
+                    $obj_booking_dtl = new HotelBookingDetail();
+                    $hotel_room_data = $obj_booking_dtl->DataForFrontSearch($date_from, $date_to, $id_hotel, $this->id_product, 1, 0, 0, -1, 0, 0, $id_cart, $id_guest);
+
+                    $total_available_rooms = $hotel_room_data['stats']['num_avail'];
+
+                    if ($total_available_rooms < $req_rm)
+                        die(Tools::jsonEncode(array('status'=>'unavailable_quantity', 'avail_rooms'=>$total_available_rooms)));
+                }
+                else
+                    die(Tools::jsonEncode(array('status'=>'failed3')));
+            }
+            else
+                die(Tools::jsonEncode(array('status'=>'failed4')));
+        }
 
         if ($this->qty == 0) {
             $this->errors[] = Tools::displayError('Null quantity.', !Tools::getValue('ajax'));
@@ -289,6 +368,43 @@ class CartControllerCore extends FrontController
             if (!$this->errors) {
                 $cart_rules = $this->context->cart->getCartRules();
                 $update_quantity = $this->context->cart->updateQty($this->qty, $this->id_product, $this->id_product_attribute, $this->customization_id, Tools::getValue('op', 'up'), $this->id_address_delivery);
+
+                /*------  BY Webkul ------*/
+                /*
+                * To add Rooms in hotel cart
+                */
+                $this->availQty = false;
+                $id_customer = $this->context->cart->id_customer;
+                $id_currency = $this->context->cart->id_currency;
+
+                $hotel_room_info_arr = $hotel_room_data['rm_data'][0]['data']['available'];
+                $chkQty = 0;
+                foreach ($hotel_room_info_arr as $key_hotel_room_info => $val_hotel_room_info)
+                {
+                    if ($chkQty < $req_rm)
+                    {
+                        $obj_htl_cart_booking_data = new HotelCartBookingData();
+                        $obj_htl_cart_booking_data->id_cart = $this->context->cart->id;
+                        $obj_htl_cart_booking_data->id_guest = $this->context->cookie->id_guest;
+                        $obj_htl_cart_booking_data->id_customer = $id_customer;
+                        $obj_htl_cart_booking_data->id_currency = $id_currency;
+                        $obj_htl_cart_booking_data->id_product = $val_hotel_room_info['id_product'];
+                        $obj_htl_cart_booking_data->id_room = $val_hotel_room_info['id_room'];
+                        $obj_htl_cart_booking_data->id_hotel = $val_hotel_room_info['id_hotel'];
+                        $obj_htl_cart_booking_data->booking_type = 1;
+                        $obj_htl_cart_booking_data->quantity = $num_days;
+                        $obj_htl_cart_booking_data->date_from = $date_from;
+                        $obj_htl_cart_booking_data->date_to = $date_to;
+                        $obj_htl_cart_booking_data->save();
+                        $chkQty++;
+                    }
+                    else
+                        break;
+                }
+                $this->availQty = $total_available_rooms - $req_rm;
+                $this->context->cookie->avail_rooms = $this->availQty;
+                /*------  BY Webkul ------*/
+
                 if ($update_quantity < 0) {
                     // If product has attribute, minimal quantity is set with minimal quantity of attribute
                     $minimal_quantity = ($this->id_product_attribute) ? Attribute::getAttributeMinimalQty($this->id_product_attribute) : $product->minimal_quantity;
@@ -371,7 +487,9 @@ class CartControllerCore extends FrontController
 
                 Cart::addExtraCarriers($result);
             }
+            
             $result['summary'] = $this->context->cart->getSummaryDetails(null, true);
+
             $result['customizedDatas'] = Product::getAllCustomizedDatas($this->context->cart->id, null, true);
             $result['HOOK_SHOPPING_CART'] = Hook::exec('displayShoppingCartFooter', $result['summary']);
             $result['HOOK_SHOPPING_CART_EXTRA'] = Hook::exec('displayShoppingCart', $result['summary']);

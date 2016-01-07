@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<module>
+	<name>dashproducts</name>
+	<displayName><![CDATA[Dasbor produk]]></displayName>
+	<version><![CDATA[0.3.3]]></version>
+	<description><![CDATA[Menambahkan blok berisi data penjualan terakhir dan ranking produk]]></description>
+	<author><![CDATA[PrestaShop]]></author>
+	<tab><![CDATA[dashboard]]></tab>
+	<is_configurable>0</is_configurable>
+	<need_instance>1</need_instance>
+	<limited_countries></limited_countries>
+</module>

@@ -1,0 +1,12 @@
+
+[{shop_url}] 
+
+Halo 
+
+Ini adalah TES EMAIL dari toko Anda.
+
+Jika sampai berarti tesnya berhasil!. 
+
+{shop_name} [{shop_url}] didukung oleh
+PrestaShop(tm) [http://www.prestashop.com/] 
+

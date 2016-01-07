@@ -42,12 +42,20 @@ class ChequePaymentModuleFrontController extends ModuleFrontController
 		$cart = $this->context->cart;
 		if (!$this->module->checkCurrency($cart))
 			Tools::redirect('index.php?controller=order');
+		
+		if (Configuration::get('WK_ALLOW_ADVANCED_PAYMENT')) 
+		{
+			$obj_customer_adv = new HotelCustomerAdvancedPayment();
+			$order_total = $obj_customer_adv->getOrdertTotal($this->context->cart->id, $this->context->cart->id_guest);
+		}
+		else
+			$order_total = $cart->getOrderTotal(true, Cart::BOTH);
 
 		$this->context->smarty->assign(array(
 			'nbProducts' => $cart->nbProducts(),
 			'cust_currency' => $cart->id_currency,
 			'currencies' => $this->module->getCurrency((int)$cart->id_currency),
-			'total' => $cart->getOrderTotal(true, Cart::BOTH),
+			'total' => $order_total,
 			'isoCode' => $this->context->language->iso_code,
 			'chequeName' => $this->module->chequeName,
 			'chequeAddress' => Tools::nl2br($this->module->address),

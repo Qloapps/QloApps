@@ -8,14 +8,11 @@ $_MODULE['<{blocknewsletter}prestashop>blocknewsletter_ba457fab18d697d978befb95e
 $_MODULE['<{blocknewsletter}prestashop>blocknewsletter_396c88991101b5ca362932952293d291'] = 'Are you sure that you want to delete all of your contacts?';
 $_MODULE['<{blocknewsletter}prestashop>blocknewsletter_c3987e4cac14a8456515f0d200da04ee'] = 'All countries';
 $_MODULE['<{blocknewsletter}prestashop>blocknewsletter_fa01fd956e87307bce4c90a0de9b0437'] = 'Customers\' country';
-$_MODULE['<{blocknewsletter}prestashop>blocknewsletter_c0859b0a5241dff468da2a9a93c3284f'] = 'Operate a filter on customers\' country.';
 $_MODULE['<{blocknewsletter}prestashop>blocknewsletter_2198f293f5e1e95dddeff819fbca0975'] = 'Newsletter subscribers';
 $_MODULE['<{blocknewsletter}prestashop>blocknewsletter_99006a61d48499231e1be92241cf772a'] = 'Filter newsletter subscribers.';
 $_MODULE['<{blocknewsletter}prestashop>blocknewsletter_7e3a51a56ddd2846e21c33f05e0aea6f'] = 'All customers';
 $_MODULE['<{blocknewsletter}prestashop>blocknewsletter_39f7a3e2b56e9bfd753ba6325533a127'] = 'Subscribers';
 $_MODULE['<{blocknewsletter}prestashop>blocknewsletter_011d8c5d94f729f013963d856cd78745'] = 'Non-subscribers';
-$_MODULE['<{blocknewsletter}prestashop>blocknewsletter_793ee192a9124cd6f529460eef17d3e5'] = 'Opted-in subscribers';
-$_MODULE['<{blocknewsletter}prestashop>blocknewsletter_7b15c043d66fecc45c8752592aa38e38'] = 'Filter opted-in subscribers.';
 $_MODULE['<{blocknewsletter}prestashop>blocknewsletter_417d63b1effb110e438d4b4b9f0fbd95'] = 'The voucher code is invalid.';
 $_MODULE['<{blocknewsletter}prestashop>blocknewsletter_c888438d14855d7d96a2724ee9c306bd'] = 'Settings updated';
 $_MODULE['<{blocknewsletter}prestashop>blocknewsletter_b718adec73e04ce3ec720dd11a06a308'] = 'ID';
@@ -47,8 +44,6 @@ $_MODULE['<{blocknewsletter}prestashop>blocknewsletter_b37f32d509cf5aabe806b1679
 $_MODULE['<{blocknewsletter}prestashop>blocknewsletter_506e58042922bff5bd753dc612e84f5b'] = 'Welcome voucher code';
 $_MODULE['<{blocknewsletter}prestashop>blocknewsletter_1d612b943b8f4792bff603384a46e5f1'] = 'Leave blank to disable by default.';
 $_MODULE['<{blocknewsletter}prestashop>blocknewsletter_c9cc8cce247e49bae79f15173ce97354'] = 'Save';
-$_MODULE['<{blocknewsletter}prestashop>blocknewsletter_2eb05fb68ae560f1f25f46422dcfe9c2'] = 'Subscribers with an account';
-$_MODULE['<{blocknewsletter}prestashop>blocknewsletter_f821fd15db9c1d946a449837c291fc68'] = 'Subscribers without an account';
 $_MODULE['<{blocknewsletter}prestashop>blocknewsletter_dbb392a2dc9b38722e69f6032faea73e'] = 'Export .CSV file';
 $_MODULE['<{blocknewsletter}prestashop>blocknewsletter_f6df4ad6dc4798f26d1f2460eef4f2e9'] = 'Search for addresses';
 $_MODULE['<{blocknewsletter}prestashop>blocknewsletter_375afa60efcc1d48300bd339cb8154b0'] = 'Email address to search';
@@ -57,8 +52,6 @@ $_MODULE['<{blocknewsletter}prestashop>blocknewsletter_13348442cc6a27032d2b4aa28
 $_MODULE['<{blocknewsletter}prestashop>blocknewsletter_82e5e0bc0f9c776c98253d569c111c0f'] = 'No customers found with these filters!';
 $_MODULE['<{blocknewsletter}prestashop>blocknewsletter_644ecc2486a059ca16b001a77909bf40'] = 'The .CSV file has been successfully exported: %d customers found.';
 $_MODULE['<{blocknewsletter}prestashop>blocknewsletter_48e3d5f66961b621c78f709afcd7d437'] = 'Download the file';
-$_MODULE['<{blocknewsletter}prestashop>blocknewsletter_faa1115fbab933e7178ee43ce1590977'] = 'WARNING: If opening this .csv file with Excel, remember to choose UTF-8 encoding or you may see strange characters.';
-$_MODULE['<{blocknewsletter}prestashop>blocknewsletter_81573e0ea79138f02fd2cee94786d7e9'] = 'Error: cannot write';
 $_MODULE['<{blocknewsletter}prestashop>list_action_enable_00d23a76e43b46dae9ec7aa9dcbebb32'] = 'Enabled';
 $_MODULE['<{blocknewsletter}prestashop>list_action_enable_b9f5c797ebbf55adccdd8539a65a0241'] = 'Disabled';
 $_MODULE['<{blocknewsletter}prestashop>blocknewsletter_ffb7e666a70151215b4c55c6268d7d72'] = 'Newsletter';

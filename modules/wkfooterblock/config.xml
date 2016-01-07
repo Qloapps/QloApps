@@ -2,7 +2,7 @@
 <module>
 	<name>wkfooterblock</name>
 	<displayName><![CDATA[Pages Footer block]]></displayName>
-	<version><![CDATA[1.6.1]]></version>
+	<version><![CDATA[0.0.2]]></version>
 	<description><![CDATA[Shows footer content.]]></description>
 	<author><![CDATA[webkul]]></author>
 	<tab><![CDATA[front_office_features]]></tab>

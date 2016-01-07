@@ -1,0 +1,69 @@
+
+[{shop_url}] 
+
+Olá {firstname} {lastname},
+
+Muito obrigado por comprar na {shop_name}! 
+
+PEDIDO: {order_name} Realizado em {date}
+
+PAGAMENTO: {payment} 		 
+
+REFERÊNCIA
+
+PRODUTO
+
+PREÇO UNITÁRIO
+
+QUANTIDADE
+
+VALOR TOTAL
+
+{products_txt} 
+
+{discounts} 
+
+PRODUTOS 
+
+{total_products} 
+
+DESCONTOS 
+
+{total_discounts} 
+
+EMBALAGEM PARA PRESENTE 
+
+{total_wrapping} 
+
+FRETE 
+
+{total_shipping} 
+
+TOTAL DE IMPOSTO PAGO 
+
+{total_tax_paid} 
+
+TOTAL PAGO 
+
+{total_paid} 
+
+TRANSPORTADORA {carrier}
+
+PAGAMENTO: {payment} 		 
+
+{delivery_block_txt} 
+
+{invoice_block_txt} 
+
+Você pode revisar seu pedido e baixar sua fatura na seção "Meus
+Pedidos" [{history_url}] na sua conta, clicando em
+"Minha Conta" [{my_account_url}] na nossa loja. 
+
+Se você tem uma conta de convidado, você pode acompanhar seu
+pedido através da seção "Rastreamento de convidado"
+[{guest_tracking_url}?id_order={order_name}] em nossa
+loja. 
+
+{shop_name} [{shop_url}] baseado em
+PrestaShop(tm) [http://www.prestashop.com/] 
+

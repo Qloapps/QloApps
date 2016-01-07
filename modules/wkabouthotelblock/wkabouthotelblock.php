@@ -1,26 +1,26 @@
 <?php
 if (!defined('_PS_VERSION_'))
-	exit;
+    exit;
 
 class WkAboutHotelBlock extends Module
 {
-	public function __construct()
-	{
-		$this->name = 'wkabouthotelblock';
-		$this->tab = 'front_office_features';
-		$this->version = '1.6.0';
-		$this->author = 'webkul';
-		$this->need_instance = 0;
+    public function __construct()
+    {
+        $this->name = 'wkabouthotelblock';
+        $this->tab = 'front_office_features';
+        $this->version = '0.0.2';
+        $this->author = 'webkul';
+        $this->need_instance = 0;
 
-		$this->bootstrap = true;
-		parent::__construct();
+        $this->bootstrap = true;
+        parent::__construct();
 
-		$this->displayName = $this->l('About Hotel Block');
-		$this->description = $this->l('Now show Block about your hotel using this module.');
-		$this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
-	}
+        $this->displayName = $this->l('About Hotel Block');
+        $this->description = $this->l('Now show Block about your hotel using this module.');
+        $this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
+    }
 
-	private function _postValidation()
+    private function _postValidation()
     {
         /*if (Tools::isSubmit('btnSubmit'))
         {
@@ -64,8 +64,8 @@ class WkAboutHotelBlock extends Module
 
     public function renderForm()
     {
-    	// Get default language
-    	$default_lang = (int)Configuration::get('PS_LANG_DEFAULT');
+        // Get default language
+        $default_lang = (int)Configuration::get('PS_LANG_DEFAULT');
 
         $fields_form[0]['form'] = array(
                 'legend' => array(
@@ -75,29 +75,29 @@ class WkAboutHotelBlock extends Module
                 'input' => array(
                     array(
                         'type' => 'text',
-                        'label' => $this->l('Why Your Hotel Heading'),
+                        'label' => $this->l('Heading1'),
                         'name' => 'WHY_THIS_HOTEL_HEADING',
-                        'hint' => $this->l('Why your hotel heading.')
+                        'hint' => $this->l('Heading to describe why to choose your hotel.')
                     ),
                     array(
                         'type' => 'textarea',
-                        'label' => $this->l('Why Your Hotel Content'),
+                        'label' => $this->l('Heading1 Content'),
                         'name' => 'WHY_THIS_HOTEL_CONTENT',
                         'rows' => '6',
-                        'hint' => $this->l('about your hotel content.')
+                        'hint' => $this->l('Content for heading1.')
                     ),
                     array(
                         'type' => 'text',
-                        'label' => $this->l('About Hotel Heading'),
+                        'label' => $this->l('Heading2'),
                         'name' => 'ABOUT_HOTEL_HEADING',
-                        'hint' => $this->l('about your hotel heading.')
+                        'hint' => $this->l('Heading to Describe about your hotel.')
                     ),
                     array(
                         'type' => 'textarea',
-                        'label' => $this->l('About Hotel Content'),
+                        'label' => $this->l('Heading2 Content'),
                         'name' => 'ABOUT_HOTEL_CONTENT',
                         'rows' => '6',
-                        'hint' => $this->l('why your hotel content.')
+                        'hint' => $this->l('Content for heading2.')
                     )
                 ),
                 'submit' => array(
@@ -161,7 +161,7 @@ class WkAboutHotelBlock extends Module
         );
     }
 
-	public function deleteConfigKeys()
+    public function deleteConfigKeys()
     {
         $var = array('WHY_THIS_HOTEL_HEADING',
                     'ABOUT_HOTEL_CONTENT', 'ABOUT_HOTEL_HEADING',
@@ -189,15 +189,15 @@ class WkAboutHotelBlock extends Module
         return true;
     }
 
-	public function install()
-	{
-		if (!parent::install()
-			|| !$this->registerHook('displayHome')
+    public function install()
+    {
+        if (!parent::install()
+            || !$this->registerHook('displayHome')
             || !$this->insertDefaultHotelEntries()
             )
-			return false;
-		return true;
-	}
+            return false;
+        return true;
+    }
 
     public function uninstall($keep = true)
     {

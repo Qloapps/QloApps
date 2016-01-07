@@ -1,0 +1,16 @@
+p.payment_module a.wk_paypal_adaptive:after{
+	color: #777777;
+    content: "";
+    display: block;
+    font-family: "FontAwesome";
+    font-size: 25px;
+    height: 22px;
+    margin-top: -11px;
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    width: 14px
+}
+p.payment_module a.wk_paypal_adaptive {
+    background: url("../../views/img/paypal-adaptive-icon.png") no-repeat scroll 15px 15px #FBFBFB;
+}

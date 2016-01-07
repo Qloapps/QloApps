@@ -100,7 +100,7 @@
 
 	{include file="controllers/products/multishop/check_fields.tpl" product_tab="Informations"}
 
-	<div class="form-group">
+	<div class="form-group hidden">
 		<label class="control-label col-lg-3" for="simple_product">
 			{$bullet_common_field} {l s='Type'}
 		</label>
@@ -116,7 +116,7 @@
 			</div>
 			<div class="radio">
 				<label for="virtual_product">
-					<input type="radio" name="type_product" id="virtual_product" {if $is_in_pack}disabled="disabled"{/if} value="{Product::PTYPE_VIRTUAL} {if $product_type == Product::PTYPE_VIRTUAL}checked="checked"{/if}">
+					<input type="radio" name="type_product" id="virtual_product" {if $is_in_pack}disabled="disabled"{/if} value="{Product::PTYPE_VIRTUAL}" {if $product_type == Product::PTYPE_VIRTUAL}checked="checked"{/if}>
 					{l s='Virtual product (services, booking, downloadable products, etc.)'}</label>
 			</div>
 			<div class="row row-padding-top">
@@ -128,12 +128,12 @@
 
 	<div id="product-pack-container" {if $product_type != Product::PTYPE_PACK}style="display:none"{/if}></div>
 
-	<hr />
-
+	<!-- <hr />
+ -->
 	<div class="form-group">
 		<div class="col-lg-1"><span class="pull-right">{include file="controllers/products/multishop/checkbox.tpl" field="name" type="default" multilang="true"}</span></div>
 		<label class="control-label col-lg-2 required" for="name_{$id_lang}">
-			<span class="label-tooltip" data-toggle="tooltip" title="{l s='The public name for this product.'} {l s='Invalid characters:'} &lt;&gt;;=#{}">
+			<span class="label-tooltip" data-toggle="tooltip" title="{l s='Write the name of the Room Type for ex. Delux, Executive etc.'} {l s='Invalid characters:'} &lt;&gt;;=#{}">
 				{l s='Room Type'}
 			</span>
 		</label>
@@ -184,7 +184,7 @@
 		</div>
 	</div>
 
-	<hr/>
+	<!-- <hr/> -->
 
 	{* status informations *}
 	<div class="form-group">

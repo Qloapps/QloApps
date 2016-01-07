@@ -80,7 +80,7 @@
 											{/if}
 											<div class="cart-info-sec rm_product_info_{$product.id_product}">
 												<span class="product_info_label">{l s='Price' mod='blockcart'}:</span>
-												<span class="price product_info_data">
+												<span class="price product_info_data" ttl_prod_price={if $priceDisplay == $smarty.const.PS_TAX_EXC}{$product.total}{else}{$product.total_wt}{/if}>
 													{if !isset($product.is_gift) || !$product.is_gift}
 														{if $priceDisplay == $smarty.const.PS_TAX_EXC}{displayWtPrice p="`$product.total`"}{else}{displayWtPrice p="`$product.total_wt`"}{/if}
 	                                                    <div id="hookDisplayProductPriceBlock-price">
@@ -118,7 +118,7 @@
 														{foreach from=$cart_htl_data[$data_k]['date_diff'] key=data_k1 item=data_v}
 															<tr class="rooms_remove_container">
 																<td>
-																	{$data_v['data_form']|date_format:"%d %b %G"}&nbsp;-&nbsp;{$data_v['data_to']|date_format:"%d %b %G"}
+																	{$data_v['data_form']|date_format:"%d %b %Y"}&nbsp;-&nbsp;{$data_v['data_to']|date_format:"%d %b %Y"}
 																</td>
 																<td class="num_rooms_in_date">{$data_v['num_rm']}</td>
 																<td>{convertPrice price=$data_v['amount']}</td>
@@ -218,7 +218,7 @@
 								</div>
 							{/if}
 							<div class="cart-prices-line last-line">
-								<span class="price cart_block_total ajax_block_cart_total">{$total}</span>
+								<span class="price cart_block_total ajax_block_cart_total" total_cart_price="{$totalToPay}">{$total}</span>
 								<span>{l s='Total' mod='blockcart'}</span>
 							</div>
 							{if $use_taxes && $display_tax_label == 1 && $show_tax}
@@ -261,15 +261,15 @@
 					<span id="layer_cart_product_title" class="product-name"></span>
 					<span id="layer_cart_product_attributes"></span>
 					<div>
-						<strong class="dark">{l s='Time Duration' mod='blockcart'}</strong>
+						<strong class="dark">{l s='Time Duration' mod='blockcart'} &nbsp;-&nbsp;</strong>
 						<span id="layer_cart_product_time_duration"></span>
 					</div>
 					<div>
-						<strong class="dark">{l s='Rooms Quantity Added' mod='blockcart'}</strong>
+						<strong class="dark">{l s='Rooms Quantity Added' mod='blockcart'} &nbsp;-&nbsp;</strong>
 						<span id="layer_cart_product_quantity"></span>
 					</div>
 					<div>
-						<strong class="dark">{l s='Total Cart Cost of This Room Type' mod='blockcart'}</strong>
+						<strong class="dark">{l s='Total Cart Cost of This Room Type' mod='blockcart'} &nbsp;-&nbsp;</strong>
 						<span id="layer_cart_product_price"></span>
 					</div>
 				</div>
@@ -385,8 +385,6 @@
 {/if}
 {strip}
 {addJsDefL name=someErrorCondition}{l s='Some Error occured.Please try again.' mod='blockcart' js=1}{/addJsDefL}
-{addJsDef cart_context=$cart_context}<!-- by webkul -->
-{addJsDef module_dir=$module_dir}<!-- by webkul -->
 {addJsDef CUSTOMIZE_TEXTFIELD=$CUSTOMIZE_TEXTFIELD}
 {addJsDef img_dir=$img_dir|escape:'quotes':'UTF-8'}
 {addJsDef generated_date=$smarty.now|intval}
@@ -399,8 +397,13 @@
 {addJsDefL name=freeProductTranslation}{l s='Free!' mod='blockcart' js=1}{/addJsDefL}
 {addJsDefL name=delete_txt}{l s='Delete' mod='blockcart' js=1}{/addJsDefL}
 {addJsDefL name=toBeDetermined}{l s='To be determined' mod='blockcart' js=1}{/addJsDefL}
-<!-- by webkul -->
+
+<!-- ################################################################### -->
+<!-- By webkul to send needed variable in ajax-cart.js -->
+<!-- ################################################################### -->
+{addJsDef module_dir=$module_dir}
 {addJsDef currency_sign = $currency->sign}
+{addJsDef room_warning_num = $warning_num}
 {addJsDef currency_format = $currency->format}
 {addJsDef currency_blank = $currency->blank}
 {addJsDefL name=adults_txt}{l s='Adults' mod='blockcart' js=1}{/addJsDefL}
@@ -412,6 +415,9 @@
 {addJsDefL name=capacity_txt}{l s='Capacity' mod='blockcart' js=1}{/addJsDefL}
 {addJsDefL name=remove_rm_title}{l s='remove this room from my cart' mod='blockcart' js=1}{/addJsDefL}
 
-{addJsDef pagename = $page_name}
+{addJsDef rm_avail_process_lnk = $link->getModuleLink('blockcart', 'checkroomavailabilityajaxprocess')}
+{addJsDef pagename = $current_page}
 {/strip}
-<!-- /MODULE Block cart -->
+<!-- ################################################################### -->
+<!-- End -->
+<!-- ################################################################### -->

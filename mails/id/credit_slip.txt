@@ -1,0 +1,16 @@
+
+[{shop_url}] 
+
+Halo {firstname} {lastname}, 
+
+Kami telah membuat nota kredit atas nama Anda untuk pembelian
+dengan kode referensi {order_name}. 
+
+Anda dapat melihat nota kredit dan mengunduh invoicenya dari "Nota
+kredit" [{history_url}] di halaman akun yang dapat
+diakses melalui menu "Akun saya" [{my_account_url}]
+diwebsite kami. 
+
+{shop_name} [{shop_url}] didukung oleh
+PrestaShop(tm) [http://www.prestashop.com/] 
+

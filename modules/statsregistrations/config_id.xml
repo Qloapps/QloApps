@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<module>
+	<name>statsregistrations</name>
+	<displayName><![CDATA[Akun pelanggan]]></displayName>
+	<version><![CDATA[1.4.0]]></version>
+	<description><![CDATA[Menambahkan tab progress pendaftaran ke statistik dashboard.]]></description>
+	<author><![CDATA[PrestaShop]]></author>
+	<tab><![CDATA[analytics_stats]]></tab>
+	<is_configurable>0</is_configurable>
+	<need_instance>0</need_instance>
+	<limited_countries></limited_countries>
+</module>

@@ -88,18 +88,18 @@ class AdminProductsControllerCore extends AdminController
 		$this->available_tabs_lang = array(
 			'Informations' => $this->l('Information'),
 			'Pack' => $this->l('Pack'),
-			'VirtualProduct' => $this->l('Virtual Product'),
+			//'VirtualProduct' => $this->l('Virtual Product'),
 			'Prices' => $this->l('Prices'),
 			'Seo' => $this->l('SEO'),
 			'Images' => $this->l('Images'),
 			'Associations' => $this->l('Associations'),
-			'Shipping' => $this->l('Shipping'),
-			'Combinations' => $this->l('Combinations'),
+			//'Shipping' => $this->l('Shipping'),
+			//'Combinations' => $this->l('Combinations'),
 			'Features' => $this->l('Features'),
-			'Customization' => $this->l('Customization'),
-			'Attachments' => $this->l('Attachments'),
+			//'Customization' => $this->l('Customization'),
+			//'Attachments' => $this->l('Attachments'),
 			'Quantities' => $this->l('Quantities'),
-			'Suppliers' => $this->l('Suppliers'),
+			//'Suppliers' => $this->l('Suppliers'),
 			'Warehouses' => $this->l('Warehouses'),
 			'Configuration' => $this->l('Configuration'),
 			'Booking' => $this->l('Booking Information')
@@ -110,17 +110,17 @@ class AdminProductsControllerCore extends AdminController
 			$this->available_tabs = array_merge($this->available_tabs, array(
 				'Informations' => 0,
 				'Pack' => 7,
-				'VirtualProduct' => 8,
+				//'VirtualProduct' => 8,
 				'Prices' => 1,
 				'Seo' => 2,
 				'Associations' => 3,
 				'Images' => 9,
-				'Shipping' => 4,
-				'Combinations' => 5,
+				//'Shipping' => 4,
+				//'Combinations' => 5,
 				'Features' => 10,
-				'Customization' => 11,
-				'Attachments' => 12,
-				'Suppliers' => 13,
+				//'Customization' => 11,
+				//'Attachments' => 12,
+				//'Suppliers' => 13,
 				'Configuration' => 14,
 				'Booking' => 15
 			));
@@ -1109,6 +1109,66 @@ class AdminProductsControllerCore extends AdminController
 
 	}
 
+	public function processAdvancedPayment()
+	{
+		if (Configuration::get('WK_ALLOW_ADVANCED_PAYMENT')) 
+		{
+			// Check if a specific price has been submitted
+			if (Tools::getIsset('submitPriceAddition'))
+				return;
+
+			$id_product = Tools::getValue('id_product');
+			
+			$id_adv_pmt = Tools::getValue('id_adv_pmt');
+			if ($id_adv_pmt) 
+				$obj_adv_pmt = new HotelAdvancedPayment($id_adv_pmt);
+			else
+				$obj_adv_pmt = new HotelAdvancedPayment();
+			
+			$adv_payment_active = Tools::getValue('adv_payment_active');
+
+			$obj_adv_pmt->id_product = $id_product;
+			$obj_adv_pmt->active = $adv_payment_active;
+
+			if ($adv_payment_active)
+			{
+				$calculate_from = Tools::getValue('cal_from');
+				
+				$payment_type = Tools::getValue('payment_type');
+
+				if ($payment_type == 1) 
+					$adv_pay_value = Tools::getValue('adv_pay_percent');
+				elseif ($payment_type == 2) 
+					$adv_pay_value = Tools::getValue('adv_pay_amount');
+
+				$adv_tax_include = Tools::getValue('adv_tax_include');
+
+				$obj_adv_pmt->payment_type = $payment_type;
+				$obj_adv_pmt->value = $adv_pay_value;
+
+				if ($payment_type == 2) 
+					$obj_adv_pmt->id_currency = (int)Configuration::get('PS_CURRENCY_DEFAULT');
+				else
+					$obj_adv_pmt->id_currency = '';
+
+				$obj_adv_pmt->tax_include = $adv_tax_include;
+				$obj_adv_pmt->calculate_from = $calculate_from;
+			}
+			else
+			{
+				$obj_adv_pmt->payment_type = '';
+				$obj_adv_pmt->value = '';
+				$obj_adv_pmt->id_currency = '';
+				$obj_adv_pmt->tax_include = '';
+				$obj_adv_pmt->calculate_from = 0;
+			}
+
+			$obj_adv_pmt->save();
+		}
+
+		return true;
+	}
+
 	public function processPriceAddition()
 	{
 		// Check if a specific price has been submitted
@@ -2041,6 +2101,7 @@ class AdminProductsControllerCore extends AdminController
 							$this->processProductAttribute();
 						if ($this->isTabSubmitted('Prices'))
 						{
+							$this->processAdvancedPayment();
 							$this->processPriceAddition();
 							$this->processSpecificPricePriorities();
 						}
@@ -3196,87 +3257,93 @@ class AdminProductsControllerCore extends AdminController
 		$this->tpl_form_vars['custom_form'] = $data->fetch();
 	}
 
-	public function processConfiguration($param)
+	public function processConfiguration()
 	{
-		$wk_id_room_type = Tools::getValue('wk_id_room_type'); 	// htl_room_type id field use only in edit case
+		/*Check if save of configuration tab is clicked*/
+		$checkConfSubmit = Tools::getValue('checkConfSubmit');
 
-		$id_product = Tools::getValue('id_product'); 	//room type
-		$id_hotel = Tools::getValue('id_hotel');
-
-		$adult = Tools::getValue('num_adults');
-		$children = Tools::getValue('num_child');
-
-		if (!$id_product || !Validate::isUnsignedInt($id_product)) 
-			$this->errors[] = Tools::displayError('There is some problem while setting room information');
-		if (!$id_hotel || !Validate::isUnsignedInt($id_hotel)) 
-			$this->errors[] = Tools::displayError('Please select a hotel');
-		if (!$adult || !Validate::isUnsignedInt($adult)) 
-			$this->errors[] = Tools::displayError('Please enter number of Adults');
-		if ($children === false || !Validate::isUnsignedInt($children)) 
-			$this->errors[] = Tools::displayError('Please enter number of children');
-
-		if (!count($this->errors)) 
+		if ($checkConfSubmit)
 		{
-			$room_num = Tools::getValue('room_num');
-			if ($room_num) 
+			$wk_id_room_type = Tools::getValue('wk_id_room_type'); 	// htl_room_type id field use only in edit case
+
+			$id_product = Tools::getValue('id_product'); 	//room type
+			$id_hotel = Tools::getValue('id_hotel');
+
+			$adult = Tools::getValue('num_adults');
+			$children = Tools::getValue('num_child');
+
+			if (!$id_product || !Validate::isUnsignedInt($id_product)) 
+				$this->errors[] = Tools::displayError('There is some problem while setting room information');
+			if (!$id_hotel || !Validate::isUnsignedInt($id_hotel)) 
+				$this->errors[] = Tools::displayError('Please select a hotel');
+			if (!$adult || !Validate::isUnsignedInt($adult)) 
+				$this->errors[] = Tools::displayError('Please enter number of Adults');
+			if ($children === false || !Validate::isUnsignedInt($children)) 
+				$this->errors[] = Tools::displayError('Please enter number of children');
+
+			if (!count($this->errors)) 
 			{
-				$room_floor = Tools::getValue('room_floor');
-				$room_status = Tools::getValue('room_status');
-				$room_comment = Tools::getValue('room_comment');
-				
-				if (count($room_num) != count($room_status))
-					$this->errors[] = Tools::displayError('There is some problem while setting room information');
-				
-				if (!count($this->errors)) 
+				$room_num = Tools::getValue('room_num');
+				if ($room_num) 
 				{
-					if ($wk_id_room_type) 
-					{
-						$obj_room_type = new HotelRoomType($wk_id_room_type);
-						$id_hotel = $obj_room_type->id_hotel;
-					}
-					else
-					{
-						$obj_room_type = new HotelRoomType();
-						$obj_room_type->id_product = $id_product;
-						$obj_room_type->id_hotel = $id_hotel;
-					}
-					$obj_room_type->adult = $adult;
-					$obj_room_type->children = $children;
-					$obj_room_type->save();
-
-					$id_rm_type = $obj_room_type->id;
-
-					$id_room_info = Tools::getValue('id_room_info');
+					$room_floor = Tools::getValue('room_floor');
+					$room_status = Tools::getValue('room_status');
+					$room_comment = Tools::getValue('room_comment');
 					
-					foreach ($room_num as $key => $value)
+					if (count($room_num) != count($room_status))
+						$this->errors[] = Tools::displayError('There is some problem while setting room information');
+					
+					if (!count($this->errors)) 
 					{
-						if ($value)
+						if ($wk_id_room_type) 
 						{
-							if ($id_room_info) 
+							$obj_room_type = new HotelRoomType($wk_id_room_type);
+							$id_hotel = $obj_room_type->id_hotel;
+						}
+						else
+						{
+							$obj_room_type = new HotelRoomType();
+							$obj_room_type->id_product = $id_product;
+							$obj_room_type->id_hotel = $id_hotel;
+						}
+						$obj_room_type->adult = $adult;
+						$obj_room_type->children = $children;
+						$obj_room_type->save();
+
+						$id_rm_type = $obj_room_type->id;
+
+						$id_room_info = Tools::getValue('id_room_info');
+						
+						foreach ($room_num as $key => $value)
+						{
+							if ($value)
 							{
-								if ($key <= (count($id_room_info)-1)) 
+								if ($id_room_info) 
 								{
-									$obj_room_info = new HotelRoomInformation($id_room_info[$key]);
+									if ($key <= (count($id_room_info)-1)) 
+									{
+										$obj_room_info = new HotelRoomInformation($id_room_info[$key]);
+									}
+									else //if any new room is added at the time of edit
+									{
+										$obj_room_info = new HotelRoomInformation();
+										$obj_room_info->id_product = $id_product;
+										$obj_room_info->id_hotel = $id_hotel;
+									}
 								}
-								else //if any new room is added at the time of edit
+								else
 								{
 									$obj_room_info = new HotelRoomInformation();
 									$obj_room_info->id_product = $id_product;
 									$obj_room_info->id_hotel = $id_hotel;
 								}
-							}
-							else
-							{
-								$obj_room_info = new HotelRoomInformation();
-								$obj_room_info->id_product = $id_product;
-								$obj_room_info->id_hotel = $id_hotel;
-							}
 
-							$obj_room_info->room_num = $value;
-							$obj_room_info->id_status = $room_status[$key];
-							$obj_room_info->floor = $room_floor[$key];
-							$obj_room_info->comment = $room_comment[$key];
-							$obj_room_info->save();
+								$obj_room_info->room_num = $value;
+								$obj_room_info->id_status = $room_status[$key];
+								$obj_room_info->floor = $room_floor[$key];
+								$obj_room_info->comment = $room_comment[$key];
+								$obj_room_info->save();
+							}
 						}
 					}
 				}
@@ -3385,7 +3452,7 @@ class AdminProductsControllerCore extends AdminController
 		$this->tpl_form_vars['custom_form'] = $data->fetch();
 	}
 
-	public function processBooking($param)
+	public function processBooking()
 	{
 		if (Tools::isSubmit('submitAddproductAndStay')) 
 		{
@@ -3614,6 +3681,22 @@ class AdminProductsControllerCore extends AdminController
 			'product' => $product,
 			'token' => $this->token
 		));
+
+		// by webkul
+		// For Advanced Payment
+		if ($obj->id)
+		{
+			$WK_ALLOW_ADVANCED_PAYMENT = Configuration::get('WK_ALLOW_ADVANCED_PAYMENT');
+			$data->assign('WK_ALLOW_ADVANCED_PAYMENT', $WK_ALLOW_ADVANCED_PAYMENT);
+
+			if ($WK_ALLOW_ADVANCED_PAYMENT) 
+			{
+				$obj_adv_pmt = new HotelAdvancedPayment();
+				$adv_pay_dtl = $obj_adv_pmt->getIdAdvPaymentByIdProduct($product->id);
+				if ($adv_pay_dtl) 
+					$data->assign('adv_pay_dtl', $adv_pay_dtl);
+			}
+		}
 
 		$this->tpl_form_vars['custom_form'] = $data->fetch();
 	}
@@ -4254,7 +4337,6 @@ class AdminProductsControllerCore extends AdminController
 		$data->assign('imagesTypes', ImageType::getImagesTypes('products'));
 
 		$product->tags = Tag::getProductTags($product->id);
-
 		$data->assign('product_type', (int)Tools::getValue('type_product', $product->getType()));
 		$data->assign('is_in_pack', (int)Pack::isPacked($product->id));
 

@@ -1,0 +1,16 @@
+
+[{shop_url}] 
+
+رسالة من أحد عملاء {shop_name} 
+
+عنوان البريد الالكتروني للعميل: {email}
+
+رسالة العميل: {message}
+
+رقم الطلب: {order_name}
+
+الملف المرفق: {attached_file} 		 
+
+{shop_name} [{shop_url}] powered by
+PrestaShop(tm) [http://www.prestashop.com/] 
+

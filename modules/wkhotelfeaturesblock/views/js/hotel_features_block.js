@@ -11,7 +11,7 @@ $(document).ready(function(){
 
 	function addOtherFeatureFormFields()
 	{
-		html = '<div class="added_feature_div"><div class="form-group"><label for="feature_title" class="control-label required"><span title="" data-toggle="tooltip" class="label-tooltip">'+feature_title_var+'</span></label><div class=""><input type="text" name="feature_title[]" class="form-control"><input type="hidden" name="feature_id" class="form-control" value="{$data.id}"></div></div>';
+		html = '<div class="added_feature_div"><div class="form-group"><label for="feature_title" class="control-label required"><span title="" data-toggle="tooltip" class="label-tooltip">'+feature_title_var+'</span></label><div class=""><input type="text" name="feature_title[]" class="form-control"><input type="hidden" name="feature_id[]" class="form-control" value="{$data.id}"></div></div>';
 		
 		html+='<div class="form-group"><label for="feature_description" class="control-label required"><span title="" data-toggle="tooltip" class="label-tooltip">'+feature_description_var+'</span></label><div class=""><input type="text" name="feature_description[]" class="form-control"></div></div>';
 		

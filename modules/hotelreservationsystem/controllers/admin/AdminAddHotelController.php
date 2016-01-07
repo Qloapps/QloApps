@@ -46,8 +46,8 @@ class AdminAddHotelController extends ModuleAdminController
 			));
 		$this->identifier  = 'id';
 		$this->bulk_actions = array('delete' => array('text' => $this->l('Delete selected'),
-											  'icon' => 'icon-trash',
-											  'confirm' => $this->l('Delete selected items?'))
+														'icon' => 'icon-trash',
+														'confirm' => $this->l('Delete selected items?'))
 									);
 		parent::__construct();
 	}
@@ -86,7 +86,6 @@ class AdminAddHotelController extends ModuleAdminController
 		}
 		elseif ($this->display == 'edit') 
 		{
-			$this->context->smarty->assign('edit',1);
 			$hotel_id = Tools::getValue('id');
 			$hotel_branch_info_obj = new HotelBranchInformation();
 			$hotel_branch_info = $hotel_branch_info_obj->hotelBranchInfoById($hotel_id);
@@ -94,15 +93,16 @@ class AdminAddHotelController extends ModuleAdminController
 			$country_id = $hotel_branch_info['country_id'];
 			$statesbycountry = State::getStatesByIdCountry($country_id);
 
+			$states = array();
 			if ($statesbycountry)
 			{
-				$states = array();
 				foreach($statesbycountry as $key=>$value)
 				{
 					$states[$key]['id'] = $value['id_state'];
 					$states[$key]['name'] = $value['name'];
 				}
 			}
+			$this->context->smarty->assign('edit',1);
 			$this->context->smarty->assign('country_var',$countries_var);
 			$this->context->smarty->assign('state_var',$states);
 			$this->context->smarty->assign('hotel_info',$hotel_branch_info);
@@ -118,7 +118,7 @@ class AdminAddHotelController extends ModuleAdminController
 
 	public function processSave()
 	{
-		$hotel_id = Tools::getValue('hotel_id');
+		$hotel_id = Tools::getValue('id');
 		$hotel_name = Tools::getValue('hotel_name');
 		$phone = Tools::getValue('phone');
 		$email = Tools::getValue('email');
@@ -134,14 +134,17 @@ class AdminAddHotelController extends ModuleAdminController
 		$zipcode = Tools::getValue('hotel_postal_code');
 		$address = Tools::getValue('address');
 		$active = Tools::getValue('ENABLE_HOTEL');
+		
 		if ($hotel_name == '')
 			$this->errors[] = Tools::displayError('Hotel name is required field.');
 		else if (!Validate::isGenericName($hotel_name))
 			$this->errors[] = Tools::displayError($this->l('Hotel name must not have Invalid characters <>;=#{}'));
+		
 		if (!$phone)
 			$this->errors[] = Tools::displayError('Phone number is required field.');
 		else if (!Validate::isPhoneNumber($phone))
 			$this->errors[] = Tools::displayError('Please enter a valid phone number.');
+		
 		if ($email == '')
 			$this->errors[] = Tools::displayError('Email is required field.');
 		else if (!Validate::isEmail($email))
@@ -149,8 +152,10 @@ class AdminAddHotelController extends ModuleAdminController
 
 		if ($check_in == '')
 			$this->errors[] = Tools::displayError('Check In time is required field.');
+		
 		if ($check_out == '')
 			$this->errors[] = Tools::displayError('Check Out Time is required field.');
+		
 		if ($zipcode == '')
 			$this->errors[] = Tools::displayError('Postal Code is required field.');
 		else if (!Validate::isPostCode($zipcode))
@@ -158,13 +163,23 @@ class AdminAddHotelController extends ModuleAdminController
 
 		if (!$rating)
 			$this->errors[] = Tools::displayError('Rating is required field.');
+		
 		if ($address == '')
 			$this->errors[] = Tools::displayError('Address is required field.');
 		
 		if (!$country)
 			$this->errors[] = Tools::displayError('Country is required field.');
+		
+		/*If selected country has states only the validate state field*/
+		$statesbycountry = State::getStatesByIdCountry($country);
+
 		if (!$state)
-			$this->errors[] = Tools::displayError('State is required field.');
+		{
+			if ($statesbycountry)
+				$this->errors[] = Tools::displayError('State is required field.');
+			else
+			{}
+		}
 
 		if ($city == '')
 			$this->errors[] = Tools::displayError('City is required field.');
@@ -261,13 +276,21 @@ class AdminAddHotelController extends ModuleAdminController
 
 				if ($cat_country)
 				{
-					$state_name = (new State())->getNameById($state);
-					$cat_state = $this->addCategory($state_name, $cat_country, $grp_ids);
+					if ($state)
+					{
+						$state_name = (new State())->getNameById($state);
+						$cat_state = $this->addCategory($state_name, $cat_country, $grp_ids);
+					}
+					else
+						$cat_state = $this->addCategory($city, $cat_country, $grp_ids);
+
 				}
 				if ($cat_state)
 					$cat_city = $this->addCategory($city, $cat_state, $grp_ids);
+
 				if ($cat_city)
 					$cat_hotel = $this->addCategory($hotel_name, $cat_city, $grp_ids, 1, $new_hotel_id);
+				
 				if ($cat_hotel)
 				{
 					$obj_hotel_info = new HotelBranchInformation($new_hotel_id);
@@ -447,7 +470,7 @@ class AdminAddHotelController extends ModuleAdminController
 				foreach (Language::getLanguages(true) as $lang)
 				{
 					$obj_cat->name[$lang['id_lang']] = $name;
-					$obj_cat->description[$lang['id_lang']] = $this->l('this category are for hotels only');
+					$obj_cat->description[$lang['id_lang']] = $this->l('this category is for hotels only');
 					$obj_cat->link_rewrite[$lang['id_lang']] = $this->l(Tools::link_rewrite($name));
 				}
 				$obj_cat->id_parent = $parent_cat;

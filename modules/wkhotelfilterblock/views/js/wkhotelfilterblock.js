@@ -205,8 +205,16 @@ $(document).ready(function()
 	            							html += '</div>';
 	            							if (typeof value.room_left != 'undefined')
 	            							{
-	            								html += '<span class="rm_left pull-right">Hurry! ';
-	            									html +='<span class="cat_remain_rm_qty_'+value.id_product+'">'+value.room_left+'</span>';
+	            								html += '<span class="rm_left pull-right" ';
+	            								if (value.room_left > warning_num)
+	            								{
+	            									html += ' style="display:none;"';
+	            								}
+
+	            								html += '>Hurry! ';
+
+
+	            								html +='<span class="cat_remain_rm_qty_'+value.id_product+'">'+value.room_left+'</span>';
 	            								html +=' rooms left</span>';
 	            							}
 	            							if (value.feature.length)

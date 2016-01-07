@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<module>
+	<name>socialsharing</name>
+	<displayName><![CDATA[Social sharing]]></displayName>
+	<version><![CDATA[1.3.1]]></version>
+	<description><![CDATA[Tampilkan tombol berbagi di sociel media (Twitter, Facebook, Google+ dan Pinterest) di halaman produk.]]></description>
+	<author><![CDATA[PrestaShop]]></author>
+	<tab><![CDATA[advertising_marketing]]></tab>
+	<is_configurable>1</is_configurable>
+	<need_instance>0</need_instance>
+	<limited_countries></limited_countries>
+</module>

@@ -1,0 +1,34 @@
+
+[{shop_url}] 
+
+Olá {firstname} {lastname},
+
+Muito obrigado por comprar na {shop_name}! 
+
+Seu pedido com a referência {order_name} foi concluído com
+sucesso e será ENVIADO ASSIM QUE RECEBERMOS O SEU PAGAMENTO . 
+
+Você selecionou o modo de pagamento por transferência bancária. 
+
+Segue abaixo os detalhes da conta e banco para realização da
+tranferência:
+
+TOTAL: {total_paid}
+
+TITULAR DA CONTA: {bankwire_owner}
+
+DETALHES DA CONTA: {bankwire_details}
+
+ENDEREÇO DO BANCO: {bankwire_address} 		 
+
+Você pode revisar seu pedido e baixar sua fatura na seção "Meus
+Pedidos" [{history_url}] na sua conta, clicando em
+"Minha Conta" [{my_account_url}] na nossa loja. 
+
+Se você tem uma conta de convidado, você pode acompanhar seu
+pedido através do link [guest_tracking_url}] em
+nossa loja na seção "Rastreamento de convidado". 
+
+{shop_name} [{shop_url}] baseado em
+PrestaShop(tm) [http://www.prestashop.com/] 
+

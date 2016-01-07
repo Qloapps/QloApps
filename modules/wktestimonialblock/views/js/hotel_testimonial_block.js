@@ -16,13 +16,11 @@ $(document).ready(function(){
 
 	function addOtherTestimonialFormFields()
 	{
-		html = '<div class="added_testimonial_div"><div class="form-group"><label for="name" class="control-label"><span title="" data-toggle="tooltip" class="label-tooltip">'+name_var+'</span></label><div class=""><input type="text" name="name[]" class="form-control" value=""><input type="hidden" name="testimonial_id" class="form-control"></div></div>';
+		html = '<div class="added_testimonial_div"><div class="form-group"><label for="name" class="control-label"><span title="" data-toggle="tooltip" class="label-tooltip">'+name_var+'</span></label><div class=""><input type="text" name="name[]" class="form-control" value=""><input type="hidden" name="testimonial_id[]" class="form-control"></div></div>';
 
-		html += '<div class="form-group"><label for="testimonial_description" class="control-label required"><span title="" data-toggle="tooltip" class="label-tooltip">'+testimonial_description_var+'</span></label><div class=""><input type="text" name="testimonial_description[]" class="form-control" value=""></div></div>';
-		
 		html+='<div class="form-group"><label for="testimonial_content" class="control-label required"><span title="" data-toggle="tooltip" class="label-tooltip">'+testimonial_content_var+'</span></label><div class=""><input type="text" name="testimonial_content[]" class="form-control wk_tinymce"></div></div>';
 		
-		html+='<div class="form-group"><label for="testimonial_image" class="control-label required col-sm-2"><span title="" data-toggle="tooltip" class="label-tooltip">'+person_image_var+'"</span></label><div class="col-sm-8"><input type="file" name="testimonial_image[]" value=""></div>';
+		html+='<div class="form-group"><label for="testimonial_image" class="control-label col-sm-2"><span title="" data-toggle="tooltip" class="label-tooltip">'+person_image_var+'"</span></label><div class="col-sm-8"><input type="file" name="testimonial_image[]" value=""></div>';
 
 		html+='<div class="col-sm-2"><a class="btn btn-default wk_added_testimonials_remove pull-right"><span>'+remove_var+'</span></a></div></div><br><br><hr></div>';
 	    $('.form_testimonial_div').append(html);

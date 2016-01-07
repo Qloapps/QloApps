@@ -314,6 +314,9 @@ class AdminCartsControllerCore extends AdminController
 		return parent::renderView();
 	}
 
+	##################################################################
+		#FUNCTION EDITED BY WEBKUL FOR SETTING CUSTOMER DATA IN THE CART.
+	##################################################################
 	public function ajaxPreProcess()
 	{
 		if ($this->tabAccess['edit'] === '1')
@@ -324,9 +327,7 @@ class AdminCartsControllerCore extends AdminController
 			$id_cart = (int)Tools::getValue('id_cart');
 			if (!$id_cart)
 				$id_cart = $customer->getLastCart(false);
-
 			$this->context->cart = new Cart((int)$id_cart);
-			// d($this->context->cart);
 
 			if (!$this->context->cart->id)
 			{
@@ -334,8 +335,8 @@ class AdminCartsControllerCore extends AdminController
 				$this->context->cart->gift = 0;
 			}
 
-			if (!$this->context->cart->id_customer)
-				$this->context->cart->id_customer = $id_customer;
+			/*if (!$this->context->cart->id_customer)
+				$this->context->cart->id_customer = $id_customer;*/
 			if (Validate::isLoadedObject($this->context->cart) && $this->context->cart->OrderExists())
 				return;
 			if (!$this->context->cart->secure_key)
@@ -349,17 +350,30 @@ class AdminCartsControllerCore extends AdminController
 
 			$addresses = $customer->getAddresses((int)$this->context->cart->id_lang);
 			$id_address_delivery = (int)Tools::getValue('id_address_delivery');
-			$id_address_invoice = (int)Tools::getValue('id_address_delivery');
+			$id_address_invoice = (int)Tools::getValue('id_address_invoice');
 
 			if (!$this->context->cart->id_address_invoice && isset($addresses[0]))
 				$this->context->cart->id_address_invoice = (int)$addresses[0]['id_address'];
 			elseif ($id_address_invoice)
-				$this->context->cart->id_address_invoice = (int)$id_address_invoice;
+				$this->context->cart->id_address_invoice = (int)$id_address_delivery;
 			if (!$this->context->cart->id_address_delivery && isset($addresses[0]))
 				$this->context->cart->id_address_delivery = $addresses[0]['id_address'];
 			elseif ($id_address_delivery)
 				$this->context->cart->id_address_delivery = (int)$id_address_delivery;
 			$this->context->cart->setNoMultishipping();
+
+			/*Code ADDED By webkul*/
+			if ($this->context->cart->id_customer != $id_customer)
+			{
+				$this->context->cart->id_customer = $id_customer;
+				$this->context->cart->secure_key = $this->context->customer->secure_key;
+				$addresses = $customer->getAddresses((int)$this->context->cart->id_lang);
+				$this->context->cart->id_address_invoice = (int)$addresses[0]['id_address'];
+				$this->context->cart->id_address_delivery = (int)$addresses[0]['id_address'];
+				$this->context->cart->setNoMultishipping();
+			}
+			/*END*/
+
 			$this->context->cart->save();
 			$currency = new Currency((int)$this->context->cart->id_currency);
 			$this->context->currency = $currency;
@@ -368,7 +382,6 @@ class AdminCartsControllerCore extends AdminController
 
 	public function ajaxProcessDeleteProduct()
 	{
-		// d(6);
 		if ($this->tabAccess['edit'] === '1')
 		{
 			$errors = array();
@@ -385,7 +398,6 @@ class AdminCartsControllerCore extends AdminController
 
 	public function ajaxProcessUpdateCustomizationFields()
 	{
-		// d(7);
 		$errors = array();
 		if ($this->tabAccess['edit'] === '1')
 		{
@@ -548,7 +560,6 @@ class AdminCartsControllerCore extends AdminController
 
 	public function ajaxProcessUpdateCurrency()
 	{
-		// d(11);
 		if ($this->tabAccess['edit'] === '1')
 		{
 			$currency = new Currency((int)Tools::getValue('id_currency'));
@@ -558,7 +569,24 @@ class AdminCartsControllerCore extends AdminController
 				$this->context->currency = $currency;
 				$this->context->cart->save();
 			}
-			echo Tools::jsonEncode($this->ajaxReturnVars());
+			#################################################################
+			#Code is added by webkul to change current cart tpl dinamically
+			#################################################################
+			$id_cart = Tools::getValue('id_cart');//get cart id from url
+			$cart_detail_data = array();
+			$cart_detail_data_obj = new HotelCartBookingData();
+			$update_htl_cart_currency = $cart_detail_data_obj->updateIdCurrencyByIdCart($id_cart, $currency->id);
+			$cart_detail_data = $cart_detail_data_obj->getCartFormatedBookinInfoByIdCart((int) $id_cart);
+			$this->context->smarty->assign(array(
+				'cart_detail_data' => $cart_detail_data,
+			));
+			
+			$tpl_path = 'default/template/controllers/orders/current_cart_details_data.tpl';
+			$cart_dtl_tpl = $this->context->smarty->fetch(_PS_BO_ALL_THEMES_DIR_.$tpl_path);
+			
+			$result = $this->ajaxReturnVars();
+			$result['cart_detail_html'] = $cart_dtl_tpl;//tpl is added to the returned array
+			echo Tools::jsonEncode($result);
 		}
 	}
 	public function ajaxProcessUpdateLang()
@@ -674,7 +702,8 @@ class AdminCartsControllerCore extends AdminController
 			if (($id_address_invoice = (int)Tools::getValue('id_address_invoice')) &&
 				($address_invoice = new Address((int)$id_address_invoice)) &&
 				$address_invoice->id_customer = $this->context->cart->id_customer)
-				$this->context->cart->id_address_invoice = (int)$address_invoice->id;
+				$this->context->cart->id_address_invoice = (int)$address_delivery->id;//For same id_address_delivery and id_address_invoice By webkul
+				/*$this->context->cart->id_address_invoice = (int)$address_invoice->id;*/
 			$this->context->cart->save();
 
 			echo Tools::jsonEncode($this->ajaxReturnVars());
@@ -757,9 +786,11 @@ class AdminCartsControllerCore extends AdminController
 	public function displayAjaxSearchCarts()
 	{
 		$id_customer = (int)Tools::getValue('id_customer');
+		$customer = new Customer($id_customer);
+		$this->context->customer = $customer;
+		
 		$carts = Cart::getCustomerCarts((int)$id_customer);
 		$orders = Order::getCustomerOrders((int)$id_customer);
-		$customer = new Customer((int)$id_customer);
 
 		if (count($carts))
 			foreach ($carts as $key => &$cart)
@@ -801,13 +832,11 @@ class AdminCartsControllerCore extends AdminController
 					break;
 				}
 		$addresses = $this->context->customer->getAddresses((int)$this->context->cart->id_lang);
-
 		foreach ($addresses as &$data)
 		{
 			$address = new Address((int)$data['id_address']);
 			$data['formated_address'] = AddressFormat::generateAddress($address, array(), "<br />");
 		}
-
 		return array(
 			'summary' => $this->getCartSummary(),
 			'delivery_option_list' => $this->getDeliveryOptionList(),

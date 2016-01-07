@@ -15,7 +15,7 @@ INSERT IGNORE INTO `PREFIX_configuration` (`name`, `value`, `date_add`, `date_up
 ('PS_OS_BANKWIRE', '10', NOW(), NOW()),
 ('PS_OS_PAYPAL', '11', NOW(), NOW()),
 ('PS_OS_WS_PAYMENT', '12', NOW(), NOW()),
-('PS_IMAGE_QUALITY', 'jpg', NOW(), NOW()),
+('PS_IMAGE_QUALITY', 'png', NOW(), NOW()),
 ('PS_PNG_QUALITY', '7', NOW(), NOW()),
 ('PS_JPEG_QUALITY', '90', NOW(), NOW()),
 ('PS_COOKIE_LIFETIME_FO', '480', NOW(), NOW()),

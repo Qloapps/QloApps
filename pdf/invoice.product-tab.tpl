@@ -38,6 +38,9 @@
 			<th class="product header small">{l s='Check-in Date' pdf='true'}</th>
 			<th class="product header small">{l s='Check-out Date' pdf='true'}</th>
 			<th class="product header-right small">{l s='Total' pdf='true'} <br /> {l s='(Tax excl.)' pdf='true'}</th>
+			{if isset($refunded_rooms) && $refunded_rooms}
+				<th class="product header-right small">{l s='Refund Status' pdf='true'}</th>
+			{/if}
 		</tr>
 	</thead>
 	<tbody>
@@ -84,6 +87,17 @@
 							{displayPrice currency=$order->id_currency price=$rm_v['amount']}
 						</p>
 					</td>
+					{if isset($refunded_rooms) && $refunded_rooms}
+						{if isset($rm_v['stage_name']) && $rm_v['stage_name'] == 'Refunded'}
+							<td class="product center">
+								<p style="background-color:green; padding-left:5px;">
+									{l s='Refunded' pdf='true'}
+								</p>
+							</td>
+						{else}
+							--
+						{/if}
+					{/if}
 				</tr>
 			{/foreach}
 		{/foreach}

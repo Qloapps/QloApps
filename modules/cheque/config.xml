@@ -6,7 +6,7 @@
 	<description><![CDATA[This module allows you to accept payments by check.]]></description>
 	<author><![CDATA[PrestaShop]]></author>
 	<tab><![CDATA[payments_gateways]]></tab>
-	<confirmUninstall>Are you sure you want to delete these details?</confirmUninstall>
+	<confirmUninstall><![CDATA[Are you sure you want to delete these details?]]></confirmUninstall>
 	<is_configurable>1</is_configurable>
 	<need_instance>1</need_instance>
 	<limited_countries></limited_countries>

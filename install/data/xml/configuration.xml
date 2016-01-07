@@ -252,7 +252,7 @@
 		<value>3</value>
 	</configuration>
 	<configuration id="PS_ORDER_PROCESS_TYPE" name="PS_ORDER_PROCESS_TYPE">
-		<value>0</value>
+		<value>1</value>
 	</configuration>
 	<configuration id="PS_SPECIFIC_PRICE_PRIORITIES" name="PS_SPECIFIC_PRICE_PRIORITIES">
 		<value>id_shop;id_currency;id_country;id_group</value>
@@ -408,7 +408,7 @@
 		<value>0</value>
 	</configuration>
 	<configuration id="PS_IMAGE_QUALITY" name="PS_IMAGE_QUALITY">
-		<value>jpg</value>
+		<value>png</value>
 	</configuration>
 	<configuration id="PS_PNG_QUALITY" name="PS_PNG_QUALITY">
 		<value>7</value>

@@ -1,0 +1,13 @@
+
+[{shop_url}] 
+
+Halo, 
+
+{shop_name} meminta Anda untuk menyebarkan tautan ini ke teman-teman
+Anda agar mereke dapat melihat daftar wishlist Anda: {wishlist}
+
+{message} [{message}] 		 
+
+{shop_name} [{shop_url}] didukung oleh
+PrestaShop(tm) [http://www.prestashop.com/] 
+

@@ -2,7 +2,7 @@
 <module>
 	<name>hotelreservationsystem</name>
 	<displayName><![CDATA[Hotel Booking and Reservation System]]></displayName>
-	<version><![CDATA[1.6.1]]></version>
+	<version><![CDATA[0.0.2]]></version>
 	<description><![CDATA[Now you can be able to build your website for your hotels for their bookings and reservations by using this module.]]></description>
 	<author><![CDATA[Webkul]]></author>
 	<tab><![CDATA[]]></tab>

@@ -278,7 +278,7 @@ class FrontControllerCore extends Controller
 
                 $country = new Country($id_country, (int)$this->context->cookie->id_lang);
 
-                if (validate::isLoadedObject($country) && $this->context->country->id !== $country->id) {
+                if (!$has_currency && validate::isLoadedObject($country) && $this->context->country->id !== $country->id) {
                     $this->context->country = $country;
                     $this->context->cookie->id_currency = (int)Currency::getCurrencyInstance($country->id_currency ? (int)$country->id_currency : (int)Configuration::get('PS_CURRENCY_DEFAULT'))->id;
                     $this->context->cookie->iso_code_country = strtoupper($country->iso_code);

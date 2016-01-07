@@ -8,7 +8,7 @@
 	</div>
 	<form id="{$table|escape:'htmlall':'UTF-8'}_form" class="defaultForm {$name_controller|escape:'htmlall':'UTF-8'} form-horizontal" action="{$current|escape:'htmlall':'UTF-8'}&{if !empty($submit_action)}{$submit_action|escape:'htmlall':'UTF-8'}{/if}&token={$token|escape:'htmlall':'UTF-8'}" method="post" enctype="multipart/form-data" {if isset($style)}style="{$style|escape:'htmlall':'UTF-8'}"{/if}>
 		{if isset($edit)}
-			<input type="hidden" value="{$hotel_info.id|escape:'html':'UTF-8'}" name="hotel_id" />
+			<input type="hidden" value="{$hotel_info.id|escape:'html':'UTF-8'}" name="id" />
 		{/if}
 		<div class="form-group">
 			<label class="control-label col-lg-3">
@@ -116,10 +116,10 @@
 			</div>
 		</div>
 		<div class="form-group">
-			<label class="control-label col-sm-3 required" for="hotel_state">{l s='State :' mod='hotelreservationsystem'}</label>
-			<div class="col-sm-6">
+			<label class="control-label col-sm-3 required hotel_state_lbl" for="hotel_state" {if isset($edit) && !$state_var}style="display:none;"{/if}>{l s='State :' mod='hotelreservationsystem'}</label>
+			<div class="col-sm-6 hotel_state_dv"  {if isset($edit) && !$state_var}style="display:none;"{/if}>
 				<div style="width: 195px;">
-					<select class="form-control" name="hotel_state" id="hotel_state" value="">
+					<select class="form-control" name="hotel_state" id="hotel_state">
 					{if isset($edit)}
 						{if $state_var}
 							{foreach $state_var as $state}
@@ -127,12 +127,12 @@
 							{/foreach}
 						{/if}
 					{else}
-						<option value="0" selected="selected">{l s='Choose Country First' mod='hotelreservationsystem'} </option>
-					{/if}}
+						<option value="0" selected="selected">{l s='Choose Country First' mod='hotelreservationsystem'}</option>
+					{/if}
 					</select>
 				</div>
-				<span class="country_import_note" style='font-style:italic; color:FCF8E3;'>{l s='Please import selected country in you prestashop for its states.' js=1 mod='hotelreservationsystem'}</span>
-			</div>	
+			</div>
+			<span class="country_import_note col-sm-10 text-right" style='font-style:italic;'>{l s='* If selected country is not imported already, Please import selected country from localization in you prestashop To get its states.' js=1 mod='hotelreservationsystem'}</span>
 		</div>
 		<div class="form-group">
 			<label class="control-label col-sm-3 required" for="hotel_city">{l s='City :' mod='hotelreservationsystem'}</label>

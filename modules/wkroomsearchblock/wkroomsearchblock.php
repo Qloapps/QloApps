@@ -10,7 +10,7 @@ class WkRoomSearchBlock extends Module
 	{
 		$this->name = 'wkroomsearchblock';
 		$this->tab = 'front_office_features';
-		$this->version = '1.6.0';
+		$this->version = '0.0.2';
 		$this->author = 'webkul';
 		$this->need_instance = 0;
 
@@ -31,6 +31,11 @@ class WkRoomSearchBlock extends Module
 			$check_in = Tools::getValue('check_in_time');
 			$check_out = Tools::getValue('check_out_time');
 
+			$check_in = date("Y-m-d", strtotime($check_in));
+			$check_out = date("Y-m-d", strtotime($check_out));
+
+			$curr_date = date("Y-m-d");
+
 			$error = false;
 
 			if ($hotel_cat_id == '')
@@ -39,6 +44,8 @@ class WkRoomSearchBlock extends Module
 				$error = 2;
 			elseif ($check_out == '' || !Validate::isDate($check_out))
 				$error = 3;
+			elseif ($check_in < $curr_date)
+				$error = 5;
 			elseif ($check_out <= $check_in)
 				$error = 4;
 
@@ -80,6 +87,8 @@ class WkRoomSearchBlock extends Module
 	{
 		if (Tools::getValue('controller') == 'index')
 			$this->context->smarty->assign('is_index_page',1);
+
+		$this->context->smarty->assign('wk_id_cart',$this->context->cart->id);
 
 		if (Tools::getValue('error')) 
 		{

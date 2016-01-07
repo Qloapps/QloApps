@@ -5,6 +5,7 @@
 		<span class="icon-bar"></span>
 	</button>
 </div>
+
 <div id="menu_cont" class="menu_cont_right">
 	<div class="row margin-lr-0">
 		<div class="col-xs-12 col-sm-12">
@@ -19,17 +20,17 @@
 						<hr class="lower">
 					</li>
 					<li>
-						<a class="navigation-link" id="htl_our_rooms_link" href="#">{l s='Our Rooms' mod='blocknevigationmenu'}</a>
+						<a class="navigation-link" id="htl_our_rooms_link" href="{if ($page_name == index)}#{else}{$base_dir}#htmlcontent_home{/if}">{l s='Our Rooms' mod='blocknevigationmenu'}</a>
 						<hr class="upper">
 						<hr class="lower">
 					</li>
 					<li>
-						<a class="navigation-link" id="htl_features_link" href="#">{l s='Features' mod='blocknevigationmenu'}</a>
+						<a class="navigation-link" id="htl_features_link" href="{if ($page_name == index)}#{else}{$base_dir}#features_block{/if}">{l s='Features' mod='blocknevigationmenu'}</a>
 						<hr class="upper">
 						<hr class="lower">
 					</li>
 					<li>
-						<a class="navigation-link" id="htl_testimonial_link" href="#">{l s='Testimonials' mod='blocknevigationmenu'}</a>
+						<a class="navigation-link" id="htl_testimonial_link" href="{if ($page_name == index)}#{else}{$base_dir}#testimonial_block{/if}">{l s='Testimonials' mod='blocknevigationmenu'}</a>
 						<hr class="upper">
 						<hr class="lower">
 					</li>

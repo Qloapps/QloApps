@@ -141,34 +141,44 @@
 			return false;
 		});
 
-		$('.delete_hotel_cart_data').on('click', function(){
-			$.ajax({
-				type:"POST",
-				url: "{$link->getAdminLink('AdminOrders')|addslashes}",
-				data : {
-					ajax: "1",
-					action: "deleteRoomProcess",
-					del_id: $(this).data('id'),
-					id_product: $(this).data('id_product'),
-					id_cart: $(this).data('id_cart'),
-					id_room: $(this).data('id_room'),
-					date_from: $(this).data('date_from'),
-					date_to: $(this).data('date_to'),
-				},
-				success : function(data)
-				{
-					if (data == 'deleted')
+		/*By Webkul to delete the rooms added in the cart*/
+		$('body').on('click', '.delete_hotel_cart_data', function(){
+			if (confirm("{l s='Are you sure?'}"))
+        	{
+				$.ajax({
+					type:"POST",
+					url: "{$link->getAdminLink('AdminOrders')|addslashes}",
+					data : {
+						ajax: "1",
+						action: "deleteRoomProcess",
+						del_id: $(this).data('id'),
+						id_product: $(this).data('id_product'),
+						id_cart: $(this).data('id_cart'),
+						id_room: $(this).data('id_room'),
+						date_from: $(this).data('date_from'),
+						date_to: $(this).data('date_to'),
+					},
+					dataType:"json",
+					success : function(data)
 					{
-						showSuccessMessage("{l s='Remove successful'}");
+						if (data.status == 'deleted')
+						{
+							showSuccessMessage("{l s='Remove successful'}");
+							if (data.cart_rooms)
+								location.reload();
+							else
+								window.location.href = "{$link->getAdminLink('AdminHotelRoomsBooking',true)}";
+						}
+						else
+						{
+							alert("l s='Some error occured.please try again.'}");
+						}
 					}
-					else
-					{
-						alert('Some error occured.please try again.')
-					}
-				}
-			});
-			$(this).closest("tr").remove();
+				});
+				$(this).closest("tr").remove();
+			}
 		});
+		/*END*/
 
 		$('input:radio[name="free_shipping"]').on('change',function() {
 			var free_shipping = $('input[name=free_shipping]:checked').val();
@@ -281,9 +291,8 @@
 
 		$('#customer_part').on('click','button.setup-customer',function(e){
 			e.preventDefault();
-			{$cart=$htl_cart}//setting cart as we sent from adminOrderController
-			id_cart = {$htl_cart->id|intval}
 			setupCustomer($(this).data('customer'));
+			updateCurrency();
 			$(this).removeClass('setup-customer').addClass('change-customer').html('<i class="icon-refresh"></i>&nbsp;{l s="Change"}').blur();
 			$(this).closest('.customerCard').addClass('selected-customer');
 			$('.selected-customer .panel-heading').prepend('<i class="icon-ok text-success"></i>');
@@ -524,7 +533,6 @@
 			{
 				if(res.found)
 				{
-					var cart_id = "{$cart_id}";
 					var html = '';
 					$.each(res.customers, function() {
 						html += '<div class="customerCard col-lg-4">';
@@ -535,7 +543,7 @@
 						html += '<span class="text-muted">'+((this.birthday != '0000-00-00') ? this.birthday : '')+'</span><br/>';
 						html += '<div class="panel-footer">';
 						html += '<a href="{$link->getAdminLink('AdminCustomers')}&id_customer='+this.id_customer+'&viewcustomer&liteDisplaying=1" class="btn btn-default fancybox"><i class="icon-search"></i> {l s='Details'}</a>';
-						html += '<button type="button" data-id_cart="'+cart_id+'" data-customer="'+this.id_customer+'" class="setup-customer btn btn-default pull-right"><i class="icon-arrow-right"></i> {l s='Choose'}</button>';
+						html += '<button type="button" data-id_cart="'+id_cart+'" data-customer="'+this.id_customer+'" class="setup-customer btn btn-default pull-right"><i class="icon-arrow-right"></i> {l s='Choose'}</button>';
 						html += '</div>';
 						html += '</div>';
 						html += '</div>';
@@ -986,7 +994,10 @@
 				},
 			success : function(res)
 			{
-					displaySummary(res);
+				$("#customer_cart_details").empty();
+				$("#customer_cart_details").append(res.cart_detail_html);
+
+				displaySummary(res);
 			}
 		});
 	}
@@ -1081,7 +1092,6 @@
 				address_invoice_detail = this.formated_address;
 				invoice_address_edit_link = "{$link->getAdminLink('AdminAddresses')}&id_address="+this.id_address+"&updateaddress&realedit=1&liteDisplaying=1&submitFormAjax=1#";
 			}
-
 			if(this.id_address == id_address_delivery)
 			{
 				address_delivery_detail = this.formated_address;
@@ -1108,12 +1118,22 @@
 			$("button[name=\"submitAddOrder\"]").removeAttr("disabled");
 		}
 
+		/*Changed by webkul to make delivery and invoice addresses same*/
 		$('#id_address_delivery').html(addresses_delivery_options);
+		$('#id_address_invoice').html(addresses_delivery_options);
+		$('#address_delivery_detail').html(address_delivery_detail);
+		$('#address_invoice_detail').html(address_delivery_detail);
+		$('#edit_delivery_address').attr('href', delivery_address_edit_link);
+		$('#edit_invoice_address').attr('href', delivery_address_edit_link);
+		/*END*/
+
+		/*Original*/
+		/*$('#id_address_delivery').html(addresses_delivery_options);
 		$('#id_address_invoice').html(addresses_invoice_options);
 		$('#address_delivery_detail').html(address_delivery_detail);
 		$('#address_invoice_detail').html(address_invoice_detail);
 		$('#edit_delivery_address').attr('href', delivery_address_edit_link);
-		$('#edit_invoice_address').attr('href', invoice_address_edit_link);
+		$('#edit_invoice_address').attr('href', invoice_address_edit_link);*/
 	}
 
 	function updateAddresses()
@@ -1142,49 +1162,7 @@
 </script>
 
 <div class="leadin">{block name="leadin"}{/block}</div>
-	<div class="panel form-horizontal" id="customer_cart_details">
-		<div class="panel-heading">
-			<i class="icon-shopping-cart"></i>
-			{l s='Cart Details'}
-		</div>
-		<div class="row">
-			<div class="col-lg-12">
-				<table class="table" id="customer_cart_details_table">
-					<thead>
-						<tr>
-							<th><span class="title_box">{l s='Room No.'}</span></th>
-							<th><span class="title_box">{l s='Room Image'}</th>
-							<th><span class="title_box">{l s='Room Type'}</span></th>
-							<th><span class="title_box">{l s='Duration'}</span></th>
-							<th><span class="title_box">{l s='Price'}</span></th>
-							<th><span class="title_box">{l s='Action'}</span></th>
-						</tr>
-					</thead>
-					<tbody>
-					{if $cart_detail_data}
-						{foreach from=$cart_detail_data item=data}
-							<tr>
-								<td>{$data.room_num}</td>
-								<td><img src="{$data.image_link}" title="Room image" /></td>
-								<td>{$data.room_type}</td>
-								<td>{$data.date_from}&nbsp To&nbsp {$data.date_to}</td>
-								<td>{convertPrice price=$data.amt_with_qty}</td>
-			
-								<td>
-									<button class="btn btn-primary delete_hotel_cart_data" data-id_room={$data.id_room} data-id_product={$data.id_product} data-id = {$data.id} data-id_cart = {$data.id_cart} data-date_to = {$data.date_to} data-date_from = {$data.date_from}><i class="icon-trash"></i>&nbsp{l s='Delete'}</button>
-								</td>
-							</tr>
-						{/foreach}
-					{else}
-						<tr>
-							<td>{l s='No Data Found.'}</td>
-						</tr>
-					{/if}
-					</tbody>
-				</table>
-			</div>
-		</div>
-	</div>
+{include file='controllers/orders/current_cart_details_data.tpl'}
 	<div class="panel form-horizontal" id="customer_part">
 		<div class="panel-heading">
 			<i class="icon-user"></i>
@@ -1274,7 +1252,6 @@
 		</div> --><!-- by webkul to hide unnessesary content -->
 	</div>
 
-
 <form class="form-horizontal" action="{$link->getAdminLink('AdminOrders')|escape:'html':'UTF-8'}&amp;submitAdd{$table|escape:'html':'UTF-8'}=1" method="post" autocomplete="off" style="display:none" id="cart_detail_form">
 	<div class="panel" id="products_part" style="display:none;">
 		<div class="panel-heading">
@@ -1282,7 +1259,7 @@
 			{l s='Cart'}
 		</div>
 		<div class="form-group">
-			<input type="hidden" value="{$cart_id}" id="id_cart" name="id_cart" />
+			<input type="hidden" value="{$cart->id}" id="id_cart" name="id_cart" />
 		</div>
 		<!-- <div class="form-group">
 			<label class="control-label col-lg-3">
@@ -1291,7 +1268,7 @@
 				</span>
 			</label>
 			<div class="col-lg-9">
-				<input type="hidden" value="{$cart_id}" id="id_cart" name="id_cart" />
+				<input type="hidden" value="{$cart->id}" id="id_cart" name="id_cart" />
 				<div class="input-group">
 					<input type="text" id="product" value="" />
 					<span class="input-group-addon">
@@ -1368,6 +1345,7 @@
 				<div class="alert alert-warning">{l s='The prices are without taxes.'}</div>
 			</div>
 		</div> --><!-- by webkul to hide unnessesary content -->
+
 
 		<div class="form-group">
 			<label class="control-label col-lg-3" for="id_currency">
@@ -1467,7 +1445,7 @@
 					<div id="address_delivery_detail"></div>
 				</div>
 			</div>
-			<div id="address_invoice" class="col-lg-6">
+			<div id="address_invoice" class="col-lg-6 hidden">
 				<h4>
 					<i class="icon-file-text"></i>
 					{l s='Invoice'}

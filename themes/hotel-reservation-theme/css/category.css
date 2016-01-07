@@ -158,11 +158,11 @@
 
 .rm_amen
 {
-    height: 24px;
-    width: 24px;
+    height: 15px;
+    width: 15px;
     display: inline-block;
     margin-right: 10px;
-    margin-bottom: 10px;
+    margin-bottom: 3px;
 }
 
 .rm_price_val
@@ -201,6 +201,7 @@
 }
 .rm_price_cont
 {
+    clear: both;
     margin-top: 10px; 
 }
 .rm_qty_cont
@@ -273,3 +274,15 @@
   float: left;
   margin-left: 5px;
   padding-top: 3px;}
+.noRoomsAvailAlert
+{
+    margin-bottom: 20px;
+    background-color: #ffa0a0;
+    border: 1px solid #cccccc;
+    color: #9f1010;
+    display: block;
+    font-size: 15px;
+    font-weight: 700;
+    padding: 10px 5px;
+    text-align: center;
+}

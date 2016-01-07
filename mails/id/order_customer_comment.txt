@@ -1,0 +1,15 @@
+
+[{shop_url}] 
+
+Halo {firstname} {lastname}, 
+
+Anda menerima pesan yang terkait dengan penjualan dengan kode
+referensi {order_name}.
+
+PELANGGAN: {firstname} {lastname} ({email})
+
+{message} 		 
+
+{shop_name} [{shop_url}] didukung oleh
+PrestaShop(tm) [http://www.prestashop.com/] 
+

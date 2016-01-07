@@ -164,14 +164,18 @@ class CategoryControllerCore extends FrontController
 
 				$obj_booking_dtl = new HotelBookingDetail();
 				$booking_data = $obj_booking_dtl->DataForFrontSearch($date_from, $date_to, $id_hotel, 0, 0, 0, 0, -1, 0, 0, $id_cart, $id_guest);
-				
+				// ddd($booking_data);
+
 				$feat_img_dir = _PS_IMG_.'rf/';
 				$ratting_img = _MODULE_DIR_.'hotelreservationsystem/views/img/Slices/icons-sprite.png';
 
 				$obj_booking_detail = new HotelBookingDetail();
 				$num_days = $obj_booking_detail->getNumberOfDays($date_from, $date_to);
 
+				$warning_num = Configuration::get('WK_ROOM_LEFT_WARNING_NUMBER');
+
 				$this->context->smarty->assign(array(
+					'warning_num' => $warning_num,
 					'num_days' => $num_days,
 					'booking_date_from' => $date_from,
 					'booking_date_to' => $date_to,
@@ -226,13 +230,9 @@ class CategoryControllerCore extends FrontController
 		$sort_value = Tools::getValue('sort_value');
 		$filter_data = Tools::getValue('filter_data');
 
-		// echo "<pre>";
-		// print_r($filter_data);
-		// die;
-		
 		$adult = 0;
 		$child = 0;
-		$ratting = 0;
+		$ratting = -1;
 		$amenities = 0;
 		$price = 0;
 

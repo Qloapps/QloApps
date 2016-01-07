@@ -1,0 +1,13 @@
+
+[{shop_url}] 
+
+Halo {firstname} {lastname}, 
+
+Berikut kode voucher Anda: {voucher_num}
+
+Cukup copy/paste kode berikut pada saat proses pembayaran di
+pembelian Anda selanjutnya. 		 
+
+{shop_name} [{shop_url}] didukung oleh
+PrestaShop(tm) [http://www.prestashop.com/] 
+

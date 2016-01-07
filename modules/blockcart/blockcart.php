@@ -80,7 +80,6 @@ class BlockCart extends Module
 		$shipping_cost_float = Tools::convertPrice($base_shipping, $currency);
 		$wrappingCost = (float)($params['cart']->getOrderTotal($useTax, Cart::ONLY_WRAPPING));
 		$totalToPay = $params['cart']->getOrderTotal($useTax);
-
 		if ($useTax && Configuration::get('PS_TAX_DISPLAY') == 1)
 		{
 			$totalToPayWithoutTaxes = $params['cart']->getOrderTotal(false);
@@ -148,6 +147,7 @@ class BlockCart extends Module
 			'show_tax' => (int)(Configuration::get('PS_TAX_DISPLAY') == 1 && (int)Configuration::get('PS_TAX')),
 			'wrapping_cost' => Tools::displayPrice($wrappingCost, $currency),
 			'product_total' => Tools::displayPrice($params['cart']->getOrderTotal($useTax, Cart::BOTH_WITHOUT_SHIPPING), $currency),
+			'totalToPay' => $totalToPay,
 			'total' => Tools::displayPrice($totalToPay, $currency),
 			'order_process' => Configuration::get('PS_ORDER_PROCESS_TYPE') ? 'order-opc' : 'order',
 			'ajax_allowed' => (int)(Configuration::get('PS_BLOCK_CART_AJAX')) == 1 ? true : false,
@@ -202,43 +202,25 @@ class BlockCart extends Module
 	{
 		if (Configuration::get('PS_CATALOG_MODE'))
 			return;
-
-		if (!isset($this->context->cart->id)) 
+		
+		if ($this->context->cart->id)
 		{
-			if (!isset($this->context->cookie->id_guest)) 
-				Guest::setNewGuest($this->context->cookie);
-
-			$cart = new Cart();
-			$cart->recyclable = 0;
-			$cart->gift = 0;
-			$cart->id_shop = (int)$this->context->shop->id;
-			$cart->id_lang = $this->context->language->id;
-			$cart->id_currency = (($id_currency = $this->context->currency->id) ? $id_currency : Configuration::get('PS_CURRENCY_DEFAULT'));
-			$cart->id_address_delivery = 0;
-			$cart->id_address_invoice = 0;
-			$cart->id_guest = (int)$this->context->cookie->id_guest;
-			$cart->id_customer = (int)$this->context->cookie->id_customer;
-			$cart->setNoMultishipping();
-			$cart->save();
-
-			$this->context->cart = $cart;
-			$this->context->cookie->id_cart = $cart->id;
+			$result = $this->getHotelCartBookingData();
+			$cart_htl_data = $result['cart_htl_data'];
+			$total_rooms = $result['total_rooms_in_cart'];
+			$this->smarty->assign(array(
+			'cart_htl_data' => $cart_htl_data,
+			'total_rooms_in_cart' => $total_rooms,
+			));
 		}
 
-		$result = $this->getHotelCartBookingData();
-		$cart_htl_data = $result['cart_htl_data'];
-		$total_rooms = $result['total_rooms_in_cart'];
-
-		$cart_context = array('id' => $this->context->cart->id,
-							  'id_customer' => $this->context->cart->id_customer,
-							  'id_guest' => $this->context->cart->id_guest);
+		$warning_num = Configuration::get('WK_ROOM_LEFT_WARNING_NUMBER');
 
 		// @todo this variable seems not used
 		$this->smarty->assign(array(
-			'cart_htl_data' => $cart_htl_data,
-			'total_rooms_in_cart' => $total_rooms,
+			'warning_num' => $warning_num,
 			'module_dir' => _MODULE_DIR_,
-			'cart_context' => Tools::jsonEncode($cart_context),
+			'current_page' => Dispatcher::getInstance()->getController(),
 			'order_page' => (strpos($_SERVER['PHP_SELF'], 'order') !== false),
 			'blockcart_top' => (isset($params['blockcart_top']) && $params['blockcart_top']) ? true : false,
 		));
@@ -258,6 +240,13 @@ class BlockCart extends Module
 
 		$this->assignContentVars($params);
 		$res = Tools::jsonDecode($this->display(__FILE__, 'blockcart-json.tpl'), true);
+
+		if (isset($params['cookie']->avail_rooms)) 
+		{
+			$res['avail_rooms'] = $params['cookie']->avail_rooms;
+			unset($this->context->cookie->avail_rooms);
+		}
+
 		$result = $this->getHotelCartBookingData();
 		$res['cart_booking_data'] = $result['cart_htl_data'];
 		$res['total_rooms_in_cart'] = $result['total_rooms_in_cart'];
@@ -474,8 +463,8 @@ class BlockCart extends Module
 								$num_days = $obj_htl_bk_dtl->getNumberOfDays($data_v['date_from'], $data_v['date_to']);
 								$total_rooms += 1;
 								$cart_htl_data[$type_key]['date_diff'][$date_join]['num_rm'] = 1;
-								$cart_htl_data[$type_key]['date_diff'][$date_join]['data_form'] = $data_v['date_from'];
-								$cart_htl_data[$type_key]['date_diff'][$date_join]['data_to'] = $data_v['date_to'];
+								$cart_htl_data[$type_key]['date_diff'][$date_join]['data_form'] = date('Y-m-d', strtotime($data_v['date_from']));
+								$cart_htl_data[$type_key]['date_diff'][$date_join]['data_to'] = date('Y-m-d', strtotime($data_v['date_to']));
 								$cart_htl_data[$type_key]['date_diff'][$date_join]['num_days'] = $num_days;
 								$amount = Product::getPriceStatic($type_value['id_product'], $price_tax, null, 6, null, false, true, 1);
 								$amount *= $num_days;

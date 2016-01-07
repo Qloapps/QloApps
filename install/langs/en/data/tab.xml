@@ -11,7 +11,7 @@
   <tab id="Catalog" name="Catalog"/>
   <tab id="Orders" name="Orders"/>
   <tab id="Customers" name="Customers"/>
-  <tab id="Price_Rules" name="Price Rules"/>
+  <tab id="Price_Rules" name="Manage Discounts"/>
   <tab id="Shipping" name="Shipping"/>
   <tab id="Localization" name="Localization"/>
   <tab id="Modules" name="Modules and Services"/>
@@ -20,11 +20,11 @@
   <tab id="Administration" name="Administration"/>
   <tab id="Stats" name="Stats"/>
   <tab id="Stock" name="Stock"/>
-  <tab id="Products" name="Products"/>
+  <tab id="Products" name="Manage Room Types"/>
   <tab id="Categories" name="Categories"/>
   <tab id="Monitoring" name="Monitoring"/>
   <tab id="Attributes_and_Values" name="Product Attributes"/>
-  <tab id="Features" name="Product Features"/>
+  <tab id="Features" name="Features"/>
   <tab id="Manufacturers" name="Manufacturers"/>
   <tab id="Suppliers" name="Suppliers"/>
   <tab id="Tags" name="Tags"/>
@@ -39,7 +39,7 @@
   <tab id="Customers_1" name="Customers"/>
   <tab id="Addresses" name="Addresses"/>
   <tab id="Groups" name="Groups"/>
-  <tab id="Shopping_Carts" name="Shopping Carts"/>
+  <tab id="Shopping_Carts" name="Booking Carts"/>
   <tab id="Customer_Service" name="Customer Service"/>
   <tab id="Contacts" name="Contacts"/>
   <tab id="Titles" name="Titles"/>
@@ -64,7 +64,7 @@
   <tab id="Payment" name="Payment"/>
   <tab id="General" name="General"/>
   <tab id="Orders_2" name="Orders"/>
-  <tab id="Products_1" name="Products"/>
+  <tab id="Products_1" name="Room Types"/>
   <tab id="Customers_2" name="Customers"/>
   <tab id="Themes" name="Themes"/>
   <tab id="SEO_URLs" name="SEO &amp; URLs"/>

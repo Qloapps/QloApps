@@ -86,6 +86,26 @@
 		</td>
 	</tr>
 	{/if}
+
+	{if isset($order_adv_dtl)}
+		<tr class="bold big">
+			<td class="grey">
+				{l s='Total Paid' pdf='true'}
+			</td>
+			<td class="white">
+				{displayPrice currency=$order_adv_dtl.id_currency price=$order_adv_dtl.total_paid_amount}
+			</td>
+		</tr>
+		<tr class="bold big">
+			<td class="grey">
+				{l s='Total Due' pdf='true'}
+			</td>
+			<td class="white">
+				{displayPrice currency=$order_adv_dtl.id_currency price=($order_adv_dtl.total_order_amount - $order_adv_dtl.total_paid_amount)}
+			</td>
+		</tr>
+	{/if}
+
 	<tr class="bold big">
 		<td class="grey">
 			{l s='Total' pdf='true'}

@@ -63,29 +63,30 @@ class AdminOrderPreferencesControllerCore extends AdminController
                 'title' =>    $this->l('General'),
                 'icon' =>    'icon-cogs',
                 'fields' =>    array(
-                    'PS_ORDER_PROCESS_TYPE' => array(
+                   /* 'PS_ORDER_PROCESS_TYPE' => array(
                         'title' => $this->l('Order process type'),
                         'hint' => $this->l('Please choose either the five-step or one-page checkout process.'),
                         'validation' => 'isInt',
                         'cast' => 'intval',
-                        'type' => 'select',
+                        'type' => 'hidden',
                         'list' => $order_process_type,
-                        'identifier' => 'value'
-                    ),
-                    'PS_GUEST_CHECKOUT_ENABLED' => array(
+                        'value' => PS_ORDER_PROCESS_OPC,
+                        'identifier' => 'value',
+                    ),*/
+                    /*'PS_GUEST_CHECKOUT_ENABLED' => array(
                         'title' => $this->l('Enable guest checkout'),
                         'hint' => $this->l('Allow guest visitors to place an order without registering.'),
                         'validation' => 'isBool',
                         'cast' => 'intval',
-                        'type' => 'bool'
-                    ),
-                    'PS_DISALLOW_HISTORY_REORDERING' => array(
+                        'type' => 'hidden'
+                    ),*/
+                    /*'PS_DISALLOW_HISTORY_REORDERING' => array(
                         'title' => $this->l('Disable Reordering Option'),
                         'hint' => $this->l('Disable the option to allow customers to reorder in one click from the order history page (required in some European countries).'),
                         'validation' => 'isBool',
                         'cast' => 'intval',
                         'type' => 'bool'
-                    ),
+                    ),*/
                     'PS_PURCHASE_MINIMUM' => array(
                         'title' => $this->l('Minimum purchase total required in order to validate the order'),
                         'hint' => $this->l('Set to 0 to disable this feature.'),
@@ -93,20 +94,20 @@ class AdminOrderPreferencesControllerCore extends AdminController
                         'cast' => 'floatval',
                         'type' => 'price'
                     ),
-                    'PS_ALLOW_MULTISHIPPING' => array(
+                   /* 'PS_ALLOW_MULTISHIPPING' => array(
                         'title' => $this->l('Allow multishipping'),
                         'hint' => $this->l('Allow the customer to ship orders to multiple addresses. This option will convert the customer\'s cart into one or more orders.'),
                         'validation' => 'isBool',
                         'cast' => 'intval',
                         'type' => 'bool'
-                    ),
-                    'PS_SHIP_WHEN_AVAILABLE' => array(
+                    ),*/
+                    /*'PS_SHIP_WHEN_AVAILABLE' => array(
                         'title' => $this->l('Delayed shipping'),
                         'hint' => $this->l('Allows you to delay shipping at your customers\' request. '),
                         'validation' => 'isBool',
                         'cast' => 'intval',
                         'type' => 'bool'
-                    ),
+                    ),*/
                     'PS_CONDITIONS' => array(
                         'title' => $this->l('Terms of service'),
                         'hint' => $this->l('Require customers to accept or decline terms of service before processing an order.'),
@@ -130,7 +131,7 @@ class AdminOrderPreferencesControllerCore extends AdminController
                 ),
                 'submit' => array('title' => $this->l('Save'))
             ),
-            'gift' => array(
+            /*'gift' => array(
                 'title' =>    $this->l('Gift options'),
                 'icon' =>    'icon-gift',
                 'fields' =>    array(
@@ -166,7 +167,7 @@ class AdminOrderPreferencesControllerCore extends AdminController
                     ),
                 ),
                 'submit' => array('title' => $this->l('Save')),
-            ),
+            ),*/
         );
 
         if (!Configuration::get('PS_ALLOW_MULTISHIPPING')) {

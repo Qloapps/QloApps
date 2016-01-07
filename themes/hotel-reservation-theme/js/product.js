@@ -1139,27 +1139,38 @@ function checkUrl()
 	return false;
 }
 
-
-// java script code by webkul on produt page.
+/*#####################################################################*/
+/*java script code by webkul on produt page.*/
+/*#####################################################################*/
 $(document).ready(function()
-{
+{	
+	if (total_avail_rms <= room_warning_num)
+	{
+		$('.num_quantity_alert').show();
+	}
+	else
+	{
+		$('.num_quantity_alert').hide();
+	}
+	/*set $max avail quantity when reloading page*/
+	$('#max_avail_type_qty').val(total_avail_rms);
+
 	if ($('#max_avail_type_qty').val() < 1)
 	{
-		$('.unvail_rooms_cond_display').hide();
 		$('.num_quantity_alert').hide();
+		$('.unvail_rooms_cond_display').hide();
 		$('.sold_out_alert').show();
 	}
 	else
 	{
 		$('.unvail_rooms_cond_display').show();
-		$('.num_quantity_alert').show();
 		$('.sold_out_alert').hide();
 	}
 
 	$("#room_check_in").datepicker(
     {
     	showOtherMonths: true,
-        dateFormat: 'yy-mm-dd',
+        dateFormat: 'dd M yy',
         minDate: 0,
         onClose: function( selectedDate ) 
         {
@@ -1169,8 +1180,8 @@ $(document).ready(function()
         },
         onSelect: function(dateText,inst)
         {
-        	var date_in = $('#room_check_in').val();
-        	var date_out = $('#room_check_out').val();
+        	var date_in = $.datepicker.formatDate('yy-mm-dd', new Date($('#room_check_in').val()));
+        	var date_out = $.datepicker.formatDate('yy-mm-dd', new Date($('#room_check_out').val()));
 
         	if (date_in >= date_out)
         	{
@@ -1186,7 +1197,7 @@ $(document).ready(function()
         	}
         	else
         	{
-        		//by webkul to manage quantity of rooms
+        		/*by webkul to manage quantity of rooms*/
 			    $.ajax({
 			    	type: 'POST',
 					headers: { "cache-control": "no-cache" },
@@ -1194,8 +1205,8 @@ $(document).ready(function()
 					cache: false,
 					dataType:'JSON',
 					data: {
-						date_from:$('#room_check_in').val(),
-						date_to:$('#room_check_out').val(),
+						date_from:date_in,
+						date_to:date_out,
 						change_date:1,
 						qty:$('#quantity_wanted').val(),
 						id_product:$('#product_page_product_id').val()
@@ -1204,11 +1215,19 @@ $(document).ready(function()
 					{
 						if (result.msg == 'success')
 						{
+							if (result.avail_rooms <= room_warning_num)
+							{
+								$('.num_quantity_alert').show();
+							}
+							else
+							{
+								$('.num_quantity_alert').hide();
+							}
+
 							$('.num_searched_avail_rooms').text(result.avail_rooms);
 							$("#max_avail_type_qty").val(result.avail_rooms);
 							$('.room_unavailability_date_error_div').hide();
 							$('.unvail_rooms_cond_display').show();
-							$('.num_quantity_alert').show();
 							$('.sold_out_alert').hide();
 
 							total_price = result.total_price;
@@ -1220,7 +1239,7 @@ $(document).ready(function()
 							$('#num_days').val(result.num_days);
 						}
 						else if (result.msg == 'unavailable_quantity')
-						{	
+						{
 							if (result.avail_rooms > 0)
 							{
 								$('.room_unavailability_date_error_div').text(unavail_qty_text);
@@ -1229,7 +1248,6 @@ $(document).ready(function()
 								$('.room_unavailability_date_error_div').show();
 								$('#quantity_wanted').val(result.avail_rooms);
 								$('.unvail_rooms_cond_display').show();
-								$('.num_quantity_alert').show();
 								$('.sold_out_alert').hide();
 
 								setTimeout(function()
@@ -1240,8 +1258,8 @@ $(document).ready(function()
 							}
 							else
 							{
-								$('.unvail_rooms_cond_display').hide();
 								$('.num_quantity_alert').hide();
+								$('.unvail_rooms_cond_display').hide();
 								$('.sold_out_alert').show();
 							}
 						}
@@ -1257,7 +1275,7 @@ $(document).ready(function()
 	$("#room_check_out").datepicker(
     {
     	showOtherMonths: true,
-        dateFormat: 'yy-mm-dd',
+        dateFormat: 'dd M yy',
         minDate: 0,
         onClose: function( selectedDate ) 
         {
@@ -1267,9 +1285,8 @@ $(document).ready(function()
         },
         onSelect: function(dateText,inst)
         {
-        	var date_in = $('#room_check_in').val();
-        	var date_out = $('#room_check_out').val();
-
+        	var date_in = $.datepicker.formatDate('yy-mm-dd', new Date($('#room_check_in').val()));
+        	var date_out = $.datepicker.formatDate('yy-mm-dd', new Date($('#room_check_out').val()));
         	if (date_in >= date_out)
         	{
         		$(this).val(inst.lastVal);
@@ -1292,8 +1309,8 @@ $(document).ready(function()
 					cache: false,
 					dataType:'JSON',
 					data: {
-						date_from:$('#room_check_in').val(),
-						date_to:$('#room_check_out').val(),
+						date_from:date_in,
+						date_to:date_out,
 						change_date:1,
 						qty:$('#quantity_wanted').val(),
 						id_product:$('#product_page_product_id').val()
@@ -1302,11 +1319,19 @@ $(document).ready(function()
 					{
 						if (result.msg == 'success')
 						{
+							if (result.avail_rooms <= room_warning_num)
+							{
+								$('.num_quantity_alert').show();
+							}
+							else
+							{
+								$('.num_quantity_alert').hide();
+							}
+
 							$('.num_searched_avail_rooms').text(result.avail_rooms);
 							$("#max_avail_type_qty").val(result.avail_rooms);
 							$('.room_unavailability_date_error_div').hide();
 							$('.unvail_rooms_cond_display').show();
-							$('.num_quantity_alert').show();
 							$('.sold_out_alert').hide();
 
 							total_price = result.total_price;
@@ -1327,7 +1352,6 @@ $(document).ready(function()
 								$('.room_unavailability_date_error_div').show();
 								$('#quantity_wanted').val(result.avail_rooms);
 								$('.unvail_rooms_cond_display').show();
-								$('.num_quantity_alert').show();
 								$('.sold_out_alert').hide();
 
 								setTimeout(function()
@@ -1339,7 +1363,6 @@ $(document).ready(function()
 							else
 							{
 								$('.unvail_rooms_cond_display').hide();
-								$('.num_quantity_alert').hide();
 								$('.sold_out_alert').show();
 							}
 						}
@@ -1365,8 +1388,7 @@ $(document).ready(function()
     	if(parseInt(qty_wntd) < 1 || parseInt(qty_wntd) > $('#max_avail_type_qty').val())
     	{
     		$('#quantity_wanted').val($('#max_avail_type_qty').val());
-    		/*$('.room_unavailability_qty_error_div').text(wrong_qty_cond);
-			$('.room_unavailability_qty_error_div').show();*/
+			
 			setTimeout(function()
 			{
 				$('.room_unavailability_qty_error_div').hide();
@@ -1382,8 +1404,8 @@ $(document).ready(function()
 				dataType:'JSON',
 				cache: false,
 				data: {
-					date_from:$('#room_check_in').val(),
-					date_to:$('#room_check_out').val(),
+					date_from:$.datepicker.formatDate('yy-mm-dd', new Date($('#room_check_in').val())),
+					date_to:$.datepicker.formatDate('yy-mm-dd', new Date($('#room_check_out').val())),
 					product_quantity_down:1,
 					qty:qty_wntd,
 					id_product:$('#product_page_product_id').val()

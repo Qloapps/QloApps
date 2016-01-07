@@ -1,0 +1,20 @@
+
+[{shop_url}] 
+
+رسالتك الى خدمة العملاء في {shop_name} 
+
+تم ارسال الرسالة بنجاح.
+
+الرسالة: {message}
+
+رقم الطلب: {order_name}
+
+المنتج: {product_name}
+
+الملف المرفق: {attached_file} 		 
+
+سيتم الرد في اقرب فرصة ممكنة. 
+
+{shop_name} [{shop_url}] powered by
+PrestaShop(tm) [http://www.prestashop.com/] 
+

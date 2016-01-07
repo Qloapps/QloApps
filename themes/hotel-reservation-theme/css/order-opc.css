@@ -97,7 +97,7 @@
     height: 35px;
 }
 
-#voucher button
+#voucher button, #advanced-payment button
 {
     border: none;
     background-color: #BF9958;
@@ -241,5 +241,59 @@
     font-weight: 700;
     font-family: "PT Serif",serif;
     text-decoration: none;
+}
+
+.opc-main-block h3.page-subheading
+{
+  margin-top: 5px;
+}
+
+.clear-both
+{
+  clear: both;
+}
+
+.partial_txt
+{
+  font-size: 16px;
+  font-weight: 700;
+  color: #585858;
+}
+
+.partial_mim_cost
+{
+  font-size: 16px;
+  font-weight: 400;
+  color: #585858;
+}
+
+#partial_data
+{
+  display: none;
+}
+
+.partial_subcont
+{
+  margin-top: 10px;
+}
+
+#current_amt_cont span.partial_txt
+{
+  transform: translate(0px, 6px);
+}
+
+#current_amt_cont div.input-group
+{
+  padding-left: 10px;
+}
+
+#current_amt_cont div.input-group span.input-group-addon
+{
+  padding: 6px 17px;
+}
+
+#current_amt_cont div.input-group input
+{
+  height: 40px;
 }
 /* By Webkul */

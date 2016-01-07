@@ -45,6 +45,10 @@
 				'date_upd' =>  	 		array('type' => self::TYPE_DATE, 'validate' => 'isDate', 'copy_post' => false),
 		));
 		
+		/**
+		 * [hotelBranchesInfo : To get all the hotels information created by the admin]
+		 * @return [array | false] [If no hotel is created then returns false otherwise returns all hotels information array]
+		 */
 		public function hotelBranchesInfo()
 		{
 			$result = Db::getInstance()->executeS('SELECT `id` , `hotel_name`, `id_category` FROM `'._DB_PREFIX_.'htl_branch_info`');
@@ -53,6 +57,10 @@
 			return false;
 		}
 
+		/**
+		 * [getActiveHotelBranchesInfo : To get all the activated hotels information created by the admin]
+		 * @return [array | false] [If no hotel is created or activated then returns false otherwise returns all activated hotels information array]
+		 */
 		public function getActiveHotelBranchesInfo()
 		{
 			$result = Db::getInstance()->executeS('SELECT `id` , `hotel_name`, `id_category` FROM `'._DB_PREFIX_.'htl_branch_info` WHERE active=1');
@@ -61,6 +69,12 @@
 			return false;
 		}
 
+		/**
+		 * Deprecated
+		 * [hotelBranchInfoById : Hotel's information By its id]
+		 * @param  [int] $id [id of the hotel which information is wanted]
+		 * @return [array | false]     [If no hotel found with id sent then returns false otherwise returns all hotel's information array]
+		 */
 		public function hotelBranchInfoById($id)
 		{
 			$result = Db::getInstance()->getRow('SELECT * FROM `'._DB_PREFIX_.'htl_branch_info` WHERE id='.$id);
@@ -69,6 +83,11 @@
 			return false;
 		}
 
+		/**
+		 * Deprecated
+		 * [hotelsNameAndId : To get array of All created Hotels name and id]
+		 * @return [array | false] [If no hotel found then returns false otherwise returns array of all hotels name and id]
+		 */
 		public function hotelsNameAndId()
 		{
 			$result = Db::getInstance()->executeS('SELECT id , hotel_name FROM `'._DB_PREFIX_.'htl_branch_info`');
@@ -77,6 +96,10 @@
 			return false;
 		}
 
+		/**
+		 * [getUnassignedFeaturesHotelIds : To get array of hotels id and name To which no hotel features are assigned]
+		 * @return [array | false] [If no hotel found then returns false otherwise returns array of all hotels name and id to which no features are assigned]
+		 */
 		public function getUnassignedFeaturesHotelIds()
 		{
 			$result = Db::getInstance()->executeS('SELECT id , hotel_name FROM `'._DB_PREFIX_.'htl_branch_info` WHERE `id` NOT IN (SELECT DISTINCT id_hotel FROM `'._DB_PREFIX_.'htl_branch_features`)');
@@ -85,6 +108,11 @@
 			return false;
 		}
 
+		/**
+		 * [getFeaturesOfHotelByHotelId : To get assigned Features of a hotel by its id]
+		 * @param  [type] $id_hotel [id of the hotel]
+		 * @return [array | false] [If no feature found then returns false otherwise returns array of all features assigned to the hotel]
+		 */
 		public function getFeaturesOfHotelByHotelId($id_hotel)
 		{
 			$result = Db::getInstance()->executeS('SELECT feature_id FROM `'._DB_PREFIX_.'htl_branch_features` WHERE id_hotel='.$id_hotel);
@@ -93,6 +121,11 @@
 			return false;
 		}
 
+		/**
+		 * [getFeaturesOfHotelByHotelId : To get Hotel's id by its category id]
+		 * @param  [int] $id_category [id_category of the hotel]
+		 * @return [array | int] [If no hotel found then returns false otherwise returns id of the hotel]
+		 */
 		public static function getHotelIdByIdCategory($id_category)
 		{
 			$result = Db::getInstance()->getValue('SELECT id FROM `'._DB_PREFIX_.'htl_branch_info` WHERE id_category='.$id_category);
@@ -101,6 +134,11 @@
 			return false;
 		}
 
+		/**
+		 * [getFeaturesOfHotelByHotelId : To get Category Information by its id_category]
+		 * @param  [int] $id_category [id of the category , Which innformation is wanted]
+		 * @return [array | false] [If no Category found then returns false otherwise returns array of information of that category]
+		 */
 		public function getCategoryDataByIdCategory($id_category)
 		{
 			$result = Db::getInstance()->getRow('SELECT * FROM `'._DB_PREFIX_.'category_lang` WHERE id_category='.$id_category);
@@ -109,4 +147,14 @@
 			
 			return false;
 		}
+
+		public function hotelBranchInfoByCategoryId($cat_id)
+		{
+			$result = Db::getInstance()->executeS("SELECT `id`, `hotel_name`, `id_category` FROM `"._DB_PREFIX_.'htl_branch_info` WHERE `id_category` ='.$cat_id.' AND `active`=1');
+
+			if ($result)
+				return $result;
+			return false;
+		}
+
 	}

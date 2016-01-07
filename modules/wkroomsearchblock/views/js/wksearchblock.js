@@ -6,7 +6,7 @@ $(document).ready(function()
     $("#check_in_time").datepicker(
     {
         showOtherMonths: true,
-        dateFormat: 'yy-mm-dd',
+        dateFormat: 'dd M yy',
         minDate: 0,
         onClose: function( selectedDate ) 
         {
@@ -18,8 +18,9 @@ $(document).ready(function()
 
     $("#check_out_time").datepicker(
     {
+
         showOtherMonths: true,
-        dateFormat: 'yy-mm-dd',
+        dateFormat: 'dd M yy',
         minDate: 0,
         onClose: function( selectedDate ) 
         {
@@ -61,7 +62,8 @@ $(document).ready(function()
             if ($(this).val() != '')
         	{
     	    	abortRunningAjax();
-    	    	ajax_check_var = $.ajax({
+    	    	ajax_check_var = $.ajax(
+                {
     	    		url:autocomplete_search_url,
     	    		data:{to_search_data:$(this).val()},
     	    		method:'POST',
@@ -141,6 +143,10 @@ $(document).ready(function()
 
     $('#search_room_submit, #filter_search_btn').on('click', function(e)
     {
+        var check_in_time = $("#check_in_time").val();
+        var check_out_time = $("#check_out_time").val();
+        var new_chk_in = $.datepicker.formatDate('yy-mm-dd', new Date(check_in_time));
+        var new_chk_out = $.datepicker.formatDate('yy-mm-dd', new Date(check_out_time));
         var error = false;
     	if ($('#hotel_cat_id').val() == '')
     	{
@@ -148,18 +154,30 @@ $(document).ready(function()
             $('#select_htl_error_p').text(hotel_name_cond);
             error = true;
     	}
-    	if ($('#check_in_time').val() == '')
+    	if (new_chk_in == '')
     	{
             $("#check_in_time").addClass("error_border");
             $('#check_in_time_error_p').text(check_in_time_cond);
     		error = true;
     	}
-    	if ($('#check_out_time').val() == '')
+        else if (new_chk_in < $.datepicker.formatDate('yy-mm-dd', new Date()))
+        {
+            $("#check_in_time").addClass("error_border");
+            $('#check_in_time_error_p').text(less_checkin_date);
+            error = true;
+        }
+    	if (new_chk_out == '')
     	{
             $("#check_out_time").addClass("error_border");
             $('#check_out_time_error_p').text(check_out_time_cond);
     		error = true;
     	}
+        else if (new_chk_out < new_chk_in)
+        {
+            $("#check_out_time").addClass("error_border");
+            $('#check_out_time_error_p').text(more_checkout_date);
+            error = true;
+        }
         if (error)
             return false;
         else

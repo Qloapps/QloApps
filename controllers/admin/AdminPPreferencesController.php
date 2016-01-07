@@ -45,14 +45,14 @@ class AdminPPreferencesControllerCore extends AdminController
             'products' => array(
                 'title' =>    $this->l('Products (general)'),
                 'fields' =>    array(
-                    'PS_CATALOG_MODE' => array(
+                    /*'PS_CATALOG_MODE' => array(
                         'title' => $this->l('Catalog mode'),
                         'hint' => $this->l('When active, all shopping features will be disabled.'),
                         'validation' => 'isBool',
                         'cast' => 'intval',
                         'required' => false,
                         'type' => 'bool'
-                    ),
+                    ),*/
                     'PS_COMPARATOR_MAX_ITEM' => array(
                         'title' => $this->l('Product comparison'),
                         'hint' => $this->l('Set the maximum number of products that can be selected for comparison. Set to "0" to disable this feature.'),
@@ -67,7 +67,7 @@ class AdminPPreferencesControllerCore extends AdminController
                         'cast' => 'intval',
                         'type' => 'text'
                     ),
-                    'PS_CART_REDIRECT' => array(
+                    /*'PS_CART_REDIRECT' => array(
                         'title' => $this->l('Redirect after adding product to cart'),
                         'hint' => $this->l('Only for non-AJAX versions of the cart.'),
                         'cast' => 'intval',
@@ -79,7 +79,7 @@ class AdminPPreferencesControllerCore extends AdminController
                             0 => $this->l('Previous page'),
                             1 => $this->l('Cart summary')
                         )
-                    ),
+                    ),*/
                     'PS_PRODUCT_SHORT_DESC_LIMIT' => array(
                         'title' => $this->l('Max size of short description'),
                         'hint' => $this->l('Set the maximum size of product short description (in characters).'),
@@ -88,7 +88,7 @@ class AdminPPreferencesControllerCore extends AdminController
                         'type' => 'text',
                         'suffix' => $this->l('characters'),
                     ),
-                    'PS_QTY_DISCOUNT_ON_COMBINATION' => array(
+                    /*'PS_QTY_DISCOUNT_ON_COMBINATION' => array(
                         'title' => $this->l('Quantity discounts based on'),
                         'hint' => $this->l('How to calculate quantity discounts.'),
                         'cast' => 'intval',
@@ -100,7 +100,7 @@ class AdminPPreferencesControllerCore extends AdminController
                             0 => $this->l('Products'),
                             1 => $this->l('Combinations')
                         )
-                    ),
+                    ),*/
                     'PS_FORCE_FRIENDLY_PRODUCT' => array(
                         'title' => $this->l('Force update of friendly URL'),
                         'hint' => $this->l('When active, friendly URL will be updated on every save.'),
@@ -160,21 +160,21 @@ class AdminPPreferencesControllerCore extends AdminController
             'fo_product_page' => array(
                 'title' =>    $this->l('Product page'),
                 'fields' =>    array(
-                    'PS_DISPLAY_QTIES' => array(
+                   /* 'PS_DISPLAY_QTIES' => array(
                         'title' => $this->l('Display available quantities on the product page'),
                         'validation' => 'isBool',
                         'cast' => 'intval',
                         'required' => false,
                         'type' => 'bool'
-                    ),
-                    'PS_LAST_QTIES' => array(
+                    ),*/
+                  /*  'PS_LAST_QTIES' => array(
                         'title' => $this->l('Display remaining quantities when the quantity is lower than'),
                         'hint' => $this->l('Set to "0" to disable this feature.'),
                         'validation' => 'isUnsignedId',
                         'required' => true,
                         'cast' => 'intval',
                         'type' => 'text'
-                    ),
+                    ),*/
                     'PS_DISPLAY_JQZOOM' => array(
                         'title' => $this->l('Enable JqZoom instead of Fancybox on the product page'),
                         'validation' => 'isBool',
@@ -182,21 +182,21 @@ class AdminPPreferencesControllerCore extends AdminController
                         'required' => false,
                         'type' => 'bool'
                     ),
-                    'PS_DISP_UNAVAILABLE_ATTR' => array(
+                    /*'PS_DISP_UNAVAILABLE_ATTR' => array(
                         'title' => $this->l('Display unavailable product attributes on the product page'),
                         'validation' => 'isBool',
                         'cast' => 'intval',
                         'required' => false,
                         'type' => 'bool'
-                    ),
-                    'PS_ATTRIBUTE_CATEGORY_DISPLAY' => array(
+                    ),*/
+                    /*'PS_ATTRIBUTE_CATEGORY_DISPLAY' => array(
                         'title' => $this->l('Display the "add to cart" button when a product has attributes'),
                         'hint' => $this->l('Display or hide the "add to cart" button on category pages for products that have attributes forcing customers to see product details.'),
                         'validation' => 'isBool',
                         'cast' => 'intval',
                         'type' => 'bool'
-                    ),
-                    'PS_ATTRIBUTE_ANCHOR_SEPARATOR' => array(
+                    ),*/
+                    /*'PS_ATTRIBUTE_ANCHOR_SEPARATOR' => array(
                         'title' => $this->l('Separator of attribute anchor on the product links'),
                         'type' => 'select',
                         'list' => array(
@@ -204,7 +204,7 @@ class AdminPPreferencesControllerCore extends AdminController
                             array('id' => ',', 'name' => ','),
                         ),
                         'identifier' => 'id'
-                    ),
+                    ),*/
                     'PS_DISPLAY_DISCOUNT_PRICE' => array(
                         'title' => $this->l('Display discounted price'),
                         'desc' => $this->l('In the volume discounts board, display the new price with the applied discount instead of showing the discount (ie. "-5%").'),

@@ -74,7 +74,7 @@
 		{/if}
 		<div id="page">
 			<div class="header-container">
-				<header id="header" style='{if $page_name == "index"}background-image:url("{$img_ps_dir}hotel_header_image.png"){else}background-color:#252525;{/if}'>
+				<header id="header" style='background-size:cover; {if $page_name == "index"}background-image:url("{$img_ps_dir}hotel_header_image.png"){else}background-color:#252525;{/if}'>
 					<div class="banner">
 						<div class="container">
 							<div class="row">

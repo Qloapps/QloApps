@@ -1,0 +1,16 @@
+
+[{shop_url}] 
+
+Halo {firstname} {lastname}, 
+
+Kami telah memperbaharui status retur #{id_order_return}, status
+barunya adalah: "{state_order_return}"
+
+Anda dapat melihat order dan mengunduh invoice dari "Riwayat
+pembelian" [{history_url}] melalui akun pelanggan
+Anda yang dapat diakses dihalaman "Akun saya"
+[{my_account_url}] diwebsite kami. 
+
+{shop_name} [{shop_url}] didukung oleh
+PrestaShop(tm) [http://www.prestashop.com/] 
+

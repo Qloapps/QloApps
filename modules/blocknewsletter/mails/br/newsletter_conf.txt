@@ -1,0 +1,10 @@
+
+[{shop_url}] 
+
+Olá, 
+
+OBRIGADO POR ASSINAR A NOSSA NEWSLETTER. 
+
+{shop_name} [{shop_url}] baseado em
+PrestaShop(tm) [http://www.prestashop.com/] 
+

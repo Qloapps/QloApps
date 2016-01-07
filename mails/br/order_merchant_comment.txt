@@ -1,0 +1,13 @@
+
+[{shop_url}] 
+
+Olá {firstname} {lastname}, 
+
+Você recebeu uma nova mensagem da loja {shop_name} sobre o pedido
+com referência {order_name}.
+
+MENSAGEM: {message} 		 
+
+{shop_name} [{shop_url}] baseado em
+PrestaShop(tm) [http://www.prestashop.com/] 
+

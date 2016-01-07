@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS `PREFIX_htl_room_type` (
   `date_add` datetime NOT NULL,
   `date_upd` datetime NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+) ENGINE=ENGINE_TYPE DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
 CREATE TABLE IF NOT EXISTS `PREFIX_htl_room_information` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS `PREFIX_htl_room_information` (
   `date_add` datetime NOT NULL,
   `date_upd` datetime NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+) ENGINE=ENGINE_TYPE DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
 CREATE TABLE IF NOT EXISTS `PREFIX_htl_branch_info` (
   `id` int(10) unsigned NOT NULL auto_increment,
@@ -88,6 +88,8 @@ CREATE TABLE IF NOT EXISTS `PREFIX_htl_booking_detail` (
   `check_out` datetime NOT NULL,
   `date_from` datetime NOT NULL,
   `date_to` datetime NOT NULL,
+  `is_refunded` tinyint(4) NOT NULL,
+  `is_back_order` tinyint(4) NOT NULL,
   `date_add` datetime NOT NULL,
   `date_upd` datetime NOT NULL,
   PRIMARY KEY (`id`)
@@ -105,18 +107,21 @@ CREATE TABLE IF NOT EXISTS `PREFIX_htl_cart_booking_data` (
   `id_guest` int(11) NOT NULL,
   `id_order` int(11) NOT NULL,
   `id_customer` int(11) NOT NULL,
+  `id_currency` int(11) NOT NULL,
   `id_product` int(11) NOT NULL,
   `id_room` int(11) NOT NULL,
   `id_hotel` int(11) NOT NULL,
-  `amount` decimal(35,0) NOT NULL,
+  `quantity` int(11) NOT NULL,
   `booking_type` tinyint(4) NOT NULL,
   `comment` text NOT NULL,
-  `date_from` date NOT NULL,
-  `date_to` date NOT NULL,
+  `is_refunded` tinyint(4) NOT NULL,
+  `is_back_order` tinyint(4) NOT NULL,
+  `date_from` datetime NOT NULL,
+  `date_to` datetime NOT NULL,
   `date_add` datetime NOT NULL,
   `date_upd` datetime NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=ENGINE_TYPE DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+) ENGINE=ENGINE_TYPE  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
 CREATE TABLE IF NOT EXISTS `PREFIX_htl_order_status` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -129,3 +134,72 @@ CREATE TABLE IF NOT EXISTS `PREFIX_htl_room_allotment_type` (
   `type` text NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=ENGINE_TYPE DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+
+CREATE TABLE IF NOT EXISTS `PREFIX_htl_advance_payment` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id_product` int(11) NOT NULL,
+  `payment_type` tinyint(4) NOT NULL,
+  `value` decimal(20,6) NOT NULL,
+  `id_currency` int(11) NOT NULL,
+  `tax_include` tinyint(4) NOT NULL,
+  `calculate_from` tinyint(4) NOT NULL,
+  `active` tinyint(4) NOT NULL,
+  `date_add` datetime NOT NULL,
+  `date_upd` datetime NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=ENGINE_TYPE  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+
+CREATE TABLE IF NOT EXISTS `PREFIX_htl_customer_adv_payment` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id_cart` int(11) NOT NULL,
+  `id_order` int(11) NOT NULL,
+  `id_guest` int(11) NOT NULL,
+  `id_customer` int(11) NOT NULL,
+  `id_currency` int(11) NOT NULL,
+  `total_paid_amount` decimal(20,6) NOT NULL,
+  `total_order_amount` decimal(20,6) NOT NULL,
+  `date_add` datetime NOT NULL,
+  `date_upd` datetime NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=ENGINE_TYPE  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+
+CREATE TABLE IF NOT EXISTS `PREFIX_htl_order_refund_rules` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `payment_type` int(2) unsigned NOT NULL,
+  `deduction_value_full_pay` decimal(20,6) NOT NULL,
+  `deduction_value_adv_pay` decimal(20,6) NOT NULL,
+  `days` decimal(35,0) NOT NULL,
+  `date_add` datetime NOT NULL,
+  `date_upd` datetime NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=ENGINE_TYPE DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+
+CREATE TABLE IF NOT EXISTS `PREFIX_htl_order_refund_info` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id_order` int(11) NOT NULL,
+  `id_product` int(11) NOT NULL,
+  `id_room` int(11) NOT NULL,
+  `id_customer` int(11) NOT NULL,
+  `id_currency` int(11) NOT NULL,
+  `order_amount` decimal(20,6) NOT NULL DEFAULT '0.000000',
+  `num_rooms` int(5) unsigned NOT NULL,
+  `date_from` date NOT NULL,
+  `date_to` date NOT NULL,
+  `refund_stage_id` int(11) NOT NULL,
+  `cancellation_reason` text NOT NULL,
+  `refunded_amount` decimal(20,6) NOT NULL DEFAULT '0.000000',
+  `date_add` datetime NOT NULL,
+  `date_upd` datetime NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=ENGINE_TYPE DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+
+CREATE TABLE IF NOT EXISTS `PREFIX_htl_order_refund_stages` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=ENGINE_TYPE DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+
+insert into `PREFIX_htl_order_refund_stages` (`name`) values ('Waitting'),
+                                                              ('Accepted'),
+                                                              ('Refunded'),
+                                                              ('Rejected'); 

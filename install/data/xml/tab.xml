@@ -15,9 +15,9 @@
     <tab id="CMS_Categories" id_parent="-1" active="1" hide_host_mode="0">
       <class_name>AdminCmsCategories</class_name>
     </tab>
-    <tab id="Combinations_Generator" id_parent="-1" active="1" hide_host_mode="0">
+    <!-- <tab id="Combinations_Generator" id_parent="-1" active="1" hide_host_mode="0">
       <class_name>AdminAttributeGenerator</class_name>
-    </tab>
+    </tab> -->
     <tab id="Search" id_parent="-1" active="1" hide_host_mode="0">
       <class_name>AdminSearch</class_name>
     </tab>
@@ -45,9 +45,9 @@
     <tab id="Modules" id_parent="" active="1" hide_host_mode="0">
       <class_name>AdminParentModules</class_name>
     </tab>
-    <tab id="Shipping" id_parent="" active="1" hide_host_mode="0">
+    <!-- <tab id="Shipping" id_parent="" active="1" hide_host_mode="0">
       <class_name>AdminParentShipping</class_name>
-    </tab>
+    </tab> -->
     <tab id="Localization" id_parent="" active="1" hide_host_mode="0">
       <class_name>AdminParentLocalization</class_name>
     </tab>
@@ -72,21 +72,21 @@
     <tab id="Categories" id_parent="Catalog" active="1" hide_host_mode="0">
       <class_name>AdminCategories</class_name>
     </tab>
-    <tab id="Monitoring" id_parent="Catalog" active="1" hide_host_mode="0">
+    <!-- <tab id="Monitoring" id_parent="Catalog" active="1" hide_host_mode="0">
       <class_name>AdminTracking</class_name>
-    </tab>
-    <tab id="Attributes_and_Values" id_parent="Catalog" active="1" hide_host_mode="0">
+    </tab> -->
+    <!-- <tab id="Attributes_and_Values" id_parent="Catalog" active="1" hide_host_mode="0">
       <class_name>AdminAttributesGroups</class_name>
-    </tab>
+    </tab> -->
     <tab id="Features" id_parent="Catalog" active="1" hide_host_mode="0">
       <class_name>AdminFeatures</class_name>
     </tab>
-    <tab id="Manufacturers" id_parent="Catalog" active="1" hide_host_mode="0">
+    <!-- <tab id="Manufacturers" id_parent="Catalog" active="1" hide_host_mode="0">
       <class_name>AdminManufacturers</class_name>
-    </tab>
-    <tab id="Suppliers" id_parent="Catalog" active="1" hide_host_mode="0">
+    </tab> -->
+    <!-- <tab id="Suppliers" id_parent="Catalog" active="1" hide_host_mode="0">
       <class_name>AdminSuppliers</class_name>
-    </tab>
+    </tab> -->
     <tab id="Tags" id_parent="Catalog" active="1" hide_host_mode="0">
       <class_name>AdminTags</class_name>
     </tab>
@@ -102,9 +102,9 @@
     <tab id="Merchandise_Returns" id_parent="Orders" active="1" hide_host_mode="0">
       <class_name>AdminReturn</class_name>
     </tab>
-    <tab id="Delivery_Slips" id_parent="Orders" active="1" hide_host_mode="0">
+    <!-- <tab id="Delivery_Slips" id_parent="Orders" active="1" hide_host_mode="0">
       <class_name>AdminDeliverySlip</class_name>
-    </tab>
+    </tab> -->
     <tab id="Credit_Slips" id_parent="Orders" active="1" hide_host_mode="0">
       <class_name>AdminSlip</class_name>
     </tab>
@@ -147,7 +147,7 @@
     <tab id="Marketing" id_parent="Price_Rules" active="1" hide_host_mode="0">
       <class_name>AdminMarketing</class_name>
     </tab>
-	<tab id="Carriers" id_parent="Shipping" active="1" hide_host_mode="0">
+	<!-- <tab id="Carriers" id_parent="Shipping" active="1" hide_host_mode="0">
       <class_name>AdminCarriers</class_name>
 	</tab>
     <tab id="Shipping_1" id_parent="Shipping" active="1" hide_host_mode="0">
@@ -155,7 +155,7 @@
     </tab>
     <tab id="CarrierWizard" id_parent="Shipping" active="1" hide_host_mode="0">
       <class_name>AdminCarrierWizard</class_name>
-    </tab>
+    </tab> -->
     <tab id="Localization_1" id_parent="Localization" active="1" hide_host_mode="0">
       <class_name>AdminLocalization</class_name>
     </tab>
@@ -300,9 +300,9 @@
     <tab id="Stock_Coverage" id_parent="Stock" active="1" hide_host_mode="0">
       <class_name>AdminStockCover</class_name>
     </tab>
-    <tab id="Supply_orders" id_parent="Stock" active="1" hide_host_mode="0">
+   <!--  <tab id="Supply_orders" id_parent="Stock" active="1" hide_host_mode="0">
       <class_name>AdminSupplyOrders</class_name>
-    </tab>
+    </tab> -->
     <tab id="Configuration" id_parent="Stock" active="1" hide_host_mode="0">
       <class_name>AdminStockConfiguration</class_name>
     </tab>

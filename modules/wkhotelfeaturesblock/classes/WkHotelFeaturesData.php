@@ -27,7 +27,7 @@
 
 		public function getAllFeaturesData()
 		{
-			$result = Db::getInstance()->executeS('SELECT * FROM '._DB_PREFIX_.'htl_features_block_data WHERE is_blog=0');
+			$result = Db::getInstance()->executeS('SELECT * FROM `'._DB_PREFIX_.'htl_features_block_data` WHERE `is_blog`=0');
 			if ($result)
 				return $result;
 			return false; 
@@ -35,7 +35,7 @@
 
 		public function getMainBlogData()
 		{
-			$result = Db::getInstance()->getRow('SELECT * FROM '._DB_PREFIX_.'htl_features_block_data WHERE is_blog=1');
+			$result = Db::getInstance()->getRow('SELECT * FROM `'._DB_PREFIX_.'htl_features_block_data` WHERE `is_blog`=1');
 			if ($result)
 				return $result;
 			return false; 

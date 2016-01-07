@@ -84,7 +84,7 @@
 				<tr class="table_head">
 					<th class="cart_product">{l s='Room Image'}</th>
 					<th class="cart_description">{l s='Room Description'}</th>
-					<th>{l s='Room Capcity'}</th>
+					<th>{l s='Room Capacity'}</th>
 					<th class="cart_unit">{l s='Unit Price'}</th>
 					<th>{l s='Rooms'}</th>
 					<th>{l s='Check-in Date'}</th>
@@ -339,7 +339,7 @@
 								</td>
 								<td class="cart_unit">
 									<p class="text-center">
-										{convertPrice price=$data_v['unit_price']}
+										{displayPrice price=$data_v['unit_price']}
 									</p>
 								</td>
 								<td class="text-center">
@@ -349,12 +349,12 @@
 								</td>
 								<td class="text-center">
 									<p>
-										{$rm_v['data_form']|date_format:"%d-%b-%G"}
+										{$rm_v['data_form']|date_format:"%d %b %Y"}
 									</p>
 								</td>
 								<td class="text-center">
 									<p>
-										{$rm_v['data_to']|date_format:"%d-%b-%G"}
+										{$rm_v['data_to']|date_format:"%d %b %Y"}
 									</p>
 								</td>
 								<td class="text-center">
@@ -362,7 +362,7 @@
 								</td>
 								<td class="cart_total text-left">
 									<p class="text-left">
-										{convertPrice price=$rm_v['amount']}
+										{displayPrice price=$rm_v['amount']}
 									</p>
 								</td>
 							</tr>

@@ -7,12 +7,12 @@
             <div class="col-sm-3">
                 <div class="filter_dw_cont">
                     <button class="btn btn-default dropdown-toggle" type="button" id="gst_rating" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <span class="pull-left sort_btn_span" data-sort-by="0" data-sort-value="0" data-sort-for="{l s='Ratting'}">{l s='Ratting'}</span>
+                        <span class="pull-left sort_btn_span" data-sort-by="0" data-sort-value="0" data-sort-for="{l s='Rating'}">{l s='Rating'}</span>
                         <span class="caret pull-right margin-top-7"></span>
                     </button>
                     <ul class="dropdown-menu" aria-labelledby="gst_rating">
-                        <li><a href="#" class="sort_result" data-sort-by="1" data-value="1">{l s='Ratting Ascending'}</a></li>
-                        <li><a href="#" class="sort_result" data-sort-by="1" data-value="2">{l s='Ratting Descending'}</a></li>
+                        <li><a href="#" class="sort_result" data-sort-by="1" data-value="1">{l s='Rating Ascending'}</a></li>
+                        <li><a href="#" class="sort_result" data-sort-by="1" data-value="2">{l s='Rating Descending'}</a></li>
                     </ul>
                 </div>
             </div>
@@ -55,9 +55,7 @@
                                 <span class="rm_review">{$room_v['num_review']} {l s='Reviews'}</span>
                             </div>
 
-                            {if isset($room_v['room_left'])}
-                                <span class="rm_left pull-right">{l s='Hurry!'} <span class="cat_remain_rm_qty_{$room_v['id_product']}">{$room_v['room_left']}</span> {l s='rooms left'}</span>
-                            {/if}
+                            <span class="rm_left pull-right" {if $room_v['room_left']>$warning_num}  style="display:none"{/if}>{l s='Hurry!'} <span class="cat_remain_rm_qty_{$room_v['id_product']}">{$room_v['room_left']}</span> {l s='rooms left'}</span>
 
                             {if !empty($room_v['feature'])}
                                 <div class="rm_amenities_cont">
@@ -67,10 +65,10 @@
                                 </div>
                             {/if}
                             <div class="row margin-lr-0 pull-left rm_price_cont">
-                                <span class="pull-left rm_price_val">{convertPrice price=$room_v['price']}</span><span class="pull-left rm_price_txt">/{l s='Per Night'}</span>
+                                <span class="pull-left rm_price_val">{displayPrice price = $room_v['price']|floatVal}</span><span class="pull-left rm_price_txt">/{l s='Per Night'}</span>
                             </div>
 
-                            <a cat_rm_check_in="{$booking_date_from}" cat_rm_check_out="{$booking_date_to}" href="" rm_product_id="{$room_v['id_product']}" cat_rm_book_nm_days="{$num_days}" class="btn rm_book_btn pull-right">{l s='Book Now'}</a>
+                            <a cat_rm_check_in="{$booking_date_from}" cat_rm_check_out="{$booking_date_to}" href="" rm_product_id="{$room_v['id_product']}" cat_rm_book_nm_days="{$num_days}" data-id-product-attribute="0" data-id-product="{$room_v['id_product']|intval}" class="btn rm_book_btn ajax_add_to_cart_button pull-right">{l s='Book Now'}</a>
 
                             <!-- ################################################ -->
 
@@ -113,6 +111,10 @@
                             <!-- ################################################ -->
                         </div>
                     </div>
+                </div>
+            {foreachelse}
+                <div class="noRoomsAvailAlert">
+                  <span>{l s='No Rooms Available For this Room Type In this Hotel!'}</span>
                 </div>
             {/foreach}
         </div>

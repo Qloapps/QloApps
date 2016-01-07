@@ -314,6 +314,7 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
 		if (!$legal_free_text)
 			$legal_free_text = Configuration::get('PS_INVOICE_LEGAL_FREE_TEXT', (int)Context::getContext()->language->id, null, (int)$this->order->id_shop);
 		$order_obj = new Order($this->order->id);
+
 		$this->context = Context::getContext();
 		$products = $order_obj->getProducts();
 
@@ -327,12 +328,14 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
 
 			$customer = new Customer($this->order->id_customer);
 			if (!empty($products)) 
-			{	
+			{
+				$refunded_rooms = 0;
 				$cart_bk_data=array();
+
 				foreach ($products as $type_key => $type_value) 
 				{
 					$product = new Product($type_value['product_id'], false, $this->context->language->id);
-					$unit_price = Product::getPriceStatic($type_value['product_id'], true, null, 6, null, false, true, 1);
+					$order_prod_dtl = $obj_htl_bk_dtl->getPsOrderDetailsByProduct($product->id, $this->order->id);
 
 					$cover_image_arr = $product->getCover($type_value['product_id']);
 							
@@ -354,13 +357,30 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
 					$cart_htl_data[$type_key]['id_product'] = $type_value['product_id'];
 					$cart_htl_data[$type_key]['cover_img'] 	= $cover_img;
 					$cart_htl_data[$type_key]['name'] 		= $product->name;
-					$cart_htl_data[$type_key]['unit_price'] = Tools::convertPrice($unit_price, $this->order->id_currency);
+					$cart_htl_data[$type_key]['unit_price'] = $order_prod_dtl['unit_price_tax_excl'];
 					$cart_htl_data[$type_key]['adult'] 		= $rm_dtl['adult'];
 					$cart_htl_data[$type_key]['children']	= $rm_dtl['children'];
 
 					foreach ($cart_bk_data as $data_k => $data_v) 
 					{
 						$date_join = strtotime($data_v['date_from']).strtotime($data_v['date_to']);
+						//work on entring refund data
+						$obj_ord_ref_info = new HotelOrderRefundInfo();
+						$ord_refnd_info = $obj_ord_ref_info->getOderRefundInfoByIdOrderIdProductByDate($this->order->id, $type_value['product_id'], $data_v['date_from'], $data_v['date_to']);
+						if ($ord_refnd_info)
+						{
+							$obj_refund_stages = new HotelOrderRefundStages();
+							$stage_name = $obj_refund_stages->getNameById($ord_refnd_info['refund_stage_id']);
+
+							if ($stage_name == 'Refunded')
+								$refunded_rooms = 1;
+						}
+						else
+						{
+							$stage_name = '';
+						}
+						// END Order Refund
+
 
 						if (isset($cart_htl_data[$type_key]['date_diff'][$date_join]))
 						{
@@ -368,11 +388,15 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
 
 							$num_days = $cart_htl_data[$type_key]['date_diff'][$date_join]['num_days'];
 							$vart_quant = (int)$cart_htl_data[$type_key]['date_diff'][$date_join]['num_rm'] * $num_days;
-							
-							$amount = Product::getPriceStatic($type_value['product_id'], true, null, 6, null,	false, true, 1);
+
+							$amount = $order_prod_dtl['unit_price_tax_excl'];
 							$amount *= $vart_quant;
 
-							$cart_htl_data[$type_key]['date_diff'][$date_join]['amount'] = Tools::convertPrice($amount, $this->order->id_currency);
+							$cart_htl_data[$type_key]['date_diff'][$date_join]['amount'] = $amount;
+
+							// For order refund
+							$cart_htl_data[$type_key]['date_diff'][$date_join]['stage_name'] = $stage_name;
+							$cart_htl_data[$type_key]['date_diff'][$date_join]['id_room'] = $data_v['id_room'];
 						}
 						else
 						{
@@ -382,16 +406,29 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
 							$cart_htl_data[$type_key]['date_diff'][$date_join]['data_form'] = $data_v['date_from'];
 							$cart_htl_data[$type_key]['date_diff'][$date_join]['data_to'] = $data_v['date_to'];
 							$cart_htl_data[$type_key]['date_diff'][$date_join]['num_days'] = $num_days;
-							$amount = Product::getPriceStatic($type_value['product_id'], true, null, 6, null, false, true, 1);
+							$amount = $order_prod_dtl['unit_price_tax_excl'];
 							$amount *= $num_days;
-							$cart_htl_data[$type_key]['date_diff'][$date_join]['amount'] = Tools::convertPrice($amount, $this->order->id_currency);
+							
+							$cart_htl_data[$type_key]['date_diff'][$date_join]['amount'] = $amount;
+		
+							// For order refund
+							$cart_htl_data[$type_key]['date_diff'][$date_join]['stage_name'] = $stage_name;
+							$cart_htl_data[$type_key]['date_diff'][$date_join]['id_room'] = $data_v['id_room'];
 						}
 					}
 				}
+
+				// For Advanced Payment
+				$obj_customer_adv = new HotelCustomerAdvancedPayment();
+				$order_adv_dtl = $obj_customer_adv->getCstAdvPaymentDtlByIdOrder($order_obj->id);
+				if ($order_adv_dtl) 
+					$this->smarty->assign('order_adv_dtl', $order_adv_dtl);
 			}
 		}
+
 		$data = array(
 			'cart_htl_data' => $cart_htl_data,
+			'refunded_rooms' => $refunded_rooms,
 			'order' => $this->order,
             'order_invoice' => $this->order_invoice,
             'order_details' => $order_details,

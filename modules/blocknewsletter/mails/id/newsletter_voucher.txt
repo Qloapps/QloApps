@@ -1,0 +1,11 @@
+
+[{shop_url}] 
+
+Halo, 
+
+Karena telah berlangganan newsletter, kami dengan senang hati
+menawarkan voucher berikut: {discount} 
+
+{shop_name} [{shop_url}] didukung oleh
+PrestaShop(tm) [http://www.prestashop.com/] 
+

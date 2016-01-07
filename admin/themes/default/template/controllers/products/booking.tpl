@@ -21,8 +21,8 @@
 			</div>
 				<input type="hidden" id="product_id" name="id_product" value="{$product->id}">
 				<input type="hidden" id="hotel_id" name="id_hotel" value="{$rooms_info.id_hotel}">
-				<input type="hidden" id="num_adults" name="num_adults" value="{$rooms_info.adult}">
-				<input type="hidden" id="num_children" name="num_children" value="{$rooms_info.children}">
+				<!-- <input type="hidden" id="num_adults" name="num_adults" value="{$rooms_info.adult}">
+				<input type="hidden" id="num_children" name="num_children" value="{$rooms_info.children}"> -->
 		</div>
 
 		<div class="form-group">

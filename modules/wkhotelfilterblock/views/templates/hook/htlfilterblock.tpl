@@ -3,7 +3,7 @@
 		{if isset($config) && $config['SHOW_RATTING_FILTER']}
 			<div class="row margin-lr-0 layered_filter_cont">
 				<div class="col-sm-12 layered_filter_heading">
-					<span>{l s='Guest Ratting' mod='wkhotelfilterblock'}</span>
+					<span>{l s='Guest Rating' mod='wkhotelfilterblock'}</span>
 					<span class="pull-right clear_filter">{l s='Clear Filter' mod='wkhotelfilterblock'}</span>
 				</div>
 				<div class="col-sm-12 lf_sub_cont">
@@ -34,7 +34,8 @@
 					</div>
 					<div class="layered_filt">
 						<input type="checkbox" class="filter" data-type="ratting" value="0">
-						<span class="filters_name">{l s='No Ratting' mod='wkhotelfilterblock'}</span>
+						<label style="background-image:url({$ratting_img});" class="ratting_img_style ratting_0">
+						</label>
 					</div>
 				</div>
 			</div>
@@ -111,4 +112,5 @@
 	{addJsDef cat_link = $cat_link}
 	{addJsDef min_price = $min_price}
 	{addJsDef max_price = $max_price}
+	{addJsDef warning_num = $warning_num}
 {/strip}

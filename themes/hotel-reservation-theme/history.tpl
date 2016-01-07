@@ -43,8 +43,15 @@
 					<th class="first_item" data-sort-ignore="true">{l s='Order reference'}</th>
 					<th class="item">{l s='Date'}</th>
 					<th data-hide="phone" class="item">{l s='Total price'}</th>
+					{if isset($adv_active)}
+						<th data-hide="phone" class="item">{l s='Due Price'}</th>
+					{/if}
 					<th data-sort-ignore="true" data-hide="phone,tablet" class="item">{l s='Payment'}</th>
 					<th class="item">{l s='Status'}</th>
+
+					<!-- By webkul to show refund status of the order-->
+					<th class="item">{l s='Refund Status'}</th>
+
 					<th data-sort-ignore="true" data-hide="phone,tablet" class="item">{l s='Invoice'}</th>
 					<th data-sort-ignore="true" data-hide="phone,tablet" class="last_item">&nbsp;</th>
 				</tr>
@@ -68,6 +75,13 @@
 								{displayPrice price=$order.total_paid currency=$order.id_currency no_utf8=false convert=false}
 							</span>
 						</td>
+						{if isset($adv_active)}
+							<td class="history_price" data-value="{$order.due_amount}">
+								<span class="price">
+									{displayPrice price=$order.due_amount currency=$order.id_currency no_utf8=false convert=false}
+								</span>
+							</td>
+						{/if}
 						<td class="history_method">{$order.payment|escape:'html':'UTF-8'}</td>
 						<td{if isset($order.order_state)} data-value="{$order.id_order_state}"{/if} class="history_state">
 							{if isset($order.order_state)}
@@ -76,6 +90,38 @@
 								</span>
 							{/if}
 						</td>
+
+						<!-- By webkul to show refund status of the order-->
+						<td class="history_refund _status">
+							{if isset($order_refund_info)}
+								{if isset($order_refund_info[$order.id_order])}
+									{if isset($order_refund_info[$order.id_order]['waitting']) && $order_refund_info[$order.id_order]['waitting']}
+										<p class="ref_req_wait">
+											{l s="Waitting Requests"} : {$order_refund_info[{$order.id_order}]['waitting']}
+										</p>
+									{/if}
+									{if isset($order_refund_info[$order.id_order]['accepted']) && $order_refund_info[$order.id_order]['accepted']}
+										<p class="ref_req_accept">
+											{l s="Accepted Requests"} : {$order_refund_info[{$order.id_order}]['accepted']}
+										</p>
+									{/if}
+									{if isset($order_refund_info[$order.id_order]['rejected']) && $order_refund_info[$order.id_order]['rejected']}
+										<p class="ref_req_reject">
+											{l s="Rejected Requests"} : {$order_refund_info[{$order.id_order}]['rejected']}
+										</p>
+									{/if}
+									{if isset($order_refund_info[$order.id_order]['refunded']) && $order_refund_info[$order.id_order]['refunded']}
+										<p class="ref_req_refund">
+											{l s="Refunded Requests"} : {$order_refund_info[{$order.id_order}]['refunded']}
+										</p>
+									{/if}
+								{else}
+									--
+								{/if}
+							{/if}
+						</td>
+						<!-- end -->
+						
 						<td class="history_invoice">
 							{if (isset($order.invoice) && $order.invoice && isset($order.invoice_number) && $order.invoice_number) && isset($invoiceAllowed) && $invoiceAllowed == true}
 								<a class="link-button" href="{$link->getPageLink('pdf-invoice', true, NULL, "id_order={$order.id_order}")|escape:'html':'UTF-8'}" title="{l s='Invoice'}" target="_blank">
@@ -124,3 +170,12 @@
 		</a>
 	</li>
 </ul>
+<!-- By webkul added for history controller url on history.js -->
+{strip}
+	{addJsDef historyUrl=$link->getPageLink("orderdetail", true)|escape:'quotes':'UTF-8'}
+	{addJsDefL name=req_sent_msg}{l s='Request Sent..' js=1}{/addJsDefL}
+	{addJsDefL name=wait_stage_msg}{l s='Waitting' js=1}{/addJsDefL}
+	{addJsDefL name=pending_state_msg}{l s='Pending...' js=1}{/addJsDefL}
+	{addJsDefL name=mail_sending_err}{l s='Some error occurred while sending mail to the customer' js=1}{/addJsDefL}
+	{addJsDefL name=refund_request_sending_error}{l s='Some error occurred while processing request for order cancellation.' js=1}{/addJsDefL}
+{/strip}

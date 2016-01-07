@@ -12,6 +12,10 @@ class HotelOrderStatus extends ObjectModel
 		),
 	);
 
+	/**
+	 * [getAllHotelOrderStatus :: To get array all possible order statuses]
+	 * @return [array|boolean] [If data found then Returns array of the order statuses else returns false]
+	 */
 	public static function getAllHotelOrderStatus()
 	{
 		$result = Db::getInstance()->executeS("SELECT * FROM `"._DB_PREFIX_."htl_order_status`");

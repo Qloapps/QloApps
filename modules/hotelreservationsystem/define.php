@@ -10,4 +10,9 @@
 	require_once ('classes/HotelRoomAllotmentType.php');
 	require_once ('classes/HotelBookingDetail.php');
 	require_once ('classes/HotelCartBookingData.php');
+	require_once ('classes/HotelAdvancedPayment.php');
+	require_once ('classes/HotelCustomerAdvancedPayment.php');
+	require_once ('classes/HotelOrderRefundRules.php');
+	require_once ('classes/HotelOrderRefundInfo.php');
+	require_once ('classes/HotelOrderRefundStages.php');
 ?>

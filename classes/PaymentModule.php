@@ -280,7 +280,6 @@ abstract class PaymentModuleCore extends Module
 						$order->id_carrier = 0;
 						$id_carrier = 0;
 					}
-
 					$order->id_customer = (int)$this->context->cart->id_customer;
 					$order->id_address_invoice = (int)$this->context->cart->id_address_invoice;
 					$order->id_address_delivery = (int)$id_address;
@@ -697,12 +696,30 @@ abstract class PaymentModuleCore extends Module
 						$delivery = new Address($order->id_address_delivery);
 						$delivery_state = $delivery->id_state ? new State($delivery->id_state) : false;
 						$invoice_state = $invoice->id_state ? new State($invoice->id_state) : false;
-						
+
 						//by webkul changing mail format
 						$cart_booking_data = $this->cartBookingDataForMail($order);
 						$cart_booking_data_text = $this->getEmailTemplateContent('hotel-booking-cart-data.text', Mail::TYPE_TEXT, $cart_booking_data);
 						$cart_booking_data_html = $this->getEmailTemplateContent('hotel-booking-cart-data.tpl', Mail::TYPE_HTML, $cart_booking_data);
+
+						//For Advanced Payment
+						$obj_customer_adv = new HotelCustomerAdvancedPayment();
+						$order_adv_dtl = $obj_customer_adv->getCstAdvPaymentDtlByIdOrder($order->id);
+						if ($order_adv_dtl) 
+						{
+							$order_adv_dtl['total_due_amount'] = $order_adv_dtl['total_order_amount'] - $order_adv_dtl['total_paid_amount'];
+							
+							$order_adv_dtl['total_paid_amount'] = Tools::displayPrice($order_adv_dtl['total_paid_amount'], $this->context->currency, false);
+							$order_adv_dtl['total_order_amount'] = Tools::displayPrice($order_adv_dtl['total_order_amount'], $this->context->currency, false);
+							$order_adv_dtl['total_due_amount'] = Tools::displayPrice($order_adv_dtl['total_due_amount'], $this->context->currency, false);
+						}
+
+						$adv_data_html = $this->getEmailTemplateContent('advanced-book-data.tpl', Mail::TYPE_HTML, $order_adv_dtl);
+						$adv_data_text = $this->getEmailTemplateContent('advanced-book-data.txt', Mail::TYPE_TEXT, $order_adv_dtl);
+
 						$data = array(
+						'{adv_data_html}' => $adv_data_html,//by webkul
+						'{adv_data_text}' => $adv_data_text,//by webkul
 						'{cart_booking_data_html}' => $cart_booking_data_html,//by webkul
 						'{firstname}' => $this->context->customer->firstname,
 						'{lastname}' => $this->context->customer->lastname,
@@ -787,6 +804,8 @@ abstract class PaymentModuleCore extends Module
 								$file_attachement,
 								null, _PS_MAIL_DIR_, false, (int)$order->id_shop
 							);
+
+						// ddd('rohit');
 					}
 
 					// updates stock in shops

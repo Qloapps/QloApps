@@ -2,7 +2,7 @@
 <module>
 	<name>wkhotelfeaturesblock</name>
 	<displayName><![CDATA[Hotel Features]]></displayName>
-	<version><![CDATA[1.6.0]]></version>
+	<version><![CDATA[0.0.2]]></version>
 	<description><![CDATA[Shows Hotel Features using this module.]]></description>
 	<author><![CDATA[webkul]]></author>
 	<tab><![CDATA[front_office_features]]></tab>

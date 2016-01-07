@@ -1,0 +1,16 @@
+
+[{shop_url}] 
+
+Olá {firstname} {lastname}, 
+
+{reply} 
+
+Por favor, não responda diretamente este e-mail, nós não
+receberemos sua mensagem. 
+
+favor utilizar este link {link} [{link}] para
+responder. 
+
+{shop_name} [{shop_url}] baseado em
+PrestaShop(tm) [http://www.prestashop.com/] 
+

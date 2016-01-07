@@ -389,7 +389,7 @@ UPDATE `PREFIX_configuration` SET `value` = IF((SELECT value FROM PREFIX_configu
 DROP TABLE PREFIX_configuration_tmp;
 
 INSERT INTO `PREFIX_configuration` (`name`, `value`, `date_add`, `date_upd`) VALUES ('PS_CIPHER_ALGORITHM', 0, NOW(), NOW());
-INSERT INTO `PREFIX_configuration` (`name`, `value`, `date_add`, `date_upd`) VALUES ('PS_ORDER_PROCESS_TYPE', 0, NOW(), NOW());
+INSERT INTO `PREFIX_configuration` (`name`, `value`, `date_add`, `date_upd`) VALUES ('PS_ORDER_PROCESS_TYPE', 1, NOW(), NOW());
 
 ALTER TABLE `PREFIX_product` ADD `minimal_quantity` INT NOT NULL DEFAULT '1' AFTER `quantity`;
 ALTER TABLE `PREFIX_product` ADD `cache_default_attribute` int(10) unsigned default NULL AFTER `indexed`;

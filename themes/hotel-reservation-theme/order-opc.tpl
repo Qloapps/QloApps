@@ -34,10 +34,17 @@
 	<h2 id="cart_title">{l s='Your shopping cart'}</h2>
 	<p class="alert alert-warning">{l s='Your new order was not accepted.'}</p>
 {else}
-	{if $productNumber}
+	{if $productNumber && isset($cart_htl_data)}
 		<!-- Shopping Cart -->
+		{if $cartChanged}
+			<p class="alert alert-danger">{l s='Your Booking Cart has been changed automatically as some rooms in your booking cart has been booked by another customer.'}</p>
+		{/if}
 
 		{include file="$tpl_dir./shopping-cart.tpl"}
+
+		<!-- Advanced Payment Options -->
+		{include file="$tpl_dir./order-opc-advanced-payment-option.tpl"}
+
 		<!-- End Shopping Cart -->
 		{if !$is_logged}
 			<!-- Create account / Guest account / Login block -->
@@ -55,6 +62,11 @@
 		{capture name=path}{l s='Your shopping cart'}{/capture}
 		<h2 class="page-heading">{l s='Your shopping cart'}</h2>
 		{include file="$tpl_dir./errors.tpl"}
+
+		{if $cartChanged}
+			<p class="alert alert-danger">{l s='Your Booking Cart has been changed automatically as some rooms in your booking cart has been booked by another customer.'}</p>
+		{/if}
+
 		<p class="alert alert-warning">{l s='Your shopping cart is empty.'}</p>
 	{/if}
 {strip}

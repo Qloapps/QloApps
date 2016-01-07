@@ -26,12 +26,22 @@ class HotelRoomInformation extends ObjectModel
 		),
 	);
 
+	/**
+	 * [deleteByProductId :: To delete all rooms information which belongs to a room type(which is a product in real) By product id]
+	 * @param  [int] $id_product [Id of the product form which all rooms information to be deleted]
+	 * @return [Boolean]         [Returns true if deleted successfully else returns false]
+	 */
 	public function deleteByProductId($id_product)
 	{
 		$delete = Db::getInstance()->delete('htl_room_information', '`id_product`='.(int)$id_product);
 		return $delete;
 	}
 
+	/**
+	 * [getHotelRoomInfoByProductId :: To get all rooms information belong to a room type(product) by product id]
+	 * @param  [int] $id_product [Id of the product]
+	 * @return [array|false]     [If data found returns array containing all rooms information belongs to a room type(product) which product id is passed else returns false]
+	 */
 	public function getHotelRoomInfoByProductId($id_product)
 	{
 		$result = Db::getInstance()->executeS('SELECT * FROM `'._DB_PREFIX_.'htl_room_information` WHERE `id_product`='.$id_product);
@@ -40,6 +50,24 @@ class HotelRoomInformation extends ObjectModel
 		return false;
 	}
 
+	/**
+	 * [getHotelRoomInfo :: To get all rooms information belong to a room type(product) and belongss to a hotel wwhich hotel id is 								passed]
+	 * @param  [type]  $id_product [Id of the room type(product)]
+	 * @param  [type]  $id_hotel   [Id of the hotel]
+	 * @param  [int] $is_getNum  [
+	 *                           If $is_getNum is passed
+	 *                           	 then returns number of rooms belong to a room type(product) and belongss to a hotel wwhich hotel 									id is passed
+	 *                           else 
+	 *                             	Returns array containing all rooms information belong to a room type(product) and belongss to 										a hotel wwhich hotel id is passed
+	 *                           	  	 ]
+	 * @return [array|int|boolean] [If $is_getNum is passed
+	 *                           	 then returns number of rooms belong to a room type(product) and belongss to a hotel wwhich hotel 									id is passed
+	 *                           else 
+	 *                             	if data found 
+	 *                             		Returns array containing all rooms information belong to a room type(product) and belongss to 										a hotel wwhich hotel id is passed
+	 *                             	else
+	 *                             	returns false; ]
+	 */
 	public function getHotelRoomInfo($id_product, $id_hotel, $is_getNum = 0)
 	{
 		$sql = "SELECT `id`, `id_hotel`, `room_num`, `id_status`, `floor`, `comment` FROM `"._DB_PREFIX_."htl_room_information` WHERE `id_product` = ".$id_product." AND `id_hotel` = ".$id_hotel;
@@ -61,6 +89,11 @@ class HotelRoomInformation extends ObjectModel
 
 	}
 
+	/**
+	 * [getHotelRoomInfoById :: To get Information of a room by its id(primary key)]
+	 * @param  [int] $id         [id of the room in the table(primary key)]
+	 * @return [array|false]     [If data found returns array containing information of the room which id is passed else returns false]
+	 */
 	public function getHotelRoomInfoById($id)
 	{
 		$sql = "SELECT `room_num` FROM `"._DB_PREFIX_."htl_room_information` WHERE `id` = ".$id;
@@ -72,6 +105,12 @@ class HotelRoomInformation extends ObjectModel
 			return false;
 	}
 
+	/**
+	 * Deprecated
+	 * [deleteHotelRoomInfoById :: To delete room information which id is passed]
+	 * @param  [int] $id_room_info [Id of the room which information(row in the table) to be deleted]
+	 * @return [Boolean]         [Returns true if deleted successfully else returns false]
+	 */
 	public function deleteHotelRoomInfoById($id_room_info)
 	{
 		$result = Db::getInstance()->delete('htl_room_information', '`id` = '.(int)$id_room_info, 1);
@@ -79,7 +118,7 @@ class HotelRoomInformation extends ObjectModel
 		return $result;
 	}
 
-	Public function getHotelDataByBookingInfo($date_from,$date_to,$room_type=false,$hotel_id,$num_rooms)
+	/*Public function getHotelDataByBookingInfo($date_from,$date_to,$room_type=false,$hotel_id,$num_rooms)
 	{
 		if ($room_type)
 		{
@@ -174,5 +213,5 @@ class HotelRoomInformation extends ObjectModel
 			return $rooms_info;
 		else
 			return false;
-	}
+	}*/
 }

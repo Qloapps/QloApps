@@ -1,0 +1,16 @@
+
+[{shop_url}] 
+
+Halo {firstname} {lastname}, 
+
+Voucher telah dibuatkan bagi Anda karena telah melakukan pembelian
+dengan kode referensi {order_name}.
+
+KODE VOUCHER: {voucher_num} senilai {voucher_amount}
+
+Cukup copy/paste kode berikut pada saat proses pembayaran di
+pembelian Anda selanjutnya. 		 
+
+{shop_name} [{shop_url}] didukung oleh
+PrestaShop(tm) [http://www.prestashop.com/] 
+

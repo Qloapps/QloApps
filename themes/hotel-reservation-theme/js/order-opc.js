@@ -22,7 +22,25 @@
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
-$(document).ready(function(){
+$(document).ready(function()
+{
+	// BY WEBKUL
+	// FOR ADVANCED PAYMENT
+	var payment_type = $(".payment_type:checked").val();
+	if (payment_type == 1) 
+		$("#partial_data").hide();
+	else if (payment_type == 2) 
+		$("#partial_data").show();
+
+	$(".payment_type").on('change',function()
+	{
+		var payment_type = $(".payment_type:checked").val();
+		if (payment_type == 1) 
+			$("#partial_data").slideUp();
+		else if (payment_type == 2) 
+			$("#partial_data").slideDown();
+	});
+
 	// GUEST CHECKOUT / NEW ACCOUNT MANAGEMENT
 	if ((typeof isLogged == 'undefined' || !isLogged) || (typeof isGuest !== 'undefined' && isGuest))
 	{

@@ -1,0 +1,14 @@
+
+[{shop_url}] 
+
+Halo {firstname} {lastname}, 
+
+{employee} ingin meneruskan diskusi ini kepada Anda. 
+
+RIWAYAT DISKUSI: {messages}
+
+{employee} menambahkan "{comment}" 		 
+
+{shop_name} [{shop_url}] didukung oleh
+PrestaShop(tm) [http://www.prestashop.com/] 
+

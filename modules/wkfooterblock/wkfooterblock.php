@@ -8,7 +8,7 @@ class WkFooterBlock extends Module
 	{
 		$this->name = 'wkfooterblock';
 		$this->tab = 'front_office_features';
-		$this->version = '1.6.1';
+		$this->version = '0.0.2';
 		$this->author = 'webkul';
 		$this->need_instance = 0;
 

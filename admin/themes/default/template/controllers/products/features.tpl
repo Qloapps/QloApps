@@ -54,7 +54,7 @@
 				<td>{$available_feature.name}</td>
 				<td>
 					<input type="hidden" id="feature_{$available_feature.id_feature}_value" name="feature_{$available_feature.id_feature}_value" value="{$value.id_feature_value}">
-					<img height="40px" width="40px" src="{$base_url}img/rf/{$value.value}" title="Room image" />
+					<img class="img img-responsive" width="15px" src="{$base_url}img/rf/{$value.value}" title="Room image" />
 				</td>
 				{/foreach}
 				<!--<td>

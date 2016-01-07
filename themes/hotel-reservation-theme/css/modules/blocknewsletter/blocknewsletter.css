@@ -34,10 +34,15 @@
             width: 350px;
             margin: 10px auto 0px;
         }}
+        @media (max-width: 400px) {
+            #newsletter_block_left .block_content
+              {
+                  width: 273px;
+              }}
   @media (max-width: 767px) {
     #footer #newsletter_block_left {
-      width: 100%;
-      height: 135px; } }
+      /*width: 100%;*/
+      height: auto; } }
   #footer #newsletter_block_left h4 {
     background: none;
     float: left;
@@ -61,6 +66,12 @@
       padding: 10px 43px 10px 12px;
       display: inline-block;
       float: left; }
+      @media (max-width: 400px) {
+        #footer #newsletter_block_left .form-group .form-control{
+          padding: 7px 43px 7px 6px;
+          height: 37px;
+        }
+      }
       #footer #newsletter_block_left .form-group .form-control:focus {
         -moz-box-shadow: black 0px 0px 0px;
         -webkit-box-shadow: black 0px 0px 0px;
@@ -97,6 +108,11 @@
         clear: none; } }
   #footer #newsletter_block_left .newsletter-input {
     max-width: 230px !important; }/*by webkul original 300px*/
+    @media (max-width: 400px) {
+      #footer #newsletter_block_left .newsletter-input {
+        max-width: 190px !important;
+      }
+    }
 
 #newsletter-input::-webkit-input-placeholder {
    color: #ffffff;
@@ -115,3 +131,34 @@
 }
 
 /*# sourceMappingURL=blocknewsletter.css.map */
+
+.submitNewsletter
+{
+  background-color: #bf9958;
+  padding-right: 25px;
+  padding-left: 25px;
+  color: #ffffff;
+  font-size:16px;
+  font-family: 'PT Serif', serif;
+  font-weight:400;
+  border: 2px solid #ffffff;
+  margin-left: 30px; }
+  @media (max-width: 400px) {
+      .submitNewsletter {
+        font-size: 13px;
+        margin-left: 20px;
+        padding-left: 15px;
+        padding-right: 15px;
+      }
+    }
+#newsletter-input
+{
+  background-color: #bf9958!important;
+  border: none!important;
+  border-bottom: 2px solid #ffffff!important;
+  color: #ffffff!important;
+  font-size:16px!important;
+  font-family: 'PT Serif', serif!important;
+  font-weight:400!important;
+  padding-right: 0px!important;
+}

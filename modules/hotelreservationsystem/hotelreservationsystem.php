@@ -1,6 +1,7 @@
 <?php
 if (!defined('_PS_VERSION_'))
     exit;
+
 require_once ('define.php');
 
 class HotelReservationSystem extends Module
@@ -9,7 +10,7 @@ class HotelReservationSystem extends Module
     public function __construct()
     {
         $this->name = 'hotelreservationsystem';
-        $this->version = '1.6.1';
+        $this->version = '0.0.2';
         $this->author = 'Webkul';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -17,6 +18,34 @@ class HotelReservationSystem extends Module
         $this->displayName = $this->l('Hotel Booking and Reservation System');
         $this->description = $this->l('Now you can be able to build your website for your hotels for their bookings and reservations by using this module.');
         $this->confirmUninstall = $this->l('Are you sure? All module data will be lost after uninstalling the module');
+    }
+
+    public function hookFooter($params)
+    {
+        /*id_guest is set to the context->cookie object because data mining for prestashop module is disabled in which id_guest was set before this*/
+        if (!isset($this->context->cookie->id_guest)) 
+            Guest::setNewGuest($this->context->cookie);
+
+        // ddd($this->_path);
+        // $this->context->controller->addCSS(($this->_path).'footertop.css', 'all');
+        $this->context->smarty->assign(array(
+            'HOOK_FOOTER_TOP'        => Hook::exec('displayFooterTop'),          // Hook created By Webkul
+        ));
+
+        $global_email = Configuration::get('WK_HOTEL_GLOBAL_CONTACT_EMAIL');
+        if (!$global_email)
+            $global_email = Configuration::get('PS_SHOP_EMAIL');
+
+        $global_contact_num = Configuration::get('WK_HOTEL_GLOBAL_CONTACT_NUMBER');
+        if (!$global_contact_num)
+            $global_contact_num = 9999999999;
+
+        $this->context->smarty->assign(array(
+            'hotel_global_email'        => $global_email,
+            'hotel_global_contact_num'  => $global_contact_num,
+        ));
+        
+        return $this->display(__FILE__, 'footertop.tpl');
     }
 
     public function hookActionProductDelete($params)
@@ -85,38 +114,182 @@ class HotelReservationSystem extends Module
         $order = $data['order'];
         $customer = $data['customer'];
 
-        $cart_products = $cart->getProducts();
+        $obj_cart_bk_data = new HotelCartBookingData();
+        $obj_htl_bk_dtl = new HotelBookingDetail();
+        $obj_rm_type = new HotelRoomType();
         
+        $cart_products = $cart->getProducts();
+
+        // Deprecated in future
+        // For Cart Lock
+        // $this->is_back_order = 0;
+        // foreach ($cart_products as $t_key => $t_value) 
+        // {
+        //     $rm_dtl = $obj_rm_type->getRoomTypeInfoByIdProduct($t_value['id_product']);
+        //     $cart_bk_data = $obj_cart_bk_data->getOnlyCartBookingData($cart->id, $cart->id_guest, $t_value['id_product']);
+
+        //     $cart_data = array();
+        //     foreach ($cart_bk_data as $cd_key => $cd_val) 
+        //     {
+        //         $date_join = strtotime($cd_val['date_from']).strtotime($cd_val['date_to']);
+
+        //         $cart_data[$date_join]['date_from'] = $cd_val['date_from'];
+        //         $cart_data[$date_join]['date_to'] = $cd_val['date_to'];
+        //         $cart_data[$date_join]['id_rms'][] = $cd_val['id_room'];
+        //     }
+
+        //     foreach ($cart_data as $cl_key => $cl_val) 
+        //     {
+        //         $avai_rm = $obj_htl_bk_dtl->DataForFrontSearch($cl_val['date_from'], $cl_val['date_to'], $rm_dtl['id_hotel'], $t_value['id_product'], 1);
+
+        //         if (count($avai_rm['rm_data'][0]['data']['available']) < count($cl_val['id_rms']))
+        //         {
+        //             foreach ($cl_val['id_rms'] as $cr_key => $cr_val) 
+        //             {
+        //                 $isRmBooked = $obj_htl_bk_dtl->chechRoomBooked($cr_val, $cl_val['date_from'], $cl_val['date_to']);
+        //                 if ($isRmBooked) 
+        //                 {
+        //                     $this->is_back_order = 1;         // Use for change in order status
+
+        //                     $updData = array('is_back_order' => 1);
+        //                     $updBy = array('id_cart' => $cart->id,
+        //                                     'id_room' => $cr_val,
+        //                                     'date_from' => $cl_val['date_from'],
+        //                                     'date_to' => $cl_val['date_to']);
+
+        //                     $obj_cart_bk_data->updateCartBookingData($updData, $updBy);
+        //                 }
+        //             }
+        //         }
+        //         else
+        //         {
+        //             foreach ($cl_val['id_rms'] as $cr_key => $cr_val) 
+        //             {
+        //                 $isRmBooked = $obj_htl_bk_dtl->chechRoomBooked($cr_val, $cl_val['date_from'], $cl_val['date_to']);
+        //                 if ($isRmBooked) 
+        //                 {
+        //                     foreach ($avai_rm['rm_data'][0]['data']['available'] as $av_key => $av_val) 
+        //                     {
+        //                         if (!in_array($av_val['id_room'], $cl_val['id_rms'])) 
+        //                         {
+        //                             $cl_val['id_rms'][$cr_key] = $av_val['id_room'];
+
+        //                             $updData = array('id_room' => $av_val['id_room']);
+        //                             $updBy = array('id_cart' => $cart->id,
+        //                                             'id_room' => $cr_val,
+        //                                             'date_from' => $cl_val['date_from'],
+        //                                             'date_to' => $cl_val['date_to']);
+
+        //                             $obj_cart_bk_data->updateCartBookingData($updData, $updBy);
+        //                             unset($avai_rm['rm_data'][0]['data']['available'][$av_key]);
+        //                             break;
+        //                         }
+        //                     }
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
+
         foreach ($cart_products as $k => $v) 
         {
-        	$obj_cart_bk_data = new HotelCartBookingData();
-        	$cart_bk_data = $obj_cart_bk_data->getOnlyCartBookingData($cart->id, $cart->id_guest, $v['id_product']);
-        	if ($cart_bk_data) 
-        	{
-        		foreach ($cart_bk_data as $cb_k => $cb_v) 
-        		{
-        			$obj_cart_bk_data = new HotelCartBookingData($cb_v['id']);
-        			$obj_cart_bk_data->id_order = $order->id;
-        			$obj_cart_bk_data->id_customer = $customer->id;
-        			$obj_cart_bk_data->save();
+            $obj_cart_bk_data = new HotelCartBookingData();
+            $cart_bk_data = $obj_cart_bk_data->getOnlyCartBookingData($cart->id, $cart->id_guest, $v['id_product']);
+            if ($cart_bk_data) 
+            {
+                foreach ($cart_bk_data as $cb_k => $cb_v) 
+                {
+                    $obj_cart_bk_data = new HotelCartBookingData($cb_v['id']);
+                    $obj_cart_bk_data->id_order = $order->id;
+                    $obj_cart_bk_data->id_customer = $customer->id;
+                    $obj_cart_bk_data->save();
 
-        			$obj_htl_bk_dtl = new HotelBookingDetail();
-        			$obj_htl_bk_dtl->id_product = 	$v['id_product'];
-					$obj_htl_bk_dtl->id_order = 	$order->id;
-					$obj_htl_bk_dtl->id_cart = 		$cart->id;
-					$obj_htl_bk_dtl->id_room = 		$obj_cart_bk_data->id_room;
-					$obj_htl_bk_dtl->id_hotel = 	$obj_cart_bk_data->id_hotel;
-					$obj_htl_bk_dtl->id_customer = 	$customer->id;
-					$obj_htl_bk_dtl->booking_type = $obj_cart_bk_data->booking_type;
-					$obj_htl_bk_dtl->id_status = 	1;
-					$obj_htl_bk_dtl->comment = 		$obj_cart_bk_data->comment;
-					$obj_htl_bk_dtl->date_from = 	$obj_cart_bk_data->date_from;
-					$obj_htl_bk_dtl->date_to = 		$obj_cart_bk_data->date_to;
-					$obj_htl_bk_dtl->save();
-        		}
-        	}
+                    $obj_htl_bk_dtl = new HotelBookingDetail();
+                    $obj_htl_bk_dtl->id_product =   $v['id_product'];
+                    $obj_htl_bk_dtl->id_order =     $order->id;
+                    $obj_htl_bk_dtl->id_cart =      $cart->id;
+                    $obj_htl_bk_dtl->id_room =      $obj_cart_bk_data->id_room;
+                    $obj_htl_bk_dtl->id_hotel =     $obj_cart_bk_data->id_hotel;
+                    $obj_htl_bk_dtl->id_customer =  $customer->id;
+                    $obj_htl_bk_dtl->booking_type = $obj_cart_bk_data->booking_type;
+                    $obj_htl_bk_dtl->id_status =    1;
+                    $obj_htl_bk_dtl->comment =      $obj_cart_bk_data->comment;
+
+                    // For Back Order(Because of cart lock)
+                    if ($obj_cart_bk_data->is_back_order) 
+                        $obj_htl_bk_dtl->is_back_order = 1;
+
+                    $obj_htl_bk_dtl->date_from =    $obj_cart_bk_data->date_from;
+                    $obj_htl_bk_dtl->date_to =      $obj_cart_bk_data->date_to;
+                    $obj_htl_bk_dtl->save();
+                }
+            }
+        }
+
+        // For Advanced Payment
+        if (Configuration::get('WK_ALLOW_ADVANCED_PAYMENT'))
+        {
+            $obj_customer_adv = new HotelCustomerAdvancedPayment();
+            $customer_adv_dtl = $obj_customer_adv->getClientAdvPaymentDtl($cart->id, $cart->id_guest);
+            if ($customer_adv_dtl) 
+            {
+                $obj_customer_adv = new HotelCustomerAdvancedPayment($customer_adv_dtl['id']);
+
+                $obj_customer_adv->id_customer = $customer->id;
+                $obj_customer_adv->id_order = $order->id;
+                
+                //if currency is changed before order
+                if ($cart->id_currency != $obj_customer_adv->id_currency)
+                {
+                    $obj_customer_adv->total_paid_amount = Tools::convertPriceFull($obj_customer_adv->total_paid_amount, new Currency($obj_customer_adv->id_currency), new Currency($cart->id_currency));
+
+                    $order_amt = $order->total_paid;
+                    $obj_customer_adv->id_currency = $cart->id_currency;
+                } 
+                else
+                    $order_amt = $order->total_paid;
+
+                $obj_customer_adv->total_order_amount = $order_amt;
+                $obj_customer_adv->save();
+            }
         }
     }
+
+    // Deprecated in future
+    // change order status in case of cart lock
+    // public function hookActionOrderHistoryAddAfter($data)
+    // {
+    //     $order_history = $data['order_history'];
+    //     $order = new Order((int)$order_history->id_order);
+        
+    //     if ($order->getCurrentState() != 9) 
+    //     {
+    //         if ($this->is_back_order) 
+    //         {
+    //             if ($order->payment == 'Bank wire')
+    //             {
+    //                 $mailVars = array(
+    //                     '{bankwire_owner}' => Configuration::get('BANK_WIRE_OWNER'),
+    //                     '{bankwire_details}' => nl2br(Configuration::get('BANK_WIRE_DETAILS')),
+    //                     '{bankwire_address}' => nl2br(Configuration::get('BANK_WIRE_ADDRESS'))
+    //                 );
+    //             }
+    //             elseif ($order->payment == 'Payment by check') 
+    //             {
+    //                 $mailVars = array(
+    //                     '{cheque_name}' => Configuration::get('CHEQUE_NAME'),
+    //                     '{cheque_address}' => Configuration::get('CHEQUE_ADDRESS'),
+    //                     '{cheque_address_html}' => str_replace("\n", '<br />', Configuration::get('CHEQUE_ADDRESS')));
+    //             }
+
+    //             $extra_vars = $mailVars;
+    //             $new_history = new OrderHistory();
+    //             $new_history->id_order = (int)$order_history->id_order;
+    //             $new_history->changeIdOrderState(9, $order, true);
+    //             $new_history->addWithemail(true, $extra_vars);
+    //         }
+    //     }
+    // }
 
     public function hookDisplayBackOfficeHeader()
     {
@@ -128,8 +301,10 @@ class HotelReservationSystem extends Module
         $this->installTab('AdminHotelReservationSystemManagement', 'Hotel Reservation System');
         $this->installTab('AdminHotelRoomsBooking', 'Book Now', 'AdminHotelReservationSystemManagement');
         $this->installTab('AdminHotelConfigurationSetting', 'Settings', 'AdminHotelReservationSystemManagement');
-        $this->installTab('AdminAddHotel', 'Add Hotel', 'AdminHotelReservationSystemManagement');
+        $this->installTab('AdminAddHotel', 'Manage Hotel', 'AdminHotelReservationSystemManagement');
         $this->installTab('AdminHotelFeatures', 'Manage Hotel Features', 'AdminHotelReservationSystemManagement');
+        $this->installTab('AdminOrderRefundRules', 'Manage Order Refund Rules', 'AdminHotelReservationSystemManagement');
+        $this->installTab('AdminOrderRefundRequests', 'Manage Order Refund Requests', 'AdminHotelReservationSystemManagement');
         return true;
     }
 
@@ -145,6 +320,10 @@ class HotelReservationSystem extends Module
         Configuration::updateValue('WK_HOTEL_GLOBAL_CONTACT_NUMBER', 9999999999);
         Configuration::updateValue('WK_TITLE_HEADER_BLOCK', $home_banner_default_title);
         Configuration::updateValue('WK_CONTENT_HEADER_BLOCK', $home_banner_default_content);
+
+        Configuration::updateValue('WK_ALLOW_ADVANCED_PAYMENT', 1);
+        Configuration::updateValue('WK_ADVANCED_PAYMENT_GLOBAL_MIN_AMOUNT', 10);
+        Configuration::updateValue('WK_ADVANCED_PAYMENT_INC_TAX', 1);
 
         return true;
     }
@@ -518,7 +697,13 @@ class HotelReservationSystem extends Module
             $tab->id_parent = 0;
         
         $tab->module = $this->name;
-        return $tab->add();
+        $res = $tab->add();
+        if ($tab_name == 'Hotel Reservation System')
+        {
+            $objTab = new Tab($tab->id);
+            $objTab->updatePosition(0, 5);
+        }
+        return $res;
     }
     
     public function install()
@@ -547,7 +732,9 @@ class HotelReservationSystem extends Module
             || !$this->insertHotelOrderStatus()
             || !$this->insertHotelRoomAllotmentType()
             || !$this->createDummyDataForProject()
+            || !$this->registerHook('footer')
             || !$this->registerHook('actionValidateOrder')
+            || !$this->registerHook('actionOrderHistoryAddAfter')
             || !$this->registerHook('displayBackOfficeHeader')
             || !$this->registerHook('actionProductDelete')
         )
@@ -569,6 +756,11 @@ class HotelReservationSystem extends Module
             `'._DB_PREFIX_.'htl_order_status`,
             `'._DB_PREFIX_.'htl_room_allotment_type`,
             `'._DB_PREFIX_.'htl_cart_booking_data`,
+            `'._DB_PREFIX_.'htl_order_refund_stages`,
+            `'._DB_PREFIX_.'htl_order_refund_info`,
+            `'._DB_PREFIX_.'htl_order_refund_rules`,
+            `'._DB_PREFIX_.'htl_customer_adv_payment`,
+            `'._DB_PREFIX_.'htl_advance_payment`,
             `'._DB_PREFIX_.'htl_room_type`');
     }
         
@@ -578,6 +770,8 @@ class HotelReservationSystem extends Module
         $this->uninstallTab('AdminHotelConfigurationSetting');
         $this->uninstallTab('AdminAddHotel');
         $this->uninstallTab('AdminHotelFeatures');
+        $this->uninstallTab('AdminHotelReservationSystemManagement');
+        $this->uninstallTab('AdminOrderRefundRequests');
         $this->uninstallTab('AdminHotelReservationSystemManagement');
         return true;
     }
@@ -605,7 +799,19 @@ class HotelReservationSystem extends Module
 
     public function deleteConfigVars()
     {
-        $var = array('WK_HOTEL_LOCATION_ENABLE', 'WK_ROOM_LEFT_WARNING_NUMBER', 'WK_HOTEL_GLOBAL_CONTACT_EMAIL', 'WK_HOTEL_GLOBAL_CONTACT_NUMBER');
+        $var = array('WK_HOTEL_LOCATION_ENABLE', 
+                     'WK_ROOM_LEFT_WARNING_NUMBER', 
+                     'WK_HOTEL_GLOBAL_CONTACT_EMAIL', 
+                     'WK_HOTEL_GLOBAL_CONTACT_NUMBER',
+                     'WK_HTL_ESTABLISHMENT_YEAR',
+                     'WK_HTL_CHAIN_NAME',
+                     'WK_TITLE_HEADER_BLOCK',
+                     'WK_CONTENT_HEADER_BLOCK',
+                     'WK_HTL_HEADER_IMAGE',
+                     'WK_ALLOW_ADVANCED_PAYMENT',
+                     'WK_ADVANCED_PAYMENT_GLOBAL_MIN_AMOUNT',
+                     'WK_ADVANCED_PAYMENT_INC_TAX',
+                     );
 
         foreach ($var as $key)
             if (!Configuration::deleteByName($key))

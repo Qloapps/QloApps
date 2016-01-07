@@ -89,16 +89,23 @@ class ProductControllerCore extends FrontController
 			$check_in = Tools::getValue('check_in_time');
 			$check_out = Tools::getValue('check_out_time');
 
+			$check_in = date("Y-m-d", strtotime($check_in));
+			$check_out = date("Y-m-d", strtotime($check_out));
+
+			$curr_date = date("Y-m-d");
+			
 			$error = false;
 
             if ($hotel_cat_id == '')
-                $error = 1;
-            elseif ($check_in == '' || !Validate::isDate($check_in))
-                $error = 1;
-            elseif ($check_out == '' || !Validate::isDate($check_out))
-                $error = 1;
-            elseif ($check_out <= $check_in)
-                $error = 1;
+				$error = 1;
+			elseif ($check_in == '' || !Validate::isDate($check_in))
+				$error = 2;
+			elseif ($check_out == '' || !Validate::isDate($check_out))
+				$error = 3;
+			elseif ($check_in < $curr_date)
+				$error = 5;
+			elseif ($check_out <= $check_in)
+				$error = 4;
 			
 			if (!$error)
 			{
@@ -255,10 +262,9 @@ class ProductControllerCore extends FrontController
 	// by webkul
 	private function checkRoomQuantityAvailability($id_product, $date_from, $date_to, $quantity)
 	{
-		$cart_context = $this->context->cart;
 		$obj_room_type = new HotelRoomType();
 		$room_info_by_id_product = $obj_room_type->getRoomTypeInfoByIdProduct($id_product);
-
+		$num_cart_rooms = 0;
 		if ($room_info_by_id_product)
 		{
 			$id_hotel = $room_info_by_id_product['id_hotel'];
@@ -268,15 +274,14 @@ class ProductControllerCore extends FrontController
 				$obj_booking_dtl = new HotelBookingDetail();
 				$hotel_room_data = $obj_booking_dtl->DataForFrontSearch($date_from, $date_to, $id_hotel, $id_product, 1, 0, 0, -1, 0, 0, $this->context->cart->id, $this->context->cart->id_guest);
 				$obj_htl_cart_booking_data = new HotelCartBookingData();
-				$num_cart_rooms = $obj_htl_cart_booking_data->getCountRoomsByIdCartIdProduct($cart_context->id, $id_product, $date_from, $date_to);
+				
+				if ($this->context->cart->id)
+					$num_cart_rooms = $obj_htl_cart_booking_data->getCountRoomsByIdCartIdProduct($this->context->cart->id, $id_product, $date_from, $date_to);
 				
 				$total_available_rooms = $hotel_room_data['stats']['num_avail'];
 				
 				if ($hotel_room_data)
 				{
-					if (!$num_cart_rooms)
-						$num_cart_rooms = 0;
-
 					if ($total_available_rooms >= $quantity)
 					{
 						$priceDisplay = Group::getPriceDisplayMethod(Group::getCurrent()->id);
@@ -417,8 +422,11 @@ class ProductControllerCore extends FrontController
 			if($this->product->customizable)
 				$customization_datas = $this->context->cart->getProductCustomization($this->product->id, null, true);
 			
-			// by webkul
+			#####################################################################
+			/*By webkul To send All needed Hotel Information on product.tpl*/
+			#####################################################################
 			
+			$total_available_rooms = 0;
 			$htl_features = array();
 			$obj_hotel_room_type = new HotelRoomType();
 			$room_info_by_product_id = $obj_hotel_room_type->getRoomTypeInfoByIdProduct($this->product->id);
@@ -461,37 +469,41 @@ class ProductControllerCore extends FrontController
 
 			$obj_booking_detail = new HotelBookingDetail();
 			$num_days = $obj_booking_detail->getNumberOfDays($date_from, $date_to);
-
-			$priceDisplay = Group::getPriceDisplayMethod(Group::getCurrent()->id);
-			if (!$priceDisplay || $priceDisplay == 2)
-			{
-				$price_tax = true;
-			}
-			elseif ($priceDisplay == 1)
-			{
-				$price_tax = false;
-			}
-
-			$price_tax_incl = Product::getPriceStatic($this->product->id, $price_tax);
+			$price_tax_incl = Product::getPriceStatic($this->product->id, HotelBookingDetail::useTax());
 			$total_price = $price_tax_incl*$num_days;
 
 			$obj_booking_dtl = new HotelBookingDetail();
 			$hotel_room_data = $obj_booking_dtl->DataForFrontSearch($date_from, $date_to, $hotel_id, $this->product->id, 1);
 
 			$obj_htl_cart_booking_data = new HotelCartBookingData();
-			$num_cart_rooms = $obj_htl_cart_booking_data->getCountRoomsByIdCartIdProduct($this->context->cart->id, $this->product->id, $date_from, $date_to);
-
+			
 			if ($hotel_room_data)
-				$total_available_rooms = $hotel_room_data['stats']['num_avail'] - $num_cart_rooms;
-			//end
+				$total_available_rooms = $hotel_room_data['stats']['num_avail'];
+			
+			if (isset($this->context->cart->id))
+			{
+				$num_cart_rooms = $obj_htl_cart_booking_data->getCountRoomsByIdCartIdProduct($this->context->cart->id, $this->product->id, $date_from, $date_to);
+				if ($num_cart_rooms)
+					$total_available_rooms = $total_available_rooms - $num_cart_rooms;
+			}
+			
 			$location_enable = Configuration::get('WK_HOTEL_LOCATION_ENABLE');
 
-			$hotel_branch_obj = new HotelBranchInformation();
-			$hotel_info = $hotel_branch_obj->getActiveHotelBranchesInfo();
+			$hotel_branch_obj = new HotelBranchInformation($hotel_id);
+			if ($location_enable)
+				$hotel_info = $hotel_branch_obj->hotelBranchInfoByCategoryId($hotel_branch_obj->id_category);
+			else
+				$hotel_info = $hotel_branch_obj->getActiveHotelBranchesInfo();
 
-			$search_data['date_from'] = $date_from;
-	        $search_data['date_to'] = $date_to;
+			$search_data['date_from'] = date("d M Y", strtotime($date_from));
+            $search_data['date_to'] = date("d M Y", strtotime($date_to));
 	        $search_data['htl_dtl'] = $hotel_branch_obj->hotelBranchInfoById($hotel_id);
+
+	        $warning_num = Configuration::get('WK_ROOM_LEFT_WARNING_NUMBER');
+
+	        #####################################################################
+	        /*End*/
+	        #####################################################################
 
 	        if (Tools::getValue('error')) 
 	            $this->context->smarty->assign('error', Tools::getValue('error'));
@@ -505,7 +517,11 @@ class ProductControllerCore extends FrontController
 				'product' => $this->product,
 				'product_manufacturer' => new Manufacturer((int)$this->product->id_manufacturer, $this->context->language->id),
 				'token' => Tools::getToken(false),
-				//by webkul
+				
+				#####################################################################
+				/*Variable needed on product page sent by webkul*/
+				#####################################################################
+				'warning_num' => $warning_num,
 				'ratting_img_path' =>  _MODULE_DIR_.'hotelreservationsystem/views/img/Slices/icons-sprite.png',
 				'num_reviews' => ProductComment::getCommentNumber($this->product->id),
 				'ratting' => ProductComment::getAverageGrade($this->product->id)['grade'],
@@ -515,14 +531,18 @@ class ProductControllerCore extends FrontController
 				'total_price'=>$total_price,
 				'product_controller_url'=>$this->context->link->getPageLink('product'),
 				'num_days'=>$num_days,
-				'date_from'=>$date_from,
-				'date_to'=>$date_to,
+				'date_from'=> date("d M Y", strtotime($date_from)),
+				'date_to'=> date("d M Y", strtotime($date_to)),
 				'hotel_location'=>$hotel_location,
 				'hotel_name'=>$hotel_name,
 				'hotel_policies'=>$hotel_policies,
 				'hotel_features'=>$htl_features,
 				'ftr_img_src'=>_PS_IMG_.'rf/',
-				//end
+				'search_data' => $search_data,
+				#####################################################################
+				/*end*/
+				#####################################################################
+
 				'features' => $this->product->getFrontFeatures($this->context->language->id),
 				'attachments' => (($this->product->cache_has_attachments) ? $this->product->getAttachments($this->context->language->id) : array()),
 				'allow_oosp' => $this->product->isAvailableWhenOutOfStock((int)$this->product->out_of_stock),
@@ -547,7 +567,6 @@ class ProductControllerCore extends FrontController
 					'category-'.(isset($this->category) ? $this->category->getFieldByLang('link_rewrite') : '')
 				),
 				'display_discount_price' => Configuration::get('PS_DISPLAY_DISCOUNT_PRICE'),
-				'search_data' => $search_data,
 			));
 		}
 		$this->setTemplate(_PS_THEME_DIR_.'product.tpl');

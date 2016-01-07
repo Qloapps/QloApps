@@ -98,9 +98,9 @@
 					</button>
 					<ul class="dropdown-menu hotel_dropdown_ul">
 						{if isset($all_hotels_info) && $all_hotels_info}
-							{foreach $all_hotels_info as $name_val}
-								<li class="hotel_name" data-hotel-cat-id="{$name_val['id_category']}">
-									{$name_val['hotel_name']}
+							{foreach from=$all_hotels_info key=htl_k item=htl_v}
+								<li class="hotel_name" data-hotel-cat-id="{$htl_v['id_category']}">
+									{$htl_v['hotel_name']}
 								</li>
 							{/foreach}
 						{/if} 
@@ -110,7 +110,7 @@
 	        </div>
 
 	        <div class="form-group col-sm-2">
-				<label class="control-label" for="check_in_time">{l s='Check In Time' mod='wkroomsearchblock'}</label>
+				<label class="control-label" for="check_in_time">{l s='Check In Time'}</label>
 				<div class="input-group">
 					<input class="form-control" type="text" id="check_in_time" name="check_in_time" autocomplete="off" {if isset($search_data)}value="{$search_data['date_from']}"{/if}/>
 					<label class="input-group-addon calender-icon-cont" for="check_in_time"><i class="icon-calendar"></i></label>
@@ -119,7 +119,7 @@
 	        </div>
 
 	        <div class="form-group col-sm-2">
-				<label class="control-label" for="check_out_time">{l s='Check Out Time' mod='wkroomsearchblock'}</label>
+				<label class="control-label" for="check_out_time">{l s='Check Out Time'}</label>
 				<div class="input-group">
 					<input class="form-control" type="text" id="check_out_time" name="check_out_time" autocomplete="off" {if isset($search_data)}value="{$search_data['date_to']}"{/if}/>
 					<label class="input-group-addon calender-icon-cont" for="check_out_time"><i class="icon-calendar"></i></label>
@@ -128,7 +128,7 @@
 	        </div>
 
 	        <div class="col-sm-2">
-	          <button type="submit" class="btn btn-default button button-medium pull-right" name="product_page_search_submit" id="search_room_submit">{l s='Search Now' mod='wkroomsearchblock'}</button>
+	          <button type="submit" class="btn btn-default button button-medium pull-right" name="product_page_search_submit" id="search_room_submit">{l s='Search Now'}</button>
 	        </div>
 	      </form>
 		</div>
@@ -139,7 +139,7 @@
 		<div class="pb-left-column col-xs-12 col-sm-4 col-md-8" style="border:1px solid #cccccc">
 			<div class="room_hotel_name_block">
 				<div class="hotel_name_block">
-					<span>{$hotel_name}</span>
+					<span>{$product->name}&nbsp;-&nbsp;{$hotel_name}</span>
 				</div>
 				{for $foo=1 to 5}
 					{if $foo <= $ratting}
@@ -252,9 +252,10 @@
 					<div id="room_info_tab" class="tab-pane active">
 						<div id="room_info_tab_information">
 							<div class="info_margin_div room_description">
-								{$product->description}
+								{$product->description}<br>
+								<strong>{l s="Room features -"}</strong>
 								{foreach from=$features key=ftr_k item=ftr_v}
-									<img height="30px" width="30px" src="{$ftr_img_src}{$ftr_v.value}">
+									&nbsp;<img width="15px" src="{$ftr_img_src}{$ftr_v.value}">
 								{/foreach}
 							</div>
 							<div class="info_margin_div">
@@ -343,20 +344,22 @@
 						<div class="form-group unvail_rooms_cond_display">
 							<label for="" class="control-label">{l s='Total Amount'}</label>
 						   	<div class="total_price_block">
-						   		<p>
+						   		<p class="col-sm-5 text-center">
 						   			{convertPrice price=$total_price|floatval}
 						   		</p>
 						   	</div>
+						   	<div class="num_quantity_alert col-sm-7">
+								<p class="pull-right">
+									{l s='Hurry'}&nbsp;
+									<span class="num_searched_avail_rooms">
+										{$total_available_rooms}
+									</span>
+									&nbsp;{l s='Rooms Left!'}
+								</p>
+							</div>
 						</div>
-						<div class="num_quantity_alert" style="color: red;"><label></label>
-							<p class="pull-right">
-								{l s='Hurry'}&nbsp;
-								<span class="num_searched_avail_rooms">
-									{$total_available_rooms}
-								</span>
-								&nbsp;{l s='rooms left!'}
-							</p>
-						</div>
+
+						<!-- End -->
 						<div class="sold_out_alert">
 							<span>{l s='Sold Out !!'}</span>
 						</div>
@@ -741,5 +744,8 @@
 {addJsDefL name=out_of_stock_cond}{l s='No room is available for this period.' js=1}{/addJsDefL}
 {addJsDefL name=wrong_qty_cond}{l s='you are trying for a invalid quantity.' js=1}{/addJsDefL}
 
+<!-- By webkul variable needed in product.js -->
+{addJsDef total_avail_rms = $total_available_rooms}
+<!-- End -->
 {/strip}
 {/if}

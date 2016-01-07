@@ -69,7 +69,7 @@ class Blocknewsletter extends Module
 
 	public function install()
 	{
-		if (!parent::install() || !$this->registerHook(array('header', 'footer', 'actionCustomerAccountAdd')))
+		if (!parent::install() || !$this->registerHook(array('header', 'footer', 'displayFooterTop', 'actionCustomerAccountAdd')))
 			return false;
 
 		Configuration::updateValue('NW_SALT', Tools::passwdGen(16));
@@ -721,25 +721,32 @@ class Blocknewsletter extends Module
 		if (!isset($this->prepared) || !$this->prepared)
 			$this->_prepareHook($params);
 		$this->prepared = true;
-		//added by webkul
-		$global_email = Configuration::get('WK_HOTEL_GLOBAL_CONTACT_EMAIL');
-		if (!$global_email)
-			$global_email = Configuration::get('PS_SHOP_EMAIL');
+		// //added by webkul
+		// $global_email = Configuration::get('WK_HOTEL_GLOBAL_CONTACT_EMAIL');
+		// if (!$global_email)
+		// 	$global_email = Configuration::get('PS_SHOP_EMAIL');
 
-		$global_contact_num = Configuration::get('WK_HOTEL_GLOBAL_CONTACT_NUMBER');
-		if (!$global_contact_num)
-			$global_contact_num = 9999999999;
+		// $global_contact_num = Configuration::get('WK_HOTEL_GLOBAL_CONTACT_NUMBER');
+		// if (!$global_contact_num)
+		// 	$global_contact_num = 9999999999;
 		
-		$this->context->smarty->assign('hotel_global_email',$global_email);
-		$this->context->smarty->assign('hotel_global_contact_num',$global_contact_num);
-		//end
+		// $this->context->smarty->assign('hotel_global_email',$global_email);
+		// $this->context->smarty->assign('hotel_global_contact_num',$global_contact_num);
+		// end
 		return $this->display(__FILE__, 'blocknewsletter.tpl');
 	}
 
-	public function hookFooter($params)
+	// by webkul
+	public function hookDisplayFooterTop($params)
 	{
 		return $this->hookDisplayLeftColumn($params);
 	}
+
+	// By webkul
+	// public function hookFooter($params)
+	// {
+	// 	return $this->hookDisplayLeftColumn($params);
+	// }
 
 	public function hookdisplayMaintenance($params)
 	{

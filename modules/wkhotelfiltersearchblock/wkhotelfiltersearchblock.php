@@ -10,7 +10,7 @@ class wkHotelFilterSearchBlock extends Module
         $this->name = 'wkhotelfiltersearchblock';
         $this->author = 'webkul';
         $this->tab = 'front_office_features';
-        $this->version = '1.6.1.1';
+        $this->version = '0.0.2';
         $this->context = Context::getContext();
 
         $this->bootstrap = true;
@@ -48,16 +48,23 @@ class wkHotelFilterSearchBlock extends Module
                 $check_in = Tools::getValue('check_in_time');
                 $check_out = Tools::getValue('check_out_time');
 
+                $check_in = date("Y-m-d", strtotime($check_in));
+                $check_out = date("Y-m-d", strtotime($check_out));
+
+                $curr_date = date("Y-m-d");
+                
                 $error = false;
 
                 if ($hotel_cat_id == '')
                     $error = 1;
                 elseif ($check_in == '' || !Validate::isDate($check_in))
-                    $error = 1;
+                    $error = 2;
                 elseif ($check_out == '' || !Validate::isDate($check_out))
-                    $error = 1;
+                    $error = 3;
+                elseif ($check_in < $curr_date)
+                    $error = 5;
                 elseif ($check_out <= $check_in)
-                    $error = 1;
+                    $error = 4;
 
                 if (!$error)
                 {
@@ -97,11 +104,15 @@ class wkHotelFilterSearchBlock extends Module
                 $date_to = date('Y-m-d', strtotime($date_from)+ 86400);
 
             $search_data['parent_data'] = $parent_dtl;
-            $search_data['date_from'] = $date_from;
-            $search_data['date_to'] = $date_to;
+            $search_data['date_from'] = date("d M Y", strtotime($date_from));
+            $search_data['date_to'] = date("d M Y", strtotime($date_to));
             $search_data['htl_dtl'] = $hotel_branch_obj->hotelBranchInfoById(HotelBranchInformation::getHotelIdByIdCategory($htl_id_category));
 
-            $hotel_info = $hotel_branch_obj->getActiveHotelBranchesInfo();
+            if ($location_enable)
+                $hotel_info = $hotel_branch_obj->hotelBranchInfoByCategoryId($htl_id_category);
+            else
+                $hotel_info = $hotel_branch_obj->getActiveHotelBranchesInfo();
+            
             $this->context->smarty->assign(
                 array(
                     'search_data'=>$search_data,

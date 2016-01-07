@@ -93,9 +93,12 @@
 			<div class="col-xs-6 col-sm-3 box-stats color1" >
 				<a href="#start_products">
 					<div class="kpi-content">
-						<i class="icon-book"></i>
-						<span class="title">{l s='Products'}</span>
-						<span class="value">{sizeof($products)}</span>
+						<i class="icon icon-home"></i>
+						<!-- Original -->
+						<!-- <span class="title">{l s='Total'}</span>
+						<span class="value">{sizeof($products)}</span> -->
+						<span class="title">{l s='Total Rooms'}</span>
+						<span class="value">{$cart_detail_data|@count}</span>
 					</div>
 				</a>
 			</div>
@@ -139,7 +142,9 @@
 						</span>
 					{/if}
 					&nbsp;
-					{if $order->delivery_number}
+
+					<!-- By webkul to hide unneccessary data on order detail page -->
+					<!-- {if $order->delivery_number}
 						<a class="btn btn-default _blank"  href="{$link->getAdminLink('AdminPdf')|escape:'html':'UTF-8'}&amp;submitAction=generateDeliverySlipPDF&amp;id_order={$order->id|intval}">
 							<i class="icon-truck"></i>
 							{l s='View delivery slip'}
@@ -149,7 +154,8 @@
 							<i class="icon-remove"></i>
 							{l s='No delivery slip'}
 						</span>
-					{/if}
+					{/if} -->
+					<!-- End -->
 					&nbsp;
 					{if Configuration::get('PS_ORDER_RETURN')}
 						<a id="desc-order-standard_refund" class="btn btn-default" href="#refundForm">
@@ -165,7 +171,7 @@
 						&nbsp;
 					{/if}
 					{if $order->hasInvoice()}
-						<a id="desc-order-partial_refund" class="btn btn-default" href="#refundForm">
+						<a id="desc-order-partial_refund" class="btn btn-default hidden" href="#refundForm">
 							<i class="icon-exchange"></i>
 							{l s='Partial refund'}
 						</a>
@@ -239,7 +245,10 @@
 								<div class="col-lg-9">
 									<select id="id_order_state" class="chosen form-control" name="id_order_state">
 									{foreach from=$states item=state}
-										<option value="{$state['id_order_state']|intval}"{if isset($currentState) && $state['id_order_state'] == $currentState->id} selected="selected" disabled="disabled"{/if}>{$state['name']|escape}</option>
+									<!-- By webkul to hide unnecessary order statues from statuses dropdown -->
+										{if $state['id_order_state']!=4 && $state['id_order_state']!=5 && $state['id_order_state']!=14}
+											<option value="{$state['id_order_state']|intval}"{if isset($currentState) && $state['id_order_state'] == $currentState->id} selected="selected" disabled="disabled"{/if}>{$state['name']|escape}</option>
+										{/if}
 									{/foreach}
 									</select>
 									<input type="hidden" name="id_order" value="{$order->id}" />
@@ -282,10 +291,10 @@
 												{$data['room_num']}
 											</td>
 											<td>
-												{$data['date_from']}
+												{$data['date_from']|date_format:"%d %b %Y"}
 											</td>
 											<td>
-												{$data['date_to']}
+												{$data['date_to']|date_format:"%d %b %Y"}
 											</td>
 											<td>
 												<form action="" method="post" class="form-horizontal">
@@ -959,7 +968,9 @@
 										<th><span class="title_box">{l s='Room Image'}</th>
 										<th><span class="title_box">{l s='Room Type'}</span></th>
 										<th><span class="title_box">{l s='Duration'}</span></th>
-										<th><span class="title_box">{l s='Price'}</span></th>
+										<th><span class="title_box">{l s='Total Price'}</span></th>
+										<th><span class="title_box">{l s='Refund Stage'}</span></th>
+										<th><span class="title_box">{l s='Refund Status'}</span></th>
 										<th><span class="title_box">{l s='Reallocate Room'}</span></th>
 									</tr>
 								</thead>
@@ -967,67 +978,52 @@
 								{if $cart_detail_data}
 									{foreach from=$cart_detail_data item=data}
 										<tr>
-											<td>{$data.room_num}</td>
-											<td><img src="{$data.image_link}" title="Room image" /></td>
-											<td>{$data.room_type}</td>
-											<td>{$data.date_from}&nbsp To&nbsp {$data.date_to}</td>
-											<td>{convertPrice price=$data.amt_with_qty}</td>
+											<td>
+												{$data.room_num}
+											</td>
+											<td>
+												<img src="{$data.image_link}" title="Room image" />
+											</td>
+											<td>
+												{$data.room_type}
+											</td>
+											<td>
+												{$data.date_from|date_format:"%d %b %Y"}&nbsp-&nbsp {$data.date_to|date_format:"%d %b %Y"}
+											</td>
+											<td>
+												{convertPriceWithCurrency price=$data.amt_with_qty currency=$currency->id}
+											</td>
+											
+											<td class="text-center stage_name">
+												<p>
+													{if isset($data['stage_name']) && $data['stage_name']}
+														{$data['stage_name']}
+													{else}
+														--
+													{/if}
+												</p>
+											</td>
+											<td class="text-center status_name">
+												<p>
+													{if $data['stage_name'] == 'Refunded' || $data['stage_name'] == 'Rejected'}
+														{l s="Done!"}
+													{else if $data['stage_name'] == 'Waitting' || $data['stage_name'] == 'Accepted'}
+														{l s="Pending..."}
+													{else}
+														--
+													{/if}
+												</p>
+											</td>
+
 											{if $data.booking_type == 1}
 											<td>
-												<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#mySwappigModal">
-													{l s='Reallocate Room' mod='hotelreservationsystem'}
-												</button>
-												<!-- Modal -->
-												<div class="modal fade" id="mySwappigModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-												  <div class="modal-dialog" role="document">
-												    <div class="modal-content">
-												      <form method="post" action="">
-													      <div class="modal-header">
-													        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-													        <h4 class="modal-title" id="myModalLabel">{l s='Reallocate Rooms'}</h4>
-													      </div>
-												      	<div class="modal-body">
-												          <div class="form-group">
-												            <label for="curr_room_num" class="control-label">{l s='Current Room Number:' mod='hotelreservationsystem'}</label>
-												            <input type="text" class="form-control" id="curr_room_num" name="curr_room_num" value="{$data['room_num']}" readonly="true">
-												            <input type="hidden" class="form-control" name="date_from" value="{$data['date_from']}">
-												            <input type="hidden" class="form-control" name="date_to" value="{$data['date_to']}">
-												            <input type="hidden" class="form-control" name="id_room" value="{$data['id_room']}">
-												            <input type="hidden" class="form-control" name="id_order" value="{$order->id}">
-												          </div>
-												          <div class="form-group">
-												            <label for="swapped_avail_rooms" class="control-label">{l s='Available Rooms To Swap:' mod='hotelreservationsystem'}</label>
-												            <div style="width: 195px;">
-																			<select class="form-control" name="swapped_avail_rooms" id="swapped_avail_rooms">
-																				<option value="" selected="selected">{l s='Select Rooms' mod='hotelreservationsystem'}</option>
-																				{if isset($data['avail_rooms_to_swap']) && $data['avail_rooms_to_swap']}
-																					{foreach from=$data['avail_rooms_to_swap'] key=room_k item=room_v}
-																						<option value="{$room_v['id_room']}" >{$room_v['room_num']}</option>
-																					{/foreach}
-																				{else}
-																					{l s='No rooms available' mod='hotelreservationsystem'}
-																				{/if}
-																			</select>
-																		</div>
-												          </div>
-												          <div class="form-group">
-												            <label for="message-text" class="col-sm-12 control-label">{l s='Currently Alloted Customer Information:' mod='hotelreservationsystem'}</label>
-												           	<dl class="well list-detail">
-																			<dt>{l s='Name'}</dt>
-																			<dd>{$data['alloted_cust_name']}</dd><br>
-																			<dt>{l s='Email'}</dt>
-																			<dd>{$data['alloted_cust_email']}</dd><br>
-																		</dl>
-														      </div>
-												      </div>
-													      <div class="modal-footer">
-													        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-													        <input type="submit" name="swap_allocated_rooms" class="btn btn-primary" value="Save">
-													      </div>
-												    </form>
-												    </div>
-												  </div>
-												</div>
+												{if $data['stage_name'] == 'Refunded' || $data['stage_name'] == 'Rejected'}
+													<p class="text-center">----</p>
+												{else}
+													<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#mySwappigModal" data-id_order="{$order->id}" data-room_num={$data['room_num']} data-date_from={$data['date_from']} data-date_to={$data['date_to']} data-id_room={$data['id_room']} data-cust_name="{$data['alloted_cust_name']}" data-cust_email="{$data['alloted_cust_email']}" data-avail_rm_swap={$data['avail_rooms_to_swap']|@json_encode} data-avail_rm_realloc={$data['avail_rooms_to_realloc']|@json_encode}>
+														{l s='Reallocate Room' mod='hotelreservationsystem'}
+													</button>
+												{/if}
 											</td>
 											{/if}
 										</tr>
@@ -1140,6 +1136,51 @@
 								{/if}
 							</div>
 						</div> --> <!-- by webkul to hide unnessary things in the page-->
+						
+						<!-- For Due amount submit panel (by webkul) -->
+						{if isset($order_adv_dtl)}
+							<div class="col-xs-6">
+								<div class="panel panel-advanced-payment">
+									<form class="clearfix" method="POST" action="{$link->getAdminLink('AdminOrders')|escape:'html':'UTF-8'}&amp;vieworder&amp;id_order={$order_adv_dtl['id_order']|intval}">
+										<div class="table-responsive">
+											<table class="table">
+												<tr>
+													<td>
+														<strong>{l s='Paid Amount'}</strong>
+													</td>
+													<td>
+														<strong>
+															{displayPrice price=$order_adv_dtl['total_paid_amount'] currency=$currency->id}
+														</strong>
+													</td>
+												</tr>
+												<tr>
+													<td>
+														<strong>{l s='Due Amount'}</strong>
+													</td>
+													<td>
+														<strong>{displayPrice price=($order_adv_dtl['total_order_amount'] - $order_adv_dtl['total_paid_amount']) currency=$currency->id}</strong>
+													</td>
+												</tr>
+												<tr>
+													<td>
+														<strong>{l s='submitted Amount'}</strong>
+													</td>
+													<td>
+														<div class="input-group">
+															<span class="input-group-addon" id="htl_order_currenct">{$currency->sign}</span>
+															<input type="text" class="form-control" placeholder="Amount" aria-describedby="htl_order_currenct" name="submitted_amount">
+														</div>
+													</td>
+												</tr>
+											</table>
+										</div>
+										<button type="submit" class="btn btn-primary" name="payDueAmount" style="margin-top:10px;">{l s="Submit Amount"}</button>
+									</form>
+								</div>
+							</div>
+						{/if}
+						
 						<div class="col-xs-6 pull-right">
 							<div class="panel panel-vouchers" style="{if !sizeof($discounts)}display:none;{/if}">
 								{if (sizeof($discounts) || $can_edit)}
@@ -1206,9 +1247,16 @@
 											{assign var=order_shipping_price value=$order->total_shipping_tax_incl}
 										{/if}
 										<tr id="total_products">
-											<td class="text-right">{l s='Rooms Cost'}</td>
+											<td class="text-right"><strong>{l s='Total Rooms Cost'}</strong></td>
 											<td class="amount text-right nowrap">
-												{displayPrice price=$order_product_price currency=$currency->id}
+												<strong>{displayPrice price=$total_rooms_cost currency=$currency->id}</strong>
+											</td>
+											<td class="partial_refund_fields current-edit" style="display:none;"></td>
+										</tr>
+										<tr id="total_tax_order">
+											<td class="text-right"><strong>{l s='Total Tax'}</strong></td>
+											<td class="text-right nowrap">
+												<strong>{displayPrice price=$total_tax_in_order currency=$currency->id}</strong>
 											</td>
 											<td class="partial_refund_fields current-edit" style="display:none;"></td>
 										</tr>
@@ -1242,14 +1290,35 @@
 												<p class="help-block"><i class="icon-warning-sign"></i> {l s='(%s)' sprintf=$smarty.capture.TaxMethod}</p>
 											</td>
 										</tr> -->    <!-- by webkul to hide unnessary things in the page-->
-										{if ($order->getTaxCalculationMethod() == $smarty.const.PS_TAX_EXC)}
+										<!-- {if ($order->getTaxCalculationMethod() == $smarty.const.PS_TAX_EXC)}
 			 							<tr id="total_taxes">
 			 								<td class="text-right">{l s='Taxes'}</td>
 			 								<td class="amount text-right nowrap" >{displayPrice price=($order->total_paid_tax_incl-$order->total_paid_tax_excl) currency=$currency->id}</td>
 			 								<td class="partial_refund_fields current-edit" style="display:none;"></td>
 			 							</tr>
-			 							{/if}
+			 							{/if} -->
+
+			 							{if isset($order_adv_dtl)}
+				 							<tr>
+												<td class="text-right"><strong>{l s='Paid Amount'}</strong></td>
+												<td class="amount text-right nowrap">
+													<strong>
+														{displayPrice price=$order_adv_dtl['total_paid_amount'] currency=$currency->id}
+													</strong>
+												</td>
+											</tr>
+											<tr>
+												<td class="text-right"><strong>{l s='Due Amount'}</strong></td>
+												<td class="amount text-right nowrap">
+													<strong>
+														{displayPrice price=($order_adv_dtl['total_order_amount'] - $order_adv_dtl['total_paid_amount']) currency=$currency->id}
+													</strong>
+												</td>
+											</tr>
+										{/if}
+										
 										{assign var=order_total_price value=$order->total_paid_tax_incl}
+										
 										<tr id="total_order">
 											<td class="text-right"><strong>{l s='Total'}</strong></td>
 											<td class="amount text-right nowrap">
@@ -1451,12 +1520,179 @@
 		</div>
 	</div>
 
+<!-- Modal for reallocation of rooms -->
+<div class="modal fade" id="mySwappigModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+    	<ul class="nav nav-tabs" role="tablist">
+		    <li role="presentation" class="active"><a href="#reallocate_room_tab" aria-controls="reallocate" role="tab" data-toggle="tab">{l s='Room Reallocation' mod='hotelreservationsystem'}</a></li>
+		    <li role="presentation"><a href="#swap_room_tab" aria-controls="swap" role="tab" data-toggle="tab">{l s='Swap Room' mod='hotelreservationsystem'}</a></li>
+		 </ul>
+		<div class="tab-content panel active">
+			<div role="tabpanel" class="tab-pane active" id="reallocate_room_tab">
+				<form method="post" action="">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+						<h4 class="modal-title" id="realloc_myModalLabel">{l s='Reallocate Rooms'}</h4>
+					</div>
+					<div class="modal-body">
+						<div class="form-group">
+							<label for="curr_room_num" class="control-label">{l s='Current Room Number:' mod='hotelreservationsystem'}</label>
+							<input type="text" class="form-control modal_curr_room_num" name="modal_curr_room_num" readonly="true">
+							<input type="hidden" class="form-control modal_date_from" name="modal_date_from">
+							<input type="hidden" class="form-control modal_date_to" name="modal_date_to">
+							<input type="hidden" class="form-control modal_id_room" name="modal_id_room">
+						</div>
+						<div class="form-group">
+							<label for="realloc_avail_rooms" class="control-label">{l s='Available Rooms To Reallocate:' mod='hotelreservationsystem'}</label>
+							<div style="width: 195px;">
+								<select class="form-control" name="realloc_avail_rooms" id="realloc_avail_rooms">
+									<option value="0" selected="selected">{l s='Select Rooms' mod='hotelreservationsystem'}</option>
+								</select>
+								<p class="error_text" id="realloc_sel_rm_err_p"></p>
+							</div>
+						</div>
+						<div class="form-group">
+							<label style="text-decoration:underline;margin-top:5px;" for="message-text" class="col-sm-12 control-label"><i class="icon-info-circle"></i>&nbsp;{l s='Currently Alloted Customer Information:' mod='hotelreservationsystem'}</label>
+							<dl class="well list-detail">
+								<dt>{l s='Name'}</dt>
+								<dd class="cust_name"></dd><br>
+								<dt>{l s='Email'}</dt>
+								<dd class="cust_email"></dd><br>
+							</dl>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">{l s="Close" mod="hotelreservationsyatem"}</button>
+						<input type="submit" id="realloc_allocated_rooms" name="realloc_allocated_rooms" class="btn btn-primary" value="Reallocate">
+					</div>
+				</form>
+			</div>
+			<div role="tabpanel" class="tab-pane" id="swap_room_tab">
+				<form method="post" action="">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+						<h4 class="modal-title" id="swap_myModalLabel">{l s='Swap Rooms'}</h4>
+					</div>
+					<div class="modal-body">
+						<div class="form-group">
+							<label for="swap_curr_room_num" class="control-label">{l s='Current Room Number:' mod='hotelreservationsystem'}</label>
+							<input type="text" class="form-control modal_curr_room_num" name="modal_curr_room_num" readonly="true">
+							<input type="hidden" class="form-control modal_date_from" name="modal_date_from">
+							<input type="hidden" class="form-control modal_date_to" name="modal_date_to">
+							<input type="hidden" class="form-control modal_id_room" name="modal_id_room">
+							<input type="hidden" class="form-control modal_id_order" name="modal_id_order">
+						</div>
+						<div class="form-group">
+							<label for="swap_avail_rooms" class="control-label">{l s='Available Rooms To Swap:' mod='hotelreservationsystem'}</label>
+							<div style="width: 195px;">
+								<select class="form-control" name="swap_avail_rooms" id="swap_avail_rooms">
+									<option value="0" selected="selected">{l s='Select Rooms' mod='hotelreservationsystem'}</option>
+								</select>
+								<p class="error_text" id="swap_sel_rm_err_p"></p>
+							</div>
+						</div>
+						<div class="form-group">
+							<label style="text-decoration:underline;margin-top:5px;" for="message-text" class="col-sm-12 control-label"><i class="icon-info-circle"></i>&nbsp;{l s='Currently Alloted Customer Information:' mod='hotelreservationsystem'}</label>
+							<dl class="well list-detail">
+								<dt>{l s='Name'}</dt>
+								<dd class="cust_name"></dd><br>
+								<dt>{l s='Email'}</dt>
+								<dd class="cust_email"></dd><br>
+							</dl>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">{l s="Close" mod="hotelreservationsyatem"}</button>
+						<input type="submit" id="swap_allocated_rooms" name="swap_allocated_rooms" class="btn btn-primary" value="Swap">
+					</div>
+				</form>
+			</div>
+		</div>
+    </div>
+  </div>
+</div>
+{strip}
+	{addJsDefL name=no_rm_avail_txt}{l s='No rooms available.' js=1 mod='hotelreservationsystem'}{/addJsDefL}
+	{addJsDefL name=slct_rm_err}{l s='Please select a room first.' js=1 mod='hotelreservationsystem'}{/addJsDefL}
+{/strip}
 	<script type="text/javascript">
 		var geocoder = new google.maps.Geocoder();
 		var delivery_map, invoice_map;
 
 		$(document).ready(function()
 		{
+			/*By webkul for swapping Booked rooms modal js*/
+		    $("#swap_allocated_rooms").on('click', function(e){
+		        $(".error_text").text('');
+		        if ($('#swapped_avail_rooms').val() == 0)
+		        {
+		            $("#sel_rm_err_p").text(slct_rm_err);
+		            return false;
+		        }
+		    });
+
+		    $('#mySwappigModal').on('hidden.bs.modal', function (e)
+		    {
+		    	$(".modal_id_order").val('');
+		        $(".modal_date_from").val('');
+		        $(".modal_date_to").val('');
+		        $(".modal_id_room").val('');
+		        $(".modal_curr_room_num").val('');
+		        $(".cust_name").text('');
+		        $(".cust_email").text('');
+		        $(".swp_rm_opts").remove();
+		        $(".realloc_rm_opts").remove();
+		    });
+
+		    $('#mySwappigModal').on('shown.bs.modal', function (e)
+		    {
+		    	$(".modal_id_order").val(e.relatedTarget.dataset.id_order);
+		        $(".modal_date_from").val(e.relatedTarget.dataset.date_from);
+		        $(".modal_date_to").val(e.relatedTarget.dataset.date_to);
+		        $(".modal_id_room").val(e.relatedTarget.dataset.id_room);
+		        $(".modal_curr_room_num").val(e.relatedTarget.dataset.room_num);
+		        $(".cust_name").text(e.relatedTarget.dataset.cust_name);
+		        $(".cust_email").text(e.relatedTarget.dataset.cust_email);
+		        html = '';
+		        var json_arr_rm_swp = JSON.parse(e.relatedTarget.dataset.avail_rm_swap);
+		        $.each(json_arr_rm_swp, function(key,val)
+		        {
+		            html += '<option class="swp_rm_opts" value="'+val.id_room+'" >'+val.room_num+'</option>';
+		        });
+		        if (html != '')
+		            $("#swap_avail_rooms").append(html);
+
+		        html = '';
+		        var json_arr_rm_realloc = JSON.parse(e.relatedTarget.dataset.avail_rm_realloc);
+		        $.each(json_arr_rm_realloc, function(key,val)
+		        {
+		            html += '<option class="realloc_rm_opts" value="'+val.id_room+'" >'+val.room_num+'</option>';
+		        });
+		        if (html != '')
+		            $("#realloc_avail_rooms").append(html);
+		    });
+			
+			/*For swaping rooms in the modal*/
+		    $("#realloc_allocated_rooms").on('click', function(e){
+		        $(".error_text").text('');
+		        if ($('#realloc_avail_rooms').val() == 0)
+		        {
+		            $("#realloc_sel_rm_err_p").text(slct_rm_err);
+		            return false;
+		        }
+		    });
+		    $("#swap_allocated_rooms").on('click', function(e){
+		        $(".error_text").text('');
+		        if ($('#swap_avail_rooms').val() == 0)
+		        {
+		            $("#swap_sel_rm_err_p").text(slct_rm_err);
+		            return false;
+		        }
+		    });	
+		
+		    /*END*/
+
 			$(".textarea-autosize").autosize();
 
 			geocoder.geocode({

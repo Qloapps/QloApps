@@ -16,6 +16,11 @@
 			),
 		);
 
+	/**
+	 * [getAllImagesByHotelId :: To get all images data of a hotel by hotel id]
+	 * @param  [int] $htl_id [Id of the hotel which images data you want]
+	 * @return [array|boolean] [if data found returns array containing information of the images of the hotel which id is passed]
+	 */
 	public function getAllImagesByHotelId($htl_id)
 	{
 		$sql = "SELECT * FROM `"._DB_PREFIX_."htl_image` WHERE `id_hotel` = ".(int)$htl_id;
@@ -28,12 +33,22 @@
 			return false;
 	}
 
+	/**
+	 * [deleteByHotelId :: To delete hotel's images data of a hotel by its hotel Id]
+	 * @param  [int] $htl_id [Id of the hotel which images data you want to delete]
+	 * @return [boolean]         [Returns true if deleted successfully else returns false]
+	 */
 	public function deleteByHotelId($htl_id)
 	{
 		$delete = Db::getInstance()->delete('htl_image', '`id_hotel`='.(int)$htl_id);
 		return $delete;
 	}
 
+	/**
+	 * [validAddHotelMainImage :: To validate the image of the hotel before saving it]
+	 * @param  [array] $image [variable having image information of the hotel]
+	 * @return [boolean]        [returns true if image is valid]
+	 */
 	public function validAddHotelMainImage($image)
 	{
 		if ($image['size'] > 0)
@@ -48,6 +63,11 @@
 			return true;
 	}
 
+	/**
+	 * [validAddHotelOtherImage :: To validate the array of images of the hotel before saving it]
+	 * @param  [array] $image [array containing images of the hotel]
+	 * @return [boolean]        [returns true if images are valid]
+	 */
 	public function validAddHotelOtherImage($image)
 	{
 		if (empty($image['name']))
@@ -63,6 +83,13 @@
 		}
 	}
 
+	/**
+	 * [uploadOtherImages :: To upload the images of the hotel]
+	 * @param  [array] $image          [array containing images of the hotel]
+	 * @param  [int] $hotel_id       [Id of the hotel to which the images belong]
+	 * @param  [string] $hotel_img_path [Path where the images to be stored]
+	 * @return [boolean]                 [true]
+	 */
 	public function uploadOtherImages($image, $hotel_id, $hotel_img_path)
 	{
 		//Upload More Images
@@ -84,8 +111,17 @@
 			$image_name = $rand_name.'.jpg';
 			ImageManager::resize($other_images[$i], $hotel_img_path.$image_name);
 		}
+		return true;
 	}
 
+	/**
+	 * [uploadMainImage :: To upload the main image of the hotel]
+	 * @param  [type]  $image          [variable having image information of the hotel]
+	 * @param  [type]  $hotel_id       [Id of the hotel to which the image belongs]
+	 * @param  [type]  $hotel_img_path [Path where the image to be stored]
+	 * @param  boolean $active         []
+	 * @return [boolean]                 [true]
+	 */
 	public function uploadMainImage($image, $hotel_id, $hotel_img_path, $active = false)
 	{
 		if (isset($image))
@@ -101,8 +137,13 @@
 				ImageManager::resize($image['tmp_name'], $hotel_img_path.$image_name);
 			}
 		}
+		return true;
 	}
 
+	/**
+	 * [randomImageName :: TO get a random string of 6 characters]
+	 * @return [string] [Returns randomly generated string of 6 digits]
+	 */
 	public function randomImageName()
 	{
 		$length = 6;

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<module>
+	<name>blockcurrencies</name>
+	<displayName><![CDATA[Blok mata uang]]></displayName>
+	<version><![CDATA[0.4.0]]></version>
+	<description><![CDATA[Menambahkan blok untuk pelanggan memilih mata uang belanja mereka.]]></description>
+	<author><![CDATA[PrestaShop]]></author>
+	<tab><![CDATA[front_office_features]]></tab>
+	<is_configurable>0</is_configurable>
+	<need_instance>0</need_instance>
+	<limited_countries></limited_countries>
+</module>

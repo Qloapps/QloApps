@@ -12,7 +12,7 @@ class WkTestimonialBlock extends Module
         $this->_postErrors = array();
 		$this->name = 'wktestimonialblock';
 		$this->tab = 'front_office_features';
-		$this->version = '1.6.0';
+		$this->version = '0.0.2';
 		$this->author = 'webkul';
 		$this->need_instance = 0;
 
@@ -26,18 +26,47 @@ class WkTestimonialBlock extends Module
 
 	public function getContent()
     {
-        if (Tools::isSubmit('save_testimonial_data'))
+        if (Tools::isSubmit('save_parent_testimonial_data'))
+        {
+            $testi_head = Tools::getValue('testimonial_heading');
+            $testi_description = Tools::getValue('testimonial_description');
+            $testimonial_id = Tools::getValue('parent_testimonial_id');
+            
+            if (!$testi_head)
+                    $this->_postErrors[] = $this->l('Testimonial Heading is a required field.');
+            if (!$testi_description)
+                    $this->_postErrors[] = $this->l('Testimonial description is a required field.');
+
+            if (!count($this->_postErrors))
+            {
+                if ($testimonial_id)
+                    $obj_feature_data = new WkHotelFeaturesData($testimonial_id);
+                else        
+                    $obj_feature_data = new WkHotelFeaturesData();
+
+                $obj_feature_data->blog_heading = $testi_head;
+                $obj_feature_data->blog_description = $testi_description;
+                $obj_feature_data->parent_data = 1;
+                $obj_feature_data->save();
+
+                $this->_html .= $this->displayConfirmation($this->l('Settings updated'));
+            }
+            else
+            {
+                foreach ($this->_postErrors as $err)
+                    $this->_html .= $this->displayError($err);
+            }
+        }
+        else if (Tools::isSubmit('save_testimonial_data'))
         {
             $name = Tools::getValue('name');
-            $testimonial_description = Tools::getValue('testimonial_description');
             $testimonial_content = Tools::getValue('testimonial_content');
 
             $testimonial_id =  Tools::getValue('testimonial_id');
-
             foreach ($name as $key => $value)
             {
-                if (!$testimonial_description[$key])
-                    $this->_postErrors[] = $this->l('Testimonial description is a required field.');
+                if (!$name[$key])
+                    $this->_postErrors[] = $this->l('Name is a required field.');
                 if (!$testimonial_content[$key])
                     $this->_postErrors[] = $this->l('Testimonial content is a required field.');
             }
@@ -47,24 +76,25 @@ class WkTestimonialBlock extends Module
 
             if (!count($this->_postErrors))
             {
-                foreach ($name as $key => $value)
+                foreach ($name as $key_testi => $value_testi)
                 {
-                    if (isset($testimonial_id[$key]) && $testimonial_id[$key])
-                        $obj_testimonial_data = new WkHotelTestimonialData($testimonial_id[$key]);
+                    if (isset($testimonial_id[$key_testi]) && $testimonial_id[$key_testi])
+                        $obj_testimonial_data = new WkHotelTestimonialData($testimonial_id[$key_testi]);
                     else        
                         $obj_testimonial_data = new WkHotelTestimonialData();
 
                     $obj_testimonial_data->name = $value;
-                    $obj_testimonial_data->testimonial_description = $testimonial_description[$key];
-                    $obj_testimonial_data->testimonial_content = $testimonial_content[$key];
+                    $obj_testimonial_data->testimonial_description = $testimonial_description[$key_testi];
+                    $obj_testimonial_data->testimonial_content = $testimonial_content[$key_testi];
+                    $obj_feature_data->parent_data = 0;
                     $obj_testimonial_data->save();
 
-                    if (isset($_FILES['testimonial_image']['name'][$key]) && $_FILES['testimonial_image']['name'][$key])
+                    if (isset($_FILES['testimonial_image']['name'][$key_testi]) && $_FILES['testimonial_image']['name'][$key_testi])
                     {
                         $obj_testimonial_data_img = new WkHotelTestimonialData($obj_testimonial_data->id);
 
                         $image_name = $obj_testimonial_data->id.'.png';
-                        ImageManager::resize($_FILES['testimonial_image']['tmp_name'][$key], $testimonial_img_path.$image_name);
+                        ImageManager::resize($_FILES['testimonial_image']['tmp_name'][$key_testi], $testimonial_img_path.$image_name);
 
                         $obj_testimonial_data_img->testimonial_image = $image_name;
                         $obj_testimonial_data_img->save();
@@ -83,8 +113,10 @@ class WkTestimonialBlock extends Module
 
         $obj_testimonial_data = new WkHotelTestimonialData();
         $testimonials_data = $obj_testimonial_data->getAllTestimonialsData();
+        $testimonials_parent_data = $obj_testimonial_data->getParentTestimonialsData();
         
         $this->context->smarty->assign('testimonials_data', $testimonials_data);
+        $this->context->smarty->assign('parent_testi_data', $testimonials_parent_data);
         $this->context->smarty->assign('module_dir', _MODULE_DIR_);
 
         //tinymce
@@ -110,18 +142,22 @@ class WkTestimonialBlock extends Module
 
     public function insertDefaultHotelTestimonialsEntries()
     {
+        $testimonial_heading = $this->l('Guest Testimonials');
+        $testimonial_description = $this->l('Fap put a bird on it next level, sustainable disrupt polaroid flannel Helvetica Kickstarter quinoa bicycle rights narwhal wolf Fap put a bird on it next level.');
         $designations = array(0 => 'Eon Comics CEO', 1 => 'Ken Comics Kal', 2 => 'Jan Comics Joe');
         $images = array(0 => '1.png', 1 => '2.png', 2 => '3.png');
         $names = array(0 => 'Calrk Kent', 1 => 'Calrk Kent', 2 => 'Calrk Kent');
-        $testimonial_description = array(
-            0 => $this->l('Fap put a bird on it next level, sustainable disrupt polaroid flannel Helvetica Kickstarter quinoa bicycle rights narwhal wolf Fap put a bird on it next level. '),
-            1 => $this->l('Fap put a bird on it next level, sustainable disrupt polaroid flannel Helvetica Kickstarter quinoa bicycle rights narwhal wolf Fap put a bird on it next level. '),
-            2 => $this->l('Fap put a bird on it next level, sustainable disrupt polaroid flannel Helvetica Kickstarter quinoa bicycle rights narwhal wolf Fap put a bird on it next level. '));
 
         $testimonial_content = array(
             0 => $this->l('Hashtag typewriter YOLO try-hard, deep v Schlitz Etsy lumbersexual vegan meditation ethical pork belly ugh selvage. Flannel Schlitz put a bird on it shabby chic. Whatever Carles blog, gastropub asymmetrical Brooklyn tofu single-origin coffee. Bicycle rights raw denim Vice, blog brunch kale chips synth sustainable artisan. Helvetica mumblecore hoodie beard.'),
             1 => $this->l('Hashtag typewriter YOLO try-hard, deep v Schlitz Etsy lumbersexual vegan meditation ethical pork belly ugh selvage. Flannel Schlitz put a bird on it shabby chic. Whatever Carles blog, gastropub asymmetrical Brooklyn tofu single-origin coffee. Bicycle rights raw denim Vice, blog brunch kale chips synth sustainable artisan. Helvetica mumblecore hoodie beard.'), 
             2 => $this->l('Hashtag typewriter YOLO try-hard, deep v Schlitz Etsy lumbersexual vegan meditation ethical pork belly ugh selvage. Flannel Schlitz put a bird on it shabby chic. Whatever Carles blog, gastropub asymmetrical Brooklyn tofu single-origin coffee. Bicycle rights raw denim Vice, blog brunch kale chips synth sustainable artisan. Helvetica mumblecore hoodie beard.'));
+
+        $obj_testimonial_data = new WkHotelTestimonialData();
+        $obj_testimonial_data->testimonial_heading = $testimonial_heading;
+        $obj_testimonial_data->testimonial_description = $testimonial_description;
+        $obj_testimonial_data->parent_data = 1;
+        $obj_testimonial_data->save();
 
         foreach ($images as $key => $value)
         {
@@ -129,8 +165,8 @@ class WkTestimonialBlock extends Module
             $obj_testimonial_data->testimonial_image = $value;
             $obj_testimonial_data->name = $names[$key];
             $obj_testimonial_data->designation = $designations[$key];
-            $obj_testimonial_data->testimonial_description = $testimonial_description[$key];
             $obj_testimonial_data->testimonial_content = $testimonial_content[$key];
+            $obj_testimonial_data->parent_data = 0;
             $obj_testimonial_data->save();
         }
 
@@ -178,13 +214,23 @@ class WkTestimonialBlock extends Module
 
 	public function hookDisplayHome()
 	{
+        /*--- owl-carousel files ---*/
+        $this->context->controller->addCSS(_PS_MODULE_DIR_.$this->name.'/views/css/owl-carousel/owl.carousel.css');
+        $this->context->controller->addCSS(_PS_MODULE_DIR_.$this->name.'/views/css/owl-carousel/owl.theme.css');
+        $this->context->controller->addCSS(_PS_MODULE_DIR_.$this->name.'/views/css/owl-carousel/owl.transitions.css');
+        $this->context->controller->addJS(_PS_MODULE_DIR_.$this->name.'/views/css/owl-carousel/owl.carousel.js');
+
+        /*---- Module Files ----*/
+        $this->context->controller->addJS(_PS_MODULE_DIR_.$this->name.'/views/js/hotel_testimonial_block.js');
+        $this->context->controller->addCSS(_PS_MODULE_DIR_.$this->name.'/views/css/testimonialblock.css');
+
         $obj_testimonial_data = new WkHotelTestimonialData();
         $testimonials_data = $obj_testimonial_data->getAllTestimonialsData();
+
+        $parent_testimonial_data = $obj_testimonial_data->getParentTestimonialsData();
+
         $this->context->smarty->assign('testimonials_data', $testimonials_data);
-        $this->context->controller->addJS(_PS_MODULE_DIR_.$this->name.'/views/js/hotel_testimonial_block.js');
-        $this->context->controller->addJS(_PS_MODULE_DIR_.$this->name.'/views/js/jquery.slideview.js');
-		$this->context->controller->addCSS(_PS_MODULE_DIR_.$this->name.'/views/css/testimonialblock.css');
-        $this->context->controller->addCSS(_PS_MODULE_DIR_.$this->name.'/views/css/jquery.slideview.css');
+        $this->context->smarty->assign('parent_testimonial_data', $parent_testimonial_data);
 
 		return $this->display(__FILE__, 'wktestimonialblock.tpl');
 	}

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<module>
+	<name>sekeywords</name>
+	<displayName><![CDATA[Mesin pencari kata kunci]]></displayName>
+	<version><![CDATA[1.2.4]]></version>
+	<description><![CDATA[Menampilkan kata kunci yang menarik kunjungan ke website Anda.]]></description>
+	<author><![CDATA[PrestaShop]]></author>
+	<tab><![CDATA[analytics_stats]]></tab>
+	<is_configurable>0</is_configurable>
+	<need_instance>0</need_instance>
+	<limited_countries></limited_countries>
+</module>

@@ -1,0 +1,16 @@
+
+[{shop_url}] 
+
+Pesan dari pelanggan {shop_name} 
+
+ALAMAT EMAIL PELANGGAN: {email}
+
+PESAN DARI PELANGGAN: {message}
+
+ID ORDER: {order_name}
+
+FILE TERLAMPIR: {attached_file} 		 
+
+{shop_name} [{shop_url}] didukung oleh
+PrestaShop(tm) [http://www.prestashop.com/] 
+

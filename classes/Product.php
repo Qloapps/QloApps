@@ -5936,7 +5936,7 @@ class ProductCore extends ObjectModel
     public function getType()
     {
         if (!$this->id) {
-            return Product::PTYPE_SIMPLE;
+            return Product::PTYPE_VIRTUAL;
         }
         if (Pack::isPack($this->id)) {
             return Product::PTYPE_PACK;
@@ -5945,7 +5945,7 @@ class ProductCore extends ObjectModel
             return Product::PTYPE_VIRTUAL;
         }
 
-        return Product::PTYPE_SIMPLE;
+        return Product::PTYPE_VIRTUAL;
     }
 
     public function hasAttributesInOtherShops()

@@ -152,3 +152,203 @@ function sendOrderMessage()
 	});
 	return false;
 }
+
+
+// by webkul , ajax for saving data for refund request
+$(document).ready(function(){
+	$('body').on('click', '.roomRequestForRefund', function()
+	{
+		var id_order = $(this).data('id_order');
+		var id_product = $(this).data('id_product');
+		var id_currency = $(this).data('id_currency');
+		var id_customer = $(this).data('id_customer');
+		var num_rooms = $(this).data('num_rooms');
+		var date_from = $(this).data('date_from');
+		var date_to = $(this).data('date_to');
+		var amount = $(this).data('amount');
+		$current = $(this);
+
+		$.fancybox({
+			href: "#reason_fancybox_content",
+			width: 600,
+		    autoSize : true,
+		    autoScale : true,
+		    maxWidth : '100%',
+			'hideOnContentClick': false,
+			beforeLoad: function ()
+			{
+				$('#cancel_req_id_order').val(id_order);
+				$('#cancel_req_id_product').val(id_product);
+				$('#cancel_req_id_currency').val(id_currency);
+				$('#cancel_req_id_customer').val(id_customer);
+				$('#cancel_req_num_rooms').val(num_rooms);
+				$('#cancel_req_date_from').val(date_from);
+				$('#cancel_req_date_to').val(date_to);
+				$('#cancel_req_amount').val(amount);
+			},
+			beforeClose: function ()
+			{
+				$('#cancel_req_id_order, #cancel_req_id_product, #cancel_req_id_currency, #cancel_req_id_customer, #cancel_req_num_rooms, #cancel_req_date_from, #cancel_req_date_to, #amount #reasonForRefund, .reasonForRefund').val('');
+				$('.cancel_req_amount').hide();
+				$('#reasonForRefund').css('border','1px solid #d6d4d4');
+				$('.required_err').hide();
+			}
+		});
+	});
+
+	$('body').on('click', '.totalOrdercancellation_btn', function()
+	{
+		var order_data = $(this).data('order_data');
+		var id_currency = $(this).data('id_currency');
+		var id_customer = $(this).data('id_customer');
+		var id_order = $(this).data('id_order');
+		
+		$.fancybox({
+			href: "#reason_fancybox_content",
+			width: 600,
+		    autoSize : true,
+		    autoScale : true,
+		    maxWidth : '100%',
+			'hideOnContentClick': false,
+			beforeLoad: function ()
+			{
+				$('#cancel_req_id_currency').val(id_currency);
+				$('#cancel_req_id_order').val(id_order);
+				$('#cancel_req_id_customer').val(id_customer);
+				$('#cancel_req_total_order_data').val(JSON.stringify(order_data));
+			},
+			beforeClose: function ()
+			{
+				$('#cancel_req_id_currency, #cancel_req_id_order, #cancel_req_id_customer, #cancel_req_total_order_data, #reasonForRefund').val('');
+				$('.cancel_req_amount').hide();
+				$('#reasonForRefund').css('border','1px solid #d6d4d4');
+				$('.required_err').hide();
+			}
+		});
+	});
+
+	$('body').on('click', '#submit_refund_reason', function()
+	{
+		var order_data = $('#cancel_req_total_order_data').val();
+		if (order_data)
+		{
+			var cancellation_reason = $('#reasonForRefund').val();
+			var id_order = $('#cancel_req_id_order').val();
+			var id_currency = $('#cancel_req_id_currency').val();
+			var id_customer = $('#cancel_req_id_customer').val();
+
+			if ($('#reasonForRefund').val() == '')
+			{
+				$('.required_err').show();
+				$('#reasonForRefund').css('border','1px solid #AA1F00');
+			}
+			else
+			{
+				$.ajax({
+			        data:{
+			        	total_order_data: order_data,
+	    				contentType: "application/json; charset=UTF-8",
+			            id_customer : id_customer,
+			            id_order : id_order,
+						id_currency : id_currency,
+						cancellation_reason : cancellation_reason,
+						saveTotalOrderRefundInfo : true,
+			        },
+			        method:'POST',
+			        dataType:'json',
+			        url:historyUrl,
+			        success:function(data)
+			        {
+			        	if (data.mail_err)
+			        	{
+			        		alert(mail_sending_err);
+			        	}
+			        	if (data.status == 'success')
+			        	{
+			        		$('.totalOrdercancellation_div').hide();
+			        		$(".roomRequestForRefund").parent().siblings('.stage_name').html('<p>'+wait_stage_msg+'</p>');
+			        		$(".roomRequestForRefund").parent().siblings('.status_name').html('<p>'+pending_state_msg+'</p>');
+			        		$(".roomRequestForRefund").parent().html('<p>'+req_sent_msg+'</p>');
+			        		$.fancybox.close();
+			        	}
+			        	else
+			        	{
+			        		alert(refund_request_sending_error);
+			        	}
+			        },
+			        error: function(XMLHttpRequest, textStatus, errorThrown)
+			        {
+			            alert(textStatus);
+			        }
+		    	});
+			}
+		}
+		else
+		{
+			var id_order = $('#cancel_req_id_order').val();
+			var id_room = $('#cancel_req_id_room').val();
+			var id_product = $('#cancel_req_id_product').val();
+			var id_currency = $('#cancel_req_id_currency').val();
+			var id_customer = $('#cancel_req_id_customer').val();
+			var num_rooms = $('#cancel_req_num_rooms').val();
+			var date_from = $('#cancel_req_date_from').val();
+			var date_to = $('#cancel_req_date_to').val();
+			var amount = $('#cancel_req_amount').val();
+			var cancellation_reason = $('#reasonForRefund').val();
+
+			if ($('#reasonForRefund').val() == '')
+			{
+				$('.required_err').show();
+				$('#reasonForRefund').css('border','1px solid #AA1F00');
+			}
+			else
+			{
+				$.ajax({
+			        data:{
+			            id_order : id_order,
+						id_product : id_product,
+						id_customer : id_customer,
+						id_currency : id_currency,
+						num_rooms : num_rooms,
+						date_from : date_from,
+						date_to : date_to,
+						amount : amount,
+						cancellation_reason : cancellation_reason,
+						saveRefundInfo : true,
+			        },
+			        method:'POST',
+			        dataType:'json',
+			        url:historyUrl,
+			        success:function(data)
+			        {
+			        	if (data.mail_err)
+			        	{
+			        		alert(mail_sending_err);
+			        	}
+
+			        	if (data.status == 'success')
+			        	{
+			        		if ($(".roomRequestForRefund").length == 1)
+			        		{
+			        			$('.totalOrdercancellation_div').hide();
+			        		}
+			        		$(".order_cancel_request_button_"+id_product+'_'+date_from+'_'+date_to).parent().siblings('.stage_name').html('<p>'+wait_stage_msg+'</p>');
+			        		$(".order_cancel_request_button_"+id_product+'_'+date_from+'_'+date_to).parent().siblings('.status_name').html('<p>'+pending_state_msg+'</p>');
+			        		$(".order_cancel_request_button_"+id_product+'_'+date_from+'_'+date_to).parent().html('<p>'+req_sent_msg+'</p>');
+			        		$.fancybox.close();
+			        	}
+			        	else
+			        	{
+			        		alert(refund_request_sending_error);
+			        	}
+			        },
+			        error: function(XMLHttpRequest, textStatus, errorThrown)
+			        {
+			            alert(textStatus);
+			        }
+		    	});
+			}
+		}
+	});
+});
+

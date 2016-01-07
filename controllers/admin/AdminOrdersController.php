@@ -57,6 +57,7 @@ class AdminOrdersControllerCore extends AdminController
 		$this->context = Context::getContext();
 
 		$this->_select = '
+		(cap.total_order_amount - cap.total_paid_amount) AS `amount_due`,
 		a.id_currency,
 		a.id_order AS id_pdf,
 		CONCAT(LEFT(c.`firstname`, 1), \'. \', c.`lastname`) AS `customer`,
@@ -72,6 +73,7 @@ class AdminOrdersControllerCore extends AdminController
 		INNER JOIN `'._DB_PREFIX_.'country` country ON address.id_country = country.id_country
 		INNER JOIN `'._DB_PREFIX_.'country_lang` country_lang ON (country.`id_country` = country_lang.`id_country` AND country_lang.`id_lang` = '.(int)$this->context->language->id.')
 		LEFT JOIN `'._DB_PREFIX_.'order_state` os ON (os.`id_order_state` = a.`current_state`)
+		LEFT JOIN `'._DB_PREFIX_.'htl_customer_adv_payment` cap ON (cap.`id_order` = a.`id_order`)
 		LEFT JOIN `'._DB_PREFIX_.'order_state_lang` osl ON (os.`id_order_state` = osl.`id_order_state` AND osl.`id_lang` = '.(int)$this->context->language->id.')';
 		$this->_orderBy = 'id_order';
 		$this->_orderWay = 'DESC';
@@ -117,6 +119,14 @@ class AdminOrdersControllerCore extends AdminController
 		$this->fields_list = array_merge($this->fields_list, array(
 			'total_paid_tax_incl' => array(
 				'title' => $this->l('Total'),
+				'align' => 'text-right',
+				'type' => 'price',
+				'currency' => true,
+				'callback' => 'setOrderCurrency',
+				'badge_success' => true
+			),
+			'amount_due' => array(
+				'title' => $this->l('Due Amount'),
 				'align' => 'text-right',
 				'type' => 'price',
 				'currency' => true,
@@ -203,7 +213,11 @@ class AdminOrdersControllerCore extends AdminController
 		return Tools::displayPrice($echo, (int)$order->id_currency);
 	}
 
-	public function initPageHeaderToolbar()
+	####################################################
+	/*commented by webkul to hide add ne order from order list page*/
+	####################################################
+
+	/*public function initPageHeaderToolbar()
 	{
 		parent::initPageHeaderToolbar();
 
@@ -220,7 +234,7 @@ class AdminOrdersControllerCore extends AdminController
 		if (Context::getContext()->shop->getContext() != Shop::CONTEXT_SHOP && isset($this->page_header_toolbar_btn['new_order'])
 			&& Shop::isFeatureActive())
 			unset($this->page_header_toolbar_btn['new_order']);
-	}
+	}*/
 
 	public function renderForm()
 	{
@@ -229,48 +243,32 @@ class AdminOrdersControllerCore extends AdminController
 
 		$id_cart = (int)Tools::getValue('id_cart');
 		$cart = new Cart((int)$id_cart);
+		
 		if ($id_cart && !Validate::isLoadedObject($cart))
 			$this->errors[] = $this->l('This cart does not exists');
+		
 		if ($id_cart && Validate::isLoadedObject($cart) && !$cart->id_customer)
 			$this->errors[] = $this->l('The cart must have a customer');
+		
 		if (count($this->errors))
 			return false;
+		
 		// check page is whether ad new order page or order detail page
 		if (isset($_GET['addorder']))
 		{
-			$cart_id = Tools::getValue('cart_id');//get cart id from url
-			$htl_cart = new Cart($cart_id);
-			$this->context->cart = $htl_cart;
+			$id_cart = Tools::getValue('cart_id');//get cart id from url
+			$cart = new Cart($id_cart);
+		
+			$this->context->cart = $cart;
 			$cart_detail_data = array();
+		
 			$cart_detail_data_obj = new HotelCartBookingData();
-			$cart_detail_data = $cart_detail_data_obj->getCartCurrentDataByCartId((int) $cart_id);
-			if ($cart_detail_data)
-			{
-				foreach ($cart_detail_data as $key => $value)
-				{
-					$product_image_id = Product::getCover($value['id_product']);
-					$link_rewrite = ((new Product((int) $value['id_product'], Configuration::get('PS_LANG_DEFAULT')))->link_rewrite[Configuration::get('PS_LANG_DEFAULT')]);
-
-					if ($product_image_id)
-						$cart_detail_data[$key]['image_link'] = $this->context->link->getImageLink($link_rewrite, $product_image_id['id_image'], 'small_default');
-					else
-						$cart_detail_data[$key]['image_link'] = $this->context->link->getImageLink($link_rewrite, $this->context->language->iso_code."-default", 'small_default');
-
-					$cart_detail_data[$key]['room_type'] = (new Product((int) $value['id_product']))->name[Configuration::get('PS_LANG_DEFAULT')];
-					$cart_detail_data[$key]['room_num'] = (new HotelRoomInformation((int) $value['id_room']))->room_num;
-					$cart_detail_data[$key]['date_from'] = (new DateTime($value['date_from']))->format('d-M Y');
-					$cart_detail_data[$key]['date_to'] = (new DateTime($value['date_to']))->format('d-M Y');
-
-					$obj_booking_dtl = new HotelBookingDetail();
-					$num_days = $obj_booking_dtl->getNumberOfDays($cart_detail_data[$key]['date_from'], $cart_detail_data[$key]['date_to']); //quantity of product
-					$cart_detail_data[$key]['amt_with_qty'] = $value['amount'] * $num_days;
-
-				}
-			}
-		}	
+			$cart_detail_data = $cart_detail_data_obj->getCartFormatedBookinInfoByIdCart((int) $id_cart);
+		}
 		//end
 		parent::renderForm();
 		unset($this->toolbar_btn['save']);
+		
 		$this->addJqueryPlugin(array('autocomplete', 'fancybox', 'typewatch'));
 
 		$defaults_order_state = array('cheque' => (int)Configuration::get('PS_OS_CHEQUE'),
@@ -278,6 +276,7 @@ class AdminOrdersControllerCore extends AdminController
 												'cashondelivery' => Configuration::get('PS_OS_COD_VALIDATION') ? (int)Configuration::get('PS_OS_COD_VALIDATION') : (int)Configuration::get('PS_OS_PREPARATION'),
 												'other' => (int)Configuration::get('PS_OS_PAYMENT'));
 		$payment_modules = array();
+		
 		foreach (PaymentModule::getInstalledPaymentModules() as $p_module)
 			$payment_modules[] = Module::getInstanceById((int)$p_module['id_module']);
 
@@ -285,9 +284,6 @@ class AdminOrdersControllerCore extends AdminController
 			'recyclable_pack' => (int)Configuration::get('PS_RECYCLABLE_PACK'),
 			'gift_wrapping' => (int)Configuration::get('PS_GIFT_WRAPPING'),
 			'cart' => $cart,
-			//by webkul for id_cart
-			'htl_cart' =>$htl_cart,
-			'cart_id' => $cart_id,
 			'cart_detail_data' => $cart_detail_data,
 			//end
 			'currencies' => Currency::getCurrenciesByIdShop(Context::getContext()->shop->id),
@@ -476,24 +472,62 @@ class AdminOrdersControllerCore extends AdminController
 	public function postProcess()
 	{
 		// by webkul for reallocation of rooms
+		if (Tools::isSubmit('realloc_allocated_rooms'))
+		{
+			$order_id = Tools::getValue('id_order');
+			$current_room_id = Tools::getValue('modal_id_room');
+			$current_room = Tools::getValue('modal_curr_room_num');
+			$date_from = Tools::getValue('modal_date_from');
+			$date_to = Tools::getValue('modal_date_to');
+			$realloc_room_id = Tools::getValue('realloc_avail_rooms');
+
+			if($realloc_room_id == 0)
+				$this->errors[] = Tools::displayError('Please select a room to swap with this room.');
+			if($current_room_id == 0)
+				$this->errors[] = Tools::displayError('Cuurent room is missing.');
+			if($date_from == 0)
+				$this->errors[] = Tools::displayError('Check In date is missing.');
+			if($date_to == 0)
+				$this->errors[] = Tools::displayError('Check Out date is missing.');
+
+			if(!count($this->errors))
+			{
+				$obj_booking_dtl = new HotelBookingDetail();
+				$room_swapped = $obj_booking_dtl->reallocateRoomWithAvailableSameRoomType($current_room_id, $date_from, $date_to, $realloc_room_id);
+				if (!$room_swapped)
+					$this->errors[] = Tools::displayError('Some error occured. Please try again.');
+				else
+					Tools::redirectAdmin(self::$currentIndex.'&id_order='.(int)$order_id.'&vieworder&token='.$this->token);
+			}
+		}
 		if (Tools::isSubmit('swap_allocated_rooms'))
 		{
-			$order_id = (int) Tools::getValue('id_order');
-			$current_room_id = Tools::getValue('id_room');
-			$current_room = Tools::getValue('curr_room_num');
-			$date_from = Tools::getValue('date_from');
-			$date_to = Tools::getValue('date_to');
-			$swapped_room_id = Tools::getValue('swapped_avail_rooms');
+			$order_id = Tools::getValue('id_order');
+			$current_room_id = Tools::getValue('modal_id_room');
+			$current_room = Tools::getValue('modal_curr_room_num');
+			$date_from = Tools::getValue('modal_date_from');
+			$date_to = Tools::getValue('modal_date_to');
+			$swapped_room_id = Tools::getValue('swap_avail_rooms');
 
-			$obj_booking_dtl = new HotelBookingDetail();
-			$room_swapped = $obj_booking_dtl->reallocateRoomWithAvailableSameRoomType($current_room_id, $date_from, $date_to, $swapped_room_id);
+			if($swapped_room_id == 0)
+				$this->errors[] = Tools::displayError('Please select a room to swap with this room.');
+			if($current_room_id == 0)
+				$this->errors[] = Tools::displayError('Cuurent room is missing.');
+			if($date_from == 0)
+				$this->errors[] = Tools::displayError('Check In date is missing.');
+			if($date_to == 0)
+				$this->errors[] = Tools::displayError('Check Out date is missing.');
 
-			if (!$room_swapped)
-				$this->errors[] = Tools::displayError('Some error occured. Please try again.');
-			else
-				Tools::redirectAdmin(self::$currentIndex.'&id_order='.(int)$order_id.'&vieworder&token='.$this->token);
+			if(!count($this->errors))
+			{
+				$obj_booking_dtl = new HotelBookingDetail();
+				$room_swapped = $obj_booking_dtl->swapRoomWithAvailableSameRoomType($current_room_id, $date_from, $date_to, $swapped_room_id);
+				if (!$room_swapped)
+					$this->errors[] = Tools::displayError('Some error occured. Please try again.');
+				else
+					Tools::redirectAdmin(self::$currentIndex.'&id_order='.(int)$order_id.'&vieworder&token='.$this->token);
+			}
 		}
-
 		//by webkul to update order status when admin changes from order detail page
 
 		if (Tools::isSubmit('submitbookingOrderStatus'))
@@ -508,10 +542,10 @@ class AdminOrdersControllerCore extends AdminController
 				if ($update)
 					Tools::redirectAdmin(self::$currentIndex.'&id_order='.(int)$order_id.'&vieworder&token='.$this->token);
 				else
-					$this->errors[] = Tools::displayError('An error occurred while updating order status..');
+					$this->errors[] = Tools::displayError('New order status is invalid.');
 			}
 			else
-				$this->errors[] = Tools::displayError('An error occurred while updating order status.');
+				$this->errors[] = Tools::displayError('New order status is invalid.');
 		}
 
 		// If id_order is sent, we instanciate a new Order object
@@ -1220,11 +1254,12 @@ class AdminOrdersControllerCore extends AdminController
 					);
 					if ($payment_module->currentOrder)
 					{
-						setcookie('id_cart', " " , time() - 86400, "/");
-						setcookie('id_guest', " " , time() - 86400, "/");
+						setcookie('wk_id_cart', " " , time() - 86400, "/");
+						setcookie('wk_id_guest', " " , time() - 86400, "/");
 
-						unset($_COOKIE['id_cart']);
-						unset($_COOKIE['id_guest']);
+						unset($_COOKIE['wk_id_cart']);
+						unset($_COOKIE['wk_id_guest']);
+						
 						//Tools::redirectAdmin(self::$currentIndex.'&id_order='.$payment_module->currentOrder.'&vieworder'.'&token='.$this->token);
 					}
 				}
@@ -1825,33 +1860,54 @@ class AdminOrdersControllerCore extends AdminController
 		$cart_id = Cart::getCartIdByOrderId(Tools::getValue('id_order'));
 		$cart_detail_data = array();
 		$cart_detail_data_obj = new HotelCartBookingData();
+		$obj_htl_bk_dtl = new HotelBookingDetail();
 
-		$cart_detail_data = $cart_detail_data_obj->getCartCurrentDataByCartId((int) $cart_id);
+		$cart_detail_data = $cart_detail_data_obj->getCartFormatedBookinInfoByIdCart((int) $cart_id);
 		if ($cart_detail_data)
 		{
+			$total_tax = 0;
+			$total_rooms_cost = 0;
 			foreach ($cart_detail_data as $key => $value)
 			{
-				$product_image_id = Product::getCover($value['id_product']);
-				$link_rewrite = ((new Product((int) $value['id_product'], Configuration::get('PS_LANG_DEFAULT')))->link_rewrite[Configuration::get('PS_LANG_DEFAULT')]);
-
-				if ($product_image_id)
-					$cart_detail_data[$key]['image_link'] = $this->context->link->getImageLink($link_rewrite, $product_image_id['id_image'], 'small_default');
+				//work on entring refund data
+				$obj_ord_ref_info = new HotelOrderRefundInfo();
+				$ord_refnd_info = $obj_ord_ref_info->getOderRefundInfoByIdOrderIdProductByDate(Tools::getValue('id_order'), $value['id_product'], $value['date_from'], $value['date_to']);
+				if ($ord_refnd_info)
+				{
+					$obj_refund_stages = new HotelOrderRefundStages();
+					$stage_name = $obj_refund_stages->getNameById($ord_refnd_info['refund_stage_id']);
+				}
 				else
-					$cart_detail_data[$key]['image_link'] = $this->context->link->getImageLink($link_rewrite, $this->context->language->iso_code."-default", 'small_default');
-
-				$cart_detail_data[$key]['room_type'] = (new Product((int) $value['id_product']))->name[Configuration::get('PS_LANG_DEFAULT')];
-				$cart_detail_data[$key]['room_num'] = (new HotelRoomInformation((int) $value['id_room']))->room_num;
-				$cart_detail_data[$key]['date_from'] = (new DateTime($value['date_from']))->format('d-M Y');
-				$cart_detail_data[$key]['date_to'] = (new DateTime($value['date_to']))->format('d-M Y');
-
+					$stage_name = '';
 				$cust_obj = new Customer($value['id_customer']);
-				$cart_detail_data[$key]['alloted_cust_name'] = $cust_obj->firstname.' '.$cust_obj->lastname;
-				$cart_detail_data[$key]['alloted_cust_email'] = $cust_obj->email;
-				$cart_detail_data[$key]['avail_rooms_to_swap'] = (new HotelBookingDetail())->getAvailableRoomsForSwaping($value['date_from'], $value['date_to'], $value['id_product'], $value['id_hotel']);
+				if ($cust_obj->firstname)
+					$cart_detail_data[$key]['alloted_cust_name'] = $cust_obj->firstname.' '.$cust_obj->lastname;
+				else
+					$cart_detail_data[$key]['alloted_cust_name'] = "No customer name found";
+				if ($cust_obj->email)
+					$cart_detail_data[$key]['alloted_cust_email'] = $cust_obj->email;
+				else
+					$cart_detail_data[$key]['alloted_cust_email'] = "No customer name found";
+				
+				$cart_detail_data[$key]['avail_rooms_to_realloc'] = $obj_htl_bk_dtl->getAvailableRoomsForReallocation($value['date_from'], $value['date_to'], $value['id_product'], $value['id_hotel']);
+				$cart_detail_data[$key]['avail_rooms_to_swap'] = $obj_htl_bk_dtl->getAvailableRoomsForSwapping($value['date_from'], $value['date_to'], $value['id_product'], $value['id_hotel'], $value['id_room']);
 
-				$obj_booking_dtl = new HotelBookingDetail();
-					$num_days = $obj_booking_dtl->getNumberOfDays($cart_detail_data[$key]['date_from'], $cart_detail_data[$key]['date_to']); //quantity of product
-					$cart_detail_data[$key]['amt_with_qty'] = $value['amount'] * $num_days;
+				/*Product price when order was created*/
+				$prod_ord_dtl = $obj_htl_bk_dtl->getPsOrderDetailsByProduct($value['id_product'], $order->id);
+
+				$unit_price_tax_excl = $prod_ord_dtl['unit_price_tax_excl'];
+				$unit_price_tax_incl = $prod_ord_dtl['unit_price_tax_incl'];
+					
+				$tax_incl_price = $value['quantity'] * $unit_price_tax_incl;
+				$tax_excl_price = $value['quantity'] * $unit_price_tax_excl;	
+
+				$total_tax += ($tax_incl_price-$tax_excl_price);
+				$total_rooms_cost += $tax_excl_price;
+
+				$cart_detail_data[$key]['amt_with_qty'] = $tax_incl_price;
+
+				// For Order Refund Status
+				$cart_detail_data[$key]['stage_name'] = $stage_name;
 			}
 		}
 		//end
@@ -1865,18 +1921,59 @@ class AdminOrdersControllerCore extends AdminController
 			{
 				$htl_booking_data_order_id[$key]['room_num'] = (new HotelRoomInformation)->getHotelRoomInfoById($value['id_room']);
 				$htl_booking_data_order_id[$key]['order_status'] = $value['id_status'];
-				$htl_booking_data_order_id[$key]['date_from'] = (new DateTime($value['date_from']))->format('d-M Y');
-				$htl_booking_data_order_id[$key]['date_to'] = (new DateTime($value['date_to']))->format('d-M Y');
+				$htl_booking_data_order_id[$key]['date_from'] = $value['date_from'];
+				$htl_booking_data_order_id[$key]['date_to'] = $value['date_to'];
 			}
 		}
 		$htl_order_status = HotelOrderStatus::getAllHotelOrderStatus();
 
+		//For Advanced Payment by Webkul
+		// if (Configuration::get('WK_ALLOW_ADVANCED_PAYMENT'))  // Decide Later
+		// {
+		$obj_customer_adv = new HotelCustomerAdvancedPayment();
+		$order_adv_dtl = $obj_customer_adv->getCstAdvPaymentDtlByIdOrder($order->id);
+		if ($order_adv_dtl) 
+		{
+			if (Tools::isSubmit('payDueAmount')) 
+			{
+				$due_submit_amount = Tools::getValue('submitted_amount');
+				if (!Validate::isPrice($due_submit_amount)) 
+				{
+					$this->errors[] = $this->l('Submitted Amount must be valid amount.');
+				}
+				else
+				{
+					$obj_customer_adv = new HotelCustomerAdvancedPayment($order_adv_dtl['id']);
+					$due_submit_amount += $obj_customer_adv->total_paid_amount;
+					if (($due_submit_amount <= $obj_customer_adv->total_order_amount) && ($due_submit_amount > 0)) 
+					{
+						$obj_customer_adv->total_paid_amount = $due_submit_amount;
+						$obj_customer_adv->save();
+
+						Tools::redirectAdmin($this->context->link->getAdminLink('AdminOrders').'&vieworder&id_order='.$order->id);
+					}
+					else
+					{
+						$this->errors[] = $this->l('Submitted Amount must be less than total order amount.');
+					}
+				}
+			}
+			$this->context->smarty->assign('order_adv_dtl', $order_adv_dtl);
+		}
+		// }
 		//end
 		// Smarty assign
 		$this->tpl_view_vars = array(
-			'htl_booking_order_data' => $htl_booking_data_order_id,//by webkul to show hotel booking order status
-			'hotel_order_status' => $htl_order_status,//by webkul to show hotel booking order status
-			'cart_detail_data' => $cart_detail_data,//by webkul hotel rooms in order data
+				
+			/*#################################################*/
+			/*Assigned variable to view.tpl By webkul*/
+			'total_rooms_cost' => $total_rooms_cost,
+			'total_tax_in_order' => $total_tax,
+			'htl_booking_order_data' => $htl_booking_data_order_id,
+			'hotel_order_status' => $htl_order_status,
+			'cart_detail_data' => $cart_detail_data,
+			/*END*/
+			/*#################################################*/
 			'order' => $order,
 			'cart' => new Cart($order->id_cart),
 			'customer' => $customer,
@@ -2931,37 +3028,7 @@ class AdminOrdersControllerCore extends AdminController
 
 	public function ajaxProcessChangePaymentMethod()
 	{
-		$id_customer = Tools::getValue('id_customer');
 		$customer = new Customer(Tools::getValue('id_customer'));
-		$this->context->customer = $customer;
-		//by webkul code to add id_customer in cart table
-		$this->context->customer = new Customer($id_customer);
-		if ($id_customer)
-		{
-			// setting data in the cart set from book now page by webkul
-			$this->context->cart = new Cart(Tools::getValue('id_cart'));
-			$this->context->cart->id_customer = $id_customer;
-			/*if (Validate::isLoadedObject($this->context->cart) && $this->context->cart->OrderExists())
-				return;*/
-			if (!$this->context->cart->secure_key)
-				$this->context->cart->secure_key = $this->context->customer->secure_key;
-			if (!$this->context->cart->id_shop)
-				$this->context->cart->id_shop = (int)$this->context->shop->id;
-			if (!$this->context->cart->id_lang)
-				$this->context->cart->id_lang = (($id_lang = (int)Tools::getValue('id_lang')) ? $id_lang : Configuration::get('PS_LANG_DEFAULT'));
-			if (!$this->context->cart->id_currency)
-				$this->context->cart->id_currency = (($id_currency = (int)Tools::getValue('id_currency')) ? $id_currency : Configuration::get('PS_CURRENCY_DEFAULT'));
-
-			$addresses = $customer->getAddresses((int)$this->context->cart->id_lang);
-			if (!$this->context->cart->id_address_invoice && isset($addresses[0]))
-				$this->context->cart->id_address_invoice = (int)$addresses[0]['id_address'];
-			elseif ($id_address_invoice)
-				$this->context->cart->id_address_invoice = (int)$id_address_invoice;
-			if (!$this->context->cart->id_address_delivery && isset($addresses[0]))
-				$this->context->cart->id_address_delivery = $addresses[0]['id_address'];
-			$this->context->cart->save();
-		}
-		//end
 		$modules = Module::getAuthorizedModules($customer->id_default_group);
 		$authorized_modules = array();
 
@@ -2996,20 +3063,27 @@ class AdminOrdersControllerCore extends AdminController
 		$del_id = Tools::getValue('del_id');
 		$room_id = Tools::getValue('id_room');
 		$obj_hotel_cart_detail = new HotelCartBookingData();
-		$deleted = $obj_hotel_cart_detail->deleteRowHotelCustomerCartDetail($del_id);
+		$deleted = $obj_hotel_cart_detail->deleteRowById($del_id);
 		if ($deleted)
 		{
 			$obj_product_process = new HotelCartBookingData();
 			$date_from = date_create($dt_frm);
 			$date_to = date_create($dt_to);
+			$num_cart_rooms = $obj_product_process->getCountRoomsByIdCartIdProduct($cart_id, $id_product, $dt_frm, $dt_to);
+
 			$diff = date_diff($date_from,$date_to);
 			$changed = $obj_product_process->changeProductDataByRoomId($room_id, $id_product, $diff->days, $cart_id);
 			if ($changed)
-				die('deleted');
+			{
+				$result['status'] = 'deleted';
+				$result['cart_rooms'] = $num_cart_rooms;
+			}
 			else
-				die(false);
+				$result['status'] = 'failed';
 		}
 		else
-			die(false);
+			$result['status'] = 'failed';
+
+		die(Tools::jsonEncode($result));
 	}
 }

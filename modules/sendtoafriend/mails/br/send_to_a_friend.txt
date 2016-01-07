@@ -1,0 +1,11 @@
+
+[{shop_url}] 
+
+Olá, {name}
+
+Clique aqui para ver este item: {product}
+[{product_link}] 
+
+{shop_name} [{shop_url}] baseado em
+PrestaShop(tm) [http://www.prestashop.com/] 
+

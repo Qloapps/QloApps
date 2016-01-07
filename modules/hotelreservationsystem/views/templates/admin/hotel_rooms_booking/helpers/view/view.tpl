@@ -5,6 +5,7 @@
 		<button type="button" class="btn btn-primary pull-right margin-right-10" id="cart_btn" data-toggle="modal" data-target="#cartModal"><i class="icon-shopping-cart"></i> {l s='Cart' mod='hotelreservationsystem'} <span class="badge" id="cart_record">{$rms_in_cart}</span></button>
 	</h3>
 	<div class="panel-body padding-0">
+	{if $booking_data}
 		<div class="row">
 			<div class="col-sm-4">
 				<div class="row box-border margin-right-10">
@@ -35,6 +36,7 @@
 								<div class="col-sm-8">
 									<select name="hotel_id" class="form-control" id="hotel_id">
 										{if isset($hotel_name) && $hotel_name}
+										<option value='0' selected>{l s='Select Hotel' mod='hotelreservationsystem'}</option>
 											{foreach $hotel_name as $name_val}
 												<option value="{$name_val['id']}" {if isset($hotel_id) && ($name_val['id'] == $hotel_id)}selected{/if}>{$name_val['hotel_name']}</option>
 											{/foreach}
@@ -58,32 +60,6 @@
 									<input type="hidden" name="search_id_prod" id="search_id_prod" value="{$room_type}">
 								</div>
 							</div>
-
-							<!-- <div class="form-group col-sm-6">
-								<label for="adult" class="control-label col-sm-4 required">
-									<span title="" data-toggle="tooltip" class="label-tooltip" data-original-title="{l s='No of Adults in one room' mod='hotelreservationsystem'}">{l s='Adults' mod='hotelreservationsystem'}</span>
-								</label>
-								<div class="col-sm-3">
-									<input type="text" name="adult" class="form-control" value="{if isset($adult)}{$adult}{else}1{/if}" id="adult">
-								</div>
-							</div> -->
-							<!-- <div class="form-group col-sm-6">
-								<label for="children" class="control-label col-sm-4 required">
-									<span title="" data-toggle="tooltip" class="label-tooltip" data-original-title="{l s='No of Children in one room' mod='hotelreservationsystem'}">{l s='children' mod='hotelreservationsystem'}</span>
-								</label>
-								<div class="col-sm-3">
-									<input type="text" name="children" class="form-control" value="{if isset($children)}{$children}{else}0{/if}" id="children">
-								</div>
-							</div> -->
-							
-							<!-- <div class="form-group col-sm-6">
-								<label for="num_rooms" class="control-label col-sm-4 required">
-									<span title="" data-toggle="tooltip" class="label-tooltip" data-original-title="{l s='No of Rooms' mod='hotelreservationsystem'}">{l s='No of Rooms' mod='hotelreservationsystem'}</span>
-								</label>
-								<div class="col-sm-3">
-									<input type="text" name="num_rooms" class="form-control" value="{if isset($num_rooms)}{$num_rooms}{else}1{/if}" id="num_rooms">
-								</div>
-							</div> -->
 							<div class="col-sm-12">
 								<button id="search_hotel_list" name="search_hotel_list" type="submit" class="btn btn-primary pull-right">
 									<i class="icon-search"></i>&nbsp&nbsp{l s='Search' mod='hotelreservationsystem'}
@@ -198,243 +174,187 @@
 				</div>
 			</div>
 		</div>
-
-		<div class="row margin-div" id="htl_rooms_list">
+	{else}
+		<p class="alert alert-warning">	{l s="Please add Hotels and rooms First !" mod="hotelreservationsystem"}</p>
+	{/if}
 {/if}
+	{if isset($booking_data) && $booking_data}
+		<div class="row margin-div" id="htl_rooms_list">
 			<div class="col-sm-12">
 				<ul class="nav nav-tabs">
-					{if isset($booking_data) && $booking_data}
-						{foreach from=$booking_data['rm_data'] key=book_k item=book_v}
-							<li {if $book_k == 0}class="active"{/if} ><a href="#room_type_{$book_k}" data-toggle="tab">{$book_v['name']}</a></li>
-						{/foreach}
-					{/if}
+					{foreach from=$booking_data['rm_data'] key=book_k item=book_v}
+						<li {if $book_k == 0}class="active"{/if} ><a href="#room_type_{$book_k}" data-toggle="tab">{$book_v['name']}</a></li>
+					{/foreach}
 				</ul>
 				<div class="tab-content panel">
-					{if isset($booking_data) && $booking_data}
-						{foreach from=$booking_data['rm_data'] key=book_k item=book_v}
-							<div id="room_type_{$book_k}" class="tab-pane {if $book_k == 0}active{/if}">
-								<ul class="nav nav-tabs">
-									<li class="active"><a href="#avail_room_data_{$book_k}" data-toggle="tab">{l s='Available Rooms' mod='hotelreservationsystem'}</a></li>
-									<li><a href="#part_room_data_{$book_k}" data-toggle="tab">{l s='Partially Available' mod='hotelreservationsystem'}</a></li>
-									<li><a href="#book_room_data_{$book_k}" data-toggle="tab">{l s='Booked Rooms' mod='hotelreservationsystem'}</a></li>
-									<li><a href="#unavail_room_data_{$book_k}" data-toggle="tab">{l s='Unavailable Rooms' mod='hotelreservationsystem'}</a></li>
-								</ul>
-								<div class="tab-content panel">
-									<div id="avail_room_data_{$book_k}" class="tab-pane active">
-										<div class="table-responsive">
-											<table class="table">
-												<thead>
+					{foreach from=$booking_data['rm_data'] key=book_k item=book_v}
+						<div id="room_type_{$book_k}" class="tab-pane {if $book_k == 0}active{/if}">
+							<ul class="nav nav-tabs">
+								<li class="active"><a href="#avail_room_data_{$book_k}" data-toggle="tab">{l s='Available Rooms' mod='hotelreservationsystem'}</a></li>
+								<li><a href="#part_room_data_{$book_k}" data-toggle="tab">{l s='Partially Available' mod='hotelreservationsystem'}</a></li>
+								<li><a href="#book_room_data_{$book_k}" data-toggle="tab">{l s='Booked Rooms' mod='hotelreservationsystem'}</a></li>
+								<li><a href="#unavail_room_data_{$book_k}" data-toggle="tab">{l s='Unavailable Rooms' mod='hotelreservationsystem'}</a></li>
+							</ul>
+							<div class="tab-content panel">
+								<div id="avail_room_data_{$book_k}" class="tab-pane active">
+									<div class="table-responsive">
+										<table class="table">
+											<thead>
+												<tr>
+													<th><span class="title_box">{l s='Room No.' mod='hotelreservationsystem'}</span></th>
+													<th><span class="title_box">{l s='Duration' mod='hotelreservationsystem'}</span></th>
+													<th><span class="title_box">{l s='Message' mod='hotelreservationsystem'}</span></th>
+													<th><span class="title_box">{l s='Allotment Type' mod='hotelreservationsystem'}</span></th>
+													<th><span class="title_box">{l s='Action' mod='hotelreservationsystem'}</span></th>
+												</tr>
+											</thead>
+											<tbody>
+												{foreach from=$book_v['data']['available'] key=avai_k item=avai_v}
 													<tr>
-														<th><span class="title_box">{l s='Room No.' mod='hotelreservationsystem'}</span></th>
-														<th><span class="title_box">{l s='Duration' mod='hotelreservationsystem'}</span></th>
-														<th><span class="title_box">{l s='Message' mod='hotelreservationsystem'}</span></th>
-														<th><span class="title_box">{l s='Allotment Type' mod='hotelreservationsystem'}</span></th>
-														<th><span class="title_box">{l s='Action' mod='hotelreservationsystem'}</span></th>
+														<td>{$avai_v['room_num']}</td>
+														<td>{$date_from|date_format:'%d %b %Y'} - {$date_to|date_format:'%d %b %Y'}</td>
+														<td>{$avai_v['room_comment']}</td>
+														<td>
+															<label class="control-label">
+																<input type="radio" value="1" name="bk_type_{$avai_v['id_room']}" data-id-room="{$avai_v['id_room']}" class="avai_bk_type" checked>
+																<span>{l s='Auto Allotment' mod='hotelreservationsystem'}</span>
+															</label>
+															<label class="control-label">
+																<input type="radio" value="2" name="bk_type_{$avai_v['id_room']}" data-id-room="{$avai_v['id_room']}" class="avai_bk_type">
+																<span>{l s='Manual Allotment' mod='hotelreservationsystem'}</span>
+															</label>
+															<input type="text" id="comment_{$avai_v['id_room']}" class="form-control avai_comment">
+														</td>
+														<td>
+															<button type="button" data-id-cart="" data-id-cart-book-data="" data-id-product="{$avai_v['id_product']}" data-id-room="{$avai_v['id_room']}" data-id-hotel="{$avai_v['id_hotel']}" data-date-from="{$date_from|date_format:'%Y-%m-%d'}" data-date-to ="{$date_to|date_format:'%Y-%m-%d'}" class="btn btn-primary avai_add_cart">{l s='Add To Cart' mod='hotelreservationsystem'}</button>
+														</td>
 													</tr>
-												</thead>
-												<tbody>
-													{foreach from=$book_v['data']['available'] key=avai_k item=avai_v}
-														<tr>
-															<td>{$avai_v['room_num']}</td>
-															<td>{$date_from|date_format:"%d-%b-%G"} {l s='To' mod='hotelreservationsystem'} {$date_to|date_format:"%d-%b-%G"}</td>
-															<td>{$avai_v['room_comment']}</td>
-															<td>
-																<label class="control-label">
-																	<input type="radio" value="1" name="bk_type_{$avai_v['id_room']}" data-id-room="{$avai_v['id_room']}" class="avai_bk_type" checked>
-																	<span>{l s='Auto Allotment' mod='hotelreservationsystem'}</span>
-																</label>
-																<label class="control-label">
-																	<input type="radio" value="2" name="bk_type_{$avai_v['id_room']}" data-id-room="{$avai_v['id_room']}" class="avai_bk_type">
-																	<span>{l s='Manual Allotment' mod='hotelreservationsystem'}</span>
-																</label>
-																<input type="text" id="comment_{$avai_v['id_room']}" class="form-control avai_comment">
-															</td>
-															<td>
-															{if isset($avai_v['in_current_cart']) && $avai_v['in_current_cart']}
-																<button type="button" data-id-cart="{$avai_v['id_cart']}" data-id-cart-book-data="{$avai_v['cart_booking_data_id']}" data-id-product="{$avai_v['id_product']}" data-id-room="{$avai_v['id_room']}" data-id-hotel="{$avai_v['id_hotel']}" data-date-from="{$date_from}" data-date-to ="{$date_to}" class="btn btn-danger avai_delete_cart_data">{l s='Remove' mod='hotelreservationsystem'}</button>
-															{else}
-																	<button type="button" data-id-cart="" data-id-cart-book-data="" data-id-product="{$avai_v['id_product']}" data-id-room="{$avai_v['id_room']}" data-id-hotel="{$avai_v['id_hotel']}" data-date-from="{$date_from}" data-date-to ="{$date_to}" class="btn btn-primary avai_add_cart">{l s='Add To Cart' mod='hotelreservationsystem'}</button>
-																{/if}
-															</td>
-														</tr>
-													{/foreach}
-												</tbody>
-											</table>
-										</div>
+												{/foreach}
+											</tbody>
+										</table>
 									</div>
-									<div id="part_room_data_{$book_k}" class="tab-pane">
-										<div class="table-responsive">
-											<table class="table">
-												<thead>
+								</div>
+								<div id="part_room_data_{$book_k}" class="tab-pane">
+									<div class="table-responsive">
+										<table class="table">
+											<thead>
+												<tr>
+													<th><span class="title_box">{l s='Room No.' mod='hotelreservationsystem'}</span></th>
+													<th class="text-center"><span class="title_box">{l s='Duration' mod='hotelreservationsystem'}</span></th>
+													<th class="text-center"><span class="title_box">{l s='Allotment Type' mod='hotelreservationsystem'}</span></th>
+													<th class="text-center"><span class="title_box">{l s='Action' mod='hotelreservationsystem'}</span></th>
+												</tr>
+											</thead>
+											<tbody>
+												{foreach from=$book_v['data']['partially_available'] key=part_k item=part_v}
 													<tr>
-														<th><span class="title_box">{l s='Room No.' mod='hotelreservationsystem'}</span></th>
-														<th><span class="title_box">{l s='Duration' mod='hotelreservationsystem'}</span></th>
-														<th><span class="title_box">{l s='Allotment Type' mod='hotelreservationsystem'}</span></th>
-														<th><span class="title_box">{l s='Action' mod='hotelreservationsystem'}</span></th>
+														<td>{$part_v['room_num']}</td>
+														<td colspan="3">
+															<table class="table">
+																{foreach from=$part_v['avai_dates'] key=sub_part_k item=sub_part_v}
+																	<tr>
+																		<td class="text-center">
+																			<p>{$sub_part_v['date_from']|date_format:'%d %b %Y'} - {$sub_part_v['date_to']|date_format:'%d %b %Y'}</p>
+																		</td>
+																		<td class="text-center">
+																			<label class="control-label">
+																				<input type="radio" value="1" class="par_bk_type" name="bk_type_{$part_v['id_room']}_{$sub_part_k}" data-id-room="{$part_v['id_room']}" data-sub-key="{$sub_part_k}" checked>
+																				<span>{l s='Auto Allotment' mod='hotelreservationsystem'}</span>
+																			</label>
+																			<label class="control-label">
+																				<input type="radio" value="2" class="par_bk_type" name="bk_type_{$part_v['id_room']}_{$sub_part_k}" data-id-room="{$part_v['id_room']}" data-sub-key="{$sub_part_k}">
+																				<span>{l s='Manual Allotment' mod='hotelreservationsystem'}</span>
+																			</label>
+																			<input type="text" id="comment_{$part_v['id_room']}_{$sub_part_k}" class="form-control par_comment">
+																		</td>
+																		<td class="text-center">
+																			<button type="button" data-id-cart="" data-id-cart-book-data="" data-id-product="{$part_v['id_product']}" data-id-room="{$part_v['id_room']}" data-id-hotel="{$part_v['id_hotel']}" data-date-from="{$sub_part_v['date_from']|date_format:'%Y-%m-%d'}" data-date-to ="{$sub_part_v['date_to']|date_format:'%Y-%m-%d'}" data-sub-key="{$sub_part_k}" class="btn btn-primary par_add_cart">{l s='Add To Cart' mod='hotelreservationsystem'}</button>
+																		</td>
+																	</tr>
+																{/foreach}
+															</table>
+														</td>
 													</tr>
-												</thead>
-												<tbody>
-													{foreach from=$book_v['data']['partially_available'] key=part_k item=part_v}
-														<tr>
-															<td>{$part_v['room_num']}</td>
-															<td>
-																{foreach from=$part_v['avai_dates'] key=sub_part_k item=sub_part_v}
-																	<div class="row partial_subrow">
-																		<p>{$sub_part_v}</p>
-																	</div>
-																{/foreach}
-															</td>
-															<td>
-																{foreach from=$part_v['avai_dates'] key=sub_part_k item=sub_part_v}
-																	<div class="row partial_subrow">
-																		<label class="control-label">
-																			<input type="radio" value="1" class="par_bk_type" name="bk_type_{$part_v['id_room']}_{$sub_part_k}" data-id-room="{$part_v['id_room']}" data-sub-key="{$sub_part_k}" checked>
-																			<span>{l s='Auto Allotment' mod='hotelreservationsystem'}</span>
-																		</label>
-																		<label class="control-label">
-																			<input type="radio" value="2" class="par_bk_type" name="bk_type_{$part_v['id_room']}_{$sub_part_k}" data-id-room="{$part_v['id_room']}" data-sub-key="{$sub_part_k}">
-																			<span>{l s='Manual Allotment' mod='hotelreservationsystem'}</span>
-																		</label>
-																		<input type="text" id="comment_{$part_v['id_room']}_{$sub_part_k}" class="form-control par_comment">
-																	</div>
-																{/foreach}
-															</td>
-															<td>
-																{foreach from=$part_v['avai_dates'] key=sub_part_k item=sub_part_v}
-																	<div class="row partial_subrow">
-																	{assign var=date_arr value=" "|explode:$sub_part_v}
-																	 {if $part_v['check_cart'][$sub_part_k]['in_current_cart']}
-																	 	<button type="button" data-id-cart="{$part_v['check_cart'][$sub_part_k]['id_cart']}" data-id-cart-book-data="{$part_v['check_cart'][$sub_part_k]['cart_booking_data_id']}" data-id-product="{$part_v['id_product']}" data-id-room="{$part_v['id_room']}" data-id-hotel="{$part_v['id_hotel']}" data-date-from="{$date_arr[0]|date_format:'%Y-%m-%d'}" data-date-to ="{$date_arr[2]|date_format:'%Y-%m-%d'}" data-sub-key="{$sub_part_k}" class="btn btn-danger part_delete_cart_data">{l s='Remove' mod='hotelreservationsystem'}</button>
-																	 {else}
-																				<button type="button" data-id-cart="" data-id-cart-book-data="" data-id-product="{$part_v['id_product']}" data-id-room="{$part_v['id_room']}" data-id-hotel="{$part_v['id_hotel']}" data-date-from="{$date_arr[0]|date_format:'%Y-%m-%d'}" data-date-to ="{$date_arr[2]|date_format:'%Y-%m-%d'}" data-sub-key="{$sub_part_k}" class="btn btn-primary par_add_cart">{l s='Add To Cart' mod='hotelreservationsystem'}</button>
-																			{/if}
-																		</div>
-																{/foreach}
-															</td>
-														</tr>
-													{/foreach}
-												</tbody>
-											</table>
-										</div>
+												{/foreach}
+											</tbody>
+										</table>
 									</div>
-									<div id="book_room_data_{$book_k}" class="tab-pane">
-										<div class="table-responsive">
-											<table class="table">
-												<thead>
+								</div>
+								<div id="book_room_data_{$book_k}" class="tab-pane">
+									<div class="table-responsive">
+										<table class="table">
+											<thead>
+												<tr>
+													<th><span class="title_box">{l s='Room No.' mod='hotelreservationsystem'}</span></th>
+													<th class="text-center"><span class="title_box">{l s='Duration' mod='hotelreservationsystem'}</span></th>
+													<th class="text-center"><span class="title_box">{l s='Message' mod='hotelreservationsystem'}</span></th>
+													<th class="text-center"><span class="title_box">{l s='Allotment Type' mod='hotelreservationsystem'}</span></th>
+													<th><span class="title_box">{l s='Reallocate' mod='hotelreservationsystem'}</span></th>
+												</tr>
+											</thead>
+											<tbody>
+												{foreach from=$book_v['data']['booked'] key=booked_k item=booked_v}
 													<tr>
-														<th><span class="title_box">{l s='Room No.' mod='hotelreservationsystem'}</span></th>
-														<th><span class="title_box">{l s='Duration' mod='hotelreservationsystem'}</span></th>
-														<th><span class="title_box">{l s='Message' mod='hotelreservationsystem'}</span></th>
-														<th><span class="title_box">{l s='Allotment Type' mod='hotelreservationsystem'}</span></th>
-														<th><span class="title_box">{l s='Reallocate' mod='hotelreservationsystem'}</span></th>
+														<td>{$booked_v['room_num']}</td>
+														<td colspan="4">
+															<table class="table">
+																{foreach from=$booked_v['detail'] key=rm_dtl_k item=rm_dtl_v}
+																	<tr>
+																		<td class="col-xs-3">{$rm_dtl_v['date_from']|date_format:'%d %b %Y'} - {$rm_dtl_v['date_to']|date_format:'%d %b %Y'}</td>
+																		<td class="col-xs-3">{$rm_dtl_v['comment']}</td>
+																		<td class="col-xs-3">
+																			<label class="control-label">
+																				<input type="radio" value="1" {if $rm_dtl_v['booking_type'] == 1}checked{/if} name="bt_type_{$booked_v['id_room']}_{$rm_dtl_v['date_from']|date_format:'%Y%m%d'}">
+																				<span>{l s='Auto Allotment' mod='hotelreservationsystem'}</span>
+																			</label>
+																			<label class="control-label">
+																				<input type="radio" value="2" {if $rm_dtl_v['booking_type'] == 2}checked{/if} name="bt_type_{$booked_v['id_room']}_{$rm_dtl_v['date_from']|date_format:'%Y%m%d'}">
+																				<span>{l s='Manual Allotment' mod='hotelreservationsystem'}</span>
+																			</label>
+																		</td>
+																		{if $rm_dtl_v['booking_type'] == 1}
+																		<td>
+																			<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#mySwappigModal" data-room_num={$booked_v['room_num']} data-date_from={$rm_dtl_v['date_from']} data-date_to={$rm_dtl_v['date_to']} data-id_room={$booked_v['id_room']} data-cust_name="{$rm_dtl_v['alloted_cust_name']}" data-cust_email="{$rm_dtl_v['alloted_cust_email']}" data-avail_rm_realloc={$rm_dtl_v['avail_rooms_to_realloc']|@json_encode} data-avail_rm_swap={$rm_dtl_v['avail_rooms_to_swap']|@json_encode}>
+																				{l s='Reallocate Room' mod='hotelreservationsystem'}
+																			</button>
+																		</td>
+																	{/if}
+																	</tr>
+																{/foreach}
+															</table>
+														</td>
 													</tr>
-												</thead>
-												<tbody>
-													{foreach from=$book_v['data']['booked'] key=booked_k item=booked_v}
-														<tr>
-															<td>{$booked_v['room_num']}</td>
-															<td>{$booked_v['date_from']|date_format:"%d-%b-%G"} {l s='To' mod='hotelreservationsystem'} {$booked_v['date_to']|date_format:"%d-%b-%G"}</td>
-															<td>{$booked_v['comment']}</td>
-															<td>
-																<label class="control-label">
-																	<input type="radio" value="1" {if $booked_v['booking_type'] == 1}checked{/if} name="bt_type_{$booked_v['id_room']}">
-																	<span>{l s='Auto Allotment' mod='hotelreservationsystem'}</span>
-																</label>
-																<label class="control-label">
-																	<input type="radio" value="2" {if $booked_v['booking_type'] == 2}checked{/if} name="bt_type_{$booked_v['id_room']}">
-																	<span>{l s='Manual Allotment' mod='hotelreservationsystem'}</span>
-																</label>
-															</td>
-															{if $booked_v['booking_type'] == 1}
-															<td>
-																<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#mySwappigModal">
-																	{l s='Reallocate Room' mod='hotelreservationsystem'}
-																</button>
-
-																<!-- Modal -->
-																<div class="modal fade" id="mySwappigModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-																  <div class="modal-dialog" role="document">
-																    <div class="modal-content">
-																      <form method="post" action="">
-																	      <div class="modal-header">
-																	        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-																	        <h4 class="modal-title" id="myModalLabel">{l s='Reallocate Rooms'}</h4>
-																	      </div>
-																      	<div class="modal-body">
-																          <div class="form-group">
-																            <label for="curr_room_num" class="control-label">{l s='Current Room Number:' mod='hotelreservationsystem'}</label>
-																            <input type="text" class="form-control" id="curr_room_num" name="curr_room_num" value="{$booked_v['room_num']}" readonly="true">
-																            <input type="hidden" class="form-control" name="date_from" value="{$booked_v['date_from']}">
-																            <input type="hidden" class="form-control" name="date_to" value="{$booked_v['date_to']}">
-																            <input type="hidden" class="form-control" name="id_room" value="{$booked_v['id_room']}">
-																          </div>
-																          <div class="form-group">
-																            <label for="swapped_avail_rooms" class="control-label">{l s='Available Rooms To Swap:' mod='hotelreservationsystem'}</label>
-																            <div style="width: 195px;">
-																							<select class="form-control" name="swapped_avail_rooms" id="swapped_avail_rooms">
-																								<option value="" selected="selected">{l s='Select Rooms' mod='hotelreservationsystem'}</option>
-																								{if isset($booked_v['avail_rooms_to_swap']) && $booked_v['avail_rooms_to_swap']}
-																									{foreach from=$booked_v['avail_rooms_to_swap'] key=room_k item=room_v}
-																										<option value="{$room_v['id_room']}" >{$room_v['room_num']}</option>
-																									{/foreach}
-																								{else}
-																									{l s='No rooms available' mod='hotelreservationsystem'}
-																								{/if}
-																							</select>
-																						</div>
-																          </div>
-																          <div class="form-group">
-																            <label for="message-text" class="col-sm-12 control-label">{l s='Currently Alloted Customer Information:' mod='hotelreservationsystem'}</label>
-																           	<dl class="well list-detail">
-																							<dt>{l s='Name'}</dt>
-																							<dd>{$booked_v['alloted_cust_name']}</dd><br>
-																							<dt>{l s='Email'}</dt>
-																							<dd>{$booked_v['alloted_cust_email']}</dd><br>
-																						</dl>
-																		      </div>
-																      </div>
-																	      <div class="modal-footer">
-																	        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-																	        <input type="submit" name="swap_allocated_rooms" class="btn btn-primary" value="Save">
-																	      </div>
-																    </form>
-																    </div>
-																  </div>
-																</div>
-															</td>
-															{/if}
-														</tr>
-													{/foreach}
-												</tbody>
-											</table>
-										</div>
+												{/foreach}
+											</tbody>
+										</table>
 									</div>
-									<div id="unavail_room_data_{$book_k}" class="tab-pane">
-										<div class="table-responsive">
-											<table class="table">
-												<thead>
+								</div>
+								<div id="unavail_room_data_{$book_k}" class="tab-pane">
+									<div class="table-responsive">
+										<table class="table">
+											<thead>
+												<tr>
+													<th><span class="title_box">{l s='Room No.' mod='hotelreservationsystem'}</span></th>
+													<th><span class="title_box">{l s='Message' mod='hotelreservationsystem'}</span></th>
+												</tr>
+											</thead>
+											<tbody>
+												{foreach from=$book_v['data']['unavailable'] key=unavai_k item=unavai_v}
 													<tr>
-														<th><span class="title_box">{l s='Room No.' mod='hotelreservationsystem'}</span></th>
-														<th><span class="title_box">{l s='Message' mod='hotelreservationsystem'}</span></th>
+														<td>{$unavai_v['room_num']}</td>
+														<td>{$unavai_v['room_comment']}</td>
 													</tr>
-												</thead>
-												<tbody>
-													{foreach from=$book_v['data']['unavailable'] key=unavai_k item=unavai_v}
-														<tr>
-															<td>{$unavai_v['room_num']}</td>
-															<td>{$unavai_v['room_comment']}</td>
-														</tr>
-													{/foreach}
-												</tbody>
-											</table>
-										</div>
+												{/foreach}
+											</tbody>
+										</table>
 									</div>
 								</div>
 							</div>
-						{/foreach}
-					{/if}	
+						</div>
+					{/foreach}
 				</div>
 			</div>
+		{/if}	
 {if !isset($ajax_delete)}
 		</div>
 	</div>
@@ -467,7 +387,9 @@
 									<tr>
 										<td>{$cart_data['room_num']}</td>
 										<td>{$cart_data['room_type']}</td>
-										<td>{$cart_data['date_from']|date_format:"%d-%b-%Y"} {l s='To' mod='hotelreservationsystem'} {$cart_data['date_to']|date_format:"%d-%b-%Y"}</td>
+										<td>
+											{$cart_data['date_from']|date_format:'%d %b %Y'} - {$cart_data['date_to']|date_format:'%d %b %Y'}
+										</td>
 										<td>{convertPrice price=$cart_data['amt_with_qty']}</td>
 										<td><button class="btn btn-default ajax_cart_delete_data" data-id-product="{$cart_data['id_product']}" data-id-hotel="{$cart_data['id_hotel']}" data-id-cart="{$cart_data['id_cart']}" data-id-cart-book-data="{$cart_data['id_cart_book_data']}" data-date-from="{$cart_data['date_from']}" data-date-to="{$cart_data['date_to']}"><i class='icon-trash'></i></button></td>
 									</tr>
@@ -486,24 +408,109 @@
 								<th colspan="1"></th>
 							</tr>
 						</table>
-						<!-- <div class='col-sm-8'>{l s='Total Amount' mod='hotelreservationsystem'}</div>
-						<div class='col-sm-4' id="cart_total_amt">{if isset($cart_tamount)}{convertPrice price=$cart_tamount}{else}0{/if}</div> -->
 					</div>
-					<!-- <div class="row row-margin-top">
-						<a href="{$link->getAdminLink('AdminOrders')}&amp;addorder&amp;cart_id={$id_cart|intval}&amp;guest_id={$id_guest|intval}" class="btn btn-primary pull-right col-sm-3">
-							{l s='Book Now' mod='hotelreservationsystem'}
-						</a>
-					</div> -->
 				</div>
 			</div>
 			<div class="modal-footer">
-				<a href="{$link->getAdminLink('AdminOrders')}&amp;addorder&amp;cart_id={$id_cart|intval}&amp;guest_id={$id_guest|intval}" class="btn btn-primary">
+				<a href="{$link->getAdminLink('AdminOrders')}&amp;addorder&amp;cart_id={$id_cart|intval}&amp;guest_id={$id_guest|intval}" class="btn btn-primary cart_booking_btn" {if empty($cart_bdata)}disabled="disabled"{/if}>
 					{l s='Book Now' mod='hotelreservationsystem'}
 				</a>
-				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+				<button type="button" class="btn btn-default" data-dismiss="modal">{l s='Close' mod='hotelreservationsystem'}</button>
 			</div>
 		</div>
 	</div>
+</div>
+
+<!-- Modal for reallocation of rooms -->
+<div class="modal fade" id="mySwappigModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+    	<ul class="nav nav-tabs" role="tablist">
+		    <li role="presentation" class="active"><a href="#reallocate_room_tab" aria-controls="reallocate" role="tab" data-toggle="tab">{l s='Room Reallocation' mod='hotelreservationsystem'}</a></li>
+		    <li role="presentation"><a href="#swap_room_tab" aria-controls="swap" role="tab" data-toggle="tab">{l s='Swap Room' mod='hotelreservationsystem'}</a></li>
+		 </ul>
+		<div class="tab-content panel active">
+			<div role="tabpanel" class="tab-pane active" id="reallocate_room_tab">
+				<form method="post" action="">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+						<h4 class="modal-title" id="realloc_myModalLabel">{l s='Reallocate Rooms'}</h4>
+					</div>
+					<div class="modal-body">
+						<div class="form-group">
+							<label for="curr_room_num" class="control-label">{l s='Current Room Number:' mod='hotelreservationsystem'}</label>
+							<input type="text" class="form-control modal_curr_room_num" name="modal_curr_room_num" readonly="true">
+							<input type="hidden" class="form-control modal_date_from" name="modal_date_from">
+							<input type="hidden" class="form-control modal_date_to" name="modal_date_to">
+							<input type="hidden" class="form-control modal_id_room" name="modal_id_room">
+						</div>
+						<div class="form-group">
+							<label for="realloc_avail_rooms" class="control-label">{l s='Available Rooms To Reallocate:' mod='hotelreservationsystem'}</label>
+							<div style="width: 195px;">
+								<select class="form-control" name="realloc_avail_rooms" id="realloc_avail_rooms">
+									<option value="0" selected="selected">{l s='Select Rooms' mod='hotelreservationsystem'}</option>
+								</select>
+								<p class="error_text" id="realloc_sel_rm_err_p"></p>
+							</div>
+						</div>
+						<div class="form-group">
+							<label style="text-decoration:underline;margin-top:5px;" for="message-text" class="col-sm-12 control-label"><i class="icon-info-circle"></i>&nbsp;{l s='Currently Alloted Customer Information:' mod='hotelreservationsystem'}</label>
+							<dl class="well list-detail">
+								<dt>{l s='Name'}</dt>
+								<dd class="cust_name"></dd><br>
+								<dt>{l s='Email'}</dt>
+								<dd class="cust_email"></dd><br>
+							</dl>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">{l s="Close" mod="hotelreservationsyatem"}</button>
+						<input type="submit" id="realloc_allocated_rooms" name="realloc_allocated_rooms" class="btn btn-primary" value="Reallocate">
+					</div>
+				</form>
+			</div>
+			<div role="tabpanel" class="tab-pane" id="swap_room_tab">
+				<form method="post" action="">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+						<h4 class="modal-title" id="swap_myModalLabel">{l s='Swap Rooms'}</h4>
+					</div>
+					<div class="modal-body">
+						<div class="form-group">
+							<label for="swap_curr_room_num" class="control-label">{l s='Current Room Number:' mod='hotelreservationsystem'}</label>
+							<input type="text" class="form-control modal_curr_room_num" name="modal_curr_room_num" readonly="true">
+							<input type="hidden" class="form-control modal_date_from" name="modal_date_from">
+							<input type="hidden" class="form-control modal_date_to" name="modal_date_to">
+							<input type="hidden" class="form-control modal_id_room" name="modal_id_room">
+						</div>
+						<div class="form-group">
+							<label for="swap_avail_rooms" class="control-label">{l s='Available Rooms To Swap:' mod='hotelreservationsystem'}</label>
+							<div style="width: 195px;">
+								<select class="form-control" name="swap_avail_rooms" id="swap_avail_rooms">
+									<option value="0" selected="selected">{l s='Select Rooms' mod='hotelreservationsystem'}</option>
+								</select>
+								<p class="error_text" id="swap_sel_rm_err_p"></p>
+							</div>
+						</div>
+						<div class="form-group">
+							<label style="text-decoration:underline;margin-top:5px;" for="message-text" class="col-sm-12 control-label"><i class="icon-info-circle"></i>&nbsp;{l s='Currently Alloted Customer Information:' mod='hotelreservationsystem'}</label>
+							<dl class="well list-detail">
+								<dt>{l s='Name'}</dt>
+								<dd class="cust_name"></dd><br>
+								<dt>{l s='Email'}</dt>
+								<dd class="cust_email"></dd><br>
+							</dl>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">{l s="Close" mod="hotelreservationsyatem"}</button>
+						<input type="submit" id="swap_allocated_rooms" name="swap_allocated_rooms" class="btn btn-primary" value="Swap">
+					</div>
+				</form>
+			</div>
+		</div>
+    </div>
+  </div>
 </div>
 
 {strip}
@@ -529,6 +536,8 @@
 	{addJsDef booking_calendar_data = $booking_calendar_data|@json_encode}
 	{addJsDef check_css_condition_var = $check_css_condition_var}
 	{addJsDef check_calender_var = $check_calender_var}
+	{addJsDefL name=no_rm_avail_txt}{l s='No rooms available.' js=1 mod='hotelreservationsystem'}{/addJsDefL}
+	{addJsDefL name=slct_rm_err}{l s='Please select a room first.' js=1 mod='hotelreservationsystem'}{/addJsDefL}
 
 {/strip}
 
@@ -570,3 +579,4 @@ $(document).ready(function()
 });
 
 </script>
+

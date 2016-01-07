@@ -40,7 +40,7 @@ class AdminFeaturesControllerCore extends AdminController
 		$this->list_id = 'feature';
 		$this->identifier = 'id_feature';
 		$this->lang = true;
-		$this->imageType = 'jpg';
+		$this->imageType = 'png';
 		$this->fieldImageSettings = array(
 			'name' => 'icon',
 			'dir' => 'rf'
@@ -189,7 +189,8 @@ class AdminFeaturesControllerCore extends AdminController
 					'label' => $this->l('Feature Logo'),		
 					'name' => 'logo',		
 					'display_image' => true,		
-					'hint' => $this->l('Upload a feature logo.')
+					'hint' => $this->l('Upload a feature logo.'),
+					'required' => true
 				)
 			)
 		);
@@ -577,43 +578,41 @@ class AdminFeaturesControllerCore extends AdminController
 			foreach ($_POST as $key => $value)
 				if (preg_match('/^name_/Ui', $key))
 					$_POST[$key] = str_replace ('\n', '', str_replace('\r', '', $value));
-
-
-			//by webkul to save image of feature with feature name
+			//validate feature image
+			if(isset($_FILES['logo']) && $_FILES['logo']['tmp_name'])
+				$this->validAddFeatureImage($_FILES['logo']);
+			else
+				$this->errors[] = Tools::displayError('Please upload a feature image.');
 
 			$obj_feature = parent::processSave();
-
-			$feature_values = FeatureValue::getFeatureValuesWithLang(1, $obj_feature->id);
-
-			if ($feature_values)
-				$obj_feature_value = new FeatureValue($feature_values[0]['id_feature_value']);
-			else
-				$obj_feature_value = new FeatureValue();
-
-			//validate feature image
-			
-			if(isset($_FILES['logo']))
-				$this->validAddFeatureImage($_FILES['logo']);
-
-			$img_path = _PS_IMG_DIR_.'rf/'.$obj_feature->id.'.png';
-			
-			if (isset($_FILES['logo']))
+			if (!count($this->errors))
 			{
+				$img_path = _PS_IMG_DIR_.'rf/'.$obj_feature->id.'.png';
+
+				//by webkul to save image of feature with feature name
+				$feature_values = FeatureValue::getFeatureValuesWithLang(1, $obj_feature->id);
+
+				if ($feature_values)
+					$obj_feature_value = new FeatureValue($feature_values[0]['id_feature_value']);
+				else
+					$obj_feature_value = new FeatureValue();
+
+
 				$current_file = _PS_TMP_IMG_DIR_.'feature_mini_'.$obj_feature->id.'_'.$this->context->shop->id.'.png';
 				if (file_exists($current_file))
 					unlink($current_file);
 
 				$this->uploadFeatureImage($_FILES['logo'], $img_path);
+				$obj_feature_value->id_feature = $obj_feature->id;
+				
+				foreach (Language::getLanguages(true) as $lang)
+		            $obj_feature_value->value[$lang['id_lang']] = $obj_feature->id.'.png';
+		        
+		        $obj_feature_value->save();
+        		return $obj_feature;
 			}
 			
-			$obj_feature_value->id_feature = $obj_feature->id;
-			
-			foreach (Language::getLanguages(true) as $lang)
-	            $obj_feature_value->value[$lang['id_lang']] = $obj_feature->id.'.png';
-	        
-	        $obj_feature_value->save();
 		}
-        return $obj_feature;
 	}
 
 	// upload feature image by webkul

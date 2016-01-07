@@ -442,7 +442,7 @@ class OrderOpcControllerCore extends ParentOrderController
 
 			if ($cart_data_dlt) 
 			{
-				Tools::redirect($link->getPageLink('order', null, $this->context->language->id));
+				Tools::redirect($link->getPageLink('order-opc', null, $this->context->language->id));
 			}
 		}
 
@@ -464,68 +464,178 @@ class OrderOpcControllerCore extends ParentOrderController
 				$htl_rm_types = $this->context->cart->getProducts();
 				if (!empty($htl_rm_types)) 
 				{
-					foreach ($htl_rm_types as $type_key => $type_value) 
+					// For Cart Lock
+					$cartChanged = false;
+					foreach ($htl_rm_types as $t_key => $t_value) 
 					{
-						$product = new Product($type_value['id_product'], false, $this->context->language->id);
-						$cover_image_arr = $product->getCover($type_value['id_product']);
-						
-						if(!empty($cover_image_arr))
-							$cover_img = $this->context->link->getImageLink($product->link_rewrite, $product->id.'-'.$cover_image_arr['id_image'], 'small_default');
-						else 
-							$cover_img = $this->context->link->getImageLink($product->link_rewrite, $this->context->language->iso_code."-default", 'small_default');
+						$rm_dtl = $obj_rm_type->getRoomTypeInfoByIdProduct($t_value['id_product']);
+						$cart_bk_data = $obj_cart_bk_data->getOnlyCartBookingData($this->context->cart->id, $this->context->cart->id_guest, $t_value['id_product']);
 
-						$unit_price = Product::getPriceStatic($type_value['id_product'], true, null, 6, null, false, true, 1);
-
-						if (isset($this->context->customer->id)) 
+						$cart_data = array();
+						foreach ($cart_bk_data as $cd_key => $cd_val) 
 						{
-							$cart_bk_data = $obj_cart_bk_data->getOnlyCartBookingData($this->context->cart->id, $this->context->cart->id_guest, $type_value['id_product']);
+							$date_join = strtotime($cd_val['date_from']).strtotime($cd_val['date_to']);
+
+							$cart_data[$date_join]['date_from'] = $cd_val['date_from'];
+							$cart_data[$date_join]['date_to'] = $cd_val['date_to'];
+							$cart_data[$date_join]['id_rms'][] = $cd_val['id_room'];
 						}
-						else
-						{
-							$cart_bk_data = $obj_cart_bk_data->getOnlyCartBookingData($this->context->cart->id, $this->context->cart->id_guest, $type_value['id_product']);
-						}
-						$rm_dtl = $obj_rm_type->getRoomTypeInfoByIdProduct($type_value['id_product']);
 
-						$cart_htl_data[$type_key]['id_product'] = $type_value['id_product'];
-						$cart_htl_data[$type_key]['cover_img'] 	= $cover_img;
-						$cart_htl_data[$type_key]['name'] 		= $product->name;
-						$cart_htl_data[$type_key]['unit_price'] = $unit_price;
-						$cart_htl_data[$type_key]['adult'] 		= $rm_dtl['adult'];
-						$cart_htl_data[$type_key]['children']	= $rm_dtl['children'];
-						
-						foreach ($cart_bk_data as $data_k => $data_v) 
+						foreach ($cart_data as $cl_key => $cl_val) 
 						{
-							$date_join = strtotime($data_v['date_from']).strtotime($data_v['date_to']);
+							$avai_rm = $obj_htl_bk_dtl->DataForFrontSearch($cl_val['date_from'], $cl_val['date_to'], $rm_dtl['id_hotel'], $t_value['id_product'], 1);
 
-							if (isset($cart_htl_data[$type_key]['date_diff'][$date_join]))
+							if (count($avai_rm['rm_data'][0]['data']['available']) < count($cl_val['id_rms']))
 							{
-								$cart_htl_data[$type_key]['date_diff'][$date_join]['num_rm'] += 1;
-
-								$num_days = $cart_htl_data[$type_key]['date_diff'][$date_join]['num_days'];
-								$vart_quant = (int)$cart_htl_data[$type_key]['date_diff'][$date_join]['num_rm'] * $num_days;
+								$cartChanged = true;
 								
-								$amount = Product::getPriceStatic($type_value['id_product'], true, null, 6, null,	false, true, 1);
-								$amount *= $vart_quant;
-
-								$cart_htl_data[$type_key]['date_diff'][$date_join]['amount'] = $amount;
-							}
-							else
-							{
-								$num_days = $obj_htl_bk_dtl->getNumberOfDays($data_v['date_from'], $data_v['date_to']);
-
-								$cart_htl_data[$type_key]['date_diff'][$date_join]['num_rm'] = 1;
-								$cart_htl_data[$type_key]['date_diff'][$date_join]['data_form'] = $data_v['date_from'];
-								$cart_htl_data[$type_key]['date_diff'][$date_join]['data_to'] = $data_v['date_to'];
-								$cart_htl_data[$type_key]['date_diff'][$date_join]['num_days'] = $num_days;
-								$amount = Product::getPriceStatic($type_value['id_product'], true, null, 6, null, false, true, 1);
-								$amount *= $num_days;
-								$cart_htl_data[$type_key]['date_diff'][$date_join]['amount'] = $amount;
-
-								$cart_htl_data[$type_key]['date_diff'][$date_join]['link'] = $link->getPageLink('order', null, $this->context->language->id, "id_product=".$type_value['id_product']."&deleteFromOrderLine=1&date_from=".$data_v['date_from']."&date_to=".$data_v['date_to']);
+								foreach ($cl_val['id_rms'] as $cr_key => $cr_val) 
+								{
+									$isRmBooked = $obj_htl_bk_dtl->chechRoomBooked($cr_val, $cl_val['date_from'], $cl_val['date_to']);
+									if ($isRmBooked) 
+									{
+										$cartData = array('id_cart' => $this->context->cart->id,
+														  'id_product' => $t_value['id_product'],
+														  'id_order' => 0,
+														  'id_room' => $cr_val,
+														  'date_from' => $cl_val['date_from'],
+														  'date_to' => $cl_val['date_to'],
+													);
+										$iscartdlt = $obj_cart_bk_data->deleteRowByCartBookingData($cartData);
+										if ($iscartdlt) 
+										{
+											$nbDays = $obj_htl_bk_dtl->getNumberOfDays($cl_val['date_from'], $cl_val['date_to']);
+											$this->context->cart->updateQty($nbDays, $t_value['id_product'], null, false, 'down');
+										}
+									}
+								}
 							}
 						}
 					}
-					$this->context->smarty->assign('cart_htl_data', $cart_htl_data);
+					$this->context->smarty->assign('cartChanged', $cartChanged);
+					
+					foreach ($htl_rm_types as $type_key => $type_value) 
+					{
+						$cart_bk_data = $obj_cart_bk_data->getOnlyCartBookingData($this->context->cart->id, $this->context->cart->id_guest, $type_value['id_product']);
+						if ($cart_bk_data) 
+						{
+							$product = new Product($type_value['id_product'], false, $this->context->language->id);
+							$cover_image_arr = $product->getCover($type_value['id_product']);
+							
+							if(!empty($cover_image_arr))
+								$cover_img = $this->context->link->getImageLink($product->link_rewrite, $product->id.'-'.$cover_image_arr['id_image'], 'small_default');
+							else 
+								$cover_img = $this->context->link->getImageLink($product->link_rewrite, $this->context->language->iso_code."-default", 'small_default');
+
+							$unit_price = Tools::ps_round(Product::getPriceStatic($type_value['id_product'], HotelBookingDetail::useTax()), 2);
+
+							$rm_dtl = $obj_rm_type->getRoomTypeInfoByIdProduct($type_value['id_product']);
+
+							$cart_htl_data[$type_key]['id_product'] = $type_value['id_product'];
+							$cart_htl_data[$type_key]['cover_img'] 	= $cover_img;
+							$cart_htl_data[$type_key]['name'] 		= $product->name;
+							$cart_htl_data[$type_key]['unit_price'] = $unit_price;
+							$cart_htl_data[$type_key]['adult'] 		= $rm_dtl['adult'];
+							$cart_htl_data[$type_key]['children']	= $rm_dtl['children'];
+							
+							foreach ($cart_bk_data as $data_k => $data_v) 
+							{
+								$date_join = strtotime($data_v['date_from']).strtotime($data_v['date_to']);
+
+								if (isset($cart_htl_data[$type_key]['date_diff'][$date_join]))
+								{
+									$cart_htl_data[$type_key]['date_diff'][$date_join]['num_rm'] += 1;
+
+									$num_days = $cart_htl_data[$type_key]['date_diff'][$date_join]['num_days'];
+									$vart_quant = (int)$cart_htl_data[$type_key]['date_diff'][$date_join]['num_rm'] * $num_days;
+									
+									$amount = Product::getPriceStatic($type_value['id_product'], HotelBookingDetail::useTax());
+									$amount *= $vart_quant;
+
+									$cart_htl_data[$type_key]['date_diff'][$date_join]['amount'] = Tools::ps_round($amount, 2);
+								}
+								else
+								{
+									$num_days = $obj_htl_bk_dtl->getNumberOfDays($data_v['date_from'], $data_v['date_to']);
+
+									$cart_htl_data[$type_key]['date_diff'][$date_join]['num_rm'] = 1;
+									$cart_htl_data[$type_key]['date_diff'][$date_join]['data_form'] = $data_v['date_from'];
+									$cart_htl_data[$type_key]['date_diff'][$date_join]['data_to'] = $data_v['date_to'];
+									$cart_htl_data[$type_key]['date_diff'][$date_join]['num_days'] = $num_days;
+									$amount = Product::getPriceStatic($type_value['id_product'], HotelBookingDetail::useTax());
+									$amount *= $num_days;
+
+									$cart_htl_data[$type_key]['date_diff'][$date_join]['amount'] = Tools::ps_round($amount, 2);
+
+									$cart_htl_data[$type_key]['date_diff'][$date_join]['link'] = $link->getPageLink('order-opc', null, $this->context->language->id, "id_product=".$type_value['id_product']."&deleteFromOrderLine=1&date_from=".$data_v['date_from']."&date_to=".$data_v['date_to']);
+								}
+							}
+						}
+					}
+					if ($cart_htl_data)
+						$this->context->smarty->assign('cart_htl_data', $cart_htl_data);
+
+					// For Advanced Payment
+					$advance_payment_active = Configuration::get('WK_ALLOW_ADVANCED_PAYMENT');
+					if ($advance_payment_active) 
+					{
+						$obj_adv_pmt = new HotelAdvancedPayment();
+
+						// $adv_amount = Tools::ps_round($obj_adv_pmt->getMinAdvPaymentAmount(), 2);
+						$adv_amount = $obj_adv_pmt->getMinAdvPaymentAmount();
+
+						if (Tools::isSubmit('submitAdvPayment')) 
+						{
+							$id_customer_adv = Tools::getValue('id_customer_adv');
+							if ($id_customer_adv) 
+								$obj_customer_adv = new HotelCustomerAdvancedPayment($id_customer_adv);
+							else
+								$obj_customer_adv = new HotelCustomerAdvancedPayment();
+
+							$payment_type = Tools::getValue('payment_type');
+							if ($payment_type == 2) 
+							{
+								$obj_customer_adv->id_cart = $this->context->cart->id;
+								$obj_customer_adv->id_guest = $this->context->cart->id_guest;
+								$obj_customer_adv->id_customer = $this->context->customer->id ? $this->context->customer->id : '';
+								$obj_customer_adv->id_currency = $this->context->cart->id_currency;
+								$obj_customer_adv->total_paid_amount = $adv_amount;
+								$obj_customer_adv->total_order_amount = $this->context->cart->getOrderTotal();
+								$obj_customer_adv->save();
+							}
+							else
+							{
+								if ($id_customer_adv) 
+									$obj_customer_adv->delete();
+							}
+
+							Tools::redirect($this->context->link->getPageLink('order-opc'));
+						}
+
+						$obj_customer_adv = new HotelCustomerAdvancedPayment();
+						$customer_adv_dtl = $obj_customer_adv->getClientAdvPaymentDtl($this->context->cart->id, $this->context->cart->id_guest);
+						if ($customer_adv_dtl) 
+						{
+							if (Tools::ps_round($customer_adv_dtl['total_paid_amount'], 2) != Tools::ps_round($adv_amount, 2)) // If More rooms are added in cart after selecting Advanced payment
+							{
+								$obj_customer_adv = new HotelCustomerAdvancedPayment($customer_adv_dtl['id']);
+								$obj_customer_adv->id_currency = $this->context->cart->id_currency;
+								$obj_customer_adv->total_paid_amount = $adv_amount;
+								$obj_customer_adv->total_order_amount = $this->context->cart->getOrderTotal();
+								$obj_customer_adv->save();
+
+								Tools::redirect($this->context->link->getPageLink('order-opc'));
+							}
+
+							$due_amount = $this->context->cart->getOrderTotal() - $customer_adv_dtl['total_paid_amount'];
+							$customer_adv_dtl['due_amount'] = $due_amount;
+
+							$this->context->smarty->assign('customer_adv_dtl', $customer_adv_dtl);
+						}
+
+						$this->context->smarty->assign('adv_amount', $adv_amount);
+						$this->context->smarty->assign('advance_payment_active', $advance_payment_active);
+					}
 				}
 			}
 			$this->setTemplate(_PS_THEME_DIR_.'order-opc.tpl');

@@ -263,6 +263,111 @@ $(document).ready(function () {
 			</div>
 		</div>
 	</div>
+
+	<!-- by webkul -->
+	{if $WK_ALLOW_ADVANCED_PAYMENT}
+		<div class="form-group">
+			<div class="col-lg-1"><span class="pull-right">{include file="controllers/products/multishop/checkbox.tpl" field="price" type="price"}</span></div>
+			<label class="control-label col-sm-2">
+				<input type="hidden" name="id_adv_pmt" {if isset($adv_pay_dtl)}value="{$adv_pay_dtl['id']}"{/if}>
+				<span class="label-tooltip" data-toggle="tooltip" title="{l s='If Disabled, Advanced payment will not appliy on this product.'}">
+					{l s='Allow Advanced Payment'}
+				</span>
+			</label>
+			<div class="col-lg-9">
+				<span class="switch prestashop-switch fixed-width-lg">
+					<input type="radio" value="1" id="adv_payment_active_on" name="adv_payment_active" class="adv_payment_active" {if ((isset($adv_pay_dtl) && $adv_pay_dtl['active']) || !isset($adv_pay_dtl))}checked="checked"{/if}>
+					<label for="adv_payment_active_on">{l s='Yes'}</label>
+					<input type="radio" value="0" id="adv_payment_active_off" name="adv_payment_active" class="adv_payment_active" {if (isset($adv_pay_dtl) && !$adv_pay_dtl['active'])}checked="checked"{/if}>
+					<label for="adv_payment_active_off">{l s='No'}</label>
+					<a class="slide-button btn"></a>
+				</span>
+			</div>
+		</div>
+
+		<div class="form-group adv_payment_field">
+			<div class="col-lg-1"><span class="pull-right">{include file="controllers/products/multishop/checkbox.tpl" field="price" type="price"}</span></div>
+			<label class="control-label col-sm-2">
+				<span class="label-tooltip" data-toggle="tooltip" title="{l s='If disabled, Advanced Payment for the product will be calculated By Global Advanced payment settings.'}">
+					{l s='Apply Product Advanced Payment Setting.'}
+				</span>
+			</label>
+			<div class="col-lg-9">
+				<span class="switch prestashop-switch fixed-width-lg">
+					<input type="radio" value="1" id="cal_from_on" name="cal_from" {if (isset($adv_pay_dtl) && $adv_pay_dtl['calculate_from'])}checked="checked"{/if}>
+					<label for="cal_from_on">{l s='Yes'}</label>
+					<input type="radio" value="0" id="cal_from_off" name="cal_from" {if ((isset($adv_pay_dtl) && !$adv_pay_dtl['calculate_from']) || !isset($adv_pay_dtl))}checked="checked"{/if}>
+					<label for="cal_from_off">{l s='No'}</label>
+					<a class="slide-button btn"></a>
+				</span>
+			</div>
+		</div>
+
+		<div class="form-group adv_payment_field">
+			<div class="col-lg-1"><span class="pull-right">{include file="controllers/products/multishop/checkbox.tpl" field="price" type="price"}</span></div>
+			<label class="control-label col-sm-2">{l s='Payment type'}</label>
+			<div class="col-lg-9">
+				<div class="radio">
+					<label for="percent_type">
+						<input type="radio" name="payment_type" class="payment_type" value="1" {if ((isset($adv_pay_dtl) && ($adv_pay_dtl['payment_type'] == 1)) || !isset($adv_pay_dtl) || !$adv_pay_dtl['payment_type'])}checked="checked"{/if}>
+						{l s='Percent (%) '}
+					</label>
+				</div>
+				<div class="radio">
+					<label for="fixed_type">
+						<input type="radio" name="payment_type" class="payment_type" value="2" {if isset($adv_pay_dtl) && ($adv_pay_dtl['payment_type'] == 2)}checked="checked"{/if}>
+						{l s='Amount'}
+					</label>
+				</div>
+			</div>
+		</div>
+
+		<div class="form-group adv_payment_field">
+			<div class="col-lg-1"><span class="pull-right">{include file="controllers/products/multishop/checkbox.tpl" field="price" type="price"}</span></div>
+			<div class="col-lg-11">
+
+				<div class="row" id="type_percent">
+					<label class="control-label col-sm-2">{l s='Value'}</label>
+					<div class="col-sm-4 col-lg-3">
+						<div class="input-group">
+							<span class="input-group-addon">%</span>
+							<input type="text" value="{if isset($adv_pay_dtl) && ($adv_pay_dtl['payment_type'] == 1)}{$adv_pay_dtl['value']}{/if}" name="adv_pay_percent" />
+						</div>
+					</div>
+				</div>
+				
+				<div class="row" id="type_amount">
+					<label class="control-label col-sm-2">{l s='Amount'}</label>
+					<div class="col-sm-4 col-lg-3">
+						<div class="input-group">
+							<span class="input-group-addon">{$currency->prefix}{$currency->suffix}</span>
+							<input name="adv_pay_amount" type="text" value="{if isset($adv_pay_dtl) && ($adv_pay_dtl['payment_type'] == 2)}{{toolsConvertPrice price=$adv_pay_dtl['value']}|string_format:'%.6f'}{/if}"/>
+						</div>
+					</div>
+				</div>
+
+			</div>
+		</div>
+
+		<div class="form-group adv_payment_field">
+			<div class="col-lg-1"><span class="pull-right">{include file="controllers/products/multishop/checkbox.tpl" field="price" type="price"}</span></div>
+			<label class="control-label col-sm-2">
+				<span class="label-tooltip" data-toggle="tooltip" title="{l s='If Enable, customer will pay : (Advanced payment price + tax) and if Disabled, customer will onluy pay advanced payment price'}">
+					{l s='Tax Include'}
+				</span>
+			</label>
+			<div class="col-lg-9">
+				<span class="switch prestashop-switch fixed-width-lg">
+					<input type="radio" value="1" id="adv_tax_include_on" name="adv_tax_include" {if (isset($adv_pay_dtl) && $adv_pay_dtl['tax_include']) || !isset($adv_pay_dtl)}checked="checked"{/if}>
+					<label for="adv_tax_include_on">{l s='Yes'}</label>
+					<input type="radio" value="0" id="adv_tax_include_off" name="adv_tax_include" {if isset($adv_pay_dtl) && !$adv_pay_dtl['tax_include']}checked="checked"{/if}>
+					<label for="adv_tax_include_off">{l s='No'}</label>
+					<a class="slide-button btn"></a>
+				</span>
+			</div>
+		</div>
+	{/if}
+
 	<div class="panel-footer">
 		<a href="{$link->getAdminLink('AdminProducts')|escape:'html':'UTF-8'}{if isset($smarty.request.page) && $smarty.request.page > 1}&amp;submitFilterproduct={$smarty.request.page|intval}{/if}" class="btn btn-default"><i class="process-icon-cancel"></i> {l s='Cancel'}</a>
 		<button type="submit" name="submitAddproduct" class="btn btn-default pull-right" disabled="disabled"><i class="process-icon-loading"></i> {l s='Save'}</button>
@@ -288,7 +393,8 @@ $(document).ready(function () {
 	<script type="text/javascript">
 		var product_prices = new Array();
 		{foreach from=$combinations item='combination'}
-			product_prices['{$combination.id_product_attribute}'] = '{$combination.price|@addcslashes:'\''}';
+			product_prices['{$combination.id_product_attribute}'] = "{$combination.price|@addcslashes:'\''}";
+			/*product_prices['{$combination.id_product_attribute}'] = '{$combination.price|@addcslashes:'\''}';*/
 		{/foreach}
 	</script>
 	<div id="add_specific_price" class="well clearfix" style="display: none;">
@@ -440,8 +546,51 @@ $(document).ready(function () {
 		</div>
 	</div>
 	<script type="text/javascript">
-		var currencyName = '{$currency->name|escape:'html':'UTF-8'|@addcslashes:'\''}';
-		$(document).ready(function(){
+		var currencyName = "{$currency->name|escape:'html':'UTF-8'|@addcslashes:'\''}";
+		$(document).ready(function()
+		{
+			var adv_payment = $(".adv_payment_active:checked").val();
+			if (adv_payment == 1)
+				$(".adv_payment_field").show();
+			else
+				$(".adv_payment_field").hide();
+
+			$(".adv_payment_active").on('change',function()
+			{
+				var adv_payment = $(".adv_payment_active:checked").val();
+				if (adv_payment == 1) 
+					$(".adv_payment_field").show();
+				else if (adv_payment == 0) 
+					$(".adv_payment_field").hide();
+			});
+
+			var payment_type = $(".payment_type:checked").val();
+			if (payment_type == 1) 
+			{
+				$("#type_percent").show();
+				$("#type_amount").hide();
+			}
+			else if (payment_type == 2) 
+			{
+				$("#type_percent").hide();
+				$("#type_amount").show();
+			}
+
+			$(".payment_type").on('change',function()
+			{
+				var payment_type = $(".payment_type:checked").val();
+				if (payment_type == 1) 
+				{
+					$("#type_percent").show();
+					$("#type_amount").hide();
+				}
+				else if (payment_type == 2) 
+				{
+					$("#type_percent").hide();
+					$("#type_amount").show();
+				}
+			});
+
 			product_prices['0'] = $('#sp_current_ht_price').html();
 			$('#id_product_attribute').change(function() {
 				$('#sp_current_ht_price').html(product_prices[$('#id_product_attribute option:selected').val()]);

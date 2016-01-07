@@ -12,7 +12,7 @@ class wkHotelFilterBlock extends Module
         $this->name = 'wkhotelfilterblock';
         $this->author = 'webkul';
         $this->tab = 'front_office_features';
-        $this->version = '1.6.1.1';
+        $this->version = '0.0.2';
         $this->context = Context::getContext();
 
         $this->bootstrap = true;
@@ -77,12 +77,12 @@ class wkHotelFilterBlock extends Module
                 $date_to = date('Y-m-d', strtotime($date_from)+ 86400);
 
             $obj_rm_type = new HotelRoomType();
-            $room_types = $obj_rm_type->getIdProductByHotelId($id_hotel);
+            $room_types = $obj_rm_type->getIdProductByHotelId($id_hotel, 0, 1, 1);
 
             $prod_price = array();
             if ($room_types)
                 foreach ($room_types as $key => $value)
-                    $prod_price[] = Product::getPriceStatic($value['id_product']);
+                    $prod_price[] = Product::getPriceStatic($value['id_product'], HotelBookingDetail::useTax());
 
             if (Configuration::get('PS_REWRITING_SETTINGS'))
                 $cat_link = $this->context->link->getCategoryLink($category).'?date_from='.$date_from.'&date_to='.$date_to;
@@ -96,8 +96,11 @@ class wkHotelFilterBlock extends Module
             $obj_booking_detail = new HotelBookingDetail();
             $num_days = $obj_booking_detail->getNumberOfDays($date_from, $date_to);
 
+            $warning_num = Configuration::get('WK_ROOM_LEFT_WARNING_NUMBER');
+
             $ratting_img = _MODULE_DIR_.$this->name.'/views/img/stars-sprite-image.png';
             $this->context->smarty->assign(array(
+                'warning_num' => $warning_num,
                 'all_feat' => $all_feat,
                 'max_adult' => $max_adult,
                 'max_child' => $max_child,
@@ -140,7 +143,7 @@ class wkHotelFilterBlock extends Module
                 'input' => array(
                     array(
                         'type' => 'switch',
-                        'label' => $this->l('Show Guest Ratting Filter'),
+                        'label' => $this->l('Show Guest Rating Filter'),
                         'name' => 'SHOW_RATTING_FILTER',
                         'required' => false,
                         'class' => 't',

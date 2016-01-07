@@ -1,4 +1,35 @@
 <div class="panel">
+	<h3 class="tab"> <i class="icon-info"></i> {l s='Configuration' mod='wkhotelfeaturesblock'}</h3>
+	<div class="panel-body">
+		<form method="post" action="">
+			<div class="row">
+				<div class="form-group">
+					<label for="testimonial_heading" class="control-label required">
+						<span title="" data-toggle="tooltip" class="label-tooltip">{l s='Parent Testimonial Heading' mod='wktestimonialblock'}</span>
+					</label>
+					<div>
+						<input type="text" name="testimonial_heading" class="form-control" {if isset($parent_testi_data.testimonial_heading)}value="{$parent_testi_data.testimonial_heading}"{/if}>
+						<input type="hidden" name="parent_testimonial_id" class="form-control" {if isset($parent_testi_data.id)}value="{$parent_testi_data.id}"{/if}>
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="testimonial_description" class="control-label required">
+						<span title="" data-toggle="tooltip" class="label-tooltip">{l s='Parent Testimonial Description' mod='wktestimonialblock'}</span>
+					</label>
+					<div>
+						<input type="text" name="testimonial_description" class="form-control" {if isset($parent_testi_data.testimonial_description)}value="{$parent_testi_data.testimonial_description}"{/if}>
+					</div>
+				</div>
+				<div class="">
+					<button id="search_hotel_list" name="save_parent_testimonial_data" type="submit" class="btn btn-primary col-sm-1 pull-right">
+						{l s='Save' mod='wktestimonialblock'}
+					</button>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+<div class="panel">
 	<h3 class="tab"> <i class="icon-info"></i> {l s='Configuration' mod='wktestimonialblock'}</h3>
 	<div class="panel-body">
 		<form method="post" action="" enctype="multipart/form-data">
@@ -19,14 +50,6 @@
 								<div class="">
 									<input type="text" name="name[]" class="form-control" {if isset($data.name)}value="{$data.name}"{/if}>
 									<input type="hidden" name="testimonial_id[]" class="form-control" {if isset($data.id)}value="{$data.id}"{/if}>
-								</div>
-							</div>
-							<div class="form-group">
-								<label for="testimonial_description" class="control-label required">
-									<span title="" data-toggle="tooltip" class="label-tooltip">{l s='Testimonial Description' mod='wktestimonialblock'}</span>
-								</label>
-								<div class="">
-									<input type="text" name="testimonial_description[]" class="form-control" {if isset($data.testimonial_description)}value="{$data.testimonial_description}"{/if}>
 								</div>
 							</div>
 							<div class="form-group">

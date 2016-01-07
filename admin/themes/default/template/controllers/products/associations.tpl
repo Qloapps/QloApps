@@ -58,7 +58,8 @@
 			</select>
 		</div>
 	</div>
-	<div class="form-group">
+	<!-- By webkul to hide unneccessary fields -->
+	<!-- <div class="form-group">
 		<label class="control-label col-lg-3" for="product_autocomplete_input">
 			<span class="label-tooltip" data-toggle="tooltip"
 			title="{l s='You can indicate existing products as accessories for this product.'}{l s='Start by typing the first letters of the product\'s name, then select the product from the drop-down list.'}{l s='Do not forget to save the product afterwards!'}">
@@ -86,8 +87,9 @@
 			{/foreach}
 			</div>
 		</div>
-	</div>
-	<div class="form-group">
+	</div> -->
+	<!-- By webkul to hide unneccessary fields -->
+	<!-- <div class="form-group">
 		<label class="control-label col-lg-3" for="id_manufacturer">{l s='Manufacturer'}</label>
 		<div class="col-lg-5">
 			<select name="id_manufacturer" id="id_manufacturer">
@@ -103,7 +105,7 @@
 				<i class="icon-plus-sign"></i> {l s='Create new manufacturer'} <i class="icon-external-link-sign"></i>
 			</a>
 		</div>
-	</div>
+	</div> -->
 	<div class="panel-footer">
 		<a href="{$link->getAdminLink('AdminProducts')|escape:'html':'UTF-8'}{if isset($smarty.request.page) && $smarty.request.page > 1}&amp;submitFilterproduct={$smarty.request.page|intval}{/if}" class="btn btn-default"><i class="process-icon-cancel"></i> {l s='Cancel'}</a>
 		<button type="submit" name="submitAddproduct" class="btn btn-default pull-right" disabled="disabled"><i class="process-icon-loading"></i> {l s='Save'}</button>

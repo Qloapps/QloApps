@@ -3973,4 +3973,15 @@ class CartCore extends ObjectModel
 			return $addresses_instance_without_carriers;
 		}
 	}
+
+
+	public static function getProductQtyInCart($id_cart, $id_product)
+	{
+		$result = Db::getInstance()->getValue("SELECT `quantity` FROM `"._DB_PREFIX_."cart_product` WHERE `id_cart`= ".$id_cart." AND `id_product`=".$id_product);
+		
+		if ($result)
+			return $result;
+		
+		return 0;
+	}
 }

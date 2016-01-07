@@ -178,8 +178,16 @@ class BankWire extends PaymentModule
 		$state = $params['objOrder']->getCurrentState();
 		if (in_array($state, array(Configuration::get('PS_OS_BANKWIRE'), Configuration::get('PS_OS_OUTOFSTOCK'), Configuration::get('PS_OS_OUTOFSTOCK_UNPAID'))))
 		{
+			if (Configuration::get('WK_ALLOW_ADVANCED_PAYMENT')) 
+			{
+				$obj_customer_adv = new HotelCustomerAdvancedPayment();
+				$order_total = $obj_customer_adv->getOrdertTotal(0, 0, $params['objOrder']->id);
+			}
+			else
+				$order_total = $params['total_to_pay'];
+
 			$this->smarty->assign(array(
-				'total_to_pay' => Tools::displayPrice($params['total_to_pay'], $params['currencyObj'], false),
+				'total_to_pay' => Tools::displayPrice($order_total, $params['currencyObj'], false),
 				'bankwireDetails' => Tools::nl2br($this->details),
 				'bankwireAddress' => Tools::nl2br($this->address),
 				'bankwireOwner' => $this->owner,

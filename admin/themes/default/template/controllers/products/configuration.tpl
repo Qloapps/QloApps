@@ -36,6 +36,7 @@
 		</label>
 		<div class="col-sm-4">
 			<input id="num_adults" type="text" name="num_adults" class="form-control" {if isset($htl_room_type)}value="{$htl_room_type['adult']}"{/if}>
+			<input type="hidden" id="checkConfSubmit" value="0" name="checkConfSubmit">
 		</div>
 	</div>
 	
@@ -128,11 +129,11 @@
 			<i class="process-icon-cancel"></i>
 			{l s='Cancel'}
 		</a>
-		<button type="submit" name="submitAddproduct" class="btn btn-default pull-right" disabled="disabled">
+		<button type="submit" name="submitAddproduct" class="btn btn-default pull-right checkConfigurationClick" disabled="disabled">
 			<i class="process-icon-loading"></i>
 			{l s='Save'}
 		</button>
-		<button type="submit" name="submitAddproductAndStay" class="btn btn-default pull-right" disabled="disabled">
+		<button type="submit" name="submitAddproductAndStay" class="btn btn-default pull-right checkConfigurationClick" disabled="disabled">
 			<i class="process-icon-loading"></i>
 				{l s='Save and stay'}
 		</button>
@@ -210,6 +211,12 @@
 	        });
 			$(this).closest(".room_data_values").remove();
 		});
+
+		$(".checkConfigurationClick").on("click", function()
+		{
+			$("#checkConfSubmit").val(1);
+		});
+
 
 		$(document).on('click','.remove-rooms-button',function(e) 
 		{

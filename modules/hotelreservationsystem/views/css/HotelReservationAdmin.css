@@ -215,13 +215,14 @@
 
 .hotel_date .ui-datepicker td
 {
-    padding: 7px!important;
+    padding: 14px!important;
 }
 
 .hotel_date .ui-state-default
 {
     border: none!important;
     text-align: center!important;
+    padding: 10px!important;
 }
 
 .hotel_date .ui-datepicker-header
@@ -401,22 +402,22 @@
 .default_available .ui-state-default
 {
     background-color: #7ec77b!important;
-    padding: 10px;
     color: #ffffff;
+    border-radius: 50%;
 }
 
 .default_part_available .ui-state-default
 {
     background-color: #dcc635!important;
-    padding: 10px;
     color: #ffffff;
+    border-radius: 50%;
 }
 
 .default_unavailable .ui-state-default
 {
     background-color: #cd5d5d!important;
-    padding: 10px;
     color: #ffffff;
+    border-radius: 50%;
 }
 
 .ui-datepicker-today
@@ -424,19 +425,25 @@
     background-color:#008abd;
 }
 
-.available
+.available .ui-state-default
 {
-    background-color: #7ec77b;
+    background-color: #7ec77b !important;
+    border-radius: 50%;
+    color: #ffffff;
 }
 
-.part_available
+.part_available .ui-state-default
 {
-    background-color: #dcc635;
+    background-color: #dcc635 !important;
+    border-radius: 50%;
+    color: #ffffff;
 }
 
-.unavailable
+.unavailable .ui-state-default
 {
-    background-color: #cd5d5d;
+    background-color: #cd5d5d !important;
+    border-radius: 50%;
+    color: #ffffff;
 }
 
 /* -- changes -- */
@@ -456,3 +463,19 @@
 }
 /* -- changes -- */
 /* ---- Book Now (Booking) ---- */
+
+/* ---- Refund Request controller ---- */
+.details-div
+{
+    margin-top: 30px;
+}
+.cancellation_charge_div
+{
+    display: none;
+}
+/* ---- Refund Request controller ---- */
+
+.error_text
+{
+  color: #AA1F00;
+}

@@ -7359,25 +7359,26 @@ div.star a:hover {
     .footer-container #footer .blockcategories_footer {
       clear: left; }
     .footer-container #footer #social_block {
-      float: right;
+      display: table;
+      margin: 0 auto;
+      /*float: right;*/
       /*width: 50%;*//*by webkul*/
       padding: 22px 15px 0 15px; }
       @media (max-width: 1200px) {
         .footer-container #footer #social_block {
-          /*width: 100%;*//*by webkul*/
-          float: none;
-          margin: 0 auto;
-          padding: 0 15px;
-          width: 200px;}}
+          /*width: 50%;*/
+          /*float: left;*/
+          }}
       @media (max-width: 767px) {
         .footer-container #footer #social_block {
-           float: left; 
-           width: 100%; } }
+           /*float: left; */
+           /*width: 100%;*/ } }
       .footer-container #footer #social_block ul {
         float: right; }
         @media (max-width: 1200px) {
           .footer-container #footer #social_block ul {
-            margin-bottom: 20px; } }
+            margin-bottom: 20px;
+            float: none; } }
         @media (max-width: 992px) {
           .footer-container #footer #social_block ul {
             margin-top: 10px; } }

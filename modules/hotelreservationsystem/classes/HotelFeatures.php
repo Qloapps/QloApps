@@ -20,6 +20,11 @@
 				'date_upd' =>  	 		array('type' => self::TYPE_DATE, 'validate' => 'isDate', 'copy_post' => false),
 		));
 
+		/**
+		 * [getFeatureInfoById :: To get feature in formation by its id]
+		 * @param  [int] $id [description]
+		 * @return [false | array]     [Returns false if no data found otherwise returns array of the information of the feature]
+		 */
 		public function getFeatureInfoById($id)
 		{
 			$result = Db::getInstance()->getRow('SELECT id , name FROM `'._DB_PREFIX_.'htl_features` WHERE id='.$id);
@@ -28,6 +33,10 @@
 			return false;
 		}
 
+		/**
+		 * [HotelAllCommonFeaturesArray :: To get array of all hotel features information according to parents feature and children features under parent feature]
+		 * @return [boolean] [If data found returns array of all common features as parent then children under this parent]
+		 */
 		public function HotelAllCommonFeaturesArray()
 		{
 			$parent_features = Db::getInstance()->executeS('SELECT id , name, position FROM `'._DB_PREFIX_.'htl_features` WHERE parent_feature_id=0 order by position');
@@ -55,6 +64,11 @@
 			return $result;
 		}
 
+		/**
+		 * [deleteHotelFeatures :: Deletes the feature which id is $delete_id and also delete all the child features which parent id is $delete_id]
+		 * @param  [int] $delete_id [id(primary_key) of the htl_features table]
+		 * @return [boolean] [true if deleted otherwise false]
+		 */
 		public function deleteHotelFeatures($delete_id)
 		{
 			$deleteHotelFeature = Db::getInstance()->delete('htl_features','id='.$delete_id.' OR parent_feature_id='.$delete_id);
@@ -63,6 +77,11 @@
 			return false;
 		}
 
+		/**
+		 * [HotelBranchSelectedFeaturesArray :: To get array of all hotel features information according to parents and children including which child features are selected for a hotel]
+		 * @param [array] $htl_features [array containing information of the features of a hotel]
+		 * @return [boolean] [If data found returns array of all common features as parent then children under this parent and also set an index in the array that defines whether the child feature is selected for the hotel or not]
+		 */
 		public function HotelBranchSelectedFeaturesArray($htl_features)
 		{
 			$parent_features = Db::getInstance()->executeS('SELECT id , name FROM `'._DB_PREFIX_.'htl_features` WHERE parent_feature_id=0');

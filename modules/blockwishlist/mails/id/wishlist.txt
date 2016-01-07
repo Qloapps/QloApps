@@ -1,0 +1,13 @@
+
+[{shop_url}] 
+
+Halo, 
+
+{firstname} {lastname} ingin Anda melihat daftar wishlist-nya:
+{wishlist}
+
+{wishlist} [{message}] 		 
+
+{shop_name} [{shop_url}] didukung oleh
+PrestaShop(tm) [http://www.prestashop.com/] 
+

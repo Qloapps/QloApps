@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<module>
+	<name>vatnumber</name>
+	<displayName><![CDATA[Kode PPN negara Eropa]]></displayName>
+	<version><![CDATA[1.8.0]]></version>
+	<description><![CDATA[Memungkinkan Anda untuk memasukan nomor NPWP pada saat membuat alamat. Anda harus mengisi field perusahaan untuk memunculkan field NPWP.]]></description>
+	<author><![CDATA[PrestaShop]]></author>
+	<tab><![CDATA[billing_invoicing]]></tab>
+	<is_configurable>1</is_configurable>
+	<need_instance>0</need_instance>
+	<limited_countries></limited_countries>
+</module>

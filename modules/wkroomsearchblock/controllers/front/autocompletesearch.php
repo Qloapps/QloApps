@@ -27,17 +27,18 @@ class WkRoomSearchBlockAutoCompleteSearchModuleFrontController extends ModuleFro
 		}
 		else if (isset($city_cat_id) && $city_cat_id)
 		{
+			$obj_htl_info = new HotelBranchInformation();
 			$cat_ids = Category::getAllCategoriesName($city_cat_id);
 			if ($cat_ids)
 			{
 				$html = '';
 				foreach ($cat_ids as $key => $value)
 				{
-					$hotel_info = $this->hotelBranchInfoByCategoryId($value['id_category']);
+					$hotel_info = $obj_htl_info->hotelBranchInfoByCategoryId($value['id_category']);
 
 					if ($hotel_info)
 					{
-						$html .= '<li class="hotel_name" data-hotel-cat-id="'.$hotel_info['id_category'].'">'.$hotel_info['hotel_name'].'</li>';
+						$html .= '<li class="hotel_name" data-hotel-cat-id="'.$hotel_info[0]['id_category'].'">'.$hotel_info[0]['hotel_name'].'</li>';
 					}
 				}
 				$result['status'] = 'success';
@@ -57,18 +58,9 @@ class WkRoomSearchBlockAutoCompleteSearchModuleFrontController extends ModuleFro
 		$sql = "SELECT cl.`id_category` , cl.`name` 
 				FROM `"._DB_PREFIX_."category_lang` AS cl
 				INNER JOIN `"._DB_PREFIX_."category` AS c ON (cl.id_category = c.id_category)
-				WHERE cl.name LIKE '%$search_data%' AND c.level_depth NOT IN (0, 1, 5)";
+				WHERE cl.name LIKE '%$search_data%' AND c.level_depth NOT IN (0, 1, 5) and id_lang=".$this->context->language->id.' GROUP BY cl.`name`';
 
 		$result = Db::getInstance()->executeS($sql);
 		return $result;
-	}
-
-	public function hotelBranchInfoByCategoryId($cat_id)
-	{
-		$result = Db::getInstance()->getRow("SELECT `id`, `hotel_name`, `id_category` FROM `"._DB_PREFIX_.'htl_branch_info` WHERE `id_category` ='.$cat_id.' AND `active`=1');
-
-		if ($result)
-			return $result;
-		return false;
 	}
 }

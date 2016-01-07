@@ -22,7 +22,7 @@
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
-{if isset($orderProducts) && count($orderProducts) > 0}
+<!-- {if isset($orderProducts) && count($orderProducts) > 0}
 	<div class="crossseling-content">
 		<h2>{l s='Customers who bought this product also bought:' mod='blockcart'}</h2>
 		<div id="blockcart_list">
@@ -49,4 +49,4 @@
 			</ul>
 		</div>
 	</div>
-{/if}
+{/if} -->

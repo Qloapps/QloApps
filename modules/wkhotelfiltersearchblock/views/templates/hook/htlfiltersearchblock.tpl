@@ -35,10 +35,10 @@
                         </div>
                     </button>
                     <ul class="dropdown-menu hotel_dropdown_ul">
-                        {if isset($hotel_name) && $hotel_name}
-                            {foreach $hotel_name as $name_val}
-                                <li class="hotel_name" data-hotel-cat-id="{$name_val['id_category']}">
-                                    {$name_val['hotel_name']}
+                        {if isset($all_hotels_info) && $all_hotels_info}
+                            {foreach from=$all_hotels_info key=htl_k item=htl_v}
+                                <li class="hotel_name" data-hotel-cat-id="{$htl_v['id_category']}">
+                                    {$htl_v['hotel_name']}
                                 </li>
                             {/foreach}
                         {/if} 

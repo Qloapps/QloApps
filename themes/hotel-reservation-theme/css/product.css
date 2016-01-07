@@ -1105,15 +1105,17 @@ Quick View Styles
 .total_price_block
 {
   color: #404040;
-    font-size: 25px;
-    font-weight: bold;
-    padding-top: 5px;
+  font-size: 19px;
+  font-weight: 600;
+  padding-top: 5px;
 }
 .total_price_block p
 {
+  overflow: auto;
   background-color: #f2f2f2;
-    display: inline-block;
-    padding: 15px 25px;
+  border: 1px solid #bdc2c9;
+  display: inline-block;
+  padding: 15px 5px;
 }
 
 .arrow-down {
@@ -1371,7 +1373,7 @@ Quick View Styles
   font-family: 'PT Serif', serif;
 }
 
-.search_block_container label 
+.search_block_container div label 
 {
     color: #ffffff;
 }
@@ -1385,11 +1387,22 @@ Quick View Styles
 {
   margin-bottom: 20px;
   background-color: #ffa0a0;
-    border: 1px solid #cccccc;
-    color: #9f1010;
-    display: block;
-    font-size: 15px;
-    font-weight: 700;
-    padding: 10px 5px;
-    text-align: center;
+  border: 1px solid #cccccc;
+  color: #9f1010;
+  display: block;
+  font-size: 15px;
+  font-weight: 700;
+  padding: 10px 5px;
+  text-align: center;
+}
+.num_quantity_alert p
+{
+  background-color: #e86464;
+  border: 1px solid #ca3636;
+  color: #ffffff;
+  font-family: PT Serif;
+  font-size: 14px;
+  font-weight: 400;
+  margin-top: 10px;
+  padding: 5px 10px;
 }

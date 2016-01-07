@@ -1,0 +1,10 @@
+
+[{shop_url}] 
+
+Halo {firstname} {lastname}, 
+
+{message} 
+
+{shop_name} [{shop_url}] didukung oleh
+PrestaShop(tm) [http://www.prestashop.com/] 
+

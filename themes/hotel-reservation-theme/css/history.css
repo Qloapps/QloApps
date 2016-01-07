@@ -38,3 +38,121 @@
     width: 263px; }
 
 /*# sourceMappingURL=history.css.map */
+
+/* ----- Order cancellation in order detail page ---- */
+
+.refund_reason_head
+{
+  font-size: 39px;
+  font-family: parisienne;
+  font-weight: 400;
+  color: #252525;
+  margin-bottom: 25px;
+  border-bottom: 1px solid #bf9958;
+  line-height: 55px;
+}
+#reasonForRefund
+{
+  font-size: 17px;
+  font-family: PT serif;
+  font-weight: 400;
+}
+.totalOrdercancellation_div
+{
+  margin-bottom: 10px;
+}
+.terms_btn
+{
+  background-color: #404040;
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 700;
+}
+.totalOrdercancellation_btn
+{
+  background-color: #bf9958;
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 700;
+    margin-right: 10px;
+}
+
+/* ----- Order cancellation in order detail page ---- */
+
+/* ---- history.tpl ---- */
+  .ref_req_wait
+  {
+    background-color: #FF8C00;
+    color: rgb(255, 255, 255);
+    padding-left: 10px;
+  }
+  .ref_req_accept
+  {
+    background-color: #00aff0;
+    color: rgb(255, 255, 255);
+    padding-left: 10px;
+  }
+  .ref_req_refund
+  {
+    background-color: #108510;
+    color: rgb(255, 255, 255);
+    padding-left: 10px;
+  }
+  .ref_req_reject 
+  {
+    background-color: #DC143C;
+    color: rgb(255, 255, 255);
+    padding-left: 10px;
+  }
+
+/* ---- history.tpl ---- */
+
+  
+/* ----- Order cancellation in order detail page ---- */
+
+.back_o_msg
+{
+  color: red;
+  font-size: 14px;
+}
+.refund_reason_head
+{
+  font-size: 39px;
+  font-family: parisienne;
+  font-weight: 400;
+  color: #252525;
+  margin-bottom: 25px;
+  border-bottom: 1px solid #bf9958;
+  line-height: 55px;
+}
+#reasonForRefund
+{
+  font-size: 17px;
+  font-family: PT serif;
+  font-weight: 400;
+}
+.totalOrdercancellation_div
+{
+  margin-bottom: 10px;
+}
+.terms_btn
+{
+  background-color: #404040;
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 700;
+}
+.totalOrdercancellation_btn
+{
+  background-color: #bf9958;
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 700;
+    margin-right: 10px;
+}
+.cust_serv_lnk
+{
+  text-decoration: underline;
+}
+
+/* ----- Order cancellation in order detail page ---- */
