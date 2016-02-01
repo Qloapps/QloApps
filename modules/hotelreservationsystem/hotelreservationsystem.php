@@ -491,7 +491,7 @@ class HotelReservationSystem extends Module
         $obj_hotel_info->short_description = $this->l('Nice place to stay');
         $obj_hotel_info->description = $this->l('Nice place to stay');
         $obj_hotel_info->rating = 3;
-        $obj_hotel_info->city = 'Nainital';
+        $obj_hotel_info->city = 'DefCity';
         $states = State::getStatesByIdCountry($def_cont_id);
         $state_id = $states[0]['id_state'];
         $obj_hotel_info->state_id = $state_id;
@@ -517,11 +517,19 @@ class HotelReservationSystem extends Module
         if ($cat_country)
         {
             $states = State::getStatesByIdCountry($def_cont_id);
-            $state_name = $states[0]['name'];
-            $cat_state = $this->addCategory($state_name, $cat_country, $grp_ids);
+            if (count($states) > 0)
+            {
+                $state_name = $states[0]['name'];
+                $cat_state = $this->addCategory($state_name, $cat_country, $grp_ids);
+            }
         }
-        if ($cat_state)
-            $cat_city = $this->addCategory('DefCity', $cat_state, $grp_ids);
+        if (count($states) > 0)
+        {
+            if ($cat_state)
+                $cat_city = $this->addCategory('DefCity', $cat_state, $grp_ids);
+        }
+        else
+            $cat_city = $this->addCategory('DefCity', $cat_country, $grp_ids);
         if ($cat_city)
             $cat_hotel = $this->addCategory('The Hotel Prime', $cat_city, $grp_ids, 1, $htl_id);
         if ($cat_hotel)

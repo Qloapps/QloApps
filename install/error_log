@@ -622,3 +622,159 @@ Stack trace:
 #2 /home/sumit/public_html/html/hotel-reservation-system/install/controllers/http/smarty_compile.php(42): Smarty->compileAllTemplates('.tpl', false)
 #3 /home/sumit/public_html/html/hotel-reservation-system/install/classes/controllerHttp.php(96): require_once('/home/sumit/pub...')
 #4 /home/sumit/public_html/html/ho in /home/sumit/public_html/html/hotel-reservation-system/tools/smarty/sysplugins/smarty_internal_utility.php on line 68
+[29-Jan-2016 15:44:54 Asia/Calcutta] PHP Fatal error:  Uncaught exception 'UnexpectedValueException' with message 'RecursiveDirectoryIterator::__construct(/home/sumit/public_html/html/hotelcommerce-master/themes/hotel-theme/): failed to open dir: No such file or directory' in /home/sumit/public_html/html/hotelcommerce-master/tools/smarty/sysplugins/smarty_internal_utility.php:68
+Stack trace:
+#0 /home/sumit/public_html/html/hotelcommerce-master/tools/smarty/sysplugins/smarty_internal_utility.php(68): RecursiveDirectoryIterator->__construct('/home/sumit/pub...')
+#1 /home/sumit/public_html/html/hotelcommerce-master/tools/smarty/Smarty.class.php(1440): Smarty_Internal_Utility::compileAllTemplates('.tpl', false, 0, NULL, Object(SmartyCustom))
+#2 /home/sumit/public_html/html/hotelcommerce-master/install/controllers/http/smarty_compile.php(42): Smarty->compileAllTemplates('.tpl', false)
+#3 /home/sumit/public_html/html/hotelcommerce-master/install/classes/controllerHttp.php(96): require_once('/home/sumit/pub...')
+#4 /home/sumit/public_html/html/hotelcommerce-master/insta in /home/sumit/public_html/html/hotelcommerce-master/tools/smarty/sysplugins/smarty_internal_utility.php on line 68
+[29-Jan-2016 15:45:06 Asia/Calcutta] PHP Fatal error:  Uncaught exception 'UnexpectedValueException' with message 'RecursiveDirectoryIterator::__construct(/home/sumit/public_html/html/hotelcommerce-master/themes/hotel-theme/): failed to open dir: No such file or directory' in /home/sumit/public_html/html/hotelcommerce-master/tools/smarty/sysplugins/smarty_internal_utility.php:68
+Stack trace:
+#0 /home/sumit/public_html/html/hotelcommerce-master/tools/smarty/sysplugins/smarty_internal_utility.php(68): RecursiveDirectoryIterator->__construct('/home/sumit/pub...')
+#1 /home/sumit/public_html/html/hotelcommerce-master/tools/smarty/Smarty.class.php(1440): Smarty_Internal_Utility::compileAllTemplates('.tpl', false, 0, NULL, Object(SmartyCustom))
+#2 /home/sumit/public_html/html/hotelcommerce-master/install/controllers/http/smarty_compile.php(42): Smarty->compileAllTemplates('.tpl', false)
+#3 /home/sumit/public_html/html/hotelcommerce-master/install/classes/controllerHttp.php(96): require_once('/home/sumit/pub...')
+#4 /home/sumit/public_html/html/hotelcommerce-master/insta in /home/sumit/public_html/html/hotelcommerce-master/tools/smarty/sysplugins/smarty_internal_utility.php on line 68
+[29-Jan-2016 15:45:11 Asia/Calcutta] PHP Fatal error:  Uncaught exception 'UnexpectedValueException' with message 'RecursiveDirectoryIterator::__construct(/home/sumit/public_html/html/hotelcommerce-master/themes/hotel-theme/): failed to open dir: No such file or directory' in /home/sumit/public_html/html/hotelcommerce-master/tools/smarty/sysplugins/smarty_internal_utility.php:68
+Stack trace:
+#0 /home/sumit/public_html/html/hotelcommerce-master/tools/smarty/sysplugins/smarty_internal_utility.php(68): RecursiveDirectoryIterator->__construct('/home/sumit/pub...')
+#1 /home/sumit/public_html/html/hotelcommerce-master/tools/smarty/Smarty.class.php(1440): Smarty_Internal_Utility::compileAllTemplates('.tpl', false, 0, NULL, Object(SmartyCustom))
+#2 /home/sumit/public_html/html/hotelcommerce-master/install/controllers/http/smarty_compile.php(42): Smarty->compileAllTemplates('.tpl', false)
+#3 /home/sumit/public_html/html/hotelcommerce-master/install/classes/controllerHttp.php(96): require_once('/home/sumit/pub...')
+#4 /home/sumit/public_html/html/hotelcommerce-master/insta in /home/sumit/public_html/html/hotelcommerce-master/tools/smarty/sysplugins/smarty_internal_utility.php on line 68
+[29-Jan-2016 15:45:35 Asia/Calcutta] PHP Fatal error:  Uncaught exception 'UnexpectedValueException' with message 'RecursiveDirectoryIterator::__construct(/home/sumit/public_html/html/hotelcommerce-master/themes/hotel-theme/): failed to open dir: No such file or directory' in /home/sumit/public_html/html/hotelcommerce-master/tools/smarty/sysplugins/smarty_internal_utility.php:68
+Stack trace:
+#0 /home/sumit/public_html/html/hotelcommerce-master/tools/smarty/sysplugins/smarty_internal_utility.php(68): RecursiveDirectoryIterator->__construct('/home/sumit/pub...')
+#1 /home/sumit/public_html/html/hotelcommerce-master/tools/smarty/Smarty.class.php(1440): Smarty_Internal_Utility::compileAllTemplates('.tpl', false, 0, NULL, Object(SmartyCustom))
+#2 /home/sumit/public_html/html/hotelcommerce-master/install/controllers/http/smarty_compile.php(42): Smarty->compileAllTemplates('.tpl', false)
+#3 /home/sumit/public_html/html/hotelcommerce-master/install/classes/controllerHttp.php(96): require_once('/home/sumit/pub...')
+#4 /home/sumit/public_html/html/hotelcommerce-master/insta in /home/sumit/public_html/html/hotelcommerce-master/tools/smarty/sysplugins/smarty_internal_utility.php on line 68
+[29-Jan-2016 15:46:13 Asia/Calcutta] PHP Fatal error:  Uncaught exception 'UnexpectedValueException' with message 'RecursiveDirectoryIterator::__construct(/home/sumit/public_html/html/hotelcommerce-master/themes/hotel-theme/): failed to open dir: No such file or directory' in /home/sumit/public_html/html/hotelcommerce-master/tools/smarty/sysplugins/smarty_internal_utility.php:68
+Stack trace:
+#0 /home/sumit/public_html/html/hotelcommerce-master/tools/smarty/sysplugins/smarty_internal_utility.php(68): RecursiveDirectoryIterator->__construct('/home/sumit/pub...')
+#1 /home/sumit/public_html/html/hotelcommerce-master/tools/smarty/Smarty.class.php(1440): Smarty_Internal_Utility::compileAllTemplates('.tpl', false, 0, NULL, Object(SmartyCustom))
+#2 /home/sumit/public_html/html/hotelcommerce-master/install/controllers/http/smarty_compile.php(42): Smarty->compileAllTemplates('.tpl', false)
+#3 /home/sumit/public_html/html/hotelcommerce-master/install/classes/controllerHttp.php(96): require_once('/home/sumit/pub...')
+#4 /home/sumit/public_html/html/hotelcommerce-master/insta in /home/sumit/public_html/html/hotelcommerce-master/tools/smarty/sysplugins/smarty_internal_utility.php on line 68
+[29-Jan-2016 19:19:45 Asia/Calcutta] PHP Fatal error:  Uncaught exception 'UnexpectedValueException' with message 'RecursiveDirectoryIterator::__construct(/home/sumit/public_html/html/hotelcommerce-master/themes/hotel-theme/): failed to open dir: No such file or directory' in /home/sumit/public_html/html/hotelcommerce-master/tools/smarty/sysplugins/smarty_internal_utility.php:68
+Stack trace:
+#0 /home/sumit/public_html/html/hotelcommerce-master/tools/smarty/sysplugins/smarty_internal_utility.php(68): RecursiveDirectoryIterator->__construct('/home/sumit/pub...')
+#1 /home/sumit/public_html/html/hotelcommerce-master/tools/smarty/Smarty.class.php(1440): Smarty_Internal_Utility::compileAllTemplates('.tpl', false, 0, NULL, Object(SmartyCustom))
+#2 /home/sumit/public_html/html/hotelcommerce-master/install/controllers/http/smarty_compile.php(42): Smarty->compileAllTemplates('.tpl', false)
+#3 /home/sumit/public_html/html/hotelcommerce-master/install/classes/controllerHttp.php(96): require_once('/home/sumit/pub...')
+#4 /home/sumit/public_html/html/hotelcommerce-master/insta in /home/sumit/public_html/html/hotelcommerce-master/tools/smarty/sysplugins/smarty_internal_utility.php on line 68
+[29-Jan-2016 19:20:46 Asia/Calcutta] PHP Fatal error:  Uncaught exception 'UnexpectedValueException' with message 'RecursiveDirectoryIterator::__construct(/home/sumit/public_html/html/hotelcommerce-master/themes/hotel-theme/): failed to open dir: No such file or directory' in /home/sumit/public_html/html/hotelcommerce-master/tools/smarty/sysplugins/smarty_internal_utility.php:68
+Stack trace:
+#0 /home/sumit/public_html/html/hotelcommerce-master/tools/smarty/sysplugins/smarty_internal_utility.php(68): RecursiveDirectoryIterator->__construct('/home/sumit/pub...')
+#1 /home/sumit/public_html/html/hotelcommerce-master/tools/smarty/Smarty.class.php(1440): Smarty_Internal_Utility::compileAllTemplates('.tpl', false, 0, NULL, Object(SmartyCustom))
+#2 /home/sumit/public_html/html/hotelcommerce-master/install/controllers/http/smarty_compile.php(42): Smarty->compileAllTemplates('.tpl', false)
+#3 /home/sumit/public_html/html/hotelcommerce-master/install/classes/controllerHttp.php(96): require_once('/home/sumit/pub...')
+#4 /home/sumit/public_html/html/hotelcommerce-master/insta in /home/sumit/public_html/html/hotelcommerce-master/tools/smarty/sysplugins/smarty_internal_utility.php on line 68
+[29-Jan-2016 19:20:55 Asia/Calcutta] PHP Fatal error:  Uncaught exception 'UnexpectedValueException' with message 'RecursiveDirectoryIterator::__construct(/home/sumit/public_html/html/hotelcommerce-master/themes/hotel-theme/): failed to open dir: No such file or directory' in /home/sumit/public_html/html/hotelcommerce-master/tools/smarty/sysplugins/smarty_internal_utility.php:68
+Stack trace:
+#0 /home/sumit/public_html/html/hotelcommerce-master/tools/smarty/sysplugins/smarty_internal_utility.php(68): RecursiveDirectoryIterator->__construct('/home/sumit/pub...')
+#1 /home/sumit/public_html/html/hotelcommerce-master/tools/smarty/Smarty.class.php(1440): Smarty_Internal_Utility::compileAllTemplates('.tpl', false, 0, NULL, Object(SmartyCustom))
+#2 /home/sumit/public_html/html/hotelcommerce-master/install/controllers/http/smarty_compile.php(42): Smarty->compileAllTemplates('.tpl', false)
+#3 /home/sumit/public_html/html/hotelcommerce-master/install/classes/controllerHttp.php(96): require_once('/home/sumit/pub...')
+#4 /home/sumit/public_html/html/hotelcommerce-master/insta in /home/sumit/public_html/html/hotelcommerce-master/tools/smarty/sysplugins/smarty_internal_utility.php on line 68
+[29-Jan-2016 20:52:57 Asia/Bangkok] PHP Fatal error:  Uncaught exception 'PrestaShopException' with message 'Property Category->name is empty' in /home/sumit/public_html/html/hotelcommerce-master/classes/ObjectModel.php:954
+Stack trace:
+#0 /home/sumit/public_html/html/hotelcommerce-master/classes/ObjectModel.php(295): ObjectModelCore->validateFieldsLang()
+#1 /home/sumit/public_html/html/hotelcommerce-master/classes/ObjectModel.php(511): ObjectModelCore->getFieldsLang()
+#2 /home/sumit/public_html/html/hotelcommerce-master/classes/Category.php(157): ObjectModelCore->add(true, false)
+#3 /home/sumit/public_html/html/hotelcommerce-master/modules/hotelreservationsystem/hotelreservationsystem.php(678): CategoryCore->add()
+#4 /home/sumit/public_html/html/hotelcommerce-master/modules/hotelreservationsystem/hotelreservationsystem.php(521): HotelReservationSystem->addCategory(NULL, '12', Array)
+#5 /home/sumit/public_html/html/hotelcommerce-master/modules/hotelreservationsystem/hotelreservationsystem.php(734): HotelReservationSystem->createDummyDataForProject()
+#6 /home/sum in /home/sumit/public_html/html/hotelcommerce-master/classes/ObjectModel.php on line 954
+[29-Jan-2016 20:02:09 Asia/Calcutta] PHP Fatal error:  Uncaught exception 'UnexpectedValueException' with message 'RecursiveDirectoryIterator::__construct(/home/sumit/public_html/html/hotelcommerce-master/themes/hotel-theme/): failed to open dir: No such file or directory' in /home/sumit/public_html/html/hotelcommerce-master/tools/smarty/sysplugins/smarty_internal_utility.php:68
+Stack trace:
+#0 /home/sumit/public_html/html/hotelcommerce-master/tools/smarty/sysplugins/smarty_internal_utility.php(68): RecursiveDirectoryIterator->__construct('/home/sumit/pub...')
+#1 /home/sumit/public_html/html/hotelcommerce-master/tools/smarty/Smarty.class.php(1440): Smarty_Internal_Utility::compileAllTemplates('.tpl', false, 0, NULL, Object(SmartyCustom))
+#2 /home/sumit/public_html/html/hotelcommerce-master/install/controllers/http/smarty_compile.php(42): Smarty->compileAllTemplates('.tpl', false)
+#3 /home/sumit/public_html/html/hotelcommerce-master/install/classes/controllerHttp.php(96): require_once('/home/sumit/pub...')
+#4 /home/sumit/public_html/html/hotelcommerce-master/insta in /home/sumit/public_html/html/hotelcommerce-master/tools/smarty/sysplugins/smarty_internal_utility.php on line 68
+[29-Jan-2016 21:17:03 Asia/Calcutta] PHP Fatal error:  Uncaught exception 'UnexpectedValueException' with message 'RecursiveDirectoryIterator::__construct(/home/sumit/public_html/html/hotelcommerce-master/themes/hotel-theme/): failed to open dir: No such file or directory' in /home/sumit/public_html/html/hotelcommerce-master/tools/smarty/sysplugins/smarty_internal_utility.php:68
+Stack trace:
+#0 /home/sumit/public_html/html/hotelcommerce-master/tools/smarty/sysplugins/smarty_internal_utility.php(68): RecursiveDirectoryIterator->__construct('/home/sumit/pub...')
+#1 /home/sumit/public_html/html/hotelcommerce-master/tools/smarty/Smarty.class.php(1440): Smarty_Internal_Utility::compileAllTemplates('.tpl', false, 0, NULL, Object(SmartyCustom))
+#2 /home/sumit/public_html/html/hotelcommerce-master/install/controllers/http/smarty_compile.php(42): Smarty->compileAllTemplates('.tpl', false)
+#3 /home/sumit/public_html/html/hotelcommerce-master/install/classes/controllerHttp.php(96): require_once('/home/sumit/pub...')
+#4 /home/sumit/public_html/html/hotelcommerce-master/insta in /home/sumit/public_html/html/hotelcommerce-master/tools/smarty/sysplugins/smarty_internal_utility.php on line 68
+[29-Jan-2016 21:17:21 Asia/Calcutta] PHP Fatal error:  Uncaught exception 'UnexpectedValueException' with message 'RecursiveDirectoryIterator::__construct(/home/sumit/public_html/html/hotelcommerce-master/themes/hotel-theme/): failed to open dir: No such file or directory' in /home/sumit/public_html/html/hotelcommerce-master/tools/smarty/sysplugins/smarty_internal_utility.php:68
+Stack trace:
+#0 /home/sumit/public_html/html/hotelcommerce-master/tools/smarty/sysplugins/smarty_internal_utility.php(68): RecursiveDirectoryIterator->__construct('/home/sumit/pub...')
+#1 /home/sumit/public_html/html/hotelcommerce-master/tools/smarty/Smarty.class.php(1440): Smarty_Internal_Utility::compileAllTemplates('.tpl', false, 0, NULL, Object(SmartyCustom))
+#2 /home/sumit/public_html/html/hotelcommerce-master/install/controllers/http/smarty_compile.php(42): Smarty->compileAllTemplates('.tpl', false)
+#3 /home/sumit/public_html/html/hotelcommerce-master/install/classes/controllerHttp.php(96): require_once('/home/sumit/pub...')
+#4 /home/sumit/public_html/html/hotelcommerce-master/insta in /home/sumit/public_html/html/hotelcommerce-master/tools/smarty/sysplugins/smarty_internal_utility.php on line 68
+[29-Jan-2016 21:18:08 Asia/Calcutta] PHP Fatal error:  Uncaught exception 'UnexpectedValueException' with message 'RecursiveDirectoryIterator::__construct(/home/sumit/public_html/html/hotelcommerce-master/themes/hotel-theme/): failed to open dir: No such file or directory' in /home/sumit/public_html/html/hotelcommerce-master/tools/smarty/sysplugins/smarty_internal_utility.php:68
+Stack trace:
+#0 /home/sumit/public_html/html/hotelcommerce-master/tools/smarty/sysplugins/smarty_internal_utility.php(68): RecursiveDirectoryIterator->__construct('/home/sumit/pub...')
+#1 /home/sumit/public_html/html/hotelcommerce-master/tools/smarty/Smarty.class.php(1440): Smarty_Internal_Utility::compileAllTemplates('.tpl', false, 0, NULL, Object(SmartyCustom))
+#2 /home/sumit/public_html/html/hotelcommerce-master/install/controllers/http/smarty_compile.php(42): Smarty->compileAllTemplates('.tpl', false)
+#3 /home/sumit/public_html/html/hotelcommerce-master/install/classes/controllerHttp.php(96): require_once('/home/sumit/pub...')
+#4 /home/sumit/public_html/html/hotelcommerce-master/insta in /home/sumit/public_html/html/hotelcommerce-master/tools/smarty/sysplugins/smarty_internal_utility.php on line 68
+[29-Jan-2016 21:28:34 Asia/Calcutta] PHP Fatal error:  Uncaught exception 'UnexpectedValueException' with message 'RecursiveDirectoryIterator::__construct(/home/sumit/public_html/html/hotelcommerce-master/themes/hotel-theme/): failed to open dir: No such file or directory' in /home/sumit/public_html/html/hotelcommerce-master/tools/smarty/sysplugins/smarty_internal_utility.php:68
+Stack trace:
+#0 /home/sumit/public_html/html/hotelcommerce-master/tools/smarty/sysplugins/smarty_internal_utility.php(68): RecursiveDirectoryIterator->__construct('/home/sumit/pub...')
+#1 /home/sumit/public_html/html/hotelcommerce-master/tools/smarty/Smarty.class.php(1440): Smarty_Internal_Utility::compileAllTemplates('.tpl', false, 0, NULL, Object(SmartyCustom))
+#2 /home/sumit/public_html/html/hotelcommerce-master/install/controllers/http/smarty_compile.php(42): Smarty->compileAllTemplates('.tpl', false)
+#3 /home/sumit/public_html/html/hotelcommerce-master/install/classes/controllerHttp.php(96): require_once('/home/sumit/pub...')
+#4 /home/sumit/public_html/html/hotelcommerce-master/insta in /home/sumit/public_html/html/hotelcommerce-master/tools/smarty/sysplugins/smarty_internal_utility.php on line 68
+[29-Jan-2016 21:29:12 Asia/Calcutta] PHP Fatal error:  Uncaught exception 'UnexpectedValueException' with message 'RecursiveDirectoryIterator::__construct(/home/sumit/public_html/html/hotelcommerce-master/themes/hotel-theme/): failed to open dir: No such file or directory' in /home/sumit/public_html/html/hotelcommerce-master/tools/smarty/sysplugins/smarty_internal_utility.php:68
+Stack trace:
+#0 /home/sumit/public_html/html/hotelcommerce-master/tools/smarty/sysplugins/smarty_internal_utility.php(68): RecursiveDirectoryIterator->__construct('/home/sumit/pub...')
+#1 /home/sumit/public_html/html/hotelcommerce-master/tools/smarty/Smarty.class.php(1440): Smarty_Internal_Utility::compileAllTemplates('.tpl', false, 0, NULL, Object(SmartyCustom))
+#2 /home/sumit/public_html/html/hotelcommerce-master/install/controllers/http/smarty_compile.php(42): Smarty->compileAllTemplates('.tpl', false)
+#3 /home/sumit/public_html/html/hotelcommerce-master/install/classes/controllerHttp.php(96): require_once('/home/sumit/pub...')
+#4 /home/sumit/public_html/html/hotelcommerce-master/insta in /home/sumit/public_html/html/hotelcommerce-master/tools/smarty/sysplugins/smarty_internal_utility.php on line 68
+[29-Jan-2016 21:29:17 Asia/Calcutta] PHP Fatal error:  Uncaught exception 'UnexpectedValueException' with message 'RecursiveDirectoryIterator::__construct(/home/sumit/public_html/html/hotelcommerce-master/themes/hotel-theme/): failed to open dir: No such file or directory' in /home/sumit/public_html/html/hotelcommerce-master/tools/smarty/sysplugins/smarty_internal_utility.php:68
+Stack trace:
+#0 /home/sumit/public_html/html/hotelcommerce-master/tools/smarty/sysplugins/smarty_internal_utility.php(68): RecursiveDirectoryIterator->__construct('/home/sumit/pub...')
+#1 /home/sumit/public_html/html/hotelcommerce-master/tools/smarty/Smarty.class.php(1440): Smarty_Internal_Utility::compileAllTemplates('.tpl', false, 0, NULL, Object(SmartyCustom))
+#2 /home/sumit/public_html/html/hotelcommerce-master/install/controllers/http/smarty_compile.php(42): Smarty->compileAllTemplates('.tpl', false)
+#3 /home/sumit/public_html/html/hotelcommerce-master/install/classes/controllerHttp.php(96): require_once('/home/sumit/pub...')
+#4 /home/sumit/public_html/html/hotelcommerce-master/insta in /home/sumit/public_html/html/hotelcommerce-master/tools/smarty/sysplugins/smarty_internal_utility.php on line 68
+[29-Jan-2016 21:36:31 Asia/Calcutta] PHP Fatal error:  Uncaught exception 'UnexpectedValueException' with message 'RecursiveDirectoryIterator::__construct(/home/sumit/public_html/html/hotelcommerce-master/themes/hotel-theme/): failed to open dir: No such file or directory' in /home/sumit/public_html/html/hotelcommerce-master/tools/smarty/sysplugins/smarty_internal_utility.php:68
+Stack trace:
+#0 /home/sumit/public_html/html/hotelcommerce-master/tools/smarty/sysplugins/smarty_internal_utility.php(68): RecursiveDirectoryIterator->__construct('/home/sumit/pub...')
+#1 /home/sumit/public_html/html/hotelcommerce-master/tools/smarty/Smarty.class.php(1440): Smarty_Internal_Utility::compileAllTemplates('.tpl', false, 0, NULL, Object(SmartyCustom))
+#2 /home/sumit/public_html/html/hotelcommerce-master/install/controllers/http/smarty_compile.php(42): Smarty->compileAllTemplates('.tpl', false)
+#3 /home/sumit/public_html/html/hotelcommerce-master/install/classes/controllerHttp.php(96): require_once('/home/sumit/pub...')
+#4 /home/sumit/public_html/html/hotelcommerce-master/insta in /home/sumit/public_html/html/hotelcommerce-master/tools/smarty/sysplugins/smarty_internal_utility.php on line 68
+[29-Jan-2016 21:37:12 Asia/Calcutta] PHP Fatal error:  Uncaught exception 'UnexpectedValueException' with message 'RecursiveDirectoryIterator::__construct(/home/sumit/public_html/html/hotelcommerce-master/themes/hotel-theme/): failed to open dir: No such file or directory' in /home/sumit/public_html/html/hotelcommerce-master/tools/smarty/sysplugins/smarty_internal_utility.php:68
+Stack trace:
+#0 /home/sumit/public_html/html/hotelcommerce-master/tools/smarty/sysplugins/smarty_internal_utility.php(68): RecursiveDirectoryIterator->__construct('/home/sumit/pub...')
+#1 /home/sumit/public_html/html/hotelcommerce-master/tools/smarty/Smarty.class.php(1440): Smarty_Internal_Utility::compileAllTemplates('.tpl', false, 0, NULL, Object(SmartyCustom))
+#2 /home/sumit/public_html/html/hotelcommerce-master/install/controllers/http/smarty_compile.php(42): Smarty->compileAllTemplates('.tpl', false)
+#3 /home/sumit/public_html/html/hotelcommerce-master/install/classes/controllerHttp.php(96): require_once('/home/sumit/pub...')
+#4 /home/sumit/public_html/html/hotelcommerce-master/insta in /home/sumit/public_html/html/hotelcommerce-master/tools/smarty/sysplugins/smarty_internal_utility.php on line 68
+[29-Jan-2016 21:37:18 Asia/Calcutta] PHP Fatal error:  Uncaught exception 'UnexpectedValueException' with message 'RecursiveDirectoryIterator::__construct(/home/sumit/public_html/html/hotelcommerce-master/themes/hotel-theme/): failed to open dir: No such file or directory' in /home/sumit/public_html/html/hotelcommerce-master/tools/smarty/sysplugins/smarty_internal_utility.php:68
+Stack trace:
+#0 /home/sumit/public_html/html/hotelcommerce-master/tools/smarty/sysplugins/smarty_internal_utility.php(68): RecursiveDirectoryIterator->__construct('/home/sumit/pub...')
+#1 /home/sumit/public_html/html/hotelcommerce-master/tools/smarty/Smarty.class.php(1440): Smarty_Internal_Utility::compileAllTemplates('.tpl', false, 0, NULL, Object(SmartyCustom))
+#2 /home/sumit/public_html/html/hotelcommerce-master/install/controllers/http/smarty_compile.php(42): Smarty->compileAllTemplates('.tpl', false)
+#3 /home/sumit/public_html/html/hotelcommerce-master/install/classes/controllerHttp.php(96): require_once('/home/sumit/pub...')
+#4 /home/sumit/public_html/html/hotelcommerce-master/insta in /home/sumit/public_html/html/hotelcommerce-master/tools/smarty/sysplugins/smarty_internal_utility.php on line 68
+[29-Jan-2016 21:49:39 Asia/Calcutta] PHP Fatal error:  Uncaught exception 'UnexpectedValueException' with message 'RecursiveDirectoryIterator::__construct(/home/sumit/public_html/html/hotelcommerce-master/themes/hotel-theme/): failed to open dir: No such file or directory' in /home/sumit/public_html/html/hotelcommerce-master/tools/smarty/sysplugins/smarty_internal_utility.php:68
+Stack trace:
+#0 /home/sumit/public_html/html/hotelcommerce-master/tools/smarty/sysplugins/smarty_internal_utility.php(68): RecursiveDirectoryIterator->__construct('/home/sumit/pub...')
+#1 /home/sumit/public_html/html/hotelcommerce-master/tools/smarty/Smarty.class.php(1440): Smarty_Internal_Utility::compileAllTemplates('.tpl', false, 0, NULL, Object(SmartyCustom))
+#2 /home/sumit/public_html/html/hotelcommerce-master/install/controllers/http/smarty_compile.php(42): Smarty->compileAllTemplates('.tpl', false)
+#3 /home/sumit/public_html/html/hotelcommerce-master/install/classes/controllerHttp.php(96): require_once('/home/sumit/pub...')
+#4 /home/sumit/public_html/html/hotelcommerce-master/insta in /home/sumit/public_html/html/hotelcommerce-master/tools/smarty/sysplugins/smarty_internal_utility.php on line 68
+[29-Jan-2016 21:49:51 Asia/Calcutta] PHP Fatal error:  Uncaught exception 'UnexpectedValueException' with message 'RecursiveDirectoryIterator::__construct(/home/sumit/public_html/html/hotelcommerce-master/themes/hotel-theme/): failed to open dir: No such file or directory' in /home/sumit/public_html/html/hotelcommerce-master/tools/smarty/sysplugins/smarty_internal_utility.php:68
+Stack trace:
+#0 /home/sumit/public_html/html/hotelcommerce-master/tools/smarty/sysplugins/smarty_internal_utility.php(68): RecursiveDirectoryIterator->__construct('/home/sumit/pub...')
+#1 /home/sumit/public_html/html/hotelcommerce-master/tools/smarty/Smarty.class.php(1440): Smarty_Internal_Utility::compileAllTemplates('.tpl', false, 0, NULL, Object(SmartyCustom))
+#2 /home/sumit/public_html/html/hotelcommerce-master/install/controllers/http/smarty_compile.php(42): Smarty->compileAllTemplates('.tpl', false)
+#3 /home/sumit/public_html/html/hotelcommerce-master/install/classes/controllerHttp.php(96): require_once('/home/sumit/pub...')
+#4 /home/sumit/public_html/html/hotelcommerce-master/insta in /home/sumit/public_html/html/hotelcommerce-master/tools/smarty/sysplugins/smarty_internal_utility.php on line 68
+[29-Jan-2016 21:50:26 Asia/Calcutta] PHP Fatal error:  Uncaught exception 'UnexpectedValueException' with message 'RecursiveDirectoryIterator::__construct(/home/sumit/public_html/html/hotelcommerce-master/themes/hotel-theme/): failed to open dir: No such file or directory' in /home/sumit/public_html/html/hotelcommerce-master/tools/smarty/sysplugins/smarty_internal_utility.php:68
+Stack trace:
+#0 /home/sumit/public_html/html/hotelcommerce-master/tools/smarty/sysplugins/smarty_internal_utility.php(68): RecursiveDirectoryIterator->__construct('/home/sumit/pub...')
+#1 /home/sumit/public_html/html/hotelcommerce-master/tools/smarty/Smarty.class.php(1440): Smarty_Internal_Utility::compileAllTemplates('.tpl', false, 0, NULL, Object(SmartyCustom))
+#2 /home/sumit/public_html/html/hotelcommerce-master/install/controllers/http/smarty_compile.php(42): Smarty->compileAllTemplates('.tpl', false)
+#3 /home/sumit/public_html/html/hotelcommerce-master/install/classes/controllerHttp.php(96): require_once('/home/sumit/pub...')
+#4 /home/sumit/public_html/html/hotelcommerce-master/insta in /home/sumit/public_html/html/hotelcommerce-master/tools/smarty/sysplugins/smarty_internal_utility.php on line 68

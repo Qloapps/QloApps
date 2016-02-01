@@ -8,6 +8,7 @@ $_MODULE['<{blocknewsletter}prestashop>blocknewsletter_ba457fab18d697d978befb95e
 $_MODULE['<{blocknewsletter}prestashop>blocknewsletter_396c88991101b5ca362932952293d291'] = 'Are you sure that you want to delete all of your contacts?';
 $_MODULE['<{blocknewsletter}prestashop>blocknewsletter_c3987e4cac14a8456515f0d200da04ee'] = 'All countries';
 $_MODULE['<{blocknewsletter}prestashop>blocknewsletter_fa01fd956e87307bce4c90a0de9b0437'] = 'Customers\' country';
+$_MODULE['<{blocknewsletter}prestashop>blocknewsletter_7599b57d77ef1608b2f6da579794cc5b'] = 'Filter customers\' country.';
 $_MODULE['<{blocknewsletter}prestashop>blocknewsletter_2198f293f5e1e95dddeff819fbca0975'] = 'Newsletter subscribers';
 $_MODULE['<{blocknewsletter}prestashop>blocknewsletter_99006a61d48499231e1be92241cf772a'] = 'Filter newsletter subscribers.';
 $_MODULE['<{blocknewsletter}prestashop>blocknewsletter_7e3a51a56ddd2846e21c33f05e0aea6f'] = 'All customers';
@@ -44,6 +45,13 @@ $_MODULE['<{blocknewsletter}prestashop>blocknewsletter_b37f32d509cf5aabe806b1679
 $_MODULE['<{blocknewsletter}prestashop>blocknewsletter_506e58042922bff5bd753dc612e84f5b'] = 'Welcome voucher code';
 $_MODULE['<{blocknewsletter}prestashop>blocknewsletter_1d612b943b8f4792bff603384a46e5f1'] = 'Leave blank to disable by default.';
 $_MODULE['<{blocknewsletter}prestashop>blocknewsletter_c9cc8cce247e49bae79f15173ce97354'] = 'Save';
+$_MODULE['<{blocknewsletter}prestashop>blocknewsletter_c48244f3d519c8c3260f2a40022f8d27'] = 'Export customers\' addresses';
+$_MODULE['<{blocknewsletter}prestashop>blocknewsletter_521f7e76a7d4f9e50c50bb945559b942'] = 'Filter customers by country.';
+$_MODULE['<{blocknewsletter}prestashop>blocknewsletter_1b09c341aa487e26dac94d2467b7f7e3'] = 'Filter customers who have subscribed to the newsletter or not, and who have an account or not.';
+$_MODULE['<{blocknewsletter}prestashop>blocknewsletter_e8be50a6977f278040458abdb2b18229'] = 'Customers can subscribe to your newsletter when registering, or by entering their email in the newsletter block.';
+$_MODULE['<{blocknewsletter}prestashop>blocknewsletter_a307579714b75082f3f8734971b125cd'] = 'Subscribers with account';
+$_MODULE['<{blocknewsletter}prestashop>blocknewsletter_d0da5609e4aebc5d532de97511a5a34a'] = 'Subscribers without account';
+$_MODULE['<{blocknewsletter}prestashop>blocknewsletter_6395c19dc5a1cef9ca125b9736358dc7'] = 'Opt-in subscribers';
 $_MODULE['<{blocknewsletter}prestashop>blocknewsletter_dbb392a2dc9b38722e69f6032faea73e'] = 'Export .CSV file';
 $_MODULE['<{blocknewsletter}prestashop>blocknewsletter_f6df4ad6dc4798f26d1f2460eef4f2e9'] = 'Search for addresses';
 $_MODULE['<{blocknewsletter}prestashop>blocknewsletter_375afa60efcc1d48300bd339cb8154b0'] = 'Email address to search';

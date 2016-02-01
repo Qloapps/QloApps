@@ -1,0 +1,23 @@
+
+[{shop_url}] 
+
+Hola {firstname} {lastname},
+
+Le agradecemos por realizar sus compras en {shop_name}! 
+
+El pago para el pedido y la refencia {order_name} ha sido
+procesado correctamente. 
+
+Usted puede revisar su pedido y descargar la factura desde
+"Historial de pedidos" [{history_url}] de su cuenta
+de cliente, haga clic en [{my_account_url}] en
+nuestra tienda. 
+
+Si tiene una cuenta de invitado, puede seguir su pedido desde la
+sección: "Seguimiento de invitado"
+[{guest_tracking_url}?id_order={order_name}] en
+nuestra tienda. 
+
+{shop_name} [{shop_url}] creado por
+PrestaShop(tm) [http://www.prestashop.com/] 
+

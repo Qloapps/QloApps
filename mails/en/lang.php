@@ -26,9 +26,7 @@ $_LANGMAIL['Password query confirmation'] = 'Password query confirmation';
 $_LANGMAIL['Newsletter voucher'] = 'Newsletter voucher';
 $_LANGMAIL['Newsletter confirmation'] = 'Newsletter confirmation';
 $_LANGMAIL['Email verification'] = 'Email verification';
-$_LANGMAIL['Stock coverage'] = 'Stock coverage';
-$_LANGMAIL['Referral Program'] = 'Referral Program';
-$_LANGMAIL['Congratulations!'] = 'Congratulations!';
+$_LANGMAIL['Your wishlist\'s link'] = 'Your wishlist\'s link';
 $_LANGMAIL['%1$s sent you a link to %2$s'] = '%1$s sent you a link to %2$s';
 
 

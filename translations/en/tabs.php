@@ -89,7 +89,6 @@ $_TABS['AdminBackup'] = 'DB Backup';
 $_TABS['AdminRequestSql'] = 'SQL Manager';
 $_TABS['AdminLogs'] = 'Logs';
 $_TABS['AdminWebservice'] = 'Webservice';
-$_TABS['AdminSelfUpgrade'] = '1-Click Upgrade';
 $_TABS['AdminAdminPreferences'] = 'Preferences';
 $_TABS['AdminQuickAccesses'] = 'Quick Access';
 $_TABS['AdminEmployees'] = 'Employees';
@@ -107,6 +106,7 @@ $_TABS['AdminStockInstantState'] = 'Instant Stock Status';
 $_TABS['AdminStockCover'] = 'Stock Coverage';
 $_TABS['AdminSupplyOrders'] = 'Supply orders';
 $_TABS['AdminStockConfiguration'] = 'Configuration';
+$_TABS['AdminOnboarding'] = 'Onboarding';
 
 
 return $_TABS;

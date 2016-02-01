@@ -13,6 +13,9 @@ $_MODULE['<{blockcustomerprivacy}prestashop>blockcustomerprivacy_00d23a76e43b46d
 $_MODULE['<{blockcustomerprivacy}prestashop>blockcustomerprivacy_b9f5c797ebbf55adccdd8539a65a0241'] = 'Disabled';
 $_MODULE['<{blockcustomerprivacy}prestashop>blockcustomerprivacy_03e1a999dcdb904300ee1b1e767c83c9'] = 'The customer data privacy message will be displayed in the account creation form.';
 $_MODULE['<{blockcustomerprivacy}prestashop>blockcustomerprivacy_b51d73fb490ad1245fa9b87042bbbbb7'] = 'Tip: If the customer privacy message is too long to be written directly in the form, you can add a link to one of your pages. This can easily be created via the "CMS" page under the "Preferences" menu.';
+$_MODULE['<{blockcustomerprivacy}prestashop>blockcustomerprivacy_67ebed7cf9667003ad2047609440513a'] = 'Display in customer area';
+$_MODULE['<{blockcustomerprivacy}prestashop>blockcustomerprivacy_fc67768369eadd8d4fb1e7839f5eae69'] = 'Customer data privacy message for customer area:';
+$_MODULE['<{blockcustomerprivacy}prestashop>blockcustomerprivacy_de1126ae0ac67eb4fda28cfad8429c79'] = 'Tip: If the customer privacy message is too long to be written directly on the page, you can add a link to one of your other pages. This can easily be created via the "CMS" page under the "Preferences" menu.';
 $_MODULE['<{blockcustomerprivacy}prestashop>blockcustomerprivacy_c9cc8cce247e49bae79f15173ce97354'] = 'Save';
 $_MODULE['<{blockcustomerprivacy}prestashop>blockcustomerprivacy_fb0440f9ca32a8b49eded51b09e70821'] = 'Customer data privacy';
 

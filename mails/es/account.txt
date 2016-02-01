@@ -1,0 +1,30 @@
+
+[{shop_url}] 
+
+Hola {firstname} {lastname},
+
+Gracias por crear una cuenta de cliente en {shop_name}. 
+
+Estos son sus datos de acceso:
+
+DIRECCIÓN EMAIL: {email}
+
+CONTRASEÑA: {passwd} 		 
+
+Consejos de Seguridad:
+
+* Mantenga los datos de su cuenta en un lugar seguro.
+
+* No comparta los detalles de su cuenta con otras personas.
+
+* Cambie su clave regularmente.
+
+* Si sospecha que alguien está usando ilegalmente su cuenta,
+avísenos inmediatamente.
+
+Ahora podrá realizar pedidos en nuestra tienda: {shop_name}
+[{shop_url}] 
+
+{shop_name} [{shop_url}] creado por
+PrestaShop(tm) [http://www.prestashop.com/] 
+

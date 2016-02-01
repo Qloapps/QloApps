@@ -1,0 +1,14 @@
+
+[{shop_url}] 
+
+Hola {firstname} {lastname}, 
+
+{employee} quería enviar este mensaje para usted. 
+
+HISTORIAL DE LA CONVERSACIÓN: {messages}
+
+{employee} añadido "{comment}" 		 
+
+{shop_name} [{shop_url}] creado por
+PrestaShop(tm) [http://www.prestashop.com/] 
+
