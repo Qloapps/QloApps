@@ -1,0 +1,5 @@
+@import url('//fonts.googleapis.com/css?family=Abril+Fatface');
+
+h1, h2, h3, h4, h5 {
+	font-family: 'Abril Fatface', sans-serif !important;
+}

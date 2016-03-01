@@ -1,0 +1,5 @@
+@import url('//fonts.googleapis.com/css?family=Ubuntu');
+
+h1, h2, h3, h4, h5 {
+	font-family: 'Ubuntu', serif !important;
+}

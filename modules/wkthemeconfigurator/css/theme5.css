@@ -1,0 +1,241 @@
+body {
+  background: #181212;
+}
+
+.header-container, .columns-container {
+  background: url(../img/bg-theme5.jpg) repeat 50% 0;
+}
+
+#header {
+  background: url(../img/bg-theme5.jpg) repeat 50% 0;
+}
+#header #nav-row {
+  background: #181212;
+}
+#header #nav-row .shop-phone {
+  color: #777;
+}
+#header #nav-row .shop-phone i, #header #nav-row .shop-phone strong {
+  color: white;
+}
+#header #currencies-block-top, #header #languages-block-top, #header #nav-row .header_user_info {
+  border-color: #515151;
+}
+#header #currencies-block-top div.current, #header #languages-block-top div.current, #header #nav-row .header_user_info a {
+  color: white;
+}
+#header #currencies-block-top div.current:hover, #header #currencies-block-top div.current.active, #header #languages-block-top div.current:hover, #header #languages-block-top div.current.active, #header #nav-row .header_user_info a:hover, #header #nav-row .header_user_info a.active {
+  background: #b04445;
+  color: white;
+}
+#header #currencies-block-top div.current strong, #header #languages-block-top div.current strong {
+  color: #b04445;
+}
+#header #currencies-block-top div.current:hover, #header #currencies-block-top div.current.active, #header #languages-block-top div.current:hover, #header #languages-block-top div.current.active {
+  background: #b04445;
+  color: white;
+}
+#header #currencies-block-top div.current:hover strong, #header #currencies-block-top div.current.active strong, #header #languages-block-top div.current:hover strong, #header #languages-block-top div.current.active strong {
+  color: #fff;
+}
+#header #currencies-block-top ul li.selected, #header #currencies-block-top ul li:hover a, #header #languages-block-top ul li.selected, #header #languages-block-top ul li:hover a {
+  background: #b04445;
+}
+#header #contact-link {
+  border-color: #515151;
+}
+#header #contact-link a {
+  color: white;
+}
+#header #contact-link a:hover, #header #contact-link a.active {
+  background: #b04445;
+  color: white;
+}
+#header #currencies-block-top div.current:after, #header #languages-block-top div.current:after {
+  color: white;
+}
+#header #search_block_top .btn.button-search {
+  background: #b04445;
+  text-shadow: 0 1px #8b3637;
+}
+#header #search_block_top .btn.button-search:hover {
+  color: white;
+  background: #333333;
+  text-shadow: 0 1px #333;
+}
+#header #search_block_top #search_query_top {
+  border-color: #dfd8ca;
+  background: rgba(248, 248, 248, 0.63);
+  color: #686666;
+}
+#header #header_user #shopping_cart a {
+  background: #b04445;
+  color: white;
+  text-shadow: 0 1px #8b3637;
+}
+#header #header_user #shopping_cart a:after {
+  color: white;
+}
+#header #header_user #shopping_cart a:hover {
+  color: white;
+  text-shadow: 0 1px #333;
+  background: #333333;
+}
+#header .sf-menu {
+  background: #faf8f4;
+  border-bottom: 3px solid #dfd8ca;
+}
+#header .sf-menu > li {
+  border-right: 1px solid #dfd8ca;
+}
+#header .sf-menu > li > a {
+  border-bottom: 3px solid #dfd8ca;
+}
+#header .sf-menu > li.sfHover > a, #header .sf-menu > li > a:hover, #header .sf-menu > li.sfHoverForce > a {
+  color: #fff;
+  background: #b04445;
+  border-bottom-color: #983334;
+}
+
+ul.product_list.grid > li .product-container .product-image-container {
+  border-color: #dfd8ca;
+}
+
+#home-page-tabs {
+  background: none;
+}
+#home-page-tabs > li {
+  border-color: #dfd8ca;
+}
+#home-page-tabs > li.active a, #home-page-tabs > li a:hover {
+  background: #b04445;
+  color: white;
+}
+
+.new-label, .sale-label {
+  background: #b04445;
+}
+.new-label:before, .new-label:after, .sale-label:before, .sale-label:after {
+  border-color: #b04445 transparent transparent transparent;
+}
+
+ul.product_list.grid > li .product-container {
+  background: none;
+}
+ul.product_list.grid > li .product-container .product-image-container {
+  background: white;
+}
+ul.product_list.grid > li .product-container .product-image-container .product_img_link {
+  background: #f1e8e3;
+}
+ul.product_list.grid > li .product-container .product-image-container .product_img_link img {
+  background: #f1e8e3;
+}
+
+.button.ajax_add_to_cart_button {
+  border-color: #b04445;
+}
+.button.ajax_add_to_cart_button span {
+  filter: none;
+  border-color: #b04445;
+  background: #b04445;
+}
+.button.ajax_add_to_cart_button:hover {
+  border-color: #B7B7B7;
+}
+.button.ajax_add_to_cart_button:hover span {
+  border-color: #B7B7B7;
+  background: #B7B7B7;
+}
+
+.price-percent-reduction {
+  background: #b04445;
+  border-color: #b04445;
+}
+
+.price, .price.product-price {
+  color: #b04445;
+}
+
+.old-price {
+  color: #b1b0b0;
+}
+
+ul.product_list.grid > li .product-container:hover {
+  background: #fff;
+  -webkit-box-shadow: 0 5px 13px rgba(0, 0, 0, 0.17);
+  -moz-box-shadow: 0 5px 13px rgba(0, 0, 0, 0.17);
+  box-shadow: 0 5px 13px rgba(0, 0, 0, 0.17);
+}
+
+#cmsinfo_block em {
+  background: #b04445;
+  text-shadow: 0 1px #8b3637;
+}
+
+#facebook_block, #cmsinfo_block {
+  background: #e5ded1;
+}
+
+#cmsinfo_block,
+#cmsinfo_block > div + div {
+  border-color: #cec7bc;
+}
+
+.footer-container #footer #block_contact_infos > div ul li {
+  color: #b5a78d;
+}
+
+.footer-container #footer #block_contact_infos > div ul li i {
+  color: #b04445;
+}
+
+#facebook_block h4, #cmsinfo_block h4,
+#cmsinfo_block h3 {
+  color: #181212;
+}
+
+#facebook_block p, #cmsinfo_block p {
+  color: #3d211f;
+}
+
+.footer-container #footer #social_block {
+  background: none;
+  padding-bottom: 15px;
+}
+
+.footer-container {
+  background: #1f1818;
+}
+@media (min-width: 768px) {
+  .footer-container {
+    background: url(../img/footer-bg5.gif) repeat-x;
+  }
+}
+
+.footer-container #footer a {
+  color: #b5a78d;
+}
+
+.footer-container #footer #block_contact_infos,
+.footer-container #footer .bottom-footer div {
+  border-color: #2e2828;
+}
+
+#footer #newsletter_block_left .form-group .form-control {
+  background: #1f1919;
+  border-color: #89837f;
+}
+#footer #newsletter_block_left .form-group .button-small {
+  color: #fff;
+}
+#footer #newsletter_block_left .form-group .button-small:hover {
+  color: #b04445;
+}
+
+.footer-container #footer #social_block ul li a {
+  color: #f3eee6;
+}
+.footer-container #footer #social_block ul li a:hover {
+  color: #b04445;
+}

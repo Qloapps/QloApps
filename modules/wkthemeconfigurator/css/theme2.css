@@ -1,0 +1,200 @@
+body {
+  background: #282828;
+}
+
+.header-container,
+.columns-container {
+  background: #f6f6f6;
+}
+
+#header {
+  background: #f6f6f6;
+}
+#header #nav-row {
+  background: #dadada;
+}
+#header #nav-row .shop-phone {
+  color: white
+}
+#header #nav-row .shop-phone i,
+#header #nav-row .shop-phone strong {
+  color: #f44051;
+}
+#header #currencies-block-top,
+#header #languages-block-top,
+#header #nav-row .header_user_info {
+  border-color: #c6c6c6;
+}
+#header #currencies-block-top div.current,
+#header #languages-block-top div.current,
+#header #nav-row .header_user_info a {
+  color: white
+}
+#header #currencies-block-top div.current:hover, #header #currencies-block-top div.current.active,
+#header #languages-block-top div.current:hover,
+#header #languages-block-top div.current.active,
+#header #nav-row .header_user_info a:hover,
+#header #nav-row .header_user_info a.active {
+  background: #b7b7b7;
+  color: white;
+}
+#header #currencies-block-top div.current strong,
+#header #languages-block-top div.current strong {
+  color: white
+}
+#header #currencies-block-top div.current:hover strong, #header #currencies-block-top div.current:hover:after, #header #currencies-block-top div.current.active strong, #header #currencies-block-top div.current.active:after,
+#header #languages-block-top div.current:hover strong,
+#header #languages-block-top div.current:hover:after,
+#header #languages-block-top div.current.active strong,
+#header #languages-block-top div.current.active:after {
+  background: #b7b7b7;
+  color: white;
+}
+#header #contact-link {
+  border-color: #c6c6c6;
+}
+#header #contact-link a {
+  color: white
+}
+#header #contact-link a:hover, #header #contact-link a.active {
+  background: #b7b7b7;
+  color: white;
+}
+#header #search_block_top .btn.button-search {
+  background: #f44051;
+}
+#header #search_block_top .btn.button-search:hover {
+  color: white;
+  background: #333333;
+}
+#header #header_user #shopping_cart a {
+  background: #f44051;
+  color: white;
+}
+#header #header_user #shopping_cart a:after {
+  color: white;
+}
+#header #header_user #shopping_cart a:hover {
+  color: white;
+  background: #333333;
+}
+#header .sf-menu {
+  background: white;
+  border-bottom: 3px solid #e8e8e8;
+}
+#header .sf-menu > li {
+  border-right: 1px solid #e8e8e8;
+}
+#header .sf-menu > li > a {
+  border-bottom: 3px solid #e8e8e8;
+}
+#header .sf-menu > li.sfHover > a, #header .sf-menu > li > a:hover, #header .sf-menu > li.sfHoverForce > a {
+  color: #fff;
+  background: #f44051;
+  border-bottom-color: #ce2434;
+}
+
+#home-page-tabs {
+  background: #f6f6f6;
+}
+#home-page-tabs > li.active a,
+#home-page-tabs > li a:hover {
+  background: #f44051;
+  color: white;
+}
+
+.new-label,
+.sale-label {
+  background: #f44051;
+}
+.new-label:before, .new-label:after,
+.sale-label:before,
+.sale-label:after {
+  border-color: #ad2b34  transparent   transparent transparent;
+}
+
+ul.product_list.grid > li .product-container {
+  background: #f6f6f6;
+}
+ul.product_list.grid > li .product-container .product-image-container {
+  background: white;
+}
+ul.product_list.grid > li .product-container .product-image-container .product_img_link {
+  background: #fbfbfb;
+}
+ul.product_list.grid > li .product-container .product-image-container .product_img_link img {
+  background: #fbfbfb;
+}
+
+.button.lnk_view {
+  text-shadow: none;
+  padding: 0;
+  border: none;
+}
+.button.lnk_view span {
+  border: none;
+  padding: 12px 16px;
+  background: #333333;
+  color: white;
+}
+.button.lnk_view:hover span {
+  background: #f44051;
+}
+
+.button.ajax_add_to_cart_button {
+  padding: 0;
+  border-color: #f44051;
+}
+.button.ajax_add_to_cart_button span {
+  filter: none;
+  border-color: #f44051;
+  background: #f44051;
+}
+.button.ajax_add_to_cart_button:hover {
+  border-color: #333333;
+}
+.button.ajax_add_to_cart_button:hover span {
+  border-color: #333333;
+  background: #333333;
+}
+
+div.star.star_on:after {
+  color: #f44051;
+}
+
+#cmsinfo_block em {
+  background: #f44051;
+}
+
+#facebook_block, #cmsinfo_block {
+  background: #e8e8e8;
+}
+
+#cmsinfo_block,
+#cmsinfo_block > div + div {
+  border-color: #d0d0d0;
+}
+
+.footer-container #footer #social_block {
+  background: #1b1b1b;
+}
+
+.footer-container {
+  background: #1b1b1b;
+}
+@media (min-width: 768px) {
+  .footer-container {
+    background: url(../img/footer-bg1.gif) repeat-x;
+  }
+}
+
+#footer #newsletter_block_left .form-group .form-control {
+  background: #1b1b1b;
+}
+#footer #newsletter_block_left .form-group .button-small {
+  color: #f44051;
+}
+
+.footer-container #footer #social_block ul li a:hover {
+  color: #f44051;
+}

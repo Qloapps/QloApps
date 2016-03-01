@@ -1,0 +1,223 @@
+@import 'compass';
+@import 'bootstrap_lib/_variables';
+
+$header-background:     #333;
+$color-style1:          #eea200;
+$color1-style1:         #fff;
+$color2-style1:         #b7b7b7;
+$color3-style1:         #333;
+$base-border-color:		#e2dec8;
+$color-shadow:          0 1px #b57b00;
+
+
+body{background:#282828}
+.header-container,
+.columns-container{background:url(../img/bg-theme8.jpg) repeat 50% 0}
+
+  //-------- HEADER
+  #header {
+   background:none;	
+	.header-row {
+	  background:$header-background;	 	   
+	  .shop-phone{
+		  color:#777;
+		i,
+		strong{color:$color-style1} 	
+		  } 
+		  	
+	}	
+     #currencies-block-top, 
+	 #languages-block-top,
+	 .header-row .header_user_info{
+	 border-color:#515151;  
+	 }
+  
+  
+   #currencies-block-top div.current, 
+  #languages-block-top div.current,
+  .header-row .header_user_info a
+  {
+	 color:$color1-style1; 
+	  &:hover, &.active {
+		background:#2b2b2b;
+		color:white
+		}
+
+ }
+    #currencies-block-top div.current, 
+  #languages-block-top div.current{
+	 strong{color:$color-style1;} 
+	  }
+	   
+  #currencies-block-top div.current, 
+ #languages-block-top div.current
+   {&:hover,
+    &.active {
+	    background:#2b2b2b;
+		color:white}
+   
+	 }
+	
+ #header #currencies-block-top ul li.selected,
+ #header #currencies-block-top ul li:hover a,
+ #header #languages-block-top ul li.selected,
+ #header #languages-block-top ul li:hover a{
+	background:$color-style1
+	
+	}
+	
+	
+	
+	#contact-link{ 
+	   border-color:#515151;
+	   a{color:$color1-style1;
+		  &:hover, &.active {
+			background:#2b2b2b;
+			color:white
+			}
+		}	
+	}		
+}
+
+  #header #currencies-block-top div.current:after,
+  #header #languages-block-top div.current:after{color:#fff}
+
+
+
+	#search_block_top{
+		   .btn.button-search{
+			background:$color-style1;
+		    text-shadow:$color-shadow;
+		   &:hover{color:white;
+			background:$color3-style1;
+			text-shadow:0 1px #333;}
+		}
+	
+		 #search_query_top{
+		border-color:#e2dec8;
+		background:rgba(248,248,248,0.63);
+		color:#686666;}
+	}
+
+
+
+     #header_user #shopping_cart a{
+		background:$color-style1; 
+		color:white;
+		text-shadow:$color-shadow;
+		 &:after{color:white}
+		&:hover{color:white;
+		text-shadow:0 1px #333;
+    	background:$color3-style1}		 
+	 }
+	 
+    .sf-menu{
+		background:#fffef6;
+		border-bottom:3px solid #e2dec8;
+		>li{
+			border-right:1px solid #e2dec8;
+			>a{border-bottom: 3px solid #e2dec8;}
+		&.sfHover > a, > a:hover, &.sfHoverForce > a 
+		{color:#fff;background:$color-style1;
+		border-bottom-color:#da9400;}
+		}
+	} 
+	
+
+//-------- columns-container
+
+
+ul.product_list.grid > li .product-container .product-image-container{border-color:$base-border-color}
+
+
+     #home-page-tabs{
+		background:none;
+		>li{border-color:$base-border-color}
+		  > li.active a, 
+		  > li a:hover{
+			background:$color-style1;
+			color:white 
+			 }
+		  }	 
+
+	.new,
+	.sale
+	{background:$color-style1;
+		&:before,
+		&:after{
+				border-color: $color-style1  transparent   transparent transparent ;			
+			}	
+	}
+
+   ul.product_list.grid > li .product-container{
+  	background:none;
+    .product-image-container{
+  	   background:white;
+       .product_img_link{
+        background:#f1e8e3;
+        img{
+          background:#f1e8e3;
+        }
+       }   
+     }
+   }
+  
+  .button.lnk_view {
+	text-shadow:none;
+	padding:0;
+	border:none;
+		span {
+			border:1px solid #9a9a9a;		
+			padding:12px 16px;
+		   background:#f2f2f2;
+		   color:white;	
+		}
+		
+	&:hover {
+		span {
+			background:$color2-style1;
+			}	
+	}
+  }
+
+    .button.ajax_add_to_cart_button{background:$color-style1}
+
+
+	.price-percent-reduction{background:$color-style1;border-color:$color-style1}
+	.price,
+	.price.product-price{color:$color-style1}
+	.old-price{color:#b1b0b0}
+
+	
+	ul.product_list.grid > li .product-container:hover{background:#fff;
+   @include box-shadow( 0 5px 13px rgba(0,0,0,0.17));
+	}
+	
+	.button.lnk_view span{color:$color3-style1}
+	.button.lnk_view:hover span{color:#fff} 
+
+  #cmsinfo_block em{background:$color-style1;text-shadow:$color-shadow}
+  #facebook_block, #cmsinfo_block{background:rgba(219,213,185,0.5)}
+  #cmsinfo_block,
+   #cmsinfo_block > div + div{border-color:#dbd5b9;}  
+   
+   
+   
+   
+   .footer-container #footer #social_block  { background:none;padding-bottom:15px;}  
+  .footer-container {	
+  background:#3f3f3f;
+																		@media (min-width: $screen-sm) { // min 768px
+																			background:url(../img/footer-bg.gif) repeat-x;
+																		}
+}
+	 #footer #newsletter_block_left .form-group{ 
+	.form-control{background:#3c3c3c;}
+	 .button-small {color:#fff;
+	 &:hover{color:$color-style1}
+	 } 
+	}
+	
+ .footer-container #footer #social_block ul li a:hover{color:$color-style1;}	
+	
+	

@@ -1,0 +1,76 @@
+@import "compass";
+@import "theme_variables";
+
+/* Home hook CSS */
+#htmlcontent_home {
+	ul {
+		margin: 0 -5px;
+		li {
+			padding: 0 5px 10px;
+			@media (max-width: $screen-xs - 1) { // max 479px
+				width: 100%;
+			}
+			img {
+				max-width: 100%;
+				height: auto;
+				@media (max-width: $screen-xs - 1) { // max 479px
+					min-width: 100%;
+				}
+			}
+			&.htmlcontent-item-5 {
+				width: 66.6667%;
+				@media (max-width: $screen-xs - 1) { // max 479px
+					width: 100%;
+				}
+			}
+		}
+	}
+}
+
+/* Top hook CSS */
+#htmlcontent_top {
+    float: right;
+    width: 33%;
+    max-width: 391px;
+    padding-left: 5px;
+	@media (max-width: $screen-xs-max) { // max 767px
+		width: 100%;
+		max-width: 100%;
+		padding-left: 0;
+		padding-top: 0px;
+	}
+	ul {
+		@media (max-width: $screen-xs-max) { // max 767px
+			margin: 0 -5px;
+		}
+		li {
+			width: 100%;
+			margin-bottom: 10px;
+			@media (max-width: $screen-xs-max) { // max 767px
+				float: left;
+				padding-left: 5px;
+				padding-right: 5px;
+				width: 50%;
+			}
+			&:last-child{
+				margin-bottom: 0;
+			}
+			img {
+				max-width: 100%;
+				height: auto;	
+			}
+		}
+	}
+}
+
+/* Left hook CSS */
+#htmlcontent_left {
+}
+
+/* Right hook CSS */
+#htmlcontent_right {
+}
+
+/* Footer hook CSS */
+#htmlcontent_footer {
+}
