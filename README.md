@@ -35,4 +35,7 @@ or raise ticket at https://webkul.com/ticket/
 Webkul is known for his proactive support and already developed more than 100+ plugins on prestashop and more than 700+ plugins on other opensource platforms.
 
 
+license
+--------
+OSL V3 : https://opensource.org/licenses/OSL-3.0
 Thank you for downloading .
