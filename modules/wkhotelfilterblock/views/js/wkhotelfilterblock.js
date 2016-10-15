@@ -2,7 +2,7 @@ $(document).ready(function()
 {
 	$(".clear_filter").on("click", function()
 	{
-		var filter_wrapper = $(this).parent(".layered_filter_heading").siblings(".lf_sub_cont");
+		var filter_wrapper = $(this).parents(".layered_filter_heading").siblings(".lf_sub_cont");
 		var make_diff = filter_wrapper.children("div"); //use to make difference between checkbox and price slider
 		if (make_diff.hasClass("layered_filt")) // for checkbox
 		{

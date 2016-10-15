@@ -1,0 +1,13 @@
+
+[{shop_url}] 
+
+Bonjour, 
+
+Merci de vous être inscrit à notre newsletter, veuillez confirmer
+votre inscription en cliquant sur le lien ci-dessous :
+
+{verif_url} [{verif_url}] 		 
+
+{shop_name} [{shop_url}] réalisé avec
+PrestaShop(tm) [http://www.prestashop.com/] 
+

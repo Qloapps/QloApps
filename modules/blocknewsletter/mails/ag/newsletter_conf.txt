@@ -1,0 +1,10 @@
+
+[{shop_url}] 
+
+Hola, 
+
+GRACIAS POR SUSCRIBIRSE A NUESTRO BOLETÍN. 
+
+{shop_name} [{shop_url}] creado por
+PrestaShop(tm) [http://www.prestashop.com/] 
+

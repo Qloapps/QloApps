@@ -72,7 +72,7 @@
 							{if $way_of_payment == 'Advance Payment'}
 								{assign var="refund_amount" value=$adv_paid_amount-$deduction_amount}
 							{else}
-								{assign var="refund_amount" value=$total_amount-$deduction_amount}
+								{assign var="refund_amount" value=$total_amount|floatval - $deduction_amount|floatval}
 							{/if}
 							<p><strong>{l s='Total Refund Amount' mod='hotelreservationsystem'} :  </strong>&nbsp;&nbsp;{$refund_amount|round:"2"}&nbsp;{$curr_code}</p>
 							

@@ -1,0 +1,20 @@
+
+[{shop_url}] 
+
+Hola {firstname} {lastname},
+
+Your order has been shipped 
+
+La vostra comanda amb referència {order_name} ha estat enviada.
+
+Gràcies per comprar a {shop_name}! 		 
+
+Podeu revisar la vostra comanda i descarregar la vostra factura
+des de la secció "Historial de comandes"
+[{history_url}] del vostre compte de client clicant a
+"El meu compte" [{my_account_url}] a la nostra
+botiga. 
+
+{shop_name} [{shop_url}] desenvolupat amb
+PrestaShop(tm) [http://www.prestashop.com/] 
+

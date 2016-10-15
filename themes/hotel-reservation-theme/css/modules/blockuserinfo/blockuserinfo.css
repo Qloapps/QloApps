@@ -1,7 +1,7 @@
 #user_info_acc
 {
   background-color: transparent;
-  color: #BF9958;
+  color: #fff;
   font-family: inherit;
   font-size: 17px;
   font-weight: 400;
@@ -20,12 +20,12 @@
 
 #user_info_acc span.account_user_name
 {
-  font-weight: bold;
+  padding-right: 5px;
 }
 
 #user_info_acc span.caret
 {
-  border-top-color: #BF9958;
+  border-top-color: #fff;
 }
 
 .header_user_info {
@@ -64,13 +64,6 @@
           display: inline-block;
         }
       }
-
-  /*@media (max-width: 370px) {
-    .user_info_xs
-    {
-      padding-right: 0px;
-    }  
-  }*/
 
 /*# sourceMappingURL=blockuserinfo.css.map */
 

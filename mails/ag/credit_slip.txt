@@ -1,0 +1,16 @@
+
+[{shop_url}] 
+
+Hola {firstname} {lastname}, 
+
+Hemos generado un crédito a su nombre para el pedido con la
+referencia {order_name}. 
+
+Puede revisar este crédito y descargar la factura desde "Mi
+historial de pedidos" [{history_url}] de su cuenta
+haciendo clic "Mi cuenta " [{my_account_url}] en
+nuestra tienda. 
+
+{shop_name} [{shop_url}] creado por
+PrestaShop(tm) [http://www.prestashop.com/] 
+

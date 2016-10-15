@@ -171,6 +171,19 @@
 				<div id="htl_other_images"></div>
 			</div>
 		</div>
+		{if isset($enabledDisplayMap) && $enabledDisplayMap}
+			<div class="form-group">  
+				<label class="col-sm-3 control-label">{l s='Map :' mod='hotelreservationsystem'}</label>
+				<div class="col-sm-6" id="googleMapContainer">
+					<input type="hidden" id="loclatitude" name="loclatitude" value="{if isset($edit)}{$hotel_info.latitude|escape:'htmlall':'UTF-8'}{/if}" />
+					<input type="hidden" id="loclongitude" name="loclongitude" value="{if isset($edit)}{$hotel_info.longitude|escape:'htmlall':'UTF-8'}{/if}" />  
+					<input type="hidden" id="locformatedAddr" name="locformatedAddr" value="{if isset($edit)}{$hotel_info.map_formated_address}{/if}" />  
+					<input type="hidden" id="googleInputField" name="googleInputField" value="{if isset($edit)}{$hotel_info.map_input_text}{/if}" />  
+					<input id="pac-input" class="controls" type="text" placeholder="Enter a location">
+					<div id="map"></div>
+				</div>
+			</div>
+		{/if}
 		<div class="panel-footer">
 			<a href="{$link->getAdminLink('AdminAddHotel')|escape:'html':'UTF-8'}" class="btn btn-default">
 				<i class="process-icon-cancel"></i>{l s='Cancel' mod='hotelreservationsystem'}
@@ -185,6 +198,8 @@
 	</form>
 </div>
 {strip}
+	{addJsDef enabledDisplayMap=$enabledDisplayMap}
+	{addJsDef defaultCountry=$defaultCountry}
 	{addJsDef statebycountryurl=$link->getAdminLink('AdminAddHotel') mod='hotelreservationsystem'}
 	{addJsDefL name=image_remove}{l s='Remove' js=1 mod='hotelreservationsystem'}{/addJsDefL}
 {/strip}
@@ -202,6 +217,7 @@
 				width : 700
 			});
 		{/block}
+
 	});
 </script>
 {/block}

@@ -1,0 +1,16 @@
+
+[{shop_url}] 
+
+Missatge d'un client de {shop_name} 
+
+ADREÇA ELECTRÒNICA DEL CLIENT: {email}
+
+MISSATGE DEL CLIENT: {message}
+
+ID DE COMANDA: {order_name}
+
+FITXER ADJUNTAT: {attached_file} 		 
+
+{shop_name} [{shop_url}] desenvolupat amb
+PrestaShop(tm) [http://www.prestashop.com/] 
+

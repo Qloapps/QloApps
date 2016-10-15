@@ -46,7 +46,9 @@ class BlockCurrencies extends Module
 
 	public function install()
 	{
-		return parent::install() && $this->registerHook('displayNav') && $this->registerHook('displayHeader');
+		return parent::install() 
+				&& $this->registerHook('displayFooterMostLeftBlock') 
+				&& $this->registerHook('displayHeader');
 	}
 
 	protected function _prepareHook($params)
@@ -76,7 +78,17 @@ class BlockCurrencies extends Module
 
 	public function hookDisplayNav($params)
 	{
-			return $this->hookDisplayTop($params);
+		return $this->hookDisplayTop($params);
+	}
+
+	public function hookDisplayTopSubPrimaryBlock($params)
+	{
+		return $this->hookDisplayTop($params);
+	}
+
+	public function hookDisplayFooterMostLeftBlock($params)
+	{
+		return $this->hookDisplayTop($params);
 	}
 
 	public function hookDisplayHeader($params)
@@ -86,5 +98,3 @@ class BlockCurrencies extends Module
 		$this->context->controller->addCSS(($this->_path).'blockcurrencies.css', 'all');
 	}
 }
-
-

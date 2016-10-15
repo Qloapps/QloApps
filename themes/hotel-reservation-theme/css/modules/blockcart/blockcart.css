@@ -158,11 +158,11 @@
       .cart_block .cart-buttons a#button_order_cart span {
         padding: 7px 0;
         font-size: 1.1em;
-        border: solid 1px #bf9958;
-        background-color: #BF9958; }
+        border: solid 1px #009ad0;
+        background: #009ad0 linear-gradient(to bottom, #009ad0 0%, #007ab7 100%) repeat-x scroll 0 0 }
       .cart_block .cart-buttons a#button_order_cart:hover span {
-        border: solid 1px #bf9958;
-        background-color: #BF9958;
+        border: solid 1px #009ad0;
+        background : #009ad0 linear-gradient(to bottom, #009ad0 0%, #007ab7 100%) repeat-x scroll 0 0;
         color: #fff; }
 
 /*******************************************************************
@@ -278,7 +278,7 @@
   background-color: #fff;
   position: absolute;
   display: none;
-  z-index: 99;
+  z-index: 300;
   width: 84%;
   margin-right: 8%;
   margin-left: 8%;
@@ -367,6 +367,13 @@
       padding: 0px 30px 20px 30px; }
       #layer_cart .layer_cart_cart .button-container .btn {
         margin-bottom: 10px; }
+      #layer_cart .layer_cart_cart .button-container a.button.button-medium {
+        border-color: #51e4ff #338fdd #2f85ce #51e4ff;
+        border-style: solid;
+        border-width: 1px;
+        font-weight: 600;
+        padding: 0;
+        text-shadow: unset; }
       #layer_cart .layer_cart_cart .button-container span.exclusive-medium {
         margin-right: 5px; }
         #layer_cart .layer_cart_cart .button-container span.exclusive-medium i {

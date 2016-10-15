@@ -1,0 +1,35 @@
+
+[{shop_url}] 
+
+Hola {firstname} {lastname},
+
+Gràcies per comprar a {shop_name}! 
+
+La vostra comanda amb referència {order_name} ha estat tramitada
+i us SERÀ ENVIADA QUAN REBEM EL VOSTRE PAGAMENT. 
+
+Heu seleccionat pagar mitjançant transferència. 
+
+Aquí hi ha les dades bancàries per a la vostra transferència:
+
+IMPORT: {total_paid}
+
+TITULAR DE COMPTE: {bankwire_owner}
+
+DETALLS DEL COMPTE: {bankwire_details}
+
+ADREÇA DE L'OFICINA BANCÀRIA: {bankwire_address} 		 
+
+Podeu revisar la vostra comanda i descarregar la vostra factura
+des de la secció "Historial de comandes"
+[{history_url}] del vostre compte de client clicant a
+"El meu compte" [{my_account_url}] a la nostra
+botiga. 
+
+Si teniu un compte de convidat, podeu seguir l'evolució de la
+comanda a la secció "Seguiment de convidat"
+[{guest_tracking_url}] de la nostra botiga. 
+
+{shop_name} [{shop_url}] desenvolupat amb
+PrestaShop(tm) [http://www.prestashop.com/] 
+

@@ -1,0 +1,13 @@
+
+[{shop_url}] 
+
+Bonjour {firstname} {lastname}, 
+
+Vous avez reçu un nouveau message de {shop_name} concernant la
+commande ayant pour référence {order_name}.
+
+MESSAGE : {message} 		 
+
+{shop_name} [{shop_url}] réalisé avec
+PrestaShop(tm) [http://www.prestashop.com/] 
+

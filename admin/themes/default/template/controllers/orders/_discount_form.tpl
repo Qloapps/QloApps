@@ -41,7 +41,7 @@
 			<select class="form-control" name="discount_type" id="discount_type">
 				<option value="1">{l s='Percent'}</option>
 				<option value="2">{l s='Amount'}</option>
-				<option value="3">{l s='Free shipping'}</option>
+				{*<option value="3">{l s='Free shipping'}</option>*}<!-- By webkul no need of free shipping voucher -->
 			</select>
 		</div>
 	</div>

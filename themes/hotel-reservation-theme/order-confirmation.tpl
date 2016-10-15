@@ -56,32 +56,35 @@
 			{/if}
 			<hr>
 			<p><strong>{l s='Order Details -'}</strong></p>
-			<div class="row totalOrdercancellation_div" {if !$non_requested_rooms}style="display:none;"{/if}>
-				<div class="col-xs-12 col-sm-12">
-					<p style="text-align:center;"><a class="terms_btn btn btn-default pull-right" href="{$redirect_link_terms}" target="_blank"><i class="icon-file-text large"></i>&nbsp;&nbsp;{l s='Terms & Conditions'}</a></p>
-					<button type="button" data-id_order="{$order->id}" data-id_currency="{$order->id_currency}" data-id_customer="{$order->id_customer}" data-order_data='{$cart_htl_data|@json_encode}' name="totalOrdercancellation_btn" class="totalOrdercancellation_btn btn btn-default pull-right" href="#htlRefundReasonForm"><span>{l s='Request Total Order Cancellation'}</span></button>
+			{if isset($order_has_invoice) && $order_has_invoice && $order->payment != 'Free order'}
+				<div class="row totalOrdercancellation_div" {if !$non_requested_rooms}style="display:none;"{/if}>
+					<div class="col-xs-12 col-sm-12">
+						<p style="text-align:center;"><a class="terms_btn btn btn-default pull-right" href="{$redirect_link_terms}" target="_blank"><i class="icon-file-text large"></i>&nbsp;&nbsp;{l s='Terms & Conditions'}</a></p>
+						<button type="button" data-id_order="{$order->id}" data-id_currency="{$order->id_currency}" data-id_customer="{$order->id_customer}" data-order_data='{$cart_htl_data|@json_encode}' name="totalOrdercancellation_btn" class="totalOrdercancellation_btn btn btn-default pull-right" href="#htlRefundReasonForm"><span>{l s='Request Total Order Cancellation'}</span></button>
+					</div>
 				</div>
-			</div>
+			{/if}
 			<div id="order-detail-content" class="">
 				<table class="table table-bordered">
 					<thead>
 						<tr>
 							<th class="cart_product">{l s='Room Image'}</th>
 							<th class="cart_description">{l s='Room Description'}</th>
-							<!-- <th>{l s='Room Capcity'}</th> -->
 							<th class="cart_unit">{l s='Unit Price'}</th>
 							<th>{l s='Rooms'}</th>
 							<th>{l s='Check-in Date'}</th>
 							<th>{l s='Check-out Date'}</th>
 							<th class="cart_total">{l s='Total'}</th>
-							<th>{l s='Request Refund'}</th>
+							{if isset($order_has_invoice) && $order_has_invoice}
+								<th>{l s='Request Refund'}</th>
+							{/if}	
 							<th>{l s='BackOrder Status'}</th>
 						</tr>
 					</thead>
 					<tfoot>
 						{if $priceDisplay && $use_tax}
 							<tr class="item">
-								<td colspan="7"></td>
+								<td colspan={if isset($order_has_invoice) && $order_has_invoice}"7"{else}"6"{/if}></td>
 								<td colspan="{if $return_allowed}2{else}1{/if}">
 									<strong>{l s='Items (tax excl.)'}</strong>
 								</td>
@@ -91,7 +94,7 @@
 							</tr>
 						{/if}
 						<tr class="item">
-							<td colspan="7"></td>
+							<td colspan={if isset($order_has_invoice) && $order_has_invoice}"7"{else}"6"{/if}></td>
 							<td colspan="{if $return_allowed}2{else}1{/if}">
 								<strong>{l s='Items'} {if $use_tax}{l s='(tax incl.)'}{/if} </strong>
 							</td>
@@ -101,7 +104,7 @@
 						</tr>
 						{if $order->total_discounts > 0}
 						<tr class="item">
-							<td colspan="7"></td>
+							<td colspan={if isset($order_has_invoice) && $order_has_invoice}"7"{else}"6"{/if}></td>
 							<td colspan="{if $return_allowed}2{else}1{/if}">
 								<strong>{l s='Total vouchers'}</strong>
 							</td>
@@ -112,7 +115,7 @@
 						{/if}
 						{if $order->total_wrapping > 0}
 						<tr class="item">
-							<td colspan="7"></td>
+							<td colspan={if isset($order_has_invoice) && $order_has_invoice}"7"{else}"6"{/if}></td>
 							<td colspan="{if $return_allowed}2{else}1{/if}">
 								<strong>{l s='Total gift wrapping cost'}</strong>
 							</td>
@@ -121,10 +124,18 @@
 							</td>
 						</tr>
 						{/if}
-						
+						<tr class="totalprice item">
+							<td colspan={if isset($order_has_invoice) && $order_has_invoice}"7"{else}"6"{/if}></td>
+							<td colspan="{if $return_allowed}2{else}1{/if}">
+								<strong>{l s='Total'}</strong>
+							</td>
+							<td colspan="{if $order->hasProductReturned()}3{else}2{/if}">
+								<span class="price">{displayWtPriceWithCurrency price=$order->total_paid currency=$currency}</span>
+							</td>
+						</tr>
 						{if isset($order_adv_dtl)}
 							<tr class="item">
-								<td colspan="7"></td>
+								<td colspan={if isset($order_has_invoice) && $order_has_invoice}"7"{else}"6"{/if}></td>
 								<td colspan="{if $return_allowed}2{else}1{/if}">
 									<strong>{l s='Total Paid'}</strong>
 								</td>
@@ -133,7 +144,7 @@
 								</td>
 							</tr>
 							<tr class="item">
-								<td colspan="7"></td>
+								<td colspan={if isset($order_has_invoice) && $order_has_invoice}"7"{else}"6"{/if}></td>
 								<td colspan="{if $return_allowed}2{else}1{/if}">
 									<strong>{l s='Total Due'}</strong>
 								</td>
@@ -142,15 +153,6 @@
 								</td>
 							</tr>
 						{/if}
-						<tr class="totalprice item">
-							<td colspan="7"></td>
-							<td colspan="{if $return_allowed}2{else}1{/if}">
-								<strong>{l s='Total'}</strong>
-							</td>
-							<td colspan="{if $order->hasProductReturned()}3{else}2{/if}">
-								<span class="price">{displayWtPriceWithCurrency price=$order->total_paid currency=$currency}</span>
-							</td>
-						</tr>
 					</tfoot>
 					<tbody>
 						{if isset($cart_htl_data)}
@@ -185,12 +187,12 @@
 										</td>
 										<td class="text-center">
 											<p>
-												{$rm_v['data_form']|date_format:"%d-%b-%G"}
+												{$rm_v['data_form']|date_format:"%d-%m-%Y"}
 											</p>
 										</td>
 										<td class="text-center">
 											<p>
-												{$rm_v['data_to']|date_format:"%d-%b-%G"}
+												{$rm_v['data_to']|date_format:"%d-%m-%Y"}
 											</p>
 										</td>
 										<td class="cart_total text-left">
@@ -202,13 +204,15 @@
 												{/if}
 											</p>
 										</td>
-										<td class="cart_total text-left">
-											{if isset($rm_v['stage_name']) && $rm_v['stage_name']}
-												<p>{l s="Request Sent.."}</p>
-											{else}
-												<button data-amount="{$rm_v['amount_tax_incl']}" data-id_order="{$order->id}" data-id_currency="{$order->id_currency}" data-id_customer="{$order->id_customer}" data-id_product="{$data_v['id_product']}" data-num_rooms="{$rm_v['num_rm']}" data-date_from="{$rm_v['data_form']|date_format:"%G-%m-%d"}" type="button" data-date_to="{$rm_v['data_to']|date_format:"%G-%m-%d"}"  name="roomRequestForRefund" class="order_cancel_request_button_{$data_v['id_product']}_{$rm_v['data_form']|date_format:"%G-%m-%d"}_{$rm_v['data_to']|date_format:"%G-%m-%d"} btn btn-default button button-small roomRequestForRefund" href="#htlRefundReasonForm"><span>{l s='Request Refund'}</span></button>
-											{/if}
-										</td>
+										{if isset($order_has_invoice) && $order_has_invoice && $order->payment != 'Free order'}
+											<td class="cart_total text-left">
+												{if isset($rm_v['stage_name']) && $rm_v['stage_name']}
+													<p>{l s="Request Sent.."}</p>
+												{else}
+													<button data-amount="{$rm_v['amount_tax_incl']}" data-id_order="{$order->id}" data-id_currency="{$order->id_currency}" data-id_customer="{$order->id_customer}" data-id_product="{$data_v['id_product']}" data-num_rooms="{$rm_v['num_rm']}" data-date_from="{$rm_v['data_form']|date_format:"%G-%m-%d"}" type="button" data-date_to="{$rm_v['data_to']|date_format:"%G-%m-%d"}"  name="roomRequestForRefund" class="order_cancel_request_button_{$data_v['id_product']}_{$rm_v['data_form']|date_format:"%G-%m-%d"}_{$rm_v['data_to']|date_format:"%G-%m-%d"} btn btn-default button button-small roomRequestForRefund" href="#htlRefundReasonForm"><span>{l s='Request Refund'}</span></button>
+												{/if}
+											</td>
+										{/if}	
 										<td class="text-center">
 											{if isset($rm_v['is_backorder']) && $rm_v['is_backorder']}
 												{l s='On Backorder'}

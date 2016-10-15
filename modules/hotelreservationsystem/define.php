@@ -15,4 +15,7 @@
 	require_once ('classes/HotelOrderRefundRules.php');
 	require_once ('classes/HotelOrderRefundInfo.php');
 	require_once ('classes/HotelOrderRefundStages.php');
+	require_once ('classes/HotelOrderRestrictDate.php');
+	require_once ('classes/HotelCustomerAdvancedProductPayment.php');
+	require_once ('classes/HotelHelper.php');
 ?>

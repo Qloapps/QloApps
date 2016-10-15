@@ -1,0 +1,7 @@
+Your Cancellation request for all bookings in the order referene {order_reference} has been sent to the admin.Please wait till it is processed.
+
+You can review your order from the Order history section of your customer account by clicking My account on our shop.
+
+{shop_name} [{shop_url}] powered by
+PrestaShop(tm) [http://www.prestashop.com/] 
+

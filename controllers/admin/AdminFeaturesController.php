@@ -168,6 +168,16 @@ class AdminFeaturesControllerCore extends AdminController
 	 */
 	public function renderForm()
 	{
+		if (!($obj = $this->loadObject(true))) {
+            return;
+        }
+		$ps_img_url = _PS_IMG_DIR_.'rf/'.$obj->id.'.png';
+		if ($img_exist = file_exists($ps_img_url)) 
+		{
+			$img_url = '../../hotelcommerce/img/rf/'.$obj->id.'.png';
+			$image = "<img class='img-thumbnail img-responsive' style='max-width:100px' src='".$img_url."'>";
+		}
+
 		$this->toolbar_title = $this->l('Add a new feature');
 		$this->fields_form = array(
 			'legend' => array(
@@ -187,7 +197,8 @@ class AdminFeaturesControllerCore extends AdminController
 				array(
 					'type' => 'file',		
 					'label' => $this->l('Feature Logo'),		
-					'name' => 'logo',		
+					'name' => 'logo',
+					'image' => $img_exist ? $image : false,
 					'display_image' => true,		
 					'hint' => $this->l('Upload a feature logo.'),
 					'required' => true

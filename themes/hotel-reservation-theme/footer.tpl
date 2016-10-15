@@ -34,8 +34,9 @@
 				<!-- Footer -->
 				<div class="footer-container">
 					<footer id="footer"  class="container">
-						<div class="row">{$HOOK_FOOTER}</div>
+						<div class="row margin-btm-50">{$HOOK_FOOTER}</div>
 					</footer>
+					{hook h="displayAfterDefautlFooterHook"}
 				</div><!-- #footer -->
 			{/if}
 		</div><!-- #page -->

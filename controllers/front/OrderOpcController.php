@@ -191,14 +191,14 @@ class OrderOpcControllerCore extends ParentOrderController
 
 						case 'makeFreeOrder':
 							/* Bypass payment step if total is 0 */
-							if (($id_order = $this->_checkFreeOrder()) && $id_order)
-							{
-								$order = new Order((int)$id_order);
-								$email = $this->context->customer->email;
-								if ($this->context->customer->is_guest)
-									$this->context->customer->logout(); // If guest we clear the cookie for security reason
-								$this->ajaxDie('freeorder:'.$order->reference.':'.$email);
-							}
+							if (($id_order = $this->_checkFreeOrder()) && $id_order) {
+                                $order = new Order((int)$id_order);
+                                $email = $this->context->customer->email;
+                                if ($this->context->customer->is_guest) {
+                                    $this->context->customer->logout();
+                                } // If guest we clear the cookie for security reason
+                                $this->ajaxDie('freeorder:'.$order->reference.':'.$email);
+                            }
 							exit;
 							break;
 
@@ -587,10 +587,11 @@ class OrderOpcControllerCore extends ParentOrderController
 						if (Tools::isSubmit('submitAdvPayment')) 
 						{
 							$id_customer_adv = Tools::getValue('id_customer_adv');
-							if ($id_customer_adv) 
+							if ($id_customer_adv) {
 								$obj_customer_adv = new HotelCustomerAdvancedPayment($id_customer_adv);
-							else
+							} else {
 								$obj_customer_adv = new HotelCustomerAdvancedPayment();
+							}
 
 							$payment_type = Tools::getValue('payment_type');
 							if ($payment_type == 2) 
@@ -600,13 +601,14 @@ class OrderOpcControllerCore extends ParentOrderController
 								$obj_customer_adv->id_customer = $this->context->customer->id ? $this->context->customer->id : '';
 								$obj_customer_adv->id_currency = $this->context->cart->id_currency;
 								$obj_customer_adv->total_paid_amount = $adv_amount;
-								$obj_customer_adv->total_order_amount = $this->context->cart->getOrderTotal();
+								$obj_customer_adv->total_order_amount = $this->context->cart->getOrderTotal(true, Cart::ONLY_PRODUCTS);
 								$obj_customer_adv->save();
 							}
 							else
 							{
-								if ($id_customer_adv) 
+								if ($id_customer_adv) {
 									$obj_customer_adv->delete();
+								}
 							}
 
 							Tools::redirect($this->context->link->getPageLink('order-opc'));
@@ -621,15 +623,26 @@ class OrderOpcControllerCore extends ParentOrderController
 								$obj_customer_adv = new HotelCustomerAdvancedPayment($customer_adv_dtl['id']);
 								$obj_customer_adv->id_currency = $this->context->cart->id_currency;
 								$obj_customer_adv->total_paid_amount = $adv_amount;
-								$obj_customer_adv->total_order_amount = $this->context->cart->getOrderTotal();
+								$obj_customer_adv->total_order_amount = $this->context->cart->getOrderTotal(true, Cart::ONLY_PRODUCTS);
 								$obj_customer_adv->save();
 
 								Tools::redirect($this->context->link->getPageLink('order-opc'));
 							}
 
-							$due_amount = $this->context->cart->getOrderTotal() - $customer_adv_dtl['total_paid_amount'];
+							$due_amount = $this->context->cart->getOrderTotal(true, Cart::ONLY_PRODUCTS) - $customer_adv_dtl['total_paid_amount'];
 							$customer_adv_dtl['due_amount'] = $due_amount;
 
+							$cart_rules = $this->context->cart->getCartRules();
+					        $total_discount = 0;
+					        if ($cart_rules) {
+					            foreach ($cart_rules as $discount) {
+					                if ($discount['reduction_currency'] != $this->context->cart->id_currency) {
+					                    $discount['reduction_amount'] = Tools::convertPriceFull($discount['reduction_amount'], new Currency($discount['reduction_currency']), $this->context->currency);
+					                }
+					                $total_discount += $discount['reduction_amount'];
+					            }
+					        }
+							$customer_adv_dtl['total_to_be_paid'] = ($customer_adv_dtl['total_paid_amount'] - $total_discount) > 0 ? ($customer_adv_dtl['total_paid_amount'] - $total_discount) : 0;
 							$this->context->smarty->assign('customer_adv_dtl', $customer_adv_dtl);
 						}
 
@@ -638,6 +651,14 @@ class OrderOpcControllerCore extends ParentOrderController
 					}
 				}
 			}
+			/*Check Order restrict condition before Payment by the customer*/
+	        if (Module::isInstalled('hotelreservationsystem') && Module::isEnabled('hotelreservationsystem')) {
+	            $error = false;
+	            require_once _PS_MODULE_DIR_.'hotelreservationsystem/define.php';
+	            $cart_products = $this->context->cart->getProducts();
+	            $order_restrict_error = HotelOrderRestrictDate::validateOrderRestrictDateOnPayment($this);
+	        }
+	        /*END*/
 			$this->setTemplate(_PS_THEME_DIR_.'order-opc.tpl');
 		}
 	}
@@ -792,8 +813,17 @@ class OrderOpcControllerCore extends ParentOrderController
 				Tools::displayPrice($minimal_purchase, $currency), Tools::displayPrice($this->context->cart->getOrderTotal(false, Cart::ONLY_PRODUCTS), $currency)
 			).'</p>';
 
+
+		// For Advanced Payment (when advance paid amount will be zero when voucher will be applied)
+        $freeAdvancePaymentOrder = false;
+        if (Module::isInstalled('hotelreservationsystem')) 
+        {
+            require_once (_PS_MODULE_DIR_.'hotelreservationsystem/define.php');
+            $obj_adv_pmt = new HotelAdvancedPayment();
+            $freeAdvancePaymentOrder = $obj_adv_pmt->_checkFreeAdvancePaymentOrder();
+        }
 		/* Bypass payment step if total is 0 */
-		if ($this->context->cart->getOrderTotal() <= 0)
+		if ($this->context->cart->getOrderTotal() <= 0 || $freeAdvancePaymentOrder)
 			return '<p class="center"><button class="button btn btn-default button-medium" name="confirmOrder" id="confirmOrder" onclick="confirmFreeOrder();" type="submit"> <span>'.Tools::displayError('I confirm my order.').'</span></button></p>';
 
 		$return = Hook::exec('displayPayment');

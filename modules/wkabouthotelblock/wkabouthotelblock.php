@@ -2,13 +2,16 @@
 if (!defined('_PS_VERSION_'))
     exit;
 
+require_once dirname(__FILE__).'/define.php';
+
 class WkAboutHotelBlock extends Module
 {
+    const INSTALL_SQL_FILE = 'install.sql';
     public function __construct()
     {
         $this->name = 'wkabouthotelblock';
         $this->tab = 'front_office_features';
-        $this->version = '0.0.2';
+        $this->version = '1.0.0';
         $this->author = 'webkul';
         $this->need_instance = 0;
 
@@ -20,152 +23,166 @@ class WkAboutHotelBlock extends Module
         $this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
     }
 
-    private function _postValidation()
+    public function hookDisplayDefaultNavigationHook() 
     {
-        /*if (Tools::isSubmit('btnSubmit'))
-        {
-            return 1;
-        }*/
+        return $this->display(__FILE__, 'hotelInteriorNaviagtionMenu.tpl');
     }
 
-    private function _postProcess()
-    {
-        if (Tools::isSubmit('btnSubmit'))
-        {
-            Configuration::updateValue('WHY_THIS_HOTEL_HEADING', Tools::getValue('WHY_THIS_HOTEL_HEADING'));
-            Configuration::updateValue('WHY_THIS_HOTEL_CONTENT', Tools::getValue('WHY_THIS_HOTEL_CONTENT'));
-            Configuration::updateValue('ABOUT_HOTEL_HEADING', Tools::getValue('ABOUT_HOTEL_HEADING'));
-            Configuration::updateValue('ABOUT_HOTEL_CONTENT', Tools::getValue('ABOUT_HOTEL_CONTENT'));
-        }
-
-        $this->_html .= $this->displayConfirmation($this->l('Settings updated'));
-        $module_config = $this->context->link->getAdminLink('AdminModules');
-        Tools::redirectAdmin($module_config.'&configure='.$this->name.'&tab_module='.$this->tab.'&module_name='.$this->name);
-    }
-
-    public function getContent()
-    {
-        if (Tools::isSubmit('btnSubmit'))
-        {
-            $this->_postValidation();
-            if (!count($this->_postErrors))
-                $this->_postProcess();
-            else
-                foreach ($this->_postErrors as $err)
-                    $this->_html .= $this->displayError($err);
-        }
-        else
-            $this->_html .= '<br />';
-
-        $this->_html .= $this->renderForm();
-
-        return $this->_html;
-    }
-
-    public function renderForm()
-    {
-        // Get default language
-        $default_lang = (int)Configuration::get('PS_LANG_DEFAULT');
-
-        $fields_form[0]['form'] = array(
-                'legend' => array(
-                    'title' => $this->l('Configuration'),
-                    'icon' => 'icon-cogs'
-                ),
-                'input' => array(
-                    array(
-                        'type' => 'text',
-                        'label' => $this->l('Heading1'),
-                        'name' => 'WHY_THIS_HOTEL_HEADING',
-                        'hint' => $this->l('Heading to describe why to choose your hotel.')
-                    ),
-                    array(
-                        'type' => 'textarea',
-                        'label' => $this->l('Heading1 Content'),
-                        'name' => 'WHY_THIS_HOTEL_CONTENT',
-                        'rows' => '6',
-                        'hint' => $this->l('Content for heading1.')
-                    ),
-                    array(
-                        'type' => 'text',
-                        'label' => $this->l('Heading2'),
-                        'name' => 'ABOUT_HOTEL_HEADING',
-                        'hint' => $this->l('Heading to Describe about your hotel.')
-                    ),
-                    array(
-                        'type' => 'textarea',
-                        'label' => $this->l('Heading2 Content'),
-                        'name' => 'ABOUT_HOTEL_CONTENT',
-                        'rows' => '6',
-                        'hint' => $this->l('Content for heading2.')
-                    )
-                ),
-                'submit' => array(
-                    'title' => $this->l('Save'),
-                )
-        );
-
-        $helper = new HelperForm();
-
-        // Module, token and currentIndex
-        $helper->module = $this;
-        $helper->name_controller = $this->name;
-        $helper->token = Tools::getAdminTokenLite('AdminModules');
-        $helper->currentIndex = AdminController::$currentIndex.'&configure='.$this->name.'&tab_module='.$this->tab.'&module_name='.$this->name;
-
-        // Title and toolbar
-        $helper->title = $this->displayName;
-        $helper->show_toolbar = true;
-        $helper->submit_action = 'btnSubmit';
-        $helper->table = $this->table;
-        $helper->identifier = $this->identifier;
-
-        //Language
-        $helper->default_form_language = $default_lang;
-        $helper->allow_employee_form_lang = $default_lang;
-
-        $helper->tpl_vars = array(
-            'fields_value' => $this->getConfigFieldsValues(),
-            'languages' => $this->context->controller->getLanguages(),
-            'id_language' => $this->context->language->id
-        );
-
-        return $helper->generateForm($fields_form);
-    }
-
-    
     public function hookDisplayHome()
     {
-        $this->context->controller->addCSS(_PS_MODULE_DIR_.$this->name.'/views/css/hotel-aboutblock.css');
+        // owl.carousel Plug-in files
+        $this->context->controller->addCSS(_PS_MODULE_DIR_.'hotelreservationsystem/libs/owl.carousel/assets/owl.carousel.min.css');
+        $this->context->controller->addCSS(_PS_MODULE_DIR_.'hotelreservationsystem/libs/owl.carousel/assets/owl.theme.default.min.css');
+        $this->context->controller->addJS(_PS_MODULE_DIR_.'hotelreservationsystem/libs/owl.carousel/owl.carousel.min.js');
 
-        $why_hotel_head = Configuration::get('WHY_THIS_HOTEL_HEADING');
-        $about_hotel_content = Configuration::get('ABOUT_HOTEL_CONTENT');
-        $about_hotel_head = Configuration::get('ABOUT_HOTEL_HEADING');
-        $why_hotel_content = Configuration::get('WHY_THIS_HOTEL_CONTENT');
+        $this->context->controller->addCSS(_PS_MODULE_DIR_.$this->name.'/views/css/WkAboutHotelBlockFront.css');
+        $this->context->controller->addJS(_PS_MODULE_DIR_.$this->name.'/views/js/WkAboutHotelBlockFront.js');
+        
+        $HOTEL_INTERIOR_HEADING = Configuration::get('HOTEL_INTERIOR_HEADING');
+        $HOTEL_INTERIOR_DESCRIPTION = Configuration::get('HOTEL_INTERIOR_DESCRIPTION');
 
-        $this->context->smarty->assign('why_hotel_head', $why_hotel_head);
-        $this->context->smarty->assign('about_hotel_content', $about_hotel_content);
-        $this->context->smarty->assign('about_hotel_head', $about_hotel_head);
-        $this->context->smarty->assign('why_hotel_content', $why_hotel_content);
+        $obj_inter_img = new WkHotelInteriorImage();
+        $InteriorImg = $obj_inter_img->getHotelInteriorImg();
 
-        return $this->display(__FILE__, 'homeabouthotelcontent.tpl');
+        $this->context->smarty->assign(array('HOTEL_INTERIOR_HEADING' => $HOTEL_INTERIOR_HEADING,
+                                             'HOTEL_INTERIOR_DESCRIPTION' => $HOTEL_INTERIOR_DESCRIPTION,
+                                             'InteriorImg' => $InteriorImg,
+                                            ));
+
+        return $this->display(__FILE__, 'hotelInteriorBlock.tpl');
     }
 
-    public function getConfigFieldsValues()
+    public function hookDisplayAddModuleSettingLink()
     {
-        return array(
-            'WHY_THIS_HOTEL_HEADING' => Tools::getValue('WHY_THIS_HOTEL_HEADING', Configuration::get('WHY_THIS_HOTEL_HEADING')),
-            'ABOUT_HOTEL_CONTENT' => Tools::getValue('ABOUT_HOTEL_CONTENT', Configuration::get('ABOUT_HOTEL_CONTENT')),
-            'ABOUT_HOTEL_HEADING' => Tools::getValue('ABOUT_HOTEL_HEADING', Configuration::get('ABOUT_HOTEL_HEADING')),
-            'WHY_THIS_HOTEL_CONTENT' => Tools::getValue('WHY_THIS_HOTEL_CONTENT', Configuration::get('WHY_THIS_HOTEL_CONTENT')),
-        );
+        return $this->display(__FILE__, 'aboutHotelBlockModuleSetting.tpl');
+    }
+
+    public function hookDisplayFooterExploreSectionHook()
+    {
+        return $this->display(__FILE__, 'hotelInteriorFooterExploreLink.tpl');
+    }
+
+    public function insertDefaultHotelEntries()
+    {
+        $HOTEL_INTERIOR_HEADING = $this->l('Interior');
+        $HOTEL_INTERIOR_DESCRIPTION = $this->l('Families travelling with kids will find Amboseli national park a safari destination matched to no other, with less tourist traffic, breathtaking open space.');
+
+        Configuration::updateValue('HOTEL_INTERIOR_HEADING', $HOTEL_INTERIOR_HEADING);
+        Configuration::updateValue('HOTEL_INTERIOR_DESCRIPTION', $HOTEL_INTERIOR_DESCRIPTION);
+
+        // Database Entry
+        for ($i = 1; $i <= 12 ; $i++) {
+            do {
+                $tmp_name = uniqid().'.jpg';
+            } while (file_exists(_PS_MODULE_DIR_.$this->name.'/views/img/hotel_interior/'.$tmp_name));
+            ImageManager::resize(_PS_MODULE_DIR_.$this->name.'/views/img/dummy_img/'.$i.'.jpg', _PS_MODULE_DIR_.$this->name.'/views/img/hotel_interior/'.$tmp_name);
+            $obj_inter_img = new WkHotelInteriorImage();
+            $obj_inter_img->name = $tmp_name;
+            $obj_inter_img->display_name = 'Dummy Image '.$i;
+            $obj_inter_img->active = 1;
+            $obj_inter_img->add();
+        }
+
+        return true;
+    }
+
+    public function install()
+    {
+        if (!file_exists(dirname(__FILE__).'/'.self::INSTALL_SQL_FILE)) {
+            return false;
+        } elseif (!$sql = Tools::file_get_contents(dirname(__FILE__).'/'.self::INSTALL_SQL_FILE)) {
+            return false;
+        }
+
+        $sql = str_replace(array('PREFIX_',  'ENGINE_TYPE'), array(_DB_PREFIX_, _MYSQL_ENGINE_), $sql);
+        $sql = preg_split("/;\s*[\r\n]+/", $sql);
+
+        foreach ($sql as $query) {
+            if ($query) {
+                if (!Db::getInstance()->execute(trim($query))) {
+                    return false;
+                }
+            }
+        }
+
+        if (!parent::install()
+            || !$this->registerHook('displayHome')
+            || !$this->registerHook('displayFooterExploreSectionHook')
+            || !$this->registerHook('displayAddModuleSettingLink')
+            || !$this->registerHook('displayDefaultNavigationHook')
+            || !$this->callInstallTab()
+            || !$this->insertDefaultHotelEntries()
+            )
+            return false;
+        return true;
+    }
+
+    public function callInstallTab()
+    {
+        //Controllers which are to be used in this modules but we have not to create tab for those controllers...
+        $this->installTab('AdminAboutHotelBlockSetting', 'Hotel Description Configuration');
+        return true;
+    }
+
+    public function installTab($class_name,$tab_name,$tab_parent_name=false) 
+    {
+        $tab = new Tab();
+        $tab->active = 1;
+        $tab->class_name = $class_name;
+        $tab->name = array();
+
+        foreach (Language::getLanguages(true) as $lang)
+            $tab->name[$lang['id_lang']] = $tab_name;
+
+        if($tab_parent_name)
+            $tab->id_parent = (int)Tab::getIdFromClassName($tab_parent_name);
+        else
+            $tab->id_parent = -1;
+        
+        $tab->module = $this->name;
+        $res = $tab->add();
+        //Set position of the Hotel reservation System Tab to the position wherewe want...
+        return $res;
+    }
+
+    public function reset()
+    {
+        if (!$this->uninstall(false)) {
+            return false;
+        }
+        if (!$this->install(false)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public function uninstall($keep = true)
+    {
+        if(!parent::uninstall() 
+            || ($keep && !$this->deleteTables())
+            || ($keep && !$this->deleteConfigKeys())
+            || ($keep && !$this->deleteHotelInterierImg())
+            || !$this->callUninstallTab())
+            return false;
+
+        return true;
+    }
+
+    public function deleteHotelInterierImg()
+    {
+        $uploadedImg = glob(_PS_MODULE_DIR_.$this->name.'/views/img/hotel_interior/*.jpg');
+        if ($uploadedImg) {
+            foreach ($uploadedImg as $interiorImg) {
+                unlink($interiorImg);
+            }
+        }
+        return true;
     }
 
     public function deleteConfigKeys()
     {
-        $var = array('WHY_THIS_HOTEL_HEADING',
-                    'ABOUT_HOTEL_CONTENT', 'ABOUT_HOTEL_HEADING',
-                    'WHY_THIS_HOTEL_CONTENT');
+        $var = array('HOTEL_INTERIOR_HEADING', 'HOTEL_INTERIOR_DESCRIPTION');
 
         foreach ($var as $key)
             if (!Configuration::deleteByName($key))
@@ -174,37 +191,28 @@ class WkAboutHotelBlock extends Module
         return true;
     }
 
-    public function insertDefaultHotelEntries()
+    public function callUninstallTab()
     {
-        //from about hotel module
-        $about_htl_head = $this->l('About Gresham Palace');
-        $about_htl_content = $this->l('A la carte, des produits fins, régionaux et originaux. Le bar quand à lui sera satisfaire les amateurs de whisky, spiritueux et grandes maisons de champagne. A la carte, des produits fins, régionaux et originaux. Le bar quand à lui sera satisfaire les amateurs de whisky, spiritueux et grandes maisons de champagne.');
-        $ehy_this_htl_head = $this->l('Why Hotel Gresham Palace');
-        $why_this_htl_content = $this->l('A la carte, des produits fins, régionaux et originaux. Le bar quand à lui sera satisfaire les amateurs de whisky, spiritueux et grandes maisons de champagne.');
-
-        Configuration::updateValue('ABOUT_HOTEL_HEADING', $about_htl_head);
-        Configuration::updateValue('ABOUT_HOTEL_CONTENT', $about_htl_content);
-        Configuration::updateValue('WHY_THIS_HOTEL_HEADING', $ehy_this_htl_head);
-        Configuration::updateValue('WHY_THIS_HOTEL_CONTENT', $why_this_htl_content);
+        $this->uninstallTab('AdminAboutHotelBlockSetting');
         return true;
     }
-
-    public function install()
+        
+    public function uninstallTab($class_name)
     {
-        if (!parent::install()
-            || !$this->registerHook('displayHome')
-            || !$this->insertDefaultHotelEntries()
-            )
+        $id_tab = (int)Tab::getIdFromClassName($class_name);
+        if ($id_tab)
+        {
+            $tab = new Tab($id_tab);
+            return $tab->delete();
+        }
+        else
             return false;
-        return true;
     }
 
-    public function uninstall($keep = true)
+    public function deleteTables()
     {
-        if(!parent::uninstall() 
-            || !$this->deleteConfigKeys())
-            return false;
-
-        return true;
+        return Db::getInstance()->execute('
+            DROP TABLE IF EXISTS
+            `'._DB_PREFIX_.'htl_interior_image`');
     }
 }

@@ -30,7 +30,7 @@
 		<div class="col-lg-1"><span class="pull-right">{include file="controllers/products/multishop/checkbox.tpl" field="meta_title" type="default" multilang="true"}</span></div>
 		<label class="control-label col-lg-2" for="meta_title_{$id_lang}">
 			<span class="label-tooltip" data-toggle="tooltip"
-				title="{l s='Public title for the product\'s page, and for search engines. Leave blank to use the product name.'} {l s='The number of remaining characters is displayed to the left of the field.'}">
+				title="{l s='Public title for the product\'s page, and for search engines. Leave blank to use the room type name.'} {l s='The number of remaining characters is displayed to the left of the field.'}">
 				{l s='Meta title'}
 			</span>
 		</label>
@@ -79,7 +79,7 @@
 		<div class="col-lg-1"><span class="pull-right">{include file="controllers/products/multishop/checkbox.tpl" field="link_rewrite" type="seo_friendly_url" multilang="true"}</span></div>
 		<label class="control-label col-lg-2" for="link_rewrite_{$id_lang}">
 			<span class="label-tooltip" data-toggle="tooltip"
-				title="{l s='This is the human-readable URL, as generated from the product\'s name. You can change it if you want.'}">
+				title="{l s='This is the human-readable URL, as generated from the room type\'s name. You can change it if you want.'}">
 				{l s='Friendly URL:'}
 			</span>
 

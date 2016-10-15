@@ -1,0 +1,15 @@
+
+[{shop_url}] 
+
+Hallo {firstname} {lastname}, 
+
+Voor uw bestelling met nummer {order_name} hebben we een
+creditnota aangemaakt. 
+
+U kunt uw creditnota bekijken en downloaden via "Mijn
+creditnota's" [{history_url}] in het "Mijn account"
+[{my_account_url}] gedeelte in onze webshop. 
+
+{shop_name} [{shop_url}] gebouwd met
+PrestaShop(tm) [http://www.prestashop.com/] 
+

@@ -150,24 +150,6 @@
     border: 1px solid #ccc;
     background: #f9f9f9; }
 
-  .review_submit_div #submitNewMessage
-  {
-    font-size:16px;
-    font-family: 'PT Serif', serif;
-    font-weight:700;
-    background-color: #BF9958;
-    color: #ffffff;
-    padding: 13px 25px;
-  }
-  .review_submit_div #cancelreview
-  {
-    font-size:16px;
-    font-family: 'PT Serif', serif;
-    font-weight:700;
-    background-color: #777777;
-    color: #ffffff;
-    padding: 13px 45px;
-  }
   #new_comment_form textarea {
     height: 200px; }
   #new_comment_form .submit {

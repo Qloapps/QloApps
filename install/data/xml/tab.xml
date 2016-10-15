@@ -90,9 +90,9 @@
     <tab id="Tags" id_parent="Catalog" active="1" hide_host_mode="0">
       <class_name>AdminTags</class_name>
     </tab>
-    <tab id="Attachments" id_parent="Catalog" active="1" hide_host_mode="0">
+    <!-- <tab id="Attachments" id_parent="Catalog" active="1" hide_host_mode="0">
       <class_name>AdminAttachments</class_name>
-    </tab>
+    </tab> -->
     <tab id="Orders_1" id_parent="Orders" active="1" hide_host_mode="0">
       <class_name>AdminOrders</class_name>
     </tab>

@@ -19,24 +19,29 @@ class AdminHotelFeaturesController extends ModuleAdminController
 			'htl_id' => array(
 				'title' => $this->l('Hotel ID'),
 				'align' => 'center',
+				'filter_key' => 'hi!id',
 			),
 			'htl_name' => array(
 				'title' => $this->l('Hotel Name'),
 				'align' => 'center',
+				'filter_key' => 'hi!hotel_name',
 			),
 			'htl_city' => array(
 				'title' => $this->l('City'),
 				'align' => 'center',
+				'filter_key' => 'hi!city',
 			),
 
 			'state_name' => array(
 				'title' => $this->l('State'),
 				'align' => 'center',
+				'filter_key' => 's!name',
 			),
 
 			'name' => array(
 				'title' => $this->l('Country'),
-				'align' => 'center'
+				'align' => 'center',
+				'filter_key' => 'cl!name',
 			),
 
 			'date_add' => array(
@@ -210,13 +215,11 @@ class AdminHotelFeaturesController extends ModuleAdminController
 			if (Tools::getValue('error') == 1)
 				$msg = Tools::displayError('Parent feature name is required.');
 			else if (Tools::getValue('error') == 2)
-				$msg = Tools::displayError('Position is required.');
+				$msg = Tools::displayError('Position is Invalid.');
 			else if (Tools::getValue('error') == 3)
 				$msg = Tools::displayError('Please add atleast one Child features.');
 			else if (Tools::getValue('error') == 4)
 				$msg = Tools::displayError('Some error occured. Please try again.');
-			else if (Tools::getValue('error') == 2)
-				$msg = Tools::displayError('Position is required.');
 
 			$this->errors[] = Tools::displayError($msg);
 			$this->context->smarty->assign("errors", $this->errors);
@@ -229,7 +232,7 @@ class AdminHotelFeaturesController extends ModuleAdminController
 			$pos = Tools::getValue('position');
 			if (!$parent_feature)
 				$error = 1;
-			else if (!$pos)
+			else if (empty($pos) || !Validate::isUnsignedInt($pos))
 				$error = 2;
 			else if (!$child_features)
 				$error = 3;

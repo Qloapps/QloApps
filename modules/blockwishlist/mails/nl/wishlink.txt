@@ -1,0 +1,13 @@
+
+[{shop_url}] 
+
+Hallo, 
+
+{shop_name} nodigt u uit om deze link naar uw vrienden te sturen
+zodat ze uw wenslijst kunnen bekijken: {wishlist}
+
+{message} [{message}] 		 
+
+{shop_name} [{shop_url}] gebouwd met
+PrestaShop(tm) [http://www.prestashop.com/] 
+

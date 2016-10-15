@@ -1,70 +1,62 @@
 
 [{shop_url}] 
 
-Hola {firstname} {lastname},
+Hi {firstname} {lastname},
 
-Le agradecemos por realizar sus compras en {shop_name}! 
+Thank you for selecting our hotel! 
 
-PEDIDO: {order_name} Situado en {date}
+ORDER: {order_name} Placed on {date}
 
-PAGO: {payment} 		 
+PAYMENT: {payment} 		 
 
-REFERENCIA
-
-PRODUCTO
-
-PRECIO UNITARIO
-
-CANTIDAD
-
-PRECIO TOTAL
+Room Image
+Room Description
+Room Capcity
+Unit Price
+Rooms Qty
+Check-in Date
+Check-out Date
+Total
 
 {products_txt} 
 
 {discounts} 
 
-PRODUCTOS 
+Total Rooms Cost 
 
 {total_products} 
 
-DESCUENTOS 
+DISCOUNTS 
 
 {total_discounts} 
 
-PAPEL DE REGALO 
-
-{total_wrapping} 
-
-TRANSPORTE 
-
-{total_shipping} 
-
-IMPUESTO TOTAL 
+TOTAL TAX PAID 
 
 {total_tax_paid} 
 
-PAGO TOTAL 
+{adv_data_text}
+
+TOTAL PAID 
 
 {total_paid} 
 
-TRANSPORTISTA: {carrier}
+CARRIER: {carrier}
 
-PAGO: {payment} 		 
+PAYMENT: {payment} 		 
 
 {delivery_block_txt} 
 
 {invoice_block_txt} 
 
-Usted puede revisar su pedido y descargar la factura desde
-"Historial de pedidos" [{history_url}] de su cuenta
-de cliente, haga clic en [{my_account_url}] en
-nuestra tienda. 
+You can review your order and download your invoice from the
+"Order history" [{history_url}] section of your
+customer account by clicking "My account"
+[{my_account_url}] on our shop. 
 
-Si tiene una cuenta de invitado, puede seguir su pedido desde la
-sección: "Seguimiento de invitado"
-[{guest_tracking_url}?id_order={order_name}] en
-nuestra tienda. 
+If you have a guest account, you can follow your order via the
+"Guest Tracking"
+[{guest_tracking_url}?id_order={order_name}] section
+on our shop. 
 
-{shop_name} [{shop_url}] creado por
+{shop_name} [{shop_url}] powered by
 PrestaShop(tm) [http://www.prestashop.com/] 
-

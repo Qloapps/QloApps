@@ -1,0 +1,30 @@
+.testimonialContentContainer {
+	margin-bottom: 25px;
+    margin-top: 70px;
+}
+.testimonialContentText {
+	color: #777777;
+    font-size: 16px;
+    font-weight: 300;
+    line-height: 28px;
+    text-align: center;
+}
+.testimonialPersonName {
+	font-weight: 400;
+	font-size: 18px;
+	color: #333333;
+	margin-top: 10px;
+}
+.testimonialPersonDesig {
+	font-weight: 400;
+	font-size: 16px;
+	color: #777777;
+}
+
+.testimonialPersonImg {
+	width: 85px !important;
+	margin: 0 auto;
+}
+.testimonialPersonDetail {
+	text-align: center;
+}

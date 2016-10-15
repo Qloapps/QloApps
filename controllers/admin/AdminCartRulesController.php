@@ -570,7 +570,7 @@ class AdminCartRulesControllerCore extends AdminController
                 'found' => true
             );
         } else {
-            return array('found' => false, 'notfound' => Tools::displayError('No product has been found.'));
+            return array('found' => false, 'notfound' => Tools::displayError('No room type has been found.'));
         }
     }
 

@@ -31,7 +31,7 @@
 {foreach from=$languages key=k item=language name="languages"}
 	{if $language.iso_code == $lang_iso}
 		<p class="selected_language">
-			<img src="{$img_lang_dir}{$language.id_lang}.jpg" alt="{$language.iso_code}" width="16" height="11" />
+			<img src="{$img_lang_dir}{$language.id_lang}.jpg" alt="{$language.iso_code|escape:'html':'UTF-8'}" width="16" height="11" />
 		</p>
 	{/if}
 {/foreach}
@@ -41,13 +41,13 @@
 			{if $language.iso_code != $lang_iso}
 				{assign var=indice_lang value=$language.id_lang}
 				{if isset($lang_rewrite_urls.$indice_lang)}
-					<a href="{$lang_rewrite_urls.$indice_lang|escape:htmlall}" title="{$language.name}">
+					<a href="{$lang_rewrite_urls.$indice_lang|escape:htmlall}" title="{$language.name|escape:'html':'UTF-8'}" rel="alternate" hreflang="{$language.iso_code|escape:'html':'UTF-8'}">
 				{else}
-					<a href="{$link->getLanguageLink($language.id_lang)|escape:htmlall}" title="{$language.name}">
+					<a href="{$link->getLanguageLink($language.id_lang)|escape:htmlall}" title="{$language.name|escape:'html':'UTF-8'}" rel="alternate" hreflang="{$language.iso_code|escape:'html':'UTF-8'}">
 
 				{/if}
 			{/if}
-					<img src="{$img_lang_dir}{$language.id_lang}.jpg" alt="{$language.iso_code}" width="16" height="11" />
+					<img src="{$img_lang_dir}{$language.id_lang}.jpg" alt="{$language.iso_code|escape:'html':'UTF-8'}" width="16" height="11" />
 			{if $language.iso_code != $lang_iso}
 				</a>
 			{/if}

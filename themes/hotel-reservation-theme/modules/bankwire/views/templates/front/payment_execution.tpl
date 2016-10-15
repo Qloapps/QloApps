@@ -32,6 +32,7 @@
 </h1>
 
 {assign var='current_step' value='payment'}
+{include file="$tpl_dir./errors.tpl"}
 {include file="$tpl_dir./order-steps.tpl"}
 
 {if $nbProducts <= 0}
@@ -85,9 +86,12 @@
             <a class="btn htl-reservation-form-btn-small" href="{$link->getPageLink('order', true, NULL, "step=3")|escape:'html':'UTF-8'}">
                 <i class="icon-chevron-left"></i>&nbsp;{l s='Other payment methods' mod='bankwire'}
             </a>
-            <button class="btn pull-right htl-reservation-form-btn-default" type="submit">
-                <span>{l s='I confirm my order' mod='bankwire'}&nbsp;<i class="icon-chevron-right right"></i></span>
-            </button>
+            {*By webkul To Check Order restrict condition before Payment by the customer*}
+            {if !isset($error_max_order_date)}
+                <button class="btn pull-right button button-medium" type="submit">
+                    <span>{l s='I confirm my order' mod='bankwire'}&nbsp;<i class="icon-chevron-right right"></i></span>
+                </button>
+            {/if}
         </p>
     </form>
 {/if}

@@ -212,6 +212,12 @@ class ContactControllerCore extends FrontController
 		$this->addCSS(_THEME_CSS_DIR_.'contact-form.css');
 		$this->addJS(_THEME_JS_DIR_.'contact-form.js');
 		$this->addJS(_PS_JS_DIR_.'validate.js');
+		
+		// GOOGLE MAP
+        $language = $this->context->language;
+        $country = $this->context->country;
+        $WK_GOOGLE_API_KEY = Configuration::get('WK_GOOGLE_API_KEY');
+        $this->addJs("https://maps.googleapis.com/maps/api/js?key=$WK_GOOGLE_API_KEY&libraries=places&language=$language->iso_code&region=$country->iso_code");
 	}
 
 	/**
@@ -254,6 +260,15 @@ class ContactControllerCore extends FrontController
 			'message' => html_entity_decode(Tools::getValue('message'))
 		));
 
+		//By webkul to send hotels Map Informations for google Map.
+		if (Configuration::get('WK_GOOGLE_ACTIVE_MAP')) {
+			$hotel_branch = new HotelBranchInformation();
+			$hotelLocationArray = $hotel_branch->getMapFormatHotelsInfo(Configuration::get('WK_MAP_HOTEL_ACTIVE_ONLY'));
+			if ($hotelLocationArray) {
+				$this->context->smarty->assign('hotelLocationArray', Tools::jsonEncode($hotelLocationArray));
+			}
+		}
+		//End
 		$this->setTemplate(_PS_THEME_DIR_.'contact-form.tpl');
 	}
 

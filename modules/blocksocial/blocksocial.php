@@ -55,7 +55,7 @@ class blocksocial extends Module
 			Configuration::updateValue('BLOCKSOCIAL_VIMEO', '') &&
 			Configuration::updateValue('BLOCKSOCIAL_INSTAGRAM', '') &&
 			$this->registerHook('displayHeader') && 
-			$this->registerHook('displayFooterTop')
+			$this->registerHook('displayFooterNotificationHook')
 			);
 	}
 	
@@ -99,7 +99,7 @@ class blocksocial extends Module
 		$this->context->controller->addCSS(($this->_path).'blocksocial.css', 'all');
 	}
 
-	public function hookDisplayFooterTop()
+	public function hookDisplayFooterNotificationHook()
 	{
 		if (!$this->isCached('blocksocial.tpl', $this->getCacheId()))
 			$this->smarty->assign(array(

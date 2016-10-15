@@ -57,33 +57,35 @@ class InstallModelInstall extends InstallAbstractModel
     }
 
     /**
-     * Generate settings file
+     * Generate settings file.
      */
     public function generateSettingsFile($database_server, $database_login, $database_password, $database_name, $database_prefix, $database_engine)
     {
         // Check permissions for settings file
         if (file_exists(_PS_ROOT_DIR_.'/'.self::SETTINGS_FILE) && !is_writable(_PS_ROOT_DIR_.'/'.self::SETTINGS_FILE)) {
             $this->setError($this->language->l('%s file is not writable (check permissions)', self::SETTINGS_FILE));
+
             return false;
         } elseif (!file_exists(_PS_ROOT_DIR_.'/'.self::SETTINGS_FILE) && !is_writable(_PS_ROOT_DIR_.'/'.dirname(self::SETTINGS_FILE))) {
             $this->setError($this->language->l('%s folder is not writable (check permissions)', dirname(self::SETTINGS_FILE)));
+
             return false;
         }
 
         // Generate settings content and write file
         $settings_constants = array(
-            '_DB_SERVER_' =>            $database_server,
-            '_DB_NAME_' =>                $database_name,
-            '_DB_USER_' =>                $database_login,
-            '_DB_PASSWD_' =>            $database_password,
-            '_DB_PREFIX_' =>            $database_prefix,
-            '_MYSQL_ENGINE_' =>        $database_engine,
-            '_PS_CACHING_SYSTEM_' =>    'CacheMemcache',
-            '_PS_CACHE_ENABLED_' =>    '0',
-            '_COOKIE_KEY_' =>            Tools::passwdGen(56),
-            '_COOKIE_IV_' =>            Tools::passwdGen(8),
-            '_PS_CREATION_DATE_' =>    date('Y-m-d'),
-            '_PS_VERSION_' =>            _PS_INSTALL_VERSION_,
+            '_DB_SERVER_' => $database_server,
+            '_DB_NAME_' => $database_name,
+            '_DB_USER_' => $database_login,
+            '_DB_PASSWD_' => $database_password,
+            '_DB_PREFIX_' => $database_prefix,
+            '_MYSQL_ENGINE_' => $database_engine,
+            '_PS_CACHING_SYSTEM_' => 'CacheMemcache',
+            '_PS_CACHE_ENABLED_' => '0',
+            '_COOKIE_KEY_' => Tools::passwdGen(56),
+            '_COOKIE_IV_' => Tools::passwdGen(8),
+            '_PS_CREATION_DATE_' => date('Y-m-d'),
+            '_PS_VERSION_' => _PS_INSTALL_VERSION_,
         );
 
         // If mcrypt is activated, add Rijndael 128 configuration
@@ -104,14 +106,16 @@ class InstallModelInstall extends InstallAbstractModel
 
         if (!file_put_contents(_PS_ROOT_DIR_.'/'.self::SETTINGS_FILE, $settings_content)) {
             $this->setError($this->language->l('Cannot write settings file'));
+
             return false;
         }
+
         return true;
     }
 
     /**
      * PROCESS : installDatabase
-     * Generate settings file and create database structure
+     * Generate settings file and create database structure.
      */
     public function installDatabase($clear_database = false)
     {
@@ -128,13 +132,14 @@ class InstallModelInstall extends InstallAbstractModel
         $sql_loader->setMetaData(array(
             'PREFIX_' => _DB_PREFIX_,
             'ENGINE_TYPE' => _MYSQL_ENGINE_,
-            'COLLATION' => (empty($collation_database) || !in_array($collation_database, $allowed_collation)) ? '' : 'COLLATE '.$collation_database
+            'COLLATION' => (empty($collation_database) || !in_array($collation_database, $allowed_collation)) ? '' : 'COLLATE '.$collation_database,
         ));
 
         try {
             $sql_loader->parse_file(_PS_INSTALL_DATA_PATH_.'db_structure.sql');
         } catch (PrestashopInstallerException $e) {
             $this->setError($this->language->l('Database structure file not found'));
+
             return false;
         }
 
@@ -142,6 +147,7 @@ class InstallModelInstall extends InstallAbstractModel
             foreach ($errors as $error) {
                 $this->setError($this->language->l('SQL error on query <i>%s</i>', $error['error']));
             }
+
             return false;
         }
 
@@ -149,7 +155,7 @@ class InstallModelInstall extends InstallAbstractModel
     }
 
     /**
-     * Clear database (only tables with same prefix)
+     * Clear database (only tables with same prefix).
      *
      * @param bool $truncate If true truncate the table, if false drop the table
      */
@@ -165,7 +171,7 @@ class InstallModelInstall extends InstallAbstractModel
 
     /**
      * PROCESS : installDefaultData
-     * Create default shop and languages
+     * Create default shop and languages.
      */
     public function installDefaultData($shop_name, $iso_country = false, $all_languages = false, $clear_database = false)
     {
@@ -189,7 +195,7 @@ class InstallModelInstall extends InstallAbstractModel
 
                     if ($xml = @simplexml_load_string($localization_file_content)) {
                         foreach ($xml->languages->language as $language) {
-                            $iso_codes_to_install[] = (string)$language->attributes()->iso_code;
+                            $iso_codes_to_install[] = (string) $language->attributes()->iso_code;
                         }
                     }
                 }
@@ -200,20 +206,22 @@ class InstallModelInstall extends InstallAbstractModel
             $languages = $this->installLanguages($iso_codes_to_install);
         } catch (PrestashopInstallerException $e) {
             $this->setError($e->getMessage());
+
             return false;
         }
 
         $flip_languages = array_flip($languages);
-        $id_lang =  (!empty($flip_languages[$this->language->getLanguageIso()])) ? $flip_languages[$this->language->getLanguageIso()] : 1;
+        $id_lang = (!empty($flip_languages[$this->language->getLanguageIso()])) ? $flip_languages[$this->language->getLanguageIso()] : 1;
         Configuration::updateGlobalValue('PS_LANG_DEFAULT', $id_lang);
         Configuration::updateGlobalValue('PS_VERSION_DB', _PS_INSTALL_VERSION_);
         Configuration::updateGlobalValue('PS_INSTALL_VERSION', _PS_INSTALL_VERSION_);
+
         return true;
     }
 
     /**
      * PROCESS : populateDatabase
-     * Populate database with default data
+     * Populate database with default data.
      */
     public function populateDatabase($entity = null)
     {
@@ -237,6 +245,7 @@ class InstallModelInstall extends InstallAbstractModel
         }
         if ($errors = $xml_loader->getErrors()) {
             $this->setError($errors);
+
             return false;
         }
 
@@ -255,6 +264,7 @@ class InstallModelInstall extends InstallAbstractModel
             $sql_loader->parse_file(_PS_INSTALL_DATA_PATH_.'db_data.sql', false);
             if ($errors = $sql_loader->getErrors()) {
                 $this->setError($errors);
+
                 return false;
             }
         }
@@ -275,6 +285,7 @@ class InstallModelInstall extends InstallAbstractModel
         $shop_group->active = true;
         if (!$shop_group->add()) {
             $this->setError($this->language->l('Cannot create group shop').' / '.Db::getInstance()->getMsgError());
+
             return false;
         }
 
@@ -287,6 +298,7 @@ class InstallModelInstall extends InstallAbstractModel
         $shop->name = $shop_name;
         if (!$shop->add()) {
             $this->setError($this->language->l('Cannot create shop').' / '.Db::getInstance()->getMsgError());
+
             return false;
         }
         Context::getContext()->shop = $shop;
@@ -301,6 +313,7 @@ class InstallModelInstall extends InstallAbstractModel
         $shop_url->active = true;
         if (!$shop_url->add()) {
             $this->setError($this->language->l('Cannot create shop URL').' / '.Db::getInstance()->getMsgError());
+
             return false;
         }
 
@@ -308,7 +321,7 @@ class InstallModelInstall extends InstallAbstractModel
     }
 
     /**
-     * Install languages
+     * Install languages.
      *
      * @return array Association between ID and iso array(id_lang => iso, ...)
      */
@@ -333,9 +346,9 @@ class InstallModelInstall extends InstallAbstractModel
             }
 
             $params_lang = array(
-                'name' => (string)$xml->name,
-                'iso_code' => substr((string)$xml->language_code, 0, 2),
-                'allow_accented_chars_url' => (string)$xml->allow_accented_chars_url
+                'name' => (string) $xml->name,
+                'iso_code' => substr((string) $xml->language_code, 0, 2),
+                'allow_accented_chars_url' => (string) $xml->allow_accented_chars_url,
             );
 
             if (InstallSession::getInstance()->safe_mode) {
@@ -370,13 +383,13 @@ class InstallModelInstall extends InstallAbstractModel
         }
 
         $list = array(
-            'products' =>        _PS_PROD_IMG_DIR_,
-            'categories' =>        _PS_CAT_IMG_DIR_,
-            'manufacturers' =>    _PS_MANU_IMG_DIR_,
-            'suppliers' =>        _PS_SUPP_IMG_DIR_,
-            'scenes' =>            _PS_SCENE_IMG_DIR_,
-            'stores' =>            _PS_STORE_IMG_DIR_,
-            null =>                _PS_IMG_DIR_.'l/', // Little trick to copy images in img/l/ path with all types
+            'products' => _PS_PROD_IMG_DIR_,
+            'categories' => _PS_CAT_IMG_DIR_,
+            'manufacturers' => _PS_MANU_IMG_DIR_,
+            'suppliers' => _PS_SUPP_IMG_DIR_,
+            'scenes' => _PS_SCENE_IMG_DIR_,
+            'stores' => _PS_STORE_IMG_DIR_,
+            null => _PS_IMG_DIR_.'l/', // Little trick to copy images in img/l/ path with all types
         );
 
         foreach ($list as $cat => $dst_path) {
@@ -400,7 +413,7 @@ class InstallModelInstall extends InstallAbstractModel
     private static $_cache_localization_pack_content = null;
     public function getLocalizationPackContent($version, $country)
     {
-        if (InstallModelInstall::$_cache_localization_pack_content === null || array_key_exists($country, InstallModelInstall::$_cache_localization_pack_content)) {
+        if (self::$_cache_localization_pack_content === null || array_key_exists($country, self::$_cache_localization_pack_content)) {
             $path_cache_file = _PS_CACHE_DIR_.'sandbox'.DIRECTORY_SEPARATOR.$version.$country.'.xml';
             if (is_file($path_cache_file)) {
                 $localization_file_content = file_get_contents($path_cache_file);
@@ -419,15 +432,15 @@ class InstallModelInstall extends InstallAbstractModel
                 }
                 file_put_contents($path_cache_file, $localization_file_content);
             }
-            InstallModelInstall::$_cache_localization_pack_content[$country] = $localization_file_content;
+            self::$_cache_localization_pack_content[$country] = $localization_file_content;
         }
 
-        return isset(InstallModelInstall::$_cache_localization_pack_content[$country]) ? InstallModelInstall::$_cache_localization_pack_content[$country] : false;
+        return isset(self::$_cache_localization_pack_content[$country]) ? self::$_cache_localization_pack_content[$country] : false;
     }
 
     /**
      * PROCESS : configureShop
-     * Set default shop configuration
+     * Set default shop configuration.
      */
     public function configureShop(array $data = array())
     {
@@ -465,7 +478,7 @@ class InstallModelInstall extends InstallAbstractModel
             Configuration::updateGlobalValue('PS_LEGACY_IMAGES', 1);
         }
 
-        $id_country = (int)Country::getByIso($data['shop_country']);
+        $id_country = (int) Country::getByIso($data['shop_country']);
 
         // Set default configuration
         Configuration::updateGlobalValue('PS_SHOP_DOMAIN',                Tools::getHttpHost());
@@ -477,7 +490,7 @@ class InstallModelInstall extends InstallAbstractModel
         Configuration::updateGlobalValue('PS_COUNTRY_DEFAULT',            $id_country);
         Configuration::updateGlobalValue('PS_LOCALE_COUNTRY',            $data['shop_country']);
         Configuration::updateGlobalValue('PS_TIMEZONE',                $data['shop_timezone']);
-        Configuration::updateGlobalValue('PS_CONFIGURATION_AGREMENT',        (int)$data['configuration_agrement']);
+        Configuration::updateGlobalValue('PS_CONFIGURATION_AGREMENT',        (int) $data['configuration_agrement']);
 
         // Set mails configuration
         Configuration::updateGlobalValue('PS_MAIL_METHOD',            ($data['use_smtp']) ? 2 : 1);
@@ -490,7 +503,7 @@ class InstallModelInstall extends InstallAbstractModel
         // Activate rijndael 128 encrypt algorihtm if mcrypt is activated
         Configuration::updateGlobalValue('PS_CIPHER_ALGORITHM', function_exists('mcrypt_encrypt') ? 1 : 0);
 
-        $groups = Group::getGroups((int)Configuration::get('PS_LANG_DEFAULT'));
+        $groups = Group::getGroups((int) Configuration::get('PS_LANG_DEFAULT'));
         $groups_default = Db::getInstance()->executeS('SELECT `name` FROM '._DB_PREFIX_.'configuration WHERE `name` LIKE "PS_%_GROUP" ORDER BY `id_configuration`');
         foreach ($groups_default as &$group_default) {
             if (is_array($group_default) && isset($group_default['name'])) {
@@ -501,7 +514,7 @@ class InstallModelInstall extends InstallAbstractModel
         if (is_array($groups) && count($groups)) {
             foreach ($groups as $key => $group) {
                 if (Configuration::get($groups_default[$key]) != $groups[$key]['id_group']) {
-                    Configuration::updateGlobalValue($groups_default[$key], (int)$groups[$key]['id_group']);
+                    Configuration::updateGlobalValue($groups_default[$key], (int) $groups[$key]['id_group']);
                 }
             }
         }
@@ -518,11 +531,11 @@ class InstallModelInstall extends InstallAbstractModel
         if (is_array($states) && count($states)) {
             foreach ($states as $key => $state) {
                 if (Configuration::get($states_default[$key]) != $states[$key]['id_order_state']) {
-                    Configuration::updateGlobalValue($states_default[$key], (int)$states[$key]['id_order_state']);
+                    Configuration::updateGlobalValue($states_default[$key], (int) $states[$key]['id_order_state']);
                 }
             }
             /* deprecated order state */
-            Configuration::updateGlobalValue('PS_OS_OUTOFSTOCK_PAID', (int)Configuration::get('PS_OS_OUTOFSTOCK'));
+            Configuration::updateGlobalValue('PS_OS_OUTOFSTOCK_PAID', (int) Configuration::get('PS_OS_OUTOFSTOCK'));
         }
 
         // Set logo configuration
@@ -538,7 +551,7 @@ class InstallModelInstall extends InstallAbstractModel
         }
 
         // Active only the country selected by the merchant
-        Db::getInstance()->execute('UPDATE '._DB_PREFIX_.'country SET active = 0 WHERE id_country != '.(int)$id_country);
+        Db::getInstance()->execute('UPDATE '._DB_PREFIX_.'country SET active = 0 WHERE id_country != '.(int) $id_country);
 
         // Set localization configuration
         $version = str_replace('.', '', _PS_VERSION_);
@@ -565,10 +578,12 @@ class InstallModelInstall extends InstallAbstractModel
             $employee->bo_menu = 0;
             if (!$employee->add()) {
                 $this->setError($this->language->l('Cannot create admin account'));
+
                 return false;
             }
         } else {
             $this->setError($this->language->l('Cannot create admin account'));
+
             return false;
         }
 
@@ -610,8 +625,8 @@ class InstallModelInstall extends InstallAbstractModel
                 'wkhotelfiltersearchblock',
                 'wkhotelfilterblock',
                 'wkabouthotelblock',
-                'wkthemeconfigurator',
                 'wkhotelfeaturesblock',
+                'wkhotelroom',
                 'wktestimonialblock',
                 'socialsharing',
                 'bankwire',
@@ -619,15 +634,23 @@ class InstallModelInstall extends InstallAbstractModel
                 'blockmyaccount',
                 'blockuserinfo',
                 'cheque',
-                'blockcurrencies',
                 'blocklanguages',
+                'blockcurrencies',
                 'dashactivity',
+                'productcomments',
                 'dashtrends',
                 'dashgoals',
                 'dashproducts',
                 'wkpaypaladaptive',
+                'wkfooterlangcurrencyblock',
+                'wkfooterexploreblock',
+                'wkfooterpaymentinfoblockcontainer',
+                'wkfooteraboutblock',
+                'wkfooterpaymentblock',
+                'wkfooternotificationblock',
                 );
         }
+
         return $modules;
     }
 
@@ -648,7 +671,7 @@ class InstallModelInstall extends InstallAbstractModel
 
     /**
      * PROCESS : installModules
-     * Download module from addons and Install all modules in ~/modules/ directory
+     * Download module from addons and Install all modules in ~/modules/ directory.
      */
     public function installModulesAddons($module = null)
     {
@@ -658,7 +681,7 @@ class InstallModelInstall extends InstallAbstractModel
             foreach ($addons_modules as $addons_module) {
                 if (file_put_contents(_PS_MODULE_DIR_.$addons_module['name'].'.zip', Tools::addonsRequest('module', array('id_module' => $addons_module['id_module'])))) {
                     if (Tools::ZipExtract(_PS_MODULE_DIR_.$addons_module['name'].'.zip', _PS_MODULE_DIR_)) {
-                        $modules[] = (string)$addons_module['name'];//if the module has been unziped we add the name in the modules list to install
+                        $modules[] = (string) $addons_module['name'];//if the module has been unziped we add the name in the modules list to install
                         unlink(_PS_MODULE_DIR_.$addons_module['name'].'.zip');
                     }
                 }
@@ -670,7 +693,7 @@ class InstallModelInstall extends InstallAbstractModel
 
     /**
      * PROCESS : installModules
-     * Download module from addons and Install all modules in ~/modules/ directory
+     * Download module from addons and Install all modules in ~/modules/ directory.
      */
     public function installModules($module = null)
     {
@@ -696,6 +719,7 @@ class InstallModelInstall extends InstallAbstractModel
 
         if ($errors) {
             $this->setError($errors);
+
             return false;
         }
 
@@ -707,7 +731,7 @@ class InstallModelInstall extends InstallAbstractModel
 
     /**
      * PROCESS : installFixtures
-     * Install fixtures (E.g. demo products)
+     * Install fixtures (E.g. demo products).
      */
     public function installFixtures($entity = null, array $data = array())
     {
@@ -743,12 +767,14 @@ class InstallModelInstall extends InstallAbstractModel
             $class = 'InstallFixtures'.Tools::toCamelCase($fixtures_name);
             if (!class_exists($class, false)) {
                 $this->setError($this->language->l('Fixtures class "%s" not found', $class));
+
                 return false;
             }
 
             $xml_loader = new $class();
             if (!$xml_loader instanceof InstallXmlLoader) {
                 $this->setError($this->language->l('"%s" must be an instance of "InstallXmlLoader"', $class));
+
                 return false;
             }
         } else {
@@ -777,6 +803,7 @@ class InstallModelInstall extends InstallAbstractModel
 
         if ($errors = $xml_loader->getErrors()) {
             $this->setError($errors);
+
             return false;
         }
 
@@ -792,7 +819,7 @@ class InstallModelInstall extends InstallAbstractModel
 
     /**
      * PROCESS : installTheme
-     * Install theme
+     * Install theme.
      */
     public function installTheme()
     {
@@ -806,6 +833,7 @@ class InstallModelInstall extends InstallAbstractModel
         $sql_loader->parse_file(_PS_INSTALL_DATA_PATH_.'theme.sql', false);
         if ($errors = $sql_loader->getErrors()) {
             $this->setError($errors);
+
             return false;
         }
     }

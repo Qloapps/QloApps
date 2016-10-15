@@ -104,7 +104,7 @@
 					{assign var='rowspan_total' value=$rowspan_total+1}
 				{/if}
 
-				<!-- {if $total_shipping_tax_exc <= 0 && (!isset($isVirtualCart) || !$isVirtualCart) && $free_ship}
+				{*{if $total_shipping_tax_exc <= 0 && (!isset($isVirtualCart) || !$isVirtualCart) && $free_ship}
 					{assign var='rowspan_total' value=$rowspan_total+1}
 				{else}
 					{if $use_taxes && $total_shipping_tax_exc != $total_shipping}
@@ -116,7 +116,7 @@
 					{elseif $total_shipping_tax_exc > 0}
 						{assign var='rowspan_total' value=$rowspan_total+1}
 					{/if}
-				{/if} -->
+				{/if} *}
 
 				{if $use_taxes}
 					{if $priceDisplay}
@@ -148,7 +148,7 @@
 									{/if}
 								{/if}
 							</td>
-							<td colspan="3" class="text-right">{if $display_tax_label}{l s='Total products (tax excl.)'}{else}{l s='Total products'}{/if}</td>
+							<td colspan="5" class="text-right">{if $display_tax_label}{l s='Total Rooms Cost (tax excl.)'}{else}{l s='Total Rooms Cost'}{/if}</td>
 							<td colspan="3" class="price" id="total_product">{displayPrice price=$total_products}</td>
 						</tr>
 					{else}
@@ -180,7 +180,7 @@
 									{/if}
 								{/if}
 							</td>
-							<td colspan="3" class="text-right">{if $display_tax_label}{l s='Total products (tax incl.)'}{else}{l s='Total products'}{/if}</td>
+							<td colspan="3" class="text-right">{if $display_tax_label}{l s='Total Rooms Cost (tax incl.)'}{else}{l s='Total Rooms Cost'}{/if}</td>
 							<td colspan="3" class="price" id="total_product">{displayPrice price=$total_products_wt}</td>
 						</tr>
 					{/if}
@@ -215,7 +215,7 @@
 								{/if}
 							{/if}
 						</td>
-						<td colspan="3" class="text-right">{l s='Total products'}</td>
+						<td colspan="3" class="text-right">{l s='Total Rooms Cost'}</td>
 						<td colspan="3" class="price" id="total_product">{displayPrice price=$total_products}</td>
 					</tr>
 				{/if}
@@ -239,7 +239,7 @@
 						{/if}
 					</td>
 				</tr>
-				<!-- {if $total_shipping_tax_exc <= 0 && (!isset($isVirtualCart) || !$isVirtualCart) && $free_ship}
+				{*{if $total_shipping_tax_exc <= 0 && (!isset($isVirtualCart) || !$isVirtualCart) && $free_ship}
 					<tr class="cart_total_delivery{if !$opc && (!isset($cart->id_address_delivery) || !$cart->id_address_delivery)} unvisible{/if} table_tfoot">
 						<td colspan="3" class="text-right">{l s='Total shipping'}</td>
 						<td colspan="3" class="price" id="total_shipping">{l s='Free shipping!'}</td>
@@ -263,9 +263,21 @@
 							<td colspan="3" class="price" id="total_shipping" >{displayPrice price=$total_shipping_tax_exc}</td>
 						</tr>
 					{/if}
-				{/if} -->
+				{/if}
+				*}
+				{if isset($customer_adv_dtl)}
+					<tr class="table_tfoot">
+						<td colspan="5" class="text-right">
+							{l s='Advance Payment Amount'}
+						</td>
+						<td colspan="3" class="price-discount price" id="total_discount">
+							<span class="partial_mim_cost">{displayPrice price=$adv_amount}</span>
+						</td>
+					</tr>
+				{/if}
+
 				<tr class="table_tfoot cart_total_voucher{if $total_discounts == 0} unvisible{/if}">
-					<td colspan="3" class="text-right">
+					<td colspan="5" class="text-right">
 						{if $display_tax_label}
 							{if $use_taxes && $priceDisplay == 0}
 								{l s='Total vouchers (tax incl.)'}
@@ -285,11 +297,23 @@
 						{displayPrice price=$total_discounts_negative}
 					</td>
 				</tr>
+
+				{if isset($customer_adv_dtl)}
+					<tr class="table_tfoot">
+						<td colspan="5" class="text-right">
+							{l s='Due Amount'}
+						</td>
+						<td colspan="3" class="price-discount price" id="total_discount">
+							<span class="partial_mim_cost">{displayPrice price=$customer_adv_dtl['due_amount']}</span>
+						</td>
+					</tr>
+				{/if}
+
 				{if $use_taxes && $show_taxes && $total_tax != 0 }
 					{if $priceDisplay != 0}
 					<tr class="table_tfoot table_total_tr cart_total_price">
-						<td colspan="3" class="text-right">{if $display_tax_label}{l s='Total (tax excl.)'}{else}{l s='Total'}{/if}</td>
-						<td colspan="3" class="price" id="total_price_without_tax">{displayPrice price=$total_price_without_tax}</td>
+						<td colspan="6" class="text-right">{if $display_tax_label}{l s='Total (tax excl.)'}{else}{l s='Total'}{/if}</td>
+						<td colspan="2" class="price" id="total_price_without_tax">{displayPrice price=$total_price_without_tax}</td>
 					</tr>
 					{/if}
 					<tr class="table_tfoot cart_total_tax">
@@ -297,8 +321,8 @@
 						<td colspan="3" class="price" id="total_tax">{displayPrice price=$total_tax}</td>
 					</tr>
 				{/if}
-				<tr class="table_tfoot table_total_tr cart_total_price">
-					<td colspan="3" class="total_price_container text-right">
+				<tr class="table_tfoot table_total_tr cart_total_price {if isset($customer_adv_dtl)} unvisible {/if}">
+					<td colspan="5" class="total_price_container text-right">
 						<span>{l s='Total'}</span>
                         <div class="hookDisplayProductPriceBlock-price">
                             {hook h="displayCartTotalPriceLabel"}
@@ -314,6 +338,17 @@
 						</td>
 					{/if}
 				</tr>
+
+				{if isset($customer_adv_dtl)}
+					<tr class="table_tfoot table_total_tr cart_total_price">
+						<td colspan="8" class="total_price_container text-right">
+							<span>{l s='Total To Be Paid Now'}</span>
+						</td>
+						<td colspan="1" class="price" id="total_price_container">
+							<span id="total_price">{displayPrice price=$customer_adv_dtl['total_to_be_paid']}</span>
+						</td>
+					</tr>
+				{/if}
 			</tfoot>
 			<tbody>
 				{if isset($cart_htl_data)}
@@ -349,12 +384,12 @@
 								</td>
 								<td class="text-center">
 									<p>
-										{$rm_v['data_form']|date_format:"%d %b %Y"}
+										{$rm_v['data_form']|date_format:"%d-%m-%Y"}
 									</p>
 								</td>
 								<td class="text-center">
 									<p>
-										{$rm_v['data_to']|date_format:"%d %b %Y"}
+										{$rm_v['data_to']|date_format:"%d-%m-%Y"}
 									</p>
 								</td>
 								<td class="text-center">

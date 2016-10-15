@@ -1,0 +1,12 @@
+
+[{shop_url}] 
+
+Hola 
+
+Aquest és un E-MAIL DE PROVA des de la vostra botiga. 
+
+Si el podeu llegir, la prova ha estat un èxit!. 
+
+{shop_name} [{shop_url}] desenvolupat amb
+PrestaShop(tm) [http://www.prestashop.com/] 
+

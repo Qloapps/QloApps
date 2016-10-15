@@ -1,0 +1,11 @@
+
+[{shop_url}] 
+
+Hola {name},
+
+Feu un clic aquí per veure aquest element: {product}
+[{product_link}] 
+
+{shop_name} [{shop_url}] desenvolupat amb
+PrestaShop(tm) [http://www.prestashop.com/] 
+

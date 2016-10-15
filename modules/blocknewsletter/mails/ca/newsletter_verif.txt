@@ -1,0 +1,13 @@
+
+[{shop_url}] 
+
+Ei, 
+
+Gràcies per subscriure-us al nostre butlletí, si us plau confirmeu
+la petició fent clic sobre l'enllaç de sota:
+
+{verif_url} [{verif_url}] 		 
+
+{shop_name} [{shop_url}] desenvolupat amb
+PrestaShop(tm) [http://www.prestashop.com/] 
+

@@ -1,0 +1,12 @@
+
+[{shop_url}] 
+
+Hola {firstname} {lastname}, 
+
+ATENCIÓN: ha recibido un nuevo registro en su Back Office.
+
+Puede comprobarlo en "HERRAMIENTAS"> "REGISTROS" de su Back Office.
+
+{shop_name} [{shop_url}] creado por
+PrestaShop(tm) [http://www.prestashop.com/] 
+

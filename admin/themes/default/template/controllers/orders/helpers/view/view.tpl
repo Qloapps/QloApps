@@ -98,7 +98,7 @@
 						<!-- <span class="title">{l s='Total'}</span>
 						<span class="value">{sizeof($products)}</span> -->
 						<span class="title">{l s='Total Rooms'}</span>
-						<span class="value">{$cart_detail_data|@count}</span>
+						<span class="value">{$order_detail_data|@count}</span>
 					</div>
 				</a>
 			</div>
@@ -291,10 +291,10 @@
 												{$data['room_num']}
 											</td>
 											<td>
-												{$data['date_from']|date_format:"%d %b %Y"}
+												{$data['date_from']|date_format:"%d-%m-%Y"}
 											</td>
 											<td>
-												{$data['date_to']|date_format:"%d %b %Y"}
+												{$data['date_to']|date_format:"%d-%m-%Y"}
 											</td>
 											<td>
 												<form action="" method="post" class="form-horizontal">
@@ -303,6 +303,8 @@
 														<option value="{$state['id']|intval}" {if isset($data.id_status) && $state.id == $data.id_status} selected="selected" disabled="disabled"{/if}>{$state.status|escape}</option>
 													{/foreach} 
 													</select>
+													<input type="hidden" name="date_from" value="{$data['date_from']}" />
+													<input type="hidden" name="date_to" value="{$data['date_to']}" />
 													<input type="hidden" name="id_room" value="{$data['id_room']}" />
 													<input type="hidden" name="id_order" value="{$order->id}" />
 													<button style="margin-left:20px;" type="submit" name="submitbookingOrderStatus" class="btn btn-primary">
@@ -956,7 +958,7 @@
 				<div class="panel">
 					<div class="panel-heading">
 						<i class="icon-shopping-cart"></i>
-						{l s='Rooms In This Order'} <span class="badge">{$cart_detail_data|@count}</span><!-- by webkul products changes as rooms -->
+						{l s='Rooms In This Order'} <span class="badge">{$order_detail_data|@count}</span><!-- by webkul products changes as rooms -->
 					</div>
 					<!--by webkul this code is added for showing rooms information on the order detail page-->
 					<div class="row">
@@ -964,87 +966,45 @@
 							<table class="table" id="customer_cart_details">
 								<thead>
 									<tr>
-										<th><span class="title_box">{l s='Room No.'}</span></th>
-										<th><span class="title_box">{l s='Room Image'}</th>
-										<th><span class="title_box">{l s='Room Type'}</span></th>
-										<th><span class="title_box">{l s='Duration'}</span></th>
-										<th><span class="title_box">{l s='Total Price'}</span></th>
-										<th><span class="title_box">{l s='Refund Stage'}</span></th>
-										<th><span class="title_box">{l s='Refund Status'}</span></th>
-										<th><span class="title_box">{l s='Reallocate Room'}</span></th>
+										<th class="text-center"><span class="title_box">{l s='Room No.'}</span></th>
+										<th class="text-center"><span class="title_box">{l s='Room Image'}</th>
+										<th class="text-center"><span class="title_box">{l s='Room Type'}</span></th>
+										<th class="text-center"><span class="title_box">{l s='Duration'}</span></th>
+										<th class="text-center"><span class="title_box">{l s='Total Price'}</span></th>
+										<th class="text-center"><span class="title_box">{l s='Refund Stage'}</span></th>
+										<th class="text-center"><span class="title_box">{l s='Refund Status'}</span></th>
+										<th class="text-center"><span class="title_box">{l s='Reallocate Room'}</span></th>
+										{if ($can_edit && !$order->hasBeenDelivered())}
+										<th class="text-center"><span class="title_box">{l s='Edit Order'}</th>
+										{/if}
 									</tr>
 								</thead>
 								<tbody>
-								{if $cart_detail_data}
-									{foreach from=$cart_detail_data item=data}
-										<tr>
-											<td>
-												{$data.room_num}
-											</td>
-											<td>
-												<img src="{$data.image_link}" title="Room image" />
-											</td>
-											<td>
-												{$data.room_type}
-											</td>
-											<td>
-												{$data.date_from|date_format:"%d %b %Y"}&nbsp-&nbsp {$data.date_to|date_format:"%d %b %Y"}
-											</td>
-											<td>
-												{convertPriceWithCurrency price=$data.amt_with_qty currency=$currency->id}
-											</td>
-											
-											<td class="text-center stage_name">
-												<p>
-													{if isset($data['stage_name']) && $data['stage_name']}
-														{$data['stage_name']}
-													{else}
-														--
-													{/if}
-												</p>
-											</td>
-											<td class="text-center status_name">
-												<p>
-													{if $data['stage_name'] == 'Refunded' || $data['stage_name'] == 'Rejected'}
-														{l s="Done!"}
-													{else if $data['stage_name'] == 'Waitting' || $data['stage_name'] == 'Accepted'}
-														{l s="Pending..."}
-													{else}
-														--
-													{/if}
-												</p>
-											</td>
-
-											{if $data.booking_type == 1}
-											<td>
-												{if $data['stage_name'] == 'Refunded' || $data['stage_name'] == 'Rejected'}
-													<p class="text-center">----</p>
-												{else}
-													<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#mySwappigModal" data-id_order="{$order->id}" data-room_num={$data['room_num']} data-date_from={$data['date_from']} data-date_to={$data['date_to']} data-id_room={$data['id_room']} data-cust_name="{$data['alloted_cust_name']}" data-cust_email="{$data['alloted_cust_email']}" data-avail_rm_swap={$data['avail_rooms_to_swap']|@json_encode} data-avail_rm_realloc={$data['avail_rooms_to_realloc']|@json_encode}>
-														{l s='Reallocate Room' mod='hotelreservationsystem'}
-													</button>
-												{/if}
-											</td>
-											{/if}
-										</tr>
+								{if $order_detail_data}
+									{foreach from=$order_detail_data item=data}
+										{* Include product line partial *}
+										{include file='controllers/orders/_product_line.tpl'}
 									{/foreach}
 								{else}
 									<tr>
 										<td>{l s='No Data Found.'}</td>
 									</tr>
 								{/if}
+								{* Include product line partial *}
+								{include file='controllers/orders/_new_product.tpl'}
 								</tbody>
 							</table>
 						</div>
 					</div>
 					<div id="refundForm">
-					<!--
+					{*
 						<a href="#" class="standard_refund"><img src="../img/admin/add.gif" alt="{l s='Process a standard refund'}" /> {l s='Process a standard refund'}</a>
 						<a href="#" class="partial_refund"><img src="../img/admin/add.gif" alt="{l s='Process a partial refund'}" /> {l s='Process a partial refund'}</a>
-					--><!-- by webkul to hide unnessary things in the page-->
+					<!-- by webkul to hide unnessary things in the page -->
+					*}
 					</div>
 
-					<!-- {capture "TaxMethod"}
+					{*	{capture "TaxMethod"}
 						{if ($order->getTaxCalculationMethod() == $smarty.const.PS_TAX_EXC)}
 							{l s='tax excluded.'}
 						{else}
@@ -1099,9 +1059,9 @@
 							</thead>
 							<tbody>
 							{foreach from=$products item=product key=k}
-								{* Include customized datas partial *}
+								 <!-- Include customized datas partial  -->
 								{include file='controllers/orders/_customized_data.tpl'}
-								{* Include product line partial *}
+								 <!-- Include product line partial  -->
 								{include file='controllers/orders/_product_line.tpl'}
 							{/foreach}
 							{if $can_edit}
@@ -1109,14 +1069,13 @@
 							{/if}
 							</tbody>
 						</table>
-					</div>
-
+					</div> <!-- by webkul to hide unnessary things in the page--> *}
 					{if $can_edit}
 					<div class="row-margin-bottom row-margin-top order_action">
 					{if !$order->hasBeenDelivered()}
 						<button type="button" id="add_product" class="btn btn-default">
 							<i class="icon-plus-sign"></i>
-							{l s='Add a product'}
+							{l s='Add Rooms In Order'}
 						</button>
 					{/if}
 						<button id="add_voucher" class="btn btn-default" type="button" >
@@ -1124,18 +1083,18 @@
 							{l s='Add a new discount'}
 						</button>
 					</div>
-					{/if} --> <!-- by webkul to hide unnessary things in the page-->
+					{/if}
 					<div class="clear">&nbsp;</div>
 					<hr>
 					<div class="row">
-						<!-- <div class="col-xs-6">
+						{* <div class="col-xs-6">
 							<div class="alert alert-warning">
 								{l s='For this customer group, prices are displayed as: [1]%s[/1]' sprintf=[$smarty.capture.TaxMethod] tags=['<strong>']}
 								{if !Configuration::get('PS_ORDER_RETURN')}
 									<br/><strong>{l s='Merchandise returns are disabled'}</strong>
 								{/if}
 							</div>
-						</div> --> <!-- by webkul to hide unnessary things in the page-->
+						</div> <!-- by webkul to hide unnessary things in the page--> *}
 						
 						<!-- For Due amount submit panel (by webkul) -->
 						{if isset($order_adv_dtl)}
@@ -1162,20 +1121,24 @@
 														<strong>{displayPrice price=($order_adv_dtl['total_order_amount'] - $order_adv_dtl['total_paid_amount']) currency=$currency->id}</strong>
 													</td>
 												</tr>
-												<tr>
-													<td>
-														<strong>{l s='submitted Amount'}</strong>
-													</td>
-													<td>
-														<div class="input-group">
-															<span class="input-group-addon" id="htl_order_currenct">{$currency->sign}</span>
-															<input type="text" class="form-control" placeholder="Amount" aria-describedby="htl_order_currenct" name="submitted_amount">
-														</div>
-													</td>
-												</tr>
+												{if ($order_adv_dtl['total_order_amount'] - $order_adv_dtl['total_paid_amount'])|round:2 > 0}
+													<tr>
+														<td>
+															<strong>{l s='submitted Amount'}</strong>
+														</td>
+														<td>
+															<div class="input-group">
+																<span class="input-group-addon" id="htl_order_currenct">{$currency->sign}</span>
+																<input type="text" class="form-control" placeholder="Amount" aria-describedby="htl_order_currenct" name="submitted_amount">
+															</div>
+														</td>
+													</tr>
+												{/if}	
 											</table>
 										</div>
-										<button type="submit" class="btn btn-primary" name="payDueAmount" style="margin-top:10px;">{l s="Submit Amount"}</button>
+										{if ($order_adv_dtl['total_order_amount'] - $order_adv_dtl['total_paid_amount'])|round:2 > 0}
+											<button type="submit" class="btn btn-primary" name="payDueAmount" style="margin-top:10px;">{l s="Submit Amount"}</button>
+										{/if}	
 									</form>
 								</div>
 							</div>
@@ -1274,7 +1237,8 @@
 											</td>
 											<td class="partial_refund_fields current-edit" style="display:none;"></td>
 										</tr>
-										<!-- <tr id="total_shipping">
+										{*
+										<tr id="total_shipping">
 											<td class="text-right">{l s='Shipping'}</td>
 											<td class="amount text-right nowrap" >
 												{displayPrice price=$order_shipping_price currency=$currency->id}
@@ -1289,14 +1253,14 @@
 												</div>
 												<p class="help-block"><i class="icon-warning-sign"></i> {l s='(%s)' sprintf=$smarty.capture.TaxMethod}</p>
 											</td>
-										</tr> -->    <!-- by webkul to hide unnessary things in the page-->
-										<!-- {if ($order->getTaxCalculationMethod() == $smarty.const.PS_TAX_EXC)}
+										</tr>
+										{if ($order->getTaxCalculationMethod() == $smarty.const.PS_TAX_EXC)}
 			 							<tr id="total_taxes">
 			 								<td class="text-right">{l s='Taxes'}</td>
 			 								<td class="amount text-right nowrap" >{displayPrice price=($order->total_paid_tax_incl-$order->total_paid_tax_excl) currency=$currency->id}</td>
 			 								<td class="partial_refund_fields current-edit" style="display:none;"></td>
 			 							</tr>
-			 							{/if} -->
+			 							{/if}  <!-- by webkul to hide unnessary things in the page-->*}
 
 			 							{if isset($order_adv_dtl)}
 				 							<tr>

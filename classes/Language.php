@@ -975,9 +975,30 @@ class LanguageCore extends ObjectModel
                 AdminTranslationsController::checkAndAddMailsFiles((string)$iso, $files_list);
                 AdminTranslationsController::addNewTabs((string)$iso, $files_list);
             }
+            //By webkul....Replace our customized mail files in the mail folder.....
+            Language::replaceCustomizedMailFiles($iso);
         }
 
         return count($errors) ? $errors : true;
+    }
+
+    //By webkul....Replace our customized mail files in the mail folder.....
+    public static function replaceCustomizedMailFiles($iso)
+    {
+        $directory = _PS_TRANSLATIONS_DIR_.'custom_mails/';
+        // Open a directory, and read its contents
+        if (is_dir($directory)){
+            $mail_to_path = _PS_MAIL_DIR_.$iso.'/';
+            if ($d_open = opendir($directory)){
+                while (($file = readdir($d_open)) !== false){
+                    if (($file == ".") || ($file == "..")) {
+                        continue;
+                    }
+                    copy($directory.$file, $mail_to_path.$file);
+                }
+                closedir($d_open);  
+            }
+        }
     }
 
     /**

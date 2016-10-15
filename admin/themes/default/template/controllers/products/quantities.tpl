@@ -158,7 +158,7 @@
 								</tr>
 							</thead>
 							{foreach from=$attributes item=attribute}
-								<tr{if $attribute['default_on']} class="highlighted"{/if}>
+								<tr{if isset($attribute['default_on']) && $attribute['default_on']} class="highlighted"{/if}>
 									<td class="available_quantity" id="qty_{$attribute['id_product_attribute']}">
 										<span>{$available_quantity[$attribute['id_product_attribute']]}</span>
 										<input type="text" name="qty_{$attribute['id_product_attribute']}" class="fixed-width-sm" value="{$available_quantity[$attribute['id_product_attribute']]|htmlentities}"/>

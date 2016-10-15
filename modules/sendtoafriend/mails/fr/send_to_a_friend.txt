@@ -1,0 +1,10 @@
+
+[{shop_url}] 
+
+Bonjour {name},
+
+Il s'agit de: {product} [{product_link}] 
+
+{shop_name} [{shop_url}] réalisé avec
+PrestaShop(tm) [http://www.prestashop.com/] 
+

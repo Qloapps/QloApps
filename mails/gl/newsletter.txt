@@ -1,0 +1,10 @@
+
+[{shop_url}] 
+
+Hi {firstname} {lastname}, 
+
+{message} 
+
+{shop_name} [{shop_url}] powered by
+PrestaShop(tm) [http://www.prestashop.com/] 
+

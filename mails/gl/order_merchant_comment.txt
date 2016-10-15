@@ -1,0 +1,13 @@
+
+[{shop_url}] 
+
+Hi {firstname} {lastname}, 
+
+You have received a new message from {shop_name} regarding order with
+the reference {order_name}.
+
+MESSAGE: {message} 		 
+
+{shop_name} [{shop_url}] powered by
+PrestaShop(tm) [http://www.prestashop.com/] 
+

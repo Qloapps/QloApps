@@ -48,7 +48,7 @@
   font-weight: 400;
   color: #252525;
   margin-bottom: 25px;
-  border-bottom: 1px solid #bf9958;
+  border-bottom: 1px solid #379bf0;
   line-height: 55px;
 }
 #reasonForRefund
@@ -70,7 +70,7 @@
 }
 .totalOrdercancellation_btn
 {
-  background-color: #bf9958;
+  background-color: #379bf0;
     color: #ffffff;
     font-size: 13px;
     font-weight: 700;
@@ -122,7 +122,7 @@
   font-weight: 400;
   color: #252525;
   margin-bottom: 25px;
-  border-bottom: 1px solid #bf9958;
+  border-bottom: 1px solid #379bf0;
   line-height: 55px;
 }
 #reasonForRefund
@@ -144,7 +144,7 @@
 }
 .totalOrdercancellation_btn
 {
-  background-color: #bf9958;
+  background-color: #379bf0;
     color: #ffffff;
     font-size: 13px;
     font-weight: 700;

@@ -1,0 +1,16 @@
+
+[{shop_url}] 
+
+Hallo {firstname} {lastname}, 
+
+{reply} 
+
+Geautomatiseerde mailbox: Aub niet direct antwoorden op deze mail
+want we zullen deze niet ontvangen. 
+
+Om te reageren, gebruik de volgende link: {link}
+[{link}] 
+
+{shop_name} [{shop_url}] gebouwd met
+PrestaShop(tm) [http://www.prestashop.com/] 
+

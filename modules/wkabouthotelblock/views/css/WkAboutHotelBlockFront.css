@@ -1,0 +1,73 @@
+.htlInterior-owlCarousel .owl-stage-outer {
+    border: 1px solid #ccc;
+}
+.interiorImgWrapper {
+    width: 100%;
+    height: 100%;
+}
+.interiorbox {
+   position: relative;
+   width: 100%;
+   padding-bottom: 50%;
+}
+.interiorboxInner {
+   position: absolute;
+   left: 0px;
+   right: 0px;
+   top: 0px;
+   bottom: 0px;
+   overflow: hidden;
+   border: 1px solid #ccc;
+}
+.interiorboxInner img {
+   width: 100%;
+}
+.htlInterior-owlCarousel .owl-prev, .htlInterior-owlCarousel .owl-next{
+    font-size: 40px;
+    font-weight: 200;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    z-index: 10;
+}
+.htlInterior-owlCarousel .owl-prev {
+    left: 0;
+}
+.htlInterior-owlCarousel .owl-next {
+    right: 0;
+}
+.nav-direction-wrapper{
+	display: table;
+    height: 100%;
+}
+.nav-direction-primary {
+	display: table-cell;
+    vertical-align: middle;
+}
+.nav-direction-secondary {
+	padding: 40px 18px;
+	opacity: 0.85;
+	background-color: #ffffff;
+}
+.interiorHoverBlockWrapper {
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	background-image: url("../img/black-opacity-5.png");
+	cursor: pointer;
+	display: none;
+}
+.interiorHoverPrimaryBlock {
+	display: table;
+    height: 100%;
+    width: 100%;
+}
+.interiorHoverSecondaryBlock {
+	color: #fff;
+    display: table-cell;
+    font-size: 50px;
+    text-align: center;
+    vertical-align: middle;
+}

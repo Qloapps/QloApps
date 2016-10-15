@@ -131,34 +131,15 @@
 }
 
 /*# sourceMappingURL=blocknewsletter.css.map */
-
-.submitNewsletter
-{
-  background-color: #bf9958;
-  padding-right: 25px;
-  padding-left: 25px;
-  color: #ffffff;
-  font-size:16px;
-  font-family: 'PT Serif', serif;
-  font-weight:400;
-  border: 2px solid #ffffff;
-  margin-left: 30px; }
-  @media (max-width: 400px) {
-      .submitNewsletter {
-        font-size: 13px;
-        margin-left: 20px;
-        padding-left: 15px;
-        padding-right: 15px;
-      }
-    }
+.button.button-medium.newsletter-btn {
+  padding: 0px 20px;
+}
 #newsletter-input
 {
-  background-color: #bf9958!important;
-  border: none!important;
-  border-bottom: 2px solid #ffffff!important;
-  color: #ffffff!important;
-  font-size:16px!important;
-  font-family: 'PT Serif', serif!important;
-  font-weight:400!important;
-  padding-right: 0px!important;
+  background-color: #3a3a3a;
+  border: 1px solid #868686;
+  color: #bfbfbf;
+  font-size: 13px;
+  height: 42px;
+  margin-bottom: 10px;
 }

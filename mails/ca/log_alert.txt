@@ -1,0 +1,14 @@
+
+[{shop_url}] 
+
+Hola {firstname} {lastname}, 
+
+ATENCIÓ: heu rebut un nou avís de registre al vostre Tauler
+d'Administració.
+
+Podeu comprovar-ho a les seccions "EINES" >"REGISTRES" del vostre
+Tauler d'Administració. 		 
+
+{shop_name} [{shop_url}] desenvolupat amb
+PrestaShop(tm) [http://www.prestashop.com/] 
+

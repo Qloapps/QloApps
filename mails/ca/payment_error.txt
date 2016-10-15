@@ -1,0 +1,25 @@
+
+[{shop_url}] 
+
+Hola {firstname} {lastname}, 
+
+Hi ha un problema amb el vostre pagament a {shop_name} per a la
+comanda amb referència {order_name}. Si us plau, contacteu amb
+nosaltres pel vostre propi interès.
+
+NO US PODEM ENVIAR LA COMANDA FINS QUE NO EN REBEM EL PAGAMENT. 		 
+
+Podeu revisar la vostra comanda i descarregar la vostra factura
+des de la secció "Historial de comandes"
+[{history_url}] del vostre compte de client clicant a
+"El meu compte" [{my_account_url}] a la nostra
+botiga. 
+
+Si teniu un compte de convidat, podeu seguir l'evolució de la
+comanda a la secció "Seguiment de convidat"
+[{guest_tracking_url}?id_order={order_name}] de la
+nostra botiga. 
+
+{shop_name} [{shop_url}] desenvolupat amb
+PrestaShop(tm) [http://www.prestashop.com/] 
+

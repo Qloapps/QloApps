@@ -1,0 +1,16 @@
+
+[{shop_url}] 
+
+Hi {firstname} {lastname}, 
+
+We have generated a credit slip in your name for order with the
+reference {order_name}. 
+
+You can review this credit slip and download your invoice from the
+"My credit slips" [{history_url}] section of your
+account by clicking "My account" [{my_account_url}]
+on our shop. 
+
+{shop_name} [{shop_url}] powered by
+PrestaShop(tm) [http://www.prestashop.com/] 
+

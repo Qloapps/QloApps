@@ -143,3 +143,15 @@ $(document).on('keyup', '.cat_quantity_wanted', function(e)
 	    });
 	}
 });
+
+/*Set maxDate for Order resrict date*/
+	$(document).ready(function(){
+		if (max_order_date)
+		{
+			var max_order_date_format = $.datepicker.formatDate('dd M yy', new Date(max_order_date));
+			$( "#check_in_time" ).datepicker( "option", "maxDate", max_order_date_format);
+			$( "#check_out_time" ).datepicker( "option", "maxDate", max_order_date_format);
+		}	
+	});
+/*End*/
+

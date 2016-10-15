@@ -116,14 +116,14 @@ $(document).ready(function () {
 	<div class="form-group">
 		<div class="col-lg-1"><span class="pull-right">{include file="controllers/products/multishop/checkbox.tpl" field="wholesale_price" type="default"}</span></div>
 		<label class="control-label col-lg-2" for="wholesale_price">
-			<span class="label-tooltip" data-toggle="tooltip" title="{l s='The wholesale price is the price you paid for the product. Do not include the tax.'}">{if !$country_display_tax_label || $tax_exclude_taxe_option}{l s='Wholesale price'}{else}{l s='Pre-tax wholesale price'}{/if}</span>
+			<span class="label-tooltip" data-toggle="tooltip" title="{l s='The wholesale price is the price you paid for the room type. Do not include the tax.'}">{if !$country_display_tax_label || $tax_exclude_taxe_option}{l s='Wholesale price'}{else}{l s='Pre-tax wholesale price'}{/if}</span>
 		</label>
 		<div class="col-lg-2">
 			<div class="input-group">
 				<span class="input-group-addon">{$currency->prefix}{$currency->suffix}</span>
 				<input maxlength="27" name="wholesale_price" id="wholesale_price" type="text" value="{{toolsConvertPrice price=$product->wholesale_price}|string_format:$priceDisplayPrecisionFormat}" onchange="this.value = this.value.replace(/,/g, '.');" />
 			</div>
-			{if isset($pack) && $pack->isPack($product->id)}<p class="help-block">{l s='The sum of wholesale prices of the products in the pack is %s%s%s' sprintf=[$currency->prefix,{toolsConvertPrice price=$pack->noPackWholesalePrice($product->id)|string_format:$priceDisplayPrecisionFormat},$currency->suffix]}</p>{/if}
+			{if isset($pack) && $pack->isPack($product->id)}<p class="help-block">{l s='The sum of wholesale prices of the room types in the pack is %s%s%s' sprintf=[$currency->prefix,{toolsConvertPrice price=$pack->noPackWholesalePrice($product->id)|string_format:$priceDisplayPrecisionFormat},$currency->suffix]}</p>{/if}
 		</div>
 	</div>
 	<div class="form-group">
@@ -236,7 +236,7 @@ $(document).ready(function () {
 			<div class="checkbox">
 				<label class="control-label" for="on_sale" >
 					<input type="checkbox" name="on_sale" id="on_sale" {if $product->on_sale}checked="checked"{/if} value="1" />
-					{l s='Display the "on sale" icon on the product page, and in the text found within the product listing.'}
+					{l s='Display the "on sale" icon on the room type page, and in the text found within the room type listing.'}
 				</label>
 			</div>
 		</div>
@@ -270,7 +270,7 @@ $(document).ready(function () {
 			<div class="col-lg-1"><span class="pull-right">{include file="controllers/products/multishop/checkbox.tpl" field="price" type="price"}</span></div>
 			<label class="control-label col-sm-2">
 				<input type="hidden" name="id_adv_pmt" {if isset($adv_pay_dtl)}value="{$adv_pay_dtl['id']}"{/if}>
-				<span class="label-tooltip" data-toggle="tooltip" title="{l s='If Disabled, Advanced payment will not appliy on this product.'}">
+				<span class="label-tooltip" data-toggle="tooltip" title="{l s='If Disabled, Advanced payment will not appliy on this room type.'}">
 					{l s='Allow Advanced Payment'}
 				</span>
 			</label>
@@ -288,7 +288,7 @@ $(document).ready(function () {
 		<div class="form-group adv_payment_field">
 			<div class="col-lg-1"><span class="pull-right">{include file="controllers/products/multishop/checkbox.tpl" field="price" type="price"}</span></div>
 			<label class="control-label col-sm-2">
-				<span class="label-tooltip" data-toggle="tooltip" title="{l s='If disabled, Advanced Payment for the product will be calculated By Global Advanced payment settings.'}">
+				<span class="label-tooltip" data-toggle="tooltip" title="{l s='If disabled, Advanced Payment for the room type will be calculated By Global Advanced payment settings.'}">
 					{l s='Apply Product Advanced Payment Setting.'}
 				</span>
 			</label>

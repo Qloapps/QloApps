@@ -128,8 +128,7 @@
 
 	<div id="product-pack-container" {if $product_type != Product::PTYPE_PACK}style="display:none"{/if}></div>
 
-	<!-- <hr />
- -->
+	{*<hr />*}
 	<div class="form-group">
 		<div class="col-lg-1"><span class="pull-right">{include file="controllers/products/multishop/checkbox.tpl" field="name" type="default" multilang="true"}</span></div>
 		<label class="control-label col-lg-2 required" for="name_{$id_lang}">
@@ -259,8 +258,7 @@
 			var product_name_redirected = '{$product_name_redirected|escape:'html':'UTF-8'}';
 		</script>
 	</div>
-
-	<div class="form-group">
+	<div class="form-group hidden">
 		<div class="col-lg-1"><span class="pull-right">{include file="controllers/products/multishop/checkbox.tpl" field="visibility" type="default"}</span></div>
 		<label class="control-label col-lg-2" for="visibility">
 			{l s='Visibility'}
@@ -275,7 +273,7 @@
 		</div>
 	</div>
 
-	<div id="product_options" class="form-group">
+	<div id="product_options" class="form-group hidden">
 		<div class="col-lg-12">
 			<div class="form-group">
 				<div class="col-lg-1">
@@ -324,10 +322,11 @@
 		</div>
 	</div>
 	<hr/>
+
 	<div class="form-group">
 		<div class="col-lg-1"><span class="pull-right">{include file="controllers/products/multishop/checkbox.tpl" field="description_short" type="tinymce" multilang="true"}</span></div>
 		<label class="control-label col-lg-2" for="description_short_{$id_lang}">
-			<span class="label-tooltip" data-toggle="tooltip" title="{l s='Appears in the product list(s), and at the top of the product page.'}">
+			<span class="label-tooltip" data-toggle="tooltip" title="{l s='Appears in the room type list(s), and at the top of the room type page.'}">
 				{l s='Short description'}
 			</span>
 		</label>
@@ -345,7 +344,7 @@
 		<div class="col-lg-1"><span class="pull-right">{include file="controllers/products/multishop/checkbox.tpl" field="description" type="tinymce" multilang="true"}</span></div>
 		<label class="control-label col-lg-2" for="description_{$id_lang}">
 			<span class="label-tooltip" data-toggle="tooltip"
-				title="{l s='Appears in the body of the product page.'}">
+				title="{l s='Appears in the body of the room type.'}">
 				{l s='Description'}
 			</span>
 		</label>

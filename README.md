@@ -1,7 +1,8 @@
 Hotel Commerce
 --------
 Hotel Commerce is Hotel Booking  & Reservarion system . Using this you can  easily launch your hotel booking website  and even  manage your offline booking too . This package is developed on top of Prestashop 1.6.
-For more info you can visit : http://qloapps.com
+
+
 Demo
 --------
 FrontEnd : http://prestashop.webkul.com/hotel-reservation/ </br>
@@ -34,7 +35,4 @@ or raise ticket at https://webkul.com/ticket/
 Webkul is known for his proactive support and already developed more than 100+ plugins on prestashop and more than 700+ plugins on other opensource platforms.
 
 
-license
---------
-OSL V3 : https://opensource.org/licenses/OSL-3.0
 Thank you for downloading .

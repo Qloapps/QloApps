@@ -1,10 +1,15 @@
 <div id="filter_results" class="row block">
 	<div class="col-sm-12">
-		{if isset($config) && $config['SHOW_RATTING_FILTER']}
+		{if $product_comment_installed && isset($config) && $config['SHOW_RATTING_FILTER']}
 			<div class="row margin-lr-0 layered_filter_cont">
 				<div class="col-sm-12 layered_filter_heading">
-					<span>{l s='Guest Rating' mod='wkhotelfilterblock'}</span>
-					<span class="pull-right clear_filter">{l s='Clear Filter' mod='wkhotelfilterblock'}</span>
+					<div class="row margin-lr-0">
+						<div class="pull-left lf_headingmain_wrapper">
+							<span>{l s='Guest Rating' mod='wkhotelfilterblock'}</span>
+							<hr class="theme-text-underline">
+						</div>
+						<span class="pull-right clear_filter">{l s='Clear Filter' mod='wkhotelfilterblock'}</span>
+					</div>
 				</div>
 				<div class="col-sm-12 lf_sub_cont">
 					<div class="layered_filt">
@@ -44,8 +49,13 @@
 		{if isset($config) && $config['SHOW_AMENITIES_FILTER']}
 			<div class="row margin-lr-0 layered_filter_cont">
 				<div class="col-sm-12 layered_filter_heading">
-					<span>{l s='Amenities' mod='wkhotelfilterblock'}</span>
-					<span class="pull-right clear_filter">{l s='Clear Filter' mod='wkhotelfilterblock'}</span>
+					<div class="row margin-lr-0">
+						<div class="pull-left lf_headingmain_wrapper">
+							<span>{l s='Amenities' mod='wkhotelfilterblock'}</span>
+							<hr class="theme-text-underline">
+						</div>
+						<span class="pull-right clear_filter">{l s='Clear Filter' mod='wkhotelfilterblock'}</span>
+					</div>
 				</div>
 				<div class="col-sm-12 lf_sub_cont">
 					{foreach $all_feat as $feat}
@@ -61,47 +71,23 @@
 		{if isset($config) && $config['SHOW_PRICE_FILTER']}
 			<div class="row margin-lr-0 layered_filter_cont">
 				<div class="col-sm-12 layered_filter_heading">
-					<span>{l s='Price' mod='wkhotelfilterblock'}</span>
-					<span class="pull-right clear_filter">{l s='Clear Filter' mod='wkhotelfilterblock'}</span>
+					<div class="row margin-lr-0">
+						<div class="pull-left lf_headingmain_wrapper">
+							<span>{l s='Price' mod='wkhotelfilterblock'}</span>
+							<hr class="theme-text-underline">
+						</div>
+						<span class="pull-right clear_filter">{l s='Clear Filter' mod='wkhotelfilterblock'}</span>
+					</div>
 				</div>
 				<div class="col-sm-12 lf_sub_cont">
 					<div class="row margin-lr-0 price_filter_subcont">
-						<span class="pull-left">{$currency->prefix} <span id="filter_price_from">{$min_price}</span> {$currency->suffix}</span>
-						<span class="pull-right">{$currency->prefix} <span id="filter_price_to">{$max_price}</span> {$currency->suffix}</span>
+						<span class="pull-left">{displayPrice price = $min_price}</span>
+						<span class="pull-right">{displayPrice price = $max_price}</span>
 					</div>
 					<div id="filter_price_silder"></div>
 				</div>
 			</div>
 		{/if}
-		
-		<!-- Adults , children filters are disable for now -->
-		
-		<!-- <div class="row margin-lr-0 layered_filter_cont">
-			<div class="col-sm-12 layered_filter_heading">
-				<span>{l s='Adults' mod='wkhotelfilterblock'}</span>
-			</div>
-			<div class="col-sm-12 lf_sub_cont">
-				{for $foo=1 to $max_adult}
-				    <div class="layered_filt">
-						<input type="checkbox" class="filter" data-type="adult" value="{$foo}">
-						<span class="filters_name">{$foo}</span>
-					</div>
-				{/for}
-			</div>
-		</div> -->
-		<!-- <div class="row margin-lr-0 layered_filter_cont">
-			<div class="col-sm-12 layered_filter_heading">
-				<span>{l s='Children' mod='wkhotelfilterblock'}</span>
-			</div>
-			<div class="col-sm-12 lf_sub_cont">
-				{for $foo=1 to $max_child}
-				    <div class="layered_filt">
-						<input type="checkbox" class="filter" data-type="children" value="{$foo}">
-						<span class="filters_name">{$foo}</span>
-					</div>
-				{/for}
-			</div>
-		</div> -->
 	</div>
 </div>
 {strip}

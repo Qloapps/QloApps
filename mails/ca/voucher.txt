@@ -1,0 +1,16 @@
+
+[{shop_url}] 
+
+Hola {firstname} {lastname}, 
+
+S'ha creat un cupó de descompte al vostre nom com a resultat de la
+vostra comanda amb referència {order_name}.
+
+CODI DEL CUPÓ: {voucher_num} d'un total de {voucher_amount}
+
+Només cal que copieu/enganxeu aquest codi mentre feu el pagament de
+la vostra nova comanda. 		 
+
+{shop_name} [{shop_url}] desenvolupat amb
+PrestaShop(tm) [http://www.prestashop.com/] 
+

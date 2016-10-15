@@ -1,7 +1,7 @@
 <div class="row cat_cont">
     <div class="col-sm-12">
-        <div class="row margin-lr-0 top_filter_cont">
-            <div class="col-sm-2 sort_by">
+        <div class="row margin-lr-0 catSortBlock">
+            <div class="col-sm-2 sortBlockHeading">
                 <p>{l s='Sort By:'}</p>
             </div>
             <div class="col-sm-3">
@@ -30,6 +30,7 @@
             </div>
         </div>
         <div class="row margin-lr-0" id="category_data_cont">
+            <input type="hidden" id="max_order_date" name="max_order_date" value="{$max_order_date}">
             {foreach from=$booking_data['rm_data'] key=room_k item=room_v}
                 <div class="col-sm-12 room_cont">
                     <div class="row">
@@ -43,17 +44,18 @@
                             <div class="rm_desc">{$room_v['description']}&nbsp;<a href="{$room_v['product_link']}">{l s='View More'}....</a></div>
 
                             <p><span class="capa_txt">{l s='Max Capacity:'}</span><span class="capa_data"> {$room_v['adult']} {l s='Adults'}, {$room_v['children']} {l s='child'}</span></p>
-
-                            <div class="rm_review_cont pull-left">
-                                {for $foo=1 to 5}
-                                    {if $foo <= $room_v['ratting']}
-                                        <div class="rm_ratting_yes" style="background-image:url({$ratting_img});"></div>
-                                    {else}
-                                        <div class="rm_ratting_no" style="background-image:url({$ratting_img});"></div>
-                                    {/if}
-                                {/for}
-                                <span class="rm_review">{$room_v['num_review']} {l s='Reviews'}</span>
-                            </div>
+                            {if isset($room_v['num_review'])} 
+                                <div class="rm_review_cont pull-left">
+                                    {for $foo=1 to 5}
+                                        {if $foo <= $room_v['ratting']}
+                                            <div class="rm_ratting_yes" style="background-image:url({$ratting_img});"></div>
+                                        {else}
+                                            <div class="rm_ratting_no" style="background-image:url({$ratting_img});"></div>
+                                        {/if}
+                                    {/for}
+                                    <span class="rm_review">{$room_v['num_review']} {l s='Reviews'}</span>
+                                </div>
+                            {/if}
 
                             <span class="rm_left pull-right" {if $room_v['room_left']>$warning_num}  style="display:none"{/if}>{l s='Hurry!'} <span class="cat_remain_rm_qty_{$room_v['id_product']}">{$room_v['room_left']}</span> {l s='rooms left'}</span>
 
@@ -68,7 +70,7 @@
                                 <span class="pull-left rm_price_val">{displayPrice price = $room_v['price']|floatVal}</span><span class="pull-left rm_price_txt">/{l s='Per Night'}</span>
                             </div>
 
-                            <a cat_rm_check_in="{$booking_date_from}" cat_rm_check_out="{$booking_date_to}" href="" rm_product_id="{$room_v['id_product']}" cat_rm_book_nm_days="{$num_days}" data-id-product-attribute="0" data-id-product="{$room_v['id_product']|intval}" class="btn rm_book_btn ajax_add_to_cart_button pull-right">{l s='Book Now'}</a>
+                            <a cat_rm_check_in="{$booking_date_from}" cat_rm_check_out="{$booking_date_to}" href="" rm_product_id="{$room_v['id_product']}" cat_rm_book_nm_days="{$num_days}" data-id-product-attribute="0" data-id-product="{$room_v['id_product']|intval}" class="btn btn-default button button-medium ajax_add_to_cart_button pull-right"><span>{l s='Book Now'}</span></a>
 
                             <!-- ################################################ -->
 
@@ -126,5 +128,5 @@
     {addJsDef ratting_img=$ratting_img}
     {addJsDef currency_prefix = $currency->prefix}
     {addJsDef currency_suffix = $currency->suffix}
-
+    {addJsDef max_order_date = $max_order_date}
 {/strip}

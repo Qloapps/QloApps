@@ -212,7 +212,7 @@
 												{foreach from=$book_v['data']['available'] key=avai_k item=avai_v}
 													<tr>
 														<td>{$avai_v['room_num']}</td>
-														<td>{$date_from|date_format:'%d %b %Y'} - {$date_to|date_format:'%d %b %Y'}</td>
+														<td>{$date_from|date_format:'%d-%m-%Y'} - {$date_to|date_format:'%d-%m-%Y'}</td>
 														<td>{$avai_v['room_comment']}</td>
 														<td>
 															<label class="control-label">
@@ -254,7 +254,7 @@
 																{foreach from=$part_v['avai_dates'] key=sub_part_k item=sub_part_v}
 																	<tr>
 																		<td class="text-center">
-																			<p>{$sub_part_v['date_from']|date_format:'%d %b %Y'} - {$sub_part_v['date_to']|date_format:'%d %b %Y'}</p>
+																			<p>{$sub_part_v['date_from']|date_format:'%d-%m-%Y'} - {$sub_part_v['date_to']|date_format:'%d-%m-%Y'}</p>
 																		</td>
 																		<td class="text-center">
 																			<label class="control-label">
@@ -300,7 +300,7 @@
 															<table class="table">
 																{foreach from=$booked_v['detail'] key=rm_dtl_k item=rm_dtl_v}
 																	<tr>
-																		<td class="col-xs-3">{$rm_dtl_v['date_from']|date_format:'%d %b %Y'} - {$rm_dtl_v['date_to']|date_format:'%d %b %Y'}</td>
+																		<td class="col-xs-3">{$rm_dtl_v['date_from']|date_format:'%d-%m-%Y'} - {$rm_dtl_v['date_to']|date_format:'%d-%m-%Y'}</td>
 																		<td class="col-xs-3">{$rm_dtl_v['comment']}</td>
 																		<td class="col-xs-3">
 																			<label class="control-label">
@@ -388,7 +388,7 @@
 										<td>{$cart_data['room_num']}</td>
 										<td>{$cart_data['room_type']}</td>
 										<td>
-											{$cart_data['date_from']|date_format:'%d %b %Y'} - {$cart_data['date_to']|date_format:'%d %b %Y'}
+											{$cart_data['date_from']|date_format:'%d-%m-%Y'} - {$cart_data['date_to']|date_format:'%d-%m-%Y'}
 										</td>
 										<td>{convertPrice price=$cart_data['amt_with_qty']}</td>
 										<td><button class="btn btn-default ajax_cart_delete_data" data-id-product="{$cart_data['id_product']}" data-id-hotel="{$cart_data['id_hotel']}" data-id-cart="{$cart_data['id_cart']}" data-id-cart-book-data="{$cart_data['id_cart_book_data']}" data-date-from="{$cart_data['date_from']}" data-date-to="{$cart_data['date_to']}"><i class='icon-trash'></i></button></td>

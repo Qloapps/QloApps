@@ -25,7 +25,7 @@
 */
 
 /* Theme URLs */
-define('_PS_DEFAULT_THEME_NAME_',        'hotel-theme');
+define('_PS_DEFAULT_THEME_NAME_',        'default-bootstrap');
 define('_PS_THEME_DIR_',                _PS_ROOT_DIR_.'/themes/'._THEME_NAME_.'/');
 define('_THEMES_DIR_',                    __PS_BASE_URI__.'themes/');
 define('_THEME_DIR_',                    _THEMES_DIR_._THEME_NAME_.'/');

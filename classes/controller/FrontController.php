@@ -953,6 +953,7 @@ class FrontControllerCore extends Controller
         $this->addJqueryPlugin('easing');
         $this->addJS(_PS_JS_DIR_.'tools.js');
         $this->addJS(_THEME_JS_DIR_.'global.js');
+        $this->addJqueryUI('ui.datepicker');
 
         // Automatically add js files from js/autoload directory in the template
         if (@filemtime($this->getThemeDir().'js/autoload/')) {
@@ -970,7 +971,7 @@ class FrontControllerCore extends Controller
                 }
             }
         }
-
+        
         if (Tools::isSubmit('live_edit') && Tools::getValue('ad') && Tools::getAdminToken('AdminModulesPositions'.(int)Tab::getIdFromClassName('AdminModulesPositions').(int)Tools::getValue('id_employee'))) {
             $this->addJqueryUI('ui.sortable');
             $this->addjqueryPlugin('fancybox');

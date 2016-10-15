@@ -1,0 +1,30 @@
+
+[{shop_url}] 
+
+Hallo {firstname} {lastname},
+
+Bedankt voor het aanmaken van uw klantaccount bij {shop_name}. 
+
+Hier zijn uw aanmeldgegevens
+
+E-MAILADRES: {email}
+
+WACHTWOORD: {passwd} 		 
+
+Belangrijke veiligheidstips
+
+* Bewaar uw accountgegevens op een veilige plaats.
+
+* Verstrek uw aanmeldgegevens nooit aan derden.
+
+* Wijzig uw wachtwoord regelmatig.
+
+* Als u vermoedt dat iemand anders uw account illegaal gebruikt,
+neem dan onmiddellijk contact met ons op.
+
+U kunt nu bestellingen op onze website plaatsen: {shop_name}
+[{shop_url}] 
+
+{shop_name} [{shop_url}] gebouwd met
+PrestaShop(tm) [http://www.prestashop.com/] 
+

@@ -1,6 +1,6 @@
 <?php
 /**
-* 2007-2015 PrestaShop
+* 2007-2016 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author    PrestaShop SA <contact@prestashop.com>
-*  @copyright 2007-2015 PrestaShop SA
+*  @copyright 2007-2016 PrestaShop SA
 *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -45,7 +45,7 @@ class CronJobs extends Module
 	{
 		$this->name = 'cronjobs';
 		$this->tab = 'administration';
-		$this->version = '1.3.2';
+		$this->version = '1.3.4';
 		$this->module_key = '';
 
 		$this->controllers = array('callback');
@@ -106,8 +106,12 @@ class CronJobs extends Module
 			Configuration::updateValue('CRONJOBS_MODULE_VERSION', $this->version);
 			Configuration::updateValue('CRONJOBS_ADMIN_DIR', Tools::encrypt($this->getAdminDir()));
 
+
 			if (Configuration::get('CRONJOBS_MODE') == 'webservice')
+            {
+                $this->updateWebservice(true);
 				return $this->enableWebservice();
+            }
 			return $this->disableWebservice();
 		}
 	}
@@ -321,7 +325,8 @@ class CronJobs extends Module
 		{
 			$query = 'INSERT INTO '._DB_PREFIX_.'cronjobs
 				(`description`, `task`, `hour`, `day`, `month`, `day_of_week`, `updated_at`, `one_shot`, `active`, `id_shop`, `id_shop_group`)
-				VALUES (\''.$description.'\', \''.urlencode($task).'\', \'0\', \''.CronJobs::EACH.'\', \''.CronJobs::EACH.'\', \''.CronJobs::EACH.'\',
+				VALUES (\''. Db::getInstance()->escape($description) .'\', \'' .
+                urlencode($task) . '\', \'0\', \''.CronJobs::EACH.'\', \''.CronJobs::EACH.'\', \''.CronJobs::EACH.'\',
 					NULL, TRUE, TRUE, '.$id_shop.', '.$id_shop_group.')';
 
 			return Db::getInstance()->execute($query);
@@ -343,7 +348,8 @@ class CronJobs extends Module
 			{
 				$query = 'INSERT INTO '._DB_PREFIX_.'cronjobs
 					(`description`, `task`, `hour`, `day`, `month`, `day_of_week`, `updated_at`, `one_shot`, `active`, `id_shop`, `id_shop_group`)
-					VALUES (\''.$description.'\', \''.urlencode($task).'\', \''.$hour.'\', \''.$day.'\', \''.$month.'\', \''.$day_of_week.'\',
+					VALUES (\''.  Db::getInstance()->escape($description) .'\', \'' .
+                    urlencode($task)  . '\', \''.$hour.'\', \''.$day.'\', \''.$month.'\', \''.$day_of_week.'\',
 						NULL, TRUE, TRUE, '.$id_shop.', '.$id_shop_group.')';
 
 				return Db::getInstance()->execute($query);
@@ -366,7 +372,7 @@ class CronJobs extends Module
 		if (isset($_SERVER['REMOTE_ADDR']) === false)
 			return true;
 
-		return in_array(Tools::getRemoteAddr(), array('127.0.0.1', '::1'));
+		return in_array(Tools::getRemoteAddr(), array('127.0.0.1', '::1')) || preg_match('/^172\.16\.|^192\.168\.|^10\.|^127\.|^localhost|\.local$/', Configuration::get('PS_SHOP_DOMAIN'));
 	}
 
 	protected function renderForm($form, $form_values, $action, $cancel = false, $back_url = false, $update = false)
@@ -443,7 +449,7 @@ class CronJobs extends Module
 	{
 		if ($this->isNewJobValid() == true)
 		{
-			$description = Tools::getValue('description');
+			$description = Db::getInstance()->escape(Tools::getValue('description'));
 			$task = urlencode(Tools::getValue('task'));
 			$hour = (int)Tools::getValue('hour');
 			$day = (int)Tools::getValue('day');
@@ -479,7 +485,7 @@ class CronJobs extends Module
 		if (Tools::isSubmit('id_cronjob') == false)
 			return false;
 
-		$description = Tools::getValue('description');
+		$description = Db::getInstance()->escape(Tools::getValue('description'));
 		$task = urlencode(Tools::getValue('task'));
 		$hour = (int)Tools::getValue('hour');
 		$day = (int)Tools::getValue('day');
@@ -647,6 +653,10 @@ class CronJobs extends Module
 
 	protected function updateWebservice($use_webservice)
 	{
+		if ($this->isLocalEnvironment() == true) {
+			return true;
+		}
+
 		$link = new Link();
 		$admin_folder = $this->getAdminDir();
 		$path = Tools::getShopDomainSsl(true, true).__PS_BASE_URI__.$admin_folder;
@@ -664,6 +674,7 @@ class CronJobs extends Module
 
 		$context_options = array('http' => array(
 			'method' => (is_null($webservice_id) == true) ? 'POST' : 'PUT',
+			'header'  => 'Content-type: application/x-www-form-urlencoded',
 			'content' => http_build_query($data)
 		));
 
@@ -676,8 +687,6 @@ class CronJobs extends Module
 			return true;
 		elseif (((Tools::isSubmit('install') == false) || (Tools::isSubmit('reset') == false)) && ((bool)$result == false))
 			return $this->setErrorMessage('An error occurred while trying to contact PrestaShop\'s cron tasks webservice.');
-		elseif ($this->isLocalEnvironment() == true)
-			return true;
 
 		if ((bool)$use_webservice == true)
 			return $this->setSuccessMessage('Your cron tasks have been successfully added to PrestaShop\'s cron tasks webservice.');

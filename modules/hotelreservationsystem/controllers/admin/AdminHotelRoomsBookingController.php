@@ -11,15 +11,13 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
 
 		parent::__construct();
 
-		// unset($_COOKIE['id_guest']);
-		// unset($_COOKIE['id_cart']);
-
+		//unset($_COOKIE['wk_id_guest']);
+		//unset($_COOKIE['wk_id_cart']);
 		$this->setPhpCookieData();
 	}
 
 	public function setPhpCookieData()
 	{
-
 		if (!isset($_COOKIE['wk_id_guest']) || !$_COOKIE['wk_id_guest']) 
 		{
 			if (!isset($this->context->cookie->id_guest)) 
@@ -34,7 +32,7 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
 		}
 		$guest = new Guest($this->context->cookie->id_guest);
 		
-		if (!isset($_COOKIE['wk_id_cart']) && !isset($this->context->cart->id) || !$_COOKIE['wk_id_guest']) 
+		if (!isset($_COOKIE['wk_id_cart']) && !isset($this->context->cart->id)) 
 		{
 			$cart = new Cart();
 			
@@ -194,6 +192,7 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
 					$cal_date_to = date('Y-m-d', strtotime($cal_date_from)+ 86400);
 
 					$booking_calendar_data[$cal_date_from] = $obj_booking_dtl->getBookingData($cal_date_from, $cal_date_to, $hotel_id, $room_type, $adult, $children, $num_rooms, 1, 1, 1, 1, 1, $id_cart, $id_guest, 1);
+
 					$start_date = date('Y-m-d', strtotime($start_date)+ 86400);
 				}
 				if ($num_rooms <= $booking_data['stats']['num_avail'])
@@ -214,8 +213,8 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
 		$all_room_type = $obj_rm_type->getRoomTypeByHotelId($hotel_id, Configuration::get('PS_LANG_DEFAULT'));
 
 		$rms_in_cart = $obj_cart_book_data->getCountRoomsInCart($id_cart, $id_guest);
-		$date_from = date("d M Y", strtotime($date_from));
-	    $date_to = date("d M Y", strtotime($date_to));
+		$date_from = date("d-m-Y", strtotime($date_from));
+	    $date_to = date("d-m-Y", strtotime($date_to));
 		$currency = new Currency((int)Configuration::get('PS_CURRENCY_DEFAULT'));
 
 		$this->tpl_view_vars = array(

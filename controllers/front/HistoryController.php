@@ -42,6 +42,7 @@ class HistoryControllerCore extends FrontController
             _THEME_JS_DIR_.'history.js',
             _THEME_JS_DIR_.'tools.js' // retro compat themes 1.5
         ));
+        $this->addJqueryPlugin(array('fancybox')); //fancybox not found for some client theme
         $this->addJqueryPlugin(array('scrollTo', 'footable', 'footable-sort'));
     }
 

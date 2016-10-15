@@ -1,0 +1,27 @@
+
+[{shop_url}] 
+
+Hola {firstname} {lastname},
+
+Gràcies per la vostra comanda amb la referència {order_name} a
+{shop_name}. 
+
+Malauradament, un o més articles actualment no estan en estoc.
+Això pot causar un retard en el vostre lliurament. Si us plau,
+accepteu les nostres disculpes, estrem treballant per tal de corregir
+la situació. 
+
+Podeu revisar la vostra comanda i descarregar la vostra factura
+des de la secció "Historial de comandes"
+[{history_url}] del vostre compte de client clicant a
+"El meu compte" [{my_account_url}] a la nostra
+botiga. 
+
+Si teniu un compte de convidat, podeu seguir l'evolució de la
+comanda a la secció "Seguiment de convidat"
+[{guest_tracking_url}?id_order={order_name}] de la
+nostra botiga. 
+
+{shop_name} [{shop_url}] desenvolupat amb
+PrestaShop(tm) [http://www.prestashop.com/] 
+

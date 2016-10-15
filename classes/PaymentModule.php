@@ -219,6 +219,19 @@ abstract class PaymentModuleCore extends Module
 			$order_creation_failed = false;
 			$cart_total_paid = (float)Tools::ps_round((float)$this->context->cart->getOrderTotal(true, Cart::BOTH), 2);
 
+			/* Total cart total in case of Advance Payment By webkul*/
+			$freeAdvancePaymentOrder = false;
+	        if (Module::isInstalled('hotelreservationsystem')) 
+	        {
+	            require_once (_PS_MODULE_DIR_.'hotelreservationsystem/define.php');
+	            $obj_adv_pmt = new HotelAdvancedPayment();
+	            $freeAdvancePaymentOrder = $obj_adv_pmt->_checkFreeAdvancePaymentOrder();
+	            if ($freeAdvancePaymentOrder) {
+	            	$cart_total_paid = 0;
+	            }
+	        }
+	        /*END*/
+
 			foreach ($cart_delivery_option as $id_address => $key_carriers)
 				foreach ($delivery_option_list[$id_address][$key_carriers]['carrier_list'] as $id_carrier => $data)
 					foreach ($data['package_list'] as $id_package)
@@ -1056,7 +1069,8 @@ abstract class PaymentModuleCore extends Module
 
 					if (isset($customer->id)) 
 					{
-						$cart_bk_data = $obj_cart_bk_data->getOnlyCartBookingData($order->id_cart, (new Cart($order->id_cart))->id_guest, $type_value['product_id'], $customer->id);
+						$cart_obj = new Cart($order->id_cart);
+						$cart_bk_data = $obj_cart_bk_data->getOnlyCartBookingData($order->id_cart, $cart_obj->id_guest, $type_value['product_id'], $customer->id);
 					}
 					else
 					{

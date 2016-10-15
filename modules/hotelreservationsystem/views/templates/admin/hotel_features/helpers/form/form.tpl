@@ -22,9 +22,11 @@
 					</div>
 					<div class="row child-features-container">
 						<div class="col-sm-12">
-						{foreach from=$value.children item=val}
-							<p>{l s={$val.name} mod='hotelreservationsyatem'}</p>
-						{/foreach}
+							{if isset($value.children) && $value.children}
+								{foreach from=$value.children item=val}
+									<p>{l s={$val.name} mod='hotelreservationsyatem'}</p>
+								{/foreach}
+							{/if}	
 						</div>
 					</div>
 				</div>
@@ -79,18 +81,18 @@
 					        <div id="accordion{$i}" class="accordion-section-content">
 					        	<table id="" class="table" style="max-width:100%">
 									<tbody>
-										{foreach from=$value.children item=val}
-											<tr>
-												<td class="border_top border_bottom border_bold">
-													<span class=""> {l s={$val.name} mod='hotelreservationsyatem'} </span>
-												</td>
-												<td style="">
-													<input name="hotel_fac[]" type="checkbox" value="{$val.id}" class="form-control" {if isset($edit) && $val.selected}checked='true'{/if}>
-												</td>
-											</tr>
-										{foreachelse}
-											<!-- code for foreachelse -->
-										{/foreach}
+										{if isset($value.children) && $value.children}
+											{foreach from=$value.children item=val}
+												<tr>
+													<td class="border_top border_bottom border_bold">
+														<span class=""> {l s={$val.name} mod='hotelreservationsyatem'} </span>
+													</td>
+													<td style="">
+														<input name="hotel_fac[]" type="checkbox" value="{$val.id}" class="form-control" {if isset($edit) && $val.selected}checked='true'{/if}>
+													</td>
+												</tr>
+											{/foreach}
+										{/if}	
 									</tbody>
 								</table>
 					        </div>

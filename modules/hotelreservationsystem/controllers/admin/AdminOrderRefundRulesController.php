@@ -12,20 +12,27 @@ class AdminOrderRefundRulesController extends ModuleAdminController
 		$this->context = Context::getContext();
 		$this->fields_list = array();
 
+		$payment_type = array(1 => 'Percentage', 0 => 'Fixed');
+
 		$this->fields_list = array(
 			'id' => array(
 				'title' => $this->l('ID'),
 				'align' => 'center',
+				'filter_key' => 'a!payment_type',
 			),
 			'payment_way' => array(
 				'title' => $this->l('Payment Type'),
 				'align' => 'center',
+				'type' => 'select',
+				'filter_key' => 'a!payment_type',
+                'list' => $payment_type,
 			),
 			'payment_amount_full_pay' => array(
 				'title' => $this->l('Full Payment Deduction Percentage/Amount'),
 				'align' => 'center',
 				'type' => 'price',
 				'currency' => true,
+				'filter_key' => 'a!deduction_value_full_pay',
 				'callback' => 'setOrderCurrency',
 			),
 			'payment_amount_adv_pay' => array(
@@ -33,6 +40,7 @@ class AdminOrderRefundRulesController extends ModuleAdminController
 				'align' => 'center',
 				'type' => 'price',
 				'currency' => true,
+				'filter_key' => 'a!deduction_value_adv_pay',
 				'callback' => 'setOrderCurrency',
 			),
 			'days' => array(
@@ -77,22 +85,18 @@ class AdminOrderRefundRulesController extends ModuleAdminController
 
 	public function renderForm() 
 	{
+		$obj_currency = new Currency(Configuration::get('PS_CURRENCY_DEFAULT'));
+		$currency_sign = (new Currency(Configuration::get('PS_CURRENCY_DEFAULT')))->sign;
 		if ($this->display == 'edit') 
 		{
 			$this->context->smarty->assign('edit',1);
 			$refund_rule_id = Tools::getValue('id');
 			$htl_order_refund_rules_obj = new HotelOrderRefundRules();
 			$htl_order_refund_rules = $htl_order_refund_rules_obj->OrderRefundRuleById($refund_rule_id);
-			
-			$currency_sign = (new Currency(Configuration::get('PS_CURRENCY_DEFAULT')))->sign;
 			$this->context->smarty->assign('defaultcurrency_sign',$currency_sign);
 			$this->context->smarty->assign('refund_rules_info',$htl_order_refund_rules);
 		}
-		else
-		{
-			$currency_sign = (new Currency(Configuration::get('PS_CURRENCY_DEFAULT')))->sign;
-			$this->context->smarty->assign('defaultcurrency_sign',$currency_sign);
-		}
+		$this->context->smarty->assign('defaultcurrency_sign',$currency_sign);
 
 		$this->fields_form = array(
 				'submit' => array(

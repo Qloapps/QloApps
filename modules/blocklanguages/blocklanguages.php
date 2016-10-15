@@ -33,7 +33,7 @@ class BlockLanguages extends Module
 	{
 		$this->name = 'blocklanguages';
 		$this->tab = 'front_office_features';
-		$this->version = '1.4.0';
+		$this->version = '1.5.0';
 		$this->author = 'PrestaShop';
 		$this->need_instance = 0;
 
@@ -46,7 +46,10 @@ class BlockLanguages extends Module
 
 	public function install()
 	{
-		return (parent::install() && $this->registerHook('displayNav') && $this->registerHook('displayHeader'));
+		return (parent::install() 
+				&& $this->registerHook('displayFooterMostLeftBlock') 
+				&& $this->registerHook('displayHeader')
+			);
 	}
 
 	protected function _prepareHook($params)
@@ -104,7 +107,16 @@ class BlockLanguages extends Module
 
 	public function hookDisplayNav($params)
 	{
+		return $this->hookDisplayTop($params);
+	}
 
+	public function hookDisplayTopSubPrimaryBlock($params)
+	{
+		return $this->hookDisplayTop($params);
+	}
+
+	public function hookDisplayFooterMostLeftBlock($params)
+	{
 		return $this->hookDisplayTop($params);
 	}
 

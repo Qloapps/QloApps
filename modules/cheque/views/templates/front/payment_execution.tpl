@@ -26,7 +26,7 @@
 {capture name=path}
 	<a href="{$link->getPageLink('order', true, NULL, "step=3")|escape:'html':'UTF-8'}" title="{l s='Go back to the Checkout' mod='cheque'}">{l s='Checkout' mod='cheque'}</a><span class="navigation-pipe">{$navigationPipe}</span>{l s='Check payment' mod='cheque'}
 {/capture}
-
+{include file="$tpl_dir./errors.tpl"}
 {include file="$tpl_dir./breadcrumb.tpl"}
 
 <h2>{l s='Order summary' mod='cheque'}</h2>
@@ -75,7 +75,10 @@
 		<b>{l s='Please confirm your order by clicking \'I confirm my order\'.' mod='cheque'}</b>
 	</p>
 	<p class="cart_navigation" id="cart_navigation">
-		<input type="submit" value="{l s='I confirm my order' mod='cheque'}" class="exclusive_large"/>
+		{*By webkul To Check Order restrict condition before Payment by the customer*}
+		{if !isset($error_max_order_date) && !$error_max_order_date}
+			<input type="submit" value="{l s='I confirm my order' mod='cheque'}" class="exclusive_large"/>
+		{/if}
 		<a href="{$link->getPageLink('order', true, NULL, "step=3")|escape:'html'}" class="button_large">{l s='Other payment methods' mod='cheque'}</a>
 	</p>
 </form>

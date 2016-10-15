@@ -23,7 +23,9 @@
 *  International Registered Trademark & Property of PrestaShop SA
 *}
 <script type="text/javascript">
-	var id_cart = {$cart->id|intval};
+	{if isset($cart->id) && $cart->id}
+		var id_cart = {$cart->id|intval};
+	{/if}
 	var id_customer = 0;
 	var admin_order_tab_link = "{$link->getAdminLink('AdminOrders')|addslashes}";
 	var changed_shipping_price = false;
@@ -121,7 +123,7 @@
 				$('#voucher').val(data.name);
 				add_cart_rule(data.id_cart_rule);
 			});
-		{if $cart->id}
+		{if isset($cart->id) && $cart->id}
 			setupCustomer({$cart->id_customer|intval});
 			useCart('{$cart->id|intval}');
 		{/if}
@@ -568,8 +570,10 @@
 		$('#summary_part').show();
 		var address_link = $('#new_address').attr('href');
 		id_customer = idCustomer;
-		//id_cart = 0;
-		id_cart = "{$cart->id}";
+		id_cart = 0;
+		{if isset($cart->id) && $cart->id}
+			id_cart = "{$cart->id}";
+		{/if}	
 		$('#new_address').attr('href', address_link.replace(/id_customer=[0-9]+/, 'id_customer='+id_customer));
 		$.ajax({
 			type:"POST",
@@ -1163,7 +1167,7 @@
 
 <div class="leadin">{block name="leadin"}{/block}</div>
 {include file='controllers/orders/current_cart_details_data.tpl'}
-	<div class="panel form-horizontal" id="customer_part">
+	<div class="panel form-horizontal" id="customer_part" {if isset($is_order_created) && $is_order_created}style="display:none;"{/if}>
 		<div class="panel-heading">
 			<i class="icon-user"></i>
 			{l s='Customer'}
@@ -1197,7 +1201,7 @@
 		<div class="row">
 			<div id="customers"></div>
 		</div>
-		<!-- <div id="carts">
+		{*<div id="carts">
 			<button type="button" id="show_old_carts" class="btn btn-default pull-right" data-toggle="collapse" data-target="#old_carts_orders">
 				<i class="icon-caret-down"></i>
 			</button>
@@ -1249,7 +1253,7 @@
 					</table>
 				</div>
 			</div>
-		</div> --><!-- by webkul to hide unnessesary content -->
+		</div> -->*}<!-- by webkul to hide unnessesary content -->
 	</div>
 
 <form class="form-horizontal" action="{$link->getAdminLink('AdminOrders')|escape:'html':'UTF-8'}&amp;submitAdd{$table|escape:'html':'UTF-8'}=1" method="post" autocomplete="off" style="display:none" id="cart_detail_form">
@@ -1261,7 +1265,7 @@
 		<div class="form-group">
 			<input type="hidden" value="{$cart->id}" id="id_cart" name="id_cart" />
 		</div>
-		<!-- <div class="form-group">
+		{*<div class="form-group">
 			<label class="control-label col-lg-3">
 				<span title="" data-toggle="tooltip" class="label-tooltip" data-original-title="{l s='Search for an existing product by typing the first letters of its name.'}">
 					{l s='Search for a product'}
@@ -1283,7 +1287,7 @@
 			<div id="product_list" class="form-group"></div>
 			<div id="attributes_list" class="form-group"></div> -->
 			<!-- @TODO: please be kind refacto -->
-			<!-- <div class="form-group">
+			<div class="form-group">
 				<div class="col-lg-9 col-lg-offset-3">
 					<iframe id="customization_list" seamless>
 						<html>
@@ -1344,7 +1348,7 @@
 			<div class="col-lg-9 col-lg-offset-3">
 				<div class="alert alert-warning">{l s='The prices are without taxes.'}</div>
 			</div>
-		</div> --><!-- by webkul to hide unnessesary content -->
+		</div> *}<!-- by webkul to hide unnessesary content -->
 
 
 		<div class="form-group">

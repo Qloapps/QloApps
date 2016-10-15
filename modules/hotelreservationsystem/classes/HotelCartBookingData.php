@@ -159,6 +159,20 @@
 				return false;
 		}
 
+		/**
+		 * [getCartCurrentDataByCartId :: To get booking information of the cart by Order id]
+		 * @param  [int] $id_order [Id of the order]
+		 * @return [array|false]  [If data found Returns the array containing the information of the cart of the passed order id else returns false]
+		 */
+		public function getCartCurrentDataByOrderId($id_order)
+		{
+			$result = Db::getInstance()->executeS("SELECT * FROM `"._DB_PREFIX_."htl_cart_booking_data` WHERE `id_order`=".$id_order);
+			if ($result)
+				return $result;
+			else
+				return false;
+		}
+
 		/*public function deleteRowHotelCustomerCartDetail($id)
 		{
 			$deleted = Db::getInstance()->delete('htl_cart_booking_data','id='.$id);
@@ -412,15 +426,19 @@
 				foreach ($cart_detail_data as $key => $value)
 				{
 					$product_image_id = Product::getCover($value['id_product']);
-					$link_rewrite = ((new Product((int) $value['id_product'], Configuration::get('PS_LANG_DEFAULT')))->link_rewrite[Configuration::get('PS_LANG_DEFAULT')]);
+
+					$productObj = new Product((int)$value['id_product'], false, (int)Configuration::get('PS_LANG_DEFAULT'));
+
+					$link_rewrite = $productObj->link_rewrite;
 
 					if ($product_image_id)
 						$cart_detail_data[$key]['image_link'] = $context->link->getImageLink($link_rewrite, $product_image_id['id_image'], 'small_default');
 					else
 						$cart_detail_data[$key]['image_link'] = $context->link->getImageLink($link_rewrite, $context->language->iso_code."-default", 'small_default');
 
-					$cart_detail_data[$key]['room_type'] = (new Product((int) $value['id_product']))->name[Configuration::get('PS_LANG_DEFAULT')];
-					$cart_detail_data[$key]['room_num'] = (new HotelRoomInformation((int) $value['id_room']))->room_num;
+					$cart_detail_data[$key]['room_type'] = $productObj->name;
+					$obj_htl_room_info = new HotelRoomInformation((int) $value['id_room']);
+					$cart_detail_data[$key]['room_num'] = $obj_htl_room_info->room_num;
 					$cart_detail_data[$key]['date_from'] = $value['date_from'];
 					$cart_detail_data[$key]['date_to'] = $value['date_to'];
 
@@ -445,5 +463,19 @@
 			if ($update_currency)
 				return true;
 			return false;
+		}
+
+		/**
+		 * [deleteRoomFromOrder : Deletes a row from the table with the supplied conditions]
+		 * @param  [int] $id_order  [Id of the order]
+		 * @param  [int] $id_room   [id_of the room]
+		 * @param  [date] $date_from [Start date of the booking]
+		 * @param  [date] $date_to   [End date of the booking]
+		 * @return [Boolean]            [True if deleted else false]
+		 */
+		public function deleteOrderedRoomFromCart($id_order, $id_hotel, $id_room, $date_from, $date_to)
+		{
+			$delete = Db::getInstance()->delete("htl_cart_booking_data", "`id_order`=".(int)$id_order." AND `id_hotel`=".(int)$id_hotel." AND `id_room`=".(int)$id_room." AND `date_from`='$date_from' AND `date_to`='$date_to'");
+			return $delete;
 		}
 	}

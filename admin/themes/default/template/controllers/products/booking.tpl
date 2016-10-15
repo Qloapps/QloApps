@@ -166,15 +166,15 @@
 									<tr>
 										<td>{$data_v['room_num']}</td>
 										<td>
-											{if $data_v['booking_status'] == 2}
+											{if $data_v['detail'][0]['booking_status'] == 1}
 												{l s='Alloted' mod='hotelreservationsystem'}
-											{elseif $data_v['booking_status'] == 3}
+											{elseif $data_v['detail'][0]['booking_status'] == 2}
 												{l s='Checked-in' mod='hotelreservationsystem'}
-											{elseif $data_v['booking_status'] == 4}
+											{elseif $data_v['detail'][0]['booking_status'] == 3}
 												{l s='Checked-out' mod='hotelreservationsystem'}
 											{/if}
 										</td>
-										<td>{$data_v['comment']}</td>
+										<td>{$data_v['detail'][0]['comment']}</td>
 									</tr>
 								{/foreach}
 							{elseif ($b_key == 'partially_available') && !empty($b_val)}
@@ -215,7 +215,8 @@ $(document).ready(function()
 	        $(".hotel_date").datepicker(
 	        {
 	            defaultDate: new Date(),
-	            dateFormat: 'yy-mm-dd',
+	            dateFormat: 'dd-mm-yy',
+	            minDate: 0,
 	            onChangeMonthYear: function(year, month)
 	            {
 	                if (check_calendar_var)
@@ -285,7 +286,9 @@ $(document).ready(function()
 	    {
 	    	$(".hotel_date").datepicker(
 	        {
-	            dateFormat: 'yy-mm-dd'
+	            defaultDate: new Date(),
+	            dateFormat: 'dd-mm-yy',
+	            minDate: 0,
 	        });
 	    }
 	}

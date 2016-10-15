@@ -64,7 +64,7 @@
 					</td>
 					<td class="product center">
 						<p class="text-center">
-							{displayPrice currency=$order->id_currency price=$data_v['unit_price']}
+							{displayPrice currency=$order->id_currency price=$data_v['unit_price_tax_excl']}
 						</p>
 					</td>
 					<td class="product center">

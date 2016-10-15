@@ -329,11 +329,16 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
 			$customer = new Customer($this->order->id_customer);
 			if (!empty($products)) 
 			{
+				$processed_product = array();
 				$refunded_rooms = 0;
 				$cart_bk_data=array();
 
 				foreach ($products as $type_key => $type_value) 
 				{
+					if (in_array($type_value['product_id'], $processed_product))
+						continue;
+					$processed_product[] = $type_value['product_id'];
+
 					$product = new Product($type_value['product_id'], false, $this->context->language->id);
 					$order_prod_dtl = $obj_htl_bk_dtl->getPsOrderDetailsByProduct($product->id, $this->order->id);
 
@@ -346,24 +351,35 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
 
 					if (isset($customer->id)) 
 					{
-						$cart_bk_data = $obj_cart_bk_data->getOnlyCartBookingData($this->order->id_cart, (new Cart($this->order->id_cart))->id_guest, $type_value['product_id'], $customer->id);
+						$cart_obj = new Cart($this->order->id_cart);
+						$order_bk_data = $obj_htl_bk_dtl->getOnlyOrderBookingData($this->order->id, $cart_obj->id_guest, $type_value['product_id'], $customer->id);
 					}
 					else
 					{
-						$cart_bk_data = $obj_cart_bk_data->getOnlyCartBookingData($this->order->id_cart, $customer->id_guest, $type_value['product_id']);
+						$order_bk_data = $obj_htl_bk_dtl->getOnlyOrderBookingData($this->order->id, $customer->id_guest, $type_value['product_id']);
 					}
 					$rm_dtl = $obj_rm_type->getRoomTypeInfoByIdProduct($type_value['product_id']);
 
 					$cart_htl_data[$type_key]['id_product'] = $type_value['product_id'];
 					$cart_htl_data[$type_key]['cover_img'] 	= $cover_img;
-					$cart_htl_data[$type_key]['name'] 		= $product->name;
-					$cart_htl_data[$type_key]['unit_price'] = $order_prod_dtl['unit_price_tax_excl'];
 					$cart_htl_data[$type_key]['adult'] 		= $rm_dtl['adult'];
 					$cart_htl_data[$type_key]['children']	= $rm_dtl['children'];
 
-					foreach ($cart_bk_data as $data_k => $data_v) 
+					foreach ($order_bk_data as $data_k => $data_v) 
 					{
 						$date_join = strtotime($data_v['date_from']).strtotime($data_v['date_to']);
+
+						/*Product price when order was created*/
+						$order_details_obj = new OrderDetail($data_v['id_order_detail']);
+						$unit_price_tax_excl = 0;
+						$unit_price_tax_incl = 0;
+						$unit_price_tax_excl = $order_details_obj->unit_price_tax_excl;
+						$unit_price_tax_incl = $order_details_obj->unit_price_tax_incl;
+						$prod_ord_dtl_name = $order_details_obj->product_name;
+						$cart_htl_data[$type_key]['name'] = $prod_ord_dtl_name;
+
+						$cart_htl_data[$type_key]['unit_price_tax_excl'] = $unit_price_tax_excl;
+						$cart_htl_data[$type_key]['unit_price_tax_incl'] = $unit_price_tax_incl;
 						//work on entring refund data
 						$obj_ord_ref_info = new HotelOrderRefundInfo();
 						$ord_refnd_info = $obj_ord_ref_info->getOderRefundInfoByIdOrderIdProductByDate($this->order->id, $type_value['product_id'], $data_v['date_from'], $data_v['date_to']);
@@ -389,7 +405,7 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
 							$num_days = $cart_htl_data[$type_key]['date_diff'][$date_join]['num_days'];
 							$vart_quant = (int)$cart_htl_data[$type_key]['date_diff'][$date_join]['num_rm'] * $num_days;
 
-							$amount = $order_prod_dtl['unit_price_tax_excl'];
+							$amount = $unit_price_tax_excl;
 							$amount *= $vart_quant;
 
 							$cart_htl_data[$type_key]['date_diff'][$date_join]['amount'] = $amount;
@@ -406,7 +422,7 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
 							$cart_htl_data[$type_key]['date_diff'][$date_join]['data_form'] = $data_v['date_from'];
 							$cart_htl_data[$type_key]['date_diff'][$date_join]['data_to'] = $data_v['date_to'];
 							$cart_htl_data[$type_key]['date_diff'][$date_join]['num_days'] = $num_days;
-							$amount = $order_prod_dtl['unit_price_tax_excl'];
+							$amount = $unit_price_tax_excl;
 							$amount *= $num_days;
 							
 							$cart_htl_data[$type_key]['date_diff'][$date_join]['amount'] = $amount;
@@ -425,7 +441,6 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
 					$this->smarty->assign('order_adv_dtl', $order_adv_dtl);
 			}
 		}
-
 		$data = array(
 			'cart_htl_data' => $cart_htl_data,
 			'refunded_rooms' => $refunded_rooms,

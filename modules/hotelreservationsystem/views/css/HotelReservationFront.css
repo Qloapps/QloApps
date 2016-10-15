@@ -1,0 +1,82 @@
+/* ===== headerHotelDescBlock.tpl ===== */
+.header-desc-container {
+	bottom: 0;
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+    z-index: -10;
+    /*height: 100%;*/
+}
+.header-desc-wrapper  {
+	display: table;
+    height: 100%;
+    width: 100%;
+}
+.header-desc-primary {
+	display: table-cell;
+    vertical-align: middle;
+    text-align: center;
+    color: #FFFFFF;
+}
+.header-desc-welcome{
+	font-size: 18px;
+	font-weight: 300;
+	margin: 0;
+}
+
+.header-desc-primary hr {
+    margin-bottom: 10px;
+}
+
+.heasder-desc-hr-first {
+    width: 42px;
+    margin-top: 10px;
+}
+
+.header-hotel-name {
+	font-size: 55px;
+	font-weight: 400;
+	margin-top: 5px;
+    margin-bottom: 25px;
+}
+
+.header-hotel-desc {
+	font-size: 400;
+	font-size: 18px;
+    line-height: 24px;
+}
+
+.heasder-desc-hr-second {
+    width: 190px;
+    margin-top: 30px;
+}
+
+@media (max-width: 767px) {
+.topSubSecondaryBlock {
+    margin-top: 0px; } }
+
+/* ===== headerHotelDescBlock.tpl ===== */
+
+.copyRightWrapper {
+    background-color: #242424;
+    padding: 30px;
+}
+.copyRightWrapper p {
+    color: #868686;
+    font-size: 16px;
+    font-weight: 400;
+    margin: 0;
+    text-align: center;
+}
+
+.copyRightWrapper {
+    background-color: #242424;
+    padding: 30px;
+    width: 100%; }
+    .copyRightWrapper .copyRight {
+        color: #868686;
+        font-size: 16px;
+        margin: 0;
+        text-align: center;
+        line-height: 23px; }

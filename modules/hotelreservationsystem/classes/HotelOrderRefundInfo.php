@@ -64,4 +64,11 @@
         return false;
     }
 
+    public function deleteOrderedRoomRefundInfo($id_order, $id_product, $date_from, $date_to)
+    {
+        $delete = Db::getInstance()->delete('htl_order_refund_info', '`id_order`='.(int) $id_order.' AND `id_product`='.(int) $id_product." AND `date_from`='$date_from' AND `date_to`='$date_to'");
+
+        return $delete;
+    }
+
   }

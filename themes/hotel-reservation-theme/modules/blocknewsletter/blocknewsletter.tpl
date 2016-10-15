@@ -24,38 +24,25 @@
 *}
 
 <!-- Block Newsletter module-->
-<div id="newsletter_block_left" class="col-xs-12 col-sm-6 col-lg-4">
-        <!-- <div class="col-sm-6 col-md-3 hotel_contact text-center">{l s='Call Us : ' mod='blocknewsletter'} {if isset($hotel_global_contact_num) && hotel_global_contact_num}{$hotel_global_contact_num}{/if}</div>
-        <div class="col-sm-6 col-md-4 hotel_email text-center">
-        {l s='Email : ' mod='blocknewsletter'}{if isset($hotel_global_email) && hotel_global_email}{$hotel_global_email}{/if}
-        </div> -->
-        <div class="block_content">
+<div class="row">
+    <section class="col-xs-12 col-sm-12">
+        <div class="row margin-lr-0 footer-section-heading">
+            <p>{l s='GET NOTIFICATIONS' mod='blocknewsletter'}</p>
+            <hr/>
+        </div>
+        <div class="row margin-lr-0">
             <form action="{$link->getPageLink('index', null, null, null, false, null, true)|escape:'html':'UTF-8'}" method="post">
                 <div class="form-group{if isset($msg) && $msg } {if $nw_error}form-error{else}form-ok{/if}{/if}" >
-                    <input placeholder="{l s='Enter E-mail for NewsLetter' mod='blocknewsletter'}" class="inputNew form-control grey newsletter-input" id="newsletter-input" type="text" name="email" size="18" value="{if isset($msg) && $msg}{$msg}{elseif isset($value) && $value}{$value}{/if}" />
-                    <button type="submit" name="submitNewsletter" id="submitNewsletter" class="btn btn-default submitNewsletter">
-                        <span>{l s='Send' mod='blocknewsletter'}</span>
+                    <input class="inputNew form-control grey newsletter-input" id="newsletter-input" type="text" name="email" size="18" value="{if isset($msg) && $msg}{$msg}{elseif isset($value) && $value}{$value}{else}{l s='Enter your e-mail' mod='blocknewsletter'}{/if}" />
+                    <button type="submit" name="submitNewsletter" class="btn button button-medium newsletter-btn">
+                        <span>{l s='Subscribe' mod='blocknewsletter'}</span>
                     </button>
                     <input type="hidden" name="action" value="0" />
                 </div>
             </form>
-        </div> 
-        <!-- <div class="row margin-lr-0 visible-sm" style="clear:both;">
-            <div class="col-sm-12">
-                <div class="block_content">
-                    <form action="{$link->getPageLink('index', null, null, null, false, null, true)|escape:'html':'UTF-8'}" method="post">
-                        <div class="form-group{if isset($msg) && $msg } {if $nw_error}form-error{else}form-ok{/if}{/if}" >
-                            <input placeholder="{l s='Enter E-mail for NewsLetter' mod='blocknewsletter'}" class="inputNew form-control grey newsletter-input" id="newsletter-input" type="text" name="email" size="18" value="{if isset($msg) && $msg}{$msg}{elseif isset($value) && $value}{$value}{/if}" />
-                            <button type="submit" name="submitNewsletter" id="submitNewsletter" class="btn btn-default submitNewsletter">
-                                <span>{l s='Send' mod='blocknewsletter'}</span>
-                            </button>
-                            <input type="hidden" name="action" value="0" />
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div> -->
-    {hook h="displayBlockNewsletterBottom" from='blocknewsletter'}
+        </div>
+        {hook h="displayBlockNewsletterBottom" from='blocknewsletter'}
+    </section>
 </div>
 <!-- /Block Newsletter module-->
 {strip}

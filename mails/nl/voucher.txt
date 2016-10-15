@@ -1,0 +1,16 @@
+
+[{shop_url}] 
+
+Hallo {firstname} {lastname}, 
+
+Een waardebon werd op uw naam aangemaakt als gevolg op uw bestelling
+met referentie {order_name}.
+
+WAARDEBON CODE: {voucher_num} ter waarde van {voucher_amount}
+
+Plaats bij uw volgende bestelling de code in uw winkelwagen voordat u
+de bestelling gaat betalen. 		 
+
+{shop_name} [{shop_url}] gebouwd met
+PrestaShop(tm) [http://www.prestashop.com/] 
+

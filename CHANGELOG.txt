@@ -1,0 +1,90 @@
+# Change Log previous version to V1.0.0:
+
+## Added Features:
+
+[+] Project : Theme has been improved.
+
+[+] FO : Order summary page design improved in case of advance payment
+
+[+] BO : Order Edit functionality is added.
+[+] BO : Order Restrict functionality is added.
+[+] BO : Order Edit id added.
+
+[+] MO : wkpaypaladaptive : Added Feature Admin can refund full transaction.
+[+] MO : wkpaypaladaptive : Order is created by IPN.
+[+] MO : Added wkhotelroom
+[+] MO : Added wkfooteraboutblock
+[+] MO : Added wkfooterexploreblock
+[+] MO : Added wkfooternotificationblock
+[+] MO : Added wkfooterpaymentblock
+[+] MO : hotelreservationsystem : Added Settings tab to centralize all configurations.
+
+
+## Improved/changed features:
+
+[+] Project : Theme has been improved.
+
+[*] FO : Fixed partial amount calculation issues in case of advance payment at order summary page.
+[*] FO : Room details page design has been improved.
+[*] FO : Room search results page design has been improved.
+[*] FO : Home page design has been improved.
+[*] FO : Contact page design has been improved.
+[*] FO : All pages design has been changed according to new theme.
+[*] FO : Theme Footer design has been improved. more modules are added to improve the view.
+
+[*] BO : Quantity tab from Catalog->products removed.
+[*] BO : Tab Catalog->Attachments removed.
+[*] BO : Tab Cart Rules is improved to make compatible for a hotel reservation system.
+[*] BO : Gift product functionality is removed from Cart Rules to make compatible for a hotel reservation system.
+[*] BO : Carrier selection functionality is removed from Cart Rules to make compatible for a hotel reservation system.
+[*] BO : Compatibility with other cart rules functionality is removed from Cart Rules to make compatible for a hotel reservation system.
+[*] BO : Product selection functionality is removed from Cart Rules to make compatible for a hotel reservation system.
+[*] BO : Free shipping functionality is removed from Cart Rules to make compatible for a hotel reservation system.
+[*] BO : Free shipping functionality is removed from Cart Rules to make compatible for a hotel reservation system.
+
+[*] MO : wkpaypaladaptive : Order is created by IPN.
+[*] MO : wkpaypaladaptive : Improved exception handling.
+[*] MO : wkpaypaladaptive : Configuration of the module moved to Hotel Reservation System -> Settings Tab.
+[*] MO : wkhotelfeaturesblock : Configuration of the module moved to Hotel Reservation System -> Settings Tab.
+[*] MO : wktestimonialblock : Configuration of the module moved to Hotel Reservation System -> Settings Tab.
+[*] MO : wkhotelfilterblock : Configuration of the module moved to Hotel Reservation System -> Settings Tab.
+[*] MO : wkroomsearchblock : design changed on home page.
+
+
+
+## Fixed bugs:
+
+[-] PROJECT : Fixed anonymous object creation issue on php version lower than 5.4 (feature does not support before php version 5.4).
+
+[-] Installer : Fixed changed mails for qloapps converted into prestashop default mails while installing the software.
+
+[-] FO : Fixed if 'Product Comment' module is uninstalled then showing error on each page at frontend where rating is shown.
+[-] FO : Fixed bug search is not working on iphones.
+[-] FO : Reservations of dates before today's date does not remove from Cart.
+[-] FO : Fixed bug search is not working on iphones.
+[-] FO : Fixed 'Total Order Cancellation' & 'Refund Request' button does not work on order confirmation page on some servers.
+[-] FO : Fixed in case when hotel is disabled and its rooms are enabled then showing error on room detail page.
+[-] FO : Fixed Contact us page at frontend is not working.
+[-] FO : Fixed link creation functions by creating them with objects created by sending id_lang also to their constructor.
+
+
+[-] BO : Fixed wrong "way of payment" issue regarding advance payment On Hotel Reservation System->Manage Order Refund Requests.
+[-] BO : Fixed wrong "way of payment" issue regarding advance payment On Hotel Reservation System->Manage Order Refund Requests.
+[-] BO : Fixed bug Cancellation charge is accepting the -ve value so the refund amount becomes more than total amount.
+[-] BO : Fixed view option is coming twice on manage order refund requests-> view page.
+[-] BO : Fixed Showing error 'Order->id_customer is empty' on admin order detail page after completing the order from backoffice.
+[-] BO : Fixed bug how number of times admin clicks add to cart button,same no. of times the room gets added into the cart from Hotel Reservation System->Book Now tab.
+[-] BO : Fixed issue if Tax is applied on the order even then Tax is shown 0 in admin order detail page.
+[-] BO : Fixed error if enter numeric data in child feature field while adding the new hotel feature on 'Manage Hotel Features' page.
+[-] BO : Fixed all filters on 'Manage hotel features page' are showing errors.
+[-] BO : Fixed all filters on Manage hotel page showing error.
+[-] BO : Fixed if deleting the hotels through 'bulk actions dropdown' then showing error.
+[-] BO : Fixed If set 'disable for 'enable hotel' option while adding the hotel showing error page.
+[-] BO : Fixed bug if update Order's room status(checking, allotted or checkout) all rooms status changed with same room number of same room type.
+[-] BO : Fixed bug if update Order's room status(checking, allotted or checkout) all rooms status changed with same room number of same room type.
+
+
+[-] MO : wktestimonialblock : Fixed while adding the image in valid format on configuration page then showing error page.
+[-] MO : wkpaypaladaptive : Fixed paypal is not working because paypal api has been changed.
+[-] MO : wkpaypaladaptive : Fixed fopen issues fixed, done by CURL.
+[-] MO : wkpaypaladaptive : Fixed payment negative value bug fixed.

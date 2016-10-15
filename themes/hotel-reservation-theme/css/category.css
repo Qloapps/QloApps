@@ -8,8 +8,8 @@
 .cat_cont
 {
     margin: 0px;
-    background-color: #F2F2F2;
-    border: 1px solid  #CCCCCC;
+    background-color: #ffffff;
+    border: 1px solid #E6E6E6;
     padding-top: 20px;
     padding-bottom: 20px;
 }
@@ -19,19 +19,21 @@
     margin-top: 7px;
 }
 
-.top_filter_cont
-{
-    margin-bottom: 15px;
-}
+.catSortBlock {
+    margin-bottom: 15px; }
+    .catSortBlock .filter_dw_cont {
+        position: relative; }
+        .catSortBlock .filter_dw_cont .dropdown-menu {
+            left: 0;
+        }
 
-.sort_by
+.sortBlockHeading
 {
-    font-size: 16px;
-    color: #505050;
-    font-weight: 700;
-    font-family: 'PT Serif', serif;
-    text-align: left;
+    color: #333333;
+    font-size: 14px;
+    font-weight: 400;
     margin-top: 8px;
+    text-align: left;
 }
 
 .disp_type_cont
@@ -44,7 +46,6 @@
 {
     width: 100%;
     text-align: left;
-    box-shadow: 0px 1px 6px #828282;
 }
 
 .display_type
@@ -58,25 +59,29 @@
 
 .room_cont
 {
-    border-top: 1px solid #ffffff;
+    border-top: 1px solid #E6E6E6;
     padding-top: 30px;
     margin-bottom: 30px;
+}
+.room_cont .btn.btn-default.button.button-medium {
+    transform: translate(0px, 6px);
 }
 
 .rm_heading
 {
-    font-size: 20px;
-    color: #3C3C3C;
-    font-weight: 700;
-    font-family: 'PT Serif', serif;
+    color: #333333;
+    font-size: 32px;
+    font-weight: 400;
+    line-height: 25px;
+    margin-bottom: 10px;
 }
 
 .rm_desc
 {
+    line-height: 22px;
+    color: #555555;
     font-size: 16px;
-    color: #3C3C3C;
     font-weight: 400;
-    font-family: 'PT Serif', serif;
     margin-bottom: 10px;
 }
 
@@ -88,24 +93,23 @@
 .rm_desc a
 {
     text-decoration: none;
-    color: #BF9958;
+    color: #379BF0;
     
 }
 
 .capa_txt
 {
-    font-size: 15px;
-    color: #3C3C3C;
-    font-weight: 700;
-    font-family: 'PT Serif', serif;
+    color: #333333;
+    font-size: 16px;
+    font-weight: 400;
 }
 
 .capa_data
 {
-    font-size: 15px;
-    color: #3C3C3C;
+    color: #555555;
+    font-size: 16px;
     font-weight: 400;
-    font-family: 'PT Serif', serif;
+    margin-left: 10px;
 }
 
 .rm_review_cont
@@ -133,9 +137,8 @@
 {
     margin-left: 10px;
     font-size: 14px;
-    color: #777777;
+    color: #555555;
     font-weight: 400;
-    font-family: 'PT Serif', serif;
 }
 
 .rm_amenities_cont
@@ -150,9 +153,9 @@
 
 .rm_left
 {
-    color: red;
-    font-size: 12px;
-    font-weight: 700;
+    color: #e85757;
+    font-size: 16px;
+    font-weight: 400;
     padding-top: 5px;
 }
 
@@ -167,38 +170,21 @@
 
 .rm_price_val
 {
-    font-size: 30px;
-    color: #3C3C3C;
-    font-weight: 700;
-    font-family: 'PT Serif', serif;
     clear: both;
+    color: #333333;
+    font-size: 32px;
+    font-weight: 400;
+    line-height: 25px;
 }
 
 .rm_price_txt
 {
+    color: #333;
+    font-size: 16px;
+    font-weight: 400;
     padding-top: 6px;
-    font-size: 12px;
-    color: #3C3C3C;
-    font-weight: 700;
-    font-family: 'PT Serif', serif;
 }
 
-.rm_book_btn
-{
-    background-color: #BF9958;
-    text-align: center;
-    font-size: 17px;
-    color: #777777;
-    font-weight: 700;
-    font-family: 'PT Serif', serif;
-    padding: 15px 20px;
-    color: #FFFFFF;
-}
-
-.rm_book_btn:active, .rm_book_btn:focus, .rm_book_btn:hover
-{
-    color: #FFFFFF;
-}
 .rm_price_cont
 {
     clear: both;
@@ -211,10 +197,10 @@
 }
 .qty_txt
 {
-    font-size: 15px;
-    font-weight: 700;
-    color: #3C3C3C;
+    color: #333333;
     float: left;
+    font-size: 16px;
+    font-weight: 400;
     transform: translate(0px, 15px);
 }
 .qty_sec_cont

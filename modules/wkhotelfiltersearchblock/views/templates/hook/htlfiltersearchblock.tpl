@@ -1,9 +1,8 @@
-<!-- {$booking_data.stats.num_avail} -->
-<!-- {$booking_data.stats.total_rooms} -->
 <div class="row margin-lr-0 block" id="filter_search_block">
     <div class="filter_header">
         <div class="col-sm-12">
             <p>{l s='Search Rooms' mod='wkhotelfiltersearchblock'}</p>
+            <hr class="theme-text-underline">
         </div>
     </div>
     <div class="col-sm-12 category_page_search_block clear-both">
@@ -17,9 +16,12 @@
                 <div class="form-group hotel_location_div">
                     <label class="control-label" for="">{l s='Hotel Location' mod='wkroomsearchblock'}</label>
                     <input class="form-control" placeholder="Enter a city, state, country name" type="text" id="hotel_location" name="hotel_location" autocomplete="off" {if isset($search_data)}value="{$search_data['parent_data']['name']}" city_cat_id="{$search_data['parent_data']['id_category']}"{/if}/>
-                    <ul class="location_search_results_ul"></ul>
+                    <div class="dropdown">
+                        <ul class="location_search_results_ul"></ul>
+                    </div>
                 </div>
             {/if}
+
             <div class="form-group htl_nm_cont">
                 <label class="control-label" for="">{l s='Hotel Name' mod='wkroomsearchblock'}</label>
                 <div class="dropdown">
@@ -30,9 +32,10 @@
                             <span id="hotel_cat_name" class="pull-left">{l s='Select Hotel'}</span>
                         {/if}
                         <input type="hidden" id="hotel_cat_id" name="hotel_cat_id" {if isset($search_data)}value="{$search_data['htl_dtl']['id_category']}"{/if}>
-                        <div class="caret_div">
-                            <span class="caret"></span>
-                        </div>
+                        <input type="hidden" id="max_order_date" name="max_order_date" value="{$max_order_date}">
+                        <span class="arrow_span">
+                            <i class="icon icon-angle-down"></i>
+                        </span>
                     </button>
                     <ul class="dropdown-menu hotel_dropdown_ul">
                         {if isset($all_hotels_info) && $all_hotels_info}
@@ -67,7 +70,7 @@
                 </div>
             </div>
             <div>
-                <button type="submit" name="filter_search_btn" class="btn filter_search_btn col-sm-12" id="filter_search_btn">
+                <button type="submit" name="filter_search_btn" class="btn btn-default button button-medium exclusive" id="filter_search_btn">
                     <span>{l s='Search' mod='wkhotelfiltersearchblock'}</span>
                 </button>
             </div>
@@ -75,7 +78,20 @@
     </div>
 </div>
 {strip}
+    {addJsDefL name=no_results_found_cond}{l s='No results found for this search' js=1 mod='wkroomsearchblock'}{/addJsDefL}
+    {addJsDefL name=hotel_loc_cond}{l s='Please enter a hotel location' js=1 mod='wkroomsearchblock'}{/addJsDefL}
     {addJsDefL name=hotel_name_cond}{l s='Please select a hotel name' js=1 mod='wkroomsearchblock'}{/addJsDefL}
     {addJsDefL name=check_in_time_cond}{l s='Please enter Check In time' js=1 mod='wkroomsearchblock'}{/addJsDefL}
     {addJsDefL name=check_out_time_cond}{l s='Please enter Check Out time' js=1 mod='wkroomsearchblock'}{/addJsDefL}
+    {addJsDefL name=num_adults_cond}{l s='Please enter number of adults.' js=1 mod='wkroomsearchblock'}{/addJsDefL}
+    {addJsDefL name=num_children_cond}{l s='Please enter number of children.' js=1 mod='wkroomsearchblock'}{/addJsDefL}
+    {addJsDefL name=some_error_occur_cond}{l s='Some error occured. Please try again.' js=1 mod='wkroomsearchblock'}{/addJsDefL}
+    {addJsDefL name=less_checkin_date}{l s='Check In date can not be before current date.' js=1 mod='wkroomsearchblock'}{/addJsDefL}
+    {addJsDefL name=more_checkout_date}{l s='Check Out date must be greater than Check In date.' js=1 mod='wkroomsearchblock'}{/addJsDefL}
+    {addJsDef autocomplete_search_url=$link->getModuleLink('wkroomsearchblock','autocompletesearch')}
+    {addJsDefL name=hotel_name_cond}{l s='Please select a hotel name' js=1 mod='wkroomsearchblock'}{/addJsDefL}
+    {addJsDefL name=check_in_time_cond}{l s='Please enter Check In time' js=1 mod='wkroomsearchblock'}{/addJsDefL}
+    {addJsDefL name=check_out_time_cond}{l s='Please enter Check Out time' js=1 mod='wkroomsearchblock'}{/addJsDefL}
+    {addJsDef max_order_date=$max_order_date}
+    {addJsDef booking_date_to=$booking_date_to}
 {/strip}

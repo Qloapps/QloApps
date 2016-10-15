@@ -153,7 +153,7 @@
 		{/if}
 
 		{if $carriers.unselected|@count + $carriers.selected|@count > 1}
-			<p class="checkbox">
+			<p class="checkbox hidden">
 				<label>
 					<input type="checkbox" id="carrier_restriction" name="carrier_restriction" value="1" {if $carriers.unselected|@count}checked="checked"{/if} />
 					{l s='Carrier selection'}
@@ -255,7 +255,7 @@
 			<p class="checkbox">
 				<label>
 					<input type="checkbox" id="product_restriction" name="product_restriction" value="1" {if $product_rule_groups|@count}checked="checked"{/if} />
-					{l s='Product selection'}
+					{l s='Room Type selection'}
 				</label>
 			</p>
 			<div id="product_restriction_div">
@@ -266,7 +266,7 @@
 					{/foreach}
 				</table>
 				<a href="javascript:addProductRuleGroup();" class="btn btn-default ">
-					<i class="icon-plus-sign"></i> {l s='Product selection'}
+					<i class="icon-plus-sign"></i> {l s='Room Type selection'}
 				</a>
 			</div>
 

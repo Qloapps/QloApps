@@ -48,6 +48,16 @@ class ChequeValidationModuleFrontController extends ModuleFrontController
 		if (!$authorized)
 			die($this->module->l('This payment method is not available.', 'validation'));
 
+		/*Check Order restrict condition before Payment by the customer*/
+		if (Module::isInstalled('hotelreservationsystem') && Module::isEnabled('hotelreservationsystem')) {
+            require_once _PS_MODULE_DIR_.'hotelreservationsystem/define.php';
+            $order_restrict_error = HotelOrderRestrictDate::validateOrderRestrictDateOnPayment($this);
+            if ($order_restrict_error) {
+                die($this->errors);
+            }
+        }
+        /*END*/
+
 		$customer = new Customer($cart->id_customer);
 
 		if (!Validate::isLoadedObject($customer))

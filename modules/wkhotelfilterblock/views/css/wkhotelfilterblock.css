@@ -1,20 +1,29 @@
 .layered_filter_cont
 {
-	border: 1px solid #CCCCCC;
-	background-color: #F2F2F2;
-	margin-top: 20px;
+	background-color: #fff;
+    border: 1px solid #e6e6e6;
+    margin-top: 20px;
 }
 
 .layered_filter_cont div.layered_filter_heading
 {
-	background-color: #404040;
 	padding: 10px;
 }
-.layered_filter_cont div.layered_filter_heading span
+.layered_filter_cont div.layered_filter_heading div.lf_headingmain_wrapper span
 {
-	font-size: 16px;
-	color: #FFFFFF;
-	font-weight: 700; 
+	color: #333;
+    font-size: 16px;
+    font-weight: 400;
+    display: block;
+}
+
+.layered_filter_cont div.layered_filter_heading span.clear_filter
+{
+	cursor: pointer;
+	color: #a9a9a9 !important;
+    font-size: 12px !important;
+    font-weight: normal !important;
+    text-decoration: underline;
 }
 
 .lf_sub_cont
@@ -22,6 +31,7 @@
 	padding: 10px;
 	max-height: 200px;
     overflow-y: auto;
+    padding: 0 10px 10px;
 }
 
 .layered_filt
@@ -62,9 +72,9 @@
 
 .filters_name, .price_filter_subcont span
 {
-	font-size: 14px;
-	color: #8D8D8D;
-	font-weight: 700;
+	font-size: 16px;
+	color: #555555;
+	font-weight: 400;
 }
 
 .layered_filt div.checker
@@ -84,7 +94,7 @@
 
 #filter_price_silder .ui-slider-range
 {
-	background-color: #bf9958;
+	background-color: #379BF0;
     background-image: none;
 }
 
@@ -97,11 +107,6 @@
     outline: none;
 }
 
-.clear_filter
-{
-	cursor: pointer;
-	color: #a9a9a9 !important;
-    font-size: 12px !important;
-    font-weight: normal !important;
-    text-decoration: underline;
+#filter_price_silder.ui-widget-content {
+	border: none;
 }

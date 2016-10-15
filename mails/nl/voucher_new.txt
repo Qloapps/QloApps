@@ -1,0 +1,13 @@
+
+[{shop_url}] 
+
+Hallo {firstname} {lastname}, 
+
+Hier is de code van uw waardebon: {voucher_num}
+
+Plaats bij uw volgende bestelling de code in uw winkelwagen voordat u
+de bestelling gaat betalen. 		 
+
+{shop_name} [{shop_url}] gebouwd met
+PrestaShop(tm) [http://www.prestashop.com/] 
+

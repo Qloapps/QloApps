@@ -20,6 +20,9 @@
 							{if isset($customer_adv_dtl)}
 								<input type="hidden" value="{$customer_adv_dtl['id']}" name="id_customer_adv">
 							{/if}
+							{if isset($customer_adv_product_dtl)}
+								<input type="hidden" value="{$customer_product_adv_dtl['id']}" name="id_customer_product_adv">
+							{/if}
 
 							<div class="row" id="partial_data">
 								<div class="row margin-lr-0">

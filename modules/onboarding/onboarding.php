@@ -1,6 +1,6 @@
 <?php
 /**
-* 2007-2015 PrestaShop
+* 2007-2016 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author    PrestaShop SA <contact@prestashop.com>
-*  @copyright 2007-2015 PrestaShop SA
+*  @copyright 2007-2016 PrestaShop SA
 *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -34,7 +34,7 @@ class OnBoarding extends Module
 		$this->name = 'onboarding';
 		$this->bootstrap = true;
 		$this->tab = 'administration';
-		$this->version = '1.0.1';
+		$this->version = '1.0.2';
 		$this->author = 'PrestaShop';
 
 		parent::__construct();
@@ -45,6 +45,8 @@ class OnBoarding extends Module
 
 		if (Configuration::get('PS_ONBOARDING_CURRENT_STEP') > 6)
 			$this->uninstall();
+
+		$this->ps_versions_compliancy = array('min' => '1.6', 'max' => '1.6.99.99');
 	}
 
 	public function install()

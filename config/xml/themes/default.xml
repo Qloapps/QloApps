@@ -1,225 +1,330 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Copyright PrestaShop -->
-<theme version="1.0" name="hotel-theme" directory="hotel-reservation-theme">
-	<author name="Rohit Jain" email="rohit053@webkul.com" url="http://192.168.1.223"/>
-	<descriptions>
-		<description iso="en"/>
-	</descriptions>
-	<variations>
-		<variation name="hotel-theme" directory="hotel-reservation-theme" responsive="1" default_left_column="0" default_right_column="0" product_per_page="1" from="1.6.1.1" to="1.6.1.1"/>
-	</variations>
-	<docs>
-		<doc name="documentation" path="doc/"/>
-	</docs>
-	<metas>
-		<meta meta_page="pagenotfound" left="0" right="0"/>
-		<meta meta_page="best-sales" left="0" right="0"/>
-		<meta meta_page="contact" left="0" right="0"/>
-		<meta meta_page="index" left="0" right="0"/>
-		<meta meta_page="manufacturer" left="0" right="0"/>
-		<meta meta_page="new-products" left="0" right="0"/>
-		<meta meta_page="password" left="0" right="0"/>
-		<meta meta_page="prices-drop" left="0" right="0"/>
-		<meta meta_page="sitemap" left="0" right="0"/>
-		<meta meta_page="supplier" left="0" right="0"/>
-		<meta meta_page="address" left="0" right="0"/>
-		<meta meta_page="addresses" left="0" right="0"/>
-		<meta meta_page="authentication" left="0" right="0"/>
-		<meta meta_page="cart" left="0" right="0"/>
-		<meta meta_page="discount" left="0" right="0"/>
-		<meta meta_page="history" left="0" right="0"/>
-		<meta meta_page="identity" left="0" right="0"/>
-		<meta meta_page="my-account" left="0" right="0"/>
-		<meta meta_page="order-follow" left="0" right="0"/>
-		<meta meta_page="order-slip" left="0" right="0"/>
-		<meta meta_page="order" left="0" right="0"/>
-		<meta meta_page="search" left="0" right="0"/>
-		<meta meta_page="stores" left="0" right="0"/>
-		<meta meta_page="order-opc" left="0" right="0"/>
-		<meta meta_page="guest-tracking" left="0" right="0"/>
-		<meta meta_page="order-confirmation" left="0" right="0"/>
-		<meta meta_page="product" left="0" right="0"/>
-		<meta meta_page="category" left="1" right="0"/>
-		<meta meta_page="cms" left="0" right="0"/>
-		<meta meta_page="module-cheque-payment" left="0" right="0"/>
-		<meta meta_page="module-cheque-validation" left="0" right="0"/>
-		<meta meta_page="module-bankwire-validation" left="0" right="0"/>
-		<meta meta_page="module-bankwire-payment" left="0" right="0"/>
-		<meta meta_page="module-cashondelivery-validation" left="0" right="0"/>
-		<meta meta_page="products-comparison" left="0" right="0"/>
-		<meta meta_page="module-blocknewsletter-verification" left="0" right="0"/>
-		<meta meta_page="module-blockwishlist-mywishlist" left="0" right="0"/>
-		<meta meta_page="module-blockwishlist-view" left="0" right="0"/>
-		<meta meta_page="module-cronjobs-callback" left="0" right="0"/>
-	</metas>
-	<modules>
-		<module action="install" name="cronjobs"/>
-		<module action="install" name="blocknavigationmenu"/>
-		<module action="install" name="wkfooterblock"/>
-		<module action="install" name="wkroomsearchblock"/>
-		<module action="install" name="wkhotelfiltersearchblock"/>
-		<module action="install" name="wkhotelfilterblock"/>
-		<module action="install" name="wkhotelfeaturesblock"/>
-		<module action="install" name="wktestimonialblock"/>
-		<module action="install" name="wkthemeconfigurator"/>
-		<module action="install" name="hotelreservationsystem"/>
-		<module action="install" name="wkabouthotelblock"/>
-		<module action="install" name="blockcart"/>
-		<module action="install" name="blocksocial"/>
-		<module action="disable" name="blocklanguages"/>
-		<module action="disable" name="blockmanufacturer"/>
-		<module action="enable" name="blockmyaccount"/>
-		<module action="enable" name="blocknewsletter"/>
-		<module action="disable" name="blockpaymentlogo"/>
-		<module action="disable" name="blocksupplier"/>
-		<module action="disable" name="blocktags"/>
-		<module action="enable" name="blockuserinfo"/>
-		<module action="disable" name="dashactivity"/>
-		<module action="disable" name="dashtrends"/>
-		<module action="disable" name="dashgoals"/>
-		<module action="disable" name="dashproducts"/>
-		<module action="disable" name="statsdata"/>
-		<module action="disable" name="blockwishlist"/>
-		<module action="enable" name="productcomments"/>
-		<module action="disable" name="sendtoafriend"/>
-		<module action="disable" name="blockadvertising"/>
-		<module action="disable" name="blockbanner"/>
-		<module action="disable" name="blockbestsellers"/>
-		<module action="disable" name="blockcategories"/>
-		<module action="disable" name="blockcms"/>
-		<module action="disable" name="blockcmsinfo"/>
-		<module action="disable" name="blockcontact"/>
-		<module action="disable" name="blockcontactinfos"/>
-		<module action="disable" name="blockcurrencies"/>
-		<module action="disable" name="blockcustomerprivacy"/>
-		<module action="disable" name="blockfacebook"/>
-		<module action="disable" name="blocklayered"/>
-		<module action="disable" name="blocklink"/>
-		<module action="disable" name="blockmyaccountfooter"/>
-		<module action="disable" name="blocknewproducts"/>
-		<module action="disable" name="blockpermanentlinks"/>
-		<module action="disable" name="blockrss"/>
-		<module action="disable" name="blocksearch"/>
-		<module action="disable" name="blocksharefb"/>
-		<module action="disable" name="blockspecials"/>
-		<module action="disable" name="blockstore"/>
-		<module action="disable" name="blocktopmenu"/>
-		<module action="disable" name="blockviewed"/>
-		<module action="disable" name="crossselling"/>
-		<module action="disable" name="homefeatured"/>
-		<module action="disable" name="homeslider"/>
-		<module action="disable" name="onboarding"/>
-		<module action="disable" name="productpaymentlogos"/>
-		<module action="disable" name="productscategory"/>
-		<module action="disable" name="producttooltip"/>
-		<module action="disable" name="socialsharing"/>
-		<module action="disable" name="trackingfront"/>
-		<module action="disable" name="vatnumber"/>
-		<hooks>
-			<hook module="cronjobs" hook="actionModuleRegisterHookAfter" position="3"/>
-			<hook module="cronjobs" hook="displayBackOfficeHeader" position="2"/>
-			<hook module="cronjobs" hook="actionModuleUnRegisterHookAfter" position="3"/>
-			<hook module="blocknavigationmenu" hook="displayTop" position="1"/>
-			<hook module="wkfooterblock" hook="displayFooter" position="8"/>
-			<hook module="wkroomsearchblock" hook="displaySearchHotelPanel" position="1"/>
-			<hook module="wkroomsearchblock" hook="Header" position="31"/>
-			<hook module="wkhotelfiltersearchblock" hook="displayLeftColumn" position="14"/>
-			<hook module="wkhotelfilterblock" hook="displayLeftColumn" position="15"/>
-			<hook module="wkhotelfilterblock" hook="Header" position="35"/>
-			<hook module="wkhotelfeaturesblock" hook="displayHome" position="5"/>
-			<hook module="wktestimonialblock" hook="displayHome" position="6"/>
-			<hook module="wkthemeconfigurator" hook="displayLeftColumn" position="16"/>
-			<hook module="wkthemeconfigurator" hook="Header" position="36"/>
-			<hook module="wkthemeconfigurator" hook="displayBackOfficeHeader" position="3"/>
-			<hook module="wkthemeconfigurator" hook="actionObjectLanguageAddAfter" position="2"/>
-			<hook module="wkthemeconfigurator" hook="displayRightColumn" position="1"/>
-			<hook module="wkthemeconfigurator" hook="displayHome" position="4"/>
-			<hook module="wkthemeconfigurator" hook="displayFooter" position="9"/>
-			<hook module="wkthemeconfigurator" hook="displayTopColumn" position="2"/>
-			<hook module="hotelreservationsystem" hook="actionValidateOrder" position="2"/>
-			<hook module="hotelreservationsystem" hook="displayBackOfficeHeader" position="4"/>
-			<hook module="hotelreservationsystem" hook="actionProductDelete" position="5"/>
-			<hook module="hotelreservationsystem" hook="actionProductSave" position="2"/>
-			<hook module="wkabouthotelblock" hook="displayHome" position="3"/>
-			<hook module="blockcart" hook="Header" position="4"/>
-			<hook module="blockcart" hook="actionCartListOverride" position="1"/>
-			<hook module="blockcart" hook="displayTop" position="2"/>
-			<hook module="blocksocial" hook="displayFooter" position="2"/>
-			<hook module="blocksocial" hook="Header" position="5"/>
-			<hook module="blocklanguages" hook="Header" position="9"/>
-			<hook module="blocklanguages" hook="displayNav" position="2"/>
-			<hook module="blockmanufacturer" hook="displayLeftColumn" position="5" exceptions="category,category,category,category,category,category,category,category,category,category,category,category,category,category"/>
-			<hook module="blockmanufacturer" hook="actionObjectManufacturerDeleteAfter" position="1"/>
-			<hook module="blockmanufacturer" hook="actionObjectManufacturerUpdateAfter" position="1"/>
-			<hook module="blockmanufacturer" hook="Header" position="14"/>
-			<hook module="blockmanufacturer" hook="actionObjectManufacturerAddAfter" position="1"/>
-			<hook module="blockmyaccount" hook="actionModuleRegisterHookAfter" position="1"/>
-			<hook module="blockmyaccount" hook="Header" position="15"/>
-			<hook module="blockmyaccount" hook="actionModuleUnRegisterHookAfter" position="1"/>
-			<hook module="blockmyaccount" hook="displayLeftColumn" position="6" exceptions="category,category,category,category,category,category,category,category,category,category,category,category,category,category"/>
-			<hook module="blocknewsletter" hook="Header" position="32"/>
-			<hook module="blocknewsletter" hook="actionCustomerAccountAdd" position="2"/>
-			<hook module="blocknewsletter" hook="displayFooter" position="1"/>
-			<hook module="blockpaymentlogo" hook="displayLeftColumn" position="7" exceptions="category,category,category,category,category,category,category,category,category,category,category,category,category,category"/>
-			<hook module="blockpaymentlogo" hook="Header" position="18"/>
-			<hook module="blocksupplier" hook="actionObjectSupplierUpdateAfter" position="1"/>
-			<hook module="blocksupplier" hook="Header" position="21"/>
-			<hook module="blocksupplier" hook="actionObjectSupplierAddAfter" position="1"/>
-			<hook module="blocksupplier" hook="displayLeftColumn" position="11" exceptions="category,category,category,category,category,category,category,category,category,category,category,category,category,category"/>
-			<hook module="blocksupplier" hook="actionObjectSupplierDeleteAfter" position="1"/>
-			<hook module="blocktags" hook="Header" position="22"/>
-			<hook module="blocktags" hook="displayLeftColumn" position="12"/>
-			<hook module="blockuserinfo" hook="displayTop" position="3"/>
-			<hook module="blockuserinfo" hook="Header" position="33"/>
-			<hook module="dashactivity" hook="actionObjectCustomerAddAfter" position="1"/>
-			<hook module="dashactivity" hook="actionObjectCustomerThreadAddAfter" position="1"/>
-			<hook module="dashactivity" hook="actionAdminControllerSetMedia" position="1"/>
-			<hook module="dashactivity" hook="dashboardZoneOne" position="1"/>
-			<hook module="dashactivity" hook="actionObjectOrderAddAfter" position="1"/>
-			<hook module="dashactivity" hook="actionObjectCustomerMessageAddAfter" position="1"/>
-			<hook module="dashactivity" hook="actionObjectOrderReturnAddAfter" position="1"/>
-			<hook module="dashactivity" hook="dashboardData" position="1"/>
-			<hook module="dashtrends" hook="actionAdminControllerSetMedia" position="2"/>
-			<hook module="dashtrends" hook="dashboardData" position="2"/>
-			<hook module="dashtrends" hook="dashboardZoneTwo" position="1"/>
-			<hook module="dashtrends" hook="actionOrderStatusPostUpdate" position="2"/>
-			<hook module="dashgoals" hook="dashboardData" position="3"/>
-			<hook module="dashgoals" hook="dashboardZoneTwo" position="2"/>
-			<hook module="dashgoals" hook="actionAdminControllerSetMedia" position="3"/>
-			<hook module="dashproducts" hook="dashboardData" position="4"/>
-			<hook module="dashproducts" hook="dashboardZoneTwo" position="3"/>
-			<hook module="dashproducts" hook="actionSearch" position="1"/>
-			<hook module="dashproducts" hook="actionObjectOrderAddAfter" position="2"/>
-			<hook module="statsdata" hook="displayFooter" position="7"/>
-			<hook module="statsdata" hook="actionAuthentication" position="1"/>
-			<hook module="statsdata" hook="actionCustomerAccountAdd" position="1"/>
-			<hook module="blockwishlist" hook="displayCustomerAccount" position="1"/>
-			<hook module="blockwishlist" hook="displayMyAccountBlock" position="1"/>
-			<hook module="blockwishlist" hook="actionCartSave" position="1"/>
-			<hook module="blockwishlist" hook="displayAdminCustomers" position="1"/>
-			<hook module="blockwishlist" hook="displayProductButtons" position="1"/>
-			<hook module="blockwishlist" hook="displayProductListFunctionalButtons" position="1"/>
-			<hook module="blockwishlist" hook="Header" position="26"/>
-			<hook module="blockwishlist" hook="displayTop" position="8"/>
-			<hook module="productcomments" hook="displayProductTabContent" position="1"/>
-			<hook module="productcomments" hook="displayProductListReviews" position="1"/>
-			<hook module="productcomments" hook="Header" position="27"/>
-			<hook module="productcomments" hook="displayProductTab" position="1"/>
-			<hook module="productcomments" hook="displayProductComparison" position="1"/>
-			<hook module="productcomments" hook="displayRightColumnProduct" position="2"/>
-			<hook module="sendtoafriend" hook="displayLeftColumnProduct" position="1"/>
-			<hook module="sendtoafriend" hook="Header" position="29"/>
-		</hooks>
-	</modules>
-	<images>
-		<image name="cart_default" width="80" height="80" products="true" categories="false" manufacturers="false" suppliers="false" scenes="false"/>
-		<image name="small_default" width="98" height="98" products="true" categories="false" manufacturers="true" suppliers="true" scenes="false"/>
-		<image name="medium_default" width="125" height="125" products="true" categories="true" manufacturers="true" suppliers="true" scenes="false"/>
-		<image name="home_default" width="250" height="250" products="true" categories="false" manufacturers="false" suppliers="false" scenes="false"/>
-		<image name="large_default" width="458" height="458" products="true" categories="false" manufacturers="true" suppliers="true" scenes="false"/>
-		<image name="thickbox_default" width="800" height="800" products="true" categories="false" manufacturers="false" suppliers="false" scenes="false"/>
-		<image name="category_default" width="870" height="217" products="false" categories="true" manufacturers="false" suppliers="false" scenes="false"/>
-		<image name="scene_default" width="870" height="270" products="false" categories="false" manufacturers="false" suppliers="false" scenes="true"/>
-		<image name="m_scene_default" width="161" height="58" products="false" categories="false" manufacturers="false" suppliers="false" scenes="true"/>
-	</images>
+<!-- Copyright Prestashop -->
+<theme version="1.0" name="default-bootstrap" directory="default-bootstrap">
+    <author name="PrestaShop" email="contact@prestashop.com" url="http://www.prestashop.com"/>
+    <descriptions>
+        <description iso="en"></description>
+    </descriptions>
+    <variations>
+        <variation name="default-bootstrap" directory="default-bootstrap" responsive="1" default_left_column="1"
+                   default_right_column="0" product_per_page="12" from="1.6.0.5" to="1.6.0.5"/>
+    </variations>
+    <docs>
+        <doc name="documentation" path="doc/"/>
+    </docs>
+    <metas>
+        <meta meta_page="404" left="0" right="0"/>
+        <meta meta_page="best-sales" left="1" right="0"/>
+        <meta meta_page="contact" left="0" right="0"/>
+        <meta meta_page="index" left="0" right="0"/>
+        <meta meta_page="manufacturer" left="1" right="0"/>
+        <meta meta_page="new-products" left="1" right="0"/>
+        <meta meta_page="password" left="0" right="0"/>
+        <meta meta_page="prices-drop" left="1" right="0"/>
+        <meta meta_page="sitemap" left="1" right="0"/>
+        <meta meta_page="supplier" left="0" right="0"/>
+        <meta meta_page="address" left="0" right="0"/>
+        <meta meta_page="addresses" left="0" right="0"/>
+        <meta meta_page="authentication" left="0" right="0"/>
+        <meta meta_page="cart" left="0" right="0"/>
+        <meta meta_page="discount" left="0" right="0"/>
+        <meta meta_page="history" left="0" right="0"/>
+        <meta meta_page="identity" left="0" right="0"/>
+        <meta meta_page="my-account" left="0" right="0"/>
+        <meta meta_page="order-follow" left="0" right="0"/>
+        <meta meta_page="order-slip" left="0" right="0"/>
+        <meta meta_page="order" left="0" right="0"/>
+        <meta meta_page="search" left="1" right="0"/>
+        <meta meta_page="stores" left="0" right="0"/>
+        <meta meta_page="order-opc" left="0" right="0"/>
+        <meta meta_page="guest-tracking" left="0" right="0"/>
+        <meta meta_page="order-confirmation" left="0" right="0"/>
+        <meta meta_page="product" left="0" right="0"/>
+        <meta meta_page="category" left="1" right="0"/>
+        <meta meta_page="cms" left="0" right="0"/>
+        <meta meta_page="module-cheque-payment" left="0" right="0"/>
+        <meta meta_page="module-cheque-validation" left="0" right="0"/>
+        <meta meta_page="module-bankwire-validation" left="0" right="0"/>
+        <meta meta_page="module-bankwire-payment" left="0" right="0"/>
+        <meta meta_page="module-cashondelivery-validation" left="0" right="0"/>
+        <meta meta_page="products-comparison" left="0" right="0"/>
+    </metas>
+    <modules>
+        <module action="enable" name="socialsharing"/>
+        <module action="enable" name="blockbanner"/>
+        <module action="enable" name="blockbestsellers"/>
+        <module action="enable" name="blockcart"/>
+        <module action="enable" name="blocksocial"/>
+        <module action="enable" name="blockcategories"/>
+        <module action="enable" name="blockcurrencies"/>
+        <module action="enable" name="blockfacebook"/>
+        <module action="enable" name="blocklanguages"/>
+        <module action="enable" name="blocklayered"/>
+        <module action="enable" name="blockcms"/>
+        <module action="enable" name="blockcmsinfo"/>
+        <module action="enable" name="blockcontact"/>
+        <module action="enable" name="blockcontactinfos"/>
+        <module action="enable" name="blockmanufacturer"/>
+        <module action="enable" name="blockmyaccount"/>
+        <module action="enable" name="blockmyaccountfooter"/>
+        <module action="enable" name="blocknewproducts"/>
+        <module action="enable" name="blocknewsletter"/>
+        <module action="enable" name="blockpaymentlogo"/>
+        <module action="enable" name="blocksearch"/>
+        <module action="enable" name="blockspecials"/>
+        <module action="enable" name="blockstore"/>
+        <module action="enable" name="blocksupplier"/>
+        <module action="enable" name="blocktags"/>
+        <module action="enable" name="blocktopmenu"/>
+        <module action="enable" name="blockuserinfo"/>
+        <module action="enable" name="blockviewed"/>
+        <module action="enable" name="dashactivity"/>
+        <module action="enable" name="dashtrends"/>
+        <module action="enable" name="dashgoals"/>
+        <module action="enable" name="dashproducts"/>
+        <module action="enable" name="homeslider"/>
+        <module action="enable" name="homefeatured"/>
+        <module action="enable" name="productpaymentlogos"/>
+        <module action="enable" name="statsdata"/>
+        <module action="enable" name="themeconfigurator"/>
+        <module action="enable" name="blockwishlist"/>
+        <module action="enable" name="productcomments"/>
+        <module action="enable" name="sendtoafriend"/>
+        <module action="disable" name="autoupgrade"/>
+        <module action="disable" name="blockadvertising"/>
+        <module action="disable" name="blockcustomerprivacy"/>
+        <module action="disable" name="blocklink"/>
+        <module action="disable" name="blockpermanentlinks"/>
+        <module action="disable" name="blockreinsurance"/>
+        <module action="disable" name="blockrss"/>
+        <module action="disable" name="blocksharefb"/>
+        <module action="disable" name="crossselling"/>
+        <module action="disable" name="editorial"/>
+        <module action="disable" name="favoriteproducts"/>
+        <module action="disable" name="ganalytics"/>
+        <module action="disable" name="gsitemap"/>
+        <module action="disable" name="mailalerts"/>
+        <module action="disable" name="newsletter"/>
+        <module action="disable" name="productscategory"/>
+        <module action="disable" name="producttooltip"/>
+        <module action="disable" name="trackingfront"/>
+        <module action="disable" name="vatnumber"/>
+        <module action="disable" name="addshoppers"/>
+        <hooks>
+            <hook module="socialsharing" hook="displayHeader" position="1"/>
+            <hook module="socialsharing" hook="displayRightColumnProduct" position="1"/>
+            <hook module="socialsharing" hook="actionObjectProductUpdateAfter" position="1"/>
+            <hook module="socialsharing" hook="actionObjectProductDeleteAfter" position="1"/>
+            <hook module="socialsharing" hook="displayCompareExtraInformation" position="1"/>
+            <hook module="blockbanner" hook="displayHeader" position="2"/>
+            <hook module="blockbanner" hook="displayBanner" position="1"/>
+            <hook module="blockbanner" hook="actionObjectLanguageAddAfter" position="1"/>
+            <hook module="blockbestsellers" hook="displayLeftColumn" position="1" exceptions="category"/>
+            <hook module="blockbestsellers" hook="displayHeader" position="3"/>
+            <hook module="blockbestsellers" hook="actionProductAdd" position="1"/>
+            <hook module="blockbestsellers" hook="actionProductUpdate" position="1"/>
+            <hook module="blockbestsellers" hook="actionProductDelete" position="1"/>
+            <hook module="blockbestsellers" hook="actionOrderStatusPostUpdate" position="1"/>
+            <hook module="blockbestsellers" hook="displayHomeTab" position="3"/>
+            <hook module="blockbestsellers" hook="displayHomeTabContent" position="3"/>
+            <hook module="blockcart" hook="displayHeader" position="4"/>
+            <hook module="blockcart" hook="displayTop" position="2"/>
+            <hook module="blockcart" hook="actionCartListOverride" position="1"/>
+            <hook module="blocksocial" hook="displayHeader" position="5"/>
+            <hook module="blocksocial" hook="displayFooter" position="2"/>
+            <hook module="blockcategories" hook="displayLeftColumn" position="2"/>
+            <hook module="blockcategories" hook="displayHeader" position="6"/>
+            <hook module="blockcategories" hook="displayFooter" position="3"/>
+            <hook module="blockcategories" hook="actionCategoryAdd" position="1"/>
+            <hook module="blockcategories" hook="actionCategoryUpdate" position="1"/>
+            <hook module="blockcategories" hook="actionCategoryDelete" position="1"/>
+            <hook module="blockcategories" hook="displayBackOfficeCategory" position="1"/>
+            <hook module="blockcategories" hook="actionAdminMetaControllerUpdate_optionsBefore" position="1"/>
+            <hook module="blockcategories" hook="actionAdminLanguagesControllerStatusBefore" position="1"/>
+            <hook module="blockcurrencies" hook="displayHeader" position="7"/>
+            <hook module="blockcurrencies" hook="displayNav" position="2"/>
+            <hook module="blockfacebook" hook="displayHome" position="2"/>
+            <hook module="blockfacebook" hook="displayHeader" position="8"/>
+            <hook module="blocklanguages" hook="displayHeader" position="9"/>
+            <hook module="blocklanguages" hook="displayNav" position="3"/>
+            <hook module="blocklayered" hook="displayLeftColumn" position="3"/>
+            <hook module="blocklayered" hook="displayHeader" position="10"/>
+            <hook module="blocklayered" hook="actionCategoryAdd" position="2"/>
+            <hook module="blocklayered" hook="actionCategoryUpdate" position="2"/>
+            <hook module="blocklayered" hook="actionCategoryDelete" position="2"/>
+            <hook module="blocklayered" hook="displayAttributeGroupForm" position="1"/>
+            <hook module="blocklayered" hook="actionAttributeGroupSave" position="1"/>
+            <hook module="blocklayered" hook="actionAttributeGroupDelete" position="1"/>
+            <hook module="blocklayered" hook="displayFeatureForm" position="1"/>
+            <hook module="blocklayered" hook="actionFeatureSave" position="1"/>
+            <hook module="blocklayered" hook="actionFeatureDelete" position="1"/>
+            <hook module="blocklayered" hook="actionProductSave" position="1"/>
+            <hook module="blocklayered" hook="actionProductListOverride" position="1"/>
+            <hook module="blocklayered" hook="displayAttributeGroupPostProcess" position="1"/>
+            <hook module="blocklayered" hook="displayFeaturePostProcess" position="1"/>
+            <hook module="blocklayered" hook="displayFeatureValueForm" position="1"/>
+            <hook module="blocklayered" hook="displayFeatureValuePostProcess" position="1"/>
+            <hook module="blocklayered" hook="actionFeatureValueDelete" position="1"/>
+            <hook module="blocklayered" hook="actionFeatureValueSave" position="1"/>
+            <hook module="blocklayered" hook="displayAttributeForm" position="1"/>
+            <hook module="blocklayered" hook="actionAttributePostProcess" position="1"/>
+            <hook module="blocklayered" hook="actionAttributeDelete" position="1"/>
+            <hook module="blocklayered" hook="actionAttributeSave" position="1"/>
+            <hook module="blockcms" hook="displayLeftColumn" position="4"/>
+            <hook module="blockcms" hook="displayHeader" position="11"/>
+            <hook module="blockcms" hook="displayFooter" position="4"/>
+            <hook module="blockcms" hook="actionObjectCmsUpdateAfter" position="1"/>
+            <hook module="blockcms" hook="actionObjectCmsDeleteAfter" position="1"/>
+            <hook module="blockcms" hook="actionShopDataDuplication" position="1"/>
+            <hook module="blockcms" hook="actionAdminStoresControllerUpdate_optionsAfter" position="1"/>
+            <hook module="blockcmsinfo" hook="displayHome" position="3"/>
+            <hook module="blockcontact" hook="displayHeader" position="12"/>
+            <hook module="blockcontact" hook="displayNav" position="4"/>
+            <hook module="blockcontactinfos" hook="displayHeader" position="13"/>
+            <hook module="blockcontactinfos" hook="displayFooter" position="6"/>
+            <hook module="blockmanufacturer" hook="displayLeftColumn" position="5" exceptions="category"/>
+            <hook module="blockmanufacturer" hook="displayHeader" position="14"/>
+            <hook module="blockmanufacturer" hook="actionObjectManufacturerDeleteAfter" position="1"/>
+            <hook module="blockmanufacturer" hook="actionObjectManufacturerAddAfter" position="1"/>
+            <hook module="blockmanufacturer" hook="actionObjectManufacturerUpdateAfter" position="1"/>
+            <hook module="blockmyaccount" hook="displayLeftColumn" position="6" exceptions="category"/>
+            <hook module="blockmyaccount" hook="displayHeader" position="15"/>
+            <hook module="blockmyaccount" hook="actionModuleRegisterHookAfter" position="1"/>
+            <hook module="blockmyaccount" hook="actionModuleUnRegisterHookAfter" position="1"/>
+            <hook module="blockmyaccountfooter" hook="displayHeader" position="16"/>
+            <hook module="blockmyaccountfooter" hook="displayFooter" position="5"/>
+            <hook module="blockmyaccountfooter" hook="actionModuleRegisterHookAfter" position="2"/>
+            <hook module="blockmyaccountfooter" hook="actionModuleUnRegisterHookAfter" position="2"/>
+            <hook module="blocknewproducts" hook="displayLeftColumn" position="7"/>
+            <hook module="blocknewproducts" hook="displayHeader" position="17"/>
+            <hook module="blocknewproducts" hook="actionProductAdd" position="2"/>
+            <hook module="blocknewproducts" hook="actionProductUpdate" position="2"/>
+            <hook module="blocknewproducts" hook="actionProductDelete" position="2"/>
+            <hook module="blocknewproducts" hook="displayHomeTab" position="1"/>
+            <hook module="blocknewproducts" hook="displayHomeTabContent" position="1"/>
+            <hook module="blocknewsletter" hook="displayHeader" position="18"/>
+            <hook module="blocknewsletter" hook="displayFooter" position="1"/>
+            <hook module="blocknewsletter" hook="actionCustomerAccountAdd" position="1"/>
+            <hook module="blockpaymentlogo" hook="displayLeftColumn" position="8" exceptions="category"/>
+            <hook module="blockpaymentlogo" hook="displayHeader" position="19"/>
+            <hook module="blocksearch" hook="displayHeader" position="20"/>
+            <hook module="blocksearch" hook="displayTop" position="1"/>
+            <hook module="blocksearch" hook="displayMobileTopSiteMap" position="1"/>
+            <hook module="blockspecials" hook="displayLeftColumn" position="9"/>
+            <hook module="blockspecials" hook="displayHeader" position="21"/>
+            <hook module="blockspecials" hook="actionProductAdd" position="3"/>
+            <hook module="blockspecials" hook="actionProductUpdate" position="3"/>
+            <hook module="blockspecials" hook="actionProductDelete" position="3"/>
+            <hook module="blockstore" hook="displayLeftColumn" position="10"/>
+            <hook module="blockstore" hook="displayHeader" position="22"/>
+            <hook module="blocksupplier" hook="displayLeftColumn" position="11" exceptions="category"/>
+            <hook module="blocksupplier" hook="displayHeader" position="23"/>
+            <hook module="blocksupplier" hook="actionObjectSupplierDeleteAfter" position="1"/>
+            <hook module="blocksupplier" hook="actionObjectSupplierAddAfter" position="1"/>
+            <hook module="blocksupplier" hook="actionObjectSupplierUpdateAfter" position="1"/>
+            <hook module="blocktags" hook="displayLeftColumn" position="12"/>
+            <hook module="blocktags" hook="displayHeader" position="24"/>
+            <hook module="blocktopmenu" hook="displayTop" position="3"/>
+            <hook module="blocktopmenu" hook="actionCategoryUpdate" position="3"/>
+            <hook module="blocktopmenu" hook="actionObjectProductUpdateAfter" position="2"/>
+            <hook module="blocktopmenu" hook="actionObjectProductDeleteAfter" position="2"/>
+            <hook module="blocktopmenu" hook="actionObjectCmsUpdateAfter" position="2"/>
+            <hook module="blocktopmenu" hook="actionObjectCmsDeleteAfter" position="2"/>
+            <hook module="blocktopmenu" hook="actionShopDataDuplication" position="2"/>
+            <hook module="blocktopmenu" hook="actionObjectManufacturerDeleteAfter" position="2"/>
+            <hook module="blocktopmenu" hook="actionObjectManufacturerAddAfter" position="2"/>
+            <hook module="blocktopmenu" hook="actionObjectManufacturerUpdateAfter" position="2"/>
+            <hook module="blocktopmenu" hook="actionObjectSupplierDeleteAfter" position="2"/>
+            <hook module="blocktopmenu" hook="actionObjectSupplierAddAfter" position="2"/>
+            <hook module="blocktopmenu" hook="actionObjectSupplierUpdateAfter" position="2"/>
+            <hook module="blocktopmenu" hook="actionObjectCategoryUpdateAfter" position="1"/>
+            <hook module="blocktopmenu" hook="actionObjectCategoryDeleteAfter" position="1"/>
+            <hook module="blocktopmenu" hook="actionObjectCategoryAddAfter" position="1"/>
+            <hook module="blocktopmenu" hook="actionObjectCmsAddAfter" position="1"/>
+            <hook module="blocktopmenu" hook="actionObjectProductAddAfter" position="1"/>
+            <hook module="blocktopmenu" hook="displayHeader" position="34"/>
+            <hook module="blockuserinfo" hook="displayHeader" position="25"/>
+            <hook module="blockuserinfo" hook="displayTop" position="4"/>
+            <hook module="blockuserinfo" hook="displayNav" position="1"/>
+            <hook module="blockviewed" hook="displayLeftColumn" position="13"/>
+            <hook module="blockviewed" hook="displayHeader" position="26"/>
+            <hook module="dashactivity" hook="dashboardZoneOne" position="1"/>
+            <hook module="dashactivity" hook="dashboardData" position="1"/>
+            <hook module="dashactivity" hook="actionObjectOrderAddAfter" position="1"/>
+            <hook module="dashactivity" hook="actionObjectCustomerAddAfter" position="1"/>
+            <hook module="dashactivity" hook="actionObjectCustomerMessageAddAfter" position="1"/>
+            <hook module="dashactivity" hook="actionObjectCustomerThreadAddAfter" position="1"/>
+            <hook module="dashactivity" hook="actionObjectOrderReturnAddAfter" position="1"/>
+            <hook module="dashactivity" hook="actionAdminControllerSetMedia" position="1"/>
+            <hook module="dashtrends" hook="actionOrderStatusPostUpdate" position="2"/>
+            <hook module="dashtrends" hook="dashboardData" position="2"/>
+            <hook module="dashtrends" hook="actionAdminControllerSetMedia" position="2"/>
+            <hook module="dashtrends" hook="dashboardZoneTwo" position="1"/>
+            <hook module="dashgoals" hook="dashboardData" position="3"/>
+            <hook module="dashgoals" hook="actionAdminControllerSetMedia" position="3"/>
+            <hook module="dashgoals" hook="dashboardZoneTwo" position="2"/>
+            <hook module="dashproducts" hook="actionSearch" position="1"/>
+            <hook module="dashproducts" hook="dashboardData" position="4"/>
+            <hook module="dashproducts" hook="actionObjectOrderAddAfter" position="2"/>
+            <hook module="dashproducts" hook="dashboardZoneTwo" position="3"/>
+            <hook module="homeslider" hook="displayHeader" position="27"/>
+            <hook module="homeslider" hook="displayTopColumn" position="1"/>
+            <hook module="homeslider" hook="actionShopDataDuplication" position="3"/>
+            <hook module="homefeatured" hook="displayHeader" position="28"/>
+            <hook module="homefeatured" hook="actionProductAdd" position="4"/>
+            <hook module="homefeatured" hook="actionProductUpdate" position="4"/>
+            <hook module="homefeatured" hook="actionProductDelete" position="4"/>
+            <hook module="homefeatured" hook="actionCategoryUpdate" position="4"/>
+            <hook module="homefeatured" hook="displayHomeTab" position="2"/>
+            <hook module="homefeatured" hook="displayHomeTabContent" position="2"/>
+            <hook module="productpaymentlogos" hook="displayHeader" position="29"/>
+            <hook module="productpaymentlogos" hook="displayProductButtons" position="2"/>
+            <hook module="statsdata" hook="actionAuthentication" position="1"/>
+            <hook module="statsdata" hook="displayFooter" position="7"/>
+            <hook module="statsdata" hook="actionCustomerAccountAdd" position="2"/>
+            <hook module="themeconfigurator" hook="displayLeftColumn" position="14"/>
+            <hook module="themeconfigurator" hook="displayHome" position="1"/>
+            <hook module="themeconfigurator" hook="displayHeader" position="30"/>
+            <hook module="themeconfigurator" hook="displayFooter" position="8"/>
+            <hook module="themeconfigurator" hook="displayBackOfficeHeader" position="1"/>
+            <hook module="themeconfigurator" hook="displayTopColumn" position="2"/>
+            <hook module="themeconfigurator" hook="actionObjectLanguageAddAfter" position="2"/>
+            <hook module="blockwishlist" hook="displayHeader" position="31"/>
+            <hook module="blockwishlist" hook="actionCartSave" position="1"/>
+            <hook module="blockwishlist" hook="displayTop" position="7"/>
+            <hook module="blockwishlist" hook="displayAdminCustomers" position="1"/>
+            <hook module="blockwishlist" hook="displayCustomerAccount" position="1"/>
+            <hook module="blockwishlist" hook="displayProductButtons" position="1"/>
+            <hook module="blockwishlist" hook="displayMyAccountBlock" position="1"/>
+            <hook module="blockwishlist" hook="displayProductListFunctionalButtons" position="1"/>
+            <hook module="productcomments" hook="displayHeader" position="32"/>
+            <hook module="productcomments" hook="displayRightColumnProduct" position="2"/>
+            <hook module="productcomments" hook="displayProductTab" position="1"/>
+            <hook module="productcomments" hook="displayProductTabContent" position="1"/>
+            <hook module="productcomments" hook="displayProductComparison" position="1"/>
+            <hook module="productcomments" hook="displayProductListReviews" position="1"/>
+            <hook module="sendtoafriend" hook="displayHeader" position="33"/>
+            <hook module="sendtoafriend" hook="displayLeftColumnProduct" position="1"/>
+        </hooks>
+    </modules>
+    <images>
+        <image name="cart_default" width="80" height="80" products="true" categories="false" manufacturers="false"
+               suppliers="false" scenes="false"/>
+        <image name="small_default" width="98" height="98" products="true" categories="false" manufacturers="true"
+               suppliers="true" scenes="false"/>
+        <image name="medium_default" width="125" height="125" products="true" categories="true" manufacturers="true"
+               suppliers="true" scenes="false"/>
+        <image name="home_default" width="250" height="250" products="true" categories="false" manufacturers="false"
+               suppliers="false" scenes="false"/>
+        <image name="large_default" width="458" height="458" products="true" categories="false" manufacturers="true"
+               suppliers="true" scenes="false"/>
+        <image name="thickbox_default" width="800" height="800" products="true" categories="false" manufacturers="false"
+               suppliers="false" scenes="false"/>
+        <image name="category_default" width="870" height="217" products="false" categories="true" manufacturers="false"
+               suppliers="false" scenes="false"/>
+        <image name="scene_default" width="870" height="270" products="false" categories="false" manufacturers="false"
+               suppliers="false" scenes="true"/>
+        <image name="m_scene_default" width="161" height="58" products="false" categories="false" manufacturers="false"
+               suppliers="false" scenes="true"/>
+    </images>
 </theme>

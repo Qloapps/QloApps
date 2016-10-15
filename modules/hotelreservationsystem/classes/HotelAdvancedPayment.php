@@ -149,4 +149,16 @@ class HotelAdvancedPayment extends ObjectModel
 
 		return $adv_amount;
 	}
+
+	public function _checkFreeAdvancePaymentOrder()
+	{
+		$advance_payment_active = Configuration::get('WK_ALLOW_ADVANCED_PAYMENT');
+        if ($advance_payment_active) {
+            $adv_amount = $this->getMinAdvPaymentAmount();
+	        $vouchersTotal = Context::getContext()->cart->getOrderTotal(true, Cart::ONLY_DISCOUNTS);
+	        $freeAdvancePayment = ($adv_amount - $vouchersTotal) <= 0 ? true : false;
+	        return $freeAdvancePayment;
+        }
+		return false;
+	}
 }

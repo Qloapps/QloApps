@@ -244,6 +244,7 @@ $(document).ready(function(){
 			}
 			else
 			{
+				$('#submit_refund_reason').attr('disabled', 'disabled');
 				$.ajax({
 			        data:{
 			        	total_order_data: order_data,
@@ -303,6 +304,7 @@ $(document).ready(function(){
 			}
 			else
 			{
+				$('#submit_refund_reason').attr('disabled', 'disabled');
 				$.ajax({
 			        data:{
 			            id_order : id_order,
@@ -328,6 +330,7 @@ $(document).ready(function(){
 
 			        	if (data.status == 'success')
 			        	{
+			        		$('#submit_refund_reason').attr('disabled', false);
 			        		if ($(".roomRequestForRefund").length == 1)
 			        		{
 			        			$('.totalOrdercancellation_div').hide();

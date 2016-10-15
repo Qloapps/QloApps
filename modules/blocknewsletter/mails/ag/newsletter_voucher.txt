@@ -1,0 +1,11 @@
+
+[{shop_url}] 
+
+Hola, 
+
+Después de su suscripción a nuestro boletín, nos complace
+ofrecerle el siguiente cupón: {discount} 
+
+{shop_name} [{shop_url}] creado por
+PrestaShop(tm) [http://www.prestashop.com/] 
+

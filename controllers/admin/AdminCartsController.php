@@ -278,17 +278,21 @@ class AdminCartsControllerCore extends AdminController
 			foreach ($cart_detail_data as $key => $value)
 			{
 				$product_image_id = Product::getCover($value['id_product']);
-				$link_rewrite = ((new Product((int) $value['id_product'], Configuration::get('PS_LANG_DEFAULT')))->link_rewrite[Configuration::get('PS_LANG_DEFAULT')]);
+				$obj_product = new Product((int) $value['id_product'], Configuration::get('PS_LANG_DEFAULT'));
+				$link_rewrite = $obj_product->link_rewrite[Configuration::get('PS_LANG_DEFAULT')];
 
 				if ($product_image_id)
 					$cart_detail_data[$key]['image_link'] = $this->context->link->getImageLink($link_rewrite, $product_image_id['id_image'], 'small_default');
 				else
 					$cart_detail_data[$key]['image_link'] = $this->context->link->getImageLink($link_rewrite, $this->context->language->iso_code."-default", 'small_default');
 
-				$cart_detail_data[$key]['room_type'] = (new Product((int) $value['id_product']))->name[Configuration::get('PS_LANG_DEFAULT')];
-				$cart_detail_data[$key]['room_num'] = (new HotelRoomInformation((int) $value['id_room']))->room_num;
-				$cart_detail_data[$key]['date_from'] = (new DateTime($value['date_from']))->format('d-M Y');
-				$cart_detail_data[$key]['date_to'] = (new DateTime($value['date_to']))->format('d-M Y');
+				$cart_detail_data[$key]['room_type'] = $obj_product->name;
+				$obj_room_info = new HotelRoomInformation((int) $value['id_room']);
+				$cart_detail_data[$key]['room_num'] = $obj_room_info->room_num;
+				$obj_date_time_from = new DateTime($value['date_from']);
+				$cart_detail_data[$key]['date_from'] = $obj_date_time_from->format('d-M Y');
+				$obj_date_time_to = new DateTime($value['date_to']);
+				$cart_detail_data[$key]['date_to'] = $obj_date_time_to->format('d-M Y');
 			}
 		}
 		//end

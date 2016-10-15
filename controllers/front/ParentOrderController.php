@@ -166,7 +166,15 @@ class ParentOrderControllerCore extends FrontController
      */
     protected function _checkFreeOrder()
     {
-        if ($this->context->cart->getOrderTotal() <= 0) {
+        // For Advanced Payment (when advance paid amount will be zero when voucher will be applied)
+        $freeAdvancePaymentOrder = false;
+        if (Module::isInstalled('hotelreservationsystem')) 
+        {
+            require_once (_PS_MODULE_DIR_.'hotelreservationsystem/define.php');
+            $obj_adv_pmt = new HotelAdvancedPayment();
+            $freeAdvancePaymentOrder = $obj_adv_pmt->_checkFreeAdvancePaymentOrder();
+        }
+        if (($this->context->cart->getOrderTotal() <= 0) || $freeAdvancePaymentOrder) {
             $order = new FreeOrder();
             $order->free_order_class = true;
             $order->validateOrder($this->context->cart->id, Configuration::get('PS_OS_PAYMENT'), 0, Tools::displayError('Free order', false), null, array(), null, false, $this->context->cart->secure_key);

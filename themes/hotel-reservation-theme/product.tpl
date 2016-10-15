@@ -35,6 +35,7 @@
 		{assign var='productPriceWithoutReduction' value=$product->getPriceWithoutReduct(true, $smarty.const.NULL)}
 	{/if}
 <div itemscope itemtype="http://schema.org/Product">
+{if isset($product_id_hotel) && $product_id_hotel}
 	<meta itemprop="url" content="{$link->getProductLink($product)}">
 	<div class="primary_block row">
 		<!-- {if !$content_only}
@@ -63,26 +64,35 @@
 		{/if}
 
 		<!-- By webkul to search panel on product page -->
-
+		{*
 		<div class="row margin-lr-0 search_block_container product_page_search">
 	      <form method="POST" autocomplete="on" autofill="on">
 	      	
 	      	<div class="col-xs-12 col-sm-12">
 		      	{if isset($error) && ($error == 1)}
-	                <p class="error_msg_prod"><i class="icon-times-circle-o"></i>&nbsp;&nbsp;{l s='All Fields are mandatory.' mod='wkroomsearchblock'}</p>
+	                <p class="error_msg_prod"><i class="icon-times-circle-o"></i>&nbsp;&nbsp;{l s='All Fields are mandatory.'}</p>
+	            {else if isset($error) && ($error == 2)}
+					<p class="error_msg_prod"><i class="icon-times-circle-o"></i>&nbsp;&nbsp;{l s='Please enter a valid Check In date.'}</p>
+				{else if isset($error) && ($error == 3)}
+					<p class="error_msg_prod"><i class="icon-times-circle-o"></i>&nbsp;&nbsp;{l s='Please enter a valid Check Out date.'}</p>
+				{else if isset($error) && ($error == 4)}
+					<p class="error_msg_prod"><i class="icon-times-circle-o"></i>&nbsp;&nbsp;{l s='Check In date should not be less than current date.'}</p>
+				{else if isset($error) && ($error == 5)}
+					<p class="error_msg_prod"><i class="icon-times-circle-o"></i>&nbsp;&nbsp;{l s='Check Out date should be after the date of check In.'}</p>
+				{else if isset($error) && ($error == 6)}
+					<p class="error_msg_prod"><i class="icon-times-circle-o"></i>&nbsp;&nbsp;{l s='You can not book rooms for the dates after '}{$max_order_date}.</p>
 	            {/if}
 	      	</div>
-
 		    {if isset($location_enable) && $location_enable}
 				<div class="form-group hotel_location_div col-sm-3">
-					<label class="control-label" for="">{l s='Hotel Location' mod='wkroomsearchblock'}</label>
+					<label class="control-label" for="">{l s='Hotel Location'}</label>
 					<input class="form-control" placeholder="Enter a city, state, country name" type="text" id="hotel_location" name="hotel_location" autocomplete="off"/>
 					<ul class="location_search_results_ul">
 					</ul>
 				</div>
 	        {/if}
 			<div class="form-group col-sm-3">
-				<label class="control-label" for="">{l s='Hotel Name' mod='wkroomsearchblock'}</label>
+				<label class="control-label" for="">{l s='Hotel Name'}</label>
 				<div class="dropdown">
 					<button class="btn btn-default hotel_cat_id_btn dropdown-toggle" type="button" data-toggle="dropdown">
 						{if isset($search_data)}
@@ -92,6 +102,7 @@
 						{/if}
 						<!-- <span id="hotel_cat_name" class="pull-left">{l s='Select Hotel'}</span> -->
 						<input type="hidden" id="hotel_cat_id" name="hotel_cat_id" {if isset($search_data)}value="{$search_data['htl_dtl']['id_category']}"{/if}>
+						<input type="hidden" id="max_order_date" name="max_order_date" value="{$max_order_date}">
 						<div class="caret_div">
 							<span class="caret"></span>
 						</div>  
@@ -112,7 +123,7 @@
 	        <div class="form-group col-sm-2">
 				<label class="control-label" for="check_in_time">{l s='Check In Time'}</label>
 				<div class="input-group">
-					<input class="form-control" type="text" id="check_in_time" name="check_in_time" autocomplete="off" {if isset($search_data)}value="{$search_data['date_from']}"{/if}/>
+					<input class="form-control" type="text" id="check_in_time" name="check_in_time" autocomplete="off" {if isset($search_data)}value="{$search_data['date_from']}"{/if} readonly />
 					<label class="input-group-addon calender-icon-cont" for="check_in_time"><i class="icon-calendar"></i></label>
 				</div>
 				<p class="error_msg_prod" id="check_in_time_error_p"></p>
@@ -121,7 +132,7 @@
 	        <div class="form-group col-sm-2">
 				<label class="control-label" for="check_out_time">{l s='Check Out Time'}</label>
 				<div class="input-group">
-					<input class="form-control" type="text" id="check_out_time" name="check_out_time" autocomplete="off" {if isset($search_data)}value="{$search_data['date_to']}"{/if}/>
+					<input class="form-control" type="text" id="check_out_time" name="check_out_time" autocomplete="off" {if isset($search_data)}value="{$search_data['date_to']}"{/if} readonly />
 					<label class="input-group-addon calender-icon-cont" for="check_out_time"><i class="icon-calendar"></i></label>
 		         </div>
 		         <p class="error_msg_prod" id="check_out_time_error_p"></p>
@@ -132,25 +143,82 @@
 	        </div>
 	      </form>
 		</div>
+		*}
+
+		<div class="header-rmsearch-wrapper">
+		    <div class="header-rmsearch-primary">
+		        <div class="container">
+		            <div class="row header-rmsearch-inner-wrapper">
+		                <form method="POST" id="search_hotel_block_form">
+		                    {if isset($location_enable) && $location_enable}
+		                        <div class="form-group col-sm-6 col-lg-3">
+		                            <input type="text" class="form-control header-rmsearch-input"  id="hotel_location" name="hotel_location" autocomplete="off" placeholder="Hotel Location">
+		                            <div class="dropdown">
+		                                <ul class="location_search_results_ul"></ul>
+		                            </div>
+		                        </div>
+		                    {/if}    
+		                    <div class="form-group {if isset($location_enable) && $location_enable}col-sm-6 col-lg-3 {else}col-sm-6 col-lg-4{/if}">
+		                        <div class="dropdown">
+		                            <button class="form-control header-rmsearch-input {if isset($error) && $error == 1}error_border{/if}" type="button" data-toggle="dropdown">
+		                                {if isset($search_data)}
+											<span id="hotel_cat_name" class="pull-left">{$search_data['htl_dtl']['hotel_name']}</span>
+										{else}
+											<span id="hotel_cat_name" class="pull-left">{l s='Select Hotel'}</span>
+										{/if}
+										<!-- <span id="hotel_cat_name" class="pull-left">{l s='Select Hotel'}</span> -->
+										<input type="hidden" id="hotel_cat_id" name="hotel_cat_id" {if isset($search_data)}value="{$search_data['htl_dtl']['id_category']}"{/if}>
+										<input type="hidden" id="max_order_date" name="max_order_date" value="{$max_order_date}">
+										<span class="arrow_span">
+		                                    <i class="icon icon-angle-down"></i>
+		                                </span>
+		                            </button>
+		                            <ul class="dropdown-menu hotel_dropdown_ul">
+		                                {if isset($all_hotels_info) && $all_hotels_info}
+											{foreach from=$all_hotels_info key=htl_k item=htl_v}
+												<li class="hotel_name" data-hotel-cat-id="{$htl_v['id_category']}">
+													{$htl_v['hotel_name']}
+												</li>
+											{/foreach}
+										{/if} 
+		                            </ul>
+		                        </div>
+		                    </div>
+		                    <div class="form-group {if isset($location_enable) && $location_enable}col-sm-4 col-lg-2{else}col-sm-6 col-lg-3{/if}">
+		                        <input type="text" class="form-control header-rmsearch-input input-date" id="check_in_time" name="check_in_time" autocomplete="off" placeholder="Check In Date" {if isset($search_data)}value="{$search_data['date_from']}"{/if} />
+		                    </div>
+		                    <div class="form-group {if isset($location_enable) && $location_enable}col-sm-4 col-lg-2{else}col-sm-6 col-lg-3{/if}">
+		                        <input type="text" class="form-control header-rmsearch-input input-date" id="check_out_time" name="check_out_time" autocomplete="off" placeholder="Check Out Date" {if isset($search_data)}value="{$search_data['date_to']}"{/if} />
+		                    </div>
+		                    <div class="form-group {if isset($location_enable) && $location_enable}col-sm-4{else}col-sm-6{/if} col-lg-2">
+		                        <button type="submit" class="btn btn-default button button-medium exclusive" name="product_page_search_submit" id="search_room_submit">
+		                            <span>{l s='Search Now' mod='wkroomsearchblock'}</span>
+		                        </button>
+		                    </div>
+		                </form>    
+		            </div>
+		        </div>
+		    </div>
+		</div>
 
 		<!-- end -->
 
 		<!-- left infos-->
-		<div class="pb-left-column col-xs-12 col-sm-4 col-md-8" style="border:1px solid #cccccc">
+		<div class="pb-left-column col-xs-12 col-sm-8 col-md-8" style="border:1px solid #cccccc">
 			<div class="room_hotel_name_block">
 				<div class="hotel_name_block">
 					<span>{$product->name}&nbsp;-&nbsp;{$hotel_name}</span>
 				</div>
-				{for $foo=1 to 5}
-					{if $foo <= $ratting}
-						<div class="room_ratting_yes" style="background-image:url({$ratting_img_path});"></div>
-					{else}
-						<div class="room_ratting_no" style="background-image:url({$ratting_img_path});"></div>
-					{/if}
-				{/for}
-				<span class="num_reviews">{$num_reviews} &nbsp;{l s='Reviews'}</span>
-
-
+				{if isset($num_reviews)}
+					{for $foo=1 to 5}
+						{if $foo <= $ratting}
+							<div class="room_ratting_yes" style="background-image:url({$ratting_img_path});"></div>
+						{else}
+							<div class="room_ratting_no" style="background-image:url({$ratting_img_path});"></div>
+						{/if}
+					{/for}
+					<span class="num_reviews">{$num_reviews} &nbsp;{l s='Reviews'}</span>
+				{/if}
 			</div>
 			<!-- product img-->
 			<div id="image-block" class="clearfix">
@@ -314,11 +382,11 @@
 						</div>
 						<div class="form-group">
 							<label for="" class="control-label">{l s='Check In Date'}</label>
-						   	<input type="text" class="form-control" name="room_check_in" id="room_check_in" value="{if isset($date_from)}{$date_from}{/if}" autocomplete="off"/>
+						   	<input type="text" class="form-control" name="room_check_in" id="room_check_in" value="{if isset($date_from)}{$date_from}{/if}" autocomplete="off" readonly />
 						</div>
 						<div class="form-group">
 							<label for="" class="control-label">{l s='Check Out Date'}</label>
-						   	<input type="text" class="form-control" name="room_check_out" id="room_check_out" value="{if isset($date_to)}{$date_to}{/if}" autocomplete="off"/>
+						   	<input type="text" class="form-control" name="room_check_out" id="room_check_out" value="{if isset($date_to)}{$date_to}{/if}" autocomplete="off" readonly />
 						</div>
 						<div class="room_unavailability_date_error_div"></div>
 						<div class="form-group unvail_rooms_cond_display">
@@ -634,9 +702,24 @@
 			{/if}
 		{/if}
 	{/if}
+	{strip}
+		{* By webkul variable needed in product.js *}
+		{addJsDef total_avail_rms = $total_available_rooms}
+		{addJsDef max_order_date = $max_order_date}
+		{addJsDef booking_date_to = $booking_date_to}
+
+		{addJsDef product_controller_url=$product_controller_url}
+	{/strip}
+{else}
+	<div class="bootstrap">
+		<div class="alert alert-warning">
+			{l s='This room type has not enough information. Please save information of related hotel and other required room information for the booking of this room type.'}
+		</div>
+	</div>
+{/if}
+
 </div> <!-- itemscope product wrapper -->
 {strip}
-{addJsDef product_controller_url=$product_controller_url}
 {if isset($smarty.get.ad) && $smarty.get.ad}
 	{addJsDefL name=ad}{$base_dir|cat:$smarty.get.ad|escape:'html':'UTF-8'}{/addJsDefL}
 {/if}
@@ -744,8 +827,19 @@
 {addJsDefL name=out_of_stock_cond}{l s='No room is available for this period.' js=1}{/addJsDefL}
 {addJsDefL name=wrong_qty_cond}{l s='you are trying for a invalid quantity.' js=1}{/addJsDefL}
 
-<!-- By webkul variable needed in product.js -->
-{addJsDef total_avail_rms = $total_available_rooms}
-<!-- End -->
+
+{addJsDefL name=hotel_loc_cond}{l s='Please enter a hotel location' js=1 mod='wkroomsearchblock'}{/addJsDefL}
+{addJsDefL name=hotel_name_cond}{l s='Please select a hotel name' js=1 mod='wkroomsearchblock'}{/addJsDefL}
+{addJsDefL name=check_in_time_cond}{l s='Please enter Check In time' js=1 mod='wkroomsearchblock'}{/addJsDefL}
+{addJsDefL name=check_out_time_cond}{l s='Please enter Check Out time' js=1 mod='wkroomsearchblock'}{/addJsDefL}
+{addJsDefL name=num_adults_cond}{l s='Please enter number of adults.' js=1 mod='wkroomsearchblock'}{/addJsDefL}
+{addJsDefL name=num_children_cond}{l s='Please enter number of children.' js=1 mod='wkroomsearchblock'}{/addJsDefL}
+{addJsDefL name=some_error_occur_cond}{l s='Some error occured. Please try again.' js=1 mod='wkroomsearchblock'}{/addJsDefL}
+{addJsDefL name=less_checkin_date}{l s='Check In date can not be before current date.' js=1 mod='wkroomsearchblock'}{/addJsDefL}
+{addJsDefL name=more_checkout_date}{l s='Check Out date must be greater than Check In date.' js=1 mod='wkroomsearchblock'}{/addJsDefL}
+{addJsDef autocomplete_search_url=$link->getModuleLink('wkroomsearchblock','autocompletesearch')}
+
+
 {/strip}
+
 {/if}

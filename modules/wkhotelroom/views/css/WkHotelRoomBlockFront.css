@@ -1,0 +1,41 @@
+.hotelRoomDescContainer{
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+	background-color: rgba(255, 255, 255, 0.85);
+    margin-left: 15px;
+    margin-right: 15px;
+    padding: 20px;
+    z-index: 10;
+}
+
+.htlRoomTypeNameText, .htlRoomTypePriceText {
+	font-size: 18px;
+	color: #222222;
+	font-weight: 400;
+	text-transform: capitalize;
+}
+.htlRoomTypeDescText{
+	font-size: 16px;
+	color: #555555;
+	font-weight: 300;
+	line-height: 21px;
+}
+.htlRoomTypeBookNow {
+	font-size: 15px!important;
+	color: #333333!important;
+	font-weight: 400!important;
+	background: transparent!important;
+    border: 1px solid #333333!important;
+    padding: 10px 30px!important;
+    text-transform: capitalize;
+}
+
+.btn.htlRoomTypeBookNow:hover{
+	border: 1px solid #333333;
+}
+
+.htlRoomTypeDescText {
+    padding-bottom: 9px;
+}

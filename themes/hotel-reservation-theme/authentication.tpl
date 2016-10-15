@@ -28,7 +28,7 @@
 		<span class="navigation-pipe">{$navigationPipe}</span>{l s='Create your account'}
 	{/if}
 {/capture}
-<h1 class="page-heading htl-reservation-page-heading">{if !isset($email_create)}{l s='Authentication'}{else}{l s='Create an account'}{/if}</h1>
+<h1 class="page-heading">{if !isset($email_create)}{l s='Authentication'}{else}{l s='Create an account'}{/if}</h1>
 {if isset($back) && preg_match("/^http/", $back)}{assign var='current_step' value='login'}{include file="$tpl_dir./order-steps.tpl"}{/if}
 {include file="$tpl_dir./errors.tpl"}
 {assign var='stateExist' value=false}
@@ -52,17 +52,17 @@
 	<div class="row">
 		<div class="col-xs-12 col-sm-6">
 			<form action="{$link->getPageLink('authentication', true)|escape:'html':'UTF-8'}" method="post" id="create-account_form" class="box">
-				<h3 class="page-subheading htl-reservation-page-sub-heading">{l s='Create an account'}</h3>
+				<h3 class="page-subheading">{l s='Create an account'}</h3>
 				<div class="form_content clearfix">
-					<p class="htl-reservation-page-content">{l s='Please enter your email address to create an account.'}</p>
+					<p class="content">{l s='Please enter your email address to create an account.'}</p>
 					<div class="alert alert-danger" id="create_account_error" style="display:none"></div>
 					<div class="form-group">
-						<label for="email_create" class="htl-reservation-form-label">{l s='Email address'}</label>
-						<input type="email" class="is_required validate account_input form-control htl-reservation-form-input" data-validate="isEmail" id="email_create" name="email_create" value="{if isset($smarty.post.email_create)}{$smarty.post.email_create|stripslashes}{/if}" />
+						<label for="email_create" class="">{l s='Email address'}</label>
+						<input type="email" class="is_required validate account_input form-control" data-validate="isEmail" id="email_create" name="email_create" value="{if isset($smarty.post.email_create)}{$smarty.post.email_create|stripslashes}{/if}" />
 					</div>
 					<div class="submit">
 						{if isset($back)}<input type="hidden" class="hidden" name="back" value="{$back|escape:'html':'UTF-8'}" />{/if}
-						<button class="btn btn-default htl-reservation-form-btn-default exclusive" type="submit" id="SubmitCreate" name="SubmitCreate">
+						<button class="btn button button-medium" type="submit" id="SubmitCreate" name="SubmitCreate">
 							<span>
 								<i class="icon-user left"></i>
 								{l s='Create an account'}
@@ -75,20 +75,20 @@
 		</div>
 		<div class="col-xs-12 col-sm-6">
 			<form action="{$link->getPageLink('authentication', true)|escape:'html':'UTF-8'}" method="post" id="login_form" class="box">
-				<h3 class="page-subheading htl-reservation-page-sub-heading">{l s='Already registered?'}</h3>
+				<h3 class="page-subheading">{l s='Already registered?'}</h3>
 				<div class="form_content clearfix">
 					<div class="form-group">
-						<label class="htl-reservation-form-label" for="email">{l s='Email address'}</label>
-						<input class="htl-reservation-form-input is_required validate account_input form-control" data-validate="isEmail" type="email" id="email" name="email" value="{if isset($smarty.post.email)}{$smarty.post.email|stripslashes}{/if}" />
+						<label class="" for="email">{l s='Email address'}</label>
+						<input class="is_required validate account_input form-control" data-validate="isEmail" type="email" id="email" name="email" value="{if isset($smarty.post.email)}{$smarty.post.email|stripslashes}{/if}" />
 					</div>
 					<div class="form-group">
-						<label class="htl-reservation-form-label" for="passwd">{l s='Password'}</label>
-						<input class="htl-reservation-form-input is_required validate account_input form-control" type="password" data-validate="isPasswd" id="passwd" name="passwd" value="" />
+						<label class="" for="passwd">{l s='Password'}</label>
+						<input class="is_required validate account_input form-control" type="password" data-validate="isPasswd" id="passwd" name="passwd" value="" />
 					</div>
 					<p class="lost_password form-group"><a href="{$link->getPageLink('password')|escape:'html':'UTF-8'}" title="{l s='Recover your forgotten password'}" rel="nofollow">{l s='Forgot your password?'}</a></p>
 					<p class="submit">
 						{if isset($back)}<input type="hidden" class="hidden" name="back" value="{$back|escape:'html':'UTF-8'}" />{/if}
-						<button type="submit" id="SubmitLogin" name="SubmitLogin" class="button btn btn-default htl-reservation-form-btn-default">
+						<button type="submit" id="SubmitLogin" name="SubmitLogin" class="btn button button-medium">
 							<span>
 								<i class="icon-lock left"></i>
 								{l s='Sign in'}
@@ -106,30 +106,30 @@
 					<h3 class="page-heading bottom-indent">{l s='Instant checkout'}</h3>
 					<!-- Account -->
 					<div class="required form-group">
-						<label for="guest_email" class="htl-reservation-form-label">{l s='Email address'} <sup>*</sup></label>
-						<input type="text" class="is_required validate form-control htl-reservation-form-input" data-validate="isEmail" id="guest_email" name="guest_email" value="{if isset($smarty.post.guest_email)}{$smarty.post.guest_email}{/if}" />
+						<label for="guest_email" class="">{l s='Email address'} <sup>*</sup></label>
+						<input type="text" class="is_required validate form-control " data-validate="isEmail" id="guest_email" name="guest_email" value="{if isset($smarty.post.guest_email)}{$smarty.post.guest_email}{/if}" />
 					</div>
 					<div class="cleafix gender-line">
-						<label class="htl-reservation-form-label">{l s='Title'}</label>
+						<label class="">{l s='Title'}</label>
 						{foreach from=$genders key=k item=gender}
 							<div class="radio-inline">
-								<label for="id_gender{$gender->id}" class="top htl-reservation-form-label">
-									<input class="htl-reservation-form-input" type="radio" name="id_gender" id="id_gender{$gender->id}" value="{$gender->id}"{if isset($smarty.post.id_gender) && $smarty.post.id_gender == $gender->id} checked="checked"{/if} />
+								<label for="id_gender{$gender->id}" class="top ">
+									<input class="" type="radio" name="id_gender" id="id_gender{$gender->id}" value="{$gender->id}"{if isset($smarty.post.id_gender) && $smarty.post.id_gender == $gender->id} checked="checked"{/if} />
 									{$gender->name}
 								</label>
 							</div>
 						{/foreach}
 					</div>
 					<div class="required form-group">
-						<label for="firstname" class="htl-reservation-form-label">{l s='First name'} <sup>*</sup></label>
-						<input type="text" class="htl-reservation-form-input is_required validate form-control" data-validate="isName" id="firstname" name="firstname" value="{if isset($smarty.post.firstname)}{$smarty.post.firstname}{/if}" />
+						<label for="firstname" class="">{l s='First name'} <sup>*</sup></label>
+						<input type="text" class="is_required validate form-control" data-validate="isName" id="firstname" name="firstname" value="{if isset($smarty.post.firstname)}{$smarty.post.firstname}{/if}" />
 					</div>
 					<div class="required form-group">
-						<label class="htl-reservation-form-label" for="lastname">{l s='Last name'} <sup>*</sup></label>
-						<input type="text" class="htl-reservation-form-input is_required validate form-control" data-validate="isName" id="lastname" name="lastname" value="{if isset($smarty.post.lastname)}{$smarty.post.lastname}{/if}" />
+						<label class="" for="lastname">{l s='Last name'} <sup>*</sup></label>
+						<input type="text" class="is_required validate form-control" data-validate="isName" id="lastname" name="lastname" value="{if isset($smarty.post.lastname)}{$smarty.post.lastname}{/if}" />
 					</div>
 					<div class="form-group date-select">
-						<label class="htl-reservation-form-label">{l s='Date of Birth'}</label>
+						<label class="">{l s='Date of Birth'}</label>
 						<div class="row">
 							<div class="col-xs-4">
 								<select id="days" name="days" class="form-control">
@@ -173,8 +173,8 @@
 					</div>
 					{if isset($newsletter) && $newsletter}
 						<div class="checkbox">
-							<label class="htl-reservation-form-label" for="newsletter">
-							<input class="htl-reservation-form-input" type="checkbox" name="newsletter" id="newsletter" value="1" {if isset($smarty.post.newsletter) && $smarty.post.newsletter == '1'}checked="checked"{/if} />
+							<label class="" for="newsletter">
+							<input class="" type="checkbox" name="newsletter" id="newsletter" value="1" {if isset($smarty.post.newsletter) && $smarty.post.newsletter == '1'}checked="checked"{/if} />
 							{l s='Sign up for our newsletter!'}</label>
 						</div>
 					{/if}
@@ -189,49 +189,49 @@
 					{foreach from=$dlv_all_fields item=field_name}
 						{if $field_name eq "company"}
 							<div class="form-group">
-								<label class="htl-reservation-form-label" for="company">{l s='Company'}{if in_array($field_name, $required_fields)} <sup>*</sup>{/if}</label>
-								<input type="text" class="form-control htl-reservation-form-input" id="company" name="company" value="{if isset($smarty.post.company)}{$smarty.post.company}{/if}" />
+								<label class="" for="company">{l s='Company'}{if in_array($field_name, $required_fields)} <sup>*</sup>{/if}</label>
+								<input type="text" class="form-control " id="company" name="company" value="{if isset($smarty.post.company)}{$smarty.post.company}{/if}" />
 							</div>
 						{elseif $field_name eq "vat_number"}
 							<div id="vat_number" style="display:none;">
 								<div class="form-group">
-									<label class="htl-reservation-form-label" for="vat-number">{l s='VAT number'}{if in_array($field_name, $required_fields)} <sup>*</sup>{/if}</label>
-									<input id="vat-number" type="text" class="htl-reservation-form-input form-control" name="vat_number" value="{if isset($smarty.post.vat_number)}{$smarty.post.vat_number}{/if}" />
+									<label class="" for="vat-number">{l s='VAT number'}{if in_array($field_name, $required_fields)} <sup>*</sup>{/if}</label>
+									<input id="vat-number" type="text" class="form-control" name="vat_number" value="{if isset($smarty.post.vat_number)}{$smarty.post.vat_number}{/if}" />
 								</div>
 							</div>
 							{elseif $field_name eq "dni"}
 							{assign var='dniExist' value=true}
 							<div class="required dni form-group">
-								<label class="htl-reservation-form-label" for="dni">{l s='Identification number'} <sup>*</sup></label>
-								<input type="text" name="dni" id="dni" class="htl-reservation-form-input"
+								<label class="" for="dni">{l s='Identification number'} <sup>*</sup></label>
+								<input type="text" name="dni" id="dni" class=""
 								 value="{if isset($smarty.post.dni)}{$smarty.post.dni}{/if}" />
 								<span class="form_info">{l s='DNI / NIF / NIE'}</span>
 							</div>
 						{elseif $field_name eq "address1"}
 							<div class="required form-group">
-								<label class="htl-reservation-form-label" for="address1">{l s='Address'} <sup>*</sup></label>
-								<input type="text" class="htl-reservation-form-input form-control" name="address1" id="address1" value="{if isset($smarty.post.address1)}{$smarty.post.address1}{/if}" />
+								<label class="" for="address1">{l s='Address'} <sup>*</sup></label>
+								<input type="text" class="form-control" name="address1" id="address1" value="{if isset($smarty.post.address1)}{$smarty.post.address1}{/if}" />
 							</div>
 						{elseif $field_name eq "address2"}
 							<div class="form-group is_customer_param">
-								<label class="htl-reservation-form-label" for="address2">{l s='Address (Line 2)'}{if in_array($field_name, $required_fields)} <sup>*</sup>{/if}</label>
-								<input type="text" class="htl-reservation-form-input form-control" name="address2" id="address2" value="{if isset($smarty.post.address2)}{$smarty.post.address2}{/if}" />
+								<label class="" for="address2">{l s='Address (Line 2)'}{if in_array($field_name, $required_fields)} <sup>*</sup>{/if}</label>
+								<input type="text" class="form-control" name="address2" id="address2" value="{if isset($smarty.post.address2)}{$smarty.post.address2}{/if}" />
 							</div>
 						{elseif $field_name eq "postcode"}
 							{assign var='postCodeExist' value=true}
 							<div class="required postcode form-group">
-								<label class="htl-reservation-form-label" for="postcode">{l s='Zip/Postal Code'} <sup>*</sup></label>
-								<input type="text" class="htl-reservation-form-input validate form-control" name="postcode" id="postcode" data-validate="isPostCode" value="{if isset($smarty.post.postcode)}{$smarty.post.postcode}{/if}"/>
+								<label class="" for="postcode">{l s='Zip/Postal Code'} <sup>*</sup></label>
+								<input type="text" class="validate form-control" name="postcode" id="postcode" data-validate="isPostCode" value="{if isset($smarty.post.postcode)}{$smarty.post.postcode}{/if}"/>
 							</div>
 						{elseif $field_name eq "city"}
 							<div class="required form-group">
-								<label class="htl-reservation-form-label" for="city">{l s='City'} <sup>*</sup></label>
-								<input type="text" class="htl-reservation-form-input form-control" name="city" id="city" value="{if isset($smarty.post.city)}{$smarty.post.city}{/if}" />
+								<label class="" for="city">{l s='City'} <sup>*</sup></label>
+								<input type="text" class="form-control" name="city" id="city" value="{if isset($smarty.post.city)}{$smarty.post.city}{/if}" />
 							</div>
 							<!-- if customer hasn't update his layout address, country has to be verified but it's deprecated -->
 						{elseif $field_name eq "Country:name" || $field_name eq "country"}
 							<div class="required select form-group">
-								<label class="htl-reservation-form-label" for="id_country">{l s='Country'} <sup>*</sup></label>
+								<label class="" for="id_country">{l s='Country'} <sup>*</sup></label>
 								<select name="id_country" id="id_country" class="form-control">
 									{foreach from=$countries item=v}
 										<option value="{$v.id_country}"{if (isset($smarty.post.id_country) AND  $smarty.post.id_country == $v.id_country) OR (!isset($smarty.post.id_country) && $sl_country == $v.id_country)} selected="selected"{/if}>{$v.name}</option>
@@ -250,7 +250,7 @@
 					{/foreach}
 					{if $stateExist eq false}
 						<div class="required id_state select unvisible form-group">
-							<label class="htl-reservation-form-label" for="id_state">{l s='State'} <sup>*</sup></label>
+							<label class="" for="id_state">{l s='State'} <sup>*</sup></label>
 							<select name="id_state" id="id_state" class="form-control">
 								<option value="">-</option>
 							</select>
@@ -258,8 +258,8 @@
 					{/if}
 					{if $postCodeExist eq false}
 						<div class="required postcode unvisible form-group">
-							<label class="htl-reservation-form-label" for="postcode">{l s='Zip/Postal Code'} <sup>*</sup></label>
-							<input type="text" class="htl-reservation-form-input validate form-control" name="postcode" id="postcode" data-validate="isPostCode" value="{if isset($smarty.post.postcode)}{$smarty.post.postcode}{/if}"/>
+							<label class="" for="postcode">{l s='Zip/Postal Code'} <sup>*</sup></label>
+							<input type="text" class="validate form-control" name="postcode" id="postcode" data-validate="isPostCode" value="{if isset($smarty.post.postcode)}{$smarty.post.postcode}{/if}"/>
 						</div>
 					{/if}
 					{if $dniExist eq false}
@@ -270,14 +270,14 @@
 						</div>
 					{/if}
 					<div class="{if isset($one_phone_at_least) && $one_phone_at_least}required {/if}form-group">
-						<label class="htl-reservation-form-label" for="phone_mobile">{l s='Mobile phone'}{if isset($one_phone_at_least) && $one_phone_at_least} <sup>*</sup>{/if}</label>
-						<input type="text" class="htl-reservation-form-input form-control" name="phone_mobile" id="phone_mobile" value="{if isset($smarty.post.phone_mobile)}{$smarty.post.phone_mobile}{/if}" />
+						<label class="" for="phone_mobile">{l s='Mobile phone'}{if isset($one_phone_at_least) && $one_phone_at_least} <sup>*</sup>{/if}</label>
+						<input type="text" class="form-control" name="phone_mobile" id="phone_mobile" value="{if isset($smarty.post.phone_mobile)}{$smarty.post.phone_mobile}{/if}" />
 					</div>
 					<input type="hidden" name="alias" id="alias" value="{l s='My address'}" />
 					<input type="hidden" name="is_new_customer" id="is_new_customer" value="0" />
 					<div class="checkbox">
-						<label class="htl-reservation-form-label" for="invoice_address">
-						<input class="htl-reservation-form-input" type="checkbox" name="invoice_address" id="invoice_address"{if (isset($smarty.post.invoice_address) && $smarty.post.invoice_address) || (isset($smarty.post.invoice_address) && $smarty.post.invoice_address)} checked="checked"{/if} autocomplete="off"/>
+						<label class="" for="invoice_address">
+						<input class="" type="checkbox" name="invoice_address" id="invoice_address"{if (isset($smarty.post.invoice_address) && $smarty.post.invoice_address) || (isset($smarty.post.invoice_address) && $smarty.post.invoice_address)} checked="checked"{/if} autocomplete="off"/>
 						{l s='Please use another address for invoice'}</label>
 					</div>
 					<div id="opc_invoice_address"  class="unvisible">
@@ -288,58 +288,58 @@
 						{foreach from=$inv_all_fields item=field_name}
 						{if $field_name eq "company"}
 						<div class="form-group">
-							<label class="htl-reservation-form-label" for="company_invoice">{l s='Company'}{if in_array($field_name, $required_fields)} <sup>*</sup>{/if}</label>
-							<input type="text" class="htl-reservation-form-input text form-control" id="company_invoice" name="company_invoice" value="{if isset($smarty.post.company_invoice) && $smarty.post.company_invoice}{$smarty.post.company_invoice}{/if}" />
+							<label class="" for="company_invoice">{l s='Company'}{if in_array($field_name, $required_fields)} <sup>*</sup>{/if}</label>
+							<input type="text" class="text form-control" id="company_invoice" name="company_invoice" value="{if isset($smarty.post.company_invoice) && $smarty.post.company_invoice}{$smarty.post.company_invoice}{/if}" />
 						</div>
 						{elseif $field_name eq "vat_number"}
 						<div id="vat_number_block_invoice" style="display:none;">
 							<div class="form-group">
-								<label class="htl-reservation-form-label" for="vat_number_invoice">{l s='VAT number'}{if in_array($field_name, $required_fields)} <sup>*</sup>{/if}</label>
-								<input type="text" class="htl-reservation-form-input form-control" id="vat_number_invoice" name="vat_number_invoice" value="{if isset($smarty.post.vat_number_invoice) && $smarty.post.vat_number_invoice}{$smarty.post.vat_number_invoice}{/if}" />
+								<label class="" for="vat_number_invoice">{l s='VAT number'}{if in_array($field_name, $required_fields)} <sup>*</sup>{/if}</label>
+								<input type="text" class="form-control" id="vat_number_invoice" name="vat_number_invoice" value="{if isset($smarty.post.vat_number_invoice) && $smarty.post.vat_number_invoice}{$smarty.post.vat_number_invoice}{/if}" />
 							</div>
 						</div>
 						{elseif $field_name eq "dni"}
 						{assign var=dniExist value=true}
 						<div class="required form-group dni_invoice">
-							<label class="htl-reservation-form-label" for="dni_invoice">{l s='Identification number'} <sup>*</sup></label>
-							<input type="text" class="htl-reservation-form-input text form-control" name="dni_invoice" id="dni_invoice" value="{if isset($smarty.post.dni_invoice) && $smarty.post.dni_invoice}{$smarty.post.dni_invoice}{/if}" />
+							<label class="" for="dni_invoice">{l s='Identification number'} <sup>*</sup></label>
+							<input type="text" class="text form-control" name="dni_invoice" id="dni_invoice" value="{if isset($smarty.post.dni_invoice) && $smarty.post.dni_invoice}{$smarty.post.dni_invoice}{/if}" />
 							<span class="form_info">{l s='DNI / NIF / NIE'}</span>
 						</div>
 						{elseif $field_name eq "firstname"}
 						<div class="required form-group">
-							<label class="htl-reservation-form-label" for="firstname_invoice">{l s='First name'} <sup>*</sup></label>
-							<input type="text" class="htl-reservation-form-input form-control" id="firstname_invoice" name="firstname_invoice" value="{if isset($smarty.post.firstname_invoice) && $smarty.post.firstname_invoice}{$smarty.post.firstname_invoice}{/if}" />
+							<label class="" for="firstname_invoice">{l s='First name'} <sup>*</sup></label>
+							<input type="text" class="form-control" id="firstname_invoice" name="firstname_invoice" value="{if isset($smarty.post.firstname_invoice) && $smarty.post.firstname_invoice}{$smarty.post.firstname_invoice}{/if}" />
 						</div>
 						{elseif $field_name eq "lastname"}
 						<div class="required form-group">
-							<label class="htl-reservation-form-label" for="lastname_invoice">{l s='Last name'} <sup>*</sup></label>
-							<input type="text" class="htl-reservation-form-input form-control" id="lastname_invoice" name="lastname_invoice" value="{if isset($smarty.post.lastname_invoice) && $smarty.post.lastname_invoice}{$smarty.post.lastname_invoice}{/if}" />
+							<label class="" for="lastname_invoice">{l s='Last name'} <sup>*</sup></label>
+							<input type="text" class="form-control" id="lastname_invoice" name="lastname_invoice" value="{if isset($smarty.post.lastname_invoice) && $smarty.post.lastname_invoice}{$smarty.post.lastname_invoice}{/if}" />
 						</div>
 						{elseif $field_name eq "address1"}
 						<div class="required form-group">
-							<label class="htl-reservation-form-label" for="address1_invoice">{l s='Address'} <sup>*</sup></label>
-							<input type="text" class="htl-reservation-form-input form-control" name="address1_invoice" id="address1_invoice" value="{if isset($smarty.post.address1_invoice) && $smarty.post.address1_invoice}{$smarty.post.address1_invoice}{/if}" />
+							<label class="" for="address1_invoice">{l s='Address'} <sup>*</sup></label>
+							<input type="text" class="form-control" name="address1_invoice" id="address1_invoice" value="{if isset($smarty.post.address1_invoice) && $smarty.post.address1_invoice}{$smarty.post.address1_invoice}{/if}" />
 						</div>
 						{elseif $field_name eq "address2"}
 						<div class="form-group is_customer_param">
-							<label class="htl-reservation-form-label" for="address2_invoice">{l s='Address (Line 2)'}{if in_array($field_name, $required_fields)} <sup>*</sup>{/if}</label>
-							<input type="text" class="htl-reservation-form-input form-control" name="address2_invoice" id="address2_invoice" value="{if isset($smarty.post.address2_invoice) && $smarty.post.address2_invoice}{$smarty.post.address2_invoice}{/if}" />
+							<label class="" for="address2_invoice">{l s='Address (Line 2)'}{if in_array($field_name, $required_fields)} <sup>*</sup>{/if}</label>
+							<input type="text" class="form-control" name="address2_invoice" id="address2_invoice" value="{if isset($smarty.post.address2_invoice) && $smarty.post.address2_invoice}{$smarty.post.address2_invoice}{/if}" />
 						</div>
 						{elseif $field_name eq "postcode"}
 						{$postCodeExist = true}
 						<div class="required postcode_invoice form-group">
-							<label class="htl-reservation-form-label" for="postcode_invoice">{l s='Zip/Postal Code'} <sup>*</sup></label>
-							<input type="text" class="htl-reservation-form-input validate form-control" name="postcode_invoice" id="postcode_invoice" data-validate="isPostCode" value="{if isset($smarty.post.postcode_invoice) && $smarty.post.postcode_invoice}{$smarty.post.postcode_invoice}{/if}"/>
+							<label class="" for="postcode_invoice">{l s='Zip/Postal Code'} <sup>*</sup></label>
+							<input type="text" class="validate form-control" name="postcode_invoice" id="postcode_invoice" data-validate="isPostCode" value="{if isset($smarty.post.postcode_invoice) && $smarty.post.postcode_invoice}{$smarty.post.postcode_invoice}{/if}"/>
 						</div>
 						{elseif $field_name eq "city"}
 						<div class="required form-group">
-							<label class="htl-reservation-form-label" for="city_invoice">{l s='City'} <sup>*</sup></label>
-							<input type="text" class="form-control htl-reservation-form-input" name="city_invoice" id="city_invoice" value="{if isset($smarty.post.city_invoice) && $smarty.post.city_invoice}{$smarty.post.city_invoice}{/if}" />
+							<label class="" for="city_invoice">{l s='City'} <sup>*</sup></label>
+							<input type="text" class="form-control " name="city_invoice" id="city_invoice" value="{if isset($smarty.post.city_invoice) && $smarty.post.city_invoice}{$smarty.post.city_invoice}{/if}" />
 						</div>
 						{elseif $field_name eq "country" || $field_name eq "Country:name"}
 						<div class="required form-group">
-							<label class="htl-reservation-form-label" for="id_country_invoice">{l s='Country'} <sup>*</sup></label>
-							<select name="id_country_invoice" id="id_country_invoice" class="htl-reservation-form-input form-control">
+							<label class="" for="id_country_invoice">{l s='Country'} <sup>*</sup></label>
+							<select name="id_country_invoice" id="id_country_invoice" class="form-control">
 								<option value="">-</option>
 								{foreach from=$countries item=v}
 								<option value="{$v.id_country}"{if (isset($smarty.post.id_country_invoice) && $smarty.post.id_country_invoice == $v.id_country) OR (!isset($smarty.post.id_country_invoice) && $sl_country == $v.id_country)} selected="selected"{/if}>{$v.name|escape:'html':'UTF-8'}</option>
@@ -349,7 +349,7 @@
 						{elseif $field_name eq "state" || $field_name eq 'State:name'}
 						{$stateExist = true}
 						<div class="required id_state_invoice form-group" style="display:none;">
-							<label class="htl-reservation-form-label" for="id_state_invoice">{l s='State'} <sup>*</sup></label>
+							<label class="" for="id_state_invoice">{l s='State'} <sup>*</sup></label>
 							<select name="id_state_invoice" id="id_state_invoice" class="form-control">
 								<option value="">-</option>
 							</select>
@@ -358,39 +358,39 @@
 						{/foreach}
 						{if !$postCodeExist}
 						<div class="required postcode_invoice form-group unvisible">
-							<label class="htl-reservation-form-label" for="postcode_invoice">{l s='Zip/Postal Code'} <sup>*</sup></label>
-							<input type="text" class="htl-reservation-form-input form-control" name="postcode_invoice" id="postcode_invoice" value="{if isset($smarty.post.postcode_invoice) && $smarty.post.postcode_invoice}{$smarty.post.postcode_invoice}{/if}"/>
+							<label class="" for="postcode_invoice">{l s='Zip/Postal Code'} <sup>*</sup></label>
+							<input type="text" class="form-control" name="postcode_invoice" id="postcode_invoice" value="{if isset($smarty.post.postcode_invoice) && $smarty.post.postcode_invoice}{$smarty.post.postcode_invoice}{/if}"/>
 						</div>
 						{/if}
 						{if !$stateExist}
 						<div class="required id_state_invoice form-group unvisible">
-							<label class="htl-reservation-form-label" for="id_state_invoice">{l s='State'} <sup>*</sup></label>
-							<select name="id_state_invoice" id="id_state_invoice" class="htl-reservation-form-input form-control">
+							<label class="" for="id_state_invoice">{l s='State'} <sup>*</sup></label>
+							<select name="id_state_invoice" id="id_state_invoice" class="form-control">
 								<option value="">-</option>
 							</select>
 						</div>
 						{/if}
 						{if $dniExist eq false}
 							<div class="required form-group dni_invoice">
-								<label class="htl-reservation-form-label" for="dni">{l s='Identification number'} <sup>*</sup></label>
-								<input type="text" class="htl-reservation-form-input text form-control" name="dni_invoice" id="dni_invoice" value="{if isset($smarty.post.dni_invoice) && $smarty.post.dni_invoice}{$smarty.post.dni_invoice}{/if}" />
+								<label class="" for="dni">{l s='Identification number'} <sup>*</sup></label>
+								<input type="text" class="text form-control" name="dni_invoice" id="dni_invoice" value="{if isset($smarty.post.dni_invoice) && $smarty.post.dni_invoice}{$smarty.post.dni_invoice}{/if}" />
 								<span class="form_info">{l s='DNI / NIF / NIE'}</span>
 							</div>
 						{/if}
 						<div class="form-group is_customer_param">
-							<label class="htl-reservation-form-label other_invoice">{l s='Additional information'}</label>
-							<textarea class="htl-reservation-form-input form-control" name="other_invoice" id="other_invoice" cols="26" rows="3"></textarea>
+							<label class=" other_invoice">{l s='Additional information'}</label>
+							<textarea class="form-control" name="other_invoice" id="other_invoice" cols="26" rows="3"></textarea>
 						</div>
 						{if isset($one_phone_at_least) && $one_phone_at_least}
 							<p class="inline-infos required is_customer_param">{l s='You must register at least one phone number.'}</p>
 						{/if}
 						<div class="form-group is_customer_param">
-							<label class="htl-reservation-form-label" for="phone_invoice">{l s='Home phone'}</label>
-							<input type="text" class="htl-reservation-form-input form-control" name="phone_invoice" id="phone_invoice" value="{if isset($smarty.post.phone_invoice) && $smarty.post.phone_invoice}{$smarty.post.phone_invoice}{/if}" />
+							<label class="" for="phone_invoice">{l s='Home phone'}</label>
+							<input type="text" class="form-control" name="phone_invoice" id="phone_invoice" value="{if isset($smarty.post.phone_invoice) && $smarty.post.phone_invoice}{$smarty.post.phone_invoice}{/if}" />
 						</div>
 						<div class="{if isset($one_phone_at_least) && $one_phone_at_least}required {/if}form-group">
-							<label class="htl-reservation-form-label" for="phone_mobile_invoice">{l s='Mobile phone'}{if isset($one_phone_at_least) && $one_phone_at_least} <sup>*</sup>{/if}</label>
-							<input type="text" class="htl-reservation-form-input form-control" name="phone_mobile_invoice" id="phone_mobile_invoice" value="{if isset($smarty.post.phone_mobile_invoice) && $smarty.post.phone_mobile_invoice}{$smarty.post.phone_mobile_invoice}{/if}" />
+							<label class="" for="phone_mobile_invoice">{l s='Mobile phone'}{if isset($one_phone_at_least) && $one_phone_at_least} <sup>*</sup>{/if}</label>
+							<input type="text" class="form-control" name="phone_mobile_invoice" id="phone_mobile_invoice" value="{if isset($smarty.post.phone_mobile_invoice) && $smarty.post.phone_mobile_invoice}{$smarty.post.phone_mobile_invoice}{/if}" />
 						</div>
 						<input type="hidden" name="alias_invoice" id="alias_invoice" value="{l s='My Invoice address'}" />
 					</div>
@@ -434,32 +434,32 @@
 				<br />
 				{foreach from=$genders key=k item=gender}
 					<div class="radio-inline">
-						<label class="htl-reservation-form-label" for="id_gender{$gender->id}" class="top">
-							<input checked="htl-reservation-form-input" type="radio" name="id_gender" id="id_gender{$gender->id}" value="{$gender->id}" {if isset($smarty.post.id_gender) && $smarty.post.id_gender == $gender->id}checked="checked"{/if} />
+						<label class="" for="id_gender{$gender->id}" class="top">
+							<input checked="" type="radio" name="id_gender" id="id_gender{$gender->id}" value="{$gender->id}" {if isset($smarty.post.id_gender) && $smarty.post.id_gender == $gender->id}checked="checked"{/if} />
 						{$gender->name}
 						</label>
 					</div>
 				{/foreach}
 			</div>
 			<div class="required form-group">
-				<label class="htl-reservation-form-label" for="customer_firstname">{l s='First name'} <sup>*</sup></label>
-				<input onkeyup="$('#firstname').val(this.value);" type="text" class="htl-reservation-form-input is_required validate form-control" data-validate="isName" id="customer_firstname" name="customer_firstname" value="{if isset($smarty.post.customer_firstname)}{$smarty.post.customer_firstname}{/if}" />
+				<label class="" for="customer_firstname">{l s='First name'} <sup>*</sup></label>
+				<input onkeyup="$('#firstname').val(this.value);" type="text" class="is_required validate form-control" data-validate="isName" id="customer_firstname" name="customer_firstname" value="{if isset($smarty.post.customer_firstname)}{$smarty.post.customer_firstname}{/if}" />
 			</div>
 			<div class="required form-group">
-				<label class="htl-reservation-form-label" for="customer_lastname">{l s='Last name'} <sup>*</sup></label>
-				<input onkeyup="$('#lastname').val(this.value);" type="text" class="htl-reservation-form-input is_required validate form-control" data-validate="isName" id="customer_lastname" name="customer_lastname" value="{if isset($smarty.post.customer_lastname)}{$smarty.post.customer_lastname}{/if}" />
+				<label class="" for="customer_lastname">{l s='Last name'} <sup>*</sup></label>
+				<input onkeyup="$('#lastname').val(this.value);" type="text" class="is_required validate form-control" data-validate="isName" id="customer_lastname" name="customer_lastname" value="{if isset($smarty.post.customer_lastname)}{$smarty.post.customer_lastname}{/if}" />
 			</div>
 			<div class="required form-group">
-				<label class="htl-reservation-form-label" for="email">{l s='Email'} <sup>*</sup></label>
-				<input type="email" class="htl-reservation-form-input is_required validate form-control" data-validate="isEmail" id="email" name="email" value="{if isset($smarty.post.email)}{$smarty.post.email}{/if}" />
+				<label class="" for="email">{l s='Email'} <sup>*</sup></label>
+				<input type="email" class="is_required validate form-control" data-validate="isEmail" id="email" name="email" value="{if isset($smarty.post.email)}{$smarty.post.email}{/if}" />
 			</div>
 			<div class="required password form-group">
-				<label class="htl-reservation-form-label" for="passwd">{l s='Password'} <sup>*</sup></label>
-				<input type="password" class="htl-reservation-form-input is_required validate form-control" data-validate="isPasswd" name="passwd" id="passwd" />
+				<label class="" for="passwd">{l s='Password'} <sup>*</sup></label>
+				<input type="password" class="is_required validate form-control" data-validate="isPasswd" name="passwd" id="passwd" />
 				<span class="form_info">{l s='(Five characters minimum)'}</span>
 			</div>
 			<div class="form-group">
-				<label class="htl-reservation-form-label">{l s='Date of Birth'}</label>
+				<label class="">{l s='Date of Birth'}</label>
 				<div class="row">
 					<div class="col-xs-4">
 						<select id="days" name="days" class="form-control">
@@ -524,20 +524,20 @@
 			<div class="account_creation">
 				<h3 class="page-subheading htl-reservation-page-sub-heading">{l s='Your company information'}</h3>
 				<p class="form-group">
-					<label class="htl-reservation-form-label" for="">{l s='Company'}</label>
-					<input type="text" class=" htl-reservation-form-input form-control" id="company" name="company" value="{if isset($smarty.post.company)}{$smarty.post.company}{/if}" />
+					<label class="" for="">{l s='Company'}</label>
+					<input type="text" class=" form-control" id="company" name="company" value="{if isset($smarty.post.company)}{$smarty.post.company}{/if}" />
 				</p>
 				<p class="form-group">
-					<label class="htl-reservation-form-label" for="siret">{l s='SIRET'}</label>
-					<input type="text" class="htl-reservation-form-input form-control" id="siret" name="siret" value="{if isset($smarty.post.siret)}{$smarty.post.siret}{/if}" />
+					<label class="" for="siret">{l s='SIRET'}</label>
+					<input type="text" class="form-control" id="siret" name="siret" value="{if isset($smarty.post.siret)}{$smarty.post.siret}{/if}" />
 				</p>
 				<p class="form-group">
-					<label class="htl-reservation-form-label" for="ape">{l s='APE'}</label>
-					<input type="text" class="htl-reservation-form-input form-control" id="ape" name="ape" value="{if isset($smarty.post.ape)}{$smarty.post.ape}{/if}" />
+					<label class="" for="ape">{l s='APE'}</label>
+					<input type="text" class="form-control" id="ape" name="ape" value="{if isset($smarty.post.ape)}{$smarty.post.ape}{/if}" />
 				</p>
 				<p class="form-group">
-					<label class="htl-reservation-form-label" for="website">{l s='Website'}</label>
-					<input type="text" class="form-control htl-reservation-form-input" id="website" name="website" value="{if isset($smarty.post.website)}{$smarty.post.website}{/if}" />
+					<label class="" for="website">{l s='Website'}</label>
+					<input type="text" class="form-control " id="website" name="website" value="{if isset($smarty.post.website)}{$smarty.post.website}{/if}" />
 				</p>
 			</div>
 		{/if}
@@ -548,54 +548,54 @@
 					{if $field_name eq "company"}
 						{if !$b2b_enable}
 							<p class="form-group">
-								<label class="htl-reservation-form-label" for="company">{l s='Company'}{if in_array($field_name, $required_fields)} <sup>*</sup>{/if}</label>
-								<input type="text" class="htl-reservation-form-input form-control" id="company" name="company" value="{if isset($smarty.post.company)}{$smarty.post.company}{/if}" />
+								<label class="" for="company">{l s='Company'}{if in_array($field_name, $required_fields)} <sup>*</sup>{/if}</label>
+								<input type="text" class="form-control" id="company" name="company" value="{if isset($smarty.post.company)}{$smarty.post.company}{/if}" />
 							</p>
 						{/if}
 					{elseif $field_name eq "vat_number"}
 						<div id="vat_number" style="display:none;">
 							<p class="form-group">
-								<label class="htl-reservation-form-label" for="vat_number">{l s='VAT number'}{if in_array($field_name, $required_fields)} <sup>*</sup>{/if}</label>
-								<input type="text" class="htl-reservation-form-input form-control" id="vat_number" name="vat_number" value="{if isset($smarty.post.vat_number)}{$smarty.post.vat_number}{/if}" />
+								<label class="" for="vat_number">{l s='VAT number'}{if in_array($field_name, $required_fields)} <sup>*</sup>{/if}</label>
+								<input type="text" class="form-control" id="vat_number" name="vat_number" value="{if isset($smarty.post.vat_number)}{$smarty.post.vat_number}{/if}" />
 							</p>
 						</div>
 					{elseif $field_name eq "firstname"}
 						<p class="required form-group">
-							<label class="htl-reservation-form-label" for="firstname">{l s='First name'} <sup>*</sup></label>
-							<input type="text" class="htl-reservation-form-input form-control" id="firstname" name="firstname" value="{if isset($smarty.post.firstname)}{$smarty.post.firstname}{/if}" />
+							<label class="" for="firstname">{l s='First name'} <sup>*</sup></label>
+							<input type="text" class="form-control" id="firstname" name="firstname" value="{if isset($smarty.post.firstname)}{$smarty.post.firstname}{/if}" />
 						</p>
 					{elseif $field_name eq "lastname"}
 						<p class="required form-group">
-							<label class="htl-reservation-form-label" for="lastname">{l s='Last name'} <sup>*</sup></label>
-							<input type="text" class="htl-reservation-form-input form-control" id="lastname" name="lastname" value="{if isset($smarty.post.lastname)}{$smarty.post.lastname}{/if}" />
+							<label class="" for="lastname">{l s='Last name'} <sup>*</sup></label>
+							<input type="text" class="form-control" id="lastname" name="lastname" value="{if isset($smarty.post.lastname)}{$smarty.post.lastname}{/if}" />
 						</p>
 					{elseif $field_name eq "address1"}
 						<p class="required form-group">
-							<label class="htl-reservation-form-label" for="address1">{l s='Address'} <sup>*</sup></label>
-							<input type="text" class="htl-reservation-form-input form-control" name="address1" id="address1" value="{if isset($smarty.post.address1)}{$smarty.post.address1}{/if}" />
+							<label class="" for="address1">{l s='Address'} <sup>*</sup></label>
+							<input type="text" class="form-control" name="address1" id="address1" value="{if isset($smarty.post.address1)}{$smarty.post.address1}{/if}" />
 							<span class="inline-infos">{l s='Street address, P.O. Box, Company name, etc.'}</span>
 						</p>
 					{elseif $field_name eq "address2"}
 						<p class="form-group is_customer_param">
-							<label class="htl-reservation-form-label" for="address2">{l s='Address (Line 2)'}{if in_array($field_name, $required_fields)} <sup>*</sup>{/if}</label>
-							<input type="text" class="htl-reservation-form-input form-control" name="address2" id="address2" value="{if isset($smarty.post.address2)}{$smarty.post.address2}{/if}" />
+							<label class="" for="address2">{l s='Address (Line 2)'}{if in_array($field_name, $required_fields)} <sup>*</sup>{/if}</label>
+							<input type="text" class="form-control" name="address2" id="address2" value="{if isset($smarty.post.address2)}{$smarty.post.address2}{/if}" />
 							<span class="inline-infos">{l s='Apartment, suite, unit, building, floor, etc...'}</span>
 						</p>
 					{elseif $field_name eq "postcode"}
 						{assign var='postCodeExist' value=true}
 						<p class="required postcode form-group">
-							<label class="htl-reservation-form-label" for="postcode">{l s='Zip/Postal Code'} <sup>*</sup></label>
-							<input type="text" class="htl-reservation-form-input validate form-control" name="postcode" id="postcode" data-validate="isPostCode" value="{if isset($smarty.post.postcode)}{$smarty.post.postcode}{/if}"/>
+							<label class="" for="postcode">{l s='Zip/Postal Code'} <sup>*</sup></label>
+							<input type="text" class="validate form-control" name="postcode" id="postcode" data-validate="isPostCode" value="{if isset($smarty.post.postcode)}{$smarty.post.postcode}{/if}"/>
 						</p>
 					{elseif $field_name eq "city"}
 						<p class="required form-group">
-							<label class="htl-reservation-form-label" for="city">{l s='City'} <sup>*</sup></label>
-							<input type="text" class="htl-reservation-form-input form-control" name="city" id="city" value="{if isset($smarty.post.city)}{$smarty.post.city}{/if}" />
+							<label class="" for="city">{l s='City'} <sup>*</sup></label>
+							<input type="text" class="form-control" name="city" id="city" value="{if isset($smarty.post.city)}{$smarty.post.city}{/if}" />
 						</p>
 						<!-- if customer hasn't update his layout address, country has to be verified but it's deprecated -->
 					{elseif $field_name eq "Country:name" || $field_name eq "country"}
 						<p class="required select form-group">
-							<label class="htl-reservation-form-label" for="id_country">{l s='Country'} <sup>*</sup></label>
+							<label class="" for="id_country">{l s='Country'} <sup>*</sup></label>
 							<select name="id_country" id="id_country" class="form-control">
 								<option value="">-</option>
 								{foreach from=$countries item=v}
@@ -615,43 +615,43 @@
 				{/foreach}
 				{if $postCodeExist eq false}
 					<p class="required postcode form-group unvisible">
-						<label class="htl-reservation-form-label" for="postcode">{l s='Zip/Postal Code'} <sup>*</sup></label>
-						<input type="text" class="htl-reservation-form-input validate form-control" name="postcode" id="postcode" data-validate="isPostCode" value="{if isset($smarty.post.postcode)}{$smarty.post.postcode}{/if}"/>
+						<label class="" for="postcode">{l s='Zip/Postal Code'} <sup>*</sup></label>
+						<input type="text" class="validate form-control" name="postcode" id="postcode" data-validate="isPostCode" value="{if isset($smarty.post.postcode)}{$smarty.post.postcode}{/if}"/>
 					</p>
 				{/if}
 				{if $stateExist eq false}
 					<p class="required id_state select unvisible form-group">
-						<label class="htl-reservation-form-label" for="id_state">{l s='State'} <sup>*</sup></label>
+						<label class="" for="id_state">{l s='State'} <sup>*</sup></label>
 						<select name="id_state" id="id_state" class="form-control">
 							<option value="">-</option>
 						</select>
 					</p>
 				{/if}
 				<p class="textarea form-group">
-					<label class="htl-reservation-form-label" for="other">{l s='Additional information'}</label>
+					<label class="" for="other">{l s='Additional information'}</label>
 					<textarea class="form-control" name="other" id="other" cols="26" rows="3">{if isset($smarty.post.other)}{$smarty.post.other}{/if}</textarea>
 				</p>
 				{if isset($one_phone_at_least) && $one_phone_at_least}
 					<p class="inline-infos">{l s='You must register at least one phone number.'}</p>
 				{/if}
 				<p class="form-group">
-					<label class="htl-reservation-form-label" for="phone">{l s='Home phone'}</label>
-					<input type="text" class="htl-reservation-form-input form-control" name="phone" id="phone" value="{if isset($smarty.post.phone)}{$smarty.post.phone}{/if}" />
+					<label class="" for="phone">{l s='Home phone'}</label>
+					<input type="text" class="form-control" name="phone" id="phone" value="{if isset($smarty.post.phone)}{$smarty.post.phone}{/if}" />
 				</p>
 				<p class="{if isset($one_phone_at_least) && $one_phone_at_least}required {/if}form-group">
-					<label class="htl-reservation-form-label" for="phone_mobile">{l s='Mobile phone'}{if isset($one_phone_at_least) && $one_phone_at_least} <sup>*</sup>{/if}</label>
-					<input type="text" class="htl-reservation-form-input form-control" name="phone_mobile" id="phone_mobile" value="{if isset($smarty.post.phone_mobile)}{$smarty.post.phone_mobile}{/if}" />
+					<label class="" for="phone_mobile">{l s='Mobile phone'}{if isset($one_phone_at_least) && $one_phone_at_least} <sup>*</sup>{/if}</label>
+					<input type="text" class="form-control" name="phone_mobile" id="phone_mobile" value="{if isset($smarty.post.phone_mobile)}{$smarty.post.phone_mobile}{/if}" />
 				</p>
 				<p class="required form-group" id="address_alias">
-					<label class="htl-reservation-form-label" for="alias">{l s='Assign an address alias for future reference.'} <sup>*</sup></label>
-					<input type="text" class="htl-reservation-form-input form-control" name="alias" id="alias" value="{if isset($smarty.post.alias)}{$smarty.post.alias}{else}{l s='My address'}{/if}" />
+					<label class="" for="alias">{l s='Assign an address alias for future reference.'} <sup>*</sup></label>
+					<input type="text" class="form-control" name="alias" id="alias" value="{if isset($smarty.post.alias)}{$smarty.post.alias}{else}{l s='My address'}{/if}" />
 				</p>
 			</div>
 			<div class="account_creation dni">
-				<h3 class="page-subheading htl-reservation-page-sub-heading">{l s='Tax identification'}</h3>
+				<h3 class="page-subheading">{l s='Tax identification'}</h3>
 				<p class="required form-group">
-					<label class="htl-reservation-form-label" for="dni">{l s='Identification number'} <sup>*</sup></label>
-					<input type="text" class="htl-reservation-form-input form-control" name="dni" id="dni" value="{if isset($smarty.post.dni)}{$smarty.post.dni}{/if}" />
+					<label class="" for="dni">{l s='Identification number'} <sup>*</sup></label>
+					<input type="text" class="form-control" name="dni" id="dni" value="{if isset($smarty.post.dni)}{$smarty.post.dni}{/if}" />
 					<span class="form_info">{l s='DNI / NIF / NIE'}</span>
 				</p>
 			</div>
@@ -661,7 +661,7 @@
 			<input type="hidden" name="email_create" value="1" />
 			<input type="hidden" name="is_new_customer" value="1" />
 			{if isset($back)}<input type="hidden" class="hidden" name="back" value="{$back|escape:'html':'UTF-8'}" />{/if}
-			<button type="submit" name="submitAccount" id="submitAccount" class="btn btn-default htl-reservation-form-btn-default">
+			<button type="submit" name="submitAccount" id="submitAccount" class="btn button button-medium">
 				<span>{l s='Register'}&nbsp;<i class="icon-chevron-right right"></i></span>
 			</button>
 			<p class="pull-right required"><span><sup>*</sup>{l s='Required field'}</span></p>

@@ -1,0 +1,20 @@
+
+[{shop_url}] 
+
+Uw bericht is succesvol verzonden aan {shop_name} klantenservice. 
+
+Uw bericht is succesvol verzonden.
+
+BERICHT: {message}
+
+ORDER NUMMER: {order_name}
+
+PRODUCT: {product_name}
+
+BIJLAGE: {attached_file} 		 
+
+We zullen zo spoedig mogelijk antwoorden. 
+
+{shop_name} [{shop_url}] gebouwd met
+PrestaShop(tm) [http://www.prestashop.com/] 
+

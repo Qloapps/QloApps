@@ -1,9 +1,7 @@
-#testimonial_block
-{
+#testimonial_block {
   padding-top: 50px;
 }
-.hotel_testimonial_heading
-{
+.hotel_testimonial_heading {
   color: #252525;
   font-size: 37px;
   text-align: center;
@@ -11,77 +9,61 @@
   line-height: 40px;
   margin-bottom: 10px;
 }
-
-.testimonial_container
-{
+.testimonial_container {
   padding-bottom: 5px;
   padding-top: 5px;
   color: #252525;
   font-size: 28px;
   text-align: center;
-  font-weight:400;
+  font-weight: 400;
 }
-
-.testimonial_content
-{
+.testimonial_content {
   color: #777777;
   font-size: 18px;
   text-align: center;
-  font-weight:400;
+  font-weight: 400;
 }
-
-.hotel_testimonial_content
-{
+.hotel_testimonial_content {
   color: #252525;
   font-size: 16px;
   text-align: center;
-  font-weight:400;
+  font-weight: 400;
   word-spacing: 3px;
   letter-spacing: 1px;
   word-wrap: break-word
-  line-height: 20px;
+  line-height:20px;
 }
-.testi_block_content
-{
+.testi_block_content {
   letter-spacing: 1px;
   line-height: 30px;
 }
-.margin-top-70
-{
+.margin-top-70 {
   margin-top: 70px;
 }
-.gap-line
-{
+.gap-line {
   background-color: #999;
   height: 1px;
   margin-top: 50px;
 }
-
-.testimonial_person_img
-{
+.testimonial_person_img {
   width: 85px;
 }
-.testimonial_person_name
-{
+.testimonial_person_name {
   color: #bf9958;
   font-size: 18px;
   font-weight: 700;
   margin-bottom: 5px;
   margin-top: 10px;
 }
-.testimonial_person_desig
-{
+.testimonial_person_desig {
   color: #777777;
   font-size: 16px;
   font-weight: 400;
 }
-
-.owl-theme .owl-controls .owl-page.active span, .owl-theme .owl-controls.clickable .owl-page:hover span 
-{
+.owl-theme .owl-controls .owl-page.active span, .owl-theme .owl-controls.clickable .owl-page:hover span {
   background-color: #bf9958;
 }
-.owl-theme .owl-controls .owl-page span 
-{
+.owl-theme .owl-controls .owl-page span {
   background: none repeat scroll 0 0 rgba(0, 0, 0, 0);
   border: 3px solid #ffffff !important;
   border-radius: 50%;

@@ -49,7 +49,7 @@
 	 * @param  [array] $image [variable having image information of the hotel]
 	 * @return [boolean]        [returns true if image is valid]
 	 */
-	public function validAddHotelMainImage($image)
+	public static function validateImage($image)
 	{
 		if ($image['size'] > 0)
 		{			

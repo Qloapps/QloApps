@@ -1,0 +1,15 @@
+
+[{shop_url}] 
+
+Hola {firstname} {lastname}, 
+
+Heu rebut un nou missatge sobre la comanda amb referència
+{order_name}.
+
+CLIENT: {firstname} {lastname} ({email})
+
+{message} 		 
+
+{shop_name} [{shop_url}] desenvolupat amb
+PrestaShop(tm) [http://www.prestashop.com/] 
+

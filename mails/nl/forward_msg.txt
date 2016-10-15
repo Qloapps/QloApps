@@ -1,0 +1,14 @@
+
+[{shop_url}] 
+
+Hallo {firstname} {lastname}, 
+
+{employee} heeft dit bericht naar je doorgestuurd. 
+
+BERICHT GESCHIEDENIS: {messages}
+
+{employee} heeft het volgende bericht achtergelaten: {comment} 		 
+
+{shop_name} [{shop_url}] gebouwd met
+PrestaShop(tm) [http://www.prestashop.com/] 
+

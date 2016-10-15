@@ -1,0 +1,20 @@
+
+[{shop_url}] 
+
+Votre message à l'attention du service client de {shop_name} 
+
+Votre message a bien été envoyé à notre service client.
+
+MESSAGE : {message}
+
+COMMANDE # : {order_name}
+
+PRODUIT : {product_name}
+
+PIÈCE JOINTE : {attached_file} 		 
+
+Nous vous répondrons dans les meilleurs délais. 
+
+{shop_name} [{shop_url}] réalisé avec
+PrestaShop(tm) [http://www.prestashop.com/] 
+

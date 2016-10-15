@@ -1,193 +1,128 @@
 <?php
 if (!defined('_PS_VERSION_'))
 	exit;
-include "classes/WkHotelFeaturesData.php";
+
+require_once (_PS_MODULE_DIR_.'hotelreservationsystem/define.php');
+require_once dirname(__FILE__).'/../wkhotelfeaturesblock/classes/WkHotelFeaturesData.php';
 
 class WkHotelFeaturesBlock extends Module
 {
-	private $_postErrors = array();
-
     const INSTALL_SQL_FILE = 'install.sql';
+	private $_postErrors = array();
 	public function __construct()
 	{
 		$this->name = 'wkhotelfeaturesblock';
 		$this->tab = 'front_office_features';
-		$this->version = '0.0.2';
+		$this->version = '1.0.0';
 		$this->author = 'webkul';
-		$this->need_instance = 0;
-
 		$this->bootstrap = true;
 		parent::__construct();
 
 		$this->displayName = $this->l('Hotel Features');
-		$this->description = $this->l('Shows Hotel Features using this module.');
+		$this->description = $this->l('Show Hotel Amenities on the home page using this module.');
 		$this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
 	}
 
-    public function getContent()
+    public function hookDisplayHome()
     {
-        if (Tools::isSubmit('save_feature_blog'))
-        {
-            $feature_blog = Tools::getValue('feature_blog_title');
-            $feature_blog_description = Tools::getValue('feature_blog_description');
-            $feature_id = Tools::getValue('feature_id');
-            
-            if (!$feature_blog)
-                    $this->_postErrors[] = $this->l('Feature blog title is a required field.');
-            if (!$feature_blog)
-                $this->_postErrors[] = $this->l('Feature blog desription is a required field.');
-
-            if (!count($this->_postErrors))
-            {
-                if ($feature_id)
-                    $obj_feature_data = new WkHotelFeaturesData($feature_id);
-                else        
-                    $obj_feature_data = new WkHotelFeaturesData();
-
-                $obj_feature_data->blog_heading = Tools::getValue('feature_blog_title');
-                $obj_feature_data->blog_description = Tools::getValue('feature_blog_description');
-                $obj_feature_data->is_blog = 1;
-                $obj_feature_data->save();
-
-                $this->_html .= $this->displayConfirmation($this->l('Settings updated'));
-            }
-            else
-            {
-                foreach ($this->_postErrors as $err)
-                    $this->_html .= $this->displayError($err);
-            }
-        }
-        else if (Tools::isSubmit('save_feature_data'))
-        {
-            $feature_title = Tools::getValue('feature_title');
-            $feature_description = Tools::getValue('feature_description');
-            $feature_image =  Tools::getValue('feature_image');
-            $features_id =  Tools::getValue('features_id');
-
-            foreach ($feature_title as $key => $value)
-            {
-                if (!$value)
-                    $this->_postErrors[] = $this->l('Feature title is a required field.');
-                if (!$feature_description[$key])
-                    $this->_postErrors[] = $this->l('Feature description is a required field.');
-            }
-            if ($_FILES)
-                $this->validateFeaturesImages($_FILES['feature_image']);                
-                $feature_img_path = _PS_MODULE_DIR_.'wkhotelfeaturesblock/views/img/';
-
-            if (!count($this->_postErrors))
-            {
-                foreach ($feature_title as $key => $value)
-                {
-                    if (isset($features_id[$key]) && $features_id[$key])
-                        $obj_feature_data = new WkHotelFeaturesData($features_id[$key]);
-                    else        
-                        $obj_feature_data = new WkHotelFeaturesData();
-
-                    $obj_feature_data->feature_title = $value;
-                    $obj_feature_data->feature_description = $feature_description[$key];
-                    $obj_feature_data->is_blog = 0;
-                    $obj_feature_data->save();
-
-                    if (isset($_FILES['feature_image']['name'][$key]) && $_FILES['feature_image']['name'][$key])
-                    {
-                        $obj_feature_data_img = new WkHotelFeaturesData($obj_feature_data->id);
-
-                        $image_name = $obj_feature_data->id.'.jpg';
-
-                        ImageManager::resize($_FILES['feature_image']['tmp_name'][$key], $feature_img_path.$image_name);
-
-                        $obj_feature_data_img->feature_image = $image_name;
-                        $obj_feature_data_img->save();
-                    }
-                }
-                $this->_html .= $this->displayConfirmation($this->l('Settings updated'));
-            }
-            else
-            {
-                foreach ($this->_postErrors as $err)
-                    $this->_html .= $this->displayError($err);
-            }
-        } 
-        else
-            $this->_html .= '<br />';
+        $this->context->controller->addCSS(_PS_MODULE_DIR_.$this->name.'/views/css/wkHotelFeaturesBlockFront.css');
+        $this->context->controller->addJS(_PS_MODULE_DIR_.$this->name.'/views/js/wkHotelFeaturesBlockFront.js');
 
         $obj_features_data = new WkHotelFeaturesData();
-        $features_data = $obj_features_data->getAllFeaturesData();
-        $blog_data = $obj_features_data->getMainBlogData();
+        $hotelAmenities = $obj_features_data->getHotelAmenities();
 
-        $this->context->smarty->assign('features_data', $features_data);
-        $this->context->smarty->assign('module_dir', _MODULE_DIR_);
-        $this->context->smarty->assign('link', new Link());
-        $this->context->smarty->assign('main_blog_data', $blog_data);
-        $this->context->controller->addJS($this->_path.'views/js/hotel_features_block.js');
-        $this->_html .= $this->context->smarty->fetch($this->local_path.'views/templates/admin/hotelfeaturesblog.tpl');
+        $HOTEL_AMENITIES_HEADING = Configuration::get('HOTEL_AMENITIES_HEADING');
+        $HOTEL_AMENITIES_DESCRIPTION = Configuration::get('HOTEL_AMENITIES_DESCRIPTION');
 
-        return $this->_html;
+        $this->context->smarty->assign(array('HOTEL_AMENITIES_HEADING' => $HOTEL_AMENITIES_HEADING, 
+        									 'HOTEL_AMENITIES_DESCRIPTION' => $HOTEL_AMENITIES_DESCRIPTION, 
+        									 'hotelAmenities' => $hotelAmenities, 
+        									));
+
+        return $this->display(__FILE__, 'hotelfeaturescontent.tpl');
     }
-    
+
+    public function hookDisplayAddModuleSettingLink()
+    {
+        $href_features_conf = $this->context->link->getAdminLink('AdminFeaturesModuleSetting');
+        $this->context->smarty->assign('features_setting_link', $href_features_conf);
+        return $this->display(__FILE__, 'hotelFeatureSettingLink.tpl');
+    }
+
+    public function hookDisplayFooterExploreSectionHook()
+    {
+        return $this->display(__FILE__, 'hotelFeatureFooterExploreLink.tpl');
+    }
+
+    public function hookDisplayDefaultNavigationHook() 
+    {
+        return $this->display(__FILE__, 'hotelFeatureNaviagtionMenu.tpl');
+    }
+
     public function insertDefaultHotelFeaturesEntries()
     {
-        $blog_title = $this->l('Feature Blog Title');
-        $blog_description = $this->l('Hailed by Wallpaper UK as a "stroke of genius" and rated by Conde Nast Traveler US as the 3rd best global hotel brand Vivanta by Taj offers an imaginative, vivacious and stylish take on cool luxury');
+        $HOTEL_AMENITIES_HEADING = $this->l('Amenities');
+        $HOTEL_AMENITIES_DESCRIPTION = $this->l('Families travelling with kids will find Amboseli national park a safari destination matched to no other, with less tourist traffic, breathtaking open space.');
 
-        $images = array(0 => '1.jpg', 1 => '2.jpg', 2 => '3.jpg');
+        Configuration::updateValue('HOTEL_AMENITIES_HEADING', $HOTEL_AMENITIES_HEADING);
+        Configuration::updateValue('HOTEL_AMENITIES_DESCRIPTION', $HOTEL_AMENITIES_DESCRIPTION);
 
-        $feature_title = array(0 => $this->l('Food And Beverages'), 1 => $this->l('24 Hours Restaurants'), 2 => $this->l('Stay First Pay After'));
+        $amenityTitle = array('luxurious Rooms', 'World class cheffs', 'Restaurants', 'Gym & Spa');
+        $feature_description  = $this->l('Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry`s standard dummy text ever since the 1500s');
 
-        $feature_description = array(0 => $this->l('Lambo blog Hotels & Resorts is a full service upscale hospitality brand in the South Asia region'), 1 => $this->l('Lambo blog Hotels & Resorts is a full service upscale hospitality brand in the South Asia region'), 2 => $this->l('Lambo blog Hotels & Resorts is a full service upscale hospitality brand in the South Asia region'));
+        for ($i = 1; $i < 5; $i++) {
+            $obj_feature_data = new WkHotelFeaturesData();
+            $obj_feature_data->feature_image = 0;
+            $obj_feature_data->feature_title = $amenityTitle[$i-1];
+            $obj_feature_data->feature_description = $feature_description;
+            $obj_feature_data->active = 1;
+            $obj_feature_data->add();
 
-        foreach ($images as $key => $value)
-        {
-            $obj_features_data = new WkHotelFeaturesData();
-            $obj_features_data->feature_image = $value;
-            $obj_features_data->feature_title = $feature_title[$key];
-            $obj_features_data->feature_description = $feature_description[$key];
-            $obj_features_data->is_blog = 0;
-            $obj_features_data->save();
+            $img_name = $obj_feature_data->id.'.jpg';
+            $img_path = _PS_MODULE_DIR_.$this->name.'/views/img/hotels_features_img/'.$img_name;
+            if (file_exists($img_path)) {
+                unlink($img_path);
+            }
+            ImageManager::resize(_PS_MODULE_DIR_.$this->name.'/views/img/dummy_img/'.$i.'.jpg', $img_path);
+            
+            $obj_feature_data->feature_image = $img_name;
+            $obj_feature_data->save();
         }
-        $obj_features_data = new WkHotelFeaturesData();
-        $obj_features_data->blog_heading = $blog_title;
-        $obj_features_data->blog_description = $blog_description;
-        $obj_features_data->is_blog = 1;
-        $obj_features_data->save();
 
         return true;
     }
 
-    public function hookDisplayHome()
+    public function callInstallTab()
     {
-        $this->context->controller->addCSS(_PS_MODULE_DIR_.$this->name.'/views/css/hotel-featuresblock.css');
-
-        $obj_features_data = new WkHotelFeaturesData();
-        $features_data = $obj_features_data->getAllFeaturesData();
-        $blog_data = $obj_features_data->getMainBlogData();
-
-        $this->context->smarty->assign('features_data', $features_data);
-        $this->context->smarty->assign('main_blog_data', $blog_data);
-        return $this->display(__FILE__, 'hotelfeaturescontent.tpl');
+        //Controllers which are to be used in this modules but we have not to create tab for those ontrollers...
+        $this->installTab('AdminFeaturesModuleSetting', 'Hotel Amenities Configurations');
+        return true;
     }
 
-    // validate feature image by webkul
-    public function validateFeaturesImages($image)
+    public function installTab($class_name,$tab_name,$tab_parent_name=false) 
     {
-        if (empty($image['name']))
-            return;
+        $tab = new Tab();
+        $tab->active = 1;
+        $tab->class_name = $class_name;
+        $tab->name = array();
 
-        //if any one is invalid extension redirect
-        foreach ($image['name'] as $img_name)
-        {
-            if ($img_name != "")
-            {
-                if(!ImageManager::isCorrectImageFileExt($img_name))
-                    $this->_postErrors[] = $this->l('Image format not recognized, allowed formats are: .gif, .jpg, .png', false);
-            }
-        }
+        foreach (Language::getLanguages(true) as $lang)
+            $tab->name[$lang['id_lang']] = $tab_name;
+
+        if($tab_parent_name)
+            $tab->id_parent = (int)Tab::getIdFromClassName($tab_parent_name);
+        else
+            $tab->id_parent = -1;
+        
+        $tab->module = $this->name;
+        $res = $tab->add();
+        //Set position of the Hotel reservation System Tab to the position wherewe want...
+        return $res;
     }
 
-	public function install()
+    public function install()
 	{
-		if (!file_exists(dirname(__FILE__).'/'.self::INSTALL_SQL_FILE))
+        if (!file_exists(dirname(__FILE__).'/'.self::INSTALL_SQL_FILE))
             return false;
         else if (!$sql = Tools::file_get_contents(dirname(__FILE__).'/'.self::INSTALL_SQL_FILE))
             return false;
@@ -199,14 +134,63 @@ class WkHotelFeaturesBlock extends Module
             if ($query)
                 if (!Db::getInstance()->execute(trim($query)))
                     return false;
-
 		if (!parent::install()
 			|| !$this->registerHook('displayHome')
+            || !$this->registerHook('displayFooterExploreSectionHook')
+            || !$this->registerHook('displayAddModuleSettingLink')
+            || !$this->registerHook('displayDefaultNavigationHook')
+            || !$this->callInstallTab()
             || !$this->insertDefaultHotelFeaturesEntries()
             )
 			return false;
 		return true;
 	}
+
+	public function reset()
+    {
+        if (!$this->uninstall(false)) {
+            return false;
+        }
+        if (!$this->install(false)) {
+            return false;
+        }
+        return true;
+    }
+
+    public function uninstall($keep = true)
+    {
+        if(!parent::uninstall() 
+            || !$this->callUninstallTab()
+        	|| ($keep && !$this->deleteTables())
+            || ($keep && !$this->deleteConfigKeys())
+            || ($keep && !$this->deleteHotelAmenityImg()))
+            return false;
+
+        return true;
+    }
+
+    public function deleteHotelAmenityImg()
+    {
+        $uploadedImg = glob(_PS_MODULE_DIR_.$this->name.'/views/img/hotels_features_img/*.jpg');
+        if ($uploadedImg) {
+            foreach ($uploadedImg as $amenityImg) {
+                unlink($amenityImg);
+            }
+        }
+        return true;
+    }
+
+    public function deleteConfigKeys()
+    {
+        $var = array('HOTEL_AMENITIES_HEADING',
+        			 'HOTEL_AMENITIES_DESCRIPTION');
+
+        foreach ($var as $key)
+            if (!Configuration::deleteByName($key))
+                return false;
+        
+        return true;
+    }
 
     public function deleteTables()
     {
@@ -215,12 +199,21 @@ class WkHotelFeaturesBlock extends Module
             `'._DB_PREFIX_.'htl_features_block_data`');
     }
 
-    public function uninstall($keep = true)
+    public function callUninstallTab()
     {
-        if(!parent::uninstall() 
-            || !$this->deleteTables())
-            return false;
-
+        $this->uninstallTab('AdminFeaturesModuleSetting');
         return true;
+    }
+        
+    public function uninstallTab($class_name)
+    {
+        $id_tab = (int)Tab::getIdFromClassName($class_name);
+        if ($id_tab)
+        {
+            $tab = new Tab($id_tab);
+            return $tab->delete();
+        }
+        else
+            return false;
     }
 }

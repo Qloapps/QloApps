@@ -341,7 +341,7 @@ function display(view)
 
 function dropDown()
 {
-	elementClick = '#header .current';
+	elementClick = '#header .current, #footer .current';
 	elementSlide =  'ul.toogle_content';
 	activeClass = 'active';
 

@@ -27,7 +27,7 @@
 		{if $comments}
 			{if (!$too_early AND ($is_logged OR $allow_guests))}
 				<p class="align_center open-comment-block">
-					<a id="new_comment_tab_btn" class="btn btn-default open-comment-form" href="#new_comment_form" style="background-color:#bf9958">
+					<a id="new_comment_tab_btn" class="btn button button-medium" href="#new_comment_form">
 						<span>{l s='Make a review' mod='productcomments'}</span>
 					</a>
 				</p>
@@ -51,7 +51,7 @@
 									</div>
 								{/if} -->
 								<div class="new_comment_form_content col-xs-12 col-sm-12">
-									<div id="new_comment_form_error" class="error" style="display: none;background-color: #cd5d5d;color: #ffffff;font-size: 13px;padding-left: 10px;font-family: 'PT Serif', serif;font-weight:400;">
+									<div id="new_comment_form_error" class="error" style="display: none;background-color: #cd5d5d;color: #ffffff;font-size: 13px;padding-left: 10px;font-weight:400;">
 										<ul></ul>
 									</div>
 									<label for="comment_title">
@@ -89,11 +89,11 @@
 										<input id="id_product_comment_send" name="id_product" type="hidden" value='{$id_product_comment_form}' />
 										<!-- <p class="fl required"><sup>*</sup> {l s='Required fields' mod='productcomments'}</p> -->
 										<p class="fr review_submit_div">
-											<button id="submitNewMessage" name="submitMessage" type="submit" class="btn btn-default">
+											<button id="submitNewMessage" name="submitMessage" type="submit" class="btn button button-medium">
 												<span>{l s='Make Review' mod='productcomments'}</span>
 											</button>&nbsp;
 											<!-- {l s='or' mod='productcomments'}&nbsp; -->
-											<button id="cancelreview" name="cancelreview" type="submit" class="btn btn-default">
+											<button id="cancelreview" name="cancelreview" type="submit" class="btn button button-medium">
 												<span>{l s='Cancel' mod='productcomments'}</span>
 											</button>
 										</p>
@@ -169,7 +169,7 @@
 		{else}
 			{if (!$too_early AND ($is_logged OR $allow_guests))}
 			<p class="align_center">
-				<a id="new_comment_tab_btn" class="btn btn-default open-comment-form" href="#new_comment_form">
+				<a id="new_comment_tab_btn" class="btn button button-medium" href="#new_comment_form">
 					<span>{l s='Be the first to write your review!' mod='productcomments'}</span>
 				</a>
 			</p>
@@ -192,7 +192,7 @@
 								</div>
 							{/if} -->
 							<div class="new_comment_form_content col-xs-12 col-sm-12">
-								<div id="new_comment_form_error" class="error" style="display: none;background-color: #cd5d5d;color: #ffffff;font-size: 13px;padding-left: 10px;font-family: 'PT Serif', serif;font-weight:400;">
+								<div id="new_comment_form_error" class="error" style="display: none;background-color: #cd5d5d;color: #ffffff;font-size: 13px;padding-left: 10px;font-weight:400;">
 									<ul></ul>
 								</div>
 								<label for="comment_title">
@@ -230,11 +230,11 @@
 									<input id="id_product_comment_send" name="id_product" type="hidden" value='{$id_product_comment_form}' />
 									<!-- <p class="fl required"><sup>*</sup> {l s='Required fields' mod='productcomments'}</p> -->
 									<p class="fr review_submit_div">
-										<button id="submitNewMessage" name="submitMessage" type="submit" class="btn btn-default">
+										<button id="submitNewMessage" name="submitMessage" type="submit" class="btn button button-medium">
 											<span>{l s='Make Review' mod='productcomments'}</span>
 										</button>&nbsp;
 										<!-- {l s='or' mod='productcomments'}&nbsp; -->
-										<button id="cancelreview" name="cancelreview" type="submit" class="btn btn-default">
+										<button id="cancelreview" name="cancelreview" type="submit" class="btn button button-medium">
 											<span>{l s='Cancel' mod='productcomments'}</span>
 										</button>
 									</p>
@@ -264,23 +264,11 @@
 {addJsDefL name=productcomment_ok}{l s='OK' mod='productcomments' js=1}{/addJsDefL}
 {/strip}
 <style type="text/css">
-	.open-comment-form
-	{
-		background-color:#BF9958;
-		color:#ffffff!important;
-		font-size:18px;
-		font-family: 'PT Serif', serif;
-		font-weight:400;
-		padding-top: 10px;
-		padding-right: 20px;
-		padding-bottom: 10px;
-		padding-left: 20px;
-	}
+	
 	.no_reviews_cond_block
 	{
-		olor: #404040;
+		color: #404040;
 		font-size:15px;
-		font-family: 'PT Serif', serif;
 		font-weight:400;
 	}
 	.name_person
@@ -288,21 +276,18 @@
 		padding: 10px;
 		color: #404040;
 		font-size:15px;
-		font-family: 'PT Serif', serif;
 		font-weight:700;
 	}
 	.review_title
 	{
 		color: #404040;
 		font-size:15px;
-		font-family: 'PT Serif', serif;
 		font-weight:700;
 	}
 	.review_content
 	{
 		color: #404040;
 		font-size:15px;
-		font-family: 'PT Serif', serif;
 		font-weight:400;
 		line-height: 23px;
 		padding-top: 10px;
@@ -319,7 +304,7 @@
 	.comment_date
 	{
 		font-size:15px;
-		font-family: 'PT Serif', serif;
+		
 		font-weight:400;
 		color: #9A9A9A;
 		margin-left: 10px;

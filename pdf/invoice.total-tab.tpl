@@ -33,19 +33,6 @@
 		</td>
 	</tr>
 
-	{if $footer.product_discounts_tax_excl > 0}
-
-		<tr>
-			<td class="grey" width="70%">
-				{l s='Total Discounts' pdf='true'}
-			</td>
-			<td class="white" width="30%">
-				- {displayPrice currency=$order->id_currency price=$footer.product_discounts_tax_excl}
-			</td>
-		</tr>
-
-	{/if}
-
 	<!-- <tr>
 		<td class="grey" width="70%">
 			{l s='Shipping Cost' pdf='true'}
@@ -90,7 +77,7 @@
 	{if isset($order_adv_dtl)}
 		<tr class="bold big">
 			<td class="grey">
-				{l s='Total Paid' pdf='true'}
+				{l s='Advance Payment Amount' pdf='true'}
 			</td>
 			<td class="white">
 				{displayPrice currency=$order_adv_dtl.id_currency price=$order_adv_dtl.total_paid_amount}
@@ -106,9 +93,21 @@
 		</tr>
 	{/if}
 
+	{if $footer.product_discounts_tax_excl > 0}
+		<tr>
+			<td class="grey" width="70%">
+				{l s='Total Discounts' pdf='true'}
+			</td>
+			<td class="white" width="30%">
+				- {displayPrice currency=$order->id_currency price=$footer.product_discounts_tax_excl}
+			</td>
+		</tr>
+
+	{/if}
+
 	<tr class="bold big">
 		<td class="grey">
-			{l s='Total' pdf='true'}
+			{l s='Total Paid' pdf='true'}
 		</td>
 		<td class="white">
 			{displayPrice currency=$order->id_currency price=$footer.total_paid_tax_incl}

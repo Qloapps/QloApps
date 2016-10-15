@@ -1,0 +1,11 @@
+
+[{shop_url}] 
+
+Hola {name},
+
+Haga clic aquí para ver este artículo: {product}
+[{product_link}] 
+
+{shop_name} [{shop_url}] creado por
+PrestaShop(tm) [http://www.prestashop.com/] 
+

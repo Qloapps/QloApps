@@ -35,14 +35,15 @@ class OrderConfirmationControllerCore extends FrontController
     public $secure_key;
 
     /**
-     * Initialize order confirmation controller
+     * Initialize order confirmation controller.
+     *
      * @see FrontController::init()
      */
     public function init()
     {
         parent::init();
 
-        $this->id_cart = (int)(Tools::getValue('id_cart', 0));
+        $this->id_cart = (int) (Tools::getValue('id_cart', 0));
         $is_guest = false;
 
         /* check if the cart has been made by a Guest customer, for redirect link */
@@ -53,12 +54,12 @@ class OrderConfirmationControllerCore extends FrontController
             $redirectLink = 'index.php?controller=history';
         }
 
-        $this->id_module = (int)(Tools::getValue('id_module', 0));
-        $this->id_order = Order::getOrderByCartId((int)($this->id_cart));
+        $this->id_module = (int) (Tools::getValue('id_module', 0));
+        $this->id_order = Order::getOrderByCartId((int) ($this->id_cart));
         $this->secure_key = Tools::getValue('key', false);
-        $order = new Order((int)($this->id_order));
+        $order = new Order((int) ($this->id_order));
         if ($is_guest) {
-            $customer = new Customer((int)$order->id_customer);
+            $customer = new Customer((int) $order->id_customer);
             $redirectLink .= '&id_order='.$order->reference.'&email='.urlencode($customer->email);
         }
         if (!$this->id_order || !$this->id_module || !$this->secure_key || empty($this->secure_key)) {
@@ -68,14 +69,15 @@ class OrderConfirmationControllerCore extends FrontController
         if (!Validate::isLoadedObject($order) || $order->id_customer != $this->context->customer->id || $this->secure_key != $order->secure_key) {
             Tools::redirect($redirectLink);
         }
-        $module = Module::getInstanceById((int)($this->id_module));
+        $module = Module::getInstanceById((int) ($this->id_module));
         if ($order->module != $module->name) {
             Tools::redirect($redirectLink);
         }
     }
 
     /**
-     * Assign template vars related to page content
+     * Assign template vars related to page content.
+     *
      * @see FrontController::initContent()
      */
     public function initContent()
@@ -85,7 +87,7 @@ class OrderConfirmationControllerCore extends FrontController
         $this->context->smarty->assign(array(
             'is_guest' => $this->context->customer->is_guest,
             'HOOK_ORDER_CONFIRMATION' => $this->displayOrderConfirmation(),
-            'HOOK_PAYMENT_RETURN' => $this->displayPaymentReturn()
+            'HOOK_PAYMENT_RETURN' => $this->displayPaymentReturn(),
         ));
 
         if ($this->context->customer->is_guest) {
@@ -93,7 +95,7 @@ class OrderConfirmationControllerCore extends FrontController
                 'id_order' => $this->id_order,
                 'reference_order' => $this->reference,
                 'id_order_formatted' => sprintf('#%06d', $this->id_order),
-                'email' => $this->context->customer->email
+                'email' => $this->context->customer->email,
             ));
             /* If guest we clear the cookie for security reason */
             $this->context->customer->mylogout();
@@ -103,100 +105,103 @@ class OrderConfirmationControllerCore extends FrontController
         $products = $order->getProducts();
 
         /*By webkul to show order details properly on order history page*/
-        if (Module::isInstalled('hotelreservationsystem')) 
-        {
-            require_once (_PS_MODULE_DIR_.'hotelreservationsystem/define.php');
+        if (Module::isInstalled('hotelreservationsystem')) {
+            require_once _PS_MODULE_DIR_.'hotelreservationsystem/define.php';
 
             $obj_cart_bk_data = new HotelCartBookingData();
             $obj_htl_bk_dtl = new HotelBookingDetail();
             $obj_rm_type = new HotelRoomType();
             $non_requested_rooms = 0;
             $any_back_order = 0;
-            if (!empty($products)) 
-            {
-                foreach ($products as $type_key => $type_value) 
-                {
+            $processed_product = array();
+            if (!empty($products)) {
+                foreach ($products as $type_key => $type_value) {
+                    if (in_array($type_value['product_id'], $processed_product)) {
+                        continue;
+                    }
+                    $processed_product[] = $type_value['product_id'];
+
                     $product = new Product($type_value['product_id'], false, $this->context->language->id);
                     $cover_image_arr = $product->getCover($type_value['product_id']);
-                    
-                    if(!empty($cover_image_arr))
-                        $cover_img = $this->context->link->getImageLink($product->link_rewrite, $product->id.'-'.$cover_image_arr['id_image'], 'small_default');
-                    else 
-                        $cover_img = $this->context->link->getImageLink($product->link_rewrite, $this->context->language->iso_code."-default", 'small_default');
 
-                    if (isset($customer->id)) 
-                    {
-                        $cart_bk_data = $obj_cart_bk_data->getOnlyCartBookingData($order->id_cart, (new Cart($order->id_cart))->id_guest, $type_value['product_id'], $customer->id);
+                    if (!empty($cover_image_arr)) {
+                        $cover_img = $this->context->link->getImageLink($product->link_rewrite, $product->id.'-'.$cover_image_arr['id_image'], 'small_default');
+                    } else {
+                        $cover_img = $this->context->link->getImageLink($product->link_rewrite, $this->context->language->iso_code.'-default', 'small_default');
                     }
-                    else
-                    {
-                        $cart_bk_data = $obj_cart_bk_data->getOnlyCartBookingData($order->id_cart, $customer->id_guest, $type_value['product_id']);
+
+                    if (isset($customer->id)) {
+                        $obj_cart = new Cart($order->id_cart);
+                        $order_bk_data = $obj_htl_bk_dtl->getOnlyOrderBookingData($order->id, $obj_cart->id_guest, $type_value['product_id'], $customer->id);
+                    } else {
+                        $order_bk_data = $obj_htl_bk_dtl->getOnlyOrderBookingData($order->id, $customer->id_guest, $type_value['product_id']);
                     }
                     $rm_dtl = $obj_rm_type->getRoomTypeInfoByIdProduct($type_value['product_id']);
-                    /*Product price when order was created*/
-                    $prod_ord_dtl = $obj_htl_bk_dtl->getPsOrderDetailsByProduct($type_value['product_id'], $order->id);
-                    $unit_price_tax_excl = $prod_ord_dtl['unit_price_tax_excl'];
-                    $unit_price_tax_incl = $prod_ord_dtl['unit_price_tax_incl'];
 
                     $cart_htl_data[$type_key]['id_product'] = $type_value['product_id'];
-                    $cart_htl_data[$type_key]['cover_img']  = $cover_img;
-                    $cart_htl_data[$type_key]['name']       = $prod_ord_dtl['product_name'];
-                    $cart_htl_data[$type_key]['unit_price_tax_excl'] = $unit_price_tax_excl;
-                    $cart_htl_data[$type_key]['unit_price_tax_incl'] = $unit_price_tax_incl;
-                    $cart_htl_data[$type_key]['adult']      = $rm_dtl['adult'];
-                    $cart_htl_data[$type_key]['children']   = $rm_dtl['children'];
-                    foreach ($cart_bk_data as $data_k => $data_v) 
-                    {
+                    $cart_htl_data[$type_key]['cover_img'] = $cover_img;
+                    $cart_htl_data[$type_key]['adult'] = $rm_dtl['adult'];
+                    $cart_htl_data[$type_key]['children'] = $rm_dtl['children'];
+
+                    foreach ($order_bk_data as $data_k => $data_v) {
                         $date_join = strtotime($data_v['date_from']).strtotime($data_v['date_to']);
+
+                        /*Product price when order was created*/
+                        $order_details_obj = new OrderDetail($data_v['id_order_detail']);
+                        $unit_price_tax_excl = 0;
+                        $unit_price_tax_incl = 0;
+                        $unit_price_tax_excl = $order_details_obj->unit_price_tax_excl;
+                        $unit_price_tax_incl = $order_details_obj->unit_price_tax_incl;
+                        $prod_ord_dtl_name = $order_details_obj->product_name;
+                        $cart_htl_data[$type_key]['name'] = $prod_ord_dtl_name;
+
+                        $cart_htl_data[$type_key]['unit_price_tax_excl'] = $unit_price_tax_excl;
+                        $cart_htl_data[$type_key]['unit_price_tax_incl'] = $unit_price_tax_incl;
 
                         //work on entring refund data
                         $obj_ord_ref_info = new HotelOrderRefundInfo();
                         $ord_refnd_info = $obj_ord_ref_info->getOderRefundInfoByIdOrderIdProductByDate($this->id_order, $type_value['product_id'], $data_v['date_from'], $data_v['date_to']);
-                        if ($ord_refnd_info)
-                        {
+                        if ($ord_refnd_info) {
                             $obj_refund_stages = new HotelOrderRefundStages();
                             $stage_name = $obj_refund_stages->getNameById($ord_refnd_info['refund_stage_id']);
-                        }
-                        else
-                        {
+                        } else {
                             $stage_name = '';
                             $non_requested_rooms = 1;
                         }
-                        if (isset($cart_htl_data[$type_key]['date_diff'][$date_join]))
-                        {
+                        if (isset($cart_htl_data[$type_key]['date_diff'][$date_join])) {
                             $cart_htl_data[$type_key]['date_diff'][$date_join]['num_rm'] += 1;
 
                             $num_days = $cart_htl_data[$type_key]['date_diff'][$date_join]['num_days'];
-                            $vart_quant = (int)$cart_htl_data[$type_key]['date_diff'][$date_join]['num_rm'] * $num_days;
-                            
+                            $vart_quant = (int) $cart_htl_data[$type_key]['date_diff'][$date_join]['num_rm'] * $num_days;
+
                             $amount_tax_excl = $unit_price_tax_excl * $vart_quant;
                             $amount_tax_incl = $unit_price_tax_incl * $vart_quant;
 
                             $cart_htl_data[$type_key]['date_diff'][$date_join]['amount_tax_incl'] = $amount_tax_incl;
                             $cart_htl_data[$type_key]['date_diff'][$date_join]['amount_tax_excl'] = $amount_tax_excl;
                             $cart_htl_data[$type_key]['date_diff'][$date_join]['is_backorder'] = $data_v['is_back_order'];
-                            if ($data_v['is_back_order'])
+                            if ($data_v['is_back_order']) {
                                 $any_back_order = 1;
+                            }
 
                             //refund_stage
                             $cart_htl_data[$type_key]['date_diff'][$date_join]['stage_name'] = $stage_name;
-                        }
-                        else
-                        {
+                        } else {
                             $num_days = $obj_htl_bk_dtl->getNumberOfDays($data_v['date_from'], $data_v['date_to']);
 
                             $cart_htl_data[$type_key]['date_diff'][$date_join]['num_rm'] = 1;
                             $cart_htl_data[$type_key]['date_diff'][$date_join]['data_form'] = $data_v['date_from'];
                             $cart_htl_data[$type_key]['date_diff'][$date_join]['data_to'] = $data_v['date_to'];
                             $cart_htl_data[$type_key]['date_diff'][$date_join]['num_days'] = $num_days;
-                            
+
                             $amount_tax_excl = $unit_price_tax_excl * $num_days;
                             $amount_tax_incl = $unit_price_tax_incl * $num_days;
 
                             $cart_htl_data[$type_key]['date_diff'][$date_join]['amount_tax_incl'] = $amount_tax_incl;
                             $cart_htl_data[$type_key]['date_diff'][$date_join]['amount_tax_excl'] = $amount_tax_excl;
-                            if ($data_v['is_back_order'])
+                            if ($data_v['is_back_order']) {
                                 $any_back_order = 1;
+                            }
                             //refund_stage
                             $cart_htl_data[$type_key]['date_diff'][$date_join]['stage_name'] = $stage_name;
                             $cart_htl_data[$type_key]['date_diff'][$date_join]['is_backorder'] = $data_v['is_back_order'];
@@ -211,8 +216,11 @@ class OrderConfirmationControllerCore extends FrontController
                 //For Advanced Payment
                 $obj_customer_adv = new HotelCustomerAdvancedPayment();
                 $order_adv_dtl = $obj_customer_adv->getCstAdvPaymentDtlByIdOrder($order->id);
-                if ($order_adv_dtl)
+                if ($order_adv_dtl) {
                     $this->context->smarty->assign('order_adv_dtl', $order_adv_dtl);
+                }
+                $order_has_invoice = $order->hasInvoice();
+                $this->context->smarty->assign('order_has_invoice', $order_has_invoice);
             }
         }
 
@@ -232,7 +240,7 @@ class OrderConfirmationControllerCore extends FrontController
     }
 
     /**
-     * Execute the hook displayPaymentReturn
+     * Execute the hook displayPaymentReturn.
      */
     public function displayPaymentReturn()
     {
@@ -250,11 +258,12 @@ class OrderConfirmationControllerCore extends FrontController
                 return Hook::exec('displayPaymentReturn', $params, $this->id_module);
             }
         }
+
         return false;
     }
 
     /**
-     * Execute the hook displayOrderConfirmation
+     * Execute the hook displayOrderConfirmation.
      */
     public function displayOrderConfirmation()
     {
@@ -272,16 +281,17 @@ class OrderConfirmationControllerCore extends FrontController
                 return Hook::exec('displayOrderConfirmation', $params);
             }
         }
+
         return false;
     }
 
     public function setMedia()
     {
-        if (Tools::getValue('ajax') != 'true')
-        {
+        if (Tools::getValue('ajax') != 'true') {
             parent::setMedia();
             $this->addCSS(_THEME_CSS_DIR_.'history.css');
             $this->addJS(_THEME_JS_DIR_.'history.js');
+            $this->addJqueryPlugin(array('fancybox')); //fancybox not found for some client theme
         }
     }
 }
