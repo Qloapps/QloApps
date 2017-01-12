@@ -28,8 +28,8 @@ In nutshell :
 Once the files in the QloApps  archive have been decompressed and uploaded on your hosting space, go to the root of your QloApps directory with your web browser, and the QloApps installer will start automatically. Follow the instructions until QloApps is installed.
 
 b) Docker Image :</br>
-https://github.com/webkul/qloapps_docker
-https://hub.docker.com/r/webkul/qloapps_docker/
+https://github.com/webkul/qloapps_docker</br>
+https://hub.docker.com/r/webkul/qloapps_docker/ </br>
 
 c) Vagrant Image :
 https://github.com/webkul/Vagrant_qloapps
