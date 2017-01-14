@@ -219,16 +219,15 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
             /* In case of advance payment */
             /*$obj_htl_cust_adv_pay = new HotelCustomerAdvancedPayment();
             $htl_cust_adv_pay_info = $obj_htl_cust_adv_pay->getCstAdvPaymentDtlByIdOrder($id_order);*/
-            $obj_htl_adv_pay = new HotelAdvancedPayment();
-            $prod_adv_payment = $obj_htl_adv_pay->getIdAdvPaymentByIdProduct($obj_refund->id_product);
-            if (!$prod_adv_payment || (isset($prod_adv_payment['payment_type']) && $prod_adv_payment['payment_type']))  {      
+            $obj_customer_adv_product = new HotelCustomerAdvancedProductPayment();
+            $prod_adv_payment = $obj_customer_adv_product->getProductAdvancePaymentDetails($obj_refund->id_order, $obj_refund->id_product);
+            if ($prod_adv_payment)  {      
                 $obj_booking_detail = new HotelBookingDetail();
-                $obj_htl_adv_pay = new HotelAdvancedPayment();
 
                 $book_days = $obj_booking_detail->getNumberOfDays($date_from, $date_to);
                 $qty_prod = ($obj_refund->num_rooms) * $book_days;
 
-                $adv_paid_amount = $obj_htl_adv_pay->getProductMinAdvPaymentAmount($id_product, $qty_prod);
+                $adv_paid_amount = $qty_prod * $prod_adv_payment['advance_payment_amount'];
                 $way_of_payment = 'Advance Payment';
 
                 $adv_paid_amount = Tools::convertPrice($adv_paid_amount, new Currency($id_currency));
@@ -365,9 +364,9 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
 
         // $obj_htl_cust_adv_pay = new HotelCustomerAdvancedPayment();
         // $htl_cust_adv_pay_info = $obj_htl_cust_adv_pay->getCstAdvPaymentDtlByIdOrder($obj_refund->id_order);
-
-        $prod_adv_payment = $obj_htl_adv_pay->getIdAdvPaymentByIdProduct($obj_refund->id_product);
-        if (!$prod_adv_payment || (isset($prod_adv_payment['payment_type']) && $prod_adv_payment['payment_type'])) {      
+        $obj_customer_adv_product = new HotelCustomerAdvancedProductPayment();
+        $prod_adv_payment = $obj_customer_adv_product->getProductAdvancePaymentDetails($obj_refund->id_order, $obj_refund->id_product);
+        if ($prod_adv_payment)  {      
             $way_of_payment = 'advancePayment';
         }
 
@@ -388,17 +387,23 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
                     if ($way_of_payment == 'advancePayment') {
                         $book_days = $obj_booking_detail->getNumberOfDays($obj_refund->date_from, $obj_refund->date_to);
                         $qty_prod = ($obj_refund->num_rooms) * $book_days;
-                        $adv_paid_amount = $obj_htl_adv_pay->getProductMinAdvPaymentAmount($obj_refund->id_product, $qty_prod);
+                        $adv_paid_amount = $qty_prod * $prod_adv_payment['advance_payment_amount'];
+                        $adv_paid_amount = Tools::convertPrice($adv_paid_amount, new Currency($id_currency));
                         $deduct_amount_val = $v_rules['deduction_value_adv_pay'];
                     } else {
                         $deduct_amount_val = $v_rules['deduction_value_full_pay'];
                     }
 
                     if ($v_rules['payment_type'] == 1) {
-                        if ($default_currency != $order_tran_curr) {
-                            $deduction_amount = Tools::convertPriceFull($deduct_amount_val, new Currency($default_currency), new Currency($order_tran_curr));
+                        if ($way_of_payment == 'advancePayment') {
+                            $deduction_amount = $adv_paid_amount*($deduct_amount_val/100);
                         } else {
-                            $deduction_amount = $deduct_amount_val;
+                            $deduction_amount = $obj_refund->order_amount*($deduct_amount_val/100);
+                        }
+
+
+                        if ($default_currency != $order_tran_curr) {
+                            $deduction_amount = Tools::convertPriceFull($deduction_amount, new Currency($default_currency), new Currency($order_tran_curr));
                         }
                     } else {
                         $order_tran_curr = $obj_refund->id_currency;

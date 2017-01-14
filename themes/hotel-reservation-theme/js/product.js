@@ -1041,10 +1041,37 @@ $(document).ready(function() {
         $('.sold_out_alert').hide();
     }
 
+    function highlightDateBorder(elementVal, date)
+    {
+        if (elementVal) {
+            var currentDate = date.getDate();
+            var currentMonth = date.getMonth()+1;
+            if (currentMonth < 10) {
+                currentMonth = '0' + currentMonth;
+            }
+            if (currentDate < 10) {
+                currentDate = '0' + currentDate;
+            }
+            dmy = date.getFullYear() + "-" + currentMonth + "-" + currentDate;
+            var date_format = elementVal.split("-");
+            var check_in_time = (date_format[2]) + '-' + (date_format[1]) + '-' + (date_format[0]);
+            if (dmy == check_in_time) {
+                return [true, "selectedCheckedDate", "Check-In date"];
+            } else {
+                return [true, ""];
+            }
+        } else {
+            return [true, ""];
+        }
+    }
+
     $("#room_check_in").datepicker({
         showOtherMonths: true,
         dateFormat: 'dd-mm-yy',
         minDate: 0,
+        beforeShowDay: function (date) {
+            return highlightDateBorder($("#room_check_in").val(), date);
+        },
         onClose: function(selectedDate) {
             var date_format = selectedDate.split("-");
             var selectedDate = new Date($.datepicker.formatDate('yy-mm-dd', new Date(date_format[2], date_format[1] - 1, date_format[0])));
@@ -1138,6 +1165,9 @@ $(document).ready(function() {
         showOtherMonths: true,
         dateFormat: 'dd-mm-yy',
         minDate: 0,
+        beforeShowDay: function (date) {
+            return highlightDateBorder($("#room_check_out").val(), date);
+        },
         onClose: function(selectedDate) {
             var date_format = selectedDate.split("-");
             var selectedDate = new Date($.datepicker.formatDate('yy-mm-dd', new Date(date_format[2], date_format[1] - 1, date_format[0])));

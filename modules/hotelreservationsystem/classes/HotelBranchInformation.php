@@ -237,9 +237,6 @@
                 if ($active) {
                     $sql .= " AND hbi.`active` = ".(int)$active;
                 }
-                return $hotel_map_array;
-            } else {
-                return false;
             }
 
             $result = Db::getInstance()->executeS($sql);

@@ -63,3 +63,8 @@ background: none !important;
     position: absolute;
     z-index: 100;
 }*/
+
+
+.selectedCheckedDate {
+  border:1px solid #007ab7!important;
+}

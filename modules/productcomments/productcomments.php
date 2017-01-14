@@ -445,7 +445,7 @@ class ProductComments extends Module
 		);
 		$helper->module = $this;
 		$helper->identifier = 'id_product_comment_criterion';
-		$helper->title = $this->l('Review Criteria');
+		$helper->title = $this->l('Rating Criteria');
 		$helper->table = $this->name.'criterion';
 		$helper->token = Tools::getAdminTokenLite('AdminModules');
 		$helper->currentIndex = AdminController::$currentIndex.'&configure='.$this->name;

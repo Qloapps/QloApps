@@ -1,3 +1,27 @@
+####################################
+# V1.0.1
+####################################
+
+## Improved/changed features:
+
+[+] Project : Theme has been improved.
+
+[*] FO : After selecting checkIn and checkout dates these dates are highlighted in the datepicker.
+[*] FO : contact Number and email were hard coded on contact page now will dinamically come from entered values from Admin General Configuration.
+[*] FO : Font-family in order summary page in synced with the theme fonts now.
+
+[*] BO : Bacorder setting option is removed from Settings->General Settings.
+[*] MO : wkpaypaladaptive : Remove PHP CURL check from installation and display warning in "AdminPaymentsSetting" controller
+
+## Fixed bugs:
+
+[-] MO : hotelreservationsystem : Fixed Google map issue on contact page.
+[-] BO : Fixed showing wrong way of payment on refund request page.
+[-] BO : Fixed showing wrong cancellation charges on refund request page.
+[-] MO : wkabouthotel : Fixed interior heading and description does not change on changing from Setting->Hotel interior Block Setting.
+[-] MO : hotelreservationsystem : refund rule bug for type percentage is resolved.
+
+
 # Change Log previous version to V1.0.0:
 
 ## Added Features:

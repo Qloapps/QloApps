@@ -493,17 +493,20 @@
          */
         public function getNumberOfDays($dateFrom, $dateTo)
         {
-            $startTimeStamp = strtotime($dateFrom);
+            $startDate = new DateTime($dateFrom);
+            $endDate = new DateTime($dateTo);
+            $daysDifference = $startDate->diff($endDate)->days;
+           /* $startTimeStamp = strtotime($dateFrom);
             $endTimeStamp = strtotime($dateTo);
 
-            $timeDiff = abs($endTimeStamp - $startTimeStamp);
+            $timeDiff = abs($endTimeStamp - $startTimeStamp);*/
 
-            $numberDays = $timeDiff / 86400;  // 86400 seconds in one day
+            /*$numberDays = $timeDiff / 86400;  // 86400 seconds in one day
 
             // and you might want to convert to integer
-            $numberDays = intval($numberDays);
+            $numberDays = $numberDays;*/
 
-            return $numberDays;
+            return $daysDifference;
         }
 
         /**

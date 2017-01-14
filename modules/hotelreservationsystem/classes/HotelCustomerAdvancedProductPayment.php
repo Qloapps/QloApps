@@ -40,4 +40,16 @@ class HotelCustomerAdvancedProductPayment extends ObjectModel
             'date_upd' => array('type' => self::TYPE_DATE, 'validate' => 'isDate'),
         ),
     );
+    
+    /**
+     * [getProductAdvancePaymentDetails :: To get Advance payment Information By id_product]
+     * @param  [int] $id_product [id of the order which Advance payment Information you want]
+     * @param  [int] $id_product [id of the product which Advance payment Information you want]
+     * @return [array|false]     [Returns array if information of advance payment of that id_product and id_order found otherwise returs false]
+     */
+    public function getProductAdvancePaymentDetails($id_order, $id_product)
+    {
+        return Db::getInstance()->getRow('SELECT * FROM `'._DB_PREFIX_.'htl_customer_adv_product_payment` WHERE `id_order`='.(int)$id_order.' AND `id_product`='.(int)$id_product);
+    }
+    
 }

@@ -2,298 +2,235 @@
 			One-Page Checkout Styles
 ********************************************************/
 #order-opc {
-  line-height: 20px; }
-  #order-opc .box {
-    padding-bottom: 20px; }
-  #order-opc .cart_navigation {
-    margin-bottom: 53px; }
-  #order-opc .page-heading.step-num {
-    position: relative;
-    padding-left: 45px;
-    overflow: visible; }
-    #order-opc .page-heading.step-num span {
-      font-weight: bold;
-      font-size: 42px;
-      line-height: 51px;
-      font-style: italic;
-      color: #333;
-      position: absolute;
-      left: 10px;
-      top: -14px; }
-  #order-opc .form-group {
-    margin-bottom: 2px; }
-    #order-opc .form-group .form-control {
-      max-width: 271px; }
-  #order-opc .lost_password {
-    display: inline-block;
-    text-decoration: underline;
-    margin: 5px 0 14px; }
-    #order-opc .lost_password:hover {
-      text-decoration: none; }
-  #order-opc .title_block {
-    font-weight: bold;
-    color: #333;
-    padding: 3px 0 6px; }
-  #order-opc .opc-button {
-    padding: 11px 0 0 0; }
-  #order-opc ul.bullet {
-    line-height: 22px;
-    margin-bottom: 5px; }
-  #order-opc .date-select {
-    padding-bottom: 10px; }
-  #order-opc .opc-add-save {
-    border-top: 1px solid #d6d4d4;
-    margin-top: 20px;
-    padding-top: 20px; }
-  #order-opc #message {
-    margin-bottom: 35px; }
-  #order-opc #opc_payment_methods {
-    margin-bottom: 30px; }
-    #order-opc #opc_payment_methods p.warning {
-      color: #F13340;
-      font-weight: 700; }
-  #order-opc #opc_account {
-    margin-bottom: 30px; }
-  #order-opc .address_delivery.select {
-    margin-bottom: 15px; }
-  #order-opc #address_invoice_form.form-group {
-    margin-bottom: 30px; }
-
-#new_account_form .id_state,
-#new_account_form .dni,
-#new_account_form .postcode {
-  display: none; }
+	line-height: 20px;
+}
+#order-opc .box {
+	padding-bottom: 20px;
+}
+#order-opc .cart_navigation {
+	margin-bottom: 53px;
+}
+#order-opc .page-heading.step-num {
+	position: relative;
+	padding-left: 45px;
+	overflow: visible;
+}
+#order-opc .page-heading.step-num span {
+	font-weight: bold;
+	font-size: 42px;
+	line-height: 51px;
+	font-style: italic;
+	color: #333;
+	position: absolute;
+	left: 10px;
+	top: -14px;
+}
+#order-opc .form-group {
+	margin-bottom: 2px;
+}
+#order-opc .form-group .form-control {
+	max-width: 271px;
+}
+#order-opc .lost_password {
+	display: inline-block;
+	text-decoration: underline;
+	margin: 5px 0 14px;
+}
+#order-opc .lost_password:hover {
+	text-decoration: none;
+}
+#order-opc .title_block {
+	font-weight: bold;
+	color: #333;
+	padding: 3px 0 6px;
+}
+#order-opc .opc-button {
+	padding: 11px 0 0 0;
+}
+#order-opc ul.bullet {
+	line-height: 22px;
+	margin-bottom: 5px;
+}
+#order-opc .date-select {
+	padding-bottom: 10px;
+}
+#order-opc .opc-add-save {
+	border-top: 1px solid #d6d4d4;
+	margin-top: 20px;
+	padding-top: 20px;
+}
+#order-opc #message {
+	margin-bottom: 35px;
+}
+#order-opc #opc_payment_methods {
+	margin-bottom: 30px;
+}
+#order-opc #opc_payment_methods p.warning {
+	color: #F13340;
+	font-weight: 700;
+}
+#order-opc #opc_account {
+	margin-bottom: 30px;
+}
+#order-opc .address_delivery.select {
+	margin-bottom: 15px;
+}
+#order-opc #address_invoice_form.form-group {
+	margin-bottom: 30px;
+}
+#new_account_form .id_state, #new_account_form .dni, #new_account_form .postcode {
+	display: none;
+}
 
 /*# sourceMappingURL=order-opc.css.map */
+
 /* By Webkul */
 
-.table_head th
-{
-    font-size: 18px;
-    color: #3C3C3C;
-    font-weight: 700;
-    font-family: "PT Serif",serif;
+.table_head th {
+	font-size: 18px;
+	color: #3C3C3C;
+	font-weight: 700;
+}
+.table_body td {
+	font-size: 16px;
+	color: #3C3C3C;
+	font-weight: 400;
+}
+#voucher h4 {
+	font-size: 18px !important;
+	color: #404040 !important;
+	font-weight: 700 !important;
+}
+#voucher #discount_name {
+	width: 200px;
+	height: 35px;
+}
+#voucher button, #advanced-payment button {
+	border: none;
+	background-color: #379bf0;
+	font-size: 16px;
+	color: #FFFFFF;
+	font-weight: 700;
+}
+#title {
+	font-size: 13px;
+	color: #3C3C3C;
+	font-weight: 600;
+}
+#display_cart_vouchers {
+	color: #404040;
+	font-weight: 400;
+}
+#display_cart_vouchers span {
+	font-weight: 700;
+	color: #3C3C3C !important;
+}
+.table_tfoot td {
+	font-size: 16px;
+	color: #3C3C3C;
+	background-color: #FFFFFF;
+}
+.table_total_tr td, .table_total_tr td span {
+	color: #333333 !important;
+}
+.account_txt {
+	font-size: 30px;
+	color: #3C3C3C;
+	font-weight: 700;
+	padding-left: 0px;
+}
+#login_form {
+	background-color: #FFFFFF;
+}
+#login_form h3 {
+	font-size: 18px;
+	color: #3C3C3C;
+	font-weight: 700;
+	margin-top: 5px;
+}
+#login_form_content p label {
+	font-size: 16px;
+	color: #3C3C3C;
+	font-weight: 700;
+}
+#login_form_content p input.form-control, #opc_account_form div input.form-control {
+	height: 40px;
+}
+#login_form_content a.lost_password {
+	font-weight: bold;
+	text-decoration: none;
+}
+#SubmitLogin, #submitAccount {
+	background-color: #379bf0;
+	font-size: 18px;
+	color: #FFFFFF;
+	font-weight: 700;
+	border-color: none;
+}
+#SubmitLogin:hover, #SubmitLogin:focus, #SubmitLogin:active, #submitAccount:hover, #submitAccount:focus, #submitAccount:active {
+	border-color: none;
+}
+#new_account_form fieldset div.box, #tc_cont {
+	background-color: #FFFFFF;
+}
+#new_account_title, #opc_account_form h3, #choose_payment_txt {
+	margin-top: 5px;
+	font-size: 18px;
+	color: #3C3C3C;
+	font-weight: 700;
+}
+#opc_account_form div label {
+	font-size: 16px;
+	color: #3C3C3C;
+	font-weight: 700;
+}
+.hard_disp_none {
+	display: none !important;
+}
+#tc_txt {
+	font-size: 16px;
+	color: #929292;
+	font-weight: 700;
+}
+#tc_link {
+	font-size: 16px;
+	color: #404040;
+	font-weight: 700;
+	text-decoration: none;
+}
+.opc-main-block h3.page-subheading {
+	margin-top: 5px;
+}
+.clear-both {
+	clear: both;
+}
+.partial_txt {
+	font-size: 16px;
+	font-weight: 700;
+	color: #585858;
+}
+.partial_mim_cost {
+	font-size: 16px;
+	font-weight: 400;
+	color: #585858;
+}
+#partial_data {
+	display: none;
+}
+.partial_subcont {
+	margin-top: 10px;
+}
+#current_amt_cont span.partial_txt {
+	transform: translate(0px, 6px);
+}
+#current_amt_cont div.input-group {
+	padding-left: 10px;
+}
+#current_amt_cont div.input-group span.input-group-addon {
+	padding: 6px 17px;
+}
+#current_amt_cont div.input-group input {
+	height: 40px;
 }
 
-.table_body td
-{
-    font-size: 16px;
-    color: #3C3C3C;
-    font-weight: 400;
-    font-family: "PT Serif",serif;
-}
-
-#voucher h4
-{
-    font-size: 18px !important;
-    color: #404040 !important;
-    font-weight: 700 !important;
-    font-family: "PT Serif",serif !important;
-}
-
-#voucher #discount_name
-{
-    width: 200px;
-    height: 35px;
-}
-
-#voucher button, #advanced-payment button
-{
-    border: none;
-    background-color: #BF9958;
-    font-size: 16px;
-    color: #FFFFFF;
-    font-weight: 700;
-    font-family: "PT Serif",serif;
-}
-
-#title
-{
-    font-size: 13px;
-    color: #3C3C3C;
-    font-weight: 600;
-    font-family: "PT Serif",serif;
-}
-
-#display_cart_vouchers
-{
-    font-family: "PT Serif",serif;
-    color: #404040;
-    font-weight: 400;
-}
-
-#display_cart_vouchers span
-{
-    font-weight: 700;
-    color: #3C3C3C !important;
-}
-
-.table_tfoot td
-{
-    font-size: 16px;
-    color: #3C3C3C;
-    font-family: "PT Serif",serif;
-    background-color: #FFFFFF;
-}
-
-.table_total_tr td, .table_total_tr td span
-{
-    color: #333333 !important;
-    font-family: "PT Serif",serif !important;
-}
-
-.account_txt
-{
-  font-size: 30px;
-  color: #3C3C3C;
-  font-weight: 700;
-  font-family: "PT Serif",serif;
-  padding-left: 0px;
-}
-
-#login_form
-{
-    background-color: #FFFFFF;
-}
-
-#login_form h3
-{
-    font-size: 18px;
-    color: #3C3C3C;
-    font-weight: 700;
-    font-family: "PT Serif",serif;
-    margin-top: 5px;
-}
-
-#login_form_content p label
-{
-    font-size: 16px;
-    color: #3C3C3C;
-    font-weight: 700;
-    font-family: "PT Serif",serif;
-}
-
-#login_form_content p input.form-control, #opc_account_form div input.form-control
-{
-    height: 40px;
-}
-
-#login_form_content a.lost_password
-{
-    font-family: "PT Serif",serif;
-    font-weight: bold;
-    text-decoration: none;
-}
-
-#SubmitLogin, #submitAccount
-{
-    background-color: #BF9958;
-    font-size: 18px;
-    color: #FFFFFF;
-    font-weight: 700;
-    font-family: "PT Serif",serif;
-    border-color: none;
-}
-#SubmitLogin:hover, #SubmitLogin:focus, #SubmitLogin:active, #submitAccount:hover, #submitAccount:focus, #submitAccount:active
-{
-    border-color: none;
-}
-
-#new_account_form fieldset div.box, #tc_cont
-{
-    background-color: #FFFFFF;
-}
-
-#new_account_title, #opc_account_form h3, #choose_payment_txt
-{
-    margin-top: 5px;
-    font-size: 18px;
-    color: #3C3C3C;
-    font-weight: 700;
-    font-family: "PT Serif",serif;
-}
-
-#opc_account_form div label
-{
-    font-size: 16px;
-    color: #3C3C3C;
-    font-weight: 700;
-    font-family: "PT Serif",serif;
-}
-
-.hard_disp_none
-{
-    display: none !important;
-}
-
-#tc_txt
-{
-    font-size: 16px;
-    color: #929292;
-    font-weight: 700;
-    font-family: "PT Serif",serif;
-}
-
-#tc_link
-{
-    font-size: 16px;
-    color: #404040;
-    font-weight: 700;
-    font-family: "PT Serif",serif;
-    text-decoration: none;
-}
-
-.opc-main-block h3.page-subheading
-{
-  margin-top: 5px;
-}
-
-.clear-both
-{
-  clear: both;
-}
-
-.partial_txt
-{
-  font-size: 16px;
-  font-weight: 700;
-  color: #585858;
-}
-
-.partial_mim_cost
-{
-  font-size: 16px;
-  font-weight: 400;
-  color: #585858;
-}
-
-#partial_data
-{
-  display: none;
-}
-
-.partial_subcont
-{
-  margin-top: 10px;
-}
-
-#current_amt_cont span.partial_txt
-{
-  transform: translate(0px, 6px);
-}
-
-#current_amt_cont div.input-group
-{
-  padding-left: 10px;
-}
-
-#current_amt_cont div.input-group span.input-group-addon
-{
-  padding: 6px 17px;
-}
-
-#current_amt_cont div.input-group input
-{
-  height: 40px;
-}
 /* By Webkul */

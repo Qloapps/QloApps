@@ -894,7 +894,6 @@ function init()
     {
     	showOtherMonths: true,
         dateFormat: 'dd-mm-yy',
-        minDate: 0,
         onClose: function( selectedDate ) 
         {
             var selectedDate = new Date(selectedDate);
@@ -907,7 +906,6 @@ function init()
     {
     	showOtherMonths: true,
         dateFormat: 'dd-mm-yy',
-        minDate: 0,
         onClose: function( selectedDate ) 
         {
             var selectedDate = new Date(selectedDate);

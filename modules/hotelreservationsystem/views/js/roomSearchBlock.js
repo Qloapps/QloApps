@@ -29,6 +29,31 @@ $(document).ready(function() {
             },
         });
     });
+
+    function highlightDateBorder(elementVal, date)
+    {
+        if (elementVal) {
+            var currentDate = date.getDate();
+            var currentMonth = date.getMonth()+1;
+            if (currentMonth < 10) {
+                currentMonth = '0' + currentMonth;
+            }
+            if (currentDate < 10) {
+                currentDate = '0' + currentDate;
+            }
+            dmy = date.getFullYear() + "-" + currentMonth + "-" + currentDate;
+            var date_format = elementVal.split("-");
+            var check_in_time = (date_format[2]) + '-' + (date_format[1]) + '-' + (date_format[0]);
+            if (dmy == check_in_time) {
+                return [true, "selectedCheckedDate", "Check-In date"];
+            } else {
+                return [true, ""];
+            }
+        } else {
+            return [true, ""];
+        }
+    }
+
     /*END*/
     var ajax_check_var = '';
     $('.location_search_results_ul').hide();
@@ -38,14 +63,8 @@ $(document).ready(function() {
         dateFormat: 'dd-mm-yy',
         minDate: 0,
         //for calender Css
-        beforeShow: function (textbox, instance) {
-            // var rect = textbox.getBoundingClientRect();
-            // instance.dpDiv.css({
-            //         marginTop: (-(textbox.offsetHeight-28)) + 'px',
-            // });
-            // setTimeout(function () {
-            //     instance.dpDiv.css({left: rect.left-73});
-            // }, 0);
+        beforeShowDay: function (date) {
+            return highlightDateBorder($("#check_in_time").val(), date);
         },
         onSelect: function(selectedDate) {
             var date_format = selectedDate.split("-");
@@ -60,16 +79,8 @@ $(document).ready(function() {
         dateFormat: 'dd-mm-yy',
         minDate: 0,
         //for calender Css
-        beforeShow: function (textbox, instance) {
-            // var rect = textbox.getBoundingClientRect();
-            // instance.dpDiv.css({
-            //         marginTop: (-(textbox.offsetHeight-28)) + 'px',
-            // });
-            // setTimeout(function () {
-            //     instance.dpDiv.css({left: rect.left-73});
-            // }, 0);
-
-            // $('#ui-datepicker-div').addClass('ui-datepicker-div-after');
+        beforeShowDay: function (date) {
+            return highlightDateBorder($("#check_out_time").val(), date);
         },
         onSelect: function(selectedDate) {
             var date_format = selectedDate.split("-");
