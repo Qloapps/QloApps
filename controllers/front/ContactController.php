@@ -254,8 +254,11 @@ class ContactControllerCore extends FrontController
 				$customer_thread['reference'] = $order->getUniqReference();
 			$this->context->smarty->assign('customerThread', $customer_thread);
 		}
-
+		$global_phone_num = Configuration::get('WK_HOTEL_GLOBAL_CONTACT_NUMBER');
+		$global_email = Configuration::get('WK_HOTEL_GLOBAL_CONTACT_EMAIL');
 		$this->context->smarty->assign(array(
+			'global_phone_num' => $global_phone_num,
+			'global_email' => $global_email,
 			'contacts' => Contact::getContacts($this->context->language->id),
 			'message' => html_entity_decode(Tools::getValue('message'))
 		));

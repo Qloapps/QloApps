@@ -5924,7 +5924,7 @@ span.exclusive_large_disabled {
   position: relative;
   display: inline-block;
   padding: 5px 7px;
-  border: 1px solid #cc9900;
+  border: 1px solid #379BF0;
   font-weight: bold;
   color: black;
   background: url(../img/bg_bt.gif) repeat-x 0 0 #f4b61b;
@@ -6000,7 +6000,7 @@ span.exclusive {
   opacity: 0.3; }
 
 .button.button-small {
-  font: bold 13px/17px 'PT Serif', sans-serif;
+  font: bold 13px/17px 'Oxygen', sans-serif;
   color: #fff;
   background: #379BF0;
   border: 1px solid;
@@ -6309,7 +6309,7 @@ table.table_block td {
   white-space: nowrap; }
 
 .price.product-price {
-  font: 600 21px/26px 'PT Serif', serif;
+  font: 600 21px/26px 'Oxygen', serif;
   color: #333; }
 
 .old-price {
@@ -6325,7 +6325,7 @@ table.table_block td {
 .price-percent-reduction {
   background: #f13340;
   border: 1px solid #d02a2c;
-  font: 600 21px/24px 'PT Serif', serif;
+  font: 600 21px/24px 'Oxygen', serif;
   color: #fff;
   padding: 0 5px 0 3px;
   display: inline-block; }
@@ -6526,7 +6526,7 @@ table.table_block td {
       #home-page-tabs > li {
         width: 100%; } }
     #home-page-tabs > li a {
-      font: 600 21px/24px 'PT Serif', serif;
+      font: 600 21px/24px 'Oxygen', serif;
       color: #555454;
       text-transform: uppercase;
       border: none;
@@ -6566,7 +6566,7 @@ table.table_block td {
 
 .block .title_block,
 .block h4 {
-  font: 600 18px/22px 'PT Serif', serif;
+  font: 600 18px/22px 'Oxygen', serif;
   color: #555454;
   background: #f6f6f6;
   border-top: 5px solid #333;
@@ -7312,7 +7312,7 @@ div.star a:hover {
       .footer-container #footer a:hover {
         color: #fff; }
     .footer-container #footer h4 {
-      font: 600 18px/22px 'PT Serif', serif;
+      font: 600 18px/22px 'Oxygen', serif;
       color: #fff;
       margin: 0 0 13px 0;
       cursor: pointer; }
@@ -7601,11 +7601,11 @@ a.price_discount_delete {
 #cart_summary tfoot td.price {
   text-align: right; }
 #cart_summary tfoot td.total_price_container span {
-  font: 600 18px/22px 'PT Serif', serif;
+  font: 600 18px/22px 'Oxygen', serif;
   color: #555454;
   text-transform: uppercase; }
 #cart_summary tfoot td#total_price_container {
-  /*font: 600 21px/25px 'PT Serif', serif;*/
+  /*font: 600 21px/25px 'Oxygen', serif;*/
   color: #333;
   background: #fff; }
 
@@ -7692,7 +7692,7 @@ a.price_discount_delete {
 .cart_voucher {
   vertical-align: top !important; }
   .cart_voucher h4 {
-    font: 600 18px/22px 'PT Serif', serif;
+    font: 600 18px/22px 'Oxygen', serif;
     color: #555454;
     text-transform: uppercase;
     padding: 7px 0 10px 0; }
@@ -8260,12 +8260,12 @@ table.discount i {
     #pagenotfound .pagenotfound .img-404 img {
       max-width: 100%; }
   #pagenotfound .pagenotfound h1 {
-    font: 600 28px/34px 'PT Serif', serif;
+    font: 600 28px/34px 'Oxygen', serif;
     color: #333;
     text-transform: uppercase;
     margin-bottom: 7px; }
   #pagenotfound .pagenotfound p {
-    font: 600 16px/20px 'PT Serif', serif;
+    font: 600 16px/20px 'Oxygen', serif;
     color: #555454;
     text-transform: uppercase;
     border-bottom: 1px solid #d6d4d4;
@@ -8473,7 +8473,7 @@ div.star.star_hover:after {
 #facebook_block h4 {
   padding: 35px 0 0 0;
   margin: 0 0 12px 0;
-  font: 300 21px/25px 'PT Serif', serif;
+  font: 300 21px/25px 'Oxygen', serif;
   color: #6f6d6d; }
   @media (max-width: 991px) {
     #facebook_block h4 {
@@ -8537,7 +8537,7 @@ div.star.star_hover:after {
     overflow: hidden; }
   #cmsinfo_block h3 {
     margin: 0 0 5px 0;
-    font: 300 21px/25px 'PT Serif', serif;
+    font: 300 21px/25px 'Oxygen', serif;
     color: #6f6d6d; }
     @media (max-width: 1199px) {
       #cmsinfo_block h3 {

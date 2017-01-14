@@ -33,11 +33,11 @@
 				</p>
 				<p>
 					<i class="icon-mobile-phone cont_icon_phone"></i>
-					<span> +91-9999999999, +91-9876543210</span>
+					<span> {if isset($global_phone_num) && $global_phone_num }{$global_phone_num}{else}{l s='No contact available'}{/if}</span>
 				</p>
 				<p>
 					<i class="icon-envelope cont_icon_enve"></i>
-					<span> noreply@webkul.com</span>
+					<span> {if isset($global_email) && $global_email }{$global_email}{else}{l s='No email available'}{/if}</span>
 				</p>
 			</div>
 		</div>

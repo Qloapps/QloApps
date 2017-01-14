@@ -12,7 +12,7 @@ class hotelreservationsystem extends Module
     public function __construct()
     {
         $this->name = 'hotelreservationsystem';
-        $this->version = '1.0.0';
+        $this->version = '1.0.1';
         $this->author = 'Webkul';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -175,30 +175,33 @@ class hotelreservationsystem extends Module
 
                     /*for saving details of the advance payment product wise*/
                     if (Configuration::get('WK_ALLOW_ADVANCED_PAYMENT')) {
-                        $prod_adv_payment = $obj_adv_payment->getIdAdvPaymentByIdProduct($product['id_product']);
+                        $obj_customer_adv = new HotelCustomerAdvancedPayment();
+                        $cust_adv_payment_dtls = $obj_customer_adv->getClientAdvPaymentDtl($cart->id, $cart->id_guest);
+                        if ($cust_adv_payment_dtls) {
+                            $prod_adv_payment = $obj_adv_payment->getIdAdvPaymentByIdProduct($product['id_product']);
 
-                        if (!$prod_adv_payment || (isset($prod_adv_payment['payment_type']) && $prod_adv_payment['payment_type'])) 
-                        {
-                            $product_adv_amount = $obj_adv_payment->getProductMinAdvPaymentAmount($product['id_product'], 1);
-                            $obj_customer_adv_product = new HotelCustomerAdvancedProductPayment();
-                            $obj_customer_adv_product->id_cart = $cart->id;
-                            $obj_customer_adv_product->id_room = $obj_cart_bk_data->id_room;
-                            $obj_customer_adv_product->id_hotel = $obj_cart_bk_data->id_hotel;
-                            $obj_customer_adv_product->id_product = $product['id_product'];
-                            $obj_customer_adv_product->id_order = $order->id;
-                            $obj_customer_adv_product->id_guest = $cart->id_guest;
-                            $obj_customer_adv_product->id_customer = $customer->id;
-                            $obj_customer_adv_product->id_currency = $cart->id_currency;
-                            $obj_customer_adv_product->product_price_tax_incl = Product::getPriceStatic($product['id_product'], true);
-                            $obj_customer_adv_product->product_price_tax_excl = Product::getPriceStatic($product['id_product'], false);
-                            $obj_customer_adv_product->advance_payment_amount = $product_adv_amount;
-                            $obj_customer_adv_product->date_from = $obj_cart_bk_data->date_from;
-                            $obj_customer_adv_product->date_to = $obj_cart_bk_data->date_to;
-                            $obj_customer_adv_product->save();
+                            if (!$prod_adv_payment || (isset($prod_adv_payment['payment_type']) && $prod_adv_payment['payment_type'])) 
+                            {
+                                $product_adv_amount = $obj_adv_payment->getProductMinAdvPaymentAmount($product['id_product'], 1);
+                                $obj_customer_adv_product = new HotelCustomerAdvancedProductPayment();
+                                $obj_customer_adv_product->id_cart = $cart->id;
+                                $obj_customer_adv_product->id_room = $obj_cart_bk_data->id_room;
+                                $obj_customer_adv_product->id_hotel = $obj_cart_bk_data->id_hotel;
+                                $obj_customer_adv_product->id_product = $product['id_product'];
+                                $obj_customer_adv_product->id_order = $order->id;
+                                $obj_customer_adv_product->id_guest = $cart->id_guest;
+                                $obj_customer_adv_product->id_customer = $customer->id;
+                                $obj_customer_adv_product->id_currency = $cart->id_currency;
+                                $obj_customer_adv_product->product_price_tax_incl = Product::getPriceStatic($product['id_product'], true);
+                                $obj_customer_adv_product->product_price_tax_excl = Product::getPriceStatic($product['id_product'], false);
+                                $obj_customer_adv_product->advance_payment_amount = $product_adv_amount;
+                                $obj_customer_adv_product->date_from = $obj_cart_bk_data->date_from;
+                                $obj_customer_adv_product->date_to = $obj_cart_bk_data->date_to;
+                                $obj_customer_adv_product->save();
+                            }
                         }
                     }
                     /*End*/
-
                 }
             }
         }

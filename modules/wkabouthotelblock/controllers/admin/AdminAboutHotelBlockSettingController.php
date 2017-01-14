@@ -21,20 +21,17 @@ class AdminAboutHotelBlockSettingController extends ModuleAdminController
                         'title' => $this->l('Heading'),
                         'type' => 'text',
                         'required' => true,
-                        'validation' => 'isName',
                         'hint' => $this->l('Block Heading. Ex: Interior.')
                     ),
                     'HOTEL_INTERIOR_DESCRIPTION' => array(
                         'title' => $this->l('Description'),
                         'type' => 'text',
                         'required' => true,
-                        'validation' => 'isName',
                         'hint' => $this->l('Block description.')
                     ),
                 ),
                 'submit' => array(
                     'title' => $this->l('Save'),
-                    'name' => 'submit_about_hotel',
                     'type' => 'submit',
                 )
             ),

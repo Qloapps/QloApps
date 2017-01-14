@@ -77,7 +77,7 @@
   padding: 11px;
 }
 .service_type_ul li:hover, .service_type_ul li:focus, .service_type_ul li:active {
-  background-color: #bf9958;
+  background-color: #379bf0;
   color: #FFFFFF;
 }
 
@@ -161,7 +161,7 @@
   padding: 11px;
 }
 .contact_type_ul li:hover, .contact_type_ul li:focus, .contact_type_ul li:active {
-  background-color: #bf9958;
+  background-color: #379bf0;
   color: #FFFFFF;
 }
 

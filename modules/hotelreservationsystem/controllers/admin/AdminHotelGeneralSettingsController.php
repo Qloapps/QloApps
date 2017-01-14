@@ -10,9 +10,9 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
         if (!($obj = $this->loadObject(true))) {
             return;
         }
-        $ps_img_url = _PS_IMG_DIR_.'hotel_header_image.png';
+        $ps_img_url = _PS_IMG_DIR_.'hotel_header_image.jpg';
         if ($img_exist = file_exists($ps_img_url)) {
-            $img_url = '../../hotelcommerce/img/hotel_header_image.png';
+            $img_url = '../../hotelcommerce/img/hotel_header_image.jpg';
             $image = "<img class='img-thumbnail img-responsive' style='max-width:100px' src='".$img_url."'>";
         }
         $this->fields_options = array(
@@ -134,7 +134,7 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
                 ),
                 'submit' => array('title' => $this->l('Save')),
             ),
-            'orderconfirmation' => array(
+            /*'orderconfirmation' => array(
                 'title' => $this->l('Advanced Payment Global Setting'),
                 'fields' => array(
                     'WK_SHOW_MSG_ON_BO' => array(
@@ -163,7 +163,7 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
                     ),
                 ),
                 'submit' => array('title' => $this->l('Save')),
-            ),
+            ),*/
             'googleMap' => array(
                 'title' => $this->l('Google Map Setting'),
                 'fields' => array(
@@ -223,10 +223,10 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
             if ($_FILES['htl_header_image']['name']) {
                 $this->validateHotelHeaderImage($_FILES['htl_header_image']);
                 if (!count($this->errors)) {
-                    $img_path = _PS_IMG_DIR_.'hotel_header_image.png';
+                    $img_path = _PS_IMG_DIR_.'hotel_header_image.jpg';
 
                     if (ImageManager::resize($_FILES['htl_header_image']['tmp_name'], $img_path)) {
-                        Configuration::updateValue('WK_HOTEL_HEADER_IMAGE', 'hotel_header_image.png');
+                        Configuration::updateValue('WK_HOTEL_HEADER_IMAGE', 'hotel_header_image.jpg');
                     } else {
                         $this->errors[] = Tools::displayError('Some error occured while uoploading image.Please try again.');
                     }

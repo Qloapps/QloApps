@@ -2,6 +2,7 @@ QloApps
 --------
 Hotel Commerce plays a vital role in hotel industry as it has changed the online presence of the hotels.QloApps also known as Qlo is a Hotel Commerce Software or you can say a Hotel Booking & Reservation System. Qlo is an open source and free platform which help you to launch your own hotel booking website and manage your online & On-Desk booking easily
 
+
 Demo
 --------
 FrontEnd : http://demo.qloapps.com </br>
@@ -10,11 +11,8 @@ username : demo@demo.com </br>
 Password : demodemo </br>
 
 
-
-
 Server configuration
 --------
-
 To install Qlo, you need a web server running PHP 5.2+ and any flavor of MySQL 5.0+ (MySQL, MariaDB, Percona Server, etc)
 You will also need a database administration tool, such as phpMyAdmin, in order to create a database for PrestaShop.
 We recommend the Apache or Nginx web servers.  
@@ -44,6 +42,14 @@ Webkul is known for his proactive support and already developed more than 100+ p
 platforms.
 
 
-Thank you for downloading .
+license
+--------
+OSL V3 : https://opensource.org/licenses/OSL-3.0
 
+
+Credits
+--------
 Crafted with :heart: at [Webkul](http://webkul.com)
+
+
+Thank you for downloading.
