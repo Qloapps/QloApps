@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<module>
+	<name>graphnvd3</name>
+	<displayName><![CDATA[NVD3 Charts]]></displayName>
+	<version><![CDATA[1.4]]></version>
+	<description><![CDATA[]]></description>
+	<author><![CDATA[PrestaShop]]></author>
+	<tab><![CDATA[administration]]></tab>
+	<is_configurable>0</is_configurable>
+	<need_instance>0</need_instance>
+	<limited_countries></limited_countries>
+</module>

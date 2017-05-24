@@ -1131,6 +1131,23 @@ $(document).ready(function() {
 
                             price = formatCurrency(total_price, currency_format, currency_sign, currency_blank);
 
+                            feature_price = parseFloat(result.feature_price);
+                            original_product_price = parseFloat(result.original_product_price);
+                            feature_price_diff = parseFloat(result.feature_price_diff);
+                            if (feature_price_diff > 0) {
+                                $('.room_type_current_price').text(formatCurrency(feature_price, currency_format, currency_sign, currency_blank));
+                                $('.room_type_current_price').show();
+                                $('.product_original_price').addClass('room_type_old_price');
+                            } else if (feature_price_diff < 0) {
+                                $('.room_type_current_price').text(formatCurrency(feature_price, currency_format, currency_sign, currency_blank));
+                                $('.room_type_current_price').show();
+                                $('.product_original_price').hide();
+                            } else {
+                                $('.room_type_current_price').hide();
+                                $('.product_original_price').removeClass('room_type_old_price');
+                                $('.product_original_price').show();
+                            }
+
                             $('.total_price_block p').text(price);
                             $('#num_days').val(result.num_days);
                         } else if (result.msg == 'unavailable_quantity') {
@@ -1164,7 +1181,20 @@ $(document).ready(function() {
     $("#room_check_out").datepicker({
         showOtherMonths: true,
         dateFormat: 'dd-mm-yy',
-        minDate: 0,
+        beforeShow: function (input, instance) {
+            var date_to = $('#check_in_time').val();
+            if (typeof date_to != 'undefined' && date_to != '') {
+                var date_format = date_to.split("-");
+                var selectedDate = new Date($.datepicker.formatDate('yy-mm-dd', new Date(date_format[2], date_format[1] - 1, date_format[0])));
+                selectedDate.setDate(selectedDate.getDate()+1);
+                $("#room_check_out").datepicker("option", "minDate", selectedDate);
+            } else {
+                var date_format = new Date();
+                var selectedDate = new Date($.datepicker.formatDate('yy-mm-dd', new Date()));
+                selectedDate.setDate(selectedDate.getDate()+1);
+                $("#room_check_out").datepicker("option", "minDate", selectedDate);
+            }
+        },
         beforeShowDay: function (date) {
             return highlightDateBorder($("#room_check_out").val(), date);
         },
@@ -1175,8 +1205,13 @@ $(document).ready(function() {
             $("#room_check_in").datepicker("option", "maxDate", selectedDate);
         },
         onSelect: function(dateText, inst) {
-            var date_in = $('#room_check_in').val();
-            var date_out = $('#room_check_out').val();
+            var date_from_format = $('#room_check_in').val().split("-");
+            var selectedDateFrom = new Date($.datepicker.formatDate('yy-mm-dd', new Date(date_from_format[2], date_from_format[1] - 1, date_from_format[0])));
+            var date_in = $.datepicker.formatDate('yy-mm-dd', selectedDateFrom);
+            var date_to_format = $('#room_check_out').val().split("-");
+            var selectedDateTo = new Date($.datepicker.formatDate('yy-mm-dd', new Date(date_to_format[2], date_to_format[1] - 1, date_to_format[0])));
+            var date_out = $.datepicker.formatDate('yy-mm-dd', selectedDateTo);
+
             if (date_in >= date_out) {
                 $(this).val(inst.lastVal);
                 $('.room_unavailability_date_error_div').text(correct_date_cond);
@@ -1220,6 +1255,22 @@ $(document).ready(function() {
                             total_price = parseFloat(total_price);
 
                             price = formatCurrency(total_price, currency_format, currency_sign, currency_blank);
+                            feature_price = parseFloat(result.feature_price);
+                            original_product_price = parseFloat(result.original_product_price);
+                            feature_price_diff = parseFloat(result.feature_price_diff);
+                            if (feature_price_diff > 0) {
+                                $('.room_type_current_price').text(formatCurrency(feature_price, currency_format, currency_sign, currency_blank));
+                                $('.room_type_current_price').show();
+                                $('.product_original_price').addClass('room_type_old_price');
+                            } else if (feature_price_diff < 0) {
+                                $('.room_type_current_price').text(formatCurrency(feature_price, currency_format, currency_sign, currency_blank));
+                                $('.room_type_current_price').show();
+                                $('.product_original_price').hide();
+                            } else {
+                                $('.room_type_current_price').hide();
+                                $('.product_original_price').removeClass('room_type_old_price');
+                                $('.product_original_price').show();
+                            }
 
                             $('.total_price_block p').text(price);
                             $('#num_days').val(result.num_days);
@@ -1234,9 +1285,9 @@ $(document).ready(function() {
                                 $('.sold_out_alert').hide();
 
                                 setTimeout(function() {
-                                        $('.room_unavailability_date_error_div').css('display', 'none');
-                                    },
-                                    3000);
+                                    $('.room_unavailability_date_error_div').css('display', 'none');
+                                },
+                                3000);
                             } else {
                                 $('.unvail_rooms_cond_display').hide();
                                 $('.sold_out_alert').show();

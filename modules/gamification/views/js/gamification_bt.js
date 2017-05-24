@@ -6,8 +6,8 @@ function gamificationTasks()
 {
 	if (typeof ids_ps_advice == 'undefined')
 		ids_ps_advice = new Array();
-	$('#gamification_notif').remove();
-	$('#header_notifs_icon_wrapper').append('<div id="gamification_notif" class="notifs"></div>');
+
+        gamificationInsertOnBackOfficeDOM('<div id="gamification_notif" class="notifs"></div>');
 	$.ajax({
 		type: 'POST',
 		url: admin_gamification_ajax_url,
@@ -91,8 +91,7 @@ function gamificationTasks()
 
 function initHeaderNotification(html)
 {
-	$('#gamification_notif').remove();
-	$('#header_notifs_icon_wrapper').append(html);
+	gamificationInsertOnBackOfficeDOM(html);
 	$('.gamification_notif').click(function () {
 		if ($('#gamification_notif_wrapper').parent().css('display') == 'none')
 		{
@@ -120,6 +119,26 @@ function initHeaderNotification(html)
 	
 	if ($('.dropdown-toggle').length)
 		$('.dropdown-toggle').dropdown();
+}
+
+function gamificationInsertOnBackOfficeDOM(html)
+{
+    $('#gamification_notif').remove();
+    // Before PrestaShop 1.7
+    if (0 < $('#header_notifs_icon_wrapper').length) {
+        $('#header_notifs_icon_wrapper').append(html);
+    } else if (0 < $('#notification').length) {
+        // PrestaShop 1.7 - Default theme
+        $(html).insertAfter('#notification');
+    } else if (0 < $('.notification-center').length) {
+        // PrestaShop 1.7 - New theme
+        $('.gamification-component').remove();
+        html = '<div class="component pull-md-right gamification-component"><ul>'+html+'</ul></div>';
+        
+        $(html).insertAfter($('.notification-center').closest('.component'));
+    } else {
+        console.error('Could not find proper place to add the gamification notification center. x_x');
+    }
 }
 
 function disabledGamificationNotification()

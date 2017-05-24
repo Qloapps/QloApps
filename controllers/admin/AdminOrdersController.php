@@ -55,26 +55,25 @@ class AdminOrdersControllerCore extends AdminController
         $this->allow_export = true;
         $this->deleted = false;
         $this->context = Context::getContext();
-
         $this->_select = '
-		(cap.total_order_amount - cap.total_paid_amount) AS `amount_due`,
-		a.id_currency,
-		a.id_order AS id_pdf,
-		CONCAT(LEFT(c.`firstname`, 1), \'. \', c.`lastname`) AS `customer`,
-		osl.`name` AS `osname`,
-		os.`color`,
-		IF((SELECT so.id_order FROM `'._DB_PREFIX_.'orders` so WHERE so.id_customer = a.id_customer AND so.id_order < a.id_order LIMIT 1) > 0, 0, 1) as new,
-		country_lang.name as cname,
-		IF(a.valid, 1, 0) badge_success';
+        (cap.total_order_amount - cap.total_paid_amount) AS `amount_due`, a.source AS order_source,
+        a.id_currency,
+        a.id_order AS id_pdf,
+        CONCAT(LEFT(c.`firstname`, 1), \'. \', c.`lastname`) AS `customer`,
+        osl.`name` AS `osname`,
+        os.`color`,
+        IF((SELECT so.id_order FROM `'._DB_PREFIX_.'orders` so WHERE so.id_customer = a.id_customer AND so.id_order < a.id_order LIMIT 1) > 0, 0, 1) as new,
+        country_lang.name as cname,
+        IF(a.valid, 1, 0) badge_success';
 
         $this->_join = '
-		LEFT JOIN `'._DB_PREFIX_.'customer` c ON (c.`id_customer` = a.`id_customer`)
-		INNER JOIN `'._DB_PREFIX_.'address` address ON address.id_address = a.id_address_delivery
-		INNER JOIN `'._DB_PREFIX_.'country` country ON address.id_country = country.id_country
-		INNER JOIN `'._DB_PREFIX_.'country_lang` country_lang ON (country.`id_country` = country_lang.`id_country` AND country_lang.`id_lang` = '.(int) $this->context->language->id.')
-		LEFT JOIN `'._DB_PREFIX_.'order_state` os ON (os.`id_order_state` = a.`current_state`)
-		LEFT JOIN `'._DB_PREFIX_.'htl_customer_adv_payment` cap ON (cap.`id_order` = a.`id_order`)
-		LEFT JOIN `'._DB_PREFIX_.'order_state_lang` osl ON (os.`id_order_state` = osl.`id_order_state` AND osl.`id_lang` = '.(int) $this->context->language->id.')';
+        LEFT JOIN `'._DB_PREFIX_.'customer` c ON (c.`id_customer` = a.`id_customer`)
+        INNER JOIN `'._DB_PREFIX_.'address` address ON address.id_address = a.id_address_delivery
+        INNER JOIN `'._DB_PREFIX_.'country` country ON address.id_country = country.id_country
+        INNER JOIN `'._DB_PREFIX_.'country_lang` country_lang ON (country.`id_country` = country_lang.`id_country` AND country_lang.`id_lang` = '.(int) $this->context->language->id.')
+        LEFT JOIN `'._DB_PREFIX_.'order_state` os ON (os.`id_order_state` = a.`current_state`)
+        LEFT JOIN `'._DB_PREFIX_.'htl_customer_adv_payment` cap ON (cap.`id_order` = a.`id_order`)
+        LEFT JOIN `'._DB_PREFIX_.'order_state_lang` osl ON (os.`id_order_state` = osl.`id_order_state` AND osl.`id_lang` = '.(int) $this->context->language->id.')';
         $this->_orderBy = 'id_order';
         $this->_orderWay = 'DESC';
         $this->_use_found_rows = false;
@@ -103,6 +102,10 @@ class AdminOrdersControllerCore extends AdminController
             ),
             'customer' => array(
                 'title' => $this->l('Customer'),
+                'havingFilter' => true,
+            ),
+            'order_source' => array(
+                'title' => $this->l('Order Source'),
                 'havingFilter' => true,
             ),
         );
@@ -163,13 +166,13 @@ class AdminOrdersControllerCore extends AdminController
 
         if (Country::isCurrentlyUsed('country', true)) {
             $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->ExecuteS('
-			SELECT DISTINCT c.id_country, cl.`name`
-			FROM `'._DB_PREFIX_.'orders` o
-			'.Shop::addSqlAssociation('orders', 'o').'
-			INNER JOIN `'._DB_PREFIX_.'address` a ON a.id_address = o.id_address_delivery
-			INNER JOIN `'._DB_PREFIX_.'country` c ON a.id_country = c.id_country
-			INNER JOIN `'._DB_PREFIX_.'country_lang` cl ON (c.`id_country` = cl.`id_country` AND cl.`id_lang` = '.(int) $this->context->language->id.')
-			ORDER BY cl.name ASC');
+            SELECT DISTINCT c.id_country, cl.`name`
+            FROM `'._DB_PREFIX_.'orders` o
+            '.Shop::addSqlAssociation('orders', 'o').'
+            INNER JOIN `'._DB_PREFIX_.'address` a ON a.id_address = o.id_address_delivery
+            INNER JOIN `'._DB_PREFIX_.'country` c ON a.id_country = c.id_country
+            INNER JOIN `'._DB_PREFIX_.'country_lang` cl ON (c.`id_country` = cl.`id_country` AND cl.`id_lang` = '.(int) $this->context->language->id.')
+            ORDER BY cl.name ASC');
 
             $country_array = array();
             foreach ($result as $row) {
@@ -1843,7 +1846,7 @@ class AdminOrdersControllerCore extends AdminController
 
         $order_detail_data = $obj_htl_bk_dtl->getOrderFormatedBookinInfoByIdOrder((int) Tools::getValue('id_order'));
         $total_tax = 0;
-        $total_rooms_cost = 0;
+        $totalRoomsCostTE = 0;
         if ($order_detail_data) {
             foreach ($order_detail_data as $key => $value) {
                 //work on entring refund data
@@ -1871,20 +1874,13 @@ class AdminOrdersControllerCore extends AdminController
                 $order_detail_data[$key]['avail_rooms_to_swap'] = $obj_htl_bk_dtl->getAvailableRoomsForSwapping($value['date_from'], $value['date_to'], $value['id_product'], $value['id_hotel'], $value['id_room']);
 
                 /*Product price when order was created*/
-                $order_details_obj = new OrderDetail($value['id_order_detail']);
-                $unit_price_tax_excl = 0;
-                $unit_price_tax_incl = 0;
-                $unit_price_tax_excl = $order_details_obj->unit_price_tax_excl;
-                $unit_price_tax_incl = $order_details_obj->unit_price_tax_incl;
-                $tax_incl_price = $value['quantity'] * $unit_price_tax_incl;
-                $tax_excl_price = $value['quantity'] * $unit_price_tax_excl;
-                $total_tax += ($tax_incl_price - $tax_excl_price);
-                $total_rooms_cost += $tax_excl_price;
-
-                $order_detail_data[$key]['unit_amt_tax_excl'] = $unit_price_tax_excl;
-                $order_detail_data[$key]['unit_amt_tax_incl'] = $unit_price_tax_incl;
-                $order_detail_data[$key]['amt_with_qty_tax_excl'] = $tax_excl_price;
-                $order_detail_data[$key]['amt_with_qty_tax_incl'] = $tax_incl_price;
+                $totalRoomsCostTE += $value['total_price_tax_excl'];
+                $total_tax += $value['total_price_tax_incl']-$value['total_price_tax_excl'];
+                $num_days = $obj_htl_bk_dtl->getNumberOfDays($value['date_from'], $value['date_to']);
+                $order_detail_data[$key]['unit_amt_tax_excl'] = $value['total_price_tax_excl']/$num_days;
+                $order_detail_data[$key]['unit_amt_tax_incl'] = $value['total_price_tax_incl']/$num_days;
+                $order_detail_data[$key]['amt_with_qty_tax_excl'] = $value['total_price_tax_excl'];
+                $order_detail_data[$key]['amt_with_qty_tax_incl'] = $value['total_price_tax_incl'];
 
                 // For Order Refund Status
                 $order_detail_data[$key]['stage_name'] = $stage_name;
@@ -1892,7 +1888,6 @@ class AdminOrdersControllerCore extends AdminController
         }
         //end
         //by webkul to send order status on order detail page
-
         $obj_bookin_detail = new HotelBookingDetail();
         $htl_booking_data_order_id = $obj_bookin_detail->getBookingDataByOrderId(Tools::getValue('id_order'));
         if ($htl_booking_data_order_id) {
@@ -1938,7 +1933,7 @@ class AdminOrdersControllerCore extends AdminController
 
             /*#################################################*/
             /*Assigned variable to view.tpl By webkul*/
-            'total_rooms_cost' => $total_rooms_cost,
+            'totalRoomsCostTE' => $totalRoomsCostTE,
             'total_tax_in_order' => $total_tax,
             'htl_booking_order_data' => $htl_booking_data_order_id,
             'hotel_order_status' => $htl_order_status,
@@ -2566,6 +2561,10 @@ class AdminOrdersControllerCore extends AdminController
                 $obj_htl_bk_dtl->comment = $obj_cart_bk_data->comment;
                 $obj_htl_bk_dtl->date_from = $obj_cart_bk_data->date_from;
                 $obj_htl_bk_dtl->date_to = $obj_cart_bk_data->date_to;
+                $total_price = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice($product_informations['product_id'], $obj_cart_bk_data->date_from, $obj_cart_bk_data->date_to);
+                $obj_htl_bk_dtl->total_price_tax_excl = $total_price['total_price_tax_incl'];
+                $obj_htl_bk_dtl->total_price_tax_incl = $total_price['total_price_tax_excl'];
+
                 $obj_htl_bk_dtl->save();
             }
         }
@@ -2719,6 +2718,29 @@ class AdminOrdersControllerCore extends AdminController
             )));
         }
 
+        // By webkul to calculate rates of the product from hotelreservation syatem tables with feature prices....
+        $hotelCartBookingData = new HotelCartBookingData();
+        $totalProductPriceBeforeTE = (float) $order_detail->total_price_tax_excl;
+        $totalProductPriceBeforeTI = (float) $order_detail->total_price_tax_incl;
+        $totalProductPriceAfterTE = 0;
+        $totalProductPriceAfterTI = 0;
+        $bookedRooms = $obj_booking_detail->getBookedRoomsByIdOrderDetail((int) Tools::getValue('order_detail_id'), $id_product);
+        if ($bookedRooms) {
+            foreach ($bookedRooms as $roomInfo) {
+                if ($roomInfo['id_room'] == $id_room && (strtotime($roomInfo['date_from']) == strtotime($old_date_from))) {
+                    $roomTotalPrice = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice($roomInfo['id_product'], $new_date_from, $new_date_to);
+                    $totalProductPriceAfterTE += (float) $roomTotalPrice['total_price_tax_excl'];
+                    $totalProductPriceAfterTI += (float) $roomTotalPrice['total_price_tax_incl'];
+                } else {
+                    $roomTotalPrice = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice($roomInfo['id_product'], $roomInfo['date_from'], $roomInfo['date_to']);
+                    $totalProductPriceAfterTE += (float) $roomInfo['total_price_tax_excl'];
+                    $totalProductPriceAfterTI += (float) $roomInfo['total_price_tax_incl'];
+                }
+            }
+        }
+        // END
+
+
         /*This code is commented by webkul because in our case quantity of the product will be number of days for which room is booked*/
         // If multiple product_quantity, the order details concern a product customized
         /*$product_quantity = 0;
@@ -2736,8 +2758,11 @@ class AdminOrdersControllerCore extends AdminController
         $product_price_tax_incl = Tools::ps_round(Tools::getValue('product_price_tax_incl'), 2);
         $product_price_tax_excl = Tools::ps_round(Tools::getValue('product_price_tax_excl'), 2);
         // Calculate differences of price (Before / After)
-        $diff_price_tax_incl = $product_price_tax_incl * $qty_diff;
-        $diff_price_tax_excl = $product_price_tax_excl * $qty_diff;
+        //$diff_price_tax_incl = $product_price_tax_incl * $qty_diff;
+        $diff_price_tax_incl = $totalProductPriceAfterTI - $totalProductPriceBeforeTI;
+        //$diff_price_tax_excl = $product_price_tax_excl * $qty_diff;
+        $diff_price_tax_excl = $totalProductPriceAfterTE - $totalProductPriceBeforeTE;
+        //var_dump($order_invoice);
         // Apply change on OrderInvoice
         if (isset($order_invoice)) {
             // If OrderInvoice to use is different, we update the old invoice and new invoice
@@ -2749,7 +2774,7 @@ class AdminOrdersControllerCore extends AdminController
 
                 $old_order_invoice->total_paid_tax_excl -= $order_detail->total_price_tax_excl;
                 $old_order_invoice->total_paid_tax_incl -= $order_detail->total_price_tax_incl;
-
+                ddd($old_order_invoice);
                 $res &= $old_order_invoice->update();
 
                 $order_invoice->total_products += $order_detail->total_price_tax_excl;
@@ -2761,7 +2786,6 @@ class AdminOrdersControllerCore extends AdminController
                 $order_detail->id_order_invoice = $order_invoice->id;
             }
         }
-
         if ($diff_price_tax_incl != 0 && $diff_price_tax_excl != 0) {
             $order_detail->unit_price_tax_excl = $product_price_tax_excl;
             $order_detail->unit_price_tax_incl = $product_price_tax_incl;
@@ -2950,10 +2974,21 @@ class AdminOrdersControllerCore extends AdminController
 
         /*END*/
         $this->doDeleteProductLineValidation($order_detail, $order);
+        $bookingInfo = $obj_booking_detail->getRowByIdOrderIdProductInDateRange($id_order, $id_product, $date_from, $date_to);
+        $bookingPriceTaxIncl = $bookingInfo['total_price_tax_incl'];
+        $bookingPriceTaxExcl = $bookingInfo['total_price_tax_excl'];
+        /*$totalProductPriceBeforeTE = $order_detail->total_price_tax_excl;
+        $totalProductPriceBeforeTI = $order_detail->total_price_tax_incl;*/
+        // by webkul to calculate rates of the product from hotelreservation syatem tables with feature prices....
+       /* $hotelCartBookingData = new HotelCartBookingData();
+        $roomTypesByIdProduct = $hotelCartBookingData->getCartInfoIdCartIdProduct($this->id, $product['id_product']);*/
 
         /*This code below to alter the values in the order detail table*/
-        $diff_products_tax_incl = $order_detail->unit_price_tax_incl * $product_quantity;
-        $diff_products_tax_excl = $order_detail->unit_price_tax_excl * $product_quantity;
+        //$diff_products_tax_incl = $order_detail->unit_price_tax_incl * $product_quantity;
+        //$diff_products_tax_excl = $order_detail->unit_price_tax_excl * $product_quantity;
+        $diff_products_tax_incl = $bookingPriceTaxIncl;
+        $diff_products_tax_excl = $bookingPriceTaxExcl;
+
         $delete = false;
         if ($product_quantity >= $order_detail->product_quantity) {
             $delete = true;

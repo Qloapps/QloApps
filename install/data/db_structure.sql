@@ -1129,6 +1129,7 @@ CREATE TABLE `PREFIX_orders` (
   `delivery_number` int(10) unsigned NOT NULL DEFAULT '0',
   `invoice_date` datetime NOT NULL,
   `delivery_date` datetime NOT NULL,
+  `source` varchar(255) DEFAULT NULL,
   `valid` int(1) unsigned NOT NULL DEFAULT '0',
   `date_add` datetime NOT NULL,
   `date_upd` datetime NOT NULL,

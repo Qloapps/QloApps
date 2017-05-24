@@ -367,8 +367,34 @@
 			<div class="booking-form">
 				<div class="total_booking_price_block">
 					<p class="booking_total_price">
-						{convertPrice price=$productPrice|floatval}/{l s='Night'}
-					</p>
+                        <span class="product_original_price {if $feature_price_diff>0}room_type_old_price{/if}" {if $feature_price_diff < 0} style="display:none;"{/if}>{convertPrice price=$productPriceWithoutReduction|floatval}</span>
+                        <span class="room_type_current_price" {if !$feature_price_diff}style="display:none;"{/if}>{convertPrice price = $feature_price|floatval}</span>
+                        /{l s='Night'}
+                    </p>
+					{*<p id="reduction_percent" {if $productPriceWithoutReduction <= 0 || !$product->specificPrice || $product->specificPrice.reduction_type != 'percentage'} style="display:none;"{/if}>{strip}
+						<span id="reduction_percent_display">
+							{if $product->specificPrice && $product->specificPrice.reduction_type == 'percentage'}-{$product->specificPrice.reduction*100}%{/if}
+						</span>
+					{/strip}</p>
+					<p id="reduction_amount" {if $productPriceWithoutReduction <= 0 || !$product->specificPrice || $product->specificPrice.reduction_type != 'amount' || $product->specificPrice.reduction|floatval ==0} style="display:none"{/if}>{strip}
+						<span id="reduction_amount_display">
+						{if $product->specificPrice && $product->specificPrice.reduction_type == 'amount' && $product->specificPrice.reduction|floatval !=0}
+							-{convertPrice price=$productPriceWithoutReduction|floatval-$productPrice|floatval}
+						{/if}
+						</span>
+					{/strip}</p>
+					<p id="old_price"{if (!$product->specificPrice || !$product->specificPrice.reduction)} class="hidden"{/if}>{strip}
+						{if $priceDisplay >= 0 && $priceDisplay <= 2}
+							{hook h="displayProductPriceBlock" product=$product type="old_price"}
+							<span id="old_price_display"><span class="price">{if $productPriceWithoutReduction > $productPrice}{convertPrice price=$productPriceWithoutReduction|floatval}{/if}</span>{if $productPriceWithoutReduction > $productPrice && $tax_enabled && $display_tax_label == 1} {if $priceDisplay == 1}{l s='tax excl.'}{else}{l s='tax incl.'}{/if}{/if}</span>
+						{/if}
+					{/strip}</p>
+					{if $priceDisplay == 2}
+						<br />
+						<span id="pretaxe_price">{strip}
+							<span id="pretaxe_price_display">{convertPrice price=$product->getPrice(false, $smarty.const.NULL)}</span> {l s='tax excl.'}
+						{/strip}</span>
+					{/if}*}
 				</div> <!-- end content_prices -->
 				<div class="arrow-down-div">
 					<div class="arrow-down"></div>
@@ -382,11 +408,11 @@
 						</div>
 						<div class="form-group">
 							<label for="" class="control-label">{l s='Check In Date'}</label>
-						   	<input type="text" class="form-control" name="room_check_in" id="room_check_in" value="{if isset($date_from)}{$date_from}{/if}" autocomplete="off" readonly />
+						   	<input type="text" class="form-control" name="room_check_in" id="room_check_in" value="{if isset($date_from)}{$date_from|date_format:"%d-%m-%Y"}{/if}" autocomplete="off" readonly />
 						</div>
 						<div class="form-group">
 							<label for="" class="control-label">{l s='Check Out Date'}</label>
-						   	<input type="text" class="form-control" name="room_check_out" id="room_check_out" value="{if isset($date_to)}{$date_to}{/if}" autocomplete="off" readonly />
+						   	<input type="text" class="form-control" name="room_check_out" id="room_check_out" value="{if isset($date_to)}{$date_to|date_format:"%d-%m-%Y"}{/if}" autocomplete="off" readonly />
 						</div>
 						<div class="room_unavailability_date_error_div"></div>
 						<div class="form-group unvail_rooms_cond_display">
@@ -706,7 +732,8 @@
 		{* By webkul variable needed in product.js *}
 		{addJsDef total_avail_rms = $total_available_rooms}
 		{addJsDef max_order_date = $max_order_date}
-		{addJsDef booking_date_to = $booking_date_to}
+		{addJsDef booking_date_to = $date_to}
+		{addJsDef booking_date_from = $date_from}
 
 		{addJsDef product_controller_url=$product_controller_url}
 	{/strip}

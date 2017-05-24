@@ -272,3 +272,9 @@
     padding: 10px 5px;
     text-align: center;
 }
+
+.room_type_old_price {
+  text-decoration: line-through;
+  color:#e85757;
+  font-size:18px; 
+}

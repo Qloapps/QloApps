@@ -176,6 +176,14 @@ class CategoryControllerCore extends FrontController
                 }
                 /*End*/
 
+                if (isset($booking_data['rm_data']) && $booking_data['rm_data']) {
+                    $useTax = HotelBookingDetail::useTax();
+                    foreach ($booking_data['rm_data'] as $key => $roomType) {
+                        $feature_price = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay($roomType['id_product'], $date_from, $date_to, $useTax);
+                        $booking_data['rm_data'][$key]['feature_price'] = $feature_price;
+                        $booking_data['rm_data'][$key]['feature_price_diff'] = (float)($roomType['price_without_reduction']-$feature_price);
+                    }
+                }
                 $this->context->smarty->assign(array(
                     'warning_num' => $warning_num,
                     'num_days' => $num_days,

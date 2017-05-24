@@ -121,7 +121,7 @@
 				{if $use_taxes}
 					{if $priceDisplay}
 						<tr class="cart_total_price table_tfoot">
-							<td rowspan="{$rowspan_total}" colspan="3" id="cart_voucher" class="cart_voucher">
+							<td rowspan="6" colspan="3" id="cart_voucher" class="cart_voucher">
 								{if $voucherAllowed}
 									{if isset($errors_discount) && $errors_discount}
 										<ul class="alert alert-danger">
@@ -148,12 +148,12 @@
 									{/if}
 								{/if}
 							</td>
-							<td colspan="5" class="text-right">{if $display_tax_label}{l s='Total Rooms Cost (tax excl.)'}{else}{l s='Total Rooms Cost'}{/if}</td>
+							<td colspan="4" class="text-right">{if $display_tax_label}{l s='Total Rooms Cost (tax excl.)'}{else}{l s='Total Rooms Cost'}{/if}</td>
 							<td colspan="3" class="price" id="total_product">{displayPrice price=$total_products}</td>
 						</tr>
 					{else}
 						<tr class="cart_total_price table_tfoot">
-							<td rowspan="{$rowspan_total}" colspan="3" id="cart_voucher" class="cart_voucher">
+							<td rowspan="6" colspan="3" id="cart_voucher" class="cart_voucher">
 								{if $voucherAllowed}
 									{if isset($errors_discount) && $errors_discount}
 										<ul class="alert alert-danger">
@@ -180,7 +180,7 @@
 									{/if}
 								{/if}
 							</td>
-							<td colspan="3" class="text-right">{if $display_tax_label}{l s='Total Rooms Cost (tax incl.)'}{else}{l s='Total Rooms Cost'}{/if}</td>
+							<td colspan="4" class="text-right">{if $display_tax_label}{l s='Total Rooms Cost (tax incl.)'}{else}{l s='Total Rooms Cost'}{/if}</td>
 							<td colspan="3" class="price" id="total_product">{displayPrice price=$total_products_wt}</td>
 						</tr>
 					{/if}
@@ -267,7 +267,7 @@
 				*}
 				{if isset($customer_adv_dtl)}
 					<tr class="table_tfoot">
-						<td colspan="5" class="text-right">
+						<td colspan="4" class="text-right">
 							{l s='Advance Payment Amount'}
 						</td>
 						<td colspan="3" class="price-discount price" id="total_discount">
@@ -277,7 +277,7 @@
 				{/if}
 
 				<tr class="table_tfoot cart_total_voucher{if $total_discounts == 0} unvisible{/if}">
-					<td colspan="5" class="text-right">
+					<td colspan="4" class="text-right">
 						{if $display_tax_label}
 							{if $use_taxes && $priceDisplay == 0}
 								{l s='Total vouchers (tax incl.)'}
@@ -300,7 +300,7 @@
 
 				{if isset($customer_adv_dtl)}
 					<tr class="table_tfoot">
-						<td colspan="5" class="text-right">
+						<td colspan="4" class="text-right">
 							{l s='Due Amount'}
 						</td>
 						<td colspan="3" class="price-discount price" id="total_discount">
@@ -312,17 +312,17 @@
 				{if $use_taxes && $show_taxes && $total_tax != 0 }
 					{if $priceDisplay != 0}
 					<tr class="table_tfoot table_total_tr cart_total_price">
-						<td colspan="6" class="text-right">{if $display_tax_label}{l s='Total (tax excl.)'}{else}{l s='Total'}{/if}</td>
-						<td colspan="2" class="price" id="total_price_without_tax">{displayPrice price=$total_price_without_tax}</td>
+						<td colspan="4" class="text-right">{if $display_tax_label}{l s='Total (tax excl.)'}{else}{l s='Total'}{/if}</td>
+						<td colspan="3" class="price" id="total_price_without_tax">{displayPrice price=$total_price_without_tax}</td>
 					</tr>
 					{/if}
 					<tr class="table_tfoot cart_total_tax">
-						<td colspan="3" class="text-right">{l s='Tax'}</td>
+						<td colspan="4" class="text-right">{l s='Tax'}</td>
 						<td colspan="3" class="price" id="total_tax">{displayPrice price=$total_tax}</td>
 					</tr>
 				{/if}
 				<tr class="table_tfoot table_total_tr cart_total_price {if isset($customer_adv_dtl)} unvisible {/if}">
-					<td colspan="5" class="total_price_container text-right">
+					<td colspan="4" class="total_price_container text-right">
 						<span>{l s='Total'}</span>
                         <div class="hookDisplayProductPriceBlock-price">
                             {hook h="displayCartTotalPriceLabel"}
@@ -341,10 +341,10 @@
 
 				{if isset($customer_adv_dtl)}
 					<tr class="table_tfoot table_total_tr cart_total_price">
-						<td colspan="8" class="total_price_container text-right">
-							<span>{l s='Total To Be Paid Now'}</span>
+						<td colspan="4" class="total_price_container text-right">
+							<span>{l s='Total To Be Paid'}</span>
 						</td>
-						<td colspan="1" class="price" id="total_price_container">
+						<td colspan="3" class="price" id="total_price_container">
 							<span id="total_price">{displayPrice price=$customer_adv_dtl['total_to_be_paid']}</span>
 						</td>
 					</tr>
@@ -374,7 +374,12 @@
 								</td>
 								<td class="cart_unit">
 									<p class="text-center">
-										{displayPrice price=$data_v['unit_price']}
+										<span class="product_original_price {if $rm_v.feature_price_diff>0}room_type_old_price{/if}" {if $rm_v.feature_price_diff < 0} style="display:none;"{/if}>
+											{convertPrice price=$data_v.unit_price_without_reduction|floatval}
+										</span>&nbsp;
+					                    <span class="room_type_current_price" {if !$rm_v.feature_price_diff}style="display:none;"{/if}>
+											{displayPrice price=$rm_v['feature_price']|floatval|round:2}
+					                    </span>
 									</p>
 								</td>
 								<td class="text-center">

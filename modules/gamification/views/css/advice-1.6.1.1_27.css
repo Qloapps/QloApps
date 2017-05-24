@@ -1,0 +1,8 @@
+#wrap_id_advice_27 .panel.panel-advice { position: relative; padding: 10px !important; min-height: 75px; }
+#wrap_id_advice_27 .panel.panel-advice a.preactivationLink { display: table; margin: 0; text-decoration: none; }
+#wrap_id_advice_27 .panel.panel-advice a.preactivationLink p, .panel.panel-advice a.preactivationLink img { display: table-cell; vertical-align: middle; }
+#wrap_id_advice_27 .panel.panel-advice a.preactivationLink p { padding: 0 20px; }
+#wrap_id_advice_27 .panel.panel-advice .gamification-close-confirmation { position: absolute; top: 4px; right: 5px; background: #FFF; padding: 5px 3px;}
+#wrap_id_advice_27 .panel.panel-advice .gamification_premium_close { display: none; position: absolute; top: 10px; right: 10px; }
+#wrap_id_advice_27 .panel.panel-advice .gamification_premium_close i { color: #00aff0; }
+#wrap_id_advice_27 .panel.panel-advice:hover .gamification_premium_close { display: block; } #wrap_id_advice_27 hr { margin: 0!important; }

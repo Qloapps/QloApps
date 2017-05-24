@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<module>
+	<name>statsequipment</name>
+	<displayName><![CDATA[Browsers and operating systems]]></displayName>
+	<version><![CDATA[1.2.3]]></version>
+	<description><![CDATA[Adds a tab containing graphs about web browser and operating system usage to the Stats dashboard.]]></description>
+	<author><![CDATA[PrestaShop]]></author>
+	<tab><![CDATA[analytics_stats]]></tab>
+	<is_configurable>0</is_configurable>
+	<need_instance>0</need_instance>
+	<limited_countries></limited_countries>
+</module>

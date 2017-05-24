@@ -39,3 +39,9 @@
 .htlRoomTypeDescText {
     padding-bottom: 9px;
 }
+
+.room_type_old_price {
+   text-decoration: line-through;
+   color:#555555;
+   font-size:14px; 
+}

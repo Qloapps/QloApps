@@ -25,12 +25,12 @@ $(document).ready(function() {
         $('#hotel_state').empty();
         $.ajax({
             data: {
-                id_country: $('#hotel_country').val(),
+                id_country: $(this).val(),
                 ajax: true,
                 action: 'StateByCountryId'
             },
             method: 'POST',
-            dataType: 'json',
+            dataType: 'JSON',
             url: statebycountryurl,
             success: function(data) {
                 var html = "";
@@ -736,11 +736,6 @@ $(document).ready(function() {
         defaultDate: new Date(),
         dateFormat: 'dd-mm-yy',
         minDate: 0,
-        // onSelect: function(dateText,inst)
-        // {
-        //     var max_dt = $.datepicker.formatDate('yy-mm-dd', new Date($('#max_htl_book_date').val()));
-        //     //$("#max_htl_book_date_hidden").val(max_dt);
-        // }
     });
 
     $("#max_global_book_date").datepicker({
@@ -870,9 +865,176 @@ $(document).ready(function() {
             }
         }
     }
+
+
+    /* ----  AdminHotelFeaturePricesSettingsController Admin ---- */
+    
+    $('#date_selection_type').on('change', function() {
+        if ($('#date_selection_type').val() == 2) {
+            $(".specific_date_type").show();
+            $(".date_range_type").hide();
+            $(".special_days_content").hide();
+        } else if ($('#date_selection_type').val() == 1) {
+            $(".specific_date_type").hide();
+            $(".date_range_type").show();
+            $(".special_days_content").show();
+        } else {
+            $(".specific_date_type").hide();
+            $(".date_range_type").show();
+            $(".special_days_content").show();
+        }
+    });
+
+
+    $(".is_special_days_exists").on ('click', function() {
+        if ($(this).is(':checked')) {
+            $('.week_days').show();
+        } else {
+            $('.week_days').hide();
+        }
+    });
+
+    $('#price_impact_type').on('change', function() {
+        if ($('#price_impact_type').val() == 2) {
+            $(".payment_type_icon").text(defaultcurrency_sign);
+        } else if ($('#price_impact_type').val() == 1) {
+            $(".payment_type_icon").text('%');
+        } else {
+            $(".payment_type_icon").text(defaultcurrency_sign);
+        }
+    });
+
+    var ajax_pre_check_var = '';
+    $('.room_type_search_results_ul').hide();
+
+    function abortRunningAjax() {
+        if (ajax_pre_check_var) {
+            ajax_pre_check_var.abort();
+        }
+    }
+
+    $(document).on('keyup', "#room_type_name", function(event) {
+        if (($('.room_type_search_results_ul').is(':visible')) && (event.which == 40 || event.which == 38)) {
+            $(this).blur();
+            if (event.which == 40)
+                $(".room_type_search_results_ul li:first").focus();
+            else if (event.which == 38)
+                $(".room_type_search_results_ul li:last").focus();
+        } else {
+            $('.room_type_search_results_ul').empty().hide();
+
+            if ($(this).val() != '') {
+                abortRunningAjax();
+                ajax_pre_check_var = $.ajax({
+                    url: autocomplete_room_search_url,
+                    data: {
+                        room_type_name : $(this).val(),
+                        action : 'SearchProductByName',
+                        ajax : true,
+                    },
+                    method: 'POST',
+                    dataType: 'JSON',
+                    success: function(data) {
+                        var html = '';
+                        if (data.status != 'failed') {
+                            $.each(data, function(key, roomType) {
+                                html += '<li data-id_product="'+roomType.id_product+'">'+roomType.name+'</li>';
+                            });
+                            $('.room_type_search_results_ul').html(html);
+                            $('.room_type_search_results_ul').show();
+                            $('.error-block').hide();
+                        } else {
+                            $('.error-block').show();
+                        }
+                    }
+                });
+            }
+        }
+    });
+
+    $(document).on('click', '.room_type_search_results_ul li', function(event) {
+        $('#room_type_name').attr('value', $(this).html());
+        $('#room_type_id').val($(this).data('id_product'));
+
+        $('.room_type_search_results_ul').empty().hide();
+    });
+
+    $("#feature_plan_date_from").datepicker({
+	      showOtherMonths: true,
+	      dateFormat: 'dd-mm-yy',
+	      minDate: 0,
+	      //for calender Css
+	      beforeShowDay: function (date) {
+	          return highlightDateBorder($("#feature_plan_date_from").val(), date);
+	      },
+	      onSelect: function(selectedDate) {
+	          var date_format = selectedDate.split("-");
+	          var selectedDate = new Date(date_format[2], date_format[1] - 1, date_format[0]);
+	          selectedDate.setDate(selectedDate.getDate() + 1);
+	          $("#feature_plan_date_to").datepicker("option", "minDate", selectedDate);
+	      },
+    });
+
+    $("#specific_date").datepicker({
+        showOtherMonths: true,
+        dateFormat: 'dd-mm-yy',
+        minDate: 0,
+    });
+
+    $("#feature_plan_date_to").datepicker({
+        showOtherMonths: true,
+        dateFormat: 'dd-mm-yy',
+        beforeShow: function (input, instance) {
+            var date_to = $('#feature_plan_date_from').val();
+            if (typeof date_to != 'undefined' && date_to != '') {
+                var date_format = date_to.split("-");
+                var selectedDate = new Date($.datepicker.formatDate('yy-mm-dd', new Date(date_format[2], date_format[1] - 1, date_format[0])));
+                selectedDate.setDate(selectedDate.getDate()+1);
+                $("#feature_plan_date_to").datepicker("option", "minDate", selectedDate);
+            } else {
+                var date_format = new Date();
+                var selectedDate = new Date($.datepicker.formatDate('yy-mm-dd', new Date()));
+                selectedDate.setDate(selectedDate.getDate()+1);
+                $("#feature_plan_date_to").datepicker("option", "minDate", selectedDate);
+            }
+        },
+        //for calender Css
+        beforeShowDay: function (date) {
+            return highlightDateBorder($("#feature_plan_date_to").val(), date);
+        },
+        onSelect: function(selectedDate) {
+            var date_format = selectedDate.split("-");
+            var selectedDate = new Date(date_format[2], date_format[1] - 1, date_format[0]);
+            selectedDate.setDate(selectedDate.getDate() - 1);
+            $("#feature_plan_date_from").datepicker("option", "maxDate", selectedDate);
+        }
+    });
+
+    function highlightDateBorder(elementVal, date)
+    {
+        if (elementVal) {
+            var currentDate = date.getDate();
+            var currentMonth = date.getMonth()+1;
+            if (currentMonth < 10) {
+                currentMonth = '0' + currentMonth;
+            }
+            if (currentDate < 10) {
+                currentDate = '0' + currentDate;
+            }
+            dmy = date.getFullYear() + "-" + currentMonth + "-" + currentDate;
+            var date_format = elementVal.split("-");
+            var check_in_time = (date_format[2]) + '-' + (date_format[1]) + '-' + (date_format[0]);
+            if (dmy == check_in_time) {
+                return [true, "selectedCheckedDate", "Check-In date"];
+            } else {
+                return [true, ""];
+            }
+        } else {
+            return [true, ""];
+        }
+    }
 });
 /* ----  HotelConfigurationSettingController Admin ---- */
 $(function() {
     $('[data-toggle="popover"]').popover()
 });
-

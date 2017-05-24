@@ -310,3 +310,33 @@ li.not_validated {
 .badges_filters select{
 	margin-right: 30px;
 }
+
+.icon-trophy-svg {
+    display:none;
+}
+
+/* PrestaShop 1.7 - new theme adaptation */
+.gamification-component .icon-trophy-svg {
+    display:block;
+    width:24px;
+    height:24px;
+}
+
+.gamification-component #gamification_notif {
+    list-style: outside none none;
+}
+.gamification-component #gamification_notif .gamification_notif::after {
+    display: none;
+}
+
+.gamification-component > ul {
+    padding: 0;
+    margin: 0;
+}
+.gamification-component .icon-trophy-svg {
+  font-size: 1.5rem;
+  line-height: 1.375rem;
+  vertical-align: middle;
+  position: relative;
+  top: 0.375em;
+}

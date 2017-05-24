@@ -1,4 +1,67 @@
 ####################################
+# V1.1.0
+####################################
+
+## Added Features:
+
+[+] Project : `source` column is added in the `order` table to show the source of the booking.
+
+[+] Project : Everywhere now prices are shown according to the feature prices.
+
+[+] Project : Everywhere prestashop logo is replaced with Qloapps logo
+
+[+] BO : Feature price plans functionality has been added.
+[+] BO : Funnctionality to disable rooms for many dates is added.
+[+] BO : processConfiguration(), initFormConfiguration() are modified and validateDisableDateRanges() is added for disabled dated functionality in AdminProductsController.
+[+] BO : AdminOrdersController is modified for feature price funtionality. renderview and renderform functions also modified to display according to feature prices.
+
+[+] FO : OrderConfirmationController, OrderOpcController, OrderDetailsController and ProductControler are modified for feature price functionality. display files of the controllers also modified.
+
+[+] MO : hotelreservationsystem : ChannelManagerServices.php is added.
+[+] MO : hotelreservationsystem : ChannelOrderPayment.php is added.
+[+] MO : hotelreservationsystem : HotelCustomerAdvancedProductPayment.php is added.
+[+] MO : hotelreservationsystem : HotelRoomDisableDates.php is added.
+[+] MO : hotelreservationsystem : QloWebservice.php is added.
+[+] MO : hotelreservationsystem : WebserviceSpecificManagementQlo.php is added.
+
+[+] MO : hotelreservationsystem : ChannelManagerServices.php is added.
+[+] MO : hotelreservationsystem : HotelRoomTypeFeaturePricing.php is added.
+[+] MO : hotelreservationsystem : ChannelOrderPayment.php is added.
+[+] MO : hotelreservationsystem : getRoomMinAdvPaymentAmount() is added in HotelAdvancedPayment.php.
+[+] MO : hotelreservationsystem : createQloAppsBookingByChannels(), createQloCustomerChannelCustomerInfo(), 									createQloCustomerAddressByChannelCustomerInfo(), createQloCartForBookingFromChannel(), ProcessCreateQloOrderForChannelBooking() 		are added for Qloapps Api need  in HotelBookingDetails.php.
+[+] MO : hotelreservationsystem : 'total_price_tax_excl' and 'total_price_tax_incl' columns are added in `htl_booking_detail` table to 										store the booking time price.
+[+] MO : hotelreservationsystem : getProductFeaturePricePlanByDateByPriority(), getHotelCartBookingData() are added in 													HotelCartBookingData.php.
+[+] MO : hotelreservationsystem : 'disabled_dates' column is added in the table `htl_room_information`.
+[+] MO : hotelreservationsystem : getRoomTypeAvailableRoomsForDateRange(), getRoomTypeDisabledRoomsForDateRange(), 														getRoomTypeBookedRoomsForDateRange() are added in HotelRoomInformation.php.
+[+] MO : hotelreservationsystem : room status 'Hold For Maintenance is replace with 'Temporary incative';
+[+] MO : hotelreservationsystem : AdminHotelRoomsBookingController.php and AdminOrderRefundRequestsController.php are changed to make 										compatible with feature price functionality.
+
+## Improved/changed features:
+
+[*] MO : wkhotelroom : price of the room types are shown at home page according to feature price plans.
+[*] FO : price of the room types are shown at home page according to feature price plans.
+
+
+## Bug/Issues Resolved:
+
+[-] FO : Resolved :: issue on saving Room type information at admin product information. On saving product sometimes redirecting to renderlist.
+[-] FO : Resolved :: If admin left the 'max global date field' to be blank,then invalid dates are shown in check in-checkout fields at frontend.
+[-] FO : Resolved :: On submitting the total order cancellation request,Popup with "Parser error text" is shown. (If submit request for single room first and then for all the rooms in the order).
+[-] BO : Resolved :: Some validation issues on manage order refund rules page.
+[-] BO : Resolved :: Room type column  added on manage order refund request -> view page. (#158)
+[-] BO : Resolved :: Advance paid amount on "manage order refund request view page" is shown for the single room.(#150)
+[-] BO : Resolved :: If admin deleted the room from "order detail page",then errors are shown on the "customer order detail page".(#137)
+[-] BO : Resolved :: While reallocating the rooms,sometimes the JSON is getting breakable,due to which no room is shown for swapping & reallocation.(#133)
+[-] FO : Resolved :: While placing an order,if customer signed out on "order summary page",then error is shown. (#119)
+[-] FO : Resolved :: If filtered with any parameter on category page,then on clicking the 'Book now button',page is redirecting to the category page itself.(#118)
+[-] FO : Resolved :: On clicking to the 'add new icon',the page is redirecting to the 'assign features page' rather than 'add new features page'.(#106)
+[-] BO : Resolved :: While adding the hotel features,no success message is shown on add new features-> manage hotel features page. (#105)
+[-] BO : Resolved :: hotel interior heading and description are not changing on saving new ones.(#87)
+[-] BO : Resolved :: PlayPal..Php curl issue on installation. needs curl to be installed on server for istallation (#89)
+[-] BO : Resolved :: Many Order Edit issues resolved.
+
+
+####################################
 # V1.0.1
 ####################################
 
@@ -11,7 +74,6 @@
 [*] FO : Font-family in order summary page in synced with the theme fonts now.
 
 [*] BO : Bacorder setting option is removed from Settings->General Settings.
-[*] MO : wkpaypaladaptive : Remove PHP CURL check from installation and display warning in "AdminPaymentsSetting" controller
 
 ## Fixed bugs:
 
@@ -19,7 +81,6 @@
 [-] BO : Fixed showing wrong way of payment on refund request page.
 [-] BO : Fixed showing wrong cancellation charges on refund request page.
 [-] MO : wkabouthotel : Fixed interior heading and description does not change on changing from Setting->Hotel interior Block Setting.
-[-] MO : hotelreservationsystem : refund rule bug for type percentage is resolved.
 
 
 # Change Log previous version to V1.0.0:

@@ -970,6 +970,7 @@
 										<th class="text-center"><span class="title_box">{l s='Room Image'}</th>
 										<th class="text-center"><span class="title_box">{l s='Room Type'}</span></th>
 										<th class="text-center"><span class="title_box">{l s='Duration'}</span></th>
+										<th class="text-center"><span class="title_box">{l s='Unit Price'}</span></th>
 										<th class="text-center"><span class="title_box">{l s='Total Price'}</span></th>
 										<th class="text-center"><span class="title_box">{l s='Refund Stage'}</span></th>
 										<th class="text-center"><span class="title_box">{l s='Refund Status'}</span></th>
@@ -1212,7 +1213,7 @@
 										<tr id="total_products">
 											<td class="text-right"><strong>{l s='Total Rooms Cost'}</strong></td>
 											<td class="amount text-right nowrap">
-												<strong>{displayPrice price=$total_rooms_cost currency=$currency->id}</strong>
+												<strong>{displayPrice price=$totalRoomsCostTE currency=$currency->id}</strong>
 											</td>
 											<td class="partial_refund_fields current-edit" style="display:none;"></td>
 										</tr>
@@ -1501,23 +1502,23 @@
 					</div>
 					<div class="modal-body">
 						<div class="form-group">
-							<label for="curr_room_num" class="control-label">{l s='Current Room Number:' mod='hotelreservationsystem'}</label>
+							<label for="curr_room_num" class="control-label model-label">{l s='Current Room Number:' mod='hotelreservationsystem'}</label>
 							<input type="text" class="form-control modal_curr_room_num" name="modal_curr_room_num" readonly="true">
 							<input type="hidden" class="form-control modal_date_from" name="modal_date_from">
 							<input type="hidden" class="form-control modal_date_to" name="modal_date_to">
 							<input type="hidden" class="form-control modal_id_room" name="modal_id_room">
 						</div>
 						<div class="form-group">
-							<label for="realloc_avail_rooms" class="control-label">{l s='Available Rooms To Reallocate:' mod='hotelreservationsystem'}</label>
-							<div style="width: 195px;">
+							<label for="realloc_avail_rooms" class="control-label model-label">{l s='Available Rooms To Reallocate:' mod='hotelreservationsystem'}</label>
+							<div class="realloc_avail_rooms_container" style="width: 195px;">
 								<select class="form-control" name="realloc_avail_rooms" id="realloc_avail_rooms">
 									<option value="0" selected="selected">{l s='Select Rooms' mod='hotelreservationsystem'}</option>
 								</select>
-								<p class="error_text" id="realloc_sel_rm_err_p"></p>
 							</div>
+							<p class="error_text" id="realloc_sel_rm_err_p"></p>
 						</div>
 						<div class="form-group">
-							<label style="text-decoration:underline;margin-top:5px;" for="message-text" class="col-sm-12 control-label"><i class="icon-info-circle"></i>&nbsp;{l s='Currently Alloted Customer Information:' mod='hotelreservationsystem'}</label>
+							<label style="text-decoration:underline;margin-top:5px;" for="message-text" class="col-sm-12 control-label model-label"><i class="icon-info-circle"></i>&nbsp;{l s='Currently Alloted Customer Information:' mod='hotelreservationsystem'}</label>
 							<dl class="well list-detail">
 								<dt>{l s='Name'}</dt>
 								<dd class="cust_name"></dd><br>
@@ -1540,7 +1541,7 @@
 					</div>
 					<div class="modal-body">
 						<div class="form-group">
-							<label for="swap_curr_room_num" class="control-label">{l s='Current Room Number:' mod='hotelreservationsystem'}</label>
+							<label for="swap_curr_room_num" class="control-label model-label">{l s='Current Room Number:' mod='hotelreservationsystem'}</label>
 							<input type="text" class="form-control modal_curr_room_num" name="modal_curr_room_num" readonly="true">
 							<input type="hidden" class="form-control modal_date_from" name="modal_date_from">
 							<input type="hidden" class="form-control modal_date_to" name="modal_date_to">
@@ -1548,16 +1549,12 @@
 							<input type="hidden" class="form-control modal_id_order" name="modal_id_order">
 						</div>
 						<div class="form-group">
-							<label for="swap_avail_rooms" class="control-label">{l s='Available Rooms To Swap:' mod='hotelreservationsystem'}</label>
-							<div style="width: 195px;">
-								<select class="form-control" name="swap_avail_rooms" id="swap_avail_rooms">
-									<option value="0" selected="selected">{l s='Select Rooms' mod='hotelreservationsystem'}</option>
-								</select>
-								<p class="error_text" id="swap_sel_rm_err_p"></p>
-							</div>
+							<label for="swap_avail_rooms" class="control-label model-label">{l s='Available Rooms To Swap:' mod='hotelreservationsystem'}</label>
+							<div class="swap_avail_rooms_container"></div>
+							<p class="error_text" id="swap_sel_rm_err_p"></p>
 						</div>
 						<div class="form-group">
-							<label style="text-decoration:underline;margin-top:5px;" for="message-text" class="col-sm-12 control-label"><i class="icon-info-circle"></i>&nbsp;{l s='Currently Alloted Customer Information:' mod='hotelreservationsystem'}</label>
+							<label style="text-decoration:underline;margin-top:5px;" for="message-text" class="col-sm-12 control-label model-label"><i class="icon-info-circle"></i>&nbsp;{l s='Currently Alloted Customer Information:' mod='hotelreservationsystem'}</label>
 							<dl class="well list-detail">
 								<dt>{l s='Name'}</dt>
 								<dd class="cust_name"></dd><br>
@@ -1580,159 +1577,171 @@
 	{addJsDefL name=no_rm_avail_txt}{l s='No rooms available.' js=1 mod='hotelreservationsystem'}{/addJsDefL}
 	{addJsDefL name=slct_rm_err}{l s='Please select a room first.' js=1 mod='hotelreservationsystem'}{/addJsDefL}
 {/strip}
-	<script type="text/javascript">
-		var geocoder = new google.maps.Geocoder();
-		var delivery_map, invoice_map;
+<style>
+	.error_text {
+		color:red;
+	}
+	.model-label {
+		font-weight:bold!important;
+	}
+</style>
 
-		$(document).ready(function()
+<script type="text/javascript">
+	var geocoder = new google.maps.Geocoder();
+	var delivery_map, invoice_map;
+
+	$(document).ready(function()
+	{
+		$('#mySwappigModal').on('hidden.bs.modal', function (e)
 		{
-			/*By webkul for swapping Booked rooms modal js*/
-		    $("#swap_allocated_rooms").on('click', function(e){
-		        $(".error_text").text('');
-		        if ($('#swapped_avail_rooms').val() == 0)
-		        {
-		            $("#sel_rm_err_p").text(slct_rm_err);
-		            return false;
-		        }
-		    });
+			$(".modal_id_order").val('');
+			$(".modal_date_from").val('');
+			$(".modal_date_to").val('');
+			$(".modal_id_room").val('');
+			$(".modal_curr_room_num").val('');
+			$(".cust_name").text('');
+			$(".cust_email").text('');
+			$(".swp_rm_opts").remove();
+			$(".realloc_rm_opts").remove();
+		});
 
-		    $('#mySwappigModal').on('hidden.bs.modal', function (e)
-		    {
-		    	$(".modal_id_order").val('');
-		        $(".modal_date_from").val('');
-		        $(".modal_date_to").val('');
-		        $(".modal_id_room").val('');
-		        $(".modal_curr_room_num").val('');
-		        $(".cust_name").text('');
-		        $(".cust_email").text('');
-		        $(".swp_rm_opts").remove();
-		        $(".realloc_rm_opts").remove();
-		    });
+		$('#mySwappigModal').on('shown.bs.modal', function (e)
+		{
+			$(".modal_id_order").val(e.relatedTarget.dataset.id_order);
+			$(".modal_date_from").val(e.relatedTarget.dataset.date_from);
+			$(".modal_date_to").val(e.relatedTarget.dataset.date_to);
+			$(".modal_id_room").val(e.relatedTarget.dataset.id_room);
+			$(".modal_curr_room_num").val(e.relatedTarget.dataset.room_num);
+			$(".cust_name").text(e.relatedTarget.dataset.cust_name);
+			$(".cust_email").text(e.relatedTarget.dataset.cust_email);
 
-		    $('#mySwappigModal').on('shown.bs.modal', function (e)
-		    {
-		    	$(".modal_id_order").val(e.relatedTarget.dataset.id_order);
-		        $(".modal_date_from").val(e.relatedTarget.dataset.date_from);
-		        $(".modal_date_to").val(e.relatedTarget.dataset.date_to);
-		        $(".modal_id_room").val(e.relatedTarget.dataset.id_room);
-		        $(".modal_curr_room_num").val(e.relatedTarget.dataset.room_num);
-		        $(".cust_name").text(e.relatedTarget.dataset.cust_name);
-		        $(".cust_email").text(e.relatedTarget.dataset.cust_email);
-		        html = '';
-		        var json_arr_rm_swp = JSON.parse(e.relatedTarget.dataset.avail_rm_swap);
-		        $.each(json_arr_rm_swp, function(key,val)
-		        {
-		            html += '<option class="swp_rm_opts" value="'+val.id_room+'" >'+val.room_num+'</option>';
-		        });
-		        if (html != '')
-		            $("#swap_avail_rooms").append(html);
+			// For Rooms Swapping
+			if (e.relatedTarget.dataset.avail_rm_swap != 'false') {
+				var json_arr_rm_swp = JSON.parse(e.relatedTarget.dataset.avail_rm_swap);
 
-		        html = '';
-		        var json_arr_rm_realloc = JSON.parse(e.relatedTarget.dataset.avail_rm_realloc);
-		        $.each(json_arr_rm_realloc, function(key,val)
-		        {
-		            html += '<option class="realloc_rm_opts" value="'+val.id_room+'" >'+val.room_num+'</option>';
-		        });
-		        if (html != '')
-		            $("#realloc_avail_rooms").append(html);
-		    });
-			
-			/*For swaping rooms in the modal*/
-		    $("#realloc_allocated_rooms").on('click', function(e){
-		        $(".error_text").text('');
-		        if ($('#realloc_avail_rooms').val() == 0)
-		        {
-		            $("#realloc_sel_rm_err_p").text(slct_rm_err);
-		            return false;
-		        }
-		    });
-		    $("#swap_allocated_rooms").on('click', function(e){
-		        $(".error_text").text('');
-		        if ($('#swap_avail_rooms').val() == 0)
-		        {
-		            $("#swap_sel_rm_err_p").text(slct_rm_err);
-		            return false;
-		        }
-		    });	
+				html = '<select class="form-control" name="swap_avail_rooms" id="swap_avail_rooms" style="width:195px;">';
+					$.each(json_arr_rm_swp, function(key,val) {
+						html += '<option class="swp_rm_opts" value="'+val.id_room+'" >'+val.room_num+'</option>';
+					});
+				html += '</select>';
+				$(".swap_avail_rooms_container").empty().append(html);
+			} else {
+				$(".swap_avail_rooms_container").empty().text(no_rm_avail_txt);
+			}
+
+			// For Rooms Reallocation
+			if (e.relatedTarget.dataset.avail_rm_realloc != 'false') {
+				var json_arr_rm_realloc = JSON.parse(e.relatedTarget.dataset.avail_rm_realloc);
+
+				html = '<select class="form-control" name="realloc_avail_rooms" id="realloc_avail_rooms" style="width:195px;">';
+					$.each(json_arr_rm_realloc, function(key,val) {
+						html += '<option class="realloc_rm_opts" value="'+val.id_room+'" >'+val.room_num+'</option>';
+					});
+				html += '</select>';
+				$(".realloc_avail_rooms_container").empty().append(html);
+			} else {
+				$(".realloc_avail_rooms_container").empty().text(no_rm_avail_txt);
+			}
+		});
 		
-		    /*END*/
+		/*For reallocating rooms in the modal*/
+		$("#realloc_allocated_rooms").on('click', function(e){
+			$(".error_text").text('');
+			var room_to_reallocate = $('#realloc_avail_rooms').val();
+			if (typeof room_to_reallocate == 'undefined' || room_to_reallocate == 0) {
+				$("#realloc_sel_rm_err_p").text(slct_rm_err);
+				return false;
+			}
+		});
+		/*For swaping rooms in the modal*/
+		$("#swap_allocated_rooms").on('click', function(e){
+			$(".error_text").text('');
+			var room_to_swap = $('#swap_avail_rooms').val();
+			console.log(room_to_swap);
+			if (typeof room_to_swap == 'undefined' || room_to_swap == 0) {
+				$("#swap_sel_rm_err_p").text(slct_rm_err);
+				return false;
+			}
+		});
+	
+		/*END*/
 
-			$(".textarea-autosize").autosize();
+		$(".textarea-autosize").autosize();
 
-			geocoder.geocode({
-				address: '{$addresses.delivery->address1|@addcslashes:'\''},{$addresses.delivery->postcode|@addcslashes:'\''},{$addresses.delivery->city|@addcslashes:'\''}{if isset($addresses.deliveryState->name) && $addresses.delivery->id_state},{$addresses.deliveryState->name|@addcslashes:'\''}{/if},{$addresses.delivery->country|@addcslashes:'\''}'
-				}, function(results, status) {
-				if (status === google.maps.GeocoderStatus.OK)
-				{
-					delivery_map = new google.maps.Map(document.getElementById('map-delivery-canvas'), {
-						zoom: 10,
-						mapTypeId: google.maps.MapTypeId.ROADMAP,
-						center: results[0].geometry.location
-					});
-					var delivery_marker = new google.maps.Marker({
-						map: delivery_map,
-						position: results[0].geometry.location,
-						url: 'http://maps.google.com?q={$addresses.delivery->address1|urlencode},{$addresses.delivery->postcode|urlencode},{$addresses.delivery->city|urlencode}{if isset($addresses.deliveryState->name) && $addresses.delivery->id_state},{$addresses.deliveryState->name|urlencode}{/if},{$addresses.delivery->country|urlencode}'
-					});
-					google.maps.event.addListener(delivery_marker, 'click', function() {
-						window.open(delivery_marker.url);
-					});
-				}
-			});
-
-			geocoder.geocode({
-				address: '{$addresses.invoice->address1|@addcslashes:'\''},{$addresses.invoice->postcode|@addcslashes:'\''},{$addresses.invoice->city|@addcslashes:'\''}{if isset($addresses.deliveryState->name) && $addresses.invoice->id_state},{$addresses.deliveryState->name|@addcslashes:'\''}{/if},{$addresses.invoice->country|@addcslashes:'\''}'
-				}, function(results, status) {
-				if (status === google.maps.GeocoderStatus.OK)
-				{
-					invoice_map = new google.maps.Map(document.getElementById('map-invoice-canvas'), {
-						zoom: 10,
-						mapTypeId: google.maps.MapTypeId.ROADMAP,
-						center: results[0].geometry.location
-					});
-					invoice_marker = new google.maps.Marker({
-						map: invoice_map,
-						position: results[0].geometry.location,
-						url: 'http://maps.google.com?q={$addresses.invoice->address1|urlencode},{$addresses.invoice->postcode|urlencode},{$addresses.invoice->city|urlencode}{if isset($addresses.deliveryState->name) && $addresses.invoice->id_state},{$addresses.deliveryState->name|urlencode}{/if},{$addresses.invoice->country|urlencode}'
-					});
-					google.maps.event.addListener(invoice_marker, 'click', function() {
-						window.open(invoice_marker.url);
-					});
-				}
-			});
-
-			var date = new Date();
-			var hours = date.getHours();
-			if (hours < 10)
-				hours = "0" + hours;
-			var mins = date.getMinutes();
-			if (mins < 10)
-				mins = "0" + mins;
-			var secs = date.getSeconds();
-			if (secs < 10)
-				secs = "0" + secs;
-
-			$('.datepicker').datetimepicker({
-				prevText: '',
-				nextText: '',
-				dateFormat: 'yy-mm-dd ' + hours + ':' + mins + ':' + secs
-			});
+		geocoder.geocode({
+			address: '{$addresses.delivery->address1|@addcslashes:'\''},{$addresses.delivery->postcode|@addcslashes:'\''},{$addresses.delivery->city|@addcslashes:'\''}{if isset($addresses.deliveryState->name) && $addresses.delivery->id_state},{$addresses.deliveryState->name|@addcslashes:'\''}{/if},{$addresses.delivery->country|@addcslashes:'\''}'
+			}, function(results, status) {
+			if (status === google.maps.GeocoderStatus.OK)
+			{
+				delivery_map = new google.maps.Map(document.getElementById('map-delivery-canvas'), {
+					zoom: 10,
+					mapTypeId: google.maps.MapTypeId.ROADMAP,
+					center: results[0].geometry.location
+				});
+				var delivery_marker = new google.maps.Marker({
+					map: delivery_map,
+					position: results[0].geometry.location,
+					url: 'http://maps.google.com?q={$addresses.delivery->address1|urlencode},{$addresses.delivery->postcode|urlencode},{$addresses.delivery->city|urlencode}{if isset($addresses.deliveryState->name) && $addresses.delivery->id_state},{$addresses.deliveryState->name|urlencode}{/if},{$addresses.delivery->country|urlencode}'
+				});
+				google.maps.event.addListener(delivery_marker, 'click', function() {
+					window.open(delivery_marker.url);
+				});
+			}
 		});
 
-		// Fix wrong maps center when map is hidden
-		$('#tabAddresses').click(function(){
-			x = delivery_map.getZoom();
-			c = delivery_map.getCenter();
-			google.maps.event.trigger(delivery_map, 'resize');
-			delivery_map.setZoom(x);
-			delivery_map.setCenter(c);
-
-			x = invoice_map.getZoom();
-			c = invoice_map.getCenter();
-			google.maps.event.trigger(invoice_map, 'resize');
-			invoice_map.setZoom(x);
-			invoice_map.setCenter(c);
+		geocoder.geocode({
+			address: '{$addresses.invoice->address1|@addcslashes:'\''},{$addresses.invoice->postcode|@addcslashes:'\''},{$addresses.invoice->city|@addcslashes:'\''}{if isset($addresses.deliveryState->name) && $addresses.invoice->id_state},{$addresses.deliveryState->name|@addcslashes:'\''}{/if},{$addresses.invoice->country|@addcslashes:'\''}'
+			}, function(results, status) {
+			if (status === google.maps.GeocoderStatus.OK)
+			{
+				invoice_map = new google.maps.Map(document.getElementById('map-invoice-canvas'), {
+					zoom: 10,
+					mapTypeId: google.maps.MapTypeId.ROADMAP,
+					center: results[0].geometry.location
+				});
+				invoice_marker = new google.maps.Marker({
+					map: invoice_map,
+					position: results[0].geometry.location,
+					url: 'http://maps.google.com?q={$addresses.invoice->address1|urlencode},{$addresses.invoice->postcode|urlencode},{$addresses.invoice->city|urlencode}{if isset($addresses.deliveryState->name) && $addresses.invoice->id_state},{$addresses.deliveryState->name|urlencode}{/if},{$addresses.invoice->country|urlencode}'
+				});
+				google.maps.event.addListener(invoice_marker, 'click', function() {
+					window.open(invoice_marker.url);
+				});
+			}
 		});
-	</script>
+
+		var date = new Date();
+		var hours = date.getHours();
+		if (hours < 10)
+			hours = "0" + hours;
+		var mins = date.getMinutes();
+		if (mins < 10)
+			mins = "0" + mins;
+		var secs = date.getSeconds();
+		if (secs < 10)
+			secs = "0" + secs;
+
+		$('.datepicker').datetimepicker({
+			prevText: '',
+			nextText: '',
+			dateFormat: 'yy-mm-dd ' + hours + ':' + mins + ':' + secs
+		});
+	});
+
+	// Fix wrong maps center when map is hidden
+	$('#tabAddresses').click(function(){
+		x = delivery_map.getZoom();
+		c = delivery_map.getCenter();
+		google.maps.event.trigger(delivery_map, 'resize');
+		delivery_map.setZoom(x);
+		delivery_map.setCenter(c);
+
+		x = invoice_map.getZoom();
+		c = invoice_map.getCenter();
+		google.maps.event.trigger(invoice_map, 'resize');
+		invoice_map.setZoom(x);
+		invoice_map.setCenter(c);
+	});
+</script>
 
 {/block}

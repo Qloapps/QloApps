@@ -99,4 +99,7 @@
 	{addJsDef min_price = $min_price}
 	{addJsDef max_price = $max_price}
 	{addJsDef warning_num = $warning_num}
+
+	{addJsDefL name=viewMoreTxt}{l s='View More' js=1 mod='wkhotelfilterblock'}{/addJsDefL}
+	{addJsDefL name=bookNowTxt}{l s='Book Now' js=1 mod='wkhotelfilterblock'}{/addJsDefL}
 {/strip}

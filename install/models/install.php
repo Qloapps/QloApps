@@ -602,6 +602,47 @@ class InstallModelInstall extends InstallAbstractModel
             Configuration::updateGlobalValue('PS_REWRITING_SETTINGS', 0);
         }
 
+        $qloData = [
+            'shopDomain' => Tools::getHttpHost(),
+            'shopDomainSsl' => Tools::getHttpHost(),
+            'physicalUri' => __PS_BASE_URI__,
+            'email' => $data['admin_email'],
+            'firstname' => Tools::ucfirst($data['admin_firstname']),
+            'lastname' => Tools::ucfirst($data['admin_lastname']),
+            'countryCode' => $data['shop_country'],
+        ];
+
+        // Qlo Notification
+        $this->setNotification($qloData);
+
+        return true;
+    }
+
+    public function setNotification($notificationData)
+    {
+        if (function_exists('curl_version')) {
+            $params = [
+                'url' => 'https://prestashop.webkul.com/hotel-reservation-clients/getNotification.php',
+                'method' => 'POST',
+                'headers' => 'Content-Type: application/json',
+                'postdata' => json_encode($notificationData),
+            ];
+
+            $curlInit = curl_init();
+            curl_setopt($curlInit, CURLOPT_URL, $params['url']);
+            curl_setopt($curlInit, CURLOPT_HTTPAUTH, CURLAUTH_ANY);
+            curl_setopt($curlInit, CURLOPT_HTTPHEADER,$params['headers']);
+            curl_setopt($curlInit, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($curlInit, CURLOPT_CUSTOMREQUEST, $params['method']);
+            curl_setopt($curlInit, CURLOPT_RETURNTRANSFER, 1);
+            if (isset($params['postdata'])) {
+                curl_setopt( $curlInit, CURLOPT_POSTFIELDS, $params['postdata']);
+            }
+            $response = curl_exec($curlInit);
+        } else {
+            // Mail Code
+        }
+
         return true;
     }
 
