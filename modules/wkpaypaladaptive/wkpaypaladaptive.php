@@ -87,6 +87,14 @@ class WkPayPalAdaptive extends PaymentModule
         );
     }
 
+    public function hookDisplayBackOfficeHeader()
+    {
+        /* The cURL PHP extension must be enabled to use this module */
+        if ((Tools::getValue('controller') == 'AdminPaymentsSetting') && !function_exists('curl_version')) {
+            $this->context->controller->warnings[] = $this->l('For correct working of Paypal payment gateway module, PHP cURL Extension (http://www.php.net/curl) must be installed/enabled on your server. Please ask your hosting provider for assistance.');
+        }
+    }
+
     public function getConfigFieldsValues()
     {
         return array(
@@ -157,13 +165,6 @@ class WkPayPalAdaptive extends PaymentModule
 
     public function install()
     {
-        /* The cURL PHP extension must be enabled to use this module */
-        if (!function_exists('curl_version')) {
-            $this->_errors[] = $this->l('Sorry, this module requires the cURL PHP Extension (http://www.php.net/curl), which is not enabled on your server. Please ask your hosting provider for assistance.');
-
-            return false;
-        }
-
         if (!file_exists(dirname(__FILE__).'/'.self::INSTALL_SQL_FILE)) {
             return (false);
         } elseif (!$sql = Tools::file_get_contents(dirname(__FILE__).'/'.self::INSTALL_SQL_FILE)) {
@@ -196,6 +197,7 @@ class WkPayPalAdaptive extends PaymentModule
             || !$this->registerHook('paymentReturn')
             || !$this->registerHook('adminOrder')
             || !$this->registerHook('addPaymentSetting')
+            || !$this->registerHook('displayBackOfficeHeader')
             ) {
             return false;
         }

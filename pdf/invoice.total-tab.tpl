@@ -107,7 +107,7 @@
 
 	<tr class="bold big">
 		<td class="grey">
-			{l s='Total Order Amount' pdf='true'}
+			{l s='Total Paid' pdf='true'}
 		</td>
 		<td class="white">
 			{displayPrice currency=$order->id_currency price=$footer.total_paid_tax_incl}

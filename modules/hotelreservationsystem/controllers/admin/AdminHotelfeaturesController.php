@@ -74,7 +74,6 @@ class AdminHotelFeaturesController extends ModuleAdminController
 
 	public function renderList() 
 	{
-        unset($this->toolbar_btn['new']);
 		$this->addRowAction('edit');
 		$this->addRowAction('delete');
 		return parent::renderList();
@@ -157,163 +156,179 @@ class AdminHotelFeaturesController extends ModuleAdminController
 		return parent::renderForm();
 	}
 
-    public function processSave()
-    {
-        if (Tools::getValue('addfeatures')) {
-            //Process of assignig features
-        } else {
-            $edit_id = Tools::getValue('edit_hotel_id');
+	public function processSave()
+	{
+		if (Tools::getValue('addfeatures')) //Process of assignig features
+		{
 
-            if ($edit_id) {
-                $delete_existing_vals = Db::getInstance()->delete('htl_branch_features', 'id_hotel='.$edit_id);
-            }
+		}
+		else
+		{
+			$edit_id = Tools::getValue('edit_hotel_id');
 
-            $id_hotel = Tools::getValue('id_hotel');
+			if ($edit_id)
+				$delete_existing_vals = Db::getInstance()->delete('htl_branch_features','id_hotel='.$edit_id);
 
-            if ($id_hotel) {
-                $hotel_features = Tools::getValue('hotel_fac');
-                $obj_hotel_features = new HotelBranchFeatures();
-                $assigned = $obj_hotel_features->assignFeaturesToHotel($id_hotel, $hotel_features);
+			$id_hotel = Tools::getValue('id_hotel');
 
-                if (!$assigned) {
-                    $this->errors[] = Tools::displayError('Some problem occure while assigning Features to the hotel.');
-                }
+			if ($id_hotel)
+			{
+				$hotel_features = Tools::getValue('hotel_fac');
+				$obj_hotel_features = new HotelBranchFeatures();
+				$assigned = $obj_hotel_features->assignFeaturesToHotel($id_hotel, $hotel_features);
 
-                if (empty($this->errors)) {
-                    if (Tools::isSubmit('submitAdd'.$this->table.'AndStay')) {
-                        Tools::redirectAdmin(self::$currentIndex.'&id='.(int)$id_hotel.'&update'.$this->table.'&conf=3&token='.$this->token);
-                    } else {
-                        if ($edit_id) {
-                            Tools::redirectAdmin(self::$currentIndex.'&conf=4&token='.$this->token);
-                        } else {
-                            Tools::redirectAdmin(self::$currentIndex.'&conf=3&token='.$this->token);
-                        }
-                    }
-                } else {
-                    if ($hotel_id) {
-                        $this->display = 'edit';
-                    } else {
-                        $this->display = 'add';
-                    }
-                }
-            } else {
-                $this->errors[] = Tools::displayError('Please select a hotel first.');
-                $this->display = 'add';
-            }
-        }
-    }
+				if (!$assigned)
+					$this->errors[] = Tools::displayError('Some problem occure while assigning Features to the hotel.');
 
-    public function postProcess()
-    {
-        if (Tools::getValue('error')) {
-            if (Tools::getValue('error') == 1) {
-                $msg = Tools::displayError('Parent feature name is required.');
-            } elseif (Tools::getValue('error') == 2) {
-                $msg = Tools::displayError('Position is Invalid.');
-            } elseif (Tools::getValue('error') == 3) {
-                $msg = Tools::displayError('Please add atleast one Child features.');
-            } elseif (Tools::getValue('error') == 4) {
-                $msg = Tools::displayError('Some error occured. Please try again.');
-            }
+				if (empty($this->errors))
+				{
+					if (Tools::isSubmit('submitAdd'.$this->table.'AndStay'))
+						Tools::redirectAdmin(self::$currentIndex.'&id='.(int)$id_hotel.'&update'.$this->table.'&conf=3&token='.$this->token);
+					else
+					{
+						if ($edit_id)
+							Tools::redirectAdmin(self::$currentIndex.'&conf=4&token='.$this->token);
+						else
+							Tools::redirectAdmin(self::$currentIndex.'&conf=3&token='.$this->token);
+					}
+				}
+				else
+				{
+					if ($hotel_id)
+						$this->display = 'edit';
+					else
+						$this->display = 'add';
+				}
+			}
+			else
+			{
+				$this->errors[] = Tools::displayError('Please select a hotel first.');
+				$this->display = 'add';
+			}
+		}
+	}
 
-            $this->errors[] = Tools::displayError($msg);
-            $this->context->smarty->assign("errors", $this->errors);
-        }
-        if (Tools::isSubmit('submit_add_btn_feature')) {
-            $prnt_ftr_id = Tools::getValue('parent_ftr_id');
-            $parent_feature = Tools::getValue('parent_ftr');
-            $child_features = Tools::getValue('child_featurs');
-            $pos = Tools::getValue('position');
-            if (!$parent_feature) {
-                $error = 1;
-            } elseif (empty($pos) || !Validate::isUnsignedInt($pos)) {
-                $error = 2;
-            } elseif (!$child_features) {
-                $error = 3;
-            }
-            if (!isset($error)) {
-                if (isset($prnt_ftr_id) && $prnt_ftr_id) {
-                    $hotelFeatures = new HotelFeatures();
-                    $update_prnt_ftr = $hotelFeatures->updateHotelFeatureInfoByParentFeatureId($prnt_ftr_id, array('name'=>$parent_feature, 'position'=>$pos));
-                    $child_features_data = $hotelFeatures->getChildFeaturesByParentFeatureId($prnt_ftr_id);
-                    if ($child_features_data) {
-                        $i=0;
-                        foreach ($child_features_data as $val) {
-                            $flag = 0;
-                            foreach ($child_features as $value) {
-                                if (is_numeric($value)) {
-                                    if ($val['id'] == $value) {
-                                        $flag = 1;
-                                    }
-                                } elseif ($i == 0) {
-                                    $obj_feature = new HotelFeatures();
-                                    $obj_feature->name = $value;
-                                    $obj_feature->active = 1;
-                                    $obj_feature->parent_feature_id = $prnt_ftr_id;
-                                    $obj_feature->save();
-                                }
-                            }
-                            if (!$flag) {
-                                $del_arr[] = $val['id'];
-                            }
-                            $i++;
-                        }
-                        if (isset($del_arr) && $del_arr) {
-                            foreach ($del_arr as $value) {
-                                $objHotelFeature = new HotelFeatures($value);
-                                $objHotelFeature->delete();
-                            }
-                        }
-                        Tools::redirectAdmin(self::$currentIndex.'&add'.$this->table.'&token='.$this->token.'&addfeatures=1&conf=4');
-                    } else {
-                        Tools::redirectAdmin(self::$currentIndex.'&error=4&add'.$this->table.'&token='.$this->token.'&addfeatures=1');
-                    }
-                } else {
-                    $obj_feature = new HotelFeatures();
-                    $obj_feature->name = $parent_feature;
-                    $obj_feature->active = 1;
-                    $obj_feature->position = $pos;
-                    $obj_feature->parent_feature_id = 0;
-                    $obj_feature->save();
-                    $parent_feature_id = $obj_feature->id;
-                    if ($parent_feature_id) {
-                        if ($child_features) {
-                            foreach ($child_features as $val) {
-                                $obj_feature = new HotelFeatures();
-                                $obj_feature->name = $this->l($val);
-                                $obj_feature->active = 1;
-                                $obj_feature->parent_feature_id = $parent_feature_id;
-                                $obj_feature->save();
-                            }
-                            Tools::redirectAdmin(self::$currentIndex.'&add'.$this->table.'&token='.$this->token.'&addfeatures=1&conf=3');
-                        }
-                    } else {
-                        Tools::redirectAdmin(self::$currentIndex.'&error=4&add'.$this->table.'&token='.$this->token.'&addfeatures=1');
-                    }
-                }
-            } else {
-                Tools::redirectAdmin(self::$currentIndex.'&error='.$error.'&add'.$this->table.'&token='.$this->token.'&addfeatures=1');
-            }
-        }
-        parent::postProcess();
-    }
+	public function postProcess()
+	{
+		if (Tools::getValue('error'))
+		{
+			if (Tools::getValue('error') == 1)
+				$msg = Tools::displayError('Parent feature name is required.');
+			else if (Tools::getValue('error') == 2)
+				$msg = Tools::displayError('Position is Invalid.');
+			else if (Tools::getValue('error') == 3)
+				$msg = Tools::displayError('Please add atleast one Child features.');
+			else if (Tools::getValue('error') == 4)
+				$msg = Tools::displayError('Some error occured. Please try again.');
 
-    public function ajaxProcessDeleteFeature()
-    {
-        $dlt_id = Tools::getValue('feature_id');
-        $obj_hotel_features = new HotelFeatures();
-        $deleted_feature = $obj_hotel_features->deleteHotelFeatures($dlt_id);
-        if ($deleted_feature) {
-            die('success');
-        } else {
-            echo 0;
-        }
-    }
+			$this->errors[] = Tools::displayError($msg);
+			$this->context->smarty->assign("errors", $this->errors);
+		}
+		if (Tools::isSubmit('submit_add_btn_feature'))
+		{
+			$prnt_ftr_id = Tools::getValue('parent_ftr_id');
+			$parent_feature = Tools::getValue('parent_ftr');
+			$child_features = Tools::getValue('child_featurs');
+			$pos = Tools::getValue('position');
+			if (!$parent_feature)
+				$error = 1;
+			else if (empty($pos) || !Validate::isUnsignedInt($pos))
+				$error = 2;
+			else if (!$child_features)
+				$error = 3;
+			if (!isset($error))
+			{
+				if (isset($prnt_ftr_id) && $prnt_ftr_id)
+				{
+					$update_prnt_ftr = Db::getInstance()->update('htl_features',array('name'=>$parent_feature,'position'=>$pos),'id='.$prnt_ftr_id);
+					$child_features_data = Db::getInstance()->executeS('SELECT id FROM `'._DB_PREFIX_.'htl_features` WHERE parent_feature_id='.(int)$prnt_ftr_id);
+					if ($child_features_data)
+					{
+						$i=0;
+						foreach($child_features_data as $val)
+						{
+							$flag = 0;
+							foreach ($child_features as $value)
+							{
+								if (is_numeric($value))
+								{
+									if ($val['id'] == $value)
+										$flag = 1;
+								}
+								else if($i == 0)
+								{
+									$obj_feature = new HotelFeatures();
+					                $obj_feature->name = $value;
+					                $obj_feature->active = 1;
+					                $obj_feature->parent_feature_id = $prnt_ftr_id;
+					                $obj_feature->save();
+								}
+							}
+							if (!$flag)
+								$del_arr[] = $val['id'];
+				            $i++;
+						}
+						if (isset($del_arr) && $del_arr)
+						{
+							foreach ($del_arr as $value)
+							{
+								$delete_ftr = Db::getInstance()->delete('htl_features','id='.$value);
+							}
+						}
+						Tools::redirectAdmin(self::$currentIndex.'&add'.$this->table.'&token='.$this->token.'&addfeatures=1');
+					}
+					else
+						Tools::redirectAdmin(self::$currentIndex.'&error=4&add'.$this->table.'&token='.$this->token.'&addfeatures=1');
+				}
+				else
+				{
+					$obj_feature = new HotelFeatures();
+		            $obj_feature->name = $parent_feature;
+		            $obj_feature->active = 1;
+		            $obj_feature->position = $pos;
+		            $obj_feature->parent_feature_id = 0;
+		            $obj_feature->save();
+		            $parent_feature_id = $obj_feature->id;
+		            if ($parent_feature_id)
+					{
+						if ($child_features)
+						{
+							foreach ($child_features as $val)
+				            {
+				                $obj_feature = new HotelFeatures();
+				                $obj_feature->name = $this->l($val);
+				                $obj_feature->active = 1;
+				                $obj_feature->parent_feature_id = $parent_feature_id;
+				                $obj_feature->save();
+				            }
+				            Tools::redirectAdmin(self::$currentIndex.'&add'.$this->table.'&token='.$this->token.'&addfeatures=1');
+						}
+					}
+					else
+						Tools::redirectAdmin(self::$currentIndex.'&error=4&add'.$this->table.'&token='.$this->token.'&addfeatures=1');
+				}
+			}
+			else
+				Tools::redirectAdmin(self::$currentIndex.'&error='.$error.'&add'.$this->table.'&token='.$this->token.'&addfeatures=1');
+		}
+		parent::postProcess();
+	}
 
-    public function setMedia()
-    {
-        parent::setMedia();
-        $this->addJs(_MODULE_DIR_.'hotelreservationsystem/views/js/HotelReservationAdmin.js');
-        $this->addCSS(_MODULE_DIR_.'hotelreservationsystem/views/css/HotelReservationAdmin.css');
-    }
-}
+	public function ajaxProcessDeleteFeature()
+	{
+		$dlt_id = Tools::getValue('feature_id');
+		$obj_hotel_features = new HotelFeatures();
+		$deleted_feature = $obj_hotel_features->deleteHotelFeatures($dlt_id);
+		if ($deleted_feature)
+			die('success');
+		else
+			echo 0;
+	}
+
+	public function setMedia()
+	{
+		parent::setMedia();
+		$this->addJs(_MODULE_DIR_.'hotelreservationsystem/views/js/HotelReservationAdmin.js');
+		$this->addCSS(_MODULE_DIR_.'hotelreservationsystem/views/css/HotelReservationAdmin.css');
+	}
+}	

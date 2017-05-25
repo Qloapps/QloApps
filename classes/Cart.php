@@ -678,70 +678,25 @@ class CartCore extends ObjectModel
 				$cart_shop_context
 			);
 
+			switch (Configuration::get('PS_ROUND_TYPE'))
+			{
+				case Order::ROUND_TOTAL:
+					$row['total'] = $row['price_with_reduction_without_tax'] * (int)$row['cart_quantity'];
+					$row['total_wt'] = $row['price_with_reduction'] * (int)$row['cart_quantity'];
+					break;
+				case Order::ROUND_LINE:
+					$row['total'] = Tools::ps_round($row['price_with_reduction_without_tax'] * (int)$row['cart_quantity'], _PS_PRICE_COMPUTE_PRECISION_);
+					$row['total_wt'] = Tools::ps_round($row['price_with_reduction'] * (int)$row['cart_quantity'], _PS_PRICE_COMPUTE_PRECISION_);
+					break;
 
-
-			/*Before Changes by webkul*/
-			// switch (Configuration::get('PS_ROUND_TYPE'))
-			// {
-			// 	case Order::ROUND_TOTAL:
-			// 		$row['total'] = $row['price_with_reduction_without_tax'] * (int)$row['cart_quantity'];
-			// 		$row['total_wt'] = $row['price_with_reduction'] * (int)$row['cart_quantity'];
-			// 		break;
-			// 	case Order::ROUND_LINE:
-			// 		$row['total'] = Tools::ps_round($row['price_with_reduction_without_tax'] * (int)$row['cart_quantity'], _PS_PRICE_COMPUTE_PRECISION_);
-			// 		$row['total_wt'] = Tools::ps_round($row['price_with_reduction'] * (int)$row['cart_quantity'], _PS_PRICE_COMPUTE_PRECISION_);
-			// 		break;
-
-			// 	case Order::ROUND_ITEM:
-			// 	default:
-			// 		$row['total'] = Tools::ps_round($row['price_with_reduction_without_tax'], _PS_PRICE_COMPUTE_PRECISION_) * (int)$row['cart_quantity'];
-			// 		$row['total_wt'] = Tools::ps_round($row['price_with_reduction'], _PS_PRICE_COMPUTE_PRECISION_) * (int)$row['cart_quantity'];
-			// 		break;
-			// }
-			//$row['price_wt'] = $row['price_with_reduction'];
-			//
-			//
-			/*By Webkul */
-
-			if (Module::isInstalled('hotelreservationsystem') && Module::isEnabled('hotelreservationsystem')) {
-            	require_once _PS_MODULE_DIR_.'hotelreservationsystem/define.php';
-				// by webkul to calculate rates of the product from hotelreservation syatem tables with feature prices....
-				$hotelCartBookingData = new HotelCartBookingData();
-				$roomTypesByIdProduct = $hotelCartBookingData->getCartInfoIdCartIdProduct($this->id, (int)$row['id_product']);
-
-				// by webkul to calculate rates of the product from hotelreservation syatem tables with feature prices....
-				$totalPriceByProductTaxIncl = 0;
-				$totalPriceByProductTaxExcl = 0;
-				$priceDisplay = Group::getPriceDisplayMethod(Group::getCurrent()->id);
-				foreach ($roomTypesByIdProduct as $key => $cartRoomInfo) {
-					$roomTotalPrice = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice($cartRoomInfo['id_product'], $cartRoomInfo['date_from'], $cartRoomInfo['date_to']);
-						$totalPriceByProductTaxIncl += $roomTotalPrice['total_price_tax_incl'];
-		            	$totalPriceByProductTaxExcl += $roomTotalPrice['total_price_tax_excl'];
-				}
-
-				switch (Configuration::get('PS_ROUND_TYPE'))
-				{
-					case Order::ROUND_TOTAL:
-						$row['total'] = $totalPriceByProductTaxExcl;
-						$row['total_wt'] = $totalPriceByProductTaxIncl;
-						break;
-					case Order::ROUND_LINE:
-						$row['total'] = Tools::ps_round($totalPriceByProductTaxExcl, _PS_PRICE_COMPUTE_PRECISION_);
-						$row['total_wt'] = Tools::ps_round($totalPriceByProductTaxIncl, _PS_PRICE_COMPUTE_PRECISION_);
-						break;
-
-					case Order::ROUND_ITEM:
-					default:
-						$row['total'] = Tools::ps_round($totalPriceByProductTaxExcl, _PS_PRICE_COMPUTE_PRECISION_) * (int)$row['cart_quantity'];
-						$row['total_wt'] = Tools::ps_round($totalPriceByProductTaxIncl, _PS_PRICE_COMPUTE_PRECISION_) * (int)$row['cart_quantity'];
-						break;
-				}
+				case Order::ROUND_ITEM:
+				default:
+					$row['total'] = Tools::ps_round($row['price_with_reduction_without_tax'], _PS_PRICE_COMPUTE_PRECISION_) * (int)$row['cart_quantity'];
+					$row['total_wt'] = Tools::ps_round($row['price_with_reduction'], _PS_PRICE_COMPUTE_PRECISION_) * (int)$row['cart_quantity'];
+					break;
 			}
 
-			/*END*/
 			$row['price_wt'] = $row['price_with_reduction'];
-
-
 			$row['description_short'] = Tools::nl2br($row['description_short']);
 
 			// check if a image associated with the attribute exists
@@ -1507,6 +1462,7 @@ class CartCore extends ObjectModel
 
 		$products_total = array();
 		$ecotax_total = 0;
+
 		foreach ($products as $product) // products refer to the cart details
 		{
 			if ($virtual_context->shop->id != $product['id_shop'])
@@ -1561,47 +1517,21 @@ class CartCore extends ObjectModel
 				if (!isset($products_total[$id_tax_rules_group.'_'.$id_address]))
 					$products_total[$id_tax_rules_group.'_'.$id_address] = 0;
 
-
-			// by webkul to calculate rates of the product from hotelreservation syatem tables with feature prices....
-			$hotelCartBookingData = new HotelCartBookingData();
-			$roomTypesByIdProduct = $hotelCartBookingData->getCartInfoIdCartIdProduct($this->id, $product['id_product']);
-
-			$totalPriceByProduct = 0;
-			$priceDisplay = Group::getPriceDisplayMethod(Group::getCurrent()->id);
-			foreach ($roomTypesByIdProduct as $key => $cartRoomInfo) {
-				$roomTotalPrice = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice($cartRoomInfo['id_product'], $cartRoomInfo['date_from'], $cartRoomInfo['date_to']);
-				if ($with_taxes) {
-					$totalPriceByProduct += $roomTotalPrice['total_price_tax_incl'];
-				} else {
-					$totalPriceByProduct += $roomTotalPrice['total_price_tax_excl'];
-				}
-			}
-
 			switch ($ps_round_type)
 			{
 				case Order::ROUND_TOTAL:
-					// before
-					//$products_total[$id_tax_rules_group.'_'.$id_address] += $price * (int)$product['cart_quantity'];
-					//by webkul
-					$products_total[$id_tax_rules_group.'_'.$id_address] += $totalPriceByProduct;
+					$products_total[$id_tax_rules_group.'_'.$id_address] += $price * (int)$product['cart_quantity'];
 					break;
 
 				case Order::ROUND_LINE:
-					//Before
-					//$product_price = $price * $product['cart_quantity'];
-					//By webkul
-					$product_price = $totalPriceByProduct;
+					$product_price = $price * $product['cart_quantity'];
 					$products_total[$id_tax_rules_group] += Tools::ps_round($product_price, $compute_precision);
 					break;
 
 				case Order::ROUND_ITEM:
 				default:
-					//Before
-					//$product_price = /*$with_taxes ? $tax_calculator->addTaxes($price) : */$price;
-					//$products_total[$id_tax_rules_group] += Tools::ps_round($product_price, $compute_precision) * (int)$product['cart_quantity'];
-					// By Webkul
-					$product_price = $totalPriceByProduct;
-					$products_total[$id_tax_rules_group] += Tools::ps_round($product_price, $compute_precision);
+					$product_price = /*$with_taxes ? $tax_calculator->addTaxes($price) : */$price;
+					$products_total[$id_tax_rules_group] += Tools::ps_round($product_price, $compute_precision) * (int)$product['cart_quantity'];
 					break;
 			}
 		}

@@ -45,13 +45,20 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
                 'title' => $this->l('Requests Status'),
                 'align' => 'center',
                 'type' => 'select',
-                'filter_key' => 'a!refund_stage_id',
+				'filter_key' => 'a!refund_stage_id',
                 'list' => $refund_stages,
                 'badge_danger' => true,
                 'badge_success' => true,
             ),
         );
+
+        /*$this->bulk_actions = array(
+                                'delete' => array('text' => $this->l('Delete selected'),
+                                                    'icon' => 'icon-trash',
+                                                 'confirm' => $this->l('Delete selected items?')));
+*/
         $this->addRowAction('view');
+        //$this->addRowAction('delete');
         $this->identifier = 'id';
         parent::__construct();
     }
@@ -88,12 +95,10 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
 
            /*for showing status of booking with badge_danger or success*/
 
-            $this->_select = ' CONCAT(firstname, " ", lastname) AS cust_name';
-            $this->_select .= ', pl.name AS product_name';
+           $this->_select = ' CONCAT(firstname, " ", lastname) AS cust_name';
+
             $this->_select .= ' ,IF(IFNULL((SELECT a.id FROM '._DB_PREFIX_.'htl_order_refund_info WHERE id=a.id AND a.refund_stage_id=1 OR a.refund_stage_id=2 LIMIT 1) , \''.$this->l('Done').'\') = \''.$this->l('Done').'\', \''.$this->l('Done').'\', \''.$this->l('Pending').'\') AS refund_status , IF((SELECT a.id FROM '._DB_PREFIX_.'htl_order_refund_info WHERE id=a.id AND a.refund_stage_id=1 OR a.refund_stage_id=2 LIMIT 1), 1, 0) badge_danger, IF((SELECT a.id FROM '._DB_PREFIX_.'htl_order_refund_info WHERE id=a.id AND a.refund_stage_id=1 OR a.refund_stage_id=2 LIMIT 1), 0, 1) badge_success';
-            $this->_join = ' LEFT JOIN `'._DB_PREFIX_.'ps_htl_branch_info` hbi ON (a.`id_hotel` = hbi.`id`)';
             $this->_join = ' LEFT JOIN `'._DB_PREFIX_.'customer` cust ON (a.`id_customer` = cust.`id_customer`)';
-            $this->_join .= ' LEFT JOIN `'._DB_PREFIX_.'product_lang` pl ON (a.`id_product` = pl.`id_product` AND pl.`id_lang` = '.$this->context->language->id.')';
             $this->_where = 'AND a.`id_order`='.$id_order;
             $this->_group = '';
             $this->_orderBy = '';
@@ -116,17 +121,10 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
                     'align' => 'center',
                     'search' => false,
                 ),
-                'id_product' => array(
-                    'title' => $this->l('Room Type'),
+                'cust_name' => array(
+                    'title' => $this->l('Customer Name'),
                     'align' => 'center',
                     'search' => false,
-                    'callback' => 'getProductColumnValue',
-                ),
-                'id_customer' => array(
-                    'title' => $this->l('Customer'),
-                    'align' => 'center',
-                    'search' => false,
-                    'callback' => 'getCustomerColumnValue',
                 ),
                 'order_amount' => array(
                     'title' => $this->l('Amount'),
@@ -135,18 +133,6 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
                     'currency' => true,
                     'callback' => 'setOrderCurrency',
                     'search' => false,
-                ),
-                'date_from' => array(
-                    'title' => $this->l('Booking From'),
-                    'align' => 'center',
-                    'search' => false,
-                    'callback' => 'getFormattedDate',
-                ),
-                'date_to' => array(
-                    'title' => $this->l('Booking To'),
-                    'align' => 'center',
-                    'search' => false,
-                    'callback' => 'getFormattedDate',
                 ),
                 'refund_status' => array(
                     'title' => $this->l('Refund Status'),
@@ -162,6 +148,12 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
                     'search' => false,
                 ),
             );
+
+            $this->bulk_actions = array(
+                                'delete' => array('text' => $this->l('Delete selected'),
+                                                'icon' => 'icon-trash',
+                                                'confirm' => $this->l('Delete selected items?'), ), );
+            $this->addRowAction('delete');
             $this->identifier = 'id';
 
             self::$currentIndex = self::$currentIndex.'&view_by_order=1';
@@ -170,22 +162,6 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
         } else {
             return parent::renderView();
         }
-    }
-
-    public function getCustomerColumnValue($value, $row)
-    {
-        return $row['cust_name'];
-        //return $row['cust_name'].'('.$value.')';
-    }
-
-    public function getProductColumnValue($value, $row)
-    {
-        return $row['product_name'].'('.$value.')';
-    }
-
-    public function getFormattedDate($value)
-    {
-        return date('d/m/Y', strtotime($value));
     }
 
     public function postProcess()
@@ -197,8 +173,8 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
             return;
         }
 
-        $date_from = date('Y-m-d', strtotime($obj_refund->date_from));
-        $date_to = date('Y-m-d', strtotime($obj_refund->date_to));
+        $date_from = $obj_refund->date_from;
+        $date_to = $obj_refund->date_to;
         $id_cart = Cart::getCartIdByOrderId($obj_refund->id_order);
         $id_product = $obj_refund->id_product;
         $id_currency = $obj_refund->id_currency;
@@ -224,8 +200,9 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
             $currency_iso_code = $obj_currency->iso_code;
 
             //room info
-            $objHtlBookingDetail = new HotelBookingDetail();
-            $rooms_ids = $objHtlBookingDetail->getCustomerIdRoomsByIdOrderIdProduct($id_order, $id_product, $date_from, $date_to);
+            $obj_htl_cart_bk_data = new HotelCartBookingData();
+            $rooms_ids = $obj_htl_cart_bk_data->getCustomerIdRoomsByIdCartIdProduct($id_cart, $id_product, $date_from, $date_to);
+
             foreach ($rooms_ids as $key_rm => $val_rm) {
                 $obj_room_info = new HotelRoomInformation($val_rm['id_room']);
                 $rooms_names[] = $obj_room_info->room_num;
@@ -240,35 +217,40 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
             $deduction_amount = $this->calculateDeductionAmountFromRefundRules($obj_refund);
 
             /* In case of advance payment */
+            /*$obj_htl_cust_adv_pay = new HotelCustomerAdvancedPayment();
+            $htl_cust_adv_pay_info = $obj_htl_cust_adv_pay->getCstAdvPaymentDtlByIdOrder($id_order);*/
             $obj_customer_adv_product = new HotelCustomerAdvancedProductPayment();
             $prod_adv_payment = $obj_customer_adv_product->getProductAdvancePaymentDetails($obj_refund->id_order, $obj_refund->id_product);
-            if ($prod_adv_payment) {
-                $adv_paid_amount = $obj_customer_adv_product->getRoomTypeAdvancePaymentMaountByDuration($obj_refund->id_order, $obj_refund->id_product, $date_from, $date_to);
+            if ($prod_adv_payment)  {      
+                $obj_booking_detail = new HotelBookingDetail();
+
+                $book_days = $obj_booking_detail->getNumberOfDays($date_from, $date_to);
+                $qty_prod = ($obj_refund->num_rooms) * $book_days;
+
+                $adv_paid_amount = $qty_prod * $prod_adv_payment['advance_payment_amount'];
                 $way_of_payment = 'Advance Payment';
-                // cconvert price 
+
                 $adv_paid_amount = Tools::convertPrice($adv_paid_amount, new Currency($id_currency));
-                //assign advance paid amount
+
                 $this->context->smarty->assign('adv_paid_amount', Tools::ps_round($adv_paid_amount, 2));
             } else {
                 $way_of_payment = 'Full Payment';
             }
-            $this->context->smarty->assign(
-                array(
-                    'refunded_amount' => $obj_refund->refunded_amount,
-                    'deduction_amount' => Tools::ps_round($deduction_amount, 2),
-                    'way_of_payment' => $way_of_payment,
-                    'total_amount' => Tools::ps_round($order_amount, 2),
-                    'curr_code' => $currency_iso_code,
-                    'currentStage' => $obj_ord_refund_stage,
-                    'room_numbers' => $rooms_names,
-                    'htl_name' => $obj_hotel_branch_info->hotel_name,
-                    'id_order_refund' => $id_order_refund,
-                    'product_name' => $product_name,
-                    'all_ord_refund_stages' => $all_ord_rfnd_stgs,
-                    'date_from' => $date_from,
-                    'date_to' => $date_to,
-                )
-            );
+            $this->context->smarty->assign(array(
+                                            'refunded_amount' => $obj_refund->refunded_amount,
+                                            'deduction_amount' => Tools::ps_round($deduction_amount, 2),
+                                            'way_of_payment' => $way_of_payment,
+                                            'total_amount' => Tools::ps_round($order_amount, 2),
+                                            'curr_code' => $currency_iso_code,
+                                            'currentStage' => $obj_ord_refund_stage,
+                                            'room_numbers' => $rooms_names,
+                                            'htl_name' => $obj_hotel_branch_info->hotel_name,
+                                            'id_order_refund' => $id_order_refund,
+                                            'product_name' => $product_name,
+                                            'all_ord_refund_stages' => $all_ord_rfnd_stgs,
+                                            'date_from' => $date_from,
+                                            'date_to' => $date_to,
+                                        ));
         }
 
         /*If Admin update the status of the order cancellation request*/
@@ -353,7 +335,7 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
                 $to = $obj_customer->email;
 
                 if (!$this->sendOrderCancellationStatusMail($templateVars, $to, $template_name)) {
-                    $this->errors[] = Tools::displayError('Some error occurred while sending mail to the customer');
+                    $this->errors = Tools::displayError('Some error occurred while sending mail to the customer');
                 } else {
                     Tools::redirectAdmin(self::$currentIndex.'&view_by_order=1&conf=4&id='.$id_order_refund.'&viewhtl_order_refund_info&token='.$this->token);
                 }
@@ -379,9 +361,12 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
 
         $obj_booking_detail = new HotelBookingDetail();
         $obj_htl_adv_pay = new HotelAdvancedPayment();
+
+        // $obj_htl_cust_adv_pay = new HotelCustomerAdvancedPayment();
+        // $htl_cust_adv_pay_info = $obj_htl_cust_adv_pay->getCstAdvPaymentDtlByIdOrder($obj_refund->id_order);
         $obj_customer_adv_product = new HotelCustomerAdvancedProductPayment();
         $prod_adv_payment = $obj_customer_adv_product->getProductAdvancePaymentDetails($obj_refund->id_order, $obj_refund->id_product);
-        if ($prod_adv_payment) {
+        if ($prod_adv_payment)  {      
             $way_of_payment = 'advancePayment';
         }
 
@@ -390,22 +375,20 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
         $default_currency = Configuration::get('PS_CURRENCY_DEFAULT');
         $order_tran_curr = $obj_refund->id_currency;
         if ($refund_rules) {
-            $explode_date = explode(' ', $obj_refund->date_add);
-            $date_request = date('Y-m-d', strtotime($explode_date[0]));
-            $date1 = date_create($obj_refund->date_from);
-            $date2 = date_create($date_request);
-            $days_diff = date_diff($date1, $date2);
-            $days_before_cancellation = (int) $days_diff->format('%a');
             foreach ($refund_rules as $k_rules => $v_rules) {
+                $explode_date = explode(' ', $v_rules['date_add']);
+                $date_request = date('Y-m-d', strtotime($explode_date[0]));
+                $date1 = date_create($obj_refund->date_from);
+                $date2 = date_create($date_request);
+                $days_diff = date_diff($date1, $date2);
+                $days_before_cancellation = (int) $days_diff->format('%a');
+
                 if ($days_before_cancellation >= $v_rules['days']) {
                     if ($way_of_payment == 'advancePayment') {
-                        $obj_customer_adv_product = new HotelCustomerAdvancedProductPayment();
-                        $prod_adv_payment = $obj_customer_adv_product->getProductAdvancePaymentDetails($obj_refund->id_order, $obj_refund->id_product);
-                        if ($prod_adv_payment) {
-                            $adv_paid_amount = $obj_customer_adv_product->getRoomTypeAdvancePaymentMaountByDuration($obj_refund->id_order, $obj_refund->id_product, $obj_refund->date_from, $obj_refund->date_to);
-                        } else {
-                            $adv_paid_amount = 0;
-                        }
+                        $book_days = $obj_booking_detail->getNumberOfDays($obj_refund->date_from, $obj_refund->date_to);
+                        $qty_prod = ($obj_refund->num_rooms) * $book_days;
+                        $adv_paid_amount = $qty_prod * $prod_adv_payment['advance_payment_amount'];
+                        $adv_paid_amount = Tools::convertPrice($adv_paid_amount, new Currency($id_currency));
                         $deduct_amount_val = $v_rules['deduction_value_adv_pay'];
                     } else {
                         $deduct_amount_val = $v_rules['deduction_value_full_pay'];
@@ -441,22 +424,18 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
                 }
             }
         }
-        /*if (!$deduction_amount) {
+        if (!$deduction_amount) {
             if ($way_of_payment == 'advancePayment') {
-                $obj_customer_adv_product = new HotelCustomerAdvancedProductPayment();
-                $prod_adv_payment = $obj_customer_adv_product->getProductAdvancePaymentDetails($obj_refund->id_order, $obj_refund->id_product);
-                if ($prod_adv_payment) {
-                    $deduction_amount = $obj_customer_adv_product->getRoomTypeAdvancePaymentMaountByDuration($obj_refund->id_order, $obj_refund->id_product, date('Y-m-d', strtotime($obj_refund->date_from)), date('Y-m-d', strtotime($obj_refund->date_to)));
-                } else {
-                    $deduction_amount = 0;
-                }
+                $book_days = $obj_booking_detail->getNumberOfDays($obj_refund->date_from, $obj_refund->date_to);
+                $qty_prod = ($obj_refund->num_rooms) * $book_days;
+                $deduction_amount = $obj_htl_adv_pay->getProductMinAdvPaymentAmount($obj_refund->id_product, $qty_prod);
                 if ($default_currency != $order_tran_curr) {
                     $deduction_amount = Tools::convertPriceFull($deduction_amount, new Currency($default_currency), new Currency($order_tran_curr));
                 }
             } else {
                 $deduction_amount = $obj_refund->order_amount;
             }
-        }*/
+        }
         return $deduction_amount;
     }
 

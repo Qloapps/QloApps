@@ -20,16 +20,7 @@
                                     <div class="hotelRoomDescContainer">
                                         <div class="row margin-lr-0">
                                             <p class="htlRoomTypeNameText pull-left">{$roomDisplay.name}</p>
-                                            
-                                            <p class="htlRoomTypePriceText pull-right">
-                                                {if $roomDisplay.feature_price_diff >= 0}
-                                                    <span class="wk_roomType_price {if $roomDisplay.feature_price_diff>0}room_type_old_price{/if}">{convertPrice price = $roomDisplay.price_without_reduction}</span>
-                                                {/if}    
-                                                {if $roomDisplay.feature_price_diff}
-                                                    <span class="wk_roomType_price">{convertPrice price = $roomDisplay.feature_price}</span>
-                                                {/if}
-                                                /&nbsp;{l s='Per Night' mod='wkhotelroom'}
-                                            </p>
+                                            <p class="htlRoomTypePriceText pull-right">{convertPrice price = $roomDisplay.price}/&nbsp;{l s='Per Night' mod='wkhotelroom'}</p>
                                         </div>
                                         <div class="row margin-lr-0 htlRoomTypeDescText">
                                             {$roomDisplay.description}

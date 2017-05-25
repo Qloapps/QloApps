@@ -113,7 +113,7 @@ class AdminAddHotelController extends ModuleAdminController
         $obj_countries = new Country();
         $countries_var = Country::getCountries($this->context->language->id);
 
-        $country = $this->context->country;
+		$country = $this->context->country;
         $this->context->smarty->assign('defaultCountry', $country->name[Configuration::get('PS_LANG_DEFAULT')]);
 
         if ($this->display == 'add') {
@@ -133,13 +133,12 @@ class AdminAddHotelController extends ModuleAdminController
                     $states[$key]['name'] = $value['name'];
                 }
             }
+            $this->context->smarty->assign('enabledDisplayMap', Configuration::get('WK_GOOGLE_ACTIVE_MAP'));
             $this->context->smarty->assign('edit', 1);
             $this->context->smarty->assign('country_var', $countries_var);
             $this->context->smarty->assign('state_var', $states);
             $this->context->smarty->assign('hotel_info', $hotel_branch_info);
         }
-        $this->context->smarty->assign('enabledDisplayMap', Configuration::get('WK_GOOGLE_ACTIVE_MAP'));
-        
 
         $this->fields_form = array(
                 'submit' => array(
@@ -215,14 +214,15 @@ class AdminAddHotelController extends ModuleAdminController
 
         if (!$country) {
             $this->errors[] = Tools::displayError('Country is required field.');
-        } else {
-            $statesbycountry = State::getStatesByIdCountry($country);
-            /*If selected country has states only the validate state field*/
+        }
 
-            if (!$state) {
-                if ($statesbycountry) {
-                    $this->errors[] = Tools::displayError('State is required field.');
-                }
+        /*If selected country has states only the validate state field*/
+        $statesbycountry = State::getStatesByIdCountry($country);
+
+        if (!$state) {
+            if ($statesbycountry) {
+                $this->errors[] = Tools::displayError('State is required field.');
+            } else {
             }
         }
 
@@ -308,13 +308,13 @@ class AdminAddHotelController extends ModuleAdminController
 
             if ($new_hotel_id) {
                 $grp_ids = array();
-                $data_grp_ids = Group::getGroups($this->context->language->id);
+                $obj_grp = new Group();
+                $data_grp_ids = $obj_grp->getGroups(1, $id_shop = false);
 
                 foreach ($data_grp_ids as $key => $value) {
                     $grp_ids[] = $value['id_group'];
                 }
-                //test
-                $country_name = (new Country())->getNameById($this->context->language->id, $country);
+                $country_name = (new Country())->getNameById(Configuration::get('PS_LANG_DEFAULT'), $country);
                 $cat_country = $this->addCategory($country_name, false, $grp_ids);
 
                 if ($cat_country) {
@@ -359,56 +359,6 @@ class AdminAddHotelController extends ModuleAdminController
             } else {
                 $this->display = 'add';
             }
-        }
-    }
-
-    public function addCategory($name, $parent_cat = false, $group_ids, $ishotel = false, $hotel_id = false)
-    {
-        if (!$parent_cat) {
-            $parent_cat = Category::getRootCategory()->id;
-        }
-
-        if ($ishotel && $hotel_id) {
-            $cat_id_hotel = Db::getInstance()->getValue('SELECT `id_category` FROM `'._DB_PREFIX_.'htl_branch_info` WHERE id='.$hotel_id);
-            if ($cat_id_hotel) {
-                $obj_cat = new Category($cat_id_hotel);
-                $obj_cat->name = array();
-                $obj_cat->description = array();
-                $obj_cat->link_rewrite = array();
-
-                foreach (Language::getLanguages(true) as $lang) {
-                    $obj_cat->name[$lang['id_lang']] = $name;
-                    $obj_cat->description[$lang['id_lang']] = $this->l('this category is for hotels only');
-                    $obj_cat->link_rewrite[$lang['id_lang']] = $this->l(Tools::link_rewrite($name));
-                }
-                $obj_cat->id_parent = $parent_cat;
-                $obj_cat->groupBox = $group_ids;
-                $obj_cat->save();
-                $cat_id = $obj_cat->id;
-
-                return $cat_id;
-            }
-        }
-        $categoryExist = Category::searchByNameAndParentCategoryId($this->context->language->id, $name, $parent_cat);
-        if ($categoryExist) {
-            return $categoryExist['id_category'];
-        } else {
-            $obj = new Category();
-            $obj->name = array();
-            $obj->description = array();
-            $obj->link_rewrite = array();
-
-            foreach (Language::getLanguages(true) as $lang) {
-                $obj->name[$lang['id_lang']] = $name;
-                $obj->description[$lang['id_lang']] = $this->l('this category are for hotels only');
-                $obj->link_rewrite[$lang['id_lang']] = $this->l(Tools::link_rewrite($name));
-            }
-            $obj->id_parent = $parent_cat;
-            $obj->groupBox = $group_ids;
-            $obj->add();
-            $cat_id = $obj->id;
-
-            return $cat_id;
         }
     }
 
@@ -519,6 +469,57 @@ class AdminAddHotelController extends ModuleAdminController
             $this->errors[] = Tools::displayError('An error occurred while updating the status for an object.').' <b>'.$this->table.'</b> '.Tools::displayError('(cannot load object)');
         }
         parent::processStatus();
+    }
+
+    public function addCategory($name, $parent_cat = false, $group_ids, $ishotel = false, $hotel_id = false)
+    {
+        if (!$parent_cat) {
+            $parent_cat = Category::getRootCategory()->id;
+        }
+
+        if ($ishotel && $hotel_id) {
+            $cat_id_hotel = Db::getInstance()->getValue('SELECT `id_category` FROM `'._DB_PREFIX_.'htl_branch_info` WHERE id='.$hotel_id);
+            if ($cat_id_hotel) {
+                $obj_cat = new Category($cat_id_hotel);
+                $obj_cat->name = array();
+                $obj_cat->description = array();
+                $obj_cat->link_rewrite = array();
+
+                foreach (Language::getLanguages(true) as $lang) {
+                    $obj_cat->name[$lang['id_lang']] = $name;
+                    $obj_cat->description[$lang['id_lang']] = $this->l('this category is for hotels only');
+                    $obj_cat->link_rewrite[$lang['id_lang']] = $this->l(Tools::link_rewrite($name));
+                }
+                $obj_cat->id_parent = $parent_cat;
+                $obj_cat->groupBox = $group_ids;
+                $obj_cat->save();
+                $cat_id = $obj_cat->id;
+
+                return $cat_id;
+            }
+        }
+        $check_category_exists = Category::searchByNameAndParentCategoryId($this->context->language->id, $name, $parent_cat);
+
+        if ($check_category_exists) {
+            return $check_category_exists['id_category'];
+        } else {
+            $obj = new Category();
+            $obj->name = array();
+            $obj->description = array();
+            $obj->link_rewrite = array();
+
+            foreach (Language::getLanguages(true) as $lang) {
+                $obj->name[$lang['id_lang']] = $name;
+                $obj->description[$lang['id_lang']] = $this->l('this category are for hotels only');
+                $obj->link_rewrite[$lang['id_lang']] = $this->l(Tools::link_rewrite($name));
+            }
+            $obj->id_parent = $parent_cat;
+            $obj->groupBox = $group_ids;
+            $obj->add();
+            $cat_id = $obj->id;
+
+            return $cat_id;
+        }
     }
 
     public function ajaxProcessStateByCountryId()

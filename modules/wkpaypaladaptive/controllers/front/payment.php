@@ -84,7 +84,7 @@ class WkPaypalAdaptivePaymentModuleFrontController extends ModuleFrontController
                 $url = trim('https://svcs.'.$sandbox.'paypal.com/AdaptivePayments/Pay');
                 $bodyparams = array(
                     'requestEnvelope.errorLanguage' => 'en_US',
-                    'reverseAllParallelPaymentsOnError' => 'true',
+                    'reverseAllParallelPaymentsOnError' => 'true',// added by sumit panwar
                     'actionType' => 'PAY',
                     'currencyCode' => $obj_currency->iso_code,
                     'cancelUrl' => $this->context->link->getPageLink('order.php', ''),

@@ -186,21 +186,12 @@
 				</td>
 			</tr>
 			{/if}
-			<tr class="totalprice item">
-				<td colspan={if isset($order_has_invoice) && $order_has_invoice  && $order->payment != 'Free order'}"8"{else}"5"{/if}></td>
-				<td colspan="{if $return_allowed}2{else}3{/if}">
-					<strong>{l s='Total to Pay'}</strong>
-				</td>
-				<td colspan="{if $order->hasProductReturned()}2{else}1{/if}" class="text-right">
-					<span class="price">{displayWtPriceWithCurrency price=$order->total_paid currency=$currency}</span>
-				</td>
-			</tr>
 			
 			{if isset($order_adv_dtl)}
 				<tr class="item">
 					<td colspan={if isset($order_has_invoice) && $order_has_invoice  && $order->payment != 'Free order'}"8"{else}"5"{/if}></td>
 					<td colspan="{if $return_allowed}2{else}3{/if}">
-						<strong>{l s='Advance Paid Amount'}</strong>
+						<strong>{l s='Advance Payment Amount'}</strong>
 					</td>
 					<td colspan="{if $order->hasProductReturned()}5{else}1{/if}" class="text-right">
 						<span class="price">{displayWtPriceWithCurrency price=$order_adv_dtl['total_paid_amount'] currency=$currency}</span>
@@ -237,6 +228,15 @@
 					<span class="price-shipping">{displayWtPriceWithCurrency price=$order->total_shipping currency=$currency}</span>
 				</td>
 			</tr> -->
+			<tr class="totalprice item">
+				<td colspan={if isset($order_has_invoice) && $order_has_invoice  && $order->payment != 'Free order'}"8"{else}"5"{/if}></td>
+				<td colspan="{if $return_allowed}2{else}3{/if}">
+					<strong>{l s='Total Paid For Order'}</strong>
+				</td>
+				<td colspan="{if $order->hasProductReturned()}2{else}1{/if}" class="text-right">
+					<span class="price">{displayWtPriceWithCurrency price=$order->total_paid currency=$currency}</span>
+				</td>
+			</tr>
 		</tfoot>
 		<tbody>
 			{if isset($cart_htl_data)}
@@ -263,25 +263,9 @@
 							<td class="cart_unit">
 								<p class="text-center">
 									{if $group_use_tax}
-										<p class="text-center">
-											<span class="product_original_price {if $rm_v.feature_price_diff>0}room_type_old_price{/if}" {if $rm_v.feature_price_diff < 0} style="display:none;"{/if}>
-												{displayWtPriceWithCurrency price=$rm_v['product_price_without_reduction_tax_incl'] currency=$currency}
-												{*{convertPrice price=$data_v.unit_price|floatval}*}
-											</span>&nbsp;
-						                    <span class="room_type_current_price" {if !$rm_v.feature_price_diff}style="display:none;"{/if}>
-						                    	{displayWtPriceWithCurrency price=$rm_v['paid_unit_price_tax_incl'] currency=$currency}
-												{*{displayPrice price=$rm_v['feature_price']|floatval|round:2}*}
-						                    </span>
-										</p>
+										{displayWtPriceWithCurrency price=$data_v['unit_price_tax_incl'] currency=$currency}
 									{else}
-										<p class="text-center">
-											<span class="product_original_price {if $rm_v.feature_price_diff>0}room_type_old_price{/if}" {if $rm_v.feature_price_diff < 0} style="display:none;"{/if}>
-												{displayWtPriceWithCurrency price=$rm_v['product_price_without_reduction_tax_excl'] currency=$currency}
-											</span>&nbsp;
-						                    <span class="room_type_current_price" {if !$rm_v.feature_price_diff}style="display:none;"{/if}>
-						                    	{displayWtPriceWithCurrency price=$rm_v['paid_unit_price_tax_excl'] currency=$currency}
-						                    </span>
-										</p>
+										{displayWtPriceWithCurrency price=$data_v['unit_price_tax_excl'] currency=$currency}
 									{/if}
 								</p>
 							</td>
@@ -657,7 +641,7 @@
 				<input type="hidden" value="" id="cancel_req_num_rooms">
 				<input type="hidden" value="" id="cancel_req_date_from">
 				<input type="hidden" value="" id="cancel_req_date_to">
-				<textarea class="form-control reasonForRefund" rows="2" name="reasonForRefund" placeholder="Write a reason for cancellation of this booking"></textarea>
+				<textarea class="form-control reasonForRefund" rows="1" name="reasonForRefund" placeholder="Write a reason for cancellation of this booking"></textarea>
 				<div>
 					<p class="fl required required_err" style="color:#AA1F00; display:none"><sup>*</sup> {l s='Required field'}</p><br>
 					<p class="fr">

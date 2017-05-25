@@ -1,27 +1,26 @@
 <?php
-if (!defined('_PS_VERSION_')) {
-    exit;
-}
+if (!defined('_PS_VERSION_'))
+	exit;
 
 require_once dirname(__FILE__).'/define.php';
 
-class wkhotelroom extends Module
+class WkHotelRoom extends Module
 {
     const INSTALL_SQL_FILE = 'install.sql';
 
-    public function __construct()
-    {
-        $this->name = 'wkhotelroom';
-        $this->tab = 'front_office_features';
-        $this->version = '1.0.1';
-        $this->author = 'webkul';
-        $this->bootstrap = true;
-        parent::__construct();
+	public function __construct()
+	{
+		$this->name = 'wkhotelroom';
+		$this->tab = 'front_office_features';
+		$this->version = '1.0.0';
+		$this->author = 'webkul';
+		$this->bootstrap = true;
+		parent::__construct();
 
-        $this->displayName = $this->l('Display Hotel Rooms');
-        $this->description = $this->l('Using this module you can display your hotel rooms in home page.');
-        $this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
-    }
+		$this->displayName = $this->l('Display Hotel Rooms');
+		$this->description = $this->l('Using this module you can display your hotel rooms in home page.');
+		$this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
+	}
 
     public function hookDisplayHome()
     {
@@ -33,44 +32,35 @@ class wkhotelroom extends Module
         $obj_room_block = new WkHotelRoomDisplay();
         $hotelRoomDisplay = $obj_room_block->getHotelRoomDisplayData();
 
-        $date_from = date('Y-m-d');
-        $date_to = date('Y-m-d', strtotime($date_from) + 86400);
         if ($hotelRoomDisplay) {
             foreach ($hotelRoomDisplay as &$htlRoom) {
                 $id_product = $htlRoom['id_product'];
                 $product = new Product($id_product, false, $id_lang);
                 $cover_image_id = Product::getCover($product->id);
-                if ($cover_image_id) {
+                if($cover_image_id)
                     $prod_img = $this->context->link->getImageLink($product->link_rewrite, $product->id.'-'.$cover_image_id['id_image'], 'large_default');
-                } else {
+                else 
                     $prod_img = $this->context->link->getImageLink($product->link_rewrite, $this->context->language->iso_code."-default", 'large_default');
-                }
-                $productPriceWithoutReduction = $product->getPriceWithoutReduct(!$useTax);
-                $product_price = Product::getPriceStatic($id_product, $useTax);
+
                 $htlRoom['image'] = $prod_img;
                 $htlRoom['description'] = $product->description_short;
                 $htlRoom['name'] = $product->name;
-                $htlRoom['price'] = $product_price;
-                $htlRoom['price_without_reduction'] = $productPriceWithoutReduction;
-
-                $feature_price = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay($id_product, $date_from, $date_to, $useTax);
-                $htlRoom['feature_price'] = $feature_price;
-                $htlRoom['feature_price_diff'] = (float)($productPriceWithoutReduction - $feature_price);
+                $htlRoom['price'] = Product::getPriceStatic($id_product, $useTax);
             }
         }
         $HOTEL_ROOM_DISPLAY_HEADING = Configuration::get('HOTEL_ROOM_DISPLAY_HEADING');
         $HOTEL_ROOM_DISPLAY_DESCRIPTION = Configuration::get('HOTEL_ROOM_DISPLAY_DESCRIPTION');
 
-        $this->context->smarty->assign(array('HOTEL_ROOM_DISPLAY_HEADING' => $HOTEL_ROOM_DISPLAY_HEADING,
-                                             'HOTEL_ROOM_DISPLAY_DESCRIPTION' => $HOTEL_ROOM_DISPLAY_DESCRIPTION,
-                                             'hotelRoomDisplay' => $hotelRoomDisplay,
-                                            ));
+        $this->context->smarty->assign(array('HOTEL_ROOM_DISPLAY_HEADING' => $HOTEL_ROOM_DISPLAY_HEADING, 
+        									 'HOTEL_ROOM_DISPLAY_DESCRIPTION' => $HOTEL_ROOM_DISPLAY_DESCRIPTION, 
+        									 'hotelRoomDisplay' => $hotelRoomDisplay, 
+        									));
 
         return $this->display(__FILE__, 'hotelRoomDisplayBlock.tpl');
     }
 
 
-    public function hookActionProductDelete($params)
+    public function hookActionProductDelete($params) 
     {
         if ($params['id_product']) {
             WkHotelRoomDisplay::deleteRoomByIdProduct($params['id_product']);
@@ -85,7 +75,7 @@ class wkhotelroom extends Module
         return $this->display(__FILE__, 'hotelRoomSettingLink.tpl');
     }
 
-    public function hookDisplayDefaultNavigationHook()
+    public function hookDisplayDefaultNavigationHook() 
     {
         return $this->display(__FILE__, 'hotelRoomNaviagtionMenu.tpl');
     }
@@ -121,22 +111,20 @@ class wkhotelroom extends Module
         return true;
     }
 
-    public function installTab($class_name, $tab_name, $tab_parent_name=false)
+    public function installTab($class_name,$tab_name,$tab_parent_name=false) 
     {
         $tab = new Tab();
         $tab->active = 1;
         $tab->class_name = $class_name;
         $tab->name = array();
 
-        foreach (Language::getLanguages(true) as $lang) {
+        foreach (Language::getLanguages(true) as $lang)
             $tab->name[$lang['id_lang']] = $tab_name;
-        }
 
-        if ($tab_parent_name) {
+        if($tab_parent_name)
             $tab->id_parent = (int)Tab::getIdFromClassName($tab_parent_name);
-        } else {
+        else
             $tab->id_parent = -1;
-        }
         
         $tab->module = $this->name;
         $res = $tab->add();
@@ -145,38 +133,33 @@ class wkhotelroom extends Module
     }
 
     public function install()
-    {
-        if (!file_exists(dirname(__FILE__).'/'.self::INSTALL_SQL_FILE)) {
+	{
+        if (!file_exists(dirname(__FILE__).'/'.self::INSTALL_SQL_FILE))
             return false;
-        } elseif (!$sql = Tools::file_get_contents(dirname(__FILE__).'/'.self::INSTALL_SQL_FILE)) {
+        else if (!$sql = Tools::file_get_contents(dirname(__FILE__).'/'.self::INSTALL_SQL_FILE))
             return false;
-        }
 
         $sql = str_replace(array('PREFIX_',  'ENGINE_TYPE'), array(_DB_PREFIX_, _MYSQL_ENGINE_), $sql);
         $sql = preg_split("/;\s*[\r\n]+/", $sql);
 
-        foreach ($sql as $query) {
-            if ($query) {
-                if (!Db::getInstance()->execute(trim($query))) {
+        foreach ($sql as $query)
+            if ($query)
+                if (!Db::getInstance()->execute(trim($query)))
                     return false;
-                }
-            }
-        }
-        if (!parent::install()
-            || !$this->registerHook('displayHome')
+		if (!parent::install()
+			|| !$this->registerHook('displayHome')
             || !$this->registerHook('actionProductDelete')
             || !$this->registerHook('displayAddModuleSettingLink')
             || !$this->registerHook('displayDefaultNavigationHook')
             || !$this->registerHook('displayFooterExploreSectionHook')
             || !$this->callInstallTab()
             || !$this->insertDefaultHotelFeaturesEntries()
-            ) {
-            return false;
-        }
-        return true;
-    }
+            )
+			return false;
+		return true;
+	}
 
-    public function reset()
+	public function reset()
     {
         if (!$this->uninstall(false)) {
             return false;
@@ -189,13 +172,12 @@ class wkhotelroom extends Module
 
     public function uninstall($keep = true)
     {
-        if (!parent::uninstall()
+        if(!parent::uninstall() 
             || !$this->callUninstallTab()
-            || ($keep && !$this->deleteTables())
+        	|| ($keep && !$this->deleteTables())
             || ($keep && !$this->deleteConfigKeys())
-            ) {
+            )
             return false;
-        }
 
         return true;
     }
@@ -210,13 +192,11 @@ class wkhotelroom extends Module
     public function deleteConfigKeys()
     {
         $var = array('HOTEL_ROOM_DISPLAY_HEADING',
-                     'HOTEL_ROOM_DISPLAY_DESCRIPTION');
+        			 'HOTEL_ROOM_DISPLAY_DESCRIPTION');
 
-        foreach ($var as $key) {
-            if (!Configuration::deleteByName($key)) {
+        foreach ($var as $key)
+            if (!Configuration::deleteByName($key))
                 return false;
-            }
-        }
         
         return true;
     }
@@ -230,11 +210,12 @@ class wkhotelroom extends Module
     public function uninstallTab($class_name)
     {
         $id_tab = (int)Tab::getIdFromClassName($class_name);
-        if ($id_tab) {
+        if ($id_tab)
+        {
             $tab = new Tab($id_tab);
             return $tab->delete();
-        } else {
-            return false;
         }
+        else
+            return false;
     }
 }

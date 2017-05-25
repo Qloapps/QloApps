@@ -18,13 +18,4 @@
 	require_once ('classes/HotelOrderRestrictDate.php');
 	require_once ('classes/HotelCustomerAdvancedProductPayment.php');
 	require_once ('classes/HotelHelper.php');
-	require_once ('classes/HotelRoomTypeFeaturePricing.php');
-	require_once ('classes/ChannelOrderPayment.php');
-
-	// Web services classes
-	require_once ('classes/WebserviceSpecificManagementQlo.php');
-	require_once ('classes/QloWebservice.php');
-	require_once ('classes/QloRoomType.php');
-	require_once ('classes/ChannelManagerServices.php');
-	require_once ('classes/HotelRoomDisableDates.php');
 ?>

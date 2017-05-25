@@ -323,16 +323,6 @@ class WebserviceRequestCore
             'product_customization_fields' => array('description' => 'Customization Field', 'class' => 'CustomizationField'),
             'customizations' => array('description' => 'Customization values', 'class' => 'Customization'),
         );
-
-        // Code from Prestashop 1.7.0.2 
-        $extra_resources = Hook::exec('addWebserviceResources', array('resources' => $resources), null, true, false);
-        if (is_array($extra_resources) && count($extra_resources)) {
-            foreach ($extra_resources as $new_resources) {
-                if (is_array($new_resources) && count($new_resources)) {
-                    $resources = array_merge($resources, $new_resources);
-                }
-            }
-        }
         ksort($resources);
         return $resources;
     }
@@ -595,8 +585,7 @@ class WebserviceRequestCore
         if (isset($this->objOutput)) {
             $this->objOutput->setStatus($status);
         }
-        //$this->errors[] = $display_errors ? array($code, $label) : 'Internal error. To see this error please display the PHP errors.';
-        $this->errors[] = $display_errors ? array($code, $label) : 'Internal error. To see this error please display the PHP errors.'.$code.' '.$label;
+        $this->errors[] = $display_errors ? array($code, $label) : 'Internal error. To see this error please display the PHP errors.';
     }
 
     /**

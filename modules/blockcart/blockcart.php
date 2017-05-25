@@ -100,16 +100,20 @@ class blockcart extends Module
                 foreach ($products as $key => &$product) {
                     if ($product['id_product'] == $cart_rule['gift_product']
                         && $product['id_product_attribute'] == $cart_rule['gift_product_attribute']) {
-                        $product['total_wt'] = Tools::ps_round($product['total_wt'] - $product['price_wt'], (int) $currency->decimals * _PS_PRICE_DISPLAY_PRECISION_);
-                        $product['total'] = Tools::ps_round($product['total'] - $product['price'], (int) $currency->decimals * _PS_PRICE_DISPLAY_PRECISION_);
+                        $product['total_wt'] = Tools::ps_round($product['total_wt'] - $product['price_wt'],
+                            (int) $currency->decimals * _PS_PRICE_DISPLAY_PRECISION_);
+                        $product['total'] = Tools::ps_round($product['total'] - $product['price'],
+                            (int) $currency->decimals * _PS_PRICE_DISPLAY_PRECISION_);
                         if ($product['cart_quantity'] > 1) {
                             array_splice($products, $key, 0, array($product));
                             $products[$key]['cart_quantity'] = $product['cart_quantity'] - 1;
                             $product['cart_quantity'] = 1;
                         }
                         $product['is_gift'] = 1;
-                        $cart_rule['value_real'] = Tools::ps_round($cart_rule['value_real'] - $product['price_wt'], (int) $currency->decimals * _PS_PRICE_DISPLAY_PRECISION_);
-                        $cart_rule['value_tax_exc'] = Tools::ps_round($cart_rule['value_tax_exc'] - $product['price'],(int) $currency->decimals * _PS_PRICE_DISPLAY_PRECISION_);
+                        $cart_rule['value_real'] = Tools::ps_round($cart_rule['value_real'] - $product['price_wt'],
+                            (int) $currency->decimals * _PS_PRICE_DISPLAY_PRECISION_);
+                        $cart_rule['value_tax_exc'] = Tools::ps_round($cart_rule['value_tax_exc'] - $product['price'],
+                            (int) $currency->decimals * _PS_PRICE_DISPLAY_PRECISION_);
                     }
                 }
             }
@@ -181,7 +185,8 @@ class blockcart extends Module
 
     public function install()
     {
-        if (parent::install() == false
+        if (
+            parent::install() == false
             || $this->registerHook('top') == false
             || $this->registerHook('header') == false
             || $this->registerHook('actionCartListOverride') == false
@@ -205,10 +210,9 @@ class blockcart extends Module
             $cart_htl_data = $result['cart_htl_data'];
             $total_rooms = $result['total_rooms_in_cart'];
             $this->smarty->assign(array(
-                'cart_htl_data' => $cart_htl_data,
-                'total_rooms_in_cart' => $total_rooms,
-                )
-            );
+            'cart_htl_data' => $cart_htl_data,
+            'total_rooms_in_cart' => $total_rooms,
+            ));
         }
 
         $warning_num = Configuration::get('WK_ROOM_LEFT_WARNING_NUMBER');
@@ -270,7 +274,8 @@ class blockcart extends Module
         $res['cart_booking_data'] = $result['cart_htl_data'];
         $res['total_rooms_in_cart'] = $result['total_rooms_in_cart'];
         if (is_array($res) && ($id_product = Tools::getValue('id_product')) && Configuration::get('PS_BLOCK_CART_SHOW_CROSSSELLING')) {
-            $this->smarty->assign('orderProducts', OrderDetail::getCrossSells($id_product, $this->context->language->id, Configuration::get('PS_BLOCK_CART_XSELL_LIMIT')));
+            $this->smarty->assign('orderProducts', OrderDetail::getCrossSells($id_product, $this->context->language->id,
+                Configuration::get('PS_BLOCK_CART_XSELL_LIMIT')));
             $res['crossSelling'] = $this->display(__FILE__, 'crossselling.tpl');
         }
 
@@ -468,18 +473,12 @@ class blockcart extends Module
                                 $cart_htl_data[$type_key]['date_diff'][$date_join]['num_rm'] += 1;
                                 $total_rooms += 1;
                                 $num_days = $cart_htl_data[$type_key]['date_diff'][$date_join]['num_days'];
-                                $vart_quant = (int) $cart_htl_data[$type_key]['date_diff'][$date_join]['num_rm'];
+                                $vart_quant = (int) $cart_htl_data[$type_key]['date_diff'][$date_join]['num_rm'] * $num_days;
 
-                                //// By webkul New way to calculate product prices with feature Prices
-                                $roomTypeDateRangePrice = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice($type_value['id_product'], $data_v['date_from'], $data_v['date_to']);
-                                if (!$price_tax) {
-                                    $amount = $roomTypeDateRangePrice['total_price_tax_excl'];
-                                } else {
-                                    $amount = $roomTypeDateRangePrice['total_price_tax_incl'];
-                                }
-                                //END
+                                $amount = Product::getPriceStatic($type_value['id_product'], $price_tax, null, 6, null,    false, true, 1);
+                                $amount *= $vart_quant;
 
-                                $cart_htl_data[$type_key]['date_diff'][$date_join]['amount'] = $amount * $vart_quant;
+                                $cart_htl_data[$type_key]['date_diff'][$date_join]['amount'] = $amount;
                             } else {
                                 $num_days = $obj_htl_bk_dtl->getNumberOfDays($data_v['date_from'], $data_v['date_to']);
                                 $total_rooms += 1;
@@ -487,16 +486,8 @@ class blockcart extends Module
                                 $cart_htl_data[$type_key]['date_diff'][$date_join]['data_form'] = date('Y-m-d', strtotime($data_v['date_from']));
                                 $cart_htl_data[$type_key]['date_diff'][$date_join]['data_to'] = date('Y-m-d', strtotime($data_v['date_to']));
                                 $cart_htl_data[$type_key]['date_diff'][$date_join]['num_days'] = $num_days;
-                                
-                                // By webkul New way to calculate product prices with feature Prices
-                                $roomTypeDateRangePrice = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice($type_value['id_product'], $data_v['date_from'], $data_v['date_to']);
-                                if (!$price_tax) {
-                                    $amount = $roomTypeDateRangePrice['total_price_tax_excl'];
-                                } else {
-                                    $amount = $roomTypeDateRangePrice['total_price_tax_incl'];
-                                }
-                                // END
-
+                                $amount = Product::getPriceStatic($type_value['id_product'], $price_tax, null, 6, null, false, true, 1);
+                                $amount *= $num_days;
                                 $cart_htl_data[$type_key]['date_diff'][$date_join]['amount'] = $amount;
                             }
                         }
@@ -507,6 +498,7 @@ class blockcart extends Module
                 }
             }
         }
+
         return array('cart_htl_data' => $cart_htl_data, 'total_rooms_in_cart' => $total_rooms);
     }
 }

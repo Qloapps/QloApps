@@ -60,14 +60,6 @@
 	</td>
 	</td>
 	<td class="text-center">
-		<span class="product_original_price {if $data.feature_price_diff > 0}room_type_old_price{/if}" {if $data.feature_price_diff < 0} style="display:none;"{/if}>
-        	{convertPriceWithCurrency price=$data.unit_price_without_reduction_tax_incl currency=$currency->id}
-		</span>&nbsp;
-        <span class="room_type_current_price" {if !$data.feature_price_diff}style="display:none;"{/if}>	
-			{convertPriceWithCurrency price=$data.paid_unit_price_tax_incl currency=$currency->id}
-        </span>
-	</td>
-	<td class="text-center">
 		<span class="product_price_show">{convertPriceWithCurrency price=$data.amt_with_qty_tax_incl currency=$currency->id}</span>
 		{if $can_edit}
 		<div class="product_price_edit" style="display:none;">
@@ -75,7 +67,7 @@
 				<div class="fixed-width-xl">
 					<div class="input-group">
 						{if $currency->format % 2}<div class="input-group-addon">{$currency->sign} {l s='tax excl.'}</div>{/if}
-						<input type="text" name="product_price_tax_excl" class="edit_product_price_tax_excl edit_product_price" value="{Tools::ps_round($data.original_unit_price_tax_excl, 2)}"/>
+						<input type="text" name="product_price_tax_excl" class="edit_product_price_tax_excl edit_product_price" value="{Tools::ps_round($data.unit_amt_tax_excl, 2)}"/>
 						{if !($currency->format % 2)}<div class="input-group-addon">{$currency->sign} {l s='tax excl.'}</div>{/if}
 					</div>
 				</div>
@@ -83,7 +75,7 @@
 				<div class="fixed-width-xl">
 					<div class="input-group">
 						{if $currency->format % 2}<div class="input-group-addon">{$currency->sign} {l s='tax incl.'}</div>{/if}
-						<input type="text" name="product_price_tax_incl" class="edit_product_price_tax_incl edit_product_price" value="{Tools::ps_round($data.original_unit_price_tax_incl, 2)}"/>
+						<input type="text" name="product_price_tax_incl" class="edit_product_price_tax_incl edit_product_price" value="{Tools::ps_round($data.unit_amt_tax_incl, 2)}"/>
 						{if !($currency->format % 2)}<div class="input-group-addon">{$currency->sign} {l s='tax incl.'}</div>{/if}
 					</div>
 				</div>
@@ -118,7 +110,7 @@
 		{if $data['stage_name'] == 'Refunded' || $data['stage_name'] == 'Rejected'}
 			<p class="text-center">----</p>
 		{else}
-			<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#mySwappigModal" data-id_order="{$order->id}" data-room_num='{$data.room_num}' data-date_from='{$data.date_from}' data-date_to='{$data.date_to}' data-id_room='{$data.id_room}' data-cust_name='{$data.alloted_cust_name}' data-cust_email='{$data.alloted_cust_email}' data-avail_rm_swap='{$data.avail_rooms_to_swap|@json_encode}' data-avail_rm_realloc='{$data.avail_rooms_to_realloc|@json_encode}'>
+			<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#mySwappigModal" data-id_order="{$order->id}" data-room_num={$data['room_num']} data-date_from={$data['date_from']} data-date_to={$data['date_to']} data-id_room={$data['id_room']} data-cust_name="{$data['alloted_cust_name']}" data-cust_email="{$data['alloted_cust_email']}" data-avail_rm_swap={$data['avail_rooms_to_swap']|@json_encode} data-avail_rm_realloc={$data['avail_rooms_to_realloc']|@json_encode}>
 				{l s='Reallocate Room' mod='hotelreservationsystem'}
 			</button>
 		{/if}
@@ -169,10 +161,3 @@
 		</td>
 	{/if}
 </tr>
-	<style type="text/css">
-		.room_type_old_price {
-			text-decoration: line-through;
-			color:#979797;
-			font-size:12px; 
-		}
-	</style>

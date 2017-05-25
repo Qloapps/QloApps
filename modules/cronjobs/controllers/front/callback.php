@@ -26,9 +26,11 @@
 
 class CronjobsCallbackModuleFrontController extends ModuleFrontController
 {
-    public function postProcess()
-    {
-        $this->module->sendCallback();
-        die;
-    }
+
+	public function postProcess()
+	{
+		$this->module->sendCallback();
+		die;
+	}
+
 }

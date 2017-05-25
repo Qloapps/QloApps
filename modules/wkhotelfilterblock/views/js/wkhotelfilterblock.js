@@ -167,7 +167,6 @@ $(document).ready(function()
             data: data,
             success: function (result)
             {
-				console.log(result);
             	if (result)
             	{
             		$('#category_data_cont').empty();
@@ -186,7 +185,7 @@ $(document).ready(function()
 	            						html += '<div class="col-sm-8">';
 	            							html += '<p class="rm_heading">'+value.name+'</p>';
 	            							html += '<div class="rm_desc">'+value.description;
-		            							html += '&nbsp;<a href="'+value.product_link+'">'+viewMoreTxt+'....';
+		            							html += '&nbsp;<a href="'+value.product_link+'">View More....';
 		            							html += '</a>';
 	            							html += '</div>';
 	            							html += '<p><span class="capa_txt">Max Capacity:</span><span class="capa_data"> '+value.adult+' Adults, '+value.children+' child</span></p>';
@@ -227,25 +226,12 @@ $(document).ready(function()
 	            									});
 	            								html += '</div>';
 	            							}
-											html += '<div class="row margin-lr-0 pull-left rm_price_cont">';
-											console.log(value.price_without_reduction - value.feature_price);
-												if (value.price_without_reduction - value.feature_price > 0) {
-													html += '<span class="pull-left rm_price_val';
-													if (value.price_without_reduction-value.feature_price > 0) {
-														html += ' room_type_old_price';
-													}
-													html += '">';
-														html += currency_prefix+value.price_without_reduction.toFixed(2)+currency_suffix;
-													html += '</span>';
-												}
-												html += '<span class="pull-left rm_price_val">';
-													html += currency_prefix+value.feature_price.toFixed(2)+currency_suffix;
-												html += '</span>';
-												html += '<span class="pull-left rm_price_txt">/Per Night</span>';
+				                            html += '<div class="row margin-lr-0 pull-left rm_price_cont">';
+				            					html += '<span class="pull-left rm_price_val">'+currency_prefix+value.price+currency_suffix+'</span><span class="pull-left rm_price_txt">/Per Night</span>';
 				                            html += '</div>';
+				                            html += ' <a cat_rm_check_in="'+date_from+'" cat_rm_check_out="'+date_to+'" href="" rm_product_id="'+value.id_product+'" cat_rm_book_nm_days="'+num_days+'" class="btn rm_book_btn pull-right">Book Now</a>';
 
-				                            // html += ' <a cat_rm_check_in="'+date_from+'" cat_rm_check_out="'+date_to+'" href="" rm_product_id="'+value.id_product+'" cat_rm_book_nm_days="'+num_days+'" class="btn rm_book_btn pull-right">Book Now</a>';
-				                            html += ' <a cat_rm_check_in="'+date_from+'" cat_rm_check_out="'+date_to+'" href="" rm_product_id="'+value.id_product+'" cat_rm_book_nm_days="'+num_days+'" data-id-product-attribute="0" data-id-product="'+value.id_product+'" class="btn btn-default button button-medium ajax_add_to_cart_button pull-right"><span>'+bookNowTxt+'</span></a>';
+				                            
 
 				                            html += '<div class="rm_qty_cont pull-right clearfix" id="cat_rm_quantity_wanted_'+value.id_product+'">';
 				                            	html += '<span class="qty_txt">Qty.:</span>';

@@ -12,8 +12,8 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
         }
         $ps_img_url = _PS_IMG_DIR_.'hotel_header_image.jpg';
         if ($img_exist = file_exists($ps_img_url)) {
-            $img_url = _PS_IMG_.'hotel_header_image.jpg';
-            $image = "<img class='img-thumbnail img-responsive' style='max-width:200px' src='".$img_url."'>";
+            $img_url = '../../hotelcommerce/img/hotel_header_image.jpg';
+            $image = "<img class='img-thumbnail img-responsive' style='max-width:100px' src='".$img_url."'>";
         }
         $this->fields_options = array(
             'general' => array(
@@ -62,8 +62,8 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
                         'type' => 'text',
                     ),
                     'WK_HTL_CHAIN_NAME' => array(
-                        'title' => $this->l('Hotel Name'),
-                        'hint' => $this->l('Enter Hotel name in case of single hotel or enter your hotels chain name in case of multiple hotels'),
+                        'title' => $this->l('Hotel Chain Name'),
+                        'hint' => $this->l('Name of chain of of your hotels. Enter Hotel name in case of single hotel'),
                         'type' => 'text',
                     ),
                     'WK_HTL_TAG_LINE' => array(
@@ -112,7 +112,7 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
                         'hint' => $this->l('Enter Minimum amount to pay in percentage for booking a room.'),
                         'type' => 'text',
                         'validation' => 'isUnsignedFloat',
-                        'suffix' => $this->l('%'),
+                        'suffix' => $this->l('Percent'),
                     ),
                     'WK_ADVANCED_PAYMENT_INC_TAX' => array(
                         'title' => $this->l('Global Booking Amount Include Tax'),
@@ -135,7 +135,7 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
                 'submit' => array('title' => $this->l('Save')),
             ),
             /*'orderconfirmation' => array(
-                'title' => $this->l('Backorder Setting'),
+                'title' => $this->l('Advanced Payment Global Setting'),
                 'fields' => array(
                     'WK_SHOW_MSG_ON_BO' => array(
                         'title' => $this->l('Show message on backorder'),
@@ -209,7 +209,7 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
                     
                 ),
                 'submit' => array(
-                                'title' => $this->l('Save'),
+                                'title' => $this->l('Save'), 
                                 // 'name' => 'submitGoogleMapSetting'
                                 ),
             ),
@@ -240,7 +240,7 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
                     $this->errors[] = Tools::displayError('Please enter Google API key.');
                 }
             }
-        }
+        } 
 
         parent::postProcess();
     }
