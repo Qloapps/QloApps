@@ -77,23 +77,10 @@ $(document).ready(function() {
     $("#check_out_time").datepicker({
         showOtherMonths: true,
         dateFormat: 'dd-mm-yy',
+        minDate: 0,
         //for calender Css
         beforeShowDay: function (date) {
             return highlightDateBorder($("#check_out_time").val(), date);
-        },
-        beforeShow: function (input, instance) {
-            var date_to = $('#check_in_time').val();
-            if (typeof date_to != 'undefined' && date_to != '') {
-                var date_format = date_to.split("-");
-                var selectedDate = new Date($.datepicker.formatDate('yy-mm-dd', new Date(date_format[2], date_format[1] - 1, date_format[0])));
-                selectedDate.setDate(selectedDate.getDate()+1);
-                $("#check_out_time").datepicker("option", "minDate", selectedDate);
-            } else {
-                var date_format = new Date();
-                var selectedDate = new Date($.datepicker.formatDate('yy-mm-dd', new Date()));
-                selectedDate.setDate(selectedDate.getDate()+1);
-                $("#check_out_time").datepicker("option", "minDate", selectedDate);
-            }
         },
         onSelect: function(selectedDate) {
             var date_format = selectedDate.split("-");
@@ -116,14 +103,14 @@ $(document).ready(function() {
     }
 
     $('body').on('click', function(event) {
-        if ($('.location_search_results_ul').is(':visible') && event.target.className != "search_result_li" && event.target.id != "hotel_location") {
+        if ($('.location_search_results_ul').is(':visible') && event.target.className != "search_result_li" && event.target.id != "hotel_location")
             $('.location_search_results_ul').empty().hide();
-        }
     });
 
     $(document).on('keyup', "#hotel_location", function(event) {
         if (($('.location_search_results_ul').is(':visible')) && (event.which == 40 || event.which == 38)) {
             $(this).blur();
+
             if (event.which == 40)
                 $(".location_search_results_ul li:first").focus();
             else if (event.which == 38)

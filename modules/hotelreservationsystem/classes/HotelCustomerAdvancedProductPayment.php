@@ -8,7 +8,6 @@ class HotelCustomerAdvancedProductPayment extends ObjectModel
     public $id_room;
     public $id_hotel;
     public $id_product;
-    public $quantity;
     public $id_guest;
     public $id_customer;
     public $id_currency;
@@ -29,7 +28,6 @@ class HotelCustomerAdvancedProductPayment extends ObjectModel
             'id_room' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
             'id_hotel' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
             'id_product' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
-            'quantity' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
             'id_guest' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
             'id_customer' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
             'id_currency' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
@@ -53,9 +51,5 @@ class HotelCustomerAdvancedProductPayment extends ObjectModel
     {
         return Db::getInstance()->getRow('SELECT * FROM `'._DB_PREFIX_.'htl_customer_adv_product_payment` WHERE `id_order`='.(int)$id_order.' AND `id_product`='.(int)$id_product);
     }
-
-    public function getRoomTypeAdvancePaymentMaountByDuration($id_order, $id_product, $date_from, $date_to)
-    {
-        return Db::getInstance()->getValue('SELECT SUM(`advance_payment_amount`) FROM `'._DB_PREFIX_.'htl_customer_adv_product_payment` WHERE `id_order`='.(int)$id_order.' AND `id_product`='.(int)$id_product.' AND `date_from`=\''.pSQL($date_from).'\' AND `date_to`=\''.pSQL($date_to).'\'');
-    }
+    
 }

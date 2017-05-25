@@ -96,7 +96,6 @@
 			</div>
 		</div>
 		<div class="col-md-12 col-lg-2">
-			{$hookDashboardZoneThree}
 			<section class="dash_news panel">
 				<h3><i class="icon-rss"></i> {l s='PrestaShop News'}</h3>
 				<div class="dash_news_content"></div>

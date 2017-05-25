@@ -1,0 +1,284 @@
+[08-Oct-2015 19:25:47 Asia/Kolkata] PHP Notice:  Trying to get property of non-object in /home/rjain/public_html/ps-hotel-reservation-system/modules/blockcart/checkroomavailabilityajaxprocess.php on line 31
+[08-Oct-2015 19:25:47 Asia/Kolkata] PHP Fatal error:  Uncaught You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'AND `id_product` = 8 AND `date_from` = '2015-10-08' AND `date_to` = '2015-10-09'' at line 1<br /><br /><pre>SELECT Count(`id`) FROM `ps_htl_cart_booking_data` WHERE `id_cart` =  AND `id_product` = 8 AND `date_from` = '2015-10-08' AND `date_to` = '2015-10-09' LIMIT 1</pre>
+  thrown in /home/rjain/public_html/ps-hotel-reservation-system/classes/db/Db.php on line 765
+[08-Oct-2015 19:25:49 Asia/Kolkata] PHP Notice:  Trying to get property of non-object in /home/rjain/public_html/ps-hotel-reservation-system/modules/blockcart/checkroomavailabilityajaxprocess.php on line 31
+[08-Oct-2015 19:25:49 Asia/Kolkata] PHP Fatal error:  Uncaught You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'AND `id_product` = 8 AND `date_from` = '2015-10-08' AND `date_to` = '2015-10-09'' at line 1<br /><br /><pre>SELECT Count(`id`) FROM `ps_htl_cart_booking_data` WHERE `id_cart` =  AND `id_product` = 8 AND `date_from` = '2015-10-08' AND `date_to` = '2015-10-09' LIMIT 1</pre>
+  thrown in /home/rjain/public_html/ps-hotel-reservation-system/classes/db/Db.php on line 765
+[08-Oct-2015 19:25:51 Asia/Kolkata] PHP Notice:  Trying to get property of non-object in /home/rjain/public_html/ps-hotel-reservation-system/modules/blockcart/checkroomavailabilityajaxprocess.php on line 31
+[08-Oct-2015 19:25:51 Asia/Kolkata] PHP Fatal error:  Uncaught You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'AND `id_product` = 8 AND `date_from` = '2015-10-08' AND `date_to` = '2015-10-09'' at line 1<br /><br /><pre>SELECT Count(`id`) FROM `ps_htl_cart_booking_data` WHERE `id_cart` =  AND `id_product` = 8 AND `date_from` = '2015-10-08' AND `date_to` = '2015-10-09' LIMIT 1</pre>
+  thrown in /home/rjain/public_html/ps-hotel-reservation-system/classes/db/Db.php on line 765
+[09-Oct-2015 12:29:00 Asia/Kolkata] PHP Notice:  Trying to get property of non-object in /home/rjain/public_html/ps-hotel-reservation-system/modules/blockcart/checkroomavailabilityajaxprocess.php on line 31
+[09-Oct-2015 12:29:00 Asia/Kolkata] PHP Fatal error:  Uncaught You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'AND `id_product` = 8 AND `date_from` = '2015-10-09' AND `date_to` = '2015-10-10'' at line 1<br /><br /><pre>SELECT Count(`id`) FROM `ps_htl_cart_booking_data` WHERE `id_cart` =  AND `id_product` = 8 AND `date_from` = '2015-10-09' AND `date_to` = '2015-10-10' LIMIT 1</pre>
+  thrown in /home/rjain/public_html/ps-hotel-reservation-system/classes/db/Db.php on line 765
+[09-Oct-2015 12:29:11 Asia/Kolkata] PHP Notice:  Trying to get property of non-object in /home/rjain/public_html/ps-hotel-reservation-system/modules/blockcart/checkroomavailabilityajaxprocess.php on line 31
+[09-Oct-2015 12:29:11 Asia/Kolkata] PHP Fatal error:  Uncaught You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'AND `id_product` = 10 AND `date_from` = '2015-10-09' AND `date_to` = '2015-10-10' at line 1<br /><br /><pre>SELECT Count(`id`) FROM `ps_htl_cart_booking_data` WHERE `id_cart` =  AND `id_product` = 10 AND `date_from` = '2015-10-09' AND `date_to` = '2015-10-10' LIMIT 1</pre>
+  thrown in /home/rjain/public_html/ps-hotel-reservation-system/classes/db/Db.php on line 765
+[09-Oct-2015 12:29:42 Asia/Kolkata] PHP Notice:  Trying to get property of non-object in /home/rjain/public_html/ps-hotel-reservation-system/modules/blockcart/checkroomavailabilityajaxprocess.php on line 31
+[09-Oct-2015 12:29:42 Asia/Kolkata] PHP Fatal error:  Uncaught You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'AND `id_product` = 10 AND `date_from` = '2016-05-13' AND `date_to` = '2016-05-14' at line 1<br /><br /><pre>SELECT Count(`id`) FROM `ps_htl_cart_booking_data` WHERE `id_cart` =  AND `id_product` = 10 AND `date_from` = '2016-05-13' AND `date_to` = '2016-05-14' LIMIT 1</pre>
+  thrown in /home/rjain/public_html/ps-hotel-reservation-system/classes/db/Db.php on line 765
+[09-Oct-2015 15:45:59 Asia/Kolkata] PHP Fatal error:  Uncaught Unknown column 'undefined' in 'where clause'<br /><br /><pre>SELECT Count(`id`) FROM `ps_htl_cart_booking_data` WHERE `id_cart` = undefined AND `id_product` = 10 AND `date_from` = '2015-10-09' AND `date_to` = '2015-10-10' LIMIT 1</pre>
+  thrown in /home/rjain/public_html/ps-hotel-reservation-system/classes/db/Db.php on line 765
+[09-Oct-2015 15:56:46 Asia/Kolkata] PHP Fatal error:  Uncaught Unknown column 'undefined' in 'where clause'<br /><br /><pre>SELECT Count(`id`) FROM `ps_htl_cart_booking_data` WHERE `id_cart` = undefined AND `id_product` = 9 AND `date_from` = '2015-10-10' AND `date_to` = '2015-10-15' LIMIT 1</pre>
+  thrown in /home/rjain/public_html/ps-hotel-reservation-system/classes/db/Db.php on line 765
+[15-Oct-2015 19:38:15 Asia/Kolkata] PHP Fatal error:  Uncaught exception 'PrestaShopException' with message 'Property HotelCartBookingData->date_from is not valid' in /home/rjain/public_html/ps-hotel-reservation-system/classes/ObjectModel.php:909
+Stack trace:
+#0 /home/rjain/public_html/ps-hotel-reservation-system/classes/ObjectModel.php(246): ObjectModelCore->validateFields()
+#1 /home/rjain/public_html/ps-hotel-reservation-system/classes/ObjectModel.php(487): ObjectModelCore->getFields()
+#2 /home/rjain/public_html/ps-hotel-reservation-system/classes/ObjectModel.php(445): ObjectModelCore->add(true, false)
+#3 /home/rjain/public_html/ps-hotel-reservation-system/modules/blockcart/checkroomavailabilityajaxprocess.php(61): ObjectModelCore->save()
+#4 {main}
+  thrown in /home/rjain/public_html/ps-hotel-reservation-system/classes/ObjectModel.php on line 909
+[15-Oct-2015 19:39:58 Asia/Kolkata] PHP Fatal error:  Uncaught exception 'PrestaShopException' with message 'Property HotelCartBookingData->date_from is not valid' in /home/rjain/public_html/ps-hotel-reservation-system/classes/ObjectModel.php:909
+Stack trace:
+#0 /home/rjain/public_html/ps-hotel-reservation-system/classes/ObjectModel.php(246): ObjectModelCore->validateFields()
+#1 /home/rjain/public_html/ps-hotel-reservation-system/classes/ObjectModel.php(487): ObjectModelCore->getFields()
+#2 /home/rjain/public_html/ps-hotel-reservation-system/classes/ObjectModel.php(445): ObjectModelCore->add(true, false)
+#3 /home/rjain/public_html/ps-hotel-reservation-system/modules/blockcart/checkroomavailabilityajaxprocess.php(61): ObjectModelCore->save()
+#4 {main}
+  thrown in /home/rjain/public_html/ps-hotel-reservation-system/classes/ObjectModel.php on line 909
+[15-Oct-2015 19:40:02 Asia/Kolkata] PHP Fatal error:  Uncaught exception 'PrestaShopException' with message 'Property HotelCartBookingData->date_from is not valid' in /home/rjain/public_html/ps-hotel-reservation-system/classes/ObjectModel.php:909
+Stack trace:
+#0 /home/rjain/public_html/ps-hotel-reservation-system/classes/ObjectModel.php(246): ObjectModelCore->validateFields()
+#1 /home/rjain/public_html/ps-hotel-reservation-system/classes/ObjectModel.php(487): ObjectModelCore->getFields()
+#2 /home/rjain/public_html/ps-hotel-reservation-system/classes/ObjectModel.php(445): ObjectModelCore->add(true, false)
+#3 /home/rjain/public_html/ps-hotel-reservation-system/modules/blockcart/checkroomavailabilityajaxprocess.php(61): ObjectModelCore->save()
+#4 {main}
+  thrown in /home/rjain/public_html/ps-hotel-reservation-system/classes/ObjectModel.php on line 909
+[15-Oct-2015 19:40:06 Asia/Kolkata] PHP Fatal error:  Uncaught exception 'PrestaShopException' with message 'Property HotelCartBookingData->date_from is not valid' in /home/rjain/public_html/ps-hotel-reservation-system/classes/ObjectModel.php:909
+Stack trace:
+#0 /home/rjain/public_html/ps-hotel-reservation-system/classes/ObjectModel.php(246): ObjectModelCore->validateFields()
+#1 /home/rjain/public_html/ps-hotel-reservation-system/classes/ObjectModel.php(487): ObjectModelCore->getFields()
+#2 /home/rjain/public_html/ps-hotel-reservation-system/classes/ObjectModel.php(445): ObjectModelCore->add(true, false)
+#3 /home/rjain/public_html/ps-hotel-reservation-system/modules/blockcart/checkroomavailabilityajaxprocess.php(61): ObjectModelCore->save()
+#4 {main}
+  thrown in /home/rjain/public_html/ps-hotel-reservation-system/classes/ObjectModel.php on line 909
+[15-Oct-2015 19:57:50 Asia/Kolkata] PHP Fatal error:  Uncaught You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'd code</b> on line <b>143</b><br />
+<br />
+<b>Notice</b>:  Trying to get propert' at line 1<br /><br /><pre>SELECT Count(`id`) FROM `ps_htl_cart_booking_data` WHERE `id_cart` = 11 AND `id_product` = 8 AND `date_from` = '2015-10-15' AND `date_to` = '<br />
+<b>Notice</b>:  Undefined index: booking_to_from in <b>/home/rjain/public_html/ps-hotel-reservation-system/tools/smarty/sysplugins/smarty_internal_templatebase.php(171) : eval()'d code</b> on line <b>143</b><br />
+<br />
+<b>Notice</b>:  Trying to get property of non-object in <b>/home/rjain/public_html/ps-hotel-reservation-system/tools/smarty/sysplugins/smarty_internal_templatebase.php(171) : eval()'d code</b> on line <b>143</b><br />
+' LIMIT 1</pre>
+  thrown in /home/rjain/public_html/ps-hotel-reservation-system/classes/db/Db.php on line 791
+[15-Oct-2015 19:58:13 Asia/Kolkata] PHP Fatal error:  Uncaught exception 'PrestaShopException' with message 'Property HotelCartBookingData->date_to is not valid' in /home/rjain/public_html/ps-hotel-reservation-system/classes/ObjectModel.php:909
+Stack trace:
+#0 /home/rjain/public_html/ps-hotel-reservation-system/classes/ObjectModel.php(246): ObjectModelCore->validateFields()
+#1 /home/rjain/public_html/ps-hotel-reservation-system/classes/ObjectModel.php(487): ObjectModelCore->getFields()
+#2 /home/rjain/public_html/ps-hotel-reservation-system/classes/ObjectModel.php(445): ObjectModelCore->add(true, false)
+#3 /home/rjain/public_html/ps-hotel-reservation-system/modules/blockcart/checkroomavailabilityajaxprocess.php(61): ObjectModelCore->save()
+#4 {main}
+  thrown in /home/rjain/public_html/ps-hotel-reservation-system/classes/ObjectModel.php on line 909
+[15-Oct-2015 19:58:18 Asia/Kolkata] PHP Fatal error:  Uncaught exception 'PrestaShopException' with message 'Property HotelCartBookingData->date_to is not valid' in /home/rjain/public_html/ps-hotel-reservation-system/classes/ObjectModel.php:909
+Stack trace:
+#0 /home/rjain/public_html/ps-hotel-reservation-system/classes/ObjectModel.php(246): ObjectModelCore->validateFields()
+#1 /home/rjain/public_html/ps-hotel-reservation-system/classes/ObjectModel.php(487): ObjectModelCore->getFields()
+#2 /home/rjain/public_html/ps-hotel-reservation-system/classes/ObjectModel.php(445): ObjectModelCore->add(true, false)
+#3 /home/rjain/public_html/ps-hotel-reservation-system/modules/blockcart/checkroomavailabilityajaxprocess.php(61): ObjectModelCore->save()
+#4 {main}
+  thrown in /home/rjain/public_html/ps-hotel-reservation-system/classes/ObjectModel.php on line 909
+[15-Oct-2015 19:59:08 Asia/Kolkata] PHP Fatal error:  Uncaught exception 'PrestaShopException' with message 'Property HotelCartBookingData->date_from is not valid' in /home/rjain/public_html/ps-hotel-reservation-system/classes/ObjectModel.php:909
+Stack trace:
+#0 /home/rjain/public_html/ps-hotel-reservation-system/classes/ObjectModel.php(246): ObjectModelCore->validateFields()
+#1 /home/rjain/public_html/ps-hotel-reservation-system/classes/ObjectModel.php(487): ObjectModelCore->getFields()
+#2 /home/rjain/public_html/ps-hotel-reservation-system/classes/ObjectModel.php(445): ObjectModelCore->add(true, false)
+#3 /home/rjain/public_html/ps-hotel-reservation-system/modules/blockcart/checkroomavailabilityajaxprocess.php(61): ObjectModelCore->save()
+#4 {main}
+  thrown in /home/rjain/public_html/ps-hotel-reservation-system/classes/ObjectModel.php on line 909
+[15-Oct-2015 19:59:09 Asia/Kolkata] PHP Fatal error:  Uncaught exception 'PrestaShopException' with message 'Property HotelCartBookingData->date_from is not valid' in /home/rjain/public_html/ps-hotel-reservation-system/classes/ObjectModel.php:909
+Stack trace:
+#0 /home/rjain/public_html/ps-hotel-reservation-system/classes/ObjectModel.php(246): ObjectModelCore->validateFields()
+#1 /home/rjain/public_html/ps-hotel-reservation-system/classes/ObjectModel.php(487): ObjectModelCore->getFields()
+#2 /home/rjain/public_html/ps-hotel-reservation-system/classes/ObjectModel.php(445): ObjectModelCore->add(true, false)
+#3 /home/rjain/public_html/ps-hotel-reservation-system/modules/blockcart/checkroomavailabilityajaxprocess.php(61): ObjectModelCore->save()
+#4 {main}
+  thrown in /home/rjain/public_html/ps-hotel-reservation-system/classes/ObjectModel.php on line 909
+[15-Oct-2015 19:59:20 Asia/Kolkata] PHP Fatal error:  Uncaught exception 'PrestaShopException' with message 'Property HotelCartBookingData->date_from is not valid' in /home/rjain/public_html/ps-hotel-reservation-system/classes/ObjectModel.php:909
+Stack trace:
+#0 /home/rjain/public_html/ps-hotel-reservation-system/classes/ObjectModel.php(246): ObjectModelCore->validateFields()
+#1 /home/rjain/public_html/ps-hotel-reservation-system/classes/ObjectModel.php(487): ObjectModelCore->getFields()
+#2 /home/rjain/public_html/ps-hotel-reservation-system/classes/ObjectModel.php(445): ObjectModelCore->add(true, false)
+#3 /home/rjain/public_html/ps-hotel-reservation-system/modules/blockcart/checkroomavailabilityajaxprocess.php(61): ObjectModelCore->save()
+#4 {main}
+  thrown in /home/rjain/public_html/ps-hotel-reservation-system/classes/ObjectModel.php on line 909
+[15-Oct-2015 19:59:48 Asia/Kolkata] PHP Fatal error:  Uncaught exception 'PrestaShopException' with message 'Property HotelCartBookingData->date_from is not valid' in /home/rjain/public_html/ps-hotel-reservation-system/classes/ObjectModel.php:909
+Stack trace:
+#0 /home/rjain/public_html/ps-hotel-reservation-system/classes/ObjectModel.php(246): ObjectModelCore->validateFields()
+#1 /home/rjain/public_html/ps-hotel-reservation-system/classes/ObjectModel.php(487): ObjectModelCore->getFields()
+#2 /home/rjain/public_html/ps-hotel-reservation-system/classes/ObjectModel.php(445): ObjectModelCore->add(true, false)
+#3 /home/rjain/public_html/ps-hotel-reservation-system/modules/blockcart/checkroomavailabilityajaxprocess.php(61): ObjectModelCore->save()
+#4 {main}
+  thrown in /home/rjain/public_html/ps-hotel-reservation-system/classes/ObjectModel.php on line 909
+[17-Nov-2015 03:19:30 US/Eastern] PHP Fatal error:  Uncaught exception 'PrestaShopException' with message 'Property HotelCartBookingData->id_currency is empty' in /home/sumit/public_html/html/ps-hotel-reservation-system/classes/ObjectModel.php:909
+Stack trace:
+#0 /home/sumit/public_html/html/ps-hotel-reservation-system/classes/ObjectModel.php(246): ObjectModelCore->validateFields()
+#1 /home/sumit/public_html/html/ps-hotel-reservation-system/classes/ObjectModel.php(487): ObjectModelCore->getFields()
+#2 /home/sumit/public_html/html/ps-hotel-reservation-system/classes/ObjectModel.php(445): ObjectModelCore->add(true, false)
+#3 /home/sumit/public_html/html/ps-hotel-reservation-system/modules/blockcart/checkroomavailabilityajaxprocess.php(61): ObjectModelCore->save()
+#4 {main}
+  thrown in /home/sumit/public_html/html/ps-hotel-reservation-system/classes/ObjectModel.php on line 909
+[17-Nov-2015 03:19:46 US/Eastern] PHP Fatal error:  Uncaught exception 'PrestaShopException' with message 'Property HotelCartBookingData->id_currency is empty' in /home/sumit/public_html/html/ps-hotel-reservation-system/classes/ObjectModel.php:909
+Stack trace:
+#0 /home/sumit/public_html/html/ps-hotel-reservation-system/classes/ObjectModel.php(246): ObjectModelCore->validateFields()
+#1 /home/sumit/public_html/html/ps-hotel-reservation-system/classes/ObjectModel.php(487): ObjectModelCore->getFields()
+#2 /home/sumit/public_html/html/ps-hotel-reservation-system/classes/ObjectModel.php(445): ObjectModelCore->add(true, false)
+#3 /home/sumit/public_html/html/ps-hotel-reservation-system/modules/blockcart/checkroomavailabilityajaxprocess.php(61): ObjectModelCore->save()
+#4 {main}
+  thrown in /home/sumit/public_html/html/ps-hotel-reservation-system/classes/ObjectModel.php on line 909
+[17-Nov-2015 03:21:15 US/Eastern] PHP Fatal error:  Uncaught exception 'PrestaShopException' with message 'Property HotelCartBookingData->id_currency is empty' in /home/sumit/public_html/html/ps-hotel-reservation-system/classes/ObjectModel.php:909
+Stack trace:
+#0 /home/sumit/public_html/html/ps-hotel-reservation-system/classes/ObjectModel.php(246): ObjectModelCore->validateFields()
+#1 /home/sumit/public_html/html/ps-hotel-reservation-system/classes/ObjectModel.php(487): ObjectModelCore->getFields()
+#2 /home/sumit/public_html/html/ps-hotel-reservation-system/classes/ObjectModel.php(445): ObjectModelCore->add(true, false)
+#3 /home/sumit/public_html/html/ps-hotel-reservation-system/modules/blockcart/checkroomavailabilityajaxprocess.php(61): ObjectModelCore->save()
+#4 {main}
+  thrown in /home/sumit/public_html/html/ps-hotel-reservation-system/classes/ObjectModel.php on line 909
+[17-Nov-2015 03:21:54 US/Eastern] PHP Fatal error:  Uncaught exception 'PrestaShopException' with message 'Property HotelCartBookingData->id_currency is empty' in /home/sumit/public_html/html/ps-hotel-reservation-system/classes/ObjectModel.php:909
+Stack trace:
+#0 /home/sumit/public_html/html/ps-hotel-reservation-system/classes/ObjectModel.php(246): ObjectModelCore->validateFields()
+#1 /home/sumit/public_html/html/ps-hotel-reservation-system/classes/ObjectModel.php(487): ObjectModelCore->getFields()
+#2 /home/sumit/public_html/html/ps-hotel-reservation-system/classes/ObjectModel.php(445): ObjectModelCore->add(true, false)
+#3 /home/sumit/public_html/html/ps-hotel-reservation-system/modules/blockcart/checkroomavailabilityajaxprocess.php(61): ObjectModelCore->save()
+#4 {main}
+  thrown in /home/sumit/public_html/html/ps-hotel-reservation-system/classes/ObjectModel.php on line 909
+[17-Nov-2015 16:28:29 Asia/Calcutta] PHP Parse error:  syntax error, unexpected ';' in /home/rjain/public_html/hotel-reservation-system/modules/blockcart/checkroomavailabilityajaxprocess.php on line 62
+[17-Nov-2015 16:28:51 Asia/Calcutta] PHP Parse error:  syntax error, unexpected ';' in /home/rjain/public_html/hotel-reservation-system/modules/blockcart/checkroomavailabilityajaxprocess.php on line 62
+[03-Dec-2015 16:41:09 Asia/Calcutta] PHP Parse error:  syntax error, unexpected end of file in /home/rjain/public_html/hotel-reservation-system/modules/blockcart/checkroomavailabilityajaxprocess.php on line 152
+[03-Dec-2015 23:27:36 Asia/Kolkata] PHP Fatal error:  Uncaught exception 'PrestaShopException' with message 'Property HotelCartBookingData->date_from is not valid' in /home/rjain/public_html/hotel-reservation-system/classes/ObjectModel.php:909
+Stack trace:
+#0 /home/rjain/public_html/hotel-reservation-system/classes/ObjectModel.php(246): ObjectModelCore->validateFields()
+#1 /home/rjain/public_html/hotel-reservation-system/classes/ObjectModel.php(487): ObjectModelCore->getFields()
+#2 /home/rjain/public_html/hotel-reservation-system/classes/ObjectModel.php(445): ObjectModelCore->add(true, false)
+#3 /home/rjain/public_html/hotel-reservation-system/modules/blockcart/checkroomavailabilityajaxprocess.php(65): ObjectModelCore->save()
+#4 {main}
+  thrown in /home/rjain/public_html/hotel-reservation-system/classes/ObjectModel.php on line 909
+[03-Dec-2015 23:35:21 Asia/Kolkata] PHP Fatal error:  Uncaught exception 'PrestaShopException' with message 'Property HotelCartBookingData->date_from is not valid' in /home/rjain/public_html/hotel-reservation-system/classes/ObjectModel.php:909
+Stack trace:
+#0 /home/rjain/public_html/hotel-reservation-system/classes/ObjectModel.php(246): ObjectModelCore->validateFields()
+#1 /home/rjain/public_html/hotel-reservation-system/classes/ObjectModel.php(487): ObjectModelCore->getFields()
+#2 /home/rjain/public_html/hotel-reservation-system/classes/ObjectModel.php(445): ObjectModelCore->add(true, false)
+#3 /home/rjain/public_html/hotel-reservation-system/modules/blockcart/checkroomavailabilityajaxprocess.php(65): ObjectModelCore->save()
+#4 {main}
+  thrown in /home/rjain/public_html/hotel-reservation-system/classes/ObjectModel.php on line 909
+[03-Dec-2015 23:37:04 Asia/Kolkata] PHP Fatal error:  Uncaught exception 'PrestaShopException' with message 'Property HotelCartBookingData->date_from is not valid' in /home/rjain/public_html/hotel-reservation-system/classes/ObjectModel.php:909
+Stack trace:
+#0 /home/rjain/public_html/hotel-reservation-system/classes/ObjectModel.php(246): ObjectModelCore->validateFields()
+#1 /home/rjain/public_html/hotel-reservation-system/classes/ObjectModel.php(487): ObjectModelCore->getFields()
+#2 /home/rjain/public_html/hotel-reservation-system/classes/ObjectModel.php(445): ObjectModelCore->add(true, false)
+#3 /home/rjain/public_html/hotel-reservation-system/modules/blockcart/checkroomavailabilityajaxprocess.php(65): ObjectModelCore->save()
+#4 {main}
+  thrown in /home/rjain/public_html/hotel-reservation-system/classes/ObjectModel.php on line 909
+[03-Dec-2015 23:37:35 Asia/Kolkata] PHP Fatal error:  Uncaught exception 'PrestaShopException' with message 'Property HotelCartBookingData->date_from is not valid' in /home/rjain/public_html/hotel-reservation-system/classes/ObjectModel.php:909
+Stack trace:
+#0 /home/rjain/public_html/hotel-reservation-system/classes/ObjectModel.php(246): ObjectModelCore->validateFields()
+#1 /home/rjain/public_html/hotel-reservation-system/classes/ObjectModel.php(487): ObjectModelCore->getFields()
+#2 /home/rjain/public_html/hotel-reservation-system/classes/ObjectModel.php(445): ObjectModelCore->add(true, false)
+#3 /home/rjain/public_html/hotel-reservation-system/modules/blockcart/checkroomavailabilityajaxprocess.php(65): ObjectModelCore->save()
+#4 {main}
+  thrown in /home/rjain/public_html/hotel-reservation-system/classes/ObjectModel.php on line 909
+[03-Dec-2015 23:37:58 Asia/Kolkata] PHP Fatal error:  Uncaught exception 'PrestaShopException' with message 'Property HotelCartBookingData->date_from is not valid' in /home/rjain/public_html/hotel-reservation-system/classes/ObjectModel.php:909
+Stack trace:
+#0 /home/rjain/public_html/hotel-reservation-system/classes/ObjectModel.php(246): ObjectModelCore->validateFields()
+#1 /home/rjain/public_html/hotel-reservation-system/classes/ObjectModel.php(487): ObjectModelCore->getFields()
+#2 /home/rjain/public_html/hotel-reservation-system/classes/ObjectModel.php(445): ObjectModelCore->add(true, false)
+#3 /home/rjain/public_html/hotel-reservation-system/modules/blockcart/checkroomavailabilityajaxprocess.php(65): ObjectModelCore->save()
+#4 {main}
+  thrown in /home/rjain/public_html/hotel-reservation-system/classes/ObjectModel.php on line 909
+[03-Dec-2015 23:38:56 Asia/Kolkata] PHP Fatal error:  Uncaught exception 'PrestaShopException' with message 'Property HotelCartBookingData->date_from is not valid' in /home/rjain/public_html/hotel-reservation-system/classes/ObjectModel.php:909
+Stack trace:
+#0 /home/rjain/public_html/hotel-reservation-system/classes/ObjectModel.php(246): ObjectModelCore->validateFields()
+#1 /home/rjain/public_html/hotel-reservation-system/classes/ObjectModel.php(487): ObjectModelCore->getFields()
+#2 /home/rjain/public_html/hotel-reservation-system/classes/ObjectModel.php(445): ObjectModelCore->add(true, false)
+#3 /home/rjain/public_html/hotel-reservation-system/modules/blockcart/checkroomavailabilityajaxprocess.php(65): ObjectModelCore->save()
+#4 {main}
+  thrown in /home/rjain/public_html/hotel-reservation-system/classes/ObjectModel.php on line 909
+[03-Dec-2015 23:40:25 Asia/Kolkata] PHP Fatal error:  Uncaught exception 'PrestaShopException' with message 'Property HotelCartBookingData->date_from is not valid' in /home/rjain/public_html/hotel-reservation-system/classes/ObjectModel.php:909
+Stack trace:
+#0 /home/rjain/public_html/hotel-reservation-system/classes/ObjectModel.php(246): ObjectModelCore->validateFields()
+#1 /home/rjain/public_html/hotel-reservation-system/classes/ObjectModel.php(487): ObjectModelCore->getFields()
+#2 /home/rjain/public_html/hotel-reservation-system/classes/ObjectModel.php(445): ObjectModelCore->add(true, false)
+#3 /home/rjain/public_html/hotel-reservation-system/modules/blockcart/checkroomavailabilityajaxprocess.php(65): ObjectModelCore->save()
+#4 {main}
+  thrown in /home/rjain/public_html/hotel-reservation-system/classes/ObjectModel.php on line 909
+[03-Dec-2015 23:45:07 Asia/Kolkata] PHP Fatal error:  Uncaught exception 'PrestaShopException' with message 'Property HotelCartBookingData->date_from is not valid' in /home/rjain/public_html/hotel-reservation-system/classes/ObjectModel.php:909
+Stack trace:
+#0 /home/rjain/public_html/hotel-reservation-system/classes/ObjectModel.php(246): ObjectModelCore->validateFields()
+#1 /home/rjain/public_html/hotel-reservation-system/classes/ObjectModel.php(487): ObjectModelCore->getFields()
+#2 /home/rjain/public_html/hotel-reservation-system/classes/ObjectModel.php(445): ObjectModelCore->add(true, false)
+#3 /home/rjain/public_html/hotel-reservation-system/modules/blockcart/checkroomavailabilityajaxprocess.php(65): ObjectModelCore->save()
+#4 {main}
+  thrown in /home/rjain/public_html/hotel-reservation-system/classes/ObjectModel.php on line 909
+[03-Dec-2015 23:47:47 Asia/Kolkata] PHP Fatal error:  Uncaught exception 'PrestaShopException' with message 'Property HotelCartBookingData->date_from is not valid' in /home/rjain/public_html/hotel-reservation-system/classes/ObjectModel.php:909
+Stack trace:
+#0 /home/rjain/public_html/hotel-reservation-system/classes/ObjectModel.php(246): ObjectModelCore->validateFields()
+#1 /home/rjain/public_html/hotel-reservation-system/classes/ObjectModel.php(487): ObjectModelCore->getFields()
+#2 /home/rjain/public_html/hotel-reservation-system/classes/ObjectModel.php(445): ObjectModelCore->add(true, false)
+#3 /home/rjain/public_html/hotel-reservation-system/modules/blockcart/checkroomavailabilityajaxprocess.php(65): ObjectModelCore->save()
+#4 {main}
+  thrown in /home/rjain/public_html/hotel-reservation-system/classes/ObjectModel.php on line 909
+[03-Dec-2015 23:48:21 Asia/Kolkata] PHP Fatal error:  Uncaught exception 'PrestaShopException' with message 'Property HotelCartBookingData->date_from is not valid' in /home/rjain/public_html/hotel-reservation-system/classes/ObjectModel.php:909
+Stack trace:
+#0 /home/rjain/public_html/hotel-reservation-system/classes/ObjectModel.php(246): ObjectModelCore->validateFields()
+#1 /home/rjain/public_html/hotel-reservation-system/classes/ObjectModel.php(487): ObjectModelCore->getFields()
+#2 /home/rjain/public_html/hotel-reservation-system/classes/ObjectModel.php(445): ObjectModelCore->add(true, false)
+#3 /home/rjain/public_html/hotel-reservation-system/modules/blockcart/checkroomavailabilityajaxprocess.php(65): ObjectModelCore->save()
+#4 {main}
+  thrown in /home/rjain/public_html/hotel-reservation-system/classes/ObjectModel.php on line 909
+[04-Dec-2015 11:43:49 Asia/Kolkata] PHP Fatal error:  Uncaught exception 'PrestaShopException' with message 'Property HotelCartBookingData->date_from is not valid' in /home/rjain/public_html/hotel-reservation-system/classes/ObjectModel.php:909
+Stack trace:
+#0 /home/rjain/public_html/hotel-reservation-system/classes/ObjectModel.php(246): ObjectModelCore->validateFields()
+#1 /home/rjain/public_html/hotel-reservation-system/classes/ObjectModel.php(487): ObjectModelCore->getFields()
+#2 /home/rjain/public_html/hotel-reservation-system/classes/ObjectModel.php(445): ObjectModelCore->add(true, false)
+#3 /home/rjain/public_html/hotel-reservation-system/modules/blockcart/checkroomavailabilityajaxprocess.php(65): ObjectModelCore->save()
+#4 {main}
+  thrown in /home/rjain/public_html/hotel-reservation-system/classes/ObjectModel.php on line 909
+[04-Dec-2015 11:46:49 Asia/Kolkata] PHP Fatal error:  Uncaught exception 'PrestaShopException' with message 'Property HotelCartBookingData->date_from is not valid' in /home/rjain/public_html/hotel-reservation-system/classes/ObjectModel.php:909
+Stack trace:
+#0 /home/rjain/public_html/hotel-reservation-system/classes/ObjectModel.php(246): ObjectModelCore->validateFields()
+#1 /home/rjain/public_html/hotel-reservation-system/classes/ObjectModel.php(487): ObjectModelCore->getFields()
+#2 /home/rjain/public_html/hotel-reservation-system/classes/ObjectModel.php(445): ObjectModelCore->add(true, false)
+#3 /home/rjain/public_html/hotel-reservation-system/modules/blockcart/checkroomavailabilityajaxprocess.php(65): ObjectModelCore->save()
+#4 {main}
+  thrown in /home/rjain/public_html/hotel-reservation-system/classes/ObjectModel.php on line 909
+[04-Dec-2015 11:53:57 Asia/Kolkata] PHP Fatal error:  Uncaught exception 'PrestaShopException' with message 'Property HotelCartBookingData->date_from is not valid' in /home/rjain/public_html/hotel-reservation-system/classes/ObjectModel.php:909
+Stack trace:
+#0 /home/rjain/public_html/hotel-reservation-system/classes/ObjectModel.php(246): ObjectModelCore->validateFields()
+#1 /home/rjain/public_html/hotel-reservation-system/classes/ObjectModel.php(487): ObjectModelCore->getFields()
+#2 /home/rjain/public_html/hotel-reservation-system/classes/ObjectModel.php(445): ObjectModelCore->add(true, false)
+#3 /home/rjain/public_html/hotel-reservation-system/modules/blockcart/checkroomavailabilityajaxprocess.php(65): ObjectModelCore->save()
+#4 {main}
+  thrown in /home/rjain/public_html/hotel-reservation-system/classes/ObjectModel.php on line 909
+[07-Dec-2015 19:21:14 Asia/Kolkata] PHP Fatal error:  Uncaught exception 'PrestaShopException' with message 'Property HotelCartBookingData->date_from is not valid' in /home/rjain/public_html/hotel-reservation-system/classes/ObjectModel.php:909
+Stack trace:
+#0 /home/rjain/public_html/hotel-reservation-system/classes/ObjectModel.php(246): ObjectModelCore->validateFields()
+#1 /home/rjain/public_html/hotel-reservation-system/classes/ObjectModel.php(487): ObjectModelCore->getFields()
+#2 /home/rjain/public_html/hotel-reservation-system/classes/ObjectModel.php(445): ObjectModelCore->add(true, false)
+#3 /home/rjain/public_html/hotel-reservation-system/modules/blockcart/checkroomavailabilityajaxprocess.php(65): ObjectModelCore->save()
+#4 {main}
+  thrown in /home/rjain/public_html/hotel-reservation-system/classes/ObjectModel.php on line 909
+[07-Dec-2015 19:24:11 Asia/Kolkata] PHP Fatal error:  Uncaught exception 'PrestaShopException' with message 'Property HotelCartBookingData->date_from is not valid' in /home/rjain/public_html/hotel-reservation-system/classes/ObjectModel.php:909
+Stack trace:
+#0 /home/rjain/public_html/hotel-reservation-system/classes/ObjectModel.php(246): ObjectModelCore->validateFields()
+#1 /home/rjain/public_html/hotel-reservation-system/classes/ObjectModel.php(487): ObjectModelCore->getFields()
+#2 /home/rjain/public_html/hotel-reservation-system/classes/ObjectModel.php(445): ObjectModelCore->add(true, false)
+#3 /home/rjain/public_html/hotel-reservation-system/modules/blockcart/checkroomavailabilityajaxprocess.php(65): ObjectModelCore->save()
+#4 {main}
+  thrown in /home/rjain/public_html/hotel-reservation-system/classes/ObjectModel.php on line 909
+[14-Dec-2015 11:36:37 Asia/Kolkata] PHP Notice:  Undefined variable: total_available_rooms in /home/rjain/public_html/hotel-reservation-system/modules/blockcart/checkroomavailabilityajaxprocess.php on line 111
+[30-Dec-2015 17:23:43 Asia/Kolkata] PHP Fatal error:  Uncaught exception 'PrestaShopException' with message 'Property HotelCartBookingData->id_cart is not valid' in /home/rjain/public_html/hotel-reservation-system/classes/ObjectModel.php:909
+Stack trace:
+#0 /home/rjain/public_html/hotel-reservation-system/classes/ObjectModel.php(246): ObjectModelCore->validateFields()
+#1 /home/rjain/public_html/hotel-reservation-system/classes/ObjectModel.php(487): ObjectModelCore->getFields()
+#2 /home/rjain/public_html/hotel-reservation-system/classes/ObjectModel.php(445): ObjectModelCore->add(true, false)
+#3 /home/rjain/public_html/hotel-reservation-system/modules/blockcart/checkroomavailabilityajaxprocess.php(65): ObjectModelCore->save()
+#4 {main}
+  thrown in /home/rjain/public_html/hotel-reservation-system/classes/ObjectModel.php on line 909
+[30-Dec-2015 17:23:58 Asia/Kolkata] PHP Fatal error:  Uncaught exception 'PrestaShopException' with message 'Property HotelCartBookingData->id_cart is not valid' in /home/rjain/public_html/hotel-reservation-system/classes/ObjectModel.php:909
+Stack trace:
+#0 /home/rjain/public_html/hotel-reservation-system/classes/ObjectModel.php(246): ObjectModelCore->validateFields()
+#1 /home/rjain/public_html/hotel-reservation-system/classes/ObjectModel.php(487): ObjectModelCore->getFields()
+#2 /home/rjain/public_html/hotel-reservation-system/classes/ObjectModel.php(445): ObjectModelCore->add(true, false)
+#3 /home/rjain/public_html/hotel-reservation-system/modules/blockcart/checkroomavailabilityajaxprocess.php(65): ObjectModelCore->save()
+#4 {main}
+  thrown in /home/rjain/public_html/hotel-reservation-system/classes/ObjectModel.php on line 909
+[31-Dec-2015 16:45:22 Asia/Calcutta] PHP Fatal error:  Class 'FrontController' not found in /home/rjain/public_html/hotel-reservation-system/modules/blockcart/checkroomavailabilityajaxprocess.php on line 3
+[31-Dec-2015 16:46:41 Asia/Calcutta] PHP Fatal error:  Class 'FrontController' not found in /home/rjain/public_html/hotel-reservation-system/modules/blockcart/checkroomavailabilityajaxprocess.php on line 3

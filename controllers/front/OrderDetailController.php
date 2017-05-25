@@ -110,19 +110,17 @@ class OrderDetailControllerCore extends FrontController
                     }
 
                     if (Validate::isLoadedObject($customer)) {
-                        Mail::Send(
-                            $this->context->language->id, 'order_customer_comment', Mail::l('Message from a customer'),
-                            array(
-                                '{lastname}' => $customer->lastname,
-                                '{firstname}' => $customer->firstname,
-                                '{email}' => $customer->email,
-                                '{id_order}' => (int) $order->id,
-                                '{order_name}' => $order->getUniqReference(),
-                                '{message}' => Tools::nl2br($msgText),
-                                '{product_name}' => $product_name,
-                            ),
-                            $to, $toName, $customer->email, $customer->firstname.' '.$customer->lastname
-                        );
+                        Mail::Send($this->context->language->id, 'order_customer_comment', Mail::l('Message from a customer'),
+                        array(
+                            '{lastname}' => $customer->lastname,
+                            '{firstname}' => $customer->firstname,
+                            '{email}' => $customer->email,
+                            '{id_order}' => (int) $order->id,
+                            '{order_name}' => $order->getUniqReference(),
+                            '{message}' => Tools::nl2br($msgText),
+                            '{product_name}' => $product_name,
+                        ),
+                        $to, $toName, $customer->email, $customer->firstname.' '.$customer->lastname);
                     }
 
                     if (Tools::getValue('ajax') != 'true') {
@@ -167,18 +165,18 @@ class OrderDetailControllerCore extends FrontController
             $amount = Tools::getValue('amount');
             $cancellation_reason = Tools::getValue('cancellation_reason');
 
-            $objHtlRefundInfo = new HotelOrderRefundInfo();
-            $objHtlRefundInfo->id_order = $id_order;
-            $objHtlRefundInfo->id_product = $id_product;
-            $objHtlRefundInfo->id_customer = $id_customer;
-            $objHtlRefundInfo->id_currency = $id_currency;
-            $objHtlRefundInfo->refund_stage_id = 1;
-            $objHtlRefundInfo->order_amount = $amount;
-            $objHtlRefundInfo->cancellation_reason = $cancellation_reason;
-            $objHtlRefundInfo->num_rooms = $num_rooms;
-            $objHtlRefundInfo->date_from = $date_from;
-            $objHtlRefundInfo->date_to = $date_to;
-            $objHtlRefundInfo->save();
+            $obj_htl_ord_ref = new HotelOrderRefundInfo();
+            $obj_htl_ord_ref->id_order = $id_order;
+            $obj_htl_ord_ref->id_product = $id_product;
+            $obj_htl_ord_ref->id_customer = $id_customer;
+            $obj_htl_ord_ref->id_currency = $id_currency;
+            $obj_htl_ord_ref->refund_stage_id = 1;
+            $obj_htl_ord_ref->order_amount = $amount;
+            $obj_htl_ord_ref->cancellation_reason = $cancellation_reason;
+            $obj_htl_ord_ref->num_rooms = $num_rooms;
+            $obj_htl_ord_ref->date_from = $date_from;
+            $obj_htl_ord_ref->date_to = $date_to;
+            $obj_htl_ord_ref->save();
 
             $id_shop = Context::getContext()->shop->id;
 
@@ -212,7 +210,7 @@ class OrderDetailControllerCore extends FrontController
             $temp_path = _PS_MODULE_DIR_.'hotelreservationsystem/mails/';
             $template_name = 'request_processed';
 
-            if ($objHtlRefundInfo->id) {
+            if ($obj_htl_ord_ref->id) {
                 if (Mail::Send($id_lang, $template_name, Mail::l('Order Cancellation Status', $id_lang), $templateVars, $to, null, null, null,  null, null, $temp_path, false, null, null)) {
                     $mail_err = 0;
                 } else {
@@ -235,25 +233,24 @@ class OrderDetailControllerCore extends FrontController
             $id_order = Tools::getValue('id_order');
 
             if (isset($total_order_data) && $total_order_data) {
-                $objHtlRefund = new HotelOrderRefundInfo();
                 foreach ($total_order_data as $data_k => $data_v) {
                     foreach ($data_v['date_diff'] as $rm_k => $rm_v) {
-                        $exist_info_refund = $objHtlRefund->getOderRefundInfoByIdOrderIdProductByDate($id_order, $data_v['id_product'], $rm_v['data_form'], $rm_v['data_to']);
+                        $obj_htl_ord_ref = new HotelOrderRefundInfo();
+                        $exist_info_refund = $obj_htl_ord_ref->getOderRefundInfoByIdOrderIdProductByDate($id_order, $data_v['id_product'], $rm_v['data_form'], $rm_v['data_to']);
 
-                        // any room existing in htl_order_refund_info
+                        // any room existin htl_order_refund_info
                         if (!$exist_info_refund) {
-                            $objHtlRefundInfo = new HotelOrderRefundInfo();
-                            $objHtlRefundInfo->id_order = $id_order;
-                            $objHtlRefundInfo->id_product = $data_v['id_product'];
-                            $objHtlRefundInfo->id_customer = $id_customer;
-                            $objHtlRefundInfo->id_currency = $id_currency;
-                            $objHtlRefundInfo->refund_stage_id = 1;
-                            $objHtlRefundInfo->order_amount = $rm_v['amount_tax_incl'];
-                            $objHtlRefundInfo->cancellation_reason = $cancellation_reason;
-                            $objHtlRefundInfo->num_rooms = $rm_v['num_rm'];
-                            $objHtlRefundInfo->date_from = $rm_v['data_form'];
-                            $objHtlRefundInfo->date_to = $rm_v['data_to'];
-                            $objHtlRefundInfo->save();
+                            $obj_htl_ord_ref->id_order = $id_order;
+                            $obj_htl_ord_ref->id_product = $data_v['id_product'];
+                            $obj_htl_ord_ref->id_customer = $id_customer;
+                            $obj_htl_ord_ref->id_currency = $id_currency;
+                            $obj_htl_ord_ref->refund_stage_id = 1;
+                            $obj_htl_ord_ref->order_amount = $rm_v['amount_tax_incl'];
+                            $obj_htl_ord_ref->cancellation_reason = $cancellation_reason;
+                            $obj_htl_ord_ref->num_rooms = $rm_v['num_rm'];
+                            $obj_htl_ord_ref->date_from = $rm_v['data_form'];
+                            $obj_htl_ord_ref->date_to = $rm_v['data_to'];
+                            $obj_htl_ord_ref->save();
                         }
                     }
                 }
@@ -277,15 +274,16 @@ class OrderDetailControllerCore extends FrontController
             $temp_path = _PS_MODULE_DIR_.'hotelreservationsystem/mails/';
             $template_name = 'total_order_processed';
 
-            if ($objHtlRefundInfo->id) {
+            if ($obj_htl_ord_ref->id) {
                 if (Mail::Send($id_lang, $template_name, Mail::l('Order Cancellation Status', $id_lang), $templateVars, $to, null, null, null,  null, null, $temp_path, false, null, null)) {
                     $mail_err = 0;
                 } else {
                     $mail_err = 1;
                 }
+
                 die(Tools::jsonEncode(array('status' => 'success', 'mail_err' => $mail_err)));
             } else {
-                die(Tools::jsonEncode(array('status' => 'failed')));
+                die(Tools::jsonEncode(array('status' => 'failed', 'mail_err' => $mail_err)));
             }
         }
         //end
@@ -359,20 +357,20 @@ class OrderDetailControllerCore extends FrontController
                             $cart_htl_data[$type_key]['adult'] = $rm_dtl['adult'];
                             $cart_htl_data[$type_key]['children'] = $rm_dtl['children'];
 
-                            // by webkul to calculate rates of the product from hotelreservation syatem tables with feature prices....
-
-                            $hotelCartBookingData = new HotelCartBookingData();
-                            //END
                             foreach ($order_bk_data as $data_k => $data_v) {
                                 $date_join = strtotime($data_v['date_from']).strtotime($data_v['date_to']);
 
                                 /*Product price when order was created*/
                                 $order_details_obj = new OrderDetail($data_v['id_order_detail']);
+                                $unit_price_tax_excl = 0;
+                                $unit_price_tax_incl = 0;
+                                $unit_price_tax_excl = $order_details_obj->unit_price_tax_excl;
+                                $unit_price_tax_incl = $order_details_obj->unit_price_tax_incl;
                                 $prod_ord_dtl_name = $order_details_obj->product_name;
                                 $cart_htl_data[$type_key]['name'] = $prod_ord_dtl_name;
 
-                                $cart_htl_data[$type_key]['paid_unit_price_tax_excl'] = ($order_details_obj->total_price_tax_excl)/$order_details_obj->product_quantity;
-                                $cart_htl_data[$type_key]['paid_unit_price_tax_incl'] = ($order_details_obj->total_price_tax_incl)/$order_details_obj->product_quantity;
+                                $cart_htl_data[$type_key]['unit_price_tax_excl'] = $unit_price_tax_excl;
+                                $cart_htl_data[$type_key]['unit_price_tax_incl'] = $unit_price_tax_incl;
 
                                 //work on entring refund data
                                 $obj_ord_ref_info = new HotelOrderRefundInfo();
@@ -388,12 +386,13 @@ class OrderDetailControllerCore extends FrontController
                                     $cart_htl_data[$type_key]['date_diff'][$date_join]['num_rm'] += 1;
 
                                     $num_days = $cart_htl_data[$type_key]['date_diff'][$date_join]['num_days'];
-                                    $var_quant = (int) $cart_htl_data[$type_key]['date_diff'][$date_join]['num_rm'];
+                                    $vart_quant = (int) $cart_htl_data[$type_key]['date_diff'][$date_join]['num_rm'] * $num_days;
 
-                                    $cart_htl_data[$type_key]['date_diff'][$date_join]['paid_unit_price_tax_excl'] = $data_v['total_price_tax_excl']/$num_days;
-                                    $cart_htl_data[$type_key]['date_diff'][$date_join]['paid_unit_price_tax_incl'] = $data_v['total_price_tax_incl']/$num_days;
-                                    $cart_htl_data[$type_key]['date_diff'][$date_join]['amount_tax_incl'] = $data_v['total_price_tax_incl']*$var_quant;
-                                    $cart_htl_data[$type_key]['date_diff'][$date_join]['amount_tax_excl'] = $data_v['total_price_tax_excl']*$var_quant;
+                                    $amount_tax_excl = $unit_price_tax_excl * $vart_quant;
+                                    $amount_tax_incl = $unit_price_tax_incl * $vart_quant;
+
+                                    $cart_htl_data[$type_key]['date_diff'][$date_join]['amount_tax_incl'] = $amount_tax_incl;
+                                    $cart_htl_data[$type_key]['date_diff'][$date_join]['amount_tax_excl'] = $amount_tax_excl;
                                     $cart_htl_data[$type_key]['date_diff'][$date_join]['is_backorder'] = $data_v['is_back_order'];
                                     if ($data_v['is_back_order']) {
                                         $any_back_order = 1;
@@ -408,10 +407,11 @@ class OrderDetailControllerCore extends FrontController
                                     $cart_htl_data[$type_key]['date_diff'][$date_join]['data_to'] = $data_v['date_to'];
                                     $cart_htl_data[$type_key]['date_diff'][$date_join]['num_days'] = $num_days;
 
-                                    $cart_htl_data[$type_key]['date_diff'][$date_join]['paid_unit_price_tax_excl'] = $data_v['total_price_tax_excl']/$num_days;
-                                    $cart_htl_data[$type_key]['date_diff'][$date_join]['paid_unit_price_tax_incl'] = $data_v['total_price_tax_incl']/$num_days;
-                                    $cart_htl_data[$type_key]['date_diff'][$date_join]['amount_tax_incl'] = $data_v['total_price_tax_incl'];
-                                    $cart_htl_data[$type_key]['date_diff'][$date_join]['amount_tax_excl'] = $data_v['total_price_tax_excl'];
+                                    $amount_tax_excl = $unit_price_tax_excl * $num_days;
+                                    $amount_tax_incl = $unit_price_tax_incl * $num_days;
+
+                                    $cart_htl_data[$type_key]['date_diff'][$date_join]['amount_tax_incl'] = $amount_tax_incl;
+                                    $cart_htl_data[$type_key]['date_diff'][$date_join]['amount_tax_excl'] = $amount_tax_excl;
                                     $cart_htl_data[$type_key]['date_diff'][$date_join]['is_backorder'] = $data_v['is_back_order'];
                                     if ($data_v['is_back_order']) {
                                         $any_back_order = 1;
@@ -419,14 +419,6 @@ class OrderDetailControllerCore extends FrontController
                                     //refund_stage
                                     $cart_htl_data[$type_key]['date_diff'][$date_join]['stage_name'] = $stage_name;
                                 }
-
-                                $cart_htl_data[$type_key]['date_diff'][$date_join]['product_price_tax_excl'] = $order_details_obj->unit_price_tax_excl;
-                                $cart_htl_data[$type_key]['date_diff'][$date_join]['product_price_tax_incl'] = $order_details_obj->unit_price_tax_incl;
-                                $cart_htl_data[$type_key]['date_diff'][$date_join]['product_price_without_reduction_tax_excl'] = $order_details_obj->unit_price_tax_excl + $order_details_obj->reduction_amount_tax_excl;
-                                $cart_htl_data[$type_key]['date_diff'][$date_join]['product_price_without_reduction_tax_incl'] = $order_details_obj->unit_price_tax_incl + $order_details_obj->reduction_amount_tax_incl;
-
-                                $feature_price_diff = (float)($cart_htl_data[$type_key]['date_diff'][$date_join]['product_price_without_reduction_tax_incl'] - $cart_htl_data[$type_key]['date_diff'][$date_join]['paid_unit_price_tax_incl']);
-                                $cart_htl_data[$type_key]['date_diff'][$date_join]['feature_price_diff'] = $feature_price_diff;
                             }
                         }
                         $redirect_link_terms = $this->context->link->getCMSLink(new CMS(3, $this->context->language->id), null, $this->context->language->id);

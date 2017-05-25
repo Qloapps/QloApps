@@ -389,8 +389,8 @@ function init()
 			$('#add_product_product_price_tax_excl').val(data.price_tax_excl);
 
 			//Added by webkul to set curent date in the date fields by default
-			var date_in = $.datepicker.formatDate('dd-mm-yy', new Date());
-        	var date_out = $.datepicker.formatDate('dd-mm-yy', new Date(new Date().getTime()+24*60*60*1000));
+			var date_in = $.datepicker.formatDate('d M yy', new Date());
+        	var date_out = $.datepicker.formatDate('d M yy', new Date(new Date().getTime()+24*60*60*1000));
         	var tr_product = $(this).closest('#new_product');
         	tr_product.find("input.add_product_date_from").val(date_in);
         	tr_product.find("input.add_product_date_to").val(date_out);
@@ -894,23 +894,23 @@ function init()
     {
     	showOtherMonths: true,
         dateFormat: 'dd-mm-yy',
-		onSelect: function(selectedDate) {
-            var date_format = selectedDate.split("-");
-            var selectedDate = new Date($.datepicker.formatDate('yy-mm-dd', new Date(date_format[2], date_format[1] - 1, date_format[0])));
-            selectedDate.setDate(selectedDate.getDate() + 1);
-            $(".add_product_date_to").datepicker("option", "minDate", selectedDate);
-        },
+        onClose: function( selectedDate ) 
+        {
+            var selectedDate = new Date(selectedDate);
+            selectedDate.setDate(selectedDate.getDate()+1);
+            $( ".add_product_date_to" ).datepicker( "option", "minDate", selectedDate );
+        }
     });
 
     $(".add_product_date_to").datepicker(
     {
     	showOtherMonths: true,
         dateFormat: 'dd-mm-yy',
-        onSelect: function(selectedDate) {
-            var date_format = selectedDate.split("-");
-            var selectedDate = new Date($.datepicker.formatDate('yy-mm-dd', new Date(date_format[2], date_format[1] - 1, date_format[0])));
+        onClose: function( selectedDate ) 
+        {
+            var selectedDate = new Date(selectedDate);
             selectedDate.setDate(selectedDate.getDate() - 1);
-            $(".add_product_date_from").datepicker("option", "maxDate", selectedDate);
+            $( ".add_product_date_from" ).datepicker( "option", "maxDate", selectedDate );
         }
     });
 	/*End*/

@@ -19,6 +19,7 @@ class AdminOrderRestrictSettingsController extends ModuleAdminController
                     'MAX_GLOBAL_BOOKING_DATE' => array(
                         'title' => $this->l('Maximum Global Date To Book a room'),
                         'type' => 'text',
+                        'readonly' => true,
                         'id' => 'max_global_book_date',
                         'hint' => $this->l('This is the maximum date till which date rooms of all your hotels can be booked.'),
                     ),
@@ -136,7 +137,7 @@ class AdminOrderRestrictSettingsController extends ModuleAdminController
             $obj_order_restrict->save();
             $new_id = $obj_order_restrict->id;
             if (Tools::isSubmit('submitAdd'.$this->table.'AndStay')) {
-                if (isset($new_id) && $new_id) {
+                if (isset($id) && $id) {
                     Tools::redirectAdmin(self::$currentIndex.'&id='.(int) $new_id.'&update'.$this->table.'&conf=4&token='.$this->token);
                 } else {
                     Tools::redirectAdmin(self::$currentIndex.'&add'.$this->table.'&conf=4&token='.$this->token);
@@ -157,8 +158,6 @@ class AdminOrderRestrictSettingsController extends ModuleAdminController
             $max_global_date_frm = date('Y-m-d', strtotime($max_global_date));
             if (!Validate::isDate($max_global_date_frm)) {
                 $this->errors[] = Tools::displayError('Enter a valid date.');
-            } else if (strtotime(date('Y-m-d')) > strtotime($max_global_date_frm)) {
-                $this->errors[] = Tools::displayError('Maximum Global Date can not be before current date.');
             }
             if (!count($this->errors)) {
                 Configuration::updateValue('MAX_GLOBAL_BOOKING_DATE', $max_global_date);
