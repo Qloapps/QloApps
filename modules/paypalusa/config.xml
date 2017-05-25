@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<module>
+	<name>paypalusa</name>
+	<displayName><![CDATA[PayPal USA, Canada]]></displayName>
+	<version><![CDATA[1.3.9]]></version>
+	<description><![CDATA[Accept payments using PayPal&#039;s Express Checkout, PayPal Payments Standard, Advanced, Pro, or Payflow.]]></description>
+	<author><![CDATA[PrestaShop]]></author>
+	<tab><![CDATA[payments_gateways]]></tab>
+	<confirmUninstall><![CDATA[Are you sure you want to delete your details?]]></confirmUninstall>
+	<is_configurable>1</is_configurable>
+	<need_instance>1</need_instance>
+	<limited_countries></limited_countries>
+</module>

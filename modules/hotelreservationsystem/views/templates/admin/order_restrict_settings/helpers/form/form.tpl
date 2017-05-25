@@ -10,7 +10,7 @@
 		{if isset($edit)}
 			<input type="hidden" value="{$id}" name="id" />
 			<div class="form-group">
-				<label class="control-label col-sm-3 required" for="hotel_id">{l s='Hotel Name :' mod='hotelreservationsystem'}</label>
+				<label class="control-label col-sm-3 required">{l s='Hotel Name :' mod='hotelreservationsystem'}</label>
 				<div class="col-sm-6">
 					<p class="form-control-static">{$ordr_restrict_hotel_data['hotel_name']}</p>
 					<input type="hidden" class="form-control" name="hotel_id" value="{$ordr_restrict_hotel_data['id_hotel']}" />
@@ -18,10 +18,10 @@
 			</div>
 		{else}
 			<div class="form-group">
-				<label class="control-label col-sm-3 required" for="hotel_id">{l s='Select Hotel :' mod='hotelreservationsystem'}</label>
+				<label class="control-label col-sm-3 required" for="resticted_hotel_id">{l s='Select Hotel :' mod='hotelreservationsystem'}</label>
 				<div class="col-sm-6">
 					<div style="width: 195px;">
-						<select class="form-control" name="hotel_id" id="hotel_id" value="">
+						<select class="form-control" name="hotel_id" id="resticted_hotel_id" value="">
 							<option value='0' selected>{l s='Select Hotel' mod='hotelreservationsystem'}</option>
 							{if isset($hotels_list) && $hotels_list}
 								{foreach $hotels_list as $list}

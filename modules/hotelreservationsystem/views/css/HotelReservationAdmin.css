@@ -548,3 +548,36 @@
 .pac-container {
     font-family: Roboto;
 } 
+
+
+/* ==== AdminHotelFeaturePricesSettingsController ==== */
+.week_days {
+    display: none;
+}
+.room_type_search_results_ul {
+    padding: 0px;
+    background: #ffffff none repeat scroll 0 0;
+    display: block;
+    position: absolute;
+    width: 100%;
+    z-index: 122222;
+    border-bottom: 1px solid #cccccc;
+    border-left: 1px solid #cccccc;
+    border-right: 1px solid #cccccc;
+    max-height: 145px;
+    overflow-y: auto;
+}
+.room_type_search_results_ul li {
+    width: 100%;
+    background-color: #fff;
+    color: #333333;
+    cursor: pointer;
+    text-align: left;
+    font-size: 12px;
+    list-style: outside none none;
+    padding: 7px;
+}
+.room_type_search_results_ul li:hover, .room_type_search_results_ul li:focus, .room_type_search_results_ul li:active {
+    background-color: #379bf0;
+    color: #FFFFFF;
+}

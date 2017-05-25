@@ -283,8 +283,9 @@ var ajaxCart = {
                 dateFrom = $('#check_in_time').val();
                 dateTo = $('#check_out_time').val();
             } else {
-                dateFrom = new Date('yyyy-mm-dd');
-                dateTo = new Date('yyyy-mm-dd');
+                
+                dateFrom = $.datepicker.formatDate('yy-mm-dd', new Date());;
+                dateTo = $.datepicker.formatDate('yy-mm-dd', new Date());;
             }
 
             // Removing product from the cart
@@ -570,8 +571,10 @@ var ajaxCart = {
 
 
                 ajaxCart.updateCart(jsonData);
-                if ($('body').attr('id') == 'order' || $('body').attr('id') == 'order-opc')
+                // @TODO in future to sync with shopping cart delete from order-opc
+                /*if ($('body').attr('id') == 'order' || $('body').attr('id') == 'order-opc') {
                     deleteProductFromSummary(idProduct + '_' + idCombination + '_' + customizationId + '_' + idAddressDelivery);
+                }*/
             },
             error: function() {
                 var error = 'ERROR: unable to delete the product';

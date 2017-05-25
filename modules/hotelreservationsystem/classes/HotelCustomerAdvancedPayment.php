@@ -38,13 +38,7 @@ class HotelCustomerAdvancedPayment extends ObjectModel
      */
     public function getClientAdvPaymentDtl($id_cart, $id_guest)
     {
-        $result = Db::getInstance()->getRow('SELECT * FROM `'._DB_PREFIX_.'htl_customer_adv_payment` WHERE `id_cart`='.$id_cart.' AND `id_guest`='.$id_guest);
-
-        if ($result) {
-            return $result;
-        }
-
-        return false;
+        return Db::getInstance()->getRow('SELECT * FROM `'._DB_PREFIX_.'htl_customer_adv_payment` WHERE `id_cart`='.$id_cart.' AND `id_guest`='.$id_guest);
     }
 
     /**
@@ -56,13 +50,7 @@ class HotelCustomerAdvancedPayment extends ObjectModel
      */
     public function getCstAdvPaymentDtlByIdOrder($id_order)
     {
-        $result = Db::getInstance()->getRow('SELECT * FROM `'._DB_PREFIX_.'htl_customer_adv_payment` WHERE `id_order`='.$id_order);
-
-        if ($result) {
-            return $result;
-        }
-
-        return false;
+        return Db::getInstance()->getRow('SELECT * FROM `'._DB_PREFIX_.'htl_customer_adv_payment` WHERE `id_order`='.$id_order);
     }
 
     /**

@@ -42,7 +42,7 @@ class gamification extends Module
     {
         $this->name = 'gamification';
         $this->tab = 'administration';
-        $this->version = '1.12.0';
+        $this->version = '1.12.3';
         $this->author = 'PrestaShop';
 
         parent::__construct();
@@ -329,7 +329,7 @@ class gamification extends Module
         $iso_country = $this->context->country->iso_code;
         $iso_currency = $this->context->currency->iso_code;
         $file_name = 'data_'.strtoupper($iso_lang).'_'.strtoupper($iso_currency).'_'.strtoupper($iso_country).'.json';
-        $versioning = '?v='.$this->version;
+        $versioning = '?v='.$this->version.'&ps_version='._PS_VERSION_;
         $data = Tools::file_get_contents($this->url_data.$file_name.$versioning);
 
         return (bool)file_put_contents($this->cache_data.'data_'.strtoupper($iso_lang).'_'.strtoupper($iso_currency).'_'.strtoupper($iso_country).'.json', $data);
@@ -496,20 +496,26 @@ class gamification extends Module
         Db::getInstance()->delete('condition_advice', 'id_advice='.(int)$id_advice);
         if (is_array($display_conditions)) {
             foreach ($display_conditions as $cond) {
-                Db::getInstance()->insert('condition_advice', array('id_condition' => $cond_ids[$cond], 'id_advice' => $id_advice, 'display' => 1));
+                Db::getInstance()->insert('condition_advice', array(
+                    'id_condition' => (int) $cond_ids[$cond], 'id_advice' => (int) $id_advice, 'display' => 1)
+                );
             }
         }
 
         if (is_array($hide_conditions)) {
             foreach ($hide_conditions as $cond) {
-                Db::getInstance()->insert('condition_advice', array('id_condition' => $cond_ids[$cond], 'id_advice' => $id_advice, 'display' => 0));
+                Db::getInstance()->insert('condition_advice', array(
+                    'id_condition' => (int) $cond_ids[$cond], 'id_advice' => (int) $id_advice, 'display' => 0)
+                );
             }
         }
 
         Db::getInstance()->delete('tab_advice', 'id_advice='.(int)$id_advice);
         if (isset($tabs) && is_array($tabs) && count($tabs)) {
             foreach ($tabs as $tab) {
-                Db::getInstance()->insert('tab_advice', array('id_tab' => (int)Tab::getIdFromClassName($tab), 'id_advice' => $id_advice));
+                Db::getInstance()->insert('tab_advice', array(
+                    'id_tab' => (int)Tab::getIdFromClassName($tab), 'id_advice' => (int) $id_advice)
+                );
             }
         }
     }

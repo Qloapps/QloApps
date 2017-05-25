@@ -1038,6 +1038,7 @@ class ProductCore extends ObjectModel
         }
 
         SpecificPriceRule::applyAllRules(array((int)$this->id));
+
         return true;
     }
 

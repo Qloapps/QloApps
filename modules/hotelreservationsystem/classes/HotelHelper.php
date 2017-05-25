@@ -2,6 +2,36 @@
 
 class HotelHelper
 {
+    public function initCurl($params)
+    {
+        if (!$params) {
+            return false;
+        }
+        if ($params['contentType'] == 'JSON') {
+            $header = array('Content-Type: application/json');
+            if (isset($params['postData'])) {
+                $header[] = 'Content-Length: '.strlen($params['postData']);
+            }
+        }
+
+        $curlInit = curl_init();
+        curl_setopt($curlInit, CURLOPT_URL, $params['url']);
+        curl_setopt($curlInit, CURLOPT_HTTPAUTH, CURLAUTH_ANY);
+        curl_setopt($curlInit, CURLOPT_HTTPHEADER,  $header);
+        curl_setopt($curlInit, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($curlInit, CURLOPT_CUSTOMREQUEST, $params['method']);
+        curl_setopt($curlInit, CURLOPT_RETURNTRANSFER, 1);
+        if (isset($params['postData'])) {
+            curl_setopt($curlInit, CURLOPT_POSTFIELDS, $params['postData']);
+        }
+        $response = curl_exec($curlInit);
+
+        // Close handle
+        curl_close($curlInit);
+
+        return $response;
+    }
+
     public function insertHotelCommonFeatures()
     {
         $parent_features_arr = array(
@@ -76,7 +106,7 @@ class HotelHelper
 
     public function insertHotelRoomsStatus()
     {
-        $room_status_arr = array('Available','Unavailable','Hold For Maintenance');
+        $room_status_arr = array('Active','Inactive','Temporary Inactive');
         foreach ($room_status_arr as $key => $value) {
             $obj_room_status = new HotelRoomStatus();
             $obj_room_status->status = $value;
@@ -185,14 +215,14 @@ class HotelHelper
         $obj_hotel_info = new HotelBranchInformation();
         $obj_hotel_info->active = 1;
         $obj_hotel_info->hotel_name = 'The Hotel Prime';
-        $obj_hotel_info->phone = 0123456789;
-        $obj_hotel_info->email = 'prime@htl.com';
+        $obj_hotel_info->phone = 0987654321;
+        $obj_hotel_info->email = 'hotelprime@htl.com';
         $obj_hotel_info->check_in = '12:00';
         $obj_hotel_info->check_out = '12:00';
         $obj_hotel_info->short_description = 'Nice place to stay';
         $obj_hotel_info->description = 'Nice place to stay';
         $obj_hotel_info->rating = 3;
-        $obj_hotel_info->city = 'DefCity';
+        $obj_hotel_info->city = 'Dummy city';
         $states = State::getStatesByIdCountry($def_cont_id);
         $state_id = $states[0]['id_state'];
         $obj_hotel_info->state_id = $state_id;
@@ -415,6 +445,29 @@ class HotelHelper
                 return true;
             }
         }
-        return false;;
+        return false;
+        ;
+    }
+
+    public static function generateRandomCode($length = 8)
+    {
+        $characters = '0123456789abcdefghijklmnopqrstuvwxyz';
+        $rand = '';
+        for ($i = 0; $i < $length; ++$i) {
+            $rand = $rand.$characters[mt_rand(0, Tools::strlen($characters) - 1)];
+        }
+
+        return $rand;
+    }
+
+    public static function getBaseDirUrl()
+    {
+        $forceSsl = Configuration::get('PS_SSL_ENABLED') && Configuration::get('PS_SSL_ENABLED_EVERYWHERE');
+        $protocol_link = (Configuration::get('PS_SSL_ENABLED') || Tools::usingSecureMode()) ? 'https://' : 'http://';
+        $baseDirSsl = $protocol_link.Tools::getShopDomainSsl().__PS_BASE_URI__;
+        $baseDir = _PS_BASE_URL_.__PS_BASE_URI__;
+
+        $startUrl = $forceSsl ? $baseDirSsl : $baseDir;
+        return $startUrl;
     }
 }

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<module>
+	<name>productpaymentlogos</name>
+	<displayName><![CDATA[Product payment logos block]]></displayName>
+	<version><![CDATA[1.3.7]]></version>
+	<description><![CDATA[Displays the logos of the available payment systems on the product page.]]></description>
+	<author><![CDATA[PrestaShop]]></author>
+	<tab><![CDATA[front_office_features]]></tab>
+	<is_configurable>1</is_configurable>
+	<need_instance>0</need_instance>
+	<limited_countries></limited_countries>
+</module>

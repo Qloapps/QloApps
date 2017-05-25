@@ -147,6 +147,9 @@ class OrderCore extends ObjectModel
     /** @var string Delivery creation date */
     public $delivery_date;
 
+    /** @var string source */
+    public $source;
+
     /** @var bool Order validity: current order status is logable (usually paid and not canceled) */
     public $valid;
 
@@ -219,6 +222,7 @@ class OrderCore extends ObjectModel
             'delivery_number' =>            array('type' => self::TYPE_INT),
             'invoice_date' =>                array('type' => self::TYPE_DATE),
             'delivery_date' =>                array('type' => self::TYPE_DATE),
+            'source' =>                        array('type' => self::TYPE_STRING),
             'valid' =>                        array('type' => self::TYPE_BOOL),
             'reference' =>                    array('type' => self::TYPE_STRING),
             'date_add' =>                    array('type' => self::TYPE_DATE, 'validate' => 'isDate'),

@@ -26,7 +26,6 @@ class WkRoomSearchBlockAutoCompleteSearchModuleFrontController extends ModuleFro
         $obj_htl_info = new HotelBranchInformation();
         if (isset($search_data) && $search_data) {
             $return_data = $obj_htl_info->getHotelCategoryTree($search_data);
-
             if ($return_data) {
                 $html = '';
                 foreach ($return_data as $key => $value) {

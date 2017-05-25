@@ -132,7 +132,13 @@
 					</select>
 				</div>
 			</div>
-			<span class="country_import_note col-sm-10 text-right" style='font-style:italic;'>{l s='* If selected country is not imported already, Please import selected country from localization in you prestashop To get its states.' js=1 mod='hotelreservationsystem'}</span>
+			<span class="country_import_note col-sm-offset-3 col-sm-9">
+				<em>
+					{l s='* If selected country is not imported, then please import selected country from' mod='hotelreservationsystem'}<a href="{$link->getAdminLink('AdminLocalization')|escape:'html':'UTF-8'}"> {l s='localization tab' mod='hotelreservationsystem'} </a>{l s='in you qloapps to get its states.' mod='hotelreservationsystem'}
+				</em>
+			</span>
+
+			
 		</div>
 		<div class="form-group">
 			<label class="control-label col-sm-3 required" for="hotel_city">{l s='City :' mod='hotelreservationsystem'}</label>

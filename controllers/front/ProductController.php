@@ -276,20 +276,34 @@ class ProductControllerCore extends FrontController
 
                 if ($hotel_room_data) {
                     if ($total_available_rooms >= $quantity) {
-                        $priceDisplay = Group::getPriceDisplayMethod(Group::getCurrent()->id);
-                        if (!$priceDisplay || $priceDisplay == 2) {
-                            $price_tax = true;
-                        } elseif ($priceDisplay == 1) {
-                            $price_tax = false;
-                        }
+                        $useTax = HotelBookingDetail::useTax();
+                        $product = new Product($id_product);
+                        $productPriceWithoutReduction = $product->getPriceWithoutReduct(!$useTax);
                         $obj_booking_detail = new HotelBookingDetail();
                         $num_days = $obj_booking_detail->getNumberOfDays($date_from, $date_to);
-                        $price_tax_incl = Product::getPriceStatic($id_product, $price_tax);
-                        $total_price = $price_tax_incl * $num_days * $quantity;
+                        $roomTypeDateRangePrice = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice($id_product, $date_from, $date_to);
+
+                        if ($useTax) {
+                            $priceProduct = Product::getPriceStatic($id_product, true);
+                            $feature_price = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay($id_product, $date_from, $date_to, true);
+                            $roomTypeDateRangePrice = $roomTypeDateRangePrice['total_price_tax_incl'];
+                        } else {
+                            $priceProduct = Product::getPriceStatic($id_product, false);
+                            $feature_price = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay($id_product, $date_from, $date_to, false);
+                            $roomTypeDateRangePrice = $roomTypeDateRangePrice['total_price_tax_excl'];
+                        }
+                        $feature_price_diff = (float)($productPriceWithoutReduction - $feature_price);
+
+                        //$price_tax_incl = Product::getPriceStatic($id_product, $price_tax);
+                        $total_price = $roomTypeDateRangePrice * $quantity;
                         $result['msg'] = 'success';
                         $result['total_price'] = $total_price;
                         $result['num_days'] = $num_days;
                         $result['avail_rooms'] = $total_available_rooms;
+
+                        $result['original_product_price'] = $priceProduct;
+                        $result['feature_price'] = $feature_price;
+                        $result['feature_price_diff'] = $feature_price_diff;
 
                         return Tools::jsonEncode($result);
                     } else {
@@ -326,7 +340,6 @@ class ProductControllerCore extends FrontController
     public function initContent()
     {
         parent::initContent();
-
         if (!$this->errors) {
             if (Pack::isPack((int) $this->product->id) && !Pack::isInStock((int) $this->product->id)) {
                 $this->product->quantity = 0;
@@ -423,6 +436,7 @@ class ProductControllerCore extends FrontController
             $obj_hotel_room_type = new HotelRoomType();
             $room_info_by_product_id = $obj_hotel_room_type->getRoomTypeInfoByIdProduct($this->product->id);
             $hotel_id = $room_info_by_product_id['id_hotel'];
+            $useTax = HotelBookingDetail::useTax();
             if (isset($hotel_id) && $hotel_id) {
                 $obj_hotel_branch = new HotelBranchInformation();
                 $hotel_info_by_id = $obj_hotel_branch->hotelBranchInfoById($hotel_id);
@@ -454,15 +468,23 @@ class ProductControllerCore extends FrontController
                     $date_to = date('Y-m-d', strtotime($date_from) + 86400);
                 }
 
+                $obj_htl_cart_booking_data = new HotelCartBookingData();
                 $obj_booking_detail = new HotelBookingDetail();
                 $num_days = $obj_booking_detail->getNumberOfDays($date_from, $date_to);
-                $price_tax_incl = Product::getPriceStatic($this->product->id, HotelBookingDetail::useTax());
-                $total_price = $price_tax_incl * $num_days;
-
+                //$price_tax_incl = Product::getPriceStatic($this->product->id, HotelBookingDetail::useTax());
+                //$total_price = $price_tax_incl * $num_days;
+                //
+                //// By webkul New way to calculate product prices with feature Prices
+                $roomTypeDateRangePrice = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice($this->product->id, $date_from, $date_to);
+                if ($useTax) {
+                    $total_price = $roomTypeDateRangePrice['total_price_tax_incl'];
+                } else {
+                    $total_price = $roomTypeDateRangePrice['total_price_tax_excl'];
+                }
+                //END
                 $obj_booking_dtl = new HotelBookingDetail();
                 $hotel_room_data = $obj_booking_dtl->DataForFrontSearch($date_from, $date_to, $hotel_id, $this->product->id, 1);
 
-                $obj_htl_cart_booking_data = new HotelCartBookingData();
 
                 if ($hotel_room_data) {
                     $total_available_rooms = $hotel_room_data['stats']['num_avail'];
@@ -511,7 +533,6 @@ class ProductControllerCore extends FrontController
                     );
                 }   
                 $this->context->smarty->assign(array(
-                    'booking_date_to' => $date_to,
                     'max_order_date' => $max_order_date,
                     'warning_num' => $warning_num,
                     'ratting_img_path' => _MODULE_DIR_.'hotelreservationsystem/views/img/Slices/icons-sprite.png',
@@ -521,8 +542,8 @@ class ProductControllerCore extends FrontController
                     'total_price' => $total_price,
                     'product_controller_url' => $this->context->link->getPageLink('product'),
                     'num_days' => $num_days,
-                    'date_from' => date('d-m-Y', strtotime($date_from)),
-                    'date_to' => date('d-m-Y', strtotime($date_to)),
+                    'date_from' => $date_from,
+                    'date_to' => $date_to,
                     'hotel_location' => $hotel_location,
                     'hotel_name' => $hotel_name,
                     'hotel_policies' => $hotel_policies,
@@ -530,10 +551,24 @@ class ProductControllerCore extends FrontController
                     'ftr_img_src' => _PS_IMG_.'rf/',
                     'search_data' => $search_data,
                 ));
+                // product price after imposing feature prices...
+                if ($useTax) {
+                    $priceProduct = Product::getPriceStatic($this->product->id, true);
+                    $feature_price = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay($this->product->id, $date_from, $date_to, true);
+                } else {
+                    $priceProduct = Product::getPriceStatic($this->product->id, false);
+                    $feature_price = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay($this->product->id, $date_from, $date_to, false);
+                }
+                $productPriceWithoutReduction = $this->product->getPriceWithoutReduct(!$useTax);
+                $feature_price_diff = (float)($productPriceWithoutReduction - $feature_price);
+                $this->context->smarty->assign('feature_price', $feature_price);
+                $this->context->smarty->assign('feature_price_diff', $feature_price_diff);
+
+                //END
             }
+
             $this->context->smarty->assign('product_id_hotel', $hotel_id);
             $this->context->smarty->assign(array(
-                
                 'stock_management' => Configuration::get('PS_STOCK_MANAGEMENT'),
                 'customizationFields' => $customization_fields,
                 'id_customization' => empty($customization_datas) ? null : $customization_datas[0]['id_customization'],

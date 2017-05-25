@@ -53,6 +53,32 @@
                 'date_upd' => array('type' => self::TYPE_DATE, 'validate' => 'isDate', 'copy_post' => false),
         ), );
 
+        protected $webserviceParameters = array(
+            'objectsNodeName' => 'hotels',
+            'objectNodeName' => 'htl_branch_info',
+            'fields' => array(
+                'currency' => array(
+                    'getter' => 'getWsDefaultCurrencyCode',
+                ),
+                'timezone' => array(
+                    'getter' => 'getWsTimezone',
+                ),
+            ),
+        );
+
+        // Web Services Code
+        public function getWsDefaultCurrencyCode()
+        {
+            $id_currency = Configuration::get('PS_CURRENCY_DEFAULT');
+            $currency = new Currency((int) $id_currency);
+            return $currency->iso_code;
+        }
+
+        public function getWsTimezone()
+        {
+            return Configuration::get('PS_TIMEZONE');
+        }
+
         /**
          * [hotelBranchesInfo : To get all the hotels information created by the admin].
          *
@@ -206,7 +232,7 @@
          */
         public function getHotelCategoryTree($search_data)
         {
-        	$context = Context::getContext();
+            $context = Context::getContext();
             $sql = 'SELECT cl.`id_category` , cl.`name` 
 					FROM `'._DB_PREFIX_.'category_lang` AS cl
 					INNER JOIN `'._DB_PREFIX_."category` AS c ON (cl.id_category = c.id_category)
@@ -256,5 +282,10 @@
             // } else {
             //     return false;
             // }
+        }
+
+        public function getAllHotels()
+        {
+            return Db::getInstance()->executeS('SELECT * FROM `'._DB_PREFIX_.'htl_branch_info`');
         }
     }

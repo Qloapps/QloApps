@@ -29,7 +29,9 @@ class AdminHotelConfigurationSettingController extends ModuleAdminController
         $href_payment_conf = $this->context->link->getAdminLink('AdminPaymentsSetting');
         $href_ord_res = $this->context->link->getAdminLink('AdminOrderRestrictSettings');
         $href_gen_conf = $this->context->link->getAdminLink('AdminHotelGeneralSettings');
+        $href_feature_price_conf = $this->context->link->getAdminLink('AdminHotelFeaturePricesSettings');
         $this->tpl_view_vars = array(
+            'feature_price_setting_link' => $href_feature_price_conf,
             'general_setting_link' => $href_gen_conf,
             'payment_setting_link' => $href_payment_conf,
             'order_restrict_setting_link' => $href_ord_res,
