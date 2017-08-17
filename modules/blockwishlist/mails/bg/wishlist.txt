@@ -1,0 +1,14 @@
+
+[{shop_url}] 
+
+Здрасти, 
+
+{firstname} {lastname} посочи, че може да
+желаете да видите списъка му/ѝ с
+желания: {wishlist}
+
+{wishlist} [{message}] 		 
+
+{shop_name} [{shop_url}] се управлява
+с PrestaShop(tm) [http://www.prestashop.com/] 
+

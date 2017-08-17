@@ -23,8 +23,7 @@
          */
         public function deleteBranchFeaturesByHotelId($htl_id)
         {
-            $delete = Db::getInstance()->delete('htl_branch_features', '`id_hotel`='.$htl_id);
-            return $delete;
+            return Db::getInstance()->delete('htl_branch_features', '`id_hotel`='.$htl_id);
         }
 
         /**

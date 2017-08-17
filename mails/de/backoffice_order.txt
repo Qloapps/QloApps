@@ -1,0 +1,13 @@
+
+[{shop_url}] 
+
+Hallo {firstname} {lastname}, 
+
+Sie haben eine neue Bestellung aufgegeben. 
+
+Klicken Sie bitte auf {order_link} [{order_link}],
+um Ihren Kauf abzuschließen. 		 
+
+{shop_name} [{shop_url}] powered by
+PrestaShop(tm) [http://www.prestashop.com/] 
+

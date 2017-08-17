@@ -37,25 +37,25 @@
 		<span class="booking_duration_show">{$data.date_from|date_format:"%d-%m-%Y"}&nbsp-&nbsp {$data.date_to|date_format:"%d-%m-%Y"}</span>
 
 		{if $can_edit}
-		<div class="booking_duration_edit" style="display:none;">
-			<div class="form-group">
-				<div class="fixed-width-xl room_check_in_div">
-					<div class="input-group">
-						<div class="input-group-addon">{l s='Check In'}</div>
-						<input type="text" class="form-control add_product_date_from" name="add_product[date_from]" value="{$data.date_from|date_format:"%d-%m-%Y"}" readonly/>
-						<div class="input-group-addon"><i class="icon-calendar"></i></div>
+			<div class="booking_duration_edit" style="display:none;">
+				<div class="form-group">
+					<div class="fixed-width-xl room_check_in_div">
+						<div class="input-group">
+							<div class="input-group-addon">{l s='Check In'}</div>
+							<input type="text" class="form-control add_product_date_from" name="add_product[date_from]" value="{$data.date_from|date_format:"%d-%m-%Y"}" readonly/>
+							<div class="input-group-addon"><i class="icon-calendar"></i></div>
+						</div>
 					</div>
-				</div>
-				<br/>
-				<div class="fixed-width-xl room_check_out_div">
-					<div class="input-group">
-						<div class="input-group-addon">{l s='Check Out'}</div>
-						<input type="text" class="form-control add_product_date_to" name="add_product[date_to]" value="{$data.date_to|date_format:"%d-%m-%Y"}" readonly/>
-						<div class="input-group-addon"><i class="icon-calendar"></i></div>
+					<br/>
+					<div class="fixed-width-xl room_check_out_div">
+						<div class="input-group">
+							<div class="input-group-addon">{l s='Check Out'}</div>
+							<input type="text" class="form-control add_product_date_to" name="add_product[date_to]" value="{$data.date_to|date_format:"%d-%m-%Y"}" readonly/>
+							<div class="input-group-addon"><i class="icon-calendar"></i></div>
+						</div>
 					</div>
 				</div>
 			</div>
-		</div>
 		{/if}
 	</td>
 	</td>

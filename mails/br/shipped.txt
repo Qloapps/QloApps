@@ -1,0 +1,18 @@
+
+[{shop_url}] 
+
+Olá {firstname} {lastname},
+
+Seu pedido foi enviado 
+
+Seu pedido com referência {order_name} foi enviado.
+
+Muito obrigado por comprar na {shop_name}! 		 
+
+Você pode revisar seu pedido e baixar sua fatura na seção "Meus
+Pedidos" [{history_url}] na sua conta, clicando em
+"Minha Conta" [{my_account_url}] na nossa loja. 
+
+{shop_name} [{shop_url}] baseado em
+PrestaShop(tm) [http://www.prestashop.com/] 
+

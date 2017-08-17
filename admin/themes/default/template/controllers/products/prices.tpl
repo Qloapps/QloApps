@@ -382,16 +382,17 @@ $(document).ready(function () {
 		<a target="_blank" href="{$link->getAdminLink('AdminHotelFeaturePricesSettings')}">{l s='create feature price plans'}</a>
 	</div>
 	<div class="table-responsive">
-		<table class="table table-stripped">
+		<table class="table table-bordered">
 			<thead>
 				<tr>
+					<th>#{l s='Id'}</th>
 					<th>{l s='Plan Name'}</th>
 					<th>{l s='Impact way'}</th>
 					<th>{l s='Impact Type'}</th>
 					<th>{l s='Impact Value'}</th>
 					<th>{l s='Date From'}</th>
 					<th>{l s='Date To'}</th>
-					<th>{l s='Status'}</th>
+					<th class="text-center">{l s='Status'}</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -399,13 +400,16 @@ $(document).ready(function () {
 					{foreach $productFeaturePrices as $featurePlan}
 						<tr>
 							<td>
+								{$featurePlan['id']}
+							</td>
+							<td>
 								{$featurePlan['feature_price_name']}
 							</td>
 							<td>
 								{if $featurePlan['impact_way'] == 1}
-									{l s='Fixed Amount'}
-								{else}
 									{l s='Percentage'}
+								{else}
+									{l s='Fixed Amount'}
 								{/if}
 							</td>
 							<td>
@@ -417,9 +421,9 @@ $(document).ready(function () {
 							</td>
 							<td>
 								{if $featurePlan['impact_way'] == 1}
-									{displayPrice price=$featurePlan['impact_value']}
-								{else}
 									{$featurePlan['impact_value']|round:2}%
+								{else}
+									{displayPrice price=$featurePlan['impact_value']}
 								{/if}
 							</td>
 							<td>
@@ -428,11 +432,11 @@ $(document).ready(function () {
 							<td>
 								{$featurePlan['date_to']|date_format:"%d-%m-%Y"}
 							</td>
-							<td>
+							<td class="text-center">
 								{if $featurePlan['active'] == 1}
-									{l s='Enabled'}
+									<i class="icon-check text-success"></i>
 								{else}
-									{l s='Disabled'}
+									<i class="icon-times text-danger"></i>
 								{/if}
 							</td>
 						</tr>
@@ -440,7 +444,7 @@ $(document).ready(function () {
 				{else}
 					<tr>
 						<td class="text-center" colspan="6">
-							<i class="icon-warning-sign"></i> {l s='No feature price plans created yet.'}
+							<i class="icon-warning-sign"></i> {l s='No feature price plans.'}
 						</td>
 					</tr>
 				{/if}

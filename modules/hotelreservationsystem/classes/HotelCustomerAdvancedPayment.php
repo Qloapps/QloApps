@@ -36,9 +36,14 @@ class HotelCustomerAdvancedPayment extends ObjectModel
      *
      * @return [array|false] [if data found returns array containing advance payment details of an order which cart id is 										$id_cart by a customer which guest id is $id_guest else returns false ]
      */
-    public function getClientAdvPaymentDtl($id_cart, $id_guest)
+    public function getClientAdvPaymentDtl($id_cart, $id_guest, $before_order = 0)
     {
-        return Db::getInstance()->getRow('SELECT * FROM `'._DB_PREFIX_.'htl_customer_adv_payment` WHERE `id_cart`='.$id_cart.' AND `id_guest`='.$id_guest);
+        // before order always only one row will be there in the cart
+        if ($before_order) {
+            return Db::getInstance()->getRow('SELECT * FROM `'._DB_PREFIX_.'htl_customer_adv_payment` WHERE `id_cart`='.$id_cart.' AND `id_guest`='.$id_guest);
+        } else {
+            return Db::getInstance()->executeS('SELECT * FROM `'._DB_PREFIX_.'htl_customer_adv_payment` WHERE `id_cart`='.$id_cart.' AND `id_guest`='.$id_guest);
+        }
     }
 
     /**
@@ -67,31 +72,34 @@ class HotelCustomerAdvancedPayment extends ObjectModel
      */
     public function getOrdertTotal($id_cart, $id_guest, $id_order = 0)
     {
-        $context = Context::getContext();
-        $cart_rules = $context->cart->getCartRules();
+        $cart = new Cart($id_cart);
+        $cart_rules = $cart->getCartRules();
         $total_discount = 0;
         if ($cart_rules) {
             foreach ($cart_rules as $discount) {
-                if ($discount['reduction_currency'] != $context->cart->id_currency) {
-                    $discount['reduction_amount'] = Tools::convertPriceFull($discount['reduction_amount'], new Currency($discount['reduction_currency']), $context->currency);
+                if ($discount['reduction_currency'] != $cart->id_currency) {
+                    $discount['reduction_amount'] = Tools::convertPriceFull($discount['reduction_amount'], new Currency($discount['reduction_currency']), new Currency($cart->id_currency));
                 }
                 $total_discount += $discount['reduction_amount'];
             }
         }
 
         if (!$id_order) {
-            $result = $this->getClientAdvPaymentDtl($id_cart, $id_guest);
-            if ($result) {
-                if ($result['id_currency'] != $context->cart->id_currency) {
-                    $order_total = Tools::convertPriceFull($result['total_paid_amount'], new Currency($result['id_currency']), $context->currency);
-                } else {
-                    $order_total = $result['total_paid_amount'];
+            $cartAdePaymemts = $this->getClientAdvPaymentDtl($id_cart, $id_guest);
+            $order_total = 0; 
+            if ($cartAdePaymemts) {
+                foreach ($cartAdePaymemts as $orderAdvPayment) {
+                    if ($orderAdvPayment['id_currency'] != $cart->id_currency) {
+                        $order_total += Tools::convertPriceFull($orderAdvPayment['total_paid_amount'], new Currency($cartAdvPaymemts['id_currency']), new Currency($cart->id_currency));
+                    } else {
+                        $order_total += $orderAdvPayment['total_paid_amount'];
+                    }
                 }
                 if ($total_discount) {
                     $order_total = ($order_total - $total_discount) > 0 ? ($order_total - $total_discount) : 0;
                 }
             } else {
-                $order_total = $context->cart->getOrderTotal(true, Cart::BOTH);
+                $order_total = $cart->getOrderTotal(true, Cart::BOTH);
             }
 
             return $order_total;
@@ -120,9 +128,12 @@ class HotelCustomerAdvancedPayment extends ObjectModel
                 $order = new Order($id_order);
                 if (Validate::isLoadedObject($order)) {
                     $obj_customer_adv->total_order_amount = $order->total_paid;
-                    $obj_customer_adv->save();
+                    return $obj_customer_adv->save();
                 }
             }
+            return false;
+        } else {
+            return true;
         }
     }
 }

@@ -1,0 +1,13 @@
+
+[{shop_url}] 
+
+Hallo {firstname} {lastname}, 
+
+ACHTUNG: Sie haben einen neuen Eintrag in der Log-Datei.
+
+Sie können dies in der Sektion "TOOLS" > "LOGS" Ihres Back Office
+überprüfen. 		 
+
+{shop_name} [{shop_url}] powered by
+PrestaShop(tm) [http://www.prestashop.com/] 
+

@@ -1,0 +1,11 @@
+{if !empty($list)}
+
+TOTAL PAID 
+
+{$list['total_paid_amount']}
+
+TOTAL DUE
+
+{$list['total_due_amount']}
+
+{/if}

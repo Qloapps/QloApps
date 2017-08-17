@@ -24,7 +24,7 @@ class WkHotelRoomDisplay extends ObjectModel
 	    $sql = 'SELECT MAX(`position`)
 	            FROM `'._DB_PREFIX_.'htl_room_block_data`';
 	    $position = DB::getInstance()->getValue($sql);
-	    
+
 	    return (is_numeric($position)) ? $position : - 1;
 	}
 
@@ -67,7 +67,7 @@ class WkHotelRoomDisplay extends ObjectModel
 		return false;
 	}
 
-	public function deleteRoomByIdProduct($id_product)
+	public static function deleteRoomByIdProduct($id_product)
 	{
 		return Db::getInstance()->delete('htl_room_block_data', 'id_product = '.(int)$id_product);
 	}

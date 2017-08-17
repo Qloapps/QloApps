@@ -1,0 +1,14 @@
+
+[{shop_url}] 
+
+Здрасти, 
+
+{shop_name} Ви приканва да изпратите този
+линк на Ваши приятели, за да видят
+списъка Ви с желания: {wishlist}
+
+{message} [{message}] 		 
+
+{shop_name} [{shop_url}] се управлява
+с PrestaShop(tm) [http://www.prestashop.com/] 
+

@@ -215,7 +215,7 @@ class HotelHelper
         $obj_hotel_info = new HotelBranchInformation();
         $obj_hotel_info->active = 1;
         $obj_hotel_info->hotel_name = 'The Hotel Prime';
-        $obj_hotel_info->phone = 0987654321;
+        $obj_hotel_info->phone = '9999999999';
         $obj_hotel_info->email = 'hotelprime@htl.com';
         $obj_hotel_info->check_in = '12:00';
         $obj_hotel_info->check_out = '12:00';
@@ -446,7 +446,6 @@ class HotelHelper
             }
         }
         return false;
-        ;
     }
 
     public static function generateRandomCode($length = 8)

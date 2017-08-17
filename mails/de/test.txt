@@ -1,0 +1,12 @@
+
+[{shop_url}] 
+
+Hallo! 
+
+Dies ist eine TESTMAIL von Ihrem Shop.
+
+Wenn Sie sie lesen können, war der Test erfolgreich. 
+
+{shop_name} [{shop_url}] powered by
+PrestaShop(tm) [http://www.prestashop.com/] 
+

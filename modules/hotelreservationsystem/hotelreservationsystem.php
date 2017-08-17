@@ -12,7 +12,7 @@ class hotelreservationsystem extends Module
     public function __construct()
     {
         $this->name = 'hotelreservationsystem';
-        $this->version = '1.1.0';
+        $this->version = '1.1.1';
         $this->author = 'Webkul';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -89,13 +89,27 @@ class hotelreservationsystem extends Module
     public function hookActionProductDelete($params)
     {
         if ($params['id_product']) {
+            $idProduct = $params['id_product'];
+
             $obj_htl_rm_type = new HotelRoomType();
             $obj_htl_rm_info = new HotelRoomInformation();
             $obj_htl_cart_data = new HotelCartBookingData();
+            $objHotelAdvancedPayment= new HotelAdvancedPayment();
+            $objRoomTypeFeaturePricing = new HotelRoomTypeFeaturePricing();
+            $objRoomDisableDates = new HotelRoomDisableDates();
 
-            $delete_cart_data = $obj_htl_cart_data->deleteBookingCartDataNotOrderedByProductId($params['id_product']);
-            $delete_room_info = $obj_htl_rm_info->deleteByProductId($params['id_product']);
-            $delete_room_type = $obj_htl_rm_type->deleteByProductId($params['id_product']);
+            $delete_cart_data = $obj_htl_cart_data->deleteBookingCartDataNotOrderedByProductId($idProduct);
+            $delete_room_info = $obj_htl_rm_info->deleteByProductId($idProduct);
+            $delete_room_type = $obj_htl_rm_type->deleteByProductId($idProduct);
+
+            $advPaymentDetail = $objHotelAdvancedPayment->getIdAdvPaymentByIdProduct($idProduct);
+            if ($advPaymentDetail) {
+                $objHotelAdvancedPayment= new HotelAdvancedPayment($advPaymentDetail['id']);
+                $objHotelAdvancedPayment->delete();
+            }
+
+            $objRoomTypeFeaturePricing->deleteFeaturePriceByIdProduct($idProduct);
+            $objRoomDisableDates->deleteRoomDisableDatesByIdRoomType($idProduct);
         }
     }
 
@@ -148,10 +162,11 @@ class hotelreservationsystem extends Module
         $obj_rm_type = new HotelRoomType();
         $obj_adv_payment = new HotelAdvancedPayment();
 
-        $cart_products = $cart->getProducts();
-        foreach ($cart_products as $product) {
+        $orderProducts = $order->getProducts();
+        foreach ($orderProducts as $product) {
             $obj_cart_bk_data = new HotelCartBookingData();
-            $cart_bk_data = $obj_cart_bk_data->getOnlyCartBookingData($cart->id, $cart->id_guest, $product['id_product']);
+            $idProduct = $product['id_product'];
+            $cart_bk_data = $obj_cart_bk_data->getOnlyCartBookingData($cart->id, $cart->id_guest, $idProduct);
             if ($cart_bk_data) {
                 foreach ($cart_bk_data as $cb_k => $cb_v) {
                     $obj_cart_bk_data = new HotelCartBookingData($cb_v['id']);
@@ -160,8 +175,8 @@ class hotelreservationsystem extends Module
                     $obj_cart_bk_data->save();
 
                     $obj_htl_bk_dtl = new HotelBookingDetail();
-                    $id_order_detail = $obj_htl_bk_dtl->getPsOrderDetailIdByIdProduct($product['id_product'], $order->id);
-                    $obj_htl_bk_dtl->id_product = $product['id_product'];
+                    $id_order_detail = $obj_htl_bk_dtl->getPsOrderDetailIdByIdProduct($idProduct, $order->id);
+                    $obj_htl_bk_dtl->id_product = $idProduct;
                     $obj_htl_bk_dtl->id_order = $order->id;
                     $obj_htl_bk_dtl->id_order_detail = $id_order_detail;
                     $obj_htl_bk_dtl->id_cart = $cart->id;
@@ -177,7 +192,7 @@ class hotelreservationsystem extends Module
                         $obj_htl_bk_dtl->is_back_order = 1;
                     }
 
-                    $total_price = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice($product['id_product'], $obj_cart_bk_data->date_from, $obj_cart_bk_data->date_to);
+                    $total_price = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice($idProduct, $obj_cart_bk_data->date_from, $obj_cart_bk_data->date_to);
                     $obj_htl_bk_dtl->date_from = $obj_cart_bk_data->date_from;
                     $obj_htl_bk_dtl->date_to = $obj_cart_bk_data->date_to;
                     $obj_htl_bk_dtl->total_price_tax_excl = Tools::ps_round($total_price['total_price_tax_excl'], 5);
@@ -189,22 +204,22 @@ class hotelreservationsystem extends Module
                         $obj_customer_adv = new HotelCustomerAdvancedPayment();
                         $cust_adv_payment_dtls = $obj_customer_adv->getClientAdvPaymentDtl($cart->id, $cart->id_guest);
                         if ($cust_adv_payment_dtls) {
-                            $prod_adv_payment = $obj_adv_payment->getIdAdvPaymentByIdProduct($product['id_product']);
+                            $prod_adv_payment = $obj_adv_payment->getIdAdvPaymentByIdProduct($idProduct);
 
                             if (!$prod_adv_payment || (isset($prod_adv_payment['payment_type']) && $prod_adv_payment['payment_type'])) {
-                                $room_adv_amount = $obj_adv_payment->getRoomMinAdvPaymentAmount($product['id_product'], $obj_cart_bk_data->date_from, $obj_cart_bk_data->date_to);
+                                $room_adv_amount = $obj_adv_payment->getRoomMinAdvPaymentAmount($idProduct, $obj_cart_bk_data->date_from, $obj_cart_bk_data->date_to);
                                 $obj_customer_adv_product = new HotelCustomerAdvancedProductPayment();
                                 $obj_customer_adv_product->id_cart = $cart->id;
                                 $obj_customer_adv_product->id_room = $obj_cart_bk_data->id_room;
                                 $obj_customer_adv_product->id_hotel = $obj_cart_bk_data->id_hotel;
                                 $obj_customer_adv_product->id_hotel = $obj_cart_bk_data->quantity;
-                                $obj_customer_adv_product->id_product = $product['id_product'];
+                                $obj_customer_adv_product->id_product = $idProduct;
                                 $obj_customer_adv_product->id_order = $order->id;
                                 $obj_customer_adv_product->id_guest = $cart->id_guest;
                                 $obj_customer_adv_product->id_customer = $customer->id;
                                 $obj_customer_adv_product->id_currency = $cart->id_currency;
-                                $obj_customer_adv_product->product_price_tax_incl = Product::getPriceStatic($product['id_product'], true);
-                                $obj_customer_adv_product->product_price_tax_excl = Product::getPriceStatic($product['id_product'], false);
+                                $obj_customer_adv_product->product_price_tax_incl = Product::getPriceStatic($idProduct, true);
+                                $obj_customer_adv_product->product_price_tax_excl = Product::getPriceStatic($idProduct, false);
                                 $obj_customer_adv_product->advance_payment_amount = $room_adv_amount;
                                 $obj_customer_adv_product->date_from = $obj_cart_bk_data->date_from;
                                 $obj_customer_adv_product->date_to = $obj_cart_bk_data->date_to;
@@ -220,24 +235,23 @@ class hotelreservationsystem extends Module
         // For Advanced Payment
         if (Configuration::get('WK_ALLOW_ADVANCED_PAYMENT')) {
             $obj_customer_adv = new HotelCustomerAdvancedPayment();
-            $customer_adv_dtl = $obj_customer_adv->getClientAdvPaymentDtl($cart->id, $cart->id_guest);
+            $customer_adv_dtl = $obj_customer_adv->getClientAdvPaymentDtl($cart->id, $cart->id_guest, 1);
             if ($customer_adv_dtl) {
-                $obj_customer_adv = new HotelCustomerAdvancedPayment($customer_adv_dtl['id']);
-
-                $obj_customer_adv->id_customer = $customer->id;
-                $obj_customer_adv->id_order = $order->id;
-
-                //if currency is changed before order
-                if ($cart->id_currency != $obj_customer_adv->id_currency) {
-                    $obj_customer_adv->total_paid_amount = Tools::convertPriceFull($obj_customer_adv->total_paid_amount, new Currency($obj_customer_adv->id_currency), new Currency($cart->id_currency));
-
-                    $order_amt = $order->total_products_wt;
-                    $obj_customer_adv->id_currency = $cart->id_currency;
+                if ($customer_adv_dtl && !$customer_adv_dtl['id_order']) {
+                    $obj_customer_adv = new HotelCustomerAdvancedPayment($customer_adv_dtl['id']);
                 } else {
-                    $order_amt = $order->total_products_wt;
+                    $obj_customer_adv = new HotelCustomerAdvancedPayment();
                 }
+                $obj_adv_pmt = new HotelAdvancedPayment();
 
-                $obj_customer_adv->total_order_amount = $order_amt;
+                $adv_amount = $obj_adv_pmt->getOrderMinAdvPaymentAmount($order->id);
+                $obj_customer_adv->id_cart = $cart->id;
+                $obj_customer_adv->id_order = $order->id;
+                $obj_customer_adv->id_guest = $cart->id_guest;
+                $obj_customer_adv->id_customer = $cart->id_customer;
+                $obj_customer_adv->id_currency = $order->id_currency;
+                $obj_customer_adv->total_paid_amount = $adv_amount;
+                $obj_customer_adv->total_order_amount = $order->total_paid_tax_incl;
                 $obj_customer_adv->save();
             }
         }

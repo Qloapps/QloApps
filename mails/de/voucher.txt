@@ -1,0 +1,17 @@
+
+[{shop_url}] 
+
+Hallo {firstname} {lastname}, 
+
+Damit werden Sie über die Erstellung eines Gutscheins auf Ihrem
+Namen nach Ihrer Bestellung Nr. {order_name} informiert.{id_order}.
+
+Hier ist der CODE IHRES GUTSCHEINS: {voucher_num}, über einen Betrag
+von {voucher_amount}
+
+Kopieren Sie diesen Code bei Ihrer nächsten Bestellung während des
+Bezahlvorgangs einfach in das Gutscheinfeld. 		 
+
+{shop_name} [{shop_url}] powered by
+PrestaShop(tm) [http://www.prestashop.com/] 
+

@@ -1,0 +1,16 @@
+
+[{shop_url}] 
+
+Hallo {firstname} {lastname}, 
+
+{reply} 
+
+Dies ist eine automatisch generierte E-Mail. Sie können darauf nicht
+antworten. 
+
+Für Antworten benutzen Sie bitte den folgenden Link: {link}
+[{link}] 
+
+{shop_name} [{shop_url}] powered by
+PrestaShop(tm) [http://www.prestashop.com/] 
+

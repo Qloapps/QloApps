@@ -3400,7 +3400,7 @@ class AdminProductsControllerCore extends AdminController
                         $objRoomType->save();
 
                         $id_rm_type = $objRoomType->id;
-                        
+
                         // Associate categories to Room Type
                         $product = new Product((int) $id_product);
                         $objHotelInfo = new HotelBranchInformation($id_hotel);
@@ -3458,12 +3458,10 @@ class AdminProductsControllerCore extends AdminController
 
     public function ajaxProcessDeleteHotelRoom()
     {
-        $id_htl_info = Tools::getValue('id');
+        $idRoom = Tools::getValue('id');
 
-        $objRoomInfo = new HotelRoomInformation();
-        $return = $objRoomInfo->deleteHotelRoomInfoById($id_htl_info);
-
-        echo $return;
+        $objRoomInfo = new HotelRoomInformation((int)$idRoom);
+        die($objRoomInfo->delete());
     }
 
     /**

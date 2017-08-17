@@ -1,0 +1,14 @@
+
+[{shop_url}] 
+
+Olá {firstname} {lastname}, 
+
+{employee} quis encaminhar esta discussão para você. 
+
+HISTÓRICO DA CONVERSA: {messages}
+
+{employee} adicionou: "{comment}" 		 
+
+{shop_name} [{shop_url}] baseado em
+PrestaShop(tm) [http://www.prestashop.com/] 
+

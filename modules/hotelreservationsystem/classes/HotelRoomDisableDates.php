@@ -56,4 +56,47 @@ class HotelRoomDisableDates extends ObjectModel
 	{
 		return Db::getInstance()->delete('htl_room_disable_dates', '`id_room`='.(int)$id_room);
 	}
+
+	
+	public function validateDisableDateRange($disableDates)
+	{
+		$hotelResModInstance = Module::getInstanceByName('hotelreservationsystem');
+		$wkDateErrors = array();		
+		if (count($disableDates)) {
+            foreach ($disableDates as $disable_key => $disableDate) {
+                if (!$disableDate['date_to'] && !$disableDate['date_from']) {
+                    unset($disableDates[$disable_key]);
+                } elseif (!Validate::isDate($disableDate['date_from']) || !Validate::isDate($disableDate['date_to'])) {
+					$wkDateErrors[] = $hotelResModInstance->l('Please fill valid date in disable date fields', 'HotelRoomDisableDates');
+                } elseif (($disableDate['date_from'] && !$disableDate['date_to']) || (!$disableDate['date_from'] && $disableDate['date_to'])) {
+					$wkDateErrors[] = $hotelResModInstance->l('Please fill all date from and date to for disable dates fields.', 'HotelRoomDisableDates');
+                } else {
+                    foreach ($disableDates as $key => $disDate) {
+                        if ($key != $disable_key) {
+                            if ((($disableDate['date_from'] < $disDate['date_from']) && ($disableDate['date_to'] <= $disDate['date_from'])) || (($disableDate['date_from'] > $disDate['date_from']) && ($disableDate['date_from'] >= $disDate['date_to']))) {
+                                // continue
+                            } else {
+								$wkDateErrors[] = $hotelResModInstance->l('Some date are conflicting with each other. Please check and reselect the date ranges.', 'HotelRoomDisableDates');
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        if (!count($disableDates)) {
+			$wkDateErrors[] = $hotelResModInstance->l('Please enter disable dates for status temporary disable.', 'HotelRoomDisableDates');
+        }
+
+		return $wkDateErrors;
+	}
+
+	public function deleteRoomDisableDatesByIdRoomType($idRoomType)
+	{
+		if (!$idRoomType) {
+			return false;
+		}
+
+		return Db::getInstance()->delete('htl_room_disable_dates', '`id_room_type`='.(int)$idRoomType);
+	}
 }

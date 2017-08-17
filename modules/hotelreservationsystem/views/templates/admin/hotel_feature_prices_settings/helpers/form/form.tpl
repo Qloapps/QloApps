@@ -41,17 +41,17 @@
             </label>
             <div class="col-lg-3">
 				<select class="form-control" name="date_selection_type" id="date_selection_type">
-					<option value="1" {if isset($featurePriceInfo->date_selection_type) && $featurePriceInfo->date_selection_type == 1}selected = "selected"{/if}">
+					<option value="1" {if isset($featurePriceInfo->date_selection_type) && $featurePriceInfo->date_selection_type == 1}selected = "selected"{/if}>
 					  {l s='Date Range' mod='hotelreservationsystem'}
 					</option>
-					<option value="2" {if isset($featurePriceInfo->date_selection_type) && $featurePriceInfo->date_selection_type == 2}selected = "selected"{/if}">
+					<option value="2" {if isset($featurePriceInfo->date_selection_type) && $featurePriceInfo->date_selection_type == 2}selected = "selected"{/if}>
 					  {l s='Specific Date' mod='hotelreservationsystem'}
 					</option>
 				</select>
 			</div>
 		</div>
 
-		<div class="form-group specific_date_type" {if isset($edit) && $edit}{if isset($featurePriceInfo->date_selection_type) && $featurePriceInfo->date_selection_type != 2}style="display:none;"{/if}{else}style="display:none;"{/if}">
+		<div class="form-group specific_date_type" {if isset($edit) && $edit}{if isset($featurePriceInfo->date_selection_type) && $featurePriceInfo->date_selection_type != 2}style="display:none;"{/if}{else}style="display:none;"{/if}>
 			<label class="col-sm-3 control-label required" for="specific_date" >
 				{l s='Specific Date' mod='hotelreservationsystem'}
 			</label>
@@ -60,15 +60,15 @@
 			</div>
 		</div>
 
-		<div class="form-group date_range_type" {if isset($featurePriceInfo->date_selection_type) && $featurePriceInfo->date_selection_type == 2}style="display:none;"{/if}">
-			<label class="col-sm-3 control-label required" for="date_form" >
+		<div class="form-group date_range_type" {if isset($featurePriceInfo->date_selection_type) && $featurePriceInfo->date_selection_type == 2}style="display:none;"{/if}>
+			<label class="col-sm-3 control-label required" for="date_form">
 				{l s='Date From' mod='hotelreservationsystem'}
 			</label>
 			<div class="col-sm-3">
 				<input type="text" id="feature_plan_date_from" name="date_from" class="form-control" value="{if isset($featurePriceInfo->date_from)}{$featurePriceInfo->date_from|date_format:"%d-%m-%Y"}{else}{$date_from|date_format:"%d-%m-%Y"}{/if}" readonly/>
 			</div>
 		</div>
-		<div class="form-group date_range_type" {if isset($featurePriceInfo->date_selection_type) && $featurePriceInfo->date_selection_type == 2}style="display:none;"{/if}">
+		<div class="form-group date_range_type" {if isset($featurePriceInfo->date_selection_type) && $featurePriceInfo->date_selection_type == 2}style="display:none;"{/if}>
 			<label class="col-sm-3 control-label required" for="date_to" >
 				{l s='Date To' mod='hotelreservationsystem'}
 			</label>
@@ -76,8 +76,8 @@
 				<input type="text" id="feature_plan_date_to" name="date_to" class="form-control" value="{if isset($featurePriceInfo->date_to)}{$featurePriceInfo->date_to|date_format:"%d-%m-%Y"}{else}{$date_to|date_format:"%d-%m-%Y"}{/if}" readonly/> 
 			</div>
 		</div>
-		<div class="form-group special_days_content" {if isset($featurePriceInfo->date_selection_type) && $featurePriceInfo->date_selection_type == 2}style="display:none;"{/if}">
-			<label class="col-sm-3 control-label required" for="date_to" >
+		<div class="form-group special_days_content" {if isset($featurePriceInfo->date_selection_type) && $featurePriceInfo->date_selection_type == 2}style="display:none;"{/if}>
+			<label class="col-sm-3 control-label required" for="date_to">
 				{l s='For Special Days' mod='hotelreservationsystem'}
 			</label>
 			<div class="col-sm-2">
@@ -91,31 +91,31 @@
 			<div class="col-sm-7 week_days" {if isset($featurePriceInfo->is_special_days_exists) && $featurePriceInfo->is_special_days_exists}style="display:block;"{/if}>
 				<div class="col-sm-1">
 					<input type="checkbox" name="special_days[]" value="mon" {if isset($special_days) && $special_days && in_array('mon', $special_days)}checked="checked"{/if}/>
-					<p>{l s='Mon' mod='psbooking'}</p>
+					<p>{l s='Mon' mod='hotelreservationsystem'}</p>
 				</div>
 				<div class="col-sm-1">
 					<input type="checkbox" name="special_days[]" value="tue" {if isset($special_days) && $special_days && in_array('tue', $special_days)}checked="checked"{/if}/>
-					<p>{l s='Tue' mod='psbooking'}</p>
+					<p>{l s='Tue' mod='hotelreservationsystem'}</p>
 				</div>
 				<div class="col-sm-1">
 					<input type="checkbox" name="special_days[]" value="wed" {if isset($special_days) && $special_days && in_array('wed', $special_days)}checked="checked"{/if}/>
-					<p>{l s='Wed' mod='psbooking'}</p>
+					<p>{l s='Wed' mod='hotelreservationsystem'}</p>
 				</div>
 				<div class="col-sm-1">
 					<input type="checkbox" name="special_days[]" value="thu" {if isset($special_days) && $special_days && in_array('thu', $special_days)}checked="checked"{/if}/>
-					<p>{l s='Thu' mod='psbooking'}</p>
+					<p>{l s='Thu' mod='hotelreservationsystem'}</p>
 				</div>
 				<div class="col-sm-1">
 					<input type="checkbox" name="special_days[]" value="fri" {if isset($special_days) && $special_days && in_array('fri', $special_days)}checked="checked"{/if}/>
-					<p>{l s='Fri' mod='psbooking'}</p>
+					<p>{l s='Fri' mod='hotelreservationsystem'}</p>
 				</div>
 				<div class="col-sm-1">
 					<input type="checkbox" name="special_days[]" value="sat" {if isset($special_days) && $special_days && in_array('sat', $special_days)}checked="checked"{/if}/>
-					<p>{l s='Sat' mod='psbooking'}</p>
+					<p>{l s='Sat' mod='hotelreservationsystem'}</p>
 				</div>
 				<div class="col-sm-1">
 					<input type="checkbox" name="special_days[]" value="sun" {if isset($special_days) && $special_days && in_array('sun', $special_days)}checked="checked"{/if}/>
-					<p>{l s='Sun' mod='psbooking'}</p>
+					<p>{l s='Sun' mod='hotelreservationsystem'}</p>
 				</div>
 			</div>
 		</div>
@@ -126,10 +126,10 @@
             </label>
             <div class="col-lg-3">
 				<select class="form-control" name="price_impact_way" id="price_impact_way">
-					<option value="1" {if isset($featurePriceInfo->impact_way) && $featurePriceInfo->impact_way == 1}selected = "selected"{/if}">
+					<option value="1" {if isset($featurePriceInfo->impact_way) && $featurePriceInfo->impact_way == 1}selected = "selected"{/if}>
 					  {l s='Decrease Price' mod='hotelreservationsystem'}
 					</option>
-					<option value="2" {if isset($featurePriceInfo->impact_way) && $featurePriceInfo->impact_way == 2}selected = "selected"{/if}">
+					<option value="2" {if isset($featurePriceInfo->impact_way) && $featurePriceInfo->impact_way == 2}selected = "selected"{/if}>
 					  {l s='Increase Price' mod='hotelreservationsystem'}
 					</option>
 				</select>
@@ -142,10 +142,10 @@
             </label>
             <div class="col-lg-3">
 				<select class="form-control" name="price_impact_type" id="price_impact_type">
-					<option value="1" {if isset($featurePriceInfo->impact_type) && $featurePriceInfo->impact_type == 1}selected = "selected"{/if}">
+					<option value="1" {if isset($featurePriceInfo->impact_type) && $featurePriceInfo->impact_type == 1}selected = "selected"{/if}>
 					  {l s='Percentage' mod='hotelreservationsystem'}
 					</option>
-					<option value="2" {if isset($featurePriceInfo->impact_type) && $featurePriceInfo->impact_type == 2}selected = "selected"{/if}">
+					<option value="2" {if isset($featurePriceInfo->impact_type) && $featurePriceInfo->impact_type == 2}selected = "selected"{/if}>
 					  {l s='Fixed Price' mod='hotelreservationsystem'}
 					</option>
 				</select>

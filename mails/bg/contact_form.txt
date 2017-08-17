@@ -1,0 +1,21 @@
+
+[{shop_url}] 
+
+Вашето съобщение до {shop_name}
+Обслужване на клиенти 
+
+Вашето съобщение е изпратено успешно.
+
+СЪОБЩЕНИЕ: {message}
+
+ПОРЪЧКА №: {order_name}
+
+ПРОДУКТ: {product_name}
+
+ПРИКАЧЕН ФАЙЛ: {attached_file} 		 
+
+Ще Ви отговорим възможно най-скоро. 
+
+{shop_name} [{shop_url}] се управлява
+с PrestaShop(tm) [http://www.prestashop.com/] 
+

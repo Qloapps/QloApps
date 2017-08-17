@@ -1,0 +1,16 @@
+
+[{shop_url}] 
+
+Olá {firstname} {lastname}, 
+
+Um cupom foi criado em seu nome, como resultado de seu pedido com
+referência {order_name}.
+
+CÓDIGO DO CUPOM: {voucher_num} no valor de {voucher_amount}
+
+Na próxima compra basta inserir o código do cupom na tela de
+pagamento. 		 
+
+{shop_name} [{shop_url}] baseado em
+PrestaShop(tm) [http://www.prestashop.com/] 
+

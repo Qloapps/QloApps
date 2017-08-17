@@ -1,0 +1,16 @@
+
+[{shop_url}] 
+
+Здравейте {firstname} {lastname}, 
+
+{reply} 
+
+Моля, не отговаряйте на този имейл
+директно, ние няма да го получим. 
+
+За да отговорите, моля ползвайте
+следния линк: {link} [{link}] 
+
+{shop_name} [{shop_url}] се управлява
+с PrestaShop(tm) [http://www.prestashop.com/] 
+
