@@ -38,8 +38,7 @@ Getting support
 If you need help using QloApps, contact the QloApps support team: qloapps@webkul.com
 or raise ticket at https://webkul.uvdesk.com
 
-Webkul is known for his proactive support and already developed more than 100+ plugins on prestashop and more than 700+ plugins on other
-platforms.
+Webkul is known for his proactive support and already developed more than 100+ plugins on prestashop and more than 700+ plugins on other platforms.
 
 
 license
