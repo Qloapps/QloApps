@@ -1,0 +1,10 @@
+
+[{shop_url}] 
+
+Здравейте {firstname} {lastname}, 
+
+{message} 
+
+{shop_name} [{shop_url}] се управлява
+с PrestaShop(tm) [http://www.prestashop.com/] 
+

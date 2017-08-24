@@ -222,6 +222,27 @@ class HotelAdvancedPayment extends ObjectModel
         return $adv_amount;
     }
 
+    /**
+     * [getMinAdvPaymentAmount description :: To get minimum advance payment amount paid by the customer for all products in the cart]
+     * @return [float] [Returns the amount paid by the customer in advance for the product for given quantities]
+     */
+    public function getOrderMinAdvPaymentAmount($id_order)
+    {
+        $order = new Order($id_order);
+        
+        $orderProducts = $order->getProducts();
+        $adv_amount = 0;
+
+        $adv_global_percent = Configuration::get('WK_ADVANCED_PAYMENT_GLOBAL_MIN_AMOUNT');
+        $adv_global_tax_inc = Configuration::get('WK_ADVANCED_PAYMENT_INC_TAX');
+
+        foreach ($orderProducts as $prod_key => $product) {
+            $adv_amount += $this->getProductMinAdvPaymentAmountByIdCart($order->id_cart, $product['id_product']);
+        }
+
+        return $adv_amount;
+    }
+
     public function _checkFreeAdvancePaymentOrder()
     {
         $advance_payment_active = Configuration::get('WK_ALLOW_ADVANCED_PAYMENT');

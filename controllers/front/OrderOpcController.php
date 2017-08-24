@@ -537,7 +537,7 @@ class OrderOpcControllerCore extends ParentOrderController
                         }
 
                         $obj_customer_adv = new HotelCustomerAdvancedPayment();
-                        $customer_adv_dtl = $obj_customer_adv->getClientAdvPaymentDtl($this->context->cart->id, $this->context->cart->id_guest);
+                        $customer_adv_dtl = $obj_customer_adv->getClientAdvPaymentDtl($this->context->cart->id, $this->context->cart->id_guest, 1);
                         if ($customer_adv_dtl) {
                             if (Tools::ps_round($customer_adv_dtl['total_paid_amount'], 2) != Tools::ps_round($adv_amount, 2)) {
                                 // If More rooms are added in cart after selecting Advanced payment

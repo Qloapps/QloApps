@@ -15,13 +15,13 @@ Server configuration
 --------
 To install Qlo, you need a web server running PHP 5.2+ and any flavor of MySQL 5.0+ (MySQL, MariaDB, Percona Server, etc)
 You will also need a database administration tool, such as phpMyAdmin, in order to create a database for PrestaShop.
-We recommend the Apache or Nginx web servers.  
+We recommend the Apache or Nginx web servers.
 
 
 Installation
 --------
 a) from Source </br>
-Please go through this blog : http://qloapps.com/install-qloapps/ for detail instruction about installation.  
+Please go through this blog : http://qloapps.com/install-qloapps/ for detail instruction about installation.
 In nutshell :
 Once the files in the QloApps  archive have been decompressed and uploaded on your hosting space, go to the root of your QloApps directory with your web browser, and the QloApps installer will start automatically. Follow the instructions until QloApps is installed.
 
@@ -38,8 +38,7 @@ Getting support
 If you need help using QloApps, contact the QloApps support team: qloapps@webkul.com
 or raise ticket at https://webkul.uvdesk.com
 
-Webkul is known for his proactive support and already developed more than 100+ plugins on prestashop and more than 700+ plugins on other 
-platforms.
+Webkul is known for his proactive support and already developed more than 100+ plugins on prestashop and more than 700+ plugins on other platforms.
 
 
 license

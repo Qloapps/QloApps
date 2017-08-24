@@ -1,0 +1,13 @@
+
+[{shop_url}] 
+
+Olá {firstname} {lastname}, 
+
+AVISO: você recebeu um novo alerta de log da sua loja.
+
+Você pode verificar isso em "PARÂMETROS AVANÇADOS" > "LOGS" na sua
+área de administração. 		 
+
+{shop_name} [{shop_url}] baseado em
+PrestaShop(tm) [http://www.prestashop.com/] 
+

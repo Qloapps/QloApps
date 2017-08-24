@@ -412,3 +412,16 @@ function accordion(status)
 		$('#left_column, #right_column').removeClass('accordion');
 	}
 }
+
+/*Growl plulin implementation to show notifications on front office*/
+function showSuccessMessage(msg) {
+	$.growl.notice({ title: "", message:msg});
+}
+
+function showErrorMessage(msg) {
+	$.growl.error({ title: "", message:msg});
+}
+
+function showNoticeMessage(msg) {
+	$.growl.notice({ title: "", message:msg});
+}

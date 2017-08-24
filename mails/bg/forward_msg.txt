@@ -1,0 +1,15 @@
+
+[{shop_url}] 
+
+Здравейте {firstname} {lastname}, 
+
+{employee} пожела да препрати тази
+дискусия на Вас. 
+
+ИСТОРИЯ НА ДИСКУСИЯТА: {messages}
+
+{employee} добави "{comment}" 		 
+
+{shop_name} [{shop_url}] се управлява
+с PrestaShop(tm) [http://www.prestashop.com/] 
+

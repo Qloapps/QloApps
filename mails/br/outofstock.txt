@@ -1,0 +1,25 @@
+
+[{shop_url}] 
+
+Olá {firstname} {lastname},
+
+Muito obrigado pelo seu pedido com referência {order_name} na
+{shop_name}. 
+
+Infelizmente, um ou mais itens estão esgotados. Isso pode causar
+um ligeiro atraso na sua entrega. Por favor, aceite nossas desculpas e
+tenha a certeza de que estamos trabalhando  para corrigir esta
+situação. 
+
+Você pode revisar seu pedido e baixar sua fatura na seção "Meus
+Pedidos" [{history_url}] na sua conta, clicando em
+"Minha Conta" [{my_account_url}] na nossa loja. 
+
+Se você tem uma conta de convidado, você pode acompanhar seu
+pedido através da seção "Rastreamento de convidado"
+[{guest_tracking_url}?id_order={order_name}] em nossa
+loja. 
+
+{shop_name} [{shop_url}] baseado em
+PrestaShop(tm) [http://www.prestashop.com/] 
+

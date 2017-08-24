@@ -1,0 +1,25 @@
+
+[{shop_url}] 
+
+Hallo {firstname} {lastname}, 
+
+Bei der Zahlung für Ihre Bestellung Nr. {order_name} bei {shop_name}
+ist ein Fehler aufgetreten. Bitte kontaktieren Sie uns so bald wie
+möglich.
+
+IHRE BESTELLUNG KÖNNEN WIR LEIDER NICHT VERSENDEN, BIS WIR DIE
+BEZAHLUNG BERHALTEN HABEN. 		 
+
+Sie können diese Bestellung ansehen und Ihre Rechnung aus dem
+"Bestellverlauf" [{history_url}] Ihres Kontos
+downloaden, indem Sie auf unserer Webseite auf "Mein Konto"
+[{my_account_url}] klicken. 
+
+Wenn Sie ein Gast-Konto haben, können Sie Ihre Bestellung im
+Abschnitt "Bestellverfolgung Gast"
+[{guest_tracking_url}?id_order={order_name}] auf
+unserer Webseite verfolgen. 
+
+{shop_name} [{shop_url}] powered by
+PrestaShop(tm) [http://www.prestashop.com/] 
+

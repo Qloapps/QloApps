@@ -137,6 +137,15 @@ class AdminAddHotelController extends ModuleAdminController
             $this->context->smarty->assign('country_var', $countries_var);
             $this->context->smarty->assign('state_var', $states);
             $this->context->smarty->assign('hotel_info', $hotel_branch_info);
+            //Hotel Images
+            $objHotelImage = new HotelImage();
+            $hotelAllImages = $objHotelImage->getAllImagesByHotelId($hotel_id);
+            if ($hotelAllImages) {
+                foreach ($hotelAllImages as &$image) {
+                    $image['path'] = _MODULE_DIR_.'hotelreservationsystem/views/img/hotel_img/'.$image['hotel_image_id'].'.jpg';
+                }
+                $this->context->smarty->assign('hotelImages', $hotelAllImages);
+            }
         }
         $this->context->smarty->assign('enabledDisplayMap', Configuration::get('WK_GOOGLE_ACTIVE_MAP'));
         
@@ -232,20 +241,19 @@ class AdminAddHotelController extends ModuleAdminController
             $this->errors[] = Tools::displayError('Enter a Valid City Name.');
         }
 
-        //validate hotel main image
-        if (isset($_FILES['hotel_image']) && $_FILES['hotel_image']['name']) {
-            $obj_htl_img = new HotelImage();
-            $error = $obj_htl_img->validateImage($_FILES['hotel_image']);
-            if ($error) {
-                $this->errors[] = Tools::displayError('<strong>'.$_FILES['hotel_image']['name'].'</strong> : Image format not recognized, allowed formats are: .gif, .jpg, .png', false);
-            }
-        }
         //validate Hotel's other images
-        if (isset($_FILES['images']) && $_FILES['images']) {
-            $obj_htl_img = new HotelImage();
-            $error = $obj_htl_img->validAddHotelOtherImage($_FILES['images']);
-            if ($error) {
-                $this->errors[] = Tools::displayError('<strong>'.$_FILES['hotel_image']['name'].'</strong> : Image format not recognized, allowed formats are: .gif, .jpg, .png', false);
+        if (isset($_FILES['hotel_images']) && $_FILES['hotel_images']) {
+            $imgErr = 1;
+            $htlImages = $_FILES['hotel_images'];
+            if (count($htlImages['name'])) {
+                $objHotelHelper = new HotelHelper();
+                foreach ($htlImages['name'] as $imageName) {
+                    if ($imageName) {
+                        if (!$objHotelHelper->validImageExt($imageName)) {
+                            $this->errors[] = Tools::displayError('<strong>'.$imageName.'</strong> : Image format not recognized, allowed formats are: .gif, .jpg, .png', false);
+                        }
+                    }
+                }
             }
         }
         if (!count($this->errors)) {
@@ -294,16 +302,11 @@ class AdminAddHotelController extends ModuleAdminController
             $new_hotel_id = $obj_hotel_info->id;
             $hotel_img_path = _PS_MODULE_DIR_.'hotelreservationsystem/views/img/hotel_img/';
 
-            //upload hotel's image
-            if (isset($_FILES['hotel_image']) && $_FILES['hotel_image']) {
-                $obj_htl_img = new HotelImage();
-                $obj_htl_img->uploadMainImage($_FILES['hotel_image'], $new_hotel_id, $hotel_img_path);
-            }
-
             //upload hotel's other images
-            if (isset($_FILES['images']) && $_FILES['images']) {
-                $obj_htl_img = new HotelImage();
-                $obj_htl_img->uploadOtherImages($_FILES['images'], $new_hotel_id, $hotel_img_path);
+            if (isset($_FILES['hotel_images']) && $_FILES['hotel_images']) {
+                $objHotelImage = new HotelImage();
+                $hotelImgPath = _PS_MODULE_DIR_.'hotelreservationsystem/views/img/hotel_img/';
+                $objHotelImage->uploadHotelImages($_FILES['hotel_images'], $new_hotel_id, $hotelImgPath);
             }
 
             if ($new_hotel_id) {
@@ -315,22 +318,22 @@ class AdminAddHotelController extends ModuleAdminController
                 }
                 //test
                 $country_name = (new Country())->getNameById($this->context->language->id, $country);
-                $cat_country = $this->addCategory($country_name, false, $grp_ids);
+                $cat_country = $obj_hotel_info->addCategory($country_name, false, $grp_ids);
 
                 if ($cat_country) {
                     if ($state) {
                         $state_name = (new State())->getNameById($state);
-                        $cat_state = $this->addCategory($state_name, $cat_country, $grp_ids);
+                        $cat_state = $obj_hotel_info->addCategory($state_name, $cat_country, $grp_ids);
                     } else {
-                        $cat_state = $this->addCategory($city, $cat_country, $grp_ids);
+                        $cat_state = $obj_hotel_info->addCategory($city, $cat_country, $grp_ids);
                     }
                 }
                 if ($cat_state) {
-                    $cat_city = $this->addCategory($city, $cat_state, $grp_ids);
+                    $cat_city = $obj_hotel_info->addCategory($city, $cat_state, $grp_ids);
                 }
 
                 if ($cat_city) {
-                    $cat_hotel = $this->addCategory($hotel_name, $cat_city, $grp_ids, 1, $new_hotel_id);
+                    $cat_hotel = $obj_hotel_info->addCategory($hotel_name, $cat_city, $grp_ids, 1, $new_hotel_id);
                 }
 
                 if ($cat_hotel) {
@@ -362,163 +365,16 @@ class AdminAddHotelController extends ModuleAdminController
         }
     }
 
-    public function addCategory($name, $parent_cat = false, $group_ids, $ishotel = false, $hotel_id = false)
+    public function ajaxProcessDeleteHotelImage()
     {
-        if (!$parent_cat) {
-            $parent_cat = Category::getRootCategory()->id;
-        }
-
-        if ($ishotel && $hotel_id) {
-            $cat_id_hotel = Db::getInstance()->getValue('SELECT `id_category` FROM `'._DB_PREFIX_.'htl_branch_info` WHERE id='.$hotel_id);
-            if ($cat_id_hotel) {
-                $obj_cat = new Category($cat_id_hotel);
-                $obj_cat->name = array();
-                $obj_cat->description = array();
-                $obj_cat->link_rewrite = array();
-
-                foreach (Language::getLanguages(true) as $lang) {
-                    $obj_cat->name[$lang['id_lang']] = $name;
-                    $obj_cat->description[$lang['id_lang']] = $this->l('this category is for hotels only');
-                    $obj_cat->link_rewrite[$lang['id_lang']] = $this->l(Tools::link_rewrite($name));
-                }
-                $obj_cat->id_parent = $parent_cat;
-                $obj_cat->groupBox = $group_ids;
-                $obj_cat->save();
-                $cat_id = $obj_cat->id;
-
-                return $cat_id;
+        $id_htl_img = Tools::getValue('id_htl_img');
+        $objHotelImage = new HotelImage($id_htl_img);
+        if ($objHotelImage->id) {
+            if ($objHotelImage->delete()) {
+                die('1');
             }
         }
-        $categoryExist = Category::searchByNameAndParentCategoryId($this->context->language->id, $name, $parent_cat);
-        if ($categoryExist) {
-            return $categoryExist['id_category'];
-        } else {
-            $obj = new Category();
-            $obj->name = array();
-            $obj->description = array();
-            $obj->link_rewrite = array();
-
-            foreach (Language::getLanguages(true) as $lang) {
-                $obj->name[$lang['id_lang']] = $name;
-                $obj->description[$lang['id_lang']] = $this->l('this category are for hotels only');
-                $obj->link_rewrite[$lang['id_lang']] = $this->l(Tools::link_rewrite($name));
-            }
-            $obj->id_parent = $parent_cat;
-            $obj->groupBox = $group_ids;
-            $obj->add();
-            $cat_id = $obj->id;
-
-            return $cat_id;
-        }
-    }
-
-    public function processDelete()
-    {
-        if (Validate::isLoadedObject($object = $this->loadObject())) {
-            $object = $this->loadObject();
-            if ($object->id) {
-                $obj_branch_features = new HotelBranchFeatures();
-
-                $obj_htl_cart_data = new HotelCartBookingData();
-
-                $obj_htl_img = new HotelImage();
-
-                $obj_htl_rm_info = new HotelRoomInformation();
-
-                $obj_htl_rm_type = new HotelRoomType();
-                $ids_product = $obj_htl_rm_type->getIdProductByHotelId($object->id);
-
-                if (isset($ids_product) && $ids_product) {
-                    foreach ($ids_product as $key_prod => $value_prod) {
-                        $delete_cart_data = $obj_htl_cart_data->deleteBookingCartDataNotOrderedByProductId($value_prod['id_product']);
-
-                        $delete_room_info = $obj_htl_rm_info->deleteByProductId($value_prod['id_product']);
-
-                        $delete_room_type = $obj_htl_rm_type->deleteByProductId($value_prod['id_product']);
-
-                        $obj_product = new Product($value_prod['id_product']);
-                        $delete_product = $obj_product->delete();
-                    }
-                }
-                $delete_branch_features = $obj_branch_features->deleteBranchFeaturesByHotelId($object->id);
-                $htl_all_images = $obj_htl_img->getAllImagesByHotelId($object->id);
-                if ($htl_all_images) {
-                    foreach ($htl_all_images as $key_img => $value_img) {
-                        $path_img = _PS_MODULE_DIR_.'hotelreservationsystem/views/img/hotel_img/'.$value_img['hotel_image_id'].'.jpg';
-                        @unlink($path_img);
-                    }
-                }
-
-                $delete_htl_img = $obj_htl_img->deleteByHotelId($object->id);
-            }
-        } else {
-            $this->errors[] = Tools::displayError('An error occurred while deleting the object.').
-                ' <b>'.$this->table.'</b> '.Tools::displayError('(cannot load object)');
-        }
-        parent::processDelete();
-    }
-
-    protected function processBulkDelete()
-    {
-        if (is_array($this->boxes) && !empty($this->boxes)) {
-            foreach ($this->boxes as $key => $value) {
-                $obj_branch_features = new HotelBranchFeatures();
-
-                $obj_htl_cart_data = new HotelCartBookingData();
-
-                $obj_htl_img = new HotelImage();
-
-                $obj_htl_rm_info = new HotelRoomInformation();
-
-                $obj_htl_rm_type = new HotelRoomType();
-                $ids_product = $obj_htl_rm_type->getIdProductByHotelId($value);
-                if (isset($ids_product) && $ids_product) {
-                    foreach ($ids_product as $key_prod => $value_prod) {
-                        $delete_cart_data = $obj_htl_cart_data->deleteBookingCartDataNotOrderedByProductId($value_prod['id_product']);
-
-                        $delete_room_info = $obj_htl_rm_info->deleteByProductId($value_prod['id_product']);
-
-                        $delete_room_type = $obj_htl_rm_type->deleteByProductId($value_prod['id_product']);
-
-                        $obj_product = new Product($value_prod['id_product']);
-                        $delete_product = $obj_product->delete();
-                    }
-                }
-                $delete_branch_features = $obj_branch_features->deleteBranchFeaturesByHotelId($value);
-                $htl_all_images = $obj_htl_img->getAllImagesByHotelId($value);
-
-                foreach ($htl_all_images as $key_img => $value_img) {
-                    $path_img = _PS_MODULE_DIR_.'hotelreservationsystem/views/img/hotel_img/'.$value_img['hotel_image_id'].'.jpg';
-                    @unlink($path_img);
-                }
-                $delete_htl_img = $obj_htl_img->deleteByHotelId($value);
-            }
-            parent::processBulkDelete();
-        } else {
-            $this->errors[] = Tools::displayError('You must select at least one element to delete.');
-        }
-    }
-
-    public function processStatus()
-    {
-        if (Validate::isLoadedObject($object = $this->loadObject())) {
-            if ($object->id && $object->active) {
-                $obj_htl_rm_info = new HotelRoomType();
-                $ids_product = $obj_htl_rm_info->getIdProductByHotelId($object->id);
-                if (isset($ids_product) && $ids_product) {
-                    foreach ($ids_product as $key_prod => $value_prod) {
-                        $obj_product = new Product($value_prod['id_product']);
-
-                        if ($obj_product->active) {
-                            $obj_product->toggleStatus();
-                        }
-                    }
-                }
-            }
-        } else {
-            $this->errors[] = Tools::displayError('An error occurred while updating the status for an object.').' <b>'.$this->table.'</b> '.Tools::displayError('(cannot load object)');
-        }
-        parent::processStatus();
+        die('0');
     }
 
     public function ajaxProcessStateByCountryId()
@@ -545,8 +401,6 @@ class AdminAddHotelController extends ModuleAdminController
     public function setMedia()
     {
         parent::setMedia();
-        $this->addJs(_MODULE_DIR_.'hotelreservationsystem/views/js/HotelReservationAdmin.js');
-        $this->addCSS(_MODULE_DIR_.'hotelreservationsystem/views/css/HotelReservationAdmin.css');
 
         // GOOGLE MAP
         $language = $this->context->language;
@@ -562,5 +416,8 @@ class AdminAddHotelController extends ModuleAdminController
         } else {
             $this->addJS(_PS_JS_DIR_.'tinymce.inc.js');
         }
+
+        $this->addJs(_MODULE_DIR_.'hotelreservationsystem/views/js/HotelReservationAdmin.js');
+        $this->addCSS(_MODULE_DIR_.'hotelreservationsystem/views/css/HotelReservationAdmin.css');
     }
 }

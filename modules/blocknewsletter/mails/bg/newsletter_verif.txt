@@ -1,0 +1,14 @@
+
+[{shop_url}] 
+
+Здрасти, 
+
+Благодарим Ви, че се абонирахте за
+нашият бюлетин, моля потвърдете
+Вашето желание с линка по-долу:
+
+{verif_url} [{verif_url}] 		 
+
+{shop_name} [{shop_url}] се управлява
+с PrestaShop(tm) [http://www.prestashop.com/] 
+

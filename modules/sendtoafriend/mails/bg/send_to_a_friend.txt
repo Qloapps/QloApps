@@ -1,0 +1,11 @@
+
+[{shop_url}] 
+
+Здравейте {name},
+
+Натиснете тук за да видите този
+артикул: {product} [{product_link}] 
+
+{shop_name} [{shop_url}] се управлява
+с PrestaShop(tm) [http://www.prestashop.com/] 
+

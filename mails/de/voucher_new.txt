@@ -1,0 +1,13 @@
+
+[{shop_url}] 
+
+Hallo {firstname} {lastname}, 
+
+Hier Ihr persönlicher Gutscheincode: {voucher_num}
+
+Kopieren Sie diesen Code bei Ihrer nächsten Bestellung während des
+Bezahlvorgangs einfach in das Gutscheinfeld. 		 
+
+{shop_name} [{shop_url}] powered by
+PrestaShop(tm) [http://www.prestashop.com/] 
+

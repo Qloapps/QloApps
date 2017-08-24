@@ -97,14 +97,22 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
         $id_cart = $this->context->cart->id;
         $id_guest = $this->context->cookie->id_guest;
         
-        $this->context->smarty->assign(array('id_cart' => $id_cart,
-                                            'id_guest' => $id_guest));
+        $this->context->smarty->assign(
+            array(
+                'id_cart' => $id_cart,
+                'id_guest' => $id_guest
+            )
+        );
 
         $cart_bdata = $obj_cart_book_data->getCartBookingDetailsByIdCartIdGuest($id_cart, $id_guest, Configuration::get('PS_LANG_DEFAULT'));
         if ($cart_bdata) {
             $cart_tamount = $this->context->cart->getOrderTotal();
-            $this->context->smarty->assign(array('cart_bdata' => $cart_bdata,
-                                                'cart_tamount' => $cart_tamount));
+            $this->context->smarty->assign(
+                array(
+                    'cart_bdata' => $cart_bdata,
+                    'cart_tamount' => $cart_tamount
+                )
+            );
         }
 
         // No use of adult, child, num_rooms
@@ -154,18 +162,22 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
                     $start_date = date('Y-m-d', strtotime($start_date)+ 86400);
                 }
 
-                if ($num_rooms <= $booking_data['stats']['num_avail']) {
-                    $check_css_condition_var = 'available';
-                } elseif ($num_rooms <= $booking_data['stats']['num_part_avai']) {
-                    $check_css_condition_var = 'part_available';
+                if (isset($booking_data)) {
+                    if ($num_rooms <= $booking_data['stats']['num_avail']) {
+                        $check_css_condition_var = 'available';
+                    } elseif ($num_rooms <= $booking_data['stats']['num_part_avai']) {
+                        $check_css_condition_var = 'part_available';
+                    } else {
+                        $check_css_condition_var = 'unavailable';
+                    }
                 } else {
-                    $check_css_condition_var = 'unavailable';
+                    $booking_data = false;
                 }
             }
         } else {
             $check_calender_var = 1;
             $date_from = date('Y-m-d');
-            $date_to = date('Y-m-d', strtotime($date_from)+ 86400);
+            $date_to = date('Y-m-t');
             $obj_htl_info = new HotelBranchInformation();
             $htl_info = $obj_htl_info->getActiveHotelBranchesInfo();
             $hotel_id = $htl_info[0]['id'];
@@ -176,7 +188,7 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
 
                 // show info of every date
 
-                $start_date = date('Y-m-01'); // hard-coded '01' for first day of the month
+                $start_date = date('Y-m-d'); // hard-coded '01' for first day of the month
                 $last_day_this_month  = date('Y-m-t');
 
                 while ($start_date <= $last_day_this_month) {
@@ -187,19 +199,22 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
 
                     $start_date = date('Y-m-d', strtotime($start_date)+ 86400);
                 }
-                if ($num_rooms <= $booking_data['stats']['num_avail']) {
-                    $check_css_condition_var = 'default_available';
-                } elseif ($num_rooms <= $booking_data['stats']['num_part_avai']) {
-                    $check_css_condition_var = 'default_part_available';
+                if (isset($booking_data)) {
+                    if ($num_rooms <= $booking_data['stats']['num_avail']) {
+                        $check_css_condition_var = 'default_available';
+                    } elseif ($num_rooms <= $booking_data['stats']['num_part_avai']) {
+                        $check_css_condition_var = 'default_part_available';
+                    } else {
+                        $check_css_condition_var = 'default_unavailable';
+                    }
                 } else {
-                    $check_css_condition_var = 'default_unavailable';
+                    $booking_data = false;
                 }
             } else {
                 $booking_data = false;
                 $booking_calendar_data = false;
             }
         }
-
         $hotel_name = $obj_htl_info->hotelsNameAndId();
         $all_room_type = $obj_rm_type->getRoomTypeByHotelId($hotel_id, Configuration::get('PS_LANG_DEFAULT'));
 

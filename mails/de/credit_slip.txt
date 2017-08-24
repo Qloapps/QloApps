@@ -1,0 +1,16 @@
+
+[{shop_url}] 
+
+Hallo {firstname} {lastname}, 
+
+Für Ihre Bestellung Nr. {order_name} haben wir eine
+Rückvergütung vorgenommen. 
+
+Wenn Sie im Shop auf "Mein Konto" [{history_url}]
+klicken, finden Sie unter dem Menüpunkt "Ihre Rückvergütungen"
+[{my_account_url}] den Erstattungs-Beleg zum Download
+bereit. 
+
+{shop_name} [{shop_url}] powered by
+PrestaShop(tm) [http://www.prestashop.com/] 
+

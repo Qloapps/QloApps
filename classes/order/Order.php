@@ -2430,4 +2430,9 @@ class OrderCore extends ObjectModel
             'WHERE o.id_order = '.(int)$this->id
         );
     }
+
+    public static function getAllOrdersByCartId($id_cart)
+    {
+        return Db::getInstance()->executeS('SELECT  * FROM '._DB_PREFIX_.'orders WHERE id_cart = '.(int)$id_cart);
+    }
 }

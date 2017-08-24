@@ -1,0 +1,15 @@
+
+[{shop_url}] 
+
+Здравейте {firstname} {lastname}, 
+
+Имате ново съобщение относно поръчка
+с референция {order_name}.
+
+КЛИЕНТ: {firstname} {lastname} ({email})
+
+{message} 		 
+
+{shop_name} [{shop_url}] се управлява
+с PrestaShop(tm) [http://www.prestashop.com/] 
+
