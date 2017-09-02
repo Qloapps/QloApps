@@ -1,30 +1,25 @@
 $(document).ready(function() {
     //For Add Hotels
-    // delete hotel image
-	$('.deleteHtlImage').on('click', function(){
-		var imgId = $(this).attr('id_htl_img');
-		var $this = $(this);
-		$.ajax({
-			url: statebycountryurl,
-			data: {
-				id_htl_img: imgId,
-				ajax: true,
-				action: 'deleteHotelImage',
-			},
-			method: 'POST',
-			success: function(data) {
-				if (data == 1) {
-					$this.closest('.img-container-div').remove();
-					showSuccessMessage(htlImgDeleteSuccessMsg);
-				} else {
-					showErrorMessage(htlImgDeleteErrMsg);
-				}
-			},
-			error: function(XMLHttpRequest, textStatus, errorThrown) {
-				alert(textStatus);
-			}
-		});
-	});
+    var i = 1;
+    $(".hotel-other-img").on("click", function(e) {
+        e.preventDefault();
+        createOtherImage();
+    });
+
+    function createOtherImage() {
+        var newdiv = document.createElement('div');
+        newdiv.setAttribute("id", "childDiv" + i);
+        newdiv.setAttribute("class", "htlChildDivClass");
+        newdiv.innerHTML = "<div class='col-md-8'><input type='file' id='images" + i + "' name='images[]'/></div><a class='htl_more_img_remove btn btn-default button button-small'><span>" + image_remove + "</span></a>";
+        var ni = document.getElementById('htl_other_images');
+        ni.appendChild(newdiv);
+        i++;
+    }
+
+    // Other image div remove event
+    $(document).on("click", ".htl_more_img_remove", function() {
+        $(this).parent(".htlChildDivClass").remove();
+    });
 
     $('#hotel_country').on('change', function() {
         $('#hotel_state').empty();
@@ -225,10 +220,8 @@ $(document).ready(function() {
 
                 $.each(calendar_data, function(key, value) {
                     if (key === dmy) {
-                        if (value && typeof value.stats != 'undefined') {
-                            msg = 'Total Available Rooms: ' + value.stats.num_avail + '&#10;Total Rooms In cart : ' + value.stats.num_cart + '&#10;Total Booked Rooms: ' + value.stats.num_booked + '&#10;Total Unvailable Rooms : ' + value.stats.num_part_avai;
-                            flag = 1;
-                        }
+                        msg = 'Total Available Rooms: ' + value.stats.num_avail + '&#013;Total Rooms In cart : ' + value.stats.num_cart + '&#013;Total Booked Rooms: ' + value.stats.num_booked + '&#013;Total Unvailable Rooms : ' + value.stats.num_part_avai;
+                        flag = 1;
                         return 1;
                     }
                 });
@@ -239,7 +232,7 @@ $(document).ready(function() {
             }
         });
 
-        //var count = $("." + check_css_condition_var).length;
+        var count = $("." + check_css_condition_var).length;
         //$("td."+check_css_condition_var).eq(0).css('border-radius','50% 0 0 50%');
         //$("td."+check_css_condition_var).eq(count-1).css('border-radius','0 50% 50% 0');
     } else {
@@ -248,32 +241,8 @@ $(document).ready(function() {
         });
     }
 
-    $("#from_date").datepicker({
-        showOtherMonths: true,
+    $("#from_date, #to_date").datepicker({
         dateFormat: 'dd-mm-yy',
-        beforeShowDay: function (date) {
-            return highlightDateBorder($("#from_date").val(), date);
-        },
-        onSelect: function(selectedDate) {
-            var date_format = selectedDate.split("-");
-            var selectedDate = new Date($.datepicker.formatDate('yy-mm-dd', new Date(date_format[2], date_format[1] - 1, date_format[0])));
-            selectedDate.setDate(selectedDate.getDate() + 1);
-            $("#to_date").datepicker("option", "minDate", selectedDate);
-        },
-    });
-
-    $("#to_date").datepicker({
-        showOtherMonths: true,
-        dateFormat: 'dd-mm-yy',
-        beforeShowDay: function (date) {
-            return highlightDateBorder($("#to_date").val(), date);
-        },
-        /*onSelect: function(selectedDate) {
-            var date_format = selectedDate.split("-");
-            var selectedDate = new Date($.datepicker.formatDate('yy-mm-dd', new Date(date_format[2], date_format[1] - 1, date_format[0])));
-            selectedDate.setDate(selectedDate.getDate() - 1);
-            $("#from_date").datepicker("option", "maxDate", selectedDate);
-        }*/
     });
 
     $("#hotel_id").on('change', function() {

@@ -40,15 +40,6 @@
             parent::__construct($id);
         }
 
-        public function getFeaturePriceInfo($idFeaturePrice)
-        {
-            if (!$idFeaturePrice) {
-                return false;
-            }
-
-            return Db::getInstance()->getRow('SELECT * FROM `'._DB_PREFIX_.'htl_room_type_feature_pricing` WHERE `id`='.(int) $idFeaturePrice);
-        }
-
         /**
          * [getRoomTypeActiveFeaturePrices returns room type active feature price plans]
          * @param  [int] $id_product [id of the product]
@@ -512,14 +503,5 @@
         public function getFeaturePricesbyIdProduct($id_product)
         {
             return Db::getInstance()->executeS('SELECT * FROM `'._DB_PREFIX_.'htl_room_type_feature_pricing` WHERE `id_product` = '.$id_product);
-        }
-
-        public function deleteFeaturePriceByIdProduct($idProduct)
-        {
-            if (!$idProduct) {
-                return false;
-            }
-
-            return Db::getInstance()->delete('htl_room_type_feature_pricing', 'id_product = '.(int)$idProduct);
         }
     }

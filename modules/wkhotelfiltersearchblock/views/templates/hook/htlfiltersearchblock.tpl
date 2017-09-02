@@ -32,8 +32,7 @@
                             <span id="hotel_cat_name" class="pull-left">{l s='Select Hotel'}</span>
                         {/if}
                         <input type="hidden" id="hotel_cat_id" name="hotel_cat_id" {if isset($search_data)}value="{$search_data['htl_dtl']['id_category']}"{/if}>
-                        <input type="hidden" id="id_hotel" name="id_hotel" {if isset($search_data)}value="{$search_data['htl_dtl']['id']}"{/if}>
-                        <input type="hidden" id="max_order_date" name="max_order_date" value="{if isset($max_order_date)}{$max_order_date}{/if}">
+                        <input type="hidden" id="max_order_date" name="max_order_date" value="{$max_order_date}">
                         <span class="arrow_span">
                             <i class="icon icon-angle-down"></i>
                         </span>
@@ -41,7 +40,7 @@
                     <ul class="dropdown-menu hotel_dropdown_ul">
                         {if isset($all_hotels_info) && $all_hotels_info}
                             {foreach from=$all_hotels_info key=htl_k item=htl_v}
-                                <li class="hotel_name" data-id-hotel="{$name_val['id']}" data-hotel-cat-id="{$htl_v['id_category']}">
+                                <li class="hotel_name" data-hotel-cat-id="{$htl_v['id_category']}">
                                     {$htl_v['hotel_name']}
                                 </li>
                             {/foreach}

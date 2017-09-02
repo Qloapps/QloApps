@@ -120,7 +120,8 @@ $(document).on('keyup', '.cat_quantity_wanted', function(e)
 			},
 			success: function(result)
 			{
-				if (result.msg == 'success') {
+				if (result.msg == 'success')
+				{
 					total_price = result.total_price;
 					total_price = parseFloat(total_price);
 
@@ -129,10 +130,14 @@ $(document).on('keyup', '.cat_quantity_wanted', function(e)
 					$('.total_price_block p').text(price);
 					$cornt_obj.closest(".rm_qty_cont").siblings(".rm_book_btn").attr('cat_rm_book_nm_days', result.num_days);
 					$('.cat_remain_rm_qty_'+$cornt_obj.attr('id_room_product')).text(result.avail_rooms);
-				} else if (result.msg == 'unavailable_quantity') {
+				}
+				else if (result.msg == 'unavailable_quantity')
+				{	
 					$cornt_obj.val(result.avail_rooms);
-				} else {
-					alert(some_error_cond);
+				}
+				else
+				{
+					alert(some_error_cond);					
 				}
 			}
 	    });
@@ -140,11 +145,13 @@ $(document).on('keyup', '.cat_quantity_wanted', function(e)
 });
 
 /*Set maxDate for Order resrict date*/
-	/*$(document).ready(function(){
-		if (max_order_date) {
+	$(document).ready(function(){
+		if (max_order_date)
+		{
 			var max_order_date_format = $.datepicker.formatDate('dd M yy', new Date(max_order_date));
 			$( "#check_in_time" ).datepicker( "option", "maxDate", max_order_date_format);
 			$( "#check_out_time" ).datepicker( "option", "maxDate", max_order_date_format);
-		}
-	});*/
+		}	
+	});
 /*End*/
+

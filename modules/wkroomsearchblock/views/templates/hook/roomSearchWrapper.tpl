@@ -21,8 +21,7 @@
 				                <span id="hotel_cat_name" class="pull-left">{l s='Select Hotel' mod='wkroomsearchblock'}</span>
 				                <input type="hidden" name="is_hotel_rooms_search" value="1">
 				                <input type="hidden" id="hotel_cat_id" name="hotel_cat_id">
-								<input type="hidden" id="id_hotel" name="id_hotel">
-				                <input type="hidden" id="max_order_date" name="max_order_date" value="{if isset($max_order_date)}{$max_order_date}{/if}">
+				                <input type="hidden" id="max_order_date" name="max_order_date" value="{$max_order_date}">
 				                <span class="arrow_span">
 				                    <i class="icon icon-angle-down"></i>
 				                </span>
@@ -30,7 +29,7 @@
 				            <ul class="dropdown-menu hotel_dropdown_ul">
 				                {if isset($hotel_name) && $hotel_name}
 				                    {foreach $hotel_name as $name_val}
-				                        <li class="hotel_name" data-id-hotel="{$name_val['id']}" data-hotel-cat-id="{$name_val['id_category']}">{$name_val['hotel_name']}</li>
+				                        <li class="hotel_name" data-hotel-cat-id="{$name_val['id_category']}">{$name_val['hotel_name']}</li>
 				                    {/foreach}
 				                {/if} 
 				            </ul>
@@ -47,7 +46,7 @@
 				            <span>{l s='Search Now' mod='wkroomsearchblock'}</span>
 				        </button>
 				    </div>
-				</form>
+				</form>    
             </div>
         </div>
     </div>

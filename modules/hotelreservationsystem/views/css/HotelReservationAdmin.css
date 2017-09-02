@@ -1,21 +1,3 @@
-/*----- Hotel Images -----*/
-a.deleteHtlImage {
-	cursor: pointer;
-	color: inherit;
-}
-.deleteHtlImage i {
-	font-size: 20px;
-}
-.dlt-link-div {
-    width: 100%;
-    float: right;
-    padding: 7px;
-}
-.img-container {
-	margin-bottom:20px;
-    border: 1px solid #ddd;
-    padding: 10px;
-}
 
 /*----- Accordion -----*/
 .accordion, .accordion * {

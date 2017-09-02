@@ -102,12 +102,11 @@ $(document).ready(function() {
             $("#check_in_time").datepicker("option", "maxDate", selectedDate);
         }
     });
-
     if (typeof max_order_date != 'undefined' && typeof booking_date_to != 'undefined') {
-        max_order_date_cal = new Date(max_order_date);
+        book_to_date = new Date(booking_date_to);
+        book_to_date.setDate(book_to_date.getDate() - 1)
+        $("#check_in_time").datepicker("option", "maxDate", book_to_date);
         $("#check_out_time").datepicker("option", "maxDate", new Date(max_order_date));
-        max_order_date_cal.setDate(max_order_date_cal.getDate() - 1);
-        $("#check_in_time").datepicker("option", "maxDate", max_order_date_cal);
     }
 
     function abortRunningAjax() {
@@ -137,7 +136,7 @@ $(document).ready(function() {
                 ajax_check_var = $.ajax({
                     url: autocomplete_search_url,
                     data: {
-                        to_search_data: $(this).val(),
+                        to_search_data: $(this).val()
                     },
                     method: 'POST',
                     dataType: 'json',
@@ -161,7 +160,7 @@ $(document).ready(function() {
         $.ajax({
             url: autocomplete_search_url,
             data: {
-                hotel_city_cat_id: $('#hotel_location').attr('city_cat_id'),
+                hotel_city_cat_id: $('#hotel_location').attr('city_cat_id')
             },
             method: 'POST',
             dataType: 'json',
@@ -180,13 +179,12 @@ $(document).ready(function() {
 
     $(document).on('click', '.hotel_dropdown_ul li', function() {
         var hotel_cat_id = $(this).attr('data-hotel-cat-id');
-        var id_hotel = $(this).attr('data-id-hotel');
         var hotel_name = $(this).html();
 
         $.ajax({
             url: autocomplete_search_url,
             data: {
-                id_hotel: id_hotel,
+                hotel_category_id: hotel_cat_id,
                 is_order_restrict_process: 1,
             },
             method: 'POST',
@@ -201,7 +199,7 @@ $(document).ready(function() {
                 }
             }
         });
-        $('#id_hotel').val(id_hotel);
+
         $('#hotel_cat_id').val(hotel_cat_id);
         $('#hotel_cat_name').html(hotel_name);
     });

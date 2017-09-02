@@ -2205,7 +2205,7 @@ class AdminOrdersControllerCore extends AdminController
             die(Tools::jsonEncode(array(
                 'result' => false,
                 'error' => Tools::displayError('Some error occured Please try again.'),
-            )));
+                )));
         }
 
         /*END*/
