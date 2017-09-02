@@ -102,9 +102,6 @@ class FrontControllerCore extends Controller
     /** @var bool If false, does not build right page column content and hides it. */
     public $display_column_right = true;
 
-    /** @var bool If false, breadcump will not display. */
-    public $show_breadcrump = false;                    // By webkul
-
     /**
      * True if controller has already been initialized.
      * Prevents initializing controller more than once.
@@ -583,7 +580,6 @@ class FrontControllerCore extends Controller
                 'HOOK_TOP'          => Hook::exec('displayTop'),
                 'HOOK_LEFT_COLUMN'  => ($this->display_column_left  ? Hook::exec('displayLeftColumn') : ''),
                 'HOOK_RIGHT_COLUMN' => ($this->display_column_right ? Hook::exec('displayRightColumn', array('cart' => $this->context->cart)) : ''),
-                'show_breadcrump'   => $this->show_breadcrump,              // By webkul
             ));
         } else {
             $this->context->smarty->assign('HOOK_MOBILE_HEADER', Hook::exec('displayMobileHeader'));
@@ -620,7 +616,7 @@ class FrontControllerCore extends Controller
             'HOOK_TOP'          => Hook::exec('displayTop'),
             'HOOK_LEFT_COLUMN'  => ($this->display_column_left  ? Hook::exec('displayLeftColumn') : ''),
             'HOOK_RIGHT_COLUMN' => ($this->display_column_right ? Hook::exec('displayRightColumn', array('cart' => $this->context->cart)) : ''),
-            'HOOK_FOOTER'       => Hook::exec('displayFooter'),
+            'HOOK_FOOTER'       => Hook::exec('displayFooter')
         ));
 
         $this->context->smarty->assign(array(
@@ -709,7 +705,6 @@ class FrontControllerCore extends Controller
             'errors'         => $this->errors,
             'display_header' => $this->display_header,
             'display_footer' => $this->display_footer,
-            
         ));
 
         $layout = $this->getLayout();
@@ -951,19 +946,15 @@ class FrontControllerCore extends Controller
             $this->setMobileMedia();
             return true;
         }
+
         $this->addCSS(_THEME_CSS_DIR_.'grid_prestashop.css', 'all');  // retro compat themes 1.5.0.1
         $this->addCSS(_THEME_CSS_DIR_.'global.css', 'all');
         $this->addJquery();
         $this->addJqueryPlugin('easing');
         $this->addJS(_PS_JS_DIR_.'tools.js');
         $this->addJS(_THEME_JS_DIR_.'global.js');
-        /*by webkul to show datepicker/timepicker on frontEnd*/
         $this->addJqueryUI('ui.datepicker');
-        $this->addJS(array(
-            _PS_JS_DIR_.'jquery/plugins/timepicker/jquery-ui-timepicker-addon.js'
-        ));
-        //By webkul to show notifications
-        $this->addjQueryPlugin('growl', null, false);
+
         // Automatically add js files from js/autoload directory in the template
         if (@filemtime($this->getThemeDir().'js/autoload/')) {
             foreach (scandir($this->getThemeDir().'js/autoload/', 0) as $file) {

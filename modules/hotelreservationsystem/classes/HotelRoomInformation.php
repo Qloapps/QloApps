@@ -26,40 +26,6 @@ class HotelRoomInformation extends ObjectModel
         ),
     );
 
-    //Overrided ObjectModel::delete()
-    public function delete()
-    {
-        $hotelResModInstance = Module::getInstanceByName('hotelreservationsystem');
-        if ($idRoom = $this->id) {
-            if (!$this->deleteRoomDisableDates() || !parent::delete()) {
-                $context = Context::getContext();
-                $context->controller->errors[] = $hotelResModInstance->l('Some error has occurred while deleting room(s). Please try again later !!', 'HotelRoomInformation');
-
-                return false;
-            }
-        } else {
-            $context->controller->errors[] = $hotelResModInstance->l('Some error has occurred while deleting room(s). Please try again later !!', 'HotelRoomInformation');
-
-            return false;
-        }
-        return true;
-    }
-
-    public function deleteRoomDisableDates($idRoom = false)
-    {
-        if (!$idRoom) {
-            $idRoom = $this->id;
-            if (!$idRoom) {
-                return false;
-            }
-        }
-
-        $objRoomDisableDates = new HotelRoomDisableDates();
-        $objRoomDisableDates->deleteRoomDisableDates((int)$idRoom);
-
-        return true;
-    }
-
     /**
      * [deleteByProductId :: To delete all rooms information which belongs to a room type(which is a product in real) By product id]
      * @param  [int] $id_product [Id of the product form which all rooms information to be deleted]
@@ -150,6 +116,103 @@ class HotelRoomInformation extends ObjectModel
 
         return $result;
     }
+
+    /*Public function getHotelDataByBookingInfo($date_from,$date_to,$room_type=false,$hotel_id,$num_rooms)
+    {
+        if ($room_type)
+        {
+            $product_name = (new Product((int) $room_type))->name[Configuration::get('PS_LANG_DEFAULT')];
+            $room_info_avail = Db::getInstance()->executeS("SELECT `id`, `id_product`, `comment` FROM `"._DB_PREFIX_."htl_room_information` WHERE `id_hotel`=".$hotel_id." AND `id_product`=".$room_type." AND `id` NOT IN ("."SELECT `id_room` FROM `"._DB_PREFIX_."htl_booking_detail` WHERE `date_from`<='$date_from' AND `date_to`>='$date_to')");
+
+            $room_info_unavail = Db::getInstance()->executeS("SELECT `id`, `id_product`, `comment` FROM `"._DB_PREFIX_."htl_room_information` WHERE `id_hotel`=".$hotel_id." AND `id_product`=".$room_type." AND `id` IN ("."SELECT `id_room` FROM `"._DB_PREFIX_."htl_booking_detail` WHERE `id_hotel`=".$hotel_id." AND `date_from`<='$date_from' AND `date_to`>='$date_to')");
+    
+            $rooms_info_partially_avail = Db::getInstance()->executeS("SELECT `id`, `id_product`, `comment` FROM `"._DB_PREFIX_."htl_room_information` WHERE `id_hotel`=".$hotel_id." AND `id_product`=".$room_type." AND `id` IN ("."SELECT `id_room` FROM `"._DB_PREFIX_."htl_booking_detail` WHERE `id_hotel`=".$hotel_id." AND `date_from`<='$date_from' AND `date_to`<='$date_to' AND `id_room` NOT IN ("."SELECT `id_room` FROM `"._DB_PREFIX_."htl_booking_detail` WHERE `date_from`<='$date_from' AND `date_to`>='$date_to'))");
+
+            $rooms_info[0]['name'] = $product_name;
+            $rooms_info[0]['id_product'] = (new Product((int) $room_type))->id;
+            $rooms_info[0]['info']['Available'] = $room_info_avail;
+            $rooms_info[0]['info']['Unavailable'] = $room_info_unavail;
+            $rooms_info[0]['info']['Partially_Available'] = $rooms_info_partially_avail;
+        }
+        else
+        {
+            $i = 0;
+            $room_types = Db::getInstance()->executeS('SELECT DISTINCT `id_product` FROM `'._DB_PREFIX_.'htl_room_information` WHERE `id_hotel`='.$hotel_id);
+            foreach ($room_types as $room_type)
+            {
+                $product_name = (new Product((int) $room_type['id_product']))->name[Configuration::get('PS_LANG_DEFAULT')];
+
+                $room_info_avail = Db::getInstance()->executeS("SELECT `id`, `id_product`, `comment` FROM `"._DB_PREFIX_."htl_room_information` WHERE `id_hotel`=".$hotel_id." AND `id_product`=".$room_type['id_product']." AND `id` NOT IN ("."SELECT `id_room` FROM `"._DB_PREFIX_."htl_booking_detail` WHERE `date_from`<='$date_from' AND `date_to`>='$date_to')");
+
+                $room_info_unavail = Db::getInstance()->executeS("SELECT `id`, `id_product`, `comment` FROM `"._DB_PREFIX_."htl_room_information` WHERE `id_hotel`=".$hotel_id." AND `id_product`=".$room_type['id_product']." AND `id` IN ("."SELECT `id_room` FROM `"._DB_PREFIX_."htl_booking_detail` WHERE `id_hotel`=".$hotel_id." AND `date_from`<='$date_from' AND `date_to`>='$date_to')");
+        
+                $rooms_info_partially_avail = Db::getInstance()->executeS("SELECT `id`, `id_product`, `comment` FROM `"._DB_PREFIX_."htl_room_information` WHERE `id_hotel`=".$hotel_id." AND `id_product`=".$room_type['id_product']." AND `id` IN ("."SELECT `id_room` FROM `"._DB_PREFIX_."htl_booking_detail` WHERE `id_hotel`=".$hotel_id." AND `date_from`<='$date_from' AND `date_to`<='$date_to' AND `id_room` NOT IN ("."SELECT `id_room` FROM `"._DB_PREFIX_."htl_booking_detail` WHERE `date_from`<='$date_from' AND `date_to`>='$date_to'))");
+
+                $rooms_info[$i]['name'] = $product_name;
+                $rooms_info[$i]['id_product'] = (new Product((int) $room_type['id_product']))->id;
+                $rooms_info[$i]['info']['Available'] = $room_info_avail;
+                $rooms_info[$i]['info']['Unavailable'] = $room_info_unavail;
+                $rooms_info[$i]['info']['Partially_Available'] = $rooms_info_partially_avail;
+                $i++;
+            }
+        }
+
+        if ($rooms_info)
+            return $rooms_info;
+        else
+            return false;
+    }
+
+    Public function getCalenderInformationByBookingInfo($date_from,$date_to,$room_type=false,$hotel_id,$num_rooms)
+    {
+        if ($room_type)
+        {
+            $product_name = (new Product((int) $room_type))->name[Configuration::get('PS_LANG_DEFAULT')];
+            $unavailable_rooms = Db::getInstance()->executeS("SELECT `id`, `comment` FROM `"._DB_PREFIX_."htl_room_information` WHERE `id_hotel`=".$hotel_id." AND `id_product`=".$room_type." AND `id` IN ("."SELECT `id_room` FROM `"._DB_PREFIX_."htl_booking_detail` WHERE `id_hotel`=".$hotel_id." AND `date_from`<='$date_from' AND `date_to`>='$date_to')");
+
+            $available_rooms = Db::getInstance()->executeS("SELECT `id`, `comment` FROM `"._DB_PREFIX_."htl_room_information` WHERE `id_hotel`=".$hotel_id." AND `id_product`=".$room_type." AND `id` NOT IN ("."SELECT `id_room` FROM `"._DB_PREFIX_."htl_booking_detail` WHERE `date_from`<='$date_from' AND `date_to`>='$date_to')");
+            
+            $partially_avail_rooms['room_info'] = Db::getInstance()->executeS("SELECT `id`,`comment` FROM `"._DB_PREFIX_."htl_room_information` WHERE `id_hotel`=".$hotel_id." AND `id_product`=".$room_type." AND `id` IN ("."SELECT `id_room` FROM `"._DB_PREFIX_."htl_booking_detail` WHERE `date_from`>='$date_from' AND `date_from`<='$date_to' AND `date_to`<='$date_to' AND `date_to`>='$date_from' AND id_room NOT IN("."SELECT id_room FROM `"._DB_PREFIX_."htl_booking_detail` WHERE `date_from`<='$date_from' AND `date_to`>='$date_to'))");
+
+            $partially_avail_rooms['booking_info'] = Db::getInstance()->executeS("SELECT `id_room`,`id_status`, `message`, `booking_type`, `date_from`, `date_to` FROM `"._DB_PREFIX_."htl_booking_detail` WHERE `id_hotel`=".$hotel_id." AND `id_product`=".$room_type." AND `id_room` IN ("."SELECT `id_room` FROM `"._DB_PREFIX_."htl_booking_detail` WHERE `date_from`>='$date_from' AND `date_from`<='$date_to' AND `date_to`<='$date_to' AND `date_to`>='$date_from' AND id_room NOT IN("."SELECT id_room FROM `"._DB_PREFIX_."htl_booking_detail` WHERE `date_from`<='$date_from' AND `date_to`>='$date_to'))");
+
+                $rooms_info['name'] = $product_name;
+                $rooms_info['id_product'] = (new Product((int) $room_type))->id;
+                $rooms_info['info']['available'] = $available_rooms;
+                $rooms_info['info']['unavailable'] = $unavailable_rooms;
+                $rooms_info['info']['partially_available'] = $partially_avail_rooms;
+        }
+        else
+        {
+            $i = 0;
+            $room_types = Db::getInstance()->executeS('SELECT DISTINCT `id_product` FROM `'._DB_PREFIX_.'htl_room_information` WHERE `id_hotel`='.$hotel_id);
+            foreach ($room_types as $room_type)
+            {
+                $product_name = (new Product((int) $room_type['id_product']))->name[Configuration::get('PS_LANG_DEFAULT')];
+
+                $unavailable_rooms = Db::getInstance()->executeS("SELECT `id`, `comment` FROM `"._DB_PREFIX_."htl_room_information` WHERE `id_hotel`=".$hotel_id." AND `id_product`=".$room_type['id_product']." AND `id` IN ("."SELECT `id_room` FROM `"._DB_PREFIX_."htl_booking_detail` WHERE `id_hotel`=".$hotel_id." AND `date_from`<='$date_from' AND `date_to`>='$date_to')");
+
+                $available_rooms = Db::getInstance()->executeS("SELECT `id`, `comment` FROM `"._DB_PREFIX_."htl_room_information` WHERE `id_hotel`=".$hotel_id." AND `id_product`=".$room_type['id_product']." AND `id` NOT IN ("."SELECT `id_room` FROM `"._DB_PREFIX_."htl_booking_detail` WHERE `date_from`<='$date_from' AND `date_to`>='$date_to')");
+                
+                $partially_avail_rooms['room_info'] = Db::getInstance()->executeS("SELECT `id`, `comment` FROM `"._DB_PREFIX_."htl_room_information` WHERE `id_hotel`=".$hotel_id." AND `id_product`=".$room_type['id_product']." AND `id` IN ("."SELECT `id_room` FROM `"._DB_PREFIX_."htl_booking_detail` WHERE `date_from`>='$date_from' AND `date_from`<='$date_to' AND `date_to`<='$date_to' AND `date_to`>='$date_from' AND id_room NOT IN("."SELECT id_room FROM `"._DB_PREFIX_."htl_booking_detail` WHERE `date_from`<='$date_from' AND `date_to`>='$date_to'))");
+
+                $partially_avail_rooms['booking_info'] = Db::getInstance()->executeS("SELECT `id_status`, `message`, `booking_type`, `date_from`, `date_to` FROM `"._DB_PREFIX_."htl_booking_detail` WHERE `id_hotel`=".$hotel_id." AND `id_product`=".$room_type['id_product']." AND `id` IN ("."SELECT `id_room` FROM `"._DB_PREFIX_."htl_booking_detail` WHERE `date_from`>='$date_from' AND `date_from`<='$date_to' AND `date_to`<='$date_to' AND `date_to`>='$date_from' AND id_room NOT IN("."SELECT id_room FROM `"._DB_PREFIX_."htl_booking_detail` WHERE `date_from`<='$date_from' AND `date_to`>='$date_to'))");
+
+
+                $rooms_info[$i]['name'] = $product_name;
+                $rooms_info[$i]['id_product'] = (new Product((int) $room_type['id_product']))->id;
+                $rooms_info[$i]['info']['Available'] = $available_rooms;
+                $rooms_info[$i]['info']['Unavailable'] = $unavailable_rooms;
+                $rooms_info[$i]['info']['Partially_Available'] = $partially_avail_rooms;
+                $i++;
+            }
+        }
+
+        if (isset($rooms_info) && $rooms_info)
+            return $rooms_info;
+        else
+            return false;
+    }*/
 
     public function getRoomTypeAvailableRoomsForDateRange($id_hotel, $id_product, $date_from, $date_to)
     {

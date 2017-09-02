@@ -56,14 +56,14 @@
 			{/if}
 			<hr>
 			<p><strong>{l s='Order Details -'}</strong></p>
-			{*{if isset($orders_has_invoice) && $orders_has_invoice && $order->payment != 'Free order'}
+			{if isset($order_has_invoice) && $order_has_invoice && $order->payment != 'Free order'}
 				<div class="row totalOrdercancellation_div" {if !$non_requested_rooms}style="display:none;"{/if}>
 					<div class="col-xs-12 col-sm-12">
 						<p style="text-align:center;"><a class="terms_btn btn btn-default pull-right" href="{$redirect_link_terms}" target="_blank"><i class="icon-file-text large"></i>&nbsp;&nbsp;{l s='Terms & Conditions'}</a></p>
 						<button type="button" data-id_order="{$order->id}" data-id_currency="{$order->id_currency}" data-id_customer="{$order->id_customer}" data-order_data='{$cart_htl_data|@json_encode}' name="totalOrdercancellation_btn" class="totalOrdercancellation_btn btn btn-default pull-right" href="#htlRefundReasonForm"><span>{l s='Request Total Order Cancellation'}</span></button>
 					</div>
 				</div>
-			{/if}*}
+			{/if}
 			<div id="order-detail-content" class="">
 				<table class="table table-bordered">
 					<thead>
@@ -75,12 +75,85 @@
 							<th>{l s='Check-in Date'}</th>
 							<th>{l s='Check-out Date'}</th>
 							<th class="cart_total">{l s='Total'}</th>
-							{*{if isset($orders_has_invoice) && $orders_has_invoice}
+							{if isset($order_has_invoice) && $order_has_invoice}
 								<th>{l s='Request Refund'}</th>
-							{/if}*}	
+							{/if}	
 							<th>{l s='BackOrder Status'}</th>
 						</tr>
 					</thead>
+					<tfoot>
+						{if $priceDisplay && $use_tax}
+							<tr class="item">
+								<td colspan={if isset($order_has_invoice) && $order_has_invoice}"7"{else}"6"{/if}></td>
+								<td colspan="{if $return_allowed}2{else}1{/if}">
+									<strong>{l s='Items (tax excl.)'}</strong>
+								</td>
+								<td colspan="{if $order->hasProductReturned()}3{else}2{/if}">
+									<span class="price">{displayWtPriceWithCurrency price=$order->getTotalProductsWithoutTaxes() currency=$currency}</span>
+								</td>
+							</tr>
+						{/if}
+						<tr class="item">
+							<td colspan={if isset($order_has_invoice) && $order_has_invoice}"7"{else}"6"{/if}></td>
+							<td colspan="{if $return_allowed}2{else}1{/if}">
+								<strong>{l s='Items'} {if $use_tax}{l s='(tax incl.)'}{/if} </strong>
+							</td>
+							<td colspan="{if $order->hasProductReturned()}3{else}2{/if}">
+								<span class="price">{displayWtPriceWithCurrency price=$order->getTotalProductsWithTaxes() currency=$currency}</span>
+							</td>
+						</tr>
+						{if $order->total_discounts > 0}
+						<tr class="item">
+							<td colspan={if isset($order_has_invoice) && $order_has_invoice}"7"{else}"6"{/if}></td>
+							<td colspan="{if $return_allowed}2{else}1{/if}">
+								<strong>{l s='Total vouchers'}</strong>
+							</td>
+							<td colspan="{if $order->hasProductReturned()}3{else}2{/if}">
+								<span class="price-discount">{displayWtPriceWithCurrency price=$order->total_discounts currency=$currency convert=1}</span>
+							</td>
+						</tr>
+						{/if}
+						{if $order->total_wrapping > 0}
+						<tr class="item">
+							<td colspan={if isset($order_has_invoice) && $order_has_invoice}"7"{else}"6"{/if}></td>
+							<td colspan="{if $return_allowed}2{else}1{/if}">
+								<strong>{l s='Total gift wrapping cost'}</strong>
+							</td>
+							<td colspan="{if $order->hasProductReturned()}3{else}2{/if}">
+								<span class="price-wrapping">{displayWtPriceWithCurrency price=$order->total_wrapping currency=$currency}</span>
+							</td>
+						</tr>
+						{/if}
+						<tr class="totalprice item">
+							<td colspan={if isset($order_has_invoice) && $order_has_invoice}"7"{else}"6"{/if}></td>
+							<td colspan="{if $return_allowed}2{else}1{/if}">
+								<strong>{l s='Total'}</strong>
+							</td>
+							<td colspan="{if $order->hasProductReturned()}3{else}2{/if}">
+								<span class="price">{displayWtPriceWithCurrency price=$order->total_paid currency=$currency}</span>
+							</td>
+						</tr>
+						{if isset($order_adv_dtl)}
+							<tr class="item">
+								<td colspan={if isset($order_has_invoice) && $order_has_invoice}"7"{else}"6"{/if}></td>
+								<td colspan="{if $return_allowed}2{else}1{/if}">
+									<strong>{l s='Total Paid'}</strong>
+								</td>
+								<td colspan="{if $order->hasProductReturned()}3{else}2{/if}">
+									<span class="price">{displayWtPriceWithCurrency price=$order_adv_dtl['total_paid_amount'] currency=$currency}</span>
+								</td>
+							</tr>
+							<tr class="item">
+								<td colspan={if isset($order_has_invoice) && $order_has_invoice}"7"{else}"6"{/if}></td>
+								<td colspan="{if $return_allowed}2{else}1{/if}">
+									<strong>{l s='Total Due'}</strong>
+								</td>
+								<td colspan="{if $order->hasProductReturned()}3{else}2{/if}">
+									<span class="price">{displayWtPriceWithCurrency price=($order_adv_dtl['total_order_amount'] - $order_adv_dtl['total_paid_amount']) currency=$currency}</span>
+								</td>
+							</tr>
+						{/if}
+					</tfoot>
 					<tbody>
 						{if isset($cart_htl_data)}
 							{foreach from=$cart_htl_data key=data_k item=data_v}
@@ -148,14 +221,14 @@
 												{/if}
 											</p>
 										</td>
-										{if isset($orders_has_invoice) && $orders_has_invoice && $order->payment != 'Free order'}
-											{*<td class="cart_total text-left">
+										{if isset($order_has_invoice) && $order_has_invoice && $order->payment != 'Free order'}
+											<td class="cart_total text-left">
 												{if isset($rm_v['stage_name']) && $rm_v['stage_name']}
 													<p>{l s="Request Sent.."}</p>
 												{else}
 													<button data-amount="{$rm_v['amount_tax_incl']}" data-id_order="{$order->id}" data-id_currency="{$order->id_currency}" data-id_customer="{$order->id_customer}" data-id_product="{$data_v['id_product']}" data-num_rooms="{$rm_v['num_rm']}" data-date_from="{$rm_v['data_form']|date_format:"%G-%m-%d"}" type="button" data-date_to="{$rm_v['data_to']|date_format:"%G-%m-%d"}"  name="roomRequestForRefund" class="order_cancel_request_button_{$data_v['id_product']}_{$rm_v['data_form']|date_format:"%G-%m-%d"}_{$rm_v['data_to']|date_format:"%G-%m-%d"} btn btn-default button button-small roomRequestForRefund" href="#htlRefundReasonForm"><span>{l s='Request Refund'}</span></button>
 												{/if}
-											</td>*}
+											</td>
 										{/if}	
 										<td class="text-center">
 											{if isset($rm_v['is_backorder']) && $rm_v['is_backorder']}
@@ -169,79 +242,6 @@
 							{/foreach}
 						{/if}
 					</tbody>
-					<tfoot>
-						{if $priceDisplay && $use_tax}
-							<tr class="item">
-								<td colspan={if isset($orders_has_invoice) && $orders_has_invoice}"7"{else}"6"{/if}></td>
-								<td colspan="{if $return_allowed}2{else}1{/if}">
-									<strong>{l s='Items (tax excl.)'}</strong>
-								</td>
-								<td colspan="{if $order->hasProductReturned()}3{else}2{/if}">
-									<span class="price">{displayWtPriceWithCurrency price=$orderTotalInfo['total_products_te'] currency=$currency}</span>
-								</td>
-							</tr>
-						{/if}
-						<tr class="item">
-							<td colspan={if isset($orders_has_invoice) && $orders_has_invoice}"7"{else}"6"{/if}></td>
-							<td colspan="{if $return_allowed}2{else}1{/if}">
-								<strong>{l s='Items'} {if $use_tax}{l s='(tax incl.)'}{/if} </strong>
-							</td>
-							<td colspan="{if $order->hasProductReturned()}3{else}2{/if}">
-								<span class="price">{displayWtPriceWithCurrency price=$orderTotalInfo['total_products_ti'] currency=$currency}</span>
-							</td>
-						</tr>
-						{if $order->total_discounts > 0}
-						<tr class="item">
-							<td colspan={if isset($orders_has_invoice) && $orders_has_invoice}"7"{else}"6"{/if}></td>
-							<td colspan="{if $return_allowed}2{else}1{/if}">
-								<strong>{l s='Total vouchers'}</strong>
-							</td>
-							<td colspan="{if $order->hasProductReturned()}3{else}2{/if}">
-								<span class="price-discount">{displayWtPriceWithCurrency price=$orderTotalInfo['total_discounts'] currency=$currency convert=1}</span>
-							</td>
-						</tr>
-						{/if}
-						{if $order->total_wrapping > 0}
-						<tr class="item">
-							<td colspan={if isset($orders_has_invoice) && $orders_has_invoice}"7"{else}"6"{/if}></td>
-							<td colspan="{if $return_allowed}2{else}1{/if}">
-								<strong>{l s='Total gift wrapping cost'}</strong>
-							</td>
-							<td colspan="{if $order->hasProductReturned()}3{else}2{/if}">
-								<span class="price-wrapping">{displayWtPriceWithCurrency price=$orderTotalInfo['total_wrapping'] currency=$currency}</span>
-							</td>
-						</tr>
-						{/if}
-						<tr class="totalprice item">
-							<td colspan={if isset($orders_has_invoice) && $orders_has_invoice}"7"{else}"6"{/if}></td>
-							<td colspan="{if $return_allowed}2{else}1{/if}">
-								<strong>{l s='Total'}</strong>
-							</td>
-							<td colspan="{if $order->hasProductReturned()}3{else}2{/if}">
-								<span class="price">{displayWtPriceWithCurrency price=$orderTotalInfo['total_paid'] currency=$currency}</span>
-							</td>
-						</tr>
-						{if isset($order_adv_dtl)}
-							<tr class="item">
-								<td colspan={if isset($orders_has_invoice) && $orders_has_invoice}"7"{else}"6"{/if}></td>
-								<td colspan="{if $return_allowed}2{else}1{/if}">
-									<strong>{l s='Total Paid'}</strong>
-								</td>
-								<td colspan="{if $order->hasProductReturned()}3{else}2{/if}">
-									<span class="price">{displayWtPriceWithCurrency price=$orderTotalInfo['total_paid_amount'] currency=$currency}</span>
-								</td>
-							</tr>
-							<tr class="item">
-								<td colspan={if isset($orders_has_invoice) && $orders_has_invoice}"7"{else}"6"{/if}></td>
-								<td colspan="{if $return_allowed}2{else}1{/if}">
-									<strong>{l s='Total Due'}</strong>
-								</td>
-								<td colspan="{if $order->hasProductReturned()}3{else}2{/if}">
-									<span class="price">{displayWtPriceWithCurrency price=($orderTotalInfo['total_order_amount'] - $orderTotalInfo['total_paid_amount']) currency=$currency}</span>
-								</td>
-							</tr>
-						{/if}
-					</tfoot>
 				</table>
 			</div>
 			<p>{l s='An email has been sent with this information.' mod='bankwire'}

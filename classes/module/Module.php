@@ -1463,14 +1463,14 @@ abstract class ModuleCore
                     foreach ($xml->module as $modaddons) {
                         $flag_found = 0;
 
-                        // foreach ($module_list as $k => &$m) {
-                        //     if (Tools::strtolower($m->name) == Tools::strtolower($modaddons->name) && !isset($m->available_on_addons)) {
-                        //         $flag_found = 1;
-                        //         if ($m->version != $modaddons->version && version_compare($m->version, $modaddons->version) === -1) {
-                        //             $module_list[$k]->version_addons = $modaddons->version;
-                        //         }
-                        //     }
-                        // }
+                        foreach ($module_list as $k => &$m) {
+                            if (Tools::strtolower($m->name) == Tools::strtolower($modaddons->name) && !isset($m->available_on_addons)) {
+                                $flag_found = 1;
+                                if ($m->version != $modaddons->version && version_compare($m->version, $modaddons->version) === -1) {
+                                    $module_list[$k]->version_addons = $modaddons->version;
+                                }
+                            }
+                        }
 
                         if ($flag_found == 0) {
                             $item = new stdClass();

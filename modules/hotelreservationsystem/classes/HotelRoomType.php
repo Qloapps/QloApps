@@ -46,17 +46,14 @@ class HotelRoomType extends ObjectModel
      */
     public function getRoomTypeInfoByIdProduct($id_product)
     {
-        $sql = 'SELECT hrt.`id`,hrt.`id_hotel`, hrt.`adult`, hrt.`children`, hbi.`hotel_name` 
-                FROM `'._DB_PREFIX_.'htl_room_type` AS hrt
-                INNER JOIN `'._DB_PREFIX_.'htl_branch_info` AS hbi ON (hbi.id = hrt.id_hotel)
-                WHERE `id_product` = '.$id_product;
-
+        $sql = 'SELECT `id`,`id_hotel`, `adult`, `children` FROM `'._DB_PREFIX_.'htl_room_type` WHERE `id_product` = '.$id_product;
         $rm_info = Db::getInstance()->getRow($sql);
+
         if ($rm_info) {
             return $rm_info;
+        } else {
+            return false;
         }
-
-        return false;
     }
 
     /**
@@ -112,7 +109,7 @@ class HotelRoomType extends ObjectModel
      */
     public function getIdProductByHotelId($hotel_id, $room_type = 0, $onlyActiveProd = 0, $onlyActiveHotel = 0)
     {
-        $sql = 'SELECT DISTINCT hrt.`id_product`, hrt.`adult`, hrt.`children`, hrt.`id`
+        $sql = 'SELECT DISTINCT hrt.`id_product`, hrt.`adult`, hrt.`children` 
 				FROM `'._DB_PREFIX_.'htl_room_type` AS hrt ';
 
         if ($onlyActiveHotel) {
@@ -131,8 +128,9 @@ class HotelRoomType extends ObjectModel
         $rm_type = Db::getInstance()->executeS($sql);
         if ($rm_type) {
             return $rm_type;
+        } else {
+            return false;
         }
-        return false;
     }
 
     /**

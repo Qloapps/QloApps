@@ -15,7 +15,8 @@ class WkRoomSearchBlockAutoCompleteSearchModuleFrontController extends ModuleFro
         $is_order_restrict_process = Tools::getValue('is_order_restrict_process');
 
         if (isset($is_order_restrict_process) && $is_order_restrict_process) {
-            $id_hotel = Tools::getValue('id_hotel');
+            $hotel_category_id = Tools::getValue('hotel_category_id');
+            $id_hotel = HotelBranchInformation::getHotelIdByIdCategory($hotel_category_id);
             $max_order_date = HotelOrderRestrictDate::getMaxOrderDate($id_hotel);
             $result['status'] = 'success';
             $result['max_order_date'] = date('Y-m-d', strtotime($max_order_date));
@@ -39,8 +40,9 @@ class WkRoomSearchBlockAutoCompleteSearchModuleFrontController extends ModuleFro
                 $html = '';
                 foreach ($cat_ids as $key => $value) {
                     $hotel_info = $obj_htl_info->hotelBranchInfoByCategoryId($value['id_category']);
+
                     if ($hotel_info) {
-                        $html .= '<li class="hotel_name"  data-id-hotel="'.$hotel_info[0]['id'].'" data-hotel-cat-id="'.$hotel_info[0]['id_category'].'">'.$hotel_info[0]['hotel_name'].'</li>';
+                        $html .= '<li class="hotel_name" data-hotel-cat-id="'.$hotel_info[0]['id_category'].'">'.$hotel_info[0]['hotel_name'].'</li>';
                     }
                 }
                 $result['status'] = 'success';

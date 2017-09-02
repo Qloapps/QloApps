@@ -46,7 +46,6 @@ function line_chart_trends(widget_name, chart_details) {
 function selectDashtrendsChart(element, type) {
     $('#dashtrends_toolbar dl').removeClass('active');
     current_charts = new Array();
-    console.log(dashtrends_data);
     $.each(dashtrends_data, function(index, value) {
         if (value.id == type || value.id == type + '_compare') {
             if (value.id == type) {

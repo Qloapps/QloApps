@@ -58,9 +58,6 @@
     </div>
 {/if}
 </div>
-
-{hook h='displayCustomerAccountAfterTabs'}
-
 <ul class="footer_links clearfix">
 <li><a class="btn btn-default button button-small" href="{$base_dir}" title="{l s='Home'}"><span><i class="icon-chevron-left"></i> {l s='Home'}</span></a></li>
 </ul>

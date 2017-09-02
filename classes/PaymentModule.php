@@ -192,6 +192,7 @@ abstract class PaymentModuleCore extends Module
             PrestaShopLogger::addLog('PaymentModule::validateOrder - Module is not active', 3, null, 'Cart', (int)$id_cart, true);
             die(Tools::displayError());
         }
+
         // Does order already exists ?
         if (Validate::isLoadedObject($this->context->cart) && $this->context->cart->OrderExists() == false) {
             if ($secure_key !== false && $secure_key != $this->context->cart->secure_key) {
@@ -267,8 +268,6 @@ abstract class PaymentModuleCore extends Module
                     }
                 }
             }
-
-            Hook::exec('actionPackageListGenerateOrder', array('package_list' => &$package_list));
 
             foreach ($package_list as $id_address => $packageByAddress) {
                 foreach ($packageByAddress as $id_package => $package) {
