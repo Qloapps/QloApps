@@ -1,0 +1,25 @@
+-----------------------------
+# V1.0.1 to V1.1.0
+-----------------------------
+
+## Added features
+
++ [CO] : Module is now made multilang.
++ [CO] : index.php added/Updated in all folders
++ [CO] : License.txt added.
++ [CO] : License added in every file.
++ [CO] : logo.gif file added.
+
+
+## Improved/changed features
+
+- [BO] : position working improved at AdminAboutHotelBlockSetting controller
+
+- [CO] : getHotelInteriorImg() improved in WkHotelInteriorImage.php
+
+- [CO] : `id` is changed to `id_interior_image` in htl_interior_image table for position working.
+
+
+## Update Policy
+
+- Database changed, Module need upload new file then UNINSTALL and re-installation.

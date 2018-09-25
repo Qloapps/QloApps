@@ -1,4 +1,22 @@
 <?php
+/**
+* 2010-2018 Webkul.
+*
+* NOTICE OF LICENSE
+*
+* All right is reserved,
+* Please go through this link for complete license : https://store.webkul.com/license.html
+*
+* DISCLAIMER
+*
+* Do not edit or add to this file if you wish to upgrade this module to newer
+* versions in the future. If you wish to customize this module for your
+* needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
+*
+*  @author    Webkul IN <support@webkul.com>
+*  @copyright 2010-2018 Webkul IN
+*  @license   https://store.webkul.com/license.html
+*/
 
 class HotelCustomerAdvancedPayment extends ObjectModel
 {
@@ -59,7 +77,7 @@ class HotelCustomerAdvancedPayment extends ObjectModel
     }
 
     /**
-     * [getOrdertTotal :: To get Total of the order In case of advance payment 
+     * [getOrdertTotal :: To get Total of the order In case of advance payment
      * 						if order id is passed returns the total paid amount for the order
      * 						else returns Order total calculated by By passed arguments $id_cart and $id_guest
      * 						].
@@ -86,7 +104,7 @@ class HotelCustomerAdvancedPayment extends ObjectModel
 
         if (!$id_order) {
             $cartAdePaymemts = $this->getClientAdvPaymentDtl($id_cart, $id_guest);
-            $order_total = 0; 
+            $order_total = 0;
             if ($cartAdePaymemts) {
                 foreach ($cartAdePaymemts as $orderAdvPayment) {
                     if ($orderAdvPayment['id_currency'] != $cart->id_currency) {

@@ -1,11 +1,11 @@
 
-[{shop_url}] 
+[{shop_url}]
 
 Halo {name},
 
 Klik disini untuk melihat item berikut: {product}
-[{product_link}] 
+[{product_link}]
 
 {shop_name} [{shop_url}] didukung oleh
-PrestaShop(tm) [http://www.prestashop.com/] 
+Webkul(tm) [https://webkul.com/]
 

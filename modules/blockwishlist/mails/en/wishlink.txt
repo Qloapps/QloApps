@@ -1,13 +1,13 @@
 
-[{shop_url}] 
+[{shop_url}]
 
-Hi, 
+Hi,
 
 {shop_name} invites you to send this link to your friends, so they
 can see your wishlist: {wishlist}
 
-{message} [{message}] 		 
+{message} [{message}]
 
 {shop_name} [{shop_url}] powered by
-PrestaShop(tm) [http://www.prestashop.com/] 
+Webkul(tm) [https://webkul.com/]
 

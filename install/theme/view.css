@@ -1275,3 +1275,26 @@ ul#optional_update li.ok {
 .btn-linkedin i { background-position: -32px 0; }
 .btn-linkedin:hover { background-color: #0a86bf; }
 .btn-linkedin:hover i { background-position: -32px -32px; }
+
+/* for qloapps view changes */
+a.wk-service-link {
+	text-decoration: none;
+	font-weight: bold;
+	color: #555;
+}
+.wk-service-link-block {
+	margin: 30px 50px 0px 10px;
+	border: 1px solid #ccc;
+	text-align: center;
+	padding: 10px;
+}
+.wk-service-link-content {
+}
+.wk-service-link-content .head {
+	font-size: 14px;
+	color: #222;
+}
+.wk-service-link-block p {
+	margin-bottom: 8px;
+	padding-bottom: 0px!important;
+}

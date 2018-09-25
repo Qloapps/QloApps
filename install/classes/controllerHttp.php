@@ -376,6 +376,24 @@ abstract class InstallControllerHttp
         return $this->language->getInformation('forum');
     }
 
+    // Get link to contact for this language
+    public function getContactLink()
+    {
+        return $this->language->getInformation('contact');
+    }
+
+    // Get link to install help for this language
+    public function getInstallHelpLink()
+    {
+        return $this->language->getInformation('install_help');
+    }
+
+    // Get link to qloapps services for this language
+    public function getServicesLink()
+    {
+        return $this->language->getInformation('services');
+    }
+
     /**
      * Get link to blog for this language
      *

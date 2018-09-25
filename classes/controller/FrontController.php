@@ -709,7 +709,7 @@ class FrontControllerCore extends Controller
             'errors'         => $this->errors,
             'display_header' => $this->display_header,
             'display_footer' => $this->display_footer,
-            
+
         ));
 
         $layout = $this->getLayout();
@@ -980,7 +980,7 @@ class FrontControllerCore extends Controller
                 }
             }
         }
-        
+
         if (Tools::isSubmit('live_edit') && Tools::getValue('ad') && Tools::getAdminToken('AdminModulesPositions'.(int)Tab::getIdFromClassName('AdminModulesPositions').(int)Tools::getValue('id_employee'))) {
             $this->addJqueryUI('ui.sortable');
             $this->addjqueryPlugin('fancybox');

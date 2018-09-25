@@ -1,10 +1,10 @@
 
-[{shop_url}] 
+[{shop_url}]
 
-Hi, 
+Hi,
 
-THANK YOU FOR SUBSCRIBING TO OUR NEWSLETTER. 
+THANK YOU FOR SUBSCRIBING TO OUR NEWSLETTER.
 
 {shop_name} [{shop_url}] powered by
-PrestaShop(tm) [http://www.prestashop.com/] 
+Webkul(tm) [https://webkul.com/]
 

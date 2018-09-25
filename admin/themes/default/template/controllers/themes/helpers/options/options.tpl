@@ -159,27 +159,7 @@
 
 
 {block name="after"}
-	<div class="panel clearfix" id="prestastore-content"></div>
 	<script type="text/javascript">
-		$.ajax({
-			type: 'POST',
-			headers: { "cache-control": "no-cache" },
-			url: 'ajax-tab.php?rand=' + new Date().getTime(),
-			async: true,
-			cache: false,
-			dataType : "html",
-			data: {
-				tab: 'AdminThemes',
-				token: '{$token|escape:'html':'UTF-8'}',
-				ajax: '1',
-				action:'getAddonsThemes',
-				page:'themes'
-			},
-			success: function(htmlData) {
-				$("#prestastore-content").html("<h3><i class='icon-picture-o'></i> {l s='Live from PrestaShop Addons!'}</h3>"+htmlData);
-			}
-		});
-
 		// These variable will move the form to another location
 		var formToMove = "appearance";
 		var formDestination = "js_theme_form_container";

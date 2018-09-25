@@ -1072,109 +1072,101 @@ $(document).ready(function() {
         beforeShowDay: function (date) {
             return highlightDateBorder($("#room_check_in").val(), date);
         },
-        onClose: function(selectedDate) {
-            var date_format = selectedDate.split("-");
-            var selectedDate = new Date($.datepicker.formatDate('yy-mm-dd', new Date(date_format[2], date_format[1] - 1, date_format[0])));
-            selectedDate.setDate(selectedDate.getDate() + 1);
-            $("#room_check_out").datepicker("option", "minDate", selectedDate);
-        },
-        onSelect: function(dateText, inst) {
-            var date_from_format = $('#room_check_in').val().split("-");
-            var selectedDateFrom = new Date($.datepicker.formatDate('yy-mm-dd', new Date(date_from_format[2], date_from_format[1] - 1, date_from_format[0])));
-            var date_in = $.datepicker.formatDate('yy-mm-dd', selectedDateFrom);
+        onSelect: function(selectedDate, inst) {
+            var date_from_format = selectedDate.split("-");
+            var selectedDate = new Date($.datepicker.formatDate('yy-mm-dd', new Date(date_from_format[2], date_from_format[1] - 1, date_from_format[0])));
+            var date_in = $.datepicker.formatDate('yy-mm-dd', selectedDate);
+
             var date_to_format = $('#room_check_out').val().split("-");
             var selectedDateTo = new Date($.datepicker.formatDate('yy-mm-dd', new Date(date_to_format[2], date_to_format[1] - 1, date_to_format[0])));
+
             var date_out = $.datepicker.formatDate('yy-mm-dd', selectedDateTo);
 
             if (date_in >= date_out) {
-                $(this).val(inst.lastVal);
-                $('.room_unavailability_date_error_div').text(correct_date_cond);
-                $('.room_unavailability_date_error_div').css('display', 'block');
+                selectedDate.setDate(selectedDate.getDate() + 1);
+                $("#room_check_out").datepicker("option", "minDate", selectedDate);
+                $("#room_check_out").val($.datepicker.formatDate('dd-mm-yy', selectedDate));
+                var date_out = $.datepicker.formatDate('yy-mm-dd', selectedDate);
+            }
 
-                setTimeout(function() {
-                        $('.room_unavailability_date_error_div').css('display', 'none');
-                    },
-                    3000);
-            } else {
-                /*by webkul to manage quantity of rooms*/
-                $.ajax({
-                    type: 'POST',
-                    headers: {
-                        "cache-control": "no-cache"
-                    },
-                    url: product_controller_url,
-                    cache: false,
-                    dataType: 'JSON',
-                    data: {
-                        date_from: date_in,
-                        date_to: date_out,
-                        change_date: 1,
-                        qty: $('#quantity_wanted').val(),
-                        id_product: $('#product_page_product_id').val()
-                    },
-                    success: function(result) {
-                        if (result.msg == 'success') {
-                            if (result.avail_rooms <= room_warning_num) {
-                                $('.num_quantity_alert').show();
-                            } else {
-                                $('.num_quantity_alert').hide();
-                            }
+            /*by webkul to manage quantity of rooms*/
+            $.ajax({
+                type: 'POST',
+                headers: {
+                    "cache-control": "no-cache"
+                },
+                url: product_controller_url,
+                cache: false,
+                dataType: 'JSON',
+                data: {
+                    date_from: date_in,
+                    date_to: date_out,
+                    change_date: 1,
+                    qty: $('#quantity_wanted').val(),
+                    id_product: $('#product_page_product_id').val()
+                },
+                success: function(result) {
+                    if (result.msg == 'success') {
+                        if (result.avail_rooms <= room_warning_num) {
+                            $('.num_quantity_alert').show();
+                        } else {
+                            $('.num_quantity_alert').hide();
+                        }
 
+                        $('.num_searched_avail_rooms').text(result.avail_rooms);
+                        $("#max_avail_type_qty").val(result.avail_rooms);
+                        $('.room_unavailability_date_error_div').hide();
+                        $('.unvail_rooms_cond_display').show();
+                        $('.sold_out_alert').hide();
+
+                        total_price = result.total_price;
+                        total_price = parseFloat(total_price);
+
+                        price = formatCurrency(total_price, currency_format, currency_sign, currency_blank);
+
+                        feature_price = parseFloat(result.feature_price);
+                        original_product_price = parseFloat(result.original_product_price);
+                        feature_price_diff = parseFloat(result.feature_price_diff);
+                        if (feature_price_diff > 0) {
+                            $('.room_type_current_price').text(formatCurrency(feature_price, currency_format, currency_sign, currency_blank));
+                            $('.room_type_current_price').show();
+                            $('.product_original_price').addClass('room_type_old_price');
+                        } else if (feature_price_diff < 0) {
+                            $('.room_type_current_price').text(formatCurrency(feature_price, currency_format, currency_sign, currency_blank));
+                            $('.room_type_current_price').show();
+                            $('.product_original_price').hide();
+                        } else {
+                            $('.room_type_current_price').hide();
+                            $('.product_original_price').removeClass('room_type_old_price');
+                            $('.product_original_price').show();
+                        }
+
+                        $('.total_price_block p').text(price);
+                        $('#num_days').val(result.num_days);
+                    } else if (result.msg == 'unavailable_quantity') {
+                        if (result.avail_rooms > 0) {
+                            $('.room_unavailability_date_error_div').text(unavail_qty_text);
                             $('.num_searched_avail_rooms').text(result.avail_rooms);
                             $("#max_avail_type_qty").val(result.avail_rooms);
-                            $('.room_unavailability_date_error_div').hide();
+                            $('.room_unavailability_date_error_div').show();
+                            $('#quantity_wanted').val(result.avail_rooms);
                             $('.unvail_rooms_cond_display').show();
                             $('.sold_out_alert').hide();
 
-                            total_price = result.total_price;
-                            total_price = parseFloat(total_price);
-
-                            price = formatCurrency(total_price, currency_format, currency_sign, currency_blank);
-
-                            feature_price = parseFloat(result.feature_price);
-                            original_product_price = parseFloat(result.original_product_price);
-                            feature_price_diff = parseFloat(result.feature_price_diff);
-                            if (feature_price_diff > 0) {
-                                $('.room_type_current_price').text(formatCurrency(feature_price, currency_format, currency_sign, currency_blank));
-                                $('.room_type_current_price').show();
-                                $('.product_original_price').addClass('room_type_old_price');
-                            } else if (feature_price_diff < 0) {
-                                $('.room_type_current_price').text(formatCurrency(feature_price, currency_format, currency_sign, currency_blank));
-                                $('.room_type_current_price').show();
-                                $('.product_original_price').hide();
-                            } else {
-                                $('.room_type_current_price').hide();
-                                $('.product_original_price').removeClass('room_type_old_price');
-                                $('.product_original_price').show();
-                            }
-
-                            $('.total_price_block p').text(price);
-                            $('#num_days').val(result.num_days);
-                        } else if (result.msg == 'unavailable_quantity') {
-                            if (result.avail_rooms > 0) {
-                                $('.room_unavailability_date_error_div').text(unavail_qty_text);
-                                $('.num_searched_avail_rooms').text(result.avail_rooms);
-                                $("#max_avail_type_qty").val(result.avail_rooms);
-                                $('.room_unavailability_date_error_div').show();
-                                $('#quantity_wanted').val(result.avail_rooms);
-                                $('.unvail_rooms_cond_display').show();
-                                $('.sold_out_alert').hide();
-
-                                setTimeout(function() {
-                                        $('.room_unavailability_date_error_div').css('display', 'none');
-                                    },
-                                    3000);
-                            } else {
-                                $('.num_quantity_alert').hide();
-                                $('.unvail_rooms_cond_display').hide();
-                                $('.sold_out_alert').show();
-                            }
+                            setTimeout(function() {
+                                    $('.room_unavailability_date_error_div').css('display', 'none');
+                                },
+                                3000);
                         } else {
-                            alert(some_error_cond);
+                            $('.num_quantity_alert').hide();
+                            $('.unvail_rooms_cond_display').hide();
+                            $('.sold_out_alert').show();
                         }
+                    } else {
+                        alert(some_error_cond);
                     }
-                });
-            }
+                }
+            });
         }
     });
 
@@ -1182,7 +1174,7 @@ $(document).ready(function() {
         showOtherMonths: true,
         dateFormat: 'dd-mm-yy',
         beforeShow: function (input, instance) {
-            var date_to = $('#check_in_time').val();
+            var date_to = $('#room_check_in').val();
             if (typeof date_to != 'undefined' && date_to != '') {
                 var date_format = date_to.split("-");
                 var selectedDate = new Date($.datepicker.formatDate('yy-mm-dd', new Date(date_format[2], date_format[1] - 1, date_format[0])));
@@ -1197,12 +1189,6 @@ $(document).ready(function() {
         },
         beforeShowDay: function (date) {
             return highlightDateBorder($("#room_check_out").val(), date);
-        },
-        onClose: function(selectedDate) {
-            var date_format = selectedDate.split("-");
-            var selectedDate = new Date($.datepicker.formatDate('yy-mm-dd', new Date(date_format[2], date_format[1] - 1, date_format[0])));
-            selectedDate.setDate(selectedDate.getDate() - 1);
-            $("#room_check_in").datepicker("option", "maxDate", selectedDate);
         },
         onSelect: function(dateText, inst) {
             var date_from_format = $('#room_check_in').val().split("-");

@@ -7,5 +7,5 @@ Cancellation Amount : {currency_sign} {cancellation_charge}
 You can review your order from the Order history section of your customer account by clicking My account on our shop.
 
 {shop_name} [{shop_url}] powered by
-PrestaShop(tm) [http://www.prestashop.com/] 
+Webkul(tm) [https://webkul.com/]
 

@@ -86,6 +86,7 @@ class InstallModelInstall extends InstallAbstractModel
             '_COOKIE_IV_' => Tools::passwdGen(8),
             '_PS_CREATION_DATE_' => date('Y-m-d'),
             '_PS_VERSION_' => _PS_INSTALL_VERSION_,
+            '_QLOAPPS_VERSION_' => _QLO_INSTALL_VERSION_,
         );
 
         // If mcrypt is activated, add Rijndael 128 configuration
@@ -624,19 +625,19 @@ class InstallModelInstall extends InstallAbstractModel
             $params = [
                 'url' => 'https://prestashop.webkul.com/hotel-reservation-clients/getNotification.php',
                 'method' => 'POST',
-                'headers' => 'Content-Type: application/json',
+                'headers' => array('Content-Type: application/json'),
                 'postdata' => json_encode($notificationData),
             ];
 
             $curlInit = curl_init();
             curl_setopt($curlInit, CURLOPT_URL, $params['url']);
             curl_setopt($curlInit, CURLOPT_HTTPAUTH, CURLAUTH_ANY);
-            curl_setopt($curlInit, CURLOPT_HTTPHEADER,$params['headers']);
+            curl_setopt($curlInit, CURLOPT_HTTPHEADER, $params['headers']);
             curl_setopt($curlInit, CURLOPT_SSL_VERIFYPEER, false);
             curl_setopt($curlInit, CURLOPT_CUSTOMREQUEST, $params['method']);
             curl_setopt($curlInit, CURLOPT_RETURNTRANSFER, 1);
             if (isset($params['postdata'])) {
-                curl_setopt( $curlInit, CURLOPT_POSTFIELDS, $params['postdata']);
+                curl_setopt($curlInit, CURLOPT_POSTFIELDS, $params['postdata']);
             }
             $response = curl_exec($curlInit);
         } else {
@@ -698,6 +699,7 @@ class InstallModelInstall extends InstallAbstractModel
     public function getAddonsModulesList($params = array())
     {
         $addons_modules = array();
+        return $addons_modules;
         $content = Tools::addonsRequest('install-modules', $params);
         $xml = @simplexml_load_string($content, null, LIBXML_NOCDATA);
 

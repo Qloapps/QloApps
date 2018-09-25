@@ -1,4 +1,22 @@
 <?php
+/**
+* 2010-2018 Webkul.
+*
+* NOTICE OF LICENSE
+*
+* All right is reserved,
+* Please go through this link for complete license : https://store.webkul.com/license.html
+*
+* DISCLAIMER
+*
+* Do not edit or add to this file if you wish to upgrade this module to newer
+* versions in the future. If you wish to customize this module for your
+* needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
+*
+*  @author    Webkul IN <support@webkul.com>
+*  @copyright 2010-2018 Webkul IN
+*  @license   https://store.webkul.com/license.html
+*/
 
 class HotelOrderRestrictDate extends ObjectModel
 {
@@ -51,31 +69,45 @@ class HotelOrderRestrictDate extends ObjectModel
 
     public function getUnsavedHotelsForOrderRestrict()
     {
-        $result = Db::getInstance()->executeS('SELECT `id` , `hotel_name` FROM `'._DB_PREFIX_.'htl_branch_info` WHERE `id` NOT IN (SELECT `id_hotel` FROM `'._DB_PREFIX_.'htl_order_restrict_date`)');
-        if ($result) {
-            return $result;
-        }
+        $idLang = Context::getContext()->language->id;
+        $sql = 'SELECT hbi.`id`, hbl.`hotel_name` FROM `'._DB_PREFIX_.'htl_branch_info` hbi
+            LEFT JOIN `'._DB_PREFIX_.'htl_branch_info_lang` hbl
+            ON (hbl.`id` = hbi.`id` AND hbl.`id_lang` = '.(int)$idLang.')
+            WHERE hbi.`id` NOT IN (SELECT DISTINCT id_hotel FROM `'._DB_PREFIX_.'htl_order_restrict_date`)';
 
-        return false;
+        return Db::getInstance()->executeS($sql);
     }
 
     public static function validateOrderRestrictDateOnPayment(&$controller)
     {
         $error = false;
+        $moduleInstance = Module::getInstanceByName('hotelreservationsystem');
         $context = Context::getContext();
-        $cart_products = $context->cart->getProducts();
-        foreach ($cart_products as $product) {
-            $obj_cart_bk_data = new HotelCartBookingData();
-            $cart_bk_data = $obj_cart_bk_data->getOnlyCartBookingData($context->cart->id, $context->cart->id_guest, $product['id_product']);
-            if ($cart_bk_data) {
-                foreach ($cart_bk_data as $data) {
-                    $obj_cart_bk_data = new HotelCartBookingData($data['id']);
-                    $max_order_date = HotelOrderRestrictDate::getMaxOrderDate($obj_cart_bk_data->id_hotel);
-                    if ($max_order_date) {
-                        if (strtotime($max_order_date) < strtotime($obj_cart_bk_data->date_from) || strtotime($max_order_date) < strtotime($obj_cart_bk_data->date_to)) {
-                            $htl_branch_info = new HotelBranchInformation($obj_cart_bk_data->id_hotel);
-                            $controller->errors[] = Tools::displayError('You can\'t Book room after date').' \''.date('d-m-Y', strtotime($max_order_date)).'\' '.Tools::displayError('For').' \''.$htl_branch_info->hotel_name.'\'. '.Tools::displayError('Please remove rooms from cart from').' \''.$htl_branch_info->hotel_name.'\' '.Tools::displayError('after date').' \''.date('d-m-Y', strtotime($max_order_date)).'\' '.Tools::displayError('to proceed.');
-                            $error = true;
+        if ($cartProducts = $context->cart->getProducts()) {
+            foreach ($cartProducts as $product) {
+                $objCartBookingData = new HotelCartBookingData();
+                if ($cart_bk_data = $objCartBookingData->getOnlyCartBookingData(
+                    $context->cart->id,
+                    $context->cart->id_guest,
+                    $product['id_product']
+                )) {
+                    foreach ($cart_bk_data as $data) {
+                        $objCartBookingData = new HotelCartBookingData($data['id']);
+                        if ($maxOrderDate = HotelOrderRestrictDate::getMaxOrderDate($objCartBookingData->id_hotel)) {
+                            if (strtotime($maxOrderDate) < strtotime($objCartBookingData->date_from)
+                                || strtotime($maxOrderDate) < strtotime($objCartBookingData->date_to)
+                            ) {
+                                $objBranchInfo = new HotelBranchInformation(
+                                    $objCartBookingData->id_hotel,
+                                    $context->language->id
+                                );
+                                $controller->errors[] = $moduleInstance->l('You can\'t Book room after date').' \''.
+                                date('d-m-Y', strtotime($maxOrderDate)).'\' '.$moduleInstance->l('For').'\''.
+                                $objBranchInfo->hotel_name.'\'. '.$moduleInstance->l('Please remove rooms from cart from').
+                                ' \''.$objBranchInfo->hotel_name.'\' '.$moduleInstance->l('after date').' \''.
+                                date('d-m-Y', strtotime($maxOrderDate)).'\' '.$moduleInstance->l('to proceed.');
+                                $error = true;
+                            }
                         }
                     }
                 }

@@ -1,3 +1,22 @@
+/**
+* 2010-2018 Webkul.
+*
+* NOTICE OF LICENSE
+*
+* All right is reserved,
+* Please go through this link for complete license : https://store.webkul.com/license.html
+*
+* DISCLAIMER
+*
+* Do not edit or add to this file if you wish to upgrade this module to newer
+* versions in the future. If you wish to customize this module for your
+* needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
+*
+*  @author    Webkul IN <support@webkul.com>
+*  @copyright 2010-2018 Webkul IN
+*  @license   https://store.webkul.com/license.html
+*/
+
 $(document).ready(function()
 {
 	$(".clear_filter").on("click", function()
@@ -34,11 +53,11 @@ $(document).ready(function()
 
 	function triggerFilter(way, sort_by, sort_value, filter_price)
 	{
-		if (way === undefined) 
+		if (way === undefined)
 	        way = 0;
-	    if (filter_price === undefined) 
+	    if (filter_price === undefined)
 	        filter_price = 1;
-	    if (sort_by === undefined && sort_value === undefined) 
+	    if (sort_by === undefined && sort_value === undefined)
 	    {
 	    	var sort_filter = $(".sort_btn_span[data-sort-value!='0']");
 	    	if (sort_filter.length)
@@ -66,7 +85,7 @@ $(document).ready(function()
 		min: min_price,
 		max: max_price,
 		values: [min_price, max_price],
-		slide: function(event, ui) 
+		slide: function(event, ui)
 		{
 			$("#filter_price_from").html(ui.values[0]);
 			$("#filter_price_to").html(ui.values[1]);
@@ -81,7 +100,7 @@ $(document).ready(function()
 			}
 		}
 	});
-	
+
 	$(".sort_result").on("click", function(e)
 	{
 		e.preventDefault();
@@ -174,7 +193,7 @@ $(document).ready(function()
 
             		$.each(result.rm_data, function(key, value)
             		{
-            			if (value.data.available.length) 
+            			if (value.data.available.length)
             			{
 	            			var html  = '<div class="col-sm-12 room_cont">';
 	            					html += '<div class="row">';
@@ -191,9 +210,9 @@ $(document).ready(function()
 	            							html += '</div>';
 	            							html += '<p><span class="capa_txt">Max Capacity:</span><span class="capa_data"> '+value.adult+' Adults, '+value.children+' child</span></p>';
 	            							html += '<div class="rm_review_cont pull-left">';
-	            								for (var i = 1; i <= 5; i++) 
+	            								for (var i = 1; i <= 5; i++)
 	            								{
-	            									if (i <= value.ratting) 
+	            									if (i <= value.ratting)
 	            									{
 	            										html += '<div class="rm_ratting_yes" style="background-image:url('+ratting_img+');"></div>'
 	            									}
@@ -253,7 +272,7 @@ $(document).ready(function()
 				                            		html += '<div class="qty_input_cont row margin-lr-0">';
 				                            			html += '<input autocomplete="off" type="text" min="1" name="qty_'+value.id_product+'" id="cat_quantity_wanted_'+value.id_product+'" class="text-center form-control cat_quantity_wanted" value="1" id_room_product="'+value.id_product+'">';
 				                            		html += '</div>';
-				                            	
+
 					                            	html += '<div class="qty_direction">';
 					                            		html += '<a href="#" data-room_id_product="'+value.id_product+'" data-field-qty="qty_'+value.id_product+'" class="btn btn-default cat_rm_quantity_up">';
 							                            	html += '<span><i class="icon-plus"></i></span>';

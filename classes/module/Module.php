@@ -42,6 +42,9 @@ abstract class ModuleCore
     /** @var array filled with known compliant PS versions */
     public $ps_versions_compliancy = array();
 
+    /** @var array filled with known compliant Qloapps versions */
+    public $qloapps_versions_compliancy = array();
+
     /** @var array filled with modules needed for install */
     public $dependencies = array();
 
@@ -231,6 +234,7 @@ abstract class ModuleCore
      */
     public function __construct($name = null, Context $context = null)
     {
+        // for Prestashop version compliancy
         if (isset($this->ps_versions_compliancy) && !isset($this->ps_versions_compliancy['min'])) {
             $this->ps_versions_compliancy['min'] = '1.4.0.0';
         }
@@ -245,6 +249,31 @@ abstract class ModuleCore
 
         if (strlen($this->ps_versions_compliancy['max']) == 3) {
             $this->ps_versions_compliancy['max'] .= '.999.999';
+        }
+
+        // for Qloapps version compliancy
+        if (isset($this->qloapps_versions_compliancy) && !isset($this->qloapps_versions_compliancy['min'])) {
+            $this->qloapps_versions_compliancy['min'] = '0.9.0.0';
+        }
+
+        if (isset($this->qloapps_versions_compliancy) && !isset($this->qloapps_versions_compliancy['max'])) {
+            $this->qloapps_versions_compliancy['max'] = _QLOAPPS_VERSION_;
+        }
+
+        if (strlen($this->qloapps_versions_compliancy['min']) == 3) {
+            $this->qloapps_versions_compliancy['min'] .= '.0.0';
+        }
+
+        if (strlen($this->qloapps_versions_compliancy['max']) == 3) {
+            $this->qloapps_versions_compliancy['max'] .= '.999.999';
+        }
+
+        if (strlen($this->qloapps_versions_compliancy['min']) == 5) {
+            $this->qloapps_versions_compliancy['min'] .= '.0';
+        }
+
+        if (strlen($this->qloapps_versions_compliancy['max']) == 5) {
+            $this->qloapps_versions_compliancy['max'] .= '.999';
         }
 
         // Load context and smarty
@@ -314,7 +343,7 @@ abstract class ModuleCore
 
         // Check PS version compliancy
         if (!$this->checkCompliancy()) {
-            $this->_errors[] = Tools::displayError('The version of your module is not compliant with your PrestaShop version.');
+            $this->_errors[] = Tools::displayError('The version of your module is not compliant with your Qloapps version.');
             return false;
         }
 
@@ -397,7 +426,11 @@ abstract class ModuleCore
 
     public function checkCompliancy()
     {
-        if (version_compare(_PS_VERSION_, $this->ps_versions_compliancy['min'], '<') || version_compare(_PS_VERSION_, $this->ps_versions_compliancy['max'], '>')) {
+        if (version_compare(_PS_VERSION_, $this->ps_versions_compliancy['min'], '<')
+            || version_compare(_PS_VERSION_, $this->ps_versions_compliancy['max'], '>')
+            // || version_compare(_QLOAPPS_VERSION_, $this->qloapps_versions_compliancy['min'], '<')
+            // || version_compare(_QLOAPPS_VERSION_, $this->qloapps_versions_compliancy['max'], '>')
+        ) {
             return false;
         } else {
             return true;
@@ -1441,102 +1474,7 @@ abstract class ModuleCore
                 }
             }
         }
-
-        // Get Default Country Modules and customer module
-        $files_list = array(
-            array('type' => 'addonsNative', 'file' => _PS_ROOT_DIR_.self::CACHE_FILE_DEFAULT_COUNTRY_MODULES_LIST, 'loggedOnAddons' => 0),
-            array('type' => 'addonsMustHave', 'file' => _PS_ROOT_DIR_.self::CACHE_FILE_MUST_HAVE_MODULES_LIST, 'loggedOnAddons' => 0),
-            array('type' => 'addonsBought', 'file' => _PS_ROOT_DIR_.self::CACHE_FILE_CUSTOMER_MODULES_LIST, 'loggedOnAddons' => 1),
-        );
-        foreach ($files_list as $f) {
-            if (file_exists($f['file']) && ($f['loggedOnAddons'] == 0 || $logged_on_addons)) {
-                if (Module::useTooMuchMemory()) {
-                    $errors[] = Tools::displayError('All modules cannot be loaded due to memory limit restrictions, please increase your memory_limit value on your server configuration');
-                    break;
-                }
-
-                $file = $f['file'];
-                $content = Tools::file_get_contents($file);
-                $xml = @simplexml_load_string($content, null, LIBXML_NOCDATA);
-
-                if ($xml && isset($xml->module)) {
-                    foreach ($xml->module as $modaddons) {
-                        $flag_found = 0;
-
-                        // foreach ($module_list as $k => &$m) {
-                        //     if (Tools::strtolower($m->name) == Tools::strtolower($modaddons->name) && !isset($m->available_on_addons)) {
-                        //         $flag_found = 1;
-                        //         if ($m->version != $modaddons->version && version_compare($m->version, $modaddons->version) === -1) {
-                        //             $module_list[$k]->version_addons = $modaddons->version;
-                        //         }
-                        //     }
-                        // }
-
-                        if ($flag_found == 0) {
-                            $item = new stdClass();
-                            $item->id = 0;
-                            $item->warning = '';
-                            $item->type = strip_tags((string)$f['type']);
-                            $item->name = strip_tags((string)$modaddons->name);
-                            $item->version = strip_tags((string)$modaddons->version);
-                            $item->tab = strip_tags((string)$modaddons->tab);
-                            $item->displayName = strip_tags((string)$modaddons->displayName);
-                            $item->description = stripslashes(strip_tags((string)$modaddons->description));
-                            $item->description_full = stripslashes(strip_tags((string)$modaddons->description_full));
-                            $item->author = strip_tags((string)$modaddons->author);
-                            $item->limited_countries = array();
-                            $item->parent_class = '';
-                            $item->onclick_option = false;
-                            $item->is_configurable = 0;
-                            $item->need_instance = 0;
-                            $item->not_on_disk = 1;
-                            $item->available_on_addons = 1;
-                            $item->trusted = Module::isModuleTrusted($item->name);
-                            $item->active = 0;
-                            $item->description_full = stripslashes($modaddons->description_full);
-                            $item->additional_description = isset($modaddons->additional_description) ? stripslashes($modaddons->additional_description) : null;
-                            $item->compatibility = isset($modaddons->compatibility) ? (array)$modaddons->compatibility : null;
-                            $item->nb_rates = isset($modaddons->nb_rates) ? (array)$modaddons->nb_rates : null;
-                            $item->avg_rate = isset($modaddons->avg_rate) ? (array)$modaddons->avg_rate : null;
-                            $item->badges = isset($modaddons->badges) ? (array)$modaddons->badges : null;
-                            $item->url = isset($modaddons->url) ? $modaddons->url : null;
-
-                            if (isset($modaddons->img)) {
-                                if (!file_exists(_PS_TMP_IMG_DIR_.md5((int)$modaddons->id.'-'.$modaddons->name).'.jpg')) {
-                                    if (!file_put_contents(_PS_TMP_IMG_DIR_.md5((int)$modaddons->id.'-'.$modaddons->name).'.jpg', Tools::file_get_contents($modaddons->img))) {
-                                        copy(_PS_IMG_DIR_.'404.gif', _PS_TMP_IMG_DIR_.md5((int)$modaddons->id.'-'.$modaddons->name).'.jpg');
-                                    }
-                                }
-
-                                if (file_exists(_PS_TMP_IMG_DIR_.md5((int)$modaddons->id.'-'.$modaddons->name).'.jpg')) {
-                                    $item->image = '../img/tmp/'.md5((int)$modaddons->id.'-'.$modaddons->name).'.jpg';
-                                }
-                            }
-
-                            if ($item->type == 'addonsMustHave') {
-                                $item->addons_buy_url = strip_tags((string)$modaddons->url);
-                                $prices = (array)$modaddons->price;
-                                $id_default_currency = Configuration::get('PS_CURRENCY_DEFAULT');
-
-                                foreach ($prices as $currency => $price) {
-                                    if ($id_currency = Currency::getIdByIsoCode($currency)) {
-                                        $item->price = (float)$price;
-                                        $item->id_currency = (int)$id_currency;
-
-                                        if ($id_default_currency == $id_currency) {
-                                            break;
-                                        }
-                                    }
-                                }
-                            }
-
-                            $module_list[$modaddons->id.'-'.$item->name] = $item;
-                        }
-                    }
-                }
-            }
-        }
-
+        //INFO:: addons module are removed from the module lists
         foreach ($module_list as $key => &$module) {
             if (defined('_PS_HOST_MODE_') && in_array($module->name, self::$hosted_modules_blacklist)) {
                 unset($module_list[$key]);
@@ -1641,7 +1579,7 @@ abstract class ModuleCore
         }
 
         $modules = array();
-        if (is_array($native_modules)) {
+        if (is_object($native_modules)) {
             foreach ($native_modules as $native_modules_type) {
                 if (in_array($native_modules_type['type'], array('native', 'partner'))) {
                     foreach ($native_modules_type->module as $module) {
@@ -1683,6 +1621,10 @@ abstract class ModuleCore
      */
     final public static function isModuleTrusted($module_name)
     {
+        // return currently always trusted as 1 because we will not chcek trust according to prestshop
+        // @TODO in future trust will be checked according to Qloapps addons
+        return 1;
+
         static $trusted_modules_list_content = null;
         static $modules_list_content = null;
         static $default_country_modules_list_content = null;

@@ -1,4 +1,23 @@
 <?php
+/**
+* 2010-2018 Webkul.
+*
+* NOTICE OF LICENSE
+*
+* All right is reserved,
+* Please go through this link for complete license : https://store.webkul.com/license.html
+*
+* DISCLAIMER
+*
+* Do not edit or add to this file if you wish to upgrade this module to newer
+* versions in the future. If you wish to customize this module for your
+* needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
+*
+*  @author    Webkul IN <support@webkul.com>
+*  @copyright 2010-2018 Webkul IN
+*  @license   https://store.webkul.com/license.html
+*/
+
 class HotelAdvancedPayment extends ObjectModel
 {
     public $id;
@@ -35,7 +54,7 @@ class HotelAdvancedPayment extends ObjectModel
     public function getIdAdvPaymentByIdProduct($id_product)
     {
         $result = Db::getInstance()->getRow("SELECT * FROM `"._DB_PREFIX_."htl_advance_payment` WHERE `id_product`=".$id_product);
-        
+
         if ($result) {
             return $result;
         }
@@ -208,7 +227,7 @@ class HotelAdvancedPayment extends ObjectModel
     public function getMinAdvPaymentAmount()
     {
         $context = Context::getContext();
-        
+
         $cart_product = $context->cart->getProducts();
         $adv_amount = 0;
 
@@ -229,7 +248,7 @@ class HotelAdvancedPayment extends ObjectModel
     public function getOrderMinAdvPaymentAmount($id_order)
     {
         $order = new Order($id_order);
-        
+
         $orderProducts = $order->getProducts();
         $adv_amount = 0;
 

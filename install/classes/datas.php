@@ -139,7 +139,7 @@ class Datas
         'admin_email' => array(
             'name' => 'email',
             'validate' => 'isEmail',
-            'default' => 'pub@prestashop.com'
+            'default' => 'pub@qloapps.com'
         ),
         'show_license' => array(
             'name' => 'license',
