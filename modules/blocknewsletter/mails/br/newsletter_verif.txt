@@ -1,13 +1,13 @@
 
-[{shop_url}] 
+[{shop_url}]
 
-Olá, 
+Olá,
 
 Obrigado por se cadastrar na nossa newsletter, por favor confirme sua
 solicitação clicando no link abaixo:
 
-{verif_url} [{verif_url}] 		 
+{verif_url} [{verif_url}]
 
 {shop_name} [{shop_url}] baseado em
-PrestaShop(tm) [http://www.prestashop.com/] 
+Webkul(tm) [https://webkul.com/]
 

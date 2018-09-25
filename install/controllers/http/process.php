@@ -230,7 +230,7 @@ class InstallControllerHttpProcess extends InstallControllerHttp
         $this->session->process_validated = array_merge($this->session->process_validated, array('installModules' => true));
         $this->ajaxJsonAnswer(true);
     }
-    
+
     /**
      * PROCESS : installModulesAddons
      * Install modules from addons
@@ -331,7 +331,7 @@ class InstallControllerHttpProcess extends InstallControllerHttp
             }
         }
         $this->process_steps[] = $install_modules;
-        
+
         $install_modules = array('key' => 'installModulesAddons', 'lang' => $this->l('Install Addons modules'));
 
         $params = array(

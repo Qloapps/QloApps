@@ -1,9 +1,26 @@
 <?php
+/**
+* 2010-2018 Webkul.
+*
+* NOTICE OF LICENSE
+*
+* All right is reserved,
+* Please go through this link for complete license : https://store.webkul.com/license.html
+*
+* DISCLAIMER
+*
+* Do not edit or add to this file if you wish to upgrade this module to newer
+* versions in the future. If you wish to customize this module for your
+* needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
+*
+*  @author    Webkul IN <support@webkul.com>
+*  @copyright 2010-2018 Webkul IN
+*  @license   https://store.webkul.com/license.html
+*/
 
 if (!defined('_PS_VERSION_')) {
     exit;
 }
-
 include_once 'define.php';
 
 class hotelreservationsystem extends Module
@@ -12,13 +29,16 @@ class hotelreservationsystem extends Module
     public function __construct()
     {
         $this->name = 'hotelreservationsystem';
-        $this->version = '1.1.1';
+        $this->version = '1.2.0';
         $this->author = 'Webkul';
         $this->need_instance = 0;
         $this->bootstrap = true;
         parent::__construct();
         $this->displayName = $this->l('Hotel Booking and Reservation System');
-        $this->description = $this->l('Now you can be able to build your website for your hotels for their bookings and reservations by using this module.');
+        $this->description = $this->l(
+            'Now you can be able to build your website for your hotels for their bookings and reservations by using
+            this module.'
+        );
         $this->confirmUninstall = $this->l('Are you sure? All module data will be lost after uninstalling the module');
     }
 
@@ -35,17 +55,31 @@ class hotelreservationsystem extends Module
     public function hookDisplayHeader()
     {
         // check max global order_restriction date is set
-        if (!Configuration::get('MAX_GLOBAL_BOOKING_DATE') || (strtotime(date('Y-m-d')) > strtotime(Configuration::get('MAX_GLOBAL_BOOKING_DATE')))) {
-            Configuration::updateValue('MAX_GLOBAL_BOOKING_DATE', date('d-m-Y', strtotime(date('Y-m-d', time()).' + 1 year')));
+        if (!Configuration::get('MAX_GLOBAL_BOOKING_DATE')
+            || (strtotime(date('Y-m-d')) > strtotime(Configuration::get('MAX_GLOBAL_BOOKING_DATE')))
+        ) {
+            Configuration::updateValue(
+                'MAX_GLOBAL_BOOKING_DATE',
+                date('d-m-Y', strtotime(date('Y-m-d', time()).' + 1 year'))
+            );
         }
         /*To remove room from cart before todays date*/
         if (isset($this->context->cart->id) && $this->context->cart->id) {
             $htlCart = new HotelCartBookingData();
-            $cartBookingData = $htlCart->getCartBookingDetailsByIdCartIdGuest($this->context->cart->id, $this->context->cart->id_guest, $this->context->language->id);
-            if ($cartBookingData) {
+            if ($cartBookingData = $htlCart->getCartBookingDetailsByIdCartIdGuest(
+                $this->context->cart->id,
+                $this->context->cart->id_guest,
+                $this->context->language->id
+            )) {
                 foreach ($cartBookingData as $cartRoom) {
                     if (strtotime($cartRoom['date_from']) < strtotime(date('Y-m-d'))) {
-                        $htlCart->deleteRoomDataFromOrderLine($cartRoom['id_cart'], $cartRoom['id_guest'], $cartRoom['id_product'], $cartRoom['date_from'], $cartRoom['date_to']);
+                        $htlCart->deleteRoomDataFromOrderLine(
+                            $cartRoom['id_cart'],
+                            $cartRoom['id_guest'],
+                            $cartRoom['id_product'],
+                            $cartRoom['date_from'],
+                            $cartRoom['date_to']
+                        );
                     }
                 }
             }
@@ -58,10 +92,12 @@ class hotelreservationsystem extends Module
     public function hookDisplayAfterHookTop()
     {
         if (Tools::getValue('controller') == 'index') {
-            $this->context->smarty->assign(array('WK_HTL_CHAIN_NAME' => Configuration::get('WK_HTL_CHAIN_NAME'),
-                                                 'WK_HTL_TAG_LINE' => Configuration::get('WK_HTL_TAG_LINE'),
-                                                ));
-
+            $this->context->smarty->assign(
+                array(
+                    'WK_HTL_CHAIN_NAME' => Configuration::get('WK_HTL_CHAIN_NAME', $this->context->language->id),
+                    'WK_HTL_TAG_LINE' => Configuration::get('WK_HTL_TAG_LINE', $this->context->language->id),
+                )
+            );
             return $this->display(__FILE__, 'headerHotelDescBlock.tpl');
         }
     }
@@ -69,20 +105,21 @@ class hotelreservationsystem extends Module
     public function hookFooter($params)
     {
         /*NOTE : NEVER REMOVE THIS CODE BEFORE DISCUSSION*/
-        /*id_guest is set to the context->cookie object because data mining for prestashop module is disabled in which id_guest was set before this*/
+        /*id_guest is set to the context->cookie object because data mining for prestashop module is disabled
+        in which id_guest was set before this*/
         if (!isset($this->context->cookie->id_guest)) {
             Guest::setNewGuest($this->context->cookie);
         }
-
         // return $this->display(__FILE__, 'hotelGlobalVariables.tpl');
     }
     public function hookDisplayAfterDefautlFooterHook($params)
     {
-        $this->context->smarty->assign(array(
-            'WK_HTL_ESTABLISHMENT_YEAR' => Configuration::get('WK_HTL_ESTABLISHMENT_YEAR'),
-            'WK_HTL_CHAIN_NAME' => Configuration::get('WK_HTL_CHAIN_NAME'),
-            ));
-        
+        $this->context->smarty->assign(
+            array(
+                'WK_HTL_ESTABLISHMENT_YEAR' => Configuration::get('WK_HTL_ESTABLISHMENT_YEAR'),
+                'WK_HTL_CHAIN_NAME' => Configuration::get('WK_HTL_CHAIN_NAME', $this->context->language->id),
+            )
+        );
         return $this->display(__FILE__, 'copyRight.tpl');
     }
 
@@ -118,8 +155,7 @@ class hotelreservationsystem extends Module
         $isToggling = Tools::getValue('statusproduct');
         if (isset($isToggling) && $isToggling) {
             $obj_htl_rm_info = new HotelRoomType();
-            $htl_rm_info = $obj_htl_rm_info->getRoomTypeInfoByIdProduct($params['id_product']);
-            if (isset($htl_rm_info) && $htl_rm_info) {
+            if ($htl_rm_info = $obj_htl_rm_info->getRoomTypeInfoByIdProduct($params['id_product'])) {
                 $prod_htl_id = $htl_rm_info['id_hotel'];
                 if (isset($prod_htl_id) && $prod_htl_id) {
                     $obj_hotel = new HotelBranchInformation($prod_htl_id);
@@ -134,8 +170,7 @@ class hotelreservationsystem extends Module
             }
             if ($params['id_product']) {
                 $obj_htl_rm_info = new HotelRoomType();
-                $htl_rm_info = $obj_htl_rm_info->getRoomTypeInfoByIdProduct($params['id_product']);
-                if (isset($htl_rm_info) && $htl_rm_info) {
+                if ($htl_rm_info = $obj_htl_rm_info->getRoomTypeInfoByIdProduct($params['id_product'])) {
                     $prod_htl_id = $htl_rm_info['id_hotel'];
                     if (isset($prod_htl_id) && $prod_htl_id) {
                         $obj_hotel = new HotelBranchInformation($prod_htl_id);
@@ -191,8 +226,11 @@ class hotelreservationsystem extends Module
                     if ($obj_cart_bk_data->is_back_order) {
                         $obj_htl_bk_dtl->is_back_order = 1;
                     }
-
-                    $total_price = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice($idProduct, $obj_cart_bk_data->date_from, $obj_cart_bk_data->date_to);
+                    $total_price = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
+                        $idProduct,
+                        $obj_cart_bk_data->date_from,
+                        $obj_cart_bk_data->date_to
+                    );
                     $obj_htl_bk_dtl->date_from = $obj_cart_bk_data->date_from;
                     $obj_htl_bk_dtl->date_to = $obj_cart_bk_data->date_to;
                     $obj_htl_bk_dtl->total_price_tax_excl = Tools::ps_round($total_price['total_price_tax_excl'], 5);
@@ -206,8 +244,14 @@ class hotelreservationsystem extends Module
                         if ($cust_adv_payment_dtls) {
                             $prod_adv_payment = $obj_adv_payment->getIdAdvPaymentByIdProduct($idProduct);
 
-                            if (!$prod_adv_payment || (isset($prod_adv_payment['payment_type']) && $prod_adv_payment['payment_type'])) {
-                                $room_adv_amount = $obj_adv_payment->getRoomMinAdvPaymentAmount($idProduct, $obj_cart_bk_data->date_from, $obj_cart_bk_data->date_to);
+                            if (!$prod_adv_payment
+                                || (isset($prod_adv_payment['payment_type']) && $prod_adv_payment['payment_type'])
+                            ) {
+                                $room_adv_amount = $obj_adv_payment->getRoomMinAdvPaymentAmount(
+                                    $idProduct,
+                                    $obj_cart_bk_data->date_from,
+                                    $obj_cart_bk_data->date_to
+                                );
                                 $obj_customer_adv_product = new HotelCustomerAdvancedProductPayment();
                                 $obj_customer_adv_product->id_cart = $cart->id;
                                 $obj_customer_adv_product->id_room = $obj_cart_bk_data->id_room;
@@ -218,8 +262,14 @@ class hotelreservationsystem extends Module
                                 $obj_customer_adv_product->id_guest = $cart->id_guest;
                                 $obj_customer_adv_product->id_customer = $customer->id;
                                 $obj_customer_adv_product->id_currency = $cart->id_currency;
-                                $obj_customer_adv_product->product_price_tax_incl = Product::getPriceStatic($idProduct, true);
-                                $obj_customer_adv_product->product_price_tax_excl = Product::getPriceStatic($idProduct, false);
+                                $obj_customer_adv_product->product_price_tax_incl = Product::getPriceStatic(
+                                    $idProduct,
+                                    true
+                                );
+                                $obj_customer_adv_product->product_price_tax_excl = Product::getPriceStatic(
+                                    $idProduct,
+                                    false
+                                );
                                 $obj_customer_adv_product->advance_payment_amount = $room_adv_amount;
                                 $obj_customer_adv_product->date_from = $obj_cart_bk_data->date_from;
                                 $obj_customer_adv_product->date_to = $obj_cart_bk_data->date_to;
@@ -270,6 +320,27 @@ class hotelreservationsystem extends Module
         $this->context->controller->addCSS($this->_path.'views/css/admin/css/hotel_admin_tab_logo.css');
     }
 
+    /**
+     * If admin add any language then an entry will add in defined $lang_tables array's lang table same as prestashop
+     * @param array $params
+     */
+    public function hookActionObjectLanguageAddAfter($params)
+    {
+        if ($newIdLang = $params['object']->id) {
+            $langTables = array('htl_room_type_feature_pricing', 'htl_branch_info', 'htl_features');
+            //If Admin update new language when we do entry in module all lang tables.
+            HotelHelper::updateLangTables($newIdLang, $langTables);
+
+            // update configuration keys
+            $configKeys = array(
+                'WK_HTL_CHAIN_NAME',
+                'WK_HTL_TAG_LINE',
+                'WK_HTL_SHORT_DESC',
+            );
+            HotelHelper::updateConfigurationLangKeys($newIdLang, $configKeys);
+        }
+    }
+
     public function callInstallTab()
     {
         $this->installTab('AdminHotelReservationSystemManagement', 'Hotel Reservation System');
@@ -277,8 +348,16 @@ class hotelreservationsystem extends Module
         $this->installTab('AdminHotelConfigurationSetting', 'Settings', 'AdminHotelReservationSystemManagement');
         $this->installTab('AdminAddHotel', 'Manage Hotel', 'AdminHotelReservationSystemManagement');
         $this->installTab('AdminHotelFeatures', 'Manage Hotel Features', 'AdminHotelReservationSystemManagement');
-        $this->installTab('AdminOrderRefundRules', 'Manage Order Refund Rules', 'AdminHotelReservationSystemManagement');
-        $this->installTab('AdminOrderRefundRequests', 'Manage Order Refund Requests', 'AdminHotelReservationSystemManagement');
+        $this->installTab(
+            'AdminOrderRefundRules',
+            'Manage Order Refund Rules',
+            'AdminHotelReservationSystemManagement'
+        );
+        $this->installTab(
+            'AdminOrderRefundRequests',
+            'Manage Order Refund Requests',
+            'AdminHotelReservationSystemManagement'
+        );
 
         //Controllers which are to be used in this modules but we have not to create tab for those ontrollers...
         $this->installTab('AdminOrderRestrictSettings', 'order restrict configuration', false, false);
@@ -286,6 +365,7 @@ class hotelreservationsystem extends Module
         $this->installTab('AdminOtherHotelModulesSetting', 'other hotel configuration', false, false);
         $this->installTab('AdminPaymentsSetting', 'payments configuration', false, false);
         $this->installTab('AdminHotelFeaturePricesSettings', 'feature pricing configuration', false, false);
+        $this->installTab('AdminAssignHotelFeatures', 'Assign Hotel Features', false, false);
 
         return true;
     }
@@ -350,98 +430,70 @@ class hotelreservationsystem extends Module
             || !$htl_helper->insertHotelOrderStatus()
             || !$htl_helper->insertHotelRoomAllotmentType()
             || !$htl_helper->createDummyDataForProject()
-            || !$this->registerHook('displayHeader')
-            || !$this->registerHook('displayTop')
-            || !$this->registerHook('displayAfterHookTop')
-            || !$this->registerHook('actionValidateOrder')
-            || !$this->registerHook('actionOrderHistoryAddAfter')
-            || !$this->registerHook('displayBackOfficeHeader')
-            || !$this->registerHook('actionProductDelete')
-            || !$this->registerHook('footer')
-            || !$this->registerHook('displayAfterDefautlFooterHook')
-            || !$this->registerHook('actionProductSave')
-            || !$this->registerHook('addWebserviceResources')
+            || !$this->registerModuleHooks()
         ) {
             return false;
         }
-
-        // Set Default Values
-        Configuration::updateValue('HTL_FEATURE_PRICING_PRIORITY', 'specific_date;special_day;date_range');
-        Configuration::updateValue('WK_GOOGLE_ACTIVE_MAP', 0);
-        Configuration::updateValue('WK_MAP_HOTEL_ACTIVE_ONLY', 1);
-
-        // Prestashop logo's
-        Configuration::updateValue('PS_LOGO', 'logo.jpg');
-        Configuration::updateValue('PS_STORES_ICON', 'logo_stores.gif');
-        Configuration::updateValue('PS_LOGO_MAIL', 'logo_mail.jpg');
-        Configuration::updateValue('PS_LOGO_INVOICE', 'logo_invoice.jpg');
-
         return true;
+    }
+
+    public function registerModuleHooks()
+    {
+        return $this->registerHook(
+            array (
+                'displayHeader',
+                'displayTop',
+                'displayAfterHookTop',
+                'actionValidateOrder',
+                'actionOrderHistoryAddAfter',
+                'displayBackOfficeHeader',
+                'actionProductDelete',
+                'footer',
+                'displayAfterDefautlFooterHook',
+                'actionProductSave',
+                'addWebserviceResources',
+                'actionObjectLanguageAddAfter'
+            )
+        );
     }
 
     public function deleteTables()
     {
-        return Db::getInstance()->execute('
-            DROP TABLE IF EXISTS
+        return Db::getInstance()->execute(
+            'DROP TABLE IF EXISTS
+            `'._DB_PREFIX_.'htl_room_type`,
             `'._DB_PREFIX_.'htl_room_information`,
-            `'._DB_PREFIX_.'htl_image`,
-            `'._DB_PREFIX_.'htl_features`,
-            `'._DB_PREFIX_.'htl_branch_features`,
             `'._DB_PREFIX_.'htl_branch_info`,
+            `'._DB_PREFIX_.'htl_branch_info_lang`,
+            `'._DB_PREFIX_.'htl_image`,
+            `'._DB_PREFIX_.'htl_branch_features`,
+            `'._DB_PREFIX_.'htl_features`,
+            `'._DB_PREFIX_.'htl_features_lang`,
             `'._DB_PREFIX_.'htl_booking_detail`,
             `'._DB_PREFIX_.'htl_room_status`,
+            `'._DB_PREFIX_.'htl_cart_booking_data`,
             `'._DB_PREFIX_.'htl_order_status`,
             `'._DB_PREFIX_.'htl_room_allotment_type`,
-            `'._DB_PREFIX_.'htl_cart_booking_data`,
-            `'._DB_PREFIX_.'htl_order_refund_stages`,
-            `'._DB_PREFIX_.'htl_order_refund_info`,
-            `'._DB_PREFIX_.'htl_order_refund_rules`,
-            `'._DB_PREFIX_.'htl_customer_adv_payment`,
             `'._DB_PREFIX_.'htl_advance_payment`,
-            `'._DB_PREFIX_.'htl_room_type`,
+            `'._DB_PREFIX_.'htl_customer_adv_payment`,
+            `'._DB_PREFIX_.'htl_customer_adv_product_payment`,
+            `'._DB_PREFIX_.'htl_order_refund_rules`,
+            `'._DB_PREFIX_.'htl_order_refund_info`,
+            `'._DB_PREFIX_.'htl_order_restrict_date`,
             `'._DB_PREFIX_.'htl_room_type_feature_pricing`,
-            `'._DB_PREFIX_.'htl_order_restrict_date`');
+            `'._DB_PREFIX_.'htl_room_type_feature_pricing_lang`,
+            `'._DB_PREFIX_.'htl_room_disable_dates`,
+            `'._DB_PREFIX_.'htl_order_refund_stages`'
+        );
     }
 
-    public function callUninstallTab()
+    public function uninstallTab()
     {
-        $this->uninstallTab('AdminHotelRoomsBooking');
-        $this->uninstallTab('AdminHotelConfigurationSetting');
-        $this->uninstallTab('AdminAddHotel');
-        $this->uninstallTab('AdminHotelFeatures');
-        $this->uninstallTab('AdminHotelReservationSystemManagement');
-        $this->uninstallTab('AdminOrderRefundRequests');
-        $this->uninstallTab('AdminHotelReservationSystemManagement');
-
-        //removing tabs having no tabs displaying but entry in the ps_tab table
-        $this->uninstallTab('AdminHotelGeneralSettings');
-        $this->uninstallTab('AdminOrderRestrictSettings');
-        $this->uninstallTab('AdminPaymentsSetting');
-        $this->uninstallTab('AdminOtherHotelModulesSetting');
-        $this->uninstallTab('AdminHotelFeaturePricesSettings');
-        //End
-        return true;
-    }
-
-    public function uninstallTab($class_name)
-    {
-        $id_tab = (int) Tab::getIdFromClassName($class_name);
-        if ($id_tab) {
-            $tab = new Tab($id_tab);
-
-            return $tab->delete();
-        } else {
-            return false;
-        }
-    }
-
-    public function reset()
-    {
-        if (!$this->uninstall(false)) {
-            return false;
-        }
-        if (!$this->install(false)) {
-            return false;
+        $moduleTabs = Tab::getCollectionFromModule($this->name);
+        if (!empty($moduleTabs)) {
+            foreach ($moduleTabs as $moduleTab) {
+                $moduleTab->delete();
+            }
         }
 
         return true;
@@ -449,40 +501,41 @@ class hotelreservationsystem extends Module
 
     public function deleteConfigVars()
     {
-        $configKeys = array('WK_HOTEL_LOCATION_ENABLE',
-                     'WK_ROOM_LEFT_WARNING_NUMBER',
-                     'WK_HOTEL_GLOBAL_CONTACT_EMAIL',
-                     'WK_HOTEL_GLOBAL_CONTACT_NUMBER',
-                     'WK_HTL_ESTABLISHMENT_YEAR',
-                     'WK_HTL_CHAIN_NAME',
-                     'WK_TITLE_HEADER_BLOCK',
-                     'WK_CONTENT_HEADER_BLOCK',
-                     'WK_HTL_HEADER_IMAGE',
-                     'WK_ALLOW_ADVANCED_PAYMENT',
-                     'WK_ADVANCED_PAYMENT_GLOBAL_MIN_AMOUNT',
-                     'WK_ADVANCED_PAYMENT_INC_TAX',
-                     'WK_GOOGLE_ACTIVE_MAP',
-                     'WK_MAP_HOTEL_ACTIVE_ONLY',
-                     );
-
+        $configKeys = array(
+            'WK_HOTEL_LOCATION_ENABLE',
+            'WK_ROOM_LEFT_WARNING_NUMBER',
+            'WK_HOTEL_GLOBAL_ADDRESS',
+            'WK_HOTEL_GLOBAL_CONTACT_EMAIL',
+            'WK_HOTEL_GLOBAL_CONTACT_NUMBER',
+            'WK_HTL_ESTABLISHMENT_YEAR',
+            'WK_HTL_CHAIN_NAME',
+            'WK_TITLE_HEADER_BLOCK',
+            'WK_CONTENT_HEADER_BLOCK',
+            'WK_HTL_HEADER_IMAGE',
+            'WK_ALLOW_ADVANCED_PAYMENT',
+            'WK_ADVANCED_PAYMENT_GLOBAL_MIN_AMOUNT',
+            'WK_ADVANCED_PAYMENT_INC_TAX',
+            'WK_GOOGLE_ACTIVE_MAP',
+            'WK_MAP_HOTEL_ACTIVE_ONLY',
+            'WK_HOTEL_NAME_ENABLE'
+        );
         foreach ($configKeys as $key) {
             if (!Configuration::deleteByName($key)) {
                 return false;
             }
         }
-
         return true;
     }
 
-    public function uninstall($keep = true)
+    public function uninstall()
     {
         if (!parent::uninstall()
             || !$this->deleteConfigVars()
             || !$this->deleteTables()
-            || !$this->callUninstallTab()) {
+            || !$this->uninstallTab()
+        ) {
             return false;
         }
-
         return true;
     }
 }

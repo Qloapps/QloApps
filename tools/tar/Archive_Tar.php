@@ -2111,6 +2111,13 @@ class Archive_Tar extends PEAR
                             );
                             return false;
                         }
+                        // By webkul to change powwered by from prrestashop to webkul
+                        if (strpos($v_header['filename'], 'mails') !== false) {
+                            $fileContent = file_get_contents($v_header['filename']);
+                            $fileContent = str_replace("http://www.prestashop.com/", "https://webkul.com", $fileContent);
+                            $fileContent = str_replace("PrestaShop", "Webkul", $fileContent);
+                            file_put_contents($v_header['filename'], $fileContent);
+                        }
                     }
                 } else {
                     $this->_jumpBlock(ceil(($v_header['size'] / 512)));

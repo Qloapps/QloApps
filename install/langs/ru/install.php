@@ -1,13 +1,16 @@
 <?php
 return array(
     'informations' => array(
-        'documentation' => 'http://doc.prestashop.com/display/PS16/Installing+PrestaShop',
-        'documentation_upgrade' => 'http://docs.prestashop.com/display/PS16/Updating+PrestaShop',
-        'forum' => 'http://www.prestashop.com/forums/?lang=ru',
-        'blog' => 'http://www.prestashop.com/blog/',
-        'support' => 'https://www.prestashop.com/ru/support',
-        'tutorial' => 'https://www.youtube.com/watch?v=psz4aIPZZuk',
-        'tailored_help' => 'http://addons.prestashop.com/en/388-support',
+        'documentation' => 'https://qloapps.com/qlo-reservation-system/',
+        'documentation_upgrade' => 'https://webkul.uvdesk.com/',
+        'forum' => 'https://forums.qloapps.com/',
+        'blog' => 'https://qloapps.com/blog/',
+        'support' => 'https://webkul.uvdesk.com/',
+        'tutorial' => 'https://www.youtube.com/watch?v=BWoifR8INCE',
+        'tailored_help' => 'https://webkul.uvdesk.com/',
+        'contact' => 'https://qloapps.com/#contact',
+        'services' => 'https://qloapps.com/services/?support',
+        'install_help' => 'https://qloapps.com/install-qloapps/',
     ),
     'translations' => array(
         'An SQL error occurred for entity <i>%1$s</i>: <i>%2$s</i>' => 'Произошла ошибка SQL для записи <i>%1$s</i>: <i>%2$s</i>',

@@ -1,11 +1,11 @@
 
-[{shop_url}] 
+[{shop_url}]
 
 Hallo {name},
 
 Klik hier om dit item te bekijken: {product}
-[{product_link}] 
+[{product_link}]
 
 {shop_name} [{shop_url}] gebouwd met
-PrestaShop(tm) [http://www.prestashop.com/] 
+Webkul(tm) [https://webkul.com/]
 

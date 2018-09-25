@@ -1,6 +1,6 @@
 <?php
 /**
-* 2010-2016 Webkul.
+* 2010-2018 Webkul.
 *
 * NOTICE OF LICENSE
 *
@@ -14,7 +14,7 @@
 * needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
 *
 *  @author    Webkul IN <support@webkul.com>
-*  @copyright 2010-2016 Webkul IN
+*  @copyright 2010-2018 Webkul IN
 *  @license   https://store.webkul.com/license.html
 */
 
@@ -105,7 +105,7 @@ class QloWebservice
 
     /**
      * Create just like PS renderField function in WebServiceOutputXML class
-     * @todo :: to be mode functional with attributes and others 
+     * @todo :: to be mode functional with attributes and others
      * @param  [type] $nodeName
      * @param  [type] $value
      * @return [type] xml node

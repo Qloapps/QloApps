@@ -1,22 +1,41 @@
-<?php 
-  class HotelOrderRefundInfo extends ObjectModel
-  {
-      public $id;
-      public $id_order;
-      public $id_product;
-      public $id_customer;
-      public $id_currency;
-      public $refund_stage_id;
-      public $order_amount;
-      public $num_rooms;
-      public $date_from;
-      public $date_to;
-      public $cancellation_reason;
-      public $refunded_amount;
-      public $date_add;
-      public $date_upd;
+<?php
+/**
+* 2010-2018 Webkul.
+*
+* NOTICE OF LICENSE
+*
+* All right is reserved,
+* Please go through this link for complete license : https://store.webkul.com/license.html
+*
+* DISCLAIMER
+*
+* Do not edit or add to this file if you wish to upgrade this module to newer
+* versions in the future. If you wish to customize this module for your
+* needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
+*
+*  @author    Webkul IN <support@webkul.com>
+*  @copyright 2010-2018 Webkul IN
+*  @license   https://store.webkul.com/license.html
+*/
 
-      public static $definition = array(
+class HotelOrderRefundInfo extends ObjectModel
+{
+    public $id;
+    public $id_order;
+    public $id_product;
+    public $id_customer;
+    public $id_currency;
+    public $refund_stage_id;
+    public $order_amount;
+    public $num_rooms;
+    public $date_from;
+    public $date_to;
+    public $cancellation_reason;
+    public $refunded_amount;
+    public $date_add;
+    public $date_upd;
+
+    public static $definition = array(
         'table' => 'htl_order_refund_info',
         'primary' => 'id',
         'fields' => array(
@@ -34,7 +53,7 @@
             'date_add' =>             array('type' => self::TYPE_DATE, 'validate' => 'isDate', 'copy_post' => false),
             'date_upd' =>             array('type' => self::TYPE_DATE, 'validate' => 'isDate', 'copy_post' => false),
     ));
-    
+
     /**
      * [getOderRefundInfoByIdOrderIdProductByDate ::To get Booking order refund Information By Id order and Id product and By date from and date to for which the room is booked]
      * @param  [int] $id_order   [Id of the order]
@@ -66,10 +85,10 @@
         return false;
     }
 
-      public function deleteOrderedRoomRefundInfo($id_order, $id_product, $date_from, $date_to)
-      {
-          $delete = Db::getInstance()->delete('htl_order_refund_info', '`id_order`='.(int) $id_order.' AND `id_product`='.(int) $id_product." AND `date_from`='$date_from' AND `date_to`='$date_to'");
+    public function deleteOrderedRoomRefundInfo($id_order, $id_product, $date_from, $date_to)
+    {
+        $delete = Db::getInstance()->delete('htl_order_refund_info', '`id_order`='.(int) $id_order.' AND `id_product`='.(int) $id_product." AND `date_from`='$date_from' AND `date_to`='$date_to'");
 
-          return $delete;
-      }
-  }
+        return $delete;
+    }
+}

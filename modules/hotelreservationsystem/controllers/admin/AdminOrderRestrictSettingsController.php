@@ -7,11 +7,15 @@ class AdminOrderRestrictSettingsController extends ModuleAdminController
         $this->table = 'htl_order_restrict_date';
         $this->className = 'HotelOrderRestrictDate';
         $this->bootstrap = true;
-        $this->_join .= 'LEFT JOIN `'._DB_PREFIX_.'htl_branch_info` hb ON (a.`id_hotel` = hb.`id`)';
-        $this->_join .= 'LEFT JOIN `'._DB_PREFIX_.'state` s ON (s.`id_state` = hb.`state_id`)';
-        $this->_join .= 'LEFT JOIN `'._DB_PREFIX_.'country_lang` cl ON (cl.`id_country` = hb.`country_id` AND cl.`id_lang` = '.Configuration::get('PS_LANG_DEFAULT').')';
-        $this->_select = 's.`name` as `state_name`, cl.`name` as country_name, hb.`hotel_name`, hb.`city`, ';
-        $this->context = Context::getContext();
+        $this->identifier = 'id';
+        parent::__construct();
+        $this->_join .= ' LEFT JOIN `'._DB_PREFIX_.'htl_branch_info` hb ON (a.`id_hotel` = hb.`id`)';
+        $this->_join .= ' LEFT JOIN `'._DB_PREFIX_.'htl_branch_info_lang` hbl
+        ON (hb.`id` = hbl.`id` AND hbl.`id_lang` = '.(int)$this->context->language->id.')';
+        $this->_join .= ' LEFT JOIN `'._DB_PREFIX_.'state` s ON (s.`id_state` = hb.`state_id`)';
+        $this->_join .= ' LEFT JOIN `'._DB_PREFIX_.'country_lang` cl
+        ON (cl.`id_country` = hb.`country_id` AND cl.`id_lang` = '.(int)$this->context->language->id.')';
+        $this->_select = 's.`name` as `state_name`, cl.`name` as country_name, hbl.`hotel_name`, hb.`city`, ';
         $this->fields_options = array(
             'orderrestrict' => array(
                 'title' => $this->l('Order Restriction Setting'),
@@ -20,13 +24,14 @@ class AdminOrderRestrictSettingsController extends ModuleAdminController
                         'title' => $this->l('Maximum Global Date To Book a room'),
                         'type' => 'text',
                         'id' => 'max_global_book_date',
-                        'hint' => $this->l('This is the maximum date till which date rooms of all your hotels can be booked.'),
+                        'hint' => $this->l(
+                            'This is the maximum date till which date rooms of all your hotels can be booked.'
+                        ),
                     ),
                 ),
                 'submit' => array('title' => $this->l('Save')),
             ),
         );
-        $this->fields_list = array();
         $this->fields_list = array(
             'id' => array(
                 'title' => $this->l('ID'),
@@ -53,13 +58,15 @@ class AdminOrderRestrictSettingsController extends ModuleAdminController
             'max_order_date' => array(
                 'title' => $this->l('Maximum Booking Date'),
                 'align' => 'center',
-            ), );
-        $this->identifier = 'id';
-        $this->bulk_actions = array('delete' => array('text' => $this->l('Delete selected'),
-                                'icon' => 'icon-trash',
-                                'confirm' => $this->l('Delete selected items?'), ),
-            );
-        parent::__construct();
+            ),
+        );
+        $this->bulk_actions = array(
+            'delete' => array(
+                'text' => $this->l('Delete selected'),
+                'icon' => 'icon-trash',
+                'confirm' => $this->l('Delete selected items?'),
+            ),
+        );
     }
 
     public function renderList()
@@ -88,22 +95,28 @@ class AdminOrderRestrictSettingsController extends ModuleAdminController
         } elseif ($this->display == 'edit') {
             $id = Tools::getValue('id');
             $obj_order_restrict = new HotelOrderRestrictDate($id);
-            $hotel_info_obj = new HotelBranchInformation($obj_order_restrict->id_hotel);
+            $hotel_info_obj = new HotelBranchInformation(
+                $obj_order_restrict->id_hotel,
+                (int)$this->context->language->id
+            );
             $ordr_restrict_data['hotel_name'] = $hotel_info_obj->hotel_name;
             $ordr_restrict_data['id_hotel'] = $obj_order_restrict->id_hotel;
             $ordr_restrict_data['max_date'] = date('d-m-Y', strtotime($obj_order_restrict->max_order_date));
             $ordr_restrict_data['hidden_max_date'] = date('Y-m-d', strtotime($obj_order_restrict->max_order_date));
-            $this->context->smarty->assign('ordr_restrict_hotel_data', $ordr_restrict_data);
-            $this->context->smarty->assign('id', $id);
-            $this->context->smarty->assign('edit', 1);
-        }
 
-        $this->fields_form = array(
-                'submit' => array(
-                    'title' => $this->l('Save'),
-                ),
+            $this->context->smarty->assign(
+                array(
+                    'ordr_restrict_hotel_data' => $ordr_restrict_data,
+                    'id' => $id,
+                    'edit' => 1
+                )
             );
-
+        }
+        $this->fields_form = array(
+            'submit' => array(
+                'title' => $this->l('Save'),
+            ),
+        );
         return parent::renderForm();
     }
 
@@ -113,14 +126,14 @@ class AdminOrderRestrictSettingsController extends ModuleAdminController
         $hotel_id = Tools::getValue('hotel_id');
         $max_htl_book_date = Tools::getValue('max_htl_book_date');
         if (!$hotel_id) {
-            $this->errors[] = Tools::displayError('Please Select a Hotel.');
+            $this->errors[] = $this->l('Please Select a Hotel.');
         }
         if (!$max_htl_book_date) {
-            $this->errors[] = Tools::displayError('Please select maximum order date of booking.');
+            $this->errors[] = $this->l('Please select maximum order date of booking.');
         } else {
             $max_htl_book_date = date('Y-m-d', strtotime($max_htl_book_date));
             if (!Validate::isDate($max_htl_book_date)) {
-                $this->errors[] = Tools::displayError('Enter a valid date.');
+                $this->errors[] = $this->l('Enter a valid date.');
             }
         }
 
@@ -137,13 +150,16 @@ class AdminOrderRestrictSettingsController extends ModuleAdminController
             $new_id = $obj_order_restrict->id;
             if (Tools::isSubmit('submitAdd'.$this->table.'AndStay')) {
                 if (isset($new_id) && $new_id) {
-                    Tools::redirectAdmin(self::$currentIndex.'&id='.(int) $new_id.'&update'.$this->table.'&conf=4&token='.$this->token);
+                    Tools::redirectAdmin(
+                        self::$currentIndex.'&id='.(int) $new_id.'&update'.$this->table.'&conf=4&token='.$this->token
+                    );
                 } else {
-                    Tools::redirectAdmin(self::$currentIndex.'&add'.$this->table.'&conf=4&token='.$this->token);
+                    Tools::redirectAdmin(
+                        self::$currentIndex.'&add'.$this->table.'&conf=4&token='.$this->token
+                    );
                 }
             } else {
-                $redirect_link = $this->context->link->getAdminLink('AdminOrderRestrictSettings');
-                Tools::redirectAdmin($redirect_link.'&conf=4');
+                Tools::redirectAdmin($this->context->link->getAdminLink('AdminOrderRestrictSettings').'&conf=4');
             }
         } else {
             $this->display = 'add';
@@ -156,9 +172,9 @@ class AdminOrderRestrictSettingsController extends ModuleAdminController
             $max_global_date = Tools::getValue('MAX_GLOBAL_BOOKING_DATE');
             $max_global_date_frm = date('Y-m-d', strtotime($max_global_date));
             if (!Validate::isDate($max_global_date_frm)) {
-                $this->errors[] = Tools::displayError('Enter a valid date.');
+                $this->errors[] = $this->l('Enter a valid date.');
             } else if (strtotime(date('Y-m-d')) > strtotime($max_global_date_frm)) {
-                $this->errors[] = Tools::displayError('Maximum Global Date can not be before current date.');
+                $this->errors[] = $this->l('Maximum Global Date can not be before current date.');
             }
             if (!count($this->errors)) {
                 Configuration::updateValue('MAX_GLOBAL_BOOKING_DATE', $max_global_date);

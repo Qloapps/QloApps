@@ -1,18 +1,190 @@
 .margin-top-50 {
   margin-top: 50px;
 }
-.contact-header {
-  font-size: 45px;
-  color: #252525;
-  font-weight: 400;
+.margin-bottom-50 {
+  margin-bottom: 50px;
+}
+.htl-contact-page {
+  padding: 10px;
+}
+.htl-contact-page .contact-header {
+  font-size: 42px;
+  color: rgba(0, 0, 0, 1);
+  text-align: center;
+  font-weight: 300;
   margin-bottom: 20px;
 }
-.contact-desc {
-  font-size: 15px;
-  color: #252525;
+.htl-contact-page .contact-desc {
+  font-size: 16px;
+  color: rgba(0, 0, 0, 1);
+  text-align: center;
+  font-weight: 300;
+  margin-bottom: 20px;
+  line-height: 30px;
+}
+.htl-contact-page .contact-form-box {
+  padding: 30px;
+  border-radius: 4px;
+  box-shadow: 2px 2px 15px 3px rgba(0,0,0,.1);
+}
+.htl-contact-page .contact-form-box .control-label {
+  font-size: 14px;
+  color: rgba(0, 0, 0, 1);
   font-weight: 400;
-  margin-bottom: 15px;
+}
+.htl-contact-page .contact-form-box .form-control, .htl-contact-page .uploader span.filename {
+  border: 1px solid rgba(0, 0, 0, 1);
+  font-size: 14px;
+  color: rgba(0, 0, 0, 1);
+  font-weight: 400;
+}
+.htl-contact-page .uploader span.filename {
+  font-size: 12px;
+}
+.htl-contact-page .contact-form-box #contact_type {
+    width: 90%;
+    text-align: left;
+}
+.htl-contact-page .contact_type_ul {
+  font-size: 14px;
+  font-weight: 400;
+  top: 45px;
+  padding: 0px;
+  width: 100%;
+  border-bottom: 1px solid rgba(0, 0, 0, 1);
+  border-left: 1px solid rgba(0, 0, 0, 1);
+  border-right: 1px solid rgba(0, 0, 0, 1);
+  max-height: 145px;
+  overflow-y: auto;
+}
+.htl-contact-page .contact_type_ul li {
+  cursor: default;
+  font-size: 14px;
+  color: rgba(0, 0, 0, 1);
+  font-weight: 400;
+  padding: 11px;
+}
+.htl-contact-page  .contact_type_ul li:hover, .htl-contact-page  .contact_type_ul li:focus, .htl-contact-page  .contact_type_ul li:active {
+  background-color: #379bf0;
+  color: #FFFFFF;
+}
+.htl-contact-page .contact_btn {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 1);
+  font-weight: 600;
+  text-transform: uppercase;
+  border-radius: 4px;
+  padding: 0 20px;
+}
+.htl-contact-page .global-address-header {
+  font-weight: 400;
+  font-size: 12px;
+  color: rgba(0, 0, 0, .6);
+  text-transform: uppercase;
+  margin-bottom: 5px;
+}
+.htl-contact-page .global-address-value {
+  font-weight: 400;
+  font-size: 14px;
+  margin-bottom: 10px;
+  color: rgba(0, 0, 0, 1);
+  line-height: 22px;
+}
+.htl-contact-page .htl-global-address-div {
+  padding: 20px;
+  border-radius: 4px;
+  margin-bottom: 10px;
+  box-shadow: 2px 2px 15px 3px rgba(0,0,0,.1);
+}
+@media screen and (min-width: 767px) {
+	.htl-contact-page .htl-global-address-div {
+    margin-top: 60px;
+  }
+}
+.htl-contact-page .hotels-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  margin-top: 80px;
+}
+.hotels-container .hotel-header {
+  margin-bottom: 40px;
+  text-align: center;
+}
+.hotels-container .hotel-header>span {
+  font-size: 30px;
+  font-weight: 400;
+  color: rgba(0, 0, 0, 1);
+  border-bottom: 1px solid rgba(0, 0, 0, 1);
+}
+.htl-contact-page span.action {
+  background:#379bf0!important;
+}
+.htl-contact-page .hotel-address-container {
+  border-radius: 4px;
+  box-shadow: 2px 2px 15px 3px rgba(0,0,0,.1);
+  float: left;
+  padding: 15px 0px;
+  width: 100%;
+}
+.htl-contact-page .hotel-city-container>span {
+  font-size: 24px;
+  font-weight: 400;
+  color: rgba(0, 0, 0, 1);
+}
+.hotel-address-container .hotel-name {
+  font-size: 18px;
+  font-weight: 400;
+  color: rgba(0, 0, 0, 1);
+  margin-bottom: 10px;
+}
+.hotel-address-container .hotel-name > span {
+  border-bottom: 2px solid rgba(0, 0, 0, 0.3);
+}
+.hotel-address-container span.htl-address-icon {
+  background-image: url(../../../modules/hotelreservationsystem/views/img/Slices/icon-contact.png);
+}
+.hotel-address-container img.htl-img {
+  border-radius: 6px;
+}
+.hotel-address-container span.htl-phone-icon {
+  background-image: url(../../../modules/hotelreservationsystem/views/img/Slices/icon-contact.png);
+  padding: 1px 15px 0px 2px;
+  background-position: 37px;
+  margin-right: 5px;
+  font-size: 14px;
+}
+.hotel-address-container span.htl-email-icon {
+  padding: 1px 10px 1px;
+  background-position: 19px;
+  margin-right: 5px;
+}
+.htl-contact-page .hotel-city-container {
+  margin-bottom: 10px;
+}
+.hotel-city-container span.htl-map-icon {
+  background-image: url(../../../modules/hotelreservationsystem/views/img/Slices/icon-contact.png);
+  padding: 1px 20px 0px 0px;
+  background-position: 0px 0px;
+  margin-right: 5px;
+  font-size: 14px;
+}
+.hotel-address-container p.hotel-branch-info-value {
+  font-size: 14px;
+  color: rgba(0, 0, 0, 1);
+  font-weight: 400;
   line-height: 25px;
+}
+.hotel-address-container .htl-map-direction-btn span {
+  font-size: 12px;
+  color: rgba(0, 0, 0, 1);
+  font-weight: 400;
+}
+.hotel-address-container .htl-map-direction-btn {
+  background-color: #D9D9D9;
+  border-radius: 4px;
+  padding: 6px 20px;
+  text-transform: uppercase;
 }
 .contact-subdiv p {
   font-size: 15px;
@@ -20,19 +192,7 @@
   font-weight: 400;
 }
 .contact-subdiv p i {
-  color: #379bf0;
-}
-.cont_icon_map {
-  font-size: 22px;
-  margin-right: 15px;
-}
-.cont_icon_phone {
-  font-size: 25px;
-  margin-right: 17px;
-}
-.cont_icon_enve {
-  font-size: 15px;
-  margin-right: 14px;
+  color: #2F85CE;
 }
 .contact_input {
   color: #9a9a9a;
@@ -50,68 +210,12 @@
   font-size: 16px;
   font-weight: 600;
 }
-.contact_btn {
-  padding: 0 20px;
-}
-.contact_btn:hover, .contact_btn:focus, .contact_btn:active {
-  color: #ffffff;
-}
-.service_type_ul {
-  background: #ffffff none repeat scroll 0 0;
-  display: block;
-  position: absolute;
-  width: 100%;
-  z-index: 122222;
-  border-bottom: 1px solid #cccccc;
-  border-left: 1px solid #cccccc;
-  border-right: 1px solid #cccccc;
-  max-height: 145px;
-  overflow-y: auto;
-}
-.service_type_ul li, .hotel_dropdown_ul li {
-  background-color: #fff;
-  color: #9a9a9a;
-  cursor: default;
-  font-size: 14px;
-  list-style: outside none none;
-  padding: 11px;
-}
-.service_type_ul li:hover, .service_type_ul li:focus, .service_type_ul li:active {
-  background-color: #379bf0;
-  color: #FFFFFF;
-}
-
-.service_type-input {
-  color: #999999;
-  font-size: 16px;
-  font-weight: 400;
-  height: 48px;
-  padding: 7px 5px 7px 12px;
-}
-
 #id_contact {
     color: #999999;
     font-weight: bold;
     text-align: left;
     width: 90%;
 }
-
-
-
-
-
-
-
-
-
-#contact_type {
-  width: 90%;
-  text-align: left;
-  color: #9a9a9a;
-  font-weight: 600;
-  opacity: 0.6;
-}
-
 .contact_type_input {
   color: #999999;
   font-size: 16px;
@@ -140,39 +244,9 @@
   font-weight: 400;
 }
 
-.contact_type_ul {
-  font-size: 14px;
-  font-weight: 400;
-  top: 45px;
-  padding: 0px;
-  width: 100%;
-  border-bottom: 1px solid #cccccc;
-  border-left: 1px solid #cccccc;
-  border-right: 1px solid #cccccc;
-  max-height: 145px;
-  overflow-y: auto;
-}
-.contact_type_ul li {
-  background-color: #fff;
-  color: #9a9a9a;
-  cursor: default;
-  font-size: 14px;
-  list-style: outside none none;
-  padding: 11px;
-}
-.contact_type_ul li:hover, .contact_type_ul li:focus, .contact_type_ul li:active {
-  background-color: #379bf0;
-  color: #FFFFFF;
-}
-
-span.action {
-  background:#379bf0!important;
-}
-
 /* ==== google map ==== */
 #googleMapWrapper {
   clear: both;
-  float: left;
   height: 500px;
 }
 #map {

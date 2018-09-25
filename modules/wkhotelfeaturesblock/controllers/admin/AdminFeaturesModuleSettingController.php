@@ -1,58 +1,81 @@
 <?php
-class AdminFeaturesModuleSettingController extends ModuleAdminController 
-{
-	public function __construct() 
-	{
-		$this->table = 'htl_features_block_data';
-		$this->className = 'WkHotelFeaturesData';
-		$this->bootstrap = true;
-		$this->context = Context::getContext();
+/**
+* 2010-2018 Webkul.
+*
+* NOTICE OF LICENSE
+*
+* All right is reserved,
+* Please go through this link for complete license : https://store.webkul.com/license.html
+*
+* DISCLAIMER
+*
+* Do not edit or add to this file if you wish to upgrade this module to newer
+* versions in the future. If you wish to customize this module for your
+* needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
+*
+*  @author    Webkul IN <support@webkul.com>
+*  @copyright 2010-2018 Webkul IN
+*  @license   https://store.webkul.com/license.html
+*/
 
-		$this->fields_options = array(
-			'global' => array(
-				'title' =>	$this->l('Hotel Features Setting'),
-				'icon' =>   'icon-cogs',
-				'fields' =>	array(
-					'HOTEL_AMENITIES_HEADING' => array(
-						'title' => $this->l('Feature Block Title'),
-						'type' => 'text',
-						'required' => 'true',
-						'validation' => 'isCatalogName',
-						'id' => 'HOTEL_AMENITIES_HEADING',
-						'hint' => $this->l('Block Heading. Ex: Amenities.'),
-					),
-					'HOTEL_AMENITIES_DESCRIPTION' => array(
-						'title' => $this->l('Feature Block Description'),
-						'type' => 'textarea',
-						'required' => 'true',
-						'id' => 'HOTEL_AMENITIES_DESCRIPTION',
-						'validation' => 'isCatalogName',
-						'rows' => '4',
-						'cols' => '2',
-						'hint' => $this->l('Block description.'),
-					),
-				),
-				'submit' => array('title' => $this->l('Save'))
-			),
-		);
-		
-		$this->fields_list = array(
-			'id' => array(
-				'title' => $this->l('ID'),
-				'align' => 'center',
-			),
-			'image' => array(
-	            'title' => $this->l('Logo'),
-	            'align' => 'center',
-	            'image' => 'store_logo',
-	            'orderby' => false,
-	            'search' => false
-	        ),
-	        'feature_title' => array(
+class AdminFeaturesModuleSettingController extends ModuleAdminController
+{
+    protected $position_identifier = 'id_features_block_to_move';
+    public function __construct()
+    {
+        $this->table = 'htl_features_block_data';
+        $this->className = 'WkHotelFeaturesData';
+        $this->_defaultOrderBy = 'position';
+        $this->bootstrap = true;
+        $this->context = Context::getContext();
+        $this->identifier = 'id_features_block';
+        parent::__construct();
+
+        // field options for global fields
+        $this->fields_options = array(
+            'global' => array(
+                'title' =>    $this->l('Hotel Amenity Setting'),
+                'icon' =>   'icon-cogs',
+                'fields' =>    array(
+                    'HOTEL_AMENITIES_HEADING' => array(
+                        'title' => $this->l('Amenity Block Title'),
+                        'type' => 'textLang',
+                        'lang' => true,
+                        'required' => true,
+                        'validation' => 'isGenericName',
+                        'hint' => $this->l('Enter a title for the amenity block.')
+                    ),
+                    'HOTEL_AMENITIES_DESCRIPTION' => array(
+                        'title' => $this->l('Amenity Block Description'),
+                        'type' => 'textareaLang',
+                        'rows' => '4',
+                        'cols' => '2',
+                        'lang' => true,
+                        'required' => true,
+                        'validation' => 'isGenericName',
+                        'hint' => $this->l('Enter a description for the amenity block.')
+                    ),
+                ),
+                'submit' => array('title' => $this->l('Save'))
+            ),
+        );
+
+        $this->fields_list = array(
+            'id_features_block' => array(
+                'title' => $this->l('ID'),
+                'align' => 'center',
+            ),
+            'date_upd' => array(
+                'title' => $this->l('Amenity Image'),
+                'align' => 'center',
+                'callback' => 'getAmenityImage',
+                'search' => false,
+            ),
+            'feature_title' => array(
                 'title' => $this->l('Amenity Title'),
                 'align' => 'text-center',
             ),
-	        'active' => array(
+            'active' => array(
                 'title' => $this->l('Active'),
                 'align' => 'center',
                 'active' => 'status',
@@ -60,19 +83,18 @@ class AdminFeaturesModuleSettingController extends ModuleAdminController
             ),
             'position' => array(
                 'title' => $this->l('Position'),
+                'align' => 'center',
                 'filter_key' => 'a!position',
                 'position' => 'position',
                 'align' => 'center',
             ),
-			'date_add' => array(
-				'title' => $this->l('Date Add'),
-				'align' => 'center',
-			),
-		);
+            'date_add' => array(
+                'title' => $this->l('Date Add'),
+                'align' => 'center',
+            ),
+        );
 
-		$this->identifier = 'id';
-
-		$this->bulk_actions = array(
+        $this->bulk_actions = array(
             'delete' => array(
                 'text' => $this->l('Delete selected'),
                 'icon' => 'icon-trash',
@@ -87,45 +109,59 @@ class AdminFeaturesModuleSettingController extends ModuleAdminController
                 'icon' => 'icon-power-off text-danger',
             ),
         );
-		parent::__construct();
-	}
+    }
 
-	public function renderList() 
-	{
-		$this->addRowAction('edit');
-		$this->addRowAction('delete');
+    public function getAmenityImage($echo, $row)
+    {
+        $image = '';
+        if ($echo) {
+            $imgUrl = _PS_MODULE_DIR_.$this->module->name.'/views/img/hotels_features_img/'.$row['id_features_block'].
+            '.jpg';
+            if (file_exists($imgUrl)) {
+                $modImgUrl = _MODULE_DIR_.$this->module->name.'/views/img/hotels_features_img/'.
+                $row['id_features_block'].'.jpg';
+                $image = "<img class='img-thumbnail img-responsive' style='max-width:70px' src='".$modImgUrl."'>";
+            }
+        }
+        if ($image == '') {
+            $image = "--";
+        }
+        return $image;
+    }
 
-		$ps_ftr_img_dir = _PS_MODULE_DIR_.'wkhotelfeaturesblock/views/img/hotels_features_img';
-		$this->context->smarty->assign('ps_ftr_img_dir', $ps_ftr_img_dir);
-		
-		$features_img_dir = _MODULE_DIR_.'wkhotelfeaturesblock/views/img/hotels_features_img';
-		$this->context->smarty->assign('features_img_dir', $features_img_dir);
+    public function renderList()
+    {
+        $this->addRowAction('edit');
+        $this->addRowAction('delete');
 
-		$this->page_header_toolbar_btn['new'] = array(
-			'href' => self::$currentIndex.'&add'.$this->table.'&token='.$this->token,
-			'desc' => $this->l('Add New Hotel Amenity')
-		);
+        $this->page_header_toolbar_btn['new'] = array(
+            'href' => self::$currentIndex.'&add'.$this->table.'&token='.$this->token,
+            'desc' => $this->l('Add New Hotel Amenity')
+        );
 
-		return parent::renderList();
-	}
+        return parent::renderList();
+    }
 
-	public function renderForm() 
-	{
-		if (!($obj = $this->loadObject(true))) {
+    public function renderForm()
+    {
+        if (!($obj = $this->loadObject(true))) {
             return;
         }
 
-        $image_url = $image_size = false;
-
-        if ($this->display == 'edit')
-        {
+        $imageUrl = $imageSize = false;
+        if ($this->display == 'edit') {
             $image = _PS_MODULE_DIR_.$this->module->name.'/views/img/hotels_features_img/'.$obj->id.'.jpg';
-	        $image_url = ImageManager::thumbnail($image, $this->table.'_'.(int)$obj->id.'.'.$this->imageType, 350,
-	            $this->imageType, true, true);
-	        $image_size = file_exists($image) ? filesize($image) / 1000 : false;
+            $imageUrl = ImageManager::thumbnail(
+                $image,
+                $this->table.'_'.(int)$obj->id.'.'.$this->imageType,
+                350,
+                $this->imageType,
+                true,
+                true
+            );
+            $imageSize = file_exists($image) ? filesize($image) / 1000 : false;
         }
-        
-		$this->fields_form = array(
+        $this->fields_form = array(
             'legend' => array(
                 'title' => $this->l('Amenities Configuration'),
                 'icon' => 'icon-globe'
@@ -136,6 +172,7 @@ class AdminFeaturesModuleSettingController extends ModuleAdminController
                     'label' => $this->l('Amenity Title'),
                     'name' => 'feature_title',
                     'required' => true,
+                    'lang' => true,
                     'hint' => $this->l('This will be displayed as amenity heading.')
                 ),
                 array(
@@ -144,6 +181,7 @@ class AdminFeaturesModuleSettingController extends ModuleAdminController
                     'name' => 'feature_description',
                     'required' => true,
                     'rows' => '4',
+                    'lang' => true,
                     'hint' => $this->l('This will be displayed as amenity description.')
                 ),
                 array(
@@ -152,10 +190,13 @@ class AdminFeaturesModuleSettingController extends ModuleAdminController
                     'name' => 'feature_image',
                     'required' => true,
                     'display_image' => true,
-                    'image' => $image_url ? $image_url : false,
-                    'size' => $image_size,
+                    'image' => $imageUrl ? $imageUrl : false,
+                    'size' => $imageSize,
                     'col' => 6,
-                    'hint' => sprintf($this->l('Maximum image size: %1s'), Tools::formatBytes(Tools::getMaxUploadSize())),
+                    'hint' => sprintf(
+                        $this->l('Maximum image size: %1s'),
+                        Tools::formatBytes(Tools::getMaxUploadSize())
+                    ),
                 ),
                 array(
                     'type' => 'switch',
@@ -178,92 +219,177 @@ class AdminFeaturesModuleSettingController extends ModuleAdminController
                 ),
             ),
             'submit' => array(
-				'title' => $this->l('Save')
-			));
-		
-		return parent::renderForm();
-	}
+                'title' => $this->l('Save')
+            ));
 
-	public function processSave()
-	{
-		$file = $_FILES['feature_image'];
+        return parent::renderForm();
+    }
 
-		/*==== Validations ====*/
-        if (!Tools::getValue('feature_title')) {
-            $this->errors[] = Tools::displayError($this->l('Please enter amenity title.'));
-        } elseif (!Validate::isCatalogName(Tools::getValue('feature_title'))) {
-            $this->errors[] = Tools::displayError($this->l('Please enter valid title.'));
-        }
-
-        if (!Tools::getValue('feature_description')) {
-        	$this->errors[] = Tools::displayError($this->l('Please enter amenity description.'));
-        } elseif (!Validate::isCatalogName(Tools::getValue('feature_description'))) {
-            $this->errors[] = Tools::displayError($this->l('Please enter valid description.'));
-        }
-
-        if (!(Tools::getValue("id") && !$file['size'])) {
-	        if (!$file['size']) {
-	            $this->errors[] = Tools::displayError($this->l('Hotel Amenity Image Required.'));
-	        } elseif ($file['error']) {
-	            $this->errors[] = Tools::displayError($this->l('Cannot upload file.'));
-	        } elseif (!(preg_match('/\.(jpe?g|gif|png)$/', $file['name']) && ImageManager::isRealImage($file['tmp_name'], $file['type']))) {
-	            $this->errors[] = Tools::displayError($this->l('Please upload image file.'));
-	        }
-        }
+    public function processSave()
+    {
+        $file = $_FILES['feature_image'];
+        $hotelAmenityId = Tools::getValue('id_features_block');
         /*==== Validations ====*/
-
-		
-		if (!count($this->errors))
-		{
-			$hotelAmenityId = Tools::getValue('id');
-			$amenityTitle = Tools::getValue('feature_title');
-	        $amenityDescription = Tools::getValue('feature_description');
-
-			if ($hotelAmenityId)
-                $obj_feature_data = new WkHotelFeaturesData($hotelAmenityId);
-            else        
-                $obj_feature_data = new WkHotelFeaturesData();
-
-            if ($file['size']) {
-            	$obj_feature_data->feature_image = 0;
+        // check if field is atleast in default language. Not available in default prestashop
+        $defaultLangId = Configuration::get('PS_LANG_DEFAULT');
+        $objDefaultLanguage = Language::getLanguage((int) $defaultLangId);
+        $languages = Language::getLanguages(false);
+        if (!trim(Tools::getValue('feature_description_'.$defaultLangId))) {
+            $this->errors[] = $this->l('feature description is required at least in ').
+            $objDefaultLanguage['name'];
+        } else {
+            foreach ($languages as $lang) {
+                if (trim(Tools::getValue('feature_description_'.$lang['id_lang']))) {
+                    if (!Validate::isGenericName(Tools::getValue('feature_description_'.$lang['id_lang']))) {
+                        $this->errors[] = $this->l('Invalid feature description in ').$lang['name'];
+                    }
+                }
             }
-			$obj_feature_data->feature_title = $amenityTitle;
-            $obj_feature_data->feature_description = $amenityDescription;
-            $obj_feature_data->active = Tools::getValue('active');
-            $obj_feature_data->save();
-            $hotelAmenityId = $obj_feature_data->id; 
+        }
+        if (!trim(Tools::getValue('feature_title_'.$defaultLangId))) {
+            $this->errors[] = $this->l('feature title is required at least in ').
+            $objDefaultLanguage['name'];
+        } else {
+            foreach ($languages as $lang) {
+                if (trim(Tools::getValue('feature_title_'.$lang['id_lang']))) {
+                    if (!Validate::isGenericName(Tools::getValue('feature_title_'.$lang['id_lang']))) {
+                        $this->errors[] = $this->l('Invalid feature title in ').$lang['name'];
+                    }
+                }
+            }
+        }
+        if (!$hotelAmenityId || $file['size']) {
+            if (!$file['size']) {
+                $this->errors[] = $this->l($this->l('Hotel Amenity Image Required.'));
+            } elseif ($file['error']) {
+                $this->errors[] = $this->l($this->l('Cannot upload file.'));
+            } elseif (!(preg_match('/\.(jpe?g|gif|png)$/', $file['name'])
+                && ImageManager::isRealImage($file['tmp_name'], $file['type']))
+            ) {
+                $this->errors[] = $this->l($this->l('Please upload image file.'));
+            }
+        }
 
+        /*==== Validations ====*/
+        if (!count($this->errors)) {
+            if ($hotelAmenityId) {
+                $objFeatureData = new WkHotelFeaturesData($hotelAmenityId);
+            } else {
+                $objFeatureData = new WkHotelFeaturesData();
+                $objFeatureData->position = WkHotelFeaturesData::getHigherPosition();
+            }
+
+            // lang fields
+            foreach ($languages as $lang) {
+                if (!trim(Tools::getValue('feature_title_'.$lang['id_lang']))) {
+                    $objFeatureData->feature_title[$lang['id_lang']] = Tools::getValue(
+                        'feature_title_'.$defaultLangId
+                    );
+                } else {
+                    $objFeatureData->feature_title[$lang['id_lang']] = Tools::getValue(
+                        'feature_title_'.$lang['id_lang']
+                    );
+                }
+                if (!trim(Tools::getValue('feature_description_'.$lang['id_lang']))) {
+                    $objFeatureData->feature_description[$lang['id_lang']] = Tools::getValue(
+                        'feature_description_'.$defaultLangId
+                    );
+                } else {
+                    $objFeatureData->feature_description[$lang['id_lang']] = Tools::getValue(
+                        'feature_description_'.$lang['id_lang']
+                    );
+                }
+            }
+
+            $objFeatureData->active = Tools::getValue('active');
+            $objFeatureData->save();
             if ($file['size']) {
-            	$img_name = $hotelAmenityId.'.jpg';
-            	$img_path = _PS_MODULE_DIR_.$this->module->name.'/views/img/hotels_features_img/'.$img_name;
-            	if (file_exists($img_path)) {
-            		unlink($img_path);
-            	}
-	            ImageManager::resize($file['tmp_name'], $img_path);
-            	
-                $obj_feature_data->feature_image = $img_name;
-                $obj_feature_data->save();
-        	}
+                $imgPath = _PS_MODULE_DIR_.$this->module->name.'/views/img/hotels_features_img/'.$objFeatureData->id.
+                '.jpg';
+                if (file_exists($imgPath)) {
+                    unlink($imgPath);
+                }
+                ImageManager::resize($file['tmp_name'], $imgPath);
+            }
 
-			if (Tools::getValue("id")) {
+            if ($hotelAmenityId) {
                 Tools::redirectAdmin(self::$currentIndex.'&conf=4&token='.$this->token);
             } else {
                 Tools::redirectAdmin(self::$currentIndex.'&conf=3&token='.$this->token);
             }
-		} else {
-            if (Tools::getValue("id"))
+        } else {
+            if ($hotelAmenityId) {
                 $this->display = 'edit';
-            else
+            } else {
                 $this->display = 'add';
+            }
         }
-	}
+    }
 
-	public function postProcess()
+    public function postProcess()
     {
-        parent::postProcess();
-        $this->addjQueryPlugin(array(
-                'tablednd',
-            ));
-        // $this->addJS(_MODULE_DIR_.'wkabouthotelblock/views/js/WkAboutHotelBlockAdmin.js');
+        if (Tools::isSubmit('submitOptions'.$this->table)) {
+            // check if field is atleast in default language. Not available in default prestashop
+            $defaultLangId = Configuration::get('PS_LANG_DEFAULT');
+            $objDefaultLanguage = Language::getLanguage((int) $defaultLangId);
+            $languages = Language::getLanguages(false);
+            if (!trim(Tools::getValue('HOTEL_AMENITIES_HEADING_'.$defaultLangId))) {
+                $this->errors[] = $this->l('Amenity block title is required at least in ').
+                $objDefaultLanguage['name'];
+            }
+            if (!trim(Tools::getValue('HOTEL_AMENITIES_DESCRIPTION_'.$defaultLangId))) {
+                $this->errors[] = $this->l('Amenity block description is required at least in ').
+                $objDefaultLanguage['name'];
+            }
+            if (!count($this->errors)) {
+                foreach ($languages as $lang) {
+                    // if lang fileds are at least in default language and not available in other languages then
+                    // set empty fields value to default language value
+                    if (!trim(Tools::getValue('HOTEL_AMENITIES_HEADING_'.$lang['id_lang']))) {
+                        $_POST['HOTEL_AMENITIES_HEADING_'.$lang['id_lang']] = Tools::getValue(
+                            'HOTEL_AMENITIES_HEADING_'.$defaultLangId
+                        );
+                    }
+                    if (!trim(Tools::getValue('HOTEL_AMENITIES_DESCRIPTION_'.$lang['id_lang']))) {
+                        $_POST['HOTEL_AMENITIES_DESCRIPTION_'.$lang['id_lang']] = Tools::getValue(
+                            'HOTEL_AMENITIES_DESCRIPTION_'.$defaultLangId
+                        );
+                    }
+                }
+                // if no custom errors the send to parent::postProcess() for further process
+                parent::postProcess();
+            }
+        } else {
+            parent::postProcess();
+        }
+    }
+
+    // update positions
+    public function ajaxProcessUpdatePositions()
+    {
+        $way = (int) Tools::getValue('way');
+        $idFeatureBlock = (int) Tools::getValue('id');
+        $positions = Tools::getValue('features_block');
+
+        foreach ($positions as $position => $value) {
+            $pos = explode('_', $value);
+
+            if (isset($pos[2]) && (int) $pos[2] === $idFeatureBlock) {
+                if ($objFeatureBlock = new WkHotelFeaturesData((int) $pos[2])) {
+                    if (isset($position)
+                        && $objFeatureBlock->updatePosition($way, $position, $idFeatureBlock)
+                    ) {
+                        echo 'ok position '.(int) $position.' for amenity block '.(int) $pos[1].'\r\n';
+                    } else {
+                        echo '{"hasError" : true, "errors" : "Can not update amenity block position '.
+                        (int) $idFeatureBlock.' to position '.(int) $position.' "}';
+                    }
+                } else {
+                    echo '{"hasError" : true, "errors" : "This amenity block ('.(int) $idFeatureBlock.
+                    ') can t be loaded"}';
+                }
+                break;
+            }
+        }
     }
 }

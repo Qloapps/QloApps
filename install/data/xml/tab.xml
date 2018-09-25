@@ -144,9 +144,9 @@
     <tab id="Catalog_Price_Rules" id_parent="Price_Rules" active="1" hide_host_mode="0">
       <class_name>AdminSpecificPriceRule</class_name>
     </tab>
-    <tab id="Marketing" id_parent="Price_Rules" active="1" hide_host_mode="0">
+    <!-- <tab id="Marketing" id_parent="Price_Rules" active="1" hide_host_mode="0">
       <class_name>AdminMarketing</class_name>
-    </tab>
+    </tab> -->
 	<!-- <tab id="Carriers" id_parent="Shipping" active="1" hide_host_mode="0">
       <class_name>AdminCarriers</class_name>
 	</tab>
@@ -186,9 +186,9 @@
     <tab id="Modules_1" id_parent="Modules" active="1" hide_host_mode="0">
       <class_name>AdminModules</class_name>
     </tab>
-    <tab id="Modules_Themes_Catalog" id_parent="Modules" active="1" hide_host_mode="0">
+    <!-- <tab id="Modules_Themes_Catalog" id_parent="Modules" active="1" hide_host_mode="0">
       <class_name>AdminAddonsCatalog</class_name>
-    </tab>
+    </tab> -->
     <tab id="Positions" id_parent="Modules" active="1" hide_host_mode="0">
       <class_name>AdminModulesPositions</class_name>
     </tab>

@@ -1,11 +1,11 @@
 
-[{shop_url}] 
+[{shop_url}]
 
-Здрасти, 
+Здрасти,
 
 БЛАГОДАРИМ ВИ ЗА АБОНИРАНЕТО ЗА
-НАШИЯТ БЮЛЕТИН. 
+НАШИЯТ БЮЛЕТИН.
 
 {shop_name} [{shop_url}] се управлява
-с PrestaShop(tm) [http://www.prestashop.com/] 
+с Webkul(tm) [https://webkul.com/]
 

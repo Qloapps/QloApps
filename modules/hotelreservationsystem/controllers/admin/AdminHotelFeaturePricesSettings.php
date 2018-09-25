@@ -1,6 +1,6 @@
 <?php
 /**
-* 2010-2016 Webkul.
+* 2010-2018 Webkul.
 *
 * NOTICE OF LICENSE
 *
@@ -14,7 +14,7 @@
 * needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
 *
 *  @author    Webkul IN <support@webkul.com>
-*  @copyright 2010-2016 Webkul IN
+*  @copyright 2010-2018 Webkul IN
 *  @license   https://store.webkul.com/license.html
 */
 
@@ -24,14 +24,23 @@ class AdminHotelFeaturePricesSettingsController extends ModuleAdminController
     {
         $this->table = 'htl_room_type_feature_pricing';
         $this->className = 'HotelRoomTypeFeaturePricing';
-
-        $this->_select .= ' IF(a.impact_type=1 , CONCAT(round(a.impact_value, 2), " ",  "%"), a.impact_value) AS impact_value';
-        $this->_select .= ' ,IF(a.impact_type=1 , \''.$this->l('Percentage').'\', \''.$this->l('Fixed Amount').'\') AS impact_type';
-        $this->_select .= ' ,IF(a.impact_way=1 , \''.$this->l('Decrease').'\', \''.$this->l('Increase').'\') AS impact_way';
-
         $this->bootstrap = true;
-        $this->identifier  = 'id';
+        $this->identifier  = 'id_feature_price';
         parent::__construct();
+
+        $this->_join .= 'JOIN `'._DB_PREFIX_.'product_lang` pl ON (pl.`id_product` = a.`id_product` AND pl.`id_lang`='.
+        Configuration::get('PS_LANG_DEFAULT').')';
+        $this->_join .= 'LEFT JOIN `'._DB_PREFIX_.'htl_room_type_feature_pricing_lang` fpl
+        ON (a.id_feature_price = fpl.id_feature_price)';
+
+        $this->_select .= ' fpl.`feature_price_name`, CONCAT(pl.`name`, " (#", a.`id_product`, ")") as product_name,
+        IF(a.impact_type=1 , CONCAT(round(a.impact_value, 2), " ",  "%"), a.impact_value) AS impact_value';
+        $this->_select .= ' ,IF(a.impact_type=1 , \''.$this->l('Percentage').'\', \''.$this->l('Fixed Amount').'\')
+        AS impact_type';
+        $this->_select .= ' ,IF(a.impact_way=1 , \''.$this->l('Decrease').'\', \''.$this->l('Increase').'\')
+        AS impact_way';
+
+        $this->_where = ' AND fpl.`id_lang` = '.(int) $this->context->language->id;
 
         $impactWays = array(1 => 'decrease', 2 => 'increase');
         $impactTypes = array(1 => 'Percentage', 2 => 'Fixed Price');
@@ -42,12 +51,12 @@ class AdminHotelFeaturePricesSettingsController extends ModuleAdminController
                     'feature_price_priority' => array(
                     ));
         $this->fields_list = array(
-            'id' => array(
+            'id_feature_price' => array(
                 'title' => $this->l('ID'),
                 'align' => 'center',
             ),
-            'id_product' => array(
-                'title' => $this->l('Id Product'),
+            'product_name' => array(
+                'title' => $this->l('Product'),
                 'align' => 'center',
             ),
             'feature_price_name' => array(
@@ -94,19 +103,15 @@ class AdminHotelFeaturePricesSettingsController extends ModuleAdminController
         );
 
         $this->bulk_actions = array(
-                'delete' => array(
-                    'text' => $this->l('Delete selected'),
-                    'icon' => 'icon-trash',
-                    'confirm' => $this->l('Delete selected items?'),
-                ),
-            );
+            'delete' => array(
+                'text' => $this->l('Delete selected'),
+                'icon' => 'icon-trash',
+                'confirm' => $this->l('Delete selected items?'),
+            ),
+        );
     }
 
-    /**
-     * [setOrderCurrency description] - A callback function for setting currency sign with amount
-     * @param [type] $echo [description]
-     * @param [type] $tr   [description]
-     */
+     //A callback function for setting currency sign with amount
     public static function setOrderCurrency($echo, $tr)
     {
         $currency_default = Configuration::get('PS_CURRENCY_DEFAULT');
@@ -123,46 +128,48 @@ class AdminHotelFeaturePricesSettingsController extends ModuleAdminController
         );
     }
 
-    public function renderList() 
+    public function renderList()
     {
         $this->addRowAction('edit');
         $this->addRowAction('delete');
         return parent::renderList();
     }
 
-    public function renderForm() 
+    public function renderForm()
     {
+        $smartyVars = array();
         $objCurrency = new Currency(Configuration::get('PS_CURRENCY_DEFAULT'));
         $currencySign = $objCurrency->sign;
         $dateFrom = date('d-m-Y');
         $dateTo = date('d-m-Y', strtotime($dateFrom) + 86400);
+        $currentLangId = Configuration::get('PS_LANG_DEFAULT');
+        $smartyVars['languages'] = Language::getLanguages(false);
+        $smartyVars['currentLang'] = Language::getLanguage((int) $currentLangId);
         if ($this->display == 'edit') {
-            $featurePriceId = Tools::getValue('id');
-            $featurePriceInfo = new HotelRoomTypeFeaturePricing($featurePriceId);
-            if ($featurePriceInfo->id_product) {
-                $product = new Product($featurePriceInfo->id_product, false, Configuration::get('PS_LANG_DEFAULT'));
-                $productName = $product->name;
-                $this->context->smarty->assign('productName', $productName);
+            $idFeaturePrice = Tools::getValue('id_feature_price');
+            if (Validate::isLoadedObject(
+                $objFeaturePrice = new HotelRoomTypeFeaturePricing($idFeaturePrice)
+            )) {
+                if ($objFeaturePrice->id_product) {
+                    $product = new Product($objFeaturePrice->id_product, false, Configuration::get('PS_LANG_DEFAULT'));
+                    $smartyVars['productName'] =  $product->name;
+                }
             }
-            $dateTo = date('d-m-Y', strtotime($featurePriceInfo->date_to));
-            $this->context->smarty->assign(array(
-                'edit' => 1,
-                'featurePriceInfo' => $featurePriceInfo,
-                'special_days' => Tools::jsonDecode($featurePriceInfo->special_days),
-            ));
+            if ($objFeaturePrice->special_days) {
+                $smartyVars['special_days'] =  Tools::jsonDecode($objFeaturePrice->special_days, true);
+            }
+            $smartyVars['objFeaturePrice'] = $objFeaturePrice;
+            $smartyVars['edit'] = 1;
         }
-        $this->tpl_form_vars = array(
-            'defaultcurrency_sign' => $currencySign,
-            'date_from' => $dateFrom,
-            'date_to' => $dateTo,
-        );
-
+        $smartyVars['defaultcurrency_sign'] = $currencySign;
+        $smartyVars['date_from'] = $dateFrom;
+        $smartyVars['date_to'] = $dateTo;
+        $this->context->smarty->assign($smartyVars);
         $this->fields_form = array(
             'submit' => array(
                 'title' => $this->l('Save'),
             ),
         );
-
         return parent::renderForm();
     }
 
@@ -188,13 +195,12 @@ class AdminHotelFeaturePricesSettingsController extends ModuleAdminController
 
     public function processSave()
     {
-        $id = Tools::getValue('id');
-        if (!isset($id) || !$id) {
-            $id = 0;
+        $idFeaturePrice = Tools::getValue('id_feature_price');
+        if (!isset($idFeaturePrice) || !$idFeaturePrice) {
+            $idFeaturePrice = 0;
         }
         $enableFeaturePrice = Tools::getValue('enable_feature_price');
         $roomTypeId = Tools::getValue('room_type_id');
-        $featurePriceName = Tools::getValue('feature_price_name');
         $dateFrom = Tools::getValue('date_from');
         $dateTo = Tools::getValue('date_to');
         $isSpecialDaysExists = Tools::getValue('is_special_days_exists');
@@ -205,112 +211,167 @@ class AdminHotelFeaturePricesSettingsController extends ModuleAdminController
         $dateSelectionType = Tools::getValue('date_selection_type');
         $specificDate = date('Y-m-d', strtotime(Tools::getValue('specific_date')));
         $jsonSpecialDays = Tools::jsonEncode($specialDays);
-        $roomTypeFeaturePricing = new HotelRoomTypeFeaturePricing();
-        if (!$roomTypeId) {
-            $this->errors[] = $this->l('Product is not selected. Please try again.');
-        }
+        $defaultLangId = Configuration::get('PS_LANG_DEFAULT');
 
-        if ($featurePriceName == '') {
-            $this->errors[] = $this->l('Feature Price Name is required field.');
-        } elseif (!Validate::isGenericName($featurePriceName)) {
-            $this->errors[] = $this->l($this->l('Feature Price Name must not have Invalid characters <>;=#{}'));
-        }
+        $objFeaturePricing = new HotelRoomTypeFeaturePricing();
 
-        if ($dateSelectionType == 1) {
-            if ($dateFrom == '') {
-                $this->errors[] = $this->l('Please choose Date from for the feature price.');
-            }
-            if ($dateTo == '') {
-                $this->errors[] = $this->l('Please choose Date to for the feature price.');
-            }
-            $dateFrom = date('Y-m-d', strtotime(Tools::getValue('date_from')));
-            $dateTo = date('Y-m-d', strtotime(Tools::getValue('date_to')));
-            if (!Validate::isDate($dateFrom)) {
-                $this->errors[] = $this->l('Invalid Date From.');
-            }
-            if (!Validate::isDate($dateTo)) {
-                $this->errors[] = $this->l('Invalid Date To.');
-            }
-            if ($dateTo < $dateFrom) {
-                $this->errors[] = $this->l('Date To must be a date after Date From.');
-            }
-            if (isset($isSpecialDaysExists) && $isSpecialDaysExists == 'on') {
-                $isSpecialDaysExists = 1;
-                if (!isset($specialDays) || !$specialDays) {
-                    $isSpecialDaysExists = 0;
-                    $this->errors[] = $this->l('Please select at least one day for the special day selection.');
-                }
-            } else {
-                $isSpecialDaysExists = 0;
-            }
+        $languages = Language::getLanguages(false);
+        $objDefaultLang = new language($defaultLangId);
+        if (!Tools::getValue('feature_price_name_'.$defaultLangId)) {
+            $this->errors[] = sprintf(
+                $this->l('Feature price rule name is required at least in %s'),
+                $objDefaultLang->name
+            );
         } else {
-            if ($specificDate == '') {
-                $this->errors[] = $this->l('Please choose Date from for the feature price.');
-            } elseif (!Validate::isDate($specificDate)) {
-                $this->errors[] = $this->l('Invalid Date From.');
-            }
-            $specificDate = date('Y-m-d', strtotime(Tools::getValue('specific_date')));
-        }
-
-        if (!$impactValue) {
-            $this->errors[] = $this->l('Please enter a valid imapct value.');
-        } else {
-            if (!Validate::isPrice($impactValue)) {
-                $this->errors[] = $this->l('Invalid value of impact value.');
-            }
-        }
-        if (!count($this->errors)) {
+            $isPlanTypeExists = 0;
             if ($dateSelectionType == 2) {
-                $isPlanTypeExists = $roomTypeFeaturePricing->checkRoomTypeFeaturePriceExistance($roomTypeId, $specificDate, date('Y-m-d', strtotime($specificDate) + 86400), 'specific_date', false, $id);
-            } else if (isset($isSpecialDaysExists) && $isSpecialDaysExists) {
-                $isPlanTypeExists = $roomTypeFeaturePricing->checkRoomTypeFeaturePriceExistance($roomTypeId, $dateFrom, $dateTo, 'special_day', $jsonSpecialDays, $id);
+                $isPlanTypeExists = $objFeaturePricing->checkRoomTypeFeaturePriceExistance(
+                    $roomTypeId,
+                    $specificDate,
+                    date('Y-m-d', strtotime($specificDate) + 86400),
+                    'specific_date',
+                    false,
+                    $idFeaturePrice
+                );
+            } elseif (isset($isSpecialDaysExists) && $isSpecialDaysExists) {
+                $isPlanTypeExists = $objFeaturePricing->checkRoomTypeFeaturePriceExistance(
+                    $roomTypeId,
+                    $dateFrom,
+                    $dateTo,
+                    'special_day',
+                    $jsonSpecialDays,
+                    $idFeaturePrice
+                );
             } else {
-                $isPlanTypeExists = $roomTypeFeaturePricing->checkRoomTypeFeaturePriceExistance($roomTypeId, $dateFrom, $dateTo, 'date_range', false, $id);
+                $isPlanTypeExists = $objFeaturePricing->checkRoomTypeFeaturePriceExistance(
+                    $roomTypeId,
+                    $dateFrom,
+                    $dateTo,
+                    'date_range',
+                    false,
+                    $idFeaturePrice
+                );
             }
             if ($isPlanTypeExists) {
-                $this->errors[] = $this->l('A feature price plan already exists in which some dates are common with this plan. Please select a different date range.');
+                $this->errors[] = $this->l(
+                    'A feature price plan already exists in which some dates are common with this plan. Please select a
+                    different date range.'
+                );
             } else {
-                if ($id) {
-                    $roomTypeFeaturePricing = new HotelRoomTypeFeaturePricing($id);
-                } else {
-                    $roomTypeFeaturePricing = new HotelRoomTypeFeaturePricing();
+            }
+
+            if (!$roomTypeId) {
+                $this->errors[] = $this->l('Room type is not selected. Please try again.');
+            }
+
+            $validateRules = call_user_func(
+                array('HotelRoomTypeFeaturePricing', 'getValidationRules'),
+                'HotelRoomTypeFeaturePricing'
+            );
+            foreach ($languages as $language) {
+                if (!Validate::isCatalogName(Tools::getValue('feature_price_name_'.$language['id_lang']))) {
+                     $this->errors[] = $this->l('Feature price name is invalid in ').$language['name'];
+                } elseif (Tools::strlen(Tools::getValue('feature_price_name_'.$language['id_lang'])) > $validateRules['sizeLang']['feature_price_name']) {
+                    sprintf(
+                        $this->l('Feature price Name field is too long (%2$d chars max).'),
+                        $validateRules['sizeLang']['feature_price_name']
+                    );
                 }
-                $roomTypeFeaturePricing->id_product = $roomTypeId;
-                $roomTypeFeaturePricing->feature_price_name = $featurePriceName;
-                $roomTypeFeaturePricing->date_selection_type = $dateSelectionType;
-                if ($dateSelectionType == 1) {
-                    $roomTypeFeaturePricing->date_from = $dateFrom;
-                    $roomTypeFeaturePricing->date_to = $dateTo;
-                } else {
-                    $roomTypeFeaturePricing->date_from = $specificDate;
-                    $roomTypeFeaturePricing->date_to = date('Y-m-d', strtotime($specificDate) + 86400);
+            }
+
+            if ($dateSelectionType == 1) {
+                if ($dateFrom == '') {
+                    $this->errors[] = $this->l('Please choose Date from for the feature price.');
                 }
-                $roomTypeFeaturePricing->impact_way = $priceImpactWay;
-                $roomTypeFeaturePricing->is_special_days_exists = $isSpecialDaysExists;
-                $roomTypeFeaturePricing->special_days = $jsonSpecialDays;
-                $roomTypeFeaturePricing->impact_type = $priceImpactType;
-                $roomTypeFeaturePricing->impact_value = $impactValue;
-                $roomTypeFeaturePricing->active = $enableFeaturePrice;
-                if ($roomTypeFeaturePricing->save()) {
-                    if (Tools::isSubmit('submitAdd'.$this->table.'AndStay')) {
-                        if ($id) {
-                            Tools::redirectAdmin(self::$currentIndex.'&id='.(int) $roomTypeFeaturePricing->id.'&update'.$this->table.'&conf=4&token='.$this->token);
-                        } else {
-                            Tools::redirectAdmin(self::$currentIndex.'&id='.(int) $roomTypeFeaturePricing->id.'&update'.$this->table.'&conf=3&token='.$this->token);
-                        }
-                    } else {
-                        if ($id) {
-                            Tools::redirectAdmin(self::$currentIndex.'&conf=4&token='.$this->token);
-                        } else {
-                            Tools::redirectAdmin(self::$currentIndex.'&conf=3&token='.$this->token);
-                        }
+                if ($dateTo == '') {
+                    $this->errors[] = $this->l('Please choose Date to for the feature price.');
+                }
+                $dateFrom = date('Y-m-d', strtotime($dateFrom));
+                $dateTo = date('Y-m-d', strtotime($dateTo));
+                if (!Validate::isDate($dateFrom)) {
+                    $this->errors[] = $this->l('Invalid Date From.');
+                }
+                if (!Validate::isDate($dateTo)) {
+                    $this->errors[] = $this->l('Invalid Date To.');
+                }
+                if ($dateTo < $dateFrom) {
+                    $this->errors[] = $this->l('Date To must be a date after Date From.');
+                }
+                if (isset($isSpecialDaysExists) && $isSpecialDaysExists == 'on') {
+                    $isSpecialDaysExists = 1;
+                    if (!isset($specialDays) || !$specialDays) {
+                        $isSpecialDaysExists = 0;
+                        $this->errors[] = $this->l('Please select at least one day for the special day selection.');
                     }
                 } else {
-                    $this->errors[] = $this->l('Some error occured while saving feature price plan.');
+                    $isSpecialDaysExists = 0;
+                }
+            } else {
+                if ($specificDate == '') {
+                    $this->errors[] = $this->l('Please choose Date from for the feature price.');
+                }
+                $specificDate = date('Y-m-d', strtotime($specificDate));
+                if (!Validate::isDate($specificDate)) {
+                    $this->errors[] = $this->l('Invalid Date From.');
+                }
+            }
+
+            if (!$impactValue) {
+                $this->errors[] = $this->l('Please enter a valid imapct value.');
+            } else {
+                if (!Validate::isPrice($impactValue)) {
+                    $this->errors[] = $this->l('Invalid value of impact value.');
+                }
+            }
+            if (!count($this->errors)) {
+                if ($idFeaturePrice) {
+                    $objFeaturePricing = new HotelRoomTypeFeaturePricing($idFeaturePrice);
+                }
+                $objFeaturePricing->id_product = $roomTypeId;
+                // lang fields
+                foreach ($languages as $language) {
+                    if (Tools::getValue('feature_price_name_'.$language['id_lang'])) {
+                        $objFeaturePricing->feature_price_name[$language['id_lang']] = Tools::getValue(
+                            'feature_price_name_'.$language['id_lang']
+                        );
+                    } else {
+                        $objFeaturePricing->feature_price_name[$language['id_lang']] = Tools::getValue(
+                            'feature_price_name_'.$defaultLangId
+                        );
+                    }
+                }
+                $objFeaturePricing->date_selection_type = $dateSelectionType;
+
+                if ($dateSelectionType == 1) {
+                    $objFeaturePricing->date_from = $dateFrom;
+                    $objFeaturePricing->date_to = $dateTo;
+                } else {
+                    $objFeaturePricing->date_from = $specificDate;
+                    $objFeaturePricing->date_to = date('Y-m-d', strtotime($specificDate) + 86400);
+                }
+                $objFeaturePricing->impact_way = $priceImpactWay;
+                $objFeaturePricing->is_special_days_exists = $isSpecialDaysExists;
+                $objFeaturePricing->special_days = $jsonSpecialDays;
+                $objFeaturePricing->impact_type = $priceImpactType;
+                $objFeaturePricing->impact_value = $impactValue;
+                $objFeaturePricing->active = $enableFeaturePrice;
+
+                if ($objFeaturePricing->save()) {
+                    if (Tools::isSubmit('submitAdd'.$this->table.'AndStay')) {
+                        Tools::redirectAdmin(
+                            self::$currentIndex.'&id_feature_price='.(int) $objFeaturePricing->id.
+                            '&update'.$this->table.'&conf=4&token='.$this->token
+                        );
+                    } else {
+                        Tools::redirectAdmin(self::$currentIndex.'&conf=4&token='.$this->token);
+                    }
+                } else {
+                    $this->errors[] = $this->l('Some error occured while saving feature price rule.');
                 }
             }
         }
-        if (isset($id) && $id) {
+
+        if (isset($idFeaturePrice) && $idFeaturePrice) {
             $this->display = 'edit';
         } else {
             $this->display = 'add';
@@ -328,16 +389,25 @@ class AdminHotelFeaturePricesSettingsController extends ModuleAdminController
                     $roomInfoByIdProduct = $hotelRoomType->getRoomTypeInfoByIdProduct($product['id_product']);
                     $idHotel = $roomInfoByIdProduct['id_hotel'];
                     if (isset($idHotel) && $idHotel) {
-                        $hotelBranchInformation = new HotelBranchInformation($idHotel);
-                        $product['name'].= ' / '.$hotelBranchInformation->hotel_name;
+                        $onjBranchInfo = new HotelBranchInformation($idHotel, $this->context->language->id);
+                        $product['name'].= ' / '.$onjBranchInfo->hotel_name;
                     }
                 }
-                echo Tools::jsonEncode($productsByName, true); die;
+                echo Tools::jsonEncode($productsByName, true);
+                die;
             } else {
-                die(Tools::jsonEncode(array('status' => 'failed', 'msg' => $this->l('No match found for entered room type name.'))));    
+                die(
+                    Tools::jsonEncode(
+                        array('status' => 'failed', 'msg' => $this->l('No match found for entered room type name.'))
+                    )
+                );
             }
         } else {
-            die(Tools::jsonEncode(array('status' => 'failed', 'msg' => $this->l('No match found for entered room type name.'))));
+            die(
+                Tools::jsonEncode(
+                    array('status' => 'failed', 'msg' => $this->l('No match found for entered room type name.'))
+                )
+            );
         }
     }
 

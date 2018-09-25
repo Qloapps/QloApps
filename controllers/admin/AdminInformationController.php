@@ -79,6 +79,7 @@ class AdminInformationControllerCore extends AdminController
         $shop_vars = array(
             'shop' => array(
                 'ps' => _PS_VERSION_,
+                'qloappsV' => _QLOAPPS_VERSION_,
                 'url' => $this->context->shop->getBaseURL(),
                 'theme' => $this->context->shop->theme_name,
             ),

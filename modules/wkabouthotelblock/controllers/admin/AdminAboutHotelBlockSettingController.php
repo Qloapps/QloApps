@@ -1,14 +1,32 @@
 <?php
+/**
+* 2010-2018 Webkul.
+*
+* NOTICE OF LICENSE
+*
+* All right is reserved,
+* Please go through this link for complete license : https://store.webkul.com/license.html
+*
+* DISCLAIMER
+*
+* Do not edit or add to this file if you wish to upgrade this module to newer
+* versions in the future. If you wish to customize this module for your
+* needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
+*
+*  @author    Webkul IN <support@webkul.com>
+*  @copyright 2010-2018 Webkul IN
+*  @license   https://store.webkul.com/license.html
+*/
 
-class AdminAboutHotelBlockSettingController extends ModuleAdminController 
+class AdminAboutHotelBlockSettingController extends ModuleAdminController
 {
-    public $bootstrap = true;
-    protected $position_identifier = 'id';
+    protected $position_identifier = 'id_interior_image_to_move';
     public function __construct()
     {
         $this->table = 'htl_interior_image';
         $this->className = 'WkHotelInteriorImage';
         $this->bootstrap = true;
+        $this->_defaultOrderBy = 'position';
         $this->context = Context::getContext();
         $this->identifier_name = 'display_name';
 
@@ -18,16 +36,22 @@ class AdminAboutHotelBlockSettingController extends ModuleAdminController
                 'icon' =>   'icon-cogs',
                 'fields' => array(
                     'HOTEL_INTERIOR_HEADING' => array(
-                        'title' => $this->l('Heading'),
-                        'type' => 'text',
+                        'title' => $this->l('Interior Block Title'),
+                        'type' => 'textLang',
+                        'lang' => true,
                         'required' => true,
-                        'hint' => $this->l('Block Heading. Ex: Interior.')
+                        'validation' => 'isGenericName',
+                        'hint' => $this->l('Enter a title for the interior block.')
                     ),
                     'HOTEL_INTERIOR_DESCRIPTION' => array(
-                        'title' => $this->l('Description'),
-                        'type' => 'text',
+                        'title' => $this->l('Interior Block Description'),
+                        'type' => 'textareaLang',
+                        'rows' => '4',
+                        'cols' => '2',
+                        'lang' => true,
                         'required' => true,
-                        'hint' => $this->l('Block description.')
+                        'validation' => 'isGenericName',
+                        'hint' => $this->l('Enter a description for the interior block.')
                     ),
                 ),
                 'submit' => array(
@@ -38,7 +62,7 @@ class AdminAboutHotelBlockSettingController extends ModuleAdminController
         );
 
         $this->fields_list = array(
-            'id' => array(
+            'id_interior_image' => array(
                 'title' => $this->l('ID'),
                 'align' => 'text-center',
                 'class' => 'fixed-width-xs'
@@ -76,8 +100,8 @@ class AdminAboutHotelBlockSettingController extends ModuleAdminController
                 'class' => 'fixed-width-xs'
             ),
         );
-        $this->identifier = 'id';
-        
+        $this->identifier = 'id_interior_image';
+
         $this->bulk_actions = array(
             'delete' => array(
                 'text' => $this->l('Delete selected'),
@@ -97,11 +121,11 @@ class AdminAboutHotelBlockSettingController extends ModuleAdminController
         parent::__construct();
     }
 
-    public function getInteriorImage($img_name)
+    public function getInteriorImage($imgName)
     {
-        $image = _PS_MODULE_DIR_.$this->module->name.'/views/img/hotel_interior/'.$img_name;
-        if (file_exists($image)) {
-            return '<img src="'._MODULE_DIR_.'wkabouthotelblock/views/img/hotel_interior/'.$img_name.'" class="img-thumbnail htlInteriorImg">';
+        if (file_exists(_PS_MODULE_DIR_.$this->module->name.'/views/img/hotel_interior/'.$imgName)) {
+            return '<img src="'._MODULE_DIR_.'wkabouthotelblock/views/img/hotel_interior/'.$imgName.
+            '" class="img-thumbnail htlInteriorImg">';
         } else {
             return '--';
         }
@@ -124,18 +148,23 @@ class AdminAboutHotelBlockSettingController extends ModuleAdminController
 
     public function renderForm()
     {
-        $image_url = $image_size = false;
+        $imageUrl = $imageSize = false;
 
-        if ($this->display == 'edit')
-        {
-            $id_htl_interior = Tools::getValue('id');
-            $obj_inter_img = new WkHotelInteriorImage($id_htl_interior);
-            $img_name = $obj_inter_img->name;
+        if ($this->display == 'edit') {
+            $idHtlInterior = Tools::getValue('id_interior_image');
+            $objHtlInteriorImg = new WkHotelInteriorImage($idHtlInterior);
+            $imgName = $objHtlInteriorImg->name;
 
-            $image = _PS_MODULE_DIR_.$this->module->name.'/views/img/hotel_interior/'.$img_name;
-	        $image_url = ImageManager::thumbnail($image, $this->table.'_'.(int)$id_htl_interior.'.'.$this->imageType, 350,
-	            $this->imageType, true, true);
-	        $image_size = file_exists($image) ? filesize($image) / 1000 : false;
+            $image = _PS_MODULE_DIR_.$this->module->name.'/views/img/hotel_interior/'.$imgName;
+            $imageUrl = ImageManager::thumbnail(
+                $image,
+                $this->table.'_'.(int)$idHtlInterior.'.'.$this->imageType,
+                350,
+                $this->imageType,
+                true,
+                true
+            );
+            $imageSize = file_exists($image) ? filesize($image) / 1000 : false;
         }
         $this->fields_form = array(
             'legend' => array(
@@ -155,10 +184,13 @@ class AdminAboutHotelBlockSettingController extends ModuleAdminController
                     'name' => 'interior_img',
                     'required' => true,
                     'display_image' => true,
-                    'image' => $image_url ? $image_url : false,
-                    'size' => $image_size,
+                    'image' => $imageUrl ? $imageUrl : false,
+                    'size' => $imageSize,
                     'col' => 6,
-                    'hint' => sprintf($this->l('Maximum image size: %1s'), Tools::formatBytes(Tools::getMaxUploadSize())),
+                    'hint' => sprintf(
+                        $this->l('Maximum image size: %1s'),
+                        Tools::formatBytes(Tools::getMaxUploadSize())
+                    ),
                 ),
                 array(
                     'type' => 'switch',
@@ -197,66 +229,131 @@ class AdminAboutHotelBlockSettingController extends ModuleAdminController
                 $this->errors[] = Tools::displayError($this->l('Please enter valid name.'));
             }
         }
-
-        if (!(Tools::getValue("id") && !$file['size'])) {
-	        if (!$file['size']) {
-	            $this->errors[] = Tools::displayError($this->l('Hotel Interior Image Required.'));
-	        } elseif ($file['error']) {
-	            $this->errors[] = Tools::displayError($this->l('Cannot upload file.'));
-	        } elseif (!(preg_match('/\.(jpe?g|gif|png)$/', $file['name']) && ImageManager::isRealImage($file['tmp_name'], $file['type']))) {
-	            $this->errors[] = Tools::displayError($this->l('Please upload image file.'));
-	        }
+        if (!(Tools::getValue("id_interior_image") && !$file['size'])) {
+            if (!$file['size']) {
+                $this->errors[] = Tools::displayError($this->l('Hotel Interior Image Required.'));
+            } elseif ($file['error']) {
+                $this->errors[] = Tools::displayError($this->l('Cannot upload file.'));
+            } elseif (!(preg_match('/\.(jpe?g|gif|png)$/', $file['name'])
+                && ImageManager::isRealImage($file['tmp_name'], $file['type']))
+            ) {
+                $this->errors[] = Tools::displayError($this->l('Please upload image file.'));
+            }
         }
 
         /*==== Validations ====*/
-
         if (!count($this->errors)) {
-        	if (Tools::getValue("id")) {
-        		$obj_inter_img = new WkHotelInteriorImage(Tools::getValue("id"));
-        	} else {
-        		$obj_inter_img = new WkHotelInteriorImage();
-        	}
+            if (Tools::getValue("id_interior_image")) {
+                $objHtlInteriorImg = new WkHotelInteriorImage(Tools::getValue("id_interior_image"));
+            } else {
+                $objHtlInteriorImg = new WkHotelInteriorImage();
+                $objHtlInteriorImg->position = WkHotelInteriorImage::getHigherPosition();
+            }
 
-        	if (Tools::getValue("id") && $file['size'] && !$file['error']) {
-        		unlink(_PS_MODULE_DIR_.$this->module->name.'/views/img/hotel_interior/'.$obj_inter_img->name);
-        	}
+            if (Tools::getValue("id_interior_image") && $file['size'] && !$file['error']) {
+                unlink(_PS_MODULE_DIR_.$this->module->name.'/views/img/hotel_interior/'.$objHtlInteriorImg->name);
+            }
 
-        	if ($file['size']) {
-	            do {
-	                $tmp_name = uniqid().'.jpg';
-	            } while (file_exists(_PS_MODULE_DIR_.$this->module->name.'/views/img/hotel_interior/'.$tmp_name));
-                // $img_size = getimagesize($file['tmp_name']);
-                // $final_width = (375 * $img_size[0]) / $img_size[1];     
-	            ImageManager::resize($file['tmp_name'], _PS_MODULE_DIR_.$this->module->name.'/views/img/hotel_interior/'.$tmp_name);
-            	
-                $obj_inter_img->name = $tmp_name;
-        	}
+            if ($file['size']) {
+                do {
+                    $tmp_name = uniqid().'.jpg';
+                } while (file_exists(_PS_MODULE_DIR_.$this->module->name.'/views/img/hotel_interior/'.$tmp_name));
+                ImageManager::resize(
+                    $file['tmp_name'],
+                    _PS_MODULE_DIR_.$this->module->name.'/views/img/hotel_interior/'.$tmp_name
+                );
 
-            $obj_inter_img->display_name = Tools::getValue('display_name');
-            $obj_inter_img->active = Tools::getValue('active');
-            $obj_inter_img->save();
+                $objHtlInteriorImg->name = $tmp_name;
+            }
 
-            if (Tools::getValue("id")) {
+            $objHtlInteriorImg->display_name = Tools::getValue('display_name');
+            $objHtlInteriorImg->active = Tools::getValue('active');
+            $objHtlInteriorImg->save();
+
+            if (Tools::getValue("id_interior_image")) {
                 Tools::redirectAdmin(self::$currentIndex.'&conf=4&token='.$this->token);
             } else {
                 Tools::redirectAdmin(self::$currentIndex.'&conf=3&token='.$this->token);
             }
-        }
-        else {
-            if (Tools::getValue("id"))
+        } else {
+            if (Tools::getValue("id_interior_image")) {
                 $this->display = 'edit';
-            else
+            } else {
                 $this->display = 'add';
+            }
         }
     }
 
     public function postProcess()
     {
-        parent::postProcess();
-        $this->addjQueryPlugin(array(
-                'tablednd',
-            ));
-        $this->addJS(_MODULE_DIR_.'wkabouthotelblock/views/js/WkAboutHotelBlockAdmin.js');
+        if (Tools::isSubmit('submitOptions'.$this->table)) {
+            // check if field is atleast in default language. Not available in default prestashop
+            $defaultLangId = Configuration::get('PS_LANG_DEFAULT');
+            $objDefaultLanguage = Language::getLanguage((int) $defaultLangId);
+            $languages = Language::getLanguages(false);
+            if (!trim(Tools::getValue('HOTEL_INTERIOR_HEADING_'.$defaultLangId))) {
+                $this->errors[] = $this->l('Interior block title is required at least in ').
+                $objDefaultLanguage['name'];
+            }
+            if (!trim(Tools::getValue('HOTEL_INTERIOR_DESCRIPTION_'.$defaultLangId))) {
+                $this->errors[] = $this->l('Interior block description is required at least in ').
+                $objDefaultLanguage['name'];
+            }
+            if (!count($this->errors)) {
+                foreach ($languages as $lang) {
+                    // if lang fileds are at least in default language and not available in other languages then
+                    // set empty fields value to default language value
+                    if (!trim(Tools::getValue('HOTEL_INTERIOR_HEADING_'.$lang['id_lang']))) {
+                        $_POST['HOTEL_INTERIOR_HEADING_'.$lang['id_lang']] = Tools::getValue(
+                            'HOTEL_INTERIOR_HEADING_'.$defaultLangId
+                        );
+                    }
+                    if (!trim(Tools::getValue('HOTEL_INTERIOR_DESCRIPTION_'.$lang['id_lang']))) {
+                        $_POST['HOTEL_INTERIOR_DESCRIPTION_'.$lang['id_lang']] = Tools::getValue(
+                            'HOTEL_INTERIOR_DESCRIPTION_'.$defaultLangId
+                        );
+                    }
+                }
+                // if no custom errors the send to parent::postProcess() for further process
+                parent::postProcess();
+            }
+        } else {
+            parent::postProcess();
+        }
+    }
+
+    // update positions
+    public function ajaxProcessUpdatePositions()
+    {
+        $way = (int) Tools::getValue('way');
+        $idInteriorImage = (int) Tools::getValue('id');
+        $positions = Tools::getValue('interior_image');
+
+        foreach ($positions as $position => $value) {
+            $pos = explode('_', $value);
+
+            if (isset($pos[2]) && (int) $pos[2] === $idInteriorImage) {
+                if ($objInteriorImg = new WkHotelInteriorImage((int) $pos[2])) {
+                    if (isset($position)
+                        && $objInteriorImg->updatePosition($way, $position, $idInteriorImage)
+                    ) {
+                        echo 'ok position '.(int) $position.' for testimonial block '.(int) $pos[1].'\r\n';
+                    } else {
+                        echo '{"hasError" : true, "errors" : "Can not update testimonial block position '.
+                        (int) $idInteriorImage.' to position '.(int) $position.' "}';
+                    }
+                } else {
+                    echo '{"hasError" : true, "errors" : "This testimonial block ('.(int) $idInteriorImage.
+                    ') can t be loaded"}';
+                }
+                break;
+            }
+        }
+    }
+
+    public function setMedia()
+    {
+        parent::setMedia();
         $this->addCSS(_MODULE_DIR_.'wkabouthotelblock/views/css/WkAboutHotelBlockAdmin.css');
     }
 }

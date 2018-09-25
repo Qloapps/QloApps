@@ -75,7 +75,7 @@ class AdminWebserviceControllerCore extends AdminController
                 'general' => array(
                     'title' =>    $this->l('Configuration'),
                     'fields' =>    array(
-                        'PS_WEBSERVICE' => array('title' => $this->l('Enable PrestaShop\'s webservice'),
+                        'PS_WEBSERVICE' => array('title' => $this->l('Enable Qloapps\'s webservice'),
                             'desc' => $this->l('Before activating the webservice, you must be sure to: ').
                                                 '<ol>
 													<li>'.$this->l('Check that URL rewriting is available on this server.').'</li>

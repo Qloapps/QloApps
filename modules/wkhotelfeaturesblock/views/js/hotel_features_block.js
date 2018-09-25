@@ -1,3 +1,22 @@
+/**
+* 2010-2018 Webkul.
+*
+* NOTICE OF LICENSE
+*
+* All right is reserved,
+* Please go through this link for complete license : https://store.webkul.com/license.html
+*
+* DISCLAIMER
+*
+* Do not edit or add to this file if you wish to upgrade this module to newer
+* versions in the future. If you wish to customize this module for your
+* needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
+*
+*  @author    Webkul IN <support@webkul.com>
+*  @copyright 2010-2018 Webkul IN
+*  @license   https://store.webkul.com/license.html
+*/
+
 $(document).ready(function(){
 		// Image: if image selected
 	$(".htl-features-btn-more-ftr").on("click", function(e){
@@ -12,9 +31,9 @@ $(document).ready(function(){
 	function addOtherFeatureFormFields()
 	{
 		html = '<div class="added_feature_div"><div class="form-group"><label for="feature_title" class="control-label required"><span title="" data-toggle="tooltip" class="label-tooltip">'+feature_title_var+'</span></label><div class=""><input type="text" name="feature_title[]" class="form-control"><input type="hidden" name="feature_id[]" class="form-control" value="{$data.id}"></div></div>';
-		
+
 		html+='<div class="form-group"><label for="feature_description" class="control-label required"><span title="" data-toggle="tooltip" class="label-tooltip">'+feature_description_var+'</span></label><div class=""><input type="text" name="feature_description[]" class="form-control"></div></div>';
-		
+
 		html+='<div class="form-group"><label for="feature_image" class="control-label required col-sm-2"><span title="" data-toggle="tooltip" class="label-tooltip">'+feature_image_var+'"</span></label><div class="col-sm-8"><input type="file" name="feature_image[]"></div>';
 
 		html+='<div class="col-sm-2"><a class="btn btn-default wk_added_features_remove pull-right"><span>'+remove_var+'</span></a></div></div><br><br><hr></div>';

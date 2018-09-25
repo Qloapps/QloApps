@@ -1,10 +1,10 @@
 
-[{shop_url}] 
+[{shop_url}]
 
-Olá, 
+Olá,
 
-OBRIGADO POR ASSINAR A NOSSA NEWSLETTER. 
+OBRIGADO POR ASSINAR A NOSSA NEWSLETTER.
 
 {shop_name} [{shop_url}] baseado em
-PrestaShop(tm) [http://www.prestashop.com/] 
+Webkul(tm) [https://webkul.com/]
 

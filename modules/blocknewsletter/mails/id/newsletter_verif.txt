@@ -1,13 +1,13 @@
 
-[{shop_url}] 
+[{shop_url}]
 
-Halo, 
+Halo,
 
 Terima kasih telah berlangganan newsletter, silahkan konfirmasi
 dengan klik pada tautan berikut :
 
-{verif_url} [{verif_url}] 		 
+{verif_url} [{verif_url}]
 
 {shop_name} [{shop_url}] didukung oleh
-PrestaShop(tm) [http://www.prestashop.com/] 
+Webkul(tm) [https://webkul.com/]
 

@@ -4,9 +4,9 @@
 <div id="dbPart">
 	<h2><?php echo $this->l('Configure your database by filling out the following fields') ?></h2>
 	<p>
-		<?php echo $this->l('To use PrestaShop, you must <a href="http://doc.prestashop.com/display/PS16/Installing+PrestaShop#InstallingPrestaShop-Creatingadatabaseforyourshop" target="_blank">create a database</a> to collect all of your store\'s data-related activities.') ?>
+		<?php echo $this->l('To use Qloapps, you must <a href="%1$s" target="_blank">create a database</a> to collect all of your website\'s data-related activities.', 'https://qloapps.com/install-qloapps/#section-4') ?>
 		<br />
-		<?php echo $this->l('Please complete the fields below in order for PrestaShop to connect to your database. ') ?>
+		<?php echo $this->l('Please complete the fields below in order for Qloapps to connect to your database. ') ?>
 	</p>
 
 	<div id="formCheckSQL">
@@ -48,7 +48,7 @@
 		<p class="aligned last">
 			<input id="btTestDB" class="button" type="button" value="<?php echo $this->l('Test your database connection now!') ?>"/>
 		</p>
-		
+
 		<input class="text" type="hidden" id="rewrite_engine" name="rewrite_engine" value="0" />
 
 		<?php if ($this->errors): ?>

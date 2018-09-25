@@ -34,7 +34,7 @@ class blockcart extends Module
     {
         $this->name = 'blockcart';
         $this->tab = 'front_office_features';
-        $this->version = '1.6.0';
+        $this->version = '1.6.1';
         $this->author = 'PrestaShop';
         $this->need_instance = 0;
 
@@ -147,7 +147,7 @@ class blockcart extends Module
             'static_token' => Tools::getToken(false),
             'free_shipping' => $total_free_shipping,
         ));
-        if (count($errors)) {
+        if (is_array($errors) && count($errors)) {
             $this->smarty->assign('errors', $errors);
         }
         if (isset($this->context->cookie->ajax_blockcart_display)) {
@@ -199,16 +199,12 @@ class blockcart extends Module
         if (Configuration::get('PS_CATALOG_MODE')) {
             return;
         }
-
+        $total_rooms = 0;
         if ($this->context->cart->id) {
-            $result = $this->getHotelCartBookingData();
-            $cart_htl_data = $result['cart_htl_data'];
-            $total_rooms = $result['total_rooms_in_cart'];
-            $this->smarty->assign(array(
-                'cart_htl_data' => $cart_htl_data,
-                'total_rooms_in_cart' => $total_rooms,
-                )
-            );
+            if ($result = $this->getHotelCartBookingData()) {
+                $this->smarty->assign('cart_htl_data', $result['cart_htl_data']);
+                $total_rooms = $result['total_rooms_in_cart'];
+            }
         }
 
         $warning_num = Configuration::get('WK_ROOM_LEFT_WARNING_NUMBER');
@@ -235,6 +231,7 @@ class blockcart extends Module
 
         // @todo this variable seems not used
         $this->smarty->assign(array(
+            'total_rooms_in_cart' => $total_rooms,
             'max_order_date' => $max_order_date,
             'warning_num' => $warning_num,
             'module_dir' => _MODULE_DIR_,
@@ -487,7 +484,7 @@ class blockcart extends Module
                                 $cart_htl_data[$type_key]['date_diff'][$date_join]['data_form'] = date('Y-m-d', strtotime($data_v['date_from']));
                                 $cart_htl_data[$type_key]['date_diff'][$date_join]['data_to'] = date('Y-m-d', strtotime($data_v['date_to']));
                                 $cart_htl_data[$type_key]['date_diff'][$date_join]['num_days'] = $num_days;
-                                
+
                                 // By webkul New way to calculate product prices with feature Prices
                                 $roomTypeDateRangePrice = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice($type_value['id_product'], $data_v['date_from'], $data_v['date_to']);
                                 if (!$price_tax) {

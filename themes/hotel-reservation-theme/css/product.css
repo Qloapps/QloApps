@@ -1082,8 +1082,13 @@ Quick View Styles
   padding-left: 20px;
   padding-right: 20px;
 }
+.booking_room_fields .hasDatepicker
+{
+  cursor: text;
+}
 .booking_room_fields input
 {
+  background-color: #fff!important;
   height: 30px!important;
   color: #A2A2A2;
   font-size:13px;
@@ -1263,7 +1268,7 @@ Quick View Styles
 .product_page_search
 {
   background-color: #404040;
-    margin-bottom: 15px!important;
+  margin-bottom: 15px!important;
   padding-top: 15px;
 }
 
@@ -1307,7 +1312,7 @@ Quick View Styles
   font-size: 14px;
 }
 
-.search_block_container div label 
+.search_block_container div label
 {
     color: #ffffff;
 }
@@ -1353,5 +1358,5 @@ Quick View Styles
 .room_type_old_price {
   text-decoration: line-through;
   color:#979797;
-  font-size:15px; 
+  font-size:15px;
 }

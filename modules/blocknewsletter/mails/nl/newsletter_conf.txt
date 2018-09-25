@@ -1,10 +1,10 @@
 
-[{shop_url}] 
+[{shop_url}]
 
-Hallo, 
+Hallo,
 
-BEDANKT VOOR UW INSCHRIJVING OP ONZE NIEUWSBRIEF 
+BEDANKT VOOR UW INSCHRIJVING OP ONZE NIEUWSBRIEF
 
 {shop_name} [{shop_url}] gebouwd met
-PrestaShop(tm) [http://www.prestashop.com/] 
+Webkul(tm) [https://webkul.com/]
 

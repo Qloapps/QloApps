@@ -1,5 +1,5 @@
 {**
-* 2010-2016 Webkul.
+* 2010-2018 Webkul.
 *
 * NOTICE OF LICENSE
 *
@@ -13,14 +13,14 @@
 * needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
 *
 *  @author    Webkul IN <support@webkul.com>
-*  @copyright 2010-2016 Webkul IN
+*  @copyright 2010-2018 Webkul IN
 *  @license   https://store.webkul.com/license.html
 *}
 
 <div class="col-md-12 text-center">
-	<h1>{l s='If you are not redirected within 10 seconds...' mod='mppaypaladaptive'}</h1>
+	<h1>{l s='If you are not redirected within 10 seconds...' mod='wkpaypaladaptive'}</h1>
 	<a class="btn btn-primary" id="paypalredirect" href="{$payPalURL|escape:'html':'UTF-8'}">
-		<span>{l s='Click here' mod='mppaypaladaptive'}</span>
+		<span>{l s='Click here' mod='wkpaypaladaptive'}</span>
 	</a>
 </div>
 <script type="text/javascript">

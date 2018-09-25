@@ -5751,7 +5751,7 @@ textarea {
   resize: none; }
 
 #header {
-  z-index: 5003; 
+  z-index: 5003;
   background-repeat: no-repeat;
   background-position: center center; /* webkul */
   background-size: cover; /* webkul */ }
@@ -8877,4 +8877,8 @@ hr.theme-text-underline {
 }
 .badge-warning {
     background-color: #fbbb22;
+}
+
+.default-cursor {
+  cursor: default!important;
 }

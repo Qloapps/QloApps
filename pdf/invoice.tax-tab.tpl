@@ -32,7 +32,10 @@
 	<table id="tax-tab" width="100%">
 		<thead>
 			<tr>
-				<th class="header small">{l s='Tax Detail' pdf='true'}</th>
+				{* <th class="header small">{l s='Tax Detail' pdf='true'}</th> *}
+				{if isset($showTaxName) && $showTaxName}
+					<th class="header small">{l s='Tax Name' pdf='true'}</th>
+				{/if}
 				<th class="header small">{l s='Tax Rate' pdf='true'}</th>
 				{if $display_tax_bases_in_breakdowns}
 					<th class="header small">{l s='Base price' pdf='true'}</th>
@@ -52,7 +55,7 @@
 				{/if}
 				{assign var=has_line value=true}
 				<tr>
-					<td class="white">
+					{* <td class="white">
 						{if !$label_printed}
 							{if $label == 'product_tax'}
 								{l s='Products' pdf='true'}
@@ -65,8 +68,16 @@
 							{/if}
 							{assign var=label_printed value=true}
 						{/if}
-					</td>
-
+					</td> *}
+					{if isset($showTaxName) && $showTaxName}
+						<td class="center white">
+							{if isset($line.name) && $line.name}
+								{$line.name}
+							{else}
+								{l s='tax' pdf='true'}
+							{/if}
+						</td>
+					{/if}
 					<td class="center white">
 						{$line.rate} %
 					</td>

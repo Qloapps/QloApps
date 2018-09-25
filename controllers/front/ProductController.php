@@ -87,7 +87,7 @@ class ProductControllerCore extends FrontController
     {
         parent::init();
 
-        //by webkul for product page searching 
+        //by webkul for product page searching
         if (Tools::isSubmit('product_page_search_submit')) {
             $hotel_cat_id = Tools::getValue('hotel_cat_id');
             $check_in = Tools::getValue('check_in_time');
@@ -168,7 +168,7 @@ class ProductControllerCore extends FrontController
 
         // if (isset($delete_room_from_current_cart) && $delete_room_from_current_cart)
         // {
-        // 	//code for 
+        // 	//code for
         // }
 
 
@@ -439,8 +439,7 @@ class ProductControllerCore extends FrontController
             $useTax = HotelBookingDetail::useTax();
             if (isset($hotel_id) && $hotel_id) {
                 $obj_hotel_branch = new HotelBranchInformation();
-                $hotel_info_by_id = $obj_hotel_branch->hotelBranchInfoById($hotel_id);
-
+                $hotel_info_by_id = $obj_hotel_branch->hotelBranchesInfo(false, 2, 1, $hotel_id);
                 $hotel_policies = $hotel_info_by_id['policies'];
                 $hotel_name = $hotel_info_by_id['hotel_name'];
 
@@ -496,21 +495,29 @@ class ProductControllerCore extends FrontController
                         $total_available_rooms = $total_available_rooms - $num_cart_rooms;
                     }
                 }
-
-                $location_enable = Configuration::get('WK_HOTEL_LOCATION_ENABLE');
-
+                $locationEnabled = Configuration::get('WK_HOTEL_LOCATION_ENABLE');
                 $hotel_branch_obj = new HotelBranchInformation($hotel_id);
-                if ($location_enable) {
+                if ($locationEnabled) {
+                    $hotel_info = $hotel_branch_obj->hotelBranchesInfo(0, 1);
+                    $totalActiveHotels = count($hotel_info);
                     $hotel_info = $hotel_branch_obj->hotelBranchInfoByCategoryId($hotel_branch_obj->id_category);
                 } else {
-                    $hotel_info = $hotel_branch_obj->getActiveHotelBranchesInfo();
+                    $hotel_info = $hotel_branch_obj->hotelBranchesInfo(0, 1);
+                    $totalActiveHotels = count($hotel_info);
+                }
+                foreach ($hotel_info as &$hotel) {
+                    $maxOrderDate = HotelOrderRestrictDate::getMaxOrderDate($hotel['id']);
+                    $hotel['max_order_date'] = date('Y-m-d', strtotime($maxOrderDate));
                 }
 
                 $search_data['date_from'] = date('d-m-Y', strtotime($date_from));
                 $search_data['date_to'] = date('d-m-Y', strtotime($date_to));
-                $search_data['htl_dtl'] = $hotel_branch_obj->hotelBranchInfoById($hotel_id);
-
-                $warning_num = Configuration::get('WK_ROOM_LEFT_WARNING_NUMBER');
+                $search_data['htl_dtl'] = $hotel_branch_obj->hotelBranchesInfo(0, 1, 1, $hotel_id);
+                $search_data['location'] = $search_data['htl_dtl']['city'];
+                if (isset($search_data['htl_dtl']['state_name'])) {
+                    $search_data['location'] .= ', '.$search_data['htl_dtl']['state_name'];
+                }
+                $search_data['location'] .= ', '.$search_data['htl_dtl']['country_name'];
 
                 /*Max date of ordering for order restrict*/
                 $max_order_date = HotelOrderRestrictDate::getMaxOrderDate($hotel_id);
@@ -518,39 +525,41 @@ class ProductControllerCore extends FrontController
                     $max_order_date = date('Y-m-d', strtotime($max_order_date));
                 }
                 /*End*/
-                #####################################################################
-                /*End*/
-                #####################################################################
 
                 if (Tools::getValue('error')) {
                     $this->context->smarty->assign('error', Tools::getValue('error'));
                 }
                 if (Module::isInstalled('productcomments')) {
-                    $this->context->smarty->assign(array(
-                        'num_reviews' => ProductComment::getCommentNumber($this->product->id),
-                        'ratting' => ProductComment::getAverageGrade($this->product->id)['grade'],
+                    $this->context->smarty->assign(
+                        array(
+                            'num_reviews' => ProductComment::getCommentNumber($this->product->id),
+                            'ratting' => ProductComment::getAverageGrade($this->product->id)['grade'],
                         )
                     );
-                }   
-                $this->context->smarty->assign(array(
-                    'max_order_date' => $max_order_date,
-                    'warning_num' => $warning_num,
-                    'ratting_img_path' => _MODULE_DIR_.'hotelreservationsystem/views/img/Slices/icons-sprite.png',
-                    'total_available_rooms' => $total_available_rooms,
-                    'all_hotels_info' => $hotel_info,
-                    'location_enable' => $location_enable,
-                    'total_price' => $total_price,
-                    'product_controller_url' => $this->context->link->getPageLink('product'),
-                    'num_days' => $num_days,
-                    'date_from' => $date_from,
-                    'date_to' => $date_to,
-                    'hotel_location' => $hotel_location,
-                    'hotel_name' => $hotel_name,
-                    'hotel_policies' => $hotel_policies,
-                    'hotel_features' => $htl_features,
-                    'ftr_img_src' => _PS_IMG_.'rf/',
-                    'search_data' => $search_data,
-                ));
+                }
+                $this->context->smarty->assign(
+                    array(
+                        'totalActiveHotels' => $totalActiveHotels,
+                        'max_order_date' => $max_order_date,
+                        'warning_num' => Configuration::get('WK_ROOM_LEFT_WARNING_NUMBER'),
+                        'ratting_img_path' => _MODULE_DIR_.'hotelreservationsystem/views/img/Slices/icons-sprite.png',
+                        'total_available_rooms' => $total_available_rooms,
+                        'all_hotels_info' => $hotel_info,
+                        'show_only_active_htl' => Configuration::get('WK_HOTEL_NAME_ENABLE'),
+                        'location_enable' => $locationEnabled,
+                        'total_price' => $total_price,
+                        'product_controller_url' => $this->context->link->getPageLink('product'),
+                        'num_days' => $num_days,
+                        'date_from' => $date_from,
+                        'date_to' => $date_to,
+                        'hotel_location' => $hotel_location,
+                        'hotel_name' => $hotel_name,
+                        'hotel_policies' => $hotel_policies,
+                        'hotel_features' => $htl_features,
+                        'ftr_img_src' => _PS_IMG_.'rf/',
+                        'search_data' => $search_data,
+                    )
+                );
                 // product price after imposing feature prices...
                 if ($useTax) {
                     $priceProduct = Product::getPriceStatic($this->product->id, true);
@@ -563,46 +572,49 @@ class ProductControllerCore extends FrontController
                 $feature_price_diff = (float)($productPriceWithoutReduction - $feature_price);
                 $this->context->smarty->assign('feature_price', $feature_price);
                 $this->context->smarty->assign('feature_price_diff', $feature_price_diff);
-
                 //END
             }
 
             $this->context->smarty->assign('product_id_hotel', $hotel_id);
-            $this->context->smarty->assign(array(
-                'stock_management' => Configuration::get('PS_STOCK_MANAGEMENT'),
-                'customizationFields' => $customization_fields,
-                'id_customization' => empty($customization_datas) ? null : $customization_datas[0]['id_customization'],
-                'accessories' => $accessories,
-                'return_link' => $return_link,
-                'product' => $this->product,
-                'product_manufacturer' => new Manufacturer((int) $this->product->id_manufacturer, $this->context->language->id),
-                'token' => Tools::getToken(false),
-
-                'features' => $this->product->getFrontFeatures($this->context->language->id),
-                'attachments' => (($this->product->cache_has_attachments) ? $this->product->getAttachments($this->context->language->id) : array()),
-                'allow_oosp' => $this->product->isAvailableWhenOutOfStock((int) $this->product->out_of_stock),
-                'last_qties' => (int) Configuration::get('PS_LAST_QTIES'),
-                'HOOK_EXTRA_LEFT' => Hook::exec('displayLeftColumnProduct'),
-                'HOOK_EXTRA_RIGHT' => Hook::exec('displayRightColumnProduct'),
-                'HOOK_PRODUCT_OOS' => Hook::exec('actionProductOutOfStock', array('product' => $this->product)),
-                'HOOK_PRODUCT_ACTIONS' => Hook::exec('displayProductButtons', array('product' => $this->product)),
-                'HOOK_PRODUCT_TAB' => Hook::exec('displayProductTab', array('product' => $this->product)),
-                'HOOK_PRODUCT_TAB_CONTENT' => Hook::exec('displayProductTabContent', array('product' => $this->product)),
-                'HOOK_PRODUCT_CONTENT' => Hook::exec('displayProductContent', array('product' => $this->product)),
-                'display_qties' => (int) Configuration::get('PS_DISPLAY_QTIES'),
-                'display_ht' => !Tax::excludeTaxeOption(),
-                'jqZoomEnabled' => Configuration::get('PS_DISPLAY_JQZOOM'),
-                'ENT_NOQUOTES' => ENT_NOQUOTES,
-                'outOfStockAllowed' => (int) Configuration::get('PS_ORDER_OUT_OF_STOCK'),
-                'errors' => $this->errors,
-                'body_classes' => array(
-                    $this->php_self.'-'.$this->product->id,
-                    $this->php_self.'-'.$this->product->link_rewrite,
-                    'category-'.(isset($this->category) ? $this->category->id : ''),
-                    'category-'.(isset($this->category) ? $this->category->getFieldByLang('link_rewrite') : ''),
-                ),
-                'display_discount_price' => Configuration::get('PS_DISPLAY_DISCOUNT_PRICE'),
-            ));
+            $this->context->smarty->assign(
+                array(
+                    'stock_management' => Configuration::get('PS_STOCK_MANAGEMENT'),
+                    'customizationFields' => $customization_fields,
+                    'id_customization' => empty($customization_datas) ? null : $customization_datas[0]['id_customization'],
+                    'accessories' => $accessories,
+                    'return_link' => $return_link,
+                    'product' => $this->product,
+                    'product_manufacturer' => new Manufacturer((int) $this->product->id_manufacturer, $this->context->language->id),
+                    'token' => Tools::getToken(false),
+                    'features' => $this->product->getFrontFeatures($this->context->language->id),
+                    'attachments' => (($this->product->cache_has_attachments) ? $this->product->getAttachments($this->context->language->id) : array()),
+                    'allow_oosp' => $this->product->isAvailableWhenOutOfStock((int) $this->product->out_of_stock),
+                    'last_qties' => (int) Configuration::get('PS_LAST_QTIES'),
+                    'HOOK_EXTRA_LEFT' => Hook::exec('displayLeftColumnProduct'),
+                    'HOOK_EXTRA_RIGHT' => Hook::exec('displayRightColumnProduct'),
+                    'HOOK_PRODUCT_OOS' => Hook::exec('actionProductOutOfStock', array('product' => $this->product)),
+                    'HOOK_PRODUCT_ACTIONS' => Hook::exec('displayProductButtons', array('product' => $this->product)),
+                    'HOOK_PRODUCT_TAB' => Hook::exec('displayProductTab', array('product' => $this->product)),
+                    'HOOK_PRODUCT_TAB_CONTENT' => Hook::exec(
+                        'displayProductTabContent',
+                        array('product' => $this->product)
+                    ),
+                    'HOOK_PRODUCT_CONTENT' => Hook::exec('displayProductContent', array('product' => $this->product)),
+                    'display_qties' => (int) Configuration::get('PS_DISPLAY_QTIES'),
+                    'display_ht' => !Tax::excludeTaxeOption(),
+                    'jqZoomEnabled' => Configuration::get('PS_DISPLAY_JQZOOM'),
+                    'ENT_NOQUOTES' => ENT_NOQUOTES,
+                    'outOfStockAllowed' => (int) Configuration::get('PS_ORDER_OUT_OF_STOCK'),
+                    'errors' => $this->errors,
+                    'body_classes' => array(
+                        $this->php_self.'-'.$this->product->id,
+                        $this->php_self.'-'.$this->product->link_rewrite,
+                        'category-'.(isset($this->category) ? $this->category->id : ''),
+                        'category-'.(isset($this->category) ? $this->category->getFieldByLang('link_rewrite') : ''),
+                    ),
+                    'display_discount_price' => Configuration::get('PS_DISPLAY_DISCOUNT_PRICE'),
+                )
+            );
         }
         $this->setTemplate(_PS_THEME_DIR_.'product.tpl');
     }

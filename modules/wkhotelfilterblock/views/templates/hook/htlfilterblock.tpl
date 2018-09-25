@@ -1,3 +1,22 @@
+{*
+* 2010-2018 Webkul.
+*
+* NOTICE OF LICENSE
+*
+* All right is reserved,
+* Please go through this link for complete license : https://store.webkul.com/license.html
+*
+* DISCLAIMER
+*
+* Do not edit or add to this file if you wish to upgrade this module to newer
+* versions in the future. If you wish to customize this module for your
+* needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
+*
+*  @author    Webkul IN <support@webkul.com>
+*  @copyright 2010-2018 Webkul IN
+*  @license   https://store.webkul.com/license.html
+*}
+
 <div id="filter_results" class="row block">
 	<div class="col-sm-12">
 		{if $product_comment_installed && isset($config) && $config['SHOW_RATTING_FILTER']}
@@ -45,7 +64,7 @@
 				</div>
 			</div>
 		{/if}
-		
+
 		{if isset($config) && $config['SHOW_AMENITIES_FILTER']}
 			<div class="row margin-lr-0 layered_filter_cont">
 				<div class="col-sm-12 layered_filter_heading">
@@ -94,7 +113,7 @@
 	{addJsDef num_days = $num_days}
 	{addJsDef date_from = $date_from}
 	{addJsDef date_to = $date_to}
-	
+
 	{addJsDef cat_link = $cat_link}
 	{addJsDef min_price = $min_price}
 	{addJsDef max_price = $max_price}
