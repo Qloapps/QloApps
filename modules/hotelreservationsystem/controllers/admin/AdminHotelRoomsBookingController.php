@@ -552,7 +552,6 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
         while ($start_date <= $last_day_this_month) {
             $cal_date_from = $start_date;
             $cal_date_to = date('Y-m-d', strtotime('+1 day', strtotime($cal_date_from)));
-
             $booking_calendar_data[$cal_date_from] = $obj_booking_dtl->getBookingData(
                 $cal_date_from,
                 $cal_date_to,
