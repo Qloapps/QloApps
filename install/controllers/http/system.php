@@ -87,11 +87,17 @@ class InstallControllerHttpSystem extends InstallControllerHttp
                     'title' => $this->l('Required PHP parameters'),
                     'success' => 1,
                     'checks' => array(
-                        'phpversion' => $this->l('PHP 5.1.2 or later is not enabled'),
+                        'phpversion' => $this->l('Minimum PHP 5.4.0 or later is required'),
                         'upload' => $this->l('Cannot upload files'),
                         'system' => $this->l('Cannot create new files and folders'),
                         'gd' => $this->l('GD library is not installed'),
-                        'mysql_support' => $this->l('MySQL support is not activated')
+                        'mysql_support' => $this->l('MySQL support is not activated'),
+                        'curl' => $this->l('Curl extension is not loaded'),
+                        'soap' => $this->l('SOAP extension is not loaded'),
+                        'simplexml' => $this->l('SimpleXml extension is not loaded'),
+                        'upload_max_filesize' => $this->l('In the PHP configuration set memory_limit to minimum 128M'),
+                        'max_execution_time' => $this->l('In the PHP configuration set max_execution_time to minimum 500'),
+                        'memory_limit' => $this->l('In the PHP configuration set upload_max_filesize to minimum 16M'),
                     )
                 ),
                 array(

@@ -76,7 +76,7 @@ abstract class InstallControllerConsole
             }
             exit;
         }
-        
+
         $errors = Datas::getInstance()->getAndCheckArgs($argv);
         if (Datas::getInstance()->show_license) {
             echo strip_tags(file_get_contents(_PS_INSTALL_PATH_.'theme/views/license_content.phtml'));
@@ -114,7 +114,7 @@ abstract class InstallControllerConsole
     {
         $this->step = $step;
         $this->datas = Datas::getInstance();
-        
+
         // Set current language
         $this->language = InstallLanguages::getInstance();
         if (!$this->datas->language) {

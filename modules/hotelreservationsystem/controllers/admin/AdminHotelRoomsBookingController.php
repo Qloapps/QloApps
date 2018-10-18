@@ -189,7 +189,7 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
 
                 while ($start_date <= $last_day_this_month) {
                     $cal_date_from = $start_date;
-                    $cal_date_to = date('Y-m-d', strtotime($cal_date_from)+ 86400);
+                    $cal_date_to = date('Y-m-d', strtotime('+1 day', strtotime($cal_date_from)));
                     $booking_calendar_data[$cal_date_from] = $obj_booking_dtl->getBookingData(
                         $cal_date_from,
                         $cal_date_to,
@@ -207,7 +207,7 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
                         $id_guest,
                         1
                     );
-                    $start_date = date('Y-m-d', strtotime($start_date)+ 86400);
+                    $start_date = date('Y-m-d', strtotime('+1 day', strtotime($start_date)));
                 }
 
                 if (isset($booking_data)) {
@@ -254,7 +254,7 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
 
                 while ($start_date <= $last_day_this_month) {
                     $cal_date_from = $start_date;
-                    $cal_date_to = date('Y-m-d', strtotime($cal_date_from)+ 86400);
+                    $cal_date_to = date('Y-m-d', strtotime('+1 day', strtotime($cal_date_from)));
 
                     $booking_calendar_data[$cal_date_from] = $obj_booking_dtl->getBookingData(
                         $cal_date_from,
@@ -273,7 +273,7 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
                         $id_guest,
                         1
                     );
-                    $start_date = date('Y-m-d', strtotime($start_date)+ 86400);
+                    $start_date = date('Y-m-d', strtotime('+1 day', strtotime($start_date)));
                 }
                 if (isset($booking_data)) {
                     if ($num_rooms <= $booking_data['stats']['num_avail']) {
@@ -551,8 +551,7 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
 
         while ($start_date <= $last_day_this_month) {
             $cal_date_from = $start_date;
-            $cal_date_to = date('Y-m-d', strtotime($cal_date_from)+ 86400);
-
+            $cal_date_to = date('Y-m-d', strtotime('+1 day', strtotime($cal_date_from)));
             $booking_calendar_data[$cal_date_from] = $obj_booking_dtl->getBookingData(
                 $cal_date_from,
                 $cal_date_to,
@@ -562,7 +561,7 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
                 $children,
                 $num_rooms
             );
-            $start_date = date('Y-m-d', strtotime($start_date)+ 86400);
+            $start_date = date('Y-m-d', strtotime('+1 day', strtotime($start_date)));
         }
         if ($booking_calendar_data) {
             die(Tools::jsonEncode($booking_calendar_data));

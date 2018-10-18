@@ -202,7 +202,7 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
         $incr = 0;
         for ($date = strtotime($date_from); $date <= strtotime($date_to); $date = ($date + $totalDaySeconds)) {
             $currentDate = date('Y-m-d', $date);
-            $nextDayDate = date('Y-m-d', strtotime($currentDate) + 86400);
+            $nextDayDate = date('Y-m-d', strtotime('+1 day', strtotime($currentDate)));
             if ($id_product) {
                 $roomTypeAvailabilityInfo = $objBookingDetail->DataForFrontSearch(
                     $currentDate,
@@ -282,7 +282,7 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
             if (isset($featurePricePlans['data']) && $featurePricePlans['data']) {
                 foreach ($featurePricePlans['data'] as $roomTypeRatesData) {
                     $dateFrom = date('Y-m-d', strtotime($roomTypeRatesData['dateFrom']));
-                    $dateTo = date('Y-m-d', strtotime($roomTypeRatesData['dateTo']) + 86400);
+                    $dateTo = date('Y-m-d', strtotime('+1 day', strtotime($roomTypeRatesData['dateTo'])));
                     if ($roomTypeRatesData['roomType']) {
                         foreach ($roomTypeRatesData['roomType'] as $key => $roomTypeRates) {
                             $id_product = $key;
@@ -309,7 +309,7 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
                                     $params['priceImpactType'] = 2;
                                     $params['impactValue'] = $impactValue;
                                     $params['enableFeaturePrice'] = 1;
-                                    $nextDate = date('Y-m-d', strtotime($dateFrom) + 86400);
+                                    $nextDate = date('Y-m-d', strtotime('+1 day', strtotime($dateFrom)));
                                     if ($nextDate == $dateTo) {
                                         $params['dateSelectionType'] = 2;
                                         $featurePriceExists = $this->checkRoomTypeFeaturePriceExistance(
@@ -349,7 +349,7 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
                                             } else {
                                                 for ($date = strtotime($dateFrom); $date <= strtotime($dateTo)-$totalDaySeconds; $date = ($date + $totalDaySeconds)) {
                                                     $currentDate = date('Y-m-d', $date);
-                                                    $nextDayDate = date('Y-m-d', strtotime($currentDate) + 86400);
+                                                    $nextDayDate = date('Y-m-d', strtotime('+1 day', strtotime($currentDate)));
                                                     $params['dateFrom'] = $currentDate;
                                                     $params['dateTo'] = $nextDayDate;
                                                     $params['dateSelectionType'] = 2;

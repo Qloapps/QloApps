@@ -184,14 +184,10 @@ class WkPayPalAdaptive extends PaymentModule
                 }
             }
         }
-        /* General Configuration options */
-        Configuration::updateValue('WK_PAYPAL_SANDBOX', 1);
-        if (Configuration::get('WK_PAYPAL_SANDBOX') != 1) {
-            Configuration::updateValue('WK_PAYPAL_SANDBOX', 1);
-        }
 
         if (!parent::install()
             || !$this->registerModuleHooks()
+            || !Configuration::updateValue('WK_PAYPAL_SANDBOX', 1)
         ) {
             return false;
         }

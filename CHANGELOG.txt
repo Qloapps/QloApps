@@ -1,4 +1,19 @@
 ####################################
+# V1.3.0
+####################################
+
+## Added Features:
+
+[+] CO : Qloapps is compatible with php 7.x.x .
+
+
+## Improved/changed features:
+
+[+] CO : "create demo data or not" option improved for Qloapps demo data .
+[+] CO : System compatibility check for Qloapps installation improved .
+
+
+####################################
 # V1.2.0
 ####################################
 

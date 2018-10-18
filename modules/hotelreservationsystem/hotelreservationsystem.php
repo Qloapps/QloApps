@@ -29,7 +29,7 @@ class hotelreservationsystem extends Module
     public function __construct()
     {
         $this->name = 'hotelreservationsystem';
-        $this->version = '1.2.0';
+        $this->version = '1.2.1';
         $this->author = 'Webkul';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -418,22 +418,32 @@ class hotelreservationsystem extends Module
                 }
             }
         }
-        $htl_helper = new HotelHelper();
+
+        // if module should be populated while installation
+        $objHtlHelper = new HotelHelper();
+        if (isset($this->populateData) && $this->populateData) {
+            if (!$objHtlHelper->deletePrestashopDefaultCategories()
+                || !$objHtlHelper->deletePrestashopDefaultFeatures()
+                || !$objHtlHelper->createHotelRoomDefaultFeatures()
+                || !$objHtlHelper->insertHotelCommonFeatures()
+                || !$objHtlHelper->createDummyDataForProject()
+            ) {
+                return false;
+            }
+        }
+
         if (!parent::install()
             || !$this->callInstallTab()
-            || !$htl_helper->insertDefaultHotelEntries()
-            || !$htl_helper->deletePrestashopDefaultCategories()
-            || !$htl_helper->deletePrestashopDefaultFeatures()
-            || !$htl_helper->createHotelRoomDefaultFeatures()
-            || !$htl_helper->insertHotelCommonFeatures()
-            || !$htl_helper->insertHotelRoomsStatus()
-            || !$htl_helper->insertHotelOrderStatus()
-            || !$htl_helper->insertHotelRoomAllotmentType()
-            || !$htl_helper->createDummyDataForProject()
             || !$this->registerModuleHooks()
+            || !$objHtlHelper->insertDefaultHotelEntries()
+            || !$objHtlHelper->insertHotelRoomsStatus()
+            || !$objHtlHelper->insertHotelOrderStatus()
+            || !$objHtlHelper->insertHotelRoomAllotmentType()
         ) {
             return false;
         }
+
+
         return true;
     }
 

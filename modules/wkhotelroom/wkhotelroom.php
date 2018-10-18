@@ -31,7 +31,7 @@ class WkHotelRoom extends Module
     {
         $this->name = 'wkhotelroom';
         $this->tab = 'front_office_features';
-        $this->version = '1.1.0';
+        $this->version = '1.1.1';
         $this->author = 'webkul';
         $this->bootstrap = true;
         parent::__construct();
@@ -43,14 +43,12 @@ class WkHotelRoom extends Module
 
     public function hookDisplayHome()
     {
-        $idLang = $this->context->language->id;
-        $useTax = HotelBookingDetail::useTax();
         $objRoomBlock = new WkHotelRoomDisplay();
-        $hotelRoomDisplay = $objRoomBlock->getHotelRoomDisplayData();
-
-        $dateFrom = date('Y-m-d');
-        $dateTo = date('Y-m-d', strtotime($dateFrom) + 86400);
-        if ($hotelRoomDisplay) {
+        if ($hotelRoomDisplay = $objRoomBlock->getHotelRoomDisplayData()) {
+            $idLang = $this->context->language->id;
+            $dateFrom = date('Y-m-d');
+            $dateTo = date('Y-m-d', strtotime($dateFrom) + 86400);
+            $useTax = HotelBookingDetail::useTax();
             foreach ($hotelRoomDisplay as &$htlRoom) {
                 $idProduct = $htlRoom['id_product'];
                 $product = new Product($idProduct, false, $idLang);
@@ -205,13 +203,21 @@ class WkHotelRoom extends Module
                 }
             }
         }
+
+        // if module should be populated while installation
+        if (isset($this->populateData) && $this->populateData) {
+            if (!WkHotelRoomDisplay::insertModuleDemoData()) {
+                return false;
+            }
+        }
+
         if (!parent::install()
             || !$this->registerModuleHooks()
             || !$this->callInstallTab()
-            || !WkHotelRoomDisplay::insertModuleDemoData()
         ) {
             return false;
         }
+
         return true;
     }
 

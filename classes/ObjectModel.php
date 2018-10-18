@@ -60,8 +60,8 @@ abstract class ObjectModelCore implements Core_Foundation_Database_EntityInterfa
     /** @var int Shop ID */
     protected $id_shop = null;
 
-    /** @var array|null List of shop IDs */
-    public $id_shop_list = null;
+    /** @var array List of shop IDs */
+    public $id_shop_list = array();
 
     /** @var bool */
     protected $get_shop_from_context = true;
@@ -751,7 +751,7 @@ abstract class ObjectModelCore implements Core_Foundation_Database_EntityInterfa
         // Remove association to multishop table
         if (Shop::isTableAssociated($this->def['table'])) {
             $id_shop_list = Shop::getContextListShopID();
-            if (count($this->id_shop_list)) {
+            if (count($this->id_shop_list) > 0) {
                 $id_shop_list = $this->id_shop_list;
             }
 
@@ -1146,9 +1146,18 @@ abstract class ObjectModelCore implements Core_Foundation_Database_EntityInterfa
             // Checking for fields validity
             // Hack for postcode required for country which does not have postcodes
             if (!empty($value) || $value === '0' || ($field == 'postcode' && $value == '0')) {
-                if (isset($data['validate']) && !Validate::$data['validate']($value) && (!empty($value) || $data['required'])) {
-                    $errors[$field] = '<b>'.self::displayFieldName($field, get_class($this), $htmlentities).'</b> '.Tools::displayError('is invalid.');
-                } else {
+
+                $validation_error = false;
+                if (isset($data['validate'])) {
+                    $data_validate = $data['validate'];
+                    if (!Validate::$data_validate($value) && (!empty($value) || $data['required'])) {
+                        $errors[$field] = '<b>'.self::displayFieldName($field, get_class($this), $htmlentities).
+                            '</b> '.Tools::displayError('is invalid.');
+                        $validation_error = true;
+                    }
+                }
+
+                if (!$validation_error) {
                     if (isset($data['copy_post']) && !$data['copy_post']) {
                         continue;
                     }

@@ -223,7 +223,18 @@ class InstallControllerHttpProcess extends InstallControllerHttp
     {
         $this->initializeContext();
 
-        $result = $this->model_install->installModules(Tools::getValue('module'));
+        // code to populate database of modules
+        if ($this->session->install_type == 'full') {
+            $populateData = 1;
+        } else {
+            $populateData = 0;
+        }
+        // extra parameter sent to populate module data or not
+        $result = $this->model_install->installModules(
+            Tools::getValue('module'),
+            $populateData
+        );
+
         if (!$result || $this->model_install->getErrors()) {
             $this->ajaxJsonAnswer(false, $this->model_install->getErrors());
         }

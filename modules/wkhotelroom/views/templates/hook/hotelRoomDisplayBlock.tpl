@@ -17,58 +17,62 @@
 *  @license   https://store.webkul.com/license.html
 *}
 
-<div id="hotelRoomsBlock" class="row home_block_container">
-    <div class="col-xs-12 col-sm-12">
-        <div class="row home_block_desc_wrapper">
-            <div class="col-md-offset-1 col-md-10 col-lg-offset-2 col-lg-8">
-                <p class="home_block_heading">{$HOTEL_ROOM_DISPLAY_HEADING|escape:'htmlall':'UTF-8'}</p>
-                <p class="home_block_description">{$HOTEL_ROOM_DISPLAY_DESCRIPTION|escape:'htmlall':'UTF-8'}</p>
-                <hr class="home_block_desc_line"/>
-            </div>
-        </div>
-        {if $hotelRoomDisplay}
-            <div class="row home_block_content">
-                <div class="col-sm-12 col-xs-12">
-                    {assign var='htlRoomBlockIteration' value=0}
-                    {foreach from=$hotelRoomDisplay item=roomDisplay name=htlRoom}
-                        {if $smarty.foreach.htlRoom.iteration%2}
-                            <div class="row">
-                        {/if}
-                                <div class="col-sm-12 col-md-6 margin-btm-30">
-                                    <img src="{$roomDisplay.image|escape:'htmlall':'UTF-8'}" alt="{$roomDisplay.name|escape:'htmlall':'UTF-8'}" class="img-responsive width-100">
-                                    <div class="hotelRoomDescContainer">
-                                        <div class="row margin-lr-0">
-                                            <p class="htlRoomTypeNameText pull-left">{$roomDisplay.name|escape:'htmlall':'UTF-8'}</p>
+{if ($HOTEL_ROOM_DISPLAY_HEADING && $HOTEL_ROOM_DISPLAY_DESCRIPTION) || $hotelRoomDisplay}
+    <div id="hotelRoomsBlock" class="row home_block_container">
+        <div class="col-xs-12 col-sm-12">
+            {if $HOTEL_ROOM_DISPLAY_HEADING && $HOTEL_ROOM_DISPLAY_DESCRIPTION}
+                <div class="row home_block_desc_wrapper">
+                    <div class="col-md-offset-1 col-md-10 col-lg-offset-2 col-lg-8">
+                        <p class="home_block_heading">{$HOTEL_ROOM_DISPLAY_HEADING|escape:'htmlall':'UTF-8'}</p>
+                        <p class="home_block_description">{$HOTEL_ROOM_DISPLAY_DESCRIPTION|escape:'htmlall':'UTF-8'}</p>
+                        <hr class="home_block_desc_line"/>
+                    </div>
+                </div>
+            {/if}
+            {if $hotelRoomDisplay}
+                <div class="row home_block_content">
+                    <div class="col-sm-12 col-xs-12">
+                        {assign var='htlRoomBlockIteration' value=0}
+                        {foreach from=$hotelRoomDisplay item=roomDisplay name=htlRoom}
+                            {if $smarty.foreach.htlRoom.iteration%2}
+                                <div class="row">
+                            {/if}
+                                    <div class="col-sm-12 col-md-6 margin-btm-30">
+                                        <img src="{$roomDisplay.image|escape:'htmlall':'UTF-8'}" alt="{$roomDisplay.name|escape:'htmlall':'UTF-8'}" class="img-responsive width-100">
+                                        <div class="hotelRoomDescContainer">
+                                            <div class="row margin-lr-0">
+                                                <p class="htlRoomTypeNameText pull-left">{$roomDisplay.name|escape:'htmlall':'UTF-8'}</p>
 
-                                            <p class="htlRoomTypePriceText pull-right">
-                                                {if $roomDisplay.feature_price_diff >= 0}
-                                                    <span class="wk_roomType_price {if $roomDisplay.feature_price_diff>0}room_type_old_price{/if}">{convertPrice price = $roomDisplay.price_without_reduction}</span>
-                                                {/if}
-                                                {if $roomDisplay.feature_price_diff}
-                                                    <span class="wk_roomType_price">{convertPrice price = $roomDisplay.feature_price}</span>
-                                                {/if}
-                                                /&nbsp;{l s='Per Night' mod='wkhotelroom'}
-                                            </p>
-                                        </div>
-                                        <div class="row margin-lr-0 htlRoomTypeDescText">
-                                            {$roomDisplay.description|escape:'htmlall':'UTF-8'}
-                                        </div>
-                                        <div class="row margin-lr-0">
-                                            <a target="blank" class="btn btn-default button htlRoomTypeBookNow" href="{$link->getProductLink($roomDisplay.id_product)|escape:'html':'UTF-8'}"><span>{l s='book now' mod='wkhotelroom'}</span></a>
+                                                <p class="htlRoomTypePriceText pull-right">
+                                                    {if $roomDisplay.feature_price_diff >= 0}
+                                                        <span class="wk_roomType_price {if $roomDisplay.feature_price_diff>0}room_type_old_price{/if}">{convertPrice price = $roomDisplay.price_without_reduction}</span>
+                                                    {/if}
+                                                    {if $roomDisplay.feature_price_diff}
+                                                        <span class="wk_roomType_price">{convertPrice price = $roomDisplay.feature_price}</span>
+                                                    {/if}
+                                                    /&nbsp;{l s='Per Night' mod='wkhotelroom'}
+                                                </p>
+                                            </div>
+                                            <div class="row margin-lr-0 htlRoomTypeDescText">
+                                                {$roomDisplay.description|escape:'htmlall':'UTF-8'}
+                                            </div>
+                                            <div class="row margin-lr-0">
+                                                <a target="blank" class="btn btn-default button htlRoomTypeBookNow" href="{$link->getProductLink($roomDisplay.id_product)|escape:'html':'UTF-8'}"><span>{l s='book now' mod='wkhotelroom'}</span></a>
+                                            </div>
                                         </div>
                                     </div>
+                            {if !($smarty.foreach.htlRoom.iteration%2)}
                                 </div>
-                        {if !($smarty.foreach.htlRoom.iteration%2)}
+                            {/if}
+                            {assign var='htlRoomBlockIteration' value=$smarty.foreach.htlRoom.iteration}
+                        {/foreach}
+                        {if $htlRoomBlockIteration%2}
                             </div>
                         {/if}
-                        {assign var='htlRoomBlockIteration' value=$smarty.foreach.htlRoom.iteration}
-                    {/foreach}
-                    {if $htlRoomBlockIteration%2}
-                        </div>
-                    {/if}
+                    </div>
                 </div>
-            </div>
-        {/if}
+            {/if}
+        </div>
+        <hr class="home_block_seperator"/>
     </div>
-    <hr class="home_block_seperator"/>
-</div>
+{/if}

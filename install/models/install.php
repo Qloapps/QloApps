@@ -737,8 +737,9 @@ class InstallModelInstall extends InstallAbstractModel
     /**
      * PROCESS : installModules
      * Download module from addons and Install all modules in ~/modules/ directory.
+     * $populateData - extra parameter sent to populate module data or not
      */
-    public function installModules($module = null)
+    public function installModules($module = null, $populateData = 1)
     {
         if ($module && !is_array($module)) {
             $module = array($module);
@@ -755,6 +756,7 @@ class InstallModelInstall extends InstallAbstractModel
             }
 
             $module = Module::getInstanceByName($module_name);
+            $module->populateData = $populateData;
             if (!$module->install()) {
                 $errors[] = $this->language->l('Cannot install module "%s"', $module_name);
             }

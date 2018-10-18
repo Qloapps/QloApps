@@ -33,15 +33,15 @@
 require_once(dirname(__FILE__) . '/InsertProcessor.php');
 
 /**
- * 
+ *
  * This class processes the REPLACE statements.
- * 
+ *
  * @author arothe
- * 
+ *
  */
 class ReplaceProcessor extends InsertProcessor {
 
-    public function process($tokenList) {
+    public function process($tokenList, $token_category = 'INSERT') {
         return parent::process($tokenList, 'REPLACE');
     }
 
