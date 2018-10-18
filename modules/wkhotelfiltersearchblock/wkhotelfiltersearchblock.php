@@ -1,4 +1,22 @@
 <?php
+/**
+* 2010-2018 Webkul.
+*
+* NOTICE OF LICENSE
+*
+* All right is reserved,
+* Please go through this link for complete license : https://store.webkul.com/license.html
+*
+* DISCLAIMER
+*
+* Do not edit or add to this file if you wish to upgrade this module to newer
+* versions in the future. If you wish to customize this module for your
+* needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
+*
+*  @author    Webkul IN <support@webkul.com>
+*  @copyright 2010-2018 Webkul IN
+*  @license   https://store.webkul.com/license.html
+*/
 
 if (!defined('_PS_VERSION_')) {
     exit;
@@ -11,7 +29,7 @@ class wkhotelfiltersearchblock extends Module
         $this->name = 'wkhotelfiltersearchblock';
         $this->author = 'webkul';
         $this->tab = 'front_office_features';
-        $this->version = '1.0.0';
+        $this->version = '1.0.1';
         $this->context = Context::getContext();
 
         $this->bootstrap = true;
@@ -92,10 +110,7 @@ class wkhotelfiltersearchblock extends Module
                 $this->context->smarty->assign('error', Tools::getValue('error'));
             }
 
-            $location_enable = Configuration::get('WK_HOTEL_LOCATION_ENABLE');
-
             $hotel_branch_obj = new HotelBranchInformation();
-
             $htl_id_category = Tools::getValue('id_category');
             $id_hotel = HotelBranchInformation::getHotelIdByIdCategory($htl_id_category);
             $category = new Category((int) $htl_id_category);
@@ -112,22 +127,38 @@ class wkhotelfiltersearchblock extends Module
             $search_data['parent_data'] = $parent_dtl;
             $search_data['date_from'] = date('d-m-Y', strtotime($date_from));
             $search_data['date_to'] = date('d-m-Y', strtotime($date_to));
-            $search_data['htl_dtl'] = $hotel_branch_obj->hotelBranchInfoById($id_hotel);
+            $search_data['htl_dtl'] = $hotel_branch_obj->hotelBranchesInfo(0, 1, 1, $id_hotel);
+            $search_data['location'] = $search_data['htl_dtl']['city'];
+            if (isset($search_data['htl_dtl']['state_name'])) {
+                $search_data['location'] .= ', '.$search_data['htl_dtl']['state_name'];
+            }
+            $search_data['location'] .= ', '.$search_data['htl_dtl']['country_name'];
 
-            if ($location_enable) {
+            $locationEnabled = Configuration::get('WK_HOTEL_LOCATION_ENABLE');
+            if ($locationEnabled) {
+                $hotel_info = $hotel_branch_obj->hotelBranchesInfo(0, 1);
+                $totalActiveHotels = count($hotel_info);
                 $hotel_info = $hotel_branch_obj->hotelBranchInfoByCategoryId($htl_id_category);
             } else {
-                $hotel_info = $hotel_branch_obj->getActiveHotelBranchesInfo();
+                $hotel_info = $hotel_branch_obj->hotelBranchesInfo(0, 1);
+                $totalActiveHotels = count($hotel_info);
+            }
+            foreach ($hotel_info as &$hotel) {
+                $maxOrderDate = HotelOrderRestrictDate::getMaxOrderDate($hotel['id']);
+                $hotel['max_order_date'] = date('Y-m-d', strtotime($maxOrderDate));
             }
             $max_order_date = HotelOrderRestrictDate::getMaxOrderDate($id_hotel);
             $this->context->smarty->assign(
                 array(
+                    'totalActiveHotels' => $totalActiveHotels,
                     'booking_date_to' => $date_to,
                     'search_data' => $search_data,
                     'all_hotels_info' => $hotel_info,
-                    'location_enable' => $location_enable,
+                    'show_only_active_htl' => Configuration::get('WK_HOTEL_NAME_ENABLE'),
+                    'location_enable' => $locationEnabled,
                     'max_order_date' => date('Y-m-d', strtotime($max_order_date)),
-                    ));
+                )
+            );
             $this->context->controller->addJS(_PS_MODULE_DIR_.'hotelreservationsystem/views/js/roomSearchBlock.js');
             $this->context->controller->addCSS(_PS_MODULE_DIR_.$this->name.'/views/css/wkhotelfiltersearchblock.css');
             $this->context->controller->addCSS(_PS_MODULE_DIR_.'hotelreservationsystem/views/css/datepickerCustom.css');

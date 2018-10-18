@@ -1,4 +1,0 @@
-2014-04-22 18:58:34 +0200	// Changelog updated
-2014-04-10 17:48:25 +0200	//small fix
-2014-03-25 16:35:25 +0100	//new version of module gamification fixed bug #PSCSX-1368
-2014-03-21 10:55:00 +0100	Initial commit

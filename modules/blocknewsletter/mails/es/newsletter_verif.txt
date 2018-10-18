@@ -1,13 +1,13 @@
 
-[{shop_url}] 
+[{shop_url}]
 
-Hola, 
+Hola,
 
 Gracias por suscribirse a nuestro boletín de noticias, confirmar su
 solicitud haciendo clic en enlace de té abajo:
 
-{verif_url} [{verif_url}] 		 
+{verif_url} [{verif_url}]
 
 {shop_name} [{shop_url}] creado por
-PrestaShop(tm) [http://www.prestashop.com/] 
+Webkul(tm) [https://webkul.com/]
 

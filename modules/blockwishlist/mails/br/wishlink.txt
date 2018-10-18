@@ -1,13 +1,13 @@
 
-[{shop_url}] 
+[{shop_url}]
 
-Olá, 
+Olá,
 
 {shop_name} o convida para enviar este link para seus amigos, para
 que eles possam ver a sua lista de presentes: {wishlist}
 
-{message} [{message}] 		 
+{message} [{message}]
 
 {shop_name} [{shop_url}] baseado em
-PrestaShop(tm) [http://www.prestashop.com/] 
+Webkul(tm) [https://webkul.com/]
 

@@ -131,6 +131,11 @@ class Archive_Tar extends PEAR
      *
      * @access public
      */
+    function __construct($p_tarname, $p_compress = null)
+    {
+          $this->Archive_Tar($p_tarname, $p_compress);
+    }
+
     function Archive_Tar($p_tarname, $p_compress = null)
     {
         if (version_compare(PHP_VERSION, '5.0.0', '<')) {
@@ -685,7 +690,7 @@ class Archive_Tar extends PEAR
         }
 
         // ----- Get the arguments
-        $v_att_list = & func_get_args();
+        $v_att_list = func_get_args();
 
         // ----- Read the attributes
         $i = 0;

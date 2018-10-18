@@ -19,11 +19,11 @@ a.deleteHtlImage {
 
 /*----- Accordion -----*/
 .accordion, .accordion * {
-    -webkit-box-sizing:border-box; 
-    -moz-box-sizing:border-box; 
+    -webkit-box-sizing:border-box;
+    -moz-box-sizing:border-box;
     box-sizing:border-box;
 }
- 
+
 .accordion {
     overflow:hidden;
     box-shadow:0px 1px 3px rgba(0,0,0,0.25);
@@ -31,7 +31,7 @@ a.deleteHtlImage {
     border: 1px solid #CCCCCC;
     background:#f7f7f7;
 }
- 
+
 /*----- Section Titles -----*/
 .accordion-section-title {
     width:100%;
@@ -45,84 +45,53 @@ a.deleteHtlImage {
     font-family: Open Sans;
     font-size: 15px;
 }
- 
+
 .accordion-section-title.active, .accordion-section-title:hover {
     background:#f7f7f7;
     text-decoration:none;
 }
- 
+
 .accordion-section:last-child .accordion-section-title {
     border-bottom:none;
 }
- 
+
 /*----- Section Content -----*/
 .accordion-section-content {
     padding:15px;
     display:none;
 }
-
-.modal-header
-{
-	padding: 0 0 0 20px !important;
-}
-
-.add_chld_ftr_div
-{
-	background-color: #bbb;
-	border-radius: 3px;
-	line-height: 22px;
-	margin-bottom: 5px;
-}
-
-.edit_chld_ftr_div
-{
-	background-color: #bbb;
-	border-radius: 3px;
-	line-height: 22px;
-	margin-bottom: 5px;
-}
-
 .remove-chld-ftr
 {
 	color: #555;
 }
-
-.ed-remove-chld-ftr
-{
-	color: #555!important;
-}
-
-
 .feature_div
 {
 	border: 1px solid #CCCCCC;
-	margin-top: 30px;
+	margin-top: 10px;
 	border-radius: 5px;
 }
-
 .feature-border-div
 {
 	margin: 0px!important;
-	font-size: 16px; 
+	font-size: 16px;
 	font-weight: bold;
 }
-
 .feature-header-div
 {
 	border-bottom: 1px solid #CCCCCC;
 }
-
 .dlt-feature
 {
 	margin-right: 5px;
 	bottom: 7px;
 }
-
 .edit_feature
 {
 	bottom: 7px;
 }
-
+.child_feature_row {
+    margin-bottom: 5px;
+}
 .child-features-container
 {
 	padding-left: 20px;
@@ -214,7 +183,7 @@ a.deleteHtlImage {
     font-size: 18px;
     color: #FFFFFF;
     font-weight: 400;
-    font-family: inherit;   
+    font-family: inherit;
     margin-left: 7px !important;
 }
 
@@ -565,7 +534,7 @@ a.deleteHtlImage {
 
 .pac-container {
     font-family: Roboto;
-} 
+}
 
 
 /* ==== AdminHotelFeaturePricesSettingsController ==== */

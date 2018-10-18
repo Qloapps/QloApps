@@ -1,3 +1,14 @@
+------------------------------
+# V1.1.0 to V1.1.1
+------------------------------
+
+## Improved/Changed Features:
+
+* [CO] : Compatible with php 7.x.x
+
+
+_____________________________________________________________________________
+
 2014-04-22 18:56:46 +0200	// Changelog updated
 2014-04-17 11:59:23 +0200	// version compliancy
 2014-03-24 15:16:08 +0100	/ MO bankwire : ps_versions_compliancy added

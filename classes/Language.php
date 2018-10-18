@@ -996,7 +996,7 @@ class LanguageCore extends ObjectModel
                     }
                     copy($directory.$file, $mail_to_path.$file);
                 }
-                closedir($d_open);  
+                closedir($d_open);
             }
         }
     }

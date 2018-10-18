@@ -1,13 +1,13 @@
 
-[{shop_url}] 
+[{shop_url}]
 
-Hola, 
+Hola,
 
 {shop_name} le invita a enviar el siguiente enlace a sus amigos, para
 que puedan ver su lista de deseos: {wishlist}
 
-{message} [{message}] 		 
+{message} [{message}]
 
 {shop_name} [{shop_url}] creado por
-PrestaShop(tm) [http://www.prestashop.com/] 
+Webkul(tm) [https://webkul.com/]
 

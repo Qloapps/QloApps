@@ -74,7 +74,7 @@ class AdminSearchConfControllerCore extends AdminController
                 'title' => $this->l('Indexing'),
                 'icon' => 'icon-cogs',
                 'info' => '<p>
-						'.$this->l('The "indexed" products have been analyzed by PrestaShop and will appear in the results of a front office search.').'<br />
+						'.$this->l('The "indexed" products have been analyzed by Qloapps and will appear in the results of a front office search.').'<br />
 						'.$this->l('Indexed products').' <strong>'.(int)$indexed.' / '.(int)$total.'</strong>.
 					</p>
 					<p>
@@ -303,7 +303,7 @@ class AdminSearchConfControllerCore extends AdminController
                     'name' => 'alias',
                     'required' => true,
                     'hint' => array(
-                        $this->l('Enter each alias separated by a comma (e.g. \'prestshop,preztashop,prestasohp\').'),
+                        $this->l('Enter each alias separated by a comma (e.g. \'qloapps,preztashop,prestasohp\').'),
                         $this->l('Forbidden characters: &lt;&gt;;=#{}')
                     )
                 ),

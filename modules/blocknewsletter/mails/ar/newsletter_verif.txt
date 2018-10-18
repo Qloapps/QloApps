@@ -1,15 +1,15 @@
 
-[{shop_url}] 
+[{shop_url}]
 
-مرحباً 
+مرحباً
 
 شكرا لك لانضمامك الى خدمة الرسائل
 الاخبارية، الرجاء تأكيد طلب الانضمام
 الى الخدمة من خلال الضعط على الرابط
 التالي:
 
-{verif_url} [{verif_url}] 		 
+{verif_url} [{verif_url}]
 
 {shop_name} [{shop_url}] powered by
-PrestaShop(tm) [http://www.prestashop.com/] 
+Webkul(tm) [https://webkul.com/]
 

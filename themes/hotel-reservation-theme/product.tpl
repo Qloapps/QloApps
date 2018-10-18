@@ -22,6 +22,7 @@
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
+
 {include file="$tpl_dir./errors.tpl"}
 {if $errors|@count == 0}
 	{if !isset($priceDisplayPrecision)}
@@ -64,146 +65,119 @@
 		{/if}
 
 		<!-- By webkul to search panel on product page -->
-		{*
-		<div class="row margin-lr-0 search_block_container product_page_search">
-	      <form method="POST" autocomplete="on" autofill="on">
-	      	
-	      	<div class="col-xs-12 col-sm-12">
-		      	{if isset($error) && ($error == 1)}
-	                <p class="error_msg_prod"><i class="icon-times-circle-o"></i>&nbsp;&nbsp;{l s='All Fields are mandatory.'}</p>
-	            {else if isset($error) && ($error == 2)}
-					<p class="error_msg_prod"><i class="icon-times-circle-o"></i>&nbsp;&nbsp;{l s='Please enter a valid Check In date.'}</p>
-				{else if isset($error) && ($error == 3)}
-					<p class="error_msg_prod"><i class="icon-times-circle-o"></i>&nbsp;&nbsp;{l s='Please enter a valid Check Out date.'}</p>
-				{else if isset($error) && ($error == 4)}
-					<p class="error_msg_prod"><i class="icon-times-circle-o"></i>&nbsp;&nbsp;{l s='Check In date should not be less than current date.'}</p>
-				{else if isset($error) && ($error == 5)}
-					<p class="error_msg_prod"><i class="icon-times-circle-o"></i>&nbsp;&nbsp;{l s='Check Out date should be after the date of check In.'}</p>
-				{else if isset($error) && ($error == 6)}
-					<p class="error_msg_prod"><i class="icon-times-circle-o"></i>&nbsp;&nbsp;{l s='You can not book rooms for the dates after '}{$max_order_date}.</p>
-	            {/if}
-	      	</div>
-		    {if isset($location_enable) && $location_enable}
-				<div class="form-group hotel_location_div col-sm-3">
-					<label class="control-label" for="">{l s='Hotel Location'}</label>
-					<input class="form-control" placeholder="Enter a city, state, country name" type="text" id="hotel_location" name="hotel_location" autocomplete="off"/>
-					<ul class="location_search_results_ul">
-					</ul>
-				</div>
-	        {/if}
-			<div class="form-group col-sm-3">
-				<label class="control-label" for="">{l s='Hotel Name'}</label>
-				<div class="dropdown">
-					<button class="btn btn-default hotel_cat_id_btn dropdown-toggle" type="button" data-toggle="dropdown">
-						{if isset($search_data)}
-							<span id="hotel_cat_name" class="pull-left">{$search_data['htl_dtl']['hotel_name']}</span>
-						{else}
-							<span id="hotel_cat_name" class="pull-left">{l s='Select Hotel'}</span>
-						{/if}
-						<!-- <span id="hotel_cat_name" class="pull-left">{l s='Select Hotel'}</span> -->
-						<input type="hidden" id="hotel_cat_id" name="hotel_cat_id" {if isset($search_data)}value="{$search_data['htl_dtl']['id_category']}"{/if}>
-						<input type="hidden" id="max_order_date" name="max_order_date" value="{$max_order_date}">
-						<div class="caret_div">
-							<span class="caret"></span>
-						</div>  
-					</button>
-					<ul class="dropdown-menu hotel_dropdown_ul">
-						{if isset($all_hotels_info) && $all_hotels_info}
-							{foreach from=$all_hotels_info key=htl_k item=htl_v}
-								<li class="hotel_name" data-hotel-cat-id="{$htl_v['id_category']}">
-									{$htl_v['hotel_name']}
-								</li>
-							{/foreach}
-						{/if} 
-					</ul>
-				</div>
-				<p class="error_msg_prod" id="select_htl_error_p"></p>
-	        </div>
-
-	        <div class="form-group col-sm-2">
-				<label class="control-label" for="check_in_time">{l s='Check In Time'}</label>
-				<div class="input-group">
-					<input class="form-control" type="text" id="check_in_time" name="check_in_time" autocomplete="off" {if isset($search_data)}value="{$search_data['date_from']}"{/if} readonly />
-					<label class="input-group-addon calender-icon-cont" for="check_in_time"><i class="icon-calendar"></i></label>
-				</div>
-				<p class="error_msg_prod" id="check_in_time_error_p"></p>
-	        </div>
-
-	        <div class="form-group col-sm-2">
-				<label class="control-label" for="check_out_time">{l s='Check Out Time'}</label>
-				<div class="input-group">
-					<input class="form-control" type="text" id="check_out_time" name="check_out_time" autocomplete="off" {if isset($search_data)}value="{$search_data['date_to']}"{/if} readonly />
-					<label class="input-group-addon calender-icon-cont" for="check_out_time"><i class="icon-calendar"></i></label>
-		         </div>
-		         <p class="error_msg_prod" id="check_out_time_error_p"></p>
-	        </div>
-
-	        <div class="col-sm-2">
-	          <button type="submit" class="btn btn-default button button-medium pull-right" name="product_page_search_submit" id="search_room_submit">{l s='Search Now'}</button>
-	        </div>
-	      </form>
-		</div>
-		*}
-
 		<div class="header-rmsearch-wrapper">
 		    <div class="header-rmsearch-primary">
 		        <div class="container">
 		            <div class="row header-rmsearch-inner-wrapper">
 		                <form method="POST" id="search_hotel_block_form">
 		                    {if isset($location_enable) && $location_enable}
-		                        <div class="form-group col-sm-6 col-lg-3">
-		                            <input type="text" class="form-control header-rmsearch-input"  id="hotel_location" name="hotel_location" autocomplete="off" placeholder="Hotel Location">
+		                        <div class="form-group
+								{if $totalActiveHotels <= 1 && !$show_only_active_htl}
+									col-sm-3
+								{else}
+									col-sm-6 col-lg-3
+								{/if}">
+		                            <input type="text" class="form-control header-rmsearch-input" id="hotel_location" name="hotel_location" autocomplete="off" placeholder="Hotel Location" {if isset($search_data['location'])}value="{$search_data['location']}"{/if}>
 		                            <div class="dropdown">
 		                                <ul class="location_search_results_ul"></ul>
 		                            </div>
 		                        </div>
-		                    {/if}    
-		                    <div class="form-group {if isset($location_enable) && $location_enable}col-sm-6 col-lg-3 {else}col-sm-6 col-lg-4{/if}">
-		                        <div class="dropdown">
-		                            <button class="form-control header-rmsearch-input {if isset($error) && $error == 1}error_border{/if}" type="button" data-toggle="dropdown">
-		                                {if isset($search_data)}
-											<span id="hotel_cat_name" class="pull-left">{$search_data['htl_dtl']['hotel_name']}</span>
-										{else}
-											<span id="hotel_cat_name" class="pull-left">{l s='Select Hotel'}</span>
-										{/if}
-										<!-- <span id="hotel_cat_name" class="pull-left">{l s='Select Hotel'}</span> -->
-										<input type="hidden" id="hotel_cat_id" name="hotel_cat_id" {if isset($search_data)}value="{$search_data['htl_dtl']['id_category']}"{/if}>
-										<input type="hidden" id="id_hotel" name="id_hotel" {if isset($search_data)}value="{$search_data['htl_dtl']['id']}"{/if}>
-										<input type="hidden" id="max_order_date" name="max_order_date" value="{if isset($max_order_date)}{$max_order_date}{/if}">
-										<span class="arrow_span">
-		                                    <i class="icon icon-angle-down"></i>
-		                                </span>
-		                            </button>
-		                            <ul class="dropdown-menu hotel_dropdown_ul">
-		                                {if isset($all_hotels_info) && $all_hotels_info}
-											{foreach from=$all_hotels_info key=htl_k item=htl_v}
-												<li class="hotel_name" data-id-hotel="{$name_val['id']}" data-hotel-cat-id="{$htl_v['id_category']}">
-													{$htl_v['hotel_name']}
-												</li>
-											{/foreach}
-										{/if} 
-		                            </ul>
-		                        </div>
+		                    {/if}
+		                    <div class="form-group {if $totalActiveHotels <= 1 && !$show_only_active_htl} hidden {/if}
+							{if isset($location_enable) && $location_enable}
+								col-sm-6 col-lg-3
+							{else}
+								col-sm-3
+							{/if}">
+								{if !show_only_active_htl}
+									<input type="hidden" id="max_order_date" name="max_order_date" value="{$all_hotels_info[0]['max_order_date']}">
+									<input type="hidden" id="hotel_cat_id" name="hotel_cat_id" value="{$all_hotels_info[0]['id_category']}">
+									<input type="hidden" id="id_hotel" name="id_hotel" value="{$all_hotels_info[0]['id']}">
+									<input type="text" id="htl_name" class="form-control header-rmsearch-input" value="{$all_hotels_info[0]['hotel_name']}" readonly>
+								{else}
+									<div class="dropdown">
+										<button class="form-control header-rmsearch-input {if isset($error) && $error == 1}error_border{/if}" type="button" data-toggle="dropdown">
+											{if isset($search_data)}
+												<span id="hotel_cat_name" class="pull-left">{$search_data['htl_dtl']['hotel_name']}</span>
+											{else}
+												<span id="hotel_cat_name" class="pull-left">{l s='Select Hotel'}</span>
+											{/if}
+											<!-- <span id="hotel_cat_name" class="pull-left">{l s='Select Hotel'}</span> -->
+											<input type="hidden" id="hotel_cat_id" name="hotel_cat_id" {if isset($search_data)}value="{$search_data['htl_dtl']['id_category']}"{/if}>
+											<input type="hidden" id="id_hotel" name="id_hotel" {if isset($search_data)}value="{$search_data['htl_dtl']['id']}"{/if}>
+											<input type="hidden" id="max_order_date" name="max_order_date" value="{if isset($max_order_date)}{$max_order_date}{/if}">
+											<span class="arrow_span">
+												<i class="icon icon-angle-down"></i>
+											</span>
+										</button>
+										<ul class="dropdown-menu hotel_dropdown_ul">
+											{if isset($all_hotels_info) && $all_hotels_info}
+												{foreach from=$all_hotels_info key=htl_k item=htl_v}
+													<li class="hotel_name" data-id-hotel="{$name_val['id']}" data-hotel-cat-id="{$htl_v['id_category']}" data-max_order_date="{$htl_v['max_order_date']}">
+														{$htl_v['hotel_name']}
+													</li>
+												{/foreach}
+											{/if}
+										</ul>
+									</div>
+								{/if}
 		                    </div>
-		                    <div class="form-group {if isset($location_enable) && $location_enable}col-sm-4 col-lg-2{else}col-sm-6 col-lg-3{/if}">
+		                    <div class="form-group
+							{if $totalActiveHotels <= 1}
+								{if isset($location_enable) && $location_enable && $show_only_active_htl}
+									col-sm-4 col-lg-2
+								{elseif isset($location_enable) && !$location_enable && !$show_only_active_htl}
+									col-sm-4
+								{else}
+									col-sm-3
+								{/if}
+							{elseif isset($location_enable) && $location_enable}
+								col-sm-4 col-lg-2
+							{else}
+								col-sm-3
+							{/if}">
 		                        <input type="text" class="form-control header-rmsearch-input input-date" id="check_in_time" name="check_in_time" autocomplete="off" placeholder="Check In Date" {if isset($search_data)}value="{$search_data['date_from']}"{/if} />
 		                    </div>
-		                    <div class="form-group {if isset($location_enable) && $location_enable}col-sm-4 col-lg-2{else}col-sm-6 col-lg-3{/if}">
+		                    <div class="form-group
+							{if count($hotel_name) <= 1}
+								{if isset($location_enable) && $location_enable && $show_only_active_htl}
+									col-sm-4 col-lg-2
+								{elseif isset($location_enable) && !$location_enable && !$show_only_active_htl}
+									col-sm-4
+								{else}
+									col-sm-3
+								{/if}
+							{elseif isset($location_enable) && $location_enable}
+								col-sm-4 col-lg-2
+							{else}
+								col-sm-3
+							{/if}">
 		                        <input type="text" class="form-control header-rmsearch-input input-date" id="check_out_time" name="check_out_time" autocomplete="off" placeholder="Check Out Date" {if isset($search_data)}value="{$search_data['date_to']}"{/if} />
 		                    </div>
-		                    <div class="form-group {if isset($location_enable) && $location_enable}col-sm-4{else}col-sm-6{/if} col-lg-2">
+		                    <div class="form-group
+							{if count($hotel_name) <= 1}
+								{if isset($location_enable) && $location_enable && $show_only_active_htl}
+									col-sm-4 col-lg-2
+								{elseif isset($location_enable) && !$location_enable && !$show_only_active_htl}
+									col-sm-4
+								{else}
+									col-sm-3
+								{/if}
+							{elseif isset($location_enable) && $location_enable}
+								col-sm-4 col-lg-2
+							{else}
+								col-sm-3
+							{/if}">
 		                        <button type="submit" class="btn btn-default button button-medium exclusive" name="product_page_search_submit" id="search_room_submit">
 		                            <span>{l s='Search Now' mod='wkroomsearchblock'}</span>
 		                        </button>
 		                    </div>
-		                </form>    
+		                </form>
 		            </div>
 		        </div>
 		    </div>
 		</div>
-
 		<!-- end -->
-
 		<!-- left infos-->
 		<div class="pb-left-column col-xs-12 col-sm-8 col-md-8" style="border:1px solid #cccccc">
 			<div class="room_hotel_name_block">
@@ -327,16 +301,18 @@
 									&nbsp;<img width="15px" src="{$ftr_img_src}{$ftr_v.value}">
 								{/foreach}
 							</div>
-							<div class="info_margin_div">
-								<div class="room_info_heading">
-									<span>{l s='Hotel Features'}</span>
+							{if isset($hotel_features) && $hotel_features}
+								<div class="info_margin_div">
+									<div class="room_info_heading">
+										<span>{l s='Hotel Features'}</span>
+									</div>
+									<div class="room_info_content row">
+										{foreach from=$hotel_features key=ftr_k item=ftr_v}
+											<span class="col-sm-4">{$ftr_v}</span>
+										{/foreach}
+									</div>
 								</div>
-								<div class="room_info_content row">
-									{foreach from=$hotel_features key=ftr_k item=ftr_v}
-										<span class="col-sm-4">{$ftr_v}</span>
-									{/foreach}
-								</div>
-							</div>	
+							{/if}
 							<!-- <div class="info_margin_div">
 								<div class="room_info_heading">
 									<span>{l s='Rooms'}</span>
@@ -357,7 +333,7 @@
 				</div>
 			</section>
 		</div> <!-- end pb-left-column -->
-		
+
 		<div class="pb-right-column col-xs-12 col-sm-4 col-md-4">
 			<p class="hidden">
 				<input type="hidden" name="token" value="{$static_token}" />
@@ -402,7 +378,7 @@
 				</div>
 				<!-- by webkul -->
 				<div class="booking_room_fields">
-					<form action="" method="post">	
+					<form action="" method="post">
 						<div class="form-group">
 							<label for="" class="control-label">{l s='Hotel Location'}</label>
 						   	<input type="text" class="form-control" name="hotel_location" id="hotel_location" value="{$hotel_location}" readonly="true" />
@@ -428,7 +404,7 @@
 								<input type="hidden" id="num_days" value="{if isset($num_days)}{$num_days}{/if}">
 								<input type="hidden" id="max_avail_type_qty" value="{if isset($total_available_rooms)}{$total_available_rooms}{/if}">
 								<input autocomplete="off" type="text" min="1" name="qty" id="quantity_wanted" class="text" value="{if isset($quantityBackup)}{$quantityBackup|intval}{else}{if $product->minimal_quantity > 1}{$product->minimal_quantity}{else}1{/if}{/if}">
-								
+
 								<a href="#" data-field-qty="qty" class="btn btn-default button-plus product_quantity_up">
 									<span><i class="icon-plus"></i></span>
 								</a>

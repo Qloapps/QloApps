@@ -1,12 +1,12 @@
 
-[{shop_url}] 
+[{shop_url}]
 
-Здрасти, 
+Здрасти,
 
 Взимайки предвид абонамента ви за
 бюлетин, имаме удоволствието да Ви
-предложим следният ваучер: {discount} 
+предложим следният ваучер: {discount}
 
 {shop_name} [{shop_url}] се управлява
-с PrestaShop(tm) [http://www.prestashop.com/] 
+с Webkul(tm) [https://webkul.com/]
 

@@ -1,13 +1,13 @@
 
-[{shop_url}] 
+[{shop_url}]
 
-Ei, 
+Ei,
 
 {firstname} {lastname} diu que és possible que vulguis veure la seva
 llista de desitjos: {wishlist}
 
-{wishlist} [{message}] 		 
+{wishlist} [{message}]
 
 {shop_name} [{shop_url}] desenvolupat amb
-PrestaShop(tm) [http://www.prestashop.com/] 
+Webkul(tm) [https://webkul.com/]
 

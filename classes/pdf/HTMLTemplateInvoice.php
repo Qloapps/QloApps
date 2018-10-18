@@ -60,9 +60,11 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
     public function getHeader()
     {
         $this->assignCommonHeaderData();
-        $this->smarty->assign(array(
-            'header' => $this->l('INVOICE'),
-        ));
+        $this->smarty->assign(
+            array(
+                'header' => $this->l('INVOICE'),
+            )
+        );
 
         return $this->smarty->fetch($this->getTemplate('header'));
     }
@@ -481,9 +483,28 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
                             && $address->id_country != Configuration::get('VATNUMBER_COUNTRY');
         $carrier = new Carrier($this->order->id_carrier);
 
-        $tax_breakdowns = $this->getTaxBreakdown();
+        // code to send name of the taxes applied on the order to show names od taxes in the invoice for GST
+        $showTaxName = 0;
+        if ($tax_breakdowns = $this->getTaxBreakdown()) {
+            if (Configuration::get('PS_INVOICE_TAXES_BREAKDOWN')) {
+                $showTaxName = 1;
+                foreach ($tax_breakdowns as $taxType => &$taxDetails) {
+                    if ($taxType = 'product_tax') {
+                        foreach ($taxDetails as $taxRate => &$tax) {
+                            if (isset($tax['id_tax'])) {
+                                if (Validate::isLoadedObject($objTax = new Tax($tax['id_tax']))) {
+                                    // add tax name in the tax details of the order
+                                    $tax['name'] = $objTax->name[$this->order->id_lang];
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
         $data = array(
+            'showTaxName' => $showTaxName,
             'tax_exempt' => $tax_exempt,
             'use_one_after_another_method' => $this->order_invoice->useOneAfterAnotherTaxComputationMethod(),
             'display_tax_bases_in_breakdowns' => $this->order_invoice->displayTaxBasesInProductTaxesBreakdown(),

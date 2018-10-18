@@ -1,5 +1,5 @@
 {**
-* 2010-2016 Webkul.
+* 2010-2018 Webkul.
 *
 * NOTICE OF LICENSE
 *
@@ -13,7 +13,7 @@
 * needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
 *
 *  @author    Webkul IN <support@webkul.com>
-*  @copyright 2010-2016 Webkul IN
+*  @copyright 2010-2018 Webkul IN
 *  @license   https://store.webkul.com/license.html
 *}
 
@@ -92,7 +92,7 @@
 								<strong>{l s='Refund Net Amount - ' mod='wkpaypaladaptive'}</strong>{$refund->refundNetAmount},&nbsp;&nbsp;{/if}{if isset($refund->refundFeeAmount)}
 								<strong>{l s='Refund Fee Amount - ' mod='wkpaypaladaptive'}</strong>{$refund->refundFeeAmount},&nbsp;&nbsp;{/if}{if isset($refund->refundGrossAmount)}
 								<strong>{l s='Refund Gross Amount - ' mod='wkpaypaladaptive'}</strong>{$refund->refundGrossAmount},&nbsp;&nbsp;{/if}{if isset($refund->totalOfAllRefunds)}
-								<strong>{l s='Total of All Refund - ' mod='wkpaypaladaptive'}</strong>{$refund->totalOfAllRefunds},&nbsp;&nbsp;{/if}						
+								<strong>{l s='Total of All Refund - ' mod='wkpaypaladaptive'}</strong>{$refund->totalOfAllRefunds},&nbsp;&nbsp;{/if}
 								{if isset($refund->refundStatus) && $refund->refundStatus} <strong>{l s='Refund Status - ' mod='wkpaypaladaptive'}</strong>{$refund->refundStatus}{/if}
 								</p>
 							{/foreach}

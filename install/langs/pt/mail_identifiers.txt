@@ -7,4 +7,4 @@ Endereço de e-mail: {email}
 
 {shop_name} - {shop_url}
 
-{shop_url} powered by PrestaShop™
+{shop_url} powered by Webkul™

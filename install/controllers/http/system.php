@@ -87,11 +87,17 @@ class InstallControllerHttpSystem extends InstallControllerHttp
                     'title' => $this->l('Required PHP parameters'),
                     'success' => 1,
                     'checks' => array(
-                        'phpversion' => $this->l('PHP 5.1.2 or later is not enabled'),
+                        'phpversion' => $this->l('Minimum PHP 5.4.0 or later is required'),
                         'upload' => $this->l('Cannot upload files'),
                         'system' => $this->l('Cannot create new files and folders'),
                         'gd' => $this->l('GD library is not installed'),
-                        'mysql_support' => $this->l('MySQL support is not activated')
+                        'mysql_support' => $this->l('MySQL support is not activated'),
+                        'curl' => $this->l('Curl extension is not loaded'),
+                        'soap' => $this->l('SOAP extension is not loaded'),
+                        'simplexml' => $this->l('SimpleXml extension is not loaded'),
+                        'upload_max_filesize' => $this->l('In the PHP configuration set memory_limit to minimum 128M'),
+                        'max_execution_time' => $this->l('In the PHP configuration set max_execution_time to minimum 500'),
+                        'memory_limit' => $this->l('In the PHP configuration set upload_max_filesize to minimum 16M'),
                     )
                 ),
                 array(
@@ -125,7 +131,7 @@ class InstallControllerHttpSystem extends InstallControllerHttp
                     'title' => $this->l('Recommended PHP parameters'),
                     'success' => $this->tests['optional']['success'],
                     'checks' => array(
-                        'new_phpversion' => sprintf($this->l('You are using PHP %s version. Soon, the latest PHP version supported by PrestaShop will be PHP 5.4. To make sure you’re ready for the future, we recommend you to upgrade to PHP 5.4 now!'), phpversion()),
+                        'new_phpversion' => sprintf($this->l('You are using PHP %s version. Soon, the latest PHP version supported by Qloapps will be PHP 5.4. To make sure you’re ready for the future, we recommend you to upgrade to PHP 5.4 now!'), phpversion()),
                         'fopen' => $this->l('Cannot open external URLs'),
                         'register_globals' => $this->l('PHP register_globals option is enabled'),
                         'gz' => $this->l('GZIP compression is not activated'),
@@ -146,7 +152,7 @@ class InstallControllerHttpSystem extends InstallControllerHttp
                 }
             }
         }
-        
+
         // If required tests failed, disable next button
         if (!$this->tests['required']['success']) {
             $this->next_button = false;

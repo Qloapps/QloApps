@@ -42,7 +42,7 @@ if (!defined('_PS_CORE_DIR_')) {
 }
 
 if (!defined('_THEME_NAME_')) {
-    define('_THEME_NAME_', 'hotel-theme');
+    define('_THEME_NAME_', 'hotel-reservation-theme');
 }
 
 

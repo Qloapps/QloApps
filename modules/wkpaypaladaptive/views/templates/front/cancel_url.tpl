@@ -1,5 +1,5 @@
 {**
-* 2010-2016 Webkul.
+* 2010-2018 Webkul.
 *
 * NOTICE OF LICENSE
 *
@@ -13,13 +13,13 @@
 * needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
 *
 *  @author    Webkul IN <support@webkul.com>
-*  @copyright 2010-2016 Webkul IN
+*  @copyright 2010-2018 Webkul IN
 *  @license   https://store.webkul.com/license.html
 *}
 
 <div class="row">
 	<div class="col-md-12 text-center">
-		<h2>{l s='There is some problem while making payment' mod='mppaypaladaptive'}</h2>
-		<a href="{$link->getPageLink('index')|escape:'html':'UTF-8'}" class="btn btn-primary"><span>{l s='Go Back' mod='mppaypaladaptive'}</span></a>
+		<h2>{l s='There is some problem while making payment' mod='wkpaypaladaptive'}</h2>
+		<a href="{$link->getPageLink('index')|escape:'html':'UTF-8'}" class="btn btn-primary"><span>{l s='Go Back' mod='wkpaypaladaptive'}</span></a>
 	</div>
 </div>

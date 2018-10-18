@@ -93,9 +93,11 @@ class DbQueryCore
     public function from($table, $alias = null)
     {
         if (!empty($table)) {
+            if (empty($this->query['from'])) {
+                $this->query['from'] = array();
+            }
             $this->query['from'][] = '`'._DB_PREFIX_.$table.'`'.($alias ? ' '.$alias : '');
         }
-
         return $this;
     }
 

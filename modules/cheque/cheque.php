@@ -40,7 +40,7 @@ class Cheque extends PaymentModule
 	{
 		$this->name = 'cheque';
 		$this->tab = 'payments_gateways';
-		$this->version = '2.6.0';
+		$this->version = '2.6.1';
 		$this->author = 'PrestaShop';
 		$this->controllers = array('payment', 'validation');
 		$this->is_eu_compatible = 1;
@@ -63,8 +63,11 @@ class Cheque extends PaymentModule
 
 		if ((!isset($this->chequeName) || !isset($this->address) || empty($this->chequeName) || empty($this->address)))
 			$this->warning = $this->l('The "Pay to the order of" and "Address" fields must be configured before using this module.');
-		if (!count(Currency::checkPaymentCurrencies($this->id)))
+
+		$currencies = Currency::checkPaymentCurrencies($this->id);
+		if (!$currencies || !count($currencies)) {
 			$this->warning = $this->l('No currency has been set for this module.');
+		}
 
 		$this->extra_mail_vars = array(
 											'{cheque_name}' => Configuration::get('CHEQUE_NAME'),

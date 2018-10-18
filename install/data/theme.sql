@@ -46,15 +46,14 @@ UPDATE `PREFIX_configuration` SET value = '10' WHERE name = 'BLOCKTAGS_NBR';
 UPDATE `PREFIX_configuration` SET value = '0_3|0_4' WHERE name = 'FOOTER_CMS';
 UPDATE `PREFIX_configuration` SET value = '0_3|0_4' WHERE name = 'FOOTER_BLOCK_ACTIVATION';
 UPDATE `PREFIX_configuration` SET value = '1' WHERE name = 'FOOTER_POWEREDBY';
-UPDATE `PREFIX_configuration` SET value = 'http://www.prestashop.com' WHERE name = 'BLOCKADVERT_LINK';
+UPDATE `PREFIX_configuration` SET value = 'https://qloapps.com/' WHERE name = 'BLOCKADVERT_LINK';
 UPDATE `PREFIX_configuration` SET value = 'store.jpg' WHERE name = 'BLOCKSTORE_IMG';
 UPDATE `PREFIX_configuration` SET value = 'jpg' WHERE name = 'BLOCKADVERT_IMG_EXT';
 UPDATE `PREFIX_configuration` SET value = 'CAT3,CAT8,CAT5,LNK1' WHERE name = 'MOD_BLOCKTOPMENU_ITEMS';
 UPDATE `PREFIX_configuration` SET value = '0' WHERE name = 'MOD_BLOCKTOPMENU_SEARCH';
-UPDATE `PREFIX_configuration` SET value = 'http://www.facebook.com/prestashop' WHERE name = 'BLOCKSOCIAL_FACEBOOK';
-UPDATE `PREFIX_configuration` SET value = 'http://www.twitter.com/prestashop' WHERE name = 'BLOCKSOCIAL_TWITTER';
-UPDATE `PREFIX_configuration` SET value = 'http://www.prestashop.com/blog/en/' WHERE name = 'BLOCKSOCIAL_RSS';
-UPDATE `PREFIX_configuration` SET value = 'https://www.google.com/+prestashop' WHERE name = 'BLOCKSOCIAL_GOOGLE_PLUS';
+UPDATE `PREFIX_configuration` SET value = 'https://www.facebook.com/qloapps' WHERE name = 'BLOCKSOCIAL_FACEBOOK';
+UPDATE `PREFIX_configuration` SET value = 'https://twitter.com/qloapps' WHERE name = 'BLOCKSOCIAL_TWITTER';
+UPDATE `PREFIX_configuration` SET value = 'https://plus.google.com/110221570427070809661' WHERE name = 'BLOCKSOCIAL_GOOGLE_PLUS';
 UPDATE `PREFIX_configuration` SET value = 'My Company' WHERE name = 'BLOCKCONTACTINFOS_COMPANY';
 UPDATE `PREFIX_configuration` SET value = '42 avenue des Champs Elysées\n75000 Paris\nFrance' WHERE name = 'BLOCKCONTACTINFOS_ADDRESS';
 UPDATE `PREFIX_configuration` SET value = '0123-456-789' WHERE name = 'BLOCKCONTACTINFOS_PHONE';
@@ -178,13 +177,13 @@ UPDATE `PREFIX_hook_module` SET position = 2
 WHERE id_module = (SELECT id_module FROM `PREFIX_module` WHERE name = 'productpaymentlogos')
 AND id_hook = @id_hook;
 
-INSERT INTO `PREFIX_hook_module_exceptions` (`id_shop`, `id_module`, `id_hook`, `file_name`) 
+INSERT INTO `PREFIX_hook_module_exceptions` (`id_shop`, `id_module`, `id_hook`, `file_name`)
 (
 	SELECT 1, m.id_module, h.id_hook, 'category'
 	FROM `PREFIX_hook` h
 	JOIN `PREFIX_hook_module` hm ON (hm.id_hook = h.id_hook)
 	JOIN `PREFIX_module` m ON (m.id_module = hm.id_module)
-	WHERE 
+	WHERE
 	h.name='displayLeftColumn' AND m.name IN ('blockbestsellers', 'blockmanufacturer', 'blocksupplier', 'blockmyaccount', 'blockpaymentlogo')
 	GROUP BY m.id_module
 );

@@ -1,0 +1,31 @@
+-----------------------------
+# V1.0.0 to V1.1.0
+-----------------------------
+
+## Added features
+
++ [CO] : Module is now made multilang.
++ [CO] : htl_testimonials_block_data_lang table added to make module multilang.
++ [CO] : index.php added/Updated in all folders
++ [CO] : License.txt added.
++ [CO] : License added in every file.
++ [CO] : logo.gif file added.
+
+
+## Bug/Issues Resolved:
+
+[+] BO : Resolved :: Image name issue issue while saving new testimonial
+[+] BO : Resolved :: Tools::displayError() replaced with $this->l() in admin AdminTestimonialsModuleSettingController
+
+
+## Improved/changed features
+
+- [BO] : getTestimonialData() improved in WkHotelTestimonialData.php
+
+- [CO] : `id` changed to `id_testimonial_block` in htl_testimonials_block_data for position working.
+- [CO] : image column remove from htl_testimonials_block_data table
+
+
+## Update Policy
+
+- Database changed, Module need upload new file then UNINSTALL and re-installation.

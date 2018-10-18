@@ -177,7 +177,7 @@ if (!class_exists('PEAR', false))
 			 * @access public
 			 * @return void
 			 */
-			function PEAR($error_class = null)
+			function __construct($error_class = null)
 			{
 					$classname = strtolower(get_class($this));
 					if ($this->_debug) {
@@ -216,6 +216,11 @@ if (!class_exists('PEAR', false))
 			 * @access public
 			 * @return void
 			 */
+			function __destruct()
+			{
+				$this->_PEAR();
+			}
+
 			function _PEAR() {
 					if ($this->_debug) {
 							printf("PEAR destructor called, class=%s\n", strtolower(get_class($this)));
@@ -861,7 +866,7 @@ if (!class_exists('PEAR_Error', false))
 			 * @access public
 			 *
 			 */
-			function PEAR_Error($message = 'unknown error', $code = null,
+			function __construct($message = 'unknown error', $code = null,
 													$mode = null, $options = null, $userinfo = null)
 			{
 					if ($mode === null) {
@@ -1301,7 +1306,7 @@ if (!class_exists('PEAR_Exception', false))
 			}
 
 			public function getTraceSafe()
-			{   
+			{
 					if (!isset($this->_trace)) {
 							$this->_trace = $this->getTrace();
 							if (empty($this->_trace)) {

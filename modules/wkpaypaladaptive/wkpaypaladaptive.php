@@ -1,6 +1,6 @@
 <?php
 /**
-* 2010-2016 Webkul.
+* 2010-2018 Webkul.
 *
 * NOTICE OF LICENSE
 *
@@ -14,15 +14,14 @@
 * needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
 *
 *  @author    Webkul IN <support@webkul.com>
-*  @copyright 2010-2016 Webkul IN
+*  @copyright 2010-2018 Webkul IN
 *  @license   https://store.webkul.com/license.html
 */
 
 include_once dirname(__FILE__).'/classes/wkpaypalhelper.php';
-include_once dirname(__FILE__).'/classes/wkpaypal.php';
 include_once dirname(__FILE__).'/classes/wkpaypaltransaction.php';
 include_once dirname(__FILE__).'/classes/wkpaypalrefund.php';
-include_once (_PS_MODULE_DIR_.'hotelreservationsystem/classes/HotelCustomerAdvancedPayment.php');
+include_once _PS_MODULE_DIR_.'hotelreservationsystem/classes/HotelCustomerAdvancedPayment.php';
 
 class WkPayPalAdaptive extends PaymentModule
 {
@@ -33,7 +32,7 @@ class WkPayPalAdaptive extends PaymentModule
     {
         $this->name = 'wkpaypaladaptive';
         $this->tab = 'payments_gateways';
-        $this->version = '1.0.0';
+        $this->version = '1.0.1';
         $this->author = 'Webkul';
         $this->bootstrap = true;
         parent::__construct();
@@ -108,11 +107,16 @@ class WkPayPalAdaptive extends PaymentModule
             return false;
         }
 
-        if (isset($params['objOrder']) && Validate::isLoadedObject($params['objOrder']) && isset($params['objOrder']->valid)) {
-            $this->smarty->assign(array(
-                'id_order' => $params['objOrder']->id,
-                'valid' => $params['objOrder']->valid,
-            ));
+        if (isset($params['objOrder'])
+            && Validate::isLoadedObject($params['objOrder'])
+            && isset($params['objOrder']->valid)
+        ) {
+            $this->smarty->assign(
+                array(
+                    'id_order' => $params['objOrder']->id,
+                    'valid' => $params['objOrder']->valid,
+                )
+            );
         }
 
         if (isset($params['objOrder']->reference) && !empty($params['objOrder']->reference)) {
@@ -127,10 +131,12 @@ class WkPayPalAdaptive extends PaymentModule
         // payment option will not display untill paypal settings not filled
         if (Configuration::get('PAYPAL_EMAIL')) {
             $this->context->controller->addCSS($this->_path.'views/css/hook_payment.css');
-            $this->smarty->assign(array(
-                'this_path' => $this->_path,
-                'this_path_ssl' => Tools::getShopDomainSsl(true, true).__PS_BASE_URI__.'modules/'.$this->name.'/',
-            ));
+            $this->smarty->assign(
+                array(
+                    'this_path' => $this->_path,
+                    'this_path_ssl' => Tools::getShopDomainSsl(true, true).__PS_BASE_URI__.'modules/'.$this->name.'/',
+                )
+            );
 
             return $this->display(__FILE__, 'payment.tpl');
         }
@@ -169,13 +175,7 @@ class WkPayPalAdaptive extends PaymentModule
         } elseif (!$sql = Tools::file_get_contents(dirname(__FILE__).'/'.self::INSTALL_SQL_FILE)) {
             return (false);
         }
-        $sql = str_replace(array(
-            'PREFIX_',
-            'ENGINE_TYPE',
-        ), array(
-            _DB_PREFIX_,
-            _MYSQL_ENGINE_,
-        ), $sql);
+        $sql = str_replace(array('PREFIX_', 'ENGINE_TYPE'), array(_DB_PREFIX_, _MYSQL_ENGINE_), $sql);
         $sql = preg_split("/;\s*[\r\n]+/", $sql);
         foreach ($sql as $query) {
             if ($query) {
@@ -184,47 +184,51 @@ class WkPayPalAdaptive extends PaymentModule
                 }
             }
         }
-        /* General Configuration options */
-        Configuration::updateValue('WK_PAYPAL_SANDBOX', 1);
-        if (Configuration::get('WK_PAYPAL_SANDBOX') != 1) {
-            Configuration::updateValue('WK_PAYPAL_SANDBOX', 1);
-        }
 
         if (!parent::install()
-            || !$this->registerHook('displayPayment')
-            || !$this->registerHook('displayAdminSellerInfoJoin')
-            || !$this->registerHook('paymentReturn')
-            || !$this->registerHook('adminOrder')
-            || !$this->registerHook('addPaymentSetting')
-            ) {
+            || !$this->registerModuleHooks()
+            || !Configuration::updateValue('WK_PAYPAL_SANDBOX', 1)
+        ) {
             return false;
         }
 
         return true;
+    }
+
+    public function registerModuleHooks()
+    {
+        return $this->registerHook(
+            array(
+                'displayPayment',
+                'displayAdminSellerInfoJoin',
+                'paymentReturn',
+                'adminOrder',
+                'addPaymentSetting',
+            )
+        );
     }
 
     public function uninstall()
     {
         if (!parent::uninstall()
             || !$this->dropTable()
-            || !$this->deleteConfigVariable()) {
+            || !$this->deleteConfigVariable()
+        ) {
             return false;
         }
-
         return true;
     }
 
     public function deleteConfigVariable()
     {
-        $configKeys = [
+        $configKeys = array(
             'WK_PAYPAL_SANDBOX',
             'APP_ID',
             'APP_USERNAME',
             'APP_PASSWORD',
             'APP_SIGNATURE',
             'PAYPAL_EMAIL'
-        ];
-
+        );
         foreach ($configKeys as $key) {
             if (!Configuration::deleteByName($key)) {
                 return false;
@@ -236,23 +240,10 @@ class WkPayPalAdaptive extends PaymentModule
 
     public function dropTable()
     {
-        return Db::getInstance()->execute('
-            DROP TABLE IF EXISTS
-            `'._DB_PREFIX_.'wkpaypal`,
+        return Db::getInstance()->execute(
+            'DROP TABLE IF EXISTS
             `'._DB_PREFIX_.'wkpaypal_transaction`,
             `'._DB_PREFIX_.'wkpaypal_refund`'
         );
-    }
-
-    public function reset()
-    {
-        if (!$this->uninstall(false)) {
-            return false;
-        }
-        if (!$this->install(false)) {
-            return false;
-        }
-
-        return true;
     }
 }

@@ -1,4 +1,22 @@
 <?php
+/**
+* 2010-2018 Webkul.
+*
+* NOTICE OF LICENSE
+*
+* All right is reserved,
+* Please go through this link for complete license : https://store.webkul.com/license.html
+*
+* DISCLAIMER
+*
+* Do not edit or add to this file if you wish to upgrade this module to newer
+* versions in the future. If you wish to customize this module for your
+* needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
+*
+*  @author    Webkul IN <support@webkul.com>
+*  @copyright 2010-2018 Webkul IN
+*  @license   https://store.webkul.com/license.html
+*/
 
 class AdminOrderRefundRequestsController extends ModuleAdminController
 {
@@ -99,7 +117,7 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
             $this->_orderBy = '';
 
             if (!Validate::isLoadedObject(new HotelOrderRefundInfo((int) $obj->id))) {
-                $this->errors[] = Tools::displayError($this->l('An error occurred while updating the status for an object.')).' <b>'.$this->table.'</b> '.Tools::displayError($this->l('(cannot load object)'));
+                $this->errors[] = $this->l($this->l('An error occurred while updating the status for an object.')).' <b>'.$this->table.'</b> '.$this->l($this->l('(cannot load object)'));
 
                 return;
             }
@@ -225,14 +243,19 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
 
             //room info
             $objHtlBookingDetail = new HotelBookingDetail();
-            $rooms_ids = $objHtlBookingDetail->getCustomerIdRoomsByIdOrderIdProduct($id_order, $id_product, $date_from, $date_to);
+            $rooms_ids = $objHtlBookingDetail->getCustomerIdRoomsByIdOrderIdProduct(
+                $id_order,
+                $id_product,
+                $date_from,
+                $date_to
+            );
             foreach ($rooms_ids as $key_rm => $val_rm) {
                 $obj_room_info = new HotelRoomInformation($val_rm['id_room']);
                 $rooms_names[] = $obj_room_info->room_num;
             }
             $obj_room_info1 = new HotelRoomInformation($rooms_ids[0]['id_room']);
 
-            $obj_hotel_branch_info = new HotelBranchInformation($obj_room_info1->id_hotel);
+            $obj_hotel_branch_info = new HotelBranchInformation($obj_room_info1->id_hotel, $this->context->language->id);
             $obj_ord_refund_stage = new HotelOrderRefundStages($refund_stage_id);
             $obj_ord_refund_stages1 = new HotelOrderRefundStages();
 
@@ -241,11 +264,19 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
 
             /* In case of advance payment */
             $obj_customer_adv_product = new HotelCustomerAdvancedProductPayment();
-            $prod_adv_payment = $obj_customer_adv_product->getProductAdvancePaymentDetails($obj_refund->id_order, $obj_refund->id_product);
+            $prod_adv_payment = $obj_customer_adv_product->getProductAdvancePaymentDetails(
+                $obj_refund->id_order,
+                $obj_refund->id_product
+            );
             if ($prod_adv_payment) {
-                $adv_paid_amount = $obj_customer_adv_product->getRoomTypeAdvancePaymentMaountByDuration($obj_refund->id_order, $obj_refund->id_product, $date_from, $date_to);
+                $adv_paid_amount = $obj_customer_adv_product->getRoomTypeAdvancePaymentMaountByDuration(
+                    $obj_refund->id_order,
+                    $obj_refund->id_product,
+                    $date_from,
+                    $date_to
+                );
                 $way_of_payment = 'Advance Payment';
-                // cconvert price 
+                // cconvert price
                 $adv_paid_amount = Tools::convertPrice($adv_paid_amount, new Currency($id_currency));
                 //assign advance paid amount
                 $this->context->smarty->assign('adv_paid_amount', Tools::ps_round($adv_paid_amount, 2));
@@ -277,17 +308,18 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
             $new_stage_id = Tools::getValue('id_order_cancellation_stage');
 
             if (!$new_stage_id) {
-                Tools::redirectAdmin(self::$currentIndex.'&view_by_order=1&id='.$id_order_refund.'&viewhtl_order_refund_info&token='.$this->token);
+                Tools::redirectAdmin(
+                    self::$currentIndex.'&view_by_order=1&id='.$id_order_refund.'&viewhtl_order_refund_info&token='.
+                    $this->token
+                );
             }
-
             if ($cancel_charges_for_cust != '' && !Validate::isPrice($cancel_charges_for_cust)) {
-                $this->errors[] = Tools::displayError('Invalid Cancellation Charge Amount.');
+                $this->errors[] = $this->l('Invalid Cancellation Charge Amount.');
             } elseif ($way_of_payment == 'Advance Payment' && $cancel_charges_for_cust > $adv_paid_amount) {
-                $this->errors[] = Tools::displayError('Cancellation Charge should be less then Advance Paid amount for the order.');
+                $this->errors[] = $this->l('Cancellation Charge should be less then Advance Paid amount for the order.');
             } elseif ($cancel_charges_for_cust != '' && $cancel_charges_for_cust > $order_amount) {
-                $this->errors[] = Tools::displayError('Cancellation Charge should be less then Total Amount.');
+                $this->errors[] = $this->l('Cancellation Charge should be less then Total Amount.');
             }
-
             if (!count($this->errors)) {
                 if ($new_stage_id == 3) {
                     $refunded_amount = 0;
@@ -313,10 +345,20 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
                 }
                 if ($obj_ord_refund_info->id) {
                     $obj_htl_booking = new HotelBookingDetail();
-                    $updated_booking = $obj_htl_booking->updateOrderRefundStatus($id_order, $date_from, $date_to, $rooms_ids);
+                    $updated_booking = $obj_htl_booking->updateOrderRefundStatus(
+                        $id_order,
+                        $date_from,
+                        $date_to,
+                        $rooms_ids
+                    );
 
                     $obj_htl_cart_booking = new HotelCartBookingData();
-                    $updated_cart_booking = $obj_htl_cart_booking->updateOrderRefundStatus($id_cart, $date_from, $date_to, $rooms_ids);
+                    $updated_cart_booking = $obj_htl_cart_booking->updateOrderRefundStatus(
+                        $id_cart,
+                        $date_from,
+                        $date_to,
+                        $rooms_ids
+                    );
                 }
 
                 $id_shop = Context::getContext()->shop->id;
@@ -325,8 +367,22 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
 
                 $templateVars = array(
                     '{shop_name}' => Tools::safeOutput(Configuration::get('PS_SHOP_NAME', null, null, $id_shop)),
-                    '{history_url}' => Context::getContext()->link->getPageLink('history', true, Context::getContext()->language->id, null, false, $id_shop),
-                    '{my_account_url}' => Context::getContext()->link->getPageLink('my-account', true, Context::getContext()->language->id, null, false, $id_shop),
+                    '{history_url}' => Context::getContext()->link->getPageLink(
+                        'history',
+                        true,
+                        Context::getContext()->language->id,
+                        null,
+                        false,
+                        $id_shop
+                    ),
+                    '{my_account_url}' => Context::getContext()->link->getPageLink(
+                        'my-account',
+                        true,
+                        Context::getContext()->language->id,
+                        null,
+                        false,
+                        $id_shop
+                    ),
                     '{currency_sign}' => $obj_currency->sign,
                     '{amount}' => $order_amount,
                     '{date_from}' => $date_from,
@@ -352,11 +408,11 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
 
                 $to = $obj_customer->email;
 
-                if (!$this->sendOrderCancellationStatusMail($templateVars, $to, $template_name)) {
-                    $this->errors[] = Tools::displayError('Some error occurred while sending mail to the customer');
-                } else {
-                    Tools::redirectAdmin(self::$currentIndex.'&view_by_order=1&conf=4&id='.$id_order_refund.'&viewhtl_order_refund_info&token='.$this->token);
-                }
+                $this->sendOrderCancellationStatusMail($templateVars, $to, $template_name);
+                Tools::redirectAdmin(
+                    self::$currentIndex.'&view_by_order=1&conf=4&id='.$id_order_refund.
+                    '&viewhtl_order_refund_info&token='.$this->token
+                );
             }
         }
         parent::postProcess();
@@ -380,7 +436,10 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
         $obj_booking_detail = new HotelBookingDetail();
         $obj_htl_adv_pay = new HotelAdvancedPayment();
         $obj_customer_adv_product = new HotelCustomerAdvancedProductPayment();
-        $prod_adv_payment = $obj_customer_adv_product->getProductAdvancePaymentDetails($obj_refund->id_order, $obj_refund->id_product);
+        $prod_adv_payment = $obj_customer_adv_product->getProductAdvancePaymentDetails(
+            $obj_refund->id_order,
+            $obj_refund->id_product
+        );
         if ($prod_adv_payment) {
             $way_of_payment = 'advancePayment';
         }
@@ -400,9 +459,17 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
                 if ($days_before_cancellation >= $v_rules['days']) {
                     if ($way_of_payment == 'advancePayment') {
                         $obj_customer_adv_product = new HotelCustomerAdvancedProductPayment();
-                        $prod_adv_payment = $obj_customer_adv_product->getProductAdvancePaymentDetails($obj_refund->id_order, $obj_refund->id_product);
+                        $prod_adv_payment = $obj_customer_adv_product->getProductAdvancePaymentDetails(
+                            $obj_refund->id_order,
+                            $obj_refund->id_product
+                        );
                         if ($prod_adv_payment) {
-                            $adv_paid_amount = $obj_customer_adv_product->getRoomTypeAdvancePaymentMaountByDuration($obj_refund->id_order, $obj_refund->id_product, $obj_refund->date_from, $obj_refund->date_to);
+                            $adv_paid_amount = $obj_customer_adv_product->getRoomTypeAdvancePaymentMaountByDuration(
+                                $obj_refund->id_order,
+                                $obj_refund->id_product,
+                                $obj_refund->date_from,
+                                $obj_refund->date_to
+                            );
                         } else {
                             $adv_paid_amount = 0;
                         }
@@ -420,12 +487,20 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
 
 
                         if ($default_currency != $order_tran_curr) {
-                            $deduction_amount = Tools::convertPriceFull($deduction_amount, new Currency($default_currency), new Currency($order_tran_curr));
+                            $deduction_amount = Tools::convertPriceFull(
+                                $deduction_amount,
+                                new Currency($default_currency),
+                                new Currency($order_tran_curr)
+                            );
                         }
                     } else {
                         $order_tran_curr = $obj_refund->id_currency;
                         if ($default_currency != $order_tran_curr) {
-                            $deduction_amount = Tools::convertPriceFull($deduct_amount_val, new Currency($default_currency), new Currency($order_tran_curr));
+                            $deduction_amount = Tools::convertPriceFull(
+                                $deduct_amount_val,
+                                new Currency($default_currency),
+                                new Currency($order_tran_curr)
+                            );
                         } else {
                             $deduction_amount = $deduct_amount_val;
                         }
@@ -441,22 +516,6 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
                 }
             }
         }
-        /*if (!$deduction_amount) {
-            if ($way_of_payment == 'advancePayment') {
-                $obj_customer_adv_product = new HotelCustomerAdvancedProductPayment();
-                $prod_adv_payment = $obj_customer_adv_product->getProductAdvancePaymentDetails($obj_refund->id_order, $obj_refund->id_product);
-                if ($prod_adv_payment) {
-                    $deduction_amount = $obj_customer_adv_product->getRoomTypeAdvancePaymentMaountByDuration($obj_refund->id_order, $obj_refund->id_product, date('Y-m-d', strtotime($obj_refund->date_from)), date('Y-m-d', strtotime($obj_refund->date_to)));
-                } else {
-                    $deduction_amount = 0;
-                }
-                if ($default_currency != $order_tran_curr) {
-                    $deduction_amount = Tools::convertPriceFull($deduction_amount, new Currency($default_currency), new Currency($order_tran_curr));
-                }
-            } else {
-                $deduction_amount = $obj_refund->order_amount;
-            }
-        }*/
         return $deduction_amount;
     }
 
@@ -464,7 +523,22 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
     {
         $id_lang = Configuration::get('PS_LANG_DEFAULT');
         $temp_path = _PS_MODULE_DIR_.'hotelreservationsystem/mails/';
-        if (Mail::Send($id_lang, $template_name, Mail::l('Order Cancellation Status', $id_lang), $templateVars, $to, null, null, null,  null, null, $temp_path, false, null, null)) {
+        if (Mail::Send(
+            $id_lang,
+            $template_name,
+            Mail::l('Order Cancellation Status', $id_lang),
+            $templateVars,
+            $to,
+            null,
+            null,
+            null,
+            null,
+            null,
+            $temp_path,
+            false,
+            null,
+            null
+        )) {
             return true;
         } else {
             return false;

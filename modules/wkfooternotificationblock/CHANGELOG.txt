@@ -1,0 +1,15 @@
+-----------------------------
+# V1.0.0 to V1.0.1
+-----------------------------
+
+## Added features
+
++ [CO] : index.php added/Updated in all folders
++ [CO] : License.txt added.
++ [CO] : License added in every file.
++ [CO] : logo.gif file added.
+
+
+## Update Policy
+
+- Mobule need only file update, can be updated only by UPLOADING new version on module

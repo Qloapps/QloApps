@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" >
 <head>
-	<title><?php echo $this->l('PrestaShop Installation Assistant') ?></title>
+	<title><?php echo $this->l('Qloapps Installation Assistant') ?></title>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<meta http-equiv="Cache-Control" content="no-cache, must-revalidate" />
 	<meta http-equiv="Pragma" content="no-cache" />
@@ -35,16 +35,9 @@
 		<li class="lnk_forum"><a href="<?php echo $this->getSupportLink() ?>" target="_blank"><?php echo $this->l('Support') ?></a></li>
 		<li class="lnk_forum"><a href="<?php echo $this->getDocumentationLink() ?>" target="_blank"><?php echo $this->l('Documentation') ?></a></li>
 		<li class="lnk_blog last"><a href="<?php echo $this->getBlogLink() ?>" target="_blank"><?php echo $this->l('Blog') ?></a></li>
-		<!--
-		<?php if ($this->getPhone()): ?>
-			<li id="phone_block" class="last">
-				<div><span><?php echo $this->l('Contact us!') ?></span><br /><?php echo $this->getPhone() ?></div>
-			</li>
-		<?php endif; ?>
-		-->
 	</ul>
 
-	<div id="PrestaShopLogo">PrestaShop</div>
+	<div id="PrestaShopLogo">Qloapps</div>
 </div>
 
 <!-- Ajax loader animation -->
@@ -54,9 +47,9 @@
 
 <!--This comment is necessary!
 
-	Purpose is to make some strings available for translation, 
+	Purpose is to make some strings available for translation,
 	that would not be 'seen' by the translations parser otherwise.
-	
+
 	$this->l('menu_welcome');
 	$this->l('menu_license');
 	$this->l('menu_system');
@@ -81,12 +74,19 @@
 			<?php endif; ?>
 		<?php endforeach; ?>
 	</ol>
-	<?php if (@fsockopen('api.prestashop.com', 80, $errno, $errst, 3)): ?>
-		<iframe scrolling="no" style="height:210px;width:200px;border:none;margin-top:20px" id="iframe_help"
-			src="https://api.prestashop.com/iframe/install.php?step=<?php echo $this->step ?>&lang=<?php echo $this->language->getLanguageIso() ?><?php if (isset($this->session->shop_country)) echo '&country='.$this->session->shop_country; ?>">
-			<p><?php echo $this->l('Contact us!') ?><br /><?php echo $this->getPhone() ?></p>
-		</iframe>
-	<?php endif; ?>
+	<a href="<?php echo $this->getServicesLink() ?>" target="blank" class="wk-service-link">
+		<div class="wk-service-link-block">
+			<p class="wk-service-link-header">
+				<img src="theme/img/icon-support.png" />
+			</p>
+			<p class="wk-service-link-content">
+				<span class="head">Need Help?</span>
+				<p class="wk-service-link-content">
+					Click here to explore Qloapps services
+				</p>
+			</p>
+		</div>
+	</a>
 </div>
 
 <!-- Page content -->
@@ -103,7 +103,7 @@
 	</div>
 	<noscript>
 		<h4 class="errorBlock" style="margin-bottom:10px">
-			<?php echo $this->l('To install PrestaShop, you need to have JavaScript enabled in your browser.') ?>
+			<?php echo $this->l('To install Qloapps, you need to have JavaScript enabled in your browser.') ?>
 			<a href="<?php echo $this->l('http://enable-javascript.com/') ?>" target="_blank">
 				<img src="theme/img/help.png" style="height:16px;width:16px" />
 			</a>

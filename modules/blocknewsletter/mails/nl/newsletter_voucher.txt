@@ -1,11 +1,11 @@
 
-[{shop_url}] 
+[{shop_url}]
 
-Hallo, 
+Hallo,
 
 Naar aanleiding van uw nieuwsbrief inschrijving bieden wij u graag
-de volgende waardebon aan: {discount} 
+de volgende waardebon aan: {discount}
 
 {shop_name} [{shop_url}] gebouwd met
-PrestaShop(tm) [http://www.prestashop.com/] 
+Webkul(tm) [https://webkul.com/]
 

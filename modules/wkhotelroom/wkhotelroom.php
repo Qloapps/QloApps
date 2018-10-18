@@ -1,11 +1,29 @@
 <?php
+/**
+* 2010-2018 Webkul.
+*
+* NOTICE OF LICENSE
+*
+* All right is reserved,
+* Please go through this link for complete license : https://store.webkul.com/license.html
+*
+* DISCLAIMER
+*
+* Do not edit or add to this file if you wish to upgrade this module to newer
+* versions in the future. If you wish to customize this module for your
+* needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
+*
+*  @author    Webkul IN <support@webkul.com>
+*  @copyright 2010-2018 Webkul IN
+*  @license   https://store.webkul.com/license.html
+*/
+
 if (!defined('_PS_VERSION_')) {
     exit;
 }
-
 require_once dirname(__FILE__).'/define.php';
 
-class wkhotelroom extends Module
+class WkHotelRoom extends Module
 {
     const INSTALL_SQL_FILE = 'install.sql';
 
@@ -13,7 +31,7 @@ class wkhotelroom extends Module
     {
         $this->name = 'wkhotelroom';
         $this->tab = 'front_office_features';
-        $this->version = '1.0.2';
+        $this->version = '1.1.1';
         $this->author = 'webkul';
         $this->bootstrap = true;
         parent::__construct();
@@ -25,54 +43,84 @@ class wkhotelroom extends Module
 
     public function hookDisplayHome()
     {
-        $this->registerHook('displayFooterExploreSectionHook');
-        $this->context->controller->addCSS(_PS_MODULE_DIR_.$this->name.'/views/css/WkHotelRoomBlockFront.css');
-        $id_lang = $this->context->language->id;
-        $useTax = HotelBookingDetail::useTax();
-
-        $obj_room_block = new WkHotelRoomDisplay();
-        $hotelRoomDisplay = $obj_room_block->getHotelRoomDisplayData();
-
-        $date_from = date('Y-m-d');
-        $date_to = date('Y-m-d', strtotime($date_from) + 86400);
-        if ($hotelRoomDisplay) {
+        $objRoomBlock = new WkHotelRoomDisplay();
+        if ($hotelRoomDisplay = $objRoomBlock->getHotelRoomDisplayData()) {
+            $idLang = $this->context->language->id;
+            $dateFrom = date('Y-m-d');
+            $dateTo = date('Y-m-d', strtotime($dateFrom) + 86400);
+            $useTax = HotelBookingDetail::useTax();
             foreach ($hotelRoomDisplay as &$htlRoom) {
-                $id_product = $htlRoom['id_product'];
-                $product = new Product($id_product, false, $id_lang);
-                $cover_image_id = Product::getCover($product->id);
-                if ($cover_image_id) {
-                    $prod_img = $this->context->link->getImageLink($product->link_rewrite, $product->id.'-'.$cover_image_id['id_image'], 'large_default');
+                $idProduct = $htlRoom['id_product'];
+                $product = new Product($idProduct, false, $idLang);
+
+                if ($coverImageId = Product::getCover($product->id)) {
+                    $prodImg = $this->context->link->getImageLink(
+                        $product->link_rewrite,
+                        $product->id.'-'.$coverImageId['id_image'],
+                        ImageType::getFormatedName('large')
+                    );
                 } else {
-                    $prod_img = $this->context->link->getImageLink($product->link_rewrite, $this->context->language->iso_code."-default", 'large_default');
+                    $prodImg = $this->context->link->getImageLink(
+                        $product->link_rewrite,
+                        $this->context->language->iso_code."-default",
+                        ImageType::getFormatedName('large')
+                    );
                 }
                 $productPriceWithoutReduction = $product->getPriceWithoutReduct(!$useTax);
-                $product_price = Product::getPriceStatic($id_product, $useTax);
-                $htlRoom['image'] = $prod_img;
+                $product_price = Product::getPriceStatic($idProduct, $useTax);
+                $htlRoom['image'] = $prodImg;
                 $htlRoom['description'] = $product->description_short;
                 $htlRoom['name'] = $product->name;
                 $htlRoom['price'] = $product_price;
                 $htlRoom['price_without_reduction'] = $productPriceWithoutReduction;
-
-                $feature_price = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay($id_product, $date_from, $date_to, $useTax);
-                $htlRoom['feature_price'] = $feature_price;
-                $htlRoom['feature_price_diff'] = (float)($productPriceWithoutReduction - $feature_price);
+                $featurePrice = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay(
+                    $idProduct,
+                    $dateFrom,
+                    $dateTo,
+                    $useTax
+                );
+                $htlRoom['feature_price'] = $featurePrice;
+                $htlRoom['feature_price_diff'] = (float)($productPriceWithoutReduction - $featurePrice);
             }
         }
-        $HOTEL_ROOM_DISPLAY_HEADING = Configuration::get('HOTEL_ROOM_DISPLAY_HEADING');
-        $HOTEL_ROOM_DISPLAY_DESCRIPTION = Configuration::get('HOTEL_ROOM_DISPLAY_DESCRIPTION');
+        $this->context->smarty->assign(
+            array(
+                'HOTEL_ROOM_DISPLAY_HEADING' => Configuration::get(
+                    'HOTEL_ROOM_DISPLAY_HEADING',
+                    $this->context->language->id
+                ),
+                'HOTEL_ROOM_DISPLAY_DESCRIPTION' => Configuration::get(
+                    'HOTEL_ROOM_DISPLAY_DESCRIPTION',
+                    $this->context->language->id
+                ),
+                'hotelRoomDisplay' => $hotelRoomDisplay
+            )
+        );
 
-        $this->context->smarty->assign(array('HOTEL_ROOM_DISPLAY_HEADING' => $HOTEL_ROOM_DISPLAY_HEADING,
-                                             'HOTEL_ROOM_DISPLAY_DESCRIPTION' => $HOTEL_ROOM_DISPLAY_DESCRIPTION,
-                                             'hotelRoomDisplay' => $hotelRoomDisplay,
-                                            ));
+        $this->context->controller->addCSS(_PS_MODULE_DIR_.$this->name.'/views/css/WkHotelRoomBlockFront.css');
 
         return $this->display(__FILE__, 'hotelRoomDisplayBlock.tpl');
     }
 
+    public function hookActionProductSave($params)
+    {
+        if (isset($params['id_product']) && $params['id_product']) {
+            if (Validate::isLoadedObject($objProduct = new Product($params['id_product']))) {
+                if (!$objProduct->active) {
+                    $objRoomBlock = new WkHotelRoomDisplay();
+                    if ($roomBlockInfo = $objRoomBlock->gerRoomByIdProduct($params['id_product'])) {
+                        $objRoomBlock = new WkHotelRoomDisplay($roomBlockInfo['id_room_block']);
+                        $objRoomBlock->active = 0;
+                        $objRoomBlock->save();
+                    }
+                }
+            }
+        }
+    }
 
     public function hookActionProductDelete($params)
     {
-        if ($params['id_product']) {
+        if (isset($params['id_product']) && $params['id_product']) {
             WkHotelRoomDisplay::deleteRoomByIdProduct($params['id_product']);
         }
     }
@@ -81,7 +129,7 @@ class wkhotelroom extends Module
     {
         $htlRoomBlockConfigLink = $this->context->link->getAdminLink('AdminHotelRoomModuleSetting');
         $this->context->smarty->assign('htlRoomBlockConfigLink', $htlRoomBlockConfigLink);
-        
+
         return $this->display(__FILE__, 'hotelRoomSettingLink.tpl');
     }
 
@@ -95,23 +143,19 @@ class wkhotelroom extends Module
         return $this->display(__FILE__, 'hotelRoomFooterExploreLink.tpl');
     }
 
-    public function insertDefaultHotelFeaturesEntries()
+    /**
+     * If admin add any language then an entry will add in defined $lang_tables array's lang table same as prestashop
+     * @param array $params
+     */
+    public function hookActionObjectLanguageAddAfter($params)
     {
-        $HOTEL_ROOM_DISPLAY_HEADING = $this->l('Our Rooms');
-        $HOTEL_ROOM_DISPLAY_DESCRIPTION = $this->l('Families travelling with kids will find Amboseli national park a safari destination matched to no other, with less tourist traffic, breathtaking open space.');
-
-        Configuration::updateValue('HOTEL_ROOM_DISPLAY_HEADING', $HOTEL_ROOM_DISPLAY_HEADING);
-        Configuration::updateValue('HOTEL_ROOM_DISPLAY_DESCRIPTION', $HOTEL_ROOM_DISPLAY_DESCRIPTION);
-
-        $ps_product = Product::getProducts(Configuration::get('PS_LANG_DEFAULT'), 0, 5, 'id_product', 'ASC');
-        foreach ($ps_product as $product) {
-            $obj_room_block = new WkHotelRoomDisplay();
-            $obj_room_block->id_product = $product['id_product'];
-            $obj_room_block->active = 1;
-            $obj_room_block->save();
+        if ($newIdLang = $params['object']->id) {
+            $configKeys = array(
+                'HOTEL_ROOM_DISPLAY_HEADING',
+                'HOTEL_ROOM_DISPLAY_DESCRIPTION',
+            );
+            HotelHelper::updateConfigurationLangKeys($newIdLang, $configKeys);
         }
-
-        return true;
     }
 
     public function callInstallTab()
@@ -121,23 +165,20 @@ class wkhotelroom extends Module
         return true;
     }
 
-    public function installTab($class_name, $tab_name, $tab_parent_name=false)
+    public function installTab($class_name, $tab_name, $tab_parent_name = false)
     {
         $tab = new Tab();
         $tab->active = 1;
         $tab->class_name = $class_name;
         $tab->name = array();
-
         foreach (Language::getLanguages(true) as $lang) {
             $tab->name[$lang['id_lang']] = $tab_name;
         }
-
         if ($tab_parent_name) {
             $tab->id_parent = (int)Tab::getIdFromClassName($tab_parent_name);
         } else {
             $tab->id_parent = -1;
         }
-        
         $tab->module = $this->name;
         $res = $tab->add();
         //Set position of the Hotel reservation System Tab to the position wherewe want...
@@ -162,79 +203,81 @@ class wkhotelroom extends Module
                 }
             }
         }
+
+        // if module should be populated while installation
+        if (isset($this->populateData) && $this->populateData) {
+            if (!WkHotelRoomDisplay::insertModuleDemoData()) {
+                return false;
+            }
+        }
+
         if (!parent::install()
-            || !$this->registerHook('displayHome')
-            || !$this->registerHook('actionProductDelete')
-            || !$this->registerHook('displayAddModuleSettingLink')
-            || !$this->registerHook('displayDefaultNavigationHook')
-            || !$this->registerHook('displayFooterExploreSectionHook')
+            || !$this->registerModuleHooks()
             || !$this->callInstallTab()
-            || !$this->insertDefaultHotelFeaturesEntries()
-            ) {
+        ) {
             return false;
         }
+
         return true;
     }
 
-    public function reset()
+    public function registerModuleHooks()
     {
-        if (!$this->uninstall(false)) {
-            return false;
-        }
-        if (!$this->install(false)) {
-            return false;
-        }
-        return true;
+        return $this->registerHook(
+            array (
+                'displayHome',
+                'actionProductDelete',
+                'displayAddModuleSettingLink',
+                'displayDefaultNavigationHook',
+                'displayFooterExploreSectionHook',
+                'actionProductSave',
+                'actionObjectLanguageAddAfter'
+            )
+        );
     }
 
-    public function uninstall($keep = true)
+    public function uninstall()
     {
         if (!parent::uninstall()
-            || !$this->callUninstallTab()
-            || ($keep && !$this->deleteTables())
-            || ($keep && !$this->deleteConfigKeys())
-            ) {
+            || !$this->uninstallTab()
+            || !$this->deleteTables()
+            || !$this->deleteConfigKeys()
+        ) {
             return false;
         }
-
         return true;
     }
 
     public function deleteTables()
     {
-        return Db::getInstance()->execute('
-            DROP TABLE IF EXISTS
-            `'._DB_PREFIX_.'htl_room_block_data`');
+        return Db::getInstance()->execute(
+            'DROP TABLE IF EXISTS
+            `'._DB_PREFIX_.'htl_room_block_data`'
+        );
     }
 
     public function deleteConfigKeys()
     {
-        $var = array('HOTEL_ROOM_DISPLAY_HEADING',
-                     'HOTEL_ROOM_DISPLAY_DESCRIPTION');
-
-        foreach ($var as $key) {
+        $configVars = array(
+            'HOTEL_ROOM_DISPLAY_HEADING',
+            'HOTEL_ROOM_DISPLAY_DESCRIPTION'
+        );
+        foreach ($configVars as $key) {
             if (!Configuration::deleteByName($key)) {
                 return false;
             }
         }
-        
         return true;
     }
 
-    public function callUninstallTab()
+    public function uninstallTab()
     {
-        $this->uninstallTab('AdminHotelRoomModuleSetting');
-        return true;
-    }
-        
-    public function uninstallTab($class_name)
-    {
-        $id_tab = (int)Tab::getIdFromClassName($class_name);
-        if ($id_tab) {
-            $tab = new Tab($id_tab);
-            return $tab->delete();
-        } else {
-            return false;
+        $moduleTabs = Tab::getCollectionFromModule($this->name);
+        if (!empty($moduleTabs)) {
+            foreach ($moduleTabs as $moduleTab) {
+                $moduleTab->delete();
+            }
         }
+        return true;
     }
 }

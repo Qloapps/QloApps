@@ -111,19 +111,25 @@ class UploaderCore
 
     public function getPostMaxSizeBytes()
     {
-        $post_max_size = ini_get('post_max_size');
-        $bytes         = trim($post_max_size);
-        $last          = strtolower($post_max_size[strlen($post_max_size) - 1]);
+        $postMaxSize = ini_get('post_max_size');
+        $bytes         = (int) trim($postMaxSize);
+        $last          = strtolower($postMaxSize[strlen($postMaxSize) - 1]);
 
         switch ($last) {
-            case 'g': $bytes *= 1024;
-            case 'm': $bytes *= 1024;
-            case 'k': $bytes *= 1024;
+            case 'g':
+                $bytes *= 1024;
+                // no break
+            case 'm':
+                $bytes *= 1024;
+                // no break
+            case 'k':
+                $bytes *= 1024;
         }
 
         if ($bytes == '') {
             $bytes = null;
         }
+
         return $bytes;
     }
 

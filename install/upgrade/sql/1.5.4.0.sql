@@ -48,7 +48,7 @@ ALTER TABLE `PREFIX_address` CHANGE `phone_mobile` `phone_mobile` varchar(32) de
 
 /* PHP:update_genders_images(); */;
 
-UPDATE `PREFIX_customer` SET `id_gender` = 1 WHERE `email` LIKE 'pub@prestashop.com' AND `id_customer` = 1 AND `id_gender` = 4;
+UPDATE `PREFIX_customer` SET `id_gender` = 1 WHERE `email` LIKE 'pub@qloapps.com' AND `id_customer` = 1 AND `id_gender` = 4;
 
 UPDATE `PREFIX_cart_rule_carrier` crc INNER JOIN `PREFIX_carrier` c ON crc.`id_carrier` = c.`id_carrier` SET crc.`id_carrier` = c.`id_reference`;
 

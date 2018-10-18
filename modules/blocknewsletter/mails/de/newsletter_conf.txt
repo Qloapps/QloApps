@@ -1,10 +1,10 @@
 
-[{shop_url}] 
+[{shop_url}]
 
-Hallo, 
+Hallo,
 
-VIELEN DANK FÜR IHRE ANMELDUNG ZU UNSEREM NEWSLETTER. 
+VIELEN DANK FÜR IHRE ANMELDUNG ZU UNSEREM NEWSLETTER.
 
 {shop_name} [{shop_url}] powered by
-PrestaShop(tm) [http://www.prestashop.com/] 
+Webkul(tm) [https://webkul.com/]
 
