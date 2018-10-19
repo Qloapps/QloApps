@@ -1,0 +1,26 @@
+language : php
+addons:
+  chrome: stable
+  apt:
+    packages:
+      - apache2
+      - postfix
+      - libapache2-mod-fastcgi
+      - libappindicator1
+      - fonts-liberation
+sudo: required
+dist: trusty
+
+php:
+  - 5.6
+  - 7.2
+after_script:
+  - sudo cat /var/log/apache2/error.log
+
+after_failure:
+  - curl -L http://localhost/
+  - cat /etc/apache2/envvars
+  - cat /etc/apache2/sites-available/000-default.conf
+  - sudo cat /var/log/php-fpm.log
+  - sudo ls -l /var/log/apache2
+  - sudo cat /var/log/apache2/other_vhosts_access.log
