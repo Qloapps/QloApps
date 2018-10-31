@@ -9,4 +9,4 @@ I dati personali di login del tuo negozio {shop_name}:
 
 
 
-{shop_url} powered by PrestaShop™
+{shop_url} powered by Webkul™

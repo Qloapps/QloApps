@@ -1,10 +1,10 @@
 
-[{shop_url}] 
+[{shop_url}]
 
-Ei, 
+Ei,
 
-GRÀCIES PER SUBSCRIURE-US A LA NOSTRA NEWSLETTER. 
+GRÀCIES PER SUBSCRIURE-US A LA NOSTRA NEWSLETTER.
 
 {shop_name} [{shop_url}] desenvolupat amb
-PrestaShop(tm) [http://www.prestashop.com/] 
+Webkul(tm) [https://webkul.com/]
 

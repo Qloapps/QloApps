@@ -1,3 +1,18 @@
+-------------------------------
+# Change Log V2.2.0 to V2.2.1
+-------------------------------
+
+## Added features:
+
+- [+]CO : Module is now GDPR complient to Qloapps GDPR module.
+
+
+## Update Policy
+
+- Mobule need only file update, can be updated only by UPLOADING new version on module
+
+_____________________________________________________________________________________________________
+
 2014-04-22 18:57:30 +0200	// Changelog updated
 2014-04-18 17:47:09 +0200	// Add search form
 2014-04-18 15:54:32 +0200	[*] Merged PR #3 from @marcinsz101

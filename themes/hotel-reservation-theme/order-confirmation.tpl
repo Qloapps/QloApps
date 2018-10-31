@@ -70,6 +70,7 @@
 						<tr>
 							<th class="cart_product">{l s='Room Image'}</th>
 							<th class="cart_description">{l s='Room Description'}</th>
+							<th>{l s='Hotel Name'}</th>
 							<th class="cart_unit">{l s='Unit Price'}</th>
 							<th>{l s='Rooms'}</th>
 							<th>{l s='Check-in Date'}</th>
@@ -77,7 +78,7 @@
 							<th class="cart_total">{l s='Total'}</th>
 							{*{if isset($orders_has_invoice) && $orders_has_invoice}
 								<th>{l s='Request Refund'}</th>
-							{/if}*}	
+							{/if}*}
 							<th>{l s='BackOrder Status'}</th>
 						</tr>
 					</thead>
@@ -98,9 +99,10 @@
 												</a>
 											</p>
 										</td>
+										<td>{$data_v['hotel_name']}</td>
 										<td class="cart_unit">
 											<p class="text-center">
-											
+
 												{if $group_use_tax}
 													<p class="text-center">
 														<span class="product_original_price {if $rm_v.feature_price_diff>0}room_type_old_price{/if}" {if $rm_v.feature_price_diff < 0} style="display:none;"{/if}>
@@ -156,7 +158,7 @@
 													<button data-amount="{$rm_v['amount_tax_incl']}" data-id_order="{$order->id}" data-id_currency="{$order->id_currency}" data-id_customer="{$order->id_customer}" data-id_product="{$data_v['id_product']}" data-num_rooms="{$rm_v['num_rm']}" data-date_from="{$rm_v['data_form']|date_format:"%G-%m-%d"}" type="button" data-date_to="{$rm_v['data_to']|date_format:"%G-%m-%d"}"  name="roomRequestForRefund" class="order_cancel_request_button_{$data_v['id_product']}_{$rm_v['data_form']|date_format:"%G-%m-%d"}_{$rm_v['data_to']|date_format:"%G-%m-%d"} btn btn-default button button-small roomRequestForRefund" href="#htlRefundReasonForm"><span>{l s='Request Refund'}</span></button>
 												{/if}
 											</td>*}
-										{/if}	
+										{/if}
 										<td class="text-center">
 											{if isset($rm_v['is_backorder']) && $rm_v['is_backorder']}
 												{l s='On Backorder'}
@@ -172,7 +174,7 @@
 					<tfoot>
 						{if $priceDisplay && $use_tax}
 							<tr class="item">
-								<td colspan={if isset($orders_has_invoice) && $orders_has_invoice}"7"{else}"6"{/if}></td>
+								<td colspan={if isset($orders_has_invoice) && $orders_has_invoice}"8"{else}"7"{/if}></td>
 								<td colspan="{if $return_allowed}2{else}1{/if}">
 									<strong>{l s='Items (tax excl.)'}</strong>
 								</td>
@@ -182,7 +184,7 @@
 							</tr>
 						{/if}
 						<tr class="item">
-							<td colspan={if isset($orders_has_invoice) && $orders_has_invoice}"7"{else}"6"{/if}></td>
+							<td colspan={if isset($orders_has_invoice) && $orders_has_invoice}"8"{else}"7"{/if}></td>
 							<td colspan="{if $return_allowed}2{else}1{/if}">
 								<strong>{l s='Items'} {if $use_tax}{l s='(tax incl.)'}{/if} </strong>
 							</td>
@@ -203,7 +205,7 @@
 						{/if}
 						{if $order->total_wrapping > 0}
 						<tr class="item">
-							<td colspan={if isset($orders_has_invoice) && $orders_has_invoice}"7"{else}"6"{/if}></td>
+							<td colspan={if isset($orders_has_invoice) && $orders_has_invoice}"8"{else}"7"{/if}></td>
 							<td colspan="{if $return_allowed}2{else}1{/if}">
 								<strong>{l s='Total gift wrapping cost'}</strong>
 							</td>
@@ -213,7 +215,7 @@
 						</tr>
 						{/if}
 						<tr class="totalprice item">
-							<td colspan={if isset($orders_has_invoice) && $orders_has_invoice}"7"{else}"6"{/if}></td>
+							<td colspan={if isset($orders_has_invoice) && $orders_has_invoice}"8"{else}"7"{/if}></td>
 							<td colspan="{if $return_allowed}2{else}1{/if}">
 								<strong>{l s='Total'}</strong>
 							</td>
@@ -223,7 +225,7 @@
 						</tr>
 						{if isset($order_adv_dtl)}
 							<tr class="item">
-								<td colspan={if isset($orders_has_invoice) && $orders_has_invoice}"7"{else}"6"{/if}></td>
+								<td colspan={if isset($orders_has_invoice) && $orders_has_invoice}"8"{else}"7"{/if}></td>
 								<td colspan="{if $return_allowed}2{else}1{/if}">
 									<strong>{l s='Total Paid'}</strong>
 								</td>
@@ -232,7 +234,7 @@
 								</td>
 							</tr>
 							<tr class="item">
-								<td colspan={if isset($orders_has_invoice) && $orders_has_invoice}"7"{else}"6"{/if}></td>
+								<td colspan={if isset($orders_has_invoice) && $orders_has_invoice}"8"{else}"7"{/if}></td>
 								<td colspan="{if $return_allowed}2{else}1{/if}">
 									<strong>{l s='Total Due'}</strong>
 								</td>

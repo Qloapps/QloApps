@@ -1,4 +1,89 @@
 ####################################
+# V1.3.1
+####################################
+
+## Added Features:
+
+[+] BO : All already compatible Stats module are installed to the qloapps now.
+
+
+## Improved/changed features:
+
+[+] BO : Hotel name is shown in the Room Type Booking list and Room Type booking status tables.
+[+] FO : Hotel name is shown in the Customer shopping list, Order confirmation and order details booking lists.
+
+
+## Bug/Issues Resolved:
+
+[-] CO : Resolved :: When set up the new install, the upload_max_filesize value in the php.ini file less than 16M, but the error message is displaying for memory_limit.
+
+
+####################################
+# V1.3.0
+####################################
+
+## Added Features:
+
+[+] CO : Qloapps is compatible with php 7.x.x .
+
+
+## Improved/changed features:
+
+[+] CO : "create demo data or not" option improved for Qloapps demo data .
+[+] CO : System compatibility check for Qloapps installation improved .
+
+
+
+####################################
+# V1.2.0
+####################################
+
+## Added Features:
+
+[+] CO : Qloapps is now GDPR compatible (changes are made in Qloapps according to Qloapps GDPR module).
+[+] CO : wkfooterpaymentblock :: Created a controller where admin will be able to create payment Blocks.
+[+] CO : wkfooterpaymentblock :: Admin will be able to enter Name , image and status of the payment block.
+[+] CO : wkfooterpaymentblock :: Admin will be able to position the payment blocks and payment image blocks will be shown to the customer as per their positions.
+[+] CO : Qloapps version compliancy code added for modules' installation
+
+[+] FO : On contact us page, design is changed.
+[+] FO : On contact us page contact header, contact content, global address are now dynamic. Enter values from AdminGeneralSettingsController.
+
+[+] BO : Configuration to show/hide only one active hotel is added in location search panel in Hotel General Settings.
+
+
+## Improved/changed features:
+
+[+] CO : Missing multilang fields added where needed in Qloapps.
+[+] CO : Tax name will be shown in the invoices now. (For GST purposes) - (enable tax breakdown is mandatory)
+[+] CO : logo.gif needed in the modules (module author:webkul)
+[+] CO : Removed prestashop from all the pages and emails of Qloapps.
+[+] CO : Changed all links of Qloapps according to the qloapps.com.
+[+] CO : Stopped sending info to prestashop while installation.
+
+[+] BO : Seperate configuration panel is made for location search panel in Hotel General Settings.
+
+
+## Bug/Issues Resolved:
+
+[-] CO : Resolved :: Theme compilation issue on ajax while Qloapps installation
+[-] CO : Resolved :: Notice on Calls to functions Product::getProducts() in wkhoteleoom and Product::getSimpleProducts() in HotelHelper.php while installation of Qloapps.[Trying to get property of non-object]
+
+[-] CO : Resolved :: hotelreservationsystem - Parent:: replaced with parent:: in classes/hotelHotelBranchInformation.php which was creating problems in installation.
+
+[-] CO : Resolved :: RecursiveDirectoryIterator::__construct(/var/www/html/themes/hotel-theme/): failed to open dir While installation.
+
+[-] BO : Resolved :: hotelreservationsystem:: Hotel images not saved while saving hotel details.
+[-] BO : Resolved :: hotelreservationsystem - $max_phone_digit is undefined issue resolved on hotel creation form.
+[-] BO : Resolved :: hotelreservationsystem:: HotelBookingDetail.php : phone number sent as string '0987654321'from 0987654321. Giving error while installing Qloapps with php7.0.0 .
+
+[-] BO : Resolved :: wktestimonialblock:: Error while saving or updating testimonials by admin.
+[-] BO : Resolved :: array_column is removed from AdminProductController [php version compatibility issue].
+
+[-] FO : Resolved :: Undefined index: total_rooms_in_cart at blockcart.tpl.
+
+
+####################################
 # V1.1.1
 ####################################
 
@@ -47,40 +132,40 @@
 [*] MO : hotelreservationsystem->HotelRoomTypeFeaturePricing.php :deleteFeaturePriceByIdProduct(),  getFeaturePriceInfo() are added.
 [*] MO : hotelreservationsystem->HotelBookingDetails.php : getBookingData() ..... $room_type = 0 (default value of room_type added)
 
-[+] MO : hotelreservationsystem::AdminAddHotelController.php - addCategory() is moved at HotelBranchInformation.php and image save changes.
-[+] MO : hotelreservationsystem::AdminProductsController.php - ajaxProcessDeleteHotelRoom() changed.
-[+] MO : hotelreservationsystem::AdminHotelRoomsBookingController.php - renderView() changes for booking data is null.
-[+] MO : hotelreservationsystem::AdminHotelFeaturePricesSettings.php - Below code is removed because impact price can be greater then 100% : if ($priceImpactType == 1) {
+[+] CO : hotelreservationsystem::AdminAddHotelController.php - addCategory() is moved at HotelBranchInformation.php and image save changes.
+[+] CO : hotelreservationsystem::AdminProductsController.php - ajaxProcessDeleteHotelRoom() changed.
+[+] CO : hotelreservationsystem::AdminHotelRoomsBookingController.php - renderView() changes for booking data is null.
+[+] CO : hotelreservationsystem::AdminHotelFeaturePricesSettings.php - Below code is removed because impact price can be greater then 100% : if ($priceImpactType == 1) {
     if ($impactValue > 100) {
         $this->errors[] = $this->l('Invalid value of impact percentage.');
     }
 }
 
-[+] MO : wkroomsearchblock::autocompletesearch.php - changes for the hotel search panel(id_hotel sent in the ajax request).
+[+] CO : wkroomsearchblock::autocompletesearch.php - changes for the hotel search panel(id_hotel sent in the ajax request).
 
-[+] MO : bankwire::bankwire.php - hookPaymentReturn() changed (seller wise order split).
-[+] MO : cheque::cheque.php - hookPaymentReturn() changed (seller wise order split).
+[+] CO : bankwire::bankwire.php - hookPaymentReturn() changed (seller wise order split).
+[+] CO : cheque::cheque.php - hookPaymentReturn() changed (seller wise order split).
 
-[+] MO : hotelreservationsystem - double codes remove in form.tpl(modules/hotelreservationsystem/views/templates/ admin/ hotel_feature_prices_settings/helpers/form/form.tpl)
-[+] MO : hotelreservationsystem::AdminHotelRoomsBookingController: form.tpl - renderView() changes for booking data is null.
-[+] MO : hotelreservationsystem::from.tpl :: AdminAddHotelController.php - Changes for tabs (hotel information and images tabs)
-[+] MO : hotelreservationsystem::roomSearchWrapper.tpl - changes for the hotel  search panel (id_hotel sent in the ajax request)
-[+] MO : htlfiltersearchblock::htlfiltersearchblock.tpl - changes for the hotel  search panel (id_hotel sent in the ajax request)
-
-
-[+] MO : hotelreservationsystem::HotelReservationAdmin.css - css added For images save and delete
+[+] CO : hotelreservationsystem - double codes remove in form.tpl(modules/hotelreservationsystem/views/templates/ admin/ hotel_feature_prices_settings/helpers/form/form.tpl)
+[+] CO : hotelreservationsystem::AdminHotelRoomsBookingController: form.tpl - renderView() changes for booking data is null.
+[+] CO : hotelreservationsystem::from.tpl :: AdminAddHotelController.php - Changes for tabs (hotel information and images tabs)
+[+] CO : hotelreservationsystem::roomSearchWrapper.tpl - changes for the hotel  search panel (id_hotel sent in the ajax request)
+[+] CO : htlfiltersearchblock::htlfiltersearchblock.tpl - changes for the hotel  search panel (id_hotel sent in the ajax request)
 
 
-[+] MO : hotelreservationsystem::HotelReservationAdmin.js - js added For images save and delete changes
-[+] MO : hotelreservationsystem::HotelReservationAdmin.js - For booking Calendar and datepicker changes when booking data is null
-[+] MO : hotelreservationsystem::roomSearchBlock.js - changes for the hotel  search panel (id_hotel sent in the ajax request)
+[+] CO : hotelreservationsystem::HotelReservationAdmin.css - css added For images save and delete
+
+
+[+] CO : hotelreservationsystem::HotelReservationAdmin.js - js added For images save and delete changes
+[+] CO : hotelreservationsystem::HotelReservationAdmin.js - For booking Calendar and datepicker changes when booking data is null
+[+] CO : hotelreservationsystem::roomSearchBlock.js - changes for the hotel  search panel (id_hotel sent in the ajax request)
 
 
 ## Bug/Issues Resolved:
 
 [-] BO : Resolved :: submitHandler: function(form) removed at line 257 (admin/themes/default/template/controllers/product/form/form.tpl) o resolve Room Type not always saved while saving fron the backoffice.
 
-[+] MO : wkhotelroom::WkHotelRoomDisplay.php - deleteRoomByIdProduct() function is turned to static becuase at the time of product delete this function is throwing error.
+[+] CO : wkhotelroom::WkHotelRoomDisplay.php - deleteRoomByIdProduct() function is turned to static becuase at the time of product delete this function is throwing error.
 
 
 ####################################
@@ -102,24 +187,24 @@
 
 [+] FO : OrderConfirmationController, OrderOpcController, OrderDetailsController and ProductControler are modified for feature price functionality. display files of the controllers also modified.
 
-[+] MO : hotelreservationsystem : ChannelManagerServices.php is added.
-[+] MO : hotelreservationsystem : ChannelOrderPayment.php is added.
-[+] MO : hotelreservationsystem : HotelCustomerAdvancedProductPayment.php is added.
-[+] MO : hotelreservationsystem : HotelRoomDisableDates.php is added.
-[+] MO : hotelreservationsystem : QloWebservice.php is added.
-[+] MO : hotelreservationsystem : WebserviceSpecificManagementQlo.php is added.
+[+] CO : hotelreservationsystem : ChannelManagerServices.php is added.
+[+] CO : hotelreservationsystem : ChannelOrderPayment.php is added.
+[+] CO : hotelreservationsystem : HotelCustomerAdvancedProductPayment.php is added.
+[+] CO : hotelreservationsystem : HotelRoomDisableDates.php is added.
+[+] CO : hotelreservationsystem : QloWebservice.php is added.
+[+] CO : hotelreservationsystem : WebserviceSpecificManagementQlo.php is added.
 
-[+] MO : hotelreservationsystem : ChannelManagerServices.php is added.
-[+] MO : hotelreservationsystem : HotelRoomTypeFeaturePricing.php is added.
-[+] MO : hotelreservationsystem : ChannelOrderPayment.php is added.
-[+] MO : hotelreservationsystem : getRoomMinAdvPaymentAmount() is added in HotelAdvancedPayment.php.
-[+] MO : hotelreservationsystem : createQloAppsBookingByChannels(), createQloCustomerChannelCustomerInfo(), 									createQloCustomerAddressByChannelCustomerInfo(), createQloCartForBookingFromChannel(), ProcessCreateQloOrderForChannelBooking() 		are added for Qloapps Api need  in HotelBookingDetails.php.
-[+] MO : hotelreservationsystem : 'total_price_tax_excl' and 'total_price_tax_incl' columns are added in `htl_booking_detail` table to 										store the booking time price.
-[+] MO : hotelreservationsystem : getProductFeaturePricePlanByDateByPriority(), getHotelCartBookingData() are added in 													HotelCartBookingData.php.
-[+] MO : hotelreservationsystem : 'disabled_dates' column is added in the table `htl_room_information`.
-[+] MO : hotelreservationsystem : getRoomTypeAvailableRoomsForDateRange(), getRoomTypeDisabledRoomsForDateRange(), 														getRoomTypeBookedRoomsForDateRange() are added in HotelRoomInformation.php.
-[+] MO : hotelreservationsystem : room status 'Hold For Maintenance is replace with 'Temporary incative';
-[+] MO : hotelreservationsystem : AdminHotelRoomsBookingController.php and AdminOrderRefundRequestsController.php are changed to make 										compatible with feature price functionality.
+[+] CO : hotelreservationsystem : ChannelManagerServices.php is added.
+[+] CO : hotelreservationsystem : HotelRoomTypeFeaturePricing.php is added.
+[+] CO : hotelreservationsystem : ChannelOrderPayment.php is added.
+[+] CO : hotelreservationsystem : getRoomMinAdvPaymentAmount() is added in HotelAdvancedPayment.php.
+[+] CO : hotelreservationsystem : createQloAppsBookingByChannels(), createQloCustomerChannelCustomerInfo(), 									createQloCustomerAddressByChannelCustomerInfo(), createQloCartForBookingFromChannel(), ProcessCreateQloOrderForChannelBooking() 		are added for Qloapps Api need  in HotelBookingDetails.php.
+[+] CO : hotelreservationsystem : 'total_price_tax_excl' and 'total_price_tax_incl' columns are added in `htl_booking_detail` table to 										store the booking time price.
+[+] CO : hotelreservationsystem : getProductFeaturePricePlanByDateByPriority(), getHotelCartBookingData() are added in 													HotelCartBookingData.php.
+[+] CO : hotelreservationsystem : 'disabled_dates' column is added in the table `htl_room_information`.
+[+] CO : hotelreservationsystem : getRoomTypeAvailableRoomsForDateRange(), getRoomTypeDisabledRoomsForDateRange(), 														getRoomTypeBookedRoomsForDateRange() are added in HotelRoomInformation.php.
+[+] CO : hotelreservationsystem : room status 'Hold For Maintenance is replace with 'Temporary incative';
+[+] CO : hotelreservationsystem : AdminHotelRoomsBookingController.php and AdminOrderRefundRequestsController.php are changed to make 										compatible with feature price functionality.
 
 ## Improved/changed features:
 
@@ -180,14 +265,14 @@
 [+] BO : Order Restrict functionality is added.
 [+] BO : Order Edit id added.
 
-[+] MO : wkpaypaladaptive : Added Feature Admin can refund full transaction.
-[+] MO : wkpaypaladaptive : Order is created by IPN.
-[+] MO : Added wkhotelroom
-[+] MO : Added wkfooteraboutblock
-[+] MO : Added wkfooterexploreblock
-[+] MO : Added wkfooternotificationblock
-[+] MO : Added wkfooterpaymentblock
-[+] MO : hotelreservationsystem : Added Settings tab to centralize all configurations.
+[+] CO : wkpaypaladaptive : Added Feature Admin can refund full transaction.
+[+] CO : wkpaypaladaptive : Order is created by IPN.
+[+] CO : Added wkhotelroom
+[+] CO : Added wkfooteraboutblock
+[+] CO : Added wkfooterexploreblock
+[+] CO : Added wkfooternotificationblock
+[+] CO : Added wkfooterpaymentblock
+[+] CO : hotelreservationsystem : Added Settings tab to centralize all configurations.
 
 
 ## Improved/changed features:

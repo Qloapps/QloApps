@@ -87,9 +87,14 @@ class ConfigurationTestCore
                 'config_dir' => 'config',
                 'files' => false,
                 'mails_dir' => 'mails',
+                'curl' => false,
+                'soap' => false,
+                'simplexml' => false,
+                'memory_limit' => false,
+                'upload_max_filesize' => false,
+                'max_execution_time' => false,
             ));
         }
-
         return $tests;
     }
 
@@ -139,7 +144,7 @@ class ConfigurationTestCore
 
     public static function test_phpversion()
     {
-        return version_compare(substr(phpversion(), 0, 5), '5.2.0', '>=');
+        return version_compare(substr(phpversion(), 0, 5), '5.4.0', '>=');
     }
 
     public static function test_new_phpversion()
@@ -157,6 +162,21 @@ class ConfigurationTestCore
         return extension_loaded('pdo_mysql');
     }
 
+    public static function test_curl()
+    {
+        return extension_loaded('curl');
+    }
+
+    public static function test_soap()
+    {
+        return extension_loaded('soap');
+    }
+
+    public static function test_simplexml()
+    {
+        return extension_loaded('simplexml');
+    }
+
     public static function test_magicquotes()
     {
         return !get_magic_quotes_gpc();
@@ -165,6 +185,33 @@ class ConfigurationTestCore
     public static function test_upload()
     {
         return ini_get('file_uploads');
+    }
+
+    public static function test_upload_max_filesize()
+    {
+        $upload_max_filesize = preg_replace('/[^0-9\.-]/', '', ini_get('upload_max_filesize'));
+        if ($upload_max_filesize >= 16) {
+            return true;
+        }
+        return false;
+    }
+
+    public static function test_max_execution_time()
+    {
+        $max_execution_time = preg_replace('/[^0-9\.-]/', '', ini_get('max_execution_time'));
+        if ($max_execution_time == 0 || $max_execution_time >= 500) {
+            return true;
+        }
+        return false;
+    }
+
+    public static function test_memory_limit()
+    {
+        $memoryLimit = preg_replace('/[^0-9\.-]/', '', ini_get('memory_limit'));
+        if ($memoryLimit == -1 || $memoryLimit >= 128) {
+            return true;
+        }
+        return false;
     }
 
     public static function test_fopen()

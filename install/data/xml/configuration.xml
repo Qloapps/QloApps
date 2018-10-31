@@ -627,7 +627,7 @@
 		<value>1</value>
 	</configuration>
 	<configuration id="BLOCKADVERT_LINK" name="BLOCKADVERT_LINK">
-		<value>http://www.prestashop.com</value>
+		<value>http://www.qloapps.com</value>
 	</configuration>
 	<configuration id="BLOCKSTORE_IMG" name="BLOCKSTORE_IMG">
 		<value>store.jpg</value>
@@ -642,13 +642,10 @@
 		<value/>
 	</configuration>
 	<configuration id="blocksocial_facebook" name="BLOCKSOCIAL_FACEBOOK">
-		<value>http://www.facebook.com/prestashop</value>
+		<value>http://www.facebook.com/qloapps</value>
 	</configuration>
 	<configuration id="blocksocial_twitter" name="BLOCKSOCIAL_TWITTER">
-		<value>http://www.twitter.com/prestashop</value>
-	</configuration>
-	<configuration id="blocksocial_rss" name="BLOCKSOCIAL_RSS">
-		<value>http://www.prestashop.com/blog/en/feed/</value>
+		<value>http://www.twitter.com/qloapps</value>
 	</configuration>
 	<configuration id="blockcontactinfos_company" name="BLOCKCONTACTINFOS_COMPANY">
 		<value>Your company</value>
@@ -662,13 +659,13 @@ Country</value>
 		<value>0123-456-789</value>
 	</configuration>
 	<configuration id="blockcontactinfos_email" name="BLOCKCONTACTINFOS_EMAIL">
-		<value>pub@prestashop.com</value>
+		<value>pub@qloapps.com</value>
 	</configuration>
 	<configuration id="blockcontact_telnumber" name="BLOCKCONTACT_TELNUMBER">
 		<value>0123-456-789</value>
 	</configuration>
 	<configuration id="blockcontact_email" name="BLOCKCONTACT_EMAIL">
-		<value>pub@prestashop.com</value>
+		<value>pub@qloapps.com</value>
 	</configuration>
 	<configuration id="SUPPLIER_DISPLAY_TEXT" name="SUPPLIER_DISPLAY_TEXT">
 		<value>1</value>
@@ -716,7 +713,7 @@ Country</value>
 		<value>PrestaShop</value>
 	</configuration>
 	<configuration id="PS_SHOP_EMAIL" name="PS_SHOP_EMAIL">
-		<value>pub@prestashop.com</value>
+		<value>pub@qloapps.com</value>
 	</configuration>
 	<configuration id="PS_MAIL_METHOD" name="PS_MAIL_METHOD">
 		<value>1</value>

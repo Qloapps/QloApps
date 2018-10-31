@@ -335,7 +335,7 @@ $(document).ready(function () {
 						</div>
 					</div>
 				</div>
-				
+
 				<div class="row" id="type_amount">
 					<label class="control-label col-sm-2">{l s='Amount'}</label>
 					<div class="col-sm-4 col-lg-3">
@@ -400,7 +400,7 @@ $(document).ready(function () {
 					{foreach $productFeaturePrices as $featurePlan}
 						<tr>
 							<td>
-								{$featurePlan['id']}
+								{$featurePlan['id_feature_price']}
 							</td>
 							<td>
 								{$featurePlan['feature_price_name']}
@@ -637,19 +637,19 @@ $(document).ready(function () {
 			$(".adv_payment_active").on('change',function()
 			{
 				var adv_payment = $(".adv_payment_active:checked").val();
-				if (adv_payment == 1) 
+				if (adv_payment == 1)
 					$(".adv_payment_field").show();
-				else if (adv_payment == 0) 
+				else if (adv_payment == 0)
 					$(".adv_payment_field").hide();
 			});
 
 			var payment_type = $(".payment_type:checked").val();
-			if (payment_type == 1) 
+			if (payment_type == 1)
 			{
 				$("#type_percent").show();
 				$("#type_amount").hide();
 			}
-			else if (payment_type == 2) 
+			else if (payment_type == 2)
 			{
 				$("#type_percent").hide();
 				$("#type_amount").show();
@@ -658,12 +658,12 @@ $(document).ready(function () {
 			$(".payment_type").on('change',function()
 			{
 				var payment_type = $(".payment_type:checked").val();
-				if (payment_type == 1) 
+				if (payment_type == 1)
 				{
 					$("#type_percent").show();
 					$("#type_amount").hide();
 				}
-				else if (payment_type == 2) 
+				else if (payment_type == 2)
 				{
 					$("#type_percent").hide();
 					$("#type_amount").show();

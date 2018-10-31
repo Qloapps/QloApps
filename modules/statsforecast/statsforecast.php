@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2014 PrestaShop
+* 2007-2016 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2014 PrestaShop SA
+*  @copyright  2007-2016 PrestaShop SA
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -43,7 +43,7 @@ class StatsForecast extends Module
 	{
 		$this->name = 'statsforecast';
 		$this->tab = 'analytics_stats';
-		$this->version = '1.3.5';
+		$this->version = '1.4.1';
 		$this->author = 'PrestaShop';
 		$this->need_instance = 0;
 
@@ -51,7 +51,7 @@ class StatsForecast extends Module
 
 		$this->displayName = $this->l('Stats Dashboard');
 		$this->description = $this->l('This is the main module for the Stats dashboard. It displays a summary of all your current statistics.');
-		$this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
+		$this->ps_versions_compliancy = array('min' => '1.6', 'max' => '1.7.0.99');
 	}
 
 	public function install()

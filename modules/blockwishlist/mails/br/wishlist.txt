@@ -1,13 +1,13 @@
 
-[{shop_url}] 
+[{shop_url}]
 
-Olá, 
+Olá,
 
 {firstname} {lastname} indicou que você deve querer visualizar a sua
 lista de presentes: {wishlist}
 
-{wishlist} [{message}] 		 
+{wishlist} [{message}]
 
 {shop_name} [{shop_url}] baseado em
-PrestaShop(tm) [http://www.prestashop.com/] 
+Webkul(tm) [https://webkul.com/]
 

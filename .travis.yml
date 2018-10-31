@@ -1,0 +1,36 @@
+language : php
+addons:
+  chrome: stable
+  apt:
+    packages:
+      - apache2
+      - postfix
+      - libapache2-mod-fastcgi
+      - libappindicator1
+      - fonts-liberation
+sudo: required
+dist: trusty
+
+php:
+  - 5.6
+  - 7.2
+
+before_script:
+  - sudo cp -f tests/travis-ci-apache-vhost /etc/apache2/sites-available/default
+  - sudo cp -Rf . /var/www/qloapps.unit.test
+  - sudo chmod 777 -R /var/www/
+  - sudo service apache2 restart
+
+script:
+  - cd /var/www/qloapps.unit.test/tests && bash getcomposer.sh && php composer.phar install && php vendor/bin/phpunit -c .
+
+after_script:
+  - sudo cat /var/log/apache2/error.log
+
+after_failure:
+  - curl -L http://localhost/
+  - cat /etc/apache2/envvars
+  - cat /etc/apache2/sites-available/000-default.conf
+  - sudo cat /var/log/php-fpm.log
+  - sudo ls -l /var/log/apache2
+  - sudo cat /var/log/apache2/other_vhosts_access.log

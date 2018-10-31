@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2014 PrestaShop
+* 2007-2016 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,66 +19,99 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2014 PrestaShop SA
+*  @copyright  2007-2016 PrestaShop SA
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
 
-if (!defined('_PS_VERSION_'))
-	exit;
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
 
 class StatsData extends Module
 {
-	public function __construct()
-	{
-		$this->name = 'statsdata';
-		$this->tab = 'analytics_stats';
-		$this->version = '1.4.1';
-		$this->author = 'PrestaShop';
-		$this->need_instance = 0;
+    public function __construct()
+    {
+        $this->name = 'statsdata';
+        $this->tab = 'analytics_stats';
+        $this->version = '1.6.2';
+        $this->author = 'PrestaShop';
+        $this->need_instance = 0;
 
-		$this->bootstrap = true;
-		parent::__construct();
+        $this->bootstrap = true;
+        parent::__construct();
 
-		$this->displayName = $this->l('Data mining for statistics');
-		$this->description = $this->l('This module must be enabled if you want to use statistics.');
-		$this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
-	}
+        $this->displayName = $this->l('Data mining for statistics');
+        $this->description = $this->l('This module must be enabled if you want to use statistics.');
+        $this->ps_versions_compliancy = array('min' => '1.6', 'max' => '1.7.0.99');
+    }
 
-	public function install()
-	{
-		return (parent::install() && $this->registerHook('footer') && $this->registerHook('authentication') && $this->registerHook('createAccount'));
-	}
+    public function install()
+    {
+        if (_PS_VERSION_ >= 1.7) {
+            $hookFooter = 'displayBeforeBodyClosingTag';
+        } else {
+            $hookFooter = 'footer';
+        }
+        return (parent::install()
+            && $this->registerHook($hookFooter)
+            && $this->registerHook('authentication')
+            && $this->registerHook('createAccount'));
+    }
 
-	public function getContent()
-	{
-		$html = '';
-		if (Tools::isSubmit('submitStatsData'))
-		{
-			Configuration::updateValue('PS_STATSDATA_CUSTOMER_PAGESVIEWS', (int)Tools::getValue('PS_STATSDATA_CUSTOMER_PAGESVIEWS'));
-			Configuration::updateValue('PS_STATSDATA_PAGESVIEWS', (int)Tools::getValue('PS_STATSDATA_PAGESVIEWS'));
-			Configuration::updateValue('PS_STATSDATA_PLUGINS', (int)Tools::getValue('PS_STATSDATA_PLUGINS'));
-			$html .= $this->displayConfirmation($this->l('Configuration updated'));
-		}
+    public function getContent()
+    {
+        $html = '';
+        if (Tools::isSubmit('submitStatsData')) {
+            Configuration::updateValue('PS_STATSDATA_CUSTOMER_PAGESVIEWS', (int)Tools::getValue('PS_STATSDATA_CUSTOMER_PAGESVIEWS'));
+            Configuration::updateValue('PS_STATSDATA_PAGESVIEWS', (int)Tools::getValue('PS_STATSDATA_PAGESVIEWS'));
+            Configuration::updateValue('PS_STATSDATA_PLUGINS', (int)Tools::getValue('PS_STATSDATA_PLUGINS'));
+            $html .= $this->displayConfirmation($this->l('Configuration updated'));
+        }
 
-		$html .= $this->renderForm();
+        $html .= $this->renderForm();
 
-		return $html;
-	}
+        return $html;
+    }
 
-	public function hookFooter($params)
-	{
-		$html = '';
-		if (!isset($params['cookie']->id_guest))
-		{
-			Guest::setNewGuest($params['cookie']);
+    public function hookFooter($params)
+    {
+        if (_PS_VERSION_ < 1.7) {
+            $script_content_plugins = $this->getScriptPlugins($params);
+            $script_content_pages_views = $this->getScriptCustomerPagesViews($params);
 
-			if (Configuration::get('PS_STATSDATA_PLUGINS'))
-			{
-				$this->context->controller->addJS($this->_path.'js/plugindetect.js');
-				$token = sha1($params['cookie']->id_guest._COOKIE_KEY_);
-				$html .= '
-				<script type="text/javascript">
+            return $script_content_plugins . $script_content_pages_views;
+        }
+
+        return false;
+    }
+
+    public function hookDisplayBeforeBodyClosingTag($params)
+    {
+        if (_PS_VERSION_ >= 1.7) {
+            $script_content_plugins = $this->getScriptPlugins($params);
+            $script_content_pages_views = $this->getScriptCustomerPagesViews($params);
+
+            return $script_content_plugins . $script_content_pages_views;
+        }
+
+        return false;
+    }
+
+    private function getScriptPlugins($params)
+    {
+        if (!isset($params['cookie']->id_guest)) {
+            Guest::setNewGuest($params['cookie']);
+
+            if (Configuration::get('PS_STATSDATA_PLUGINS')) {
+                if (_PS_VERSION_ >= 1.7) {
+                    $this->context->controller->registerJavascript('modules-plugindetect', 'modules/'.$this->name.'/js/plugindetect.js', array('position' => 'bottom', 'priority' => 150));
+                } else {
+                    $this->context->controller->addJS($this->_path.'js/plugindetect.js');
+                }
+
+                $token = sha1($params['cookie']->id_guest._COOKIE_KEY_);
+                return '<script type="text/javascript">
 					$(document).ready(function() {
 						plugins = new Object;
 						plugins.adobe_director = (PluginDetect.getVersion("Shockwave") != null) ? 1 : 0;
@@ -97,21 +130,25 @@ class StatsData extends Module
 						$.post("'.Context::getContext()->link->getPageLink('statistics', (bool)(Tools::getShopProtocol() == 'https://')).'", navinfo);
 					});
 				</script>';
-			}
-		}
+            }
+        }
 
-		// Record the guest path then increment the visit counter of the page
-		$token_array = Connection::setPageConnection($params['cookie']);
-		ConnectionsSource::logHttpReferer();
-		if (Configuration::get('PS_STATSDATA_PAGESVIEWS'))
-			Page::setPageViewed($token_array['id_page']);
+        return '';
+    }
 
-		if (Configuration::get('PS_STATSDATA_CUSTOMER_PAGESVIEWS'))
-		{
-			// Ajax request sending the time spend on the page
-			$token = sha1($token_array['id_connections'].$token_array['id_page'].$token_array['time_start']._COOKIE_KEY_);
-			$html .= '
-			<script type="text/javascript">
+    private function getScriptCustomerPagesViews($params)
+    {
+        // Record the guest path then increment the visit counter of the page
+        $token_array = Connection::setPageConnection($params['cookie']);
+        ConnectionsSource::logHttpReferer();
+        if (Configuration::get('PS_STATSDATA_PAGESVIEWS')) {
+            Page::setPageViewed($token_array['id_page']);
+        }
+
+        if (Configuration::get('PS_STATSDATA_CUSTOMER_PAGESVIEWS')) {
+            // Ajax request sending the time spend on the page
+            $token = sha1($token_array['id_connections'].$token_array['id_page'].$token_array['time_start']._COOKIE_KEY_);
+            return '<script type="text/javascript">
 				var time_start;
 				$(window).load(
 					function() {
@@ -132,137 +169,134 @@ class StatsData extends Module
 					}
 				);
 			</script>';
-		}
+        }
 
-		return $html;
-	}
+        return '';
+    }
 
-	public function hookCreateAccount($params)
-	{
-		return $this->hookAuthentication($params);
-	}
+    public function hookCreateAccount($params)
+    {
+        return $this->hookAuthentication($params);
+    }
 
-	public function hookAuthentication($params)
-	{
-		// Update or merge the guest with the customer id (login and account creation)
-		$guest = new Guest($params['cookie']->id_guest);
-		$result = Db::getInstance()->getRow('
+    public function hookAuthentication($params)
+    {
+        // Update or merge the guest with the customer id (login and account creation)
+        $guest = new Guest($params['cookie']->id_guest);
+        $result = Db::getInstance()->getRow('
 		SELECT `id_guest`
 		FROM `'._DB_PREFIX_.'guest`
 		WHERE `id_customer` = '.(int)$params['cookie']->id_customer);
 
-		if ((int)$result['id_guest'])
-		{
-			// The new guest is merged with the old one when it's connecting to an account
-			$guest->mergeWithCustomer($result['id_guest'], $params['cookie']->id_customer);
-			$params['cookie']->id_guest = $guest->id;
-		}
-		else
-		{
-			// The guest is duplicated if it has multiple customer accounts
-			$method = ($guest->id_customer) ? 'add' : 'update';
-			$guest->id_customer = $params['cookie']->id_customer;
-			$guest->{$method}();
-		}
-	}
+        if ((int)$result['id_guest']) {
+            // The new guest is merged with the old one when it's connecting to an account
+            $guest->mergeWithCustomer($result['id_guest'], $params['cookie']->id_customer);
+            $params['cookie']->id_guest = $guest->id;
+        } else {
+            // The guest is duplicated if it has multiple customer accounts
+            $method = ($guest->id_customer) ? 'add' : 'update';
+            $guest->id_customer = $params['cookie']->id_customer;
+            $guest->{$method}();
+        }
+    }
 
-	public function renderForm()
-	{
-		$fields_form = array(
-			'form' => array(
-				'legend' => array(
-					'title' => $this->l('Settings'),
-					'icon' => 'icon-cogs'
-				),
-				'input' => array(
-					array(
-						'type' => 'switch',
-						'label' => $this->l('Save page views for each customer'),
-						'name' => 'PS_STATSDATA_CUSTOMER_PAGESVIEWS',
-						'desc' => $this->l('Storing customer page views uses a lot of CPU resources and database space. Only enable if your server can handle it.'),
-						'values' => array(
-							array(
-								'id' => 'active_on',
-								'value' => 1,
-								'label' => $this->l('Enabled')
-							),
-							array(
-								'id' => 'active_off',
-								'value' => 0,
-								'label' => $this->l('Disabled')
-							)
-						),
-					),
-					array(
-						'type' => 'switch',
-						'label' => $this->l('Save global page views'),
-						'name' => 'PS_STATSDATA_PAGESVIEWS',
-						'desc' => $this->l('Global page views uses fewer resources than customer\'s, but it uses resources nonetheless.'),
-						'values' => array(
-							array(
-								'id' => 'active_on',
-								'value' => 1,
-								'label' => $this->l('Enabled')
-							),
-							array(
-								'id' => 'active_off',
-								'value' => 0,
-								'label' => $this->l('Disabled')
-							)
-						),
-					),
-					array(
-						'type' => 'switch',
-						'label' => $this->l('Plugins detection'),
-						'name' => 'PS_STATSDATA_PLUGINS',
-						'desc' => $this->l('Plugins detection loads an extra 20 kb JavaScript file once for new visitors.'),
-						'values' => array(
-							array(
-								'id' => 'active_on',
-								'value' => 1,
-								'label' => $this->l('Enabled')
-							),
-							array(
-								'id' => 'active_off',
-								'value' => 0,
-								'label' => $this->l('Disabled')
-							)
-						),
-					)
-				),
-				'submit' => array(
-					'title' => $this->l('Save'),
-				)
-			),
-		);
+    public function renderForm()
+    {
+        $fields_form = array(
+            'form' => array(
+                'legend' => array(
+                    'title' => $this->l('Settings'),
+                    'icon' => 'icon-cogs'
+                ),
+                'input' => array(
+                    array(
+                        'type' => 'switch',
+                        'label' => $this->l('Save page views for each customer'),
+                        'name' => 'PS_STATSDATA_CUSTOMER_PAGESVIEWS',
+                        'desc' => $this->l('Storing customer page views uses a lot of CPU resources and database space. Only enable if your server can handle it.'),
+                        'values' => array(
+                            array(
+                                'id' => 'active_on',
+                                'value' => 1,
+                                'label' => $this->l('Enabled')
+                            ),
+                            array(
+                                'id' => 'active_off',
+                                'value' => 0,
+                                'label' => $this->l('Disabled')
+                            )
+                        ),
+                    ),
+                    array(
+                        'type' => 'switch',
+                        'label' => $this->l('Save global page views'),
+                        'name' => 'PS_STATSDATA_PAGESVIEWS',
+                        'desc' => $this->l('Global page views uses fewer resources than customer\'s, but it uses resources nonetheless.'),
+                        'values' => array(
+                            array(
+                                'id' => 'active_on',
+                                'value' => 1,
+                                'label' => $this->l('Enabled')
+                            ),
+                            array(
+                                'id' => 'active_off',
+                                'value' => 0,
+                                'label' => $this->l('Disabled')
+                            )
+                        ),
+                    ),
+                    array(
+                        'type' => 'switch',
+                        'label' => $this->l('Plugins detection'),
+                        'name' => 'PS_STATSDATA_PLUGINS',
+                        'desc' => $this->l('Plugins detection loads an extra 20 kb JavaScript file once for new visitors.'),
+                        'values' => array(
+                            array(
+                                'id' => 'active_on',
+                                'value' => 1,
+                                'label' => $this->l('Enabled')
+                            ),
+                            array(
+                                'id' => 'active_off',
+                                'value' => 0,
+                                'label' => $this->l('Disabled')
+                            )
+                        ),
+                    )
+                ),
+                'submit' => array(
+                    'title' => $this->l('Save'),
+                )
+            ),
+        );
 
-		$helper = new HelperForm();
-		$helper->show_toolbar = false;
-		$helper->table = $this->table;
-		$lang = new Language((int)Configuration::get('PS_LANG_DEFAULT'));
-		$helper->default_form_language = $lang->id;
-		$helper->allow_employee_form_lang = Configuration::get('PS_BO_ALLOW_EMPLOYEE_FORM_LANG') ? Configuration::get('PS_BO_ALLOW_EMPLOYEE_FORM_LANG') : 0;
-		$this->fields_form = array();
+        $helper = new HelperForm();
+        $helper->show_toolbar = false;
+        $helper->table = $this->table;
+        $lang = new Language((int)Configuration::get('PS_LANG_DEFAULT'));
+        $helper->default_form_language = $lang->id;
+        $helper->allow_employee_form_lang = Configuration::get('PS_BO_ALLOW_EMPLOYEE_FORM_LANG') ? Configuration::get('PS_BO_ALLOW_EMPLOYEE_FORM_LANG') : 0;
+        $this->fields_form = array();
 
-		$helper->identifier = $this->identifier;
-		$helper->submit_action = 'submitStatsData';
-		$helper->currentIndex = $this->context->link->getAdminLink('AdminModules', false).'&configure='.$this->name.'&tab_module='.$this->tab.'&module_name='.$this->name;
-		$helper->token = Tools::getAdminTokenLite('AdminModules');
-		$helper->tpl_vars = array(
-			'fields_value' => $this->getConfigFieldsValues(),
-			'languages' => $this->context->controller->getLanguages(),
-			'id_language' => $this->context->language->id
-		);
+        $helper->identifier = $this->identifier;
+        $helper->submit_action = 'submitStatsData';
+        $helper->currentIndex = $this->context->link->getAdminLink('AdminModules', false).'&configure='.$this->name.'&tab_module='.$this->tab.'&module_name='.$this->name;
+        $helper->token = Tools::getAdminTokenLite('AdminModules');
+        $helper->tpl_vars = array(
+            'fields_value' => $this->getConfigFieldsValues(),
+            'languages' => $this->context->controller->getLanguages(),
+            'id_language' => $this->context->language->id
+        );
 
-		return $helper->generateForm(array($fields_form));
-	}
+        return $helper->generateForm(array($fields_form));
+    }
 
-	public function getConfigFieldsValues()
-	{
-		return array(
-			'PS_STATSDATA_CUSTOMER_PAGESVIEWS' => Tools::getValue('PS_STATSDATA_CUSTOMER_PAGESVIEWS', Configuration::get('PS_STATSDATA_CUSTOMER_PAGESVIEWS')),
-			'PS_STATSDATA_PAGESVIEWS' => Tools::getValue('PS_STATSDATA_PAGESVIEWS', Configuration::get('PS_STATSDATA_PAGESVIEWS')),
-			'PS_STATSDATA_PLUGINS' => Tools::getValue('PS_STATSDATA_PLUGINS', Configuration::get('PS_STATSDATA_PLUGINS')),
-		);
-	}
+    public function getConfigFieldsValues()
+    {
+        return array(
+            'PS_STATSDATA_CUSTOMER_PAGESVIEWS' => Tools::getValue('PS_STATSDATA_CUSTOMER_PAGESVIEWS', Configuration::get('PS_STATSDATA_CUSTOMER_PAGESVIEWS')),
+            'PS_STATSDATA_PAGESVIEWS' => Tools::getValue('PS_STATSDATA_PAGESVIEWS', Configuration::get('PS_STATSDATA_PAGESVIEWS')),
+            'PS_STATSDATA_PLUGINS' => Tools::getValue('PS_STATSDATA_PLUGINS', Configuration::get('PS_STATSDATA_PLUGINS')),
+        );
+    }
 }

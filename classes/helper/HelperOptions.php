@@ -158,6 +158,7 @@ class HelperOptionsCore extends Helper
 
                 // Fill values for all languages for all lang fields
                 if (substr($field['type'], -4) == 'Lang') {
+                    $field['value'] = array();
                     foreach ($languages as $language) {
                         if ($field['type'] == 'textLang') {
                             $value = Tools::getValue($key.'_'.$language['id_lang'], Configuration::get($key, $language['id_lang']));
@@ -166,7 +167,11 @@ class HelperOptionsCore extends Helper
                         } elseif ($field['type'] == 'selectLang') {
                             $value = Configuration::get($key, $language['id_lang']);
                         }
-                        $field['languages'][$language['id_lang']] = $value;
+                        if (isset($value)) {
+                            $field['languages'][$language['id_lang']] = $value;
+                        } else {
+                            $field['languages'][$language['id_lang']] = '';
+                        }
                         $field['value'][$language['id_lang']] = $this->getOptionValue($key.'_'.strtoupper($language['iso_code']), $field);
                     }
                 }

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<modules_list>
+	<modules type="native">
+		<module name="hotelreservationsystem"/>
+		<module name="wkabouthotelblock"/>
+		<module name="wkfooteraboutblock"/>
+		<module name="wkfooterexploreblock"/>
+		<module name="wkfooterlangcurrencyblock"/>
+		<module name="wkfooternotificationblock"/>
+		<module name="wkfooterpaymentblock"/>
+		<module name="wkfooterpaymentinfoblockcontainer"/>
+		<module name="wkhotelfeaturesblock"/>
+		<module name="wkhotelfilterblock"/>
+		<module name="wkhotelfiltersearchblock"/>
+		<module name="wkhotelroom"/>
+		<module name="wkpaypaladaptive"/>
+		<module name="wkroomsearchblock"/>
+		<module name="wktestimonialblock"/>
+	</modules>
+</modules_list>

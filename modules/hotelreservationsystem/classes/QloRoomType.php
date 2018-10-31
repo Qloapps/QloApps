@@ -1,6 +1,6 @@
 <?php
 /**
-* 2010-2016 Webkul.
+* 2010-2018 Webkul.
 *
 * NOTICE OF LICENSE
 *
@@ -14,7 +14,7 @@
 * needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
 *
 *  @author    Webkul IN <support@webkul.com>
-*  @copyright 2010-2016 Webkul IN
+*  @copyright 2010-2018 Webkul IN
 *  @license   https://store.webkul.com/license.html
 */
 
@@ -48,12 +48,12 @@ class QloRoomType extends QloWebservice
     public function getRoomRates(array $params)
     {
         $objRoomTypeFeaturePrice = new HotelRoomTypeFeaturePricing();
-        
+
         $idProd = 0;
         if (isset($params['idRoomType'])) {
             $idProd = $params['idRoomType'];
         }
-        
+
         $rates = $objRoomTypeFeaturePrice->getHotelRoomTypesRatesAndInventoryByDate($params['idHotel'], $idProd, $params['dateFrom'], $params['dateTo']);
 
         $this->output .= $this->objOutput->getObjectRender()->renderNodeHeader('getRoomRatesApi', array());
@@ -100,7 +100,7 @@ class QloRoomType extends QloWebservice
             'propertyId' => $hotelId,
             'data' => [],
         ];
-        
+
         $rateData = $availRateData['Hotel']['rate_lists']['rate_list'];
 
         foreach ($rateData as $dateWise) {
@@ -110,7 +110,7 @@ class QloRoomType extends QloWebservice
 
             if (isset($dateWise['date_range']['RoomTypeLists']['RoomType']['id'])) {
                 $roomTypeDetail = $dateWise['date_range']['RoomTypeLists']['RoomType'];
-                
+
                 $formateSubData['roomType'][$roomTypeDetail['id']]['status'] = $roomTypeDetail['status'];
                 if (isset($roomTypeDetail['rate'])) {
                     $formateSubData['roomType'][$roomTypeDetail['id']]['rate'] = $roomTypeDetail['rate'];
@@ -170,7 +170,7 @@ class QloRoomType extends QloWebservice
 
     // /**
     //  * [getCustomerAddress description]
-    //  * 
+    //  *
     //  * @api /getcustomeraddress
     //  * @param  int $idCustomer
     //  * @return xml output
@@ -220,7 +220,7 @@ class QloRoomType extends QloWebservice
 
     // /**
     //  * Get required field in address from configuration
-    //  * 
+    //  *
     //  * @return xml node
     //  */
     // public function addressConfiguration()
@@ -239,7 +239,7 @@ class QloRoomType extends QloWebservice
 
     // /**
     //  * Get country and state list
-    //  * 
+    //  *
     //  * @api /getcountrieswithstates
     //  * @return [type] [description]
     //  */
@@ -290,7 +290,7 @@ class QloRoomType extends QloWebservice
 
     // /**
     //  * Is 'company' field available while adding address
-    //  * 
+    //  *
     //  * @param  int  $idCountry
     //  * @return boolean
     //  */

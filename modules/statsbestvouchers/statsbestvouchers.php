@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2014 PrestaShop
+* 2007-2016 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,92 +19,94 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2014 PrestaShop SA
+*  @copyright  2007-2016 PrestaShop SA
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
 
-if (!defined('_PS_VERSION_'))
-	exit;
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
 
 class StatsBestVouchers extends ModuleGrid
 {
-	private $html;
-	private $query;
-	private $columns;
-	private $default_sort_column;
-	private $default_sort_direction;
-	private $empty_message;
-	private $paging_message;
+    private $html;
+    private $query;
+    private $columns;
+    private $default_sort_column;
+    private $default_sort_direction;
+    private $empty_message;
+    private $paging_message;
 
-	public function __construct()
-	{
-		$this->name = 'statsbestvouchers';
-		$this->tab = 'analytics_stats';
-		$this->version = '1.4.1';
-		$this->author = 'PrestaShop';
-		$this->need_instance = 0;
+    public function __construct()
+    {
+        $this->name = 'statsbestvouchers';
+        $this->tab = 'analytics_stats';
+        $this->version = '1.5.1';
+        $this->author = 'PrestaShop';
+        $this->need_instance = 0;
 
-		parent::__construct();
+        parent::__construct();
 
-		$this->default_sort_column = 'ca';
-		$this->default_sort_direction = 'DESC';
-		$this->empty_message = $this->l('Empty recordset returned.');
-		$this->paging_message = sprintf($this->l('Displaying %1$s of %2$s'), '{0} - {1}', '{2}');
+        $this->default_sort_column = 'ca';
+        $this->default_sort_direction = 'DESC';
+        $this->empty_message = $this->l('Empty recordset returned.');
+        $this->paging_message = sprintf($this->l('Displaying %1$s of %2$s'), '{0} - {1}', '{2}');
 
-		$this->columns = array(
-			array(
-				'id' => 'code',
-				'header' => $this->l('Code'),
-				'dataIndex' => 'code',
-				'align' => 'left'
-			),
-			array(
-				'id' => 'name',
-				'header' => $this->l('Name'),
-				'dataIndex' => 'name',
-				'align' => 'left'
-			),
-			array(
-				'id' => 'ca',
-				'header' => $this->l('Sales'),
-				'dataIndex' => 'ca',
-				'align' => 'right'
-			),
-			array(
-				'id' => 'total',
-				'header' => $this->l('Total used'),
-				'dataIndex' => 'total',
-				'align' => 'center'
-			)
-		);
+        $this->columns = array(
+            array(
+                'id' => 'code',
+                'header' => $this->l('Code'),
+                'dataIndex' => 'code',
+                'align' => 'left'
+            ),
+            array(
+                'id' => 'name',
+                'header' => $this->l('Name'),
+                'dataIndex' => 'name',
+                'align' => 'left'
+            ),
+            array(
+                'id' => 'ca',
+                'header' => $this->l('Sales'),
+                'dataIndex' => 'ca',
+                'align' => 'right'
+            ),
+            array(
+                'id' => 'total',
+                'header' => $this->l('Total used'),
+                'dataIndex' => 'total',
+                'align' => 'center'
+            )
+        );
 
-		$this->displayName = $this->l('Best vouchers');
-		$this->description = $this->l('Adds a list of the best vouchers to the Stats dashboard.');
-		$this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
-	}
+        $this->displayName = $this->l('Best vouchers');
+        $this->description = $this->l('Adds a list of the best vouchers to the Stats dashboard.');
+        $this->ps_versions_compliancy = array('min' => '1.6', 'max' => '1.7.0.99');
+    }
 
-	public function install()
-	{
-		return (parent::install() && $this->registerHook('AdminStatsModules'));
-	}
+    public function install()
+    {
+        return (parent::install() && $this->registerHook('AdminStatsModules'));
+    }
 
-	public function hookAdminStatsModules($params)
-	{
-		$engine_params = array(
-			'id' => 'id_product',
-			'title' => $this->displayName,
-			'columns' => $this->columns,
-			'defaultSortColumn' => $this->default_sort_column,
-			'defaultSortDirection' => $this->default_sort_direction,
-			'emptyMessage' => $this->empty_message,
-			'pagingMessage' => $this->paging_message
-		);
+    public function hookAdminStatsModules($params)
+    {
+        $engine_params = array(
+            'id' => 'id_product',
+            'title' => $this->displayName,
+            'columns' => $this->columns,
+            'defaultSortColumn' => $this->default_sort_column,
+            'defaultSortDirection' => $this->default_sort_direction,
+            'emptyMessage' => $this->empty_message,
+            'pagingMessage' => $this->paging_message
+        );
 
-		if (Tools::getValue('export'))
-			$this->csvExport($engine_params);
+        if (Tools::getValue('export')) {
+            $this->csvExport($engine_params);
+        }
 
-		$this->html = '
+        $this->html = '
 			<div class="panel-heading">
 				'.$this->displayName.'
 			</div>
@@ -113,13 +115,13 @@ class StatsBestVouchers extends ModuleGrid
 				<i class="icon-cloud-upload"></i> '.$this->l('CSV Export').'
 			</a>';
 
-		return $this->html;
-	}
+        return $this->html;
+    }
 
-	public function getData()
-	{
-		$currency = new Currency(Configuration::get('PS_CURRENCY_DEFAULT'));
-		$this->query = 'SELECT SQL_CALC_FOUND_ROWS cr.code, ocr.name, COUNT(ocr.id_cart_rule) as total, ROUND(SUM(o.total_paid_real) / o.conversion_rate,2) as ca
+    public function getData()
+    {
+        $currency = new Currency(Configuration::get('PS_CURRENCY_DEFAULT'));
+        $this->query = 'SELECT SQL_CALC_FOUND_ROWS cr.code, ocr.name, COUNT(ocr.id_cart_rule) as total, ROUND(SUM(o.total_paid_real) / o.conversion_rate,2) as ca
 				FROM '._DB_PREFIX_.'order_cart_rule ocr
 				LEFT JOIN '._DB_PREFIX_.'orders o ON o.id_order = ocr.id_order
 				LEFT JOIN '._DB_PREFIX_.'cart_rule cr ON cr.id_cart_rule = ocr.id_cart_rule
@@ -128,21 +130,23 @@ class StatsBestVouchers extends ModuleGrid
 					AND o.invoice_date BETWEEN '.$this->getDate().'
 				GROUP BY ocr.id_cart_rule';
 
-		if (Validate::IsName($this->_sort))
-		{
-			$this->query .= ' ORDER BY `'.bqSQL($this->_sort).'`';
-			if (isset($this->_direction) && (Tools::strtoupper($this->_direction) == 'ASC' || Tools::strtoupper($this->_direction) == 'DESC'))
-				$this->query .= ' '.pSQL($this->_direction);
-		}
+        if (Validate::IsName($this->_sort)) {
+            $this->query .= ' ORDER BY `'.bqSQL($this->_sort).'`';
+            if (isset($this->_direction) && (Tools::strtoupper($this->_direction) == 'ASC' || Tools::strtoupper($this->_direction) == 'DESC')) {
+                $this->query .= ' '.pSQL($this->_direction);
+            }
+        }
 
-		if (($this->_start === 0 || Validate::IsUnsignedInt($this->_start)) && Validate::IsUnsignedInt($this->_limit))
-			$this->query .= ' LIMIT '.(int)$this->_start.', '.(int)$this->_limit;
+        if (($this->_start === 0 || Validate::IsUnsignedInt($this->_start)) && Validate::IsUnsignedInt($this->_limit)) {
+            $this->query .= ' LIMIT '.(int)$this->_start.', '.(int)$this->_limit;
+        }
 
-		$values = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($this->query);
-		foreach ($values as &$value)
-			$value['ca'] = Tools::displayPrice($value['ca'], $currency);
+        $values = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($this->query);
+        foreach ($values as &$value) {
+            $value['ca'] = Tools::displayPrice($value['ca'], $currency);
+        }
 
-		$this->_values = $values;
-		$this->_totalCount = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('SELECT FOUND_ROWS()');
-	}
+        $this->_values = $values;
+        $this->_totalCount = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('SELECT FOUND_ROWS()');
+    }
 }

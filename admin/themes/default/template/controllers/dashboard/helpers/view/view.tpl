@@ -89,43 +89,26 @@
 		</div>
 		<div class="col-md-8 col-lg-7" id="hookDashboardZoneTwo">
 			{$hookDashboardZoneTwo}
-			<div id="dashaddons" class="row-margin-bottom">
-				<a href="http://addons.prestashop.com/en/209-dashboards?utm_source=back-office&amp;utm_medium=dashboard&amp;utm_campaign=back-office-{$lang_iso|upper}&amp;utm_content={if $host_mode}cloud{else}download{/if}" class="_blank">
-					<i class="icon-plus"></i> {l s='Add more dashboard modules'}
-				</a>
-			</div>
 		</div>
 		<div class="col-md-12 col-lg-2">
 			{$hookDashboardZoneThree}
-			<section class="dash_news panel">
-				<h3><i class="icon-rss"></i> {l s='PrestaShop News'}</h3>
-				<div class="dash_news_content"></div>
-				<div class="text-center"><h4><a href="http://www.prestashop.com/blog/" onclick="return !window.open(this.href);">{l s='Find more news'}</a></h4></div>
-			</section>
-			<section id="dash_version" class="visible-lg">
-				<iframe style="overflow:hidden;border:none" src="{$new_version_url|escape:'html':'UTF-8'}" ></iframe>
-			</section>
 			<section class="dash_links panel">
 				<h3><i class="icon-link"></i> {l s="Useful links"}</h3>
 					<dl>
-						<dt><a href="http://doc.prestashop.com/display/PS16?utm_source=back-office&amp;utm_medium=dashboard&amp;utm_campaign=back-office-{$lang_iso|upper}&amp;utm_content={if $host_mode}cloud{else}download{/if}" class="_blank">{l s="Official Documentation"}</a></dt>
-						<dd>{l s="User, Developer and Designer Guides"}</dd>
+						<dt><a href="https://qloapps.com/qlo-reservation-system/" class="_blank">{l s="Official Documentation"}</a></dt>
+						<dd>{l s="Qloapps User Guide"}</dd>
 					</dl>
 					<dl>
-						<dt><a href="http://www.prestashop.com/forums?utm_source=back-office&amp;utm_medium=dashboard&amp;utm_campaign=back-office-{$lang_iso|upper}&amp;utm_content={if $host_mode}cloud{else}download{/if}" class="_blank">{l s="PrestaShop Forum"}</a></dt>
-						<dd>{l s="Connect with the PrestaShop community"}</dd>
+						<dt><a href="https://forums.qloapps.com/" class="_blank">{l s="Qloapps Forum"}</a></dt>
+						<dd>{l s="Connect with the Qloapps community"}</dd>
 					</dl>
 					<dl>
-						<dt><a href="http://addons.prestashop.com?utm_source=back-office&amp;utm_medium=dashboard&amp;utm_campaign=back-office-{$lang_iso|upper}&amp;utm_content={if $host_mode}cloud{else}download{/if}" class="_blank">{l s="PrestaShop Addons"}</a></dt>
-						<dd>{l s="Enhance your store with templates & modules"}</dd>
+						<dt><a href="https://store.webkul.com/Qloapps.html" class="_blank">{l s="Qloapps Addons"}</a></dt>
+						<dd>{l s="Enhance your store Qloapps modules"}</dd>
 					</dl>
 					<dl>
-						<dt><a href="http://forge.prestashop.com?utm_source=back-office&amp;utm_medium=dashboard&amp;utm_campaign=back-office-{$lang_iso|upper}&amp;utm_content={if $host_mode}cloud{else}download{/if}" class="_blank">{l s="The Forge"}</a></dt>
-						<dd>{l s="Report issues in the Bug Tracker"}</dd>
-					</dl>
-					<dl>
-						<dt><a href="http://www.prestashop.com/en/contact-us?utm_source=back-office&amp;utm_medium=dashboard&amp;utm_campaign=back-office-{$lang_iso|upper}&amp;utm_content={if $host_mode}cloud{else}download{/if}" class="_blank">{l s="Contact Us!"}</a></dt>
-						<dd></dd>
+						<dt><a href="https://qloapps.com/#contact" class="_blank">{l s="Contact Us!"}</a></dt>
+						<dd>{l s="Contact us for any help"}</dd>
 					</dl>
 			</section>
 		</div>

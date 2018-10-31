@@ -122,7 +122,7 @@
 			<button type="button" data-id_order="{$order->id}" data-id_currency="{$order->id_currency}" data-id_customer="{$order->id_customer}" data-order_data='{$cart_htl_data|@json_encode}' name="totalOrdercancellation_btn" class="totalOrdercancellation_btn btn btn-default pull-right" href="#htlRefundReasonForm"><span>{l s='Request Total Order Cancellation'}</span></button>
 		</div>
 	</div>
-{/if}	
+{/if}
 <div id="order-detail-content" class="table_block table-responsive">
 	<table class="table table-bordered">
 		<thead>
@@ -139,6 +139,7 @@
 
 				<th class="cart_product">{l s='Room Image'}</th>
 				<th class="cart_description">{l s='Room Description'}</th>
+				<th>{l s='Hotel Name'}</th>
 				<th>{l s='Room Capcity'}</th>
 				<th class="cart_unit">{l s='Unit Price'}</th>
 				<th>{l s='Rooms'}</th>
@@ -156,7 +157,7 @@
 		<tfoot>
 			{if $priceDisplay && $use_tax}
 				<tr class="item">
-					<td colspan={if isset($order_has_invoice) && $order_has_invoice  && $order->payment != 'Free order'}"8"{else}"5"{/if}></td>
+					<td colspan={if isset($order_has_invoice) && $order_has_invoice  && $order->payment != 'Free order'}"9"{else}"6"{/if}></td>
 					<td colspan="{if $return_allowed}3{else}3{/if}">
 						<strong>{l s='Items (tax excl.)'}</strong>
 					</td>
@@ -166,7 +167,7 @@
 				</tr>
 			{/if}
 			<tr class="item">
-				<td colspan={if isset($order_has_invoice) && $order_has_invoice  && $order->payment != 'Free order'}"8"{else}"5"{/if}></td>
+				<td colspan={if isset($order_has_invoice) && $order_has_invoice  && $order->payment != 'Free order'}"9"{else}"6"{/if}></td>
 				<td colspan="{if $return_allowed}2{else}3{/if}">
 					<strong>{l s='Items'} {if $use_tax}{l s='(tax incl.)'}{/if} </strong>
 				</td>
@@ -177,7 +178,7 @@
 
 			{if $order->total_wrapping > 0}
 			<tr class="item">
-				<td colspan={if isset($order_has_invoice) && $order_has_invoice  && $order->payment != 'Free order'}"8"{else}"5"{/if}></td>
+				<td colspan={if isset($order_has_invoice) && $order_has_invoice  && $order->payment != 'Free order'}"9"{else}"6"{/if}></td>
 				<td colspan="{if $return_allowed}2{else}3{/if}">
 					<strong>{l s='Total gift wrapping cost'}</strong>
 				</td>
@@ -187,7 +188,7 @@
 			</tr>
 			{/if}
 			<tr class="totalprice item">
-				<td colspan={if isset($order_has_invoice) && $order_has_invoice  && $order->payment != 'Free order'}"8"{else}"5"{/if}></td>
+				<td colspan={if isset($order_has_invoice) && $order_has_invoice  && $order->payment != 'Free order'}"9"{else}"6"{/if}></td>
 				<td colspan="{if $return_allowed}2{else}3{/if}">
 					<strong>{l s='Total to Pay'}</strong>
 				</td>
@@ -195,10 +196,10 @@
 					<span class="price">{displayWtPriceWithCurrency price=$order->total_paid currency=$currency}</span>
 				</td>
 			</tr>
-			
+
 			{if isset($order_adv_dtl)}
 				<tr class="item">
-					<td colspan={if isset($order_has_invoice) && $order_has_invoice  && $order->payment != 'Free order'}"8"{else}"5"{/if}></td>
+					<td colspan={if isset($order_has_invoice) && $order_has_invoice  && $order->payment != 'Free order'}"9"{else}"6"{/if}></td>
 					<td colspan="{if $return_allowed}2{else}3{/if}">
 						<strong>{l s='Advance Paid Amount'}</strong>
 					</td>
@@ -207,7 +208,7 @@
 					</td>
 				</tr>
 				<tr class="item">
-					<td colspan={if isset($order_has_invoice) && $order_has_invoice  && $order->payment != 'Free order'}"8"{else}"5"{/if}></td>
+					<td colspan={if isset($order_has_invoice) && $order_has_invoice  && $order->payment != 'Free order'}"9"{else}"6"{/if}></td>
 					<td colspan="{if $return_allowed}2{else}3{/if}">
 						<strong>{l s='Total Due'}</strong>
 					</td>
@@ -219,7 +220,7 @@
 
 			{if $order->total_discounts > 0}
 			<tr class="item">
-				<td colspan={if isset($order_has_invoice) && $order_has_invoice  && $order->payment != 'Free order'}"8"{else}"5"{/if}></td>
+				<td colspan={if isset($order_has_invoice) && $order_has_invoice  && $order->payment != 'Free order'}"9"{else}"6"{/if}></td>
 				<td colspan="{if $return_allowed}3{else}3{/if}">
 					<strong>{l s='Total vouchers'}</strong>
 				</td>
@@ -255,6 +256,7 @@
 									</a>
 								</p>
 							</td>
+							<td>{$data_v['hotel_name']}</td>
 							<td>
 								<p class="text-left">
 									{$data_v['adult']} {l s='Adults'}, {$data_v['children']} {l s='Children'}

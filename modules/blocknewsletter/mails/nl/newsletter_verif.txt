@@ -1,13 +1,13 @@
 
-[{shop_url}] 
+[{shop_url}]
 
-Hallo, 
+Hallo,
 
 Hartelijk dank voor uw inschrijving op onze nieuwsbrief. Bevestig uw
 aanvraag door te klikken op de volgende link:
 
-{verif_url} [{verif_url}] 		 
+{verif_url} [{verif_url}]
 
 {shop_name} [{shop_url}] gebouwd met
-PrestaShop(tm) [http://www.prestashop.com/] 
+Webkul(tm) [https://webkul.com/]
 

@@ -3374,7 +3374,7 @@ class AdminProductsControllerCore extends AdminController
                     $room_comment = Tools::getValue('room_comment');
                     $disable_dates = Tools::getValue('disableDatesJSON');
                     $room_status = Tools::getValue('room_status');
-                    
+
                     if (count($room_num) != count($room_status)) {
                         $this->errors[] = Tools::displayError('There is some problem while setting room information');
                     } else {
@@ -3407,7 +3407,10 @@ class AdminProductsControllerCore extends AdminController
                         $hotelIdCategory = $objHotelInfo->id_category;
                         $category = new Category($hotelIdCategory);
                         $hotelCategories = $category->getParentsCategories();
-                        $categoryIds = array_column($hotelCategories, 'id_category');
+                        $categoryIds = array();
+                        foreach ($hotelCategories as $rowCateg) {
+                            $categoryIds[] = $rowCateg['id_category'];
+                        }
                         $product->updateCategories($categoryIds);
                         // Associate categories to Room Type
 
@@ -3506,7 +3509,7 @@ class AdminProductsControllerCore extends AdminController
                         $cal_date_to = date('Y-m-d', strtotime($cal_date_from) + 86400);
 
                         $booking_calendar_data[$cal_date_from] = $obj_booking_dtl->getBookingData($date_from, $date_to, $rm_info['id_hotel'], $obj->id, $rm_info['adult'], $rm_info['children'], 0, 1);
-                        
+
                         // if product is inactive then booking_details will be false
                         if (!$booking_calendar_data[$cal_date_from]) {
                             $booking_calendar_data[$cal_date_from]['stats']['num_avail'] = 0;

@@ -90,12 +90,12 @@
 			</li>
 			{/if}
 			{if isset($module_update_link)}
-			<li>
-				<a id="desc-module-update" class="toolbar_btn" href="{$module_update_link}" title="{l s='Update'}">
-					<i class="process-icon-refresh"></i>
-					<div>{l s='Check update'}</div>
-				</a>
-			</li>
+				{* <li>
+					<a id="desc-module-update" class="toolbar_btn" href="{$module_update_link}" title="{l s='Update'}">
+						<i class="process-icon-refresh"></i>
+						<div>{l s='Check update'}</div>
+					</a>
+				</li> *}
 			{/if}
 			<li>
 				<a id="desc-module-hook" class="toolbar_btn" href="{$module_hook_link}" title="{l s='Manage hooks'}">

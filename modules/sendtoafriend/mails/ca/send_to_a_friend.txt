@@ -1,11 +1,11 @@
 
-[{shop_url}] 
+[{shop_url}]
 
 Hola {name},
 
 Feu un clic aquí per veure aquest element: {product}
-[{product_link}] 
+[{product_link}]
 
 {shop_name} [{shop_url}] desenvolupat amb
-PrestaShop(tm) [http://www.prestashop.com/] 
+Webkul(tm) [https://webkul.com/]
 

@@ -1,10 +1,10 @@
 
-[{shop_url}] 
+[{shop_url}]
 
-Hola, 
+Hola,
 
-GRACIAS POR SUSCRIBIRSE A NUESTRO BOLETÍN. 
+GRACIAS POR SUSCRIBIRSE A NUESTRO BOLETÍN.
 
 {shop_name} [{shop_url}] creado por
-PrestaShop(tm) [http://www.prestashop.com/] 
+Webkul(tm) [https://webkul.com/]
 

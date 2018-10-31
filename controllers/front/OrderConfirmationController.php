@@ -109,6 +109,7 @@ class OrderConfirmationControllerCore extends FrontController
 
             $cartOrders = Order::getAllOrdersByCartId($order->id_cart);
             if ($cartOrders) {
+                $objHtlBranchInfo = new HotelBranchInformation();
                 $obj_cart_bk_data = new HotelCartBookingData();
                 $obj_htl_bk_dtl = new HotelBookingDetail();
                 $obj_rm_type = new HotelRoomType();
@@ -222,6 +223,15 @@ class OrderConfirmationControllerCore extends FrontController
 
                                 $feature_price_diff = (float)($cart_htl_data[$type_key]['date_diff'][$date_join]['product_price_without_reduction_tax_incl'] - $cart_htl_data[$type_key]['date_diff'][$date_join]['paid_unit_price_tax_incl']);
                                 $cart_htl_data[$type_key]['date_diff'][$date_join]['feature_price_diff'] = $feature_price_diff;
+
+                                //enter hotel name
+                                $hotelInfo = $objHtlBranchInfo->hotelBranchesInfo(
+                                    Configuration::get('PS_LANG_DEFAULT'),
+                                    2,
+                                    0,
+                                    $data_v['id_hotel']
+                                );
+                                $cart_htl_data[$type_key]['hotel_name'] = $hotelInfo['hotel_name'];
                             }
                         }
                     }

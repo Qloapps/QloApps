@@ -475,7 +475,7 @@ class OrderOpcControllerCore extends ParentOrderController
 
                             if (count($avai_rm['rm_data'][0]['data']['available']) < count($cl_val['id_rms'])) {
                                 $cartChanged = true;
-                                
+
                                 foreach ($cl_val['id_rms'] as $cr_key => $cr_val) {
                                     $isRmBooked = $obj_htl_bk_dtl->chechRoomBooked($cr_val, $cl_val['date_from'], $cl_val['date_to']);
                                     if ($isRmBooked) {
@@ -502,7 +502,7 @@ class OrderOpcControllerCore extends ParentOrderController
                     if ($cart_htl_data) {
                         $this->context->smarty->assign('cart_htl_data', $cart_htl_data);
                     }
-                    
+
                     // For Advanced Payment
                     $advance_payment_active = Configuration::get('WK_ALLOW_ADVANCED_PAYMENT');
                     if ($advance_payment_active) {

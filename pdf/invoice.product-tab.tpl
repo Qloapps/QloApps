@@ -29,9 +29,9 @@
 			<th class="product header small">{l s='Room Description' pdf='true'}</th>
 			<th class="product header small">{l s='Room Capcity' pdf='true'}</th>
 
-			{if isset($layout.before_discount)}
+			{* {if isset($layout.before_discount)}
 				<th class="product header small">{l s='Base price' pdf='true'} <br /> {l s='(Tax excl.)' pdf='true'}</th>
-			{/if}
+			{/if} *}
 
 			<th class="product header-right small" width="{$layout.unit_price_tax_excl.width}%">{l s='Unit Price' pdf='true'} <br /> {l s='(Tax excl.)' pdf='true'}</th>
 			<th class="product header small">{l s='Rooms Qty' pdf='true'}</th>

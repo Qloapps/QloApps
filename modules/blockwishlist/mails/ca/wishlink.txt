@@ -1,13 +1,13 @@
 
-[{shop_url}] 
+[{shop_url}]
 
-Ei, 
+Ei,
 
 {shop_name} et convida a enviar aquest enllaç als teus amics, per
 tal que vegin la vostra llista de desitjos: {wishlist}
 
-{message} [{message}] 		 
+{message} [{message}]
 
 {shop_name} [{shop_url}] desenvolupat amb
-PrestaShop(tm) [http://www.prestashop.com/] 
+Webkul(tm) [https://webkul.com/]
 

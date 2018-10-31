@@ -117,7 +117,7 @@ class AdminPreferencesControllerCore extends AdminController
             $fields = array_merge($fields, array(
                 'PS_TOKEN_ENABLE' => array(
                     'title' => $this->l('Increase front office security'),
-                    'desc' => $this->l('Enable or disable token in the Front Office to improve PrestaShop\'s security.'),
+                    'desc' => $this->l('Enable or disable token in the Front Office to improve Qloapps\'s security.'),
                     'validation' => 'isBool',
                     'cast' => 'intval',
                     'type' => 'bool',

@@ -41,7 +41,7 @@ class bankwire extends PaymentModule
     {
         $this->name = 'bankwire';
         $this->tab = 'payments_gateways';
-        $this->version = '1.1.0';
+        $this->version = '1.1.1';
         $this->author = 'PrestaShop';
         $this->controllers = array('payment', 'validation');
         $this->is_eu_compatible = 1;
@@ -69,7 +69,8 @@ class bankwire extends PaymentModule
         if (!isset($this->owner) || !isset($this->details) || !isset($this->address)) {
             $this->warning = $this->l('Account owner and account details must be configured before using this module.');
         }
-        if (!count(Currency::checkPaymentCurrencies($this->id))) {
+        $currencies = Currency::checkPaymentCurrencies($this->id);
+        if (!$currencies || !count($currencies)) {
             $this->warning = $this->l('No currency has been set for this module.');
         }
 

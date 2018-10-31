@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2015 PrestaShop
+* 2007-2016 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2016 PrestaShop SA
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -38,7 +38,7 @@ class StatsProduct extends ModuleGraph
 	{
 		$this->name = 'statsproduct';
 		$this->tab = 'analytics_stats';
-		$this->version = '1.4.0';
+		$this->version = '1.5.1';
 		$this->author = 'PrestaShop';
 		$this->need_instance = 0;
 
@@ -46,7 +46,7 @@ class StatsProduct extends ModuleGraph
 
 		$this->displayName = $this->l('Product details');
 		$this->description = $this->l('Adds detailed statistics for each product to the Stats dashboard.');
-		$this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
+		$this->ps_versions_compliancy = array('min' => '1.6', 'max' => '1.7.0.99');
 	}
 
 	public function install()
@@ -109,8 +109,11 @@ class StatsProduct extends ModuleGraph
 				'.Shop::addSqlAssociation('product', 'p').'
 				'.(Tools::getValue('id_category') ? 'LEFT JOIN `'._DB_PREFIX_.'category_product` cp ON p.`id_product` = cp.`id_product`' : '').'
 				WHERE pl.`id_lang` = '.(int)$id_lang.'
-					'.(Tools::getValue('id_category') ? 'AND cp.id_category = '.(int)Tools::getValue('id_category') : '').'
-				ORDER BY pl.`name`';
+					'.(Tools::getValue('id_category') ? 'AND cp.id_category = '.(int)Tools::getValue('id_category') : '');
+		if (version_compare(_PS_VERSION_, '1.7.0.0', '>=')) {
+			$sql .= ' AND p.state = ' . Product::STATE_SAVED;
+		}
+		$sql .= ' ORDER BY pl.`name`';
 
 		return Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
 	}
@@ -294,13 +297,15 @@ class StatsProduct extends ModuleGraph
 							</thead>
 						<tbody>';
 					$token_products = Tools::getAdminToken('AdminProducts'.(int)Tab::getIdFromClassName('AdminProducts').(int)$this->context->employee->id);
-					foreach ($cross_selling as $selling)
+					foreach ($cross_selling as $selling) {
+						$urlParams = array('id_product' => (int)$selling['id_product'], 'updateproduct' => 1, 'token' => $token_products);
 						$this->html .= '
 							<tr>
-								<td><a href="?tab=AdminProducts&id_product='.(int)$selling['id_product'].'&addproduct&token='.$token_products.'">'.$selling['pname'].'</a></td>
+								<td><a href="' . preg_replace("/\\?.*$/", '?tab=AdminProducts&id_product=' . (int)$selling['id_product'] . '&updateproduct&token=' . $token_products, $this->context->link->getAdminLink('AdminProducts', true, $urlParams)) . '">' . $selling['pname'] . '</a></td>
 								<td class="text-center">'.(int)$selling['pqty'].'</td>
 								<td class="text-right">'.Tools::displayprice($selling['pprice'], $currency).'</td>
 							</tr>';
+					}
 					$this->html .= '
 							</tbody>
 						</table>

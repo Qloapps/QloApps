@@ -22,17 +22,11 @@
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
-{if !isset($logged_on_addons) || !$logged_on_addons}
 <div class="alert bg-info">
 	<div class="row modules-addons-info">
-		<h4>{l s='Addons membership provides access to all our PrestaShop modules.'}</h4>
-		<p>{l s='Once connected, your new modules will be automatically installed.'}</p>
-	</div>
-	<div class="row modules-addons-buttons">
-		<a class="btn btn-default btn-primary _blank" href="{$addons_register_link|escape:'html':'UTF-8'}"><i class="icon-pencil"></i> {l s='Sign up'}</a><a href="#" class="addons_connect btn btn-default" data-toggle="modal" data-target="#modal_addons_connect" title="{l s='Connect to PrestaShop Marketplace account'}"><i class="icon-user"></i> {l s='Log in'}</a>
+		<h4>{l s='Explore all addon of Qloapps '}<a class="btn btn-default _blank" href="https://store.webkul.com/Qloapps.html"> @{l s='Qloapps addons'}</a></h4>
 	</div>
 </div>
-{/if}
 {$kpis}
 {if $add_permission eq '1'}
 <div id="module_install" class="row" style="{if !isset($smarty.post.downloadflag)}display: none;{/if}">

@@ -50,16 +50,20 @@ class InstallControllerHttpConfigure extends InstallControllerHttp
             $this->session->admin_email = trim(Tools::getValue('admin_email'));
             $this->session->send_informations = Tools::getValue('send_informations');
             if ($this->session->send_informations) {
-                $params = http_build_query(array(
-                    'email' => $this->session->admin_email,
-                    'method' => 'addMemberToNewsletter',
-                    'language' => $this->language->getLanguageIso(),
-                    'visitorType' => 1,
-                    'source' => 'installer'
-                ));
-                Tools::file_get_contents('http://www.prestashop.com/ajax/controller.php?'.$params);
+                // Qlo Notification
+                $qloData = [
+                    'shopDomain' => Tools::getHttpHost(),
+                    'shopDomainSsl' => Tools::getHttpHost(),
+                    'physicalUri' => __PS_BASE_URI__,
+                    'email' => Tools::getValue('admin_email'),
+                    'firstname' => Tools::ucfirst(Tools::getValue('admin_firstname')),
+                    'lastname' => Tools::ucfirst(Tools::getValue('admin_lastname')),
+                    'countryCode' => Tools::getValue('shop_country'),
+                ];
+                $objModelInstall = new InstallModelInstall();
+                $objModelInstall->setNotification($qloData);
+                // END
             }
-
             // If password fields are empty, but are already stored in session, do not fill them again
             if (!$this->session->admin_password || trim(Tools::getValue('admin_password'))) {
                 $this->session->admin_password = trim(Tools::getValue('admin_password'));

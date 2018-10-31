@@ -1,10 +1,10 @@
 
-[{shop_url}] 
+[{shop_url}]
 
-Halo, 
+Halo,
 
-TERIMA KASIH TELAH BERLANGGANAN NEWSLETTER KAMI. 
+TERIMA KASIH TELAH BERLANGGANAN NEWSLETTER KAMI.
 
 {shop_name} [{shop_url}] didukung oleh
-PrestaShop(tm) [http://www.prestashop.com/] 
+Webkul(tm) [https://webkul.com/]
 

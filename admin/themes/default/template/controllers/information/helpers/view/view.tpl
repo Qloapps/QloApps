@@ -138,7 +138,7 @@
 					{l s='Store information'}
 				</h3>
 				<p>
-					<strong>{l s='PrestaShop version:'}</strong> {$shop.ps|escape:'html':'UTF-8'}
+					<strong>{l s='Qloapps version:'}</strong> {$shop.qloappsV|escape:'html':'UTF-8'}
 				</p>
 				<p>
 					<strong>{l s='Shop URL:'}</strong> {$shop.url|escape:'html':'UTF-8'}

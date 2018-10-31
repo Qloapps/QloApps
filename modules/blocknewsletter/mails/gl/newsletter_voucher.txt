@@ -1,11 +1,11 @@
 
-[{shop_url}] 
+[{shop_url}]
 
-Hi, 
+Hi,
 
 Regarding your newsletter subscription, we are pleased to offer
-you the following voucher: {discount} 
+you the following voucher: {discount}
 
 {shop_name} [{shop_url}] powered by
-PrestaShop(tm) [http://www.prestashop.com/] 
+Webkul(tm) [https://webkul.com/]
 

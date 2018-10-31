@@ -151,7 +151,7 @@ class AdminPerformanceControllerCore extends AdminController
             'input' => array(
                 array(
                     'type' => 'switch',
-                    'label' => $this->l('Disable non PrestaShop modules'),
+                    'label' => $this->l('Disable non Native modules'),
                     'name' => 'native_module',
                     'class' => 't',
                     'is_bool' => true,
@@ -167,7 +167,7 @@ class AdminPerformanceControllerCore extends AdminController
                             'label' => $this->l('Disabled')
                         )
                     ),
-                    'hint' => $this->l('Enable or disable non PrestaShop Modules.')
+                    'hint' => $this->l('Enable or disable non Native Modules.')
                 ),
                 array(
                     'type' => 'switch',
@@ -290,7 +290,7 @@ class AdminPerformanceControllerCore extends AdminController
                 'title' => $this->l('CCC (Combine, Compress and Cache)'),
                 'icon' => 'icon-fullscreen'
             ),
-            'description' => $this->l('CCC allows you to reduce the loading time of your page. With these settings you will gain performance without even touching the code of your theme. Make sure, however, that your theme is compatible with PrestaShop 1.4+. Otherwise, CCC will cause problems.'),
+            'description' => $this->l('CCC allows you to reduce the loading time of your page. With these settings you will gain performance without even touching the code of your theme.'),
             'input' => array(
                 array(
                     'type' => 'hidden',

@@ -34,6 +34,11 @@
 		{$data.room_type}
 	</td>
 	<td class="text-center">
+		<a href="{$link->getAdminLink('AdminAddHotel')}&amp;id={$data['id_hotel']}&amp;updatehtl_branch_info" target="_blank">
+			<span>{$data['hotel_name']}</span>
+		</a>
+	</td>
+	<td class="text-center">
 		<span class="booking_duration_show">{$data.date_from|date_format:"%d-%m-%Y"}&nbsp-&nbsp {$data.date_to|date_format:"%d-%m-%Y"}</span>
 
 		{if $can_edit}
@@ -63,7 +68,7 @@
 		<span class="product_original_price {if $data.feature_price_diff > 0}room_type_old_price{/if}" {if $data.feature_price_diff < 0} style="display:none;"{/if}>
         	{convertPriceWithCurrency price=$data.unit_price_without_reduction_tax_incl currency=$currency->id}
 		</span>&nbsp;
-        <span class="room_type_current_price" {if !$data.feature_price_diff}style="display:none;"{/if}>	
+        <span class="room_type_current_price" {if !$data.feature_price_diff}style="display:none;"{/if}>
 			{convertPriceWithCurrency price=$data.paid_unit_price_tax_incl currency=$currency->id}
         </span>
 	</td>
@@ -91,7 +96,7 @@
 		</div>
 		{/if}
 	</td>
-	
+
 	<td class="text-center stage_name">
 		<p>
 			{if isset($data['stage_name']) && $data['stage_name']}
@@ -173,6 +178,6 @@
 		.room_type_old_price {
 			text-decoration: line-through;
 			color:#979797;
-			font-size:12px; 
+			font-size:12px;
 		}
 	</style>

@@ -1,13 +1,13 @@
 
-[{shop_url}] 
+[{shop_url}]
 
 Hi {firstname} {lastname},
 
-Thank you for selecting our hotel! 
+Thank you for selecting our hotel!
 
 ORDER: {order_name} Placed on {date}
 
-PAYMENT: {payment} 		 
+PAYMENT: {payment}
 
 Room Image
 Room Description
@@ -18,45 +18,45 @@ Check-in Date
 Check-out Date
 Total
 
-{products_txt} 
+{products_txt}
 
-{discounts} 
+{discounts}
 
-Total Rooms Cost 
+Total Rooms Cost
 
-{total_products} 
+{total_products}
 
-DISCOUNTS 
+DISCOUNTS
 
-{total_discounts} 
+{total_discounts}
 
-TOTAL TAX PAID 
+TOTAL TAX PAID
 
-{total_tax_paid} 
+{total_tax_paid}
 
 {adv_data_text}
 
-TOTAL PAID 
+TOTAL PAID
 
-{total_paid} 
+{total_paid}
 
 CARRIER: {carrier}
 
-PAYMENT: {payment} 		 
+PAYMENT: {payment}
 
-{delivery_block_txt} 
+{delivery_block_txt}
 
-{invoice_block_txt} 
+{invoice_block_txt}
 
 You can review your order and download your invoice from the
 "Order history" [{history_url}] section of your
 customer account by clicking "My account"
-[{my_account_url}] on our shop. 
+[{my_account_url}] on our shop.
 
 If you have a guest account, you can follow your order via the
 "Guest Tracking"
 [{guest_tracking_url}?id_order={order_name}] section
-on our shop. 
+on our shop.
 
 {shop_name} [{shop_url}] powered by
-PrestaShop(tm) [http://www.prestashop.com/] 
+Webkul(tm) [https://webkul.com/]

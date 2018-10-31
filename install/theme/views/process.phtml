@@ -7,7 +7,6 @@ var process_steps = <?php echo Tools::jsonEncode($this->process_steps) ?>;
 var admin = '<?php echo(file_exists('../admin-dev') ? '../admin-dev' : '../admin') ?>';
 -->
 </script>
-
 <div id="install_process_form">
 	<div id="progress_bar">
 		<div class="installing"></div>
@@ -36,7 +35,7 @@ var admin = '<?php echo(file_exists('../admin-dev') ? '../admin-dev' : '../admin
 <div id="install_process_success">
 	<div class="clearfix">
 		<h2><?php echo $this->l('Your installation is finished!'); ?></h2>
-		<p><?php echo $this->l('You have just finished installing your shop. Thank you for using PrestaShop!'); ?></p>
+		<p><?php echo $this->l('You have just finished installing Qloapps. Thank you for using Qloapps!'); ?></p>
 		<p><?php echo $this->l('Please remember your login information:') ?></p>
 		<table cellpadding="0" cellspacing="0" border="0" id="resultInstall" width="620">
 			<tr class="odd">
@@ -60,30 +59,30 @@ var admin = '<?php echo(file_exists('../admin-dev') ? '../admin-dev' : '../admin
 
 		<h3 class="infosBlock">
 			<?php echo $this->l('For security purposes, you must delete the "install" folder.') ?>
-			<a href="<?php echo $this->l('http://doc.prestashop.com/display/PS16/Installing+PrestaShop#InstallingPrestaShop-Completingtheinstallation') ?>" target="_blank"><img src="theme/img/help.png" /></a>
+			<a href="<?php echo 'https://qloapps.com/install-qloapps/#section-11' ?>" target="_blank"><img src="theme/img/help.png" /></a>
 		</h3>
 
 		<div id="boBlock" class="blockInfoEnd clearfix" onclick="window.open(admin)">
 			<img src="theme/img/visu_boBlock.png" alt="" />
 			<h3><?php echo $this->l('Back Office'); ?></h3>
-			<p class="description"><?php echo $this->l('Manage your store using your Back Office. Manage your orders and customers, add modules, change themes, etc.') ?></p>
+			<p class="description"><?php echo $this->l('Manage your website using your Back Office. Manage your orders and customers, add modules, change themes, etc.') ?></p>
 			<p>
-				<a class="BO" target="_blank"><span><?php echo $this->l('Manage your store') ?></span></a>
+				<a class="BO" target="_blank"><span><?php echo $this->l('Manage your website') ?></span></a>
 			</p>
 		</div>
 		<div id="foBlock" class="blockInfoEnd last clearfix" onclick="window.open('../')" />
 			<img src="theme/img/visu_foBlock.png" alt="" />
 			<h3><?php echo $this->l('Front Office'); ?></h3>
-			<p class="description"><?php echo $this->l('Discover your store as your future customers will see it!') ?></p>
+			<p class="description"><?php echo $this->l('Discover your website as your future customers will see it!') ?></p>
 			<p>
-				<a class="FO" target="_blank"><span><?php echo $this->l('Discover your store') ?></span></a>
+				<a class="FO" target="_blank"><span><?php echo $this->l('Discover your website') ?></span></a>
 			</p>
 		</div>
 	</div>
 
 	<div class="sharing">
 		<p><?php echo $this->l('Share your experience with your friends!'); ?></p>
-		<button type="button" class="btn-twitter" onclick="psinstall_twitter_click('<?php echo $this->l('I just built an online store with PrestaShop!'); ?> <?php echo $this->l('Watch this exhilarating experience: http://vimeo.com/89298199'); ?>');">
+		<button type="button" class="btn-twitter" onclick="psinstall_twitter_click('<?php echo $this->l('I just built an online hotel booking website with Qloapps!'); ?> <?php echo $this->l('See all the features here : https://qloapps.com/qlo-reservation-system/'); ?>');">
 			<i></i> <?php echo $this->l('Tweet'); ?>
 		</button>
 		<button type="button" class="btn-facebook" onclick="psinstall_facebook_click();">
@@ -92,19 +91,13 @@ var admin = '<?php echo(file_exists('../admin-dev') ? '../admin-dev' : '../admin
 		<button type="button" class="btn-google-plus" onclick="psinstall_google_click();">
 			<i></i> <?php echo $this->l('Google+'); ?>
 		</button>
-		<button type="button" class="btn-pinterest" onclick="psinstall_pinterest_click();">
+		<!-- <button type="button" class="btn-pinterest" onclick="psinstall_pinterest_click();">
 			<i></i> <?php echo $this->l('Pinterest'); ?>
-		</button>
+		</button> -->
 		<button type="button" class="btn-linkedin" onclick="psinstall_linkedin_click();">
 			<i></i> <?php echo $this->l('LinkedIn'); ?>
 		</button>
 	</div>
 </div>
-
-<?php if (@fsockopen('addons.prestashop.com', 80, $errno, $errst, 3)): ?>
-	<iframe src="https://addons.prestashop.com/psinstall1541.php?version=2&lang=<?php echo $this->language->getLanguageIso() ?>&activity=<?php echo $this->session->shop_activity ?>&country=<?php echo $this->session->shop_country ?>" scrolling="no" id="prestastore">
-		<p><a href="http://addons.prestashop.com/" target="_blank"><?php echo $this->l('Check out PrestaShop Addons to add that little something extra to your store!'); ?></a></p>
-	</iframe>
-<?php endif; ?>
 
 <?php $this->displayTemplate('footer') ?>

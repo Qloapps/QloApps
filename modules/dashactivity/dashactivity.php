@@ -138,7 +138,7 @@ class Dashactivity extends Module
 				),
 				'data_list_small' => array(
 					'dash_traffic_source' => array(
-						'<i class="icon-circle" style="color:'.self::$colors[0].'"></i> prestashop.com' => round($visits / 2),
+						'<i class="icon-circle" style="color:'.self::$colors[0].'"></i> qloapps.com' => round($visits / 2),
 						'<i class="icon-circle" style="color:'.self::$colors[1].'"></i> google.com' => round($visits / 3),
 						'<i class="icon-circle" style="color:'.self::$colors[2].'"></i> Direct Traffic' => 0
 					)
@@ -147,7 +147,7 @@ class Dashactivity extends Module
 					'dash_trends_chart1' => array(
 						'chart_type' => 'pie_chart_trends',
 						'data' => array(
-							array('key' => 'prestashop.com', 'y' => round($visits / 2), 'color' => self::$colors[0]),
+							array('key' => 'qloapps.com', 'y' => round($visits / 2), 'color' => self::$colors[0]),
 							array('key' => 'google.com', 'y' => round($visits / 3), 'color' => self::$colors[1]),
 							array('key' => 'Direct Traffic', 'y' =>0, 'color' => self::$colors[2]),
 						)

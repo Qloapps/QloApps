@@ -57,7 +57,7 @@ class InstallControllerHttpDatabase extends InstallControllerHttp
         $this->session->database_password = trim(Tools::getValue('dbPassword'));
         $this->session->database_prefix = trim(Tools::getValue('db_prefix'));
         $this->session->database_clear = Tools::getValue('database_clear');
-        
+
         $this->session->rewrite_engine = Tools::getValue('rewrite_engine');
     }
 
@@ -80,7 +80,7 @@ class InstallControllerHttpDatabase extends InstallControllerHttp
         if (count($this->errors)) {
             return false;
         }
-        
+
         if (!isset($this->session->database_engine)) {
             $this->session->database_engine = $this->model_database->getBestEngine($this->session->database_server, $this->session->database_name, $this->session->database_login, $this->session->database_password);
         }
@@ -150,7 +150,7 @@ class InstallControllerHttpDatabase extends InstallControllerHttp
                 $this->database_prefix = _DB_PREFIX_;
             } else {
                 $this->database_server = 'localhost';
-                $this->database_name = 'prestashop';
+                $this->database_name = 'qloapps';
                 $this->database_login = 'root';
                 $this->database_password = '';
                 $this->database_engine = 'InnoDB';

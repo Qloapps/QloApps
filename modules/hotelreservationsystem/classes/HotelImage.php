@@ -1,20 +1,39 @@
 <?php
-    class HotelImage extends ObjectModel
-    {
-        public $id;
-        public $hotel_id;
-        public $hotel_image_id;
-        public $active;
+/**
+* 2010-2018 Webkul.
+*
+* NOTICE OF LICENSE
+*
+* All right is reserved,
+* Please go through this link for complete license : https://store.webkul.com/license.html
+*
+* DISCLAIMER
+*
+* Do not edit or add to this file if you wish to upgrade this module to newer
+* versions in the future. If you wish to customize this module for your
+* needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
+*
+*  @author    Webkul IN <support@webkul.com>
+*  @copyright 2010-2018 Webkul IN
+*  @license   https://store.webkul.com/license.html
+*/
 
-        public static $definition = array(
-            'table' => 'htl_image',
-            'primary' => 'id',
-            'fields' => array(
-                'id_hotel' => array('type' => self::TYPE_INT, 'validate' => 'isInt'),
-                'hotel_image_id' => array('type' => self::TYPE_STRING),
-                'active' => array('type' => self::TYPE_BOOL,'validate' => 'isBool')
-            ),
-        );
+class HotelImage extends ObjectModel
+{
+    public $id;
+    public $id_hotel;
+    public $hotel_image_id;
+    public $cover;
+
+    public static $definition = array(
+        'table' => 'htl_image',
+        'primary' => 'id',
+        'fields' => array(
+            'id_hotel' => array('type' => self::TYPE_INT, 'validate' => 'isInt'),
+            'hotel_image_id' => array('type' => self::TYPE_STRING),
+            'cover' => array('type' => self::TYPE_BOOL,'validate' => 'isBool')
+        ),
+    );
 
     /**
      * [getAllImagesByHotelId :: To get all images data of a hotel by hotel id]
@@ -23,15 +42,7 @@
      */
     public function getAllImagesByHotelId($htl_id)
     {
-        $sql = "SELECT * FROM `"._DB_PREFIX_."htl_image` WHERE `id_hotel` = ".(int)$htl_id;
-
-        $htl_images = Db::getInstance()->executeS($sql);
-
-        if ($htl_images) {
-            return $htl_images;
-        } else {
-            return false;
-        }
+        return Db::getInstance()->executeS('SELECT * FROM `'._DB_PREFIX_.'htl_image` WHERE `id_hotel` = '.(int)$htl_id);
     }
 
     /**
@@ -46,28 +57,76 @@
     }
 
     /**
-     * [uploadOtherImages :: To upload the images of the hotel]
-     * @param  [array] $image          [array containing images of the hotel]
-     * @param  [int] $hotel_id       [Id of the hotel to which the images belong]
-     * @param  [string] $hotel_img_path [Path where the images to be stored]
-     * @return [boolean]                 [true]
+     * [validAddHotelMainImage :: To validate the image of the hotel before saving it]
+     * @param  [array] $image [variable having image information of the hotel]
+     * @return [boolean]        [returns true if image is valid]
      */
-    public function uploadHotelImages($images, $id_hotel, $dest_path)
+    public static function validateImage($image)
     {
-        if (isset($images)) {
-            $objHotelHelper = new HotelHelper();
-            $hotelImages  = $images['tmp_name'];
-            foreach ($hotelImages as $image) {
-                $randName = $objHotelHelper->generateRandomCode(8);
-                $imageName = $randName.'.jpg';
-                if (ImageManager::resize($image, $dest_path.$imageName)) {
-                    $hotelImage = new HotelImage();
-                    $hotelImage->id_hotel = $id_hotel;
-                    $hotelImage->hotel_image_id = $randName;
-                    $hotelImage->save();
+        if ($image['size'] > 0) {
+            if ($image['tmp_name'] != "") {
+                if (!ImageManager::isCorrectImageFileExt($image['name'])) {
+                    return true;
                 }
             }
+        } else {
+            return true;
         }
-        return true;
     }
+
+    public static function getCover($idHotel)
+    {
+        return Db::getInstance()->getRow(
+            'SELECT * FROM `'._DB_PREFIX_.'htl_image` WHERE `id_hotel` = '.(int)$idHotel.' AND `cover`=1'
+        );
     }
+
+    public function uploadHotelImages($images, $idHotel, $destPath)
+    {
+        if (isset($images) && $idHotel && $destPath) {
+            $objHotelHelper = new HotelHelper();
+            $hotelImages  = $images['tmp_name'];
+            if (is_array($images['tmp_name'])) {
+                foreach ($hotelImages as $image) {
+                    $randName = $objHotelHelper->generateRandomCode(8);
+                    $imageName = $randName.'.jpg';
+                    if (ImageManager::resize($image, $destPath.$imageName)) {
+                        $objHtlImage = new HotelImage();
+                        $objHtlImage->id_hotel = $idHotel;
+                        if ($coverImgExist = HotelImage::getCover($idHotel)) {
+                            $objHtlImage->cover = 0;
+                        } else {
+                            $objHtlImage->cover = 1;
+                        }
+                        $objHtlImage->hotel_image_id = $randName;
+                        $objHtlImage->save();
+                    }
+                }
+            } else {
+                $randName = $objHotelHelper->generateRandomCode(8);
+                $imageName = $randName.'.jpg';
+                if (ImageManager::resize($hotelImages, $destPath.$imageName)) {
+                    $objHtlImage = new HotelImage();
+                    $objHtlImage->id_hotel = $idHotel;
+                    if ($coverImgExist = HotelImage::getCover($idHotel)) {
+                        $objHtlImage->cover = 0;
+                    } else {
+                        $objHtlImage->cover = 1;
+                    }
+                    $objHtlImage->hotel_image_id = $randName;
+                    if ($objHtlImage->save()) {
+                        $addedImage = array(
+                            'id_image' => $objHtlImage->id,
+                            'cover' => $objHtlImage->cover,
+                            'image_url' => _MODULE_DIR_.'hotelreservationsystem/views/img/hotel_img/'.
+                            $randName.'.jpg',
+                        );
+                        return $addedImage;
+                    }
+                }
+            }
+            return true;
+        }
+        return false;
+    }
+}

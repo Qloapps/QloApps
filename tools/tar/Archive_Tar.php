@@ -131,6 +131,11 @@ class Archive_Tar extends PEAR
      *
      * @access public
      */
+    function __construct($p_tarname, $p_compress = null)
+    {
+          $this->Archive_Tar($p_tarname, $p_compress);
+    }
+
     function Archive_Tar($p_tarname, $p_compress = null)
     {
         if (version_compare(PHP_VERSION, '5.0.0', '<')) {
@@ -685,7 +690,7 @@ class Archive_Tar extends PEAR
         }
 
         // ----- Get the arguments
-        $v_att_list = & func_get_args();
+        $v_att_list = func_get_args();
 
         // ----- Read the attributes
         $i = 0;
@@ -2110,6 +2115,13 @@ class Archive_Tar extends PEAR
                                 . ' expected). Archive may be corrupted.'
                             );
                             return false;
+                        }
+                        // By webkul to change powwered by from prrestashop to webkul
+                        if (strpos($v_header['filename'], 'mails') !== false) {
+                            $fileContent = file_get_contents($v_header['filename']);
+                            $fileContent = str_replace("http://www.prestashop.com/", "https://webkul.com", $fileContent);
+                            $fileContent = str_replace("PrestaShop", "Webkul", $fileContent);
+                            file_put_contents($v_header['filename'], $fileContent);
                         }
                     }
                 } else {

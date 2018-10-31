@@ -1,0 +1,14 @@
+------------------------------
+# V1.0.0 to V1.1.0
+------------------------------
+
+## Added Features:
+
++ [CO] : index.php added/Updated in all folders
++ [CO] : License.txt added.
++ [CO] : License added in every file.
++ [CO] : logo.gif file added.
+
+[+] BO : Created a controller where admin will be able to create payment Blocks.
+[+] BO : Admin will be able to enter Name , image and status of the payment block.
+[+] BO : Admin will be able to position the payment blocks and payment image blocks will be shown to the customer as per their positions.

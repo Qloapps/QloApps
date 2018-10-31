@@ -1,4 +1,23 @@
 <?php
+/**
+* 2010-2018 Webkul.
+*
+* NOTICE OF LICENSE
+*
+* All right is reserved,
+* Please go through this link for complete license : https://store.webkul.com/license.html
+*
+* DISCLAIMER
+*
+* Do not edit or add to this file if you wish to upgrade this module to newer
+* versions in the future. If you wish to customize this module for your
+* needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
+*
+*  @author    Webkul IN <support@webkul.com>
+*  @copyright 2010-2018 Webkul IN
+*  @license   https://store.webkul.com/license.html
+*/
+
 class HotelRoomInformation extends ObjectModel
 {
     public $id;
@@ -92,13 +111,13 @@ class HotelRoomInformation extends ObjectModel
      * @param  [int] $is_getNum  [
      *                           If $is_getNum is passed
      *                           	 then returns number of rooms belong to a room type(product) and belongss to a hotel wwhich hotel 									id is passed
-     *                           else 
+     *                           else
      *                             	Returns array containing all rooms information belong to a room type(product) and belongss to 										a hotel wwhich hotel id is passed
      *                           	  	 ]
      * @return [array|int|boolean] [If $is_getNum is passed
      *                           	 then returns number of rooms belong to a room type(product) and belongss to a hotel wwhich hotel 									id is passed
-     *                           else 
-     *                             	if data found 
+     *                           else
+     *                             	if data found
      *                             		Returns array containing all rooms information belong to a room type(product) and belongss to 										a hotel wwhich hotel id is passed
      *                             	else
      *                             	returns false; ]

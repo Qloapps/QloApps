@@ -324,7 +324,7 @@ class WebserviceRequestCore
             'customizations' => array('description' => 'Customization values', 'class' => 'Customization'),
         );
 
-        // Code from Prestashop 1.7.0.2 
+        // Code from Prestashop 1.7.0.2
         $extra_resources = Hook::exec('addWebserviceResources', array('resources' => $resources), null, true, false);
         if (is_array($extra_resources) && count($extra_resources)) {
             foreach ($extra_resources as $new_resources) {
@@ -1439,7 +1439,8 @@ class WebserviceRequestCore
                             $this->setError(400, 'parameter "'.$fieldName.'" not writable. Please remove this attribute of this XML', 93);
                             return false;
                         } else {
-                            $object->$fieldProperties['setter']((string)$attributes->$fieldName);
+                            $setter = $fieldProperties['setter'];
+                            $object->$setter((string)$attributes->$fieldName);
                         }
                     } elseif (property_exists($object, $sqlId)) {
                         $object->$sqlId = (string)$attributes->$fieldName;

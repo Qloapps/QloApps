@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2014 PrestaShop
+* 2007-2016 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,77 +19,80 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2014 PrestaShop SA
+*  @copyright  2007-2016 PrestaShop SA
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
 
-if (!defined('_PS_VERSION_'))
-	exit;
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
 
 class GraphNvD3 extends ModuleGraphEngine
 {
-	private $_width;
-	private $_height;
-	private $_values;
-	private $_legend;
-	private $_titles;
+    private $_width;
+    private $_height;
+    private $_values;
+    private $_legend;
+    private $_titles;
 
-    function __construct($type = null)
+    public function __construct($type = null)
     {
-		if ($type !== null)
-			return parent::__construct($type);
+        if ($type !== null) {
+            return parent::__construct($type);
+        }
 
-		$this->name = 'graphnvd3';
-		$this->tab = 'administration';
-		$this->version = '1.4';
-		$this->author = 'PrestaShop';
-		$this->need_instance = 0;
+        $this->name = 'graphnvd3';
+        $this->tab = 'administration';
+        $this->version = '1.5.1';
+        $this->author = 'PrestaShop';
+        $this->need_instance = 0;
 
-		Module::__construct();
+        Module::__construct();
 
-		$this->displayName = $this->l('NVD3 Charts');
-		$this->description = '';
+        $this->displayName = $this->l('NVD3 Charts');
+        $this->description = '';
     }
 
-	function install()
-	{
-		return (parent::install() && $this->registerHook('GraphEngine') && $this->registerHook('actionAdminControllerSetMedia'));
-	}
+    public function install()
+    {
+        return (parent::install() && $this->registerHook('GraphEngine') && $this->registerHook('actionAdminControllerSetMedia'));
+    }
 
-	public function hookActionAdminControllerSetMedia($params)
-	{
-		$admin_webpath = str_ireplace(_PS_ROOT_DIR_, '', _PS_ADMIN_DIR_);
-		$admin_webpath = preg_replace('/^'.preg_quote(DIRECTORY_SEPARATOR, '/').'/', '', $admin_webpath);
+    public function hookActionAdminControllerSetMedia($params)
+    {
+        $admin_webpath = str_ireplace(_PS_ROOT_DIR_, '', _PS_ADMIN_DIR_);
+        $admin_webpath = preg_replace('/^'.preg_quote(DIRECTORY_SEPARATOR, '/').'/', '', $admin_webpath);
 
-		$this->context->controller->addJS(array(
-			_PS_JS_DIR_.'vendor/d3.v3.min.js',
-			__PS_BASE_URI__.$admin_webpath.'/themes/'.$this->context->employee->bo_theme.'/js/vendor/nv.d3.min.js',
-		));
-		$this->context->controller->addCSS(__PS_BASE_URI__.$admin_webpath.'/themes/'.$this->context->employee->bo_theme.'/css/vendor/nv.d3.css');
-	}
+        $this->context->controller->addJS(array(
+            _PS_JS_DIR_.'vendor/d3.v3.min.js',
+            __PS_BASE_URI__.$admin_webpath.'/themes/'.$this->context->employee->bo_theme.'/js/vendor/nv.d3.min.js',
+        ));
+        $this->context->controller->addCSS(__PS_BASE_URI__.$admin_webpath.'/themes/'.$this->context->employee->bo_theme.'/css/vendor/nv.d3.css');
+    }
 
-	public static function hookGraphEngine($params, $drawer)
-	{
-		static $divid = 1;
+    public static function hookGraphEngine($params, $drawer)
+    {
+        static $divid = 1;
 
-		if (strpos($params['width'], '%') !== false)
-			$params['width'] = (int)preg_replace('/\s*%\s*/', '', $params['width']).'%';
-		else
-			$params['width'] = (int)$params['width'].'px';
+        if (strpos($params['width'], '%') !== false) {
+            $params['width'] = (int)preg_replace('/\s*%\s*/', '', $params['width']).'%';
+        } else {
+            $params['width'] = (int)$params['width'].'px';
+        }
 
-		$nvd3_func = array(
-			'line' => '
+        $nvd3_func = array(
+            'line' => '
 				nv.models.lineChart()',
-			'pie' => '
+            'pie' => '
 				nv.models.pieChart()
 					.x(function(d) { return d.label; })
 					.y(function(d) { return d.value; })
 					.showLabels(true)
 					.showLegend(false)'
-		);
+        );
 
-		return '
+        return '
 		<div id="nvd3_chart_'.$divid.'" class="chart with-transitions">
 			<svg style="width:'.$params['width'].';height:'.(int)$params['height'].'px"></svg>
 		</div>
@@ -121,60 +124,58 @@ class GraphNvD3 extends ModuleGraphEngine
 			}
 		});
 		</script>';
-	}
+    }
 
-	public function createValues($values)
-	{
-		$this->_values = $values;
-	}
+    public function createValues($values)
+    {
+        $this->_values = $values;
+    }
 
-	public function setSize($width, $height)
-	{
-		$this->_width = $width;
-		$this->_height = $height;
-	}
+    public function setSize($width, $height)
+    {
+        $this->_width = $width;
+        $this->_height = $height;
+    }
 
-	public function setLegend($legend)
-	{
-		$this->_legend = $legend;
-	}
+    public function setLegend($legend)
+    {
+        $this->_legend = $legend;
+    }
 
-	public function setTitles($titles)
-	{
-		$this->_titles = $titles;
-	}
+    public function setTitles($titles)
+    {
+        $this->_titles = $titles;
+    }
 
-	public function draw()
-	{
-		$array = array(
-			'axisLabels' => array('xAxis' => $this->_titles['x'], 'yAxis' => $this->_titles['y']),
-			'data' => array()
-		);
+    public function draw()
+    {
+        $array = array(
+            'axisLabels' => array('xAxis' => $this->_titles['x'], 'yAxis' => $this->_titles['y']),
+            'data' => array()
+        );
 
-		if (!isset($this->_values[0]) || !is_array($this->_values[0]))
-		{
-			$nvd3_values = array();
-			if (Tools::getValue('type') == 'pie')
-			{
-				foreach ($this->_values as $x => $y)
-					$nvd3_values[] = array('label' => $this->_legend[$x], 'value' => $y);
-				$array['data'] = $nvd3_values;
-			}
-			else
-			{
-				foreach ($this->_values as $x => $y)
-					$nvd3_values[] = array('x' => $x, 'y' => $y);
-				$array['data'][] = array('values' => $nvd3_values, 'key' => $this->_titles['main']);
-			}
-		}
-		else
-			foreach ($this->_values as $layer => $gross_values)
-			{
-				$nvd3_values = array();
-				foreach ($gross_values as $x => $y)
-					$nvd3_values[] = array('x' => $x, 'y' => $y);
-				$array['data'][] = array('values' => $nvd3_values, 'key' => $this->_titles['main'][$layer]);
-			}
-		die(preg_replace('/"([0-9]+)"/', '$1', Tools::jsonEncode($array)));
-	}
+        if (!isset($this->_values[0]) || !is_array($this->_values[0])) {
+            $nvd3_values = array();
+            if (Tools::getValue('type') == 'pie') {
+                foreach ($this->_values as $x => $y) {
+                    $nvd3_values[] = array('label' => $this->_legend[$x], 'value' => $y);
+                }
+                $array['data'] = $nvd3_values;
+            } else {
+                foreach ($this->_values as $x => $y) {
+                    $nvd3_values[] = array('x' => $x, 'y' => $y);
+                }
+                $array['data'][] = array('values' => $nvd3_values, 'key' => $this->_titles['main']);
+            }
+        } else {
+            foreach ($this->_values as $layer => $gross_values) {
+                $nvd3_values = array();
+                foreach ($gross_values as $x => $y) {
+                    $nvd3_values[] = array('x' => $x, 'y' => $y);
+                }
+                $array['data'][] = array('values' => $nvd3_values, 'key' => $this->_titles['main'][$layer]);
+            }
+        }
+        die(preg_replace('/"([0-9]+)"/', '$1', Tools::jsonEncode($array)));
+    }
 }

@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2014 PrestaShop
+* 2007-2016 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2014 PrestaShop SA
+*  @copyright  2007-2016 PrestaShop SA
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -35,7 +35,7 @@ class StatsCheckUp extends Module
 	{
 		$this->name = 'statscheckup';
 		$this->tab = 'analytics_stats';
-		$this->version = '1.3.1';
+		$this->version = '1.5.0';
 		$this->author = 'PrestaShop';
 		$this->need_instance = 0;
 
@@ -43,7 +43,7 @@ class StatsCheckUp extends Module
 
 		$this->displayName = $this->l('Catalog evaluation');
 		$this->description = $this->l('Adds a quick evaluation of your catalog quality to the Stats dashboard.');
-		$this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
+		$this->ps_versions_compliancy = array('min' => '1.6', 'max' => '1.7.0.99');
 	}
 
 	public function install()
@@ -127,22 +127,28 @@ class StatsCheckUp extends Module
 					SELECT COUNT(*)
 					FROM '._DB_PREFIX_.'image i
 					'.Shop::addSqlAssociation('image', 'i').'
-					WHERE i.id_product = p.id_product
-				) as nbImages, (
-					SELECT SUM(od.product_quantity)
-					FROM '._DB_PREFIX_.'orders o
-					LEFT JOIN '._DB_PREFIX_.'order_detail od ON o.id_order = od.id_order
-					WHERE od.product_id = p.id_product
-						AND o.invoice_date BETWEEN '.ModuleGraph::getDateBetween().'
-						'.Shop::addSqlRestriction(Shop::SHARE_ORDER, 'o').'
+					WHERE i.id_product = p.id_product ';
+		if (version_compare(_PS_VERSION_, '1.7.0.0', '>=')) {
+			$sql .= 'AND p.state = ' . Product::STATE_SAVED . ' ';
+		}
+		$sql .= ') as nbImages, (
+				SELECT SUM(od.product_quantity)
+				FROM '._DB_PREFIX_.'orders o
+				LEFT JOIN '._DB_PREFIX_.'order_detail od ON o.id_order = od.id_order
+				WHERE od.product_id = p.id_product
+					AND o.invoice_date BETWEEN '.ModuleGraph::getDateBetween().'
+					'.Shop::addSqlRestriction(Shop::SHARE_ORDER, 'o').'
 				) as nbSales,
 				IFNULL(stock.quantity, 0) as stock
 				FROM '._DB_PREFIX_.'product p
 				'.Shop::addSqlAssociation('product', 'p').'
 				'.Product::sqlStock('p', 0).'
 				LEFT JOIN '._DB_PREFIX_.'product_lang pl
-					ON (p.id_product = pl.id_product AND pl.id_lang = '.(int)$this->context->language->id.Shop::addSqlRestrictionOnLang('pl').')
-				ORDER BY '.$order_by;
+				ON (p.id_product = pl.id_product AND pl.id_lang = '.(int)$this->context->language->id.Shop::addSqlRestrictionOnLang('pl').')';
+		if (version_compare(_PS_VERSION_, '1.7.0.0', '>=')) {
+			$sql .= 'WHERE p.state = '. Product::STATE_SAVED . ' ';
+		}
+		$sql .= 'ORDER BY '.$order_by;
 		$result = $db->executeS($sql);
 
 		if (!$result)
@@ -263,10 +269,11 @@ class StatsCheckUp extends Module
 			$scores['average'] = array_sum($scores) / $divisor;
 			$scores['average'] = ($scores['average'] < 1 ? 0 : ($scores['average'] > 1.5 ? 2 : 1));
 
+			$urlParams = array('id_product' => $row['id_product'], 'updateproduct' => 1, 'token' => $token_products);
 			$this->html .= '
 				<tr>
 					<td>'.$row['id_product'].'</td>
-					<td><a href="'.Tools::safeOutput('index.php?tab=AdminProducts&updateproduct&id_product='.$row['id_product'].'&token='.$token_products).'">'.Tools::substr($row['name'], 0, 42).'</a></td>
+					<td><a href="'.Tools::safeOutput(preg_replace("/\\?.*$/", '?tab=AdminProducts&updateproduct&id_product='.$row['id_product'].'&token='.$token_products, $this->context->link->getAdminLink('AdminProducts', true, $urlParams))).'">'.Tools::substr($row['name'], 0, 42).'</a></td>
 					<td class="center">'.$array_colors[$scores['active']].'</td>';
 				foreach ($languages as $language)
 					if (isset($row['desclength_'.$language['iso_code']]))

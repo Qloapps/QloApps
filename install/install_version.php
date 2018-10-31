@@ -25,3 +25,4 @@
 */
 
 define('_PS_INSTALL_VERSION_', '1.6.1.1');
+define('_QLO_INSTALL_VERSION_', '1.3.1');
