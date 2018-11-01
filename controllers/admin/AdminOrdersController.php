@@ -1892,11 +1892,20 @@ class AdminOrdersControllerCore extends AdminController
         $htl_booking_data_order_id = $obj_bookin_detail->getBookingDataByOrderId(Tools::getValue('id_order'));
         if ($htl_booking_data_order_id) {
             $obj_htl_rm_info = new HotelRoomInformation();
+            $objHtlBranchInfo = new HotelBranchInformation();
             foreach ($htl_booking_data_order_id as $key => $value) {
                 $htl_booking_data_order_id[$key]['room_num'] = $obj_htl_rm_info->getHotelRoomInfoById($value['id_room']);
                 $htl_booking_data_order_id[$key]['order_status'] = $value['id_status'];
                 $htl_booking_data_order_id[$key]['date_from'] = $value['date_from'];
                 $htl_booking_data_order_id[$key]['date_to'] = $value['date_to'];
+                //enter hotel name
+                $hotelInfo = $objHtlBranchInfo->hotelBranchesInfo(
+                    Configuration::get('PS_LANG_DEFAULT'),
+                    2,
+                    0,
+                    $value['id_hotel']
+                );
+                $htl_booking_data_order_id[$key]['hotel_name'] = $hotelInfo['hotel_name'];
             }
         }
         $htl_order_status = HotelOrderStatus::getAllHotelOrderStatus();
@@ -2897,7 +2906,7 @@ class AdminOrdersControllerCore extends AdminController
 
         /*By webkul to edit the Hotel Cart and Hotel Order tables when editing the room for the order detail page*/
         $update_htl_tables = $obj_booking_detail->UpdateHotelCartHotelOrderOnOrderEdit($id_order, $id_room, $old_date_from, $old_date_to, $new_date_from, $new_date_to);
-        
+
         //Update Order Info in Customer Advance payment table
         $obj_customer_adv = new HotelCustomerAdvancedPayment();
         $obj_customer_adv->updateAdvancePaymentInfoOnOrderEdit($id_order);

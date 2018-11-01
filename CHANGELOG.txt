@@ -1,4 +1,24 @@
 ####################################
+# V1.3.1
+####################################
+
+## Added Features:
+
+[+] BO : All already compatible Stats module are installed to the qloapps now.
+
+
+## Improved/changed features:
+
+[+] BO : Hotel name is shown in the Room Type Booking list and Room Type booking status tables.
+[+] FO : Hotel name is shown in the Customer shopping list, Order confirmation and order details booking lists.
+
+
+## Bug/Issues Resolved:
+
+[-] CO : Resolved :: When set up the new install, the upload_max_filesize value in the php.ini file less than 16M, but the error message is displaying for memory_limit.
+
+
+####################################
 # V1.3.0
 ####################################
 
@@ -11,6 +31,7 @@
 
 [+] CO : "create demo data or not" option improved for Qloapps demo data .
 [+] CO : System compatibility check for Qloapps installation improved .
+
 
 
 ####################################

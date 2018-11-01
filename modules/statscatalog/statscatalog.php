@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2014 PrestaShop
+* 2007-2016 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2014 PrestaShop SA
+*  @copyright  2007-2016 PrestaShop SA
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -36,7 +36,7 @@ class StatsCatalog extends Module
 	{
 		$this->name = 'statscatalog';
 		$this->tab = 'analytics_stats';
-		$this->version = '1.2.3';
+		$this->version = '1.4.0';
 		$this->author = 'PrestaShop';
 		$this->need_instance = 0;
 
@@ -44,6 +44,7 @@ class StatsCatalog extends Module
 
 		$this->displayName = $this->l('Catalog statistics');
 		$this->description = $this->l('Adds a tab containing general statistics about your catalog to the Stats dashboard.');
+		$this->ps_versions_compliancy = array('min' => '1.6', 'max' => '1.7.0.99');
 	}
 
 	public function install()
@@ -224,14 +225,15 @@ class StatsCatalog extends Module
 						</tr>
 					</thead>
 					<tbody>';
-			foreach ($products_nb as $product)
+			foreach ($products_nb as $product) {
+				$urlParams = array('id_product' => $product['id_product'], 'updateproduct' => '1');
 				$html .= '
 					<tr'.($irow++ % 2 ? ' class="alt_row"' : '').'>
 						<td>'.$product['id_product'].'</td>
 						<td>'.$product['name'].'</td>
 						<td class="left">
 							<div class="btn-group btn-group-action">
-								<a class="btn btn-default" href="'.Tools::safeOutput('index.php?tab=AdminProducts&id_product='.$product['id_product'].'&addproduct&token='.$product_token).'" target="_blank">
+								<a class="btn btn-default" href="' . Tools::safeOutput(preg_replace("/\\?.*$/", '?tab=AdminProducts&id_product=' . $product['id_product'] . '&updateproduct&token=' . $product_token, $this->context->link->getAdminLink('AdminProducts', true, $urlParams))) . '" target="_blank">
 									<i class="icon-edit"></i> '.$this->l('Edit').'
 								</a>
 								<button data-toggle="dropdown" class="btn btn-default dropdown-toggle" type="button">
@@ -247,6 +249,7 @@ class StatsCatalog extends Module
 							</div>
 						</td>
 					</tr>';
+			}
 			$html .= '
 					</tbody>
 				</table>';

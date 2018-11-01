@@ -639,7 +639,7 @@ class HotelCartBookingData extends ObjectModel
 
         if (Module::isInstalled('hotelreservationsystem')) {
             require_once _PS_MODULE_DIR_.'hotelreservationsystem/define.php';
-
+            $objHtlBranchInfo = new HotelBranchInformation();
             $obj_cart_bk_data = new self();
             $obj_htl_bk_dtl = new HotelBookingDetail();
             $obj_rm_type = new HotelRoomType();
@@ -718,6 +718,15 @@ class HotelCartBookingData extends ObjectModel
                             $feature_price_diff = (float)($unitPriceWithoutReduction - $feature_price);
                             $cart_htl_data[$type_key]['date_diff'][$date_join]['feature_price'] = $feature_price;
                             $cart_htl_data[$type_key]['date_diff'][$date_join]['feature_price_diff'] = $feature_price_diff;
+
+                            //enter hotel name
+                            $hotelInfo = $objHtlBranchInfo->hotelBranchesInfo(
+                                $context->language->id,
+                                2,
+                                0,
+                                $data_v['id_hotel']
+                            );
+                            $cart_htl_data[$type_key]['hotel_name'] = $hotelInfo['hotel_name'];
                         }
                         foreach ($cart_htl_data[$type_key]['date_diff'] as $key => $value) {
                             $cart_htl_data[$type_key]['total_num_rooms'] += $value['num_rm'];

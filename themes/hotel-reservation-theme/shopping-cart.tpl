@@ -84,6 +84,7 @@
 				<tr class="table_head">
 					<th class="cart_product">{l s='Room Image'}</th>
 					<th class="cart_description">{l s='Room Description'}</th>
+					<th>{l s='Hotel Name'}</th>
 					<th>{l s='Room Capacity'}</th>
 					<th class="cart_unit">{l s='Unit Price'}</th>
 					<th>{l s='Rooms'}</th>
@@ -367,6 +368,7 @@
 										</a>
 									</p>
 								</td>
+								<td>{$data_v['hotel_name']}</td>
 								<td>
 									<p class="text-left">
 										{$data_v['adult']} {l s='Adults'}, {$data_v['children']} {l s='Children'}

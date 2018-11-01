@@ -280,6 +280,7 @@
 									<table class="table table-responsive">
 										<tr>
 											<th>{l s='Room No.'}</th>
+											<th>{l s='Hotel Name'}</th>
 											<th>{l s='Date From'}</th>
 											<th>{l s='Date To'}</th>
 											<th>{l s='Order Status'}</th>
@@ -289,6 +290,11 @@
 										<tr>
 											<td>
 												{$data['room_num']}
+											</td>
+											<td>
+												<a href="{$link->getAdminLink('AdminAddHotel')}&amp;id={$data['id_hotel']}&amp;updatehtl_branch_info" target="_blank">
+													<span>{$data['hotel_name']}</span>
+												</a>
 											</td>
 											<td>
 												{$data['date_from']|date_format:"%d-%m-%Y"}
@@ -301,7 +307,7 @@
 													<select style="display:inline;width:40%;" name="booking_order_status">
 													{foreach from=$hotel_order_status item=state}
 														<option value="{$state['id']|intval}" {if isset($data.id_status) && $state.id == $data.id_status} selected="selected" disabled="disabled"{/if}>{$state.status|escape}</option>
-													{/foreach} 
+													{/foreach}
 													</select>
 													<input type="hidden" name="date_from" value="{$data['date_from']}" />
 													<input type="hidden" name="date_to" value="{$data['date_to']}" />
@@ -319,7 +325,7 @@
 											<td>{l s='No data found.'}</td>
 										</tr>
 										{/if}
-									</table>	
+									</table>
 								</div>
 							</div>
 						</div>
@@ -969,6 +975,7 @@
 										<th class="text-center"><span class="title_box">{l s='Room No.'}</span></th>
 										<th class="text-center"><span class="title_box">{l s='Room Image'}</th>
 										<th class="text-center"><span class="title_box">{l s='Room Type'}</span></th>
+										<th class="text-center"><span class="title_box">{l s='Hotel Name'}</span></th>
 										<th class="text-center"><span class="title_box">{l s='Duration'}</span></th>
 										<th class="text-center"><span class="title_box">{l s='Unit Price'}</span></th>
 										<th class="text-center"><span class="title_box">{l s='Total Price'}</span></th>
@@ -1096,7 +1103,7 @@
 								{/if}
 							</div>
 						</div> <!-- by webkul to hide unnessary things in the page--> *}
-						
+
 						<!-- For Due amount submit panel (by webkul) -->
 						{if isset($order_adv_dtl)}
 							<div class="col-xs-6">
@@ -1134,17 +1141,17 @@
 															</div>
 														</td>
 													</tr>
-												{/if}	
+												{/if}
 											</table>
 										</div>
 										{if ($order_adv_dtl['total_order_amount'] - $order_adv_dtl['total_paid_amount'])|round:2 > 0}
 											<button type="submit" class="btn btn-primary" name="payDueAmount" style="margin-top:10px;">{l s="Submit Amount"}</button>
-										{/if}	
+										{/if}
 									</form>
 								</div>
 							</div>
 						{/if}
-						
+
 						<div class="col-xs-6 pull-right">
 							<div class="panel panel-vouchers" style="{if !sizeof($discounts)}display:none;{/if}">
 								{if (sizeof($discounts) || $can_edit)}
@@ -1281,9 +1288,9 @@
 												</td>
 											</tr>
 										{/if}
-										
+
 										{assign var=order_total_price value=$order->total_paid_tax_incl}
-										
+
 										<tr id="total_order">
 											<td class="text-right"><strong>{l s='Total'}</strong></td>
 											<td class="amount text-right nowrap">
@@ -1643,7 +1650,7 @@
 				$(".realloc_avail_rooms_container").empty().text(no_rm_avail_txt);
 			}
 		});
-		
+
 		/*For reallocating rooms in the modal*/
 		$("#realloc_allocated_rooms").on('click', function(e){
 			$(".error_text").text('');
@@ -1663,7 +1670,7 @@
 				return false;
 			}
 		});
-	
+
 		/*END*/
 
 		$(".textarea-autosize").autosize();

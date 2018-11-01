@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2014 PrestaShop
+* 2007-2016 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2014 PrestaShop SA
+*  @copyright  2007-2016 PrestaShop SA
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -41,7 +41,7 @@ class StatsBestSuppliers extends ModuleGrid
 	{
 		$this->name = 'statsbestsuppliers';
 		$this->tab = 'analytics_stats';
-		$this->version = '1.3.1';
+		$this->version = '1.4.1';
 		$this->author = 'PrestaShop';
 		$this->need_instance = 0;
 
@@ -75,7 +75,7 @@ class StatsBestSuppliers extends ModuleGrid
 
 		$this->displayName = $this->l('Best suppliers');
 		$this->description = $this->l('Adds a list of the best suppliers to the Stats dashboard.');
-		$this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
+		$this->ps_versions_compliancy = array('min' => '1.6', 'max' => '1.7.0.99');
 	}
 
 	public function install()

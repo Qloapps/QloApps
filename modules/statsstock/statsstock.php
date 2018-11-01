@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2015 PrestaShop
+* 2007-2016 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2016 PrestaShop SA
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -35,7 +35,7 @@ class StatsStock extends Module
 	{
 		$this->name = 'statsstock';
 		$this->tab = 'analytics_stats';
-		$this->version = '1.5.0';
+		$this->version = '1.6.0';
 		$this->author = 'PrestaShop';
 		$this->need_instance = 0;
 
@@ -43,7 +43,7 @@ class StatsStock extends Module
 
 		$this->displayName = $this->l('Available quantities');
 		$this->description = $this->l('Adds a tab showing the quantity of available products for sale to the Stats dashboard.');
-		$this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
+		$this->ps_versions_compliancy = array('min' => '1.6', 'max' => '1.7.0.99');
 	}
 
 	public function install()
@@ -66,16 +66,21 @@ class StatsStock extends Module
 					FROM '._DB_PREFIX_.'product_attribute pa
 					'.Shop::addSqlAssociation('product_attribute', 'pa').'
 					WHERE p.id_product = pa.id_product
-					AND product_attribute_shop.wholesale_price != 0
-				), product_shop.wholesale_price) as wholesale_price,
+					AND product_attribute_shop.wholesale_price != 0 ';
+		if (version_compare(_PS_VERSION_, '1.7.0.0', '>=')) {
+			$sql .= 'AND p.state = ' . Product::STATE_SAVED . ' ';
+		}
+		$sql .= '), product_shop.wholesale_price) as wholesale_price,
 				IFNULL(stock.quantity, 0) as quantity
 				FROM '._DB_PREFIX_.'product p
 				'.Shop::addSqlAssociation('product', 'p').'
 				INNER JOIN '._DB_PREFIX_.'product_lang pl
 					ON (p.id_product = pl.id_product AND pl.id_lang = '.(int)$this->context->language->id.Shop::addSqlRestrictionOnLang('pl').')
-				'.Product::sqlStock('p', 0).'
-				WHERE 1 = 1
-				'.$filter;
+				'.Product::sqlStock('p', 0);
+		if (version_compare(_PS_VERSION_, '1.7.0.0', '>=')) {
+			$sql .= ' WHERE p.state = ' . Product::STATE_SAVED . ' ';
+		}
+		$sql .= $filter;
 		$products = Db::getInstance()->executeS($sql);
 
 		foreach ($products as $key => $p)

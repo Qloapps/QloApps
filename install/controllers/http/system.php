@@ -95,9 +95,9 @@ class InstallControllerHttpSystem extends InstallControllerHttp
                         'curl' => $this->l('Curl extension is not loaded'),
                         'soap' => $this->l('SOAP extension is not loaded'),
                         'simplexml' => $this->l('SimpleXml extension is not loaded'),
-                        'upload_max_filesize' => $this->l('In the PHP configuration set memory_limit to minimum 128M'),
+                        'memory_limit' => $this->l('In the PHP configuration set memory_limit to minimum 128M'),
                         'max_execution_time' => $this->l('In the PHP configuration set max_execution_time to minimum 500'),
-                        'memory_limit' => $this->l('In the PHP configuration set upload_max_filesize to minimum 16M'),
+                        'upload_max_filesize' => $this->l('In the PHP configuration set upload_max_filesize to minimum 16M'),
                     )
                 ),
                 array(

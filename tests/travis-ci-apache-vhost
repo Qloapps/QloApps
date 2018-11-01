@@ -1,0 +1,18 @@
+<VirtualHost *:80>
+
+  ServerName localhost
+
+  AddHandler php5-fcgi .php
+  Action php5-fcgi /php5-fcgi
+  Alias /php5-fcgi /usr/lib/cgi-bin/php5-fcgi
+  FastCgiExternalServer /usr/lib/cgi-bin/php5-fcgi -host 127.0.0.1:9000 -pass-header Authorization
+
+  DocumentRoot /var/www/
+  <Directory /var/www/>
+    Options FollowSymLinks MultiViews ExecCGI
+    AllowOverride All
+    Order deny,allow
+    Allow from all
+  </Directory>
+
+</VirtualHost>

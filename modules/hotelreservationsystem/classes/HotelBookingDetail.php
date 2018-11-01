@@ -1006,6 +1006,7 @@ class HotelBookingDetail extends ObjectModel
         $context = Context::getContext();
         $order_detail_data = $this->getOrderCurrentDataByOrderId((int) $id_order);
         if ($order_detail_data) {
+            $objHtlBranchInfo = new HotelBranchInformation();
             foreach ($order_detail_data as $key => $value) {
                 $product_image_id = Product::getCover($value['id_product']);
                 $link_rewrite = ((new Product((int) $value['id_product'], Configuration::get('PS_LANG_DEFAULT')))->link_rewrite[Configuration::get('PS_LANG_DEFAULT')]);
@@ -1036,6 +1037,15 @@ class HotelBookingDetail extends ObjectModel
                 $order_detail_data[$key]['feature_price_diff'] = $feature_price_diff;
 
                 $order_detail_data[$key]['quantity'] = $num_days;
+
+                //enter hotel name
+                $hotelInfo = $objHtlBranchInfo->hotelBranchesInfo(
+                    Configuration::get('PS_LANG_DEFAULT'),
+                    2,
+                    0,
+                    $value['id_hotel']
+                );
+                $order_detail_data[$key]['hotel_name'] = $hotelInfo['hotel_name'];
             }
         }
         if ($order_detail_data) {

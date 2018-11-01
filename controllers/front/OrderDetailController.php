@@ -323,7 +323,7 @@ class OrderDetailControllerCore extends FrontController
                 //by webkul to show order details properly on order history page
                 if (Module::isInstalled('hotelreservationsystem')) {
                     require_once _PS_MODULE_DIR_.'hotelreservationsystem/define.php';
-
+                    $objHtlBranchInfo = new HotelBranchInformation();
                     $obj_cart_bk_data = new HotelCartBookingData();
                     $obj_htl_bk_dtl = new HotelBookingDetail();
                     $obj_rm_type = new HotelRoomType();
@@ -427,6 +427,15 @@ class OrderDetailControllerCore extends FrontController
 
                                 $feature_price_diff = (float)($cart_htl_data[$type_key]['date_diff'][$date_join]['product_price_without_reduction_tax_incl'] - $cart_htl_data[$type_key]['date_diff'][$date_join]['paid_unit_price_tax_incl']);
                                 $cart_htl_data[$type_key]['date_diff'][$date_join]['feature_price_diff'] = $feature_price_diff;
+
+                                //enter hotel name
+                                $hotelInfo = $objHtlBranchInfo->hotelBranchesInfo(
+                                    Configuration::get('PS_LANG_DEFAULT'),
+                                    2,
+                                    0,
+                                    $data_v['id_hotel']
+                                );
+                                $cart_htl_data[$type_key]['hotel_name'] = $hotelInfo['hotel_name'];
                             }
                         }
                         $redirect_link_terms = $this->context->link->getCMSLink(new CMS(3, $this->context->language->id), null, $this->context->language->id);
