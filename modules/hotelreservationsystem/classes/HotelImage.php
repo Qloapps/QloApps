@@ -56,6 +56,13 @@ class HotelImage extends ObjectModel
         return $delete;
     }
 
+    public static function getCover($idHotel)
+    {
+        return Db::getInstance()->getRow(
+            'SELECT * FROM `'._DB_PREFIX_.'htl_image` WHERE `id_hotel` = '.(int)$idHotel.' AND `cover`=1'
+        );
+    }
+
     /**
      * [validAddHotelMainImage :: To validate the image of the hotel before saving it]
      * @param  [array] $image [variable having image information of the hotel]
@@ -72,13 +79,6 @@ class HotelImage extends ObjectModel
         } else {
             return true;
         }
-    }
-
-    public static function getCover($idHotel)
-    {
-        return Db::getInstance()->getRow(
-            'SELECT * FROM `'._DB_PREFIX_.'htl_image` WHERE `id_hotel` = '.(int)$idHotel.' AND `cover`=1'
-        );
     }
 
     public function uploadHotelImages($images, $idHotel, $destPath)

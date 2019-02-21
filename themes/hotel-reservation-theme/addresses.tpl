@@ -39,9 +39,11 @@
                     {assign var=addressKey value=" "|explode:$pattern}
                     <li>
                     {foreach from=$addressKey item=key name="word_loop"}
-                        <span {if isset($addresses_style[$key])} class="{$addresses_style[$key]}"{/if}>
-                            {$address.formated[$key|replace:',':'']|escape:'html':'UTF-8'}
-                        </span>
+						{if isset($address.formated[$key|replace:',':''])}
+							<span {if isset($addresses_style[$key])} class="{$addresses_style[$key]}"{/if}>
+								{$address.formated[$key|replace:',':'']|escape:'html':'UTF-8'}
+							</span>
+						{/if}
                     {/foreach}
                     </li>
                 {/foreach}
@@ -50,7 +52,7 @@
                 <a class="btn btn-default button button-small" href="{$link->getPageLink('address', true, null, "id_address={$address.object.id|intval}&delete")|escape:'html':'UTF-8'}" data-id="addresses_confirm" title="{l s='Delete'}"><span>{l s='Delete'}<i class="icon-remove right"></i></span></a></li>
             </ul>
         </div>
-	{if $smarty.foreach.myLoop.index % 2 && !$smarty.foreach.myLoop.last} 
+	{if $smarty.foreach.myLoop.index % 2 && !$smarty.foreach.myLoop.last}
 	</div>
 	<div class="bloc_adresses row">
 	{/if}

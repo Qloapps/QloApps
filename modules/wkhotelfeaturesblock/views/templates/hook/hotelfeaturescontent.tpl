@@ -117,7 +117,7 @@
                                 <div class="row margin-lr-0 amenity_content">
                                     <div class="col-xs-12 padding-lr-0">
                                         <div class="amenity_img_primary">
-                                            <div class="amenity_img_secondary" style="background-image: url('{$module_dir|escape:'htmlall':'UTF-8'}views/img/hotels_features_img/{$amenity.feature_image|escape:'htmlall':'UTF-8'}')">
+                                            <div class="amenity_img_secondary" style="background-image: url('{$module_dir|escape:'htmlall':'UTF-8'}views/img/hotels_features_img/{$amenity.id_features_block|escape:'htmlall':'UTF-8'}.jpg')">
                                             </div>
                                         </div>
                                     </div>

@@ -1,4 +1,34 @@
 ####################################
+# V1.3.2
+####################################
+
+## Added Features:
+
+[+] CO : pscleaner module is added for cleaning demo data from QloApps.
+
+[+] FO : Option for Guest checkout is given at Preferences->Orders tab. So Guest Checkout is enabled.
+
+[+] FO : Option for Shorter registration/address form is given at Preferences->Customers tab. (In this case address will be created from customer chosen room type's hotel address automatically).
+
+[+] CO : wkfooterexploreblock :: Admin can add custom explore links to show at footer explore block and navigation menu also. table  'htl_custom_explore_link' added with multilang.
+
+## Improved/changed features:
+
+[-] BO : New category option from "quick access" links is removed.
+[+] FO : Checkout page design has been changed.
+[+] CO : Images validation improved.
+
+
+## Bug/Issues Resolved:
+
+[-] CO : 56% Installation issue.
+
+[-] BO : Dashboard graphs not loading issues on php 7.2
+[-] BO : feature update issue on not selecting image while updating the feature.
+[-] BO : Category bug resolve (Should not be created updated deleted from anywhere). Will be handled from hotel creation/updation/deletion.
+
+
+####################################
 # V1.3.1
 ####################################
 

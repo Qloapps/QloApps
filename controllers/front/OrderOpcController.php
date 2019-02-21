@@ -382,33 +382,65 @@ class OrderOpcControllerCore extends ParentOrderController
                 break;
             }
         }
+        if ($this->context->cart->id_address_delivery) {
+            // send address formatted layout data
+            if (Validate::isLoadedObject($address = new Address($this->context->cart->id_address_delivery))) {
+                $addressLayout = AddressFormat::getFormattedLayoutData($address);
+                $orderedAddressFields = AddressFormat::getOrderedAddressFields($address->id_country, false, true);
+                $this->context->smarty->assign(
+                    array(
+                        'orderedAddressFields' => $orderedAddressFields,
+                        'addressLayout' => $addressLayout
+                    )
+                );
+            }
+        }
 
-        $this->context->smarty->assign(array(
-            'free_shipping' => $free_shipping,
-            'isGuest' => isset($this->context->cookie->is_guest) ? $this->context->cookie->is_guest : 0,
-            'countries' => $countries,
-            'sl_country' => (int)Tools::getCountry(),
-            'PS_GUEST_CHECKOUT_ENABLED' => Configuration::get('PS_GUEST_CHECKOUT_ENABLED'),
-            'errorCarrier' => Tools::displayError('You must choose a carrier.', false),
-            'errorTOS' => Tools::displayError('You must accept the Terms of Service.', false),
-            'isPaymentStep' => isset($_GET['isPaymentStep']) && $_GET['isPaymentStep'],
-            'genders' => Gender::getGenders(),
-            'one_phone_at_least' => (int)Configuration::get('PS_ONE_PHONE_AT_LEAST'),
-            'HOOK_CREATE_ACCOUNT_FORM' => Hook::exec('displayCustomerAccountForm'),
-            'HOOK_CREATE_ACCOUNT_TOP' => Hook::exec('displayCustomerAccountFormTop')
-        ));
+        // assign checkout process steps
+        $this->setCheckoutProcess();
+
+        // if there is cookie variable in the url the redirect
+        if (Tools::getValue('proceed_to_customer_dtl') || Tools::getValue('proceed_to_payment')) {
+            Tools::redirect($this->context->link->getPageLink('order-opc', null, $this->context->language->id));
+        }
+
+        $this->context->smarty->assign('checkout_process_steps', $this->checkoutProcess->getSteps());
+        $this->context->smarty->assign(
+            array(
+                'THEME_DIR' => _THEME_DIR_,
+                'PS_CUSTOMER_ADDRESS_CREATION' => Configuration::get('PS_CUSTOMER_ADDRESS_CREATION'),
+                'free_shipping' => $free_shipping,
+                'isGuest' => isset($this->context->cookie->is_guest) ? $this->context->cookie->is_guest : 0,
+                'countries' => $countries,
+                'sl_country' => (int)Tools::getCountry(),
+                'PS_GUEST_CHECKOUT_ENABLED' => Configuration::get('PS_GUEST_CHECKOUT_ENABLED'),
+                'errorCarrier' => Tools::displayError('You must choose a carrier.', false),
+                'errorTOS' => Tools::displayError('You must accept the Terms of Service.', false),
+                'isPaymentStep' => isset($_GET['isPaymentStep']) && $_GET['isPaymentStep'],
+                'genders' => Gender::getGenders(),
+                'one_phone_at_least' => (int)Configuration::get('PS_ONE_PHONE_AT_LEAST'),
+                'HOOK_CREATE_ACCOUNT_FORM' => Hook::exec('displayCustomerAccountForm'),
+                'HOOK_CREATE_ACCOUNT_TOP' => Hook::exec('displayCustomerAccountFormTop')
+            )
+        );
         $years = Tools::dateYears();
         $months = Tools::dateMonths();
         $days = Tools::dateDays();
-        $this->context->smarty->assign(array(
-            'years' => $years,
-            'months' => $months,
-            'days' => $days,
-        ));
+        $this->context->smarty->assign(
+            array(
+                'years' => $years,
+                'months' => $months,
+                'days' => $days,
+            )
+        );
 
         /* Load guest informations */
-        if ($this->isLogged && $this->context->cookie->is_guest) {
-            $this->context->smarty->assign('guestInformations', $this->_getGuestInformations());
+        if ($this->isLogged) {
+            if ($this->context->cookie->is_guest) {
+                $this->context->smarty->assign('guestInformations', $this->_getGuestInformations());
+            } else {
+                $this->context->smarty->assign('guestInformations', (array)$this->context->customer);
+            }
         }
         // ADDRESS
         if ($this->isLogged) {
@@ -433,11 +465,14 @@ class OrderOpcControllerCore extends ParentOrderController
             $id_product = Tools::getValue('id_product');
             $date_from = Tools::getValue('date_from');
             $date_to = Tools::getValue('date_to');
-
             $obj_cart_bk_data = new HotelCartBookingData();
-            $cart_data_dlt = $obj_cart_bk_data->deleteRoomDataFromOrderLine($this->context->cart->id, $this->context->cart->id_guest, $id_product, $date_from, $date_to);
-
-            if ($cart_data_dlt) {
+            if ($cart_data_dlt = $obj_cart_bk_data->deleteRoomDataFromOrderLine(
+                $this->context->cart->id,
+                $this->context->cart->id_guest,
+                $id_product,
+                $date_from,
+                $date_to
+            )) {
                 Tools::redirect($link->getPageLink('order-opc', null, $this->context->language->id));
             }
         }
@@ -447,7 +482,7 @@ class OrderOpcControllerCore extends ParentOrderController
             $this->setTemplate(_PS_THEME_DIR_ . 'order-opc-advanced.tpl');
         } else {
             if (Module::isInstalled('hotelreservationsystem')) {
-                require_once(_PS_MODULE_DIR_.'hotelreservationsystem/define.php');
+                require_once _PS_MODULE_DIR_.'hotelreservationsystem/define.php';
 
                 $obj_cart_bk_data = new HotelCartBookingData();
                 $obj_htl_bk_dtl = new HotelBookingDetail();
@@ -498,9 +533,8 @@ class OrderOpcControllerCore extends ParentOrderController
                         }
                     }
                     $this->context->smarty->assign('cartChanged', $cartChanged);
-                    $cart_htl_data = HotelCartBookingData::getHotelCartBookingData();
-                    if ($cart_htl_data) {
-                        $this->context->smarty->assign('cart_htl_data', $cart_htl_data);
+                    if ($cartBookingInfo = HotelCartBookingData::getHotelCartBookingData()) {
+                        $this->context->smarty->assign('cart_htl_data', $cartBookingInfo);
                     }
 
                     // For Advanced Payment
@@ -567,7 +601,6 @@ class OrderOpcControllerCore extends ParentOrderController
                             $customer_adv_dtl['total_to_be_paid'] = ($customer_adv_dtl['total_paid_amount'] - $total_discount) > 0 ? ($customer_adv_dtl['total_paid_amount'] - $total_discount) : 0;
                             $this->context->smarty->assign('customer_adv_dtl', $customer_adv_dtl);
                         }
-
                         $this->context->smarty->assign('adv_amount', $adv_amount);
                         $this->context->smarty->assign('advance_payment_active', $advance_payment_active);
                     }
@@ -583,6 +616,25 @@ class OrderOpcControllerCore extends ParentOrderController
             /*END*/
             $this->setTemplate(_PS_THEME_DIR_.'order-opc.tpl');
         }
+    }
+
+    // sets checkout process steps as per current values
+    private function setCheckoutProcess()
+    {
+        $this->checkoutProcess = new CheckoutProcess();
+        // add the steps you want to add in checkout process
+        $this->checkoutProcess
+            ->addStep(new CheckoutCartSummaryStep())
+            ->addStep(new CheckoutCustomerDetailsStep())
+            ->addStep(new CheckoutPaymentStep());
+
+        $this->checkoutProcess->handleRequest();
+
+        // for making steps synced
+        $this->checkoutProcess
+            ->setNextStepReachable()
+            ->markCurrentStep()
+            ->invalidateAllStepsAfterCurrent();
     }
 
     protected function _getGuestInformations()
@@ -866,7 +918,6 @@ class OrderOpcControllerCore extends ParentOrderController
                 $dlv_adr_fields[] = trim($field_name);
             }
         }
-
         foreach ($require_form_fields_list as $field_name) {
             if (!in_array($field_name, $inv_adr_fields)) {
                 $inv_adr_fields[] = trim($field_name);
@@ -886,11 +937,13 @@ class OrderOpcControllerCore extends ParentOrderController
             ${$adr_type.'_adr_fields'} = array_unique(${$adr_type.'_adr_fields'});
             ${$adr_type.'_all_fields'} = array_unique(${$adr_type.'_all_fields'});
 
-            $this->context->smarty->assign(array(
-                $adr_type.'_adr_fields' => ${$adr_type.'_adr_fields'},
-                $adr_type.'_all_fields' => ${$adr_type.'_all_fields'},
-                'required_fields' => $require_form_fields_list
-            ));
+            $this->context->smarty->assign(
+                array(
+                    $adr_type.'_adr_fields' => ${$adr_type.'_adr_fields'},
+                    $adr_type.'_all_fields' => ${$adr_type.'_all_fields'},
+                    'required_fields' => $require_form_fields_list
+                )
+            );
         }
     }
 

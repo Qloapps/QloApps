@@ -26,6 +26,8 @@ class AdminHotelFeaturesController extends ModuleAdminController
         $this->table = 'htl_features';
         $this->className = 'HotelFeatures';
         $this->identifier  = 'id';
+        $this->toolbar_title = $this->l('Manage Hotel Features');
+
         parent::__construct();
         $this->display = 'view';
     }

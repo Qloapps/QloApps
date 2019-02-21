@@ -203,6 +203,8 @@ class AddressCore extends ObjectModel
         if (Validate::isUnsignedId($this->id_customer)) {
             Customer::resetAddressCache($this->id_customer, $this->id);
         }
+        // reset checkout process if addresses deletes
+        CheckoutProcess::refreshCheckoutProcess();
 
         if (!$this->isUsed()) {
             return parent::delete();

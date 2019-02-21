@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 49.3 (51167) - http://www.bohemiancoding.com/sketch -->
+    <title>icon-features</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <rect id="path-1" x="0" y="0" width="24" height="24" rx="12"></rect>
+    </defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Checkout-1" transform="translate(-295.000000, -336.000000)">
+            <g id="Checkout-details" transform="translate(164.000000, 133.000000)">
+                <g id="Room" transform="translate(1.000000, 51.000000)">
+                    <g id="01" transform="translate(21.000000, 88.000000)">
+                        <g id="checkout/room-list/normal">
+                            <g id="Additional-features" transform="translate(109.000000, 64.000000)">
+                                <g id="01">
+                                    <g id="checkout/amenities/check">
+                                        <g id="icon-features">
+                                            <g id="Rectangle-5">
+                                                <use fill="#84BD46" fill-rule="evenodd" xlink:href="#path-1"></use>
+                                                <rect stroke="#658740" stroke-width="1" x="0.5" y="0.5" width="23" height="23" rx="11.5"></rect>
+                                            </g>
+                                            <polygon id="Rectangle-6" fill="#FFFFFF" transform="translate(13.547381, 12.415872) rotate(45.000000) translate(-13.547381, -12.415872) " points="12.5213969 7.02998868 14.5213969 7.02998868 14.5733647 17.8017561 12.5733647 17.8017561"></polygon>
+                                            <rect id="Rectangle-6-Copy" fill="#FFFFFF" transform="translate(9.392767, 14.392767) rotate(-45.000000) translate(-9.392767, -14.392767) " x="8.39276695" y="12.0088835" width="2" height="4.76776695"></rect>
+                                        </g>
+                                    </g>
+                                </g>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

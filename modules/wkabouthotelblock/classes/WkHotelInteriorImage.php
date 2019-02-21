@@ -81,7 +81,7 @@ class WkHotelInteriorImage extends ObjectModel
         return false;
     }
 
-    public static function getHigherPosition()
+    public function getHigherPosition()
     {
         $position = DB::getInstance()->getValue(
             'SELECT MAX(`position`) FROM `'._DB_PREFIX_.'htl_interior_image`'
@@ -127,42 +127,48 @@ class WkHotelInteriorImage extends ObjectModel
      * Call it after deleting a blocks.
      * @return bool $return
      */
-    public static function cleanPositions()
+    public function cleanPositions()
     {
         Db::getInstance()->execute('SET @i = -1', false);
         $sql = 'UPDATE `'._DB_PREFIX_.'htl_interior_image` SET `position` = @i:=@i+1 ORDER BY `position` ASC';
         return (bool) Db::getInstance()->execute($sql);
     }
 
-    public static function insertModuleDemoData()
+    public function insertModuleDemoData()
     {
         $languages = Language::getLanguages(false);
         $HOTEL_INTERIOR_HEADING = array();
         $HOTEL_INTERIOR_DESCRIPTION = array();
         foreach ($languages as $lang) {
             $HOTEL_INTERIOR_HEADING[$lang['id_lang']] = 'Interior';
-            $HOTEL_INTERIOR_DESCRIPTION[$lang['id_lang']] = 'Families travelling with kids will find Amboseli national
-            park a safari destination matched to no other, with less tourist traffic, breathtaking open space.';
+            $HOTEL_INTERIOR_DESCRIPTION[$lang['id_lang']] = 'Families travelling with kids will find Amboseli national park a safari destination matched to no other, with less tourist traffic, breathtaking open space.';
         }
+        Configuration::updateValue('HOTEL_INTERIOR_BLOCK_NAV_LINK', 1);
         // update global configuration values in multilang
         Configuration::updateValue('HOTEL_INTERIOR_HEADING', $HOTEL_INTERIOR_HEADING);
         Configuration::updateValue('HOTEL_INTERIOR_DESCRIPTION', $HOTEL_INTERIOR_DESCRIPTION);
 
         // Database Entry
         for ($i = 1; $i <= 12; $i++) {
-            do {
-                $tmp_name = uniqid().'.jpg';
-            } while (file_exists(_PS_MODULE_DIR_.'wkabouthotelblock/views/img/hotel_interior/'.$tmp_name));
-            ImageManager::resize(
-                _PS_MODULE_DIR_.'wkabouthotelblock/views/img/dummy_img/'.$i.'.jpg',
-                _PS_MODULE_DIR_.'wkabouthotelblock/views/img/hotel_interior/'.$tmp_name
-            );
-            $objHtlInteriorImg = new WkHotelInteriorImage();
-            $objHtlInteriorImg->name = $tmp_name;
-            $objHtlInteriorImg->display_name = 'Dummy Image '.$i;
-            $objHtlInteriorImg->position = self::getHigherPosition();
-            $objHtlInteriorImg->active = 1;
-            $objHtlInteriorImg->add();
+            $imgName = $i.'.jpg';
+            $srcPath = _PS_MODULE_DIR_.'wkabouthotelblock/views/img/dummy_img/'.$imgName;
+            if (file_exists($srcPath)) {
+                if (ImageManager::isRealImage($srcPath)
+                    && ImageManager::isCorrectImageFileExt($srcPath)
+                ) {
+                    if (ImageManager::resize(
+                        $srcPath,
+                        _PS_MODULE_DIR_.'wkabouthotelblock/views/img/hotel_interior/'.$imgName
+                    )) {
+                        $objHtlInteriorImg = new WkHotelInteriorImage();
+                        $objHtlInteriorImg->name = $imgName;
+                        $objHtlInteriorImg->display_name = 'Dummy Image '.$i;
+                        $objHtlInteriorImg->position = $this->getHigherPosition();
+                        $objHtlInteriorImg->active = 1;
+                        $objHtlInteriorImg->save();
+                    }
+                }
+            }
         }
 
         return true;

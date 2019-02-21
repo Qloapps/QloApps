@@ -1,0 +1,349 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<logos>
+
+	<country iso_code="default">
+		<PayPalLogoSmall>https://www.paypal.com/en_GB/Marketing/i/logo/PayPal_logo_80x35.gif</PayPalLogoSmall>
+		<PayPalLogoMedium>https://www.paypal.com/en_GB/Marketing/i/logo/PayPal_logo_100x45.gif</PayPalLogoMedium>
+		<PayPalLogoLarge>https://www.paypal.com/en_GB/Marketing/i/logo/PayPal_logo_150x65.gif</PayPalLogoLarge>
+
+		<PayPalMarkSmall>https://www.paypal.com/en_GB/GB/i/logo/PayPal_mark_37x23.gif</PayPalMarkSmall>
+		<PayPalMarkMedium>https://www.paypal.com/en_GB/GB/i/logo/PayPal_mark_50x34.gif</PayPalMarkMedium>
+		<PayPalMarkLarge>https://www.paypal.com/en_GB/GB/i/logo/PayPal_mark_60x38.gif</PayPalMarkLarge>
+
+		<LocalPayPalHorizontalSolutionPP>/views/img/default_logos/default_horizontal.png</LocalPayPalHorizontalSolutionPP>
+		<LocalPayPalVerticalSolutionPP>/views/img/default_logos/default_logo.gif</LocalPayPalVerticalSolutionPP>
+	</country>
+
+	<country iso_code="AU">
+		<PayPalLogoSmall>https://www.paypal.com/en_GB/Marketing/i/logo/PayPal_logo_80x35.gif</PayPalLogoSmall>
+		<PayPalLogoMedium>https://www.paypal.com/en_GB/Marketing/i/logo/PayPal_logo_100x45.gif</PayPalLogoMedium>
+		<PayPalLogoLarge>https://www.paypal.com/en_GB/Marketing/i/logo/PayPal_logo_150x65.gif</PayPalLogoLarge>
+
+		<PayPalMarkSmall>https://www.paypal.com/en_AU/i/logo/PayPal_mark_37x23.gif</PayPalMarkSmall>
+		<PayPalMarkMedium>https://www.paypal.com/en_AU/i/logo/PayPal_mark_50x34.gif</PayPalMarkMedium>
+		<PayPalMarkLarge>https://www.paypal.com/en_AU/i/logo/PayPal_mark_60x38.gif</PayPalMarkLarge>
+
+        <PayPalHorizontalSolutionPP>https://www.paypalobjects.com/en_AU/AU/i/bnr/horizontal_solution_PP.gif</PayPalHorizontalSolutionPP>
+
+        <PayPalVerticalSolutionPP></PayPalVerticalSolutionPP>
+        <LocalPayPalVerticalSolutionPP>/views/img/default_logos/AU_vertical_solution_PP.png</LocalPayPalVerticalSolutionPP>
+	</country>
+
+	<country iso_code="BE">
+		<PayPalLogoSmall>https://www.paypal.com/fr_FR/BE/Marketing/i/logo/PayPal_logo_80x35.gif</PayPalLogoSmall>
+		<PayPalLogoMedium>https://www.paypal.com/fr_FR/BE/Marketing/i/logo/PayPal_logo_100x45.gif</PayPalLogoMedium>
+		<PayPalLogoLarge>https://www.paypal.com/fr_FR/BE/Marketing/i/logo/PayPal_logo_150x65.gif</PayPalLogoLarge>
+
+		<PayPalMarkSmall>https://www.paypal.com/en_US/BE/i/logo/PayPal_mark_37x23.gif</PayPalMarkSmall>
+		<PayPalMarkMedium>https://www.paypal.com/fr_FR/i/logo/PayPal_mark_50x34.gif</PayPalMarkMedium>
+		<PayPalMarkLarge>https://www.paypal.com/fr_FR/i/logo/PayPal_mark_60x38.gif</PayPalMarkLarge>
+		<PayPalMarkGiant>https://www.paypal.com/fr_FR/i/logo/PayPal_mark_180x113.gif</PayPalMarkGiant>
+
+		<PayPalHorizontalSolutionPP></PayPalHorizontalSolutionPP>
+		<LocalPayPalHorizontalSolutionPP>/views/img/default_logos/BE_horizontal_solution_PP.png</LocalPayPalHorizontalSolutionPP>
+
+		<PayPalVerticalSolutionPP></PayPalVerticalSolutionPP>
+		<LocalPayPalVerticalSolutionPP>/views/img/default_logos/BE_vertical_solution_PP.png</LocalPayPalVerticalSolutionPP>
+	</country>
+
+	<country iso_code="CN">
+		<PayPalLogoSmall>https://www.paypal.com/en_GB/Marketing/i/logo/PayPal_logo_80x35.gif</PayPalLogoSmall>
+		<PayPalLogoMedium>https://www.paypal.com/en_GB/Marketing/i/logo/PayPal_logo_100x45.gif</PayPalLogoMedium>
+		<PayPalLogoLarge>https://www.paypal.com/en_GB/Marketing/i/logo/PayPal_logo_150x65.gif</PayPalLogoLarge>
+
+		<PayPalMarkLarge>https://www.paypal.com/zh_CN/CN/i/logo/PayPal_mark_60x38.gif</PayPalMarkLarge>
+		<PayPalMarkGiant>https://www.paypal.com/zh_CN/CN/i/logo/PayPal_mark_180x113.gif</PayPalMarkGiant>
+
+		<PayPalHorizontalSolutionPP>https://www.paypal.com/zh_CN/i/bnr/horizontal_solution_PP.gif</PayPalHorizontalSolutionPP>
+		<LocalPayPalVerticalSolutionPP>https://www.paypal.com/zh_CN/i/bnr/vertical_solution_PP.gif</LocalPayPalVerticalSolutionPP>
+	</country>
+
+	<country iso_code="DE">
+		<PayPalLogoSmall>https://www.paypalobjects.com/webstatic/de_DE/i/de-pp-logo-100px.png</PayPalLogoSmall>
+		<PayPalLogoMedium>https://www.paypalobjects.com/webstatic/de_DE/i/de-pp-logo-150px.png</PayPalLogoMedium>
+		<PayPalLogoLarge>https://www.paypalobjects.com/webstatic/de_DE/i/de-pp-logo-200px.png</PayPalLogoLarge>
+
+		<PayPalHorizontalSolutionPP>https://www.paypalobjects.com/webstatic/de_DE/i/de-pp-logo-200px.png</PayPalHorizontalSolutionPP>
+		<LocalPayPalHorizontalSolutionPP>/modules/paypal/views/img/default_logos/DE_horizontal_solution_PP.gif</LocalPayPalHorizontalSolutionPP>
+
+		<ExpressCheckoutShortcutButton>https://www.paypalobjects.com/webstatic/de_DE/i/de-btn-expresscheckout.gif</ExpressCheckoutShortcutButton>
+
+		<PayPalMarkSmall>https://www.paypalobjects.com/webstatic/mktg/logo/pp_cc_mark_37x23.jpg</PayPalMarkSmall>
+		<PayPalMarkMedium>https://www.paypalobjects.com/webstatic/mktg/logo/pp_cc_mark_74x46.jpg</PayPalMarkMedium>
+		<PayPalMarkLarge>https://www.paypalobjects.com/webstatic/mktg/logo/pp_cc_mark_111x69.jpg</PayPalMarkLarge>
+
+		<PayPalVerticalSolutionPP></PayPalVerticalSolutionPP>
+		<LocalPayPalVerticalSolutionPP>/views/img/default_logos/DE_vertical_solution_PP.gif</LocalPayPalVerticalSolutionPP>
+	</country>
+
+
+	<country iso_code="ES">
+		<PayPalLogoSmall>https://www.paypal.com/es_ES/ES/Marketing/i/logo/PayPal_logo_80x35.gif</PayPalLogoSmall>
+		<PayPalLogoMedium>https://www.paypal.com/es_ES/ES/Marketing/i/logo/PayPal_logo_100x45.gif</PayPalLogoMedium>
+		<PayPalLogoLarge>https://www.paypal.com/es_ES/ES/Marketing/i/logo/PayPal_logo_150x65.gif</PayPalLogoLarge>
+
+		<PayPalMarkSmall>https://www.paypal.com/es_ES/ES/i/logo/PayPal_mark_37x23.gif</PayPalMarkSmall>
+		<PayPalMarkMedium>https://www.paypal.com/es_ES/ES/i/logo/PayPal_mark_50x34.gif</PayPalMarkMedium>
+		<PayPalMarkLarge>https://www.paypal.com/es_ES/ES/i/logo/PayPal_mark_60x38.gif</PayPalMarkLarge>
+
+		<PayPalHorizontalSolutionPP>https://www.paypal.com/es_ES/ES/i/bnr/horizontal_solution_PP.gif</PayPalHorizontalSolutionPP>
+		<PayPalVerticalSolutionPP>https://www.paypal.com/es_ES/ES/i/bnr/vertical_solution_PP.gif</PayPalVerticalSolutionPP>
+	</country>
+
+	<country iso_code="FR">
+		<PayPalLogoSmall>https://www.paypalobjects.com/webstatic/mktg/logo/pp_cc_mark_37x23.jpg</PayPalLogoSmall>
+		<PayPalLogoMedium>https://www.paypalobjects.com/webstatic/mktg/logo/pp_cc_mark_74x46.jpg</PayPalLogoMedium>
+		<PayPalLogoLarge>https://www.paypalobjects.com/webstatic/mktg/logo/pp_cc_mark_111x69.jpg</PayPalLogoLarge>
+
+		<PayPalMarkSmall>https://www.paypalobjects.com/webstatic/mktg/logo/pp_cc_mark_37x23.jpg</PayPalMarkSmall>
+		<PayPalMarkMedium>https://www.paypalobjects.com/webstatic/mktg/logo/pp_cc_mark_74x46.jpg</PayPalMarkMedium>
+		<PayPalMarkLarge>https://www.paypalobjects.com/webstatic/mktg/logo/pp_cc_mark_111x69.jpg</PayPalMarkLarge>
+
+		<PayPalHorizontalSolutionPP>https://www.paypalobjects.com/webstatic/mktg/logo-center/logo_paypal_moyens_paiement_fr.jpg</PayPalHorizontalSolutionPP>
+
+		<!-- Distant object must be declared to use the local object -->
+		<PayPalVerticalSolutionPP></PayPalVerticalSolutionPP>
+		<LocalPayPalVerticalSolutionPP>/views/img/default_logos/FR_vertical_solution_PP.png</LocalPayPalVerticalSolutionPP>
+	</country>
+
+	<country iso_code="GB">
+		<PayPalLogoSmall>https://www.paypal.com/en_GB/Marketing/i/logo/PayPal_logo_80x35.gif</PayPalLogoSmall>
+		<PayPalLogoMedium>https://www.paypal.com/en_GB/Marketing/i/logo/PayPal_logo_100x45.gif</PayPalLogoMedium>
+		<PayPalLogoLarge>https://www.paypal.com/en_GB/Marketing/i/logo/PayPal_logo_150x65.gif</PayPalLogoLarge>
+
+		<PayPalMarkSmall>https://www.paypal.com/en_GB/GB/i/logo/PayPal_mark_37x23.gif</PayPalMarkSmall>
+		<PayPalMarkMedium>https://www.paypal.com/en_GB/GB/i/logo/PayPal_mark_50x34.gif</PayPalMarkMedium>
+		<PayPalMarkLarge>https://www.paypal.com/en_GB/GB/i/logo/PayPal_mark_60x38.gif</PayPalMarkLarge>
+
+		<PayPalHorizontalSolutionPP>https://www.paypal.com/en_GB/i/bnr/horizontal_solution_PP.gif</PayPalHorizontalSolutionPP>
+		<PayPalVerticalSolutionPP>https://www.paypal.com/en_GB/i/bnr/vertical_solution_PP.gif</PayPalVerticalSolutionPP>
+	</country>
+
+	<country iso_code="HK">
+		<PayPalLogoSmall>https://www.paypal.com/en_GB/Marketing/i/logo/PayPal_logo_80x35.gif</PayPalLogoSmall>
+		<PayPalLogoMedium>https://www.paypal.com/en_GB/Marketing/i/logo/PayPal_logo_100x45.gif</PayPalLogoMedium>
+		<PayPalLogoLarge>https://www.paypal.com/en_GB/Marketing/i/logo/PayPal_logo_150x65.gif</PayPalLogoLarge>
+
+		<PayPalMarkSmall>https://www.paypal.com/en_GB/GB/i/logo/PayPal_mark_37x23.gif</PayPalMarkSmall>
+		<PayPalMarkMedium>https://www.paypal.com/en_GB/GB/i/logo/PayPal_mark_50x34.gif</PayPalMarkMedium>
+		<PayPalMarkLarge>https://www.paypal.com/en_GB/GB/i/logo/PayPal_mark_60x38.gif</PayPalMarkLarge>
+
+		<PayPalHorizontalSolutionPP>https://www.paypal.com/en_GB/HK/i/bnr/horizontal_solution_4_hk.gif</PayPalHorizontalSolutionPP>
+		<PayPalVerticalSolutionPP>https://www.paypalobjects.com/en_GB/HK/i/bnr/vertical_solution_4_hk.gif</PayPalVerticalSolutionPP>
+	</country>
+
+	<country iso_code="IL">
+		<PayPalLogoSmall>https://www.paypal.com/en_GB/Marketing/i/logo/PayPal_logo_80x35.gif</PayPalLogoSmall>
+		<PayPalLogoMedium>https://www.paypal.com/en_GB/Marketing/i/logo/PayPal_logo_100x45.gif</PayPalLogoMedium>
+		<PayPalLogoLarge>https://www.paypal.com/en_GB/Marketing/i/logo/PayPal_logo_150x65.gif</PayPalLogoLarge>
+
+		<PayPalMarkSmall>https://www.paypal.com/en_GB/GB/i/logo/PayPal_mark_37x23.gif</PayPalMarkSmall>
+		<PayPalMarkMedium>https://www.paypal.com/en_GB/GB/i/logo/PayPal_mark_50x34.gif</PayPalMarkMedium>
+		<PayPalMarkLarge>https://www.paypal.com/en_GB/GB/i/logo/PayPal_mark_60x38.gif</PayPalMarkLarge>
+
+		<PayPalHorizontalSolutionPP>https://www.paypalobjects.com/en_US/PL/i/bnr/bnr_horizontal_solution_PP_166wx80h.gif</PayPalHorizontalSolutionPP>
+		<PayPalVerticalSolutionPP>https://www.paypalobjects.com/en_US/PL/i/bnr/bnr_horizontal_solution_PP_166wx80h.gif</PayPalVerticalSolutionPP>
+	</country>
+
+	<country iso_code="IN">
+		<PayPalLogoSmall>https://www.paypal.com/en_GB/Marketing/i/logo/PayPal_logo_80x35.gif</PayPalLogoSmall>
+		<PayPalLogoMedium>https://www.paypal.com/en_GB/Marketing/i/logo/PayPal_logo_100x45.gif</PayPalLogoMedium>
+		<PayPalLogoLarge>https://www.paypal.com/en_GB/Marketing/i/logo/PayPal_logo_150x65.gif</PayPalLogoLarge>
+
+		<PayPalMarkSmall>https://www.paypal.com/en_GB/GB/i/logo/PayPal_mark_37x23.gif</PayPalMarkSmall>
+		<PayPalMarkMedium>https://www.paypal.com/en_GB/GB/i/logo/PayPal_mark_50x34.gif</PayPalMarkMedium>
+		<PayPalMarkLarge>https://www.paypal.com/en_GB/GB/i/logo/PayPal_mark_60x38.gif</PayPalMarkLarge>
+
+		<PayPalHorizontalSolutionPP>https://www.paypal.com/en_GB/SG/i/bnr/horizontal_solution_mc_visa.gif</PayPalHorizontalSolutionPP>
+		<PayPalVerticalSolutionPP>https://www.paypalobjects.com/en_GB/SG/i/bnr/vertical_solution_4_hk.gif</PayPalVerticalSolutionPP>
+	</country>
+
+	<country iso_code="IT">
+		<PayPalLogoSmall>https://www.paypal.com/it_IT/IT/Marketing/i/logo/PayPal_logo_80x35.gif</PayPalLogoSmall>
+		<PayPalLogoMedium>https://www.paypal.com/it_IT/IT/Marketing/i/logo/PayPal_logo_100x45.gif</PayPalLogoMedium>
+		<PayPalLogoLarge>https://www.paypal.com/it_IT/IT/Marketing/i/logo/PayPal_logo_150x65.gif</PayPalLogoLarge>
+
+		<PayPalMarkSmall>https://www.paypal.com/it_IT/IT/i/logo/PayPal_mark_37x23.gif</PayPalMarkSmall>
+		<PayPalMarkMedium>https://www.paypal.com/it_IT/IT/i/logo/PayPal_mark_50x34.gif</PayPalMarkMedium>
+		<PayPalMarkLarge>https://www.paypal.com/it_IT/IT/i/logo/PayPal_mark_60x38.gif</PayPalMarkLarge>
+
+		<PayPalHorizontalSolutionPP>https://www.paypalobjects.com/it_IT/IT/Marketing/i/bnr/bnr_horizontal_solutiongraphic_335x80.gif</PayPalHorizontalSolutionPP>
+		<PayPalVerticalSolutionPP>https://www.paypalobjects.com/it_IT/IT/Marketing/i/bnr/bnr_vertical_solutiongraphic_150x172.gif</PayPalVerticalSolutionPP>
+	</country>
+
+	<country iso_code="JP">
+		<PayPalLogoSmall>https://www.paypal.com/en_GB/Marketing/i/logo/PayPal_logo_80x35.gif</PayPalLogoSmall>
+		<PayPalLogoMedium>https://www.paypal.com/en_GB/Marketing/i/logo/PayPal_logo_100x45.gif</PayPalLogoMedium>
+		<PayPalLogoLarge>https://www.paypal.com/en_GB/Marketing/i/logo/PayPal_logo_150x65.gif</PayPalLogoLarge>
+
+		<PayPalMarkSmall>https://www.paypal.com/en_GB/GB/i/logo/PayPal_mark_37x23.gif</PayPalMarkSmall>
+		<PayPalMarkMedium>https://www.paypal.com/en_GB/GB/i/logo/PayPal_mark_50x34.gif</PayPalMarkMedium>
+		<PayPalMarkLarge>https://www.paypal.com/en_GB/GB/i/logo/PayPal_mark_60x38.gif</PayPalMarkLarge>
+
+		<PayPalHorizontalSolutionPP>https://www.paypal.com/en_US/JP/i/bnr/horizontal_solution_4_jcb.gif</PayPalHorizontalSolutionPP>
+		<PayPalVerticalSolutionPP>https://www.paypal.com/en_US/JP/i/bnr/vertical_solution_4_jcb.gif</PayPalVerticalSolutionPP>
+	</country>
+
+	<country iso_code="MY">
+		<PayPalLogoSmall>https://www.paypal.com/en_GB/Marketing/i/logo/PayPal_logo_80x35.gif</PayPalLogoSmall>
+		<PayPalLogoMedium>https://www.paypal.com/en_GB/Marketing/i/logo/PayPal_logo_100x45.gif</PayPalLogoMedium>
+		<PayPalLogoLarge>https://www.paypal.com/en_GB/Marketing/i/logo/PayPal_logo_150x65.gif</PayPalLogoLarge>
+
+		<PayPalMarkSmall>https://www.paypal.com/en_GB/GB/i/logo/PayPal_mark_37x23.gif</PayPalMarkSmall>
+		<PayPalMarkMedium>https://www.paypal.com/en_GB/GB/i/logo/PayPal_mark_50x34.gif</PayPalMarkMedium>
+		<PayPalMarkLarge>https://www.paypal.com/en_GB/GB/i/logo/PayPal_mark_60x38.gif</PayPalMarkLarge>
+
+		<PayPalHorizontalSolutionPP>https://www.paypalobjects.com/en_GB/SG/i/bnr/horizontal_solution_4_hk.gif</PayPalHorizontalSolutionPP>
+		<PayPalVerticalSolutionPP>https://www.paypalobjects.com/en_GB/SG/i/bnr/vertical_solution_4_hk.gif</PayPalVerticalSolutionPP>
+	</country>
+
+	<country iso_code="NL">
+		<PayPalLogoSmall>https://www.paypal.com/nl_NL/NL/Marketing/i/logo/PayPal_logo_80x35.gif</PayPalLogoSmall>
+		<PayPalLogoMedium>https://www.paypal.com/nl_NL/NL/Marketing/i/logo/PayPal_logo_100x45.gif</PayPalLogoMedium>
+		<PayPalLogoLarge>https://www.paypal.com/nl_NL/NL/Marketing/i/logo/PayPal_logo_150x65.gif</PayPalLogoLarge>
+
+		<PayPalMarkSmall>https://www.paypal.com/nl_NL/NL/i/logo/PayPal_mark_37x23.gif</PayPalMarkSmall>
+		<PayPalMarkMedium>https://www.paypal.com/nl_NL/NL/i/logo/PayPal_mark_50x34.gif</PayPalMarkMedium>
+		<PayPalMarkLarge>https://www.paypal.com/nl_NL/NL/i/logo/PayPal_mark_60x38.gif</PayPalMarkLarge>
+
+		<PayPalHorizontalSolutionPP>https://www.paypalobjects.com/nl_NL/NL/i/bnr/horizontal_solution_PP.gif</PayPalHorizontalSolutionPP>
+	</country>
+
+	<country iso_code="NZ">
+		<PayPalLogoSmall>https://www.paypal.com/nl_NL/NL/Marketing/i/logo/PayPal_logo_80x35.gif</PayPalLogoSmall>
+		<PayPalLogoMedium>https://www.paypal.com/nl_NL/NL/Marketing/i/logo/PayPal_logo_100x45.gif</PayPalLogoMedium>
+		<PayPalLogoLarge>https://www.paypal.com/nl_NL/NL/Marketing/i/logo/PayPal_logo_150x65.gif</PayPalLogoLarge>
+
+		<PayPalMarkSmall>https://www.paypal.com/nl_NL/NL/i/logo/PayPal_mark_37x23.gif</PayPalMarkSmall>
+		<PayPalMarkMedium>https://www.paypal.com/nl_NL/NL/i/logo/PayPal_mark_50x34.gif</PayPalMarkMedium>
+		<PayPalMarkLarge>https://www.paypal.com/nl_NL/NL/i/logo/PayPal_mark_60x38.gif</PayPalMarkLarge>
+
+		<PayPalHorizontalSolutionPP>https://www.paypalobjects.com/en_AU/AU/i/bnr/horizontal_solution_PP.gif</PayPalHorizontalSolutionPP>
+	</country>
+
+	<country iso_code="PL">
+		<PayPalLogoSmall>https://www.paypal.com/en_GB/Marketing/i/logo/PayPal_logo_80x35.gif</PayPalLogoSmall>
+		<PayPalLogoMedium>https://www.paypal.com/en_GB/Marketing/i/logo/PayPal_logo_100x45.gif</PayPalLogoMedium>
+		<PayPalLogoLarge>https://www.paypal.com/en_GB/Marketing/i/logo/PayPal_logo_150x65.gif</PayPalLogoLarge>
+
+		<PayPalMarkSmall>https://www.paypal.com/en_GB/GB/i/logo/PayPal_mark_37x23.gif</PayPalMarkSmall>
+		<PayPalMarkMedium>https://www.paypal.com/en_GB/GB/i/logo/PayPal_mark_50x34.gif</PayPalMarkMedium>
+		<PayPalMarkLarge>https://www.paypal.com/en_GB/GB/i/logo/PayPal_mark_60x38.gif</PayPalMarkLarge>
+
+		<PayPalHorizontalSolutionPP></PayPalHorizontalSolutionPP>
+		<LocalPayPalHorizontalSolutionPP>/views/img/default_logos/PL_horizontal_solution_PP.png</LocalPayPalHorizontalSolutionPP>
+
+		<PayPalVerticalSolutionPP></PayPalVerticalSolutionPP>
+		<LocalPayPalVerticalSolutionPP>/views/img/default_logos/PL_vertical_solution_PP.png</LocalPayPalVerticalSolutionPP>
+	</country>
+
+	<country iso_code="PT">
+		<PayPalLogoSmall>https://www.paypal.com/en_GB/Marketing/i/logo/PayPal_logo_80x35.gif</PayPalLogoSmall>
+		<PayPalLogoMedium>https://www.paypal.com/en_GB/Marketing/i/logo/PayPal_logo_100x45.gif</PayPalLogoMedium>
+		<PayPalLogoLarge>https://www.paypal.com/en_GB/Marketing/i/logo/PayPal_logo_150x65.gif</PayPalLogoLarge>
+
+		<PayPalMarkSmall>https://www.paypal.com/en_GB/GB/i/logo/PayPal_mark_37x23.gif</PayPalMarkSmall>
+		<PayPalMarkMedium>https://www.paypal.com/en_GB/GB/i/logo/PayPal_mark_50x34.gif</PayPalMarkMedium>
+		<PayPalMarkLarge>https://www.paypal.com/en_GB/GB/i/logo/PayPal_mark_60x38.gif</PayPalMarkLarge>
+
+		<PayPalHorizontalSolutionPP>https://www.paypalobjects.com/fr_XC/i/bnr/horizontal_solution_PPeCheck.gif</PayPalHorizontalSolutionPP>
+		<PayPalVerticalSolutionPP>https://www.paypalobjects.com/fr_XC/i/bnr/vertical_solution_PPeCheck.gif</PayPalVerticalSolutionPP>
+	</country>
+
+	<country iso_code="TR">
+        <PayPalLogoSmall>https://www.paypal.com/en_GB/Marketing/i/logo/PayPal_logo_80x35.gif</PayPalLogoSmall>
+        <PayPalLogoMedium>https://www.paypal.com/en_GB/Marketing/i/logo/PayPal_logo_100x45.gif</PayPalLogoMedium>
+        <PayPalLogoLarge>https://www.paypal.com/en_GB/Marketing/i/logo/PayPal_logo_150x65.gif</PayPalLogoLarge>
+
+        <PayPalMarkSmall>https://www.paypal.com/en_GB/GB/i/logo/PayPal_mark_37x23.gif</PayPalMarkSmall>
+        <PayPalMarkMedium>https://www.paypal.com/en_GB/GB/i/logo/PayPal_mark_50x34.gif</PayPalMarkMedium>
+        <PayPalMarkLarge>https://www.paypal.com/en_GB/GB/i/logo/PayPal_mark_60x38.gif</PayPalMarkLarge>
+
+		<PayPalHorizontalSolutionPP>https://www.paypalobjects.com/en_US/PL/i/bnr/bnr_horizontal_solution_PP_166wx80h.gif</PayPalHorizontalSolutionPP>
+	</country>
+
+	<country iso_code="RA">
+		<PayPalLogoSmall>https://www.paypal.com/en_GB/Marketing/i/logo/PayPal_logo_80x35.gif</PayPalLogoSmall>
+		<PayPalLogoMedium>https://www.paypal.com/en_GB/Marketing/i/logo/PayPal_logo_100x45.gif</PayPalLogoMedium>
+		<PayPalLogoLarge>https://www.paypal.com/en_GB/Marketing/i/logo/PayPal_logo_150x65.gif</PayPalLogoLarge>
+
+		<PayPalMarkSmall>https://www.paypal.com/en_GB/GB/i/logo/PayPal_mark_37x23.gif</PayPalMarkSmall>
+		<PayPalMarkMedium>https://www.paypal.com/en_GB/GB/i/logo/PayPal_mark_50x34.gif</PayPalMarkMedium>
+		<PayPalMarkLarge>https://www.paypal.com/en_GB/GB/i/logo/PayPal_mark_60x38.gif</PayPalMarkLarge>
+
+		<PayPalHorizontalSolutionPP></PayPalHorizontalSolutionPP>
+		<LocalPayPalHorizontalSolutionPP>/views/img/default_logos/RA_horizontal_solution_PP.png</LocalPayPalHorizontalSolutionPP>
+
+		<PayPalVerticalSolutionPP></PayPalVerticalSolutionPP>
+		<LocalPayPalVerticalSolutionPP>/views/img/default_logos/RA_vertical_solution_PP.png</LocalPayPalVerticalSolutionPP>
+	</country>
+
+	<country iso_code="RE">
+		<PayPalLogoSmall>https://www.paypal.com/en_GB/Marketing/i/logo/PayPal_logo_80x35.gif</PayPalLogoSmall>
+		<PayPalLogoMedium>https://www.paypal.com/en_GB/Marketing/i/logo/PayPal_logo_100x45.gif</PayPalLogoMedium>
+		<PayPalLogoLarge>https://www.paypal.com/en_GB/Marketing/i/logo/PayPal_logo_150x65.gif</PayPalLogoLarge>
+
+		<PayPalMarkSmall>https://www.paypal.com/en_GB/GB/i/logo/PayPal_mark_37x23.gif</PayPalMarkSmall>
+		<PayPalMarkMedium>https://www.paypal.com/en_GB/GB/i/logo/PayPal_mark_50x34.gif</PayPalMarkMedium>
+		<PayPalMarkLarge>https://www.paypal.com/en_GB/GB/i/logo/PayPal_mark_60x38.gif</PayPalMarkLarge>
+
+		<PayPalHorizontalSolutionPP></PayPalHorizontalSolutionPP>
+		<LocalPayPalHorizontalSolutionPP>/views/img/default_logos/RE_horizontal_solution_PP.png</LocalPayPalHorizontalSolutionPP>
+
+		<PayPalVerticalSolutionPP></PayPalVerticalSolutionPP>
+		<LocalPayPalVerticalSolutionPP>/views/img/default_logos/RE_vertical_solution_PP.png</LocalPayPalVerticalSolutionPP>
+	</country>
+
+	<country iso_code="SG">
+		<PayPalLogoSmall>https://www.paypal.com/en_GB/Marketing/i/logo/PayPal_logo_80x35.gif</PayPalLogoSmall>
+		<PayPalLogoMedium>https://www.paypal.com/en_GB/Marketing/i/logo/PayPal_logo_100x45.gif</PayPalLogoMedium>
+		<PayPalLogoLarge>https://www.paypal.com/en_GB/Marketing/i/logo/PayPal_logo_150x65.gif</PayPalLogoLarge>
+
+		<PayPalMarkSmall>https://www.paypal.com/en_GB/GB/i/logo/PayPal_mark_37x23.gif</PayPalMarkSmall>
+		<PayPalMarkMedium>https://www.paypal.com/en_GB/GB/i/logo/PayPal_mark_50x34.gif</PayPalMarkMedium>
+		<PayPalMarkLarge>https://www.paypal.com/en_GB/GB/i/logo/PayPal_mark_60x38.gif</PayPalMarkLarge>
+
+		<PayPalHorizontalSolutionPP>https://www.paypalobjects.com/en_GB/SG/i/bnr/horizontal_solution_4_hk.gif</PayPalHorizontalSolutionPP>
+		<PayPalVerticalSolutionPP>https://www.paypalobjects.com/en_GB/SG/i/bnr/vertical_solution_4_hk.gif</PayPalVerticalSolutionPP>
+	</country>
+
+	<country iso_code="TH">
+		<PayPalLogoSmall>https://www.paypal.com/en_GB/Marketing/i/logo/PayPal_logo_80x35.gif</PayPalLogoSmall>
+		<PayPalLogoMedium>https://www.paypal.com/en_GB/Marketing/i/logo/PayPal_logo_100x45.gif</PayPalLogoMedium>
+		<PayPalLogoLarge>https://www.paypal.com/en_GB/Marketing/i/logo/PayPal_logo_150x65.gif</PayPalLogoLarge>
+
+		<PayPalMarkSmall>https://www.paypal.com/en_GB/GB/i/logo/PayPal_mark_37x23.gif</PayPalMarkSmall>
+		<PayPalMarkMedium>https://www.paypal.com/en_GB/GB/i/logo/PayPal_mark_50x34.gif</PayPalMarkMedium>
+		<PayPalMarkLarge>https://www.paypal.com/en_GB/GB/i/logo/PayPal_mark_60x38.gif</PayPalMarkLarge>
+
+		<PayPalHorizontalSolutionPP>https://www.paypalobjects.com/en_GB/TH/i/bnr/horizontal_solution_4_hk.gif</PayPalHorizontalSolutionPP>
+		<PayPalVerticalSolutionPP>https://www.paypalobjects.com/en_GB/TH/i/bnr/vertical_solution_4_hk.gif</PayPalVerticalSolutionPP>
+	</country>
+
+	<country iso_code="TW">
+		<PayPalLogoSmall>https://www.paypal.com/en_GB/Marketing/i/logo/PayPal_logo_80x35.gif</PayPalLogoSmall>
+		<PayPalLogoMedium>https://www.paypal.com/en_GB/Marketing/i/logo/PayPal_logo_100x45.gif</PayPalLogoMedium>
+		<PayPalLogoLarge>https://www.paypal.com/en_GB/Marketing/i/logo/PayPal_logo_150x65.gif</PayPalLogoLarge>
+
+		<PayPalMarkSmall>https://www.paypal.com/en_GB/GB/i/logo/PayPal_mark_37x23.gif</PayPalMarkSmall>
+		<PayPalMarkMedium>https://www.paypal.com/en_GB/GB/i/logo/PayPal_mark_50x34.gif</PayPalMarkMedium>
+		<PayPalMarkLarge>https://www.paypal.com/en_GB/GB/i/logo/PayPal_mark_60x38.gif</PayPalMarkLarge>
+
+		<PayPalHorizontalSolutionPP>https://www.paypal.com/en_GB/HK/i/bnr/horizontal_solution_4_hk.gif</PayPalHorizontalSolutionPP>
+		<PayPalVerticalSolutionPP>https://www.paypal.com/en_GB/HK/i/bnr/vertical_solution_4_hk.gif</PayPalVerticalSolutionPP>
+	</country>
+
+	<country iso_code="US">
+		<PayPalLogoSmall>https://www.paypal.com/en_GB/Marketing/i/logo/PayPal_logo_80x35.gif</PayPalLogoSmall>
+		<PayPalLogoMedium>https://www.paypal.com/en_GB/Marketing/i/logo/PayPal_logo_100x45.gif</PayPalLogoMedium>
+		<PayPalLogoLarge>https://www.paypal.com/en_GB/Marketing/i/logo/PayPal_logo_150x65.gif</PayPalLogoLarge>
+
+		<PayPalMarkSmall>https://www.paypal.com/en_GB/GB/i/logo/PayPal_mark_37x23.gif</PayPalMarkSmall>
+		<PayPalMarkMedium>https://www.paypal.com/en_GB/GB/i/logo/PayPal_mark_50x34.gif</PayPalMarkMedium>
+		<PayPalMarkLarge>https://www.paypal.com/en_GB/GB/i/logo/PayPal_mark_60x38.gif</PayPalMarkLarge>
+
+		<PayPalHorizontalSolutionPP>https://www.paypalobjects.com/fr_XC/i/bnr/horizontal_solution_PPeCheck.gif</PayPalHorizontalSolutionPP>
+		<PayPalVerticalSolutionPP>https://www.paypalobjects.com/fr_XC/i/bnr/vertical_solution_PPeCheck.gif</PayPalVerticalSolutionPP>
+	</country>
+
+</logos>

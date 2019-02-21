@@ -10,6 +10,7 @@ class AdminHotelConfigurationSettingController extends ModuleAdminController
         if (!($obj = $this->loadObject(true))) {
             return;
         }
+        $this->toolbar_title = $this->l('Manage Hotel Settings');
         parent::__construct();
     }
 

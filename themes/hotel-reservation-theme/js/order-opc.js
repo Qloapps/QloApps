@@ -24,20 +24,29 @@
 */
 $(document).ready(function()
 {
+	$('.opc-collapse').on('show.bs.collapse', function () {
+		$(this).closest('.card').find('.accordion-left-arrow').addClass('hidden');
+		$(this).closest('.card').find('.step-edit').removeClass('hidden');
+	});
+	$('.opc-collapse').on('hide.bs.collapse', function () {
+		$(this).closest('.card').find('.accordion-left-arrow').removeClass('hidden');
+		$(this).closest('.card').find('.step-edit').addClass('hidden');
+	});
+
 	// BY WEBKUL
 	// FOR ADVANCED PAYMENT
 	var payment_type = $(".payment_type:checked").val();
-	if (payment_type == 1) 
+	if (payment_type == 1)
 		$("#partial_data").hide();
-	else if (payment_type == 2) 
+	else if (payment_type == 2)
 		$("#partial_data").show();
 
 	$(".payment_type").on('change',function()
 	{
 		var payment_type = $(".payment_type:checked").val();
-		if (payment_type == 1) 
+		if (payment_type == 1)
 			$("#partial_data").slideUp();
-		else if (payment_type == 2) 
+		else if (payment_type == 2)
 			$("#partial_data").slideDown();
 	});
 
@@ -90,7 +99,7 @@ $(document).ready(function()
 		$(document).on('click', '#openLoginFormBlock', function(e){
 			e.preventDefault();
 			$('#openNewAccountBlock').show();
-			$(this).hide();
+			$('.already_registered_block').hide();
 			$('#login_form_content').slideDown('slow');
 			$('#new_account_form').slideUp('slow');
 		});
@@ -124,6 +133,7 @@ $(document).ready(function()
 						// update token
 						static_token = jsonData.token;
 						updateNewAccountToAddressBlock(that.attr('data-adv-api'));
+						location.reload();
 					}
 				},
 				error: function(XMLHttpRequest, textStatus, errorThrown) {
@@ -274,7 +284,10 @@ $(document).ready(function()
 						else
 							updateNewAccountToAddressBlock(advApiParam);
 					}
-					$('#opc_new_account-overlay, #opc_delivery_methods-overlay, #opc_payment_methods-overlay').fadeIn('slow');
+					if (!jsonData.hasError) {
+						location.reload();
+					}
+					//$('#guest-info-block, #opc_new_account-overlay, #opc_delivery_methods-overlay, #opc_payment_methods-overlay').fadeIn('slow');
 				},
 				error: function(XMLHttpRequest, textStatus, errorThrown) {
 					if (textStatus !== 'abort')
@@ -472,7 +485,9 @@ function updateAddressSelection(is_adv_api)
 				updateHookShoppingCartExtra(jsonData.HOOK_SHOPPING_CART_EXTRA);
 				if ($('#gift-price').length == 1)
 					$('#gift-price').html(jsonData.gift_price);
-				$('#opc_account-overlay, #opc_delivery_methods-overlay, #opc_payment_methods-overlay').fadeOut('slow');
+				$('#guest-info-block, #opc_account-overlay, #opc_delivery_methods-overlay, #opc_payment_methods-overlay').fadeOut('slow');
+
+				location.reload();
 			}
 		},
 		error: function(XMLHttpRequest, textStatus, errorThrown) {
@@ -493,7 +508,7 @@ function updateAddressSelection(is_adv_api)
 	            else
 	                alert(error);
 			}
-			$('#opc_account-overlay, #opc_delivery_methods-overlay, #opc_payment_methods-overlay').fadeOut('slow');
+			$('#guest-info-block, #opc_account-overlay, #opc_delivery_methods-overlay, #opc_payment_methods-overlay').fadeOut('slow');
 		}
 	});
 }
@@ -751,7 +766,7 @@ function saveAddress(type)
 						$.scrollTo('#opc_account_errors', 800);
 					});
 				});
-				$('#opc_account-overlay, #opc_delivery_methods-overlay, #opc_payment_methods-overlay').fadeOut('slow');
+				$('#guest-info-block, #opc_account-overlay, #opc_delivery_methods-overlay, #opc_payment_methods-overlay').fadeOut('slow');
 				result = false;
 			}
 			else
@@ -780,7 +795,7 @@ function saveAddress(type)
 	            else
 	                alert(error);
 			}
-			$('#opc_account-overlay, #opc_delivery_methods-overlay, #opc_payment_methods-overlay').fadeOut('slow');
+			$('#guest-info-block, #opc_account-overlay, #opc_delivery_methods-overlay, #opc_payment_methods-overlay').fadeOut('slow');
 		}
 		});
 
@@ -789,7 +804,7 @@ function saveAddress(type)
 
 function updateNewAccountToAddressBlock(is_adv_api)
 {
-	$('#opc_account-overlay, #opc_delivery_methods-overlay, #opc_payment_methods-overlay').fadeOut('slow');
+	//$('#guest-info-block, #opc_account-overlay, #opc_delivery_methods-overlay, #opc_payment_methods-overlay').fadeOut('slow');
 
 	$.ajax({
 		type: 'POST',
@@ -817,7 +832,7 @@ function updateNewAccountToAddressBlock(is_adv_api)
 				if (json.no_address == 1)
 					document.location.href = addressUrl;
 
-				$('#opc_new_account').fadeOut('fast', function() 
+				$('.guest-info-block').fadeOut('fast', function()
 				{
 					if (typeof json.formatedAddressFieldsValuesList !== 'undefined' && json.formatedAddressFieldsValuesList )
 					{
@@ -846,18 +861,18 @@ function updateNewAccountToAddressBlock(is_adv_api)
 						});
 					}
 
-					$(this).fadeIn('fast', function() 
+					$(this).fadeIn('fast', function()
 					{
                         if ($('#gift-price').length == 1)
                             $('#gift-price').html(json.gift_price);
 
 						//After login, the products are automatically associated to an address
-						// $.each(json.summary.products, function() 
+						// $.each(json.summary.products, function()
 						// {
 						// 	updateAddressId(this.id_product, this.id_product_attribute, '0', this.id_address_delivery);
 						// });
 						// updateAddressesDisplay(true);
-                        if (typeof is_adv_api === 'undefined' || !is_adv_api) 
+                        if (typeof is_adv_api === 'undefined' || !is_adv_api)
                         {
                             updateCarrierList(json.carrier_data);
                             updateCarrierSelectionAndGift();

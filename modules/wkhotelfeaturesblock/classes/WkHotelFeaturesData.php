@@ -119,7 +119,7 @@ class WkHotelFeaturesData extends ObjectModel
      * Call it after deleting a blocks.
      * @return bool $return
      */
-    public static function cleanPositions()
+    public function cleanPositions()
     {
         Db::getInstance()->execute('SET @i = -1', false);
         $sql = 'UPDATE `'._DB_PREFIX_.'htl_features_block_data` SET `position` = @i:=@i+1 ORDER BY `position` ASC';
@@ -127,23 +127,22 @@ class WkHotelFeaturesData extends ObjectModel
     }
 
     // enter the default demo data of the module
-    public static function insertModuleDemoData()
+    public function insertModuleDemoData()
     {
+        Configuration::updateValue('HOTEL_AMENITIES_BLOCK_NAV_LINK', 1);
+
         $languages = Language::getLanguages(false);
         $HOTEL_AMENITIES_HEADING = array();
         $HOTEL_AMENITIES_DESCRIPTION = array();
-
         foreach ($languages as $lang) {
             $HOTEL_AMENITIES_HEADING[$lang['id_lang']] = 'Amenities';
-            $HOTEL_AMENITIES_DESCRIPTION[$lang['id_lang']] = 'Families travelling with kids will find Amboseli national
-            park a safari destination matched to no other, with less tourist traffic, breathtaking open space.';
+            $HOTEL_AMENITIES_DESCRIPTION[$lang['id_lang']] = 'Families travelling with kids will find Amboseli national park a safari destination matched to no other, with less tourist traffic, breathtaking open space.';
         }
         Configuration::updateValue('HOTEL_AMENITIES_HEADING', $HOTEL_AMENITIES_HEADING);
         Configuration::updateValue('HOTEL_AMENITIES_DESCRIPTION', $HOTEL_AMENITIES_DESCRIPTION);
 
         $amenityTitle = array('luxurious Rooms', 'World class cheffs', 'Restaurants', 'Gym & Spa');
-        $amenityDescription  = 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum
-        has been the industry`s standard dummy text ever since the 1500s';
+        $amenityDescription  = 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry`s standard dummy text ever since the 1500s';
 
         for ($i = 0; $i < 4; $i++) {
             $objFeatureData = new WkHotelFeaturesData();
@@ -153,13 +152,19 @@ class WkHotelFeaturesData extends ObjectModel
             }
             $objFeatureData->active = 1;
             $objFeatureData->position = WkHotelFeaturesData::getHigherPosition();
-            $objFeatureData->save();
-
-            $imgPath = _PS_MODULE_DIR_.'wkhotelfeaturesblock/views/img/hotels_features_img/'.$objFeatureData->id.'.jpg';
-            ImageManager::resize(
-                _PS_MODULE_DIR_.'wkhotelfeaturesblock/views/img/dummy_img/'.$objFeatureData->id.'.jpg',
-                $imgPath
-            );
+            if ($objFeatureData->save()) {
+                $srcPath = _PS_MODULE_DIR_.'wkhotelfeaturesblock/views/img/dummy_img/'.$objFeatureData->id.'.jpg';
+                if (file_exists($srcPath)) {
+                    if (ImageManager::isRealImage($srcPath)
+                        && ImageManager::isCorrectImageFileExt($srcPath)
+                    ) {
+                        ImageManager::resize(
+                            $srcPath,
+                            _PS_MODULE_DIR_.'wkhotelfeaturesblock/views/img/hotels_features_img/'.$objFeatureData->id.'.jpg'
+                        );
+                    }
+                }
+            }
         }
         return true;
     }

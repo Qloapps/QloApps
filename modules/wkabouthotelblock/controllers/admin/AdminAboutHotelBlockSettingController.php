@@ -29,12 +29,21 @@ class AdminAboutHotelBlockSettingController extends ModuleAdminController
         $this->_defaultOrderBy = 'position';
         $this->context = Context::getContext();
         $this->identifier_name = 'display_name';
+        $this->identifier = 'id_interior_image';
 
         $this->fields_options = array(
             'global' => array(
                 'title' =>  $this->l('Hotel Interior Description'),
                 'icon' =>   'icon-cogs',
                 'fields' => array(
+                    'HOTEL_INTERIOR_BLOCK_NAV_LINK' => array(
+                        'title' => $this->l('Show link at navigation'),
+                        'hint' => $this->l('Enable, if you want to display a link at navigation menu for the interior block at home page.'),
+                        'validation' => 'isBool',
+                        'cast' => 'intval',
+                        'type' => 'bool',
+                        'required' => true
+                    ),
                     'HOTEL_INTERIOR_HEADING' => array(
                         'title' => $this->l('Interior Block Title'),
                         'type' => 'textLang',
@@ -60,6 +69,25 @@ class AdminAboutHotelBlockSettingController extends ModuleAdminController
                 )
             ),
         );
+
+        parent::__construct();
+    }
+
+    public function initContent()
+    {
+        parent::initContent();
+        // to customize the view as per our requirements
+        if ($this->display != 'add' && $this->display != 'edit') {
+            $this->content .= $this->wkRenderList();
+            $this->context->smarty->assign('content', $this->content);
+        }
+    }
+
+    public function wkRenderList()
+    {
+        $this->informations[] = $this->l('For better view, upload hotel interior image in multiple of 3.');
+        $this->addRowAction('edit');
+        $this->addRowAction('delete');
 
         $this->fields_list = array(
             'id_interior_image' => array(
@@ -100,7 +128,6 @@ class AdminAboutHotelBlockSettingController extends ModuleAdminController
                 'class' => 'fixed-width-xs'
             ),
         );
-        $this->identifier = 'id_interior_image';
 
         $this->bulk_actions = array(
             'delete' => array(
@@ -117,8 +144,16 @@ class AdminAboutHotelBlockSettingController extends ModuleAdminController
                 'icon' => 'icon-power-off text-danger',
             ),
         );
+        return parent::renderList();
+    }
 
-        parent::__construct();
+    public function initToolbar()
+    {
+        parent::initToolbar();
+        $this->page_header_toolbar_btn['new'] = array(
+            'href' => self::$currentIndex.'&add'.$this->table.'&token='.$this->token,
+            'desc' => $this->l('Add New Hotel Image'),
+        );
     }
 
     public function getInteriorImage($imgName)
@@ -129,21 +164,6 @@ class AdminAboutHotelBlockSettingController extends ModuleAdminController
         } else {
             return '--';
         }
-    }
-
-    public function renderList()
-    {
-        $this->informations[] = $this->l('For better view, upload hotel interior image in multiple of 3.');
-
-        $this->addRowAction('edit');
-        $this->addRowAction('delete');
-
-        $this->page_header_toolbar_btn['new'] = array(
-            'href' => self::$currentIndex.'&add'.$this->table.'&token='.$this->token,
-            'desc' => $this->l('Add New Hotel Image'),
-        );
-
-        return parent::renderList();
     }
 
     public function renderForm()
@@ -226,18 +246,14 @@ class AdminAboutHotelBlockSettingController extends ModuleAdminController
         /*==== Validations ====*/
         if (Tools::getValue('display_name')) {
             if (!Validate::isCatalogName(Tools::getValue('display_name'))) {
-                $this->errors[] = Tools::displayError($this->l('Please enter valid name.'));
+                $this->errors[] = $this->l('Please enter valid name.');
             }
         }
         if (!(Tools::getValue("id_interior_image") && !$file['size'])) {
             if (!$file['size']) {
-                $this->errors[] = Tools::displayError($this->l('Hotel Interior Image Required.'));
-            } elseif ($file['error']) {
-                $this->errors[] = Tools::displayError($this->l('Cannot upload file.'));
-            } elseif (!(preg_match('/\.(jpe?g|gif|png)$/', $file['name'])
-                && ImageManager::isRealImage($file['tmp_name'], $file['type']))
-            ) {
-                $this->errors[] = Tools::displayError($this->l('Please upload image file.'));
+                $this->errors[] = $this->l('Hotel Interior Image Required.');
+            } elseif ($error = ImageManager::validateUpload($file, Tools::getMaxUploadSize())) {
+                $this->errors[] = $error;
             }
         }
 
@@ -247,7 +263,7 @@ class AdminAboutHotelBlockSettingController extends ModuleAdminController
                 $objHtlInteriorImg = new WkHotelInteriorImage(Tools::getValue("id_interior_image"));
             } else {
                 $objHtlInteriorImg = new WkHotelInteriorImage();
-                $objHtlInteriorImg->position = WkHotelInteriorImage::getHigherPosition();
+                $objHtlInteriorImg->position = $objHtlInteriorImg->getHigherPosition();
             }
 
             if (Tools::getValue("id_interior_image") && $file['size'] && !$file['error']) {

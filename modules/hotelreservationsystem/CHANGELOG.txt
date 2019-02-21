@@ -1,4 +1,34 @@
 -------------------------
+# V1.2.1 to V1.2.2
+-------------------------
+
+## Improved/changed features:
+
+[+] CO : Demo data insertion improved.
+[+] CO : getHotelCartBookingData() improved as used many places in QloApps.
+
+[+] CO : Call to HotelImage::validateImage() is deprecated.
+[+] CO : Call to Hotelhelper::validImageExt() is deprecated.
+
+
+[+] BO : Unused category deletion process added on hotel deletion. function deleteUnusedHotelCategories() added.
+[+] BO : Hotel creation code improved.
+[+] BO : Images validation improved.
+[+] BO : Zipcode validation is improved as per selected country.
+
+
+## Bug/Issues Resolved:
+
+[-] CO : Zipcode in demo data is now dynamic for selected country while QloApps installation.
+
+
+
+## Update Policy
+
+- Mobule need only file update, can be updated only by UPLOADING new version on module
+
+
+-------------------------
 # V1.2.0 to V1.2.1
 -------------------------
 

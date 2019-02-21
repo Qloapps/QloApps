@@ -31,7 +31,7 @@ class WkHotelRoom extends Module
     {
         $this->name = 'wkhotelroom';
         $this->tab = 'front_office_features';
-        $this->version = '1.1.1';
+        $this->version = '1.1.2';
         $this->author = 'webkul';
         $this->bootstrap = true;
         parent::__construct();
@@ -121,7 +121,8 @@ class WkHotelRoom extends Module
     public function hookActionProductDelete($params)
     {
         if (isset($params['id_product']) && $params['id_product']) {
-            WkHotelRoomDisplay::deleteRoomByIdProduct($params['id_product']);
+            $objRoomBlock = new WkHotelRoomDisplay();
+            $objRoomBlock->deleteRoomByIdProduct($params['id_product']);
         }
     }
 
@@ -135,12 +136,9 @@ class WkHotelRoom extends Module
 
     public function hookDisplayDefaultNavigationHook()
     {
-        return $this->display(__FILE__, 'hotelRoomNaviagtionMenu.tpl');
-    }
-
-    public function hookDisplayFooterExploreSectionHook()
-    {
-        return $this->display(__FILE__, 'hotelRoomFooterExploreLink.tpl');
+        if (Configuration::get('HOTEL_ROOM_BLOCK_NAV_LINK')) {
+            return $this->display(__FILE__, 'hotelRoomNaviagtionMenu.tpl');
+        }
     }
 
     /**
@@ -204,18 +202,19 @@ class WkHotelRoom extends Module
             }
         }
 
-        // if module should be populated while installation
-        if (isset($this->populateData) && $this->populateData) {
-            if (!WkHotelRoomDisplay::insertModuleDemoData()) {
-                return false;
-            }
-        }
-
         if (!parent::install()
             || !$this->registerModuleHooks()
             || !$this->callInstallTab()
         ) {
             return false;
+        }
+
+        $objRoomBlock = new WkHotelRoomDisplay();
+        // if module should be populated while installation
+        if (isset($this->populateData) && $this->populateData) {
+            if (!$objRoomBlock->insertModuleDemoData()) {
+                return false;
+            }
         }
 
         return true;

@@ -41,7 +41,6 @@
 
 {assign var='current_step' value='summary'}
 {include file="$tpl_dir./order-steps.tpl"}
-{include file="$tpl_dir./errors.tpl"}
 
 {if isset($empty)}
 	<p class="alert alert-warning">{l s='Your shopping cart is empty.'}</p>
@@ -78,375 +77,113 @@
 	{assign var='total_wrapping_taxes_num' value="{if $total_wrapping != 0}1{else}0{/if}"}
 	{* eu-legal *}
 	{hook h="displayBeforeShoppingCartBlock"}
-	<div id="order-detail-content" class="table_block table-responsive">
-		<table id="cart_summary" class="table table-bordered {if $PS_STOCK_MANAGEMENT}stock-management-on{else}stock-management-off{/if}">
-			<thead>
-				<tr class="table_head">
-					<th class="cart_product">{l s='Room Image'}</th>
-					<th class="cart_description">{l s='Room Description'}</th>
-					<th>{l s='Hotel Name'}</th>
-					<th>{l s='Room Capacity'}</th>
-					<th class="cart_unit">{l s='Unit Price'}</th>
-					<th>{l s='Rooms'}</th>
-					<th>{l s='Check-in Date'}</th>
-					<th>{l s='Check-out Date'}</th>
-					<th class="cart_delete last_item">&nbsp;</th>
-					<th class="cart_total">{l s='Total'}</th>
-				</tr>
-			</thead>
-			<tfoot>
-				{assign var='rowspan_total' value=2+$total_discounts_num+$total_wrapping_taxes_num}
 
-				{if $use_taxes && $show_taxes && $total_tax != 0}
-					{assign var='rowspan_total' value=$rowspan_total+1}
-				{/if}
-
-				{if $priceDisplay != 0}
-					{assign var='rowspan_total' value=$rowspan_total+1}
-				{/if}
-
-				{*{if $total_shipping_tax_exc <= 0 && (!isset($isVirtualCart) || !$isVirtualCart) && $free_ship}
-					{assign var='rowspan_total' value=$rowspan_total+1}
-				{else}
-					{if $use_taxes && $total_shipping_tax_exc != $total_shipping}
-						{if $priceDisplay && $total_shipping_tax_exc > 0}
-							{assign var='rowspan_total' value=$rowspan_total+1}
-						{elseif $total_shipping > 0}
-							{assign var='rowspan_total' value=$rowspan_total+1}
-						{/if}
-					{elseif $total_shipping_tax_exc > 0}
-						{assign var='rowspan_total' value=$rowspan_total+1}
-					{/if}
-				{/if} *}
-
-				{if $use_taxes}
-					{if $priceDisplay}
-						<tr class="cart_total_price table_tfoot">
-							<td rowspan="6" colspan="3" id="cart_voucher" class="cart_voucher">
-								{if $voucherAllowed}
-									{if isset($errors_discount) && $errors_discount}
-										<ul class="alert alert-danger">
-											{foreach $errors_discount as $k=>$error}
-												<li>{$error|escape:'html':'UTF-8'}</li>
-											{/foreach}
-										</ul>
-									{/if}
-									<form action="{if $opc}{$link->getPageLink('order-opc', true)}{else}{$link->getPageLink('order', true)}{/if}" method="post" id="voucher">
-										<fieldset>
-											<h4>{l s='Vouchers'}</h4>
-											<input type="text" class="discount_name form-control" id="discount_name" name="discount_name" value="{if isset($discount_name) && $discount_name}{$discount_name}{/if}" />
-											<input type="hidden" name="submitDiscount" />
-											<button type="submit" name="submitAddDiscount" class="btn btn-default"><span>{l s='OK'}</span></button>
-										</fieldset>
-									</form>
-									{if $displayVouchers}
-										<p id="title" class="title-offers">{l s='Take advantage of our exclusive offers:'}</p>
-										<div id="display_cart_vouchers">
-											{foreach $displayVouchers as $voucher}
-												{if $voucher.code != ''}<span class="voucher_name" data-code="{$voucher.code|escape:'html':'UTF-8'}">{$voucher.code|escape:'html':'UTF-8'}</span> - {/if}{$voucher.name}<br />
-											{/foreach}
-										</div>
-									{/if}
-								{/if}
-							</td>
-							<td colspan="4" class="text-right">{if $display_tax_label}{l s='Total Rooms Cost (tax excl.)'}{else}{l s='Total Rooms Cost'}{/if}</td>
-							<td colspan="3" class="price" id="total_product">{displayPrice price=$total_products}</td>
-						</tr>
-					{else}
-						<tr class="cart_total_price table_tfoot">
-							<td rowspan="6" colspan="3" id="cart_voucher" class="cart_voucher">
-								{if $voucherAllowed}
-									{if isset($errors_discount) && $errors_discount}
-										<ul class="alert alert-danger">
-											{foreach $errors_discount as $k=>$error}
-												<li>{$error|escape:'html':'UTF-8'}</li>
-											{/foreach}
-										</ul>
-									{/if}
-									<form action="{if $opc}{$link->getPageLink('order-opc', true)}{else}{$link->getPageLink('order', true)}{/if}" method="post" id="voucher">
-										<fieldset>
-											<h4>{l s='Vouchers'}</h4>
-											<input type="text" class="discount_name form-control" id="discount_name" name="discount_name" value="{if isset($discount_name) && $discount_name}{$discount_name}{/if}" />
-											<input type="hidden" name="submitDiscount" />
-											<button type="submit" name="submitAddDiscount" class="btn btn-default"><span>{l s='OK'}</span></button>
-										</fieldset>
-									</form>
-									{if $displayVouchers}
-										<p id="title" class="title-offers">{l s='Take advantage of our exclusive offers:'}</p>
-										<div id="display_cart_vouchers">
-											{foreach $displayVouchers as $voucher}
-												{if $voucher.code != ''}<span class="voucher_name" data-code="{$voucher.code|escape:'html':'UTF-8'}">{$voucher.code|escape:'html':'UTF-8'}</span> - {/if}{$voucher.name}<br />
-											{/foreach}
-										</div>
-									{/if}
-								{/if}
-							</td>
-							<td colspan="4" class="text-right">{if $display_tax_label}{l s='Total Rooms Cost (tax incl.)'}{else}{l s='Total Rooms Cost'}{/if}</td>
-							<td colspan="3" class="price" id="total_product">{displayPrice price=$total_products_wt}</td>
-						</tr>
-					{/if}
-				{else}
-					<tr class="cart_total_price table_tfoot">
-						<td rowspan="{$rowspan_total}" colspan="3" id="cart_voucher" class="cart_voucher">
-							{if $voucherAllowed}
-								{if isset($errors_discount) && $errors_discount}
-									<ul class="alert alert-danger">
-										{foreach $errors_discount as $k=>$error}
-											<li>{$error|escape:'html':'UTF-8'}</li>
-										{/foreach}
-									</ul>
-								{/if}
-								<form action="{if $opc}{$link->getPageLink('order-opc', true)}{else}{$link->getPageLink('order', true)}{/if}" method="post" id="voucher">
-									<fieldset>
-										<h4>{l s='Vouchers'}</h4>
-										<input type="text" class="discount_name form-control" id="discount_name" name="discount_name" value="{if isset($discount_name) && $discount_name}{$discount_name}{/if}" />
-										<input type="hidden" name="submitDiscount" />
-										<button type="submit" name="submitAddDiscount" class="btn btn-default">
-											<span>{l s='OK'}</span>
-										</button>
-									</fieldset>
-								</form>
-								{if $displayVouchers}
-									<p id="title" class="title-offers">{l s='Take advantage of our exclusive offers:'}</p>
-									<div id="display_cart_vouchers">
-										{foreach $displayVouchers as $voucher}
-											{if $voucher.code != ''}<span class="voucher_name" data-code="{$voucher.code|escape:'html':'UTF-8'}">{$voucher.code|escape:'html':'UTF-8'}</span> - {/if}{$voucher.name}<br />
-										{/foreach}
-									</div>
-								{/if}
-							{/if}
-						</td>
-						<td colspan="3" class="text-right">{l s='Total Rooms Cost'}</td>
-						<td colspan="3" class="price" id="total_product">{displayPrice price=$total_products}</td>
-					</tr>
-				{/if}
-				<tr{if $total_wrapping == 0} style="display: none;"{/if} class="table_tfoot">
-					<td colspan="3" class="text-right">
-						{if $use_taxes}
-							{if $display_tax_label}{l s='Total gift wrapping (tax incl.)'}{else}{l s='Total gift-wrapping cost'}{/if}
-						{else}
-							{l s='Total gift-wrapping cost'}
-						{/if}
-					</td>
-					<td colspan="3" class="price-discount price" id="total_wrapping">
-						{if $use_taxes}
-							{if $priceDisplay}
-								{displayPrice price=$total_wrapping_tax_exc}
-							{else}
-								{displayPrice price=$total_wrapping}
-							{/if}
-						{else}
-							{displayPrice price=$total_wrapping_tax_exc}
-						{/if}
-					</td>
-				</tr>
-				{*{if $total_shipping_tax_exc <= 0 && (!isset($isVirtualCart) || !$isVirtualCart) && $free_ship}
-					<tr class="cart_total_delivery{if !$opc && (!isset($cart->id_address_delivery) || !$cart->id_address_delivery)} unvisible{/if} table_tfoot">
-						<td colspan="3" class="text-right">{l s='Total shipping'}</td>
-						<td colspan="3" class="price" id="total_shipping">{l s='Free shipping!'}</td>
-					</tr>
-				{else}
-					{if $use_taxes && $total_shipping_tax_exc != $total_shipping}
-						{if $priceDisplay}
-							<tr class="table_tfoot cart_total_delivery{if $total_shipping_tax_exc <= 0} unvisible{/if}">
-								<td colspan="3" class="text-right">{if $display_tax_label}{l s='Total shipping (tax excl.)'}{else}{l s='Total shipping'}{/if}</td>
-								<td colspan="3" class="price" id="total_shipping">{displayPrice price=$total_shipping_tax_exc}</td>
-							</tr>
-						{else}
-							<tr class="table_tfoot cart_total_delivery{if $total_shipping <= 0} unvisible{/if}">
-								<td colspan="3" class="text-right">{if $display_tax_label}{l s='Total shipping (tax incl.)'}{else}{l s='Total shipping'}{/if}</td>
-								<td colspan="3" class="price" id="total_shipping" >{displayPrice price=$total_shipping}</td>
-							</tr>
-						{/if}
-					{else}
-						<tr class="table_tfoot cart_total_delivery{if $total_shipping_tax_exc <= 0} unvisible{/if}">
-							<td colspan="3" class="text-right">{l s='Total shipping'}</td>
-							<td colspan="3" class="price" id="total_shipping" >{displayPrice price=$total_shipping_tax_exc}</td>
-						</tr>
-					{/if}
-				{/if}
-				*}
-				{if isset($customer_adv_dtl)}
-					<tr class="table_tfoot">
-						<td colspan="4" class="text-right">
-							{l s='Advance Payment Amount'}
-						</td>
-						<td colspan="3" class="price-discount price" id="total_discount">
-							<span class="partial_mim_cost">{displayPrice price=$adv_amount}</span>
-						</td>
-					</tr>
-				{/if}
-
-				<tr class="table_tfoot cart_total_voucher{if $total_discounts == 0} unvisible{/if}">
-					<td colspan="4" class="text-right">
-						{if $display_tax_label}
-							{if $use_taxes && $priceDisplay == 0}
-								{l s='Total vouchers (tax incl.)'}
-							{else}
-								{l s='Total vouchers (tax excl.)'}
-							{/if}
-						{else}
-							{l s='Total vouchers'}
-						{/if}
-					</td>
-					<td colspan="3" class="price-discount price" id="total_discount">
-						{if $use_taxes && $priceDisplay == 0}
-							{assign var='total_discounts_negative' value=$total_discounts * -1}
-						{else}
-							{assign var='total_discounts_negative' value=$total_discounts_tax_exc * -1}
-						{/if}
-						{displayPrice price=$total_discounts_negative}
-					</td>
-				</tr>
-
-				{if isset($customer_adv_dtl)}
-					<tr class="table_tfoot">
-						<td colspan="4" class="text-right">
-							{l s='Due Amount'}
-						</td>
-						<td colspan="3" class="price-discount price" id="total_discount">
-							<span class="partial_mim_cost">{displayPrice price=$customer_adv_dtl['due_amount']}</span>
-						</td>
-					</tr>
-				{/if}
-
-				{if $use_taxes && $show_taxes && $total_tax != 0 }
-					{if $priceDisplay != 0}
-					<tr class="table_tfoot table_total_tr cart_total_price">
-						<td colspan="4" class="text-right">{if $display_tax_label}{l s='Total (tax excl.)'}{else}{l s='Total'}{/if}</td>
-						<td colspan="3" class="price" id="total_price_without_tax">{displayPrice price=$total_price_without_tax}</td>
-					</tr>
-					{/if}
-					<tr class="table_tfoot cart_total_tax">
-						<td colspan="4" class="text-right">{l s='Tax'}</td>
-						<td colspan="3" class="price" id="total_tax">{displayPrice price=$total_tax}</td>
-					</tr>
-				{/if}
-				<tr class="table_tfoot table_total_tr cart_total_price {if isset($customer_adv_dtl)} unvisible {/if}">
-					<td colspan="4" class="total_price_container text-right">
-						<span>{l s='Total'}</span>
-                        <div class="hookDisplayProductPriceBlock-price">
-                            {hook h="displayCartTotalPriceLabel"}
-                        </div>
-					</td>
-					{if $use_taxes}
-						<td colspan="3" class="price" id="total_price_container">
-							<span id="total_price">{displayPrice price=$total_price}</span>
-						</td>
-					{else}
-						<td colspan="3" class="price" id="total_price_container">
-							<span id="total_price">{displayPrice price=$total_price_without_tax}</span>
-						</td>
-					{/if}
-				</tr>
-
-				{if isset($customer_adv_dtl)}
-					<tr class="table_tfoot table_total_tr cart_total_price">
-						<td colspan="4" class="total_price_container text-right">
-							<span>{l s='Total To Be Paid'}</span>
-						</td>
-						<td colspan="3" class="price" id="total_price_container">
-							<span id="total_price">{displayPrice price=$customer_adv_dtl['total_to_be_paid']}</span>
-						</td>
-					</tr>
-				{/if}
-			</tfoot>
-			<tbody>
-				{if isset($cart_htl_data)}
-					{foreach from=$cart_htl_data key=data_k item=data_v}
-						{foreach from=$data_v['date_diff'] key=rm_k item=rm_v}
-							<tr class="table_body">
-								<td class="cart_product">
+	<div class="order-detail-content">
+		<p class="room_info_text">{l s='rooms information'}</p>
+		{foreach from=$cart_htl_data key=data_k item=data_v}
+			{foreach from=$data_v['date_diff'] key=rm_k item=rm_v}
+				<div class="row cart_product_line">
+					<div class="col-sm-2 room-type-img-block">
+						<p>
+							<a href="{$link->getProductLink($data_v['id_product'])}">
+								<img src="{$data_v['cover_img']}" class="img-responsive" />
+							</a>
+						</p>
+						<p class="room_remove_block">
+							<a href="{$rm_v['link']}"><i class="icon-trash"></i> &nbsp;{l s='Remove'}</a>
+						</p>
+					</div>
+					<div class="col-sm-10">
+						<div class="room-info-container">
+							<div class="room-xs-img">
+								<a href="{$link->getProductLink($data_v['id_product'])}">
+									<img src="{$data_v['cover_img']}" class="img-responsive" />
+								</a>
+							</div>
+							<div class="room-xs-info">
+								<p class="product-name">
 									<a href="{$link->getProductLink($data_v['id_product'])}">
-										<img src="{$data_v['cover_img']}" class="img-responsive" />
+										{$data_v['name']}
 									</a>
-								</td>
-								<td class="cart_description">
-									<p class="product-name">
-										<a href="{$link->getProductLink($data_v['id_product'])}">
-											{$data_v['name']}
-										</a>
+									<a class="btn btn-default pull-right room-xs-remove" href="{$rm_v['link']}"><i class="icon-trash"></i></a>
+								</p>
+								{if isset($data_v['hotel_info']['location'])}
+									<p class="hotel-location">
+										<i class="icon-map-marker"></i> &nbsp;{$data_v['hotel_info']['location']}
 									</p>
-								</td>
-								<td>{$data_v['hotel_name']}</td>
-								<td>
-									<p class="text-left">
-										{$data_v['adult']} {l s='Adults'}, {$data_v['children']} {l s='Children'}
-									</p>
-								</td>
-								<td class="cart_unit">
-									<p class="text-center">
-										<span class="product_original_price {if $rm_v.feature_price_diff>0}room_type_old_price{/if}" {if $rm_v.feature_price_diff < 0} style="display:none;"{/if}>
-											{convertPrice price=$data_v.unit_price_without_reduction|floatval}
-										</span>&nbsp;
-					                    <span class="room_type_current_price" {if !$rm_v.feature_price_diff}style="display:none;"{/if}>
-											{displayPrice price=$rm_v['feature_price']|floatval|round:2}
-					                    </span>
-									</p>
-								</td>
-								<td class="text-center">
-									<p>
-										{$rm_v['num_rm']}
-									</p>
-								</td>
-								<td class="text-center">
-									<p>
-										{$rm_v['data_form']|date_format:"%d-%m-%Y"}
-									</p>
-								</td>
-								<td class="text-center">
-									<p>
-										{$rm_v['data_to']|date_format:"%d-%m-%Y"}
-									</p>
-								</td>
-								<td class="text-center">
-									<a href="{$rm_v['link']}"><i class="icon-trash"></i></a>
-								</td>
-								<td class="cart_total text-left">
-									<p class="text-left">
-										{displayPrice price=$rm_v['amount']}
-									</p>
-								</td>
-							</tr>
-						{/foreach}
-					{/foreach}
-				{/if}
-			</tbody>
-
-			{if sizeof($discounts)}
-				<tbody>
-					{foreach $discounts as $discount}
-					{if ((float)$discount.value_real == 0 && $discount.free_shipping != 1) || ((float)$discount.value_real == 0 && $discount.code == '')}
-						{continue}
-					{/if}
-						<tr class="table_body cart_discount {if $discount@last}last_item{elseif $discount@first}first_item{else}item{/if}" id="cart_discount_{$discount.id_discount}">
-							<td class="cart_discount_name" colspan="3">{$discount.name}</td>
-							<td class="cart_discount_price">
-								<span class="price-discount">
-								{if !$priceDisplay}{displayPrice price=$discount.value_real*-1}{else}{displayPrice price=$discount.value_tax_exc*-1}{/if}
-								</span>
-							</td>
-							<td class="cart_discount_delete">1</td>
-							<td colspan="2"></td>
-							<td class="price_discount_del text-center">
-								{if strlen($discount.code)}
-									<a
-										href="{if $opc}{$link->getPageLink('order-opc', true)}{else}{$link->getPageLink('order', true)}{/if}?deleteDiscount={$discount.id_discount}"
-										class="price_discount_delete"
-										title="{l s='Delete'}">
-										<i class="icon-trash"></i>
-									</a>
 								{/if}
-							</td>
-							<td class="cart_discount_price">
-								<span class="price-discount price">{if !$priceDisplay}{displayPrice price=$discount.value_real*-1}{else}{displayPrice price=$discount.value_tax_exc*-1}{/if}</span>
-							</td>
-						</tr>
-					{/foreach}
-				</tbody>
-			{/if}
-		</table>
-	</div> <!-- end order-detail-content -->
+							</div>
+						</div>
+						{if isset($data_v['hotel_info']['room_features'])}
+							<div class="room-type-features">
+							{foreach $data_v['hotel_info']['room_features'] as $feature}
+								<span class="room-type-feature">
+									<img src="{$THEME_DIR}img/icon/form-ok-circle.svg" /> {$feature['name']}
+								</span>
+							{/foreach}
+							</div>
+						{/if}
+						<div class="room_duration_block">
+							<div class="col-sm-3 col-xs-6">
+								<p class="room_duration_block_head">{l s='CHECK IN'}</p>
+								<p class="room_duration_block_value">{$rm_v['data_form']|date_format:"%d %b, %a"}</p>
+							</div>
+							<div class="col-sm-3 col-xs-6">
+								<p class="room_duration_block_head">{l s='CHECK OUT'}</p>
+								<p class="room_duration_block_value">{$rm_v['data_to']|date_format:"%d %b, %a"}</p>
+							</div>
+							<div class="col-sm-2 col-xs-6">
+								<p class="room_duration_block_head">{l s='ROOMS'}</p>
+								<p class="room_duration_block_value">
+									{if {$rm_v['num_rm']} <= 9}0{$rm_v['num_rm']}{else}{$rm_v['num_rm']}{/if}
+								</p>
+							</div>
+							<div class="col-sm-4 col-xs-6">
+								<p class="room_duration_block_head">{l s='NO. OF GUESTS'}</p>
+								<p class="room_duration_block_value">
+									{if {$data_v['adult']} <= 9}0{$data_v['adult']}{else}{$data_v['adult']}{/if} {l s='Adults'}, {if {$data_v['children']} <= 9}0{$data_v['children']}{else}{$data_v['children']}{/if} {l s='Child'}
+								</p>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-sm-6">
+								<p class="room_total_price">
+									<span class="room_type_current_price">
+										{displayPrice price=$rm_v['amount']}
+									</span>
+								</p>
+								<p class="room_total_price_detial">
+									{l s='Prices for'} {$rm_v['num_days']} {l s='Night(s) stay'}{if $use_taxes} {l s='(Included'} {else}{l s='(Excluded)'}{/if} {l s='all taxes.)'}
+								</p>
+							</div>
+							<div class="col-sm-6">
+								<div class="unit_price_block">
+									<p class="room_unit_price">
+										{if $rm_v['feature_price_diff'] > 0}
+											<span class="real_price">{if $use_taxes}{displayPrice price=$data_v['unit_price_without_reduction']}{else}{displayPrice price=$data_v['unit_price']}{/if}</span>
+										{/if} {displayPrice price=$rm_v['feature_price']}<span>/{l s='Per Night'}<span>
+									</p>
+									{if $rm_v['feature_price_diff'] > 0}
+										<p class="room_unit_price_detail">{l s='You save'} {displayPrice price=($rm_v['feature_price_diff'])} {l s='per night'}</p>
+									{/if}
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<hr>
+			{/foreach}
+		{/foreach}
+		<div class="row">
+			<div class="col-sm-12 proceed_btn_block">
+				<a class="btn btn-default button button-medium pull-right" href="{$link->getPageLink('order-opc', null, null, ['proceed_to_customer_dtl' => 1])}" title="Proceed to checkout" rel="nofollow">
+					<span>
+						{l s='Proceed'}
+					</span>
+				</a>
+			</div>
+		</div>
+	</div>
 
 	{if $show_option_allow_separate_package}
 	<p>
@@ -555,9 +292,9 @@
 	<div class="cart_navigation_extra">
 		<div id="HOOK_SHOPPING_CART_EXTRA">{if isset($HOOK_SHOPPING_CART_EXTRA)}{$HOOK_SHOPPING_CART_EXTRA}{/if}</div>
 	</div>
-{strip}
-{addJsDef deliveryAddress=$cart->id_address_delivery|intval}
-{addJsDefL name=txtProduct}{l s='product' js=1}{/addJsDefL}
-{addJsDefL name=txtProducts}{l s='products' js=1}{/addJsDefL}
-{/strip}
+	{strip}
+		{addJsDef deliveryAddress=$cart->id_address_delivery|intval}
+		{addJsDefL name=txtProduct}{l s='product' js=1}{/addJsDefL}
+		{addJsDefL name=txtProducts}{l s='products' js=1}{/addJsDefL}
+	{/strip}
 {/if}

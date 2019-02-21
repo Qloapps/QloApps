@@ -611,6 +611,7 @@ class InstallModelInstall extends InstallAbstractModel
             'firstname' => Tools::ucfirst($data['admin_firstname']),
             'lastname' => Tools::ucfirst($data['admin_lastname']),
             'countryCode' => $data['shop_country'],
+            'marketingConsent' => $data['marketing_consent'],
         ];
 
         // Qlo Notification

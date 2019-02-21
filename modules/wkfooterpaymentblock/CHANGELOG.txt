@@ -1,3 +1,16 @@
+-----------------------------
+# V1.1.0 to V1.1.1
+-----------------------------
+
+## Improved/changed features
+
+[+] BO : Images validation improved.
+
+## Update Policy
+
+- Mobule need only file update, can be updated only by UPLOADING new version on module
+
+
 ------------------------------
 # V1.0.0 to V1.1.0
 ------------------------------

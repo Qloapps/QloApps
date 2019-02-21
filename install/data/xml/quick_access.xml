@@ -5,9 +5,6 @@
     <field name="link"/>
   </fields>
   <entities>
-    <quick_access id="New_category" new_window="0">
-      <link>index.php?controller=AdminCategories&amp;addcategory</link>
-    </quick_access>
     <quick_access id="New_product" new_window="0">
       <link>index.php?controller=AdminProducts&amp;addproduct</link>
     </quick_access>
