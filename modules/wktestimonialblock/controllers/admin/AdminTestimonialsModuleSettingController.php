@@ -32,13 +32,20 @@ class AdminTestimonialsModuleSettingController extends ModuleAdminController
 
         parent::__construct();
 
-        // field options for global fields
         $this->fields_options = array(
-            'featuresmodulesetting' => array(
+            'modulesetting' => array(
                 'title' =>    $this->l('Hotel Testimonials Setting'),
                 'fields' =>    array(
+                    'HOTEL_TESIMONIAL_BLOCK_NAV_LINK' => array(
+                        'title' => $this->l('Show link at navigation'),
+                        'hint' => $this->l('Enable, if you want to display a link at navigation menu for the testimonial block at home page.'),
+                        'validation' => 'isBool',
+                        'cast' => 'intval',
+                        'type' => 'bool',
+                        'required' => true
+                    ),
                     'HOTEL_TESIMONIAL_BLOCK_HEADING' => array(
-                        'title' => $this->l('Testimonial Block Title'),
+                        'title' => $this->l('Testimonial block title'),
                         'type' => 'textLang',
                         'hint' => $this->l('Testimonial block title. ex. guest testimonials.'),
                         'lang' => true,
@@ -46,7 +53,7 @@ class AdminTestimonialsModuleSettingController extends ModuleAdminController
                         'validation' => 'isGenericName'
                     ),
                     'HOTEL_TESIMONIAL_BLOCK_CONTENT' => array(
-                        'title' => $this->l('Testimonial Block Description'),
+                        'title' => $this->l('Testimonial block description'),
                         'type' => 'textareaLang',
                         'rows' => '4',
                         'cols' => '2',
@@ -59,6 +66,41 @@ class AdminTestimonialsModuleSettingController extends ModuleAdminController
                 'submit' => array('title' => $this->l('Save'))
             ),
         );
+    }
+
+    public function getTestimonialImage($echo, $row)
+    {
+        $image = '';
+        if ($echo) {
+            $imgUrl = _PS_MODULE_DIR_.$this->module->name.'/views/img/hotels_testimonials_img/'.
+            $row['id_testimonial_block'].'.jpg';
+            if (file_exists($imgUrl)) {
+                $modImgUrl = _MODULE_DIR_.$this->module->name.'/views/img/hotels_testimonials_img/'.
+                $row['id_testimonial_block'].'.jpg';
+                $image = "<img class='img-thumbnail img-responsive' style='max-width:70px' src='".$modImgUrl."'>";
+            }
+        }
+        if ($image == '') {
+            $modImgUrl = _MODULE_DIR_.$this->module->name.'/views/img/default-user.jpg';
+            $image = "<img class='img-thumbnail img-responsive' style='max-width:70px' src='".$modImgUrl."'>";
+        }
+        return $image;
+    }
+
+    public function initContent()
+    {
+        parent::initContent();
+        // to customize the view as per our requirements
+        if ($this->display != 'add' && $this->display != 'edit') {
+            $this->content .= $this->wkRenderList();
+            $this->context->smarty->assign('content', $this->content);
+        }
+    }
+
+    public function wkRenderList()
+    {
+        $this->addRowAction('edit');
+        $this->addRowAction('delete');
 
         $this->fields_list = array(
             'id_testimonial_block' => array(
@@ -92,6 +134,7 @@ class AdminTestimonialsModuleSettingController extends ModuleAdminController
                 'class' => 'fixed-width-xs'
             ),
         );
+
         $this->bulk_actions = array(
             'delete' => array(
                 'text' => $this->l('Delete selected'),
@@ -107,31 +150,7 @@ class AdminTestimonialsModuleSettingController extends ModuleAdminController
                 'icon' => 'icon-power-off text-danger',
             ),
         );
-    }
 
-    public function getTestimonialImage($echo, $row)
-    {
-        $image = '';
-        if ($echo) {
-            $imgUrl = _PS_MODULE_DIR_.$this->module->name.'/views/img/hotels_testimonials_img/'.
-            $row['id_testimonial_block'].'.jpg';
-            if (file_exists($imgUrl)) {
-                $modImgUrl = _MODULE_DIR_.$this->module->name.'/views/img/hotels_testimonials_img/'.
-                $row['id_testimonial_block'].'.jpg';
-                $image = "<img class='img-thumbnail img-responsive' style='max-width:70px' src='".$modImgUrl."'>";
-            }
-        }
-        if ($image == '') {
-            $modImgUrl = _MODULE_DIR_.$this->module->name.'/views/img/default-user.jpg';
-            $image = "<img class='img-thumbnail img-responsive' style='max-width:70px' src='".$modImgUrl."'>";
-        }
-        return $image;
-    }
-
-    public function renderList()
-    {
-        $this->addRowAction('edit');
-        $this->addRowAction('delete');
         return parent::renderList();
     }
 
@@ -253,9 +272,8 @@ class AdminTestimonialsModuleSettingController extends ModuleAdminController
         }
 
         if (isset($_FILES['testimonial_image']) && $_FILES['testimonial_image']['tmp_name']) {
-            $error = HotelImage::validateImage($_FILES['testimonial_image']);
-            if ($error) {
-                $this->errors[] = $this->l('Image format not recognized, allowed formats are: .gif, .jpg, .png', false);
+            if ($error = ImageManager::validateUpload($_FILES['testimonial_image'], Tools::getMaxUploadSize())) {
+                $this->errors[] = $error;
             }
         }
 
@@ -264,7 +282,7 @@ class AdminTestimonialsModuleSettingController extends ModuleAdminController
                 $objTestimonialData = new WkHotelTestimonialData($idTestimonial);
             } else {
                 $objTestimonialData = new WkHotelTestimonialData();
-                $objTestimonialData->position = WkHotelTestimonialData::getHigherPosition();
+                $objTestimonialData->position = $objTestimonialData->getHigherPosition();
             }
             $objTestimonialData->name = $personName;
             $objTestimonialData->designation = $personDesignation;

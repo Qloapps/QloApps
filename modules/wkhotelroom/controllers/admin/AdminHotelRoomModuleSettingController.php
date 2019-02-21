@@ -34,6 +34,14 @@ class AdminHotelRoomModuleSettingController extends ModuleAdminController
                 'title' =>    $this->l('Hotel Room Display Setting'),
                 'icon' =>   'icon-cogs',
                 'fields' =>    array(
+                    'HOTEL_ROOM_BLOCK_NAV_LINK' => array(
+                        'title' => $this->l('Show link at navigation'),
+                        'hint' => $this->l('Enable, if you want to display a link at navigation menu for the hotel rooms block at home page.'),
+                        'validation' => 'isBool',
+                        'cast' => 'intval',
+                        'type' => 'bool',
+                        'required' => true
+                    ),
                     'HOTEL_ROOM_DISPLAY_HEADING' => array(
                         'title' => $this->l('Hotel Room Block Title'),
                         'type' => 'textLang',
@@ -56,6 +64,53 @@ class AdminHotelRoomModuleSettingController extends ModuleAdminController
                 'submit' => array('title' => $this->l('Save'))
             ),
         );
+        $this->identifier = 'id_room_block';
+
+        parent::__construct();
+    }
+
+    public function getProductImage($idProduct)
+    {
+        $objProduct = new Product($idProduct, false, Configuration::get('PS_LANG_DEFAULT'));
+        if ($coverImageId = Product::getCover($objProduct->id)) {
+            $prodImg = $this->context->link->getImageLink(
+                $objProduct->link_rewrite,
+                $objProduct->id.'-'.$coverImageId['id_image'],
+                ImageType::getFormatedName('home')
+            );
+        } else {
+            $prodImg = $this->context->link->getImageLink(
+                $objProduct->link_rewrite,
+                $this->context->language->iso_code."-default",
+                ImageType::getFormatedName('home')
+            );
+        }
+        return '<img src="'.$prodImg.'" class="img-thumbnail htlRoomImg">';
+    }
+
+    public function initContent()
+    {
+        parent::initContent();
+        // to customize the view as per our requirements
+        if ($this->display != 'add' && $this->display != 'edit') {
+            $this->content .= $this->wkRenderList();
+            $this->context->smarty->assign('content', $this->content);
+        }
+    }
+
+    public function initToolbar()
+    {
+        parent::initToolbar();
+        $this->page_header_toolbar_btn['new'] = array(
+            'href' => self::$currentIndex.'&add'.$this->table.'&token='.$this->token,
+            'desc' => $this->l('Add New Hotel Room Block')
+        );
+    }
+
+    public function wkRenderList()
+    {
+        $this->addRowAction('edit');
+        $this->addRowAction('delete');
 
         $this->fields_list = array(
             'id_room_block' => array(
@@ -87,9 +142,6 @@ class AdminHotelRoomModuleSettingController extends ModuleAdminController
                 'align' => 'center',
             ),
         );
-
-        $this->identifier = 'id_room_block';
-
         $this->bulk_actions = array(
             'delete' => array(
                 'text' => $this->l('Delete selected'),
@@ -104,37 +156,6 @@ class AdminHotelRoomModuleSettingController extends ModuleAdminController
                 'text' => $this->l('Disable selection'),
                 'icon' => 'icon-power-off text-danger',
             ),
-        );
-        parent::__construct();
-    }
-
-    public function getProductImage($idProduct)
-    {
-        $objProduct = new Product($idProduct, false, Configuration::get('PS_LANG_DEFAULT'));
-        if ($coverImageId = Product::getCover($objProduct->id)) {
-            $prodImg = $this->context->link->getImageLink(
-                $objProduct->link_rewrite,
-                $objProduct->id.'-'.$coverImageId['id_image'],
-                ImageType::getFormatedName('home')
-            );
-        } else {
-            $prodImg = $this->context->link->getImageLink(
-                $objProduct->link_rewrite,
-                $this->context->language->iso_code."-default",
-                ImageType::getFormatedName('home')
-            );
-        }
-        return '<img src="'.$prodImg.'" class="img-thumbnail htlRoomImg">';
-    }
-
-    public function renderList()
-    {
-        $this->addRowAction('edit');
-        $this->addRowAction('delete');
-
-        $this->page_header_toolbar_btn['new'] = array(
-            'href' => self::$currentIndex.'&add'.$this->table.'&token='.$this->token,
-            'desc' => $this->l('Add New Hotel Room Block')
         );
 
         return parent::renderList();
@@ -238,7 +259,7 @@ class AdminHotelRoomModuleSettingController extends ModuleAdminController
             if ($idRoomBlock) {
                 $objRoomBlock = new WkHotelRoomDisplay($idRoomBlock);
             } else {
-                $objRoomBlock->position = WkHotelRoomDisplay::getHigherPosition();
+                $objRoomBlock->position = $objRoomBlock->getHigherPosition();
             }
             $objRoomBlock->id_product = $idProduct;
             $objRoomBlock->active = $active;

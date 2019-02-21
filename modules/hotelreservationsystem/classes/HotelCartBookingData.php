@@ -632,110 +632,171 @@ class HotelCartBookingData extends ObjectModel
      */
     public static function getHotelCartBookingData()
     {
+        $cartHotelData = array();
         $context = Context::getContext();
-        $total_rooms = 0;
-        $cart_htl_data = array();
-        $price_tax = HotelBookingDetail::useTax();
+        if ($cartRoomTypes = $context->cart->getProducts()) {
+            $idLang = $context->language->id;
+            $price_tax = HotelBookingDetail::useTax();
+            // create needed objects
+            $objCartBooking = new self();
+            $objBookingDetail = new HotelBookingDetail();
+            $objRoomType = new HotelRoomType();
+            $objHotelBranch = new HotelBranchInformation();
+            $objHtlFeatures = new HotelFeatures();
 
-        if (Module::isInstalled('hotelreservationsystem')) {
-            require_once _PS_MODULE_DIR_.'hotelreservationsystem/define.php';
-            $objHtlBranchInfo = new HotelBranchInformation();
-            $obj_cart_bk_data = new self();
-            $obj_htl_bk_dtl = new HotelBookingDetail();
-            $obj_rm_type = new HotelRoomType();
-
-            $htl_rm_types = $context->cart->getProducts();
-            if (!empty($htl_rm_types)) {
-                foreach ($htl_rm_types as $type_key => $type_value) {
-                    $product = new Product($type_value['id_product'], false, $context->language->id);
-                    $cover_image_arr = $product->getCover($type_value['id_product']);
-
-                    if (!empty($cover_image_arr)) {
-                        $cover_img = $context->link->getImageLink($product->link_rewrite, $product->id.'-'.$cover_image_arr['id_image'], 'small_default');
+            foreach ($cartRoomTypes as $prodKey => $product) {
+                if (Validate::isLoadedObject(
+                    $objProduct = new Product($product['id_product'], false, $idLang)
+                )) {
+                    $coverImageArr = $objProduct->getCover($product['id_product']);
+                    // get cover image link
+                    if (!empty($coverImageArr)) {
+                        $coverImg = $context->link->getImageLink(
+                            $objProduct->link_rewrite,
+                            $objProduct->id.'-'.$coverImageArr['id_image'],
+                            'small_default'
+                        );
                     } else {
-                        $cover_img = $context->link->getImageLink($product->link_rewrite, $context->language->iso_code.'-default', 'small_default');
+                        $coverImg = $context->link->getImageLink(
+                            $objProduct->link_rewrite,
+                            $context->language->iso_code.'-default',
+                            'small_default'
+                        );
                     }
+                    $unitPrice = Product::getPriceStatic(
+                        $product['id_product'],
+                        $price_tax,
+                        null,
+                        6,
+                        null,
+                        false,
+                        true,
+                        1
+                    );
+                    $unitPriceWithoutReduction = $objProduct->getPriceWithoutReduct(!$price_tax);
+                    $roomDetail = $objRoomType->getRoomTypeInfoByIdProduct($product['id_product']);
+                    $cartHotelData[$prodKey]['adult'] = $roomDetail['adult'];
+                    $cartHotelData[$prodKey]['children'] = $roomDetail['children'];
+                    $cartHotelData[$prodKey]['total_num_rooms'] = 0;
+                    $cartHotelData[$prodKey]['id_product'] = $product['id_product'];
+                    $cartHotelData[$prodKey]['cover_img'] = $coverImg;
+                    $cartHotelData[$prodKey]['name'] = $objProduct->name;
+                    $cartHotelData[$prodKey]['unit_price'] = $unitPrice;
+                    $cartHotelData[$prodKey]['unit_price_without_reduction'] = $unitPriceWithoutReduction;
+                    // add hotel info of the room
+                    if ($hotelInfo = $objHotelBranch->hotelBranchesInfo(false, 2, 1, $roomDetail['id_hotel'])) {
+                        $hotelInfo['location'] = $hotelInfo['hotel_name'].', '.$hotelInfo['city'].', '.
+                        State::getNameById($hotelInfo['state_id']).', '.
+                        Country::getNameById($idLang, $hotelInfo['country_id'])
+                        .', '.$hotelInfo['zipcode'];
 
-                    $unit_price = Product::getPriceStatic($type_value['id_product'], $price_tax, null, 6, null, false, true, 1);
-                    $unitPriceWithoutReduction = $product->getPriceWithoutReduct(!$price_tax);
-                    if (isset($context->customer->id)) {
-                        $cart_bk_data = $obj_cart_bk_data->getOnlyCartBookingData($context->cart->id, $context->cart->id_guest, $type_value['id_product']);
-                    } else {
-                        $cart_bk_data = $obj_cart_bk_data->getOnlyCartBookingData($context->cart->id, $context->cart->id_guest, $type_value['id_product']);
-                    }
-                    $rm_dtl = $obj_rm_type->getRoomTypeInfoByIdProduct($type_value['id_product']);
-                    $cart_htl_data[$type_key]['total_num_rooms'] = 0;
-                    $cart_htl_data[$type_key]['id_product'] = $type_value['id_product'];
-                    $cart_htl_data[$type_key]['cover_img'] = $cover_img;
-                    $cart_htl_data[$type_key]['name'] = $product->name;
-                    $cart_htl_data[$type_key]['unit_price'] = $unit_price;
-                    $cart_htl_data[$type_key]['unit_price_without_reduction'] = $unitPriceWithoutReduction;
-                    $cart_htl_data[$type_key]['adult'] = $rm_dtl['adult'];
-                    $cart_htl_data[$type_key]['children'] = $rm_dtl['children'];
-                    if (isset($cart_bk_data) && $cart_bk_data) {
-                        foreach ($cart_bk_data as $data_k => $data_v) {
-                            $date_join = strtotime($data_v['date_from']).strtotime($data_v['date_to']);
-                            if (isset($cart_htl_data[$type_key]['date_diff'][$date_join])) {
-                                $cart_htl_data[$type_key]['date_diff'][$date_join]['num_rm'] += 1;
-                                $total_rooms += 1;
-                                $num_days = $cart_htl_data[$type_key]['date_diff'][$date_join]['num_days'];
-                                $vart_quant = (int) $cart_htl_data[$type_key]['date_diff'][$date_join]['num_rm'];
-                                //// By webkul New way to calculate product prices with feature Prices
-                                $roomTypeDateRangePrice = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice($type_value['id_product'], $data_v['date_from'], $data_v['date_to']);
-                                if (!$price_tax) {
-                                    $amount = $roomTypeDateRangePrice['total_price_tax_excl'];
-                                } else {
-                                    $amount = $roomTypeDateRangePrice['total_price_tax_incl'];
+                        // append hotel features
+                        if ($hotelFeaureIds = $objHotelBranch->getFeaturesOfHotelByHotelId($roomDetail['id_hotel'])) {
+                            $hotelFeatures = array();
+                            foreach ($hotelFeaureIds as $value) {
+                                $htlFeatureInfo = $objHtlFeatures->getFeatureInfoById($value['feature_id']);
+                                if ($htlFeatureInfo = $objHtlFeatures->getFeatureInfoById($value['feature_id'])) {
+                                    $hotelFeatures[] = $htlFeatureInfo['name'];
                                 }
-                                //END
-
-                                $cart_htl_data[$type_key]['date_diff'][$date_join]['amount'] = $amount * $vart_quant;
-                            } else {
-                                $num_days = $obj_htl_bk_dtl->getNumberOfDays($data_v['date_from'], $data_v['date_to']);
-                                $total_rooms += 1;
-                                $cart_htl_data[$type_key]['date_diff'][$date_join]['num_rm'] = 1;
-                                $cart_htl_data[$type_key]['date_diff'][$date_join]['data_form'] = date('Y-m-d', strtotime($data_v['date_from']));
-                                $cart_htl_data[$type_key]['date_diff'][$date_join]['data_to'] = date('Y-m-d', strtotime($data_v['date_to']));
-                                $cart_htl_data[$type_key]['date_diff'][$date_join]['num_days'] = $num_days;
-
-                                // By webkul New way to calculate product prices with feature Prices
-                                $roomTypeDateRangePrice = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice($type_value['id_product'], $data_v['date_from'], $data_v['date_to']);
-                                if (!$price_tax) {
-                                    $amount = $roomTypeDateRangePrice['total_price_tax_excl'];
-                                } else {
-                                    $amount = $roomTypeDateRangePrice['total_price_tax_incl'];
-                                }
-                                // END
-                                $cart_htl_data[$type_key]['date_diff'][$date_join]['amount'] = $amount;
-                                $cart_htl_data[$type_key]['date_diff'][$date_join]['link'] = $context->link->getPageLink('order-opc', null, $context->language->id, "id_product=".$type_value['id_product']."&deleteFromOrderLine=1&date_from=".$data_v['date_from']."&date_to=".$data_v['date_to']);
                             }
-                            // product price after imposing feature prices...
-                            if ($price_tax) {
-                                $feature_price = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay($type_value['id_product'], $data_v['date_from'], $data_v['date_to'], true);
+                            if ($hotelFeatures) {
+                                $hotelInfo['htl_features'] = $hotelFeatures;
+                            }
+                        }
+                        // append roomtype features
+                        $hotelInfo['room_features'] = $objProduct->getFrontFeatures($idLang);
+
+                        $cartHotelData[$prodKey]['hotel_info'] = $hotelInfo;
+                    }
+                    if (isset($context->customer->id)) {
+                        $cartBookingDetails = $objCartBooking->getOnlyCartBookingData(
+                            $context->cart->id,
+                            $context->cart->id_guest,
+                            $product['id_product']
+                        );
+                    } else {
+                        $cartBookingDetails = $objCartBooking->getOnlyCartBookingData(
+                            $context->cart->id,
+                            $context->cart->id_guest,
+                            $product['id_product']
+                        );
+                    }
+                    if (isset($cartBookingDetails) && $cartBookingDetails) {
+                        foreach ($cartBookingDetails as $data_k => $data_v) {
+                            $dateJoin = strtotime($data_v['date_from']).strtotime($data_v['date_to']);
+                            if (isset($cartHotelData[$prodKey]['date_diff'][$dateJoin])) {
+                                $cartHotelData[$prodKey]['date_diff'][$dateJoin]['num_rm'] += 1;
+                                $numDays = $cartHotelData[$prodKey]['date_diff'][$dateJoin]['num_days'];
+                                $varQty = (int) $cartHotelData[$prodKey]['date_diff'][$dateJoin]['num_rm'];
+                                $roomTypeDateRangePrice = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
+                                    $product['id_product'],
+                                    $data_v['date_from'],
+                                    $data_v['date_to']
+                                );
+                                if (!$price_tax) {
+                                    $amount = $roomTypeDateRangePrice['total_price_tax_excl'];
+                                } else {
+                                    $amount = $roomTypeDateRangePrice['total_price_tax_incl'];
+                                }
+                                $cartHotelData[$prodKey]['date_diff'][$dateJoin]['amount'] = $amount * $varQty;
                             } else {
-                                $feature_price = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay($type_value['id_product'], $data_v['date_from'], $data_v['date_to'], false);
+                                $numDays = $objBookingDetail->getNumberOfDays($data_v['date_from'], $data_v['date_to']);
+                                $cartHotelData[$prodKey]['date_diff'][$dateJoin]['num_rm'] = 1;
+                                $cartHotelData[$prodKey]['date_diff'][$dateJoin]['data_form'] = date(
+                                    'Y-m-d',
+                                    strtotime($data_v['date_from'])
+                                );
+                                $cartHotelData[$prodKey]['date_diff'][$dateJoin]['data_to'] = date(
+                                    'Y-m-d',
+                                    strtotime($data_v['date_to'])
+                                );
+                                $cartHotelData[$prodKey]['date_diff'][$dateJoin]['num_days'] = $numDays;
+                                $roomTypeDateRangePrice = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
+                                    $product['id_product'],
+                                    $data_v['date_from'],
+                                    $data_v['date_to']
+                                );
+                                if (!$price_tax) {
+                                    $amount = $roomTypeDateRangePrice['total_price_tax_excl'];
+                                } else {
+                                    $amount = $roomTypeDateRangePrice['total_price_tax_incl'];
+                                }
+                                $cartHotelData[$prodKey]['date_diff'][$dateJoin]['amount'] = $amount;
+                                $cartHotelData[$prodKey]['date_diff'][$dateJoin]['link'] = $context->link->getPageLink(
+                                    'order-opc',
+                                    null,
+                                    $idLang,
+                                    "id_product=".$product['id_product']."&deleteFromOrderLine=1&date_from=".
+                                    $data_v['date_from']."&date_to=".$data_v['date_to']
+                                );
+                            }
+                            if ($price_tax) {
+                                $feature_price = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay(
+                                    $product['id_product'],
+                                    $data_v['date_from'],
+                                    $data_v['date_to'],
+                                    true
+                                );
+                            } else {
+                                $feature_price = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay(
+                                    $product['id_product'],
+                                    $data_v['date_from'],
+                                    $data_v['date_to'],
+                                    false
+                                );
                             }
                             $feature_price_diff = (float)($unitPriceWithoutReduction - $feature_price);
-                            $cart_htl_data[$type_key]['date_diff'][$date_join]['feature_price'] = $feature_price;
-                            $cart_htl_data[$type_key]['date_diff'][$date_join]['feature_price_diff'] = $feature_price_diff;
-
-                            //enter hotel name
-                            $hotelInfo = $objHtlBranchInfo->hotelBranchesInfo(
-                                $context->language->id,
-                                2,
-                                0,
-                                $data_v['id_hotel']
-                            );
-                            $cart_htl_data[$type_key]['hotel_name'] = $hotelInfo['hotel_name'];
+                            $cartHotelData[$prodKey]['date_diff'][$dateJoin]['feature_price'] = $feature_price;
+                            $cartHotelData[$prodKey]['date_diff'][$dateJoin]['feature_price_diff'] = $feature_price_diff;
                         }
-                        foreach ($cart_htl_data[$type_key]['date_diff'] as $key => $value) {
-                            $cart_htl_data[$type_key]['total_num_rooms'] += $value['num_rm'];
+                        foreach ($cartHotelData[$prodKey]['date_diff'] as $key => $value) {
+                            $cartHotelData[$prodKey]['total_num_rooms'] += $value['num_rm'];
                         }
                     }
                 }
             }
         }
-        return $cart_htl_data;
+        return $cartHotelData;
     }
 
     public function getHotelCartDistinctDateRangesByRoomType($id_cart, $id_product)

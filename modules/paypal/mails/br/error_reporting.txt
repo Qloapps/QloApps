@@ -1,0 +1,9 @@
+        Oi,
+
+        Relatório de erro do seu módulo PayPalAPI
+
+        Um cliente encontrou um problem com o módulo PayPalAPI, veja relatório:
+
+        {logs}
+
+        {shop_url} provido por PrestaShop™

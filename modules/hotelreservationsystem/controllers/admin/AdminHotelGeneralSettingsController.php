@@ -279,7 +279,9 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
                 $objDefaultLanguage['name'];
             }
             if ($_FILES['htl_header_image']['name']) {
-                $this->validateHotelHeaderImage($_FILES['htl_header_image']);
+                if ($error = ImageManager::validateUpload($_FILES['htl_header_image'], Tools::getMaxUploadSize())) {
+                    $this->errors[] = $error;
+                }
 
                 if (!count($this->errors)) {
                     $img_path = _PS_IMG_DIR_.'hotel_header_image.jpg';
@@ -346,20 +348,6 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
             }
         } else {
             parent::postProcess();
-        }
-    }
-
-    public function validateHotelHeaderImage($image)
-    {
-        if ($image['size'] > 0) {
-            if ($image['tmp_name'] != '') {
-                if (!ImageManager::isCorrectImageFileExt($image['name'])) {
-                    $this->errors[] = '<strong>'.$_FILES['htl_header_image']['name'].'</strong> : '.
-                    $this->l('Image format not recognized, allowed formats are: .gif, .jpg, .png');
-                }
-            }
-        } else {
-            return true;
         }
     }
 

@@ -49,6 +49,7 @@ class InstallControllerHttpConfigure extends InstallControllerHttp
             $this->session->admin_lastname = trim(Tools::getValue('admin_lastname'));
             $this->session->admin_email = trim(Tools::getValue('admin_email'));
             $this->session->send_informations = Tools::getValue('send_informations');
+            $this->session->marketing_consent = Tools::getValue('marketing_consent');
             if ($this->session->send_informations) {
                 // Qlo Notification
                 $qloData = [
@@ -59,6 +60,7 @@ class InstallControllerHttpConfigure extends InstallControllerHttp
                     'firstname' => Tools::ucfirst(Tools::getValue('admin_firstname')),
                     'lastname' => Tools::ucfirst(Tools::getValue('admin_lastname')),
                     'countryCode' => Tools::getValue('shop_country'),
+                    'marketingConsent' => Tools::getValue('marketing_consent'),
                 ];
                 $objModelInstall = new InstallModelInstall();
                 $objModelInstall->setNotification($qloData);

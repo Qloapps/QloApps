@@ -31,12 +31,25 @@ class AdminFeaturesModuleSettingController extends ModuleAdminController
         $this->identifier = 'id_features_block';
         parent::__construct();
 
+        $this->_join .= 'LEFT JOIN `'._DB_PREFIX_.'htl_features_block_data_lang` hfl
+        ON (a.id_features_block = hfl.id_features_block AND hfl.`id_lang` = '.(int) $this->context->language->id.')';
+
+        $this->_select = ' hfl.`feature_title`';
+
         // field options for global fields
         $this->fields_options = array(
             'global' => array(
                 'title' =>    $this->l('Hotel Amenity Setting'),
                 'icon' =>   'icon-cogs',
                 'fields' =>    array(
+                    'HOTEL_AMENITIES_BLOCK_NAV_LINK' => array(
+                        'title' => $this->l('Show link at navigation'),
+                        'hint' => $this->l('Enable, if you want to display a link at navigation menu for the amenities block at home page.'),
+                        'validation' => 'isBool',
+                        'cast' => 'intval',
+                        'type' => 'bool',
+                        'required' => true
+                    ),
                     'HOTEL_AMENITIES_HEADING' => array(
                         'title' => $this->l('Amenity Block Title'),
                         'type' => 'textLang',
@@ -59,6 +72,49 @@ class AdminFeaturesModuleSettingController extends ModuleAdminController
                 'submit' => array('title' => $this->l('Save'))
             ),
         );
+    }
+
+    public function getAmenityImage($echo, $row)
+    {
+        $image = '';
+        if ($echo) {
+            $imgUrl = _PS_MODULE_DIR_.$this->module->name.'/views/img/hotels_features_img/'.$row['id_features_block'].
+            '.jpg';
+            if (file_exists($imgUrl)) {
+                $modImgUrl = _MODULE_DIR_.$this->module->name.'/views/img/hotels_features_img/'.
+                $row['id_features_block'].'.jpg';
+                $image = "<img class='img-thumbnail img-responsive' style='max-width:70px' src='".$modImgUrl."'>";
+            }
+        }
+        if ($image == '') {
+            $image = "--";
+        }
+        return $image;
+    }
+
+    public function initContent()
+    {
+        parent::initContent();
+        // to customize the view as per our requirements
+        if ($this->display != 'add' && $this->display != 'edit') {
+            $this->content .= $this->wkRenderList();
+            $this->context->smarty->assign('content', $this->content);
+        }
+    }
+
+    public function initToolbar()
+    {
+        parent::initToolbar();
+        $this->page_header_toolbar_btn['new'] = array(
+            'href' => self::$currentIndex.'&add'.$this->table.'&token='.$this->token,
+            'desc' => $this->l('Add New Hotel Amenity')
+        );
+    }
+
+    public function wkRenderList()
+    {
+        $this->addRowAction('edit');
+        $this->addRowAction('delete');
 
         $this->fields_list = array(
             'id_features_block' => array(
@@ -108,35 +164,6 @@ class AdminFeaturesModuleSettingController extends ModuleAdminController
                 'text' => $this->l('Disable selection'),
                 'icon' => 'icon-power-off text-danger',
             ),
-        );
-    }
-
-    public function getAmenityImage($echo, $row)
-    {
-        $image = '';
-        if ($echo) {
-            $imgUrl = _PS_MODULE_DIR_.$this->module->name.'/views/img/hotels_features_img/'.$row['id_features_block'].
-            '.jpg';
-            if (file_exists($imgUrl)) {
-                $modImgUrl = _MODULE_DIR_.$this->module->name.'/views/img/hotels_features_img/'.
-                $row['id_features_block'].'.jpg';
-                $image = "<img class='img-thumbnail img-responsive' style='max-width:70px' src='".$modImgUrl."'>";
-            }
-        }
-        if ($image == '') {
-            $image = "--";
-        }
-        return $image;
-    }
-
-    public function renderList()
-    {
-        $this->addRowAction('edit');
-        $this->addRowAction('delete');
-
-        $this->page_header_toolbar_btn['new'] = array(
-            'href' => self::$currentIndex.'&add'.$this->table.'&token='.$this->token,
-            'desc' => $this->l('Add New Hotel Amenity')
         );
 
         return parent::renderList();
@@ -260,13 +287,9 @@ class AdminFeaturesModuleSettingController extends ModuleAdminController
         }
         if (!$hotelAmenityId || $file['size']) {
             if (!$file['size']) {
-                $this->errors[] = $this->l($this->l('Hotel Amenity Image Required.'));
-            } elseif ($file['error']) {
-                $this->errors[] = $this->l($this->l('Cannot upload file.'));
-            } elseif (!(preg_match('/\.(jpe?g|gif|png)$/', $file['name'])
-                && ImageManager::isRealImage($file['tmp_name'], $file['type']))
-            ) {
-                $this->errors[] = $this->l($this->l('Please upload image file.'));
+                $this->errors[] = $this->l('Hotel Amenity Image Required.');
+            } elseif ($error = ImageManager::validateUpload($file, Tools::getMaxUploadSize())) {
+                $this->errors[] = $error;
             }
         }
 
@@ -276,7 +299,7 @@ class AdminFeaturesModuleSettingController extends ModuleAdminController
                 $objFeatureData = new WkHotelFeaturesData($hotelAmenityId);
             } else {
                 $objFeatureData = new WkHotelFeaturesData();
-                $objFeatureData->position = WkHotelFeaturesData::getHigherPosition();
+                $objFeatureData->position = $objFeatureData->getHigherPosition();
             }
 
             // lang fields

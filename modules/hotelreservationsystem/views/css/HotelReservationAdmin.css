@@ -568,3 +568,6 @@ a.deleteHtlImage {
     background-color: #379bf0;
     color: #FFFFFF;
 }
+.setting-title {
+    text-align: left;
+}

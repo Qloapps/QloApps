@@ -33,8 +33,6 @@
 			</span>
 		{/if}
 	</h1>
-{else}
-	<h1 class="page-heading" id="choose_payment_txt">{l s='Payment methods'}</h1>
 {/if}
 
 {if !$opc}
@@ -45,7 +43,6 @@
 	<div id="opc_payment_methods" class="opc-main-block">
 		<div id="opc_payment_methods-overlay" class="opc-overlay" style="display: none;"></div>
 {/if}
-
 {if $advanced_payment_api}
     {include file="$tpl_dir./order-payment-advanced.tpl"}
 {else}

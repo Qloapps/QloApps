@@ -72,14 +72,19 @@ class CartControllerCore extends FrontController
         if ($this->context->cookie->exists() && !$this->errors && !($this->context->customer->isLogged() && !$this->isTokenValid())) {
             if (Tools::getIsset('add') || Tools::getIsset('update')) {
                 $this->processChangeProductInCart();
+                CheckoutProcess::refreshCheckoutProcess();
             } elseif (Tools::getIsset('delete')) {
                 $this->processDeleteProductInCart();
+                CheckoutProcess::refreshCheckoutProcess();
             } elseif (Tools::getIsset('changeAddressDelivery')) {
                 $this->processChangeProductAddressDelivery();
+                CheckoutProcess::refreshCheckoutProcess();
             } elseif (Tools::getIsset('allowSeperatedPackage')) {
                 $this->processAllowSeperatedPackage();
+                CheckoutProcess::refreshCheckoutProcess();
             } elseif (Tools::getIsset('duplicate')) {
                 $this->processDuplicateProduct();
+                CheckoutProcess::refreshCheckoutProcess();
             }
             // Make redirection
             if (!$this->errors && !$this->ajax) {
@@ -392,7 +397,7 @@ class CartControllerCore extends FrontController
                     if ($chkQty < $req_rm) {
                         $obj_htl_cart_booking_data = new HotelCartBookingData();
                         $obj_htl_cart_booking_data->id_cart = $this->context->cart->id;
-                        $obj_htl_cart_booking_data->id_guest = $this->context->cookie->id_guest;
+                        $obj_htl_cart_booking_data->id_guest = $this->context->cart->id_guest;
                         $obj_htl_cart_booking_data->id_customer = $id_customer;
                         $obj_htl_cart_booking_data->id_currency = $id_currency;
                         $obj_htl_cart_booking_data->id_product = $val_hotel_room_info['id_product'];

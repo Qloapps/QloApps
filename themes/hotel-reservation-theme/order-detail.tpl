@@ -29,7 +29,7 @@
 		<input type="hidden" value="{$order->id}" name="id_order"/>
 		<input type="hidden" value="" name="submitReorder"/>
 
-		<!-- <a href="#" onclick="$(this).closest('form').submit(); return false;" class="button btn btn-default button-medium pull-right"><span>{l s='Reorder'}<i class="icon-chevron-right right"></i></span></a> --><!-- by webkul not to show reorder tab -->
+		{* <a href="#" onclick="$(this).closest('form').submit(); return false;" class="button btn btn-default button-medium pull-right"><span>{l s='Reorder'}<i class="icon-chevron-right right"></i></span></a> --><!-- by webkul not to show reorder tab *}
 	</form>
 	{/if}
 	<p class="dark">
@@ -101,12 +101,22 @@
 			<ul class="address item {if $order->isVirtual()}full_width{/if} box">
 				<li><h3 class="page-subheading">{l s='Customer address'} ({$address_invoice->alias})</h3></li>
 				{foreach from=$inv_adr_fields name=inv_loop item=field_item}
-					{if $field_item eq "company" && isset($address_invoice->company)}<li class="address_company">{$address_invoice->company|escape:'html':'UTF-8'}</li>
-					{elseif $field_item eq "address2" && $address_invoice->address2}<li class="address_address2">{$address_invoice->address2|escape:'html':'UTF-8'}</li>
-					{elseif $field_item eq "phone_mobile" && $address_invoice->phone_mobile}<li class="address_phone_mobile">{$address_invoice->phone_mobile|escape:'html':'UTF-8'}</li>
+					{if $field_item eq "company" && isset($address_invoice->company)}
+						<li class="address_company">{$address_invoice->company|escape:'html':'UTF-8'}</li>
+					{elseif $field_item eq "address2" && $address_invoice->address2}
+						<li class="address_address2">{$address_invoice->address2|escape:'html':'UTF-8'}</li>
+					{elseif $field_item eq "phone_mobile" && $address_invoice->phone_mobile}
+						<li class="address_phone_mobile">{$address_invoice->phone_mobile|escape:'html':'UTF-8'}</li>
 					{else}
-							{assign var=address_words value=" "|explode:$field_item}
-							<li>{foreach from=$address_words item=word_item name="word_loop"}{if !$smarty.foreach.word_loop.first} {/if}<span class="address_{$word_item|replace:',':''}">{$invoiceAddressFormatedValues[$word_item|replace:',':'']|escape:'html':'UTF-8'}</span>{/foreach}</li>
+						{assign var=address_words value=" "|explode:$field_item}
+						<li>
+							{foreach from=$address_words item=word_item name="word_loop"}
+								{if !$smarty.foreach.word_loop.first} {/if}
+								{if isset($invoiceAddressFormatedValues[$word_item|replace:',':''])}
+									<span class="address_{$word_item|replace:',':''}">{$invoiceAddressFormatedValues[$word_item|replace:',':'']|escape:'html':'UTF-8'}</span>
+								{/if}
+							{/foreach}
+						</li>
 					{/if}
 				{/foreach}
 			</ul>
@@ -115,7 +125,7 @@
 </div>
 {$HOOK_ORDERDETAILDISPLAYED}
 {if !$is_guest}<form action="{$link->getPageLink('order-follow', true)|escape:'html':'UTF-8'}" method="post">{/if}
-{if isset($order_has_invoice) && $order_has_invoice && $order->payment != 'Free order'}
+{if !$is_guest && isset($order_has_invoice) && $order_has_invoice && $order->payment != 'Free order'}
 	<div class="row totalOrdercancellation_div" {if !$non_requested_rooms}style="display:none;"{/if}>
 		<div class="col-xs-12 col-sm-12">
 			<p style="text-align:center;"><a class="terms_btn btn btn-default pull-right" href="{$redirect_link_terms}" target="_blank"><i class="icon-file-text large"></i>&nbsp;&nbsp;{l s='Terms & Conditions'}</a></p>
@@ -146,7 +156,7 @@
 				<th>{l s='Check-in Date'}</th>
 				<th>{l s='Check-out Date'}</th>
 				<th class="cart_total">{l s='Total'}</th>
-				{if isset($order_has_invoice) && $order_has_invoice  && $order->payment != 'Free order'}
+				{if !$is_guest && isset($order_has_invoice) && $order_has_invoice  && $order->payment != 'Free order'}
 					<th>{l s='Request Refund'}</th>
 					<th>{l s='Refund Stage'}</th>
 					<th>{l s='Refund Status'}</th>
@@ -157,7 +167,7 @@
 		<tfoot>
 			{if $priceDisplay && $use_tax}
 				<tr class="item">
-					<td colspan={if isset($order_has_invoice) && $order_has_invoice  && $order->payment != 'Free order'}"9"{else}"6"{/if}></td>
+					<td colspan={if !$is_guest && isset($order_has_invoice) && $order_has_invoice  && $order->payment != 'Free order'}"9"{else}"6"{/if}></td>
 					<td colspan="{if $return_allowed}3{else}3{/if}">
 						<strong>{l s='Items (tax excl.)'}</strong>
 					</td>
@@ -167,7 +177,7 @@
 				</tr>
 			{/if}
 			<tr class="item">
-				<td colspan={if isset($order_has_invoice) && $order_has_invoice  && $order->payment != 'Free order'}"9"{else}"6"{/if}></td>
+				<td colspan={if !$is_guest && isset($order_has_invoice) && $order_has_invoice  && $order->payment != 'Free order'}"9"{else}"6"{/if}></td>
 				<td colspan="{if $return_allowed}2{else}3{/if}">
 					<strong>{l s='Items'} {if $use_tax}{l s='(tax incl.)'}{/if} </strong>
 				</td>
@@ -178,7 +188,7 @@
 
 			{if $order->total_wrapping > 0}
 			<tr class="item">
-				<td colspan={if isset($order_has_invoice) && $order_has_invoice  && $order->payment != 'Free order'}"9"{else}"6"{/if}></td>
+				<td colspan={if !$is_guest && isset($order_has_invoice) && $order_has_invoice  && $order->payment != 'Free order'}"9"{else}"6"{/if}></td>
 				<td colspan="{if $return_allowed}2{else}3{/if}">
 					<strong>{l s='Total gift wrapping cost'}</strong>
 				</td>
@@ -188,7 +198,7 @@
 			</tr>
 			{/if}
 			<tr class="totalprice item">
-				<td colspan={if isset($order_has_invoice) && $order_has_invoice  && $order->payment != 'Free order'}"9"{else}"6"{/if}></td>
+				<td colspan={if !$is_guest && isset($order_has_invoice) && $order_has_invoice  && $order->payment != 'Free order'}"9"{else}"6"{/if}></td>
 				<td colspan="{if $return_allowed}2{else}3{/if}">
 					<strong>{l s='Total to Pay'}</strong>
 				</td>
@@ -197,9 +207,9 @@
 				</td>
 			</tr>
 
-			{if isset($order_adv_dtl)}
+			{if isset($order_adv_dtl) && $order_adv_dtl}
 				<tr class="item">
-					<td colspan={if isset($order_has_invoice) && $order_has_invoice  && $order->payment != 'Free order'}"9"{else}"6"{/if}></td>
+					<td colspan={if !$is_guest && isset($order_has_invoice) && $order_has_invoice  && $order->payment != 'Free order'}"9"{else}"6"{/if}></td>
 					<td colspan="{if $return_allowed}2{else}3{/if}">
 						<strong>{l s='Advance Paid Amount'}</strong>
 					</td>
@@ -208,7 +218,7 @@
 					</td>
 				</tr>
 				<tr class="item">
-					<td colspan={if isset($order_has_invoice) && $order_has_invoice  && $order->payment != 'Free order'}"9"{else}"6"{/if}></td>
+					<td colspan={if !$is_guest && isset($order_has_invoice) && $order_has_invoice  && $order->payment != 'Free order'}"9"{else}"6"{/if}></td>
 					<td colspan="{if $return_allowed}2{else}3{/if}">
 						<strong>{l s='Total Due'}</strong>
 					</td>
@@ -220,7 +230,7 @@
 
 			{if $order->total_discounts > 0}
 			<tr class="item">
-				<td colspan={if isset($order_has_invoice) && $order_has_invoice  && $order->payment != 'Free order'}"9"{else}"6"{/if}></td>
+				<td colspan={if !$is_guest && isset($order_has_invoice) && $order_has_invoice  && $order->payment != 'Free order'}"9"{else}"6"{/if}></td>
 				<td colspan="{if $return_allowed}3{else}3{/if}">
 					<strong>{l s='Total vouchers'}</strong>
 				</td>
@@ -230,14 +240,14 @@
 			</tr>
 			{/if}
 
-			<!-- <tr class="item">
+			{* <tr class="item">
 				<td colspan="{if $return_allowed}2{else}1{/if}">
 					<strong>{l s='Shipping & handling'} {if $use_tax}{l s='(tax incl.)'}{/if} </strong>
 				</td>
 				<td colspan="{if $order->hasProductReturned()}5{else}4{/if}">
 					<span class="price-shipping">{displayWtPriceWithCurrency price=$order->total_shipping currency=$currency}</span>
 				</td>
-			</tr> -->
+			</tr> *}
 		</tfoot>
 		<tbody>
 			{if isset($cart_htl_data)}
@@ -311,7 +321,7 @@
 									{/if}
 								</p>
 							</td>
-							{if isset($order_has_invoice) && $order_has_invoice  && $order->payment != 'Free order'}
+							{if !$is_guest && isset($order_has_invoice) && $order_has_invoice  && $order->payment != 'Free order'}
 								<td class="cart_total text-left">
 									{if isset($rm_v['stage_name']) && $rm_v['stage_name']}
 										<p>{l s="Request Sent.."}</p>
@@ -333,7 +343,7 @@
 										{if $rm_v['stage_name'] == 'Refunded' || $rm_v['stage_name'] == 'Rejected'}
 											{l s="Done!"}
 										{else if $rm_v['stage_name'] == 'Waitting' || $rm_v['stage_name'] == 'Accepted'}
-											{l s="Pending..."}
+											{l s="Pending.."}
 										{else}
 											--
 										{/if}
@@ -352,7 +362,7 @@
 				{/foreach}
 			{/if}
 
-		<!-- {foreach from=$products item=product name=products}
+		{* {foreach from=$products item=product name=products}
 			{if !isset($product.deleted)}
 				{assign var='productId' value=$product.product_id}
 				{assign var='productAttributeId' value=$product.product_attribute_id}
@@ -499,7 +509,7 @@
 					</tr>
 				{/if}
 			{/if}
-		{/foreach} -->
+		{/foreach} *}
 		{foreach from=$discounts item=discount}
 			<tr class="item">
 				<td class="text-center">{$discount.name|escape:'html':'UTF-8'}</td>
@@ -618,7 +628,7 @@
 		<h3 class="page-heading bottom-indent">{l s='Add a message'}</h3>
 		<p>{l s='If you would like to add a comment about your order, please write it in the field below.'}</p>
 		<p class="form-group">
-		<label for="id_product">{l s='Product'}</label>
+		<label for="id_product">{l s='Room Type'}</label>
 			<select name="id_product" class="form-control">
 				<option value="0">{l s='-- Choose --'}</option>
 				{foreach from=$products item=product name=products}
@@ -636,12 +646,11 @@
 		</div>
 	</form>
 {else}
-<p class="alert alert-info"><i class="icon-info-sign"></i>{l s='You cannot return merchandise with a guest account'}</p>
+<p class="alert alert-info"><i class="icon-info-sign"></i> {l s='You cannot request refund with a guest account'}</p>
 {/if}
 {/if}
 
-
-<!-- Fancybox -->
+{* Fancybox *}
 <div style="display: none;" id="reason_fancybox_content">
 	<div id="htlRefundReasonForm">
 		<h2 class="refund_reason_head">

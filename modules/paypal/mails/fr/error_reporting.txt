@@ -1,0 +1,9 @@
+	Bonjour,
+
+	Rapport d'erreur à partir de votre module PayPalAPI
+
+	Un client a rencontré un problème avec le module PayPalAPI:
+
+	{logs}
+
+	{shop_url} propulsé par PrestaShop™

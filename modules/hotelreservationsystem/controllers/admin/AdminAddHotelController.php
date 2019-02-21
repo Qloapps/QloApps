@@ -255,12 +255,6 @@ class AdminAddHotelController extends ModuleAdminController
             $this->errors[] = $this->l('Check Out Time is required field.');
         }
 
-        if ($zipcode == '') {
-            $this->errors[] = $this->l('Postal Code is required field.');
-        } elseif (!Validate::isPostCode($zipcode)) {
-            $this->errors[] = $this->l('Enter a Valid Postal Code.');
-        }
-
         if (!$rating) {
             $this->errors[] = $this->l('Rating is required field.');
         }
@@ -279,6 +273,15 @@ class AdminAddHotelController extends ModuleAdminController
                 if ($statesbycountry) {
                     $this->errors[] = $this->l('State is required field.');
                 }
+            }
+            /* Check zip code format */
+            $objCountry = new Country($country);
+            if ($objCountry->zip_code_format && !$objCountry->checkZipCode($zipcode)) {
+                $this->errors[] = sprintf($this->l('The Zip/Postal code you\'ve entered is invalid. It must follow this format: %s'), str_replace('C', $objCountry->iso_code, str_replace('N', '0', str_replace('L', 'A', $objCountry->zip_code_format))));
+            } elseif (empty($zipcode) && $objCountry->need_zip_code) {
+                $this->errors[] = $this->l('A Zip / Postal code is required.');
+            } elseif ($zipcode && !Validate::isPostCode($zipcode)) {
+                $this->errors[] = $this->l('The Zip / Postal code is invalid.');
             }
         }
 
@@ -381,6 +384,9 @@ class AdminAddHotelController extends ModuleAdminController
             $objHotelBranch->map_input_text = $map_input_text;
             $objHotelBranch->save();
 
+            // hotel categories before save categories
+            $categsBeforeUpd = $objHotelBranch->getAllHotelCategories();
+
             if ($newIdHotel = $objHotelBranch->id) {
                 $groupIds = array();
                 if ($dataGroupIds = Group::getGroups($this->context->language->id)) {
@@ -389,10 +395,11 @@ class AdminAddHotelController extends ModuleAdminController
                     }
                 }
                 $objCountry = new Country();
-                $countryName = $objCountry->getNameById($this->context->language->id, $country);
+                $countryName = $objCountry->getNameById(Configuration::get('PS_LANG_DEFAULT'), $country);
                 if ($catCountry = $objHotelBranch->addCategory($countryName, false, $groupIds)) {
                     if ($state) {
-                        $stateName = (new State())->getNameById($state);
+                        $objState = new State();
+                        $stateName = $objState->getNameById($state);
                         $catState = $objHotelBranch->addCategory($stateName, $catCountry, $groupIds);
                     } else {
                         $catState = $objHotelBranch->addCategory($city, $catCountry, $groupIds);
@@ -411,6 +418,23 @@ class AdminAddHotelController extends ModuleAdminController
                     }
                 }
             }
+            // hotel categories after save categories
+            $categsAfterUpd = $objHotelBranch->getAllHotelCategories();
+
+            // delete categories which not in hotel categories and also unused
+            if ($unusedCategs = array_diff($categsBeforeUpd, $categsAfterUpd)) {
+                if ($hotelCategories = $objHotelBranch->getAllHotelCategories()) {
+                    foreach ($unusedCategs as $idCategory) {
+                        if (!in_array($idCategory, $hotelCategories)
+                            && $idCategory != Configuration::get('PS_HOME_CATEGORY')
+                        ) {
+                            $objCategory = new Category($idCategory);
+                            $objCategory->delete();
+                        }
+                    }
+                }
+            }
+
             if (Tools::isSubmit('submitAdd'.$this->table.'AndStay')) {
                 if ($idHotel) {
                     Tools::redirectAdmin(
@@ -465,7 +489,7 @@ class AdminAddHotelController extends ModuleAdminController
         if ($idHotel) {
             $invalidImg = ImageManager::validateUpload(
                 $_FILES['hotel_image'],
-                Tools::getMaxUploadSize(Configuration::get('PS_LIMIT_UPLOAD_IMAGE_VALUE') * 1048576)
+                Tools::getMaxUploadSize()
             );
             if (!$invalidImg) {
                 // Add Hotel images

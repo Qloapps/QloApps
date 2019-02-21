@@ -45,6 +45,11 @@ class AdminCategoriesControllerCore extends AdminController
 
     public function __construct()
     {
+        // redirect to admin dashboard as no entry allowed in category controller. It will be managed solely from
+        // hotel creation , updation and deletion
+        $this->context = Context::getContext();
+        Tools::redirectAdmin($this->context->link->getAdminLink('AdminDashboard'));
+
         $this->bootstrap = true;
         $this->table = 'category';
         $this->className = 'Category';
@@ -53,8 +58,6 @@ class AdminCategoriesControllerCore extends AdminController
         $this->explicitSelect = true;
         $this->_defaultOrderBy = 'position';
         $this->allow_export = true;
-
-        $this->context = Context::getContext();
 
         $this->fieldImageSettings = array(
             'name' => 'image',

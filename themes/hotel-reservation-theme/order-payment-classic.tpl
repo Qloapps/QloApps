@@ -23,6 +23,17 @@
 *  International Registered Trademark & Property of PrestaShop SA
 *}
 <div class="paiement_block">
+    {include file="$tpl_dir./order-opc-advanced-payment-option.tpl"}
+
+    <div id="tc_cont">
+        <p class="checkbox">
+            <input type="checkbox" name="cgv" id="cgv" value="1" {if $checkedTOS}checked="checked"{/if} />
+            <label for="cgv" id="tc_txt">{l s='I agree to the terms of service and will adhere to them unconditionally.'}</label>
+            <a id="tc_link" href="{$link_conditions|escape:'html':'UTF-8'}" class="iframe" rel="nofollow" >{l s='(Read the Terms of Service)'}</a>
+        </p>
+    </div>
+
+    <p class="block-small-header">{l s='PAYMENT RESOURCE'}</p>
     <div id="HOOK_TOP_PAYMENT">{$HOOK_TOP_PAYMENT}</div>
     {if $HOOK_PAYMENT}
         {if !$opc}

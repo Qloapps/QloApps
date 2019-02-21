@@ -415,7 +415,7 @@ class HotelHelper
         }
         $obj_hotel_info->state_id = $state_id;
         $obj_hotel_info->country_id = $def_cont_id;
-        $obj_hotel_info->zipcode = '263001';
+        $obj_hotel_info->zipcode = self::getRandomZipcodeByForCountry($def_cont_id);
         $obj_hotel_info->address = 'Monticello Dr, Montgomery, AL 36117, USA';
         $obj_hotel_info->save();
 
@@ -502,7 +502,18 @@ class HotelHelper
 
             Search::indexation(Tools::link_rewrite($value_prod), $product_id);
 
-            $product->addToCategories(2);
+            // assign all the categories of hotel and its parent to the product
+            if (Validate::isLoadedObject($objHotel = new HotelBranchInformation($id_hotel))) {
+                if (Validate::isLoadedObject($objCategory = new Category($objHotel->id_category))) {
+                    if ($hotelCategories = $objCategory->getParentsCategories()) {
+                        $categoryIds = array();
+                        foreach ($hotelCategories as $rowCateg) {
+                            $categoryIds[] = $rowCateg['id_category'];
+                        }
+                        $product->addToCategories($categoryIds);
+                    }
+                }
+            }
 
             StockAvailable::updateQuantity($product_id, null, 999999999);
 
@@ -514,7 +525,11 @@ class HotelHelper
             if (is_dir($image_dir_path)) {
                 if ($opendir = opendir($image_dir_path)) {
                     while (($image = readdir($opendir)) !== false) {
-                        if ($this->validImageExt($image)) {
+                        $old_path = $image_dir_path.$image;
+
+                        if (ImageManager::isRealImage($old_path)
+                            && ImageManager::isCorrectImageFileExt($old_path)
+                        ) {
                             $image_obj = new Image();
                             $image_obj->id_product = $product_id;
                             $image_obj->position = Image::getHighestPosition($product_id) + 1;
@@ -529,7 +544,6 @@ class HotelHelper
                                 $image_obj->cover = 0;
                             }
                             $image_obj->add();
-                            $old_path = $image_dir_path.$image;
                             $new_path = $image_obj->getPathForCreation();
                             foreach ($imagesTypes as $image_type) {
                                 ImageManager::resize(
@@ -771,4 +785,21 @@ class HotelHelper
         }
         return true;
     }
+
+    public static function getRandomZipcodeByForCountry($idCountry)
+    {
+        $randZipCode = '';
+        $alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        if (Validate::isLoadedObject($objCountry = new Country($idCountry))) {
+            if ($objCountry->need_zip_code) {
+                if ($randZipCode = $objCountry->zip_code_format) {
+                    $randZipCode = str_replace('N', mt_rand(0, 9), $randZipCode);
+                    $randZipCode = str_replace('L', $alphabet[mt_rand(0, Tools::strlen($alphabet) - 1)], $randZipCode);
+                    $randZipCode = str_replace('C', $objCountry->iso_code, $randZipCode);
+                }
+            }
+        }
+        return $randZipCode;
+    }
+
 }

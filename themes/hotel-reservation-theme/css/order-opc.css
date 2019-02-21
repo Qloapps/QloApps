@@ -4,6 +4,10 @@
 #order-opc {
 	line-height: 20px;
 }
+#order-opc input.form-control {
+	height: 40px;
+	border-radius: 4px;
+}
 #order-opc .box {
 	padding-bottom: 20px;
 }
@@ -26,10 +30,10 @@
 	top: -14px;
 }
 #order-opc .form-group {
-	margin-bottom: 2px;
+	margin-bottom: 10px;
 }
 #order-opc .form-group .form-control {
-	max-width: 271px;
+	max-width: 100%;
 }
 #order-opc .lost_password {
 	display: inline-block;
@@ -43,9 +47,6 @@
 	font-weight: bold;
 	color: #333;
 	padding: 3px 0 6px;
-}
-#order-opc .opc-button {
-	padding: 11px 0 0 0;
 }
 #order-opc ul.bullet {
 	line-height: 22px;
@@ -86,32 +87,6 @@
 
 /* By Webkul */
 
-.table_head th {
-	font-size: 18px;
-	color: #3C3C3C;
-	font-weight: 700;
-}
-.table_body td {
-	font-size: 16px;
-	color: #3C3C3C;
-	font-weight: 400;
-}
-#voucher h4 {
-	font-size: 18px !important;
-	color: #404040 !important;
-	font-weight: 700 !important;
-}
-#voucher #discount_name {
-	width: 200px;
-	height: 35px;
-}
-#voucher button, #advanced-payment button {
-	border: none;
-	background-color: #379bf0;
-	font-size: 16px;
-	color: #FFFFFF;
-	font-weight: 700;
-}
 #title {
 	font-size: 13px;
 	color: #3C3C3C;
@@ -123,21 +98,6 @@
 }
 #display_cart_vouchers span {
 	font-weight: 700;
-	color: #3C3C3C !important;
-}
-.table_tfoot td {
-	font-size: 16px;
-	color: #3C3C3C;
-	background-color: #FFFFFF;
-}
-.table_total_tr td, .table_total_tr td span {
-	color: #333333 !important;
-}
-.account_txt {
-	font-size: 30px;
-	color: #3C3C3C;
-	font-weight: 700;
-	padding-left: 0px;
 }
 #login_form {
 	background-color: #FFFFFF;
@@ -148,30 +108,13 @@
 	font-weight: 700;
 	margin-top: 5px;
 }
-#login_form_content p label {
-	font-size: 16px;
-	color: #3C3C3C;
-	font-weight: 700;
-}
-#login_form_content p input.form-control, #opc_account_form div input.form-control {
-	height: 40px;
-}
 #login_form_content a.lost_password {
 	font-weight: bold;
 	text-decoration: none;
 }
-#SubmitLogin, #submitAccount {
-	background-color: #379bf0;
-	font-size: 18px;
-	color: #FFFFFF;
-	font-weight: 700;
-	border-color: none;
-}
-#SubmitLogin:hover, #SubmitLogin:focus, #SubmitLogin:active, #submitAccount:hover, #submitAccount:focus, #submitAccount:active {
-	border-color: none;
-}
 #new_account_form fieldset div.box, #tc_cont {
 	background-color: #FFFFFF;
+	margin-bottom: 20px;
 }
 #new_account_title, #opc_account_form h3, #choose_payment_txt {
 	margin-top: 5px;
@@ -179,64 +122,464 @@
 	color: #3C3C3C;
 	font-weight: 700;
 }
-#opc_account_form div label {
-	font-size: 16px;
-	color: #3C3C3C;
-	font-weight: 700;
-}
-.hard_disp_none {
-	display: none !important;
-}
-#tc_txt {
-	font-size: 16px;
-	color: #929292;
-	font-weight: 700;
-}
-#tc_link {
-	font-size: 16px;
-	color: #404040;
-	font-weight: 700;
-	text-decoration: none;
+#opc_new_account form label {
+	font-size: 14px;
+	color: #333333;
+	font-weight: 400;
 }
 .opc-main-block h3.page-subheading {
 	margin-top: 5px;
 }
-.clear-both {
+#order-opc .clear-both {
 	clear: both;
 }
-.partial_txt {
-	font-size: 16px;
-	font-weight: 700;
-	color: #585858;
+#order-opc .partial_txt {
+	font-size: 14px;
+	color: #333333;
 }
-.partial_mim_cost {
+#order-opc .partial_min_cost {
 	font-size: 16px;
-	font-weight: 400;
-	color: #585858;
+	color: #333333;
 }
-#partial_data {
+#order-opc #partial_data {
 	display: none;
 }
-.partial_subcont {
+#order-opc .partial_subcont {
 	margin-top: 10px;
 }
-#current_amt_cont span.partial_txt {
-	transform: translate(0px, 6px);
-}
-#current_amt_cont div.input-group {
-	padding-left: 10px;
-}
-#current_amt_cont div.input-group span.input-group-addon {
-	padding: 6px 17px;
-}
-#current_amt_cont div.input-group input {
-	height: 40px;
-}
-
-/* By Webkul */
-
-.room_type_old_price {
+#order-opc .room_type_old_price {
 	text-decoration: line-through;
 	color:#979797;
-	font-size:12px; 
+	font-size:12px;
 }
+#order-opc .block-small-header {
+	font-size: 12px;
+	color: #777777;
+	font-weight: 600;
+}
+.order-detail-content .product-name a {
+	font-size: 22px;
+	color: #333333 !important;
+}
+
+.order-detail-content .hotel-location {
+	font-size: 14px;
+    padding: 10px 0px 0px 0px;
+    color: #777777;
+}
+.order-detail-content .hotel-location > i {
+	font-size: 18px;
+}
+.order-detail-content .hotel-location > .htl-address-icon {
+	background-image: url(../../../modules/hotelreservationsystem/views/img/Slices/icon-contact.png);
+	padding: 1px 15px 0px 2px;
+	background-position: 1px;
+	margin-right: 5px;
+	font-size: 14px;
+}
+.order-detail-content div.room-type-features {
+	margin-bottom: 5px;
+}
+.order-detail-content span.room-type-feature {
+	white-space: nowrap;
+	line-height: 35px;
+	background-color: #eee;
+	border-radius: 10px;
+	margin-right: 10px;
+	padding: 3px 10px 6px 0px;
+	font-size: 14px;
+	color: #555555;
+}
+.order-detail-content .room_duration_block_head {
+	font-size: 12px;
+    color: #777777;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+.order-detail-content .room_duration_block_value {
+	font-size: 16px;
+	color: #333333;
+}
+.order-detail-content .room_duration_block {
+	margin-bottom: 15px;
+	float: left;
+    width: 100%;
+	background-color: #D8EDFF;
+	border-radius: 2px;
+	padding: 10px 0px 5px 0px;
+}
+.order-detail-content .cart_product_summary_line .room_duration_block {
+	background-color: #fff;
+}
+.order-detail-content .cart_product_summary_line .room_total_price {
+	font-size: 24px;
+	color: #333333;
+}
+
+.order-detail-content .room_total_price {
+	font-size: 24px;
+	color: #333333;
+}
+.order-detail-content .room_total_price_detial {
+	font-size: 14px;
+	color: #777777;
+}
+.order-detail-content .unit_price_block {
+	display: inline-block;
+    padding: 10px 15px 0px;
+    background-color: #f2f2f2f2;
+    border-radius: 6px;
+}
+.order-detail-content .room_info_text {
+	font-size: 12px;
+	color: #777777;
+	text-transform: uppercase;
+	font-family: OpenSans-Semibold;
+}
+.order-detail-content .room_unit_price{
+	font-size: 24px;
+	color: #333333;
+	text-align: right;
+}
+.order-detail-content .room_unit_price span {
+	font-size: 14px;
+}
+.order-detail-content .room_unit_price span.real_price {
+	color: #777777;
+	text-decoration: line-through;
+}
+.order-detail-content .room_unit_price_detail {
+	font-size: 14px;
+	color: #777777;
+}
+.order-detail-content .room_remove_block {
+	font-size: 12px;
+	color: #555;
+	text-align: center;
+	margin-top: 20px
+}
+.order-detail-content .room_remove_block i {
+	font-size: 18px;
+}
+#order-opc #guest-info-block div.info-head {
+	font-size: 14px;
+	color: #555555;
+}
+#order-opc #guest-info-block div.info-value {
+	font-size: 14px;
+	color: #333333;
+	overflow: auto;
+}
+
+/* Guest Account Block */
+#order-opc .opc_dropdown_btn {
+	height: 40px;
+	border-radius: 4px;
+}
+#order-opc .order_opc_ul {
+	font-size: 14px;
+	font-weight: 400;
+	top: 45px;
+	padding: 0px;
+	width: 100%;
+	border-bottom: 1px solid rgba(0, 0, 0, 1);
+	border-left: 1px solid rgba(0, 0, 0, 1);
+	border-right: 1px solid rgba(0, 0, 0, 1);
+	max-height: 145px;
+	overflow-y: auto;
+}
+#order-opc .order_opc_ul li {
+	cursor: default;
+	font-size: 14px;
+	color: rgba(0, 0, 0, 1);
+	font-weight: 400;
+	padding: 11px;
+}
+#order-opc .order_opc_ul li:hover, #order-opc .order_opc_ul li:focus, #order-opc .order_opc_ul li:active {
+	background-color: #379bf0;
+	color: #FFFFFF;
+}
+#order-opc .already_registered_block {
+	font-size: 14px;
+	line-height: 19px;
+	color: #333333;
+}
+#order-opc .already_registered_block #openLoginFormBlock {
+	color: #003AEF;
+	font-weight: 600;
+}
+
+#new_account_form #opc_guestCheckout {
+	padding: 14px 25px;
+}
+#new_account_form #opc_createAccount {
+	padding: 14px 25px;
+	margin-left: 15px;
+}
+#order-opc #opc_new_account {
+	padding-bottom: 10px;
+}
+#order-opc .step-edit > a {
+	font-size: 14px;
+	color: #0000FF;
+	text-align: right;
+}
+
+/* Voucher Bock Css */
+#order-opc .cart_voucher_detail_block {
+	font-size: 14px;
+	color: #555555;
+}
+#order-opc .cart_voucher_detail_block .cart_voucher_head {
+	font-size: 12px;
+	color: #777777;
+	text-transform: uppercase;
+	font-weight: 600;
+}
+#order-opc .cart_voucher_detail_block span.cart_discount_name {
+	font-size: 14px;
+	color: #459C3D;
+	background-color: #FFFFFF;
+	border: 2px dashed #459C3D;
+	padding: 10px;
+	display: inline-block;
+	width: 60%;
+	font-weight: 600;
+}
+#order-opc .cart_discount_name a.price_discount_delete {
+	color: #777777;
+	font-size: 16px;
+}
+#order-opc .cart_voucher_detail_block .cart_applied_voucher {
+	margin-bottom: 5px;
+}
+#order-opc .cart_voucher_detail_block span.voucher_apply_state {
+	background-color: #EDEDED;
+	padding: 10px 15px;
+    border-radius: 4px;
+	color: #459C3D;
+	display: inline-block;
+}
+#order-opc .avail_vouchers_block .avail_voucher_name {
+	font-size: 12px;
+	font-weight: 600;
+	color: #0000FF;
+	margin-bottom: 2px;
+}
+#order-opc .avail_vouchers_block .avail_voucher_name>.voucher_name {
+	cursor: pointer;
+}
+#order-opc .avail_vouchers_block .avail_voucher_des {
+	font-size: 12px;
+	color: #777777;
+	margin-bottom: 2px;
+}
+#order-opc .avail_vouchers_block .seperator {
+	margin-top: 10px;
+    margin-bottom: 10px;
+}
+#order-opc .cart_total_detail_block .cart_total_values {
+	float: right;
+}
+#order-opc .cart_total_detail_block .total_discount_block {
+	color: #459C3D;
+}
+#order-opc .cart_total_detail_block .cart_final_total_block {
+	line-height: 40px;
+}
+#order-opc .cart_total_detail_block .cart_final_total_block > .cart_total_values {
+	font-size: 28px;
+	color: #003AEF;
+}
+#order-opc .opc_advance_payment_block {
+	margin-bottom: 30px;
+}
+#order-opc #advanced-payment label > span {
+	font-size: 14px!important;
+	font-weight: normal!important;
+}
+@media (max-width: 767px) {
+	#order-opc .cart_voucher_detail_block .submit_discount_div {
+		margin-top: 10px;
+	}
+	#order-opc .room-type-img-block {
+		display: none;
+	}
+	#order-opc .cart_product_line .room-type-features {
+		display: none;
+	}
+	.order-detail-content .room-xs-img {
+		display: inline-block;
+	}
+	.order-detail-content .room-xs-info {
+		display: inline-block;
+	}
+	.order-detail-content .room-xs-img {
+		width: 9%;
+		margin-right: 2%;
+	}
+	.order-detail-content .room-xs-img img {
+		width: 60px;
+	}
+	.order-detail-content .room-xs-info {
+		width: 88%;
+		vertical-align: top;
+	}
+	.order-detail-content .hotel-location {
+		padding: 4px 0px 0px 0px;
+	}
+	.order-detail-content .room-xs-remove {
+		display: block;
+		font-size: 16px!important;
+		padding: 0px 4px;
+	}
+}
+@media (max-width: 480px) {
+	.order-detail-content .room-xs-info {
+		display: inline-block;
+		width: 76%;
+		vertical-align: top;
+	}
+	.order-detail-content .room-xs-img {
+		display: inline-block;
+		width: 20%;
+		margin-right: 2%;
+	}
+	.order-detail-content .room-xs-img img {
+		width: 60px;
+	}
+	.order-detail-content .hotel-location {
+		font-size: 13px;
+	}
+}
+@media (min-width: 481px) and (max-width: 650px) {
+	.order-detail-content .room-xs-info {
+		display: inline-block;
+		width: 85%;
+		vertical-align: top;
+	}
+	.order-detail-content .room-xs-img {
+		display: inline-block;
+		width: 12%;
+		margin-right: 2%;
+	}
+	.order-detail-content .room-xs-img img {
+		width: 60px;
+	}
+}
+@media (min-width: 768px) {
+	#order-opc .cart_product_line .unit_price_block {
+		float: right;
+	}
+	.order-detail-content .room_unit_price_detail {
+		text-align: right;
+	}
+	.order-detail-content .room-xs-img {
+		display: none;
+	}
+	.order-detail-content .room-xs-remove {
+		display: none;
+	}
+}
+@media (min-width: 992px) and (max-width: 1199px) {
+	#order-opc .cart_voucher_detail_block .submit_discount_div {
+		margin-top: 10px;
+	}
+	#order-opc .cart_voucher_detail_block span.cart_discount_name {
+		width: 50%;
+	}
+}
+@media (max-width: 480px) {
+	#order-opc .cart_voucher_detail_block span.cart_discount_name {
+		width: 50%;
+	}
+	#order-opc #new_account_form #opc_guestCheckout {
+		width: 100%;
+		margin-bottom: 15px;
+	}
+	#order-opc #new_account_form #opc_createAccount {
+		width: 100%;
+		margin-left: 0px;
+	}
+}
+#order-opc .cart_total_detail_block {
+	font-size: 14px;
+	color: #333333;
+}
+@media (max-width: 350px) {
+	#order-opc .cart_total_detail_block {
+		font-size: 12px;
+	}
+	#order-opc .cart_total_detail_block .cart_final_total_block > .cart_total_values {
+		font-size: 24px;
+	}
+}
+
+#order-opc #oprder-opc-accordion .accordion-header {
+	font-size: 20px;
+	color: #333333;
+	padding: 0px;
+	cursor: pointer;
+}
+#order-opc #oprder-opc-accordion .accordion-left-arrow {
+	font-size: 25px;
+}
+#order-opc #oprder-opc-accordion #shopping-cart-head .accordion-left-arrow {
+	display: none;
+}
+#order-opc #oprder-opc-accordion .card-header>h5 {
+	margin: 0px;
+}
+#order-opc #oprder-opc-accordion .card-body {
+	margin-top: 20px;
+}
+#order-opc .right-border {
+	border-right: 1px solid #ccc;
+}
+#order-opc select {
+	background-color: #fff;
+	height: 40px;
+	border-radius: 4px;
+	padding: 3px 5px;
+	color: #333;
+	border: 1px solid #d6d4d4;
+	width: 100%;
+}
+#order-opc #center_column form.std .row .col-xs-4 {
+	max-width: 127px;
+}
+#opc_account_form .gender-line {
+	padding-top: 0px;
+}
+
+/* buttons css */
+#order-opc .opc-button-small {
+	border: none;
+	border-radius: 4px;
+	font-size: 14px;
+	padding: 10px 25px;
+	font-weight: 600;
+}
+#order-opc .opc-btn-primary {
+	background-color: #1292FF;
+	color: #FFFFFF;
+}
+#order-opc .opc-btn-default {
+	border: 1px solid #1292FF;
+	background-color: #fff;
+	color: #1292FF;
+}
+#order-opc .opc-button {
+	padding: 11px 0 0 0;
+}
+#order-opc .button-medium {
+	background-color: #1292FF;
+	box-shadow: 0 0px 20px 0 rgba(0,0,0,0.34);
+	border-radius: 2px;
+	padding: 5px 50px;}
+	#order-opc .button-medium > span {
+		font-size: 14px;
+		font-weight: 600;
+		color: #FFFFFF;
+		text-transform: uppercase;
+		text-align: center;}

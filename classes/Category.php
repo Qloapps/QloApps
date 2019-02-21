@@ -433,10 +433,11 @@ class CategoryCore extends ObjectModel
         }
         $right = (int)$n++;
 
-        Db::getInstance()->execute('
-		UPDATE '._DB_PREFIX_.'category
-		SET nleft = '.(int)$left.', nright = '.(int)$right.'
-		WHERE id_category = '.(int)$id_category.' LIMIT 1');
+        Db::getInstance()->execute(
+            'UPDATE '._DB_PREFIX_.'category
+		    SET nleft = '.(int)$left.', nright = '.(int)$right.'
+            WHERE id_category = '.(int)$id_category.' LIMIT 1'
+        );
     }
 
     /**

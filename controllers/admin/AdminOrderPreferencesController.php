@@ -73,13 +73,13 @@ class AdminOrderPreferencesControllerCore extends AdminController
                         'value' => PS_ORDER_PROCESS_OPC,
                         'identifier' => 'value',
                     ),*/
-                    /*'PS_GUEST_CHECKOUT_ENABLED' => array(
+                    'PS_GUEST_CHECKOUT_ENABLED' => array(
                         'title' => $this->l('Enable guest checkout'),
                         'hint' => $this->l('Allow guest visitors to place an order without registering.'),
                         'validation' => 'isBool',
                         'cast' => 'intval',
-                        'type' => 'hidden'
-                    ),*/
+                        'type' => 'bool'
+                    ),
                     /*'PS_DISALLOW_HISTORY_REORDERING' => array(
                         'title' => $this->l('Disable Reordering Option'),
                         'hint' => $this->l('Disable the option to allow customers to reorder in one click from the order history page (required in some European countries).'),

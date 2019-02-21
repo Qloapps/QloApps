@@ -1,4 +1,26 @@
 -----------------------------
+# V1.1.0 to V1.1.1
+-----------------------------
+
+## Added features
+
+[+] BO : Configuration option "Show link at navigation" given to choose whether show testimonial link at navigation menu or not.
+
+
+## Improved/changed features
+
+[+] BO : Images validation improved.
+[+] BO : Render option moved above render list at AdminTestimonialsModuleSetting controller.
+[-] FO : "Testimonial" link is removed from footer explore block.
+
+
+## Update Policy
+
+- Mobule need only file update, can be updated only by UPLOADING new version on module
+
+
+
+-----------------------------
 # V1.0.0 to V1.1.0
 -----------------------------
 

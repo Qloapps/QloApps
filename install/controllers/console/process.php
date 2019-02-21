@@ -244,6 +244,7 @@ class InstallControllerConsoleProcess extends InstallControllerConsole
             'admin_lastname' =>            $this->datas->admin_lastname,
             'admin_password' =>            $this->datas->admin_password,
             'admin_email' =>            $this->datas->admin_email,
+            'marketing_consent' =>      $this->datas->marketing_consent,
             'configuration_agrement' =>    true,
             'send_informations' => true,
         ));
