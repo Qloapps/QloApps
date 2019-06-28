@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -195,7 +195,7 @@ class HelperListCore extends Helper
                 $position_group_identifier = Category::getRootCategory()->id;
             }
 
-            $positions = array_map(function($elem) { return (int)($elem['position']); }, $this->_list);
+            $positions = array_map(create_function('$elem', 'return (int)($elem[\'position\']);'), $this->_list);
             sort($positions);
         }
 
@@ -599,6 +599,11 @@ class HelperListCore extends Helper
                 $value = Tools::getValue($value_key);
             }
 
+            $value = Context::getContext()->cookie->{$value_key};
+            if (!$value && Tools::getIsset($value_key)) {
+                $value = Tools::getValue($value_key);
+            }
+
             switch ($params['type']) {
                 case 'bool':
                     if (isset($params['ajax']) && $params['ajax']) {
@@ -609,7 +614,7 @@ class HelperListCore extends Helper
                 case 'date':
                 case 'datetime':
                     if (is_string($value)) {
-                        $value = Tools::unSerialize($value);
+                        $value = json_decode($value, true);
                     }
                     if (!Validate::isCleanHtml($value[0]) || !Validate::isCleanHtml($value[1])) {
                         $value = '';
@@ -668,7 +673,6 @@ class HelperListCore extends Helper
             'pagination' => $this->_pagination,
             'list_total' => $this->listTotal,
             'sql' => isset($this->sql) && $this->sql ? str_replace('\n', ' ', str_replace('\r', '', $this->sql)) : false,
-            'token' => $this->token,
             'table' => $this->table,
             'bulk_actions' => $this->bulk_actions,
             'show_toolbar' => $this->show_toolbar,
@@ -698,7 +702,8 @@ class HelperListCore extends Helper
             'name' => isset($name) ? $name : null,
             'name_id' => isset($name_id) ? $name_id : null,
             'row_hover' => $this->row_hover,
-            'list_id' => isset($this->list_id) ? $this->list_id : $this->table
+            'list_id' => isset($this->list_id) ? $this->list_id : $this->table,
+            'token' => $this->token,
         ), $this->tpl_vars));
 
         return $this->header_tpl->fetch();
@@ -743,7 +748,8 @@ class HelperListCore extends Helper
 
         $this->footer_tpl->assign(array_merge($this->tpl_vars, array(
             'current' => $this->currentIndex,
-            'list_id' => $this->list_id
+            'list_id' => $this->list_id,
+            'token' => $this->token,
         )));
         return $this->footer_tpl->fetch();
     }

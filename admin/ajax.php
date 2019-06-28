@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -88,8 +88,7 @@ if (Tools::isSubmit('updateElementEmployee') && Tools::getValue('updateElementEm
 if (Tools::isSubmit('searchCategory')) {
     $q = Tools::getValue('q');
     $limit = Tools::getValue('limit');
-    $results = Db::getInstance()->executeS(
-        'SELECT c.`id_category`, cl.`name`
+    $results = Db::getInstance()->executeS('SELECT c.`id_category`, cl.`name`
 		FROM `'._DB_PREFIX_.'category` c
 		LEFT JOIN `'._DB_PREFIX_.'category_lang` cl ON (c.`id_category` = cl.`id_category`'.Shop::addSqlRestrictionOnLang('cl').')
 		WHERE cl.`id_lang` = '.(int)$context->language->id.' AND c.`level_depth` <> 0
@@ -123,4 +122,9 @@ if (Tools::isSubmit('getZones')) {
     $html .= '</select>';
     $array = array('hasError' => false, 'errors' => '', 'data' => $html);
     die(Tools::jsonEncode($array));
+}
+
+if (Tools::isSubmit('getEmailHTML') && $email = Tools::getValue('email')) {
+    $email_html = AdminTranslationsController::getEmailHTML($email);
+    die($email_html);
 }

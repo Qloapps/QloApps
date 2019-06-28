@@ -1,3 +1,12 @@
+------------------------------
+# V1.3.7 to V1.4.1
+------------------------------
+
+## Improved/Changed Features:
+
+* [CO] : Updated with latest PS version - 1.6.1.23.
+
+
 2014-04-17 11:53:57 +0200	// Version compliancy
 2014-03-31 12:08:03 +0200	[-] MO : productpaymentlogos : if there is not a link specified in the configuration, no link will be displayed
 2014-03-24 15:22:19 +0100	/ MO productpaymentlogos : ps_versions_compliancy added

@@ -1,0 +1,6 @@
+### Braintree transaction error # 2018-11-23 09:09:40 ###
+## cart id # 94 ##
+## amount # 2000.000000 ##
+## Braintree error message ##
+# Unknown or expired payment_method_nonce. #
+# error code: 91565 # message: Unknown or expired paymentMethodNonce. #

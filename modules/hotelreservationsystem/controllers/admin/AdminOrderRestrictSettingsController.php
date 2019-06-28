@@ -24,9 +24,7 @@ class AdminOrderRestrictSettingsController extends ModuleAdminController
                         'title' => $this->l('Maximum Global Date To Book a room'),
                         'type' => 'text',
                         'id' => 'max_global_book_date',
-                        'hint' => $this->l(
-                            'This is the maximum date till which date rooms of all your hotels can be booked.'
-                        ),
+                        'hint' => $this->l('Maximum date by which rooms of your hotels can be booked.'),
                     ),
                 ),
                 'submit' => array('title' => $this->l('Save')),
@@ -177,7 +175,7 @@ class AdminOrderRestrictSettingsController extends ModuleAdminController
                 $this->errors[] = $this->l('Maximum Global Date can not be before current date.');
             }
             if (!count($this->errors)) {
-                Configuration::updateValue('MAX_GLOBAL_BOOKING_DATE', $max_global_date);
+                parent::postProcess();
             }
         } else {
             parent::postProcess();

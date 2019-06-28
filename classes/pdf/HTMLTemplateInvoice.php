@@ -1,6 +1,6 @@
 <?php
 /**
- * 2007-2015 PrestaShop
+ * 2007-2017 PrestaShop
  *
  * NOTICE OF LICENSE
  *
@@ -18,9 +18,9 @@
  * versions in the future. If you wish to customize PrestaShop for your
  * needs please refer to http://www.prestashop.com for more information.
  *
- *  @author 	PrestaShop SA <contact@prestashop.com>
- *  @copyright  2007-2015 PrestaShop SA
- *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ *  @author    PrestaShop SA <contact@prestashop.com>
+ *  @copyright 2007-2017 PrestaShop SA
+ *  @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PrestaShop SA
  */
 
@@ -30,6 +30,7 @@
 class HTMLTemplateInvoiceCore extends HTMLTemplate
 {
     public $order;
+    public $order_invoice;
     public $available_in_your_account = false;
 
     /**
@@ -37,17 +38,27 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
      * @param $smarty
      * @throws PrestaShopException
      */
-    public function __construct(OrderInvoice $order_invoice, $smarty)
+    public function __construct(OrderInvoice $order_invoice, $smarty, $bulk_mode = false)
     {
         $this->order_invoice = $order_invoice;
         $this->order = new Order((int)$this->order_invoice->id_order);
         $this->smarty = $smarty;
 
+        // If shop_address is null, then update it with current one.
+        // But no DB save required here to avoid massive updates for bulk PDF generation case.
+        // (DB: bug fixed in 1.6.1.1 with upgrade SQL script to avoid null shop_address in old orderInvoices)
+        if (!isset($this->order_invoice->shop_address) || !$this->order_invoice->shop_address) {
+            $this->order_invoice->shop_address = OrderInvoice::getCurrentFormattedShopAddress((int)$this->order->id_shop);
+            if (!$bulk_mode) {
+                OrderInvoice::fixAllShopAddresses();
+            }
+        }
+
         // header informations
         $this->date = Tools::displayDate($order_invoice->date_add);
 
         $id_lang = Context::getContext()->language->id;
-        $this->title = $order_invoice->getInvoiceNumberFormatted($id_lang);
+        $this->title = $order_invoice->getInvoiceNumberFormatted($id_lang, (int)$this->order->id_shop);
 
         $this->shop = new Shop((int)$this->order->id_shop);
     }
@@ -60,11 +71,7 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
     public function getHeader()
     {
         $this->assignCommonHeaderData();
-        $this->smarty->assign(
-            array(
-                'header' => $this->l('INVOICE'),
-            )
-        );
+        $this->smarty->assign(array('header' => HTMLTemplateInvoice::l('Invoice')));
 
         return $this->smarty->fetch($this->getTemplate('header'));
     }
@@ -72,12 +79,11 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
     /**
      * Compute layout elements size
      *
-     * @params $params Array Layout elements
+     * @param $params Array Layout elements
      *
      * @return Array Layout elements columns size
      */
-
-    private function computeLayout($params)
+    protected function computeLayout($params)
     {
         $layout = array(
             'reference' => array(
@@ -141,25 +147,17 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
 
         $invoice_address = new Address((int)$this->order->id_address_invoice);
         $country = new Country((int)$invoice_address->id_country);
-
-        if ($this->order_invoice->invoice_address) {
-            $formatted_invoice_address = $this->order_invoice->invoice_address;
-        } else {
-            $formatted_invoice_address = AddressFormat::generateAddress($invoice_address, $invoiceAddressPatternRules, '<br />', ' ');
-        }
+        $formatted_invoice_address = AddressFormat::generateAddress($invoice_address, $invoiceAddressPatternRules, '<br />', ' ');
 
         $delivery_address = null;
         $formatted_delivery_address = '';
         if (isset($this->order->id_address_delivery) && $this->order->id_address_delivery) {
-            if ($this->order_invoice->delivery_address) {
-                $formatted_delivery_address = $this->order_invoice->delivery_address;
-            } else {
-                $delivery_address = new Address((int)$this->order->id_address_delivery);
-                $formatted_delivery_address = AddressFormat::generateAddress($delivery_address, $deliveryAddressPatternRules, '<br />', ' ');
-            }
+            $delivery_address = new Address((int)$this->order->id_address_delivery);
+            $formatted_delivery_address = AddressFormat::generateAddress($delivery_address, $deliveryAddressPatternRules, '<br />', ' ');
         }
 
         $customer = new Customer((int)$this->order->id_customer);
+        $carrier = new Carrier((int)$this->order->id_carrier);
 
         $order_details = $this->order_invoice->getProducts();
 
@@ -171,7 +169,7 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
                 $order_detail['unit_price_tax_excl_before_specific_price'] = $order_detail['unit_price_tax_excl_including_ecotax'] + $order_detail['reduction_amount_tax_excl'];
             } elseif ($order_detail['reduction_percent'] > 0) {
                 $has_discount = true;
-                $order_detail['unit_price_tax_excl_before_specific_price'] = (100 * $order_detail['unit_price_tax_excl_including_ecotax']) / (100 - 15);
+                $order_detail['unit_price_tax_excl_before_specific_price'] = (100 * $order_detail['unit_price_tax_excl_including_ecotax']) / (100 - $order_detail['reduction_percent']);
             }
 
             // Set tax_code
@@ -285,18 +283,18 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
          */
         $round_type = null;
         switch ($this->order->round_type) {
-            case Order::ROUND_TOTAL:
+        case Order::ROUND_TOTAL:
                 $round_type = 'total';
-                break;
-            case Order::ROUND_LINE;
+            break;
+        case Order::ROUND_LINE:
                 $round_type = 'line';
-                break;
-            case Order::ROUND_ITEM:
+            break;
+        case Order::ROUND_ITEM:
                 $round_type = 'item';
-                break;
-            default:
+            break;
+        default:
                 $round_type = 'line';
-                break;
+            break;
         }
 
         $display_product_images = Configuration::get('PS_PDF_IMG_INVOICE');
@@ -325,7 +323,7 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
                 $processed_product = array();
                 $refunded_rooms = 0;
                 $cart_bk_data=array();
-
+                $totalDemandsPrice = 0;
                 foreach ($products as $type_key => $type_value) {
                     if (in_array($type_value['product_id'], $processed_product)) {
                         continue;
@@ -333,14 +331,17 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
                     $processed_product[] = $type_value['product_id'];
 
                     $product = new Product($type_value['product_id'], false, $this->context->language->id);
-                    $order_prod_dtl = $obj_htl_bk_dtl->getPsOrderDetailsByProduct($product->id, $this->order->id);
-
+                    $order_prod_dtl = $obj_htl_bk_dtl->getPsOrderDetailsByProduct(
+                        $type_value['product_id'],
+                        $this->order->id
+                    );
                     $cover_image_arr = $product->getCover($type_value['product_id']);
 
                     if (!empty($cover_image_arr)) {
-                        $cover_img = $this->context->link->getImageLink($product->link_rewrite, $product->id.'-'.$cover_image_arr['id_image'], 'small_default');
+                        $coverImageObj = new Image($cover_image_arr['id_image']);
+                        $cover_img = _PS_PROD_IMG_DIR_.$coverImageObj->getExistingImgPath().'.jpg';
                     } else {
-                        $cover_img = $this->context->link->getImageLink($product->link_rewrite, $this->context->language->iso_code."-default", 'small_default');
+                        $cover_img = _PS_PROD_IMG_DIR_.$this->context->language->iso_code.'-default-small_default.jpg';
                     }
 
                     if (isset($customer->id)) {
@@ -355,7 +356,7 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
                     $cart_htl_data[$type_key]['cover_img']    = $cover_img;
                     $cart_htl_data[$type_key]['adult']        = $rm_dtl['adult'];
                     $cart_htl_data[$type_key]['children']    = $rm_dtl['children'];
-
+                    $objBookingDemand = new HotelBookingDemands();
                     foreach ($order_bk_data as $data_k => $data_v) {
                         $date_join = strtotime($data_v['date_from']).strtotime($data_v['date_to']);
 
@@ -384,9 +385,23 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
                             $stage_name = '';
                         }
                         // END Order Refund
-
-
                         if (isset($cart_htl_data[$type_key]['date_diff'][$date_join])) {
+                            $cart_htl_data[$type_key]['date_diff'][$date_join]['extra_demands'] = $objBookingDemand->getRoomTypeBookingExtraDemands(
+                                $order_obj->id,
+                                $type_value['product_id'],
+                                0,
+                                $data_v['date_from'],
+                                $data_v['date_to']
+                            );
+                            $cart_htl_data[$type_key]['date_diff'][$date_join]['extra_demands_price'] = $objBookingDemand->getRoomTypeBookingExtraDemands(
+                                $order_obj->id,
+                                $type_value['product_id'],
+                                0,
+                                $data_v['date_from'],
+                                $data_v['date_to'],
+                                0,
+                                1
+                            );
                             $cart_htl_data[$type_key]['date_diff'][$date_join]['num_rm'] += 1;
 
                             $num_days = $cart_htl_data[$type_key]['date_diff'][$date_join]['num_days'];
@@ -401,6 +416,23 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
                             $cart_htl_data[$type_key]['date_diff'][$date_join]['stage_name'] = $stage_name;
                             $cart_htl_data[$type_key]['date_diff'][$date_join]['id_room'] = $data_v['id_room'];
                         } else {
+                            $cart_htl_data[$type_key]['date_diff'][$date_join]['extra_demands'] = $objBookingDemand->getRoomTypeBookingExtraDemands(
+                                $order_obj->id,
+                                $type_value['product_id'],
+                                0,
+                                $data_v['date_from'],
+                                $data_v['date_to']
+                            );
+                            $cart_htl_data[$type_key]['date_diff'][$date_join]['extra_demands_price'] = $objBookingDemand->getRoomTypeBookingExtraDemands(
+                                $order_obj->id,
+                                $type_value['product_id'],
+                                0,
+                                $data_v['date_from'],
+                                $data_v['date_to'],
+                                0,
+                                1
+                            );
+
                             $num_days = $obj_htl_bk_dtl->getNumberOfDays($data_v['date_from'], $data_v['date_to']);
 
                             $cart_htl_data[$type_key]['date_diff'][$date_join]['num_rm'] = 1;
@@ -415,16 +447,18 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
                             // For order refund
                             $cart_htl_data[$type_key]['date_diff'][$date_join]['stage_name'] = $stage_name;
                             $cart_htl_data[$type_key]['date_diff'][$date_join]['id_room'] = $data_v['id_room'];
+                            $totalDemandsPrice += $cart_htl_data[$type_key]['date_diff'][$date_join]['extra_demands_price'];
                         }
                     }
                 }
-
                 // For Advanced Payment
                 $obj_customer_adv = new HotelCustomerAdvancedPayment();
                 $order_adv_dtl = $obj_customer_adv->getCstAdvPaymentDtlByIdOrder($order_obj->id);
                 if ($order_adv_dtl) {
                     $this->smarty->assign('order_adv_dtl', $order_adv_dtl);
                 }
+                // enter extra demands price to the footer total details
+                $footer['total_extra_demands'] = $totalDemandsPrice;
             }
         }
         $data = array(
@@ -461,10 +495,12 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
             'product_tab' => $this->smarty->fetch($this->getTemplate('invoice.product-tab')),
             'tax_tab' => $this->getTaxTabContent(),
             'payment_tab' => $this->smarty->fetch($this->getTemplate('invoice.payment-tab')),
+            'note_tab' => $this->smarty->fetch($this->getTemplate('invoice.note-tab')),
             'total_tab' => $this->smarty->fetch($this->getTemplate('invoice.total-tab')),
+            'shipping_tab' => $this->smarty->fetch($this->getTemplate('invoice.shipping-tab')),
         );
-
         $this->smarty->assign($tpls);
+
         return $this->smarty->fetch($this->getTemplateByCountry($country->iso_code));
     }
 
@@ -626,6 +662,19 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
      */
     public function getFilename()
     {
-        return Configuration::get('PS_INVOICE_PREFIX', Context::getContext()->language->id, null, $this->order->id_shop).sprintf('%06d', $this->order_invoice->number).'.pdf';
+        $id_lang = Context::getContext()->language->id;
+        $id_shop = (int)$this->order->id_shop;
+        $format = '%1$s%2$06d';
+
+        if (Configuration::get('PS_INVOICE_USE_YEAR')) {
+            $format = Configuration::get('PS_INVOICE_YEAR_POS') ? '%1$s%3$s-%2$06d' : '%1$s%2$06d-%3$s';
+        }
+
+        return sprintf(
+            $format,
+            Configuration::get('PS_INVOICE_PREFIX', $id_lang, null, $id_shop),
+            $this->order_invoice->number,
+            date('Y', strtotime($this->order_invoice->date_add))
+        ).'.pdf';
     }
 }

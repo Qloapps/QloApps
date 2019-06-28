@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -169,12 +169,7 @@ function getPath($url_base, $id_category, $path = '', $highlight = '', $category
             $n_categories = (int)count($categories);
             foreach ($categories as $category) {
                 $link = Context::getContext()->link->getAdminLink('AdminCategories');
-                $edit = '<a href="'.Tools::safeOutput($link.'&id_category='.(int)$category['id_category'].'&'.(($category['id_category'] == 1 || $home) ? 'viewcategory' : 'updatecategory')).'" title="'.($category['id_category'] == Category::getRootCategory()->id_category ? 'Home' : 'Modify').'"><i class="icon-'.(($category['id_category'] == Category::getRootCategory()->id_category || $home) ? 'home' : 'pencil').'"></i></a> ';
-                $full_path .= $edit.
-                ($n < $n_categories ? '<a href="'.Tools::safeOutput($url_base.'&id_category='.(int)$category['id_category'].'&viewcategory&token='.Tools::getAdminToken('AdminCategories'.(int)Tab::getIdFromClassName('AdminCategories').(int)$context->employee->id)).'" title="'.htmlentities($category['name'], ENT_NOQUOTES, 'UTF-8').'">' : '').
-                (!empty($highlight) ? str_ireplace($highlight, '<span class="highlight">'.htmlentities($highlight, ENT_NOQUOTES, 'UTF-8').'</span>', $category['name']) : $category['name']).
-                ($n < $n_categories ? '</a>' : '').
-                (($n++ != $n_categories || !empty($path)) ? ' > ' : '');
+                $full_path .= $category['name'].(($n++ != $n_categories || !empty($path)) ? ' > ' : '');
             }
 
             return $full_path.$path;
@@ -487,11 +482,11 @@ function runAdminTab($tab, $ajax_mode = false)
                                 if (is_array($admin_obj->table)) {
                                     foreach ($admin_obj->table as $table) {
                                         if (strncmp($key, $table.'Filter_', 7) === 0 || strncmp($key, 'submitFilter', 12) === 0) {
-                                            $cookie->$key = !is_array($value) ? $value : serialize($value);
+                                            $cookie->$key = !is_array($value) ? $value : json_encode($value);
                                         }
                                     }
                                 } elseif (strncmp($key, $admin_obj->table.'Filter_', 7) === 0 || strncmp($key, 'submitFilter', 12) === 0) {
-                                    $cookie->$key = !is_array($value) ? $value : serialize($value);
+                                    $cookie->$key = !is_array($value) ? $value : json_encode($value);
                                 }
                             }
                         }

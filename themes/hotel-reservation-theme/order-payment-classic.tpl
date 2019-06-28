@@ -1,5 +1,5 @@
 {*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -18,11 +18,22 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
 <div class="paiement_block">
+    {include file="$tpl_dir./order-opc-advanced-payment-option.tpl"}
+
+    <div id="tc_cont">
+        <p class="checkbox">
+            <input type="checkbox" name="cgv" id="cgv" value="1" {if $checkedTOS}checked="checked"{/if} />
+            <label for="cgv" id="tc_txt">{l s='I agree to the terms of service and will adhere to them unconditionally.'}</label>
+            <a id="tc_link" href="{$link_conditions|escape:'html':'UTF-8'}" class="iframe" rel="nofollow" >{l s='(Read the Terms of Service)'}</a>
+        </p>
+    </div>
+
+    <p class="block-small-header">{l s='PAYMENT RESOURCE'}</p>
     <div id="HOOK_TOP_PAYMENT">{$HOOK_TOP_PAYMENT}</div>
     {if $HOOK_PAYMENT}
         {if !$opc}
@@ -83,7 +94,7 @@
                             {/if}
                         </td>
                     </tr>
-                    {if $total_shipping_tax_exc <= 0 && !isset($virtualCart)}
+                    {if $total_shipping_tax_exc <= 0 && (!isset($isVirtualCart) || !$isVirtualCart) && $free_ship}
                         <tr class="cart_total_delivery">
                             <td colspan="4" class="text-right">{l s='Total shipping'}</td>
                             <td colspan="2" class="price" id="total_shipping">{l s='Free Shipping!'}</td>
@@ -112,9 +123,9 @@
                         <td colspan="4" class="text-right">
                             {if $use_taxes}
                                 {if $priceDisplay}
-                                    {if $display_tax_label}{l s='Total vouchers (tax excl.)'}{else}{l s='Total vouchers'}{/if}
+                                    {if $display_tax_label && $show_taxes}{l s='Total vouchers (tax excl.)'}{else}{l s='Total vouchers'}{/if}
                                 {else}
-                                    {if $display_tax_label}{l s='Total vouchers (tax incl.)'}{else}{l s='Total vouchers'}{/if}
+                                    {if $display_tax_label && $show_taxes}{l s='Total vouchers (tax incl.)'}{else}{l s='Total vouchers'}{/if}
                                 {/if}
                             {else}
                                 {l s='Total vouchers'}

@@ -1,5 +1,5 @@
 {*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -18,7 +18,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
@@ -32,16 +32,18 @@
 	{assign var="adrs_style" value=$addresses_style}
 	<div class="bloc_adresses row">
 	{foreach from=$multipleAddresses item=address name=myLoop}
-    	<div class="col-xs-12 col-sm-12 address">
+    	<div class="col-xs-12 col-sm-6 address">
 			<ul class="{if $smarty.foreach.myLoop.last}last_item{elseif $smarty.foreach.myLoop.first}first_item{/if}{if $smarty.foreach.myLoop.index % 2} alternate_item{else} item{/if} box">
                 <li><h3 class="page-subheading">{$address.object.alias}</h3></li>
                 {foreach from=$address.ordered name=adr_loop item=pattern}
                     {assign var=addressKey value=" "|explode:$pattern}
                     <li>
                     {foreach from=$addressKey item=key name="word_loop"}
-                        <span {if isset($addresses_style[$key])} class="{$addresses_style[$key]}"{/if}>
-                            {$address.formated[$key|replace:',':'']|escape:'html':'UTF-8'}
-                        </span>
+						{if isset($address.formated[$key|replace:',':''])}
+							<span {if isset($addresses_style[$key])} class="{$addresses_style[$key]}"{/if}>
+								{$address.formated[$key|replace:',':'']|escape:'html':'UTF-8'}
+							</span>
+						{/if}
                     {/foreach}
                     </li>
                 {/foreach}
@@ -50,7 +52,7 @@
                 <a class="btn btn-default button button-small" href="{$link->getPageLink('address', true, null, "id_address={$address.object.id|intval}&delete")|escape:'html':'UTF-8'}" data-id="addresses_confirm" title="{l s='Delete'}"><span>{l s='Delete'}<i class="icon-remove right"></i></span></a></li>
             </ul>
         </div>
-	{if $smarty.foreach.myLoop.index % 2 && !$smarty.foreach.myLoop.last} 
+	{if $smarty.foreach.myLoop.index % 2 && !$smarty.foreach.myLoop.last}
 	</div>
 	<div class="bloc_adresses row">
 	{/if}
@@ -65,6 +67,6 @@
 </div>
 <ul class="footer_links clearfix">
 	<li><a class="btn btn-default button button-small" href="{$link->getPageLink('my-account', true)|escape:'html':'UTF-8'}"><span><i class="icon-chevron-left"></i> {l s='Back to your account'}</span></a></li>
-	<li><a class="btn btn-default button button-small" href="{$base_dir}"><span><i class="icon-chevron-left"></i> {l s='Home'}</span></a></li>
+	<li><a class="btn btn-default button button-small" href="{if isset($force_ssl) && $force_ssl}{$base_dir_ssl}{else}{$base_dir}{/if}"><span><i class="icon-chevron-left"></i> {l s='Home'}</span></a></li>
 </ul>
 {addJsDefL name=addressesConfirm}{l s='Are you sure?' js=1}{/addJsDefL}

@@ -57,6 +57,7 @@ class AdminFooterPaymentBlockSettingController extends ModuleAdminController
             'date_add' => array(
                 'title' => $this->l('Date Add'),
                 'align' => 'center',
+                'type' => 'datetime',
             ),
         );
 
@@ -175,15 +176,14 @@ class AdminFooterPaymentBlockSettingController extends ModuleAdminController
         if (!trim($paymentName)) {
             $this->errors[] = Tools::displayError('Payment\'s Name is a required field.');
         }
-        if (!$idPaymentBlock || (isset($_FILES['payment_image']['tmp_name']) && $_FILES['payment_image']['tmp_name'])) {
-            if ($_FILES['payment_image'] && $_FILES['payment_image']['tmp_name'] && $_FILES['payment_image']['name']) {
-                if (!HotelHelper::validImageExt($_FILES['payment_image']['name'])) {
-                    $this->errors[] = $this->l('Image format not recognized, allowed formats are: .gif, .jpg, .png');
-                }
-            } else {
-                $this->errors[] = $this->l('Please select an image for payment block.');
+        if (isset($_FILES['payment_image']['tmp_name']) && $_FILES['payment_image']['tmp_name']) {
+            if ($error = ImageManager::validateUpload($_FILES['payment_image'], Tools::getMaxUploadSize())) {
+                $this->errors[] = $error;
             }
+        } elseif (!$idPaymentBlock) {
+            $this->errors[] = $this->l('Please select an image for payment block.');
         }
+
 
         if (!count($this->errors)) {
             if ($idPaymentBlock) {

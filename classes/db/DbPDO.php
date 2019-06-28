@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -99,13 +99,15 @@ class DbPDOCore extends Db
         try {
             $this->link = $this->_getPDO($this->server, $this->user, $this->password, $this->database, 5);
         } catch (PDOException $e) {
-            die(sprintf(Tools::displayError('Link to database cannot be established: %s'), utf8_encode($e->getMessage())));
+            throw new PrestaShopException('Link to database cannot be established:'.$e->getMessage());
         }
 
         // UTF-8 support
         if ($this->link->exec('SET NAMES \'utf8\'') === false) {
-            die(Tools::displayError('PrestaShop Fatal error: no utf-8 support. Please check your server configuration.'));
+            throw new PrestaShopException('PrestaShop Fatal error: no utf-8 support. Please check your server configuration.');
         }
+
+        $this->link->exec('SET SESSION sql_mode = \'\'');
 
         return $this->link;
     }
@@ -365,10 +367,11 @@ class DbPDOCore extends Db
         $result = $this->link->query($sql);
         if (!$result) {
             $value = 'MyISAM';
-        }
-        $row = $result->fetch();
-        if (!$row || strtolower($row['Value']) != 'yes') {
-            $value = 'MyISAM';
+        } else {
+            $row = $result->fetch();
+            if (!$row || strtolower($row['Value']) != 'yes') {
+                $value = 'MyISAM';
+            }
         }
 
         /* MySQL >= 5.6 */

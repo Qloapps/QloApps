@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -110,6 +110,7 @@ class ParentOrderControllerCore extends FrontController
                                 $this->errors[] = $error;
                             } else {
                                 $this->context->cart->addCartRule($cartRule->id);
+                                CartRule::autoAddToCart($this->context);
                                 if (Configuration::get('PS_ORDER_PROCESS_TYPE') == 1) {
                                     Tools::redirect('index.php?controller=order-opc&addingCartRule=1');
                                 }
@@ -486,8 +487,6 @@ class ParentOrderControllerCore extends FrontController
 
     protected function _assignCarrier()
     {
-        $address = new Address($this->context->cart->id_address_delivery);
-        $id_zone = Address::getZoneById($address->id);
         $carriers = $this->context->cart->simulateCarriersOutput(null, true);
         $checked = $this->context->cart->simulateCarrierSelectedOutput(false);
         $delivery_option_list = $this->context->cart->getDeliveryOptionList();

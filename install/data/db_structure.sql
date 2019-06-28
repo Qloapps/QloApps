@@ -1,3 +1,4 @@
+SET SESSION sql_mode = '';
 SET NAMES 'utf8';
 
 CREATE TABLE `PREFIX_access` (
@@ -25,7 +26,7 @@ CREATE TABLE `PREFIX_address` (
   `id_supplier` int(10) unsigned NOT NULL DEFAULT '0',
   `id_warehouse` int(10) unsigned NOT NULL DEFAULT '0',
   `alias` varchar(32) NOT NULL,
-  `company` varchar(64) DEFAULT NULL,
+  `company` varchar(255) DEFAULT NULL,
   `lastname` varchar(32) NOT NULL,
   `firstname` varchar(32) NOT NULL,
   `address1` varchar(128) NOT NULL,
@@ -157,7 +158,7 @@ CREATE TABLE `PREFIX_carrier_lang` (
   `id_carrier` int(10) unsigned NOT NULL,
   `id_shop` int(11) unsigned NOT NULL DEFAULT '1',
   `id_lang` int(10) unsigned NOT NULL,
-  `delay` varchar(128) DEFAULT NULL,
+  `delay` varchar(512) DEFAULT NULL,
   PRIMARY KEY (`id_lang`,`id_shop`, `id_carrier`)
 ) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8 COLLATION;
 
@@ -311,7 +312,7 @@ CREATE TABLE `PREFIX_cart_product` (
   `id_product` int(10) unsigned NOT NULL,
   `id_address_delivery` int(10) UNSIGNED DEFAULT '0',
   `id_shop` int(10) unsigned NOT NULL DEFAULT '1',
-  `id_product_attribute` int(10) unsigned DEFAULT NULL,
+  `id_product_attribute` int(10) unsigned NOT NULL DEFAULT '0',
   `quantity` int(10) unsigned NOT NULL DEFAULT '0',
   `date_add` datetime NOT NULL,
   PRIMARY KEY (`id_cart`,`id_product`,`id_product_attribute`,`id_address_delivery`),
@@ -367,7 +368,8 @@ CREATE TABLE `PREFIX_category_product` (
   `id_product` int(10) unsigned NOT NULL,
   `position` int(10) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`id_category`,`id_product`),
-  INDEX (`id_product`)
+  INDEX (`id_product`),
+  INDEX (`id_category`, `position`)
 ) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8 COLLATION;
 
 CREATE TABLE `PREFIX_cms` (
@@ -1762,7 +1764,8 @@ CREATE TABLE `PREFIX_search_index` (
   `id_product` int(11) unsigned NOT NULL,
   `id_word` int(11) unsigned NOT NULL,
   `weight` smallint(4) unsigned NOT NULL DEFAULT 1,
-  PRIMARY KEY (`id_word`, `id_product`)
+  PRIMARY KEY (`id_word`, `id_product`),
+  KEY `id_product` (`id_product`,`weight`)
 ) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8 COLLATION;
 
 CREATE TABLE `PREFIX_search_word` (
@@ -1798,7 +1801,12 @@ CREATE TABLE `PREFIX_specific_price` (
 	KEY `from_quantity` (`from_quantity`),
 	KEY (`id_specific_price_rule`),
 	KEY (`id_cart`),
-  UNIQUE KEY `id_product_2` (`id_cart`, `id_product`,`id_shop`,`id_shop_group`,`id_currency`,`id_country`,`id_group`,`id_customer`,`id_product_attribute`,`from_quantity`,`id_specific_price_rule`,`from`,`to`)
+  KEY `id_product_attribute` (`id_product_attribute`),
+  KEY `id_shop` (`id_shop`),
+  KEY `id_customer` (`id_customer`),
+  KEY `from` (`from`),
+  KEY `to` (`to`),
+  UNIQUE KEY `id_product_2` (`id_product`,`id_product_attribute`,`id_customer`,`id_cart`,`from`,`to`,`id_shop`,`id_shop_group`,`id_currency`,`id_country`,`id_group`,`from_quantity`,`id_specific_price_rule`)
 ) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8 COLLATION;
 
 CREATE TABLE `PREFIX_state` (
@@ -2657,3 +2665,4 @@ CREATE TABLE IF NOT EXISTS `PREFIX_cms_role_lang` (
   `name` varchar(128) DEFAULT NULL,
   PRIMARY KEY (`id_cms_role`,`id_lang`, id_shop)
 ) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8;
+

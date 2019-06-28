@@ -1,3 +1,28 @@
+{*
+* 2007-2017 PrestaShop
+*
+* NOTICE OF LICENSE
+*
+* This source file is subject to the Academic Free License (AFL 3.0)
+* that is bundled with this package in the file LICENSE.txt.
+* It is also available through the world-wide-web at this URL:
+* http://opensource.org/licenses/afl-3.0.php
+* If you did not receive a copy of the license and are unable to
+* obtain it through the world-wide-web, please send an email
+* to license@prestashop.com so we can send you a copy immediately.
+*
+* DISCLAIMER
+*
+* Do not edit or add to this file if you wish to upgrade PrestaShop to newer
+* versions in the future. If you wish to customize PrestaShop for your
+* needs please refer to http://www.prestashop.com for more information.
+*
+*  @author PrestaShop SA <contact@prestashop.com>
+*  @copyright  2007-2017 PrestaShop SA
+*  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+*  International Registered Trademark & Property of PrestaShop SA
+*}
+
 <div class="row cat_cont">
     <div class="col-sm-12">
         <div class="row margin-lr-0 catSortBlock">
@@ -44,7 +69,7 @@
                             <div class="rm_desc">{$room_v['description']}&nbsp;<a href="{$room_v['product_link']}">{l s='View More'}....</a></div>
 
                             <p><span class="capa_txt">{l s='Max Capacity:'}</span><span class="capa_data"> {$room_v['adult']} {l s='Adults'}, {$room_v['children']} {l s='child'}</span></p>
-                            {if isset($room_v['num_review'])} 
+                            {if isset($room_v['num_review'])}
                                 <div class="rm_review_cont pull-left">
                                     {for $foo=1 to 5}
                                         {if $foo <= $room_v['ratting']}
@@ -104,7 +129,7 @@
                                     </div>
                                 </div>
                             </div>
-                            
+
 
                             <!-- <div id="cat_rm_quantity_wanted_{$room_v['id_product']}">
                                 <a href="#" data-field-qty="qty_{$room_v['id_product']}" class="btn btn-default button-minus cat_rm_quantity_down">
@@ -113,12 +138,12 @@
                                     </span>
                                 </a>
                                 <input autocomplete="off" type="text" min="1" name="qty_{$room_v['id_product']}" id="cat_quantity_wanted_{$room_v['id_product']}" class="text" value="1" />
-                                
+
                                 <a href="#" data-room_id_product="{$room_v['id_product']}" data-field-qty="qty_{$room_v['id_product']}" class="btn btn-default button-plus cat_rm_quantity_up">
                                     <span><i class="icon-plus"></i></span>
                                 </a>
                             </div> -->
-                            
+
 
                             <!-- ################################################ -->
                         </div>
@@ -126,7 +151,7 @@
                 </div>
             {foreachelse}
                 <div class="noRoomsAvailAlert">
-                  <span>{l s='No Rooms Available For this Room Type In this Hotel!'}</span>
+                  <span>{l s='No room available for this hotel!'}</span>
                 </div>
             {/foreach}
         </div>

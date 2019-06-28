@@ -1,5 +1,5 @@
 /*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -18,26 +18,35 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
 $(document).ready(function()
 {
+	$('.opc-collapse').on('show.bs.collapse', function () {
+		$(this).closest('.card').find('.accordion-left-arrow').addClass('hidden');
+		$(this).closest('.card').find('.step-edit').removeClass('hidden');
+	});
+	$('.opc-collapse').on('hide.bs.collapse', function () {
+		$(this).closest('.card').find('.accordion-left-arrow').removeClass('hidden');
+		$(this).closest('.card').find('.step-edit').addClass('hidden');
+	});
+
 	// BY WEBKUL
 	// FOR ADVANCED PAYMENT
 	var payment_type = $(".payment_type:checked").val();
-	if (payment_type == 1) 
+	if (payment_type == 1)
 		$("#partial_data").hide();
-	else if (payment_type == 2) 
+	else if (payment_type == 2)
 		$("#partial_data").show();
 
 	$(".payment_type").on('change',function()
 	{
 		var payment_type = $(".payment_type:checked").val();
-		if (payment_type == 1) 
+		if (payment_type == 1)
 			$("#partial_data").slideUp();
-		else if (payment_type == 2) 
+		else if (payment_type == 2)
 			$("#partial_data").slideDown();
 	});
 
@@ -90,7 +99,7 @@ $(document).ready(function()
 		$(document).on('click', '#openLoginFormBlock', function(e){
 			e.preventDefault();
 			$('#openNewAccountBlock').show();
-			$(this).hide();
+			$('.already_registered_block').hide();
 			$('#login_form_content').slideDown('slow');
 			$('#new_account_form').slideUp('slow');
 		});
@@ -124,6 +133,7 @@ $(document).ready(function()
 						// update token
 						static_token = jsonData.token;
 						updateNewAccountToAddressBlock(that.attr('data-adv-api'));
+						location.reload();
 					}
 				},
 				error: function(XMLHttpRequest, textStatus, errorThrown) {
@@ -274,7 +284,10 @@ $(document).ready(function()
 						else
 							updateNewAccountToAddressBlock(advApiParam);
 					}
-					$('#opc_new_account-overlay, #opc_delivery_methods-overlay, #opc_payment_methods-overlay').fadeIn('slow');
+					if (!jsonData.hasError) {
+						location.reload();
+					}
+					//$('#guest-info-block, #opc_new_account-overlay, #opc_delivery_methods-overlay, #opc_payment_methods-overlay').fadeIn('slow');
 				},
 				error: function(XMLHttpRequest, textStatus, errorThrown) {
 					if (textStatus !== 'abort')
@@ -320,6 +333,144 @@ $(document).ready(function()
 	}
 	if (typeof(open_multishipping_fancybox) !== 'undefined' && open_multishipping_fancybox)
 		$('#link_multishipping_form').click();
+
+	// fancybox for extra bed requirement edit on checkout page
+	$('body').on('click', '.open_rooms_extra_demands', function() {
+		var idProduct = $(this).attr('id_product');
+		var dateFrom = $(this).attr('date_from');
+		var dateTo = $(this).attr('date_to');
+		$.fancybox({
+			href: "#rooms_extra_demands",
+		    autoSize : true,
+		    autoScale : true,
+			maxWidth : '100%',
+			'hideOnContentClick': false,
+			beforeLoad: function () {
+				$.ajax({
+					type: 'POST',
+					headers: {
+						"cache-control": "no-cache"
+					},
+					url: orderOpcUrl,
+					dataType: 'html',
+					cache: false,
+					data: {
+						date_from: dateFrom,
+						date_to: dateTo,
+						id_product: idProduct,
+						method: 'getRoomTypeBookingDemands',
+						ajax: true
+					},
+					success: function(result) {
+						$('#rooms_type_extra_demands').find('#room_type_demands_desc').html('');
+						$('#rooms_type_extra_demands').find('#room_type_demands_desc').append(result);
+					},
+				});
+			},
+			afterClose: function() {
+				// reload so that changes prices will reflect everywhere
+				location.reload();
+			},
+		});
+	});
+
+	function close_accordion_section() {
+        $('.accordion .accordion-section-title').removeClass('active');
+        $('.accordion .accordion-section-content').slideUp(300).removeClass('open');
+    }
+
+    $(document).on('click', '.accordion-section-title', function(e) {
+        // Grab current anchor value
+        var currentAttrValue = $(this).attr('href');
+
+        if ($(e.target).is('.active')) {
+            close_accordion_section();
+            $(this).find('i').removeClass('icon-angle-down');
+            $(this).find('i').addClass('icon-angle-left');
+        } else {
+            close_accordion_section();
+            // Add active class to section title
+            $(this).addClass('active');
+            $(this).find('i').removeClass('icon-angle-left');
+            $(this).find('i').addClass('icon-angle-down');
+            // Open up the hidden content panel
+            $('.accordion ' + currentAttrValue).slideDown(300).addClass('open');
+        }
+        e.preventDefault();
+	});
+
+	$(document).on('click', '.id_room_type_demand', function() {
+		var roomDemands = [];
+		// get the selected extra demands by customer
+		$(this).closest('.room_demand_detail').find('input:checkbox.id_room_type_demand:checked').each(function () {
+			roomDemands.push({
+				'id_global_demand':$(this).val(),
+				'id_option': $(this).closest('.room_demand_block').find('.id_option').val()
+			});
+		});
+		var idBookingCart = $(this).attr('id_cart_booking');
+		$.ajax({
+			type: 'POST',
+			headers: {
+				"cache-control": "no-cache"
+			},
+			url: orderOpcUrl,
+			dataType: 'JSON',
+			cache: false,
+			data: {
+				id_cart_booking: idBookingCart,
+				room_demands: JSON.stringify(roomDemands),
+				method: 'changeRoomDemands',
+				ajax: true
+			},
+			success: function(result) {
+				if (result == 1) {
+					showSuccessMessage(txtExtraDemandSucc);
+				} else {
+					showErrorMessage(txtExtraDemandErr);
+				}
+			}
+		});
+	});
+
+	$(document).on('change', '.demand_adv_option_block .id_option', function(e) {
+        var option_selected = $(this).find('option:selected');
+		var extra_demand_price = option_selected.attr("optionPrice")
+        extra_demand_price = parseFloat(extra_demand_price);
+        extra_demand_price = formatCurrency(extra_demand_price, currency_format, currency_sign, currency_blank);
+		$(this).closest('.room_demand_block').find('.extra_demand_option_price').text(extra_demand_price);
+		var roomDemands = [];
+		// get the selected extra demands by customer
+		$(this).closest('.room_demand_detail').find('input:checkbox.id_room_type_demand:checked').each(function () {
+			roomDemands.push({
+				'id_global_demand':$(this).val(),
+				'id_option': $(this).closest('.room_demand_block').find('.id_option').val()
+			});
+		});
+		var idBookingCart = $(this).closest('.room_demand_block').find('.id_room_type_demand').attr('id_cart_booking');
+		$.ajax({
+			type: 'POST',
+			headers: {
+				"cache-control": "no-cache"
+			},
+			url: orderOpcUrl,
+			dataType: 'JSON',
+			cache: false,
+			data: {
+				id_cart_booking: idBookingCart,
+				room_demands: JSON.stringify(roomDemands),
+				method: 'changeRoomDemands',
+				ajax: true
+			},
+			success: function(result) {
+				if (result == 1) {
+					showSuccessMessage(txtExtraDemandSucc);
+				} else {
+					showErrorMessage(txtExtraDemandErr);
+				}
+			}
+		});
+    });
 });
 
 function updateCarrierList(json)
@@ -472,7 +623,9 @@ function updateAddressSelection(is_adv_api)
 				updateHookShoppingCartExtra(jsonData.HOOK_SHOPPING_CART_EXTRA);
 				if ($('#gift-price').length == 1)
 					$('#gift-price').html(jsonData.gift_price);
-				$('#opc_account-overlay, #opc_delivery_methods-overlay, #opc_payment_methods-overlay').fadeOut('slow');
+				$('#guest-info-block, #opc_account-overlay, #opc_delivery_methods-overlay, #opc_payment_methods-overlay').fadeOut('slow');
+
+				location.reload();
 			}
 		},
 		error: function(XMLHttpRequest, textStatus, errorThrown) {
@@ -493,7 +646,7 @@ function updateAddressSelection(is_adv_api)
 	            else
 	                alert(error);
 			}
-			$('#opc_account-overlay, #opc_delivery_methods-overlay, #opc_payment_methods-overlay').fadeOut('slow');
+			$('#guest-info-block, #opc_account-overlay, #opc_delivery_methods-overlay, #opc_payment_methods-overlay').fadeOut('slow');
 		}
 	});
 }
@@ -751,7 +904,7 @@ function saveAddress(type)
 						$.scrollTo('#opc_account_errors', 800);
 					});
 				});
-				$('#opc_account-overlay, #opc_delivery_methods-overlay, #opc_payment_methods-overlay').fadeOut('slow');
+				$('#guest-info-block, #opc_account-overlay, #opc_delivery_methods-overlay, #opc_payment_methods-overlay').fadeOut('slow');
 				result = false;
 			}
 			else
@@ -780,7 +933,7 @@ function saveAddress(type)
 	            else
 	                alert(error);
 			}
-			$('#opc_account-overlay, #opc_delivery_methods-overlay, #opc_payment_methods-overlay').fadeOut('slow');
+			$('#guest-info-block, #opc_account-overlay, #opc_delivery_methods-overlay, #opc_payment_methods-overlay').fadeOut('slow');
 		}
 		});
 
@@ -789,7 +942,7 @@ function saveAddress(type)
 
 function updateNewAccountToAddressBlock(is_adv_api)
 {
-	$('#opc_account-overlay, #opc_delivery_methods-overlay, #opc_payment_methods-overlay').fadeOut('slow');
+	//$('#guest-info-block, #opc_account-overlay, #opc_delivery_methods-overlay, #opc_payment_methods-overlay').fadeOut('slow');
 
 	$.ajax({
 		type: 'POST',
@@ -817,7 +970,7 @@ function updateNewAccountToAddressBlock(is_adv_api)
 				if (json.no_address == 1)
 					document.location.href = addressUrl;
 
-				$('#opc_new_account').fadeOut('fast', function() 
+				$('.guest-info-block').fadeOut('fast', function()
 				{
 					if (typeof json.formatedAddressFieldsValuesList !== 'undefined' && json.formatedAddressFieldsValuesList )
 					{
@@ -846,18 +999,18 @@ function updateNewAccountToAddressBlock(is_adv_api)
 						});
 					}
 
-					$(this).fadeIn('fast', function() 
+					$(this).fadeIn('fast', function()
 					{
                         if ($('#gift-price').length == 1)
                             $('#gift-price').html(json.gift_price);
 
 						//After login, the products are automatically associated to an address
-						// $.each(json.summary.products, function() 
+						// $.each(json.summary.products, function()
 						// {
 						// 	updateAddressId(this.id_product, this.id_product_attribute, '0', this.id_address_delivery);
 						// });
 						// updateAddressesDisplay(true);
-                        if (typeof is_adv_api === 'undefined' || !is_adv_api) 
+                        if (typeof is_adv_api === 'undefined' || !is_adv_api)
                         {
                             updateCarrierList(json.carrier_data);
                             updateCarrierSelectionAndGift();
@@ -1048,6 +1201,7 @@ function multishippingMode(it)
 			}
 		});
 	}
-	if (typeof bindUniform !=='undefined')
+	if (typeof bindUniform !=='undefined') {
 		bindUniform();
+	}
 }

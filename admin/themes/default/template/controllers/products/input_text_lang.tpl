@@ -1,5 +1,5 @@
 {*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -18,7 +18,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
@@ -67,14 +67,6 @@
 {/foreach}
 {if isset($maxchar)}
 <script type="text/javascript">
-function countDown($source, $target) {
-	var max = $source.attr("data-maxchar");
-	$target.html(max-$source.val().length);
-
-	$source.keyup(function(){
-		$target.html(max-$source.val().length);
-	});
-}
 
 $(document).ready(function(){
 {foreach from=$languages item=language}

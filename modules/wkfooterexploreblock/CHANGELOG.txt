@@ -1,4 +1,37 @@
 -----------------------------
+# V2.0.0 to V2.0.1
+-----------------------------
+
+## Improved/changed features
+
+[*] BO : Render list filter issues resolved..
+
+
+## Update Policy
+
+- Mobule need only file update, can be updated only by UPLOADING new version on module
+
+
+
+-----------------------------
+# V1.0.1 to V2.0.0
+-----------------------------
+
+## Added features
+
++ [BO] : Admin can add custom explore links to show at footer explore block.
++ [BO] : Admin can add cms page also to show at footer explore block.
++ [BO] : Admin has option to show custom explore link at navigation menu also.
++ [BO] : Admin has option to show custom explore link at footer block also.
++ [CO] : table  'htl_custom_explore_link' added with multilang.
+
+
+## Update Policy
+
+- Database changed, Module need upload new file then UNINSTALL and re-installation.
+
+
+-----------------------------
 # V1.0.0 to V1.0.1
 -----------------------------
 

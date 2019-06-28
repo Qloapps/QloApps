@@ -1,15 +1,15 @@
 
-[{shop_url}]
+[/{shop_url}] 
 
 Hi {firstname} {lastname},
 
-Thank you for creating a customer account at {shop_name}.
+Thank you for creating a customer account at {shop_name}. 
 
 Here are your login details:
 
 E-MAIL ADDRESS: {email}
 
-PASSWORD: {passwd}
+PASSWORD: {passwd} 		 
 
 Important Security Tips:
 
@@ -22,9 +22,8 @@ Important Security Tips:
 * Should you suspect someone is using your account illegally, please
 notify us immediately.
 
-You can now place orders on our shop: {shop_name}
-[{shop_url}]
+You can now place orders on our shop: {shop_name} [/{shop_url}] 
 
-{shop_name} [{shop_url}] powered by
-Webkul(tm) [https://webkul.com/]
+{shop_name} [/{shop_url}] powered by PrestaShop(tm)
+[http://www.prestashop.com/] 
 

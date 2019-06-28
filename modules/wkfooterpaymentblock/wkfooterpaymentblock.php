@@ -32,7 +32,7 @@ class WkFooterPaymentBlock extends Module
     {
         $this->name = 'wkfooterpaymentblock';
         $this->tab = 'front_office_features';
-        $this->version = '1.1.0';
+        $this->version = '1.1.2';
         $this->author = 'webkul';
         $this->need_instance = 0;
 

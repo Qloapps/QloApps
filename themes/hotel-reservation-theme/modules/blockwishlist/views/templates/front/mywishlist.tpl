@@ -1,5 +1,5 @@
 {*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -18,7 +18,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
@@ -77,7 +77,7 @@
 							<tr id="wishlist_{$wishlists[i].id_wishlist|intval}">
 								<td style="width:200px;">
 									<a href="#" onclick="javascript:event.preventDefault();WishlistManage('block-order-detail', '{$wishlists[i].id_wishlist|intval}');">
-										{$wishlists[i].name|truncate:30:'...'|escape:'html':'UTF-8'}
+										{$wishlists[i].name|truncate:30:'...'|escape:'htmlall':'UTF-8'}
 									</a>
 								</td>
 								<td class="bold align_center">

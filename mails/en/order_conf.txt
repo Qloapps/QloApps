@@ -26,6 +26,9 @@ Total Rooms Cost
 
 {total_products}
 
+Total Additional Facilities Cost
+{total_extra_demands
+
 DISCOUNTS
 
 {total_discounts}

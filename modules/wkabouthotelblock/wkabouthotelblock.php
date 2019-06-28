@@ -31,7 +31,7 @@ class WkAboutHotelBlock extends Module
     {
         $this->name = 'wkabouthotelblock';
         $this->tab = 'front_office_features';
-        $this->version = '1.1.0';
+        $this->version = '1.1.2';
         $this->author = 'webkul';
         $this->need_instance = 0;
 
@@ -45,7 +45,9 @@ class WkAboutHotelBlock extends Module
 
     public function hookDisplayDefaultNavigationHook()
     {
-        return $this->display(__FILE__, 'hotelInteriorNaviagtionMenu.tpl');
+        if (Configuration::get('HOTEL_INTERIOR_BLOCK_NAV_LINK')) {
+            return $this->display(__FILE__, 'hotelInteriorNaviagtionMenu.tpl');
+        }
     }
 
     public function hookDisplayHome()
@@ -85,11 +87,6 @@ class WkAboutHotelBlock extends Module
         return $this->display(__FILE__, 'aboutHotelBlockModuleSetting.tpl');
     }
 
-    public function hookDisplayFooterExploreSectionHook()
-    {
-        return $this->display(__FILE__, 'hotelInteriorFooterExploreLink.tpl');
-    }
-
     /**
      * If admin add any language then an entry will add in defined $lang_tables array's lang table same as prestashop
      * @param array $params
@@ -123,11 +120,11 @@ class WkAboutHotelBlock extends Module
                 }
             }
         }
-
+        $objHtlInteriorImg = new WkHotelInteriorImage();
         if (!parent::install()
             || !$this->registerModuleHooks()
             || !$this->callInstallTab()
-            || !WkHotelInteriorImage::insertModuleDemoData()
+            || !$objHtlInteriorImg->insertModuleDemoData()
         ) {
             return false;
         }

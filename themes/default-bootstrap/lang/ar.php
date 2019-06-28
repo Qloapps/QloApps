@@ -118,6 +118,8 @@ $_LANG['best-sales_3cb29f0ccc5fd220a97df89dafe46290'] = 'الأكثر مبيعا
 $_LANG['best-sales_73d3cc7826075c127caaadb0e20162ab'] = 'لا توجد منتجات أكثر مبيعاً في هذا الوقت.';
 $_LANG['breadcrumb_56cf8b33ab527ab81b4f6b3ceac090dd'] = 'الرجوع للصفحة الرئيسية';
 $_LANG['breadcrumb_641879153fe03137042781f70f56c98d'] = 'عودة إلى نتائج البحث عن "%s" (%d نتائج اخرى)';
+$_LANG['category-count_ff32f7dba36bcd6d0a4214cd80253c3a'] = 'لايوجد منتجات بهذا القسم';
+$_LANG['category-count_79ac892bd1769d83ef1c16dae9f4eddd'] = 'يوجد منتج واحد';
 $_LANG['category-count_a9d48596a6537347711527bab8fcd152'] = 'هناك %d منتجات';
 $_LANG['category_d3da97e2d9aee5c8fbe03156ad051c99'] = 'مشاهدة المزيد';
 $_LANG['category_f73cc399b5ce12735a57f03414f09ef9'] = 'قسم فرعي';
@@ -172,6 +174,8 @@ $_LANG['global_10ac3d04253ef7e1ddc73e6091c0cd55'] = 'التالي';
 $_LANG['global_dd1f775e443ff3b9a89270713580a51b'] = 'السابق';
 $_LANG['guest-tracking_3aedb5d3a3e36f7bb6baf1fbb9497894'] = 'متابعة الضيوف';
 $_LANG['guest-tracking_43b2f3ca9c34b5934ff858549406f556'] = 'لمزيد من المزايا...';
+$_LANG['guest-tracking_a719d9bdf7a895ffc54665300df2ada4'] = 'حساب الضيف الخاص بك تحول بنجاح إلى حساب زبون. يمكنك الدخول الآن عن طريقه. ';
+$_LANG['guest-tracking_bd4f56eeb4852216dd80cec2c24cf51d'] = 'سجل الدخول الآن.';
 $_LANG['guest-tracking_109636f722b8fccc95d072b2760a6282'] = 'حول حساب الضيف الخاص بك إلى حساب زبون واستمتع:';
 $_LANG['guest-tracking_7a8fe8aaa64e691d82f429d39e0df3a5'] = 'دخول شخصي وآمن';
 $_LANG['guest-tracking_93aef17b1541efc1c3f8bd6679972096'] = 'اتمام الطلب بخطوات سهلة وسريعة';
@@ -179,6 +183,7 @@ $_LANG['guest-tracking_1f1015bbef5f42d858e8486397ad8f3e'] = 'عملية ارجا
 $_LANG['guest-tracking_3b6bf3c0c07b89dc86f415117a1f0b80'] = 'ضع كلمة المرور:';
 $_LANG['guest-tracking_94966d90747b97d1f0f206c98a8b1ac3'] = 'ارسل';
 $_LANG['guest-tracking_a82be0f551b8708bc08eb33cd9ded0cf'] = 'روابط ذات صلة';
+$_LANG['guest-tracking_57d244b331a3a5eb30dd5384a370e085'] = 'اضغط هنا للدخول إلى حساب الزبون الخاص بك.';
 $_LANG['guest-tracking_d2948a89e47a4ad7eb8412c1c260ea88'] = 'تابع طلبيتك، من فضلك أدخل البيانات الآتية:';
 $_LANG['guest-tracking_63c193f613dd3d9d6c16da7678efda2a'] = 'رقم مرجع طلب الشراء:';
 $_LANG['guest-tracking_92dbb751eb9457441af82a53f3cfae54'] = 'مثلا  QIIXJXNUI أو QIIXJXNUI#1';
@@ -237,6 +242,9 @@ $_LANG['identity_15bbb9d0bbf25e8d2978de1168c749dc'] = 'الموقع الإلكت
 $_LANG['identity_c9cc8cce247e49bae79f15173ce97354'] = 'حفظ';
 $_LANG['identity_a958dbb46713e59856c35f89e5092a5e'] = 'العودة إلى الحساب الخاص بك';
 $_LANG['identity_8cf04a9734132302f96da8e113e80ce5'] = 'الصفحة الرئيسية';
+$_LANG['maintenance_ddd1e07caabdcc9888ac25c25f0e2e38'] = 'سنعود قريبا.';
+$_LANG['maintenance_4056c202598382610049fd3c94fb592c'] = 'نقوم حاليا بتحديث متجرنا، وسنعود قريبا جدا.';
+$_LANG['maintenance_a450422e114d28330cd7b912e127ef5c'] = 'نشكر لكم صبركم.';
 $_LANG['manufacturer-list_0e1e874dde345d19583102a9fd63fb7e'] = 'الشركات المصنعة:';
 $_LANG['manufacturer-list_84be54bb4bd1b755a27d86388700d097'] = 'الماركات';
 $_LANG['manufacturer-list_ce7bdbaa2a5998973271d85172456ee6'] = 'لا توجد ماركات.';
@@ -256,6 +264,7 @@ $_LANG['my-account_4b0afa9e8d3cdefd4fb21faebe22ef5f'] = 'تم تسجيل الح�
 $_LANG['my-account_999fe77c512638fd1b2ff18646d24781'] = 'أهلا بك في حسابك. يمكنك هنا تعديل المعلومات الشخصية والعناوين وكذلك متابعة طلبات الشراء.';
 $_LANG['my-account_f4c5b2b545efb89fefa11fd6c9da1cb3'] = 'أضف العنوان الأول';
 $_LANG['my-account_7442e29d7d53e549b78d93c46b8cdcfc'] = 'الطلبات';
+$_LANG['my-account_cea4dedd9147586b361b90e900944690'] = 'تاريخ الطلبية و التفاصيل';
 $_LANG['my-account_e06d7593c1cd6dabef450be6c3da7091'] = 'إعادة الباضائع';
 $_LANG['my-account_89080f0eedbd5491a93157930f1e45fc'] = 'البضائع المستردة';
 $_LANG['my-account_d1a365ea7809ae5831c6d9f86886630c'] = 'إيصال الإتمانية';
@@ -271,6 +280,7 @@ $_LANG['nbr-product-page_498f79c4c5bbde77f1bceb6c86fd0f6d'] = 'أعرض';
 $_LANG['nbr-product-page_4f5d5f295ddc8fd8673e74dd5fbe114a'] = 'لكل صفحة';
 $_LANG['new-products_9ff0635f5737513b1a6f559ac2bff745'] = 'وصل حديثاً';
 $_LANG['new-products_d58424783355b6da2dedc302f2bf4065'] = 'لا توجد منتجات جديدة.';
+$_LANG['order-address-advanced_4cf3bec7b06f4713c8b143802e7fab31'] = 'تفاصيل العنوان (/العناوين)';
 $_LANG['order-address-advanced_af0f5bdc5be121b9307687aeeae38c17'] = 'عنوان التوصيل';
 $_LANG['order-address-advanced_601d8c4b9f72fc1862013c19b677a499'] = 'عنوان الفاتورة';
 $_LANG['order-address-multishipping-products_d28f8bbb0740354aae5456da9cc56d0e'] = 'اختار عناوين التوصيل';
@@ -326,15 +336,23 @@ $_LANG['order-carrier-advanced_6f05787682585c32498e88bcd2ea88fc'] = 'طرق ال
 $_LANG['order-carrier-advanced_3818429ccff49b9d6ab2b4a9a137a00a'] = 'ليس هنالك حاجة لجهة شحن لهذه الطلبية';
 $_LANG['order-carrier-advanced_cc9b9807af9192bed55cb1e92ba28844'] = 'اختر خيارا للتوصيل لعنوانك:';
 $_LANG['order-carrier-advanced_8fb37535c12fbe2899ab442ec474c157'] = 'اختر خيار التوصيل';
+$_LANG['order-carrier-advanced_2a08bd3364d511e7573f0ebdbeda7c3d'] = 'وقت التوصيل:';
 $_LANG['order-carrier-advanced_b6dddfff5178ce64364ca3f683930354'] = 'أفضل سعر وسرعة';
 $_LANG['order-carrier-advanced_c2a32e7734b79d54eaaddb651707b403'] = 'الأسرع';
 $_LANG['order-carrier-advanced_b1992d8f7c58180c1ebd461b7d502423'] = 'أفضل سعر';
 $_LANG['order-carrier-advanced_21034ae6d01a83e702839a72ba8a77b0'] = '(بدون الضريبة)';
 $_LANG['order-carrier-advanced_1f87346a16cf80c372065de3c54c86d9'] = '(شامل للضريبة)';
 $_LANG['order-carrier-advanced_b24ce0cd392a5b0b8dedc66c25213594'] = 'مجاناً!';
+$_LANG['order-carrier-advanced_23753c5016cd82e4ec63ba61cd2a13f5'] = 'لهذا المنتج:';
+$_LANG['order-carrier-advanced_3d113dda516dec82953c7ef1b770278c'] = 'لهذه المنتجات:';
 $_LANG['order-carrier-advanced_2d51d96d770cc2244be31a85e608de19'] = 'لا توجد جهة شحن متاحة.';
+$_LANG['order-carrier-advanced_0383858ad9a560ca2ecb8066c1681807'] = 'المنتجات المختارة لا يمكن توصيلها بالنواقل المتوفرة: إنها ثقيلة جدا. يرجى تعديل سلة التسوق لتقليل وزنها.';
+$_LANG['order-carrier-advanced_942649e42a59a56bd717acc3fed307b8'] = 'المنتجات المختارة لا يمكن توصيلها بالنواقل المتوفرة. يرجى تعديل سلة التسوق.';
+$_LANG['order-carrier-advanced_7c013b3defbf4cec9cd69f2e99a8d84c'] = 'المنتجات المختارة لا يمكن توصيلها بالنواقل المتوفرة: حجمها لا يصلح. يرجى تعديل سلة التسوق لتقليل حجمها.';
 $_LANG['order-carrier-advanced_a6cc8cbe3fa07d0fca172c36a603332c'] = 'لا توجد جهة شحن متاحة للعنوان "%s".';
+$_LANG['order-carrier-advanced_bd5b551d1757a856d9f2d01dc7850080'] = 'اترك رسالة';
 $_LANG['order-carrier-advanced_d93651d012e77dac5581b08db33195b2'] = 'إذا أردت أن تضيف تعليقا عن طلبيتك، فضلا أكتبه بالأسفل.';
+$_LANG['order-carrier-advanced_6407498d5c2b5cdd00f58568a4835db3'] = 'التعبئة والتغليف القابلة لإعادة التدوير';
 $_LANG['order-carrier-advanced_9193b58520051d8b59ca64a5cc5353ff'] = 'اوافق ان استلم طلبي في علبة معادة التصنيع';
 $_LANG['order-carrier-advanced_0d9175fe89fb80d815e7d03698b6e83a'] = 'هدية';
 $_LANG['order-carrier-advanced_32224bd6487699ea66652d3dc502455d'] = 'أريد أن يتم تغليف طلبيتي.';
@@ -351,15 +369,23 @@ $_LANG['order-carrier-advanced_5508a53851720a210e50f7b8a6f66f46'] = 'يجب أن
 $_LANG['order-carrier-opc-advanced_3818429ccff49b9d6ab2b4a9a137a00a'] = 'ليس هنالك حاجة لجهة شحن لهذه الطلبية';
 $_LANG['order-carrier-opc-advanced_cc9b9807af9192bed55cb1e92ba28844'] = 'اختر خيارا للتوصيل لعنوانك:';
 $_LANG['order-carrier-opc-advanced_8fb37535c12fbe2899ab442ec474c157'] = 'اختر خيار التوصيل';
+$_LANG['order-carrier-opc-advanced_2a08bd3364d511e7573f0ebdbeda7c3d'] = 'وقت التوصيل:';
 $_LANG['order-carrier-opc-advanced_b6dddfff5178ce64364ca3f683930354'] = 'أفضل سعر وسرعة';
 $_LANG['order-carrier-opc-advanced_c2a32e7734b79d54eaaddb651707b403'] = 'الأسرع';
 $_LANG['order-carrier-opc-advanced_b1992d8f7c58180c1ebd461b7d502423'] = 'أفضل سعر';
 $_LANG['order-carrier-opc-advanced_21034ae6d01a83e702839a72ba8a77b0'] = '(بدون الضريبة)';
 $_LANG['order-carrier-opc-advanced_1f87346a16cf80c372065de3c54c86d9'] = '(شامل للضريبة)';
 $_LANG['order-carrier-opc-advanced_b24ce0cd392a5b0b8dedc66c25213594'] = 'مجاناً!';
+$_LANG['order-carrier-opc-advanced_23753c5016cd82e4ec63ba61cd2a13f5'] = 'لهذا المنتج:';
+$_LANG['order-carrier-opc-advanced_3d113dda516dec82953c7ef1b770278c'] = 'لهذه المنتجات:';
 $_LANG['order-carrier-opc-advanced_2d51d96d770cc2244be31a85e608de19'] = 'لا توجد جهة شحن متاحة.';
+$_LANG['order-carrier-opc-advanced_0383858ad9a560ca2ecb8066c1681807'] = 'المنتجات المختارة لا يمكن توصيلها بالنواقل المتوفرة: إنها ثقيلة جدا. يرجى تعديل سلة التسوق لتقليل وزنها.';
+$_LANG['order-carrier-opc-advanced_942649e42a59a56bd717acc3fed307b8'] = 'المنتجات المختارة لا يمكن توصيلها بالنواقل المتوفرة. يرجى تعديل سلة التسوق.';
+$_LANG['order-carrier-opc-advanced_7c013b3defbf4cec9cd69f2e99a8d84c'] = 'المنتجات المختارة لا يمكن توصيلها بالنواقل المتوفرة: حجمها لا يصلح. يرجى تعديل سلة التسوق لتقليل حجمها.';
 $_LANG['order-carrier-opc-advanced_a6cc8cbe3fa07d0fca172c36a603332c'] = 'لا توجد جهة شحن متاحة للعنوان "%s".';
+$_LANG['order-carrier-opc-advanced_bd5b551d1757a856d9f2d01dc7850080'] = 'اترك رسالة';
 $_LANG['order-carrier-opc-advanced_d93651d012e77dac5581b08db33195b2'] = 'إذا أردت أن تضيف تعليقا عن طلبيتك، فضلا أكتبه بالأسفل.';
+$_LANG['order-carrier-opc-advanced_6407498d5c2b5cdd00f58568a4835db3'] = 'التعبئة والتغليف القابلة لإعادة التدوير';
 $_LANG['order-carrier-opc-advanced_9193b58520051d8b59ca64a5cc5353ff'] = 'اوافق ان استلم طلبي في علبة معادة التصنيع';
 $_LANG['order-carrier-opc-advanced_0d9175fe89fb80d815e7d03698b6e83a'] = 'هدية';
 $_LANG['order-carrier-opc-advanced_32224bd6487699ea66652d3dc502455d'] = 'أريد أن يتم تغليف طلبيتي.';
@@ -373,15 +399,23 @@ $_LANG['order-carrier_6f05787682585c32498e88bcd2ea88fc'] = 'طرق التوصي�
 $_LANG['order-carrier_3818429ccff49b9d6ab2b4a9a137a00a'] = 'ليس هنالك حاجة لجهة شحن لهذه الطلبية';
 $_LANG['order-carrier_cc9b9807af9192bed55cb1e92ba28844'] = 'اختر خيارا للتوصيل لعنوانك:';
 $_LANG['order-carrier_8fb37535c12fbe2899ab442ec474c157'] = 'اختر خيار التوصيل';
+$_LANG['order-carrier_2a08bd3364d511e7573f0ebdbeda7c3d'] = 'وقت التوصيل:';
 $_LANG['order-carrier_b6dddfff5178ce64364ca3f683930354'] = 'أفضل سعر وسرعة';
 $_LANG['order-carrier_c2a32e7734b79d54eaaddb651707b403'] = 'الأسرع';
 $_LANG['order-carrier_b1992d8f7c58180c1ebd461b7d502423'] = 'أفضل سعر';
 $_LANG['order-carrier_21034ae6d01a83e702839a72ba8a77b0'] = '(بدون الضريبة)';
 $_LANG['order-carrier_1f87346a16cf80c372065de3c54c86d9'] = '(شامل للضريبة)';
 $_LANG['order-carrier_b24ce0cd392a5b0b8dedc66c25213594'] = 'مجاناً!';
+$_LANG['order-carrier_23753c5016cd82e4ec63ba61cd2a13f5'] = 'لهذا المنتج:';
+$_LANG['order-carrier_3d113dda516dec82953c7ef1b770278c'] = 'لهذه المنتجات:';
 $_LANG['order-carrier_2d51d96d770cc2244be31a85e608de19'] = 'لا توجد جهة شحن متاحة.';
+$_LANG['order-carrier_0383858ad9a560ca2ecb8066c1681807'] = 'المنتجات المختارة لا يمكن توصيلها بالنواقل المتوفرة: إنها ثقيلة جدا. يرجى تعديل سلة التسوق لتقليل وزنها.';
+$_LANG['order-carrier_942649e42a59a56bd717acc3fed307b8'] = 'المنتجات المختارة لا يمكن توصيلها بالنواقل المتوفرة. يرجى تعديل سلة التسوق.';
+$_LANG['order-carrier_7c013b3defbf4cec9cd69f2e99a8d84c'] = 'المنتجات المختارة لا يمكن توصيلها بالنواقل المتوفرة: حجمها لا يصلح. يرجى تعديل سلة التسوق لتقليل حجمها.';
 $_LANG['order-carrier_a6cc8cbe3fa07d0fca172c36a603332c'] = 'لا توجد جهة شحن متاحة للعنوان "%s".';
+$_LANG['order-carrier_bd5b551d1757a856d9f2d01dc7850080'] = 'اترك رسالة';
 $_LANG['order-carrier_d93651d012e77dac5581b08db33195b2'] = 'إذا أردت أن تضيف تعليقا عن طلبيتك، فضلا أكتبه بالأسفل.';
+$_LANG['order-carrier_6407498d5c2b5cdd00f58568a4835db3'] = 'التعبئة والتغليف القابلة لإعادة التدوير';
 $_LANG['order-carrier_9193b58520051d8b59ca64a5cc5353ff'] = 'اوافق ان استلم طلبي في علبة معادة التصنيع';
 $_LANG['order-carrier_0d9175fe89fb80d815e7d03698b6e83a'] = 'هدية';
 $_LANG['order-carrier_32224bd6487699ea66652d3dc502455d'] = 'أريد أن يتم تغليف طلبيتي.';
@@ -399,6 +433,8 @@ $_LANG['order-confirmation_fb077ecba55e5552916bde26d8b9e794'] = 'تأكيد طل
 $_LANG['order-confirmation_e19e31ddb54b493059808ec4f2dab4cb'] = 'رقم تعريف طلب الشراء هو:';
 $_LANG['order-confirmation_9be66ab020fd0ffb9dd22756969b8dc7'] = 'تم إرسال رقم تعريف طلب الشراء للبريد الإلكتروني.';
 $_LANG['order-confirmation_4082ea29b4f196c4f60533500139725a'] = 'تابع طلب الشراء';
+$_LANG['order-confirmation_f5f73bed0ea882264f4da4e924736859'] = 'اذهب إلى صفحة سجل طلبات الشراء الخاصة بك';
+$_LANG['order-confirmation_241cc604e9c62701f4bc4a2e1848ec13'] = 'عرض سجل طلبات الشراء الخاصة بك';
 $_LANG['order-detail_332c80b1838dc515f5031e09da3b7f3f'] = 'إعادة الطلب';
 $_LANG['order-detail_6332e7985befad227455d60812bd1449'] = 'تفاصيل الطلب رقم  %s - المقدم فى';
 $_LANG['order-detail_914419aa32f04011357d3b604a86d7eb'] = 'جهة الشحن';
@@ -425,6 +461,7 @@ $_LANG['order-detail_1f87346a16cf80c372065de3c54c86d9'] = '(شامل للضري�
 $_LANG['order-detail_ada0f55ef37f4928c5cd970f378c15e8'] = 'إجمالي القسائم:';
 $_LANG['order-detail_38fb6e512f5b9cd141963623ab3b5ddd'] = 'إجمالي الهدايا المغلفة';
 $_LANG['order-detail_0e321f3a4007b6404f4d93f7f35b2364'] = 'الشحن والتسليم';
+$_LANG['order-detail_96b0141273eabab320119c467cdcaf17'] = 'الإجمالي';
 $_LANG['order-detail_c060ca8505d0aa094635fbf9beac94b0'] = 'حمل هذا المنتج';
 $_LANG['order-detail_aec9b5b1c2f91ccdef8e25f5f1dac86a'] = 'حمل المنتج';
 $_LANG['order-detail_be686376cddb23d0227444ccc3c4b5b7'] = 'القسيمة';
@@ -630,12 +667,17 @@ $_LANG['order-payment-advanced_068f80c7519d0528fb08e82137a72131'] = 'المنت�
 $_LANG['order-payment-advanced_a40cab5994f36d4c48103a22ca082e8f'] = 'سلة الشراء الخاصة بك';
 $_LANG['order-payment-advanced_879f6b8877752685a966564d072f498f'] = 'سلة الشراء فارغة';
 $_LANG['order-payment-advanced_5af5f631f774a71445e3028253874394'] = 'هذا المتجر لا يقبل طلب شرائك الجديد.';
+$_LANG['order-payment-advanced_b54cae027174159a78c651b2875617cf'] = 'خيارات الدفع';
+$_LANG['order-payment-advanced_c43df96b54c29ae01f3bd6fdb3494dc6'] = 'غير قادر على العثور على أي خيار دفع متاح لسلة التسوق الخاصة بك. يرجى الاتصال بنا إذا استمرت المشكلة';
+$_LANG['order-payment-advanced_97abaa921b2270031573362f57aad4a4'] = 'الشروط والأحكام';
 $_LANG['order-payment-advanced_ad88a6c9e8c880f23639321d78ec859d'] = 'أوافق على شروط الخدمة وسوف أطيعها.';
 $_LANG['order-payment-advanced_d53afd7ef9af5405df040482add9b153'] = '(اقرأ شروط الخدمة)';
 $_LANG['order-payment-classic_deb10517653c255364175796ace3553f'] = 'منتج';
 $_LANG['order-payment-classic_b5a7adde1af5c87d7fd797b6245c2a39'] = 'الوصف';
+$_LANG['order-payment-classic_faeaec9eda6bc4c8cb6e1a9156a858be'] = 'التوفر';
 $_LANG['order-payment-classic_6c957f72dc8cdacc75762f2cbdcdfaf2'] = 'سعر الوحدة';
 $_LANG['order-payment-classic_03ab340b3f99e03cff9e84314ead38c0'] = 'الكمية';
+$_LANG['order-payment-classic_96b0141273eabab320119c467cdcaf17'] = 'الإجمالي';
 $_LANG['order-payment-classic_2370a4958c4ebe6d6c8045cd49a6b392'] = 'مجموع المنتجات(بدون الضريبة):';
 $_LANG['order-payment-classic_db205f01b4fd580fb5daa9072d96849d'] = 'إجمالي المنتجات';
 $_LANG['order-payment-classic_ebaee01719541f61281c16ba22ebbfde'] = 'مجموع المنتجات(شاملة الضريبة):';
@@ -655,6 +697,7 @@ $_LANG['order-payment-classic_a82868319826fb092b73968e661b5b38'] = 'القسائ
 $_LANG['order-payment-classic_444bcb3a3fcf8389296c49467f27e1d6'] = 'موافق';
 $_LANG['order-payment-classic_f7b96335c6a33477579e43f3da368507'] = 'استفد من عروضنا:';
 $_LANG['order-payment-classic_1ac6ee29e9e68fb71bad91c1d34348cc'] = '%s:';
+$_LANG['order-payment-classic_1021f02536dc46ab3b07c269949e4de7'] = 'النص #%s:';
 $_LANG['order-payment-classic_8e1263b23607508e7ba8ff39aec8031d'] = 'لم يتم تثبيت أي إضافات للدفع .';
 $_LANG['order-payment-classic_dd1f775e443ff3b9a89270713580a51b'] = 'السابق';
 $_LANG['order-payment-classic_300225ee958b6350abc51805dab83c24'] = 'الاستمرار في التسوق';
@@ -680,12 +723,14 @@ $_LANG['order-return_f3ba7c2fb2c65ad6fa1b1efd30573a8d'] = 'من فضلك إضب�
 $_LANG['order-return_955b51949c0e756934c02c521f7f9405'] = 'وصل الإرجاع على هيئة PDF';
 $_LANG['order-return_e81874a861e2b26ea2c4ecce9f378078'] = 'وقم بإضافته مع الطلبية';
 $_LANG['order-return_d9d95b7fdffceaaa11c6bbae7b3bfa37'] = 'يرجى مشاهدة وصل الإرجاع على هيئة PDF';
+$_LANG['order-return_5347ffe274974d2f2c9dfcb9d8f1b691'] = 'للعنوان الصحيح.';
 $_LANG['order-return_16dafae9102750489087d1d087b72aba'] = 'عندما نستلم طلبيتك، سوف نقوم بإعلامك عن طريق البريد الإلكتروني. عندها سنقوم بإعادة حساب المبلغ الذي سيتم سداده لك.';
 $_LANG['order-return_f393a2fe17dc0cacff53a136479b845d'] = 'تفضل بسؤالنا عندما يكون لديك أي استفسار';
 $_LANG['order-return_f637120d9f24c366b382ede6c21cddf0'] = 'إذا لم تحترم الشروط المذكورة أعلاه للإعادة ، نحن نحتفظ بالحق في رفض الصفقة الخاصة بك و / أو السداد.';
 $_LANG['order-return_44a9edeffb86277f007fa90d96689a6d'] = 'عليك أن تنتظر رسالة تأكيد من طرفنا قبل القيام بعملية ارجاع السلع.';
 $_LANG['order-slip_d95cf4ab2cbf1dfb63f066b50558b07d'] = 'حسابي';
 $_LANG['order-slip_d1a365ea7809ae5831c6d9f86886630c'] = 'إيصال الإتمانية';
+$_LANG['order-slip_f97bb49d92cd0fe889f07e290b4792d5'] = 'وصول المبالغ التي استلمتها بعد إلغاء طلبياتك';
 $_LANG['order-slip_cf3bae95c5f6023d5a10fe415b205a45'] = 'الإيصال الإتمانية';
 $_LANG['order-slip_a240fa27925a635b08dc28c9e4f9216d'] = 'طلب شراء';
 $_LANG['order-slip_446faa7da2d42ba4ffeda73cb119dd91'] = 'تاريخ الإصدار';
@@ -727,6 +772,7 @@ $_LANG['product-list_03c2e7e41ffc181a4e84080b4710e81e'] = 'جديد';
 $_LANG['product-list_bb63f16d5ebfcfa8a651642a7bb2ea5c'] = 'تخفيض!';
 $_LANG['product-list_2d0f6b8300be19cf35e89e66f0677f95'] = 'أضف للسلة';
 $_LANG['product-list_4351cfebe4b61d8aa5efa1d020710005'] = 'عرض';
+$_LANG['product-list_63a78ed4647f7c63c2929e35ec1c95e3'] = 'تخصيص';
 $_LANG['product-list_d3da97e2d9aee5c8fbe03156ad051c99'] = 'مشاهدة المزيد';
 $_LANG['product-list_03de921a8ea82897e13d33d66c28b4db'] = 'على الإنترنت فقط!';
 $_LANG['product-list_ca2bf12169883f4982d8fe34b7e3c618'] = 'سعر مخفض!';
@@ -771,6 +817,8 @@ $_LANG['product_10ac3d04253ef7e1ddc73e6091c0cd55'] = 'التالي';
 $_LANG['product_02ea084dc2ef3e9965dbba4ec87d2f9b'] = 'عرض جميع الصور';
 $_LANG['product_03de921a8ea82897e13d33d66c28b4db'] = 'على الإنترنت فقط!';
 $_LANG['product_3dd42bfc8345e82c43b4a40a3426ec49'] = 'المرجع:';
+$_LANG['product_ed51222f31afbf17ca5f3b0654db8969'] = 'الشرط:';
+$_LANG['product_656c3be690ee43df4b845bd2a2ebe587'] = 'منتج جديد';
 $_LANG['product_019d1ca7d50cc54b995f60d456435e87'] = 'مستخدم';
 $_LANG['product_6da03a74721a0554b7143254225cc08a'] = 'تحديث';
 $_LANG['product_2b56b60f878922093facd42284848a0c'] = 'مزيد من التفاصيل';
@@ -785,9 +833,13 @@ $_LANG['product_13dba24862cf9128167a59100e154c8d'] = 'طباعة';
 $_LANG['product_887ee91702c962a70b87cbef07bbcaec'] = 'بدون الضريبة';
 $_LANG['product_e2e79605fc9450ec17957cf0e910f5c6'] = 'شامل للضريبة';
 $_LANG['product_9a9a97ca85af73f90515e72745f730f0'] = 'بدلا من';
+$_LANG['product_54d3b260d7e0e3377ff04b75bf564982'] = 'بما فيه';
+$_LANG['product_ac230c36810502ea7e2a0e0ea427c586'] = 'لضرائب بيئية';
 $_LANG['product_a134618182b99ff9151d7e0b6b92410a'] = '(لا تتأثر بالخصم)';
 $_LANG['product_fe3838c7c11aa406dd956566e17360d5'] = 'كل';
 $_LANG['product_694e8d1f2ee056f98ee488bdc4982d73'] = 'الكمية';
+$_LANG['product_04325f5c10c9818bc464d660daa2b030'] = 'الحد الأدنى لكميات طلبيات الشراء للمنتج هي';
+$_LANG['product_63a78ed4647f7c63c2929e35ec1c95e3'] = 'تخصيص';
 $_LANG['product_2d0f6b8300be19cf35e89e66f0677f95'] = 'أضف للسلة';
 $_LANG['product_fc21aa6a8b0bceb8570c8c81b6b38307'] = 'خصومات كبيرة';
 $_LANG['product_3601146c4e948c32b6424d2c0a7f0118'] = 'السعر';
@@ -825,15 +877,21 @@ $_LANG['search_3a93aed43691aed28d2ce3a53d3c63f8'] = '%d نتيجة تم العث
 $_LANG['search_a09e4037d02313230a191007246e1694'] = '%d نتائج تم العثور عليها.';
 $_LANG['search_b2c56c8b57680e576c61c1b5df0d0c2d'] = 'لا يوجد نتائج للبحث عن';
 $_LANG['search_a4bb6bf91165c149d73930f43ad4ef69'] = 'من فضلك ادخل كلمات للبحث.';
+$_LANG['shopping-cart-advanced_76c5684afc4bd7adab31b1f78765fd93'] = 'ملخص السلة';
 $_LANG['shopping-cart-advanced_deb10517653c255364175796ace3553f'] = 'منتج';
 $_LANG['shopping-cart-advanced_b5a7adde1af5c87d7fd797b6245c2a39'] = 'الوصف';
+$_LANG['shopping-cart-advanced_faeaec9eda6bc4c8cb6e1a9156a858be'] = 'التوفر';
 $_LANG['shopping-cart-advanced_6c957f72dc8cdacc75762f2cbdcdfaf2'] = 'سعر الوحدة';
 $_LANG['shopping-cart-advanced_03ab340b3f99e03cff9e84314ead38c0'] = 'الكمية';
+$_LANG['shopping-cart-advanced_96b0141273eabab320119c467cdcaf17'] = 'الإجمالي';
 $_LANG['shopping-cart-advanced_a82868319826fb092b73968e661b5b38'] = 'القسائم';
 $_LANG['shopping-cart-advanced_e0aa021e21dddbd6d8cecec71e9cf564'] = 'اعتماد التخفيض';
 $_LANG['shopping-cart-advanced_12a7a93d72ded50311b52c7d0a853e3c'] = 'استفد من عروضنا الحصرية:';
+$_LANG['shopping-cart-advanced_2370a4958c4ebe6d6c8045cd49a6b392'] = 'مجموع  المنتجات (بدون الضريبة)';
 $_LANG['shopping-cart-advanced_db205f01b4fd580fb5daa9072d96849d'] = 'إجمالي المنتجات';
+$_LANG['shopping-cart-advanced_ebaee01719541f61281c16ba22ebbfde'] = 'مجموع المنتجات (شامل للضريبة)';
 $_LANG['shopping-cart-advanced_59816dd41a0dab043184d5ab19e2edaf'] = 'إجمالي الهدايا المغلفة (شامل للضريبة)';
+$_LANG['shopping-cart-advanced_aec651d4c4c49791b9324884bba0949b'] = 'إجمالي تكلفة تغليف الهدايا';
 $_LANG['shopping-cart-advanced_f4e8b53a114e5a17d051ab84d326cae5'] = 'إجمالي الشحن';
 $_LANG['shopping-cart-advanced_c6995d6cc084c192bc2e742f052a5c74'] = 'شحن مجاني!';
 $_LANG['shopping-cart-advanced_f246a17c095de09e043cc1cb917481da'] = 'مجموع الشحن (بدون الضرائب):';
@@ -847,6 +905,8 @@ $_LANG['shopping-cart-advanced_2fb3b950fd7711136f7f251ae5fbdbdc'] = '#النص';
 $_LANG['shopping-cart-advanced_f2a6c498fb90ee345d997f888fce3b18'] = 'حذف';
 $_LANG['shopping-cart-advanced_dd1f775e443ff3b9a89270713580a51b'] = 'السابق';
 $_LANG['shopping-cart-advanced_300225ee958b6350abc51805dab83c24'] = 'الاستمرار في التسوق';
+$_LANG['shopping-cart-advanced_80f94ab1e96030eaba765084e48b96ca'] = 'الطلب مع الالتزام بالدفع';
+$_LANG['shopping-cart-product-line_f910c9ffb69f6a8aefbb7f235f178f46'] = ' : ';
 $_LANG['shopping-cart-product-line_6665e3761028c84e1d228de3432229ed'] = 'وحدة حفظ المخزون';
 $_LANG['shopping-cart-product-line_69d08bd5f8cf4e228930935c3f13e42f'] = 'متوفر حالياً';
 $_LANG['shopping-cart-product-line_b55197a49e8c4cd8c314bc2aa39d6feb'] = 'غير متوفر بالمستودع';
@@ -857,6 +917,7 @@ $_LANG['shopping-cart-product-line_1d9baf077ee87921f57a8fe42d510b65'] = 'خصم'
 $_LANG['shopping-cart-product-line_e716b72edf18038c04664e9b21569177'] = 'يجب عليك أن تشتري كمية لا تقل عن %d من هذه السلعة.';
 $_LANG['shopping-cart-product-line_ec211f7c20af43e742bf2570c3cb84f9'] = 'إضافة';
 $_LANG['shopping-cart-product-line_f2a6c498fb90ee345d997f888fce3b18'] = 'حذف';
+$_LANG['shopping-cart-product-line_96b0141273eabab320119c467cdcaf17'] = 'الإجمالي';
 $_LANG['shopping-cart_a40cab5994f36d4c48103a22ca082e8f'] = 'سلة الشراء الخاصة بك';
 $_LANG['shopping-cart_ff578eb1d07934124f4b9339ecfd2bf6'] = 'ملخص سلة الشراء';
 $_LANG['shopping-cart_d6bf6fa1b9ec58788836df2f1019cdb0'] = 'سلة الشراء الخاصة بك تحتوى على ';
@@ -868,8 +929,10 @@ $_LANG['shopping-cart_5af5f631f774a71445e3028253874394'] = 'هذا المتجر 
 $_LANG['shopping-cart_b4f90d226d5212c67236540da6b5c2da'] = 'آخر منتج تم إضافته';
 $_LANG['shopping-cart_deb10517653c255364175796ace3553f'] = 'منتج';
 $_LANG['shopping-cart_b5a7adde1af5c87d7fd797b6245c2a39'] = 'الوصف';
+$_LANG['shopping-cart_faeaec9eda6bc4c8cb6e1a9156a858be'] = 'التوفر';
 $_LANG['shopping-cart_6c957f72dc8cdacc75762f2cbdcdfaf2'] = 'سعر الوحدة';
 $_LANG['shopping-cart_03ab340b3f99e03cff9e84314ead38c0'] = 'الكمية';
+$_LANG['shopping-cart_96b0141273eabab320119c467cdcaf17'] = 'الإجمالي';
 $_LANG['shopping-cart_a82868319826fb092b73968e661b5b38'] = 'القسائم';
 $_LANG['shopping-cart_e0aa021e21dddbd6d8cecec71e9cf564'] = 'اعتماد التخفيض';
 $_LANG['shopping-cart_12a7a93d72ded50311b52c7d0a853e3c'] = 'استفد من عروضنا الحصرية:';
@@ -877,6 +940,7 @@ $_LANG['shopping-cart_2370a4958c4ebe6d6c8045cd49a6b392'] = 'مجموع المن�
 $_LANG['shopping-cart_db205f01b4fd580fb5daa9072d96849d'] = 'إجمالي المنتجات';
 $_LANG['shopping-cart_ebaee01719541f61281c16ba22ebbfde'] = 'مجموع المنتجات(شاملة الضريبة):';
 $_LANG['shopping-cart_59816dd41a0dab043184d5ab19e2edaf'] = 'إجمالي الهدايا المغلفة (شامل للضريبة)';
+$_LANG['shopping-cart_aec651d4c4c49791b9324884bba0949b'] = 'إجمالي تكلفة تغليف الهدايا';
 $_LANG['shopping-cart_f4e8b53a114e5a17d051ab84d326cae5'] = 'إجمالي الشحن';
 $_LANG['shopping-cart_c6995d6cc084c192bc2e742f052a5c74'] = 'شحن مجاني!';
 $_LANG['shopping-cart_f246a17c095de09e043cc1cb917481da'] = 'مجموع الشحن (بدون الضرائب):';
@@ -939,6 +1003,7 @@ $_LANG['stores_e72dca5d5a8a4706a206f3225324bf44'] = 'اسم المتجر';
 $_LANG['stores_af9cbba00fbb4f354bab26d24fa44183'] = 'عنوان المتجر';
 $_LANG['stores_23a5151445e0c061a51e74989d74ce44'] = 'ساعات العمل';
 $_LANG['stores_673ae02fffb72f0fe68a66f096a01347'] = 'رقم الهاتف:';
+$_LANG['stores_0e2fb5b02182fd28b9b96e86ed27838f'] = 'فاكس:';
 $_LANG['stores_6a1e265f92087bb6dd18194833fe946b'] = 'البريد الإكتروني';
 $_LANG['stores_dd8e04bdafcdc0ff0a6be34cd74394c0'] = 'أدخل الموقع (مثلا: الرمز البريدي، العنوان، المدينة أو الدولة) للعثور على أقرب محل تجاري.';
 $_LANG['stores_12e8c7785484eb1547a9793a6b8603f9'] = 'موقعك:';
@@ -953,6 +1018,7 @@ $_LANG['stores_e80ba8cf66845d479eb275578353e358'] = 'محل تجاري تم ال
 $_LANG['stores_c3d0689b0ded3217c1b4fef6e9513930'] = 'محلات تجارية تم العثور عليها -- شاهد كافة النتائج:';
 $_LANG['stores_a9407a9201ef1b64f0c567ed291574ba'] = 'الحصول على الإتجاهات';
 $_LANG['stores_9e076f5885f5cc16a4b5aeb8de4adff5'] = 'لم يتم العثور على محل تجاري';
+$_LANG['supplier-list_a00e46e856e637f8fd077b4fd710c9e2'] = 'الموردون:';
 $_LANG['supplier-list_44cc6cf69e752cd267e29e71ac4175ff'] = 'لا يوجد موردين.';
 $_LANG['supplier-list_bf1f33501d576cce01509b67e2260242'] = 'يوجد %d مورد.';
 $_LANG['supplier-list_70e0158b4815b0ad6be5f86a11e3a3b4'] = 'يوجد %d موردون.';
@@ -974,6 +1040,7 @@ $_LANG['live_edit_da87eac3848a0d55560bdd129a0e134b'] = 'لا يمكن إلغاء
 $_LANG['live_edit_79030d996976f29a5e986a42d8f026e5'] = 'لم يتم حفظ مكتن الإضافه';
 $_LANG['live_edit_3c5b87f318f203adbfcc5d6a68959359'] = 'خطأ فى عرض قائمة الإضافات';
 $_LANG['live_edit_c9cc8cce247e49bae79f15173ce97354'] = 'حفظ';
+$_LANG['live_edit_d8dcfab18b3a6eba56d617dd1dcb1ba7'] = 'اغلق التعديل المباشر';
 
 
 return $_LANG;

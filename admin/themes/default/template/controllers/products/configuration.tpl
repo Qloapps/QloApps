@@ -2,7 +2,7 @@
 	<div id="product-configuration" class="panel product-tab">
 		<input type="hidden" name="submitted_tabs[]" value="Configuration" />
 		<h3 class="tab"> <i class="icon-AdminAdmin"></i> {l s='Configuration' mod='hotelreservationsystem'}</h3>
-		
+
 		{if isset($htl_room_type)}
 			<input type="hidden" value="{$htl_room_type['id']}" name="wk_id_room_type">
 		{/if}
@@ -29,7 +29,7 @@
 				</div>
 			{/if}
 		</div>
-		
+
 		<div class="form-group">
 			<label class="control-label col-sm-2" for="num_adults">
 				{l s='Adults' mod='hotelreservationsystem'}
@@ -39,10 +39,10 @@
 				<input type="hidden" id="checkConfSubmit" value="0" name="checkConfSubmit">
 			</div>
 		</div>
-		
+
 		<div class="form-group">
 			<label class="control-label col-sm-2" for="num_child">
-				{l s='Childrens' mod='hotelreservationsystem'}
+				{l s='Children' mod='hotelreservationsystem'}
 			</label>
 			<div class="col-sm-4">
 				<input id="num_child" type="text" name="num_child" class="form-control" {if isset($htl_room_type)}value="{$htl_room_type['children']}"{/if}>
@@ -53,8 +53,10 @@
 			<table class="table hotel-room">
 				<thead>
 					<tr class="nodrag nodrop">
-						<th class="col-sm-1 center">
-							<span>{l s='Room No.' mod='hotelreservationsystem'}</span>
+						<th class="col-sm-2 center">
+							<label class="control-label">
+								<span class="label-tooltip" data-toggle="tooltip" title="" data-original-title="Enter the name of the Room for ex. A-101. Invalid characters <>;=#{}">{l s='Room No.'}</span>
+							</label>
 						</th>
 						<th class="col-sm-2 center">
 							<span>{l s='Floor' mod='hotelreservationsystem'}</span>
@@ -62,7 +64,7 @@
 						<th class="col-sm-2">
 							<span>{l s='Status' mod='hotelreservationsystem'}</span>
 						</th>
-						<th class="col-sm-7 center">
+						<th class="col-sm-6 center">
 							<span>{l s='Extra Information' mod='hotelreservationsystem'}</span>
 						</th>
 					</tr>
@@ -215,7 +217,7 @@
 		// Disable dates data filling when model open
 		$('#deactiveDatesModal').on('show.bs.modal', function (e) {
 			$('.disabledDatesTr').remove();
-			
+
 			var modelTriggerElement = $(e.relatedTarget);
 			var html = '';
 
@@ -298,7 +300,7 @@
 				return true;
 			}
 		});
-		
+
 		// Add new room detail
 		$('#add-more-rooms-button').on('click',function() {
 			var lengthRooms = $('.room_data_values').length;
@@ -321,7 +323,7 @@
 					html += '<a class="btn btn-default deactiveDatesModal" data-toggle="modal" data-target="#deactiveDatesModal" style="display: none;">';
 						html += "{l s='Add Dates' mod='hotelreservationsystem'}";
 					html += '</a>';
-					html += '<input type="hidden" class="form-control disableDatesJSON" name="disableDatesJSON" value="0">';
+					html += '<input type="hidden" class="form-control disableDatesJSON" name="disableDatesJSON[]" value="0">';
 					html += '<input type="text" class="form-control room_comment" name="room_comment[]">';
 				html += '</td>';
 				html += '<td class="center col-sm-1">';
@@ -350,7 +352,7 @@
 	            {
 	            	if (parseInt(result) == 1)
 	            	{
-		               	showSuccessMessage("{l s='Remove successful'}");
+		               	showSuccessMessage("{l s='Removed successfully'}");
 	            	}
 	            }
 	        });

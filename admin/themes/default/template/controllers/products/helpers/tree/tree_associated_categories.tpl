@@ -1,5 +1,5 @@
 {*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -18,7 +18,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
@@ -33,17 +33,9 @@
 <script type="text/javascript">
 	var currentToken="{$token|@addslashes}";
 	var treeClickFunc = function() {
-		var loc = location.href;
-		if (loc.indexOf("&id_category") !== -1) {
-			loc = location.href.replace(
-				/&id_category=[0-9]*/, "&id_category="
-				+ $(this).val());
-		}
-		else {
-			loc = location.href + "&id_category="
-				+ $(this).val();
-		}
-		location.href = loc;
+		var newURL = window.location.protocol + "//" + window.location.host + window.location.pathname;
+		var queryString = window.location.search.replace(/&id_category=[0-9]*/, "") + "&id_category=" + $(this).val();
+		location.href = newURL+queryString; // hash part is dropped: window.location.hash
 	};
 	function addDefaultCategory(elem)
 	{
@@ -131,7 +123,12 @@
 			}
 		});
 	{/if}
-	$(document).ready(function(){
+	function startTree() {
+		if (typeof $.fn.tree === 'undefined') {
+			setTimeout(startTree, 100);
+			return;
+		}
+
 		$('#{$id|escape:'html':'UTF-8'}').tree('collapseAll');
 		$('#{$id|escape:'html':'UTF-8'}').find(':input[type=radio]').click(treeClickFunc);
 
@@ -159,5 +156,6 @@
 		{else}
 			$('#collapse-all-{$id|escape:'html':'UTF-8'}').hide();
 		{/if}
-	});
+	}
+	startTree();
 </script>

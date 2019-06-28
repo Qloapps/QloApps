@@ -26,13 +26,22 @@
 
 	<tr>
 		<td class="grey" width="70%">
-			{l s='Total Order Cost' pdf='true'}
+			{l s='Total Rooms Cost' pdf='true'}
 		</td>
 		<td class="white" width="30%">
 			{displayPrice currency=$order->id_currency price=$footer.products_before_discounts_tax_excl}
 		</td>
 	</tr>
-
+	{if isset($footer.total_extra_demands) && $footer.total_extra_demands}
+		<tr>
+			<td class="grey" width="70%">
+				{l s='Total Extra Demands Cost' pdf='true'}
+			</td>
+			<td class="white" width="30%">
+				{displayPrice currency=$order->id_currency price=$footer.total_extra_demands}
+			</td>
+		</tr>
+	{/if}
 	<!-- <tr>
 		<td class="grey" width="70%">
 			{l s='Shipping Cost' pdf='true'}

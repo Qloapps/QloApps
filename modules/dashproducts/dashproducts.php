@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2015 PrestaShop
+* 2007-2016 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2016 PrestaShop SA
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -33,7 +33,7 @@ class DashProducts extends Module
 	{
 		$this->name = 'dashproducts';
 		$this->tab = 'dashboard';
-		$this->version = '0.3.3';
+		$this->version = '1.0.0';
 		$this->author = 'PrestaShop';
 
 		$this->push_filename = _PS_CACHE_DIR_.'push/activity';
@@ -42,7 +42,7 @@ class DashProducts extends Module
 		parent::__construct();
 		$this->displayName = $this->l('Dashboard Products');
 		$this->description = $this->l('Adds a block with a table of your latest orders and a ranking of your products');
-		$this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
+		$this->ps_versions_compliancy = array('min' => '1.6', 'max' => '1.7.0.99');
 	}
 
 	public function install()
@@ -102,9 +102,10 @@ class DashProducts extends Module
 		$header = array(
 			array('title' => $this->l('Customer Name'), 'class' => 'text-left'),
 			array('title' => $this->l('Products'), 'class' => 'text-center'),
-			array('title' => $this->l('Total'), 'class' => 'text-center'),
+			array('title' => $this->l('Total').' '.$this->l('Tax excl.'), 'class' => 'text-center'),
 			array('title' => $this->l('Date'), 'class' => 'text-center'),
-			array('title' => $this->l('Action'), 'class' => 'text-center'),
+			array('title' => $this->l('Status'), 'class' => 'text-center'),
+			array('title' => '', 'class' => 'text-right'),
 		);
 
 		$limit = (int)Configuration::get('DASHPRODUCT_NBR_SHOW_LAST_ORDER') ? (int)Configuration::get('DASHPRODUCT_NBR_SHOW_LAST_ORDER') : 10;
@@ -117,7 +118,7 @@ class DashProducts extends Module
 			$tr = array();
 			$tr[] = array(
 				'id' => 'firstname_lastname',
-				'value' => Tools::htmlentitiesUTF8($order['firstname']).' '.Tools::htmlentitiesUTF8($order['lastname']),
+				'value' => '<a href="'.$this->context->link->getAdminLink('AdminCustomers', true).'&id_customer='.$order['id_customer'].'&viewcustomer">'.Tools::htmlentitiesUTF8($order['firstname']).' '.Tools::htmlentitiesUTF8($order['lastname']).'</a>',
 				'class' => 'text-left',
 			);
 			$tr[] = array(
@@ -138,8 +139,13 @@ class DashProducts extends Module
 				'class' => 'text-center',
 			);
 			$tr[] = array(
+				'id' => 'status',
+				'value' => Tools::htmlentitiesUTF8($order['state_name']),
+				'class' => 'text-center',
+			);
+			$tr[] = array(
 				'id' => 'details',
-				'value' => $this->l('Details'),
+				'value' => '',
 				'class' => 'text-right',
 				'wrapper_start' => '<a class="btn btn-default" href="index.php?tab=AdminOrders&id_order='.(int)$order['id_order'].'&vieworder&token='.Tools::getAdminTokenLite('AdminOrders').'" title="'.$this->l('Details').'"><i class="icon-search"></i>',
 				'wrapper_end' => '</a>'
@@ -190,16 +196,20 @@ class DashProducts extends Module
 			'
 					SELECT
 						product_id,
-						count(*) as total,
-						AVG(total_price_tax_excl / conversion_rate) as price,
+						product_name,
+						SUM(product_quantity) as total,
+						p.price as price,
+						pa.price as price_attribute,
 						SUM(total_price_tax_excl / conversion_rate) as sales,
 						SUM(product_quantity * purchase_supplier_price / conversion_rate) as expenses
 					FROM `'._DB_PREFIX_.'orders` o
 		LEFT JOIN `'._DB_PREFIX_.'order_detail` od ON o.id_order = od.id_order
+		LEFT JOIN `'._DB_PREFIX_.'product` p ON p.id_product = product_id
+		LEFT JOIN `'._DB_PREFIX_.'product_attribute` pa ON pa.id_product_attribute = od.product_attribute_id
 		WHERE `invoice_date` BETWEEN "'.pSQL($date_from).' 00:00:00" AND "'.pSQL($date_to).' 23:59:59"
 		AND valid = 1
 		'.Shop::addSqlRestriction(false, 'o').'
-		GROUP BY product_id
+		GROUP BY product_id, product_attribute_id
 		ORDER BY total DESC
 		LIMIT '.(int)Configuration::get('DASHPRODUCT_NBR_SHOW_BEST_SELLER', 10)
 		);
@@ -219,6 +229,11 @@ class DashProducts extends Module
 				$path_to_image = _PS_PROD_IMG_DIR_.$image->getExistingImgPath().'.'.$this->context->controller->imageType;
 				$img = ImageManager::thumbnail($path_to_image, 'product_mini_'.$product_obj->id.'.'.$this->context->controller->imageType, 45, $this->context->controller->imageType);
 			}
+			
+			$productPrice = $product['price'];
+            		if (isset($product['price_attribute']) && $product['price_attribute'] != '0.000000') {
+                		$productPrice = $product['price_attribute'];
+            		}
 
 			$body[] = array(
 				array(
@@ -228,7 +243,7 @@ class DashProducts extends Module
 				),
 				array(
 					'id' => 'product',
-					'value' => Tools::htmlentitiesUTF8($product_obj->name).'<br/>'.Tools::displayPrice($product['price']),
+					'value' => '<a href="'.$this->context->link->getAdminLink('AdminProducts', true).'&id_product='.$product_obj->id.'&updateproduct">'.Tools::htmlentitiesUTF8($product['product_name']).'</a>'.'<br/>'.Tools::displayPrice($productPrice),
 					'class' => 'text-center'
 				),
 				array(

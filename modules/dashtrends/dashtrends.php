@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2015 PrestaShop
+* 2007-2016 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2016 PrestaShop SA
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -39,7 +39,7 @@ class Dashtrends extends Module
 	{
 		$this->name = 'dashtrends';
 		$this->tab = 'dashboard';
-		$this->version = '0.7.5';
+		$this->version = '1.0.0';
 		$this->author = 'PrestaShop';
 
 		$this->push_filename = _PS_CACHE_DIR_.'push/trends';
@@ -48,7 +48,7 @@ class Dashtrends extends Module
 		parent::__construct();
 		$this->displayName = $this->l('Dashboard Trends');
 		$this->description = $this->l('Adds a block with a graphical representation of the development of your store(s) based on selected key data.');
-		$this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
+		$this->ps_versions_compliancy = array('min' => '1.6', 'max' => '1.7.0.99');
 	}
 
 	public function install()
@@ -70,7 +70,8 @@ class Dashtrends extends Module
 	public function hookDashboardZoneTwo($params)
 	{
 		$this->context->smarty->assign(array(
-			'currency' => $this->context->currency
+			'currency' => $this->context->currency,
+            '_PS_PRICE_DISPLAY_PRECISION_' => _PS_PRICE_DISPLAY_PRECISION_
 		));
 		return $this->display(__FILE__, 'dashboard_zone_two.tpl');
 	}
@@ -204,9 +205,7 @@ class Dashtrends extends Module
 
 	public function hookDashboardData($params)
 	{
-		// Artificially remove the decimals in order to get a cleaner Dashboard
-		$currency = clone $this->context->currency;
-		$currency->decimals = 0;
+		$this->currency = clone $this->context->currency;
 
 		// Retrieve, refine and add up data for the selected period
 		$tmp_data = $this->getData($params['date_from'], $params['date_to']);
@@ -224,19 +223,33 @@ class Dashtrends extends Module
 			$this->dashboard_data_compare = $this->translateCompareData($this->dashboard_data, $this->dashboard_data_compare);
 		}
 
+        $sales_score = Tools::displayPrice($this->dashboard_data_sum['sales'], $this->currency).
+                       $this->addTaxSuffix();
+
+        $cart_value_score = Tools::displayPrice($this->dashboard_data_sum['average_cart_value'], $this->currency).
+                            $this->addTaxSuffix();
+
+        $net_profit_score = Tools::displayPrice($this->dashboard_data_sum['net_profits'], $this->currency).
+                            $this->addTaxSuffix();
+
 		return array(
 			'data_value' => array(
-				'sales_score' => Tools::displayPrice(round($this->dashboard_data_sum['sales']), $currency),
-				'orders_score' => Tools::displayNumber($this->dashboard_data_sum['orders'], $currency),
-				'cart_value_score' => Tools::displayPrice($this->dashboard_data_sum['average_cart_value'], $currency),
-				'visits_score' => Tools::displayNumber($this->dashboard_data_sum['visits'], $currency),
+				'sales_score' => $sales_score,
+				'orders_score' => Tools::displayNumber($this->dashboard_data_sum['orders'], $this->currency),
+				'cart_value_score' => $cart_value_score,
+				'visits_score' => Tools::displayNumber($this->dashboard_data_sum['visits'], $this->currency),
 				'conversion_rate_score' => round(100 * $this->dashboard_data_sum['conversion_rate'], 2).'%',
-				'net_profits_score' => Tools::displayPrice(round($this->dashboard_data_sum['net_profits']), $currency),
+				'net_profits_score' => $net_profit_score,
 			),
 			'data_trends' => $this->data_trends,
 			'data_chart' => array('dash_trends_chart1' => $this->getChartTrends()),
 		);
 	}
+
+    protected function addTaxSuffix()
+    {
+        return ' <small>'.$this->l('tax excl.').'</small>';
+    }
 
 	protected function translateCompareData($normal, $compare)
 	{

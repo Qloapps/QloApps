@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -49,6 +49,7 @@ class InstallControllerHttpConfigure extends InstallControllerHttp
             $this->session->admin_lastname = trim(Tools::getValue('admin_lastname'));
             $this->session->admin_email = trim(Tools::getValue('admin_email'));
             $this->session->send_informations = Tools::getValue('send_informations');
+            $this->session->marketing_consent = Tools::getValue('marketing_consent');
             if ($this->session->send_informations) {
                 // Qlo Notification
                 $qloData = [
@@ -59,11 +60,13 @@ class InstallControllerHttpConfigure extends InstallControllerHttp
                     'firstname' => Tools::ucfirst(Tools::getValue('admin_firstname')),
                     'lastname' => Tools::ucfirst(Tools::getValue('admin_lastname')),
                     'countryCode' => Tools::getValue('shop_country'),
+                    'marketingConsent' => Tools::getValue('marketing_consent'),
                 ];
                 $objModelInstall = new InstallModelInstall();
                 $objModelInstall->setNotification($qloData);
                 // END
             }
+
             // If password fields are empty, but are already stored in session, do not fill them again
             if (!$this->session->admin_password || trim(Tools::getValue('admin_password'))) {
                 $this->session->admin_password = trim(Tools::getValue('admin_password'));

@@ -1,28 +1,27 @@
 /*
- * 2007-2015 PrestaShop
- *
- * NOTICE OF LICENSE
- *
- * This source file is subject to the Academic Free License (AFL 3.0)
- * that is bundled with this package in the file LICENSE.txt.
- * It is also available through the world-wide-web at this URL:
- * http://opensource.org/licenses/afl-3.0.php
- * If you did not receive a copy of the license and are unable to
- * obtain it through the world-wide-web, please send an email
- * to license@prestashop.com so we can send you a copy immediately.
- *
- * DISCLAIMER
- *
- * Do not edit or add to this file if you wish to upgrade PrestaShop to newer
- * versions in the future. If you wish to customize PrestaShop for your
- * needs please refer to http://www.prestashop.com for more information.
- *
- *  @author PrestaShop SA <contact@prestashop.com>
- *  @copyright  2007-2015 PrestaShop SA
- *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
- *  International Registered Trademark & Property of PrestaShop SA
- */
-
+* 2007-2017 PrestaShop
+*
+* NOTICE OF LICENSE
+*
+* This source file is subject to the Academic Free License (AFL 3.0)
+* that is bundled with this package in the file LICENSE.txt.
+* It is also available through the world-wide-web at this URL:
+* http://opensource.org/licenses/afl-3.0.php
+* If you did not receive a copy of the license and are unable to
+* obtain it through the world-wide-web, please send an email
+* to license@prestashop.com so we can send you a copy immediately.
+*
+* DISCLAIMER
+*
+* Do not edit or add to this file if you wish to upgrade PrestaShop to newer
+* versions in the future. If you wish to customize PrestaShop for your
+* needs please refer to http://www.prestashop.com for more information.
+*
+*  @author PrestaShop SA <contact@prestashop.com>
+*  @copyright  2007-2017 PrestaShop SA
+*  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+*  International Registered Trademark & Property of PrestaShop SA
+*/
 //global variables
 var serialScrollNbImagesDisplayed;
 var selectedCombination = [];
@@ -32,73 +31,87 @@ var original_url = window.location + '';
 var first_url_check = true;
 var firstTime = true;
 /* Retro compat from product.tpl */
-if (typeof customizationFields !== 'undefined' && customizationFields) {
-    var customizationFieldsBk = customizationFields;
-    customizationFields = [];
-    var j = 0;
-    for (var i = 0; i < customizationFieldsBk.length; ++i) {
-        var key = 'pictures_' + parseInt(id_product) + '_' + parseInt(customizationFieldsBk[i]['id_customization_field']);
-        customizationFields[i] = [];
-        customizationFields[i][0] = (parseInt(customizationFieldsBk[i]['type']) == 0) ? 'img' + i : 'textField' + j++;
-        customizationFields[i][1] = (parseInt(customizationFieldsBk[i]['type']) == 0 && customizationFieldsBk[i][key]) ? 2 : parseInt(customizationFieldsBk[i]['required']);
-    }
+if (typeof customizationFields !== 'undefined' && customizationFields)
+{
+	var customizationFieldsBk = customizationFields;
+	customizationFields = [];
+	var j = 0;
+	for (var i = 0; i < customizationFieldsBk.length; ++i)
+	{
+		var key = 'pictures_' + parseInt(id_product) + '_' + parseInt(customizationFieldsBk[i]['id_customization_field']);
+		customizationFields[i] = [];
+		customizationFields[i][0] = (parseInt(customizationFieldsBk[i]['type']) == 0) ? 'img' + i : 'textField' + j++;
+		customizationFields[i][1] = (parseInt(customizationFieldsBk[i]['type']) == 0 && customizationFieldsBk[i][key]) ? 2 : parseInt(customizationFieldsBk[i]['required']);
+	}
 }
 
-if (typeof combinationImages !== 'undefined' && combinationImages) {
-    combinationImagesJS = [];
-    combinationImagesJS[0] = [];
-    var k = 0;
-    for (var i in combinationImages) {
-        combinationImagesJS[i] = [];
-        for (var j in combinationImages[i]) {
-            var id_image = parseInt(combinationImages[i][j]['id_image']);
-            if (id_image) {
-                combinationImagesJS[0][k++] = id_image;
-                combinationImagesJS[i][j] = [];
-                combinationImagesJS[i][j] = id_image;
-            }
-        }
-    }
+if (typeof combinationImages !== 'undefined' && combinationImages)
+{
+	combinationImagesJS = [];
+	combinationImagesJS[0] = [];
+	var k = 0;
+	for (var i in combinationImages)
+	{
+		combinationImagesJS[i] = [];
+		for (var j in combinationImages[i])
+		{
+			var id_image = parseInt(combinationImages[i][j]['id_image']);
+			if (id_image)
+			{
+				combinationImagesJS[0][k++] = id_image;
+				combinationImagesJS[i][j] = [];
+				combinationImagesJS[i][j] = id_image;
+			}
+		}
+	}
 
-    if (typeof combinationImagesJS[0] !== 'undefined' && combinationImagesJS[0]) {
-        var array_values = [];
-        for (var key in arrayUnique(combinationImagesJS[0]))
-            array_values.push(combinationImagesJS[0][key]);
-        combinationImagesJS[0] = array_values;
-    }
-    combinationImages = combinationImagesJS;
+	if (typeof combinationImagesJS[0] !== 'undefined' && combinationImagesJS[0])
+	{
+	   var array_values = [];
+	   for (var key in arrayUnique(combinationImagesJS[0]))
+		   array_values.push(combinationImagesJS[0][key]);
+	   combinationImagesJS[0] = array_values;
+	}
+	combinationImages = combinationImagesJS;
 }
 
-if (typeof combinations !== 'undefined' && combinations) {
-    combinationsJS = [];
-    var k = 0;
-    for (var i in combinations) {
-        globalQuantity += combinations[i]['quantity'];
-        combinationsJS[k] = [];
-        combinationsJS[k]['idCombination'] = parseInt(i);
-        combinationsJS[k]['idsAttributes'] = combinations[i]['attributes'];
-        combinationsJS[k]['quantity'] = combinations[i]['quantity'];
-        combinationsJS[k]['price'] = combinations[i]['price'];
-        combinationsJS[k]['ecotax'] = combinations[i]['ecotax'];
-        combinationsJS[k]['image'] = parseInt(combinations[i]['id_image']);
-        combinationsJS[k]['reference'] = combinations[i]['reference'];
-        combinationsJS[k]['unit_price'] = combinations[i]['unit_impact'];
-        combinationsJS[k]['minimal_quantity'] = parseInt(combinations[i]['minimal_quantity']);
+if (typeof combinations !== 'undefined' && combinations)
+{
+	combinationsJS = [];
+	combinationsHashSet = {};
+	var k = 0;
+	for (var i in combinations)
+	{
+		globalQuantity += combinations[i]['quantity'];
+		combinationsJS[k] = [];
+		combinationsJS[k]['idCombination'] = parseInt(i);
+		combinationsJS[k]['idsAttributes'] = combinations[i]['attributes'];
+		combinationsJS[k]['quantity'] = combinations[i]['quantity'];
+		combinationsJS[k]['price'] = combinations[i]['price'];
+		combinationsJS[k]['ecotax'] = combinations[i]['ecotax'];
+		combinationsJS[k]['image'] = parseInt(combinations[i]['id_image']);
+		combinationsJS[k]['reference'] = combinations[i]['reference'];
+		combinationsJS[k]['unit_price'] = combinations[i]['unit_impact'];
+		combinationsJS[k]['minimal_quantity'] = parseInt(combinations[i]['minimal_quantity']);
 
-        combinationsJS[k]['available_date'] = [];
-        combinationsJS[k]['available_date']['date'] = combinations[i]['available_date'];
-        combinationsJS[k]['available_date']['date_formatted'] = combinations[i]['date_formatted'];
+		combinationsJS[k]['available_date'] = [];
+			combinationsJS[k]['available_date']['date'] = combinations[i]['available_date'];
+			combinationsJS[k]['available_date']['date_formatted'] = combinations[i]['date_formatted'];
 
-        combinationsJS[k]['specific_price'] = [];
-        combinationsJS[k]['specific_price']['reduction_percent'] = (combinations[i]['specific_price'] && combinations[i]['specific_price']['reduction'] && combinations[i]['specific_price']['reduction_type'] == 'percentage') ? combinations[i]['specific_price']['reduction'] * 100 : 0;
-        combinationsJS[k]['specific_price']['reduction_price'] = (combinations[i]['specific_price'] && combinations[i]['specific_price']['reduction'] && combinations[i]['specific_price']['reduction_type'] == 'amount') ? combinations[i]['specific_price']['reduction'] : 0;
-        combinationsJS[k]['price'] = (combinations[i]['specific_price'] && combinations[i]['specific_price']['price'] && parseInt(combinations[i]['specific_price']['price']) != -1) ? combinations[i]['specific_price']['price'] : combinations[i]['price'];
+		combinationsJS[k]['specific_price'] = [];
+			combinationsJS[k]['specific_price']['reduction_percent'] = (combinations[i]['specific_price'] && combinations[i]['specific_price']['reduction'] && combinations[i]['specific_price']['reduction_type'] == 'percentage') ? combinations[i]['specific_price']['reduction'] * 100 : 0;
+			combinationsJS[k]['specific_price']['reduction_price'] = (combinations[i]['specific_price'] && combinations[i]['specific_price']['reduction'] && combinations[i]['specific_price']['reduction_type'] == 'amount') ? combinations[i]['specific_price']['reduction'] : 0;
+			combinationsJS[k]['price'] = (combinations[i]['specific_price'] && combinations[i]['specific_price']['price'] && parseInt(combinations[i]['specific_price']['price']) != -1) ? combinations[i]['specific_price']['price'] :  combinations[i]['price'];
 
-        combinationsJS[k]['reduction_type'] = (combinations[i]['specific_price'] && combinations[i]['specific_price']['reduction_type']) ? combinations[i]['specific_price']['reduction_type'] : '';
-        combinationsJS[k]['id_product_attribute'] = (combinations[i]['specific_price'] && combinations[i]['specific_price']['id_product_attribute']) ? combinations[i]['specific_price']['id_product_attribute'] : 0;
-        k++;
-    }
-    combinations = combinationsJS;
+		combinationsJS[k]['reduction_type'] = (combinations[i]['specific_price'] && combinations[i]['specific_price']['reduction_type']) ? combinations[i]['specific_price']['reduction_type'] : '';
+		combinationsJS[k]['id_product_attribute'] = (combinations[i]['specific_price'] && combinations[i]['specific_price']['id_product_attribute']) ? combinations[i]['specific_price']['id_product_attribute'] : 0;
+
+		var key = combinationsJS[k]['idsAttributes'].sort().join('-');
+		combinationsHashSet[key] = combinationsJS[k];
+
+		k++;
+	}
+	combinations = combinationsJS;
 }
 /* */
 
@@ -453,7 +466,7 @@ function updateDisplay() {
         $('#quantity_wanted_p:hidden').show('slow');
 
         //show the "add to cart" button ONLY if it was hidden
-        $('#add_to_cart:hidden').fadeIn(600);
+        $('#add_to_cart:id_demands').fadeIn(600);
 
         //hide the hook out of stock
         $('#oosHook').hide();
@@ -764,8 +777,8 @@ function displayImage(domAAroundImgThumb, no_animation) {
 function displayDiscounts(combination) {
     // Tables & rows selection
     var quantityDiscountTable = $('#quantityDiscount');
-    var combinationsSpecificQuantityDiscount = $('#quantityDiscount_' + combination, quantityDiscountTable);
-    var allQuantityDiscount = $('#quantityDiscount_0', quantityDiscountTable);
+    var combinationsSpecificQuantityDiscount = $('.quantityDiscount_'+combination, quantityDiscountTable);
+	var allQuantityDiscount = $('.quantityDiscount_0', quantityDiscountTable);
 
     // If there is some combinations specific quantity discount, show them, else, if there are some
     // products quantity discount: show them. In case of result, show the category.
@@ -775,7 +788,7 @@ function displayDiscounts(combination) {
         quantityDiscountTable.show();
     } else if (allQuantityDiscount.length != 0) {
         allQuantityDiscount.show();
-        $('tbody tr', quantityDiscountTable).not('#quantityDiscount_0').hide();
+        $('tbody tr', quantityDiscountTable).not('.quantityDiscount_0').hide();
         quantityDiscountTable.show();
     } else {
         quantityDiscountTable.hide();
@@ -1036,9 +1049,11 @@ $(document).ready(function() {
         $('.num_quantity_alert').hide();
         $('.unvail_rooms_cond_display').hide();
         $('.sold_out_alert').show();
+        disableRoomTypeDemands(1);
     } else {
         $('.unvail_rooms_cond_display').show();
         $('.sold_out_alert').hide();
+        disableRoomTypeDemands(0);
     }
 
     function highlightDateBorder(elementVal, date)
@@ -1089,6 +1104,15 @@ $(document).ready(function() {
                 var date_out = $.datepicker.formatDate('yy-mm-dd', selectedDate);
             }
 
+            // get the selected extra demands by customer
+            var roomDemands = [];
+            $('input:checkbox.id_room_type_demand:checked').each(function () {
+                roomDemands.push({
+                    'id_global_demand':$(this).val(),
+                    'id_option': $(this).closest('.room_demand_block').find('.id_option').val()
+                });
+            });
+
             /*by webkul to manage quantity of rooms*/
             $.ajax({
                 type: 'POST',
@@ -1103,7 +1127,10 @@ $(document).ready(function() {
                     date_to: date_out,
                     change_date: 1,
                     qty: $('#quantity_wanted').val(),
-                    id_product: $('#product_page_product_id').val()
+                    id_product: $('#product_page_product_id').val(),
+                    room_demands: JSON.stringify(roomDemands),
+                    action: 'checkRoomAvailabilityAndRate',
+                    ajax: true
                 },
                 success: function(result) {
                     if (result.msg == 'success') {
@@ -1118,11 +1145,16 @@ $(document).ready(function() {
                         $('.room_unavailability_date_error_div').hide();
                         $('.unvail_rooms_cond_display').show();
                         $('.sold_out_alert').hide();
+                        disableRoomTypeDemands(0);
 
                         total_price = result.total_price;
                         total_price = parseFloat(total_price);
-
-                        price = formatCurrency(total_price, currency_format, currency_sign, currency_blank);
+                        total_price = formatCurrency(total_price, currency_format, currency_sign, currency_blank);
+                        total_room_price = result.total_room_price;
+                        total_room_price = parseFloat(total_room_price);
+                        total_room_price = formatCurrency(total_room_price, currency_format, currency_sign, currency_blank);
+                        $('.total_price_block p').text(total_price);
+                        $('.total_rooms_price_block').text(total_room_price);
 
                         feature_price = parseFloat(result.feature_price);
                         original_product_price = parseFloat(result.original_product_price);
@@ -1141,7 +1173,6 @@ $(document).ready(function() {
                             $('.product_original_price').show();
                         }
 
-                        $('.total_price_block p').text(price);
                         $('#num_days').val(result.num_days);
                     } else if (result.msg == 'unavailable_quantity') {
                         if (result.avail_rooms > 0) {
@@ -1152,6 +1183,7 @@ $(document).ready(function() {
                             $('#quantity_wanted').val(result.avail_rooms);
                             $('.unvail_rooms_cond_display').show();
                             $('.sold_out_alert').hide();
+                            disableRoomTypeDemands(0);
 
                             setTimeout(function() {
                                     $('.room_unavailability_date_error_div').css('display', 'none');
@@ -1161,6 +1193,7 @@ $(document).ready(function() {
                             $('.num_quantity_alert').hide();
                             $('.unvail_rooms_cond_display').hide();
                             $('.sold_out_alert').show();
+                            disableRoomTypeDemands(1);
                         }
                     } else {
                         alert(some_error_cond);
@@ -1208,6 +1241,14 @@ $(document).ready(function() {
                     },
                     3000);
             } else {
+                // get the selected extra demands by customer
+                var roomDemands = [];
+                $('input:checkbox.id_room_type_demand:checked').each(function () {
+                    roomDemands.push({
+                        'id_global_demand':$(this).val(),
+                        'id_option': $(this).closest('.room_demand_block').find('.id_option').val()
+                    });
+                });
                 //by webkul to manage quantity of rooms
                 $.ajax({
                     type: 'POST',
@@ -1222,7 +1263,10 @@ $(document).ready(function() {
                         date_to: date_out,
                         change_date: 1,
                         qty: $('#quantity_wanted').val(),
-                        id_product: $('#product_page_product_id').val()
+                        id_product: $('#product_page_product_id').val(),
+                        room_demands: JSON.stringify(roomDemands),
+                        action: 'checkRoomAvailabilityAndRate',
+                        ajax: true
                     },
                     success: function(result) {
                         if (result.msg == 'success') {
@@ -1236,11 +1280,16 @@ $(document).ready(function() {
                             $('.room_unavailability_date_error_div').hide();
                             $('.unvail_rooms_cond_display').show();
                             $('.sold_out_alert').hide();
-
+                            disableRoomTypeDemands(0);
                             total_price = result.total_price;
                             total_price = parseFloat(total_price);
+                            total_price = formatCurrency(total_price, currency_format, currency_sign, currency_blank);
+                            total_room_price = result.total_room_price;
+                            total_room_price = parseFloat(total_room_price);
+                            total_room_price = formatCurrency(total_room_price, currency_format, currency_sign, currency_blank);
+                            $('.total_price_block p').text(total_price);
+                            $('.total_rooms_price_block').text(total_room_price);
 
-                            price = formatCurrency(total_price, currency_format, currency_sign, currency_blank);
                             feature_price = parseFloat(result.feature_price);
                             original_product_price = parseFloat(result.original_product_price);
                             feature_price_diff = parseFloat(result.feature_price_diff);
@@ -1258,7 +1307,6 @@ $(document).ready(function() {
                                 $('.product_original_price').show();
                             }
 
-                            $('.total_price_block p').text(price);
                             $('#num_days').val(result.num_days);
                         } else if (result.msg == 'unavailable_quantity') {
                             if (result.avail_rooms > 0) {
@@ -1269,7 +1317,7 @@ $(document).ready(function() {
                                 $('#quantity_wanted').val(result.avail_rooms);
                                 $('.unvail_rooms_cond_display').show();
                                 $('.sold_out_alert').hide();
-
+                                disableRoomTypeDemands(0);
                                 setTimeout(function() {
                                     $('.room_unavailability_date_error_div').css('display', 'none');
                                 },
@@ -1277,6 +1325,7 @@ $(document).ready(function() {
                             } else {
                                 $('.unvail_rooms_cond_display').hide();
                                 $('.sold_out_alert').show();
+                                disableRoomTypeDemands(1);
                             }
                         } else {
                             alert(some_error_cond);
@@ -1288,60 +1337,20 @@ $(document).ready(function() {
     });
 
     $('#quantity_wanted').on('keyup', function() {
-        var qty_wntd = $('#quantity_wanted').val();
-        if (qty_wntd == '' || !$.isNumeric(qty_wntd)) {
-            $('#quantity_wanted').val(1);
-            qty_wntd = $('#quantity_wanted').val();
-        }
-        $('#quantity_wanted').val(parseInt(qty_wntd));
-        if (parseInt(qty_wntd) < 1 || parseInt(qty_wntd) > $('#max_avail_type_qty').val()) {
-            $('#quantity_wanted').val($('#max_avail_type_qty').val());
+        changeRoomTypeDemands();
+    });
 
-            setTimeout(function() {
-                    $('.room_unavailability_qty_error_div').hide();
-                },
-                2000);
-        } else if (qty_wntd <= $('#max_avail_type_qty').val() && qty_wntd >= 1) {
-            $.ajax({
-                type: 'POST',
-                headers: {
-                    "cache-control": "no-cache"
-                },
-                url: product_controller_url,
-                dataType: 'JSON',
-                cache: false,
-                data: {
-                    date_from: $('#room_check_in').val(),
-                    date_to: $('#room_check_out').val(),
-                    product_quantity_down: 1,
-                    qty: qty_wntd,
-                    id_product: $('#product_page_product_id').val()
-                },
-                success: function(result) {
-                    if (result.msg == 'success') {
-                        total_price = result.total_price;
-                        total_price = parseFloat(total_price);
+    $('.id_room_type_demand').on('click', function() {
+        changeRoomTypeDemands();
+    });
 
-                        price = formatCurrency(total_price, currency_format, currency_sign, currency_blank);
-
-                        $('.total_price_block p').text(price);
-                        $('#num_days').val(result.num_days);
-                        $("#max_avail_type_qty").val(result.avail_rooms);
-                    } else if (result.msg == 'unavailable_quantity') {
-                        $('#quantity_wanted').val(result.avail_rooms);
-                        $('.room_unavailability_qty_error_div').text(unavail_qty_text);
-                        $('.room_unavailability_qty_error_div').show();
-
-                        setTimeout(function() {
-                                $('.room_unavailability_qty_error_div').hide();
-                            },
-                            3000);
-                    } else {
-                        alert(some_error_cond);
-                    }
-                }
-            });
-        }
+    $(document).on('change', '.demand_adv_option_block .id_option', function(e) {
+        var option_selected = $(this).find('option:selected');
+        var extra_demand_price = option_selected.attr("optionPrice")
+        extra_demand_price = parseFloat(extra_demand_price);
+        extra_demand_price = formatCurrency(extra_demand_price, currency_format, currency_sign, currency_blank);
+        $(this).closest('.demand_adv_option_block').find('.extra_demand_option_price').text(extra_demand_price);
+        changeRoomTypeDemands();
     });
 
     /*Set maxDate for Order resrict date*/
@@ -1350,3 +1359,79 @@ $(document).ready(function() {
         $("#room_check_out").datepicker("option", "maxDate", new Date(max_order_date));
     }
 });
+
+function changeRoomTypeDemands() {
+    var qty_wntd = $('#quantity_wanted').val();
+    if (qty_wntd == '' || !$.isNumeric(qty_wntd)) {
+        $('#quantity_wanted').val(1);
+        qty_wntd = $('#quantity_wanted').val();
+    }
+    $('#quantity_wanted').val(parseInt(qty_wntd));
+    if ((parseInt(qty_wntd) < 1 || parseInt(qty_wntd) > $('#max_avail_type_qty').val())
+        && $('#max_avail_type_qty').val() > 0
+    ) {
+        $('#quantity_wanted').val($('#max_avail_type_qty').val());
+        setTimeout(function() {
+            $('.room_unavailability_qty_error_div').hide();
+        },
+        2000);
+    } else if (qty_wntd <= $('#max_avail_type_qty').val() && qty_wntd >= 1) {
+        // get the selected extra demands by customer
+        var roomDemands = [];
+        $('input:checkbox.id_room_type_demand:checked').each(function () {
+            roomDemands.push({
+                'id_global_demand':$(this).val(),
+                'id_option': $(this).closest('.room_demand_block').find('.id_option').val()
+            });
+        });
+        $.ajax({
+            type: 'POST',
+            headers: {
+                "cache-control": "no-cache"
+            },
+            url: product_controller_url,
+            dataType: 'JSON',
+            cache: false,
+            data: {
+                date_from: $('#room_check_in').val(),
+                date_to: $('#room_check_out').val(),
+                product_quantity_down: 1,
+                qty: qty_wntd,
+                id_product: $('#product_page_product_id').val(),
+                room_demands: JSON.stringify(roomDemands),
+                action: 'checkRoomAvailabilityAndRate',
+                ajax: true
+            },
+            success: function(result) {
+                if (result.msg == 'success') {
+                    total_price = result.total_price;
+                    total_price = parseFloat(total_price);
+                    total_price = formatCurrency(total_price, currency_format, currency_sign, currency_blank);
+                    $('.total_price_block p').text(total_price);
+                    total_room_price = result.total_room_price;
+                    total_room_price = parseFloat(total_room_price);
+                    total_room_price = formatCurrency(total_room_price, currency_format, currency_sign, currency_blank);
+                    $('.total_rooms_price_block').text(total_room_price);
+                    extra_demand_price = result.extra_demand_price;
+                    extra_demand_price = parseFloat(extra_demand_price);
+                    extra_demand_price = formatCurrency(extra_demand_price, currency_format, currency_sign, currency_blank);
+                    $('.extra_demands_price_block').text(extra_demand_price);
+
+                    $('#num_days').val(result.num_days);
+                    $("#max_avail_type_qty").val(result.avail_rooms);
+                } else if (result.msg == 'unavailable_quantity') {
+                    $('#quantity_wanted').val(result.avail_rooms);
+                    $('.room_unavailability_qty_error_div').text(unavail_qty_text);
+                    $('.room_unavailability_qty_error_div').show();
+
+                    setTimeout(function() {
+                        $('.room_unavailability_qty_error_div').hide();
+                    },
+                    2000);
+                } else {
+                    alert(some_error_cond);
+                }
+            }
+        });
+    }
+}

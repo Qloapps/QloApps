@@ -38,7 +38,11 @@ while ($cycle && $i < $max_cycles) {
 
 if (!empty($_FILES)) {
     $info = pathinfo($_FILES['file']['name']);
-    if (isset($info['extension']) && in_array(fix_strtolower($info['extension']), $ext)) {
+    if (isset($info['extension'])
+            && in_array(fix_strtolower($info['extension']), $ext)
+            // If fileinfo extension is installed, check the mime type too
+            && (!function_exists('mime_content_type') || in_array(mime_content_type($_FILES['file']['tmp_name']), $mime))
+    ) {
         $tempFile = $_FILES['file']['tmp_name'];
 
         $targetPath = $storeFolder;

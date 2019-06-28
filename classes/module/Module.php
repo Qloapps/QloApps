@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -784,7 +784,7 @@ abstract class ModuleCore
         Db::getInstance()->execute('
 			UPDATE '._DB_PREFIX_.'module_shop
 			SET enable_device = enable_device + '.(int)$device.'
-			WHERE enable_device &~ '.(int)$device.' AND id_module='.(int)$this->id.
+			WHERE (enable_device &~ '.(int)$device.' OR enable_device = 0) AND id_module='.(int)$this->id.
             Shop::addSqlRestriction()
         );
 
@@ -911,7 +911,6 @@ abstract class ModuleCore
             Hook::exec('actionModuleRegisterHookBefore', array('object' => $this, 'hook_name' => $hook_name));
             // Get hook id
             $id_hook = Hook::getIdByName($hook_name);
-            $live_edit = Hook::getLiveEditById((int)Hook::getIdByName($hook_name_bak));
 
             // If hook does not exist, we create it
             if (!$id_hook) {
@@ -1392,7 +1391,7 @@ abstract class ModuleCore
 
                     // If (false) is a trick to not load the class with "eval".
                     // This way require_once will works correctly
-                    if (eval('if (false){	'.$file.' }') !== false) {
+                    if (eval('if (false){	'.$file."\n".' }') !== false) {
                         require_once(_PS_MODULE_DIR_.$module.'/'.$module.'.php');
                     } else {
                         $errors[] = sprintf(Tools::displayError('%1$s (parse error in %2$s)'), $module, substr($file_path, strlen(_PS_ROOT_DIR_)));
@@ -1620,10 +1619,6 @@ abstract class ModuleCore
      */
     final public static function isModuleTrusted($module_name)
     {
-        // return currently always trusted as 1 because we will not chcek trust according to prestshop
-        // @TODO in future trust will be checked according to Qloapps addons
-        return 1;
-
         static $trusted_modules_list_content = null;
         static $modules_list_content = null;
         static $default_country_modules_list_content = null;
@@ -1662,17 +1657,17 @@ abstract class ModuleCore
 
         // If the module is trusted, which includes both partner modules and modules bought on Addons
 
-        if (strpos($trusted_modules_list_content, $module_name) !== false) {
+        if (stripos($trusted_modules_list_content, $module_name) !== false) {
             // If the module is not a partner, then return 1 (which means the module is "trusted")
-            if (strpos($modules_list_content, '<module name="'.$module_name.'"/>') == false) {
+            if (stripos($modules_list_content, '<module name="'.$module_name.'"/>') == false) {
                 return 1;
-            } elseif (strpos($default_country_modules_list_content, '<name><![CDATA['.$module_name.']]></name>') !== false) {
+            } elseif (stripos($default_country_modules_list_content, '<name><![CDATA['.$module_name.']]></name>') !== false) {
                 // The module is a parter. If the module is in the file that contains module for this country then return 1 (which means the module is "trusted")
                 return 1;
             }
             // The module seems to be trusted, but it does not seem to be dedicated to this country
             return 2;
-        } elseif (strpos($untrusted_modules_list_content, $module_name) !== false) {
+        } elseif (stripos($untrusted_modules_list_content, $module_name) !== false) {
             // If the module is already in the untrusted list, then return 0 (untrusted)
             return 0;
         } else {
@@ -2615,7 +2610,7 @@ abstract class ModuleCore
      * Install module's controllers using public property $controllers
      * @return bool
      */
-    private function installControllers()
+    protected function installControllers()
     {
         $themes = Theme::getThemes();
         $theme_meta_value = array();

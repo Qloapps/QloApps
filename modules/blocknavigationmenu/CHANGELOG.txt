@@ -1,0 +1,8 @@
+-----------------------------
+# V1.0.0 to V1.0.1
+-----------------------------
+
+## Improved/Changed Features:
+
+* [FO] : Display issues resolved. (Scroll while menu items are more than menu height).
+* [CO] : index.php added.

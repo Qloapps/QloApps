@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2015 PrestaShop
+* 2007-2016 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2016 PrestaShop SA
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -47,11 +47,11 @@ class Blockrss extends Module
 		$this->displayName = $this->l('RSS feed block');
 		$this->description = $this->l('Adds a block displaying a RSS feed.');
 
-		$this->version = '1.3.0';
+		$this->version = '1.3.2';
 		$this->author = 'PrestaShop';
 		$this->error = false;
 		$this->valid = false;
-		$this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
+		$this->ps_versions_compliancy = array('min' => '1.6', 'max' => '1.6.99.99');
  	}
 
  	function install()
@@ -152,6 +152,8 @@ class Blockrss extends Module
 									preg_match('/< *img[^>]*src *= *["\']?([^"\']*)/', $xmlValues['content'], $image);
 									if (array_key_exists(1, $image) && $image[1])
 									{
+										if ($image[1][0] == '/')
+											$image[1] = 'http:'.$image[1];
 										// Try if distant image exist : timeout 0.3s
 										$context = stream_context_create(array('http' => array('timeout' => 0.3)));
 										if (file_get_contents($image[1], false, $context, -1, 1) !== false)

@@ -1,11 +1,10 @@
 
-[{shop_url}]
+[/{shop_url}] 
 
 Hi {name},
 
-Click here to view this item: {product}
-[{product_link}]
+Click here to view this item: {product} [/{product_link}] 
 
-{shop_name} [{shop_url}] powered by
-Webkul(tm) [https://webkul.com/]
+{shop_name} [/{shop_url}] powered by PrestaShop(tm)
+[http://www.prestashop.com/] 
 

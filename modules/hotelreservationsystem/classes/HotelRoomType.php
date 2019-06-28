@@ -81,11 +81,14 @@ class HotelRoomType extends ObjectModel
      *
      * @return [array|boolean] [If data found returns array containing all rooms types information belongs to the passed hotel_id type else returns false ]
      */
-    public function getRoomTypeByHotelId($hotel_id, $id_lang)
+    public function getRoomTypeByHotelId($hotel_id, $id_lang, $active = 2)
     {
         $sql = 'SELECT pl.`name` AS room_type, pl.`id_product` AS id_product, p.`active`
-			FROM `'._DB_PREFIX_.'htl_room_type` AS rt
-            INNER JOIN `'._DB_PREFIX_.'product_lang` AS pl
+			FROM `'._DB_PREFIX_.'htl_room_type` AS rt';
+        if ($active != 2) {
+            $sql .= ' INNER JOIN `'._DB_PREFIX_.'product` AS pp ON (rt.id_product = pp.id_product AND pp.active = 1)';
+        }
+        $sql .= ' INNER JOIN `'._DB_PREFIX_.'product_lang` AS pl
             ON (rt.`id_product` = pl.`id_product` AND pl.`id_lang`='.(int)$id_lang.')
             INNER JOIN `'._DB_PREFIX_.'product` AS p ON (rt.`id_product` = p.`id_product`)
 			WHERE rt.id_hotel ='.(int)$hotel_id;
@@ -186,5 +189,17 @@ class HotelRoomType extends ObjectModel
     public function getAllRoomTypes()
     {
         return Db::getInstance()->executeS('SELECT * FROM `'._DB_PREFIX_.'htl_room_type`');
+    }
+
+    public static function getRoomTypeTaxRate($idproduct)
+    {
+        $priceTI = Product::getPriceStatic($idproduct, true, null, 6, null, false, true);
+        $priceTE = Product::getPriceStatic($idproduct, false, null, 6, null, false, true);
+        if ($priceTE) {
+            $taxRate = (($priceTI - $priceTE) / $priceTE) * 100;
+        } else {
+            $taxRate = 0;
+        }
+        return $taxRate;
     }
 }

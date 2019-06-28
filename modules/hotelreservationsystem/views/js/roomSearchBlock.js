@@ -217,8 +217,17 @@ $(document).ready(function() {
         var max_order_date = $("#max_order_date").val();
         var max_order_date_format = $.datepicker.formatDate('yy-mm-dd', new Date(max_order_date));
         var error = false;
-        if ($('#hotel_cat_id').val() == '') {
-            $(".header-rmsearch-input").addClass("error_border");
+
+        var locationCatId = $('#hotel_location').attr('city_cat_id');
+        var hotelCatId = $('#hotel_cat_id').val();
+        $('.header-rmsearch-input').removeClass("error_border");
+
+        if (hotelCatId == '') {
+            if (typeof(locationCatId) == 'undefined' || locationCatId == '') {
+                $("#hotel_location").addClass("error_border");
+                error = true;
+            }
+            $("#id_hotel_button").addClass("error_border");
             $('#select_htl_error_p').text(hotel_name_cond);
             error = true;
         }

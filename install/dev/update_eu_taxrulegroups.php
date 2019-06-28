@@ -75,7 +75,8 @@ function addTax(SimpleXMLElement $taxes, SimpleXMLElement $tax, array $attribute
 {
     $newTax = new SimpleXMLElement('<tax/>');
 
-    $insertBefore = $taxes->xpath('//taxRulesGroup[1]')[0];
+    $taxRulesGroups = $taxes->xpath('//taxRulesGroup[1]');
+    $insertBefore = $taxRulesGroups[0];
 
     if (!$insertBefore) {
         die("Could not find any `taxRulesGroup`, don't know where to append the tax.\n");

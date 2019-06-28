@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -73,13 +73,13 @@ class AdminOrderPreferencesControllerCore extends AdminController
                         'value' => PS_ORDER_PROCESS_OPC,
                         'identifier' => 'value',
                     ),*/
-                    /*'PS_GUEST_CHECKOUT_ENABLED' => array(
+                    'PS_GUEST_CHECKOUT_ENABLED' => array(
                         'title' => $this->l('Enable guest checkout'),
                         'hint' => $this->l('Allow guest visitors to place an order without registering.'),
                         'validation' => 'isBool',
                         'cast' => 'intval',
-                        'type' => 'hidden'
-                    ),*/
+                        'type' => 'bool'
+                    ),
                     /*'PS_DISALLOW_HISTORY_REORDERING' => array(
                         'title' => $this->l('Disable Reordering Option'),
                         'hint' => $this->l('Disable the option to allow customers to reorder in one click from the order history page (required in some European countries).'),

@@ -269,7 +269,7 @@ INSERT INTO `PREFIX_meta_lang` (`id_meta`, `id_lang`, `title`, `description`, `k
 (2, 2, 'Meilleurs ventes', 'Liste de nos produits les mieux vendus', 'meilleurs ventes'),
 (3, 1, 'Contact us', 'Use our form to contact us', 'contact, form, e-mail'),
 (3, 2, 'Contactez-nous', 'Utilisez notre formulaire pour nous contacter', 'contact, formulaire, e-mail'),
-(4, 1, '', 'Shop powered by Webkul', 'shop, prestashop'),
+(4, 1, '', 'Website powered by Webkul', 'shop, prestashop'),
 (4, 2, '', 'Boutique propulsé par PrestaShop', 'boutique, prestashop'),
 (5, 1, 'Manufacturers', 'Manufacturers list', 'manufacturer'),
 (5, 2, 'Fabricants', 'Liste de nos fabricants', 'fabricants'),

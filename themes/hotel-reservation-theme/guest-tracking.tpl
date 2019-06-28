@@ -1,5 +1,5 @@
 {*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -18,7 +18,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
@@ -55,7 +55,7 @@
 
 		<div id="block-history">
 			<div id="block-order-detail" class="std">
-			{include file="./order-detail.tpl"}
+				{include file="./order-detail.tpl"}
 			</div>
 		</div>
 	{/foreach}
@@ -65,16 +65,16 @@
 	{include file="$tpl_dir./errors.tpl"}
 
 	{if isset($transformSuccess)}
-		<p class="alert alert-success">{l s='Your guest account has been successfully transformed into a customer account. You can now log in as a registered shopper. '} <a href="{$link->getPageLink('authentication', true)|escape:'html':'UTF-8'}">{l s='Log in now.'}</a></p>
+		<p class="alert alert-success">{l s='Your guest account has been successfully transformed into a customer account. You can now log in as a registered user. '} <a href="{$link->getPageLink('authentication', true)|escape:'html':'UTF-8'}">{l s='Log in now.'}</a></p>
 	{else}
 		<form method="post" action="{$action|escape:'html':'UTF-8'}#guestToCustomer" class="std">
 			<fieldset class="description_box box">
 
                 <p><strong class="dark">{l s='Transform your guest account into a customer account and enjoy:'}</strong></p>
 				<ul>
-					<li> -{l s='Personalized and secure access'}</li>
-					<li> -{l s='Fast and easy checkout'}</li>
-					<li> -{l s='Easier merchandise return'}</li>
+					<li> - {l s='Personalized and secure access'}</li>
+					<li> - {l s='Fast and easy checkout'}</li>
+					<li> - {l s='Easier refund process'}</li>
 				</ul>
                 <div class="row">
                 	<div class="col-xs-12 col-sm-5 col-md-4 col-lg-3">
@@ -106,7 +106,7 @@
                     <div class="text form-group">
                         <label>{l s='Order Reference:'} </label>
                         <input class="form-control" type="text" name="order_reference" value="{if isset($smarty.get.id_order)}{$smarty.get.id_order|escape:'html':'UTF-8'}{else}{if isset($smarty.post.id_order)}{$smarty.post.id_order|escape:'html':'UTF-8'}{/if}{/if}" size="8" />
-                        <i>{l s='For example: QIIXJXNUI or QIIXJXNUI#1'}</i>
+                        <i>{l s='For example: QIIXJXNUI'}</i>
                     </div>
                     <div class="text form-group">
                         <label>{l s='Email:'}</label>

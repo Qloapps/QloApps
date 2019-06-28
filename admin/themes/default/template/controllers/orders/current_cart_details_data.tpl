@@ -12,8 +12,8 @@
 							<th><span class="title_box">{l s='Room Image'}</th>
 							<th><span class="title_box">{l s='Room Type'}</span></th>
 							<th><span class="title_box">{l s='Duration'}</span></th>
-							<th><span class="title_box">{l s='Unit Price'}</span></th>
-							<th><span class="title_box">{l s='Price'}</span></th>
+							<th><span class="title_box">{l s='Unit Price (Tax incl.)'}</span></th>
+							<th><span class="title_box">{l s='Price (Tax excl.)'}</span></th>
 							<th><span class="title_box">{l s='Action'}</span></th>
 						</tr>
 					</thead>
@@ -30,7 +30,7 @@
 									<span class="product_original_price {if $data.feature_price_diff > 0}room_type_old_price{/if}" {if $data.feature_price_diff < 0} style="display:none;"{/if}>
 			                        	{displayPrice price=$data.product_price}
 									</span>&nbsp;
-			                        <span class="room_type_current_price" {if !$data.feature_price_diff}style="display:none;"{/if}>	
+			                        <span class="room_type_current_price" {if !$data.feature_price_diff}style="display:none;"{/if}>
 										{displayPrice price=$data.feature_price}
 			                        </span>
 								</td>
@@ -55,6 +55,6 @@
 		.room_type_old_price {
 			  text-decoration: line-through;
 			  color:#979797;
-			  font-size:12px; 
+			  font-size:12px;
 			}
 	</style>

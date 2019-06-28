@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -267,13 +267,18 @@ class CustomerCore extends ObjectModel
         Db::getInstance()->execute('DELETE FROM '._DB_PREFIX_.'specific_price WHERE id_customer='.(int)$this->id);
         Db::getInstance()->execute('DELETE FROM '._DB_PREFIX_.'compare WHERE id_customer='.(int)$this->id);
 
-        $carts = Db::getInstance()->executes('SELECT id_cart
-															FROM '._DB_PREFIX_.'cart
-															WHERE id_customer='.(int)$this->id);
+        $carts = Db::getInstance()->executes('SELECT id_cart FROM '._DB_PREFIX_.'cart WHERE id_customer='.(int)$this->id);
         if ($carts) {
+            $objHtlCartData = new HotelCartBookingData();
+            $objCustomerAdv = new HotelCustomerAdvancedPayment();
             foreach ($carts as $cart) {
+                $objCart = new Cart($cart['id_cart']);
                 Db::getInstance()->execute('DELETE FROM '._DB_PREFIX_.'cart WHERE id_cart='.(int)$cart['id_cart']);
                 Db::getInstance()->execute('DELETE FROM '._DB_PREFIX_.'cart_product WHERE id_cart='.(int)$cart['id_cart']);
+                // delete rows from hotel booking cart table
+                $objHtlCartData->deleteCartBookingData($cart['id_cart'], 0, 0, 0, 0, 0);
+                // delete hotel advance payment of current cart of this customer
+                $objCustomerAdv->deleteClientCartAdvPaymentDtl($cart['id_cart'], $objCart->id_guest);
             }
         }
 
@@ -294,13 +299,15 @@ class CustomerCore extends ObjectModel
     /**
      * Return customers list
      *
+     * @param null|bool $only_active Returns only active customers when true
      * @return array Customers
      */
-    public static function getCustomers()
+    public static function getCustomers($only_active = null)
     {
         $sql = 'SELECT `id_customer`, `email`, `firstname`, `lastname`
 				FROM `'._DB_PREFIX_.'customer`
-				WHERE 1 '.Shop::addSqlRestriction(Shop::SHARE_CUSTOMER).'
+				WHERE 1 '.Shop::addSqlRestriction(Shop::SHARE_CUSTOMER).
+				($only_active ? ' AND `active` = 1' : '').'
 				ORDER BY `id_customer` ASC';
         return Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
     }
@@ -590,7 +597,7 @@ class CustomerCore extends ObjectModel
             return array();
         }
         return Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS('
-		SELECT c.date_add, COUNT(cp.id_page) AS pages, TIMEDIFF(MAX(cp.time_end), c.date_add) as time, http_referer,INET_NTOA(ip_address) as ipaddress
+		SELECT c.id_connections, c.date_add, COUNT(cp.id_page) AS pages, TIMEDIFF(MAX(cp.time_end), c.date_add) as time, http_referer,INET_NTOA(ip_address) as ipaddress
 		FROM `'._DB_PREFIX_.'guest` g
 		LEFT JOIN `'._DB_PREFIX_.'connections` c ON c.id_guest = g.id_guest
 		LEFT JOIN `'._DB_PREFIX_.'connections_page` cp ON c.id_connections = cp.id_connections
@@ -643,7 +650,7 @@ class CustomerCore extends ObjectModel
 
     public function cleanGroups()
     {
-        Db::getInstance()->execute('DELETE FROM `'._DB_PREFIX_.'customer_group` WHERE `id_customer` = '.(int)$this->id);
+    	return Db::getInstance()->delete('customer_group', 'id_customer = '.(int)$this->id);
     }
 
     public function addGroups($groups)

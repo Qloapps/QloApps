@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -45,6 +45,11 @@ class AdminCategoriesControllerCore extends AdminController
 
     public function __construct()
     {
+        // redirect to admin dashboard as no entry allowed in category controller. It will be managed solely from
+        // hotel creation , updation and deletion
+        $this->context = Context::getContext();
+        // Tools::redirectAdmin($this->context->link->getAdminLink('AdminDashboard'));
+
         $this->bootstrap = true;
         $this->table = 'category';
         $this->className = 'Category';
@@ -256,7 +261,7 @@ class AdminCategoriesControllerCore extends AdminController
         $nb_items = count($this->_list);
         for ($i = 0; $i < $nb_items; $i++) {
             $item = &$this->_list[$i];
-            $category_tree = Category::getChildren((int)$item['id_category'], $this->context->language->id);
+            $category_tree = Category::getChildren((int)$item['id_category'], $this->context->language->id, false);
             if (!count($category_tree)) {
                 $this->addRowActionSkipList('view', array($item['id_category']));
             }
@@ -327,6 +332,10 @@ class AdminCategoriesControllerCore extends AdminController
                     'desc' => $this->l('Back to list')
                 );
             }
+        }
+        if (!$this->lite_display && isset($this->toolbar_btn['back']['href']) && $this->_category->level_depth > 1
+            && $this->_category->id_parent && $this->_category->id_parent != (int)Configuration::get('PS_ROOT_CATEGORY')) {
+            $this->toolbar_btn['back']['href'] .= '&id_category='.(int)$this->_category->id_parent;
         }
     }
 
@@ -442,10 +451,34 @@ class AdminCategoriesControllerCore extends AdminController
             return;
         }
 
-        $image = _PS_CAT_IMG_DIR_.$obj->id.'.jpg';
-        $image_url = ImageManager::thumbnail($image, $this->table.'_'.(int)$obj->id.'.'.$this->imageType, 350,
-            $this->imageType, true, true);
+        $image = _PS_CAT_IMG_DIR_.$obj->id.'.'.$this->imageType;
+        $image_url = ImageManager::thumbnail($image, $this->table.'_'.(int)$obj->id.'.'.$this->imageType, 350, $this->imageType, true, true);
+
         $image_size = file_exists($image) ? filesize($image) / 1000 : false;
+        $images_types = ImageType::getImagesTypes('categories');
+        $format = array();
+        $thumb = $thumb_url = '';
+        $formated_category= ImageType::getFormatedName('category');
+        $formated_medium = ImageType::getFormatedName('medium');
+        foreach ($images_types as $k => $image_type) {
+            if ($formated_category == $image_type['name']) {
+                $format['category'] = $image_type;
+            } elseif ($formated_medium == $image_type['name']) {
+                $format['medium'] = $image_type;
+                $thumb = _PS_CAT_IMG_DIR_.$obj->id.'-'.$image_type['name'].'.'.$this->imageType;
+                if (is_file($thumb)) {
+                    $thumb_url = ImageManager::thumbnail($thumb, $this->table.'_'.(int)$obj->id.'-thumb.'.$this->imageType, (int)$image_type['width'], $this->imageType, true, true);
+                }
+            }
+        }
+
+        if (!is_file($thumb)) {
+            $thumb = $image;
+            $thumb_url = ImageManager::thumbnail($image, $this->table.'_'.(int)$obj->id.'-thumb.'.$this->imageType, 125, $this->imageType, true, true);
+            ImageManager::resize(_PS_TMP_IMG_DIR_.$this->table.'_'.(int)$obj->id.'-thumb.'.$this->imageType, _PS_TMP_IMG_DIR_.$this->table.'_'.(int)$obj->id.'-thumb.'.$this->imageType, (int)$image_type['width'], (int)$image_type['height']);
+        }
+
+        $thumb_size = file_exists($thumb) ? filesize($thumb) / 1000 : false;
 
         $this->fields_form = array(
             'tinymce' => true,
@@ -503,18 +536,29 @@ class AdminCategoriesControllerCore extends AdminController
                 ),
                 array(
                     'type' => 'file',
-                    'label' => $this->l('Image'),
+                    'label' => $this->l('Category Cover Image'),
                     'name' => 'image',
                     'display_image' => true,
                     'image' => $image_url ? $image_url : false,
                     'size' => $image_size,
                     'delete_url' => self::$currentIndex.'&'.$this->identifier.'='.$this->_category->id.'&token='.$this->token.'&deleteImage=1',
-                    'hint' => $this->l('Upload a category logo from your computer.'),
+                   'hint' => $this->l('This is the main image for your category, displayed in the category page. The category description will overlap this image and appear in its top-left corner.'),
+                   'format' => $format['category']
                 ),
                 array(
-                    'type' => 'textarea',
+                   'type' => 'file',
+                   'label' => $this->l('Category thumbnail'),
+                   'name' => 'thumb',
+                   'display_image' => true,
+                   'image' => $thumb_url ? $thumb_url : false,
+                   'size' => $thumb_size,
+                   'format' => $format['medium']
+                ),
+                array(
+                    'type' => 'text',
                     'label' => $this->l('Meta title'),
                     'name' => 'meta_title',
+                    'maxchar' => 70,
                     'lang' => true,
                     'rows' => 5,
                     'cols' => 100,
@@ -524,6 +568,7 @@ class AdminCategoriesControllerCore extends AdminController
                     'type' => 'textarea',
                     'label' => $this->l('Meta description'),
                     'name' => 'meta_description',
+                    'maxchar' => 160,
                     'lang' => true,
                     'rows' => 5,
                     'cols' => 100,
@@ -611,11 +656,11 @@ class AdminCategoriesControllerCore extends AdminController
             return;
         }
 
-        $image = ImageManager::thumbnail(_PS_CAT_IMG_DIR_.'/'.$obj->id.'.jpg', $this->table.'_'.(int)$obj->id.'.'.$this->imageType, 350, $this->imageType, true);
+        $image = ImageManager::thumbnail(_PS_CAT_IMG_DIR_.'/'.$obj->id.'.'.$this->imageType, $this->table.'_'.(int)$obj->id.'.'.$this->imageType, 350, $this->imageType, true);
 
         $this->fields_value = array(
             'image' => $image ? $image : false,
-            'size' => $image ? filesize(_PS_CAT_IMG_DIR_.'/'.$obj->id.'.jpg') / 1000 : false
+            'size' => $image ? filesize(_PS_CAT_IMG_DIR_.'/'.$obj->id.'.'.$this->imageType) / 1000 : false
         );
 
         // Added values of object Group
@@ -643,12 +688,41 @@ class AdminCategoriesControllerCore extends AdminController
         }
         if (Tools::isSubmit('forcedeleteImage') || (isset($_FILES['image']) && $_FILES['image']['size'] > 0) || Tools::getValue('deleteImage')) {
             $this->processForceDeleteImage();
+            $this->processForceDeleteThumb();
             if (Tools::isSubmit('forcedeleteImage')) {
                 Tools::redirectAdmin(self::$currentIndex.'&token='.Tools::getAdminTokenLite('AdminCategories').'&conf=7');
             }
         }
 
         return parent::postProcess();
+    }
+
+    public function processForceDeleteThumb()
+    {
+        $category = $this->loadObject(true);
+
+        if (Validate::isLoadedObject($category)) {
+            if (file_exists(_PS_TMP_IMG_DIR_.$this->table.'_'.$category->id.'-thumb.'.$this->imageType)
+                && !unlink(_PS_TMP_IMG_DIR_.$this->table.'_'.$category->id.'-thumb.'.$this->imageType)) {
+                return false;
+            }
+            if (file_exists(_PS_CAT_IMG_DIR_.$category->id.'_thumb.'.$this->imageType)
+                && !unlink(_PS_CAT_IMG_DIR_.$category->id.'_thumb.'.$this->imageType)) {
+                return false;
+            }
+
+            $images_types = ImageType::getImagesTypes('categories');
+            $formated_medium = ImageType::getFormatedName('medium');
+            foreach ($images_types as $k => $image_type) {
+                if ($formated_medium == $image_type['name'] &&
+                    file_exists(_PS_CAT_IMG_DIR_.$category->id.'-'.$image_type['name'].'.'.$this->imageType) &&
+                    !unlink(_PS_CAT_IMG_DIR_.$category->id.'-'.$image_type['name'].'.'.$this->imageType)
+                ) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     public function processForceDeleteImage()
@@ -787,25 +861,57 @@ class AdminCategoriesControllerCore extends AdminController
     protected function postImage($id)
     {
         $ret = parent::postImage($id);
-        $generate_hight_dpi_images = (bool)Configuration::get('PS_HIGHT_DPI');
+        if (($id_category = (int)Tools::getValue('id_category')) && isset($_FILES) && count($_FILES)) {
+            $name = 'image';
+            if ($_FILES[$name]['name'] != null && file_exists(_PS_CAT_IMG_DIR_.$id_category.'.'.$this->imageType)) {
+                $images_types = ImageType::getImagesTypes('categories');
+                foreach ($images_types as $k => $image_type) {
+                    if (!ImageManager::resize(
+                        _PS_CAT_IMG_DIR_.$id_category.'.'.$this->imageType,
+                        _PS_CAT_IMG_DIR_.$id_category.'-'.stripslashes($image_type['name']).'.'.$this->imageType,
+                        (int)$image_type['width'],
+                        (int)$image_type['height']
+                    )) {
+                        $this->errors = Tools::displayError('An error occurred while uploading category image.');
+                    }
+                }
+            }
 
-        if (($id_category = (int)Tools::getValue('id_category')) &&
-            isset($_FILES) && count($_FILES) && $_FILES['image']['name'] != null &&
-            file_exists(_PS_CAT_IMG_DIR_.$id_category.'.jpg')) {
-            $images_types = ImageType::getImagesTypes('categories');
-            foreach ($images_types as $k => $image_type) {
-                ImageManager::resize(
-                    _PS_CAT_IMG_DIR_.$id_category.'.jpg',
-                    _PS_CAT_IMG_DIR_.$id_category.'-'.stripslashes($image_type['name']).'.jpg',
-                    (int)$image_type['width'], (int)$image_type['height']
-                );
-
-                if ($generate_hight_dpi_images) {
-                    ImageManager::resize(
-                        _PS_CAT_IMG_DIR_.$id_category.'.jpg',
-                        _PS_CAT_IMG_DIR_.$id_category.'-'.stripslashes($image_type['name']).'2x.jpg',
-                        (int)$image_type['width']*2, (int)$image_type['height']*2
-                    );
+            $name = 'thumb';
+            if ($_FILES[$name]['name'] != null) {
+                if (!isset($images_types)) {
+                    $images_types = ImageType::getImagesTypes('categories');
+                }
+                $formated_medium = ImageType::getFormatedName('medium');
+                foreach ($images_types as $k => $image_type) {
+                    if ($formated_medium == $image_type['name']) {
+                        if ($error = ImageManager::validateUpload($_FILES[$name], Tools::getMaxUploadSize())) {
+                            $this->errors[] = $error;
+                        } elseif (!($tmpName = tempnam(_PS_TMP_IMG_DIR_, 'PS')) || !move_uploaded_file($_FILES[$name]['tmp_name'], $tmpName)) {
+                            $ret = false;
+                        } else {
+                            if (!ImageManager::resize(
+                                $tmpName,
+                                _PS_CAT_IMG_DIR_.$id_category.'-'.stripslashes($image_type['name']).'.'.$this->imageType,
+                                (int)$image_type['width'],
+                                (int)$image_type['height']
+                            )) {
+                                $this->errors = Tools::displayError('An error occurred while uploading thumbnail image.');
+                            } elseif (($infos = getimagesize($tmpName)) && is_array($infos)) {
+                                ImageManager::resize(
+                                    $tmpName,
+                                    _PS_CAT_IMG_DIR_.$id_category.'_'.$name.'.'.$this->imageType,
+                                    (int)$infos[0],
+                                    (int)$infos[1]
+                                );
+                            }
+                            if (count($this->errors)) {
+                                $ret = false;
+                            }
+                            unlink($tmpName);
+                            $ret = true;
+                        }
+                    }
                 }
             }
         }
@@ -838,8 +944,6 @@ class AdminCategoriesControllerCore extends AdminController
         $category = new Category($id_category_to_move);
         if (Validate::isLoadedObject($category)) {
             if (isset($position) && $category->updatePosition($way, $position)) {
-                Hook::exec('actionCategoryUpdate');
-
                 /* Position '0' was not found in given positions so try to reorder parent category*/
                 if (!$found_first) {
                     $category->cleanPositions((int)$category->id_parent);

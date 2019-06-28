@@ -68,3 +68,12 @@ background: none !important;
 .selectedCheckedDate {
   border:1px solid #007ab7!important;
 }
+
+/* .hasDatepicker {
+  background-color: #fff!important;
+  height: 35px;
+  background-image: url(../../views/img/icon/icon-calendar.png)!important;
+  background-repeat: no-repeat!important;
+  background-position: 96% 50%!important;
+  cursor: text!important;
+} */

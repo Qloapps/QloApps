@@ -2,7 +2,6 @@
 <entity_quick_access>
   <quick_access id="Home" name="Home"/>
   <quick_access id="My_Shop" name="My Shop"/>
-  <quick_access id="New_category" name="New category"/>
   <quick_access id="New_product" name="New product"/>
   <quick_access id="New_voucher" name="New voucher"/>
 </entity_quick_access>

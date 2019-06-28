@@ -45,21 +45,31 @@ class HotelRoomInformation extends ObjectModel
         ),
     );
 
+    public function update($null_values = false)
+    {
+        if ($idRoom = $this->id) {
+            // delete rooms from cart which are set inactive
+            if ($this->id_status == 2) {
+                $objCartBookingData = new HotelCartBookingData();
+                if (!$objCartBookingData->deleteCartBookingData(0, 0, $idRoom)) {
+                    return false;
+                }
+            }
+        }
+        return parent::update();
+    }
+
     //Overrided ObjectModel::delete()
     public function delete()
     {
-        $hotelResModInstance = Module::getInstanceByName('hotelreservationsystem');
         if ($idRoom = $this->id) {
-            if (!$this->deleteRoomDisableDates() || !parent::delete()) {
-                $context = Context::getContext();
-                $context->controller->errors[] = $hotelResModInstance->l('Some error has occurred while deleting room(s). Please try again later !!', 'HotelRoomInformation');
-
+            $objCartBookingData = new HotelCartBookingData();
+            if (!$this->deleteRoomDisableDates()
+                || !$objCartBookingData->deleteCartBookingData(0, 0, $idRoom)
+                || !parent::delete()
+            ) {
                 return false;
             }
-        } else {
-            $context->controller->errors[] = $hotelResModInstance->l('Some error has occurred while deleting room(s). Please try again later !!', 'HotelRoomInformation');
-
-            return false;
         }
         return true;
     }
@@ -84,10 +94,19 @@ class HotelRoomInformation extends ObjectModel
      * @param  [int] $id_product [Id of the product form which all rooms information to be deleted]
      * @return [Boolean]         [Returns true if deleted successfully else returns false]
      */
-    public function deleteByProductId($id_product)
+    public function deleteByProductId($idProduct)
     {
-        $delete = Db::getInstance()->delete('htl_room_information', '`id_product`='.(int)$id_product);
-        return $delete;
+        if ($rooms = Db::getInstance()->executeS(
+            'SELECT * FROM `'._DB_PREFIX_.'htl_room_information` WHERE `id_product`='.(int) $idProduct
+        )) {
+            foreach ($rooms as $room) {
+                $objRoomInfo = new HotelRoomInformation($room['id']);
+                if (!$objRoomInfo->delete()) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     /**

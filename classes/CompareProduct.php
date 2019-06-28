@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -136,23 +136,15 @@ class CompareProductCore extends ObjectModel
      * @param string $period
      * @return void
      */
-    public static function cleanCompareProducts($period = 'week')
+    public static function cleanCompareProducts($period = null)
     {
-        if ($period === 'week') {
-            $interval = '1 WEEK';
-        } elseif ($period === 'month') {
-            $interval = '1 MONTH';
-        } elseif ($period === 'year') {
-            $interval = '1 YEAR';
-        } else {
-            return;
+        if ($period !== null) {
+            Tools::displayParameterAsDeprecated('period');
         }
 
-        if ($interval != null) {
-            Db::getInstance()->execute('
-			DELETE cp, c FROM `'._DB_PREFIX_.'compare_product` cp, `'._DB_PREFIX_.'compare` c
-			WHERE cp.date_upd < DATE_SUB(NOW(), INTERVAL 1 WEEK) AND c.`id_compare`=cp.`id_compare`');
-        }
+        Db::getInstance()->execute('
+        DELETE cp, c FROM `'._DB_PREFIX_.'compare_product` cp, `'._DB_PREFIX_.'compare` c
+        WHERE cp.date_upd < DATE_SUB(NOW(), INTERVAL 1 WEEK) AND c.`id_compare`=cp.`id_compare`');
     }
 
     /**

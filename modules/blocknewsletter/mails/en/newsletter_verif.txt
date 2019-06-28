@@ -1,13 +1,13 @@
 
-[{shop_url}]
+[/{shop_url}] 
 
-Hi,
+Hi, 
 
 Thank you for subscribing to our newsletter, please confirm your
 request by clicking the link below :
 
-{verif_url} [{verif_url}]
+{verif_url} [/{verif_url}] 		 
 
-{shop_name} [{shop_url}] powered by
-Webkul(tm) [https://webkul.com/]
+{shop_name} [/{shop_url}] powered by PrestaShop(tm)
+[http://www.prestashop.com/] 
 

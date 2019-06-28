@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -86,5 +86,18 @@ class ModuleFrontControllerCore extends FrontController
         }
 
         return false;
+    }
+
+    public function initContent()
+    {
+        if (Tools::isSubmit('module') && Tools::getValue('controller') == 'payment') {
+            $currency = Currency::getCurrency((int)$this->context->cart->id_currency);
+            $orderTotal = $this->context->cart->getOrderTotal();
+            $minimal_purchase = Tools::convertPrice((float)Configuration::get('PS_PURCHASE_MINIMUM'), $currency);
+            if ($this->context->cart->getOrderTotal(false, Cart::ONLY_PRODUCTS) < $minimal_purchase) {
+                Tools::redirect('index.php?controller=order&step=1');
+            }
+        }
+        parent::initContent();
     }
 }

@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -496,10 +496,16 @@ class AdminThemesControllerCore extends AdminController
 
     public function downloadAddonsThemes()
     {
-        if (!$this->logged_on_addons) {
+        if (
+            !$this->logged_on_addons
+            || !in_array(
+                    $this->authorizationLevel(),
+                    array(AdminController::LEVEL_ADD, AdminController::LEVEL_DELETE)
+                )
+            || _PS_MODE_DEMO_
+        ) {
             return false;
         }
-
         if (!$this->isFresh(Theme::CACHE_FILE_CUSTOMER_THEMES_LIST, 86400)) {
             file_put_contents(_PS_ROOT_DIR_.Theme::CACHE_FILE_CUSTOMER_THEMES_LIST, Tools::addonsRequest('customer_themes'));
         }
@@ -601,41 +607,59 @@ class AdminThemesControllerCore extends AdminController
 
     public function processUpdate()
     {
-        if (Tools::getIsset('id_theme') && Tools::getIsset('name') && Tools::getIsset('directory')) {
-            $theme = new Theme((int)Tools::getValue('id_theme'));
-            $theme->name = Tools::getValue('name');
-            $theme->directory = Tools::getValue('directory');
-            $theme->default_left_column = Tools::getValue('default_left_column');
-            $theme->default_right_column = Tools::getValue('default_right_column');
-            $nb_product_per_page = (int)Tools::getValue('product_per_page');
-            if ($nb_product_per_page == 0) {
-                $nb_product_per_page = 1;
-            }
-
-            $theme->product_per_page = $nb_product_per_page;
-
-            if ($this->context->shop->id_theme == (int)Tools::getValue('id_theme')) {
-                Configuration::updateValue('PS_PRODUCTS_PER_PAGE', $nb_product_per_page);
-            }
-
-            if (isset($_FILES['image_preview']) && $_FILES['image_preview']['error'] == 0) {
-                if (@getimagesize($_FILES['image_preview']['tmp_name']) && !ImageManager::validateUpload($_FILES['image_preview'], 300000)) {
-                    move_uploaded_file($_FILES['image_preview']['tmp_name'], _PS_ALL_THEMES_DIR_.$theme->directory.'/preview.jpg');
-                } else {
-                    $this->errors[] = $this->l('Image is not valid.');
-                    $this->display = 'form';
-
-                    return false;
+        if(
+            !in_array(
+                $this->authorizationLevel(),
+                array(AdminController::LEVEL_EDIT, AdminController::LEVEL_ADD, AdminController::LEVEL_DELETE))
+            || _PS_MODE_DEMO_
+        ) {
+            $this->errors[] = Tools::displayError('You do not have permission to edit here.');
+        } else {
+            if (Tools::getIsset('id_theme') && Tools::getIsset('name') && Tools::getIsset('directory')) {
+                $theme = new Theme((int)Tools::getValue('id_theme'));
+                $theme->name = Tools::getValue('name');
+                $theme->directory = Tools::getValue('directory');
+                $theme->default_left_column = Tools::getValue('default_left_column');
+                $theme->default_right_column = Tools::getValue('default_right_column');
+                $nb_product_per_page = (int)Tools::getValue('product_per_page');
+                if ($nb_product_per_page == 0) {
+                    $nb_product_per_page = 1;
                 }
+
+                $theme->product_per_page = $nb_product_per_page;
+
+                if ($this->context->shop->id_theme == (int)Tools::getValue('id_theme')) {
+                    Configuration::updateValue('PS_PRODUCTS_PER_PAGE', $nb_product_per_page);
+                }
+
+                if (isset($_FILES['image_preview']) && $_FILES['image_preview']['error'] == 0) {
+                    if (@getimagesize($_FILES['image_preview']['tmp_name']) && !ImageManager::validateUpload($_FILES['image_preview'], 300000)) {
+                        move_uploaded_file($_FILES['image_preview']['tmp_name'], _PS_ALL_THEMES_DIR_.$theme->directory.'/preview.jpg');
+                    } else {
+                        $this->errors[] = $this->l('Image is not valid.');
+                        $this->display = 'form';
+
+                        return false;
+                    }
+                }
+                $theme->update();
             }
-            $theme->update();
+            Tools::redirectAdmin(Context::getContext()->link->getAdminLink('AdminThemes').'&conf=29');
         }
-        Tools::redirectAdmin(Context::getContext()->link->getAdminLink('AdminThemes').'&conf=29');
     }
 
     protected function processUpdateOptions()
     {
-        parent::processUpdateOptions();
+        if(
+            !in_array(
+                $this->authorizationLevel(),
+                array(AdminController::LEVEL_EDIT, AdminController::LEVEL_ADD, AdminController::LEVEL_DELETE))
+            || _PS_MODE_DEMO_
+        ) {
+            $this->errors[] = Tools::displayError('You do not have permission to edit here.');
+        } else {
+            parent::processUpdateOptions();
+        }
 
         if (!count($this->errors)) {
             Tools::redirectAdmin(Context::getContext()->link->getAdminLink('AdminThemes').'&conf=6');
@@ -644,41 +668,49 @@ class AdminThemesControllerCore extends AdminController
 
     public function processDelete()
     {
+        if(
+            !in_array(
+                $this->authorizationLevel(),
+                array(AdminController::LEVEL_DELETE))
+            || _PS_MODE_DEMO_
+        ) {
+            $this->errors[] = Tools::displayError('You do not have permission to delete here.');
+        } else {
         /** @var Theme $obj */
-        $obj = $this->loadObject();
-        if ($obj) {
-            if ($obj->isUsed()) {
-                $this->errors[] = $this->l('The theme is being used by at least one shop. Please choose another theme before continuing.');
+            $obj = $this->loadObject();
+            if ($obj) {
+                if ($obj->isUsed()) {
+                    $this->errors[] = $this->l('The theme is being used by at least one shop. Please choose another theme before continuing.');
 
-                return false;
-            }
-            $themes = array();
-            foreach (Theme::getThemes() as $theme) {
-                /** @var Theme $theme */
-                if ($theme->id != $obj->id) {
-                    $themes[] = $theme->directory;
+                    return false;
+                }
+                $themes = array();
+                foreach (Theme::getThemes() as $theme) {
+                    /** @var Theme $theme */
+                    if ($theme->id != $obj->id) {
+                        $themes[] = $theme->directory;
+                    }
+                }
+
+                if (is_dir(_PS_ALL_THEMES_DIR_.$obj->directory) && !in_array($obj->directory, $themes)) {
+                    Tools::deleteDirectory(_PS_ALL_THEMES_DIR_.$obj->directory.'/');
+                }
+
+                $ids_themes = Tools::unSerialize(Configuration::get('PS_ADDONS_THEMES_IDS'));
+                if (array_key_exists($obj->directory, $ids_themes)) {
+                    unset($ids_themes[$obj->directory]);
+                }
+
+                $obj->removeMetas();
+            } elseif ($obj === false && $theme_dir = Tools::getValue('theme_dir')) {
+                $theme_dir = basename($theme_dir);
+                if (Tools::deleteDirectory(_PS_ALL_THEMES_DIR_.$theme_dir.'/')) {
+                    Tools::redirectAdmin(Context::getContext()->link->getAdminLink('AdminThemes').'&conf=2');
+                } else {
+                    $this->errors[] = Tools::displayError('The folder cannot be deleted');
                 }
             }
-
-            if (is_dir(_PS_ALL_THEMES_DIR_.$obj->directory) && !in_array($obj->directory, $themes)) {
-                Tools::deleteDirectory(_PS_ALL_THEMES_DIR_.$obj->directory.'/');
-            }
-
-            $ids_themes = Tools::unSerialize(Configuration::get('PS_ADDONS_THEMES_IDS'));
-            if (array_key_exists($obj->directory, $ids_themes)) {
-                unset($ids_themes[$obj->directory]);
-            }
-
-            $obj->removeMetas();
-        } elseif ($obj === false && $theme_dir = Tools::getValue('theme_dir')) {
-            $theme_dir = basename($theme_dir);
-            if (Tools::deleteDirectory(_PS_ALL_THEMES_DIR_.$theme_dir.'/')) {
-                Tools::redirectAdmin(Context::getContext()->link->getAdminLink('AdminThemes').'&conf=2');
-            } else {
-                $this->errors[] = Tools::displayError('The folder cannot be deleted');
-            }
         }
-
         return parent::processDelete();
     }
 
@@ -1429,77 +1461,106 @@ class AdminThemesControllerCore extends AdminController
 
     public function processImportTheme()
     {
-        $this->display = 'importtheme';
+        if(
+            !in_array(
+                $this->authorizationLevel(),
+                array(AdminController::LEVEL_ADD, AdminController::LEVEL_DELETE))
+            || _PS_MODE_DEMO_
+        ) {
+            $this->errors[] = Tools::displayError('You do not have permission to add here.');
+            return false;
+        } else {
+            $this->display = 'importtheme';
 
-        if ($this->context->mode == Context::MODE_HOST) {
-            return true;
-        }
+            if ($this->context->mode == Context::MODE_HOST) {
+                return true;
+            }
 
-        if (isset($_FILES['themearchive']) && isset($_POST['filename']) && Tools::isSubmit('theme_archive_server')) {
-            $uniqid = uniqid();
-            $sandbox = _PS_CACHE_DIR_.'sandbox'.DIRECTORY_SEPARATOR.$uniqid.DIRECTORY_SEPARATOR;
-            mkdir($sandbox);
-            $archive_uploaded = false;
+            if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_FILES['themearchive']) && isset($_POST['filename']) && Tools::isSubmit('theme_archive_server')) {
+                $uniqid = uniqid();
+                $sandbox = _PS_CACHE_DIR_.'sandbox'.DIRECTORY_SEPARATOR.$uniqid.DIRECTORY_SEPARATOR;
+                mkdir($sandbox, 0777, true);
+                $archive_uploaded = false;
 
-            if (Tools::getValue('filename') != '') {
-                $uploader = new Uploader('themearchive');
-                $uploader->setCheckFileSize(false);
-                $uploader->setAcceptTypes(array('zip'));
-                $uploader->setSavePath($sandbox);
-                $file = $uploader->process(Theme::UPLOADED_THEME_DIR_NAME.'.zip');
+                if (Tools::getValue('filename') != '') {
+                    $uploader = new Uploader('themearchive');
+                    $uploader->setCheckFileSize(false);
+                    $uploader->setAcceptTypes(array('zip'));
+                    $uploader->setSavePath($sandbox);
+                    $file = $uploader->process(Theme::UPLOADED_THEME_DIR_NAME.'.zip');
 
-                if ($file[0]['error'] === 0) {
-                    if (Tools::ZipTest($sandbox.Theme::UPLOADED_THEME_DIR_NAME.'.zip')) {
+                    if ($file[0]['error'] === 0) {
+                        if (Tools::ZipTest($sandbox.Theme::UPLOADED_THEME_DIR_NAME.'.zip')) {
+                            $archive_uploaded = true;
+                        } else {
+                            $this->errors[] = $this->l('Zip file seems to be broken');
+                        }
+                    } else {
+                        $this->errors[] = $file[0]['error'];
+                    }
+                } elseif (Tools::getValue('themearchiveUrl') != '') {
+                    if (!Validate::isModuleUrl($url = Tools::getValue('themearchiveUrl'), $this->errors)) {
+                        $this->errors[] = $this->l('Only zip files are allowed');
+                    } elseif (!Tools::copy($url, $sandbox.Theme::UPLOADED_THEME_DIR_NAME.'.zip')) {
+                        $this->errors[] = $this->l('Error during the file download');
+                    } elseif (Tools::ZipTest($sandbox.Theme::UPLOADED_THEME_DIR_NAME.'.zip')) {
+                        $archive_uploaded = true;
+                    } else {
+                        $this->errors[] = $this->l('Zip file seems to be broken');
+                    }
+                } elseif (Tools::getValue('theme_archive_server') != '') {
+                    $filename = _PS_ALL_THEMES_DIR_.Tools::getValue('theme_archive_server');
+                    if (substr($filename, -4) != '.zip') {
+                        $this->errors[] = $this->l('Only zip files are allowed');
+                    } elseif (!copy($filename, $sandbox.Theme::UPLOADED_THEME_DIR_NAME.'.zip')) {
+                        $this->errors[] = $this->l('An error has occurred during the file copy.');
+                    } elseif (Tools::ZipTest($sandbox.Theme::UPLOADED_THEME_DIR_NAME.'.zip')) {
                         $archive_uploaded = true;
                     } else {
                         $this->errors[] = $this->l('Zip file seems to be broken');
                     }
                 } else {
-                    $this->errors[] = $file[0]['error'];
+                    $this->errors[] = $this->l('You must upload or enter a location of your zip');
                 }
-            } elseif (Tools::getValue('themearchiveUrl') != '') {
-                if (!Validate::isModuleUrl($url = Tools::getValue('themearchiveUrl'), $this->errors)) {
-                    $this->errors[] = $this->l('Only zip files are allowed');
-                } elseif (!Tools::copy($url, $sandbox.Theme::UPLOADED_THEME_DIR_NAME.'.zip')) {
-                    $this->errors[] = $this->l('Error during the file download');
-                } elseif (Tools::ZipTest($sandbox.Theme::UPLOADED_THEME_DIR_NAME.'.zip')) {
-                    $archive_uploaded = true;
+
+                if ($archive_uploaded) {
+                    if ($this->extractTheme($sandbox.Theme::UPLOADED_THEME_DIR_NAME.'.zip', $sandbox)) {
+                        $this->installTheme(Theme::UPLOADED_THEME_DIR_NAME, $sandbox);
+                    }
+                }
+
+                Tools::deleteDirectory($sandbox);
+
+                if (count($this->errors) > 0) {
+                    $this->display = 'importtheme';
                 } else {
-                    $this->errors[] = $this->l('Zip file seems to be broken');
+                    Tools::redirectAdmin(Context::getContext()->link->getAdminLink('AdminThemes').'&conf=18');
                 }
-            } elseif (Tools::getValue('theme_archive_server') != '') {
-                $filename = _PS_ALL_THEMES_DIR_.Tools::getValue('theme_archive_server');
-                if (substr($filename, -4) != '.zip') {
-                    $this->errors[] = $this->l('Only zip files are allowed');
-                } elseif (!copy($filename, $sandbox.Theme::UPLOADED_THEME_DIR_NAME.'.zip')) {
-                    $this->errors[] = $this->l('An error has occurred during the file copy.');
-                } elseif (Tools::ZipTest($sandbox.Theme::UPLOADED_THEME_DIR_NAME.'.zip')) {
-                    $archive_uploaded = true;
-                } else {
-                    $this->errors[] = $this->l('Zip file seems to be broken');
-                }
-            } else {
-                $this->errors[] = $this->l('You must upload or enter a location of your zip');
-            }
-
-            if ($archive_uploaded) {
-                if ($this->extractTheme($sandbox.Theme::UPLOADED_THEME_DIR_NAME.'.zip', $sandbox)) {
-                    $this->installTheme(Theme::UPLOADED_THEME_DIR_NAME, $sandbox);
-                }
-            }
-
-            Tools::deleteDirectory($sandbox);
-
-            if (count($this->errors) > 0) {
-                $this->display = 'importtheme';
-            } else {
-                Tools::redirectAdmin(Context::getContext()->link->getAdminLink('AdminThemes').'&conf=18');
+            } elseif ($_SERVER['REQUEST_METHOD'] == 'POST') {
+                //method is POST but no uplad info -> there is post error
+                $max_post = (int)ini_get('post_max_size');
+                $this->errors[] = sprintf($this->l('The file size exceeds the size allowed by the server. The limit is set to %s MB.'), '<b>'.$max_post.'</b>');
             }
         }
     }
 
     protected function extractTheme($theme_zip_file, $sandbox)
     {
+        if (
+            !in_array(
+                    $this->authorizationLevel(),
+                    array(
+                        AdminController::LEVEL_EDIT,
+                        AdminController::LEVEL_ADD,
+                        AdminController::LEVEL_DELETE
+                        )
+                )
+            || _PS_MODE_DEMO_
+        ) {
+            $this->errors[] = $this->l('You do not have permission to extract here.');
+            return false;
+        }
+
         if (Tools::ZipExtract($theme_zip_file, $sandbox.Theme::UPLOADED_THEME_DIR_NAME.'/')) {
             return true;
         }
@@ -1510,48 +1571,58 @@ class AdminThemesControllerCore extends AdminController
 
     protected function installTheme($theme_dir, $sandbox = false, $redirect = true)
     {
-        if (!$sandbox) {
-            $uniqid = uniqid();
-            $sandbox = _PS_CACHE_DIR_.'sandbox'.DIRECTORY_SEPARATOR.$uniqid.DIRECTORY_SEPARATOR;
-            mkdir($sandbox);
-            Tools::recurseCopy(_PS_ALL_THEMES_DIR_.$theme_dir, $sandbox.$theme_dir);
-        }
+        if (
+            in_array(
+                $this->authorizationLevel(),
+                array(
+                    AdminController::LEVEL_ADD,
+                    AdminController::LEVEL_DELETE
+                    )
+            )
+            && !_PS_MODE_DEMO_
+        ) {
+            if (!$sandbox) {
+                $uniqid = uniqid();
+                $sandbox = _PS_CACHE_DIR_.'sandbox'.DIRECTORY_SEPARATOR.$uniqid.DIRECTORY_SEPARATOR;
+                mkdir($sandbox);
+                Tools::recurseCopy(_PS_ALL_THEMES_DIR_.$theme_dir, $sandbox.$theme_dir);
+            }
 
-        $xml_file = $sandbox.$theme_dir.'/Config.xml';
-        if (!$this->checkXmlFields($xml_file)) {
-            $this->errors[] = $this->l('Bad configuration file');
-        } else {
-            $imported_theme = $this->importThemeXmlConfig(simplexml_load_file($xml_file));
-            foreach ($imported_theme as $theme) {
-                if (Validate::isLoadedObject($theme)) {
-                    if (!copy($sandbox.$theme_dir.'/Config.xml', _PS_ROOT_DIR_.'/config/xml/themes/'.$theme->directory.'.xml')) {
-                        $this->errors[] = $this->l('Can\'t copy configuration file');
+            $xml_file = $sandbox.$theme_dir.'/Config.xml';
+            if (!$this->checkXmlFields($xml_file)) {
+                $this->errors[] = $this->l('Bad configuration file');
+            } else {
+                $imported_theme = $this->importThemeXmlConfig(simplexml_load_file($xml_file));
+                foreach ($imported_theme as $theme) {
+                    if (Validate::isLoadedObject($theme)) {
+                        if (!copy($sandbox.$theme_dir.'/Config.xml', _PS_ROOT_DIR_.'/config/xml/themes/'.$theme->directory.'.xml')) {
+                            $this->errors[] = $this->l('Can\'t copy configuration file');
+                        }
+
+                        $target_dir = _PS_ALL_THEMES_DIR_.$theme->directory;
+                        if (file_exists($target_dir)) {
+                            Tools::deleteDirectory($target_dir);
+                        }
+
+                        $theme_doc_dir = $target_dir.'/docs/';
+                        if (file_exists($theme_doc_dir)) {
+                            Tools::deleteDirectory($theme_doc_dir);
+                        }
+
+                        mkdir($target_dir);
+                        mkdir($theme_doc_dir);
+
+                        Tools::recurseCopy($sandbox.$theme_dir.'/themes/'.$theme->directory.'/', $target_dir.'/');
+                        Tools::recurseCopy($sandbox.$theme_dir.'/doc/', $theme_doc_dir);
+                        Tools::recurseCopy($sandbox.$theme_dir.'/modules/', _PS_MODULE_DIR_);
+                    } else {
+                        $this->errors[] = $theme;
                     }
-
-                    $target_dir = _PS_ALL_THEMES_DIR_.$theme->directory;
-                    if (file_exists($target_dir)) {
-                        Tools::deleteDirectory($target_dir);
-                    }
-
-                    $theme_doc_dir = $target_dir.'/docs/';
-                    if (file_exists($theme_doc_dir)) {
-                        Tools::deleteDirectory($theme_doc_dir);
-                    }
-
-                    mkdir($target_dir);
-                    mkdir($theme_doc_dir);
-
-                    Tools::recurseCopy($sandbox.$theme_dir.'/themes/'.$theme->directory.'/', $target_dir.'/');
-                    Tools::recurseCopy($sandbox.$theme_dir.'/doc/', $theme_doc_dir);
-                    Tools::recurseCopy($sandbox.$theme_dir.'/modules/', _PS_MODULE_DIR_);
-                } else {
-                    $this->errors[] = $theme;
                 }
             }
+
+            Tools::deleteDirectory($sandbox);
         }
-
-        Tools::deleteDirectory($sandbox);
-
         if (!count($this->errors)) {
             if ($redirect) {
                 Tools::redirectAdmin(Context::getContext()->link->getAdminLink('AdminThemes').'&conf=18');
@@ -2400,8 +2471,19 @@ class AdminThemesControllerCore extends AdminController
 
         foreach ($module_hooks as $hooks) {
             foreach ($hooks as $hook) {
+                $id_hook = (int)Hook::getIdByName($hook['hook']);
+                // If hook does not exist, we create it
+                if (!$id_hook) {
+                    $new_hook = new Hook();
+                    $new_hook->name = pSQL($hook['hook']);
+                    $new_hook->title = pSQL($hook['hook']);
+                    $new_hook->live_edit = (bool)preg_match('/^display/i', $new_hook->name);
+                    $new_hook->position = (bool)$new_hook->live_edit;
+                    $new_hook->add();
+                    $id_hook = (int) $new_hook->id;
+                }
                 $sql_hook_module = 'INSERT INTO `'._DB_PREFIX_.'hook_module` (`id_module`, `id_shop`, `id_hook`, `position`)
-									VALUES ('.(int)$id_module.', '.(int)$shop.', '.(int)Hook::getIdByName($hook['hook']).', '.(int)$hook['position'].')';
+									VALUES ('.(int)$id_module.', '.(int)$shop.', '.(int)$id_hook.', '.(int)$hook['position'].')';
 
                 if (count($hook['exceptions']) > 0) {
                     foreach ($hook['exceptions'] as $exception) {
@@ -2580,10 +2662,22 @@ class AdminThemesControllerCore extends AdminController
             if (!empty($val) && !$this->_isThemeCompatible($val)) { // don't submit if errors
                 unset($_POST['submitThemes'.$this->table]);
             }
+            if(
+                Tools::getValue('updatetheme')
+                && (
+                    !in_array(
+                        $this->authorizationLevel(),
+                        array(AdminController::LEVEL_EDIT, AdminController::LEVEL_ADD, AdminController::LEVEL_DELETE))
+                    || _PS_MODE_DEMO_
+                    )
+            ) {
+                Tools::redirectAdmin(self::$currentIndex.'&token='.$this->token.'&error');
+            }
+
             Tools::clearCache($this->context->smarty);
 
             return parent::postProcess();
-        }
+       }
     }
 
     /**
@@ -2753,6 +2847,9 @@ class AdminThemesControllerCore extends AdminController
 
     public function initProcess()
     {
+        if (isset($_GET['error'])) {
+            $this->errors[] = Tools::displayError('You do not have permission to edit this.');
+        }
         if ((isset($_GET['responsive'.$this->table]) || isset($_GET['responsive'])) && Tools::getValue($this->identifier)) {
             if ($this->tabAccess['edit'] === '1') {
                 $this->action = 'responsive';

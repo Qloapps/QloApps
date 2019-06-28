@@ -32,7 +32,7 @@ class WkHotelFeaturesBlock extends Module
     {
         $this->name = 'wkhotelfeaturesblock';
         $this->tab = 'front_office_features';
-        $this->version = '1.1.0';
+        $this->version = '2.0.1';
         $this->author = 'webkul';
         $this->bootstrap = true;
         parent::__construct();
@@ -70,14 +70,11 @@ class WkHotelFeaturesBlock extends Module
         return $this->display(__FILE__, 'hotelFeatureSettingLink.tpl');
     }
 
-    public function hookDisplayFooterExploreSectionHook()
-    {
-        return $this->display(__FILE__, 'hotelFeatureFooterExploreLink.tpl');
-    }
-
     public function hookDisplayDefaultNavigationHook()
     {
-        return $this->display(__FILE__, 'hotelFeatureNaviagtionMenu.tpl');
+        if (Configuration::get('HOTEL_AMENITIES_BLOCK_NAV_LINK')) {
+            return $this->display(__FILE__, 'hotelFeatureNaviagtionMenu.tpl');
+        }
     }
 
     /**
@@ -102,7 +99,7 @@ class WkHotelFeaturesBlock extends Module
 
     public function callInstallTab()
     {
-        //Controllers which are to be used in this modules but we have not to create tab for those ontrollers...
+        //Controllers which are to be used in this modules but we have not to create tab for those Controllers...
         $this->installTab('AdminFeaturesModuleSetting', 'Hotel Amenities Configurations');
         return true;
     }
@@ -147,10 +144,11 @@ class WkHotelFeaturesBlock extends Module
                 }
             }
         }
+        $objFeaturesData = new WkHotelFeaturesData();
         if (!parent::install()
             || !$this->registerModuleHooks()
             || !$this->callInstallTab()
-            || !WkHotelFeaturesData::insertModuleDemoData()
+            || !$objFeaturesData->insertModuleDemoData()
         ) {
             return false;
         }

@@ -1,5 +1,5 @@
 {*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -18,7 +18,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *	@author PrestaShop SA <contact@prestashop.com>
-*	@copyright	2007-2015 PrestaShop SA
+*	@copyright	2007-2017 PrestaShop SA
 *	@license		http://opensource.org/licenses/afl-3.0.php	Academic Free License (AFL 3.0)
 *	International Registered Trademark & Property of PrestaShop SA
 *}
@@ -26,13 +26,13 @@
 <script type="text/javascript">
 	var summary_translation_undefined = '{l s='[undefined]' js=1}';
 	var summary_translation_meta_informations = '{l s='This carrier is @s1 and the delivery announced is: @s2.' js=1}';
-	var summary_translation_free = '<strong>{l s='free' js=1}</strong>';
-	var summary_translation_paid = '<strong>{l s='not free' js=1}</strong>';
+	var summary_translation_free = '{l s='free' js=1}';
+	var summary_translation_paid = '{l s='not free' js=1}';
 	var summary_translation_range = '<span class="is_free">{l s='This carrier can deliver orders from @s1 to @s2.' js=1}</span>';
 	var summary_translation_range_limit =  '{l s='If the order is out of range, the behavior is to @s3.' js=1}';
 	var summary_translation_shipping_cost = '{l s='The shipping cost is calculated @s1 and the tax rule @s2 will be applied.' js=1}';
-	var summary_translation_price = '<strong>{l s='according to the price' js=1}</strong>';
-	var summary_translation_weight = '<strong>{l s='according to the weight' js=1}</strong>';
+	var summary_translation_price = '{l s='according to the price' js=1}';
+	var summary_translation_weight = '{l s='according to the weight' js=1}';
 </script>
 
 <div class="defaultForm">

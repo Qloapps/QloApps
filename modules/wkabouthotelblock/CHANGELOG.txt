@@ -1,4 +1,39 @@
 -----------------------------
+# V1.1.1 to V1.1.2
+-----------------------------
+
+## Improved/changed features
+
+[*] BO : Images validation improved client side (for post_max_size issue).
+[*] BO : Validate::isGenericName validation added for title and description fields.
+
+## Update Policy
+
+- Mobule need only file update, can be updated only by UPLOADING new version on module
+
+
+-----------------------------
+# V1.1.0 to V1.1.1
+-----------------------------
+
+## Added features
+
+[+] BO : Configuration option "Show link at navigation" given to choose whether show "About Hotel Block" link at navigation menu or not.
+
+
+## Improved/changed features
+
+[+] BO : Images validation improved.
+[+] BO : Render option moved above render list at AdminAboutHotelBlockSetting controller.
+- [BO] : "Interior" link is removed from footer explore block.
+
+
+## Update Policy
+
+- Mobule need only file update, can be updated only by UPLOADING new version on module
+
+
+-----------------------------
 # V1.0.1 to V1.1.0
 -----------------------------
 

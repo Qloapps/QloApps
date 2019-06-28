@@ -1,5 +1,5 @@
 /*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -18,7 +18,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registred Trademark & Property of PrestaShop SA
 */
@@ -27,6 +27,7 @@ var ajaxQueries = new Array();
 var ajaxLoaderOn = 0;
 var sliderList = new Array();
 var slidersInit = false;
+var lockLocationChecking = false;
 
 $(document).ready(function()
 {
@@ -93,17 +94,12 @@ $(document).ready(function()
 	});
 
 	// Click on label
-	$('#layered_block_left label:not(.layered_color) a').on({
-		click: function(e) {
-			e.preventDefault();
-			var disable = $(this).parent().parent().find('input').attr('disabled');
-			if (disable == ''
-			|| typeof(disable) == 'undefined'
-			|| disable == false)
-			{
-				$(this).parent().parent().find('input').click();
-				reloadContent();
-			}
+	$(document).on('click', '#layered_block_left label:not(.layered_color) a', function(e) {
+		e.preventDefault();
+		var disable = $(this).parent().parent().find('input').attr('disabled');
+		if (disable == '' || typeof(disable) == 'undefined' || disable == false)
+		{
+			$(this).parent().parent().find('input').click();
 		}
 	});
 
@@ -119,17 +115,17 @@ $(document).ready(function()
 		hideFilterValueAction(this);
 	});
 
-	$('.selectProductSort').unbind('change').bind('change', function(event) {
+	$(document).off('change', '.selectProductSort').on('change', '.selectProductSort', function(e) {
 		$('.selectProductSort').val($(this).val());
 
 		if($('#layered_form').length > 0)
-			reloadContent(true);
+			reloadContent('forceSlide');
 	});
 
-	$(document).off('change', '#layered_form select[name=n]').on('change', '#layered_form select[name=n]', function(e)
+	$(document).off('change', 'select[name="n"]').on('change', 'select[name="n"]', function(e)
 	{
 		$('select[name=n]').val($(this).val());
-		reloadContent(true);
+		reloadContent('forceSlide');
 	});
 
 	paginationButton(false);
@@ -312,10 +308,10 @@ function paginationButton(nbProductsIn, nbProductOut)
 			var nbPage = parseInt($('div.pagination li.current').children().children().html());
 			var nb_products = nbProductsIn;
 
-			if ($('#nb_item option:selected').length == 0)
+			if ($('#nb_page_items option:selected').length == 0)
 				var nbPerPage = nb_products;
 			else
-				var nbPerPage = parseInt($('#nb_item option:selected').val());
+				var nbPerPage = parseInt($('#nb_page_items option:selected').val());
 
 			isNaN(nbPage) ? nbPage = 1 : nbPage = nbPage;
 			nbPerPage*nbPage < nb_products ? productShowing = nbPerPage*nbPage :productShowing = (nbPerPage*nbPage-nb_products-nbPerPage*nbPage)*-1;
@@ -468,7 +464,7 @@ function reloadContent(params_plus)
 	}
 
 	var slideUp = true;
-	if (typeof params_plus === undefined || !(typeof params_plus === 'string'))
+	if (typeof params_plus === 'undefined' || !(typeof params_plus === 'string'))
 	{
 		params_plus = '';
 		slideUp = false;
@@ -487,11 +483,14 @@ function reloadContent(params_plus)
 	{
 		type: 'GET',
 		url: baseDir + 'modules/blocklayered/blocklayered-ajax.php',
-		data: data+params_plus+n,
+		data: data + '&' + params_plus + n,
 		dataType: 'json',
 		cache: false, // @todo see a way to use cache and to add a timestamps parameter to refresh cache each 10 minutes for example
 		success: function(result)
 		{
+			if (typeof(result) === 'undefined')
+				return;
+
 			if (result.meta_description != '')
 				$('meta[name="description"]').attr('content', result.meta_description);
 

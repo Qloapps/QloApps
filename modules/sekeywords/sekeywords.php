@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2014 PrestaShop
+* 2007-2016 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2014 PrestaShop SA
+*  @copyright  2007-2016 PrestaShop SA
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -38,7 +38,7 @@ class SEKeywords extends ModuleGraph
     {
         $this->name = 'sekeywords';
         $this->tab = 'analytics_stats';
-        $this->version = '1.2.4';
+        $this->version = '1.4.1';
         $this->author = 'PrestaShop';
         $this->need_instance = 0;
 
@@ -56,6 +56,7 @@ class SEKeywords extends ModuleGraph
 
         $this->displayName = $this->l('Search engine keywords');
         $this->description = $this->l('Displays which keywords have led visitors to your website.');
+        $this->ps_versions_compliancy = array('min' => '1.6', 'max' => '1.7.0.99');
     }
 
     public function install()
@@ -126,7 +127,7 @@ class SEKeywords extends ModuleGraph
 			<h4>'.$this->l('How does it work?').'</h4>
 			<p>'
             .$this->l('When a visitor comes to your website, the web server notes the URL of the site he/she comes from. This module then parses the URL, and if it finds a reference to a known search engine, it finds the keywords in it.').'<br>'.
-            $this->l('This module can recognize all the search engines listed in Qloapps\'s Stats/Search Engine page -- and you can add more!').'<br>'.
+            $this->l('This module can recognize all the search engines listed in QloApps\'s Stats/Search Engine page -- and you can add more!').'<br>'.
             $this->l('IMPORTANT NOTE: in September 2013, Google chose to encrypt its searches queries using SSL. This means all the referer-based tools in the World (including this one) cannot identify Google keywords anymore.').'
 			</p>
 		</div>

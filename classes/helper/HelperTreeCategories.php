@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -59,17 +59,45 @@ class HelperTreeCategoriesCore extends TreeCore
         $this->setUseShopRestriction($use_shop_restriction);
     }
 
-    private function fillTree(&$categories, $id_category)
+    private function fillTree(&$categories, $rootCategoryId)
     {
         $tree = array();
-        foreach ($categories[$id_category] as $category) {
-            $tree[$category['id_category']] = $category;
-            if (!empty($categories[$category['id_category']])) {
-                $tree[$category['id_category']]['children'] = $this->fillTree($categories, $category['id_category']);
-            } elseif ($result = Category::hasChildren($category['id_category'], $this->getLang(), false, $this->getShop()->id)) {
-                $tree[$category['id_category']]['children'] = array($result[0]['id_category'] => $result[0]);
+        $rootCategoryId = (int)$rootCategoryId;
+
+        foreach ($categories[$rootCategoryId] as $category) {
+            $categoryId = (int)$category['id_category'];
+            $tree[$categoryId] = $category;
+
+            if (Category::hasChildren($categoryId, $this->getLang(), false, $this->getShop()->id)) {
+                $categoryChildren = Category::getChildren(
+                    $categoryId,
+                    $this->getLang(),
+                    false,
+                    $this->getShop()->id
+                );
+
+                foreach ($categoryChildren as $index => $child) {
+                    $childId = (int)$child['id_category'];
+
+                    if (!array_key_exists('children', $tree[$categoryId])) {
+                        $tree[$categoryId]['children'] = array($childId => $child);
+                    } else {
+                        $tree[$categoryId]['children'][$childId] = $child;
+                    }
+
+                    $categories[$childId] = array($child);
+                }
+
+                foreach ($tree[$categoryId]['children'] as $childId => $child) {
+                    $subtree = $this->fillTree($categories, $childId);
+
+                    foreach ($subtree as $subcategoryId => $subcategory) {
+                        $tree[$categoryId]['children'][$subcategoryId] = $subcategory;
+                    }
+                }
             }
         }
+
         return $tree;
     }
 

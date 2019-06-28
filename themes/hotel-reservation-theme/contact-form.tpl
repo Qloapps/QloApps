@@ -1,8 +1,33 @@
+{*
+* 2007-2017 PrestaShop
+*
+* NOTICE OF LICENSE
+*
+* This source file is subject to the Academic Free License (AFL 3.0)
+* that is bundled with this package in the file LICENSE.txt.
+* It is also available through the world-wide-web at this URL:
+* http://opensource.org/licenses/afl-3.0.php
+* If you did not receive a copy of the license and are unable to
+* obtain it through the world-wide-web, please send an email
+* to license@prestashop.com so we can send you a copy immediately.
+*
+* DISCLAIMER
+*
+* Do not edit or add to this file if you wish to upgrade PrestaShop to newer
+* versions in the future. If you wish to customize PrestaShop for your
+* needs please refer to http://www.prestashop.com for more information.
+*
+*  @author PrestaShop SA <contact@prestashop.com>
+*  @copyright  2007-2017 PrestaShop SA
+*  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+*  International Registered Trademark & Property of PrestaShop SA
+*}
+
 {if isset($confirmation)}
 	<p class="alert alert-success">{l s='Your message has been successfully sent to our team.'}</p>
 	<ul class="footer_links clearfix">
 		<li>
-			<a class="btn btn-default button button-small" href="{$base_dir}">
+			<a class="btn btn-default button button-small" href="{if isset($force_ssl) && $force_ssl}{$base_dir_ssl}{else}{$base_dir}{/if}">
 				<span>
 					<i class="icon-chevron-left"></i>{l s='Home'}
 				</span>
@@ -13,7 +38,7 @@
 	<p class="alert alert-warning">{l s='Your message has already been sent.'}</p>
 	<ul class="footer_links clearfix">
 		<li>
-			<a class="btn btn-default button button-small" href="{$base_dir}">
+			<a class="btn btn-default button button-small" href="{if isset($force_ssl) && $force_ssl}{$base_dir_ssl}{else}{$base_dir}{/if}">
 				<span>
 					<i class="icon-chevron-left"></i>{l s='Home'}
 				</span>
@@ -135,6 +160,8 @@
 					{/if}
 					{hook h='displayGDPRConsent' moduleName='contactform'}
 					<div class="form-group">
+						<input type="text" name="url" value="" class="hidden" />
+						<input type="hidden" name="contactKey" value="{$contactKey}" />
 						<button class="btn button button-medium contact_btn" type="submit" name="submitMessage" id="submitMessage" ><span>{l s='Send Message'}</span></button>
 					</div>
 				</form>

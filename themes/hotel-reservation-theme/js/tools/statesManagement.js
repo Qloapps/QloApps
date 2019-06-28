@@ -1,5 +1,5 @@
 /*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -18,7 +18,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -30,7 +30,8 @@ var states = [];
 $(document).ready(function(){
 	setCountries();
 	bindStateInputAndUpdate();
-	bindUniform();
+	if (typeof bindUniform !=='undefined')
+		bindUniform();
 	bindZipcode();
 	bindCheckbox();
 	$(document).on('click', '#invoice_address', function(e){
@@ -69,7 +70,8 @@ function bindCheckbox()
 		$('#opc_invoice_address').slideDown('slow');
 		if ($('#company_invoice').val() == '')
 			$('#vat_number_block_invoice').hide();
-		bindUniform();
+		if (typeof bindUniform !=='undefined')
+			bindUniform();
 	}
 	else
 		$('#opc_invoice_address').slideUp('slow');
@@ -140,7 +142,7 @@ function updateState(suffix)
 		});
 
 		$('.id_state' + (typeof suffix !== 'undefined' ? '_' + suffix : '') + ':hidden').fadeIn('slow');
-		$('#id_state, #id_state_invoice').uniform();
+		$('#id_state_invoice').uniform();
 	}
 	else
 		$('.id_state' + (typeof suffix !== 'undefined' ? '_' + suffix : '')).fadeOut('fast');

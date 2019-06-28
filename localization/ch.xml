@@ -4,7 +4,7 @@
 		<currency name="Franc" iso_code="CHF" iso_code_num="756" sign="CHF" blank="1" conversion_rate="1.34183" format="5" decimals="1" />
 	</currencies>
 	<languages>
-		<language iso_code="dh" />
+		<language iso_code="de" />
 		<language iso_code="fr" />
 		<language iso_code="it" />
 	</languages>

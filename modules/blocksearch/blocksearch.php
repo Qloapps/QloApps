@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2015 PrestaShop
+* 2007-2016 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2016 PrestaShop SA
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -33,7 +33,7 @@ class BlockSearch extends Module
 	{
 		$this->name = 'blocksearch';
 		$this->tab = 'search_filter';
-		$this->version = '1.6.0';
+		$this->version = '1.7.1';
 		$this->author = 'PrestaShop';
 		$this->need_instance = 0;
 
@@ -41,12 +41,12 @@ class BlockSearch extends Module
 
 		$this->displayName = $this->l('Quick search block');
 		$this->description = $this->l('Adds a quick search field to your website.');
-		$this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
+		$this->ps_versions_compliancy = array('min' => '1.6', 'max' => '1.6.99.99');
 	}
 
 	public function install()
 	{
-		if (!parent::install() || !$this->registerHook('top') || !$this->registerHook('header') || !$this->registerHook('displayMobileTopSiteMap'))
+		if (!parent::install() || !$this->registerHook('top') || !$this->registerHook('header') || !$this->registerHook('displayMobileTopSiteMap') || !$this->registerHook('displaySearch'))
 			return false;
 		return true;
 	}
@@ -125,6 +125,11 @@ public function hookDisplayMobileHeader($params)
 		return $this->hookTop($params);
 	}
 
+	public function hookDisplaySearch($params)
+    {
+        return $this->hookRightColumn($params);
+    }
+
 	private function calculHookCommon($params)
 	{
 		$this->smarty->assign(array(
@@ -138,4 +143,3 @@ public function hookDisplayMobileHeader($params)
 		return true;
 	}
 }
-

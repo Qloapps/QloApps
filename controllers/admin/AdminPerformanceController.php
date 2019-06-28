@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -151,7 +151,7 @@ class AdminPerformanceControllerCore extends AdminController
             'input' => array(
                 array(
                     'type' => 'switch',
-                    'label' => $this->l('Disable non Native modules'),
+                    'label' => $this->l('Disable non PrestaShop modules'),
                     'name' => 'native_module',
                     'class' => 't',
                     'is_bool' => true,
@@ -167,7 +167,7 @@ class AdminPerformanceControllerCore extends AdminController
                             'label' => $this->l('Disabled')
                         )
                     ),
-                    'hint' => $this->l('Enable or disable non Native Modules.')
+                    'hint' => $this->l('Enable or disable non PrestaShop Modules.')
                 ),
                 array(
                     'type' => 'switch',
@@ -290,7 +290,7 @@ class AdminPerformanceControllerCore extends AdminController
                 'title' => $this->l('CCC (Combine, Compress and Cache)'),
                 'icon' => 'icon-fullscreen'
             ),
-            'description' => $this->l('CCC allows you to reduce the loading time of your page. With these settings you will gain performance without even touching the code of your theme.'),
+            'description' => $this->l('CCC allows you to reduce the loading time of your page. With these settings you will gain performance without even touching the code of your theme. Make sure, however, that your theme is compatible with PrestaShop 1.4+. Otherwise, CCC will cause problems.'),
             'input' => array(
                 array(
                     'type' => 'hidden',
@@ -485,18 +485,12 @@ class AdminPerformanceControllerCore extends AdminController
                         'type' => 'radio',
                         'label' => $this->l('Algorithm'),
                         'name' => 'PS_CIPHER_ALGORITHM',
-                        'hint' => $this->l('Mcrypt is faster than our custom BlowFish class, but requires the "mcrypt" PHP extension. If you change this configuration, all cookies will be reset.'),
                         'values' => array(
                             array(
                                 'id' => 'PS_CIPHER_ALGORITHM_1',
                                 'value' => 1,
-                                'label' => $this->l('Use Rijndael with mcrypt lib.').(!function_exists('mcrypt_encrypt') ? '' : $warning_mcrypt)
+                                'label' => $this->l('Use Rijndael with mcrypt lib.').(function_exists('mcrypt_encrypt') ? '' : $warning_mcrypt)
                             ),
-                            array(
-                                'id' => 'PS_CIPHER_ALGORITHM_0',
-                                'value' => 0,
-                                'label' => $this->l('Use the custom BlowFish class.')
-                            )
                         )
                     )
                 ),
@@ -584,7 +578,7 @@ class AdminPerformanceControllerCore extends AdminController
                         array(
                             'id' => 'CacheApc',
                             'value' => 'CacheApc',
-                            'label' => $this->l('APC').(extension_loaded('apc') ? '' : $warning_apc)
+                            'label' => $this->l('APC').((extension_loaded('apc') || extension_loaded('apcu')) ? '' : $warning_apc)
                         ),
                         array(
                             'id' => 'CacheXcache',
@@ -856,7 +850,7 @@ class AdminPerformanceControllerCore extends AdminController
                         $this->errors[] = Tools::displayError('The "Mcrypt" PHP extension is not activated on this server.');
                     } else {
                         if (!strstr($new_settings, '_RIJNDAEL_KEY_')) {
-                            $key_size = mcrypt_get_key_size(MCRYPT_RIJNDAEL_128, MCRYPT_MODE_ECB);
+                            $key_size = mcrypt_get_key_size(MCRYPT_RIJNDAEL_128, MCRYPT_MODE_CBC);
                             $key = Tools::passwdGen($key_size);
                             $new_settings = preg_replace(
                                 '/define\(\'_COOKIE_KEY_\', \'([a-z0-9=\/+-_]+)\'\);/i',
@@ -865,7 +859,7 @@ class AdminPerformanceControllerCore extends AdminController
                             );
                         }
                         if (!strstr($new_settings, '_RIJNDAEL_IV_')) {
-                            $iv_size = mcrypt_get_iv_size(MCRYPT_RIJNDAEL_128, MCRYPT_MODE_ECB);
+                            $iv_size = mcrypt_get_iv_size(MCRYPT_RIJNDAEL_128, MCRYPT_MODE_CBC);
                             $iv = base64_encode(mcrypt_create_iv($iv_size, MCRYPT_RAND));
                             $new_settings = preg_replace(
                                 '/define\(\'_COOKIE_IV_\', \'([a-z0-9=\/+-_]+)\'\);/i',
@@ -914,7 +908,7 @@ class AdminPerformanceControllerCore extends AdminController
                     } elseif ($caching_system == 'CacheMemcached' && !extension_loaded('memcached')) {
                         $this->errors[] = Tools::displayError('To use Memcached, you must install the Memcached PECL extension on your server.').'
 							<a href="http://www.php.net/manual/en/memcached.installation.php">http://www.php.net/manual/en/memcached.installation.php</a>';
-                    } elseif ($caching_system == 'CacheApc' && !extension_loaded('apc')) {
+                    } elseif ($caching_system == 'CacheApc' && !extension_loaded('apc') && !extension_loaded('apcu')) {
                         $this->errors[] = Tools::displayError('To use APC cache, you must install the APC PECL extension on your server.').'
 							<a href="http://fr.php.net/manual/fr/apc.installation.php">http://fr.php.net/manual/fr/apc.installation.php</a>';
                     } elseif ($caching_system == 'CacheXcache' && !extension_loaded('xcache')) {

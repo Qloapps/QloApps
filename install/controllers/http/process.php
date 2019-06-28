@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -194,17 +194,18 @@ class InstallControllerHttpProcess extends InstallControllerHttp
         $this->initializeContext();
 
         $success = $this->model_install->configureShop(array(
-            'shop_name' =>                $this->session->shop_name,
-            'shop_activity' =>            $this->session->shop_activity,
-            'shop_country' =>            $this->session->shop_country,
-            'shop_timezone' =>            $this->session->shop_timezone,
-            'admin_firstname' =>        $this->session->admin_firstname,
-            'admin_lastname' =>            $this->session->admin_lastname,
-            'admin_password' =>            $this->session->admin_password,
-            'admin_email' =>            $this->session->admin_email,
-            'send_informations' =>        $this->session->send_informations,
-            'configuration_agrement' =>    $this->session->configuration_agrement,
-            'rewrite_engine' =>            $this->session->rewrite_engine,
+            'shop_name' => $this->session->shop_name,
+            'shop_activity' => $this->session->shop_activity,
+            'shop_country' => $this->session->shop_country,
+            'shop_timezone' => $this->session->shop_timezone,
+            'admin_firstname' => $this->session->admin_firstname,
+            'admin_lastname' => $this->session->admin_lastname,
+            'admin_password' => $this->session->admin_password,
+            'admin_email' =>   $this->session->admin_email,
+            'marketing_consent' => $this->session->marketing_consent,
+            'send_informations' => $this->session->send_informations,
+            'configuration_agrement' => $this->session->configuration_agrement,
+            'rewrite_engine' => $this->session->rewrite_engine,
         ));
 
         if (!$success || $this->model_install->getErrors()) {

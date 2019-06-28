@@ -1,4 +1,50 @@
 -----------------------------
+# V2.0.0 to V2.0.1
+-----------------------------
+
+## Improved/changed features
+
+[*] BO : Images validation improved client side (for post_max_size issue).
+[*] BO : Render list filter issues resolved.
+[*] BO : validation improved.
+
+## Update Policy
+
+- Mobule need only file update, can be updated only by UPLOADING new version on module
+
+
+
+-----------------------------
+# V1.1.0 to V2.0.0
+-----------------------------
+
+## Added features
+
+[+] BO : Configuration option "Show link at navigation" given to choose whether show Amenities link at navigation menu or not.
+
+
+## Improved/changed features
+
+[-] CO : Unneccessary JS file and hotel_features_block.js removed. (not ised anywhere)
+[-] BO : code using feature_img field is removed from every where.
+
+[+] BO : Images validation improved.
+[+] BO : Render option moved above render list at AdminFeaturesModuleSetting controller.
+[-] FO : "Amenities" link is removed from footer explore block.
+
+
+## Bug/Issues Resolved:
+
+[-] BO : Resolved :: Amenity title does not show in Amenities List (admin).
+[-] CO : Resolved :: Amenity image does not show in the XS screen sizes.
+
+
+## Update Policy
+
+- Database changed, Module need upload new file then UNINSTALL and re-installation.- Mobule need only file update, can be updated only by UPLOADING new version on module
+
+
+-----------------------------
 # V1.0.0 to V1.1.0
 -----------------------------
 

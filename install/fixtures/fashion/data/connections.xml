@@ -9,8 +9,8 @@
     <field name="id_shop"/>
   </fields>
   <entities>
-    <connections id="connections_1" id_guest="guest_1" id_page="1" ip_address="10424105181" id_shop_group="1" id_shop="1">
-      <http_referer>http://www.qloapps.com</http_referer>
+    <connections id="connections_1" id_guest="guest_1" id_page="1" ip_address="2130706433" id_shop_group="1" id_shop="1">
+      <http_referer>https://www.qloapps.com</http_referer>
     </connections>
   </entities>
 </entity_connections>

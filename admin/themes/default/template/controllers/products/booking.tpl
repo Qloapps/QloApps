@@ -44,7 +44,7 @@
 					</div>
 				</div>
 			</div>
-			
+
 			<div class="col-sm-5 htl_room_data_cont">
 				<div class="row">
 					<div class="col-sm-6">
@@ -118,7 +118,7 @@
 				</div>
 			</div>
 		</div>
-		
+
 		<div class="panel-footer">
 			<a href="{$link->getAdminLink('AdminProducts')|escape:'html':'UTF-8'}{if isset($smarty.request.page) && $smarty.request.page > 1}&amp;submitFilterproduct={$smarty.request.page|intval}{/if}" class="btn btn-default">
 				<i class="process-icon-cancel"></i>
@@ -182,7 +182,7 @@
 									<tr>
 										<td>{$data_v['room_num']}</td>
 										<td>{l s='Partially Available' mod='hotelreservationsystem'}</td>
-										<td>{$data_v['comment']}</td>
+										<td>{if isset($data_v['comment'])}{$data_v['comment']}{/if}</td>
 									</tr>
 								{/foreach}
 							{/if}
@@ -197,23 +197,46 @@
 <script type="text/javascript">
 
 $(document).ready(function()
-{	
+{
 	var booking_calendar_data = '{$booking_calendar_data|@json_encode}';
 	var check_css_condition_var = '{$check_css_condition_var}';
 	var check_calendar_var = '{$check_calendar_var}';
 
-	$("#from_date, #to_date").datepicker(
-	{
-		dateFormat: 'yy-mm-dd'
-	});
+	$("#from_date").datepicker({
+        dateFormat: 'yy-mm-dd',
+        onSelect: function(selectedDate) {
+            var date_format = selectedDate.split("-");
+            var selectedDate = new Date($.datepicker.formatDate('yy-mm-dd', new Date(date_format[0], date_format[1] - 1, date_format[2])));
+            selectedDate.setDate(selectedDate.getDate() + 1);
+            $("#to_date").datepicker("option", "minDate", selectedDate);
+        },
+    });
+
+    $("#to_date").datepicker({
+        dateFormat: 'yy-mm-dd',
+        beforeShow: function (input, instance) {
+            var datefrom = $('#from_date').val();
+            if (typeof datefrom != 'undefined' && datefrom != '') {
+                var date_format = datefrom.split("-");
+                var selectedDate = new Date($.datepicker.formatDate('yy-mm-dd', new Date(date_format[0], date_format[1] - 1, date_format[2])));
+                selectedDate.setDate(selectedDate.getDate()+1);
+                $("#to_date").datepicker("option", "minDate", selectedDate);
+            } else {
+                var date_format = new Date();
+                var selectedDate = new Date($.datepicker.formatDate('yy-mm-dd', new Date()));
+                selectedDate.setDate(selectedDate.getDate()+1);
+                $("#to_date").datepicker("option", "minDate", selectedDate);
+            }
+        }
+    });
+
 	if (booking_calendar_data != 'null' && check_css_condition_var && check_calendar_var)
 	{
 		if (typeof(booking_calendar_data) != 'undefined')
 	    {
 	        var calendar_data = JSON.parse(booking_calendar_data);
 
-	        $(".hotel_date").datepicker(
-	        {
+	        $(".hotel_date").datepicker({
 	            defaultDate: new Date(),
 	            dateFormat: 'dd-mm-yy',
 	            minDate: 0,
@@ -264,7 +287,7 @@ $(document).ready(function()
 	                {
 	                    if (key === dmy)
 	                    {
-	                        msg = 'Total Available : '+value.stats.num_avail+'&#013;Total Partail Available : '+value.stats.num_part_avai+'&#013;Total Unvailable : '+value.stats.num_unavail+'&#013;Total Booked : '+value.stats.num_booked;
+	                        msg = 'Total Available : '+value.stats.num_avail+'&#013;Total Partial Available : '+value.stats.num_part_avai+'&#013;Total Unvailable : '+value.stats.num_unavail+'&#013;Total Booked : '+value.stats.num_booked;
 	                        flag = 1;
 	                        return 1;
 	                    }
@@ -277,10 +300,10 @@ $(document).ready(function()
 	                    return [true];
 	            }
 	        });
-	        
+
 	        var count = $("."+check_css_condition_var).length;
 	        //$("td."+check_css_condition_var).eq(0).css('border-radius','50% 0 0 50%');
-	        $("td."+check_css_condition_var).eq(count-1).css('border-radius','0 50% 50% 0');    
+	        $("td."+check_css_condition_var).eq(count-1).css('border-radius','0 50% 50% 0');
 	    }
 	    else
 	    {
@@ -298,5 +321,5 @@ $(document).ready(function()
     	$("#checkTabClick").val(1);
     });
 });
-	
+
 </script>

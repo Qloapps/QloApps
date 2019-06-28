@@ -316,6 +316,7 @@ class HotelBranchInformation extends ObjectModel
     {
         $objHotelInfo = new HotelBranchInformation($this->id);
         $oldStatus = $objHotelInfo->active;
+
         if ($return = parent::update()) {
             if ($oldStatus && !$this->active) {
                 $objHotelRoomType = new HotelRoomType();
@@ -341,11 +342,73 @@ class HotelBranchInformation extends ObjectModel
         return $return;
     }
 
+    public function addCategory($name, $parent_cat = false, $group_ids, $ishotel = false, $idHotel = false)
+    {
+        $context = Context::getContext();
+        if (!$parent_cat) {
+            $parent_cat = Category::getRootCategory()->id;
+        }
+        // if ($ishotel && $idHotel) {
+        //     if ($catIdHotel = Db::getInstance()->getValue(
+        //         'SELECT `id_category` FROM `'._DB_PREFIX_.'htl_branch_info` WHERE id = '.(int)$idHotel
+        //     )) {
+        //         $category = new Category($catIdHotel);
+        //         foreach (Language::getLanguages(true) as $lang) {
+        //             if (is_array($name) && isset($name[$lang['id_lang']])) {
+        //                 $catName = $name[$lang['id_lang']];
+        //             } else {
+        //                 $catName = $name;
+        //             }
+        //             $category->name[$lang['id_lang']] = $catName;
+        //             $category->description[$lang['id_lang']] =  $this->moduleInstance->l(
+        //                 'Hotel Branch Category',
+        //                 'HotelBranchInformation'
+        //             );
+        //             $category->link_rewrite[$lang['id_lang']] = Tools::link_rewrite($catName);
+        //         }
+        //         $category->id_parent = $parent_cat;
+        //         $category->groupBox = $group_ids;
+        //         $category->save();
+        //         return $category->id;
+        //     }
+        // }
+        if (is_array($name) && isset($name[Configuration::get('PS_LANG_DEFAULT')])) {
+            $catName = $name[Configuration::get('PS_LANG_DEFAULT')];
+        } else {
+            $catName = $name;
+        }
+        if ($categoryExists = Category::searchByNameAndParentCategoryId(
+            Configuration::get('PS_LANG_DEFAULT'),
+            $catName,
+            $parent_cat
+        )) {
+            return $categoryExists['id_category'];
+        } else {
+            $category = new Category();
+            foreach (Language::getLanguages(true) as $lang) {
+                if (is_array($name) && isset($name[$lang['id_lang']])) {
+                    $catName = $name[$lang['id_lang']];
+                } else {
+                    $catName = $name;
+                }
+                $category->name[$lang['id_lang']] = $catName;
+                $category->description[$lang['id_lang']] = $this->moduleInstance->l(
+                    'Hotel Branch Category', 'HotelBranchInformation'
+                );
+                $category->link_rewrite[$lang['id_lang']] = Tools::link_rewrite($catName);
+            }
+            $category->id_parent = $parent_cat;
+            $category->groupBox = $group_ids;
+            $category->add();
+            return $category->id;
+        }
+    }
+
     //Overrided ObjectModet::delete() to delete all the dependencies of the hotel
     public function delete()
     {
+        $contextController = Context::getContext()->controller;
         if ($idHotel = $this->id) {
-            $contextController = Context::getContext()->controller;
             // room types of this hotel
             $objHotelRoomType = new HotelRoomType();
             $idsProduct = $objHotelRoomType->getIdProductByHotelId($idHotel);
@@ -383,6 +446,13 @@ class HotelBranchInformation extends ObjectModel
                     'HotelBranchInformation'
                 );
             }
+            // delete hotel unused categories of this hotel
+            if (!$this->deleteUnusedHotelCategories($idHotel)) {
+                $contextController->errors[] = $this->moduleInstance->l(
+                    'Some error has occurred while deleting unused hotel categories.',
+                    'HotelBranchInformation'
+                );
+            }
         }
         if (!count($contextController->errors)) {
             if ($result = parent::delete()) {
@@ -393,69 +463,60 @@ class HotelBranchInformation extends ObjectModel
         }
     }
 
-    public function addCategory($name, $parent_cat = false, $group_ids, $ishotel = false, $idHotel = false)
+    /**
+     * returns all the categories used by all the hotels
+     * @param array $excludeIdHotels  [array of the hotels which categories you dont want]
+     * @return [array] returns array of all the categories used by all the hotels
+     */
+    public function getAllHotelCategories($excludeIdHotels = array())
     {
-        $context = Context::getContext();
-        if (!$parent_cat) {
-            $parent_cat = Category::getRootCategory()->id;
+        $hotelrelatedCategs = array();
+        $sql = 'SELECT `id_category` FROM `'._DB_PREFIX_.'htl_branch_info`';
+        if ($excludeIdHotels && count($excludeIdHotels)) {
+            $sql .= ' WHERE `id` NOT IN ('.implode(',', $excludeIdHotels).')';
         }
-        if ($ishotel && $idHotel) {
-            $catIdHotel = Db::getInstance()->getValue(
-                'SELECT `id_category` FROM `'._DB_PREFIX_.'htl_branch_info` WHERE id='.$idHotel
-            );
-            if ($catIdHotel) {
-                $category = new Category($catIdHotel);
-                foreach (Language::getLanguages(true) as $lang) {
-                    if (is_array($name) && isset($name[$lang['id_lang']])) {
-                        $catName = $name[$lang['id_lang']];
-                    } else {
-                        $catName = $name;
+        // get all the hotel name categories
+        if ($hotelCategs = Db::getInstance()->executeS($sql)) {
+            foreach ($hotelCategs as $rowCateg) {
+                if (Validate::isLoadedObject($objCategory = new Category($rowCateg['id_category']))) {
+                    if ($parentCategs = $objCategory->getParentsCategories(Configuration::get('PS_LANG_DEFAULT'))) {
+                        foreach ($parentCategs as $categInfo) {
+                            // enter only unique categories in the array
+                            if (!in_array($categInfo['id_category'], $hotelrelatedCategs)) {
+                                $hotelrelatedCategs[] = $categInfo['id_category'];
+                            }
+                        }
                     }
-                    $category->name[$lang['id_lang']] = $catName;
-                    $category->description[$lang['id_lang']] =  $this->moduleInstance->l(
-                        'Hotel Branch Category',
-                        'HotelBranchInformation'
-                    );
-                    $category->link_rewrite[$lang['id_lang']] = Tools::link_rewrite($catName);
                 }
-                $category->id_parent = $parent_cat;
-                $category->groupBox = $group_ids;
-                $category->save();
-                $cat_id = $category->id;
-                return $cat_id;
             }
         }
-        if (is_array($name) && isset($name[$context->language->id])) {
-            $catName = $name[$context->language->id];
-        } else {
-            $catName = $name;
-        }
-        if ($categoryExists = Category::searchByNameAndParentCategoryId(
-            $context->language->id,
-            $catName,
-            $parent_cat
-        )) {
-            return $categoryExists['id_category'];
-        } else {
-            $category = new Category();
-            foreach (Language::getLanguages(true) as $lang) {
-                if (is_array($name) && isset($name[$lang['id_lang']])) {
-                    $catName = $name[$lang['id_lang']];
-                } else {
-                    $catName = $name;
-                }
-                $category->name[$lang['id_lang']] = $catName;
-                $category->description[$lang['id_lang']] = $this->moduleInstance->l(
-                    'Hotel Branch Category', 'HotelBranchInformation'
-                );
-                $category->link_rewrite[$lang['id_lang']] = Tools::link_rewrite($catName);
-            }
-            $category->id_parent = $parent_cat;
-            $category->groupBox = $group_ids;
-            $category->add();
-            $cat_id = $category->id;
+        return $hotelrelatedCategs;
+    }
 
-            return $cat_id;
+    /**
+     * Deletes all the unused categories created by hotel creation of a hotel
+     * @param [int] $idHotel which categories you want to delete
+     * @return true if all the categories will be deleted
+     */
+    public function deleteUnusedHotelCategories($idHotel)
+    {
+        if (Validate::isLoadedObject($objHotel = new HotelBranchInformation($idHotel))) {
+            $idCategory = $objHotel->id_category;
+            if (Validate::isLoadedObject($objCategory = new Category($idCategory))) {
+                $hotelCategories = $this->getAllHotelCategories(array($idHotel));
+                // check if category is not root or home category and not used by other hotels
+                while ($idCategory
+                    && !in_array($idCategory, $hotelCategories)
+                    && $idCategory != Configuration::get('PS_HOME_CATEGORY')
+                ) {
+                    if ($objCategory->delete()) {
+                        // continue deleting the unused parent hotel categories
+                        $idCategory = $objCategory->id_parent;
+                        $objCategory = new Category($idCategory);
+                    }
+                }
+            }
         }
+        return true;
     }
 }

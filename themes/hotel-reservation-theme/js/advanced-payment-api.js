@@ -1,5 +1,5 @@
 /*
- * 2007-2015 PrestaShop
+ * 2007-2017 PrestaShop
  *
  * NOTICE OF LICENSE
  *
@@ -18,7 +18,7 @@
  * needs please refer to http://www.prestashop.com for more information.
  *
  *  @author PrestaShop SA <contact@prestashop.com>
- *  @copyright  2007-2015 PrestaShop SA
+ *  @copyright  2007-2017 PrestaShop SA
  *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PrestaShop SA
  */
@@ -45,20 +45,24 @@ $(document).ready(function(){
 
         if (handler.checkTOS() === false)
         {
-            alert(aeuc_tos_err_str);
+            var to_display = $('<div/>').html(aeuc_tos_err_str).text();
+            alert(to_display);
             return;
         }
         if (aeuc_has_virtual_products === true && handler.checkVirtualProductRevocation() === false)
         {
-            alert(aeuc_virt_prod_err_str);
+            var to_display = $('<div/>').html(aeuc_virt_prod_err_str).text();
+            alert(to_display);
             return;
         }
         if (handler.selected_option === null) {
-            alert(aeuc_no_pay_err_str);
+            var to_display = $('<div/>').html(aeuc_no_pay_err_str).text();
+            alert(to_display);
             return;
         }
         if (handler.submitForm() === false) {
-            alert(aeuc_submit_err_str);
+            var to_display = $('<div/>').html(aeuc_submit_err_str).text();
+            alert(to_display);
             return;
         }
         return;
@@ -79,18 +83,10 @@ var PaymentOptionHandler = function() {
         }
         this.selected_option = elem;
         this.selected_option.addClass('payment_selected');
-        this.selected_option.children('a:first').css({
-            'border': '1px solid #55c65e',
-            'border-radius': '4px'
-        });
         this.selected_option.children('a:first').children('.payment_option_selected:first').fadeIn();
     };
 
     this.unselectOption = function() {
-        this.selected_option.children('a:first').css({
-            'border': '1px solid #d6d4d4',
-            'border-radius': '4px'
-        });
         this.selected_option.children('a:first').children('.payment_option_selected:first').fadeOut();
         this.selected_option.removeClass('payment_selected');
     };

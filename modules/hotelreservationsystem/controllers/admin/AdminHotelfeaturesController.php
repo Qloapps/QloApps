@@ -26,6 +26,8 @@ class AdminHotelFeaturesController extends ModuleAdminController
         $this->table = 'htl_features';
         $this->className = 'HotelFeatures';
         $this->identifier  = 'id';
+        $this->toolbar_title = $this->l('Manage Hotel Features');
+
         parent::__construct();
         $this->display = 'view';
     }
@@ -111,16 +113,53 @@ class AdminHotelFeaturesController extends ModuleAdminController
             if (!trim(Tools::getValue('parent_ftr_name_'.$defaultLangId))) {
                 $this->errors[] = $this->l('Parent feature name is required at least in ').
                 $objDefaultLanguage['name'];
+            } elseif (!Validate::isGenericName(Tools::getValue('parent_ftr_name_'.$defaultLangId))) {
+                $this->errors[] = $this->l('Parent feature name is invalid.');
+            } else {
+                foreach ($languages as $lang) {
+                    // validate non required fields
+                    if (trim(Tools::getValue('parent_ftr_name_'.$lang['id_lang']))) {
+                        if (!Validate::isGenericName(Tools::getValue('parent_ftr_name_'.$lang['id_lang']))) {
+                            $this->errors[] = $this->l('Invalid parent feature name in ').$lang['name'];
+                        }
+                    }
+                }
             }
             if ($childFeaturesDefLang = Tools::getValue('child_features_'.$defaultLangId)) {
-                foreach ($childFeaturesDefLang as $childftr) {
+                foreach ($childFeaturesDefLang as $kChild => $childftr) {
                     if (!trim($childftr)) {
                         $this->errors[] = $this->l('Child features name is required at least in ').
                         $objDefaultLanguage['name'];
+                    } elseif (!Validate::isGenericName($childftr)) {
+                        $this->errors[] = $this->l('Child features name is invalid : ').$childftr;
+                    } else {
+                        foreach ($languages as $lang) {
+                            if ($childFtrLang = Tools::getValue('child_features_'.$lang['id_lang'])) {
+                                if (!Validate::isGenericName($childFtrLang[$kChild])) {
+                                    $this->errors[] = $this->l('Invalid child feature name in ').$lang['name'].
+                                    ' : '.$childFtrLang[$kChild];
+                                }
+                            }
+                        }
                     }
+                }
+
+                if (!count($this->errors)) {
                 }
             } else {
                 $this->errors[] = $this->l('Please add atleast one Child features.');
+            }
+
+            foreach ($languages as $lang) {
+                if (!trim(Tools::getValue('parent_ftr_name_'.$lang['id_lang']))) {
+                    $objHotelFeatures->name[$lang['id_lang']] = Tools::getValue(
+                        'parent_ftr_name_'.$defaultLangId
+                    );
+                } else {
+                    $objHotelFeatures->name[$lang['id_lang']] = Tools::getValue(
+                        'parent_ftr_name_'.$lang['id_lang']
+                    );
+                }
             }
 
             if (!count($this->errors)) {

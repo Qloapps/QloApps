@@ -32,7 +32,7 @@ class WkTestimonialBlock extends Module
     {
         $this->name = 'wktestimonialblock';
         $this->tab = 'front_office_features';
-        $this->version = '1.1.0';
+        $this->version = '1.1.2';
         $this->author = 'webkul';
         $this->need_instance = 0;
 
@@ -94,12 +94,9 @@ class WkTestimonialBlock extends Module
 
     public function hookDisplayDefaultNavigationHook()
     {
-        return $this->display(__FILE__, 'hotelTestimonialNaviagtionMenu.tpl');
-    }
-
-    public function hookDisplayFooterExploreSectionHook()
-    {
-        return $this->display(__FILE__, 'hotelTestimonialFooterExploreLink.tpl');
+        if (Configuration::get('HOTEL_TESIMONIAL_BLOCK_NAV_LINK')) {
+            return $this->display(__FILE__, 'hotelTestimonialNaviagtionMenu.tpl');
+        }
     }
 
     /**
@@ -139,10 +136,11 @@ class WkTestimonialBlock extends Module
                 }
             }
         }
+        $objTestimonialData = new WkHotelTestimonialData();
         if (!parent::install()
             || !$this->registerModuleHooks()
             || !$this->callInstallTab()
-            || !WkHotelTestimonialData::insertModuleDemoData()
+            || !$objTestimonialData->insertModuleDemoData()
         ) {
             return false;
         }

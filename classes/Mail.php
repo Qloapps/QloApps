@@ -1,33 +1,30 @@
 <?php
-/*
-* 2007-2015 PrestaShop
-*
-* NOTICE OF LICENSE
-*
-* This source file is subject to the Open Software License (OSL 3.0)
-* that is bundled with this package in the file LICENSE.txt.
-* It is also available through the world-wide-web at this URL:
-* http://opensource.org/licenses/osl-3.0.php
-* If you did not receive a copy of the license and are unable to
-* obtain it through the world-wide-web, please send an email
-* to license@prestashop.com so we can send you a copy immediately.
-*
-* DISCLAIMER
-*
-* Do not edit or add to this file if you wish to upgrade PrestaShop to newer
-* versions in the future. If you wish to customize PrestaShop for your
-* needs please refer to http://www.prestashop.com for more information.
-*
-*  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
-*  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
-*  International Registered Trademark & Property of PrestaShop SA
-*/
+/**
+ * 2007-2017 PrestaShop
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Open Software License (OSL 3.0)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/osl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@prestashop.com so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade PrestaShop to newer
+ * versions in the future. If you wish to customize PrestaShop for your
+ * needs please refer to http://www.prestashop.com for more information.
+ *
+ * @author    PrestaShop SA <contact@prestashop.com>
+ * @copyright 2007-2017 PrestaShop SA
+ * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * International Registered Trademark & Property of PrestaShop SA
+ */
 
-include_once(_PS_SWIFT_DIR_.'Swift.php');
-include_once(_PS_SWIFT_DIR_.'Swift/Connection/SMTP.php');
-include_once(_PS_SWIFT_DIR_.'Swift/Connection/NativeMail.php');
-include_once(_PS_SWIFT_DIR_.'Swift/Plugin/Decorator.php');
+include_once(_PS_SWIFT_DIR_.'swift_required.php');
 
 class MailCore extends ObjectModel
 {
@@ -70,19 +67,22 @@ class MailCore extends ObjectModel
     /**
      * Send Email
      *
-     * @param int $id_lang Language of the email (to translate the template)
+     * @param int $id_lang Language ID of the email (to translate the template)
      * @param string $template Template: the name of template not be a var but a string !
-     * @param string $subject
-     * @param string $template_vars
-     * @param string $to
-     * @param string $to_name
-     * @param string $from
-     * @param string $from_name
+     * @param string $subject Subject of the email
+     * @param string $template_vars Template variables for the email
+     * @param string|array $to To email
+     * @param string|array $to_name To name
+     * @param string $from From email
+     * @param string $from_name To email
      * @param array $file_attachment Array with three parameters (content, mime and name). You can use an array of array to attach multiple files
-     * @param bool $modeSMTP
-     * @param string $template_path
-     * @param bool $die
-     * @param string $bcc Bcc recipient
+     * @param bool $mode_smtp SMTP mode (deprecated)
+     * @param string $template_path Template path
+     * @param bool $die Die after error
+     * @param int $id_shop Shop ID
+     * @param string|array $bcc Bcc recipient(s) (email address)
+     * @param string $reply_to Email address for setting the Reply-To header
+     * @return bool|int Whether sending was successful. If not at all, false, otherwise amount of recipients succeeded.
      */
     public static function Send($id_lang, $template, $subject, $template_vars, $to,
         $to_name = null, $from = null, $from_name = null, $file_attachment = null, $mode_smtp = null,
@@ -121,8 +121,8 @@ class MailCore extends ObjectModel
             }
         }
 
-        if (!isset($configuration['PS_MAIL_SMTP_ENCRYPTION'])) {
-            $configuration['PS_MAIL_SMTP_ENCRYPTION'] = 'off';
+        if (!isset($configuration['PS_MAIL_SMTP_ENCRYPTION']) || Tools::strtolower($configuration['PS_MAIL_SMTP_ENCRYPTION']) === 'off') {
+            $configuration['PS_MAIL_SMTP_ENCRYPTION'] = false;
         }
         if (!isset($configuration['PS_MAIL_SMTP_PORT'])) {
             $configuration['PS_MAIL_SMTP_PORT'] = 'default';
@@ -177,64 +177,67 @@ class MailCore extends ObjectModel
             return false;
         }
 
-        /* Construct multiple recipients list if needed */
-        $to_list = new Swift_RecipientList();
-        if (is_array($to) && isset($to)) {
-            foreach ($to as $key => $addr) {
-                $addr = trim($addr);
-                if (!Validate::isEmail($addr)) {
-                    Tools::dieOrLog(Tools::displayError('Error: invalid e-mail address'), $die);
-                    return false;
-                }
-
-                if (is_array($to_name) && $to_name && is_array($to_name) && Validate::isGenericName($to_name[$key])) {
-                    $to_name = $to_name[$key];
-                }
-
-                $to_name = (($to_name == null || $to_name == $addr) ? '' : self::mimeEncode($to_name));
-                $to_list->addTo($addr, $to_name);
-            }
-            $to_plugin = $to[0];
-        } else {
-            /* Simple recipient, one address */
-            $to_plugin = $to;
-            $to_name = (($to_name == null || $to_name == $to) ? '' : self::mimeEncode($to_name));
-            $to_list->addTo($to, $to_name);
-        }
-        if (isset($bcc)) {
-            $to_list->addBcc($bcc);
-        }
-
         try {
+
+            /* Construct multiple recipients list if needed */
+            $message = Swift_Message::newInstance();
+            if (is_array($to) && isset($to)) {
+                foreach ($to as $key => $addr) {
+                    $addr = trim($addr);
+                    if (!Validate::isEmail($addr)) {
+                        Tools::dieOrLog(Tools::displayError('Error: invalid e-mail address'), $die);
+                        return false;
+                    }
+
+                    if (is_array($to_name) && isset($to_name[$key])) {
+                        $addrName = $to_name[$key];
+                    } else {
+                        $addrName = $to_name;
+                    }
+
+                    $addrName = (($addrName == null || $addrName == $addr || !Validate::isGenericName($addrName)) ? '' : self::mimeEncode($addrName));
+                    $message->addTo($addr, $addrName);
+                }
+                $to_plugin = $to[0];
+            } else {
+                /* Simple recipient, one address */
+                $to_plugin = $to;
+                $to_name = (($to_name == null || $to_name == $to) ? '' : self::mimeEncode($to_name));
+                $message->addTo($to, $to_name);
+            }
+
+            if (isset($bcc) && is_array($bcc)) {
+                foreach ($bcc as $addr) {
+                    $addr = trim($addr);
+                    if (!Validate::isEmail($addr)) {
+                        Tools::dieOrLog(Tools::displayError('Error: invalid e-mail address'), $die);
+                        return false;
+                    }
+                    $message->addBcc($addr);
+                }
+            } elseif (isset($bcc)) {
+                $message->addBcc($bcc);
+            }
+
             /* Connect with the appropriate configuration */
             if ($configuration['PS_MAIL_METHOD'] == 2) {
                 if (empty($configuration['PS_MAIL_SERVER']) || empty($configuration['PS_MAIL_SMTP_PORT'])) {
                     Tools::dieOrLog(Tools::displayError('Error: invalid SMTP server or SMTP port'), $die);
                     return false;
                 }
-                $connection = new Swift_Connection_SMTP(
-                    $configuration['PS_MAIL_SERVER'],
-                    $configuration['PS_MAIL_SMTP_PORT'],
-                    $configuration['PS_MAIL_SMTP_ENCRYPTION'] == 'ssl' ? Swift_Connection_SMTP::ENC_SSL : (($configuration['PS_MAIL_SMTP_ENCRYPTION'] == 'tls' ? Swift_Connection_SMTP::ENC_TLS : Swift_Connection_SMTP::ENC_OFF))
-                );
-                $connection->setTimeout(4);
-                if (!$connection) {
-                    return false;
-                }
-                if (!empty($configuration['PS_MAIL_USER'])) {
-                    $connection->setUsername($configuration['PS_MAIL_USER']);
-                }
-                if (!empty($configuration['PS_MAIL_PASSWD'])) {
-                    $connection->setPassword($configuration['PS_MAIL_PASSWD']);
-                }
+
+                $connection = Swift_SmtpTransport::newInstance($configuration['PS_MAIL_SERVER'], $configuration['PS_MAIL_SMTP_PORT'], $configuration['PS_MAIL_SMTP_ENCRYPTION'])
+                    ->setUsername($configuration['PS_MAIL_USER'])
+                    ->setPassword($configuration['PS_MAIL_PASSWD']);
+
             } else {
-                $connection = new Swift_Connection_NativeMail();
+                $connection = Swift_MailTransport::newInstance();
             }
 
             if (!$connection) {
                 return false;
             }
-            $swift = new Swift($connection, Configuration::get('PS_MAIL_DOMAIN', null, null, $id_shop));
+            $swift = Swift_Mailer::newInstance($connection);
             /* Get templates content */
             $iso = Language::getIsoById((int)$id_lang);
             if (!$iso) {
@@ -252,7 +255,7 @@ class MailCore extends ObjectModel
             }
 
             if ($module_name !== false && (file_exists($theme_path.'modules/'.$module_name.'/mails/'.$iso_template.'.txt') ||
-                file_exists($theme_path.'modules/'.$module_name.'/mails/'.$iso_template.'.html'))) {
+                    file_exists($theme_path.'modules/'.$module_name.'/mails/'.$iso_template.'.html'))) {
                 $template_path = $theme_path.'modules/'.$module_name.'/mails/';
             } elseif (file_exists($theme_path.'mails/'.$iso_template.'.txt') || file_exists($theme_path.'mails/'.$iso_template.'.html')) {
                 $template_path = $theme_path.'mails/';
@@ -273,8 +276,8 @@ class MailCore extends ObjectModel
                 'template_txt' => &$template_txt,
                 'id_lang' => (int)$id_lang
             ), null, true);
-            $template_html .= file_get_contents($template_path.$iso_template.'.html');
-            $template_txt .= strip_tags(html_entity_decode(file_get_contents($template_path.$iso_template.'.txt'), null, 'utf-8'));
+            $template_html .= Tools::file_get_contents($template_path.$iso_template.'.html');
+            $template_txt .= strip_tags(html_entity_decode(Tools::file_get_contents($template_path.$iso_template.'.txt'), null, 'utf-8'));
             Hook::exec('actionEmailAddAfterContent', array(
                 'template' => $template,
                 'template_html' => &$template_html,
@@ -294,14 +297,12 @@ class MailCore extends ObjectModel
 
             /* Create mail and attach differents parts */
             $subject = '['.Configuration::get('PS_SHOP_NAME', null, null, $id_shop).'] '.$subject;
-            $message = new Swift_Message($subject);
+            $message->setSubject($subject);
 
             $message->setCharset('utf-8');
 
             /* Set Message-ID - getmypid() is blocked on some hosting */
             $message->setId(Mail::generateId());
-
-            $message->headers->setEncoding('Q');
 
             if (!($reply_to && Validate::isEmail($reply_to))) {
                 $reply_to = $from;
@@ -326,7 +327,7 @@ class MailCore extends ObjectModel
             ShopUrl::cacheMainDomainForShop((int)$id_shop);
             /* don't attach the logo as */
             if (isset($logo)) {
-                $template_vars['{shop_logo}'] = $message->attach(new Swift_Message_EmbeddedFile(new Swift_File($logo), null, ImageManager::getMimeTypeByExtension($logo)));
+                $template_vars['{shop_logo}'] = $message->embed(Swift_Image::fromPath($logo));
             }
 
             if ((Context::getContext()->link instanceof Link) === false) {
@@ -348,12 +349,12 @@ class MailCore extends ObjectModel
                 'id_lang' => (int)$id_lang
             ), null, true);
             $template_vars = array_merge($template_vars, $extra_template_vars);
-            $swift->attachPlugin(new Swift_Plugin_Decorator(array($to_plugin => $template_vars)), 'decorator');
+            $swift->registerPlugin(new Swift_Plugins_DecoratorPlugin(array($to_plugin => $template_vars)));
             if ($configuration['PS_MAIL_TYPE'] == Mail::TYPE_BOTH || $configuration['PS_MAIL_TYPE'] == Mail::TYPE_TEXT) {
-                $message->attach(new Swift_Message_Part($template_txt, 'text/plain', '8bit', 'utf-8'));
+                $message->addPart($template_txt, 'text/plain', 'utf-8');
             }
             if ($configuration['PS_MAIL_TYPE'] == Mail::TYPE_BOTH || $configuration['PS_MAIL_TYPE'] == Mail::TYPE_HTML) {
-                $message->attach(new Swift_Message_Part($template_html, 'text/html', '8bit', 'utf-8'));
+                $message->addPart($template_html, 'text/html', 'utf-8');
             }
             if ($file_attachment && !empty($file_attachment)) {
                 // Multiple attachments?
@@ -363,77 +364,117 @@ class MailCore extends ObjectModel
 
                 foreach ($file_attachment as $attachment) {
                     if (isset($attachment['content']) && isset($attachment['name']) && isset($attachment['mime'])) {
-                        $message->attach(new Swift_Message_Attachment($attachment['content'], $attachment['name'], $attachment['mime']));
+                        $message->attach(Swift_Attachment::newInstance()->setFilename($attachment['name'])->setContentType($attachment['mime'])->setBody($attachment['content']));
                     }
                 }
             }
             /* Send mail */
-            $send = $swift->send($message, $to_list, new Swift_Address($from, $from_name));
-            $swift->disconnect();
+            $message->setFrom(array($from => $from_name));
+            $send = $swift->send($message);
 
             ShopUrl::resetMainDomainCache();
 
             if ($send && Configuration::get('PS_LOG_EMAILS')) {
                 $mail = new Mail();
-                $mail->template = substr($template, 0, 62);
-                $mail->subject = substr($subject, 0, 254);
+                $mail->template = Tools::substr($template, 0, 62);
+                $mail->subject = Tools::substr($subject, 0, 254);
                 $mail->id_lang = (int)$id_lang;
-                foreach (array_merge($to_list->getTo(), $to_list->getCc(), $to_list->getBcc()) as $recipient) {
+                $recipients_to = $message->getTo();
+                $recipients_cc = $message->getCc();
+                $recipients_bcc = $message->getBcc();
+                if (!is_array($recipients_to)) {
+                    $recipients_to = array();
+                }
+                if (!is_array($recipients_cc)) {
+                    $recipients_cc = array();
+                }
+                if (!is_array($recipients_bcc)) {
+                    $recipients_bcc = array();
+                }
+                foreach (array_merge($recipients_to, $recipients_cc, $recipients_bcc) as $email => $recipient_name) {
                     /** @var Swift_Address $recipient */
                     $mail->id = null;
-                    $mail->recipient = substr($recipient->getAddress(), 0, 126);
+                    $mail->recipient = Tools::substr($email, 0, 126);
                     $mail->add();
                 }
             }
 
             return $send;
-        } catch (Swift_Exception $e) {
+        } catch (Swift_SwiftException $e) {
             PrestaShopLogger::addLog(
                 'Swift Error: '.$e->getMessage(),
                 3,
                 null,
-                'Swift_Message'
+                'Swift_Message',
+                null,
+                true
             );
 
             return false;
         }
     }
 
+    /**
+     * @param $id_mail Mail ID
+     * @return bool Whether removal succeeded
+     */
     public static function eraseLog($id_mail)
     {
         return Db::getInstance()->delete('mail', 'id_mail = '.(int)$id_mail);
     }
 
+    /**
+     * @return bool
+     */
     public static function eraseAllLogs()
     {
         return Db::getInstance()->execute('TRUNCATE TABLE '._DB_PREFIX_.'mail');
     }
 
-    public static function sendMailTest($smtpChecked, $smtpServer, $content, $subject, $type, $to, $from, $smtpLogin, $smtpPassword, $smtpPort = 25, $smtpEncryption)
+    /**
+     * Send a test email
+     *
+     * @param bool $smtp_checked Is SMTP checked?
+     * @param string $smtp_server SMTP Server hostname
+     * @param string $content Content of the email
+     * @param string $subject Subject of the email
+     * @param bool $type Deprecated
+     * @param string $to To email address
+     * @param string $from From email address
+     * @param string $smtp_login SMTP login name
+     * @param string $smtp_password SMTP password
+     * @param int $smtp_port SMTP Port
+     * @param bool|string $smtp_encryption Encryption type. "off" or false disable encryption.
+     * @return bool|string True if succeeded, otherwise the error message
+     */
+    public static function sendMailTest($smtp_checked, $smtp_server, $content, $subject, $type, $to, $from, $smtp_login, $smtp_password, $smtp_port = 25, $smtp_encryption)
     {
         $result = false;
         try {
-            if ($smtpChecked) {
-                $smtp = new Swift_Connection_SMTP($smtpServer, $smtpPort, ($smtpEncryption == 'off') ?
-                    Swift_Connection_SMTP::ENC_OFF : (($smtpEncryption == 'tls') ? Swift_Connection_SMTP::ENC_TLS : Swift_Connection_SMTP::ENC_SSL));
-                $smtp->setUsername($smtpLogin);
-                $smtp->setpassword($smtpPassword);
-                $smtp->setTimeout(5);
-                $swift = new Swift($smtp, Configuration::get('PS_MAIL_DOMAIN'));
+            if ($smtp_checked) {
+                if (Tools::strtolower($smtp_encryption) === 'off') {
+                    $smtp_encryption = false;
+                }
+                $smtp = Swift_SmtpTransport::newInstance($smtp_server, $smtp_port, $smtp_encryption)
+                    ->setUsername($smtp_login)
+                    ->setPassword($smtp_password);
+                $swift = Swift_Mailer::newInstance($smtp);
             } else {
-                $swift = new Swift(new Swift_Connection_NativeMail(), Configuration::get('PS_MAIL_DOMAIN'));
+                $swift = Swift_Mailer::newInstance(Swift_MailTransport::newInstance());
             }
 
-            $message = new Swift_Message($subject, $content, $type);
+            $message = Swift_Message::newInstance();
 
-            if ($swift->send($message, $to, $from)) {
+            $message
+                ->setFrom($from)
+                ->setTo($to)
+                ->setSubject($subject)
+                ->setBody($content);
+
+            if ($swift->send($message)) {
                 $result = true;
             }
-
-            $swift->disconnect();
-        } catch (Swift_ConnectionException $e) {
-            $result = $e->getMessage();
-        } catch (Swift_Message_MimeException $e) {
+        } catch (Swift_SwiftException $e) {
             $result = $e->getMessage();
         }
 
@@ -446,6 +487,7 @@ class MailCore extends ObjectModel
      * we have to return a sentence with accents.
      *
      * @param string $string raw sentence (write directly in file)
+     * @return mixed
      */
     public static function l($string, $id_lang = null, Context $context = null)
     {
@@ -474,7 +516,7 @@ class MailCore extends ObjectModel
         }
 
         $key = str_replace('\'', '\\\'', $string);
-        return str_replace('"', '&quot;', stripslashes((array_key_exists($key, $_LANGMAIL) && !empty($_LANGMAIL[$key])) ? $_LANGMAIL[$key] : $string));
+        return str_replace('"', '&quot;', Tools::stripslashes((array_key_exists($key, $_LANGMAIL) && !empty($_LANGMAIL[$key])) ? $_LANGMAIL[$key] : $string));
     }
 
     /* Rewrite of Swift_Message::generateId() without getmypid() */
@@ -484,14 +526,20 @@ class MailCore extends ObjectModel
             'utctime' => gmstrftime('%Y%m%d%H%M%S'),
             'randint' => mt_rand(),
             'customstr' => (preg_match("/^(?<!\\.)[a-z0-9\\.]+(?!\\.)\$/iD", $idstring) ? $idstring : "swift") ,
-            'hostname' => (isset($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : php_uname('n')),
+            'hostname' => ((isset($_SERVER['SERVER_NAME']) && !empty($_SERVER['SERVER_NAME'])) ? $_SERVER['SERVER_NAME'] : php_uname('n')),
         );
-        return vsprintf("<%s.%d.%s@%s>", $midparams);
+        return vsprintf("%s.%d.%s@%s", $midparams);
     }
 
+    /**
+     * Check if a multibyte character set is used for the data
+     *
+     * @param string $data Data
+     * @return bool Whether the string uses a multibyte character set
+     */
     public static function isMultibyte($data)
     {
-        $length = strlen($data);
+        $length = Tools::strlen($data);
         for ($i = 0; $i < $length; $i++) {
             if (ord(($data[$i])) > 128) {
                 return true;
@@ -500,23 +548,31 @@ class MailCore extends ObjectModel
         return false;
     }
 
+    /**
+     * MIME encode the string
+     *
+     * @param string $string The string to encode
+     * @param string $charset The character set to use
+     * @param string $newline The newline character(s)
+     * @return mixed|string MIME encoded string
+     */
     public static function mimeEncode($string, $charset = 'UTF-8', $newline = "\r\n")
     {
-        if (!self::isMultibyte($string) && strlen($string) < 75) {
+        if (!self::isMultibyte($string) && Tools::strlen($string) < 75) {
             return $string;
         }
 
-        $charset = strtoupper($charset);
+        $charset = Tools::strtoupper($charset);
         $start = '=?'.$charset.'?B?';
         $end = '?=';
         $sep = $end.$newline.' '.$start;
-        $length = 75 - strlen($start) - strlen($end);
+        $length = 75 - Tools::strlen($start) - Tools::strlen($end);
         $length = $length - ($length % 4);
 
         if ($charset === 'UTF-8') {
             $parts = array();
             $maxchars = floor(($length * 3) / 4);
-            $stringLength = strlen($string);
+            $stringLength = Tools::strlen($string);
 
             while ($stringLength > $maxchars) {
                 $i = (int)$maxchars;
@@ -526,9 +582,9 @@ class MailCore extends ObjectModel
                     $result = ord($string[--$i]);
                 }
 
-                $parts[] = base64_encode(substr($string, 0, $i));
-                $string = substr($string, $i);
-                $stringLength = strlen($string);
+                $parts[] = base64_encode(Tools::substr($string, 0, $i));
+                $string = Tools::substr($string, $i);
+                $stringLength = Tools::strlen($string);
             }
 
             $parts[] = base64_encode($string);

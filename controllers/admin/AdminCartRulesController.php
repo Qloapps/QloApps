@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -229,6 +229,18 @@ class AdminCartRulesControllerCore extends AdminController
         }
 
         return parent::postProcess();
+    }
+
+    public function processDelete()
+    {
+        $res = parent::processDelete();
+        if (Tools::isSubmit('delete'.$this->table)) {
+            $back = urldecode(Tools::getValue('back', ''));
+            if (!empty($back)) {
+                $this->redirect_after = $back;
+            }
+        }
+        return $res;
     }
 
     protected function afterUpdate($current_object)
@@ -516,19 +528,20 @@ class AdminCartRulesControllerCore extends AdminController
         }
 
         if (Tools::isSubmit('customerFilter')) {
+            $query_multishop = Shop::isFeatureActive() ? 's.`name` AS `from_shop_name`,' : '';
             $search_query = trim(Tools::getValue('q'));
-            $customers = Db::getInstance()->executeS('
-			SELECT `id_customer`, `email`, CONCAT(`firstname`, \' \', `lastname`) as cname
-			FROM `'._DB_PREFIX_.'customer`
-			WHERE `deleted` = 0 AND is_guest = 0 AND active = 1
-			AND (
-				`id_customer` = '.(int)$search_query.'
-				OR `email` LIKE "%'.pSQL($search_query).'%"
-				OR `firstname` LIKE "%'.pSQL($search_query).'%"
-				OR `lastname` LIKE "%'.pSQL($search_query).'%"
-			)
-			ORDER BY `firstname`, `lastname` ASC
-			LIMIT 50');
+            $customers = Db::getInstance()->executeS('SELECT c.`id_customer`, c.`email`, '.$query_multishop.' CONCAT(c.`firstname`, \' \', c.`lastname`) as cname
+                FROM `'._DB_PREFIX_.'customer` c
+                LEFT JOIN `'._DB_PREFIX_.'shop` s ON (c.`id_shop` = s.`id_shop`)
+                WHERE c.`deleted` = 0 AND c.`is_guest` = 0 AND c.`active` = 1
+                AND (
+                    c.`id_customer` = '.(int)$search_query.'
+                    OR c.`email` LIKE "%'.pSQL($search_query).'%"
+                    OR c.`firstname` LIKE "%'.pSQL($search_query).'%"
+                    OR c.`lastname` LIKE "%'.pSQL($search_query).'%"
+                )
+                ORDER BY c.`firstname`, c.`lastname` ASC
+                LIMIT 50');
             die(Tools::jsonEncode($customers));
         }
         // Both product filter (free product and product discount) search for products
@@ -583,11 +596,6 @@ class AdminCartRulesControllerCore extends AdminController
     public function renderForm()
     {
         $limit = 40;
-        $back = Tools::safeOutput(Tools::getValue('back', ''));
-        if (empty($back)) {
-            $back = self::$currentIndex.'&token='.$this->token;
-        }
-
         $this->toolbar_btn['save-and-stay'] = array(
             'href' => '#',
             'desc' => $this->l('Save and Stay')

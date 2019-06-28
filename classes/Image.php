@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -275,9 +275,9 @@ class ImageCore extends ObjectModel
 			WHERE `id_product` = '.(int)$id_product
         ) &&
         Db::getInstance()->execute('
-			UPDATE `'._DB_PREFIX_.'image` i, `'._DB_PREFIX_.'image_shop` image_shop
+			UPDATE `'._DB_PREFIX_.'image_shop` image_shop
 			SET image_shop.`cover` = NULL
-			WHERE image_shop.id_shop IN ('.implode(',', array_map('intval', Shop::getContextListShopID())).') AND image_shop.id_image = i.id_image AND i.`id_product` = '.(int)$id_product
+			WHERE image_shop.id_shop IN ('.implode(',', array_map('intval', Shop::getContextListShopID())).') AND image_shop.`id_product` = '.(int)$id_product
         ));
     }
 
@@ -290,10 +290,23 @@ class ImageCore extends ObjectModel
     public static function getCover($id_product)
     {
         return Db::getInstance()->getRow('
-			SELECT * FROM `'._DB_PREFIX_.'image` i'.
-            Shop::addSqlAssociation('image', 'i').'
-			WHERE i.`id_product` = '.(int)$id_product.'
+			SELECT * FROM `'._DB_PREFIX_.'image_shop` image_shop
+			WHERE image_shop.`id_product` = '.(int)$id_product.'
 			AND image_shop.`cover`= 1');
+    }
+
+    /**
+     *Get global product cover
+     *
+     * @param int $id_product Product ID
+     * @return bool result
+     */
+    public static function getGlobalCover($id_product)
+    {
+        return Db::getInstance()->getRow('
+			SELECT * FROM `'._DB_PREFIX_.'image` i
+			WHERE i.`id_product` = '.(int)$id_product.'
+			AND i.`cover`= 1');
     }
 
     /**
@@ -326,8 +339,10 @@ class ImageCore extends ObjectModel
                         copy(_PS_PROD_IMG_DIR_.$image_old->getExistingImgPath().'-'.$image_type['name'].'.jpg',
                         $new_path.'-'.$image_type['name'].'.jpg');
                         if (Configuration::get('WATERMARK_HASH')) {
-                            copy(_PS_PROD_IMG_DIR_.$image_old->getExistingImgPath().'-'.$image_type['name'].'-'.Configuration::get('WATERMARK_HASH').'.jpg',
-                            $new_path.'-'.$image_type['name'].'-'.Configuration::get('WATERMARK_HASH').'.jpg');
+                            $old_image_path = _PS_PROD_IMG_DIR_.$image_old->getExistingImgPath().'-'.$image_type['name'].'-'.Configuration::get('WATERMARK_HASH').'.jpg';
+                            if (file_exists($old_image_path)) {
+                                copy($old_image_path, $new_path.'-'.$image_type['name'].'-'.Configuration::get('WATERMARK_HASH').'.jpg');
+                            }
                         }
                     }
                 }

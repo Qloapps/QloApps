@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -140,6 +140,13 @@ class AdminPreferencesControllerCore extends AdminController
                     'type' => 'bool',
                     'default' => '0'
                 ),
+                // 'PS_API_KEY' => array(
+                //     'title' => $this->l('API key'),
+                //     'desc' => $this->l('Add your API key to display Google Map'),
+                //     'cast' => 'strval',
+                //     'type' => 'text',
+                //     'class' => 'fixed-width-xxl'
+                // ),
                 'PS_PRICE_ROUND_MODE' => array(
                     'title' => $this->l('Round mode'),
                     'desc' => $this->l('You can choose among 6 different ways of rounding prices. "Round up away from zero ..." is the recommended behavior.'),

@@ -7899,7 +7899,7 @@ a.iframe {
   a.iframe:hover {
     text-decoration: none; }
 
-p.payment_module {
+p.p.payment_module {
   margin-bottom: 10px; }
   p.payment_module a {
     display: block;
@@ -7907,47 +7907,54 @@ p.payment_module {
     -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
     border-radius: 4px;
-    font-size: 17px;
+    font-size: 14px;
     line-height: 23px;
     color: #333;
     font-weight: bold;
-    padding: 33px 40px 34px 99px;
+    padding: 30px 25px 27px 100px;
     letter-spacing: -1px;
     position: relative; }
-    p.payment_module a.bankwire {
-      background: url(../img/bankwire.png) 15px 12px no-repeat #fbfbfb; }
-    p.payment_module a.cheque {
-      background: url(../img/cheque.png) 15px 15px no-repeat #fbfbfb; }
-    p.payment_module a.cash {
-      background: url(../img/cash.png) 15px 15px no-repeat #fbfbfb; }
-    p.payment_module a.cheque:after, p.payment_module a.bankwire:after, p.payment_module a.cash:after {
-      display: block;
-      content: "\f054";
-      position: absolute;
-      right: 15px;
-      margin-top: -11px;
-      top: 50%;
-      font-family: "FontAwesome";
-      font-size: 25px;
-      height: 22px;
-      width: 14px;
-      color: #777; }
-    p.payment_module a:hover {
-      background-color: #f6f6f6; }
-    p.payment_module a span {
-      font-weight: bold;
-      color: #777; }
-
-.payment_module.box {
+  p.payment_module a:after {
+    display: block;
+    content: "\f054";
+    position: absolute;
+    right: 12px;
+    margin-top: -11px;
+    top: 50%;
+    font-family: "FontAwesome";
+    font-size: 20px;
+    height: 22px;
+    width: 14px;
+    color: #777; }
+  p.payment_module a:hover {
+    background-color: #f6f6f6; }
+  p.payment_module a span {
+    font-weight: bold;
+    color: #777; }
+  p.payment_module a.bankwire {
+    background: url(../img/bankwire.png) 15px 8px no-repeat #fbfbfb; }
+  p.payment_module a.cheque {
+    background: url(../img/cheque.png) 15px 8px no-repeat #fbfbfb; }
+  p.payment_module a.cash {
+    background: url(../img/cash.png) 15px 8px no-repeat #fbfbfb; }
+  .payment_module.box {
   margin-top: 20px; }
 
-p.cheque-indent {
+  p.cheque-indent {
   margin-bottom: 9px; }
 
-.cheque-box .form-group {
-  margin-bottom: 0px; }
-  .cheque-box .form-group .form-control {
-    width: 269px; }
+@media (max-width: 480px) {
+  p.payment_module a {
+    background-position: 12px 8px!important;
+    padding: 17px 25px 17px 90px;
+  }
+}
+@media (max-width: 355px) {
+  p.payment_module a {
+    background-position: 8px 8px!important;
+    padding: 7px 25px 7px 90px;
+  }
+}
 
 .order-confirmation.box {
   line-height: 29px; }
@@ -8041,7 +8048,6 @@ p.cheque-indent {
 #identity .gender-line,
 #account-creation_form .gender-line,
 #new_account_form .gender-line,
-#opc_account_form .gender-line,
 #authentication .gender-line {
   margin-bottom: 4px;
   padding-top: 4px; }
@@ -8052,7 +8058,7 @@ p.cheque-indent {
   #opc_account_form .gender-line > label,
   #authentication .gender-line > label {
     margin-right: 10px;
-    margin-bottom: 0; }
+    }
   #address .gender-line .radio-inline label,
   #identity .gender-line .radio-inline label,
   #account-creation_form .gender-line .radio-inline label,
@@ -8063,13 +8069,11 @@ p.cheque-indent {
     color: #777777; }
 
 #identity #center_column form.std .row,
-#authentication #center_column form.std .row,
-#order-opc #center_column form.std .row {
+#authentication #center_column form.std .row {
   margin-left: -5px;
   margin-right: -5px; }
   #identity #center_column form.std .row .col-xs-4,
-  #authentication #center_column form.std .row .col-xs-4,
-  #order-opc #center_column form.std .row .col-xs-4 {
+  #authentication #center_column form.std .row .col-xs-4 {
     padding-left: 5px;
     padding-right: 5px;
     max-width: 94px; }
@@ -8878,7 +8882,16 @@ hr.theme-text-underline {
 .badge-warning {
     background-color: #fbbb22;
 }
-
 .default-cursor {
   cursor: default!important;
 }
+.card {
+  margin-bottom: 20px;
+  background-color: #FFFFFF;
+  box-shadow: 0 2px 6px 0 rgba(0,0,0,0.20);
+  border-radius: 4px;
+  padding: 15px;
+  display: block;}
+
+
+

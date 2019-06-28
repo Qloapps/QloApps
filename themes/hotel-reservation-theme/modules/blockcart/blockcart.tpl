@@ -1,5 +1,5 @@
 {*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -18,7 +18,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
@@ -309,7 +309,7 @@
 					<div class="layer_cart_row">
 						<strong class="dark">
 							{l s='Wrapping' mod='blockcart'}
-							{if $display_tax_label}
+							{if $use_taxes && $display_tax_label && $show_tax}
 								{if $priceDisplay == 1}
 									{l s='(tax excl.)' mod='blockcart'}
 								{else}
@@ -342,6 +342,12 @@
 					<div class="layer_cart_row">
 						<strong class="dark">{l s='Tax' mod='blockcart'}</strong>
 						<span class="price cart_block_tax_cost ajax_cart_tax_cost">{$tax_cost}</span>
+					</div>
+				{/if}
+				{if isset($total_extra_demands)}
+					<div class="layer_cart_row">
+						<strong class="dark">{l s='Total Additional Facilities Cost' mod='blockcart'}</strong>
+						<span class="price ajax_cart_extra_demands_cost">{convertPrice price=$total_extra_demands}</span>
 					</div>
 				{/if}
 				<div class="layer_cart_row">
@@ -397,6 +403,8 @@
 {addJsDefL name=freeProductTranslation}{l s='Free!' mod='blockcart' js=1}{/addJsDefL}
 {addJsDefL name=delete_txt}{l s='Delete' mod='blockcart' js=1}{/addJsDefL}
 {addJsDefL name=toBeDetermined}{l s='To be determined' mod='blockcart' js=1}{/addJsDefL}
+{/strip}
+<!-- /MODULE Block cart -->
 
 <!-- ################################################################### -->
 <!-- By webkul to send needed variable in ajax-cart.js -->

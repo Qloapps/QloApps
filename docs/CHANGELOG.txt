@@ -1,4 +1,4 @@
-2007-2015 PrestaShop
+2007-2017 PrestaShop
 
 NOTICE OF LICENSE
 
@@ -17,12 +17,746 @@ versions in the future. If you wish to customize PrestaShop for your
 needs please refer to http://www.prestashop.com for more information.
 
 @author PrestaShop SA <contact@prestashop.com>
-@copyright 2007-2015 PrestaShop  SA
+@copyright 2007-2017 PrestaShop  SA
 @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 International Registred Trademark & Property of PrestaShop SA
 
 Release Notes for PrestaShop 1.6
 --------------------------------
+####################################
+#   v1.6.1.23 - (2018-11-01)
+####################################
+
+
+####################################
+#   v1.6.1.22 - (2018-10-09)
+####################################
+
+    Fixed bugs:
+
+    CO: Missing class const on cert refresh
+
+####################################
+#   v1.6.1.21 - (2018-10-03)
+####################################
+
+    Fixed bugs:
+
+    BO: Fix Module configure permission
+    BO: Disallow the negative discounts in orders
+    BO: Replace serialize with json_encode
+
+    FO : Removed duplicate expressions
+    FO : Stop sending a copy of the contact message to the "author" (avoid spam)
+
+    CO: Add a fallback to curl when file_get_content() return an empty response
+    CO: Hide arguments in debug trace page
+    CO: Fix the possibility to create a customer with "造" or "
+    CO: Catch all Swift exceptions in Mail::Send()
+
+####################################
+#   v1.6.1.20 - (2018-06-27)
+####################################
+
+    Fixed bugs:
+
+    BO: Improve cookie encryption
+    BO: PHP 7.2 compat - Fix fatal error
+    BO: Fix undefined property key on Rijndael
+
+    FO: Control if customer is the owner of the selected order in contact form
+
+    CO: Use https no http employee class
+
+    WS: FIX PHP 7.1 compat in WebserviceOutputBuilder
+
+####################################
+#   v1.6.1.19 - (2018-05-28)
+####################################
+
+    Fixed bugs:
+
+    BO: Fix directory listing
+
+    FO: Add compliance to GDPR law for blocknewsletter, contact form and mail alerts
+
+####################################
+#   v1.6.1.18 - (2018-02-05)
+####################################
+
+    Fixed bugs:
+
+    BO: Move to HTTPS
+    BO: Update marketplace URL to http(S)
+    BO: Fix AdminController's processDeleteImage() redirect after URL
+    BO: Fix stock available after add product in order
+    BO: Fix selecting a product does not work on Mac
+    BO: Update AdminModulesController.php
+    BO: Fix Stock cover report stock out calculation
+    BO: Revert "Add paid order to stats dashboard even when there's no related invoice generated"
+
+    FO: Hide the password in the confirmation email
+    FO: Fix the blank page when no currency defined in the shop
+    FO: Fix the sorting problem with a descending order in the products filtering page
+    FO: Split width of summary invoice pdf
+    FO: Fix conditionals check in DiscountController
+    FO: Fix the email validator
+
+    CO: Fixed for duplication of product which has both combinations and specific prices
+    CO: Fix error 500, result of built-in function in write context
+    CO: Fix PHP 7.1 compatibility
+    CO: Increase limit message chars
+    CO: Fix PHP Warning when updating category with multishop
+    CO: Add DB prefix in delete() method all time $add_prefix is set to true
+    CO: Clean the DB after language delete
+    CO: Use english email template as fallback in getEmailTemplateContent
+
+    IN: Update Postal Code of South Korea
+
+    WS: Fix the update product web service
+
+
+####################################
+#   v1.6.1.17 - (2017-09-07)
+####################################
+
+    Fixed bugs:
+    BO: Enable the create_order button when ordering virtual products & there's no available carriers
+    BO: Fix the currency display in supply order
+    BO: Fix coverage calculations in Stock Cover Report
+    BO: Add paid order to stats dashboard even when there's no related invoice generated
+
+    FO: Wrong gift display in My Voucher page in My Account
+    FO: Fix the email validation in instant checkout
+    FO: Secure the contact_form from spammers
+    FO: Secure FO from JS injection in URL
+    FO: Fix select delivery_option when changing the address in OPC
+    FO: Display the price based on the feature Customer_Groups
+
+    CO: Speed up search queries
+    CO: Load id_shop routes when needed
+    CO: Fix error when deleting a cart
+    CO: Add is_object condition in isInt function to prevent the error 500
+    CO: Fix duplicate url for supplier list when try to access a supplier
+    CO: Update the encrypt and decrypt functions to support all PHP versions
+    CO: Check if CMS Category is associated to shop
+
+
+####################################
+#   v1.6.1.16 - (2017-08-01)
+####################################
+
+	Fixed bugs:
+    BO: Fix bulk delete for CMS Category
+    BO: Remove download limit (SQL manager CSV export)
+    BO: Fix the export link of ASM movements
+    BO: Fixed bug about the language link in the reply_msg mail
+    BO: Add unicode prime symbol in PDF
+    BO: Add correctly the free_shipping cart_rule to an order from BO
+    BO: Update only checked fields when multishop option activated
+
+    FO: Fix multistore search indexation
+    FO: Fix the pagination of the list of products
+    FO: Fixed opc_id_address_invoice in OPC
+    FO: Add impact on price to the product price
+    FO: CategoryController - Show page 404 with an error instead of redirecting to the 404
+    FO: Use $base_dir_ssl if SSL is enabled on CMS categories pages
+    FO: Fix tax problems in shopping cart
+    FO: Fix unit price of the product with combinations
+    FO: Fix the translation when installing Prestashop
+
+    CO: Use MySQL index in cart delete method
+    CO: Undefined index base_price
+    CO: Subrequest error in SQL Manager
+    CO: Fix import theme while module use non registered hook in DB
+
+
+####################################
+#   v1.6.1.15 - (2017-06-28)
+####################################
+
+	Fixed bugs:
+    BO: Do not clutter webcaches with duplicated assets' objects
+    BO: Fix the conversion_rate in the order_payment table
+    BO: Fix the categories tree
+    BO: Display product reference in Stock management list (ASM)
+    BO: Fix available quantity for ASM items in Order_edit & FO
+    BO: Fix ASM real quantity issues when changing SupplyOrder status
+    BO: Fix subcategories pagination
+    BO: Prevent adding pack in itself
+    BO: Add the condition of SSL_ENABLED to Google Maps
+    BO: Eliminate currencies doubling in ASM currency list
+
+    FO: Apache rules for .woff2 font files
+    FO: Fix the specific price of the default combination
+    FO: Fix line endings in theme's JS files
+    FO: Fix Category Block in the Left Sidebar on Sitemap Page
+
+    CO: getBaseLink() should be public
+    CO: Fix AdminSlipController filter
+    CO: Fix wrong keys for cache
+
+    LO: Update colombian tax rate
+
+    WS: Fix preg_replace /e modifier for PHP 7.1
+
+
+####################################
+#   v1.6.1.14 - (2017-06-05)
+####################################
+
+	Fixed bugs:
+    BO: Pipes in product names in autocomplete
+    BO: Fix taxes in credit slip
+    BO: Fix the refresh button of the stats bloc in the products list
+    BO: Add API_KEY field to display the map
+    BO: Fix customer message order
+    BO: Set correct value on load to display the right tab
+    BO: Translation of return merchandise fields
+    BO: Fix html interpreted as text in carrier's wizard summary
+    BO: Fix non well formed numeric value
+    BO: Fix error in HelperOptions
+
+    FO: Fix popover with multiple wishlists
+    FO: Shipping cost indication wrong
+    FO: Fix 404 bug when query string contains a LF
+    FO: Fix manufacturer pagination
+    FO: Fix JS error "Uncaught ReferenceError"
+
+    CO: Increase carrier delay length
+    CO: Send Http 500 error code when we can't connect to the database instead of a 200 code
+    CO: make OrderInvoice overridable
+
+    LO: Replace EN (US) by EN (UK) in UK localization pack
+
+
+####################################
+#   v1.6.1.13 - (2017-04-10)
+####################################
+
+	Fixed bugs:
+    CO: Optimization for Cart Rules
+    CO: Fix url rewrite setting not used on multishop
+    CO: Clean order detail cache after setting invoice id
+    CO: Update Israel localization
+    CO: Remove unused variables declarations and assignations
+
+    BO: Error importing theme when cache directory is cleared
+    BO: Allow stock transfer between warehouses in multishop context
+    BO: Fix search in Advanced Stock Management
+    BO: Use native round instead of 2 forced decimals
+    BO: Replace comma with dot in special price
+    BO: Don't double encode test email
+    BO: Generate PDF invoices in user language
+    BO: Fixes on must-have module upgrade
+
+    FO: Fix Combination filter in stock management section
+    FO: Fix price display when quantity discount on combination
+    FO: Style categories tree in footer
+
+    IN: Allow 255 char to company field in Adress
+    IN: Fix install language
+
+####################################
+#   v1.6.1.12 - (2017-03-14)
+####################################
+
+	Fixed bugs:
+	CO: Deflate .svg files
+	CO: Webservices now show PS validation errors
+	CO: Update Israel VAT to 17%
+	CO: Fix bag with Cart::getPackageSthippingCost cache id
+	CO: Fix send to multiple addresses with different names
+	CO: Add missing option to bcc multiple addresses in Mail::send()
+	CO: Use shop email as sender for template order_customer_comment
+	CO: Fix 7.1 compatibility
+	CO: Update Doc import files
+
+	BO: Modification permission on Theme Page and option
+	BO: Modification permission on Theme Page and option
+	BO: Fix error when creating a zero value in the attribute size
+	BO: Fix bug while filtering Credit Slip
+	BO: Fix doubled quantity when ordering a customizable product
+	BO: Callback on HelperList should have highest priority
+	BO: Avoid overwriting $token in global Smarty context.
+
+	FO: Product reference is now available in blockbestsellers module
+	FO: Fix ecotax rounded twice
+	FO: Bugfix JS with advancedEuCompliance
+	FO: Fix product without combination hashchange
+
+####################################
+#   v1.6.1.11 - (2017-01-16)
+####################################
+
+	Fixed bugs:
+	CO: Fix detection of APCu on Performance page
+	CO: Cast id_cart to int to keep it in the SQL query
+	CO: Performance opt on scandir() usage
+	CO: Fix for MySQL error 1093 in generating the invoice number
+	CO: Fix misuse of getimagesize returned informations
+	CO: Fixed method Order::isVirtual
+	CO: PHP 7.1 Fatal error: operator not supported in DbQuery.php
+	CO: Fix multiple configuration entry for PERCENT_PRODUCT_OUT_OF_STOCK_EXPIRE
+
+	BO: Fixed category search in product association tab
+	BO: Fix date filter when entering BO
+	BO: Fixed product customization duplication
+	BO: Uploader helper multiple files undefined _max_files
+	BO: Orders amount currency fixed
+	BO: Remove synchronous javascript call in translations
+
+	FO: Reset country in address page after error
+	FO: Fix & optimize search::find queries
+	FO: Re-instate default id for product list
+	FO: Accessory product names are not the product name (Schema.org)
+	FO: Fix grid view payment methods on small devices
+
+
+####################################
+#   v1.6.1.10 - (2016-11-25)
+####################################
+
+	Fixed bugs:
+
+	[-] MO : (3b0f90b) missing IF for PRODUCT_TAB
+
+	[-] BO : (3979614) Fix admin email translations
+
+
+	Improved/changed features:
+
+	[*] BO : (81d6f5b) Bring back email pattern value in case someone uses it
+
+
+
+
+
+####################################
+#   v1.6.1.7 - (2016-09-06)
+####################################
+
+	Fixed bugs:
+
+	[-] BO : (f19ae86) Solved problem with non-unserialized filters datas
+
+	[-] FO : (2636a31) Fix rouding error in ProductController (PSCSX-7566)
+
+
+	Improved/changed features:
+
+	[*] CORE : (e12c209) Fix a case where $context->smarty could be undefined
+
+
+	Others:
+
+	CO: Fixed cart rule removal with gift product
+	CO: Fix bug #PSCSX-6142 - wrong default cover id in webservice
+	CO: change visibility of installControllers() method
+	CO: Fix warning when duplicating products
+
+	FO: Add a hook on cart product line
+	FO: Solved problem with a situation when we'd like to use category thumb w/o category lead banner
+	FO : Prevent customer to view all codes
+
+	Resolved "price.toFixed is not a function" issue
+	PSCSX-7138 Bad discount computation when multiples tax rates are involved
+	Keep CMS HTML code when upgrading
+
+
+####################################
+#   v1.6.1.6 - (2016-06-15)
+####################################
+
+	Fixed bugs:
+
+	[-] BO : (2e3d0f6) fixed bug when no results with address and map does not exist
+	[-] BO : (2d30765) add user shop origin in autocomplete cart rule
+	[-] BO : (d207083) fixed bug parent tab list wont show if admin tab class is invalid.
+	[-] BO : (052208b) fixed bug when toggle status product not logged
+
+	[-] FO : (c0ee6b7) Fix CSS 404 when using subdirectory
+	[-] FO : (e4a7b70) Only display vouchers available 'only' for customers
+	[-] FO : (e4e2b61) smartyHook now returns empty string when module is not installed.
+	[-] FO : (b2f9338) #PSCSX-5582 fix wrong displayed specific price on product detail
+	[-] FO : (44c1b4e) Display only available vouchers in customer back office
+	[-] FO : (c736160) on user bo, display all discount values
+
+	[-] TEST : (c586ee3) Fix PHP 7 tests
+
+	[-] CORE : (39241d6) Check for displayPaymentEU to fix advanced checkout restrictions
+	[-] CORE : (fb208a3) Fix fatal error on classes/stock/StockAvailable.php (1.6)
+
+	[-] PDF : (2d14094) Fix generation of PDF files
+
+	[-] WS : (114f10b) Fix for PHP 5.2, 5.3 and 7.0 compatibility
+
+	[-] MO : (e7a51f3) #NM-248 Broken pagination links in loyalty
+
+
+	Improved/changed features:
+
+	[*] FO : (4e1a70a) Added more information about minimum amount
+
+
+	Added Features:
+
+	[+] IN : (a1ce85c) All key must not be nullable
+
+
+
+
+
+####################################
+#   v1.6.1.5 - (2016-04-08)
+####################################
+
+	Fixed bugs:
+
+	[-] PDF : (9f7ab92) update constraints on Addresses display
+	[-] PDF : (e7103c4) updated b2b template
+	[-] PDF : (e0bde47) invoices printing now done as page groups to keep the pagination relevant
+	[-] PDF : (3464ca0) fixed pagination block display
+	[-] PDF : (a788652) Moved note block to his own remplate
+	[-] PDF : (b5ef9f2) (re) added shipping box in invoice
+
+	[-] FO : (331527c) Fix incorrect cart rules list in case of country restriction (PSCSX-7873)
+	[-] FO : (a343610) PSCSX-7449, fix parse error in AuthController.php
+	[-] FO : (42d8847) #PSCSX-5582 fix wrong displayed specific price on product detail
+	[-] FO : (755f77b) Fix warning if combinations are disabled
+	[-] FO : (05b701f) Fix combination price calculation with impact and reduction
+	[-] FO : (b1352d7) Fix JavaScript mistake in blocklayered.js
+	[-] FO : (8ee195a) fixed bug on payment module, check if defined $order object
+
+	[-] CORE : (9870d84) use a cached cacert file for curl
+	[-] CORE : (deebce3) Fixed double preg_quote()
+
+	[-] BO : (647eba0) Fix the display of the listing filters on the toolbar
+	[-] BO : (6e69c4a) Change only active state on bulk status change
+	[-] BO : (69b87a8) Fix incorrect shipping taxes in order slips (PSCSX-4881)
+	[-] BO : (44eb96c) Fix filter by category change not working after other actions. …
+	[-] BO : (76d53ac) add error message on upload theme bigger than post_max_size
+
+	[-] LO : (011a2e5) Traditionnal Chinese for HK pack
+
+	[-] TR : (948a3e5) language.xml - fix TW script
+
+	[-] SECURITY : (cc49345) Fixes PSCSX-4841 Usage of ECB mode
+
+	[-] CLASS : (7234efd) Alias / return false if feature is not active in aliasExists()
+
+	[-] MO : (de7e9aa) bankwire / correct module name for translation
+
+
+	Improved/changed features:
+
+	[*] CORE : (85e6025) Update swift mailer
+	[*] CORE : (81465fe) Add a fallback to curl when file_get_content() return an empty response
+
+	[*] TR : (4b3ddf5) Update Polish installer
+	[*] TR : (62bbc16) feature.xml in Vietnamese
+	[*] TR : (1cce929) Update italian installer
+	[*] TR : (5319857) Improve Dutch meta info
+
+	[*] CLASS : (ec03391) Hook / indicate which method to use for deprecated methods
+
+	[*] FO : (999ff45) Removed template logic that is not needed
+
+
+	Added Features:
+
+	[+] TR : (30c4adc) Adding Vietnamese installer
+
+
+
+
+
+####################################
+#   v1.6.1.4 - (2016-01-06)
+####################################
+
+	Fixed bugs:
+
+	[-] CORE : (c243c8a) Fix ObjectModel error management on validation
+	[-] CORE : (508e1cd) Fix AdminTab PHP 7 compatibilty
+	[-] CORE : (355a4a7) Report of https://github.com/PrestaShop/PrestaShop/pull/3673
+	[-] CORE : (0a07da9) fix #PSCSX-7007, notice in searchcron
+	[-] CORE : (13285fd) Fix PSCSX-6953, bad upload error check
+
+	[-] TESTS : (b826568) removed tests for prestafraud module
+
+	[-] BO : (c35d896) Fixed bug in HTMLTemplateInvoice prevents problems with invoice prefixs
+	[-] BO : (e71bdaa) fixed translation bug in prestashop addons modal
+	[-] BO : (48d9da7) Fixed upgrade index specific_price table
+
+	[-] FO : (0eecc7a) Fix #PSCSX-7021, bad specific base price for combinations
+	[-] FO : (40717fa) Fix #PSCSX-7021, bad impact price / currency
+	[-] FO : (0bd1bdc) Fix robots.txt rules for default language URLs
+	[-] FO : (ed08594) Fix quantity discount table wont appear again after swith on combination without quantity discount
+
+
+	Improved/changed features:
+
+	[*] PROJECT : (bcbec89) Improve PHP 7 compatibility
+
+	[*] BO : (ad3c187) #PSCSX-6251 on product order add unit product price without tax
+	[*] BO : (06502f9) Dont restrict orders listing to addresses join
+
+	[*] CORE : (94846bd) Fix #PSCSX-7015, Uploader setAcceptFiles case sensitive
+
+	[*] FO : (83c7ee1) #PSCSX-5582 update price from discount when changing quantity
+
+
+####################################
+#   v1.6.1.3 - (2015-11-26)
+####################################
+
+	Fixed bugs:
+
+	[-] FIX : (e3eef33) Uncaught Error: Access to undeclared static property: Validate::$field
+	[-] FIX : (0ab3b7d) Uncaught Error: Access to undeclared static property: Validate::$field
+
+	[-] BO : (c83e478) Revert from #4015 to allow longer meta
+	[-] BO : (f1d09d6) Fix flush of local cache when adding a new specific price (PSCSX-7184)
+
+	[-] FO : (bbbd4b3) Add id_order to order_details link to work without JS
+
+	[-] LO : (673d7fe) Fix Intra-EU VAT
+
+
+
+
+
+####################################
+#   v1.6.1.2 - (2015-10-29)
+####################################
+
+	Fixed bugs:
+
+	[-] FO : Fix wrong date check in specific price (PSCSX-6942)
+	[-] FO : Fix performances issue with SpecificPrice (PSCSX-6942)
+	[-] FO : Fix undefined var when no combinations
+	[-] FO : Added missing hook for AdvancedEU on accessories
+	[-] FO : Fix #PSCSX-6995, bad redirection on cart when minimum amount for order
+	[-] FO : Fix performances issue with smarty custom
+	[-] FO : Fix bug #PSCSX-6938, bad validation when empty zipcode validation pattern
+	[-] FO : Metas in maintenance mode
+	[-] FO : Fix #PSCSX-6926, notice Undefined index: nb_products
+	[-] FO : Fix #PSCSX-6884, bad redirect when PS_CART_REDIRECT
+	[-] FO : Fix #PSCSX-6888, products links without correct anchor for attributes in shopping-cart
+	[-] FO : Fix bug #PSCSX-6884, could not add to cart in quickview
+	[-] FO : #PSCSX-5366, no localstorage with Safari private browsing
+	[-] FO : Fix #PSCSX-5053, Too much calls of findCombination again
+	[-] FO : Fix #PSCSX-5480, content hooked to 'productListReviews' is removed on dynamic list/grid update
+	[-] FO : Fix #PSCSX-5344, could not see available vouchers when changing quantities
+	[-] FO : Fix #PSCSX-5447, no validation on non multishop filed in multishop
+	[-] FO : Report of https://github.com/PrestaShop/PrestaShop/pull/3928
+	[-] FO : Fix #PSCSX-5182, for newsletter flag for customer if previously registred as guet
+	[-] FO : fix when clicking filters labels, not checkbox. Fixed an #3337 reported on 1.6.1.x
+	[-] FO : Footer fix in default-bootstrap theme: nocache on copyright year #3351 reported on 1.6.1.x
+	[-] FO : #PSCSX-6820 part 2/2
+	[-] FO : Fix bug #PSCSX-6770, bad redirection to my account in accordion footer
+	[-] FO : Fix #PSCSX-6749, OrderHistory multishop getCustomerOrders shared orders
+	[-] FO : Fix #PSCSX-6701, notice on customizedDatas
+	[-] FO : Fix #PSCSX-6699, Table 'ps_product_reductions' already exists
+	[-] FO : Fix #PSCSX-6661 Fatal error Property CustomerThread->id_order is not valid
+	[-] FO : Possible error Cannot read property 'iso_code' of undefined
+	[-] FO : Possible undefined function binduniform
+	[-] FO : Fix #PSCSX-5669, $errors_discount dead code, report of https://github.com/PrestaShop/PrestaShop/pull/3076
+	[-] FO : Fix bug #PSCSX-4707, new products name in columns
+	[-] FO : Fix #PSCSX-4898, possible fatal error in products-comparison
+	[-] FO : Avoid possible undefined vars in global.js
+	[-] FO : minimum order value outside order steps
+	[-] FO : Fix #PSCSX-5445, take account of PS_SSL_ENABLED_EVERYWHERE in file manager config
+	[-] FO : Css fix #PSCSX-5408, TOS width on small devices
+	[-] FO : Fix #PSCSX-5319, dead code in product-list.tpl
+	[-] FO : Fix #PSCSX-5483, missing nofollow in pagination.tpl
+	[-] FO : Fix #PSCSX-5261, no alt on subcategories images
+	[-] FO : Avoid displaying payment message
+	[-] FO : Fix #PSCSX-6492, negative prices on product page
+	[-] FO : Fix issue with multishop / multilanguage tags
+	[-] FO : Fix #PSCSX-4899, Search alias for words containing hyphens fail
+	[-] FO : Fix current_url variable used in pagination
+	[-] FO : Fix #PSCSX-6582, could not change currency with PS_DETECT_COUNTRY
+	[-] FO : #PSCSX-5459 Add to cart button for accessories
+
+	[-] CORE : cleanCompareProducts interval
+	[-] CORE : Could not edit a carrier, follow up https://github.com/PrestaShop/PrestaShop/pull/4094
+	[-] CORE : Fix #PSCSX-7012, bad length for compagny field (address) for upgrade from < 1.5.2.0
+	[-] CORE : #PSCSX-6970, fix typo in getCMSContent
+	[-] CORE : Undefined var follow up https://github.com/PrestaShop/PrestaShop/pull/4006
+	[-] CORE : Could not disable third party modules
+	[-] CORE : #PSCFV-10112 notice Undefined index: host in classes/ConnectionsSource.php
+	[-] CORE : Fix #PSCSX-4768, too much call of Carrier::addDeliveryPrice
+	[-] CORE : Adding few casts to ValidateOrder
+	[-] CORE : Error in foreign field name
+	[-] CORE : Follow up https://github.com/PrestaShop/PrestaShop/pull/2509/files
+	[-] CORE : Report of https://github.com/PrestaShop/PrestaShop/pull/3964
+	[-] CORE : Report of https://github.com/PrestaShop/PrestaShop/pull/3963
+	[-] CORE : Fixed currency convertion
+	[-] CORE : Fix #PSCSX-5357, inconsistent cart rule country restriction
+	[-] CORE : Allow invoice template override
+	[-] CORE : Fix #PSCSX-6798, add index on search_index table
+	[-] CORE : Fix #PSCSX-6797, hard coded table name in configuration class
+	[-] CORE : Typo report of https://github.com/PrestaShop/PrestaShop/pull/3995
+	[-] CORE : Fix #PSCSX-6719, bad cache on colors list on attribute deletion
+	[-] CORE : Again and again fix #PSCSX-6719, bad cache_default_attribute on attribute group deletion
+	[-] CORE : Fix #PSCSX-6814, bad sql query in Lanqguage::loadUpdateSQL()
+	[-] CORE : Order::hasDelivery new return type
+	[-] CORE : Fix #PSCSX-6755, Notice: Undefined variable: delivery_address in classes/pdf/HTMLTemplateOrderSlip.php
+	[-] CORE : Fix #PSCSX-6632, Property StockAvailable->id_product is empty
+	[-] CORE : Bad norm function getCountry
+	[-] CORE : Revert of https://github.com/PrestaShop/PrestaShop/pull/2509
+	[-] CORE : Fix #PSCSX-6637, incorrect cart total
+	[-] CORE : Fix #PSCSX-5273 Reflect 6 decimals for product weight according db structure
+	[-] CORE : Fix case statement in HTMLTemplateInvoice
+	[-] CORE : Fix colon in switch statement
+	[-] CORE : Remove leftover symbol in Translate.php
+	[-] CORE : Stock synchronization fails in case of shared warehouse
+	[-] CORE : #PSCSX-6577, could not load bootstrap-sortable.js with Chrome
+	[-] CORE : DbMySQLi + socket
+
+	[-] BO : Notice in AdminCustomers
+	[-] BO : Fix #PSCSX-7050, wrong pictures shown in AdminProducts
+	[-] BO : Fix bad usage of .html() instead of .text() in carrier_wizard.js
+	[-] BO : Added missing escape on legend field product form
+	[-] BO : Fix pagination, followup https://github.com/PrestaShop/PrestaShop/commit/dd3cf42354fc1a7cd08b6b9efe202b185bdf3239
+	[-] BO : Show stock warning on products less then 0
+	[-] BO : Fix PSCSX-6960 - AdminCustomerController, string now translatable
+	[-] BO : remove old warning icon if no customer found when search one in create order
+	[-] BO : Fix #PSCSX-6916, Bad redirect when deleting shopping cart rule in customer details view
+	[-] BO : Fix #PSCSX-6903, Exception on specific price amount import
+	[-] BO : Fix bug #PSCSX-6924, Property CustomerMessage->message is empty
+	[-] BO : Fix #PSCSX-6837, delete thumb on product import
+	[-] BO : Fix #PSCSX-6865 bad utm_campaign, notice: Undefined index: lang_iso
+	[-] BO : Fix #PSCSX-6860, customer groups - remove enable status on customers
+	[-] BO : Fix #PSCSX-6859, wrong redirect after editing customer
+	[-] BO : Fix #PSCSX-6805, confusion about private messages in AdminCustomerThreads
+	[-] BO : Fixed checking if module is trusted PSCSX-6883
+	[-] BO : Fixed bug while testing module
+	[-] BO : Fix #PSCSX-5435, remove back button message of expired POST data
+	[-] BO : Fix meta description, follow up https://github.com/PrestaShop/PrestaShop/pull/4015
+	[-] BO : Bad sql association for date_upd of product and categories, could not reorder
+	[-] BO : Partial report of https://github.com/PrestaShop/PrestaShop/pull/3853
+	[-] BO : fixed bug Unable to translate header
+	[-] BO : Fix #PSCSX-6834 Enable product pack and product dematerialized for redirection product (Moved 301)
+	[-] BO : Fix #PSCSX-6834 Enable product pack and product dematerialized for accessories
+	[-] BO : fix column icon width
+	[-] BO : Fix #PSCSX-6663, bad table id after DND
+	[-] BO : Fix use of custom class with textarea (even if autoload_rte not set)
+	[-] BO : Fix #PSCSX-6801, AdminBackupControllerCore and timeout
+	[-] BO : Fix #PSCSX-6795, Catalog Rule for a specific shop do not save shop_id
+	[-] BO : Group by on currencies on AdminSpecificPriceRule
+	[-] BO : Fix #PSCSX-6667, bad action display when sub categories disabled
+	[-] BO : Fix #PSCSX-6753, parse serror when quotes in import file name
+	[-] BO : Fix #PSCSX-6804, could not bulk delete attributes
+	[-] BO : Fix #PSCSX-6752, bad id for email translations toggle
+	[-] BO : Fix #PSCSX-6743, possible Exception in product tabs loading
+	[-] BO : Fix #PSCSX-6723, could not re enable module on devices
+	[-] BO : Fix #PSCSX-6718, virtual product Duplicate entry
+	[-] BO : Fix #PSCSX-6687, commas in carrier prices wizard
+	[-] BO : Fix #PSCSX-6664, product date_upd when position change
+	[-] BO : Fix #PSCSX-6664, category date_upd when position change
+	[-] BO : Fix performance issue with tags
+	[-] BO : #PSCSX-6658, wrong escaping in helpers/form/form.tpl
+	[-] BO : undefined var in AdminProducts
+	[-] BO : Fix #PSCSX-6636 modules logo witdh
+	[-] BO : Fix #PSCSX-6629 typo Warehouse::$idintval
+	[-] BO : Fix #SCSX-6588, wrong "back o list" href on AdminCategories
+	[-] BO : name of select multiple in Form Helper TPL
+	[-] BO : Fix #PSCSX-5442 cart rules don't retain customer name/email on error
+	[-] BO : Fix issue with smarty lazy cache & timestamp (PSCSX-6601)
+	[-] BO : Fix issue with smarty lazy cache & timestamp
+	[-] BO : Fix #PSCSX-5271, notices on order statuses
+	[-] BO : Duplicate currencies in AdminCountries in multishop
+	[-] BO : Fix issue with cover image (PSCSX-6473)
+	[-] BO : Fix product import dates
+	[-] BO : Fix #PSCSX-6583 / You can now have a "from" date and a "to" date like '0000-00-00 00:00:00'
+	[-] BO : Pass empty firstname and lastname email vars to mail template
+
+	[-] INSTALLER : Date format was American (cherry picked from commit 7609530fce25663160def3d4387987d4c957885e)
+
+	[-] TR : Change 'Uitzonderlijk' into 'Openstaand'
+	[-] TR : #PSCSX-5938 Emails not copied into theme folder
+
+	[-] IN : Wrong id_guest in cart.xml
+	[-] IN : Bad install value for delivery table
+	[-] IN : Fix #PSCSX-6700, could not install in Czech, missing translation for fixtures data, still needs translation to be done
+
+	[-] WS : Manage multiple exclude filter values
+
+	[-] CLASS : AdminController / Remove displayNoSmarty() method
+	[-] CLASS : Module / $live_edit declared but not used
+	[-] CLASS : Customization / Use getValue() instead of getRow()
+	[-] CLASS : Address / Use getValue() instead of getRow() in isUsed() method
+	[-] CLASS : Missing category param when update positions + duplicate call
+	[-] CLASS : Category / Use DB delete() method in deleteCategoriesFromShop()
+	[-] CLASS : Category / Use DB delete() method in cleanGroups() & cleanAssoProducts();
+	[-] CLASS : Product / Use DB delete() method in cleanGroups()
+	[-] CLASS : Customer / Give the possibility to filter on active field in getCustomers()
+	[-] CLASS : Cart / Correct cache_key name for getOrderedCartRulesIds()
+	[-] CLASS : Product / Use DB delete() method in deleteAccessories() & deleteFromAccessories() methods
+	[-] CLASS : Product / Change getDefaultIdProductAttribute() method
+	[-] CLASS : Product / Change getIdProductAttributeMostExpensive() method
+	[-] CLASS : Product / Use null direclty instead of create new var as null
+	[-] CLASS : Product / Call orderbyPrice only if there are some results
+
+	[-] MO : #PSCSX-6820 related
+	[-] MO : NM-188 Correct points on product load in loyalty
+
+	[-] INSTALL : Fix possible duplicate hook
+
+	[-] TEST : Removing PrestaFraud scoring test
+
+	[-] PDF : #PSCSX-6569 Could not translate "Free Shipping" in pdf
+
+
+	Improved/changed features:
+
+	[*] BO : #PSCFV-12359 #PSCSX-1257 product tab async loading
+	[*] BO : wording AdminCarrierWizard - typo
+	[*] BO : wording - thumbnail image
+	[*] BO : wording - assign vs affect
+	[*] BO : Add versioning to addJS to renew admin.js
+	[*] BO : Fix max width 96px on module logo on "not trusted module" popin. #3356 reported of 1.6.1.x
+	[*] BO : makes picking products easier
+	[*] BO : Fix #PSCSX-4024 removing extra sapace at end of product names and url rewrite
+	[*] BO : Fix #PSCSX-6132 Add search_contains in chosen init
+	[*] BO : Fix #PSCSX-6570, id_connections in last connections
+	[*] BO : #NM-305 add driver in AdminInformation
+	[*] BO : Meta title and description use textarea
+
+	[*] CORE : SpecificPriceRule without conditions to id_product 0 instead of full products list
+	[*] CORE : Fix htmlentities in conf
+	[*] CORE : #PSCSX-3181, follow up https://gist.github.com/hereswhatidid/8c8edef106ee95138b03 implements data-keepinline for scripts not being defered
+	[*] CORE : Media::getMediaPath improved
+	[*] CORE : Fix #PSCSX-5772 & #PSCSX-4666, enable invoice number reset
+	[*] CORE : #PSCSX-3576, add category thumbnail
+
+	[*] FO : theme.sql new demo address
+	[*] FO : Fix #PSCSX-5053, improve findCombination speed
+	[*] FO : Add InStock mdata when out of stock is OK
+
+	[*] TR : update Swedish installer
+	[*] TR : Better consistency + improved readability
+	[*] TR : Translate placeholder imgs to Dutch
+	[*] TR : Translate login info mail to Dutch
+	[*] TR : Translated risk levels to Dutch (cherry picked from commit 1e6788f358bc850d3d22964839aaa885119c9be9)
+	[*] TR : Translated country list to Dutch (cherry picked from commit ea0cdff236936f6a5af3511c0f285dbda24983b6)
+	[*] TR : Swedish install files, few edits
+	[*] TR : Translate install xml files to Swedish
+
+	[*] IN : fixtures, add some Czech translations
+
+	[*] MO : Blocklanguages add hreflang and rel alternate to the links for a better SEO and avoid duplicate content
+
+	[*] INSTALL : Alter ignore drop key is now generic and fix an 1.6.1.1 error
+	[*] INSTALL : The 1.6.1.1 indexes are now safely removed
+
+
+
+
+
 ####################################
 #   v1.6.1.1 - (2015-08-20)
 ####################################
@@ -269,7 +1003,7 @@ Release Notes for PrestaShop 1.6
 	[+] TESTS : Add unit tests for PrestaShop#2867 minifyCSS() && ReplaceByAbsoluteURL()
 
 
-	
+
 
 
 ####################################
@@ -1104,7 +1838,7 @@ Release Notes for PrestaShop 1.6
 	[+] DBQUERY : improve to use SELECT or DELETE syntax.
 
 
-	
+
 
 
 

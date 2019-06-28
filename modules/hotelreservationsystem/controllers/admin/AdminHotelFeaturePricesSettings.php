@@ -28,40 +28,36 @@ class AdminHotelFeaturePricesSettingsController extends ModuleAdminController
         $this->identifier  = 'id_feature_price';
         parent::__construct();
 
-        $this->_join .= 'JOIN `'._DB_PREFIX_.'product_lang` pl ON (pl.`id_product` = a.`id_product` AND pl.`id_lang`='.
-        Configuration::get('PS_LANG_DEFAULT').')';
-        $this->_join .= 'LEFT JOIN `'._DB_PREFIX_.'htl_room_type_feature_pricing_lang` fpl
-        ON (a.id_feature_price = fpl.id_feature_price)';
+        $this->_join .= ' LEFT JOIN `'._DB_PREFIX_.'product_lang` pl ON (pl.`id_product` = a.`id_product` AND pl.`id_lang`='.(int) $this->context->language->id.')';
+        $this->_join .= ' LEFT JOIN `'._DB_PREFIX_.'htl_room_type_feature_pricing_lang` fpl ON (a.id_feature_price = fpl.id_feature_price AND fpl.`id_lang` = '.(int) $this->context->language->id.')';
 
-        $this->_select .= ' fpl.`feature_price_name`, CONCAT(pl.`name`, " (#", a.`id_product`, ")") as product_name,
-        IF(a.impact_type=1 , CONCAT(round(a.impact_value, 2), " ",  "%"), a.impact_value) AS impact_value';
+        $this->_select .= ' fpl.`feature_price_name` as ftr_price_name, CONCAT(pl.`name`, " (#", a.`id_product`, ")") as product_name, IF(a.impact_type=1 , CONCAT(round(a.impact_value, 2), " ", "%"), a.impact_value) AS impact_value';
         $this->_select .= ' ,IF(a.impact_type=1 , \''.$this->l('Percentage').'\', \''.$this->l('Fixed Amount').'\')
         AS impact_type';
         $this->_select .= ' ,IF(a.impact_way=1 , \''.$this->l('Decrease').'\', \''.$this->l('Increase').'\')
         AS impact_way';
-
-        $this->_where = ' AND fpl.`id_lang` = '.(int) $this->context->language->id;
 
         $impactWays = array(1 => 'decrease', 2 => 'increase');
         $impactTypes = array(1 => 'Percentage', 2 => 'Fixed Price');
 
         $priorities = Configuration::get('HTL_FEATURE_PRICING_PRIORITY');
         $this->context->smarty->assign('featurePricePriority', explode(';', $priorities));
-        $this->fields_options = array(
-                    'feature_price_priority' => array(
-                    ));
+        $this->fields_options = array('feature_price_priority' => array());
         $this->fields_list = array(
             'id_feature_price' => array(
                 'title' => $this->l('ID'),
                 'align' => 'center',
             ),
             'product_name' => array(
-                'title' => $this->l('Product'),
+                'title' => $this->l('Room'),
                 'align' => 'center',
+                'havingFilter' => true,
+                'callback' => 'getRoomTypeLink',
             ),
-            'feature_price_name' => array(
+            'ftr_price_name' => array(
                 'title' => $this->l('Feature Name'),
                 'align' => 'center',
+                'havingFilter' => true,
             ),
             'impact_way' => array(
                 'title' => $this->l('Impact Way'),
@@ -93,6 +89,7 @@ class AdminHotelFeaturePricesSettingsController extends ModuleAdminController
                 'title' => $this->l('Date To'),
                 'align' => 'center',
                 'type' => 'date',
+                'callback' => 'getDateToValue',
             ),
             'active' => array(
                 'align' => 'center',
@@ -101,7 +98,6 @@ class AdminHotelFeaturePricesSettingsController extends ModuleAdminController
                 'type' => 'bool',
             ),
         );
-
         $this->bulk_actions = array(
             'delete' => array(
                 'text' => $this->l('Delete selected'),
@@ -109,9 +105,30 @@ class AdminHotelFeaturePricesSettingsController extends ModuleAdminController
                 'confirm' => $this->l('Delete selected items?'),
             ),
         );
+
+        $this->list_no_link = true;
     }
 
-     //A callback function for setting currency sign with amount
+    public function getDateToValue($dateTo, $row)
+    {
+        if ($row['date_selection_type'] == 1) {
+            return date($this->context->language->date_format_lite, strtotime($dateTo));
+        } else {
+            return '<span class="badge badge-success">'.$this->l('Specific date').'</span>';
+        }
+    }
+
+    public function getRoomTypeLink($productName, $row)
+    {
+        $displayData = '';
+        if ($row['id_product']) {
+            $displayData .= '<a target="_blank" href="'.$this->context->link->getAdminLink('AdminProducts').
+                '&id_product='.$row['id_product'].'&updateproduct">'.$productName.'</a>';
+        }
+        return $displayData;
+    }
+
+    //A callback function for setting currency sign with amount
     public static function setOrderCurrency($echo, $tr)
     {
         $currency_default = Configuration::get('PS_CURRENCY_DEFAULT');
@@ -217,23 +234,18 @@ class AdminHotelFeaturePricesSettingsController extends ModuleAdminController
 
         $languages = Language::getLanguages(false);
         $objDefaultLang = new language($defaultLangId);
-        if (!Tools::getValue('feature_price_name_'.$defaultLangId)) {
-            $this->errors[] = sprintf(
-                $this->l('Feature price rule name is required at least in %s'),
-                $objDefaultLang->name
+        $isPlanTypeExists = 0;
+        if ($dateSelectionType == 2) {
+            $isPlanTypeExists = $objFeaturePricing->checkRoomTypeFeaturePriceExistance(
+                $roomTypeId,
+                $specificDate,
+                date('Y-m-d', strtotime("+1 day", strtotime($specificDate))),
+                'specific_date',
+                false,
+                $idFeaturePrice
             );
-        } else {
-            $isPlanTypeExists = 0;
-            if ($dateSelectionType == 2) {
-                $isPlanTypeExists = $objFeaturePricing->checkRoomTypeFeaturePriceExistance(
-                    $roomTypeId,
-                    $specificDate,
-                    date('Y-m-d', strtotime($specificDate) + 86400),
-                    'specific_date',
-                    false,
-                    $idFeaturePrice
-                );
-            } elseif (isset($isSpecialDaysExists) && $isSpecialDaysExists) {
+        } elseif (isset($isSpecialDaysExists) && $isSpecialDaysExists == 'on') {
+            if ($jsonSpecialDays != "false") {
                 $isPlanTypeExists = $objFeaturePricing->checkRoomTypeFeaturePriceExistance(
                     $roomTypeId,
                     $dateFrom,
@@ -243,34 +255,39 @@ class AdminHotelFeaturePricesSettingsController extends ModuleAdminController
                     $idFeaturePrice
                 );
             } else {
-                $isPlanTypeExists = $objFeaturePricing->checkRoomTypeFeaturePriceExistance(
-                    $roomTypeId,
-                    $dateFrom,
-                    $dateTo,
-                    'date_range',
-                    false,
-                    $idFeaturePrice
-                );
+                $this->errors[] = $this->l('Please select at least one day for the special day selection.');
             }
-            if ($isPlanTypeExists) {
-                $this->errors[] = $this->l(
-                    'A feature price plan already exists in which some dates are common with this plan. Please select a
-                    different date range.'
-                );
-            } else {
-            }
+        } else {
+            $isPlanTypeExists = $objFeaturePricing->checkRoomTypeFeaturePriceExistance(
+                $roomTypeId,
+                $dateFrom,
+                $dateTo,
+                'date_range',
+                false,
+                $idFeaturePrice
+            );
+        }
 
+        if ($isPlanTypeExists) {
+            $this->errors[] = $this->l('A feature price rule already exists in which some dates are common with this
+            plan. Please select a different date range.');
+        } else {
             if (!$roomTypeId) {
-                $this->errors[] = $this->l('Room type is not selected. Please try again.');
+                $this->errors[] = $this->l('Room is not selected. Please try again.');
             }
-
+            if (!Tools::getValue('feature_price_name_'.$defaultLangId)) {
+                $this->errors[] = sprintf(
+                    $this->l('Feature price rule name is required at least in %s'),
+                    $objDefaultLang->name
+                );
+            }
             $validateRules = call_user_func(
                 array('HotelRoomTypeFeaturePricing', 'getValidationRules'),
                 'HotelRoomTypeFeaturePricing'
             );
             foreach ($languages as $language) {
                 if (!Validate::isCatalogName(Tools::getValue('feature_price_name_'.$language['id_lang']))) {
-                     $this->errors[] = $this->l('Feature price name is invalid in ').$language['name'];
+                    $this->errors[] = $this->l('Feature price name is invalid in ').$language['name'];
                 } elseif (Tools::strlen(Tools::getValue('feature_price_name_'.$language['id_lang'])) > $validateRules['sizeLang']['feature_price_name']) {
                     sprintf(
                         $this->l('Feature price Name field is too long (%2$d chars max).'),
@@ -317,7 +334,7 @@ class AdminHotelFeaturePricesSettingsController extends ModuleAdminController
             }
 
             if (!$impactValue) {
-                $this->errors[] = $this->l('Please enter a valid imapct value.');
+                $this->errors[] = $this->l('Please enter a valid impact value.');
             } else {
                 if (!Validate::isPrice($impactValue)) {
                     $this->errors[] = $this->l('Invalid value of impact value.');
@@ -370,7 +387,6 @@ class AdminHotelFeaturePricesSettingsController extends ModuleAdminController
                 }
             }
         }
-
         if (isset($idFeaturePrice) && $idFeaturePrice) {
             $this->display = 'edit';
         } else {

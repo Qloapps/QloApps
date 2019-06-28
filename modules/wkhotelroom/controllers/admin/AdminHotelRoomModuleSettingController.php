@@ -34,6 +34,14 @@ class AdminHotelRoomModuleSettingController extends ModuleAdminController
                 'title' =>    $this->l('Hotel Room Display Setting'),
                 'icon' =>   'icon-cogs',
                 'fields' =>    array(
+                    'HOTEL_ROOM_BLOCK_NAV_LINK' => array(
+                        'title' => $this->l('Show link at navigation'),
+                        'hint' => $this->l('Enable, if you want to display a link at navigation menu for the hotel rooms block at home page.'),
+                        'validation' => 'isBool',
+                        'cast' => 'intval',
+                        'type' => 'bool',
+                        'required' => true
+                    ),
                     'HOTEL_ROOM_DISPLAY_HEADING' => array(
                         'title' => $this->l('Hotel Room Block Title'),
                         'type' => 'textLang',
@@ -43,19 +51,22 @@ class AdminHotelRoomModuleSettingController extends ModuleAdminController
                         'hint' => $this->l('Enter a title for the hotel rooms block.'),
                     ),
                     'HOTEL_ROOM_DISPLAY_DESCRIPTION' => array(
-                        'title' => $this->l('Enter a description for the hotel rooms block.'),
+                        'title' => $this->l('Hotel room block description'),
                         'type' => 'textareaLang',
                         'lang' => true,
                         'required' => true,
                         'validation' => 'isGenericName',
                         'rows' => '4',
                         'cols' => '2',
-                        'hint' => $this->l('Block description.'),
+                        'hint' => $this->l('Enter a description for the hotel rooms block.'),
                     ),
                 ),
                 'submit' => array('title' => $this->l('Save'))
             ),
         );
+
+        $this->addRowAction('edit');
+        $this->addRowAction('delete');
 
         $this->fields_list = array(
             'id_room_block' => array(
@@ -85,11 +96,9 @@ class AdminHotelRoomModuleSettingController extends ModuleAdminController
             'date_add' => array(
                 'title' => $this->l('Date Add'),
                 'align' => 'center',
+                'type' => 'datetime',
             ),
         );
-
-        $this->identifier = 'id_room_block';
-
         $this->bulk_actions = array(
             'delete' => array(
                 'text' => $this->l('Delete selected'),
@@ -105,6 +114,8 @@ class AdminHotelRoomModuleSettingController extends ModuleAdminController
                 'icon' => 'icon-power-off text-danger',
             ),
         );
+        $this->identifier = 'id_room_block';
+
         parent::__construct();
     }
 
@@ -127,17 +138,24 @@ class AdminHotelRoomModuleSettingController extends ModuleAdminController
         return '<img src="'.$prodImg.'" class="img-thumbnail htlRoomImg">';
     }
 
-    public function renderList()
+    public function initContent()
     {
-        $this->addRowAction('edit');
-        $this->addRowAction('delete');
+        parent::initContent();
+        // to customize the view as per our requirements
+        if ($this->display != 'add' && $this->display != 'edit') {
+            $this->content = $this->renderOptions();
+            $this->content .= $this->renderList();
+            $this->context->smarty->assign('content', $this->content);
+        }
+    }
 
+    public function initToolbar()
+    {
+        parent::initToolbar();
         $this->page_header_toolbar_btn['new'] = array(
             'href' => self::$currentIndex.'&add'.$this->table.'&token='.$this->token,
             'desc' => $this->l('Add New Hotel Room Block')
         );
-
-        return parent::renderList();
     }
 
     public function renderForm()
@@ -178,7 +196,7 @@ class AdminHotelRoomModuleSettingController extends ModuleAdminController
                     'name' => 'product_search',
                     'html_content' => $html,
                     'required' => true,
-                    'hint' => $this->l('Select Room Type which you want to display in home page.')
+                    'hint' => $this->l('Select a room type to display in home page.')
                 ),
                 array(
                     'type' => 'switch',
@@ -238,7 +256,7 @@ class AdminHotelRoomModuleSettingController extends ModuleAdminController
             if ($idRoomBlock) {
                 $objRoomBlock = new WkHotelRoomDisplay($idRoomBlock);
             } else {
-                $objRoomBlock->position = WkHotelRoomDisplay::getHigherPosition();
+                $objRoomBlock->position = $objRoomBlock->getHigherPosition();
             }
             $objRoomBlock->id_product = $idProduct;
             $objRoomBlock->active = $active;
@@ -269,10 +287,26 @@ class AdminHotelRoomModuleSettingController extends ModuleAdminController
             if (!trim(Tools::getValue('HOTEL_ROOM_DISPLAY_HEADING_'.$defaultLangId))) {
                 $this->errors[] = $this->l('Hotel rooms block title is required at least in ').
                 $objDefaultLanguage['name'];
+            } else {
+                foreach ($languages as $lang) {
+                    if (trim(Tools::getValue('HOTEL_ROOM_DISPLAY_HEADING_'.$lang['id_lang']))) {
+                        if (!Validate::isGenericName(Tools::getValue('HOTEL_ROOM_DISPLAY_HEADING_'.$lang['id_lang']))) {
+                            $this->errors[] = $this->l('Invalid hotel rooms block title in ').$lang['name'];
+                        }
+                    }
+                }
             }
             if (!trim(Tools::getValue('HOTEL_ROOM_DISPLAY_DESCRIPTION_'.$defaultLangId))) {
                 $this->errors[] = $this->l('Hotel rooms block description is required at least in ').
                 $objDefaultLanguage['name'];
+            } else {
+                foreach ($languages as $lang) {
+                    if (trim(Tools::getValue('HOTEL_ROOM_DISPLAY_DESCRIPTION_'.$lang['id_lang']))) {
+                        if (!Validate::isGenericName(Tools::getValue('HOTEL_ROOM_DISPLAY_DESCRIPTION_'.$lang['id_lang']))) {
+                            $this->errors[] = $this->l('Invalid hotel rooms block description in ').$lang['name'];
+                        }
+                    }
+                }
             }
             if (!count($this->errors)) {
                 foreach ($languages as $lang) {

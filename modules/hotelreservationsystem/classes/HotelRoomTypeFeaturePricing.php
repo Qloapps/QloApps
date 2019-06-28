@@ -120,10 +120,12 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
         $id_product,
         $date_from,
         $date_to,
-        $type='date_range',
-        $current_Special_days=false,
-        $id_feature_price=0
+        $type = 'date_range',
+        $current_Special_days = false,
+        $id_feature_price = 0
     ) {
+        $date_from = date('Y-m-d', strtotime($date_from));
+        $date_to = date('Y-m-d', strtotime($date_to));
         if ($type == 'specific_date') {
             return Db::getInstance()->getRow(
                 'SELECT * FROM `'._DB_PREFIX_.'htl_room_type_feature_pricing`
@@ -136,14 +138,14 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
             $featurePrice = Db::getInstance()->getRow(
                 'SELECT * FROM `'._DB_PREFIX_.'htl_room_type_feature_pricing`
                 WHERE `id_product`='.(int) $id_product.'
-                AND `is_special_days_exists`=1
-                AND `active`=1
-                AND `date_from` < \''.pSQL($date_to).'\' AND `date_to` > \''.pSQL($date_from).'\'
+                AND `is_special_days_exists`=1 AND `active`=1
+                AND `date_from` < \''.pSQL($date_to).'\'
+                AND `date_to` > \''.pSQL($date_from).'\'
                 AND `id_feature_price`!='.(int) $id_feature_price
             );
             if ($featurePrice) {
-                $specialDays = Tools::jsonDecode($featurePrice['special_days']);
-                $currentSpecialDays = Tools::jsonDecode($current_Special_days);
+                $specialDays = json_decode($featurePrice['special_days']);
+                $currentSpecialDays = json_decode($current_Special_days);
                 $commonValues = array_intersect($specialDays, $currentSpecialDays);
                 if ($commonValues) {
                     return $featurePrice;
@@ -156,11 +158,12 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
                 WHERE `id_product`='.(int) $id_product.'
                 AND `date_selection_type`=1
                 AND `is_special_days_exists`=0
-                AND `date_from` < \''.pSQL($date_to).'\'
-                AND `date_to` > \''.pSQL($date_from).'\'
+                AND `date_from` <= \''.pSQL($date_to).'\'
+                AND `date_to` >= \''.pSQL($date_from).'\'
                 AND `id_feature_price`!='.(int) $id_feature_price
             );
         }
+        return false;
     }
 
     /**
@@ -583,7 +586,7 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
      *
      * @return [float] [Returns Total price of the room type]
      */
-    public static function getRoomTypeTotalPrice($id_product, $date_from, $date_to)
+    public static function getRoomTypeTotalPrice($id_product, $date_from, $date_to, $quantity = 0)
     {
         $totalDaySeconds = 24 * 60 * 60;
         $totalPrice = array();
@@ -608,11 +611,10 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
         $hotelCartBookingData = new HotelCartBookingData();
         for ($date = strtotime($date_from); $date <= (strtotime($date_to)-$totalDaySeconds); $date = ($date+$totalDaySeconds)) {
             $currentDate = date('Y-m-d', $date);
-            $featurePrice = $hotelCartBookingData->getProductFeaturePricePlanByDateByPriority(
+            if ($featurePrice = $hotelCartBookingData->getProductFeaturePricePlanByDateByPriority(
                 $id_product,
                 $currentDate
-            );
-            if ($featurePrice) {
+            )) {
                 if ($featurePrice['impact_type'] == 1) {
                     //percentage
                     $featureImpactPriceTE = Tools::convertPrice(
@@ -642,14 +644,23 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
                     $priceWithFeatureTI = 0;
                     $priceWithFeatureTE = 0;
                 }
-                $totalPrice['total_price_tax_incl'] += $priceWithFeatureTI;
-                $totalPrice['total_price_tax_excl'] += $priceWithFeatureTE;
+                if ($quantity) {
+                    $totalPrice['total_price_tax_incl'] += $priceWithFeatureTI * $quantity;
+                    $totalPrice['total_price_tax_excl'] += $priceWithFeatureTE * $quantity;
+                } else {
+                    $totalPrice['total_price_tax_incl'] += $priceWithFeatureTI;
+                    $totalPrice['total_price_tax_excl'] += $priceWithFeatureTE;
+                }
             } else {
-                $totalPrice['total_price_tax_incl'] += $productPriceTI;
-                $totalPrice['total_price_tax_excl'] += $productPriceTE;
+                if ($quantity) {
+                    $totalPrice['total_price_tax_incl'] += $productPriceTI * $quantity;
+                    $totalPrice['total_price_tax_excl'] += $productPriceTE * $quantity;
+                } else {
+                    $totalPrice['total_price_tax_incl'] += $productPriceTI;
+                    $totalPrice['total_price_tax_excl'] += $productPriceTE;
+                }
             }
         }
-
         return $totalPrice;
     }
 

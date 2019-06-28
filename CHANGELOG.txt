@@ -1,4 +1,67 @@
 ####################################
+# V1.4.0
+####################################
+
+## Added Features:
+
+[+] CO : Additional facilities functionality is added.
+[+] CO : Almost all updates added to QloApps till the prestashop version 1.6.1.23.
+
+
+## Improved/changed features:
+
+[*] CO : Tools::generateHtaccess() improved
+[*] CO : ($round = true) parameter added in Tools::convertPriceFull()
+[*] CO : Localization updated
+[*] CO : mails/en/product_download.txt bug resolved
+[*] CO : swiftMailer version updated to 5.2.2
+[*] CO : translations updated
+[*] CO : config/config.inc.php improved (smarty early inclusion)
+[*] CO : config/smarty.config.inc.php improved (smartyHook() return improved)
+[*] CO : Security: Use Mcrypt’s CBC mode instead of the ECB mode.
+
+[*] CO : Almost all improvements/changes features added to QloApps till the prestashop version 1.6.1.23.
+[*] BO : All Stats Module compatible with QloApps
+
+[*] FO : Room type details Page Design improved
+
+## Bug/Issues Resolved:
+
+[-] CO : Almost all bugs resolved in QloApps till the prestashop version 1.6.1.23.
+[-] CO : Resolved :: QloApps Compatible with MySQL 5.7
+
+
+####################################
+# V1.3.2
+####################################
+
+## Added Features:
+
+[+] CO : pscleaner module is added for cleaning demo data from QloApps.
+
+[+] FO : Option for Guest checkout is given at Preferences->Orders tab. So Guest Checkout is enabled.
+
+[+] FO : Option for Shorter registration/address form is given at Preferences->Customers tab. (In this case address will be created from customer chosen room type's hotel address automatically).
+
+[+] CO : wkfooterexploreblock :: Admin can add custom explore links to show at footer explore block and navigation menu also. table  'htl_custom_explore_link' added with multilang.
+
+## Improved/changed features:
+
+[-] BO : New category option from "quick access" links is removed.
+[+] FO : Checkout page design has been changed.
+[+] CO : Images validation improved.
+
+
+## Bug/Issues Resolved:
+
+[-] CO : 56% Installation issue.
+
+[-] BO : Dashboard graphs not loading issues on php 7.2
+[-] BO : feature update issue on not selecting image while updating the feature.
+[-] BO : Category bug resolve (Should not be created updated deleted from anywhere). Will be handled from hotel creation/updation/deletion.
+
+
+####################################
 # V1.3.1
 ####################################
 

@@ -1,5 +1,5 @@
 /*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -18,7 +18,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -60,7 +60,7 @@ function formatCurrency(price, currencyFormat, currencySign, currencyBlank)
 {
 	// if you modified this function, don't forget to modify the PHP function displayPrice (in the Tools.php class)
 	var blank = '';
-	price = parseFloat(price.toFixed(10));
+	price = parseFloat(price).toFixed(10);
 	price = ps_round(price, priceDisplayPrecision);
 	if (currencyBlank > 0)
 		blank = ' ';
@@ -593,14 +593,16 @@ function isCleanHtml(content)
 	return true;
 }
 
-function sleep(milliseconds)
-{
-	var start = new Date().getTime();
-
-	for (var i = 0; i < 1e7; i++) {
-		if ((new Date().getTime() - start) > milliseconds) {
-			break;
-		}
+function getStorageAvailable() {
+	test = 'foo';
+	storage =  window.localStorage || window.sessionStorage;
+	try {
+		storage.setItem(test, test);
+		storage.removeItem(test);
+		return storage;
+	}
+	catch (error) {
+		return null;
 	}
 }
 

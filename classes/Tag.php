@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -130,40 +130,45 @@ class TagCore extends ObjectModel
 		INSERT INTO `'._DB_PREFIX_.'product_tag` (`id_tag`, `id_product`, `id_lang`)
 		VALUES '.$data);
 
-        self::updateTagCount();
+        if ($list != array()) {
+            self::updateTagCount($list);
+        }
 
         return $result;
     }
 
-    public static function updateTagCount()
+    public static function updateTagCount($tag_list = null)
     {
         if (!Module::getBatchMode()) {
+            if ($tag_list != null) {
+                $tag_list_query = ' AND pt.id_tag IN ('.implode(',', $tag_list).')';
+                Db::getInstance()->execute('DELETE pt FROM `'._DB_PREFIX_.'tag_count` pt WHERE 1=1 '.$tag_list_query);
+            } else {
+                $tag_list_query = '';
+            }
+
+
+
             Db::getInstance()->execute('REPLACE INTO `'._DB_PREFIX_.'tag_count` (id_group, id_tag, id_lang, id_shop, counter)
-			SELECT cg.id_group, t.id_tag, t.id_lang, ps.id_shop, COUNT(pt.id_tag) AS times
+			SELECT cg.id_group, pt.id_tag, pt.id_lang, id_shop, COUNT(pt.id_tag) AS times
 				FROM `'._DB_PREFIX_.'product_tag` pt
-				LEFT JOIN `'._DB_PREFIX_.'tag` t ON (t.id_tag = pt.id_tag)
-				LEFT JOIN `'._DB_PREFIX_.'product` p ON (p.id_product = pt.id_product)
 				INNER JOIN `'._DB_PREFIX_.'product_shop` product_shop
-					ON (product_shop.id_product = p.id_product)
+					USING (id_product)
 				JOIN (SELECT DISTINCT id_group FROM `'._DB_PREFIX_.'category_group`) cg
-				JOIN (SELECT DISTINCT id_shop FROM `'._DB_PREFIX_.'shop`) ps
-				WHERE pt.`id_lang` = 1 AND product_shop.`active` = 1
+				WHERE product_shop.`active` = 1
 				AND EXISTS(SELECT 1 FROM `'._DB_PREFIX_.'category_product` cp
 								LEFT JOIN `'._DB_PREFIX_.'category_group` cgo ON (cp.`id_category` = cgo.`id_category`)
-								WHERE cgo.`id_group` = cg.id_group AND p.`id_product` = cp.`id_product`)
-				AND product_shop.id_shop = ps.id_shop
-				GROUP BY pt.id_tag, cg.id_group');
+								WHERE cgo.`id_group` = cg.id_group AND product_shop.`id_product` = cp.`id_product`)
+				'.$tag_list_query.'
+				GROUP BY pt.id_tag, pt.id_lang, cg.id_group, id_shop ORDER BY NULL');
             Db::getInstance()->execute('REPLACE INTO `'._DB_PREFIX_.'tag_count` (id_group, id_tag, id_lang, id_shop, counter)
-			SELECT 0, t.id_tag, t.id_lang, ps.id_shop, COUNT(pt.id_tag) AS times
+			SELECT 0, pt.id_tag, pt.id_lang, id_shop, COUNT(pt.id_tag) AS times
 				FROM `'._DB_PREFIX_.'product_tag` pt
-				LEFT JOIN `'._DB_PREFIX_.'tag` t ON (t.id_tag = pt.id_tag)
-				LEFT JOIN `'._DB_PREFIX_.'product` p ON (p.id_product = pt.id_product)
 				INNER JOIN `'._DB_PREFIX_.'product_shop` product_shop
-					ON (product_shop.id_product = p.id_product)
-				JOIN (SELECT DISTINCT id_shop FROM `'._DB_PREFIX_.'shop`) ps
-				WHERE pt.`id_lang` = 1 AND product_shop.`active` = 1
-				AND product_shop.id_shop = ps.id_shop
-				GROUP BY pt.id_tag');
+					USING (id_product)
+				WHERE product_shop.`active` = 1
+				'.$tag_list_query.'
+				GROUP BY pt.id_tag, pt.id_lang, id_shop ORDER BY NULL');
         }
     }
 
@@ -248,14 +253,23 @@ class TagCore extends ObjectModel
                 }
             }
         }
-        self::updateTagCount();
+        self::updateTagCount(array((int)$this->id));
         return $result;
     }
 
     public static function deleteTagsForProduct($id_product)
     {
+        $tags_removed = Db::getInstance()->executeS('SELECT id_tag FROM '._DB_PREFIX_.'product_tag WHERE id_product='.(int)$id_product);
         $result = Db::getInstance()->delete('product_tag', 'id_product = '.(int)$id_product);
-        self::updateTagCount();
+        Db::getInstance()->delete('tag', 'NOT EXISTS (SELECT 1 FROM '._DB_PREFIX_.'product_tag
+        												WHERE '._DB_PREFIX_.'product_tag.id_tag = '._DB_PREFIX_.'tag.id_tag)');
+        $tag_list = array();
+        foreach($tags_removed as $tag_removed) {
+            $tag_list[] = $tag_removed['id_tag'];
+        }
+        if ($tag_list != array()) {
+            self::updateTagCount($tag_list);
+        }
         return $result;
     }
 }

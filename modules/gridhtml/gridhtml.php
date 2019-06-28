@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2014 PrestaShop
+* 2007-2016 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2014 PrestaShop SA
+*  @copyright  2007-2016 PrestaShop SA
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -40,7 +40,7 @@ class GridHtml extends ModuleGridEngine
 		{
 			$this->name = 'gridhtml';
 			$this->tab = 'administration';
-			$this->version = '1.2.2';
+			$this->version = '1.3.1';
 			$this->author = 'PrestaShop';
 			$this->need_instance = 0;
 			
@@ -61,6 +61,13 @@ class GridHtml extends ModuleGridEngine
 		self::$_columns = $params['columns'];
 		if (!isset($params['emptyMsg']))
 			$params['emptyMsg'] = 'Empty';
+
+        $customParams = '';
+        if (isset($params['customParams'])) {
+            foreach ($params['customParams'] as $name => $value) {
+                $customParams .= '&'.$name.'='.urlencode($value);
+            }
+        }
 
 		$html = '
 		<table class="table" id="grid_1">
@@ -133,8 +140,8 @@ class GridHtml extends ModuleGridEngine
 				url = url.replace(/&start=[0-9]+/i, "") + from;
 				getGridData(url);
 			}
-			
-			$(document).ready(function(){getGridData("'.$grider.'&sort='.urlencode($params['defaultSortColumn']).'&dir='.urlencode($params['defaultSortDirection']).'");});
+
+			$(document).ready(function(){getGridData("'.$grider.'&sort='.urlencode($params['defaultSortColumn']).'&dir='.urlencode($params['defaultSortDirection']).$customParams.'");});
 		</script>';
 		return $html;
 	}

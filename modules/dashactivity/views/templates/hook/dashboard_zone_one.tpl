@@ -1,5 +1,5 @@
 {*
-* 2007-2015 PrestaShop
+* 2007-2016 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -18,7 +18,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 * @author    PrestaShop SA <contact@prestashop.com>
-* @copyright 2007-2015 PrestaShop SA
+* @copyright 2007-2016 PrestaShop SA
 * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 * International Registered Trademark & Property of PrestaShop SA
 *}
@@ -104,12 +104,14 @@
 					<span id="new_messages"></span>
 				</span>
 			</li>
-			<li>
+			{if Module::isInstalled('productcomments')}
+				<li>
 				<span class="data_label"><a href="{$link->getAdminLink('AdminModules')|escape:'html':'UTF-8'}&amp;configure=productcomments&amp;tab_module=front_office_features&amp;module_name=productcomments">{l s='Product Reviews' mod='dashactivity'}</a></span>
-				<span class="data_value size_l">
-					<span id="product_reviews"></span>
-				</span>
-			</li>
+					<span class="data_value size_l">
+						<span id="product_reviews"></span>
+					</span>
+				</li>
+			{/if}
 		</ul>
 	</section>
 	<section id="dash_customers" class="loading">

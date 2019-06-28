@@ -66,7 +66,8 @@
       <taxRule iso_code_country="sk" id_tax="1"/>
       <taxRule iso_code_country="fi" id_tax="1"/>
       <taxRule iso_code_country="se" id_tax="1"/>
-      <taxRule iso_code_country="uk" id_tax="1"/>
+      <taxRule iso_code_country="gb" id_tax="1"/>
+      <taxRule iso_code_country="hr" id_tax="1"/>
     </taxRulesGroup>
     <taxRulesGroup name="LU Reduced Rate (14%)">
       <taxRule iso_code_country="be" id_tax="2"/>
@@ -95,7 +96,8 @@
       <taxRule iso_code_country="sk" id_tax="2"/>
       <taxRule iso_code_country="fi" id_tax="2"/>
       <taxRule iso_code_country="se" id_tax="2"/>
-      <taxRule iso_code_country="uk" id_tax="2"/>
+      <taxRule iso_code_country="gb" id_tax="2"/>
+      <taxRule iso_code_country="hr" id_tax="2"/>
     </taxRulesGroup>
     <taxRulesGroup name="LU Reduced Rate (8%)">
       <taxRule iso_code_country="be" id_tax="4"/>
@@ -124,7 +126,8 @@
       <taxRule iso_code_country="sk" id_tax="4"/>
       <taxRule iso_code_country="fi" id_tax="4"/>
       <taxRule iso_code_country="se" id_tax="4"/>
-      <taxRule iso_code_country="uk" id_tax="4"/>
+      <taxRule iso_code_country="gb" id_tax="4"/>
+      <taxRule iso_code_country="hr" id_tax="4"/>
     </taxRulesGroup>
     <taxRulesGroup name="LU Super Reduced Rate (3%)">
       <taxRule iso_code_country="be" id_tax="5"/>
@@ -153,7 +156,8 @@
       <taxRule iso_code_country="sk" id_tax="5"/>
       <taxRule iso_code_country="fi" id_tax="5"/>
       <taxRule iso_code_country="se" id_tax="5"/>
-      <taxRule iso_code_country="uk" id_tax="5"/>
+      <taxRule iso_code_country="gb" id_tax="5"/>
+      <taxRule iso_code_country="hr" id_tax="5"/>
     </taxRulesGroup>
     <taxRulesGroup name="LU Foodstuff Rate (3%)">
       <taxRule iso_code_country="be" id_tax="5"/>
@@ -182,7 +186,8 @@
       <taxRule iso_code_country="sk" id_tax="5"/>
       <taxRule iso_code_country="fi" id_tax="5"/>
       <taxRule iso_code_country="se" id_tax="5"/>
-      <taxRule iso_code_country="uk" id_tax="5"/>
+      <taxRule iso_code_country="gb" id_tax="5"/>
+      <taxRule iso_code_country="hr" id_tax="5"/>
     </taxRulesGroup>
     <taxRulesGroup name="LU Books Rate (3%)">
       <taxRule iso_code_country="be" id_tax="5"/>
@@ -211,7 +216,8 @@
       <taxRule iso_code_country="sk" id_tax="5"/>
       <taxRule iso_code_country="fi" id_tax="5"/>
       <taxRule iso_code_country="se" id_tax="5"/>
-      <taxRule iso_code_country="uk" id_tax="5"/>
+      <taxRule iso_code_country="gb" id_tax="5"/>
+      <taxRule iso_code_country="hr" id_tax="5"/>
     </taxRulesGroup>
     <taxRulesGroup name="EU VAT For Virtual Products" auto-generated="1" eu-tax-group="virtual">
       <taxRule iso_code_country="lu" id_tax="1"/>

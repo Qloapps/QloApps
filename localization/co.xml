@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <localizationPack name="Colombia" version="1.0">
 	<currencies>
-		<currency name="Peso" iso_code="COP" iso_code_num="170" sign="$" blank="1" conversion_rate="2457.29" format="2" decimals="1" />
+		<currency name="Peso" iso_code="COP" iso_code_num="170" sign="$" blank="1" conversion_rate="2923.98" format="2" decimals="1" />
 	</currencies>
 	<languages>
-		<language iso_code="es" />
+		<language iso_code="cb" />
+    <language iso_code="es" />
 	</languages>
 	<taxes>
-		<tax id="1" name="IVA CO 16%" rate="16" />
+		<tax id="1" name="IVA CO 19%" rate="19" />
 		
-		<taxRulesGroup name="CO Standard Rate (16%)">
+		<taxRulesGroup name="CO Standard Rate (19%)">
 			<taxRule iso_code_country="co" id_tax="1" />
 		</taxRulesGroup>
 	</taxes>

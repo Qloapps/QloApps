@@ -1,5 +1,5 @@
 {*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -18,7 +18,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
@@ -30,7 +30,7 @@
     {/if}
 {/foreach}
 <h2>{l s='Address(es) Details'}</h2>
-{if ((!empty($delivery_option) AND !isset($virtualCart)) OR $delivery->id OR $invoice->id)}
+{if ((!empty($delivery_option) AND (!isset($isVirtualCart) || !$isVirtualCart)) OR $delivery->id OR $invoice->id)}
     <div class="order_delivery clearfix row">
         {if !isset($formattedAddresses) || (count($formattedAddresses.invoice) == 0 && count($formattedAddresses.delivery) == 0) || (count($formattedAddresses.invoice.formated) == 0 && count($formattedAddresses.delivery.formated) == 0)}
             {if $delivery->id}

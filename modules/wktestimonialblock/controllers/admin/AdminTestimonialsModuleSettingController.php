@@ -32,13 +32,20 @@ class AdminTestimonialsModuleSettingController extends ModuleAdminController
 
         parent::__construct();
 
-        // field options for global fields
         $this->fields_options = array(
-            'featuresmodulesetting' => array(
+            'modulesetting' => array(
                 'title' =>    $this->l('Hotel Testimonials Setting'),
                 'fields' =>    array(
+                    'HOTEL_TESIMONIAL_BLOCK_NAV_LINK' => array(
+                        'title' => $this->l('Show link at navigation'),
+                        'hint' => $this->l('Enable, if you want to display a link at navigation menu for the testimonial block at home page.'),
+                        'validation' => 'isBool',
+                        'cast' => 'intval',
+                        'type' => 'bool',
+                        'required' => true
+                    ),
                     'HOTEL_TESIMONIAL_BLOCK_HEADING' => array(
-                        'title' => $this->l('Testimonial Block Title'),
+                        'title' => $this->l('Testimonial block title'),
                         'type' => 'textLang',
                         'hint' => $this->l('Testimonial block title. ex. guest testimonials.'),
                         'lang' => true,
@@ -46,7 +53,7 @@ class AdminTestimonialsModuleSettingController extends ModuleAdminController
                         'validation' => 'isGenericName'
                     ),
                     'HOTEL_TESIMONIAL_BLOCK_CONTENT' => array(
-                        'title' => $this->l('Testimonial Block Description'),
+                        'title' => $this->l('Testimonial block description'),
                         'type' => 'textareaLang',
                         'rows' => '4',
                         'cols' => '2',
@@ -59,6 +66,9 @@ class AdminTestimonialsModuleSettingController extends ModuleAdminController
                 'submit' => array('title' => $this->l('Save'))
             ),
         );
+
+        $this->addRowAction('edit');
+        $this->addRowAction('delete');
 
         $this->fields_list = array(
             'id_testimonial_block' => array(
@@ -92,6 +102,7 @@ class AdminTestimonialsModuleSettingController extends ModuleAdminController
                 'class' => 'fixed-width-xs'
             ),
         );
+
         $this->bulk_actions = array(
             'delete' => array(
                 'text' => $this->l('Delete selected'),
@@ -128,11 +139,15 @@ class AdminTestimonialsModuleSettingController extends ModuleAdminController
         return $image;
     }
 
-    public function renderList()
+    public function initContent()
     {
-        $this->addRowAction('edit');
-        $this->addRowAction('delete');
-        return parent::renderList();
+        parent::initContent();
+        // to customize the view as per our requirements
+        if ($this->display != 'add' && $this->display != 'edit') {
+            $this->content = $this->renderOptions();
+            $this->content .= $this->renderList();
+            $this->context->smarty->assign('content', $this->content);
+        }
     }
 
     public function renderForm()
@@ -231,8 +246,8 @@ class AdminTestimonialsModuleSettingController extends ModuleAdminController
         }
         if (!$personDesignation) {
             $this->errors[] = $this->l('Person\'s Designation is a required field.');
-        } elseif (!Validate::isGenericName($personName)) {
-            $this->errors[] = $this->l('Invalid Person\'s Name.');
+        } elseif (!Validate::isGenericName($personDesignation)) {
+            $this->errors[] = $this->l('Invalid Person\'s Designation.');
         }
 
         // check if field is atleast in default language. Not available in default prestashop
@@ -253,9 +268,8 @@ class AdminTestimonialsModuleSettingController extends ModuleAdminController
         }
 
         if (isset($_FILES['testimonial_image']) && $_FILES['testimonial_image']['tmp_name']) {
-            $error = HotelImage::validateImage($_FILES['testimonial_image']);
-            if ($error) {
-                $this->errors[] = $this->l('Image format not recognized, allowed formats are: .gif, .jpg, .png', false);
+            if ($error = ImageManager::validateUpload($_FILES['testimonial_image'], Tools::getMaxUploadSize())) {
+                $this->errors[] = $error;
             }
         }
 
@@ -264,7 +278,7 @@ class AdminTestimonialsModuleSettingController extends ModuleAdminController
                 $objTestimonialData = new WkHotelTestimonialData($idTestimonial);
             } else {
                 $objTestimonialData = new WkHotelTestimonialData();
-                $objTestimonialData->position = WkHotelTestimonialData::getHigherPosition();
+                $objTestimonialData->position = $objTestimonialData->getHigherPosition();
             }
             $objTestimonialData->name = $personName;
             $objTestimonialData->designation = $personDesignation;
@@ -310,12 +324,28 @@ class AdminTestimonialsModuleSettingController extends ModuleAdminController
             $objDefaultLanguage = Language::getLanguage((int) $defaultLangId);
             $languages = Language::getLanguages(false);
             if (!trim(Tools::getValue('HOTEL_TESIMONIAL_BLOCK_HEADING_'.$defaultLangId))) {
-                $this->errors[] = $this->l('testimonial block title is required at least in ').
+                $this->errors[] = $this->l('Testimonial block title is required at least in ').
                 $objDefaultLanguage['name'];
+            } else {
+                foreach ($languages as $lang) {
+                    if (trim(Tools::getValue('HOTEL_TESIMONIAL_BLOCK_HEADING_'.$lang['id_lang']))) {
+                        if (!Validate::isGenericName(Tools::getValue('HOTEL_TESIMONIAL_BLOCK_HEADING_'.$lang['id_lang']))) {
+                            $this->errors[] = $this->l('Invalid testimonial block title in ').$lang['name'];
+                        }
+                    }
+                }
             }
             if (!trim(Tools::getValue('HOTEL_TESIMONIAL_BLOCK_CONTENT_'.$defaultLangId))) {
-                $this->errors[] = $this->l('testimonial block description is required at least in ').
+                $this->errors[] = $this->l('Testimonial block description is required at least in ').
                 $objDefaultLanguage['name'];
+            } else {
+                foreach ($languages as $lang) {
+                    if (trim(Tools::getValue('HOTEL_TESIMONIAL_BLOCK_CONTENT_'.$lang['id_lang']))) {
+                        if (!Validate::isGenericName(Tools::getValue('HOTEL_TESIMONIAL_BLOCK_CONTENT_'.$lang['id_lang']))) {
+                            $this->errors[] = $this->l('Invalid testimonial block description in ').$lang['name'];
+                        }
+                    }
+                }
             }
             if (!count($this->errors)) {
                 foreach ($languages as $lang) {
@@ -367,5 +397,17 @@ class AdminTestimonialsModuleSettingController extends ModuleAdminController
                 break;
             }
         }
+    }
+
+    public function setMedia()
+    {
+        parent::setMedia();
+        Media::addJsDef(
+            array(
+                'filesizeError' => $this->l('File exceeds maximum size.'),
+                'maxSizeAllowed' => Tools::getMaxUploadSize(),
+            )
+        );
+        $this->addJS(_MODULE_DIR_.$this->module->name.'/views/js/WkTestimonialBlockAdmin.js');
     }
 }

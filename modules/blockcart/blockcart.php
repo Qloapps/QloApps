@@ -34,7 +34,7 @@ class blockcart extends Module
     {
         $this->name = 'blockcart';
         $this->tab = 'front_office_features';
-        $this->version = '1.6.1';
+        $this->version = '1.6.2';
         $this->author = 'PrestaShop';
         $this->need_instance = 0;
 
@@ -127,6 +127,17 @@ class blockcart extends Module
                 $total_free_shipping = 0;
             }
         }
+
+        $objCartBookingData = new HotelCartBookingData();
+        $totalDemandsPrice = $objCartBookingData->getCartExtraDemands(
+            $this->context->cart->id,
+            0,
+            0,
+            0,
+            0,
+            1
+        );
+
         $this->smarty->assign(array(
             'products' => $products,
             'customizedDatas' => Product::getAllCustomizedDatas((int) ($params['cart']->id)),
@@ -139,8 +150,10 @@ class blockcart extends Module
             'show_wrapping' => $wrappingCost > 0 ? true : false,
             'show_tax' => (int) (Configuration::get('PS_TAX_DISPLAY') == 1 && (int) Configuration::get('PS_TAX')),
             'wrapping_cost' => Tools::displayPrice($wrappingCost, $currency),
-            'product_total' => Tools::displayPrice($params['cart']->getOrderTotal($useTax, Cart::BOTH_WITHOUT_SHIPPING), $currency),
+            'product_total' => Tools::displayPrice($params['cart']->getOrderTotal($useTax, Cart::ONLY_PRODUCTS), $currency),
             'totalToPay' => $totalToPay,
+            'total_extra_demands' => $totalDemandsPrice,
+            'total_extra_demands_format' => Tools::displayPrice($totalDemandsPrice, $currency),
             'total' => Tools::displayPrice($totalToPay, $currency),
             'order_process' => Configuration::get('PS_ORDER_PROCESS_TYPE') ? 'order-opc' : 'order',
             'ajax_allowed' => (int) (Configuration::get('PS_BLOCK_CART_AJAX')) == 1 ? true : false,

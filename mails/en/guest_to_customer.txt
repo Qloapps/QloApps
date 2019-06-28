@@ -1,19 +1,19 @@
 
-[{shop_url}]
+[/{shop_url}] 
 
-Hi {firstname} {lastname},
+Hi {firstname} {lastname}, 
 
 Your guest account for {shop_name} was converted to a customer
-account.
+account. 
 
 E-MAIL ADDRESS: {email}
 
-PASSWORD: {passwd}
+PASSWORD: {passwd} 		 
 
-Please be careful when sharing these login details with others.
+Please be careful when sharing these login details with others. 
 
-You can access your customer account on our shop: {shop_url}
+You can access your customer account on our shop: {shop_url} 
 
-{shop_name} [{shop_url}] powered by
-Webkul(tm) [https://webkul.com/]
+{shop_name} [/{shop_url}] powered by PrestaShop(tm)
+[http://www.prestashop.com/] 
 

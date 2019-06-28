@@ -1,6 +1,6 @@
 <?php
 /**
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -620,7 +620,7 @@ class FrontControllerCore extends Controller
             'HOOK_TOP'          => Hook::exec('displayTop'),
             'HOOK_LEFT_COLUMN'  => ($this->display_column_left  ? Hook::exec('displayLeftColumn') : ''),
             'HOOK_RIGHT_COLUMN' => ($this->display_column_right ? Hook::exec('displayRightColumn', array('cart' => $this->context->cart)) : ''),
-            'HOOK_FOOTER'       => Hook::exec('displayFooter'),
+            'HOOK_FOOTER'       => Hook::exec('displayFooter')
         ));
 
         $this->context->smarty->assign(array(
@@ -709,7 +709,6 @@ class FrontControllerCore extends Controller
             'errors'         => $this->errors,
             'display_header' => $this->display_header,
             'display_footer' => $this->display_footer,
-
         ));
 
         $layout = $this->getLayout();
@@ -951,6 +950,7 @@ class FrontControllerCore extends Controller
             $this->setMobileMedia();
             return true;
         }
+
         $this->addCSS(_THEME_CSS_DIR_.'grid_prestashop.css', 'all');  // retro compat themes 1.5.0.1
         $this->addCSS(_THEME_CSS_DIR_.'global.css', 'all');
         $this->addJquery();
@@ -1161,7 +1161,7 @@ class FrontControllerCore extends Controller
         }
 
         // Remove the page parameter in order to get a clean URL for the pagination template
-        $current_url = preg_replace('/(\?)?(&amp;)?p=\d+/', '$1', Tools::htmlentitiesUTF8($_SERVER['REQUEST_URI']));
+        $current_url = preg_replace('/(?:(\?)|&amp;)p=\d+/', '$1', Tools::htmlentitiesUTF8($_SERVER['REQUEST_URI']));
 
         if ($this->n != $default_products_per_page || isset($this->context->cookie->nb_item_per_page)) {
             $this->context->cookie->nb_item_per_page = $this->n;
