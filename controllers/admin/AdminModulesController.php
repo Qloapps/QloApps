@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -307,6 +307,7 @@ class AdminModulesControllerCore extends AdminController
         $this->context->smarty->assign(array(
             'tab_modules_list' => $modules_list_sort,
             'admin_module_favorites_view' => $this->context->link->getAdminLink('AdminModules').'&select=favorites',
+            'lang_iso' => $this->context->language->iso_code
         ));
 
         $this->smartyOutputContent('controllers/modules/tab_modules_list.tpl');
@@ -768,6 +769,7 @@ class AdminModulesControllerCore extends AdminController
                         $files_list = array(
                             array('type' => 'addonsNative', 'file' => Module::CACHE_FILE_DEFAULT_COUNTRY_MODULES_LIST, 'loggedOnAddons' => 0),
                             array('type' => 'addonsBought', 'file' => Module::CACHE_FILE_CUSTOMER_MODULES_LIST, 'loggedOnAddons' => 1),
+                            array('type' => 'addonsMustHave', 'file' => Module::CACHE_FILE_MUST_HAVE_MODULES_LIST, 'loggedOnAddons' => 1),
                         );
 
                         foreach ($files_list as $f) {
@@ -825,7 +827,7 @@ class AdminModulesControllerCore extends AdminController
                         $this->errors[] = Tools::displayError('You do not have permission to install this module.');
                     } elseif ($key == 'delete' && ($this->tabAccess['delete'] !== '1' || !$module->getPermission('configure'))) {
                         $this->errors[] = Tools::displayError('You do not have permission to delete this module.');
-                    } elseif ($key == 'configure' && ($this->tabAccess['edit'] !== '1' || !$module->getPermission('configure') || !Module::isInstalled(urldecode($name)))) {
+                    } elseif ($key == 'configure' && (!$module->getPermission('configure') || !Module::isInstalled(urldecode($name)))) {
                         $this->errors[] = Tools::displayError('You do not have permission to configure this module.');
                     } elseif ($key == 'install' && Module::isInstalled($module->name)) {
                         $this->errors[] = sprintf(Tools::displayError('This module is already installed: %s.'), $module->name);
@@ -949,7 +951,7 @@ class AdminModulesControllerCore extends AdminController
                             if (isset($this->_modules_ad[$module->name])) {
                                 $ad_modules = $this->getModulesByInstallation($this->_modules_ad[$module->name]);
 
-                                foreach ($ad_modules['not_installed'] as $key => &$module) {
+                                foreach ($ad_modules['not_installed'] as &$module) {
                                     if (isset($module->addons_buy_url)) {
                                         $module->addons_buy_url = str_replace('utm_source=v1trunk_api', 'utm_source=back-office', $module->addons_buy_url)
                                             .'&utm_medium=related-modules&utm_campaign=back-office-'.strtoupper($this->context->language->iso_code)
@@ -1025,7 +1027,7 @@ class AdminModulesControllerCore extends AdminController
 
             $module_upgraded = implode('|', $module_upgraded);
 
-            if ($key == 'updateAll') {
+            if (Tools::getValue('updateAll')) {
                 Tools::redirectAdmin(self::$currentIndex.'&token='.$this->token.'&allUpdated=1');
             } elseif (isset($module_upgraded) && $module_upgraded != '') {
                 Tools::redirectAdmin(self::$currentIndex.'&token='.$this->token.'&updated=1&module_name='.$module_upgraded);
@@ -1418,7 +1420,7 @@ class AdminModulesControllerCore extends AdminController
         }
 
         // Retrieve Modules Preferences
-        $modules_preferences = '';
+        $modules_preferences = array();
         $tab_modules_preferences = array();
         $modules_preferences_tmp = Db::getInstance()->executeS('SELECT * FROM `'._DB_PREFIX_.'module_preference` WHERE `id_employee` = '.(int)$this->id_employee);
         $tab_modules_preferences_tmp = Db::getInstance()->executeS('SELECT * FROM `'._DB_PREFIX_.'tab_module_preference` WHERE `id_employee` = '.(int)$this->id_employee);
@@ -1488,7 +1490,7 @@ class AdminModulesControllerCore extends AdminController
                     require_once(_PS_MODULE_DIR_.$module->name.'/'.$module->name.'.php');
                 }
 
-                if ($object = new $module->name()) {
+                if ($object = Adapter_ServiceLocator::get($module->name)) {
                     /** @var Module $object */
                     $object->runUpgradeModule();
                     if ((count($errors_module_list = $object->getErrors()))) {
@@ -1506,7 +1508,7 @@ class AdminModulesControllerCore extends AdminController
                 if (!class_exists($module->name)) {
                     if (file_exists(_PS_MODULE_DIR_.$module->name.'/'.$module->name.'.php')) {
                         require_once(_PS_MODULE_DIR_.$module->name.'/'.$module->name.'.php');
-                        $object = new $module->name();
+                        $object = Adapter_ServiceLocator::get($module->name);
                         $module_success[] = array('name' => $module->name, 'message' => array(
                             0 => sprintf($this->l('Current version: %s'), $object->version),
                             1 => $this->l('No file upgrades applied (none exist).'))

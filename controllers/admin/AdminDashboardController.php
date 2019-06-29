@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -70,7 +70,7 @@ class AdminDashboardControllerCore extends AdminController
     {
         $forms = array();
         $currency = new Currency(Configuration::get('PS_CURRENCY_DEFAULT'));
-        $carriers = Carrier::getCarriers($this->context->language->id, true);
+        $carriers = Carrier::getCarriers($this->context->language->id, true, false, false, null, 'ALL_CARRIERS');
         $modules = Module::getModulesOnDisk(true);
 
         $forms = array(
@@ -200,7 +200,8 @@ class AdminDashboardControllerCore extends AdminController
         // 	'Save' => $this->l('Save', 'AdminStatsTab')
         // );
 
-        if ($this->context->cookie->__get('stats_date_update') < strtotime(date('Y-m-d'))) {
+        $test_stats_date_update = $this->context->cookie->__get('stats_date_update');
+        if (!empty($test_stats_date_update) && $this->context->cookie->__get('stats_date_update') < strtotime(date('Y-m-d'))) {
             switch ($this->context->employee->preselect_date_range) {
                 case 'day':
                     $date_from = date('Y-m-d');

@@ -1,5 +1,5 @@
 {*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -18,7 +18,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
@@ -28,14 +28,14 @@
 	{l s='My vouchers'}
 </h1>
 
-{if isset($cart_rules) && count($cart_rules) && $nb_cart_rules}
+{if isset($cart_rules) && $nb_cart_rules}
 	<table class="discount table table-bordered footab">
 		<thead>
 			<tr>
 				<th data-sort-ignore="true" class="discount_code first_item">{l s='Code'}</th>
 				<th data-sort-ignore="true" class="discount_description item">{l s='Description'}</th>
 				<th class="discount_quantity item">{l s='Quantity'}</th>
-				<th data-sort-ignore="true" data-hide="phone,tablet" class="discount_value item">{l s='Value'}*</th>
+				<th data-sort-ignore="true" data-hide="phone,tablet" class="discount_value item">{l s='Value'}</th>
 				<th data-hide="phone,tablet" class="discount_minimum item">{l s='Minimum'}</th>
 				<th data-sort-ignore="true" data-hide="phone,tablet" class="discount_cumulative item">{l s='Cumulative'}</th>
 				<th data-hide="phone" class="discount_expiration_date last_item">{l s='Expiration date'}</th>
@@ -48,21 +48,32 @@
 					<td class="discount_description">{$discountDetail.name}</td>
 					<td data-value="{$discountDetail.quantity_for_user}" class="discount_quantity">{$discountDetail.quantity_for_user}</td>
 					<td class="discount_value">
-						{if $discountDetail.id_discount_type == 1}
-							{$discountDetail.value|escape:'html':'UTF-8'}%
-						{elseif $discountDetail.id_discount_type == 2}
-							{convertPrice price=$discountDetail.value} ({if $discountDetail.reduction_tax == 1}{l s='Tax included'}{else}{l s='Tax excluded'}{/if})
-						{elseif $discountDetail.id_discount_type == 3}
+						{if $discountDetail.reduction_percent > 0}
+							{$discountDetail.reduction_percent|escape:'html':'UTF-8'}%
+						{/if}
+						{if $discountDetail.reduction_amount > 0}
+							{if $discountDetail.reduction_percent > 0} + {/if}
+							{convertPrice price=$discountDetail.reduction_amount} ({if $discountDetail.reduction_tax == 1}{l s='Tax included'}{else}{l s='Tax excluded'}{/if})
+						{/if}
+						{if $discountDetail.free_shipping}
+							{if $discountDetail.reduction_percent > 0 || $discountDetail.reduction_amount > 0} + {/if}
 							{l s='Free shipping'}
-						{else}
-							-
+						{/if}
+						{if $discountDetail.gift_product > 0}
+							{if $discountDetail.reduction_percent > 0 || $discountDetail.reduction_amount > 0} + {/if}
+							<a href="{$discountDetail.gift_product_link|escape:'html':'UTF-8'}">
+								{$discountDetail.gift_product_name|escape:'html':'UTF-8'}
+								{if isset($discountDetail.gift_product_attributes) && $discountDetail.gift_product_attributes|count_characters}
+								 ({$discountDetail.gift_product_attributes|escape:'html':'UTF-8'})
+								{/if}
+							</a>
 						{/if}
 					</td>
 					<td class="discount_minimum" data-value="{if $discountDetail.minimal == 0}0{else}{$discountDetail.minimal}{/if}">
 						{if $discountDetail.minimal == 0}
 							{l s='None'}
 						{else}
-							{convertPrice price=$discountDetail.minimal}
+							{convertPrice price=$discountDetail.minimal} ({if $discountDetail.minimum_amount_tax == 1}{l s='Tax included'}{else}{l s='Tax excluded'}{/if})
 						{/if}
 					</td>
 					<td class="discount_cumulative">
@@ -92,7 +103,7 @@
 		</a>
 	</li>
 	<li>
-		<a class="btn btn-default button button-small" href="{$base_dir}">
+		<a class="btn btn-default button button-small" href="{if isset($force_ssl) && $force_ssl}{$base_dir_ssl}{else}{$base_dir}{/if}">
 			<span>
 				<i class="icon-chevron-left"></i> {l s='Home'}
 			</span>

@@ -67,7 +67,8 @@
       <taxRule iso_code_country="sk" id_tax="1"/>
       <taxRule iso_code_country="fi" id_tax="1"/>
       <taxRule iso_code_country="se" id_tax="1"/>
-      <taxRule iso_code_country="uk" id_tax="1"/>
+      <taxRule iso_code_country="gb" id_tax="1"/>
+      <taxRule iso_code_country="hr" id_tax="1"/>
     </taxRulesGroup>
     <taxRulesGroup name="GR Reduced Rate (13%)">
       <taxRule iso_code_country="be" id_tax="2"/>
@@ -96,7 +97,8 @@
       <taxRule iso_code_country="sk" id_tax="2"/>
       <taxRule iso_code_country="fi" id_tax="2"/>
       <taxRule iso_code_country="se" id_tax="2"/>
-      <taxRule iso_code_country="uk" id_tax="2"/>
+      <taxRule iso_code_country="gb" id_tax="2"/>
+      <taxRule iso_code_country="hr" id_tax="2"/>
     </taxRulesGroup>
     <taxRulesGroup name="GR Super Reduced Rate (6.5%)">
       <taxRule iso_code_country="be" id_tax="3"/>
@@ -125,7 +127,8 @@
       <taxRule iso_code_country="sk" id_tax="3"/>
       <taxRule iso_code_country="fi" id_tax="3"/>
       <taxRule iso_code_country="se" id_tax="3"/>
-      <taxRule iso_code_country="uk" id_tax="3"/>
+      <taxRule iso_code_country="gb" id_tax="3"/>
+      <taxRule iso_code_country="hr" id_tax="3"/>
     </taxRulesGroup>
     <taxRulesGroup name="GR islands Standard Rate (16%)">
       <taxRule iso_code_country="be" id_tax="4"/>
@@ -154,7 +157,8 @@
       <taxRule iso_code_country="sk" id_tax="4"/>
       <taxRule iso_code_country="fi" id_tax="4"/>
       <taxRule iso_code_country="se" id_tax="4"/>
-      <taxRule iso_code_country="uk" id_tax="4"/>
+      <taxRule iso_code_country="gb" id_tax="4"/>
+      <taxRule iso_code_country="hr" id_tax="4"/>
     </taxRulesGroup>
     <taxRulesGroup name="GR islands Reduced Rate (8%)">
       <taxRule iso_code_country="be" id_tax="5"/>
@@ -183,7 +187,8 @@
       <taxRule iso_code_country="sk" id_tax="5"/>
       <taxRule iso_code_country="fi" id_tax="5"/>
       <taxRule iso_code_country="se" id_tax="5"/>
-      <taxRule iso_code_country="uk" id_tax="5"/>
+      <taxRule iso_code_country="gb" id_tax="5"/>
+      <taxRule iso_code_country="hr" id_tax="5"/>
     </taxRulesGroup>
     <taxRulesGroup name="GR islands Super Reduced Rate (4%)">
       <taxRule iso_code_country="be" id_tax="6"/>
@@ -212,7 +217,8 @@
       <taxRule iso_code_country="sk" id_tax="6"/>
       <taxRule iso_code_country="fi" id_tax="6"/>
       <taxRule iso_code_country="se" id_tax="6"/>
-      <taxRule iso_code_country="uk" id_tax="6"/>
+      <taxRule iso_code_country="gb" id_tax="6"/>
+      <taxRule iso_code_country="hr" id_tax="6"/>
     </taxRulesGroup>
     <taxRulesGroup name="EU VAT For Virtual Products" auto-generated="1" eu-tax-group="virtual">
       <taxRule iso_code_country="gr" id_tax="1"/>

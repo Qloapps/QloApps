@@ -1,5 +1,5 @@
 /*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -18,7 +18,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -188,9 +188,9 @@ $(document).ready(function(){
 			},
 			beforeClose: function ()
 			{
-				$('#cancel_req_id_order, #cancel_req_id_product, #cancel_req_id_currency, #cancel_req_id_customer, #cancel_req_num_rooms, #cancel_req_date_from, #cancel_req_date_to, #amount #reasonForRefund, .reasonForRefund').val('');
+				$('#cancel_req_id_order, #cancel_req_id_product, #cancel_req_id_currency, #cancel_req_id_customer, #cancel_req_num_rooms, #cancel_req_date_from, #cancel_req_date_to, #amount .reasonForRefund, .reasonForRefund').val('');
 				$('.cancel_req_amount').hide();
-				$('#reasonForRefund').css('border','1px solid #d6d4d4');
+				$('.reasonForRefund').css('border','1px solid #d6d4d4');
 				$('.required_err').hide();
 			}
 		});
@@ -202,7 +202,7 @@ $(document).ready(function(){
 		var id_currency = $(this).data('id_currency');
 		var id_customer = $(this).data('id_customer');
 		var id_order = $(this).data('id_order');
-		
+
 		$.fancybox({
 			href: "#reason_fancybox_content",
 			width: 600,
@@ -219,31 +219,26 @@ $(document).ready(function(){
 			},
 			beforeClose: function ()
 			{
-				$('#cancel_req_id_currency, #cancel_req_id_order, #cancel_req_id_customer, #cancel_req_total_order_data, #reasonForRefund').val('');
+				$('#cancel_req_id_currency, #cancel_req_id_order, #cancel_req_id_customer, #cancel_req_total_order_data, .reasonForRefund').val('');
 				$('.cancel_req_amount').hide();
-				$('#reasonForRefund').css('border','1px solid #d6d4d4');
+				$('.reasonForRefund').css('border','1px solid #d6d4d4');
 				$('.required_err').hide();
 			}
 		});
 	});
 
-	$('body').on('click', '#submit_refund_reason', function()
-	{
+	$('body').on('click', '#submit_refund_reason', function() {
 		var order_data = $('#cancel_req_total_order_data').val();
-		if (order_data)
-		{
-			var cancellation_reason = $('#reasonForRefund').val();
+		if (order_data) {
+			var cancellation_reason = $('.reasonForRefund').val();
 			var id_order = $('#cancel_req_id_order').val();
 			var id_currency = $('#cancel_req_id_currency').val();
 			var id_customer = $('#cancel_req_id_customer').val();
 
-			if ($('#reasonForRefund').val() == '')
-			{
+			if ($('.reasonForRefund').val() == '') {
 				$('.required_err').show();
-				$('#reasonForRefund').css('border','1px solid #AA1F00');
-			}
-			else
-			{
+				$('.reasonForRefund').css('border','1px solid #AA1F00');
+			} else {
 				$('#submit_refund_reason').attr('disabled', 'disabled');
 				$.ajax({
 			        data:{
@@ -258,34 +253,26 @@ $(document).ready(function(){
 			        method:'POST',
 			        dataType:'json',
 			        url:historyUrl,
-			        success:function(data)
-			        {
-			        	if (data.mail_err)
-			        	{
+			        success:function(data) {
+			        	if (data.mail_err) {
 			        		alert(mail_sending_err);
 			        	}
-			        	if (data.status == 'success')
-			        	{
+			        	if (data.status == 'success') {
 			        		$('.totalOrdercancellation_div').hide();
 			        		$(".roomRequestForRefund").parent().siblings('.stage_name').html('<p>'+wait_stage_msg+'</p>');
 			        		$(".roomRequestForRefund").parent().siblings('.status_name').html('<p>'+pending_state_msg+'</p>');
 			        		$(".roomRequestForRefund").parent().html('<p>'+req_sent_msg+'</p>');
 			        		$.fancybox.close();
-			        	}
-			        	else
-			        	{
+			        	} else {
 			        		alert(refund_request_sending_error);
 			        	}
 			        },
-			        error: function(XMLHttpRequest, textStatus, errorThrown)
-			        {
+			        error: function(XMLHttpRequest, textStatus, errorThrown) {
 			            alert(textStatus);
 			        }
 		    	});
 			}
-		}
-		else
-		{
+		} else {
 			var id_order = $('#cancel_req_id_order').val();
 			var id_room = $('#cancel_req_id_room').val();
 			var id_product = $('#cancel_req_id_product').val();
@@ -295,15 +282,12 @@ $(document).ready(function(){
 			var date_from = $('#cancel_req_date_from').val();
 			var date_to = $('#cancel_req_date_to').val();
 			var amount = $('#cancel_req_amount').val();
-			var cancellation_reason = $('#reasonForRefund').val();
+			var cancellation_reason = $('.reasonForRefund').val();
 
-			if ($('#reasonForRefund').val() == '')
-			{
+			if ($('.reasonForRefund').val() == '') {
 				$('.required_err').show();
-				$('#reasonForRefund').css('border','1px solid #AA1F00');
-			}
-			else
-			{
+				$('.reasonForRefund').css('border','1px solid #AA1F00');
+			} else {
 				$('#submit_refund_reason').attr('disabled', 'disabled');
 				$.ajax({
 			        data:{
@@ -352,6 +336,44 @@ $(document).ready(function(){
 		    	});
 			}
 		}
+	});
+
+	// fancybox for extra bed requirement edit on checkout page
+	$('body').on('click', '.open_rooms_extra_demands', function() {
+		var idProduct = $(this).attr('id_product');
+		var idOrder = $(this).attr('id_order');
+		var dateFrom = $(this).attr('date_from');
+		var dateTo = $(this).attr('date_to');
+		$.fancybox({
+			href: "#rooms_extra_demands",
+		    autoSize : true,
+		    autoScale : true,
+			maxWidth : '100%',
+			'hideOnContentClick': false,
+			beforeLoad: function () {
+				$.ajax({
+					type: 'POST',
+					headers: {
+						"cache-control": "no-cache"
+					},
+					url: historyUrl,
+					dataType: 'html',
+					cache: false,
+					data: {
+						date_from: dateFrom,
+						date_to: dateTo,
+						id_product: idProduct,
+						id_order: idOrder,
+						method: 'getRoomTypeBookingDemands',
+						ajax: true
+					},
+					success: function(result) {
+						$('#rooms_type_extra_demands').find('#room_type_demands_desc').html('');
+						$('#rooms_type_extra_demands').find('#room_type_demands_desc').append(result);
+					},
+				});
+			},
+		});
 	});
 });
 

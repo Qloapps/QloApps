@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -268,18 +268,19 @@ class SpecificPriceRuleCore extends ObjectModel
             }
         } else {
             // All products without conditions
-            $query = new DbQuery();
-            $query->select('p.`id_product`')
-                ->select('NULL as `id_product_attribute`')
-                ->from('product', 'p')
-                ->leftJoin('product_shop', 'ps', 'p.`id_product` = ps.`id_product`')
-                ->where('ps.id_shop = '.(int)$current_shop_id);
-
             if ($products && count($products)) {
+                $query = new DbQuery();
+                $query->select('p.`id_product`')
+                    ->select('NULL as `id_product_attribute`')
+                    ->from('product', 'p')
+                    ->leftJoin('product_shop', 'ps', 'p.`id_product` = ps.`id_product`')
+                    ->where('ps.id_shop = '.(int)$current_shop_id);
                 $query->where('p.`id_product` IN ('.implode(', ', array_map('intval', $products)).')');
+                $result = Db::getInstance()->executeS($query);
+            } else {
+                $result = array(array('id_product' => 0, 'id_product_attribute' => null));
             }
 
-            $result = Db::getInstance()->executeS($query);
         }
 
         return $result;
@@ -288,7 +289,7 @@ class SpecificPriceRuleCore extends ObjectModel
     public static function applyRuleToProduct($id_rule, $id_product, $id_product_attribute = null)
     {
         $rule = new SpecificPriceRule((int)$id_rule);
-        if (!Validate::isLoadedObject($rule) || !$id_product) {
+        if (!Validate::isLoadedObject($rule) || !Validate::isUnsignedInt($id_product)) {
             return false;
         }
 

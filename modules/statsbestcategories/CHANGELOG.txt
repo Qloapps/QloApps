@@ -1,3 +1,14 @@
+------------------------------
+# V1.5.1 to V1.5.2
+------------------------------
+
+## Improved/Changed Features:
+
+* [CO] : Module is made compatible with QloApps.
+
+_____________________________________________________________________________________________________
+
+
 2014-03-27 17:16:31 +0100	/ MO statsbestcategories : min ps_versions_compliancy modified (1.5.6.1 => 1.6)
 2014-03-24 15:22:36 +0100	/ MO statsbestcategories : ps_versions_compliancy added
 2014-03-20 14:35:55 +0100	Initial commit

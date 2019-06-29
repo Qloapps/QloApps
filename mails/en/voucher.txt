@@ -1,7 +1,7 @@
 
-[{shop_url}]
+[/{shop_url}] 
 
-Hi {firstname} {lastname},
+Hi {firstname} {lastname}, 
 
 A voucher has been created in your name as a result of your order
 with the reference {order_name}.
@@ -9,8 +9,8 @@ with the reference {order_name}.
 VOUCHER CODE: {voucher_num} in the amount of {voucher_amount}
 
 Simply copy/paste this code during the payment process for your next
-order.
+order. 		 
 
-{shop_name} [{shop_url}] powered by
-Webkul(tm) [https://webkul.com/]
+{shop_name} [/{shop_url}] powered by PrestaShop(tm)
+[http://www.prestashop.com/] 
 

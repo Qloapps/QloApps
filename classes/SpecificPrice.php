@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -89,14 +89,26 @@ class SpecificPriceCore extends ObjectModel
 
 
     protected static $_specificPriceCache = array();
+    protected static $_filterOutCache = array();
     protected static $_cache_priorities = array();
+    protected static $_no_specific_values = array();
+
+    /**
+     * Flush local cache
+     */
+    protected function flushCache() {
+        SpecificPrice::$_specificPriceCache = array();
+        SpecificPrice::$_filterOutCache = array();
+        SpecificPrice::$_cache_priorities = array();
+        SpecificPrice::$_no_specific_values = array();
+        Product::flushPriceCache();
+    }
 
     public function add($autodate = true, $nullValues = false)
     {
         if (parent::add($autodate, $nullValues)) {
             // Flush cache when we adding a new specific price
-            SpecificPrice::$_specificPriceCache = array();
-            Product::flushPriceCache();
+            $this->flushCache();
             // Set cache of feature detachable to true
             Configuration::updateGlobalValue('PS_SPECIFIC_PRICE_FEATURE_ACTIVE', '1');
             return true;
@@ -108,8 +120,7 @@ class SpecificPriceCore extends ObjectModel
     {
         if (parent::update($null_values)) {
             // Flush cache when we updating a new specific price
-            SpecificPrice::$_specificPriceCache = array();
-            Product::flushPriceCache();
+            $this->flushCache();
             return true;
         }
         return false;
@@ -119,8 +130,7 @@ class SpecificPriceCore extends ObjectModel
     {
         if (parent::delete()) {
             // Flush cache when we deletind a new specific price
-            SpecificPrice::$_specificPriceCache = array();
-            Product::flushPriceCache();
+            $this->flushCache();
             // Refresh cache of feature detachable
             Configuration::updateGlobalValue('PS_SPECIFIC_PRICE_FEATURE_ACTIVE', SpecificPrice::isCurrentlyUsed($this->def['table']));
             return true;
@@ -198,6 +208,131 @@ class SpecificPriceCore extends ObjectModel
         return preg_split('/;/', $priority);
     }
 
+    /**
+     * Remove or add a field value to a query if values are present in the database (cache friendly)
+     *
+     * @param string $field_name
+     * @param int $field_value
+     * @param int $threshold
+     * @return string
+     * @throws PrestaShopDatabaseException
+     */
+    protected static function filterOutField($field_name, $field_value, $threshold = 1000)
+    {
+        $query_extra = 'AND `'.$field_name.'` = 0 ';
+        if ($field_value == 0 || array_key_exists($field_name, self::$_no_specific_values)) {
+            return $query_extra;
+        }
+        $key_cache     = __FUNCTION__.'-'.$field_name.'-'.$threshold;
+        $specific_list = array();
+        if (!array_key_exists($key_cache, SpecificPrice::$_filterOutCache)) {
+            $query_count    = 'SELECT COUNT(DISTINCT `'.$field_name.'`) FROM `'._DB_PREFIX_.'specific_price` WHERE `'.$field_name.'` != 0';
+            $specific_count = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue($query_count);
+            if ($specific_count == 0) {
+                self::$_no_specific_values[$field_name] = true;
+
+                return $query_extra;
+            }
+            if ($specific_count < $threshold) {
+                $query             = 'SELECT DISTINCT `'.$field_name.'` FROM `'._DB_PREFIX_.'specific_price` WHERE `'.$field_name.'` != 0';
+                $tmp_specific_list = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($query);
+                foreach ($tmp_specific_list as $key => $value) {
+                    $specific_list[] = $value[$field_name];
+                }
+            }
+            SpecificPrice::$_filterOutCache[$key_cache] = $specific_list;
+        } else {
+            $specific_list = SpecificPrice::$_filterOutCache[$key_cache];
+        }
+
+        // $specific_list is empty if the threshold is reached
+        if (empty($specific_list) || in_array($field_value, $specific_list)) {
+            $query_extra = 'AND `'.$field_name.'` '.self::formatIntInQuery(0, $field_value).' ';
+        }
+
+        return $query_extra;
+    }
+
+    /**
+     * Remove or add useless fields value depending on the values in the database (cache friendly)
+     *
+     * @param int|null $id_product
+     * @param int|null $id_product_attribute
+     * @param int|null $id_cart
+     * @param string|null $beginning
+     * @param string|null $ending
+     * @return string
+     */
+    protected static function computeExtraConditions($id_product, $id_product_attribute, $id_customer, $id_cart, $beginning = null, $ending = null)
+    {
+        $first_date = date('Y-m-d 00:00:00');
+        $last_date = date('Y-m-d 23:59:59');
+        $now = date('Y-m-d H:i:00');
+        if ($beginning === null) {
+            $beginning = $now;
+        }
+        if ($ending === null) {
+            $ending = $now;
+        }
+        $id_customer = (int)$id_customer;
+        $id_cart = (int)$id_cart;
+
+        $query_extra = '';
+
+        if ($id_product !== null) {
+            $query_extra .= self::filterOutField('id_product', $id_product);
+        }
+
+        if ($id_customer !== null) {
+            $query_extra .= self::filterOutField('id_customer', $id_customer);
+        }
+
+        if ($id_product_attribute !== null) {
+            $query_extra .= self::filterOutField('id_product_attribute', $id_product_attribute);
+        }
+
+        if ($id_cart !== null) {
+            $query_extra .= self::filterOutField('id_cart', $id_cart);
+        }
+
+        if ($ending == $now && $beginning == $now) {
+            $key = __FUNCTION__.'-'.$first_date.'-'.$last_date;
+            if (!array_key_exists($key, SpecificPrice::$_filterOutCache)) {
+                $query_from_count    = 'SELECT 1 FROM `'._DB_PREFIX_.'specific_price` WHERE `from` BETWEEN \''.$first_date.'\' AND \''.$last_date.'\'';
+                $from_specific_count = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue($query_from_count);
+
+                $query_to_count                       = 'SELECT 1 FROM `'._DB_PREFIX_.'specific_price` WHERE `to` BETWEEN \''.$first_date.'\' AND \''.$last_date.'\'';
+
+                $to_specific_count                    = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue($query_to_count);
+                SpecificPrice::$_filterOutCache[$key] = array($from_specific_count, $to_specific_count);
+            } else {
+                list($from_specific_count, $to_specific_count) = SpecificPrice::$_filterOutCache[$key];
+            }
+        } else {
+            $from_specific_count = $to_specific_count = 1;
+        }
+
+        // if the from and to is not reached during the current day, just change $ending & $beginning to any date of the day to improve the cache
+        if (!$from_specific_count && !$to_specific_count) {
+            $ending = $beginning = $first_date;
+        }
+
+        $query_extra .= ' AND (`from` = \'0000-00-00 00:00:00\' OR \''.$beginning.'\' >= `from`)'
+                       .' AND (`to` = \'0000-00-00 00:00:00\' OR \''.$ending.'\' <= `to`)';
+
+        return $query_extra;
+    }
+
+    private static function formatIntInQuery($first_value, $second_value) {
+        $first_value = (int)$first_value;
+        $second_value = (int)$second_value;
+        if ($first_value != $second_value) {
+            return 'IN ('.$first_value.', '.$second_value.')';
+        } else {
+            return ' = '.$first_value;
+        }
+    }
+
     public static function getSpecificPrice($id_product, $id_shop, $id_currency, $id_country, $id_group, $quantity, $id_product_attribute = null, $id_customer = 0, $id_cart = 0, $real_quantity = 0)
     {
         if (!SpecificPrice::isFeatureActive()) {
@@ -210,24 +345,15 @@ class SpecificPriceCore extends ObjectModel
 
         $key = ((int)$id_product.'-'.(int)$id_shop.'-'.(int)$id_currency.'-'.(int)$id_country.'-'.(int)$id_group.'-'.(int)$quantity.'-'.(int)$id_product_attribute.'-'.(int)$id_cart.'-'.(int)$id_customer.'-'.(int)$real_quantity);
         if (!array_key_exists($key, SpecificPrice::$_specificPriceCache)) {
-            $now = date('Y-m-d H:i:00');
+            $query_extra = self::computeExtraConditions($id_product, $id_product_attribute, $id_customer, $id_cart);
             $query = '
 			SELECT *, '.SpecificPrice::_getScoreQuery($id_product, $id_shop, $id_currency, $id_country, $id_group, $id_customer).'
-				FROM `'._DB_PREFIX_.'specific_price` USE INDEX (id_product_2)
-				WHERE `id_product` IN (0, '.(int)$id_product.')
-				AND `id_product_attribute` IN (0, '.(int)$id_product_attribute.')
-				AND `id_shop` IN (0, '.(int)$id_shop.')
-				AND `id_currency` IN (0, '.(int)$id_currency.')
-				AND `id_country` IN (0, '.(int)$id_country.')
-				AND `id_group` IN (0, '.(int)$id_group.')
-				AND `id_customer` IN (0, '.(int)$id_customer.')
-				AND
-				(
-					(`from` = \'0000-00-00 00:00:00\' OR \''.$now.'\' >= `from`)
-					AND
-					(`to` = \'0000-00-00 00:00:00\' OR \''.$now.'\' <= `to`)
-				)
-				AND id_cart IN (0, '.(int)$id_cart.')
+				FROM `'._DB_PREFIX_.'specific_price`
+				WHERE
+                `id_shop` '.self::formatIntInQuery(0, $id_shop).' AND
+                `id_currency` '.self::formatIntInQuery(0, $id_currency).' AND
+                `id_country` '.self::formatIntInQuery(0, $id_country).' AND
+                `id_group` '.self::formatIntInQuery(0, $id_group).' '.$query_extra.'
 				AND IF(`from_quantity` > 1, `from_quantity`, 0) <= ';
 
             $query .= (Configuration::get('PS_QTY_DISCOUNT_ON_COMBINATION') || !$id_cart || !$real_quantity) ? (int)$quantity : max(1, (int)$real_quantity);
@@ -279,25 +405,16 @@ class SpecificPriceCore extends ObjectModel
             return array();
         }
 
-        $now = date('Y-m-d H:i:00');
+        $query_extra = self::computeExtraConditions($id_product, ((!$all_combinations)?$id_product_attribute:null), $id_customer, null);
         $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS('
 			SELECT *,
 					'.SpecificPrice::_getScoreQuery($id_product, $id_shop, $id_currency, $id_country, $id_group, $id_customer).'
-				FROM `'._DB_PREFIX_.'specific_price` USE INDEX (id_product_2)
+				FROM `'._DB_PREFIX_.'specific_price`
 				WHERE
-					`id_product` IN(0, '.(int)$id_product.') AND
-					'.(!$all_combinations ? '`id_product_attribute` IN(0, '.(int)$id_product_attribute.') AND ' : '').'
-					`id_shop` IN(0, '.(int)$id_shop.') AND
-					`id_currency` IN(0, '.(int)$id_currency.') AND
-					`id_country` IN(0, '.(int)$id_country.') AND
-					`id_group` IN(0, '.(int)$id_group.') AND
-					`id_customer` IN(0, '.(int)$id_customer.')
-					AND
-					(
-						(`from` = \'0000-00-00 00:00:00\' OR \''.$now.'\' >= `from`)
-						AND
-						(`to` = \'0000-00-00 00:00:00\' OR \''.$now.'\' <= `to`)
-					)
+					`id_shop` '.self::formatIntInQuery(0, $id_shop).' AND
+					`id_currency` '.self::formatIntInQuery(0, $id_currency).' AND
+					`id_country` '.self::formatIntInQuery(0, $id_country).' AND
+					`id_group` '.self::formatIntInQuery(0, $id_group).' '.$query_extra.'
 					ORDER BY `from_quantity` ASC, `id_specific_price_rule` ASC, `score` DESC, `to` DESC, `from` DESC
 		', false, false);
 
@@ -326,26 +443,19 @@ class SpecificPriceCore extends ObjectModel
             return array();
         }
 
-        $now = date('Y-m-d H:i:00');
+
+
+        $query_extra = self::computeExtraConditions($id_product, $id_product_attribute, $id_customer, null);
         return Db::getInstance(_PS_USE_SQL_SLAVE_)->getRow('
 			SELECT *,
 					'.SpecificPrice::_getScoreQuery($id_product, $id_shop, $id_currency, $id_country, $id_group, $id_customer).'
-			FROM `'._DB_PREFIX_.'specific_price` USE INDEX (id_product_2)
+			FROM `'._DB_PREFIX_.'specific_price`
 			WHERE
-					`id_product` IN(0, '.(int)$id_product.') AND
-					`id_product_attribute` IN(0, '.(int)$id_product_attribute.') AND
-					`id_shop` IN(0, '.(int)$id_shop.') AND
-					`id_currency` IN(0, '.(int)$id_currency.') AND
-					`id_country` IN(0, '.(int)$id_country.') AND
-					`id_group` IN(0, '.(int)$id_group.') AND
-					`id_customer` IN(0, '.(int)$id_customer.') AND
-					`from_quantity` >= '.(int)$quantity.'
-					AND
-					(
-						(`from` = \'0000-00-00 00:00:00\' OR \''.$now.'\' >= `from`)
-						AND
-						(`to` = \'0000-00-00 00:00:00\' OR \''.$now.'\' <= `to`)
-					)
+					`id_shop` '.self::formatIntInQuery(0, $id_shop).' AND
+					`id_currency` '.self::formatIntInQuery(0, $id_currency).' AND
+					`id_country` '.self::formatIntInQuery(0, $id_country).' AND
+					`id_group` '.self::formatIntInQuery(0, $id_group).' AND
+					`from_quantity` >= '.(int)$quantity.' '.$query_extra.'
 					ORDER BY `from_quantity` DESC, `score` DESC, `to` DESC, `from` DESC
 		');
     }
@@ -356,26 +466,20 @@ class SpecificPriceCore extends ObjectModel
             return array();
         }
 
-        $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS('
-			SELECT SQL_NO_CACHE `id_product`, `id_product_attribute`
+        $query_extra = self::computeExtraConditions(null, null, $id_customer, null, $beginning, $ending);
+        $results = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS('
+			SELECT `id_product`, `id_product_attribute`
 			FROM `'._DB_PREFIX_.'specific_price`
-			WHERE	`id_shop` IN(0, '.(int)$id_shop.') AND
-					`id_currency` IN(0, '.(int)$id_currency.') AND
-					`id_country` IN(0, '.(int)$id_country.') AND
-					`id_group` IN(0, '.(int)$id_group.') AND
-					`id_customer` IN(0, '.(int)$id_customer.') AND
+			WHERE	`id_shop` '.self::formatIntInQuery(0, $id_shop).' AND
+					`id_currency` '.self::formatIntInQuery(0, $id_currency).' AND
+					`id_country` '.self::formatIntInQuery(0, $id_country).' AND
+					`id_group` '.self::formatIntInQuery(0, $id_group).' AND
 					`from_quantity` = 1 AND
-					(
-						(`from` = \'0000-00-00 00:00:00\' OR \''.pSQL($beginning).'\' >= `from`)
-						AND
-						(`to` = \'0000-00-00 00:00:00\' OR \''.pSQL($ending).'\' <= `to`)
-					)
-					AND
 					`reduction` > 0
-		', false, false);
+		'.$query_extra);
         $ids_product = array();
-        while ($row = Db::getInstance()->nextRow($result)) {
-            $ids_product[] = $with_combination_id ? array('id_product' => (int)$row['id_product'], 'id_product_attribute' => (int)$row['id_product_attribute']) : (int)$row['id_product'];
+        foreach($results as $key => $value) {
+            $ids_product[] = $with_combination_id ? array('id_product' => (int)$value['id_product'], 'id_product_attribute' => (int)$value['id_product_attribute']) : (int)$value['id_product'];
         }
 
         return $ids_product;

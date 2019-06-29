@@ -111,6 +111,14 @@ class HotelAdvancedPayment extends ObjectModel
                                 $adv_amount = $prod_adv['value'] * $productCartQuantity;
                             }
                         }
+                        if ($price_without_tax) {
+                            $taxRate = (($price_with_tax-$price_without_tax)/$price_without_tax)*100;
+                        } else {
+                            $taxRate = 0;
+                        }
+                        $taxRate = HotelRoomType::getRoomTypeTaxRate($id_product);
+                        $taxPrice = ($adv_amount * $taxRate) / 100;
+                        $adv_amount += $taxPrice;
                     }
                 } else { // Advanced payment is calculated by Global advanced payment setting
                     if ($adv_global_tax_inc) {
@@ -339,5 +347,24 @@ class HotelAdvancedPayment extends ObjectModel
         }
 
         return $adv_amount;
+    }
+
+    // check if advance payment is available for the current cart
+    public function isAdvancePaymentAvailableForCurrentCart()
+    {
+        if (Configuration::get('WK_ALLOW_ADVANCED_PAYMENT')) {
+            $context = Context::getContext();
+            if ($cartProducts = $context->cart->getProducts()) {
+                foreach ($cartProducts as $product) {
+                    $idProduct = $product['id_product'];
+                    if ($advPaymentInfo = $this->getIdAdvPaymentByIdProduct($idProduct)) {
+                        if ($advPaymentInfo['active']) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
     }
 }

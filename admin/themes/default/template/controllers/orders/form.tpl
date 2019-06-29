@@ -1,5 +1,5 @@
 {*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -18,7 +18,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
@@ -573,7 +573,7 @@
 		id_cart = 0;
 		{if isset($cart->id) && $cart->id}
 			id_cart = "{$cart->id}";
-		{/if}	
+		{/if}
 		$('#new_address').attr('href', address_link.replace(/id_customer=[0-9]+/, 'id_customer='+id_customer));
 		$.ajax({
 			type:"POST",
@@ -640,15 +640,29 @@
 			$('#carrier_form').show();
 			$('#delivery_option').html(html);
 			$('#carriers_err').hide();
-			$("button[name=\"submitAddOrder\"]").removeAttr("disabled");
 		}
 		else
 		{
 			$('#carrier_form').hide();
 			$('#carriers_err').show().html('{l s='No carrier can be applied to this order'}');
+		}
+	}
 
-			// commented by webkul to enable button in case of ordering virtual product
-			//$("button[name=\"submitAddOrder\"]").attr("disabled", "disabled");
+	// commented by webkul to enable button in case of ordering virtual product
+	function checkVirtualProduct(products, delivery_option_list) {
+		if (delivery_option_list.length == 0 && products.length > 0) {
+			var find = 1;
+			$.each(products, function () {
+				if (find == 1) {
+					this.is_virtual == 1 ? find = 1 : find = 0;
+				}
+			});
+			if (find == 1) {
+				$("button[name=\"submitAddOrder\"]").removeAttr("disabled");
+			}
+			else {
+				$("button[name=\"submitAddOrder\"]").attr("disabled", "disabled");
+			}
 		}
 	}
 
@@ -683,7 +697,7 @@
 					else
 						customization_errors = false;
 					$('#products_found').show();
-					products_found += '<label class="control-label col-lg-3">{l s='Product'}</label><div class="col-lg-6"><select id="id_product" onclick="display_product_attributes();display_product_customizations();"></div>';
+					products_found += '<label class="control-label col-lg-3">{l s='Product'}</label><div class="col-lg-6"><select id="id_product" onchange="display_product_attributes();display_product_customizations();"></div>';
 					attributes_html += '<label class="control-label col-lg-3">{l s='Combination'}</label><div class="col-lg-6">';
 					$.each(res.products, function() {
 						products_found += '<option '+(this.combinations.length > 0 ? 'rel="'+this.qty_in_stock+'"' : '')+' value="'+this.id_product+'">'+this.name+(this.combinations.length == 0 ? ' - '+this.formatted_price : '')+'</option>';
@@ -873,6 +887,7 @@
 		*/
 
 		updateDeliveryOptionList(jsonSummary.delivery_option_list);
+		checkVirtualProduct(jsonSummary.summary.products,jsonSummary.delivery_option_list);
 
 		if (jsonSummary.cart.gift == 1)
 			$('#order_gift').attr('checked', true);
@@ -967,7 +982,6 @@
 		//refresh form customization
 		searchProducts();
 
-		addProductProcess();
 	}
 
 	function addProductProcess()
@@ -1096,6 +1110,7 @@
 				address_invoice_detail = this.formated_address;
 				invoice_address_edit_link = "{$link->getAdminLink('AdminAddresses')}&id_address="+this.id_address+"&updateaddress&realedit=1&liteDisplaying=1&submitFormAjax=1#";
 			}
+
 			if(this.id_address == id_address_delivery)
 			{
 				address_delivery_detail = this.formated_address;

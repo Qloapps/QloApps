@@ -1,4 +1,19 @@
 -----------------------------
+# V1.1.1 to V1.1.2
+-----------------------------
+
+## Improved/changed features
+
+[*] BO : Images validation improved client side (for post_max_size issue).
+[*] BO : Render list filter issues resolved.
+[*] BO : validation improved.
+
+## Update Policy
+
+- Mobule need only file update, can be updated only by UPLOADING new version on module
+
+
+-----------------------------
 # V1.1.0 to V1.1.1
 -----------------------------
 

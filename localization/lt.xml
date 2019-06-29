@@ -64,7 +64,8 @@
 			<taxRule iso_code_country="sk" id_tax="1"/>
 			<taxRule iso_code_country="fi" id_tax="1"/>
 			<taxRule iso_code_country="se" id_tax="1"/>
-			<taxRule iso_code_country="uk" id_tax="1"/>
+			<taxRule iso_code_country="gb" id_tax="1"/>
+			<taxRule iso_code_country="hr" id_tax="1"/>
 		</taxRulesGroup>
 		<taxRulesGroup name="LT Reduced Rate (9%)">
 			<taxRule iso_code_country="be" id_tax="2"/>
@@ -93,7 +94,8 @@
 			<taxRule iso_code_country="sk" id_tax="2"/>
 			<taxRule iso_code_country="fi" id_tax="2"/>
 			<taxRule iso_code_country="se" id_tax="2"/>
-			<taxRule iso_code_country="uk" id_tax="2"/>
+			<taxRule iso_code_country="gb" id_tax="2"/>
+			<taxRule iso_code_country="hr" id_tax="2"/>
 		</taxRulesGroup>
 		<taxRulesGroup name="LT Super Reduced Rate (5%)">
 			<taxRule iso_code_country="be" id_tax="3"/>
@@ -122,7 +124,8 @@
 			<taxRule iso_code_country="sk" id_tax="3"/>
 			<taxRule iso_code_country="fi" id_tax="3"/>
 			<taxRule iso_code_country="se" id_tax="3"/>
-			<taxRule iso_code_country="uk" id_tax="3"/>
+			<taxRule iso_code_country="gb" id_tax="3"/>
+			<taxRule iso_code_country="hr" id_tax="3"/>
 		</taxRulesGroup>
 		<taxRulesGroup name="LT Foodstuff Rate (21%)">
 			<taxRule iso_code_country="be" id_tax="1"/>
@@ -151,7 +154,8 @@
 			<taxRule iso_code_country="sk" id_tax="1"/>
 			<taxRule iso_code_country="fi" id_tax="1"/>
 			<taxRule iso_code_country="se" id_tax="1"/>
-			<taxRule iso_code_country="uk" id_tax="1"/>
+			<taxRule iso_code_country="gb" id_tax="1"/>
+			<taxRule iso_code_country="hr" id_tax="1"/>
 		</taxRulesGroup>
 		<taxRulesGroup name="LT Books Rate (9%)">
 			<taxRule iso_code_country="be" id_tax="2"/>
@@ -180,7 +184,8 @@
 			<taxRule iso_code_country="sk" id_tax="2"/>
 			<taxRule iso_code_country="fi" id_tax="2"/>
 			<taxRule iso_code_country="se" id_tax="2"/>
-			<taxRule iso_code_country="uk" id_tax="2"/>
+			<taxRule iso_code_country="gb" id_tax="2"/>
+			<taxRule iso_code_country="hr" id_tax="2"/>
 		</taxRulesGroup>
 		<taxRulesGroup name="EU VAT For Virtual Products" auto-generated="1" eu-tax-group="virtual">
 			<taxRule iso_code_country="lt" id_tax="1"/>

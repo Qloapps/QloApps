@@ -1,5 +1,5 @@
 {*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -18,7 +18,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
@@ -78,13 +78,13 @@
 										<span class="label-tooltip" data-toggle="tooltip" data-html="true" title="{if is_array($input.hint)}
 													{foreach $input.hint as $hint}
 														{if is_array($hint)}
-															{$hint.text|escape:'html':'UTF-8'}
+															{$hint.text|escape:'quotes'}
 														{else}
-															{$hint|escape:'html':'UTF-8'}
+															{$hint|escape:'quotes'}
 														{/if}
 													{/foreach}
 												{else}
-													{$input.hint|escape:'html':'UTF-8'}
+													{$input.hint|escape:'quotes'}
 												{/if}">
 										{/if}
 										{$input.label}
@@ -96,7 +96,7 @@
 							{/block}
 
 							{block name="field"}
-								<div class="col-lg-{if isset($input.col)}{$input.col|intval}{else}9{/if} {if !isset($input.label)}col-lg-offset-3{/if}">
+								<div class="col-lg-{if isset($input.col)}{$input.col|intval}{else}9{/if}{if !isset($input.label)} col-lg-offset-3{/if}">
 								{block name="input"}
 								{if $input.type == 'text' || $input.type == 'tags'}
 									{if isset($input.lang) AND $input.lang}
@@ -125,9 +125,9 @@
 												{if isset($input.maxchar) || isset($input.prefix) || isset($input.suffix)}
 												<div class="input-group{if isset($input.class)} {$input.class}{/if}">
 												{/if}
-												{if isset($input.maxchar)}
+												{if isset($input.maxchar) && $input.maxchar}
 												<span id="{if isset($input.id)}{$input.id}_{$language.id_lang}{else}{$input.name}_{$language.id_lang}{/if}_counter" class="input-group-addon">
-													<span class="text-count-down">{$input.maxchar}</span>
+													<span class="text-count-down">{$input.maxchar|intval}</span>
 												</span>
 												{/if}
 												{if isset($input.prefix)}
@@ -142,8 +142,8 @@
 													value="{if isset($input.string_format) && $input.string_format}{$value_text|string_format:$input.string_format|escape:'html':'UTF-8'}{else}{$value_text|escape:'html':'UTF-8'}{/if}"
 													onkeyup="if (isArrowKey(event)) return ;updateFriendlyURL();"
 													{if isset($input.size)} size="{$input.size}"{/if}
-													{if isset($input.maxchar)} data-maxchar="{$input.maxchar}"{/if}
-													{if isset($input.maxlength)} maxlength="{$input.maxlength}"{/if}
+													{if isset($input.maxchar) && $input.maxchar} data-maxchar="{$input.maxchar|intval}"{/if}
+													{if isset($input.maxlength) && $input.maxlength} maxlength="{$input.maxlength|intval}"{/if}
 													{if isset($input.readonly) && $input.readonly} readonly="readonly"{/if}
 													{if isset($input.disabled) && $input.disabled} disabled="disabled"{/if}
 													{if isset($input.autocomplete) && !$input.autocomplete} autocomplete="off"{/if}
@@ -173,17 +173,8 @@
 										</div>
 										{/if}
 									{/foreach}
-									{if isset($input.maxchar)}
+									{if isset($input.maxchar) && $input.maxchar}
 									<script type="text/javascript">
-									function countDown($source, $target) {
-										var max = $source.attr("data-maxchar");
-										$target.html(max-$source.val().length);
-
-										$source.keyup(function(){
-											$target.html(max-$source.val().length);
-										});
-									}
-
 									$(document).ready(function(){
 									{foreach from=$languages item=language}
 										countDown($("#{if isset($input.id)}{$input.id}_{$language.id_lang}{else}{$input.name}_{$language.id_lang}{/if}"), $("#{if isset($input.id)}{$input.id}_{$language.id_lang}{else}{$input.name}_{$language.id_lang}{/if}_counter"));
@@ -212,8 +203,8 @@
 										{if isset($input.maxchar) || isset($input.prefix) || isset($input.suffix)}
 										<div class="input-group{if isset($input.class)} {$input.class}{/if}">
 										{/if}
-										{if isset($input.maxchar)}
-										<span id="{if isset($input.id)}{$input.id}{else}{$input.name}{/if}_counter" class="input-group-addon"><span class="text-count-down">{$input.maxchar}</span></span>
+										{if isset($input.maxchar) && $input.maxchar}
+										<span id="{if isset($input.id)}{$input.id}{else}{$input.name}{/if}_counter" class="input-group-addon"><span class="text-count-down">{$input.maxchar|intval}</span></span>
 										{/if}
 										{if isset($input.prefix)}
 										<span class="input-group-addon">
@@ -226,8 +217,8 @@
 											value="{if isset($input.string_format) && $input.string_format}{$value_text|string_format:$input.string_format|escape:'html':'UTF-8'}{else}{$value_text|escape:'html':'UTF-8'}{/if}"
 											class="{if isset($input.class)}{$input.class}{/if}{if $input.type == 'tags'} tagify{/if}"
 											{if isset($input.size)} size="{$input.size}"{/if}
-											{if isset($input.maxchar)} data-maxchar="{$input.maxchar}"{/if}
-											{if isset($input.maxlength)} maxlength="{$input.maxlength}"{/if}
+											{if isset($input.maxchar) && $input.maxchar} data-maxchar="{$input.maxchar|intval}"{/if}
+											{if isset($input.maxlength) && $input.maxlength} maxlength="{$input.maxlength|intval}"{/if}
 											{if isset($input.readonly) && $input.readonly} readonly="readonly"{/if}
 											{if isset($input.disabled) && $input.disabled} disabled="disabled"{/if}
 											{if isset($input.autocomplete) && !$input.autocomplete} autocomplete="off"{/if}
@@ -243,16 +234,8 @@
 										{if isset($input.maxchar) || isset($input.prefix) || isset($input.suffix)}
 										</div>
 										{/if}
-										{if isset($input.maxchar)}
+										{if isset($input.maxchar) && $input.maxchar}
 										<script type="text/javascript">
-										function countDown($source, $target) {
-											var max = $source.attr("data-maxchar");
-											$target.html(max-$source.val().length);
-
-											$source.keyup(function(){
-												$target.html(max-$source.val().length);
-											});
-										}
 										$(document).ready(function(){
 											countDown($("#{if isset($input.id)}{$input.id}{else}{$input.name}{/if}"), $("#{if isset($input.id)}{$input.id}{else}{$input.name}{/if}_counter"));
 										});
@@ -266,7 +249,7 @@
 										{if isset($input.maxchar)}
 										<div class="input-group">
 											<span id="{if isset($input.id)}{$input.id}{else}{$input.name}{/if}_counter" class="input-group-addon">
-												<span class="text-count-down">{$input.maxchar}</span>
+												<span class="text-count-down">{$input.maxchar|intval}</span>
 											</span>
 										{/if}
 										<input type="text"
@@ -275,15 +258,15 @@
 											value="{if isset($input.string_format) && $input.string_format}{$value_text|string_format:$input.string_format|escape:'html':'UTF-8'}{else}{$value_text|escape:'html':'UTF-8'}{/if}"
 											class="{if isset($input.class)}{$input.class}{/if}{if $input.type == 'tags'} tagify{/if}"
 											{if isset($input.size)} size="{$input.size}"{/if}
-											{if isset($input.maxchar)} data-maxchar="{$input.maxchar}"{/if}
-											{if isset($input.maxlength)} maxlength="{$input.maxlength}"{/if}
+											{if isset($input.maxchar) && $input.maxchar} data-maxchar="{$input.maxchar|intval}"{/if}
+											{if isset($input.maxlength) && $input.maxlength} maxlength="{$input.maxlength|intval}"{/if}
 											{if isset($input.readonly) && $input.readonly} readonly="readonly"{/if}
 											{if isset($input.disabled) && $input.disabled} disabled="disabled"{/if}
 											{if isset($input.autocomplete) && !$input.autocomplete} autocomplete="off"{/if}
 											{if isset($input.placeholder) && $input.placeholder } placeholder="{$input.placeholder}"{/if}
 											/>
 										{if isset($input.suffix)}{$input.suffix}{/if}
-										{if isset($input.maxchar)}
+										{if isset($input.maxchar) && $input.maxchar}
 										</div>
 										{/if}
 										</div>
@@ -298,15 +281,8 @@
 											</button>
 										</div>
 									</div>
-									{if isset($input.maxchar)}
+									{if isset($input.maxchar) && $input.maxchar}
 									<script type="text/javascript">
-										function countDown($source, $target) {
-											var max = $source.attr("data-maxchar");
-											$target.html(max-$source.val().length);
-											$source.keyup(function(){
-												$target.html(max-$source.val().length);
-											});
-										}
 										$(document).ready(function() {
 											countDown($("#{if isset($input.id)}{$input.id}{else}{$input.name}{/if}"), $("#{if isset($input.id)}{$input.id}{else}{$input.name}{/if}_counter"));
 										});
@@ -454,37 +430,63 @@
 										<a class="slide-button btn"></a>
 									</span>
 								{elseif $input.type == 'textarea'}
+									{if isset($input.maxchar) && $input.maxchar}<div class="input-group">{/if}
 									{assign var=use_textarea_autosize value=true}
 									{if isset($input.lang) AND $input.lang}
-									{foreach $languages as $language}
-									{if $languages|count > 1}
-									<div class="form-group translatable-field lang-{$language.id_lang}"{if $language.id_lang != $defaultFormLanguage} style="display:none;"{/if}>
-										<div class="col-lg-9">
-									{/if}
-											<textarea {if isset($input.readonly) && $input.readonly} readonly="readonly"{/if} name="{$input.name}_{$language.id_lang}" class="{if isset($input.autoload_rte) && $input.autoload_rte}rte autoload_rte{else}textarea-autosize{/if}{if isset($input.class)} {$input.class}{/if}">{$fields_value[$input.name][$language.id_lang]|escape:'html':'UTF-8'}</textarea>
-									{if $languages|count > 1}
-										</div>
-										<div class="col-lg-2">
-											<button type="button" class="btn btn-default dropdown-toggle" tabindex="-1" data-toggle="dropdown">
-												{$language.iso_code}
-												<span class="caret"></span>
-											</button>
-											<ul class="dropdown-menu">
-												{foreach from=$languages item=language}
-												<li>
-													<a href="javascript:hideOtherLanguage({$language.id_lang});" tabindex="-1">{$language.name}</a>
-												</li>
-												{/foreach}
-											</ul>
-										</div>
-									</div>
-									{/if}
-									{/foreach}
-
+										{foreach $languages as $language}
+											{if $languages|count > 1}
+											<div class="form-group translatable-field lang-{$language.id_lang}"{if $language.id_lang != $defaultFormLanguage} style="display:none;"{/if}>
+												<div class="col-lg-9">
+											{/if}
+													{if isset($input.maxchar) && $input.maxchar}
+														<span id="{if isset($input.id)}{$input.id}_{$language.id_lang}{else}{$input.name}_{$language.id_lang}{/if}_counter" class="input-group-addon">
+															<span class="text-count-down">{$input.maxchar|intval}</span>
+														</span>
+													{/if}
+													<textarea{if isset($input.readonly) && $input.readonly} readonly="readonly"{/if} name="{$input.name}_{$language.id_lang}" id="{if isset($input.id)}{$input.id}{else}{$input.name}{/if}_{$language.id_lang}" class="{if isset($input.autoload_rte) && $input.autoload_rte}rte autoload_rte{else}textarea-autosize{/if}{if isset($input.class)} {$input.class}{/if}"{if isset($input.maxlength) && $input.maxlength} maxlength="{$input.maxlength|intval}"{/if}{if isset($input.maxchar) && $input.maxchar} data-maxchar="{$input.maxchar|intval}"{/if}>{$fields_value[$input.name][$language.id_lang]|escape:'html':'UTF-8'}</textarea>
+											{if $languages|count > 1}
+												</div>
+												<div class="col-lg-2">
+													<button type="button" class="btn btn-default dropdown-toggle" tabindex="-1" data-toggle="dropdown">
+														{$language.iso_code}
+														<span class="caret"></span>
+													</button>
+													<ul class="dropdown-menu">
+														{foreach from=$languages item=language}
+														<li>
+															<a href="javascript:hideOtherLanguage({$language.id_lang});" tabindex="-1">{$language.name}</a>
+														</li>
+														{/foreach}
+													</ul>
+												</div>
+											</div>
+											{/if}
+										{/foreach}
+										{if isset($input.maxchar) && $input.maxchar}
+											<script type="text/javascript">
+											$(document).ready(function(){
+											{foreach from=$languages item=language}
+												countDown($("#{if isset($input.id)}{$input.id}_{$language.id_lang}{else}{$input.name}_{$language.id_lang}{/if}"), $("#{if isset($input.id)}{$input.id}_{$language.id_lang}{else}{$input.name}_{$language.id_lang}{/if}_counter"));
+											{/foreach}
+											});
+											</script>
+										{/if}
 									{else}
-										<textarea {if isset($input.readonly) && $input.readonly} readonly="readonly"{/if} name="{$input.name}" id="{if isset($input.id)}{$input.id}{else}{$input.name}{/if}" {if isset($input.cols)}cols="{$input.cols}"{/if} {if isset($input.rows)}rows="{$input.rows}"{/if} class="{if isset($input.autoload_rte) && $input.autoload_rte}rte autoload_rte{else}textarea-autosize{/if}{if isset($input.class)} {$input.class}{/if}">{$fields_value[$input.name]|escape:'html':'UTF-8'}</textarea>
+										{if isset($input.maxchar) && $input.maxchar}
+											<span id="{if isset($input.id)}{$input.id}_{$language.id_lang}{else}{$input.name}_{$language.id_lang}{/if}_counter" class="input-group-addon">
+												<span class="text-count-down">{$input.maxchar|intval}</span>
+											</span>
+										{/if}
+										<textarea{if isset($input.readonly) && $input.readonly} readonly="readonly"{/if} name="{$input.name}" id="{if isset($input.id)}{$input.id}{else}{$input.name}{/if}" {if isset($input.cols)}cols="{$input.cols}"{/if} {if isset($input.rows)}rows="{$input.rows}"{/if} class="{if isset($input.autoload_rte) && $input.autoload_rte}rte autoload_rte{else}textarea-autosize{/if}{if isset($input.class)} {$input.class}{/if}"{if isset($input.maxlength) && $input.maxlength} maxlength="{$input.maxlength|intval}"{/if}{if isset($input.maxchar) && $input.maxchar} data-maxchar="{$input.maxchar|intval}"{/if}>{$fields_value[$input.name]|escape:'html':'UTF-8'}</textarea>
+										{if isset($input.maxchar) && $input.maxchar}
+											<script type="text/javascript">
+											$(document).ready(function(){
+												countDown($("#{if isset($input.id)}{$input.id}{else}{$input.name}{/if}"), $("#{if isset($input.id)}{$input.id}{else}{$input.name}{/if}_counter"));
+											});
+											</script>
+										{/if}
 									{/if}
-
+									{if isset($input.maxchar) && $input.maxchar}</div>{/if}
 								{elseif $input.type == 'checkbox'}
 									{if isset($input.expand)}
 										<a class="btn btn-default show_checkbox{if strtolower($input.expand.default) == 'hide'} hidden{/if}" href="#">

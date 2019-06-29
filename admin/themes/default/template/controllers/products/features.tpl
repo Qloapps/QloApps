@@ -1,5 +1,5 @@
 {*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -18,7 +18,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
@@ -26,10 +26,10 @@
 {if isset($product->id)}
 <div id="product-features" class="panel product-tab">
 	<input type="hidden" name="submitted_tabs[]" value="Features" />
-	<h3>{l s='Assign features to this product'}</h3>
+	<h3>{l s='Assign features to this room type'}</h3>
 
 	<div class="alert alert-info">
-		{l s='You can specify a value for each relevant feature regarding this product. Empty fields will not be displayed.'}<br/>
+		{l s='You can specify a value for each relevant feature regarding this room type. Empty fields will not be displayed.'}<br/>
 		{l s='You can either create a specific value, or select among the existing pre-defined values you\'ve previously added.'}
 	</div>
 

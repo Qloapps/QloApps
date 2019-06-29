@@ -98,7 +98,7 @@
     color: rgb(255, 255, 255);
     padding-left: 10px;
   }
-  .ref_req_reject 
+  .ref_req_reject
   {
     background-color: #DC143C;
     color: rgb(255, 255, 255);
@@ -107,7 +107,7 @@
 
 /* ---- history.tpl ---- */
 
-  
+
 /* ----- Order cancellation in order detail page ---- */
 
 .back_o_msg
@@ -118,7 +118,6 @@
 .refund_reason_head
 {
   font-size: 39px;
-  font-family: parisienne;
   font-weight: 400;
   color: #252525;
   margin-bottom: 25px;
@@ -128,7 +127,6 @@
 #reasonForRefund
 {
   font-size: 17px;
-  font-family: PT serif;
   font-weight: 400;
 }
 .totalOrdercancellation_div
@@ -138,27 +136,54 @@
 .terms_btn
 {
   background-color: #404040;
-    color: #ffffff;
-    font-size: 13px;
-    font-weight: 700;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 700;
 }
 .totalOrdercancellation_btn
 {
   background-color: #379bf0;
-    color: #ffffff;
-    font-size: 13px;
-    font-weight: 700;
-    margin-right: 10px;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 700;
+  margin-right: 10px;
 }
 .cust_serv_lnk
 {
   text-decoration: underline;
 }
-
 /* ----- Order cancellation in order detail page ---- */
-
 .room_type_old_price {
   text-decoration: line-through;
   color:#979797;
-  font-size:12px; 
+  font-size:12px;
 }
+/* Fancy-box for extra demands Css */
+#rooms_extra_demands {
+  font-size: 16px;}
+.room_extra_demands .open_rooms_extra_demands {
+  font-size:12px;
+	font-weight: 600;
+  color: #0000FF;}
+#rooms_extra_demands .demand_header {
+  padding-bottom: 15px;
+  border-bottom: 1px solid rgb(0, 0, 0, 0.1);
+  margin-bottom: 15px;}
+#rooms_extra_demands .demand_detail .demand_detail_price_block {
+  font-size: 14px;
+  margin-bottom: 15px;}
+#rooms_extra_demands .rooms_extra_demands_head {
+  margin-bottom: 18px;}
+#rooms_extra_demands .card {
+  padding-bottom: 0px;}
+
+
+/* fancybox changes */
+#order-confirmation .fancybox-overlay, #history .fancybox-overlay {
+	background: rgba(255, 255, 255, 0.95)!important;}
+	#order-confirmation .fancybox-skin, #history .fancybox-skin {
+	box-shadow: none!important;}
+	#order-confirmation .fancybox-skin .fancybox-close:after, #history .fancybox-skin .fancybox-close:after {
+	content: "";}
+	#order-confirmation .fancybox-skin .fancybox-close, #history .fancybox-skin .fancybox-close {
+	background-image: url(../img/icon/icon-close.svg);}

@@ -1,6 +1,6 @@
 <?php
 /**
- * 2007-2015 PrestaShop
+ * 2007-2017 PrestaShop
  *
  * NOTICE OF LICENSE
  *
@@ -19,7 +19,7 @@
  * needs please refer to http://www.prestashop.com for more information.
  *
  *  @author 	PrestaShop SA <contact@prestashop.com>
- *  @copyright  2007-2015 PrestaShop SA
+ *  @copyright  2007-2017 PrestaShop SA
  *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PrestaShop SA
  */
@@ -196,7 +196,7 @@ class AdminSpecificPriceRuleControllerCore extends AdminController
                     'label' => $this->l('Currency'),
                     'name' => 'id_currency',
                     'options' => array(
-                        'query' => array_merge(array(0 => array('id_currency' => 0, 'name' => $this->l('All currencies'))), Currency::getCurrencies()),
+                        'query' => array_merge(array(0 => array('id_currency' => 0, 'name' => $this->l('All currencies'))), Currency::getCurrencies(false, true, true)),
                         'id' => 'id_currency',
                         'name' => 'name'
                     ),
@@ -308,7 +308,8 @@ class AdminSpecificPriceRuleControllerCore extends AdminController
             'price' => $price,
             'from_quantity' => (($value = $this->getFieldValue($this->object, 'from_quantity')) ? $value : 1),
             'reduction' => number_format((($value = $this->getFieldValue($this->object, 'reduction')) ? $value : 0), 6),
-            'leave_bprice_on' => $price ? 0 : 1
+            'leave_bprice_on' => $price ? 0 : 1,
+            'shop_id' => (($value = $this->getFieldValue($this->object, 'id_shop')) ? $value : 1)
         );
 
         $attribute_groups = array();

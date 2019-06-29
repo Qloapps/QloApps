@@ -1,5 +1,5 @@
 {*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -18,7 +18,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
@@ -145,27 +145,54 @@
 								</p>
 							</div>
 						</div>
-						<div class="row">
-							<div class="col-sm-6">
-								<p class="room_total_price">
-									<span class="room_type_current_price">
-										{displayPrice price=$rm_v['amount']}
-									</span>
-								</p>
-								<p class="room_total_price_detial">
-									{l s='Prices for'} {$rm_v['num_days']} {l s='Night(s) stay'}{if $use_taxes} {l s='(Included'} {else}{l s='(Excluded)'}{/if} {l s='all taxes.)'}
-								</p>
-							</div>
-							<div class="col-sm-6">
-								<div class="unit_price_block">
-									<p class="room_unit_price">
-										{if $rm_v['feature_price_diff'] > 0}
-											<span class="real_price">{if $use_taxes}{displayPrice price=$data_v['unit_price_without_reduction']}{else}{displayPrice price=$data_v['unit_price']}{/if}</span>
-										{/if} {displayPrice price=$rm_v['feature_price']}<span>/{l s='Per Night'}<span>
-									</p>
-									{if $rm_v['feature_price_diff'] > 0}
-										<p class="room_unit_price_detail">{l s='You save'} {displayPrice price=($rm_v['feature_price_diff'])} {l s='per night'}</p>
+						<div class="row room_price_detail_block">
+							<div class="col-sm-7">
+								<div class="row">
+									<div class="col-sm-6">
+										<div class="rooms_price_block">
+											<p class="room_total_price">
+												<span class="room_type_current_price">
+													{displayPrice price=($rm_v['amount'])}
+												</span>
+												{if isset($data_v['extra_demands']) && $data_v['extra_demands']}
+													<span class="plus-sign pull-right">
+														+
+													</span>
+												{/if}
+											</p>
+											<p class="room_total_price_detial">
+												{l s='Total rooms price'} {if $display_tax_label}{if $priceDisplay} {l s='(Excl.'} {else}{l s='(Incl.)'}{/if} {l s='all taxes.)'}{/if}
+											</p>
+										</div>
+									</div>
+									{if isset($data_v['extra_demands']) && $data_v['extra_demands']}
+										<div class="col-sm-6">
+											<div class="demand_price_block">
+												<p class="demand_total_price">
+													<span class="room_type_current_price">
+														{displayPrice price=$rm_v['demand_price']}
+													</span>
+												</p>
+												<p class="room_total_price_detial">
+													<a date_from="{$rm_v['data_form']|escape:'html':'UTF-8'}" date_to="{$rm_v['data_to']|escape:'html':'UTF-8'}" id_product="{$data_v['id_product']|escape:'html':'UTF-8'}" class="open_rooms_extra_demands" href="#rooms_type_extra_demands_form">
+														{l s='Additional Facilities'}
+													</a>
+												</p>
+											</div>
+										</div>
 									{/if}
+								</div>
+							</div>
+							<div class="col-sm-5">
+								<div class="total_price_block">
+									<p class="room_total_price">
+										<span class="room_type_current_price">
+											{displayPrice price=($rm_v['amount']+$rm_v['demand_price'])}
+										</span>
+									</p>
+									<p class="room_total_price_detial">
+										{l s='Total price for'} {$rm_v['num_days']} {l s='Night(s) stay'}{if $display_tax_label}{if $priceDisplay} {l s='(Excl.'} {else}{l s='(Incl.'}{/if} {l s='all taxes.)'}{/if}
+									</p>
 								</div>
 							</div>
 						</div>
@@ -298,3 +325,16 @@
 		{addJsDefL name=txtProducts}{l s='products' js=1}{/addJsDefL}
 	{/strip}
 {/if}
+
+{* Fancybox for extra demands*}
+<div style="display:none;" id="rooms_extra_demands">
+	<div id="rooms_type_extra_demands">
+		<div class="panel">
+			<div class="rooms_extra_demands_head">
+				<h3>{l s='Additional Facilities'}</h3>
+				<p class="rooms_extra_demands_text">{l s='Add below additional facilities to the rooms for better hotel experience'}</p>
+			</div>
+			<div id="room_type_demands_desc"></div>
+		</div>
+	</div>
+</div>

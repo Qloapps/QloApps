@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -506,12 +506,16 @@ class AdminMetaControllerCore extends AdminController
 
             // Files
             if (count($this->rb_data['Files'])) {
-                $language_ids = Language::getIDs();
+                $activeLanguageCount = count(Language::getIDs());
                 fwrite($write_fd, "# Files\n");
                 foreach ($this->rb_data['Files'] as $iso_code => $files) {
                     foreach ($files as $file) {
-                        if (!empty($language_ids)) {
-                            fwrite($write_fd, 'Disallow: /*'.$iso_code.'/'.$file."\n");
+                        if ($activeLanguageCount > 1) {
+                            // Friendly URLs have language ISO code when multiple languages are active
+                            fwrite($write_fd, 'Disallow: /*' . $iso_code . '/' . $file . "\n");
+                        } elseif ($activeLanguageCount == 1) {
+                            // Friendly URL does not have language ISO when only one language is active
+                            fwrite($write_fd, 'Disallow: /*' . $file . "\n");
                         } else {
                             fwrite($write_fd, 'Disallow: /'.$file."\n");
                         }

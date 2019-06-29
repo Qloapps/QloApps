@@ -17,9 +17,9 @@ $_MODULE['<{cheque}prestashop>cheque_4b2f62e281e9a6829c6df0e87d34233a'] = 'Payer
 $_MODULE['<{cheque}prestashop>cheque_dd7bf230fde8d4836917806aff6a6b27'] = 'Adresse';
 $_MODULE['<{cheque}prestashop>cheque_0fe62049ad5246bc188ec1bae347269e'] = 'Adresse à laquelle le chèque doit être envoyé.';
 $_MODULE['<{cheque}prestashop>cheque_c9cc8cce247e49bae79f15173ce97354'] = 'Enregistrer';
-$_MODULE['<{cheque}prestashop>validation_e2b7dec8fa4b498156dfee6e4c84b156'] = 'Cette méthode de paiement n\'est pas disponible.';
+$_MODULE['<{cheque}prestashop>validation_e2b7dec8fa4b498156dfee6e4c84b156'] = 'Ce moyen de paiement n\'est pas disponible.';
 $_MODULE['<{cheque}prestashop>payment_execution_644818852b4dd8cf9da73543e30f045a'] = 'Retour à la commande';
-$_MODULE['<{cheque}prestashop>payment_execution_6ff063fbc860a79759a7369ac32cee22'] = 'Processus de commande';
+$_MODULE['<{cheque}prestashop>payment_execution_6ff063fbc860a79759a7369ac32cee22'] = 'Commander';
 $_MODULE['<{cheque}prestashop>payment_execution_8520b283b0884394b13b80d5689628b3'] = 'Paiement par chèque';
 $_MODULE['<{cheque}prestashop>payment_execution_f1d3b424cd68795ecaa552883759aceb'] = 'Récapitulatif de commande';
 $_MODULE['<{cheque}prestashop>payment_execution_879f6b8877752685a966564d072f498f'] = 'Votre panier est vide';
@@ -36,7 +36,7 @@ $_MODULE['<{cheque}prestashop>payment_execution_52f64bc0164b0e79deaeaaaa7e93f98f
 $_MODULE['<{cheque}prestashop>payment_execution_46b9e3665f187c739c55983f757ccda0'] = 'Je confirme ma commande';
 $_MODULE['<{cheque}prestashop>payment_execution_569fd05bdafa1712c4f6be5b153b8418'] = 'Autres moyens de paiement';
 $_MODULE['<{cheque}prestashop>infos_14e41f4cfd99b10766cc15676d8cda66'] = 'Ce module vous permet d\'accepter des paiements par chèque.';
-$_MODULE['<{cheque}prestashop>infos_e444fe40d43bccfad255cf62ddc8d18f'] = 'Si le client choisit ce mode de paiement, la commande passera à l\'état \\"Paiement en attente\\".';
+$_MODULE['<{cheque}prestashop>infos_e444fe40d43bccfad255cf62ddc8d18f'] = 'Si le client choisit ce moyen de paiement, la commande passera à l\'état "Paiement en attente".';
 $_MODULE['<{cheque}prestashop>infos_8c88bbf5712292b26e2a6bbeb0a7b5c4'] = 'Par conséquent, vous devez valider manuellement la commande dès réception du chèque.';
 $_MODULE['<{cheque}prestashop>payment_return_88526efe38fd18179a127024aba8c1d7'] = 'Votre commande sur %s a bien été enregistrée.';
 $_MODULE['<{cheque}prestashop>payment_return_61da27a5dd1f8ced46c77b0feaa9e159'] = 'Veuillez nous envoyer un chèque avec :';
@@ -52,7 +52,7 @@ $_MODULE['<{cheque}prestashop>payment_return_decce112a9e64363c997b04aa71b7cb8'] 
 $_MODULE['<{cheque}prestashop>payment_return_9bdf695c5a30784327137011da6ef568'] = 'Nous avons rencontré un problème avec votre commande, veuillez contacter notre support client';
 $_MODULE['<{cheque}prestashop>payment_4b80fae2153218ed763bdadc418e8589'] = 'Payer par chèque';
 $_MODULE['<{cheque}prestashop>payment_4e1fb9f4b46556d64db55d50629ee301'] = '(le traitement de la commande sera plus long)';
-$_MODULE['<{cheque}prestashop>payment_execution_0881a11f7af33bc1b43e437391129d66'] = 'Merci de confirmer votre commande en cliquant sur \\"Je confirme ma commande\\"';
+$_MODULE['<{cheque}prestashop>payment_execution_0881a11f7af33bc1b43e437391129d66'] = 'Merci de confirmer votre commande en cliquant sur "Je confirme ma commande"';
 $_MODULE['<{cheque}prestashop>payment_return_d15feee53d81ea16269e54d4784fa123'] = 'Nous avons rencontré un problème avec votre commande. Nous vous invitons à prendre contact avec notre';
 $_MODULE['<{cheque}prestashop>payment_f05fd8637f8a6281466a507fcb56baec'] = 'Payer par chèque';
 

@@ -356,3 +356,16 @@ function get_file_by_url($url)
 
     return $data;
 }
+
+/**
+ * @param string $sourcePath
+ * @param array $paths List of paths to compare
+ */
+function stopIfSameDir($sourcePath, array $paths)
+{
+    foreach ($paths as $path) {
+        if (realpath($sourcePath) === realpath($path)) {
+            die('wrong_path');
+        }
+    }
+}

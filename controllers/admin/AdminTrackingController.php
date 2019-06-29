@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -146,7 +146,7 @@ class AdminTrackingControllerCore extends AdminController
             'id_product' => array('title' => $this->l('ID'), 'class' => 'fixed-width-xs', 'align' => 'center'),
             'reference' => array('title' => $this->l('Reference')),
             'name' => array('title' => $this->l('Name'), 'filter_key' => 'b!name'),
-            'active' => array('title' => $this->l('Status'), 'type' => 'bool', 'active' => 'status', 'align' => 'center', 'class' => 'fixed-width-xs')
+            'active' => array('title' => $this->l('Status'), 'type' => 'bool', 'active' => 'status', 'align' => 'center', 'class' => 'fixed-width-xs', 'filter_key' => 'a!active')
         );
 
         $this->clearFilters();
@@ -190,7 +190,7 @@ class AdminTrackingControllerCore extends AdminController
             'id_product' => array('title' => $this->l('ID'), 'class' => 'fixed-width-xs', 'align' => 'center'),
             'reference' => array('title' => $this->l('Reference')),
             'name' => array('title' => $this->l('Name')),
-            'active' => array('title' => $this->l('Status'), 'type' => 'bool', 'active' => 'status', 'align' => 'center', 'class' => 'fixed-width-xs')
+            'active' => array('title' => $this->l('Status'), 'type' => 'bool', 'active' => 'status', 'align' => 'center', 'class' => 'fixed-width-xs', 'filter_key' => 'a!active')
         );
         $this->clearFilters();
 

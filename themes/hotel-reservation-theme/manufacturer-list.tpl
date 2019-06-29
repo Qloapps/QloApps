@@ -1,5 +1,5 @@
 {*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -18,7 +18,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
@@ -46,7 +46,7 @@
 	{if $nbManufacturers > 0}
     	<div class="content_sortPagiBar">
         	<div class="sortPagiBar clearfix">
-				{if isset($manufacturer) && $manufacturer.nb_products > 0}
+				{if isset($manufacturer) && isset($manufacturer.nb_products) && $manufacturer.nb_products > 0}
 					<ul class="display hidden-xs">
 						<li class="display-title">
 							{l s='View:'}
@@ -87,14 +87,14 @@
 						<div class="row">
 			            	<div class="left-side col-xs-12 col-sm-3">
 								<div class="logo">
-									{if $manufacturer.nb_products > 0}
+									{if isset($manufacturer.nb_products) && $manufacturer.nb_products > 0}
 										<a
 										class="lnk_img"
 										href="{$link->getmanufacturerLink($manufacturer.id_manufacturer, $manufacturer.link_rewrite)|escape:'html':'UTF-8'}"
 										title="{$manufacturer.name|escape:'html':'UTF-8'}" >
 									{/if}
 										<img src="{$img_manu_dir}{$manufacturer.image|escape:'html':'UTF-8'}-medium_default.jpg" alt="" />
-									{if $manufacturer.nb_products > 0}
+									{if isset($manufacturer.nb_products) && $manufacturer.nb_products > 0}
 										</a>
 									{/if}
 								</div> <!-- .logo -->
@@ -102,13 +102,13 @@
 
 							<div class="middle-side col-xs-12 col-sm-5">
 								<h3>
-									{if $manufacturer.nb_products > 0}
+									{if isset($manufacturer.nb_products) && $manufacturer.nb_products > 0}
 										<a
 										class="product-name"
 										href="{$link->getmanufacturerLink($manufacturer.id_manufacturer, $manufacturer.link_rewrite)|escape:'html':'UTF-8'}">
 									{/if}
 										{$manufacturer.name|truncate:60:'...'|escape:'html':'UTF-8'}
-									{if $manufacturer.nb_products > 0}
+									{if isset($manufacturer.nb_products) && $manufacturer.nb_products > 0}
 										</a>
 									{/if}
 								</h3>
@@ -120,19 +120,21 @@
 							<div class="right-side col-xs-12 col-sm-4">
 			                	<div class="right-side-content">
 			                        <p class="product-counter">
-			                            {if $manufacturer.nb_products > 0}
+			                            {if isset($manufacturer.nb_products) && $manufacturer.nb_products > 0}
 			                            	<a href="{$link->getmanufacturerLink($manufacturer.id_manufacturer, $manufacturer.link_rewrite)|escape:'html':'UTF-8'}">
 			                            {/if}
-			                            {if $manufacturer.nb_products == 1}
+			                            {if isset($manufacturer.nb_products) && $manufacturer.nb_products == 1}
 			                            	{l s='%d product' sprintf=$manufacturer.nb_products|intval}
 			                            {else}
+			                              {if isset($manufacturer.nb_products) && $manufacturer.nb_products > 0}
 			                            	{l s='%d products' sprintf=$manufacturer.nb_products|intval}
+			                              {/if}
 			                            {/if}
-			                            {if $manufacturer.nb_products > 0}
+			                            {if isset($manufacturer.nb_products) && $manufacturer.nb_products > 0}
 			                        		</a>
 			                        	{/if}
 			                        </p>
-				                    {if $manufacturer.nb_products > 0}
+				                    {if isset($manufacturer.nb_products) && $manufacturer.nb_products > 0}
 				                        <a
 				                        class="btn btn-default button exclusive-medium"
 				                        href="{$link->getmanufacturerLink($manufacturer.id_manufacturer, $manufacturer.link_rewrite)|escape:'html':'UTF-8'}">

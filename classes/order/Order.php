@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license	http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -713,8 +713,7 @@ class OrderCore extends ObjectModel
 				SELECT `image_shop`.id_image
 				FROM `'._DB_PREFIX_.'image` i'.
                 Shop::addSqlAssociation('image', 'i', true, 'image_shop.cover=1').'
-				WHERE i.id_product = '.(int)$product['product_id']
-            );
+				WHERE i.id_product = '.(int)$product['product_id']);
         }
 
         $product['image'] = null;
@@ -758,17 +757,17 @@ class OrderCore extends ObjectModel
         if (count($products) < 1) {
             return false;
         }
+
         $virtual = true;
+
         foreach ($products as $product) {
-            $pd = ProductDownload::getIdFromIdProduct((int)$product['product_id']);
-            if ($pd && Validate::isUnsignedInt($pd) && $product['download_hash'] && $product['display_filename'] != '') {
-                if ($strict === false) {
-                    return true;
-                }
-            } else {
-                $virtual &= false;
+            if ($strict === false && (bool)$product['is_virtual']) {
+                return true;
             }
+
+            $virtual &= (bool)$product['is_virtual'];
         }
+
         return $virtual;
     }
 
@@ -891,11 +890,12 @@ class OrderCore extends ObjectModel
         }
 
         $res = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS('
-		SELECT o.*, (SELECT SUM(od.`product_quantity`) FROM `'._DB_PREFIX_.'order_detail` od WHERE od.`id_order` = o.`id_order`) nb_products
-		FROM `'._DB_PREFIX_.'orders` o
-		WHERE o.`id_customer` = '.(int)$id_customer.'
-		GROUP BY o.`id_order`
-		ORDER BY o.`date_add` DESC');
+        SELECT o.*, (SELECT SUM(od.`product_quantity`) FROM `'._DB_PREFIX_.'order_detail` od WHERE od.`id_order` = o.`id_order`) nb_products
+        FROM `'._DB_PREFIX_.'orders` o
+        WHERE o.`id_customer` = '.(int)$id_customer.
+        Shop::addSqlRestriction(Shop::SHARE_ORDER).'
+        GROUP BY o.`id_order`
+        ORDER BY o.`date_add` DESC');
         if (!$res) {
             return array();
         }
@@ -1169,10 +1169,11 @@ class OrderCore extends ObjectModel
 
     public static function getLastInvoiceNumber()
     {
-        return Db::getInstance()->getValue('
-			SELECT MAX(`number`)
-			FROM `'._DB_PREFIX_.'order_invoice`
-		');
+        $sql = 'SELECT MAX(`number`) FROM `'._DB_PREFIX_.'order_invoice`';
+        if (Configuration::get('PS_INVOICE_RESET')) {
+            $sql .= ' WHERE DATE_FORMAT(`date_add`, "%Y") = '.(int)date('Y');
+        }
+        return Db::getInstance()->getValue($sql);
     }
 
     public static function setLastInvoiceNumber($order_invoice_id, $id_shop)
@@ -1192,8 +1193,13 @@ class OrderCore extends ObjectModel
         if ($number) {
             $sql .= (int)$number;
         } else {
-            $sql .= '(SELECT new_number FROM (SELECT (MAX(`number`) + 1) AS new_number
-			FROM `'._DB_PREFIX_.'order_invoice`) AS result)';
+            // Find the next number
+            $new_number_sql = 'SELECT (MAX(`number`) + 1) AS new_number
+                FROM `'._DB_PREFIX_.'order_invoice`'.(Configuration::get('PS_INVOICE_RESET') ?
+                ' WHERE DATE_FORMAT(`date_add`, "%Y") = '.(int)date('Y') : '');
+            $new_number = DB::getInstance()->getValue($new_number_sql);
+
+            $sql .= (int)$new_number;
         }
 
         $sql .= ' WHERE `id_order_invoice` = '.(int)$order_invoice_id;
@@ -1210,8 +1216,7 @@ class OrderCore extends ObjectModel
         return Db::getInstance()->getValue('
 			SELECT `number`
 			FROM `'._DB_PREFIX_.'order_invoice`
-			WHERE `id_order_invoice` = '.(int)$order_invoice_id
-        );
+			WHERE `id_order_invoice` = '.(int)$order_invoice_id);
     }
 
     /**
@@ -1220,7 +1225,7 @@ class OrderCore extends ObjectModel
     public function setInvoice($use_existing_payment = false)
     {
         if (!$this->hasInvoice()) {
-            if ($id = (int)$this->hasDelivery()) {
+            if ($id = (int)$this->getOrderInvoiceIdIfHasDelivery()) {
                 $order_invoice = new OrderInvoice($id);
             } else {
                 $order_invoice = new OrderInvoice();
@@ -1258,6 +1263,7 @@ class OrderCore extends ObjectModel
 				UPDATE `'._DB_PREFIX_.'order_detail`
 				SET `id_order_invoice` = '.(int)$order_invoice->id.'
 				WHERE `id_order` = '.(int)$order_invoice->id_order);
+            Cache::clean('objectmodel_OrderDetail_*');
 
             // Update order payment
             if ($use_existing_payment) {
@@ -1413,8 +1419,7 @@ class OrderCore extends ObjectModel
         return Db::getInstance()->getValue('
 			SELECT `delivery_number`
 			FROM `'._DB_PREFIX_.'order_invoice`
-			WHERE `id_order_invoice` = '.(int)$order_invoice_id
-        );
+			WHERE `id_order_invoice` = '.(int)$order_invoice_id);
     }
 
     public function setDelivery()
@@ -1660,8 +1665,7 @@ class OrderCore extends ObjectModel
 		FROM `'._DB_PREFIX_.'order_detail_tax` odt
 		LEFT JOIN `'._DB_PREFIX_.'order_detail` od ON (od.`id_order_detail` = odt.`id_order_detail`)
 		WHERE od.`id_order` = '.(int)$this->id.'
-		AND od.`tax_computation_method` = '.(int)TaxCalculator::ONE_AFTER_ANOTHER_METHOD
-        );
+		AND od.`tax_computation_method` = '.(int)TaxCalculator::ONE_AFTER_ANOTHER_METHOD);
     }
 
     /**
@@ -1895,8 +1899,7 @@ class OrderCore extends ObjectModel
 			SELECT SUM(total_paid_tax_incl)
 			FROM `'._DB_PREFIX_.'orders`
 			WHERE `reference` = \''.pSQL($this->reference).'\'
-			AND `id_cart` = '.(int)$this->id_cart
-        );
+			AND `id_cart` = '.(int)$this->id_cart);
     }
 
     /**
@@ -2024,8 +2027,7 @@ class OrderCore extends ObjectModel
         return Db::getInstance()->executeS('
 		SELECT `ecotax_tax_rate`, SUM(`ecotax`) as `ecotax_tax_excl`, SUM(`ecotax`) as `ecotax_tax_incl`
 		FROM `'._DB_PREFIX_.'order_detail`
-		WHERE `id_order` = '.(int)$this->id
-        );
+		WHERE `id_order` = '.(int)$this->id);
     }
 
     /**
@@ -2050,12 +2052,21 @@ class OrderCore extends ObjectModel
      */
     public function hasDelivery()
     {
-        return (bool)Db::getInstance()->getValue('
+        return (bool)$this->getOrderInvoiceIdIfHasDelivery();
+    }
+
+    /**
+     * Get order invoice id if has delivery return id_order_invoice if this order has already a delivery slip
+     *
+     * @return int
+     */
+    public function getOrderInvoiceIdIfHasDelivery()
+    {
+        return (int)Db::getInstance()->getValue('
 			SELECT `id_order_invoice`
 			FROM `'._DB_PREFIX_.'order_invoice`
 			WHERE `id_order` =  '.(int)$this->id.'
-			AND `delivery_number` > 0'
-        );
+			AND `delivery_number` > 0');
     }
 
     /**
@@ -2232,7 +2243,7 @@ class OrderCore extends ObjectModel
         return true;
     }
 
-    
+
     /**
      * By default this function was made for invoice, to compute tax amounts and balance delta (because of computation made on round values).
      * If you provide $limitToOrderDetails, only these item will be taken into account. This option is usefull for order slip for example,
@@ -2277,12 +2288,7 @@ class OrderCore extends ObjectModel
             }
         }
 
-        $products_tax    = $this->total_products_wt - $this->total_products;
-        $discounts_tax    = $this->total_discounts_tax_incl - $this->total_discounts_tax_excl;
-
-        // We add $free_shipping_tax because when there is free shipping, the tax that would
-        // be paid if there wasn't is included in $discounts_tax.
-        $expected_total_tax = $products_tax - $discounts_tax + $free_shipping_tax;
+        $expected_total_tax = $this->total_products_wt - $this->total_products;
         $actual_total_tax = 0;
         $actual_total_base = 0;
 

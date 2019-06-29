@@ -111,8 +111,9 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
         $hotel_name = '';
         $all_room_type = array();
         $rms_in_cart = 0;
+        $hotel_id = 0;
         $room_type = 0;
-
+        $booking_data = false;
         $id_cart = $this->context->cart->id;
         $id_guest = $this->context->cookie->id_guest;
 
@@ -144,161 +145,119 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
         $num_rooms = 1;
         $check_css_condition_var = '';
 
+        if (Tools::getValue('dt_f')) {
+            $date_from = Tools::getValue('dt_f');
+        } else {
+            $date_from = date('Y-m-d');
+        }
+        if (Tools::getValue('dt_t')) {
+            $date_to = Tools::getValue('dt_t');
+        } else {
+            $date_to = date('Y-m-t');
+        }
+        if (Tools::getValue('id_htl')) {
+            $hotel_id = Tools::getValue('id_htl');
+        } else {
+            $obj_htl_info = new HotelBranchInformation();
+            if ($htl_info = $obj_htl_info->hotelBranchesInfo(false, 1)) {
+                $hotel_id = $htl_info[0]['id'];
+            }
+        }
+        if (Tools::getValue('id_rt')) {
+            $room_type = Tools::getValue('id_rt');
+        }
+        $formAction = '';
         if (Tools::isSubmit('search_hotel_list')) {
             $date_from = Tools::getValue('from_date');
             $date_to = Tools::getValue('to_date');
-
-            $date_from = date("Y-m-d", strtotime($date_from));
-            $date_to = date("Y-m-d", strtotime($date_to));
-
             $hotel_id = Tools::getValue('hotel_id');
             $room_type = Tools::getValue('room_type');
 
-            if ($date_from == '') {
-                $this->errors[] = $this->l('Date From is required field.');
-            }
-            if ($date_to == '') {
-                $this->errors[] = $this->l('Date To is required field.');
-            }
-            if ($date_to <= $date_from) {
-                $this->errors[] = $this->l('Date To should be greater than Date From.');
-            }
-            if ($hotel_id == '') {
-                $this->errors[] = $this->l('Hotel name is required field.');
-            }
+            $formAction = $this->context->link->getAdminLink('AdminHotelRoomsBooking').
+            '&dt_f='.$date_from.'&dt_t='.$date_to.'&id_htl='.$hotel_id.'&id_rt='.$room_type;
+            Tools::redirectAdmin($formAction);
 
-            $booking_calendar_data = array();
-            if (!count($this->errors)) {
-                $booking_data = $this->getAllBookingDataInfo(
-                    $date_from,
-                    $date_to,
-                    $hotel_id,
-                    $room_type,
-                    $adult,
-                    $children,
-                    $num_rooms,
-                    $id_cart,
-                    $id_guest
-                );
+        }
+        if ($date_from == '') {
+            $this->errors[] = $this->l('Date from is required field.');
+        }
+        if ($date_to == '') {
+            $this->errors[] = $this->l('Date to is required field.');
+        }
+        if (strtotime($date_to) <= strtotime($date_from)) {
+            $this->errors[] = $this->l('Date to should be greater than Date from.');
+        }
 
-                /*$booking_data = $obj_booking_dtl->getBookingData($date_from, $date_to, $hotel_id, $room_type, $adult, $children, $num_rooms, 0, 1, 1, 1, 1, $id_cart, $id_guest, 1);*/
+        $date_from = date("Y-m-d", strtotime($date_from));
+        $date_to = date("Y-m-d", strtotime($date_to));
 
-                //To show info of every date
-                $start_date = $date_from; // hard-coded '01' for first day
-                $last_day_this_month  = $date_to;
-
-                while ($start_date <= $last_day_this_month) {
-                    $cal_date_from = $start_date;
-                    $cal_date_to = date('Y-m-d', strtotime('+1 day', strtotime($cal_date_from)));
-                    $booking_calendar_data[$cal_date_from] = $obj_booking_dtl->getBookingData(
-                        $cal_date_from,
-                        $cal_date_to,
-                        $hotel_id,
-                        $room_type,
-                        $adult,
-                        $children,
-                        $num_rooms,
-                        1,
-                        1,
-                        1,
-                        1,
-                        1,
-                        $id_cart,
-                        $id_guest,
-                        1
-                    );
-                    $start_date = date('Y-m-d', strtotime('+1 day', strtotime($start_date)));
+        $booking_calendar_data = array();
+        if (!count($this->errors)) {
+            if (!$hotel_id) {
+                $this->errors[] = $this->l('Please select a hotel.');
+                $obj_htl_info = new HotelBranchInformation();
+                if ($htl_info = $obj_htl_info->hotelBranchesInfo(false, 1)) {
+                    $hotel_id = $htl_info[0]['id'];
                 }
+            }
+            $booking_data = $this->getAllBookingDataInfo(
+                $date_from,
+                $date_to,
+                $hotel_id,
+                $room_type,
+                $adult,
+                $children,
+                $num_rooms,
+                $id_cart,
+                $id_guest
+            );
 
-                if (isset($booking_data)) {
-                    if ($num_rooms <= $booking_data['stats']['num_avail']) {
-                        $check_css_condition_var = 'available';
-                    } elseif ($num_rooms <= $booking_data['stats']['num_part_avai']) {
-                        $check_css_condition_var = 'part_available';
-                    } else {
-                        $check_css_condition_var = 'unavailable';
-                    }
+            //To show info of every date
+            $start_date = $date_from; // hard-coded '01' for first day
+            $last_day_this_month  = $date_to;
+
+            $bookingParams = array();
+            $bookingParams['hotel_id'] = $hotel_id;
+            $bookingParams['room_type'] = $room_type;
+            $bookingParams['adult'] = $adult;
+            $bookingParams['children'] = $children;
+            $bookingParams['num_rooms'] = $num_rooms;
+            $bookingParams['for_calendar'] = 1;
+            $bookingParams['search_available'] = 1;
+            $bookingParams['search_partial'] = 1;
+            $bookingParams['search_booked'] = 1;
+            $bookingParams['search_unavai'] = 1;
+            $bookingParams['id_cart'] = $id_cart;
+            $bookingParams['id_guest'] = $id_guest;
+            $bookingParams['search_cart_rms'] = 1;
+
+            while ($start_date <= $last_day_this_month) {
+                $cal_date_from = $start_date;
+                $cal_date_to = date('Y-m-d', strtotime('+1 day', strtotime($cal_date_from)));
+                $bookingParams['date_from'] = $cal_date_from;
+                $bookingParams['date_to'] = $cal_date_to;
+
+                $booking_calendar_data[$cal_date_from] = $obj_booking_dtl->getBookingData($bookingParams);
+                $start_date = date('Y-m-d', strtotime('+1 day', strtotime($start_date)));
+            }
+
+            if (isset($booking_data)) {
+                if ($num_rooms <= $booking_data['stats']['num_avail']) {
+                    $check_css_condition_var = 'default_available';
+                } elseif ($num_rooms <= $booking_data['stats']['num_part_avai']) {
+                    $check_css_condition_var = 'default_part_available';
                 } else {
-                    $booking_data = false;
+                    $check_css_condition_var = 'default_unavailable';
                 }
-            }
-        } else {
-            $check_calender_var = 1;
-            $date_from = date('Y-m-d');
-            $date_to = date('Y-m-t');
-            // if date from is the last date of the month
-            if (strtotime($date_from) == strtotime($date_to)) {
-                $date_to = date('Y-m-d', strtotime('+1 day', strtotime($date_to)));
-            }
-            $obj_htl_info = new HotelBranchInformation();
-            $htl_info = $obj_htl_info->hotelBranchesInfo(false, 1);
-            $hotel_id = $htl_info[0]['id'];
-            if ($hotel_id) {
-                $booking_data = $this->getAllBookingDataInfo(
-                    $date_from,
-                    $date_to,
-                    $hotel_id,
-                    $room_type,
-                    $adult,
-                    $children,
-                    $num_rooms,
-                    $id_cart,
-                    $id_guest
-                );
-                /*$booking_data = $obj_booking_dtl->getBookingData($date_from, $date_to, $hotel_id, $room_type, $adult, $children, $num_rooms, 0, 1, 1, 1, 1, $id_cart, $id_guest, 1);*/
-
-                // show info of every date
-
-                $start_date = date('Y-m-d'); // hard-coded '01' for first day of the month
-                $last_day_this_month  = date('Y-m-t');
-
-                while ($start_date <= $last_day_this_month) {
-                    $cal_date_from = $start_date;
-                    $cal_date_to = date('Y-m-d', strtotime('+1 day', strtotime($cal_date_from)));
-
-                    $booking_calendar_data[$cal_date_from] = $obj_booking_dtl->getBookingData(
-                        $cal_date_from,
-                        $cal_date_to,
-                        $hotel_id,
-                        $room_type,
-                        $adult,
-                        $children,
-                        $num_rooms,
-                        1,
-                        1,
-                        1,
-                        1,
-                        1,
-                        $id_cart,
-                        $id_guest,
-                        1
-                    );
-                    $start_date = date('Y-m-d', strtotime('+1 day', strtotime($start_date)));
-                }
-                if (isset($booking_data)) {
-                    if ($num_rooms <= $booking_data['stats']['num_avail']) {
-                        $check_css_condition_var = 'default_available';
-                    } elseif ($num_rooms <= $booking_data['stats']['num_part_avai']) {
-                        $check_css_condition_var = 'default_part_available';
-                    } else {
-                        $check_css_condition_var = 'default_unavailable';
-                    }
-                } else {
-                    $booking_data = false;
-                }
-            } else {
-                $booking_data = false;
-                $booking_calendar_data = false;
             }
         }
-        $hotel_name = $obj_htl_info->hotelBranchesInfo(false);
-        $all_room_type = $obj_rm_type->getRoomTypeByHotelId($hotel_id, Configuration::get('PS_LANG_DEFAULT'));
+        $hotel_name = $obj_htl_info->hotelBranchesInfo(false, 1);
+        $all_room_type = $obj_rm_type->getRoomTypeByHotelId($hotel_id, Configuration::get('PS_LANG_DEFAULT'), 1);
 
         $rms_in_cart = $obj_cart_book_data->getCountRoomsInCart($id_cart, $id_guest);
         $date_from = date("d-m-Y", strtotime($date_from));
         $date_to = date("d-m-Y", strtotime($date_to));
         $currency = new Currency((int)Configuration::get('PS_CURRENCY_DEFAULT'));
-
         $this->tpl_view_vars = array(
             'check_calender_var' => $check_calender_var,
             'date_from' => $date_from,
@@ -315,6 +274,7 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
             'all_room_type' => $all_room_type,
             'currency' => $currency,
             'rms_in_cart' => $rms_in_cart,
+            'formAction' => $formAction,
         );
         return parent::renderView();
     }
@@ -322,10 +282,8 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
     public function ajaxProcessGetRoomType()
     {
         $hotel_id  = Tools::getValue('hotel_id');
-
         $obj_room_type = new HotelRoomType();
-        $room_type_info = $obj_room_type->getRoomTypeByHotelId($hotel_id, Configuration::get('PS_LANG_DEFAULT'));
-
+        $room_type_info = $obj_room_type->getRoomTypeByHotelId($hotel_id, Configuration::get('PS_LANG_DEFAULT'), 1);
         die(Tools::jsonEncode($room_type_info));
     }
 
@@ -405,23 +363,24 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
             $total_amount = $this->context->cart->getOrderTotal();
             $rms_in_cart = $obj_cart_book_data->getCountRoomsInCart($id_cart, $id_guest);
 
-            $booking_stats = $obj_booking_dtl->getBookingData(
-                $search_date_from,
-                $search_date_to,
-                $id_hotel,
-                $search_id_prod,
-                0,
-                0,
-                1,
-                1,
-                1,
-                1,
-                0,
-                0,
-                $id_cart,
-                $id_guest,
-                1
-            );
+            $bookingParams = array();
+            $bookingParams['date_from'] = $search_date_from;
+            $bookingParams['date_to'] = $search_date_to;
+            $bookingParams['hotel_id'] = $id_hotel;
+            $bookingParams['room_type'] = $search_id_prod;
+            $bookingParams['adult'] = 0;
+            $bookingParams['children'] = 0;
+            $bookingParams['num_rooms'] = 1;
+            $bookingParams['for_calendar'] = 1;
+            $bookingParams['search_available'] = 1;
+            $bookingParams['search_partial'] = 1;
+            $bookingParams['search_booked'] = 0;
+            $bookingParams['search_unavai'] = 0;
+            $bookingParams['id_cart'] = $id_cart;
+            $bookingParams['id_guest'] = $id_guest;
+            $bookingParams['search_cart_rms'] = 1;
+
+            $booking_stats = $obj_booking_dtl->getBookingData($bookingParams);
             //$rm_amount = $unit_price * (int)$num_day;
             //$rm_amount = Tools::ps_round($rm_amount, 2);
             //
@@ -456,23 +415,24 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
                 $rms_in_cart = $obj_cart_book_data->getCountRoomsInCart($id_cart, $id_guest);
 
                 if (!$ajax_delete) {
-                    $booking_stats = $obj_booking_dtl->getBookingData(
-                        $search_date_from,
-                        $search_date_to,
-                        $id_hotel,
-                        $search_id_prod,
-                        0,
-                        0,
-                        1,
-                        1,
-                        1,
-                        1,
-                        0,
-                        0,
-                        $id_cart,
-                        $id_guest,
-                        1
-                    );
+                    $bookingParams = array();
+                    $bookingParams['date_from'] = $search_date_from;
+                    $bookingParams['date_to'] = $search_date_to;
+                    $bookingParams['hotel_id'] = $id_hotel;
+                    $bookingParams['room_type'] = $search_id_prod;
+                    $bookingParams['adult'] = 0;
+                    $bookingParams['children'] = 0;
+                    $bookingParams['num_rooms'] = 1;
+                    $bookingParams['for_calendar'] = 1;
+                    $bookingParams['search_available'] = 1;
+                    $bookingParams['search_partial'] = 1;
+                    $bookingParams['search_booked'] = 0;
+                    $bookingParams['search_unavai'] = 0;
+                    $bookingParams['id_cart'] = $id_cart;
+                    $bookingParams['id_guest'] = $id_guest;
+                    $bookingParams['search_cart_rms'] = 1;
+
+                    $booking_stats = $obj_booking_dtl->getBookingData($bookingParams);
                     $cart_data = array(
                         'total_amount' => $total_amount,
                         'rms_in_cart' => $rms_in_cart,
@@ -549,18 +509,20 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
 
         $obj_booking_dtl = new HotelBookingDetail();
 
+        $bookingParams = array();
+        $bookingParams['hotel_id'] = $hotel_id;
+        $bookingParams['room_type'] = $room_type;
+        $bookingParams['adult'] = $adult;
+        $bookingParams['children'] = $children;
+        $bookingParams['num_rooms'] = $num_rooms;
         while ($start_date <= $last_day_this_month) {
             $cal_date_from = $start_date;
             $cal_date_to = date('Y-m-d', strtotime('+1 day', strtotime($cal_date_from)));
-            $booking_calendar_data[$cal_date_from] = $obj_booking_dtl->getBookingData(
-                $cal_date_from,
-                $cal_date_to,
-                $hotel_id,
-                $room_type,
-                $adult,
-                $children,
-                $num_rooms
-            );
+
+            $bookingParams['date_from'] = $cal_date_from;
+            $bookingParams['date_to'] = $cal_date_to;
+
+            $booking_calendar_data[$cal_date_from] = $obj_booking_dtl->getBookingData($bookingParams);
             $start_date = date('Y-m-d', strtotime('+1 day', strtotime($start_date)));
         }
         if ($booking_calendar_data) {
@@ -613,10 +575,10 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
             $swapped_room_id = Tools::getValue('swap_avail_rooms');
 
             if ($swapped_room_id == 0) {
-                $this->errors[] = $this->l('Please select a room to swap with this room.');
+                $this->errors[] = $this->l('Please select aroom to swap with thisroom.');
             }
             if ($current_room_id == 0) {
-                $this->errors[] = $this->l('Cuurent room is missing.');
+                $this->errors[] = $this->l('Cuurentroom is missing.');
             }
             if ($date_from == 0) {
                 $this->errors[] = $this->l('Check In date is missing.');
@@ -654,40 +616,46 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
     ) {
         $obj_booking_dtl = new HotelBookingDetail();
         $obj_cart_book_data = new HotelCartBookingData();
-        $booking_data = $obj_booking_dtl->getBookingData(
-            $date_from,
-            $date_to,
-            $hotel_id,
-            $room_type,
-            $adult,
-            $children,
-            $num_rooms,
-            0,
-            1,
-            1,
-            1,
-            1,
-            $id_cart,
-            $id_guest,
-            1
-        );
+
+        $bookingParams = array();
+        $bookingParams['date_from'] = $date_from;
+        $bookingParams['date_to'] = $date_to;
+        $bookingParams['hotel_id'] = $hotel_id;
+        $bookingParams['room_type'] = $room_type;
+        $bookingParams['adult'] = $adult;
+        $bookingParams['children'] = $children;
+        $bookingParams['num_rooms'] = $num_rooms;
+        $bookingParams['for_calendar'] = 0;
+        $bookingParams['search_available'] = 1;
+        $bookingParams['search_partial'] = 1;
+        $bookingParams['search_booked'] = 1;
+        $bookingParams['search_unavai'] = 1;
+        $bookingParams['id_cart'] = $id_cart;
+        $bookingParams['id_guest'] = $id_guest;
+        $bookingParams['search_cart_rms'] = 1;
+
+        $booking_data = $obj_booking_dtl->getBookingData($bookingParams);
         if ($booking_data) {
             foreach ($booking_data['rm_data'] as $key_bk_data => $value_bk_data) {
                 if (isset($value_bk_data['data']['booked']) && $value_bk_data['data']['booked']) {
                     foreach ($value_bk_data['data']['booked'] as $booked_k1 => $booked_v1) {
-                        $cust_obj = new Customer($booked_v1['detail'][0]['id_customer']);
-                        if ($cust_obj->firstname) {
-                            $booking_data['rm_data'][$key_bk_data]['data']['booked'][$booked_k1]['detail'][0]['alloted_cust_name'] = $cust_obj->firstname.' '.$cust_obj->lastname;
-                        } else {
-                            $booking_data['rm_data'][$key_bk_data]['data']['booked'][$booked_k1]['detail'][0]['alloted_cust_name'] = "No customer name found";
+                        if (isset($booked_v1['detail']) && $booked_v1['detail']) {
+                            foreach ($booked_v1['detail'] as $kDtl => $bookedDtls) {
+                                $cust_obj = new Customer($booked_v1['detail'][$kDtl]['id_customer']);
+                                if ($cust_obj->firstname) {
+                                    $booking_data['rm_data'][$key_bk_data]['data']['booked'][$booked_k1]['detail'][$kDtl]['alloted_cust_name'] = $cust_obj->firstname.' '.$cust_obj->lastname;
+                                } else {
+                                    $booking_data['rm_data'][$key_bk_data]['data']['booked'][$booked_k1]['detail'][$kDtl]['alloted_cust_name'] = "No customer name found";
+                                }
+                                if ($cust_obj->email) {
+                                    $booking_data['rm_data'][$key_bk_data]['data']['booked'][$booked_k1]['detail'][$kDtl]['alloted_cust_email'] = $cust_obj->email;
+                                } else {
+                                    $booking_data['rm_data'][$key_bk_data]['data']['booked'][$booked_k1]['detail'][$kDtl]['alloted_cust_email'] = "No customer email found";
+                                }
+                                $booking_data['rm_data'][$key_bk_data]['data']['booked'][$booked_k1]['detail'][$kDtl]['avail_rooms_to_realloc'] = $obj_booking_dtl->getAvailableRoomsForReallocation($booked_v1['detail'][$kDtl]['date_from'], $booked_v1['detail'][$kDtl]['date_to'], $booked_v1['id_product'], $booked_v1['id_hotel']);
+                                $booking_data['rm_data'][$key_bk_data]['data']['booked'][$booked_k1]['detail'][$kDtl]['avail_rooms_to_swap'] = $obj_booking_dtl->getAvailableRoomsForSwapping($booked_v1['detail'][$kDtl]['date_from'], $booked_v1['detail'][$kDtl]['date_to'], $booked_v1['id_product'], $booked_v1['id_hotel'], $booked_v1['id_room']);
+                            }
                         }
-                        if ($cust_obj->email) {
-                            $booking_data['rm_data'][$key_bk_data]['data']['booked'][$booked_k1]['detail'][0]['alloted_cust_email'] = $cust_obj->email;
-                        } else {
-                            $booking_data['rm_data'][$key_bk_data]['data']['booked'][$booked_k1]['detail'][0]['alloted_cust_email'] = "No customer email found";
-                        }
-                        $booking_data['rm_data'][$key_bk_data]['data']['booked'][$booked_k1]['detail'][0]['avail_rooms_to_realloc'] = $obj_booking_dtl->getAvailableRoomsForReallocation($booked_v1['detail'][0]['date_from'], $booked_v1['detail'][0]['date_to'], $booked_v1['id_product'], $booked_v1['id_hotel']);
-                        $booking_data['rm_data'][$key_bk_data]['data']['booked'][$booked_k1]['detail'][0]['avail_rooms_to_swap'] = $obj_booking_dtl->getAvailableRoomsForSwapping($booked_v1['detail'][0]['date_from'], $booked_v1['detail'][0]['date_to'], $booked_v1['id_product'], $booked_v1['id_hotel'], $booked_v1['id_room']);
                     }
                 }
             }

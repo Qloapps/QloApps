@@ -68,7 +68,7 @@
 					<div class="form-group">
 						<label class="col-sm-3 control-label required" for="hotel_name" >
 							{l s='Hotel Name :' mod='hotelreservationsystem'}
-							{include file="../../../_partials/mp-form-fields-flag.tpl"}
+							{include file="../../../_partials/htl-form-fields-flag.tpl"}
 						</label>
 						<div class="col-lg-6">
 							{foreach from=$languages item=language}
@@ -86,7 +86,7 @@
 					<div class="form-group">
 						<label class="col-sm-3 control-label">
 							{l s='Short Description :' mod='hotelreservationsystem'}
-							{include file="../../../_partials/mp-form-fields-flag.tpl"}
+							{include file="../../../_partials/htl-form-fields-flag.tpl"}
 						</label>
 						<div class="col-lg-6">
 							{foreach from=$languages item=language}
@@ -104,7 +104,7 @@
 					<div class="form-group">
 						<label class="col-sm-3 control-label">
 							{l s='Description :' mod='hotelreservationsystem'}
-							{include file="../../../_partials/mp-form-fields-flag.tpl"}
+							{include file="../../../_partials/htl-form-fields-flag.tpl"}
 						</label>
 						<div class="col-lg-6">
 							{foreach from=$languages item=language}
@@ -228,7 +228,7 @@
 					<div class="form-group">
 						<label class="col-sm-3 control-label">
 							{l s='Hotel Policies :' mod='hotelreservationsystem'}
-							{include file="../../../_partials/mp-form-fields-flag.tpl"}
+							{include file="../../../_partials/htl-form-fields-flag.tpl"}
 						</label>
 						<div class="col-lg-6">
 							{foreach from=$languages item=language}

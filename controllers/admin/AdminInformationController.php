@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -70,6 +70,7 @@ class AdminInformationControllerCore extends AdminController
                     'user' => _DB_USER_,
                     'prefix' => _DB_PREFIX_,
                     'engine' => _MYSQL_ENGINE_,
+                    'driver' => Db::getClass(),
                 ),
                 'uname' => function_exists('php_uname') ? php_uname('s').' '.php_uname('v').' '.php_uname('m') : '',
                 'apache_instaweb' => Tools::apacheModExists('mod_instaweb')
@@ -167,7 +168,7 @@ class AdminInformationControllerCore extends AdminController
     {
         $this->file_list = array('missing' => array(), 'updated' => array());
         $xml = @simplexml_load_file(_PS_API_URL_.'/xml/md5/'._PS_VERSION_.'.xml');
-        if (!$xml) {
+        if (!$xml || !isset($xml->ps_root_dir[0])) {
             die(Tools::jsonEncode($this->file_list));
         }
 

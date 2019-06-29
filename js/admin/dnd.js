@@ -1,5 +1,5 @@
 /*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -18,7 +18,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -58,13 +58,13 @@ function initTableDnD(table)
 				var ids = row.id.split('_');
 				var tableDrag = table;
 				var params = '';
-				table.id = table.id.replace('table-', '');
-				if (table.id == 'cms_block_0' || table.id == 'cms_block_1')
+				var tableId = table.id.replace('table-', '');
+				if (tableId == 'cms_block_0' || tableId == 'cms_block_1')
 					params = {
 						updatePositions: true,
 						configure: 'blockcms'
 					};
-				else if (table.id == 'category')
+				else if (tableId == 'category')
 				{
 					params = {
 						action: 'updatePositions',
@@ -73,14 +73,14 @@ function initTableDnD(table)
 						way: way
 					};
 				}
-				else if (table.id == 'cms_category')
+				else if (tableId == 'cms_category')
 					params = {
 						action: 'updateCmsCategoriesPositions',
 						id_cms_category_parent: ids[1],
 						id_cms_category_to_move: ids[2],
 						way: way
 					};
-				else if (table.id == 'cms')
+				else if (tableId == 'cms')
 					params = {
 						action: 'updateCmsPositions',
 						id_cms_category: ids[1],
@@ -94,7 +94,7 @@ function initTableDnD(table)
 						id_module: ids[1],
 						way: way
 					};
-				else if (table.id.indexOf('attribute') != -1 && table.id != 'attribute_group') {
+				else if (tableId.indexOf('attribute') != -1 && tableId!= 'attribute_group') {
 					params = {
 						action: 'updateAttributesPositions',
 						id_attribute_group: ids[1],
@@ -102,14 +102,14 @@ function initTableDnD(table)
 						way: way
 					};
 				}
-				else if (table.id == 'attribute_group') {
+				else if (tableId == 'attribute_group') {
 					params = {
 						action: 'updateGroupsPositions',
 						id_attribute_group: ids[2],
 						way: way
 					}
 				}
-				else if (table.id == 'product') {
+				else if (tableId == 'product') {
 					params = {
 						action: 'updatePositions',
 						id_category: ids[1],
@@ -117,8 +117,8 @@ function initTableDnD(table)
 						way: way
 					};
 				}
-				else if (table.id.indexOf('module-') != -1) {
-					module = table.id.replace('module-', '');
+				else if (tableId.indexOf('module-') != -1) {
+					module = tableId.replace('module-', '');
 
 					params = {
 						updatePositions: true,
@@ -139,8 +139,8 @@ function initTableDnD(table)
 				params['page'] = parseInt($('input[name=page]').val());
 				params['selected_pagination'] = parseInt($('input[name=selected_pagination]').val());
 
-				var data = $.tableDnD.serialize();
-				if ((table.id == 'category') && (data.indexOf('_0&') != -1))
+				var data = $.tableDnD.serialize().replace(/table-/g, '');
+				if ((tableId == 'category') && (data.indexOf('_0&') != -1))
 					data += '&found_first=1';
 				$.ajax({
 					type: 'POST',
@@ -159,7 +159,7 @@ function initTableDnD(table)
 						}
 						else
 						{
-							if (table.id == 'product' || table.id.indexOf('attribute') != -1 || table.id == 'attribute_group' || table.id == 'feature')
+							if (tableId == 'product' || tableId.indexOf('attribute') != -1 || tableId == 'attribute_group' || tableId == 'feature')
 								var reg = /_[0-9][0-9]*$/g;
 							else
 								var reg = /_[0-9]$/g;
@@ -196,3 +196,4 @@ function initTableDnD(table)
 		}
 	});
 }
+

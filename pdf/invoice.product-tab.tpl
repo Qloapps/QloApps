@@ -25,7 +25,9 @@
 <table class="product" width="100%" cellpadding="4" cellspacing="0">
 	<thead>
 		<tr>
-			<th class="product header small">{l s='Room Image' pdf='true'}</th>
+			{if $display_product_images}
+				<th class="product header small">{l s='Room Image' pdf='true'}</th>
+			{/if}
 			<th class="product header small">{l s='Room Description' pdf='true'}</th>
 			<th class="product header small">{l s='Room Capcity' pdf='true'}</th>
 
@@ -49,9 +51,11 @@
 			{foreach from=$data_v['date_diff'] key=rm_k item=rm_v}
 				{cycle values=["color_line_even", "color_line_odd"] assign=bgcolor_class}
 				<tr class="product {$bgcolor_class}">
-					<td class="cart_product">
-						<img src="{$data_v['cover_img']}" class="img-responsive" />
-					</td>
+					{if $display_product_images}
+						<td class="cart_product">
+							<img src="{$data_v['cover_img']}" class="img-responsive thumbnail" />
+						</td>
+					{/if}
 					<td class="product center">
 						<p class="product-name">
 							{$data_v['name']}
@@ -99,6 +103,35 @@
 						{/if}
 					{/if}
 				</tr>
+				{if isset($rm_v['extra_demands']) && $rm_v['extra_demands']}
+					<tr>
+						<td colspan="8">
+							<p><strong>{l s='Additional Facilities Details' pdf='true'}</strong></p>
+							<table class="demands-table" cellpadding="4" cellspacing="0">
+								<thead>
+									<tr>
+										{assign var=roomCount value=1}
+										{foreach $rm_v['extra_demands'] as $roomDemand}
+											<th><strong>{l s='Room' pdf='true'} - {$roomCount}</strong><br></th>
+											{assign var=roomCount value=$roomCount+1}
+										{/foreach}
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										{foreach $rm_v['extra_demands'] as $roomDemands}
+											<td>
+												{foreach $roomDemands['extra_demands'] as $demand}
+													<p><span>{$demand['name']}</span> &nbsp;&nbsp; - &nbsp;&nbsp; <span class="pull-right">{displayPrice currency=$order->id_currency price=$demand['price']}</span></p>
+												{/foreach}
+											</td>
+										{/foreach}
+									</tr>
+								</tbody>
+							</table>
+						</td>
+					</tr>
+				{/if}
 			{/foreach}
 		{/foreach}
 	{/if}
@@ -128,3 +161,11 @@
 
 	</tbody>
 </table>
+<style>
+	.demands-table td, .demands-table th {
+		border: 1px solid #ccc;
+	}
+	.pull-right {
+		float: right;
+	}
+</style>

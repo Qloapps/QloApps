@@ -1,5 +1,5 @@
 {*
-* 2007-2015 PrestaShop
+* 2007-2016 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -18,15 +18,15 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2016 PrestaShop SA
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
 <script>
-	var currency_format = {$currency->format|intval};
+	var currency_format = {$currency->format|floatval};
 	var currency_sign = '{$currency->sign|@addcslashes:'\''}';
 	var currency_blank = {$currency->blank|intval};
-	var priceDisplayPrecision = 0;
+	var priceDisplayPrecision = {$_PS_PRICE_DISPLAY_PRECISION_|intval};
 </script>
 <div class="clearfix"></div>
 <section id="dashtrends" class="panel widget{if $allow_push} allow_push{/if}">

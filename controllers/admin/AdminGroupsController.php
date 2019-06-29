@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -236,7 +236,7 @@ class AdminGroupsControllerCore extends AdminController
             'email' => array('title' => $this->l('Email address'), 'filter_key' => 'c!email', 'orderby' => true),
             'birthday' => array('title' => $this->l('Birth date'), 'type' => 'date', 'class' => 'fixed-width-md', 'align' => 'center'),
             'date_add' => array('title' => $this->l('Registration date'), 'type' => 'date', 'class' => 'fixed-width-md', 'align' => 'center'),
-            'active' => array('title' => $this->l('Enabled'), 'align' => 'center', 'class' => 'fixed-width-sm', 'active' => 'status', 'type' => 'bool', 'search' => false, 'orderby' => false, 'filter_key' => 'c!active')
+            'active' => array('title' => $this->l('Enabled'), 'align' => 'center', 'class' => 'fixed-width-sm', 'type' => 'bool', 'search' => false, 'orderby' => false, 'filter_key' => 'c!active', 'callback' => 'printOptinIcon')
         ));
         $this->_select = 'c.*, a.id_group';
         $this->_join = 'LEFT JOIN `'._DB_PREFIX_.'customer` c ON (a.`id_customer` = c.`id_customer`)';
@@ -247,6 +247,12 @@ class AdminGroupsControllerCore extends AdminController
         $this->processFilter();
         return parent::renderList();
     }
+
+    public function printOptinIcon($value, $customer)
+    {
+        return ($value ? '<i class="icon-check"></i>' : '<i class="icon-remove"></i>');
+    }
+
 
     public function renderForm()
     {
@@ -605,7 +611,7 @@ class AdminGroupsControllerCore extends AdminController
         $href = self::$currentIndex.'&'.$this->identifier.'='.$id.'&update'.$this->table.'&token='.($token != null ? $token : $this->token);
 
         if ($this->display == 'view') {
-            $href = Context::getContext()->link->getAdminLink('AdminCustomers').'&id_customer='.(int)$id.'&updatecustomer';
+            $href = Context::getContext()->link->getAdminLink('AdminCustomers').'&id_customer='.(int)$id.'&updatecustomer&back='.urlencode($href);
         }
 
         $tpl->assign(array(

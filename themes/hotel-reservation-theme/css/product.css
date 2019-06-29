@@ -1,5 +1,9 @@
 /* product desc */
 /* primary_block ***************************************************************************** */
+.columns-container {
+  background-color: #FAFAFA;
+}
+
 .primary_block {
   margin-bottom: 40px; }
 
@@ -33,8 +37,6 @@ a.fancybox-nav {
   position: relative;
   display: block;
   cursor: pointer;
-  padding: 5px;
-  /*border: 1px solid #dbdbdb;*//*by webkul*/
   background: #fff; }
   @media (max-width: 767px) {
     .pb-left-column #image-block {
@@ -42,6 +44,7 @@ a.fancybox-nav {
       margin: 0 auto; } }
   .pb-left-column #image-block img {
     background: #fbfbfb;
+    border-radius: 4px;
     width: 100%; }
   .pb-left-column #image-block #view_full_size .span_link {
     position: absolute;
@@ -106,13 +109,13 @@ a.fancybox-nav {
     list-style-type: none;
     padding-left: 0;
     overflow: hidden;
+    margin-bottom: 0px;
     height: 90px; }
   #thumbs_list li {
     float: left;
     height: 90px;
     width: 90px;
     cursor: pointer;
-    border: 1px solid #dbdbdb;
     margin-right: 8px;
     line-height: 0;
     -moz-box-sizing: border-box;
@@ -125,7 +128,6 @@ a.fancybox-nav {
         margin-right: 6px; } }
     #thumbs_list li a {
       display: block;
-      border: 3px solid #fff;
       -moz-transition: all 0.3s ease;
       -o-transition: all 0.3s ease;
       -webkit-transition: all 0.3s ease;
@@ -137,7 +139,8 @@ a.fancybox-nav {
       #thumbs_list li a:hover, #thumbs_list li a.shown {
         border-color: #dbdbdb; }
     #thumbs_list li img {
-      border: 1px solid #fff;
+      border: 1px solid #dbdbdb;
+      border-radius: 4px;
       width: 100%;
       height: 100%;
       -moz-box-sizing: border-box;
@@ -228,7 +231,7 @@ span.view_scroll_spacer {
     padding-right: 2px; }
 
 .resetimg {
-  padding: 10px 0 0; }
+  margin: 0px; }
   .resetimg #resetImages i {
     margin-right: 6px; }
 
@@ -709,12 +712,9 @@ table.table-product-discounts {
 
 /* quantity_wanted */
 #quantity_wanted_p input {
-  width: 78px;
-  height: 27px;
-  padding: 0 6px;
+  width: 100%;
   float: left;
-  border: 1px solid #d6d4d4;
-  line-height: 27px; }
+  line-height: 25px; }
 /*#quantity_wanted_p .btn {
   float: left;
   margin-left: 3px; }*/
@@ -727,8 +727,7 @@ table.table-product-discounts {
   margin-left: 5px;
   padding-top: 3px;}
 #quantity_wanted_p label {
-  display: block;
-  margin-bottom: 7px; }
+  display: block;}
 
 /* availability_statut */
 #availability_statut span#availability_label,
@@ -887,7 +886,6 @@ table.table-product-discounts {
         padding: 0 5px;
         height: 22px;
         width: 100%;
-        border: 1px solid #d6d4d4;
         font-size: 12px;
         color: #666; }
   #send_friend_form .submit {
@@ -1064,95 +1062,54 @@ Quick View Styles
 
 
 /****************CSS by webkul on product page********************/
-
-.book_now_submit
-{
-  background-color: #7bae39;
-  border: 1px solid #629222;
+#add_to_cart {
+  margin: 0px;}
+#add_to_cart .book_now_submit {
+  background-color: #36BA46;
+  border: 1px solid #36BA46;
+  border-radius: 4px;
   color: #ffffff;
-  font-size: 18px;
-  font-family: inherit;
   font-weight: bold;
-  padding-bottom: 13px;
-  padding-top: 13px;
   width: 100%;
-}
-.booking_room_fields
-{
-  padding-left: 20px;
-  padding-right: 20px;
-}
-.booking_room_fields .hasDatepicker
-{
-  cursor: text;
-}
-.booking_room_fields input
-{
-  background-color: #fff!important;
-  height: 30px!important;
-  color: #A2A2A2;
-  font-size:13px;
-  font-family: inherit;
-  font-weight:700;
-  padding-left: 13px;
-}
-.booking_room_fields label
-{
-  color: #404040;
-  font-size:14px;
-  font-family: inherit;
-  font-weight:700;
-}
-.content_prices
-{
-  background-color: #404040;
-}
-.total_price_block
-{
-  color: #404040;
-  font-size: 19px;
-  font-weight: 600;
-  padding-top: 5px;
-}
-.total_price_block p
-{
-  overflow: auto;
-  background-color: #f2f2f2;
-  border: 1px solid #bdc2c9;
-  display: inline-block;
-  padding: 15px 5px;
-}
-
+  text-transform: uppercase;
+  padding: 15px;}
+.booking_room_fields .hasDatepicker {
+  cursor: text;}
+.booking_room_fields .htl_location_block p {
+  line-height: 25px;
+  font-size: 18px;
+  color: #000;
+  margin-bottom: 25px;}
+.booking_room_fields .form-group {
+  margin-bottom: 20px;}
+.content_prices {
+  background-color: #404040;}
+.total_price_block p {
+  font-size: 28px;
+  color: #000;}
+.total_price_block label {
+  margin-bottom: 10px;}
 .arrow-down {
   border-left: 14px solid transparent;
     border-right: 14px solid transparent;
     border-top: 14px solid #404040;
     display: inline-block;
     height: 0;
-    width: 0;
-}
-.arrow-down-div
-{
-  text-align: center;
-}
+    width: 0;}
+.arrow-down-div {
+  text-align: center;}
 .booking_total_price
 {
   font-family: inherit;
   color: #ffffff;
-    padding: 20px 10px;
-    text-align: center;
-    margin: 0;
-    font-size: 22px;
-    font-weight: 700;
-}
+  padding: 20px 10px;
+  text-align: center;
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;}
 .total_booking_price_block
 {
-  background-color: #404040;
-}
-.booking-form
-{
-  border: 1px solid #cccccc;
-}
+  background-color: #404040;}
 .product_description_tabs
 {
   font-family: inherit;
@@ -1160,88 +1117,68 @@ Quick View Styles
     font-size: 18px;
     font-weight: 700;
     border-bottom: none!important;
-    padding-left: 20px;
-}
+    padding-left: 20px;}
 .product_description_tabs li.selected
 {
   font-family: inherit;
     color: #404040;
     font-size: 18px;
     font-weight: 700;
-    border-bottom: 2px solid #379aef;
-}
-.product_description_tabs li.active
-{
+    border-bottom: 2px solid #379aef;}
+.product_description_tabs li.active {
   font-family: inherit;
-    color: #404040;
-    font-size: 18px;
-    font-weight: 700;
-    border-bottom: 3px solid #379aef;
-}
+  color: #404040;
+  font-size: 18px;
+  font-weight: 700;
+  border-bottom: 4px solid #379aef;}
 .product_description_tabs_contents
 {
   margin-top: 0px!important;
-  padding: 20px;
-  border: 1px solid #cccccc;
+  line-height: 25px;}
+.idTabHrefShort {
+  font-size: 14px;
+  color: #000000!important;
+  text-align: center;
+  border: none!important;}
+.room_info_heading {
+  margin-bottom: 5px;
+  font-weight: 700;
+  opacity: 0.5;
+  font-size: 12px;
+  color: #000000;
+  text-transform: uppercase;}
+.room_info_content {
+  font-size: 14px;
+  color: #000000;}
+.info_margin_div {
+  font-size: 14px;
+  color: #333333;
   line-height: 25px;
-}
-.idTabHrefShort
-{
-  border: none!important;
-}
-.room_info_heading
-{
-  font-family: inherit;
-    color: #379aef;
-    font-size: 20px;
-    font-weight: 700;
-    border-bottom: 1px solid #cccccc;
-  padding-bottom: 10px;
-}
-.room_info_content
-{
-  font-family: inherit;
-    color: #404040;
-    font-size: 16px;
-    font-weight: 400;
-    padding-top: 10px;
-}
-.info_margin_div
-{
-  margin-bottom: 40px;
-}
-.hotel_name_block
-{
-  font-family: inherit;
-    color: #404040;
-    font-size: 24px;
-    font-weight: 700;
-    margin-bottom: 10px;
-}
+  margin-bottom: 30px;}
+.hotel_name_block {
+  font-family: OpenSans;
+  font-size: 22px;
+  color: #000000;
+  margin-bottom: 5px;}
 .room_hotel_name_block
 {
-  padding-top: 20px;
-  padding-bottom: 20px;
-}
+  padding-bottom: 12px;}
 .room_rating_block
 {
   font-family: inherit;
     color: #777777;
     font-size: 14px;
-    font-weight: 400;
-}
+    font-weight: 400;}
 .room_rating_block span
 {
-  margin-left: 10px;
-}
+  margin-left: 10px;}
 .room_description p
 {
   font-family: inherit;
     color: #404040;
     font-size: 16px;
     font-weight: 400;
-    padding-top: 10px;
-}
+    padding-top: 10px;}
 .room_unavailability_qty_error_div
 {
   display: none;
@@ -1250,8 +1187,7 @@ Quick View Styles
     font-size: 13px;
     margin-bottom: 10px;
     padding: 2px;
-    text-align: center;
-}
+    text-align: center;}
 
 .room_unavailability_date_error_div
 {
@@ -1261,102 +1197,216 @@ Quick View Styles
     font-size: 13px;
     margin-bottom: 10px;
     padding: 2px;
-    text-align: center;
-}
+    text-align: center;}
 
 /*datepicker on search css*/
 .product_page_search
 {
   background-color: #404040;
   margin-bottom: 15px!important;
-  padding-top: 15px;
-}
+  padding-top: 15px;}
 
 .product_page_search .location_search_results_ul
 {
-  width: 90%!important;
-}
+  width: 90%!important;}
 
 .product_page_search .location_search_results_ul li
 {
-  border-top: 1px solid #cccccc;
-}
-
-.product_page_search #search_room_submit
-{
-  margin-top: 23px;
-    padding: 9.2px 40px!important;
-}
-
+  border-top: 1px solid #cccccc;}
 .room_ratting_yes
 {
   background-position: 48px 22px;
   display: inline-block;
     height: 22px;
-    width: 22px;
-}
-
+    width: 22px;}
 .room_ratting_no
 {
   background-position: 74px 22px;
   display: inline-block;
     height: 22px;
-    width: 22px;
-}
-
-.num_reviews
-{
-  margin-left: 10px;
-  font-weight: 400;
-  color: #777777;
+    width: 22px;}
+.num_reviews {
   font-size: 14px;
-}
-
-.search_block_container div label
-{
-    color: #ffffff;
-}
-
+  color: #0000FF;
+  margin-left: 10px;}
+.search_block_container div label {
+    color: #ffffff;}
 .search_block_container.product_page_search
 {
-  margin-top: 0px;
-}
-
-.sold_out_alert
-{
-  margin-bottom: 20px;
-  background-color: #ffa0a0;
-  border: 1px solid #cccccc;
-  color: #9f1010;
+  margin-top: 0px;}
+.sold_out_alert {
+  color: #FF4B4B;
   display: block;
-  font-size: 15px;
-  font-weight: 700;
-  padding: 10px 5px;
-  text-align: center;
-}
-.num_quantity_alert p
-{
-  background-color: #e86464;
-  border: 1px solid #ca3636;
-  color: #ffffff;
-  font-size: 12px;
-  font-weight: 400;
-  margin-top: 10px;
-  padding: 5px 10px;
-}
+  font-size: 16px;
+  font-weight: 700;}
+.num_quantity_alert {
+  font-size: 14px;
+  color: #FF4B4B;
+  font-weight: 700;}
 
 /*for search block background*/
 .header-rmsearch-wrapper {
   background-color: #404040;
-  margin-bottom: 10px;
-}
-
+  margin-bottom: 10px;}
 .idTabHrefShort:hover {
-  color: #333;
-}
+  color: #333;}
 
 .room_type_old_price {
   text-decoration: line-through;
   color:#979797;
-  font-size:15px;
+  font-size:15px;}
+  #center_column .button-medium {
+    background-color: #1292FF;
+    box-shadow: 0 0px 20px 0 rgba(0,0,0,0.34);
+    border-radius: 2px;
+    padding: 0px 50px;}
+    #center_column .button-medium > span {
+      font-size: 14px;
+      padding: 11px;
+      font-weight: 600;
+      color: #FFFFFF;
+      text-transform: uppercase;
+      text-align: center;}
+
+
+#quantity_wanted_p .rm_qty_cont {
+  width: 100%;
+  margin-right: 15px;}
+#quantity_wanted_p .qty_sec_cont {
+  width: 100%;
+  margin: 0px;
+  float: left;}
+#quantity_wanted_p .qty_input_cont {
+  float: left;
+  width: 126px;}
+#quantity_wanted_p .qty_input_cont input {
+  border-radius: 4px 0px 0px 4px;}
+#quantity_wanted_p .qty_direction {
+    width: 22px;
+    float: left;}
+#quantity_wanted_p .qty_direction a {
+  padding: 2px 5px;
+  border-left: 0px;
+  border-color: #999;}
+.product_wrapper .header-rmsearch-inner-wrapper {
+  margin-top: 15px!important;
+  margin-bottom: 10px!important;}
+.product_wrapper .header-rmsearch-wrapper {
+  background-color: transparent;
+  margin-bottom: 10px;}
+.product_wrapper .header-rmsearch-input {
+  background: transparent!important;
+  border: 1px solid #999999!important;
+  color: #333333!important;}
+.product_wrapper .circle-small {
+  opacity: 0.5;
+  font-size: 16px;
+  font-weight: 700;
+  margin-right: 3px;
+  background: #FFFFFF;}
+.room_info_content span.col-sm-4 {
+  margin-bottom: 5px;}
+.product_wrapper .input-date {
+  background: transparent url(../img/icon/icon-calendar.svg) no-repeat scroll 92% 50%!important;
+  background-size: 16px!important;}
+#search_hotel_block_form #search_room_submit{
+  width: 100%;}
+.product_wrapper input {
+  background-color: transparent!important;
+  border: 1px solid #999999;
+  box-shadow: 0 1px 0 0 rgba(0,0,0,0.13);
+  height: 48px;
+  border-radius: 4px;
+  color: #333;
+  font-size: 14px;
+  padding: 0px 15px;}
+.product_wrapper textarea {
+  background-color: transparent!important;
+  border: 1px solid #999999;
+  box-shadow: 0 1px 0 0 rgba(0,0,0,0.13);
+  height: 48px;
+  border-radius: 4px;
+  color: #333;
+  font-size: 14px;
+  padding: 0px 15px;}
+.product_wrapper label {
+  display: block;
+  font-size: 14px;
+  color: #333;}
+.product_wrapper .price_desc_block label {
+  opacity: 0.5;
+}
+.booking_room_fields .htl_location_block label {
+  opacity: 0.5;
+  margin-bottom: 10px;
+  text-transform: uppercase;}
+.nav-tabs > li.active > a, .nav-tabs > li.active > a:hover, .nav-tabs > li.active > a:focus {
+  background-color: transparent;
+}
+@media (min-width: 360px) and (max-width: 767px) {
+  #search_hotel_block_form #search_room_submit {
+    width: auto;}
+}
+@media (min-width: 768px) and (max-width: 1199px) {
+  .num_avail_rooms_alert {
+    float: left!important;}
+  .booking_room_fields .form-group {
+    width: 100%;}}
+@media (min-width: 320px) and (max-width: 767px) {
+  .product_wrapper .input-date {
+      background-position: 97% 50%!important;}}
+@media (max-width: 450px) {
+  .num_avail_rooms_alert {
+    float: left!important;}
+  .booking_room_fields .form-group {
+    width: 100%;}}
+
+/* room type extra demands container */
+.room_demands_container_overlay {
+  display: none;
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.05);
+  z-index: 100;
+}
+#product select {
+  background-color: #fff;
+  height: 40px;
+  border-radius: 4px;
+  padding: 3px 5px;
+  color: #333;
+  border: 1px solid #d6d4d4;
+}
+.room_demands_container .room_demand_block {
+  margin-bottom: 15px;
+  color: #333;
+  font-size: 14px;
+}
+.room_demands_container .checkbox {
+  margin-top: 2px;
+}
+.room_demands_container label {
+  opacity: 0.5;
+  margin-bottom: 15px;
+  text-transform: uppercase;
+}
+.separator-hr-mg-10 {
+  margin-bottom: 10px;
+  margin-top: 10px;
+}
+.price_desc_block {
+  font-size: 18px;
+}
+.price_desc_block .total_rooms_price_block {
+  color: #333;
+}
+.price_desc_block .extra_demands_price_block {
+  color: #299DFF;
+}
+.price_desc_block .plus-sign {
+  font-size: 24px;
+  color: #505050;
 }

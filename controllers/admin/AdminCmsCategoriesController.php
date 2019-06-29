@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -172,7 +172,7 @@ class AdminCmsCategoriesControllerCore extends AdminController
             }
         }
         /* Delete multiple objects */
-        elseif (Tools::getValue('submitDel'.$this->table) || Tools::getValue('submitBulkdelete'.$this->table)) {
+        elseif (Tools::getValue('submitDel'.$this->table) || Tools::isSubmit('submitBulkdelete'.$this->table)) {
             if ($this->tabAccess['delete'] === '1') {
                 if (Tools::isSubmit($this->table.'Box')) {
                     $cms_category = new CMSCategory();
@@ -215,6 +215,7 @@ class AdminCmsCategoriesControllerCore extends AdminController
                     'type' => 'text',
                     'label' => $this->l('Name'),
                     'name' => 'name',
+                    'class' => 'copyMeta2friendlyURL',
                     'required' => true,
                     'lang' => true,
                     'hint' => $this->l('Invalid characters:').' &lt;&gt;;=#{}'

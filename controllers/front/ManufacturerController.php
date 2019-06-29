@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -115,10 +115,8 @@ class ManufacturerControllerCore extends FrontController
         if (Configuration::get('PS_DISPLAY_SUPPLIERS')) {
             $data = Manufacturer::getManufacturers(false, $this->context->language->id, true, false, false, false);
             $nbProducts = count($data);
-            $this->n = abs((int)Tools::getValue('n', Configuration::get('PS_PRODUCTS_PER_PAGE')));
-            $this->p = abs((int)Tools::getValue('p', 1));
-            $data = Manufacturer::getManufacturers(true, $this->context->language->id, true, $this->p, $this->n, false);
             $this->pagination($nbProducts);
+            $data = Manufacturer::getManufacturers(true, $this->context->language->id, true, $this->p, $this->n, false);
 
             foreach ($data as &$item) {
                 $item['image'] = (!file_exists(_PS_MANU_IMG_DIR_.$item['id_manufacturer'].'-'.ImageType::getFormatedName('medium').'.jpg')) ? $this->context->language->iso_code.'-default' : $item['id_manufacturer'];

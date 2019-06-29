@@ -68,7 +68,7 @@
 	font-size: 18px;
 	color: #FFFFFF;
 	font-weight: 400;
-	font-family: inherit;	
+	font-family: inherit;
 	margin-left: 7px !important;
 }
 
@@ -223,8 +223,8 @@
 .default_part_available .ui-state-default
 {
     background-color: #dcc635!important;
-    color: #ffffff;
     border-radius: 50%;
+    color: #ffffff;
 }
 
 .default_unavailable .ui-state-default
@@ -248,7 +248,7 @@
 
 .part_available .ui-state-default
 {
-    background-color: #dcc635 !important;
+    background-color: #dcc635!important;
     border-radius: 50%;
     color: #ffffff;
 }

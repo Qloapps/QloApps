@@ -27,6 +27,7 @@ $_LANGMAIL['Newsletter voucher'] = 'Newsletter voucher';
 $_LANGMAIL['Newsletter confirmation'] = 'Newsletter confirmation';
 $_LANGMAIL['Email verification'] = 'Email verification';
 $_LANGMAIL['Your wishlist\'s link'] = 'Your wishlist\'s link';
+$_LANGMAIL['Message from %1$s %2$s'] = 'Message from %1$s %2$s';
 $_LANGMAIL['%1$s sent you a link to %2$s'] = '%1$s sent you a link to %2$s';
 
 

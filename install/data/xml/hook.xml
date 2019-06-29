@@ -325,5 +325,8 @@
     <hook id="actionEmailAddAfterContent" live_edit="0">
       <name>actionEmailAddAfterContent</name><title>Add extra content after mail content</title><description>This hook is called just after fetching mail template</description>
     </hook>
+    <hook id="displayCartExtraProductActions" live_edit="0">
+      <name>displayCartExtraProductActions</name><title>Extra buttons in shopping cart</title><description>This hook adds extra buttons to the product lines, in the shopping cart</description>
+    </hook>
   </entities>
 </entity_hook>

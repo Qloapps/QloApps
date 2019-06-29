@@ -1,6 +1,6 @@
 <?php
 /**
- * 2007-2015 PrestaShop
+ * 2007-2017 PrestaShop
  *
  * NOTICE OF LICENSE
  *
@@ -19,7 +19,7 @@
  * needs please refer to http://www.prestashop.com for more information.
  *
  *  @author 	PrestaShop SA <contact@prestashop.com>
- *  @copyright  2007-2015 PrestaShop SA
+ *  @copyright  2007-2017 PrestaShop SA
  *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PrestaShop SA
  */
@@ -41,7 +41,7 @@ class Adapter_PackItemsManager
         }
         return Pack::getItems($pack->id, $id_lang);
     }
-    
+
     /**
      * Get all Packs that contains the given item in the corresponding declination.
      *
@@ -58,7 +58,7 @@ class Adapter_PackItemsManager
         }
         return Pack::getPacksContainingItem($item->id, $item_attribute_id, $id_lang);
     }
-    
+
     /**
      * Is this product a pack?
      *
@@ -69,7 +69,7 @@ class Adapter_PackItemsManager
     {
         return Pack::isPack($product->id);
     }
-    
+
     /**
      * Is this product in a pack?
      * If $id_product_attribute specified, then will restrict search on the given combination,
@@ -83,5 +83,5 @@ class Adapter_PackItemsManager
     {
         return Pack::isPacked($product->id, $id_product_attribute);
     }
-    
+
 }

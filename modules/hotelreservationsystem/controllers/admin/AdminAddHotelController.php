@@ -178,7 +178,6 @@ class AdminAddHotelController extends ModuleAdminController
         $longitude = Tools::getValue('loclongitude');
         $map_formated_address = Tools::getValue('locformatedAddr');
         $map_input_text = Tools::getValue('googleInputField');
-
         // check if field is atleast in default language. Not available in default prestashop
         $defaultLangId = Configuration::get('PS_LANG_DEFAULT');
         $objDefaultLanguage = Language::getLanguage((int) $defaultLangId);
@@ -194,43 +193,19 @@ class AdminAddHotelController extends ModuleAdminController
                         $this->errors[] = $this->l('Invalid Hotel name in ').$lang['name'];
                     }
                 }
-                if ($shortDescription = Tools::getValue(
-                    'short_description_'.$lang['id_lang']
-                )) {
-                    if (!Validate::isCleanHtml(
-                        $shortDescription,
-                        (int) Configuration::get('PS_ALLOW_HTML_IFRAME')
-                    )) {
-                        $this->errors[] = sprintf(
-                            $this->l('Short description is not valid in %s'),
-                            $lang['name']
-                        );
+                if ($shortDescription = html_entity_decode(Tools::getValue('short_description_'.$lang['id_lang']))) {
+                    if (!Validate::isCleanHtml($shortDescription)) {
+                        $this->errors[] = sprintf($this->l('Short description is not valid in %s'), $lang['name']);
                     }
                 }
-                if ($description = Tools::getValue(
-                    'short_description_'.$lang['id_lang']
-                )) {
-                    if (!Validate::isCleanHtml(
-                        $description,
-                        (int) Configuration::get('PS_ALLOW_HTML_IFRAME')
-                    )) {
-                        $this->errors[] = sprintf(
-                            $this->l('Description is not valid in %s'),
-                            $lang['name']
-                        );
+                if ($description = html_entity_decode(Tools::getValue('description_'.$lang['id_lang']))) {
+                    if (!Validate::isCleanHtml($description)) {
+                        $this->errors[] = sprintf($this->l('Description is not valid in %s'), $lang['name']);
                     }
                 }
-                if ($policies = Tools::getValue(
-                    'policies_'.$lang['id_lang']
-                )) {
-                    if (!Validate::isCleanHtml(
-                        $policies,
-                        (int) Configuration::get('PS_ALLOW_HTML_IFRAME')
-                    )) {
-                        $this->errors[] = sprintf(
-                            $this->l('policies are not valid in %s'),
-                            $lang['name']
-                        );
+                if ($policies = html_entity_decode(Tools::getValue('policies_'.$lang['id_lang']))) {
+                    if (!Validate::isCleanHtml($policies)) {
+                        $this->errors[] = sprintf($this->l('policies are not valid in %s'), $lang['name']);
                     }
                 }
             }
@@ -571,13 +546,18 @@ class AdminAddHotelController extends ModuleAdminController
     public function setMedia()
     {
         parent::setMedia();
-
+        Media::addJsDef(
+            array(
+                'filesizeError' => $this->l('File exceeds maximum size.'),
+                'maxSizeAllowed' => Tools::getMaxUploadSize(),
+            )
+        );
         // GOOGLE MAP
         $language = $this->context->language;
         $country = $this->context->country;
-        $WK_GOOGLE_API_KEY = Configuration::get('WK_GOOGLE_API_KEY');
+        $PS_API_KEY = Configuration::get('PS_API_KEY');
         $this->addJs(
-            'https://maps.googleapis.com/maps/api/js?key='.$WK_GOOGLE_API_KEY.'&libraries=places&language='.
+            'https://maps.googleapis.com/maps/api/js?key='.$PS_API_KEY.'&libraries=places&language='.
             $language->iso_code.'&region='.$country->iso_code
         );
         //tinymce

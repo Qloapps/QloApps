@@ -1,5 +1,5 @@
 {*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -18,7 +18,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
@@ -167,13 +167,19 @@
 							{* Total cart details, tax details, advance payment details and voucher details *}
 							<div class="col-sm-12 card cart_total_detail_block">
 								<p>
-									<span>{l s='Total Rooms Cost'}</span>
+									<span>{l s='Total Rooms Cost'}{if $display_tax_label}{l s=' (tax excl.)'}{/if}</span>
 									<span class="cart_total_values">{displayPrice price=$total_products}</span>
 								</p>
+								{if isset($totalDemandsPrice) && $totalDemandsPrice}
+									<p>
+										<span>{l s='Total Additional Facilities Cost'}</span>
+										<span class="cart_total_values">{displayPrice price=$totalDemandsPrice}</span>
+									</p>
+								{/if}
 								{if $use_taxes && $show_taxes && $total_tax != 0 }
 									{if $priceDisplay != 0}
 										<p class="cart_total_price">
-											<span>{if $display_tax_label}{l s='Total (tax excl.)'}{else}{l s='Total'}{/if}</span> -
+											<span>{if $display_tax_label}{l s='Total (tax excl.)'}{else}{l s='Total'}{/if}</span>
 											<span class="cart_total_values">{displayPrice price=$total_price_without_tax}</span>
 										</p>
 									{/if}
@@ -383,6 +389,8 @@
 						{addJsDefL name=titleDelivery}{$smarty.capture.default|@addcslashes:'\''}{/addJsDefL}
 						{capture}<a class="button button-small btn btn-default" href="{$smarty.capture.addressUrlAdd}" title="{l s='Update' js=1}"><span>{l s='Update' js=1}<i class="icon-chevron-right right"></i></span></a>{/capture}
 						{addJsDefL name=liUpdate}{$smarty.capture.default|@addcslashes:'\''}{/addJsDefL}
+						{addJsDefL name=txtExtraDemandSucc}{l s='Updated Successfully' js=1}{/addJsDefL}
+						{addJsDefL name=txtExtraDemandErr}{l s='Some error occurred while updating demands' js=1}{/addJsDefL}
 					{/strip}
 				{/if}
 			</div>

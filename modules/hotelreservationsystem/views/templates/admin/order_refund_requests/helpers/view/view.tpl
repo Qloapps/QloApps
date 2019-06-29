@@ -8,9 +8,7 @@
 				<div class="customer_details details-div">
 					<h3>{l s="Customer Details" mod="hotelreservationsyatem"}</h3>
 					{if isset($customer_name)}
-						
 						<p><strong>{l s='Customer Name' mod='hotelreservationsystem'} :  </strong>&nbsp;&nbsp;{$customer_name|escape:'html':'UTF-8'}</p>
-						
 						<p><strong>{l s='Customer Email' mod='hotelreservationsystem'} :  </strong>&nbsp;&nbsp;{$customer_email|escape:'html':'UTF-8'}</p>
 					{else}
 						<p><strong>{l s='Customer' mod='hotelreservationsystem'} :  </strong>{l s='As a guest' mod='hotelreservationsystem'}</p>
@@ -20,25 +18,25 @@
 				<div class="order_cancellation_details details-div row">
 					<h3>{l s="Order Cancellation Details" mod="hotelreservationsyatem"}</h3>
 					<div class="col-lg-6">
-						
+
 						<p><strong>{l s='Hotel Name' mod='hotelreservationsystem'} :  </strong>&nbsp;&nbsp;{$htl_name|escape:'html':'UTF-8'}</p>
-						
+
 						<p><strong>{l s='Room Type' mod='hotelreservationsystem'} :  </strong>&nbsp;&nbsp;{$product_name|escape:'html':'UTF-8'}</p>
-						
-						<p><strong>{l s='Room Numbers' mod='hotelreservationsystem'} :  </strong>&nbsp;&nbsp;						{foreach from=$room_numbers item=rm_name}	
+
+						<p><strong>{l s='Room Numbers' mod='hotelreservationsystem'} :  </strong>&nbsp;&nbsp;						{foreach from=$room_numbers item=rm_name}
 							{$rm_name|escape:'html':'UTF-8'},&nbsp;
-						{/foreach}	
+						{/foreach}
 						</p>
-						
+
 						<p><strong>{l s='Date From' mod='hotelreservationsystem'} :  </strong>&nbsp;&nbsp;{$date_from|date_format:"%d-%b-%G"}</p>
 
 						<p><strong>{l s='Date To' mod='hotelreservationsystem'} :  </strong>&nbsp;&nbsp;{$date_to|date_format:"%d-%b-%G"}</p>
 
 					</div>
 					<div class="col-lg-6">
-						<p><strong>{l s='Total Amount' mod='hotelreservationsystem'} :  </strong>&nbsp;&nbsp;{$total_amount}&nbsp;{$curr_code}</p>
+						<p><strong>{l s='Total Amount' mod='hotelreservationsystem'} :  </strong>&nbsp;&nbsp;{displayPrice price=$total_amount currency=$id_currency}</p>
 
-						
+
 						<p><strong>{l s='Order Cancellation Stage' mod='hotelreservationsystem'} :  </strong>&nbsp;&nbsp;{$currentStage->name|escape:'html':'UTF-8'}</p>
 
 						{if isset($currentStage->name) && $currentStage->name == 'Refunded'}
@@ -47,13 +45,13 @@
 							{else}
 								{assign var="cancel_charge" value=$total_amount-$refunded_amount}
 							{/if}
-							<p><strong>{l s='Total Cancellation Charges' mod='hotelreservationsystem'} :  </strong>&nbsp;&nbsp;{$cancel_charge|round:"2"}&nbsp;{$curr_code}</p>
-							<p><strong>{l s='Total Refund Amount' mod='hotelreservationsystem'} :  </strong>&nbsp;&nbsp;{$refunded_amount|round:"2"}&nbsp;{$curr_code}</p>
+							<p><strong>{l s='Total Cancellation Charges' mod='hotelreservationsystem'} :  </strong>&nbsp;&nbsp;{displayPrice price=$cancel_charge currency=$id_currency}</p>
+							<p><strong>{l s='Total Refund Amount' mod='hotelreservationsystem'} :  </strong>&nbsp;&nbsp;{displayPrice price=$refunded_amount currency=$id_currency}</p>
 						{/if}
 
 						<p><strong>{l s='Way Of Payment' mod='hotelreservationsystem'} :  </strong>&nbsp;&nbsp;{$way_of_payment|escape:'html':'UTF-8'}</p>
 						{if $way_of_payment == 'Advance Payment'}
-							<p><strong>{l s='Advance Paid Amount' mod='hotelreservationsystem'} :  </strong>&nbsp;&nbsp;{$adv_paid_amount}&nbsp;{$curr_code}</p>
+							<p><strong>{l s='Advance Paid Amount' mod='hotelreservationsystem'} :  </strong>&nbsp;&nbsp;{displayPrice price=$adv_paid_amount currency=$id_currency}</p>
 						{/if}
 					</div>
 				</div>
@@ -67,15 +65,15 @@
 						<form action="" method="post" class="form-horizontal well hidden-print">
 							<div class="row">
 
-							<p><strong>{l s='Total Cancellation Charges' mod='hotelreservationsystem'} :  </strong>&nbsp;&nbsp;{$deduction_amount|round:"2"}&nbsp;{$curr_code}</p>
+							<p><strong>{l s='Total Cancellation Charges' mod='hotelreservationsystem'} :  </strong>&nbsp;&nbsp;{displayPrice price=$deduction_amount currency=$id_currency}</p>
 
 							{if $way_of_payment == 'Advance Payment'}
 								{assign var="refund_amount" value=$adv_paid_amount-$deduction_amount}
 							{else}
 								{assign var="refund_amount" value=$total_amount|floatval - $deduction_amount|floatval}
 							{/if}
-							<p><strong>{l s='Total Refund Amount' mod='hotelreservationsystem'} :  </strong>&nbsp;&nbsp;{$refund_amount|round:"2"}&nbsp;{$curr_code}</p>
-							
+							<p><strong>{l s='Total Refund Amount' mod='hotelreservationsystem'} :  </strong>&nbsp;&nbsp;{displayPrice price=$refund_amount currency=$id_currency}</p>
+
 							<hr>
 								<div class="form-group">
 									<label for="id_order_cancellation_stage" class="required control-label col-lg-2">

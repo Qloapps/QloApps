@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -39,9 +39,7 @@ class InstallModelMail extends InstallAbstractModel
     {
         parent::__construct();
 
-        require_once(_PS_CORE_DIR_.'/tools/swift/Swift.php');
-        require_once(_PS_CORE_DIR_.'/tools/swift/Swift/Connection/SMTP.php');
-        require_once(_PS_CORE_DIR_.'/tools/swift/Swift/Connection/NativeMail.php');
+        require_once(_PS_CORE_DIR_.'/tools/swift/swift_required.php');
 
         $this->smtp_checked = $smtp_checked;
         $this->server = $server;
@@ -64,25 +62,36 @@ class InstallModelMail extends InstallAbstractModel
         try {
             // Test with custom SMTP connection
             if ($this->smtp_checked) {
-                $smtp = new Swift_Connection_SMTP($this->server, $this->port, ($this->encryption == "off") ? Swift_Connection_SMTP::ENC_OFF : (($this->encryption == "tls") ? Swift_Connection_SMTP::ENC_TLS : Swift_Connection_SMTP::ENC_SSL));
+                // Retrocompatibility
+                if (Tools::strtolower($this->encryption) === 'off') {
+                    $this->encryption = false;
+                }
+                $smtp = Swift_SmtpTransport::newInstance($this->server, $this->port, $this->encryption);
                 $smtp->setUsername($this->login);
                 $smtp->setpassword($this->password);
                 $smtp->setTimeout(5);
-                $swift = new Swift($smtp);
+                $swift = Swift_Mailer::newInstance($smtp);
             } else {
                 // Test with normal PHP mail() call
-                $swift = new Swift(new Swift_Connection_NativeMail());
+                $swift = Swift_Mailer::newInstance(Swift_MailTransport::newInstance());
             }
 
+            $message = Swift_Message::newInstance();
+
+            $message
+                ->setFrom($this->email)
+                ->setTo('no-reply@'.Tools::getHttpHost(false, false, true))
+                ->setSubject($subject)
+                ->setBody($content);
             $message = new Swift_Message($subject, $content, 'text/html');
-            if (@$swift->send($message, $this->email, 'no-reply@'.Tools::getHttpHost(false, false, true))) {
-                $result = false;
+            if (@$swift->send($message)) {
+                $result = true;
             } else {
                 $result = 'Could not send message';
             }
 
             $swift->disconnect();
-        } catch (Swift_Exception $e) {
+        } catch (Swift_SwiftException $e) {
             $result = $e->getMessage();
         }
 

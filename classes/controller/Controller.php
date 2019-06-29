@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -374,24 +374,34 @@ abstract class ControllerCore
     {
         if (is_array($js_uri)) {
             foreach ($js_uri as $js_file) {
-                $js_path = $js_file;
+                $js_file = explode('?', $js_file);
+                $version = '';
+                if (isset($js_file[1]) && $js_file[1]) {
+                    $version = $js_file[1];
+                }
+                $js_path = $js_file = $js_file[0];
                 if ($check_path) {
                     $js_path = Media::getJSPath($js_file);
                 }
 
                 // $key = is_array($js_path) ? key($js_path) : $js_path;
                 if ($js_path && !in_array($js_path, $this->js_files)) {
-                    $this->js_files[] = $js_path;
+                    $this->js_files[] = $js_path.($version ? '?'.$version : '');
                 }
             }
         } else {
-            $js_path = $js_uri;
+            $js_uri = explode('?', $js_uri);
+            $version = '';
+            if (isset($js_uri[1]) && $js_uri[1]) {
+                $version = $js_uri[1];
+            }
+            $js_path = $js_uri = $js_uri[0];
             if ($check_path) {
                 $js_path = Media::getJSPath($js_uri);
             }
 
             if ($js_path && !in_array($js_path, $this->js_files)) {
-                $this->js_files[] = $js_path;
+                $this->js_files[] = $js_path.($version ? '?'.$version : '');
             }
         }
     }

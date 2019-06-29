@@ -17,13 +17,18 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
 
 $(function() {
-		var storage = getStorageAvailable();
+
+		var storage = false;
+
+		if (typeof(getStorageAvailable) !== 'undefined') {
+			storage = getStorageAvailable();
+		}
 
 		initHelp = function(){
 			$('#main').addClass('helpOpen');
@@ -64,7 +69,7 @@ $(function() {
 					storage.setItem('helpOpen', false);
 			}
 		});
-		
+
 		// Help persistency
 		if (storage && storage.getItem('helpOpen') == "true") {
 		 	$('a.btn-help').trigger('click');
@@ -97,20 +102,6 @@ $(function() {
 			['fr','20840479']
 		];
 
-
-	function getStorageAvailable() {
-		test = 'foo'; 
-		storage =  window.localStorage || window.sessionStorage;
-	    try {
-	        storage.setItem(test, test);
-	        storage.removeItem(test);
-	        		//open help if localstorage helpOpen = true;
-	        return storage;
-	    } 
-	    catch (error) {
-	        return null;
-	    }
-	}
 
 	// change help icon
 	function iconCloseHelp(){

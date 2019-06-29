@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="16px" height="18px" viewBox="0 0 16 18" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 51.3 (57544) - http://www.bohemiancoding.com/sketch -->
+    <title>icon-calendar</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" stroke-linecap="round" stroke-linejoin="round">
+        <g id="Product-Page-3" transform="translate(-1059.000000, -289.000000)" stroke="#000000">
+            <g id="buy-card/hurry-up" transform="translate(915.000000, 166.000000)">
+                <g id="dropdown/with-label/date-normal" transform="translate(20.000000, 90.000000)">
+                    <g id="icon-calendar" transform="translate(125.000000, 34.000000)">
+                        <rect id="Rectangle-path" x="0" y="2" width="14" height="14" rx="2"></rect>
+                        <path d="M10,0 L10,3" id="Shape"></path>
+                        <path d="M4,0 L4,3" id="Shape"></path>
+                        <path d="M0,6 L14,6" id="Shape"></path>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

@@ -15,7 +15,7 @@
 	</div>
 	<form action="{$currentIndex|escape}&amp;token={$currentToken|escape}&amp;addcart_rule" id="cart_rule_form" class="form-horizontal" method="post">
 		{if $currentObject->id}<input type="hidden" name="id_cart_rule" value="{$currentObject->id|intval}" />{/if}
-		<input type="hidden" id="currentFormTab" name="currentFormTab" value="informations" />
+		<input type="hidden" id="currentFormTab" name="currentFormTab" value="{if isset($smarty.post.currentFormTab)}{$smarty.post.currentFormTab|escape:'quotes'}{else}informations{/if}" />
 		<div id="cart_rule_informations" class="panel cart_rule_tab">
 			{include file='controllers/cart_rules/informations.tpl'}
 		</div>

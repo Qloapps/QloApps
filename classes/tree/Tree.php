@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -387,10 +387,10 @@ class TreeCore
             $bo_theme = 'default';
         }
 
-        $js_path = __PS_BASE_URI__.$admin_webpath.'/themes/'.$bo_theme.'/js/tree.js';
+        $js_path = __PS_BASE_URI__.$admin_webpath.'/themes/'.$bo_theme.'/js/tree.js?v=' ._PS_VERSION_;
         if ($this->getContext()->controller->ajax) {
             if (!$this->_no_js) {
-                $html = '<script type="text/javascript" src="'.$js_path.'"></script>';
+                $html = '<script type="text/javascript">$(function(){ $.ajax({url: "' .$js_path . '",cache:true,dataType: "script"})});</script>';
             }
         } else {
             $this->getContext()->controller->addJs($js_path);

@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -58,7 +58,7 @@ class SupplierControllerCore extends FrontController
         if ($id_supplier = (int)Tools::getValue('id_supplier')) {
             $this->supplier = new Supplier($id_supplier, $this->context->language->id);
 
-            if (!Validate::isLoadedObject($this->supplier) || !$this->supplier->active) {
+            if (!Validate::isLoadedObject($this->supplier) || !$this->supplier->active || !$this->supplier->isAssociatedToShop()) {
                 header('HTTP/1.1 404 Not Found');
                 header('Status: 404 Not Found');
                 $this->errors[] = Tools::displayError('The chosen supplier does not exist.');

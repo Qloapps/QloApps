@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -36,9 +36,11 @@ class ContactControllerCore extends FrontController
     public function postProcess()
     {
         if (Tools::isSubmit('submitMessage')) {
+            $saveContactKey = $this->context->cookie->contactFormKey;
             $extension = array('.txt', '.rtf', '.doc', '.docx', '.pdf', '.zip', '.png', '.jpeg', '.gif', '.jpg');
             $file_attachment = Tools::fileAttachment('fileUpload');
             $message = Tools::getValue('message'); // Html entities is not usefull, iscleanHtml check there is no bad html tags.
+            $url = Tools::getValue('url');
             if (!($from = trim(Tools::getValue('from'))) || !Validate::isEmail($from)) {
                 $this->errors[] = Tools::displayError('Invalid email address.');
             } elseif (!$message) {
@@ -51,6 +53,8 @@ class ContactControllerCore extends FrontController
                 $this->errors[] = Tools::displayError('An error occurred during the file-upload process.');
             } elseif (!empty($file_attachment['name']) && !in_array(Tools::strtolower(substr($file_attachment['name'], -4)), $extension) && !in_array(Tools::strtolower(substr($file_attachment['name'], -5)), $extension)) {
                 $this->errors[] = Tools::displayError('Bad file extension');
+            } elseif ($url === false || !empty($url) || $saveContactKey != (Tools::getValue('contactKey'))) {
+                $this->errors[] = Tools::displayError('An error occurred while sending the message.');
             } else {
                 $customer = $this->context->customer;
                 if (!$customer->id) {
@@ -58,6 +62,14 @@ class ContactControllerCore extends FrontController
                 }
 
                 $id_order = (int)$this->getOrder();
+
+                /**
+                 * Check if customer select his order.
+                 */
+                if (!empty($id_order)) {
+                    $order = new Order($id_order);
+                    $id_order = (int) $order->id_customer === (int) $customer->id ? $id_order : 0;
+                }
 
                 if (!((
                         ($id_customer_thread = (int)Tools::getValue('id_customer_thread'))
@@ -183,13 +195,10 @@ class ContactControllerCore extends FrontController
                         }
                     }
 
-                    if (empty($contact->email)) {
-                        Mail::Send($this->context->language->id, 'contact_form', ((isset($ct) && Validate::isLoadedObject($ct)) ? sprintf(Mail::l('Your message has been correctly sent #ct%1$s #tc%2$s'), $ct->id, $ct->token) : Mail::l('Your message has been correctly sent')), $var_list, $from, null, null, null, $file_attachment);
-                    } else {
+                    if (!empty($contact->email)) {
                         if (!Mail::Send($this->context->language->id, 'contact', Mail::l('Message from contact form').' [no_sync]',
                             $var_list, $contact->email, $contact->name, null, null,
-                                    $file_attachment, null, _PS_MAIL_DIR_, false, null, null, $from) ||
-                                !Mail::Send($this->context->language->id, 'contact_form', ((isset($ct) && Validate::isLoadedObject($ct)) ? sprintf(Mail::l('Your message has been correctly sent #ct%1$s #tc%2$s'), $ct->id, $ct->token) : Mail::l('Your message has been correctly sent')), $var_list, $from, null, null, null, $file_attachment, null, _PS_MAIL_DIR_, false, null, null, $contact->email)) {
+                                    $file_attachment, null,    _PS_MAIL_DIR_, false, null, null, $from)) {
                             $this->errors[] = Tools::displayError('An error occurred while sending the message.');
                         }
                     }
@@ -214,8 +223,8 @@ class ContactControllerCore extends FrontController
         // GOOGLE MAP
         $language = $this->context->language;
         $country = $this->context->country;
-        $WK_GOOGLE_API_KEY = Configuration::get('WK_GOOGLE_API_KEY');
-        $this->addJs("https://maps.googleapis.com/maps/api/js?key=$WK_GOOGLE_API_KEY&libraries=places&language=$language->iso_code&region=$country->iso_code");
+        $PS_API_KEY = Configuration::get('PS_API_KEY');
+        $this->addJs("https://maps.googleapis.com/maps/api/js?key=$PS_API_KEY&libraries=places&language=$language->iso_code&region=$country->iso_code");
     }
 
     /**
@@ -271,13 +280,15 @@ class ContactControllerCore extends FrontController
                         $hotel['image_url'] = _MODULE_DIR_.'hotelreservationsystem/views/img/hotel_img/'.
                         $objHtlImg->hotel_image_id.'.jpg';
                     } else {
-                        $hotel['image_url'] = _MODULE_DIR_.'hotelreservationsystem/views/img/Slices/black-opacity-5.png';
+                        $hotel['image_url'] = _MODULE_DIR_.'hotelreservationsystem/views/img/Slices/hotel-default-icon.png';
                     }
                 } else {
-                    $hotel['image_url'] = _MODULE_DIR_.'hotelreservationsystem/views/img/Slices/black-opacity-5.png';
+                    $hotel['image_url'] = _MODULE_DIR_.'hotelreservationsystem/views/img/Slices/hotel-default-icon.png';
                 }
             }
         }
+	$contactKey = md5(uniqid(microtime(), true));
+        $this->context->cookie->__set('contactFormKey', $contactKey);
         $this->context->smarty->assign(
             array(
                 'hotelsInfo' => $hotelsInfo,
@@ -285,7 +296,8 @@ class ContactControllerCore extends FrontController
                 'gblHtlEmail' => $gblHtlEmail,
                 'gblHtlAddress' => $gblHtlAddress,
                 'contacts' => Contact::getContacts($this->context->language->id),
-                'message' => html_entity_decode(Tools::getValue('message'))
+                'message' => html_entity_decode(Tools::getValue('message')),
+	        'contactKey' => $contactKey,
             )
         );
 
@@ -340,12 +352,12 @@ class ContactControllerCore extends FrontController
             $orders = Order::getByReference($reference);
             if ($orders) {
                 foreach ($orders as $order) {
-                    $id_order = $order->id;
+                    $id_order = (int)$order->id;
                     break;
                 }
             }
-        } else {
-            $id_order = Tools::getValue('id_order');
+        } elseif (Order::getCartIdStatic((int)Tools::getValue('id_order'))) {
+            $id_order = (int)Tools::getValue('id_order');
         }
         return (int)$id_order;
     }

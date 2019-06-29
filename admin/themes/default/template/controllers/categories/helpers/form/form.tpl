@@ -1,5 +1,5 @@
 {*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -18,7 +18,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
@@ -41,6 +41,12 @@
 	{else}
 		{$smarty.block.parent}
 	{/if}
+	{if in_array($input.name, ['image', 'thumb'])}
+		<div class="col-lg-6">
+			<div class="help-block">{l s='Recommended dimensions (for the default theme): %1spx x %2spx' sprintf=[$input.format.width, $input.format.height]}
+			</div>
+		</div>
+	{/if}
 {/block}
 {block name="description"}
 	{$smarty.block.parent}
@@ -55,7 +61,7 @@
 {/block}
 {block name="input_row"}
 	{$smarty.block.parent}
-	{if ($input.name == 'image')}
+	{if ($input.name == 'thumb')}
 	{$displayBackOfficeCategory}
 	{/if}
 {/block}

@@ -1,4 +1,19 @@
 -----------------------------
+# V1.1.2 to V1.1.3
+-----------------------------
+
+## Improved/changed features
+
+[*] BO : Validate::isGenericName validation added for title and description fields.
+[*] BO : Render list filter issues resolved.
+
+## Update Policy
+
+- Mobule need only file update, can be updated only by UPLOADING new version on module
+
+
+
+-----------------------------
 # V1.1.1 to V1.1.2
 -----------------------------
 

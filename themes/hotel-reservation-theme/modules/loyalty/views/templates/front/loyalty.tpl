@@ -1,5 +1,5 @@
 {*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -18,7 +18,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
@@ -62,61 +62,111 @@
 		<p class="alert alert-warning">{l s='You have not placed any orders.' mod='loyalty'}</p>
 	{/if}
 </div>
-<div id="pagination" class="pagination">
-	{if $nbpagination < $orders|@count}
-		<ul class="pagination">
-		{if $page != 1}
-			{assign var='p_previous' value=$page-1}
-			<li id="pagination_previous">
-				<a href="{summarypaginationlink p=$p_previous n=$nbpagination}" title="{l s='Previous' mod='loyalty'}" rel="nofollow">&laquo;&nbsp;{l s='Previous' mod='loyalty'}</a>
-			</li>
+<div class="bottom-pagination-content clearfix">
+	<div id="pagination" class="pagination clearfix">
+		{if $orders|@count > $nbpagination}
+			<form class="showall" action="{$pagination_link}" method="get">
+				<div>
+					<button type="submit" class="btn btn-default button exclusive-medium">
+						<span>{l s='Show all' mod='loyalty'}</span>
+					</button>
+					<input name="n" id="nb_item" class="hidden" value="{$orders|@count}" />
+					<input name="process" class="hidden" value="summary" />
+				</div>
+			</form>
+		{/if}
+		{if $nbpagination < $orders|@count}
+			<ul class="pagination">
+			{if $page != 1}
+				{assign var='p_previous' value=$page-1}
+				<li id="pagination_previous" class="pagination_previous">
+					<a href="{summarypaginationlink p=$p_previous n=$nbpagination}" title="{l s='Previous' mod='loyalty'}" rel="prev">
+						<i class="icon-chevron-left"></i> <b>{l s='Previous' mod='loyalty'}</b>
+					</a>
+				</li>
+			{else}
+				<li id="pagination_previous" class="disabled pagination_previous">
+					<span>
+						<i class="icon-chevron-left"></i> <b>{l s='Previous' mod='loyalty'}</b>
+					</span>
+				</li>
+			{/if}
+			{if $page > 2}
+				<li>
+					<a href="{summarypaginationlink p='1' n=$nbpagination}" rel="nofollow"><span>1</span></a>
+				</li>
+				{if $page > 3}
+					<li class="truncate">
+						<span>
+							<span>...</span>
+						</span>
+					</li>
+				{/if}
+			{/if}
+			{section name=pagination start=$page-1 loop=$page+2 step=1}
+				{if $page == $smarty.section.pagination.index}
+					<li class="active current">
+						<span>
+							<span>{$page|escape:'html':'UTF-8'}</span>
+						</span>
+					</li>
+				{elseif $smarty.section.pagination.index > 0 && $orders|@count+$nbpagination > ($smarty.section.pagination.index)*($nbpagination)}
+					<li>
+						<a href="{summarypaginationlink p=$smarty.section.pagination.index n=$nbpagination}">
+							<span>{$smarty.section.pagination.index|escape:'html':'UTF-8'}</span>
+						</a>
+					</li>
+				{/if}
+			{/section}
+			{if $max_page-$page > 1}
+				{if $max_page-$page > 2}
+					<li class="truncate">
+						<span>
+							<span>...</span>
+						</span>
+					</li>
+				{/if}
+				<li>
+					<a href="{summarypaginationlink p=$max_page n=$nbpagination}">
+						<span>{$max_page}</span>
+					</a>
+				</li>
+			{/if}
+			{if $orders|@count > $page * $nbpagination}
+				{assign var='p_next' value=$page+1}
+				<li id="pagination_next" class="pagination_next">
+					<a href="{summarypaginationlink p=$p_next n=$nbpagination}" rel="next">
+						<b>{l s='Next' mod='loyalty'}</b> <i class="icon-chevron-right"></i>
+					</a>
+				</li>
+			{else}
+				<li id="pagination_next" class="pagination_next disabled">
+					<span>
+						<b>{l s='Next' mod='loyalty'}</b> <i class="icon-chevron-right"></i>
+					</span>
+				</li>
+			{/if}
+			</ul>
+		{/if}
+	</div>
+	<div class="product-count">
+		{if ($nbpagination*$page) < $orders|@count }
+			{assign var='itemShowing' value=$nbpagination*$page}
 		{else}
-			<li id="pagination_previous" class="disabled"><span>&laquo;&nbsp;{l s='Previous' mod='loyalty'}</span></li>
+			{assign var='itemShowing' value=($nbpagination*$page-$orders|@count-$nbpagination*$page)*-1}
 		{/if}
-		{if $page > 2}
-			<li><a href="{summarypaginationlink p='1' n=$nbpagination}" rel="nofollow">1</a></li>
-			{if $page > 3}
-				<li class="truncate">...</li>
-			{/if}
-		{/if}
-		{section name=pagination start=$page-1 loop=$page+2 step=1}
-			{if $page == $smarty.section.pagination.index}
-				<li class="current"><span>{$page|escape:'html':'UTF-8'}</span></li>
-			{elseif $smarty.section.pagination.index > 0 && $orders|@count+$nbpagination > ($smarty.section.pagination.index)*($nbpagination)}
-				<li><a href="{summarypaginationlink p=$smarty.section.pagination.index n=$nbpagination}">{$smarty.section.pagination.index|escape:'html':'UTF-8'}</a></li>
-			{/if}
-		{/section}
-		{if $max_page-$page > 1}
-			{if $max_page-$page > 2}
-				<li class="truncate">...</li>
-			{/if}
-			<li><a href="{summarypaginationlink p=$max_page n=$nbpagination}">{$max_page}</a></li>
-		{/if}
-		{if $orders|@count > $page * $nbpagination}
-			{assign var='p_next' value=$page+1}
-			<li id="pagination_next"><a href="{summarypaginationlink p=$p_next n=$nbpagination}" title="{l s='Next' mod='loyalty'}" rel="nofollow">{l s='Next' mod='loyalty'}&nbsp;&raquo;</a></li>
+		{if $page==1}
+			{assign var='itemShowingStart' value=1}
 		{else}
-			<li id="pagination_next" class="disabled"><span>{l s='Next' mod='loyalty'}&nbsp;&raquo;</span></li>
+			{assign var='itemShowingStart' value=$nbpagination*$page-$nbpagination+1}
 		{/if}
-		</ul>
-	{/if}
-	{if $orders|@count > 10}
-		<form action="{$pagination_link}" method="get" class="pagination">
-			<p>
-				<input type="submit" class="button_mini" value="{l s='OK'  mod='loyalty'}" />
-				<label for="nb_item">{l s='items:' mod='loyalty'}</label>
-				<select name="n" id="nb_item">
-				{foreach from=$nArray item=nValue}
-					{if $nValue <= $orders|@count}
-						<option value="{$nValue|escape:'html':'UTF-8'}" {if $nbpagination == $nValue}selected="selected"{/if}>{$nValue|escape:'html':'UTF-8'}</option>
-					{/if}
-				{/foreach}
-				</select>
-				<input type="hidden" name="p" value="1" />
-			</p>
-		</form>
+		{if $orders|@count > 1}
+			{l s='Showing %1$d - %2$d of %3$d items' sprintf=[$itemShowingStart, $itemShowing, $orders|@count] mod='loyalty'}
+		{else}
+			{l s='Showing %1$d - %2$d of 1 item' sprintf=[$itemShowingStart, $itemShowing] mod='loyalty'}
 	{/if}
 	</div>
+</div>
 
 <p>{l s='Vouchers generated here are usable in the following categories : ' mod='loyalty'}
 {if $categories}{$categories}{else}{l s='All' mod='loyalty'}{/if}</p>
@@ -178,7 +228,7 @@
 	</table>
 	<div id="block-order-detail" class="unvisible">&nbsp;</div>
 </div>
-	
+
 {if $minimalLoyalty > 0}<p>{l s='The minimum order amount in order to use these vouchers is:' mod='loyalty'} {convertPrice price=$minimalLoyalty}</p>{/if}
 
 {else}
@@ -193,6 +243,6 @@
 		<a class="btn btn-default button button-small" href="{$link->getPageLink('my-account', true)|escape:'html':'UTF-8'}" title="{l s='Back to Your Account' mod='loyalty'}" rel="nofollow"><span><i class="icon-chevron-left"></i>{l s='Back to Your Account' mod='loyalty'}</span></a>
 	</li>
 	<li>
-		<a class="btn btn-default button button-small" href="{$base_dir}" title="{l s='Home' mod='loyalty'}"><span><i class="icon-chevron-left"></i>{l s='Home' mod='loyalty'}</span></a>
+		<a class="btn btn-default button button-small" href="{if isset($force_ssl) && $force_ssl}{$base_dir_ssl}{else}{$base_dir}{/if}" title="{l s='Home' mod='loyalty'}"><span><i class="icon-chevron-left"></i>{l s='Home' mod='loyalty'}</span></a>
 	</li>
 </ul>

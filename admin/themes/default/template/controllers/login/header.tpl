@@ -1,5 +1,5 @@
 {*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -18,7 +18,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
@@ -41,13 +41,23 @@
 		<title>
 			{$shop_name} {if $meta_title != ''}{if isset($navigationPipe)}{$navigationPipe|escape:'html':'UTF-8'}{else}&gt;{/if} {$meta_title}{/if} (PrestaShop&trade;)
 		</title>
-		{foreach from=$css_files key=css_uri item=media}
-			<link href="{$css_uri}" rel="stylesheet" type="text/css" media="{$media}" />
-		{/foreach}
+		{if isset($css_files)}
+			{foreach from=$css_files key=css_uri item=media}
+				{if $css_uri == 'lteIE9'}
+					<!--[if lte IE 9]>
+					{foreach from=$css_files[$css_uri] key=css_uriie9 item=mediaie9}
+					<link rel="stylesheet" href="{$css_uriie9|escape:'html':'UTF-8'}" type="text/css" media="{$mediaie9|escape:'html':'UTF-8'}" />
+					{/foreach}
+					<![endif]-->
+				{else}
+					<link rel="stylesheet" href="{$css_uri|escape:'html':'UTF-8'}" type="text/css" media="{$media|escape:'html':'UTF-8'}" />
+				{/if}
+			{/foreach}
+		{/if}
 		{foreach from=$js_files item=js_uri}
 			<script type="text/javascript" src="{$js_uri}"></script>
 		{/foreach}
-		<script type="text/javascript" src="../js/admin/login.js?{$smarty.now}"></script>
+		<script type="text/javascript" src="../js/admin/login.js?v={$smarty.const._PS_VERSION_|escape:'html':'UTF-8'}"></script>
 
 		{if (isset($js_def) && count($js_def) || isset($js_files) && count($js_files))}
 			{include file=$smarty.const._PS_ALL_THEMES_DIR_|cat:"javascript.tpl"}

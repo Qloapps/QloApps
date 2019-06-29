@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -309,7 +309,14 @@ class OrderOpcControllerCore extends ParentOrderController
                             $this->context->cart->setNoMultishipping();
                             $this->ajaxDie();
                             break;
-
+                        case 'getRoomTypeBookingDemands':
+                            $this->ajaxDie($this->getRoomTypeBookingDemands());
+                            exit;
+                            break;
+                        case 'changeRoomDemands':
+                            $this->ajaxDie($this->changeRoomDemands());
+                            exit;
+                            break;
                         default:
                             throw new PrestaShopException('Unknown method "'.Tools::getValue('method').'"');
                     }
@@ -405,6 +412,21 @@ class OrderOpcControllerCore extends ParentOrderController
         }
 
         $this->context->smarty->assign('checkout_process_steps', $this->checkoutProcess->getSteps());
+
+        // set room type demands
+        $objGlobalDemand = new HotelRoomTypeGlobalDemand();
+        $allDemands = $objGlobalDemand->getAllDemands();
+        $objCurrency = new Currency(Configuration::get('PS_CURRENCY_DEFAULT'));
+        // get room type additional services
+        $objRoomDemand = new HotelRoomTypeDemand();
+        $this->context->smarty->assign(
+            array (
+                'allDemands' => $allDemands,
+                'defaultcurrencySign' => $objCurrency->sign,
+            )
+        );
+
+
         $this->context->smarty->assign(
             array(
                 'THEME_DIR' => _THEME_DIR_,
@@ -538,12 +560,11 @@ class OrderOpcControllerCore extends ParentOrderController
                     }
 
                     // For Advanced Payment
-                    $advance_payment_active = Configuration::get('WK_ALLOW_ADVANCED_PAYMENT');
-                    if ($advance_payment_active) {
-                        $obj_adv_pmt = new HotelAdvancedPayment();
+                    $objAdvPayment = new HotelAdvancedPayment();
+                    if ($advance_payment_active = $objAdvPayment->isAdvancePaymentAvailableForCurrentCart()) {
 
-                        // $adv_amount = Tools::ps_round($obj_adv_pmt->getMinAdvPaymentAmount(), 2);
-                        $adv_amount = $obj_adv_pmt->getMinAdvPaymentAmount();
+                        // $adv_amount = Tools::ps_round($objAdvPayment->getMinAdvPaymentAmount(), 2);
+                        $adv_amount = $objAdvPayment->getMinAdvPaymentAmount();
                         if (Tools::isSubmit('submitAdvPayment')) {
                             $id_customer_adv = Tools::getValue('id_customer_adv');
                             if ($id_customer_adv) {
@@ -579,13 +600,12 @@ class OrderOpcControllerCore extends ParentOrderController
                                 $obj_customer_adv = new HotelCustomerAdvancedPayment($customer_adv_dtl['id']);
                                 $obj_customer_adv->id_currency = $this->context->cart->id_currency;
                                 $obj_customer_adv->total_paid_amount = $adv_amount;
-                                $obj_customer_adv->total_order_amount = $this->context->cart->getOrderTotal(true, Cart::ONLY_PRODUCTS);
+                                $obj_customer_adv->total_order_amount = $this->context->cart->getOrderTotal(true, Cart::BOTH);
                                 $obj_customer_adv->save();
 
                                 Tools::redirect($this->context->link->getPageLink('order-opc'));
                             }
-
-                            $due_amount = $this->context->cart->getOrderTotal(true, Cart::ONLY_PRODUCTS) - $customer_adv_dtl['total_paid_amount'];
+                            $due_amount = $this->context->cart->getOrderTotal(true, Cart::BOTH) - $customer_adv_dtl['total_paid_amount'];
                             $customer_adv_dtl['due_amount'] = $due_amount;
 
                             $cart_rules = $this->context->cart->getCartRules();
@@ -604,6 +624,18 @@ class OrderOpcControllerCore extends ParentOrderController
                         $this->context->smarty->assign('adv_amount', $adv_amount);
                         $this->context->smarty->assign('advance_payment_active', $advance_payment_active);
                     }
+                }
+                // total price of extra demands in the cart
+                $objCartBookingData = new HotelCartBookingData();
+                if ($totalDemandsPrice = $objCartBookingData->getCartExtraDemands(
+                    $this->context->cart->id,
+                    0,
+                    0,
+                    0,
+                    0,
+                    1
+                )) {
+                    $this->context->smarty->assign('totalDemandsPrice', $totalDemandsPrice);
                 }
             }
             /*Check Order restrict condition before Payment by the customer*/
@@ -802,8 +834,15 @@ class OrderOpcControllerCore extends ParentOrderController
         $freeAdvancePaymentOrder = false;
         if (Module::isInstalled('hotelreservationsystem')) {
             require_once(_PS_MODULE_DIR_.'hotelreservationsystem/define.php');
-            $obj_adv_pmt = new HotelAdvancedPayment();
-            $freeAdvancePaymentOrder = $obj_adv_pmt->_checkFreeAdvancePaymentOrder();
+            $objCustomerAdvPay = new HotelCustomerAdvancedPayment();
+            if ($objCustomerAdvPay->getClientAdvPaymentDtl(
+                $this->context->cart->id,
+                $this->context->cart->id_guest,
+                1
+            )) {
+                $objAdvPayment = new HotelAdvancedPayment();
+                $freeAdvancePaymentOrder = $objAdvPayment->_checkFreeAdvancePaymentOrder();
+            }
         }
         /* Bypass payment step if total is 0 */
         if ($this->context->cart->getOrderTotal() <= 0 || $freeAdvancePaymentOrder) {
@@ -918,6 +957,7 @@ class OrderOpcControllerCore extends ParentOrderController
                 $dlv_adr_fields[] = trim($field_name);
             }
         }
+
         foreach ($require_form_fields_list as $field_name) {
             if (!in_array($field_name, $inv_adr_fields)) {
                 $inv_adr_fields[] = trim($field_name);
@@ -969,5 +1009,67 @@ class OrderOpcControllerCore extends ParentOrderController
             Product::addCustomizationPrice($result['summary']['products'], $result['customizedDatas']);
         }
         return $result;
+    }
+
+    public function getRoomTypeBookingDemands()
+    {
+        $extraDemandsTpl = '';
+        if ($idProduct = Tools::getValue('id_product')) {
+            if (($dateFrom = Tools::getValue('date_from'))
+                && ($dateTo = Tools::getValue('date_to'))
+            ) {
+                $objCartBookingData = new HotelCartBookingData();
+                if ($selectedRoomDemands = $objCartBookingData->getCartExtraDemands(
+                    $this->context->cart->id,
+                    $idProduct,
+                    0,
+                    $dateFrom,
+                    $dateTo
+                )) {
+                    // get room type additional demands
+                    $objRoomDemands = new HotelRoomTypeDemand();
+                    if ($roomTypeDemands = $objRoomDemands->getRoomTypeDemands($idProduct)) {
+                        foreach ($roomTypeDemands as &$demand) {
+                            // if demand has advance options then set demand price as first advance option price.
+                            if (isset($demand['adv_option']) && $demand['adv_option']) {
+                                $demand['price'] = current($demand['adv_option'])['price'];
+                            }
+                        }
+                        foreach ($selectedRoomDemands as &$selectedDemand) {
+                            if (isset($selectedDemand['extra_demands']) && $selectedDemand['extra_demands']) {
+                                $extraDmd = array();
+                                foreach ($selectedDemand['extra_demands'] as $sDemand) {
+                                    $selectedDemand['selected_global_demands'][] = $sDemand['id_global_demand'];
+                                    $extraDmd[$sDemand['id_global_demand'].'-'.$sDemand['id_option']] = $sDemand;
+                                }
+                                $selectedDemand['extra_demands'] = $extraDmd;
+                            }
+                        }
+                        $this->context->smarty->assign('roomTypeDemands', $roomTypeDemands);
+                        $this->context->smarty->assign('selectedRoomDemands', $selectedRoomDemands);
+                        $extraDemandsTpl .= $this->context->smarty->fetch(
+                            _PS_THEME_DIR_.'_partials/cart_booking_demands.tpl'
+                        );
+                    }
+                }
+            }
+        }
+        return $extraDemandsTpl;
+    }
+
+    public function changeRoomDemands()
+    {
+        if ($idCartBooking = Tools::getValue('id_cart_booking')) {
+            if (Validate::isLoadedObject($objCartbookingCata = new HotelCartBookingData($idCartBooking))) {
+                $roomDemands = Tools::getValue('room_demands');
+                $roomDemands = Tools::jsonDecode($roomDemands, true);
+                $roomDemands = Tools::jsonEncode($roomDemands);
+                $objCartbookingCata->extra_demands = $roomDemands;
+                if ($objCartbookingCata->save()) {
+                    die('1');
+                }
+            }
+        }
+        die('0');
     }
 }

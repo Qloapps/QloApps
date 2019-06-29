@@ -1,6 +1,6 @@
 <?php
 /**
- * 2007-2015 PrestaShop
+ * 2007-2017 PrestaShop
  *
  * NOTICE OF LICENSE
  *
@@ -19,7 +19,7 @@
  * needs please refer to http://www.prestashop.com for more information.
  *
  *  @author 	PrestaShop SA <contact@prestashop.com>
- *  @copyright  2007-2015 PrestaShop SA
+ *  @copyright  2007-2017 PrestaShop SA
  *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PrestaShop SA
  */
@@ -91,7 +91,9 @@ class MediaCore
     /**
      * @var string pattern used in packJSinHTML
      */
-    public static $pattern_js = '#\s*(<\s*script(?:\s[^>]*(?:javascript)[^>]*|)+>)(.*)(<\s*/script\s*[^>]*>)\s*#Uims';
+    public static $pattern_js = '/(<\s*script(?:\s+[^>]*(?:javascript|src)[^>]*)?\s*>)(.*)(<\s*\/script\s*[^>]*>)/Uims';
+
+    protected static $pattern_keepinline = 'data-keepinline';
 
     public static function minifyHTML($html_content)
     {
@@ -133,19 +135,21 @@ class MediaCore
     {
         if (strlen($html_content) > 0) {
             $html_content_copy = $html_content;
-            $html_content = preg_replace_callback(
-                Media::$pattern_js,
-                array('Media', 'packJSinHTMLpregCallback'),
-                $html_content,
-                Media::getBackTrackLimit());
+            if (!preg_match('/'.Media::$pattern_keepinline.'/', $html_content)) {
+                    $html_content = preg_replace_callback(
+                    Media::$pattern_js,
+                    array('Media', 'packJSinHTMLpregCallback'),
+                    $html_content,
+                    Media::getBackTrackLimit());
 
-            // If the string is too big preg_replace return an error
-            // In this case, we don't compress the content
-            if (function_exists('preg_last_error') && preg_last_error() == PREG_BACKTRACK_LIMIT_ERROR) {
-                if (_PS_MODE_DEV_) {
-                    Tools::error_log('ERROR: PREG_BACKTRACK_LIMIT_ERROR in function packJSinHTML');
+                // If the string is too big preg_replace return an error
+                // In this case, we don't compress the content
+                if (function_exists('preg_last_error') && preg_last_error() == PREG_BACKTRACK_LIMIT_ERROR) {
+                    if (_PS_MODE_DEV_) {
+                        Tools::error_log('ERROR: PREG_BACKTRACK_LIMIT_ERROR in function packJSinHTML');
+                    }
+                    return $html_content_copy;
                 }
-                return $html_content_copy;
             }
             return $html_content;
         }
@@ -275,18 +279,13 @@ class MediaCore
             return false;
         }
 
-        $file_uri = '';
         if (!array_key_exists('host', $url_data)) {
             $media_uri_host_mode = '/'.ltrim(str_replace(str_replace(array('/', '\\'), DIRECTORY_SEPARATOR, _PS_CORE_DIR_), __PS_BASE_URI__, $media_uri), '/\\');
             $media_uri = '/'.ltrim(str_replace(str_replace(array('/', '\\'), DIRECTORY_SEPARATOR, _PS_ROOT_DIR_), __PS_BASE_URI__, $media_uri), '/\\');
-            $url_data['path'] = $media_uri;
             // remove PS_BASE_URI on _PS_ROOT_DIR_ for the following
-            $file_uri = _PS_ROOT_DIR_.Tools::str_replace_once(__PS_BASE_URI__, DIRECTORY_SEPARATOR, $url_data['path']);
-            $file_uri_host_mode = _PS_CORE_DIR_.Tools::str_replace_once(__PS_BASE_URI__, DIRECTORY_SEPARATOR, Tools::str_replace_once(_PS_CORE_DIR_, '', $url_data['path']));
-        }
+            $file_uri = _PS_ROOT_DIR_.Tools::str_replace_once(__PS_BASE_URI__, DIRECTORY_SEPARATOR, $media_uri);
+            $file_uri_host_mode = _PS_CORE_DIR_.Tools::str_replace_once(__PS_BASE_URI__, DIRECTORY_SEPARATOR, Tools::str_replace_once(_PS_CORE_DIR_, '', $media_uri));
 
-        // check if css files exists
-        if (!array_key_exists('host', $url_data)) {
             if (!@filemtime($file_uri) || @filesize($file_uri) === 0) {
                 if (!defined('_PS_HOST_MODE_')) {
                     return false;
@@ -296,9 +295,7 @@ class MediaCore
                     $media_uri = $media_uri_host_mode;
                 }
             }
-        }
 
-        if (!array_key_exists('host', $url_data)) {
             $media_uri = str_replace('//', '/', $media_uri);
         }
 
@@ -489,10 +486,11 @@ class MediaCore
      * Combine Compress and Cache CSS (ccc) calls
      *
      * @param array $css_files
+     * @param array $cache_path
      *
      * @return array processed css_files
      */
-    public static function cccCss($css_files)
+    public static function cccCss($css_files, $cache_path = null)
     {
         //inits
         $css_files_by_media = array();
@@ -501,7 +499,9 @@ class MediaCore
         $compressed_css_files_not_found = array();
         $compressed_css_files_infos = array();
         $protocol_link = Tools::getCurrentUrlProtocolPrefix();
-        $cache_path = _PS_THEME_DIR_.'cache/';
+        //if cache_path not specified, set curent theme cache folder
+        $cache_path = $cache_path ? $cache_path : _PS_THEME_DIR_.'cache/';
+        $css_split_need_refresh = false;
 
         // group css files by media
         foreach ($css_files as $filename => $media) {
@@ -565,6 +565,7 @@ class MediaCore
         foreach ($css_files_by_media as $media => $media_infos) {
             $cache_filename = $cache_path.'v_'.$version.'_'.$compressed_css_files_infos[$media]['key'].'_'.$media.'.css';
             if ($media_infos['date'] > $compressed_css_files_infos[$media]['date']) {
+                $css_split_need_refresh = true;
                 $cache_filename = $cache_path.'v_'.$version.'_'.$compressed_css_files_infos[$media]['key'].'_'.$media.'.css';
                 $compressed_css_files[$media] = '';
                 foreach ($media_infos['files'] as $file_infos) {
@@ -596,7 +597,67 @@ class MediaCore
             $url = str_replace(_PS_THEME_DIR_, _THEMES_DIR_._THEME_NAME_.'/', $filename);
             $css_files[$protocol_link.Tools::getMediaServer($url).$url] = $media;
         }
-        return array_merge($external_css_files, $css_files);
+
+        $compiled_css = array_merge($external_css_files, $css_files);
+
+        //If browser not IE <= 9, bypass ieCssSplitter
+        $user_agent = isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '';
+        if (!preg_match('/(?i)msie [1-9]/', $user_agent)) {
+            return $compiled_css;
+        }
+        $splitted_css = self::ieCssSplitter($compiled_css, $cache_path.'ie9', $css_split_need_refresh);
+
+        return array_merge($splitted_css, $compiled_css);
+    }
+
+    /**
+     * Splits stylesheets that go beyond the IE limit of 4096 selectors
+     *
+     * @param array $compiled_css
+     * @param string $cache_path
+     * @param bool $refresh
+     *
+     * @return array processed css_files
+     */
+    public static function ieCssSplitter($compiled_css, $cache_path, $refresh = false)
+    {
+        $splitted_css = array();
+        $protocol_link = Tools::getCurrentUrlProtocolPrefix();
+        //return cached css
+        if (!$refresh) {
+            foreach (array_diff(scandir($cache_path), array('..', '.')) as $file) {
+                $css_url = str_replace(_PS_ROOT_DIR_, '', $protocol_link.Tools::getMediaServer('').$cache_path.DIRECTORY_SEPARATOR.$file);
+                $splitted_css[$css_url] = 'all';
+            }
+            return array('lteIE9' => $splitted_css);
+        }
+        if (!is_dir($cache_path)) {
+            mkdir($cache_path, 0777, true);
+        }
+        require_once(_PS_ROOT_DIR_.'/tools/CssSplitter.php');
+        $splitter = new CssSplitter();
+        $css_rule_limit = 4095;
+        foreach ($compiled_css as $css => $media) {
+            $file_info = parse_url($css);
+            $file_basename = basename($file_info['path']);
+            $css_content = file_get_contents(_PS_ROOT_DIR_.$file_info['path']);
+            $count = $splitter->countSelectors($css_content) - $css_rule_limit;
+            if (($count / $css_rule_limit) > 0) {
+                $part = 2;
+                for ($i = $count; $i > 0; $i -= $css_rule_limit) {
+                    $new_css_name = 'ie_split_'.$part.'_'.$file_basename;
+                    $css_url = str_replace(_PS_ROOT_DIR_, '', $protocol_link.Tools::getMediaServer('').$cache_path.DIRECTORY_SEPARATOR.$new_css_name);
+                    $splitted_css[$css_url] = $media;
+                    file_put_contents($cache_path.DIRECTORY_SEPARATOR.$new_css_name, $splitter->split($css_content, $part));
+                    chmod($cache_path.DIRECTORY_SEPARATOR.$new_css_name, 0777);
+                    $part++;
+                }
+            }
+        }
+        if (count($splitted_css) > 0) {
+            return array('lteIE9' => $splitted_css);
+        }
+        return array('lteIE9' => array());
     }
 
     public static function getBackTrackLimit()
@@ -712,10 +773,8 @@ class MediaCore
     {
         foreach (array(_PS_THEME_DIR_.'cache') as $dir) {
             if (file_exists($dir)) {
-                foreach (scandir($dir) as $file) {
-                    if ($file[0] != '.' && $file != 'index.php') {
-                        Tools::deleteFile($dir.DIRECTORY_SEPARATOR.$file, array('index.php'));
-                    }
+                foreach (array_diff(scandir($dir), array('..', '.', 'index.php')) as $file) {
+                    Tools::deleteFile($dir.DIRECTORY_SEPARATOR.$file);
                 }
             }
         }
@@ -830,7 +889,7 @@ class MediaCore
                             }
                         }
                     }
-                    if (!in_array($src, Media::$inline_script_src)) {
+                    if (!in_array($src, Media::$inline_script_src) && !$script->getAttribute(Media::$pattern_keepinline)) {
                         Context::getContext()->controller->addJS($src);
                     }
                 }
@@ -864,10 +923,9 @@ class MediaCore
         }
 
         /* This is an inline script, add its content to inline scripts stack then remove it from content */
-        if (!empty($inline) && preg_match(Media::$pattern_js, $original) !== false && Media::$inline_script[] = $inline) {
+        if (!empty($inline) && preg_match(Media::$pattern_js, $original) !== false && !preg_match('/'.Media::$pattern_keepinline.'/', $original) && Media::$inline_script[] = $inline) {
             return '';
         }
-
         /* This is an external script, if it already belongs to js_files then remove it from content */
         preg_match('/src\s*=\s*["\']?([^"\']*)[^>]/ims', $original, $results);
         if (array_key_exists(1, $results)) {
@@ -875,12 +933,13 @@ class MediaCore
                 $protocol_link = Tools::getCurrentUrlProtocolPrefix();
                 $results[1] = $protocol_link.ltrim($results[1], '/');
             }
+
             if (in_array($results[1], Context::getContext()->controller->js_files) || in_array($results[1], Media::$inline_script_src)) {
                 return '';
             }
         }
 
         /* return original string because no match was found */
-        return $original;
+        return "\n".$original;
     }
 }

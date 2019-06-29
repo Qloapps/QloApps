@@ -17,24 +17,24 @@
     <field name="id_shop_group"/>
   </fields>
   <entities>
-    <cart id="cart_1" id_carrier="My_carrier" id_address_delivery="My_address" id_address_invoice="My_address" id_currency="1" id_customer="John" id_guest="2" secure_key="b44a6d9efd7a0076a0fbce6b15eaf3b1" recyclable="0" gift="0" allow_seperated_package="0" id_shop="1" id_shop_group="1">
-      <delivery_option>a:1:{i:3;s:2:"2,";}</delivery_option>
+    <cart id="cart_1" id_carrier="My_carrier" id_address_delivery="My_address" id_address_invoice="My_address" id_currency="1" id_customer="John" id_guest="guest_1" secure_key="b44a6d9efd7a0076a0fbce6b15eaf3b1" recyclable="0" gift="0" allow_seperated_package="0" id_shop="1" id_shop_group="1">
+      <delivery_option>{"3":"2,"}</delivery_option>
       <gift_message/>
     </cart>
     <cart id="cart_2" id_carrier="My_carrier" id_address_delivery="My_address" id_address_invoice="My_address" id_currency="1" id_customer="John" id_guest="guest_1" secure_key="b44a6d9efd7a0076a0fbce6b15eaf3b1" recyclable="0" gift="0" allow_seperated_package="0" id_shop="1" id_shop_group="1">
-      <delivery_option>a:1:{i:3;s:2:"2,";}</delivery_option>
+      <delivery_option>{"3":"2,"}</delivery_option>
       <gift_message/>
     </cart>
     <cart id="cart_3" id_carrier="My_carrier" id_address_delivery="My_address" id_address_invoice="My_address" id_currency="1" id_customer="John" id_guest="guest_1" secure_key="b44a6d9efd7a0076a0fbce6b15eaf3b1" recyclable="0" gift="0" allow_seperated_package="0" id_shop="1" id_shop_group="1">
-      <delivery_option>a:1:{i:3;s:2:"2,";}</delivery_option>
+      <delivery_option>{"3":"2,"}</delivery_option>
       <gift_message/>
     </cart>
     <cart id="cart_4" id_carrier="My_carrier" id_address_delivery="My_address" id_address_invoice="My_address" id_currency="1" id_customer="John" id_guest="guest_1" secure_key="b44a6d9efd7a0076a0fbce6b15eaf3b1" recyclable="0" gift="0" allow_seperated_package="0" id_shop="1" id_shop_group="1">
-      <delivery_option>a:1:{i:3;s:2:"2,";}</delivery_option>
+      <delivery_option>{"3":"2,"}</delivery_option>
       <gift_message/>
     </cart>
     <cart id="cart_5" id_carrier="My_carrier" id_address_delivery="My_address" id_address_invoice="My_address" id_currency="1" id_customer="John" id_guest="guest_1" secure_key="b44a6d9efd7a0076a0fbce6b15eaf3b1" recyclable="0" gift="0" allow_seperated_package="0" id_shop="1" id_shop_group="1">
-      <delivery_option>a:1:{i:3;s:2:"2,";}</delivery_option>
+      <delivery_option>{"3":"2,"}</delivery_option>
       <gift_message/>
     </cart>
   </entities>

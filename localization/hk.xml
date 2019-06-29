@@ -4,7 +4,7 @@
 		<currency name="Hong Kong Dollar" iso_code="HKD" iso_code_num="344" sign="$" blank="1" conversion_rate="11.0512" format="2" decimals="1" />
 	</currencies>
 	<languages>
-		<language iso_code="zh" />
+		<language iso_code="tw" />
 	</languages>
 	<units>
 		<unit type="weight" value="市制" />

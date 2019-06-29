@@ -32,9 +32,16 @@ $(document).ready(function () {
             var formData = new FormData();
             var file = files[i];
 
-            formData.append('hotel_image', file);
-            uploadHotelImages(formData);
+            if (typeof file != 'undefined') {
+                if (file.size > maxSizeAllowed) {
+                    showErrorMessage(filesizeError + '[' + file.name +  ']');
+                } else {
+                    formData.append('hotel_image', file);
+                    uploadHotelImages(formData);
+                }
+            }
         }
+        $('#hotel_images').val(null);
     });
 
     function uploadHotelImages(formData) {

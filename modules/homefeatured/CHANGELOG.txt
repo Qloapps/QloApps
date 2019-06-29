@@ -1,3 +1,12 @@
+------------------------------
+# V1.6.4 to V1.8.1
+------------------------------
+
+## Improved/Changed Features:
+
+* [CO] : Updated with latest PS version - 1.6.1.23.
+
+
 2014-04-22 18:58:43 +0200	// Changelog updated
 2014-04-07 18:48:47 +0200	// typo
 2014-04-07 18:46:31 +0200	[-] FO : Fix css bug #PSCFV-11485 for 1.5

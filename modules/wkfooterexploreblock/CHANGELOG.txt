@@ -1,4 +1,19 @@
 -----------------------------
+# V2.0.0 to V2.0.1
+-----------------------------
+
+## Improved/changed features
+
+[*] BO : Render list filter issues resolved..
+
+
+## Update Policy
+
+- Mobule need only file update, can be updated only by UPLOADING new version on module
+
+
+
+-----------------------------
 # V1.0.1 to V2.0.0
 -----------------------------
 

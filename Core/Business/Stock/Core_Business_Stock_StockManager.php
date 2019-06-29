@@ -1,6 +1,6 @@
 <?php
 /**
- * 2007-2015 PrestaShop
+ * 2007-2017 PrestaShop
  *
  * NOTICE OF LICENSE
  *
@@ -19,7 +19,7 @@
  * needs please refer to http://www.prestashop.com for more information.
  *
  *  @author 	PrestaShop SA <contact@prestashop.com>
- *  @copyright  2007-2015 PrestaShop SA
+ *  @copyright  2007-2017 PrestaShop SA
  *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PrestaShop SA
  */
@@ -47,7 +47,7 @@ class Core_Business_Stock_StockManager
                 $productStockAvailable = $stockManager->getStockAvailableByProduct($product_pack, $product_pack->id_pack_product_attribute, $id_shop);
                 $productStockAvailable->quantity = $productStockAvailable->quantity + ($delta_quantity * $product_pack->pack_quantity);
                 $productStockAvailable->update();
-                
+
                 $cacheManager->clean('StockAvailable::getQuantityAvailableByProduct_'.(int)$product_pack->id.'*');
             }
         }
@@ -59,7 +59,7 @@ class Core_Business_Stock_StockManager
             $stock_available->update();
         }
     }
-    
+
     /**
      * This will decrease (if needed) Packs containing this product
      * (with the right declinaison) if there is not enough product in stocks.
@@ -85,7 +85,7 @@ class Core_Business_Stock_StockManager
             }
 
             // Decrease stocks of the pack only if there is not enough items to constituate the actual pack stocks.
-            
+
             // How many packs can be constituated with the remaining product stocks
             $quantity_by_pack = $pack->pack_item_quantity;
             $max_pack_quantity = max(array(0, floor($stock_available->quantity / $quantity_by_pack)));
@@ -99,7 +99,7 @@ class Core_Business_Stock_StockManager
             }
         }
     }
-    
+
     /**
      * Will update Product available stock int he given declinaison. If product is a Pack, could decrease the sub products.
      * If Product is contained in a Pack, Pack could be decreased or not (only if sub product stocks become not sufficient).
@@ -124,6 +124,8 @@ class Core_Business_Stock_StockManager
         } else {
             // The product is not a pack
             $stockAvailable->quantity = $stockAvailable->quantity + $delta_quantity;
+            $stockAvailable->id_product = (int)$product->id;
+            $stockAvailable->id_product_attribute = (int)$id_product_attribute;
             $stockAvailable->update();
 
             // Decrease case only: the stock of linked packs should be decreased too.
@@ -145,6 +147,6 @@ class Core_Business_Stock_StockManager
             )
         );
     }
-    
-    
+
+
 }

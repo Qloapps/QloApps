@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -35,7 +35,7 @@ class PrestaShopExceptionCore extends Exception
     public function displayMessage()
     {
         header('HTTP/1.1 500 Internal Server Error');
-        if (_PS_MODE_DEV_ || defined('_PS_ADMIN_DIR_')) {
+        if (_PS_MODE_DEV_) {
             // Display error message
             echo '<style>
 				#psException{font-family: Verdana; font-size: 14px}
@@ -74,7 +74,8 @@ class PrestaShopExceptionCore extends Exception
                     $this->displayFileDebug($trace['file'], $trace['line'], $id);
                 }
                 if (isset($trace['args']) && count($trace['args'])) {
-                    $this->displayArgsDebug($trace['args'], $id);
+                    $args = $this->hideCriticalArgs($trace);
+                    $this->displayArgsDebug($args, $id);
                 }
                 echo '</li>';
             }
@@ -120,6 +121,52 @@ class PrestaShopExceptionCore extends Exception
             }
         }
         echo '</pre></div>';
+    }
+
+    /**
+     * Prevent critical arguments to be displayed in the debug trace page (e.g. database password)
+     * Returns the array of args with critical arguments replaced by placeholders
+     *
+     * @param array $trace
+     * @return array
+     */
+    protected function hideCriticalArgs(array $trace)
+    {
+        $args = $trace['args'];
+        if (empty($trace['class']) || empty($trace['function'])) {
+            return $args;
+        }
+
+        $criticalParameters = array(
+            'pwd',
+            'pass',
+            'passwd',
+            'password',
+            'database',
+            'server',
+        );
+        $hiddenArgs = array();
+        try {
+            $class = new ReflectionClass($trace['class']);
+            /** @var \ReflectionMethod $method */
+            $method = $class->getMethod($trace['function']);
+            /** @var \ReflectionParameter $parameter */
+            foreach ($method->getParameters() as $argIndex => $parameter) {
+                if ($argIndex >= count($args)) {
+                    break;
+                }
+
+                if (in_array(strtolower($parameter->getName()), $criticalParameters)) {
+                    $hiddenArgs[] = '**hidden_' . $parameter->getName() . '**';
+                } else {
+                    $hiddenArgs[] = $args[$argIndex];
+                }
+            }
+        } catch (ReflectionException $e) {
+            //In worst case scenario there are some critical args we could't detect so we return an empty array
+        }
+
+        return $hiddenArgs;
     }
 
     /**

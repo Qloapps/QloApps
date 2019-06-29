@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -33,7 +33,7 @@ class VatNumber extends TaxManagerModule
 	{
 		$this->name = 'vatnumber';
 		$this->tab = 'billing_invoicing';
-		$this->version = '1.8.0';
+		$this->version = '2.0.0';
 		$this->author = 'PrestaShop';
 		$this->need_instance = 0;
 
@@ -48,11 +48,15 @@ class VatNumber extends TaxManagerModule
 
 		$this->displayName = $this->l('European VAT number');
 		$this->description = $this->l('Enables you to enter the intra-community VAT number when creating the address. You must fill in the company field to allow entering the VAT number.');
+		$this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
 	}
 
 	public function install()
 	{
-		return (parent::install() && Configuration::updateValue('VATNUMBER_MANAGEMENT', 1));
+		return
+		    parent::install()
+		    && Configuration::updateValue('VATNUMBER_MANAGEMENT', 1)
+		    && $this->registerHook('actionValidateCustomerAddressForm');
 	}
 
 	public function uninstall()
@@ -225,7 +229,7 @@ class VatNumber extends TaxManagerModule
 					array(
 						'type' => 'select',
 						'label' => $this->l('Customers\' country'),
-						'desc' => $this->l('Operate a filter on customers\' country.'),
+						'desc' => $this->l('Filter customers\' country.'),
 						'name' => 'VATNUMBER_COUNTRY',
 						'required' => false,
 						'default_value' => (int)$this->context->country->id,
@@ -289,5 +293,21 @@ class VatNumber extends TaxManagerModule
 			'VATNUMBER_COUNTRY' => Tools::getValue('VATNUMBER_COUNTRY', Configuration::get('VATNUMBER_COUNTRY')),
 			'VATNUMBER_CHECKING' => Tools::getValue('VATNUMBER_CHECKING', Configuration::get('VATNUMBER_CHECKING')),
 		);
+	}
+
+	public function hookActionValidateCustomerAddressForm(&$params)
+	{
+		$form = $params['form'];
+		$is_valid = true;
+
+		if (($vatNumber = $form->getField('vat_number')) && Configuration::get('VATNUMBER_MANAGEMENT') && Configuration::get('VATNUMBER_CHECKING')) {
+			$isAVatNumber = VatNumber::WebServiceCheck($vatNumber->getValue());
+			if (is_array($isAVatNumber) && count($isAVatNumber) > 0) {
+				$vatNumber->addError($isAVatNumber[0]);
+				$is_valid = false;
+			}
+		}
+
+		return $is_valid;
 	}
 }

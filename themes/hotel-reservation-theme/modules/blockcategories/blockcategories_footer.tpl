@@ -1,5 +1,5 @@
 {*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -18,7 +18,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
@@ -28,7 +28,7 @@
 	<h4>{l s='Categories' mod='blockcategories'}</h4>
 	<div class="category_footer toggle-footer">
 		<div class="list">
-			<ul class="tree {if $isDhtml}dhtml{/if}">
+			<ul class="{if $isDhtml}dhtml{/if}">
 			{foreach from=$blockCategTree.children item=child name=blockCategTree}
 				{if $smarty.foreach.blockCategTree.last}
 					{include file="$branche_tpl_path" node=$child last='true'}

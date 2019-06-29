@@ -120,11 +120,11 @@
       <value>#IN</value>
     </configuration>
     <configuration id="PS_INVCE_INVOICE_ADDR_RULES" name="PS_INVCE_INVOICE_ADDR_RULES">
-      <value>{"avoid":["vat_number","phone","phone_mobile"]}</value>
+      <value>{"avoid":[]}</value>
     </configuration>
     <configuration id="PS_INVCE_DELIVERY_ADDR_RULES" name="PS_INVCE_DELIVERY_ADDR_RULES">
-      <value>{"avoid":["vat_number","phone","phone_mobile"]}</value>
-    </configuration>
+      <value>{"avoid":[]}</value>
+	</configuration>
 	<configuration id="PS_DELIVERY_PREFIX" name="PS_DELIVERY_PREFIX">
 		<value>#DE</value>
 	</configuration>

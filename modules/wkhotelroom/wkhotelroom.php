@@ -31,7 +31,7 @@ class WkHotelRoom extends Module
     {
         $this->name = 'wkhotelroom';
         $this->tab = 'front_office_features';
-        $this->version = '1.1.2';
+        $this->version = '1.1.3';
         $this->author = 'webkul';
         $this->bootstrap = true;
         parent::__construct();
@@ -71,6 +71,7 @@ class WkHotelRoom extends Module
                 $htlRoom['image'] = $prodImg;
                 $htlRoom['description'] = $product->description_short;
                 $htlRoom['name'] = $product->name;
+                $htlRoom['show_price'] = $product->show_price;
                 $htlRoom['price'] = $product_price;
                 $htlRoom['price_without_reduction'] = $productPriceWithoutReduction;
                 $featurePrice = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay(

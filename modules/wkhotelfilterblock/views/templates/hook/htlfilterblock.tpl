@@ -100,8 +100,8 @@
 				</div>
 				<div class="col-sm-12 lf_sub_cont">
 					<div class="row margin-lr-0 price_filter_subcont">
-						<span class="pull-left">{displayPrice price = $min_price}</span>
-						<span class="pull-right">{displayPrice price = $max_price}</span>
+						<span class="pull-left">{$currency->prefix} <span id="filter_price_from">{$min_price}</span> {$currency->suffix}</span>
+						<span class="pull-right">{$currency->prefix} <span id="filter_price_to">{$max_price}</span> {$currency->suffix}</span>
 					</div>
 					<div id="filter_price_silder"></div>
 				</div>

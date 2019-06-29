@@ -69,7 +69,7 @@
 			</tr>
 		{/if}
 	{/if}
-	
+
 	{if ($order->total_paid_tax_incl - $order->total_paid_tax_excl) > 0}
 		<tr>
 			<td class="grey" width="70%">
@@ -80,7 +80,7 @@
 			</td>
 		</tr>
 	{/if}
-	
+
 	<tr class="bold">
 		<td class="grey" width="70%">
 			{if $tax_excluded_display}{l s='Total (Tax Excl.)' pdf='true'}{else}{l s='Total (Tax Incl.)' pdf='true'}{/if}
@@ -94,8 +94,6 @@
 					{$total_paid = $order->total_paid_tax_incl - $total_cart_rule}
 				{/if}
 				- {displayPrice currency=$order->id_currency price=$total_paid}
-			{elseif $amount_choosen}
-				- {displayPrice currency=$order->id_currency price=($order_slip->amount+$order_slip->shipping_cost_amount)}
 			{else}
 				{if $tax_excluded_display}
 					- {displayPrice currency=$order->id_currency price=$order->total_paid_tax_excl}

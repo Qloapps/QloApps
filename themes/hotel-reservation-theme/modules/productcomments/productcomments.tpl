@@ -22,7 +22,7 @@
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
-<div id="idTab5" class="tab-pane">
+<div id="idTab5" class="tab-pane card">
 	<div id="product_comments_block_tab">
 		{if $comments}
 			{if (!$too_early AND ($is_logged OR $allow_guests))}
@@ -170,7 +170,7 @@
 			{if (!$too_early AND ($is_logged OR $allow_guests))}
 			<p class="align_center">
 				<a id="new_comment_tab_btn" class="btn button button-medium" href="#new_comment_form">
-					<span>{l s='Be the first to write your review!' mod='productcomments'}</span>
+					<span>{l s='Be the first to write your review' mod='productcomments'}</span>
 				</a>
 			</p>
 			<div class="new_comment_form_outer" style="display: none;">
@@ -264,7 +264,7 @@
 {addJsDefL name=productcomment_ok}{l s='OK' mod='productcomments' js=1}{/addJsDefL}
 {/strip}
 <style type="text/css">
-	
+
 	.no_reviews_cond_block
 	{
 		color: #404040;
@@ -304,7 +304,7 @@
 	.comment_date
 	{
 		font-size:15px;
-		
+
 		font-weight:400;
 		color: #9A9A9A;
 		margin-left: 10px;

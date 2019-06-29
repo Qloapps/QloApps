@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -48,12 +48,14 @@ class AdminSlipControllerCore extends AdminController
             'id_order' => array(
                 'title' => $this->l('Order ID'),
                 'align' => 'left',
-                'class' => 'fixed-width-md'
+                'class' => 'fixed-width-md',
+                'havingFilter' => true
             ),
             'date_add' => array(
                 'title' => $this->l('Date issued'),
                 'type' => 'date',
-                'align' => 'right'
+                'align' => 'right',
+                'filter_key' => 'a!date_add'
             ),
             'id_pdf' => array(
                 'title' => $this->l('PDF'),
@@ -185,7 +187,7 @@ class AdminSlipControllerCore extends AdminController
             'desc' => $this->l('Generate PDF file')
         );
     }
-    
+
     public function printPDFIcons($id_order_slip, $tr)
     {
         $order_slip = new OrderSlip((int)$id_order_slip);

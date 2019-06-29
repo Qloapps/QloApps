@@ -1,5 +1,5 @@
 {*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -18,7 +18,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
@@ -125,10 +125,17 @@
 </div>
 {$HOOK_ORDERDETAILDISPLAYED}
 {if !$is_guest}<form action="{$link->getPageLink('order-follow', true)|escape:'html':'UTF-8'}" method="post">{/if}
-{if !$is_guest && isset($order_has_invoice) && $order_has_invoice && $order->payment != 'Free order'}
+{if !$is_guest
+	&& isset($order_has_invoice)
+	&& $order_has_invoice
+	&& ($order->payment != 'Free order' || (isset($order_adv_dtl) && $order_adv_dtl && $order_adv_dtl['total_paid_amount'] > 0))}
 	<div class="row totalOrdercancellation_div" {if !$non_requested_rooms}style="display:none;"{/if}>
 		<div class="col-xs-12 col-sm-12">
-			<p style="text-align:center;"><a class="terms_btn btn btn-default pull-right" href="{$redirect_link_terms}" target="_blank"><i class="icon-file-text large"></i>&nbsp;&nbsp;{l s='Terms & Conditions'}</a></p>
+			<p style="text-align:center;">
+				<a class="terms_btn btn btn-default pull-right" href="{$redirect_link_terms}" target="_blank">
+					<i class="icon-file-text large"></i>&nbsp;&nbsp;{l s='Terms & Conditions'}
+				</a>
+			</p>
 			<button type="button" data-id_order="{$order->id}" data-id_currency="{$order->id_currency}" data-id_customer="{$order->id_customer}" data-order_data='{$cart_htl_data|@json_encode}' name="totalOrdercancellation_btn" class="totalOrdercancellation_btn btn btn-default pull-right" href="#htlRefundReasonForm"><span>{l s='Request Total Order Cancellation'}</span></button>
 		</div>
 	</div>
@@ -150,24 +157,30 @@
 				<th class="cart_product">{l s='Room Image'}</th>
 				<th class="cart_description">{l s='Room Description'}</th>
 				<th>{l s='Hotel Name'}</th>
-				<th>{l s='Room Capcity'}</th>
+				<th>{l s='Room Capacity'}</th>
 				<th class="cart_unit">{l s='Unit Price'}</th>
 				<th>{l s='Rooms'}</th>
 				<th>{l s='Check-in Date'}</th>
 				<th>{l s='Check-out Date'}</th>
 				<th class="cart_total">{l s='Total'}</th>
-				{if !$is_guest && isset($order_has_invoice) && $order_has_invoice  && $order->payment != 'Free order'}
+				{if !$is_guest
+					&& isset($order_has_invoice)
+					&& $order_has_invoice
+					&& ($order->payment != 'Free order' || (isset($order_adv_dtl) && $order_adv_dtl && $order_adv_dtl['total_paid_amount'] > 0))}
 					<th>{l s='Request Refund'}</th>
 					<th>{l s='Refund Stage'}</th>
 					<th>{l s='Refund Status'}</th>
 				{/if}
-				<th>{l s='Back-Order Status'}</th>
+				{* <th>{l s='Back-Order Status'}</th> *}
 			</tr>
 		</thead>
 		<tfoot>
 			{if $priceDisplay && $use_tax}
 				<tr class="item">
-					<td colspan={if !$is_guest && isset($order_has_invoice) && $order_has_invoice  && $order->payment != 'Free order'}"9"{else}"6"{/if}></td>
+					<td colspan={if !$is_guest
+						&& isset($order_has_invoice)
+						&& $order_has_invoice
+						&& ($order->payment != 'Free order' || (isset($order_adv_dtl) && $order_adv_dtl && $order_adv_dtl['total_paid_amount'] > 0))}"8"{else}"5"{/if}></td>
 					<td colspan="{if $return_allowed}3{else}3{/if}">
 						<strong>{l s='Items (tax excl.)'}</strong>
 					</td>
@@ -177,7 +190,10 @@
 				</tr>
 			{/if}
 			<tr class="item">
-				<td colspan={if !$is_guest && isset($order_has_invoice) && $order_has_invoice  && $order->payment != 'Free order'}"9"{else}"6"{/if}></td>
+				<td colspan={if !$is_guest
+					&& isset($order_has_invoice)
+					&& $order_has_invoice
+					&& ($order->payment != 'Free order' || (isset($order_adv_dtl) && $order_adv_dtl && $order_adv_dtl['total_paid_amount'] > 0))}"8"{else}"5"{/if}></td>
 				<td colspan="{if $return_allowed}2{else}3{/if}">
 					<strong>{l s='Items'} {if $use_tax}{l s='(tax incl.)'}{/if} </strong>
 				</td>
@@ -185,10 +201,26 @@
 					<span class="price">{displayWtPriceWithCurrency price=$order->getTotalProductsWithTaxes() currency=$currency}</span>
 				</td>
 			</tr>
-
+			{if $total_demands_price > 0}
+				<tr class="item">
+					<td colspan={if !$is_guest
+						&& isset($order_has_invoice)
+						&& $order_has_invoice
+						&& ($order->payment != 'Free order' || (isset($order_adv_dtl) && $order_adv_dtl && $order_adv_dtl['total_paid_amount'] > 0))}"8"{else}"5"{/if}></td>
+					<td colspan="{if $return_allowed}2{else}3{/if}">
+						<strong>{l s='Total Additional Facilities Cost'}</strong>
+					</td>
+					<td colspan="{if $order->hasProductReturned()}5{else}1{/if}" class="text-right">
+						<span class="price">{displayWtPriceWithCurrency price=$total_demands_price currency=$currency}</span>
+					</td>
+				</tr>
+			{/if}
 			{if $order->total_wrapping > 0}
 			<tr class="item">
-				<td colspan={if !$is_guest && isset($order_has_invoice) && $order_has_invoice  && $order->payment != 'Free order'}"9"{else}"6"{/if}></td>
+				<td colspan={if !$is_guest
+					&& isset($order_has_invoice)
+					&& $order_has_invoice
+					&& ($order->payment != 'Free order' || (isset($order_adv_dtl) && $order_adv_dtl && $order_adv_dtl['total_paid_amount'] > 0))}"8"{else}"5"{/if}></td>
 				<td colspan="{if $return_allowed}2{else}3{/if}">
 					<strong>{l s='Total gift wrapping cost'}</strong>
 				</td>
@@ -197,19 +229,27 @@
 				</td>
 			</tr>
 			{/if}
-			<tr class="totalprice item">
-				<td colspan={if !$is_guest && isset($order_has_invoice) && $order_has_invoice  && $order->payment != 'Free order'}"9"{else}"6"{/if}></td>
-				<td colspan="{if $return_allowed}2{else}3{/if}">
-					<strong>{l s='Total to Pay'}</strong>
-				</td>
-				<td colspan="{if $order->hasProductReturned()}2{else}1{/if}" class="text-right">
-					<span class="price">{displayWtPriceWithCurrency price=$order->total_paid currency=$currency}</span>
-				</td>
-			</tr>
 
+			{if $order->total_discounts > 0}
+				<tr class="item">
+					<td colspan={if !$is_guest
+						&& isset($order_has_invoice)
+						&& $order_has_invoice
+						&& ($order->payment != 'Free order' || (isset($order_adv_dtl) && $order_adv_dtl && $order_adv_dtl['total_paid_amount'] > 0))}"8"{else}"5"{/if}></td>
+					<td colspan="{if $return_allowed}3{else}3{/if}">
+						<strong>{l s='Total vouchers'}</strong>
+					</td>
+					<td colspan="{if $order->hasProductReturned()}5{else}1{/if}" class="text-right">
+						<span class="price-discount">-{displayWtPriceWithCurrency price=$order->total_discounts currency=$currency convert=1}</span>
+					</td>
+				</tr>
+			{/if}
 			{if isset($order_adv_dtl) && $order_adv_dtl}
 				<tr class="item">
-					<td colspan={if !$is_guest && isset($order_has_invoice) && $order_has_invoice  && $order->payment != 'Free order'}"9"{else}"6"{/if}></td>
+					<td colspan={if !$is_guest
+					&& isset($order_has_invoice)
+					&& $order_has_invoice
+					&& ($order->payment != 'Free order' || (isset($order_adv_dtl) && $order_adv_dtl && $order_adv_dtl['total_paid_amount'] > 0))}"8"{else}"5"{/if}></td>
 					<td colspan="{if $return_allowed}2{else}3{/if}">
 						<strong>{l s='Advance Paid Amount'}</strong>
 					</td>
@@ -218,7 +258,10 @@
 					</td>
 				</tr>
 				<tr class="item">
-					<td colspan={if !$is_guest && isset($order_has_invoice) && $order_has_invoice  && $order->payment != 'Free order'}"9"{else}"6"{/if}></td>
+					<td colspan={if !$is_guest
+					&& isset($order_has_invoice)
+					&& $order_has_invoice
+					&& ($order->payment != 'Free order' || (isset($order_adv_dtl) && $order_adv_dtl && $order_adv_dtl['total_paid_amount'] > 0))}"8"{else}"5"{/if}></td>
 					<td colspan="{if $return_allowed}2{else}3{/if}">
 						<strong>{l s='Total Due'}</strong>
 					</td>
@@ -227,18 +270,18 @@
 					</td>
 				</tr>
 			{/if}
-
-			{if $order->total_discounts > 0}
-			<tr class="item">
-				<td colspan={if !$is_guest && isset($order_has_invoice) && $order_has_invoice  && $order->payment != 'Free order'}"9"{else}"6"{/if}></td>
-				<td colspan="{if $return_allowed}3{else}3{/if}">
-					<strong>{l s='Total vouchers'}</strong>
+			<tr class="totalprice item">
+				<td colspan={if !$is_guest
+					&& isset($order_has_invoice)
+					&& $order_has_invoice
+					&& ($order->payment != 'Free order' || (isset($order_adv_dtl) && $order_adv_dtl && $order_adv_dtl['total_paid_amount'] > 0))}"8"{else}"5"{/if}></td>
+				<td colspan="{if $return_allowed}2{else}3{/if}">
+					<strong>{l s='Total Paid'}</strong>
 				</td>
-				<td colspan="{if $order->hasProductReturned()}5{else}1{/if}" class="text-right">
-					<span class="price-discount">-{displayWtPriceWithCurrency price=$order->total_discounts currency=$currency convert=1}</span>
+				<td colspan="{if $order->hasProductReturned()}2{else}1{/if}" class="text-right">
+					<span class="price">{displayWtPriceWithCurrency price=$order->total_paid currency=$currency}</span>
 				</td>
 			</tr>
-			{/if}
 
 			{* <tr class="item">
 				<td colspan="{if $return_allowed}2{else}1{/if}">
@@ -265,6 +308,14 @@
 										{$data_v['name']}
 									</a>
 								</p>
+								{if isset($rm_v['extra_demands']) && $rm_v['extra_demands']}
+									<p class="room_extra_demands">
+										<a date_from="{$rm_v['data_form']}" date_to="{$rm_v['data_to']}" id_product="{$data_v['id_product']}" id_order="{$order->id}" class="open_rooms_extra_demands" href="#rooms_type_extra_demands">
+											{l s='Additional Facilities'}
+										</a>
+									</p>
+									<p>{displayWtPriceWithCurrency price=$rm_v['extra_demands_price'] currency=$currency}</p>
+								{/if}
 							</td>
 							<td>{$data_v['hotel_name']}</td>
 							<td>
@@ -321,12 +372,15 @@
 									{/if}
 								</p>
 							</td>
-							{if !$is_guest && isset($order_has_invoice) && $order_has_invoice  && $order->payment != 'Free order'}
+							{if !$is_guest
+								&& isset($order_has_invoice)
+								&& $order_has_invoice
+								&& ($order->payment != 'Free order' || (isset($order_adv_dtl) && $order_adv_dtl && $order_adv_dtl['total_paid_amount'] > 0))}
 								<td class="cart_total text-left">
 									{if isset($rm_v['stage_name']) && $rm_v['stage_name']}
 										<p>{l s="Request Sent.."}</p>
 									{else}
-										<button data-amount="{$rm_v['amount_tax_incl']}" data-id_order="{$order->id}" data-id_currency="{$order->id_currency}" data-id_customer="{$order->id_customer}" data-id_product="{$data_v['id_product']}" data-num_rooms="{$rm_v['num_rm']}" data-date_from="{$rm_v['data_form']|date_format:"%G-%m-%d"}" type="button" data-date_to="{$rm_v['data_to']|date_format:"%G-%m-%d"}"  name="roomRequestForRefund" class="order_cancel_request_button_{$data_v['id_product']}_{$rm_v['data_form']|date_format:"%G-%m-%d"}_{$rm_v['data_to']|date_format:"%G-%m-%d"} btn btn-default button button-small roomRequestForRefund" href="#htlRefundReasonForm"><span>{l s='Request Refund'}</span></button>
+										<button data-amount="{$rm_v['amount_tax_incl']+$rm_v['extra_demands_price']}" data-id_order="{$order->id}" data-id_currency="{$order->id_currency}" data-id_customer="{$order->id_customer}" data-id_product="{$data_v['id_product']}" data-num_rooms="{$rm_v['num_rm']}" data-date_from="{$rm_v['data_form']|date_format:"%G-%m-%d"}" type="button" data-date_to="{$rm_v['data_to']|date_format:"%G-%m-%d"}"  name="roomRequestForRefund" class="order_cancel_request_button_{$data_v['id_product']}_{$rm_v['data_form']|date_format:"%G-%m-%d"}_{$rm_v['data_to']|date_format:"%G-%m-%d"} btn btn-default button button-small roomRequestForRefund" href="#htlRefundReasonForm"><span>{l s='Request Refund'}</span></button>
 									{/if}
 								</td>
 								<td class="text-center stage_name">
@@ -342,7 +396,7 @@
 									<p>
 										{if $rm_v['stage_name'] == 'Refunded' || $rm_v['stage_name'] == 'Rejected'}
 											{l s="Done!"}
-										{else if $rm_v['stage_name'] == 'Waitting' || $rm_v['stage_name'] == 'Accepted'}
+										{else if $rm_v['stage_name'] == 'Waiting' || $rm_v['stage_name'] == 'Accepted'}
 											{l s="Pending.."}
 										{else}
 											--
@@ -350,13 +404,13 @@
 									</p>
 								</td>
 							{/if}
-							<td class="text-center">
+							{* <td class="text-center">
 								{if isset($rm_v['is_backorder']) && $rm_v['is_backorder']}
 									{l s='On Backorder'}
 								{else}
 									--
 								{/if}
-							</td>
+							</td> *}
 						</tr>
 					{/foreach}
 				{/foreach}
@@ -371,6 +425,7 @@
 				{else}
 					{assign var='productQuantity' value=$product.product_quantity}
 				{/if}
+				<!-- Customized products -->
 				{if isset($product.customizedDatas)}
 					<tr class="item">
 						{if $return_allowed}<td class="order_cb"></td>{/if}
@@ -452,6 +507,7 @@
 						{/foreach}
 					{/foreach}
 				{/if}
+				<!-- Classic products -->
 				{if $product.product_quantity > $product.customizationQuantityTotal}
 					<tr class="item">
 						{if $return_allowed}<td class="order_cb"><input type="checkbox" id="cb_{$product.id_order_detail|intval}" name="ids_order_detail[{$product.id_order_detail|intval}]" value="{$product.id_order_detail|intval}" /></td>{/if}
@@ -650,6 +706,20 @@
 {/if}
 {/if}
 
+
+{* Fancybox for extra demands*}
+<div style="display:none;" id="rooms_extra_demands">
+	<div id="rooms_type_extra_demands">
+		<div class="panel">
+			<div class="rooms_extra_demands_head">
+				<h3>{l s='Additional Facilities'}</h3>
+				<p class="rooms_extra_demands_text">{l s='Below are the additional facilities chosen by you in this booking'}</p>
+			</div>
+			<div id="room_type_demands_desc"></div>
+		</div>
+	</div>
+</div>
+
 {* Fancybox *}
 <div style="display: none;" id="reason_fancybox_content">
 	<div id="htlRefundReasonForm">
@@ -668,7 +738,7 @@
 				<input type="hidden" value="" id="cancel_req_num_rooms">
 				<input type="hidden" value="" id="cancel_req_date_from">
 				<input type="hidden" value="" id="cancel_req_date_to">
-				<textarea class="form-control reasonForRefund" rows="2" name="reasonForRefund" placeholder="Write a reason for cancellation of this booking"></textarea>
+				<textarea class="form-control reasonForRefund" rows="2" name="reasonForRefund" placeholder="{l s='Write a reason for cancellation of this booking'}"></textarea>
 				<div>
 					<p class="fl required required_err" style="color:#AA1F00; display:none"><sup>*</sup> {l s='Required field'}</p><br>
 					<p class="fr">

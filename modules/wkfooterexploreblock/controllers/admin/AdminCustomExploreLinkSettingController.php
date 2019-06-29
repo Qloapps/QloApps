@@ -33,7 +33,10 @@ class AdminCustomExploreLinkSettingController extends ModuleAdminController
         $this->_join .= 'LEFT JOIN `'._DB_PREFIX_.'htl_custom_explore_link_lang` cel
         ON (a.id_explore_link = cel.id_explore_link AND cel.`id_lang` = '.(int) $this->context->language->id.')';
 
-        $this->_select = ' cel.`name`';
+        $this->_join .= 'LEFT JOIN `'._DB_PREFIX_.'cms_lang` cmsl
+        ON (a.id_cms = cmsl.id_cms AND cmsl.`id_lang` = '.(int) $this->context->language->id.')';
+
+        $this->_select = ' IF(a.`id_cms`, cmsl.`meta_title`, cel.`name`) as name';
 
         $this->fields_list = array(
             'id_explore_link' => array(
@@ -43,7 +46,7 @@ class AdminCustomExploreLinkSettingController extends ModuleAdminController
             'name' => array(
                 'title' => $this->l('Name'),
                 'align' => 'center',
-                'callback' => 'getExploreLinkName',
+                'havingFilter' => true,
             ),
             'link' => array(
                 'title' => $this->l('Link'),
@@ -78,6 +81,7 @@ class AdminCustomExploreLinkSettingController extends ModuleAdminController
             'date_add' => array(
                 'title' => $this->l('Date Add'),
                 'align' => 'center',
+                'type' => 'datetime',
             ),
         );
 
@@ -97,17 +101,6 @@ class AdminCustomExploreLinkSettingController extends ModuleAdminController
             ),
         );
         $this->list_no_link = true;
-    }
-
-    public function getExploreLinkName($name, $row)
-    {
-        if ($row['id_cms']) {
-            if (Validate::isLoadedObject($objCMS = new CMS($row['id_cms']))) {
-                return $objCMS->meta_title[$this->context->language->id];
-            }
-        } else {
-            return $name;
-        }
     }
 
     public function getExploreRedirectUrl($link, $row)
@@ -226,9 +219,15 @@ class AdminCustomExploreLinkSettingController extends ModuleAdminController
             } else {
                 $objCustomExploreLink->id_cms = 0;
                 foreach ($languages as $language) {
-                    $objCustomExploreLink->name[$language['id_lang']] = Tools::getValue(
-                        'explore_link_name_'.$language['id_lang']
-                    );
+                    if (!trim(Tools::getValue('explore_link_name_'.$language['id_lang']))) {
+                        $objCustomExploreLink->name[$language['id_lang']] = Tools::getValue(
+                            'explore_link_name_'.$defaultLangId
+                        );
+                    } else {
+                        $objCustomExploreLink->name[$language['id_lang']] = Tools::getValue(
+                            'explore_link_name_'.$language['id_lang']
+                        );
+                    }
                 }
                 $objCustomExploreLink->link = $link;
             }

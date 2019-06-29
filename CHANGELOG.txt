@@ -1,4 +1,37 @@
 ####################################
+# V1.4.0
+####################################
+
+## Added Features:
+
+[+] CO : Additional facilities functionality is added.
+[+] CO : Almost all updates added to QloApps till the prestashop version 1.6.1.23.
+
+
+## Improved/changed features:
+
+[*] CO : Tools::generateHtaccess() improved
+[*] CO : ($round = true) parameter added in Tools::convertPriceFull()
+[*] CO : Localization updated
+[*] CO : mails/en/product_download.txt bug resolved
+[*] CO : swiftMailer version updated to 5.2.2
+[*] CO : translations updated
+[*] CO : config/config.inc.php improved (smarty early inclusion)
+[*] CO : config/smarty.config.inc.php improved (smartyHook() return improved)
+[*] CO : Security: Use Mcrypt’s CBC mode instead of the ECB mode.
+
+[*] CO : Almost all improvements/changes features added to QloApps till the prestashop version 1.6.1.23.
+[*] BO : All Stats Module compatible with QloApps
+
+[*] FO : Room type details Page Design improved
+
+## Bug/Issues Resolved:
+
+[-] CO : Almost all bugs resolved in QloApps till the prestashop version 1.6.1.23.
+[-] CO : Resolved :: QloApps Compatible with MySQL 5.7
+
+
+####################################
 # V1.3.2
 ####################################
 

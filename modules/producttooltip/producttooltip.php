@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2014 PrestaShop
+* 2007-2016 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2014 PrestaShop SA
+*  @copyright  2007-2016 PrestaShop SA
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -33,7 +33,7 @@ class ProductToolTip extends Module
 	{
 		$this->name = 'producttooltip';
 		$this->tab = 'front_office_features';
-		$this->version = '1.3.1';
+		$this->version = '1.4.1';
 		$this->author = 'PrestaShop';
 		$this->need_instance = 0;
 
@@ -42,6 +42,7 @@ class ProductToolTip extends Module
 
 		$this->displayName = $this->l('Product tooltips');
 		$this->description = $this->l('Shows information on a product page: how many people are viewing it, the last time it was sold and the last time it was added to a cart.');
+		$this->ps_versions_compliancy = array('min' => '1.6', 'max' => '1.6.99.99');
 	}
 
 	public function install()

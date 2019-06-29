@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -66,12 +66,14 @@ class StockManagerCore implements StockManagerInterface
         $id_supply_order = null,
         $employee = null
     ) {
-        if (!Validate::isLoadedObject($warehouse) || (!is_int($price_te) && !is_float($price_te))
-        || !$quantity || !$id_product) {
+        if ($this->shouldPreventStockOperation($warehouse, $id_product, $quantity)) {
             return false;
         }
 
-        $price_te = (float)round($price_te, 6);
+        $price_te = round((float)$price_te, 6);
+        if ($price_te < 0.0) { // why <= ?
+            return false;
+        }
 
         if (!StockMvtReason::exists($id_stock_mvt_reason)) {
             $id_stock_mvt_reason = Configuration::get('PS_STOCK_MVT_INC_REASON_DEFAULT');
@@ -208,37 +210,42 @@ class StockManagerCore implements StockManagerInterface
      * @param int|null      $id_order
      * @param int           $ignore_pack
      * @param Employee|null $employee
+     * @param Stock|null    $stock
      *
      * @return array
      * @throws PrestaShopException
      */
-    public function removeProduct($id_product,
-                                  $id_product_attribute = null,
-                                  Warehouse $warehouse,
-                                  $quantity,
-                                  $id_stock_mvt_reason,
-                                  $is_usable = true,
-                                  $id_order = null,
-                                  $ignore_pack = 0,
-                                  $employee = null)
+    public function removeProduct(
+        $id_product,
+        $id_product_attribute = null,
+        Warehouse $warehouse,
+        $quantity,
+        $id_stock_mvt_reason,
+        $is_usable = true,
+        $id_order = null,
+        $ignore_pack = 0,
+        $employee = null,
+        Stock $stock = null
+    )
     {
-        $return = array();
+        $removedProducts = array();
 
-        if (!Validate::isLoadedObject($warehouse) || !$quantity || !$id_product) {
-            return $return;
+        if ($this->shouldPreventStockOperation($warehouse, $id_product, $quantity)) {
+            return $removedProducts;
         }
 
-        if (!StockMvtReason::exists($id_stock_mvt_reason)) {
-            $id_stock_mvt_reason = Configuration::get('PS_STOCK_MVT_DEC_REASON_DEFAULT');
-        }
+        $id_stock_mvt_reason = $this->ensureStockMovementReasonIsValid($id_stock_mvt_reason);
 
-        $context = Context::getContext();
-
-        // Special case of a pack
-        if (Pack::isPack((int)$id_product) && !$ignore_pack) {
+        if ($this->shouldHandleStockOperationForProductsPack($id_product, $ignore_pack)) {
             if (Validate::isLoadedObject($product = new Product((int)$id_product))) {
                 // Gets items
-                if ($product->pack_stock_type == 1 || $product->pack_stock_type == 2 || ($product->pack_stock_type == 3 && Configuration::get('PS_PACK_STOCK_TYPE') > 0)) {
+                if (
+                    $product->pack_stock_type == 1 ||
+                    $product->pack_stock_type == 2 || (
+                        $product->pack_stock_type == 3 &&
+                        Configuration::get('PS_PACK_STOCK_TYPE') > 0
+                    )
+                ) {
                     $products_pack = Pack::getItems((int)$id_product, (int)Configuration::get('PS_LANG_DEFAULT'));
                     // Foreach item
                     foreach ($products_pack as $product_pack) {
@@ -249,53 +256,73 @@ class StockManagerCore implements StockManagerInterface
                                 if (!$warehouse_stock_found) {
                                     if (Warehouse::exists($product_warehouse['id_warehouse'])) {
                                         $current_warehouse = new Warehouse($product_warehouse['id_warehouse']);
-                                        $return[] = $this->removeProduct($product_pack->id, $product_pack->id_pack_product_attribute, $current_warehouse, $product_pack->pack_quantity * $quantity, $id_stock_mvt_reason, $is_usable, $id_order);
+                                        $removedProducts[] = $this->removeProduct(
+                                            $product_pack->id,
+                                            $product_pack->id_pack_product_attribute,
+                                            $current_warehouse,
+                                            $product_pack->pack_quantity * $quantity,
+                                            $id_stock_mvt_reason, $is_usable, $id_order
+                                        );
 
                                         // The product was found on this warehouse. Stop the stock searching.
-                                        $warehouse_stock_found = !empty($return[count($return) - 1]);
+                                        $warehouse_stock_found = !empty($removedProducts[count($removedProducts) - 1]);
                                     }
                                 }
                             }
                         }
                     }
                 }
-                if ($product->pack_stock_type == 0 || $product->pack_stock_type == 2 ||
-                    ($product->pack_stock_type == 3 && (Configuration::get('PS_PACK_STOCK_TYPE') == 0 || Configuration::get('PS_PACK_STOCK_TYPE') == 2))) {
-                    $return = array_merge($return, $this->removeProduct($id_product, $id_product_attribute, $warehouse, $quantity, $id_stock_mvt_reason, $is_usable, $id_order, 1));
+
+                if (
+                    $product->pack_stock_type == 0 ||
+                    $product->pack_stock_type == 2 || (
+                        $product->pack_stock_type == 3 && (
+                            Configuration::get('PS_PACK_STOCK_TYPE') == 0 ||
+                            Configuration::get('PS_PACK_STOCK_TYPE') == 2
+                        )
+                    )
+                ) {
+                    $removedProducts = array_merge(
+                        $removedProducts,
+                        $this->removeProduct(
+                            $id_product,
+                            $id_product_attribute,
+                            $warehouse,
+                            $quantity,
+                            $id_stock_mvt_reason,
+                            $is_usable,
+                            $id_order,
+                            1
+                        )
+                    );
                 }
             } else {
                 return false;
             }
         } else {
-            // gets total quantities in stock for the current product
-            $physical_quantity_in_stock = (int)$this->getProductPhysicalQuantities($id_product, $id_product_attribute, array($warehouse->id), false);
-            $usable_quantity_in_stock = (int)$this->getProductPhysicalQuantities($id_product, $id_product_attribute, array($warehouse->id), true);
+            $quantity_in_stock = $this->computeProductQuantityInStock(
+                $warehouse,
+                $id_product,
+                $id_product_attribute,
+                $is_usable,
+                $stock
+            );
 
-            // check quantity if we want to decrement unusable quantity
-            if (!$is_usable) {
-                $quantity_in_stock = $physical_quantity_in_stock - $usable_quantity_in_stock;
-            } else {
-                $quantity_in_stock = $usable_quantity_in_stock;
+            if ($this->ensureProductQuantityRequestedForRemovalIsValid($quantity, $quantity_in_stock)) {
+                return $removedProducts;
             }
 
-            // checks if it's possible to remove the given quantity
-            if ($quantity_in_stock < $quantity) {
-                return $return;
-            }
+            $stock_collection = $this->getProductStockLinesInWarehouse(
+                $id_product,
+                $id_product_attribute,
+                $warehouse,
+                $stock
+            );
 
-            $stock_collection = $this->getStockCollection($id_product, $id_product_attribute, $warehouse->id);
-            $stock_collection->getAll();
-
-            // check if the collection is loaded
+            /** @var \Countable $stock_collection */
             if (count($stock_collection) <= 0) {
-                return $return;
+                return $removedProducts;
             }
-
-            $stock_history_qty_available = array();
-            $mvt_params = array();
-            $stock_params = array();
-            $quantity_to_decrement_by_stock = array();
-            $global_quantity_to_decrement = $quantity;
 
             // switch on MANAGEMENT_TYPE
             switch ($warehouse->management_type) {
@@ -305,40 +332,26 @@ class StockManagerCore implements StockManagerInterface
                     // There is one and only one stock for a given product in a warehouse in this mode
                     $stock = $stock_collection->current();
 
-                    $mvt_params = array(
-                        'id_stock' => $stock->id,
-                        'physical_quantity' => $quantity,
-                        'id_stock_mvt_reason' => $id_stock_mvt_reason,
-                        'id_order' => $id_order,
-                        'price_te' => $stock->price_te,
-                        'last_wa' => $stock->price_te,
-                        'current_wa' => $stock->price_te,
-                        'id_employee' => (int)$context->employee->id ? (int)$context->employee->id : $employee->id,
-                        'employee_firstname' => $context->employee->firstname ? $context->employee->firstname : $employee->firstname,
-                        'employee_lastname' => $context->employee->lastname ? $context->employee->lastname : $employee->lastname,
-                        'sign' => -1
-                    );
-                    $stock_params = array(
-                        'physical_quantity' => ($stock->physical_quantity - $quantity),
-                        'usable_quantity' => ($is_usable ? ($stock->usable_quantity - $quantity) : $stock->usable_quantity)
+                    $this->removeProductQuantityApplyingCump(
+                        $quantity,
+                        $id_stock_mvt_reason,
+                        $is_usable,
+                        $id_order,
+                        $employee,
+                        $stock
                     );
 
-                    // saves stock in warehouse
-                    $stock->hydrate($stock_params);
-                    $stock->update();
-
-                    // saves stock mvt
-                    $stock_mvt = new StockMvt();
-                    $stock_mvt->hydrate($mvt_params);
-                    $stock_mvt->save();
-
-                    $return[$stock->id]['quantity'] = $quantity;
-                    $return[$stock->id]['price_te'] = $stock->price_te;
+                    $removedProducts[$stock->id]['quantity'] = $quantity;
+                    $removedProducts[$stock->id]['price_te'] = $stock->price_te;
 
                 break;
 
                 case 'LIFO':
                 case 'FIFO':
+
+                    $stock_history_qty_available = array();
+                    $quantity_to_decrement_by_stock = array();
+                    $global_quantity_to_decrement = $quantity;
 
                     // for each stock, parse its mvts history to calculate the quantities left for each positive mvt,
                     // according to the instant available quantities for this stock
@@ -361,10 +374,10 @@ class StockManagerCore implements StockManagerInterface
                         );
 
                         while ($row = Db::getInstance()->nextRow($resource)) {
-                            // break - in FIFO mode, we have to retreive the oldest positive mvts for which there are left quantities
+                            // continue - in FIFO mode, we have to retreive the oldest positive mvts for which there are left quantities
                             if ($warehouse->management_type == 'FIFO') {
                                 if ($row['qty'] == 0) {
-                                    break;
+                                    continue;
                                 }
                             }
 
@@ -412,9 +425,14 @@ class StockManagerCore implements StockManagerInterface
                         }
                     }
 
+                    $employeeAttributes = $this->getAttributesOfEmployeeRequestingStockMovement($employee);
+
                     // for each stock, decrements it and logs the mvts
                     foreach ($stock_collection as $stock) {
-                        if (array_key_exists($stock->id, $quantity_to_decrement_by_stock) && is_array($quantity_to_decrement_by_stock[$stock->id])) {
+                        if (
+                            array_key_exists($stock->id, $quantity_to_decrement_by_stock) &&
+                            is_array($quantity_to_decrement_by_stock[$stock->id])
+                        ) {
                             $total_quantity_for_current_stock = 0;
 
                             foreach ($quantity_to_decrement_by_stock[$stock->id] as $id_mvt_referrer => $qte) {
@@ -426,7 +444,7 @@ class StockManagerCore implements StockManagerInterface
                                     'price_te' => $stock->price_te,
                                     'sign' => -1,
                                     'referer' => $id_mvt_referrer,
-                                    'id_employee' => (int)$context->employee->id ? (int)$context->employee->id : $employee->id,
+                                    'id_employee' => $employeeAttributes['employee_id'],
                                 );
 
                                 // saves stock mvt
@@ -437,13 +455,19 @@ class StockManagerCore implements StockManagerInterface
                                 $total_quantity_for_current_stock += $qte;
                             }
 
+                            if ($is_usable) {
+                                $usableProductQuantity = $stock->usable_quantity - $total_quantity_for_current_stock;
+                            } else {
+                                $usableProductQuantity = $stock->usable_quantity;
+                            }
+
                             $stock_params = array(
                                 'physical_quantity' => ($stock->physical_quantity - $total_quantity_for_current_stock),
-                                'usable_quantity' => ($is_usable ? ($stock->usable_quantity - $total_quantity_for_current_stock) : $stock->usable_quantity)
+                                'usable_quantity' => $usableProductQuantity
                             );
 
-                            $return[$stock->id]['quantity'] = $total_quantity_for_current_stock;
-                            $return[$stock->id]['price_te'] = $stock->price_te;
+                            $removedProducts[$stock->id]['quantity'] = $total_quantity_for_current_stock;
+                            $removedProducts[$stock->id]['price_te'] = $stock->price_te;
 
                             // saves stock in warehouse
                             $stock->hydrate($stock_params);
@@ -454,18 +478,26 @@ class StockManagerCore implements StockManagerInterface
             }
 
             if (Pack::isPacked($id_product, $id_product_attribute)) {
-                $packs = Pack::getPacksContainingItem($id_product, $id_product_attribute, (int)Configuration::get('PS_LANG_DEFAULT'));
-                foreach($packs as $pack) {
+                $packs = Pack::getPacksContainingItem(
+                    $id_product,
+                    $id_product_attribute,
+                    (int)Configuration::get('PS_LANG_DEFAULT')
+                );
+
+                foreach ($packs as $pack) {
                     // Decrease stocks of the pack only if pack is in linked stock mode (option called 'Decrement both')
-                    if (!((int)$pack->pack_stock_type == 2) &&
-                        !((int)$pack->pack_stock_type == 3 && (int)Configuration::get('PS_PACK_STOCK_TYPE') == 2)
-                        ) {
+                    if (
+                        !((int)$pack->pack_stock_type == 2) &&
+                        !(
+                            (int)$pack->pack_stock_type == 3 &&
+                            (int)Configuration::get('PS_PACK_STOCK_TYPE') == 2
+                        )
+                    ) {
                         continue;
                     }
 
-                    // Decrease stocks of the pack only if there is not enough items to constituate the actual pack stocks.
-                    
-                    // How many packs can be constituated with the remaining product stocks
+                    // Decrease stocks of the pack only if there is not enough items to constitute the actual pack stocks.
+                    // How many packs can be constituted with the remaining product stocks
                     $quantity_by_pack = $pack->pack_item_quantity;
                     $stock_available_quantity = $quantity_in_stock - $quantity;
                     $max_pack_quantity = max(array(0, floor($stock_available_quantity / $quantity_by_pack)));
@@ -475,63 +507,64 @@ class StockManagerCore implements StockManagerInterface
                         $product_warehouses = Warehouse::getPackWarehouses($pack->id);
                         $warehouse_stock_found = false;
                         foreach ($product_warehouses as $product_warehouse) {
-
                             if (!$warehouse_stock_found) {
                                 if (Warehouse::exists($product_warehouse)) {
                                     $current_warehouse = new Warehouse($product_warehouse);
-                                    $return[] = $this->removeProduct($pack->id, null, $current_warehouse, $quantity_delta, $id_stock_mvt_reason, $is_usable, $id_order, 1);
+                                    $removedProducts[] = $this->removeProduct(
+                                        $pack->id,
+                                        null,
+                                        $current_warehouse,
+                                        $quantity_delta,
+                                        $id_stock_mvt_reason,
+                                        $is_usable,
+                                        $id_order,
+                                        1
+                                    );
+
                                     // The product was found on this warehouse. Stop the stock searching.
-                                    $warehouse_stock_found = !empty($return[count($return) - 1]);
+                                    $warehouse_stock_found = !empty($removedProducts[count($removedProducts) - 1]);
                                 }
                             }
                         }
                     }
                 }
             }
-            
-            
-        }
-        
-
-
-        // if we remove a usable quantity, exec hook
-        if ($is_usable) {
-            Hook::exec('actionProductCoverage',
-                    array(
-                        'id_product' => $id_product,
-                        'id_product_attribute' => $id_product_attribute,
-                        'warehouse' => $warehouse
-                    )
-            );
         }
 
-        return $return;
+        $this->hookCoverageOnProductRemoval(
+            $warehouse,
+            $id_product,
+            $id_product_attribute,
+            $is_usable
+        );
+
+        return $removedProducts;
     }
 
     /**
-     * @see StockManagerInterface::getProductPhysicalQuantities()
+     * @deprecated
+     * @see getPhysicalProductQuantities
+     *
+     * @param int $id_product
+     * @param int $id_product_attribute
+     * @param null $ids_warehouse
+     * @param bool $usable
+     * @return int
      */
-    public function getProductPhysicalQuantities($id_product, $id_product_attribute, $ids_warehouse = null, $usable = false)
+    public function getProductPhysicalQuantities(
+        $id_product,
+        $id_product_attribute,
+        $ids_warehouse = null,
+        $usable = false
+    )
     {
-        if (!is_null($ids_warehouse)) {
-            // in case $ids_warehouse is not an array
-            if (!is_array($ids_warehouse)) {
-                $ids_warehouse = array($ids_warehouse);
-            }
-
-            // casts for security reason
-            $ids_warehouse = array_map('intval', $ids_warehouse);
-            if (!count($ids_warehouse)) {
-                return 0;
-            }
-        } else {
-            $ids_warehouse = array();
-        }
+        $ids_warehouse = $this->normalizeWarehouseIds($ids_warehouse);
 
         $query = new DbQuery();
         $query->select('SUM('.($usable ? 's.usable_quantity' : 's.physical_quantity').')');
         $query->from('stock', 's');
         $query->where('s.id_product = '.(int)$id_product);
+
         if (0 != $id_product_attribute) {
             $query->where('s.id_product_attribute = '.(int)$id_product_attribute);
         }
@@ -541,6 +574,78 @@ class StockManagerCore implements StockManagerInterface
         }
 
         return (int)Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue($query);
+    }
+
+    /**
+     * @param $productStockCriteria
+     * @return int
+     */
+    public function getPhysicalProductQuantities($productStockCriteria)
+    {
+        $productStockCriteria = $this->validateProductStockCriteria($productStockCriteria);
+
+        return (int)$this->getProductPhysicalQuantities(
+            $productStockCriteria['product_id'],
+            $productStockCriteria['product_attribute_id'],
+            $productStockCriteria['warehouse_id']
+        );
+    }
+
+    /**
+     * @param $productStockCriteria
+     * @return int
+     */
+    public function getUsableProductQuantities($productStockCriteria)
+    {
+        $productStockCriteria = $this->validateProductStockCriteria($productStockCriteria);
+
+        return (int)$this->getProductPhysicalQuantities(
+            $productStockCriteria['product_id'],
+            $productStockCriteria['product_attribute_id'],
+            $productStockCriteria['warehouse_id'],
+            $usable = true
+        );
+    }
+
+    /**
+     * @param array $criteria
+     * @return array
+     * @throws Exception
+     */
+    protected function validateProductStockCriteria(array $criteria)
+    {
+        if (!array_key_exists('product_id', $criteria)) {
+            throw new \Exception('Missing product id');
+        }
+
+        if (!array_key_exists('product_attribute_id', $criteria)) {
+            throw new \Exception('Missing product combination id');
+        }
+
+        if (!array_key_exists('warehouse_id', $criteria)) {
+            throw new \Exception('Missing warehouse id');
+        }
+
+        return $criteria;
+    }
+
+    /**
+     * @param $ids_warehouse
+     * @return array
+     */
+    public function normalizeWarehouseIds($ids_warehouse)
+    {
+        $normalizedWarehouseIds = array();
+
+        if (!is_null($ids_warehouse)) {
+            if (!is_array($ids_warehouse)) {
+                $ids_warehouse = array($ids_warehouse);
+            }
+
+            $normalizedWarehouseIds = array_map('intval', $ids_warehouse);
+        }
+
+        return $normalizedWarehouseIds;
     }
 
     /**
@@ -731,6 +836,28 @@ class StockManagerCore implements StockManagerInterface
             $coverage = 7;
         } // Week by default
 
+        $quantity_out = $this->getProductOutForCoverage($id_product, $id_product_attribute, $coverage, $id_warehouse);
+        if (!$quantity_out) {
+            return -1;
+        }
+
+        $quantity_per_day = Tools::ps_round($quantity_out / $coverage);
+        $physical_quantity = $this->getProductPhysicalQuantities($id_product,
+                                                                 $id_product_attribute,
+                                                                 ($id_warehouse ? array($id_warehouse) : null),
+                                                                 true);
+        $time_left = ($quantity_per_day == 0) ? (-1) : Tools::ps_round($physical_quantity / $quantity_per_day);
+
+        return $time_left;
+    }
+
+    /**
+     * @see StockManagerInterface::getProductOutForCoverage()
+     * Here, $coverage is a number of days
+     * @return int number of products sold over the coverage period
+     */
+    public function getProductOutForCoverage($id_product, $id_product_attribute, $coverage, $id_warehouse = null) {
+
         // gets all stock_mvt for the given coverage period
         $query = '
 			SELECT SUM(view.quantity) as quantity_out
@@ -751,19 +878,7 @@ class StockManagerCore implements StockManagerInterface
 				GROUP BY sm.`id_stock_mvt`
 			) as view';
 
-        $quantity_out = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue($query);
-        if (!$quantity_out) {
-            return -1;
-        }
-
-        $quantity_per_day = Tools::ps_round($quantity_out / $coverage);
-        $physical_quantity = $this->getProductPhysicalQuantities($id_product,
-                                                                 $id_product_attribute,
-                                                                 ($id_warehouse ? array($id_warehouse) : null),
-                                                                 true);
-        $time_left = ($quantity_per_day == 0) ? (-1) : Tools::ps_round($physical_quantity / $quantity_per_day);
-
-        return $time_left;
+        return Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue($query);
     }
 
     /**
@@ -787,13 +902,23 @@ class StockManagerCore implements StockManagerInterface
      * @param int $id_product_attribute
      * @param int $id_warehouse Optional
      * @param int $price_te Optional
+     * @param Stock $stock Optional
      * @return PrestaShopCollection Collection of Stock
      */
-    protected function getStockCollection($id_product, $id_product_attribute, $id_warehouse = null, $price_te = null)
+    protected function getStockCollection(
+        $id_product,
+        $id_product_attribute,
+        $id_warehouse = null,
+        $price_te = null,
+        Stock $stock = null
+    )
     {
         $stocks = new PrestaShopCollection('Stock');
         $stocks->where('id_product', '=', $id_product);
         $stocks->where('id_product_attribute', '=', $id_product_attribute);
+        if ($stock) {
+            $stocks->where('id_stock', '=', $stock->id);
+        }
         if ($id_warehouse) {
             $stocks->where('id_warehouse', '=', $id_warehouse);
         }
@@ -841,5 +966,222 @@ class StockManagerCore implements StockManagerInterface
         }
 
         return $stock_quantity;
+    }
+
+    /**
+     * Prevent stock operation whenever product, quantity or warehouse are invalid
+     *
+     * @param Warehouse $warehouse
+     * @param $productId
+     * @param $quantity
+     * @return bool
+     */
+    protected function shouldPreventStockOperation(Warehouse $warehouse, $productId, $quantity)
+    {
+        return !Validate::isLoadedObject($warehouse) || !$quantity || !$productId;
+    }
+
+    /**
+     * @param $stockMovementReasonId
+     * @return mixed
+     */
+    protected function ensureStockMovementReasonIsValid($stockMovementReasonId)
+    {
+        if (!StockMvtReason::exists($stockMovementReasonId)) {
+            $stockMovementReasonId = Configuration::get('PS_STOCK_MVT_DEC_REASON_DEFAULT');
+        }
+
+        return $stockMovementReasonId;
+    }
+
+    /**
+     * @param $productId
+     * @param $shouldIgnorePack
+     * @return bool
+     */
+    protected function shouldHandleStockOperationForProductsPack($productId, $shouldIgnorePack)
+    {
+        return Pack::isPack((int)$productId) && !$shouldIgnorePack;
+    }
+
+    /**
+     * @param Warehouse $warehouse
+     * @param $productId
+     * @param $productAttributeId
+     * @param $isUsable
+     */
+    protected function hookCoverageOnProductRemoval(
+        Warehouse $warehouse,
+        $productId,
+        $productAttributeId,
+        $isUsable
+    )
+    {
+        if ($isUsable) {
+            Hook::exec('actionProductCoverage',
+                array(
+                    'id_product' => $productId,
+                    'id_product_attribute' => $productAttributeId,
+                    'warehouse' => $warehouse
+                )
+            );
+        }
+    }
+
+    /**
+     * @param Warehouse $warehouse
+     * @param $productId
+     * @param $productAttributeId
+     * @param $shouldHandleUsableQuantity
+     * @param $stock
+     * @return int
+     */
+    protected function computeProductQuantityInStock(
+        Warehouse $warehouse,
+        $productId,
+        $productAttributeId,
+        $shouldHandleUsableQuantity,
+        Stock $stock = null
+    )
+    {
+        $productStockCriteria = array(
+            'product_id' => $productId,
+            'product_attribute_id' => $productAttributeId,
+            'warehouse_id' => $warehouse->id
+        );
+        $physicalProductQuantityInStock = $this->getPhysicalProductQuantities($productStockCriteria);
+        $usableProductQuantityInStock = $this->getUsableProductQuantities($productStockCriteria);
+
+        if ($stock) {
+            $physicalProductQuantityInStock = $stock->physical_quantity;
+            $usableProductQuantityInStock = $stock->usable_quantity;
+        }
+
+        $productQuantityInStock = $physicalProductQuantityInStock;
+
+        if ($shouldHandleUsableQuantity) {
+            $productQuantityInStock = $usableProductQuantityInStock;
+        }
+
+        return (int)$productQuantityInStock;
+    }
+
+    /**
+     * @param $quantity
+     * @param $quantity_in_stock
+     * @return bool
+     */
+    protected function ensureProductQuantityRequestedForRemovalIsValid($quantity, $quantity_in_stock)
+    {
+        return $quantity_in_stock < $quantity;
+    }
+
+    /**
+     * @param $id_product
+     * @param $id_product_attribute
+     * @param Warehouse $warehouse
+     * @param Stock $stock
+     * @return PrestaShopCollection
+     */
+    protected function getProductStockLinesInWarehouse(
+        $id_product,
+        $id_product_attribute,
+        Warehouse $warehouse,
+        Stock $stock = null
+    )
+    {
+        $stockLines = $this->getStockCollection($id_product, $id_product_attribute, $warehouse->id, null, $stock);
+        $stockLines->getAll();
+
+        return $stockLines;
+    }
+
+    /**
+     * @param $employee
+     * @return array
+     */
+    protected function getAttributesOfEmployeeRequestingStockMovement($employee)
+    {
+        $context = Context::getContext();
+
+        if ((int)$context->employee->id) {
+            $employeeId = (int)$context->employee->id;
+        } else {
+            $employeeId = $employee->id;
+        }
+
+        if ($context->employee->firstname) {
+            $employeeFirstName = $context->employee->firstname;
+        } else {
+            $employeeFirstName = $employee->firstname;
+        }
+
+        if ($context->employee->lastname) {
+            $employeeLastName = $context->employee->lastname;
+        } else {
+            $employeeLastName = $employee->lastname;
+        }
+
+        return array(
+            'employee_id' => $employeeId,
+            'first_name' => $employeeFirstName,
+            'last_name' => $employeeLastName
+        );
+    }
+
+    /**
+     * @param $quantity
+     * @param $id_stock_mvt_reason
+     * @param $is_usable
+     * @param $id_order
+     * @param $employee
+     * @param $stock
+     */
+    public function removeProductQuantityApplyingCump(
+        $quantity,
+        $id_stock_mvt_reason,
+        $is_usable,
+        $id_order,
+        $employee,
+        $stock
+    )
+    {
+        $employeeAttributes = $this->getAttributesOfEmployeeRequestingStockMovement($employee);
+
+        $movementParams = array(
+            'id_stock' => $stock->id,
+            'physical_quantity' => $quantity,
+            'id_stock_mvt_reason' => $id_stock_mvt_reason,
+            'id_order' => $id_order,
+            'price_te' => $stock->price_te,
+            'last_wa' => $stock->price_te,
+            'current_wa' => $stock->price_te,
+            'id_employee' => $employeeAttributes['employee_id'],
+            'employee_firstname' => $employeeAttributes['first_name'],
+            'employee_lastname' => $employeeAttributes['last_name'],
+            'sign' => -1
+        );
+
+        if ($is_usable) {
+            $usableProductQuantity = $stock->usable_quantity - $quantity;
+        } else {
+            $usableProductQuantity = $stock->usable_quantity;
+        }
+
+        $physicalProductQuantity = $stock->physical_quantity - $quantity;
+
+        $stockParams = array(
+            'physical_quantity' => $physicalProductQuantity,
+            'usable_quantity' => $usableProductQuantity
+        );
+
+        /** @var \StockCore $stock */
+        $stock->hydrate($stockParams);
+        $stock->update();
+
+        /** @var \StockMvtCore $stockMovement */
+        $stockMovement = new StockMvt();
+        $stockMovement->hydrate($movementParams);
+        $stockMovement->save();
     }
 }

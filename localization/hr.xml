@@ -35,13 +35,94 @@
     <tax id="107" name="DDV SI 22%" rate="22" auto-generated="1" from-eu-tax-group="virtual"/>
     <tax id="108" name="DPH SK 20%" rate="20" auto-generated="1" from-eu-tax-group="virtual"/>
     <taxRulesGroup name="Croatia PDV 5%">
-      <taxRule iso_code_country="hr" behavior="0" id_tax="81"/>
+      <taxRule iso_code_country="be" id_tax="81"/>
+      <taxRule iso_code_country="bg" id_tax="81"/>
+      <taxRule iso_code_country="cz" id_tax="81"/>
+      <taxRule iso_code_country="dk" id_tax="81"/>
+      <taxRule iso_code_country="de" id_tax="81"/>
+      <taxRule iso_code_country="ee" id_tax="81"/>
+      <taxRule iso_code_country="gr" id_tax="81"/>
+      <taxRule iso_code_country="es" id_tax="81"/>
+      <taxRule iso_code_country="fr" id_tax="81"/>
+      <taxRule iso_code_country="ie" id_tax="81"/>
+      <taxRule iso_code_country="it" id_tax="81"/>
+      <taxRule iso_code_country="cy" id_tax="81"/>
+      <taxRule iso_code_country="lv" id_tax="81"/>
+      <taxRule iso_code_country="lt" id_tax="81"/>
+      <taxRule iso_code_country="lu" id_tax="81"/>
+      <taxRule iso_code_country="hu" id_tax="81"/>
+      <taxRule iso_code_country="mt" id_tax="81"/>
+      <taxRule iso_code_country="nl" id_tax="81"/>
+      <taxRule iso_code_country="at" id_tax="81"/>
+      <taxRule iso_code_country="pl" id_tax="81"/>
+      <taxRule iso_code_country="pt" id_tax="81"/>
+      <taxRule iso_code_country="ro" id_tax="81"/>
+      <taxRule iso_code_country="si" id_tax="81"/>
+      <taxRule iso_code_country="sk" id_tax="81"/>
+      <taxRule iso_code_country="fi" id_tax="81"/>
+      <taxRule iso_code_country="se" id_tax="81"/>
+      <taxRule iso_code_country="gb" id_tax="81"/>
+      <taxRule iso_code_country="hr" id_tax="81"/>
     </taxRulesGroup>
     <taxRulesGroup name="Croatia PDV 25%">
-      <taxRule iso_code_country="hr" behavior="0" id_tax="79"/>
+      <taxRule iso_code_country="be" id_tax="79"/>
+      <taxRule iso_code_country="bg" id_tax="79"/>
+      <taxRule iso_code_country="cz" id_tax="79"/>
+      <taxRule iso_code_country="dk" id_tax="79"/>
+      <taxRule iso_code_country="de" id_tax="79"/>
+      <taxRule iso_code_country="ee" id_tax="79"/>
+      <taxRule iso_code_country="gr" id_tax="79"/>
+      <taxRule iso_code_country="es" id_tax="79"/>
+      <taxRule iso_code_country="fr" id_tax="79"/>
+      <taxRule iso_code_country="ie" id_tax="79"/>
+      <taxRule iso_code_country="it" id_tax="79"/>
+      <taxRule iso_code_country="cy" id_tax="79"/>
+      <taxRule iso_code_country="lv" id_tax="79"/>
+      <taxRule iso_code_country="lt" id_tax="79"/>
+      <taxRule iso_code_country="lu" id_tax="79"/>
+      <taxRule iso_code_country="hu" id_tax="79"/>
+      <taxRule iso_code_country="mt" id_tax="79"/>
+      <taxRule iso_code_country="nl" id_tax="79"/>
+      <taxRule iso_code_country="at" id_tax="79"/>
+      <taxRule iso_code_country="pl" id_tax="79"/>
+      <taxRule iso_code_country="pt" id_tax="79"/>
+      <taxRule iso_code_country="ro" id_tax="79"/>
+      <taxRule iso_code_country="si" id_tax="79"/>
+      <taxRule iso_code_country="sk" id_tax="79"/>
+      <taxRule iso_code_country="fi" id_tax="79"/>
+      <taxRule iso_code_country="se" id_tax="79"/>
+      <taxRule iso_code_country="gb" id_tax="79"/>
+      <taxRule iso_code_country="hr" id_tax="79"/>
     </taxRulesGroup>
     <taxRulesGroup name="Croatia PDV 10%">
-      <taxRule iso_code_country="hr" behavior="0" id_tax="80"/>
+      <taxRule iso_code_country="be" id_tax="80"/>
+      <taxRule iso_code_country="bg" id_tax="80"/>
+      <taxRule iso_code_country="cz" id_tax="80"/>
+      <taxRule iso_code_country="dk" id_tax="80"/>
+      <taxRule iso_code_country="de" id_tax="80"/>
+      <taxRule iso_code_country="ee" id_tax="80"/>
+      <taxRule iso_code_country="gr" id_tax="80"/>
+      <taxRule iso_code_country="es" id_tax="80"/>
+      <taxRule iso_code_country="fr" id_tax="80"/>
+      <taxRule iso_code_country="ie" id_tax="80"/>
+      <taxRule iso_code_country="it" id_tax="80"/>
+      <taxRule iso_code_country="cy" id_tax="80"/>
+      <taxRule iso_code_country="lv" id_tax="80"/>
+      <taxRule iso_code_country="lt" id_tax="80"/>
+      <taxRule iso_code_country="lu" id_tax="80"/>
+      <taxRule iso_code_country="hu" id_tax="80"/>
+      <taxRule iso_code_country="mt" id_tax="80"/>
+      <taxRule iso_code_country="nl" id_tax="80"/>
+      <taxRule iso_code_country="at" id_tax="80"/>
+      <taxRule iso_code_country="pl" id_tax="80"/>
+      <taxRule iso_code_country="pt" id_tax="80"/>
+      <taxRule iso_code_country="ro" id_tax="80"/>
+      <taxRule iso_code_country="si" id_tax="80"/>
+      <taxRule iso_code_country="sk" id_tax="80"/>
+      <taxRule iso_code_country="fi" id_tax="80"/>
+      <taxRule iso_code_country="se" id_tax="80"/>
+      <taxRule iso_code_country="gb" id_tax="80"/>
+      <taxRule iso_code_country="hr" id_tax="80"/>
     </taxRulesGroup>
     <tax id="79" name="Croatia PDV 25%" rate="25.000" eu-tax-group="virtual"/>
     <tax id="80" name="Croatia PDV 10%" rate="10.000"/>

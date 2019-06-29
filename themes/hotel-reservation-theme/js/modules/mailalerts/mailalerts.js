@@ -1,5 +1,5 @@
 /*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -18,7 +18,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -117,7 +117,7 @@ function  addNotification()
 		url: mailalerts_url_add,
 		data: 'id_product=' + id_product + '&id_product_attribute='+$('#idCombination').val()+'&customer_email='+$('#oos_customer_email').val()+'',
 		success: function (msg) {
-			if (msg == '1') 
+			if (msg == '1')
 			{
 				$('#mailalert_link').hide();
 				$('#oos_customer_email').hide();
@@ -128,7 +128,7 @@ function  addNotification()
 			{
 				$('#oos_customer_email_result').html(mailalerts_already);
 				$('#oos_customer_email_result').css('color', 'red').show();
-			} 
+			}
 			else
 			{
 				$('#oos_customer_email_result').html(mailalerts_invalid);

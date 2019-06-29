@@ -1,5 +1,5 @@
 {*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -18,7 +18,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
@@ -118,14 +118,33 @@
 							var rte_mail_config = {};
 							rte_mail_config['editor_selector'] = 'rte-mail-' + rte_mail_selector;
 							rte_mail_config['height'] = '500px';
+							// We want the default plugins + 'fullpage' plugin for HTML emails
+							rte_mail_config['plugins'] = "colorpicker link image paste pagebreak table contextmenu filemanager table code media autoresize textcolor anchor fullpage";
 							// move controls to active panel
 							$('#translation_mails-control-actions').appendTo($(this).find('.panel-collapse.in'));
 							// when user first open email
 							if (frame.find('iframe.email-frame').length == 0) {
 								// load iframe
-								frame.append('<iframe class="email-frame" src="'+src+'"/>');
-								// init tinyMCE with special config
-								tinySetup(rte_mail_config);
+								frame.append('<iframe class="email-frame" />');
+								$.ajax({
+									url:'ajax.php',
+									type: 'POST',
+									dataType: 'html',
+									data: {
+										getEmailHTML : true,
+										email : src
+									},
+									success: function(result)
+									{
+										var doc = frame.find('iframe')[0].contentWindow.document;
+										doc.open();
+										doc.write(result);
+										doc.close();
+										tinySetup(rte_mail_config);
+										// init tinyMCE with special config
+									}
+								});
+
 							}
 						});
 					})

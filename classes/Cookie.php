@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -76,13 +76,7 @@ class CookieCore
         $this->_name = 'PrestaShop-'.md5(($this->_standalone ? '' : _PS_VERSION_).$name.$this->_domain);
         $this->_allow_writing = true;
         $this->_salt = $this->_standalone ? str_pad('', 8, md5('ps'.__FILE__)) : _COOKIE_IV_;
-        if ($this->_standalone) {
-            $this->_cipherTool = new Blowfish(str_pad('', 56, md5('ps'.__FILE__)), str_pad('', 56, md5('iv'.__FILE__)));
-        } elseif (!Configuration::get('PS_CIPHER_ALGORITHM') || !defined('_RIJNDAEL_KEY_')) {
-            $this->_cipherTool = new Blowfish(_COOKIE_KEY_, _COOKIE_IV_);
-        } else {
-            $this->_cipherTool = new Rijndael(_RIJNDAEL_KEY_, _RIJNDAEL_IV_);
-        }
+        $this->_cipherTool = new Rijndael(_RIJNDAEL_KEY_, _RIJNDAEL_IV_);
         $this->_secure = (bool)$secure;
 
         $this->update();
@@ -299,9 +293,9 @@ class CookieCore
                     $this->_content[$tmpTab2[0]] = $tmpTab2[1];
                 }
             }
-            /* Blowfish fix */
+
             if (isset($this->_content['checksum'])) {
-                $this->_content['checksum'] = (int)($this->_content['checksum']);
+                $this->_content['checksum'] = (int) $this->_content['checksum'];
             }
             //printf("\$this->_content['checksum'] = %s<br />", $this->_content['checksum']);
             //die();

@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -110,6 +110,18 @@ class AdminCustomerThreadsControllerCore extends AdminController
                 'filter_key' => 'messages',
                 'tmpTableFilter' => true,
                 'maxlength' => 40,
+            ),
+            'private' => array(
+                'title' => $this->l('Private'),
+                'type' => 'select',
+                'filter_key' => 'private',
+                'align' => 'center',
+                'cast' => 'intval',
+                'callback' => 'printOptinIcon',
+                'list' => array(
+                    '0' => $this->l('No'),
+                    '1' => $this->l('Yes')
+                )
             ),
             'date_upd' => array(
                 'title' => $this->l('Last message'),
@@ -227,7 +239,7 @@ class AdminCustomerThreadsControllerCore extends AdminController
         $this->addRowAction('delete');
 
         $this->_select = '
-			CONCAT(c.`firstname`," ",c.`lastname`) as customer, cl.`name` as contact, l.`name` as language, group_concat(message) as messages,
+			CONCAT(c.`firstname`," ",c.`lastname`) as customer, cl.`name` as contact, l.`name` as language, group_concat(message) as messages, cm.private,
 			(
 				SELECT IFNULL(CONCAT(LEFT(e.`firstname`, 1),". ",e.`lastname`), "--")
 				FROM `'._DB_PREFIX_.'customer_message` cm2
@@ -282,6 +294,11 @@ class AdminCustomerThreadsControllerCore extends AdminController
     {
         parent::initToolbar();
         unset($this->toolbar_btn['new']);
+    }
+
+    public function printOptinIcon($value, $customer)
+    {
+        return ($value ? '<i class="icon-check"></i>' : '<i class="icon-remove"></i>');
     }
 
     public function postProcess()
@@ -357,7 +374,9 @@ class AdminCustomerThreadsControllerCore extends AdminController
                     $params = array(
                         '{messages}' => Tools::nl2br(stripslashes($output)),
                         '{employee}' => $current_employee->firstname.' '.$current_employee->lastname,
-                        '{comment}' => stripslashes($_POST['message_forward'])
+                        '{comment}' => stripslashes($_POST['message_forward']),
+                        '{firstname}' => '',
+                        '{lastname}' => '',
                     );
 
                     if (Mail::Send(
@@ -399,7 +418,7 @@ class AdminCustomerThreadsControllerCore extends AdminController
                     $params = array(
                         '{reply}' => Tools::nl2br(Tools::getValue('reply_message')),
                         '{link}' => Tools::url(
-                            $this->context->link->getPageLink('contact', true, null, null, false, $ct->id_shop),
+                            $this->context->link->getPageLink('contact', true, (int)$ct->id_lang, null, false, $ct->id_shop),
                             'id_customer_thread='.(int)$ct->id.'&token='.$ct->token
                         ),
                         '{firstname}' => $customer->firstname,
@@ -641,7 +660,7 @@ class AdminCustomerThreadsControllerCore extends AdminController
                 foreach ($orders as $key => $order) {
                     if ($order['valid']) {
                         $orders_ok[] = $order;
-                        $total_ok += $order['total_paid_real'];
+                        $total_ok += $order['total_paid_real']/$order['conversion_rate'];
                     }
                     $orders[$key]['date_add'] = Tools::displayDate($order['date_add']);
                     $orders[$key]['total_paid_real'] = Tools::displayPrice($order['total_paid_real'], new Currency((int)$order['id_currency']));
@@ -703,7 +722,10 @@ class AdminCustomerThreadsControllerCore extends AdminController
             $product = new Product((int)$message['id_product'], false, $this->context->language->id);
             $link_product = $this->context->link->getAdminLink('AdminOrders').'&vieworder&id_order='.(int)$product->id;
 
-            $content = $this->l('Message to: ').' <span class="badge">'.(!$message['id_employee'] ? $message['subject'] : $message['customer_name']).'</span><br/>';
+            $content = '';
+            if (!$message['private']) {
+                $content .= $this->l('Message to: ').' <span class="badge">'.(!$message['id_employee'] ? $message['subject'] : $message['customer_name']).'</span><br/>';
+            }
             if (Validate::isLoadedObject($product)) {
                 $content .= '<br/>'.$this->l('Product: ').'<span class="label label-info">'.$product->name.'</span><br/><br/>';
             }
@@ -1057,13 +1079,14 @@ class AdminCustomerThreadsControllerCore extends AdminController
                         $message = utf8_encode($message);
                         $message = quoted_printable_decode($message);
                         $message = nl2br($message);
+                        $message = Tools::substr($message, 0, (int) CustomerMessage::$definition['fields']['message']['size']);
+
                         $cm = new CustomerMessage();
                         $cm->id_customer_thread = $ct->id;
-                        $cm->message = $message;
-
-                        if (!Validate::isCleanHtml($message)) {
+                        if (empty($message) || !Validate::isCleanHtml($message)) {
                             $str_errors.= Tools::displayError(sprintf('Invalid Message Content for subject: %1s', $subject));
                         } else {
+                            $cm->message = $message;
                             $cm->add();
                         }
                     }
