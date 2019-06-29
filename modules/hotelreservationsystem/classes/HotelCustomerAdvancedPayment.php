@@ -56,12 +56,15 @@ class HotelCustomerAdvancedPayment extends ObjectModel
      */
     public function getClientAdvPaymentDtl($id_cart, $id_guest, $before_order = 0)
     {
-        // before order always only one row will be there in the cart
-        if ($before_order) {
-            return Db::getInstance()->getRow('SELECT * FROM `'._DB_PREFIX_.'htl_customer_adv_payment` WHERE `id_cart`='.$id_cart.' AND `id_guest`='.$id_guest);
-        } else {
-            return Db::getInstance()->executeS('SELECT * FROM `'._DB_PREFIX_.'htl_customer_adv_payment` WHERE `id_cart`='.$id_cart.' AND `id_guest`='.$id_guest);
+        if ($id_cart && $id_guest) {
+            // before order always only one row will be there in the cart
+            if ($before_order) {
+                return Db::getInstance()->getRow('SELECT * FROM `'._DB_PREFIX_.'htl_customer_adv_payment` WHERE `id_cart`='.$id_cart.' AND `id_guest`='.$id_guest);
+            } else {
+                return Db::getInstance()->executeS('SELECT * FROM `'._DB_PREFIX_.'htl_customer_adv_payment` WHERE `id_cart`='.$id_cart.' AND `id_guest`='.$id_guest);
+            }
         }
+        return false;
     }
 
     /**
@@ -153,5 +156,14 @@ class HotelCustomerAdvancedPayment extends ObjectModel
         } else {
             return true;
         }
+    }
+
+    public function deleteClientCartAdvPaymentDtl($idCart, $idGuest)
+    {
+        $where = '`id_cart`='.(int) $idCart.' AND `id_guest`='.(int) $idGuest.' AND `id_order`=0';
+        return Db::getInstance()->delete(
+            'htl_customer_adv_payment',
+            $where
+        );
     }
 }

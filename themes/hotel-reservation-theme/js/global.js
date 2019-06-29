@@ -1,5 +1,5 @@
 /*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -18,7 +18,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -92,12 +92,12 @@ $(document).ready(function(){
 			sticky: false,
 			mouseOutClose: true,
 			fx: {
-		    	open:       'fadeIn',
-		    	openSpeed:  'fast'
+				open:       'fadeIn',
+				openSpeed:  'fast'
 			}
 		}).css('opacity', 0.8);
 
-	if (!!$.prototype.fancybox)
+	if (typeof(FancyboxI18nClose) !== 'undefined' && typeof(FancyboxI18nNext) !== 'undefined' && typeof(FancyboxI18nPrev) !== 'undefined' && !!$.prototype.fancybox)
 		$.extend($.fancybox.defaults.tpl, {
 			closeBtn : '<a title="' + FancyboxI18nClose + '" class="fancybox-item fancybox-close" href="javascript:;"></a>',
 			next     : '<a title="' + FancyboxI18nNext + '" class="fancybox-nav fancybox-next" href="javascript:;"><span></span></a>',
@@ -113,7 +113,9 @@ $(document).ready(function(){
 
 function highdpiInit()
 {
-	if($('.replace-2x').css('font-size') == "1px")
+	if (typeof highDPI === 'undefined')
+		return;
+	if(highDPI && $('.replace-2x').css('font-size') == "1px")
 	{
 		var els = $("img.replace-2x").get();
 		for(var i = 0; i < els.length; i++)
@@ -133,29 +135,29 @@ function highdpiInit()
 // Used to compensante Chrome/Safari bug (they don't care about scroll bar for width)
 function scrollCompensate()
 {
-    var inner = document.createElement('p');
-    inner.style.width = "100%";
-    inner.style.height = "200px";
+	var inner = document.createElement('p');
+	inner.style.width = "100%";
+	inner.style.height = "200px";
 
-    var outer = document.createElement('div');
-    outer.style.position = "absolute";
-    outer.style.top = "0px";
-    outer.style.left = "0px";
-    outer.style.visibility = "hidden";
-    outer.style.width = "200px";
-    outer.style.height = "150px";
-    outer.style.overflow = "hidden";
-    outer.appendChild(inner);
+	var outer = document.createElement('div');
+	outer.style.position = "absolute";
+	outer.style.top = "0px";
+	outer.style.left = "0px";
+	outer.style.visibility = "hidden";
+	outer.style.width = "200px";
+	outer.style.height = "150px";
+	outer.style.overflow = "hidden";
+	outer.appendChild(inner);
 
-    document.body.appendChild(outer);
-    var w1 = inner.offsetWidth;
-    outer.style.overflow = 'scroll';
-    var w2 = inner.offsetWidth;
-    if (w1 == w2) w2 = outer.clientWidth;
+	document.body.appendChild(outer);
+	var w1 = inner.offsetWidth;
+	outer.style.overflow = 'scroll';
+	var w2 = inner.offsetWidth;
+	if (w1 == w2) w2 = outer.clientWidth;
 
-    document.body.removeChild(outer);
+	document.body.removeChild(outer);
 
-    return (w1 - w2);
+	return (w1 - w2);
 }
 
 function responsiveResize()
@@ -164,14 +166,16 @@ function responsiveResize()
 	if (($(window).width()+scrollCompensate()) <= 767 && responsiveflag == false)
 	{
 		accordion('enable');
-	    accordionFooter('enable');
+		accordionFooter('enable');
 		responsiveflag = true;
 	}
 	else if (($(window).width()+scrollCompensate()) >= 768)
 	{
 		accordion('disable');
 		accordionFooter('disable');
-	    responsiveflag = false;
+		responsiveflag = false;
+		// if (typeof bindUniform !=='undefined')
+		// 	bindUniform();
 	}
 	blockHover();
 }
@@ -236,6 +240,14 @@ function quick_view()
 
 function bindGrid()
 {
+	var storage = false;
+	if (typeof(getStorageAvailable) !== 'undefined') {
+		storage = getStorageAvailable();
+	}
+	if (!storage) {
+		return;
+	}
+
 	var view = $.totalStorage('display');
 
 	if (!view && (typeof displayList != 'undefined') && displayList)
@@ -264,7 +276,7 @@ function display(view)
 		$('ul.product_list').removeClass('grid').addClass('list row');
 		$('.product_list > li').removeClass('col-xs-12 col-sm-6 col-md-4').addClass('col-xs-12');
 		$('.product_list > li').each(function(index, element) {
-			html = '';
+			var html = '';
 			html = '<div class="product-container"><div class="row">';
 				html += '<div class="left-block col-xs-4 col-sm-5 col-md-4">' + $(element).find('.left-block').html() + '</div>';
 				html += '<div class="center-block col-xs-4 col-sm-7 col-md-4">';
@@ -293,7 +305,7 @@ function display(view)
 					html += '<div class="functional-buttons clearfix col-sm-12">' + $(element).find('.functional-buttons').html() + '</div>';
 				html += '</div>';
 			html += '</div></div>';
-		$(element).html(html);
+			$(element).html(html);
 		});
 		$('.display').find('li#list').addClass('selected');
 		$('.display').find('li#grid').removeAttr('class');
@@ -304,8 +316,8 @@ function display(view)
 		$('ul.product_list').removeClass('list').addClass('grid row');
 		$('.product_list > li').removeClass('col-xs-12').addClass('col-xs-12 col-sm-6 col-md-4');
 		$('.product_list > li').each(function(index, element) {
-		html = '';
-		html += '<div class="product-container">';
+			var html = '';
+			html += '<div class="product-container">';
 			html += '<div class="left-block">' + $(element).find('.left-block').html() + '</div>';
 			html += '<div class="right-block">';
 				html += '<div class="product-flags">'+ $(element).find('.product-flags').html() + '</div>';
@@ -330,8 +342,8 @@ function display(view)
 				}
 			html += '</div>';
 			html += '<div class="functional-buttons clearfix">' + $(element).find('.functional-buttons').html() + '</div>';
-		html += '</div>';
-		$(element).html(html);
+			html += '</div>';
+			$(element).html(html);
 		});
 		$('.display').find('li#grid').addClass('selected');
 		$('.display').find('li#list').removeAttr('class');
@@ -344,7 +356,6 @@ function dropDown()
 	elementClick = '#header .current, #footer .current';
 	elementSlide =  'ul.toogle_content';
 	activeClass = 'active';
-
 	$(elementClick).on('click', function(e){
 		e.stopPropagation();
 		var subUl = $(this).next(elementSlide);
@@ -379,8 +390,9 @@ function accordionFooter(status)
 {
 	if(status == 'enable')
 	{
-		$('#footer .footer-block h4').on('click', function(){
+		$('#footer .footer-block h4').on('click', function(e){
 			$(this).toggleClass('active').parent().find('.toggle-footer').stop().slideToggle('medium');
+			e.preventDefault();
 		})
 		$('#footer').addClass('accordion').find('.toggle-footer').slideUp('fast');
 	}
@@ -393,7 +405,6 @@ function accordionFooter(status)
 
 function accordion(status)
 {
-	leftColumnBlocks = $('#left_column');
 	if(status == 'enable')
 	{
 		var accordion_selector = '#right_column .block .title_block, #left_column .block .title_block, #left_column #newsletter_block_left h4,' +
@@ -410,6 +421,13 @@ function accordion(status)
 	{
 		$('#right_column .block .title_block, #left_column .block .title_block, #left_column #newsletter_block_left h4').removeClass('active').off().parent().find('.block_content').removeAttr('style').slideDown('fast');
 		$('#left_column, #right_column').removeClass('accordion');
+	}
+}
+
+function bindUniform()
+{
+	if (!!$.prototype.uniform) {
+		$("select.form-control,input[type='radio'],input[type='checkbox']").not(".not_uniform").uniform();
 	}
 }
 

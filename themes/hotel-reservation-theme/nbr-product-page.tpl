@@ -1,5 +1,5 @@
 {*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -18,7 +18,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @version  Release: $Revision$
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
@@ -47,7 +47,7 @@
 				{if isset($tag) AND $tag AND !is_array($tag)}
 					<input type="hidden" name="tag" value="{$tag|escape:'html':'UTF-8'}" />
 				{/if}
-				<label for="nb_item{if isset($paginationId)}_{$paginationId}{/if}">
+				<label for="nb_page_items{if isset($paginationId)}_{$paginationId}{/if}">
 					{l s='Show'}
 				</label>
 				{if is_array($requestNb)}
@@ -57,7 +57,7 @@
 						{/if}
 					{/foreach}
 				{/if}
-				<select name="n" id="nb_item{if isset($paginationId)}_{$paginationId}{/if}" class="form-control">
+				<select name="n" id="nb_page_items{if isset($paginationId)}_{$paginationId}{/if}" class="form-control">
 					{assign var="lastnValue" value="0"}
 					{foreach from=$nArray item=nValue}
 						{if $lastnValue <= $nb_products}

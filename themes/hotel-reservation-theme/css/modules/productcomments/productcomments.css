@@ -126,8 +126,7 @@
         font-size: 13px;
         color: #000; }
   #new_comment_form .new_comment_form_content {
-    padding: 15px 25px 15px 15px;
-    }
+    padding: 15px 25px 15px 15px;}
     @media (max-width: 767px) {
       #new_comment_form .new_comment_form_content {
         padding-left: 25px; } }
@@ -136,29 +135,13 @@
       font-weight: bold;
       font-size: 12px; }
   #new_comment_form label {
-    display: block;
-    padding-top: 15px;
-    color: #404040;
-    font-size:15px;
-    font-family: 'PT Serif', serif;
-    font-weight:400;}
-  #new_comment_form input,
+    display: block;}
+  #new_comment_form input {
+    width: 100%;}
   #new_comment_form textarea {
-    padding: 0 5px;
-    height: 45px;
     width: 100%;
-    border: 1px solid #ccc;
-    background: #f9f9f9; }
-
-  #new_comment_form textarea {
     height: 200px; }
-  #new_comment_form .submit {
-    margin-top: 20px;
-    padding: 0;
-    font-size: 13px;
-    text-align: right; }
   #new_comment_form #criterions_list {
-    /*border-bottom: 1px solid #CCC;*/
     padding-top: 15px;
     list-style-type: none; }
     #new_comment_form #criterions_list li {
@@ -172,41 +155,39 @@
     font-size: 12px; }
 
 /* TAB COMMENTS ******************************************************************************** */
-#product_comments_block_tab {
-  margin: 0 0 20px 0; }
-  #product_comments_block_tab div.comment {
-    margin: 0 0 14px;
-    padding-top: 14px;
-    border-top: 1px solid #d6d4d4; }
-    #product_comments_block_tab div.comment:first-child {
-      padding: 0;
-      border: none; }
-    #product_comments_block_tab div.comment .comment_author {
-      padding: 0 20px;
-      line-height: 18px; }
-      #product_comments_block_tab div.comment .comment_author span {
-        font-weight: bold;
-        float: left; }
-      #product_comments_block_tab div.comment .comment_author .star_content {
-        display: inline-block;
-        vertical-align: middle;
-        margin: 0 0 0 5px; }
-    #product_comments_block_tab div.comment .comment_details {
-      overflow: hidden;
-      border-left: 1px solid #d6d4d4; }
-      @media (max-width: 991px) {
-        #product_comments_block_tab div.comment .comment_details {
-          border-left: none; }
-          #product_comments_block_tab div.comment .comment_details ul {
-            list-style-type: none;
-            margin: 0; }
-            #product_comments_block_tab div.comment .comment_details ul li {
-              padding: 2px 0 2px; }
-              #product_comments_block_tab div.comment .comment_details ul li:before {
-                font-family: "FontAwesome";
-                content: "\f0da";
-                color: #333;
-                margin-right: 8px; } }
+#product_comments_block_tab div.comment {
+  margin: 0 0 14px;
+  padding-top: 14px;
+  border-top: 1px solid #d6d4d4; }
+  #product_comments_block_tab div.comment:first-child {
+    padding: 0;
+    border: none; }
+  #product_comments_block_tab div.comment .comment_author {
+    padding: 0 20px;
+    line-height: 18px; }
+    #product_comments_block_tab div.comment .comment_author span {
+      font-weight: bold;
+      float: left; }
+    #product_comments_block_tab div.comment .comment_author .star_content {
+      display: inline-block;
+      vertical-align: middle;
+      margin: 0 0 0 5px; }
+  #product_comments_block_tab div.comment .comment_details {
+    overflow: hidden;
+    border-left: 1px solid #d6d4d4; }
+    @media (max-width: 991px) {
+      #product_comments_block_tab div.comment .comment_details {
+        border-left: none; }
+        #product_comments_block_tab div.comment .comment_details ul {
+          list-style-type: none;
+          margin: 0; }
+          #product_comments_block_tab div.comment .comment_details ul li {
+            padding: 2px 0 2px; }
+            #product_comments_block_tab div.comment .comment_details ul li:before {
+              font-family: "FontAwesome";
+              content: "\f0da";
+              color: #333;
+              margin-right: 8px; } }
   #product_comments_block_tab div.star:after {
     content: "\f006";
     font-family: "FontAwesome";

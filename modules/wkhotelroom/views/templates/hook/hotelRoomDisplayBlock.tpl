@@ -42,19 +42,20 @@
                                         <div class="hotelRoomDescContainer">
                                             <div class="row margin-lr-0">
                                                 <p class="htlRoomTypeNameText pull-left">{$roomDisplay.name|escape:'htmlall':'UTF-8'}</p>
-
-                                                <p class="htlRoomTypePriceText pull-right">
-                                                    {if $roomDisplay.feature_price_diff >= 0}
-                                                        <span class="wk_roomType_price {if $roomDisplay.feature_price_diff>0}room_type_old_price{/if}">{convertPrice price = $roomDisplay.price_without_reduction}</span>
-                                                    {/if}
-                                                    {if $roomDisplay.feature_price_diff}
-                                                        <span class="wk_roomType_price">{convertPrice price = $roomDisplay.feature_price}</span>
-                                                    {/if}
-                                                    /&nbsp;{l s='Per Night' mod='wkhotelroom'}
-                                                </p>
+                                                {if $roomDisplay.show_price && !isset($restricted_country_mode) && !$PS_CATALOG_MODE}
+                                                    <p class="htlRoomTypePriceText pull-right">
+                                                        {if $roomDisplay.feature_price_diff >= 0}
+                                                            <span class="wk_roomType_price {if $roomDisplay.feature_price_diff>0}room_type_old_price{/if}">{convertPrice price = $roomDisplay.price_without_reduction}</span>
+                                                        {/if}
+                                                        {if $roomDisplay.feature_price_diff}
+                                                            <span class="wk_roomType_price">{convertPrice price = $roomDisplay.feature_price}</span>
+                                                        {/if}
+                                                        /&nbsp;{l s='Per Night' mod='wkhotelroom'}
+                                                    </p>
+                                                {/if}
                                             </div>
                                             <div class="row margin-lr-0 htlRoomTypeDescText">
-                                                {$roomDisplay.description|escape:'htmlall':'UTF-8'}
+                                                {$roomDisplay.description}
                                             </div>
                                             <div class="row margin-lr-0">
                                                 <a target="blank" class="btn btn-default button htlRoomTypeBookNow" href="{$link->getProductLink($roomDisplay.id_product)|escape:'html':'UTF-8'}"><span>{l s='book now' mod='wkhotelroom'}</span></a>

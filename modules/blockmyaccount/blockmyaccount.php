@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2015 PrestaShop
+* 2007-2016 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2016 PrestaShop SA
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -33,7 +33,7 @@ class BlockMyAccount extends Module
 	{
 		$this->name = 'blockmyaccount';
 		$this->tab = 'front_office_features';
-		$this->version = '1.4.0';
+		$this->version = '1.4.1';
 		$this->author = 'PrestaShop';
 		$this->need_instance = 0;
 
@@ -41,14 +41,14 @@ class BlockMyAccount extends Module
 
 		$this->displayName = $this->l('My Account block');
 		$this->description = $this->l('Displays a block with links relative to a user\'s account.');
-		$this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
+		$this->ps_versions_compliancy = array('min' => '1.6', 'max' => '1.6.99.99');
 	}
 
 	public function install()
 	{
-		if (!$this->addMyAccountBlockHook() 
-			|| !parent::install() 
-			|| !$this->registerHook('displayLeftColumn') 
+		if (!$this->addMyAccountBlockHook()
+			|| !parent::install()
+			|| !$this->registerHook('displayLeftColumn')
 			|| !$this->registerHook('displayHeader')
 			|| !$this->registerHook('actionModuleRegisterHookAfter')
 			|| !$this->registerHook('actionModuleUnRegisterHookAfter'))
@@ -89,7 +89,7 @@ class BlockMyAccount extends Module
 	{
 		return $this->hookDisplayLeftColumn($params);
 	}
-	
+
 	public function hookDisplayFooter($params)
 	{
 		return $this->hookDisplayLeftColumn($params);
@@ -110,5 +110,3 @@ class BlockMyAccount extends Module
 		$this->context->controller->addCSS(($this->_path).'blockmyaccount.css', 'all');
 	}
 }
-
-

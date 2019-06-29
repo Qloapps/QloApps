@@ -1,5 +1,5 @@
 {*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -18,7 +18,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
@@ -46,7 +46,7 @@
 	<div class="form-group">
 		<div class="col-lg-1"><span class="pull-right">{include file="controllers/products/multishop/checkbox.tpl" field="id_category_default" type="default"}</span></div>
 		<label class="control-label col-lg-2" for="id_category_default">
-			<span class="label-tooltip" data-toggle="tooltip" title="{l s='The default category is the main category for your product, and is displayed by default.'}">
+			<span class="label-tooltip" data-toggle="tooltip" title="{l s='The default category is the main category for your room type, and is displayed by default.'}">
 				{l s='Default category'}
 			</span>
 		</label>

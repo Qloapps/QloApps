@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -109,21 +109,6 @@ class SearchCore
         if ($indexation) {
             $string = preg_replace('/[._-]+/', ' ', $string);
         } else {
-            $string = preg_replace('/[._]+/', '', $string);
-            $string = ltrim(preg_replace('/([^ ])-/', '$1 ', ' '.$string));
-            $string = preg_replace('/[._]+/', '', $string);
-            $string = preg_replace('/[^\s]-+/', '', $string);
-        }
-
-        $blacklist = Tools::strtolower(Configuration::get('PS_SEARCH_BLACKLIST', $id_lang));
-        if (!empty($blacklist)) {
-            $string = preg_replace('/(?<=\s)('.$blacklist.')(?=\s)/Su', '', $string);
-            $string = preg_replace('/^('.$blacklist.')(?=\s)/Su', '', $string);
-            $string = preg_replace('/(?<=\s)('.$blacklist.')$/Su', '', $string);
-            $string = preg_replace('/^('.$blacklist.')$/Su', '', $string);
-        }
-
-        if (!$indexation) {
             $words = explode(' ', $string);
             $processed_words = array();
             // search for aliases for each word of the query
@@ -136,6 +121,18 @@ class SearchCore
                 }
             }
             $string = implode(' ', $processed_words);
+            $string = preg_replace('/[._]+/', '', $string);
+            $string = ltrim(preg_replace('/([^ ])-/', '$1 ', ' '.$string));
+            $string = preg_replace('/[._]+/', '', $string);
+            $string = preg_replace('/[^\s]-+/', '', $string);
+        }
+
+        $blacklist = Tools::strtolower(Configuration::get('PS_SEARCH_BLACKLIST', $id_lang));
+        if (!empty($blacklist)) {
+            $string = preg_replace('/(?<=\s)('.$blacklist.')(?=\s)/Su', '', $string);
+            $string = preg_replace('/^('.$blacklist.')(?=\s)/Su', '', $string);
+            $string = preg_replace('/(?<=\s)('.$blacklist.')$/Su', '', $string);
+            $string = preg_replace('/^('.$blacklist.')$/Su', '', $string);
         }
 
         // If the language is constituted with symbol and there is no "words", then split every chars
@@ -202,7 +199,7 @@ class SearchCore
                 $start_search = Configuration::get('PS_SEARCH_START') ? '%': '';
                 $end_search = Configuration::get('PS_SEARCH_END') ? '': '%';
 
-                $intersect_array[] = 'SELECT si.id_product
+                $intersect_array[] = 'SELECT DISTINCT si.id_product
 					FROM '._DB_PREFIX_.'search_word sw
 					LEFT JOIN '._DB_PREFIX_.'search_index si ON sw.id_word = si.id_word
 					WHERE sw.id_lang = '.(int)$id_lang.'
@@ -245,7 +242,7 @@ class SearchCore
         }
 
         $results = $db->executeS('
-		SELECT cp.`id_product`
+		SELECT DISTINCT cp.`id_product`
 		FROM `'._DB_PREFIX_.'category_product` cp
 		'.(Group::isFeatureActive() ? 'INNER JOIN `'._DB_PREFIX_.'category_group` cg ON cp.`id_category` = cg.`id_category`' : '').'
 		INNER JOIN `'._DB_PREFIX_.'category` c ON cp.`id_category` = c.`id_category`
@@ -261,19 +258,17 @@ class SearchCore
         foreach ($results as $row) {
             $eligible_products[] = $row['id_product'];
         }
+
+        $eligible_products2 = array();
         foreach ($intersect_array as $query) {
-            $eligible_products2 = array();
             foreach ($db->executeS($query, true, false) as $row) {
                 $eligible_products2[] = $row['id_product'];
             }
-
-            $eligible_products = array_intersect($eligible_products, $eligible_products2);
-            if (!count($eligible_products)) {
-                return ($ajax ? array() : array('total' => 0, 'result' => array()));
-            }
         }
-
-        $eligible_products = array_unique($eligible_products);
+        $eligible_products = array_unique(array_intersect($eligible_products, array_unique($eligible_products2)));
+        if (!count($eligible_products)) {
+            return ($ajax ? array() : array('total' => 0, 'result' => array()));
+        }
 
         $product_pool = '';
         foreach ($eligible_products as $id_product) {
@@ -606,6 +601,7 @@ class SearchCore
             $db->execute('DELETE si FROM `'._DB_PREFIX_.'search_index` si
 				INNER JOIN `'._DB_PREFIX_.'product` p ON (p.id_product = si.id_product)
 				'.Shop::addSqlAssociation('product', 'p').'
+				INNER JOIN `'._DB_PREFIX_.'search_word` sw ON (sw.id_word = si.id_word AND product_shop.id_shop = sw.id_shop)
 				WHERE product_shop.`visibility` IN ("both", "search")
 				AND product_shop.`active` = 1
 				AND '.($id_product ? 'p.`id_product` = '.(int)$id_product : 'product_shop.`indexed` = 0'));

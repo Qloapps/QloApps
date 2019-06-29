@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2015 PrestaShop
+* 2007-2016 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2016 PrestaShop SA
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -36,7 +36,7 @@ class sendToAFriend extends Module
 	function __construct($dontTranslate = false)
  	{
  	 	$this->name = 'sendtoafriend';
-		$this->version = '1.8.0';
+		$this->version = '1.9.0';
 		$this->author = 'PrestaShop';
  	 	$this->tab = 'front_office_features';
 		$this->need_instance = 0;
@@ -49,7 +49,7 @@ class sendToAFriend extends Module
 			$this->displayName = $this->l('Send to a Friend module');
 			$this->description = $this->l('Allows customers to send a product link to a friend.');
  		}
-		$this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
+		$this->ps_versions_compliancy = array('min' => '1.6', 'max' => '1.6.99.99');
 	}
 
 	public function install()
@@ -86,5 +86,36 @@ class sendToAFriend extends Module
 			$this->context->controller->addCSS($this->_path.'sendtoafriend.css', 'all');
 			$this->context->controller->addJS($this->_path.'sendtoafriend.js');
 		}
+	}
+
+	public function isValidName($name)
+	{
+		$isName          = Validate::isName($name);
+		$isShortName     = $this->isShortName($name);
+		$isNameLikeAnUrl = $this->isNameLikeAnUrl($name);
+		$isValidName     = $isName && $isShortName && !$isNameLikeAnUrl;
+
+		return $isValidName;
+	}
+
+	public function isShortName($name)
+	{
+		$isShortName = (strlen($name) <= 50);
+
+		return $isShortName;
+	}
+
+	public function isNameLikeAnUrl($name)
+	{
+		// THIS REGEX IS NOT MEANT TO FIND A VALID URL
+		// the goal is to see if the given string for a Person Name is containing something similar to an url
+		//
+		// See all strings that i tested the regex against in https://regex101.com/r/yL7lU0/3
+		//
+		// Please fork the regex if you can improve it and make a Pull Request
+		$regex           = "/(https?:[\/]*.*)|([\.]*[[[:alnum:]]+\.[^ ]]*.*)/m";
+		$isNameLikeAnUrl = (bool) preg_match_all($regex, $name);
+
+		return $isNameLikeAnUrl;
 	}
 }

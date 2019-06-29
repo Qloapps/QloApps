@@ -1,5 +1,5 @@
 {*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -18,7 +18,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
@@ -128,7 +128,7 @@
 								if (typeof data.result.{$name|escape:'html':'UTF-8'}[i].error !== 'undefined' && data.result.{$name|escape:'html':'UTF-8'}[i].error != '') {
 									$('#{$id|escape:'html':'UTF-8'}-errors').html('<strong>'+data.result.{$name|escape:'html':'UTF-8'}[i].name+'</strong> : '+data.result.{$name|escape:'html':'UTF-8'}[i].error).parent().show();
 								}
-								else 
+								else
 								{
 									$(data.context).appendTo($('#{$id|escape:'html':'UTF-8'}-success'));
 									$('#{$id|escape:'html':'UTF-8'}-success').parent().show();
@@ -137,7 +137,7 @@
 									{
 										var template = '<div>';
 										template += data.result.{$name|escape:'html':'UTF-8'}[i].image;
-										
+
 										if (typeof data.result.{$name|escape:'html':'UTF-8'}[i].delete_url !== 'undefined')
 											template += '<p><a class="btn btn-default" href="'+data.result.{$name|escape:'html':'UTF-8'}[i].delete_url+'"><i class="icon-trash"></i> {l s='Delete'}</a></p>';
 
@@ -150,10 +150,13 @@
 						}
 					}
 
-					$(data.context).find('button').remove();					
+					$(data.context).find('button').remove();
 				}
 			},
 		}).on('fileuploadalways', function (e, data) {
+				if (typeof {$id|escape:'html':'UTF-8'}_max_files !== 'undefined') {
+					{$id|escape:'html':'UTF-8'}_max_files--;
+				}
 				{$id|escape:'html':'UTF-8'}_total_files--;
 
 				if ({$id|escape:'html':'UTF-8'}_total_files == 0)
@@ -177,8 +180,8 @@
 			var button = $('<button/>').addClass('btn btn-default pull-right').prop('type', 'button').html('<i class="icon-trash"></i> {l s='Remove file'}').appendTo(data.context).on('click', function() {
 				{$id|escape:'html':'UTF-8'}_total_files--;
 				data.files = null;
-				
-				var total_elements = $(this).parent().siblings('div.row').length;
+
+				var total_elements = $(this).parent().siblings('div.form-group').length;
 				$(this).parent().remove();
 
 				if (total_elements == 0) {
@@ -189,24 +192,25 @@
 			$('#{$id|escape:'html':'UTF-8'}-files-list').parent().show();
 			$('#{$id|escape:'html':'UTF-8'}-upload-button').show().bind('click', function () {
 				if (data.files != null)
-					data.submit();						
+					data.submit();
 			});
 
 			{$id|escape:'html':'UTF-8'}_total_files++;
 		}).on('fileuploadprocessalways', function (e, data) {
 			var index = data.index,	file = data.files[index];
-			
+
 			if (file.error) {
 				$('#{$id|escape:'html':'UTF-8'}-errors').append('<div class="form-group"><strong>'+file.name+'</strong> ('+humanizeSize(file.size)+') : '+file.error+'</div>').parent().show();
 				$(data.context).find('button').trigger('click');
 			}
 		});
 
+		$('#{$id|escape:'html':'UTF-8'}-files-list').parent().hide();
+		{$id|escape:'html':'UTF-8'}_total_files = 0;
+
 		$('#{$id|escape:'html':'UTF-8'}-add-button').on('click', function() {
 			$('#{$id|escape:'html':'UTF-8'}-success').html('').parent().hide();
 			$('#{$id|escape:'html':'UTF-8'}-errors').html('').parent().hide();
-			$('#{$id|escape:'html':'UTF-8'}-files-list').parent().hide();
-			{$id|escape:'html':'UTF-8'}_total_files = 0;
 			$('#{$id|escape:'html':'UTF-8'}').trigger('click');
 		});
 	});

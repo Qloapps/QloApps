@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -41,6 +41,6 @@ if (substr(_COOKIE_KEY_, 34, 8) != Tools::getValue('token')) {
 
 ini_set('max_execution_time', 7200);
 Search::indexation(Tools::getValue('full'));
-if (Tools::getValue('redirect')) {
+if (Tools::getValue('redirect') && isset($_SERVER['HTTP_REFERER'])) {
     Tools::redirectAdmin($_SERVER['HTTP_REFERER'].'&conf=4');
 }

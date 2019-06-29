@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -45,10 +45,7 @@ class AuthControllerCore extends FrontController
         parent::init();
 
         if (!Tools::getIsset('step') && $this->context->customer->isLogged() && !$this->ajax) {
-            Tools::redirect(
-                'index.php?controller='.
-                (($this->authRedirection !== false) ? urlencode($this->authRedirection) : 'my-account')
-            );
+            Tools::redirect('index.php?controller='.(($this->authRedirection !== false) ? urlencode($this->authRedirection) : 'my-account'));
         }
 
         if (Tools::getValue('create_account')) {
@@ -70,14 +67,12 @@ class AuthControllerCore extends FrontController
         $this->addCSS(_THEME_CSS_DIR_.'htl-reservation-general.css');// webkul
 
         $this->addJqueryPlugin('typewatch');
-        $this->addJS(
-            array(
-                _THEME_JS_DIR_.'tools/vatManagement.js',
-                _THEME_JS_DIR_.'tools/statesManagement.js',
-                _THEME_JS_DIR_.'authentication.js',
-                _PS_JS_DIR_.'validate.js'
-            )
-        );
+        $this->addJS(array(
+            _THEME_JS_DIR_.'tools/vatManagement.js',
+            _THEME_JS_DIR_.'tools/statesManagement.js',
+            _THEME_JS_DIR_.'authentication.js',
+            _PS_JS_DIR_.'validate.js'
+        ));
     }
 
     /**
@@ -128,15 +123,13 @@ class AuthControllerCore extends FrontController
                 $countries = Country::getCountries($this->context->language->id, true);
             }
 
-            $this->context->smarty->assign(
-                array(
+            $this->context->smarty->assign(array(
                     'inOrderProcess' => true,
                     'PS_GUEST_CHECKOUT_ENABLED' => Configuration::get('PS_GUEST_CHECKOUT_ENABLED'),
                     'PS_REGISTRATION_PROCESS_TYPE' => Configuration::get('PS_REGISTRATION_PROCESS_TYPE'),
                     'sl_country' => (int)$this->id_country,
                     'countries' => $countries
-                )
-            );
+                ));
         }
 
         if (Tools::getValue('create_account')) {
@@ -154,24 +147,20 @@ class AuthControllerCore extends FrontController
         $this->assignAddressFormat();
 
         // Call a hook to display more information on form
-        $this->context->smarty->assign(
-            array(
-                'HOOK_CREATE_ACCOUNT_FORM' => Hook::exec('displayCustomerAccountForm'),
-                'HOOK_CREATE_ACCOUNT_TOP' => Hook::exec('displayCustomerAccountFormTop')
-            )
-        );
+        $this->context->smarty->assign(array(
+            'HOOK_CREATE_ACCOUNT_FORM' => Hook::exec('displayCustomerAccountForm'),
+            'HOOK_CREATE_ACCOUNT_TOP' => Hook::exec('displayCustomerAccountFormTop')
+        ));
 
         // Just set $this->template value here in case it's used by Ajax
         $this->setTemplate(_PS_THEME_DIR_.'authentication.tpl');
 
         if ($this->ajax) {
             // Call a hook to display more information on form
-            $this->context->smarty->assign(
-                array(
+            $this->context->smarty->assign(array(
                     'PS_REGISTRATION_PROCESS_TYPE' => Configuration::get('PS_REGISTRATION_PROCESS_TYPE'),
                     'genders' => Gender::getGenders()
-                )
-            );
+                ));
 
             $return = array(
                 'hasError' => !empty($this->errors),
@@ -195,8 +184,7 @@ class AuthControllerCore extends FrontController
         $selectedDays = (int)(Tools::getValue('days', 0));
         $days = Tools::dateDays();
 
-        $this->context->smarty->assign(
-            array(
+        $this->context->smarty->assign(array(
                 'one_phone_at_least' => (int)Configuration::get('PS_ONE_PHONE_AT_LEAST'),
                 'onr_phone_at_least' => (int)Configuration::get('PS_ONE_PHONE_AT_LEAST'), //retro compat
                 'years' => $years,
@@ -205,8 +193,7 @@ class AuthControllerCore extends FrontController
                 'sl_month' => $selectedMonths,
                 'days' => $days,
                 'sl_day' => $selectedDays
-            )
-        );
+            ));
     }
 
     /**
@@ -220,14 +207,12 @@ class AuthControllerCore extends FrontController
         } else {
             $countries = Country::getCountries($this->context->language->id, true);
         }
-        $this->context->smarty->assign(
-            array(
+        $this->context->smarty->assign(array(
                 'countries' => $countries,
                 'PS_REGISTRATION_PROCESS_TYPE' => Configuration::get('PS_REGISTRATION_PROCESS_TYPE'),
                 'sl_country' => (int)$this->id_country,
                 'vat_management' => Configuration::get('VATNUMBER_MANAGEMENT')
-            )
-        );
+            ));
     }
 
     /**
@@ -253,13 +238,11 @@ class AuthControllerCore extends FrontController
         }
 
         foreach (array('inv', 'dlv') as $addressType) {
-            $this->context->smarty->assign(
-                array(
-                    $addressType.'_adr_fields' => $addressFormat,
-                    $addressType.'_all_fields' => $addressItems,
-                    'required_fields' => $requireFormFieldsList
-                )
-            );
+            $this->context->smarty->assign(array(
+                $addressType.'_adr_fields' => $addressFormat,
+                $addressType.'_all_fields' => $addressItems,
+                'required_fields' => $requireFormFieldsList
+            ));
         }
     }
 
@@ -321,20 +304,14 @@ class AuthControllerCore extends FrontController
                 // Add customer to the context
                 $this->context->customer = $customer;
 
-                if (Configuration::get('PS_CART_FOLLOWING')
-                    && (empty($this->context->cookie->id_cart) || Cart::getNbProducts($this->context->cookie->id_cart) == 0) && $id_cart = (int)Cart::lastNoneOrderedCart($this->context->customer->id)
-                ) {
+                if (Configuration::get('PS_CART_FOLLOWING') && (empty($this->context->cookie->id_cart) || Cart::getNbProducts($this->context->cookie->id_cart) == 0) && $id_cart = (int)Cart::lastNoneOrderedCart($this->context->customer->id)) {
                     $this->context->cart = new Cart($id_cart);
                 } else {
                     $id_carrier = (int)$this->context->cart->id_carrier;
                     $this->context->cart->id_carrier = 0;
                     $this->context->cart->setDeliveryOption(null);
-                    $this->context->cart->id_address_delivery = (int)Address::getFirstCustomerAddressId(
-                        (int)($customer->id)
-                    );
-                    $this->context->cart->id_address_invoice = (int)Address::getFirstCustomerAddressId(
-                        (int)($customer->id)
-                    );
+                    $this->context->cart->id_address_delivery = (int)Address::getFirstCustomerAddressId((int)($customer->id));
+                    $this->context->cart->id_address_invoice = (int)Address::getFirstCustomerAddressId((int)($customer->id));
                 }
                 $this->context->cart->id_customer = (int)$customer->id;
                 $this->context->cart->secure_key = $customer->secure_key;
@@ -349,18 +326,19 @@ class AuthControllerCore extends FrontController
                 $this->context->cookie->write();
                 $this->context->cart->autosetProductAddress();
 
-                Hook::exec('actionAuthentication');
+                Hook::exec('actionAuthentication', array('customer' => $this->context->customer));
 
                 // Login information have changed, so we check if the cart rules still apply
                 CartRule::autoRemoveFromCart($this->context);
                 CartRule::autoAddToCart($this->context);
 
-                if (!$this->ajax && $back = Tools::getValue('back')) {
-                    if ($back == Tools::secureReferrer(Tools::getValue('back'))) {
+                if (!$this->ajax) {
+                    $back = Tools::getValue('back','my-account');
+
+                    if ($back == Tools::secureReferrer($back)) {
                         Tools::redirect(html_entity_decode($back));
                     }
 
-                    $back = $back ? $back : 'my-account';
                     Tools::redirect('index.php?controller='.(($this->authRedirection !== false) ? urlencode($this->authRedirection) : $back));
                 }
             }
@@ -386,15 +364,22 @@ class AuthControllerCore extends FrontController
      */
     protected function processCustomerNewsletter(&$customer)
     {
+        $blocknewsletter = Module::isInstalled('blocknewsletter') && $module_newsletter = Module::getInstanceByName('blocknewsletter');
+        if ($blocknewsletter && $module_newsletter->active && !Tools::getValue('newsletter')) {
+            require_once _PS_MODULE_DIR_.'blocknewsletter/blocknewsletter.php';
+            if (is_callable(array($module_newsletter, 'isNewsletterRegistered')) && $module_newsletter->isNewsletterRegistered(Tools::getValue('email')) == Blocknewsletter::GUEST_REGISTERED) {
+                /* Force newsletter registration as customer as already registred as guest */
+                $_POST['newsletter'] = true;
+            }
+        }
+
         if (Tools::getValue('newsletter')) {
+            $customer->newsletter = true;
             $customer->ip_registration_newsletter = pSQL(Tools::getRemoteAddr());
             $customer->newsletter_date_add = pSQL(date('Y-m-d H:i:s'));
-
-            if ($module_newsletter = Module::getInstanceByName('blocknewsletter')) {
-                /** @var Blocknewsletter $module_newsletter */
-                if ($module_newsletter->active) {
-                    $module_newsletter->confirmSubscription(Tools::getValue('email'));
-                }
+            /** @var Blocknewsletter $module_newsletter */
+            if ($blocknewsletter && $module_newsletter->active) {
+                $module_newsletter->confirmSubscription(Tools::getValue('email'));
             }
         }
     }
@@ -436,6 +421,7 @@ class AuthControllerCore extends FrontController
         if (!Configuration::get('PS_ORDER_PROCESS_TYPE') && Configuration::get('PS_GUEST_CHECKOUT_ENABLED') && Tools::getValue('invoice_address')) {
             $addresses_types[] = 'address_invoice';
         }
+
         $error_phone = false;
         if (Configuration::get('PS_ONE_PHONE_AT_LEAST')) {
             if (Tools::isSubmit('submitGuestAccount') || !Tools::getValue('is_new_customer')) {
@@ -443,10 +429,9 @@ class AuthControllerCore extends FrontController
                     $error_phone = true;
                 }
             } elseif (((Configuration::get('PS_REGISTRATION_PROCESS_TYPE') && Configuration::get('PS_ORDER_PROCESS_TYPE'))
-                || (Configuration::get('PS_ORDER_PROCESS_TYPE') && !Tools::getValue('email_create'))
-                || (Configuration::get('PS_REGISTRATION_PROCESS_TYPE') && Tools::getValue('email_create')))
-                && (!Tools::getValue('phone') && !Tools::getValue('phone_mobile'))
-            ) {
+                    || (Configuration::get('PS_ORDER_PROCESS_TYPE') && !Tools::getValue('email_create'))
+                    || (Configuration::get('PS_REGISTRATION_PROCESS_TYPE') && Tools::getValue('email_create')))
+                    && (!Tools::getValue('phone') && !Tools::getValue('phone_mobile'))) {
                 $error_phone = true;
             }
         }
@@ -486,14 +471,14 @@ class AuthControllerCore extends FrontController
         }
         // End
         $this->errors = array_unique(array_merge($this->errors, $customer->validateController()));
+
         // Check the requires fields which are settings in the BO
         $this->errors = $this->errors + $customer->validateFieldsRequiredDatabase();
 
         if (!Configuration::get('PS_REGISTRATION_PROCESS_TYPE') && !$this->ajax && !Tools::isSubmit('submitGuestAccount')) {
             if (!count($this->errors)) {
-                if (Tools::isSubmit('newsletter')) {
-                    $this->processCustomerNewsletter($customer);
-                }
+
+                $this->processCustomerNewsletter($customer);
 
                 $customer->firstname = Tools::ucwords($customer->firstname);
                 $customer->birthday = (empty($_POST['years']) ? '' : (int)Tools::getValue('years').'-'.(int)Tools::getValue('months').'-'.(int)Tools::getValue('days'));
@@ -509,21 +494,17 @@ class AuthControllerCore extends FrontController
                     if ($customer->add()) {
                         if (!$customer->is_guest) {
                             if (!$this->sendConfirmationMail($customer)) {
-                                // webkul - we will not stop process on email delivery fails
-                                //$this->errors[] = Tools::displayError('The email cannot be sent.');
+                                $this->errors[] = Tools::displayError('The email cannot be sent.');
                             }
                         }
 
                         $this->updateContext($customer);
 
                         $this->context->cart->update();
-                        Hook::exec(
-                            'actionCustomerAccountAdd',
-                            array(
+                        Hook::exec('actionCustomerAccountAdd', array(
                                 '_POST' => $_POST,
                                 'newCustomer' => $customer
-                            )
-                        );
+                            ));
                         if ($this->ajax) {
                             $return = array(
                                 'hasError' => !empty($this->errors),
@@ -545,7 +526,9 @@ class AuthControllerCore extends FrontController
                         if (count($this->context->cart->getProducts(true)) > 0) {
                             $multi = (int)Tools::getValue('multi-shipping');
                             Tools::redirect('index.php?controller=order'.($multi ? '&multi-shipping='.$multi : ''));
-                        } else { // else : redirection to the account
+                        }
+                        // else : redirection to the account
+                        else {
                             Tools::redirect('index.php?controller='.(($this->authRedirection !== false) ? urlencode($this->authRedirection) : 'my-account'));
                         }
                     } else {
@@ -553,7 +536,9 @@ class AuthControllerCore extends FrontController
                     }
                 }
             }
-        } else { // if registration type is in one step, we save the address
+        } else {
+            // if registration type is in one step, we save the address
+
             $_POST['lastname'] = $lastnameAddress;
             $_POST['firstname'] = $firstnameAddress;
             $post_back = $_POST;
@@ -593,37 +578,26 @@ class AuthControllerCore extends FrontController
                     $this->errors[] = Tools::displayError('The Zip / Postal code is invalid.');
                 }
 
-                if ($country->need_identification_number
-                    && (!Tools::getValue('dni') || !Validate::isDniLite(Tools::getValue('dni')))
-                ) {
+                if ($country->need_identification_number && (!Tools::getValue('dni') || !Validate::isDniLite(Tools::getValue('dni')))) {
                     $this->errors[] = Tools::displayError('The identification number is incorrect or has already been used.');
                 } elseif (!$country->need_identification_number) {
                     $$addresses_type->dni = null;
                 }
 
                 if (Tools::isSubmit('submitAccount') || Tools::isSubmit('submitGuestAccount')) {
-                    if (!($country = new Country($$addresses_type->id_country, Configuration::get('PS_LANG_DEFAULT')))
-                        || !Validate::isLoadedObject($country)
-                    ) {
+                    if (!($country = new Country($$addresses_type->id_country, Configuration::get('PS_LANG_DEFAULT'))) || !Validate::isLoadedObject($country)) {
                         $this->errors[] = Tools::displayError('Country is invalid');
                     }
                 }
                 $contains_state = isset($country) && is_object($country) ? (int)$country->contains_states: 0;
                 $id_state = isset($$addresses_type) && is_object($$addresses_type) ? (int)$$addresses_type->id_state: 0;
-                if ((Tools::isSubmit('submitAccount') || Tools::isSubmit('submitGuestAccount'))
-                    && $contains_state
-                    && !$id_state
-                ) {
+                if ((Tools::isSubmit('submitAccount') || Tools::isSubmit('submitGuestAccount')) && $contains_state && !$id_state) {
                     $this->errors[] = Tools::displayError('This country requires you to choose a State.');
                 }
             }
         }
 
-        if (!@checkdate(Tools::getValue('months'), Tools::getValue('days'), Tools::getValue('years'))
-            && !(Tools::getValue('months') == ''
-            && Tools::getValue('days') == ''
-            && Tools::getValue('years') == '')
-        ) {
+        if (!@checkdate(Tools::getValue('months'), Tools::getValue('days'), Tools::getValue('years')) && !(Tools::getValue('months') == '' && Tools::getValue('days') == '' && Tools::getValue('years') == '')) {
             $this->errors[] = Tools::displayError('Invalid date of birth');
         }
 
@@ -631,9 +605,8 @@ class AuthControllerCore extends FrontController
             if (Customer::customerExists(Tools::getValue('email'))) {
                 $this->errors[] = Tools::displayError('An account using this email address has already been registered. Please enter a valid password or request a new one. ', false);
             }
-            if (Tools::isSubmit('newsletter')) {
-                $this->processCustomerNewsletter($customer);
-            }
+
+            $this->processCustomerNewsletter($customer);
 
             $customer->birthday = (empty($_POST['years']) ? '' : (int)Tools::getValue('years').'-'.(int)Tools::getValue('months').'-'.(int)Tools::getValue('days'));
             if (!Validate::isBirthDate($customer->birthday)) {
@@ -660,6 +633,7 @@ class AuthControllerCore extends FrontController
                                 }
                             }
                         }
+
                         $this->errors = array_unique(array_merge($this->errors, $$addresses_type->validateController()));
                         if ($addresses_type == 'address_invoice') {
                             $_POST = $post_back;
@@ -684,20 +658,14 @@ class AuthControllerCore extends FrontController
                             $customer->addGroups(array((int)Configuration::get('PS_GUEST_GROUP')));
                         }
                         $this->updateContext($customer);
-                        $this->context->cart->id_address_delivery = (int)Address::getFirstCustomerAddressId(
-                            (int)$customer->id
-                        );
-                        $this->context->cart->id_address_invoice = (int)Address::getFirstCustomerAddressId(
-                            (int)$customer->id
-                        );
+                        $this->context->cart->id_address_delivery = (int)Address::getFirstCustomerAddressId((int)$customer->id);
+                        $this->context->cart->id_address_invoice = (int)Address::getFirstCustomerAddressId((int)$customer->id);
                         if (isset($address_invoice) && Validate::isLoadedObject($address_invoice)) {
                             $this->context->cart->id_address_invoice = (int)$address_invoice->id;
                         }
 
                         if ($this->ajax && Configuration::get('PS_ORDER_PROCESS_TYPE')) {
-                            $delivery_option = array(
-                                (int)$this->context->cart->id_address_delivery => (int)$this->context->cart->id_carrier.','
-                            );
+                            $delivery_option = array((int)$this->context->cart->id_address_delivery => (int)$this->context->cart->id_carrier.',');
                             $this->context->cart->setDeliveryOption($delivery_option);
                         }
 
@@ -707,12 +675,10 @@ class AuthControllerCore extends FrontController
                         // Avoid articles without delivery address on the cart
                         $this->context->cart->autosetProductAddress();
 
-                        Hook::exec(
-                            'actionCustomerAccountAdd', array(
+                        Hook::exec('actionCustomerAccountAdd', array(
                                 '_POST' => $_POST,
                                 'newCustomer' => $customer
-                            )
-                        );
+                            ));
                         if ($this->ajax) {
                             $return = array(
                                 'hasError' => !empty($this->errors),
@@ -726,10 +692,7 @@ class AuthControllerCore extends FrontController
                             $this->ajaxDie(Tools::jsonEncode($return));
                         }
                         // if registration type is in two steps, we redirect to register address
-                        if (!Configuration::get('PS_REGISTRATION_PROCESS_TYPE')
-                            && !$this->ajax
-                            && !Tools::isSubmit('submitGuestAccount')
-                        ) {
+                        if (!Configuration::get('PS_REGISTRATION_PROCESS_TYPE') && !$this->ajax && !Tools::isSubmit('submitGuestAccount')) {
                             Tools::redirect('index.php?controller=address');
                         }
 
@@ -740,7 +703,9 @@ class AuthControllerCore extends FrontController
                         // redirection: if cart is not empty : redirection to the cart
                         if (count($this->context->cart->getProducts(true)) > 0) {
                             Tools::redirect('index.php?controller=order'.($multi = (int)Tools::getValue('multi-shipping') ? '&multi-shipping='.$multi : ''));
-                        } else { // else : redirection to the account
+                        }
+                        // else : redirection to the account
+                        else {
                             Tools::redirect('index.php?controller='.(($this->authRedirection !== false) ? urlencode($this->authRedirection) : 'my-account'));
                         }
                     }
@@ -775,11 +740,11 @@ class AuthControllerCore extends FrontController
      */
     protected function processSubmitCreate()
     {
-        if (!Validate::isEmail($email = Tools::getValue('email_create')) || empty($email)) {
+        if (!Validate::isEmail($email = trim(Tools::getValue('email_create'))) || empty($email)) {
             $this->errors[] = Tools::displayError('Invalid email address.');
         } elseif (Customer::customerExists($email)) {
             $this->errors[] = Tools::displayError('An account using this email address has already been registered. Please enter a valid password or request a new one. ', false);
-            $_POST['email'] = Tools::getValue('email_create');
+            $_POST['email'] = trim(Tools::getValue('email_create'));
             unset($_POST['email_create']);
         } else {
             $this->create_account = true;
@@ -813,10 +778,10 @@ class AuthControllerCore extends FrontController
     }
 
     /**
-     * Confirmation mail to the customer
+     * sendConfirmationMail
      * @param Customer $customer
-     * @return [bool] true if maail sent or false
-    */
+     * @return bool
+     */
     protected function sendConfirmationMail(Customer $customer)
     {
         if (!Configuration::get('PS_CUSTOMER_CREATION_EMAIL')) {
@@ -831,7 +796,8 @@ class AuthControllerCore extends FrontController
                 '{firstname}' => $customer->firstname,
                 '{lastname}' => $customer->lastname,
                 '{email}' => $customer->email,
-                '{passwd}' => Tools::getValue('passwd')),
+                '{passwd}' => str_repeat('*', strlen(Tools::getValue('passwd'))),
+            ),
             $customer->email,
             $customer->firstname.' '.$customer->lastname
         );

@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -42,7 +42,7 @@ class CategoryControllerCore extends FrontController
     protected $cat_products;
 
     /**
-     * Sets default medias for this controller.
+     * Sets default medias for this controller
      */
     public function setMedia()
     {
@@ -62,11 +62,12 @@ class CategoryControllerCore extends FrontController
             $this->addJS(_THEME_JS_DIR_.'scenes.js');
             $this->addJqueryPlugin(array('scrollTo', 'serialScroll'));
         }
+
         $this->addJS(_THEME_JS_DIR_.'category.js');
     }
 
     /**
-     * Redirects to canonical or "Not Found" URL.
+     * Redirects to canonical or "Not Found" URL
      *
      * @param string $canonical_url
      */
@@ -75,28 +76,21 @@ class CategoryControllerCore extends FrontController
         if (Tools::getValue('live_edit')) {
             return;
         }
-
-        if (!Validate::isLoadedObject($this->category) || !$this->category->inShop() || !$this->category->isAssociatedToShop() || in_array($this->category->id, array(Configuration::get('PS_HOME_CATEGORY'), Configuration::get('PS_ROOT_CATEGORY')))) {
-            $this->redirect_after = '404';
-            $this->redirect();
-        }
-
         if (!Tools::getValue('noredirect') && Validate::isLoadedObject($this->category)) {
             parent::canonicalRedirection($this->context->link->getCategoryLink($this->category));
         }
     }
 
     /**
-     * Initializes controller.
+     * Initializes controller
      *
      * @see FrontController::init()
-     *
      * @throws PrestaShopException
      */
     public function init()
     {
         // Get category ID
-        $id_category = (int) Tools::getValue('id_category');
+        $id_category = (int)Tools::getValue('id_category');
         if (!$id_category || !Validate::isUnsignedId($id_category)) {
             $this->errors[] = Tools::displayError('Missing category ID');
         }
@@ -107,22 +101,22 @@ class CategoryControllerCore extends FrontController
         parent::init();
 
         // Check if the category is active and return 404 error if is disable.
-        if (!$this->category->active) {
+        if (!$this->category->active || !Validate::isLoadedObject($this->category) || !$this->category->inShop() || !$this->category->isAssociatedToShop() || in_array($this->category->id, array(Configuration::get('PS_HOME_CATEGORY'), Configuration::get('PS_ROOT_CATEGORY')))) {
             header('HTTP/1.1 404 Not Found');
             header('Status: 404 Not Found');
-        }
-
-        // Check if category can be accessible by current customer and return 403 if not
-        if (!$this->category->checkAccess($this->context->customer->id)) {
-            header('HTTP/1.1 403 Forbidden');
-            header('Status: 403 Forbidden');
-            $this->errors[] = Tools::displayError('You do not have access to this category.');
-            $this->customer_access = false;
-        }
+            $this->errors[] = Tools::displayError('Category not found');
+        } else
+            // Check if category can be accessible by current customer and return 403 if not
+            if (!$this->category->checkAccess($this->context->customer->id)) {
+                header('HTTP/1.1 403 Forbidden');
+                header('Status: 403 Forbidden');
+                $this->errors[] = Tools::displayError('You do not have access to this category.');
+                $this->customer_access = false;
+            }
     }
 
     /**
-     * Initializes page content variables.
+     * Initializes page content variables
      */
     public function initContent()
     {
@@ -304,7 +298,7 @@ class CategoryControllerCore extends FrontController
     }
 
     /**
-     * Assigns scenes template variables.
+     * Assigns scenes template variables
      */
     protected function assignScenes()
     {
@@ -330,28 +324,28 @@ class CategoryControllerCore extends FrontController
     }
 
     /**
-     * Assigns subcategory templates variables.
+     * Assigns subcategory templates variables
      */
     protected function assignSubcategories()
     {
         if ($sub_categories = $this->category->getSubCategories($this->context->language->id)) {
             $this->context->smarty->assign(array(
-                'subcategories' => $sub_categories,
+                'subcategories'          => $sub_categories,
                 'subcategories_nb_total' => count($sub_categories),
-                'subcategories_nb_half' => ceil(count($sub_categories) / 2),
+                'subcategories_nb_half'  => ceil(count($sub_categories) / 2)
             ));
         }
     }
 
     /**
-     * Assigns product list template variables.
+     * Assigns product list template variables
      */
     public function assignProductList()
     {
         $hook_executed = false;
         Hook::exec('actionProductListOverride', array(
-            'nbProducts' => &$this->nbProducts,
-            'catProducts' => &$this->cat_products,
+            'nbProducts'   => &$this->nbProducts,
+            'catProducts'  => &$this->cat_products,
             'hookExecuted' => &$hook_executed,
         ));
 
@@ -359,8 +353,8 @@ class CategoryControllerCore extends FrontController
         if (!$hook_executed) {
             $this->context->smarty->assign('categoryNameComplement', '');
             $this->nbProducts = $this->category->getProducts(null, null, null, $this->orderBy, $this->orderWay, true);
-            $this->pagination((int) $this->nbProducts); // Pagination must be call after "getProducts"
-            $this->cat_products = $this->category->getProducts($this->context->language->id, (int) $this->p, (int) $this->n, $this->orderBy, $this->orderWay);
+            $this->pagination((int)$this->nbProducts); // Pagination must be call after "getProducts"
+            $this->cat_products = $this->category->getProducts($this->context->language->id, (int)$this->p, (int)$this->n, $this->orderBy, $this->orderWay);
         }
         // Hook executed, use the override
         else {
@@ -368,8 +362,10 @@ class CategoryControllerCore extends FrontController
             $this->pagination($this->nbProducts);
         }
 
+        $this->addColorsToProductList($this->cat_products);
+
         Hook::exec('actionProductListModifier', array(
-            'nb_products' => &$this->nbProducts,
+            'nb_products'  => &$this->nbProducts,
             'cat_products' => &$this->cat_products,
         ));
 
@@ -379,13 +375,11 @@ class CategoryControllerCore extends FrontController
             }
         }
 
-        $this->addColorsToProductList($this->cat_products);
-
         $this->context->smarty->assign('nb_products', $this->nbProducts);
     }
 
     /**
-     * Returns an instance of the current category.
+     * Returns an instance of the current category
      *
      * @return Category
      */

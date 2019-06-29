@@ -78,6 +78,53 @@ class HotelBookingDetail extends ObjectModel
         parent::__construct($id);
     }
 
+    public function getBookingDataParams($params)
+    {
+        if (!isset($params['room_type'])) {
+            $params['room_type'] = 0;
+        }
+        if (!isset($params['adult'])) {
+            $params['adult'] = 0;
+        }
+        if (!isset($params['children'])) {
+            $params['children'] = 0;
+        }
+        if (!isset($params['num_rooms'])) {
+            $params['num_rooms'] = 1;
+        }
+        if (!isset($params['for_calendar'])) {
+            $params['for_calendar'] = 0;
+        }
+        if (!isset($params['search_available'])) {
+            $params['search_available'] = 1;
+        }
+        if (!isset($params['search_partial'])) {
+            $params['search_partial'] = 1;
+        }
+        if (!isset($params['search_booked'])) {
+            $params['search_booked'] = 1;
+        }
+        if (!isset($params['search_unavai'])) {
+            $params['search_unavai'] = 1;
+        }
+        if (!isset($params['id_cart'])) {
+            $params['id_cart'] = 0;
+        }
+        if (!isset($params['id_guest'])) {
+            $params['id_guest'] = 0;
+        }
+        if (!isset($params['search_cart_rms'])) {
+            $params['search_cart_rms'] = 0;
+        }
+        if (!isset($params['only_active_roomtype'])) {
+            $params['only_active_roomtype'] = 1;
+        }
+        if (!isset($params['only_active_hotel'])) {
+            $params['only_active_hotel'] = 1;
+        }
+        return $params;
+    }
+
     /**
      * [getBookingData :: To get Array of rooms data].
      *
@@ -102,326 +149,335 @@ class HotelBookingDetail extends ObjectModel
      * Note: Adult and children both are used for front category page only in available rooms
      * Note :: $for_calendar is used both for calender and also for getting stats of rooms
      */
-    public function getBookingData($date_from, $date_to, $hotel_id, $room_type = 0, $adult = 0, $children = 0, $num_rooms = 1, $for_calendar = 0, $search_available = 1, $search_partial = 1, $search_booked = 1, $search_unavai = 1, $id_cart = 0, $id_guest = 0, $search_cart_rms = 0)
+    public function getBookingData($params)
     {
-        $date_from = date('Y-m-d H:i:s', strtotime($date_from));
-        $date_to = date('Y-m-d H:i:s', strtotime($date_to));
+        // extract all keys and values of the array [$params] into variables and values
+        extract($this->getBookingDataParams($params));
+        if ($date_from && $date_to && $hotel_id) {
+            $date_from = date('Y-m-d H:i:s', strtotime($date_from));
+            $date_to = date('Y-m-d H:i:s', strtotime($date_to));
 
-        $obj_room_info = new HotelRoomInformation();
-        $obj_rm_type = new HotelRoomType();
-        $room_types = $obj_rm_type->getIdProductByHotelId($hotel_id, $room_type, 1, 1);
-        if ($room_types) {
-            $total_rooms = 0;
-            $num_booked = 0;
-            $num_unavail = 0;
-            $num_avail = 0;
-            $num_part_avai = 0;
-            $num_cart = 0;
-            $new_part_arr = array();
-            $booking_data = array();
+            $obj_room_info = new HotelRoomInformation();
+            $obj_rm_type = new HotelRoomType();
 
-            if ($search_partial) {
-                $this->partAvaiDates = array();
-                $this->allReqDates = $this->createDateRangeArray($date_from, $date_to, 1);
-            }
+            if ($room_types = $obj_rm_type->getIdProductByHotelId(
+                $hotel_id,
+                $room_type,
+                $only_active_roomtype,
+                $only_active_hotel
+            )) {
+                $total_rooms = 0;
+                $num_booked = 0;
+                $num_unavail = 0;
+                $num_avail = 0;
+                $num_part_avai = 0;
+                $num_cart = 0;
+                $new_part_arr = array();
+                $booking_data = array();
 
-            foreach ($room_types as $key => $room_type) {
                 if ($search_partial) {
-                    $this->dltDates = array();
+                    $this->partAvaiDates = array();
+                    $this->allReqDates = $this->createDateRangeArray($date_from, $date_to, 1);
                 }
 
-                $total_rooms += $obj_room_info->getHotelRoomInfo($room_type['id_product'], $hotel_id, 1);
-
-                $obj_product = new Product((int) $room_type['id_product']);
-                $product_name = $obj_product->name[Configuration::get('PS_LANG_DEFAULT')];
-
-                if ($search_cart_rms) {
-                    if ($id_cart && $id_guest) {
-                        $sql = 'SELECT cbd.`id_product`, cbd.`id_room`, cbd.`id_hotel`, cbd.`booking_type`, cbd.`comment`, rf.`room_num`, cbd.`date_from`, cbd.`date_to`
-                            FROM `'._DB_PREFIX_.'htl_cart_booking_data` AS cbd
-                            INNER JOIN `'._DB_PREFIX_.'htl_room_information` AS rf ON (rf.id = cbd.id_room)
-                            WHERE cbd.id_hotel='.$hotel_id.' AND cbd.id_product ='.$room_type['id_product'].' AND cbd.id_cart = '.$id_cart.' AND cbd.id_guest ='.$id_guest.' AND cbd.is_refunded = 0 AND cbd.is_back_order = 0';
-                        $cart_rooms = Db::getInstance()->executeS($sql);
-                    } else {
-                        $cart_rooms = array();
-                    }
-                    $num_cart += count($cart_rooms);
-                }
-
-                if ($search_booked) {
-                    $sql = 'SELECT bd.id_product, bd.id_room, bd.id_hotel, bd.id_customer, bd.booking_type, bd.id_status AS booking_status, bd.comment, rf.room_num, bd.date_from, bd.date_to
-                        FROM `'._DB_PREFIX_.'htl_booking_detail` AS bd
-                        INNER JOIN `'._DB_PREFIX_.'htl_room_information` AS rf ON (rf.id = bd.id_room)
-                        WHERE bd.id_hotel='.$hotel_id.' AND bd.id_product ='.$room_type['id_product']." AND bd.date_from <= '$date_from' AND bd.date_to >='$date_to' AND bd.is_refunded = 0 AND bd.is_back_order = 0";
-
-                    $booked_rooms = Db::getInstance()->executeS($sql);
-
-                    foreach ($booked_rooms as $booked_k => $booked_v) {
-                        $booked_rooms[$booked_k]['detail'][] = array('date_from' => $booked_v['date_from'],
-                                                                    'date_to' => $booked_v['date_to'],
-                                                                    'id_customer' => $booked_v['id_customer'],
-                                                                    'booking_type' => $booked_v['booking_type'],
-                                                                    'booking_status' => $booked_v['booking_status'],
-                                                                    'comment' => $booked_v['comment'],
-                                                                    );
-
-                        unset($booked_rooms[$booked_k]['date_from']);
-                        unset($booked_rooms[$booked_k]['date_to']);
-                        unset($booked_rooms[$booked_k]['id_customer']);
-                        unset($booked_rooms[$booked_k]['booking_type']);
-                        unset($booked_rooms[$booked_k]['booking_status']);
-                        unset($booked_rooms[$booked_k]['comment']);
+                foreach ($room_types as $key => $room_type) {
+                    if ($search_partial) {
+                        $this->dltDates = array();
                     }
 
-                    $num_booked += count($booked_rooms);
-                }
+                    $total_rooms += $obj_room_info->getHotelRoomInfo($room_type['id_product'], $hotel_id, 1);
 
-                if ($search_unavai) {
-                    $sql1 = 'SELECT `id_product`, `id_hotel`, `room_num`, `comment` AS `room_comment`
-                            FROM `'._DB_PREFIX_.'htl_room_information`
-                            WHERE `id_hotel`='.$hotel_id.' AND `id_product` ='.$room_type['id_product'].' AND `id_status` = 2';
+                    $obj_product = new Product((int) $room_type['id_product']);
+                    $product_name = $obj_product->name[Configuration::get('PS_LANG_DEFAULT')];
 
-                    $sql2 = 'SELECT hri.`id_product`, hri.`id_hotel`, hri.`room_num`, hri.`comment` AS `room_comment`
-                            FROM `'._DB_PREFIX_.'htl_room_information` AS hri
-                            INNER JOIN `'._DB_PREFIX_.'htl_room_disable_dates` AS hrdd ON (hrdd.id_room_type = hri.id_product AND hrdd.	id_room = hri.id)
-                            WHERE hri.`id_hotel`='.$hotel_id.' AND hri.`id_product` ='.$room_type['id_product'].' AND hri.`id_status` = 3 AND hrdd.`date_from` <= \''.pSql($date_from).'\' AND hrdd.`date_to` >= \''.pSql($date_to).'\'';
+                    if ($search_cart_rms) {
+                        if ($id_cart && $id_guest) {
+                            $sql = 'SELECT cbd.`id_product`, cbd.`id_room`, cbd.`id_hotel`, cbd.`booking_type`, cbd.`comment`, rf.`room_num`, cbd.`date_from`, cbd.`date_to`
+                                FROM `'._DB_PREFIX_.'htl_cart_booking_data` AS cbd
+                                INNER JOIN `'._DB_PREFIX_.'htl_room_information` AS rf ON (rf.id = cbd.id_room)
+                                WHERE cbd.id_hotel='.$hotel_id.' AND cbd.id_product ='.$room_type['id_product'].' AND cbd.id_cart = '.$id_cart.' AND cbd.id_guest ='.$id_guest.' AND cbd.is_refunded = 0 AND cbd.is_back_order = 0';
+                            $cart_rooms = Db::getInstance()->executeS($sql);
+                        } else {
+                            $cart_rooms = array();
+                        }
+                        $num_cart += count($cart_rooms);
+                    }
 
-                    $sql = $sql1.' UNION '.$sql2;
+                    if ($search_booked) {
+                        $sql = 'SELECT bd.id_product, bd.id_room, bd.id_hotel, bd.id_customer, bd.booking_type, bd.id_status AS booking_status, bd.comment, rf.room_num, bd.date_from, bd.date_to
+                            FROM `'._DB_PREFIX_.'htl_booking_detail` AS bd
+                            INNER JOIN `'._DB_PREFIX_.'htl_room_information` AS rf ON (rf.id = bd.id_room)
+                            WHERE bd.id_hotel='.$hotel_id.' AND bd.id_product ='.$room_type['id_product']." AND bd.date_from <= '$date_from' AND bd.date_to >='$date_to' AND bd.is_refunded = 0 AND bd.is_back_order = 0";
 
-                    $unavail_rooms = Db::getInstance()->executeS($sql);
-                    $num_unavail += count($unavail_rooms);
-                }
+                        $booked_rooms = Db::getInstance()->executeS($sql);
 
-                if ($search_available) {
-                    $exclude_ids = 'SELECT `id_room`
-                            FROM '._DB_PREFIX_."htl_booking_detail
-                            WHERE is_back_order = 0 AND is_refunded = 0 AND ((date_from <= '$date_from' AND date_to > '$date_from' AND date_to <= '$date_to') OR (date_from > '$date_from' AND date_to < '$date_to') OR (date_from >= '$date_from' AND date_from < '$date_to' AND date_to >= '$date_to') OR (date_from < '$date_from' AND date_to > '$date_to'))";
+                        foreach ($booked_rooms as $booked_k => $booked_v) {
+                            $booked_rooms[$booked_k]['detail'][] = array('date_from' => $booked_v['date_from'],
+                                                                        'date_to' => $booked_v['date_to'],
+                                                                        'id_customer' => $booked_v['id_customer'],
+                                                                        'booking_type' => $booked_v['booking_type'],
+                                                                        'booking_status' => $booked_v['booking_status'],
+                                                                        'comment' => $booked_v['comment'],
+                                                                        );
 
-                    if (!empty($id_cart) && !empty($id_guest)) {
+                            unset($booked_rooms[$booked_k]['date_from']);
+                            unset($booked_rooms[$booked_k]['date_to']);
+                            unset($booked_rooms[$booked_k]['id_customer']);
+                            unset($booked_rooms[$booked_k]['booking_type']);
+                            unset($booked_rooms[$booked_k]['booking_status']);
+                            unset($booked_rooms[$booked_k]['comment']);
+                        }
+
+                        $num_booked += count($booked_rooms);
+                    }
+
+                    if ($search_unavai) {
+                        $sql1 = 'SELECT `id_product`, `id_hotel`, `room_num`, `comment` AS `room_comment`
+                                FROM `'._DB_PREFIX_.'htl_room_information`
+                                WHERE `id_hotel`='.$hotel_id.' AND `id_product` ='.$room_type['id_product'].' AND `id_status` = 2';
+
+                        $sql2 = 'SELECT hri.`id_product`, hri.`id_hotel`, hri.`room_num`, hri.`comment` AS `room_comment`
+                                FROM `'._DB_PREFIX_.'htl_room_information` AS hri
+                                INNER JOIN `'._DB_PREFIX_.'htl_room_disable_dates` AS hrdd ON (hrdd.id_room_type = hri.id_product AND hrdd.	id_room = hri.id)
+                                WHERE hri.`id_hotel`='.$hotel_id.' AND hri.`id_product` ='.$room_type['id_product'].' AND hri.`id_status` = 3 AND hrdd.`date_from` <= \''.pSql($date_from).'\' AND hrdd.`date_to` >= \''.pSql($date_to).'\'';
+
+                        $sql = $sql1.' UNION '.$sql2;
+
+                        $unavail_rooms = Db::getInstance()->executeS($sql);
+                        $num_unavail += count($unavail_rooms);
+                    }
+
+                    if ($search_available) {
+                        $exclude_ids = 'SELECT `id_room`
+                                FROM '._DB_PREFIX_."htl_booking_detail
+                                WHERE is_back_order = 0 AND is_refunded = 0 AND ((date_from <= '$date_from' AND date_to > '$date_from' AND date_to <= '$date_to') OR (date_from > '$date_from' AND date_to < '$date_to') OR (date_from >= '$date_from' AND date_from < '$date_to' AND date_to >= '$date_to') OR (date_from < '$date_from' AND date_to > '$date_to'))";
+
+                        if (!empty($id_cart) && !empty($id_guest)) {
+                            $exclude_ids .= ' UNION
+                                SELECT `id_room`
+                                FROM '._DB_PREFIX_.'htl_cart_booking_data
+                                WHERE id_cart='.$id_cart.' AND id_guest='.$id_guest." AND is_refunded = 0 AND  is_back_order = 0 AND ((date_from <= '$date_from' AND date_to > '$date_from' AND date_to <= '$date_to') OR (date_from > '$date_from' AND date_to < '$date_to') OR (date_from >= '$date_from' AND date_from < '$date_to' AND date_to >= '$date_to') OR (date_from < '$date_from' AND date_to > '$date_to'))";
+                        }
+
+                        // For excludes temporary disable rooms
                         $exclude_ids .= ' UNION
-                            SELECT `id_room`
-                            FROM '._DB_PREFIX_.'htl_cart_booking_data
-                            WHERE id_cart='.$id_cart.' AND id_guest='.$id_guest." AND is_refunded = 0 AND  is_back_order = 0 AND ((date_from <= '$date_from' AND date_to > '$date_from' AND date_to <= '$date_to') OR (date_from > '$date_from' AND date_to < '$date_to') OR (date_from >= '$date_from' AND date_from < '$date_to' AND date_to >= '$date_to') OR (date_from < '$date_from' AND date_to > '$date_to'))";
+                            SELECT hri.`id` AS id_room
+                            FROM '._DB_PREFIX_.'htl_room_information AS hri
+                            INNER JOIN `'._DB_PREFIX_.'htl_room_disable_dates` AS hrdd ON (hrdd.`id_room_type` = hri.`id_product` AND hrdd.`id_room` = hri.`id`)
+                            WHERE hri.`id_hotel`='.$hotel_id.' AND hri.`id_product` ='.$room_type['id_product'].' AND hri.`id_status` = 3 AND (hrdd.`date_from` < \''.pSql($date_to).'\' AND hrdd.`date_to` > \''.pSql($date_from).'\')';
+
+                        $sql = 'SELECT ri.`id` AS `id_room`, ri.`id_product`, ri.`id_hotel`, ri.`room_num`, ri.`comment` AS `room_comment`
+                            FROM `'._DB_PREFIX_.'htl_room_information` AS ri ';
+                        if ($adult || $children) {
+                            $sql .= 'INNER JOIN '._DB_PREFIX_.'htl_room_type AS rt ON (rt.id_product = ri.id_product AND rt.id_hotel = ri.id_hotel';
+                            if ($adult) {
+                                $sql .= ' AND rt.adult >= '.$adult;
+                            }
+                            if ($children) {
+                                $sql .= ' AND rt.children >= '.$children;
+                            }
+                            $sql .= ')';
+                        }
+
+                        $sql .= ' WHERE ri.id_hotel='.$hotel_id.' AND ri.id_product='.$room_type['id_product'].' AND ri.id_status != 2 AND ri.id NOT IN ('.$exclude_ids.')';
+
+                        $avai_rooms = Db::getInstance()->executeS($sql);
+                        $num_avail += count($avai_rooms);
                     }
 
-                    // For excludes temporary disable rooms
-                    $exclude_ids .= ' UNION
-                        SELECT hri.`id` AS id_room
-                        FROM '._DB_PREFIX_.'htl_room_information AS hri
-                        INNER JOIN `'._DB_PREFIX_.'htl_room_disable_dates` AS hrdd ON (hrdd.`id_room_type` = hri.`id_product` AND hrdd.`id_room` = hri.`id`)
-                        WHERE hri.`id_hotel`='.$hotel_id.' AND hri.`id_product` ='.$room_type['id_product'].' AND hri.`id_status` = 3 AND (hrdd.`date_from` < \''.pSql($date_to).'\' AND hrdd.`date_to` > \''.pSql($date_from).'\')';
+                    if ($search_partial) {
+                        $sql1 = "SELECT bd.`id_product`, bd.`id_room`, bd.`id_hotel`, bd.`id_customer`, bd.`booking_type`, bd.`id_status` AS booking_status, bd.`comment` AS `room_comment`, rf.`room_num`, bd.`date_from`, bd.`date_to`
+                            FROM `"._DB_PREFIX_."htl_booking_detail` AS bd
+                            INNER JOIN `"._DB_PREFIX_."htl_room_information` AS rf ON (rf.`id` = bd.`id_room` AND rf.`id_status` = 1)
+                            WHERE bd.`id_hotel`=".$hotel_id." AND bd.`id_product`=".$room_type['id_product']." AND bd.`is_back_order` = 0 AND bd.`is_refunded` = 0 AND ((bd.`date_from` <= '$date_from' AND bd.`date_to` > '$date_from' AND bd.`date_to` < '$date_to') OR (bd.`date_from` > '$date_from' AND bd.`date_from` < '$date_to' AND bd.`date_to` >= '$date_to') OR (bd.`date_from` > '$date_from' AND bd.`date_from` < '$date_to' AND bd.`date_to` < '$date_to'))";
 
-                    $sql = 'SELECT ri.`id` AS `id_room`, ri.`id_product`, ri.`id_hotel`, ri.`room_num`, ri.`comment` AS `room_comment`
-                        FROM `'._DB_PREFIX_.'htl_room_information` AS ri ';
-                    if ($adult || $children) {
-                        $sql .= 'INNER JOIN '._DB_PREFIX_.'htl_room_type AS rt ON (rt.id_product = ri.id_product AND rt.id_hotel = ri.id_hotel';
-                        if ($adult) {
-                            $sql .= ' AND rt.adult >= '.$adult;
-                        }
-                        if ($children) {
-                            $sql .= ' AND rt.children >= '.$children;
-                        }
-                        $sql .= ')';
-                    }
+                        $sql2 = "SELECT hri.`id_product`, hrdd.`id_room`, hri.`id_hotel`, '0' AS `id_customer`, '0' AS `booking_type`, '0' AS `booking_status`, '0' AS `room_comment`, hri.`room_num`, hrdd.`date_from`, hrdd.`date_to`
+                            FROM `"._DB_PREFIX_."htl_room_information` AS hri
+                            INNER JOIN `"._DB_PREFIX_."htl_room_disable_dates` AS hrdd ON (hrdd.`id_room_type` = hri.`id_product` AND hrdd.`id_room` = hri.`id`)
+                            WHERE hri.`id_hotel`=".$hotel_id." AND hri.`id_product`=".$room_type['id_product']." AND hri.`id_status` = 3 AND ((hrdd.`date_from` <= '$date_from' AND hrdd.`date_to` > '$date_from' AND hrdd.`date_to` < '$date_to') OR (hrdd.`date_from` > '$date_from' AND hrdd.`date_from` < '$date_to' AND hrdd.`date_to` >= '$date_to') OR (hrdd.`date_from` > '$date_from' AND hrdd.`date_from` < '$date_to' AND hrdd.`date_to` < '$date_to'))";
+                        $sql = $sql1.' UNION '.$sql2;
 
-                    $sql .= ' WHERE ri.id_hotel='.$hotel_id.' AND ri.id_product='.$room_type['id_product'].' AND ri.id_status != 2 AND ri.id NOT IN ('.$exclude_ids.')';
+                        // NOTE:: Before code if written to user order by with union
+                        $sql = "SELECT s.*
+                                FROM (".$sql.") AS s
+                                ORDER BY s.`id_room`";
+                        // Ends Here
 
-                    $avai_rooms = Db::getInstance()->executeS($sql);
-                    $num_avail += count($avai_rooms);
-                }
+                        $part_arr = Db::getInstance()->executeS($sql);
+                        $partial_avai_rooms = array();
+                        foreach ($part_arr as $pr_val) {
+                            $partial_avai_rooms[$pr_val['id_room']]['id_product'] = $pr_val['id_product'];
+                            $partial_avai_rooms[$pr_val['id_room']]['id_room'] = $pr_val['id_room'];
+                            $partial_avai_rooms[$pr_val['id_room']]['id_hotel'] = $pr_val['id_hotel'];
+                            $partial_avai_rooms[$pr_val['id_room']]['room_num'] = $pr_val['room_num'];
 
-                if ($search_partial) {
-                    $sql1 = "SELECT bd.`id_product`, bd.`id_room`, bd.`id_hotel`, bd.`id_customer`, bd.`booking_type`, bd.`id_status` AS booking_status, bd.`comment` AS `room_comment`, rf.`room_num`, bd.`date_from`, bd.`date_to`
-                        FROM `"._DB_PREFIX_."htl_booking_detail` AS bd
-                        INNER JOIN `"._DB_PREFIX_."htl_room_information` AS rf ON (rf.`id` = bd.`id_room` AND rf.`id_status` = 1)
-                        WHERE bd.`id_hotel`=".$hotel_id." AND bd.`id_product`=".$room_type['id_product']." AND bd.`is_back_order` = 0 AND bd.`is_refunded` = 0 AND ((bd.`date_from` <= '$date_from' AND bd.`date_to` > '$date_from' AND bd.`date_to` < '$date_to') OR (bd.`date_from` > '$date_from' AND bd.`date_from` < '$date_to' AND bd.`date_to` >= '$date_to') OR (bd.`date_from` > '$date_from' AND bd.`date_from` < '$date_to' AND bd.`date_to` < '$date_to'))";
-
-                    $sql2 = "SELECT hri.`id_product`, hrdd.`id_room`, hri.`id_hotel`, '0' AS `id_customer`, '0' AS `booking_type`, '0' AS `booking_status`, '0' AS `room_comment`, hri.`room_num`, hrdd.`date_from`, hrdd.`date_to`
-                        FROM `"._DB_PREFIX_."htl_room_information` AS hri
-                        INNER JOIN `"._DB_PREFIX_."htl_room_disable_dates` AS hrdd ON (hrdd.`id_room_type` = hri.`id_product` AND hrdd.`id_room` = hri.`id`)
-                        WHERE hri.`id_hotel`=".$hotel_id." AND hri.`id_product`=".$room_type['id_product']." AND hri.`id_status` = 3 AND ((hrdd.`date_from` <= '$date_from' AND hrdd.`date_to` > '$date_from' AND hrdd.`date_to` < '$date_to') OR (hrdd.`date_from` > '$date_from' AND hrdd.`date_from` < '$date_to' AND hrdd.`date_to` >= '$date_to') OR (hrdd.`date_from` > '$date_from' AND hrdd.`date_from` < '$date_to' AND hrdd.`date_to` < '$date_to'))";
-                    $sql = $sql1.' UNION '.$sql2;
-
-                    // NOTE:: Before code if written to user order by with union
-                    $sql = "SELECT s.*
-                            FROM (".$sql.") AS s
-                            ORDER BY s.`id_room`";
-                    // Ends Here
-
-                    $part_arr = Db::getInstance()->executeS($sql);
-                    $partial_avai_rooms = array();
-                    foreach ($part_arr as $pr_val) {
-                        $partial_avai_rooms[$pr_val['id_room']]['id_product'] = $pr_val['id_product'];
-                        $partial_avai_rooms[$pr_val['id_room']]['id_room'] = $pr_val['id_room'];
-                        $partial_avai_rooms[$pr_val['id_room']]['id_hotel'] = $pr_val['id_hotel'];
-                        $partial_avai_rooms[$pr_val['id_room']]['room_num'] = $pr_val['room_num'];
-
-                        if ($pr_val['id_customer']) {
-                            $partial_avai_rooms[$pr_val['id_room']]['booked_dates'][] = array(
-                                'date_from' => $pr_val['date_from'],
-                                'date_to' => $pr_val['date_to'],
-                                'id_customer' => $pr_val['id_customer'],
-                                'booking_type' => $pr_val['booking_type'],
-                                'booking_status' => $pr_val['booking_status'],
-                                'comment' => $pr_val['room_comment']
-                            );
-                        }
-
-                        if (!isset($partial_avai_rooms[$pr_val['id_room']]['avai_dates'])) {
-                            if (($pr_val['date_from'] <= $date_from) && ($pr_val['date_to'] > $date_from) && ($pr_val['date_to'] < $date_to)) {
-                                // from lower to middle range
-
-                                $forRange = $this->createDateRangeArray($pr_val['date_to'], $date_to, 0, $pr_val['id_room']);
-                                $available_dates = $this->getPartialRange($forRange, $pr_val['id_room'], $key);
-                            } elseif (($pr_val['date_from'] > $date_from) && ($pr_val['date_from'] < $date_to) && ($pr_val['date_to'] >= $date_to)) {
-                                // from middle to higher range
-
-                                $forRange = $this->createDateRangeArray($date_from, $pr_val['date_from'], 0, $pr_val['id_room']);
-                                $available_dates = $this->getPartialRange($forRange, $pr_val['id_room'], $key);
-                            } elseif (($pr_val['date_from'] > $date_from) && ($pr_val['date_from'] < $date_to) && ($pr_val['date_to'] > $date_from) && ($pr_val['date_to'] < $date_to)) {
-                                // between range
-
-                                $forRange1 = $this->createDateRangeArray($date_from, $pr_val['date_from'], 0, $pr_val['id_room']);
-                                $init_range = $this->getPartialRange($forRange1, $pr_val['id_room'], $key);
-
-                                $forRange2 = $this->createDateRangeArray($pr_val['date_to'], $date_to, 0, $pr_val['id_room']);
-                                $last_range = $this->getPartialRange($forRange2, $pr_val['id_room'], $key);
-
-                                $available_dates = $init_range + $last_range;
+                            if ($pr_val['id_customer']) {
+                                $partial_avai_rooms[$pr_val['id_room']]['booked_dates'][] = array(
+                                    'date_from' => $pr_val['date_from'],
+                                    'date_to' => $pr_val['date_to'],
+                                    'id_customer' => $pr_val['id_customer'],
+                                    'booking_type' => $pr_val['booking_type'],
+                                    'booking_status' => $pr_val['booking_status'],
+                                    'comment' => $pr_val['room_comment']
+                                );
                             }
 
-                            $partial_avai_rooms[$pr_val['id_room']]['avai_dates'] = $available_dates;
-                        } else {
-                            /*
-                                * Note :: createDateRangeArray function check and unset dates from allReqDates(array) but below it will only return array of date because dates already been removed from "if" condition
-                                */
-                            $bk_dates = $this->createDateRangeArray($pr_val['date_from'], $pr_val['date_to'], 0, 0, 0);
-                            if (count($bk_dates) >= 2) {
-                                for ($i = 0; $i < count($bk_dates) - 1; ++$i) {
-                                    $dateJoin = strtotime($bk_dates[$i]);
+                            if (!isset($partial_avai_rooms[$pr_val['id_room']]['avai_dates'])) {
+                                if (($pr_val['date_from'] <= $date_from) && ($pr_val['date_to'] > $date_from) && ($pr_val['date_to'] < $date_to)) {
+                                    // from lower to middle range
 
-                                    if (isset($partial_avai_rooms[$pr_val['id_room']]['avai_dates'][$dateJoin])) {
-                                        if (isset($this->dltDates[$pr_val['id_room']]) && $this->dltDates[$pr_val['id_room']]) {
-                                            $this->allReqDates[] = $bk_dates[$i];
+                                    $forRange = $this->createDateRangeArray($pr_val['date_to'], $date_to, 0, $pr_val['id_room']);
+                                    $available_dates = $this->getPartialRange($forRange, $pr_val['id_room'], $key);
+                                } elseif (($pr_val['date_from'] > $date_from) && ($pr_val['date_from'] < $date_to) && ($pr_val['date_to'] >= $date_to)) {
+                                    // from middle to higher range
+
+                                    $forRange = $this->createDateRangeArray($date_from, $pr_val['date_from'], 0, $pr_val['id_room']);
+                                    $available_dates = $this->getPartialRange($forRange, $pr_val['id_room'], $key);
+                                } elseif (($pr_val['date_from'] > $date_from) && ($pr_val['date_from'] < $date_to) && ($pr_val['date_to'] > $date_from) && ($pr_val['date_to'] < $date_to)) {
+                                    // between range
+
+                                    $forRange1 = $this->createDateRangeArray($date_from, $pr_val['date_from'], 0, $pr_val['id_room']);
+                                    $init_range = $this->getPartialRange($forRange1, $pr_val['id_room'], $key);
+
+                                    $forRange2 = $this->createDateRangeArray($pr_val['date_to'], $date_to, 0, $pr_val['id_room']);
+                                    $last_range = $this->getPartialRange($forRange2, $pr_val['id_room'], $key);
+
+                                    $available_dates = $init_range + $last_range;
+                                }
+
+                                $partial_avai_rooms[$pr_val['id_room']]['avai_dates'] = $available_dates;
+                            } else {
+                                /*
+                                    * Note :: createDateRangeArray function check and unset dates from allReqDates(array) but below it will only return array of date because dates already been removed from "if" condition
+                                    */
+                                $bk_dates = $this->createDateRangeArray($pr_val['date_from'], $pr_val['date_to'], 0, 0, 0);
+                                if (count($bk_dates) >= 2) {
+                                    for ($i = 0; $i < count($bk_dates) - 1; ++$i) {
+                                        $dateJoin = strtotime($bk_dates[$i]);
+
+                                        if (isset($partial_avai_rooms[$pr_val['id_room']]['avai_dates'][$dateJoin])) {
+                                            if (isset($this->dltDates[$pr_val['id_room']]) && $this->dltDates[$pr_val['id_room']]) {
+                                                $this->allReqDates[] = $bk_dates[$i];
+                                            }
+                                            unset($partial_avai_rooms[$pr_val['id_room']]['avai_dates'][$dateJoin]);
+                                            unset($this->partAvaiDates[$pr_val['id_room'].$dateJoin]);
                                         }
-                                        unset($partial_avai_rooms[$pr_val['id_room']]['avai_dates'][$dateJoin]);
-                                        unset($this->partAvaiDates[$pr_val['id_room'].$dateJoin]);
                                     }
                                 }
                             }
                         }
+
+                        $rm_part_avai = count($partial_avai_rooms);
+                        $num_part_avai += $rm_part_avai;
                     }
 
-                    $rm_part_avai = count($partial_avai_rooms);
-                    $num_part_avai += $rm_part_avai;
-                }
+                    // if (!$for_calendar)
+                    // {
+                    $booking_data['rm_data'][$key]['name'] = $product_name;
+                    $booking_data['rm_data'][$key]['id_product'] = (int) $room_type['id_product'];
 
-                // if (!$for_calendar)
-                // {
-                $booking_data['rm_data'][$key]['name'] = $product_name;
-                $booking_data['rm_data'][$key]['id_product'] = (int) $room_type['id_product'];
+                    if ($search_available) {
+                        $booking_data['rm_data'][$key]['data']['available'] = $avai_rooms;
+                    }
 
-                if ($search_available) {
-                    $booking_data['rm_data'][$key]['data']['available'] = $avai_rooms;
-                }
+                    if ($search_unavai) {
+                        $booking_data['rm_data'][$key]['data']['unavailable'] = $unavail_rooms;
+                    }
 
-                if ($search_unavai) {
-                    $booking_data['rm_data'][$key]['data']['unavailable'] = $unavail_rooms;
-                }
+                    if ($search_booked) {
+                        $booking_data['rm_data'][$key]['data']['booked'] = $booked_rooms;
+                    }
 
-                if ($search_booked) {
-                    $booking_data['rm_data'][$key]['data']['booked'] = $booked_rooms;
+                    if ($search_partial) {
+                        $booking_data['rm_data'][$key]['data']['partially_available'] = $partial_avai_rooms;
+                    }
+
+                    if ($search_cart_rms) {
+                        $booking_data['rm_data'][$key]['data']['cart_rooms'] = $cart_rooms;
+                    }
+                    // }
                 }
 
                 if ($search_partial) {
-                    $booking_data['rm_data'][$key]['data']['partially_available'] = $partial_avai_rooms;
-                }
+                    foreach ($booking_data['rm_data'] as $bk_data_key => $bk_data_val) {
+                        foreach ($bk_data_val['data']['partially_available'] as $part_rm_key => $part_rm_val) {
+                            if (empty($part_rm_val['avai_dates'])) {
+                                unset($booking_data['rm_data'][$bk_data_key]['data']['partially_available'][$part_rm_key]['avai_dates']);
 
-                if ($search_cart_rms) {
-                    $booking_data['rm_data'][$key]['data']['cart_rooms'] = $cart_rooms;
-                }
-                // }
-            }
+                                $booking_data['rm_data'][$bk_data_key]['data']['partially_available'][$part_rm_key]['detail'] = $booking_data['rm_data'][$bk_data_key]['data']['partially_available'][$part_rm_key]['booked_dates'];
 
-            if ($search_partial) {
-                foreach ($booking_data['rm_data'] as $bk_data_key => $bk_data_val) {
-                    foreach ($bk_data_val['data']['partially_available'] as $part_rm_key => $part_rm_val) {
-                        if (empty($part_rm_val['avai_dates'])) {
-                            unset($booking_data['rm_data'][$bk_data_key]['data']['partially_available'][$part_rm_key]['avai_dates']);
+                                unset($booking_data['rm_data'][$bk_data_key]['data']['partially_available'][$part_rm_key]['booked_dates']);
 
-                            $booking_data['rm_data'][$bk_data_key]['data']['partially_available'][$part_rm_key]['detail'] = $booking_data['rm_data'][$bk_data_key]['data']['partially_available'][$part_rm_key]['booked_dates'];
+                                if ($search_booked) {
+                                    $booking_data['rm_data'][$bk_data_key]['data']['booked'] = array_merge($booking_data['rm_data'][$bk_data_key]['data']['booked'], array($booking_data['rm_data'][$bk_data_key]['data']['partially_available'][$part_rm_key]));
+                                    $num_booked += 1;
 
-                            unset($booking_data['rm_data'][$bk_data_key]['data']['partially_available'][$part_rm_key]['booked_dates']);
+                                    unset($booking_data['rm_data'][$bk_data_key]['data']['partially_available'][$part_rm_key]);
+                                }
+                                $num_part_avai -= 1;
+                            } elseif (!empty($this->allReqDates)) {
+                                unset($booking_data['rm_data'][$bk_data_key]['data']['partially_available'][$part_rm_key]['avai_dates']);
+                                unset($booking_data['rm_data'][$bk_data_key]['data']['partially_available'][$part_rm_key]['booked_dates']);
+                                if ($search_unavai) {
+                                    $booking_data['rm_data'][$bk_data_key]['data']['partially_available'][$part_rm_key]['room_comment'] = '';
+                                    $booking_data['rm_data'][$bk_data_key]['data']['unavailable'] = array_merge($booking_data['rm_data'][$bk_data_key]['data']['unavailable'], array($booking_data['rm_data'][$bk_data_key]['data']['partially_available'][$part_rm_key]));
 
-                            if ($search_booked) {
-                                $booking_data['rm_data'][$bk_data_key]['data']['booked'] = array_merge($booking_data['rm_data'][$bk_data_key]['data']['booked'], array($booking_data['rm_data'][$bk_data_key]['data']['partially_available'][$part_rm_key]));
-                                $num_booked += 1;
+                                    $num_unavail += 1;
 
-                                unset($booking_data['rm_data'][$bk_data_key]['data']['partially_available'][$part_rm_key]);
+                                    unset($booking_data['rm_data'][$bk_data_key]['data']['partially_available'][$part_rm_key]);
+                                }
+                                $num_part_avai -= 1;
                             }
-                            $num_part_avai -= 1;
-                        } elseif (!empty($this->allReqDates)) {
-                            unset($booking_data['rm_data'][$bk_data_key]['data']['partially_available'][$part_rm_key]['avai_dates']);
-                            unset($booking_data['rm_data'][$bk_data_key]['data']['partially_available'][$part_rm_key]['booked_dates']);
-                            if ($search_unavai) {
-                                $booking_data['rm_data'][$bk_data_key]['data']['partially_available'][$part_rm_key]['room_comment'] = '';
-                                $booking_data['rm_data'][$bk_data_key]['data']['unavailable'] = array_merge($booking_data['rm_data'][$bk_data_key]['data']['unavailable'], array($booking_data['rm_data'][$bk_data_key]['data']['partially_available'][$part_rm_key]));
-
-                                $num_unavail += 1;
-
-                                unset($booking_data['rm_data'][$bk_data_key]['data']['partially_available'][$part_rm_key]);
-                            }
-                            $num_part_avai -= 1;
                         }
-                    }
 
-                    // Remove Cart Rooms from Partial available rooms
-                    if ($search_cart_rms) {
-                        foreach ($bk_data_val['data']['cart_rooms'] as $cart_key => $cart_val) {
-                            if (isset($this->partAvaiDates[$cart_val['id_room'].strtotime($cart_val['date_from'])])) {
-                                $rm_data_key = $this->partAvaiDates[$cart_val['id_room'].strtotime($cart_val['date_from'])]['rm_data_key'];
+                        // Remove Cart Rooms from Partial available rooms
+                        if ($search_cart_rms) {
+                            foreach ($bk_data_val['data']['cart_rooms'] as $cart_key => $cart_val) {
+                                if (isset($this->partAvaiDates[$cart_val['id_room'].strtotime($cart_val['date_from'])])) {
+                                    $rm_data_key = $this->partAvaiDates[$cart_val['id_room'].strtotime($cart_val['date_from'])]['rm_data_key'];
 
-                                unset($booking_data['rm_data'][$rm_data_key]['data']['partially_available'][$cart_val['id_room']]['avai_dates'][strtotime($cart_val['date_from'])]);
+                                    unset($booking_data['rm_data'][$rm_data_key]['data']['partially_available'][$cart_val['id_room']]['avai_dates'][strtotime($cart_val['date_from'])]);
 
-                                if (empty($booking_data['rm_data'][$rm_data_key]['data']['partially_available'][$cart_val['id_room']]['avai_dates'])) {
-                                    unset($booking_data['rm_data'][$rm_data_key]['data']['partially_available'][$cart_val['id_room']]);
-                                    $num_part_avai -= 1;
+                                    if (empty($booking_data['rm_data'][$rm_data_key]['data']['partially_available'][$cart_val['id_room']]['avai_dates'])) {
+                                        unset($booking_data['rm_data'][$rm_data_key]['data']['partially_available'][$cart_val['id_room']]);
+                                        $num_part_avai -= 1;
+                                    }
                                 }
                             }
-                        }
 
-                        unset($this->partAvaiDates);
+                            unset($this->partAvaiDates);
+                        }
                     }
                 }
+
+                if ($for_calendar) {
+                    unset($booking_data['rm_data']);
+                }
+
+                $booking_data['stats']['total_rooms'] = $total_rooms;
+
+                if ($search_booked) {
+                    $booking_data['stats']['num_booked'] = $num_booked;
+                }
+
+                if ($search_unavai) {
+                    $booking_data['stats']['num_unavail'] = $num_unavail;
+                }
+
+                if ($search_available) {
+                    $booking_data['stats']['num_avail'] = $num_avail;
+                }
+
+                if ($search_partial) {
+                    $booking_data['stats']['num_part_avai'] = $num_part_avai;
+                }
+
+                if ($search_partial) {
+                    $booking_data['stats']['num_cart'] = $num_cart;
+                }
+
+                return $booking_data;
             }
-
-            if ($for_calendar) {
-                unset($booking_data['rm_data']);
-            }
-
-            $booking_data['stats']['total_rooms'] = $total_rooms;
-
-            if ($search_booked) {
-                $booking_data['stats']['num_booked'] = $num_booked;
-            }
-
-            if ($search_unavai) {
-                $booking_data['stats']['num_unavail'] = $num_unavail;
-            }
-
-            if ($search_available) {
-                $booking_data['stats']['num_avail'] = $num_avail;
-            }
-
-            if ($search_partial) {
-                $booking_data['stats']['num_part_avai'] = $num_part_avai;
-            }
-
-            if ($search_partial) {
-                $booking_data['stats']['num_cart'] = $num_cart;
-            }
-
-            return $booking_data;
         }
     }
 
@@ -633,7 +689,24 @@ class HotelBookingDetail extends ObjectModel
 
         $this->context = Context::getContext();
 
-        $booking_data = $this->getBookingData($date_from, $date_to, $id_hotel, $id_product, $adult, $children, 0, 0, 1, 0, 0, 0, $id_cart, $id_guest);
+        $bookingParams = array();
+        $bookingParams['date_from'] = $date_from;
+        $bookingParams['date_to'] = $date_to;
+        $bookingParams['hotel_id'] = $id_hotel;
+        $bookingParams['room_type'] = $id_product;
+        $bookingParams['adult'] = $adult;
+        $bookingParams['children'] = $children;
+        $bookingParams['num_rooms'] = 0;
+        $bookingParams['for_calendar'] = 0;
+        $bookingParams['search_available'] = 1;
+        $bookingParams['search_partial'] = 0;
+        $bookingParams['search_booked'] = 0;
+        $bookingParams['search_unavai'] = 0;
+        $bookingParams['id_cart'] = $id_cart;
+        $bookingParams['id_guest'] = $id_guest;
+
+        $booking_data = $this->getBookingData($bookingParams);
+
         if (!$for_room_type) {
             if (!empty($booking_data)) {
                 $obj_rm_type = new HotelRoomType();

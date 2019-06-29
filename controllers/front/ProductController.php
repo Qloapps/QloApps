@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -52,14 +52,14 @@ class ProductControllerCore extends FrontController
             $this->context->controller->addCSS(_PS_MODULE_DIR_.'hotelreservationsystem/views/css/searchblock.css');
             $this->addJS(array(
                 _THEME_JS_DIR_.'tools.js',  // retro compat themes 1.5
-                _THEME_JS_DIR_.'product.js',
+                _THEME_JS_DIR_.'product.js'
             ));
         } else {
             $this->addJqueryPlugin(array('scrollTo', 'serialScroll'));
             $this->addJS(array(
                 _THEME_JS_DIR_.'tools.js',  // retro compat themes 1.5
                 _THEME_MOBILE_JS_DIR_.'product.js',
-                _THEME_MOBILE_JS_DIR_.'jquery.touch-gallery.js',
+                _THEME_MOBILE_JS_DIR_.'jquery.touch-gallery.js'
             ));
         }
 
@@ -79,14 +79,12 @@ class ProductControllerCore extends FrontController
     }
 
     /**
-     * Initialize product controller.
-     *
+     * Initialize product controller
      * @see FrontController::init()
      */
     public function init()
     {
         parent::init();
-
         //by webkul for product page searching
         if (Tools::isSubmit('product_page_search_submit')) {
             $hotel_cat_id = Tools::getValue('hotel_cat_id');
@@ -135,43 +133,6 @@ class ProductControllerCore extends FrontController
             Tools::redirect($redirect_link);
         }
 
-        //by webkul to check available rooms quantity on product page
-        $product_quantity_up = Tools::getValue('product_quantity_up');
-        $product_quantity_down = Tools::getValue('product_quantity_down');
-        $change_date = Tools::getValue('change_date');
-
-        if (isset($product_quantity_down) && $product_quantity_down) {
-            $id_product = Tools::getValue('id_product');
-            $date_from = Tools::getValue('date_from');
-            $date_to = Tools::getValue('date_to');
-            $quantity = Tools::getValue('qty');
-            $result = $this->checkRoomQuantityAvailability($id_product, $date_from, $date_to, $quantity);
-            die($result);
-        } elseif (isset($product_quantity_up) && $product_quantity_up) {
-            $id_product = Tools::getValue('id_product');
-            $date_from = Tools::getValue('date_from');
-            $date_to = Tools::getValue('date_to');
-            $quantity = Tools::getValue('qty');
-            $result = $this->checkRoomQuantityAvailability($id_product, $date_from, $date_to, $quantity);
-            die($result);
-        } elseif (isset($change_date) && $change_date) {
-            $id_product = Tools::getValue('id_product');
-            $date_from = Tools::getValue('date_from');
-            $date_to = Tools::getValue('date_to');
-            $quantity = Tools::getValue('qty');
-            $result = $this->checkRoomQuantityAvailability($id_product, $date_from, $date_to, $quantity);
-            die($result);
-        }
-
-        // // by webkul to delete cart rooms individually
-        // $delete_room_from_current_cart = Tools::getValue('delete_room_from_cart');
-
-        // if (isset($delete_room_from_current_cart) && $delete_room_from_current_cart)
-        // {
-        // 	//code for
-        // }
-
-
         if ($id_product = (int) Tools::getValue('id_product')) {
             $this->product = new Product($id_product, true, $this->context->language->id, $this->context->shop->id);
         }
@@ -183,13 +144,13 @@ class ProductControllerCore extends FrontController
         } else {
             $this->canonicalRedirection();
             /*
-             * If the product is associated to the shop
-             * and is active or not active but preview mode (need token + file_exists)
+            * If the product is associated to the shop
+            * and is active or not active but preview mode (need token + file_exists)
              * allow showing the product
              * In all the others cases => 404 "Product is no longer available"
              */
             if (!$this->product->isAssociatedToShop() || !$this->product->active) {
-                if (Tools::getValue('adtoken') == Tools::getAdminToken('AdminProducts'.(int) Tab::getIdFromClassName('AdminProducts').(int) Tools::getValue('id_employee')) && $this->product->isAssociatedToShop()) {
+                if (Tools::getValue('adtoken') == Tools::getAdminToken('AdminProducts'.(int)Tab::getIdFromClassName('AdminProducts').(int)Tools::getValue('id_employee')) && $this->product->isAssociatedToShop()) {
                     // If the product is not active, it's the admin preview mode
                     $this->context->smarty->assign('adminActionDisplay', true);
                 } else {
@@ -218,7 +179,7 @@ class ProductControllerCore extends FrontController
                         break;
                     }
                 }
-            } elseif (!$this->product->checkAccess(isset($this->context->customer->id) && $this->context->customer->id ? (int) $this->context->customer->id : 0)) {
+            } elseif (!$this->product->checkAccess(isset($this->context->customer->id) && $this->context->customer->id ? (int)$this->context->customer->id : 0)) {
                 header('HTTP/1.1 403 Forbidden');
                 header('Status: 403 Forbidden');
                 $this->errors[] = Tools::displayError('You do not have access to this Room Type.');
@@ -230,125 +191,47 @@ class ProductControllerCore extends FrontController
                     // If the previous page was a category and is a parent category of the product use this category as parent category
                     $id_object = false;
                     if (isset($regs[1]) && is_numeric($regs[1])) {
-                        $id_object = (int) $regs[1];
+                        $id_object = (int)$regs[1];
                     } elseif (isset($regs[5]) && is_numeric($regs[5])) {
-                        $id_object = (int) $regs[5];
+                        $id_object = (int)$regs[5];
                     }
                     if ($id_object) {
                         $referers = array($_SERVER['HTTP_REFERER'],urldecode($_SERVER['HTTP_REFERER']));
                         if (in_array($this->context->link->getCategoryLink($id_object), $referers)) {
-                            $id_category = (int) $id_object;
-                        } elseif (isset($this->context->cookie->last_visited_category) && (int) $this->context->cookie->last_visited_category && in_array($this->context->link->getProductLink($id_object), $referers)) {
-                            $id_category = (int) $this->context->cookie->last_visited_category;
+                            $id_category = (int)$id_object;
+                        } elseif (isset($this->context->cookie->last_visited_category) && (int)$this->context->cookie->last_visited_category && in_array($this->context->link->getProductLink($id_object), $referers)) {
+                            $id_category = (int)$this->context->cookie->last_visited_category;
                         }
                     }
                 }
-                if (!$id_category || !Category::inShopStatic($id_category, $this->context->shop) || !Product::idIsOnCategoryId((int) $this->product->id, array('0' => array('id_category' => $id_category)))) {
-                    $id_category = (int) $this->product->id_category_default;
+                if (!$id_category || !Category::inShopStatic($id_category, $this->context->shop) || !Product::idIsOnCategoryId((int)$this->product->id, array('0' => array('id_category' => $id_category)))) {
+                    $id_category = (int)$this->product->id_category_default;
                 }
-                $this->category = new Category((int) $id_category, (int) $this->context->cookie->id_lang);
+                $this->category = new Category((int)$id_category, (int)$this->context->cookie->id_lang);
                 if (isset($this->context->cookie) && isset($this->category->id_category) && !(Module::isInstalled('blockcategories') && Module::isEnabled('blockcategories'))) {
-                    $this->context->cookie->last_visited_category = (int) $this->category->id_category;
+                    $this->context->cookie->last_visited_category = (int)$this->category->id_category;
                 }
             }
-        }
-    }
-
-    // by webkul
-    private function checkRoomQuantityAvailability($id_product, $date_from, $date_to, $quantity)
-    {
-        $obj_room_type = new HotelRoomType();
-        $room_info_by_id_product = $obj_room_type->getRoomTypeInfoByIdProduct($id_product);
-        $num_cart_rooms = 0;
-        if ($room_info_by_id_product) {
-            $id_hotel = $room_info_by_id_product['id_hotel'];
-
-            if ($id_hotel) {
-                $obj_booking_dtl = new HotelBookingDetail();
-                $hotel_room_data = $obj_booking_dtl->DataForFrontSearch($date_from, $date_to, $id_hotel, $id_product, 1, 0, 0, -1, 0, 0, $this->context->cart->id, $this->context->cart->id_guest);
-                $obj_htl_cart_booking_data = new HotelCartBookingData();
-
-                if ($this->context->cart->id) {
-                    $num_cart_rooms = $obj_htl_cart_booking_data->getCountRoomsByIdCartIdProduct($this->context->cart->id, $id_product, $date_from, $date_to);
-                }
-
-                $total_available_rooms = $hotel_room_data['stats']['num_avail'];
-
-                if ($hotel_room_data) {
-                    if ($total_available_rooms >= $quantity) {
-                        $useTax = HotelBookingDetail::useTax();
-                        $product = new Product($id_product);
-                        $productPriceWithoutReduction = $product->getPriceWithoutReduct(!$useTax);
-                        $obj_booking_detail = new HotelBookingDetail();
-                        $num_days = $obj_booking_detail->getNumberOfDays($date_from, $date_to);
-                        $roomTypeDateRangePrice = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice($id_product, $date_from, $date_to);
-
-                        if ($useTax) {
-                            $priceProduct = Product::getPriceStatic($id_product, true);
-                            $feature_price = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay($id_product, $date_from, $date_to, true);
-                            $roomTypeDateRangePrice = $roomTypeDateRangePrice['total_price_tax_incl'];
-                        } else {
-                            $priceProduct = Product::getPriceStatic($id_product, false);
-                            $feature_price = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay($id_product, $date_from, $date_to, false);
-                            $roomTypeDateRangePrice = $roomTypeDateRangePrice['total_price_tax_excl'];
-                        }
-                        $feature_price_diff = (float)($productPriceWithoutReduction - $feature_price);
-
-                        //$price_tax_incl = Product::getPriceStatic($id_product, $price_tax);
-                        $total_price = $roomTypeDateRangePrice * $quantity;
-                        $result['msg'] = 'success';
-                        $result['total_price'] = $total_price;
-                        $result['num_days'] = $num_days;
-                        $result['avail_rooms'] = $total_available_rooms;
-
-                        $result['original_product_price'] = $priceProduct;
-                        $result['feature_price'] = $feature_price;
-                        $result['feature_price_diff'] = $feature_price_diff;
-
-                        return Tools::jsonEncode($result);
-                    } else {
-                        $result['msg'] = 'unavailable_quantity';
-                        $result['avail_rooms'] = $total_available_rooms;
-
-                        return Tools::jsonEncode($result);
-                    }
-                } else {
-                    $result['msg'] = 'failed1';
-                    $result['avail_rooms'] = $total_available_rooms;
-
-                    return Tools::jsonEncode($result);
-                }
-            } else {
-                $result['msg'] = 'failed2';
-                $result['avail_rooms'] = $total_available_rooms;
-
-                return Tools::jsonEncode($result);
-            }
-        } else {
-            $result['msg'] = 'failed3';
-            $result['avail_rooms'] = $total_available_rooms;
-
-            return Tools::jsonEncode($result);
         }
     }
 
     /**
-     * Assign template vars related to page content.
-     *
+     * Assign template vars related to page content
      * @see FrontController::initContent()
      */
     public function initContent()
     {
         parent::initContent();
+
         if (!$this->errors) {
-            if (Pack::isPack((int) $this->product->id) && !Pack::isInStock((int) $this->product->id)) {
+            if (Pack::isPack((int)$this->product->id) && !Pack::isInStock((int)$this->product->id)) {
                 $this->product->quantity = 0;
             }
 
             $this->product->description = $this->transformDescriptionWithImg($this->product->description);
 
             // Assign to the template the id of the virtual product. "0" if the product is not downloadable.
-            $this->context->smarty->assign('virtual', ProductDownload::getIdFromIdProduct((int) $this->product->id));
+            $this->context->smarty->assign('virtual', ProductDownload::getIdFromIdProduct((int)$this->product->id));
 
             $this->context->smarty->assign('customizationFormTarget', Tools::safeOutput(urldecode($_SERVER['REQUEST_URI'])));
 
@@ -357,7 +240,7 @@ class ProductControllerCore extends FrontController
                 // We check that the cookie exists first to avoid ghost carts
                 if (!$this->context->cart->id && isset($_COOKIE[$this->context->cookie->getName()])) {
                     $this->context->cart->add();
-                    $this->context->cookie->id_cart = (int) $this->context->cart->id;
+                    $this->context->cookie->id_cart = (int)$this->context->cart->id;
                 }
                 $this->pictureUpload();
                 $this->textRecord();
@@ -383,7 +266,7 @@ class ProductControllerCore extends FrontController
 
             $this->context->smarty->assign(array(
                 'pictures' => $pictures,
-                'textFields' => $text_fields, ));
+                'textFields' => $text_fields));
 
             $this->product->customization_required = false;
             $customization_fields = $this->product->customizable ? $this->product->getCustomizationFields($this->context->language->id) : false;
@@ -420,7 +303,7 @@ class ProductControllerCore extends FrontController
             }
 
             $accessories = $this->product->getAccessories($this->context->language->id);
-            if ($this->product->cache_is_pack || ($accessories && count($accessories))) {
+            if ($this->product->cache_is_pack || count($accessories)) {
                 $this->context->controller->addCSS(_THEME_CSS_DIR_.'product_list.css');
             }
             if ($this->product->customizable) {
@@ -575,9 +458,20 @@ class ProductControllerCore extends FrontController
                 //END
             }
 
-            $this->context->smarty->assign('product_id_hotel', $hotel_id);
+            // get room type additional demands
+            $objRoomDemands = new HotelRoomTypeDemand();
+            if ($roomTypeDemands = $objRoomDemands->getRoomTypeDemands($this->product->id)) {
+                foreach ($roomTypeDemands as &$demand) {
+                    // if demand has advance options then set demand price as first advance option price.
+                    if (isset($demand['adv_option']) && $demand['adv_option']) {
+                        $demand['price'] = current($demand['adv_option'])['price'];
+                    }
+                }
+            }
             $this->context->smarty->assign(
                 array(
+                    'room_type_demands' => $roomTypeDemands,
+                    'product_id_hotel' => $hotel_id,
                     'stock_management' => Configuration::get('PS_STOCK_MANAGEMENT'),
                     'customizationFields' => $customization_fields,
                     'id_customization' => empty($customization_datas) ? null : $customization_datas[0]['id_customization'],
@@ -620,76 +514,83 @@ class ProductControllerCore extends FrontController
     }
 
     /**
-     * Assign price and tax to the template.
+     * Assign price and tax to the template
      */
     protected function assignPriceAndTax()
     {
-        $id_customer = (isset($this->context->customer) ? (int) $this->context->customer->id : 0);
-        $id_group = (int) Group::getCurrent()->id;
-        $id_country = $id_customer ? (int) Customer::getCurrentCountry($id_customer) : (int) Tools::getCountry();
+        $id_customer = (isset($this->context->customer) ? (int)$this->context->customer->id : 0);
+        $id_group = (int)Group::getCurrent()->id;
+        $id_country = $id_customer ? (int)Customer::getCurrentCountry($id_customer) : (int)Tools::getCountry();
 
         $group_reduction = GroupReduction::getValueForProduct($this->product->id, $id_group);
         if ($group_reduction === false) {
-            $group_reduction = Group::getReduction((int) $this->context->cookie->id_customer) / 100;
+            $group_reduction = Group::getReduction((int)$this->context->cookie->id_customer) / 100;
         }
 
         // Tax
-        $tax = (float) $this->product->getTaxesRate(new Address((int) $this->context->cart->{Configuration::get('PS_TAX_ADDRESS_TYPE')}));
+        $tax = (float)$this->product->getTaxesRate(new Address((int)$this->context->cart->{Configuration::get('PS_TAX_ADDRESS_TYPE')}));
         $this->context->smarty->assign('tax_rate', $tax);
 
         $product_price_with_tax = Product::getPriceStatic($this->product->id, true, null, 6);
         if (Product::$_taxCalculationMethod == PS_TAX_INC) {
             $product_price_with_tax = Tools::ps_round($product_price_with_tax, 2);
         }
-        $product_price_without_eco_tax = (float) $product_price_with_tax - $this->product->ecotax;
+        $product_price_without_eco_tax = (float)$product_price_with_tax - $this->product->ecotax;
 
-        $ecotax_rate = (float) Tax::getProductEcotaxRate($this->context->cart->{Configuration::get('PS_TAX_ADDRESS_TYPE')});
-        $ecotax_tax_amount = Tools::ps_round($this->product->ecotax, 2);
-        if (Product::$_taxCalculationMethod == PS_TAX_INC && (int) Configuration::get('PS_TAX')) {
-            $ecotax_tax_amount = Tools::ps_round($ecotax_tax_amount * (1 + $ecotax_rate / 100), 2);
+        $ecotax_rate = (float)Tax::getProductEcotaxRate($this->context->cart->{Configuration::get('PS_TAX_ADDRESS_TYPE')});
+        if (Product::$_taxCalculationMethod == PS_TAX_INC && (int)Configuration::get('PS_TAX')) {
+            $ecotax_tax_amount = Tools::ps_round($this->product->ecotax * (1 + $ecotax_rate / 100), 2);
+        } else {
+            $ecotax_tax_amount = Tools::ps_round($this->product->ecotax, 2);
         }
 
-        $id_currency = (int) $this->context->cookie->id_currency;
-        $id_product = (int) $this->product->id;
+        $id_currency = (int)$this->context->cookie->id_currency;
+        $id_product = (int)$this->product->id;
         $id_shop = $this->context->shop->id;
 
-        $quantity_discounts = SpecificPrice::getQuantityDiscounts($id_product, $id_shop, $id_currency, $id_country, $id_group, null, true, (int) $this->context->customer->id);
+        $quantity_discounts = SpecificPrice::getQuantityDiscounts($id_product, $id_shop, $id_currency, $id_country, $id_group, null, true, (int)$this->context->customer->id);
         foreach ($quantity_discounts as &$quantity_discount) {
+            if (!isset($quantity_discount['base_price'])) {
+                $quantity_discount['base_price'] = 0;
+            }
             if ($quantity_discount['id_product_attribute']) {
-                $combination = new Combination((int) $quantity_discount['id_product_attribute']);
-                $attributes = $combination->getAttributesName((int) $this->context->language->id);
+                $quantity_discount['base_price'] = $this->product->getPrice(Product::$_taxCalculationMethod == PS_TAX_INC, $quantity_discount['id_product_attribute']);
+
+                $combination = new Combination((int)$quantity_discount['id_product_attribute']);
+                $attributes = $combination->getAttributesName((int)$this->context->language->id);
                 foreach ($attributes as $attribute) {
                     $quantity_discount['attributes'] = $attribute['name'].' - ';
                 }
                 $quantity_discount['attributes'] = rtrim($quantity_discount['attributes'], ' - ');
             }
-            if ((int) $quantity_discount['id_currency'] == 0 && $quantity_discount['reduction_type'] == 'amount') {
+            if ((int)$quantity_discount['id_currency'] == 0 && $quantity_discount['reduction_type'] == 'amount') {
                 $quantity_discount['reduction'] = Tools::convertPriceFull($quantity_discount['reduction'], null, Context::getContext()->currency);
             }
         }
 
-        $product_price = $this->product->getPrice(Product::$_taxCalculationMethod == PS_TAX_INC, false);
         $address = new Address($this->context->cart->{Configuration::get('PS_TAX_ADDRESS_TYPE')});
-        $this->context->smarty->assign(array(
-            'quantity_discounts' => $this->formatQuantityDiscounts($quantity_discounts, $product_price, (float) $tax, $ecotax_tax_amount),
-            'ecotax_tax_inc' => $ecotax_tax_amount,
-            'ecotax_tax_exc' => Tools::ps_round($this->product->ecotax, 2),
-            'ecotaxTax_rate' => $ecotax_rate,
-            'productPriceWithoutEcoTax' => (float) $product_price_without_eco_tax,
-            'group_reduction' => $group_reduction,
-            'no_tax' => Tax::excludeTaxeOption() || !$this->product->getTaxesRate($address),
-            'ecotax' => (!count($this->errors) && $this->product->ecotax > 0 ? Tools::convertPrice((float) $this->product->ecotax) : 0),
-            'tax_enabled' => Configuration::get('PS_TAX') && !Configuration::get('AEUC_LABEL_TAX_INC_EXC'),
-            'customer_group_without_tax' => Group::getPriceDisplayMethod($this->context->customer->id_default_group),
-        ));
+        $this->context->smarty->assign(
+            array(
+                'quantity_discounts' => $this->formatQuantityDiscounts($quantity_discounts, null, (float)$tax, $ecotax_tax_amount),
+                'ecotax_tax_inc' => $ecotax_tax_amount,
+                'ecotax_tax_exc' => Tools::ps_round($this->product->ecotax, 2),
+                'ecotaxTax_rate' => $ecotax_rate,
+                'productPriceWithoutEcoTax' => (float)$product_price_without_eco_tax,
+                'group_reduction' => $group_reduction,
+                'no_tax' => Tax::excludeTaxeOption() || !$this->product->getTaxesRate($address),
+                'ecotax' => (!count($this->errors) && $this->product->ecotax > 0 ? Tools::convertPrice((float)$this->product->ecotax) : 0),
+                'tax_enabled' => Configuration::get('PS_TAX') && !Configuration::get('AEUC_LABEL_TAX_INC_EXC'),
+                'customer_group_without_tax' => Group::getPriceDisplayMethod($this->context->customer->id_default_group),
+            )
+        );
     }
 
     /**
-     * Assign template vars related to images.
+     * Assign template vars related to images
      */
     protected function assignImages()
     {
-        $images = $this->product->getImages((int) $this->context->cookie->id_lang);
+        $images = $this->product->getImages((int)$this->context->cookie->id_lang);
         $product_images = array();
 
         if (isset($images[0])) {
@@ -700,41 +601,41 @@ class ProductControllerCore extends FrontController
                 $this->context->smarty->assign('mainImage', $image);
                 $cover = $image;
                 $cover['id_image'] = (Configuration::get('PS_LEGACY_IMAGES') ? ($this->product->id.'-'.$image['id_image']) : $image['id_image']);
-                $cover['id_image_only'] = (int) $image['id_image'];
+                $cover['id_image_only'] = (int)$image['id_image'];
             }
-            $product_images[(int) $image['id_image']] = $image;
+            $product_images[(int)$image['id_image']] = $image;
         }
 
         if (!isset($cover)) {
             if (isset($images[0])) {
                 $cover = $images[0];
                 $cover['id_image'] = (Configuration::get('PS_LEGACY_IMAGES') ? ($this->product->id.'-'.$images[0]['id_image']) : $images[0]['id_image']);
-                $cover['id_image_only'] = (int) $images[0]['id_image'];
+                $cover['id_image_only'] = (int)$images[0]['id_image'];
             } else {
                 $cover = array(
                     'id_image' => $this->context->language->iso_code.'-default',
                     'legend' => 'No picture',
-                    'title' => 'No picture',
+                    'title' => 'No picture'
                 );
             }
         }
         $size = Image::getSize(ImageType::getFormatedName('large'));
         $this->context->smarty->assign(array(
-            'have_image' => (isset($cover['id_image']) && (int) $cover['id_image']) ? array((int) $cover['id_image']) : Product::getCover((int) Tools::getValue('id_product')),
+            'have_image' => (isset($cover['id_image']) && (int)$cover['id_image'])? array((int)$cover['id_image']) : Product::getCover((int)Tools::getValue('id_product')),
             'cover' => $cover,
-            'imgWidth' => (int) $size['width'],
+            'imgWidth' => (int)$size['width'],
             'mediumSize' => Image::getSize(ImageType::getFormatedName('medium')),
             'largeSize' => Image::getSize(ImageType::getFormatedName('large')),
             'homeSize' => Image::getSize(ImageType::getFormatedName('home')),
             'cartSize' => Image::getSize(ImageType::getFormatedName('cart')),
-            'col_img_dir' => _PS_COL_IMG_DIR_, ));
+            'col_img_dir' => _PS_COL_IMG_DIR_));
         if (count($product_images)) {
             $this->context->smarty->assign('images', $product_images);
         }
     }
 
     /**
-     * Assign template vars related to attribute groups and colors.
+     * Assign template vars related to attribute groups and colors
      */
     protected function assignAttributesGroups()
     {
@@ -754,7 +655,7 @@ class ProductControllerCore extends FrontController
                     if (!isset($colors[$row['id_attribute']]['attributes_quantity'])) {
                         $colors[$row['id_attribute']]['attributes_quantity'] = 0;
                     }
-                    $colors[$row['id_attribute']]['attributes_quantity'] += (int) $row['quantity'];
+                    $colors[$row['id_attribute']]['attributes_quantity'] += (int)$row['quantity'];
                 }
                 if (!isset($groups[$row['id_attribute_group']])) {
                     $groups[$row['id_attribute_group']] = array(
@@ -767,28 +668,28 @@ class ProductControllerCore extends FrontController
 
                 $groups[$row['id_attribute_group']]['attributes'][$row['id_attribute']] = $row['attribute_name'];
                 if ($row['default_on'] && $groups[$row['id_attribute_group']]['default'] == -1) {
-                    $groups[$row['id_attribute_group']]['default'] = (int) $row['id_attribute'];
+                    $groups[$row['id_attribute_group']]['default'] = (int)$row['id_attribute'];
                 }
                 if (!isset($groups[$row['id_attribute_group']]['attributes_quantity'][$row['id_attribute']])) {
                     $groups[$row['id_attribute_group']]['attributes_quantity'][$row['id_attribute']] = 0;
                 }
-                $groups[$row['id_attribute_group']]['attributes_quantity'][$row['id_attribute']] += (int) $row['quantity'];
+                $groups[$row['id_attribute_group']]['attributes_quantity'][$row['id_attribute']] += (int)$row['quantity'];
 
                 $combinations[$row['id_product_attribute']]['attributes_values'][$row['id_attribute_group']] = $row['attribute_name'];
-                $combinations[$row['id_product_attribute']]['attributes'][] = (int) $row['id_attribute'];
-                $combinations[$row['id_product_attribute']]['price'] = (float) $row['price'];
+                $combinations[$row['id_product_attribute']]['attributes'][] = (int)$row['id_attribute'];
+                $combinations[$row['id_product_attribute']]['price'] = (float)Tools::convertPriceFull($row['price'], null, Context::getContext()->currency, false);
 
                 // Call getPriceStatic in order to set $combination_specific_price
-                if (!isset($combination_prices_set[(int) $row['id_product_attribute']])) {
-                    Product::getPriceStatic((int) $this->product->id, false, $row['id_product_attribute'], 6, null, false, true, 1, false, null, null, null, $combination_specific_price);
-                    $combination_prices_set[(int) $row['id_product_attribute']] = true;
+                if (!isset($combination_prices_set[(int)$row['id_product_attribute']])) {
+                    Product::getPriceStatic((int)$this->product->id, false, $row['id_product_attribute'], 6, null, false, false, 1, false, null, null, null, $combination_specific_price);
+                    $combination_prices_set[(int)$row['id_product_attribute']] = true;
                     $combinations[$row['id_product_attribute']]['specific_price'] = $combination_specific_price;
                 }
-                $combinations[$row['id_product_attribute']]['ecotax'] = (float) $row['ecotax'];
-                $combinations[$row['id_product_attribute']]['weight'] = (float) $row['weight'];
-                $combinations[$row['id_product_attribute']]['quantity'] = (int) $row['quantity'];
+                $combinations[$row['id_product_attribute']]['ecotax'] = (float)$row['ecotax'];
+                $combinations[$row['id_product_attribute']]['weight'] = (float)$row['weight'];
+                $combinations[$row['id_product_attribute']]['quantity'] = (int)$row['quantity'];
                 $combinations[$row['id_product_attribute']]['reference'] = $row['reference'];
-                $combinations[$row['id_product_attribute']]['unit_impact'] = $row['unit_price_impact'];
+                $combinations[$row['id_product_attribute']]['unit_impact'] = Tools::convertPriceFull($row['unit_price_impact'], null, Context::getContext()->currency, false);
                 $combinations[$row['id_product_attribute']]['minimal_quantity'] = $row['minimal_quantity'];
                 if ($row['available_date'] != '0000-00-00' && Validate::isDate($row['available_date'])) {
                     $combinations[$row['id_product_attribute']]['available_date'] = $row['available_date'];
@@ -800,7 +701,7 @@ class ProductControllerCore extends FrontController
                 if (!isset($combination_images[$row['id_product_attribute']][0]['id_image'])) {
                     $combinations[$row['id_product_attribute']]['id_image'] = -1;
                 } else {
-                    $combinations[$row['id_product_attribute']]['id_image'] = $id_image = (int) $combination_images[$row['id_product_attribute']][0]['id_image'];
+                    $combinations[$row['id_product_attribute']]['id_image'] = $id_image = (int)$combination_images[$row['id_product_attribute']][0]['id_image'];
                     if ($row['default_on']) {
                         if (isset($this->context->smarty->tpl_vars['cover']->value)) {
                             $current_cover = $this->context->smarty->tpl_vars['cover']->value;
@@ -809,7 +710,7 @@ class ProductControllerCore extends FrontController
                         if (is_array($combination_images[$row['id_product_attribute']])) {
                             foreach ($combination_images[$row['id_product_attribute']] as $tmp) {
                                 if ($tmp['id_image'] == $current_cover['id_image']) {
-                                    $combinations[$row['id_product_attribute']]['id_image'] = $id_image = (int) $tmp['id_image'];
+                                    $combinations[$row['id_product_attribute']]['id_image'] = $id_image = (int)$tmp['id_image'];
                                     break;
                                 }
                             }
@@ -834,8 +735,8 @@ class ProductControllerCore extends FrontController
                                 if (isset($product_images[$id_image])) {
                                     $cover = $product_images[$id_image];
                                 }
-                                $cover['id_image'] = (Configuration::get('PS_LEGACY_IMAGES') ? ($this->product->id.'-'.$id_image) : (int) $id_image);
-                                $cover['id_image_only'] = (int) $id_image;
+                                $cover['id_image'] = (Configuration::get('PS_LEGACY_IMAGES') ? ($this->product->id.'-'.$id_image) : (int)$id_image);
+                                $cover['id_image_only'] = (int)$id_image;
                                 $this->context->smarty->assign('cover', $cover);
                             }
                         }
@@ -862,7 +763,7 @@ class ProductControllerCore extends FrontController
             foreach ($combinations as $id_product_attribute => $comb) {
                 $attribute_list = '';
                 foreach ($comb['attributes'] as $id_attribute) {
-                    $attribute_list .= '\''.(int) $id_attribute.'\',';
+                    $attribute_list .= '\''.(int)$id_attribute.'\',';
                 }
                 $attribute_list = rtrim($attribute_list, ',');
                 $combinations[$id_product_attribute]['list'] = $attribute_list;
@@ -872,13 +773,13 @@ class ProductControllerCore extends FrontController
                 'groups' => $groups,
                 'colors' => (count($colors)) ? $colors : false,
                 'combinations' => $combinations,
-                'combinationImages' => $combination_images,
+                'combinationImages' => $combination_images
             ));
         }
     }
 
     /**
-     * Get and assign attributes combinations informations.
+     * Get and assign attributes combinations informations
      */
     protected function assignAttributesCombinations()
     {
@@ -893,14 +794,14 @@ class ProductControllerCore extends FrontController
             $attributes_combinations = array();
         }
         $this->context->smarty->assign(array(
-            'attributesCombinations' => $attributes_combinations,
-            'attribute_anchor_separator' => Configuration::get('PS_ATTRIBUTE_ANCHOR_SEPARATOR'),
+            'attributesCombinations' =>  $attributes_combinations,
+            'attribute_anchor_separator' => Configuration::get('PS_ATTRIBUTE_ANCHOR_SEPARATOR')
             )
         );
     }
 
     /**
-     * Assign template vars related to category.
+     * Assign template vars related to category
      */
     protected function assignCategory()
     {
@@ -908,13 +809,13 @@ class ProductControllerCore extends FrontController
         if ($this->category !== false && Validate::isLoadedObject($this->category) && $this->category->inShop() && $this->category->isAssociatedToShop()) {
             $path = Tools::getPath($this->category->id, $this->product->name, true);
         } elseif (Category::inShopStatic($this->product->id_category_default, $this->context->shop)) {
-            $this->category = new Category((int) $this->product->id_category_default, (int) $this->context->language->id);
+            $this->category = new Category((int)$this->product->id_category_default, (int)$this->context->language->id);
             if (Validate::isLoadedObject($this->category) && $this->category->active && $this->category->isAssociatedToShop()) {
-                $path = Tools::getPath((int) $this->product->id_category_default, $this->product->name);
+                $path = Tools::getPath((int)$this->product->id_category_default, $this->product->name);
             }
         }
         if (!isset($path) || !$path) {
-            $path = Tools::getPath((int) $this->context->shop->id_category, $this->product->name);
+            $path = Tools::getPath((int)$this->context->shop->id_category, $this->product->name);
         }
 
         $sub_categories = array();
@@ -926,10 +827,10 @@ class ProductControllerCore extends FrontController
                 'path' => $path,
                 'category' => $this->category,
                 'subCategories' => $sub_categories,
-                'id_category_current' => (int) $this->category->id,
-                'id_category_parent' => (int) $this->category->id_parent,
+                'id_category_current' => (int)$this->category->id,
+                'id_category_parent' => (int)$this->category->id_parent,
                 'return_category_name' => Tools::safeOutput($this->category->getFieldByLang('name')),
-                'categories' => Category::getHomeCategories($this->context->language->id, true, (int) $this->context->shop->id),
+                'categories' => Category::getHomeCategories($this->context->language->id, true, (int)$this->context->shop->id)
             ));
         }
         $this->context->smarty->assign(array('HOOK_PRODUCT_FOOTER' => Hook::exec('displayFooterProduct', array('product' => $this->product, 'category' => $this->category))));
@@ -956,19 +857,19 @@ class ProductControllerCore extends FrontController
         $authorized_file_fields = array();
         foreach ($field_ids as $field_id) {
             if ($field_id['type'] == Product::CUSTOMIZE_FILE) {
-                $authorized_file_fields[(int) $field_id['id_customization_field']] = 'file'.(int) $field_id['id_customization_field'];
+                $authorized_file_fields[(int)$field_id['id_customization_field']] = 'file'.(int)$field_id['id_customization_field'];
             }
         }
         $indexes = array_flip($authorized_file_fields);
         foreach ($_FILES as $field_name => $file) {
             if (in_array($field_name, $authorized_file_fields) && isset($file['tmp_name']) && !empty($file['tmp_name'])) {
                 $file_name = md5(uniqid(rand(), true));
-                if ($error = ImageManager::validateUpload($file, (int) Configuration::get('PS_PRODUCT_PICTURE_MAX_SIZE'))) {
+                if ($error = ImageManager::validateUpload($file, (int)Configuration::get('PS_PRODUCT_PICTURE_MAX_SIZE'))) {
                     $this->errors[] = $error;
                 }
 
-                $product_picture_width = (int) Configuration::get('PS_PRODUCT_PICTURE_WIDTH');
-                $product_picture_height = (int) Configuration::get('PS_PRODUCT_PICTURE_HEIGHT');
+                $product_picture_width = (int)Configuration::get('PS_PRODUCT_PICTURE_WIDTH');
+                $product_picture_height = (int)Configuration::get('PS_PRODUCT_PICTURE_HEIGHT');
                 $tmp_name = tempnam(_PS_TMP_IMG_DIR_, 'PS');
                 if ($error || (!$tmp_name || !move_uploaded_file($file['tmp_name'], $tmp_name))) {
                     return false;
@@ -988,7 +889,6 @@ class ProductControllerCore extends FrontController
                 unlink($tmp_name);
             }
         }
-
         return true;
     }
 
@@ -1001,7 +901,7 @@ class ProductControllerCore extends FrontController
         $authorized_text_fields = array();
         foreach ($field_ids as $field_id) {
             if ($field_id['type'] == Product::CUSTOMIZE_TEXTFIELD) {
-                $authorized_text_fields[(int) $field_id['id_customization_field']] = 'textField'.(int) $field_id['id_customization_field'];
+                $authorized_text_fields[(int)$field_id['id_customization_field']] = 'textField'.(int)$field_id['id_customization_field'];
             }
         }
 
@@ -1014,7 +914,7 @@ class ProductControllerCore extends FrontController
                     $this->context->cart->addTextFieldToProduct($this->product->id, $indexes[$field_name], Product::CUSTOMIZE_TEXTFIELD, $value);
                 }
             } elseif (in_array($field_name, $authorized_text_fields) && $value == '') {
-                $this->context->cart->deleteCustomizationToProduct((int) $this->product->id, $indexes[$field_name]);
+                $this->context->cart->deleteCustomizationToProduct((int)$this->product->id, $indexes[$field_name]);
             }
         }
     }
@@ -1028,7 +928,7 @@ class ProductControllerCore extends FrontController
             }
         }
         if (isset($_POST['quantityBackup'])) {
-            $this->context->smarty->assign('quantityBackup', (int) $_POST['quantityBackup']);
+            $this->context->smarty->assign('quantityBackup', (int)$_POST['quantityBackup']);
         }
         $this->context->smarty->assign('customizationFormTarget', $customization_form_target);
     }
@@ -1040,7 +940,7 @@ class ProductControllerCore extends FrontController
             if ($row['price'] >= 0) {
                 // The price may be directly set
 
-                $cur_price = (!$row['reduction_tax'] ? $row['price'] : $row['price'] * (1 + $tax_rate / 100)) + (float) $ecotax_amount;
+                $cur_price = (!$row['reduction_tax'] ? $row['price'] : $row['price'] * (1 + $tax_rate / 100)) + (float)$ecotax_amount;
 
                 if ($row['reduction_type'] == 'amount') {
                     $cur_price -= ($row['reduction_tax'] ? $row['reduction'] : $row['reduction'] / (1 + $tax_rate / 100));
@@ -1049,18 +949,21 @@ class ProductControllerCore extends FrontController
                     $cur_price *= 1 - $row['reduction'];
                 }
 
-                $row['real_value'] = $price - $cur_price;
+                $row['real_value'] = $row['base_price'] > 0 ? $row['base_price'] - $cur_price : $cur_price;
             } else {
                 if ($row['reduction_type'] == 'amount') {
-                    $row['real_value'] = $row['reduction_tax'] ? $row['reduction'] : $row['reduction'] +  ($row['reduction'] * $tax_rate) / 100;
-                    $row['reduction_with_tax'] = $row['reduction_tax'] ? $row['reduction'] : $row['reduction'] +  ($row['reduction'] * $tax_rate) / 100;
+					if (Product::$_taxCalculationMethod == PS_TAX_INC) {
+						$row['real_value'] = $row['reduction_tax'] == 1 ? $row['reduction'] : $row['reduction'] * (1 + $tax_rate / 100);
+					} else {
+						$row['real_value'] = $row['reduction_tax'] == 0 ? $row['reduction'] : $row['reduction'] / (1 + $tax_rate / 100);
+					}
+                    $row['reduction_with_tax'] = $row['reduction_tax'] ? $row['reduction'] : $row['reduction'] +  ($row['reduction'] *$tax_rate) / 100;
                 } else {
                     $row['real_value'] = $row['reduction'] * 100;
                 }
             }
-            $row['nextQuantity'] = (isset($specific_prices[$key + 1]) ? (int) $specific_prices[$key + 1]['from_quantity'] : -1);
+            $row['nextQuantity'] = (isset($specific_prices[$key + 1]) ? (int)$specific_prices[$key + 1]['from_quantity'] : - 1);
         }
-
         return $specific_prices;
     }
 
@@ -1072,5 +975,98 @@ class ProductControllerCore extends FrontController
     public function getCategory()
     {
         return $this->category;
+    }
+
+    public function displayAjaxCheckRoomAvailabilityAndRate()
+    {
+        $result = array();
+        if ($idProduct = Tools::getValue('id_product')) {
+            $objHotelRoomType = new HotelRoomType();
+            if ($roomTypeInfo = $objHotelRoomType->getRoomTypeInfoByIdProduct($idProduct)) {
+                $dateFrom = Tools::getValue('date_from');
+                $dateTo = Tools::getValue('date_to');
+                $quantity = Tools::getValue('qty');
+                $roomDemands = Tools::getValue('room_demands');
+                if ($idHotel = $roomTypeInfo['id_hotel']) {
+                    $objBookingDetail = new HotelBookingDetail();
+                    if ($hotelRoomData = $objBookingDetail->DataForFrontSearch(
+                        $dateFrom,
+                        $dateTo,
+                        $idHotel,
+                        $idProduct,
+                        1,
+                        0,
+                        0,
+                        -1,
+                        0,
+                        0,
+                        $this->context->cart->id,
+                        $this->context->cart->id_guest
+                    )) {
+                        $totalAvailRooms = $hotelRoomData['stats']['num_avail'];
+                        if ($totalAvailRooms >= $quantity) {
+                            $totalPrice = 0;
+                            $useTax = HotelBookingDetail::useTax();
+                            $product = new Product($idProduct);
+                            $productPriceWithoutReduction = $product->getPriceWithoutReduct(!$useTax);
+                            $numDays = $objBookingDetail->getNumberOfDays($dateFrom, $dateTo);
+                            $roomTypeDateRangePrice = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
+                                $idProduct,
+                                $dateFrom,
+                                $dateTo
+                            );
+                            if ($useTax) {
+                                $priceProduct = Product::getPriceStatic($idProduct, true);
+                                $featurePrice = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay($idProduct, $dateFrom, $dateTo, true);
+                                $roomTypeDateRangePrice = $roomTypeDateRangePrice['total_price_tax_incl'];
+                            } else {
+                                $priceProduct = Product::getPriceStatic($idProduct, false);
+                                $featurePrice = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay($idProduct, $dateFrom, $dateTo, false);
+                                $roomTypeDateRangePrice = $roomTypeDateRangePrice['total_price_tax_excl'];
+                            }
+                            $featurePriceDiff = (float)($productPriceWithoutReduction - $featurePrice);
+
+                            //$price_tax_incl = Product::getPriceStatic($idProduct, $price_tax);
+                            $totalRoomPrice = $roomTypeDateRangePrice * $quantity;
+                            $totalPrice += $totalRoomPrice;
+                            $demandsPrice = 0;
+                            if ($roomDemand = Tools::getValue('room_demands')) {
+                                if ($roomDemand = Tools::jsonDecode($roomDemand, true)) {
+                                    $objRoomDemandPrice = new HotelRoomTypeDemandPrice();
+                                    $demandsPrice = $objRoomDemandPrice->getRoomTypeDemandsTotalPrice(
+                                        $idProduct,
+                                        $roomDemand
+                                    );
+                                    $demandsPrice *= $quantity;
+                                    $totalPrice += $demandsPrice;
+                                }
+                            }
+                            $result['msg'] = 'success';
+                            $result['total_price'] = $totalPrice;
+                            $result['total_room_price'] = $totalRoomPrice;
+                            $result['extra_demand_price'] = $demandsPrice;
+                            $result['num_days'] = $numDays;
+                            $result['avail_rooms'] = $totalAvailRooms;
+                            $result['original_product_price'] = $priceProduct;
+                            $result['feature_price'] = $featurePrice;
+                            $result['feature_price_diff'] = $featurePriceDiff;
+                        } else {
+                            $result['msg'] = 'unavailable_quantity';
+                            $result['avail_rooms'] = $totalAvailRooms;
+                        }
+                    } else {
+                        $result['msg'] = 'failed1';
+                        $result['avail_rooms'] = $totalAvailRooms;
+                    }
+                } else {
+                    $result['msg'] = 'failed2';
+                    $result['avail_rooms'] = $totalAvailRooms;
+                }
+            }
+        } else {
+            $result['msg'] = 'failed3';
+            $result['avail_rooms'] = 0;
+        }
+        die(Tools::jsonEncode($result));
     }
 }

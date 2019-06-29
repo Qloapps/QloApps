@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2015 PrestaShop
+* 2007-2016 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2016 PrestaShop SA
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -33,7 +33,7 @@ class BlockCategories extends Module
 	{
 		$this->name = 'blockcategories';
 		$this->tab = 'front_office_features';
-		$this->version = '2.9.0';
+		$this->version = '2.9.4';
 		$this->author = 'PrestaShop';
 
 		$this->bootstrap = true;
@@ -41,7 +41,7 @@ class BlockCategories extends Module
 
 		$this->displayName = $this->l('Categories block');
 		$this->description = $this->l('Adds a block featuring product categories.');
-		$this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
+		$this->ps_versions_compliancy = array('min' => '1.6', 'max' => '1.6.99.99');
 	}
 
 	public function install()
@@ -131,7 +131,7 @@ class BlockCategories extends Module
 		if (isset($resultParents[$id_category]) && count($resultParents[$id_category]) && ($maxDepth == 0 || $currentDepth < $maxDepth))
 			foreach ($resultParents[$id_category] as $subcat)
 				$children[] = $this->getTree($resultParents, $resultIds, $maxDepth, $subcat['id_category'], $currentDepth + 1);
-		if (isset($resultIds[$id_category])) 
+		if (isset($resultIds[$id_category]))
 		{
 			$link = $this->context->link->getCategoryLink($id_category, $resultIds[$id_category]['link_rewrite']);
 			$name = $resultIds[$id_category]['name'];
@@ -139,7 +139,7 @@ class BlockCategories extends Module
 		}
 		else
 			$link = $name = $desc = '';
-			
+
 		$return = array(
 			'id' => $id_category,
 			'link' => $link,
@@ -167,6 +167,12 @@ class BlockCategories extends Module
 				$files[$i]['delete_url'] = Context::getContext()->link->getAdminLink('AdminBlockCategories').'&deleteThumb='.$i.'&id_category='.(int)$category->id;
 			}
 		}
+
+		$images_types = ImageType::getImagesTypes('categories');
+		$formated_medium = ImageType::getFormatedName('medium');
+		foreach ($images_types as $k => $image_type)
+			if ($formated_medium == $image_type['name'])
+				$this->smarty->assign('format', $image_type);
 
 		$helper = new HelperImageUploader();
 		$helper->setMultiple(true)->setUseAjax(true)->setName('thumbnail')->setFiles($files)->setMaxFiles(3)->setUrl(

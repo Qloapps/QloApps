@@ -1,4 +1,40 @@
 -------------------------
+# V1.2.2 to V1.3.0
+-------------------------
+
+## Added Features:
+
+[+] CO : Additional Facility functionality is added.
+[+] CO : `extra_demands` columnn added to the table `htl_cart_booking_data`.
+[+] CO : Tables `htl_booking_demands`, `htl_room_type_global_demand`, `htl_room_type_global_demand_lang`, `htl_room_type_global_demand_advance_option`, `htl_room_type_global_demand_advance_option_lang`, `htl_room_type_demand_price`, `htl_room_type_demand` are added to the module to manage extra demand feature.
+
+[+] BO : AdminRoomTypeGlobalDemand controller added to create and update extra demands.
+[Hotel reservation system -> Settings -> Additional Demands]
+
+[+] BO : "EXTRA DEMANDS" tab added while updating a room type.
+
+
+## Improved/changed features:
+
+[*] CO : mp-form-fields-flag.tpl name changed to htl-form-fields-flag.tpl
+[*] BO : Tiny mce fields validations improved.
+[*] BO : Feature price settings filters are improved.
+[*] BO : Order Refund rules page filters are improved.
+[*] BO : Order Refund Requests page filters are improved.
+[*] BO : Book Now page search process is improved.
+[*] BO : Google map key is now at General Settings -> GOOGLE MAP SETTING only removed from Preferences->General tab.
+
+## Bug/Issues Resolved:
+
+[-] BO : Zipcode in demo data is now dynamic for selected country while QloApps installation.
+
+
+## Update Policy
+
+- Database changed, Module need upload new file then UNINSTALL and re-installation.
+
+
+-------------------------
 # V1.2.1 to V1.2.2
 -------------------------
 

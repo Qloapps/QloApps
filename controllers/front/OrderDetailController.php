@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -33,8 +33,7 @@ class OrderDetailControllerCore extends FrontController
     public $ssl = true;
 
     /**
-     * Initialize order detail controller.
-     *
+     * Initialize order detail controller
      * @see FrontController::init()
      */
     public function init()
@@ -45,14 +44,13 @@ class OrderDetailControllerCore extends FrontController
     }
 
     /**
-     * Start forms process.
-     *
+     * Start forms process
      * @see FrontController::postProcess()
      */
     public function postProcess()
     {
         if (Tools::isSubmit('submitMessage')) {
-            $idOrder = (int) Tools::getValue('id_order');
+            $idOrder = (int)Tools::getValue('id_order');
             $msgText = Tools::getValue('msgText');
 
             if (!$idOrder || !Validate::isUnsignedId($idOrder)) {
@@ -67,37 +65,37 @@ class OrderDetailControllerCore extends FrontController
                 if (Validate::isLoadedObject($order) && $order->id_customer == $this->context->customer->id) {
                     //check if a thread already exist
                     $id_customer_thread = CustomerThread::getIdCustomerThreadByEmailAndIdOrder($this->context->customer->email, $order->id);
-                    $id_product = (int) Tools::getValue('id_product');
+                    $id_product = (int)Tools::getValue('id_product');
                     $cm = new CustomerMessage();
                     if (!$id_customer_thread) {
                         $ct = new CustomerThread();
                         $ct->id_contact = 0;
-                        $ct->id_customer = (int) $order->id_customer;
-                        $ct->id_shop = (int) $this->context->shop->id;
+                        $ct->id_customer = (int)$order->id_customer;
+                        $ct->id_shop = (int)$this->context->shop->id;
                         if ($id_product && $order->orderContainProduct($id_product)) {
                             $ct->id_product = $id_product;
                         }
-                        $ct->id_order = (int) $order->id;
-                        $ct->id_lang = (int) $this->context->language->id;
+                        $ct->id_order = (int)$order->id;
+                        $ct->id_lang = (int)$this->context->language->id;
                         $ct->email = $this->context->customer->email;
                         $ct->status = 'open';
                         $ct->token = Tools::passwdGen(12);
                         $ct->add();
                     } else {
-                        $ct = new CustomerThread((int) $id_customer_thread);
+                        $ct = new CustomerThread((int)$id_customer_thread);
                         $ct->status = 'open';
                         $ct->update();
                     }
 
                     $cm->id_customer_thread = $ct->id;
                     $cm->message = $msgText;
-                    $cm->ip_address = (int) ip2long($_SERVER['REMOTE_ADDR']);
+                    $cm->ip_address = (int)ip2long($_SERVER['REMOTE_ADDR']);
                     $cm->add();
 
                     if (!Configuration::get('PS_MAIL_EMAIL_MESSAGE')) {
                         $to = strval(Configuration::get('PS_SHOP_EMAIL'));
                     } else {
-                        $to = new Contact((int) Configuration::get('PS_MAIL_EMAIL_MESSAGE'));
+                        $to = new Contact((int)Configuration::get('PS_MAIL_EMAIL_MESSAGE'));
                         $to = strval($to->email);
                     }
                     $toName = strval(Configuration::get('PS_SHOP_NAME'));
@@ -105,28 +103,40 @@ class OrderDetailControllerCore extends FrontController
 
                     $product = new Product($id_product);
                     $product_name = '';
-                    if (Validate::isLoadedObject($product) && isset($product->name[(int) $this->context->language->id])) {
-                        $product_name = $product->name[(int) $this->context->language->id];
+                    if (Validate::isLoadedObject($product) && isset($product->name[(int)$this->context->language->id])) {
+                        $product_name = $product->name[(int)$this->context->language->id];
                     }
 
                     if (Validate::isLoadedObject($customer)) {
                         Mail::Send(
-                            $this->context->language->id, 'order_customer_comment', Mail::l('Message from a customer'),
+                            $this->context->language->id,
+                            'order_customer_comment',
+                            Mail::l('Message from a customer'),
                             array(
                                 '{lastname}' => $customer->lastname,
                                 '{firstname}' => $customer->firstname,
                                 '{email}' => $customer->email,
-                                '{id_order}' => (int) $order->id,
+                                '{id_order}' => (int)$order->id,
                                 '{order_name}' => $order->getUniqReference(),
                                 '{message}' => Tools::nl2br($msgText),
-                                '{product_name}' => $product_name,
+                                '{product_name}' => $product_name
                             ),
-                            $to, $toName, $customer->email, $customer->firstname.' '.$customer->lastname
+                            $to,
+                            $toName,
+                            strval(Configuration::get('PS_SHOP_EMAIL')),
+                            $customer->firstname.' '.$customer->lastname,
+                            null,
+                            null,
+                            _PS_MAIL_DIR_,
+                            false,
+                            null,
+                            null,
+                            $customer->email
                         );
                     }
 
                     if (Tools::getValue('ajax') != 'true') {
-                        Tools::redirect('index.php?controller=order-detail&id_order='.(int) $idOrder);
+                        Tools::redirect('index.php?controller=order-detail&id_order='.(int)$idOrder);
                     }
 
                     $this->context->smarty->assign('message_confirmation', true);
@@ -143,8 +153,7 @@ class OrderDetailControllerCore extends FrontController
     }
 
     /**
-     * Assign template vars related to page content.
-     *
+     * Assign template vars related to page content
      * @see FrontController::initContent()
      */
     public function initContent()
@@ -154,6 +163,28 @@ class OrderDetailControllerCore extends FrontController
         //By webkul to save order refund Info in our table
         $saveRefundInfo = Tools::getValue('saveRefundInfo');
         $saveTotalOrderRefundInfo = Tools::getValue('saveTotalOrderRefundInfo');
+        $method = Tools::getValue('method');
+        if ($method == 'getRoomTypeBookingDemands') {
+            $extraDemandsTpl = '';
+            if (($idProduct = Tools::getValue('id_product'))
+                && ($idOrder = Tools::getValue('id_order'))
+                && ($dateFrom = Tools::getValue('date_from'))
+                && ($dateTo = Tools::getValue('date_to'))
+            ) {
+                $objBookingDemand = new HotelBookingDemands();
+                if ($extraDemands = $objBookingDemand->getRoomTypeBookingExtraDemands(
+                    $idOrder,
+                    $idProduct,
+                    0,
+                    $dateFrom,
+                    $dateTo
+                )) {
+                    $this->context->smarty->assign('extraDemands', $extraDemands);
+                    $extraDemandsTpl .= $this->context->smarty->fetch(_PS_THEME_DIR_.'_partials/order_booking_demands.tpl');
+                }
+            }
+            die($extraDemandsTpl);
+        }
 
         /*If requesst for only one room cancellation*/
         if (isset($saveRefundInfo) && $saveRefundInfo) {
@@ -248,7 +279,7 @@ class OrderDetailControllerCore extends FrontController
                             $objHtlRefundInfo->id_customer = $id_customer;
                             $objHtlRefundInfo->id_currency = $id_currency;
                             $objHtlRefundInfo->refund_stage_id = 1;
-                            $objHtlRefundInfo->order_amount = $rm_v['amount_tax_incl'];
+                            $objHtlRefundInfo->order_amount = $rm_v['amount_tax_incl'] + $rm_v['extra_demands_price'];
                             $objHtlRefundInfo->cancellation_reason = $cancellation_reason;
                             $objHtlRefundInfo->num_rooms = $rm_v['num_rm'];
                             $objHtlRefundInfo->date_from = $rm_v['data_form'];
@@ -295,10 +326,10 @@ class OrderDetailControllerCore extends FrontController
         } else {
             $order = new Order($id_order);
             if (Validate::isLoadedObject($order) && $order->id_customer == $this->context->customer->id) {
-                $id_order_state = (int) $order->getCurrentState();
-                $carrier = new Carrier((int) $order->id_carrier, (int) $order->id_lang);
-                $addressInvoice = new Address((int) $order->id_address_invoice);
-                $addressDelivery = new Address((int) $order->id_address_delivery);
+                $id_order_state = (int)$order->getCurrentState();
+                $carrier = new Carrier((int)$order->id_carrier, (int)$order->id_lang);
+                $addressInvoice = new Address((int)$order->id_address_invoice);
+                $addressDelivery = new Address((int)$order->id_address_delivery);
 
                 $inv_adr_fields = AddressFormat::getOrderedAddressFields($addressInvoice->id_country);
                 $dlv_adr_fields = AddressFormat::getOrderedAddressFields($addressDelivery->id_country);
@@ -307,16 +338,16 @@ class OrderDetailControllerCore extends FrontController
                 $deliveryAddressFormatedValues = AddressFormat::getFormattedAddressFieldsValues($addressDelivery, $dlv_adr_fields);
 
                 if ($order->total_discounts > 0) {
-                    $this->context->smarty->assign('total_old', (float) $order->total_paid - $order->total_discounts);
+                    $this->context->smarty->assign('total_old', (float)$order->total_paid - $order->total_discounts);
                 }
                 $products = $order->getProducts();
 
                 /* DEPRECATED: customizedDatas @since 1.5 */
-                $customizedDatas = Product::getAllCustomizedDatas((int) $order->id_cart);
+                $customizedDatas = Product::getAllCustomizedDatas((int)$order->id_cart);
                 Product::addCustomizationPrice($products, $customizedDatas);
 
                 OrderReturn::addReturnedQuantity($products, $order->id);
-                $order_status = new OrderState((int) $id_order_state, (int) $order->id_lang);
+                $order_status = new OrderState((int)$id_order_state, (int)$order->id_lang);
 
                 $customer = new Customer($order->id_customer);
 
@@ -329,7 +360,8 @@ class OrderDetailControllerCore extends FrontController
                     $objRoomType = new HotelRoomType();
                     $objCustomerAdv = new HotelCustomerAdvancedPayment();
                     $objOrdRefundInfo = new HotelOrderRefundInfo();
-
+                    $objRefundStages = new HotelOrderRefundStages();
+                    $objBookingDemand = new HotelBookingDemands();
                     $nonRequestedRooms = 0;
                     $anyBackOrder = 0;
                     $processedProducts = array();
@@ -338,6 +370,7 @@ class OrderDetailControllerCore extends FrontController
 
                 if ($hotelresInstalled) {
                     if (!empty($products)) {
+                        $total_demands_price = 0;
                         foreach ($products as $type_key => $type_value) {
                             if (in_array($type_value['product_id'], $processedProducts)) {
                                 continue;
@@ -366,6 +399,7 @@ class OrderDetailControllerCore extends FrontController
                             $cartHotelData[$type_key]['adult'] = $rm_dtl['adult'];
                             $cartHotelData[$type_key]['children'] = $rm_dtl['children'];
 
+                            $objBookingDemand = new HotelBookingDemands();
                             foreach ($order_bk_data as $data_k => $data_v) {
                                 $date_join = strtotime($data_v['date_from']).strtotime($data_v['date_to']);
 
@@ -420,7 +454,26 @@ class OrderDetailControllerCore extends FrontController
                                     //refund_stage
                                     $cartHotelData[$type_key]['date_diff'][$date_join]['stage_name'] = $stage_name;
                                 }
-
+                                $cartHotelData[$type_key]['date_diff'][$date_join]['extra_demands'] = $objBookingDemand->getRoomTypeBookingExtraDemands(
+                                    $id_order,
+                                    $type_value['product_id'],
+                                    0,
+                                    $data_v['date_from'],
+                                    $data_v['date_to']
+                                );
+                                if (empty($cartHotelData[$type_key]['date_diff'][$date_join]['extra_demands_price'])) {
+                                    $cartHotelData[$type_key]['date_diff'][$date_join]['extra_demands_price'] = 0;
+                                }
+                                $cartHotelData[$type_key]['date_diff'][$date_join]['extra_demands_price'] += $extraDemandPrice = $objBookingDemand->getRoomTypeBookingExtraDemands(
+                                    $id_order,
+                                    $type_value['product_id'],
+                                    $data_v['id_room'],
+                                    $data_v['date_from'],
+                                    $data_v['date_to'],
+                                    0,
+                                    1
+                                );
+                                $total_demands_price += $extraDemandPrice;
                                 $cartHotelData[$type_key]['date_diff'][$date_join]['product_price_tax_excl'] = $order_details_obj->unit_price_tax_excl;
                                 $cartHotelData[$type_key]['date_diff'][$date_join]['product_price_tax_incl'] = $order_details_obj->unit_price_tax_incl;
                                 $cartHotelData[$type_key]['date_diff'][$date_join]['product_price_without_reduction_tax_excl'] = $order_details_obj->unit_price_tax_excl + $order_details_obj->reduction_amount_tax_excl;
@@ -443,14 +496,14 @@ class OrderDetailControllerCore extends FrontController
 
                         //For Advanced Payment
                         $orderAdvDetail = $objCustomerAdv->getCstAdvPaymentDtlByIdOrder($order->id);
-
                         $this->context->smarty->assign(
                             array(
+                                'total_demands_price' => $total_demands_price,
                                 'any_back_order' => $anyBackOrder,
                                 'shw_bo_msg' => Configuration::get('WK_SHOW_MSG_ON_BO'),
                                 'back_ord_msg' => Configuration::get('WK_BO_MESSAGE'),
                                 'order_has_invoice' => $order->hasInvoice(),
-                                'redirect_link_terms', $redirectTermsLink,
+                                'redirect_link_terms' => $redirectTermsLink,
                                 'cart_htl_data' => $cartHotelData,
                                 'non_requested_rooms' => $nonRequestedRooms,
                                 'order_adv_dtl' => $orderAdvDetail

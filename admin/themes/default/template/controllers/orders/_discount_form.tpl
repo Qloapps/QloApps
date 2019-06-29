@@ -1,5 +1,5 @@
 {*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -18,7 +18,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
@@ -84,7 +84,7 @@
 		<div class="col-lg-9 col-lg-offset-3">
 			<p class="checkbox">
 				<label class="control-label" for="discount_all_invoices">
-					<input type="checkbox" name="discount_all_invoices" id="discount_all_invoices" value="1" /> 
+					<input type="checkbox" name="discount_all_invoices" id="discount_all_invoices" value="1" />
 					{l s='Apply on all invoices'}
 				</label>
 			</p>

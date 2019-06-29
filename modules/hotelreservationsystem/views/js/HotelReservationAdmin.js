@@ -77,7 +77,7 @@ $(document).ready(function() {
         $('.accordion .accordion-section-content').slideUp(300).removeClass('open');
     }
 
-    $('.accordion-section-title').click(function(e) {
+    $(document).on('click', '.accordion-section-title', function(e) {
         // Grab current anchor value
         var currentAttrValue = $(this).attr('href');
 
@@ -274,16 +274,15 @@ $(document).ready(function() {
                     },
                     success: function(result) {
                         $("#hotel_id option[value='0']").remove(); // to remove Select hotel option
-
                         $('#room_type').empty();
-                        if (result) {
-                            html = "<option value='0'>" + opt_select_all + "</option>";
+                        html = "<option value='0'>" + opt_select_all + "</option>";
+                        if (result.length) {
                             $.each(result, function(key, value) {
                                 html += "<option value='" + value.id_product + "'>" + value.room_type + "</option>";
                             });
                             $('#room_type').append(html);
                         } else {
-                            html = "<option value='-1'>" + slt_another_htl + "</option>";
+                            showErrorMessage(noRoomTypeAvlTxt);
                             $('#room_type').append(html);
                         }
                     }
@@ -327,20 +326,26 @@ $(document).ready(function() {
         $(".cust_name").text(e.relatedTarget.dataset.cust_name);
         $(".cust_email").text(e.relatedTarget.dataset.cust_email);
         html = '';
-        var json_arr_rm_swp = JSON.parse(e.relatedTarget.dataset.avail_rm_swap);
-        $.each(json_arr_rm_swp, function(key, val) {
-            html += '<option class="swp_rm_opts" value="' + val.id_room + '" >' + val.room_num + '</option>';
-        });
-        if (html != '')
+        if (e.relatedTarget.dataset.avail_rm_realloc) {
+            var json_arr_rm_swp = JSON.parse(e.relatedTarget.dataset.avail_rm_swap);
+            $.each(json_arr_rm_swp, function(key, val) {
+                html += '<option class="swp_rm_opts" value="' + val.id_room + '" >' + val.room_num + '</option>';
+            });
+        }
+        if (html != '') {
             $("#swap_avail_rooms").append(html);
+        }
 
         html = '';
-        var json_arr_rm_realloc = JSON.parse(e.relatedTarget.dataset.avail_rm_realloc);
-        $.each(json_arr_rm_realloc, function(key, val) {
-            html += '<option class="realloc_rm_opts" value="' + val.id_room + '" >' + val.room_num + '</option>';
-        });
-        if (html != '')
+        if (e.relatedTarget.dataset.avail_rm_realloc) {
+            var json_arr_rm_realloc = JSON.parse(e.relatedTarget.dataset.avail_rm_realloc);
+            $.each(json_arr_rm_realloc, function(key, val) {
+                html += '<option class="realloc_rm_opts" value="' + val.id_room + '" >' + val.room_num + '</option>';
+            });
+        }
+        if (html != '') {
             $("#realloc_avail_rooms").append(html);
+        }
     });
 
     $('body').on('click', '.avai_add_cart', function() {
@@ -983,6 +988,28 @@ $(document).ready(function() {
         }
     });
 
+    if (parseInt($("input[name='WK_ALLOW_ADVANCED_PAYMENT']:checked").val()) == 0) {
+        $("input[name='WK_ADVANCED_PAYMENT_GLOBAL_MIN_AMOUNT']").closest('.form-group').hide();
+        $("input[name='WK_ADVANCED_PAYMENT_INC_TAX']").closest('.form-group').hide();
+    }
+    $("input[name='WK_ALLOW_ADVANCED_PAYMENT']").on('change', function () {
+        if (parseInt($(this).val())) {
+            $("input[name='WK_ADVANCED_PAYMENT_GLOBAL_MIN_AMOUNT']").closest('.form-group').show();
+            $("input[name='WK_ADVANCED_PAYMENT_INC_TAX']").closest('.form-group').show();
+        } else {
+            $("input[name='WK_ADVANCED_PAYMENT_GLOBAL_MIN_AMOUNT']").closest('.form-group').hide();
+            $("input[name='WK_ADVANCED_PAYMENT_INC_TAX']").closest('.form-group').hide();
+        }
+    });
+
+    $("#htl_header_image").on("change", function(event) {
+		if (typeof this.files[0] != 'undefined') {
+			if (this.files[0].size > maxSizeAllowed) {
+				showErrorMessage(filesizeError);
+				$('#htl_header_image').val(null);
+			}
+		}
+    });
 });
 
 function showFeaturePriceRuleLangField(lang_iso_code, id_lang)

@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -114,8 +114,8 @@ class AdminCustomerPreferencesControllerCore extends AdminController
                         'type' => 'bool'
                     ),
                     'PS_CUSTOMER_ADDRESS_CREATION' => array(
-                        'title' => $this->l('Enable customer address creation at checkout'),
-                        'hint' => $this->l('If disabled, At checkout process, guest has to fill only personal details and address will be created according to the hotel address which rooms guest has in his cart. If enabled, guest has to fill his address details in checkout process.'),
+                        'title' => $this->l('Address creation during checkout'),
+                        'hint' => $this->l('If disabled, Address form will not appear to user during checkout process. So by default hotel address, which rooms guest has in his cart will be considered as user address. Else user has to fill adress details.'),
                         'validation' => 'isBool',
                         'cast' => 'intval',
                         'type' => 'bool'

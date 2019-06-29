@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -201,8 +201,8 @@ class MetaCore extends ObjectModel
      */
     public static function getMetaTags($id_lang, $page_name, $title = '')
     {
-        global $maintenance;
-        if (!(isset($maintenance) && (!in_array(Tools::getRemoteAddr(), explode(',', Configuration::get('PS_MAINTENANCE_IP')))))) {
+        if (!(!Configuration::get('PS_SHOP_ENABLE')
+            && !in_array(Tools::getRemoteAddr(), explode(',', Configuration::get('PS_MAINTENANCE_IP'))))) {
             if ($page_name == 'product' && ($id_product = Tools::getValue('id_product'))) {
                 return Meta::getProductMetas($id_product, $id_lang, $page_name);
             } elseif ($page_name == 'category' && ($id_category = Tools::getValue('id_category'))) {

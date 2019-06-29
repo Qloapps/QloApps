@@ -37,11 +37,12 @@ if (!$products_accesses['edit'] && !$cms_accesses['edit']) {
 //    |   |   |   |   |- plugin.min.js
 
 
-$base_url= Tools::getHttpHost(true);  // DON'T TOUCH (base url (only domain) of site (without final /)).
+$base_url = Tools::getHttpHost(true);  // DON'T TOUCH (base url (only domain) of site (without final /)).
+$base_url = Configuration::get('PS_SSL_ENABLED') && Configuration::get('PS_SSL_ENABLED_EVERYWHERE') ? $base_url : str_replace('https', 'http', $base_url);
 $upload_dir = Context::getContext()->shop->getBaseURI().'img/cms/'; // path from base_url to base of upload folder (with start and final /)
-$current_path =  _PS_ROOT_DIR_.'/img/cms/'; // relative path from filemanager folder to upload folder (with final /)
+$current_path = _PS_ROOT_DIR_.'/img/cms/'; // relative path from filemanager folder to upload folder (with final /)
 //thumbs folder can't put inside upload folder
-$thumbs_base_path =  _PS_ROOT_DIR_.'/img/tmp/cms/'; // relative path from filemanager folder to thumbs folder (with final /)
+$thumbs_base_path = _PS_ROOT_DIR_.'/img/tmp/cms/'; // relative path from filemanager folder to thumbs folder (with final /)
 
 //--------------------------------------------------------------------------------------------------------
 // YOU CAN COPY AND CHANGE THESE VARIABLES INTO FOLDERS config.php FILES TO CUSTOMIZE EACH FOLDER OPTIONS
@@ -110,6 +111,14 @@ $ext_misc = array();// array('zip', 'rar','gz','tar','iso','dmg'); //Archives
 
 $ext=array_merge($ext_img, $ext_file, $ext_misc, $ext_video, $ext_music); //allowed extensions
 
+//**********************
+//Allowed mime types
+//**********************
+$mime_img = array('image/jpeg', 'image/png', 'image/gif', 'image/bmp', 'image/tiff', 'image/svg');
+$mime_file = array('application/pdf');
+$mime_video = array('video/mpeg', 'video/mp4', 'video/x-msvideo', 'audio/x-ms-wma', 'video/x-flv', 'video/webm');
+
+$mime = array_merge($mime_img, $mime_file, $mime_video);
 
 /******************
  * AVIARY config

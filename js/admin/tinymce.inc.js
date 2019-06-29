@@ -1,5 +1,12 @@
 function tinySetup(config)
 {
+	if (typeof tinyMCE === 'undefined') {
+		setTimeout(function() {
+			tinySetup(config);
+		}, 100);
+		return;
+	}
+
 	if(!config)
 		config = {};
 

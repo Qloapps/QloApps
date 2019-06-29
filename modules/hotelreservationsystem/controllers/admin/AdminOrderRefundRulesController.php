@@ -18,7 +18,6 @@ class AdminOrderRefundRulesController extends ModuleAdminController
             'id' => array(
                 'title' => $this->l('ID'),
                 'align' => 'center',
-                'filter_key' => 'a!payment_type',
             ),
             'payment_way' => array(
                 'title' => $this->l('Payment Type'),
@@ -112,25 +111,25 @@ class AdminOrderRefundRulesController extends ModuleAdminController
         $amount_full_pay = Tools::getValue('deduction_value_full_pay');
         $amount_adv_pay = Tools::getValue('deduction_value_adv_pay');
         $cancellation_days =  Tools::getValue('cancellation_days');
-        
+
 
         if ($payment_type == '') {
             $this->errors[] = Tools::displayError('Payment Type is required field.');
         }
-        
+
         if (!$amount_full_pay) {
             $this->errors[] = Tools::displayError('Enter Deduction Value For Full Payment.');
         }
         if (!$amount_adv_pay) {
             $this->errors[] = Tools::displayError('Enter Deduction value for Advance Payment.');
         }
-        
+
         //payment_type =1 is percentage and 2 is fixed amount
         if ($payment_type == 1) {
             if (!Validate::isFloat($amount_full_pay)) {
                 $this->errors[] = Tools::displayError('Enter a valid Deduction percentage.');
             } elseif ($amount_full_pay > 100 || $amount_full_pay < 0) {
-                $this->errors[] = Tools::displayError('Enter a valid percentage(0 < % and 100 > %).');
+                $this->errors[] = Tools::displayError('Enter a valid percentage(0 < % and 100 >= %).');
             }
             if (!Validate::isFloat($amount_adv_pay)) {
                 $this->errors[] = Tools::displayError('Enter a valid Deduction percentage.');
@@ -154,10 +153,10 @@ class AdminOrderRefundRulesController extends ModuleAdminController
             if ($order_refund_rule_id) {
                 $order_refund_rule = new HotelOrderRefundRules($order_refund_rule_id);
                 if ($order_refund_rule->days != $cancellation_days) {
-                    $this->errors[] = Tools::displayError('Refund rule for ').$cancellation_days.Tools::displayError(' days alresdy exists.');
+                    $this->errors[] = Tools::displayError('Refund rule for ').$cancellation_days.Tools::displayError(' days already exists.');
                 }
             } else {
-                $this->errors[] = Tools::displayError('Refund rule for ').$cancellation_days.Tools::displayError(' days alresdy exists.');
+                $this->errors[] = Tools::displayError('Refund rule for ').$cancellation_days.Tools::displayError(' days already exists.');
             }
         }
 

@@ -1,5 +1,5 @@
 {*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -18,7 +18,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
@@ -56,7 +56,7 @@
                                                 <td class="delivery_option_logo">
                                                     {foreach $option.carrier_list as $carrier}
                                                         {if $carrier.logo}
-                                                            <img src="{$carrier.logo|escape:'htmlall':'UTF-8'}" alt="{$carrier.instance->name|escape:'htmlall':'UTF-8'}"/>
+                                                            <img class="order_carrier_logo" src="{$carrier.logo|escape:'htmlall':'UTF-8'}" alt="{$carrier.instance->name|escape:'htmlall':'UTF-8'}"/>
                                                         {elseif !$option.unique_carrier}
                                                             {$carrier.instance->name|escape:'htmlall':'UTF-8'}
                                                             {if !$carrier@last} - {/if}
@@ -115,7 +115,7 @@
                                                     {assign var="first" value=current($option.carrier_list)}
                                                     <td class="delivery_option_logo{if $first.product_list[0].carrier_list[0] eq 0} hide{/if}">
                                                         {if $first.logo}
-                                                            <img src="{$first.logo|escape:'htmlall':'UTF-8'}" alt="{$first.instance->name|escape:'htmlall':'UTF-8'}"/>
+                                                            <img class="order_carrier_logo" src="{$first.logo|escape:'htmlall':'UTF-8'}" alt="{$first.instance->name|escape:'htmlall':'UTF-8'}"/>
                                                         {elseif !$option.unique_carrier}
                                                             {$first.instance->name|escape:'htmlall':'UTF-8'}
                                                         {/if}
@@ -186,7 +186,7 @@
                                                         <tr>
                                                             <td class="delivery_option_logo{if $carrier.product_list[0].carrier_list[0] eq 0} hide{/if}">
                                                                 {if $carrier.logo}
-                                                                    <img src="{$carrier.logo|escape:'htmlall':'UTF-8'}" alt="{$carrier.instance->name|escape:'htmlall':'UTF-8'}"/>
+                                                                    <img class="order_carrier_logo" src="{$carrier.logo|escape:'htmlall':'UTF-8'}" alt="{$carrier.instance->name|escape:'htmlall':'UTF-8'}"/>
                                                                 {elseif !$option.unique_carrier}
                                                                     {$carrier.instance->name|escape:'htmlall':'UTF-8'}
                                                                 {/if}
@@ -291,6 +291,7 @@
                 </div>
             {/if}
             {if $recyclablePackAllowed}
+                <p class="carrier_title">{l s='Recyclable Packaging'}</p>
                 <div class="checkbox recyclable">
                     <label for="recyclable">
                         <input type="checkbox" name="recyclable" id="recyclable" value="1"{if $recyclable == 1} checked="checked"{/if} />

@@ -1,5 +1,5 @@
 /*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -18,7 +18,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -40,7 +40,7 @@ $(document).ready(function(){
 
 	$('#addressInput').keypress(function(e) {
 		code = e.keyCode ? e.keyCode : e.which;
-		if(code.toString() === 13)
+		if(code.toString() == 13)
 			searchLocations();
 	});
 
@@ -61,7 +61,7 @@ function initMarkers()
 {
 	searchUrl += '?ajax=1&all=1';
 	downloadUrl(searchUrl, function(data) {
-		var xml = parseXml(data);
+		var xml = parseXml(data.trim());
 		var markerNodes = xml.documentElement.getElementsByTagName('marker');
 		var bounds = new google.maps.LatLngBounds();
 		for (var i = 0; i < markerNodes.length; i++)
@@ -147,7 +147,7 @@ function searchLocationsNear(center)
 	var radius = document.getElementById('radiusSelect').value;
 	var searchUrl = baseUri+'?controller=stores&ajax=1&latitude=' + center.lat() + '&longitude=' + center.lng() + '&radius=' + radius;
 	downloadUrl(searchUrl, function(data) {
-		var xml = parseXml(data);
+		var xml = parseXml(data.trim());
 		var markerNodes = xml.documentElement.getElementsByTagName('marker');
 		var bounds = new google.maps.LatLngBounds();
 

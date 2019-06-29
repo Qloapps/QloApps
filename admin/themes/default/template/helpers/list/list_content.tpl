@@ -1,5 +1,5 @@
 {*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -18,7 +18,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
@@ -65,6 +65,12 @@
 				{if isset($tr.$key)}
 					{if isset($params.active)}
 						{$tr.$key}
+					{elseif isset($params.callback)}
+						{if isset($params.maxlength) && Tools::strlen($tr.$key) > $params.maxlength}
+							<span title="{$tr.$key}">{$tr.$key|truncate:$params.maxlength:'...'}</span>
+						{else}
+							{$tr.$key}
+						{/if}
 					{elseif isset($params.activeVisu)}
 						{if $tr.$key}
 							<i class="icon-check-ok"></i> {l s='Enabled'}
@@ -92,7 +98,11 @@
 							{/if}
 						{/if}
 					{elseif isset($params.type) && $params.type == 'price'}
-						{displayPrice price=$tr.$key}
+						{if isset($tr.id_currency)}
+							{displayPrice price=$tr.$key currency=$tr.id_currency}
+						{else}
+							{displayPrice price=$tr.$key}
+						{/if}
 					{elseif isset($params.float)}
 						{$tr.$key}
 					{elseif isset($params.type) && $params.type == 'date'}
@@ -106,12 +116,6 @@
 					{* If type is 'editable', an input is created *}
 					{elseif isset($params.type) && $params.type == 'editable' && isset($tr.id)}
 						<input type="text" name="{$key}_{$tr.id}" value="{$tr.$key|escape:'html':'UTF-8'}" class="{$key}" />
-					{elseif isset($params.callback)}
-						{if isset($params.maxlength) && Tools::strlen($tr.$key) > $params.maxlength}
-							<span title="{$tr.$key}">{$tr.$key|truncate:$params.maxlength:'...'}</span>
-						{else}
-							{$tr.$key}
-						{/if}
 					{elseif $key == 'color'}
 						{if !is_array($tr.$key)}
 						<div style="background-color: {$tr.$key};" class="attributes-color-container"></div>
@@ -173,7 +177,7 @@
 						<ul class="dropdown-menu">
 						{foreach $compiled_actions AS $key => $action}
 							{if $key != 0}
-							<li {if $action == 'divider'}class="divider"{/if}>
+							<li{if $action == 'divider' && $compiled_actions|count > 3} class="divider"{/if}>
 								{if $action != 'divider'}{$action}{/if}
 							</li>
 							{/if}

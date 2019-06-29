@@ -1,0 +1,102 @@
+<entity_tab encoding="UTF-8">
+  <tab id="Addresses" name="&#x110;&#x1ECB;a ch&#x1EC9;"/>
+  <tab id="Administration" name="Administration"/>
+  <tab id="Advanced_Parameters" name="Th&#xF4;ng s&#x1ED1; chi ti&#x1EBF;t"/>
+  <tab id="Attachments" name="&#x110;&#xED;nh k&#xE8;m"/>
+  <tab id="Attributes_and_Values" name="Thu&#x1ED9;c t&#xED;nh s&#x1EA3;n ph&#x1EA9;m"/>
+  <tab id="Carriers" name="Cty v&#x1EAD;n chuy&#x1EC3;n"/>
+  <tab id="CarrierWizard" name="Nh&#xE0; v&#x1EAD;n chuy&#x1EC3;n"/>
+  <tab id="Cart_Rules" name="Cart Rules"/>
+  <tab id="Catalog" name="Danh m&#x1EE5;c"/>
+  <tab id="Catalog_Price_Rules" name="Quy &#x111;&#x1ECB;nh Danh m&#x1EE5;c Gi&#xE1;"/>
+  <tab id="Categories" name="Ph&#xE2;n lo&#x1EA1;i"/>
+  <tab id="CMS" name="CMS"/>
+  <tab id="CMS_Categories" name="CMS Danh m&#x1EE5;c"/>
+  <tab id="CMS_Pages" name="CMS trang"/>
+  <tab id="Combinations_Generator" name="Combinations Generator"/>
+  <tab id="Configuration" name="C&#x1EA5;u h&#xEC;nh"/>
+  <tab id="Configuration_Information" name="Th&#xF4;ng tin c&#x1EA5;u h&#xEC;nh"/>
+  <tab id="Contacts" name="Li&#xEA;n l&#x1EA1;c"/>
+  <tab id="Countries" name="C&#xE1;c qu&#x1ED1;c gia"/>
+  <tab id="Credit_Slips" name="Phi&#x1EBF;u t&#xED;n d&#x1EE5;ng"/>
+  <tab id="CSV_Import" name="nh&#x1EAD;p CSV"/>
+  <tab id="Currencies" name="Ti&#x1EC1;n t&#x1EC7;"/>
+  <tab id="Customer_Service" name="D&#x1ECB;ch v&#x1EE5; Kh&#xE1;ch h&#xE0;ng"/>
+  <tab id="Customers" name="Kh&#xE1;ch h&#xE0;ng"/>
+  <tab id="Customers_1" name="Kh&#xE1;ch h&#xE0;ng"/>
+  <tab id="Customers_2" name="Kh&#xE1;ch h&#xE0;ng"/>
+  <tab id="Dashboard" name="Dashboard"/>
+  <tab id="DB_Backup" name="DB Backup"/>
+  <tab id="Delivery_Slips" name="Phi&#x1EBF;u giao h&#xE0;ng"/>
+  <tab id="E-mail" name="H&#x1ED9;p th&#x1B0;"/>
+  <tab id="Employees" name="Nh&#xE2;n vi&#xEA;n"/>
+  <tab id="Features" name="S&#x1EA3;n ph&#x1EA9;m n&#x1ED5;i b&#x1EAD;t"/>
+  <tab id="General" name="Chung"/>
+  <tab id="Geolocation" name="&#x110;&#x1ECB;nh v&#x1ECB; &#x111;&#x1ECB;a l&#xFD;"/>
+  <tab id="Groups" name="Nh&#xF3;m"/>
+  <tab id="Images" name="&#x1EA2;nh"/>
+  <tab id="Instant_Stock_Status" name="Tr&#x1EA1;ng th&#xE1;i h&#xE0;ng trong kho hi&#x1EC7;n t&#x1EA1;i"/>
+  <tab id="Invoices" name="Bi&#xEA;n nh&#x1EAD;n"/>
+  <tab id="Languages" name="Ng&#xF4;n ng&#x1EEF;"/>
+  <tab id="Localization" name="&#x110;&#x1ECB;a ph&#x1B0;&#x1A1;ng h&#xF3;a"/>
+  <tab id="Localization_1" name="&#x110;&#x1ECB;a ph&#x1B0;&#x1A1;ng h&#xF3;a"/>
+  <tab id="Login" name="&#x110;&#x103;ng nh&#x1EAD;p"/>
+  <tab id="Logs" name="Logs"/>
+  <tab id="Maintenance" name="B&#x1EA3;o tr&#xEC;"/>
+  <tab id="Manufacturers" name="Nh&#xE0; s&#x1EA3;n xu&#x1EA5;t"/>
+  <tab id="Marketing" name="Marketing"/>
+  <tab id="Menus" name="Menu"/>
+  <tab id="Merchandise_Returns" name="H&#xE0;ng h&#xF3;a tr&#x1EA3; l&#x1EA1;i"/>
+  <tab id="Modules" name="Modules v&#xE0; d&#x1ECB;ch v&#x1EE5;"/>
+  <tab id="Modules_1" name="Modules v&#xE0; d&#x1ECB;ch v&#x1EE5;"/>
+  <tab id="Modules_Themes_Catalog" name="Danh m&#x1EE5;c Module &amp; Giao di&#x1EC7;n"/>
+  <tab id="Monitoring" name="Gi&#xE1;m s&#xE1;t"/>
+  <tab id="Multistore" name="Multistore"/>
+  <tab id="Order_Messages" name="Tin nh&#x1EAF;n &#x111;&#x1A1;n h&#xE0;ng"/>
+  <tab id="Orders" name="&#x111;&#x1EB7;t h&#xE0;ng"/>
+  <tab id="Orders_1" name="&#x110;&#x1A1;n h&#xE0;ng"/>
+  <tab id="Orders_2" name="&#x110;&#x1A1;n h&#xE0;ng"/>
+  <tab id="Outstanding" name="N&#x1ED5;i b&#x1EAD;t"/>
+  <tab id="Payment" name="Thanh to&#xE1;n"/>
+  <tab id="Performance" name="Performance"/>
+  <tab id="Permissions" name="Ph&#xE2;n Quy&#x1EC1;n"/>
+  <tab id="Positions" name="V&#x1ECB; tr&#xED;"/>
+  <tab id="Preferences" name="T&#xF9;y ch&#x1ECD;n"/>
+  <tab id="Preferences_1" name="T&#xF9;y ch&#x1ECD;n"/>
+  <tab id="Price_Rules" name="Khuy&#x1EBF;n m&#x1EA1;i"/>
+  <tab id="Products" name="S&#x1EA3;n ph&#x1EA9;m"/>
+  <tab id="Products_1" name="S&#x1EA3;n ph&#x1EA9;m"/>
+  <tab id="Profiles" name="H&#x1ED3; s&#x1A1; c&#xE1; nh&#xE2;n"/>
+  <tab id="Quick_Access" name="Truy c&#x1EAD;p nhanh"/>
+  <tab id="Referrers" name="Ngu&#x1ED3;n gi&#x1EDB;i thi&#x1EC7;u"/>
+  <tab id="Search" name="T&#xEC;m ki&#x1EBF;m"/>
+  <tab id="Search_1" name="T&#xEC;m ki&#x1EBF;m"/>
+  <tab id="Search_Engines" name="B&#x1ED9; m&#xE1;y t&#xEC;m ki&#x1EBF;m"/>
+  <tab id="SEO_URLs" name="SEO &amp; URLs"/>
+  <tab id="Shipping" name="V&#x1EAD;n chuy&#x1EC3;n"/>
+  <tab id="Shipping_1" name="T&#xF9;y ch&#x1ECD;n"/>
+  <tab id="Shop_URLs" name="Shop URLs"/>
+  <tab id="Shopping_Carts" name="Gi&#x1ECF; h&#xE0;ng"/>
+  <tab id="Shops" name="Shops"/>
+  <tab id="SQL_Manager" name="Qu&#x1EA3;n l&#xFD; SQL"/>
+  <tab id="States" name="Tr&#x1EA1;ng th&#xE1;i"/>
+  <tab id="Stats" name="Th&#x1ED1;ng k&#xEA;"/>
+  <tab id="Stats_1" name="Th&#x1ED1;ng k&#xEA;"/>
+  <tab id="Statuses" name="Tr&#x1EA1;ng th&#xE1;i"/>
+  <tab id="Stock" name="Kho"/>
+  <tab id="Stock_Coverage" name="Ph&#x1EA1;m vi kho h&#xE0;ng"/>
+  <tab id="Stock_Management" name="Qu&#x1EA3;n l&#xFD; kho"/>
+  <tab id="Stock_Movement" name="Xu&#x1EA5;t nh&#x1EAD;p t&#x1ED3;n kho"/>
+  <tab id="Store_Contacts" name="Li&#xEA;n h&#x1EC7; c&#x1EE7;a c&#x1EED;a h&#xE0;ng"/>
+  <tab id="Suppliers" name="Nh&#xE0; cung c&#x1EA5;p"/>
+  <tab id="Supply_orders" name="&#x110;&#x1A1;n &#x111;&#x1EB7;t h&#xE0;ng cung c&#x1EA5;p"/>
+  <tab id="Tags" name="T&#x1EEB; kho&#xE1;"/>
+  <tab id="Tax_Rules" name="Tax Rules"/>
+  <tab id="Taxes" name="Thu&#x1EBF;"/>
+  <tab id="Themes" name="Giao di&#x1EC7;n"/>
+  <tab id="Titles" name="Ti&#xEA;u &#x111;&#x1EC1;"/>
+  <tab id="Translations" name="D&#x1ECB;ch"/>
+  <tab id="Warehouses" name="Nh&#xE0; kho"/>
+  <tab id="Webservice" name="Webservice"/>
+  <tab id="Zones" name="C&#xE1;c khu v&#x1EF1;c"/>
+</entity_tab>

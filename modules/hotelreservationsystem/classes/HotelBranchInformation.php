@@ -348,30 +348,30 @@ class HotelBranchInformation extends ObjectModel
         if (!$parent_cat) {
             $parent_cat = Category::getRootCategory()->id;
         }
-        if ($ishotel && $idHotel) {
-            if ($catIdHotel = Db::getInstance()->getValue(
-                'SELECT `id_category` FROM `'._DB_PREFIX_.'htl_branch_info` WHERE id = '.(int)$idHotel
-            )) {
-                $category = new Category($catIdHotel);
-                foreach (Language::getLanguages(true) as $lang) {
-                    if (is_array($name) && isset($name[$lang['id_lang']])) {
-                        $catName = $name[$lang['id_lang']];
-                    } else {
-                        $catName = $name;
-                    }
-                    $category->name[$lang['id_lang']] = $catName;
-                    $category->description[$lang['id_lang']] =  $this->moduleInstance->l(
-                        'Hotel Branch Category',
-                        'HotelBranchInformation'
-                    );
-                    $category->link_rewrite[$lang['id_lang']] = Tools::link_rewrite($catName);
-                }
-                $category->id_parent = $parent_cat;
-                $category->groupBox = $group_ids;
-                $category->save();
-                return $category->id;
-            }
-        }
+        // if ($ishotel && $idHotel) {
+        //     if ($catIdHotel = Db::getInstance()->getValue(
+        //         'SELECT `id_category` FROM `'._DB_PREFIX_.'htl_branch_info` WHERE id = '.(int)$idHotel
+        //     )) {
+        //         $category = new Category($catIdHotel);
+        //         foreach (Language::getLanguages(true) as $lang) {
+        //             if (is_array($name) && isset($name[$lang['id_lang']])) {
+        //                 $catName = $name[$lang['id_lang']];
+        //             } else {
+        //                 $catName = $name;
+        //             }
+        //             $category->name[$lang['id_lang']] = $catName;
+        //             $category->description[$lang['id_lang']] =  $this->moduleInstance->l(
+        //                 'Hotel Branch Category',
+        //                 'HotelBranchInformation'
+        //             );
+        //             $category->link_rewrite[$lang['id_lang']] = Tools::link_rewrite($catName);
+        //         }
+        //         $category->id_parent = $parent_cat;
+        //         $category->groupBox = $group_ids;
+        //         $category->save();
+        //         return $category->id;
+        //     }
+        // }
         if (is_array($name) && isset($name[Configuration::get('PS_LANG_DEFAULT')])) {
             $catName = $name[Configuration::get('PS_LANG_DEFAULT')];
         } else {

@@ -1,5 +1,5 @@
 {*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -18,7 +18,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
@@ -31,7 +31,6 @@
 {include file="$tpl_dir./order-steps.tpl"}
 
 {include file="$tpl_dir./errors.tpl"}
-
 
 {$HOOK_ORDER_CONFIRMATION}
 <div class="box">
@@ -56,14 +55,6 @@
 			{/if}
 			<hr>
 			<p><strong>{l s='Order Details -'}</strong></p>
-			{*{if isset($orders_has_invoice) && $orders_has_invoice && $order->payment != 'Free order'}
-				<div class="row totalOrdercancellation_div" {if !$non_requested_rooms}style="display:none;"{/if}>
-					<div class="col-xs-12 col-sm-12">
-						<p style="text-align:center;"><a class="terms_btn btn btn-default pull-right" href="{$redirect_link_terms}" target="_blank"><i class="icon-file-text large"></i>&nbsp;&nbsp;{l s='Terms & Conditions'}</a></p>
-						<button type="button" data-id_order="{$order->id}" data-id_currency="{$order->id_currency}" data-id_customer="{$order->id_customer}" data-order_data='{$cart_htl_data|@json_encode}' name="totalOrdercancellation_btn" class="totalOrdercancellation_btn btn btn-default pull-right" href="#htlRefundReasonForm"><span>{l s='Request Total Order Cancellation'}</span></button>
-					</div>
-				</div>
-			{/if}*}
 			<div id="order-detail-content" class="">
 				<table class="table table-bordered">
 					<thead>
@@ -79,7 +70,7 @@
 							{*{if isset($orders_has_invoice) && $orders_has_invoice}
 								<th>{l s='Request Refund'}</th>
 							{/if}*}
-							<th>{l s='BackOrder Status'}</th>
+							{* <th>{l s='BackOrder Status'}</th> *}
 						</tr>
 					</thead>
 					<tbody>
@@ -98,6 +89,14 @@
 													{$data_v['name']}
 												</a>
 											</p>
+											{if isset($rm_v['extra_demands']) && $rm_v['extra_demands']}
+												<p class="room_extra_demands">
+													<a date_from="{$rm_v['data_form']}" date_to="{$rm_v['data_to']}" id_product="{$data_v['id_product']}" id_order="{$order->id}" class="open_rooms_extra_demands" href="#rooms_type_extra_demands">
+														{l s='Additional Facilities'}
+													</a>
+												</p>
+												<p>{displayWtPriceWithCurrency price=$rm_v['extra_demands_price'] currency=$currency}</p>
+											{/if}
 										</td>
 										<td>{$data_v['hotel_name']}</td>
 										<td class="cart_unit">
@@ -151,21 +150,14 @@
 											</p>
 										</td>
 										{if isset($orders_has_invoice) && $orders_has_invoice && $order->payment != 'Free order'}
-											{*<td class="cart_total text-left">
-												{if isset($rm_v['stage_name']) && $rm_v['stage_name']}
-													<p>{l s="Request Sent.."}</p>
-												{else}
-													<button data-amount="{$rm_v['amount_tax_incl']}" data-id_order="{$order->id}" data-id_currency="{$order->id_currency}" data-id_customer="{$order->id_customer}" data-id_product="{$data_v['id_product']}" data-num_rooms="{$rm_v['num_rm']}" data-date_from="{$rm_v['data_form']|date_format:"%G-%m-%d"}" type="button" data-date_to="{$rm_v['data_to']|date_format:"%G-%m-%d"}"  name="roomRequestForRefund" class="order_cancel_request_button_{$data_v['id_product']}_{$rm_v['data_form']|date_format:"%G-%m-%d"}_{$rm_v['data_to']|date_format:"%G-%m-%d"} btn btn-default button button-small roomRequestForRefund" href="#htlRefundReasonForm"><span>{l s='Request Refund'}</span></button>
-												{/if}
-											</td>*}
 										{/if}
-										<td class="text-center">
+										{* <td class="text-center">
 											{if isset($rm_v['is_backorder']) && $rm_v['is_backorder']}
 												{l s='On Backorder'}
 											{else}
 												--
 											{/if}
-										</td>
+										</td> *}
 									</tr>
 								{/foreach}
 							{/foreach}
@@ -174,39 +166,39 @@
 					<tfoot>
 						{if $priceDisplay && $use_tax}
 							<tr class="item">
-								<td colspan={if isset($orders_has_invoice) && $orders_has_invoice}"8"{else}"7"{/if}></td>
-								<td colspan="{if $return_allowed}2{else}1{/if}">
+								<td colspan={if isset($orders_has_invoice) && $orders_has_invoice}"5"{else}"5"{/if}></td>
+								<td colspan="{if $return_allowed}3{else}2{/if}">
 									<strong>{l s='Items (tax excl.)'}</strong>
 								</td>
 								<td colspan="{if $order->hasProductReturned()}3{else}2{/if}">
-									<span class="price">{displayWtPriceWithCurrency price=$orderTotalInfo['total_products_te'] currency=$currency}</span>
+									<span>{displayWtPriceWithCurrency price=$orderTotalInfo['total_products_te'] currency=$currency}</span>
 								</td>
 							</tr>
 						{/if}
 						<tr class="item">
-							<td colspan={if isset($orders_has_invoice) && $orders_has_invoice}"8"{else}"7"{/if}></td>
-							<td colspan="{if $return_allowed}2{else}1{/if}">
+							<td colspan={if isset($orders_has_invoice) && $orders_has_invoice}"5"{else}"5"{/if}></td>
+							<td colspan="{if $return_allowed}3{else}2{/if}">
 								<strong>{l s='Items'} {if $use_tax}{l s='(tax incl.)'}{/if} </strong>
 							</td>
 							<td colspan="{if $order->hasProductReturned()}3{else}2{/if}">
-								<span class="price">{displayWtPriceWithCurrency price=$orderTotalInfo['total_products_ti'] currency=$currency}</span>
+								<span>{displayWtPriceWithCurrency price=$orderTotalInfo['total_products_ti'] currency=$currency}</span>
 							</td>
 						</tr>
-						{if $order->total_discounts > 0}
-						<tr class="item">
-							<td colspan={if isset($orders_has_invoice) && $orders_has_invoice}"7"{else}"6"{/if}></td>
-							<td colspan="{if $return_allowed}2{else}1{/if}">
-								<strong>{l s='Total vouchers'}</strong>
-							</td>
-							<td colspan="{if $order->hasProductReturned()}3{else}2{/if}">
-								<span class="price-discount">{displayWtPriceWithCurrency price=$orderTotalInfo['total_discounts'] currency=$currency convert=1}</span>
-							</td>
-						</tr>
+						{if $orderTotalInfo['total_demands_price'] > 0}
+							<tr class="item">
+								<td colspan={if isset($orders_has_invoice) && $orders_has_invoice}"5"{else}"5"{/if}></td>
+								<td colspan="{if $return_allowed}3{else}2{/if}">
+									<strong>{l s='Total Additional Facilities Cost'}</strong>
+								</td>
+								<td colspan="{if $order->hasProductReturned()}3{else}2{/if}">
+									<span>{displayWtPriceWithCurrency price=$orderTotalInfo['total_demands_price'] currency=$currency convert=1}</span>
+								</td>
+							</tr>
 						{/if}
 						{if $order->total_wrapping > 0}
 						<tr class="item">
-							<td colspan={if isset($orders_has_invoice) && $orders_has_invoice}"8"{else}"7"{/if}></td>
-							<td colspan="{if $return_allowed}2{else}1{/if}">
+							<td colspan={if isset($orders_has_invoice) && $orders_has_invoice}"5"{else}"5"{/if}></td>
+							<td colspan="{if $return_allowed}3{else}2{/if}">
 								<strong>{l s='Total gift wrapping cost'}</strong>
 							</td>
 							<td colspan="{if $order->hasProductReturned()}3{else}2{/if}">
@@ -214,35 +206,46 @@
 							</td>
 						</tr>
 						{/if}
-						<tr class="totalprice item">
-							<td colspan={if isset($orders_has_invoice) && $orders_has_invoice}"8"{else}"7"{/if}></td>
-							<td colspan="{if $return_allowed}2{else}1{/if}">
-								<strong>{l s='Total'}</strong>
+						{if $order->total_discounts > 0}
+						<tr class="item">
+							<td colspan={if isset($orders_has_invoice) && $orders_has_invoice}"5"{else}"5"{/if}></td>
+							<td colspan="{if $return_allowed}3{else}2{/if}">
+								<strong>{l s='Total vouchers'}</strong>
 							</td>
 							<td colspan="{if $order->hasProductReturned()}3{else}2{/if}">
-								<span class="price">{displayWtPriceWithCurrency price=$orderTotalInfo['total_paid'] currency=$currency}</span>
+								<span class="price-discount">{displayWtPriceWithCurrency price=$orderTotalInfo['total_discounts'] currency=$currency convert=1}</span>
 							</td>
 						</tr>
+						{/if}
 						{if isset($order_adv_dtl)}
 							<tr class="item">
-								<td colspan={if isset($orders_has_invoice) && $orders_has_invoice}"8"{else}"7"{/if}></td>
-								<td colspan="{if $return_allowed}2{else}1{/if}">
+								<td colspan={if isset($orders_has_invoice) && $orders_has_invoice}"5"{else}"5"{/if}></td>
+								<td colspan="{if $return_allowed}3{else}2{/if}">
 									<strong>{l s='Total Paid'}</strong>
 								</td>
 								<td colspan="{if $order->hasProductReturned()}3{else}2{/if}">
-									<span class="price">{displayWtPriceWithCurrency price=$orderTotalInfo['total_paid_amount'] currency=$currency}</span>
+									<span>{displayWtPriceWithCurrency price=$orderTotalInfo['total_paid_amount'] currency=$currency}</span>
 								</td>
 							</tr>
 							<tr class="item">
-								<td colspan={if isset($orders_has_invoice) && $orders_has_invoice}"8"{else}"7"{/if}></td>
-								<td colspan="{if $return_allowed}2{else}1{/if}">
+								<td colspan={if isset($orders_has_invoice) && $orders_has_invoice}"5"{else}"5"{/if}></td>
+								<td colspan="{if $return_allowed}3{else}2{/if}">
 									<strong>{l s='Total Due'}</strong>
 								</td>
 								<td colspan="{if $order->hasProductReturned()}3{else}2{/if}">
-									<span class="price">{displayWtPriceWithCurrency price=($orderTotalInfo['total_order_amount'] - $orderTotalInfo['total_paid_amount']) currency=$currency}</span>
+									<span>{displayWtPriceWithCurrency price=($orderTotalInfo['total_order_amount'] - $orderTotalInfo['total_paid_amount']) currency=$currency}</span>
 								</td>
 							</tr>
 						{/if}
+						<tr class="totalprice item">
+							<td colspan={if isset($orders_has_invoice) && $orders_has_invoice}"5"{else}"5"{/if}></td>
+							<td colspan="{if $return_allowed}3{else}2{/if}">
+								<strong>{l s='Total'}</strong>
+							</td>
+							<td colspan="{if $order->hasProductReturned()}3{else}2{/if}">
+								<span>{displayWtPriceWithCurrency price=$orderTotalInfo['total_paid'] currency=$currency}</span>
+							</td>
+						</tr>
 					</tfoot>
 				</table>
 			</div>
@@ -257,42 +260,22 @@
 	</p>
 {/if}
 
-
-<!-- Fancybox -->
-<div style="display: none;" id="reason_fancybox_content">
-	<div id="htlRefundReasonForm">
-		<h2 class="refund_reason_head">
-			{l s='Write a reason For order cancellation'}
-		</h2>
-		<div>
-			<div class="refundReasonFormContent col-sm-12 col-xs-12">
-				<input type="hidden" value="" id="cancel_req_total_order_data">
-				<input type="hidden" value="" id="cancel_req_id_room">
-				<input type="hidden" value="" id="cancel_req_amount">
-				<input type="hidden" value="" id="cancel_req_id_order">
-				<input type="hidden" value="" id="cancel_req_id_currency">
-				<input type="hidden" value="" id="cancel_req_id_customer">
-				<input type="hidden" value="" id="cancel_req_id_product">
-				<input type="hidden" value="" id="cancel_req_num_rooms">
-				<input type="hidden" value="" id="cancel_req_date_from">
-				<input type="hidden" value="" id="cancel_req_date_to">
-				<textarea class="form-control reasonForRefund" rows="2" name="reasonForRefund" placeholder="Write a reason for cancellation of this booking"></textarea>
-				<div>
-					<p class="fl required required_err" style="color:#AA1F00; display:none"><sup>*</sup> {l s='Required field'}</p><br>
-					<p class="fr">
-						<button id="submit_refund_reason" name="submit_refund_reason" type="submit" class="btn button button-medium">
-							<span>{l s='Submit' mod='marketplace'}</span>
-						</button>&nbsp;
-					</p>
-				</div>
+{* Fancybox for extra demands*}
+<div style="display:none;" id="rooms_extra_demands">
+	<div id="rooms_type_extra_demands">
+		<div class="panel">
+			<div class="rooms_extra_demands_head">
+				<h3>{l s='Additional Facilities'}</h3>
+				<p class="rooms_extra_demands_text">{l s='Below are the additional facilities chosen by you in this booking'}</p>
 			</div>
+			<div id="room_type_demands_desc"></div>
 		</div>
 	</div>
 </div>
 {strip}
 	{addJsDef historyUrl=$link->getPageLink("orderdetail", true)|escape:'quotes':'UTF-8'}
 	{addJsDefL name=req_sent_msg}{l s='Request Sent..' js=1}{/addJsDefL}
-	{addJsDefL name=wait_stage_msg}{l s='Waitting' js=1}{/addJsDefL}
+	{addJsDefL name=wait_stage_msg}{l s='Waiting' js=1}{/addJsDefL}
 	{addJsDefL name=pending_state_msg}{l s='Pending...' js=1}{/addJsDefL}
 	{addJsDefL name=mail_sending_err}{l s='Some error occurred while sending mail to the customer' js=1}{/addJsDefL}
 	{addJsDefL name=refund_request_sending_error}{l s='Some error occurred while processing request for order cancellation.' js=1}{/addJsDefL}

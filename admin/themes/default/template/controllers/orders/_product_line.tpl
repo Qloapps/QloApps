@@ -1,5 +1,5 @@
 {*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -18,7 +18,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
@@ -31,7 +31,17 @@
 		<img src="{$data.image_link}" title="Room image" />
 	</td>
 	<td class="text-center">
-		{$data.room_type}
+		<p>{$data.room_type}</p>
+		{if isset($data['extra_demands']) && $data['extra_demands']}
+			<p class="room_extra_demands">
+				<a href="#" data-toggle="modal" data-target="#rooms_type_extra_demands" date_from="{$data['date_from']}" date_to="{$data['date_to']}" id_product="{$data['id_product']}" id_room="{$data['id_room']}" id_order="{$order->id}" class="open_room_extra_demands">
+					{l s='Additional Features'}
+				</a>
+			</p>
+			<p>
+				{convertPriceWithCurrency price=$data['extra_demands_price'] currency=$currency->id}
+			</p>
+		{/if}
 	</td>
 	<td class="text-center">
 		<a href="{$link->getAdminLink('AdminAddHotel')}&amp;id={$data['id_hotel']}&amp;updatehtl_branch_info" target="_blank">
@@ -110,7 +120,7 @@
 		<p>
 			{if $data['stage_name'] == 'Refunded' || $data['stage_name'] == 'Rejected'}
 				{l s="Done!"}
-			{else if $data['stage_name'] == 'Waitting' || $data['stage_name'] == 'Accepted'}
+			{else if $data['stage_name'] == 'Waiting' || $data['stage_name'] == 'Accepted'}
 				{l s="Pending..."}
 			{else}
 				--
@@ -174,10 +184,3 @@
 		</td>
 	{/if}
 </tr>
-	<style type="text/css">
-		.room_type_old_price {
-			text-decoration: line-through;
-			color:#979797;
-			font-size:12px;
-		}
-	</style>

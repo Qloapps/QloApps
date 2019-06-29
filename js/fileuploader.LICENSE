@@ -1,0 +1,24 @@
+File uploader component is licensed under GNU GPL 2 or later and GNU LGPL 2 or later.
+© 2010 Andrew Valums
+
+This distribution also includes:
+
+    server/OctetStreamReader.java
+    Dual Licensed under the MIT and GPL v.2
+
+    jQuery JavaScript Library
+    http://jquery.com/
+    Copyright 2010, John Resig
+    Dual licensed under the MIT or GPL Version 2 licenses.
+    http://jquery.org/license
+
+    Sizzle.js - CSS selector engine used by jQuery
+    http://sizzlejs.com/
+    Copyright 2010, The Dojo Foundation
+    Released under the MIT, BSD, and GPL Licenses.
+
+    QUnit - A JavaScript Unit Testing Framework
+    http://docs.jquery.com/QUnit
+    Copyright (c) 2009 John Resig, Jörn Zaefferer
+    Dual licensed under the MIT (MIT-LICENSE.txt)
+    and GPL (GPL-LICENSE.txt) licenses.

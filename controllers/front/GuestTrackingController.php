@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -68,6 +68,7 @@ class GuestTrackingControllerCore extends FrontController
             if (!empty($order_reference)) {
                 $order_collection = Order::getByReference($order_reference);
             }
+
             $email = Tools::getValue('email');
 
             if (empty($order_reference) && empty($id_order)) {
@@ -112,16 +113,38 @@ class GuestTrackingControllerCore extends FrontController
     {
         parent::initContent();
 
+        $method = Tools::getValue('method');
+        if ($method == 'getRoomTypeBookingDemands') {
+            $extraDemandsTpl = '';
+            if (($idProduct = Tools::getValue('id_product'))
+                && ($idOrder = Tools::getValue('id_order'))
+                && ($dateFrom = Tools::getValue('date_from'))
+                && ($dateTo = Tools::getValue('date_to'))
+            ) {
+                $objBookingDemand = new HotelBookingDemands();
+                if ($extraDemands = $objBookingDemand->getRoomTypeBookingExtraDemands(
+                    $idOrder,
+                    $idProduct,
+                    0,
+                    $dateFrom,
+                    $dateTo
+                )) {
+                    $this->context->smarty->assign('extraDemands', $extraDemands);
+                    $extraDemandsTpl .= $this->context->smarty->fetch(_PS_THEME_DIR_.'_partials/order_booking_demands.tpl');
+                }
+            }
+            die($extraDemandsTpl);
+        }
+
         /* Handle brute force attacks */
         if (count($this->errors)) {
             sleep(1);
         }
-        $this->context->smarty->assign(
-            array(
-                'action' => $this->context->link->getPageLink('guest-tracking.php', true),
-                'errors' => $this->errors,
-            )
-        );
+
+        $this->context->smarty->assign(array(
+            'action' => $this->context->link->getPageLink('guest-tracking.php', true),
+            'errors' => $this->errors,
+        ));
         $this->setTemplate(_PS_THEME_DIR_.'guest-tracking.tpl');
     }
 
@@ -189,26 +212,27 @@ class GuestTrackingControllerCore extends FrontController
             // enter the details of the booking the order
             if ($hotelresInstalled) {
                 if ($orderProducts = $order->getProducts()) {
+                    $total_demands_price = 0;
                     foreach ($orderProducts as $type_key => $type_value) {
                         if (in_array($type_value['product_id'], $processedProducts)) {
                             continue;
                         }
                         $processedProducts[] = $type_value['product_id'];
 
-                        $objProduct = new Product($type_value['product_id'], false, $this->context->language->id);
-                        $cover_image_arr = $objProduct->getCover($type_value['product_id']);
+                        $product = new Product($type_value['product_id'], false, $this->context->language->id);
+                        $cover_image_arr = $product->getCover($type_value['product_id']);
 
                         if (!empty($cover_image_arr)) {
-                            $cover_img = $this->context->link->getImageLink($objProduct->link_rewrite, $objProduct->id.'-'.$cover_image_arr['id_image'], 'small_default');
+                            $cover_img = $this->context->link->getImageLink($product->link_rewrite, $product->id.'-'.$cover_image_arr['id_image'], 'small_default');
                         } else {
-                            $cover_img = $this->context->link->getImageLink($objProduct->link_rewrite, $this->context->language->iso_code.'-default', 'small_default');
+                            $cover_img = $this->context->link->getImageLink($product->link_rewrite, $this->context->language->iso_code.'-default', 'small_default');
                         }
 
                         if (isset($customer->id)) {
                             $obj_cart = new Cart($order->id_cart);
-                            $order_bk_data = $objBookingDetail->getOnlyOrderBookingData($idOrder, $obj_cart->id_guest, $type_value['product_id'], $customer->id);
+                            $order_bk_data = $objBookingDetail->getOnlyOrderBookingData($order->id, $obj_cart->id_guest, $type_value['product_id'], $customer->id);
                         } else {
-                            $order_bk_data = $objBookingDetail->getOnlyOrderBookingData($idOrder, $customer->id_guest, $type_value['product_id']);
+                            $order_bk_data = $objBookingDetail->getOnlyOrderBookingData($order->id, $customer->id_guest, $type_value['product_id']);
                         }
                         $rm_dtl = $objRoomType->getRoomTypeInfoByIdProduct($type_value['product_id']);
 
@@ -217,10 +241,7 @@ class GuestTrackingControllerCore extends FrontController
                         $cartHotelData[$type_key]['adult'] = $rm_dtl['adult'];
                         $cartHotelData[$type_key]['children'] = $rm_dtl['children'];
 
-                        // by webkul to calculate rates of the product from hotelreservation syatem tables with feature prices....
-
-
-                        //END
+                        $objBookingDemand = new HotelBookingDemands();
                         foreach ($order_bk_data as $data_k => $data_v) {
                             $date_join = strtotime($data_v['date_from']).strtotime($data_v['date_to']);
 
@@ -233,7 +254,6 @@ class GuestTrackingControllerCore extends FrontController
                             $cartHotelData[$type_key]['paid_unit_price_tax_incl'] = ($order_details_obj->total_price_tax_incl)/$order_details_obj->product_quantity;
 
                             //work on entring refund data
-
                             $ord_refnd_info = $objOrdRefundInfo->getOderRefundInfoByIdOrderIdProductByDate($idOrder, $type_value['product_id'], $data_v['date_from'], $data_v['date_to']);
                             if ($ord_refnd_info) {
                                 $stage_name = $objRefundStages->getNameById($ord_refnd_info['refund_stage_id']);
@@ -276,7 +296,26 @@ class GuestTrackingControllerCore extends FrontController
                                 //refund_stage
                                 $cartHotelData[$type_key]['date_diff'][$date_join]['stage_name'] = $stage_name;
                             }
-
+                            $cartHotelData[$type_key]['date_diff'][$date_join]['extra_demands'] = $objBookingDemand->getRoomTypeBookingExtraDemands(
+                                $idOrder,
+                                $type_value['product_id'],
+                                0,
+                                $data_v['date_from'],
+                                $data_v['date_to']
+                            );
+                            if (empty($cartHotelData[$type_key]['date_diff'][$date_join]['extra_demands_price'])) {
+                                $cartHotelData[$type_key]['date_diff'][$date_join]['extra_demands_price'] = 0;
+                            }
+                            $cartHotelData[$type_key]['date_diff'][$date_join]['extra_demands_price'] += $extraDemandPrice = $objBookingDemand->getRoomTypeBookingExtraDemands(
+                                $idOrder,
+                                $type_value['product_id'],
+                                $data_v['id_room'],
+                                $data_v['date_from'],
+                                $data_v['date_to'],
+                                0,
+                                1
+                            );
+                            $total_demands_price += $extraDemandPrice;
                             $cartHotelData[$type_key]['date_diff'][$date_join]['product_price_tax_excl'] = $order_details_obj->unit_price_tax_excl;
                             $cartHotelData[$type_key]['date_diff'][$date_join]['product_price_tax_incl'] = $order_details_obj->unit_price_tax_incl;
                             $cartHotelData[$type_key]['date_diff'][$date_join]['product_price_without_reduction_tax_excl'] = $order_details_obj->unit_price_tax_excl + $order_details_obj->reduction_amount_tax_excl;
@@ -307,6 +346,7 @@ class GuestTrackingControllerCore extends FrontController
 
             $this->context->smarty->assign(
                 array(
+                    'total_demands_price' => $total_demands_price,
                     'any_back_order' => $anyBackOrder,
                     'shw_bo_msg' => Configuration::get('WK_SHOW_MSG_ON_BO'),
                     'back_ord_msg' => Configuration::get('WK_BO_MESSAGE'),
@@ -322,25 +362,30 @@ class GuestTrackingControllerCore extends FrontController
             Hook::exec('actionOrderDetail', array('carrier' => $order->carrier, 'order' => $order));
         }
 
-        $this->context->smarty->assign(
-            array(
-                'shop_name' => Configuration::get('PS_SHOP_NAME'),
-                'order_collection' => $order_list,
-                'return_allowed' => false,
-                'invoiceAllowed' => (int)Configuration::get('PS_INVOICE'),
-                'is_guest' => true,
-                'group_use_tax' => (Group::getPriceDisplayMethod($customer->id_default_group) == PS_TAX_INC),
-                'CUSTOMIZE_FILE' => Product::CUSTOMIZE_FILE,
-                'CUSTOMIZE_TEXTFIELD' => Product::CUSTOMIZE_TEXTFIELD,
-                'use_tax' => Configuration::get('PS_TAX'),
-            )
-        );
+        $this->context->smarty->assign(array(
+            'shop_name' => Configuration::get('PS_SHOP_NAME'),
+            'order_collection' => $order_list,
+            'return_allowed' => false,
+            'invoiceAllowed' => (int)Configuration::get('PS_INVOICE'),
+            'is_guest' => true,
+            'group_use_tax' => (Group::getPriceDisplayMethod($customer->id_default_group) == PS_TAX_INC),
+            'CUSTOMIZE_FILE' => Product::CUSTOMIZE_FILE,
+            'CUSTOMIZE_TEXTFIELD' => Product::CUSTOMIZE_TEXTFIELD,
+            'use_tax' => Configuration::get('PS_TAX'),
+            ));
     }
 
     public function setMedia()
     {
         parent::setMedia();
 
+        Media::addJsDef(
+            array(
+                'historyUrl' => $this->context->link->getPageLink('guest-tracking.php', true)
+            )
+        );
+
+        $this->addJS(_THEME_JS_DIR_.'history.js');
         $this->addCSS(_THEME_CSS_DIR_.'history.css');
         $this->addCSS(_THEME_CSS_DIR_.'addresses.css');
     }

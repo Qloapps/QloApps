@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -132,21 +132,21 @@ class CustomizationCore extends ObjectModel
 
     public static function getLabel($id_customization, $id_lang, $id_shop = null)
     {
-        if (!$id_customization || !$id_lang) {
+        if (!(int)$id_customization || !(int)$id_lang) {
             return false;
         }
-        if (Shop::isFeatureActive() && !$id_shop) {
+        if (Shop::isFeatureActive() && !(int)$id_shop) {
             $id_shop = (int)Context::getContext()->shop->id;
         }
 
-        $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->getRow('
+        $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
 		SELECT `name`
 		FROM `'._DB_PREFIX_.'customization_field_lang`
-		WHERE `id_customization_field` = '.(int)($id_customization).($id_shop ? ' AND cfl.`id_shop` = '.$id_shop : '').'
-		AND `id_lang` = '.(int)($id_lang)
+		WHERE `id_customization_field` = '.(int)$id_customization.((int)$id_shop ? ' AND cfl.`id_shop` = '.(int)$id_shop : '').'
+		AND `id_lang` = '.(int)$id_lang
         );
 
-        return $result['name'];
+        return $result;
     }
 
     public static function retrieveQuantitiesFromIds($ids_customizations)

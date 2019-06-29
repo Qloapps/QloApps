@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -129,16 +129,8 @@ class OrderInvoiceCore extends ObjectModel
     public function add($autodate = true, $null_values = false)
     {
         $order = new Order($this->id_order);
-        
-        $this->shop_address = self::getCurrentFormattedShopAddress($order->id_shop);
 
-        $invoice_address = new Address((int)$order->id_address_invoice);
-        $invoiceAddressPatternRules = Tools::jsonDecode(Configuration::get('PS_INVCE_INVOICE_ADDR_RULES'), true);
-        $this->invoice_address = AddressFormat::generateAddress($invoice_address, $invoiceAddressPatternRules, '<br />', ' ');
-
-        $delivery_address = new Address((int)$order->id_address_delivery);
-        $deliveryAddressPatternRules = Tools::jsonDecode(Configuration::get('PS_INVCE_DELIVERY_ADDR_RULES'), true);
-        $this->delivery_address = AddressFormat::generateAddress($delivery_address, $deliveryAddressPatternRules, '<br />', ' ');
+        $this->shop_address = OrderInvoice::getCurrentFormattedShopAddress($order->id_shop);
 
         return parent::add();
     }
@@ -152,7 +144,7 @@ class OrderInvoiceCore extends ObjectModel
 		ON p.id_product = od.product_id
 		LEFT JOIN `'._DB_PREFIX_.'product_shop` ps ON (ps.id_product = p.id_product AND ps.id_shop = od.id_shop)
 		WHERE od.`id_order` = '.(int)$this->id_order.'
-		'.($this->id && $this->number ? ' AND od.`id_order_invoice` = '.(int)$this->id : ''));
+		'.($this->id && $this->number ? ' AND od.`id_order_invoice` = '.(int)$this->id : '').' ORDER BY od.`product_name`');
     }
 
     public static function getInvoiceByNumber($id_invoice)
@@ -172,8 +164,7 @@ class OrderInvoiceCore extends ObjectModel
         $id_order_invoice = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
 			SELECT `id_order_invoice`
 			FROM `'._DB_PREFIX_.'order_invoice`
-			WHERE number = '.(int)$id_invoice
-        );
+			WHERE number = '.(int)$id_invoice);
 
         return ($id_order_invoice ? new OrderInvoice($id_order_invoice) : false);
     }
@@ -337,8 +328,8 @@ class OrderInvoiceCore extends ObjectModel
 		LEFT JOIN `'._DB_PREFIX_.'order_detail` od ON (od.`id_order_detail` = odt.`id_order_detail`)
 		WHERE od.`id_order` = '.(int)$this->id_order.'
 		AND od.`id_order_invoice` = '.(int)$this->id.'
-		AND od.`tax_computation_method` = '.(int)TaxCalculator::ONE_AFTER_ANOTHER_METHOD
-        ) || Configuration::get('PS_INVOICE_TAXES_BREAKDOWN');
+		AND od.`tax_computation_method` = '.(int)TaxCalculator::ONE_AFTER_ANOTHER_METHOD)
+        || Configuration::get('PS_INVOICE_TAXES_BREAKDOWN');
     }
 
     public function displayTaxBasesInProductTaxesBreakdown()
@@ -722,8 +713,11 @@ class OrderInvoiceCore extends ObjectModel
         $query = new DbQuery();
         $query->select('oip2.id_order_invoice');
         $query->from('order_invoice_payment', 'oip1');
-        $query->innerJoin('order_invoice_payment', 'oip2',
-            'oip2.id_order_payment = oip1.id_order_payment AND oip2.id_order_invoice <> oip1.id_order_invoice');
+        $query->innerJoin(
+            'order_invoice_payment',
+            'oip2',
+            'oip2.id_order_payment = oip1.id_order_payment AND oip2.id_order_invoice <> oip1.id_order_invoice AND oip1.id_order = oip2.id_order'  
+        );
         $query->where('oip1.id_order_invoice = '.$this->id);
 
         $invoices = Db::getInstance()->executeS($query);
@@ -755,10 +749,16 @@ class OrderInvoiceCore extends ObjectModel
         $query = new DbQuery();
         $query->select('SUM(oi.total_paid_tax_incl) as total_paid_tax_incl, SUM(oi.total_paid_tax_excl) as total_paid_tax_excl');
         $query->from('order_invoice_payment', 'oip1');
-        $query->innerJoin('order_invoice_payment', 'oip2',
-            'oip2.id_order_payment = oip1.id_order_payment AND oip2.id_order_invoice <> oip1.id_order_invoice');
-        $query->leftJoin('order_invoice', 'oi',
-            'oi.id_order_invoice = oip2.id_order_invoice');
+        $query->innerJoin(
+            'order_invoice_payment',
+            'oip2',
+            'oip2.id_order_payment = oip1.id_order_payment AND oip2.id_order_invoice <> oip1.id_order_invoice AND oip1.id_order = oip2.id_order'
+        );
+        $query->leftJoin(
+            'order_invoice',
+            'oi',
+            'oi.id_order_invoice = oip2.id_order_invoice'
+        );
         $query->where('oip1.id_order_invoice = '.$this->id);
 
         $row = Db::getInstance()->getRow($query);
@@ -842,7 +842,13 @@ class OrderInvoiceCore extends ObjectModel
             return $invoice_formatted_number;
         }
 
-        return sprintf('%1$s%2$06d', Configuration::get('PS_INVOICE_PREFIX', $id_lang, null, $id_shop), $this->number);
+        $format = '%1$s%2$06d';
+
+        if (Configuration::get('PS_INVOICE_USE_YEAR')) {
+            $format = Configuration::get('PS_INVOICE_YEAR_POS') ? '%1$s%3$s/%2$06d' : '%1$s%2$06d/%3$s';
+        }
+
+        return sprintf($format, Configuration::get('PS_INVOICE_PREFIX', (int)$id_lang, null, (int)$id_shop), $this->number, date('Y', strtotime($this->date_add)));
     }
 
     public function saveCarrierTaxCalculator(array $taxes_amount)
@@ -870,8 +876,9 @@ class OrderInvoiceCore extends ObjectModel
 
         return $is_correct;
     }
-    
-    public static function getCurrentFormattedShopAddress($id_shop = null) {
+
+    public static function getCurrentFormattedShopAddress($id_shop = null)
+    {
         $address = new Address();
         $address->company = Configuration::get('PS_SHOP_NAME', null, null, $id_shop);
         $address->address1 = Configuration::get('PS_SHOP_ADDR1', null, null, $id_shop);
@@ -883,7 +890,7 @@ class OrderInvoiceCore extends ObjectModel
 
         return AddressFormat::generateAddress($address, array(), '<br />', ' ');
     }
-    
+
     /**
      * This method is used to fix shop addresses that cannot be fixed during upgrade process
      * (because uses the whole environnement of PS classes that is not available during upgrade).
@@ -892,11 +899,12 @@ class OrderInvoiceCore extends ObjectModel
      *
      * @since 1.6.1.1
      */
-    public static function fixAllShopAddresses() {
+    public static function fixAllShopAddresses()
+    {
         $shop_ids = Shop::getShops(false, null, true);
         $db = Db::getInstance();
-        foreach($shop_ids as $id_shop) {
-            $address = self::getCurrentFormattedShopAddress($id_shop);
+        foreach ($shop_ids as $id_shop) {
+            $address = OrderInvoice::getCurrentFormattedShopAddress($id_shop);
             $escaped_address = $db->escape($address, true, true);
 
             $db->execute('UPDATE `'._DB_PREFIX_.'order_invoice` INNER JOIN `'._DB_PREFIX_.'orders` USING (`id_order`)

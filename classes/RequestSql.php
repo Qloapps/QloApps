@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -416,7 +416,7 @@ class RequestSqlCore extends ObjectModel
         $nb = count($select);
         for ($i = 0; $i < $nb; $i++) {
             $attribut = $select[$i];
-            if ($attribut['base_expr'] != '*' && !preg_match('/\.*$/', $attribut['base_expr'])) {
+            if ($attribut['base_expr'] != '*' && !preg_match('/\.$/', $attribut['base_expr'])) {
                 if ($attribut['expr_type'] == 'colref') {
                     if ($attr = $this->cutAttribute(trim($attribut['base_expr']), $from)) {
                         if (!$this->attributExistInTable($attr['attribut'], $attr['table'])) {

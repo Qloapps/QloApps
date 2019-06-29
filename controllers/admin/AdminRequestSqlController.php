@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -351,23 +351,18 @@ class AdminRequestSqlControllerCore extends AdminController
                 }
                 if (file_exists($export_dir.$file)) {
                     $filesize = filesize($export_dir.$file);
-                    $upload_max_filesize = Tools::convertBytes(ini_get('upload_max_filesize'));
-                    if ($filesize < $upload_max_filesize) {
-                        if (Configuration::get('PS_ENCODING_FILE_MANAGER_SQL')) {
-                            $charset = Configuration::get('PS_ENCODING_FILE_MANAGER_SQL');
-                        } else {
-                            $charset = self::$encoding_file[0]['name'];
-                        }
-
-                        header('Content-Type: text/csv; charset='.$charset);
-                        header('Cache-Control: no-store, no-cache');
-                        header('Content-Disposition: attachment; filename="'.$file.'"');
-                        header('Content-Length: '.$filesize);
-                        readfile($export_dir.$file);
-                        die();
+                    if (Configuration::get('PS_ENCODING_FILE_MANAGER_SQL')) {
+                        $charset = Configuration::get('PS_ENCODING_FILE_MANAGER_SQL');
                     } else {
-                        $this->errors[] = Tools::DisplayError('The file is too large and can not be downloaded. Please use the LIMIT clause in this query.');
+                        $charset = self::$encoding_file[0]['name'];
                     }
+
+                    header('Content-Type: text/csv; charset='.$charset);
+                    header('Cache-Control: no-store, no-cache');
+                    header('Content-Disposition: attachment; filename="'.$file.'"');
+                    header('Content-Length: '.$filesize);
+                    readfile($export_dir.$file);
+                    die();
                 }
             }
         }

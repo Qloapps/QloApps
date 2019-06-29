@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<entity_category>
+  <category id="Root" id_shop="1">
+    <name>Gốc</name>
+    <description/>
+    <link_rewrite>goc</link_rewrite>
+    <meta_title/>
+    <meta_keywords/>
+    <meta_description/>
+  </category>
+  <category id="Home" id_shop="1">
+    <name>Trang chủ</name>
+    <description/>
+    <link_rewrite>trang-chu</link_rewrite>
+    <meta_title/>
+    <meta_keywords/>
+    <meta_description/>
+  </category>
+</entity_category>

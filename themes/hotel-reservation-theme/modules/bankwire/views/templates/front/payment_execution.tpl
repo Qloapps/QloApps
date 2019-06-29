@@ -1,5 +1,5 @@
 {*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -18,7 +18,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
@@ -61,15 +61,17 @@
                 -
                 {if $currencies|@count > 1}
                     {l s='We allow several currencies to be sent via bank wire.' mod='bankwire'}
-                    <div class="form-group">
-                        <label>{l s='Choose one of the following:' mod='bankwire'}</label>
-                        <select id="currency_payment" class="form-control" name="currency_payment">
-                            {foreach from=$currencies item=currency}
-                                <option value="{$currency.id_currency}" {if $currency.id_currency == $cust_currency}selected="selected"{/if}>
-                                    {$currency.name}
-                                </option>
-                            {/foreach}
-                        </select>
+                    <div class="form-group row">
+                        <label class="col-xs-12">{l s='Choose one of the following:' mod='bankwire'}</label>
+                        <div class="col-xs-4">
+                            <select id="currency_payment" class="form-control" name="currency_payment">
+                                {foreach from=$currencies item=currency}
+                                    <option value="{$currency.id_currency}" {if $currency.id_currency == $cust_currency}selected="selected"{/if}>
+                                        {$currency.name}
+                                    </option>
+                                {/foreach}
+                            </select>
+                        </div>
                     </div>
                 {else}
                     {l s='We allow the following currency to be sent via bank wire:' mod='bankwire'}&nbsp;<b>{$currencies.0.name}</b>

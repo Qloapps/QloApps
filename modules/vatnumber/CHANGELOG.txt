@@ -1,3 +1,12 @@
+------------------------------
+# V1.8.0 to V2.0.0
+------------------------------
+
+## Improved/Changed Features:
+
+* [CO] : Updated with latest PS version - 1.6.1.23.
+
+
 2014-04-18 17:05:53 +0200	// update version for release
 2014-04-18 16:55:22 +0200	[-] Fix retrocompat PrestaShop 1.5
 2014-04-17 11:40:40 +0200	Bug fix (PS 1.5): ps_version_compliancy removed

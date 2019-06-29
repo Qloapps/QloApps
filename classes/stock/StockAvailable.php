@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -208,7 +208,9 @@ class StockAvailableCore extends ObjectModel
                             $allowed_warehouse_for_combination_clean[] = (int)$warehouse['id_warehouse'];
                         }
                         $allowed_warehouse_for_combination_clean = array_intersect($allowed_warehouse_for_combination_clean, $warehouses);
-                        if ($order_id_shop != null && !count(array_intersect($allowed_warehouse_for_combination_clean, $order_warehouses))) {
+                        if (($order_id_shop != null && !count(array_intersect($allowed_warehouse_for_combination_clean, $order_warehouses))) ||
+                            !count($allowed_warehouse_for_combination_clean)
+                        ) {
                             continue;
                         }
 
@@ -239,7 +241,7 @@ class StockAvailableCore extends ObjectModel
                                     'id_product_attribute' => (int)$id_product_attribute,
                                 )
                             );
-                            StockAvailable::addSqlShopParams($query['data']);
+                            StockAvailable::addSqlShopParams($query['data'], $id_shop);
                             Db::getInstance()->insert($query['table'], $query['data']);
                         }
 
@@ -469,7 +471,7 @@ class StockAvailableCore extends ObjectModel
         }
 
         $stockManager = Adapter_ServiceLocator::get('Core_Business_Stock_StockManager');
-        $stockManager->updateQuantity($product, $id_product_attribute, $delta_quantity, $id_shop = null);
+        $stockManager->updateQuantity($product, $id_product_attribute, $delta_quantity, $id_shop);
         return true;
     }
 

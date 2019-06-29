@@ -34,7 +34,7 @@
 				{l s='Room Type :' mod='hotelreservationsystem'}
 			</label>
 			<div class="col-sm-3">
-				<input type="text" id="room_type_name" name="room_type_name" class="form-control" placeholder= "{l s='Enter Room Type Name' mod='hotelreservationsystem'}" value="{if isset($productName)}{$productName}{/if}"/>
+				<input autocomplete="off" type="text" id="room_type_name" name="room_type_name" class="form-control" placeholder= "{l s='Enter Room Type Name' mod='hotelreservationsystem'}" value="{if isset($productName)}{$productName}{/if}"/>
 				<input type="hidden" id="room_type_id" name="room_type_id" class="form-control" value="{if isset($objFeaturePrice->id_product)}{$objFeaturePrice->id_product}{else}0{/if}"/>
 				<div class="dropdown">
 	                <ul class="room_type_search_results_ul"></ul>

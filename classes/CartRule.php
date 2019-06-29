@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -347,29 +347,40 @@ class CartRuleCore extends ObjectModel
             }
         }
 
-        foreach ($result as $key => $cart_rule) {
+        $result_bak = $result;
+        $result = array();
+        $country_restriction = false;
+        foreach ($result_bak as $key => $cart_rule) {
             if ($cart_rule['country_restriction']) {
+                $country_restriction = true;
                 $countries = Db::getInstance()->ExecuteS('
-					SELECT `id_country`
-					FROM `'._DB_PREFIX_.'address`
-					WHERE `id_customer` = '.(int)$id_customer.'
-					AND `deleted` = 0'
+                    SELECT `id_country`
+                    FROM `'._DB_PREFIX_.'address`
+                    WHERE `id_customer` = '.(int)$id_customer.'
+                    AND `deleted` = 0'
                 );
 
                 if (is_array($countries) && count($countries)) {
                     foreach ($countries as $country) {
                         $id_cart_rule = (bool)Db::getInstance()->getValue('
-							SELECT crc.id_cart_rule
-							FROM '._DB_PREFIX_.'cart_rule_country crc
-							WHERE crc.id_cart_rule = '.(int)$cart_rule['id_cart_rule'].'
-							AND crc.id_country = '.(int)$country['id_country']);
-                        if (!$id_cart_rule) {
-                            unset($result[$key]);
+                            SELECT crc.id_cart_rule
+                            FROM '._DB_PREFIX_.'cart_rule_country crc
+                            WHERE crc.id_cart_rule = '.(int)$cart_rule['id_cart_rule'].'
+                            AND crc.id_country = '.(int)$country['id_country']);
+                        if ($id_cart_rule) {
+                            $result[] = $result_bak[$key];
+                            break;
                         }
                     }
                 }
             }
+            else {
+                $result[] = $result_bak[$key];
+            }
         }
+
+        if (!$country_restriction)
+             $result = $result_bak;
 
         // Retrocompatibility with 1.4 discounts
         foreach ($result as &$cart_rule) {
@@ -881,11 +892,6 @@ class CartRuleCore extends ObjectModel
         $all_products = $context->cart->getProducts();
         $package_products = (is_null($package) ? $all_products : $package['products']);
 
-        $all_cart_rules_ids = $context->cart->getOrderedCartRulesIds();
-
-        $cart_amount_ti = $context->cart->getOrderTotal(true, Cart::ONLY_PRODUCTS);
-        $cart_amount_te = $context->cart->getOrderTotal(false, Cart::ONLY_PRODUCTS);
-
         $reduction_value = 0;
 
         $cache_id = 'getContextualValue_'.(int)$this->id.'_'.(int)$use_tax.'_'.(int)$context->cart->id.'_'.(int)$filter;
@@ -896,6 +902,11 @@ class CartRuleCore extends ObjectModel
         if (Cache::isStored($cache_id)) {
             return Cache::retrieve($cache_id);
         }
+
+        $all_cart_rules_ids = $context->cart->getOrderedCartRulesIds();
+
+        $cart_amount_ti = $context->cart->getOrderTotal(true, Cart::ONLY_PRODUCTS);
+        $cart_amount_te = $context->cart->getOrderTotal(false, Cart::ONLY_PRODUCTS);
 
         // Free shipping on selected carriers
         if ($this->free_shipping && in_array($filter, array(CartRule::FILTER_ACTION_ALL, CartRule::FILTER_ACTION_ALL_NOCAP, CartRule::FILTER_ACTION_SHIPPING))) {
@@ -978,7 +989,9 @@ class CartRuleCore extends ObjectModel
                             || in_array($product['id_product'].'-0', $selected_products)) {
                             $price = $product['price'];
                             if ($use_tax) {
-                                $price *= (1 + $context->cart->getAverageProductsTaxRate());
+                                $infos = Product::getTaxesInformations($product, $context);
+                                $tax_rate = $infos['rate'] / 100;
+                                $price *= (1 + $tax_rate);
                             }
 
                             $selected_products_reduction += $price * $product['cart_quantity'];
@@ -1385,12 +1398,12 @@ class CartRuleCore extends ObjectModel
         // Delete the product rules that does not have any values
         if (Db::getInstance()->Affected_Rows() > 0) {
             Db::getInstance()->delete('cart_rule_product_rule', 'NOT EXISTS (SELECT 1 FROM `'._DB_PREFIX_.'cart_rule_product_rule_value`
-																							WHERE `cart_rule_product_rule`.`id_product_rule` = `cart_rule_product_rule_value`.`id_product_rule`)');
+																							WHERE `'._DB_PREFIX_.'cart_rule_product_rule`.`id_product_rule` = `'._DB_PREFIX_.'cart_rule_product_rule_value`.`id_product_rule`)');
         }
         // If the product rules were the only conditions of a product rule group, delete the product rule group
         if (Db::getInstance()->Affected_Rows() > 0) {
             Db::getInstance()->delete('cart_rule_product_rule_group', 'NOT EXISTS (SELECT 1 FROM `'._DB_PREFIX_.'cart_rule_product_rule`
-																						WHERE `cart_rule_product_rule`.`id_product_rule_group` = `cart_rule_product_rule_group`.`id_product_rule_group`)');
+																						WHERE `'._DB_PREFIX_.'cart_rule_product_rule`.`id_product_rule_group` = `'._DB_PREFIX_.'cart_rule_product_rule_group`.`id_product_rule_group`)');
         }
 
         // If the product rule group were the only restrictions of a cart rule, update de cart rule restriction cache

@@ -1,13 +1,13 @@
 
-[{shop_url}]
+[/{shop_url}] 
 
-Hi,
+Hi, 
 
 {firstname} {lastname} indicated you may want to see his/her
 wishlist: {wishlist}
 
-{wishlist} [{message}]
+{wishlist} [/{message}] 		 
 
-{shop_name} [{shop_url}] powered by
-Webkul(tm) [https://webkul.com/]
+{shop_name} [/{shop_url}] powered by PrestaShop(tm)
+[http://www.prestashop.com/] 
 

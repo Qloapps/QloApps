@@ -64,7 +64,8 @@
       <taxRule iso_code_country="sk" id_tax="1"/>
       <taxRule iso_code_country="fi" id_tax="1"/>
       <taxRule iso_code_country="se" id_tax="1"/>
-      <taxRule iso_code_country="uk" id_tax="1"/>
+      <taxRule iso_code_country="gb" id_tax="1"/>
+      <taxRule iso_code_country="hr" id_tax="1"/>
     </taxRulesGroup>
     <taxRulesGroup name="FI Reduced Rate (13%)">
       <taxRule iso_code_country="be" id_tax="2"/>
@@ -93,7 +94,8 @@
       <taxRule iso_code_country="sk" id_tax="2"/>
       <taxRule iso_code_country="fi" id_tax="2"/>
       <taxRule iso_code_country="se" id_tax="2"/>
-      <taxRule iso_code_country="uk" id_tax="2"/>
+      <taxRule iso_code_country="gb" id_tax="2"/>
+      <taxRule iso_code_country="hr" id_tax="2"/>
     </taxRulesGroup>
     <taxRulesGroup name="FI Super Reduced Rate (9%)">
       <taxRule iso_code_country="be" id_tax="3"/>
@@ -122,7 +124,8 @@
       <taxRule iso_code_country="sk" id_tax="3"/>
       <taxRule iso_code_country="fi" id_tax="3"/>
       <taxRule iso_code_country="se" id_tax="3"/>
-      <taxRule iso_code_country="uk" id_tax="3"/>
+      <taxRule iso_code_country="gb" id_tax="3"/>
+      <taxRule iso_code_country="hr" id_tax="3"/>
     </taxRulesGroup>
     <taxRulesGroup name="FI Foodstuff Rate (13%)">
       <taxRule iso_code_country="be" id_tax="2"/>
@@ -151,7 +154,8 @@
       <taxRule iso_code_country="sk" id_tax="2"/>
       <taxRule iso_code_country="fi" id_tax="2"/>
       <taxRule iso_code_country="se" id_tax="2"/>
-      <taxRule iso_code_country="uk" id_tax="2"/>
+      <taxRule iso_code_country="gb" id_tax="2"/>
+      <taxRule iso_code_country="hr" id_tax="2"/>
     </taxRulesGroup>
     <taxRulesGroup name="FI Books Rate (9%)">
       <taxRule iso_code_country="be" id_tax="3"/>
@@ -180,7 +184,8 @@
       <taxRule iso_code_country="sk" id_tax="3"/>
       <taxRule iso_code_country="fi" id_tax="3"/>
       <taxRule iso_code_country="se" id_tax="3"/>
-      <taxRule iso_code_country="uk" id_tax="3"/>
+      <taxRule iso_code_country="gb" id_tax="3"/>
+      <taxRule iso_code_country="hr" id_tax="3"/>
     </taxRulesGroup>
     <taxRulesGroup name="EU VAT For Virtual Products" auto-generated="1" eu-tax-group="virtual">
       <taxRule iso_code_country="fi" id_tax="1"/>

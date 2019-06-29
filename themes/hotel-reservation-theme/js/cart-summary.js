@@ -1,5 +1,5 @@
 /*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -18,7 +18,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -928,7 +928,7 @@ function updateCartSummary(json)
 	}
 
 	// Block cart
-	if (typeof(orderProcess) !== 'undefined' && orderProcess == 'order-opc')
+	if (typeof(orderProcess) !== 'undefined' && orderProcess == 'order-opc' && !json.is_virtual_cart)
 		$('.ajax_cart_shipping_cost').parent().find('.unvisible').show();
 
 	if (json.total_shipping > 0)
@@ -950,7 +950,7 @@ function updateCartSummary(json)
 	{
 		if (parseFloat(json.total_shipping) > 0)
 			$('.ajax_cart_shipping_cost').text(jsonData.shippingCost);
-		else if (json.carrier.id == null && typeof(toBeDetermined) !== 'undefined')
+		else if (json.carrier.id == null && typeof(toBeDetermined) !== 'undefined' && !json.free_ship)
 			$('.ajax_cart_shipping_cost').html(toBeDetermined);
 		else if (typeof(freeShippingTranslation) != 'undefined')
 			$('.ajax_cart_shipping_cost').html(freeShippingTranslation);
@@ -979,19 +979,15 @@ function updateCartSummary(json)
 	}
 	else
 	{
-		if (json.carrier.id != null || json.free_ship == 1)
+		if (json.carrier.id != null || json.free_ship)
+		{
 			$('#total_shipping').html(freeShippingTranslation);
-		else if (!hasDeliveryAddress)
+			if (json.is_virtual_cart)
+				$('.cart_total_delivery').hide();
+		}
+		if (!hasDeliveryAddress)
 			$('.cart_total_delivery').hide();
 	}
-
-	if (json.free_ship > 0 && !json.is_virtual_cart)
-	{
-		$('.cart_free_shipping').fadeIn();
-		$('#free_shipping').html(formatCurrency(json.free_ship, currencyFormat, currencySign, currencyBlank));
-	}
-	else
-		$('.cart_free_shipping').hide();
 
 	if (json.total_wrapping > 0)
 	{

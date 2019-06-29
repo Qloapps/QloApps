@@ -1,3 +1,13 @@
+------------------------------
+# V0.3.3 to V1.0.0
+------------------------------
+
+## Improved/Changed Features:
+
+* [CO] : Updated with latest PS version - 1.6.1.23.
+
+
+
 2014-04-22 18:58:19 +0200	// Changelog updated
 2014-03-24 15:21:15 +0100	/ MO dashproducts : ps_versions_compliancy added
 2014-03-20 14:32:28 +0100	Initial commit

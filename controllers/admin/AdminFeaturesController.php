@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -224,6 +224,12 @@ class AdminFeaturesControllerCore extends AdminController
             $this->page_header_toolbar_btn['new_feature'] = array(
                 'href' => self::$currentIndex.'&addfeature&token='.$this->token,
                 'desc' => $this->l('Add new feature', null, null, false),
+                'icon' => 'process-icon-new'
+            );
+
+            $this->page_header_toolbar_btn['new_feature_value'] = array(
+                'href' => self::$currentIndex.'&addfeature_value&id_feature='.(int)Tools::getValue('id_feature').'&token='.$this->token,
+                'desc' => $this->l('Add new feature value', null, null, false),
                 'icon' => 'process-icon-new'
             );
         }

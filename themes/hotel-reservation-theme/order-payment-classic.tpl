@@ -1,5 +1,5 @@
 {*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -18,7 +18,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
@@ -94,7 +94,7 @@
                             {/if}
                         </td>
                     </tr>
-                    {if $total_shipping_tax_exc <= 0 && !isset($virtualCart)}
+                    {if $total_shipping_tax_exc <= 0 && (!isset($isVirtualCart) || !$isVirtualCart) && $free_ship}
                         <tr class="cart_total_delivery">
                             <td colspan="4" class="text-right">{l s='Total shipping'}</td>
                             <td colspan="2" class="price" id="total_shipping">{l s='Free Shipping!'}</td>
@@ -123,9 +123,9 @@
                         <td colspan="4" class="text-right">
                             {if $use_taxes}
                                 {if $priceDisplay}
-                                    {if $display_tax_label}{l s='Total vouchers (tax excl.)'}{else}{l s='Total vouchers'}{/if}
+                                    {if $display_tax_label && $show_taxes}{l s='Total vouchers (tax excl.)'}{else}{l s='Total vouchers'}{/if}
                                 {else}
-                                    {if $display_tax_label}{l s='Total vouchers (tax incl.)'}{else}{l s='Total vouchers'}{/if}
+                                    {if $display_tax_label && $show_taxes}{l s='Total vouchers (tax incl.)'}{else}{l s='Total vouchers'}{/if}
                                 {/if}
                             {else}
                                 {l s='Total vouchers'}

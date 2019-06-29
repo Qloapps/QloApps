@@ -1,6 +1,6 @@
 <?php
 /**
- * 2007-2015 PrestaShop
+ * 2007-2017 PrestaShop
  *
  * NOTICE OF LICENSE
  *
@@ -19,7 +19,7 @@
  * needs please refer to http://www.prestashop.com for more information.
  *
  *  @author 	PrestaShop SA <contact@prestashop.com>
- *  @copyright  2007-2015 PrestaShop SA
+ *  @copyright  2007-2017 PrestaShop SA
  *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *  International Registered Trademark & Property of PrestaShop SA
  */
@@ -115,7 +115,7 @@ class AddressCore extends ObjectModel
             'id_country' =>        array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => true),
             'id_state' =>            array('type' => self::TYPE_INT, 'validate' => 'isNullOrUnsignedId'),
             'alias' =>                array('type' => self::TYPE_STRING, 'validate' => 'isGenericName', 'required' => true, 'size' => 32),
-            'company' =>            array('type' => self::TYPE_STRING, 'validate' => 'isGenericName', 'size' => 64),
+            'company' =>            array('type' => self::TYPE_STRING, 'validate' => 'isGenericName', 'size' => 255),
             'lastname' =>            array('type' => self::TYPE_STRING, 'validate' => 'isName', 'required' => true, 'size' => 32),
             'firstname' =>            array('type' => self::TYPE_STRING, 'validate' => 'isName', 'required' => true, 'size' => 32),
             'vat_number' =>            array('type' => self::TYPE_STRING, 'validate' => 'isGenericName'),
@@ -308,13 +308,13 @@ class AddressCore extends ObjectModel
      */
     public function isUsed()
     {
-        $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->getRow('
+        $result = (int)Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
 		SELECT COUNT(`id_order`) AS used
 		FROM `'._DB_PREFIX_.'orders`
 		WHERE `id_address_delivery` = '.(int)$this->id.'
 		OR `id_address_invoice` = '.(int)$this->id);
 
-        return isset($result['used']) ? $result['used'] : false;
+        return $result > 0 ? (int)$result : false;
     }
 
     public static function getCountryAndState($id_address)
@@ -381,8 +381,8 @@ class AddressCore extends ObjectModel
     public static function initialize($id_address = null, $with_geoloc = false)
     {
         $context = Context::getContext();
-
-        if ($id_address) {
+        $exists = (int)$id_address && (bool)Address::addressExists($id_address);
+        if ($exists) {
             $context_hash = (int)$id_address;
         } elseif ($with_geoloc && isset($context->customer->geoloc_id_country)) {
             $context_hash = md5((int)$context->customer->geoloc_id_country.'-'.(int)$context->customer->id_state.'-'.
@@ -396,7 +396,7 @@ class AddressCore extends ObjectModel
 
         if (!Cache::isStored($cache_id)) {
             // if an id_address has been specified retrieve the address
-            if ($id_address) {
+            if ($exists) {
                 $address = new Address((int)$id_address);
 
                 if (!Validate::isLoadedObject($address)) {

@@ -32,7 +32,7 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
 
         /*for showing status of booking with badge_danger or success*/
         $this->_select .= ' ,IF(IFNULL((SELECT a.id FROM '._DB_PREFIX_.'htl_order_refund_info WHERE id_order=a.id_order AND (refund_stage_id=1 OR refund_stage_id=2) LIMIT 1) , \''.$this->l('Done').'\') = \''.$this->l('Done').'\', \''.$this->l('Done').'\', \''.$this->l('Pending').'\') AS req_status , IF((SELECT a.id FROM '._DB_PREFIX_.'htl_order_refund_info WHERE id_order=a.id_order AND (refund_stage_id=1 OR refund_stage_id=2) LIMIT 1), 1, 0) badge_danger, IF((SELECT a.id FROM '._DB_PREFIX_.'htl_order_refund_info WHERE id_order=a.id_order AND (refund_stage_id=1 OR refund_stage_id=2) LIMIT 1), 0, 1) badge_success';
-
+        // $this->processResetFilters();
         $this->_lang = $this->context->language->id;
         $this->_join .= ' LEFT JOIN `'._DB_PREFIX_.'customer` cust ON (a.`id_customer` = cust.`id_customer`)';
         $this->_group = 'GROUP BY a.`id_order`';
@@ -62,11 +62,9 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
             'req_status' => array(
                 'title' => $this->l('Requests Status'),
                 'align' => 'center',
-                'type' => 'select',
-                'filter_key' => 'a!refund_stage_id',
-                'list' => $refund_stages,
                 'badge_danger' => true,
                 'badge_success' => true,
+                'havingFilter' => true,
             ),
         );
         $this->addRowAction('view');
@@ -286,10 +284,10 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
             $this->context->smarty->assign(
                 array(
                     'refunded_amount' => $obj_refund->refunded_amount,
-                    'deduction_amount' => Tools::ps_round($deduction_amount, 2),
+                    'deduction_amount' => $deduction_amount,
                     'way_of_payment' => $way_of_payment,
-                    'total_amount' => Tools::ps_round($order_amount, 2),
-                    'curr_code' => $currency_iso_code,
+                    'total_amount' => $order_amount,
+                    'id_currency' => $id_currency,
                     'currentStage' => $obj_ord_refund_stage,
                     'room_numbers' => $rooms_names,
                     'htl_name' => $obj_hotel_branch_info->hotel_name,
@@ -316,9 +314,9 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
             if ($cancel_charges_for_cust != '' && !Validate::isPrice($cancel_charges_for_cust)) {
                 $this->errors[] = $this->l('Invalid Cancellation Charge Amount.');
             } elseif ($way_of_payment == 'Advance Payment' && $cancel_charges_for_cust > $adv_paid_amount) {
-                $this->errors[] = $this->l('Cancellation Charge should be less then Advance Paid amount for the order.');
+                $this->errors[] = $this->l('Cancellation Charge should be less than Advance Paid amount for the order.');
             } elseif ($cancel_charges_for_cust != '' && $cancel_charges_for_cust > $order_amount) {
-                $this->errors[] = $this->l('Cancellation Charge should be less then Total Amount.');
+                $this->errors[] = $this->l('Cancellation Charge should be less than Total Amount.');
             }
             if (!count($this->errors)) {
                 if ($new_stage_id == 3) {

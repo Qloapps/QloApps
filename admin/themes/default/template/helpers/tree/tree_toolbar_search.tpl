@@ -1,5 +1,5 @@
 {*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -18,7 +18,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
@@ -35,9 +35,13 @@
 {if isset($typeahead_source) && isset($id)}
 
 <script type="text/javascript">
-	$(document).ready(
-		function()
-		{
+	$(function() {
+
+		function startTypeahead() {
+			if (typeof $.fn.typeahead === 'undefined') {
+				setTimeout(startTypeahead, 100);
+				return;
+			}
 			$("#{$id|escape:'html':'UTF-8'}").typeahead(
 			{
 				name: "{$name|escape:'html':'UTF-8'}",
@@ -45,12 +49,14 @@
 				local: [{$typeahead_source}]
 			});
 
-			$("#{$id|escape:'html':'UTF-8'}").keypress(function( event ) {
-				if ( event.which == 13 ) {
+			$("#{$id|escape:'html':'UTF-8'}").keypress(function (event) {
+				if (event.which == 13) {
 					event.stopPropagation();
 				}
 			});
 		}
-	);
+
+		startTypeahead();
+	});
 </script>
 {/if}

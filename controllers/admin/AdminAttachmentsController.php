@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -43,8 +43,8 @@ class AdminAttachmentsControllerCore extends AdminController
         $this->addRowAction('view');
         $this->addRowAction('delete');
 
-        $this->_select = 'IFNULL(virtual.products, 0) as products';
-        $this->_join = 'LEFT JOIN (SELECT id_attachment, COUNT(*) as products FROM '._DB_PREFIX_.'product_attachment GROUP BY id_attachment) virtual ON a.id_attachment = virtual.id_attachment';
+        $this->_select = 'IFNULL(virtual_product_attachment.products, 0) as products';
+        $this->_join = 'LEFT JOIN (SELECT id_attachment, COUNT(*) as products FROM '._DB_PREFIX_.'product_attachment GROUP BY id_attachment) AS virtual_product_attachment ON a.id_attachment = virtual_product_attachment.id_attachment';
         $this->_use_found_rows = false;
 
         $this->fields_list = array(
@@ -66,7 +66,7 @@ class AdminAttachmentsControllerCore extends AdminController
             'products' => array(
                 'title' => $this->l('Associated with'),
                 'suffix' => $this->l('product(s)'),
-                'filter_key' => 'virtual!products',
+                'filter_key' => 'virtual_product_attachment!products',
             ),
         );
 

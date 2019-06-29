@@ -1,6 +1,6 @@
 function sendSearchQuery() {
 	pattern = $('#addons-search-box').val();
-	url = 'http://addons.prestashop.com/en/search.php?search_query='+pattern+'&amp;utm_source=back-office&amp;utm_medium=recherche-theme&amp;utm_campaign=back-office-EN';
+	url = 'https://addons.prestashop.com/en/search.php?search_query='+pattern+'&amp;utm_source=back-office&amp;utm_medium=recherche-theme&amp;utm_campaign=back-office-EN';
 	window.open(url, '_blank');
 }
 

@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2015 PrestaShop
+* 2007-2016 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2016 PrestaShop SA
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -30,7 +30,7 @@ include_once(dirname(__FILE__).'/sendtoafriend.php');
 
 $module = new SendToAFriend();
 
-if (Tools::getValue('action') == 'sendToMyFriend' && Tools::getValue('secure_key') == $module->secure_key)
+if (Module::isEnabled('sendtoafriend') && Tools::getValue('action') == 'sendToMyFriend' && Tools::getValue('secure_key') == $module->secure_key)
 {
 		// Retrocompatibilty with old theme
 		if($friend = Tools::getValue('friend'))
@@ -56,6 +56,13 @@ if (Tools::getValue('action') == 'sendToMyFriend' && Tools::getValue('secure_key
 
 		if (!$friendName || !$friendMail || !$id_product)
 			die('0');
+
+		$isValidEmail = Validate::isEmail($friendMail);
+		$isValidName  = $module->isValidName($friendName);
+
+		if (false === $isValidName || false === $isValidEmail) {
+			die('0');
+		}
 
 		/* Email generation */
 		$product = new Product((int)$id_product, false, $module->context->language->id);

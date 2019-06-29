@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -123,14 +123,14 @@ class LanguageCore extends ObjectModel
             if (!file_exists($path_file)) {
                 if ($file != 'tabs') {
                     @file_put_contents($path_file, '<?php
-	global $'.$var.';
-	$'.$var.' = array();
-?>');
-                } else {
-                    @file_put_contents($path_file, '<?php
-	$'.$var.' = array();
-	return $'.$var.';
-?>');
+                        global $'.$var.';
+                        $'.$var.' = array();
+                    ?>');
+                    } else {
+                        @file_put_contents($path_file, '<?php
+                        $'.$var.' = array();
+                        return $'.$var.';
+                    ?>');
                 }
             }
 
@@ -441,7 +441,7 @@ class LanguageCore extends ObjectModel
                 $shop_field_exists = $primary_key_exists = false;
                 $columns = Db::getInstance()->executeS('SHOW COLUMNS FROM `'.$name.'`');
                 foreach ($columns as $column) {
-                    $fields .= $column['Field'].', ';
+                    $fields .= '`'.$column['Field'].'`, ';
                     if ($column['Field'] == 'id_shop') {
                         $shop_field_exists = true;
                     }
@@ -512,7 +512,7 @@ class LanguageCore extends ObjectModel
             // Database translations deletion
             $result = Db::getInstance()->executeS('SHOW TABLES FROM `'._DB_NAME_.'`');
             foreach ($result as $row) {
-                if (isset($row['Tables_in_'._DB_NAME_]) && !empty($row['Tables_in_'._DB_NAME_]) && preg_match('/'.preg_quote(_DB_PREFIX_).'_lang/', $row['Tables_in_'._DB_NAME_])) {
+                if (isset($row['Tables_in_'._DB_NAME_]) && !empty($row['Tables_in_'._DB_NAME_]) && preg_match('/'.preg_quote(_DB_PREFIX_).'[a-z_]+_lang/', $row['Tables_in_'._DB_NAME_])) {
                     if (!Db::getInstance()->execute('DELETE FROM `'.$row['Tables_in_'._DB_NAME_].'` WHERE `id_lang` = '.(int)$this->id)) {
                         return false;
                     }
@@ -960,7 +960,8 @@ class LanguageCore extends ObjectModel
                 $files_list = $other_files;
             }
 
-            if (!$gz->extractList(AdminTranslationsController::filesListToPaths($files_list), _PS_TRANSLATIONS_DIR_.'../')) {
+            // Extract all the content of the archive in the directory
+            if (!$gz->extractModify(_PS_TRANSLATIONS_DIR_.'../', '')) {
                 $errors[] = sprintf(Tools::displayError('Cannot decompress the translation file for the following language: %s'), (string)$iso);
             }
 
@@ -1026,7 +1027,7 @@ class LanguageCore extends ObjectModel
         return Cache::retrieve($key);
     }
 
-    public static function updateModulesTranslations(Array $modules_list)
+    public static function updateModulesTranslations(array $modules_list)
     {
         require_once(_PS_TOOL_DIR_.'tar/Archive_Tar.php');
 
@@ -1034,16 +1035,13 @@ class LanguageCore extends ObjectModel
         foreach ($languages as $lang) {
             $gz = false;
             $files_listing = array();
+
+            if (Language::downloadAndInstallLanguagePack($lang['iso_code'], null, null, false) !== true) {
+                break;
+            }
+            $filegz = _PS_TRANSLATIONS_DIR_.$lang['iso_code'].'.gzip';
+
             foreach ($modules_list as $module_name) {
-                $filegz = _PS_TRANSLATIONS_DIR_.$lang['iso_code'].'.gzip';
-
-                clearstatcache();
-                if (@filemtime($filegz) < (time() - (24 * 3600))) {
-                    if (Language::downloadAndInstallLanguagePack($lang['iso_code'], null, null, false) !== true) {
-                        break;
-                    }
-                }
-
                 $gz = new Archive_Tar($filegz, true);
                 $files_list = Language::getLanguagePackListContent($lang['iso_code'], $gz);
                 foreach ($files_list as $i => $file) {

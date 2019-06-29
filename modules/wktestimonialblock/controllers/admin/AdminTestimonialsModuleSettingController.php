@@ -66,39 +66,7 @@ class AdminTestimonialsModuleSettingController extends ModuleAdminController
                 'submit' => array('title' => $this->l('Save'))
             ),
         );
-    }
 
-    public function getTestimonialImage($echo, $row)
-    {
-        $image = '';
-        if ($echo) {
-            $imgUrl = _PS_MODULE_DIR_.$this->module->name.'/views/img/hotels_testimonials_img/'.
-            $row['id_testimonial_block'].'.jpg';
-            if (file_exists($imgUrl)) {
-                $modImgUrl = _MODULE_DIR_.$this->module->name.'/views/img/hotels_testimonials_img/'.
-                $row['id_testimonial_block'].'.jpg';
-                $image = "<img class='img-thumbnail img-responsive' style='max-width:70px' src='".$modImgUrl."'>";
-            }
-        }
-        if ($image == '') {
-            $modImgUrl = _MODULE_DIR_.$this->module->name.'/views/img/default-user.jpg';
-            $image = "<img class='img-thumbnail img-responsive' style='max-width:70px' src='".$modImgUrl."'>";
-        }
-        return $image;
-    }
-
-    public function initContent()
-    {
-        parent::initContent();
-        // to customize the view as per our requirements
-        if ($this->display != 'add' && $this->display != 'edit') {
-            $this->content .= $this->wkRenderList();
-            $this->context->smarty->assign('content', $this->content);
-        }
-    }
-
-    public function wkRenderList()
-    {
         $this->addRowAction('edit');
         $this->addRowAction('delete');
 
@@ -150,8 +118,36 @@ class AdminTestimonialsModuleSettingController extends ModuleAdminController
                 'icon' => 'icon-power-off text-danger',
             ),
         );
+    }
 
-        return parent::renderList();
+    public function getTestimonialImage($echo, $row)
+    {
+        $image = '';
+        if ($echo) {
+            $imgUrl = _PS_MODULE_DIR_.$this->module->name.'/views/img/hotels_testimonials_img/'.
+            $row['id_testimonial_block'].'.jpg';
+            if (file_exists($imgUrl)) {
+                $modImgUrl = _MODULE_DIR_.$this->module->name.'/views/img/hotels_testimonials_img/'.
+                $row['id_testimonial_block'].'.jpg';
+                $image = "<img class='img-thumbnail img-responsive' style='max-width:70px' src='".$modImgUrl."'>";
+            }
+        }
+        if ($image == '') {
+            $modImgUrl = _MODULE_DIR_.$this->module->name.'/views/img/default-user.jpg';
+            $image = "<img class='img-thumbnail img-responsive' style='max-width:70px' src='".$modImgUrl."'>";
+        }
+        return $image;
+    }
+
+    public function initContent()
+    {
+        parent::initContent();
+        // to customize the view as per our requirements
+        if ($this->display != 'add' && $this->display != 'edit') {
+            $this->content = $this->renderOptions();
+            $this->content .= $this->renderList();
+            $this->context->smarty->assign('content', $this->content);
+        }
     }
 
     public function renderForm()
@@ -250,8 +246,8 @@ class AdminTestimonialsModuleSettingController extends ModuleAdminController
         }
         if (!$personDesignation) {
             $this->errors[] = $this->l('Person\'s Designation is a required field.');
-        } elseif (!Validate::isGenericName($personName)) {
-            $this->errors[] = $this->l('Invalid Person\'s Name.');
+        } elseif (!Validate::isGenericName($personDesignation)) {
+            $this->errors[] = $this->l('Invalid Person\'s Designation.');
         }
 
         // check if field is atleast in default language. Not available in default prestashop
@@ -328,12 +324,28 @@ class AdminTestimonialsModuleSettingController extends ModuleAdminController
             $objDefaultLanguage = Language::getLanguage((int) $defaultLangId);
             $languages = Language::getLanguages(false);
             if (!trim(Tools::getValue('HOTEL_TESIMONIAL_BLOCK_HEADING_'.$defaultLangId))) {
-                $this->errors[] = $this->l('testimonial block title is required at least in ').
+                $this->errors[] = $this->l('Testimonial block title is required at least in ').
                 $objDefaultLanguage['name'];
+            } else {
+                foreach ($languages as $lang) {
+                    if (trim(Tools::getValue('HOTEL_TESIMONIAL_BLOCK_HEADING_'.$lang['id_lang']))) {
+                        if (!Validate::isGenericName(Tools::getValue('HOTEL_TESIMONIAL_BLOCK_HEADING_'.$lang['id_lang']))) {
+                            $this->errors[] = $this->l('Invalid testimonial block title in ').$lang['name'];
+                        }
+                    }
+                }
             }
             if (!trim(Tools::getValue('HOTEL_TESIMONIAL_BLOCK_CONTENT_'.$defaultLangId))) {
-                $this->errors[] = $this->l('testimonial block description is required at least in ').
+                $this->errors[] = $this->l('Testimonial block description is required at least in ').
                 $objDefaultLanguage['name'];
+            } else {
+                foreach ($languages as $lang) {
+                    if (trim(Tools::getValue('HOTEL_TESIMONIAL_BLOCK_CONTENT_'.$lang['id_lang']))) {
+                        if (!Validate::isGenericName(Tools::getValue('HOTEL_TESIMONIAL_BLOCK_CONTENT_'.$lang['id_lang']))) {
+                            $this->errors[] = $this->l('Invalid testimonial block description in ').$lang['name'];
+                        }
+                    }
+                }
             }
             if (!count($this->errors)) {
                 foreach ($languages as $lang) {
@@ -385,5 +397,17 @@ class AdminTestimonialsModuleSettingController extends ModuleAdminController
                 break;
             }
         }
+    }
+
+    public function setMedia()
+    {
+        parent::setMedia();
+        Media::addJsDef(
+            array(
+                'filesizeError' => $this->l('File exceeds maximum size.'),
+                'maxSizeAllowed' => Tools::getMaxUploadSize(),
+            )
+        );
+        $this->addJS(_MODULE_DIR_.$this->module->name.'/views/js/WkTestimonialBlockAdmin.js');
     }
 }

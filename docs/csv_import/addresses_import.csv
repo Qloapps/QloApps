@@ -1,4 +1,4 @@
-id;Alias*;Active (0/1);Customer e-mail*;Customer ID;Manufacturer;Supplier;Company;Lastname*;Firstname*;Address 1*;Address 2;Zipcode*;City*;Country*;State;Other;Phone;Mobile Phone;VAT number;DNI
+Adress ID;Alias*;Active (0/1);Customer e-mail*;Customer ID;Manufacturer;Supplier;Company;Lastname*;Firstname*;Address 1*;Address 2;Zipcode*;City*;Country*;State;Other;Phone;Mobile Phone;VAT number;DNI
 1;Peter.Pan / New York;1;Peter.Pan@prestashop.com;;;;;Pan;Peter;360W, 42nd Street;;12001;New York;United States;New York;;01 02 03 04 05;06 02 03 04 05;;;
 2;Wendy.Moira.Darling / New York;1;Wendy.Moira.Darling@prestashop.com;;;;;Darling;Wendy Moira;360W, 42nd Street;;12001;New York;United States;New York;;01 02 03 04 05;06 02 03 04 05;;;
 3;Wendy.Moira.Darling / London;1;Wendy.Moira.Darling@prestashop.com;;;;;Darling;Wendy Moira;Lansdowne road 50 London;Kensington;W11;London;United Kingdom;;;01 02 03 04 05;06 02 03 04 05;;;

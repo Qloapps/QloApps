@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -90,14 +90,6 @@ class AdminStockInstantStateControllerCore extends AdminController
                 'orderby' => true,
                 'search' => false,
             ),
-            'real_quantity' => array(
-                'title' => $this->l('Real quantity'),
-                'class' => 'fixed-width-xs',
-                'align' => 'center',
-                'orderby' => false,
-                'search' => false,
-                'hint' => $this->l('Physical quantity (usable) - Client orders + Supply Orders'),
-            ),
         );
 
         $this->addRowAction('details');
@@ -142,19 +134,30 @@ class AdminStockInstantStateControllerCore extends AdminController
      */
     public function renderList()
     {
+        $this->fields_list['real_quantity'] = array(
+            'title' => $this->l('Real quantity'),
+            'class' => 'fixed-width-xs',
+            'align' => 'center',
+            'orderby' => false,
+            'search' => false,
+            'hint' => $this->l('Physical quantity (usable) - Client orders + Supply Orders'),
+        );
+
         // query
-        $this->_select = '
+        $this->_select = 'IFNULL(pa.ean13, p.ean13) as ean13,
+            IFNULL(pa.upc, p.upc) as upc,
+            IFNULL(pa.reference, p.reference) as reference,
 			IFNULL(CONCAT(pl.name, \' : \', GROUP_CONCAT(DISTINCT agl.`name`, \' - \', al.name SEPARATOR \', \')),pl.name) as name,
 			w.id_currency';
 
-        $this->_group = 'GROUP BY a.id_product, a.id_product_attribute';
-
-        $this->_join = 'LEFT JOIN `'._DB_PREFIX_.'warehouse` w ON (w.id_warehouse = a.id_warehouse)';
+        $this->_join = 'INNER JOIN `'._DB_PREFIX_.'product` p ON (p.id_product = a.id_product AND p.advanced_stock_management = 1)';
+        $this->_join .= 'LEFT JOIN `'._DB_PREFIX_.'warehouse` w ON (w.id_warehouse = a.id_warehouse)';
         $this->_join .= ' LEFT JOIN `'._DB_PREFIX_.'product_lang` pl ON (
 			a.id_product = pl.id_product
 			AND pl.id_lang = '.(int)$this->context->language->id.'
 		)';
         $this->_join .= ' LEFT JOIN `'._DB_PREFIX_.'product_attribute_combination` pac ON (pac.id_product_attribute = a.id_product_attribute)';
+        $this->_join .= ' LEFT JOIN `'._DB_PREFIX_.'product_attribute` pa ON (pa.id_product_attribute = a.id_product_attribute)';
         $this->_join .= ' LEFT JOIN `'._DB_PREFIX_.'attribute` atr ON (atr.id_attribute = pac.id_attribute)';
         $this->_join .= ' LEFT JOIN `'._DB_PREFIX_.'attribute_lang` al ON (
 			al.id_attribute = pac.id_attribute
@@ -164,6 +167,11 @@ class AdminStockInstantStateControllerCore extends AdminController
 			agl.id_attribute_group = atr.id_attribute_group
 			AND agl.id_lang = '.(int)$this->context->language->id.'
 		)';
+
+        $this->_group = 'GROUP BY a.id_product, a.id_product_attribute';
+
+        $this->_orderBy = 'name';
+        $this->_orderWay = 'ASC';
 
         if ($this->getCurrentCoverageWarehouse() != -1) {
             $this->_where .= ' AND a.id_warehouse = '.$this->getCurrentCoverageWarehouse();
@@ -208,6 +216,7 @@ class AdminStockInstantStateControllerCore extends AdminController
         if (Tools::isSubmit('id_stock')) {
             // if a product id is submit
 
+            $this->list_no_link = true;
             $this->lang = false;
             $this->table = 'stock';
             $this->list_id = 'details';
@@ -224,14 +233,19 @@ class AdminStockInstantStateControllerCore extends AdminController
             $id_product = $ids[0];
             $id_product_attribute = $ids[1];
             $id_warehouse = Tools::getValue('id_warehouse', -1);
-            $this->_select = 'IFNULL(CONCAT(pl.name, \' : \', GROUP_CONCAT(DISTINCT agl.`name`, \' - \', al.name SEPARATOR \', \')),pl.name) as name,
+            $this->_select = 'IFNULL(pa.ean13, p.ean13) as ean13,
+                IFNULL(pa.upc, p.upc) as upc,
+                IFNULL(pa.reference, p.reference) as reference,
+                IFNULL(CONCAT(pl.name, \' : \', GROUP_CONCAT(DISTINCT agl.`name`, \' - \', al.name SEPARATOR \', \')),pl.name) as name,
 				w.id_currency, a.price_te';
-            $this->_join = ' LEFT JOIN `'._DB_PREFIX_.'warehouse` AS w ON w.id_warehouse = a.id_warehouse';
+            $this->_join = 'INNER JOIN `'._DB_PREFIX_.'product` p ON (p.id_product = a.id_product AND p.advanced_stock_management = 1)';
+            $this->_join .= ' LEFT JOIN `'._DB_PREFIX_.'warehouse` AS w ON w.id_warehouse = a.id_warehouse';
             $this->_join .= ' LEFT JOIN `'._DB_PREFIX_.'product_lang` pl ON (
 				a.id_product = pl.id_product
 				AND pl.id_lang = '.(int)$this->context->language->id.'
 			)';
             $this->_join .= ' LEFT JOIN `'._DB_PREFIX_.'product_attribute_combination` pac ON (pac.id_product_attribute = a.id_product_attribute)';
+            $this->_join .= ' LEFT JOIN `'._DB_PREFIX_.'product_attribute` pa ON (pa.id_product_attribute = a.id_product_attribute)';
             $this->_join .= ' LEFT JOIN `'._DB_PREFIX_.'attribute` atr ON (atr.id_attribute = pac.id_attribute)';
             $this->_join .= ' LEFT JOIN `'._DB_PREFIX_.'attribute_lang` al ON (
 				al.id_attribute = pac.id_attribute
@@ -246,6 +260,9 @@ class AdminStockInstantStateControllerCore extends AdminController
             if ($id_warehouse != -1) {
                 $this->_where .= ' AND a.id_warehouse = '.(int)$id_warehouse;
             }
+
+            $this->_orderBy = 'name';
+            $this->_orderWay = 'ASC';
 
             $this->_group = 'GROUP BY a.price_te';
 
@@ -280,11 +297,11 @@ class AdminStockInstantStateControllerCore extends AdminController
 
                 // gets quantities and valuation
                 $query = new DbQuery();
-                $query->select('SUM(physical_quantity) as physical_quantity');
-                $query->select('SUM(usable_quantity) as usable_quantity');
+                $query->select('physical_quantity');
+                $query->select('usable_quantity');
                 $query->select('SUM(price_te * physical_quantity) as valuation');
                 $query->from('stock');
-                $query->where('id_product = '.(int)$item['id_product'].' AND id_product_attribute = '.(int)$item['id_product_attribute']);
+                $query->where('id_stock = '.(int)$item['id_stock'].' AND id_product = '.(int)$item['id_product'].' AND id_product_attribute = '.(int)$item['id_product_attribute']);
 
                 if ($this->getCurrentCoverageWarehouse() != -1) {
                     $query->where('id_warehouse = '.(int)$this->getCurrentCoverageWarehouse());

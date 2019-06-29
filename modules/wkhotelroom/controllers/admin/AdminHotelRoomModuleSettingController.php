@@ -51,64 +51,20 @@ class AdminHotelRoomModuleSettingController extends ModuleAdminController
                         'hint' => $this->l('Enter a title for the hotel rooms block.'),
                     ),
                     'HOTEL_ROOM_DISPLAY_DESCRIPTION' => array(
-                        'title' => $this->l('Enter a description for the hotel rooms block.'),
+                        'title' => $this->l('Hotel room block description'),
                         'type' => 'textareaLang',
                         'lang' => true,
                         'required' => true,
                         'validation' => 'isGenericName',
                         'rows' => '4',
                         'cols' => '2',
-                        'hint' => $this->l('Block description.'),
+                        'hint' => $this->l('Enter a description for the hotel rooms block.'),
                     ),
                 ),
                 'submit' => array('title' => $this->l('Save'))
             ),
         );
-        $this->identifier = 'id_room_block';
 
-        parent::__construct();
-    }
-
-    public function getProductImage($idProduct)
-    {
-        $objProduct = new Product($idProduct, false, Configuration::get('PS_LANG_DEFAULT'));
-        if ($coverImageId = Product::getCover($objProduct->id)) {
-            $prodImg = $this->context->link->getImageLink(
-                $objProduct->link_rewrite,
-                $objProduct->id.'-'.$coverImageId['id_image'],
-                ImageType::getFormatedName('home')
-            );
-        } else {
-            $prodImg = $this->context->link->getImageLink(
-                $objProduct->link_rewrite,
-                $this->context->language->iso_code."-default",
-                ImageType::getFormatedName('home')
-            );
-        }
-        return '<img src="'.$prodImg.'" class="img-thumbnail htlRoomImg">';
-    }
-
-    public function initContent()
-    {
-        parent::initContent();
-        // to customize the view as per our requirements
-        if ($this->display != 'add' && $this->display != 'edit') {
-            $this->content .= $this->wkRenderList();
-            $this->context->smarty->assign('content', $this->content);
-        }
-    }
-
-    public function initToolbar()
-    {
-        parent::initToolbar();
-        $this->page_header_toolbar_btn['new'] = array(
-            'href' => self::$currentIndex.'&add'.$this->table.'&token='.$this->token,
-            'desc' => $this->l('Add New Hotel Room Block')
-        );
-    }
-
-    public function wkRenderList()
-    {
         $this->addRowAction('edit');
         $this->addRowAction('delete');
 
@@ -140,6 +96,7 @@ class AdminHotelRoomModuleSettingController extends ModuleAdminController
             'date_add' => array(
                 'title' => $this->l('Date Add'),
                 'align' => 'center',
+                'type' => 'datetime',
             ),
         );
         $this->bulk_actions = array(
@@ -157,8 +114,48 @@ class AdminHotelRoomModuleSettingController extends ModuleAdminController
                 'icon' => 'icon-power-off text-danger',
             ),
         );
+        $this->identifier = 'id_room_block';
 
-        return parent::renderList();
+        parent::__construct();
+    }
+
+    public function getProductImage($idProduct)
+    {
+        $objProduct = new Product($idProduct, false, Configuration::get('PS_LANG_DEFAULT'));
+        if ($coverImageId = Product::getCover($objProduct->id)) {
+            $prodImg = $this->context->link->getImageLink(
+                $objProduct->link_rewrite,
+                $objProduct->id.'-'.$coverImageId['id_image'],
+                ImageType::getFormatedName('home')
+            );
+        } else {
+            $prodImg = $this->context->link->getImageLink(
+                $objProduct->link_rewrite,
+                $this->context->language->iso_code."-default",
+                ImageType::getFormatedName('home')
+            );
+        }
+        return '<img src="'.$prodImg.'" class="img-thumbnail htlRoomImg">';
+    }
+
+    public function initContent()
+    {
+        parent::initContent();
+        // to customize the view as per our requirements
+        if ($this->display != 'add' && $this->display != 'edit') {
+            $this->content = $this->renderOptions();
+            $this->content .= $this->renderList();
+            $this->context->smarty->assign('content', $this->content);
+        }
+    }
+
+    public function initToolbar()
+    {
+        parent::initToolbar();
+        $this->page_header_toolbar_btn['new'] = array(
+            'href' => self::$currentIndex.'&add'.$this->table.'&token='.$this->token,
+            'desc' => $this->l('Add New Hotel Room Block')
+        );
     }
 
     public function renderForm()
@@ -199,7 +196,7 @@ class AdminHotelRoomModuleSettingController extends ModuleAdminController
                     'name' => 'product_search',
                     'html_content' => $html,
                     'required' => true,
-                    'hint' => $this->l('Select Room Type which you want to display in home page.')
+                    'hint' => $this->l('Select a room type to display in home page.')
                 ),
                 array(
                     'type' => 'switch',
@@ -290,10 +287,26 @@ class AdminHotelRoomModuleSettingController extends ModuleAdminController
             if (!trim(Tools::getValue('HOTEL_ROOM_DISPLAY_HEADING_'.$defaultLangId))) {
                 $this->errors[] = $this->l('Hotel rooms block title is required at least in ').
                 $objDefaultLanguage['name'];
+            } else {
+                foreach ($languages as $lang) {
+                    if (trim(Tools::getValue('HOTEL_ROOM_DISPLAY_HEADING_'.$lang['id_lang']))) {
+                        if (!Validate::isGenericName(Tools::getValue('HOTEL_ROOM_DISPLAY_HEADING_'.$lang['id_lang']))) {
+                            $this->errors[] = $this->l('Invalid hotel rooms block title in ').$lang['name'];
+                        }
+                    }
+                }
             }
             if (!trim(Tools::getValue('HOTEL_ROOM_DISPLAY_DESCRIPTION_'.$defaultLangId))) {
                 $this->errors[] = $this->l('Hotel rooms block description is required at least in ').
                 $objDefaultLanguage['name'];
+            } else {
+                foreach ($languages as $lang) {
+                    if (trim(Tools::getValue('HOTEL_ROOM_DISPLAY_DESCRIPTION_'.$lang['id_lang']))) {
+                        if (!Validate::isGenericName(Tools::getValue('HOTEL_ROOM_DISPLAY_DESCRIPTION_'.$lang['id_lang']))) {
+                            $this->errors[] = $this->l('Invalid hotel rooms block description in ').$lang['name'];
+                        }
+                    }
+                }
             }
             if (!count($this->errors)) {
                 foreach ($languages as $lang) {

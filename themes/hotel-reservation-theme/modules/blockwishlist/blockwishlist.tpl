@@ -1,5 +1,5 @@
 {*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -18,7 +18,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
@@ -67,7 +67,7 @@
 					<select name="wishlists" id="wishlists" class="form-control">
 						{foreach from=$wishlists item=wishlist name=i}
 								<option value="{$wishlist.id_wishlist}"{if $id_wishlist eq $wishlist.id_wishlist or ($id_wishlist == false and $smarty.foreach.i.first)} selected="selected"{/if}>
-									{$wishlist.name|truncate:22:'...'|escape:'html':'UTF-8'}
+									{$wishlist.name|truncate:22:'...'|escape:'htmlall':'UTF-8'}
 								</option>
 						{/foreach}
 					</select>

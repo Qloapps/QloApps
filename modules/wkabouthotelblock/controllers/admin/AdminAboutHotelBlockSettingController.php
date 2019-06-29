@@ -70,21 +70,6 @@ class AdminAboutHotelBlockSettingController extends ModuleAdminController
             ),
         );
 
-        parent::__construct();
-    }
-
-    public function initContent()
-    {
-        parent::initContent();
-        // to customize the view as per our requirements
-        if ($this->display != 'add' && $this->display != 'edit') {
-            $this->content .= $this->wkRenderList();
-            $this->context->smarty->assign('content', $this->content);
-        }
-    }
-
-    public function wkRenderList()
-    {
         $this->informations[] = $this->l('For better view, upload hotel interior image in multiple of 3.');
         $this->addRowAction('edit');
         $this->addRowAction('delete');
@@ -144,7 +129,18 @@ class AdminAboutHotelBlockSettingController extends ModuleAdminController
                 'icon' => 'icon-power-off text-danger',
             ),
         );
-        return parent::renderList();
+        parent::__construct();
+    }
+
+    public function initContent()
+    {
+        parent::initContent();
+        // to customize the view as per our requirements
+        if ($this->display != 'add' && $this->display != 'edit') {
+            $this->content = $this->renderOptions();
+            $this->content .= $this->renderList();
+            $this->context->smarty->assign('content', $this->content);
+        }
     }
 
     public function initToolbar()
@@ -310,10 +306,26 @@ class AdminAboutHotelBlockSettingController extends ModuleAdminController
             if (!trim(Tools::getValue('HOTEL_INTERIOR_HEADING_'.$defaultLangId))) {
                 $this->errors[] = $this->l('Interior block title is required at least in ').
                 $objDefaultLanguage['name'];
+            } else {
+                foreach ($languages as $lang) {
+                    if (trim(Tools::getValue('HOTEL_INTERIOR_HEADING_'.$lang['id_lang']))) {
+                        if (!Validate::isGenericName(Tools::getValue('HOTEL_INTERIOR_HEADING_'.$lang['id_lang']))) {
+                            $this->errors[] = $this->l('Invalid interior block title in ').$lang['name'];
+                        }
+                    }
+                }
             }
             if (!trim(Tools::getValue('HOTEL_INTERIOR_DESCRIPTION_'.$defaultLangId))) {
                 $this->errors[] = $this->l('Interior block description is required at least in ').
                 $objDefaultLanguage['name'];
+            } else {
+                foreach ($languages as $lang) {
+                    if (trim(Tools::getValue('HOTEL_INTERIOR_DESCRIPTION_'.$lang['id_lang']))) {
+                        if (!Validate::isGenericName(Tools::getValue('HOTEL_INTERIOR_DESCRIPTION_'.$lang['id_lang']))) {
+                            $this->errors[] = $this->l('Invalid interior block description in ').$lang['name'];
+                        }
+                    }
+                }
             }
             if (!count($this->errors)) {
                 foreach ($languages as $lang) {
@@ -370,6 +382,13 @@ class AdminAboutHotelBlockSettingController extends ModuleAdminController
     public function setMedia()
     {
         parent::setMedia();
+        Media::addJsDef(
+            array(
+                'filesizeError' => $this->l('File exceeds maximum size.'),
+                'maxSizeAllowed' => Tools::getMaxUploadSize(),
+            )
+        );
+        $this->addJS(_MODULE_DIR_.$this->module->name.'/views/js/WkAboutHotelBlockAdmin.js');
         $this->addCSS(_MODULE_DIR_.'wkabouthotelblock/views/css/WkAboutHotelBlockAdmin.css');
     }
 }

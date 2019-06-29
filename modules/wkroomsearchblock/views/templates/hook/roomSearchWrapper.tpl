@@ -58,7 +58,7 @@
 									<div class="dropdown">
 										<input type="hidden" id="hotel_cat_id" name="hotel_cat_id">
 										<input type="hidden" id="id_hotel" name="id_hotel">
-										<button class="form-control header-rmsearch-input {if isset($error) && $error == 1}error_border{/if}" type="button" data-toggle="dropdown">
+										<button class="form-control header-rmsearch-input {if isset($error) && $error == 1}error_border{/if}" type="button" data-toggle="dropdown" id="id_hotel_button">
 											<span id="hotel_cat_name" class="pull-left">{l s='Select Hotel' mod='wkroomsearchblock'}</span>
 											<span class="arrow_span">
 												<i class="icon icon-angle-down"></i>

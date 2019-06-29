@@ -66,7 +66,8 @@
       <taxRule iso_code_country="sk" id_tax="1"/>
       <taxRule iso_code_country="fi" id_tax="1"/>
       <taxRule iso_code_country="se" id_tax="1"/>
-      <taxRule iso_code_country="uk" id_tax="1"/>
+      <taxRule iso_code_country="gb" id_tax="1"/>
+      <taxRule iso_code_country="hr" id_tax="1"/>
     </taxRulesGroup>
     <taxRulesGroup name="ES Reduced Rate (10%)">
       <taxRule iso_code_country="be" id_tax="2"/>
@@ -95,7 +96,8 @@
       <taxRule iso_code_country="sk" id_tax="2"/>
       <taxRule iso_code_country="fi" id_tax="2"/>
       <taxRule iso_code_country="se" id_tax="2"/>
-      <taxRule iso_code_country="uk" id_tax="2"/>
+      <taxRule iso_code_country="gb" id_tax="2"/>
+      <taxRule iso_code_country="hr" id_tax="2"/>
     </taxRulesGroup>
     <taxRulesGroup name="ES Super Reduced Rate (4%)">
       <taxRule iso_code_country="be" id_tax="3"/>
@@ -124,7 +126,8 @@
       <taxRule iso_code_country="sk" id_tax="3"/>
       <taxRule iso_code_country="fi" id_tax="3"/>
       <taxRule iso_code_country="se" id_tax="3"/>
-      <taxRule iso_code_country="uk" id_tax="3"/>
+      <taxRule iso_code_country="gb" id_tax="3"/>
+      <taxRule iso_code_country="hr" id_tax="3"/>
     </taxRulesGroup>
     <taxRulesGroup name="ES Foodstuff Rate (4%)">
       <taxRule iso_code_country="be" id_tax="3"/>
@@ -153,7 +156,8 @@
       <taxRule iso_code_country="sk" id_tax="3"/>
       <taxRule iso_code_country="fi" id_tax="3"/>
       <taxRule iso_code_country="se" id_tax="3"/>
-      <taxRule iso_code_country="uk" id_tax="3"/>
+      <taxRule iso_code_country="gb" id_tax="3"/>
+      <taxRule iso_code_country="hr" id_tax="3"/>
     </taxRulesGroup>
     <taxRulesGroup name="ES Books Rate (4%)">
       <taxRule iso_code_country="be" id_tax="3"/>
@@ -182,7 +186,8 @@
       <taxRule iso_code_country="sk" id_tax="3"/>
       <taxRule iso_code_country="fi" id_tax="3"/>
       <taxRule iso_code_country="se" id_tax="3"/>
-      <taxRule iso_code_country="uk" id_tax="3"/>
+      <taxRule iso_code_country="gb" id_tax="3"/>
+      <taxRule iso_code_country="hr" id_tax="3"/>
     </taxRulesGroup>
     <taxRulesGroup name="EU VAT For Virtual Products" auto-generated="1" eu-tax-group="virtual">
       <taxRule iso_code_country="es" id_tax="1"/>

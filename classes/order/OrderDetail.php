@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -761,11 +761,11 @@ class OrderDetailCore extends ObjectModel
 				LEFT JOIN '._DB_PREFIX_.'product_lang pl ON (pl.id_product = od.product_id'.Shop::addSqlRestrictionOnLang('pl').')
 				LEFT JOIN '._DB_PREFIX_.'category_lang cl ON (cl.id_category = product_shop.id_category_default'.Shop::addSqlRestrictionOnLang('cl').')
 				LEFT JOIN '._DB_PREFIX_.'image i ON (i.id_product = od.product_id)
+				'.Shop::addSqlAssociation('image', 'i', true, 'image_shop.cover=1').'
 				WHERE od.id_order IN ('.$list.')
 					AND pl.id_lang = '.(int)$id_lang.'
 					AND cl.id_lang = '.(int)$id_lang.'
 					AND od.product_id != '.(int)$id_product.'
-					AND i.cover = 1
 					AND product_shop.active = 1'
                     .($front ? ' AND product_shop.`visibility` IN ("both", "catalog")' : '').'
 				ORDER BY RAND()

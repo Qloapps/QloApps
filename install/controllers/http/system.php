@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -98,6 +98,7 @@ class InstallControllerHttpSystem extends InstallControllerHttp
                         'memory_limit' => $this->l('In the PHP configuration set memory_limit to minimum 128M'),
                         'max_execution_time' => $this->l('In the PHP configuration set max_execution_time to minimum 500'),
                         'upload_max_filesize' => $this->l('In the PHP configuration set upload_max_filesize to minimum 16M'),
+                        'fopen' => $this->l('Cannot open external URLs (requires allow_url_fopen as On).'),
                     )
                 ),
                 array(
@@ -132,7 +133,6 @@ class InstallControllerHttpSystem extends InstallControllerHttp
                     'success' => $this->tests['optional']['success'],
                     'checks' => array(
                         'new_phpversion' => sprintf($this->l('You are using PHP %s version. Soon, the latest PHP version supported by Qloapps will be PHP 5.4. To make sure you’re ready for the future, we recommend you to upgrade to PHP 5.4 now!'), phpversion()),
-                        'fopen' => $this->l('Cannot open external URLs'),
                         'register_globals' => $this->l('PHP register_globals option is enabled'),
                         'gz' => $this->l('GZIP compression is not activated'),
                         'mcrypt' => $this->l('Mcrypt extension is not enabled'),

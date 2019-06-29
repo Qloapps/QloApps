@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2015 PrestaShop
+* 2007-2018 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2018 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -43,29 +43,115 @@ class RijndaelCore
      */
     public function encrypt($plaintext)
     {
-        $length = (ini_get('mbstring.func_overload') & 2) ? mb_strlen($plaintext, ini_get('default_charset')) : strlen($plaintext);
-
-        if ($length >= 1048576) {
+        if (strlen($plaintext) >= 1048576) {
             return false;
         }
-        return base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_128, $this->_key, $plaintext, MCRYPT_MODE_ECB, $this->_iv)).sprintf('%06d', $length);
+
+        $cipherText = null;
+        if (function_exists('openssl_encrypt') && version_compare(phpversion(), '5.3.3', '>=')) {
+            $cipherText = openssl_encrypt($plaintext, 'AES-128-CBC', $this->_key, OPENSSL_RAW_DATA, $this->_iv);
+        } elseif (function_exists('mcrypt_encrypt')) {
+            $ivSize = mcrypt_get_iv_size(MCRYPT_RIJNDAEL_128, MCRYPT_MODE_CBC);
+            $iv = mcrypt_create_iv($ivSize, MCRYPT_RAND);
+            $blockSize = mcrypt_get_block_size(MCRYPT_RIJNDAEL_128, MCRYPT_MODE_CBC);
+            $pad = $blockSize - (strlen($plaintext) % $blockSize);
+
+            $cipherText = mcrypt_encrypt(
+                MCRYPT_RIJNDAEL_128,
+                $this->_key,
+                $plaintext . str_repeat(chr($pad), $pad),
+                MCRYPT_MODE_CBC,
+                $iv
+            );
+            $cipherText = $iv.$cipherText;
+        } else {
+            throw new RuntimeException('Either Mcrypt or OpenSSL extension is required to run Prestashop');
+        }
+
+        return $this->generateHmac($cipherText) . ':' . base64_encode($cipherText);
     }
 
-    public function decrypt($ciphertext)
+    public function decrypt($cipherText)
     {
-        if (ini_get('mbstring.func_overload') & 2) {
-            $length = intval(mb_substr($ciphertext, -6, 6, ini_get('default_charset')));
-            $ciphertext = mb_substr($ciphertext, 0, -6, ini_get('default_charset'));
-            return mb_substr(
-                mcrypt_decrypt(MCRYPT_RIJNDAEL_128, $this->_key, base64_decode($ciphertext), MCRYPT_MODE_ECB, $this->_iv),
-                0,
-                $length,
-                ini_get('default_charset')
-            );
-        } else {
-            $length = intval(substr($ciphertext, -6));
-            $ciphertext = substr($ciphertext, 0, -6);
-            return substr(mcrypt_decrypt(MCRYPT_RIJNDAEL_128, $this->_key, base64_decode($ciphertext), MCRYPT_MODE_ECB, $this->_iv), 0, $length);
+        $data = explode(':', $cipherText);
+        if (count($data) != 2) {
+            return false;
         }
+
+        list($hmac, $encrypted) = $data;
+
+        $encrypted = base64_decode($encrypted);
+        $newHmac = $this->generateHmac($encrypted);
+        if ($hmac !== $newHmac) {
+            return false;
+        }
+
+        $output = null;
+        if (function_exists('openssl_decrypt') && version_compare(phpversion(), '5.3.3', '>=')) {
+            $output = openssl_decrypt($encrypted, 'AES-128-CBC', $this->_key, OPENSSL_RAW_DATA, $this->_iv);
+        } elseif (function_exists('mcrypt_decrypt')) {
+            $ivSize = mcrypt_get_iv_size(MCRYPT_RIJNDAEL_128, MCRYPT_MODE_CBC);
+            $ivDec = substr($encrypted, 0, $ivSize);
+            $encrypted = substr($encrypted, $ivSize);
+            $output = mcrypt_decrypt(
+                MCRYPT_RIJNDAEL_128,
+                $this->_key,
+                $encrypted,
+                MCRYPT_MODE_CBC,
+                $ivDec
+            );
+            $pad = ord($output[strlen($output) - 1]);
+            $output = substr($output, 0, -$pad);
+        } else {
+            throw new RuntimeException('Either Mcrypt or OpenSSL extension is required to run Prestashop');
+        }
+
+        return $output;
+    }
+
+    /**
+     * Generate Hmac
+     *
+     * @param string $encrypted
+     *
+     * @return string
+     */
+    protected function generateHmac($encrypted)
+    {
+        $macKey = $this->generateKeygenS2k('sha256', $this->_key, $this->_iv, 32);
+        return hash_hmac(
+            'sha256',
+            $this->_iv . MCRYPT_RIJNDAEL_128 . $encrypted,
+            $macKey
+        );
+    }
+
+    /**
+     * Alternative to mhash_keygen_s2k for security reason
+     * and php compatibilities.
+     *
+     * @param string  $hash
+     * @param string  $password
+     * @param string  $salt
+     * @param integer $bytes
+     *
+     * @return string
+     */
+    protected function generateKeygenS2k($hash, $password, $salt, $bytes)
+    {
+        $result = '';
+        foreach (range(0, ceil($bytes / strlen(hash($hash, null, true))) - 1) as $i) {
+            $result .= hash(
+                $hash,
+                str_repeat("\0", $i) . str_pad(substr($salt, 0, 8), 8, "\0", STR_PAD_RIGHT) . $password,
+                true
+            );
+        }
+
+        return substr(
+            $result,
+            0,
+            intval($bytes)
+        );
     }
 }

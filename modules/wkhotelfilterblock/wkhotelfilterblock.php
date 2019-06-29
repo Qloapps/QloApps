@@ -31,7 +31,7 @@ class wkhotelfilterblock extends Module
         $this->name = 'wkhotelfilterblock';
         $this->author = 'webkul';
         $this->tab = 'front_office_features';
-        $this->version = '1.0.1';
+        $this->version = '1.0.2';
         $this->context = Context::getContext();
 
         $this->bootstrap = true;
@@ -107,6 +107,8 @@ class wkhotelfilterblock extends Module
     public function hookDisplayLeftColumn()
     {
         if ($this->context->controller->php_self == 'category') {
+            Media::addJsDef(array('noRoomAvailTxt' => $this->l('No room available')));
+
             $this->context->controller->addJS(_PS_MODULE_DIR_.$this->name.'/views/js/wkhotelfilterblock.js');
             $this->context->controller->addCSS(_PS_MODULE_DIR_.$this->name.'/views/css/wkhotelfilterblock.css');
             $id_lang = $this->context->language->id;

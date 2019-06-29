@@ -52,6 +52,7 @@
 }
 
 .menu_cont_left {
+  overflow-y: scroll;
   transform: translate(0px);
   transition: all 0.3s ease-out 0s
 }

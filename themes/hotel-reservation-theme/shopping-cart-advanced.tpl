@@ -1,5 +1,5 @@
 {*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -18,7 +18,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
@@ -58,7 +58,7 @@
             {assign var='rowspan_total' value=$rowspan_total+1}
         {/if}
 
-        {if $total_shipping_tax_exc <= 0 && !isset($virtualCart)}
+        {if $total_shipping_tax_exc <= 0 && (!isset($isVirtualCart) || !$isVirtualCart) && $free_ship}
             {assign var='rowspan_total' value=$rowspan_total+1}
         {else}
             {if $use_taxes && $total_shipping_tax_exc != $total_shipping}
@@ -77,13 +77,6 @@
                 <tr class="cart_total_price">
                     <td rowspan="{$rowspan_total}" colspan="3" id="cart_voucher" class="cart_voucher">
                         {if $voucherAllowed}
-                            {if isset($errors_discount) && $errors_discount}
-                                <ul class="alert alert-danger">
-                                    {foreach $errors_discount as $k=>$error}
-                                        <li>{$error|escape:'html':'UTF-8'}</li>
-                                    {/foreach}
-                                </ul>
-                            {/if}
                             <form action="{if $opc}{$link->getPageLink('order-opc', true)}{else}{$link->getPageLink('order', true)}{/if}" method="post" id="voucher">
                                 <fieldset>
                                     <h4>{l s='Vouchers'}</h4>
@@ -109,13 +102,6 @@
                 <tr class="cart_total_price">
                     <td rowspan="{$rowspan_total}" colspan="2" id="cart_voucher" class="cart_voucher">
                         {if $voucherAllowed}
-                            {if isset($errors_discount) && $errors_discount}
-                                <ul class="alert alert-danger">
-                                    {foreach $errors_discount as $k=>$error}
-                                        <li>{$error|escape:'html':'UTF-8'}</li>
-                                    {/foreach}
-                                </ul>
-                            {/if}
                             <form action="{if $opc}{$link->getPageLink('order-opc', true)}{else}{$link->getPageLink('order', true)}{/if}" method="post" id="voucher">
                                 <fieldset>
                                     <h4>{l s='Vouchers'}</h4>
@@ -142,13 +128,6 @@
             <tr class="cart_total_price">
                 <td rowspan="{$rowspan_total}" colspan="2" id="cart_voucher" class="cart_voucher">
                     {if $voucherAllowed}
-                        {if isset($errors_discount) && $errors_discount}
-                            <ul class="alert alert-danger">
-                                {foreach $errors_discount as $k=>$error}
-                                    <li>{$error|escape:'html':'UTF-8'}</li>
-                                {/foreach}
-                            </ul>
-                        {/if}
                         <form action="{if $opc}{$link->getPageLink('order-opc', true)}{else}{$link->getPageLink('order', true)}{/if}" method="post" id="voucher">
                             <fieldset>
                                 <h4>{l s='Vouchers'}</h4>
@@ -193,10 +172,10 @@
                 {/if}
             </td>
         </tr>
-        {if $total_shipping_tax_exc <= 0 && !isset($virtualCart)}
+        {if $total_shipping_tax_exc <= 0 && (!isset($isVirtualCart) || !$isVirtualCart)}
             <tr class="cart_total_delivery{if !$opc && (!isset($cart->id_address_delivery) || !$cart->id_address_delivery)} unvisible{/if}">
                 <td colspan="{$col_span_subtotal}" class="text-right">{l s='Total shipping'}</td>
-                <td colspan="2" class="price" id="total_shipping">{l s='Free Shipping!'}</td>
+                <td colspan="2" class="price" id="total_shipping">{l s='Free shipping!'}</td>
             </tr>
         {else}
             {if $use_taxes && $total_shipping_tax_exc != $total_shipping}
@@ -254,7 +233,7 @@
         <tr class="cart_total_price">
             <td colspan="{$col_span_subtotal}" class="total_price_container text-right">
                 <span>{l s='Total'}</span>
-                <div id="hookDisplayProductPriceBlock-price">
+                <div class="hookDisplayProductPriceBlock-price">
                     {hook h="displayCartTotalPriceLabel"}
                 </div>
             </td>
@@ -283,7 +262,7 @@
             {assign var='odd' value=($odd+1)%2}
             {assign var='ignoreProductLast' value=isset($customizedDatas.$productId.$productAttributeId) || count($gift_products)}
             {* Display the product line *}
-            {include file="$tpl_dir./shopping-cart-product-line.tpl" productLast=$product@last productFirst=$product@first noDeleteButton=1 cannotModify=1}
+            {include file="$tpl_dir./shopping-cart-product-line.tpl" productLast=$product@last productFirst=$product@first noDeleteButton=0 cannotModify=0}
             {* Then the customized datas ones*}
             {if isset($customizedDatas.$productId.$productAttributeId)}
                 {foreach $customizedDatas.$productId.$productAttributeId[$product.id_address_delivery] as $id_customization=>$customization}
@@ -328,7 +307,7 @@
                 {/foreach}
 
                 {* If it exists also some uncustomized products *}
-                {if $product.quantity-$quantityDisplayed > 0}{include file="$tpl_dir./shopping-cart-product-line.tpl" productLast=$product@last productFirst=$product@first noDeleteButton=1 cannotModify=1}{/if}
+                {if $product.quantity-$quantityDisplayed > 0}{include file="$tpl_dir./shopping-cart-product-line.tpl" productLast=$product@last productFirst=$product@first noDeleteButton=0 cannotModify=0}{/if}
             {/if}
         {/foreach}
         {assign var='last_was_odd' value=$product@iteration%2}
@@ -340,7 +319,7 @@
             {assign var='ignoreProductLast' value=isset($customizedDatas.$productId.$productAttributeId)}
             {assign var='cannotModify' value=1}
             {* Display the gift product line *}
-            {include file="$tpl_dir./shopping-cart-product-line.tpl" productLast=$product@last productFirst=$product@first noDeleteButton=1 cannotModify=1}
+            {include file="$tpl_dir./shopping-cart-product-line.tpl" productLast=$product@last productFirst=$product@first noDeleteButton=0 cannotModify=0}
         {/foreach}
         </tbody>
         {if sizeof($discounts)}
@@ -392,3 +371,7 @@
     </a>
     <button data-show-if-js="" style="" id="confirmOrder" type="button" class="button btn btn-default standard-checkout button-medium"><span>{l s='Order With Obligation To Pay'}</span></button>
 </p>
+
+{strip}
+{addJsDef deliveryAddress=$cart->id_address_delivery|intval}
+{/strip}

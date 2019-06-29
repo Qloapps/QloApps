@@ -1,5 +1,5 @@
 {*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -18,7 +18,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
@@ -73,15 +73,14 @@
 			</div>
 		</div>
 		<script type="text/javascript">
-			var id_product = {if isset($product->id)}{$product->id}{else}0{/if};
-			var id_lang_default = {$id_lang_default};
-			var product_type_pack = {Product::PTYPE_PACK};
-			var product_type_virtual = {Product::PTYPE_VIRTUAL};
-			var product_type_simple = {Product::PTYPE_SIMPLE};
+			var id_product = {if isset($product->id)}{$product->id|intval}{else}0{/if};
+			var id_lang_default = {$id_lang_default|intval};
+			var product_type_pack = {Product::PTYPE_PACK|intval};
+			var product_type_virtual = {Product::PTYPE_VIRTUAL|intval};
+			var product_type_simple = {Product::PTYPE_SIMPLE|intval};
 
-			var has_combinations = {$has_combinations};
+			var has_combinations = {$has_combinations|intval};
 
-			var toload = new Array();
 			var empty_pack_msg = '{l s='This pack is empty. You will need to add at least one product to the pack before you can save.' js=1}';
 			var empty_name_msg = '{l s='The product name is empty. You will at least need to enter a name for the default language before you can save the product.' js=1}';
 			var empty_link_rewrite_msg = '{l s='The friendly URL is empty. You will at least need to enter a friendly URL for the default language before you can save the product.' slashes=1}';
@@ -102,7 +101,6 @@
 				var display_multishop_checkboxes = false;
 			{/if}
 
-			var tabs_preloaded = new Array();
 			var tabs_to_preload = new Array();
 			var mod_evasive = {if isset($mod_evasive) && $mod_evasive}true{else}false{/if};
 			var mod_security = {if isset($mod_security) && $mod_security}true{else}false{/if};
@@ -224,8 +222,7 @@
 							tabs_to_preload.push('{$tab_name}');
 					{/if}
 				{/foreach}
-
-				// Recursively load tabs starting with the first element of stack
+				tabs_manager.tabs_to_preload = tabs_to_preload.slice(0);
 				tabs_manager.displayBulk(tabs_to_preload);
 				$('.productTabs').show();
 				$('#product-tab-content-wait').hide();
@@ -252,9 +249,6 @@
 							required: ""
 						}
 					},
-					{*submitHandler: function(form) {
-						form.submit();
-					},*}
 					// override jquery validate plugin defaults for bootstrap 3
 					highlight: function(element) {
 						$(element).closest('.form-group').addClass('has-error');

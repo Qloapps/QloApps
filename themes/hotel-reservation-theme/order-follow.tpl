@@ -1,5 +1,5 @@
 {*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -18,7 +18,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
@@ -68,7 +68,7 @@
 	        </button>
 	   	</p>
 	</form>
-	
+
 {/if}
 {if isset($errorDetail1) && $errorDetail1}
 	<p class="alert alert-danger">
@@ -105,15 +105,15 @@
 			{foreach from=$ordersReturn item=return name=myLoop}
 				<tr class="{if $smarty.foreach.myLoop.first}first_item{elseif $smarty.foreach.myLoop.last}last_item{else}item{/if} {if $smarty.foreach.myLoop.index % 2}alternate_item{/if}">
 					<td class="bold">
-						<a 
-						class="color-myaccount" 
+						<a
+						class="color-myaccount"
 						href="javascript:showOrder(0, {$return.id_order_return|intval}, '{$link->getPageLink('order-return', true)|escape:'html':'UTF-8'}');">
 							{l s='#'}{$return.id_order_return|string_format:"%06d"}
 						</a>
 					</td>
 					<td class="history_method">
-						<a 
-						class="color-myaccount" 
+						<a
+						class="color-myaccount"
 						href="javascript:showOrder(1, {$return.id_order|intval}, '{$link->getPageLink('order-detail', true)|escape:'html':'UTF-8'}');">
 							{$return.reference}
 						</a>
@@ -154,7 +154,7 @@
 		</a>
 	</li>
 	<li>
-		<a class="btn btn-default button button-small" href="{$base_dir}">
+		<a class="btn btn-default button button-small" href="{if isset($force_ssl) && $force_ssl}{$base_dir_ssl}{else}{$base_dir}{/if}">
 			<span>
 				<i class="icon-chevron-left"></i> {l s='Home'}
 			</span>

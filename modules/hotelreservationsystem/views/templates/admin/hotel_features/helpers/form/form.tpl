@@ -47,7 +47,7 @@
 				<div class="form-group row">
 					<label class="col-sm-3 control-label" >
 						{l s='Parent Feature Name' mod='hotelreservationsystem'}
-						{include file="../../../_partials/mp-form-fields-flag.tpl"}
+						{include file="../../../_partials/htl-form-fields-flag.tpl"}
 					</label>
 					<div class="col-sm-4">
 						{if isset($edit)}
@@ -75,7 +75,7 @@
 				<div class="form-group row">
 					<label class="col-sm-3 control-label">
 						{l s='Child Features' mod='hotelreservationsystem'}
-						{include file="../../../_partials/mp-form-fields-flag.tpl"}
+						{include file="../../../_partials/htl-form-fields-flag.tpl"}
 					</label>
 					<div class="col-sm-4">
 						<input type="text" placeholder="Enter child feature name" class="child_ftr_name" name="child_ftr_name">

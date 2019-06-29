@@ -1,4 +1,13 @@
 -----------------------------
+# V1.6.1 to V1.6.2
+-----------------------------
+
+## Improved/Changed Features:
+
+* [FO] : Improved rooms removal process from the cart from front end.
+
+
+-----------------------------
 # V1.6.0 to V1.6.1
 -----------------------------
 

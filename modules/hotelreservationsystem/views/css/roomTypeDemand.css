@@ -1,0 +1,42 @@
+/**
+* 2010-2019 Webkul.
+*
+* NOTICE OF LICENSE
+*
+* All right is reserved,
+* Please go through this link for complete license : https://store.webkul.com/license.html
+*
+* DISCLAIMER
+*
+* Do not edit or add to this file if you wish to upgrade this module to newer
+* versions in the future. If you wish to customize this module for your
+* needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
+*
+*  @author    Webkul IN <support@webkul.com>
+*  @copyright 2010-2019 Webkul IN
+*  @license   https://store.webkul.com/license.html
+*/
+
+/*----- Accordion -----*/
+.accordion, .accordion * {
+    -webkit-box-sizing:border-box;
+    -moz-box-sizing:border-box;
+    box-sizing:border-box;
+}
+.accordion {
+    overflow:hidden;
+    border-bottom: 1px solid #CCCCCC;
+}
+.accordion-section-title {
+    width:100%;
+    padding:15px;
+    display:inline-block;
+    transition:all linear 0.15s;
+    color:#252525 !important;
+    text-decoration:none !important;
+}
+.accordion-section-content {
+    display:none;
+    border-top: 1px solid #eee;
+    padding-top: 15px;
+}

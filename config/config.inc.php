@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2017 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -199,6 +199,10 @@ if (!isset($language) || !Validate::isLoadedObject($language)) {
 }
 $context->language = $language;
 
+/* Get smarty */
+require_once($currentDir.'/smarty.config.inc.php');
+$context->smarty = $smarty;
+
 if (!defined('_PS_ADMIN_DIR_')) {
     if (isset($cookie->id_customer) && (int)$cookie->id_customer) {
         $customer = new Customer($cookie->id_customer);
@@ -259,7 +263,3 @@ if (!defined('_MEDIA_SERVER_2_')) {
 if (!defined('_MEDIA_SERVER_3_')) {
     define('_MEDIA_SERVER_3_', Configuration::get('PS_MEDIA_SERVER_3'));
 }
-
-/* Get smarty */
-require_once($currentDir.'/smarty.config.inc.php');
-$context->smarty = $smarty;

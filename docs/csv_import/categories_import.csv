@@ -1,4 +1,4 @@
-ID;Active (0/1);Name *;Parent category;Root category (0/1);Description;Meta title;Meta keywords;Meta description;URL rewritten;Image URL
+Category ID;Active (0/1);Name *;Parent category;Root category (0/1);Description;Meta title;Meta keywords;Meta description;URL rewritten;Image URL
 10;1;iPods;Home;0;Now that you can buy movies from the iTunes Store and sync them to your iPod, the whole world is your theater.;Meta title-iPods;Meta keywords-iPods;Meta description-iPods;music-ipods;http://yourlinktotheimage.com/img1000.jpg
 11;1;Accessories;Home;0;Wonderful accessories for your iPod;Meta title-Accessories;Meta keywords-Accessories;Meta description-Accessories;accessories-ipod;http://yourlinktotheimage.com/img1001.jpg
 12;1;Laptops;Home;0;The latest Intel processor, a bigger hard drive, plenty of memory, and even more new features all fit inside just one liberating inch. The new Mac laptops have the performance, power, and connectivity of a desktop computer. Without the desk part.;Meta title-Laptops;Meta keywords-Laptops;Meta description-Laptops;laptops;http://yourlinktotheimage.com/img1002.jpg

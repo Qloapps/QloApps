@@ -3,7 +3,7 @@
 	<div class="alert alert-info">
 		{l s='Sometimes one customer can fit into multiple Feature price rules. In this case priorities allow you to define which rule applies to the Room Type.' mod='hotelreservationsystem'}
 	</div>
-	<form id="{$table|escape:'htmlall':'UTF-8'}_form" class="defaultForm {$name_controller|escape:'htmlall':'UTF-8'} form-horizontal" action="{$current|escape:'htmlall':'UTF-8'}&{if !empty($submit_action)}{$submit_action|escape:'htmlall':'UTF-8'}{/if}&token={$token|escape:'htmlall':'UTF-8'}" method="post" enctype="multipart/form-data" {if isset($style)}style="{$style|escape:'htmlall':'UTF-8'}"{/if}>
+	<form id="{$table|escape:'htmlall':'UTF-8'}_form" class="defaultForm form-horizontal" action="{$current|escape:'htmlall':'UTF-8'}&{if !empty($submit_action)}{$submit_action|escape:'htmlall':'UTF-8'}{/if}&token={$token|escape:'htmlall':'UTF-8'}" method="post" enctype="multipart/form-data" {if isset($style)}style="{$style|escape:'htmlall':'UTF-8'}"{/if}>
 		<div class="form-group">
 			<label class="control-label col-lg-3" for="featurePricePriority">{l s='Feature Price Calculation Priorities' mod='hotelreservationsystem'} :: </label>
 			<div class="input-group col-lg-9">
