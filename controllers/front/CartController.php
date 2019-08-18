@@ -278,6 +278,9 @@ class CartControllerCore extends FrontController
 
             $obj_booking_detail = new HotelBookingDetail();
             $num_days = $obj_booking_detail->getNumberOfDays($date_from, $date_to);
+	
+	    $num_days = ((int) $num_days == 0) ? 1 : (int) $num_days;
+	    $this->qty = ($this->qty == 0) ? 1 : $this->qty;
 
             $req_rm = $this->qty;
             $this->qty = $this->qty * (int) $num_days;
