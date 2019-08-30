@@ -608,7 +608,7 @@ class HotelBookingDetail extends ObjectModel
     {
         $startDate = new DateTime($dateFrom);
         $endDate = new DateTime($dateTo);
-        $daysDifference = $startDate->diff($endDate)->days;
+        $daysDifference = ($startDate==$endDate) ? 1 : $startDate->diff($endDate)->days;
         /* $startTimeStamp = strtotime($dateFrom);
         $endTimeStamp = strtotime($dateTo);
 
