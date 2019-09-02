@@ -269,41 +269,56 @@ class CartControllerCore extends FrontController
         $id_cart = $this->context->cart->id;
         $id_guest = $this->context->cart->id_guest;
 
-        /*
-        *   By Webkul
-        *   This code is to check available quantity of Room before adding it to cart.
-        */
+        // By Webkul : This code is to check available quantity of Room before adding it to cart.
         if (Module::isInstalled('hotelreservationsystem') && Module::isEnabled('hotelreservationsystem')) {
             require_once _PS_MODULE_DIR_.'hotelreservationsystem/define.php';
-
-            $obj_booking_detail = new HotelBookingDetail();
-            $num_days = $obj_booking_detail->getNumberOfDays($date_from, $date_to);
-
-            $req_rm = $this->qty;
-            $this->qty = $this->qty * (int) $num_days;
-            $obj_room_type = new HotelRoomType();
-            $room_info_by_id_product = $obj_room_type->getRoomTypeInfoByIdProduct($this->id_product);
-
-            if ($room_info_by_id_product) {
-                $id_hotel = $room_info_by_id_product['id_hotel'];
-
-                if ($id_hotel) {
-                    /*Check Order restrict condition before adding in to cart*/
-                    $max_order_date = HotelOrderRestrictDate::getMaxOrderDate($id_hotel);
-                    if ($max_order_date) {
-                        $max_order_date = date('Y-m-d', strtotime($max_order_date));
-                        if ($max_order_date < $date_from || $max_order_date < $date_to) {
-                            $this->errors[] = Tools::displayError('You can\'t Book room after date '.$max_order_date);
+            $objRoomType = new HotelRoomType();
+            if ($roomTypeInfo = $objRoomType->getRoomTypeInfoByIdProduct($this->id_product)) {
+                if ($id_hotel = $roomTypeInfo['id_hotel']) {
+                    if (strtotime($date_from) < strtotime(date('Y-m-d'))) {
+                        $this->errors[] = Tools::displayError('You can\'t book room before current date');
+                    } elseif (strtotime($date_from) >= strtotime($date_to)) {
+                        $this->errors[] = Tools::displayError('Check-out date must be after check-in date');
+                    } elseif ($maxOrdDate = HotelOrderRestrictDate::getMaxOrderDate($id_hotel)) {
+                        // Check Order restrict condition before adding in to cart
+                        if (strtotime($maxOrdDate) < strtotime($date_from)
+                            || strtotime($maxOrdDate) < strtotime($date_to)
+                        ) {
+                            $maxOrdDate = date('d-m-Y', strtotime($maxOrdDate));
+                            $this->errors[] = Tools::displayError('You can\'t book room after date '.$maxOrdDate);
                         }
                     }
-                    /*END*/
-                    $obj_booking_dtl = new HotelBookingDetail();
-                    $hotel_room_data = $obj_booking_dtl->DataForFrontSearch($date_from, $date_to, $id_hotel, $this->id_product, 1, 0, 0, -1, 0, 0, $id_cart, $id_guest);
-
-                    $total_available_rooms = $hotel_room_data['stats']['num_avail'];
-
-                    if ($total_available_rooms < $req_rm) {
-                        die(Tools::jsonEncode(array('status' => 'unavailable_quantity', 'avail_rooms' => $total_available_rooms)));
+                    if (!$this->errors) {
+                        $objBookingDtl = new HotelBookingDetail();
+                        $num_days = $objBookingDtl->getNumberOfDays($date_from, $date_to);
+                        $req_rm = $this->qty;
+                        $this->qty = $this->qty * (int) $num_days;
+                        $obj_booking_dtl = new HotelBookingDetail();
+                        if ($hotel_room_data = $obj_booking_dtl->DataForFrontSearch(
+                            $date_from,
+                            $date_to,
+                            $id_hotel,
+                            $this->id_product,
+                            1,
+                            0,
+                            0,
+                            -1,
+                            0,
+                            0,
+                            $id_cart,
+                            $id_guest
+                        )) {
+                            if (isset($hotel_room_data['stats']['num_avail'])) {
+                                $total_available_rooms = $hotel_room_data['stats']['num_avail'];
+                                if ($total_available_rooms < $req_rm) {
+                                    die(Tools::jsonEncode(array('status' => 'unavailable_quantity', 'avail_rooms' => $total_available_rooms)));
+                                }
+                            } else {
+                                $this->errors[] = Tools::displayError('Rooms are unavailable. Please try with different dates');
+                            }
+                        } else {
+                            $this->errors[] = Tools::displayError('Rooms are unavailable. Please try with different dates');
+                        }
                     }
                 } else {
                     die(Tools::jsonEncode(array('status' => 'failed3')));
