@@ -171,7 +171,7 @@ class AdminFeaturesControllerCore extends AdminController
         }
         $ps_img_url = _PS_IMG_DIR_.'rf/'.$obj->id.'.png';
         if ($img_exist = file_exists($ps_img_url)) {
-            $img_url = '../img/rf/'.$obj->id.'.png';
+            $img_url = _PS_IMG_.'rf/'.$obj->id.'.png';
             $image = "<img class='img-thumbnail img-responsive' style='max-width:100px' src='".$img_url."'>";
         }
 
