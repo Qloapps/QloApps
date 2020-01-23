@@ -9,5 +9,5 @@ damit diese Ihre Wunschliste {wishlist} sehen können: {wishlist}
 {message} [{message}]
 
 {shop_name} [{shop_url}] powered by
-Webkul(tm) [https://webkul.com/]
+Webkul(tm) [https://webkul.com]
 

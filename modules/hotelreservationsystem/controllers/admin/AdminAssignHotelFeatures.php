@@ -25,8 +25,16 @@ class AdminAssignHotelFeaturesController extends ModuleAdminController
         $this->bootstrap = true;
         $this->table = 'htl_branch_features';
         $this->className = 'HotelBranchFeatures';
-
         $this->identifier  = 'id';
+        $this->context = Context::getContext();
+
+        // START send access query information to the admin controller
+        $this->access_select = ' SELECT a.`id` FROM '._DB_PREFIX_.'htl_branch_features a';
+        $this->access_join = ' INNER JOIN '._DB_PREFIX_.'htl_branch_info hbi ON (hbi.id = a.id_hotel)';
+        if ($acsHtls = HotelBranchInformation::getProfileAccessedHotels($this->context->employee->id_profile, 1, 1)) {
+            $this->access_where = ' WHERE hbi.id IN ('.implode(',', $acsHtls).')';
+        }
+
         parent::__construct();
 
         $this->_join .= 'LEFT JOIN `'._DB_PREFIX_.'htl_branch_info` hi ON (hi.`id` = a.`id_hotel`)';
@@ -117,6 +125,13 @@ class AdminAssignHotelFeaturesController extends ModuleAdminController
             $featuresList = $objHotelFeatures->HotelAllCommonFeaturesArray();
             $objBranchInfo = new HotelBranchInformation();
             $unassignedFtrsHotels = $objBranchInfo->getUnassignedFeaturesHotelIds();
+            // filter hotels as per accessed hotels
+            $unassignedFtrsHotels = HotelBranchInformation::filterDataByHotelAccess(
+                $unassignedFtrsHotels,
+                $this->context->employee->id_profile,
+                1
+            );
+
             $smartyVars['hotels'] = $unassignedFtrsHotels;
             $smartyVars['features_list'] = $featuresList;
         } elseif ($this->display == 'edit') {

@@ -32,7 +32,7 @@ class WkHotelFeaturesBlock extends Module
     {
         $this->name = 'wkhotelfeaturesblock';
         $this->tab = 'front_office_features';
-        $this->version = '2.0.1';
+        $this->version = '2.0.2';
         $this->author = 'webkul';
         $this->bootstrap = true;
         parent::__construct();
@@ -48,7 +48,7 @@ class WkHotelFeaturesBlock extends Module
         $this->context->controller->addJS(_PS_MODULE_DIR_.$this->name.'/views/js/wkHotelFeaturesBlockFront.js');
 
         $objFeaturesData = new WkHotelFeaturesData();
-        $hotelAmenities = $objFeaturesData->getHotelAmenities();
+        $hotelAmenities = $objFeaturesData->getHotelAmenities(1);
 
         $HOTEL_AMENITIES_HEADING = Configuration::get('HOTEL_AMENITIES_HEADING', $this->context->language->id);
         $HOTEL_AMENITIES_DESCRIPTION = Configuration::get('HOTEL_AMENITIES_DESCRIPTION', $this->context->language->id);
@@ -68,13 +68,6 @@ class WkHotelFeaturesBlock extends Module
         $hrefFeaturesConf = $this->context->link->getAdminLink('AdminFeaturesModuleSetting');
         $this->context->smarty->assign('features_setting_link', $hrefFeaturesConf);
         return $this->display(__FILE__, 'hotelFeatureSettingLink.tpl');
-    }
-
-    public function hookDisplayDefaultNavigationHook()
-    {
-        if (Configuration::get('HOTEL_AMENITIES_BLOCK_NAV_LINK')) {
-            return $this->display(__FILE__, 'hotelFeatureNaviagtionMenu.tpl');
-        }
     }
 
     /**
@@ -162,7 +155,6 @@ class WkHotelFeaturesBlock extends Module
                 'displayHome',
                 'displayFooterExploreSectionHook',
                 'displayAddModuleSettingLink',
-                'displayDefaultNavigationHook',
                 'actionObjectLanguageAddAfter'
             )
         );

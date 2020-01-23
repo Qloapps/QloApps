@@ -9,5 +9,5 @@ Anda agar mereke dapat melihat daftar wishlist Anda: {wishlist}
 {message} [{message}]
 
 {shop_name} [{shop_url}] didukung oleh
-Webkul(tm) [https://webkul.com/]
+Webkul(tm) [https://webkul.com]
 

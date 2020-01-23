@@ -9,5 +9,5 @@ bestätigen Sie Ihre Anmeldung durch Klick auf den folgenden Link:
 {verif_url} [{verif_url}]
 
 {shop_name} [{shop_url}] powered by
-Webkul(tm) [https://webkul.com/]
+Webkul(tm) [https://webkul.com]
 

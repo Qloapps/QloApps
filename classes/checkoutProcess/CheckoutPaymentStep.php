@@ -27,7 +27,8 @@ class CheckoutPaymentStep extends AbstractCheckoutStep
 
     public function handleRequest()
     {
-        if ($this->context->cookie->__get('customer_details_proceeded')) {
+        if ($this->context->cookie->__get('customer_details_proceeded')) 
+        {
             $this->step_is_reachable = 1;
             $this->step_is_current = 1;
             $this->step_is_complete = 0;

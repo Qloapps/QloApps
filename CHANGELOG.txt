@@ -1,4 +1,51 @@
 ####################################
+# V1.4.1
+####################################
+
+## Added Features:
+
+[+] BO : Hotel wise employee permission management is added. now admin can give permission to his employees according to the specific hotel selections
+
+[+] BO : Additional facility : functionality is added at backoffice order creation process also.
+[+] BO : Additional facility : Tax can be applied on additional facilities.
+[+] BO : Additional facility : Per day price calculation option is added.[Price will be calculated on per day basis of the booking or for entire date range of the booking]
+[+] BO : Order Confirmation Email : Now admin can set to whom order confirmation email will be sent from Preferences -> orders tab.
+[+] CO : displayNavigationBottomHook hook added "hotelcommerce/modules/blockuserinfo/nav-xs.tpl".
+
+## Improved/changed features:
+
+[*] FO : Address details on Order details page is changed. Only details (name, email and mobile number) will be shown which we are showing to the customer at checkout page
+[*] FO : Address will not be shown to the customer while checkout process. edit link also removed from "Guest Information" section at checkout page.
+
+[*] BO : Option to delete one room in two default created rows in while saving rooms of the room type.
+[*] BO : unit price fields removed from backoffice room type creation page.
+
+[*] CO : blocknavigationmenu : Navigaion menu improved. All links are dynamic now.
+[*] CO : wkfooterexploreblock module is removed. All functionalities are merged with blocknavigationmenu module.
+[*] CO : Orders will be splitted now hotelwise. A new order will be created for each hotel.
+[*] CO : Trademark and powered by changed to webkul (from presatshop).
+[*] CO : Correct single quotes and double quotes of Class HotelBookingDetail.php
+[*] CO : Installed paypal module by prestashop by default while QloApps installation.
+[*] CO : Translations are improved.
+
+## Bug/Issues Resolved:
+
+[-] BO : Resolved : Room does not free even after room status set to checkout.
+[-] BO : Resolved : Infinite loop on Room type page while loading Booking Information tab.
+[-] BO : Resolved : Book now page showing error when current date is last date of the month.
+[-] BO : Resolved : Image is not showing while feature update (Catalog->features) and issue while updating feature.
+
+[-] CO : Resolved : As theme name was "hotel-theme". So on saving theme translations a new theme directory "hotel-theme" is created and translations are saved in this directory. now "hotel-theme" is replaced with "hotel-reservation-theme".
+[-] CO : Resolved : Feature price plans not working. [ Create two plans one for sunday and other for saturday. At the moment it's only showing the change/increase on Saturdays not Sundays. If I unable Saturdays it is showing the price change on Sundays and not Saturdays.
+[-] CO : Resolved : Order status is 'Payment Error' if payment is done by advance payment with real payment gateways.
+
+[-] FO : Resolved : blockcart and blocknavigationmenu modules swaps randomly at displayTop hook.
+[-] FO : Resolved : Disable dates of last room will be saved for all previous rooms while saving rooms of a room type.
+[-] FO : Resolved : Rooms are not visible when changing minimum price in filter by price.
+[-] FO : Resolved : Null quantity issue when check-in date and check-out dates are the same. When the date_from and the date_to passed in the URL parameter are identical they are accepted in the entries (Check-In Date & Check-out Date) on the room type detail page. Once we click on Book now pop up with "Null quantity" message appears.
+
+
+####################################
 # V1.4.0
 ####################################
 
@@ -134,7 +181,7 @@
 
 [-] CO : Resolved :: hotelreservationsystem - Parent:: replaced with parent:: in classes/hotelHotelBranchInformation.php which was creating problems in installation.
 
-[-] CO : Resolved :: RecursiveDirectoryIterator::__construct(/var/www/html/themes/hotel-theme/): failed to open dir While installation.
+[-] CO : Resolved :: RecursiveDirectoryIterator::__construct(/var/www/html/themes/hotel-reservation-theme/): failed to open dir While installation.
 
 [-] BO : Resolved :: hotelreservationsystem:: Hotel images not saved while saving hotel details.
 [-] BO : Resolved :: hotelreservationsystem - $max_phone_digit is undefined issue resolved on hotel creation form.

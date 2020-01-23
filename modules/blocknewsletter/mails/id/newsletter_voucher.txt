@@ -7,5 +7,5 @@ Karena telah berlangganan newsletter, kami dengan senang hati
 menawarkan voucher berikut: {discount}
 
 {shop_name} [{shop_url}] didukung oleh
-Webkul(tm) [https://webkul.com/]
+Webkul(tm) [https://webkul.com]
 

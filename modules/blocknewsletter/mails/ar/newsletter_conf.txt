@@ -1,10 +1,10 @@
 
-[/{shop_url}] 
+[/{shop_url}]
 
-مرحباً 
+مرحباً
 
-شكراً لإشتراكك في النشرة البريدية. 
+شكراً لإشتراكك في النشرة البريدية.
 
-{shop_name} [/{shop_url}] مدعوم من بريستاشوب(tm)
-[http://www.prestashop.com/] 
+{shop_name} [/{shop_url}] Webkul(tm)
+[https://webkul.com]
 

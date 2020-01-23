@@ -6,5 +6,5 @@ Hallo,
 VIELEN DANK FÜR IHRE ANMELDUNG ZU UNSEREM NEWSLETTER.
 
 {shop_name} [{shop_url}] powered by
-Webkul(tm) [https://webkul.com/]
+Webkul(tm) [https://webkul.com]
 

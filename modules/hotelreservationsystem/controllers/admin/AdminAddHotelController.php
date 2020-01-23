@@ -26,6 +26,14 @@ class AdminAddHotelController extends ModuleAdminController
         $this->table = 'htl_branch_info';
         $this->className = 'HotelBranchInformation';
         $this->identifier = 'id';
+        $this->context = Context::getContext();
+
+        // START send access query information to the admin controller
+        $this->access_select = ' SELECT a.`id` FROM '._DB_PREFIX_.'htl_branch_info a';
+        if ($acsHtls = HotelBranchInformation::getProfileAccessedHotels($this->context->employee->id_profile, 1, 1)) {
+            $this->access_where = ' WHERE a.id IN ('.implode(',', $acsHtls).')';
+        }
+
         parent::__construct();
 
         $this->_join .= 'LEFT JOIN `'._DB_PREFIX_.'htl_branch_info_lang` hbl
@@ -107,7 +115,7 @@ class AdminAddHotelController extends ModuleAdminController
         $smartyVars['languages'] = Language::getLanguages(false);
         $smartyVars['currentLang'] = Language::getLanguage((int) $currentLangId);
 
-        $countries = Country::getCountries($this->context->language->id);
+        $countries = Country::getCountries($this->context->language->id, true);
         $smartyVars['country_var'] = $countries;
 
         $country = $this->context->country;
@@ -127,7 +135,6 @@ class AdminAddHotelController extends ModuleAdminController
                 }
             }
             $smartyVars['edit'] =  1;
-            $smartyVars['country_var'] =  $countries;
             $smartyVars['state_var'] =  $states;
             $smartyVars['hotel_info'] =  $hotelBranchInfo;
             //Hotel Images
@@ -439,23 +446,16 @@ class AdminAddHotelController extends ModuleAdminController
 
     public function ajaxProcessStateByCountryId()
     {
-        $idCountry = Tools::getValue('id_country');
         $states = array();
-        $statesbycountry = State::getStatesByIdCountry($idCountry);
-        if ($statesbycountry) {
-            $states = array();
-            foreach ($statesbycountry as $key => $value) {
-                $states[$key]['id'] = $value['id_state'];
-                $states[$key]['name'] = $value['name'];
+        if ($idCountry = Tools::getValue('id_country')) {
+            if ($statesbycountry = State::getStatesByIdCountry($idCountry)) {
+                foreach ($statesbycountry as $key => $value) {
+                    $states[$key]['id'] = $value['id_state'];
+                    $states[$key]['name'] = $value['name'];
+                }
             }
-            if (isset($states)) {
-                die(Tools::jsonEncode($states));
-            } else {
-                die(Tools::jsonEncode($states));
-            }
-        } else {
-            die(Tools::jsonEncode($states));
         }
+        die(Tools::jsonEncode($states));
     }
 
     public function ajaxProcessUploadHotelImages()
@@ -517,30 +517,28 @@ class AdminAddHotelController extends ModuleAdminController
 
     public function ajaxProcessDeleteHotelImage()
     {
-        $idImage = Tools::getValue('id_image');
-        if ($idImage) {
-            $idHotel = Tools::getValue('id_hotel');
-            $objHtlImage = new HotelImage((int) $idImage);
-            if ($objHtlImage->delete()) {
-                if (!HotelImage::getCover($idHotel)) {
-                    $images = $objHtlImage->getAllImagesByHotelId($idHotel);
-                    if ($images) {
-                        $objHtlImage = new HotelImage($images[0]['id']);
-                        $objHtlImage->cover = 1;
-                        $objHtlImage->save();
+        if ($idImage = Tools::getValue('id_image')) {
+            if ($idHotel = Tools::getValue('id_hotel')) {
+                if (Validate::isLoadedObject($objHtlImage = new HotelImage((int) $idImage))) {
+                    $imgCode = $objHtlImage->hotel_image_id;
+                    if ($objHtlImage->delete()) {
+                        if (!HotelImage::getCover($idHotel)) {
+                            $images = $objHtlImage->getAllImagesByHotelId($idHotel);
+                            if ($images) {
+                                $objHtlImage = new HotelImage($images[0]['id']);
+                                $objHtlImage->cover = 1;
+                                $objHtlImage->save();
+                            }
+                        }
+                        if (file_exists(_PS_MODULE_DIR_.$this->module->name.'/views/img/hotel_img/'.$imgCode.'.jpg')) {
+                            @unlink(_PS_MODULE_DIR_.$this->module->name.'/views/img/hotel_img/'.$imgCode.'.jpg');
+                        }
+                        die(true);
                     }
                 }
-
-                if (file_exists(_PS_MODULE_DIR_.$this->module->name.'/views/img/hotel_img/'.$idImage.'.jpg')) {
-                    @unlink(_PS_MODULE_DIR_.$this->module->name.'/views/img/hotel_img/'.$idImage.'.jpg');
-                }
-                die(true);
-            } else {
-                die(false);
             }
-        } else {
-            die(false);
         }
+        die(false);
     }
 
     public function setMedia()

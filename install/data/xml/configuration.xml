@@ -323,6 +323,18 @@
 	<configuration id="PS_GUEST_CHECKOUT_ENABLED" name="PS_GUEST_CHECKOUT_ENABLED">
 		<value>0</value>
 	</configuration>
+	<configuration id="PS_ORDER_CONF_MAIL_TO_CUSTOMER" name="PS_ORDER_CONF_MAIL_TO_CUSTOMER">
+		<value>1</value>
+	</configuration>
+	<configuration id="PS_ORDER_CONF_MAIL_TO_SUPERADMIN" name="PS_ORDER_CONF_MAIL_TO_SUPERADMIN">
+		<value>1</value>
+	</configuration>
+	<configuration id="PS_ORDER_CONF_MAIL_TO_HOTEL_MANAGER" name="PS_ORDER_CONF_MAIL_TO_HOTEL_MANAGER">
+		<value>1</value>
+	</configuration>
+	<configuration id="PS_ORDER_CONF_MAIL_TO_EMPLOYEE" name="PS_ORDER_CONF_MAIL_TO_EMPLOYEE">
+		<value>1</value>
+	</configuration>
 	<configuration id="PS_DISPLAY_SUPPLIERS" name="PS_DISPLAY_SUPPLIERS">
 		<value>1</value>
 	</configuration>

@@ -82,8 +82,8 @@
 			</a>
 			{*By webkul To Check Order restrict condition before Payment by the customer*}
 			{if !isset($error_max_order_date)}
-                <button class="btn pull-right htl-reservation-form-btn-default" type="submit">
-                    <span>{l s='I confirm my order' mod='bankwire'}&nbsp;<i class="icon-chevron-right right"></i></span>
+                <button class="btn pull-right button button-medium" type="submit">
+                    <span>{l s='I confirm my order' mod='cheque'}&nbsp;<i class="icon-chevron-right right"></i></span>
                 </button>
             {/if}
 		</p>

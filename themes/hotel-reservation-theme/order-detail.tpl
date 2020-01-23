@@ -83,42 +83,21 @@
 
 <div class="adresses_bloc">
 	<div class="row">
-		{* <div class="col-xs-12 col-sm-6"{if $order->isVirtual()} style="display:none;"{/if}>
-			<ul class="address alternate_item box">
-				<li><h3 class="page-subheading">{l s='Delivery address'} ({$address_delivery->alias})</h3></li>
-				{foreach from=$dlv_adr_fields name=dlv_loop item=field_item}
-					{if $field_item eq "company" && isset($address_delivery->company)}<li class="address_company">{$address_delivery->company|escape:'html':'UTF-8'}</li>
-					{elseif $field_item eq "address2" && $address_delivery->address2}<li class="address_address2">{$address_delivery->address2|escape:'html':'UTF-8'}</li>
-					{elseif $field_item eq "phone_mobile" && $address_delivery->phone_mobile}<li class="address_phone_mobile">{$address_delivery->phone_mobile|escape:'html':'UTF-8'}</li>
-					{else}
-							{assign var=address_words value=" "|explode:$field_item}
-							<li>{foreach from=$address_words item=word_item name="word_loop"}{if !$smarty.foreach.word_loop.first} {/if}<span class="address_{$word_item|replace:',':''}">{$deliveryAddressFormatedValues[$word_item|replace:',':'']|escape:'html':'UTF-8'}</span>{/foreach}</li>
-					{/if}
-				{/foreach}
-			</ul>
-		</div> *}<!-- By webkul to hide delivery address of the product -->
 		<div class="col-xs-12 col-sm-12">
 			<ul class="address item {if $order->isVirtual()}full_width{/if} box">
-				<li><h3 class="page-subheading">{l s='Customer address'} ({$address_invoice->alias})</h3></li>
-				{foreach from=$inv_adr_fields name=inv_loop item=field_item}
-					{if $field_item eq "company" && isset($address_invoice->company)}
-						<li class="address_company">{$address_invoice->company|escape:'html':'UTF-8'}</li>
-					{elseif $field_item eq "address2" && $address_invoice->address2}
-						<li class="address_address2">{$address_invoice->address2|escape:'html':'UTF-8'}</li>
-					{elseif $field_item eq "phone_mobile" && $address_invoice->phone_mobile}
-						<li class="address_phone_mobile">{$address_invoice->phone_mobile|escape:'html':'UTF-8'}</li>
-					{else}
-						{assign var=address_words value=" "|explode:$field_item}
-						<li>
-							{foreach from=$address_words item=word_item name="word_loop"}
-								{if !$smarty.foreach.word_loop.first} {/if}
-								{if isset($invoiceAddressFormatedValues[$word_item|replace:',':''])}
-									<span class="address_{$word_item|replace:',':''}">{$invoiceAddressFormatedValues[$word_item|replace:',':'']|escape:'html':'UTF-8'}</span>
-								{/if}
-							{/foreach}
-						</li>
-					{/if}
-				{/foreach}
+				<li><h3 class="page-subheading">{l s='Customer Details'}</h3></li>
+				{if isset($address_invoice->firstname) && $address_invoice->firstname}
+					<li class="row"><div class="col-sm-3 col-md-2 col-xs-6">{l s='Name'}</div><div class="col-sm-9 col-xs-6">{$address_invoice->firstname|escape:'html':'UTF-8'} {$address_invoice->lastname|escape:'html':'UTF-8'}</div></li>
+				{/if}
+				{if isset($guestInformations['email']) && $guestInformations['email']}
+					<li class="row"><div class="col-sm-3 col-md-2 col-xs-6">{l s='Email'}</div><div class="col-sm-9 col-xs-6">{$guestInformations['email']|escape:'html':'UTF-8'}</div></li>
+				{/if}
+				{if isset($address_invoice->phone_mobile) && $address_invoice->phone_mobile}
+					<li class="row"><div class="col-sm-3 col-md-2 col-xs-6">{l s='Mobile Number'}</div><div class="col-sm-9 col-xs-6">{$address_invoice->phone_mobile|escape:'html':'UTF-8'}</div></li>
+				{/if}
+				{if isset($address_invoice->phone) && $address_invoice->phone}
+					<li class="row"><div class="col-sm-3 col-md-2 col-xs-6">{l s='Phone Number'}</div><div class="col-sm-9 col-xs-6">{$address_invoice->phone|escape:'html':'UTF-8'}</div></li>
+				{/if}
 			</ul>
 		</div>
 	</div>
@@ -201,17 +180,31 @@
 					<span class="price">{displayWtPriceWithCurrency price=$order->getTotalProductsWithTaxes() currency=$currency}</span>
 				</td>
 			</tr>
-			{if $total_demands_price > 0}
+			{if $total_demands_price_te}
+				{if $priceDisplay && $use_tax}
+					<tr class="item">
+						<td colspan={if !$is_guest
+							&& isset($order_has_invoice)
+							&& $order_has_invoice
+							&& ($order->payment != 'Free order' || (isset($order_adv_dtl) && $order_adv_dtl && $order_adv_dtl['total_paid_amount'] > 0))}"8"{else}"5"{/if}></td>
+						<td colspan="{if $return_allowed}3{else}3{/if}">
+							<strong>{l s='Additional facilities Cost (tax excl.)'}</strong>
+						</td>
+						<td colspan="{if $order->hasProductReturned()}5{else}1{/if}" class="text-right">
+							<span>{displayWtPriceWithCurrency price=$total_demands_price_te currency=$currency}</span>
+						</td>
+					</tr>
+				{/if}
 				<tr class="item">
 					<td colspan={if !$is_guest
 						&& isset($order_has_invoice)
 						&& $order_has_invoice
 						&& ($order->payment != 'Free order' || (isset($order_adv_dtl) && $order_adv_dtl && $order_adv_dtl['total_paid_amount'] > 0))}"8"{else}"5"{/if}></td>
 					<td colspan="{if $return_allowed}2{else}3{/if}">
-						<strong>{l s='Total Additional Facilities Cost'}</strong>
+						<strong>{l s='Additional facilities Cost (tax incl.)'}</strong>
 					</td>
 					<td colspan="{if $order->hasProductReturned()}5{else}1{/if}" class="text-right">
-						<span class="price">{displayWtPriceWithCurrency price=$total_demands_price currency=$currency}</span>
+						<span>{displayWtPriceWithCurrency price=$total_demands_price_ti currency=$currency convert=1}</span>
 					</td>
 				</tr>
 			{/if}
@@ -314,7 +307,13 @@
 											{l s='Additional Facilities'}
 										</a>
 									</p>
-									<p>{displayWtPriceWithCurrency price=$rm_v['extra_demands_price'] currency=$currency}</p>
+									<p>
+										{if $group_use_tax}
+											{displayWtPriceWithCurrency price=$rm_v['extra_demands_price_ti'] currency=$currency}
+										{else}
+											{displayWtPriceWithCurrency price=$rm_v['extra_demands_price_te'] currency=$currency}
+										{/if}
+									</p>
 								{/if}
 							</td>
 							<td>{$data_v['hotel_name']}</td>

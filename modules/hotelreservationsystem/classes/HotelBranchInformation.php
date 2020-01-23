@@ -92,6 +92,179 @@ class HotelBranchInformation extends ObjectModel
         parent::__construct($id, $id_lang, $id_shop);
     }
 
+    public function add($autodate = true, $null_values = false)
+    {
+        // Add tab
+        if (parent::add($autodate, $null_values)) {
+            // insert accesses of the hotel
+            return self::initAccess($this->id);
+        }
+        return false;
+    }
+
+    /** When creating a new hotel $idHotel, this add default rights to the table access
+     * @param int $idHotel
+     * @param Context $context
+     * @return bool true if succeed
+     */
+    protected function initAccess($idHotel, Context $context = null)
+    {
+        if (!$context) {
+            $context = Context::getContext();
+        }
+        if (!$context->employee || !$context->employee->id_profile) {
+            return false;
+        }
+        /* Profile selection */
+        $profiles = Db::getInstance()->executeS('SELECT `id_profile` FROM '._DB_PREFIX_.'profile WHERE `id_profile` != 1');
+        if (!$profiles || empty($profiles)) {
+            return true;
+        }
+        /* Query definition */
+        $query = 'REPLACE INTO `'._DB_PREFIX_.'htl_access` (`id_profile`, `id_hotel`, `access`)';
+        $query .= ' VALUES '.'(1, '.(int)$idHotel.', 1),';
+
+        foreach ($profiles as $profile) {
+            $access = ($profile['id_profile'] == $context->employee->id_profile) ? 1 : 0;
+            $query .= ' ('.(int)$profile['id_profile'].', '.(int)$idHotel.', '.(int)$access.'),';
+        }
+        $query = trim($query, ', ');
+        return Db::getInstance()->execute($query);
+    }
+
+    // Add profile hotel access while profile is added
+    public function addHotelsAccessToProfile($idProfile)
+    {
+        return Db::getInstance()->execute(
+            'INSERT INTO '._DB_PREFIX_.'htl_access (SELECT '.(int)$idProfile.', id, 0 FROM '
+            ._DB_PREFIX_.'htl_branch_info)'
+        );
+    }
+
+    // Add profile hotel access while profile is deleted
+    public function deleteProfileHotelsAccess($idProfile)
+    {
+        return Db::getInstance()->execute(
+            'DELETE FROM `'._DB_PREFIX_.'htl_access` WHERE `id_profile` = '.(int)$idProfile
+        );
+    }
+
+    /**
+     * get profile accessed hotels
+     * @param [type] $idProfile
+     * @param integer $access send 1 for allowed, 0 for not allowed and 2 form all
+     * @param integer $onlyhotelIds  send 1 if only hotel ids needed
+     * @return [hotelaccessInfo or id_hotel array]
+     */
+    public static function getProfileAccessedHotels($idProfile, $access = 2, $onlyhotelIds = 0)
+    {
+        $sql = 'SELECT `id_hotel` FROM `'._DB_PREFIX_.'htl_access` WHERE `id_profile` = '.(int)$idProfile;
+        if ($access != 2) {
+            $sql .= ' AND access = 1';
+        }
+        if ($hotelAccessInfo =  Db::getInstance()->executeS($sql)) {
+            if ($onlyhotelIds) {
+                $hotels = array();
+                foreach ($hotelAccessInfo as $hotel) {
+                    $hotels[] = $hotel['id_hotel'];
+                }
+                return $hotels;
+            }
+        }
+        return $hotelAccessInfo;
+    }
+
+    // Add profile hotel access while profile is deleted
+    public function getHotelAccess($idHotel)
+    {
+        return Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS(
+            'SELECT * FROM `'._DB_PREFIX_.'htl_access` WHERE `id_hotel` = '.(int)$idHotel
+        );
+    }
+
+    /**
+     * Filter associative array containing id_hotel or id prodcut as per the hotels access
+     * @param [array] $data : associative array containing id_hotel or id prodcut in its elements
+     * @param [int] $idProfile : id profile as pe which we have to filter data of hotel access
+     * @param [int] $idAsIdHotel : consider id key in the array as id_hotel
+     * @param [int] $idAsIdProduct : consider id key in the array as id_product
+     * @param [int] $addAccessKey : Dont unset but set a key which define the access by hotels
+     * @return [array or false]
+     */
+    public static function filterDataByHotelAccess(
+        $dataArray,
+        $idProfile,
+        $idAsIdHotel = 0,
+        $idAsIdProduct = 0,
+        $addAccessKey = 0
+    ) {
+        if ($hotelAccessInfo =  Db::getInstance()->executeS(
+            'SELECT `id_hotel` FROM `'._DB_PREFIX_.'htl_access` WHERE  access = 1 AND `id_profile` = '.(int)$idProfile
+        )) {
+            $hotels = array();
+            foreach ($hotelAccessInfo as $hotel) {
+                $hotels[] = $hotel['id_hotel'];
+            }
+            if ($hotels) {
+                foreach ($dataArray as $key => $row) {
+                    if (isset($row['id_hotel'])) {
+                        if ($addAccessKey) {
+                            $dataArray[$key]['htl_access'] = 0;
+                            if (in_array($row['id_hotel'], $hotels)) {
+                                $dataArray[$key]['htl_access'] = 1;
+                            }
+                        } else {
+                            if (!in_array($row['id_hotel'], $hotels)) {
+                                unset($dataArray[$key]);
+                            }
+                        }
+                    } elseif ($idAsIdHotel && isset($row['id'])) {
+                        if ($addAccessKey) {
+                            $dataArray[$key]['htl_access'] = 0;
+                            if (in_array($row['id'], $hotels)) {
+                                $dataArray[$key]['htl_access'] = 1;
+                            }
+                        } else {
+                            if (!in_array($row['id'], $hotels)) {
+                                unset($dataArray[$key]);
+                            }
+                        }
+                    } elseif ($idAsIdProduct && isset($row['id'])) {
+                        $objRoomType = new HotelRoomType();
+                        if ($roomTypeInfo = $objRoomType->getRoomTypeInfoByIdProduct($row['id'])) {
+                            if ($addAccessKey) {
+                                $dataArray[$key]['htl_access'] = 0;
+                                if (in_array($roomTypeInfo['id_hotel'], $hotels)) {
+                                    $dataArray[$key]['htl_access'] = 1;
+                                }
+                            } else {
+                                if (!in_array($roomTypeInfo['id_hotel'], $hotels)) {
+                                    unset($dataArray[$key]);
+                                }
+                            }
+                        }
+                    } elseif (isset($row['id_product'])) {
+                        $objRoomType = new HotelRoomType();
+                        if ($roomTypeInfo = $objRoomType->getRoomTypeInfoByIdProduct($row['id_product'])) {
+                            if ($addAccessKey) {
+                                $dataArray[$key]['htl_access'] = 0;
+                                if (in_array($roomTypeInfo['id_hotel'], $hotels)) {
+                                    $dataArray[$key]['htl_access'] = 1;
+                                }
+                            } else {
+                                if (!in_array($roomTypeInfo['id_hotel'], $hotels)) {
+                                    unset($dataArray[$key]);
+                                }
+                            }
+                        }
+                    }
+                }
+                return $dataArray;
+            }
+        }
+        return array();
+    }
+
     // Web Services Code
     public function getWsDefaultCurrencyCode()
     {
@@ -348,30 +521,6 @@ class HotelBranchInformation extends ObjectModel
         if (!$parent_cat) {
             $parent_cat = Category::getRootCategory()->id;
         }
-        // if ($ishotel && $idHotel) {
-        //     if ($catIdHotel = Db::getInstance()->getValue(
-        //         'SELECT `id_category` FROM `'._DB_PREFIX_.'htl_branch_info` WHERE id = '.(int)$idHotel
-        //     )) {
-        //         $category = new Category($catIdHotel);
-        //         foreach (Language::getLanguages(true) as $lang) {
-        //             if (is_array($name) && isset($name[$lang['id_lang']])) {
-        //                 $catName = $name[$lang['id_lang']];
-        //             } else {
-        //                 $catName = $name;
-        //             }
-        //             $category->name[$lang['id_lang']] = $catName;
-        //             $category->description[$lang['id_lang']] =  $this->moduleInstance->l(
-        //                 'Hotel Branch Category',
-        //                 'HotelBranchInformation'
-        //             );
-        //             $category->link_rewrite[$lang['id_lang']] = Tools::link_rewrite($catName);
-        //         }
-        //         $category->id_parent = $parent_cat;
-        //         $category->groupBox = $group_ids;
-        //         $category->save();
-        //         return $category->id;
-        //     }
-        // }
         if (is_array($name) && isset($name[Configuration::get('PS_LANG_DEFAULT')])) {
             $catName = $name[Configuration::get('PS_LANG_DEFAULT')];
         } else {
@@ -455,8 +604,11 @@ class HotelBranchInformation extends ObjectModel
             }
         }
         if (!count($contextController->errors)) {
-            if ($result = parent::delete()) {
-                return $result;
+            // delete accesses of the hotel
+            if (Db::getInstance()->execute('DELETE FROM '._DB_PREFIX_.'htl_access WHERE `id_hotel` = '.(int)$this->id)
+                && parent::delete()
+            ) {
+                return true;
             }
         } else {
             return false;

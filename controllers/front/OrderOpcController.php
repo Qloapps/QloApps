@@ -414,21 +414,18 @@ class OrderOpcControllerCore extends ParentOrderController
         $this->context->smarty->assign('checkout_process_steps', $this->checkoutProcess->getSteps());
 
         // set room type demands
+        $objCartBookingData = new HotelCartBookingData();
         $objGlobalDemand = new HotelRoomTypeGlobalDemand();
         $allDemands = $objGlobalDemand->getAllDemands();
         $objCurrency = new Currency(Configuration::get('PS_CURRENCY_DEFAULT'));
-        // get room type additional services
-        $objRoomDemand = new HotelRoomTypeDemand();
-        $this->context->smarty->assign(
-            array (
-                'allDemands' => $allDemands,
-                'defaultcurrencySign' => $objCurrency->sign,
-            )
-        );
-
-
+        $totalFacilityCostTI = $objCartBookingData->getCartExtraDemands($this->context->cart->id, 0, 0, 0, 0, 1, 0, 1);
+        $totalFacilityCostTE = $objCartBookingData->getCartExtraDemands($this->context->cart->id, 0, 0, 0, 0, 1, 0, 0);
         $this->context->smarty->assign(
             array(
+                'additional_facilities_tax' => ($totalFacilityCostTI - $totalFacilityCostTE),
+                'totalFacilityCostTE' => $totalFacilityCostTE,
+                'allDemands' => $allDemands,
+                'defaultcurrencySign' => $objCurrency->sign,
                 'THEME_DIR' => _THEME_DIR_,
                 'PS_CUSTOMER_ADDRESS_CREATION' => Configuration::get('PS_CUSTOMER_ADDRESS_CREATION'),
                 'free_shipping' => $free_shipping,
@@ -487,8 +484,8 @@ class OrderOpcControllerCore extends ParentOrderController
             $id_product = Tools::getValue('id_product');
             $date_from = Tools::getValue('date_from');
             $date_to = Tools::getValue('date_to');
-            $obj_cart_bk_data = new HotelCartBookingData();
-            if ($cart_data_dlt = $obj_cart_bk_data->deleteRoomDataFromOrderLine(
+            $objCartBookingData = new HotelCartBookingData();
+            if ($cart_data_dlt = $objCartBookingData->deleteRoomDataFromOrderLine(
                 $this->context->cart->id,
                 $this->context->cart->id_guest,
                 $id_product,
@@ -505,8 +502,6 @@ class OrderOpcControllerCore extends ParentOrderController
         } else {
             if (Module::isInstalled('hotelreservationsystem')) {
                 require_once _PS_MODULE_DIR_.'hotelreservationsystem/define.php';
-
-                $obj_cart_bk_data = new HotelCartBookingData();
                 $obj_htl_bk_dtl = new HotelBookingDetail();
                 $obj_rm_type = new HotelRoomType();
 
@@ -516,7 +511,7 @@ class OrderOpcControllerCore extends ParentOrderController
                     $cartChanged = false;
                     foreach ($htl_rm_types as $t_key => $t_value) {
                         $rm_dtl = $obj_rm_type->getRoomTypeInfoByIdProduct($t_value['id_product']);
-                        $cart_bk_data = $obj_cart_bk_data->getOnlyCartBookingData($this->context->cart->id, $this->context->cart->id_guest, $t_value['id_product']);
+                        $cart_bk_data = $objCartBookingData->getOnlyCartBookingData($this->context->cart->id, $this->context->cart->id_guest, $t_value['id_product']);
 
                         $cart_data = array();
                         foreach ($cart_bk_data as $cd_key => $cd_val) {
@@ -544,7 +539,7 @@ class OrderOpcControllerCore extends ParentOrderController
                                             'date_from' => $cl_val['date_from'],
                                             'date_to' => $cl_val['date_to'],
                                         );
-                                        $iscartdlt = $obj_cart_bk_data->deleteRowByCartBookingData($cartData);
+                                        $iscartdlt = $objCartBookingData->deleteRowByCartBookingData($cartData);
                                         if ($iscartdlt) {
                                             $nbDays = $obj_htl_bk_dtl->getNumberOfDays($cl_val['date_from'], $cl_val['date_to']);
                                             $this->context->cart->updateQty($nbDays, $t_value['id_product'], null, false, 'down');
@@ -624,18 +619,6 @@ class OrderOpcControllerCore extends ParentOrderController
                         $this->context->smarty->assign('adv_amount', $adv_amount);
                         $this->context->smarty->assign('advance_payment_active', $advance_payment_active);
                     }
-                }
-                // total price of extra demands in the cart
-                $objCartBookingData = new HotelCartBookingData();
-                if ($totalDemandsPrice = $objCartBookingData->getCartExtraDemands(
-                    $this->context->cart->id,
-                    0,
-                    0,
-                    0,
-                    0,
-                    1
-                )) {
-                    $this->context->smarty->assign('totalDemandsPrice', $totalDemandsPrice);
                 }
             }
             /*Check Order restrict condition before Payment by the customer*/

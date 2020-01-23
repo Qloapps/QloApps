@@ -272,7 +272,10 @@ class CategoryControllerCore extends FrontController
 
             $obj_booking_dtl = new HotelBookingDetail();
             $booking_data = $obj_booking_dtl->DataForFrontSearch($date_from, $date_to, $id_hotel, 0, 0, $adult, $child, $ratting, $amenities, $price, $id_cart, $id_guest);
-
+            if (isset($booking_data['rm_data']) && $booking_data['rm_data']) {
+                // reset array keys from 0
+                $booking_data['rm_data'] = array_values($booking_data['rm_data']);
+            }
             if ($sort_by && $sort_value) {
                 $indi_arr = array();
 
@@ -281,7 +284,6 @@ class CategoryControllerCore extends FrontController
                 } elseif ($sort_value == 2) {
                     $direction = SORT_DESC;
                 }
-
                 foreach ($booking_data['rm_data'] as $s_k => $s_v) {
                     if ($sort_by == 1) {
                         $indi_arr[$s_k] = $s_v['ratting'];

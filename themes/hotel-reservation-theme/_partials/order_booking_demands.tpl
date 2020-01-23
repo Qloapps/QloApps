@@ -12,7 +12,13 @@
 							<div class="row demand_detail_price_block">
 								<div class="col-xs-6">{$demand['name']|escape:'html':'UTF-8'}</div>
 								<div class="col-xs-6">
-									<span class="pull-right">{displayPrice price="{$demand['price']|escape:'html':'UTF-8'}"}</span>
+									<span class="pull-right">
+										{if $useTax}
+											{displayPrice price="{$demand['total_price_tax_incl']|escape:'html':'UTF-8'}"}
+										{else}
+											{displayPrice price="{$demand['total_price_tax_excl']|escape:'html':'UTF-8'}"}
+										{/if}
+									</span>
 								</div>
 							</div>
 						{/foreach}

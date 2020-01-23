@@ -194,8 +194,8 @@ class HotelBookingDetail extends ObjectModel
                         if ($id_cart && $id_guest) {
                             $sql = 'SELECT cbd.`id_product`, cbd.`id_room`, cbd.`id_hotel`, cbd.`booking_type`, cbd.`comment`, rf.`room_num`, cbd.`date_from`, cbd.`date_to`
                                 FROM `'._DB_PREFIX_.'htl_cart_booking_data` AS cbd
-                                INNER JOIN `'._DB_PREFIX_.'htl_room_information` AS rf ON (rf.id = cbd.id_room)
-                                WHERE cbd.id_hotel='.$hotel_id.' AND cbd.id_product ='.$room_type['id_product'].' AND cbd.id_cart = '.$id_cart.' AND cbd.id_guest ='.$id_guest.' AND cbd.is_refunded = 0 AND cbd.is_back_order = 0';
+                                INNER JOIN `'._DB_PREFIX_.'htl_room_information` AS rf ON (rf.`id` = cbd.`id_room`)
+                                WHERE cbd.`id_hotel`='.(int)$hotel_id.' AND cbd.`id_product` ='.(int)$room_type['id_product'].' AND cbd.`id_cart` = '.(int)$id_cart.' AND cbd.`id_guest` ='.(int)$id_guest.' AND cbd.`is_refunded` = 0 AND cbd.`is_back_order` = 0';
                             $cart_rooms = Db::getInstance()->executeS($sql);
                         } else {
                             $cart_rooms = array();
@@ -204,21 +204,22 @@ class HotelBookingDetail extends ObjectModel
                     }
 
                     if ($search_booked) {
-                        $sql = 'SELECT bd.id_product, bd.id_room, bd.id_hotel, bd.id_customer, bd.booking_type, bd.id_status AS booking_status, bd.comment, rf.room_num, bd.date_from, bd.date_to
+                        $sql = 'SELECT bd.`id_product`, bd.`id_room`, bd.`id_hotel`, bd.`id_customer`, bd.`booking_type`, bd.`id_status` AS booking_status, bd.`comment`, rf.`room_num`, bd.`date_from`, bd.`date_to`
                             FROM `'._DB_PREFIX_.'htl_booking_detail` AS bd
-                            INNER JOIN `'._DB_PREFIX_.'htl_room_information` AS rf ON (rf.id = bd.id_room)
-                            WHERE bd.id_hotel='.$hotel_id.' AND bd.id_product ='.$room_type['id_product']." AND bd.date_from <= '$date_from' AND bd.date_to >='$date_to' AND bd.is_refunded = 0 AND bd.is_back_order = 0";
+                            INNER JOIN `'._DB_PREFIX_.'htl_room_information` AS rf ON (rf.`id` = bd.`id_room`)
+                            WHERE bd.`id_hotel`='.(int)$hotel_id.' AND bd.`id_product` ='.(int)$room_type['id_product'].' AND bd.`is_refunded` = 0 AND bd.`is_back_order` = 0 AND IF(bd.`id_status` = 3, bd.`date_from` <= \''.pSQL($date_from).'\' AND bd.`check_out` >= \''.pSQL($date_to).'\', bd.`date_from` <= \''.pSQL($date_from).'\' AND bd.date_to >= \''.pSQL($date_to).'\')';
 
                         $booked_rooms = Db::getInstance()->executeS($sql);
 
                         foreach ($booked_rooms as $booked_k => $booked_v) {
-                            $booked_rooms[$booked_k]['detail'][] = array('date_from' => $booked_v['date_from'],
-                                                                        'date_to' => $booked_v['date_to'],
-                                                                        'id_customer' => $booked_v['id_customer'],
-                                                                        'booking_type' => $booked_v['booking_type'],
-                                                                        'booking_status' => $booked_v['booking_status'],
-                                                                        'comment' => $booked_v['comment'],
-                                                                        );
+                            $booked_rooms[$booked_k]['detail'][] = array(
+                                'date_from' => $booked_v['date_from'],
+                                'date_to' => $booked_v['date_to'],
+                                'id_customer' => $booked_v['id_customer'],
+                                'booking_type' => $booked_v['booking_type'],
+                                'booking_status' => $booked_v['booking_status'],
+                                'comment' => $booked_v['comment'],
+                            );
 
                             unset($booked_rooms[$booked_k]['date_from']);
                             unset($booked_rooms[$booked_k]['date_to']);
@@ -234,11 +235,11 @@ class HotelBookingDetail extends ObjectModel
                     if ($search_unavai) {
                         $sql1 = 'SELECT `id_product`, `id_hotel`, `room_num`, `comment` AS `room_comment`
                                 FROM `'._DB_PREFIX_.'htl_room_information`
-                                WHERE `id_hotel`='.$hotel_id.' AND `id_product` ='.$room_type['id_product'].' AND `id_status` = 2';
+                                WHERE `id_hotel`='.(int)$hotel_id.' AND `id_product` ='.(int)$room_type['id_product'].' AND `id_status` = 2';
 
                         $sql2 = 'SELECT hri.`id_product`, hri.`id_hotel`, hri.`room_num`, hri.`comment` AS `room_comment`
                                 FROM `'._DB_PREFIX_.'htl_room_information` AS hri
-                                INNER JOIN `'._DB_PREFIX_.'htl_room_disable_dates` AS hrdd ON (hrdd.id_room_type = hri.id_product AND hrdd.	id_room = hri.id)
+                                INNER JOIN `'._DB_PREFIX_.'htl_room_disable_dates` AS hrdd ON (hrdd.`id_room_type` = hri.`id_product` AND hrdd.	id_room = hri.`id`)
                                 WHERE hri.`id_hotel`='.$hotel_id.' AND hri.`id_product` ='.$room_type['id_product'].' AND hri.`id_status` = 3 AND hrdd.`date_from` <= \''.pSql($date_from).'\' AND hrdd.`date_to` >= \''.pSql($date_to).'\'';
 
                         $sql = $sql1.' UNION '.$sql2;
@@ -249,61 +250,78 @@ class HotelBookingDetail extends ObjectModel
 
                     if ($search_available) {
                         $exclude_ids = 'SELECT `id_room`
-                                FROM '._DB_PREFIX_."htl_booking_detail
-                                WHERE is_back_order = 0 AND is_refunded = 0 AND ((date_from <= '$date_from' AND date_to > '$date_from' AND date_to <= '$date_to') OR (date_from > '$date_from' AND date_to < '$date_to') OR (date_from >= '$date_from' AND date_from < '$date_to' AND date_to >= '$date_to') OR (date_from < '$date_from' AND date_to > '$date_to'))";
+                        FROM `'._DB_PREFIX_.'htl_booking_detail`
+                        WHERE `is_back_order` = 0 AND `is_refunded` = 0 AND IF(`id_status` = 3, (
+                            (DATE_FORMAT(`check_out`,  "%Y-%m-%d") > \''.pSQL($date_from).'\' AND DATE_FORMAT(`check_out`,  "%Y-%m-%d") <= \''.PSQL($date_to).'\') AND (
+                                (`date_from` <= \''.pSQL($date_from).'\' AND `check_out` > \''.pSQL($date_from).'\' AND `check_out` <= \''.PSQL($date_to).'\') OR
+                                (`date_from` >= \''.pSQL($date_from).'\' AND `check_out` > \''.pSQL($date_from).'\' AND `check_out` <= \''.pSQL($date_to).'\') OR
+                                (`date_from` >= \''.pSQL($date_from).'\' AND `date_from` < \''.pSQL($date_to).'\' AND `check_out` >= \''.pSQL($date_to).'\') OR
+                                (`date_from` <= \''.pSQL($date_from).'\' AND `check_out` >= \''.pSQL($date_to).'\')
+                            )
+                        ), (
+                            (`date_from` <= \''.pSQL($date_from).'\' AND `date_to` > \''.pSQL($date_from).'\' AND `date_to` <= \''.PSQL($date_to).'\') OR
+                            (`date_from` >= \''.pSQL($date_from).'\' AND `date_to` <= \''.pSQL($date_to).'\') OR
+                            (`date_from` >= \''.pSQL($date_from).'\' AND `date_from` < \''.pSQL($date_to).'\' AND `date_to` >= \''.pSQL($date_to).'\') OR
+                            (`date_from` <= \''.pSQL($date_from).'\' AND `date_to` >= \''.pSQL($date_to).'\')
+                        ))';
 
                         if (!empty($id_cart) && !empty($id_guest)) {
                             $exclude_ids .= ' UNION
                                 SELECT `id_room`
-                                FROM '._DB_PREFIX_.'htl_cart_booking_data
-                                WHERE id_cart='.$id_cart.' AND id_guest='.$id_guest." AND is_refunded = 0 AND  is_back_order = 0 AND ((date_from <= '$date_from' AND date_to > '$date_from' AND date_to <= '$date_to') OR (date_from > '$date_from' AND date_to < '$date_to') OR (date_from >= '$date_from' AND date_from < '$date_to' AND date_to >= '$date_to') OR (date_from < '$date_from' AND date_to > '$date_to'))";
+                                FROM `'._DB_PREFIX_.'htl_cart_booking_data`
+                                WHERE id_cart='.(int)$id_cart.' AND id_guest='.(int)$id_guest.' AND is_refunded = 0 AND  is_back_order = 0 AND ((date_from <= \''.pSQL($date_from).'\' AND date_to > \''.pSQL($date_from).'\' AND date_to <= \''.pSQL($date_to).'\') OR (date_from > \''.pSQL($date_from).'\' AND date_to < \''.pSQL($date_to).'\') OR (date_from >= \''.pSQL($date_from).'\' AND date_from < \''.pSQL($date_to).'\' AND date_to >= \''.pSQL($date_to).'\') OR (date_from < \''.pSQL($date_from).'\' AND date_to > \''.pSQL($date_to).'\'))';
                         }
 
                         // For excludes temporary disable rooms
                         $exclude_ids .= ' UNION
                             SELECT hri.`id` AS id_room
-                            FROM '._DB_PREFIX_.'htl_room_information AS hri
+                            FROM `'._DB_PREFIX_.'htl_room_information` AS hri
                             INNER JOIN `'._DB_PREFIX_.'htl_room_disable_dates` AS hrdd ON (hrdd.`id_room_type` = hri.`id_product` AND hrdd.`id_room` = hri.`id`)
-                            WHERE hri.`id_hotel`='.$hotel_id.' AND hri.`id_product` ='.$room_type['id_product'].' AND hri.`id_status` = 3 AND (hrdd.`date_from` < \''.pSql($date_to).'\' AND hrdd.`date_to` > \''.pSql($date_from).'\')';
+                            WHERE hri.`id_hotel`='.(int)$hotel_id.' AND hri.`id_product` ='.(int)$room_type['id_product'].' AND hri.`id_status` = 3 AND (hrdd.`date_from` <= \''.pSql($date_to).'\' AND hrdd.`date_to` >= \''.pSql($date_from).'\')';
 
                         $sql = 'SELECT ri.`id` AS `id_room`, ri.`id_product`, ri.`id_hotel`, ri.`room_num`, ri.`comment` AS `room_comment`
-                            FROM `'._DB_PREFIX_.'htl_room_information` AS ri ';
-                        if ($adult || $children) {
-                            $sql .= 'INNER JOIN '._DB_PREFIX_.'htl_room_type AS rt ON (rt.id_product = ri.id_product AND rt.id_hotel = ri.id_hotel';
-                            if ($adult) {
-                                $sql .= ' AND rt.adult >= '.$adult;
-                            }
-                            if ($children) {
-                                $sql .= ' AND rt.children >= '.$children;
-                            }
-                            $sql .= ')';
-                        }
-
-                        $sql .= ' WHERE ri.id_hotel='.$hotel_id.' AND ri.id_product='.$room_type['id_product'].' AND ri.id_status != 2 AND ri.id NOT IN ('.$exclude_ids.')';
+                                FROM `'._DB_PREFIX_.'htl_room_information` AS ri
+                                WHERE ri.`id_hotel`='.(int)$hotel_id.' AND ri.`id_product`='.(int)$room_type['id_product'].' AND ri.`id_status` != 2 AND ri.`id` NOT IN ('.$exclude_ids.')';
 
                         $avai_rooms = Db::getInstance()->executeS($sql);
                         $num_avail += count($avai_rooms);
                     }
 
                     if ($search_partial) {
-                        $sql1 = "SELECT bd.`id_product`, bd.`id_room`, bd.`id_hotel`, bd.`id_customer`, bd.`booking_type`, bd.`id_status` AS booking_status, bd.`comment` AS `room_comment`, rf.`room_num`, bd.`date_from`, bd.`date_to`
-                            FROM `"._DB_PREFIX_."htl_booking_detail` AS bd
-                            INNER JOIN `"._DB_PREFIX_."htl_room_information` AS rf ON (rf.`id` = bd.`id_room` AND rf.`id_status` = 1)
-                            WHERE bd.`id_hotel`=".$hotel_id." AND bd.`id_product`=".$room_type['id_product']." AND bd.`is_back_order` = 0 AND bd.`is_refunded` = 0 AND ((bd.`date_from` <= '$date_from' AND bd.`date_to` > '$date_from' AND bd.`date_to` < '$date_to') OR (bd.`date_from` > '$date_from' AND bd.`date_from` < '$date_to' AND bd.`date_to` >= '$date_to') OR (bd.`date_from` > '$date_from' AND bd.`date_from` < '$date_to' AND bd.`date_to` < '$date_to'))";
+                        $sql1 = 'SELECT bd.`id_product`, bd.`id_room`, bd.`id_hotel`, bd.`id_customer`, bd.`booking_type`, bd.`id_status` AS booking_status, bd.`comment` AS `room_comment`, rf.`room_num`, bd.`date_from`, IF(bd.`id_status` = 3, bd.`check_out`, bd.`date_to`) AS `date_to`
+                            FROM `'._DB_PREFIX_.'htl_booking_detail` AS bd
+                            INNER JOIN `'._DB_PREFIX_.'htl_room_information` AS rf ON (rf.`id` = bd.`id_room`)
+                            WHERE bd.`id_hotel`='.(int)$hotel_id.' AND bd.`id_product`='.(int)$room_type['id_product'].' AND rf.`id_status` != 2 AND bd.`is_back_order` = 0 AND bd.`is_refunded` = 0 AND IF(bd.`id_status` = 3, (
+                                (DATE_FORMAT(`check_out`,  "%Y-%m-%d") > \''.pSQL($date_from).'\' AND DATE_FORMAT(`check_out`,  "%Y-%m-%d") < \''.PSQL($date_to).'\') AND (
+                                    (bd.`date_from` <= \''.pSQL($date_from).'\' AND bd.`check_out` > \''.pSQL($date_from).'\' AND bd.`check_out` < \''.pSQL($date_to).'\') OR
+                                    (bd.`date_from` > \''.pSQL($date_from).'\' AND bd.`date_from` < \''.pSQL($date_to).'\' AND bd.`check_out` >= \''.pSQL($date_to).'\') OR
+                                    (bd.`date_from` > \''.pSQL($date_from).'\' AND bd.`date_from` < \''.pSQL($date_to).'\' AND bd.`check_out` > \''.pSQL($date_from).'\' AND bd.`check_out` < \''.pSQL($date_to).'\')
+                                )
+                            ), (
+                                (bd.`date_from` <= \''.pSQL($date_from).'\' AND bd.`date_to` > \''.pSQL($date_from).'\' AND bd.`date_to` < \''.pSQL($date_to).'\') OR
+                                (bd.`date_from` > \''.pSQL($date_from).'\' AND bd.`date_from` < \''.pSQL($date_to).'\' AND bd.`date_to` >= \''.pSQL($date_to).'\') OR
+                                (bd.`date_from` > \''.pSQL($date_from).'\' AND bd.`date_from` < \''.pSQL($date_to).'\' AND bd.`date_to` < \''.pSQL($date_to).'\')
+                            ))';
 
-                        $sql2 = "SELECT hri.`id_product`, hrdd.`id_room`, hri.`id_hotel`, '0' AS `id_customer`, '0' AS `booking_type`, '0' AS `booking_status`, '0' AS `room_comment`, hri.`room_num`, hrdd.`date_from`, hrdd.`date_to`
-                            FROM `"._DB_PREFIX_."htl_room_information` AS hri
-                            INNER JOIN `"._DB_PREFIX_."htl_room_disable_dates` AS hrdd ON (hrdd.`id_room_type` = hri.`id_product` AND hrdd.`id_room` = hri.`id`)
-                            WHERE hri.`id_hotel`=".$hotel_id." AND hri.`id_product`=".$room_type['id_product']." AND hri.`id_status` = 3 AND ((hrdd.`date_from` <= '$date_from' AND hrdd.`date_to` > '$date_from' AND hrdd.`date_to` < '$date_to') OR (hrdd.`date_from` > '$date_from' AND hrdd.`date_from` < '$date_to' AND hrdd.`date_to` >= '$date_to') OR (hrdd.`date_from` > '$date_from' AND hrdd.`date_from` < '$date_to' AND hrdd.`date_to` < '$date_to'))";
+                        $sql2 = 'SELECT hri.`id_product`, hrdd.`id_room`, hri.`id_hotel`, 0 AS `id_customer`, 0 AS `booking_type`, 0 AS `booking_status`, 0 AS `room_comment`, hri.`room_num`, hrdd.`date_from`, hrdd.`date_to`
+                            FROM `'._DB_PREFIX_.'htl_room_information` AS hri
+                            INNER JOIN `'._DB_PREFIX_.'htl_room_disable_dates` AS hrdd ON (hrdd.`id_room_type` = hri.`id_product` AND hrdd.`id_room` = hri.`id`)
+                            WHERE hri.`id_hotel`='.(int)$hotel_id.' AND hri.`id_product`='.(int)$room_type['id_product'].' AND
+                            hri.`id_status` = 3 AND (
+                                (hrdd.`date_from` <= \''.pSQL($date_from).'\' AND hrdd.`date_to` > \''.pSQL($date_from).'\' AND hrdd.`date_to` < \''.pSQL($date_to).'\') OR
+                                (hrdd.`date_from` > \''.pSQL($date_from).'\' AND hrdd.`date_from` < \''.pSQL($date_to).'\' AND hrdd.`date_to` >= \''.pSQL($date_to).'\') OR
+                                (hrdd.`date_from` > \''.pSQL($date_from).'\' AND hrdd.`date_from` < \''.pSQL($date_to).'\' AND hrdd.`date_to` < \''.pSQL($date_to).'\')
+                            )';
+                        // $part_arr2 = Db::getInstance()->executeS($sql2);
+                        // $part_arr = array_merge($part_arr1 ? $part_arr1 : array(), $part_arr2 ? $part_arr2 : array());
+
                         $sql = $sql1.' UNION '.$sql2;
-
-                        // NOTE:: Before code if written to user order by with union
-                        $sql = "SELECT s.*
-                                FROM (".$sql.") AS s
-                                ORDER BY s.`id_room`";
-                        // Ends Here
-
+                        // NOTE:: Before code if written to use "ORDER BY" with union
+                        $sql = 'SELECT s.*
+                                FROM ('.$sql.') AS s
+                                ORDER BY s.`id_room`';
                         $part_arr = Db::getInstance()->executeS($sql);
+
                         $partial_avai_rooms = array();
                         foreach ($part_arr as $pr_val) {
                             $partial_avai_rooms[$pr_val['id_room']]['id_product'] = $pr_val['id_product'];
@@ -484,14 +502,15 @@ class HotelBookingDetail extends ObjectModel
     // This function algo is same as available rooms algo and it not similar to booked rooms algo.
     public function chechRoomBooked($id_room, $date_from, $date_to)
     {
-        $sql = 'SELECT `id_product`, `id_order`, `id_cart`, `id_room`, `id_hotel`, `id_customer` FROM `'._DB_PREFIX_.'htl_booking_detail` WHERE `id_room` = '.$id_room." AND `is_back_order` = 0 AND `is_refunded` = 0 AND ((date_from <= '$date_from' AND date_to > '$date_from' AND date_to <= '$date_to') OR (date_from > '$date_from' AND date_to < '$date_to') OR (date_from >= '$date_from' AND date_from < '$date_to' AND date_to >= '$date_to') OR (date_from < '$date_from' AND date_to > '$date_to'))";
+        $sql = 'SELECT `id_product`, `id_order`, `id_cart`, `id_room`, `id_hotel`, `id_customer`
+        FROM `'._DB_PREFIX_.'htl_booking_detail` WHERE `id_room` = '.(int)$id_room.
+        ' AND `is_back_order` = 0 AND `is_refunded` = 0 AND ((date_from <= \''.pSQL($date_from).'\' AND date_to > \''.
+        pSQL($date_from).'\' AND date_to <= \''.pSQL($date_to).'\') OR (date_from > \''.pSQL($date_from).
+        '\' AND date_to < \''.pSQL($date_to).'\') OR (date_from >= \''.pSQL($date_from).'\' AND date_from < \''.
+        pSQL($date_to).'\' AND date_to >= \''.pSQL($date_to).'\') OR (date_from < \''.pSQL($date_from).
+        '\' AND date_to > \''.pSQL($date_to).'\'))';
 
-        $result = Db::getInstance()->getRow($sql);
-        if ($result) {
-            return $result;
-        }
-
-        return false;
+        return Db::getInstance()->getRow($sql);
     }
 
     /**
@@ -567,15 +586,12 @@ class HotelBookingDetail extends ObjectModel
                 unset($this->allReqDates[$key]);
             }
         }
-
         return true;
     }
 
     /**
      * [getPartialRange :: To get array containing ].
-     *
      * @param [array] $dateArr [Array containing dates]
-     *
      * @return [array] [IF passed array of dates contains more than one date then returns ]
      */
     public function getPartialRange($dateArr, $id_room = 0, $rm_data_key = false)
@@ -609,15 +625,6 @@ class HotelBookingDetail extends ObjectModel
         $startDate = new DateTime($dateFrom);
         $endDate = new DateTime($dateTo);
         $daysDifference = $startDate->diff($endDate)->days;
-        /* $startTimeStamp = strtotime($dateFrom);
-        $endTimeStamp = strtotime($dateTo);
-
-        $timeDiff = abs($endTimeStamp - $startTimeStamp);*/
-
-        /*$numberDays = $timeDiff / 86400;  // 86400 seconds in one day
-
-        // and you might want to convert to integer
-        $numberDays = $numberDays;*/
 
         return $daysDifference;
     }
@@ -631,34 +638,42 @@ class HotelBookingDetail extends ObjectModel
      */
     public function getBookingDataByOrderId($order_id)
     {
-        $result = Db::getInstance()->executeS('SELECT * FROM `'._DB_PREFIX_.'htl_booking_detail` WHERE `id_order`='.$order_id);
-        if ($result) {
-            return $result;
-        }
-
-        return false;
+        return Db::getInstance()->executeS(
+            'SELECT * FROM `'._DB_PREFIX_.'htl_booking_detail` WHERE `id_order`='.(int)$order_id
+        );
     }
 
     /**
      * [updateBookingOrderStatusBYOrderId :: To update the order status of a room in the booking].
-     *
      * @param [int] $order_id   [Id of the order]
      * @param [int] $new_status [Id of the new status of the order to be updated]
      * @param [int] $id_room    [Id of the room which order status is to be ypdated]
-     *
      * @return [Boolean] [Returns true if successfully updated else returns false]
      */
     public function updateBookingOrderStatusByOrderId($order_id, $new_status, $id_room, $date_from, $date_to)
     {
         $table = 'htl_booking_detail';
+        $currentDate = date('Y-m-d H:i:s');
+
         if ($new_status == 2) {
-            $data = array('id_status' => $new_status,'check_in' => date('Y-m-d'));
+            $data = array(
+                'id_status' => $new_status,
+                'check_in' => ($currentDate > $date_to ? $date_to : $currentDate)
+            );
         } elseif ($new_status == 3) {
-            $data = array('id_status' => $new_status,'check_out' => date('Y-m-d'));
+            $data = array(
+                'id_status' => $new_status,
+                'check_out' => ($currentDate > $date_to ? $date_to : $currentDate)
+            );
         } else {
-            $data = array('id_status' => $new_status);
+            $data = array(
+                'id_status' => $new_status,
+                'check_in' => '',
+                'check_out' => ''
+            );
         }
-        $where = 'id_order = '.$order_id.' AND id_room = '.$id_room.' AND `date_from` = \''.pSQL($date_from).'\' AND `date_to` = \''.pSQL($date_to).'\'';
+        $where = 'id_order = '.(int)$order_id.' AND id_room = '.(int)$id_room.' AND `date_from` = \''.pSQL($date_from).'\' AND `date_to` = \''.pSQL($date_to).'\'';
+
         return Db::getInstance()->update($table, $data, $where);
     }
 
@@ -817,9 +832,16 @@ class HotelBookingDetail extends ObjectModel
         }
 
         if (isset($current_admin_cart_id) && $current_admin_cart_id) {
-            $sql = 'SELECT `id` AS `id_room`, `id_product`, `id_hotel`, `room_num`, `comment` AS `room_comment` FROM `'._DB_PREFIX_.'htl_room_information` WHERE `id_hotel`='.$hotel_id.' AND `id_product`='.$room_type.' AND id_status = 1 AND `id` NOT IN (SELECT `id_room` FROM `'._DB_PREFIX_."htl_booking_detail` WHERE `date_from` < '$date_to' AND `date_to` > '$date_from' AND `is_refunded`=0 AND `is_back_order`=0) AND `id` NOT IN (SELECT `id_room` FROM `"._DB_PREFIX_.'htl_cart_booking_data` WHERE `id_cart`='.$current_admin_cart_id.')';
+            $sql = 'SELECT `id` AS `id_room`, `id_product`, `id_hotel`, `room_num`, `comment` AS `room_comment`
+            FROM `'._DB_PREFIX_.'htl_room_information`
+            WHERE `id_hotel`='.(int)$hotel_id.' AND `id_product`='.(int)$room_type.' AND id_status = 1
+            AND `id` NOT IN (SELECT `id_room` FROM `'._DB_PREFIX_.'htl_booking_detail` WHERE `date_from` < \''.
+            pSQL($date_to).'\' AND `date_to` > \''.pSQL($date_from).'\' AND `is_refunded`=0 AND `is_back_order`=0)
+            AND `id` NOT IN (SELECT `id_room` FROM `'._DB_PREFIX_.'htl_cart_booking_data` WHERE `id_cart`='.
+            (int)$current_admin_cart_id.')';
         } else {
-            $sql = 'SELECT `id` AS `id_room`, `id_product`, `id_hotel`, `room_num`, `comment` AS `room_comment` FROM `'._DB_PREFIX_.'htl_room_information` WHERE `id_hotel`='.$hotel_id.' AND `id_product`='.$room_type.' AND id_status = 1 AND `id` NOT IN (SELECT `id_room` FROM `'._DB_PREFIX_."htl_booking_detail` WHERE `date_from` < '$date_to' AND `date_to` > '$date_from' AND `is_refunded`=0 AND `is_back_order`=0)";
+            $sql = 'SELECT `id` AS `id_room`, `id_product`, `id_hotel`, `room_num`, `comment` AS `room_comment`
+            FROM `'._DB_PREFIX_.'htl_room_information` WHERE `id_hotel`='.(int)$hotel_id.' AND `id_product`='.(int)$room_type.' AND id_status = 1 AND `id` NOT IN (SELECT `id_room` FROM `'._DB_PREFIX_.'htl_booking_detail` WHERE `date_from` < \''.pSQL($date_to).'\' AND `date_to` > \''.pSQL($date_from).'\' AND `is_refunded`=0 AND `is_back_order`=0)';
         }
         $avail_rooms = Db::getInstance()->executeS($sql);
         if ($avail_rooms) {
@@ -831,8 +853,7 @@ class HotelBookingDetail extends ObjectModel
 
     /**
         * [getAvailableRoomsForSwaping :: Get the available rooms for the swapping of the selected room with another room].
-        *
-        * @param [date] $date_from[Start date of booking of the room to be swapped with available rooms]
+        * @param [date] $date_from       [Start date of booking of the room to be swapped with available rooms]
         * @param [date] $date_to         [End date of booking of the room to be swapped with available rooms]
         * @param [int]  $room_type       [Id of the product to which the room belongs to be swapped]
         * @param [int]  $hotel_id        [Id of the Hotel to which the room belongs to be swapped]
@@ -841,19 +862,14 @@ class HotelBookingDetail extends ObjectModel
         */
     public function getAvailableRoomsForSwapping($date_from, $date_to, $room_type, $hotel_id, $id_room)
     {
-        $sql = 'SELECT `id` AS `id_room`, `id_product`, `id_hotel`, `room_num`, `comment` AS `room_comment` FROM `'._DB_PREFIX_.'htl_room_information` WHERE `id_hotel`='.$hotel_id.' AND `id_product`='.$room_type.' AND `id_status` = 1 AND `id` IN ('.'SELECT `id_room` FROM `'._DB_PREFIX_."htl_booking_detail` WHERE `date_from` = '$date_from' AND `date_to` = '$date_to' AND `id_room`!=".$id_room.' AND `is_refunded`=0 AND `is_back_order`=0)';
+        $sql = 'SELECT `id` AS `id_room`, `id_product`, `id_hotel`, `room_num`, `comment` AS `room_comment` FROM `'._DB_PREFIX_.'htl_room_information` WHERE `id_hotel`='.(int)$hotel_id.' AND `id_product`='.(int)$room_type.
+        ' AND `id_status` = 1 AND `id` IN (SELECT `id_room` FROM `'._DB_PREFIX_.'htl_booking_detail` WHERE `date_from` = \''.pSQL($date_from).'\' AND `date_to` = \''.pSQL($date_to).'\' AND `id_room`!='.(int)$id_room.' AND `is_refunded`=0 AND `is_back_order`=0)';
 
-        $avail_rooms = Db::getInstance()->executeS($sql);
-        if ($avail_rooms) {
-            return $avail_rooms;
-        }
-
-        return false;
+        return Db::getInstance()->executeS($sql);
     }
 
     /**
      * [reallocateRoomWithAvailableSameRoomType :: To reallocate rooms with available rooms in case of reallocation of the room].
-     *
      * @param [int]  $current_room_id [Id of the room to be reallocated]
      * @param [date] $date_from       [start date of the booking of the room]
      * @param [date] $date_to         [end date of the booking of the room]
@@ -868,7 +884,8 @@ class HotelBookingDetail extends ObjectModel
         $table = 'htl_booking_detail';
         $table2 = 'htl_cart_booking_data';
         $data = array('id_room' => $swapped_room_id);
-        $where = "date_from='$date_from' AND date_to='$date_to' AND id_room=".$current_room_id;
+        $where = 'date_from=\''.pSQL($date_from).'\' AND date_to=\''.pSQL($date_to).'\' AND id_room='.
+        (int)$current_room_id;
         $result = Db::getInstance()->update($table, $data, $where);
         $result2 = Db::getInstance()->update($table2, $data, $where);
         if ($result) {
@@ -876,16 +893,13 @@ class HotelBookingDetail extends ObjectModel
             if ($result2) {
                 return true;
             }
-
             return false;
         }
-
         return false;
     }
 
     /**
      * [swapRoomWithAvailableSameRoomType :: To swap rooms with available rooms in case of reallocation of the room].
-     *
      * @param [int]  $current_room_id [Id of the room to be swapped]
      * @param [date] $date_from       [start date of the booking of the room]
      * @param [date] $date_to         [end date of the booking of the room]
@@ -898,31 +912,41 @@ class HotelBookingDetail extends ObjectModel
         $date_from = date('Y-m-d H:i:s', strtotime($date_from));
         $date_to = date('Y-m-d H:i:s', strtotime($date_to));
 
-        $idcrt1 = Db::getInstance()->getValue('SELECT `id` FROM `'._DB_PREFIX_."htl_cart_booking_data` WHERE `date_from`='$date_from' AND `date_to`='$date_to' AND `id_room`=".$swapped_room_id);
-        $idcrt2 = Db::getInstance()->getValue('SELECT `id` FROM `'._DB_PREFIX_."htl_cart_booking_data` WHERE `date_from`='$date_from' AND `date_to`='$date_to' AND `id_room`=".$current_room_id);
+        $idcrt1 = Db::getInstance()->getValue(
+            'SELECT `id` FROM `'._DB_PREFIX_.'htl_cart_booking_data` WHERE `date_from`=\''.pSQL($date_from).
+            '\' AND `date_to`=\''.pSQL($date_to).'\' AND `id_room`='.(int)$swapped_room_id
+        );
+        $idcrt2 = Db::getInstance()->getValue(
+            'SELECT `id` FROM `'._DB_PREFIX_.'htl_cart_booking_data` WHERE `date_from`=\''.pSQL($date_from).
+            '\' AND `date_to`=\''.pSQL($date_to).'\' AND `id_room`='.(int)$current_room_id
+        );
 
-        $id1 = Db::getInstance()->getValue('SELECT `id` FROM `'._DB_PREFIX_."htl_booking_detail` WHERE `date_from`='$date_from' AND `date_to`='$date_to' AND `id_room`=".$swapped_room_id);
-        $id2 = Db::getInstance()->getValue('SELECT `id` FROM `'._DB_PREFIX_."htl_booking_detail` WHERE `date_from`='$date_from' AND `date_to`='$date_to' AND `id_room`=".$current_room_id);
+        $id1 = Db::getInstance()->getValue(
+            'SELECT `id` FROM `'._DB_PREFIX_.'htl_booking_detail` WHERE `date_from`=\''.pSQL($date_from).
+            '\' AND `date_to`=\''.pSQL($date_to).'\' AND `id_room`='.(int)$swapped_room_id
+        );
+        $id2 = Db::getInstance()->getValue(
+            'SELECT `id` FROM `'._DB_PREFIX_.'htl_booking_detail` WHERE `date_from`=\''.pSQL($date_from).
+            '\' AND `date_to`=\''.pSQL($date_to).'\' AND `id_room`='.(int)$current_room_id
+        );
+        $sql = 'UPDATE `'._DB_PREFIX_.'htl_cart_booking_data` SET `id_room`=IF(`id`='.(int)$idcrt1.','.
+        (int)$current_room_id.','.(int)$swapped_room_id.') WHERE `id` IN('.(int)$idcrt1.','.(int)$idcrt2.')';
 
-        $sql = 'UPDATE `'._DB_PREFIX_.'htl_cart_booking_data` SET `id_room`=IF(`id`='.$idcrt1.','.$current_room_id.','.$swapped_room_id.') WHERE `id` IN('.$idcrt1.','.$idcrt2.')';
-        $sql1 = 'UPDATE `'._DB_PREFIX_.'htl_booking_detail` SET `id_room`=IF(`id`='.$id1.','.$current_room_id.','.$swapped_room_id.') WHERE `id` IN('.$id1.','.$id2.')';
+        $sql1 = 'UPDATE `'._DB_PREFIX_.'htl_booking_detail` SET `id_room`=IF(`id`='.(int)$id1.','.(int)$current_room_id.
+        ','.(int)$swapped_room_id.') WHERE `id` IN('.(int)$id1.','.(int)$id2.')';
 
-        $result = Db::getInstance()->execute($sql);
-        if ($result) {
+        if ($result = Db::getInstance()->execute($sql)) {
             $result2 = Db::getInstance()->execute($sql1);
             if ($result2) {
                 return true;
             }
-
             return false;
         }
-
         return false;
     }
 
     /**
      * [updateOrderRefundStatus :: To update the refund status of a room booked in the order if amount refunded by the admin].
-     *
      * @param [int]  $id_order  [Id of the order]
      * @param [date] $date_from [start date of the bookin of the room]
      * @param [date] $date_to   [end date of the bookin of the room]
@@ -935,10 +959,10 @@ class HotelBookingDetail extends ObjectModel
         $table = 'htl_booking_detail';
         $data = array('is_refunded' => 1);
         foreach ($id_rooms as $key_rm => $val_rm) {
-            $where = '`id_order` = '.$id_order.' AND `id_room` = '.$val_rm['id_room']." AND `date_from` = '$date_from' AND `date_to` = '$date_to'";
+            $where = 'id_order='.(int)$id_order.' AND id_room = '.(int)$val_rm['id_room'].' AND `date_from`= \''.
+            pSQL($date_from).'\' AND `date_to` = \''.pSQL($date_to).'\'';
             $result = Db::getInstance()->update($table, $data, $where);
         }
-
         return $result;
     }
 
@@ -955,7 +979,6 @@ class HotelBookingDetail extends ObjectModel
         } elseif ($priceDisplay == 1) {
             $price_tax = false;
         }
-
         return $price_tax;
     }
 
@@ -969,18 +992,13 @@ class HotelBookingDetail extends ObjectModel
      */
     public function getPsOrderDetailsByProduct($id_product, $id_order)
     {
-        $sql = 'SELECT * FROM `'._DB_PREFIX_.'order_detail` WHERE `id_order`='.$id_order.' AND `product_id`='.$id_product;
-        $result = Db::getInstance()->executeS($sql);
-        if ($result) {
-            return $result;
-        }
-
-        return false;
+        $sql = 'SELECT * FROM `'._DB_PREFIX_.'order_detail` WHERE `id_order`='.(int)$id_order.' AND `product_id`='.
+        (int)$id_product;
+        return Db::getInstance()->executeS($sql);
     }
 
     /**
      * [deleteRoomFromOrder : Deletes a row from the table with the supplied conditions].
-     *
      * @param [int]  $id_order  [Id of the order]
      * @param [int]  $id_room   [id_of the room]
      * @param [date] $date_from [Start date of the booking]
@@ -990,26 +1008,40 @@ class HotelBookingDetail extends ObjectModel
      */
     public function deleteOrderedRoomFromOrder($id_order, $id_hotel, $id_room, $date_from, $date_to)
     {
-        $delete = Db::getInstance()->delete('htl_booking_detail', '`id_order`='.(int) $id_order.' AND `id_hotel`='.(int) $id_hotel.' AND `id_room`='.(int) $id_room." AND `date_from`='$date_from' AND `date_to`='$date_to'");
+        return Db::getInstance()->delete(
+            'htl_booking_detail',
+            '`id_order`='.(int) $id_order.' AND `id_hotel`='.(int) $id_hotel.' AND `id_room`='.(int) $id_room.
+            ' AND `date_from`=\''.pSQL($date_from).'\' AND `date_to`=\''.pSQL($date_to).'\''
+        );
 
         return $delete;
     }
 
-    public function getRoomBookinInformationForDateRangeByOrder($id_room, $old_date_from, $old_date_to, $new_date_from, $new_date_to)
-    {
-        $sql = 'SELECT * FROM `'._DB_PREFIX_.'htl_booking_detail` WHERE `id_room`='.$id_room." AND `date_from` < '$new_date_to' AND `date_to` > '$new_date_from' AND `date_from` != '$old_date_from' AND `date_to` != '$old_date_to' AND `is_refunded`=0 AND `is_back_order`=0";
-        $result = Db::getInstance()->executeS($sql);
-        if ($result) {
-            return $result;
-        }
+    public function getRoomBookinInformationForDateRangeByOrder(
+        $id_room,
+        $old_date_from,
+        $old_date_to,
+        $new_date_from,
+        $new_date_to
+    ) {
+        $sql = 'SELECT * FROM `'._DB_PREFIX_.'htl_booking_detail` WHERE `id_room`='.(int)$id_room.
+        ' AND `date_from` < \''.pSQL($new_date_to).'\' AND `date_to` > \''.pSQL($new_date_from).
+        '\' AND `date_from` != \''.pSQL($old_date_from).'\' AND `date_to` != \''.pSQL($old_date_to).
+        '\' AND `is_refunded`=0 AND `is_back_order`=0';
 
-        return false;
+        return Db::getInstance()->executeS($sql);
     }
 
-    public function UpdateHotelCartHotelOrderOnOrderEdit($id_order, $id_room, $old_date_from, $old_date_to, $new_date_from, $new_date_to)
-    {
-        $rowByIdOrderIdRoom = Db::getInstance()->getRow('SELECT * FROM `'._DB_PREFIX_.'htl_booking_detail` WHERE `id_room`='.$id_room.' AND `id_order`='.$id_order);
-            $numDays = $this->getNumberOfDays($old_date_from, $old_date_to);
+    public function UpdateHotelCartHotelOrderOnOrderEdit(
+        $id_order,
+        $id_room,
+        $old_date_from,
+        $old_date_to,
+        $new_date_from,
+        $new_date_to
+    ) {
+        $rowByIdOrderIdRoom = Db::getInstance()->getRow('SELECT * FROM `'._DB_PREFIX_.'htl_booking_detail` WHERE `id_room`='.(int)$id_room.' AND `id_order`='.(int)$id_order);
+        $numDays = $this->getNumberOfDays($old_date_from, $old_date_to);
         $paidUnitRoomPriceTE = $rowByIdOrderIdRoom['total_price_tax_excl']/$numDays;
         $paidUnitRoomPriceTI = $rowByIdOrderIdRoom['total_price_tax_incl']/$numDays;
 
@@ -1020,9 +1052,20 @@ class HotelBookingDetail extends ObjectModel
         $table = 'htl_cart_booking_data';
         $table1 = 'htl_booking_detail';
         $num_days = $this->getNumberOfDays($new_date_from, $new_date_to);
-        $data_cart = array('date_from' => $new_date_from,'date_to' => $new_date_to,'quantity' => $num_days);
-        $data_order = array('date_from' => $new_date_from,'date_to' => $new_date_to, 'total_price_tax_excl' => $newTotalPriceTE,'total_price_tax_incl' => $newTotalPriceTI);
-        $where = 'id_order = '.$id_order.' AND id_room = '.$id_room." AND date_from = '$old_date_from' AND date_to = '$old_date_to' AND `is_refunded`=0 AND `is_back_order`=0";
+        $data_cart = array(
+            'date_from' => $new_date_from,
+            'date_to' => $new_date_to,
+            'quantity' => $num_days
+        );
+        $data_order = array(
+            'date_from' => $new_date_from,
+            'date_to' => $new_date_to,
+            'total_price_tax_excl' => $newTotalPriceTE,
+            'total_price_tax_incl' => $newTotalPriceTI
+        );
+
+        $where = 'id_order = '.(int)$id_order.' AND id_room = '.(int)$id_room.' AND date_from= \''.pSQL($old_date_from).
+        '\' AND date_to = \''.pSQL($old_date_to).'\' AND `is_refunded`=0 AND `is_back_order`=0';
 
         $result = Db::getInstance()->update($table, $data_cart, $where);
 
@@ -1033,45 +1076,31 @@ class HotelBookingDetail extends ObjectModel
 
     /**
      * [getPsOrderDetailIdByIdProduct :: Returns id_order_details accoording to the product and order Id].
-     *
      * @param [int] $id_product [Id of the product]
      * @param [int] $id_order   [Id of the order]
-     *
      * @return [int|false] [If found id_order_detail else returns false]
      */
     public function getPsOrderDetailIdByIdProduct($id_product, $id_order)
     {
-        $sql = 'SELECT `id_order_detail` FROM `'._DB_PREFIX_.'order_detail` WHERE `id_order`='.$id_order.' AND `product_id`='.$id_product;
-        $result = Db::getInstance()->getvalue($sql);
-        if ($result) {
-            return $result;
-        }
-
-        return false;
+        $sql = 'SELECT `id_order_detail` FROM `'._DB_PREFIX_.'order_detail` WHERE `id_order`='.(int)$id_order.' AND `product_id`='.(int)$id_product;
+        return Db::getInstance()->getvalue($sql);
     }
 
     /**
      * [getOrderCurrentDataByOrderId :: To get booking information of the order by Order id].
-     *
      * @param [int] $id_order [Id of the order]
-     *
      * @return [array|false] [If data found Returns the array containing the information of the cart of the passed order id else returns false]
      */
     public function getOrderCurrentDataByOrderId($id_order)
     {
-        $result = Db::getInstance()->executeS('SELECT * FROM `'._DB_PREFIX_.'htl_booking_detail` WHERE `id_order`='.$id_order);
-        if ($result) {
-            return $result;
-        } else {
-            return false;
-        }
+        return Db::getInstance()->executeS(
+            'SELECT * FROM `'._DB_PREFIX_.'htl_booking_detail` WHERE `id_order`='.(int)$id_order
+        );
     }
 
     /**
      * [getOrderFormatedBookinInfoByIdOrder : To get Order booking information with some additional information in a custom famated way].
-     *
      * @param [Int] $id_order [Id of the order]
-     *
      * @return [Array|false] [If data found returns cart booking information with some additional information else returns false]
      */
     public function getOrderFormatedBookinInfoByIdOrder($id_order)
@@ -1124,7 +1153,6 @@ class HotelBookingDetail extends ObjectModel
         if ($order_detail_data) {
             return $order_detail_data;
         }
-
         return false;
     }
 
@@ -1137,30 +1165,28 @@ class HotelBookingDetail extends ObjectModel
      */
     public function getLastInsertedIdOrderDetail($id_order)
     {
-        $result = Db::getInstance()->getValue('SELECT MAX(`id_order_detail`) FROM `'._DB_PREFIX_.'order_detail` WHERE `id_order`='.$id_order);
-        if ($result) {
-            return $result;
-        } else {
-            return false;
-        }
+        return Db::getInstance()->getValue(
+            'SELECT MAX(`id_order_detail`) FROM `'._DB_PREFIX_.'order_detail` WHERE `id_order`='.(int)$id_order
+        );
     }
 
     /**
      * [getOnlyOrderBookingData description].
-     *
      * @param [type] $id_order    [description]
      * @param [type] $id_guest    [description]
      * @param [type] $id_product  [description]
      * @param int    $id_customer [description]
-     *
      * @return [type] [description]
      */
     public function getOnlyOrderBookingData($id_order, $id_guest, $id_product, $id_customer = 0)
     {
-        $sql = 'SELECT hbd.*, od.`unit_price_tax_incl`, od.`unit_price_tax_excl`, od.`reduction_amount_tax_excl`, od.`reduction_amount_tax_incl` FROM `'._DB_PREFIX_.'htl_booking_detail` hbd INNER JOIN `'._DB_PREFIX_.'order_detail` od ON (od.id_order_detail = hbd.id_order_detail) WHERE hbd.`id_order` = '.$id_order.' AND hbd.`id_product` = '.$id_product;
+        $sql = 'SELECT hbd.*, od.`unit_price_tax_incl`, od.`unit_price_tax_excl`, od.`reduction_amount_tax_excl`,
+        od.`reduction_amount_tax_incl` FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+        INNER JOIN `'._DB_PREFIX_.'order_detail` od ON (od.`id_order_detail` = hbd.`id_order_detail`)
+        WHERE hbd.`id_order` = '.(int)$id_order.' AND hbd.`id_product` = '.(int)$id_product;
 
         if ($id_customer) {
-            $sql .=  ' AND hbd.`id_customer` = '.$id_customer;
+            $sql .=  ' AND hbd.`id_customer` = '.(int)$id_customer;
         }
         return Db::getInstance()->executeS($sql);
     }
@@ -1173,7 +1199,10 @@ class HotelBookingDetail extends ObjectModel
      */
     public static function getOrderInfoIdOrderIdProduct($id_order, $id_product)
     {
-        return Db::getInstance()->executeS("SELECT * FROM `"._DB_PREFIX_."htl_booking_detail` WHERE `id_order`=".(int) $id_order." AND `id_product`=".(int) $id_product);
+        return Db::getInstance()->executeS(
+            'SELECT * FROM `'._DB_PREFIX_.'htl_booking_detail`
+            WHERE `id_order`='.(int) $id_order.' AND `id_product`='.(int) $id_product
+        );
     }
 
     /**
@@ -1186,7 +1215,11 @@ class HotelBookingDetail extends ObjectModel
      */
     public function getCustomerIdRoomsByIdOrderIdProduct($id_order, $id_product, $date_from, $date_to)
     {
-        return Db::getInstance()->executeS('SELECT `id_room` FROM `'._DB_PREFIX_.'htl_booking_detail` WHERE `id_order`='.(int) $id_order.' AND `id_product`='.(int) $id_product.' AND `date_from`=\''.$date_from.'\' AND `date_to`= \''.$date_to.'\'');
+        return Db::getInstance()->executeS(
+            'SELECT `id_room` FROM `'._DB_PREFIX_.'htl_booking_detail`
+            WHERE `id_order`='.(int)$id_order.' AND `id_product`='.(int)$id_product.
+            ' AND `date_from`=\''.pSQL($date_from).'\' AND `date_to`= \''.pSQL($date_to).'\''
+        );
     }
 
     /**
@@ -1197,7 +1230,10 @@ class HotelBookingDetail extends ObjectModel
      */
     public function getBookedRoomsByIdOrderDetail($id_order_detail, $id_product)
     {
-        return Db::getInstance()->executeS('SELECT * FROM `'._DB_PREFIX_.'htl_booking_detail` WHERE `id_order_detail`='.(int) $id_order_detail.' AND `id_product`='.(int) $id_product);
+        return Db::getInstance()->executeS(
+            'SELECT * FROM `'._DB_PREFIX_.'htl_booking_detail`
+            WHERE `id_order_detail`='.(int)$id_order_detail.' AND `id_product`='.(int)$id_product
+        );
     }
 
     /**
@@ -1456,11 +1492,9 @@ class HotelBookingDetail extends ObjectModel
     {
         $cartTable = 'htl_cart_booking_data';
         $orderTable = 'htl_booking_detail';
-        $condition = 'id_order = '.$id_order;
+        $condition = 'id_order = '.(int)$id_order;
         if (Db::getInstance()->delete($orderTable, $condition)) {
-            if (Db::getInstance()->delete($cartTable, $condition)) {
-                return true;
-            }
+            return Db::getInstance()->delete($cartTable, $condition);
         }
         return false;
     }
@@ -1469,11 +1503,9 @@ class HotelBookingDetail extends ObjectModel
     {
         $cartTable = 'htl_cart_booking_data';
         $orderTable = 'htl_booking_detail';
-        $condition = 'id_order = '.$id_order.' AND id_product = '.$id_product.' AND id_room = '.$id_room;
+        $condition = 'id_order = '.(int)$id_order.' AND id_product = '.(int)$id_product.' AND id_room = '.(int)$id_room;
         if (Db::getInstance()->delete($orderTable, $condition)) {
-            if (Db::getInstance()->delete($cartTable, $condition)) {
-                return true;
-            }
+            return Db::getInstance()->delete($cartTable, $condition);
         }
         return false;
     }
@@ -1482,11 +1514,9 @@ class HotelBookingDetail extends ObjectModel
     {
         $cartTable = 'htl_cart_booking_data';
         $orderTable = 'htl_booking_detail';
-        $condition = 'id_order = '.$id_order.' AND id_product = '.$id_product;
+        $condition = 'id_order = '.(int)$id_order.' AND id_product = '.(int)$id_product;
         if (Db::getInstance()->delete($orderTable, $condition)) {
-            if (Db::getInstance()->delete($cartTable, $condition)) {
-                return true;
-            }
+            return Db::getInstance()->delete($cartTable, $condition);
         }
         return false;
     }
@@ -1542,11 +1572,10 @@ class HotelBookingDetail extends ObjectModel
     {
         $cartTable = 'htl_cart_booking_data';
         $orderTable = 'htl_booking_detail';
-        $condition = '`id_order` = '.$id_order.' AND `id_product` = '.$id_product.' AND `id_room` = '.$id_room;
+        $condition = '`id_order` = '.(int)$id_order.' AND `id_product` = '.(int)$id_product.
+        ' AND `id_room` = '.(int)$id_room;
         if (Db::getInstance()->update($orderTable, $update_params, $condition)) {
-            if (Db::getInstance()->update($cartTable, $update_params, $condition)) {
-                return true;
-            }
+            return Db::getInstance()->update($cartTable, $update_params, $condition);
         }
         return false;
     }
@@ -1585,7 +1614,11 @@ class HotelBookingDetail extends ObjectModel
 
             // Add new entry to the table
             if ($orderDetail->save()) {
-                return Db::getInstance()->update('htl_booking_detail', array('id_order_detail' => $orderDetail->id_order_detail), '`id_order` = '.$id_order.' AND `id_product` = '.$id_product);
+                return Db::getInstance()->update(
+                    'htl_booking_detail',
+                    array('id_order_detail' => $orderDetail->id_order_detail),
+                    '`id_order` = '.(int)$id_order.' AND `id_product` = '.(int)$id_product
+                );
             }
         }
         return false;
@@ -1601,6 +1634,19 @@ class HotelBookingDetail extends ObjectModel
      */
     public function getRowByIdOrderIdProductInDateRange($id_order, $id_product, $date_from, $date_to)
     {
-        return Db::getInstance()->getRow('SELECT * FROM `'._DB_PREFIX_.'htl_booking_detail` WHERE `id_order`='.(int) $id_order.' AND `id_product`='.(int) $id_product.' AND `date_from`=\''.$date_from.'\' AND `date_to`= \''.$date_to.'\'');
+        return Db::getInstance()->getRow(
+            'SELECT * FROM `'._DB_PREFIX_.'htl_booking_detail`
+            WHERE `id_order`='.(int)$id_order.' AND `id_product`='.(int)$id_product.
+            ' AND `date_from`=\''.pSQL($date_from).'\' AND `date_to`= \''.pSQL($date_to).'\''
+        );
+    }
+
+    public function getRoomBookingData($idRoom, $idOrder)
+    {
+        $sql = 'SELECT `id_product`, `id_order_detail`, `id_hotel`, `id_customer`, `booking_type`, `id_status`, `check_in`, `check_out`
+                FROM `'._DB_PREFIX_.'htl_booking_detail`
+                WHERE `id_order`='.(int)$idOrder.' AND `id_room`='.(int)$idRoom;
+
+        return Db::getInstance()->getRow($sql);
     }
 }

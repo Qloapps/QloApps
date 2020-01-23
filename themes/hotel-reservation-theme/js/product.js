@@ -1156,6 +1156,10 @@ $(document).ready(function() {
                         $('.total_price_block p').text(total_price);
                         $('.total_rooms_price_block').text(total_room_price);
 
+                        extra_demand_price = parseFloat(result.extra_demand_price);
+                        extra_demand_price = formatCurrency(extra_demand_price, currency_format, currency_sign, currency_blank);
+                        $('.extra_demands_price_block').text(extra_demand_price);
+
                         feature_price = parseFloat(result.feature_price);
                         original_product_price = parseFloat(result.original_product_price);
                         feature_price_diff = parseFloat(result.feature_price_diff);
@@ -1289,6 +1293,10 @@ $(document).ready(function() {
                             total_room_price = formatCurrency(total_room_price, currency_format, currency_sign, currency_blank);
                             $('.total_price_block p').text(total_price);
                             $('.total_rooms_price_block').text(total_room_price);
+
+                            extra_demand_price = parseFloat(result.extra_demand_price);
+                            extra_demand_price = formatCurrency(extra_demand_price, currency_format, currency_sign, currency_blank);
+                            $('.extra_demands_price_block').text(extra_demand_price);
 
                             feature_price = parseFloat(result.feature_price);
                             original_product_price = parseFloat(result.original_product_price);

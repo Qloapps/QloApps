@@ -30,142 +30,104 @@
 			{/if}
 			<th class="product header small">{l s='Room Description' pdf='true'}</th>
 			<th class="product header small">{l s='Room Capcity' pdf='true'}</th>
-
+			<th class="product header small">{l s='Tax Rate(s)' pdf='true'}</th>
 			{* {if isset($layout.before_discount)}
 				<th class="product header small">{l s='Base price' pdf='true'} <br /> {l s='(Tax excl.)' pdf='true'}</th>
 			{/if} *}
 
-			<th class="product header-right small" width="{$layout.unit_price_tax_excl.width}%">{l s='Unit Price' pdf='true'} <br /> {l s='(Tax excl.)' pdf='true'}</th>
+			<th class="product header small" width="{$layout.unit_price_tax_excl.width}%">{l s='Unit Price' pdf='true'} <br /> {l s='(Tax excl.)' pdf='true'}</th>
 			<th class="product header small">{l s='Rooms Qty' pdf='true'}</th>
 			<th class="product header small">{l s='Check-in Date' pdf='true'}</th>
 			<th class="product header small">{l s='Check-out Date' pdf='true'}</th>
-			<th class="product header-right small">{l s='Total' pdf='true'} <br /> {l s='(Tax excl.)' pdf='true'}</th>
+			<th class="product header small">{l s='Total' pdf='true'} <br /> {l s='(Tax excl.)' pdf='true'}</th>
 			{if isset($refunded_rooms) && $refunded_rooms}
-				<th class="product header-right small">{l s='Refund Status' pdf='true'}</th>
+				<th class="product header small">{l s='Refund Status' pdf='true'}</th>
 			{/if}
 		</tr>
 	</thead>
 	<tbody>
-	{if isset($cart_htl_data)}
-		{foreach from=$cart_htl_data key=data_k item=data_v}
-			{foreach from=$data_v['date_diff'] key=rm_k item=rm_v}
-				{cycle values=["color_line_even", "color_line_odd"] assign=bgcolor_class}
-				<tr class="product {$bgcolor_class}">
-					{if $display_product_images}
-						<td class="cart_product">
-							<img src="{$data_v['cover_img']}" class="img-responsive thumbnail" />
-						</td>
-					{/if}
-					<td class="product center">
-						<p class="product-name">
-							{$data_v['name']}
-						</p>
-					</td>
-					<td>
-						<p class="text-left">
-							{$data_v['adult']} {l s='Adults'}, {$data_v['children']} {l s='Children'}
-						</p>
-					</td>
-					<td class="product center">
-						<p class="text-center">
-							{displayPrice currency=$order->id_currency price=$rm_v['paid_unit_price_tax_incl']}
-						</p>
-					</td>
-					<td class="product center">
-						<p class="text-left">
-							{$rm_v['num_rm']}
-						</p>
-					</td>
-					<td class="product center">
-						<p>
-							{$rm_v['data_form']|date_format:"%d-%b-%G"}
-						</p>
-					</td>
-					<td class="product center">
-						<p>
-							{$rm_v['data_to']|date_format:"%d-%b-%G"}
-						</p>
-					</td>
-					<td class="product center">
-						<p>
-							{displayPrice currency=$order->id_currency price=$rm_v['amount']}
-						</p>
-					</td>
-					{if isset($refunded_rooms) && $refunded_rooms}
-						{if isset($rm_v['stage_name']) && $rm_v['stage_name'] == 'Refunded'}
-							<td class="product center">
-								<p style="background-color:green; padding-left:5px;">
-									{l s='Refunded' pdf='true'}
-								</p>
+		{if isset($cart_htl_data)}
+			{foreach from=$cart_htl_data key=data_k item=data_v}
+				{foreach from=$data_v['date_diff'] key=rm_k item=rm_v}
+					{cycle values=["color_line_even", "color_line_odd"] assign=bgcolor_class}
+					<tr class="product {$bgcolor_class}">
+						{if $display_product_images}
+							<td class="cart_product">
+								<img src="{$data_v['cover_img']}" class="thumbnail" />
 							</td>
-						{else}
-							--
 						{/if}
-					{/if}
-				</tr>
-				{if isset($rm_v['extra_demands']) && $rm_v['extra_demands']}
-					<tr>
-						<td colspan="8">
-							<p><strong>{l s='Additional Facilities Details' pdf='true'}</strong></p>
-							<table class="demands-table" cellpadding="4" cellspacing="0">
-								<thead>
-									<tr>
-										{assign var=roomCount value=1}
-										{foreach $rm_v['extra_demands'] as $roomDemand}
-											<th><strong>{l s='Room' pdf='true'} - {$roomCount}</strong><br></th>
-											{assign var=roomCount value=$roomCount+1}
-										{/foreach}
-									</tr>
-								</thead>
-								<tbody>
-									<tr>
-										{foreach $rm_v['extra_demands'] as $roomDemands}
-											<td>
-												{foreach $roomDemands['extra_demands'] as $demand}
-													<p><span>{$demand['name']}</span> &nbsp;&nbsp; - &nbsp;&nbsp; <span class="pull-right">{displayPrice currency=$order->id_currency price=$demand['price']}</span></p>
-												{/foreach}
-											</td>
-										{/foreach}
-									</tr>
-								</tbody>
-							</table>
+						<td class="product center">
+							<p class="product-name">
+								{$data_v['name']}
+							</p>
 						</td>
+						<td>
+							<p class="text-left">
+								{$data_v['adult']} {l s='Adults'}, {$data_v['children']} {l s='Children'}
+							</p>
+						</td>
+						<td class="product center">
+							{$data_v['order_detail_tax_label']}
+						</td>
+						<td class="product center">
+							<p class="text-center">
+								{displayPrice currency=$order->id_currency price=$rm_v['paid_unit_price_tax_incl']}
+							</p>
+						</td>
+						<td class="product center">
+							<p class="text-left">
+								{$rm_v['num_rm']}
+							</p>
+						</td>
+						<td class="product center">
+							<p>
+								{$rm_v['data_form']|date_format:"%d-%m-%Y"}
+							</p>
+						</td>
+						<td class="product center">
+							<p>
+								{$rm_v['data_to']|date_format:"%d-%m-%Y"}
+							</p>
+						</td>
+						<td class="product center">
+							<p>
+								{displayPrice currency=$order->id_currency price=$rm_v['amount']}
+							</p>
+						</td>
+						{if isset($refunded_rooms) && $refunded_rooms}
+							{if isset($rm_v['stage_name']) && $rm_v['stage_name'] == 'Refunded'}
+								<td class="product center">
+									<p style="background-color:green; padding-left:5px;">
+										{l s='Refunded' pdf='true'}
+									</p>
+								</td>
+							{else}
+								--
+							{/if}
+						{/if}
 					</tr>
-				{/if}
+				{/foreach}
 			{/foreach}
-		{/foreach}
-	{/if}
-
-	<!-- END PRODUCTS -->
-
-	<!-- CART RULES -->
-
-	<!-- {assign var="shipping_discount_tax_incl" value="0"}
-	{foreach from=$cart_rules item=cart_rule name="cart_rules_loop"}
-		{if $smarty.foreach.cart_rules_loop.first}
-		<tr class="discount">
-			<th class="header" colspan="{$layout._colCount}">
-				{l s='Discounts' pdf='true'}
-			</th>
-		</tr>
 		{/if}
-		<tr class="discount">
-			<td class="white right" colspan="{$layout._colCount - 1}">
-				{$cart_rule.name}
-			</td>
-			<td class="right white">
-				- {displayPrice currency=$order->id_currency price=$cart_rule.value_tax_excl}
-			</td>
-		</tr>
-	{/foreach} -->
-
+		{* END PRODUCTS *}
+		{* CART RULES *}
+		{* {assign var="shipping_discount_tax_incl" value="0"}
+		{foreach from=$cart_rules item=cart_rule name="cart_rules_loop"}
+			{if $smarty.foreach.cart_rules_loop.first}
+			<tr class="discount">
+				<th class="header" colspan="{$layout._colCount}">
+					{l s='Discounts' pdf='true'}
+				</th>
+			</tr>
+			{/if}
+			<tr class="discount">
+				<td class="white right" colspan="{$layout._colCount - 1}">
+					{$cart_rule.name}
+				</td>
+				<td class="right white">
+					- {displayPrice currency=$order->id_currency price=$cart_rule.value_tax_excl}
+				</td>
+			</tr>
+		{/foreach} *}
 	</tbody>
 </table>
-<style>
-	.demands-table td, .demands-table th {
-		border: 1px solid #ccc;
-	}
-	.pull-right {
-		float: right;
-	}
-</style>

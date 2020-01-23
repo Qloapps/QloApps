@@ -7,4 +7,4 @@ E-mail : {email}
 
 {shop_name} - {shop_url}
 
-{shop_url} didukung oleh PrestaShop™
+{shop_url} didukung oleh Webkul™

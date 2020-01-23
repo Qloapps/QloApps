@@ -6,5 +6,5 @@ Olá,
 OBRIGADO POR ASSINAR A NOSSA NEWSLETTER.
 
 {shop_name} [{shop_url}] baseado em
-Webkul(tm) [https://webkul.com/]
+Webkul(tm) [https://webkul.com]
 

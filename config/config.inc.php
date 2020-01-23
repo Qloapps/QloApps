@@ -263,3 +263,5 @@ if (!defined('_MEDIA_SERVER_2_')) {
 if (!defined('_MEDIA_SERVER_3_')) {
     define('_MEDIA_SERVER_3_', Configuration::get('PS_MEDIA_SERVER_3'));
 }
+
+require_once (_PS_ROOT_DIR_.'/modules/hotelreservationsystem/define.php');

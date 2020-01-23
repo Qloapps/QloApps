@@ -50,7 +50,7 @@ class HotelRoomTypeDemandPrice extends ObjectModel
         );
     }
 
-    public function getRoomTypeDemandsTotalPrice($idProduct, $roomDemands)
+    public function getRoomTypeDemandsTotalPrice($idProduct, $roomDemands, $useTax = null, $dateFrom = 0, $dateTo = 0)
     {
         $totalDemandsPrice = 0;
         if ($roomDemands) {
@@ -62,40 +62,42 @@ class HotelRoomTypeDemandPrice extends ObjectModel
             } else {
                 $idCurrency = (int)Configuration::get('PS_CURRENCY_DEFAULT');
             }
+            $objRoomDmdPrice = new HotelRoomTypeDemandPrice();
+            if ($useTax === null) {
+                $useTax = HotelBookingDetail::useTax();
+            }
+            $objBookingDetail = new HotelBookingDetail();
             foreach ($roomDemands as $demand) {
                 $idGlobalDemand = $demand['id_global_demand'];
                 $idOption = $demand['id_option'];
+                $objGlobalDemand = new HotelRoomTypeGlobalDemand($idGlobalDemand);
                 if ($idOption) {
                     $objOption = new HotelRoomTypeGlobalDemandAdvanceOption($idOption);
-                    $priceByRoom = $this->getRoomTypeDemandPrice(
+                    $price = HotelRoomTypeDemand::getPriceStatic(
                         $idProduct,
                         $idGlobalDemand,
-                        $idOption
+                        $idOption,
+                        $useTax
                     );
-                    if (Validate::isPrice($priceByRoom)) {
-                        $totalDemandsPrice += $priceByRoom;
-                    } else {
-                        $totalDemandsPrice += $objOption->price;
-                    }
                 } else {
-                    $objGlobalDemand = new HotelRoomTypeGlobalDemand($idGlobalDemand);
-                    $priceByRoom = $this->getRoomTypeDemandPrice(
+                    $price = HotelRoomTypeDemand::getPriceStatic(
                         $idProduct,
                         $idGlobalDemand,
-                        $idOption
+                        0,
+                        $useTax
                     );
-                    if (Validate::isPrice($priceByRoom)) {
-                        $totalDemandsPrice += $priceByRoom;
-                    } else {
-                        $totalDemandsPrice += $objGlobalDemand->price;
+                }
+                if ($objGlobalDemand->price_calc_method == HotelRoomTypeGlobalDemand::WK_PRICE_CALC_METHOD_EACH_DAY) {
+                    if ($dateFrom && $dateTo) {
+                        $numDays = $objBookingDetail->getNumberOfDays($dateFrom, $dateTo);
+                        if ($numDays > 1) {
+                            $price *= $numDays;
+                        }
                     }
                 }
+                $totalDemandsPrice += $price;
             }
         }
-        $totalDemandsPrice = Tools::convertPrice(
-            $totalDemandsPrice,
-            $idCurrency
-        );
         return $totalDemandsPrice;
     }
 
@@ -115,6 +117,46 @@ class HotelRoomTypeDemandPrice extends ObjectModel
             'htl_room_type_demand_price',
             $where
         );
+    }
+
+    public function delete()
+    {
+        // delete advance options of the global demands
+        $objAdvOption = new HotelRoomTypeGlobalDemandAdvanceOption();
+        if ($advOptions = $objAdvOption->getGlobalDemandAdvanceOptions($this->id)) {
+            foreach ($advOptions as $option) {
+                $objAdvOption = new HotelRoomTypeGlobalDemandAdvanceOption($option['id']);
+                $objAdvOption->delete();
+            }
+        }
+        // delete the global demands from cart
+        $objCartBookingData = new HotelCartBookingData();
+        if ($cartExtraDemands = $objCartBookingData->getCartExtraDemands()) {
+            foreach ($cartExtraDemands as &$demandInfo) {
+                if (isset($demandInfo['extra_demands']) && $demandInfo['extra_demands']) {
+                    $cartChanged = 0;
+                    foreach ($demandInfo['extra_demands'] as $key => $demand) {
+                        if ($this->id == $demand['id_global_demand']) {
+                            $cartChanged = 1;
+                            unset($demandInfo['extra_demands'][$key]);
+                        }
+                    }
+                    if ($cartChanged) {
+                        if (Validate::isLoadedObject($objCartBooking = new HotelCartBookingData($demandInfo['id']))) {
+                            $objCartBooking->extra_demands = Tools::jsonEncode($demandInfo['extra_demands']);
+                            $objCartBooking->save();
+                        }
+                    }
+                }
+            }
+        }
+
+        // delete the info from room type demands table
+        $objRoomTypeDemand = new HotelRoomTypeDemand();
+        $objRoomTypeDemand->deleteRoomTypeDemands(0, $this->id);
+        $objRoomTypeDemandPrice = new HotelRoomTypeDemandPrice();
+        $objRoomTypeDemandPrice->deleteRoomTypeDemandPrices(0, $this->id);
+        return parent::delete();
     }
 }
 

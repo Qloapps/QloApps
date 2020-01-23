@@ -28,7 +28,7 @@ class WkFooterAboutBlock extends Module
     {
         $this->name = 'wkfooteraboutblock';
         $this->tab = 'front_office_features';
-        $this->version = '1.0.1';
+        $this->version = '1.0.2';
         $this->author = 'webkul';
         $this->need_instance = 0;
 

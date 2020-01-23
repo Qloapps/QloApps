@@ -6,5 +6,5 @@ Hola,
 GRACIAS POR SUSCRIBIRSE A NUESTRO BOLETÍN.
 
 {shop_name} [{shop_url}] creado por
-Webkul(tm) [https://webkul.com/]
+Webkul(tm) [https://webkul.com]
 

@@ -122,14 +122,28 @@ class GuestTrackingControllerCore extends FrontController
                 && ($dateTo = Tools::getValue('date_to'))
             ) {
                 $objBookingDemand = new HotelBookingDemands();
+                $order = new Order($idOrder);
+                $customer = new Customer((int)$order->id_customer);
+                $useTax = 0;
+                if (Group::getPriceDisplayMethod($customer->id_default_group) == PS_TAX_INC) {
+                    $useTax = 1;
+                }
                 if ($extraDemands = $objBookingDemand->getRoomTypeBookingExtraDemands(
                     $idOrder,
                     $idProduct,
                     0,
                     $dateFrom,
-                    $dateTo
+                    $dateTo,
+                    1,
+                    0,
+                    $useTax
                 )) {
-                    $this->context->smarty->assign('extraDemands', $extraDemands);
+                    $this->context->smarty->assign(
+                        array(
+                            'useTax' => $useTax,
+                            'extraDemands' => $extraDemands,
+                        )
+                    );
                     $extraDemandsTpl .= $this->context->smarty->fetch(_PS_THEME_DIR_.'_partials/order_booking_demands.tpl');
                 }
             }
@@ -212,7 +226,8 @@ class GuestTrackingControllerCore extends FrontController
             // enter the details of the booking the order
             if ($hotelresInstalled) {
                 if ($orderProducts = $order->getProducts()) {
-                    $total_demands_price = 0;
+                    $total_demands_price_te = 0;
+                    $total_demands_price_ti = 0;
                     foreach ($orderProducts as $type_key => $type_value) {
                         if (in_array($type_value['product_id'], $processedProducts)) {
                             continue;
@@ -303,19 +318,36 @@ class GuestTrackingControllerCore extends FrontController
                                 $data_v['date_from'],
                                 $data_v['date_to']
                             );
-                            if (empty($cartHotelData[$type_key]['date_diff'][$date_join]['extra_demands_price'])) {
-                                $cartHotelData[$type_key]['date_diff'][$date_join]['extra_demands_price'] = 0;
+                            if (empty($cartHotelData[$type_key]['date_diff'][$date_join]['extra_demands_price_ti'])) {
+                                $cartHotelData[$type_key]['date_diff'][$date_join]['extra_demands_price_ti'] = 0;
                             }
-                            $cartHotelData[$type_key]['date_diff'][$date_join]['extra_demands_price'] += $extraDemandPrice = $objBookingDemand->getRoomTypeBookingExtraDemands(
+                            $extraDemandPriceTI = $objBookingDemand->getRoomTypeBookingExtraDemands(
                                 $idOrder,
                                 $type_value['product_id'],
-                                $data_v['id_room'],
+                                0,
                                 $data_v['date_from'],
                                 $data_v['date_to'],
                                 0,
+                                1,
                                 1
                             );
-                            $total_demands_price += $extraDemandPrice;
+                            $cartHotelData[$type_key]['date_diff'][$date_join]['extra_demands_price_ti'] += $extraDemandPriceTI;
+                            if (empty($cartHotelData[$type_key]['date_diff'][$date_join]['extra_demands_price_te'])) {
+                                $cartHotelData[$type_key]['date_diff'][$date_join]['extra_demands_price_te'] = 0;
+                            }
+                            $extraDemandPriceTE = $objBookingDemand->getRoomTypeBookingExtraDemands(
+                                $idOrder,
+                                $type_value['product_id'],
+                                0,
+                                $data_v['date_from'],
+                                $data_v['date_to'],
+                                0,
+                                1,
+                                0
+                            );
+                            $cartHotelData[$type_key]['date_diff'][$date_join]['extra_demands_price_te'] += $extraDemandPriceTE;
+                            $total_demands_price_ti += $extraDemandPriceTI;
+                            $total_demands_price_te += $extraDemandPriceTE;
                             $cartHotelData[$type_key]['date_diff'][$date_join]['product_price_tax_excl'] = $order_details_obj->unit_price_tax_excl;
                             $cartHotelData[$type_key]['date_diff'][$date_join]['product_price_tax_incl'] = $order_details_obj->unit_price_tax_incl;
                             $cartHotelData[$type_key]['date_diff'][$date_join]['product_price_without_reduction_tax_excl'] = $order_details_obj->unit_price_tax_excl + $order_details_obj->reduction_amount_tax_excl;
@@ -346,7 +378,8 @@ class GuestTrackingControllerCore extends FrontController
 
             $this->context->smarty->assign(
                 array(
-                    'total_demands_price' => $total_demands_price,
+                    'total_demands_price_ti' => $total_demands_price_ti,
+                    'total_demands_price_te' => $total_demands_price_te,
                     'any_back_order' => $anyBackOrder,
                     'shw_bo_msg' => Configuration::get('WK_SHOW_MSG_ON_BO'),
                     'back_ord_msg' => Configuration::get('WK_BO_MESSAGE'),
@@ -372,7 +405,8 @@ class GuestTrackingControllerCore extends FrontController
             'CUSTOMIZE_FILE' => Product::CUSTOMIZE_FILE,
             'CUSTOMIZE_TEXTFIELD' => Product::CUSTOMIZE_TEXTFIELD,
             'use_tax' => Configuration::get('PS_TAX'),
-            ));
+            'guestInformations' => (array)$customer,
+        ));
     }
 
     public function setMedia()

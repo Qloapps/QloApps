@@ -6,4 +6,4 @@
 
 	{logs}
 
-	{shop_url} lanzado por PrestaShop™
+	{shop_url} lanzado por Webkul™

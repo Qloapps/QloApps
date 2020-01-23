@@ -169,7 +169,7 @@ class ParentOrderControllerCore extends FrontController
     {
         // For Advanced Payment (when advance paid amount will be zero when voucher will be applied)
         $freeAdvancePaymentOrder = false;
-        if (Module::isInstalled('hotelreservationsystem')) 
+        if (Module::isInstalled('hotelreservationsystem'))
         {
             require_once (_PS_MODULE_DIR_.'hotelreservationsystem/define.php');
             $obj_adv_pmt = new HotelAdvancedPayment();

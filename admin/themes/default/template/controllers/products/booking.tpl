@@ -1,12 +1,12 @@
 {if isset($product->id) && isset($htl_config)}
 	<div id="product-configuration" class="panel product-tab">
 		<input type="hidden" name="submitted_tabs[]" value="Booking"/>
-		<h3 class="tab"> <i class="icon-info"></i> {l s='Booking Information' mod='hotelreservationsystem'}</h3>
+		<h3 class="tab"> <i class="icon-info"></i> {l s='Booking Information'}</h3>
 
 		<div class="form-group">
 			<div class="col-sm-1"></div>
 			<label for="from_date" class="control-label col-sm-1 required">
-				<span title="" data-toggle="tooltip" class="label-tooltip" data-original-title="{l s='Booking Date starts from'}">{l s='From' mod='hotelreservationsystem'}</span>
+				<span title="" data-toggle="tooltip" class="label-tooltip" data-original-title="{l s='Booking date starts from'}">{l s='From'}</span>
 			</label>
 			<div class="col-sm-2">
 				<input type="hidden" id="checkTabClick" value="0" name="checkTabClick">
@@ -14,7 +14,7 @@
 			</div>
 
 			<label for="to_date" class="control-label col-sm-1 required">
-				<span title="" data-toggle="tooltip" class="label-tooltip" data-original-title="{l s='Booking Date upto'}">{l s='To' mod='hotelreservationsystem'}</span>
+				<span title="" data-toggle="tooltip" class="label-tooltip" data-original-title="{l s='Booking date upto'}">{l s='To'}</span>
 			</label>
 			<div class="col-sm-2">
 				<input type="text" name="to_date" class="form-control" id="to_date" value="{$date_to}">
@@ -50,7 +50,7 @@
 					<div class="col-sm-6">
 						<div class="row">
 							<div class="col-sm-12 htl_room_cat_data">
-								<p class="room_cat_header">{l s='Total Rooms' mod='hotelreservationsystem'}</p>
+								<p class="room_cat_header">{l s='Total Rooms'}</p>
 								<p class="room_cat_data">{$booking_data['stats']['total_rooms']}</p>
 							</div>
 						</div>
@@ -59,7 +59,7 @@
 					<div class="col-sm-6">
 						<div class="row">
 							<div class="col-sm-12 htl_room_cat_data no_border">
-								<p class="room_cat_header">{l s='Partially Available' mod='hotelreservationsystem'}</p>
+								<p class="room_cat_header">{l s='Partially Available'}</p>
 								<p class="room_cat_data">{$booking_data['stats']['num_part_avai']}</p>
 							</div>
 						</div>
@@ -70,7 +70,7 @@
 					<div class="col-sm-6">
 						<div class="row">
 							<div class="col-sm-12 htl_room_cat_data">
-								<p class="room_cat_header">{l s='Available Rooms' mod='hotelreservationsystem'}</p>
+								<p class="room_cat_header">{l s='Available Rooms'}</p>
 								<p class="room_cat_data">{$booking_data['stats']['num_avail']}</p>
 							</div>
 						</div>
@@ -79,7 +79,7 @@
 					<div class="col-sm-6">
 						<div class="row">
 							<div class="col-sm-12 htl_room_cat_data no_border">
-								<p class="room_cat_header">{l s='Booked Rooms' mod='hotelreservationsystem'}</p>
+								<p class="room_cat_header">{l s='Booked Rooms'}</p>
 								<p class="room_cat_data">{$booking_data['stats']['num_booked']}</p>
 							</div>
 						</div>
@@ -90,7 +90,7 @@
 					<div class="col-sm-6">
 						<div class="row">
 							<div class="col-sm-12 htl_room_cat_data">
-								<p class="room_cat_header">{l s='Unavailable Rooms' mod='hotelreservationsystem'}</p>
+								<p class="room_cat_header">{l s='Unavailable Rooms'}</p>
 								<p class="room_cat_data">{$booking_data['stats']['num_unavail']}</p>
 							</div>
 						</div>
@@ -101,19 +101,19 @@
 				<div class="row">
 					<div class="col-sm-6 indi_cont clearfix">
 						<div class="color_indicate bg-green"></div>
-						<span class="indi_label">{l s='Available Rooms' mod='hotelreservationsystem'}</span>
+						<span class="indi_label">{l s='Available Rooms'}</span>
 					</div>
 					<div class="col-sm-6 indi_cont clearfix">
 						<div class="color_indicate bg-yellow"></div>
-						<span class="indi_label">{l s='Partially Available' mod='hotelreservationsystem'}</span>
+						<span class="indi_label">{l s='Partially Available'}</span>
 					</div>
 					<div class="col-sm-6 indi_cont clearfix">
 						<div class="color_indicate bg-red"></div>
-						<span class="indi_label">{l s='Unavailable Rooms' mod='hotelreservationsystem'}</span>
+						<span class="indi_label">{l s='Unavailable Rooms'}</span>
 					</div>
 					<div class="col-sm-6 indi_cont clearfix">
 						<div class="color_indicate bg-gray"></div>
-						<span class="indi_label">{l s='Hold For Maintenance' mod='hotelreservationsystem'}</span>
+						<span class="indi_label">{l s='Hold For Maintenance'}</span>
 					</div>
 				</div>
 			</div>
@@ -122,7 +122,7 @@
 		<div class="panel-footer">
 			<a href="{$link->getAdminLink('AdminProducts')|escape:'html':'UTF-8'}{if isset($smarty.request.page) && $smarty.request.page > 1}&amp;submitFilterproduct={$smarty.request.page|intval}{/if}" class="btn btn-default">
 				<i class="process-icon-cancel"></i>
-				{l s='Cancel' mod='hotelreservationsystem'}
+				{l s='Cancel'}
 			</a>
 			<button type="submit" name="submitAddproductAndStay" class="btn btn-default pull-right" disabled="disabled" id="stayBookingTab">
 				<i class="process-icon-loading"></i>
@@ -132,15 +132,15 @@
 	</div>
 
 	<div class="panel">
-		<h3 class="tab"> <i class="icon-list"></i> {l s='LIST OF HOTEL ROOMS' mod='hotelreservationsystem'}</h3>
+		<h3 class="tab"> <i class="icon-list"></i> {l s='LIST OF HOTEL ROOMS'}</h3>
 		<div class="form-group">
 			<div class="table-responsive">
 				<table class="table">
 					<thead>
 						<tr>
-							<th>{l s='Room No.' mod='hotelreservationsystem'}</th>
-							<th>{l s='Status' mod='hotelreservationsystem'}</th>
-							<th>{l s='Message' mod='hotelreservationsystem'}</th>
+							<th>{l s='Room No.'}</th>
+							<th>{l s='Status'}</th>
+							<th>{l s='Message'}</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -149,7 +149,7 @@
 								{foreach from=$b_val key=data_k item=data_v}
 									<tr>
 										<td>{$data_v['room_num']}</td>
-										<td>{l s='Available' mod='hotelreservationsystem'}</td>
+										<td>{l s='Available'}</td>
 										<td>{$data_v['room_comment']}</td>
 									</tr>
 								{/foreach}
@@ -157,7 +157,7 @@
 								{foreach from=$b_val key=data_k item=data_v}
 									<tr>
 										<td>{$data_v['room_num']}</td>
-										<td>{l s='Unavailable' mod='hotelreservationsystem'}</td>
+										<td>{l s='Unavailable'}</td>
 										<td>{$data_v['room_comment']}</td>
 									</tr>
 								{/foreach}
@@ -167,11 +167,11 @@
 										<td>{$data_v['room_num']}</td>
 										<td>
 											{if $data_v['detail'][0]['booking_status'] == 1}
-												{l s='Alloted' mod='hotelreservationsystem'}
+												{l s='Alloted'}
 											{elseif $data_v['detail'][0]['booking_status'] == 2}
-												{l s='Checked-in' mod='hotelreservationsystem'}
+												{l s='Checked-in'}
 											{elseif $data_v['detail'][0]['booking_status'] == 3}
-												{l s='Checked-out' mod='hotelreservationsystem'}
+												{l s='Checked-out'}
 											{/if}
 										</td>
 										<td>{$data_v['detail'][0]['comment']}</td>
@@ -181,7 +181,7 @@
 								{foreach from=$b_val key=data_k item=data_v}
 									<tr>
 										<td>{$data_v['room_num']}</td>
-										<td>{l s='Partially Available' mod='hotelreservationsystem'}</td>
+										<td>{l s='Partially Available'}</td>
 										<td>{if isset($data_v['comment'])}{$data_v['comment']}{/if}</td>
 									</tr>
 								{/foreach}

@@ -6,4 +6,4 @@
 
 	{logs}
 
-	{shop_url} powered by PrestaShop™
+	{shop_url} powered by Webkul™

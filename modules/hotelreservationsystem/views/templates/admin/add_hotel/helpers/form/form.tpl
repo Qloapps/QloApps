@@ -1,11 +1,12 @@
 <div class="panel">
 	<div class="panel-heading">
 		{if isset($edit)}
-			<i class='icon-pencil'></i>&nbsp{l s='Edit Hotel' mod='hotelreservationsystem'}
+			<i class='icon-pencil'></i> {l s='Edit Hotel' mod='hotelreservationsystem'}
 		{else}
-			<i class='icon-plus'></i>&nbsp{l s='Add New Hotel' mod='hotelreservationsystem'}
+			<i class='icon-plus'></i> {l s='Add New Hotel' mod='hotelreservationsystem'}
 		{/if}
 	</div>
+
 	<form id="{$table|escape:'htmlall':'UTF-8'}_form" class="defaultForm {$name_controller|escape:'htmlall':'UTF-8'} form-horizontal" action="{$current|escape:'htmlall':'UTF-8'}&{if !empty($submit_action)}{$submit_action|escape:'htmlall':'UTF-8'}{/if}&token={$token|escape:'htmlall':'UTF-8'}" method="post" enctype="multipart/form-data" {if isset($style)}style="{$style|escape:'htmlall':'UTF-8'}"{/if}>
 		{if count($languages) > 1}
 			<div class="col-lg-12">
@@ -175,7 +176,7 @@
 					</div>
 					<div class="form-group">
 						<label class="control-label col-sm-3 required" for="hotel_country">{l s='Country :' mod='hotelreservationsystem'}</label>
-						<div class="col-sm-6">
+						<div class="col-sm-9">
 							<div style="width: 195px;">
 								<select class="form-control" name="hotel_country" id="hotel_country" value="">
 									<option value="0" selected="selected">{l s='Choose your Country' mod='hotelreservationsystem'} </option>
@@ -186,11 +187,12 @@
 									{/if}
 								</select>
 							</div>
+							<div class="help-block"><em>** {l s='If Hotel\'s country is not present in country list then import that country from' mod='hotelreservationsystem'}<a href="{$link->getAdminLink('AdminLocalization')|escape:'html':'UTF-8'}"> <strong>{l s='Localization' mod='hotelreservationsystem'}</strong> </a>{l s='tab.' mod='hotelreservationsystem'}</em></div>
 						</div>
 					</div>
-					<div class="form-group">
+					<div class="form-group hotel_state_dv" {if isset($edit) && !$state_var}style="display:none;"{/if}>
 						<label class="control-label col-sm-3 required hotel_state_lbl" for="hotel_state" {if isset($edit) && !$state_var}style="display:none;"{/if}>{l s='State :' mod='hotelreservationsystem'}</label>
-						<div class="col-sm-6 hotel_state_dv"  {if isset($edit) && !$state_var}style="display:none;"{/if}>
+						<div class="col-sm-6">
 							<div style="width: 195px;">
 								<select class="form-control" name="hotel_state" id="hotel_state">
 								{if isset($edit)}
@@ -205,13 +207,6 @@
 								</select>
 							</div>
 						</div>
-						<span class="country_import_note col-sm-offset-3 col-sm-9">
-							<em>
-								{l s='* If selected country is not imported, then please import selected country from' mod='hotelreservationsystem'}<a href="{$link->getAdminLink('AdminLocalization')|escape:'html':'UTF-8'}"> {l s='localization tab' mod='hotelreservationsystem'} </a>{l s='in you qloapps to get its states.' mod='hotelreservationsystem'}
-							</em>
-						</span>
-
-
 					</div>
 					<div class="form-group">
 						<label class="control-label col-sm-3 required" for="hotel_city">{l s='City :' mod='hotelreservationsystem'}</label>

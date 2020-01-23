@@ -31,7 +31,7 @@ class WkAboutHotelBlock extends Module
     {
         $this->name = 'wkabouthotelblock';
         $this->tab = 'front_office_features';
-        $this->version = '1.1.2';
+        $this->version = '1.1.3';
         $this->author = 'webkul';
         $this->need_instance = 0;
 
@@ -41,13 +41,6 @@ class WkAboutHotelBlock extends Module
         $this->displayName = $this->l('About Hotel Block');
         $this->description = $this->l('Now show Block about your hotel using this module.');
         $this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
-    }
-
-    public function hookDisplayDefaultNavigationHook()
-    {
-        if (Configuration::get('HOTEL_INTERIOR_BLOCK_NAV_LINK')) {
-            return $this->display(__FILE__, 'hotelInteriorNaviagtionMenu.tpl');
-        }
     }
 
     public function hookDisplayHome()
@@ -138,7 +131,6 @@ class WkAboutHotelBlock extends Module
                 'displayHome',
                 'displayFooterExploreSectionHook',
                 'displayAddModuleSettingLink',
-                'displayDefaultNavigationHook',
                 'actionObjectLanguageAddAfter'
             )
         );

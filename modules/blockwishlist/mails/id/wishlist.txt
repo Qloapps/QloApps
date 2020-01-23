@@ -9,5 +9,5 @@ Halo,
 {wishlist} [{message}]
 
 {shop_name} [{shop_url}] didukung oleh
-Webkul(tm) [https://webkul.com/]
+Webkul(tm) [https://webkul.com]
 

@@ -355,7 +355,6 @@ class ProductControllerCore extends FrontController
                 $num_days = $obj_booking_detail->getNumberOfDays($date_from, $date_to);
                 //$price_tax_incl = Product::getPriceStatic($this->product->id, HotelBookingDetail::useTax());
                 //$total_price = $price_tax_incl * $num_days;
-                //
                 //// By webkul New way to calculate product prices with feature Prices
                 $roomTypeDateRangePrice = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice($this->product->id, $date_from, $date_to);
                 if ($useTax) {
@@ -1035,13 +1034,17 @@ class ProductControllerCore extends FrontController
                                     $objRoomDemandPrice = new HotelRoomTypeDemandPrice();
                                     $demandsPrice = $objRoomDemandPrice->getRoomTypeDemandsTotalPrice(
                                         $idProduct,
-                                        $roomDemand
+                                        $roomDemand,
+                                        $useTax,
+                                        $dateFrom,
+                                        $dateTo
                                     );
                                     $demandsPrice *= $quantity;
                                     $totalPrice += $demandsPrice;
                                 }
                             }
                             $result['msg'] = 'success';
+                            $result['quantity'] = (int)$quantity;
                             $result['total_price'] = $totalPrice;
                             $result['total_room_price'] = $totalRoomPrice;
                             $result['extra_demand_price'] = $demandsPrice;

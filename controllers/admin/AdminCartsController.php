@@ -41,6 +41,7 @@ class AdminCartsControllerCore extends AdminController
         $this->addRowAction('delete');
         $this->allow_export = true;
         $this->_orderWay = 'DESC';
+        $this->context = Context::getContext();
 
         $this->_select = 'CONCAT(LEFT(c.`firstname`, 1), \'. \', c.`lastname`) `customer`, a.id_cart total, ca.name carrier,
 		IF (IFNULL(o.id_order, \''.$this->l('Non ordered').'\') = \''.$this->l('Non ordered').'\', IF(TIME_TO_SEC(TIMEDIFF(\''.pSQL(date('Y-m-d H:i:00', time())).'\', a.`date_add`)) > 86400, \''.$this->l('Abandoned cart').'\', \''.$this->l('Non ordered').'\'), o.id_order) AS status, IF(o.id_order, 1, 0) badge_success, IF(o.id_order, 0, 1) badge_danger, IF(co.id_guest, 1, 0) id_guest';
@@ -111,6 +112,13 @@ class AdminCartsControllerCore extends AdminController
                 'icon' => 'icon-trash'
             )
         );
+
+        // START send access query information to the admin controller
+        $this->access_select = ' SELECT a.`id_cart` FROM '._DB_PREFIX_.'cart a';
+        $this->access_join = ' INNER JOIN '._DB_PREFIX_.'htl_cart_booking_data hcb ON (hcb.id_cart = a.id_cart)';
+        if ($acsHtls = HotelBranchInformation::getProfileAccessedHotels($this->context->employee->id_profile, 1, 1)) {
+            $this->access_where = ' WHERE hcb.id_hotel IN ('.implode(',', $acsHtls).')';
+        }
 
         parent::__construct();
     }
@@ -586,10 +594,10 @@ class AdminCartsControllerCore extends AdminController
             $this->context->smarty->assign(array(
                 'cart_detail_data' => $cart_detail_data,
             ));
-            
+
             $tpl_path = 'default/template/controllers/orders/current_cart_details_data.tpl';
             $cart_dtl_tpl = $this->context->smarty->fetch(_PS_BO_ALL_THEMES_DIR_.$tpl_path);
-            
+
             $result = $this->ajaxReturnVars();
             $result['cart_detail_html'] = $cart_dtl_tpl;//tpl is added to the returned array
             echo Tools::jsonEncode($result);
@@ -796,7 +804,7 @@ class AdminCartsControllerCore extends AdminController
         $id_customer = (int)Tools::getValue('id_customer');
         $customer = new Customer($id_customer);
         $this->context->customer = $customer;
-        
+
         $carts = Cart::getCustomerCarts((int)$id_customer);
         $orders = Order::getCustomerOrders((int)$id_customer);
 

@@ -1,4 +1,17 @@
 -----------------------------
+# V2.0.1 to V2.0.2
+-----------------------------
+
+## Improved/changed features
+
+[*] CO : hookDisplayDefaultNavigationHook hook removed as module's navigation link at front menu will be managed by blocknavigatiomenu module now.
+
+## Update Policy
+
+- Mobule need only file update, can be updated only by UPLOADING new version on module
+
+
+-----------------------------
 # V2.0.0 to V2.0.1
 -----------------------------
 

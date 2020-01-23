@@ -1166,26 +1166,37 @@
 											{assign var=order_shipping_price value=$order->total_shipping_tax_incl}
 										{/if}
 										<tr id="total_products">
-											<td class="text-right"><strong>{l s='Total Rooms Cost'}</strong></td>
+											<td class="text-right"><strong>{l s='Total Rooms Cost (tax excl.)'}</strong></td>
 											<td class="amount text-right nowrap">
 												<strong>{displayPrice price=$totalRoomsCostTE currency=$currency->id}</strong>
 											</td>
 											<td class="partial_refund_fields current-edit" style="display:none;"></td>
 										</tr>
-										<tr id="total_products">
-											<td class="text-right"><strong>{l s='Total Additional Facilities Cost'}</strong></td>
-											<td class="amount text-right nowrap">
-												<strong>{displayPrice price=$totalDemandsPrice currency=$currency->id}</strong>
-											</td>
-											<td class="partial_refund_fields current-edit" style="display:none;"></td>
-										</tr>
+										{if isset($totalDemandsPriceTE) && $totalDemandsPriceTE > 0}
+											<tr id="total_products">
+												<td class="text-right"><strong>{l s='Additional Facilities Cost (tax excl.)'}</strong></td>
+												<td class="amount text-right nowrap">
+													<strong>{displayPrice price=$totalDemandsPriceTE currency=$currency->id}</strong>
+												</td>
+												<td class="partial_refund_fields current-edit" style="display:none;"></td>
+											</tr>
+										{/if}
 										<tr id="total_tax_order">
-											<td class="text-right"><strong>{l s='Total Tax'}</strong></td>
+											<td class="text-right"><strong>{l s='Total Rooms Tax'}</strong></td>
 											<td class="text-right nowrap">
-												<strong>{displayPrice price=$total_tax_in_order currency=$currency->id}</strong>
+												<strong>{displayPrice price=$total_room_tax currency=$currency->id}</strong>
 											</td>
 											<td class="partial_refund_fields current-edit" style="display:none;"></td>
 										</tr>
+										{if isset($totalDemandsPriceTE) && $totalDemandsPriceTE > 0}
+											<tr id="total_tax_order">
+												<td class="text-right"><strong>{l s='Additional Facilities Tax'}</strong></td>
+												<td class="text-right nowrap">
+													<strong>{displayPrice price=($totalDemandsPriceTI - $totalDemandsPriceTE) currency=$currency->id}</strong>
+												</td>
+												<td class="partial_refund_fields current-edit" style="display:none;"></td>
+											</tr>
+										{/if}
 										<tr id="total_discounts" {if $order->total_discounts_tax_incl == 0}style="display: none;"{/if}>
 											<td class="text-right">{l s='Discounts'}</td>
 											<td class="amount text-right nowrap">
@@ -1216,15 +1227,7 @@
 												</div>
 												<p class="help-block"><i class="icon-warning-sign"></i> {l s='(%s)' sprintf=$smarty.capture.TaxMethod}</p>
 											</td>
-										</tr>
-										{if ($order->getTaxCalculationMethod() == $smarty.const.PS_TAX_EXC)}
-			 							<tr id="total_taxes">
-			 								<td class="text-right">{l s='Taxes'}</td>
-			 								<td class="amount text-right nowrap" >{displayPrice price=($order->total_paid_tax_incl-$order->total_paid_tax_excl) currency=$currency->id}</td>
-			 								<td class="partial_refund_fields current-edit" style="display:none;"></td>
-			 							</tr>
-			 							{/if}  <!-- by webkul to hide unnessary things in the page-->
-										 *}
+										</tr>*}
 
 			 							{if isset($order_adv_dtl)}
 				 							<tr>
@@ -1244,11 +1247,17 @@
 												</td>
 											</tr>
 										{/if}
-
+										{if ($order->getTaxCalculationMethod() == $smarty.const.PS_TAX_EXC)}
+											<tr id="total_taxes">
+												<td class="text-right"><strong>{l s='Total Taxes'}</strong></td>
+												<td class="amount text-right nowrap" ><strong>{displayPrice price=($order->total_paid_tax_incl-$order->total_paid_tax_excl) currency=$currency->id}</strong></td>
+												<td class="partial_refund_fields current-edit" style="display:none;"></td>
+											</tr>
+			 							{/if}
 										{assign var=order_total_price value=$order->total_paid_tax_incl}
 
 										<tr id="total_order">
-											<td class="text-right"><strong>{l s='Total'}</strong></td>
+											<td class="text-right"><strong>{l s='Final Order Total'}</strong></td>
 											<td class="amount text-right nowrap">
 												<strong>{displayPrice price=$order_total_price currency=$currency->id}</strong>
 											</td>
@@ -1458,7 +1467,7 @@
 		 </ul>
 		<div class="tab-content panel active">
 			<div role="tabpanel" class="tab-pane active" id="reallocate_room_tab">
-				<form method="post" action="">
+				<form method="post" action="{$link->getAdminLink('AdminOrders')|escape:'html':'UTF-8'}&amp;vieworder&amp;id_order={$order->id|intval}">
 					<div class="modal-header">
 						<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
 						<h4 class="modal-title" id="realloc_myModalLabel">{l s='Reallocate Rooms'}</h4>
@@ -1497,7 +1506,7 @@
 				</form>
 			</div>
 			<div role="tabpanel" class="tab-pane" id="swap_room_tab">
-				<form method="post" action="">
+				<form method="post" action="{$link->getAdminLink('AdminOrders')|escape:'html':'UTF-8'}&amp;vieworder&amp;id_order={$order->id|intval}">
 					<div class="modal-header">
 						<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
 						<h4 class="modal-title" id="swap_myModalLabel">{l s='Swap Rooms'}</h4>

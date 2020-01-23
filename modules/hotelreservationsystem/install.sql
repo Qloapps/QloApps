@@ -160,10 +160,24 @@ CREATE TABLE IF NOT EXISTS `PREFIX_htl_booking_demands` (
 	`id_booking_demand` int(11) NOT NULL AUTO_INCREMENT,
 	`id_htl_booking` int(11) NOT NULL,
 	`name` varchar(255) character set utf8 NOT NULL,
-	`price` decimal(20,6) NOT NULL DEFAULT '0.000000',
+	`unit_price_tax_excl` decimal(20,6) NOT NULL DEFAULT '0.000000',
+	`unit_price_tax_incl` decimal(20,6) NOT NULL DEFAULT '0.000000',
+	`total_price_tax_excl` decimal(20,6) NOT NULL DEFAULT '0.000000',
+	`total_price_tax_incl` decimal(20,6) NOT NULL DEFAULT '0.000000',
+	`price_calc_method` int(11) unsigned DEFAULT '0',
+	`id_tax_rules_group` int(11) unsigned DEFAULT '0',
+	`tax_computation_method` tinyint(1) unsigned NOT NULL DEFAULT '0',
 	`date_add` datetime NOT NULL,
 	`date_upd` datetime NOT NULL,
 	PRIMARY KEY (`id_booking_demand`)
+) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
+CREATE TABLE IF NOT EXISTS `PREFIX_htl_booking_demands_tax` (
+	`id_booking_demand` int(11) NOT NULL AUTO_INCREMENT,
+	`id_tax` int(11) NOT NULL,
+	`unit_amount` DECIMAL(16, 6) NOT NULL DEFAULT '0.00',
+  	`total_amount` DECIMAL(16, 6) NOT NULL DEFAULT '0.00',
+	PRIMARY KEY (`id_booking_demand`, `id_tax`)
 ) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 CREATE TABLE IF NOT EXISTS `PREFIX_htl_room_status` (
@@ -304,6 +318,8 @@ CREATE TABLE IF NOT EXISTS `PREFIX_htl_room_type_feature_pricing_lang` (
 CREATE TABLE IF NOT EXISTS `PREFIX_htl_room_type_global_demand` (
 	`id_global_demand` int(11) NOT NULL AUTO_INCREMENT,
 	`price` decimal(20,6) NOT NULL DEFAULT '0.000000',
+	`id_tax_rules_group` int(10) unsigned NOT NULL DEFAULT '0',
+	`price_calc_method` tinyint(1) NOT NULL,
 	`date_add` datetime NOT NULL,
 	`date_upd` datetime NOT NULL,
 	PRIMARY KEY (`id_global_demand`)
@@ -363,6 +379,13 @@ CREATE TABLE IF NOT EXISTS `PREFIX_htl_room_disable_dates` (
 	`date_upd` datetime NOT NULL,
 	PRIMARY KEY (`id`)
 ) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
+CREATE TABLE IF NOT EXISTS `PREFIX_htl_access` (
+  `id_profile` int(10) unsigned NOT NULL,
+  `id_hotel` int(10) unsigned NOT NULL,
+  `access` int(11) NOT NULL,
+  PRIMARY KEY (`id_profile`, `id_hotel`)
+) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8;
 
 insert into `PREFIX_htl_order_refund_stages` (`name`) values ('Waiting'),
                                                               ('Accepted'),

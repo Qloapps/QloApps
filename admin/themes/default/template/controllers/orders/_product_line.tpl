@@ -39,7 +39,7 @@
 				</a>
 			</p>
 			<p>
-				{convertPriceWithCurrency price=$data['extra_demands_price'] currency=$currency->id}
+				{convertPriceWithCurrency price=$data['extra_demands_price_ti'] currency=$currency->id}
 			</p>
 		{/if}
 	</td>

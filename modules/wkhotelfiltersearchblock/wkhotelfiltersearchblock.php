@@ -29,7 +29,7 @@ class wkhotelfiltersearchblock extends Module
         $this->name = 'wkhotelfiltersearchblock';
         $this->author = 'webkul';
         $this->tab = 'front_office_features';
-        $this->version = '1.0.1';
+        $this->version = '1.0.2';
         $this->context = Context::getContext();
 
         $this->bootstrap = true;

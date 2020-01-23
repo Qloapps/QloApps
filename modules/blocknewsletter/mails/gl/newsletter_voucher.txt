@@ -7,5 +7,5 @@ Regarding your newsletter subscription, we are pleased to offer
 you the following voucher: {discount}
 
 {shop_name} [{shop_url}] powered by
-Webkul(tm) [https://webkul.com/]
+Webkul(tm) [https://webkul.com]
 

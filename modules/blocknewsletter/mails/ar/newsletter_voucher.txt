@@ -1,12 +1,12 @@
 
-[/{shop_url}] 
+[/{shop_url}]
 
-مرحباً 
+مرحباً
 
 لانضمامك الى خدمة الرسائل
 الاخبارية، يسعدنا ات تقدم لك القسيمة
-التالية: {discount} 
+التالية: {discount}
 
-{shop_name} [/{shop_url}] مدعوم من بريستاشوب(tm)
-[http://www.prestashop.com/] 
+{shop_name} [/{shop_url}] Webkul(tm)
+[https://webkul.com]
 

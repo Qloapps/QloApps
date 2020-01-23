@@ -135,7 +135,7 @@
 	{hook h="displayAdminLogin"}
 	<div id="login-footer">
 		<p class="text-center text-muted">
-			<a href="https://webkul.com/" onclick="return !window.open(this.href);">
+			<a href="https://webkul.com" onclick="return !window.open(this.href);">
 				&copy; Webkul&#8482; 2015-{$smarty.now|date_format:"%Y"} - All rights reserved
 			</a>
 		</p>

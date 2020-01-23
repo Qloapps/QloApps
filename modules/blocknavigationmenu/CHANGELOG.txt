@@ -1,4 +1,29 @@
 -----------------------------
+# V1.0.1 to V1.1.0
+-----------------------------
+
+## Added features
+
++ [BO] : wkfooterexploreblock module is removed. All functionalities of wkfooterexploreblock module are merged with blocknavigationmenu module.
++ [BO] : Admin can create links from CMS pages, front end controller pages, Manual redirect links for the navigation link.
++ [BO] : Admin have configuration to choose to display Footer explore block with navigation links.
++ [BO] : Admin can choose to show navigation link at navigation menu.
++ [BO] : Admin can choose to show navigation link at footer block.
++ [BO] : Admin can position navigation links for footer block and navigation menu.
++ [CO] : table  'htl_custom_navigation_link' added with multilang.
++ [CO] : Admin can chose whether to show navigation block on footer or not.
+
+
+## Improved/changed features
+
+[-] CO : Home and Contact navigation links are not static they are dynamic and optional from backoffice.
+
+## Update Policy
+
+- Database changed, Module need upload new file then UNINSTALL and re-installation.- Mobule need only file update, can be updated only by UPLOADING new version on module
+
+
+-----------------------------
 # V1.0.0 to V1.0.1
 -----------------------------
 

@@ -29,7 +29,7 @@ class hotelreservationsystem extends Module
     public function __construct()
     {
         $this->name = 'hotelreservationsystem';
-        $this->version = '1.3.0';
+        $this->version = '1.4.0';
         $this->author = 'Webkul';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -156,6 +156,30 @@ class hotelreservationsystem extends Module
             $objRoomTypeDemandPrice->deleteRoomTypeDemandPrices($idProduct); // delete prices for room type
             $objRoomTypeDemand = new HotelRoomTypeDemand();
             $objRoomTypeDemand->deleteRoomTypeDemands($idProduct); // delete additional demands for room type
+        }
+    }
+
+    // Add profile hotel access while profile is added
+    public function hookActionObjectProfileAddAfter($params)
+    {
+        if (isset($params['object']->id)) {
+            $idProfile = $params['object']->id;
+            $objHotelBranch = new HotelBranchInformation();
+            if (!$objHotelBranch->addHotelsAccessToProfile($idProfile)) {
+                $this->context->controller->errors[] = $this->l('Some error occurred while adding hotel accesses to this profile');
+            }
+        }
+    }
+
+    // Delete profile hotel access while profile is deleted
+    public function hookActionObjectProfileDeleteBefore($params)
+    {
+        if (isset($params['object']->id)) {
+            $idProfile = $params['object']->id;
+            $objHotelBranch = new HotelBranchInformation();
+            if (!$objHotelBranch->deleteProfileHotelsAccess($idProfile)) {
+                $this->context->controller->errors[] = $this->l('Some error occurred while deleting hotel accesses of the profile');
+            }
         }
     }
 
@@ -319,53 +343,54 @@ class hotelreservationsystem extends Module
         $order = $data['order'];
         $customer = $data['customer'];
 
-        $obj_cart_bk_data = new HotelCartBookingData();
-        $obj_htl_bk_dtl = new HotelBookingDetail();
+        $objCartBkData = new HotelCartBookingData();
+        $objHtlBkDtl = new HotelBookingDetail();
         $obj_rm_type = new HotelRoomType();
         $obj_adv_payment = new HotelAdvancedPayment();
 
         $orderProducts = $order->getProducts();
+        $vatAddress = new Address((int)$order->{Configuration::get('PS_TAX_ADDRESS_TYPE')});
         foreach ($orderProducts as $product) {
-            $obj_cart_bk_data = new HotelCartBookingData();
+            $objCartBkData = new HotelCartBookingData();
             $idProduct = $product['id_product'];
-            $cart_bk_data = $obj_cart_bk_data->getOnlyCartBookingData($cart->id, $cart->id_guest, $idProduct);
+            $cart_bk_data = $objCartBkData->getOnlyCartBookingData($cart->id, $cart->id_guest, $idProduct);
             if ($cart_bk_data) {
                 foreach ($cart_bk_data as $cb_k => $cb_v) {
-                    $obj_cart_bk_data = new HotelCartBookingData($cb_v['id']);
-                    $obj_cart_bk_data->id_order = $order->id;
-                    $obj_cart_bk_data->id_customer = $customer->id;
-                    $obj_cart_bk_data->save();
+                    $objCartBkData = new HotelCartBookingData($cb_v['id']);
+                    $objCartBkData->id_order = $order->id;
+                    $objCartBkData->id_customer = $customer->id;
+                    $objCartBkData->save();
 
-                    $obj_htl_bk_dtl = new HotelBookingDetail();
-                    $id_order_detail = $obj_htl_bk_dtl->getPsOrderDetailIdByIdProduct($idProduct, $order->id);
-                    $obj_htl_bk_dtl->id_product = $idProduct;
-                    $obj_htl_bk_dtl->id_order = $order->id;
-                    $obj_htl_bk_dtl->id_order_detail = $id_order_detail;
-                    $obj_htl_bk_dtl->id_cart = $cart->id;
-                    $obj_htl_bk_dtl->id_room = $obj_cart_bk_data->id_room;
-                    $obj_htl_bk_dtl->id_hotel = $obj_cart_bk_data->id_hotel;
-                    $obj_htl_bk_dtl->id_customer = $customer->id;
-                    $obj_htl_bk_dtl->booking_type = $obj_cart_bk_data->booking_type;
-                    $obj_htl_bk_dtl->id_status = 1;
-                    $obj_htl_bk_dtl->comment = $obj_cart_bk_data->comment;
+                    $objHtlBkDtl = new HotelBookingDetail();
+                    $id_order_detail = $objHtlBkDtl->getPsOrderDetailIdByIdProduct($idProduct, $order->id);
+                    $objHtlBkDtl->id_product = $idProduct;
+                    $objHtlBkDtl->id_order = $order->id;
+                    $objHtlBkDtl->id_order_detail = $id_order_detail;
+                    $objHtlBkDtl->id_cart = $cart->id;
+                    $objHtlBkDtl->id_room = $objCartBkData->id_room;
+                    $objHtlBkDtl->id_hotel = $objCartBkData->id_hotel;
+                    $objHtlBkDtl->id_customer = $customer->id;
+                    $objHtlBkDtl->booking_type = $objCartBkData->booking_type;
+                    $objHtlBkDtl->id_status = 1;
+                    $objHtlBkDtl->comment = $objCartBkData->comment;
 
                     // For Back Order(Because of cart lock)
-                    if ($obj_cart_bk_data->is_back_order) {
-                        $obj_htl_bk_dtl->is_back_order = 1;
+                    if ($objCartBkData->is_back_order) {
+                        $objHtlBkDtl->is_back_order = 1;
                     }
                     $total_price = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
                         $idProduct,
-                        $obj_cart_bk_data->date_from,
-                        $obj_cart_bk_data->date_to
+                        $objCartBkData->date_from,
+                        $objCartBkData->date_to
                     );
-                    $obj_htl_bk_dtl->date_from = $obj_cart_bk_data->date_from;
-                    $obj_htl_bk_dtl->date_to = $obj_cart_bk_data->date_to;
-                    $obj_htl_bk_dtl->total_price_tax_excl = Tools::ps_round($total_price['total_price_tax_excl'], 5);
-                    $obj_htl_bk_dtl->total_price_tax_incl = Tools::ps_round($total_price['total_price_tax_incl'], 5);
-                    if ($obj_htl_bk_dtl->save()) {
+                    $objHtlBkDtl->date_from = $objCartBkData->date_from;
+                    $objHtlBkDtl->date_to = $objCartBkData->date_to;
+                    $objHtlBkDtl->total_price_tax_excl = Tools::ps_round($total_price['total_price_tax_excl'], 5);
+                    $objHtlBkDtl->total_price_tax_incl = Tools::ps_round($total_price['total_price_tax_incl'], 5);
+                    if ($objHtlBkDtl->save()) {
                         // save extra demands info
-                        if ($obj_cart_bk_data->extra_demands
-                            && ($extraDemands = Tools::jsonDecode($obj_cart_bk_data->extra_demands, true))
+                        if ($objCartBkData->extra_demands
+                            && ($extraDemands = Tools::jsonDecode($objCartBkData->extra_demands, true))
                         ) {
                             $idLang = (int)$cart->id_lang;
                             $objRoomDemandPrice = new HotelRoomTypeDemandPrice();
@@ -373,43 +398,57 @@ class hotelreservationsystem extends Module
                                 $idGlobalDemand = $demand['id_global_demand'];
                                 $idOption = $demand['id_option'];
                                 $objBookingDemand = new HotelBookingDemands();
-                                $objBookingDemand->id_htl_booking = $obj_htl_bk_dtl->id;
+                                $objBookingDemand->id_htl_booking = $objHtlBkDtl->id;
+                                $objGlobalDemand = new HotelRoomTypeGlobalDemand($idGlobalDemand, $idLang);
                                 if ($idOption) {
                                     $objOption = new HotelRoomTypeGlobalDemandAdvanceOption($idOption, $idLang);
                                     $objBookingDemand->name = $objOption->name;
-                                    $priceByRoom = $objRoomDemandPrice->getRoomTypeDemandPrice(
-                                        $idProduct,
-                                        $idGlobalDemand,
-                                        $idOption
-                                    );
-                                    if (Validate::isPrice($priceByRoom)) {
-                                        $objBookingDemand->price = $priceByRoom;
-                                    } else {
-                                        $objBookingDemand->price = $objOption->price;
-                                    }
                                 } else {
-                                    $objGlobalDemand = new HotelRoomTypeGlobalDemand($idGlobalDemand, $idLang);
+                                    $idOption = 0;
                                     $objBookingDemand->name = $objGlobalDemand->name;
-                                    $priceByRoom = $objRoomDemandPrice->getRoomTypeDemandPrice(
-                                        $idProduct,
-                                        $idGlobalDemand,
-                                        $idOption
+                                }
+                                $objBookingDemand->unit_price_tax_excl = HotelRoomTypeDemand::getPriceStatic(
+                                    $idProduct,
+                                    $idGlobalDemand,
+                                    $idOption,
+                                    0
+                                );
+                                $objBookingDemand->unit_price_tax_incl = HotelRoomTypeDemand::getPriceStatic(
+                                    $idProduct,
+                                    $idGlobalDemand,
+                                    $idOption,
+                                    1
+                                );
+                                $qty = 1;
+                                if ($objGlobalDemand->price_calc_method == HotelRoomTypeGlobalDemand::WK_PRICE_CALC_METHOD_EACH_DAY) {
+                                    $numDays = $objHtlBkDtl->getNumberOfDays(
+                                        $objHtlBkDtl->date_from,
+                                        $objHtlBkDtl->date_to
                                     );
-                                    if (Validate::isPrice($priceByRoom)) {
-                                        $objBookingDemand->price = $priceByRoom;
-                                    } else {
-                                        $objBookingDemand->price = $objGlobalDemand->price;
+                                    if ($numDays > 1) {
+                                        $qty *= $numDays;
                                     }
                                 }
-                                $objBookingDemand->price = Tools::convertPrice(
-                                    $objBookingDemand->price,
-                                    (int)$order->id_currency
+                                $objBookingDemand->total_price_tax_excl = $objBookingDemand->unit_price_tax_excl * $qty;
+                                $objBookingDemand->total_price_tax_incl = $objBookingDemand->unit_price_tax_incl * $qty;
+
+                                $objBookingDemand->price_calc_method = $objGlobalDemand->price_calc_method;
+                                $objBookingDemand->id_tax_rules_group = $objGlobalDemand->id_tax_rules_group;
+                                $taxManager = TaxManagerFactory::getManager(
+                                    $vatAddress,
+                                    $objGlobalDemand->id_tax_rules_group
                                 );
-                                $objBookingDemand->save();
+                                $taxCalc = $taxManager->getTaxCalculator();
+                                $objBookingDemand->tax_computation_method = (int)$taxCalc->computation_method;
+                                if ($objBookingDemand->save()) {
+                                    $objBookingDemand->tax_calculator = $taxCalc;
+                                    $objBookingDemand->id_global_demand = $idGlobalDemand;
+                                    // Now save tax details of the extra demand
+                                    $objBookingDemand->setBookingDemandTaxDetails();
+                                }
                             }
                         }
                     }
-
                     /*for saving details of the advance payment product wise*/
                     if (Configuration::get('WK_ALLOW_ADVANCED_PAYMENT')) {
                         $obj_customer_adv = new HotelCustomerAdvancedPayment();
@@ -422,14 +461,14 @@ class hotelreservationsystem extends Module
                             ) {
                                 $room_adv_amount = $obj_adv_payment->getRoomMinAdvPaymentAmount(
                                     $idProduct,
-                                    $obj_cart_bk_data->date_from,
-                                    $obj_cart_bk_data->date_to
+                                    $objCartBkData->date_from,
+                                    $objCartBkData->date_to
                                 );
                                 $obj_customer_adv_product = new HotelCustomerAdvancedProductPayment();
                                 $obj_customer_adv_product->id_cart = $cart->id;
-                                $obj_customer_adv_product->id_room = $obj_cart_bk_data->id_room;
-                                $obj_customer_adv_product->id_hotel = $obj_cart_bk_data->id_hotel;
-                                $obj_customer_adv_product->id_hotel = $obj_cart_bk_data->quantity;
+                                $obj_customer_adv_product->id_room = $objCartBkData->id_room;
+                                $obj_customer_adv_product->id_hotel = $objCartBkData->id_hotel;
+                                $obj_customer_adv_product->id_hotel = $objCartBkData->quantity;
                                 $obj_customer_adv_product->id_product = $idProduct;
                                 $obj_customer_adv_product->id_order = $order->id;
                                 $obj_customer_adv_product->id_guest = $cart->id_guest;
@@ -444,8 +483,8 @@ class hotelreservationsystem extends Module
                                     false
                                 );
                                 $obj_customer_adv_product->advance_payment_amount = $room_adv_amount;
-                                $obj_customer_adv_product->date_from = $obj_cart_bk_data->date_from;
-                                $obj_customer_adv_product->date_to = $obj_cart_bk_data->date_to;
+                                $obj_customer_adv_product->date_from = $objCartBkData->date_from;
+                                $obj_customer_adv_product->date_to = $objCartBkData->date_to;
                                 $obj_customer_adv_product->save();
                             }
                         }
@@ -653,7 +692,9 @@ class hotelreservationsystem extends Module
                 'actionObjectLanguageAddAfter',
                 'actionAdminControllerSetMedia',
                 'displayAdminProductsExtra',
-                'actionProductUpdate'
+                'actionProductUpdate',
+                'actionObjectProfileAddAfter',
+                'actionObjectProfileDeleteBefore',
             )
         );
     }
@@ -684,6 +725,7 @@ class hotelreservationsystem extends Module
             `'._DB_PREFIX_.'htl_room_type_feature_pricing`,
             `'._DB_PREFIX_.'htl_room_type_feature_pricing_lang`,
             `'._DB_PREFIX_.'htl_room_disable_dates`,
+            `'._DB_PREFIX_.'htl_access`,
             `'._DB_PREFIX_.'htl_order_refund_stages`'
         );
     }

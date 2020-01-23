@@ -24,26 +24,36 @@
 *}
 
 <!--  TAX DETAILS -->
+
 {if $tax_exempt}
-
 	{l s='Exempt of VAT according to section 259B of the General Tax Code.' pdf='true'}
-
 {elseif (isset($tax_breakdowns) && $tax_breakdowns)}
-	<table id="tax-tab" width="100%">
+	{assign var=th_rows value=3}
+	{if isset($showTaxName) && $showTaxName}
+		{assign var=th_rows value=$th_rows+1}
+	{/if}
+	{if $display_tax_bases_in_breakdowns}
+		{assign var=th_rows value=$th_rows+1}
+	{/if}
+	<table class="bordered-table" id="tax-tab" width="100%">
 		<thead>
 			<tr>
-				{* <th class="header small">{l s='Tax Detail' pdf='true'}</th> *}
+				<th colspan="{$th_rows}" class="header">{l s='Tax Details' pdf='true'}</th>
+			</tr>
+			<tr>
+				<th class="header-left small">{l s='Tax Detail' pdf='true'}</th>
 				{if isset($showTaxName) && $showTaxName}
-					<th class="header small">{l s='Tax Name' pdf='true'}</th>
+					<th class="header-left small">{l s='Tax Name' pdf='true'}</th>
 				{/if}
-				<th class="header small">{l s='Tax Rate' pdf='true'}</th>
+				<th class="header-left small">{l s='Tax Rate' pdf='true'}</th>
 				{if $display_tax_bases_in_breakdowns}
-					<th class="header small">{l s='Base price' pdf='true'}</th>
+					<th class="header-left small">{l s='Base price' pdf='true'}</th>
 				{/if}
-				<th class="header-right small">{l s='Total Tax' pdf='true'}</th>
+				<th class="header-left small">{l s='Total Tax' pdf='true'}</th>
 			</tr>
 		</thead>
 		<tbody>
+
 		{assign var=has_line value=false}
 
 		{foreach $tax_breakdowns as $label => $bd}
@@ -54,11 +64,13 @@
 					{continue}
 				{/if}
 				{assign var=has_line value=true}
-				<tr>
-					{* <td class="white">
-						{if !$label_printed}
+				<tr class="{if !$label_printed}tr-border-top{/if}">
+					{if !$label_printed}
+						<td class="white" rowspan="{$bd|count}">
 							{if $label == 'product_tax'}
-								{l s='Products' pdf='true'}
+								{l s='Rooms' pdf='true'}
+							{elseif $label == 'extra_demands_tax'}
+								{l s='Extra Demands' pdf='true'}
 							{elseif $label == 'shipping_tax'}
 								{l s='Shipping' pdf='true'}
 							{elseif $label == 'ecotax_tax'}
@@ -67,10 +79,10 @@
 								{l s='Wrapping' pdf='true'}
 							{/if}
 							{assign var=label_printed value=true}
-						{/if}
-					</td> *}
+						</td>
+					{/if}
 					{if isset($showTaxName) && $showTaxName}
-						<td class="center white">
+						<td class="white">
 							{if isset($line.name) && $line.name}
 								{$line.name}
 							{else}
@@ -78,35 +90,33 @@
 							{/if}
 						</td>
 					{/if}
-					<td class="center white">
+					<td class="white">
 						{$line.rate} %
 					</td>
 
 					{if $display_tax_bases_in_breakdowns}
-						<td class="right white">
+						<td class="white">
 							{if isset($is_order_slip) && $is_order_slip}- {/if}
 							{displayPrice currency=$order->id_currency price=$line.total_tax_excl}
 						</td>
 					{/if}
 
-					<td class="right white">
+					<td class="white">
 						{if isset($is_order_slip) && $is_order_slip}- {/if}
 						{displayPrice currency=$order->id_currency price=$line.total_amount}
 					</td>
 				</tr>
 			{/foreach}
 		{/foreach}
-
 		{if !$has_line}
-		<tr>
-			<td class="white center" colspan="{if $display_tax_bases_in_breakdowns}4{else}3{/if}">
-				{l s='No taxes' pdf='true'}
-			</td>
-		</tr>
+			<tr>
+				<td class="white" colspan="{if $display_tax_bases_in_breakdowns}4{else}3{/if}">
+					{l s='No taxes' pdf='true'}
+				</td>
+			</tr>
 		{/if}
 
 		</tbody>
 	</table>
-
 {/if}
 <!--  / TAX DETAILS -->

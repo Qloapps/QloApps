@@ -20,7 +20,8 @@
 
 class CheckoutCartSummaryStep extends AbstractCheckoutStep
 {
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
         $this->step_key = 'checkout_rooms_summary';
     }

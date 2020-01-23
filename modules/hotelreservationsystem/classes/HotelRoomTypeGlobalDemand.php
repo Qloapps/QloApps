@@ -22,6 +22,8 @@ class HotelRoomTypeGlobalDemand extends ObjectModel
 {
     public $name;
     public $price;
+    public $id_tax_rules_group;
+    public $price_calc_method;
     public $date_add;
     public $date_upd;
 
@@ -31,6 +33,8 @@ class HotelRoomTypeGlobalDemand extends ObjectModel
         'multilang' => true,
         'fields' => array(
             'price' => array('type' => self::TYPE_FLOAT),
+            'id_tax_rules_group' => array('type' => self::TYPE_INT),
+            'price_calc_method' => array('type' => self::TYPE_INT),
             'date_add' => array('type' => self::TYPE_DATE, 'validate' => 'isDate'),
             'date_upd' => array('type' => self::TYPE_DATE, 'validate' => 'isDate'),
             //lang fields
@@ -42,6 +46,9 @@ class HotelRoomTypeGlobalDemand extends ObjectModel
                 'size' => 128
             ),
     ));
+
+    const WK_PRICE_CALC_METHOD_EACH_DAY = 1;
+    const WK_PRICE_CALC_METHOD_RANGE = 0;
 
     public function __construct($id = null, $id_lang = null, $id_shop = null)
     {
@@ -106,5 +113,14 @@ class HotelRoomTypeGlobalDemand extends ObjectModel
             }
         }
         return $demands;
+    }
+
+    public static function getIdTaxRulesGroupByIdGlobalDemanu($idGlobalDemand)
+    {
+        $context = Context::getContext();
+        return Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue(
+            'SELECT `id_tax_rules_group` FROM `'._DB_PREFIX_.'htl_room_type_global_demand`
+            WHERE `id_global_demand` = '.(int)$idGlobalDemand
+        );
     }
 }

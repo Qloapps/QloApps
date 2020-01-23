@@ -9,7 +9,7 @@
 					{foreach $roomDemand['extra_demands'] as $demand}
 						<p>
 							<span>{$demand['name']}</span>
-							<span class="pull-right">{displayPrice price=$demand['price'] currency=$orderCurrency}</span>
+							<span class="pull-right">{displayPrice price=$demand['total_price_tax_incl'] currency=$orderCurrency}</span>
 						</p>
 					{/foreach}
 				</div>

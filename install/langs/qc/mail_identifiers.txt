@@ -10,4 +10,4 @@ Adresse électronique : {email}
 
 
 
-{shop_url} propulsé par PrestaShop™
+{shop_url} propulsé par Webkul™

@@ -7,5 +7,5 @@ Sie haben unseren Newsletter abonniert. Als Dankeschön erhalten
 Sie den folgenden Gutschein: {discount}
 
 {shop_name} [{shop_url}] powered by
-Webkul(tm) [https://webkul.com/]
+Webkul(tm) [https://webkul.com]
 

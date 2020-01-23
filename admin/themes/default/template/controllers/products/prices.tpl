@@ -155,7 +155,7 @@ $(document).ready(function () {
 			</script>
 			<div class="row">
 				<div class="col-lg-6">
-					<select onchange="javascript:calcPrice(); unitPriceWithTax('unit');" name="id_tax_rules_group" id="id_tax_rules_group" {if $tax_exclude_taxe_option}disabled="disabled"{/if} >
+					<select onchange="javascript:calcPrice(); {*unitPriceWithTax('unit');*}" name="id_tax_rules_group" id="id_tax_rules_group" {if $tax_exclude_taxe_option}disabled="disabled"{/if} >
 						<option value="0">{l s='No Tax'}</option>
 					{foreach from=$tax_rules_groups item=tax_rules_group}
 						<option value="{$tax_rules_group.id_tax_rules_group}" {if $product->getIdTaxRulesGroup() == $tax_rules_group.id_tax_rules_group}selected="selected"{/if} >
@@ -202,8 +202,8 @@ $(document).ready(function () {
 		</div>
 		{if isset($pack) && $pack->isPack($product->id)}<p class="col-lg-9 col-lg-offset-3 help-block">{l s='The sum of prices of the room types in the pack is %s%s%s' sprintf=[$currency->prefix,{toolsConvertPrice price=$pack->noPackPrice($product->id)|string_format:$priceDisplayPrecisionFormat},$currency->suffix]}</p>{/if}
 	</div>
-
-	<div class="form-group">
+	{* As no use in QloApps currently so commented *}
+	{* <div class="form-group">
 		<div class="col-lg-1"><span class="pull-right">{include file="controllers/products/multishop/checkbox.tpl" field="unit_price" type="unit_price"}</span></div>
 		<label class="control-label col-lg-2" for="unit_price">
 			<span class="label-tooltip" data-toggle="tooltip" title="{l s='When selling a pack of items, you can indicate the unit price for each item of the pack. For instance, "per bottle" or "per pound".'}">{l s='Unit price (tax excl.)'}</span>
@@ -216,7 +216,7 @@ $(document).ready(function () {
 				<input id="unity" name="unity" type="text" value="{$product->unity|htmlentitiesUTF8}"  maxlength="255" onkeyup="if (isArrowKey(event)) return ;unitySecond();" onchange="unitySecond();"/>
 			</div>
 		</div>
-	</div>
+	</div> *}
 	{if isset($product->unity) && $product->unity}
 	<div class="form-group">
 		<div class="col-lg-9 col-lg-offset-3">
@@ -712,7 +712,7 @@ $(document).ready(function () {
 		<thead>
 			<tr>
 				<th>{l s='Rule'}</th>
-				<th>{l s='Combination'}</th>
+				{* <th>{l s='Combination'}</th> *}
 				{if $multi_shop}<th>{l s='Shop'}</th>{/if}
 				<th>{l s='Currency'}</th>
 				<th>{l s='Country'}</th>
@@ -735,7 +735,7 @@ $(document).ready(function () {
 					$(document).ready(function() {
 						delete_price_rule = '{l s="Do you really want to remove this price rule?"}';
 						calcPriceTI();
-						unitPriceWithTax('unit');
-						});
+						//unitPriceWithTax('unit');
+					});
 				</script>
 			{/if}

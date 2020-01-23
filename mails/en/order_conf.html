@@ -106,22 +106,28 @@
 			<table class="table table-recap" bgcolor="#ffffff" style="width:100%;border-collapse:collapse"><!-- Title -->
 				<tr>
 					<tr>
-					<th bgcolor="#f8f8f8" style="border:1px solid #D6D4D4;background-color: #fbfbfb;color: #333;font-family: Arial;font-size: 13px;padding: 10px;">Room Image</th>
-					<th bgcolor="#f8f8f8" style="border:1px solid #D6D4D4;background-color: #fbfbfb;color: #333;font-family: Arial;font-size: 13px;padding: 10px;">Room Description</th>
-					<th bgcolor="#f8f8f8" style="border:1px solid #D6D4D4;background-color: #fbfbfb;color: #333;font-family: Arial;font-size: 13px;padding: 10px;" width="17%">Room Capcity</th>
-					<th bgcolor="#f8f8f8" style="border:1px solid #D6D4D4;background-color: #fbfbfb;color: #333;font-family: Arial;font-size: 13px;padding: 10px;">Unit Price</th>
-					<th bgcolor="#f8f8f8" style="border:1px solid #D6D4D4;background-color: #fbfbfb;color: #333;font-family: Arial;font-size: 13px;padding: 10px;" width="17%">Rooms Qty</th>
-					<th bgcolor="#f8f8f8" style="border:1px solid #D6D4D4;background-color: #fbfbfb;color: #333;font-family: Arial;font-size: 13px;padding: 10px;" width="17%">Check-in Date</th>
-					<th bgcolor="#f8f8f8" style="border:1px solid #D6D4D4;background-color: #fbfbfb;color: #333;font-family: Arial;font-size: 13px;padding: 10px;" width="17%">Check-out Date</th>
-					<th bgcolor="#f8f8f8" style="border:1px solid #D6D4D4;background-color: #fbfbfb;color: #333;font-family: Arial;font-size: 13px;padding: 10px;" width="17%">Total</th>
-				</tr>
+						<th bgcolor="#f8f8f8" style="border:1px solid #D6D4D4;background-color: #fbfbfb;color: #333;font-family: Arial;font-size: 13px;padding: 10px;">Room Image</th>
+						<th bgcolor="#f8f8f8" style="border:1px solid #D6D4D4;background-color: #fbfbfb;color: #333;font-family: Arial;font-size: 13px;padding: 10px;">Room Description</th>
+						<th bgcolor="#f8f8f8" style="border:1px solid #D6D4D4;background-color: #fbfbfb;color: #333;font-family: Arial;font-size: 13px;padding: 10px;" width="17%">Room Capcity</th>
+						<th bgcolor="#f8f8f8" style="border:1px solid #D6D4D4;background-color: #fbfbfb;color: #333;font-family: Arial;font-size: 13px;padding: 10px;">Unit Price</th>
+						<th bgcolor="#f8f8f8" style="border:1px solid #D6D4D4;background-color: #fbfbfb;color: #333;font-family: Arial;font-size: 13px;padding: 10px;" width="17%">Rooms Qty</th>
+						<th bgcolor="#f8f8f8" style="border:1px solid #D6D4D4;background-color: #fbfbfb;color: #333;font-family: Arial;font-size: 13px;padding: 10px;" width="17%">Check-in Date</th>
+						<th bgcolor="#f8f8f8" style="border:1px solid #D6D4D4;background-color: #fbfbfb;color: #333;font-family: Arial;font-size: 13px;padding: 10px;" width="17%">Check-out Date</th>
+						<th bgcolor="#f8f8f8" style="border:1px solid #D6D4D4;background-color: #fbfbfb;color: #333;font-family: Arial;font-size: 13px;padding: 10px;" width="17%">Total</th>
+					</tr>
 				<tr>
 					<td colspan="5" style="border:1px solid #D6D4D4;text-align:center;color:#777;padding:7px 0">
 						&nbsp;&nbsp;{cart_booking_data_html}
 					</td>
 				</tr>
+
 				<tr>
-					<td colspan="5" style="border:1px solid #D6D4D4;text-align:center;color:#777;padding:7px 0">
+					<td colspan="8" style="border:1px solid #D6D4D4;text-align:center;color:#777;padding:7px 0">
+						{extra_demands_details_html}
+					</td>
+				</tr>
+				<tr>
+					<td colspan="8" style="border:1px solid #D6D4D4;text-align:center;color:#777;padding:7px 0">
 						&nbsp;&nbsp;{discounts}
 					</td>
 				</tr>
@@ -173,7 +179,7 @@
 								<td width="10" style="color:#333;padding:0">&nbsp;</td>
 								<td align="right" style="color:#333;padding:0">
 									<font size="2" face="Open-sans, sans-serif" color="#555454">
-										{total_extra_demands}
+										{total_extra_demands_te}
 									</font>
 								</td>
 								<td width="10" style="color:#333;padding:0">&nbsp;</td>
@@ -209,62 +215,6 @@
 						</table>
 					</td>
 				</tr>
-				<!-- <tr class="conf_body">
-					<td bgcolor="#f8f8f8" colspan="4" style="border:1px solid #D6D4D4;color:#333;padding:7px 0">
-						<table class="table" style="width:100%;border-collapse:collapse">
-							<tr>
-								<td width="10" style="color:#333;padding:0">&nbsp;</td>
-								<td align="right" style="color:#333;padding:0">
-									<font size="2" face="Open-sans, sans-serif" color="#555454">
-										<strong>Gift-wrapping</strong>
-									</font>
-								</td>
-								<td width="10" style="color:#333;padding:0">&nbsp;</td>
-							</tr>
-						</table>
-					</td>
-					<td bgcolor="#f8f8f8" colspan="4" style="border:1px solid #D6D4D4;color:#333;padding:7px 0">
-						<table class="table" style="width:100%;border-collapse:collapse">
-							<tr>
-								<td width="10" style="color:#333;padding:0">&nbsp;</td>
-								<td align="right" style="color:#333;padding:0">
-									<font size="2" face="Open-sans, sans-serif" color="#555454">
-										{total_wrapping}
-									</font>
-								</td>
-								<td width="10" style="color:#333;padding:0">&nbsp;</td>
-							</tr>
-						</table>
-					</td>
-				</tr> -->
-				<!-- <tr class="conf_body">
-					<td bgcolor="#f8f8f8" colspan="4" style="border:1px solid #D6D4D4;color:#333;padding:7px 0">
-						<table class="table" style="width:100%;border-collapse:collapse">
-							<tr>
-								<td width="10" style="color:#333;padding:0">&nbsp;</td>
-								<td align="right" style="color:#333;padding:0">
-									<font size="2" face="Open-sans, sans-serif" color="#555454">
-										<strong>Shipping</strong>
-									</font>
-								</td>
-								<td width="10" style="color:#333;padding:0">&nbsp;</td>
-							</tr>
-						</table>
-					</td>
-					<td bgcolor="#f8f8f8" colspan="4" style="border:1px solid #D6D4D4;color:#333;padding:7px 0">
-						<table class="table" style="width:100%;border-collapse:collapse">
-							<tr>
-								<td width="10" style="color:#333;padding:0">&nbsp;</td>
-								<td align="right" style="color:#333;padding:0">
-									<font size="2" face="Open-sans, sans-serif" color="#555454">
-										{total_shipping}
-									</font>
-								</td>
-								<td width="10" style="color:#333;padding:0">&nbsp;</td>
-							</tr>
-						</table>
-					</td>
-				</tr> -->
 				<tr class="conf_body">
 					<td bgcolor="#f8f8f8" colspan="4" style="border:1px solid #D6D4D4;color:#333;padding:7px 0">
 						<table class="table" style="width:100%;border-collapse:collapse">
@@ -272,7 +222,7 @@
 								<td width="10" style="color:#333;padding:0">&nbsp;</td>
 								<td align="right" style="color:#333;padding:0">
 									<font size="2" face="Open-sans, sans-serif" color="#555454">
-										<strong>Total Tax paid</strong>
+										<strong>Total Rooms Tax</strong>
 									</font>
 								</td>
 								<td width="10" style="color:#333;padding:0">&nbsp;</td>
@@ -286,6 +236,35 @@
 								<td align="right" style="color:#333;padding:0">
 									<font size="2" face="Open-sans, sans-serif" color="#555454">
 										{total_tax_paid}
+									</font>
+								</td>
+								<td width="10" style="color:#333;padding:0">&nbsp;</td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+
+				<tr class="conf_body">
+					<td bgcolor="#f8f8f8" colspan="4" style="border:1px solid #D6D4D4;color:#333;padding:7px 0">
+						<table class="table" style="width:100%;border-collapse:collapse">
+							<tr>
+								<td width="10" style="color:#333;padding:0">&nbsp;</td>
+								<td align="right" style="color:#333;padding:0">
+									<font size="2" face="Open-sans, sans-serif" color="#555454">
+										<strong>Additional Facilities Tax</strong>
+									</font>
+								</td>
+								<td width="10" style="color:#333;padding:0">&nbsp;</td>
+							</tr>
+						</table>
+					</td>
+					<td bgcolor="#f8f8f8" colspan="4" style="border:1px solid #D6D4D4;color:#333;padding:7px 0">
+						<table class="table" style="width:100%;border-collapse:collapse">
+							<tr>
+								<td width="10" style="color:#333;padding:0">&nbsp;</td>
+								<td align="right" style="color:#333;padding:0">
+									<font size="2" face="Open-sans, sans-serif" color="#555454">
+										{extra_demands_tax}
 									</font>
 								</td>
 								<td width="10" style="color:#333;padding:0">&nbsp;</td>
@@ -331,26 +310,6 @@
 		</font>
 	</td>
 </tr>
-<!-- <tr>
-	<td class="box" style="border:1px solid #D6D4D4;background-color:#f8f8f8;padding:7px 0">
-		<table class="table" style="width:100%">
-			<tr>
-				<td width="10" style="padding:7px 0">&nbsp;</td>
-				<td style="padding:7px 0">
-					<font size="2" face="Open-sans, sans-serif" color="#555454">
-						<p data-html-only="1" style="border-bottom:1px solid #D6D4D4;margin:3px 0 7px;text-transform:uppercase;font-weight:500;font-size:18px;padding-bottom:10px">
-							Shipping						</p>
-						<span style="color:#777">
-							<span style="color:#333"><strong>Carrier:</strong></span> {carrier}<br /><br />
-							<span style="color:#333"><strong>Payment:</strong></span> {payment}
-						</span>
-					</font>
-				</td>
-				<td width="10" style="padding:7px 0">&nbsp;</td>
-			</tr>
-		</table>
-	</td>
-</tr> -->
 <tr>
 	<td class="space_footer" style="padding:0!important">&nbsp;</td>
 </tr>
@@ -358,24 +317,6 @@
 	<td style="padding:7px 0">
 		<table class="table" style="width:100%">
 			<tr>
-				<!-- <td class="box address" width="310" style="border:1px solid #D6D4D4;background-color:#f8f8f8;padding:7px 0">
-					<table class="table" style="width:100%">
-						<tr>
-							<td width="10" style="padding:7px 0">&nbsp;</td>
-							<td style="padding:7px 0">
-								<font size="2" face="Open-sans, sans-serif" color="#555454">
-									<p data-html-only="1" style="border-bottom:1px solid #D6D4D4;margin:3px 0 7px;text-transform:uppercase;font-weight:500;font-size:18px;padding-bottom:10px">
-										Delivery address									</p>
-									<span data-html-only="1" style="color:#777">
-										{delivery_block_html}
-									</span>
-
-								</font>
-							</td>
-							<td width="10" style="padding:7px 0">&nbsp;</td>
-						</tr>
-					</table>
-				</td> -->
 				<td width="20" class="space_address" style="padding:7px 0">&nbsp;</td>
 				<td class="box address" width="310" style="border:1px solid #D6D4D4;background-color:#f8f8f8;padding:7px 0">
 					<table class="table" style="width:100%">
@@ -424,7 +365,7 @@
 						</tr>
 						<tr>
 							<td class="footer" style="border-top:4px solid #333333;padding:7px 0">
-								<span><a href="{shop_url}" style="color:#337ff1">{shop_name}</a> powered by <a href="https://webkul.com/" style="color:#337ff1">Webkul&trade;</a></span>
+								<span><a href="{shop_url}" style="color:#337ff1">{shop_name}</a> powered by <a href="https://webkul.com" style="color:#337ff1">Webkul&trade;</a></span>
 							</td>
 						</tr>
 					</table>

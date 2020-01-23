@@ -565,9 +565,7 @@ class HotelCartBookingData extends ObjectModel
 
     /**
      * [getCartFormatedBookinInfoByIdCart : To get cart booking information with some additional information in a custom famated way].
-     *
      * @param [Int] $id_cart [Id of the cart]
-     *
      * @return [Array|false] [If data found returns cart booking information with some additional information else returns false]
      */
     public function getCartFormatedBookinInfoByIdCart($id_cart)
@@ -575,6 +573,7 @@ class HotelCartBookingData extends ObjectModel
         $context = Context::getContext();
         $cart_detail_data = $this->getCartCurrentDataByCartId((int) $id_cart);
         if ($cart_detail_data) {
+            $objRoomDemands = new HotelRoomTypeDemand();
             foreach ($cart_detail_data as $key => $value) {
                 $product_image_id = Product::getCover($value['id_product']);
 
@@ -595,13 +594,37 @@ class HotelCartBookingData extends ObjectModel
                 $cart_detail_data[$key]['date_to'] = $value['date_to'];
 
                 $unit_price = Product::getPriceStatic($value['id_product'], true);
+                $unit_price_tax_excl = Product::getPriceStatic($value['id_product'], false);
                 $productPriceWithoutReduction = $productObj->getPriceWithoutReduct(false);
                 $feature_price = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay($value['id_product'], $value['date_from'], $value['date_to'], true);
+                $feature_price_tax_excl = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay($value['id_product'], $value['date_from'], $value['date_to'], false);
                 $feature_price_diff = (float)($productPriceWithoutReduction - $feature_price);
                 $cart_detail_data[$key]['product_price'] = $unit_price;
+                $cart_detail_data[$key]['product_price_tax_excl'] = $unit_price_tax_excl;
                 $cart_detail_data[$key]['feature_price'] = $feature_price;
+                $cart_detail_data[$key]['feature_price_tax_excl'] = $feature_price_tax_excl;
                 $cart_detail_data[$key]['feature_price_diff'] = $feature_price_diff;
-
+                // add extra demands
+                $cart_detail_data[$key]['extra_demands'] = $objRoomDemands->getRoomTypeDemands(
+                    $value['id_product']
+                );
+                $cart_detail_data[$key]['selected_demands'] = $this->getCartExtraDemands(
+                    $id_cart,
+                    $value['id_product'],
+                    $value['id_room'],
+                    $value['date_from'],
+                    $value['date_to'],
+                    0,
+                    1
+                );
+                $cart_detail_data[$key]['demand_price'] = $this->getCartExtraDemands(
+                    $id_cart,
+                    $value['id_product'],
+                    $value['id_room'],
+                    $value['date_from'],
+                    $value['date_to'],
+                    1
+                );
                 // By webkul New way to calculate product prices with feature Prices
                 $roomTypeDateRangePrice = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice($value['id_product'], $value['date_from'], $value['date_to']);
 
@@ -684,11 +707,13 @@ class HotelCartBookingData extends ObjectModel
                         return $featurePrice;
                     }
                 } elseif ($priority == 'special_day') {
-                    $featurePrice = Db::getInstance()->getRow('SELECT * FROM `'._DB_PREFIX_.'htl_room_type_feature_pricing` WHERE `id_product`='.(int) $id_product.' AND `is_special_days_exists`=1 AND `active`=1 AND `date_from` <= \''.$date.'\' AND `date_to` >= \''.$date.'\'');
+                    $featurePrice = Db::getInstance()->executeS('SELECT * FROM `'._DB_PREFIX_.'htl_room_type_feature_pricing` WHERE `id_product`='.(int) $id_product.' AND `is_special_days_exists`=1 AND `active`=1 AND `date_from` <= \''.$date.'\' AND `date_to` >= \''.$date.'\'');
                     if ($featurePrice) {
-                        $specialDays = Tools::jsonDecode($featurePrice['special_days']);
-                        if (in_array(strtolower(date('D', strtotime($date))), $specialDays)) {
-                            return $featurePrice;
+                        foreach ($featurePrice as $fRow) {
+                            $specialDays = Tools::jsonDecode($fRow['special_days']);
+                            if (in_array(strtolower(date('D', strtotime($date))), $specialDays)) {
+                                return $fRow;
+                            }
                         }
                     }
                 } elseif ($priority == 'date_range') {
@@ -967,8 +992,13 @@ class HotelCartBookingData extends ObjectModel
         $idRoom = 0,
         $dateFrom = 0,
         $dateTo = 0,
-        $getTotalPrice = 0
+        $getTotalPrice = 0,
+        $onlyRoomDemands = 0,
+        $useTax = null
     ) {
+        if ($useTax === null) {
+            $useTax = HotelBookingDetail::useTax();
+        }
         $context = Context::getContext();
         if (isset($context->currency->id)
             && Validate::isLoadedObject($context->currency)
@@ -981,8 +1011,7 @@ class HotelCartBookingData extends ObjectModel
         if ($getTotalPrice) {
             $totalDemandsPrice = 0;
         }
-        $sql = 'SELECT `id`, `id_product`, `id_room`, `extra_demands` FROM `'._DB_PREFIX_.'htl_cart_booking_data`
-        WHERE 1';
+        $sql = 'SELECT * FROM `'._DB_PREFIX_.'htl_cart_booking_data` WHERE 1';
         if ($idCart) {
             $sql .= ' AND `id_cart`='.(int) $idCart;
         }
@@ -995,23 +1024,88 @@ class HotelCartBookingData extends ObjectModel
         if ($dateFrom && $dateTo) {
             $sql .= ' AND `date_from` = \''.pSQL($dateFrom).'\' AND `date_to` = \''.pSQL($dateTo).'\'';
         }
-        if ($roomTypeDemands = Db::getInstance()->executeS($sql)) {
-            $objRoomDemandPrice = new HotelRoomTypeDemandPrice();
-            foreach ($roomTypeDemands as &$demand) {
+        //if ($idCart && ($idRoom || ($idProduct && $dateFrom && $dateTo))) {
+        if ($onlyRoomDemands) {
+            if ($roomTypeDemands = Db::getInstance()->getRow($sql)) {
+                $objRoomDemandPrice = new HotelRoomTypeDemandPrice();
+
                 if ($getTotalPrice) {
-                    if ($demand['extra_demands']
-                        && ($extraDemand = Tools::jsonDecode($demand['extra_demands'], true))
+                    if ($roomTypeDemands['extra_demands']
+                        && ($extraDemand = Tools::jsonDecode($roomTypeDemands['extra_demands'], true))
                     ) {
                         $totalDemandsPrice += $objRoomDemandPrice->getRoomTypeDemandsTotalPrice(
-                            $demand['id_product'],
-                            $extraDemand
+                            $roomTypeDemands['id_product'],
+                            $extraDemand,
+                            $useTax,
+                            $roomTypeDemands['date_from'],
+                            $roomTypeDemands['date_to']
                         );
                     }
                 } else {
-                    $demand['extra_demands'] = Tools::jsonDecode(
-                        $demand['extra_demands'],
+                    $roomTypeDemands['extra_demands'] = Tools::jsonDecode(
+                        $roomTypeDemands['extra_demands'],
                         true
                     );
+                    if (isset($roomTypeDemands['extra_demands']) && $roomTypeDemands['extra_demands']) {
+                        foreach ($roomTypeDemands['extra_demands'] as &$selDemand) {
+                            if ($selDemand['id_option']) {
+                                $objOption = new HotelRoomTypeGlobalDemandAdvanceOption(
+                                    $selDemand['id_option'],
+                                    $context->language->id
+                                );
+                                $selDemand['name'] = $objOption->name;
+                            } else {
+                                $objGlobalDemand = new HotelRoomTypeGlobalDemand(
+                                    $selDemand['id_global_demand'],
+                                    $context->language->id
+                                );
+                                $selDemand['name'] = $objGlobalDemand->name;
+                            }
+                        }
+                    }
+                    $roomTypeDemands = $roomTypeDemands['extra_demands'];
+                }
+            }
+        } else {
+            if ($roomTypeDemands = Db::getInstance()->executeS($sql)) {
+                $objRoomDemandPrice = new HotelRoomTypeDemandPrice();
+                foreach ($roomTypeDemands as $key => &$demand) {
+                    if ($getTotalPrice) {
+                        if ($demand['extra_demands']
+                            && ($extraDemand = Tools::jsonDecode($demand['extra_demands'], true))
+                        ) {
+                            $totalDemandsPrice += $objRoomDemandPrice->getRoomTypeDemandsTotalPrice(
+                                $demand['id_product'],
+                                $extraDemand,
+                                $useTax,
+                                $demand['date_from'],
+                                $demand['date_to']
+                            );
+                        }
+                    } else {
+                        $demand['extra_demands'] = Tools::jsonDecode(
+                            $demand['extra_demands'],
+                            true
+                        );
+                        if (isset($demand['extra_demands']) && $demand['extra_demands']) {
+                            foreach ($demand['extra_demands'] as &$selDemand) {
+                                if ($selDemand['id_option']) {
+                                    $objOption = new HotelRoomTypeGlobalDemandAdvanceOption(
+                                        $selDemand['id_option'],
+                                        $context->language->id
+                                    );
+                                    $selDemand['name'] = $objOption->name;
+                                } else {
+                                    $objGlobalDemand = new HotelRoomTypeGlobalDemand(
+                                        $selDemand['id_global_demand'],
+                                        $context->language->id
+                                    );
+                                    $selDemand['name'] = $objGlobalDemand->name;
+
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }

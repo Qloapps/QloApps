@@ -32,28 +32,54 @@ class AdminRoomTypeGlobalDemandController extends ModuleAdminController
 
         $this->_join .= ' LEFT JOIN `'._DB_PREFIX_.'htl_room_type_global_demand_lang` asl
         ON (a.id_global_demand = asl.id_global_demand)';
-        $this->_select .= ' asl.`name`';
+
+        $this->_join .= ' LEFT JOIN `'._DB_PREFIX_.'htl_room_type_global_demand_advance_option` dao
+        ON (a.id_global_demand = dao.id_global_demand)';
+
+        $this->_select .= ' a.`price` as global_price, asl.`name` as global_name,';
+
+        $this->_select .= ' IF(SUM(dao.`id_option`), 1, 0) as adv_options,';
+        $this->_select .= ' IF(SUM(dao.`id_option`), "'.$this->l('Yes').'", "'.$this->l('No').'") as has_adv_option,';
+        $this->_select .= ' IF(SUM(dao.`id_option`), 1, 0) badge_success, IF(SUM(dao.`id_option`), 0, 1) badge_danger,' ;
+
         $this->_where = ' AND asl.`id_lang` = '.(int) $this->context->language->id;
+        $this->_group = ' GROUP BY a.`id_global_demand`';
+        $advOptList = array(
+            1 => $this->l('Yes'),
+            0 => $this->l('No'),
+        );
 
         $this->fields_list = array(
             'id_global_demand' => array(
                 'title' => $this->l('Id'),
                 'align' => 'center',
             ),
-            'name' => array(
+            'global_name' => array(
                 'title' => $this->l('Name'),
                 'align' => 'center',
+                'havingFilter' => true,
+                'filter_key' => 'global_name',
             ),
-            'price' => array(
+            'has_adv_option' => array(
+                'title' => $this->l('Advance Options'),
+                'hint' => $this->l('Yes, if this activity includes a price. No, if activity has no price'),
+                'align' => 'center',
+                'type' => 'bool',
+                'type' => 'select',
+                'list' => $advOptList,
+                'badge_success' => true,
+                'badge_danger' => true,
+                'class' => 'fixed-width-xs',
+                'havingFilter' => true,
+                'filter_key' => 'adv_options',
+            ),
+            'global_price' => array(
                 'title' => $this->l('Price'),
                 'align' => 'center',
                 'type' => 'price',
                 'currency' => true,
-            ),
-            'date_add' => array(
-                'title' => $this->l('Date Add'),
-                'align' => 'center',
-                'type' => 'date',
+                'havingFilter' => true,
+                'filter_key' => 'global_price',
             ),
         );
 
@@ -69,11 +95,13 @@ class AdminRoomTypeGlobalDemandController extends ModuleAdminController
     public function initToolbar()
     {
         parent::initToolbar();
-        $this->page_header_toolbar_btn['new'] = array(
-            'href' => self::$currentIndex.'&add'.$this->table.'&token='.$this->token,
-            'desc' => $this->l('Add New Facility'),
-            'imgclass' => 'new'
-        );
+        if (empty($this->display)) {
+            $this->page_header_toolbar_btn['new'] = array(
+                'href' => self::$currentIndex.'&add'.$this->table.'&token='.$this->token,
+                'desc' => $this->l('Add New Facility'),
+                'imgclass' => 'new'
+            );
+        }
     }
 
     public function renderList()
@@ -107,6 +135,10 @@ class AdminRoomTypeGlobalDemandController extends ModuleAdminController
                 $smartyVars['edit'] = 1;
             }
         }
+        //show tax rule group
+        if ($taxRuleGroups = TaxRulesGroup::getTaxRulesGroups(true)) {
+            $smartyVars['taxRuleGroups'] = $taxRuleGroups;
+        }
         Media::addJsDef(
             array(
                 'globalDemandLink' => $this->context->link->getAdminLink('AdminRoomTypeGlobalDemand'),
@@ -132,6 +164,8 @@ class AdminRoomTypeGlobalDemandController extends ModuleAdminController
     {
         $idDemand = Tools::getValue('id_global_demand');
         $price = Tools::getValue('price');
+        $idTaxRulesGroup = Tools::getValue('id_tax_rules_group');
+        $priceCalcMethod = Tools::getValue('price_calc_method');
         $activeAdvOpt = Tools::getValue('active_adv_option');
         $advOptPrices = Tools::getValue('option_price');
         $advOptIds = Tools::getValue('id_option');
@@ -153,11 +187,37 @@ class AdminRoomTypeGlobalDemandController extends ModuleAdminController
                 }
             }
         }
-        if (!Validate::isPrice($price)) {
-            $this->errors[] = $this->l('Please enter a valid price.');
+        if (!$activeAdvOpt) {
+            if (!Validate::isPrice($price)) {
+                $this->errors[] = $this->l('Please enter a valid price.');
+            }
+        } else {
+            $price = 0;
         }
         if ($activeAdvOpt && !$advOptPrices) {
             $this->errors[] = $this->l('Please create at least one advance option for the service.');
+        }
+        // validate non advance options
+        if ($activeAdvOpt && $advOptPrices) {
+            foreach ($advOptPrices as $key => $advPrice) {
+                if (!trim(Tools::getValue('option_name_'.$defaultLangId)[$key])) {
+                    $this->errors[] = $this->l('Advance option name is required at least in ').
+                    $objDefaultLanguage['name'];
+                } else {
+                    foreach ($languages as $lang) {
+                        if (trim(Tools::getValue('option_name_'.$lang['id_lang'])[$key])) {
+                            if (!Validate::isGenericName(
+                                Tools::getValue('option_name_'.$lang['id_lang'])[$key]
+                            )) {
+                                $this->errors[] = $this->l('Invalid advance option name in ').$lang['name'];
+                            }
+                        }
+                    }
+                }
+                if (!Validate::isPrice($advPrice)) {
+                    $this->errors[] = $this->l('Please enter a valid price for advance option.');
+                }
+            }
         }
 
         if (!count($this->errors)) {
@@ -179,6 +239,8 @@ class AdminRoomTypeGlobalDemandController extends ModuleAdminController
                 }
             }
             $objGlobalDemand->price = $price;
+            $objGlobalDemand->id_tax_rules_group = $idTaxRulesGroup;
+            $objGlobalDemand->price_calc_method = $priceCalcMethod;
             if ($objGlobalDemand->save()) {
                 $objOption = new HotelRoomTypeGlobalDemandAdvanceOption();
                 $skipIds = array();
@@ -191,49 +253,28 @@ class AdminRoomTypeGlobalDemandController extends ModuleAdminController
                     }
                 }
                 $objOption->deleteGlobalDemandAdvanceOptions($objGlobalDemand->id, $skipIds);
-                if ($activeAdvOpt) {
+                if ($activeAdvOpt && $advOptPrices) {
                     foreach ($advOptPrices as $key => $advPrice) {
-                        if (!trim(Tools::getValue('option_name_'.$defaultLangId)[$key])) {
-                            $this->errors[] = $this->l('Advance option name is required at least in ').
-                            $objDefaultLanguage['name'];
+                        if (isset($advOptIds[$key]) && $advOptIds[$key]) {
+                            $objAdvOption = new HotelRoomTypeGlobalDemandAdvanceOption($advOptIds[$key]);
                         } else {
-                            foreach ($languages as $lang) {
-                                // validate non required fields
-                                if (trim(Tools::getValue('option_name_'.$lang['id_lang'])[$key])) {
-                                    if (!Validate::isGenericName(
-                                        Tools::getValue('option_name_'.$lang['id_lang'])[$key]
-                                    )) {
-                                        $this->errors[] = $this->l('Invalid advance option name in ').$lang['name'];
-                                    }
-                                }
-                            }
+                            $objAdvOption = new HotelRoomTypeGlobalDemandAdvanceOption();
                         }
-                        if (!Validate::isPrice($advPrice)) {
-                            $this->errors[] = $this->l('Please enter a valid price for advance option.');
-                        }
-
-                        if (!count($this->errors)) {
-                            if (isset($advOptIds[$key]) && $advOptIds[$key]) {
-                                $objAdvOption = new HotelRoomTypeGlobalDemandAdvanceOption($advOptIds[$key]);
+                        $objAdvOption->id_global_demand = $objGlobalDemand->id;
+                        // advance options lang fields
+                        foreach ($languages as $lang) {
+                            if (!trim(Tools::getValue('option_name_'.$lang['id_lang'])[$key])) {
+                                $objAdvOption->name[$lang['id_lang']] = Tools::getValue(
+                                    'option_name_'.$defaultLangId
+                                )[$key];
                             } else {
-                                $objAdvOption = new HotelRoomTypeGlobalDemandAdvanceOption();
+                                $objAdvOption->name[$lang['id_lang']] = Tools::getValue(
+                                    'option_name_'.$lang['id_lang']
+                                )[$key];
                             }
-                            $objAdvOption->id_global_demand = $objGlobalDemand->id;
-                            // advance options lang fields
-                            foreach ($languages as $lang) {
-                                if (!trim(Tools::getValue('option_name_'.$lang['id_lang'])[$key])) {
-                                    $objAdvOption->name[$lang['id_lang']] = Tools::getValue(
-                                        'option_name_'.$defaultLangId
-                                    )[$key];
-                                } else {
-                                    $objAdvOption->name[$lang['id_lang']] = Tools::getValue(
-                                        'option_name_'.$lang['id_lang']
-                                    )[$key];
-                                }
-                            }
-                            $objAdvOption->price = $advPrice;
-                            $objAdvOption->save();
                         }
+                        $objAdvOption->price = $advPrice;
+                        $objAdvOption->save();
                     }
                 }
             }

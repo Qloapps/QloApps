@@ -178,7 +178,7 @@ class ThemeCore extends ObjectModel
 
         if (file_exists(_PS_ROOT_DIR_.'/config/xml/themes/'.$theme->directory.'.xml')) {
             $config_file = _PS_ROOT_DIR_.'/config/xml/themes/'.$theme->directory.'.xml';
-        } elseif ($theme->name == 'hotel-theme') {
+        } elseif ($theme->name == 'hotel-reservation-theme') {
             $config_file = _PS_ROOT_DIR_.'/config/xml/themes/default.xml';
         } else {
             $config_file = false;
@@ -197,7 +197,7 @@ class ThemeCore extends ObjectModel
                     $theme_arr['author_'.$key] = (string)$value;
                 }
 
-                if ($theme_arr['theme_name'] == 'hotel-theme') {
+                if ($theme_arr['theme_name'] == 'hotel-reservation-theme') {
                     $theme_arr['tc'] = Module::isEnabled('wkthemeconfigurator');
                 }
             }

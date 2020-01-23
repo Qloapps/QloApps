@@ -169,7 +169,7 @@
 									col-sm-3
 								{/if}">
 									<button type="submit" class="btn btn-default button button-medium pull-right" name="product_page_search_submit" id="search_room_submit">
-										<span>{l s='Search' mod='wkroomsearchblock'}</span>
+										<span>{l s='Search'}</span>
 									</button>
 								</div>
 							</form>
@@ -288,7 +288,7 @@
 					<!--HOOK_PRODUCT_TAB -->
 					<section class="page-product-box">
 						<ul class="nav nav-tabs product_description_tabs">
-							<li class="active"><a href="#room_info_tab" class="idTabHrefShort" data-toggle="tab">{l s='Room Information' mod='productcomments'}</a></li>
+							<li class="active"><a href="#room_info_tab" class="idTabHrefShort" data-toggle="tab">{l s='Room Information'}</a></li>
 							{$HOOK_PRODUCT_TAB}
 						</ul>
 						<div class="tab-content product_description_tabs_contents">
@@ -870,15 +870,15 @@
 {addJsDefL name=wrong_qty_cond}{l s='you are trying for a invalid quantity.' js=1}{/addJsDefL}
 
 
-{addJsDefL name=hotel_loc_cond}{l s='Please enter a hotel location' js=1 mod='wkroomsearchblock'}{/addJsDefL}
-{addJsDefL name=hotel_name_cond}{l s='Please select a hotel name' js=1 mod='wkroomsearchblock'}{/addJsDefL}
-{addJsDefL name=check_in_time_cond}{l s='Please enter Check In time' js=1 mod='wkroomsearchblock'}{/addJsDefL}
-{addJsDefL name=check_out_time_cond}{l s='Please enter Check Out time' js=1 mod='wkroomsearchblock'}{/addJsDefL}
-{addJsDefL name=num_adults_cond}{l s='Please enter number of adults.' js=1 mod='wkroomsearchblock'}{/addJsDefL}
-{addJsDefL name=num_children_cond}{l s='Please enter number of children.' js=1 mod='wkroomsearchblock'}{/addJsDefL}
-{addJsDefL name=some_error_occur_cond}{l s='Some error occured. Please try again.' js=1 mod='wkroomsearchblock'}{/addJsDefL}
-{addJsDefL name=less_checkin_date}{l s='Check In date can not be before current date.' js=1 mod='wkroomsearchblock'}{/addJsDefL}
-{addJsDefL name=more_checkout_date}{l s='Check Out date must be greater than Check In date.' js=1 mod='wkroomsearchblock'}{/addJsDefL}
+{addJsDefL name=hotel_loc_cond}{l s='Please enter a hotel location' js=1}{/addJsDefL}
+{addJsDefL name=hotel_name_cond}{l s='Please select a hotel name' js=1}{/addJsDefL}
+{addJsDefL name=check_in_time_cond}{l s='Please enter Check In time' js=1}{/addJsDefL}
+{addJsDefL name=check_out_time_cond}{l s='Please enter Check Out time' js=1}{/addJsDefL}
+{addJsDefL name=num_adults_cond}{l s='Please enter number of adults.' js=1}{/addJsDefL}
+{addJsDefL name=num_children_cond}{l s='Please enter number of children.' js=1}{/addJsDefL}
+{addJsDefL name=some_error_occur_cond}{l s='Some error occured. Please try again.' js=1}{/addJsDefL}
+{addJsDefL name=less_checkin_date}{l s='Check In date can not be before current date.' js=1}{/addJsDefL}
+{addJsDefL name=more_checkout_date}{l s='Check Out date must be greater than Check In date.' js=1}{/addJsDefL}
 {addJsDef autocomplete_search_url=$link->getModuleLink('wkroomsearchblock','autocompletesearch')}
 
 

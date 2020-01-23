@@ -76,6 +76,14 @@ class AdminProductsControllerCore extends AdminController
         if (!Tools::getValue('id_product')) {
             $this->multishop_context_group = false;
         }
+        $this->context = Context::getContext();
+
+        // START send access query information to the admin controller
+        $this->access_select = ' SELECT a.`id_product` FROM '._DB_PREFIX_.'product a';
+        $this->access_join = ' INNER JOIN '._DB_PREFIX_.'htl_room_type hrt ON (hrt.id_product = a.id_product)';
+        if ($acsHtls = HotelBranchInformation::getProfileAccessedHotels($this->context->employee->id_profile, 1, 1)) {
+            $this->access_where = ' WHERE hrt.id_hotel IN ('.implode(',', $acsHtls).')';
+        }
 
         parent::__construct();
 
@@ -255,19 +263,6 @@ class AdminProductsControllerCore extends AdminController
             'orderby' => false,
             'search' => false
         );
-
-        //By webkul ..need not to show quantity of the product
-        /*if (Configuration::get('PS_STOCK_MANAGEMENT')) {
-            $this->fields_list['sav_quantity'] = array(
-                'title' => $this->l('Quantity'),
-                'type' => 'int',
-                'align' => 'text-right',
-                'filter_key' => 'sav!quantity',
-                'orderby' => true,
-                'badge_danger' => true,
-                //'hint' => $this->l('This is the quantity available in the current shop/group.'),
-            );
-        }*/
 
         $this->fields_list['active'] = array(
             'title' => $this->l('Status'),
@@ -3341,9 +3336,7 @@ class AdminProductsControllerCore extends AdminController
                     }
                 }
             }
-        }
-
-        if (!count($disableDates)) {
+        } else {
             $this->errors[] = Tools::displayError('Please add dates for status temporary disable.');
         }
     }
@@ -3392,10 +3385,11 @@ class AdminProductsControllerCore extends AdminController
                             }
                         }
                         //validate room status
+                        $disableDtsArr = array();
                         foreach ($room_status as $key => $status) {
                             if ($status == 3) {
-                                $disableDatesArray = Tools::jsonDecode($disable_dates[$key], true);
-                                $this->validateDisableDateRanges($disableDatesArray);
+                                $disableDtsArr[$key] = Tools::jsonDecode($disable_dates[$key], true);
+                                $this->validateDisableDateRanges($disableDtsArr[$key]);
                             }
                         }
                     }
@@ -3452,16 +3446,18 @@ class AdminProductsControllerCore extends AdminController
                                 $objRoomInfo->comment = $room_comment[$key];
                                 if ($objRoomInfo->save()) {
                                     if ($room_status[$key] == 3) {
-                                        if ($disableDatesArray) {
-                                            $objRoomDisableDates = new HotelRoomDisableDates();
-                                            $objRoomDisableDates->deleteRoomDisableDates($objRoomInfo->id);
-                                            foreach ($disableDatesArray as $disableDateRange) {
-                                                $objRoomDisableDates->id_room_type = $id_product;
-                                                $objRoomDisableDates->id_room = $objRoomInfo->id;
-                                                $objRoomDisableDates->date_from = $disableDateRange['date_from'];
-                                                $objRoomDisableDates->date_to = $disableDateRange['date_to'];
-                                                $objRoomDisableDates->reason = $disableDateRange['reason'];
-                                                $objRoomDisableDates->add();
+                                        $objDisDts = new HotelRoomDisableDates();
+                                        $objDisDts->deleteRoomDisableDates($objRoomInfo->id);
+                                        if (isset($disableDtsArr[$key]) && $disableDtsArr[$key]) {
+                                            // delete privious save dats
+                                            foreach ($disableDtsArr[$key] as $disDtRange) {
+                                                $objDisDts = new HotelRoomDisableDates();
+                                                $objDisDts->id_room_type = $id_product;
+                                                $objDisDts->id_room = $objRoomInfo->id;
+                                                $objDisDts->date_from = $disDtRange['date_from'];
+                                                $objDisDts->date_to = $disDtRange['date_to'];
+                                                $objDisDts->reason = $disDtRange['reason'];
+                                                $objDisDts->add();
                                             }
                                         }
                                     }
@@ -3476,10 +3472,14 @@ class AdminProductsControllerCore extends AdminController
 
     public function ajaxProcessDeleteHotelRoom()
     {
-        $idRoom = Tools::getValue('id');
-
-        $objRoomInfo = new HotelRoomInformation((int)$idRoom);
-        die($objRoomInfo->delete());
+        if ($this->tabAccess['edit'] == 1) {
+            $idRoom = Tools::getValue('id');
+            $objRoomInfo = new HotelRoomInformation((int)$idRoom);
+            if ($objRoomInfo->delete()) {
+                die('1');
+            }
+        }
+        die('0');
     }
 
     /**
@@ -3526,10 +3526,11 @@ class AdminProductsControllerCore extends AdminController
                     $bookingParams['only_active_roomtype'] = 0;
 
                     $booking_data = $obj_booking_dtl->getBookingData($bookingParams);
+
                     $bookingParams['for_calendar'] = 1;
                     while ($start_date <= $last_date) {
                         $cal_date_from = $start_date;
-                        $cal_date_to = date('Y-m-d', strtotime($cal_date_from) + 86400);
+                        $cal_date_to = date('Y-m-d', strtotime('+1 day', strtotime($cal_date_from)));
                         $booking_calendar_data[$cal_date_from] = $obj_booking_dtl->getBookingData($bookingParams);
 
                         // if product is inactive then booking_details will be false
@@ -3539,8 +3540,7 @@ class AdminProductsControllerCore extends AdminController
                             $booking_calendar_data[$cal_date_from]['stats']['num_unavail'] = 0;
                             $booking_calendar_data[$cal_date_from]['stats']['num_booked'] = 0;
                         }
-
-                        $start_date = date('Y-m-d', strtotime($start_date)+ 86400);
+                        $start_date = date('Y-m-d', strtotime('+1 day', strtotime($start_date)));
                     }
                     if (isset($search_flag) && $search_flag) {
                         if ($booking_data['stats']['num_avail'] > 0) {
@@ -4128,8 +4128,8 @@ class AdminProductsControllerCore extends AdminController
                 if (!$specific_price['id_shop'] || in_array($specific_price['id_shop'], Shop::getContextListShopID())) {
                     $content .= '
 					<tr '.($i % 2 ? 'class="alt_row"' : '').'>
-						<td>'.$rule_name.'</td>
-						<td>'.$attributes_name.'</td>';
+						<td>'.$rule_name.'</td>';
+						// <td>'.$attributes_name.'</td>';
 
                     $can_delete_specific_prices = true;
                     if (Shop::isFeatureActive()) {

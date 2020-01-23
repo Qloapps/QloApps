@@ -370,7 +370,15 @@ abstract class PaymentModuleCore extends Module
                     // We don't use the following condition to avoid the float precision issues : http://www.php.net/manual/en/language.types.float.php
                     // if ($order->total_paid != $order->total_paid_real)
                     // We use number_format in order to compare two string
-                    if ($order_status->logable && number_format($cart_total_paid, _PS_PRICE_COMPUTE_PRECISION_) != number_format($amount_paid, _PS_PRICE_COMPUTE_PRECISION_)) {
+                    if (Configuration::get('WK_ALLOW_ADVANCED_PAYMENT')) {
+                        $objCustAdv = new HotelCustomerAdvancedPayment();
+                        $advOrderTotal = $objCustAdv->getOrdertTotal($this->context->cart->id, $this->context->cart->id_guest);
+                        // if customer is paying advance payment amount
+                        if ($order_status->logable && number_format($advOrderTotal, _PS_PRICE_COMPUTE_PRECISION_) != number_format($amount_paid, _PS_PRICE_COMPUTE_PRECISION_)) {
+                            $id_order_state = Configuration::get('PS_OS_ERROR');
+                        }
+                    } elseif ($order_status->logable && number_format($cart_total_paid, _PS_PRICE_COMPUTE_PRECISION_) != number_format($amount_paid, _PS_PRICE_COMPUTE_PRECISION_)) {
+                        // if customer is paying full payment amount
                         $id_order_state = Configuration::get('PS_OS_ERROR');
                     }
 
@@ -440,11 +448,14 @@ abstract class PaymentModuleCore extends Module
 
             // Make sure CartRule caches are empty
             CartRule::cleanCache();
+            $objRoomType = new HotelRoomType();
             foreach ($order_detail_list as $key => $order_detail) {
                 /** @var OrderDetail $order_detail */
 
                 $order = $order_list[$key];
                 if (!$order_creation_failed && isset($order->id)) {
+                    // first set if_hotel as 0 and get the hotel id from room type info -> below
+                    $idHotel = 0;
                     if (!$secure_key) {
                         $message .= '<br />'.Tools::displayError('Warning: the secure key is empty, check your payment account before validation');
                     }
@@ -518,6 +529,12 @@ abstract class PaymentModuleCore extends Module
                         // Check if is not a virutal product for the displaying of shipping
                         if (!$product['is_virtual']) {
                             $virtual_product &= false;
+                        }
+                        // If id_hotel is not available then find id_hotel for sending mails hotel wise
+                        if (!$idHotel) {
+                            if ($roomDetail = $objRoomType->getRoomTypeInfoByIdProduct((int)$product['id_product'])) {
+                                $idHotel = $roomDetail['id_hotel'];
+                            }
                         }
                     } // end foreach ($products)
 
@@ -728,6 +745,8 @@ abstract class PaymentModuleCore extends Module
                         $cart_booking_data_text = $this->getEmailTemplateContent('hotel-booking-cart-data.text', Mail::TYPE_TEXT, $cart_booking_data['cart_htl_data']);
                         $cart_booking_data_html = $this->getEmailTemplateContent('hotel-booking-cart-data.tpl', Mail::TYPE_HTML, $cart_booking_data['cart_htl_data']);
 
+                        $extra_demands_details_html = $this->getEmailTemplateContent('booking_extra_demands.tpl', Mail::TYPE_HTML, $cart_booking_data['cart_htl_data']);
+
                         //For Advanced Payment
                         $obj_customer_adv = new HotelCustomerAdvancedPayment();
                         $order_adv_dtl = $obj_customer_adv->getCstAdvPaymentDtlByIdOrder($order->id);
@@ -743,69 +762,68 @@ abstract class PaymentModuleCore extends Module
                         $adv_data_text = $this->getEmailTemplateContent('advanced-book-data.txt', Mail::TYPE_TEXT, $order_adv_dtl);
 
                         $data = array(
-                        '{adv_data_html}' => $adv_data_html,//by webkul
-                        '{adv_data_text}' => $adv_data_text,//by webkul
-                        '{cart_booking_data_html}' => $cart_booking_data_html,//by webkul
-                        '{total_demands_price}' => Tools::displayPrice(
-                            $cart_booking_data['total_extra_demads'],
-                            $this->context->currency,
-                            false
-                        ),//by webkul
-                        '{firstname}' => $this->context->customer->firstname,
-                        '{lastname}' => $this->context->customer->lastname,
-                        '{email}' => $this->context->customer->email,
-                        '{delivery_block_txt}' => $this->_getFormatedAddress($delivery, "\n"),
-                        '{invoice_block_txt}' => $this->_getFormatedAddress($invoice, "\n"),
-                        '{delivery_block_html}' => $this->_getFormatedAddress($delivery, '<br />', array(
-                            'firstname'    => '<span style="font-weight:bold;">%s</span>',
-                            'lastname'    => '<span style="font-weight:bold;">%s</span>'
-                        )),
-                        '{invoice_block_html}' => $this->_getFormatedAddress($invoice, '<br />', array(
+                            '{adv_data_html}' => $adv_data_html,//by webkul
+                            '{adv_data_text}' => $adv_data_text,//by webkul
+                            '{cart_booking_data_html}' => $cart_booking_data_html,//by webkul
+                            '{extra_demands_details_html}' => $extra_demands_details_html,//by webkul
+                            '{total_extra_demands_te}' => Tools::displayPrice(
+                                $cart_booking_data['total_extra_demands_te'],
+                                $this->context->currency,
+                                false
+                            ),
+                            '{extra_demands_tax}' => Tools::displayPrice(
+                                ($cart_booking_data['total_extra_demands_ti']-$cart_booking_data['total_extra_demands_te']),
+                                $this->context->currency,
+                                false
+                            ),
+                            '{delivery_block_txt}' => $this->_getFormatedAddress($delivery, "\n"),
+                            '{invoice_block_txt}' => $this->_getFormatedAddress($invoice, "\n"),
+                            '{delivery_block_html}' => $this->_getFormatedAddress($delivery, '<br />', array(
                                 'firstname'    => '<span style="font-weight:bold;">%s</span>',
                                 'lastname'    => '<span style="font-weight:bold;">%s</span>'
-                        )),
-                        '{delivery_company}' => $delivery->company,
-                        '{delivery_firstname}' => $delivery->firstname,
-                        '{delivery_lastname}' => $delivery->lastname,
-                        '{delivery_address1}' => $delivery->address1,
-                        '{delivery_address2}' => $delivery->address2,
-                        '{delivery_city}' => $delivery->city,
-                        '{delivery_postal_code}' => $delivery->postcode,
-                        '{delivery_country}' => $delivery->country,
-                        '{delivery_state}' => $delivery->id_state ? $delivery_state->name : '',
-                        '{delivery_phone}' => ($delivery->phone) ? $delivery->phone : $delivery->phone_mobile,
-                        '{delivery_other}' => $delivery->other,
-                        '{invoice_company}' => $invoice->company,
-                        '{invoice_vat_number}' => $invoice->vat_number,
-                        '{invoice_firstname}' => $invoice->firstname,
-                        '{invoice_lastname}' => $invoice->lastname,
-                        '{invoice_address2}' => $invoice->address2,
-                        '{invoice_address1}' => $invoice->address1,
-                        '{invoice_city}' => $invoice->city,
-                        '{invoice_postal_code}' => $invoice->postcode,
-                        '{invoice_country}' => $invoice->country,
-                        '{invoice_state}' => $invoice->id_state ? $invoice_state->name : '',
-                        '{invoice_phone}' => ($invoice->phone) ? $invoice->phone : $invoice->phone_mobile,
-                        '{invoice_other}' => $invoice->other,
-                        '{order_name}' => $order->getUniqReference(),
-                        '{date}' => Tools::displayDate(date('Y-m-d H:i:s'), null, 1),
-                        '{carrier}' => ($virtual_product || !isset($carrier->name)) ? Tools::displayError('No carrier') : $carrier->name,
-                        '{payment}' => Tools::substr($order->payment, 0, 32),
-                        '{products}' => $product_list_html,
-                        '{products_txt}' => $product_list_txt,
-                        '{discounts}' => $cart_rules_list_html,
-                        '{discounts_txt}' => $cart_rules_list_txt,
-                        '{total_extra_demands}' => Tools::displayPrice(
-                            $cart_booking_data['total_extra_demads'],
-                            $this->context->currency,
-                            false
-                        ),
-                        '{total_paid}' => Tools::displayPrice($order->total_paid, $this->context->currency, false),
-                        '{total_products}' => Tools::displayPrice(Product::getTaxCalculationMethod() == PS_TAX_EXC ? $order->total_products : $order->total_products_wt, $this->context->currency, false),
-                        '{total_discounts}' => Tools::displayPrice($order->total_discounts, $this->context->currency, false),
-                        '{total_shipping}' => Tools::displayPrice($order->total_shipping, $this->context->currency, false),
-                        '{total_wrapping}' => Tools::displayPrice($order->total_wrapping, $this->context->currency, false),
-                        '{total_tax_paid}' => Tools::displayPrice(($order->total_products_wt - $order->total_products) + ($order->total_shipping_tax_incl - $order->total_shipping_tax_excl), $this->context->currency, false));
+                            )),
+                            '{invoice_block_html}' => $this->_getFormatedAddress($invoice, '<br />', array(
+                                    'firstname'    => '<span style="font-weight:bold;">%s</span>',
+                                    'lastname'    => '<span style="font-weight:bold;">%s</span>'
+                            )),
+                            '{delivery_company}' => $delivery->company,
+                            '{delivery_firstname}' => $delivery->firstname,
+                            '{delivery_lastname}' => $delivery->lastname,
+                            '{delivery_address1}' => $delivery->address1,
+                            '{delivery_address2}' => $delivery->address2,
+                            '{delivery_city}' => $delivery->city,
+                            '{delivery_postal_code}' => $delivery->postcode,
+                            '{delivery_country}' => $delivery->country,
+                            '{delivery_state}' => $delivery->id_state ? $delivery_state->name : '',
+                            '{delivery_phone}' => ($delivery->phone) ? $delivery->phone : $delivery->phone_mobile,
+                            '{delivery_other}' => $delivery->other,
+                            '{invoice_company}' => $invoice->company,
+                            '{invoice_vat_number}' => $invoice->vat_number,
+                            '{invoice_firstname}' => $invoice->firstname,
+                            '{invoice_lastname}' => $invoice->lastname,
+                            '{invoice_address2}' => $invoice->address2,
+                            '{invoice_address1}' => $invoice->address1,
+                            '{invoice_city}' => $invoice->city,
+                            '{invoice_postal_code}' => $invoice->postcode,
+                            '{invoice_country}' => $invoice->country,
+                            '{invoice_state}' => $invoice->id_state ? $invoice_state->name : '',
+                            '{invoice_phone}' => ($invoice->phone) ? $invoice->phone : $invoice->phone_mobile,
+                            '{invoice_other}' => $invoice->other,
+                            '{order_name}' => $order->getUniqReference(),
+                            '{date}' => Tools::displayDate(date('Y-m-d H:i:s'), null, 1),
+                            '{carrier}' => ($virtual_product || !isset($carrier->name)) ? Tools::displayError('No carrier') : $carrier->name,
+                            '{payment}' => Tools::substr($order->payment, 0, 32),
+                            '{products}' => $product_list_html,
+                            '{products_txt}' => $product_list_txt,
+                            '{discounts}' => $cart_rules_list_html,
+                            '{discounts_txt}' => $cart_rules_list_txt,
+                            '{total_paid}' => Tools::displayPrice($order->total_paid, $this->context->currency, false),
+                            '{total_products}' => Tools::displayPrice(Product::getTaxCalculationMethod() == PS_TAX_EXC ? $order->total_products : $order->total_products_wt, $this->context->currency, false),
+                            '{total_discounts}' => Tools::displayPrice($order->total_discounts, $this->context->currency, false),
+                            '{total_shipping}' => Tools::displayPrice($order->total_shipping, $this->context->currency, false),
+                            '{total_wrapping}' => Tools::displayPrice($order->total_wrapping, $this->context->currency, false),
+                            '{total_tax_paid}' => Tools::displayPrice(($order->total_products_wt - $order->total_products) + ($order->total_shipping_tax_incl - $order->total_shipping_tax_excl), $this->context->currency, false)
+                        );
 
                         if (is_array($extra_vars)) {
                             $data = array_merge($data, $extra_vars);
@@ -827,19 +845,108 @@ abstract class PaymentModuleCore extends Module
                             PrestaShopLogger::addLog('PaymentModule::validateOrder - Mail is about to be sent', 1, null, 'Cart', (int)$id_cart, true);
                         }
 
-                        if (Validate::isEmail($this->context->customer->email)) {
-                            Mail::Send(
-                                (int)$order->id_lang,
-                                'order_conf',
-                                Mail::l('Order confirmation', (int)$order->id_lang),
-                                $data,
-                                $this->context->customer->email,
-                                $this->context->customer->firstname.' '.$this->context->customer->lastname,
-                                null,
-                                null,
-                                $file_attachement,
-                                null, _PS_MAIL_DIR_, false, (int)$order->id_shop
-                            );
+                        // Send order confirmation mails to the reciepients according to the order mail configuration
+                        if (Configuration::get('PS_ORDER_CONF_MAIL_TO_CUSTOMER')){
+                            if (Validate::isEmail($this->context->customer->email)) {
+                                // send customer information
+                                $data['{firstname}'] = $this->context->customer->firstname;
+                                $data['{lastname}'] = $this->context->customer->lastname;
+                                $data['{email}'] = $this->context->customer->email;
+                                Mail::Send(
+                                    (int)$order->id_lang,
+                                    'order_conf',
+                                    Mail::l('Order confirmation', (int)$order->id_lang),
+                                    $data,
+                                    $this->context->customer->email,
+                                    $this->context->customer->firstname.' '.$this->context->customer->lastname,
+                                    null,
+                                    null,
+                                    $file_attachement,
+                                    null, _PS_MAIL_DIR_, false, (int)$order->id_shop
+                                );
+                            }
+                        }
+                        if (Configuration::get('PS_ORDER_CONF_MAIL_TO_SUPERADMIN')){
+                            // send superadmin information
+                            if (Validate::isLoadedObject($superAdmin = new Employee(_PS_ADMIN_PROFILE_))) {
+                                if (Validate::isEmail($superAdmin->email)) {
+                                    $data['{customer_name}'] = $this->context->customer->firstname.' '.$this->context->customer->lastname;
+                                    $data['{customer_email}'] = $this->context->customer->email;
+                                    $data['{firstname}'] = $superAdmin->firstname;
+                                    $data['{lastname}'] = $superAdmin->lastname;
+                                    $data['{email}'] = $superAdmin->email;
+                                    Mail::Send(
+                                        (int)$order->id_lang,
+                                        'order_conf_admin',
+                                        Mail::l('Order confirmation', (int)$order->id_lang),
+                                        $data,
+                                        $superAdmin->email,
+                                        $superAdmin->firstname.' '.$superAdmin->lastname,
+                                        null,
+                                        null,
+                                        $file_attachement,
+                                        null, _PS_MAIL_DIR_, false, (int)$order->id_shop
+                                    );
+                                }
+                            }
+                        }
+                        if ($idHotel
+                            && Validate::isLoadedObject($objHotel = new HotelBranchInformation($idHotel))
+                        ) {
+                            if (Configuration::get('PS_ORDER_CONF_MAIL_TO_HOTEL_MANAGER')){
+                                // send hotel information
+                                $data['{firstname}'] = '';
+                                $data['{lastname}'] = '';
+                                $data['{email}'] = $objHotel->email;
+                                $data['{customer_name}'] = $this->context->customer->firstname.' '.$this->context->customer->lastname;
+                                $data['{customer_email}'] = $this->context->customer->email;
+                                if (Validate::isEmail($objHotel->email)) {
+                                    Mail::Send(
+                                        (int)$order->id_lang,
+                                        'order_conf_admin',
+                                        Mail::l('Order confirmation', (int)$order->id_lang),
+                                        $data,
+                                        $objHotel->email,
+                                        null,
+                                        null,
+                                        null,
+                                        $file_attachement,
+                                        null, _PS_MAIL_DIR_, false, (int)$order->id_shop
+                                    );
+                                }
+                            }
+                            if (Configuration::get('PS_ORDER_CONF_MAIL_TO_EMPLOYEE')){
+                                if ($htlAccesses = $objHotel->getHotelAccess($idHotel)) {
+                                    $data['{customer_name}'] = $this->context->customer->firstname.' '.$this->context->customer->lastname;
+                                    $data['{customer_email}'] = $this->context->customer->email;
+                                    foreach ($htlAccesses as $access) {
+                                        if ($access['id_profile'] != _PS_ADMIN_PROFILE_) {
+                                            if ($htlEmployees = Employee::getEmployeesByProfile($access['id_profile'])) {
+                                                foreach ($htlEmployees as $empl) {
+                                                    if (Validate::isEmail($empl['email'])) {
+                                                        // send hotel manager (employee) have permission for this hotel
+                                                        $data['{firstname}'] = $empl['firstname'];
+                                                        $data['{lastname}'] = $empl['lastname'];
+                                                        $data['{email}'] = $empl['email'];
+                                                        Mail::Send(
+                                                            (int)$order->id_lang,
+                                                            'order_conf_admin',
+                                                            Mail::l('Order confirmation', (int)$order->id_lang),
+                                                            $data,
+                                                            $empl['email'],
+                                                            $empl['firstname'].' '.$empl['lastname'],
+                                                            null,
+                                                            null,
+                                                            $file_attachement,
+                                                            null, _PS_MAIL_DIR_, false, (int)$order->id_shop
+                                                        );
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
 
@@ -1077,7 +1184,8 @@ abstract class PaymentModuleCore extends Module
             $obj_htl_bk_dtl = new HotelBookingDetail();
             $obj_rm_type = new HotelRoomType();
             $objBookingDemand = new HotelBookingDemands();
-            $totalDemandsPrice = 0;
+            $result['total_extra_demands_te'] = 0;
+            $result['total_extra_demands_ti'] = 0;
             $cart_htl_data = array();
             if (!empty($products)) {
                 foreach ($products as $type_key => $type_value) {
@@ -1132,13 +1240,24 @@ abstract class PaymentModuleCore extends Module
                                 $data_v['date_from'],
                                 $data_v['date_to']
                             );
-                            $cart_htl_data[$type_key]['date_diff'][$date_join]['extra_demands_price'] = $objBookingDemand->getRoomTypeBookingExtraDemands(
+                            $cart_htl_data[$type_key]['date_diff'][$date_join]['extra_demands_price_te'] = $objBookingDemand->getRoomTypeBookingExtraDemands(
                                 $order->id,
                                 $type_value['product_id'],
                                 0,
                                 $data_v['date_from'],
                                 $data_v['date_to'],
                                 0,
+                                1,
+                                0
+                            );
+                            $cart_htl_data[$type_key]['date_diff'][$date_join]['extra_demands_price_ti'] = $objBookingDemand->getRoomTypeBookingExtraDemands(
+                                $order->id,
+                                $type_value['product_id'],
+                                0,
+                                $data_v['date_from'],
+                                $data_v['date_to'],
+                                0,
+                                1,
                                 1
                             );
                         } else {
@@ -1162,22 +1281,33 @@ abstract class PaymentModuleCore extends Module
                                 $data_v['date_from'],
                                 $data_v['date_to']
                             );
-                            $cart_htl_data[$type_key]['date_diff'][$date_join]['extra_demands_price'] = $objBookingDemand->getRoomTypeBookingExtraDemands(
+                            $cart_htl_data[$type_key]['date_diff'][$date_join]['extra_demands_price_te'] = $objBookingDemand->getRoomTypeBookingExtraDemands(
                                 $order->id,
                                 $type_value['product_id'],
                                 0,
                                 $data_v['date_from'],
                                 $data_v['date_to'],
                                 0,
+                                1,
+                                0
+                            );
+                            $cart_htl_data[$type_key]['date_diff'][$date_join]['extra_demands_price_ti'] = $objBookingDemand->getRoomTypeBookingExtraDemands(
+                                $order->id,
+                                $type_value['product_id'],
+                                0,
+                                $data_v['date_from'],
+                                $data_v['date_to'],
+                                0,
+                                1,
                                 1
                             );
-                            $totalDemandsPrice += $cart_htl_data[$type_key]['date_diff'][$date_join]['extra_demands_price'];
+                            $result['total_extra_demands_te'] += $cart_htl_data[$type_key]['date_diff'][$date_join]['extra_demands_price_te'];
+                            $result['total_extra_demands_ti'] += $cart_htl_data[$type_key]['date_diff'][$date_join]['extra_demands_price_ti'];
                         }
                     }
                 }
             }
             $result['cart_htl_data'] = $cart_htl_data;
-            $result['total_extra_demads'] = $totalDemandsPrice;
         }
         return $result;
     }
