@@ -42,7 +42,7 @@ class ProductComments extends Module
 	{
 		$this->name = 'productcomments';
 		$this->tab = 'front_office_features';
-		$this->version = '3.5.2';
+		$this->version = '3.5.3';
 		$this->author = 'PrestaShop';
 		$this->need_instance = 0;
 		$this->bootstrap = true;
@@ -347,6 +347,11 @@ class ProductComments extends Module
 		if (Configuration::get('PRODUCT_COMMENTS_MODERATE'))
 		{
 			$comments = ProductComment::getByValidate(0, false);
+			// filter room types as per accessed hotels
+            $comments = HotelBranchInformation::filterDataByHotelAccess(
+                $comments,
+                $this->context->employee->id_profile
+            );
 
 			$fields_list = $this->getStandardFieldList();
 
@@ -376,6 +381,11 @@ class ProductComments extends Module
 		}
 
 		$comments = ProductComment::getReportedComments();
+		// filter room types as per accessed hotels
+		$comments = HotelBranchInformation::filterDataByHotelAccess(
+			$comments,
+			$this->context->employee->id_profile
+		);
 
 		$fields_list = $this->getStandardFieldList();
 
@@ -459,6 +469,11 @@ class ProductComments extends Module
 		require_once(dirname(__FILE__).'/ProductComment.php');
 
 		$comments = ProductComment::getByValidate(1, false);
+		// filter room types as per accessed hotels
+		$comments = HotelBranchInformation::filterDataByHotelAccess(
+			$comments,
+			$this->context->employee->id_profile
+		);
 
 		$fields_list = $this->getStandardFieldList();
 

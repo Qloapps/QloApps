@@ -34,7 +34,7 @@
 							{else}
 								col-sm-6 col-lg-3
 							{/if}">
-								<input type="text" class="form-control header-rmsearch-input" id="hotel_location" name="hotel_location" autocomplete="off" placeholder="Hotel Location">
+								<input type="text" class="form-control header-rmsearch-input" id="hotel_location" name="hotel_location" autocomplete="off" placeholder="{l s='Hotel Location' mod='wkroomsearchblock'}">
 								<div class="dropdown">
 									<ul class="location_search_results_ul"></ul>
 								</div>
@@ -89,7 +89,7 @@
 						{else}
 							col-sm-3
 						{/if}">
-							<input type="text" class="form-control header-rmsearch-input input-date" id="check_in_time" name="check_in_time" autocomplete="off" placeholder="Check In Date">
+							<input type="text" class="form-control header-rmsearch-input input-date" id="check_in_time" name="check_in_time" autocomplete="off" placeholder="{l s='Check In Date' mod='wkroomsearchblock'}">
 						</div>
 						<div class="form-group
 						{if count($hotel_name) <= 1}
@@ -105,7 +105,7 @@
 						{else}
 							col-sm-3
 						{/if}">
-							<input type="text" class="form-control header-rmsearch-input input-date" id="check_out_time" name="check_out_time" autocomplete="off" placeholder="Check Out Date">
+							<input type="text" class="form-control header-rmsearch-input input-date" id="check_out_time" name="check_out_time" autocomplete="off" placeholder="{l s='Check Out Date' mod='wkroomsearchblock'}">
 						</div>
 						<div class="form-group
 						{if count($hotel_name) <= 1}

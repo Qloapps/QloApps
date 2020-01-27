@@ -7,5 +7,5 @@ Quant a la subscripció a la newsletter, ens plau oferir-vos el
 següent cupó de descompte: {discount}
 
 {shop_name} [{shop_url}] desenvolupat amb
-Webkul(tm) [https://webkul.com/]
+Webkul(tm) [https://webkul.com]
 

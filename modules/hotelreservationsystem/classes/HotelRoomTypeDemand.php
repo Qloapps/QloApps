@@ -20,10 +20,12 @@
 
 class HotelRoomTypeDemand extends ObjectModel
 {
-    public $id_product;
-    public $id_global_demand;
+    public $idProduct;
+    public $idGlobalDemand;
     public $date_add;
     public $date_upd;
+
+    protected static $_prices = array();
 
     public static $definition = array(
         'table' => 'htl_room_type_demand',
@@ -36,7 +38,7 @@ class HotelRoomTypeDemand extends ObjectModel
         )
     );
 
-    public function getRoomTypeDemands($idProduct, $idLang = 0)
+    public function getRoomTypeDemands($idProduct, $idLang = 0, $useTax = null)
     {
         if (!$idLang) {
             $idLang = Context::getContext()->language->id;
@@ -60,31 +62,27 @@ class HotelRoomTypeDemand extends ObjectModel
             } else {
                 $idCurrency = (int)Configuration::get('PS_CURRENCY_DEFAULT');
             }
+            if ($useTax === null) {
+                $useTax = HotelBookingDetail::useTax();
+            }
             foreach ($roomTypeDemands as &$demand) {
                 $idGlobalDemand = $demand['id_global_demand'];
                 $roomTypeDemandInfo[$idGlobalDemand]['name'] = $demand['name'];
-                $priceByRoom = $objRoomDemandPrice->getRoomTypeDemandPrice($idProduct, $idGlobalDemand);
-                if (Validate::isPrice($priceByRoom)) {
-                    $roomTypeDemandInfo[$idGlobalDemand]['price'] = $priceByRoom;
-                } else {
-                    $roomTypeDemandInfo[$idGlobalDemand]['price'] = $demand['price'];
-                }
-                $roomTypeDemandInfo[$idGlobalDemand]['price'] = Tools::convertPrice(
-                    $roomTypeDemandInfo[$idGlobalDemand]['price'],
-                    $idCurrency
+
+                $roomTypeDemandInfo[$idGlobalDemand]['price'] = HotelRoomTypeDemand::getPriceStatic(
+                    $idProduct,
+                    $idGlobalDemand,
+                    0,
+                    $useTax
                 );
                 if ($advOptions = $objAdvOption->getGlobalDemandAdvanceOptions($idGlobalDemand, $idLang)) {
                     foreach ($advOptions as &$option) {
                         $idOption = $option['id'];
-                        $priceByRoom = $objRoomDemandPrice->getRoomTypeDemandPrice($idProduct, $idGlobalDemand, $idOption);
-                        if (Validate::isPrice($priceByRoom)) {
-                            $roomTypeDemandInfo[$idGlobalDemand]['adv_option'][$idOption]['price'] = $priceByRoom;
-                        } else {
-                            $roomTypeDemandInfo[$idGlobalDemand]['adv_option'][$idOption]['price'] = $option['price'];
-                        }
-                        $roomTypeDemandInfo[$idGlobalDemand]['adv_option'][$idOption]['price'] = Tools::convertPrice(
-                            $roomTypeDemandInfo[$idGlobalDemand]['adv_option'][$idOption]['price'],
-                            $idCurrency
+                        $roomTypeDemandInfo[$idGlobalDemand]['adv_option'][$idOption]['price'] = HotelRoomTypeDemand::getPriceStatic(
+                            $idProduct,
+                            $idGlobalDemand,
+                            $idOption,
+                            $useTax
                         );
                         $roomTypeDemandInfo[$idGlobalDemand]['adv_option'][$idOption]['name'] = $option['name'];
                     }
@@ -93,6 +91,181 @@ class HotelRoomTypeDemand extends ObjectModel
             return $roomTypeDemandInfo;
         }
         return false;
+    }
+
+    public static function getPriceStatic(
+        $idProduct,
+        $idGlobalDemand,
+        $idOption = 0,
+        $useTax = true,
+        $decimals = 6,
+        $idCustomer = null,
+        $idCart = null,
+        $id_address = null,
+        Context $context = null
+    ) {
+        if (!$context) {
+            $context = Context::getContext();
+        }
+
+        $curCart = $context->cart;
+
+        if (!Validate::isBool($useTax) || !Validate::isUnsignedId($idProduct)) {
+            die(Tools::displayError());
+        }
+
+        // If there is cart in context or if the specified id_cart is different from the context cart id
+        if (!is_object($curCart) || (Validate::isUnsignedInt($idCart) && $idCart && $curCart->id != $idCart)) {
+            if (!$idCart && !isset($context->employee)) {
+                die(Tools::displayError());
+            }
+            $curCart = new Cart($idCart);
+            // Store cart in context to avoid multiple instantiations in BO
+            if (!Validate::isLoadedObject($context->cart)) {
+                $context->cart = $curCart;
+            }
+        }
+
+        $idCurrency = Validate::isLoadedObject($context->currency) ? (int)$context->currency->id : (int)Configuration::get('PS_CURRENCY_DEFAULT');
+
+        // retrieve address informations
+        $idCountry = (int)$context->country->id;
+        $idState = 0;
+        $zipcode = 0;
+
+        if (!$id_address && Validate::isLoadedObject($curCart)) {
+            $id_address = $curCart->{Configuration::get('PS_TAX_ADDRESS_TYPE')};
+        }
+
+        if ($id_address) {
+            $addressInfos = Address::getCountryAndState($id_address);
+            if ($addressInfos['id_country']) {
+                $idCountry = (int)$addressInfos['id_country'];
+                $idState = (int)$addressInfos['id_state'];
+                $zipcode = $addressInfos['postcode'];
+            }
+        } elseif (isset($context->customer->geoloc_id_country)) {
+            $idCountry = (int)$context->customer->geoloc_id_country;
+            $idState = (int)$context->customer->id_state;
+            $zipcode = $context->customer->postcode;
+        }
+
+        if (Tax::excludeTaxeOption()) {
+            $useTax = false;
+        }
+
+        if ($useTax != false
+            && !empty($addressInfos['vat_number'])
+            && $addressInfos['id_country'] != Configuration::get('VATNUMBER_COUNTRY')
+            && Configuration::get('VATNUMBER_MANAGEMENT')) {
+            $useTax = false;
+        }
+
+        if (is_null($idCustomer) && Validate::isLoadedObject($context->customer)) {
+            $idCustomer = $context->customer->id;
+        }
+
+        return static::priceCalculation(
+            $context->shop->id,
+            $idProduct,
+            $idGlobalDemand,
+            $idOption,
+            $idCountry,
+            $idState,
+            $zipcode,
+            $idCurrency,
+            $useTax,
+            $decimals,
+            $idCustomer,
+            $idCart
+        );
+    }
+
+    public static function priceCalculation(
+        $idShop,
+        $idProduct,
+        $idGlobalDemand,
+        $idOption,
+        $idCountry,
+        $idState,
+        $zipcode,
+        $idCurrency,
+        $useTax,
+        $decimals,
+        $idCustomer = 0,
+        $idCart = 0
+    ) {
+        static $address = null;
+        static $context = null;
+
+        if ($address === null) {
+            $address = new Address();
+        }
+
+        if ($context == null) {
+            $context = Context::getContext()->cloneContext();
+        }
+
+        if ($idShop !== null && $context->shop->id != (int)$idShop) {
+            $context->shop = new Shop((int)$idShop);
+        }
+
+        $cacheId = (int)$idProduct.'-'.(int)$idGlobalDemand.'-'.(int)$idShop.'-'.(int)$idCurrency.'-'.
+        (int)$idCountry.'-'.$idState.'-'.$zipcode.'-'.(int)$idOption.'-'.(int)$idCustomer.'-'.(int)$idCart.'-'.
+        ($useTax?'1':'0').'-'.(int)$decimals;
+
+        if (isset(self::$_prices[$cacheId])) {
+            /* Affect reference before returning cache */
+            return self::$_prices[$cacheId];
+        }
+
+        // here get the price of global demand
+        $objRoomDmdPrice = new HotelRoomTypeDemandPrice();
+        if ($idOption) {
+            $objOption = new HotelRoomTypeGlobalDemandAdvanceOption($idOption);
+            $price = $objRoomDmdPrice->getRoomTypeDemandPrice(
+                $idProduct,
+                $idGlobalDemand,
+                $idOption
+            );
+            if (!Validate::isPrice($price)) {
+                $price = $objOption->price;
+            }
+        } else {
+            $objGlobalDemand = new HotelRoomTypeGlobalDemand($idGlobalDemand);
+            $price = $objRoomDmdPrice->getRoomTypeDemandPrice(
+                $idProduct,
+                $idGlobalDemand
+            );
+            if (!Validate::isPrice($price)) {
+                $price = $objGlobalDemand->price;
+            }
+        }
+        $price = Tools::convertPrice($price, $idCurrency);
+        // Tax calculation section
+        $address->id_country = $idCountry;
+        $address->id_state = $idState;
+        $address->postcode = $zipcode;
+
+        $tax_manager = TaxManagerFactory::getManager(
+            $address,
+            HotelRoomTypeGlobalDemand::getIdTaxRulesGroupByIdGlobalDemanu((int)$idGlobalDemand)
+        );
+        $product_tax_calculator = $tax_manager->getTaxCalculator();
+
+        // Add Tax
+        if ($useTax) {
+            $price = $product_tax_calculator->addTaxes($price);
+        }
+
+        $price = Tools::ps_round($price, $decimals);
+
+        if ($price < 0) {
+            $price = 0;
+        }
+
+        self::$_prices[$cacheId] = $price;
+        return self::$_prices[$cacheId];
     }
 
     public function deleteRoomTypeDemands($idProduct = 0, $idGlobalDemand = 0)

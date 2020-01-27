@@ -7,4 +7,4 @@
 
 {shop_name} - {shop_url}
 
-{shop_url} 是透過 PrestaShop™ 建置
+{shop_url} 是透過 Webkul™ 建置

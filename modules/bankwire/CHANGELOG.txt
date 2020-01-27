@@ -1,4 +1,15 @@
 ------------------------------
+# V1.1.1 to V1.1.2
+------------------------------
+
+## Improved/Changed Features:
+
+* [FO] : Translations improved.
+* [CO] : Correct cart total is sent to validateOrder() in case of advance payment.
+
+
+
+------------------------------
 # V1.1.0 to V1.1.1
 ------------------------------
 

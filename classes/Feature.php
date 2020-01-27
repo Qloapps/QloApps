@@ -41,7 +41,7 @@ class FeatureCore extends ObjectModel
             'position' =>    array('type' => self::TYPE_INT, 'validate' => 'isInt'),
 
             /* Lang fields */
-            'name' =>        array('type' => self::TYPE_STRING, 'lang' => true, 'validate' => 'isCatalogName', 'required' => true, 'size' => 128),
+            'name' =>        array('type' => self::TYPE_STRING, 'lang' => true, 'validate' => 'isGenericName', 'required' => true, 'size' => 128),
         ),
     );
 

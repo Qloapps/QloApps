@@ -3,5 +3,5 @@ Your Cancellation request for all bookings in the order referene {order_referenc
 You can review your order from the Order history section of your customer account by clicking My account on our shop.
 
 {shop_name} [{shop_url}] powered by
-Webkul(tm) [https://webkul.com/]
+Webkul(tm) [https://webkul.com]
 

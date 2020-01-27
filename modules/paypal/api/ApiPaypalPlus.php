@@ -375,7 +375,7 @@ class ApiPaypalPlus
                 $context->cart->id_guest
             );
         } else {
-            $orderTotal = $cart->getOrderTotal($withTax, Cart::BOTH);
+            $orderTotal = $context->cart->getOrderTotal($withTax, Cart::BOTH);
         }
         return $orderTotal;
     }

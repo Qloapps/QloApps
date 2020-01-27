@@ -69,6 +69,14 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
         );
         $this->addRowAction('view');
         $this->identifier = 'id';
+
+        // START send access query information to the admin controller
+        $this->access_select = ' SELECT a.`id` FROM '._DB_PREFIX_.'htl_order_refund_info a';
+        $this->access_join = ' INNER JOIN '._DB_PREFIX_.'htl_booking_detail hbd ON (hbd.id_order = a.id_order)';
+        if ($acsHtls = HotelBranchInformation::getProfileAccessedHotels($this->context->employee->id_profile, 1, 1)) {
+            $this->access_where = ' WHERE hbd.id_hotel IN ('.implode(',', $acsHtls).')';
+        }
+
         parent::__construct();
     }
 

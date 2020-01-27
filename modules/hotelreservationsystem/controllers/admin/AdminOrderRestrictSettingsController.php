@@ -8,6 +8,15 @@ class AdminOrderRestrictSettingsController extends ModuleAdminController
         $this->className = 'HotelOrderRestrictDate';
         $this->bootstrap = true;
         $this->identifier = 'id';
+        $this->context = Context::getContext();
+
+        // START send access query information to the admin controller
+        $this->access_select = ' SELECT a.`id` FROM '._DB_PREFIX_.'htl_order_restrict_date a';
+        $this->access_join = ' INNER JOIN '._DB_PREFIX_.'htl_branch_info hbi ON (hbi.id = a.id_hotel)';
+        if ($acsHtls = HotelBranchInformation::getProfileAccessedHotels($this->context->employee->id_profile, 1, 1)) {
+            $this->access_where = ' WHERE hbi.id IN ('.implode(',', $acsHtls).')';
+        }
+
         parent::__construct();
         $this->_join .= ' LEFT JOIN `'._DB_PREFIX_.'htl_branch_info` hb ON (a.`id_hotel` = hb.`id`)';
         $this->_join .= ' LEFT JOIN `'._DB_PREFIX_.'htl_branch_info_lang` hbl
@@ -89,6 +98,12 @@ class AdminOrderRestrictSettingsController extends ModuleAdminController
         if ($this->display == 'add') {
             $order_restrict_date = new HotelOrderRestrictDate();
             $hotels_list = $order_restrict_date->getUnsavedHotelsForOrderRestrict();
+            // filter hotels as per accessed hotels
+            $hotels_list = HotelBranchInformation::filterDataByHotelAccess(
+                $hotels_list,
+                $this->context->employee->id_profile,
+                1
+            );
             $this->context->smarty->assign('hotels_list', $hotels_list);
         } elseif ($this->display == 'edit') {
             $id = Tools::getValue('id');

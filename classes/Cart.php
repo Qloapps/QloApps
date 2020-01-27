@@ -1753,9 +1753,8 @@ class CartCore extends ObjectModel
 
         // price of extra demands on room type in the cart
         if ($type == Cart::BOTH || $type == Cart::BOTH_WITHOUT_SHIPPING) {
-            if ($totalDemandsPrice = $objCartBookingData->getCartExtraDemands($this->id, 0, 0, 0, 0, 1)) {
-                $order_total += $totalDemandsPrice;
-            }
+            $totalDemandsPrice = $objCartBookingData->getCartExtraDemands($this->id, 0, 0, 0, 0, 1, 0, (int)$with_taxes);
+            $order_total += $totalDemandsPrice;
         }
 
         return Tools::ps_round((float)$order_total, $compute_precision);
@@ -2077,6 +2076,45 @@ class CartCore extends ObjectModel
                 }
             }
         }
+
+        // Step 6 : Break $package_list hotel wise
+        $orderPackage = array();
+        $objRoomType = new HotelRoomType();
+        foreach ($final_package_list as $id_address => $packages) {
+            foreach ($packages as $id_package => $package) {
+                foreach ($package['product_list'] as $product) {
+                    $productInfo = $objRoomType->getRoomTypeInfoByIdProduct($product['id_product']);
+                    $idHotel = $productInfo['id_hotel'] ? $productInfo['id_hotel'] : 0;
+
+                    $orderPackage[$id_address][$idHotel]['product_list'][] = $product;
+                    if (!isset($orderPackage[$id_address][$idHotel]['carrier_list'])) {
+                        $orderPackage[$id_address][$idHotel]['carrier_list'] = $product['carrier_list'];
+                    } else {
+                        $orderPackage[$id_address][$idHotel]['carrier_list'] = array_intersect($orderPackage[$id_address][$idHotel]['carrier_list'], $product['carrier_list']);
+                    }
+                    if (!isset($orderPackage[$id_address][$idHotel]['warehouse_list'])) {
+                        $orderPackage[$id_address][$idHotel]['warehouse_list'] = $package['warehouse_list'];
+                    }
+                    if (!isset($orderPackage[$id_address][$idHotel]['id_warehouse'])) {
+                        $orderPackage[$id_address][$idHotel]['id_warehouse'] = $package['id_warehouse'];
+                    }
+                    if (isset($package['id_carrier'])) {
+                        if (!isset($orderPackage[$id_address][$idHotel]['id_carrier'])) {
+                            $orderPackage[$id_address][$idHotel]['id_carrier'] = $package['id_carrier'];
+                        }
+                    }
+                }
+            }
+        }
+        $hotelWisePackageList = array();
+        foreach ($orderPackage as $id_address => $packageByAddress) {
+            foreach ($packageByAddress as $id_package => $package) {
+                $hotelWisePackageList[$id_address][] = $package;
+            }
+        }
+        $final_package_list = $hotelWisePackageList;
+        // END $package_list hotel wise
+
         $cache[$cache_key] = $final_package_list;
         return $final_package_list;
     }
@@ -3246,7 +3284,27 @@ class CartCore extends ObjectModel
         $total_products = $this->getOrderTotal(false, Cart::ONLY_PRODUCTS);
         $total_discounts = $this->getOrderTotal(true, Cart::ONLY_DISCOUNTS);
         $total_discounts_tax_exc = $this->getOrderTotal(false, Cart::ONLY_DISCOUNTS);
-
+        $objCartBookingData = new HotelCartBookingData();
+        $totalDemandsWT = $objCartBookingData->getCartExtraDemands(
+            $this->id,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            1
+        );
+        $totalDemandsTaxExcl = $objCartBookingData->getCartExtraDemands(
+            $this->id,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0
+        );
         // The cart content is altered for display
         foreach ($cart_rules as &$cart_rule) {
             // If the cart rule is automatic (wihtout any code) and include free shipping, it should not be displayed as a cart rule but only set the shipping cost to 0
@@ -3332,6 +3390,8 @@ class CartCore extends ObjectModel
             'total_shipping_tax_exc' => $total_shipping_tax_exc,
             'total_products_wt' => $total_products_wt,
             'total_products' => $total_products,
+            'total_extra_demands_wt' => $totalDemandsWT,
+            'total_extra_demands_tax_exc' => $totalDemandsTaxExcl,
             'total_price' => $base_total_tax_inc,
             'total_tax' => $total_tax,
             'total_price_without_tax' => $base_total_tax_exc,

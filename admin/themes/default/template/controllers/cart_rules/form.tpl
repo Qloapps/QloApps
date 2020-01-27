@@ -41,7 +41,7 @@
 		var timeText = '{l s='Time' js=1}';
 		var hourText = '{l s='Hour' js=1}';
 		var minuteText = '{l s='Minute' js=1}';
-		
+
 		var languages = new Array();
 		{foreach from=$languages item=language key=k}
 			languages[{$k}] = {

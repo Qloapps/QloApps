@@ -95,7 +95,13 @@
 														{l s='Additional Facilities'}
 													</a>
 												</p>
-												<p>{displayWtPriceWithCurrency price=$rm_v['extra_demands_price'] currency=$currency}</p>
+												<p>
+													{if $group_use_tax}
+														{displayWtPriceWithCurrency price=$rm_v['extra_demands_price_ti'] currency=$currency}
+													{else}
+														{displayWtPriceWithCurrency price=$rm_v['extra_demands_price_te'] currency=$currency}
+													{/if}
+												</p>
 											{/if}
 										</td>
 										<td>{$data_v['hotel_name']}</td>
@@ -184,14 +190,25 @@
 								<span>{displayWtPriceWithCurrency price=$orderTotalInfo['total_products_ti'] currency=$currency}</span>
 							</td>
 						</tr>
-						{if $orderTotalInfo['total_demands_price'] > 0}
+						{if $orderTotalInfo['total_demands_price_te'] > 0}
+							{if $priceDisplay && $use_tax}
+								<tr class="item">
+									<td colspan={if isset($orders_has_invoice) && $orders_has_invoice}"5"{else}"5"{/if}></td>
+									<td colspan="{if $return_allowed}3{else}2{/if}">
+										<strong>{l s='Additional facilities Cost (tax excl.)'}</strong>
+									</td>
+									<td colspan="{if $order->hasProductReturned()}3{else}2{/if}">
+										<span>{displayWtPriceWithCurrency price=$orderTotalInfo['total_demands_price_te'] currency=$currency}</span>
+									</td>
+								</tr>
+							{/if}
 							<tr class="item">
 								<td colspan={if isset($orders_has_invoice) && $orders_has_invoice}"5"{else}"5"{/if}></td>
 								<td colspan="{if $return_allowed}3{else}2{/if}">
-									<strong>{l s='Total Additional Facilities Cost'}</strong>
+									<strong>{l s='Additional facilities Cost (tax incl.)'}</strong>
 								</td>
 								<td colspan="{if $order->hasProductReturned()}3{else}2{/if}">
-									<span>{displayWtPriceWithCurrency price=$orderTotalInfo['total_demands_price'] currency=$currency convert=1}</span>
+									<span>{displayWtPriceWithCurrency price=$orderTotalInfo['total_demands_price_ti'] currency=$currency convert=1}</span>
 								</td>
 							</tr>
 						{/if}

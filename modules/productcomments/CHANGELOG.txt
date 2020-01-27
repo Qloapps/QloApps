@@ -1,4 +1,18 @@
-2014-04-17 11:40:33 +0200	Bug fix (PS 1.5): ps_version_compliancy removed
+
+-------------------------
+# V3.5.2 to V3.5.3
+-------------------------
+
+## Improved/changed features:
+
+[+] CO : renderModerateLists(), renderCommentsList() are updated in productcomments.php for managing hotel wise permission management.
+
+## Update Policy
+
+- Mobule need only file update, can be updated only by UPLOADING new version on module
+
+_____________________________________________________________________________________________
+u2014-04-17 11:40:33 +0200	Bug fix (PS 1.5): ps_version_compliancy removed
 2014-04-15 18:54:08 +0200	[*] hookDisplayLeftColumnProduct() added
 2014-04-09 18:28:59 +0200	Fix #PSCSX-1684, display correct date format
 2014-03-21 10:55:15 +0100	Initial commit

@@ -131,43 +131,41 @@ class AdminOrderPreferencesControllerCore extends AdminController
                 ),
                 'submit' => array('title' => $this->l('Save'))
             ),
-            /*'gift' => array(
-                'title' =>    $this->l('Gift options'),
-                'icon' =>    'icon-gift',
+            'email' => array(
+                'title' =>    $this->l('Email'),
+                'icon' =>    'icon-cogs',
                 'fields' =>    array(
-                    'PS_GIFT_WRAPPING' => array(
-                        'title' => $this->l('Offer gift wrapping'),
-                        'hint' => $this->l('Suggest gift-wrapping to customers.'),
+                    'PS_ORDER_CONF_MAIL_TO_CUSTOMER' => array(
+                        'title' => $this->l('Order confirmation mail to customer'),
+                        'hint' => $this->l('Enable, if you want to send order confirmation email to the customer.'),
                         'validation' => 'isBool',
                         'cast' => 'intval',
                         'type' => 'bool'
                     ),
-                    'PS_GIFT_WRAPPING_PRICE' => array(
-                        'title' => $this->l('Gift-wrapping price'),
-                        'hint' => $this->l('Set a price for gift wrapping.'),
-                        'validation' => 'isPrice',
-                        'cast' => 'floatval',
-                        'type' => 'price'
-                    ),
-                    'PS_GIFT_WRAPPING_TAX_RULES_GROUP' => array(
-                        'title' => $this->l('Gift-wrapping tax'),
-                        'hint' => $this->l('Set a tax for gift wrapping.'),
-                        'validation' => 'isInt',
+                    'PS_ORDER_CONF_MAIL_TO_SUPERADMIN' => array(
+                        'title' => $this->l('Order confirmation mail to super admin'),
+                        'hint' => $this->l('Enable, if you want to send order confirmation email to the super admin.'),
+                        'validation' => 'isBool',
                         'cast' => 'intval',
-                        'type' => 'select',
-                        'list' => array_merge(array(array('id_tax_rules_group' => 0, 'name' => $this->l('None'))), TaxRulesGroup::getTaxRulesGroups(true)),
-                        'identifier' => 'id_tax_rules_group'
+                        'type' => 'bool'
                     ),
-                    'PS_RECYCLABLE_PACK' => array(
-                        'title' => $this->l('Offer recycled packaging'),
-                        'hint' => $this->l('Suggest recycled packaging to customer.'),
+                    'PS_ORDER_CONF_MAIL_TO_HOTEL_MANAGER' => array(
+                        'title' => $this->l('Order confirmation mail to hotelier'),
+                        'hint' => $this->l('Enable, if you want to send order confirmation email to the hotelier. Mail will be sent to the email saved while creating the hotel.'),
+                        'validation' => 'isBool',
+                        'cast' => 'intval',
+                        'type' => 'bool'
+                    ),
+                    'PS_ORDER_CONF_MAIL_TO_EMPLOYEE' => array(
+                        'title' => $this->l('Order confirmation mail to employee'),
+                        'hint' => $this->l('Enable, if you want to send order confirmation email to the employees with profiles which have permission to manage the hotel.'),
                         'validation' => 'isBool',
                         'cast' => 'intval',
                         'type' => 'bool'
                     ),
                 ),
-                'submit' => array('title' => $this->l('Save')),
-            ),*/
+                'submit' => array('title' => $this->l('Save'))
+            ),
         );
 
         if (!Configuration::get('PS_ALLOW_MULTISHIPPING')) {

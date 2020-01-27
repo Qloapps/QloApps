@@ -9,5 +9,5 @@ que puedan ver su lista de deseos: {wishlist}
 {message} [{message}]
 
 {shop_name} [{shop_url}] creado por
-Webkul(tm) [https://webkul.com/]
+Webkul(tm) [https://webkul.com]
 

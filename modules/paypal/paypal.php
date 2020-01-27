@@ -102,7 +102,7 @@ class PayPal extends PaymentModule
     {
         $this->name = 'paypal';
         $this->tab = 'payments_gateways';
-        $this->version = '1.0.0';
+        $this->version = '1.0.1';
         $this->author = 'PrestaShop';
         $this->is_eu_compatible = 1;
 
@@ -952,7 +952,10 @@ class PayPal extends PaymentModule
 
 
         //If merchant has not upgraded and payment method is out of country's specs
-        if (!Configuration::get('PAYPAL_UPDATED_COUNTRIES_OK') && !in_array((int) Configuration::get('PAYPAL_PAYMENT_METHOD'), $this->getPaymentMethods())) {
+        if (!Configuration::get('PAYPAL_UPDATED_COUNTRIES_OK')
+            && $this->getPaymentMethods()
+            && !in_array((int) Configuration::get('PAYPAL_PAYMENT_METHOD'), $this->getPaymentMethods())
+        ) {
             return false;
         }
 
@@ -2629,21 +2632,26 @@ class PayPal extends PaymentModule
 
     public function hookDisplayPDFInvoice($params)
     {
-
-        $order_detail = PaypalPlusPui::getByIdOrder($params['object']->id_order);
-        $information = Tools::jsonDecode($order_detail['pui_informations'], true);
-        $tab = '<table style="border: solid 1pt black; padding:0 10pt">
-    <tr><td></td><td></td></tr>
-    <tr><td><b>'.$this->l('Bank name').'</b></td><td>'.$information['recipient_banking_instruction']['bank_name'].'</td></tr>
-    <tr><td><b>'.$this->l('Account holder name').'</b></td><td>'.$information['recipient_banking_instruction']['account_holder_name'].'</td></tr>
-    <tr><td><b>'.$this->l('IBAN').'</b></td><td>'.$information['recipient_banking_instruction']['international_bank_account_number'].'</td></tr>
-    <tr><td><b>'.$this->l('BIC').'</b></td><td>'.$information['recipient_banking_instruction']['bank_identifier_code'].'</td></tr>
-    <tr><td></td><td></td></tr>
-    <tr><td><b>'.$this->l('Amount due / currency').'</b></td><td>'.$information['amount']['value'].' '.$information['amount']['currency'].'</td></tr>
-    <tr><td><b>'.$this->l('Payment due date').'</b></td><td>'.$information['payment_due_date'].'</td></tr>
-    <tr><td><b>'.$this->l('reference').'</b></td><td>'.$information['reference_number'].'</td></tr>
-    <tr><td></td><td></td></tr>
-</table>';
-        return $tab;
+        if ($idOrder = $params['object']->id_order) {
+            if (Validate::isLoadedObject($order = new Order($params['object']->id_order))) {
+                if ($order->module == $this->name) {
+                    $order_detail = PaypalPlusPui::getByIdOrder($params['object']->id_order);
+                    $information = Tools::jsonDecode($order_detail['pui_informations'], true);
+                    $tab = '<table style="border: solid 1pt black; padding:0 10pt">
+                        <tr><td></td><td></td></tr>
+                        <tr><td><b>'.$this->l('Bank name').'</b></td><td>'.$information['recipient_banking_instruction']['bank_name'].'</td></tr>
+                        <tr><td><b>'.$this->l('Account holder name').'</b></td><td>'.$information['recipient_banking_instruction']['account_holder_name'].'</td></tr>
+                        <tr><td><b>'.$this->l('IBAN').'</b></td><td>'.$information['recipient_banking_instruction']['international_bank_account_number'].'</td></tr>
+                        <tr><td><b>'.$this->l('BIC').'</b></td><td>'.$information['recipient_banking_instruction']['bank_identifier_code'].'</td></tr>
+                        <tr><td></td><td></td></tr>
+                        <tr><td><b>'.$this->l('Amount due / currency').'</b></td><td>'.$information['amount']['value'].' '.$information['amount']['currency'].'</td></tr>
+                        <tr><td><b>'.$this->l('Payment due date').'</b></td><td>'.$information['payment_due_date'].'</td></tr>
+                        <tr><td><b>'.$this->l('reference').'</b></td><td>'.$information['reference_number'].'</td></tr>
+                        <tr><td></td><td></td></tr>
+                    </table>';
+                    return $tab;
+                }
+            }
+        }
     }
 }

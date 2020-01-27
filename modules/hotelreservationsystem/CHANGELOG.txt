@@ -1,4 +1,41 @@
 -------------------------
+# V1.3.0 to V1.4.0
+-------------------------
+
+## Added Features:
+
+[+] CO : Table `htl_booking_demands_tax` added to the module for additional facility tax.
+[+] CO : Table `htl_access` added to the module to manage hotel wise permission management.
+[+] BO : Additional facility : Tax can be applied on additional facilities.
+[+] BO : Additional facility : Per day price calculation option is added.[Price will be calculated on per day basis of the booking or for entire date range of the booking]
+[+] BO : All controllers accesses are now manages according to the hotel wise permission management.
+
+[+] CO : hookActionObjectProfileAddAfter, hookActionObjectProfileDeleteBefore are added to add and delete hotel accessed while adding or deleting any profile.
+
+
+## Improved/changed features:
+
+[+] CO : Table `htl_booking_demands` altered to the manage to additional facility tax.
+[*] CO : getCartFormatedBookinInfoByIdCart(), getCartExtraDemands() functions improved for extra demands in HotelCartBookingData class.
+[*] CO : add(), initAccess(), addHotelsAccessToProfile(), deleteProfileHotelsAccess(), getProfileAccessedHotels(), filterDataByHotelAccess() added in class HotelBranchInformation for managing hotel wise permission management.
+[*] CO : delete() updated in class HotelBranchInformation to delete from htl_access for managing hotel wise permission management while deleting a hotel.
+[*] CO : updateBookingOrderStatusByOrderId() updated in class HotelBookingDetail.
+
+[*] BO : Only imported countries will be shown in the country dropdown while saving a hotel.
+
+## Bug/Issues Resolved:
+
+[-] CO : Resolved: Room type's Advance payment information is now saved while adding room types on the installation of the module. [As room type is unavailable for the advance payment]
+getProductFeaturePricePlanByDateByPriority
+[-] BO : Resolved: Hotel image file does not delete from the folder after hotel image deletion.
+
+
+## Update Policy
+
+- Database changed, Module need upload new file then UNINSTALL and re-installation.
+
+
+-------------------------
 # V1.2.2 to V1.3.0
 -------------------------
 

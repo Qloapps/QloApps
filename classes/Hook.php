@@ -418,8 +418,15 @@ class HookCore extends ObjectModel
      *
      * @return string/array modules output
      */
-    public static function exec($hook_name, $hook_args = array(), $id_module = null, $array_return = false, $check_exceptions = true, $use_push = false, $id_shop = null)
-    {
+    public static function exec(
+        $hook_name,
+        $hook_args = array(),
+        $id_module = null,
+        $array_return = false,
+        $check_exceptions = true,
+        $use_push = false,
+        $id_shop = null
+    ) {
         if (defined('PS_INSTALLATION_IN_PROGRESS')) {
             return;
         }

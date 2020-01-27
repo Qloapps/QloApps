@@ -73,14 +73,60 @@ function toggleCartRuleFilter(id)
 
 function removeCartRuleOption(item)
 {
+	var error = 0;
 	var id = $(item).attr('id').replace('_remove', '');
-	$('#' + id + '_2 option:selected').remove().appendTo('#' + id + '_1');
+	var selectedOpt = $('#' + id + '_2 option:selected');
+	var notAlloedRooms = [];
+	// validate if rooms with no hotel access are selected
+	$.each( selectedOpt, function( key, val ) {
+		if ($(this).attr('data-htl_access') == 0) {
+			notAlloedRooms.push($(this).text());
+			error = 1;
+		}
+	});
+	if (error == 0) {
+		selectedOpt.remove().appendTo('#' + id + '_1');;
+	} else {
+		var errorHtml = '';
+		errorHtml += room_access_err;
+		if (notAlloedRooms.length) {
+			errorHtml += '<br />' + room_rmv_txt + '<ul>';
+			$.each( notAlloedRooms, function( key, val ) {
+				errorHtml += '<li>' + val + '</li>';
+			});
+			errorHtml += '</ul>';
+		}
+		showErrorMessage(errorHtml);
+	}
 }
 
 function addCartRuleOption(item)
 {
+	var error = 0;
 	var id = $(item).attr('id').replace('_add', '');
-	$('#' + id + '_1 option:selected').remove().appendTo('#' + id + '_2');
+	var selectedOpt = $('#' + id + '_1 option:selected');
+	var notAlloedRooms = [];
+	// validate if rooms with no hotel access are selected
+	$.each( selectedOpt, function( key, val ) {
+		if ($(this).attr('data-htl_access') == 0) {
+			notAlloedRooms.push($(this).text());
+			error = 1;
+		}
+	});
+	if (error == 0) {
+		selectedOpt.remove().appendTo('#' + id + '_2');
+	} else {
+		var errorHtml = '';
+		errorHtml += room_access_err;
+		if (notAlloedRooms.length) {
+			errorHtml += '<br />' + room_rmv_txt + '<ul>';
+			$.each( notAlloedRooms, function( key, val ) {
+				errorHtml += '<li>' + val + '</li>';
+			});
+			errorHtml += '</ul>';
+		}
+		showErrorMessage(errorHtml);
+	}
 }
 
 function updateProductRuleShortDescription(item)

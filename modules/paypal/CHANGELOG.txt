@@ -1,0 +1,12 @@
+-------------------------
+# V1.0.0 to V1.0.1
+-------------------------
+
+## Bug/Issues Resolved:
+
+[-] CO : Resolved: ApiPaypalPlus.php - $cart is undefined in function getCartPaymentTotal(). $cart is hanged to $context->cart.
+[-] CO : Resolved: Payment module name in the order condition checked in the hook displayPDFInvoice.
+
+## Update Policy
+
+- Mobule need only file update, can be updated only by UPLOADING new version on module

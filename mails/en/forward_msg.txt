@@ -1,14 +1,14 @@
 
-[/{shop_url}] 
+[/{shop_url}]
 
-Hi {firstname} {lastname}, 
+Hi {firstname} {lastname},
 
-{employee} wanted to forward this discussion to you. 
+{employee} wanted to forward this discussion to you.
 
 DISCUSSION HISTORY: {messages}
 
-{employee} added "{comment}" 		 
+{employee} added "{comment}"
 
-{shop_name} [/{shop_url}] powered by PrestaShop(tm)
-[http://www.prestashop.com/] 
+{shop_name} [/{shop_url}] powered by Webkul(tm)
+[https://webkul.com]
 

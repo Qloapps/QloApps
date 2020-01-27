@@ -315,7 +315,6 @@ class OrderInvoiceCore extends ObjectModel
     /**
      * This method returns true if at least one order details uses the
      * One After Another tax computation method.
-     *
      * @since 1.5
      * @return bool
      */
@@ -323,13 +322,13 @@ class OrderInvoiceCore extends ObjectModel
     {
         // if one of the order details use the tax computation method the display will be different
         return Db::getInstance()->getValue('
-		SELECT od.`tax_computation_method`
-		FROM `'._DB_PREFIX_.'order_detail_tax` odt
-		LEFT JOIN `'._DB_PREFIX_.'order_detail` od ON (od.`id_order_detail` = odt.`id_order_detail`)
-		WHERE od.`id_order` = '.(int)$this->id_order.'
-		AND od.`id_order_invoice` = '.(int)$this->id.'
-		AND od.`tax_computation_method` = '.(int)TaxCalculator::ONE_AFTER_ANOTHER_METHOD)
-        || Configuration::get('PS_INVOICE_TAXES_BREAKDOWN');
+    		SELECT od.`tax_computation_method`
+    		FROM `' . _DB_PREFIX_ . 'order_detail_tax` odt
+    		LEFT JOIN `' . _DB_PREFIX_ . 'order_detail` od ON (od.`id_order_detail` = odt.`id_order_detail`)
+    		WHERE od.`id_order` = ' . (int) $this->id_order . '
+    		AND od.`id_order_invoice` = ' . (int) $this->id . '
+    		AND od.`tax_computation_method` = ' . (int) TaxCalculator::ONE_AFTER_ANOTHER_METHOD)
+            || Configuration::get('PS_INVOICE_TAXES_BREAKDOWN');
     }
 
     public function displayTaxBasesInProductTaxesBreakdown()
@@ -360,7 +359,6 @@ class OrderInvoiceCore extends ObjectModel
         $breakdown = array();
 
         $details = $order->getProductTaxesDetails();
-
         if ($sum_composite_taxes) {
             $grouped_details = array();
             foreach ($details as $row) {
@@ -377,10 +375,8 @@ class OrderInvoiceCore extends ObjectModel
                 $grouped_details[$row['id_order_detail']]['total_tax_base'] += $row['total_tax_base'];
                 $grouped_details[$row['id_order_detail']]['total_amount'] += $row['total_amount'];
             }
-
             $details = $grouped_details;
         }
-
         foreach ($details as $row) {
             $rate = sprintf('%.3f', $row['tax_rate']);
             if (!isset($breakdown[$rate])) {
@@ -388,7 +384,7 @@ class OrderInvoiceCore extends ObjectModel
                     'total_price_tax_excl' => 0,
                     'total_amount' => 0,
                     'id_tax' => $row['id_tax'],
-                    'rate' =>$rate,
+                    'rate' => $rate,
                 );
             }
 
@@ -402,7 +398,68 @@ class OrderInvoiceCore extends ObjectModel
         }
 
         ksort($breakdown);
+        return $breakdown;
+    }
 
+    public function getExtraDemandTaxesBreakdown($order = null)
+    {
+        if (!$order) {
+            $order = $this->getOrder();
+        }
+        $breakdown = array();
+        $objBookingDemand = new HotelBookingDemands();
+        $details = $objBookingDemand->getExtraDemandsTaxesDetails($order->id);
+        if (!$this->useOneAfterAnotherTaxComputationMethod()) {
+            $grouped_details = array();
+            foreach ($details as $row) {
+                if (!isset($grouped_details[$row['id_htl_booking']][$row['id_booking_demand']])) {
+                    $grouped_details[$row['id_htl_booking']][$row['id_booking_demand']] = array(
+                        'tax_rate' => 0,
+                        'total_tax_base' => 0,
+                        'total_amount' => 0,
+                        'id_tax' => $row['id_tax'],
+                    );
+                    $grouped_details[$row['id_htl_booking']][$row['id_booking_demand']]['total_tax_base'] += $row['total_price_tax_excl'];
+                }
+                $grouped_details[$row['id_htl_booking']][$row['id_booking_demand']]['total_amount'] += $row['total_amount'];
+                $grouped_details[$row['id_htl_booking']][$row['id_booking_demand']]['tax_rate'] += $row['rate'];
+            }
+            $details = $grouped_details;
+            foreach ($details as $detail) {
+                foreach ($detail as $row) {
+                    $rate = sprintf('%.3f', $row['tax_rate']);
+                    if (!isset($breakdown[$rate])) {
+                        $breakdown[$rate] = array(
+                            'total_price_tax_excl' => 0,
+                            'total_amount' => 0,
+                            'id_tax' => $row['id_tax'],
+                            'rate' =>$rate,
+                        );
+                    }
+                    $breakdown[$rate]['total_price_tax_excl'] += $row['total_tax_base'];
+                    $breakdown[$rate]['total_amount'] += $row['total_amount'];
+                }
+            }
+        } else {
+            foreach ($details as $row) {
+                $rate = sprintf('%.3f', $row['rate']);
+                if (!isset($breakdown[$rate])) {
+                    $breakdown[$rate] = array(
+                        'total_price_tax_excl' => 0,
+                        'total_amount' => 0,
+                        'id_tax' => $row['id_tax'],
+                        'rate' =>$rate,
+                    );
+                }
+                $breakdown[$rate]['total_price_tax_excl'] += $row['total_tax_base'];
+                $breakdown[$rate]['total_amount'] += $row['total_amount'];
+            }
+        }
+        foreach ($breakdown as $rate => $data) {
+            $breakdown[$rate]['total_price_tax_excl'] = Tools::ps_round($data['total_price_tax_excl'], _PS_PRICE_COMPUTE_PRECISION_, $order->round_mode);
+            $breakdown[$rate]['total_amount'] = Tools::ps_round($data['total_amount'], _PS_PRICE_COMPUTE_PRECISION_, $order->round_mode);
+        }
+        ksort($breakdown);
         return $breakdown;
     }
 
@@ -716,7 +773,7 @@ class OrderInvoiceCore extends ObjectModel
         $query->innerJoin(
             'order_invoice_payment',
             'oip2',
-            'oip2.id_order_payment = oip1.id_order_payment AND oip2.id_order_invoice <> oip1.id_order_invoice AND oip1.id_order = oip2.id_order'  
+            'oip2.id_order_payment = oip1.id_order_payment AND oip2.id_order_invoice <> oip1.id_order_invoice AND oip1.id_order = oip2.id_order'
         );
         $query->where('oip1.id_order_invoice = '.$this->id);
 

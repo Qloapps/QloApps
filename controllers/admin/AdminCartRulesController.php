@@ -39,6 +39,8 @@ class AdminCartRulesControllerCore extends AdminController
         $this->addRowAction('delete');
         $this->_orderWay = 'DESC';
 
+        $this->context = Context::getContext();
+
         $this->bulk_actions = array('delete' => array('text' => $this->l('Delete selected'),'icon' => 'icon-trash', 'confirm' => $this->l('Delete selected items?')));
 
         $this->fields_list = array(
@@ -51,6 +53,25 @@ class AdminCartRulesControllerCore extends AdminController
             'active' => array('title' => $this->l('Status'), 'active' => 'status', 'type' => 'bool', 'align' => 'center', 'class' => 'fixed-width-xs', 'orderby' => false),
         );
 
+        // START send access query information to the admin controller
+        $this->access_select = ' SELECT a.`id_cart_rule` FROM '._DB_PREFIX_.'cart_rule a';
+        if ($acsHtls = HotelBranchInformation::getProfileAccessedHotels($this->context->employee->id_profile, 1, 1)) {
+            // check roomtypes access if at least one hotel is acessed
+            $permittedIdsQuery = ' SELECT DISTINCT crprg.`id_cart_rule`
+            FROM '._DB_PREFIX_.'cart_rule_product_rule_group crprg';
+            $permittedIdsQuery .= ' INNER JOIN '._DB_PREFIX_.'cart_rule_product_rule crpr
+            ON (crprg.id_product_rule_group = crpr.id_product_rule_group)';
+            $permittedIdsQuery .= ' INNER JOIN '._DB_PREFIX_.'cart_rule_product_rule_value crpv
+            ON (crpv.id_product_rule = crpr.id_product_rule)';
+            $permittedIdsQuery .= ' INNER JOIN '._DB_PREFIX_.'htl_room_type hrt ON (crpv.id_item = hrt.id_product)';
+            $permittedIdsQuery .= ' WHERE hrt.id_hotel IN ('.implode(',', $acsHtls).')';
+        }
+        $notInCond = ' SELECT DISTINCT cprg.`id_cart_rule` FROM '._DB_PREFIX_.'cart_rule_product_rule_group cprg';
+        //check access if at least one hotel is acessed other wise remove all cart rules created for room types
+        if ($acsHtls) {
+            $notInCond .= ' WHERE cprg.`id_cart_rule` NOT IN ('.$permittedIdsQuery.')';
+        }
+        $this->access_where = ' WHERE a.`id_cart_rule` NOT IN ('.$notInCond.')';
         parent::__construct();
     }
 
@@ -125,6 +146,12 @@ class AdminCartRulesControllerCore extends AdminController
     public function setMedia()
     {
         parent::setMedia();
+        Media::addJsDef(
+            array(
+                'room_access_err' => $this->l('You can only select room types which hotel(s) access is provided to this employee.'),
+                'room_rmv_txt' => $this->l('Unselect below room types'),
+            )
+        );
         $this->addJqueryPlugin(array('typewatch', 'fancybox', 'autocomplete'));
     }
 
@@ -250,8 +277,6 @@ class AdminCartRulesControllerCore extends AdminController
         foreach (array('country', 'carrier', 'group', 'product_rule_group', 'shop') as $type) {
             Db::getInstance()->delete('cart_rule_'.$type, '`id_cart_rule` = '.(int)$id_cart_rule);
         }
-
-
         Db::getInstance()->delete('cart_rule_product_rule', 'NOT EXISTS (SELECT 1 FROM `'._DB_PREFIX_.'cart_rule_product_rule_group`
 			WHERE `'._DB_PREFIX_.'cart_rule_product_rule`.`id_product_rule_group` = `'._DB_PREFIX_.'cart_rule_product_rule_group`.`id_product_rule_group`)');
         Db::getInstance()->delete('cart_rule_product_rule_value', 'NOT EXISTS (SELECT 1 FROM `'._DB_PREFIX_.'cart_rule_product_rule`
@@ -462,9 +487,26 @@ class AdminCartRulesControllerCore extends AdminController
                 foreach ($results as $row) {
                     $products[in_array($row['id'], $selected) ? 'selected' : 'unselected'][] = $row;
                 }
+                // filter hotels as per accessed hotels
+                $products['selected'] = HotelBranchInformation::filterDataByHotelAccess(
+                    $products['selected'],
+                    $this->context->employee->id_profile,
+                    0,
+                    1,
+                    1
+                );
+                $products['unselected'] = HotelBranchInformation::filterDataByHotelAccess(
+                    $products['unselected'],
+                    $this->context->employee->id_profile,
+                    0,
+                    1,
+                    1
+                );
+
                 Context::getContext()->smarty->assign('product_rule_itemlist', $products);
                 $choose_content = $this->createTemplate('product_rule_itemlist.tpl')->fetch();
                 Context::getContext()->smarty->assign('product_rule_choose_content', $choose_content);
+
                 break;
             case 'manufacturers':
                 $products = array('selected' => array(), 'unselected' => array());
@@ -547,6 +589,11 @@ class AdminCartRulesControllerCore extends AdminController
         // Both product filter (free product and product discount) search for products
         if (Tools::isSubmit('giftProductFilter') || Tools::isSubmit('reductionProductFilter')) {
             $products = Product::searchByName(Context::getContext()->language->id, trim(Tools::getValue('q')));
+            // filter hotels as per accessed hotels
+            $products = HotelBranchInformation::filterDataByHotelAccess(
+                $products,
+                $this->context->employee->id_profile
+            );
             die(Tools::jsonEncode($products));
         }
     }

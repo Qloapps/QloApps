@@ -645,7 +645,6 @@ class InstallModelInstall extends InstallAbstractModel
         } else {
             $modules = array(
                 'hotelreservationsystem',
-                'blocknavigationmenu',
                 'blocknewsletter',
                 'blocksocial',
                 'wkfooterblock',
@@ -658,14 +657,20 @@ class InstallModelInstall extends InstallAbstractModel
                 'wktestimonialblock',
                 'socialsharing',
                 'bankwire',
-                'blockcart',
-                'blockmyaccount',
-                'blockuserinfo',
                 'cheque',
+                'paypal',
+                'wkpaypaladaptive',
+                'blockmyaccount',
                 'blocklanguages',
                 'blockcurrencies',
-                'dashactivity',
                 'productcomments',
+                'wkfooterlangcurrencyblock',
+                'wkfooterpaymentinfoblockcontainer',
+                'wkfooteraboutblock',
+                'wkfooterpaymentblock',
+                'wkfooternotificationblock',
+                'blocknavigationmenu',
+                'dashactivity',
                 'dashtrends',
                 'dashgoals',
                 'dashproducts',
@@ -689,14 +694,9 @@ class InstallModelInstall extends InstallAbstractModel
                 'statsbestvouchers',
                 'statsbestcustomers',
                 'statsequipment',
-                'wkpaypaladaptive',
-                'wkfooterlangcurrencyblock',
-                'wkfooterexploreblock',
-                'wkfooterpaymentinfoblockcontainer',
-                'wkfooteraboutblock',
-                'wkfooterpaymentblock',
-                'wkfooternotificationblock',
-                );
+                'blockcart',
+                'blockuserinfo',
+            );
         }
         return $modules;
     }

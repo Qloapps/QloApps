@@ -68,7 +68,7 @@
 				{/foreach}
 			</div>
 		</div>
-		<div class="form-group">
+		<div class="form-group" {if isset($smarty.post.active_adv_option)}{if $smarty.post.active_adv_option}style="display:none;"{/if}{elseif isset($globalDemands['adv_option']) && $globalDemands['adv_option']|@count}style="display:none;"{/if}>
 			<label class="col-sm-3 control-label required" >
 				{l s='Price' mod='hotelreservationsystem'}({l s='tax excl.' mod='hotelreservationsystem'})
 			</label>
@@ -79,13 +79,60 @@
 					value="{if isset($smarty.post.price)}{$smarty.post.price}{elseif isset($globalDemands['price'])}{$globalDemands['price']}{/if}"/>
 				</div>
 			</div>
-			{* <div class="row">
-				<label class="col-sm-3" >
+		</div>
+		{if isset($taxRuleGroups)}
+			<div class="form-group">
+				<label class="col-sm-3 control-label required" >
+					{l s='Tax Rule' mod='hotelreservationsystem'}
 				</label>
-				<div class="help-block col-sm-9">
-					{l s='Price of the demand will be calculated with this field only of advance options are not created for this demand.' mod='hotelreservationsystem'}
+				<div class="col-sm-3">
+					<select name="id_tax_rules_group" id="id_tax_rules_group" class="form-control form-control-select" data-action="input_excl">
+						<option value="0">{l s='No tax' mod='hotelreservationsystem'}</option>
+						{foreach $taxRuleGroups as $tax_rule}
+							<option value="{$tax_rule.id_tax_rules_group|escape:'html':'UTF-8'}" {if isset($smarty.post.id_tax_rules_group) && ($smarty.post.id_tax_rules_group == $tax_rule.id_tax_rules_group)}selected{elseif isset($globalDemands['id_tax_rules_group']) && ($globalDemands['id_tax_rules_group'] == $tax_rule.id_tax_rules_group)}selected{/if}>
+								{$tax_rule.name|escape:'html':'UTF-8'}
+							</option>
+						{/foreach}
+					</select>
 				</div>
-			</div> *}
+			</div>
+		{/if}
+		<div class="form-group">
+			<label class="col-sm-3 control-label">
+				<span class="label-tooltip" data-toggle="tooltip" data-html="true" data-original-title="{l s='Enable, if you want to add the price of this facility for each day in the booking. Disable, If you want to add price of the facility for entire date range of the booking.' mod='hotelreservationsystem'}">{l s='Per day price calculation' mod='hotelreservationsystem'}</span>
+			</label>
+			<div class="col-sm-6">
+				<span class="switch prestashop-switch fixed-width-lg">
+					<input type="radio" value="1" id="price_calc_method_on" name="price_calc_method"
+					{if isset($smarty.post.price_calc_method)}
+						{if $smarty.post.price_calc_method}
+							checked="checked"
+						{/if}
+					{elseif isset($globalDemands['price_calc_method']) && $globalDemands['price_calc_method']}
+						checked="checked"
+					{/if}>
+					<label for="price_calc_method_on">{l s='Yes' mod='hotelreservationsystem'}</label>
+					<input type="radio" value="0" id="price_calc_method_off" name="price_calc_method"
+					{if isset($smarty.post.price_calc_method)}
+						{if !$smarty.post.price_calc_method}
+							checked="checked"
+						{/if}
+					{elseif !isset($globalDemands['price_calc_method'])}
+						checked="checked"
+					{elseif isset($globalDemands['price_calc_method']) && !$globalDemands['price_calc_method']}
+						checked="checked"
+					{/if}>
+					<label for="price_calc_method_off">{l s='No' mod='hotelreservationsystem'}</label>
+					<a class="slide-button btn"></a>
+				</span>
+			</div>
+		</div>
+		<div class="form-group">
+			<div class="col-lg-9 col-lg-offset-3">
+				<div class="alert alert-info">
+					{l s='Enable ("Per day price calculation"), if you want to add the price of this facility for each day in the booking. Disable, If you want to add price of the facility for entire date range of the booking.' mod='hotelreservationsystem'}
+				</div>
+			</div>
 		</div>
 		<div class="form-group">
 			<label class="col-sm-3 control-label">
@@ -117,7 +164,7 @@
 				</span>
 			</div>
 		</div>
-		<div class="adv_options_dtl form-group {if isset($smarty.post.active_adv_option)}{if !$smarty.post.active_adv_option}hidden{/if}{elseif !isset($globalDemands['adv_option']) || !$globalDemands['adv_option']|@count}hidden{/if}">
+		<div class="adv_options_dtl form-group" {if isset($smarty.post.active_adv_option)}{if !$smarty.post.active_adv_option}style="display:none;"{/if}{elseif !isset($globalDemands['adv_option']) || !$globalDemands['adv_option']|@count}style="display:none;"{/if}>
 			<label class="col-sm-3 control-label">
 				{* {l s='Advance options' mod='hotelreservationsystem'} *}
 			</label>

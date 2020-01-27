@@ -1,13 +1,10 @@
-
-[{shop_url}]
-
+Message from {shop_name}
 Hi {firstname} {lastname},
-
 Thank you for selecting our hotel!
+Order details
+{order_name} Placed on {date}
 
-ORDER: {order_name} Placed on {date}
-
-PAYMENT: {payment}
+Payment: {payment}
 
 Room Image
 Room Description
@@ -18,38 +15,32 @@ Check-in Date
 Check-out Date
 Total
 
-{products_txt}
-
+{cart_booking_data_html}
+{extra_demands_details_html}
 {discounts}
 
 Total Rooms Cost
-
 {total_products}
 
 Total Additional Facilities Cost
-{total_extra_demands
+{total_extra_demands_te}
 
-DISCOUNTS
-
+Discounts
 {total_discounts}
 
-TOTAL TAX PAID
-
+Total Rooms Tax
 {total_tax_paid}
 
-{adv_data_text}
+Additional Facilities Tax
+{extra_demands_tax}
 
-TOTAL PAID
+{adv_data_html}
 
+Total
 {total_paid}
 
-CARRIER: {carrier}
-
-PAYMENT: {payment}
-
-{delivery_block_txt}
-
-{invoice_block_txt}
+Customer address
+{invoice_block_html}
 
 You can review your order and download your invoice from the
 "Order history" [{history_url}] section of your
@@ -62,4 +53,4 @@ If you have a guest account, you can follow your order via the
 on our shop.
 
 {shop_name} [{shop_url}] powered by
-Webkul(tm) [https://webkul.com/]
+Webkul(tm) [https://webkul.com]

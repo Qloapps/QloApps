@@ -26,44 +26,42 @@
 
 	<tr>
 		<td class="grey" width="70%">
-			{l s='Total Rooms Cost' pdf='true'}
+			{l s='Total Rooms Cost (tax excl.)' pdf='true'}
 		</td>
 		<td class="white" width="30%">
 			{displayPrice currency=$order->id_currency price=$footer.products_before_discounts_tax_excl}
 		</td>
 	</tr>
-	{if isset($footer.total_extra_demands) && $footer.total_extra_demands}
+	{if isset($footer.total_extra_demands_te) && $footer.total_extra_demands_te}
 		<tr>
 			<td class="grey" width="70%">
-				{l s='Total Extra Demands Cost' pdf='true'}
+				{l s='Extra Demands Cost (tax excl.)' pdf='true'}
 			</td>
 			<td class="white" width="30%">
-				{displayPrice currency=$order->id_currency price=$footer.total_extra_demands}
+				{displayPrice currency=$order->id_currency price=$footer.total_extra_demands_te}
 			</td>
 		</tr>
 	{/if}
-	<!-- <tr>
-		<td class="grey" width="70%">
-			{l s='Shipping Cost' pdf='true'}
-		</td>
-		<td class="white" width="30%">
-			{if $footer.shipping_tax_excl > 0}
-				{displayPrice currency=$order->id_currency price=$footer.shipping_tax_excl}
-			{else}
-				{l s='Free Shipping' pdf=true}
-			{/if}
-		</td>
-	</tr> -->
-
-	<!-- {if $footer.wrapping_tax_excl > 0}
+	{if isset($footer.product_taxes) && $footer.product_taxes}
 		<tr>
-			<td class="grey">
-				{l s='Wrapping Cost' pdf='true'}
+			<td class="grey" width="70%">
+				{l s='Rooms Tax' pdf='true'}
 			</td>
-			<td class="white">{displayPrice currency=$order->id_currency price=$footer.wrapping_tax_excl}</td>
+			<td class="white" width="30%">
+				{displayPrice currency=$order->id_currency price=($footer.product_taxes)}
+			</td>
 		</tr>
-	{/if} -->
-
+	{/if}
+	{if isset($footer.total_extra_demands_te) && $footer.total_extra_demands_te}
+		<tr>
+			<td class="grey" width="70%">
+				{l s='Extra Demands Tax' pdf='true'}
+			</td>
+			<td class="white" width="30%">
+				{displayPrice currency=$order->id_currency price=($footer.total_extra_demands_ti - $footer.total_extra_demands_te)}
+			</td>
+		</tr>
+	{/if}
 	<tr class="bold">
 		<td class="grey">
 			{l s='Total (Tax excl.)' pdf='true'}
@@ -111,7 +109,6 @@
 				- {displayPrice currency=$order->id_currency price=$footer.product_discounts_tax_excl}
 			</td>
 		</tr>
-
 	{/if}
 
 	<tr class="bold big">

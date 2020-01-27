@@ -26,6 +26,15 @@ class AdminHotelFeaturePricesSettingsController extends ModuleAdminController
         $this->className = 'HotelRoomTypeFeaturePricing';
         $this->bootstrap = true;
         $this->identifier  = 'id_feature_price';
+        $this->context = Context::getContext();
+
+        // START send access query information to the admin controller
+        $this->access_select = ' SELECT a.`id_feature_price` FROM '._DB_PREFIX_.'htl_room_type_feature_pricing a';
+        $this->access_join = ' INNER JOIN '._DB_PREFIX_.'htl_room_type hrt ON (hrt.id_product = a.id_product)';
+        if ($acsHtls = HotelBranchInformation::getProfileAccessedHotels($this->context->employee->id_profile, 1, 1)) {
+            $this->access_where = ' WHERE hrt.id_hotel IN ('.implode(',', $acsHtls).')';
+        }
+
         parent::__construct();
 
         $this->_join .= ' LEFT JOIN `'._DB_PREFIX_.'product_lang` pl ON (pl.`id_product` = a.`id_product` AND pl.`id_lang`='.(int) $this->context->language->id.')';
@@ -399,6 +408,11 @@ class AdminHotelFeaturePricesSettingsController extends ModuleAdminController
         $productName = Tools::getValue('room_type_name');
         if ($productName) {
             $productsByName = Product::searchByName($this->context->language->id, $productName);
+            // filter room types as per accessed hotels
+            $productsByName = HotelBranchInformation::filterDataByHotelAccess(
+                $productsByName,
+                $this->context->employee->id_profile
+            );
             if ($productsByName) {
                 foreach ($productsByName as &$product) {
                     $hotelRoomType = new HotelRoomType();

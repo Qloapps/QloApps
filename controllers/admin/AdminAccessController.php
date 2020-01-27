@@ -76,8 +76,14 @@ class AdminAccessControllerCore extends AdminController
             }
         }
 
+        // Send all hotels for the permissions of the hotels
+        $objHtlBranchInfo = new HotelBranchInformation();
+        $hotels = $objHtlBranchInfo->hotelBranchesInfo();
+
         $modules = array();
+        $hotelAccess = array();
         foreach ($profiles as $profile) {
+            // Get modules accesses by profiles
             $modules[$profile['id_profile']] = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS('
 				SELECT ma.`id_module`, m.`name`, ma.`view`, ma.`configure`, ma.`uninstall`
 				FROM '._DB_PREFIX_.'module_access ma
@@ -85,7 +91,7 @@ class AdminAccessControllerCore extends AdminController
 					ON ma.id_module = m.id_module
 				WHERE id_profile = '.(int)$profile['id_profile'].'
 				ORDER BY m.name
-			');
+            ');
             foreach ($modules[$profile['id_profile']] as $k => &$module) {
                 $m = Module::getInstanceById($module['id_module']);
                 // the following condition handles invalid modules
@@ -95,12 +101,24 @@ class AdminAccessControllerCore extends AdminController
                     unset($modules[$profile['id_profile']][$k]);
                 }
             }
-
             uasort($modules[$profile['id_profile']], array($this, 'sortModuleByName'));
+            // End module accesses
+
+            // Get Hotels accesses by profiles
+            foreach ($hotels as $hotelInfo) {
+                $idHotel = $hotelInfo['id'];
+                $hotelAccess[$profile['id_profile']][$idHotel] = Db::getInstance(_PS_USE_SQL_SLAVE_)->getRow(
+                    'SELECT * FROM `'._DB_PREFIX_.'htl_access`
+                    WHERE `id_profile` = '.(int)$profile['id_profile'].' AND `id_hotel` = '.(int)$idHotel
+                );
+            }
+            // End Hotels accesses
         }
 
         $this->fields_form = array('');
         $this->tpl_form_vars = array(
+            'hotelAccess' => $hotelAccess,
+            'hotels' => $hotels,
             'profiles' => $profiles,
             'accesses' => $accesses,
             'id_tab_parentmodule' => (int)Tab::getIdFromClassName('AdminParentModules'),
@@ -132,13 +150,15 @@ class AdminAccessControllerCore extends AdminController
         $this->initPageHeaderToolbar();
 
         $this->content .= $this->renderForm();
-        $this->context->smarty->assign(array(
-            'content' => $this->content,
-            'url_post' => self::$currentIndex.'&token='.$this->token,
-            'show_page_header_toolbar' => $this->show_page_header_toolbar,
-            'page_header_toolbar_title' => $this->page_header_toolbar_title,
-            'page_header_toolbar_btn' => $this->page_header_toolbar_btn
-        ));
+        $this->context->smarty->assign(
+            array(
+                'content' => $this->content,
+                'url_post' => self::$currentIndex.'&token='.$this->token,
+                'show_page_header_toolbar' => $this->show_page_header_toolbar,
+                'page_header_toolbar_title' => $this->page_header_toolbar_title,
+                'page_header_toolbar_btn' => $this->page_header_toolbar_btn
+            )
+        );
     }
 
     public function initToolbarTitle()
@@ -150,6 +170,37 @@ class AdminAccessControllerCore extends AdminController
     {
         parent::initPageHeaderToolbar();
         unset($this->page_header_toolbar_btn['cancel']);
+    }
+
+    public function ajaxProcessUpdateHotelAccess()
+    {
+        if (_PS_MODE_DEMO_) {
+            throw new PrestaShopException(Tools::displayError('This functionality has been disabled.'));
+        }
+        if ($this->tabAccess['edit'] != '1') {
+            throw new PrestaShopException(Tools::displayError('You do not have permission to edit this.'));
+        }
+
+        if (Tools::isSubmit('submitAddHotelAccess')) {
+            $enabled = (int)Tools::getValue('enabled');
+            $idHotel = (int)Tools::getValue('id_hotel');
+            $idProfile = (int)Tools::getValue('id_profile');
+            $where = '`id_hotel`';
+
+            if ($idHotel == -1) {
+                $sql = 'UPDATE `'._DB_PREFIX_.'htl_access`
+                SET `access` = '.(int)$enabled.'
+                WHERE `id_profile` = '.(int)$idProfile;
+            } else {
+                $sql = 'UPDATE `'._DB_PREFIX_.'htl_access`
+                SET `access` = '.(int)$enabled.'
+                WHERE `id_hotel` = '.(int)$idHotel.' AND `id_profile` = '.(int)$idProfile;
+            }
+
+            $res = Db::getInstance()->execute($sql) ? 'ok' : 'error';
+
+            die($res);
+        }
     }
 
     public function ajaxProcessUpdateAccess()

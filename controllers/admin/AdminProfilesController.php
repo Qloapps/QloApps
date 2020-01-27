@@ -57,7 +57,7 @@ class AdminProfilesControllerCore extends AdminController
                         ),
             'name' => array('title' => $this->l('Name'))
             );
-            
+
         $this->identifier = 'id_profile';
 
         $this->fields_form = array(
@@ -112,7 +112,7 @@ class AdminProfilesControllerCore extends AdminController
                 'icon' => 'process-icon-new'
             );
         }
-        
+
         parent::initPageHeaderToolbar();
     }
 }

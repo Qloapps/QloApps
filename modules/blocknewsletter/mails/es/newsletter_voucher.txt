@@ -7,5 +7,5 @@ Después de su suscripción a nuestro boletín, nos complace
 ofrecerle el siguiente cupón: {discount}
 
 {shop_name} [{shop_url}] creado por
-Webkul(tm) [https://webkul.com/]
+Webkul(tm) [https://webkul.com]
 

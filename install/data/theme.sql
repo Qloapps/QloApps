@@ -110,10 +110,6 @@ UPDATE `PREFIX_hook_module` SET position = 1
 WHERE id_module = (SELECT id_module FROM `PREFIX_module` WHERE name = 'blocksearch')
 AND id_hook = @id_hook;
 
-UPDATE `PREFIX_hook_module` SET position = 2
-WHERE id_module = (SELECT id_module FROM `PREFIX_module` WHERE name = 'blockcart')
-AND id_hook = @id_hook;
-
 UPDATE `PREFIX_hook_module` SET position = 3
 WHERE id_module = (SELECT id_module FROM `PREFIX_module` WHERE name = 'blocktopmenu')
 AND id_hook = @id_hook;

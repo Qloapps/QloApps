@@ -1,13 +1,13 @@
 
-[/{shop_url}] 
+[/{shop_url}]
 
-Bonjour, 
+Bonjour,
 
 {firstname} {lastname} vous invite à visiter sa liste de cadeaux
 {wishlist} : {wishlist}
 
-{wishlist} [/{message}] 		 
+{wishlist} [/{message}]
 
-{shop_name} [/{shop_url}] réalisé avec PrestaShop(tm)
-[http://www.prestashop.com/] 
+{shop_name} [/{shop_url}] réalisé avec Webkul(tm)
+[https://webkul.com]
 

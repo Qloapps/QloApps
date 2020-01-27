@@ -36,10 +36,11 @@
 								<div class="col-sm-8">
 									<select name="hotel_id" class="form-control" id="hotel_id">
 										{if isset($hotel_name) && $hotel_name}
-										<option value='0' selected>{l s='Select Hotel' mod='hotelreservationsystem'}</option>
 											{foreach $hotel_name as $name_val}
 												<option value="{$name_val['id']|escape:'htmlall':'UTF-8'}" {if isset($hotel_id) && ($name_val['id'] == $hotel_id)}selected{/if}>{$name_val['hotel_name']|escape:'htmlall':'UTF-8'}</option>
 											{/foreach}
+										{else}
+											{l s='No hotels available' mod='hotelreservationsystem'}
 										{/if}
 									</select>
 								</div>
@@ -453,9 +454,9 @@
 						<div class="form-group">
 							<label style="text-decoration:underline;margin-top:5px;" for="message-text" class="col-sm-12 control-label"><i class="icon-info-circle"></i>&nbsp;{l s='Currently Alloted Customer Information:' mod='hotelreservationsystem'}</label>
 							<dl class="well list-detail">
-								<dt>{l s='Name'}</dt>
+								<dt>{l s='Name' mod='hotelreservationsystem'}</dt>
 								<dd class="cust_name"></dd><br>
-								<dt>{l s='Email'}</dt>
+								<dt>{l s='Email' mod='hotelreservationsystem'}</dt>
 								<dd class="cust_email"></dd><br>
 							</dl>
 						</div>
@@ -470,7 +471,7 @@
 				<form method="post" action="">
 					<div class="modal-header">
 						<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-						<h4 class="modal-title" id="swap_myModalLabel">{l s='Swap Rooms'}</h4>
+						<h4 class="modal-title" id="swap_myModalLabel">{l s='Swap Rooms' mod='hotelreservationsystem'}</h4>
 					</div>
 					<div class="modal-body">
 						<div class="form-group">
@@ -492,9 +493,9 @@
 						<div class="form-group">
 							<label style="text-decoration:underline;margin-top:5px;" for="message-text" class="col-sm-12 control-label"><i class="icon-info-circle"></i>&nbsp;{l s='Currently Alloted Customer Information:' mod='hotelreservationsystem'}</label>
 							<dl class="well list-detail">
-								<dt>{l s='Name'}</dt>
+								<dt>{l s='Name' mod='hotelreservationsystem'}</dt>
 								<dd class="cust_name"></dd><br>
-								<dt>{l s='Email'}</dt>
+								<dt>{l s='Email' mod='hotelreservationsystem'}</dt>
 								<dd class="cust_email"></dd><br>
 							</dl>
 						</div>

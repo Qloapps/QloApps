@@ -59,9 +59,9 @@ $(document).ready(function() {
     $('.location_search_results_ul').hide();
 
     $("#check_in_time").datepicker({
-        showOtherMonths: true,
         dateFormat: 'dd-mm-yy',
         minDate: 0,
+        dayNamesMin: [ "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
         //for calender Css
         beforeShowDay: function (date) {
             return highlightDateBorder($("#check_in_time").val(), date);
@@ -75,8 +75,8 @@ $(document).ready(function() {
     });
 
     $("#check_out_time").datepicker({
-        showOtherMonths: true,
         dateFormat: 'dd-mm-yy',
+        dayNamesMin: [ "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
         //for calender Css
         beforeShowDay: function (date) {
             return highlightDateBorder($("#check_out_time").val(), date);

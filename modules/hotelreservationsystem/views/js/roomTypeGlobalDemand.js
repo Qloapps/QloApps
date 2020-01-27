@@ -20,10 +20,11 @@
 $(document).ready(function() {
     $("input[name='active_adv_option']").on('change', function () {
         if (parseInt($(this).val())) {
-            $(".adv_options_dtl").removeClass('hidden');
+            $("#price").closest('.form-group').hide(200);
+            $(".adv_options_dtl").show(200);
         } else {
-            $(".adv_options_dtl").addClass('hidden');
-            $("#" + WK_CATALOG_ORDER_REWARD + "_advertise_theme_color_div").addClass('hidden');
+            $(".adv_options_dtl").hide(200);
+            $("#price").closest('.form-group').show(200);
         }
     });
 

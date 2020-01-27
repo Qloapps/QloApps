@@ -6,5 +6,5 @@ Ei,
 GRÀCIES PER SUBSCRIURE-US A LA NOSTRA NEWSLETTER.
 
 {shop_name} [{shop_url}] desenvolupat amb
-Webkul(tm) [https://webkul.com/]
+Webkul(tm) [https://webkul.com]
 

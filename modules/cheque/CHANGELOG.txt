@@ -1,4 +1,13 @@
 ------------------------------
+# V2.6.2 to V2.6.3
+------------------------------
+
+## Improved/Changed Features:
+
+* [CO] : Correct cart total is sent to validateOrder() in case of advance payment.
+
+
+------------------------------
 # V2.6.1 to V2.6.2
 ------------------------------
 

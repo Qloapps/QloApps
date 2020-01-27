@@ -9,5 +9,5 @@ aanvraag door te klikken op de volgende link:
 {verif_url} [{verif_url}]
 
 {shop_name} [{shop_url}] gebouwd met
-Webkul(tm) [https://webkul.com/]
+Webkul(tm) [https://webkul.com]
 

@@ -172,14 +172,27 @@ class OrderDetailControllerCore extends FrontController
                 && ($dateTo = Tools::getValue('date_to'))
             ) {
                 $objBookingDemand = new HotelBookingDemands();
+                $useTax = 0;
+                $customer = Context::getContext()->customer;
+                if (Group::getPriceDisplayMethod($customer->id_default_group) == PS_TAX_INC) {
+                    $useTax = 1;
+                }
                 if ($extraDemands = $objBookingDemand->getRoomTypeBookingExtraDemands(
                     $idOrder,
                     $idProduct,
                     0,
                     $dateFrom,
-                    $dateTo
+                    $dateTo,
+                    1,
+                    0,
+                    $useTax
                 )) {
-                    $this->context->smarty->assign('extraDemands', $extraDemands);
+                    $this->context->smarty->assign(
+                        array(
+                            'useTax' => $useTax,
+                            'extraDemands' => $extraDemands,
+                        )
+                    );
                     $extraDemandsTpl .= $this->context->smarty->fetch(_PS_THEME_DIR_.'_partials/order_booking_demands.tpl');
                 }
             }
@@ -370,7 +383,8 @@ class OrderDetailControllerCore extends FrontController
 
                 if ($hotelresInstalled) {
                     if (!empty($products)) {
-                        $total_demands_price = 0;
+                        $total_demands_price_te = 0;
+                        $total_demands_price_ti = 0;
                         foreach ($products as $type_key => $type_value) {
                             if (in_array($type_value['product_id'], $processedProducts)) {
                                 continue;
@@ -437,7 +451,6 @@ class OrderDetailControllerCore extends FrontController
                                     $cartHotelData[$type_key]['date_diff'][$date_join]['stage_name'] = $stage_name;
                                 } else {
                                     $num_days = $objBookingDetail->getNumberOfDays($data_v['date_from'], $data_v['date_to']);
-
                                     $cartHotelData[$type_key]['date_diff'][$date_join]['num_rm'] = 1;
                                     $cartHotelData[$type_key]['date_diff'][$date_join]['data_form'] = $data_v['date_from'];
                                     $cartHotelData[$type_key]['date_diff'][$date_join]['data_to'] = $data_v['date_to'];
@@ -461,19 +474,34 @@ class OrderDetailControllerCore extends FrontController
                                     $data_v['date_from'],
                                     $data_v['date_to']
                                 );
-                                if (empty($cartHotelData[$type_key]['date_diff'][$date_join]['extra_demands_price'])) {
-                                    $cartHotelData[$type_key]['date_diff'][$date_join]['extra_demands_price'] = 0;
+                                if (empty($cartHotelData[$type_key]['date_diff'][$date_join]['extra_demands_price_ti'])) {
+                                    $cartHotelData[$type_key]['date_diff'][$date_join]['extra_demands_price_ti'] = 0;
                                 }
-                                $cartHotelData[$type_key]['date_diff'][$date_join]['extra_demands_price'] += $extraDemandPrice = $objBookingDemand->getRoomTypeBookingExtraDemands(
+                                $cartHotelData[$type_key]['date_diff'][$date_join]['extra_demands_price_ti'] += $extraDemandPriceTI = $objBookingDemand->getRoomTypeBookingExtraDemands(
                                     $id_order,
                                     $type_value['product_id'],
                                     $data_v['id_room'],
                                     $data_v['date_from'],
                                     $data_v['date_to'],
                                     0,
+                                    1,
                                     1
                                 );
-                                $total_demands_price += $extraDemandPrice;
+                                if (empty($cartHotelData[$type_key]['date_diff'][$date_join]['extra_demands_price_te'])) {
+                                    $cartHotelData[$type_key]['date_diff'][$date_join]['extra_demands_price_te'] = 0;
+                                }
+                                $cartHotelData[$type_key]['date_diff'][$date_join]['extra_demands_price_te'] += $extraDemandPriceTE = $objBookingDemand->getRoomTypeBookingExtraDemands(
+                                    $id_order,
+                                    $type_value['product_id'],
+                                    $data_v['id_room'],
+                                    $data_v['date_from'],
+                                    $data_v['date_to'],
+                                    0,
+                                    1,
+                                    0
+                                );
+                                $total_demands_price_ti += $extraDemandPriceTI;
+                                $total_demands_price_te += $extraDemandPriceTE;
                                 $cartHotelData[$type_key]['date_diff'][$date_join]['product_price_tax_excl'] = $order_details_obj->unit_price_tax_excl;
                                 $cartHotelData[$type_key]['date_diff'][$date_join]['product_price_tax_incl'] = $order_details_obj->unit_price_tax_incl;
                                 $cartHotelData[$type_key]['date_diff'][$date_join]['product_price_without_reduction_tax_excl'] = $order_details_obj->unit_price_tax_excl + $order_details_obj->reduction_amount_tax_excl;
@@ -498,7 +526,8 @@ class OrderDetailControllerCore extends FrontController
                         $orderAdvDetail = $objCustomerAdv->getCstAdvPaymentDtlByIdOrder($order->id);
                         $this->context->smarty->assign(
                             array(
-                                'total_demands_price' => $total_demands_price,
+                                'total_demands_price_ti' => $total_demands_price_ti,
+                                'total_demands_price_te' => $total_demands_price_te,
                                 'any_back_order' => $anyBackOrder,
                                 'shw_bo_msg' => Configuration::get('WK_SHOW_MSG_ON_BO'),
                                 'back_ord_msg' => Configuration::get('WK_BO_MESSAGE'),
@@ -516,6 +545,7 @@ class OrderDetailControllerCore extends FrontController
                     array(
                         'shop_name' => strval(Configuration::get('PS_SHOP_NAME')),
                         'order' => $order,
+                        'guestInformations' => (array)new Customer($order->id_customer),
                         'return_allowed' => (int) $order->isReturnable(),
                         'currency' => new Currency($order->id_currency),
                         'order_state' => (int) $id_order_state,

@@ -10,7 +10,7 @@
     </fields>
     <entities>
         <theme id="default">
-            <name>hotel-theme</name>
+            <name>hotel-reservation-theme</name>
             <directory>hotel-reservation-theme</directory>
             <responsive>1</responsive>
             <default_left_column>1</default_left_column>

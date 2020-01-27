@@ -32,7 +32,7 @@ class WkTestimonialBlock extends Module
     {
         $this->name = 'wktestimonialblock';
         $this->tab = 'front_office_features';
-        $this->version = '1.1.2';
+        $this->version = '1.1.3';
         $this->author = 'webkul';
         $this->need_instance = 0;
 
@@ -92,13 +92,6 @@ class WkTestimonialBlock extends Module
         return $this->display(__FILE__, 'wktestimonialblock.tpl');
     }
 
-    public function hookDisplayDefaultNavigationHook()
-    {
-        if (Configuration::get('HOTEL_TESIMONIAL_BLOCK_NAV_LINK')) {
-            return $this->display(__FILE__, 'hotelTestimonialNaviagtionMenu.tpl');
-        }
-    }
-
     /**
      * If admin add any language then an entry will add in defined $lang_tables array's lang table same as prestashop
      * @param array $params
@@ -154,7 +147,6 @@ class WkTestimonialBlock extends Module
                 'displayHome',
                 'displayFooterExploreSectionHook',
                 'displayAddModuleSettingLink',
-                'displayDefaultNavigationHook',
                 'actionObjectLanguageAddAfter'
             )
         );

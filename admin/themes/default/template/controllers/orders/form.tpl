@@ -912,6 +912,7 @@
 		$('#total_taxes').html(formatCurrency(parseFloat(jsonSummary.summary.total_tax), currency_format, currency_sign, currency_blank));
 		$('#total_without_taxes').html(formatCurrency(parseFloat(jsonSummary.summary.total_price_without_tax), currency_format, currency_sign, currency_blank));
 		$('#total_with_taxes').html(formatCurrency(parseFloat(jsonSummary.summary.total_price), currency_format, currency_sign, currency_blank));
+		$('#total_extra_demands').html(formatCurrency(parseFloat(jsonSummary.summary.total_extra_demands_tax_exc), currency_format, currency_sign, currency_blank));
 		$('#total_products').html(formatCurrency(parseFloat(jsonSummary.summary.total_products), currency_format, currency_sign, currency_blank));
 		id_currency = jsonSummary.cart.id_currency;
 		$('#id_currency option').removeAttr('selected');
@@ -1181,7 +1182,7 @@
 </script>
 
 <div class="leadin">{block name="leadin"}{/block}</div>
-{include file='controllers/orders/current_cart_details_data.tpl'}
+{include file='controllers/orders/_current_cart_details_data.tpl'}
 	<div class="panel form-horizontal" id="customer_part" {if isset($is_order_created) && $is_order_created}style="display:none;"{/if}>
 		<div class="panel-heading">
 			<i class="icon-user"></i>
@@ -1571,8 +1572,14 @@
 			<div class="row">
 				<div class="col-lg-2">
 					<div class="data-focus">
-						<span>{l s='Total products'}</span><br/>
+						<span>{l s='Total rooms (Tax excl.)'}</span><br/>
 						<span id="total_products" class="size_l text-success"></span>
+					</div>
+				</div>
+				<div class="col-lg-2">
+					<div class="data-focus">
+						<span>{l s='Total additinal facilties (Tax excl.)'}</span><br/>
+						<span id="total_extra_demands" class="size_l text-success"></span>
 					</div>
 				</div>
 				<div class="col-lg-2">
@@ -1581,22 +1588,16 @@
 						<span id="total_vouchers" class="size_l text-danger"></span>
 					</div>
 				</div>
-				<!-- <div class="col-lg-2">
-					<div class="data-focus">
-						<span>{l s='Total shipping (Tax excl.)'}</span><br/>
-						<span id="total_shipping" class="size_l"></span>
-					</div>
-				</div> --><!-- by webkul to hide unnessesary content -->
-				<div class="col-lg-2">
-					<div class="data-focus">
-						<span>{l s='Total taxes'}</span><br/>
-						<span id="total_taxes" class="size_l"></span>
-					</div>
-				</div>
 				<div class="col-lg-2">
 					<div class="data-focus">
 						<span>{l s='Total (Tax excl.)'}</span><br/>
 						<span id="total_without_taxes" class="size_l"></span>
+					</div>
+				</div>
+				<div class="col-lg-2">
+					<div class="data-focus">
+						<span>{l s='Total taxes'}</span><br/>
+						<span id="total_taxes" class="size_l"></span>
 					</div>
 				</div>
 				<div class="col-lg-2">

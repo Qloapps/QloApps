@@ -64,7 +64,14 @@ class BankwireValidationModuleFrontController extends ModuleFrontController
 			Tools::redirect('index.php?controller=order&step=1');
 
 		$currency = $this->context->currency;
-		$total = (float)$cart->getOrderTotal(true, Cart::BOTH);
+
+		if (Configuration::get('WK_ALLOW_ADVANCED_PAYMENT')) {
+            $obj_customer_adv = new HotelCustomerAdvancedPayment();
+            $total = $obj_customer_adv->getOrdertTotal($cart->id, $cart->id_guest);
+        } else {
+            $total = $cart->getOrderTotal(true, Cart::BOTH);
+        }
+
 		$mailVars = array(
 			'{bankwire_owner}' => Configuration::get('BANK_WIRE_OWNER'),
 			'{bankwire_details}' => nl2br(Configuration::get('BANK_WIRE_DETAILS')),

@@ -9,5 +9,5 @@ que eles possam ver a sua lista de presentes: {wishlist}
 {message} [{message}]
 
 {shop_name} [{shop_url}] baseado em
-Webkul(tm) [https://webkul.com/]
+Webkul(tm) [https://webkul.com]
 

@@ -75,19 +75,6 @@
 													<h5 class="accordion-header" data-toggle="collapse" data-target="#collapse-guest-info" aria-expanded="true" aria-controls="collapse-guest-info">
 														<span>{l s='Guest Information'}</span>
 														<i class="icon-angle-left pull-right accordion-left-arrow {if $step->step_is_current}hidden{/if}"></i>
-														<span class="step-edit pull-right {if !$step->step_is_current}hidden{/if}">
-															{if $is_logged || $isGuest}
-																{if isset($delivery->id) && $delivery->id}
-																	<a target="_blank" href="{$link->getPageLink('address', null, null, ['id_address' => $delivery->id])}" title="{l s='Edit customer address'}" rel="nofollow">
-																		<i class="icon-pencil"></i> {l s='edit'}
-																	</a>
-																{else}
-																	<a target="_blank" href="{$link->getPageLink('addresses')}" title="{l s='Edit customer address'}" rel="nofollow">
-																		<i class="icon-pencil"></i> {l s='edit'}
-																	</a>
-																{/if}
-															{/if}
-														</span>
 													</h5>
 												</div>
 												{if $step->step_is_reachable}
@@ -95,28 +82,31 @@
 														<div class="card-body">
 															{if $is_logged || $isGuest}
 																<div class="row margin-btm-10">
+																	<div class="col-sm-3 col-xs-5 info-head">{l s='Name'}</div>
+																	<div class="col-sm-9 col-xs-7 info-value">{$guestInformations['firstname']} {$guestInformations['lastname']}</div>
+																</div>
+																<div class="row margin-btm-10">
 																	<div class="col-sm-3 col-xs-5 info-head">{l s='Email'}</div>
 																	<div class="col-sm-9 col-xs-7 info-value">{$guestInformations['email']}</div>
 																</div>
-																<div class="row margin-btm-10">
-																	<div class="col-sm-3 col-xs-5 info-head">{l s='Address Details'}</div>
-																	<div class="col-sm-9 col-xs-7 info-value">
-																		<ul>
-																			{foreach from=$addressLayout.ordered name=adr_loop item=pattern}
-																				{assign var=addressKey value=" "|explode:$pattern}
-																				<li>
-																					{foreach from=$addressKey item=key name="word_loop"}
-																						{if isset($addressLayout.formated[$key|replace:',':''])}
-																							<span>
-																								{$addressLayout.formated[$key|replace:',':'']|escape:'html':'UTF-8'}
-																							</span>
-																						{/if}
-																					{/foreach}
-																				</li>
-																			{/foreach}
-																		</ul>
+																{if (isset($delivery->phone_mobile) && $delivery->phone_mobile) || (isset($delivery->phone) && $delivery->phone)}
+																	<div class="row margin-btm-10">
+																		<div class="col-sm-3 col-xs-5 info-head">
+																			{if isset($delivery->phone_mobile) && $delivery->phone_mobile}
+																				{l s='Mobile Number'}
+																			{else}
+																				{l s='Phone Number'}
+																			{/if}
+																		</div>
+																		<div class="col-sm-9 col-xs-7 info-value">
+																			{if isset($delivery->phone_mobile) && $delivery->phone_mobile}
+																				{$delivery->phone_mobile|escape:'html':'UTF-8'}
+																			{else}
+																				{$delivery->phone|escape:'html':'UTF-8'}
+																			{/if}
+																		</div>
 																	</div>
-																</div>
+																{/if}
 																<hr>
 																<div class="row">
 																	<div class="col-sm-12 proceed_btn_block">
@@ -167,13 +157,13 @@
 							{* Total cart details, tax details, advance payment details and voucher details *}
 							<div class="col-sm-12 card cart_total_detail_block">
 								<p>
-									<span>{l s='Total Rooms Cost'}{if $display_tax_label}{l s=' (tax excl.)'}{/if}</span>
+									<span>{l s='Total rooms cost'}{if $display_tax_label}{l s=' (tax excl.)'}{/if}</span>
 									<span class="cart_total_values">{displayPrice price=$total_products}</span>
 								</p>
-								{if isset($totalDemandsPrice) && $totalDemandsPrice}
+								{if isset($totalFacilityCostTE) && $totalFacilityCostTE}
 									<p>
-										<span>{l s='Total Additional Facilities Cost'}</span>
-										<span class="cart_total_values">{displayPrice price=$totalDemandsPrice}</span>
+										<span>{l s='Total additional facilities'}{if $display_tax_label}{l s=' (tax excl.)'}{/if}</span>
+										<span class="cart_total_values">{displayPrice price=$totalFacilityCostTE}</span>
 									</p>
 								{/if}
 								{if $use_taxes && $show_taxes && $total_tax != 0 }
@@ -184,8 +174,14 @@
 										</p>
 									{/if}
 									<p class="cart_total_tax">
-										<span>{l s='Tax'}</span>
-										<span class="cart_total_values">{displayPrice price=$total_tax}</span>
+										<span>{l s='Tax on rooms'}</span>
+										<span class="cart_total_values">{displayPrice price=($total_tax-$additional_facilities_tax)}</span>
+									</p>
+								{/if}
+								{if $use_taxes && $show_taxes && $additional_facilities_tax != 0 }
+									<p class="cart_total_tax">
+										<span>{l s='Tax on facilities'}</span>
+										<span class="cart_total_values">{displayPrice price=$additional_facilities_tax}</span>
 									</p>
 								{/if}
 								<p {if $total_wrapping == 0} class="unvisible"{/if}>

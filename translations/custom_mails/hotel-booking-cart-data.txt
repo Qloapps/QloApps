@@ -17,19 +17,6 @@
 			{$rm_v['data_to']|date_format:"%d-%b-%G"}
 
 			{$rm_v['amount']}
-			{if isset($rm_v['extra_demands']) && $rm_v['extra_demands']}
-				{assign var=roomCount value=1}
-				{foreach $rm_v['extra_demands'] as $roomDemand}
-					{l s='Room'} - {$roomCount}
-					{assign var=roomCount value=$roomCount+1}
-				{/foreach}
-				{foreach $rm_v['extra_demands'] as $roomDemands}
-					{foreach $roomDemands['extra_demands'] as $demand}
-						{$demand['name']}
-						{convertPrice price=$demand['price']}
-					{/foreach}
-				{/foreach}
-			{/if}
 		{/foreach}
 	{/foreach}
 {/if}

@@ -99,7 +99,7 @@
 				</div>
 			{else}
 				<div class="alert alert-warning">
-					{l s='No Additional facilities created yet.' mod='hotelreservationsystem'} {l s='To create pelase visit'} <a target="_blank" href="{$link->getAdminLink('AdminRoomTypeGlobalDemand')}">{l s='Additional facilities'}</a>
+					{l s='No additional facilities created yet. To create pelase visit' mod='hotelreservationsystem'} <a target="_blank" href="{$link->getAdminLink('AdminRoomTypeGlobalDemand')}">{l s='Additional facilities' mod='hotelreservationsystem'}</a> {l s='page' mod='hotelreservationsystem'}.
 				</div>
 			{/if}
 		</div>

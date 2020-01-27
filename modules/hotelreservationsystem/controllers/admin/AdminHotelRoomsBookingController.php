@@ -154,13 +154,22 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
             $date_to = Tools::getValue('dt_t');
         } else {
             $date_to = date('Y-m-t');
+            if (strtotime($date_from) == strtotime($date_to)) {
+                $date_to = date('Y-m-d', strtotime('+1 day', strtotime($date_to)));
+            }
         }
         if (Tools::getValue('id_htl')) {
             $hotel_id = Tools::getValue('id_htl');
         } else {
             $obj_htl_info = new HotelBranchInformation();
             if ($htl_info = $obj_htl_info->hotelBranchesInfo(false, 1)) {
-                $hotel_id = $htl_info[0]['id'];
+                // filter hotels as per accessed hotels
+                $htl_info = HotelBranchInformation::filterDataByHotelAccess(
+                    $htl_info,
+                    $this->context->employee->id_profile,
+                    1
+                );
+                $hotel_id = reset($htl_info)['id'];
             }
         }
         if (Tools::getValue('id_rt')) {
@@ -193,13 +202,6 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
 
         $booking_calendar_data = array();
         if (!count($this->errors)) {
-            if (!$hotel_id) {
-                $this->errors[] = $this->l('Please select a hotel.');
-                $obj_htl_info = new HotelBranchInformation();
-                if ($htl_info = $obj_htl_info->hotelBranchesInfo(false, 1)) {
-                    $hotel_id = $htl_info[0]['id'];
-                }
-            }
             $booking_data = $this->getAllBookingDataInfo(
                 $date_from,
                 $date_to,
@@ -252,6 +254,12 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
             }
         }
         $hotel_name = $obj_htl_info->hotelBranchesInfo(false, 1);
+        // filter hotels as per accessed hotels
+        $hotel_name = HotelBranchInformation::filterDataByHotelAccess(
+            $hotel_name,
+            $this->context->employee->id_profile,
+            1
+        );
         $all_room_type = $obj_rm_type->getRoomTypeByHotelId($hotel_id, Configuration::get('PS_LANG_DEFAULT'), 1);
 
         $rms_in_cart = $obj_cart_book_data->getCountRoomsInCart($id_cart, $id_guest);

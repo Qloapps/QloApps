@@ -1,7 +1,7 @@
 {if isset($product->id)}
 	<div id="product-configuration" class="panel product-tab">
 		<input type="hidden" name="submitted_tabs[]" value="Configuration" />
-		<h3 class="tab"> <i class="icon-AdminAdmin"></i> {l s='Configuration' mod='hotelreservationsystem'}</h3>
+		<h3 class="tab"> <i class="icon-AdminAdmin"></i> {l s='Configuration'}</h3>
 
 		{if isset($htl_room_type)}
 			<input type="hidden" value="{$htl_room_type['id']}" name="wk_id_room_type">
@@ -10,7 +10,7 @@
 		<div class="form-group">
 			{if isset($htl_room_type)}
 				<label class="control-label col-sm-2" for="hotel_place">
-					{l s='Hotel' mod='hotelreservationsystem'}
+					{l s='Hotel'}
 				</label>
 				<div class="col-sm-4">
 					<input type="text" class="form-control" value="{$htl_full_info['hotel_name']}" readonly>
@@ -18,7 +18,7 @@
 				</div>
 			{else}
 				<label class="control-label col-sm-2" for="hotel_place">
-					{l s='Select Hotel' mod='hotelreservationsystem'}
+					{l s='Select Hotel'}
 				</label>
 				<div class="col-sm-4">
 					<select name="id_hotel" id="hotel_place" class="form-control">
@@ -32,7 +32,7 @@
 
 		<div class="form-group">
 			<label class="control-label col-sm-2" for="num_adults">
-				{l s='Adults' mod='hotelreservationsystem'}
+				{l s='Adults'}
 			</label>
 			<div class="col-sm-4">
 				<input id="num_adults" type="text" name="num_adults" class="form-control" {if isset($htl_room_type)}value="{$htl_room_type['adult']}"{/if}>
@@ -42,7 +42,7 @@
 
 		<div class="form-group">
 			<label class="control-label col-sm-2" for="num_child">
-				{l s='Children' mod='hotelreservationsystem'}
+				{l s='Children'}
 			</label>
 			<div class="col-sm-4">
 				<input id="num_child" type="text" name="num_child" class="form-control" {if isset($htl_room_type)}value="{$htl_room_type['children']}"{/if}>
@@ -59,13 +59,13 @@
 							</label>
 						</th>
 						<th class="col-sm-2 center">
-							<span>{l s='Floor' mod='hotelreservationsystem'}</span>
+							<span>{l s='Floor'}</span>
 						</th>
 						<th class="col-sm-2">
-							<span>{l s='Status' mod='hotelreservationsystem'}</span>
+							<span>{l s='Status'}</span>
 						</th>
 						<th class="col-sm-6 center">
-							<span>{l s='Extra Information' mod='hotelreservationsystem'}</span>
+							<span>{l s='Extra Information'}</span>
 						</th>
 					</tr>
 					{if isset($htl_room_info) && $htl_room_info}
@@ -85,7 +85,7 @@
 									</select>
 								</td>
 								<td class="center col-sm-6">
-									<a class="btn btn-default deactiveDatesModal" data-toggle="modal" data-target="#deactiveDatesModal" {if $info['id_status'] != 3 }style="display: none;"{/if}>{if $info['id_status'] != 3 }{l s='Add Dates' mod='hotelreservationsystem'}{else}{l s='View Dates' mod='hotelreservationsystem'}{/if}
+									<a class="btn btn-default deactiveDatesModal" data-toggle="modal" data-target="#deactiveDatesModal" {if $info['id_status'] != 3 }style="display: none;"{/if}>{if $info['id_status'] != 3 }{l s='Add Dates'}{else}{l s='View Dates'}{/if}
 									</a>
 									<input type="text" class="form-control room_comment" value="{$info['comment']}" name="room_comment[]" {if $info['id_status'] == 3 }style="display: none;"{/if}>
 									<input type="hidden" class="form-control disableDatesJSON" name="disableDatesJSON[]" {if $info['id_status'] == 3}value="{$info['disabled_dates_json']|escape:'html':'UTF-8'}"{/if}>
@@ -114,11 +114,16 @@
 								</td>
 								<td class="center col-sm-6">
 									<a class="deactiveDatesModal" data-toggle="modal" data-target="#deactiveDatesModal" style="display: none;">
-										{l s='add Dates' mod='hotelreservationsystem'}
+										{l s='add Dates'}
 									</a>
 									<input type="hidden" class="form-control disableDatesJSON" name="disableDatesJSON" value="0">
 									<input type="text" class="form-control room_comment" name="room_comment[]">
 								</td>
+								{if $k == 1}
+									<td class="center col-sm-1">
+										<a href="#" class="remove-rooms-button btn btn-default"><i class="icon-trash"></i></a>
+									</td>
+								{/if}
 							</tr>
 						{/for}
 					{/if}
@@ -128,7 +133,7 @@
 				<div class="col-sm-12">
 					<button id="add-more-rooms-button" class="btn btn-default" type="button" data-size="s" data-style="expand-right">
 						<i class="icon-folder-open"></i>
-						{l s='Add More Rooms' mod='hotelreservationsystem'}
+						{l s='Add More Rooms'}
 					</button>
 				</div>
 			</div>
@@ -158,7 +163,7 @@
 				<button type="button" class="close margin-right-10" data-dismiss="modal" aria-label="Close">
 					<span aria-hidden="true">&times;</span>
 				</button>
-				<h4 class="modal-title"><i class="icon-calendar"></i>&nbsp; {l s='Disable dates' mod='hotelreservationsystem'}</h4>
+				<h4 class="modal-title"><i class="icon-calendar"></i>&nbsp; {l s='Disable dates'}</h4>
 			</div>
 			<div class="modal-body">
 				<div class="from-group table-responsive-row clearfix">
@@ -166,13 +171,13 @@
 						<thead>
 							<tr class="nodrag nodrop">
 								<th class="col-sm-1 center">
-									<span>{l s='Date From' mod='hotelreservationsystem'}</span>
+									<span>{l s='Date From'}</span>
 								</th>
 								<th class="col-sm-2 center">
-									<span>{l s='Date To' mod='hotelreservationsystem'}</span>
+									<span>{l s='Date To'}</span>
 								</th>
 								<th class="col-sm-2 center">
-									<span>{l s='Reason' mod='hotelreservationsystem'}</span>
+									<span>{l s='Reason'}</span>
 								</th>
 							</tr>
 						</thead>
@@ -181,13 +186,13 @@
 					</table>
 					<div class="form-group">
 						<div class="col-sm-12">
-							<a href="#" class="add_more_room_disable_dates btn btn-default"><i class="icon icon-plus"></i>{l s="Add More" mod='hotelreservationsystem'}</a>
+							<a href="#" class="add_more_room_disable_dates btn btn-default"><i class="icon icon-plus"></i>{l s="Add More"}</a>
 						</div>
 					</div>
 				</div>
 			</div>
 			<div class="modal-footer">
-				<button type="button" class="btn btn-default deactiveDatesModalSubmit">{l s='Done' mod='hotelreservationsystem'}</button>
+				<button type="button" class="btn btn-default deactiveDatesModalSubmit">{l s='Done'}</button>
 			</div>
 		</div>
 	</div>
@@ -321,7 +326,7 @@
 				html += '</td>';
 				html += '<td class="center col-sm-6">';
 					html += '<a class="btn btn-default deactiveDatesModal" data-toggle="modal" data-target="#deactiveDatesModal" style="display: none;">';
-						html += "{l s='Add Dates' mod='hotelreservationsystem'}";
+						html += "{l s='Add Dates'}";
 					html += '</a>';
 					html += '<input type="hidden" class="form-control disableDatesJSON" name="disableDatesJSON[]" value="0">';
 					html += '<input type="text" class="form-control room_comment" name="room_comment[]">';
@@ -337,7 +342,7 @@
 		// delete room
 		$('.rm_htl_room').on('click',function(e) {
 			e.preventDefault();
-
+			var $current = $(this);
 			var id_htl_info = $(this).attr('data-id-htl-info');
 			$.ajax({
 	            url: prod_link,
@@ -348,15 +353,18 @@
 	            	action:'deleteHotelRoom',
 	            	id: id_htl_info,
 	            },
-	            success: function (result)
-	            {
-	            	if (parseInt(result) == 1)
-	            	{
+	            success: function (result) {
+	            	if (parseInt(result) == 1) {
 		               	showSuccessMessage("{l s='Removed successfully'}");
-	            	}
-	            }
+						$current.closest(".room_data_values").remove();
+	            	} else {
+						showErrorMessage("{l s='Some error occurred'}");
+					}
+	            },
+				error: function(XMLHttpRequest, textStatus, errorThrown) {
+					showErrorMessage("{l s='Some error occurred'}");
+				}
 	        });
-			$(this).closest(".room_data_values").remove();
 		});
 
 		$(".checkConfigurationClick").on("click", function() {

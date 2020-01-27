@@ -392,7 +392,7 @@ class HotelHelper
         $obj_hotel_info->phone = '0987654321';
         $obj_hotel_info->email = 'hotelprime@htl.com';
         $obj_hotel_info->check_in = '12:00';
-        $obj_hotel_info->check_out = '12:00';
+        $obj_hotel_info->check_out = '11:00';
 
         // lang fields
         $languages = Language::getLanguages(false);
@@ -415,7 +415,13 @@ class HotelHelper
         }
         $obj_hotel_info->state_id = $state_id;
         $obj_hotel_info->country_id = $def_cont_id;
-        $obj_hotel_info->zipcode = self::getRandomZipcodeByForCountry($def_cont_id);
+        if (!$zipCode = self::getRandomZipcodeByForCountry($def_cont_id)) {
+            $objCountry = new Country($def_cont_id);
+            if (strtoupper($objCountry->iso_code) == 'GB') {
+                $zipCode = 'AA1A 1AA';
+            }
+        }
+        $obj_hotel_info->zipcode = $zipCode;
         $obj_hotel_info->address = 'Monticello Dr, Montgomery, AL 36117, USA';
         $obj_hotel_info->save();
 
@@ -583,7 +589,23 @@ class HotelHelper
             foreach ($ftr_arr as $key_htl_ftr => $val_htl_ftr) {
                 $product->addFeaturesToDB($val_htl_ftr, $ftr_val_arr[$key_htl_ftr]);
             }
+
+            // save advance payment information
+            $this->saveAdvancedPaymentInfo($product_id);
         }
+    }
+
+    public function saveAdvancedPaymentInfo($id_product)
+    {
+        $obj_adv_pmt = new HotelAdvancedPayment();
+        $obj_adv_pmt->active = 0;
+        $obj_adv_pmt->id_product = $id_product;
+        $obj_adv_pmt->payment_type = '';
+        $obj_adv_pmt->value = '';
+        $obj_adv_pmt->id_currency = '';
+        $obj_adv_pmt->tax_include = '';
+        $obj_adv_pmt->calculate_from = 0;
+        return $obj_adv_pmt->save();
     }
 
     public function saveDummyHotelImages($idHotel)
@@ -801,5 +823,4 @@ class HotelHelper
         }
         return $randZipCode;
     }
-
 }

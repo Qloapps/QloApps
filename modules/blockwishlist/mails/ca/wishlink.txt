@@ -9,5 +9,5 @@ tal que vegin la vostra llista de desitjos: {wishlist}
 {message} [{message}]
 
 {shop_name} [{shop_url}] desenvolupat amb
-Webkul(tm) [https://webkul.com/]
+Webkul(tm) [https://webkul.com]
 

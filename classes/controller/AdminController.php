@@ -487,6 +487,34 @@ class AdminControllerCore extends Controller
         }
         $this->tabAccess = Profile::getProfileAccess($this->context->employee->id_profile, $this->id);
 
+        if ($this->context->employee->id_profile != _PS_ADMIN_PROFILE_) {
+            // Here we wiil check the query if hotel wise access is available
+            $this->access_query = '';
+            if (isset($this->access_select)) {
+                $this->access_query .= $this->access_select;
+            }
+            if (isset($this->access_join)) {
+                $this->access_query .= $this->access_join;
+            }
+            if (isset($this->access_where)) {
+                $this->access_query .= $this->access_where;
+            } elseif ($this->access_query && (!isset($this->access_where) || !$this->access_where)) {
+                $this->access_query .= ' WHERE 0';
+            }
+            if ($this->access_query) {
+                if (Tools::getValue($this->identifier)) {
+                    $this->access_query .= ' AND a.'.$this->identifier.'='.(int) Tools::getValue($this->identifier);
+                    if (!Db::getInstance()->executeS($this->access_query)) {
+                        $this->tabAccess['view'] = '0';
+                        $this->tabAccess['add'] = '0';
+                        $this->tabAccess['edit'] = '0';
+                        $this->tabAccess['delete'] = '0';
+                    }
+                }
+            }
+        }
+        // Access control End
+
         // Fix for homepage
         if ($this->controller_name == 'AdminDashboard') {
             $_POST['token'] = $this->token;
@@ -548,7 +576,7 @@ class AdminControllerCore extends Controller
      */
     public function initBreadcrumbs($tab_id = null, $tabs = null)
     {
-        if (is_array($tabs) || count($tabs)) {
+        if (is_array($tabs)) {
             $tabs = array();
         }
 
@@ -2894,9 +2922,9 @@ class AdminControllerCore extends Controller
                 $this->errors[] = Tools::displayError('You do not have permission to edit this.');
             }
         } elseif (Tools::isSubmit('submitAdd'.$this->table)
-                 || Tools::isSubmit('submitAdd'.$this->table.'AndStay')
-                 || Tools::isSubmit('submitAdd'.$this->table.'AndPreview')
-                 || Tools::isSubmit('submitAdd'.$this->table.'AndBackToParent')) {
+            || Tools::isSubmit('submitAdd'.$this->table.'AndStay')
+            || Tools::isSubmit('submitAdd'.$this->table.'AndPreview')
+            || Tools::isSubmit('submitAdd'.$this->table.'AndBackToParent')) {
             // case 1: updating existing entry
             if ($this->id_object) {
                 if ($this->tabAccess['edit'] === '1') {
@@ -3216,8 +3244,15 @@ class AdminControllerCore extends Controller
 			'.$lang_join.'
 			'.(isset($this->_join) ? $this->_join.' ' : '').'
 			'.$join_shop;
-            $sql_where = ' '.(isset($this->_where) ? $this->_where.' ' : '').($this->deleted ? 'AND a.`deleted` = 0 ' : '').
-            (isset($this->_filter) ? $this->_filter : '').$where_shop.'
+            $sql_where = ' '.(isset($this->_where) ? $this->_where.' ' : '');
+            $sql_where .= ($this->deleted ? 'AND a.`deleted` = 0 ' : '');
+
+            // here add condition of hotel accesses
+            if (isset($this->access_query) && $this->access_query) {
+                $sql_where .= ' AND a.'.$this->identifier.' IN ('.$this->access_query.')';
+            }
+
+            $sql_where .= (isset($this->_filter) ? $this->_filter : '').$where_shop.'
 			'.(isset($this->_group) ? $this->_group.' ' : '').'
 			'.$having_clause;
             $sql_order_by = ' ORDER BY '.((str_replace('`', '', $order_by) == $this->identifier) ? 'a.' : '').$order_by.' '.pSQL($order_way).

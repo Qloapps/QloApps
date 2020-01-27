@@ -24,10 +24,10 @@
 *}
 <script type="text/javascript">
 	$(document).ready(function() {
-		
+
 		var id_tab_parentmodule = {$id_tab_parentmodule|intval};
 		var id_tab_module = {$id_tab_module|intval};
-		
+
 		$('tr.child-'+id_tab_parentmodule+' > td > input.view.'+id_tab_module).change( function () {
 
 			if (!$(this).prop('checked'))
@@ -37,7 +37,7 @@
 					$('#table_module_2 thead th:eq(1) input').trigger('click');
 			}
 		});
-		
+
 		$('tr.child-'+id_tab_parentmodule+' > td > input.edit.'+id_tab_module).change( function () {
 
 			if (!$(this).prop('checked'))
@@ -47,7 +47,7 @@
 					$('#table_module_2 thead th:eq(2) input').trigger('click');
 			}
 		});
-		
+
 		$('div.productTabs').find('a').each(function() {
 			$(this).attr('href', '#');
 		});
@@ -187,6 +187,49 @@
 			});
 		});
 
+		// Change Accesses of hotels
+		$(".changeHotelAccess").change(function(){
+			var tout = $(this).data('rel').split('||');
+			var id_hotel = tout[0];
+			var id_profile = tout[2];
+			var enabled = $(this).is(':checked') ? 1 : 0;
+			var enabled_attr = $(this).is(':checked') ? true : false;
+			var table = 'table#table_hotel_'+id_profile;
+
+			if (id_hotel == -1) {
+				$(table+' .ajax-htl-all').attr("checked", enabled_attr);
+			}
+
+			$.ajax({
+				url: "{$link->getAdminLink('AdminAccess')|addslashes}",
+				cache: false,
+				data : {
+					ajaxMode: '1',
+					id_hotel: id_hotel,
+					enabled: enabled,
+					id_profile: id_profile,
+					submitAddHotelAccess: '1',
+					action: 'updateHotelAccess',
+					ajax: '1',
+					token: '{getAdminToken tab='AdminAccess'}'
+				},
+				success : function(res,textStatus,jqXHR)
+				{
+					try {
+						if (res == 'ok') {
+							showSuccessMessage("{l s='Update successful'}");
+						} else {
+							showErrorMessage("{l s='Update error'}");
+						}
+					}
+					catch(e)
+					{
+						jAlert('Technical error');
+					}
+				}
+			});
+		});
+
 	});
 </script>
 {if $show_toolbar}
@@ -213,9 +256,42 @@
 		{/foreach}
 		{foreach $profiles as $profile}
 		<div class="profile-{$profile.id_profile} tab-profile" style="display:{if $profile.id_profile != $current_profile}none{/if}">
-			<div class="row">			
+			<div class="row">
 			{if $profile.id_profile != $admin_profile}
-				<div class="col-lg-6">	
+				<div class="col-lg-6">
+					{if isset($hotels) && $hotels}
+						<div class="panel">
+							<h3>{l s='Hotel Permissions'}</h3>
+							<table class="table" id="table_hotel_{$profile.id_profile}">
+								<thead>
+									<tr>
+										<th>{l s='Hotel'}</th>
+										<th>
+											<input type="checkbox"{if $access_edit == 1} class="changeHotelAccess" data-rel="-1||all||{$profile.id_profile}"{else} disabled="disabled"{/if}/>
+											{l s='All'}
+										</th>
+									</tr>
+								</thead>
+								<tbody>
+									{if !count($hotels)}
+										<tr>
+											<td colspan="6">{l s='No menu'}</td>
+										</tr>
+									{else}
+										{foreach $hotels as $hotelInfo}
+											{assign var=result_accesses value=0}
+											<tr class="parentTr">
+												<td>{$hotelInfo['hotel_name']|escape:'html':'UTF-8'}</td>
+												<td>
+													<input type="checkbox"{if $access_edit == 1} data-rel="{$hotelInfo['id']}||specific||{$profile.id_profile|escape:'html':'UTF-8'}||all" class="changeHotelAccess ajax-htl-all"{else} class="all" disabled="disabled"{/if}{if isset($hotelAccess[$profile.id_profile][$hotelInfo.id]['access']) && $hotelAccess[$profile.id_profile][$hotelInfo.id]['access']} checked="checked"{/if}/>
+												</td>
+											</tr>
+										{/foreach}
+									{/if}
+								</tbody>
+							</table>
+						</div>
+					{/if}
 					<div class="panel">
 						<h3>{l s='Menu'}</h3>
 						<table class="table" id="table_{$profile.id_profile}">
@@ -255,8 +331,8 @@
 										{if !$tab.id_parent OR $tab.id_parent == -1}
 											{assign var=is_child value=false}
 											{assign var=result_accesses value=0}
-											<tr{if !$is_child} class="parent"{/if}>
-												<td{if !$is_child} class="bold"{/if}>{if $is_child} &raquo; {/if}<strong>{$tab.name}</strong></td>
+											<tr {if !$is_child} class="parent"{/if}>
+												<td {if !$is_child} class="bold"{/if}>{if $is_child} &raquo; {/if}<strong>{$tab.name}</strong></td>
 												{foreach $perms as $perm}
 													{if $access_edit == 1}
 														<td>

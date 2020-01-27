@@ -10,5 +10,5 @@
 {message} [{message}]
 
 {shop_name} [{shop_url}] се управлява
-с Webkul(tm) [https://webkul.com/]
+с Webkul(tm) [https://webkul.com]
 

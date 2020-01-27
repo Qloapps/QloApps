@@ -31,7 +31,7 @@ class WkHotelRoom extends Module
     {
         $this->name = 'wkhotelroom';
         $this->tab = 'front_office_features';
-        $this->version = '1.1.3';
+        $this->version = '1.1.4';
         $this->author = 'webkul';
         $this->bootstrap = true;
         parent::__construct();
@@ -135,13 +135,6 @@ class WkHotelRoom extends Module
         return $this->display(__FILE__, 'hotelRoomSettingLink.tpl');
     }
 
-    public function hookDisplayDefaultNavigationHook()
-    {
-        if (Configuration::get('HOTEL_ROOM_BLOCK_NAV_LINK')) {
-            return $this->display(__FILE__, 'hotelRoomNaviagtionMenu.tpl');
-        }
-    }
-
     /**
      * If admin add any language then an entry will add in defined $lang_tables array's lang table same as prestashop
      * @param array $params
@@ -228,7 +221,6 @@ class WkHotelRoom extends Module
                 'displayHome',
                 'actionProductDelete',
                 'displayAddModuleSettingLink',
-                'displayDefaultNavigationHook',
                 'displayFooterExploreSectionHook',
                 'actionProductSave',
                 'actionObjectLanguageAddAfter'
