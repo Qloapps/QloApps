@@ -53,6 +53,32 @@ function upgrade_module_1_4_1($object, $install = false)
 				ADD COLUMN `price_calc_method` tinyint(1) NOT NULL;')) {
             return false;
         }
+	if (!Db::getInstance()->Execute("
+	            CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_custom_navigation_link` (
+                `id_navigation_link` int(11) NOT NULL AUTO_INCREMENT,
+                `link` text NOT NULL,
+                `is_custom_link` tinyint(1) NOT NULL,
+                `id_cms` int(11) NOT NULL DEFAULT '0',
+                `position` int(11) unsigned NOT NULL DEFAULT '0',
+                `show_at_navigation` tinyint(1) NOT NULL DEFAULT '0',
+                `show_at_footer` tinyint(1) NOT NULL DEFAULT '0',
+                `active` tinyint(1) NOT NULL,
+                `date_add` datetime NOT NULL,
+                `date_upd` datetime NOT NULL,
+                PRIMARY KEY (`id_navigation_link`)
+            ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;")) {
+            return false;
+        }
+	
+	if (!Db::getInstance()->Execute("
+            CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_custom_navigation_link_lang` (
+                `id_navigation_link` int(11) NOT NULL,
+                `id_lang` int(11) NOT NULL,
+                `name` varchar(255) NOT NULL,
+                PRIMARY KEY (`id_navigation_link`, `id_lang`)
+                ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8 ;")) {
+            return false;
+        }
 
         Configuration::updateValue('_QLO_INSTALL_VERSION_', '1.4.1');
 
