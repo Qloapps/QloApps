@@ -33,6 +33,9 @@ class hotelreservationsystem extends Module
         $this->author = 'Webkul';
         $this->need_instance = 0;
         $this->bootstrap = true;
+        if(!Configuration::get('_QLOAPPS_VERSION_')){
+			Configuration::updateValue('_QLOAPPS_VERSION_', $this->version);
+		}
         parent::__construct();
         $this->displayName = $this->l('Hotel Booking and Reservation System');
         $this->description = $this->l(
@@ -629,49 +632,66 @@ class hotelreservationsystem extends Module
 
     public function install()
     {
-        if (!file_exists(dirname(__FILE__).'/'.self::INSTALL_SQL_FILE)) {
-            return false;
-        } elseif (!$sql = Tools::file_get_contents(dirname(__FILE__).'/'.self::INSTALL_SQL_FILE)) {
-            return false;
-        }
+		if(version_compare(Configuration::get('_QLOAPPS_VERSION_'), $this->version, '<')){
+			$this->runUpgrades(false);
+		} else {
+			if (!file_exists(dirname(__FILE__).'/'.self::INSTALL_SQL_FILE)) {
+				return false;
+			} elseif (!$sql = Tools::file_get_contents(dirname(__FILE__).'/'.self::INSTALL_SQL_FILE)) {
+				return false;
+			}
 
-        $sql = str_replace(array('PREFIX_',  'ENGINE_TYPE'), array(_DB_PREFIX_, _MYSQL_ENGINE_), $sql);
-        $sql = preg_split("/;\s*[\r\n]+/", $sql);
+			$sql = str_replace(array('PREFIX_',  'ENGINE_TYPE'), array(_DB_PREFIX_, _MYSQL_ENGINE_), $sql);
+			$sql = preg_split("/;\s*[\r\n]+/", $sql);
 
-        foreach ($sql as $query) {
-            if ($query) {
-                if (!Db::getInstance()->execute(trim($query))) {
-                    return false;
-                }
-            }
-        }
+			foreach ($sql as $query) {
+				if ($query) {
+					if (!Db::getInstance()->execute(trim($query))) {
+						return false;
+					}
+				}
+			}
 
-        // if module should be populated while installation
-        $objHtlHelper = new HotelHelper();
-        if (isset($this->populateData) && $this->populateData) {
-            if (!$objHtlHelper->deletePrestashopDefaultCategories()
-                || !$objHtlHelper->deletePrestashopDefaultFeatures()
-                || !$objHtlHelper->createHotelRoomDefaultFeatures()
-                || !$objHtlHelper->insertHotelCommonFeatures()
-                || !$objHtlHelper->createDummyDataForProject()
-            ) {
-                return false;
-            }
-        }
+			// if module should be populated while installation
+			$objHtlHelper = new HotelHelper();
+			if (isset($this->populateData) && $this->populateData) {
+				if (!$objHtlHelper->deletePrestashopDefaultCategories()
+					|| !$objHtlHelper->deletePrestashopDefaultFeatures()
+					|| !$objHtlHelper->createHotelRoomDefaultFeatures()
+					|| !$objHtlHelper->insertHotelCommonFeatures()
+					|| !$objHtlHelper->createDummyDataForProject()
+				) {
+					return false;
+				}
+			}
 
-        if (!parent::install()
-            || !$this->callInstallTab()
-            || !$this->registerModuleHooks()
-            || !$objHtlHelper->insertDefaultHotelEntries()
-            || !$objHtlHelper->insertHotelRoomsStatus()
-            || !$objHtlHelper->insertHotelOrderStatus()
-            || !$objHtlHelper->insertHotelRoomAllotmentType()
-        ) {
-            return false;
-        }
-
+			if (!parent::install()
+				|| !$this->callInstallTab()
+				|| !$this->registerModuleHooks()
+				|| !$objHtlHelper->insertDefaultHotelEntries()
+				|| !$objHtlHelper->insertHotelRoomsStatus()
+				|| !$objHtlHelper->insertHotelOrderStatus()
+				|| !$objHtlHelper->insertHotelRoomAllotmentType()
+			) {
+				return false;
+			}
+		}
 
         return true;
+    }
+	
+	/**
+     * Launch upgrade process
+     */
+    public function runUpgrades($install = false)
+    {
+        foreach (array('1.4.0', '1.4.1', '1.4.x') as $version) {
+			$file = dirname(__FILE__).'/upgrade/upgrade-'.$version.'.php';
+			if (version_compare(Configuration::get('_QLOAPPS_VERSION_'), $version, '<') && file_exists($file)) {
+				include_once $file;
+				call_user_func('upgrade_module_'.str_replace('.', '_', $version), $this, $install);
+			}
+		}
     }
 
     public function registerModuleHooks()
