@@ -30,12 +30,12 @@ function upgrade_module_1_4_1($object, $install = false)
             return false;
         }
 		
-		if (!Db::getInstance()->Execute('
+	if (!Db::getInstance()->Execute('
 			ALTER TABLE `'._DB_PREFIX_.'htl_booking_demands` DROP COLUMN `price`;')) {
             return false;
         }
 		
-		if (!Db::getInstance()->Execute('
+	if (!Db::getInstance()->Execute('
 			ALTER TABLE `'._DB_PREFIX_.'htl_booking_demands` 
 				ADD COLUMN `unit_price_tax_excl` decimal(20,6) NOT NULL DEFAULT \'0.000000\', 
 				ADD COLUMN `unit_price_tax_incl` decimal(20,6) NOT NULL DEFAULT \'0.000000\', 
@@ -47,7 +47,7 @@ function upgrade_module_1_4_1($object, $install = false)
             return false;
         }
 		
-		if (!Db::getInstance()->Execute('
+	if (!Db::getInstance()->Execute('
 			ALTER TABLE `'._DB_PREFIX_.'htl_room_type_global_demand` 
 				ADD COLUMN `id_tax_rules_group` int(10) unsigned NOT NULL DEFAULT \'0\',
 				ADD COLUMN `price_calc_method` tinyint(1) NOT NULL;')) {
@@ -81,7 +81,21 @@ function upgrade_module_1_4_1($object, $install = false)
         }
 
         Configuration::updateValue('_QLO_INSTALL_VERSION_', '1.4.1');
+	
+	//Update theme name
+	if (!Db::getInstance()->Execute("
+		UPDATE `"._DB_PREFIX_."theme` SET name='hotel-reservation-theme'
+    		  WHERE name='hotel-theme' AND directory='hotel-reservation-theme';")) {
+            return false;
+        }
 
+	//Add news Hook
+	$object->registerHook(
+            array (
+                'actionObjectProfileAddAfter',
+                'actionObjectProfileDeleteBefore',
+            )
+        );
     }
     return true;
 }
