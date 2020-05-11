@@ -985,7 +985,6 @@ class ProductControllerCore extends FrontController
                 $dateFrom = Tools::getValue('date_from');
                 $dateTo = Tools::getValue('date_to');
                 $quantity = Tools::getValue('qty');
-                $roomDemands = Tools::getValue('room_demands');
                 if ($idHotel = $roomTypeInfo['id_hotel']) {
                     $objBookingDetail = new HotelBookingDetail();
                     if ($hotelRoomData = $objBookingDetail->DataForFrontSearch(
