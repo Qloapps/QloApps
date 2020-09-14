@@ -1,6 +1,6 @@
 <?php
 /**
-* 2010-2018 Webkul.
+* 2010-2020 Webkul.
 *
 * NOTICE OF LICENSE
 *
@@ -14,7 +14,7 @@
 * needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
 *
 *  @author    Webkul IN <support@webkul.com>
-*  @copyright 2010-2018 Webkul IN
+*  @copyright 2010-2020 Webkul IN
 *  @license   https://store.webkul.com/license.html
 */
 
@@ -47,7 +47,7 @@ class WkRoomSearchBlockAutoCompleteSearchModuleFrontController extends ModuleFro
                     if ($hotel_info = $obj_htl_info->hotelBranchInfoByCategoryId($value['id_category'])) {
                         $maxOrderDate = HotelOrderRestrictDate::getMaxOrderDate($hotel_info[0]['id']);
                         $maxOrderDate = date('Y-m-d', strtotime($maxOrderDate));
-                        $html .= '<li class="hotel_name" data-id-hotel="'.$hotel_info[0]['id'].'" data-hotel-cat-id="'.
+                        $html .= '<li tabindex="-1" class="search_result_li" data-id-hotel="'.$hotel_info[0]['id'].'" data-hotel-cat-id="'.
                         $hotel_info[0]['id_category'].'" data-max_order_date="'.$maxOrderDate.'">'.
                         $hotel_info[0]['hotel_name'].'</li>';
                     }

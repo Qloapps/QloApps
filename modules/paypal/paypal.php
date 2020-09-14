@@ -102,7 +102,7 @@ class PayPal extends PaymentModule
     {
         $this->name = 'paypal';
         $this->tab = 'payments_gateways';
-        $this->version = '1.0.1';
+        $this->version = '1.0.2';
         $this->author = 'PrestaShop';
         $this->is_eu_compatible = 1;
 
@@ -219,26 +219,6 @@ class PayPal extends PaymentModule
         if (file_exists(_PS_MODULE_DIR_.'paypalapi/paypalapi.php') && $this->active) {
             $this->warning = $this->l('All features of Paypal API module are included in the new Paypal module. In order to do not have any conflict, please do not use and remove PayPalAPI module.').'<br />';
         }
-
-        /* For 1.4.3 and less compatibility */
-        $update_config = array('PS_OS_CHEQUE' => 1, 'PS_OS_PAYMENT' => 2, 'PS_OS_PREPARATION' => 3,
-            'PS_OS_SHIPPING' => 4,
-            'PS_OS_DELIVERED' => 5, 'PS_OS_CANCELED' => 6, 'PS_OS_REFUND' => 7, 'PS_OS_ERROR' => 8,
-            'PS_OS_OUTOFSTOCK' => 9,
-            'PS_OS_BANKWIRE' => 10, 'PS_OS_PAYPAL' => 11, 'PS_OS_WS_PAYMENT' => 12);
-
-        foreach ($update_config as $key => $value) {
-            if (!Configuration::get($key) || (int) Configuration::get($key) < 1) {
-                if (defined('_'.$key.'_') && (int) constant('_'.$key.'_')
-                    > 0) {
-                    Configuration::updateValue($key, constant('_'.$key.'_'));
-                } else {
-                    Configuration::updateValue($key, $value);
-                }
-
-            }
-        }
-
     }
 
     public function isPayPalAPIAvailable()
@@ -1471,8 +1451,8 @@ class PayPal extends PaymentModule
     public function renderExpressCheckoutForm($type)
     {
         if ((!Configuration::get('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT') && !$this->useMobile())
-            || !in_array(ECS, $this->getPaymentMethods()) ||
-            (((int) Configuration::get('PAYPAL_BUSINESS') == 1) && ((int) Configuration::get('PAYPAL_PAYMENT_METHOD')
+            || !in_array(ECS, $this->getPaymentMethods())
+            || (((int) Configuration::get('PAYPAL_BUSINESS') == 1) && ((int) Configuration::get('PAYPAL_PAYMENT_METHOD')
                 == HSS) && !$this->useMobile())) {
             return;
         }

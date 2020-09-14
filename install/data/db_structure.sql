@@ -186,6 +186,7 @@ CREATE TABLE `PREFIX_cart` (
   `gift_message` text,
   `mobile_theme` tinyint(1) NOT NULL DEFAULT '0',
   `allow_seperated_package` TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',
+  `is_advance_payment` tinyint(1) NOT NULL DEFAULT '0',
   `date_add` datetime NOT NULL,
   `date_upd` datetime NOT NULL,
   PRIMARY KEY (`id_cart`),
@@ -1133,6 +1134,8 @@ CREATE TABLE `PREFIX_orders` (
   `delivery_date` datetime NOT NULL,
   `source` varchar(255) DEFAULT NULL,
   `valid` int(1) unsigned NOT NULL DEFAULT '0',
+  `is_advance_payment` tinyint(1) NOT NULL DEFAULT '0',
+  `advance_paid_amount` decimal(20,6) NOT NULL DEFAULT '0.00',
   `date_add` datetime NOT NULL,
   `date_upd` datetime NOT NULL,
   PRIMARY KEY (`id_order`),
@@ -1291,8 +1294,12 @@ CREATE TABLE `PREFIX_order_return` (
   `id_order_return` int(10) unsigned NOT NULL auto_increment,
   `id_customer` int(10) unsigned NOT NULL,
   `id_order` int(10) unsigned NOT NULL,
-  `state` tinyint(1) unsigned NOT NULL DEFAULT '1',
+  `state` int(10) unsigned NOT NULL DEFAULT '1',
+	`id_transaction` varchar(100) NOT NULL DEFAULT '',
+	`payment_mode` varchar(255) NOT NULL DEFAULT '',
+	`refunded_amount` decimal(20,6) NOT NULL DEFAULT '0.000000',
   `question` text NOT NULL,
+  `by_admin` tinyint(1) unsigned NOT NULL DEFAULT '0',
   `date_add` datetime NOT NULL,
   `date_upd` datetime NOT NULL,
   PRIMARY KEY (`id_order_return`),
@@ -1301,16 +1308,27 @@ CREATE TABLE `PREFIX_order_return` (
 ) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8 COLLATION;
 
 CREATE TABLE `PREFIX_order_return_detail` (
+  `id_order_return_detail` int(10) unsigned NOT NULL auto_increment,
   `id_order_return` int(10) unsigned NOT NULL,
-  `id_order_detail` int(10) unsigned NOT NULL,
+	`id_htl_booking` int(11) NOT NULL,
+  `refunded_amount` decimal(20,6) NOT NULL DEFAULT '0.000000',
+  `id_order_detail` int(10) unsigned NOT NULL DEFAULT '0',
   `id_customization` int(10) unsigned NOT NULL DEFAULT '0',
   `product_quantity` int(10) unsigned NOT NULL DEFAULT '0',
-  PRIMARY KEY (`id_order_return`,`id_order_detail`,`id_customization`)
+  KEY `id_htl_booking` (`id_htl_booking`),
+  PRIMARY KEY (`id_order_return_detail`)
 ) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8 COLLATION;
 
 CREATE TABLE `PREFIX_order_return_state` (
   `id_order_return_state` int(10) unsigned NOT NULL auto_increment,
   `color` varchar(32) DEFAULT NULL,
+  `send_email_to_customer` tinyint(1) UNSIGNED NOT NULL DEFAULT '0',
+  `send_email_to_superadmin` tinyint(1) UNSIGNED NOT NULL DEFAULT '0',
+  `send_email_to_employee` tinyint(1) UNSIGNED NOT NULL DEFAULT '0',
+  `send_email_to_hotelier` tinyint(1) UNSIGNED NOT NULL DEFAULT '0',
+  `denied` tinyint(1) UNSIGNED NOT NULL DEFAULT '0',
+  `refunded` tinyint(1) UNSIGNED NOT NULL DEFAULT '0',
+  `module_name` VARCHAR(255) NULL DEFAULT NULL,
   PRIMARY KEY (`id_order_return_state`)
 ) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8 COLLATION;
 
@@ -1318,9 +1336,10 @@ CREATE TABLE `PREFIX_order_return_state_lang` (
   `id_order_return_state` int(10) unsigned NOT NULL,
   `id_lang` int(10) unsigned NOT NULL,
   `name` varchar(64) NOT NULL,
+  `customer_template` varchar(64) NOT NULL,
+  `admin_template` varchar(64) NOT NULL,
   PRIMARY KEY (`id_order_return_state`,`id_lang`)
 ) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8 COLLATION;
-
 
 CREATE TABLE `PREFIX_order_slip` (
   `id_order_slip` int(10) unsigned NOT NULL auto_increment,
@@ -1346,6 +1365,7 @@ CREATE TABLE `PREFIX_order_slip` (
 CREATE TABLE `PREFIX_order_slip_detail` (
   `id_order_slip` int(10) unsigned NOT NULL,
   `id_order_detail` int(10) unsigned NOT NULL,
+  `id_htl_booking` int(10) unsigned NOT NULL,
   `product_quantity` int(10) unsigned NOT NULL DEFAULT '0',
   `unit_price_tax_excl` DECIMAL(20, 6) NULL,
   `unit_price_tax_incl` DECIMAL(20, 6) NULL,
@@ -1353,7 +1373,7 @@ CREATE TABLE `PREFIX_order_slip_detail` (
   `total_price_tax_incl` DECIMAL(20, 6),
   `amount_tax_excl` DECIMAL(20, 6) DEFAULT NULL,
   `amount_tax_incl` DECIMAL(20, 6) DEFAULT NULL,
-  PRIMARY KEY (`id_order_slip`,`id_order_detail`)
+  PRIMARY KEY (`id_order_slip`,`id_htl_booking`)
 ) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8 COLLATION;
 
 CREATE TABLE `PREFIX_order_state` (

@@ -185,6 +185,7 @@ class AdminCountriesControllerCore extends AdminController
                 'title' => $this->l('Countries'),
                 'icon' => 'icon-globe'
             ),
+            'description' => $this->l('After changing \'Zip/postal code format\' for a country, please make sure to  update the correct zip/postal code for hotels in that country.'),
             'input' => array(
                 array(
                     'type' => 'text',

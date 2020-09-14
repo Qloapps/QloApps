@@ -1,6 +1,6 @@
 <?php
 /**
-* 2010-2018 Webkul.
+* 2010-2020 Webkul.
 *
 * NOTICE OF LICENSE
 *
@@ -14,7 +14,7 @@
 * needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
 *
 *  @author    Webkul IN <support@webkul.com>
-*  @copyright 2010-2018 Webkul IN
+*  @copyright 2010-2020 Webkul IN
 *  @license   https://store.webkul.com/license.html
 */
 
@@ -40,12 +40,20 @@ class WkHotelInteriorImage extends ObjectModel
         ),
     );
 
+    public function __construct($id = null, $id_lang = null, $id_shop = null)
+    {
+        parent::__construct($id, $id_lang, $id_shop);
+
+        $this->image_dir = _PS_MODULE_DIR_.'wkabouthotelblock/views/img/hotel_interior/';
+        $this->image_name = $this->name;
+    }
+
     /**
      * NOTE : If you want to get all images then pass false in argument variable
      */
     public function getHotelInteriorImg($active = 2)
     {
-        $sql = 'SELECT `name`, `display_name`, `position`
+        $sql = 'SELECT `id_interior_image`, `name`, `display_name`, `position`
                 FROM `'._DB_PREFIX_.'htl_interior_image` WHERE 1';
 
         if ($active != 2) {
@@ -60,25 +68,19 @@ class WkHotelInteriorImage extends ObjectModel
         return false;
     }
 
+    /**
+     * Deletes current interior image block from the database
+     * @return bool `true` if delete was successful
+     */
     public function delete()
     {
-        // delete image of the block
-        if (!$this->deleteHotelInteriorImg($this->id)) {
+        if (!parent::delete()
+            || !$this->deleteImage(true)
+            || !$this->cleanPositions()
+        ) {
             return false;
         }
-        $return = parent::delete();
-        /* Reinitializing position */
-        $this->cleanPositions();
-        return $return;
-    }
-
-    public function deleteHotelInteriorImg($id_htl_interior)
-    {
-        $obj_inter_img = new WkHotelInteriorImage($id_htl_interior);
-        if (unlink(_PS_MODULE_DIR_.'wkabouthotelblock/views/img/hotel_interior/'.$obj_inter_img->name)) {
-            return true;
-        }
-        return false;
+        return true;
     }
 
     public function getHigherPosition()
@@ -150,15 +152,15 @@ class WkHotelInteriorImage extends ObjectModel
 
         // Database Entry
         for ($i = 1; $i <= 12; $i++) {
-            $imgName = $i.'.jpg';
-            $srcPath = _PS_MODULE_DIR_.'wkabouthotelblock/views/img/dummy_img/'.$imgName;
+            $imgName = $i;
+            $srcPath = _PS_MODULE_DIR_.'wkabouthotelblock/views/img/dummy_img/'.$imgName.'.jpg';
             if (file_exists($srcPath)) {
                 if (ImageManager::isRealImage($srcPath)
                     && ImageManager::isCorrectImageFileExt($srcPath)
                 ) {
                     if (ImageManager::resize(
                         $srcPath,
-                        _PS_MODULE_DIR_.'wkabouthotelblock/views/img/hotel_interior/'.$imgName
+                        _PS_MODULE_DIR_.'wkabouthotelblock/views/img/hotel_interior/'.$imgName.'.jpg'
                     )) {
                         $objHtlInteriorImg = new WkHotelInteriorImage();
                         $objHtlInteriorImg->name = $imgName;

@@ -29,12 +29,11 @@
 	{if $smarty.const._PS_VERSION_ >= 1.6}
 
 	<div class="row">
-		<div class="col-xs-12 col-md-6">
+		<div class="col-xs-12 col-md-12">
 		<p class="payment_module paypal" >
 			<a href="javascript:void(0)" style="padding-left:17px;" onclick="$('#paypal_form').submit();" id="paypal_process_payment" title="{l s='Pay with your card or your PayPal account' mod='paypal'}">
-				
-						<img src="{$logos.LocalPayPalHorizontalSolutionPP|escape:'htmlall':'UTF-8'}" alt="{l s='Pay with your card or your PayPal account' mod='paypal'}" height="48px" />		
-					{l s='Pay with your card or your PayPal account' mod='paypal'}
+				<img src="{$logos.LocalPayPalHorizontalSolutionPP|escape:'htmlall':'UTF-8'}" alt="{l s='Pay with your card or your PayPal account' mod='paypal'}" height="48px" />
+				{l s='Pay with your card or your PayPal account' mod='paypal'}
 			</a>
 		</p>
 		</div>
@@ -42,18 +41,17 @@
 	{else}
 	<p class="payment_module">
 		<a href="javascript:void(0)" onclick="$('#paypal_form').submit();" id="paypal_process_payment" title="{l s='Pay with your card or your PayPal account' mod='paypal'}">
-			
-					<img src="{$logos.LocalPayPalHorizontalSolutionPP|escape:'htmlall':'UTF-8'}" alt="{l s='Pay with your card or your PayPal account' mod='paypal'}" height="48px" />		
-				{l s='Pay with your card or your PayPal account' mod='paypal'}
+			<img src="{$logos.LocalPayPalHorizontalSolutionPP|escape:'htmlall':'UTF-8'}" alt="{l s='Pay with your card or your PayPal account' mod='paypal'}" height="48px" />
+			{l s='Pay with your card or your PayPal account' mod='paypal'}
 		</a>
 	</p>
 	{/if}
 {else}
 	{if $smarty.const._PS_VERSION_ >= 1.6}
 	<div class="row">
-		<div class="col-xs-12 col-md-6">
+		<div class="col-xs-12 col-md-12">
 		<p class="payment_module">
-			<iframe name="hss_iframe" width="556px" height="540px" style="overflow: hidden; border: none" class="payment_module"></iframe>	
+			<iframe name="hss_iframe" width="556px" height="540px" style="overflow: hidden; border: none" class="payment_module"></iframe>
 		</p>
 		</div>
 	</div>

@@ -1,6 +1,6 @@
 <?php
 /**
-* 2010-2018 Webkul.
+* 2010-2020 Webkul.
 *
 * NOTICE OF LICENSE
 *
@@ -14,7 +14,7 @@
 * needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
 *
 *  @author    Webkul IN <support@webkul.com>
-*  @copyright 2010-2018 Webkul IN
+*  @copyright 2010-2020 Webkul IN
 *  @license   https://store.webkul.com/license.html
 */
 
@@ -34,6 +34,29 @@ class HotelImage extends ObjectModel
             'cover' => array('type' => self::TYPE_BOOL,'validate' => 'isBool')
         ),
     );
+
+
+    public function __construct($id = null, $id_lang = null, $id_shop = null)
+    {
+        parent::__construct($id, $id_lang, $id_shop);
+
+        $this->image_dir = _PS_MODULE_DIR_.'hotelreservationsystem/views/img/hotel_img/';
+        $this->image_name = $this->hotel_image_id;
+    }
+
+    /**
+     * Deletes current interior image block from the database
+     * @return bool `true` if delete was successful
+     */
+    public function delete()
+    {
+        if (!parent::delete()
+            || !$this->deleteImage(true)
+        ) {
+            return false;
+        }
+        return true;
+    }
 
     /**
      * [getAllImagesByHotelId :: To get all images data of a hotel by hotel id]
@@ -118,8 +141,7 @@ class HotelImage extends ObjectModel
                         $addedImage = array(
                             'id_image' => $objHtlImage->id,
                             'cover' => $objHtlImage->cover,
-                            'image_url' => _MODULE_DIR_.'hotelreservationsystem/views/img/hotel_img/'.
-                            $randName.'.jpg',
+                            'image_url' => Context::getContext()->link->getMediaLink(_MODULE_DIR_.'hotelreservationsystem/views/img/hotel_img/'.$randName.'.jpg'),
                         );
                         return $addedImage;
                     }
@@ -128,5 +150,10 @@ class HotelImage extends ObjectModel
             return true;
         }
         return false;
+    }
+
+    public function getAllImages()
+    {
+        return Db::getInstance()->executeS('SELECT * FROM `'._DB_PREFIX_.'htl_image`');
     }
 }

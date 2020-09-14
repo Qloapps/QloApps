@@ -12,14 +12,6 @@
     <name>În procesare</name>
     <template>preparation</template>
   </order_state>
-  <order_state id="Shipped">
-    <name>Expediată</name>
-    <template>shipped</template>
-  </order_state>
-  <order_state id="Delivered">
-    <name>Livrată</name>
-    <template/>
-  </order_state>
   <order_state id="Canceled">
     <name>Anulată</name>
     <template>order_canceled</template>
@@ -52,8 +44,8 @@
     <name>Plata de la distanță acceptată</name>
     <template>payment</template>
   </order_state>
-  <order_state id="Awaiting_cod_validation">
-    <name>Awaiting cod validation</name>
-    <template>cashondelivery</template>
+  <order_state id="Awaiting_remote_payment">
+    <name>Awaiting remote payment</name>
+    <template/>
   </order_state>
 </entity_order_state>

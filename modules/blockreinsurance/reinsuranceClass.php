@@ -28,10 +28,10 @@ class reinsuranceClass extends ObjectModel
 {
 	/** @var integer reinsurance id*/
 	public $id;
-	
+
 	/** @var integer reinsurance id shop*/
 	public $id_shop;
-	
+
 	/** @var string reinsurance file name icon*/
 	public $file_name;
 
@@ -53,6 +53,24 @@ class reinsuranceClass extends ObjectModel
 			'text' =>					array('type' => self::TYPE_STRING, 'lang' => true, 'validate' => 'isGenericName', 'required' => true),
 		)
 	);
+
+	public function __construct($id = null, $id_lang = null, $id_shop = null) // by webkul for object deletiom with image
+    {
+        parent::__construct($id, $id_lang, $id_shop);
+
+		$this->image_dir = _PS_MODULE_DIR_.'blockreinsurance/img/';
+        $this->image_name = explode('.', $this->file_name)[0];
+	}
+
+	public function delete() // by webkul for object deletion with image
+    {
+        if (!parent::delete()
+            || !$this->deleteImage(true)
+        ) {
+            return false;
+        }
+        return true;
+    }
 
 	public function copyFromPost()
 	{

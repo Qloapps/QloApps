@@ -129,6 +129,9 @@ abstract class ObjectModelCore implements Core_Foundation_Database_EntityInterfa
     /** @var string Path to image directory. Used for image deletion. */
     protected $image_dir = null;
 
+    /** @var string image name used for image deletion. */ //by webkul
+    protected $image_name = null;
+
     /** @var String file type of image files. */
     protected $image_format = 'jpg';
 
@@ -554,7 +557,7 @@ abstract class ObjectModelCore implements Core_Foundation_Database_EntityInterfa
 					SELECT *
 					FROM `'._DB_PREFIX_.bqSQL($definition['table']).'`
 					WHERE `'.bqSQL($definition['primary']).'` = '.(int)$this->id
-                );
+        );
         if (!$res) {
             return false;
         }
@@ -563,7 +566,7 @@ abstract class ObjectModelCore implements Core_Foundation_Database_EntityInterfa
         foreach ($res as $field => &$value) {
             if (isset($definition['fields'][$field])) {
                 $value = ObjectModel::formatValue($value, $definition['fields'][$field]['type'], false, true,
-                                                  !empty($definition['fields'][$field]['allow_null']));
+                    !empty($definition['fields'][$field]['allow_null']));
             }
         }
 
@@ -586,7 +589,7 @@ abstract class ObjectModelCore implements Core_Foundation_Database_EntityInterfa
                 foreach ($row as $field => &$value) {
                     if (isset($definition['fields'][$field])) {
                         $value = ObjectModel::formatValue($value, $definition['fields'][$field]['type'], false, true,
-                                                          !empty($definition['fields'][$field]['allow_null']));
+                            !empty($definition['fields'][$field]['allow_null']));
                     }
                 }
             }
@@ -1255,10 +1258,10 @@ abstract class ObjectModelCore implements Core_Foundation_Database_EntityInterfa
             }
             if (isset($details['validate'])) {
                 $current_field['validateMethod'] = (
-                                array_key_exists('validateMethod', $resource_parameters['fields'][$field_name]) ?
+                    array_key_exists('validateMethod', $resource_parameters['fields'][$field_name]) ?
                                 array_merge($resource_parameters['fields'][$field_name]['validateMethod'], array($details['validate'])) :
                                 array($details['validate'])
-                            );
+                );
             }
             $resource_parameters['fields'][$field_name] = array_merge($resource_parameters['fields'][$field_name], $current_field);
 
@@ -1665,9 +1668,16 @@ abstract class ObjectModelCore implements Core_Foundation_Database_EntityInterfa
         if ($force_delete || !$this->hasMultishopEntries()) {
             /* Deleting object images and thumbnails (cache) */
             if ($this->image_dir) {
-                if (file_exists($this->image_dir.$this->id.'.'.$this->image_format)
-                    && !unlink($this->image_dir.$this->id.'.'.$this->image_format)) {
-                    return false;
+                if ($this->image_name) { // by webkul
+                    if (file_exists($this->image_dir.$this->image_name.'.'.$this->image_format)
+                        && !unlink($this->image_dir.$this->image_name.'.'.$this->image_format)) {
+                        return false;
+                    }
+                } else {
+                    if (file_exists($this->image_dir.$this->id.'.'.$this->image_format)
+                       && !unlink($this->image_dir.$this->id.'.'.$this->image_format)) {
+                        return false;
+                    }
                 }
             }
             if (file_exists(_PS_TMP_IMG_DIR_.$this->def['table'].'_'.$this->id.'.'.$this->image_format)
@@ -1681,9 +1691,16 @@ abstract class ObjectModelCore implements Core_Foundation_Database_EntityInterfa
 
             $types = ImageType::getImagesTypes();
             foreach ($types as $image_type) {
-                if (file_exists($this->image_dir.$this->id.'-'.stripslashes($image_type['name']).'.'.$this->image_format)
-                && !unlink($this->image_dir.$this->id.'-'.stripslashes($image_type['name']).'.'.$this->image_format)) {
-                    return false;
+                if ($this->image_name) { // by webkul
+                    if (file_exists($this->image_dir.$this->id.'-'.stripslashes($image_type['name']).'.'.$this->image_format)
+                        && !unlink($this->image_dir.$this->id.'-'.stripslashes($image_type['name']).'.'.$this->image_format)) {
+                        return false;
+                    }
+                } else {
+                    if (file_exists($this->image_dir.$this->id.'-'.stripslashes($image_type['name']).'.'.$this->image_format)
+                        && !unlink($this->image_dir.$this->id.'-'.stripslashes($image_type['name']).'.'.$this->image_format)) {
+                        return false;
+                    }
                 }
             }
         }
@@ -1701,10 +1718,12 @@ abstract class ObjectModelCore implements Core_Foundation_Database_EntityInterfa
      */
     public static function existsInDatabase($id_entity, $table)
     {
-        $row = Db::getInstance()->getRow('
+        $row = Db::getInstance()->getRow(
+            '
 			SELECT `id_'.bqSQL($table).'` as id
 			FROM `'._DB_PREFIX_.bqSQL($table).'` e
-			WHERE e.`id_'.bqSQL($table).'` = '.(int)$id_entity, false
+			WHERE e.`id_'.bqSQL($table).'` = '.(int)$id_entity,
+            false
         );
 
         return isset($row['id']);

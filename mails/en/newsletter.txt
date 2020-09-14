@@ -1,10 +1,10 @@
 
-[/{shop_url}]
+[/{shop_url}] 
 
-Hi {firstname} {lastname},
+Hi {firstname} {lastname}, 
 
-{message}
+{message} 
 
 {shop_name} [/{shop_url}] powered by Webkul(tm)
-[https://webkul.com]
+[https://webkul.com] 
 

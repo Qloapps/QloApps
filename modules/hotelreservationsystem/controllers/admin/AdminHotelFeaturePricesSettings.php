@@ -1,6 +1,6 @@
 <?php
 /**
-* 2010-2018 Webkul.
+* 2010-2020 Webkul.
 *
 * NOTICE OF LICENSE
 *
@@ -14,7 +14,7 @@
 * needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
 *
 *  @author    Webkul IN <support@webkul.com>
-*  @copyright 2010-2018 Webkul IN
+*  @copyright 2010-2020 Webkul IN
 *  @license   https://store.webkul.com/license.html
 */
 
@@ -169,8 +169,10 @@ class AdminHotelFeaturePricesSettingsController extends ModuleAdminController
         $dateFrom = date('d-m-Y');
         $dateTo = date('d-m-Y', strtotime($dateFrom) + 86400);
         $currentLangId = Configuration::get('PS_LANG_DEFAULT');
+
         $smartyVars['languages'] = Language::getLanguages(false);
         $smartyVars['currentLang'] = Language::getLanguage((int) $currentLangId);
+
         if ($this->display == 'edit') {
             $idFeaturePrice = Tools::getValue('id_feature_price');
             if (Validate::isLoadedObject(
@@ -186,10 +188,13 @@ class AdminHotelFeaturePricesSettingsController extends ModuleAdminController
             }
             $smartyVars['objFeaturePrice'] = $objFeaturePrice;
             $smartyVars['edit'] = 1;
+
+            $smartyVars['feature_price_groups'] = $objFeaturePrice->getGroups($idFeaturePrice);
         }
         $smartyVars['defaultcurrency_sign'] = $currencySign;
         $smartyVars['date_from'] = $dateFrom;
         $smartyVars['date_to'] = $dateTo;
+        $smartyVars['groups'] = Group::getGroups($this->context->language->id);
         $this->context->smarty->assign($smartyVars);
         $this->fields_form = array(
             'submit' => array(
@@ -381,6 +386,9 @@ class AdminHotelFeaturePricesSettingsController extends ModuleAdminController
                 $objFeaturePricing->impact_type = $priceImpactType;
                 $objFeaturePricing->impact_value = $impactValue;
                 $objFeaturePricing->active = $enableFeaturePrice;
+
+                // set the values of the groups for this feature price
+                $objFeaturePricing->groupBox = Tools::getValue('groupBox');
 
                 if ($objFeaturePricing->save()) {
                     if (Tools::isSubmit('submitAdd'.$this->table.'AndStay')) {

@@ -1,6 +1,6 @@
 <?php
 /**
-* 2010-2019 Webkul.
+* 2010-2020 Webkul.
 *
 * NOTICE OF LICENSE
 *
@@ -14,7 +14,7 @@
 * needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
 *
 *  @author    Webkul IN <support@webkul.com>
-*  @copyright 2010-2019 Webkul IN
+*  @copyright 2010-2020 Webkul IN
 *  @license   https://store.webkul.com/license.html
 */
 
@@ -53,6 +53,18 @@ class HotelBookingDemands extends ObjectModel
             'date_add' => array('type' => self::TYPE_DATE, 'validate' => 'isDate'),
             'date_upd' => array('type' => self::TYPE_DATE, 'validate' => 'isDate')
     ));
+
+    protected $webserviceParameters = array(
+        'objectsNodeName' => 'extra_demands',
+        'objectNodeName' => 'extra_demand',
+        'fields' => array(
+            'id_htl_booking' => array(
+                'xlink_resource' => array(
+                    'resourceName' => 'bookings',
+                )
+            ),
+        ),
+    );
 
     public function getRoomTypeBookingExtraDemands(
         $idOrder,
@@ -269,5 +281,22 @@ class HotelBookingDemands extends ObjectModel
             }
         }
         return $taxDetails;
+    }
+
+    public function deleteBookingDemands($idHotelBooking)
+    {
+        // first delete all tax details of this booking demands
+        Db::getInstance()->delete(
+            'htl_booking_demands_tax',
+            'id_booking_demand IN (SELECT `id_booking_demand` FROM `'._DB_PREFIX_.'htl_booking_demands` WHERE `id_htl_booking` = '.(int)$idHotelBooking.')'
+        );
+
+        // delete all the demands
+        return Db::getInstance()->delete('htl_booking_demands', 'id_htl_booking = '.(int)$idHotelBooking);
+    }
+
+    public function deleteBookingDemandTaxDetails($idBookingDemand)
+    {
+        return Db::getInstance()->delete('htl_booking_demands_tax', 'id_booking_demand = '.(int)$idBookingDemand);
     }
 }

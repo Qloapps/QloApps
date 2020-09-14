@@ -1,6 +1,0 @@
-<?xml version="1.0"?>
-<entity_carrier>
-  <carrier id="My_carrier" id_shop="1">
-    <delay>Delivery next day!</delay>
-  </carrier>
-</entity_carrier>

@@ -28,7 +28,7 @@
 .primary_block .pb-left-column img {
   max-width: 100%;
 
-  /*height: 100%;*/ }
+  height: 100%; }
 a.fancybox-nav {
   outline: 0; }
 
@@ -38,10 +38,9 @@ a.fancybox-nav {
   display: block;
   cursor: pointer;
   background: #fff; }
-  @media (max-width: 767px) {
-    .pb-left-column #image-block {
-      width: 280px;
-      margin: 0 auto; } }
+  @media (min-width: 768px) {
+    .pb-left-column #image-block-cont {
+      padding-left: 0px; } }
   .pb-left-column #image-block img {
     background: #fbfbfb;
     border-radius: 4px;
@@ -86,46 +85,66 @@ a.fancybox-nav {
 
 /* miniatures */
 .pb-left-column #views_block {
-  margin-top: 10px; }
+  /* margin-top: 10px;  */
+}
+
   @media (max-width: 767px) {
     .pb-left-column #views_block {
-      width: 280px;
+      position: relative;
       margin: 10px auto 0px auto; } }
 
 #thumbs_list {
   overflow: hidden;
   float: left;
-  width: 392px; }
+  width: 100%;
+  height: 590px;
+}
   @media (min-width: 992px) and (max-width: 1199px) {
     #thumbs_list {
-      width: 294px; } }
+      height: 420px; } }
   @media (min-width: 768px) and (max-width: 991px) {
     #thumbs_list {
-      width: 164px; } }
+      height: 290px; } }
   @media (max-width: 767px) {
     #thumbs_list {
-      width: 196px; } }
+      height: 90px;
+      float: none;
+        margin: auto;} }
   #thumbs_list ul#thumbs_list_frame {
     list-style-type: none;
     padding-left: 0;
     overflow: hidden;
-    margin-bottom: 0px;
-    height: 90px; }
+    margin: auto; }
+    @media (max-width: 767px) {
+      #thumbs_list ul#thumbs_list_frame {
+        height: 90px;
+      }
+    }
   #thumbs_list li {
-    float: left;
     height: 90px;
     width: 90px;
     cursor: pointer;
-    margin-right: 8px;
+    margin: auto;
+    margin-bottom: 10px;
     line-height: 0;
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
     box-sizing: border-box; }
-    @media (min-width: 768px) and (max-width: 991px) {
+    #thumbs_list li.last {
+      margin-bottom: 0px;
+    }
+    @media (min-width: 992px) and (max-width: 1199px) {
       #thumbs_list li {
         width: 76px;
-        height: 76px;
-        margin-right: 6px; } }
+        height: 76px; } }
+    @media (max-width: 767px) {
+      #thumbs_list li {
+        margin-right: 10px;
+        float: left;}
+        #thumbs_list li.last {
+          margin-right: 0px;
+        } }
+
     #thumbs_list li a {
       display: block;
       -moz-transition: all 0.3s ease;
@@ -146,10 +165,6 @@ a.fancybox-nav {
       -moz-box-sizing: border-box;
       -webkit-box-sizing: border-box;
       box-sizing: border-box; }
-      @media (min-width: 768px) and (max-width: 991px) {
-        #thumbs_list li img {
-          width: 68px;
-          height: 68px; } }
 
 .show-right-column.hide-left-column #thumbs_list, .hide-right-column.show-left-column #thumbs_list {
   width: 294px; }
@@ -198,37 +213,52 @@ span.view_scroll_spacer {
 
 #view_scroll_left,
 #view_scroll_right {
-  margin-top: 38px;
+  position: absolute;
+  left: 0;
+  right: 0;
+  margin: auto;
   height: 20px;
   width: 20px;
   line-height: 0;
   font-size: 0;
   overflow: hidden; }
-  @media (min-width: 768px) and (max-width: 991px) {
-    #view_scroll_left,
-    #view_scroll_right {
-      margin-top: 28px; } }
+
   #view_scroll_left:before,
   #view_scroll_right:before {
-    padding-left: 2px;
-    color: #c0c0c0;
+    color: #ffffff;
     font-family: "FontAwesome";
-    font-size: 20px;
+    font-size: 22px;
     line-height: 22px; }
   #view_scroll_left:hover:before,
   #view_scroll_right:hover:before {
-    color: #333; }
+    color: #c0c0c0; }
 
 #view_scroll_right {
-  float: left; }
+  bottom: 4px; }
   #view_scroll_right:before {
-    content: "\f138"; }
+    content: "\f13a"; }
 
 #view_scroll_left {
-  margin-top: 0; }
+  top: 4px; }
   #view_scroll_left:before {
-    content: "\f137";
-    padding-right: 2px; }
+    content: "\f139";
+  }
+
+  @media (max-width: 767px) {
+    #view_scroll_left,
+    #view_scroll_right {
+      top: 40%;
+      margin: 0; }
+
+    #view_scroll_right {
+      left: unset;}
+      #view_scroll_right:before {
+        content: "\f138"; }
+
+    #view_scroll_left {
+      right: unset;}
+      #view_scroll_left:before {
+        content: "\f137"; } }
 
 .resetimg {
   margin: 0px; }
@@ -1150,11 +1180,20 @@ Quick View Styles
 .room_info_content {
   font-size: 14px;
   color: #000000;}
+  .room_info_content .refund-rule-name {
+    font-weight: 600;}
+
+.non_refundable_txt {
+  font-weight: 600;
+  font-size: 14px;}
 .info_margin_div {
   font-size: 14px;
   color: #333333;
   line-height: 25px;
-  margin-bottom: 30px;}
+  margin-bottom: 25px;}
+  #refund_policies_tab .info_margin_div {
+    margin-bottom: 10px;}
+
 .hotel_name_block {
   font-family: OpenSans;
   font-size: 22px;
@@ -1199,20 +1238,6 @@ Quick View Styles
     padding: 2px;
     text-align: center;}
 
-/*datepicker on search css*/
-.product_page_search
-{
-  background-color: #404040;
-  margin-bottom: 15px!important;
-  padding-top: 15px;}
-
-.product_page_search .location_search_results_ul
-{
-  width: 90%!important;}
-
-.product_page_search .location_search_results_ul li
-{
-  border-top: 1px solid #cccccc;}
 .room_ratting_yes
 {
   background-position: 48px 22px;
@@ -1229,12 +1254,7 @@ Quick View Styles
   font-size: 14px;
   color: #0000FF;
   margin-left: 10px;}
-.search_block_container div label {
-    color: #ffffff;}
-.search_block_container.product_page_search
-{
-  margin-top: 0px;}
-.sold_out_alert {
+.sold_out_alert, .order_restrict_alert {
   color: #FF4B4B;
   display: block;
   font-size: 16px;
@@ -1245,9 +1265,6 @@ Quick View Styles
   font-weight: 700;}
 
 /*for search block background*/
-.header-rmsearch-wrapper {
-  background-color: #404040;
-  margin-bottom: 10px;}
 .idTabHrefShort:hover {
   color: #333;}
 
@@ -1288,16 +1305,6 @@ Quick View Styles
   padding: 2px 5px;
   border-left: 0px;
   border-color: #999;}
-.product_wrapper .header-rmsearch-inner-wrapper {
-  margin-top: 15px!important;
-  margin-bottom: 10px!important;}
-.product_wrapper .header-rmsearch-wrapper {
-  background-color: transparent;
-  margin-bottom: 10px;}
-.product_wrapper .header-rmsearch-input {
-  background: transparent!important;
-  border: 1px solid #999999!important;
-  color: #333333!important;}
 .product_wrapper .circle-small {
   opacity: 0.5;
   font-size: 16px;
@@ -1309,8 +1316,6 @@ Quick View Styles
 .product_wrapper .input-date {
   background: transparent url(../img/icon/icon-calendar.svg) no-repeat scroll 92% 50%!important;
   background-size: 16px!important;}
-#search_hotel_block_form #search_room_submit{
-  width: 100%;}
 .product_wrapper input {
   background-color: transparent!important;
   border: 1px solid #999999;
@@ -1342,10 +1347,6 @@ Quick View Styles
   text-transform: uppercase;}
 .nav-tabs > li.active > a, .nav-tabs > li.active > a:hover, .nav-tabs > li.active > a:focus {
   background-color: transparent;
-}
-@media (min-width: 360px) and (max-width: 767px) {
-  #search_hotel_block_form #search_room_submit {
-    width: auto;}
 }
 @media (min-width: 768px) and (max-width: 1199px) {
   .num_avail_rooms_alert {
@@ -1410,3 +1411,50 @@ Quick View Styles
   font-size: 24px;
   color: #505050;
 }
+
+/* extra demands Css */
+#rooms_extra_demands {
+  position: relative;
+  font-size: 16px;}
+.room_extra_demands .open_rooms_extra_demands {
+	font-size:12px;
+	font-weight: 600;
+	color: #0000FF;}
+#rooms_extra_demands .demand_header {
+	padding-bottom: 15px;}
+#rooms_extra_demands .room_demand_detail .demand_detail_price_block {
+	font-size: 14px;
+	margin-bottom: 15px;}
+#rooms_extra_demands .rooms_extra_demands_head {
+	margin-bottom: 18px;}
+#rooms_extra_demands .card {
+	padding-bottom: 0px;}
+#rooms_extra_demands .room_demand_block {
+	margin-bottom: 15px;
+	color: #333;
+	font-size: 14px;}
+#rooms_extra_demands .checkbox {
+	margin-top: 3px;}
+#rooms_extra_demands label {
+	opacity: 0.5;
+	margin-bottom: 15px;
+	text-transform: uppercase;}
+
+/* fancybox accordian css */
+/* #rooms_extra_demands .accordion, #rooms_extra_demands .accordion * {
+	-webkit-box-sizing:border-box;
+	-moz-box-sizing:border-box;
+	box-sizing:border-box;}
+#rooms_extra_demands .accordion {
+	overflow:hidden;
+	border-bottom: 1px solid #CCCCCC;}
+#rooms_extra_demands .accordion-section-title {
+	width:100%;
+	display:inline-block;
+	transition:all linear 0.15s;
+	color:#252525 !important;
+	text-decoration:none !important;}
+#rooms_extra_demands .accordion-section-content {
+	display:none;
+	border-top: 1px solid #eee;
+	padding-top: 15px;} */

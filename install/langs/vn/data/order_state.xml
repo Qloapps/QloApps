@@ -12,14 +12,6 @@
     <name>Chuẩn bị trong tiến trình</name>
     <template>preparation</template>
   </order_state>
-  <order_state id="Shipped">
-    <name>Đã giao hàng</name>
-    <template>shipped</template>
-  </order_state>
-  <order_state id="Delivered">
-    <name>Giao</name>
-    <template/>
-  </order_state>
   <order_state id="Canceled">
     <name>Hủy</name>
     <template>order_canceled</template>

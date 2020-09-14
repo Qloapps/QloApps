@@ -32,61 +32,50 @@ class OrderReturnControllerCore extends FrontController
     public $ssl = true;
 
     /**
-     * Initialize order return controller
-     * @see FrontController::init()
-     */
-    public function init()
-    {
-        parent::init();
-
-        header('Cache-Control: no-cache, must-revalidate');
-        header('Expires: Sat, 26 Jul 1997 05:00:00 GMT');
-        
-        $id_order_return = (int)Tools::getValue('id_order_return');
-
-        if (!isset($id_order_return) || !Validate::isUnsignedId($id_order_return)) {
-            $this->errors[] = Tools::displayError('Order ID required');
-        } else {
-            $order_return = new OrderReturn((int)$id_order_return);
-            if (Validate::isLoadedObject($order_return) && $order_return->id_customer == $this->context->cookie->id_customer) {
-                $order = new Order((int)($order_return->id_order));
-                if (Validate::isLoadedObject($order)) {
-                    $state = new OrderReturnState((int)$order_return->state);
-                    $this->context->smarty->assign(array(
-                        'orderRet' => $order_return,
-                        'order' => $order,
-                        'state_name' => $state->name[(int)$this->context->language->id],
-                        'return_allowed' => false,
-                        'products' => OrderReturn::getOrdersReturnProducts((int)$order_return->id, $order),
-                        'returnedCustomizations' => OrderReturn::getReturnedCustomizedProducts((int)$order_return->id_order),
-                        'customizedDatas' => Product::getAllCustomizedDatas((int)$order->id_cart)
-                    ));
-                } else {
-                    $this->errors[] = Tools::displayError('Cannot find the order return.');
-                }
-            } else {
-                $this->errors[] = Tools::displayError('Cannot find the order return.');
-            }
-        }
-    }
-
-    /**
      * Assign template vars related to page content
      * @see FrontController::initContent()
      */
     public function initContent()
     {
+        $this->show_breadcrump = true;
+        $this->display_column_left = false;
+        $this->display_column_right = false;
+
         parent::initContent();
 
-        $this->context->smarty->assign(array(
-            'errors' => $this->errors,
-            'nbdaysreturn' => (int)Configuration::get('PS_ORDER_RETURN_NB_DAYS')
-        ));
-        $this->setTemplate(_PS_THEME_DIR_.'order-return.tpl');
-    }
+        if (isset($this->context->customer->id) && $this->context->customer->id) {
+            if (Validate::isLoadedObject($objOrderReturn = new OrderReturn(Tools::getValue('id_order_return')))) {
+                if ($this->context->customer->id == $objOrderReturn->id_customer) {
+                    $refundStatuses = OrderReturnStateCore::getOrderReturnStates($this->context->language->id);
+                    $objOrder = new Order($objOrderReturn->id_order);
+                    $orderCurrency = new Currency($objOrder->id_currency);
 
-    public function displayAjax()
-    {
-        $this->smartyOutputContent($this->template);
+                    $refundReqBookings = $objOrderReturn->getOrderRefundRequestedBookings($objOrderReturn->id_order, $objOrderReturn->id, 0, 1);
+
+                    $this->context->smarty->assign(
+                        array (
+                            'orderReturnInfo' => (array)$objOrderReturn,
+                            'refundReqBookings' => $refundReqBookings,
+                            'orderInfo' => (array) $objOrder,
+                            'orderCurrency' => (array) $orderCurrency,
+                            'currentStateInfo' => (array) new OrderReturnState($objOrderReturn->state,
+                            $this->context->language->id),
+                            'isRefundCompleted' => $objOrderReturn->hasBeenCompleted(),
+                        )
+                    );
+
+                    $this->setTemplate(_PS_THEME_DIR_.'order-return.tpl');
+                } else {
+                    Tools::redirect($this->context->link->getpagelink('my-account'));
+                }
+            } else {
+                Tools::redirect($this->context->link->getpagelink('my-account'));
+            }
+        } else {
+            Tools::redirect(
+                'index.php?controller=authentication&back='.urlencode($this->context->link->getpageLink('my-account'))
+            );
+        }
     }
 }
+

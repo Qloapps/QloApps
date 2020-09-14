@@ -1,6 +1,6 @@
 <?php
 /**
-* 2010-2018 Webkul.
+* 2010-2020 Webkul.
 *
 * NOTICE OF LICENSE
 *
@@ -14,7 +14,7 @@
 * needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
 *
 *  @author    Webkul IN <support@webkul.com>
-*  @copyright 2010-2018 Webkul IN
+*  @copyright 2010-2020 Webkul IN
 *  @license   https://store.webkul.com/license.html
 */
 
@@ -27,10 +27,9 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
         $this->bootstrap = true;
         parent::__construct();
 
-        $psImgUrl = _PS_IMG_DIR_.'hotel_header_image.jpg';
-        if ($imgExist = file_exists($psImgUrl)) {
-            $image = '<img class="img-thumbnail img-responsive" style="max-width:200px" src="'._PS_IMG_.
-            'hotel_header_image.jpg'.'">';
+        $psImgUrl = $this->context->link->getMediaLink(_PS_IMG_.'hotel_header_image.jpg');
+        if ($imgExist = (bool)Tools::file_get_contents($psImgUrl)) {
+            $image = '<img class="img-thumbnail img-responsive" style="max-width:200px" src="'.$psImgUrl.'">';
         }
         $objHotelInfo = new HotelBranchInformation();
         if (!$hotelsInfo = $objHotelInfo->hotelBranchesInfo(false, 1)) {
@@ -40,6 +39,7 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
         $locationDisable = ((count($hotelsInfo) < 2) && !Configuration::get('WK_HOTEL_NAME_ENABLE')) ? true : false;
         $this->fields_options = array(
             'hotelsearchpanel' => array(
+                'icon' => 'icon-search',
                 'title' => $this->l('Hotel Search Setting'),
                 'fields' => array(
                     'WK_HOTEL_LOCATION_ENABLE' => array(
@@ -346,18 +346,18 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
                     // if lang fileds are at least in default language and not available in other languages then
                     // set empty fields value to default language value
                     if (!trim(Tools::getValue('WK_HTL_CHAIN_NAME_'.$lang['id_lang']))) {
-                        $_POST['WK_HTL_CHAIN_NAME_'.$lang['id_lang']] = Tools::getValue(
-                            'WK_HTL_CHAIN_NAME_'.$defaultLangId
+                        $_POST['WK_HTL_CHAIN_NAME_'.$lang['id_lang']] = trim(
+                            Tools::getValue('WK_HTL_CHAIN_NAME_'.$defaultLangId)
                         );
                     }
                     if (!trim(Tools::getValue('WK_HTL_TAG_LINE_'.$lang['id_lang']))) {
-                        $_POST['WK_HTL_TAG_LINE_'.$lang['id_lang']] = Tools::getValue(
-                            'WK_HTL_TAG_LINE_'.$defaultLangId
+                        $_POST['WK_HTL_TAG_LINE_'.$lang['id_lang']] = trim(
+                            Tools::getValue('WK_HTL_TAG_LINE_'.$defaultLangId)
                         );
                     }
                     if (!trim(Tools::getValue('WK_HTL_SHORT_DESC_'.$lang['id_lang']))) {
-                        $_POST['WK_HTL_SHORT_DESC_'.$lang['id_lang']] = Tools::getValue(
-                            'WK_HTL_SHORT_DESC_'.$defaultLangId
+                        $_POST['WK_HTL_SHORT_DESC_'.$lang['id_lang']] = trim(
+                            Tools::getValue('WK_HTL_SHORT_DESC_'.$defaultLangId)
                         );
                     }
                 }

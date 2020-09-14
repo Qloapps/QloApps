@@ -30,24 +30,7 @@
 			{/if}
 		</div>
 
-		<div class="form-group">
-			<label class="control-label col-sm-2" for="num_adults">
-				{l s='Adults'}
-			</label>
-			<div class="col-sm-4">
-				<input id="num_adults" type="text" name="num_adults" class="form-control" {if isset($htl_room_type)}value="{$htl_room_type['adult']}"{/if}>
-				<input type="hidden" id="checkConfSubmit" value="0" name="checkConfSubmit">
-			</div>
-		</div>
-
-		<div class="form-group">
-			<label class="control-label col-sm-2" for="num_child">
-				{l s='Children'}
-			</label>
-			<div class="col-sm-4">
-				<input id="num_child" type="text" name="num_child" class="form-control" {if isset($htl_room_type)}value="{$htl_room_type['children']}"{/if}>
-			</div>
-		</div>
+		<input type="hidden" id="checkConfSubmit" value="0" name="checkConfSubmit">
 
 		<div class="from-group table-responsive-row clearfix">
 			<table class="table hotel-room">

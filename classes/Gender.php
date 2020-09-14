@@ -67,9 +67,10 @@ class GenderCore extends ObjectModel
 
     public function getImage($use_unknown = false)
     {
-        if (!isset($this->id) || empty($this->id) || !file_exists(_PS_GENDERS_DIR_.$this->id.'.jpg')) {
-            return _THEME_GENDERS_DIR_.'Unknown.jpg';
+        $context = Context::getContext(); // by webkul get media link
+        if (!isset($this->id) || empty($this->id) || !(bool)Tools::file_get_contents($context->link->getMediaLink(_THEME_GENDERS_DIR_.$this->id.'.jpg'))) {
+            return $context->link->getMediaLink(_THEME_GENDERS_DIR_.'Unknown.jpg');
         }
-        return _THEME_GENDERS_DIR_.$this->id.'.jpg';
+        return $context->link->getMediaLink(_THEME_GENDERS_DIR_.$this->id.'.jpg');
     }
 }

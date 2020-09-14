@@ -31,7 +31,7 @@
   <tab id="Attachments" name="Prilozi"/>
   <tab id="Orders_1" name="Porudžbine"/>
   <tab id="Invoices" name="Fakture"/>
-  <tab id="Merchandise_Returns" name="Povraćaj robe"/>
+  <!-- <tab id="Merchandise_Returns" name="Povraćaj robe"/> -->
   <tab id="Delivery_Slips" name="Komadi dostave"/>
   <tab id="Credit_Slips" name="Komadi kredita"/>
   <tab id="Statuses" name="Statusi"/>

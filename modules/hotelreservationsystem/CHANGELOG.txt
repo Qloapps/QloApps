@@ -1,4 +1,43 @@
 -------------------------
+# V1.4.0 to V1.4.1
+-------------------------
+
+## Added Features:
+
+[+] CO : Columns `active_refund` are added in 'htl_branch_info' table.
+[+] CO : Columns `total_paid_amount`, `available_for_order`, `hotel_name`, `room_type_name`, `city`, `state`, `country`, `zipcode`, `phone`, `email`, `check_in_time`, `check_out_time`, `room_num`, `adult`, `children` in 'htl_booking_detail' table.
+[+] CO : tables 'htl_room_type_feature_pricing_group', 'htl_branch_refund_rules', 'htl_order_refund_rules' added.
+[+] CO : Class 'HotelBranchRefundRules' is added.
+[+] CO : datatable library is addded to the module.
+[+] CO : wk_refund_request.js, wk_refund_rule.js addded to the module.
+
+[+] BO : Occupancy setting added in the Hotel General Setting Tab.
+[+] BO : Feature Price Rule: Groups wise Condition in feature price rules is added.
+[+] BO : Admin can enable/disable refund for the hotel.
+[+] BO : Refund rules can be selected hotel wise.
+
+## Improved/changed features:
+
+[*] CO : All files license year is updated to 2020.
+[*] CO : tables 'htl_customer_adv_payment', 'htl_customer_adv_product_payment', 'htl_order_refund_info', 'htl_order_refund_stages' are removed.
+[*] CO : Classes 'HotelCustomerAdvancedPayment', 'HotelCustomerAdvancedProductPayment', 'HotelOrderRefundInfo', 'HotelOrderRefundStages' are removed.
+[*] CO : All search block css and js are moved to "wkroomsearchblock" module.
+[*] CO : Images link are now generated dynamically
+
+[*] BO : In Admin Refund Rules controller name and description fields are added.
+[*] BO : Admin Refund Request controller is improved and now will work as per new flow of refund process.
+[*] BO : Create demo zipcode if zipcode is required and pattern not provided.
+
+## Bug/Issues Resolved:
+[-] CO : Resolved:: Feature price wrong calculation in currencies other than default currency in case of impact way percentage.
+
+
+## Update Policy
+
+- Database changed, Module need upload new file then UNINSTALL and re-installation.
+
+
+-------------------------
 # V1.3.0 to V1.4.0
 -------------------------
 

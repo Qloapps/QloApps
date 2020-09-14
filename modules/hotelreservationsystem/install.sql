@@ -1,5 +1,5 @@
 /**
-* 2010-2018 Webkul.
+* 2010-2020 Webkul.
 *
 * NOTICE OF LICENSE
 *
@@ -13,7 +13,7 @@
 * needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
 *
 *  @author    Webkul IN <support@webkul.com>
-*  @copyright 2010-2018 Webkul IN
+*  @copyright 2010-2020 Webkul IN
 *  @license   https://store.webkul.com/license.html
 */
 
@@ -59,6 +59,7 @@ CREATE TABLE IF NOT EXISTS `PREFIX_htl_branch_info` (
 	`longitude` decimal(11,8) NOT NULL,
 	`map_formated_address` text NOT NULL,
 	`map_input_text` text NOT NULL,
+	`active_refund` tinyint(1) unsigned NOT NULL DEFAULT '0',
 	`date_add` datetime NOT NULL,
 	`date_upd` datetime NOT NULL,
 	PRIMARY KEY (`id`)
@@ -121,11 +122,11 @@ CREATE TABLE IF NOT EXISTS `PREFIX_htl_cart_booking_data` (
 	`quantity` int(11) NOT NULL,
 	`booking_type` tinyint(4) NOT NULL,
 	`comment` text NOT NULL,
-	`is_refunded` tinyint(4) NOT NULL,
 	`is_back_order` tinyint(4) NOT NULL,
 	`extra_demands` text NOT NULL,
 	`date_from` datetime NOT NULL,
 	`date_to` datetime NOT NULL,
+	`is_refunded` tinyint(1) NOT NULL DEFAULT '0',
 	`date_add` datetime NOT NULL,
 	`date_upd` datetime NOT NULL,
 	PRIMARY KEY (`id`)
@@ -149,8 +150,23 @@ CREATE TABLE IF NOT EXISTS `PREFIX_htl_booking_detail` (
 	`date_to` datetime NOT NULL,
 	`total_price_tax_excl` decimal(20,6) NOT NULL,
 	`total_price_tax_incl` decimal(20,6) NOT NULL,
-	`is_refunded` tinyint(4) NOT NULL,
+	`total_paid_amount` decimal(20,6) NOT NULL DEFAULT '0.000000',
 	`is_back_order` tinyint(4) NOT NULL,
+	`hotel_name` varchar(255) DEFAULT NULL,
+	`room_type_name` varchar(255) DEFAULT NULL,
+	`city` varchar(255) NOT NULL,
+	`state` varchar(255) DEFAULT NULL,
+	`country` varchar(255) DEFAULT NULL,
+	`zipcode` varchar(12) DEFAULT NULL,
+	`phone` varchar(32) DEFAULT NULL,
+	`email` varchar(128) DEFAULT NULL,
+	`check_in_time` varchar(32) DEFAULT NULL,
+	`check_out_time` varchar(32) DEFAULT NULL,
+	`room_num` varchar(225) DEFAULT NULL,
+	`adult` smallint(6) NOT NULL DEFAULT '0',
+	`children` smallint(6) NOT NULL DEFAULT '0',
+	`is_refunded` tinyint(1) NOT NULL DEFAULT '0',
+	-- `available_for_order` tinyint(1) NOT NULL DEFAULT '0',
 	`date_add` datetime NOT NULL,
 	`date_upd` datetime NOT NULL,
 	PRIMARY KEY (`id`)
@@ -186,12 +202,6 @@ CREATE TABLE IF NOT EXISTS `PREFIX_htl_room_status` (
 	PRIMARY KEY (`id`)
 ) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
-CREATE TABLE IF NOT EXISTS `PREFIX_htl_order_status` (
-	`id` int(11) NOT NULL AUTO_INCREMENT,
-	`status` text NOT NULL,
-	PRIMARY KEY (`id`)
-) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
-
 CREATE TABLE IF NOT EXISTS `PREFIX_htl_room_allotment_type` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `type` text NOT NULL,
@@ -212,74 +222,33 @@ CREATE TABLE IF NOT EXISTS `PREFIX_htl_advance_payment` (
 	PRIMARY KEY (`id`)
 ) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
-CREATE TABLE IF NOT EXISTS `PREFIX_htl_customer_adv_payment` (
-	`id` int(11) NOT NULL AUTO_INCREMENT,
-	`id_cart` int(11) NOT NULL,
-	`id_order` int(11) NOT NULL,
-	`id_guest` int(11) NOT NULL,
-	`id_customer` int(11) NOT NULL,
-	`id_currency` int(11) NOT NULL,
-	`total_paid_amount` decimal(20,6) NOT NULL,
-	`total_order_amount` decimal(20,6) NOT NULL,
-	`date_add` datetime NOT NULL,
-	`date_upd` datetime NOT NULL,
-	PRIMARY KEY (`id`)
-) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
-
-CREATE TABLE IF NOT EXISTS `PREFIX_htl_customer_adv_product_payment` (
-	`id` int(11) NOT NULL AUTO_INCREMENT,
-	`id_cart` int(11) NOT NULL,
-	`id_hotel` int(11) NOT NULL,
-	`id_room` int(11) NOT NULL,
-	`id_product` int(11) NOT NULL,
-	`quantity` int(11) NOT NULL,
-	`id_order` int(11) NOT NULL,
-	`id_guest` int(11) NOT NULL,
-	`id_customer` int(11) NOT NULL,
-	`id_currency` int(11) NOT NULL,
-	`product_price_tax_incl` decimal(20,6) NOT NULL,
-	`product_price_tax_excl` decimal(20,6) NOT NULL,
-	`advance_payment_amount` decimal(20,6) NOT NULL,
-	`date_from` datetime NOT NULL,
-	`date_to` datetime NOT NULL,
-	`date_add` datetime NOT NULL,
-	`date_upd` datetime NOT NULL,
-	PRIMARY KEY (`id`)
-) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
-
 CREATE TABLE IF NOT EXISTS `PREFIX_htl_order_refund_rules` (
-	`id` int(11) NOT NULL AUTO_INCREMENT,
+	`id_refund_rule` int(11) NOT NULL AUTO_INCREMENT,
 	`payment_type` int(2) unsigned NOT NULL,
 	`deduction_value_full_pay` decimal(20,6) NOT NULL,
 	`deduction_value_adv_pay` decimal(20,6) NOT NULL,
 	`days` decimal(35,0) NOT NULL,
 	`date_add` datetime NOT NULL,
 	`date_upd` datetime NOT NULL,
-	PRIMARY KEY (`id`)
+	PRIMARY KEY (`id_refund_rule`)
 ) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
-CREATE TABLE IF NOT EXISTS `PREFIX_htl_order_refund_info` (
-	`id` int(11) NOT NULL AUTO_INCREMENT,
-	`id_order` int(11) NOT NULL,
-	`id_product` int(11) NOT NULL,
-	`id_customer` int(11) NOT NULL,
-	`id_currency` int(11) NOT NULL,
-	`order_amount` decimal(20,6) NOT NULL DEFAULT '0.000000',
-	`num_rooms` int(5) unsigned NOT NULL,
-	`date_from` datetime NOT NULL,
-	`date_to` datetime NOT NULL,
-	`refund_stage_id` int(11) NOT NULL,
-	`cancellation_reason` text NOT NULL,
-	`refunded_amount` decimal(20,6) NOT NULL DEFAULT '0.000000',
+CREATE TABLE IF NOT EXISTS `PREFIX_htl_order_refund_rules_lang` (
+	`id_refund_rule` int(10) unsigned NOT NULL,
+	`id_lang` int(10) unsigned NOT NULL,
+	`name` varchar(255) DEFAULT NULL,
+	`description` text,
+	PRIMARY KEY (`id_refund_rule`, `id_lang`)
+) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `PREFIX_htl_branch_refund_rules` (
+	`id_hotel_refund_rule` int(11) NOT NULL AUTO_INCREMENT,
+	`id_refund_rule` int(10) unsigned NOT NULL,
+	`id_hotel` int(10) unsigned NOT NULL,
+	`position` int(10) unsigned NOT NULL DEFAULT '0',
 	`date_add` datetime NOT NULL,
 	`date_upd` datetime NOT NULL,
-	PRIMARY KEY (`id`)
-) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
-
-CREATE TABLE IF NOT EXISTS `PREFIX_htl_order_refund_stages` (
-	`id` int(11) NOT NULL AUTO_INCREMENT,
-	`name` varchar(255) NOT NULL,
-	PRIMARY KEY (`id`)
+	PRIMARY KEY (`id_hotel_refund_rule`)
 ) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 CREATE TABLE IF NOT EXISTS `PREFIX_htl_order_restrict_date` (
@@ -313,6 +282,12 @@ CREATE TABLE IF NOT EXISTS `PREFIX_htl_room_type_feature_pricing_lang` (
 	`id_lang` int(10) unsigned NOT NULL,
 	`feature_price_name` varchar(255) character set utf8 NOT NULL,
 	PRIMARY KEY (`id_feature_price`, `id_lang`)
+) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8;
+
+CREATE TABLE `PREFIX_htl_room_type_feature_pricing_group` (
+  `id_feature_price` int(10) unsigned NOT NULL,
+  `id_group` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`id_feature_price`,`id_group`)
 ) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `PREFIX_htl_room_type_global_demand` (
@@ -387,7 +362,8 @@ CREATE TABLE IF NOT EXISTS `PREFIX_htl_access` (
   PRIMARY KEY (`id_profile`, `id_hotel`)
 ) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8;
 
-insert into `PREFIX_htl_order_refund_stages` (`name`) values ('Waiting'),
-                                                              ('Accepted'),
-                                                              ('Refunded'),
-                                                              ('Rejected');
+CREATE TABLE IF NOT EXISTS `PREFIX_htl_order_status` (
+	`id` int(11) NOT NULL AUTO_INCREMENT,
+	`status` text NOT NULL,
+	PRIMARY KEY (`id`)
+) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;

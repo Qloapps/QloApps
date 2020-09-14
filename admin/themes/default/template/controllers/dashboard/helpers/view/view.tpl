@@ -103,7 +103,7 @@
 						<dd>{l s="Connect with the Qloapps community"}</dd>
 					</dl>
 					<dl>
-						<dt><a href="https://store.webkul.com/Qloapps.html" class="_blank">{l s="Qloapps Addons"}</a></dt>
+						<dt><a href="https://qloapps.com/addons/" class="_blank">{l s="Qloapps Addons"}</a></dt>
 						<dd>{l s="Enhance your store Qloapps modules"}</dd>
 					</dl>
 					<dl>

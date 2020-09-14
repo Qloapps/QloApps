@@ -31,7 +31,7 @@
   <tab id="Attachments" name="پیوست‌ها"/>
   <tab id="Orders_1" name="سفارش‌ها"/>
   <tab id="Invoices" name="صورت حساب‌ها"/>
-  <tab id="Merchandise_Returns" name="بازگشت‌های کالا"/>
+  <!-- <tab id="Merchandise_Returns" name="بازگشت‌های کالا"/> -->
   <tab id="Delivery_Slips" name="رسیدهای تحویل"/>
   <tab id="Credit_Slips" name="رسیدهای اعتبار"/>
   <tab id="Statuses" name="وضعیت‌ها"/>

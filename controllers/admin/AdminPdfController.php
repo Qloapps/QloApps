@@ -73,7 +73,6 @@ class AdminPdfControllerCore extends AdminController
             die(Tools::displayError('The order cannot be found within your database.'));
         }
 
-        $order->products = OrderSlip::getOrdersSlipProducts($order_slip->id, $order);
         $this->generatePDF($order_slip, PDF::TEMPLATE_ORDER_SLIP);
     }
 
@@ -129,7 +128,6 @@ class AdminPdfControllerCore extends AdminController
         foreach ($id_order_slips_list as $id_order_slips) {
             $order_slips[] = new OrderSlip((int)$id_order_slips);
         }
-
         $this->generatePDF($order_slips, PDF::TEMPLATE_ORDER_SLIP);
     }
 

@@ -1,0 +1,147 @@
+/**
+* 2010-2020 Webkul.
+*
+/* * NOTICE OF LICENSE
+*
+* All right is reserved,
+* Please go through this link for complete license : https://store.webkul.com/license.html
+*
+* DISCLAIMER
+*
+* Do not edit or add to this file if you wish to upgrade this module to newer
+* versions in the future. If you wish to customize this module for your
+* needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
+*
+*  @author    Webkul IN <support@webkul.com>
+*  @copyright 2010-2020 Webkul IN
+*  @license   https://store.webkul.com/license.html
+*/
+
+#search_hotel_block_form .header-rmsearch-input {
+  border-radius: 4px;
+  border: none;
+  color: #333;
+  font-size: 14px;
+  font-weight: 400;
+  padding: 7px 5px 7px 12px;
+  border: 1px solid #555555;
+  background-color: #FFF;}
+  #search_hotel_block_form .header-rmsearch-input:active, #search_hotel_block_form .header-rmsearch-input:focus {
+    border: 2px solid #1292FF;}
+  #search_hotel_block_form #hotel_location, #search_hotel_block_form #id_hotel_button, #search_hotel_block_form #guest_occupancy {
+    padding-left: 45px;
+    padding-right: 35px;
+    background-repeat: no-repeat;
+    background-position: 4% 50%;}
+  #search_hotel_block_form #hotel_location {
+    background-image: url("../../views/img/icon-hotel.svg");}
+  #search_hotel_block_form #id_hotel_button {
+    background: url("../../views/img/icon-hotel.svg") no-repeat 4% 50%, url("../../views/img/icon-dropdown-arrow.svg") no-repeat 96% 50%;
+    background-color: #FFF;}
+  #search_hotel_block_form #guest_occupancy {
+    background: url("../../views/img/icon-users.svg") no-repeat 4% 50%, url("../../views/img/icon-dropdown-arrow.svg") no-repeat 96% 50%;
+    background-color: #FFF;}
+
+  #search_hotel_block_form .input-date {
+    cursor: text;
+    background-image: url("../../views/img/icon-calendar.svg");
+    background-repeat: no-repeat;
+    padding-right: 40px;
+    background-position: 96% 50%;}
+  #search_hotel_block_form #hotel_location {
+    padding-right: 15px;}
+  .header-rmsearch-input::-webkit-input-placeholder {
+    color: #333;}
+  .header-rmsearch-input:-moz-placeholder {
+    /* Firefox 18- */
+    color: #999999;
+    font-weight: 400;}
+  .header-rmsearch-input::-moz-placeholder {
+    /* Firefox 19+ */
+    color: #999999;
+    font-weight: 400;}
+  .header-rmsearch-input:-ms-input-placeholder {
+    color: #999999;
+    font-weight: 400;}
+  .search_block_container .dropdown-toggle {
+    background-color: #f2f2f2;
+    width: 100%;
+    border-color: #d6d4d4;
+    color: #000;
+    padding: 0px !important;
+    height: 40px;}
+
+.header-rmsearch-wrapper .dropdown {
+  position: relative;}
+.header-rmsearch-wrapper .dropdown-menu {
+  margin: 0px;}
+.header-rmsearch-wrapper .hotel_dropdown_ul {
+  position: absolute;
+  font-size: 14px;
+  z-index: 100;
+  font-weight: 400;
+  padding: 0px;
+  width: 100%;
+  box-shadow: 0 8px 25px -4px rgba(0,0,0,0.39);
+  max-height: 145px;
+  overflow-y: auto;}
+.header-rmsearch-wrapper .location_search_results_ul {
+  position: absolute;
+  font-size: 14px;
+  z-index: 100;
+  font-weight: 400;
+  padding: 0px;
+  width: 100%;
+  box-shadow: 0 8px 25px -4px rgba(0,0,0,0.39);
+  max-height: 145px;
+  overflow-y: auto;}
+  .header-rmsearch-wrapper .location_search_results_ul li, .header-rmsearch-wrapper .hotel_dropdown_ul li {
+    background-color: #fff;
+    color: #333333;
+    cursor: pointer;
+    text-align: left;
+    font-size: 14px;
+    list-style: outside none none;
+    padding: 15px;}
+    .header-rmsearch-wrapper .location_search_results_ul li:hover, .header-rmsearch-wrapper .location_search_results_ul li:focus, .header-rmsearch-wrapper .location_search_results_ul li:active, .header-rmsearch-wrapper .hotel_dropdown_ul li:hover, .header-rmsearch-wrapper .hotel_dropdown_ul li:focus, .header-rmsearch-wrapper .hotel_dropdown_ul li:active {
+      background-color: #379bf0;
+      color: #FFFFFF;}
+
+
+.header-rmsearch-wrapper .label-desc-txt {
+  font-size: 12px;
+  color: #777777;}
+.header-rmsearch-wrapper .btn {
+  font-weight: 600;}
+.header-rmsearch-wrapper .btn-primary {
+  background-color: #1292FF;
+  color: #FFF;}
+.header-rmsearch-wrapper .btn-lg {
+  padding: 19px;}
+.header-rmsearch-wrapper .wk-padding-5 {
+  padding-left: 5px;
+  padding-right: 5px;}
+  /* .header-rmsearch-wrapper {
+    background-color: #FFF;
+    border-radius: 6px;
+    padding: 20px;} */
+    .header-search-tag-line {
+      font-size: 19px;
+      color: #000000;
+      font-weight: 600;
+      text-align: center;
+      margin-top: 0px;}
+    .header-search-tag-desc {
+      font-size: 14px;
+      color: #333333;
+      line-height: 22px;
+      text-align: center;}
+      #search_hotel_block_form .form-group {
+        margin-bottom: 20px;}
+      #search_hotel_block_form #search_room_submit {
+        background-color: #1292FF;
+        width: 100%;
+        font-size: 13px;
+        text-transform: uppercase;
+        border: none;
+        border-radius: 4px;}

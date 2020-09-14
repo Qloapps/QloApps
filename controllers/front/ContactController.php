@@ -274,16 +274,16 @@ class ContactControllerCore extends FrontController
                         $objHtlImg = new HotelImage($hotel['id_cover_img'])
                     )
                 ) {
-                    if (file_exists(
-                        _PS_MODULE_DIR_.'hotelreservationsystem/views/img/hotel_img/'.$objHtlImg->hotel_image_id.'.jpg'
-                    )) {
-                        $hotel['image_url'] = _MODULE_DIR_.'hotelreservationsystem/views/img/hotel_img/'.
-                        $objHtlImg->hotel_image_id.'.jpg';
+                    // by webkul to get media link.
+                    $htlImgLink = $this->context->link->getMediaLink(_MODULE_DIR_.'hotelreservationsystem/views/img/hotel_img/'.$objHtlImg->hotel_image_id.'.jpg');
+
+                    if ((bool)Tools::file_get_contents($htlImgLink)) {
+                        $hotel['image_url'] = $htlImgLink;
                     } else {
-                        $hotel['image_url'] = _MODULE_DIR_.'hotelreservationsystem/views/img/Slices/hotel-default-icon.png';
+                        $hotel['image_url'] = $this->context->link->getMediaLink(_MODULE_DIR_.'hotelreservationsystem/views/img/Slices/hotel-default-icon.png');
                     }
                 } else {
-                    $hotel['image_url'] = _MODULE_DIR_.'hotelreservationsystem/views/img/Slices/hotel-default-icon.png';
+                    $hotel['image_url'] = $this->context->link->getMediaLink(_MODULE_DIR_.'hotelreservationsystem/views/img/Slices/hotel-default-icon.png');
                 }
             }
         }

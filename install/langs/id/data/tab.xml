@@ -31,7 +31,7 @@
   <tab id="Attachments" name="Lampiran"/>
   <tab id="Orders_1" name="Penjualan"/>
   <tab id="Invoices" name="Invoice"/>
-  <tab id="Merchandise_Returns" name="Retur barang"/>
+  <!-- <tab id="Merchandise_Returns" name="Retur barang"/> -->
   <tab id="Delivery_Slips" name="Nota pengiriman"/>
   <tab id="Credit_Slips" name="Nota kredit"/>
   <tab id="Statuses" name="Status"/>

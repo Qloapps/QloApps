@@ -109,7 +109,7 @@ class blockcart extends Module
                         }
                         $product['is_gift'] = 1;
                         $cart_rule['value_real'] = Tools::ps_round($cart_rule['value_real'] - $product['price_wt'], (int) $currency->decimals * _PS_PRICE_DISPLAY_PRECISION_);
-                        $cart_rule['value_tax_exc'] = Tools::ps_round($cart_rule['value_tax_exc'] - $product['price'],(int) $currency->decimals * _PS_PRICE_DISPLAY_PRECISION_);
+                        $cart_rule['value_tax_exc'] = Tools::ps_round($cart_rule['value_tax_exc'] - $product['price'], (int) $currency->decimals * _PS_PRICE_DISPLAY_PRECISION_);
                     }
                 }
             }

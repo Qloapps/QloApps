@@ -180,7 +180,7 @@ class OrderHistoryCore extends ObjectModel
                     $employee = null;
                 }
             }
-            
+
 
             // foreach products of the order
             foreach ($order->getProductsDetail() as $product) {

@@ -173,10 +173,11 @@ class WebserviceOutputXMLCore implements WebserviceOutputInterface
     }
     public function overrideContent($content)
     {
+        // changed QloApps in place of prestashop
         $xml = '<?xml version="1.0" encoding="UTF-8"?>'."\n";
-        $xml .= '<prestashop xmlns:xlink="http://www.w3.org/1999/xlink">'."\n";
+        $xml .= '<qloapps xmlns:xlink="http://www.w3.org/1999/xlink">'."\n";
         $xml .= $content;
-        $xml .= '</prestashop>'."\n";
+        $xml .= '</qloapps>'."\n";
         return $xml;
     }
     public function renderAssociationWrapperHeader()

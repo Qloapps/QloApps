@@ -1,6 +1,6 @@
 <?php
 /**
-* 2010-2018 Webkul.
+* 2010-2020 Webkul.
 *
 * NOTICE OF LICENSE
 *
@@ -14,7 +14,7 @@
 * needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
 *
 *  @author    Webkul IN <support@webkul.com>
-*  @copyright 2010-2018 Webkul IN
+*  @copyright 2010-2020 Webkul IN
 *  @license   https://store.webkul.com/license.html
 */
 
@@ -46,6 +46,27 @@ class HotelRoomTypeGlobalDemand extends ObjectModel
                 'size' => 128
             ),
     ));
+
+    protected $webserviceParameters = array(
+        'objectsNodeName' => 'extra_demands',
+        'objectNodeName' => 'extra_demand',
+        'fields' => array(
+            'id_tax_rules_group' => array(
+                'xlink_resource' => array(
+                    'resourceName' => 'tax_rule_groups'
+                )
+            ),
+        ),
+        'associations' => array(
+            'demand_advance_options' => array(
+                'resource' => 'advance_option',
+                'setter' => false,
+                'fields' => array(
+                    'id' => array('required' => true),
+                )
+            ),
+        ),
+    );
 
     const WK_PRICE_CALC_METHOD_EACH_DAY = 1;
     const WK_PRICE_CALC_METHOD_RANGE = 0;
@@ -121,6 +142,14 @@ class HotelRoomTypeGlobalDemand extends ObjectModel
         return Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue(
             'SELECT `id_tax_rules_group` FROM `'._DB_PREFIX_.'htl_room_type_global_demand`
             WHERE `id_global_demand` = '.(int)$idGlobalDemand
+        );
+    }
+
+    // Webservice :: get advance options of the global demand
+    public function getWsDemandAdvanceOptions()
+    {
+        return Db::getInstance()->executeS(
+            'SELECT `id_option` as `id` FROM `'._DB_PREFIX_.'htl_room_type_global_demand_advance_option` WHERE `id_global_demand` = '.(int)$this->id.' ORDER BY `id` ASC'
         );
     }
 }

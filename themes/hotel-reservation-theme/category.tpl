@@ -87,7 +87,8 @@
                             {if !empty($room_v['feature'])}
                                 <div class="rm_amenities_cont">
                                     {foreach from=$room_v['feature'] key=feat_k item=feat_v}
-                                        <img src="{$feat_img_dir}{$feat_v['value']}" class="rm_amen">
+                                        <img src="{$link->getMediaLink("`$feat_img_dir`{$feat_v.value}")}" class="rm_amen"> {* by webkul change meddia link*}
+                                        {* <img src="{$feat_img_dir}{$feat_v['value']}" class="rm_amen"> *}
                                     {/foreach}
                                 </div>
                             {/if}

@@ -1,6 +1,6 @@
 <?php
 /**
-* 2010-2018 Webkul.
+* 2010-2020 Webkul.
 *
 * NOTICE OF LICENSE
 *
@@ -14,7 +14,7 @@
 * needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
 *
 *  @author    Webkul IN <support@webkul.com>
-*  @copyright 2010-2018 Webkul IN
+*  @copyright 2010-2020 Webkul IN
 *  @license   https://store.webkul.com/license.html
 */
 
@@ -124,17 +124,14 @@ class AdminTestimonialsModuleSettingController extends ModuleAdminController
     {
         $image = '';
         if ($echo) {
-            $imgUrl = _PS_MODULE_DIR_.$this->module->name.'/views/img/hotels_testimonials_img/'.
-            $row['id_testimonial_block'].'.jpg';
-            if (file_exists($imgUrl)) {
-                $modImgUrl = _MODULE_DIR_.$this->module->name.'/views/img/hotels_testimonials_img/'.
-                $row['id_testimonial_block'].'.jpg';
-                $image = "<img class='img-thumbnail img-responsive' style='max-width:70px' src='".$modImgUrl."'>";
+            $imgUrl = $this->context->link->getMediaLink(_MODULE_DIR_.$this->module->name.'/views/img/hotels_testimonials_img/'.$row['id_testimonial_block'].'.jpg');
+            if ((bool)Tools::file_get_contents($imgUrl)) {
+                $image = "<img class='img-thumbnail img-responsive' style='max-width:70px' src='".$imgUrl."'>";
             }
         }
         if ($image == '') {
-            $modImgUrl = _MODULE_DIR_.$this->module->name.'/views/img/default-user.jpg';
-            $image = "<img class='img-thumbnail img-responsive' style='max-width:70px' src='".$modImgUrl."'>";
+            $imgUrl = $this->context->link->getMediaLink(_MODULE_DIR_.$this->module->name.'/views/img/default-user.jpg');
+            $image = "<img class='img-thumbnail img-responsive' style='max-width:70px' src='".$imgUrl."'>";
         }
         return $image;
     }
@@ -155,10 +152,9 @@ class AdminTestimonialsModuleSettingController extends ModuleAdminController
         if (!($obj = $this->loadObject(true))) {
             return;
         }
-        $psImgUrl = _PS_MODULE_DIR_.$this->module->name.'/views/img/hotels_testimonials_img/'.$obj->id.'.jpg';
-        if ($imgExist = file_exists($psImgUrl)) {
-            $modImgUrl = _MODULE_DIR_.$this->module->name.'/views/img/hotels_testimonials_img/'.$obj->id.'.jpg';
-            $image = "<img class='img-thumbnail img-responsive' style='max-width:100px' src='".$modImgUrl."'>";
+        $imgUrl = $this->context->link->getMediaLink(_MODULE_DIR_.$this->module->name.'/views/img/hotels_testimonials_img/'.$obj->id.'.jpg');
+        if ($imgExist = (bool)Tools::file_get_contents($imgUrl)) {
+            $image = "<img class='img-thumbnail img-responsive' style='max-width:100px' src='".$imgUrl."'>";
         }
 
         $this->fields_form = array(

@@ -1655,6 +1655,8 @@ abstract class ModuleCore
             $untrusted_modules_list_content = Tools::file_get_contents(_PS_ROOT_DIR_.self::CACHE_FILE_UNTRUSTED_MODULES_LIST);
         }
 
+        $objModule = Module::getInstanceByName($module_name);
+
         // If the module is trusted, which includes both partner modules and modules bought on Addons
 
         if (stripos($trusted_modules_list_content, $module_name) !== false) {
@@ -1667,6 +1669,9 @@ abstract class ModuleCore
             }
             // The module seems to be trusted, but it does not seem to be dedicated to this country
             return 2;
+        // Check if module is from webkul then it will be considered as trusted module
+        } elseif (isset($objModule->author) && (strtolower($objModule->author) == 'webkul')) {
+            return 1;
         } elseif (stripos($untrusted_modules_list_content, $module_name) !== false) {
             // If the module is already in the untrusted list, then return 0 (untrusted)
             return 0;

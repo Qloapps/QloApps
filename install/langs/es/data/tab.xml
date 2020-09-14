@@ -30,7 +30,7 @@
   <tab id="Attachments" name="Adjuntos"/>
   <tab id="Orders_1" name="Pedidos"/>
   <tab id="Invoices" name="Facturas"/>
-  <tab id="Merchandise_Returns" name="Devoluciones de mercancía"/>
+  <!-- <tab id="Merchandise_Returns" name="Devoluciones de mercancía"/> -->
   <tab id="Delivery_Slips" name="Albaranes de entrega"/>
   <tab id="Credit_Slips" name="Factura de abonos"/>
   <tab id="Statuses" name="Estados"/>

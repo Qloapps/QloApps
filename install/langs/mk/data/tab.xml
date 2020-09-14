@@ -31,7 +31,7 @@
   <tab id="Attachments" name="прилози"/>
   <tab id="Orders_1" name="Нарачки"/>
   <tab id="Invoices" name="Фактури"/>
-  <tab id="Merchandise_Returns" name="Враќање на производи"/>
+  <!-- <tab id="Merchandise_Returns" name="Враќање на производи"/> -->
   <tab id="Delivery_Slips" name="Потврда за испорака"/>
   <tab id="Credit_Slips" name="Кредитни исечоци"/>
   <tab id="Statuses" name="Состојби"/>

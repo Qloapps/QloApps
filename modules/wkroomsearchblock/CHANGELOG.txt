@@ -1,4 +1,23 @@
 -----------------------------
+# V1.0.3 to V1.1.0
+-----------------------------
+
+## Added features
+
+[+] FO : All search panels in the QloApps are integrated in this module now. Search panels will be shown by different hooks.
+[+] [CO] : License.txt added.
+[+] [CO] : Readme.md added.
+
+## Improved/changed features
+
+[*] FO : Design of all search panels are changed.
+
+## Update Policy
+
+- Mobule need only file update, can be updated only by UPLOADING new version on module
+
+
+-----------------------------
 # V1.0.2 to V1.0.3
 -----------------------------
 

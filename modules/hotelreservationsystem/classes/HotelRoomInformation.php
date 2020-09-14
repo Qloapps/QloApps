@@ -1,6 +1,6 @@
 <?php
 /**
-* 2010-2018 Webkul.
+* 2010-2020 Webkul.
 *
 * NOTICE OF LICENSE
 *
@@ -14,7 +14,7 @@
 * needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
 *
 *  @author    Webkul IN <support@webkul.com>
-*  @copyright 2010-2018 Webkul IN
+*  @copyright 2010-2020 Webkul IN
 *  @license   https://store.webkul.com/license.html
 */
 
@@ -42,6 +42,29 @@ class HotelRoomInformation extends ObjectModel
             'comment' =>    array('type' => self::TYPE_STRING),
             'date_add' =>    array('type' => self::TYPE_DATE, 'validate' => 'isDate'),
             'date_upd' =>    array('type' => self::TYPE_DATE, 'validate' => 'isDate')
+        ),
+    );
+
+    protected $webserviceParameters = array(
+        'objectMethods' => array(
+            'add' => 'addWs',
+            'update' => 'updateWs',
+            'delete' => 'deleteWs',
+        ),
+        'objectsNodeName' => 'rooms',
+        'objectNodeName' => 'room',
+        'fields' => array(
+            'id_product' => array(
+                'xlink_resource' => array(
+                    'resourceName' => 'products',
+                )
+            ),
+            'id_hotel' => array(
+                'setter' => false,
+                'xlink_resource' => array(
+                    'resourceName' => 'hotels',
+                )
+            ),
         ),
     );
 
@@ -202,5 +225,33 @@ class HotelRoomInformation extends ObjectModel
     public function getRoomTypeBookedRoomsForDateRange($id_hotel, $id_product, $date_from, $date_to)
     {
         return Db::getInstance()->executeS('SELECT * FROM `'._DB_PREFIX_.'htl_booking_detail` where `date_from`< \''.pSQL($date_to).'\' AND `date_to`>\''.$date_from.'\' AND `id_product`='.(int) $id_product.' AND `id_hotel`='.(int) $id_hotel);
+    }
+
+    // Webservice :: webservice add function
+    public function addWs($autodate = true, $null_values = false)
+    {
+        $objRoomType = new HotelRoomType();
+        if ($roomTypeInfo = $objRoomType->getRoomTypeInfoByIdProduct($this->id_product)) {
+            $this->id_hotel = $roomTypeInfo['id_hotel'];
+            return $this->add($autodate, $null_values);
+        }
+        return false;
+    }
+
+    // Webservice :: webservice update function
+    public function updateWs($null_values = false)
+    {
+        $objRoomType = new HotelRoomType();
+        if ($roomTypeInfo = $objRoomType->getRoomTypeInfoByIdProduct($this->id_product)) {
+            $this->id_hotel = $roomTypeInfo['id_hotel'];
+            return $this->update($null_values);
+        }
+        return false;
+    }
+
+    // Webservice :: webservice delete function
+    public function deleteWs()
+    {
+        return $this->delete();
     }
 }

@@ -45,20 +45,27 @@ class FeatureCore extends ObjectModel
         ),
     );
 
-
     protected $webserviceParameters = array(
-        'objectsNodeName' => 'product_features',
-        'objectNodeName' => 'product_feature',
-        'fields' => array(),
+        'objectsNodeName' => 'room_type_features',
+        'objectNodeName' => 'room_type_feature',
+        'fields' => array(
+            'id_default_image' => array(
+                'getter' => 'getWsFeatureImage',
+                'setter' => false,
+                'xlink_resource' => array(
+                    'resourceName' => 'images',
+                    'subResourceName' => 'features'
+                )
+            ),
+        ),
     );
 
     /**
      * Get a feature data for a given id_feature and id_lang
-     *
      * @param int $id_lang Language id
      * @param int $id_feature Feature id
      * @return array Array with feature's data
-     */
+    */
     public static function getFeature($id_lang, $id_feature)
     {
         return Db::getInstance()->getRow('
@@ -347,5 +354,11 @@ class FeatureCore extends ObjectModel
 				FROM `'._DB_PREFIX_.'feature`';
         $position = DB::getInstance()->getValue($sql);
         return (is_numeric($position)) ? $position : - 1;
+    }
+
+    // Webservice :: get image id of the feature
+    public function getWsFeatureImage()
+    {
+        return $this->id;
     }
 }

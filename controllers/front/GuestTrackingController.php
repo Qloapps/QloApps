@@ -186,9 +186,6 @@ class GuestTrackingControllerCore extends FrontController
             $objHtlBranchInfo = new HotelBranchInformation();
             $objBookingDetail = new HotelBookingDetail();
             $objRoomType = new HotelRoomType();
-            $objCustomerAdv = new HotelCustomerAdvancedPayment();
-            $objOrdRefundInfo = new HotelOrderRefundInfo();
-            $objRefundStages = new HotelOrderRefundStages();
 
             $nonRequestedRooms = 0;
             $anyBackOrder = 0;
@@ -268,14 +265,6 @@ class GuestTrackingControllerCore extends FrontController
                             $cartHotelData[$type_key]['paid_unit_price_tax_excl'] = ($order_details_obj->total_price_tax_excl)/$order_details_obj->product_quantity;
                             $cartHotelData[$type_key]['paid_unit_price_tax_incl'] = ($order_details_obj->total_price_tax_incl)/$order_details_obj->product_quantity;
 
-                            //work on entring refund data
-                            $ord_refnd_info = $objOrdRefundInfo->getOderRefundInfoByIdOrderIdProductByDate($idOrder, $type_value['product_id'], $data_v['date_from'], $data_v['date_to']);
-                            if ($ord_refnd_info) {
-                                $stage_name = $objRefundStages->getNameById($ord_refnd_info['refund_stage_id']);
-                            } else {
-                                $stage_name = '';
-                                $nonRequestedRooms = 1;
-                            }
                             if (isset($cartHotelData[$type_key]['date_diff'][$date_join])) {
                                 $cartHotelData[$type_key]['date_diff'][$date_join]['num_rm'] += 1;
 
@@ -290,8 +279,6 @@ class GuestTrackingControllerCore extends FrontController
                                 if ($data_v['is_back_order']) {
                                     $anyBackOrder = 1;
                                 }
-                                //refund_stage
-                                $cartHotelData[$type_key]['date_diff'][$date_join]['stage_name'] = $stage_name;
                             } else {
                                 $num_days = $objBookingDetail->getNumberOfDays($data_v['date_from'], $data_v['date_to']);
 
@@ -308,8 +295,6 @@ class GuestTrackingControllerCore extends FrontController
                                 if ($data_v['is_back_order']) {
                                     $anyBackOrder = 1;
                                 }
-                                //refund_stage
-                                $cartHotelData[$type_key]['date_diff'][$date_join]['stage_name'] = $stage_name;
                             }
                             $cartHotelData[$type_key]['date_diff'][$date_join]['extra_demands'] = $objBookingDemand->getRoomTypeBookingExtraDemands(
                                 $idOrder,
@@ -366,8 +351,6 @@ class GuestTrackingControllerCore extends FrontController
                             $cartHotelData[$type_key]['hotel_name'] = $hotelInfo['hotel_name'];
                         }
                     }
-                    //For Advanced Payment
-                    $order_adv_dtl = $objCustomerAdv->getCstAdvPaymentDtlByIdOrder($idOrder);
                 }
             }
             // end booking details entries
@@ -384,10 +367,8 @@ class GuestTrackingControllerCore extends FrontController
                     'shw_bo_msg' => Configuration::get('WK_SHOW_MSG_ON_BO'),
                     'back_ord_msg' => Configuration::get('WK_BO_MESSAGE'),
                     'order_has_invoice' => $order->hasInvoice(),
-                    'redirect_link_terms', $redirectTermsLink,
                     'cart_htl_data' => $cartHotelData,
                     'non_requested_rooms' => $nonRequestedRooms,
-                    'order_adv_dtl' => $order_adv_dtl
                 )
             );
             //end
@@ -398,7 +379,7 @@ class GuestTrackingControllerCore extends FrontController
         $this->context->smarty->assign(array(
             'shop_name' => Configuration::get('PS_SHOP_NAME'),
             'order_collection' => $order_list,
-            'return_allowed' => false,
+            'refund_allowed' => false,
             'invoiceAllowed' => (int)Configuration::get('PS_INVOICE'),
             'is_guest' => true,
             'group_use_tax' => (Group::getPriceDisplayMethod($customer->id_default_group) == PS_TAX_INC),

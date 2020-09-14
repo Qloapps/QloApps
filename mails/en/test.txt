@@ -1,12 +1,12 @@
 
-[/{shop_url}]
+[/{shop_url}] 
 
-Hello
+Hello 
 
 This is a TEST E-MAIL from your shop.
 
-If you can read this, the test was successful!.
+If you can read this, the test was successful!. 
 
 {shop_name} [/{shop_url}] powered by Webkul(tm)
-[https://webkul.com]
+[https://webkul.com] 
 

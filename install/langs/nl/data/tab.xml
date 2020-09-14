@@ -31,7 +31,7 @@
   <tab id="Attachments" name="Bijlagen"/>
   <tab id="Orders_1" name="Bestellingen"/>
   <tab id="Invoices" name="Facturen"/>
-  <tab id="Merchandise_Returns" name="Retourzendingen"/>
+  <!-- <tab id="Merchandise_Returns" name="Retourzendingen"/> -->
   <tab id="Delivery_Slips" name="Pakbonnen"/>
   <tab id="Credit_Slips" name="Creditnota's"/>
   <tab id="Statuses" name="Statussen"/>

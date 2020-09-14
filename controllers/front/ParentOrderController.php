@@ -167,18 +167,27 @@ class ParentOrderControllerCore extends FrontController
      */
     protected function _checkFreeOrder()
     {
-        // For Advanced Payment (when advance paid amount will be zero when voucher will be applied)
-        $freeAdvancePaymentOrder = false;
-        if (Module::isInstalled('hotelreservationsystem'))
-        {
-            require_once (_PS_MODULE_DIR_.'hotelreservationsystem/define.php');
-            $obj_adv_pmt = new HotelAdvancedPayment();
-            $freeAdvancePaymentOrder = $obj_adv_pmt->_checkFreeAdvancePaymentOrder();
+        // let see if any due amount for order status
+        $dueAmount = 0;
+        // check if customer has chosen advance payment option for this cart
+        if ($this->context->cart->is_advance_payment) {
+            $orderTotal = $this->context->cart->getOrderTotal(true, CART::ADVANCE_PAYMENT);
+            $dueAmount = ($this->context->cart->getOrderTotal() - $orderTotal);
+        } else {
+            $orderTotal = $this->context->cart->getOrderTotal();
         }
-        if (($this->context->cart->getOrderTotal() <= 0) || $freeAdvancePaymentOrder) {
+        if ($orderTotal <= 0) {
             $order = new FreeOrder();
             $order->free_order_class = true;
-            $order->validateOrder($this->context->cart->id, Configuration::get('PS_OS_PAYMENT'), 0, Tools::displayError('Free order', false), null, array(), null, false, $this->context->cart->secure_key);
+
+            // order status payment accepted if no amount is pending for the booking
+            if ($dueAmount > 0) {
+                $orderStatus = Configuration::get('PS_OS_AWAITING_REMOTE_PAYMENT');
+            } else {
+                $orderStatus = Configuration::get('PS_OS_PAYMENT');
+            }
+
+            $order->validateOrder($this->context->cart->id, $orderStatus, 0, Tools::displayError('Free order', false), null, array(), null, false, $this->context->cart->secure_key);
             return (int)Order::getOrderByCartId($this->context->cart->id);
         }
         return false;

@@ -159,185 +159,99 @@ class OrderDetailControllerCore extends FrontController
     public function initContent()
     {
         parent::initContent();
-
-        //By webkul to save order refund Info in our table
-        $saveRefundInfo = Tools::getValue('saveRefundInfo');
-        $saveTotalOrderRefundInfo = Tools::getValue('saveTotalOrderRefundInfo');
-        $method = Tools::getValue('method');
-        if ($method == 'getRoomTypeBookingDemands') {
-            $extraDemandsTpl = '';
-            if (($idProduct = Tools::getValue('id_product'))
-                && ($idOrder = Tools::getValue('id_order'))
-                && ($dateFrom = Tools::getValue('date_from'))
-                && ($dateTo = Tools::getValue('date_to'))
-            ) {
-                $objBookingDemand = new HotelBookingDemands();
-                $useTax = 0;
-                $customer = Context::getContext()->customer;
-                if (Group::getPriceDisplayMethod($customer->id_default_group) == PS_TAX_INC) {
-                    $useTax = 1;
-                }
-                if ($extraDemands = $objBookingDemand->getRoomTypeBookingExtraDemands(
-                    $idOrder,
-                    $idProduct,
-                    0,
-                    $dateFrom,
-                    $dateTo,
-                    1,
-                    0,
-                    $useTax
-                )) {
-                    $this->context->smarty->assign(
-                        array(
-                            'useTax' => $useTax,
-                            'extraDemands' => $extraDemands,
-                        )
-                    );
-                    $extraDemandsTpl .= $this->context->smarty->fetch(_PS_THEME_DIR_.'_partials/order_booking_demands.tpl');
-                }
-            }
-            die($extraDemandsTpl);
-        }
-
-        /*If requesst for only one room cancellation*/
-        if (isset($saveRefundInfo) && $saveRefundInfo) {
-            $id_order = Tools::getValue('id_order');
-            $id_customer = Tools::getValue('id_customer');
-            $id_currency = Tools::getValue('id_currency');
-            $id_product = Tools::getValue('id_product');
-            $num_rooms = Tools::getValue('num_rooms');
-            $date_from = Tools::getValue('date_from');
-            $date_to = Tools::getValue('date_to');
-            $amount = Tools::getValue('amount');
-            $cancellation_reason = Tools::getValue('cancellation_reason');
-
-            $objHtlRefundInfo = new HotelOrderRefundInfo();
-            $objHtlRefundInfo->id_order = $id_order;
-            $objHtlRefundInfo->id_product = $id_product;
-            $objHtlRefundInfo->id_customer = $id_customer;
-            $objHtlRefundInfo->id_currency = $id_currency;
-            $objHtlRefundInfo->refund_stage_id = 1;
-            $objHtlRefundInfo->order_amount = $amount;
-            $objHtlRefundInfo->cancellation_reason = $cancellation_reason;
-            $objHtlRefundInfo->num_rooms = $num_rooms;
-            $objHtlRefundInfo->date_from = $date_from;
-            $objHtlRefundInfo->date_to = $date_to;
-            $objHtlRefundInfo->save();
-
-            $id_shop = Context::getContext()->shop->id;
-
-            //customer info
-            $obj_customer = new Customer($id_customer);
-
-            //product info
-            $prod_obj = new Product($id_product, false, $this->context->language->id);
-            $product_name = $prod_obj->name;
-
-            //currency data
-            $obj_currency = new Currency($id_currency);
-            $currency_sign = $obj_currency->sign;
-
-            $admin_data = new EmployeeCore(1);
-            $templateVars = array(
-                '{shop_name}' => Tools::safeOutput(Configuration::get('PS_SHOP_NAME', null, null, $id_shop)),
-                '{history_url}' => Context::getContext()->link->getPageLink('history', true, Context::getContext()->language->id, null, false, $id_shop),
-                '{my_account_url}' => Context::getContext()->link->getPageLink('my-account', true, Context::getContext()->language->id, null, false, $id_shop),
-                '{currency_sign}' => $currency_sign,
-                '{amount}' => $amount,
-                '{date_from}' => $date_from,
-                '{date_to}' => $date_to,
-                '{cust_name}' => $obj_customer->firstname.' '.$obj_customer->lastname,
-                '{cust_email}' => $obj_customer->email,
-                '{product_name}' => $product_name,
-                '{admin_email}' => $admin_data->email,
-            );
-            $to = $obj_customer->email;
-            $id_lang = Configuration::get('PS_LANG_DEFAULT');
-            $temp_path = _PS_MODULE_DIR_.'hotelreservationsystem/mails/';
-            $template_name = 'request_processed';
-
-            if ($objHtlRefundInfo->id) {
-                if (Mail::Send($id_lang, $template_name, Mail::l('Order Cancellation Status', $id_lang), $templateVars, $to, null, null, null,  null, null, $temp_path, false, null, null)) {
-                    $mail_err = 0;
-                } else {
-                    $mail_err = 1;
-                }
-
-                die(Tools::jsonEncode(array('status' => 'success', 'mail_err' => $mail_err)));
-            } else {
-                die(Tools::jsonEncode(array('status' => 'failed', 'mail_err' => $mail_err)));
-            }
-        }
-
-        /*If requesst for only all rooms cancellation in the order*/
-        if (isset($saveTotalOrderRefundInfo) && $saveTotalOrderRefundInfo) {
-            $total_order_json_string_data = Tools::getValue('total_order_data');
-            $total_order_data = Tools::jsonDecode($total_order_json_string_data, true);
-            $id_customer = Tools::getValue('id_customer');
-            $id_currency = Tools::getValue('id_currency');
-            $cancellation_reason = Tools::getValue('cancellation_reason');
-            $id_order = Tools::getValue('id_order');
-
-            if (isset($total_order_data) && $total_order_data) {
-                $objHtlRefund = new HotelOrderRefundInfo();
-                foreach ($total_order_data as $data_k => $data_v) {
-                    foreach ($data_v['date_diff'] as $rm_k => $rm_v) {
-                        $exist_info_refund = $objHtlRefund->getOderRefundInfoByIdOrderIdProductByDate($id_order, $data_v['id_product'], $rm_v['data_form'], $rm_v['data_to']);
-
-                        // any room existing in htl_order_refund_info
-                        if (!$exist_info_refund) {
-                            $objHtlRefundInfo = new HotelOrderRefundInfo();
-                            $objHtlRefundInfo->id_order = $id_order;
-                            $objHtlRefundInfo->id_product = $data_v['id_product'];
-                            $objHtlRefundInfo->id_customer = $id_customer;
-                            $objHtlRefundInfo->id_currency = $id_currency;
-                            $objHtlRefundInfo->refund_stage_id = 1;
-                            $objHtlRefundInfo->order_amount = $rm_v['amount_tax_incl'] + $rm_v['extra_demands_price'];
-                            $objHtlRefundInfo->cancellation_reason = $cancellation_reason;
-                            $objHtlRefundInfo->num_rooms = $rm_v['num_rm'];
-                            $objHtlRefundInfo->date_from = $rm_v['data_form'];
-                            $objHtlRefundInfo->date_to = $rm_v['data_to'];
-                            $objHtlRefundInfo->save();
-                        }
-                    }
-                }
-            }
-            $id_shop = Context::getContext()->shop->id;
-            $obj_order = new Order($id_order);
-
-            //customer info
-            $obj_customer = new Customer($id_customer);
-
-            $admin_data = new EmployeeCore(1);
-            $templateVars = array(
-                '{shop_name}' => Tools::safeOutput(Configuration::get('PS_SHOP_NAME', null, null, $id_shop)),
-                '{history_url}' => Context::getContext()->link->getPageLink('history', true, Context::getContext()->language->id, null, false, $id_shop),
-                '{my_account_url}' => Context::getContext()->link->getPageLink('my-account', true, Context::getContext()->language->id, null, false, $id_shop),
-                '{cust_name}' => $obj_customer->firstname.' '.$obj_customer->lastname,
-                '{order_reference}' => $obj_order->reference,
-            );
-            $to = $obj_customer->email;
-            $id_lang = Configuration::get('PS_LANG_DEFAULT');
-            $temp_path = _PS_MODULE_DIR_.'hotelreservationsystem/mails/';
-            $template_name = 'total_order_processed';
-
-            if ($objHtlRefundInfo->id) {
-                if (Mail::Send($id_lang, $template_name, Mail::l('Order Cancellation Status', $id_lang), $templateVars, $to, null, null, null,  null, null, $temp_path, false, null, null)) {
-                    $mail_err = 0;
-                } else {
-                    $mail_err = 1;
-                }
-                die(Tools::jsonEncode(array('status' => 'success', 'mail_err' => $mail_err)));
-            } else {
-                die(Tools::jsonEncode(array('status' => 'failed')));
-            }
-        }
-        //end
-
         if (!($id_order = (int) Tools::getValue('id_order')) || !Validate::isUnsignedId($id_order)) {
             $this->errors[] = Tools::displayError('Order ID required');
         } else {
             $order = new Order($id_order);
+            // Here handle request from the ajax on order details page i.e refund, additional qty etc
+            $method = Tools::getValue('method');
+            // extra demands popup ajax
+            if ($method == 'getRoomTypeBookingDemands') {
+                $extraDemandsTpl = '';
+                if (($idProduct = Tools::getValue('id_product'))
+                    && ($idOrder = Tools::getValue('id_order'))
+                    && ($dateFrom = Tools::getValue('date_from'))
+                    && ($dateTo = Tools::getValue('date_to'))
+                ) {
+                    $objBookingDemand = new HotelBookingDemands();
+                    $useTax = 0;
+                    $customer = Context::getContext()->customer;
+                    if (Group::getPriceDisplayMethod($customer->id_default_group) == PS_TAX_INC) {
+                        $useTax = 1;
+                    }
+                    if ($extraDemands = $objBookingDemand->getRoomTypeBookingExtraDemands(
+                        $idOrder,
+                        $idProduct,
+                        0,
+                        $dateFrom,
+                        $dateTo,
+                        1,
+                        0,
+                        $useTax
+                    )) {
+                        $this->context->smarty->assign(
+                            array(
+                                'useTax' => $useTax,
+                                'extraDemands' => $extraDemands,
+                            )
+                        );
+                        $extraDemandsTpl .= $this->context->smarty->fetch(_PS_THEME_DIR_.'_partials/order_booking_demands.tpl');
+                    }
+                }
+
+                die($extraDemandsTpl);
+            } elseif ($method == 'submitRefundRequest') { // room cancellation ajax
+                $hasError = 0;
+                if (!$refundReason = Tools::getValue('cancellation_reason')) {
+                    $hasError = 1;
+                }
+                if ($bookingRefunds = Tools::getValue('bookings_to_refund')) {
+                    if (!count($bookingRefunds = Tools::jsonDecode($bookingRefunds, true))) {
+                        $hasError = 1;
+                    } else {
+                        foreach ($bookingRefunds as $idHtlBooking) {
+                            if (OrderReturn::getOrdersReturnDetail($order->id, 0, $idHtlBooking)) {
+                                $hasError = 1;
+                                break;
+                            }
+                        }
+                    }
+                } else {
+                    $hasError = 1;
+                }
+                if (!$hasError) {
+                    $objOrderReturn = new OrderReturn();
+                    $objOrderReturn->id_customer = $order->id_customer;
+                    $objOrderReturn->id_order = $order->id;
+                    $objOrderReturn->state = 0;
+                    $objOrderReturn->by_admin = 0;
+                    $objOrderReturn->question = $refundReason;
+                    $objOrderReturn->save();
+                    if ($objOrderReturn->id) {
+                        foreach ($bookingRefunds as $idHtlBooking) {
+                            $objHtlBooking = new HotelBookingDetail($idHtlBooking);
+                            $numDays = $objHtlBooking->getNumberOfDays(
+                                $objHtlBooking->date_from,
+                                $objHtlBooking->date_to
+                            );
+
+                            $objOrderReturnDetail = new OrderReturnDetail();
+                            $objOrderReturnDetail->id_order_return = $objOrderReturn->id;
+                            $objOrderReturnDetail->id_order_detail = $objHtlBooking->id_order_detail;
+                            $objOrderReturnDetail->product_quantity = $numDays;
+                            $objOrderReturnDetail->id_htl_booking = $idHtlBooking;
+                            $objOrderReturnDetail->save();
+                        }
+                    }
+                    // Emails to customer, admin on refund request state change
+                    $objOrderReturn->changeIdOrderReturnState(OrderReturnState::ORDER_RETRUN_FIRST_STATUS, $objOrderReturn->id);
+
+                    die(Tools::jsonEncode(array('status' => 1)));
+                }
+                die(Tools::jsonEncode(array('status' => 0)));
+            }
+            // END ajax request handle
+
             if (Validate::isLoadedObject($order) && $order->id_customer == $this->context->customer->id) {
                 $id_order_state = (int)$order->getCurrentState();
                 $carrier = new Carrier((int)$order->id_carrier, (int)$order->id_lang);
@@ -355,36 +269,26 @@ class OrderDetailControllerCore extends FrontController
                 }
                 $products = $order->getProducts();
 
-                /* DEPRECATED: customizedDatas @since 1.5 */
-                $customizedDatas = Product::getAllCustomizedDatas((int)$order->id_cart);
-                Product::addCustomizationPrice($products, $customizedDatas);
-
-                OrderReturn::addReturnedQuantity($products, $order->id);
                 $order_status = new OrderState((int)$id_order_state, (int)$order->id_lang);
 
                 $customer = new Customer($order->id_customer);
 
                 //by webkul to show order details properly on order history page
 
-                if ($hotelresInstalled = Module::isInstalled('hotelreservationsystem')) {
+                if (Module::isInstalled('hotelreservationsystem')) {
                     include_once _PS_MODULE_DIR_.'hotelreservationsystem/define.php';
                     $objHtlBranchInfo = new HotelBranchInformation();
                     $objBookingDetail = new HotelBookingDetail();
                     $objRoomType = new HotelRoomType();
-                    $objCustomerAdv = new HotelCustomerAdvancedPayment();
-                    $objOrdRefundInfo = new HotelOrderRefundInfo();
-                    $objRefundStages = new HotelOrderRefundStages();
                     $objBookingDemand = new HotelBookingDemands();
-                    $nonRequestedRooms = 0;
+                    $nonRequestedRooms = 1;
                     $anyBackOrder = 0;
                     $processedProducts = array();
                     $cartHotelData = array();
-                }
+                    $total_demands_price_te = 0;
+                    $total_demands_price_ti = 0;
 
-                if ($hotelresInstalled) {
                     if (!empty($products)) {
-                        $total_demands_price_te = 0;
-                        $total_demands_price_ti = 0;
                         foreach ($products as $type_key => $type_value) {
                             if (in_array($type_value['product_id'], $processedProducts)) {
                                 continue;
@@ -407,7 +311,6 @@ class OrderDetailControllerCore extends FrontController
                                 $order_bk_data = $objBookingDetail->getOnlyOrderBookingData($order->id, $customer->id_guest, $type_value['product_id']);
                             }
                             $rm_dtl = $objRoomType->getRoomTypeInfoByIdProduct($type_value['product_id']);
-
                             $cartHotelData[$type_key]['id_product'] = $type_value['product_id'];
                             $cartHotelData[$type_key]['cover_img'] = $cover_img;
                             $cartHotelData[$type_key]['adult'] = $rm_dtl['adult'];
@@ -419,20 +322,10 @@ class OrderDetailControllerCore extends FrontController
 
                                 /*Product price when order was created*/
                                 $order_details_obj = new OrderDetail($data_v['id_order_detail']);
-                                $prod_ord_dtl_name = $order_details_obj->product_name;
-                                $cartHotelData[$type_key]['name'] = $prod_ord_dtl_name;
-
+                                $cartHotelData[$type_key]['name'] = $order_details_obj->product_name;
                                 $cartHotelData[$type_key]['paid_unit_price_tax_excl'] = ($order_details_obj->total_price_tax_excl)/$order_details_obj->product_quantity;
                                 $cartHotelData[$type_key]['paid_unit_price_tax_incl'] = ($order_details_obj->total_price_tax_incl)/$order_details_obj->product_quantity;
 
-                                //work on entring refund data
-                                $ord_refnd_info = $objOrdRefundInfo->getOderRefundInfoByIdOrderIdProductByDate($id_order, $type_value['product_id'], $data_v['date_from'], $data_v['date_to']);
-                                if ($ord_refnd_info) {
-                                    $stage_name = $objRefundStages->getNameById($ord_refnd_info['refund_stage_id']);
-                                } else {
-                                    $stage_name = '';
-                                    $nonRequestedRooms = 1;
-                                }
                                 if (isset($cartHotelData[$type_key]['date_diff'][$date_join])) {
                                     $cartHotelData[$type_key]['date_diff'][$date_join]['num_rm'] += 1;
 
@@ -447,8 +340,6 @@ class OrderDetailControllerCore extends FrontController
                                     if ($data_v['is_back_order']) {
                                         $anyBackOrder = 1;
                                     }
-                                    //refund_stage
-                                    $cartHotelData[$type_key]['date_diff'][$date_join]['stage_name'] = $stage_name;
                                 } else {
                                     $num_days = $objBookingDetail->getNumberOfDays($data_v['date_from'], $data_v['date_to']);
                                     $cartHotelData[$type_key]['date_diff'][$date_join]['num_rm'] = 1;
@@ -464,9 +355,10 @@ class OrderDetailControllerCore extends FrontController
                                     if ($data_v['is_back_order']) {
                                         $anyBackOrder = 1;
                                     }
-                                    //refund_stage
-                                    $cartHotelData[$type_key]['date_diff'][$date_join]['stage_name'] = $stage_name;
                                 }
+
+                                $cartHotelData[$type_key]['date_diff'][$date_join]['ids_htl_booking_detail'][] = $data_v['id'];
+
                                 $cartHotelData[$type_key]['date_diff'][$date_join]['extra_demands'] = $objBookingDemand->getRoomTypeBookingExtraDemands(
                                     $id_order,
                                     $type_value['product_id'],
@@ -510,43 +402,47 @@ class OrderDetailControllerCore extends FrontController
                                 $feature_price_diff = (float)($cartHotelData[$type_key]['date_diff'][$date_join]['product_price_without_reduction_tax_incl'] - $cartHotelData[$type_key]['date_diff'][$date_join]['paid_unit_price_tax_incl']);
                                 $cartHotelData[$type_key]['date_diff'][$date_join]['feature_price_diff'] = $feature_price_diff;
 
-                                //enter hotel name
-                                $hotelInfo = $objHtlBranchInfo->hotelBranchesInfo(
-                                    Configuration::get('PS_LANG_DEFAULT'),
-                                    2,
-                                    0,
-                                    $data_v['id_hotel']
-                                );
-                                $cartHotelData[$type_key]['hotel_name'] = $hotelInfo['hotel_name'];
+                                $cartHotelData[$type_key]['hotel_name'] = $data_v['hotel_name'];
                             }
                         }
-                        $redirectTermsLink = $this->context->link->getCMSLink(new CMS(3, $this->context->language->id), null, $this->context->language->id);
 
-                        //For Advanced Payment
-                        $orderAdvDetail = $objCustomerAdv->getCstAdvPaymentDtlByIdOrder($order->id);
-                        $this->context->smarty->assign(
-                            array(
-                                'total_demands_price_ti' => $total_demands_price_ti,
-                                'total_demands_price_te' => $total_demands_price_te,
-                                'any_back_order' => $anyBackOrder,
-                                'shw_bo_msg' => Configuration::get('WK_SHOW_MSG_ON_BO'),
-                                'back_ord_msg' => Configuration::get('WK_BO_MESSAGE'),
-                                'order_has_invoice' => $order->hasInvoice(),
-                                'redirect_link_terms' => $redirectTermsLink,
-                                'cart_htl_data' => $cartHotelData,
-                                'non_requested_rooms' => $nonRequestedRooms,
-                                'order_adv_dtl' => $orderAdvDetail
-                            )
-                        );
+                        $redirectTermsLink = $this->context->link->getCMSLink(new CMS(3, $this->context->language->id), null, $this->context->language->id);
                     }
+
+                    $this->context->smarty->assign(
+                        array(
+                            'id_cms_refund_policy' => Configuration::get('WK_GLOBAL_REFUND_POLICY_CMS'),
+                            'THEME_DIR' => _THEME_DIR_,
+                            'total_demands_price_ti' => $total_demands_price_ti,
+                            'total_demands_price_te' => $total_demands_price_te,
+                            'any_back_order' => $anyBackOrder,
+                            'shw_bo_msg' => Configuration::get('WK_SHOW_MSG_ON_BO'),
+                            'back_ord_msg' => Configuration::get('WK_BO_MESSAGE'),
+                            'order_has_invoice' => $order->hasInvoice(),
+                            'cart_htl_data' => $cartHotelData,
+                            'non_requested_rooms' => $nonRequestedRooms,
+                        )
+                    );
                 }
-                //end
+
+                $objOrderReturn = new OrderReturn();
+                $refundedAmount = 0;
+                if ($refundReqBookings = $objOrderReturn->getOrderRefundRequestedBookings($order->id, 0, 1)) {
+                    $refundedAmount = $objOrderReturn->getRefundedAmount($order->id);
+                }
                 $this->context->smarty->assign(
                     array(
+                        'hasOrderPaid' => $order->hasBeenPaid(),
+                        // refund info
+                        'refund_allowed' => (int) $order->isReturnable(),
+                        'returns' => OrderReturn::getOrdersReturn($order->id_customer, $order->id),
+                        'refundReqBookings' => $refundReqBookings,
+                        'hasCompletelyRefunded' => $order->hasCompletelyRefunded(),
+                        'refundedAmount' => $refundedAmount,
+
                         'shop_name' => strval(Configuration::get('PS_SHOP_NAME')),
                         'order' => $order,
                         'guestInformations' => (array)new Customer($order->id_customer),
-                        'return_allowed' => (int) $order->isReturnable(),
                         'currency' => new Currency($order->id_currency),
                         'order_state' => (int) $id_order_state,
                         'invoiceAllowed' => (int) Configuration::get('PS_INVOICE'),
@@ -571,9 +467,6 @@ class OrderDetailControllerCore extends FrontController
                         'isRecyclable' => Configuration::get('PS_RECYCLABLE_PACK'),
                         'use_tax' => Configuration::get('PS_TAX'),
                         'group_use_tax' => (Group::getPriceDisplayMethod($customer->id_default_group) == PS_TAX_INC),
-                        /* DEPRECATED: customizedDatas @since 1.5 */
-                        'customizedDatas' => $customizedDatas,
-                        /* DEPRECATED: customizedDatas @since 1.5 */
                         'reorderingAllowed' => !(bool) Configuration::get('PS_DISALLOW_HISTORY_REORDERING'),
                     )
                 );

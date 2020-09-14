@@ -566,13 +566,14 @@ class LanguageCore extends ObjectModel
                 '-default-'.ImageType::getFormatedName('small').'.jpg'
             );
             $images_directories = array(_PS_CAT_IMG_DIR_, _PS_MANU_IMG_DIR_, _PS_PROD_IMG_DIR_, _PS_SUPP_IMG_DIR_);
+            $context = Context::getContext();
             foreach ($images_directories as $image_directory) {
                 foreach ($images as $image) {
                     if (file_exists($image_directory.$this->iso_code.$image)) {
-                        unlink($image_directory.$this->iso_code.$image);
+                        Tools::deleteFile($image_directory.$this->iso_code.$image); //by webkul use deleteFile insted of unlink
                     }
                     if (file_exists(_PS_ROOT_DIR_.'/img/l/'.$this->id.'.jpg')) {
-                        unlink(_PS_ROOT_DIR_.'/img/l/'.$this->id.'.jpg');
+                        Tools::deleteFile(_PS_ROOT_DIR_.'/img/l/'.$this->id.'.jpg'); //by webkul use deleteFile insted of unlink
                     }
                 }
             }

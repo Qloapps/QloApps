@@ -1,6 +1,6 @@
 <?php
 /**
-* 2010-2018 Webkul.
+* 2010-2020 Webkul.
 *
 * NOTICE OF LICENSE
 *
@@ -14,7 +14,7 @@
 * needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
 *
 *  @author    Webkul IN <support@webkul.com>
-*  @copyright 2010-2018 Webkul IN
+*  @copyright 2010-2020 Webkul IN
 *  @license   https://store.webkul.com/license.html
 */
 
@@ -38,6 +38,29 @@ class HotelRoomType extends ObjectModel
             'children' => array('type' => self::TYPE_INT, 'validate' => 'isInt'),
             'date_add' => array('type' => self::TYPE_DATE, 'validate' => 'isDate'),
             'date_upd' => array('type' => self::TYPE_DATE, 'validate' => 'isDate'),
+        ),
+    );
+
+    protected $webserviceParameters = array(
+        'objectsNodeName' => 'hotel_room_types',
+        'objectNodeName' => 'hotel_room_type',
+        'fields' => array(
+            'id_product' => array(
+                'xlink_resource' => array(
+                    'resourceName' => 'room_types',
+                )
+            ),
+            'id_hotel' => array(
+                'xlink_resource' => array(
+                    'resourceName' => 'hotels',
+                )
+            ),
+        ),
+        'associations' => array(
+            'hotel_rooms' => array(
+                'resource' => 'hotel_room',
+                'fields' => array('id' => array('required' => true))
+            ),
         ),
     );
 
@@ -201,5 +224,13 @@ class HotelRoomType extends ObjectModel
             $taxRate = 0;
         }
         return $taxRate;
+    }
+
+    // Webservice funcions
+    public function getWsHotelRooms()
+    {
+        return Db::getInstance()->executeS(
+            'SELECT `id` FROM `'._DB_PREFIX_.'htl_room_information` WHERE `id_product` = '.(int)$this->id_product.' ORDER BY `id` ASC'
+        );
     }
 }

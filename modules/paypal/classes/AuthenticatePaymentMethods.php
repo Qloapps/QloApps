@@ -112,7 +112,7 @@ class AuthenticatePaymentMethods
             'SL'=>array(WPS, ECS),
             'SN'=>array(WPS, ECS),
         );
-        $return = isset($payment_method[$iso_code]) ? $payment_method[$iso_code] : false;
+        $return = isset($payment_method[$iso_code]) ? $payment_method[$iso_code] : array();
         if (Configuration::get('VZERO_ENABLED')) {
             $return[] = PVZ;
         }

@@ -22,6 +22,7 @@
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
+
 <table id="summary-tab" width="100%">
 	<tr>
 		<th class="header small" valign="middle">{l s='Order Reference' pdf='true'}</th>

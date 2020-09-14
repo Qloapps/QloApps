@@ -141,48 +141,108 @@ class AdminStatusesControllerCore extends AdminController
                 'align' => 'left',
                 'width' => 'auto',
                 'color' => 'color'
-            )
+            ),
+            'refunded' => array(
+                'title' => $this->l('Refunded'),
+                'align' => 'text-center',
+                'active' => 'refunded',
+                'type' => 'bool',
+                'ajax' => true,
+                'orderby' => false,
+                'class' => 'fixed-width-sm'
+            ),
+            'denied' => array(
+                'title' => $this->l('Denied'),
+                'align' => 'text-center',
+                'active' => 'denied',
+                'type' => 'bool',
+                'ajax' => true,
+                'orderby' => false,
+                'class' => 'fixed-width-sm'
+            ),
+            'send_email_to_customer' => array(
+                'title' => $this->l('Send email to customer'),
+                'align' => 'text-center',
+                'active' => 'sendEmailToSuperAdmin',
+                'type' => 'bool',
+                'ajax' => true,
+                'orderby' => false,
+                'class' => 'fixed-width-sm'
+            ),
+            'send_email_to_superadmin' => array(
+                'title' => $this->l('Send email to super admin'),
+                'align' => 'text-center',
+                'active' => 'sendEmailToCustomer',
+                'type' => 'bool',
+                'ajax' => true,
+                'orderby' => false,
+                'class' => 'fixed-width-sm'
+            ),
+            'send_email_to_employee' => array(
+                'title' => $this->l('Send email to employee'),
+                'align' => 'text-center',
+                'active' => 'sendEmailToEmployee',
+                'type' => 'bool',
+                'ajax' => true,
+                'orderby' => false,
+                'class' => 'fixed-width-sm'
+            ),
+            'send_email_to_hotelier' => array(
+                'title' => $this->l('Send email to hotelier'),
+                'align' => 'text-center',
+                'active' => 'sendEmailToHotelier',
+                'type' => 'bool',
+                'ajax' => true,
+                'orderby' => false,
+                'class' => 'fixed-width-sm'
+            ),
+            // 'customer_template' => array(
+            //     'title' => $this->l('Customer Email template')
+            // ),
+            // 'admin_template' => array(
+            //     'title' => $this->l('Admin Email template')
+            // ),
         );
     }
 
     protected function initOrderReturnsForm()
     {
         $id_order_return_state = (int)Tools::getValue('id_order_return_state');
-
         // Create Object OrderReturnState
         $order_return_state = new OrderReturnState($id_order_return_state);
-
         //init field form variable for order return form
-        $this->fields_form = array();
-
-        //$this->initToolbar();
-        $this->getlanguages();
-        $helper = new HelperForm();
-        $helper->currentIndex = self::$currentIndex;
-        $helper->token = $this->token;
-        $helper->table = 'order_return_state';
-        $helper->identifier = 'id_order_return_state';
-        $helper->id = $order_return_state->id;
-        $helper->toolbar_scroll = false;
-        $helper->languages = $this->_languages;
-        $helper->default_form_language = $this->default_form_language;
-        $helper->allow_employee_form_lang = $this->allow_employee_form_lang;
+        $this->table = 'order_return_state';
+        $this->className = 'OrderReturnState';
+        $this->identifier = 'id_order_return_state';
+        $this->object = null;
 
         if ($order_return_state->id) {
-            $helper->fields_value = array(
+            $mailToCustomer = $this->getFieldValue($order_return_state, 'send_email_to_customer');
+            $mailToSuperadmin = $this->getFieldValue($order_return_state, 'send_email_to_superadmin');
+            $mailToEmployee = $this->getFieldValue($order_return_state, 'send_email_to_employee');
+            $mailToHotelier = $this->getFieldValue($order_return_state, 'send_email_to_hotelier');
+            $this->fields_value = array(
                 'name' => $this->getFieldValue($order_return_state, 'name'),
                 'color' => $this->getFieldValue($order_return_state, 'color'),
+                    'refunded_on' => $this->getFieldValue($order_return_state, 'refunded'),
+                    'denied_on' => $this->getFieldValue($order_return_state, 'denied'),
+                    'send_email_to_customer_on' => $mailToCustomer,
+                    'send_email_to_customer' => $mailToCustomer,
+                    'send_email_to_superadmin_on' => $mailToSuperadmin,
+                    'send_email_to_superadmin' => $mailToSuperadmin,
+                    'send_email_to_employee_on' => $mailToEmployee,
+                    'send_email_to_employee' => $mailToEmployee,
+                    'send_email_to_hotelier_on' => $mailToHotelier,
+                    'send_email_to_hotelier' => $mailToHotelier,
+                    'show_customer_template' => $mailToCustomer,
+                    'show_admin_template' => $mailToSuperadmin || $mailToEmployee || $mailToHotelier,
             );
         } else {
-            $helper->fields_value = array(
+            $this->fields_value = array(
                 'name' => $this->getFieldValue($order_return_state, 'name'),
                 'color' => "#ffffff",
             );
         }
-
-        $helper->toolbar_btn = $this->toolbar_btn;
-        $helper->title = $this->l('Edit Return Status');
-        return $helper;
     }
 
     public function initPageHeaderToolbar()
@@ -195,7 +255,7 @@ class AdminStatusesControllerCore extends AdminController
             );
             $this->page_header_toolbar_btn['new_order_return_state'] = array(
                 'href' => self::$currentIndex.'&addorder_return_state&token='.$this->token,
-                'desc' => $this->l('Add new order return status', null, null, false),
+                'desc' => $this->l('Add new order refund status', null, null, false),
                 'icon' => 'process-icon-new'
             );
         }
@@ -236,9 +296,10 @@ class AdminStatusesControllerCore extends AdminController
 
         // call postProcess() to take care of actions and filters
         $this->postProcess();
-        $this->toolbar_title = $this->l('Return statuses');
+        $this->toolbar_title = $this->l('Refund statuses');
 
         parent::initToolbar();
+
         $lists .= parent::renderList();
 
         return $lists;
@@ -261,158 +322,161 @@ class AdminStatusesControllerCore extends AdminController
 
     public function renderForm()
     {
-        $this->fields_form = array(
-            'tinymce' => true,
-            'legend' => array(
-                'title' => $this->l('Order status'),
-                'icon' => 'icon-time'
-            ),
-            'input' => array(
-                array(
-                    'type' => 'text',
-                    'label' => $this->l('Status name'),
-                    'name' => 'name',
-                    'lang' => true,
-                    'required' => true,
-                    'hint' => array(
-                        $this->l('Order status (e.g. \'Pending\').'),
-                        $this->l('Invalid characters: numbers and').' !<>,;?=+()@#"{}_$%:'
-                    )
-                ),
-                array(
-                    'type' => 'file',
-                    'label' => $this->l('Icon'),
-                    'name' => 'icon',
-                    'hint' => $this->l('Upload an icon from your computer (File type: .gif, suggested size: 16x16).')
-                ),
-                array(
-                    'type' => 'color',
-                    'label' => $this->l('Color'),
-                    'name' => 'color',
-                    'hint' => $this->l('Status will be highlighted in this color. HTML colors only.').' "lightblue", "#CC6600")'
-                ),
-                array(
-                    'type' => 'checkbox',
-                    'name' => 'logable',
-                    'values' => array(
-                        'query' => array(
-                            array('id' => 'on', 'name' => $this->l('Consider the associated order as validated.'), 'val' => '1'),
-                            ),
-                        'id' => 'id',
-                        'name' => 'name'
-                    )
-                ),
-                array(
-                    'type' => 'checkbox',
-                    'name' => 'invoice',
-                    'values' => array(
-                        'query' => array(
-                            array('id' => 'on', 'name' => $this->l('Allow a customer to download and view PDF versions of his/her invoices.'), 'val' => '1'),
-                            ),
-                        'id' => 'id',
-                        'name' => 'name'
-                    )
-                ),
-                array(
-                    'type' => 'checkbox',
-                    'name' => 'hidden',
-                    'values' => array(
-                        'query' => array(
-                            array('id' => 'on', 'name' => $this->l('Hide this status in all customer orders.'), 'val' => '1'),
-                            ),
-                        'id' => 'id',
-                        'name' => 'name'
-                    )
-                ),
-                array(
-                    'type' => 'checkbox',
-                    'name' => 'send_email',
-                    'values' => array(
-                        'query' => array(
-                            array('id' => 'on', 'name' => $this->l('Send an email to the customer when his/her order status has changed.'), 'val' => '1'),
-                            ),
-                        'id' => 'id',
-                        'name' => 'name'
-                    )
-                ),
-                array(
-                    'type' => 'checkbox',
-                    'name' => 'pdf_invoice',
-                    'values' => array(
-                        'query' => array(
-                            array('id' => 'on',  'name' => $this->l('Attach invoice PDF to email.'), 'val' => '1'),
-                            ),
-                        'id' => 'id',
-                        'name' => 'name'
-                    ),
-                ),
-                array(
-                    'type' => 'checkbox',
-                    'name' => 'pdf_delivery',
-                    'values' => array(
-                        'query' => array(
-                            array('id' => 'on',  'name' => $this->l('Attach delivery slip PDF to email.'), 'val' => '1'),
-                            ),
-                        'id' => 'id',
-                        'name' => 'name'
-                    ),
-                ),
-                array(
-                    'type' => 'checkbox',
-                    'name' => 'shipped',
-                    'values' => array(
-                        'query' => array(
-                            array('id' => 'on',  'name' => $this->l('Set the order as shipped.'), 'val' => '1'),
-                            ),
-                        'id' => 'id',
-                        'name' => 'name'
-                    )
-                ),
-                array(
-                    'type' => 'checkbox',
-                    'name' => 'paid',
-                    'values' => array(
-                        'query' => array(
-                            array('id' => 'on', 'name' => $this->l('Set the order as paid.'), 'val' => '1'),
-                            ),
-                        'id' => 'id',
-                        'name' => 'name'
-                    )
-                ),
-                array(
-                    'type' => 'checkbox',
-                    'name' => 'delivery',
-                    'values' => array(
-                        'query' => array(
-                            array('id' => 'on', 'name' => $this->l('Show delivery PDF.'), 'val' => '1'),
-                            ),
-                        'id' => 'id',
-                        'name' => 'name'
-                    )
-                ),
-                array(
-                    'type' => 'select_template',
-                    'label' => $this->l('Template'),
-                    'name' => 'template',
-                    'lang' => true,
-                    'options' => array(
-                        'query' => $this->getTemplates(),
-                        'id' => 'id',
-                        'name' => 'name',
-                        'folder' => 'folder'
-                    ),
-                    'hint' => array(
-                        $this->l('Only letters, numbers and underscores ("_") are allowed.'),
-                        $this->l('Email template for both .html and .txt.')
-                    )
-                )
-            ),
-            'submit' => array(
-                'title' => $this->l('Save'),
-            )
-        );
-
         if (Tools::isSubmit('updateorder_state') || Tools::isSubmit('addorder_state')) {
+            $this->fields_form = array(
+                'tinymce' => true,
+                'legend' => array(
+                    'title' => $this->l('Order status'),
+                    'icon' => 'icon-time'
+                ),
+                'input' => array(
+                    array(
+                        'type' => 'text',
+                        'label' => $this->l('Status name'),
+                        'name' => 'name',
+                        'lang' => true,
+                        'required' => true,
+                        'hint' => array(
+                            $this->l('Order status (e.g. \'Pending\').'),
+                            $this->l('Invalid characters: numbers and').' !<>,;?=+()@#"{}_$%:'
+                        )
+                    ),
+                    array(
+                        'type' => 'file',
+                        'label' => $this->l('Icon'),
+                        'name' => 'icon',
+                        'hint' => $this->l('Upload an icon from your computer (File type: .gif, suggested size: 16x16).')
+                    ),
+                    array(
+                        'type' => 'color',
+                        'label' => $this->l('Color'),
+                        'name' => 'color',
+                        'hint' => $this->l('Status will be highlighted in this color. HTML colors only.').' "lightblue", "#CC6600")'
+                    ),
+                    array(
+                        'type' => 'checkbox',
+                        'name' => 'logable',
+                        'values' => array(
+                            'query' => array(
+                                array('id' => 'on', 'name' => $this->l('Consider the associated order as validated.'), 'val' => '1'),
+                                ),
+                            'id' => 'id',
+                            'name' => 'name'
+                        )
+                    ),
+                    array(
+                        'type' => 'checkbox',
+                        'name' => 'invoice',
+                        'values' => array(
+                            'query' => array(
+                                array('id' => 'on', 'name' => $this->l('Allow a customer to download and view PDF versions of his/her invoices.'), 'val' => '1'),
+                                ),
+                            'id' => 'id',
+                            'name' => 'name'
+                        )
+                    ),
+                    array(
+                        'type' => 'checkbox',
+                        'name' => 'hidden',
+                        'values' => array(
+                            'query' => array(
+                                array('id' => 'on', 'name' => $this->l('Hide this status in all customer orders.'), 'val' => '1'),
+                                ),
+                            'id' => 'id',
+                            'name' => 'name'
+                        )
+                    ),
+                    array(
+                        'class' => 'email_to_customer',
+                        'type' => 'checkbox',
+                        'name' => 'send_email',
+                        'values' => array(
+                            'query' => array(
+                                array('id' => 'on', 'name' => $this->l('Send an email to the customer when his/her order status has changed.'), 'val' => '1'),
+                                ),
+                            'id' => 'id',
+                            'name' => 'name'
+                        )
+                    ),
+                    array(
+                        'type' => 'checkbox',
+                        'name' => 'pdf_invoice',
+                        'values' => array(
+                            'query' => array(
+                                array('id' => 'on',  'name' => $this->l('Attach invoice PDF to email.'), 'val' => '1'),
+                                ),
+                            'id' => 'id',
+                            'name' => 'name'
+                        ),
+                    ),
+                    array(
+                        'type' => 'checkbox',
+                        'name' => 'pdf_delivery',
+                        'values' => array(
+                            'query' => array(
+                                array('id' => 'on',  'name' => $this->l('Attach delivery slip PDF to email.'), 'val' => '1'),
+                                ),
+                            'id' => 'id',
+                            'name' => 'name'
+                        ),
+                    ),
+                    array(
+                        'type' => 'checkbox',
+                        'name' => 'shipped',
+                        'values' => array(
+                            'query' => array(
+                                array('id' => 'on',  'name' => $this->l('Set the order as shipped.'), 'val' => '1'),
+                                ),
+                            'id' => 'id',
+                            'name' => 'name'
+                        )
+                    ),
+                    array(
+                        'type' => 'checkbox',
+                        'name' => 'paid',
+                        'values' => array(
+                            'query' => array(
+                                array('id' => 'on', 'name' => $this->l('Set the order as paid.'), 'val' => '1'),
+                                ),
+                            'id' => 'id',
+                            'name' => 'name'
+                        )
+                    ),
+                    array(
+                        'type' => 'checkbox',
+                        'name' => 'delivery',
+                        'values' => array(
+                            'query' => array(
+                                array('id' => 'on', 'name' => $this->l('Show delivery PDF.'), 'val' => '1'),
+                                ),
+                            'id' => 'id',
+                            'name' => 'name'
+                        )
+                    ),
+                    array(
+                        'type' => 'select_template',
+                        'is_customer_template' => 1,
+                        'label' => $this->l('Template'),
+                        'field_name' => 'send_email',
+                        'template_attr' => 'email_to_customer',
+                        'name' => 'template',
+                        'lang' => true,
+                        'options' => array(
+                            'query' => $this->getTemplates(),
+                            'id' => 'id',
+                            'name' => 'name',
+                            'folder' => 'folder'
+                        ),
+                        'hint' => array(
+                            $this->l('Only letters, numbers and underscores ("_") are allowed.'),
+                            $this->l('Email template for both .html and .txt.')
+                        )
+                    )
+                ),
+                'submit' => array(
+                    'title' => $this->l('Save'),
+                )
+            );
             return $this->renderOrderStatusForm();
         } elseif (Tools::isSubmit('updateorder_return_state') || Tools::isSubmit('addorder_return_state')) {
             return $this->renderOrderReturnsForm();
@@ -428,6 +492,8 @@ class AdminStatusesControllerCore extends AdminController
         }
 
         $this->fields_value = array(
+            'show_customer_template' => $this->getFieldValue($obj, 'send_email'),
+            'show_admin_template' => 0,
             'logable_on' => $this->getFieldValue($obj, 'logable'),
             'invoice_on' => $this->getFieldValue($obj, 'invoice'),
             'hidden_on' => $this->getFieldValue($obj, 'hidden'),
@@ -450,23 +516,17 @@ class AdminStatusesControllerCore extends AdminController
 
     protected function renderOrderReturnsForm()
     {
-        $helper = $this->initOrderReturnsForm();
-        $helper->show_cancel_button = true;
+        $this->initOrderReturnsForm();
 
-        $back = Tools::safeOutput(Tools::getValue('back', ''));
-        if (empty($back)) {
-            $back = self::$currentIndex.'&token='.$this->token;
-        }
-        if (!Validate::isCleanHtml($back)) {
-            die(Tools::displayError());
+        if (!($obj = $this->loadObject(true))) {
+            return;
         }
 
-        $helper->back_url = $back;
-
-        $this->fields_form[0]['form'] = array(
+        //init field form variable for order return form
+        $this->fields_form = array(
             'tinymce' => true,
             'legend' => array(
-                'title' => $this->l('Return status'),
+                'title' => $this->l('Refund status'),
                 'icon' => 'icon-time'
             ),
             'input' => array(
@@ -477,7 +537,7 @@ class AdminStatusesControllerCore extends AdminController
                     'lang' => true,
                     'required' => true,
                     'hint' => array(
-                        $this->l('Order\'s return status name.'),
+                        $this->l('Order\'s refund status name.'),
                         $this->l('Invalid characters: numbers and').' !<>,;?=+()@#"�{}_$%:'
                     )
                 ),
@@ -486,13 +546,141 @@ class AdminStatusesControllerCore extends AdminController
                     'label' => $this->l('Color'),
                     'name' => 'color',
                     'hint' => $this->l('Status will be highlighted in this color. HTML colors only.').' "lightblue", "#CC6600")'
-                )
+                ),
+                array(
+                    'type' => 'checkbox',
+                    'name' => 'refunded',
+                    'values' => array(
+                        'query' => array(
+                            array('id' => 'on', 'name' => $this->l('Consider the associated order refund as refunded.'), 'val' => '1'),
+                            ),
+                        'id' => 'id',
+                        'name' => 'name'
+                    )
+                ),
+                array(
+                    'type' => 'checkbox',
+                    'name' => 'denied',
+                    'values' => array(
+                        'query' => array(
+                            array('id' => 'on', 'name' => $this->l('Consider the associated order refund as denied.'), 'val' => '1'),
+                            ),
+                        'id' => 'id',
+                        'name' => 'name'
+                    )
+                ),
+                array(
+                    'class' => 'email_to_customer',
+                    'type' => 'checkbox',
+                    'name' => 'send_email_to_customer',
+                    'values' => array(
+                        'query' => array(
+                            array(
+                                'id' => 'on',
+                                'name' => $this->l('Send an email to the customer when his/her order refund status has changed.'),
+                                'val' => '1'
+                            ),
+                        ),
+                        'id' => 'id',
+                        'name' => 'name'
+                    )
+                ),
+                array(
+                    'type' => 'checkbox',
+                    'class' => 'email_to_admin',
+                    'name' => 'send_email_to_superadmin',
+                    'values' => array(
+                        'query' => array(
+                            array(
+                                'id' => 'on',
+                                'name' => $this->l('Send an email to the super admin order refund status has changed.'),
+                                'val' => '1'
+                            ),
+                        ),
+                        'id' => 'id',
+                        'name' => 'name'
+                    )
+                ),
+                array(
+                    'type' => 'checkbox',
+                    'class' => 'email_to_admin',
+                    'name' => 'send_email_to_employee',
+                    'values' => array(
+                        'query' => array(
+                            array(
+                                'id' => 'on',
+                                'name' => $this->l('Send an email to the employee when order refund status has changed.'),
+                                'val' => '1'
+                            ),
+                        ),
+                        'id' => 'id',
+                        'name' => 'name'
+                    )
+                ),
+                array(
+                    'type' => 'checkbox',
+                    'class' => 'email_to_admin',
+                    'name' => 'send_email_to_hotelier',
+                    'values' => array(
+                        'query' => array(
+                            array(
+                                'id' => 'on',
+                                'name' => $this->l('Send an email to the hotelier when order refund status has changed.'),
+                                'val' => '1'
+                            ),
+                        ),
+                        'id' => 'id',
+                        'name' => 'name'
+                    )
+                ),
+                array(
+                    'type' => 'select_template',
+                    'is_customer_template' => 1,
+                    'field_name' => 'send_email_to_customer',
+                    'template_attr' => 'email_to_customer',
+                    'label' => $this->l('Template for customer email'),
+                    'name' => 'customer_template',
+                    'lang' => true,
+                    'options' => array(
+                        'query' => $this->getTemplates(),
+                        'id' => 'id',
+                        'name' => 'name',
+                        'folder' => 'folder'
+                    ),
+                    'hint' => array(
+                        $this->l('This email will be sent to the customer.'),
+                        $this->l('Only letters, numbers and underscores ("_") are allowed.'),
+                        $this->l('Email template for both .html and .txt.')
+                    )
+                ),
+                array(
+                    'type' => 'select_template',
+                    'is_customer_template' => 0,
+                    'is_admin_template' => 1,
+                    'field_name' => 'send_email_to_customer',
+                    'template_attr' => 'email_to_admin',
+                    'label' => $this->l('Template for admin email'),
+                    'name' => 'admin_template',
+                    'lang' => true,
+                    'options' => array(
+                        'query' => $this->getTemplates(),
+                        'id' => 'id',
+                        'name' => 'name',
+                        'folder' => 'folder'
+                    ),
+                    'hint' => array(
+                        $this->l('This email will be sent to the admin (superadmin, employee, hotelier).'),
+                        $this->l('Only letters, numbers and underscores ("_") are allowed.'),
+                        $this->l('Email template for both .html and .txt.')
+                    )
+                ),
             ),
             'submit' => array(
                 'title' => $this->l('Save'),
             )
         );
-        return $helper->generateForm($this->fields_form);
+
+        return parent::renderForm();
     }
 
     protected function getTemplates()
@@ -536,22 +724,67 @@ class AdminStatusesControllerCore extends AdminController
         }
 
         if (Tools::isSubmit('submitAddorder_return_state')) {
-            $id_order_return_state = Tools::getValue('id_order_return_state');
+            $refunded = Tools::getValue('refunded_on');
+            $denied = Tools::getValue('denied_on');
 
-            // Create Object OrderReturnState
-            $order_return_state = new OrderReturnState((int)$id_order_return_state);
+            $defaultLangId = Configuration::get('PS_LANG_DEFAULT');
+            $objDefaultLanguage = Language::getLanguage((int) $defaultLangId);
+            $languages = Language::getLanguages(false);
 
-            $order_return_state->color = Tools::getValue('color');
-            $order_return_state->name = array();
-            foreach (Language::getIDs(false) as $id_lang) {
-                $order_return_state->name[$id_lang] = Tools::getValue('name_'.$id_lang);
+            if (!trim(Tools::getValue('name_'.$defaultLangId))) {
+                $this->errors[] = $this->l('Name is required at least in ').
+                $objDefaultLanguage['name'];
+            } else {
+                foreach ($languages as $lang) {
+                    // validate non required fields
+                    if (trim(Tools::getValue('name_'.$lang['id_lang']))) {
+                        if (!Validate::isGenericName(Tools::getValue('name_'.$lang['id_lang']))) {
+                            $this->errors[] = $this->l('Invalid name in ').$lang['name'];
+                        }
+                    }
+                }
             }
 
-            // Update object
-            if (!$order_return_state->save()) {
-                $this->errors[] = Tools::displayError('An error has occurred: Can\'t save the current order\'s return status.');
-            } else {
-                Tools::redirectAdmin(self::$currentIndex.'&conf=4&token='.$this->token);
+            if ($refunded && $denied) {
+                $this->errors[] = $this->l('Return state can not be set refunded and denied together.');
+            }
+
+            if (!count($this->errors)) {
+                $id_order_return_state = Tools::getValue('id_order_return_state');
+                // Create Object OrderReturnState
+                $order_return_state = new OrderReturnState((int)$id_order_return_state);
+                $order_return_state->color = Tools::getValue('color');
+                $order_return_state->send_email_to_customer = Tools::getValue('send_email_to_customer_on');
+                $order_return_state->send_email_to_superadmin = Tools::getValue('send_email_to_superadmin_on');
+                $order_return_state->send_email_to_employee = Tools::getValue('send_email_to_employee_on');
+                $order_return_state->send_email_to_hotelier = Tools::getValue('send_email_to_hotelier_on');
+                $order_return_state->name = array();
+                $order_return_state->template = array();
+                foreach (Language::getIDs(false) as $id_lang) {
+                    $order_return_state->name[$id_lang] = Tools::getValue('name_'.$id_lang);
+                    if ($order_return_state->send_email_to_customer) {
+                        $order_return_state->customer_template[$id_lang] = Tools::getValue('customer_template_'.$id_lang);
+                    } else {
+                        $order_return_state->customer_template[$id_lang] = '';
+                    }
+
+                    if ($order_return_state->send_email_to_superadmin
+                        || $order_return_state->send_email_to_employee
+                        || $order_return_state->send_email_to_hotelier
+                    ) {
+                        $order_return_state->admin_template[$id_lang] = Tools::getValue('admin_template_'.$id_lang);
+                    } else {
+                        $order_return_state->admin_template[$id_lang] = '';
+                    }
+                }
+                $order_return_state->refunded = $refunded;
+                $order_return_state->denied = $denied;
+                // Update object
+                if (!$order_return_state->save()) {
+                    $this->errors[] = Tools::displayError('An error has occurred: Can\'t save the current order\'s refund status.');
+                } else {
+                    Tools::redirectAdmin(self::$currentIndex.'&conf=4&token='.$this->token);
+                }
             }
         }
 
@@ -569,7 +802,7 @@ class AdminStatusesControllerCore extends AdminController
             $order_return_state = new OrderReturnState((int)$id_order_return_state);
 
             if (!$order_return_state->delete()) {
-                $this->errors[] = Tools::displayError('An error has occurred: Can\'t delete the current order\'s return status.');
+                $this->errors[] = Tools::displayError('An error has occurred: Can\'t delete the current order\'s refund status.');
             } else {
                 Tools::redirectAdmin(self::$currentIndex.'&conf=1&token='.$this->token);
             }
@@ -633,7 +866,7 @@ class AdminStatusesControllerCore extends AdminController
         parent::afterImageUpload();
 
         if (($id_order_state = (int)Tools::getValue('id_order_state')) &&
-             isset($_FILES) && count($_FILES) && file_exists(_PS_ORDER_STATE_IMG_DIR_.$id_order_state.'.gif')) {
+             isset($_FILES) && count($_FILES) && (bool)Tools::file_get_contents($this->context->link->getMediaLink(_PS_IMG_.'os/'.$id_order_state.'.gif'))) { //by webkul
             $current_file = _PS_TMP_IMG_DIR_.'order_state_mini_'.$id_order_state.'_'.$this->context->shop->id.'.gif';
 
             if (file_exists($current_file)) {
@@ -683,6 +916,99 @@ class AdminStatusesControllerCore extends AdminController
             echo json_encode(array('success' => 1, 'text' => $this->l('The status has been updated successfully.')));
         } else {
             echo json_encode(array('success' => 0, 'text' => $this->l('An error occurred while updating this meta.')));
+        }
+    }
+
+    public function ajaxProcessSendEmailToCustomerOrderReturnState()
+    {
+        $id_order_return_state = (int)Tools::getValue('id_order_return_state');
+
+        $sql = 'UPDATE '._DB_PREFIX_.'order_return_state SET `send_email_to_customer`= NOT `send_email_to_customer` WHERE id_order_return_state='.(int)$id_order_return_state;
+        $result = Db::getInstance()->execute($sql);
+
+        if ($result) {
+            echo json_encode(array('success' => 1, 'text' => $this->l('The status has been updated successfully.')));
+        } else {
+            echo json_encode(array('success' => 0, 'text' => $this->l('An error occurred while updating this meta.')));
+        }
+    }
+
+    public function ajaxProcessSendEmailToSuperAdminOrderReturnState()
+    {
+        $id_order_return_state = (int)Tools::getValue('id_order_return_state');
+
+        $sql = 'UPDATE '._DB_PREFIX_.'order_return_state SET `send_email_to_superadmin`= NOT `send_email_to_superadmin` WHERE id_order_return_state='.(int)$id_order_return_state;
+        $result = Db::getInstance()->execute($sql);
+
+        if ($result) {
+            echo json_encode(array('success' => 1, 'text' => $this->l('The status has been updated successfully.')));
+        } else {
+            echo json_encode(array('success' => 0, 'text' => $this->l('An error occurred while updating this meta.')));
+        }
+    }
+
+    public function ajaxProcessSendEmailToEmployeeOrderReturnState()
+    {
+        $id_order_return_state = (int)Tools::getValue('id_order_return_state');
+
+        $sql = 'UPDATE '._DB_PREFIX_.'order_return_state SET `send_email_to_employee`= NOT `send_email_to_employee` WHERE id_order_return_state='.(int)$id_order_return_state;
+        $result = Db::getInstance()->execute($sql);
+
+        if ($result) {
+            echo json_encode(array('success' => 1, 'text' => $this->l('The status has been updated successfully.')));
+        } else {
+            echo json_encode(array('success' => 0, 'text' => $this->l('An error occurred while updating this meta.')));
+        }
+    }
+
+    public function ajaxProcessSendEmailToHotelierOrderReturnState()
+    {
+        $id_order_return_state = (int)Tools::getValue('id_order_return_state');
+
+        $sql = 'UPDATE '._DB_PREFIX_.'order_return_state SET `send_email_to_hotelier`= NOT `send_email_to_hotelier` WHERE id_order_return_state='.(int)$id_order_return_state;
+        $result = Db::getInstance()->execute($sql);
+
+        if ($result) {
+            echo json_encode(array('success' => 1, 'text' => $this->l('The status has been updated successfully.')));
+        } else {
+            echo json_encode(array('success' => 0, 'text' => $this->l('An error occurred while updating this meta.')));
+        }
+    }
+
+    public function ajaxProcessRefundedOrderReturnState()
+    {
+        $id_order_return_state = (int)Tools::getValue('id_order_return_state');
+
+        $sql = 'UPDATE '._DB_PREFIX_.'order_return_state SET `refunded`= NOT `refunded` WHERE id_order_return_state='.(int)$id_order_return_state;
+        $result = Db::getInstance()->execute($sql);
+
+        if ($result) {
+            echo json_encode(array('success' => 1, 'text' => $this->l('The status has been updated successfully.')));
+        } else {
+            echo json_encode(array('success' => 0, 'text' => $this->l('An error occurred while updating this meta.')));
+        }
+    }
+
+    public function ajaxProcessDeniedOrderReturnState()
+    {
+        $id_order_return_state = (int)Tools::getValue('id_order_return_state');
+
+        $sql = 'UPDATE '._DB_PREFIX_.'order_return_state SET `denied`= NOT `denied` WHERE id_order_return_state='.(int)$id_order_return_state;
+        $result = Db::getInstance()->execute($sql);
+
+        if ($result) {
+            echo json_encode(array('success' => 1, 'text' => $this->l('The status has been updated successfully.')));
+        } else {
+            echo json_encode(array('success' => 0, 'text' => $this->l('An error occurred while updating this meta.')));
+        }
+    }
+
+    public function setMedia()
+    {
+        parent::setMedia();
+
+        if ($this->tabAccess['edit'] == 1 && $this->display == 'edit') {
+            $this->addJS(_PS_JS_DIR_.'admin/order_states.js');
         }
     }
 }

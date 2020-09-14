@@ -776,7 +776,7 @@ class FrontControllerCore extends Controller
         header('HTTP/1.1 503 temporarily overloaded');
         $this->context->smarty->assign(array(
             'shop_name'   => $this->context->shop->name,
-            'favicon_url' => _PS_IMG_.Configuration::get('PS_FAVICON'),
+            'favicon_url' => $this->context->link->getMediaLink(_PS_IMG_.Configuration::get('PS_FAVICON')),
             'logo_url'    => $this->context->link->getMediaLink(_PS_IMG_.Configuration::get('PS_LOGO'))
         ));
         $this->smartyOutputContent($this->getTemplatePath($this->getThemeDir().'restricted-country.tpl'));
@@ -1630,7 +1630,7 @@ class FrontControllerCore extends Controller
         }
 
         return array(
-            'favicon_url'       => _PS_IMG_.Configuration::get('PS_FAVICON'),
+            'favicon_url'       => $this->context->link->getMediaLink(_PS_IMG_.Configuration::get('PS_FAVICON')),
             'logo_image_width'  => ($mobile_device == false ? Configuration::get('SHOP_LOGO_WIDTH')  : Configuration::get('SHOP_LOGO_MOBILE_WIDTH')),
             'logo_image_height' => ($mobile_device == false ? Configuration::get('SHOP_LOGO_HEIGHT') : Configuration::get('SHOP_LOGO_MOBILE_HEIGHT')),
             'logo_url'          => $logo

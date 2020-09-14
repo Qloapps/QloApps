@@ -217,6 +217,8 @@ var ajaxCart = {
                                     disableRoomTypeDemands(0);
                                     $('.unvail_rooms_cond_display').show();
                                 }
+                            } else if (pagename == 'orderopc') {
+                                location.reload();
                             } else {
                                 var date_checkIn = $('#check_in_time').val();
                                 var date_checkOut = $('#check_out_time').val();
@@ -415,14 +417,9 @@ var ajaxCart = {
         if ($('.cart_block_list').hasClass('collapsed'))
             this.expand();
 
+
         // get the selected extra demands by customer
-        var roomDemands = [];
-        $('input:checkbox.id_room_type_demand:checked').each(function () {
-            roomDemands.push({
-                'id_global_demand':$(this).val(),
-                'id_option': $(this).closest('.room_demand_block').find('.id_option').val()
-            });
-       });
+        var roomDemands = getRoomsExtraDemands();
         //send the ajax request to the server
         $.ajax({
             type: 'POST',
@@ -578,7 +575,9 @@ var ajaxCart = {
                         }
                     });
                 }
-
+                if (pagename == 'orderopc') {
+                    location.reload();
+                }
 
                 ajaxCart.updateCart(jsonData);
                 // @TODO in future to sync with shopping cart delete from order-opc
@@ -959,12 +958,12 @@ var ajaxCart = {
 
         //by webkul has to work on it more..
         if (pagename == 'product') {
-            $('#layer_cart_product_time_duration').text($('#room_check_in').val() + '-' + $('#room_check_out').val());
+            $('#layer_cart_product_time_duration').text($('#room_check_in').val() + ' - ' + $('#room_check_out').val());
             $('#layer_cart_product_quantity').text($('#quantity_wanted').val());
             $('#quantity_wanted').val(1);
         }
         if (pagename == 'category') {
-            $('#layer_cart_product_time_duration').text($('#check_in_time').val() + '-' + $('#check_out_time').val());
+            $('#layer_cart_product_time_duration').text($('#check_in_time').val() + ' - ' + $('#check_out_time').val());
             $('#layer_cart_product_quantity').text($('#cat_quantity_wanted_' + product.id).val());
             $('#cat_quantity_wanted_' + product.id).val(1);
 
@@ -1123,4 +1122,18 @@ function disableRoomTypeDemands(show) {
         $('.room_demands_container').find('input:checkbox.id_room_type_demand').removeAttr('disabled');
         $('.room_demands_container').find('.checker').removeClass('disabled');
     }
+}
+
+function getRoomsExtraDemands()
+{
+    var roomDemands = [];
+
+    $('input:checkbox.id_room_type_demand:checked').each(function () {
+        roomDemands.push({
+            'id_global_demand':$(this).val(),
+            'id_option': $(this).closest('.room_demand_block').find('.id_option').val()
+        });
+    });
+
+    return roomDemands;
 }

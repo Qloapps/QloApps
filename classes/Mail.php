@@ -314,18 +314,19 @@ class MailCore extends ObjectModel
 
             $template_vars = array_map(array('Tools', 'htmlentitiesDecodeUTF8'), $template_vars);
             $template_vars = array_map(array('Tools', 'stripslashes'), $template_vars);
-
-            if (Configuration::get('PS_LOGO_MAIL') !== false && file_exists(_PS_IMG_DIR_.Configuration::get('PS_LOGO_MAIL', null, null, $id_shop))) {
-                $logo = _PS_IMG_DIR_.Configuration::get('PS_LOGO_MAIL', null, null, $id_shop);
+            // by webkul to get logo from media link.
+            if (Configuration::get('PS_LOGO_MAIL') !== false && (bool)Tools::file_get_contents(Context::getContext()->link->getMediaLink(_PS_IMG_.Configuration::get('PS_LOGO_MAIL', null, null, $id_shop)))) {
+                $logo = Context::getContext()->link->getMediaLink(_PS_IMG_.Configuration::get('PS_LOGO_MAIL', null, null, $id_shop));
             } else {
-                if (file_exists(_PS_IMG_DIR_.Configuration::get('PS_LOGO', null, null, $id_shop))) {
-                    $logo = _PS_IMG_DIR_.Configuration::get('PS_LOGO', null, null, $id_shop);
+                if ((bool)Tools::file_get_contents(Context::getContext()->link->getMediaLink(_PS_IMG_.Configuration::get('PS_LOGO', null, null, $id_shop)))) {
+                    $logo = Context::getContext()->link->getMediaLink(_PS_IMG_.Configuration::get('PS_LOGO', null, null, $id_shop));
                 } else {
                     $template_vars['{shop_logo}'] = '';
                 }
             }
             ShopUrl::cacheMainDomainForShop((int)$id_shop);
             /* don't attach the logo as */
+
             if (isset($logo)) {
                 $template_vars['{shop_logo}'] = $message->embed(Swift_Image::fromPath($logo));
             }
@@ -595,5 +596,29 @@ class MailCore extends ObjectModel
         }
 
         return $start.$string.$end;
+    }
+
+    public function getEmailTemplateContent($templateName, $mailType, $list)
+    {
+        $emailConfiguration = Configuration::get('PS_MAIL_TYPE');
+        if ($emailConfiguration != $mailType && $emailConfiguration != Mail::TYPE_BOTH) {
+            return '';
+        }
+        $context = Context::getContext();
+        $pathToFindEmail = array(
+            _PS_THEME_DIR_.'mails'.DIRECTORY_SEPARATOR.$context->language->iso_code.DIRECTORY_SEPARATOR.$templateName.'.tpl',
+            _PS_THEME_DIR_.'mails'.DIRECTORY_SEPARATOR.'en'.DIRECTORY_SEPARATOR.$templateName.'.tpl',
+            _PS_MAIL_DIR_.$context->language->iso_code.DIRECTORY_SEPARATOR.$templateName.'.tpl',
+            _PS_MAIL_DIR_.'en'.DIRECTORY_SEPARATOR.$templateName.'.tpl',
+        );
+
+        foreach ($pathToFindEmail as $path) {
+            if (Tools::file_exists_cache($path)) {
+                $context->smarty->assign('list', $list);
+                return $context->smarty->fetch($path);
+            }
+        }
+
+        return '';
     }
 }

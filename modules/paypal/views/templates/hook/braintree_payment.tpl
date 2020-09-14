@@ -26,7 +26,7 @@
 
 {*Displaying a button or the iframe*}
 <div class="row">
-	<div class="col-xs-12 col-md-6">
+	<div class="col-xs-12 col-md-12">
 		<div class="braintree-row-payment">
 			<p class="payment_module">
 			{if $error_msg != ''}<p class="braintree_error">{$error_msg|escape:'htmlall':'UTF-8'}<p>{/if}

@@ -148,7 +148,7 @@ class AdminThemesControllerCore extends AdminController
                         'type' => 'file',
                         'name' => 'PS_LOGO',
                         'tab' => 'logo',
-                        'thumb' => _PS_IMG_.Configuration::get('PS_LOGO')
+                        'thumb' => $this->context->link->getMediaLink(_PS_IMG_.Configuration::get('PS_LOGO'))
                     ),
                     'PS_LOGO_MOBILE' => array(
                         'title' => $this->l('Header logo for mobile'),
@@ -157,7 +157,7 @@ class AdminThemesControllerCore extends AdminController
                         'type' => 'file',
                         'name' => 'PS_LOGO_MOBILE',
                         'tab' => 'mobile',
-                        'thumb' => (Configuration::get('PS_LOGO_MOBILE') !== false && file_exists(_PS_IMG_DIR_.Configuration::get('PS_LOGO_MOBILE'))) ? _PS_IMG_.Configuration::get('PS_LOGO_MOBILE') : _PS_IMG_.Configuration::get('PS_LOGO')
+                        'thumb' => (Configuration::get('PS_LOGO_MOBILE') !== false && (bool)Tools::file_get_contents($this->context->link->getMediaLink(_PS_IMG_.Configuration::get('PS_LOGO_MOBILE')))) ? $this->context->link->getMediaLink(_PS_IMG_.Configuration::get('PS_LOGO_MOBILE')) : $this->context->link->getMediaLink(_PS_IMG_.Configuration::get('PS_LOGO'))
                     ),
                     'PS_LOGO_MAIL' => array(
                         'title' => $this->l('Mail logo'),
@@ -166,7 +166,7 @@ class AdminThemesControllerCore extends AdminController
                         'type' => 'file',
                         'name' => 'PS_LOGO_MAIL',
                         'tab' => 'logo2',
-                        'thumb' => (Configuration::get('PS_LOGO_MAIL') !== false && file_exists(_PS_IMG_DIR_.Configuration::get('PS_LOGO_MAIL'))) ? _PS_IMG_.Configuration::get('PS_LOGO_MAIL') : _PS_IMG_.Configuration::get('PS_LOGO')
+                        'thumb' => (Configuration::get('PS_LOGO_MAIL') !== false && (bool)Tools::file_get_contents($this->context->link->getMediaLink(_PS_IMG_.Configuration::get('PS_LOGO_MAIL')))) ? $this->context->link->getMediaLink(_PS_IMG_.Configuration::get('PS_LOGO_MAIL')) : $this->context->link->getMediaLink(_PS_IMG_.Configuration::get('PS_LOGO'))
                     ),
                     'PS_LOGO_INVOICE' => array(
                         'title' => $this->l('Invoice logo'),
@@ -175,7 +175,7 @@ class AdminThemesControllerCore extends AdminController
                         'type' => 'file',
                         'name' => 'PS_LOGO_INVOICE',
                         'tab' => 'logo2',
-                        'thumb' => (Configuration::get('PS_LOGO_INVOICE') !== false && file_exists(_PS_IMG_DIR_.Configuration::get('PS_LOGO_INVOICE'))) ? _PS_IMG_.Configuration::get('PS_LOGO_INVOICE') : _PS_IMG_.Configuration::get('PS_LOGO')
+                        'thumb' => (Configuration::get('PS_LOGO_INVOICE') !== false && (bool)Tools::file_get_contents($this->context->link->getMediaLink(_PS_IMG_.Configuration::get('PS_LOGO_INVOICE')))) ? $this->context->link->getMediaLink(_PS_IMG_.Configuration::get('PS_LOGO_INVOICE')) : $this->context->link->getMediaLink(_PS_IMG_.Configuration::get('PS_LOGO'))
                     ),
                     'PS_FAVICON' => array(
                         'title' => $this->l('Favicon'),
@@ -183,7 +183,7 @@ class AdminThemesControllerCore extends AdminController
                         'type' => 'file',
                         'name' => 'PS_FAVICON',
                         'tab' => 'icons',
-                        'thumb' => _PS_IMG_.Configuration::get('PS_FAVICON').(Tools::getValue('conf') ? sprintf('?%04d', rand(0, 9999)) : '')
+                        'thumb' => $this->context->link->getMediaLink(_PS_IMG_.Configuration::get('PS_FAVICON').(Tools::getValue('conf') ? sprintf('?%04d', rand(0, 9999)) : ''))
                     ),
                     'PS_STORES_ICON' => array(
                         'title' => $this->l('Store icon'),
@@ -191,7 +191,7 @@ class AdminThemesControllerCore extends AdminController
                         'type' => 'file',
                         'name' => 'PS_STORES_ICON',
                         'tab' => 'icons',
-                        'thumb' => _PS_IMG_.Configuration::get('PS_STORES_ICON')
+                        'thumb' => $this->context->link->getMediaLink(_PS_IMG_.Configuration::get('PS_STORES_ICON'))
                     ),
                     'PS_ALLOW_MOBILE_DEVICE' => array(
                         'title' => $this->l('Enable the mobile theme'),
@@ -2775,7 +2775,7 @@ class AdminThemesControllerCore extends AdminController
                         Shop::setContext(Shop::CONTEXT_SHOP);
                         $logo_shop = Configuration::get($field_name);
                         if ($logo_all != $logo_shop && $logo_group != $logo_shop && $logo_shop != false) {
-                            @unlink(_PS_IMG_DIR_.Configuration::get($field_name));
+                            Tools::deleteFile(_PS_IMG_DIR_.Configuration::get($field_name)); //by webkul use deleteFile insted of unlink
                         }
                     } elseif (Shop::getContext() == Shop::CONTEXT_GROUP) {
                         $id_shop_group = Shop::getContextShopGroupID();
@@ -2783,16 +2783,16 @@ class AdminThemesControllerCore extends AdminController
                         $logo_all = Configuration::get($field_name);
                         Shop::setContext(Shop::CONTEXT_GROUP);
                         if ($logo_all != Configuration::get($field_name)) {
-                            @unlink(_PS_IMG_DIR_.Configuration::get($field_name));
+                            Tools::deleteFile(_PS_IMG_DIR_.Configuration::get($field_name)); //by webkul use deleteFile insted of unlink
                         }
                     }
                 } else {
-                    @unlink(_PS_IMG_DIR_.Configuration::get($field_name));
+                    Tools::deleteFile(_PS_IMG_DIR_.Configuration::get($field_name)); //by webkul use deleteFile insted of unlink
                 }
             }
             Configuration::updateValue($field_name, $logo_name, false, $id_shop_group, $id_shop);
             Hook::exec('actionAdminThemesControllerUpdate_optionsAfter');
-            @unlink($tmp_name);
+            unlink($tmp_name);
         }
     }
 

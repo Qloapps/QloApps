@@ -2,12 +2,9 @@ Message from {shop_name}
 Hi {firstname} {lastname},
 Thank you for selecting our hotel!
 Order details
-{order_name} Placed on {date}
-
-Payment: {payment}
-
-Room Image
-Room Description
+Order: {order_name} Placed on {date}
+Room Image<
+Room Description<
 Room Capcity
 Unit Price
 Rooms Qty
@@ -16,7 +13,9 @@ Check-out Date
 Total
 
 {cart_booking_data_html}
+
 {extra_demands_details_html}
+
 {discounts}
 
 Total Rooms Cost
@@ -34,9 +33,7 @@ Total Rooms Tax
 Additional Facilities Tax
 {extra_demands_tax}
 
-{adv_data_html}
-
-Total
+Final Booking Amount
 {total_paid}
 
 Customer address

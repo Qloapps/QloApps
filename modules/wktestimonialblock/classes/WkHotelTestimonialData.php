@@ -1,6 +1,6 @@
 <?php
 /**
-* 2010-2018 Webkul.
+* 2010-2020 Webkul.
 *
 * NOTICE OF LICENSE
 *
@@ -14,7 +14,7 @@
 * needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
 *
 *  @author    Webkul IN <support@webkul.com>
-*  @copyright 2010-2018 Webkul IN
+*  @copyright 2010-2020 Webkul IN
 *  @license   https://store.webkul.com/license.html
 */
 
@@ -43,6 +43,13 @@ class WkHotelTestimonialData extends ObjectModel
             'testimonial_content' => array('type' => self::TYPE_STRING, 'lang' => true, 'required' => true),
     ));
 
+    public function __construct($id = null, $id_lang = null, $id_shop = null)
+    {
+        parent::__construct($id, $id_lang, $id_shop);
+
+        $this->image_dir = _PS_MODULE_DIR_.'wktestimonialblock/views/img/hotels_testimonials_img/';
+    }
+
     public function getTestimonialData($active = 2, $idLang = false)
     {
         if (!$idLang) {
@@ -64,15 +71,14 @@ class WkHotelTestimonialData extends ObjectModel
 
     public function delete()
     {
-        // delete image of the block
-        $imgPath = _PS_MODULE_DIR_.'wktestimonialblock/views/img/hotels_testimonials_img/'.$this->id.'.jpg';
-        if (file_exists($imgPath)) {
-            unlink($imgPath);
+        if (!parent::delete()
+            || !$this->deleteImage(true)
+            || !$this->cleanPositions()
+        ) {
+            return false;
         }
-        $return = parent::delete();
-        /* Reinitializing position */
-        $this->cleanPositions();
-        return $return;
+        return true;
+
     }
 
     public function getHigherPosition()

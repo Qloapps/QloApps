@@ -1,6 +1,6 @@
 <?php
 /**
-* 2010-2018 Webkul.
+* 2010-2020 Webkul.
 *
 * NOTICE OF LICENSE
 *
@@ -14,7 +14,7 @@
 * needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
 *
 *  @author    Webkul IN <support@webkul.com>
-*  @copyright 2010-2018 Webkul IN
+*  @copyright 2010-2020 Webkul IN
 *  @license   https://store.webkul.com/license.html
 */
 
@@ -40,6 +40,12 @@ class HotelFeatures extends ObjectModel
             //lang fields
             'name' => array('type' => self::TYPE_STRING, 'lang' => true),
         )
+    );
+
+    protected $webserviceParameters = array(
+        'objectsNodeName' => 'hotel_features',
+        'objectNodeName' => 'hotel_feature',
+        'fields' => array(),
     );
 
     public function delete()
@@ -181,8 +187,6 @@ class HotelFeatures extends ObjectModel
 
                         $result[$value['id']]['children'][] = $value1;
                     }
-                } else {
-                    return false;
                 }
             }
         }

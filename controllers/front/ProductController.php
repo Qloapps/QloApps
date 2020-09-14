@@ -48,8 +48,6 @@ class ProductControllerCore extends FrontController
             $this->addJqueryPlugin(array('fancybox', 'idTabs', 'scrollTo', 'serialScroll', 'bxslider'));
             // for the search block By webkul
             $this->addCSS(_PS_MODULE_DIR_.'hotelreservationsystem/views/css/datepickerCustom.css');
-            $this->context->controller->addJS(_PS_MODULE_DIR_.'hotelreservationsystem/views/js/roomSearchBlock.js');
-            $this->context->controller->addCSS(_PS_MODULE_DIR_.'hotelreservationsystem/views/css/searchblock.css');
             $this->addJS(array(
                 _THEME_JS_DIR_.'tools.js',  // retro compat themes 1.5
                 _THEME_JS_DIR_.'product.js'
@@ -85,53 +83,6 @@ class ProductControllerCore extends FrontController
     public function init()
     {
         parent::init();
-        //by webkul for product page searching
-        if (Tools::isSubmit('product_page_search_submit')) {
-            $hotel_cat_id = Tools::getValue('hotel_cat_id');
-            $check_in = Tools::getValue('check_in_time');
-            $check_out = Tools::getValue('check_out_time');
-
-            $check_in = date('Y-m-d', strtotime($check_in));
-            $check_out = date('Y-m-d', strtotime($check_out));
-
-            $curr_date = date('Y-m-d');
-            $max_order_date = Tools::getValue('max_order_date');
-            $error = false;
-
-            if ($hotel_cat_id == '') {
-                $error = 1;
-            } elseif ($check_in == '' || !Validate::isDate($check_in)) {
-                $error = 2;
-            } elseif ($check_out == '' || !Validate::isDate($check_out)) {
-                $error = 3;
-            } elseif ($check_in < $curr_date) {
-                $error = 5;
-            } elseif ($check_out <= $check_in) {
-                $error = 4;
-            }
-            if ($max_order_date) {
-                if ($max_order_date < $check_in || $max_order_date < $check_out) {
-                    $error = 6;
-                }
-            }
-
-            if (!$error) {
-                if (Configuration::get('PS_REWRITING_SETTINGS')) {
-                    $redirect_link = $this->context->link->getCategoryLink(new Category($hotel_cat_id, $this->context->language->id), null, $this->context->language->id).'?date_from='.$check_in.'&date_to='.$check_out;
-                } else {
-                    $redirect_link = $this->context->link->getCategoryLink(new Category($hotel_cat_id, $this->context->language->id), null, $this->context->language->id).'&date_from='.$check_in.'&date_to='.$check_out;
-                }
-            } else {
-                $id_product = Tools::getValue('id_product');
-                if (Configuration::get('PS_REWRITING_SETTINGS')) {
-                    $redirect_link = $this->context->link->getCategoryLink(new Category($hotel_cat_id, $this->context->language->id), null, $this->context->language->id).'?error='.$error;
-                } else {
-                    $redirect_link = $this->context->link->getProductLink(new Product($id_product, false, $this->context->language->id), null, null, null, $this->context->language->id).'&error='.$error;
-                }
-            }
-
-            Tools::redirect($redirect_link);
-        }
 
         if ($id_product = (int) Tools::getValue('id_product')) {
             $this->product = new Product($id_product, true, $this->context->language->id, $this->context->shop->id);
@@ -344,10 +295,10 @@ class ProductControllerCore extends FrontController
 
                 if (!($date_from = Tools::getValue('date_from'))) {
                     $date_from = date('Y-m-d');
-                    $date_to = date('Y-m-d', strtotime($date_from) + 86400);
+                    $date_to = date('Y-m-d', strtotime('+1 day', strtotime($date_from)));
                 }
                 if (!($date_to = Tools::getValue('date_to'))) {
-                    $date_to = date('Y-m-d', strtotime($date_from) + 86400);
+                    $date_to = date('Y-m-d', strtotime('+1 day', strtotime($date_from)));
                 }
 
                 $obj_htl_cart_booking_data = new HotelCartBookingData();
@@ -366,45 +317,26 @@ class ProductControllerCore extends FrontController
                 $obj_booking_dtl = new HotelBookingDetail();
                 $hotel_room_data = $obj_booking_dtl->DataForFrontSearch($date_from, $date_to, $hotel_id, $this->product->id, 1);
 
-
                 if ($hotel_room_data) {
                     $total_available_rooms = $hotel_room_data['stats']['num_avail'];
                 }
-
+                $hotel_branch_obj = new HotelBranchInformation($hotel_id);
                 if (isset($this->context->cart->id)) {
                     $num_cart_rooms = $obj_htl_cart_booking_data->getCountRoomsByIdCartIdProduct($this->context->cart->id, $this->product->id, $date_from, $date_to);
                     if ($num_cart_rooms) {
                         $total_available_rooms = $total_available_rooms - $num_cart_rooms;
                     }
                 }
-                $locationEnabled = Configuration::get('WK_HOTEL_LOCATION_ENABLE');
-                $hotel_branch_obj = new HotelBranchInformation($hotel_id);
-                if ($locationEnabled) {
-                    $hotel_info = $hotel_branch_obj->hotelBranchesInfo(0, 1);
-                    $totalActiveHotels = count($hotel_info);
-                    $hotel_info = $hotel_branch_obj->hotelBranchInfoByCategoryId($hotel_branch_obj->id_category);
-                } else {
-                    $hotel_info = $hotel_branch_obj->hotelBranchesInfo(0, 1);
-                    $totalActiveHotels = count($hotel_info);
-                }
-                foreach ($hotel_info as &$hotel) {
-                    $maxOrderDate = HotelOrderRestrictDate::getMaxOrderDate($hotel['id']);
-                    $hotel['max_order_date'] = date('Y-m-d', strtotime($maxOrderDate));
-                }
-
-                $search_data['date_from'] = date('d-m-Y', strtotime($date_from));
-                $search_data['date_to'] = date('d-m-Y', strtotime($date_to));
-                $search_data['htl_dtl'] = $hotel_branch_obj->hotelBranchesInfo(0, 1, 1, $hotel_id);
-                $search_data['location'] = $search_data['htl_dtl']['city'];
-                if (isset($search_data['htl_dtl']['state_name'])) {
-                    $search_data['location'] .= ', '.$search_data['htl_dtl']['state_name'];
-                }
-                $search_data['location'] .= ', '.$search_data['htl_dtl']['country_name'];
-
                 /*Max date of ordering for order restrict*/
+                $order_date_restrict = false;
                 $max_order_date = HotelOrderRestrictDate::getMaxOrderDate($hotel_id);
                 if ($max_order_date) {
                     $max_order_date = date('Y-m-d', strtotime($max_order_date));
+                    if (strtotime('-1 day', strtotime($max_order_date)) < strtotime($date_from)
+                        || strtotime($max_order_date) < strtotime($date_to)
+                    ) {
+                        $order_date_restrict = true;
+                    }
                 }
                 /*End*/
 
@@ -419,16 +351,14 @@ class ProductControllerCore extends FrontController
                         )
                     );
                 }
+
                 $this->context->smarty->assign(
                     array(
-                        'totalActiveHotels' => $totalActiveHotels,
+                        'isHotelRefundable' => $hotel_branch_obj->isRefundable(),
                         'max_order_date' => $max_order_date,
                         'warning_num' => Configuration::get('WK_ROOM_LEFT_WARNING_NUMBER'),
                         'ratting_img_path' => _MODULE_DIR_.'hotelreservationsystem/views/img/Slices/icons-sprite.png',
                         'total_available_rooms' => $total_available_rooms,
-                        'all_hotels_info' => $hotel_info,
-                        'show_only_active_htl' => Configuration::get('WK_HOTEL_NAME_ENABLE'),
-                        'location_enable' => $locationEnabled,
                         'total_price' => $total_price,
                         'product_controller_url' => $this->context->link->getPageLink('product'),
                         'num_days' => $num_days,
@@ -439,7 +369,7 @@ class ProductControllerCore extends FrontController
                         'hotel_policies' => $hotel_policies,
                         'hotel_features' => $htl_features,
                         'ftr_img_src' => _PS_IMG_.'rf/',
-                        'search_data' => $search_data,
+                        'order_date_restrict' => $order_date_restrict
                     )
                 );
                 // product price after imposing feature prices...
@@ -454,7 +384,14 @@ class ProductControllerCore extends FrontController
                 $feature_price_diff = (float)($productPriceWithoutReduction - $feature_price);
                 $this->context->smarty->assign('feature_price', $feature_price);
                 $this->context->smarty->assign('feature_price_diff', $feature_price_diff);
-                //END
+
+                // send hotel refund rules
+                if ($hotel_branch_obj->active_refund) {
+                    $objBranchRefundRules = new HotelBranchRefundRules();
+                    if ($hotelRefundRules = $objBranchRefundRules->getHotelRefundRules($hotel_id, 0, 1, 0, 1)) {
+                        $this->context->smarty->assign('hotelRefundRules', $hotelRefundRules);
+                    }
+                }
             }
 
             // get room type additional demands
@@ -467,6 +404,8 @@ class ProductControllerCore extends FrontController
                     }
                 }
             }
+
+
             $this->context->smarty->assign(
                 array(
                     'room_type_demands' => $roomTypeDemands,
@@ -792,7 +731,8 @@ class ProductControllerCore extends FrontController
         } else {
             $attributes_combinations = array();
         }
-        $this->context->smarty->assign(array(
+        $this->context->smarty->assign(
+            array(
             'attributesCombinations' =>  $attributes_combinations,
             'attribute_anchor_separator' => Configuration::get('PS_ATTRIBUTE_ANCHOR_SEPARATOR')
             )
@@ -951,11 +891,11 @@ class ProductControllerCore extends FrontController
                 $row['real_value'] = $row['base_price'] > 0 ? $row['base_price'] - $cur_price : $cur_price;
             } else {
                 if ($row['reduction_type'] == 'amount') {
-					if (Product::$_taxCalculationMethod == PS_TAX_INC) {
-						$row['real_value'] = $row['reduction_tax'] == 1 ? $row['reduction'] : $row['reduction'] * (1 + $tax_rate / 100);
-					} else {
-						$row['real_value'] = $row['reduction_tax'] == 0 ? $row['reduction'] : $row['reduction'] / (1 + $tax_rate / 100);
-					}
+                    if (Product::$_taxCalculationMethod == PS_TAX_INC) {
+                        $row['real_value'] = $row['reduction_tax'] == 1 ? $row['reduction'] : $row['reduction'] * (1 + $tax_rate / 100);
+                    } else {
+                        $row['real_value'] = $row['reduction_tax'] == 0 ? $row['reduction'] : $row['reduction'] / (1 + $tax_rate / 100);
+                    }
                     $row['reduction_with_tax'] = $row['reduction_tax'] ? $row['reduction'] : $row['reduction'] +  ($row['reduction'] *$tax_rate) / 100;
                 } else {
                     $row['real_value'] = $row['reduction'] * 100;
@@ -985,7 +925,6 @@ class ProductControllerCore extends FrontController
                 $dateFrom = Tools::getValue('date_from');
                 $dateTo = Tools::getValue('date_to');
                 $quantity = Tools::getValue('qty');
-                $roomDemands = Tools::getValue('room_demands');
                 if ($idHotel = $roomTypeInfo['id_hotel']) {
                     $objBookingDetail = new HotelBookingDetail();
                     if ($hotelRoomData = $objBookingDetail->DataForFrontSearch(

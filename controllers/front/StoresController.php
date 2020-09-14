@@ -108,7 +108,7 @@ class StoresControllerCore extends FrontController
 
             $addresses_formated[$store['id_store']] = AddressFormat::getFormattedLayoutData($address);
 
-            $store['has_picture'] = file_exists(_PS_STORE_IMG_DIR_.(int)$store['id_store'].'.jpg');
+            $store['has_picture'] = Tools::file_get_contents($this->context->link->getMediaLink(_THEME_STORE_DIR_.(int)$store['id_store'].'.jpg')); // by webkul to get media link.
             if ($working_hours = $this->renderStoreWorkingHours($store)) {
                 $store['working_hours'] = $working_hours;
             }
@@ -208,7 +208,7 @@ class StoresControllerCore extends FrontController
      */
     protected function assignStores()
     {
-        $this->context->smarty->assign('hasStoreIcon', file_exists(_PS_IMG_DIR_.Configuration::get('PS_STORES_ICON')));
+        $this->context->smarty->assign('hasStoreIcon', Tools::file_get_contents($this->context->link->getMediaLink(_PS_IMG_DIR_.Configuration::get('PS_STORES_ICON')))); // by webkul to get media link.
 
         $distance_unit = Configuration::get('PS_DISTANCE_UNIT');
         if (!in_array($distance_unit, array('km', 'mi'))) {

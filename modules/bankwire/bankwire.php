@@ -41,7 +41,7 @@ class bankwire extends PaymentModule
     {
         $this->name = 'bankwire';
         $this->tab = 'payments_gateways';
-        $this->version = '1.1.2';
+        $this->version = '1.1.3';
         $this->author = 'PrestaShop';
         $this->controllers = array('payment', 'validation');
         $this->is_eu_compatible = 1;
@@ -188,29 +188,31 @@ class bankwire extends PaymentModule
         if (!$this->active) {
             return;
         }
-        $cart = new Cart($params['objOrder']->id_cart);
-        $state = $params['objOrder']->getCurrentState();
+        $objOrder = $params['objOrder'];
+        $cart = new Cart($objOrder->id_cart);
+        $state = $objOrder->getCurrentState();
         if (in_array($state, array(Configuration::get('PS_OS_BANKWIRE'), Configuration::get('PS_OS_OUTOFSTOCK'), Configuration::get('PS_OS_OUTOFSTOCK_UNPAID')))) {
-            if (Configuration::get('WK_ALLOW_ADVANCED_PAYMENT')) {
-                $obj_customer_adv = new HotelCustomerAdvancedPayment();
-                $order_total = $obj_customer_adv->getOrdertTotal($cart->id, $cart->id_guest);
+            if ($objOrder->is_advance_payment) {
+                $order_total = $objOrder->advance_paid_amount;
             } else {
-                $order_total = $cart->getOrderTotal();
-            }
+                $order_total = $objOrder->total_paid;
+			}
+
             $this->smarty->assign(array(
                 'total_to_pay' => Tools::displayPrice($order_total, $params['currencyObj'], false),
                 'bankwireDetails' => Tools::nl2br($this->details),
                 'bankwireAddress' => Tools::nl2br($this->address),
                 'bankwireOwner' => $this->owner,
                 'status' => 'ok',
-                'id_order' => $params['objOrder']->id
+                'id_order' => $objOrder->id
             ));
-            if (isset($params['objOrder']->reference) && !empty($params['objOrder']->reference)) {
-                $this->smarty->assign('reference', $params['objOrder']->reference);
+            if (isset($objOrder->reference) && !empty($objOrder->reference)) {
+                $this->smarty->assign('reference', $objOrder->reference);
             }
         } else {
             $this->smarty->assign('status', 'failed');
         }
+
         return $this->display(__FILE__, 'payment_return.tpl');
     }
 

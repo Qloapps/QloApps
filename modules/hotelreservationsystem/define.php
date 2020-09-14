@@ -1,6 +1,6 @@
 <?php
 /**
-* 2010-2018 Webkul.
+* 2010-2020 Webkul.
 *
 * NOTICE OF LICENSE
 *
@@ -14,7 +14,7 @@
 * needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
 *
 *  @author    Webkul IN <support@webkul.com>
-*  @copyright 2010-2018 Webkul IN
+*  @copyright 2010-2020 Webkul IN
 *  @license   https://store.webkul.com/license.html
 */
 
@@ -30,12 +30,8 @@ require_once 'classes/HotelRoomAllotmentType.php';
 require_once 'classes/HotelBookingDetail.php';
 require_once 'classes/HotelCartBookingData.php';
 require_once 'classes/HotelAdvancedPayment.php';
-require_once 'classes/HotelCustomerAdvancedPayment.php';
 require_once 'classes/HotelOrderRefundRules.php';
-require_once 'classes/HotelOrderRefundInfo.php';
-require_once 'classes/HotelOrderRefundStages.php';
 require_once 'classes/HotelOrderRestrictDate.php';
-require_once 'classes/HotelCustomerAdvancedProductPayment.php';
 require_once 'classes/HotelHelper.php';
 require_once 'classes/HotelRoomTypeFeaturePricing.php';
 require_once 'classes/ChannelOrderPayment.php';
@@ -46,9 +42,11 @@ require_once 'classes/HotelRoomTypeGlobalDemandAdvanceOption.php';
 require_once 'classes/HotelRoomTypeDemandPrice.php';
 require_once 'classes/HotelRoomTypeDemand.php';
 
-// Web services classes
-require_once 'classes/WebserviceSpecificManagementQlo.php';
 require_once 'classes/QloWebservice.php';
 require_once 'classes/QloRoomType.php';
-require_once 'classes/ChannelManagerServices.php';
 require_once 'classes/HotelRoomDisableDates.php';
+require_once 'classes/HotelBranchRefundRules.php';
+
+// Web services classes
+require_once 'classes/WebserviceSpecificManagementQlo.php';
+require_once 'classes/WebserviceSpecificManagementHotelImages.php';

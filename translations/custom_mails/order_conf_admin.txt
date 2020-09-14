@@ -1,13 +1,15 @@
 Message from {shop_name}
 Hi {firstname} {lastname},
+
 New Bookings created on {shop_name}!
+
 Customer details
 Name: {customer_name}
 Email: {customer_email}
-Order details
-ORDER: {order_name} Placed on {date}
-PAYMENT: {payment}
 
+Order details
+Order: {order_name} Placed on {date}
+Payment: {payment}
 Room Image
 Room Description
 Room Capcity
@@ -15,35 +17,30 @@ Unit Price
 Rooms Qty
 Check-in Date
 Check-out Date
+
 Total
-
 {cart_booking_data_html}
-{extra_demands_details_html}
-{discounts}
 
-{products_txt}
+{extra_demands_details_html}
 
 {discounts}
 
 Total Rooms Cost
-
 {total_products}
 
 Total Additional Facilities Cost
 {total_extra_demands_te}
 
-DISCOUNTS
-
+Discounts
 {total_discounts}
 
-TOTAL TAX PAID
-
+Total Rooms Tax
 {total_tax_paid}
 
-{adv_data_text}
+Additional Facilities Tax
+{extra_demands_tax}
 
-TOTAL
-
+Final Booking Amount
 {total_paid}
 
 {shop_name} powered by Webkul&trade;

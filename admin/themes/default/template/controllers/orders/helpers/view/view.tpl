@@ -157,24 +157,16 @@
 					{/if} -->
 					<!-- End -->
 					&nbsp;
-					{if Configuration::get('PS_ORDER_RETURN')}
+					{if $refund_allowed && !$hasCompletelyRefunded}
 						<a id="desc-order-standard_refund" class="btn btn-default" href="#refundForm">
 							<i class="icon-exchange"></i>
-							{if $order->hasBeenShipped()}
-								{l s='Return products'}
-							{elseif $order->hasBeenPaid()}
-								{l s='Standard refund'}
+							{if $order->hasBeenPaid()}
+								{l s='Initiate refund'}
 							{else}
-								{l s='Cancel products'}
+								{l s='Cancel bookings'}
 							{/if}
 						</a>
 						&nbsp;
-					{/if}
-					{if $order->hasInvoice()}
-						<a id="desc-order-partial_refund" class="btn btn-default hidden" href="#refundForm">
-							<i class="icon-exchange"></i>
-							{l s='Partial refund'}
-						</a>
 					{/if}
 				</div>
 				<!-- Tab nav -->
@@ -206,7 +198,7 @@
 									{foreach from=$history item=row key=key}
 										{if ($key == 0)}
 											<tr>
-												<td style="background-color:{$row['color']}"><img src="../img/os/{$row['id_order_state']|intval}.gif" width="16" height="16" alt="{$row['ostate_name']|stripslashes}" /></td>
+												<td style="background-color:{$row['color']}"><img src="{$link->getMediaLink("`$img_dir`os/`$row['id_order_state']|intval`.gif")}" width="16" height="16" alt="{$row['ostate_name']|stripslashes}" /></td> {* by webkul to get media link *}
 												<td style="background-color:{$row['color']};color:{$row['text-color']}">{$row['ostate_name']|stripslashes}</td>
 												<td style="background-color:{$row['color']};color:{$row['text-color']}">{if $row['employee_lastname']}{$row['employee_firstname']|stripslashes} {$row['employee_lastname']|stripslashes}{/if}</td>
 												<td style="background-color:{$row['color']};color:{$row['text-color']}">{dateFormat date=$row['date_add'] full=true}</td>
@@ -221,7 +213,7 @@
 											</tr>
 										{else}
 											<tr>
-												<td><img src="../img/os/{$row['id_order_state']|intval}.gif" width="16" height="16" /></td>
+												<td><img src="{$link->getMediaLink("`$img_dir`os/`$row['id_order_state']|intval`.gif")}" width="16" height="16" /></td>
 												<td>{$row['ostate_name']|stripslashes}</td>
 												<td>{if $row['employee_lastname']}{$row['employee_firstname']|stripslashes} {$row['employee_lastname']|stripslashes}{else}&nbsp;{/if}</td>
 												<td>{dateFormat date=$row['date_add'] full=true}</td>
@@ -244,12 +236,9 @@
 							<div class="row">
 								<div class="col-lg-9">
 									<select id="id_order_state" class="chosen form-control" name="id_order_state">
-									{foreach from=$states item=state}
-									<!-- By webkul to hide unnecessary order statues from statuses dropdown -->
-										{if $state['id_order_state']!=4 && $state['id_order_state']!=5 && $state['id_order_state']!=14}
+										{foreach from=$states item=state}
 											<option value="{$state['id_order_state']|intval}"{if isset($currentState) && $state['id_order_state'] == $currentState->id} selected="selected" disabled="disabled"{/if}>{$state['name']|escape}</option>
-										{/if}
-									{/foreach}
+										{/foreach}
 									</select>
 									<input type="hidden" name="id_order" value="{$order->id}" />
 								</div>
@@ -268,6 +257,11 @@
 						{include file='controllers/orders/_documents.tpl'}
 					</div>
 				</div>
+				{if $returns}
+					<div class="alert alert-warning">
+						{l s='Booking cancellation requests has raised  from this order. To see booking cancelation requests'} <a target="_blank" href="{$link->getAdminLink('AdminOrderRefundRequests')}&amp;id_order={$order->id}&amp;vieworder_return">{l s='Click here'}</a>.
+					</div>
+				{/if}
 				<div class="row">
 					<div class="panel">
 						<div class="panel-heading order_status_heading">
@@ -276,7 +270,7 @@
 						</div>
 						<div class="panel-content">
 							<div class="row">
-								<div class="col-lg-12">
+								<div class="col-lg-12" id="room_status_info_wrapper">
 									<table class="table table-responsive">
 										<tr>
 											<th>{l s='Room No.'}</th>
@@ -286,44 +280,54 @@
 											<th>{l s='Order Status'}</th>
 										</tr>
 										{if isset($htl_booking_order_data) && $htl_booking_order_data}
-										{foreach from=$htl_booking_order_data item=data}
-										<tr>
-											<td>
-												{$data['room_num']}
-											</td>
-											<td>
-												<a href="{$link->getAdminLink('AdminAddHotel')}&amp;id={$data['id_hotel']}&amp;updatehtl_branch_info" target="_blank">
-													<span>{$data['hotel_name']}</span>
-												</a>
-											</td>
-											<td>
-												{$data['date_from']|date_format:"%d-%m-%Y"}
-											</td>
-											<td>
-												{$data['date_to']|date_format:"%d-%m-%Y"}
-											</td>
-											<td>
-												<form action="" method="post" class="form-horizontal">
-													<select style="margin-right:20px;margin-bottom:5px;display:inline;width:40%;" name="booking_order_status">
-													{foreach from=$hotel_order_status item=state}
-														<option value="{$state['id']|intval}" {if isset($data.id_status) && $state.id == $data.id_status} selected="selected" disabled="disabled"{/if}>{$state.status|escape}</option>
-													{/foreach}
-													</select>
-													<input type="hidden" name="date_from" value="{$data['date_from']}" />
-													<input type="hidden" name="date_to" value="{$data['date_to']}" />
-													<input type="hidden" name="id_room" value="{$data['id_room']}" />
-													<input type="hidden" name="id_order" value="{$order->id}" />
-													<button type="submit" name="submitbookingOrderStatus" class="btn btn-primary">
-														{l s='Update Status'}
-													</button>
-												</form>
-											</td>
-										</tr>
-										{/foreach}
+											{foreach from=$htl_booking_order_data item=data}
+												<tr>
+													<td>
+														{$data['room_num']}
+													</td>
+													<td>
+														<a href="{$link->getAdminLink('AdminAddHotel')}&amp;id={$data['id_hotel']}&amp;updatehtl_branch_info" target="_blank">
+															<span>{$data['hotel_name']}</span>
+														</a>
+													</td>
+													<td>
+														{$data['date_from']|date_format:"%d-%m-%Y"}
+													</td>
+													<td>
+														{$data['date_to']|date_format:"%d-%m-%Y"}
+													</td>
+													<td>
+														<form action="" method="post" class="form-horizontal row room_status_info_form">
+															<div class="col-sm-7">
+																<select name="booking_order_status" class="form-control booking_order_status margin-bottom-5">
+																	{foreach from=$hotel_order_status item=state}
+																		<option value="{$state['id']|intval}" {if isset($data.id_status) && $state.id == $data.id_status} selected="selected" disabled="disabled"{/if}>{$state.status|escape}</option>
+																	{/foreach}
+																</select>
+
+																{if $data['id_status'] == 2}<span class="badge badge-success margin-bottom-5">{l s='checked in on'} {$data['check_in']|date_format:"%d-%m-%Y"}</span>{elseif $data['id_status'] == 3}<span class="badge badge-success margin-bottom-5">{l s='checked out on'} {$data['check_out']|date_format:"%d-%m-%Y"}</span>{/if}
+
+																{* field for the current date *}
+																<input class="room_status_date wk-input-date" type="text" name="status_date" value="{$data['date_from']|date_format:"%d-%m-%Y"}" readonly/>
+
+																<input type="hidden" name="date_from" value="{$data['date_from']|date_format:"%Y-%m-%d"}" />
+																<input type="hidden" name="date_to" value="{$data['date_to']|date_format:"%Y-%m-%d"}" />
+																<input type="hidden" name="id_room" value="{$data['id_room']}" />
+																<input type="hidden" name="id_order" value="{$order->id}" />
+															</div>
+															<div class="col-sm-5">
+																<button type="submit" name="submitbookingOrderStatus" class="btn btn-primary">
+																	{l s='Update Status'}
+																</button>
+															</div>
+														</form>
+													</td>
+												</tr>
+											{/foreach}
 										{else}
-										<tr>
-											<td>{l s='No data found.'}</td>
-										</tr>
+											<tr>
+												<td>{l s='No data found.'}</td>
+											</tr>
 										{/if}
 									</table>
 								</div>
@@ -971,6 +975,9 @@
 							<table class="table" id="customer_cart_details">
 								<thead>
 									<tr>
+										{if $refund_allowed}
+											<th class="standard_refund_fields" style="display:none"></th>
+										{/if}
 										<th class="text-center"><span class="title_box">{l s='Room No.'}</span></th>
 										<th class="text-center"><span class="title_box">{l s='Room Image'}</th>
 										<th class="text-center"><span class="title_box">{l s='Room Type'}</span></th>
@@ -978,8 +985,10 @@
 										<th class="text-center"><span class="title_box">{l s='Duration'}</span></th>
 										<th class="text-center"><span class="title_box">{l s='Unit Price (Tax incl.)'}</span></th>
 										<th class="text-center"><span class="title_box">{l s='Total Price (Tax incl.)'}</span></th>
-										<th class="text-center"><span class="title_box">{l s='Refund Stage'}</span></th>
-										<th class="text-center"><span class="title_box">{l s='Refund Status'}</span></th>
+										{if isset($refundReqBookings) && $refundReqBookings}
+											<th class="text-center"><span class="title_box">{l s='Refund State'}</span></th>
+											<th class="text-center"><span class="title_box">{l s='Refunded amount'}</span></th>
+										{/if}
 										<th class="text-center"><span class="title_box">{l s='Reallocate Room'}</span></th>
 										{if ($can_edit && !$order->hasBeenDelivered())}
 										<th class="text-center"><span class="title_box">{l s='Edit Order'}</th>
@@ -1003,13 +1012,6 @@
 							</table>
 						</div>
 					</div>
-					{*
-					<div id="refundForm">
-						<a href="#" class="standard_refund"><img src="../img/admin/add.gif" alt="{l s='Process a standard refund'}" /> {l s='Process a standard refund'}</a>
-						<a href="#" class="partial_refund"><img src="../img/admin/add.gif" alt="{l s='Process a partial refund'}" /> {l s='Process a partial refund'}</a>
-						<!-- by webkul to hide unnessary things in the page -->
-					</div>
-					*}
 
 					{capture "TaxMethod"}
 						{if ($order->getTaxCalculationMethod() == $smarty.const.PS_TAX_EXC)}
@@ -1024,82 +1026,38 @@
 						<input type="hidden" name="TaxMethod" value="1">
 					{/if}
 					{if $can_edit}
-					<div class="row-margin-bottom row-margin-top order_action">
-					{if !$order->hasBeenDelivered()}
-						<button type="button" id="add_product" class="btn btn-default">
-							<i class="icon-plus-sign"></i>
-							{l s='Add Rooms In Order'}
-						</button>
-					{/if}
-						<button id="add_voucher" class="btn btn-default" type="button" >
-							<i class="icon-ticket"></i>
-							{l s='Add a new discount'}
-						</button>
-					</div>
+						<div class="row-margin-bottom row-margin-top order_action standard_refund_fields"  style="display: none;">
+							<textarea class="cancellation_reason" name="cancellation_reason" placeholder="{l s='Enter reason to cancel bookings'}"></textarea>
+						</div>
+						<div class="row-margin-bottom row-margin-top order_action">
+							{if !$order->hasBeenDelivered()}
+								<button type="button" id="add_product" class="btn btn-default">
+									<i class="icon-plus-sign"></i>
+									{l s='Add Rooms In Order'}
+								</button>
+							{/if}
+							<button id="add_voucher" class="btn btn-default" type="button" >
+								<i class="icon-ticket"></i>
+								{l s='Add a new discount'}
+							</button>
+
+							{if $refund_allowed && !$hasCompletelyRefunded}
+								<button style="display: none;" type="submit" name="initiateRefund" class="btn btn-success standard_refund_fields pull-right" id="initiateRefund">
+									{if $order->hasBeenPaid()}<i class="icon-undo"></i> {l s='Initiate Refund'}{else}{l s='Cancel bookings'}{/if}
+								</button>
+							{/if}
+						</div>
 					{/if}
 					<div class="clear">&nbsp;</div>
-					<hr>
 					<div class="row">
-						{*
 						<div class="col-xs-6">
 							<div class="alert alert-warning">
 								{l s='For this customer group, prices are displayed as: [1]%s[/1]' sprintf=[$smarty.capture.TaxMethod] tags=['<strong>']}
-								{if !Configuration::get('PS_ORDER_RETURN')}
-									<br/><strong>{l s='Merchandise returns are disabled'}</strong>
+								{if !$refund_allowed}
+									<br/><strong>{l s='Refunds are disabled'}</strong>
 								{/if}
 							</div>
 						</div>
-						<!-- by webkul to hide unnessary things in the page-->
-						*}
-
-						 {* For Due amount submit panel (by webkul)  *}
-						{if isset($order_adv_dtl)}
-							<div class="col-xs-6">
-								<div class="panel panel-advanced-payment">
-									<form class="clearfix" method="POST" action="{$link->getAdminLink('AdminOrders')|escape:'html':'UTF-8'}&amp;vieworder&amp;id_order={$order_adv_dtl['id_order']|intval}">
-										<div class="table-responsive">
-											<table class="table">
-												<tr>
-													<td>
-														<strong>{l s='Paid Amount'}</strong>
-													</td>
-													<td>
-														<strong>
-															{displayPrice price=$order_adv_dtl['total_paid_amount'] currency=$currency->id}
-														</strong>
-													</td>
-												</tr>
-												<tr>
-													<td>
-														<strong>{l s='Due Amount'}</strong>
-													</td>
-													<td>
-														<strong>{displayPrice price=($order_adv_dtl['total_order_amount'] - $order_adv_dtl['total_paid_amount']) currency=$currency->id}</strong>
-													</td>
-												</tr>
-												{if ($order_adv_dtl['total_order_amount'] - $order_adv_dtl['total_paid_amount']) > 0}
-													<tr>
-														<td>
-															<strong>{l s='submitted Amount'}</strong>
-														</td>
-														<td>
-															<div class="input-group">
-																<span class="input-group-addon" id="htl_order_currenct">{$currency->sign}</span>
-																<input type="text" class="form-control" placeholder="Amount" aria-describedby="htl_order_currenct" name="submitted_amount">
-															</div>
-														</td>
-													</tr>
-												{/if}
-											</table>
-										</div>
-										{if ($order_adv_dtl['total_order_amount'] - $order_adv_dtl['total_paid_amount'])|round:2 > 0}
-											<button type="submit" class="btn btn-primary" name="payDueAmount" style="margin-top:10px;">{l s="Submit Amount"}</button>
-										{/if}
-									</form>
-								</div>
-							</div>
-						{/if}
-
 						<div class="col-xs-6 pull-right">
 							<div class="panel panel-vouchers" style="{if !sizeof($discounts)}display:none;{/if}">
 								{if (sizeof($discounts) || $can_edit)}
@@ -1211,173 +1169,45 @@
 											</td>
 											<td class="partial_refund_fields current-edit" style="display:none;"></td>
 										</tr>
-										{*
-										<tr id="total_shipping">
-											<td class="text-right">{l s='Shipping'}</td>
-											<td class="amount text-right nowrap" >
-												{displayPrice price=$order_shipping_price currency=$currency->id}
-											</td>
-											<td class="partial_refund_fields current-edit" style="display:none;">
-												<div class="input-group">
-													<div class="input-group-addon">
-														{$currency->prefix}
-														{$currency->suffix}
-													</div>
-													<input type="text" name="partialRefundShippingCost" value="0" />
-												</div>
-												<p class="help-block"><i class="icon-warning-sign"></i> {l s='(%s)' sprintf=$smarty.capture.TaxMethod}</p>
-											</td>
-										</tr>*}
-
-			 							{if isset($order_adv_dtl)}
-				 							<tr>
-												<td class="text-right"><strong>{l s='Paid Amount'}</strong></td>
-												<td class="amount text-right nowrap">
-													<strong>
-														{displayPrice price=$order_adv_dtl['total_paid_amount'] currency=$currency->id}
-													</strong>
-												</td>
+										{if ($order->getTaxCalculationMethod() == $smarty.const.PS_TAX_EXC)}
+											<tr id="total_taxes">
+												<td class="text-right"><strong>{l s='Total Taxes'}</strong></td>
+												<td class="amount text-right nowrap" ><strong>{displayPrice price=($order->total_paid_tax_incl - $order->total_paid_tax_excl) currency=$currency->id}</strong></td>
+												<td class="partial_refund_fields current-edit" style="display:none;"></td>
 											</tr>
+			 							{/if}
+										<tr id="total_order">
+											<td class="text-right"><strong>{l s='Final Booking Total'}</strong></td>
+											<td class="amount text-right nowrap">
+												<strong>{displayPrice price=$order->total_paid_tax_incl currency=$currency->id}</strong>
+											</td>
+											<td class="partial_refund_fields current-edit" style="display:none;"></td>
+										</tr>
+
+										{if isset($refundReqBookings) && $refundReqBookings}
+											<tr id="total_order">
+												<td class="text-right"><strong>* {l s='Refunded Amount'}</strong></td>
+												<td class="amount text-right nowrap">
+													<strong>{displayPrice price=$refundedAmount currency=$currency->id}</strong>
+												</td>
+												<td class="partial_refund_fields current-edit" style="display:none;"></td>
+											</tr>
+										{/if}
+
+										{if $order->total_paid_tax_incl > $order->total_paid_real}
 											<tr>
 												<td class="text-right"><strong>{l s='Due Amount'}</strong></td>
 												<td class="amount text-right nowrap">
 													<strong>
-														{displayPrice price=($order_adv_dtl['total_order_amount'] - $order_adv_dtl['total_paid_amount']) currency=$currency->id}
+														{displayPrice currency=$order->id_currency price=($order->total_paid_tax_incl - $order->total_paid_real)}
 													</strong>
 												</td>
 											</tr>
 										{/if}
-										{if ($order->getTaxCalculationMethod() == $smarty.const.PS_TAX_EXC)}
-											<tr id="total_taxes">
-												<td class="text-right"><strong>{l s='Total Taxes'}</strong></td>
-												<td class="amount text-right nowrap" ><strong>{displayPrice price=($order->total_paid_tax_incl-$order->total_paid_tax_excl) currency=$currency->id}</strong></td>
-												<td class="partial_refund_fields current-edit" style="display:none;"></td>
-											</tr>
-			 							{/if}
-										{assign var=order_total_price value=$order->total_paid_tax_incl}
-
-										<tr id="total_order">
-											<td class="text-right"><strong>{l s='Final Order Total'}</strong></td>
-											<td class="amount text-right nowrap">
-												<strong>{displayPrice price=$order_total_price currency=$currency->id}</strong>
-											</td>
-											<td class="partial_refund_fields current-edit" style="display:none;"></td>
-										</tr>
 									</table>
 								</div>
 							</div>
 						</div>
-					</div>
-					<div style="display: none;" class="standard_refund_fields form-horizontal panel">
-						<div class="form-group">
-							{if ($order->hasBeenDelivered() && Configuration::get('PS_ORDER_RETURN'))}
-							<p class="checkbox">
-								<label for="reinjectQuantities">
-									<input type="checkbox" id="reinjectQuantities" name="reinjectQuantities" />
-									{l s='Re-stock products'}
-								</label>
-							</p>
-							{/if}
-							{if ((!$order->hasBeenDelivered() && $order->hasBeenPaid()) || ($order->hasBeenDelivered() && Configuration::get('PS_ORDER_RETURN')))}
-							<p class="checkbox">
-								<label for="generateCreditSlip">
-									<input type="checkbox" id="generateCreditSlip" name="generateCreditSlip" onclick="toggleShippingCost()" />
-									{l s='Generate a credit slip'}
-								</label>
-							</p>
-							<p class="checkbox">
-								<label for="generateDiscount">
-									<input type="checkbox" id="generateDiscount" name="generateDiscount" onclick="toggleShippingCost()" />
-									{l s='Generate a voucher'}
-								</label>
-							</p>
-							<p class="checkbox" id="spanShippingBack" style="display:none;">
-								<label for="shippingBack">
-									<input type="checkbox" id="shippingBack" name="shippingBack" />
-									{l s='Repay shipping costs'}
-								</label>
-							</p>
-							{if $order->total_discounts_tax_excl > 0 || $order->total_discounts_tax_incl > 0}
-							<br/><p>{l s='This order has been partially paid by voucher. Choose the amount you want to refund:'}</p>
-							<p class="radio">
-								<label id="lab_refund_total_1" for="refund_total_1">
-									<input type="radio" value="0" name="refund_total_voucher_off" id="refund_total_1" checked="checked" />
-									{l s='Include amount of initial voucher: '}
-								</label>
-							</p>
-							<p class="radio">
-								<label id="lab_refund_total_2" for="refund_total_2">
-									<input type="radio" value="1" name="refund_total_voucher_off" id="refund_total_2"/>
-									{l s='Exclude amount of initial voucher: '}
-								</label>
-							</p>
-							<div class="nowrap radio-inline">
-								<label id="lab_refund_total_3" class="pull-left" for="refund_total_3">
-									{l s='Amount of your choice: '}
-									<input type="radio" value="2" name="refund_total_voucher_off" id="refund_total_3"/>
-								</label>
-								<div class="input-group col-lg-1 pull-left">
-									<div class="input-group-addon">
-										{$currency->prefix}
-										{$currency->suffix}
-									</div>
-									<input type="text" class="input fixed-width-md" name="refund_total_voucher_choose" value="0"/>
-								</div>
-							</div>
-							{/if}
-						{/if}
-						</div>
-						{if (!$order->hasBeenDelivered() || ($order->hasBeenDelivered() && Configuration::get('PS_ORDER_RETURN')))}
-						<div class="row">
-							<input type="submit" name="cancelProduct" value="{if $order->hasBeenDelivered()}{l s='Return products'}{elseif $order->hasBeenPaid()}{l s='Refund products'}{else}{l s='Cancel products'}{/if}" class="btn btn-default" />
-						</div>
-						{/if}
-					</div>
-					<div style="display:none;" class="partial_refund_fields">
-						<p class="checkbox">
-							<label for="reinjectQuantitiesRefund">
-								<input type="checkbox" id="reinjectQuantitiesRefund" name="reinjectQuantities" />
-								{l s='Re-stock products'}
-							</label>
-						</p>
-						<p class="checkbox">
-							<label for="generateDiscountRefund">
-								<input type="checkbox" id="generateDiscountRefund" name="generateDiscountRefund" onclick="toggleShippingCost()" />
-								{l s='Generate a voucher'}
-							</label>
-						</p>
-						{if $order->total_discounts_tax_excl > 0 || $order->total_discounts_tax_incl > 0}
-						<p>{l s='This order has been partially paid by voucher. Choose the amount you want to refund:'}</p>
-						<p class="radio">
-							<label id="lab_refund_1" for="refund_1">
-								<input type="radio" value="0" name="refund_voucher_off" id="refund_1" checked="checked" />
-								{l s='Product(s) price: '}
-							</label>
-						</p>
-						<p class="radio">
-							<label id="lab_refund_2" for="refund_2">
-								<input type="radio" value="1" name="refund_voucher_off" id="refund_2"/>
-								{l s='Product(s) price, excluding amount of initial voucher: '}
-							</label>
-						</p>
-						<div class="nowrap radio-inline">
-								<label id="lab_refund_3" class="pull-left" for="refund_3">
-									{l s='Amount of your choice: '}
-									<input type="radio" value="2" name="refund_voucher_off" id="refund_3"/>
-								</label>
-								<div class="input-group col-lg-1 pull-left">
-									<div class="input-group-addon">
-										{$currency->prefix}
-										{$currency->suffix}
-									</div>
-									<input type="text" class="input fixed-width-md" name="refund_voucher_choose" value="0"/>
-								</div>
-							</div>
-						{/if}
-						<br/>
-						<button type="submit" name="partialRefund" class="btn btn-default">
-							<i class="icon-check"></i> {l s='Partial refund'}
-						</button>
 					</div>
 				</div>
 			</form>
@@ -1462,8 +1292,8 @@
   <div class="modal-dialog" role="document">
     <div class="modal-content">
     	<ul class="nav nav-tabs" role="tablist">
-		    <li role="presentation" class="active"><a href="#reallocate_room_tab" aria-controls="reallocate" role="tab" data-toggle="tab">{l s='Room Reallocation' mod='hotelreservationsystem'}</a></li>
-		    <li role="presentation"><a href="#swap_room_tab" aria-controls="swap" role="tab" data-toggle="tab">{l s='Swap Room' mod='hotelreservationsystem'}</a></li>
+		    <li role="presentation" class="active"><a href="#reallocate_room_tab" aria-controls="reallocate" role="tab" data-toggle="tab">{l s='Room Reallocation'}</a></li>
+		    <li role="presentation"><a href="#swap_room_tab" aria-controls="swap" role="tab" data-toggle="tab">{l s='Swap Room'}</a></li>
 		 </ul>
 		<div class="tab-content panel active">
 			<div role="tabpanel" class="tab-pane active" id="reallocate_room_tab">
@@ -1474,23 +1304,23 @@
 					</div>
 					<div class="modal-body">
 						<div class="form-group">
-							<label for="curr_room_num" class="control-label model-label">{l s='Current Room Number:' mod='hotelreservationsystem'}</label>
+							<label for="curr_room_num" class="control-label model-label">{l s='Current Room Number:'}</label>
 							<input type="text" class="form-control modal_curr_room_num" name="modal_curr_room_num" readonly="true">
 							<input type="hidden" class="form-control modal_date_from" name="modal_date_from">
 							<input type="hidden" class="form-control modal_date_to" name="modal_date_to">
 							<input type="hidden" class="form-control modal_id_room" name="modal_id_room">
 						</div>
 						<div class="form-group">
-							<label for="realloc_avail_rooms" class="control-label model-label">{l s='Available Rooms To Reallocate:' mod='hotelreservationsystem'}</label>
+							<label for="realloc_avail_rooms" class="control-label model-label">{l s='Available Rooms To Reallocate:'}</label>
 							<div class="realloc_avail_rooms_container" style="width: 195px;">
 								<select class="form-control" name="realloc_avail_rooms" id="realloc_avail_rooms">
-									<option value="0" selected="selected">{l s='Select Rooms' mod='hotelreservationsystem'}</option>
+									<option value="0" selected="selected">{l s='Select Rooms'}</option>
 								</select>
 							</div>
 							<p class="error_text" id="realloc_sel_rm_err_p"></p>
 						</div>
 						<div class="form-group">
-							<label style="text-decoration:underline;margin-top:5px;" for="message-text" class="col-sm-12 control-label model-label"><i class="icon-info-circle"></i>&nbsp;{l s='Currently Alloted Customer Information:' mod='hotelreservationsystem'}</label>
+							<label style="text-decoration:underline;margin-top:5px;" for="message-text" class="col-sm-12 control-label model-label"><i class="icon-info-circle"></i>&nbsp;{l s='Currently Alloted Customer Information:'}</label>
 							<dl class="well list-detail">
 								<dt>{l s='Name'}</dt>
 								<dd class="cust_name"></dd><br>
@@ -1513,7 +1343,7 @@
 					</div>
 					<div class="modal-body">
 						<div class="form-group">
-							<label for="swap_curr_room_num" class="control-label model-label">{l s='Current Room Number:' mod='hotelreservationsystem'}</label>
+							<label for="swap_curr_room_num" class="control-label model-label">{l s='Current Room Number:'}</label>
 							<input type="text" class="form-control modal_curr_room_num" name="modal_curr_room_num" readonly="true">
 							<input type="hidden" class="form-control modal_date_from" name="modal_date_from">
 							<input type="hidden" class="form-control modal_date_to" name="modal_date_to">
@@ -1521,12 +1351,12 @@
 							<input type="hidden" class="form-control modal_id_order" name="modal_id_order">
 						</div>
 						<div class="form-group">
-							<label for="swap_avail_rooms" class="control-label model-label">{l s='Available Rooms To Swap:' mod='hotelreservationsystem'}</label>
+							<label for="swap_avail_rooms" class="control-label model-label">{l s='Available Rooms To Swap:'}</label>
 							<div class="swap_avail_rooms_container"></div>
 							<p class="error_text" id="swap_sel_rm_err_p"></p>
 						</div>
 						<div class="form-group">
-							<label style="text-decoration:underline;margin-top:5px;" for="message-text" class="col-sm-12 control-label model-label"><i class="icon-info-circle"></i>&nbsp;{l s='Currently Alloted Customer Information:' mod='hotelreservationsystem'}</label>
+							<label style="text-decoration:underline;margin-top:5px;" for="message-text" class="col-sm-12 control-label model-label"><i class="icon-info-circle"></i>&nbsp;{l s='Currently Alloted Customer Information:'}</label>
 							<dl class="well list-detail">
 								<dt>{l s='Name'}</dt>
 								<dd class="cust_name"></dd><br>
@@ -1546,48 +1376,89 @@
   </div>
 </div>
 
-
 {* MOdal for extra demands *}
-<div class="modal fade" id="rooms_type_extra_demands" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content" id="room_type_demands_desc">
-    </div>
-  </div>
+<div class="modal" tabindex="-1" role="dialog" id="rooms_type_extra_demands">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content" id="room_extra_demand_content">
+
+		</div>
+	</div>
 </div>
-{strip}
-	{addJsDefL name=no_rm_avail_txt}{l s='No rooms available.' js=1 mod='hotelreservationsystem'}{/addJsDefL}
-	{addJsDefL name=slct_rm_err}{l s='Please select a room first.' js=1 mod='hotelreservationsystem'}{/addJsDefL}
-{/strip}
+
+{* Apply css for the page *}
 <style>
 	.error_text {
-		color:red;
-	}
+		color:red;}
 	.model-label {
-		font-weight:bold!important;
-	}
+		font-weight:bold!important;}
 	.room_type_old_price {
 		text-decoration: line-through;
 		color:#979797;
-		font-size:12px;
-	}
-	#rooms_type_extra_demands .demand_header {
-		font-size:16px;
-		padding-bottom: 15px;
-		border-bottom: 1px solid rgb(0, 0, 0, 0.1);
-		margin-bottom: 15px;}
-	#rooms_type_extra_demands .demand_detail p {
-		font-size:14px;
-		margin-bottom: 15px;}
-	#rooms_type_extra_demands .rooms_extra_demands_head {
-		margin-bottom: 18px;}
-	#rooms_type_extra_demands #room_type_demands_desc {
-		padding: 15px;}
+		font-size:12px;}
+	.wk-input-date {
+		cursor: text!important;
+		background-color: #F5F8F9!important;}
+	#room_status_info_wrapper .margin-bottom-5 {
+		margin-bottom: 5px!important;}
+	#room_status_info_wrapper .room_status_date {
+		display: none;}
 </style>
 
-<script type="text/javascript">
+
+{strip}
+	{addJsDefL name=no_rm_avail_txt}{l s='No rooms available.' js=1}{/addJsDefL}
+	{addJsDefL name=slct_rm_err}{l s='Please select a room first.' js=1}{/addJsDefL}
+	{addJsDefL name=txtExtraDemandSucc}{l s='Updated Successfully' js=1}{/addJsDefL}
+	{addJsDefL name=atleastSelectTxt}{l s='Select at least one facility to update.' js=1}{/addJsDefL}
+
+	{addJsDefL name=txtSomeErr}{l s='Some error occurred. Please try again.' js=1}{/addJsDefL}
+	{addJsDefL name=txtDeleteSucc}{l s='Deleted successfully' js=1}{/addJsDefL}
+	{addJsDefL name=txtInvalidDemandVal}{l s='Invalid demand value found' js=1}{/addJsDefL}
+{/strip}
+
+{* Apply javascript for the page *}
+<script>
 	var geocoder = new google.maps.Geocoder();
 	var delivery_map, invoice_map;
+
 	$(document).ready(function() {
+		{* check id reason is inserted before submitting the refund *}
+		$('#initiateRefund').on('click', function(e) {
+			if ($.trim($('.cancellation_reason').val()) == '') {
+				$('.cancellation_reason').focus().css('border', '1px solid red');
+				return false;
+			}
+		});
+
+		{* toggle date input of check-in checkout dates as per status selected *}
+		$('.booking_order_status').on('change', function() {
+			var status = $(this).val();
+			if (status == '2' || status == '3') {
+				$(this).closest('.room_status_info_form').find('.room_status_date').show();
+			} else {
+				$(this).closest('.room_status_info_form').find('.room_status_date').hide();
+			}
+		});
+
+		{* open date picker for the date input of check-in checkout dates *}
+		$(document).on('focus', '.room_status_date', function() {
+			var dateFrom = $(this).closest('.room_status_info_form').find('[name="date_from"]').val();
+			dateFrom = dateFrom.split("-");
+            minDate = new Date($.datepicker.formatDate('yy-mm-dd', new Date(dateFrom[0], dateFrom[1] - 1, dateFrom[2])));
+
+			var dateTo = $(this).closest('.room_status_info_form').find('[name="date_to"]').val();
+			dateTo = dateTo.split("-");
+            maxDate = new Date($.datepicker.formatDate('yy-mm-dd', new Date(dateTo[0], dateTo[1] - 1, dateTo[2])));
+
+			$(this).datepicker({
+				dateFormat: 'dd-mm-yy',
+				minDate: minDate,
+				maxDate: maxDate,
+				dayNamesMin: [ "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+			});
+		});
+
+		{* open fancybox for extra demands *}
 		$('.open_room_extra_demands').on('click', function(e) {
 			e.preventDefault();
 			var idProduct = $(this).attr('id_product');
@@ -1595,6 +1466,12 @@
 			var idRoom = $(this).attr('id_room');
 			var dateFrom = $(this).attr('date_from');
 			var dateTo = $(this).attr('date_to');
+			var idHtlBooking = $(this).attr('id_htl_booking');
+			var orderEdit = 0;
+			if(  $(this).closest('.product-line-row').find(".submitProductChange").is(":visible") == true ) {
+				orderEdit = 1;
+			}
+
 			$.ajax({
 				type: 'POST',
 				headers: {
@@ -1609,15 +1486,124 @@
 					id_order: idOrder,
 					date_from: dateFrom,
 					date_to: dateTo,
+					orderEdit: orderEdit,
 					action: 'getRoomTypeBookingDemands',
 					ajax: true
 				},
 				success: function(result) {
-					$('#room_type_demands_desc').html('');
-					$('#room_type_demands_desc').append(result);
+					$('#room_extra_demand_content').html('');
+					$('#room_extra_demand_content').append(result);
+
+					$('#room_extra_demand_content #id_htl_booking').val(idHtlBooking);
+
 					$('#rooms_type_extra_demands').modal('show');
 				},
 			});
+		});
+
+		{* when choose to add new facilities while additional facilities edit *}
+		$(document).on('click', '#room_extra_demand_content #btn_new_room_facility', function() {
+			$('#rooms_extra_demands .room_demands_container').show();
+			$('#room_extra_demand_content #save_room_facilities').show();
+			$('#room_extra_demand_content #back_to_facilities_btn').show();
+			$('#rooms_extra_demands .room_ordered_demands').hide();
+			$('#room_extra_demand_content #btn_new_room_facility').hide();
+		});
+		{* click on back button on created facilities while additional facilities edit *}
+		$(document).on('click', '#room_extra_demand_content #back_to_facilities_btn', function() {
+			$('#rooms_extra_demands .room_ordered_demands').show();
+			$('#room_extra_demand_content #btn_new_room_facility').show();
+			$('#rooms_extra_demands .room_demands_container').hide();
+			$('#room_extra_demand_content #save_room_facilities').hide();
+			$('#room_extra_demand_content #back_to_facilities_btn').hide();
+		});
+
+		{* // save room extra demand to the order *}
+		$(document).on('click', '#save_room_facilities', function(e) {
+			e.preventDefault();
+			var idHtlBooking = $(this).closest('#room_extra_demand_content').find('#id_htl_booking').val();
+			if (idHtlBooking) {
+				var roomDemands = [];
+				// get the selected extra demands by customer
+				$(this).closest('#room_extra_demand_content').find('input:checkbox.id_room_type_demand:checked').each(function () {
+					roomDemands.push({
+						'id_global_demand':$(this).val(),
+						'id_option': $(this).closest('.room_demand_block').find('.id_option').val()
+					});
+				});
+
+				if (roomDemands.length) {
+					$.ajax({
+						type: 'POST',
+						headers: {
+							"cache-control": "no-cache"
+						},
+						url: "{$link->getAdminLink('AdminOrders')|addslashes}",
+						dataType: 'JSON',
+						cache: false,
+						data: {
+							id_htl_booking: idHtlBooking,
+							room_demands: JSON.stringify(roomDemands),
+							action: 'EditRoomExtraDemands',
+							ajax: true
+						},
+						success: function(result) {
+							if (result == 1) {
+								showSuccessMessage(txtExtraDemandSucc);
+								$('#rooms_type_extra_demands').modal('hide');
+							} else {
+								showErrorMessage(txtSomeErr);
+							}
+						}
+					});
+				} else {
+					showErrorMessage(atleastSelectTxt);
+				}
+			}
+		});
+
+		{* Delete ordered room booking demand *}
+		$(document).on('click', '.del-order-room-demand', function(e) {
+			e.preventDefault();
+			if (confirm(txt_confirm)) {
+				var idBookingDemand = $(this).attr('id_booking_demand');
+				$currentItem = $(this);
+				if (idBookingDemand) {
+					$.ajax({
+						type: 'POST',
+						headers: {
+							"cache-control": "no-cache"
+						},
+						url: "{$link->getAdminLink('AdminOrders')|addslashes}",
+						dataType: 'JSON',
+						cache: false,
+						data: {
+							id_booking_demand: idBookingDemand,
+							action: 'DeleteRoomExtraDemand',
+							ajax: true
+						},
+						success: function(result) {
+							if (result == 1) {
+								$currentItem.closest('tr').remove();
+								showSuccessMessage(txtDeleteSucc);
+							} else {
+								showErrorMessage(txtSomeErr);
+							}
+						}
+					});
+				} else {
+					showErrorMessage(txtInvalidDemandVal);
+				}
+			}
+		});
+
+		// change advance option of extra demand
+		$(document).on('change', '.demand_adv_option_block .id_option', function(e) {
+			var option_selected = $(this).find('option:selected');
+			var extra_demand_price = option_selected.attr("optionPrice")
+			extra_demand_price = parseFloat(extra_demand_price);
+			extra_demand_price = formatCurrency(extra_demand_price, currency_format, currency_sign, currency_blank);
+			$(this).closest('.room_demand_block').find('.extra_demand_option_price').text(extra_demand_price);
 		});
 
 		$('#mySwappigModal').on('hidden.bs.modal', function (e)

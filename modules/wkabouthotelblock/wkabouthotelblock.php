@@ -1,6 +1,6 @@
 <?php
 /**
-* 2010-2018 Webkul.
+* 2010-2020 Webkul.
 *
 * NOTICE OF LICENSE
 *
@@ -14,7 +14,7 @@
 * needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
 *
 *  @author    Webkul IN <support@webkul.com>
-*  @copyright 2010-2018 Webkul IN
+*  @copyright 2010-2020 Webkul IN
 *  @license   https://store.webkul.com/license.html
 */
 
@@ -31,7 +31,7 @@ class WkAboutHotelBlock extends Module
     {
         $this->name = 'wkabouthotelblock';
         $this->tab = 'front_office_features';
-        $this->version = '1.1.3';
+        $this->version = '1.1.5';
         $this->author = 'webkul';
         $this->need_instance = 0;
 
@@ -169,9 +169,9 @@ class WkAboutHotelBlock extends Module
     public function uninstall()
     {
         if (!parent::uninstall()
+            || !$this->deleteHotelInterierImg()
             || !$this->deleteTables()
             || !$this->deleteConfigKeys()
-            || !$this->deleteHotelInterierImg()
             || !$this->uninstallTab()
         ) {
             return false;
@@ -193,10 +193,12 @@ class WkAboutHotelBlock extends Module
 
     public function deleteHotelInterierImg()
     {
-        $uploadedImg = glob(_PS_MODULE_DIR_.$this->name.'/views/img/hotel_interior/*.jpg');
-        if ($uploadedImg) {
-            foreach ($uploadedImg as $interiorImg) {
-                unlink($interiorImg);
+        $objHtlInteriorImg = new WkHotelInteriorImage();
+        $InteriorImgs = $objHtlInteriorImg->getHotelInteriorImg();
+        foreach($InteriorImgs as $key => $interiorImg) {
+            $objHtlInteriorImg = new WkHotelInteriorImage($interiorImg['id_interior_image']);
+            if (Validate::isLoadedObject($objHtlInteriorImg)) {
+                $objHtlInteriorImg->deleteImage(true);
             }
         }
         return true;

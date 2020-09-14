@@ -1,7 +1,0 @@
-2014-04-22 15:05:15 +0200	// cashondelivery: wrong word + typography.
-2014-04-17 11:47:55 +0200	// Fixed indent
-2014-04-17 11:45:29 +0200	// Fix config.xml indent
-2014-04-17 11:42:08 +0200	[-] MO : cashondelivery - Fix 1.5 ps_version_compliancy issue
-2014-04-07 15:10:41 +0200	// cashondelivery: string easier to translate.
-2014-03-24 18:26:00 +0100	/ MO cashondelivery : ps_versions_compliancy added
-2014-03-21 10:53:57 +0100	Initial commit

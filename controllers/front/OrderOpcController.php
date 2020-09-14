@@ -360,6 +360,9 @@ class OrderOpcControllerCore extends ParentOrderController
     {
         parent::initContent();
 
+        // check ORDER RESTRICT condition before payment by the customer
+        $orderRestrictErr = HotelOrderRestrictDate::validateOrderRestrictDateOnPayment($this);
+
         /* id_carrier is not defined in database before choosing a carrier, set it to a default one to match a potential cart _rule */
         if (empty($this->context->cart->id_carrier)) {
             $checked = $this->context->cart->simulateCarrierSelectedOutput();
@@ -403,6 +406,11 @@ class OrderOpcControllerCore extends ParentOrderController
             }
         }
 
+        // if any error is there in the checkout process the reset the steps of checkout
+        if (count($this->errors)) {
+            CheckoutProcess::refreshCheckoutProcess();
+        }
+
         // assign checkout process steps
         $this->setCheckoutProcess();
 
@@ -422,6 +430,7 @@ class OrderOpcControllerCore extends ParentOrderController
         $totalFacilityCostTE = $objCartBookingData->getCartExtraDemands($this->context->cart->id, 0, 0, 0, 0, 1, 0, 0);
         $this->context->smarty->assign(
             array(
+                'orderRestrictErr' => $orderRestrictErr,
                 'additional_facilities_tax' => ($totalFacilityCostTI - $totalFacilityCostTE),
                 'totalFacilityCostTE' => $totalFacilityCostTE,
                 'allDemands' => $allDemands,
@@ -500,135 +509,46 @@ class OrderOpcControllerCore extends ParentOrderController
             $this->addJS(_THEME_JS_DIR_ . 'advanced-payment-api.js');
             $this->setTemplate(_PS_THEME_DIR_ . 'order-opc-advanced.tpl');
         } else {
-            if (Module::isInstalled('hotelreservationsystem')) {
-                require_once _PS_MODULE_DIR_.'hotelreservationsystem/define.php';
-                $obj_htl_bk_dtl = new HotelBookingDetail();
-                $obj_rm_type = new HotelRoomType();
+            // set used objects in the below code
+            $objBookingDetail = new HotelBookingDetail();
+            $objHtlRoomType = new HotelRoomType();
 
-                $htl_rm_types = $this->context->cart->getProducts();
-                if (!empty($htl_rm_types)) {
-                    // For Cart Lock
-                    $cartChanged = false;
-                    foreach ($htl_rm_types as $t_key => $t_value) {
-                        $rm_dtl = $obj_rm_type->getRoomTypeInfoByIdProduct($t_value['id_product']);
-                        $cart_bk_data = $objCartBookingData->getOnlyCartBookingData($this->context->cart->id, $this->context->cart->id_guest, $t_value['id_product']);
+            $roomTypeList = $this->context->cart->getProducts();
+            if (!empty($roomTypeList)) {
 
-                        $cart_data = array();
-                        foreach ($cart_bk_data as $cd_key => $cd_val) {
-                            $date_join = strtotime($cd_val['date_from']).strtotime($cd_val['date_to']);
+                if ($cartBookingInfo = HotelCartBookingData::getHotelCartBookingData()) {
+                    $this->context->smarty->assign('cart_htl_data', $cartBookingInfo);
+                }
 
-                            $cart_data[$date_join]['date_from'] = $cd_val['date_from'];
-                            $cart_data[$date_join]['date_to'] = $cd_val['date_to'];
-                            $cart_data[$date_join]['id_rms'][] = $cd_val['id_room'];
+                // For Advanced Payment work
+                $objAdvPayment = new HotelAdvancedPayment();
+                if ($objAdvPayment->isAdvancePaymentAvailableForCurrentCart()) {
+                    if (Tools::isSubmit('submitAdvPayment')) {
+                        if (Tools::getValue('payment_type') == Order::ORDER_PAYMENT_TYPE_ADVANCE) {
+                            $this->context->cart->is_advance_payment = 1;
+                        } else {
+                            $this->context->cart->is_advance_payment = 0;
                         }
+                        $this->context->cart->save();
 
-                        foreach ($cart_data as $cl_key => $cl_val) {
-                            $avai_rm = $obj_htl_bk_dtl->DataForFrontSearch($cl_val['date_from'], $cl_val['date_to'], $rm_dtl['id_hotel'], $t_value['id_product'], 1);
-
-                            if (count($avai_rm['rm_data'][0]['data']['available']) < count($cl_val['id_rms'])) {
-                                $cartChanged = true;
-
-                                foreach ($cl_val['id_rms'] as $cr_key => $cr_val) {
-                                    $isRmBooked = $obj_htl_bk_dtl->chechRoomBooked($cr_val, $cl_val['date_from'], $cl_val['date_to']);
-                                    if ($isRmBooked) {
-                                        $cartData = array(
-                                            'id_cart' => $this->context->cart->id,
-                                            'id_product' => $t_value['id_product'],
-                                            'id_order' => 0,
-                                            'id_room' => $cr_val,
-                                            'date_from' => $cl_val['date_from'],
-                                            'date_to' => $cl_val['date_to'],
-                                        );
-                                        $iscartdlt = $objCartBookingData->deleteRowByCartBookingData($cartData);
-                                        if ($iscartdlt) {
-                                            $nbDays = $obj_htl_bk_dtl->getNumberOfDays($cl_val['date_from'], $cl_val['date_to']);
-                                            $this->context->cart->updateQty($nbDays, $t_value['id_product'], null, false, 'down');
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    $this->context->smarty->assign('cartChanged', $cartChanged);
-                    if ($cartBookingInfo = HotelCartBookingData::getHotelCartBookingData()) {
-                        $this->context->smarty->assign('cart_htl_data', $cartBookingInfo);
+                        Tools::redirect($this->context->link->getPageLink('order-opc'));
                     }
 
-                    // For Advanced Payment
-                    $objAdvPayment = new HotelAdvancedPayment();
-                    if ($advance_payment_active = $objAdvPayment->isAdvancePaymentAvailableForCurrentCart()) {
-
-                        // $adv_amount = Tools::ps_round($objAdvPayment->getMinAdvPaymentAmount(), 2);
-                        $adv_amount = $objAdvPayment->getMinAdvPaymentAmount();
-                        if (Tools::isSubmit('submitAdvPayment')) {
-                            $id_customer_adv = Tools::getValue('id_customer_adv');
-                            if ($id_customer_adv) {
-                                $obj_customer_adv = new HotelCustomerAdvancedPayment($id_customer_adv);
-                            } else {
-                                $obj_customer_adv = new HotelCustomerAdvancedPayment();
-                            }
-
-                            $payment_type = Tools::getValue('payment_type');
-                            if ($payment_type == 2) {
-                                $obj_customer_adv->id_cart = $this->context->cart->id;
-                                $obj_customer_adv->id_guest = $this->context->cart->id_guest;
-                                $obj_customer_adv->id_customer = $this->context->customer->id ? $this->context->customer->id : '';
-                                $obj_customer_adv->id_currency = $this->context->cart->id_currency;
-                                $obj_customer_adv->total_paid_amount = $adv_amount;
-                                $obj_customer_adv->total_order_amount = $this->context->cart->getOrderTotal(true, Cart::ONLY_PRODUCTS);
-                                $obj_customer_adv->save();
-                            } else {
-                                if ($id_customer_adv) {
-                                    $obj_customer_adv->delete();
-                                }
-                            }
-
-                            Tools::redirect($this->context->link->getPageLink('order-opc'));
-                        }
-
-                        $obj_customer_adv = new HotelCustomerAdvancedPayment();
-                        $customer_adv_dtl = $obj_customer_adv->getClientAdvPaymentDtl($this->context->cart->id, $this->context->cart->id_guest, 1);
-                        if ($customer_adv_dtl) {
-                            if (Tools::ps_round($customer_adv_dtl['total_paid_amount'], 2) != Tools::ps_round($adv_amount, 2)) {
-                                // If More rooms are added in cart after selecting Advanced payment
-
-                                $obj_customer_adv = new HotelCustomerAdvancedPayment($customer_adv_dtl['id']);
-                                $obj_customer_adv->id_currency = $this->context->cart->id_currency;
-                                $obj_customer_adv->total_paid_amount = $adv_amount;
-                                $obj_customer_adv->total_order_amount = $this->context->cart->getOrderTotal(true, Cart::BOTH);
-                                $obj_customer_adv->save();
-
-                                Tools::redirect($this->context->link->getPageLink('order-opc'));
-                            }
-                            $due_amount = $this->context->cart->getOrderTotal(true, Cart::BOTH) - $customer_adv_dtl['total_paid_amount'];
-                            $customer_adv_dtl['due_amount'] = $due_amount;
-
-                            $cart_rules = $this->context->cart->getCartRules();
-                            $total_discount = 0;
-                            if ($cart_rules) {
-                                foreach ($cart_rules as $discount) {
-                                    if ($discount['reduction_currency'] != $this->context->cart->id_currency) {
-                                        $discount['reduction_amount'] = Tools::convertPriceFull($discount['reduction_amount'], new Currency($discount['reduction_currency']), $this->context->currency);
-                                    }
-                                    $total_discount += $discount['reduction_amount'];
-                                }
-                            }
-                            $customer_adv_dtl['total_to_be_paid'] = ($customer_adv_dtl['total_paid_amount'] - $total_discount) > 0 ? ($customer_adv_dtl['total_paid_amount'] - $total_discount) : 0;
-                            $this->context->smarty->assign('customer_adv_dtl', $customer_adv_dtl);
-                        }
-                        $this->context->smarty->assign('adv_amount', $adv_amount);
-                        $this->context->smarty->assign('advance_payment_active', $advance_payment_active);
+                    // set if advance payment is selected by the customer
+                    if ($this->context->cart->is_advance_payment) {
+                        $this->context->smarty->assign('is_advance_payment', 1);
                     }
+
+                    // get advance payment amount and send data to the template
+                    $advPaymentAmount = $this->context->cart->getOrderTotal(true, Cart::ADVANCE_PAYMENT);
+                    $this->context->smarty->assign(array(
+                        'advance_payment_active'=> 1,
+                        'advPaymentAmount'=> $advPaymentAmount,
+                        'dueAmount'=> ($this->context->cart->getOrderTotal() - $advPaymentAmount),
+                    ));
                 }
             }
-            /*Check Order restrict condition before Payment by the customer*/
-            if (Module::isInstalled('hotelreservationsystem') && Module::isEnabled('hotelreservationsystem')) {
-                $error = false;
-                require_once _PS_MODULE_DIR_.'hotelreservationsystem/define.php';
-                $cart_products = $this->context->cart->getProducts();
-                $order_restrict_error = HotelOrderRestrictDate::validateOrderRestrictDateOnPayment($this);
-            }
-            /*END*/
+
             $this->setTemplate(_PS_THEME_DIR_.'order-opc.tpl');
         }
     }
@@ -813,22 +733,15 @@ class OrderOpcControllerCore extends ParentOrderController
         }
 
 
-        // For Advanced Payment (when advance paid amount will be zero when voucher will be applied)
-        $freeAdvancePaymentOrder = false;
-        if (Module::isInstalled('hotelreservationsystem')) {
-            require_once(_PS_MODULE_DIR_.'hotelreservationsystem/define.php');
-            $objCustomerAdvPay = new HotelCustomerAdvancedPayment();
-            if ($objCustomerAdvPay->getClientAdvPaymentDtl(
-                $this->context->cart->id,
-                $this->context->cart->id_guest,
-                1
-            )) {
-                $objAdvPayment = new HotelAdvancedPayment();
-                $freeAdvancePaymentOrder = $objAdvPayment->_checkFreeAdvancePaymentOrder();
-            }
+        // check if customer has chosen advance payment option for this cart
+        if ($this->context->cart->is_advance_payment) {
+            $orderTotal = $this->context->cart->getOrderTotal(true, CART::ADVANCE_PAYMENT);
+        } else {
+            $orderTotal = $this->context->cart->getOrderTotal();
         }
+
         /* Bypass payment step if total is 0 */
-        if ($this->context->cart->getOrderTotal() <= 0 || $freeAdvancePaymentOrder) {
+        if ($orderTotal <= 0) {
             return '<p class="center"><button class="button btn btn-default button-medium" name="confirmOrder" id="confirmOrder" onclick="confirmFreeOrder();" type="submit"> <span>'.Tools::displayError('I confirm my order.').'</span></button></p>';
         }
 

@@ -40,7 +40,7 @@ class AdminFeaturesControllerCore extends AdminController
         $this->list_id = 'feature';
         $this->identifier = 'id_feature';
         $this->lang = true;
-        $this->imageType = 'png';
+        $this->imageType = 'jpg';
         $this->fieldImageSettings = array(
             'name' => 'icon',
             'dir' => 'rf'
@@ -169,9 +169,10 @@ class AdminFeaturesControllerCore extends AdminController
         if (!($obj = $this->loadObject(true))) {
             return;
         }
-        $ps_img_url = _PS_IMG_DIR_.'rf/'.$obj->id.'.png';
-        if ($img_exist = file_exists($ps_img_url)) {
-            $img_url = _PS_IMG_.'rf/'.$obj->id.'.png';
+        // by webkul to get media link.
+        // $ps_img_url = _PS_IMG_DIR_.'rf/'.$obj->id.'.jpg';
+        $img_url = $this->context->link->getMediaLink(_PS_IMG_.'rf/'.$obj->id.'.jpg');
+        if ($img_exist = Tools::file_get_contents($img_url)) {
             $image = "<img class='img-thumbnail img-responsive' style='max-width:100px' src='".$img_url."'>";
         }
 
@@ -227,11 +228,11 @@ class AdminFeaturesControllerCore extends AdminController
                 'icon' => 'process-icon-new'
             );
 
-            $this->page_header_toolbar_btn['new_feature_value'] = array(
-                'href' => self::$currentIndex.'&addfeature_value&id_feature='.(int)Tools::getValue('id_feature').'&token='.$this->token,
-                'desc' => $this->l('Add new room feature value', null, null, false),
-                'icon' => 'process-icon-new'
-            );
+            // $this->page_header_toolbar_btn['new_feature_value'] = array(
+            //     'href' => self::$currentIndex.'&addfeature_value&id_feature='.(int)Tools::getValue('id_feature').'&token='.$this->token,
+            //     'desc' => $this->l('Add new room feature value', null, null, false),
+            //     'icon' => 'process-icon-new'
+            // );
         }
 
         if ($this->display == 'view') {
@@ -581,7 +582,7 @@ class AdminFeaturesControllerCore extends AdminController
                 $sql = 'SELECT `position`+1
 						FROM `'._DB_PREFIX_.'feature`
 						ORDER BY position DESC';
-            // set the position of the new feature in $_POST for postProcess() method
+                // set the position of the new feature in $_POST for postProcess() method
                 $_POST['position'] = DB::getInstance()->getValue($sql);
             }
             // clean \n\r characters
@@ -607,13 +608,13 @@ class AdminFeaturesControllerCore extends AdminController
                 if (isset($featureImage['tmp_name']) && $featureImage['tmp_name']) {
                     // if already feature image then delete it once before uploading new image
                     if ($idFeature) {
-                        $currentImg = _PS_TMP_IMG_DIR_.'feature_mini_'.$objFeature->id.'_'.$this->context->shop->id.'.png';
+                        $currentImg = _PS_TMP_IMG_DIR_.'feature_mini_'.$objFeature->id.'_'.$this->context->shop->id.'.jpg';
                         if (file_exists($currentImg)) {
                             unlink($currentImg);
                         }
                     }
                     // upload feature image
-                    $imgPath = _PS_IMG_DIR_.'rf/'.$objFeature->id.'.png';
+                    $imgPath = _PS_IMG_DIR_.'rf/'.$objFeature->id.'.jpg';
                     if (!ImageManager::resize($featureImage['tmp_name'], $imgPath)) {
                         $this->errors[] = $this->l('Some error occurred while uploding room feature image. Please try again.');
                     }
@@ -627,9 +628,10 @@ class AdminFeaturesControllerCore extends AdminController
                 } else {
                     $objFeatureValue = new FeatureValue();
                 }
+
                 $objFeatureValue->id_feature = $objFeature->id;
                 foreach (Language::getLanguages(true) as $lang) {
-                    $objFeatureValue->value[$lang['id_lang']] = $objFeature->id.'.png';
+                    $objFeatureValue->value[$lang['id_lang']] = $objFeature->id.'.jpg';
                 }
                 $objFeatureValue->save();
                 return $objFeature;

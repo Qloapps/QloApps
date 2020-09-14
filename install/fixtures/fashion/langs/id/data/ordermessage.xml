@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<list_ordermessage>
-	<ordermessage id="delay">
-		<name><![CDATA[Delay]]></name>
-		<message><![CDATA[Hi,Unfortunately, an item on your order is currently out of stock. This may cause a slight delay in delivery.Please accept our apologies and rest assured that we are working hard to rectify this.Best regards,]]></message>
-	</ordermessage>
-</list_ordermessage>

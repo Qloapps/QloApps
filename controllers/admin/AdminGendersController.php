@@ -219,7 +219,7 @@ class AdminGendersControllerCore extends AdminController
         parent::afterImageUpload();
 
         if (($id_gender = (int)Tools::getValue('id_gender')) &&
-             isset($_FILES) && count($_FILES) && file_exists(_PS_GENDERS_DIR_.$id_gender.'.jpg')) {
+             isset($_FILES) && count($_FILES) && Tools::file_get_contents($this->context->link->getMediaLink(_THEME_GENDERS_DIR_.$id_gender.'.jpg'))) { // by webkul
             $current_file = _PS_TMP_IMG_DIR_.'gender_mini_'.$id_gender.'_'.$this->context->shop->id.'.jpg';
 
             if (file_exists($current_file)) {

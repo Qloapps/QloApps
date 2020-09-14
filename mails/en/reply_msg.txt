@@ -1,14 +1,14 @@
 
-[/{shop_url}]
+[/{shop_url}] 
 
-Hi {firstname} {lastname},
+Hi {firstname} {lastname}, 
 
-{reply}
+{reply} 
 
-Please do not reply directly to this email, we will not receive it.
+Please do not reply directly to this email, we will not receive it. 
 
-In order to reply, please use the following link: {link} [/{link}]
+In order to reply, please use the following link: {link} [/{link}] 
 
 {shop_name} [/{shop_url}] powered by Webkul(tm)
-[https://webkul.com]
+[https://webkul.com] 
 

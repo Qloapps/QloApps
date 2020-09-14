@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="15px" height="18px" viewBox="0 0 15 18" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 51.3 (57544) - http://www.bohemiancoding.com/sketch -->
+    <title>icon-map-pin</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" stroke-linecap="round" stroke-linejoin="round">
+        <g id="Occupancy-Wise-Search-1" transform="translate(-365.000000, -296.000000)" stroke="#000000" stroke-width="1.5">
+            <g id="hero">
+                <g id="search" transform="translate(319.000000, 170.000000)">
+                    <g id="all-actionables-[20v]" transform="translate(30.000000, 108.000000)">
+                        <g id="hotel-location">
+                            <g id="icon-map-pin" transform="translate(17.000000, 19.000000)">
+                                <path d="M13,6.5 C13,11.5555556 6.5,15.8888889 6.5,15.8888889 C6.5,15.8888889 0,11.5555556 0,6.5 C5.34929466e-08,2.91014916 2.91014916,9.68575476e-08 6.5,9.68575478e-08 C10.0898508,9.68575479e-08 12.9999999,2.91014916 13,6.5 Z" id="Shape"></path>
+                                <circle id="Oval" cx="6.5" cy="6.5" r="2.16666667"></circle>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

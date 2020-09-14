@@ -1,6 +1,6 @@
 <?php
 /**
-* 2010-2018 Webkul.
+* 2010-2020 Webkul.
 *
 * NOTICE OF LICENSE
 *
@@ -14,7 +14,7 @@
 * needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
 *
 *  @author    Webkul IN <support@webkul.com>
-*  @copyright 2010-2018 Webkul IN
+*  @copyright 2010-2020 Webkul IN
 *  @license   https://store.webkul.com/license.html
 */
 
@@ -133,12 +133,9 @@ class AdminFeaturesModuleSettingController extends ModuleAdminController
     {
         $image = '';
         if ($echo) {
-            $imgUrl = _PS_MODULE_DIR_.$this->module->name.'/views/img/hotels_features_img/'.$row['id_features_block'].
-            '.jpg';
-            if (file_exists($imgUrl)) {
-                $modImgUrl = _MODULE_DIR_.$this->module->name.'/views/img/hotels_features_img/'.
-                $row['id_features_block'].'.jpg';
-                $image = "<img class='img-thumbnail img-responsive' style='max-width:70px' src='".$modImgUrl."'>";
+            $imgUrl = $this->context->link->getMediaLink(_MODULE_DIR_.$this->module->name.'/views/img/hotels_features_img/'.$row['id_features_block'].'.jpg');
+            if ((bool)Tools::file_get_contents($imgUrl)) {
+                $image = "<img class='img-thumbnail img-responsive' style='max-width:70px' src='".$imgUrl."'>";
             }
         }
         if ($image == '') {
@@ -173,19 +170,11 @@ class AdminFeaturesModuleSettingController extends ModuleAdminController
             return;
         }
 
-        $imageUrl = $imageSize = false;
-        if ($this->display == 'edit') {
-            $image = _PS_MODULE_DIR_.$this->module->name.'/views/img/hotels_features_img/'.$obj->id.'.jpg';
-            $imageUrl = ImageManager::thumbnail(
-                $image,
-                $this->table.'_'.(int)$obj->id.'.'.$this->imageType,
-                350,
-                $this->imageType,
-                true,
-                true
-            );
-            $imageSize = file_exists($image) ? filesize($image) / 1000 : false;
+        $imgUrl = $this->context->link->getMediaLink(_MODULE_DIR_.$this->module->name.'/views/img/hotels_features_img/'.$obj->id.'.jpg');
+        if ($imgExist = (bool)Tools::file_get_contents($imgUrl)) {
+            $image = "<img class='img-thumbnail img-responsive' style='max-width:250px' src='".$imgUrl."'>";
         }
+
         $this->fields_form = array(
             'legend' => array(
                 'title' => $this->l('Amenities Configuration'),
@@ -215,9 +204,7 @@ class AdminFeaturesModuleSettingController extends ModuleAdminController
                     'name' => 'feature_image',
                     'required' => true,
                     'display_image' => true,
-                    'image' => $imageUrl ? $imageUrl : false,
-                    'size' => $imageSize,
-                    'col' => 6,
+                    'image' => $imgExist ? $image : false,
                     'hint' => sprintf(
                         $this->l('Maximum image size: %1s'),
                         Tools::formatBytes(Tools::getMaxUploadSize())

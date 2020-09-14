@@ -1,6 +1,6 @@
 <?php
 /**
-* 2010-2019 Webkul.
+* 2010-2020 Webkul.
 *
 * NOTICE OF LICENSE
 *
@@ -14,7 +14,7 @@
 * needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
 *
 *  @author    Webkul IN <support@webkul.com>
-*  @copyright 2010-2019 Webkul IN
+*  @copyright 2010-2020 Webkul IN
 *  @license   https://store.webkul.com/license.html
 */
 
@@ -44,6 +44,18 @@ class HotelRoomTypeGlobalDemandAdvanceOption extends ObjectModel
                 'size' => 128
             ),
     ));
+
+    protected $webserviceParameters = array(
+        'objectsNodeName' => 'advance_options',
+        'objectNodeName' => 'advance_option',
+        'fields' => array(
+            'id_global_demand' => array(
+                'xlink_resource' => array(
+                    'resourceName' => 'extra_demands'
+                )
+            ),
+        ),
+    );
 
     public function __construct($id = null, $id_lang = null, $id_shop = null)
     {

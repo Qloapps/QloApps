@@ -1,4 +1,22 @@
 -----------------------------
+# V2.0.2 to V2.0.3
+-----------------------------
+
+## Improved/changed features
+
+[*] CO : License year is changed up to 2020.
+[*] CO : Images link are now generated dynamically
+
+## Bug/Issues Resolved:
+
+[-] FO : FIXED : If all rows are disabled then also Features block is visible on home page.
+
+## Update Policy
+
+- Mobule need only file update, can be updated only by UPLOADING new version on module
+
+
+-----------------------------
 # V2.0.1 to V2.0.2
 -----------------------------
 

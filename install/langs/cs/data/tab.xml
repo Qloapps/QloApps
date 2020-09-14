@@ -31,7 +31,7 @@
   <tab id="Attachments" name="Přílohy"/>
   <tab id="Orders_1" name="Objednávky"/>
   <tab id="Invoices" name="Faktury"/>
-  <tab id="Merchandise_Returns" name="Vrácení zboží"/>
+  <!-- <tab id="Merchandise_Returns" name="Vrácení zboží"/> -->
   <tab id="Delivery_Slips" name="Dodací listy"/>
   <tab id="Credit_Slips" name="Dobropisy"/>
   <tab id="Statuses" name="Stavy objednávek"/>

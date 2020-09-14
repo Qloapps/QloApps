@@ -1,0 +1,24 @@
+Message from {shop_name}
+Hi {firstname} {lastname},
+A request has been completed for the booking cancellation.
+
+Order details
+
+Order: {order_reference} Placed on {order_date}
+Refund Status: {status_name}
+Refunded Amount: {refunded_amount}
+Payment Mode: {payment_mode}
+Transaction Id: {id_transaction}
+
+Booking details
+
+Room Num
+Room Type
+Hotel
+Duration
+{refundBookingHtml}
+
+Customer details
+Customer name: {customer_name}
+Customer email: {customer_email}
+{shop_name} powered by Webkul

@@ -1,6 +1,6 @@
 <?php
 /**
-* 2010-2018 Webkul.
+* 2010-2020 Webkul.
 *
 * NOTICE OF LICENSE
 *
@@ -14,7 +14,7 @@
 * needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
 *
 *  @author    Webkul IN <support@webkul.com>
-*  @copyright 2010-2018 Webkul IN
+*  @copyright 2010-2020 Webkul IN
 *  @license   https://store.webkul.com/license.html
 */
 
@@ -33,7 +33,6 @@ class HotelBookingDetail extends ObjectModel
     public $id_hotel;
     public $id_customer;
     public $booking_type;
-    public $id_status;
     public $comment;
     public $check_in;
     public $check_out;
@@ -41,8 +40,27 @@ class HotelBookingDetail extends ObjectModel
     public $date_to;
     public $total_price_tax_excl;    // Total price paid for this date range for this room type
     public $total_price_tax_incl;    // Total price paid for this date range for this room type
-    public $is_refunded;
+    public $total_paid_amount;       // Advance payment amount for the room
     public $is_back_order;
+    public $id_status;
+    public $is_refunded;
+    // public $available_for_order;
+
+    // hotel information/location/contact
+    public $hotel_name;
+    public $room_type_name;
+    public $city;
+    public $state;
+    public $country;
+    public $zipcode;
+    public $phone;
+    public $email;
+    public $check_in_time;
+    public $check_out_time;
+    public $room_num;
+    public $adult;
+    public $children;
+
     public $date_add;
     public $date_upd;
 
@@ -60,17 +78,65 @@ class HotelBookingDetail extends ObjectModel
             'booking_type' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
             'id_status' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
             'comment' => array('type' => self::TYPE_STRING),
-            'check_in' => array('type' => self::TYPE_DATE, 'validate' => 'isDate'),
-            'check_out' => array('type' => self::TYPE_DATE, 'validate' => 'isDate'),
+            'check_in' => array('type' => self::TYPE_DATE),
+            'check_out' => array('type' => self::TYPE_DATE),
             'date_from' => array('type' => self::TYPE_DATE, 'validate' => 'isDate'),
             'date_to' => array('type' => self::TYPE_DATE, 'validate' => 'isDate'),
             'total_price_tax_excl' => array('type' => self::TYPE_FLOAT, 'validate' => 'isPrice'),
             'total_price_tax_incl' => array('type' => self::TYPE_FLOAT, 'validate' => 'isPrice'),
+            'total_paid_amount' => array('type' => self::TYPE_FLOAT, 'validate' => 'isPrice', 'default' => 0),
             'is_refunded' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
+            // 'available_for_order' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
             'is_back_order' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
+
+            // hotel information/location/contact
+            'room_num' => array('type' => self::TYPE_STRING),
+            'room_type_name' => array('type' => self::TYPE_STRING),
+            'hotel_name' => array('type' => self::TYPE_STRING),
+            'city' => array('type' => self::TYPE_STRING, 'validate' => 'isCityName', 'size' => 64),
+            'state' => array('type' => self::TYPE_STRING),
+            'country' => array('type' => self::TYPE_STRING),
+            'zipcode' => array('type' => self::TYPE_STRING),
+            'phone' => array('type' => self::TYPE_STRING, 'validate' => 'isPhoneNumber', 'size' => 32),
+            'email' => array('type' => self::TYPE_STRING, 'validate' => 'isEmail', 'size' => 255),
+            'check_in_time' => array('type' => self::TYPE_STRING),
+            'check_out_time' => array('type' => self::TYPE_STRING),
+            'adult' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
+            'children' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
+
             'date_add' => array('type' => self::TYPE_DATE, 'validate' => 'isDate'),
             'date_upd' => array('type' => self::TYPE_DATE, 'validate' => 'isDate'),
-    ), );
+        ),
+    );
+
+    protected $webserviceParameters = array(
+        'objectsNodeName' => 'bookings',
+        'objectNodeName' => 'booking',
+        'fields' => array(
+            'id_product' => array(
+                'xlink_resource' => array(
+                    'resourceName' => 'products',
+                )
+            ),
+            'id_hotel' => array(
+                'xlink_resource' => array(
+                    'resourceName' => 'hotels',
+                )
+            ),
+            'id_order' => array(
+                'xlink_resource' => array(
+                    'resourceName' => 'orders',
+                )
+            ),
+        ),
+        'associations' => array(
+            'booking_extra_demands' => array(
+                'setter' => false,
+                'resource' => 'extra_demand',
+                'fields' => array('id' => array())
+            ),
+        ),
+    );
 
     public function __construct($id = null, $id_lang = null, $id_shop = null)
     {
@@ -650,20 +716,32 @@ class HotelBookingDetail extends ObjectModel
      * @param [int] $id_room    [Id of the room which order status is to be ypdated]
      * @return [Boolean] [Returns true if successfully updated else returns false]
      */
-    public function updateBookingOrderStatusByOrderId($order_id, $new_status, $id_room, $date_from, $date_to)
-    {
-        $table = 'htl_booking_detail';
-        $currentDate = date('Y-m-d H:i:s');
+    public function updateBookingOrderStatusByOrderId(
+        $order_id,
+        $new_status,
+        $id_room,
+        $date_from,
+        $date_to,
+        $status_date = ''
+    ) {
+        if ($status_date) {
+            $status_date = date('Y-m-d H:i:s', strtotime($status_date));
+        } else {
+            $status_date = date('Y-m-d H:i:s');
+        }
 
+        $table = 'htl_booking_detail';
+
+        // create date to update in the table
         if ($new_status == 2) {
             $data = array(
                 'id_status' => $new_status,
-                'check_in' => ($currentDate > $date_to ? $date_to : $currentDate)
+                'check_in' => ($status_date > $date_to ? $date_to : $status_date)
             );
         } elseif ($new_status == 3) {
             $data = array(
                 'id_status' => $new_status,
-                'check_out' => ($currentDate > $date_to ? $date_to : $currentDate)
+                'check_out' => ($status_date > $date_to ? $date_to : $status_date)
             );
         } else {
             $data = array(
@@ -672,7 +750,10 @@ class HotelBookingDetail extends ObjectModel
                 'check_out' => ''
             );
         }
-        $where = 'id_order = '.(int)$order_id.' AND id_room = '.(int)$id_room.' AND `date_from` = \''.pSQL($date_from).'\' AND `date_to` = \''.pSQL($date_to).'\'';
+
+        // where conditions
+        $where = 'id_order = '.(int)$order_id.' AND id_room = '.(int)$id_room.
+        ' AND `date_from` = \''.pSQL($date_from).'\' AND `date_to` = \''.pSQL($date_to).'\'';
 
         return Db::getInstance()->update($table, $data, $where);
     }
@@ -954,14 +1035,18 @@ class HotelBookingDetail extends ObjectModel
      *
      * @return [boolean] [true if updated otherwise false]
      */
-    public function updateOrderRefundStatus($id_order, $date_from, $date_to, $id_rooms)
+    public function updateOrderRefundStatus($id_order, $date_from = false, $date_to = false, $id_rooms = array())
     {
         $table = 'htl_booking_detail';
         $data = array('is_refunded' => 1);
-        foreach ($id_rooms as $key_rm => $val_rm) {
-            $where = 'id_order='.(int)$id_order.' AND id_room = '.(int)$val_rm['id_room'].' AND `date_from`= \''.
-            pSQL($date_from).'\' AND `date_to` = \''.pSQL($date_to).'\'';
-            $result = Db::getInstance()->update($table, $data, $where);
+        if ($id_rooms) {
+            foreach ($id_rooms as $key_rm => $val_rm) {
+                $where = 'id_order='.(int)$id_order.' AND id_room = '.(int)$val_rm['id_room'].' AND `date_from`= \''.
+                pSQL($date_from).'\' AND `date_to` = \''.pSQL($date_to).'\'';
+                $result = Db::getInstance()->update($table, $data, $where);
+            }
+        } else {
+            return Db::getInstance()->update($table, $data, 'id_order='.(int)$id_order);
         }
         return $result;
     }
@@ -1105,10 +1190,10 @@ class HotelBookingDetail extends ObjectModel
      */
     public function getOrderFormatedBookinInfoByIdOrder($id_order)
     {
-        $context = Context::getContext();
-        $order_detail_data = $this->getOrderCurrentDataByOrderId((int) $id_order);
-        if ($order_detail_data) {
+        if ($order_detail_data = $this->getOrderCurrentDataByOrderId((int) $id_order)) {
+            $context = Context::getContext();
             $objHtlBranchInfo = new HotelBranchInformation();
+
             foreach ($order_detail_data as $key => $value) {
                 $product_image_id = Product::getCover($value['id_product']);
                 $link_rewrite = ((new Product((int) $value['id_product'], Configuration::get('PS_LANG_DEFAULT')))->link_rewrite[Configuration::get('PS_LANG_DEFAULT')]);
@@ -1119,40 +1204,28 @@ class HotelBookingDetail extends ObjectModel
                     $order_detail_data[$key]['image_link'] = $context->link->getImageLink($link_rewrite, $context->language->iso_code.'-default', 'small_default');
                 }
 
-                $order_detail_data[$key]['room_type'] = (new Product((int) $value['id_product']))->name[Configuration::get('PS_LANG_DEFAULT')];
-                $order_detail_data[$key]['room_num'] = (new HotelRoomInformation((int) $value['id_room']))->room_num;
-                $order_detail_data[$key]['date_from'] = $value['date_from'];
-                $order_detail_data[$key]['date_to'] = $value['date_to'];
+                $objOrderDetail = new OrderDetail($value['id_order_detail']);
+                $order_detail_data[$key]['room_type'] = $objOrderDetail->product_name;
+                $order_detail_data[$key]['original_unit_price_tax_excl'] = $objOrderDetail->unit_price_tax_excl;
+                $order_detail_data[$key]['original_unit_price_tax_incl'] = $objOrderDetail->unit_price_tax_incl;
+                $order_detail_data[$key]['unit_price_without_reduction_tax_excl'] = $objOrderDetail->unit_price_tax_excl + $objOrderDetail->reduction_amount_tax_excl;
+                $order_detail_data[$key]['unit_price_without_reduction_tax_incl'] = $objOrderDetail->unit_price_tax_incl + $objOrderDetail->reduction_amount_tax_incl;
+
                 $num_days = $this->getNumberOfDays($value['date_from'], $value['date_to']);
-
-                $order_detail_data[$key]['paid_unit_price_tax_excl'] = $value['total_price_tax_excl']/$num_days;
-                $order_detail_data[$key]['paid_unit_price_tax_incl'] = $value['total_price_tax_incl']/$num_days;
-
-                $order_detail = new OrderDetail($value['id_order_detail']);
-
-                $order_detail_data[$key]['original_unit_price_tax_excl'] = $order_detail->unit_price_tax_excl;
-                $order_detail_data[$key]['original_unit_price_tax_incl'] = $order_detail->unit_price_tax_incl;
-                $order_detail_data[$key]['unit_price_without_reduction_tax_excl'] = $order_detail->unit_price_tax_excl + $order_detail->reduction_amount_tax_excl;
-                $order_detail_data[$key]['unit_price_without_reduction_tax_incl'] = $order_detail->unit_price_tax_incl + $order_detail->reduction_amount_tax_incl;
-
-                $feature_price_diff = (float)($order_detail_data[$key]['unit_price_without_reduction_tax_incl'] - $order_detail_data[$key]['paid_unit_price_tax_incl']);
-                $order_detail_data[$key]['feature_price_diff'] = $feature_price_diff;
-
                 $order_detail_data[$key]['quantity'] = $num_days;
+                $order_detail_data[$key]['paid_unit_price_tax_excl'] = $value['total_price_tax_excl'] / $num_days;
+                $order_detail_data[$key]['paid_unit_price_tax_incl'] = $value['total_price_tax_incl'] / $num_days;
 
-                //enter hotel name
-                $hotelInfo = $objHtlBranchInfo->hotelBranchesInfo(
-                    Configuration::get('PS_LANG_DEFAULT'),
-                    2,
-                    0,
-                    $value['id_hotel']
-                );
-                $order_detail_data[$key]['hotel_name'] = $hotelInfo['hotel_name'];
+                $order_detail_data[$key]['feature_price_diff'] = (float)($order_detail_data[$key]['unit_price_without_reduction_tax_incl'] - $order_detail_data[$key]['paid_unit_price_tax_incl']);
+
+                // Check if this booking as any refund history then enter refund data
+                if ($refundInfo = OrderReturnCore::getOrdersReturnDetail($id_order, 0, $value['id'])) {
+                    $order_detail_data[$key]['refund_info'] = reset($refundInfo);
+                }
             }
-        }
-        if ($order_detail_data) {
             return $order_detail_data;
         }
+
         return false;
     }
 
@@ -1415,8 +1488,10 @@ class HotelBookingDetail extends ObjectModel
                 /*Check Order restrict condition before adding in to cart*/
                 $max_order_date = HotelOrderRestrictDate::getMaxOrderDate($id_hotel);
                 if ($max_order_date) {
-                    $max_order_date = date('Y-m-d', strtotime($max_order_date));
-                    if ($max_order_date < $date_from || $max_order_date < $date_to) {
+                    if (strtotime('-1 day', strtotime($max_order_date)) < strtotime($date_from)
+                        || strtotime($max_order_date) < strtotime($date_to)
+                    ) {
+                        $max_order_date = date('Y-m-d', strtotime($max_order_date));
                         $this->errors[] = $this->moduleInstance->l('You can\'t Book room after date ', 'HotelBookingDetail').$max_order_date;
                     }
                 }
@@ -1632,12 +1707,12 @@ class HotelBookingDetail extends ObjectModel
      * @param  [date] $date_to   [End date of the booking]
      * @return [array|false]     [If rooms found returns array containing rooms ids else returns false]
      */
-    public function getRowByIdOrderIdProductInDateRange($id_order, $id_product, $date_from, $date_to)
+    public function getRowByIdOrderIdProductInDateRange($id_order, $id_product, $date_from, $date_to, $id_room = 0)
     {
         return Db::getInstance()->getRow(
             'SELECT * FROM `'._DB_PREFIX_.'htl_booking_detail`
             WHERE `id_order`='.(int)$id_order.' AND `id_product`='.(int)$id_product.
-            ' AND `date_from`=\''.pSQL($date_from).'\' AND `date_to`= \''.pSQL($date_to).'\''
+            ' AND `date_from`=\''.pSQL($date_from).'\' AND `date_to`= \''.pSQL($date_to).'\''.' AND `id_room`='.(int)$id_room
         );
     }
 
@@ -1648,5 +1723,22 @@ class HotelBookingDetail extends ObjectModel
                 WHERE `id_order`='.(int)$idOrder.' AND `id_room`='.(int)$idRoom;
 
         return Db::getInstance()->getRow($sql);
+    }
+
+    // Webservice funcions
+    public function getWsBookingExtraDemands()
+    {
+        return Db::getInstance()->executeS(
+            'SELECT `id_booking_demand` as `id` FROM `'._DB_PREFIX_.'htl_booking_demands` WHERE `id_htl_booking` = '.(int)$this->id.' ORDER BY `id` ASC'
+        );
+    }
+
+    public function getOrderStatusToFreeBookedRoom()
+    {
+        return (array(
+            Configuration::get('PS_OS_CANCELED'),
+            Configuration::get('PS_OS_REFUND'),
+            Configuration::get('PS_OS_ERROR'),
+        ));
     }
 }
