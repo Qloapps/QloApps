@@ -32,8 +32,8 @@ $(window).resize(function(){
 
 $(document).on('click', '.lnk_more', function(e){
 	e.preventDefault();
-	$('#category_description_short').hide(); 
-	$('#category_description_full').show(); 
+	$('#category_description_short').hide();
+	$('#category_description_full').show();
 	$(this).hide();
 });
 
@@ -89,7 +89,7 @@ $(document).on('click', '.cat_rm_quantity_down', function(e){
 });
 
 
-$(document).on('keyup', '.cat_quantity_wanted', function(e)
+$(document).on('focusout', '.cat_quantity_wanted', function(e)
 {
 	var qty_wntd = $(this).val();
 	if (qty_wntd == '' || !$.isNumeric(qty_wntd))

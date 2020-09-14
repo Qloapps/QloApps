@@ -33,7 +33,7 @@
   <tab id="Attachments" name="附加檔案"/>
   <tab id="Orders_1" name="訂單"/>
   <tab id="Invoices" name="發票"/>
-  <tab id="Merchandise_Returns" name="退貨"/>
+  <!-- <tab id="Merchandise_Returns" name="退貨"/> -->
   <tab id="Delivery_Slips" name="出貨單"/>
   <tab id="Credit_Slips" name="折讓單"/>
   <tab id="Statuses" name="狀態"/>

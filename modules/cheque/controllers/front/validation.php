@@ -65,12 +65,12 @@ class ChequeValidationModuleFrontController extends ModuleFrontController
 
 		$currency = $this->context->currency;
 
-		if (Configuration::get('WK_ALLOW_ADVANCED_PAYMENT')) {
-            $obj_customer_adv = new HotelCustomerAdvancedPayment();
-            $total = $obj_customer_adv->getOrdertTotal($cart->id, $cart->id_guest);
+		// if advance payment is available and customer has chosen advance payment
+		if ($cart->is_advance_payment) {
+			$total = $cart->getOrderTotal(true, Cart::ADVANCE_PAYMENT);
         } else {
-            $total = (float)$cart->getOrderTotal(true, Cart::BOTH);
-        }
+            $total = $cart->getOrderTotal(true, Cart::BOTH);
+		}
 
 		$mailVars =	array(
 			'{cheque_name}' => Configuration::get('CHEQUE_NAME'),

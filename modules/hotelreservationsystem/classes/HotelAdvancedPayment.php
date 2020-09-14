@@ -1,6 +1,6 @@
 <?php
 /**
-* 2010-2018 Webkul.
+* 2010-2020 Webkul.
 *
 * NOTICE OF LICENSE
 *
@@ -14,7 +14,7 @@
 * needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
 *
 *  @author    Webkul IN <support@webkul.com>
-*  @copyright 2010-2018 Webkul IN
+*  @copyright 2010-2020 Webkul IN
 *  @license   https://store.webkul.com/license.html
 */
 
@@ -31,6 +31,9 @@ class HotelAdvancedPayment extends ObjectModel
     public $date_add;
     public $date_upd;
 
+    const WK_ADVANCE_PAYMENT_TYPE_PERCENTAGE = 1;
+    const WK_ADVANCE_PAYMENT_TYPE_FIXED = 2;
+
     public static $definition = array(
         'table' => 'htl_advance_payment',
         'primary' => 'id',
@@ -45,6 +48,18 @@ class HotelAdvancedPayment extends ObjectModel
             'date_add' =>                array('type' => self::TYPE_DATE, 'validate' => 'isDate'),
             'date_upd' =>                array('type' => self::TYPE_DATE, 'validate' => 'isDate'),
     ));
+
+    protected $webserviceParameters = array(
+        'objectsNodeName' => 'advance_payments',
+        'objectNodeName' => 'advance_payment',
+        'fields' => array(
+            'id_product' => array(
+                'xlink_resource' => array(
+                    'resourceName' => 'room_types',
+                )
+            ),
+        ),
+    );
 
     /**
      * [getIdAdvPaymentByIdProduct :: To get Advance payment Information By id_product]
@@ -62,14 +77,14 @@ class HotelAdvancedPayment extends ObjectModel
     }
 
 
-    public function getProductMinAdvPaymentAmountByIdCart($id_cart, $id_product, $adv_global_percent = 0, $adv_global_tax_inc = 0)
+    public function getProductMinAdvPaymentAmountByIdCart($id_cart, $id_product, $adv_global_percent = 0, $adv_global_tax_incl = 0, $with_taxes = 1)
     {
         if (!$adv_global_percent) {
             $adv_global_percent = Configuration::get('WK_ADVANCED_PAYMENT_GLOBAL_MIN_AMOUNT');
         }
 
-        if (!$adv_global_tax_inc) {
-            $adv_global_tax_inc = Configuration::get('WK_ADVANCED_PAYMENT_INC_TAX');
+        if (!$adv_global_tax_incl) {
+            $adv_global_tax_incl = Configuration::get('WK_ADVANCED_PAYMENT_INC_TAX');
         }
         $price_with_tax = Product::getPriceStatic($id_product, true, null, 6, null, false, true);
         $price_without_tax = Product::getPriceStatic($id_product, false, null, 6, null, false, true);
@@ -88,7 +103,7 @@ class HotelAdvancedPayment extends ObjectModel
         if ($prod_adv) {
             if ($prod_adv['active']) {
                 if ($prod_adv['calculate_from']) { // Advanced payment is calculated by product advanced payment setting
-                    if ($prod_adv['payment_type'] == 1) { // Percentage
+                    if ($prod_adv['payment_type'] == self::WK_ADVANCE_PAYMENT_TYPE_PERCENTAGE) { // Percentage
                         if ($prod_adv['tax_include']) {
                             $prod_price = $totalPriceByProductTaxIncl;
                         } else {
@@ -111,17 +126,19 @@ class HotelAdvancedPayment extends ObjectModel
                                 $adv_amount = $prod_adv['value'] * $productCartQuantity;
                             }
                         }
-                        if ($price_without_tax) {
-                            $taxRate = (($price_with_tax-$price_without_tax)/$price_without_tax)*100;
-                        } else {
-                            $taxRate = 0;
+                        if ($with_taxes) {
+                            if ($price_without_tax) {
+                                $taxRate = (($price_with_tax-$price_without_tax)/$price_without_tax)*100;
+                            } else {
+                                $taxRate = 0;
+                            }
+                            $taxRate = HotelRoomType::getRoomTypeTaxRate($id_product);
+                            $taxPrice = ($adv_amount * $taxRate) / 100;
+                            $adv_amount += $taxPrice;
                         }
-                        $taxRate = HotelRoomType::getRoomTypeTaxRate($id_product);
-                        $taxPrice = ($adv_amount * $taxRate) / 100;
-                        $adv_amount += $taxPrice;
                     }
                 } else { // Advanced payment is calculated by Global advanced payment setting
-                    if ($adv_global_tax_inc) {
+                    if ($adv_global_tax_incl && $with_taxes) {
                         $adv_amount = ($totalPriceByProductTaxIncl*$adv_global_percent)/100 ;
                     } else {
                         $adv_amount = ($totalPriceByProductTaxExcl*$adv_global_percent)/100 ;
@@ -132,7 +149,7 @@ class HotelAdvancedPayment extends ObjectModel
                 $adv_amount = $prod_price;
             }
         } else {
-            if ($adv_global_tax_inc) {
+            if ($adv_global_tax_incl && $with_taxes) {
                 $adv_amount = ($totalPriceByProductTaxIncl*$adv_global_percent)/100 ;
             } else {
                 $adv_amount = ($totalPriceByProductTaxExcl*$adv_global_percent)/100 ;
@@ -148,17 +165,17 @@ class HotelAdvancedPayment extends ObjectModel
      * @param  [int]  $id_product         [ID of the product which minimum advance payment amount paid by the customer for given quantities you want]
      * @param  [int]  $prod_qty           [Product quantity]
      * @param  float $adv_global_percent [How much percent customer has to pay of total order in case of partial payment]
-     * @param  boolean $adv_global_tax_inc [How much percent customer has to pay of total order in case of partial payment will be calculated from tax included price or tax excluded price]
+     * @param  boolean $adv_global_tax_incl [How much percent customer has to pay of total order in case of partial payment will be calculated from tax included price or tax excluded price]
      * @return [float]                     [Returns the amount paid by the customer in advance for the product for given quantities]
      */
-    public function getProductMinAdvPaymentAmount($id_product, $prod_qty, $adv_global_percent = 0, $adv_global_tax_inc = 0)
+    public function getProductMinAdvPaymentAmount($id_product, $prod_qty, $adv_global_percent = 0, $adv_global_tax_incl = 0)
     {
         if (!$adv_global_percent) {
             $adv_global_percent = Configuration::get('WK_ADVANCED_PAYMENT_GLOBAL_MIN_AMOUNT');
         }
 
-        if (!$adv_global_tax_inc) {
-            $adv_global_tax_inc = Configuration::get('WK_ADVANCED_PAYMENT_INC_TAX');
+        if (!$adv_global_tax_incl) {
+            $adv_global_tax_incl = Configuration::get('WK_ADVANCED_PAYMENT_INC_TAX');
         }
 
         $price_with_tax = Product::getPriceStatic($id_product, true, null, 6, null, false, true, $prod_qty);
@@ -171,7 +188,7 @@ class HotelAdvancedPayment extends ObjectModel
                 if ($prod_adv['calculate_from']) {
                     // Advanced payment is calculated by product advanced payment setting
 
-                    if ($prod_adv['payment_type'] == 1) {
+                    if ($prod_adv['payment_type'] == self::WK_ADVANCE_PAYMENT_TYPE_PERCENTAGE) {
                         // Percentage
 
                         if ($prod_adv['tax_include']) {
@@ -203,7 +220,7 @@ class HotelAdvancedPayment extends ObjectModel
                 } else {
                     // Advanced payment is calculated by Global advanced payment setting
 
-                    if ($adv_global_tax_inc) {
+                    if ($adv_global_tax_incl) {
                         $prod_price = $price_with_tax * $prod_qty;
                     } else {
                         $prod_price = $price_without_tax * $prod_qty;
@@ -216,13 +233,13 @@ class HotelAdvancedPayment extends ObjectModel
                 $adv_amount = $prod_price;
             }
         } else {
-            if ($adv_global_tax_inc) {
+            if ($adv_global_tax_incl) {
                 $prod_price = $price_with_tax * $prod_qty;
             } else {
                 $prod_price = $price_without_tax * $prod_qty;
             }
 
-            $adv_amount = ($prod_price*$adv_global_percent)/100 ;
+            $adv_amount = ($prod_price * $adv_global_percent)/100 ;
         }
 
         return $adv_amount;
@@ -240,7 +257,7 @@ class HotelAdvancedPayment extends ObjectModel
         $adv_amount = 0;
 
         $adv_global_percent = Configuration::get('WK_ADVANCED_PAYMENT_GLOBAL_MIN_AMOUNT');
-        $adv_global_tax_inc = Configuration::get('WK_ADVANCED_PAYMENT_INC_TAX');
+        $adv_global_tax_incl = Configuration::get('WK_ADVANCED_PAYMENT_INC_TAX');
 
         foreach ($cart_product as $prod_key => $cart_prod) {
             $adv_amount += $this->getProductMinAdvPaymentAmountByIdCart($context->cart->id, $cart_prod['id_product']);
@@ -261,7 +278,7 @@ class HotelAdvancedPayment extends ObjectModel
         $adv_amount = 0;
 
         $adv_global_percent = Configuration::get('WK_ADVANCED_PAYMENT_GLOBAL_MIN_AMOUNT');
-        $adv_global_tax_inc = Configuration::get('WK_ADVANCED_PAYMENT_INC_TAX');
+        $adv_global_tax_incl = Configuration::get('WK_ADVANCED_PAYMENT_INC_TAX');
 
         foreach ($orderProducts as $prod_key => $product) {
             $adv_amount += $this->getProductMinAdvPaymentAmountByIdCart($order->id_cart, $product['id_product']);
@@ -272,12 +289,10 @@ class HotelAdvancedPayment extends ObjectModel
 
     public function _checkFreeAdvancePaymentOrder()
     {
-        $advance_payment_active = Configuration::get('WK_ALLOW_ADVANCED_PAYMENT');
-        if ($advance_payment_active) {
+        if (Configuration::get('WK_ALLOW_ADVANCED_PAYMENT')) {
             $adv_amount = $this->getMinAdvPaymentAmount();
             $vouchersTotal = Context::getContext()->cart->getOrderTotal(true, Cart::ONLY_DISCOUNTS);
-            $freeAdvancePayment = ($adv_amount - $vouchersTotal) <= 0 ? true : false;
-            return $freeAdvancePayment;
+            return ($adv_amount - $vouchersTotal) <= 0 ? true : false;
         }
         return false;
     }
@@ -287,7 +302,7 @@ class HotelAdvancedPayment extends ObjectModel
         $date_from = date('Y-m-d', strtotime($date_from));
         $date_to = date('Y-m-d', strtotime($date_to));
         $adv_global_percent = Configuration::get('WK_ADVANCED_PAYMENT_GLOBAL_MIN_AMOUNT');
-        $adv_global_tax_inc = Configuration::get('WK_ADVANCED_PAYMENT_INC_TAX');
+        $adv_global_tax_incl = Configuration::get('WK_ADVANCED_PAYMENT_INC_TAX');
 
         $price_with_tax = Product::getPriceStatic($id_product, true, null, 6, null, false, true);
         $price_without_tax = Product::getPriceStatic($id_product, false, null, 6, null, false, true);
@@ -309,7 +324,7 @@ class HotelAdvancedPayment extends ObjectModel
                         } else {
                             $prod_price = $totalPriceByProductTaxExcl;
                         }
-                        $adv_amount = ($prod_price*$prod_adv['value'])/100 ;
+                        $adv_amount = ($prod_price * $prod_adv['value']) / 100 ;
                     } else {
                         $prod_adv['value'] = Tools::convertPrice($prod_adv['value']);
 
@@ -328,21 +343,24 @@ class HotelAdvancedPayment extends ObjectModel
                         }
                     }
                 } else { // Advanced payment is calculated by Global advanced payment setting
-                    if ($adv_global_tax_inc) {
-                        $adv_amount = ($totalPriceByProductTaxIncl*$adv_global_percent)/100 ;
+                    if ($adv_global_tax_incl) {
+                        $adv_amount = ($totalPriceByProductTaxIncl * $adv_global_percent) / 100 ;
                     } else {
-                        $adv_amount = ($totalPriceByProductTaxExcl*$adv_global_percent)/100 ;
+                        $adv_amount = ($totalPriceByProductTaxExcl * $adv_global_percent) / 100 ;
                     }
                 }
             } else {
-                $prod_price = $totalPriceByProductTaxIncl;
-                $adv_amount = $prod_price;
+                if ($with_taxes) {
+                    $adv_amount = $totalPriceByProductTaxIncl;
+                } else {
+                    $adv_amount = $totalPriceByProductTaxExcl;
+                }
             }
         } else {
-            if ($adv_global_tax_inc) {
-                $adv_amount = ($totalPriceByProductTaxIncl*$adv_global_percent)/100 ;
+            if ($adv_global_tax_incl) {
+                $adv_amount = ($totalPriceByProductTaxIncl * $adv_global_percent) / 100 ;
             } else {
-                $adv_amount = ($totalPriceByProductTaxExcl*$adv_global_percent)/100 ;
+                $adv_amount = ($totalPriceByProductTaxExcl * $adv_global_percent) / 100 ;
             }
         }
 
@@ -354,11 +372,17 @@ class HotelAdvancedPayment extends ObjectModel
     {
         if (Configuration::get('WK_ALLOW_ADVANCED_PAYMENT')) {
             $context = Context::getContext();
+            // check if there is any ptoduct in the cart with advance payment option available
             if ($cartProducts = $context->cart->getProducts()) {
                 foreach ($cartProducts as $product) {
                     $idProduct = $product['id_product'];
                     if ($advPaymentInfo = $this->getIdAdvPaymentByIdProduct($idProduct)) {
                         if ($advPaymentInfo['active']) {
+                            // if no impact on price with advancne payment then no need of advance payment
+                            if ($context->cart->getOrderTotal() == $context->cart->getOrderTotal(true, CART::ADVANCE_PAYMENT)) {
+                                return false;
+                            }
+
                             return true;
                         }
                     }

@@ -17,6 +17,8 @@
   text-align: center; }
 #order-detail-content table label {
   font-weight: 400; }
+.wk_booking_details_wrapper table {
+  margin-bottom: 10px!important;}
 
 .table td.history_detail a + a {
   margin-left: 14px; }
@@ -40,124 +42,59 @@
 /*# sourceMappingURL=history.css.map */
 
 /* ----- Order cancellation in order detail page ---- */
+.standard_refund_fields {
+  display: none;}
 
-.refund_reason_head
-{
-  font-size: 39px;
-  font-family: parisienne;
-  font-weight: 400;
-  color: #252525;
-  margin-bottom: 25px;
-  border-bottom: 1px solid #379bf0;
-  line-height: 55px;
-}
-#reasonForRefund
-{
-  font-size: 17px;
-  font-family: PT serif;
-  font-weight: 400;
-}
-.totalOrdercancellation_div
-{
-  margin-bottom: 10px;
-}
-.terms_btn
-{
-  background-color: #404040;
-    color: #ffffff;
-    font-size: 13px;
-    font-weight: 700;
-}
-.totalOrdercancellation_btn
-{
-  background-color: #379bf0;
-    color: #ffffff;
-    font-size: 13px;
-    font-weight: 700;
-    margin-right: 10px;
-}
-
-/* ----- Order cancellation in order detail page ---- */
-
-/* ---- history.tpl ---- */
-  .ref_req_wait
-  {
-    background-color: #FF8C00;
-    color: rgb(255, 255, 255);
-    padding-left: 10px;
-  }
-  .ref_req_accept
-  {
-    background-color: #00aff0;
-    color: rgb(255, 255, 255);
-    padding-left: 10px;
-  }
-  .ref_req_refund
-  {
-    background-color: #108510;
-    color: rgb(255, 255, 255);
-    padding-left: 10px;
-  }
-  .ref_req_reject
-  {
-    background-color: #DC143C;
-    color: rgb(255, 255, 255);
-    padding-left: 10px;
-  }
-
-/* ---- history.tpl ---- */
+.loading_overlay {
+  display: none;
+  position: fixed;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 100000;}
+.loading-img {
+  position: absolute;
+  left: 50%;
+  top: 50%;}
 
 
-/* ----- Order cancellation in order detail page ---- */
-
-.back_o_msg
-{
-  color: red;
+.refund_reason_head {
+  margin-bottom: 15px;
+  font-size: 22px;
+  color: #414141;}
+#reasonForRefund {
   font-size: 14px;
-}
-.refund_reason_head
-{
-  font-size: 39px;
-  font-weight: 400;
-  color: #252525;
-  margin-bottom: 25px;
-  border-bottom: 1px solid #379bf0;
-  line-height: 55px;
-}
-#reasonForRefund
-{
-  font-size: 17px;
-  font-weight: 400;
-}
-.totalOrdercancellation_div
-{
-  margin-bottom: 10px;
-}
-.terms_btn
-{
+  color: #777777;}
+.totalOrdercancellation_div {
+  margin-bottom: 10px;}
+.terms_btn {
   background-color: #404040;
   color: #ffffff;
   font-size: 13px;
-  font-weight: 700;
-}
-.totalOrdercancellation_btn
-{
+  font-weight: 700;}
+.totalOrdercancellation_btn {
   background-color: #379bf0;
   color: #ffffff;
   font-size: 13px;
   font-weight: 700;
-  margin-right: 10px;
-}
-.cust_serv_lnk
-{
-  text-decoration: underline;
-}
+  margin-right: 10px;}
+.reason_submit_wrapper {
+  text-align: center;}
+
 /* ----- Order cancellation in order detail page ---- */
+.back_o_msg {
+  color: red;
+  font-size: 14px;}
+.cust_serv_lnk {
+  text-decoration: underline;}
+
 .room_type_old_price {
   text-decoration: line-through;
   color:#979797;
-  font-size:12px;
-}
+  font-size:12px;}
+
 /* Fancy-box for extra demands Css */
 #rooms_extra_demands {
   font-size: 16px;}
@@ -177,13 +114,77 @@
 #rooms_extra_demands .card {
   padding-bottom: 0px;}
 
+.cancel_requests_link_wrapper a {
+  font-weight: bold;
+  font-style: italic;
+  text-decoration: underline;
+  color: #000;}
+/* refund buttons */
+  #history .checkbox {
+    margin-bottom: 15px;
+    line-height: 12px;}
+  #history .booking_refund_fields label {
+    font-size: 14px;
+    color: #333;
+    font-weight: bold;
+    padding-left: 6px;}
+  #history .refund_policy_link {
+    background-color: #D9D9D9;;
+    border: 1px solid #D9D9D9;;
+    font-size: 14px;
+    padding: 12px 30px;
+    font-weight: 600;
+    color: #232323;
+    text-transform: uppercase;
+    text-align: center;}
+  #history #order_refund_request {
+    background-color: #1292FF;
+    border: 1px solid #1292FF;
+    font-size: 14px;
+    padding: 12px 30px;
+    font-weight: 600;
+    color: #FFF;
+    text-transform: uppercase;
+    margin-left: 10px;
+    text-align: center;}
+    @media screen and (max-width: 405px) {
+      #history #order_refund_request {
+      margin-bottom: 5px;}}
+
+    #history  .cancel_request_btn {
+      background-color: #FF4B4B!important;
+      border: 1px solid #FF4B4B!important;}
+  #history #order_refund_request_submit {
+    background-color: #36BA46;
+    border: 1px solid #36BA46;
+    color: #fff;
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 14px;
+    padding: 12px 30px;}
+  #history #submit_refund_reason {
+    background-color: #1292FF;
+    border: 1px solid #1292FF;
+    color: #fff;
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 14px;
+    padding: 12px 30px;}
+
+  .refund_request_fields {
+      display: none;}
 
 /* fancybox changes */
-#order-confirmation .fancybox-overlay, #history .fancybox-overlay {
+/* fancybox changes */
+#history .fancybox-overlay {
 	background: rgba(255, 255, 255, 0.95)!important;}
-	#order-confirmation .fancybox-skin, #history .fancybox-skin {
-	box-shadow: none!important;}
-	#order-confirmation .fancybox-skin .fancybox-close:after, #history .fancybox-skin .fancybox-close:after {
-	content: "";}
-	#order-confirmation .fancybox-skin .fancybox-close, #history .fancybox-skin .fancybox-close {
-	background-image: url(../img/icon/icon-close.svg);}
+#history .fancybox-skin {
+  background: #FFF;
+  box-shadow: 0 4px 4px 0 rgba(0,0,0,0.25);
+  border-radius: 2px;}
+#history .fancybox-skin .fancybox-close:after {
+  content: "";}
+#history .fancybox-skin .fancybox-close {
+  top: -36px;
+  right: -36px;
+  background-image: url(../img/icon/icon-close.svg);}

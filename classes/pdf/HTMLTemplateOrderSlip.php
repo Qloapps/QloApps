@@ -93,14 +93,15 @@ class HTMLTemplateOrderSlipCore extends HTMLTemplateInvoice
 
         if ($this->order_slip->amount > 0) {
             foreach ($this->order->products as &$product) {
-                $product['total_price_tax_excl'] = $product['unit_price_tax_excl'] * $product['product_quantity'];
-                $product['total_price_tax_incl'] = $product['unit_price_tax_incl'] * $product['product_quantity'];
+                // $product['total_price_tax_excl'] = $product['unit_price_tax_excl'] * $product['product_quantity'];
+                // $product['total_price_tax_incl'] = $product['unit_price_tax_incl'] * $product['product_quantity'];
 
                 if ($this->order_slip->partial == 1) {
                     $order_slip_detail = Db::getInstance()->getRow('
 						SELECT * FROM `'._DB_PREFIX_.'order_slip_detail`
 						WHERE `id_order_slip` = '.(int)$this->order_slip->id.'
-						AND `id_order_detail` = '.(int)$product['id_order_detail']);
+                        AND `id_order_detail` = '.(int)$product['id_order_detail'].'
+                        AND `id_htl_booking` = '.(int)$product['id_htl_booking']);
 
                     $product['total_price_tax_excl'] = $order_slip_detail['amount_tax_excl'];
                     $product['total_price_tax_incl'] = $order_slip_detail['amount_tax_incl'];
@@ -143,7 +144,6 @@ class HTMLTemplateOrderSlipCore extends HTMLTemplateInvoice
                 }
             }
         }
-
         $this->smarty->assign(array(
             'order' => $this->order,
             'order_slip' => $this->order_slip,

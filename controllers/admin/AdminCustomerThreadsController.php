@@ -458,7 +458,7 @@ class AdminCustomerThreadsControllerCore extends AdminController
 
     public function initContent()
     {
-        if (isset($_GET['filename']) && file_exists(_PS_UPLOAD_DIR_.$_GET['filename']) && Validate::isFileName($_GET['filename'])) {
+        if (isset($_GET['filename']) && (bool)Tools::file_get_contents($context->link->getMediaLink(_THEME_PROD_PIC_DIR_.$_GET['filename'])) && Validate::isFileName($_GET['filename'])) { // by webkul
             AdminCustomerThreadsController::openUploadedFile();
         }
 
@@ -808,7 +808,7 @@ class AdminCustomerThreadsControllerCore extends AdminController
             'email' => $email,
             'id_employee' => $id_employee,
             'PS_SHOP_NAME' => Configuration::get('PS_SHOP_NAME'),
-            'file_name' => file_exists(_PS_UPLOAD_DIR_.$message['file_name']),
+            'file_name' => (bool)Tools::file_get_contents($context->link->getMediaLink(_THEME_PROD_PIC_DIR_.$message['file_name'])), // by webkul
             'contacts' => $contacts,
             'is_valid_order_id' => $is_valid_order_id
         ));

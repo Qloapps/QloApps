@@ -321,9 +321,11 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
             $customer = new Customer($this->order->id_customer);
             if (!empty($products)) {
                 $processed_product = array();
-                $refunded_rooms = 0;
                 $cart_bk_data=array();
-                $totalDemandsPrice = 0;
+
+                $totalDemandsPriceTE = 0;
+                $totalDemandsPriceTI = 0;
+
                 foreach ($products as $type_key => $type_value) {
                     if (in_array($type_value['product_id'], $processed_product)) {
                         continue;
@@ -331,10 +333,6 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
                     $processed_product[] = $type_value['product_id'];
 
                     $product = new Product($type_value['product_id'], false, $this->context->language->id);
-                    $order_prod_dtl = $obj_htl_bk_dtl->getPsOrderDetailsByProduct(
-                        $type_value['product_id'],
-                        $this->order->id
-                    );
                     $cover_image_arr = $product->getCover($type_value['product_id']);
 
                     if (!empty($cover_image_arr)) {
@@ -366,25 +364,11 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
                         $unit_price_tax_incl = 0;
                         $unit_price_tax_excl = $order_details_obj->unit_price_tax_excl;
                         $unit_price_tax_incl = $order_details_obj->unit_price_tax_incl;
-                        $prod_ord_dtl_name = $order_details_obj->product_name;
-                        $cart_htl_data[$type_key]['name'] = $prod_ord_dtl_name;
 
+                        $cart_htl_data[$type_key]['name'] = $order_details_obj->product_name;
                         $cart_htl_data[$type_key]['unit_price_tax_excl'] = $unit_price_tax_excl;
                         $cart_htl_data[$type_key]['unit_price_tax_incl'] = $unit_price_tax_incl;
-                        //work on entring refund data
-                        $obj_ord_ref_info = new HotelOrderRefundInfo();
-                        $ord_refnd_info = $obj_ord_ref_info->getOderRefundInfoByIdOrderIdProductByDate($this->order->id, $type_value['product_id'], $data_v['date_from'], $data_v['date_to']);
-                        if ($ord_refnd_info) {
-                            $obj_refund_stages = new HotelOrderRefundStages();
-                            $stage_name = $obj_refund_stages->getNameById($ord_refnd_info['refund_stage_id']);
 
-                            if ($stage_name == 'Refunded') {
-                                $refunded_rooms = 1;
-                            }
-                        } else {
-                            $stage_name = '';
-                        }
-                        // END Order Refund
                         if (isset($cart_htl_data[$type_key]['date_diff'][$date_join])) {
                             $cart_htl_data[$type_key]['date_diff'][$date_join]['extra_demands'] = $objBookingDemand->getRoomTypeBookingExtraDemands(
                                 $order_obj->id,
@@ -488,20 +472,15 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
                     }
                 }
                 unset($tax_temp);
-                // For Advanced Payment
-                $obj_customer_adv = new HotelCustomerAdvancedPayment();
-                $order_adv_dtl = $obj_customer_adv->getCstAdvPaymentDtlByIdOrder($order_obj->id);
-                if ($order_adv_dtl) {
-                    $this->smarty->assign('order_adv_dtl', $order_adv_dtl);
-                }
+
                 // enter extra demands price to the footer total details
                 $footer['total_extra_demands_ti'] = $totalDemandsPriceTI;
                 $footer['total_extra_demands_te'] = $totalDemandsPriceTE;
             }
         }
+
         $data = array(
             'cart_htl_data' => $cart_htl_data,
-            'refunded_rooms' => $refunded_rooms,
             'order' => $this->order,
             'order_invoice' => $this->order_invoice,
             'order_details' => $order_details,

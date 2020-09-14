@@ -285,15 +285,15 @@ class WebserviceRequestCore
             'order_states' => array('description' => 'The Order statuses','class' => 'OrderState'),
             'order_slip' => array('description' => 'The Order slips', 'class' => 'OrderSlip'),
             'price_ranges' => array('description' => 'Price ranges', 'class' => 'RangePrice'),
-            'product_features' => array('description' => 'The product features','class' => 'Feature'),
-            'product_feature_values' => array('description' => 'The product feature values','class' => 'FeatureValue'),
-            'product_options' => array('description' => 'The product options','class' => 'AttributeGroup'),
-            'product_option_values' => array('description' => 'The product options value','class' => 'Attribute'),
-            'products' => array('description' => 'The products','class' => 'Product'),
+            'room_type_features' => array('description' => 'The product features','class' => 'Feature'),
+            'room_type_feature_values' => array('description' => 'The product feature values','class' => 'FeatureValue'),
+            'room_type_options' => array('description' => 'The product options','class' => 'AttributeGroup'),
+            'room_type_option_values' => array('description' => 'The product options value','class' => 'Attribute'),
+            'room_types' => array('description' => 'The room types','class' => 'Product'),
             'states' => array('description' => 'The available states of countries','class' => 'State'),
             'stores' => array('description' => 'The stores', 'class' => 'Store'),
             'suppliers' => array('description' => 'The product suppliers','class' => 'Supplier'),
-            'tags' => array('description' => 'The Products tags','class' => 'Tag'),
+            'tags' => array('description' => 'The products tags','class' => 'Tag'),
             'translated_configurations' => array('description' => 'Shop configuration', 'class' => 'TranslatedConfiguration'),
             'weight_ranges' => array('description' => 'Weight ranges', 'class' => 'RangeWeight'),
             'zones' => array('description' => 'The Countries zones','class' => 'Zone'),
@@ -757,7 +757,7 @@ class WebserviceRequestCore
                 }
             }
             if ($this->hasErrors()) {
-                header('WWW-Authenticate: Basic realm="Welcome to PrestaShop Webservice, please enter the authentication key as the login. No password required."');
+                header('WWW-Authenticate: Basic realm="Welcome to QloApps Webservice, please enter the authentication key as the login. No password required."');
                 $this->objOutput->setStatus(401);
                 return false;
             } else {
@@ -776,7 +776,7 @@ class WebserviceRequestCore
     protected function isActivated()
     {
         if (!Configuration::get('PS_WEBSERVICE')) {
-            $this->setError(503, 'The PrestaShop webservice is disabled. Please activate it in the PrestaShop Back Office', 22);
+            $this->setError(503, 'The QloApps webservice is disabled. Please activate it in the QloApps Back Office', 22);
             return false;
         }
         return true;

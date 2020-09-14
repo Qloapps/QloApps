@@ -443,3 +443,38 @@ function showErrorMessage(msg) {
 function showNoticeMessage(msg) {
 	$.growl.notice({ title: "", message:msg});
 }
+
+
+// highlight dates of the selected date range
+function highlightSelectedDateRange(date, checkIn, checkOut)
+{
+    if (checkIn || checkOut) {
+        // Lets make the date in the required format
+        var currentDate = date.getDate();
+        var currentMonth = date.getMonth()+1;
+        if (currentMonth < 10) {
+            currentMonth = '0' + currentMonth;
+        }
+        if (currentDate < 10) {
+            currentDate = '0' + currentDate;
+        }
+        dmy = date.getFullYear() + "-" + currentMonth + "-" + currentDate;
+
+        if (checkIn) {
+            checkIn = checkIn.split("-");
+            checkIn = (checkIn[2]) + '-' + (checkIn[1]) + '-' + (checkIn[0]);
+        }
+        if (checkOut) {
+            checkOut = checkOut.split("-");
+            checkOut = (checkOut[2]) + '-' + (checkOut[1]) + '-' + (checkOut[0]);
+        }
+
+        if (dmy == checkIn || dmy == checkOut) {
+            return [true, 'selectedCheckedDate', ''];
+        } else if ((checkIn && checkOut) && (dmy >= checkIn && dmy <= checkOut)) {
+            return [true, 'in-select-date-range', ''];
+        }
+    }
+
+    return [true, ''];
+}

@@ -36,7 +36,7 @@ class PSCleaner extends Module
     {
         $this->name = 'pscleaner';
         $this->tab = 'administration';
-        $this->version = '1.0.0';
+        $this->version = '1.0.1';
         $this->author = 'PrestaShop';
         $this->need_instance = 0;
         if (version_compare(_PS_VERSION_, '1.6.0.0 ', '>=')) {
@@ -763,25 +763,23 @@ class PSCleaner extends Module
                 'stock_mvt',
                 'warehouse',
                 //Qlo modules tables
-                'htl_room_type_feature_pricing_lang',
-                'htl_room_type_feature_pricing',
-                'htl_room_disable_dates',
-                'htl_advance_payment',
                 'htl_room_type',
                 'htl_room_information',
-                'htl_image',
-                'htl_order_restrict_date',
-                'htl_branch_features',
-                'htl_branch_info_lang',
                 'htl_branch_info',
-                'htl_interior_image',
-                'htl_features_block_data',
-                'htl_features_block_data_lang',
-                'htl_room_block_data',
-                'htl_testimonials_block_data',
-                'htl_testimonials_block_data_lang',
-
-
+                'htl_branch_info_lang',
+                'htl_image',
+                'htl_branch_features',
+                'htl_features',
+                'htl_features_lang',
+                'htl_advance_payment',
+                'htl_branch_refund_rules',
+                'htl_order_restrict_date',
+                'htl_room_type_feature_pricing',
+                'htl_room_type_feature_pricing_lang',
+                'htl_room_type_feature_pricing_group',
+                'htl_room_type_demand_price',
+                'htl_room_type_demand',
+                'htl_room_disable_dates',
             )
         );
     }
@@ -824,11 +822,10 @@ class PSCleaner extends Module
             'product_sale',
             'referrer_cache',
             //Qlo modules order tables
-            'htl_customer_adv_payment',
-            'htl_customer_adv_product_payment',
-            'htl_order_refund_info',
             'htl_cart_booking_data',
             'htl_booking_detail',
+            'htl_booking_demands',
+            'htl_booking_demands_tax',
         );
     }
 }

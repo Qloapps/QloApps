@@ -1,6 +1,6 @@
 <?php
 /**
-* 2010-2018 Webkul.
+* 2010-2020 Webkul.
 *
 * NOTICE OF LICENSE
 *
@@ -14,7 +14,7 @@
 * needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
 *
 *  @author    Webkul IN <support@webkul.com>
-*  @copyright 2010-2018 Webkul IN
+*  @copyright 2010-2020 Webkul IN
 *  @license   https://store.webkul.com/license.html
 */
 
@@ -42,6 +42,13 @@ class WkHotelFeaturesData extends ObjectModel
         )
     );
 
+    public function __construct($id = null, $id_lang = null, $id_shop = null)
+    {
+        parent::__construct($id, $id_lang, $id_shop);
+
+        $this->image_dir = _PS_MODULE_DIR_.'wkhotelfeaturesblock/views/img/hotels_features_img/';
+    }
+
     public function getHotelAmenities($active = 2, $idLang = false)
     {
         if (!$idLang) {
@@ -60,17 +67,19 @@ class WkHotelFeaturesData extends ObjectModel
         return Db::getInstance()->executeS($sql);
     }
 
+    /**
+     * Deletes current featuer block from the database
+     * @return bool `true` if delete was successful
+     */
     public function delete()
     {
-        // delete image of the block
-        $imgPath = _PS_MODULE_DIR_.'wkhotelfeaturesblock/views/img/hotels_features_img/'.$this->id.'.jpg';
-        if (file_exists($imgPath)) {
-            unlink($imgPath);
+        if (!parent::delete()
+            || !$this->deleteImage(true)
+            || !$this->cleanPositions()
+        ) {
+            return false;
         }
-        $return = parent::delete();
-        /* Reinitializing position */
-        $this->cleanPositions();
-        return $return;
+        return true;
     }
 
     public static function getHigherPosition()

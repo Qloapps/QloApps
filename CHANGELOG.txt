@@ -1,4 +1,88 @@
 ####################################
+# V1.5.0
+####################################
+
+## Added Features:
+
+[+] CO : QloApps APIs are created (Prestashop APIs are modified as per hotel QloApps changes)
+[+] CO : `is_advance_payment` column is added in the 'cart' table.
+[+] CO : `is_advance_payment`, `advance_paid_amount` columns are added in the 'orders' table.
+[+] CO : `id_transaction`, `payment_mode`, `refunded_amount`, `by_admin` columns are added in the 'order_return' table.
+[+] CO : `id_order_return_detail`, `id_htl_booking`, `refunded_amount` columns are added in the 'order_return_detail' table.
+[+] CO : `send_email_to_customer`, `send_email_to_superadmin`, `send_email_to_employee`, `send_email_to_hotelier`, denied`, `refunded`, `module_name` columns are added in the 'order_return_state' table.
+[+] CO : `customer_template`, `admin_template` columns are added in the 'order_return_state_lang' table.
+[+] CO : `id_htl_booking` column is added in the 'order_slip_detail' table.
+[+] CO : Refund emails will be sent to the customer as per return state setting
+[+] CO : All images link are now generated dynamically
+
+[+] FO : Room type refund policies in the policies tab is shown in the room type details page.
+[+] FO : A controller will be there for the customer which will show his refund requests info
+
+[+] BO : Admin can enable/disable refund for the hotel
+[+] BO : Refund Process:: Order return statuses improved for order refund statuses.
+[+] BO : Admin can select rules for the hotel [checkboxes]
+[+] BO : Admin can initiate refund if refund is enable for the system
+[+] BO : Admin can select which state is considered as refunded complete in the return state.
+[+] BO : Admin can select which state is considered as refunded denied in the return state.
+[+] BO : Admin can select whcih email will be sent to customer and admin for the return state.
+
+[+] BO : Feature Price Rule: Groups wise Condition in feature price rules is added.
+[+] BO : Global refund policies cms page can be selected from refund rules controller.
+[+] BO : Refund can be enabled/disabled globally from refund rules controller.
+[+] BO : Payment mode and transaction id can be saved for the refund.
+[+] BO : Voucher slip can be generated for refund.
+[+] BO : Credit slip can be generated for refund.
+[+] BO : Additional facilities can be edited at the time of order editing.
+[+] BO : Room type features images are used as jpg images in place of png images.
+
+
+## Improved/changed features:
+
+[*] BO : Refund Process:: Order return statuses improved for order refund statuses.
+[*] BO : In Additional Facilities list no price will be shown if facility have advance options.
+[*] BO : Admin will be able to select a checkout date while changing status of the room from order details page.
+[*] BO : Hotel category will be selected Default room type category.
+[*] BO : In Room type renderlist hotel(instead of category), city, number rooms, adults, Childs columns added.
+[*] BO : Merchandise Return tab is removed.
+[*] BO : Room type ids now start room type id from 1 in room type render list.
+[*] BO : Prestashop warning pop up will nt be shown during module installation for Webkul modules.
+[*] BO : Updated addons link from store to addon's page
+[*] BO : Added recomended image size for room type images for appropriate view on front end.
+
+[*] FO : Calendar Design is improved of date from and date to in QloApps.
+[*] FO : 'Proceed' button during checkout will be disabled in case of errors while checkout.
+[*] FO : Search panel is improved on all pages.
+[*] FO : Cart warning text changed
+[*] FO : Refund request proocess is improved for the customer. Designed is also improved.
+
+[*] CO : paypal adaptive module (by webkul) Removed completely from qloapps
+[*] CO : All the irrelevant data creation from the installation process is removed Which is not related to Qloapps but Prestashop. e.g  carriers, stores, suppliers, manufacturers...... etc. Order data will not be populated now.
+
+[*] CO : For refund request "order_return" and "order_return_detail" tables are used.
+[*] CO : For order refund states "order_return_states" table is used.
+
+
+## Bug/Issues Resolved:
+
+[-] BO : FIXED : Room does not free even after room status set to checkout.
+[-] BO : FIXED : Room does not free while order status is changed to Refunded, Cancelled or Payment Error.
+[-] BO : FIXED : Additional facilities price id not managed while deleting a booking from admin order details page.
+
+[-] FO : FIXED: when using advance payment option, discount voucher (amount) get applied to advance payment amount along with total order cost
+[-] FO : FIXED : If all rows are disabled then also blocks (Interior, Rooms, Features, Testimonials) are visible on home page.
+[-] FO : FIXED : Zip code error while making the guest check.
+[-] FO : FIXED : Issue while creating a customer/guest from checkout page on firefox browser.
+[-] FO : FIXED : Check-out date same as check-in date when current data is more than max order date for hotel
+[-] FO : FIXED : customer able to process booking for inactive rooms
+[-] FO : FIXED : Image strech issue on product page.
+[-] FO : FIXED : Cart page not update when delete from from cart dropdown
+[-] FO : FIXED : While making the guest check out the system shows zip code error in some countries.
+
+[-] CO : FIXED : Fatal error: Uncaught exception 'ImagickException' while creating invoice.
+[-] CO : FIXED : warning while creating invoice (total demands variable issue)
+
+
+####################################
 # V1.4.1
 ####################################
 

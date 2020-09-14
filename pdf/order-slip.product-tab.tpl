@@ -27,8 +27,9 @@
 
 	<thead>
 		<tr>
-			<th class="product header small" width="60%">{l s='Product / Reference' pdf='true'}</th>
-			<th class="product header small" width="10%">{l s='Qty' pdf='true'}</th>
+			<th class="product header small" width="30%">{l s='Room Type / Reference' pdf='true'}</th>
+			<th class="product header small" width="30%">{l s='Duration' pdf='true'}</th>
+			<th class="product header small" width="10%">{l s='Num rooms' pdf='true'}</th>
 			<th class="product header-right small" width="15%">{l s='Unit price' pdf='true'}<br />{if $tax_excluded_display}{l s='(Tax Excl.)' pdf='true'}{else}{l s='(Tax Incl.)' pdf='true'}{/if}</th>
 			<th class="product header-right small" width="15%">{l s='Price' pdf='true'}<br />{if $tax_excluded_display}{l s='(Tax Excl.)' pdf='true'}{else}{l s='(Tax Incl.)' pdf='true'}{/if}</th>
 		</tr>
@@ -49,7 +50,10 @@
 						{$order_detail.product_name}
 					</td>
 					<td class="product center">
-						{$order_detail.product_quantity}
+						{$order_detail.date_from|date_format:"%d-%m-%Y"} {l s='To' pdf='true'} {$order_detail.date_to|date_format:"%d-%m-%Y"}
+					</td>
+					<td class="product center">
+						{$order_detail.num_rooms}
 					</td>
 					<td class="product right">
 						{if $tax_excluded_display}

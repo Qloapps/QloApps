@@ -45,7 +45,7 @@ class BlockAdvertising extends Module
 	{
 		$this->name = 'blockadvertising';
 		$this->tab = 'advertising_marketing';
-		$this->version = '0.10.1';
+		$this->version = '0.10.2';
 		$this->author = 'PrestaShop';
 		$this->need_instance = 0;
 
@@ -66,11 +66,11 @@ class BlockAdvertising extends Module
 	{
 		$this->adv_imgname = 'advertising';
 		if ((Shop::getContext() == Shop::CONTEXT_GROUP || Shop::getContext() == Shop::CONTEXT_SHOP)
-			&& file_exists(_PS_MODULE_DIR_.$this->name.'/img/'.$this->adv_imgname.'-g'.$this->context->shop->getContextShopGroupID().'.'.Configuration::get('BLOCKADVERT_IMG_EXT'))
+			&& (bool)Tools::file_get_contents($this->context->link->getMediaLink(_MODULE_DIR_.$this->name.'/img/'.$this->adv_imgname.'-g'.$this->context->shop->getContextShopGroupID().'.'.Configuration::get('BLOCKADVERT_IMG_EXT'))) //bywebkul
 		)
 			$this->adv_imgname .= '-g'.$this->context->shop->getContextShopGroupID();
 		if (Shop::getContext() == Shop::CONTEXT_SHOP
-			&& file_exists(_PS_MODULE_DIR_.$this->name.'/img/'.$this->adv_imgname.'-s'.$this->context->shop->getContextShopID().'.'.Configuration::get('BLOCKADVERT_IMG_EXT'))
+			&& (bool)Tools::file_get_contents($this->context->link->getMediaLink(_MODULE_DIR_.$this->name.'/img/'.$this->adv_imgname.'-s'.$this->context->shop->getContextShopID().'.'.Configuration::get('BLOCKADVERT_IMG_EXT'))) // by webkul
 		)
 			$this->adv_imgname .= '-s'.$this->context->shop->getContextShopID();
 
@@ -128,8 +128,8 @@ class BlockAdvertising extends Module
 	private function _deleteCurrentImg()
 	{
 		// Delete the image file
-		if ($this->adv_imgname != 'advertising' && file_exists(_PS_MODULE_DIR_.$this->name.'/img/'.$this->adv_imgname.'.'.Configuration::get('BLOCKADVERT_IMG_EXT')))
-			unlink(_PS_MODULE_DIR_.$this->name.'/img/'.$this->adv_imgname.'.'.Configuration::get('BLOCKADVERT_IMG_EXT'));
+		if ($this->adv_imgname != 'advertising' && (bool)Tools::file_get_contents($this->context->link->getMediaLink(_PS_MODULE_DIR_.$this->name.'/img/'.$this->adv_imgname.'.'.Configuration::get('BLOCKADVERT_IMG_EXT')))) // by webkul
+			Tools::deleteFile(_PS_MODULE_DIR_.$this->name.'/img/'.$this->adv_imgname.'.'.Configuration::get('BLOCKADVERT_IMG_EXT'));
 
 		// Update the extension to the global value or the shop group value if available
 		Configuration::deleteFromContext('BLOCKADVERT_IMG_EXT');
@@ -163,8 +163,9 @@ class BlockAdvertising extends Module
 						$this->adv_imgname = 'advertising-s'.(int)$this->context->shop->getContextShopID();
 
 					// Copy the image in the module directory with its new name
-					if (!move_uploaded_file($_FILES['adv_img']['tmp_name'], _PS_MODULE_DIR_.$this->name.'/img/'.$this->adv_imgname.'.'.Configuration::get('BLOCKADVERT_IMG_EXT')))
-						$errors .= $this->l('File upload error.');
+					if(!ImageManager::resize($_FILES['adv_img']['tmp_name'], _PS_MODULE_DIR_.$this->name.'/img/'.$this->adv_imgname.'.'.Configuration::get('BLOCKADVERT_IMG_EXT'))) { //by webkul
+                        $errors .= $this->l('File upload error.');
+					}
 				}
 			}
 

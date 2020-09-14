@@ -1,19 +1,19 @@
 
-[/{shop_url}]
+[/{shop_url}] 
 
-Hi {firstname} {lastname},
+Hi {firstname} {lastname}, 
 
 We have processed your {shop_name} refund for order with the
-reference {order_name}.
+reference {order_name}. 
 
 You can review your order and download your invoice from the
 "Order history" [/{history_url}] section of your customer account by
-clicking "My account" [/{my_account_url}] on our shop.
+clicking "My account" [/{my_account_url}] on our shop. 
 
 If you have a guest account, you can follow your order via the
 "Guest Tracking" [/{guest_tracking_url}?id_order={order_name}] section
-on our shop.
+on our shop. 
 
 {shop_name} [/{shop_url}] powered by Webkul(tm)
-[https://webkul.com]
+[https://webkul.com] 
 

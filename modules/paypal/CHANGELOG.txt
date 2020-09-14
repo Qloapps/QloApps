@@ -1,4 +1,24 @@
 -------------------------
+# V1.0.1 to V1.0.2
+-------------------------
+
+## Improved/Changed Features:
+
+[*] CO : Methods to determine advance payment is changed as per core changes.
+[*] CO : getPaymentMethods function improved.
+[*] CO : Payment option design is improved on checkout page.
+
+## Bug/Issues Resolved:
+
+[-] CO : Resolved: paypal module does not include Additional Facilities cost.
+
+
+## Update Policy
+
+- Mobule need only file update, can be updated only by UPLOADING new version on module
+
+
+-------------------------
 # V1.0.0 to V1.0.1
 -------------------------
 

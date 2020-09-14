@@ -67,7 +67,7 @@
 				{l s='Forum'}
 			</a>
 			/&nbsp;
-			<a href="https://store.webkul.com/Qloapps.html" class="footer_link _blank">
+			<a href="https://qloapps.com/addons/" class="footer_link _blank">
 				<i class="icon-puzzle-piece"></i>
 				{l s='Addons'}
 			</a>

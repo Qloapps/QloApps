@@ -46,7 +46,7 @@
   <tab id="Manufacturers" name="Fabricantes"/>
   <tab id="Marketing" name="Marketing"/>
   <tab id="Menus" name="Separadores"/>
-  <tab id="Merchandise_Returns" name="Devolução de mercadoria"/>
+  <!-- <tab id="Merchandise_Returns" name="Devolução de mercadoria"/> -->
   <tab id="Modules_1" name="Módulos e Serviços"/>
   <tab id="Modules" name="Módulos"/>
   <tab id="Modules_Themes_Catalog" name="Catálogo de Módulos e Temas"/>

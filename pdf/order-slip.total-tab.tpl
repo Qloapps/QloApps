@@ -42,7 +42,7 @@
 			{if $tax_excluded_display}
 				<tr>
 					<td class="grey" width="70%">
-						{l s='Product Total (Tax Excl.)' pdf='true'}
+						{l s='Rooms Total (Tax Excl.)' pdf='true'}
 					</td>
 					<td class="white" width="30%">
 						- {displayPrice currency=$order->id_currency price=$order->total_products}
@@ -51,7 +51,7 @@
 			{else}
 				<tr>
 					<td class="grey" width="70%">
-						{l s='Product Total (Tax Incl.)' pdf='true'}
+						{l s='Rooms Total (Tax Incl.)' pdf='true'}
 					</td>
 					<td class="white" width="30%">
 						- {displayPrice currency=$order->id_currency price=$order->total_products_wt}
@@ -61,7 +61,7 @@
 		{else}
 			<tr>
 				<td class="grey" width="70%">
-					{l s='Product Total' pdf='true'}
+					{l s='Rooms Total' pdf='true'}
 				</td>
 				<td class="white" width="30%">
 					- {displayPrice currency=$order->id_currency price=$order->total_products}

@@ -63,121 +63,6 @@
 					{$confirmation}
 				</p>
 			{/if}
-
-			<!-- By webkul to search panel on product page -->
-			<div class="header-rmsearch-wrapper">
-				<div class="header-rmsearch-primary">
-					<div class="container">
-						<div class="row header-rmsearch-inner-wrapper">
-							<form method="POST" id="search_hotel_block_form">
-								{if isset($location_enable) && $location_enable}
-									<div class="form-group
-									{if $totalActiveHotels <= 1 && !$show_only_active_htl}
-										col-sm-3
-									{else}
-										col-sm-6 col-lg-3
-									{/if}">
-										<input type="text" class="form-control header-rmsearch-input" id="hotel_location" name="hotel_location" autocomplete="off" placeholder="{l s='Hotel Location'}" {if isset($search_data['location'])}value="{$search_data['location']}"{/if}>
-										<div class="dropdown">
-											<ul class="location_search_results_ul"></ul>
-										</div>
-									</div>
-								{/if}
-								<div class="form-group {if $totalActiveHotels <= 1 && !$show_only_active_htl} hidden {/if}
-								{if isset($location_enable) && $location_enable}
-									col-sm-6 col-lg-3
-								{else}
-									col-sm-3
-								{/if}">
-									{if !show_only_active_htl}
-										<input type="hidden" id="max_order_date" name="max_order_date" value="{$all_hotels_info[0]['max_order_date']}">
-										<input type="hidden" id="hotel_cat_id" name="hotel_cat_id" value="{$all_hotels_info[0]['id_category']}">
-										<input type="hidden" id="id_hotel" name="id_hotel" value="{$all_hotels_info[0]['id']}">
-										<input type="text" id="htl_name" class="form-control header-rmsearch-input" value="{$all_hotels_info[0]['hotel_name']}" readonly>
-									{else}
-										<div class="dropdown">
-											<button class="form-control header-rmsearch-input {if isset($error) && $error == 1}error_border{/if}" type="button" data-toggle="dropdown">
-												{if isset($search_data)}
-													<span id="hotel_cat_name" class="pull-left">{$search_data['htl_dtl']['hotel_name']}</span>
-												{else}
-													<span id="hotel_cat_name" class="pull-left">{l s='Select Hotel'}</span>
-												{/if}
-												<!-- <span id="hotel_cat_name" class="pull-left">{l s='Select Hotel'}</span> -->
-												<input type="hidden" id="hotel_cat_id" name="hotel_cat_id" {if isset($search_data)}value="{$search_data['htl_dtl']['id_category']}"{/if}>
-												<input type="hidden" id="id_hotel" name="id_hotel" {if isset($search_data)}value="{$search_data['htl_dtl']['id']}"{/if}>
-												<input type="hidden" id="max_order_date" name="max_order_date" value="{if isset($max_order_date)}{$max_order_date}{/if}">
-												<span class="arrow_span">
-													<i class="icon icon-angle-down"></i>
-												</span>
-											</button>
-											<ul class="dropdown-menu hotel_dropdown_ul">
-												{if isset($all_hotels_info) && $all_hotels_info}
-													{foreach from=$all_hotels_info key=htl_k item=htl_v}
-														<li class="hotel_name" data-id-hotel="{$htl_v['id']}" data-hotel-cat-id="{$htl_v['id_category']}" data-max_order_date="{$htl_v['max_order_date']}">
-															{$htl_v['hotel_name']}
-														</li>
-													{/foreach}
-												{/if}
-											</ul>
-										</div>
-									{/if}
-								</div>
-								<div class="form-group
-								{if $totalActiveHotels <= 1}
-									{if isset($location_enable) && $location_enable && $show_only_active_htl}
-										col-sm-4 col-lg-2
-									{elseif isset($location_enable) && !$location_enable && !$show_only_active_htl}
-										col-sm-4
-									{else}
-										col-sm-3
-									{/if}
-								{elseif isset($location_enable) && $location_enable}
-									col-sm-4 col-lg-2
-								{else}
-									col-sm-3
-								{/if}">
-									<input type="text" class="form-control header-rmsearch-input input-date" id="check_in_time" name="check_in_time" autocomplete="off" placeholder="{l s='Check In Date'}" {if isset($search_data)}value="{$search_data['date_from']}"{/if} />
-								</div>
-								<div class="form-group
-								{if count($hotel_name) <= 1}
-									{if isset($location_enable) && $location_enable && $show_only_active_htl}
-										col-sm-4 col-lg-2
-									{elseif isset($location_enable) && !$location_enable && !$show_only_active_htl}
-										col-sm-4
-									{else}
-										col-sm-3
-									{/if}
-								{elseif isset($location_enable) && $location_enable}
-									col-sm-4 col-lg-2
-								{else}
-									col-sm-3
-								{/if}">
-									<input type="text" class="form-control header-rmsearch-input input-date" id="check_out_time" name="check_out_time" autocomplete="off" placeholder="{l s='Check Out Date'}" {if isset($search_data)}value="{$search_data['date_to']}"{/if} />
-								</div>
-								<div class="form-group
-								{if count($hotel_name) <= 1}
-									{if isset($location_enable) && $location_enable && $show_only_active_htl}
-										col-sm-4 col-lg-2
-									{elseif isset($location_enable) && !$location_enable && !$show_only_active_htl}
-										col-sm-4
-									{else}
-										col-sm-3
-									{/if}
-								{elseif isset($location_enable) && $location_enable}
-									col-sm-4 col-lg-2
-								{else}
-									col-sm-3
-								{/if}">
-									<button type="submit" class="btn btn-default button button-medium pull-right" name="product_page_search_submit" id="search_room_submit">
-										<span>{l s='Search'}</span>
-									</button>
-								</div>
-							</form>
-						</div>
-					</div>
-				</div>
-			</div>
-			<!-- end -->
 			<!-- left infos-->
 			<div class="pb-left-column col-xs-12 col-sm-8 col-md-8">
 				<div class="room_type_img_containter card">
@@ -197,80 +82,87 @@
 						{/if}
 					</div>
 					<!-- product img-->
-					<div id="image-block" class="clearfix">
-						<!-- {if $product->new}
-							<span class="new-box">
-								<span class="new-label">{l s='New'}</span>
-							</span>
-						{/if} -->
-						{if $product->on_sale}
-							<span class="sale-box no-print">
-								<span class="sale-label">{l s='Sale!'}</span>
-							</span>
-						{elseif $product->specificPrice && $product->specificPrice.reduction && $productPriceWithoutReduction > $productPrice}
-							<span class="discount">{l s='Reduced price!'}</span>
-						{/if}
-						{if $have_image}
-							<span id="view_full_size">
-								{if $jqZoomEnabled && $have_image && !$content_only}
-									<a class="jqzoom" title="{if !empty($cover.legend)}{$cover.legend|escape:'html':'UTF-8'}{else}{$product->name|escape:'html':'UTF-8'}{/if}" rel="gal1" href="{$link->getImageLink($product->link_rewrite, $cover.id_image, 'thickbox_default')|escape:'html':'UTF-8'}">
-										<img itemprop="image" src="{$link->getImageLink($product->link_rewrite, $cover.id_image, 'large_default')|escape:'html':'UTF-8'}" title="{if !empty($cover.legend)}{$cover.legend|escape:'html':'UTF-8'}{else}{$product->name|escape:'html':'UTF-8'}{/if}" alt="{if !empty($cover.legend)}{$cover.legend|escape:'html':'UTF-8'}{else}{$product->name|escape:'html':'UTF-8'}{/if}"/>
-									</a>
-								{else}
-									<img id="bigpic" itemprop="image" src="{$link->getImageLink($product->link_rewrite, $cover.id_image, 'large_default')|escape:'html':'UTF-8'}" title="{if !empty($cover.legend)}{$cover.legend|escape:'html':'UTF-8'}{else}{$product->name|escape:'html':'UTF-8'}{/if}" alt="{if !empty($cover.legend)}{$cover.legend|escape:'html':'UTF-8'}{else}{$product->name|escape:'html':'UTF-8'}{/if}" width="{$largeSize.width}" height="{$largeSize.height}"/>
-									<!-- {if !$content_only}
-										<span class="span_link no-print">{l s='View larger'}</span>
-									{/if} -->
+					<div class="row">
+
+						<div id="image-block-cont" class="col-xs-12 col-sm-9 col-sm-push-3 col-md-10 col-md-push-2">
+							<div id="image-block" class="clearfix">
+								<!-- {if $product->new}
+									<span class="new-box">
+										<span class="new-label">{l s='New'}</span>
+									</span>
+								{/if} -->
+								{if $product->on_sale}
+									<span class="sale-box no-print">
+										<span class="sale-label">{l s='Sale!'}</span>
+									</span>
+								{elseif $product->specificPrice && $product->specificPrice.reduction && $productPriceWithoutReduction > $productPrice}
+									<span class="discount">{l s='Reduced price!'}</span>
 								{/if}
-							</span>
-						{else}
-							<span id="view_full_size">
-								<img itemprop="image" src="{$img_prod_dir}{$lang_iso}-default-large_default.jpg" id="bigpic" alt="" title="{$product->name|escape:'html':'UTF-8'}" width="{$largeSize.width}" height="{$largeSize.height}"/>
-								{if !$content_only}
-									<span class="span_link">
-										{l s='View larger'}
+								{if $have_image}
+									<span id="view_full_size">
+										{if $jqZoomEnabled && $have_image && !$content_only}
+											<a class="jqzoom" title="{if !empty($cover.legend)}{$cover.legend|escape:'html':'UTF-8'}{else}{$product->name|escape:'html':'UTF-8'}{/if}" rel="gal1" href="{$link->getImageLink($product->link_rewrite, $cover.id_image, 'thickbox_default')|escape:'html':'UTF-8'}">
+												<img itemprop="image" src="{$link->getImageLink($product->link_rewrite, $cover.id_image, 'large_default')|escape:'html':'UTF-8'}" title="{if !empty($cover.legend)}{$cover.legend|escape:'html':'UTF-8'}{else}{$product->name|escape:'html':'UTF-8'}{/if}" alt="{if !empty($cover.legend)}{$cover.legend|escape:'html':'UTF-8'}{else}{$product->name|escape:'html':'UTF-8'}{/if}"/>
+											</a>
+										{else}
+											<img id="bigpic" itemprop="image" src="{$link->getImageLink($product->link_rewrite, $cover.id_image, 'large_default')|escape:'html':'UTF-8'}" title="{if !empty($cover.legend)}{$cover.legend|escape:'html':'UTF-8'}{else}{$product->name|escape:'html':'UTF-8'}{/if}" alt="{if !empty($cover.legend)}{$cover.legend|escape:'html':'UTF-8'}{else}{$product->name|escape:'html':'UTF-8'}{/if}" width="{$largeSize.width}" height="{$largeSize.height}"/>
+											<!-- {if !$content_only}
+												<span class="span_link no-print">{l s='View larger'}</span>
+											{/if} -->
+										{/if}
+									</span>
+								{else}
+									<span id="view_full_size">
+										<img itemprop="image" src="{$img_prod_dir}{$lang_iso}-default-large_default.jpg" id="bigpic" alt="" title="{$product->name|escape:'html':'UTF-8'}" width="{$largeSize.width}" height="{$largeSize.height}"/>
+										{if !$content_only}
+											<span class="span_link">
+												{l s='View larger'}
+											</span>
+										{/if}
 									</span>
 								{/if}
-							</span>
-						{/if}
-					</div> <!-- end image-block -->
-					{if isset($images) && count($images) > 0}
-						<!-- thumbnails -->
-						<div id="views_block" class="clearfix {if isset($images) && count($images) < 2}hidden{/if}">
-							{if isset($images) && count($images) > 2}
-								<span class="view_scroll_spacer">
-									<a id="view_scroll_left" class="" title="{l s='Other views'}" href="javascript:{ldelim}{rdelim}">
-										{l s='Previous'}
-									</a>
-								</span>
-							{/if}
-							<div id="thumbs_list">
-								<ul id="thumbs_list_frame">
-								{if isset($images)}
-									{foreach from=$images item=image name=thumbnails}
-										{assign var=imageIds value="`$product->id`-`$image.id_image`"}
-										{if !empty($image.legend)}
-											{assign var=imageTitle value=$image.legend|escape:'html':'UTF-8'}
-										{else}
-											{assign var=imageTitle value=$product->name|escape:'html':'UTF-8'}
+							</div> <!-- end image-block -->
+						</div>
+						<div class="col-xs-12 col-sm-3 col-sm-pull-9 col-md-2 col-md-pull-10">
+							{if isset($images) && count($images) > 0}
+								<!-- thumbnails -->
+									<div id="views_block" class="clearfix {if isset($images) && count($images) < 2}hidden{/if}">
+										{if isset($images) && count($images) > 2}
+											{* <span class="view_scroll_spacer"> *}
+												<a id="view_scroll_left" class="" title="{l s='Other views'}" href="javascript:{ldelim}{rdelim}">
+													{l s='Previous'}
+												</a>
+											{* </span> *}
 										{/if}
-										<li id="thumbnail_{$image.id_image}"{if $smarty.foreach.thumbnails.last} class="last"{/if}>
-											<a{if $jqZoomEnabled && $have_image && !$content_only} href="javascript:void(0);" rel="{literal}{{/literal}gallery: 'gal1', smallimage: '{$link->getImageLink($product->link_rewrite, $imageIds, 'large_default')|escape:'html':'UTF-8'}',largeimage: '{$link->getImageLink($product->link_rewrite, $imageIds, 'thickbox_default')|escape:'html':'UTF-8'}'{literal}}{/literal}"{else} href="{$link->getImageLink($product->link_rewrite, $imageIds, 'thickbox_default')|escape:'html':'UTF-8'}"	data-fancybox-group="other-views" class="fancybox{if $image.id_image == $cover.id_image} shown{/if}"{/if} title="{$imageTitle}">
-												<img class="img-responsive" id="thumb_{$image.id_image}" src="{$link->getImageLink($product->link_rewrite, $imageIds, 'cart_default')|escape:'html':'UTF-8'}" alt="{$imageTitle}" title="{$imageTitle}"{if isset($cartSize)} height="{$cartSize.height}" width="{$cartSize.width}"{/if} itemprop="image" />
+										<div id="thumbs_list">
+											<ul id="thumbs_list_frame">
+											{if isset($images)}
+												{foreach from=$images item=image name=thumbnails}
+													{assign var=imageIds value="`$product->id`-`$image.id_image`"}
+													{if !empty($image.legend)}
+														{assign var=imageTitle value=$image.legend|escape:'html':'UTF-8'}
+													{else}
+														{assign var=imageTitle value=$product->name|escape:'html':'UTF-8'}
+													{/if}
+													<li id="thumbnail_{$image.id_image}"{if $smarty.foreach.thumbnails.last} class="last"{/if}>
+														<a{if $jqZoomEnabled && $have_image && !$content_only} href="javascript:void(0);" rel="{literal}{{/literal}gallery: 'gal1', smallimage: '{$link->getImageLink($product->link_rewrite, $imageIds, 'large_default')|escape:'html':'UTF-8'}',largeimage: '{$link->getImageLink($product->link_rewrite, $imageIds, 'thickbox_default')|escape:'html':'UTF-8'}'{literal}}{/literal}"{else} href="{$link->getImageLink($product->link_rewrite, $imageIds, 'thickbox_default')|escape:'html':'UTF-8'}"	data-fancybox-group="other-views" class="fancybox{if $image.id_image == $cover.id_image} shown{/if}"{/if} title="{$imageTitle}">
+															<img class="img-responsive" id="thumb_{$image.id_image}" src="{$link->getImageLink($product->link_rewrite, $imageIds, 'cart_default')|escape:'html':'UTF-8'}" alt="{$imageTitle}" title="{$imageTitle}"{if isset($cartSize)} height="{$cartSize.height}" width="{$cartSize.width}"{/if} itemprop="image" />
+														</a>
+													</li>
+												{/foreach}
+											{/if}
+											</ul>
+										</div> <!-- end thumbs_list -->
+										{if isset($images) && count($images) > 2}
+											<a id="view_scroll_right" title="{l s='Other views'}" href="javascript:{ldelim}{rdelim}">
+												{l s='Next'}
 											</a>
-										</li>
-									{/foreach}
-								{/if}
-								</ul>
-							</div> <!-- end thumbs_list -->
-							{if isset($images) && count($images) > 2}
-								<a id="view_scroll_right" title="{l s='Other views'}" href="javascript:{ldelim}{rdelim}">
-									{l s='Next'}
-								</a>
+										{/if}
+									</div> <!-- end views-block -->
+								<!-- end thumbnails -->
 							{/if}
-						</div> <!-- end views-block -->
-						<!-- end thumbnails -->
-					{/if}
+						</div>
+					</div>
 					{if isset($images) && count($images) > 1}
 						<p class="resetimg clear no-print">
 							<span id="wrapResetImages" style="display: none;">
@@ -289,13 +181,16 @@
 					<section class="page-product-box">
 						<ul class="nav nav-tabs product_description_tabs">
 							<li class="active"><a href="#room_info_tab" class="idTabHrefShort" data-toggle="tab">{l s='Room Information'}</a></li>
+							<li><a href="#refund_policies_tab" class="idTabHrefShort" data-toggle="tab">{l s='Refund policies'}</a></li>
 							{$HOOK_PRODUCT_TAB}
 						</ul>
 						<div class="tab-content product_description_tabs_contents">
 							<div id="room_info_tab" class="tab-pane active card">
 								<div id="room_info_tab_information">
-									<div class="info_margin_div room_description">
-										{$product->description}
+									<div class="row info_margin_div room_description">
+										<div class="col-sm-12">
+											{$product->description}
+										</div>
 									</div>
 									{if isset($features) && $features}
 										<div class="info_margin_div">
@@ -304,7 +199,7 @@
 											</div>
 											<div class="room_info_content">
 												{foreach from=$features key=ftr_k item=ftr_v}
-													<img title="{$ftr_v.name|escape:'html':'UTF-8'}" alt="{$ftr_v.name|escape:'html':'UTF-8'}" width="15px" src="{$ftr_img_src|escape:'html':'UTF-8'}{$ftr_v.value|escape:'html':'UTF-8'}">&nbsp;
+													<img title="{$ftr_v.name|escape:'html':'UTF-8'}" alt="{$ftr_v.name|escape:'html':'UTF-8'}" width="15px" src="{$link->getMediaLink("`$ftr_img_src|escape:'html':'UTF-8'`{$ftr_v.value|escape:'html':'UTF-8'}")}">&nbsp;
 												{/foreach}
 											</div>
 										</div>
@@ -339,6 +234,23 @@
 									{/if}
 								</div>
 							</div>
+							<div id="refund_policies_tab" class="tab-pane card">
+								{if isset($isHotelRefundable) && $isHotelRefundable}
+									{if isset($hotelRefundRules) && $hotelRefundRules}
+										{foreach $hotelRefundRules as $refundRule}
+											<div class="info_margin_div">
+												<div class="room_info_content">
+													<i class="circle-small">o</i> <span class="refund-rule-name">{$refundRule['name']|escape:'html':'UTF-8'} - </span> <span>{$refundRule['description']|escape:'html':'UTF-8'}</span>
+												</div>
+											</div>
+										{/foreach}
+									{else}
+										{l s='N/A'}
+									{/if}
+								{else}
+									<span class="non_refundable_txt error_msg">{l s='Non Refundable'}</span>
+								{/if}
+							</div>
 							{if isset($HOOK_PRODUCT_TAB_CONTENT) && $HOOK_PRODUCT_TAB_CONTENT}{$HOOK_PRODUCT_TAB_CONTENT}{/if}
 						</div>
 					</section>
@@ -360,7 +272,7 @@
 									<label for="" class="control-label">{l s='Hotel Location'}</label>
 									<p>{$hotel_location|escape:'html':'UTF-8'}</p>
 								</div>
-								{if $product->show_price && !isset($restricted_country_mode) && !$PS_CATALOG_MODE}
+								{if $product->show_price && !isset($restricted_country_mode) && !$PS_CATALOG_MODE && !$order_date_restrict}
 									<div class="row">
 										<div class="form-group col-sm-6">
 											<label for="" class="control-label">{l s='Check In Date'}</label>
@@ -433,8 +345,13 @@
 										<span>{l s='Rooms Sold Out !'}</span>
 									</div>
 								{/if}
+								{if $order_date_restrict}
+									<div class="order_restrict_alert">
+										<span>{l s='You can\'t book for rooms after date'} {$max_order_date|date_format:"%d-%m-%Y"}</span>
+									</div>
+								{/if}
 								<div class="unvail_rooms_cond_display">
-									{if (!$allow_oosp && $product->quantity <= 0) || !$product->available_for_order || (isset($restricted_country_mode) && $restricted_country_mode) || $PS_CATALOG_MODE}
+									{if (!$allow_oosp && $product->quantity <= 0) || !$product->available_for_order || (isset($restricted_country_mode) && $restricted_country_mode) || $PS_CATALOG_MODE || $order_date_restrict}
 									{else}
 										<p id="add_to_cart" class="buttons_bottom_block no-print">
 											<button type="submit" name="Submit" class="exclusive book_now_submit">
@@ -448,6 +365,7 @@
 							</form>
 						</div>
 					</div>
+
 					{* extra room type demands *}
 					{if isset($room_type_demands) && $room_type_demands}
 						<div class="col-sm-12 card room_demands_container">
@@ -762,125 +680,111 @@
 	{/if}
 </div> <!-- itemscope product wrapper -->
 {strip}
-{if isset($smarty.get.ad) && $smarty.get.ad}
-	{addJsDefL name=ad}{$base_dir|cat:$smarty.get.ad|escape:'html':'UTF-8'}{/addJsDefL}
-{/if}
-{if isset($smarty.get.adtoken) && $smarty.get.adtoken}
-	{addJsDefL name=adtoken}{$smarty.get.adtoken|escape:'html':'UTF-8'}{/addJsDefL}
-{/if}
-{addJsDef allowBuyWhenOutOfStock=$allow_oosp|boolval}
-{addJsDef availableNowValue=$product->available_now|escape:'quotes':'UTF-8'}
-{addJsDef availableLaterValue=$product->available_later|escape:'quotes':'UTF-8'}
-{addJsDef attribute_anchor_separator=$attribute_anchor_separator|escape:'quotes':'UTF-8'}
-{addJsDef attributesCombinations=$attributesCombinations}
-{addJsDef currentDate=$smarty.now|date_format:'%Y-%m-%d %H:%M:%S'}
-{if isset($combinations) && $combinations}
-	{addJsDef combinations=$combinations}
-	{addJsDef combinationsFromController=$combinations}
-	{addJsDef displayDiscountPrice=$display_discount_price}
-	{addJsDefL name='upToTxt'}{l s='Up to' js=1}{/addJsDefL}
-{/if}
-{if isset($combinationImages) && $combinationImages}
-	{addJsDef combinationImages=$combinationImages}
-{/if}
-{addJsDef customizationId=$id_customization}
-{addJsDef customizationFields=$customizationFields}
-{addJsDef default_eco_tax=$product->ecotax|floatval}
-{addJsDef displayPrice=$priceDisplay|intval}
-{addJsDef ecotaxTax_rate=$ecotaxTax_rate|floatval}
-{if isset($cover.id_image_only)}
-	{addJsDef idDefaultImage=$cover.id_image_only|intval}
-{else}
-	{addJsDef idDefaultImage=0}
-{/if}
-{addJsDef img_ps_dir=$img_ps_dir}
-{addJsDef img_prod_dir=$img_prod_dir}
-{addJsDef id_product=$product->id|intval}
-{addJsDef jqZoomEnabled=$jqZoomEnabled|boolval}
-{addJsDef maxQuantityToAllowDisplayOfLastQuantityMessage=$last_qties|intval}
-{addJsDef minimalQuantity=$product->minimal_quantity|intval}
-{addJsDef noTaxForThisProduct=$no_tax|boolval}
-{if isset($customer_group_without_tax)}
-	{addJsDef customerGroupWithoutTax=$customer_group_without_tax|boolval}
-{else}
-	{addJsDef customerGroupWithoutTax=false}
-{/if}
-{if isset($group_reduction)}
-	{addJsDef groupReduction=$group_reduction|floatval}
-{else}
-	{addJsDef groupReduction=false}
-{/if}
-{addJsDef oosHookJsCodeFunctions=Array()}
-{addJsDef productHasAttributes=isset($groups)|boolval}
-{addJsDef productPriceTaxExcluded=($product->getPriceWithoutReduct(true)|default:'null' - $product->ecotax)|floatval}
-{addJsDef productPriceTaxIncluded=($product->getPriceWithoutReduct(false)|default:'null' - $product->ecotax)|floatval}
-{addJsDef productBasePriceTaxExcluded=($product->getPrice(false, null, 6, null, false, false) - $product->ecotax)|floatval}
-{addJsDef productBasePriceTaxExcl=($product->getPrice(false, null, 6, null, false, false)|floatval)}
-{addJsDef productBasePriceTaxIncl=($product->getPrice(true, null, 6, null, false, false)|floatval)}
-{addJsDef productReference=$product->reference|escape:'html':'UTF-8'}
-{addJsDef productAvailableForOrder=$product->available_for_order|boolval}
-{addJsDef productPriceWithoutReduction=$productPriceWithoutReduction|floatval}
-{addJsDef productPrice=$productPrice|floatval}
-{addJsDef productUnitPriceRatio=$product->unit_price_ratio|floatval}
-{addJsDef productShowPrice=(!$PS_CATALOG_MODE && $product->show_price)|boolval}
-{addJsDef PS_CATALOG_MODE=$PS_CATALOG_MODE}
-{if $product->specificPrice && $product->specificPrice|@count}
-	{addJsDef product_specific_price=$product->specificPrice}
-{else}
-	{addJsDef product_specific_price=array()}
-{/if}
-{if $display_qties == 1 && $product->quantity}
-	{addJsDef quantityAvailable=$product->quantity}
-{else}
-	{addJsDef quantityAvailable=0}
-{/if}
-{addJsDef quantitiesDisplayAllowed=$display_qties|boolval}
-{if $product->specificPrice && $product->specificPrice.reduction && $product->specificPrice.reduction_type == 'percentage'}
-	{addJsDef reduction_percent=$product->specificPrice.reduction*100|floatval}
-{else}
-	{addJsDef reduction_percent=0}
-{/if}
-{if $product->specificPrice && $product->specificPrice.reduction && $product->specificPrice.reduction_type == 'amount'}
-	{addJsDef reduction_price=$product->specificPrice.reduction|floatval}
-{else}
-	{addJsDef reduction_price=0}
-{/if}
-{if $product->specificPrice && $product->specificPrice.price}
-	{addJsDef specific_price=$product->specificPrice.price|floatval}
-{else}
-	{addJsDef specific_price=0}
-{/if}
-{addJsDef specific_currency=($product->specificPrice && $product->specificPrice.id_currency)|boolval} {* TODO: remove if always false *}
-{addJsDef stock_management=$PS_STOCK_MANAGEMENT|intval}
-{addJsDef taxRate=$tax_rate|floatval}
-{addJsDefL name=doesntExist}{l s='This combination does not exist for this product. Please select another combination.' js=1}{/addJsDefL}
-{addJsDefL name=doesntExistNoMore}{l s='This product is no longer in stock' js=1}{/addJsDefL}
-{addJsDefL name=doesntExistNoMoreBut}{l s='with those attributes but is available with others.' js=1}{/addJsDefL}
-{addJsDefL name=fieldRequired}{l s='Please fill in all the required fields before saving your customization.' js=1}{/addJsDefL}
-{addJsDefL name=uploading_in_progress}{l s='Uploading in progress, please be patient.' js=1}{/addJsDefL}
-{addJsDefL name='product_fileDefaultHtml'}{l s='No file selected' js=1}{/addJsDefL}
-{addJsDefL name='product_fileButtonHtml'}{l s='Choose File' js=1}{/addJsDefL}
-{addJsDef currency_sign = $currency->sign}
-{addJsDef currency_format = $currency->format}
-{addJsDef currency_blank = $currency->blank}
-{addJsDefL name=correct_date_cond}{l s='Check Out Date should be greater than Check in date.' js=1}{/addJsDefL}
-{addJsDefL name=some_error_cond}{l s='Some error occured .Please try again.' js=1}{/addJsDefL}
-{addJsDefL name=unavail_qty_text}{l s='Required quantity of rooms are Not available.' js=1}{/addJsDefL}
-{addJsDefL name=out_of_stock_cond}{l s='No room is available for this period.' js=1}{/addJsDefL}
-{addJsDefL name=wrong_qty_cond}{l s='you are trying for a invalid quantity.' js=1}{/addJsDefL}
-
-
-{addJsDefL name=hotel_loc_cond}{l s='Please enter a hotel location' js=1}{/addJsDefL}
-{addJsDefL name=hotel_name_cond}{l s='Please select a hotel name' js=1}{/addJsDefL}
-{addJsDefL name=check_in_time_cond}{l s='Please enter Check In time' js=1}{/addJsDefL}
-{addJsDefL name=check_out_time_cond}{l s='Please enter Check Out time' js=1}{/addJsDefL}
-{addJsDefL name=num_adults_cond}{l s='Please enter number of adults.' js=1}{/addJsDefL}
-{addJsDefL name=num_children_cond}{l s='Please enter number of children.' js=1}{/addJsDefL}
-{addJsDefL name=some_error_occur_cond}{l s='Some error occured. Please try again.' js=1}{/addJsDefL}
-{addJsDefL name=less_checkin_date}{l s='Check In date can not be before current date.' js=1}{/addJsDefL}
-{addJsDefL name=more_checkout_date}{l s='Check Out date must be greater than Check In date.' js=1}{/addJsDefL}
-{addJsDef autocomplete_search_url=$link->getModuleLink('wkroomsearchblock','autocompletesearch')}
-
-
-{/strip}
+	{if isset($smarty.get.ad) && $smarty.get.ad}
+		{addJsDefL name=ad}{$base_dir|cat:$smarty.get.ad|escape:'html':'UTF-8'}{/addJsDefL}
+	{/if}
+	{if isset($smarty.get.adtoken) && $smarty.get.adtoken}
+		{addJsDefL name=adtoken}{$smarty.get.adtoken|escape:'html':'UTF-8'}{/addJsDefL}
+	{/if}
+	{addJsDef allowBuyWhenOutOfStock=$allow_oosp|boolval}
+	{addJsDef availableNowValue=$product->available_now|escape:'quotes':'UTF-8'}
+	{addJsDef availableLaterValue=$product->available_later|escape:'quotes':'UTF-8'}
+	{addJsDef attribute_anchor_separator=$attribute_anchor_separator|escape:'quotes':'UTF-8'}
+	{addJsDef attributesCombinations=$attributesCombinations}
+	{addJsDef currentDate=$smarty.now|date_format:'%Y-%m-%d %H:%M:%S'}
+	{if isset($combinations) && $combinations}
+		{addJsDef combinations=$combinations}
+		{addJsDef combinationsFromController=$combinations}
+		{addJsDef displayDiscountPrice=$display_discount_price}
+		{addJsDefL name='upToTxt'}{l s='Up to' js=1}{/addJsDefL}
+	{/if}
+	{if isset($combinationImages) && $combinationImages}
+		{addJsDef combinationImages=$combinationImages}
+	{/if}
+	{addJsDef customizationId=$id_customization}
+	{addJsDef customizationFields=$customizationFields}
+	{addJsDef default_eco_tax=$product->ecotax|floatval}
+	{addJsDef displayPrice=$priceDisplay|intval}
+	{addJsDef ecotaxTax_rate=$ecotaxTax_rate|floatval}
+	{if isset($cover.id_image_only)}
+		{addJsDef idDefaultImage=$cover.id_image_only|intval}
+	{else}
+		{addJsDef idDefaultImage=0}
+	{/if}
+	{addJsDef img_ps_dir=$img_ps_dir}
+	{addJsDef img_prod_dir=$img_prod_dir}
+	{addJsDef id_product=$product->id|intval}
+	{addJsDef jqZoomEnabled=$jqZoomEnabled|boolval}
+	{addJsDef maxQuantityToAllowDisplayOfLastQuantityMessage=$last_qties|intval}
+	{addJsDef minimalQuantity=$product->minimal_quantity|intval}
+	{addJsDef noTaxForThisProduct=$no_tax|boolval}
+	{if isset($customer_group_without_tax)}
+		{addJsDef customerGroupWithoutTax=$customer_group_without_tax|boolval}
+	{else}
+		{addJsDef customerGroupWithoutTax=false}
+	{/if}
+	{if isset($group_reduction)}
+		{addJsDef groupReduction=$group_reduction|floatval}
+	{else}
+		{addJsDef groupReduction=false}
+	{/if}
+	{addJsDef oosHookJsCodeFunctions=Array()}
+	{addJsDef productHasAttributes=isset($groups)|boolval}
+	{addJsDef productPriceTaxExcluded=($product->getPriceWithoutReduct(true)|default:'null' - $product->ecotax)|floatval}
+	{addJsDef productPriceTaxIncluded=($product->getPriceWithoutReduct(false)|default:'null' - $product->ecotax)|floatval}
+	{addJsDef productBasePriceTaxExcluded=($product->getPrice(false, null, 6, null, false, false) - $product->ecotax)|floatval}
+	{addJsDef productBasePriceTaxExcl=($product->getPrice(false, null, 6, null, false, false)|floatval)}
+	{addJsDef productBasePriceTaxIncl=($product->getPrice(true, null, 6, null, false, false)|floatval)}
+	{addJsDef productReference=$product->reference|escape:'html':'UTF-8'}
+	{addJsDef productAvailableForOrder=$product->available_for_order|boolval}
+	{addJsDef productPriceWithoutReduction=$productPriceWithoutReduction|floatval}
+	{addJsDef productPrice=$productPrice|floatval}
+	{addJsDef productUnitPriceRatio=$product->unit_price_ratio|floatval}
+	{addJsDef productShowPrice=(!$PS_CATALOG_MODE && $product->show_price)|boolval}
+	{addJsDef PS_CATALOG_MODE=$PS_CATALOG_MODE}
+	{if $product->specificPrice && $product->specificPrice|@count}
+		{addJsDef product_specific_price=$product->specificPrice}
+	{else}
+		{addJsDef product_specific_price=array()}
+	{/if}
+	{if $display_qties == 1 && $product->quantity}
+		{addJsDef quantityAvailable=$product->quantity}
+	{else}
+		{addJsDef quantityAvailable=0}
+	{/if}
+	{addJsDef quantitiesDisplayAllowed=$display_qties|boolval}
+	{if $product->specificPrice && $product->specificPrice.reduction && $product->specificPrice.reduction_type == 'percentage'}
+		{addJsDef reduction_percent=$product->specificPrice.reduction*100|floatval}
+	{else}
+		{addJsDef reduction_percent=0}
+	{/if}
+	{if $product->specificPrice && $product->specificPrice.reduction && $product->specificPrice.reduction_type == 'amount'}
+		{addJsDef reduction_price=$product->specificPrice.reduction|floatval}
+	{else}
+		{addJsDef reduction_price=0}
+	{/if}
+	{if $product->specificPrice && $product->specificPrice.price}
+		{addJsDef specific_price=$product->specificPrice.price|floatval}
+	{else}
+		{addJsDef specific_price=0}
+	{/if}
+	{addJsDef specific_currency=($product->specificPrice && $product->specificPrice.id_currency)|boolval} {* TODO: remove if always false *}
+	{addJsDef stock_management=$PS_STOCK_MANAGEMENT|intval}
+	{addJsDef taxRate=$tax_rate|floatval}
+	{addJsDefL name=doesntExist}{l s='This combination does not exist for this product. Please select another combination.' js=1}{/addJsDefL}
+	{addJsDefL name=doesntExistNoMore}{l s='This product is no longer in stock' js=1}{/addJsDefL}
+	{addJsDefL name=doesntExistNoMoreBut}{l s='with those attributes but is available with others.' js=1}{/addJsDefL}
+	{addJsDefL name=fieldRequired}{l s='Please fill in all the required fields before saving your customization.' js=1}{/addJsDefL}
+	{addJsDefL name=uploading_in_progress}{l s='Uploading in progress, please be patient.' js=1}{/addJsDefL}
+	{addJsDefL name='product_fileDefaultHtml'}{l s='No file selected' js=1}{/addJsDefL}
+	{addJsDefL name='product_fileButtonHtml'}{l s='Choose File' js=1}{/addJsDefL}
+	{addJsDef currency_sign = $currency->sign}
+	{addJsDef currency_format = $currency->format}
+	{addJsDef currency_blank = $currency->blank}
+	{addJsDefL name=correct_date_cond}{l s='Check Out Date should be greater than Check in date.' js=1}{/addJsDefL}
+	{addJsDefL name=some_error_cond}{l s='Some error occured .Please try again.' js=1}{/addJsDefL}
+	{addJsDefL name=unavail_qty_text}{l s='Required quantity of rooms are Not available.' js=1}{/addJsDefL}
+	{addJsDefL name=out_of_stock_cond}{l s='No room is available for this period.' js=1}{/addJsDefL}
+	{addJsDefL name=wrong_qty_cond}{l s='you are trying for a invalid quantity.' js=1}{/addJsDefL}
+	{/strip}
 {/if}

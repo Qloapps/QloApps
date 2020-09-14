@@ -31,7 +31,7 @@
   <tab id="Attachments" name="Priedai"/>
   <tab id="Orders_1" name="Užsakymai"/>
   <tab id="Invoices" name="Sąskaitos"/>
-  <tab id="Merchandise_Returns" name="Prekių grąžinimai"/>
+  <!-- <tab id="Merchandise_Returns" name="Prekių grąžinimai"/> -->
   <tab id="Delivery_Slips" name="Važtaražščiai"/>
   <tab id="Credit_Slips" name="Grąžinimo kuponai"/>
   <tab id="Statuses" name="Būsenos"/>

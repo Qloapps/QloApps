@@ -114,7 +114,7 @@ class CustomerMessageCore extends ObjectModel
     public function delete()
     {
         if (!empty($this->file_name)) {
-            @unlink(_PS_UPLOAD_DIR_.$this->file_name);
+            Tools::deleteFile(_PS_UPLOAD_DIR_.$this->file_name); // by webkul use deleteFile insted of unlink
         }
         return parent::delete();
     }

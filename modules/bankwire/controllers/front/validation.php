@@ -49,7 +49,7 @@ class BankwireValidationModuleFrontController extends ModuleFrontController
 		if (!$authorized)
 			die($this->module->l('This payment method is not available.', 'validation'));
 
-		/*Check Order restrict condition before Payment by the customer*/
+		// Check Order restrict condition before Payment by the customer
 		if (Module::isInstalled('hotelreservationsystem') && Module::isEnabled('hotelreservationsystem')) {
             require_once _PS_MODULE_DIR_.'hotelreservationsystem/define.php';
             $order_restrict_error = HotelOrderRestrictDate::validateOrderRestrictDateOnPayment($this);
@@ -57,7 +57,6 @@ class BankwireValidationModuleFrontController extends ModuleFrontController
                 die($this->errors);
             }
         }
-        /*END*/
 
 		$customer = new Customer($cart->id_customer);
 		if (!Validate::isLoadedObject($customer))
@@ -65,12 +64,12 @@ class BankwireValidationModuleFrontController extends ModuleFrontController
 
 		$currency = $this->context->currency;
 
-		if (Configuration::get('WK_ALLOW_ADVANCED_PAYMENT')) {
-            $obj_customer_adv = new HotelCustomerAdvancedPayment();
-            $total = $obj_customer_adv->getOrdertTotal($cart->id, $cart->id_guest);
+		// if advance payment is available and customer has chosen advance payment
+		if ($cart->is_advance_payment) {
+			$total = $cart->getOrderTotal(true, Cart::ADVANCE_PAYMENT);
         } else {
             $total = $cart->getOrderTotal(true, Cart::BOTH);
-        }
+		}
 
 		$mailVars = array(
 			'{bankwire_owner}' => Configuration::get('BANK_WIRE_OWNER'),

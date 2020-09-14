@@ -1,3 +1,13 @@
+------------------------------
+# V0.10.1 to V0.10.2
+------------------------------
+
+## Improved/Changed Features:
+
+* [CO] :Images link are now generated dynamically
+
+_____________________________________________________________________________
+
 2014-04-22 18:56:48 +0200	// Changelog updated
 2014-04-15 17:23:48 +0200	[*] MO : blockadvertising - Changed the way images are stocked to avoid overwrite on update
 2014-03-24 10:44:25 +0100	// MO BlockAdvertising : ps_versions_compliancy added

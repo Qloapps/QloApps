@@ -1,4 +1,15 @@
 ------------------------------
+# V2.6.3 to V2.6.4
+------------------------------
+
+## Improved/Changed Features:
+
+* [CO] : Change the method to calculate the advance payment amount for the order.
+* [CO] : Changed confirm order validation
+* [CO] : Removed unnecessary files.
+
+
+------------------------------
 # V2.6.2 to V2.6.3
 ------------------------------
 

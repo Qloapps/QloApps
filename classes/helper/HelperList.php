@@ -296,6 +296,13 @@ class HelperListCore extends Helper
                         $path_to_image = _PS_IMG_DIR_.$params['image'].'/'.Image::getImgFolderStatic($tr['id_image']).(int)$tr['id_image'].'.'.$this->imageType;
                     }
                     $this->_list[$index][$key] = ImageManager::thumbnail($path_to_image, $this->table.'_mini_'.$item_id.'_'.$this->context->shop->id.'.'.$this->imageType, 45, $this->imageType);
+
+                    // @todo find way to use media link insted of hook
+                    // by webkul for overriding images field if using media server.
+                    Hook::exec(
+                        'actionRenderListImageModifier',
+                        array('key' => $key, 'field' => $params, 'item_id' => $item_id, 'image_type' => $this->imageType, 'list' => &$this->_list[$index])
+                    );
                 } elseif (isset($params['icon']) && isset($tr[$key]) && (isset($params['icon'][$tr[$key]]) || isset($params['icon']['default']))) {
                     if (!$this->bootstrap) {
                         if (isset($params['icon'][$tr[$key]]) && is_array($params['icon'][$tr[$key]])) {

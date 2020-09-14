@@ -220,7 +220,8 @@ class CartControllerCore extends FrontController
             $this->id_product,
             $this->id_product_attribute,
             $old_id_address_delivery,
-            $new_id_address_delivery);
+            $new_id_address_delivery
+        );
     }
 
     protected function processAllowSeperatedPackage()
@@ -245,11 +246,11 @@ class CartControllerCore extends FrontController
         }
 
         if (!$this->context->cart->duplicateProduct(
-                $this->id_product,
-                $this->id_product_attribute,
-                $this->id_address_delivery,
-                (int)Tools::getValue('new_id_address_delivery')
-            )) {
+            $this->id_product,
+            $this->id_product_attribute,
+            $this->id_address_delivery,
+            (int)Tools::getValue('new_id_address_delivery')
+        )) {
             //$error_message = $this->l('Error durring product duplication');
             // For the moment no translations
             $error_message = 'Error durring product duplication';
@@ -281,7 +282,7 @@ class CartControllerCore extends FrontController
                         $this->errors[] = Tools::displayError('Check-out date must be after check-in date');
                     } elseif ($maxOrdDate = HotelOrderRestrictDate::getMaxOrderDate($id_hotel)) {
                         // Check Order restrict condition before adding in to cart
-                        if (strtotime($maxOrdDate) < strtotime($date_from)
+                        if (strtotime('-1 day', strtotime($maxOrdDate)) < strtotime($date_from)
                             || strtotime($maxOrdDate) < strtotime($date_to)
                         ) {
                             $maxOrdDate = date('d-m-Y', strtotime($maxOrdDate));

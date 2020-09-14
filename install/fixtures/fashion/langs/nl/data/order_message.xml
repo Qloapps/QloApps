@@ -1,7 +1,0 @@
-<?xml version='1.0'?>
-<entity_order_message>
-  <order_message id='Delay'>
-    <name>Vertraging</name>
-    <message>Hallo, Een van de door u bestelde artikelen is momenteel niet op voorraad. Hierdoor kan de levertijd iets uitlopen. Wij bieden u onze excuses aan en doen er alles aan om u zo snel mogelijk te leveren. Met vriendelijke groet,</message>
-  </order_message>
-</entity_order_message>

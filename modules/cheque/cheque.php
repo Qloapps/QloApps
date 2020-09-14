@@ -40,7 +40,7 @@ class Cheque extends PaymentModule
 	{
 		$this->name = 'cheque';
 		$this->tab = 'payments_gateways';
-		$this->version = '2.6.3';
+		$this->version = '2.6.4';
 		$this->author = 'PrestaShop';
 		$this->controllers = array('payment', 'validation');
 		$this->is_eu_compatible = 1;
@@ -171,28 +171,30 @@ class Cheque extends PaymentModule
 	{
 		if (!$this->active) {
             return;
-        }
-        $cart = new Cart($params['objOrder']->id_cart);
-        $state = $params['objOrder']->getCurrentState();
+		}
+		$objOrder = $params['objOrder'];
+        $cart = new Cart($objOrder->id_cart);
+        $state = $objOrder->getCurrentState();
         if (in_array($state, array(Configuration::get('PS_OS_CHEQUE'), Configuration::get('PS_OS_OUTOFSTOCK'), Configuration::get('PS_OS_OUTOFSTOCK_UNPAID')))) {
-            if (Configuration::get('WK_ALLOW_ADVANCED_PAYMENT')) {
-                $obj_customer_adv = new HotelCustomerAdvancedPayment();
-                $order_total = $obj_customer_adv->getOrdertTotal($cart->id, $cart->id_guest);
+            if ($objOrder->is_advance_payment) {
+                $order_total = $objOrder->advance_paid_amount;
             } else {
-                $order_total = $cart->getOrderTotal();
-            }
+                $order_total = $objOrder->total_paid;
+			}
+
 			$this->smarty->assign(array(
 				'total_to_pay' => Tools::displayPrice($order_total, $params['currencyObj'], false),
 				'chequeName' => $this->chequeName,
 				'chequeAddress' => Tools::nl2br($this->address),
 				'status' => 'ok',
-				'id_order' => $params['objOrder']->id
+				'id_order' => $objOrder->id
 			));
-			if (isset($params['objOrder']->reference) && !empty($params['objOrder']->reference))
-				$this->smarty->assign('reference', $params['objOrder']->reference);
-		}
-		else
+			if (isset($objOrder->reference) && !empty($objOrder->reference))
+				$this->smarty->assign('reference', $objOrder->reference);
+		} else {
 			$this->smarty->assign('status', 'failed');
+		}
+
 		return $this->display(__FILE__, 'payment_return.tpl');
 	}
 

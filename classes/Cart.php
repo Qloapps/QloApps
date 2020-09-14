@@ -83,6 +83,11 @@ class CartCore extends ObjectModel
     /** @var bool Allow to seperate order in multiple package in order to recieve as soon as possible the available products */
     public $allow_seperated_package = false;
 
+    /**
+    * @var int is_advance_payment used to determine if this cart is selected for advance payment or full payment
+    */
+    public $is_advance_payment;
+
     protected static $_nbProducts = array();
     protected static $_isVirtualCart = array();
 
@@ -118,28 +123,43 @@ class CartCore extends ObjectModel
             'mobile_theme' =>            array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
             'delivery_option' =>        array('type' => self::TYPE_STRING),
             'secure_key' =>            array('type' => self::TYPE_STRING, 'size' => 32),
-            'allow_seperated_package' =>array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
+            'allow_seperated_package' => array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
+            'is_advance_payment' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'default' => 0),
             'date_add' =>                array('type' => self::TYPE_DATE, 'validate' => 'isDate'),
             'date_upd' =>                array('type' => self::TYPE_DATE, 'validate' => 'isDate'),
         ),
     );
 
     protected $webserviceParameters = array(
+        'objectMethods' => array(
+            'add' => 'addWs',
+            'update' => 'updateWs'
+        ),
         'fields' => array(
-            'id_address_delivery' => array('xlink_resource' => 'addresses'),
-            'id_address_invoice' => array('xlink_resource' => 'addresses'),
+            'id_address' => array(
+                'xlink_resource' => 'addresses',
+                'getter' => 'getWsIdAddress',
+                'setter' => 'setWsIdAddress',
+            ),
             'id_currency' => array('xlink_resource' => 'currencies'),
             'id_customer' => array('xlink_resource' => 'customers'),
             'id_guest' => array('xlink_resource' => 'guests'),
             'id_lang' => array('xlink_resource' => 'languages'),
         ),
+
         'associations' => array(
-            'cart_rows' => array('resource' => 'cart_row', 'virtual_entity' => true, 'fields' => array(
-                'id_product' => array('required' => true, 'xlink_resource' => 'products'),
-                'id_product_attribute' => array('required' => true, 'xlink_resource' => 'combinations'),
-                'id_address_delivery' => array('required' => true, 'xlink_resource' => 'addresses'),
-                'quantity' => array('required' => true),
-                )
+            // 'cart_rows' => array('resource' => 'cart_row', 'virtual_entity' => true, 'fields' => array(
+            //     'id_product' => array('required' => true, 'xlink_resource' => 'products'),
+            //     'id_product_attribute' => array('required' => true, 'xlink_resource' => 'combinations'),
+            //     'id_address_delivery' => array('required' => true, 'xlink_resource' => 'addresses'),
+            //     'quantity' => array('required' => true),
+            //     )
+            // ),
+
+            'cart_bookings' => array(
+                'setter' => false,
+                'resource' => 'booking',
+                'fields' => array('id' => array('required' => true))
             ),
         ),
     );
@@ -152,6 +172,8 @@ class CartCore extends ObjectModel
     const ONLY_WRAPPING = 6;
     const ONLY_PRODUCTS_WITHOUT_SHIPPING = 7;
     const ONLY_PHYSICAL_PRODUCTS_WITHOUT_SHIPPING = 8;
+    const ADVANCE_PAYMENT = 9;
+    const ADVANCE_PAYMENT_ONLY_PRODUCTS = 10;
 
     public function __construct($id = null, $id_lang = null)
     {
@@ -264,8 +286,8 @@ class CartCore extends ObjectModel
         );
 
         foreach ($uploaded_files as $must_unlink) {
-            unlink(_PS_UPLOAD_DIR_.$must_unlink['value'].'_small');
-            unlink(_PS_UPLOAD_DIR_.$must_unlink['value']);
+            Tools::deleteFile(_PS_UPLOAD_DIR_.$must_unlink['value'].'_small'); //by webkul use deleteFile insted of unlink
+            Tools::deleteFile(_PS_UPLOAD_DIR_.$must_unlink['value']); //by webkul use deleteFile insted of unlink
         }
 
         Db::getInstance()->execute('
@@ -1209,8 +1231,8 @@ class CartCore extends ObjectModel
 						AND type = '.(int)$customization['type'].'
 						AND `index` = '.(int)$customization['index']);
                     if ($type == Product::CUSTOMIZE_FILE) {
-                        @unlink(_PS_UPLOAD_DIR_.$customization['value']);
-                        @unlink(_PS_UPLOAD_DIR_.$customization['value'].'_small');
+                        Tools::deleteFile(_PS_UPLOAD_DIR_.$customization['value']); //by webkul use deleteFile insted of unlink
+                        Tools::deleteFile(_PS_UPLOAD_DIR_.$customization['value'].'_small'); //by webkul use deleteFile insted of unlink
                     }
                     break;
                 }
@@ -1390,7 +1412,10 @@ class CartCore extends ObjectModel
 
             // Delete customization picture if necessary
             if (isset($cust_data['type']) && $cust_data['type'] == 0) {
-                $result &= (@unlink(_PS_UPLOAD_DIR_.$cust_data['value']) && @unlink(_PS_UPLOAD_DIR_.$cust_data['value'].'_small'));
+                $result &= (
+                    Tools::deleteFile(_PS_UPLOAD_DIR_.$cust_data['value']) && //by webkul use deleteFile insted of unlink
+                    Tools::deleteFile(_PS_UPLOAD_DIR_.$cust_data['value'].'_small') //by webkul use deleteFile insted of unlink
+                );
             }
 
             $result &= Db::getInstance()->execute(
@@ -1484,6 +1509,8 @@ class CartCore extends ObjectModel
             Cart::ONLY_WRAPPING,
             Cart::ONLY_PRODUCTS_WITHOUT_SHIPPING,
             Cart::ONLY_PHYSICAL_PRODUCTS_WITHOUT_SHIPPING,
+            Cart::ADVANCE_PAYMENT,
+            Cart::ADVANCE_PAYMENT_ONLY_PRODUCTS,
         );
 
         // Define virtual context to prevent case where the cart is not the in the global context
@@ -1551,7 +1578,7 @@ class CartCore extends ObjectModel
 
         $products_total = array();
         $ecotax_total = 0;
-
+        $totalDemandsPrice = 0;
         $objCartBookingData = new HotelCartBookingData();
         foreach ($products as $product) {
             // products refer to the cart details
@@ -1616,39 +1643,57 @@ class CartCore extends ObjectModel
             $totalPriceByProduct = 0;
             $priceDisplay = Group::getPriceDisplayMethod(Group::getCurrent()->id);
             foreach ($roomTypesByIdProduct as $key => $cartRoomInfo) {
-                $roomTotalPrice = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice($cartRoomInfo['id_product'], $cartRoomInfo['date_from'], $cartRoomInfo['date_to']);
+                // get the real price of the room type
+                $roomTotalPrice = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
+                    $cartRoomInfo['id_product'],
+                    $cartRoomInfo['date_from'],
+                    $cartRoomInfo['date_to']
+                );
                 if ($with_taxes) {
                     $totalPriceByProduct += $roomTotalPrice['total_price_tax_incl'];
                 } else {
                     $totalPriceByProduct += $roomTotalPrice['total_price_tax_excl'];
                 }
+
+                // If customer has selected advance payment of the cart
+                if ($type == Cart::ADVANCE_PAYMENT || $type == Cart::ADVANCE_PAYMENT_ONLY_PRODUCTS) {
+                    $objAdvPayment = new HotelAdvancedPayment();
+                    $advProductPrice = $objAdvPayment->getProductMinAdvPaymentAmountByIdCart(
+                        $this->id,
+                        $cartRoomInfo['id_product'],
+                        0,
+                        0,
+                        $with_taxes
+                    );
+
+                    // set advance payment  price only if it is greater than real price
+                    if ($advProductPrice < $totalPriceByProduct) {
+                        $totalPriceByProduct = $advProductPrice;
+                    }
+                }
             }
 
             switch ($ps_round_type) {
                 case Order::ROUND_TOTAL:
-                    // before
-                    //$products_total[$id_tax_rules_group.'_'.$id_address] += $price * (int)$product['cart_quantity'];
-                    //by webkul
                     $products_total[$id_tax_rules_group.'_'.$id_address] += $totalPriceByProduct;
                     break;
 
                 case Order::ROUND_LINE:
-                    //Before
-                    //$product_price = $price * $product['cart_quantity'];
-                    //By webkul
                     $product_price = $totalPriceByProduct;
                     $products_total[$id_tax_rules_group] += Tools::ps_round($product_price, $compute_precision);
                     break;
 
                 case Order::ROUND_ITEM:
                 default:
-                    //Before
-                    //$product_price = /*$with_taxes ? $tax_calculator->addTaxes($price) : */$price;
-                    //$products_total[$id_tax_rules_group] += Tools::ps_round($product_price, $compute_precision) * (int)$product['cart_quantity'];
-                    // By Webkul
                     $product_price = $totalPriceByProduct;
                     $products_total[$id_tax_rules_group] += Tools::ps_round($product_price, $compute_precision);
                     break;
+            }
+
+
+            // price of extra demands on room type in the cart
+            if ($type == Cart::BOTH || $type == Cart::BOTH_WITHOUT_SHIPPING || $type == Cart::ADVANCE_PAYMENT) {
+                $totalDemandsPrice += $objCartBookingData->getCartExtraDemands($this->id, $product['id_product'], 0, 0, 0, 1, 0, (int)$with_taxes);
             }
         }
 
@@ -1675,9 +1720,14 @@ class CartCore extends ObjectModel
             return $wrapping_fees;
         }
 
+        // price of extra demands on room type in the cart
+        if ($type == Cart::BOTH || $type == Cart::BOTH_WITHOUT_SHIPPING || $type == Cart::ADVANCE_PAYMENT) {
+            $order_total += $totalDemandsPrice;
+        }
+
         $order_total_discount = 0;
         $order_shipping_discount = 0;
-        if (!in_array($type, array(Cart::ONLY_SHIPPING, Cart::ONLY_PRODUCTS)) && CartRule::isFeatureActive()) {
+        if (!in_array($type, array(Cart::ONLY_SHIPPING, Cart::ONLY_PRODUCTS, Cart::ADVANCE_PAYMENT_ONLY_PRODUCTS)) && CartRule::isFeatureActive()) {
             // First, retrieve the cart rules associated to this "getOrderTotal"
             if ($with_shipping || $type == Cart::ONLY_DISCOUNTS) {
                 $cart_rules = $this->getCartRules(CartRule::FILTER_ACTION_ALL);
@@ -1739,7 +1789,7 @@ class CartCore extends ObjectModel
             $order_total -= $order_total_discount;
         }
 
-        if ($type == Cart::BOTH) {
+        if ($type == Cart::BOTH || $type == Cart::ADVANCE_PAYMENT) {
             $order_total += $shipping_fees + $wrapping_fees;
         }
 
@@ -1749,12 +1799,6 @@ class CartCore extends ObjectModel
 
         if ($type == Cart::ONLY_DISCOUNTS) {
             return $order_total_discount;
-        }
-
-        // price of extra demands on room type in the cart
-        if ($type == Cart::BOTH || $type == Cart::BOTH_WITHOUT_SHIPPING) {
-            $totalDemandsPrice = $objCartBookingData->getCartExtraDemands($this->id, 0, 0, 0, 0, 1, 0, (int)$with_taxes);
-            $order_total += $totalDemandsPrice;
         }
 
         return Tools::ps_round((float)$order_total, $compute_precision);
@@ -2419,8 +2463,8 @@ class CartCore extends ObjectModel
                     }
                     $delivery_option_list[$id_address][$key]['carrier_list'][$id_carrier]['instance'] = $carrier_collection[$id_carrier];
 
-                    if (file_exists(_PS_SHIP_IMG_DIR_.$id_carrier.'.jpg')) {
-                        $delivery_option_list[$id_address][$key]['carrier_list'][$id_carrier]['logo'] = _THEME_SHIP_DIR_.$id_carrier.'.jpg';
+                    if (Tools::file_get_contents($context->link->getMediaLink(_THEME_SHIP_DIR_.$id_carrier.'.jpg'))) { // by webkul
+                        $delivery_option_list[$id_address][$key]['carrier_list'][$id_carrier]['logo'] = $context->link->getMediaLink(_THEME_SHIP_DIR_.$id_carrier.'.jpg'); // by webkul to get media link
                     } else {
                         $delivery_option_list[$id_address][$key]['carrier_list'][$id_carrier]['logo'] = false;
                     }
@@ -3574,7 +3618,10 @@ class CartCore extends ObjectModel
 
         // Delete customization picture if necessary
         if ($cust_data['type'] == 0) {
-            $result &= (@unlink(_PS_UPLOAD_DIR_.$cust_data['value']) && @unlink(_PS_UPLOAD_DIR_.$cust_data['value'].'_small'));
+            $result &= (
+                Tools::deleteFile(_PS_UPLOAD_DIR_.$cust_data['value']) && //by webkul use deleteFile insted of unlink
+                Tools::deleteFile(_PS_UPLOAD_DIR_.$cust_data['value'].'_small') //by webkul use deleteFile insted of unlink
+            );
         }
 
         $result &= Db::getInstance()->execute('DELETE
@@ -4217,7 +4264,6 @@ class CartCore extends ObjectModel
         }
     }
 
-
     public static function getProductQtyInCart($id_cart, $id_product)
     {
         $result = Db::getInstance()->getValue("SELECT `quantity` FROM `"._DB_PREFIX_."cart_product` WHERE `id_cart`= ".$id_cart." AND `id_product`=".$id_product);
@@ -4227,5 +4273,243 @@ class CartCore extends ObjectModel
         }
 
         return 0;
+    }
+
+    // Webservice:: Get id_address in the cart
+    public function getWsIdAddress()
+    {
+        return Db::getInstance()->getValue(
+            'SELECT id_address_delivery FROM `'._DB_PREFIX_.'cart`
+            WHERE id_cart = '.(int)$this->id
+        );
+    }
+
+    // Webservice :: Set id_address in the cart
+    public function setWsIdAddress($id_address)
+    {
+        if ($this->id) {
+            return Db::getInstance()->execute(
+                'UPDATE `'._DB_PREFIX_.'cart`
+                SET `id_address_delivery` = '.(int)$id_address.', `id_address_invoice` = '.(int)$id_address.'
+                WHERE `id_cart` = '.(int)$this->id
+            );
+        }
+        return false;
+    }
+
+    // Webservice:: Get booking rows
+    public function getWsCartBookings()
+    {
+        return Db::getInstance()->executeS('
+			SELECT `id`
+			FROM `'._DB_PREFIX_.'htl_cart_booking_data`
+			WHERE id_cart = '.(int)$this->id.' ORDER BY `id` ASC'
+        );
+    }
+
+    public function addWs($autodate = true, $null_values = false)
+    {
+        $this->id_shop = Configuration::get('PS_SHOP_DEFAULT');
+        $objShop = new Shop($this->id_shop);
+        $this->id_shop_group = $objShop->id_shop_group;
+
+        // get bookings xaml data
+        $postData = trim(file_get_contents('php://input'));
+        libxml_use_internal_errors(true);
+        $xml = simplexml_load_string(utf8_decode($postData));
+        $cartData = Tools::jsonDecode(Tools::jsonEncode($xml, true));
+
+        $this->id_address_delivery = $cartData->cart->id_address;
+        $this->id_address_invoice = $cartData->cart->id_address;
+
+        if ($this->add($autodate, $null_values)) {
+            // set bookings for the cart
+            $bookingRows = $cartData->cart->associations->cart_bookings->booking;
+            if (isset($bookingRows->id_hotel)) {
+                $bookingRows = array($bookingRows);
+            }
+            return true;
+        }
+
+        return false;
+    }
+
+    public function updateWs($autodate = true, $null_values = false)
+    {
+        $this->id_shop = Configuration::get('PS_SHOP_DEFAULT');
+        $objShop = new Shop($this->id_shop);
+        $this->id_shop_group = $objShop->id_shop_group;
+
+        // get bookings xml data
+        $postData = trim(file_get_contents('php://input'));
+        libxml_use_internal_errors(true);
+        $xml = simplexml_load_string(utf8_decode($postData));
+        $cartData = Tools::jsonDecode(Tools::jsonEncode($xml, true));
+
+        $this->id_address_delivery = $cartData->cart->id_address;
+        $this->id_address_invoice = $cartData->cart->id_address;
+
+        if ($this->update($autodate, $null_values)) {
+            // set bookings for the cart
+            $bookingRows = $cartData->cart->associations->cart_bookings->booking;
+            if (isset($bookingRows->id_hotel)) {
+                $bookingRows = array($bookingRows);
+            }
+            $this->setWsCartRooms($bookingRows);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    public function setWsCartRooms($bookingRows)
+    {
+        $idCart = $this->id;
+        $objCart = new Cart($idCart);
+        $idGuest = $objCart->id_guest;
+
+        // delete cart bookings
+        $objCartBooking = new HotelCartBookingData();
+        $objCartBooking->deleteCartBookingData($idCart);
+        $this->deleteAssociations();
+        $hasErrors = 0;
+        // lets validate the cart booking data first
+        if (isset($bookingRows) && count($bookingRows)) {
+            $objRoomType = new HotelRoomType();
+            $objBookingDtl = new HotelBookingDetail();
+            $errors = array();
+            $idCustomer = $objCart->id_customer;
+            $idCurrency = $objCart->id_currency;
+
+            $extraDemands = null;
+            foreach ($bookingRows as $booking) {
+                $booking = Tools::jsonDecode(Tools::jsonEncode($booking, true), true);
+                if (isset($booking['extra_demands']['extra_demand'])) {
+                    $extraDemands = $booking['extra_demands']['extra_demand'];
+                    if (isset($extraDemands['id_global_demand'])) {
+                        $extraDemands = array($extraDemands);
+                    }
+                    // $extraDemands = Tools::jsonDecode($extraDemands, true);
+                    $extraDemands = Tools::jsonEncode($extraDemands);
+                }
+
+                // get room booking info
+                $idProduct = $booking['id_product'];
+                $dateFrom = $booking['date_from'];
+                $dateTo = $booking['date_to'];
+                $prodQty = 1;
+                // change format to the database format
+                $dateFrom = date("Y-m-d", strtotime($dateFrom));
+                $dateTo = date("Y-m-d", strtotime($dateTo));
+
+                if ($roomTypeInfo = $objRoomType->getRoomTypeInfoByIdProduct($idProduct)) {
+                    if ($idHotel = $roomTypeInfo['id_hotel']) {
+                        if (strtotime($dateFrom) >= strtotime($dateTo)) {
+                            $hasErrors = 1;
+                            WebserviceRequest::getInstance()->setError(500, Tools::displayError('Check-out date must be after check-in date.'), 134);
+                        } elseif ($maxOrdDate = HotelOrderRestrictDate::getMaxOrderDate($idHotel)) {
+                            // Check Order restrict condition before adding in to cart
+                            if (strtotime('-1 day', strtotime($maxOrdDate)) < strtotime($dateFrom)
+                                || strtotime($maxOrdDate) < strtotime($dateTo)
+                            ) {
+                                $maxOrdDate = date('d-m-Y', strtotime($maxOrdDate));
+                                $hasErrors = 1;
+                                WebserviceRequest::getInstance()->setError(500, Tools::displayError('You can\'t book room after date.'), 134);
+                            }
+                        }
+
+                        if (!count($errors)) {
+                            $numDays = $objBookingDtl->getNumberOfDays($dateFrom, $dateTo);
+                            $prodQty = $prodQty * (int) $numDays;
+                            $reqRooms = 1;
+
+                            if ($hotelRoomData = $objBookingDtl->DataForFrontSearch(
+                                $dateFrom,
+                                $dateTo,
+                                $idHotel,
+                                $idProduct,
+                                1,
+                                0,
+                                0,
+                                -1,
+                                0,
+                                0,
+                                $idCart,
+                                $idGuest
+                            )) {
+                                if (isset($hotelRoomData['stats']['num_avail'])) {
+                                    $totalAvailRooms = $hotelRoomData['stats']['num_avail'];
+                                    if ($totalAvailRooms < $reqRooms) {
+                                        $hasErrors = 1;
+                                        WebserviceRequest::getInstance()->setError(500, Tools::displayError('unavailable quantity'), 134);
+                                    }
+                                } else {
+                                    $hasErrors = 1;
+                                    WebserviceRequest::getInstance()->setError(500, Tools::displayError('Rooms are unavailable. Please try with different dates'), 134);
+                                }
+                            } else {
+                                $hasErrors = 1;
+                                WebserviceRequest::getInstance()->setError(500, Tools::displayError('Rooms are unavailable. Please try with different dates'), 134);
+                            }
+                        }
+                    } else {
+                        $hasErrors = 1;
+                        WebserviceRequest::getInstance()->setError(500, Tools::displayError('Rooms are unavailable.'), 134);
+                    }
+                } else {
+                    $hasErrors = 1;
+                    WebserviceRequest::getInstance()->setError(500, Tools::displayError('Rooms are unavailable.'), 134);
+                }
+
+                if ($prodQty == 0) {
+                    $hasErrors = 1;
+                    WebserviceRequest::getInstance()->setError(500, Tools::displayError('Null quantity.'), 134);
+                } elseif (!$idProduct) {
+                    $hasErrors = 1;
+                    WebserviceRequest::getInstance()->setError(500, Tools::displayError('Room type not found.'), 134);
+                }
+                $product = new Product($idProduct, true, $objCart->id_lang);
+                if (!$product->id || !$product->active) {
+                    $hasErrors = 1;
+                    WebserviceRequest::getInstance()->setError(500, Tools::displayError('Room type not found.'), 134);
+                }
+                // If no errors, process product addition
+                if (!$hasErrors) {
+                    $update_quantity = $objCart->updateQty($prodQty, $idProduct, 0, 0, Tools::getValue('op', 'up'), $this->id_address_delivery);
+                    $chkQty = 0;
+                    if ($hotelAvailRomms = $hotelRoomData['rm_data'][0]['data']['available']) {
+                        foreach ($hotelAvailRomms as $key_hotel_room_info => $val_hotel_room_info) {
+                            if ($chkQty < $reqRooms) {
+                                $objCartBooking = new HotelCartBookingData();
+                                $objCartBooking->id_cart = $objCart->id;
+                                $objCartBooking->id_guest = $objCart->id_guest;
+                                $objCartBooking->id_customer = $idCustomer;
+                                $objCartBooking->id_currency = $idCurrency;
+                                $objCartBooking->id_product = $val_hotel_room_info['id_product'];
+                                $objCartBooking->id_room = $val_hotel_room_info['id_room'];
+                                $objCartBooking->id_hotel = $val_hotel_room_info['id_hotel'];
+                                $objCartBooking->booking_type = 1;
+                                $objCartBooking->quantity = $numDays;
+                                $objCartBooking->extra_demands = $extraDemands;
+                                $objCartBooking->date_from = $dateFrom;
+                                $objCartBooking->date_to = $dateTo;
+                                $objCartBooking->save();
+                                ++$chkQty;
+                            } else {
+                                break;
+                            }
+                        }
+                    }
+                } else {
+                    // delete cart bookings
+                    $objCartBooking = new HotelCartBookingData();
+                    $objCartBooking->deleteCartBookingData($idCart);
+                    $this->deleteAssociations();
+                }
+            }
+        }
+
+        return true;
     }
 }

@@ -44,7 +44,6 @@ class OrderConfirmationControllerCore extends FrontController
 
         $this->id_cart = (int)(Tools::getValue('id_cart', 0));
         $is_guest = false;
-
         /* check if the cart has been made by a Guest customer, for redirect link */
         if (Cart::isGuestCartByCartId($this->id_cart)) {
             $is_guest = true;
@@ -104,32 +103,28 @@ class OrderConfirmationControllerCore extends FrontController
         /*By webkul to show order details properly on order history page*/
         if (Module::isInstalled('hotelreservationsystem')) {
             require_once _PS_MODULE_DIR_.'hotelreservationsystem/define.php';
+            $non_requested_rooms = 0;
+            $any_back_order = 0;
+            $processed_product = array();
+            $orderTotalInfo = array();
+            $orderTotalInfo['total_demands_price_te'] = 0;
+            $orderTotalInfo['total_demands_price_ti'] = 0;
+            $orderTotalInfo['total_products_te'] = 0;
+            $orderTotalInfo['total_products_ti'] = 0;
+            $orderTotalInfo['total_discounts'] = 0;
+            $orderTotalInfo['total_paid'] = 0;
+            $orderTotalInfo['total_paid_real'] = 0;
+            $orderTotalInfo['total_wrapping'] = 0;
+            $orderTotalInfo['total_order_amount'] = 0;
 
-            $cartOrders = Order::getAllOrdersByCartId($order->id_cart);
-            if ($cartOrders) {
+            $orders_has_invoice = 1;
+            if ($cartOrders = Order::getAllOrdersByCartId($order->id_cart)) {
                 $objHtlBranchInfo = new HotelBranchInformation();
                 $obj_cart_bk_data = new HotelCartBookingData();
                 $obj_htl_bk_dtl = new HotelBookingDetail();
                 $obj_rm_type = new HotelRoomType();
-                $non_requested_rooms = 0;
-                $any_back_order = 0;
-                $processed_product = array();
-                $orderTotalInfo = array();
-                $orderTotalInfo['total_demands_price_te'] = 0;
-                $orderTotalInfo['total_demands_price_ti'] = 0;
-                $orderTotalInfo['total_products_te'] = 0;
-                $orderTotalInfo['total_products_ti'] = 0;
-                $orderTotalInfo['total_discounts'] = 0;
-                $orderTotalInfo['total_paid'] = 0;
-                $orderTotalInfo['total_paid_amount'] = 0;
-                $orderTotalInfo['total_wrapping'] = 0;
                 $orderTotalInfo['total_order_amount'] = 0;
-                $orderTotalInfo['total_order_amount'] = 0;
-                $orders_has_invoice = 1;
                 $hotelCartBookingData = new HotelCartBookingData();
-                $obj_customer_adv = new HotelCustomerAdvancedPayment();
-                $obj_refund_stages = new HotelOrderRefundStages();
-                $obj_ord_ref_info = new HotelOrderRefundInfo();
                 $objBookingDemand = new HotelBookingDemands();
                 foreach ($cartOrders as $cartOrder) {
                     $idOrder = $cartOrder['id_order'];
@@ -166,16 +161,15 @@ class OrderConfirmationControllerCore extends FrontController
                                 $date_join = strtotime($data_v['date_from']).strtotime($data_v['date_to']);
                                 /*Product price when order was created*/
                                 $order_details_obj = new OrderDetail($data_v['id_order_detail']);
-                                $prod_ord_dtl_name = $order_details_obj->product_name;
-                                $cart_htl_data[$type_key]['name'] = $prod_ord_dtl_name;
+                                $cart_htl_data[$type_key]['name'] = $order_details_obj->product_name;
                                 //work on entring refund data
-                                $ord_refnd_info = $obj_ord_ref_info->getOderRefundInfoByIdOrderIdProductByDate($this->id_order, $type_value['product_id'], $data_v['date_from'], $data_v['date_to']);
-                                if ($ord_refnd_info) {
-                                    $stage_name = $obj_refund_stages->getNameById($ord_refnd_info['refund_stage_id']);
-                                } else {
-                                    $stage_name = '';
-                                    $non_requested_rooms = 1;
-                                }
+                                // $ord_refnd_info = $obj_ord_ref_info->getOderRefundInfoByIdOrderIdProductByDate($this->id_order, $type_value['product_id'], $data_v['date_from'], $data_v['date_to']);
+                                // if ($ord_refnd_info) {
+                                //     $stage_name = $obj_refund_stages->getNameById($ord_refnd_info['refund_stage_id']);
+                                // } else {
+                                    //     $non_requested_rooms = 1;
+                                    // }
+                                $stage_name = '';
                                 if (isset($cart_htl_data[$type_key]['date_diff'][$date_join])) {
                                     $cart_htl_data[$type_key]['date_diff'][$date_join]['num_rm'] += 1;
 
@@ -259,46 +253,35 @@ class OrderConfirmationControllerCore extends FrontController
                                 $cart_htl_data[$type_key]['date_diff'][$date_join]['feature_price_diff'] = $feature_price_diff;
 
                                 //enter hotel name
-                                $hotelInfo = $objHtlBranchInfo->hotelBranchesInfo(
-                                    Configuration::get('PS_LANG_DEFAULT'),
-                                    2,
-                                    0,
-                                    $data_v['id_hotel']
-                                );
-                                $cart_htl_data[$type_key]['hotel_name'] = $hotelInfo['hotel_name'];
+                                $cart_htl_data[$type_key]['hotel_name'] = $data_v['hotel_name'];
                             }
                         }
                     }
                     if (!$objCartOrder->hasInvoice()) {
                         $orders_has_invoice = 0;
                     }
-                    //For Advanced Payment
-                    $order_adv_dtl = $obj_customer_adv->getCstAdvPaymentDtlByIdOrder($idOrder);
-                    if ($order_adv_dtl) {
-                        $this->context->smarty->assign('order_adv_dtl', $order_adv_dtl);
-                    }
+
                     $orderTotalInfo['total_wrapping'] += $objCartOrder->total_wrapping;
                     $orderTotalInfo['total_products_te'] += $objCartOrder->getTotalProductsWithoutTaxes();
                     $orderTotalInfo['total_products_ti'] += $objCartOrder->getTotalProductsWithTaxes();
                     $orderTotalInfo['total_discounts'] += $objCartOrder->total_discounts;
                     $orderTotalInfo['total_paid'] += $objCartOrder->total_paid;
-                    $orderTotalInfo['total_paid_amount'] += $order_adv_dtl['total_paid_amount'];
-                    $orderTotalInfo['total_order_amount'] += $order_adv_dtl['total_order_amount'];
+                    $orderTotalInfo['total_paid_real'] += $objCartOrder->total_paid_real;
                 }
-                $redirect_link_terms = $this->context->link->getCMSLink(new CMS(3, $this->context->language->id), null, $this->context->language->id);
-                $this->context->smarty->assign('orderTotalInfo', $orderTotalInfo);
-                $this->context->smarty->assign('redirect_link_terms', $redirect_link_terms);
+
                 $this->context->smarty->assign('cart_htl_data', $cart_htl_data);
-                $this->context->smarty->assign('non_requested_rooms', $non_requested_rooms);
-                $this->context->smarty->assign('orders_has_invoice', $orders_has_invoice);
             }
+
+            $this->context->smarty->assign('orderTotalInfo', $orderTotalInfo);
+            $this->context->smarty->assign('non_requested_rooms', $non_requested_rooms);
+            $this->context->smarty->assign('orders_has_invoice', $orders_has_invoice);
         }
 
         $shw_bo_msg = Configuration::get('WK_SHOW_MSG_ON_BO');
         $bo_msg = Configuration::get('WK_BO_MESSAGE');
         $this->context->smarty->assign(
             array(
-                'return_allowed' => (int) $order->isReturnable(),
+                'refund_allowed' => (int) $order->isReturnable(),
                 'any_back_order' => $any_back_order,
                 'shw_bo_msg' => $shw_bo_msg,
                 'back_ord_msg' => $bo_msg,
@@ -308,7 +291,6 @@ class OrderConfirmationControllerCore extends FrontController
             )
         );
 
-        /*END*/
         $this->setTemplate(_PS_THEME_DIR_.'order-confirmation.tpl');
     }
 

@@ -1,3 +1,16 @@
+-----------------------------
+# V1.0.0 to V1.0.1
+-----------------------------
+
+## Improved/changed features
+
+[*] CO : Tables of hotelreservationsystem module is updated.
+
+## Update Policy
+
+- Mobule need only file update, can be updated only by UPLOADING new version on module
+
+
 ____________________________________________________________________________________________________
 ChangeLog : QloApps Data Cleaner 1.0.0 | COMPATIBLE:: QloApps V1.x.x | Added in QloApps V1.3.2
 ____________________________________________________________________________________________________

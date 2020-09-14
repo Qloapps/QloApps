@@ -75,7 +75,7 @@ class HTMLTemplateOrderReturnCore extends HTMLTemplate
             'invoice_address' => $formatted_invoice_address,
             'shop_address' => AddressFormat::generateAddress($this->shop->getAddress(), array(), '<br />', ' ')
         ));
-        
+
         $tpls = array(
             'style_tab' => $this->smarty->fetch($this->getTemplate('invoice.style-tab')),
             'addresses_tab' => $this->smarty->fetch($this->getTemplate('order-return.addresses-tab')),
@@ -84,7 +84,7 @@ class HTMLTemplateOrderReturnCore extends HTMLTemplate
             'conditions_tab' => $this->smarty->fetch($this->getTemplate('order-return.conditions-tab')),
         );
         $this->smarty->assign($tpls);
-        
+
         return $this->smarty->fetch($this->getTemplate('order-return'));
     }
 
@@ -107,7 +107,7 @@ class HTMLTemplateOrderReturnCore extends HTMLTemplate
     {
         return 'invoices.pdf';
     }
-    
+
     /**
      * Returns the template's HTML header
      *

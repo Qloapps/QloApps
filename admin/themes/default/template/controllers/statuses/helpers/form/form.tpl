@@ -26,7 +26,7 @@
 
 {block name="label"}
 	{if $input.type == "select_template"}
-		<div id="tpl" style="display:{if isset($fields_value.send_email) && $fields_value.send_email}block{else}none{/if}">
+		<div id="tpl_{$input.template_attr}" style="display:{if $input.is_customer_template}{if isset($fields_value.show_customer_template) && $fields_value.show_customer_template}block{else}none{/if}{else}{if isset($fields_value.show_admin_template) && $fields_value.show_admin_template}block{else}none{/if}{/if}">
 	{/if}
 	{$smarty.block.parent}
 {/block}
@@ -40,10 +40,10 @@
 			<div class="translatable-field lang-{$language.id_lang}" {if $language.id_lang != $defaultFormLanguage}style="display:none"{/if}>
 				<div class="col-lg-8">
 					<select name="{$input.name}_{$language.id_lang}"
-							id="{$input.name}_select_{$language.id_lang}"
-							{if isset($input.multiple)}multiple="multiple" {/if}
-							{if isset($input.size)}size="{$input.size}"{/if}
-							{if isset($input.onchange)}onchange="{$input.onchange}"{/if}>
+					id="{$input.name}_select_{$language.id_lang}"
+					{if isset($input.multiple)}multiple="multiple" {/if}
+					{if isset($input.size)}size="{$input.size}"{/if}
+					{if isset($input.onchange)}onchange="{$input.onchange}"{/if}>
 						{if isset($input.options.query[$language.iso_code]) && $input.options.query[$language.iso_code]}
 							{foreach $input.options.query[$language.iso_code] AS $option}
 								<option value="{$option[$input.options.id]}"
@@ -72,7 +72,7 @@
 						</li>
 						{/foreach}
 					</ul>
-					<button type="button" class="btn btn-default" onclick="viewTemplates('#template_select_{$language.id_lang}', '{$language.iso_code}/', '.html');">
+					<button type="button" class="btn btn-default" onclick="viewTemplates('#{$input.name}_select_{$language.id_lang}', '{$language.iso_code}/', '.html');">
 						<i class="icon-eye-open"></i>
 						{l s='Preview'}
 					</button>
@@ -110,8 +110,19 @@
 
 {block name="script"}
 	$(document).ready(function() {
-		$('#send_email_on').click(function() {
-			$('#tpl').slideToggle();
+		$('#send_email_on, #send_email_to_customer_on').click(function() {
+			$('#tpl_'+$(this).attr('class')).slideToggle();
+		});
+
+		$('#send_email_to_superadmin_on, #send_email_to_employee_on, #send_email_to_hotelier_on').click(function() {
+			if ($('#send_email_to_superadmin_on').is(":checked")
+				|| $('#send_email_to_employee_on').is(":checked")
+				|| $('#send_email_to_hotelier_on').is(":checked")
+			) {
+				$('#tpl_' + $(this).attr('class')).show(500);
+			} else {
+				$('#tpl_' + $(this).attr('class')).hide(500);
+			}
 		});
 	});
 {/block}

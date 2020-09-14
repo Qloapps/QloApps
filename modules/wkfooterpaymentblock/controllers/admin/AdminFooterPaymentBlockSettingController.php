@@ -85,10 +85,9 @@ class AdminFooterPaymentBlockSettingController extends ModuleAdminController
     {
         $image = '';
         if ($row['id_payment_block']) {
-            $imgUrl = _PS_MODULE_DIR_.$this->module->name.'/views/img/payment_img/'.$row['id_payment_block'].'.jpg';
-            if ($imgExist = file_exists($imgUrl)) {
-                $modImgUrl = _MODULE_DIR_.$this->module->name.'/views/img/payment_img/'.$row['id_payment_block'].'.jpg';
-                $image = "<img class='img-thumbnail img-responsive' style='max-width:70px' src='".$modImgUrl."'>";
+            $imgUrl = $this->context->link->getMediaLink(_MODULE_DIR_.$this->module->name.'/views/img/payment_img/'.$row['id_payment_block'].'.jpg');
+            if ($imgExist = (bool)Tools::file_get_contents($imgUrl)) {
+                $image = "<img class='img-thumbnail img-responsive' style='max-width:70px' src='".$imgUrl."'>";
             }
         }
         return $image;
@@ -112,10 +111,9 @@ class AdminFooterPaymentBlockSettingController extends ModuleAdminController
         if (!($object = $this->loadObject(true))) {
             return;
         }
-        $imgUrl = _PS_MODULE_DIR_.$this->module->name.'/views/img/payment_img/'.$object->id.'.jpg';
-        if ($imgExist = file_exists($imgUrl)) {
-            $modImgUrl = _MODULE_DIR_.$this->module->name.'/views/img/payment_img/'.$object->id.'.jpg';
-            $image = "<img class='img-thumbnail img-responsive' style='max-width:100px' src='".$modImgUrl."'>";
+        $imgUrl = $this->context->link->getMediaLink(_MODULE_DIR_.$this->module->name.'/views/img/payment_img/'.$object->id.'.jpg');
+        if ($imgExist = (bool)Tools::file_get_contents($imgUrl)) {
+            $image = "<img class='img-thumbnail img-responsive' style='max-width:100px' src='".$imgUrl."'>";
         }
 
         $this->fields_form = array(
@@ -237,13 +235,14 @@ class AdminFooterPaymentBlockSettingController extends ModuleAdminController
                     ) {
                         echo 'ok position '.(int) $position.' for payment block '.(int) $pos[1].'\r\n';
                     } else {
-                        echo '{"hasError" : true, "errors" : "Can not update payment block position '.
+                        echo '{"hasError" : true, "errors" : "Can not update payment block '.
                         (int) $idPaymentBlock.' to position '.(int) $position.' "}';
                     }
                 } else {
                     echo '{"hasError" : true, "errors" : "This payment block ('.(int) $idPaymentBlock.
-                    ') can t be loaded"}';
+                    ') cant be loaded"}';
                 }
+
                 break;
             }
         }

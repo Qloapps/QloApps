@@ -133,7 +133,6 @@ $(document).ready(function()
 						// update token
 						static_token = jsonData.token;
 						updateNewAccountToAddressBlock(that.attr('data-adv-api'));
-						location.reload();
 					}
 				},
 				error: function(XMLHttpRequest, textStatus, errorThrown) {
@@ -283,9 +282,6 @@ $(document).ready(function()
 						}
 						else
 							updateNewAccountToAddressBlock(advApiParam);
-					}
-					if (!jsonData.hasError) {
-						location.reload();
 					}
 					//$('#guest-info-block, #opc_new_account-overlay, #opc_delivery_methods-overlay, #opc_payment_methods-overlay').fadeIn('slow');
 				},
@@ -1020,6 +1016,7 @@ function updateNewAccountToAddressBlock(is_adv_api)
 					});
 				});
 			}
+			location.reload();
 		},
 		error: function(XMLHttpRequest, textStatus, errorThrown) {
 			if (textStatus !== 'abort')

@@ -26,7 +26,7 @@
 {if $smarty.const._PS_VERSION_ >= 1.6}
 
 <div class="row">
-	<div class="col-xs-12 col-md-6">
+	<div class="col-xs-12 col-md-12">
         <p class="payment_module paypal">
         	{if $use_paypal_in_context}
 				<a href="javascript:void(0)" onclick="" id="paypal_process_payment" title="{l s='Pay with PayPal' mod='paypal'}">
@@ -47,14 +47,14 @@
 					{l s='Pay with your card or your PayPal account' mod='paypal'}
                     {/if}
 				{/if}
-				
+
 			</a>
 		</p>
     </div>
 </div>
 
 <style>
-	p.payment_module.paypal a 
+	p.payment_module.paypal a
 	{ldelim}
 		padding-left:17px;
 	{rdelim}
@@ -70,7 +70,7 @@
 			{else}
 				<img src="{$logos.LocalPayPalLogoMedium|escape:'htmlall':'UTF-8'}" alt="{l s='Pay with your card or your PayPal account' mod='paypal'}" />
 			{/if}
-			{l s='Pay with your card or your PayPal account' mod='paypal'}	
+			{l s='Pay with your card or your PayPal account' mod='paypal'}
         {/if}
 	</a>
 </p>

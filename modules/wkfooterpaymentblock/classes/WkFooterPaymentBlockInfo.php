@@ -37,21 +37,26 @@ class WkFooterPaymentBlockInfo extends ObjectModel
             'date_upd' => array('type' => self::TYPE_DATE, 'validate' => 'isDate'),
     ));
 
+    public function __construct($id = null, $id_lang = null, $id_shop = null)
+    {
+        parent::__construct($id, $id_lang, $id_shop);
+
+        $this->image_dir = _PS_MODULE_DIR_.'wkfooterpaymentblock/views/img/payment_img/';
+    }
+
     /**
      * Deletes current payment block from the database
      * @return bool `true` if delete was successful
      */
     public function delete()
     {
-        // delete image of the payment block
-        $imgPath = _PS_MODULE_DIR_.'wkfooterpaymentblock/views/img/payment_img/'.$this->id.'.jpg';
-        if (file_exists($imgPath)) {
-            unlink($imgPath);
+        if (!parent::delete()
+            || !$this->deleteImage(true)
+            || !$this->cleanPositions()
+        ) {
+            return false;
         }
-        $return = parent::delete();
-        /* Reinitializing position */
-        $this->cleanPositions();
-        return $return;
+        return true;
     }
 
     public function getAllPaymentBlocks($active = null, $orderBy = '', $orderWay = 'ASC')
@@ -77,7 +82,7 @@ class WkFooterPaymentBlockInfo extends ObjectModel
 
     public function updatePosition($way, $position)
     {
-        if (!$result = Db::getInstance()->executeS(
+        if (!$res = Db::getInstance()->executeS(
             'SELECT hpb.`id_payment_block`, hpb.`position` FROM `'._DB_PREFIX_.'htl_footer_payment_block_info` hpb
             WHERE hpb.`id_payment_block` = '.(int) $this->id.' ORDER BY `position` ASC'
         )
@@ -86,7 +91,7 @@ class WkFooterPaymentBlockInfo extends ObjectModel
         }
 
         $movedPaymentBlock = false;
-        foreach ($result as $paymentBlock) {
+        foreach ($res as $paymentBlock) {
             if ((int)$paymentBlock['id_payment_block'] == (int)$this->id) {
                 $movedPaymentBlock = $paymentBlock;
             }

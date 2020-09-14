@@ -135,8 +135,8 @@ class ProductDownloadCore extends ObjectModel
             return false;
         }
 
-        return unlink(_PS_DOWNLOAD_DIR_.$this->filename)
-            && Db::getInstance()->delete('product_download', 'id_product_download = '.(int)$id_product_download);
+        return Tools::deleteFile(_PS_DOWNLOAD_DIR_.$this->filename)
+            && Db::getInstance()->delete('product_download', 'id_product_download =  '.(int)$id_product_download);
     }
 
     /**
@@ -149,7 +149,7 @@ class ProductDownloadCore extends ObjectModel
         if (!$this->filename) {
             return false;
         }
-        return file_exists(_PS_DOWNLOAD_DIR_.$this->filename);
+        return (bool)Tools::file_get_contents(__PS_BASE_URI__.'download/'.$this->filename);
     }
 
     /**

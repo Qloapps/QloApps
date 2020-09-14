@@ -42,10 +42,6 @@
 
 						<div class="col-md-8">
 							{include file="$tpl_dir./errors.tpl"}
-							{* Shopping Cart  *}
-							{if isset($cartChanged) && $cartChanged}
-								<p class="alert alert-danger">{l s='Your Booking Cart has been changed automatically as some rooms in your booking cart has been booked by another customer.'}</p>
-							{/if}
 
 							{* Accordian for all blocks *}
 							<div class="accordion" id="oprder-opc-accordion">
@@ -107,16 +103,20 @@
 																		</div>
 																	</div>
 																{/if}
-																<hr>
-																<div class="row">
-																	<div class="col-sm-12 proceed_btn_block">
-																		<a class="btn btn-default button button-medium pull-right" href="{$link->getPageLink('order-opc', null, null, ['proceed_to_payment' => 1])}" title="Proceed to Payment" rel="nofollow">
-																			<span>
-																				{l s='Proceed'}
-																			</span>
-																		</a>
+
+																{* proceed only if no order restrict errors are there *}
+																{if !$orderRestrictErr}
+																	<hr>
+																	<div class="row">
+																		<div class="col-sm-12 proceed_btn_block">
+																			<a class="btn btn-default button button-medium pull-right" href="{$link->getPageLink('order-opc', null, null, ['proceed_to_payment' => 1])}" title="Proceed to Payment" rel="nofollow">
+																				<span>
+																					{l s='Proceed'}
+																				</span>
+																			</a>
+																		</div>
 																	</div>
-																</div>
+																{/if}
 															{else}
 																<!-- Create account / Guest account / Login block -->
 																{include file="$tpl_dir./order-opc-new-account.tpl"}
@@ -204,16 +204,6 @@
 										{/if}
 									</span>
 								</p>
-								{if isset($customer_adv_dtl)}
-									<p>
-										<span>{l s='Advance Payment Amount'}</span>
-										<span class="cart_total_values">{displayPrice price=$adv_amount}</span>
-									</p>
-									<p>
-										<span>{l s='Due Amount'}</span>
-										<span class="cart_total_values">{displayPrice price=$customer_adv_dtl['due_amount']}</span>
-									</p>
-								{/if}
 								<p class="total_discount_block {if $total_discounts == 0} unvisible{/if}">
 									<span>
 										{if $display_tax_label}
@@ -235,12 +225,21 @@
 										{displayPrice price=$total_discounts_negative}
 									</span>
 								</p>
+								{if isset($is_advance_payment) && $is_advance_payment}
+									<p>
+										<span>{l s='Advance Payment Amount'}</span>
+										<span class="cart_total_values">{displayPrice price=$advPaymentAmount}</span>
+									</p>
+									<p>
+										<span>{l s='Due Amount'}</span>
+										<span class="cart_total_values">{displayPrice price=$dueAmount}</span>
+									</p>
+								{/if}
 								<p class="cart_final_total_block">
-									{if isset($customer_adv_dtl)}
-										<span>{l s='Final Total'}</span>
-										<span class="cart_total_values">{displayPrice price=$customer_adv_dtl['total_to_be_paid']}</span>
+									<span>{l s='Final Total'}</span>
+									{if isset($is_advance_payment) && $is_advance_payment}
+										<span class="cart_total_values">{displayPrice price=$advPaymentAmount}</span>
 									{else}
-										<span>{l s='Final Total'}</span>
 										<span class="cart_total_values">
 											{if $use_taxes}
 												{displayPrice price=$total_price}
@@ -329,11 +328,7 @@
 						<h2 class="page-heading">{l s='Your shopping cart'}</h2>
 						{include file="$tpl_dir./errors.tpl"}
 
-						{if isset($cartChanged) && $cartChanged}
-							<p class="alert alert-danger">{l s='Your booking cart has been changed automatically as some rooms in your booking cart has been booked by another customer.'}</p>
-						{/if}
-
-						<p class="alert alert-warning">{l s='Till now you did not enter any room in your cart.'}</p>
+						<p class="alert alert-warning">{l s='Till now you did not added any room in your cart.'}</p>
 					{/if}
 					{strip}
 						{addJsDef imgDir=$img_dir}

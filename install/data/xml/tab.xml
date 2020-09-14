@@ -99,9 +99,9 @@
     <tab id="Invoices" id_parent="Orders" active="1" hide_host_mode="0">
       <class_name>AdminInvoices</class_name>
     </tab>
-    <tab id="Merchandise_Returns" id_parent="Orders" active="1" hide_host_mode="0">
+    <!-- <tab id="Merchandise_Returns" id_parent="Orders" active="1" hide_host_mode="0">
       <class_name>AdminReturn</class_name>
-    </tab>
+    </tab> -->
     <!-- <tab id="Delivery_Slips" id_parent="Orders" active="1" hide_host_mode="0">
       <class_name>AdminDeliverySlip</class_name>
     </tab> -->

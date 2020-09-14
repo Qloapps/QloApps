@@ -1,6 +1,6 @@
 <?php
 /**
-* 2010-2018 Webkul.
+* 2010-2020 Webkul.
 *
 * NOTICE OF LICENSE
 *
@@ -14,7 +14,7 @@
 * needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
 *
 *  @author    Webkul IN <support@webkul.com>
-*  @copyright 2010-2018 Webkul IN
+*  @copyright 2010-2020 Webkul IN
 *  @license   https://store.webkul.com/license.html
 */
 
@@ -62,6 +62,46 @@ class HotelCartBookingData extends ObjectModel
             'extra_demands' => array('type' => self::TYPE_STRING),
             'date_add' => array('type' => self::TYPE_DATE, 'validate' => 'isDate'),
             'date_upd' => array('type' => self::TYPE_DATE, 'validate' => 'isDate'),
+        ),
+    );
+
+    protected $webserviceParameters = array(
+        'objectsNodeName' => 'cart_bookings',
+        'objectNodeName' => 'booking',
+        'fields' => array(
+            'id_hotel' => array(
+                'xlink_resource' => array(
+                    'resourceName' => 'hotels',
+                )
+            ),
+            'id_product' => array(
+                'xlink_resource' => array(
+                    'resourceName' => 'products',
+                )
+            ),
+            'id_room' => array(
+                'xlink_resource' => array(
+                    'resourceName' => 'hotel_rooms',
+                )
+            ),
+        ),
+        'associations' => array(
+            'extra_demands' => array(
+                'setter' => false,
+                'resource' => 'extra_demand',
+                'fields' => array(
+                    'id_global_demand' => array(
+                        'xlink_resource' => array(
+                            'resourceName' => 'extra_demands',
+                        )
+                    ),
+                    'id_option' => array(
+                        'xlink_resource' => array(
+                            'resourceName' => 'demand_advance_options',
+                        )
+                    )
+                )
+            ),
         ),
     );
 
@@ -310,7 +350,11 @@ class HotelCartBookingData extends ObjectModel
             $numRooms = count($cartBookingInfo);
             if ($updPsCart) {
                 $objBookingDetail = new HotelBookingDetail();
-                $controllerType = Context::getContext()->controller->controller_type;
+                if (isset(Context::getContext()->controller->controller_type)) {
+                    $controllerType = Context::getContext()->controller->controller_type;
+                } else {
+                    $controllerType = 'front';
+                }
                 foreach ($cartBookingInfo as $bookingRow) {
                     $idPsCart = $bookingRow['id_cart'];
                     $idPsProduct = $bookingRow['id_product'];
@@ -691,10 +735,10 @@ class HotelCartBookingData extends ObjectModel
      *
      * @param [int]  $id_product [id of the product]
      * @param [date] $date       [date for which feature price plan to be returned]
-     *
+     * @param [int] $id_group    [id_group for which price is need (if available for the passed group)]
      * @return [array|false] [returns array containg info of the feature plan if foung otherwise returns false]
      */
-    public function getProductFeaturePricePlanByDateByPriority($id_product, $date)
+    public function getProductFeaturePricePlanByDateByPriority($id_product, $date, $id_group)
     {
         //Get priority
         $featurePricePriority = Configuration::get('HTL_FEATURE_PRICING_PRIORITY');
@@ -702,13 +746,23 @@ class HotelCartBookingData extends ObjectModel
         if ($featurePricePriority) {
             foreach ($featurePricePriority as $priority) {
                 if ($priority == 'specific_date') {
-                    $featurePrice = Db::getInstance()->getRow('SELECT * FROM `'._DB_PREFIX_.'htl_room_type_feature_pricing` WHERE `id_product`='.(int) $id_product.' AND `active`=1 AND `date_selection_type`=2 AND `date_from` = \''.$date.'\'');
-                    if ($featurePrice) {
+                    if ($featurePrice = Db::getInstance()->getRow(
+                        'SELECT * FROM `'._DB_PREFIX_.'htl_room_type_feature_pricing` fp
+                        INNER JOIN `'._DB_PREFIX_.'htl_room_type_feature_pricing_group` fpg
+                        ON (fp.`id_feature_price` = fpg.`id_feature_price` AND fpg.`id_group` = '.(int) $id_group.')
+                        WHERE fp.`id_product`='.(int) $id_product.' AND fp.`active`=1
+                        AND fp.`date_selection_type`=2 AND fp.`date_from` = \''.pSQL($date).'\''
+                    )) {
                         return $featurePrice;
                     }
                 } elseif ($priority == 'special_day') {
-                    $featurePrice = Db::getInstance()->executeS('SELECT * FROM `'._DB_PREFIX_.'htl_room_type_feature_pricing` WHERE `id_product`='.(int) $id_product.' AND `is_special_days_exists`=1 AND `active`=1 AND `date_from` <= \''.$date.'\' AND `date_to` >= \''.$date.'\'');
-                    if ($featurePrice) {
+                    if ($featurePrice = Db::getInstance()->executeS(
+                        'SELECT * FROM `'._DB_PREFIX_.'htl_room_type_feature_pricing` fp
+                        INNER JOIN `'._DB_PREFIX_.'htl_room_type_feature_pricing_group` fpg
+                        ON (fp.`id_feature_price` = fpg.`id_feature_price` AND fpg.`id_group` = '.(int) $id_group.')
+                        WHERE fp.`id_product`='.(int) $id_product.' AND fp.`is_special_days_exists`=1
+                        AND fp.`active`=1 AND fp.`date_from` <= \''.pSQL($date).'\' AND fp.`date_to` >= \''.pSQL($date).'\''
+                    )) {
                         foreach ($featurePrice as $fRow) {
                             $specialDays = Tools::jsonDecode($fRow['special_days']);
                             if (in_array(strtolower(date('D', strtotime($date))), $specialDays)) {
@@ -717,8 +771,14 @@ class HotelCartBookingData extends ObjectModel
                         }
                     }
                 } elseif ($priority == 'date_range') {
-                    $featurePrice = Db::getInstance()->getRow('SELECT * FROM `'._DB_PREFIX_.'htl_room_type_feature_pricing` WHERE `id_product`='.(int) $id_product.' AND `date_selection_type`=1 AND `is_special_days_exists`=0 AND `active`=1 AND `date_from` <= \''.$date.'\' AND `date_to` >= \''.$date.'\'');
-                    if ($featurePrice) {
+                    if ($featurePrice = Db::getInstance()->getRow(
+                        'SELECT * FROM `'._DB_PREFIX_.'htl_room_type_feature_pricing` fp
+                        INNER JOIN `'._DB_PREFIX_.'htl_room_type_feature_pricing_group` fpg
+                        ON (fp.`id_feature_price` = fpg.`id_feature_price` AND fpg.`id_group` = '.(int) $id_group.')
+                        WHERE fp.`id_product`='.(int) $id_product.' AND fp.`date_selection_type`=1
+                        AND `is_special_days_exists`=0 AND `active`=1
+                        AND fp.`date_from` <= \''.pSQL($date).'\' AND fp.`date_to` >= \''.pSQL($date).'\''
+                    )) {
                         return $featurePrice;
                     }
                 }
@@ -1113,6 +1173,18 @@ class HotelCartBookingData extends ObjectModel
             return $totalDemandsPrice;
         } else {
             return $roomTypeDemands;
+        }
+    }
+
+    // Webservice :: get extra demands for the cart booking
+    public function getWsExtraDemands()
+    {
+        $extraDemands = Tools::jsonDecode($this->extra_demands, true);
+        if (count($extraDemands)) {
+            foreach ($extraDemands as &$demnad) {
+                $demnad['id'] = $demnad['id_global_demand'];
+            }
+            return $extraDemands;
         }
     }
 }

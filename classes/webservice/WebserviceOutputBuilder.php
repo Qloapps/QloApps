@@ -595,10 +595,10 @@ class WebserviceOutputBuilderCore
                 }
 
                 $parent_details = array(
-                        'object_id'    => $object->id,
-                        'entity_name'    => $ws_params['objectNodeName'],
-                        'entities_name'    => $ws_params['objectsNodeName'],
-                    );
+                    'object_id'    => $object->id,
+                    'entity_name'    => $ws_params['objectNodeName'],
+                    'entities_name'    => $ws_params['objectsNodeName'],
+                );
 
                 if (is_array($getter)) {
                     $association_resources = call_user_func($getter, $object);

@@ -41,6 +41,10 @@
 			<div class="col-lg-9">
 				{$image_uploader}
 			</div>
+			<div class="col-lg-9 col-lg-offset-3">
+				<div class="help-block">{l s='Please upload a square image (Recommended resolution 800 x 800px)'}
+				</div>
+			</div>
 		</div>
 		<div class="form-group">
 			<label class="control-label col-lg-3">
@@ -111,9 +115,9 @@
 	<table id="lineType" style="display:none;">
 		<tr id="image_id">
 			<td>
-				<a href="{$smarty.const._THEME_PROD_DIR_}image_path.jpg" class="fancybox">
+				<a href="{$link->getMediaLink("`$smarty.const._THEME_PROD_DIR_`image_path.jpg")}" class="fancybox"> {* by webkul to get media link *}
 					<img
-						src="{$smarty.const._THEME_PROD_DIR_}{$iso_lang}-default-{$imageType}.jpg"
+						src="{$link->getMediaLink("`$smarty.const._THEME_PROD_DIR_`$iso_lang-default-`$imageType`.jpg")}"
 						alt="legend"
 						title="legend"
 						class="img-thumbnail" />

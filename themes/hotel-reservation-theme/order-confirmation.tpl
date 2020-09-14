@@ -67,10 +67,6 @@
 							<th>{l s='Check-in Date'}</th>
 							<th>{l s='Check-out Date'}</th>
 							<th class="cart_total">{l s='Total'}</th>
-							{*{if isset($orders_has_invoice) && $orders_has_invoice}
-								<th>{l s='Request Refund'}</th>
-							{/if}*}
-							{* <th>{l s='BackOrder Status'}</th> *}
 						</tr>
 					</thead>
 					<tbody>
@@ -172,103 +168,94 @@
 					<tfoot>
 						{if $priceDisplay && $use_tax}
 							<tr class="item">
-								<td colspan={if isset($orders_has_invoice) && $orders_has_invoice}"5"{else}"5"{/if}></td>
-								<td colspan="{if $return_allowed}3{else}2{/if}">
-									<strong>{l s='Items (tax excl.)'}</strong>
+								<td colspan="3"></td>
+								<td colspan="3">
+									<strong>{l s='Rooms (tax excl.)'}</strong>
 								</td>
-								<td colspan="{if $order->hasProductReturned()}3{else}2{/if}">
+								<td colspan="2">
 									<span>{displayWtPriceWithCurrency price=$orderTotalInfo['total_products_te'] currency=$currency}</span>
 								</td>
 							</tr>
 						{/if}
 						<tr class="item">
-							<td colspan={if isset($orders_has_invoice) && $orders_has_invoice}"5"{else}"5"{/if}></td>
-							<td colspan="{if $return_allowed}3{else}2{/if}">
-								<strong>{l s='Items'} {if $use_tax}{l s='(tax incl.)'}{/if} </strong>
+							<td colspan="3"></td>
+							<td colspan="3">
+								<strong>{l s='Rooms'} {if $use_tax}{l s='(tax incl.)'}{/if} </strong>
 							</td>
-							<td colspan="{if $order->hasProductReturned()}3{else}2{/if}">
+							<td colspan="2">
 								<span>{displayWtPriceWithCurrency price=$orderTotalInfo['total_products_ti'] currency=$currency}</span>
 							</td>
 						</tr>
 						{if $orderTotalInfo['total_demands_price_te'] > 0}
 							{if $priceDisplay && $use_tax}
 								<tr class="item">
-									<td colspan={if isset($orders_has_invoice) && $orders_has_invoice}"5"{else}"5"{/if}></td>
-									<td colspan="{if $return_allowed}3{else}2{/if}">
+									<td colspan="3"></td>
+									<td colspan="3">
 										<strong>{l s='Additional facilities Cost (tax excl.)'}</strong>
 									</td>
-									<td colspan="{if $order->hasProductReturned()}3{else}2{/if}">
+									<td colspan="2">
 										<span>{displayWtPriceWithCurrency price=$orderTotalInfo['total_demands_price_te'] currency=$currency}</span>
 									</td>
 								</tr>
 							{/if}
 							<tr class="item">
-								<td colspan={if isset($orders_has_invoice) && $orders_has_invoice}"5"{else}"5"{/if}></td>
-								<td colspan="{if $return_allowed}3{else}2{/if}">
+								<td colspan="3"></td>
+								<td colspan="3">
 									<strong>{l s='Additional facilities Cost (tax incl.)'}</strong>
 								</td>
-								<td colspan="{if $order->hasProductReturned()}3{else}2{/if}">
+								<td colspan="2">
 									<span>{displayWtPriceWithCurrency price=$orderTotalInfo['total_demands_price_ti'] currency=$currency convert=1}</span>
 								</td>
 							</tr>
 						{/if}
 						{if $order->total_wrapping > 0}
 						<tr class="item">
-							<td colspan={if isset($orders_has_invoice) && $orders_has_invoice}"5"{else}"5"{/if}></td>
-							<td colspan="{if $return_allowed}3{else}2{/if}">
+							<td colspan="3"></td>
+							<td colspan="3">
 								<strong>{l s='Total gift wrapping cost'}</strong>
 							</td>
-							<td colspan="{if $order->hasProductReturned()}3{else}2{/if}">
+							<td colspan="2">
 								<span class="price-wrapping">{displayWtPriceWithCurrency price=$orderTotalInfo['total_wrapping'] currency=$currency}</span>
 							</td>
 						</tr>
 						{/if}
 						{if $order->total_discounts > 0}
 						<tr class="item">
-							<td colspan={if isset($orders_has_invoice) && $orders_has_invoice}"5"{else}"5"{/if}></td>
-							<td colspan="{if $return_allowed}3{else}2{/if}">
+							<td colspan="3"></td>
+							<td colspan="3">
 								<strong>{l s='Total vouchers'}</strong>
 							</td>
-							<td colspan="{if $order->hasProductReturned()}3{else}2{/if}">
+							<td colspan="2">
 								<span class="price-discount">{displayWtPriceWithCurrency price=$orderTotalInfo['total_discounts'] currency=$currency convert=1}</span>
 							</td>
 						</tr>
 						{/if}
-						{if isset($order_adv_dtl)}
-							<tr class="item">
-								<td colspan={if isset($orders_has_invoice) && $orders_has_invoice}"5"{else}"5"{/if}></td>
-								<td colspan="{if $return_allowed}3{else}2{/if}">
-									<strong>{l s='Total Paid'}</strong>
-								</td>
-								<td colspan="{if $order->hasProductReturned()}3{else}2{/if}">
-									<span>{displayWtPriceWithCurrency price=$orderTotalInfo['total_paid_amount'] currency=$currency}</span>
-								</td>
-							</tr>
-							<tr class="item">
-								<td colspan={if isset($orders_has_invoice) && $orders_has_invoice}"5"{else}"5"{/if}></td>
-								<td colspan="{if $return_allowed}3{else}2{/if}">
-									<strong>{l s='Total Due'}</strong>
-								</td>
-								<td colspan="{if $order->hasProductReturned()}3{else}2{/if}">
-									<span>{displayWtPriceWithCurrency price=($orderTotalInfo['total_order_amount'] - $orderTotalInfo['total_paid_amount']) currency=$currency}</span>
-								</td>
-							</tr>
-						{/if}
 						<tr class="totalprice item">
-							<td colspan={if isset($orders_has_invoice) && $orders_has_invoice}"5"{else}"5"{/if}></td>
-							<td colspan="{if $return_allowed}3{else}2{/if}">
-								<strong>{l s='Total'}</strong>
+							<td colspan="3"></td>
+							<td colspan="3">
+								<strong>{l s='Final Booking Total'}</strong>
 							</td>
-							<td colspan="{if $order->hasProductReturned()}3{else}2{/if}">
+							<td colspan="2">
 								<span>{displayWtPriceWithCurrency price=$orderTotalInfo['total_paid'] currency=$currency}</span>
 							</td>
 						</tr>
+						{if $orderTotalInfo['total_paid'] > $orderTotalInfo['total_paid_real']}
+							<tr class="item">
+								<td colspan="3"></td>
+								<td colspan="3">
+									<strong>{l s='Due Amount'}</strong>
+								</td>
+								<td colspan="2">
+									<span>{displayWtPriceWithCurrency price=($orderTotalInfo['total_paid'] - $orderTotalInfo['total_paid_real']) currency=$currency}</span>
+								</td>
+							</tr>
+						{/if}
 					</tfoot>
 				</table>
 			</div>
-			<p>{l s='An email has been sent with this information.' mod='bankwire'}
-				<br /><strong>{l s='Your order will be sent as soon as we receive payment.' mod='bankwire'}</strong>
-				<br />{l s='If you have questions, comments or concerns, please contact our' mod='bankwire'} <a class="cust_serv_lnk" href="{$link->getPageLink('contact', true)|escape:'html'}">{l s='expert customer support team' mod='bankwire'}</a>
+			<p>{l s='An email has been sent with this information.'}
+				<br /><strong>{l s='Your order will be sent as soon as we receive payment.'}</strong>
+				<br />{l s='If you have questions, comments or concerns, please contact our'} <a class="cust_serv_lnk" href="{$link->getPageLink('contact', true)|escape:'html'}">{l s='expert customer support team'}</a>
 			</p>
 		</div>
 	{/if}

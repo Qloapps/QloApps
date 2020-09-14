@@ -1,6 +1,6 @@
 <?php
 /**
-* 2010-2018 Webkul.
+* 2010-2020 Webkul.
 *
 * NOTICE OF LICENSE
 *
@@ -14,7 +14,7 @@
 * needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
 *
 *  @author    Webkul IN <support@webkul.com>
-*  @copyright 2010-2018 Webkul IN
+*  @copyright 2010-2020 Webkul IN
 *  @license   https://store.webkul.com/license.html
 */
 
@@ -33,6 +33,8 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
     public $active;
     public $date_add;
     public $date_upd;
+
+    public $groupBox;
 
     public static $definition = array(
         'table' => 'htl_room_type_feature_pricing',
@@ -62,10 +64,49 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
             ),
     ));
 
+    protected $webserviceParameters = array(
+        'objectsNodeName' => 'feature_prices',
+        'objectNodeName' => 'feature_price',
+        'fields' => array(
+            'id_product' => array(
+                'xlink_resource' => array(
+                    'resourceName' => 'room_types',
+                )
+            ),
+        ),
+        'associations' => array(
+            'groups' => array('resource' => 'group'),
+        )
+    );
+
     public function __construct($id = null, $id_lang = null, $id_shop = null)
     {
         $this->moduleInstance = Module::getInstanceByName('hotelreservationsystem');
         parent::__construct($id);
+    }
+
+    public function add($autodate = true, $null_values = true)
+    {
+        $return = parent::add($autodate, $null_values);
+
+        // call to add/update all the group entries
+        $this->updateGroup($this->groupBox);
+
+        return $return;
+    }
+
+    public function update($nullValues = false)
+    {
+        // first call to add/update all the group entries
+        $this->updateGroup($this->groupBox);
+        return parent::update($nullValues);
+    }
+
+    public function delete()
+    {
+        // first call to delete all the group entries
+        $this->cleanGroups();
+        return parent::delete();
     }
 
     public function getFeaturePriceInfo($idFeaturePrice)
@@ -586,7 +627,7 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
      *
      * @return [float] [Returns Total price of the room type]
      */
-    public static function getRoomTypeTotalPrice($id_product, $date_from, $date_to, $quantity = 0)
+    public static function getRoomTypeTotalPrice($id_product, $date_from, $date_to, $quantity = 0, $id_group = 0)
     {
         $totalDaySeconds = 24 * 60 * 60;
         $totalPrice = array();
@@ -601,6 +642,12 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
         } else {
             $taxRate = 0;
         }
+
+        // Initializations
+        if (!$id_group) {
+            $id_group = (int)Group::getCurrent()->id;
+        }
+
         // if date_from and date_to are same then date_to will be the next date date of date_from
         if (strtotime($date_from) == strtotime($date_to)) {
             $date_to = date('Y-m-d', (strtotime($date_from) + $totalDaySeconds));
@@ -613,18 +660,13 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
             $currentDate = date('Y-m-d', $date);
             if ($featurePrice = $hotelCartBookingData->getProductFeaturePricePlanByDateByPriority(
                 $id_product,
-                $currentDate
+                $currentDate,
+                $id_group
             )) {
                 if ($featurePrice['impact_type'] == 1) {
                     //percentage
-                    $featureImpactPriceTE = Tools::convertPrice(
-                        $productPriceTE * ($featurePrice['impact_value'] / 100),
-                        $id_currency
-                    );
-                    $featureImpactPriceTI = Tools::convertPrice(
-                        $productPriceTI * ($featurePrice['impact_value'] / 100),
-                        $id_currency
-                    );
+                    $featureImpactPriceTE = $productPriceTE * ($featurePrice['impact_value'] / 100);
+                    $featureImpactPriceTI = $productPriceTI * ($featurePrice['impact_value'] / 100);
                 } else {
                     //Fixed Price
                     $taxPrice = ($featurePrice['impact_value']*$taxRate)/100;
@@ -671,11 +713,18 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
      * @param  [date] $date_to    [end date]
      * @return [float] [returns per day feature price of the Room Type]
      */
-    public static function getRoomTypeFeaturePricesPerDay($id_product, $date_from, $date_to, $use_tax=true)
+    public static function getRoomTypeFeaturePricesPerDay($id_product, $date_from, $date_to, $use_tax = true, $id_group = 0)
     {
         $dateFrom = date('Y-m-d', strtotime($date_from));
         $dateTo = date('Y-m-d', strtotime($date_to));
-        $totalDurationPrice = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice($id_product, $dateFrom, $dateTo);
+        $totalDurationPrice = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
+            $id_product,
+            $dateFrom,
+            $dateTo,
+            0,
+            $id_group
+        );
+
         $totalDurationPriceTI = $totalDurationPrice['total_price_tax_incl'];
         $totalDurationPriceTE = $totalDurationPrice['total_price_tax_excl'];
         $objHotelBookingDetail = new HotelBookingDetail();
@@ -710,5 +759,84 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
             return false;
         }
         return Db::getInstance()->delete('htl_room_type_feature_pricing', 'id_product = '.(int)$idProduct);
+    }
+
+    /**
+     * Update customer groups associated to the object
+     * @param array $groups groups
+     */
+    public function updateGroup($groups)
+    {
+        $this->cleanGroups();
+        if ($groups && !empty($groups)) {
+            $this->addGroups($groups);
+        }
+    }
+
+    /**
+     * Deletes groups entries in the table. Send id_group if you want to delete entries by group i.e. when group deletes
+     * @param integer $idGroup
+     * @return void
+     */
+    public function cleanGroups($idGroup = 0)
+    {
+        if ($idGroup) {
+            $condition = 'id_group = '.(int)$idGroup;
+        } else {
+            $condition = 'id_feature_price = '.(int)$this->id;
+        }
+
+    	return Db::getInstance()->delete('htl_room_type_feature_pricing_group', $condition);
+    }
+
+    /**
+     * Add customer groups associated to the object
+     * @param array $groups groups
+     */
+    public function addGroups($groups)
+    {
+        if ($groups && !empty($groups)) {
+            foreach ($groups as $group) {
+                $row = array('id_feature_price' => (int)$this->id, 'id_group' => (int)$group);
+                Db::getInstance()->insert('htl_room_type_feature_pricing_group', $row, false, true, Db::INSERT_IGNORE);
+            }
+        }
+    }
+
+    public function getGroups($idFeaturePrice)
+    {
+        $groups = array();
+        if ($results = Db::getInstance()->executeS(
+            ' SELECT `id_group` FROM '._DB_PREFIX_.'htl_room_type_feature_pricing_group
+            WHERE `id_feature_price` = '.(int)$idFeaturePrice
+        )) {
+            foreach ($results as $group) {
+                $groups[] = (int)$group['id_group'];
+            }
+        }
+        return $groups;
+    }
+
+    // Webservice:: get groups in the feature price
+    public function getWsGroups()
+    {
+        return Db::getInstance()->executeS('
+			SELECT fg.`id_group` as id
+			FROM '._DB_PREFIX_.'htl_room_type_feature_pricing_group fg
+			'.Shop::addSqlAssociation('group', 'fg').'
+			WHERE fg.`id_feature_price` = '.(int)$this->id
+        );
+    }
+
+    // Webservice:: set groups in the feature price
+    public function setWsGroups($result)
+    {
+        $groups = array();
+        foreach ($result as $row) {
+            $groups[] = $row['id'];
+        }
+        $this->cleanGroups();
+        $this->addGroups($groups);
+        return true;
     }
 }

@@ -44,6 +44,12 @@
 						{l s='Images' mod='hotelreservationsystem'}
 					</a>
 				</li>
+				<li>
+					<a href="#hotel-refund-policies" data-toggle="tab">
+						<i class="icon-file"></i>
+						{l s='Redund Policies' mod='hotelreservationsystem'}
+					</a>
+				</li>
 			</ul>
 			<div class="tab-content panel collapse in">
 				<div class="tab-pane active" id="hotel-information">
@@ -315,6 +321,92 @@
 									</table>
 								</div>
 							</div>
+						</div>
+					{else}
+						<div class="alert alert-warning">
+							{l s='Please save the hotel information before saving the hotel images.' mod='hotelreservationsystem'}
+						</div>
+					{/if}
+				</div>
+				<div class="tab-pane" id="hotel-refund-policies">
+					{if isset($hotel_info.id) && $hotel_info.id}
+						<div class="form-group">
+							<label for="active_refund" class="control-label col-sm-5">
+								<span title="" data-toggle="tooltip" class="label-tooltip" data-original-title='{l s='Enable, if you want to enable refund for this hotel.' mod='hotelreservationsystem'}'>{l s='Enable refund' mod='hotelreservationsystem'}</span>
+							</label>
+							<div class="col-sm-7">
+								<span class="switch prestashop-switch fixed-width-lg">
+									<input type="radio" value="1" id="active_refund_on" name="active_refund"
+									{if isset($smarty.post.active_refund)}{if $smarty.post.active_refund}checked="checked"{/if}{elseif isset($hotel_info) && $hotel_info.active_refund}checked="checked"{/if}>
+
+									<label for="active_refund_on">{l s='Yes' mod='hotelreservationsystem'}</label>
+
+									<input type="radio" value="0" id="active_refund_off" name="active_refund"
+									{if isset($smarty.post.active_refund)}{if !$smarty.post.active_refund}checked="checked"{/if}{elseif !isset($hotel_info)}checked="checked"{elseif isset($hotel_info) && !$hotel_info.active_refund}checked="checked"{/if}>
+
+									<label for="active_refund_off">{l s='No' mod='hotelreservationsystem'}</label>
+									<a class="slide-button btn"></a>
+								</span>
+							</div>
+						</div>
+						<div class="refund_rules_container" {if isset($smarty.post.active_refund)}{if !$smarty.post.active_refund}style="display:none;"{/if}{elseif !isset($hotel_info.active_refund) || !$hotel_info.active_refund}style="display:none;"{/if}>
+							{if isset($allRefundRules) && $allRefundRules}
+								<hr>
+								<div class="table-responsive">
+									<table class="table wk-htl-datatable">
+										<thead>
+											<tr>
+												<th></th>
+												<th></th>
+												<th>{l s='Id' mod='hotelreservationsystem'}</th>
+												<th>{l s='Name' mod='hotelreservationsystem'}</th>
+												<th>{l s='Full payment charges' mod='hotelreservationsystem'}</th>
+												<th>{l s='Advance payment charges' mod='hotelreservationsystem'}</th>
+												<th>{l s='Days before cancelation' mod='hotelreservationsystem'}</th>
+											</tr>
+										</thead>
+										<tbody id="slides">
+											{foreach from=$allRefundRules item=refundRule}
+												<tr id="slides_{$refundRule.id_refund_rule}">
+													<td>
+														<i class="icon-arrows "></i>
+													</td>
+													<td>
+														<p class="checkbox">
+															<label><input name="htl_refund_rules[]" type="checkbox" class="checkbox" value="{$refundRule.id_refund_rule}" {if isset($hotelRefundRules) && ($refundRule.id_refund_rule|in_array:$hotelRefundRules)}checked{/if} /></label>
+														</p>
+													</td>
+													<td>
+														{$refundRule.id_refund_rule|escape:'html':'UTF-8'} <a target="blank" href="{$link->getAdminLink('AdminOrderRefundRules')|escape:'html':'UTF-8'}&amp;id_refund_rule={$refundRule.id_refund_rule|escape:'html':'UTF-8'}&amp;updatehtl_order_refund_rules"><i class="icon-external-link-sign"></i></a>
+													</td>
+													<td>
+														{$refundRule['name']|escape:'html':'UTF-8'}
+													</td>
+													<td>
+														{if $refundRule['payment_type'] == $WK_REFUND_RULE_PAYMENT_TYPE_PERCENTAGE}
+															{$refundRule['deduction_value_full_pay']|escape:'html':'UTF-8'} %
+														{else}
+															{displayPrice price=$refundRule['deduction_value_full_pay'] currency=$defaultCurrency}
+														{/if}
+													</td>
+													<td>
+														{if $refundRule['payment_type'] == $WK_REFUND_RULE_PAYMENT_TYPE_PERCENTAGE}
+															{$refundRule['deduction_value_adv_pay']|escape:'html':'UTF-8'} %
+														{else}
+															{displayPrice price=$refundRule['deduction_value_adv_pay'] currency=$defaultCurrency}
+														{/if}
+													</td>
+													<td>{$refundRule['days']|escape:'html':'UTF-8'} {l s='days' mod='hotelreservationsystem'}</td>
+												</tr>
+											{/foreach}
+										</tbody>
+									</table>
+								</div>
+							{else}
+								<div class="alert alert-warning">
+									{l s='No refund rules are created yet.' mod='hotelreservationsystem'} {l s='You can create refund rules by visiting '} <a target="_blank" href="{$link->getAdminLink('AdminOrderRefundRules')}">{l s='create refund rules'}</a>
+								</div>
+							{/if}
 						</div>
 					{else}
 						<div class="alert alert-warning">

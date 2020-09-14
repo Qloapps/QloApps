@@ -1,0 +1,89 @@
+/**
+* 2010-2020 Webkul.
+*
+* NOTICE OF LICENSE
+*
+* All right is reserved,
+* Please go through this link for complete license : https://store.webkul.com/license.html
+*
+* DISCLAIMER
+*
+* Do not edit or add to this file if you wish to upgrade this module to newer
+* versions in the future. If you wish to customize this module for your
+* needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
+*
+*  @author    Webkul IN <support@webkul.com>
+*  @copyright 2010-2020 Webkul IN
+*  @license   https://store.webkul.com/license.html
+*/
+
+
+.header-rmsearch-container {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;}
+.header-rmsearch-hide-xs {
+  background-image: url("../img/black-opacity-5.png");}
+.header-rmsearch-show-xs {
+  background-color: #ffffff;
+  top: 0;}
+.header-rmsearch-wrapper {
+  display: table;
+  height: 100%;
+  width: 100%;}
+.header-rmsearch-primary {
+  display: table-cell;
+  vertical-align: middle;
+  text-align: center;}
+.header-rmsearch-inner-wrapper {
+  margin-top: 30px;
+  margin-bottom: 15px;}
+#make_booking_btn {
+  background-color: #BF9958;
+  width: 155px;
+  height: 50px;
+  color: #ffffff;
+  font-size: 18px;
+  font-family: 'PT Serif', serif;
+  font-weight: 400;}
+#make_booking_btn_div {
+  margin-top: 20px;
+  text-align: center;}
+
+.fancy_search_header_xs {
+  margin-top: 25px;
+  padding-left: 15px;
+  padding-right: 15px;
+  text-align: left;
+  font-size: 22px;}
+.fancy_search_header_xs hr {
+    border: 1px solid #379bf0;
+    float: left;
+    margin-top: 5px;
+    width: 125px;}
+
+#search_hotel_block_form .header-rmsearch-input {
+  height: 55px;}
+.header-rmsearch-show-xs {
+  background-color: #ffffff;
+  top: 0;}
+#search_hotel_block_form .header-rmsearch-input {
+  height: 55px;}
+#search_hotel_block_form #search_room_submit {
+  padding: 5px;
+  box-shadow: 0 0 20px 0 rgba(18,146,255,0.42);}
+@media (min-width: 768px) {
+  #search_hotel_block_form .input-date {
+    background-position: 92% 50%;}
+  #search_hotel_block_form .check_in_field_block {
+    padding-right:5px;}
+  #search_hotel_block_form .check_out_field_block {
+    padding-left:5px;}}
+
+@media (min-width: 768px) and (max-width: 1199px) {
+  #search_hotel_block_form #hotel_location, #search_hotel_block_form #id_hotel_button {
+    padding-left: 40px;
+    padding-right: 30px;}
+}

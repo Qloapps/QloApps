@@ -39,11 +39,11 @@ class Blockreinsurance extends Module
 			$this->tab = 'front_office_features';
 		else
 			$this->tab = 'Blocks';
-		$this->version = '2.2.1';
+		$this->version = '2.2.2';
 		$this->author = 'PrestaShop';
 
 		$this->bootstrap = true;
-		parent::__construct();	
+		parent::__construct();
 
 		$this->displayName = $this->l('Customer reassurance block');
 		$this->description = $this->l('Adds an information block aimed at offering helpful information to reassure customers that your store is trustworthy.');
@@ -59,7 +59,7 @@ class Blockreinsurance extends Module
 			// Disable on mobiles and tablets
 			$this->disableDevice(Context::DEVICE_TABLET | Context::DEVICE_MOBILE);
 	}
-	
+
 	public function installDB()
 	{
 		$return = true;
@@ -70,7 +70,7 @@ class Blockreinsurance extends Module
 				`file_name` VARCHAR(100) NOT NULL,
 				PRIMARY KEY (`id_reinsurance`)
 			) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8 ;');
-		
+
 		$return &= Db::getInstance()->execute('
 			CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'reinsurance_lang` (
 				`id_reinsurance` INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -78,7 +78,7 @@ class Blockreinsurance extends Module
 				`text` VARCHAR(300) NOT NULL,
 				PRIMARY KEY (`id_reinsurance`, `id_lang`)
 			) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8 ;');
-		
+
 		return $return;
 	}
 
@@ -148,7 +148,7 @@ class Blockreinsurance extends Module
 				$reinsurance = new reinsuranceClass();
 			$reinsurance->copyFromPost();
 			$reinsurance->id_shop = $this->context->shop->id;
-			
+
 			if ($reinsurance->validateFields(false) && $reinsurance->validateFieldsLang(false))
 			{
 				$reinsurance->save();
@@ -160,7 +160,7 @@ class Blockreinsurance extends Module
 						return false;
 					elseif (!ImageManager::resize($tmpName, dirname(__FILE__).'/img/reinsurance-'.(int)$reinsurance->id.'-'.(int)$reinsurance->id_shop.'.jpg'))
 						return false;
-					unlink($tmpName);
+					Tools::deleteImage($tmpName); // by webkul
 					$reinsurance->file_name = 'reinsurance-'.(int)$reinsurance->id.'-'.(int)$reinsurance->id_shop.'.jpg';
 					$reinsurance->save();
 				}
@@ -169,7 +169,7 @@ class Blockreinsurance extends Module
 			else
 				$html .= '<div class="conf error">'.$this->l('An error occurred while attempting to save.').'</div>';
 		}
-		
+
 		if (Tools::isSubmit('updateblockreinsurance') || Tools::isSubmit('addblockreinsurance'))
 		{
 			$helper = $this->initForm();
@@ -178,7 +178,7 @@ class Blockreinsurance extends Module
 				{
 					$reinsurance = new reinsuranceClass((int)$id_reinsurance);
 					$helper->fields_value['text'][(int)$lang['id_lang']] = $reinsurance->text[(int)$lang['id_lang']];
-				}	
+				}
 				else
 					$helper->fields_value['text'][(int)$lang['id_lang']] = Tools::getValue('text_'.(int)$lang['id_lang'], '');
 			if ($id_reinsurance = Tools::getValue('id_reinsurance'))
@@ -186,14 +186,12 @@ class Blockreinsurance extends Module
 				$this->fields_form[0]['form']['input'][] = array('type' => 'hidden', 'name' => 'id_reinsurance');
 				$helper->fields_value['id_reinsurance'] = (int)$id_reinsurance;
  			}
-				
+
 			return $html.$helper->generateForm($this->fields_form);
 		}
 		else if (Tools::isSubmit('deleteblockreinsurance'))
 		{
 			$reinsurance = new reinsuranceClass((int)$id_reinsurance);
-			if (file_exists(dirname(__FILE__).'/img/'.$reinsurance->file_name))
-				unlink(dirname(__FILE__).'/img/'.$reinsurance->file_name);
 			$reinsurance->delete();
 			$this->_clearCache('blockreinsurance.tpl');
 			Tools::redirectAdmin(AdminController::$currentIndex.'&configure='.$this->name.'&token='.Tools::getAdminTokenLite('AdminModules'));
@@ -351,7 +349,7 @@ class Blockreinsurance extends Module
 			array('text' => $this->l('Free Shipping.'), 'file_name' => 'reinsurance-4-1.jpg'),
 			array('text' => $this->l('100% secure payment processing.'), 'file_name' => 'reinsurance-5-1.jpg')
 		);
-		
+
 		foreach($tab_texts as $tab)
 		{
 			$reinsurance = new reinsuranceClass();

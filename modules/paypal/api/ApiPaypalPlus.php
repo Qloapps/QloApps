@@ -267,14 +267,11 @@ class ApiPaypalPlus
         /* Item */
         // ojects needed to get advance paid amount
         if ($cartItems = $cart->getProducts()) {
-            $objCustomerAdv = new HotelCustomerAdvancedPayment();
             $objAdvPayment = new HotelAdvancedPayment();
             $objCartBooking = new HotelCartBookingData();
             foreach ($cartItems as $cartItem) {
                 // set advance product price if customer chhoses advance payment
-                if (Configuration::get('WK_ALLOW_ADVANCED_PAYMENT')
-                    && $objCustomerAdv->getClientAdvPaymentDtl($this->context->cart->id, $this->context->cart->id_guest)
-                ) {
+                if ($this->context->cart->is_advance_payment) {
                     $cartItem['price_wt'] = $cartItem['price'] = $objAdvPayment->getProductMinAdvPaymentAmountByIdCart(
                         $this->context->cart->id,
                         $cartItem['id_product']
@@ -368,14 +365,10 @@ class ApiPaypalPlus
     public function getCartPaymentTotal($withTax = true)
     {
         $context = Context::getContext();
-        if (Configuration::get('WK_ALLOW_ADVANCED_PAYMENT')) {
-            $objCustAdvPay = new HotelCustomerAdvancedPayment();
-            $orderTotal = $objCustAdvPay->getOrdertTotal(
-                $context->cart->id,
-                $context->cart->id_guest
-            );
+        if ($context->cart->is_advance_payment) {
+            $orderTotal = $context->cart->getOrderTotal(true, Cart::ADVANCE_PAYMENT);
         } else {
-            $orderTotal = $context->cart->getOrderTotal($withTax, Cart::BOTH);
+            $orderTotal = $context->cart->getOrderTotal(true, Cart::BOTH);
         }
         return $orderTotal;
     }

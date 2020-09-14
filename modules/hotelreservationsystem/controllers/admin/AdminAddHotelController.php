@@ -1,6 +1,6 @@
 <?php
 /**
-* 2010-2018 Webkul.
+* 2010-2020 Webkul.
 *
 * NOTICE OF LICENSE
 *
@@ -14,7 +14,7 @@
 * needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
 *
 *  @author    Webkul IN <support@webkul.com>
-*  @copyright 2010-2018 Webkul IN
+*  @copyright 2010-2020 Webkul IN
 *  @license   https://store.webkul.com/license.html
 */
 
@@ -115,6 +115,8 @@ class AdminAddHotelController extends ModuleAdminController
         $smartyVars['languages'] = Language::getLanguages(false);
         $smartyVars['currentLang'] = Language::getLanguage((int) $currentLangId);
 
+        $smartyVars['defaultCurrency'] = Configuration::get('PS_CURRENCY_DEFAULT');
+
         $countries = Country::getCountries($this->context->language->id, true);
         $smartyVars['country_var'] = $countries;
 
@@ -139,13 +141,24 @@ class AdminAddHotelController extends ModuleAdminController
             $smartyVars['hotel_info'] =  $hotelBranchInfo;
             //Hotel Images
             $objHotelImage = new HotelImage();
-            $hotelAllImages = $objHotelImage->getAllImagesByHotelId($idHotel);
-            if ($hotelAllImages) {
+            if ($hotelAllImages = $objHotelImage->getAllImagesByHotelId($idHotel)) {
                 foreach ($hotelAllImages as &$image) {
-                    $image['image_link'] = _MODULE_DIR_.$this->module->name.'/views/img/hotel_img/'.
+                    $image['image_link'] = $this->context->link->getMediaLink(_MODULE_DIR_.$this->module->name.'/views/img/hotel_img/'.$image['hotel_image_id'].'.jpg');
                     $image['hotel_image_id'].'.jpg';
                 }
                 $smartyVars['hotelImages'] =  $hotelAllImages;
+            }
+
+            $objRefundRules = new HotelOrderRefundRules();
+            if ($allRefundRules = $objRefundRules->getAllOrderRefundRules(0, $idHotel)) {
+                $smartyVars['allRefundRules'] =  $allRefundRules;
+                $smartyVars['WK_REFUND_RULE_PAYMENT_TYPE_PERCENTAGE'] = HotelOrderRefundRules::WK_REFUND_RULE_PAYMENT_TYPE_PERCENTAGE;
+                $smartyVars['WK_REFUND_RULE_PAYMENT_TYPE_FIXED'] = HotelOrderRefundRules::WK_REFUND_RULE_PAYMENT_TYPE_FIXED;
+                // send hotel refund rules
+                $objBranchRefundRules = new HotelBranchRefundRules();
+                if ($hotelRefundRules = $objBranchRefundRules->getHotelRefundRules($idHotel)) {
+                    $smartyVars['hotelRefundRules'] =  array_column($hotelRefundRules, 'id_refund_rule');
+                }
             }
         }
 
@@ -181,6 +194,7 @@ class AdminAddHotelController extends ModuleAdminController
         $zipcode = Tools::getValue('hotel_postal_code');
         $address = Tools::getValue('address');
         $active = Tools::getValue('ENABLE_HOTEL');
+        $activeRefund = Tools::getValue('active_refund');
         $latitude = Tools::getValue('loclatitude');
         $longitude = Tools::getValue('loclongitude');
         $map_formated_address = Tools::getValue('locformatedAddr');
@@ -294,6 +308,8 @@ class AdminAddHotelController extends ModuleAdminController
                 }
             }
             $objHotelBranch->active = $active;
+            $objHotelBranch->active_refund = $activeRefund;
+
             // lang fields
             $hotelCatName = array();
             foreach ($languages as $lang) {
@@ -370,6 +386,29 @@ class AdminAddHotelController extends ModuleAdminController
             $categsBeforeUpd = $objHotelBranch->getAllHotelCategories();
 
             if ($newIdHotel = $objHotelBranch->id) {
+                // Save refund rules of the hotels
+                if ($hotelRefundRules = Tools::getValue('htl_refund_rules')) {
+                    foreach ($hotelRefundRules as $key => $idRefundRule) {
+                        $objBranchRefundRules = new HotelBranchRefundRules();
+                        if (!$objBranchRefundRules->getHotelRefundRules(
+                            $newIdHotel,
+                            $idRefundRule
+                        )) {
+                            $objBranchRefundRules->id_hotel = $newIdHotel;
+                            $objBranchRefundRules->id_refund_rule = $idRefundRule;
+                            $objBranchRefundRules->position = $key + 1;
+                            $objBranchRefundRules->save();
+                        }
+                    }
+                }
+                // delete unselected (but previously selected refund values)
+                $objBranchRefundRules = new HotelBranchRefundRules();
+                $objBranchRefundRules->deleteHotelRefundRules(
+                    $newIdHotel,
+                    0,
+                    $hotelRefundRules
+                );
+
                 $groupIds = array();
                 if ($dataGroupIds = Group::getGroups($this->context->language->id)) {
                     foreach ($dataGroupIds as $key => $value) {
@@ -520,7 +559,6 @@ class AdminAddHotelController extends ModuleAdminController
         if ($idImage = Tools::getValue('id_image')) {
             if ($idHotel = Tools::getValue('id_hotel')) {
                 if (Validate::isLoadedObject($objHtlImage = new HotelImage((int) $idImage))) {
-                    $imgCode = $objHtlImage->hotel_image_id;
                     if ($objHtlImage->delete()) {
                         if (!HotelImage::getCover($idHotel)) {
                             $images = $objHtlImage->getAllImagesByHotelId($idHotel);
@@ -530,9 +568,6 @@ class AdminAddHotelController extends ModuleAdminController
                                 $objHtlImage->save();
                             }
                         }
-                        if (file_exists(_PS_MODULE_DIR_.$this->module->name.'/views/img/hotel_img/'.$imgCode.'.jpg')) {
-                            @unlink(_PS_MODULE_DIR_.$this->module->name.'/views/img/hotel_img/'.$imgCode.'.jpg');
-                        }
                         die(true);
                     }
                 }
@@ -541,13 +576,47 @@ class AdminAddHotelController extends ModuleAdminController
         die(false);
     }
 
+    public function ajaxProcessUpdateSlidesPosition()
+    {
+        if (($slideIds = Tools::getValue('slides'))
+            && ($idHotel = Tools::getValue('id_hotel'))
+        ) {
+            $position = 1;
+            $objBranchRefundRule = new HotelBranchRefundRules();
+             foreach ($slideIds as $idRefundRule) {
+                if ($hotelRefundRule = $objBranchRefundRule->getHotelRefundRules($idHotel, $idRefundRule)) {
+                    $hotelRefundRule = reset($hotelRefundRule);
+                    $objBranchRefundRule = new HotelBranchRefundRules($hotelRefundRule['id_hotel_refund_rule']);
+                    $objBranchRefundRule->position = $position;
+                    $objBranchRefundRule->save();
+                    $position += 1;
+                }
+            }
+            die(1);
+        }
+        die(0);
+    }
+
     public function setMedia()
     {
         parent::setMedia();
+
+        HotelHelper::assignDataTableVariables();
+        $this->context->controller->addJS(
+            _MODULE_DIR_.$this->module->name.'/libs/datatable/jquery.dataTables.min.js'
+        );
+        $this->context->controller->addJS(
+            _MODULE_DIR_.$this->module->name.'/libs/datatable/dataTables.bootstrap.js'
+        );
+        $this->context->controller->addCSS(
+            _MODULE_DIR_.$this->module->name.'/views/css/libs/datatable/datatable_bootstrap.css'
+        );
+
         Media::addJsDef(
             array(
                 'filesizeError' => $this->l('File exceeds maximum size.'),
                 'maxSizeAllowed' => Tools::getMaxUploadSize(),
+                'sortRowsUrl' => $this->context->link->getAdminLink('AdminAddHotel'),
             )
         );
         // GOOGLE MAP
@@ -565,6 +634,9 @@ class AdminAddHotelController extends ModuleAdminController
         } else {
             $this->addJS(_PS_JS_DIR_.'tinymce.inc.js');
         }
+
+        $this->addJqueryUI('ui.sortable');
+
         $this->addJS(_MODULE_DIR_.$this->module->name.'/views/js/hotelImage.js');
         $this->addJS(_MODULE_DIR_.$this->module->name.'/views/js/HotelReservationAdmin.js');
         $this->addCSS(_MODULE_DIR_.$this->module->name.'/views/css/HotelReservationAdmin.css');

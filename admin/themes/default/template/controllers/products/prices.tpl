@@ -338,10 +338,17 @@ $(document).ready(function () {
 
 				<div class="row" id="type_amount">
 					<label class="control-label col-sm-2">{l s='Amount'}</label>
-					<div class="col-sm-4 col-lg-3">
-						<div class="input-group">
-							<span class="input-group-addon">{$currency->prefix}{$currency->suffix}</span>
-							<input name="adv_pay_amount" type="text" value="{if isset($adv_pay_dtl) && ($adv_pay_dtl['payment_type'] == 2)}{{toolsConvertPrice price=$adv_pay_dtl['value']}|string_format:'%.6f'}{/if}"/>
+					<div class="col-sm-9">
+						<div class="row">
+							<div class="col-sm-4 col-lg-3">
+								<div class="input-group">
+									<span class="input-group-addon">{$currency->prefix}{$currency->suffix}</span>
+									<input name="adv_pay_amount" type="text" value="{if isset($adv_pay_dtl) && ($adv_pay_dtl['payment_type'] == 2)}{{toolsConvertPrice price=$adv_pay_dtl['value']}|string_format:'%.6f'}{/if}"/>
+								</div>
+							</div>
+						</div>
+						<div class="help-block">
+							{l s='If final price of the room type is less than advance payment amount for the customer then customer will pay the final(lesser) price of the room type.'}
 						</div>
 					</div>
 				</div>

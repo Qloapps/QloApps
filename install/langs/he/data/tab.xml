@@ -31,7 +31,7 @@
   <tab id="Attachments" name="קבצים מצורפים"/>
   <tab id="Orders_1" name="הזמנות"/>
   <tab id="Invoices" name="חשבוניות"/>
-  <tab id="Merchandise_Returns" name="החזרת מוצרים"/>
+  <!-- <tab id="Merchandise_Returns" name="החזרת מוצרים"/> -->
   <tab id="Delivery_Slips" name="שוברי משלוח"/>
   <tab id="Credit_Slips" name="שוברי זיכוי"/>
   <tab id="Statuses" name="סטטוסי הזמנה ומלאי"/>

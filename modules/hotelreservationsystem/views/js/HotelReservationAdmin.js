@@ -71,6 +71,14 @@ $(document).ready(function() {
         format: 'H:i'
     });
 
+    $("input[name='active_refund']").on('change', function () {
+        if (parseInt($(this).val())) {
+            $('.refund_rules_container').show();
+        } else {
+            $('.refund_rules_container').hide();
+        }
+    });
+
     // For hotel Features
     function close_accordion_section() {
         $('.accordion .accordion-section-title').removeClass('active');
@@ -635,30 +643,6 @@ $(document).ready(function() {
 
     /* ---- Book Now page Admin ---- */
 
-    /* ----  HotelOrderRefundRulesController Admin ---- */
-
-    $('#refund_payment_type').on('change', function() {
-        if ($('#refund_payment_type').val() == 2) {
-            $(".payment_type_icon").text(defaultcurrency_sign);
-        } else if ($('#refund_payment_type').val() == 1) {
-            $(".payment_type_icon").text('%');
-        } else {
-            $(".payment_type_icon").text(defaultcurrency_sign);
-        }
-    });
-
-    //js for HotelOrderRefundRequestController
-    $('#id_order_cancellation_stage').on('change', function() {
-        if ($('#id_order_cancellation_stage').val() == 3) {
-            $(".cancellation_charge_div").show();
-        } else {
-            $(".cancellation_charge_div").hide();
-        }
-    });
-
-    /* ----  HotelOrderRefundRulesController Admin ---- */
-
-
     /* ----  HotelConfigurationSettingController Admin ---- */
 
     if ($('#WK_SHOW_MSG_ON_BO_on').prop('checked') === true) {
@@ -688,7 +672,7 @@ $(document).ready(function() {
         minDate: 0,
     });
 
-    //$( "#max_global_book_date" ).datepicker( "option", "maxDate", '20 Mar 2016');
+    //$( "#max_global_book_date" ).datepicker( "option", "maxDate", '20 Mar 2020');
     /*END*/
     if ($('#googleMapContainer').length) {
         // Initiate Google map
@@ -1010,6 +994,50 @@ $(document).ready(function() {
 			}
 		}
     });
+
+    // Display datatables in lead request page
+    if ($("table.wk-htl-datatable").length) {
+        wkDataTable = $('table.wk-htl-datatable').DataTable({
+            "order": [],
+            "columnDefs": [{
+                "targets": 'no-sort',
+                "orderable": false,
+            }],
+            "language": {
+                "lengthMenu": display_name + " _MENU_ " + records_name,
+                "zeroRecords": no_product,
+                "info": show_page + " _PAGE_ " + show_of + " _PAGES_ ",
+                "infoEmpty": no_record,
+                "infoFiltered": "(" + filter_from + " _MAX_ " + t_record + ")",
+                "sSearch": search_item,
+                "oPaginate": {
+                    "sPrevious": p_page,
+                    "sNext": n_page
+                }
+            }
+        });
+    }
+
+    // ui.sorttable drag drop
+    if ($("#slides").length) {
+        $(function() {
+            var $mySlides = $("#slides");
+            $mySlides.sortable({
+                cursor: "move",
+                update: function() {
+                    var order = $(this).sortable("serialize") + "&action=updateSlidesPosition&ajax=true&id_hotel="+
+                    $('#id-hotel').val();
+                    $.post(sortRowsUrl, order);
+                }
+            });
+            $mySlides.hover(function() {
+                $(this).css("cursor","move");
+                },
+                function() {
+                $(this).css("cursor","auto");
+            });
+        });
+    }
 });
 
 function showFeaturePriceRuleLangField(lang_iso_code, id_lang)

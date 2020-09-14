@@ -1,6 +1,6 @@
 <?php
 /**
-* 2010-2018 Webkul.
+* 2010-2020 Webkul.
 *
 * NOTICE OF LICENSE
 *
@@ -14,7 +14,7 @@
 * needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
 *
 *  @author    Webkul IN <support@webkul.com>
-*  @copyright 2010-2018 Webkul IN
+*  @copyright 2010-2020 Webkul IN
 *  @license   https://store.webkul.com/license.html
 */
 
@@ -40,6 +40,7 @@ class HotelBranchInformation extends ObjectModel
     public $longitude;
     public $map_formated_address;
     public $map_input_text;
+    public $active_refund;
     public $date_add;
     public $date_upd;
 
@@ -64,6 +65,7 @@ class HotelBranchInformation extends ObjectModel
             'longitude' => array('type' => self::TYPE_FLOAT),
             'map_formated_address' => array('type' => self::TYPE_HTML, 'size' => 128),
             'map_input_text' => array('type' => self::TYPE_STRING, 'size' => 128),
+            'active_refund' => array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
             'date_add' => array('type' => self::TYPE_DATE, 'validate' => 'isDate', 'copy_post' => false),
             'date_upd' => array('type' => self::TYPE_DATE, 'validate' => 'isDate', 'copy_post' => false),
             //lang fields
@@ -75,13 +77,44 @@ class HotelBranchInformation extends ObjectModel
 
     protected $webserviceParameters = array(
         'objectsNodeName' => 'hotels',
-        'objectNodeName' => 'htl_branch_info',
+        'objectNodeName' => 'hotel',
+        'objectMethods' => array(
+            'add' => 'addWs',
+            'delete' => 'deleteWs',
+            'update' => 'updateWs',
+        ),
+
         'fields' => array(
-            'currency' => array(
-                'getter' => 'getWsDefaultCurrencyCode',
+            'id_default_image' => array(
+                'getter' => 'getCoverWs',
+                'xlink_resource' => array(
+                    'resourceName' => 'hotel_images',
+                )
             ),
-            'timezone' => array(
-                'getter' => 'getWsTimezone',
+            'max_order_date' => array(
+                'getter' => 'getWsMaxOrderDate',
+                'setter' => 'setWsMaxOrderDate',
+            ),
+        ),
+
+        'associations' => array(
+            'room_types' => array(
+                'setter' => false,
+                'resource' => 'room_types',
+                'fields' => array('id' => array())
+            ),
+            'hotel_images' => array(
+                'setter' => false,
+                'resource' => 'image',
+                'fields' => array('id' => array())
+            ),
+            'hotel_features' => array(
+                'resource' => 'hotel_feature',
+                'fields' => array('id' => array('required' => true))
+            ),
+            'hotel_refund_rules' => array(
+                'resource' => 'hotel_refund_rule',
+                'fields' => array('id' => array('required' => true))
             ),
         ),
     );
@@ -112,9 +145,7 @@ class HotelBranchInformation extends ObjectModel
         if (!$context) {
             $context = Context::getContext();
         }
-        if (!$context->employee || !$context->employee->id_profile) {
-            return false;
-        }
+
         /* Profile selection */
         $profiles = Db::getInstance()->executeS('SELECT `id_profile` FROM '._DB_PREFIX_.'profile WHERE `id_profile` != 1');
         if (!$profiles || empty($profiles)) {
@@ -125,7 +156,11 @@ class HotelBranchInformation extends ObjectModel
         $query .= ' VALUES '.'(1, '.(int)$idHotel.', 1),';
 
         foreach ($profiles as $profile) {
-            $access = ($profile['id_profile'] == $context->employee->id_profile) ? 1 : 0;
+            $access = 0;
+            if (isset($context->employee->id_profile)) {
+                $access = ($profile['id_profile'] == $context->employee->id_profile) ? 1 : 0;
+            }
+
             $query .= ' ('.(int)$profile['id_profile'].', '.(int)$idHotel.', '.(int)$access.'),';
         }
         $query = trim($query, ', ');
@@ -263,19 +298,6 @@ class HotelBranchInformation extends ObjectModel
             }
         }
         return array();
-    }
-
-    // Web Services Code
-    public function getWsDefaultCurrencyCode()
-    {
-        $id_currency = Configuration::get('PS_CURRENCY_DEFAULT');
-        $currency = new Currency((int) $id_currency);
-        return $currency->iso_code;
-    }
-
-    public function getWsTimezone()
-    {
-        return Configuration::get('PS_TIMEZONE');
     }
 
     public function hotelBranchesInfo($idLang = false, $active = 2, $detailedInfo = 0, $idHotel = 0)
@@ -512,6 +534,7 @@ class HotelBranchInformation extends ObjectModel
         } else {
             return false;
         }
+
         return $return;
     }
 
@@ -584,9 +607,9 @@ class HotelBranchInformation extends ObjectModel
             $hotelAllImages = $objHotelImage->getAllImagesByHotelId($idHotel);
             if ($hotelAllImages) {
                 foreach ($hotelAllImages as $key_img => $value_img) {
-                    $path_img = _PS_MODULE_DIR_.'hotelreservationsystem/views/img/hotel_img/'.
-                    $value_img['hotel_image_id'].'.jpg';
-                    @unlink($path_img);
+                    if (Validate::isLoadedObject($objHotelImage = new HotelImage((int) $value_img['id']))) {
+                        $objHotelImage->deleteImage();
+                    }
                 }
             }
             if (!$objHotelImage->deleteByHotelId($idHotel)) {
@@ -670,5 +693,243 @@ class HotelBranchInformation extends ObjectModel
             }
         }
         return true;
+    }
+
+    public function isRefundable()
+    {
+        return (Configuration::get('WK_ORDER_REFUND_ALLOWED') && $this->active_refund);
+    }
+
+    // Webservice getter : get virtual field id_default_image
+    public function getCoverWs()
+    {
+        if ($result = HotelImage::getCover($this->id)) {
+            // we are sending id_hotel/id_image as per the url set for the hotel images
+            return $result['id_hotel'].'/'.$result['id'];
+        }
+        return false;
+    }
+
+    /**
+    * Webservice setter : set virtual field id_default_image in hotel images
+    * @return bool
+    */
+    public function setCoverWs($id_image)
+    {
+        // first unset the cover
+        Db::getInstance()->execute('UPDATE `'._DB_PREFIX_.'htl_image` SET `cover` = NULL
+			WHERE `id_hotel` = '.(int)$this->id);
+
+        // set the sent id of the image to the cover of the hotel
+        Db::getInstance()->execute('UPDATE `'._DB_PREFIX_.'htl_image` SET `cover` = 1 WHERE `id_image` = '.(int)$id_image);
+
+        return true;
+    }
+
+    // Webservice:: function to prepare id parameter for hotel images in a hotel api
+    public function getWsHotelImages()
+    {
+        $ids = array();
+        if ($hotelImages =  Db::getInstance()->executeS('SELECT * FROM `'._DB_PREFIX_.'htl_image` WHERE `id_hotel` = '.(int)$this->id)) {
+            foreach ($hotelImages as $key => $image) {
+                // we are sending id_hotel/id_image as per the url set for the hotel images
+                $ids[$key]['id'] = $image['id_hotel'].'/'.$image['id'];
+            }
+        }
+        return $ids;
+    }
+
+    // Webservice:: function to prepare id parameter for hotel features in a hotel api
+    public function getWsHotelFeatures()
+    {
+        return Db::getInstance()->executeS(
+            'SELECT `feature_id` as `id` FROM `'._DB_PREFIX_.'htl_branch_features` WHERE `id_hotel` = '.(int)$this->id.
+            ' ORDER BY `feature_id` ASC'
+        );
+    }
+
+    // Webservice:: function to prepare id parameter for hotel features in a hotel api
+    public function setWsHotelFeatures($branchFeatures)
+    {
+        Db::getInstance()->execute('
+			DELETE FROM `'._DB_PREFIX_.'htl_branch_features`
+			WHERE `id_hotel` = '.(int)$this->id
+        );
+
+        foreach ($branchFeatures as $feature) {
+            Db::getInstance()->execute('INSERT INTO `'._DB_PREFIX_.'htl_branch_features` (`id_hotel`, `feature_id`) VALUES ('.(int)$this->id.', '.(int)$feature['id'].')');
+        }
+
+        return true;
+    }
+
+    // Webservice:: function to get hotel refund rules in a hotel api
+    public function getWsHotelRefundRules()
+    {
+        return Db::getInstance()->executeS(
+            'SELECT `id_refund_rule` as `id` FROM `'._DB_PREFIX_.'htl_branch_refund_rules` WHERE `id_hotel` = '.(int)$this->id.' ORDER BY `id_refund_rule` ASC'
+        );
+    }
+
+    // Webservice:: function to set hotel refund rules in a hotel api
+    public function setWsHotelRefundRules($refundRules)
+    {
+        Db::getInstance()->execute('
+            DELETE FROM `'._DB_PREFIX_.'htl_branch_refund_rules`
+            WHERE `id_hotel` = '.(int)$this->id
+        );
+
+        foreach ($refundRules as $rule) {
+            Db::getInstance()->execute('INSERT INTO `'._DB_PREFIX_.'htl_branch_refund_rules` (`id_hotel`, `id_refund_rule`) VALUES ('.(int)$this->id.', '.(int)$rule['id'].')');
+        }
+
+        return true;
+    }
+
+    // Webservice :: get room types of the hotel
+    public function getWsRoomTypes()
+    {
+        return Db::getInstance()->executeS(
+            'SELECT `id_product` as `id` FROM `'._DB_PREFIX_.'htl_room_type` WHERE `id_hotel` = '.(int)$this->id.' ORDER BY `id` ASC'
+        );
+    }
+
+    // Webservice :: get max order date of the hotel
+    public function getWsMaxOrderDate()
+    {
+        return Db::getInstance()->getValue(
+            'SELECT `max_order_date` FROM `'._DB_PREFIX_.'htl_order_restrict_date` WHERE `id_hotel` = '.(int)$this->id.' ORDER BY `id` ASC'
+        );
+    }
+
+    // Webservice :: set max order date of the hotel
+    public function setWsMaxOrderDate($maxOrderDate)
+    {
+        if ($this->id) {
+            // delete previous
+            Db::getInstance()->execute('
+                DELETE FROM `'._DB_PREFIX_.'htl_order_restrict_date`
+                WHERE `id_hotel` = '.(int)$this->id
+            );
+
+            // set max_order_date for the hotel from request
+            return Db::getInstance()->execute('INSERT INTO `'._DB_PREFIX_.'htl_order_restrict_date` (`id_hotel`, `max_order_date`) VALUES ('.(int)$this->id.', \''.pSQL($maxOrderDate).'\')');
+        }
+    }
+
+    // Webservice :: function will run when hotel added from API
+    public function addWs($autodate = true, $null_values = false)
+    {
+        if ($this->add($autodate, $null_values)) {
+            // set categories of the hotel
+            $this->setWsHotelCategories();
+
+            $postData = trim(file_get_contents('php://input'));
+            libxml_use_internal_errors(true);
+            $xml = simplexml_load_string(utf8_decode($postData));
+
+            $hotelData = Tools::jsonDecode(Tools::jsonEncode($xml));
+            if (isset($hotelData->hotel->max_order_date)) {
+                if ($maxOrderDate = $hotelData->hotel->max_order_date) {
+                    $this->setWsMaxOrderDate($maxOrderDate);
+                }
+            }
+
+            return true;
+        }
+        return false;
+    }
+
+    // Webservice :: function will run when hotel updated from API
+    public function updateWs($null_values = false)
+    {
+        if ($this->update($null_values)) {
+            // set categories of the hotel
+            $this->setWsHotelCategories();
+
+            $postData = trim(file_get_contents('php://input'));
+            libxml_use_internal_errors(true);
+            $xml = simplexml_load_string(utf8_decode($postData));
+
+            $hotelData = Tools::jsonDecode(Tools::jsonEncode($xml));
+            if (isset($hotelData->hotel->max_order_date)) {
+                if ($maxOrderDate = $hotelData->hotel->max_order_date) {
+                    $this->setWsMaxOrderDate($maxOrderDate);
+                }
+            }
+
+            return true;
+        }
+        return false;
+    }
+
+    // Webservice :: function will run when hotel deleted from API
+    public function deleteWs()
+    {
+        if ($this->delete()) {
+            return true;
+        }
+        return false;
+    }
+
+    // Webservice:: create country, state, city, hotel categories after hotel creation
+    public function setWsHotelCategories()
+    {
+        if ($this->id) {
+            // hotel categories before save categories
+            $categsBeforeUpd = $this->getAllHotelCategories();
+
+
+            $idLang = Configuration::get('PS_LANG_DEFAULT');
+            $groupIds = array();
+            if ($dataGroupIds = Group::getGroups($idLang)) {
+                foreach ($dataGroupIds as $key => $value) {
+                    $groupIds[] = $value['id_group'];
+                }
+            }
+            $objCountry = new Country();
+            $countryName = $objCountry->getNameById($idLang, $this->country_id);
+            if ($catCountry = $this->addCategory($countryName, false, $groupIds)) {
+                if ($this->state_id) {
+                    $objState = new State();
+                    $stateName = $objState->getNameById($this->state_id);
+                    $catState = $this->addCategory($stateName, $catCountry, $groupIds);
+                } else {
+                    $catState = $this->addCategory($this->city, $catCountry, $groupIds);
+                }
+                if ($catState) {
+                    if ($catCity = $this->addCategory($this->city, $catState, $groupIds)) {
+                        $hotelCatName = $this->hotel_name;
+                        if ($catHotel = $this->addCategory(
+                            $hotelCatName, $catCity, $groupIds, 1, $this->id
+                        )) {
+                            $this->id_category = $catHotel;
+                            $this->save();
+                        }
+                    }
+                }
+            }
+
+            // hotel categories after save categories
+            $categsAfterUpd = $this->getAllHotelCategories();
+
+            // delete categories which not in hotel categories and also unused
+            if ($unusedCategs = array_diff($categsBeforeUpd, $categsAfterUpd)) {
+                if ($hotelCategories = $this->getAllHotelCategories()) {
+                    foreach ($unusedCategs as $idCategory) {
+                        if (!in_array($idCategory, $hotelCategories)
+                            && $idCategory != Configuration::get('PS_HOME_CATEGORY')
+                        ) {
+                            $objCategory = new Category($idCategory);
+                            $objCategory->delete();
+                        }
+                    }
+                }
+            }
+
+            return true;
+        }
+
+        return false;
     }
 }

@@ -1,6 +1,6 @@
 <?php
 /**
-* 2010-2018 Webkul.
+* 2010-2020 Webkul.
 *
 * NOTICE OF LICENSE
 *
@@ -14,7 +14,7 @@
 * needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
 *
 *  @author    Webkul IN <support@webkul.com>
-*  @copyright 2010-2018 Webkul IN
+*  @copyright 2010-2020 Webkul IN
 *  @license   https://store.webkul.com/license.html
 */
 
@@ -32,7 +32,7 @@ class WkHotelFeaturesBlock extends Module
     {
         $this->name = 'wkhotelfeaturesblock';
         $this->tab = 'front_office_features';
-        $this->version = '2.0.2';
+        $this->version = '2.0.3';
         $this->author = 'webkul';
         $this->bootstrap = true;
         parent::__construct();
@@ -163,10 +163,10 @@ class WkHotelFeaturesBlock extends Module
     public function uninstall()
     {
         if (!parent::uninstall()
+            || !$this->deleteHotelAmenityImg()
             || !$this->uninstallTab()
             || !$this->deleteTables()
             || !$this->deleteConfigKeys()
-            || !$this->deleteHotelAmenityImg()
         ) {
             return false;
         }
@@ -176,10 +176,12 @@ class WkHotelFeaturesBlock extends Module
 
     public function deleteHotelAmenityImg()
     {
-        $uploadedImg = glob(_PS_MODULE_DIR_.$this->name.'/views/img/hotels_features_img/*.jpg');
-        if ($uploadedImg) {
-            foreach ($uploadedImg as $amenityImg) {
-                unlink($amenityImg);
+        $objFeaturesData = new WkHotelFeaturesData();
+        $hotelAmenities = $objFeaturesData->getHotelAmenities();
+        foreach ($hotelAmenities as $amenity) {
+            $objFeaturesData = new WkHotelFeaturesData($amenity['id_features_block']);
+            if (Validate::isLoadedObject($objFeaturesData)) {
+                $objFeaturesData->deleteImage(true);
             }
         }
         return true;

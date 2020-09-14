@@ -30,6 +30,9 @@ class OrderCore extends ObjectModel
     const ROUND_LINE = 2;
     const ROUND_TOTAL = 3;
 
+    // payment type for the customer on checkout page
+    const ORDER_PAYMENT_TYPE_FULL = 1;
+    const ORDER_PAYMENT_TYPE_ADVANCE = 2;
 
     /** @var int Delivery address id */
     public $id_address_delivery;
@@ -175,6 +178,16 @@ class OrderCore extends ObjectModel
     public $round_type;
 
     /**
+    * @var int is_advance_payment used to determine if this order is paid as advance payment or full payment
+    */
+    public $is_advance_payment;
+
+    /**
+    * @var int advance_paid_amount used to save paid amount for the advance payment
+    */
+    public $advance_paid_amount;
+
+    /**
      * @see ObjectModel::$definition
      */
     public static $definition = array(
@@ -189,7 +202,7 @@ class OrderCore extends ObjectModel
             'id_shop' =>                    array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
             'id_lang' =>                    array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => true),
             'id_customer' =>                array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => true),
-            'id_carrier' =>                array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => true),
+            'id_carrier' =>                array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
             'current_state' =>                array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
             'secure_key' =>                array('type' => self::TYPE_STRING, 'validate' => 'isMd5'),
             'payment' =>                    array('type' => self::TYPE_STRING, 'validate' => 'isGenericName', 'required' => true),
@@ -225,6 +238,8 @@ class OrderCore extends ObjectModel
             'source' =>                        array('type' => self::TYPE_STRING),
             'valid' =>                        array('type' => self::TYPE_BOOL),
             'reference' =>                    array('type' => self::TYPE_STRING),
+            'is_advance_payment' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'default' => 0),
+            'advance_paid_amount' => array('type' => self::TYPE_FLOAT, 'validate' => 'isPrice'),
             'date_add' =>                    array('type' => self::TYPE_DATE, 'validate' => 'isDate'),
             'date_upd' =>                    array('type' => self::TYPE_DATE, 'validate' => 'isDate'),
         ),
@@ -249,31 +264,36 @@ class OrderCore extends ObjectModel
             'module' => array('required' => true),
             'invoice_number' => array(),
             'invoice_date' => array(),
-            'delivery_number' => array(),
-            'delivery_date' => array(),
+            // 'delivery_number' => array(),
+            // 'delivery_date' => array(),
             'valid' => array(),
             'date_add' => array(),
             'date_upd' => array(),
-            'shipping_number' => array(
-                'getter' => 'getWsShippingNumber',
-                'setter' => 'setWsShippingNumber'
-            ),
+            // 'shipping_number' => array(
+            //     'getter' => 'getWsShippingNumber',
+            //     'setter' => 'setWsShippingNumber'
+            // ),
         ),
         'associations' => array(
-            'order_rows' => array('resource' => 'order_row', 'setter' => false, 'virtual_entity' => true,
-                'fields' => array(
-                    'id' =>  array(),
-                    'product_id' => array('required' => true),
-                    'product_attribute_id' => array('required' => true),
-                    'product_quantity' => array('required' => true),
-                    'product_name' => array('setter' => false),
-                    'product_reference' => array('setter' => false),
-                    'product_ean13' => array('setter' => false),
-                    'product_upc' => array('setter' => false),
-                    'product_price' => array('setter' => false),
-                    'unit_price_tax_incl' => array('setter' => false),
-                    'unit_price_tax_excl' => array('setter' => false),
-                )),
+            // 'order_rows' => array('resource' => 'order_row', 'setter' => false, 'virtual_entity' => true,
+            //     'fields' => array(
+            //         'id' =>  array(),
+            //         'product_id' => array('required' => true),
+            //         'product_attribute_id' => array('required' => true),
+            //         'product_quantity' => array('required' => true),
+            //         'product_name' => array('setter' => false),
+            //         'product_reference' => array('setter' => false),
+            //         'product_ean13' => array('setter' => false),
+            //         'product_upc' => array('setter' => false),
+            //         'product_price' => array('setter' => false),
+            //         'unit_price_tax_incl' => array('setter' => false),
+            //         'unit_price_tax_excl' => array('setter' => false),
+            //     )),
+            'bookings' => array(
+                'resource' => 'booking',
+                'setter' => false,
+                'virtual_entity' => true
+            ),
         ),
 
     );
@@ -1155,15 +1175,18 @@ class OrderCore extends ObjectModel
 
     /**
      * Can this order be returned by the client?
-     *
      * @return bool
-     */
+    */
     public function isReturnable()
     {
-        if (Configuration::get('PS_ORDER_RETURN', null, null, $this->id_shop) && $this->isPaidAndShipped()) {
-            return $this->getNumberOfDays();
-        }
+        $objBookingDetail = new HotelBookingDetail();
+        if ($bookingInfo = $objBookingDetail->getBookingDataByOrderId($this->id)) {
+            $idHotel = reset($bookingInfo)['id_hotel'];
+            $objHotelBranch = new HotelBranchInformation($idHotel);
 
+            // check if global as well as hotel refund is allowed
+            return (Configuration::get('WK_ORDER_REFUND_ALLOWED') && $objHotelBranch->active_refund);
+        }
         return false;
     }
 
@@ -2440,5 +2463,56 @@ class OrderCore extends ObjectModel
     public static function getAllOrdersByCartId($id_cart)
     {
         return Db::getInstance()->executeS('SELECT  * FROM '._DB_PREFIX_.'orders WHERE id_cart = '.(int)$id_cart);
+    }
+
+    // Order is considered as refunded if all bookings are requested for refund and all are with refunded status
+    // $refundFlag [ORDER_RETURN_STATE_FLAG_REFUNDED || ORDER_RETURN_STATE_FLAG_DENIED]
+    public function hasCompletelyRefunded($refundFlag = 0)
+    {
+        if ($refundBookings = OrderReturn::getOrdersReturnDetail($this->id)) {
+            $objHotelBooking = new HotelBookingdetail();
+            if ($orderBookings = $objHotelBooking->getOrderCurrentDataByOrderId($this->id)) {
+                if (count($refundBookings) == count($orderBookings)) {
+                    if ($refundFlag) {
+                        foreach ($refundBookings as $refundRow) {
+                            if (Validate::isLoadedObject(
+                                $objReturnState = new OrderReturnState($refundRow['current_state']
+                            ))) {
+                                if ($refundFlag == OrderReturnState::ORDER_RETURN_STATE_FLAG_REFUNDED
+                                    && !$objReturnState->refunded
+                                ) {
+                                    return false;
+                                }
+                                if ($refundFlag == OrderReturnState::ORDER_RETURN_STATE_FLAG_DENIED
+                                    && !$objReturnState->denied
+                                ) {
+                                    return false;
+                                }
+                            }
+                        }
+                    }
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    // Order is considered as denied if all bookings are requested for refund and all are with denied status
+    public function orderRefundHasBeenDenied()
+    {
+        if (OrderReturn::getOrdersReturn($this->id_customer, $this->id)) {
+
+        }
+
+        return false;
+    }
+
+    public function getWsBookings()
+    {
+        return Db::getInstance()->executeS(
+            'SELECT `id` FROM `'._DB_PREFIX_.'htl_booking_detail` WHERE `id_order` = '.(int)$this->id.' ORDER BY `id` ASC'
+        );
     }
 }

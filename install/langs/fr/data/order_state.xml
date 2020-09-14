@@ -12,14 +12,6 @@
     <name>En cours de préparation</name>
     <template>preparation</template>
   </order_state>
-  <order_state id='Shipped'>
-    <name>Expédié</name>
-    <template>shipped</template>
-  </order_state>
-  <order_state id='Delivered'>
-    <name>Livré</name>
-    <template/>
-  </order_state>
   <order_state id='Canceled'>
     <name>Annulé</name>
     <template>order_canceled</template>
@@ -52,8 +44,8 @@
     <name>Paiement à distance accepté</name>
     <template>payment</template>
   </order_state>
-  <order_state id="Awaiting_cod_validation">
-    <name>En attente de paiement à la livraison</name>
-    <template>cashondelivery</template>
+  <order_state id="Awaiting_remote_payment">
+    <name>Awaiting remote payment</name>
+    <template/>
   </order_state>
 </entity_order_state>

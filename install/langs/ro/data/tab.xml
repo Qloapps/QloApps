@@ -31,7 +31,7 @@
   <tab id="Attachments" name="Fișiere anexate"/>
   <tab id="Orders_1" name="Comenzi"/>
   <tab id="Invoices" name="Facturi"/>
-  <tab id="Merchandise_Returns" name="Returnări de marfă"/>
+  <!-- <tab id="Merchandise_Returns" name="Returnări de marfă"/> -->
   <tab id="Delivery_Slips" name="Avize de expediție"/>
   <tab id="Credit_Slips" name="Note de credit"/>
   <tab id="Statuses" name="Stadii"/>

@@ -111,6 +111,7 @@ class AdminProductsControllerCore extends AdminController
             //'Suppliers' => $this->l('Suppliers'),
             'Warehouses' => $this->l('Warehouses'),
             'Configuration' => $this->l('Configuration'),
+            'Occupancy' => $this->l('Occupancy'),
             'Booking' => $this->l('Booking Information'),
         );
 
@@ -131,7 +132,8 @@ class AdminProductsControllerCore extends AdminController
                 //'Attachments' => 12,
                 //'Suppliers' => 13,
                 'Configuration' => 14,
-                'Booking' => 15,
+                'Occupancy' => 15,
+                'Booking' => 16,
             ));
         }
 
@@ -198,12 +200,17 @@ class AdminProductsControllerCore extends AdminController
 
         $id_shop = Shop::isFeatureActive() && Shop::getContext() == Shop::CONTEXT_SHOP? (int)$this->context->shop->id : 'a.id_shop_default';
         $this->_join .= ' JOIN `'._DB_PREFIX_.'product_shop` sa ON (a.`id_product` = sa.`id_product` AND sa.id_shop = '.$id_shop.')
+                LEFT JOIN `'._DB_PREFIX_.'htl_room_type` hrt ON (a.`id_product` = hrt.`id_product`)
+                LEFT JOIN `'._DB_PREFIX_.'htl_branch_info` hb ON (hrt.`id_hotel` = hb.`id`)
+                LEFT JOIN `'._DB_PREFIX_.'htl_branch_info_lang` hbl ON (hb.`id` = hbl.`id` AND b.`id_lang` = hbl.`id_lang`)
 				LEFT JOIN `'._DB_PREFIX_.'category_lang` cl ON ('.$alias.'.`id_category_default` = cl.`id_category` AND b.`id_lang` = cl.`id_lang` AND cl.id_shop = '.$id_shop.')
 				LEFT JOIN `'._DB_PREFIX_.'shop` shop ON (shop.id_shop = '.$id_shop.')
 				LEFT JOIN `'._DB_PREFIX_.'image_shop` image_shop ON (image_shop.`id_product` = a.`id_product` AND image_shop.`cover` = 1 AND image_shop.id_shop = '.$id_shop.')
 				LEFT JOIN `'._DB_PREFIX_.'image` i ON (i.`id_image` = image_shop.`id_image`)
 				LEFT JOIN `'._DB_PREFIX_.'product_download` pd ON (pd.`id_product` = a.`id_product` AND pd.`active` = 1)';
 
+        $this->_select .= ' (SELECT COUNT(hri.`id`) FROM `'._DB_PREFIX_.'htl_room_information` hri WHERE hri.`id_product` = a.`id_product`) as num_rooms, ';
+        $this->_select .= 'hrt.`adult`, hrt.`children`, hb.`id` as id_hotel, hb.`city`, hbl.`hotel_name`, ';
         $this->_select .= 'shop.`name` AS `shopname`, a.`id_shop_default`, ';
         $this->_select .= $alias_image.'.`id_image` AS `id_image`, cl.`name` AS `name_category`, '.$alias.'.`price`, 0 AS `price_final`, a.`is_virtual`, pd.`nb_downloadable`, sav.`quantity` AS `sav_quantity`, '.$alias.'.`active`, IF(sav.`quantity`<=0, 1, 0) AS `badge_danger`';
 
@@ -233,32 +240,44 @@ class AdminProductsControllerCore extends AdminController
             'title' => $this->l('Name'),
             'filter_key' => 'b!name'
         );
-        $this->fields_list['reference'] = array(
-            'title' => $this->l('Reference'),
-            'align' => 'left',
-        );
-
         if (Shop::isFeatureActive() && Shop::getContext() != Shop::CONTEXT_SHOP) {
             $this->fields_list['shopname'] = array(
                 'title' => $this->l('Default shop'),
                 'filter_key' => 'shop!name',
             );
         } else {
-            $this->fields_list['name_category'] = array(
-                'title' => $this->l('Category'),
-                'filter_key' => 'cl!name',
+            $this->fields_list['hotel_name'] = array(
+                'title' => $this->l('Hotel'),
+                'filter_key' => 'hbl!hotel_name',
+                'callback' => 'getHotelName',
             );
         }
+        $this->fields_list['adult'] = array(
+            'title' => $this->l('Adults'),
+            'filter_key' => 'hrt!adult',
+            'align' => 'center',
+        );
+        $this->fields_list['child'] = array(
+            'title' => $this->l('Children'),
+            'filter_key' => 'hrt!children',
+            'align' => 'center',
+        );
+        // use it for total rooms
+        $this->fields_list['num_rooms'] = array(
+            'title' => $this->l('Total Rooms'),
+            'align' => 'center',
+            'havingFilter' => true,
+        );
         $this->fields_list['price'] = array(
             'title' => $this->l('Base price'),
             'type' => 'price',
-            'align' => 'text-right',
+            'align' => 'text-left',
             'filter_key' => 'a!price'
         );
         $this->fields_list['price_final'] = array(
             'title' => $this->l('Final price'),
             'type' => 'price',
-            'align' => 'text-right',
+            'align' => 'text-left',
             'havingFilter' => true,
             'orderby' => false,
             'search' => false
@@ -284,7 +303,16 @@ class AdminProductsControllerCore extends AdminController
         }
     }
 
-    public static function getQuantities($echo, $tr)
+    public function getHotelName($hotelName, $row)
+    {
+        if ($hotelName && isset($row['city'])) {
+            return $hotelName.' - '.$row['city'];
+        }
+
+        return '--';
+    }
+
+    public static function getQuantities($hotelName, $tr)
     {
         if ((int)$tr['is_virtual'] == 1 && $tr['nb_downloadable'] == 0) {
             return '&infin;';
@@ -2135,7 +2163,9 @@ class AdminProductsControllerCore extends AdminController
                         if ($this->isTabSubmitted('Images')) {
                             $this->processImageLegends();
                         }
-
+                        if ($this->isTabSubmitted('Occupancy')) {
+                            $this->processOccupancy();
+                        }
                         if ($this->isTabSubmitted('Configuration')) {
                             $this->processConfiguration();
                         }
@@ -3271,8 +3301,7 @@ class AdminProductsControllerCore extends AdminController
                     $roomStatus = $objRoomStatus->getAllRoomStatus();
 
                     $objRoomType = new HotelRoomType();
-                    $hotelRoomType = $objRoomType->getRoomTypeInfoByIdProduct($obj->id);
-                    if ($hotelRoomType) {
+                    if ($hotelRoomType = $objRoomType->getRoomTypeInfoByIdProduct($obj->id)) {
                         $data->assign('htl_room_type', $hotelRoomType);
 
                         $hotelFullInfo = $objHotelInfo->hotelBranchInfoById($hotelRoomType['id_hotel']);
@@ -3314,6 +3343,66 @@ class AdminProductsControllerCore extends AdminController
         $this->tpl_form_vars['custom_form'] = $data->fetch();
     }
 
+    // send information for the occupancy tab
+    public function initFormOccupancy($obj)
+    {
+        $data = $this->createTemplate($this->tpl_form);
+        if ($obj->id) {
+            $smartyVars['product'] = $obj;
+            if ($this->product_exists_in_shop) {
+                // Check is any hotel is created or not
+                $objHotelInfo = new HotelBranchInformation();
+                if ($objHotelInfo->hotelsNameAndId()) {
+                    $objRoomType = new HotelRoomType();
+                    if ($roomTypeInfo = $objRoomType->getRoomTypeInfoByIdProduct($obj->id)) {
+                        $smartyVars['roomTypeInfo'] = $roomTypeInfo;
+                    }
+                } else {
+                    $this->displayWarning($this->l('Add Hotel Before configurate this room type.'));
+                }
+            } else {
+                $this->displayWarning($this->l('You must save the room type in this shop before managing occupancy.'));
+            }
+        } else {
+            $this->displayWarning($this->l('You must save this room type before managing occupancy.'));
+        }
+        $data->assign($smartyVars);
+        $this->tpl_form_vars['custom_form'] = $data->fetch();
+    }
+
+    // save occupancy information
+    public function processOccupancy()
+    {
+        $idProduct = Tools::getValue('id_product');
+        if ((int)Tools::getValue('is_occupancy_submit')
+            && Validate::isLoadedObject($product = new Product((int)$idProduct)
+        )) {
+            // htl_room_type id field use only in edit case
+            if ($idHtlRoomType = Tools::getValue('wk_id_room_type')) {
+                if (Validate::isLoadedObject($objRoomType = new HotelRoomType($idHtlRoomType))) {
+                    $baseAdults = Tools::getValue('base_adults');
+                    $baseChildren = Tools::getValue('base_children');
+
+                    if (!$baseAdults || !Validate::isUnsignedInt($baseAdults)) {
+                        $this->errors[] = Tools::displayError('Invalid base adults');
+                    }
+                    if (!Validate::isUnsignedInt($baseChildren)) {
+                        $this->errors[] = Tools::displayError('Invalid base children');
+                    }
+                    if (!count($this->errors)) {
+                        $objRoomType->adult = $baseAdults;
+                        $objRoomType->children = $baseChildren;
+                        $objRoomType->save();
+                    }
+                } else {
+                    $this->errors[] = Tools::displayError('Invalid room type found.');
+                }
+            } else {
+                $this->errors[] = Tools::displayError('Please save hotel of the room type from configuration tab.');
+            }
+        }
+    }
+
     public function validateDisableDateRanges($disableDates)
     {
         if (count($disableDates)) {
@@ -3343,16 +3432,13 @@ class AdminProductsControllerCore extends AdminController
 
     public function processConfiguration()
     {
-        /*Check if save of configuration tab is clicked*/
-        $checkConfSubmit = Tools::getValue('checkConfSubmit');
-        if ($checkConfSubmit) {
-            $wk_id_room_type = Tools::getValue('wk_id_room_type');    // htl_room_type id field use only in edit case
+        /*Check if save of configuration tab is submitted*/
+        if (Tools::getValue('checkConfSubmit')) {
+            // htl_room_type id field use only in edit case
+            $wk_id_room_type = Tools::getValue('wk_id_room_type');
 
             $id_product = Tools::getValue('id_product');    //room type
             $id_hotel = Tools::getValue('id_hotel');
-
-            $adult = Tools::getValue('num_adults');
-            $children = Tools::getValue('num_child');
 
             if (!$id_product || !Validate::isUnsignedInt($id_product)) {
                 $this->errors[] = Tools::displayError('There is some problem while setting room information');
@@ -3360,13 +3446,6 @@ class AdminProductsControllerCore extends AdminController
             if (!$id_hotel || !Validate::isUnsignedInt($id_hotel)) {
                 $this->errors[] = Tools::displayError('Please select a hotel');
             }
-            if (!$adult || !Validate::isUnsignedInt($adult)) {
-                $this->errors[] = Tools::displayError('Please enter valid number of Adults');
-            }
-            if ($children === false || !Validate::isUnsignedInt($children)) {
-                $this->errors[] = Tools::displayError('Please enter valid number of children');
-            }
-
             if (!count($this->errors)) {
                 $room_numbers = Tools::getValue('room_num');
                 if ($room_numbers) {
@@ -3393,7 +3472,6 @@ class AdminProductsControllerCore extends AdminController
                             }
                         }
                     }
-
                     if (!count($this->errors)) {
                         if ($wk_id_room_type) {
                             $objRoomType = new HotelRoomType($wk_id_room_type);
@@ -3403,8 +3481,6 @@ class AdminProductsControllerCore extends AdminController
                             $objRoomType->id_product = $id_product;
                             $objRoomType->id_hotel = $id_hotel;
                         }
-                        $objRoomType->adult = $adult;
-                        $objRoomType->children = $children;
                         $objRoomType->save();
 
                         $id_rm_type = $objRoomType->id;

@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<entity_scene>
-  <fields id="name" class="Scene" image="scenes, scenes/thumbs">
-    <field name="active"/>
-  </fields>
-  <entities>
-  </entities>
-</entity_scene>

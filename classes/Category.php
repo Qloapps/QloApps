@@ -135,7 +135,10 @@ class CategoryCore extends ObjectModel
     public function __construct($id_category = null, $id_lang = null, $id_shop = null)
     {
         parent::__construct($id_category, $id_lang, $id_shop);
-        $this->id_image = ($this->id && file_exists(_PS_CAT_IMG_DIR_.(int)$this->id.'.jpg')) ? (int)$this->id : false;
+
+        $link = new Link();
+        $imgLink = $link->getMediaLink(_PS_CAT_IMG_DIR_.(int)$this->id.'.jpg'); // by webkul use media link for images
+        $this->id_image = ($this->id && (bool)Tools::file_get_contents($imgLink)) ? (int)$this->id : false;
         $this->image_dir = _PS_CAT_IMG_DIR_;
     }
 
@@ -482,7 +485,8 @@ class CategoryCore extends ObjectModel
         if (!Validate::isBool($active)) {
             die(Tools::displayError());
         }
-        $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS('
+        $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS(
+            '
 			SELECT *
 			FROM `'._DB_PREFIX_.'category` c
 			'.Shop::addSqlAssociation('category', 'c').'
@@ -506,9 +510,16 @@ class CategoryCore extends ObjectModel
         return $categories;
     }
 
-    public static function getAllCategoriesName($root_category = null, $id_lang = false, $active = true, $groups = null,
-                                                $use_shop_restriction = true, $sql_filter = '', $sql_sort = '', $sql_limit = '')
-    {
+    public static function getAllCategoriesName(
+        $root_category = null,
+        $id_lang = false,
+        $active = true,
+        $groups = null,
+        $use_shop_restriction = true,
+        $sql_filter = '',
+        $sql_sort = '',
+        $sql_limit = ''
+    ) {
         if (isset($root_category) && !Validate::isInt($root_category)) {
             die(Tools::displayError());
         }
@@ -525,7 +536,8 @@ class CategoryCore extends ObjectModel
             .(isset($groups) && Group::isFeatureActive() ? implode('', $groups) : ''));
 
         if (!Cache::isStored($cache_id)) {
-            $result = Db::getInstance()->executeS('
+            $result = Db::getInstance()->executeS(
+                '
 				SELECT c.id_category, cl.name
 				FROM `'._DB_PREFIX_.'category` c
 				'.($use_shop_restriction ? Shop::addSqlAssociation('category', 'c') : '').'
@@ -549,9 +561,16 @@ class CategoryCore extends ObjectModel
         return $result;
     }
 
-    public static function getNestedCategories($root_category = null, $id_lang = false, $active = true, $groups = null,
-        $use_shop_restriction = true, $sql_filter = '', $sql_sort = '', $sql_limit = '')
-    {
+    public static function getNestedCategories(
+        $root_category = null,
+        $id_lang = false,
+        $active = true,
+        $groups = null,
+        $use_shop_restriction = true,
+        $sql_filter = '',
+        $sql_sort = '',
+        $sql_limit = ''
+    ) {
         if (isset($root_category) && !Validate::isInt($root_category)) {
             die(Tools::displayError());
         }
@@ -568,7 +587,8 @@ class CategoryCore extends ObjectModel
             .(isset($groups) && Group::isFeatureActive() ? implode('', $groups) : ''));
 
         if (!Cache::isStored($cache_id)) {
-            $result = Db::getInstance()->executeS('
+            $result = Db::getInstance()->executeS(
+                '
 				SELECT c.*, cl.*
 				FROM `'._DB_PREFIX_.'category` c
 				'.($use_shop_restriction ? Shop::addSqlAssociation('category', 'c') : '').'
@@ -997,7 +1017,8 @@ class CategoryCore extends ObjectModel
             }
         }
 
-        $flag = Db::getInstance()->execute('
+        $flag = Db::getInstance()->execute(
+            '
 			INSERT IGNORE INTO `'._DB_PREFIX_.'category_product` (`id_product`, `id_category`, `position`)
 			VALUES '.implode(',', $row)
         );
@@ -1064,8 +1085,11 @@ class CategoryCore extends ObjectModel
             $id_lang = Context::getContext()->language->id;
         }
 
-        return $link->getCategoryLink($this,
-            is_array($this->link_rewrite) ? $this->link_rewrite[$id_lang] : $this->link_rewrite, $id_lang);
+        return $link->getCategoryLink(
+            $this,
+            is_array($this->link_rewrite) ? $this->link_rewrite[$id_lang] : $this->link_rewrite,
+            $id_lang
+        );
     }
 
     public function getName($id_lang = null)
@@ -1245,12 +1269,12 @@ class CategoryCore extends ObjectModel
 
     public function cleanGroups()
     {
-    	return Db::getInstance()->delete('category_group', 'id_category = '.(int)$this->id);
+        return Db::getInstance()->delete('category_group', 'id_category = '.(int)$this->id);
     }
 
     public function cleanAssoProducts()
     {
-    	return Db::getInstance()->delete('category_product', 'id_category = '.(int)$this->id);
+        return Db::getInstance()->delete('category_product', 'id_category = '.(int)$this->id);
     }
 
     public function addGroups($groups)
@@ -1783,7 +1807,7 @@ class CategoryCore extends ObjectModel
      */
     public static function deleteCategoriesFromShop($id_shop)
     {
-    	return Db::getInstance()->delete('category_shop', 'id_shop = '.(int)$id_shop);
+        return Db::getInstance()->delete('category_shop', 'id_shop = '.(int)$id_shop);
     }
 
     /**

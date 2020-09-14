@@ -325,14 +325,10 @@ class PrestaBraintree
     public function getCartPaymentTotal()
     {
         $context = Context::getContext();
-        if (Configuration::get('WK_ALLOW_ADVANCED_PAYMENT')) {
-            $objCustAdvPay = new HotelCustomerAdvancedPayment();
-            $orderTotal = $objCustAdvPay->getOrdertTotal(
-                $context->cart->id,
-                $context->cart->id_guest
-            );
+        if ($context->cart->is_advance_payment) {
+            $orderTotal = $context->cart->getOrderTotal(true, Cart::ADVANCE_PAYMENT);
         } else {
-            $orderTotal = $cart->getOrderTotal(true, Cart::BOTH);
+            $orderTotal = $context->cart->getOrderTotal(true, Cart::BOTH);
         }
         return $orderTotal;
     }

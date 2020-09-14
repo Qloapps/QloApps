@@ -1,18 +1,23 @@
-<?xml version='1.0'?>
+<?xml version="1.0"?>
 <entity_order_return_state>
-  <order_return_state id='Waiting_for_confirmation'>
-    <name>নিশ্চিত করনের জন্য অপেক্ষমান</name>
+  <order_return_state id="Waiting_for_confirmation">
+    <name>Waiting for confirmation</name>
+    <customer_template>order_refund_waiting_customer</customer_template>
+    <admin_template>order_refund_waiting_admin</admin_template>
   </order_return_state>
-  <order_return_state id='Waiting_for_package'>
-    <name>প্যাকিং এর জন্য অপেক্ষমাণ </name>
+  <order_return_state id="Request_received">
+    <name>Request received</name>
+    <customer_template>order_refund_received_customer</customer_template>
+    <admin_template>order_refund_received_admin</admin_template>
   </order_return_state>
-  <order_return_state id='Package_received'>
-    <name>প্যাকেজ রিসিভ করা হয়েছে</name>
+  <order_return_state id="Refund_denied">
+    <name>Refund denied</name>
+    <customer_template>order_refund_denied_customer</customer_template>
+    <admin_template>order_refund_denied_admin</admin_template>
   </order_return_state>
-  <order_return_state id='Return_denied'>
-    <name>ফেরত বাতিল </name>
-  </order_return_state>
-  <order_return_state id='Return_completed'>
-    <name>ফেরত সম্পন্ন </name>
+  <order_return_state id="Refund_completed">
+    <name>Refund completed</name>
+    <customer_template>order_refund_completed_customer</customer_template>
+    <admin_template>order_refund_completed_admin</admin_template>
   </order_return_state>
 </entity_order_return_state>

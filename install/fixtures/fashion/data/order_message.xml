@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<entity_order_message>
-  <fields id="name" class="OrderMessage"/>
-  <entities>
-    <order_message id="Delay"/>
-  </entities>
-</entity_order_message>

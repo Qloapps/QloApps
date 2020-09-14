@@ -1,5 +1,5 @@
 {*
-* 2010-2018 Webkul.
+* 2010-2020 Webkul.
 *
 * NOTICE OF LICENSE
 *
@@ -13,7 +13,7 @@
 * needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
 *
 *  @author    Webkul IN <support@webkul.com>
-*  @copyright 2010-2018 Webkul IN
+*  @copyright 2010-2020 Webkul IN
 *  @license   https://store.webkul.com/license.html
 *}
 
@@ -253,6 +253,46 @@
 					<label for="enable_feature_price_off">{l s='No' mod='hotelreservationsystem'}</label>
 					<a class="slide-button btn"></a>
 				</span>
+			</div>
+		</div>
+
+		{* select group accesses *}
+		<div class="form-group">
+			<label class="control-label col-lg-3">
+				<span class="label-tooltip" data-toggle="tooltip" data-html="true" data-original-title="{l s='Select all the groups that you would like to apply to this feature price.' mod='hotelreservationsystem'}">{l s='Group access' mod='hotelreservationsystem'}</span>
+			</label>
+			<div class="col-lg-6">
+				<div class="table-responsive">
+					<table class="table table-bordered">
+						<thead>
+							<tr>
+								<th class="text-center"></th>
+								<th class="text-center">{l s='Group' mod='hotelreservationsystem'}</th>
+							</tr>
+						</thead>
+						<tbody>
+							{if isset($groups) && $groups}
+								{foreach $groups as $group}
+									<tr>
+										<td class="text-center">
+											<input type="checkbox" name="groupBox[]" value="{$group['id_group']|escape:'html':'UTF-8'}" {if isset($feature_price_groups) && $feature_price_groups && $group['id_group']|in_array:$feature_price_groups}checked{/if}/>
+										</td>
+										<td class="text-center">{$group['name']|escape:'html':'UTF-8'}</td>
+									</tr>
+								{/foreach}
+							{else}
+								<tr>
+									<td class="list-empty" colspan="2">
+										<div class="list-empty-msg">
+											<i class="icon-warning-sign list-empty-icon"></i>
+											{l s='No Groups Available' mod='hotelreservationsystem'}
+										</div>
+									</td>
+								</tr>
+							{/if}
+						</tbody>
+					</table>
+				</div>
 			</div>
 		</div>
 

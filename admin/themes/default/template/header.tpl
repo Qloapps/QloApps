@@ -297,7 +297,7 @@
 {/if}
 				<ul id="header_employee_box">
 					<li class="hidden-sm hidden-xs">
-						<a target="_blank" href="https://store.webkul.com/Qloapps.html" class="toolbar_btn" title="{l s='Explore Qloapps Addons'}">
+						<a target="_blank" href="https://qloapps.com/addons/" class="toolbar_btn" title="{l s='Explore Qloapps Addons'}">
 							<i class="icon-chain-broken"></i>
 							{l s='Explore Qloapps Addons'}
 						</a>

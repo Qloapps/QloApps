@@ -2976,6 +2976,16 @@ a.thumbnail:focus {
   .alert-info .alert-link {
     color: #e6e6e6; }
 
+/* by webkul */
+.alert-info-light {
+  background-color: #e6f2ff;
+  color: #4D89B5;}
+.alert-warning-light {
+  background-color: #FDE7BB;
+  color: #CD9321;}
+
+
+
 .alert-warning {
   background-color: #fe9126;
   border-color: #e4752b;
@@ -8713,7 +8723,7 @@ div.star.star_hover:after {
 
 
 .error_msg {
-  color :#8B0000;
+  color: #FF4B4B;
 }
 .error_msg_prod {
   color: #ffffff;

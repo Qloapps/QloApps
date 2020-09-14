@@ -1,6 +1,6 @@
 <?php
 /**
-* 2010-2018 Webkul.
+* 2010-2020 Webkul.
 *
 * NOTICE OF LICENSE
 *
@@ -14,7 +14,7 @@
 * needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
 *
 *  @author    Webkul IN <support@webkul.com>
-*  @copyright 2010-2018 Webkul IN
+*  @copyright 2010-2020 Webkul IN
 *  @license   https://store.webkul.com/license.html
 */
 
@@ -32,7 +32,7 @@ class WkTestimonialBlock extends Module
     {
         $this->name = 'wktestimonialblock';
         $this->tab = 'front_office_features';
-        $this->version = '1.1.3';
+        $this->version = '1.1.4';
         $this->author = 'webkul';
         $this->need_instance = 0;
 
@@ -81,6 +81,15 @@ class WkTestimonialBlock extends Module
 
         $objTestimonialData = new WkHotelTestimonialData();
         $testimonialsData = $objTestimonialData->getTestimonialData(1);
+        foreach($testimonialsData as &$testimonials) {
+            $imgUrl = $this->context->link->getMediaLink(_MODULE_DIR_.$this->name.'/views/img/hotels_testimonials_img/'.$testimonials['id_testimonial_block'].'.jpg');
+            if ((bool)Tools::file_get_contents($imgUrl)) {
+                $testimonials['img_url'] = $imgUrl;
+            } else {
+                $testimonials['img_url'] = $this->context->link->getMediaLink(_MODULE_DIR_.$this->name.'/views/img/default-user.jpg');
+            }
+        }
+
         $this->context->smarty->assign(
             array(
                 'HOTEL_TESIMONIAL_BLOCK_HEADING' => $HOTEL_TESIMONIAL_BLOCK_HEADING,
@@ -217,10 +226,10 @@ class WkTestimonialBlock extends Module
     public function uninstall()
     {
         if (!parent::uninstall()
+            || !$this->deleteTestimonialUserImage()
             || !$this->deleteTables()
             || !$this->uninstallTab()
             || !$this->deleteConfigKeys()
-            || !$this->deleteTestimonialUserImage()
         ) {
             return false;
         }
@@ -229,9 +238,12 @@ class WkTestimonialBlock extends Module
 
     public function deleteTestimonialUserImage()
     {
-        if ($uploadedImg = glob(_PS_MODULE_DIR_.$this->name.'/views/img/hotels_testimonials_img/*.jpg')) {
-            foreach ($uploadedImg as $img) {
-                unlink($img);
+        $objTestimonialData = new WkHotelTestimonialData();
+        $testimonialsData = $objTestimonialData->getTestimonialData(1);
+        foreach($testimonialsData as &$testimonials) {
+            $objTestimonialData = new WkHotelTestimonialData($testimonials['id_testimonial_block']);
+            if(Validate::isLoadedObject($objTestimonialData)) {
+                $objTestimonialData->deleteImage(true);
             }
         }
         return true;

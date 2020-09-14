@@ -229,17 +229,12 @@ abstract class PaymentModuleCore extends Module
             $order_creation_failed = false;
             $cart_total_paid = (float)Tools::ps_round((float)$this->context->cart->getOrderTotal(true, Cart::BOTH), 2);
 
-            /* Total cart total in case of Advance Payment By webkul*/
-            $freeAdvancePaymentOrder = false;
-            if (Module::isInstalled('hotelreservationsystem')) {
-                require_once(_PS_MODULE_DIR_.'hotelreservationsystem/define.php');
-                $obj_adv_pmt = new HotelAdvancedPayment();
-                $freeAdvancePaymentOrder = $obj_adv_pmt->_checkFreeAdvancePaymentOrder();
-                if ($freeAdvancePaymentOrder) {
-                    $cart_total_paid = 0;
-                }
+            if ($this->context->cart->is_advance_payment) {
+                $cart_total_paid = (float)Tools::ps_round(
+                    (float)$this->context->cart->getOrderTotal(true, CART::ADVANCE_PAYMENT),
+                    2
+                );
             }
-            /*END*/
 
             foreach ($cart_delivery_option as $id_address => $key_carriers) {
                 foreach ($delivery_option_list[$id_address][$key_carriers]['carrier_list'] as $id_carrier => $data) {
@@ -358,6 +353,10 @@ abstract class PaymentModuleCore extends Module
                         PrestaShopLogger::addLog('PaymentModule::validateOrder - Order is about to be added', 1, null, 'Cart', (int)$id_cart, true);
                     }
 
+                    // advance payment information
+                    $order->is_advance_payment = $this->context->cart->is_advance_payment;
+                    $order->advance_paid_amount = $cart_total_paid;
+
                     // Creating order
                     $result = $order->add();
 
@@ -370,14 +369,7 @@ abstract class PaymentModuleCore extends Module
                     // We don't use the following condition to avoid the float precision issues : http://www.php.net/manual/en/language.types.float.php
                     // if ($order->total_paid != $order->total_paid_real)
                     // We use number_format in order to compare two string
-                    if (Configuration::get('WK_ALLOW_ADVANCED_PAYMENT')) {
-                        $objCustAdv = new HotelCustomerAdvancedPayment();
-                        $advOrderTotal = $objCustAdv->getOrdertTotal($this->context->cart->id, $this->context->cart->id_guest);
-                        // if customer is paying advance payment amount
-                        if ($order_status->logable && number_format($advOrderTotal, _PS_PRICE_COMPUTE_PRECISION_) != number_format($amount_paid, _PS_PRICE_COMPUTE_PRECISION_)) {
-                            $id_order_state = Configuration::get('PS_OS_ERROR');
-                        }
-                    } elseif ($order_status->logable && number_format($cart_total_paid, _PS_PRICE_COMPUTE_PRECISION_) != number_format($amount_paid, _PS_PRICE_COMPUTE_PRECISION_)) {
+                    if ($order_status->logable && number_format($cart_total_paid, _PS_PRICE_COMPUTE_PRECISION_) != number_format($amount_paid, _PS_PRICE_COMPUTE_PRECISION_)) {
                         // if customer is paying full payment amount
                         $id_order_state = Configuration::get('PS_OS_ERROR');
                     }
@@ -740,32 +732,16 @@ abstract class PaymentModuleCore extends Module
                         $delivery_state = $delivery->id_state ? new State($delivery->id_state) : false;
                         $invoice_state = $invoice->id_state ? new State($invoice->id_state) : false;
 
-                        //by webkul changing mail format
+                        // changing mail format
                         $cart_booking_data = $this->cartBookingDataForMail($order);
                         $cart_booking_data_text = $this->getEmailTemplateContent('hotel-booking-cart-data.text', Mail::TYPE_TEXT, $cart_booking_data['cart_htl_data']);
                         $cart_booking_data_html = $this->getEmailTemplateContent('hotel-booking-cart-data.tpl', Mail::TYPE_HTML, $cart_booking_data['cart_htl_data']);
 
                         $extra_demands_details_html = $this->getEmailTemplateContent('booking_extra_demands.tpl', Mail::TYPE_HTML, $cart_booking_data['cart_htl_data']);
 
-                        //For Advanced Payment
-                        $obj_customer_adv = new HotelCustomerAdvancedPayment();
-                        $order_adv_dtl = $obj_customer_adv->getCstAdvPaymentDtlByIdOrder($order->id);
-                        if ($order_adv_dtl) {
-                            $order_adv_dtl['total_due_amount'] = $order_adv_dtl['total_order_amount'] - $order_adv_dtl['total_paid_amount'];
-
-                            $order_adv_dtl['total_paid_amount'] = Tools::displayPrice($order_adv_dtl['total_paid_amount'], $this->context->currency, false);
-                            $order_adv_dtl['total_order_amount'] = Tools::displayPrice($order_adv_dtl['total_order_amount'], $this->context->currency, false);
-                            $order_adv_dtl['total_due_amount'] = Tools::displayPrice($order_adv_dtl['total_due_amount'], $this->context->currency, false);
-                        }
-
-                        $adv_data_html = $this->getEmailTemplateContent('advanced-book-data.tpl', Mail::TYPE_HTML, $order_adv_dtl);
-                        $adv_data_text = $this->getEmailTemplateContent('advanced-book-data.txt', Mail::TYPE_TEXT, $order_adv_dtl);
-
                         $data = array(
-                            '{adv_data_html}' => $adv_data_html,//by webkul
-                            '{adv_data_text}' => $adv_data_text,//by webkul
-                            '{cart_booking_data_html}' => $cart_booking_data_html,//by webkul
-                            '{extra_demands_details_html}' => $extra_demands_details_html,//by webkul
+                            '{cart_booking_data_html}' => $cart_booking_data_html,
+                            '{extra_demands_details_html}' => $extra_demands_details_html,
                             '{total_extra_demands_te}' => Tools::displayPrice(
                                 $cart_booking_data['total_extra_demands_te'],
                                 $this->context->currency,
@@ -1176,7 +1152,7 @@ abstract class PaymentModuleCore extends Module
     {
         $result = array();
         $customer = new Customer($order->id_customer);
-        //by webkul to show order details properly on order history page
+        // To show order details properly on order history page
         $products = $order->getProducts();
         if (Module::isInstalled('hotelreservationsystem')) {
             require_once(_PS_MODULE_DIR_.'hotelreservationsystem/define.php');

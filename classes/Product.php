@@ -236,7 +236,7 @@ class ProductCore extends ObjectModel
 
     /**
      * @var int tell the type of stock management to apply on the pack
-     */
+    */
     public $pack_stock_type = 3;
 
     public static $_taxCalculationMethod = null;
@@ -247,7 +247,7 @@ class ProductCore extends ObjectModel
     /**
      * @since 1.5.6.1
      * @var array $_cart_quantity is deprecated since 1.5.6.1
-     */
+    */
     protected static $_cart_quantity = array();
 
     protected static $_tax_rules_group = array();
@@ -346,10 +346,26 @@ class ProductCore extends ObjectModel
     protected $webserviceParameters = array(
         'objectMethods' => array(
             'add' => 'addWs',
-            'update' => 'updateWs'
+            'update' => 'updateWs',
+            'delete' => 'deleteWs'
         ),
-        'objectNodeNames' => 'products',
+
+        'objectsNodeName' => 'room_types',
+        'objectNodeName' => 'room_type',
         'fields' => array(
+            'id_hotel' => array(
+                'getter' => 'getWsHotel',
+                'setter' => 'setWsHotel',
+                'xlink_resource' => 'hotels'
+            ),
+            'adults' => array(
+                'getter' => 'getWsAdults',
+                'setter' => 'setWsAdults',
+            ),
+            'children' => array(
+                'getter' => 'getWsChildren',
+                'setter' => 'setWsChildren',
+            ),
             'id_manufacturer' => array(
                 'xlink_resource' => 'manufacturers'
             ),
@@ -366,16 +382,16 @@ class ProductCore extends ObjectModel
                 'setter' => 'setCoverWs',
                 'xlink_resource' => array(
                     'resourceName' => 'images',
-                    'subResourceName' => 'products'
+                    'subResourceName' => 'room_types'
                 )
             ),
-            'id_default_combination' => array(
-                'getter' => 'getWsDefaultCombination',
-                'setter' => 'setWsDefaultCombination',
-                'xlink_resource' => array(
-                    'resourceName' => 'combinations'
-                )
-            ),
+            // 'id_default_combination' => array(
+            //     'getter' => 'getWsDefaultCombination',
+            //     'setter' => 'setWsDefaultCombination',
+            //     'xlink_resource' => array(
+            //         'resourceName' => 'combinations'
+            //     )
+            // ),
             'id_tax_rules_group' => array(
                 'xlink_resource' => array(
                     'resourceName' => 'tax_rule_groups'
@@ -385,10 +401,10 @@ class ProductCore extends ObjectModel
                 'getter' => 'getWsPositionInCategory',
                 'setter' => 'setWsPositionInCategory'
             ),
-            'manufacturer_name' => array(
-                'getter' => 'getWsManufacturerName',
-                'setter' => false
-            ),
+            // 'manufacturer_name' => array(
+            //     'getter' => 'getWsManufacturerName',
+            //     'setter' => false
+            // ),
             'quantity' => array(
                 'getter' => false,
                 'setter' => false
@@ -396,6 +412,13 @@ class ProductCore extends ObjectModel
             'type' => array(
                 'getter' => 'getWsType',
                 'setter' => 'setWsType',
+            ),
+            'id_advance_paypent' => array(
+                'xlink_resource' => array(
+                    'resourceName' => 'advance_payments'
+                ),
+                'getter' => 'getWsRoomTypeAdvancePayment',
+                'setter' => false
             ),
         ),
         'associations' => array(
@@ -409,55 +432,35 @@ class ProductCore extends ObjectModel
                 'resource' => 'image',
                 'fields' => array('id' => array())
             ),
-            'combinations' => array(
-                'resource' => 'combination',
+            'room_type_features' => array(
+                'resource' => 'room_type_feature',
                 'fields' => array(
                     'id' => array('required' => true),
-                )
-            ),
-            'product_option_values' => array(
-                'resource' => 'product_option_value',
-                'fields' => array(
-                    'id' => array('required' => true),
-                )
-            ),
-            'product_features' => array(
-                'resource' => 'product_feature',
-                'fields' => array(
-                    'id' => array('required' => true),
-                    'id_feature_value' => array(
-                        'required' => true,
-                        'xlink_resource' => 'product_feature_values'
-                    ),
                 )
             ),
             'tags' => array('resource' => 'tag',
                 'fields' => array(
                     'id' => array('required' => true),
-            )),
-            'stock_availables' => array('resource' => 'stock_available',
-                'fields' => array(
-                    'id' => array('required' => true),
-                    'id_product_attribute' => array('required' => true),
-                ),
-                'setter' => false
-            ),
-            'accessories' => array(
-                'resource' => 'product',
-                'api' => 'products',
-                'fields' => array(
-                    'id' => array(
-                        'required' => true,
-                        'xlink_resource' => 'product'),
                 )
             ),
-            'product_bundle' => array(
-                'resource' => 'product',
-                'api' => 'products',
+            'hotel_rooms' => array(
+                'setter' => false,
+                'resource' => 'hotel_room',
+                'fields' => array('id' => array('required' => true))
+            ),
+            'feature_prices' => array(
+                'setter' => false,
+                'resource' => 'feature_price',
                 'fields' => array(
                     'id' => array('required' => true),
-                    'quantity' => array(),
-                ),
+                )
+            ),
+            'extra_demands' => array(
+                'setter' => false,
+                'resource' => 'extra_demand',
+                'fields' => array(
+                    'id' => array('required' => true),
+                )
             ),
         ),
     );
@@ -1487,7 +1490,7 @@ class ProductCore extends ObjectModel
         ), 'id_product = '.(int)$id_product.Shop::addSqlRestriction());
 
         $result &= Db::getInstance()->update('product', array(
-            'cache_default_attribute' => $id_default_attribute,
+           'cache_default_attribute' => $id_default_attribute,
         ), 'id_product = '.(int)$id_product);
 
         if ($result && $id_default_attribute) {
@@ -3614,7 +3617,7 @@ class ProductCore extends ObjectModel
      * Link accessories with product
      *
      * @param array $accessories_id Accessories ids
-     */
+    */
     public function changeAccessories($accessories_id)
     {
         foreach ($accessories_id as $id_product_2) {
@@ -5027,9 +5030,9 @@ class ProductCore extends ObjectModel
         $key = 'product_id_tax_rules_group_'.(int)$id_product.'_'.(int)$context->shop->id;
         if (!Cache::isStored($key)) {
             $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
-							SELECT `id_tax_rules_group`
-							FROM `'._DB_PREFIX_.'product_shop`
-							WHERE `id_product` = '.(int)$id_product.' AND id_shop='.(int)$context->shop->id);
+                        SELECT `id_tax_rules_group`
+                        FROM `'._DB_PREFIX_.'product_shop`
+                        WHERE `id_product` = '.(int)$id_product.' AND id_shop='.(int)$context->shop->id);
             Cache::store($key, (int)$result);
             return (int)$result;
         }
@@ -5056,41 +5059,40 @@ class ProductCore extends ObjectModel
 
     /**
     * Webservice getter : get product features association
-    *
     * @return array
     */
-    public function getWsProductFeatures()
+    public function getWsRoomTypeFeatures()
     {
-        $rows = $this->getFeatures();
-        foreach ($rows as $keyrow => $row) {
-            foreach ($row as $keyfeature => $feature) {
-                if ($keyfeature == 'id_feature') {
-                    $rows[$keyrow]['id'] = $feature;
-                    unset($rows[$keyrow]['id_feature']);
-                }
-                unset($rows[$keyrow]['id_product']);
-                unset($rows[$keyrow]['custom']);
-            }
-            asort($rows[$keyrow]);
-        }
-        return $rows;
+        $result = Db::getInstance()->executeS(
+            'SELECT `id_feature` AS id FROM `'._DB_PREFIX_.'feature_product`
+            WHERE `id_product` = '.(int)$this->id
+        );
+
+        return $result;
     }
 
     /**
      * Webservice setter : set product features association
-     *
      * @param $product_features Product Feature ids
      * @return bool
-     */
-    public function setWsProductFeatures($product_features)
+    */
+    public function setWsRoomTypeFeatures($product_features)
     {
         Db::getInstance()->execute('
 			DELETE FROM `'._DB_PREFIX_.'feature_product`
 			WHERE `id_product` = '.(int)$this->id
         );
+
         foreach ($product_features as $product_feature) {
-            $this->addFeaturesToDB($product_feature['id'], $product_feature['id_feature_value']);
+            if ($featureValues = FeatureValue::getFeatureValuesWithLang(
+                Configuration::get('PS_LANG_DEFAULT'),
+                $product_feature['id']
+            )) {
+                $idFeatureValue = $featureValues[0]['id_feature_value'];
+                $this->addFeaturesToDB($product_feature['id'], $idFeatureValue);
+            }
         }
+
         return true;
     }
 
@@ -5106,7 +5108,6 @@ class ProductCore extends ObjectModel
 
     /**
      * Webservice setter : set virtual field default combination
-     *
      * @param int $id_combination id default combination
      * @return bool
      */
@@ -5450,11 +5451,10 @@ class ProductCore extends ObjectModel
         return Db::getInstance()->delete('product_tag', 'id_product = '.(int)$this->id);
     }
 
-
-    public function getWsManufacturerName()
-    {
-        return Manufacturer::getNameById((int)$this->id_manufacturer);
-    }
+    // public function getWsManufacturerName()
+    // {
+    //     return Manufacturer::getNameById((int)$this->id_manufacturer);
+    // }
 
     public static function resetEcoTax()
     {
@@ -5761,12 +5761,40 @@ class ProductCore extends ObjectModel
         return Db::getInstance()->getValue($query);
     }
 
+    // set room type info for room type maping
+    public function setWsRoomTypeInfo()
+    {
+        if ($this->id) {
+            // delete previous
+            Db::getInstance()->execute('
+                DELETE FROM `'._DB_PREFIX_.'htl_room_type`
+                WHERE `id_product` = '.(int)$this->id
+            );
+
+            // save room type info adult, child, hotel info
+            $postData = trim(file_get_contents('php://input'));
+            libxml_use_internal_errors(true);
+            $xml = simplexml_load_string(utf8_decode($postData));
+
+            $roomtypeData = Tools::jsonDecode(Tools::jsonEncode($xml), true);
+
+            // set room  map info for the hotel from request
+            return Db::getInstance()->execute('INSERT INTO `'._DB_PREFIX_.'htl_room_type` (`id_product`, `id_hotel`, `adult`, `children`, `date_add`, `date_upd`) VALUES ('.(int)$this->id.', '.(int) $roomtypeData['room_type']['id_hotel'].', '.(int) $roomtypeData['room_type']['adults'].', '.(int) $roomtypeData['room_type']['children'].', \''.date('Y-m-d h:i:s').'\', \''.date('Y-m-d h:i:s').'\')');
+        }
+
+        return true;
+    }
+
     public function addWs($autodate = true, $null_values = false)
     {
-        $success = $this->add($autodate, $null_values);
-        if ($success && Configuration::get('PS_SEARCH_INDEXATION')) {
-            Search::indexation(false, $this->id);
+        if ($success = $this->add($autodate, $null_values)) {
+            if (Configuration::get('PS_SEARCH_INDEXATION')) {
+                Search::indexation(false, $this->id);
+            }
+
+            $this->setWsRoomTypeInfo();
         }
+
         return $success;
     }
 
@@ -5776,6 +5804,9 @@ class ProductCore extends ObjectModel
         if ($success && Configuration::get('PS_SEARCH_INDEXATION')) {
             Search::indexation(false, $this->id);
         }
+
+        $this->setWsRoomTypeInfo();
+
         Hook::exec('updateProduct', array('id_product' => (int)$this->id));
         return $success;
     }
@@ -6143,5 +6174,106 @@ class ProductCore extends ObjectModel
     {
         return Db::getInstance()->execute('UPDATE '._DB_PREFIX_.'product p
 		'.Shop::addSqlAssociation('product', 'p').' SET product_shop.pack_stock_type = '.(int)$pack_stock_type.' WHERE p.`id_product` = '.(int)$id_product);
+    }
+
+    // Webservice funcions
+    public function getWsHotelRooms()
+    {
+        return Db::getInstance()->executeS(
+            'SELECT `id` FROM `'._DB_PREFIX_.'htl_room_information` WHERE `id_product` = '.(int)$this->id.' ORDER BY `id` ASC'
+        );
+    }
+
+    public function getWsFeaturePrices()
+    {
+        return Db::getInstance()->executeS(
+            'SELECT `id_feature_price` as `id` FROM `'._DB_PREFIX_.'htl_room_type_feature_pricing` WHERE `id_product` = '.(int)$this->id.' ORDER BY `id` ASC'
+        );
+    }
+
+    public function getWsAdvancePayments()
+    {
+        return Db::getInstance()->executeS(
+            'SELECT `id` FROM `'._DB_PREFIX_.'htl_advance_payment` WHERE `id_product` = '.(int)$this->id.' ORDER BY `id` ASC'
+        );
+    }
+
+    public function getWsHotel()
+    {
+        return Db::getInstance()->getValue(
+            'SELECT `id_hotel` FROM `'._DB_PREFIX_.'htl_room_type` WHERE `id_product` = '.(int)$this->id.' ORDER BY `id` ASC'
+        );
+    }
+
+    public function getWsAdults()
+    {
+        return Db::getInstance()->getValue(
+            'SELECT `adult` FROM `'._DB_PREFIX_.'htl_room_type` WHERE `id_product` = '.(int)$this->id.' ORDER BY `id` ASC'
+        );
+    }
+
+    public function getWsChildren()
+    {
+        return Db::getInstance()->getValue(
+            'SELECT `children` FROM `'._DB_PREFIX_.'htl_room_type` WHERE `id_product` = '.(int)$this->id.' ORDER BY `id` ASC'
+        );
+    }
+
+    public function getWsExtraDemands()
+    {
+        return Db::getInstance()->getValue(
+            'SELECT `id_global_demand` as `id` FROM `'._DB_PREFIX_.'htl_room_type_demand` WHERE `id_product` = '.(int)$this->id
+        );
+    }
+
+    public function getWsRoomTypeAdvancePayment()
+    {
+        return Db::getInstance()->getValue(
+            'SELECT `id` FROM `'._DB_PREFIX_.'htl_advance_payment` WHERE `id_product` = '.(int)$this->id
+        );
+    }
+
+    public function setWsChildren($children)
+    {
+        if ($this->id) {
+            return Db::getInstance()->execute(
+                'UPDATE `'._DB_PREFIX_.'htl_room_type` '.'
+                SET `children` = '.(int) $children.'
+                WHERE `id_product` = '.(int)$this->id
+            );
+        }
+
+        return true;
+    }
+
+    public function setWsAdults($adults)
+    {
+        if ($this->id) {
+            return Db::getInstance()->execute(
+                'UPDATE `'._DB_PREFIX_.'htl_room_type` '.'
+                SET `adults` = '.(int) $adults.'
+                WHERE `id_product` = '.(int)$this->id
+            );
+        }
+
+        return true;
+    }
+
+    public function setWsHotel($idHotel)
+    {
+        if ($this->id) {
+            return Db::getInstance()->execute(
+                'UPDATE `'._DB_PREFIX_.'htl_room_type` '.'
+                SET `id_hotel` = '.(int) $idHotel.'
+                WHERE `id_product` = '.(int)$this->id
+            );
+        }
+
+        return true;
+    }
+
+    public function deleteWs()
+    {
+        return $this->delete();
     }
 }

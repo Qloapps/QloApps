@@ -31,7 +31,7 @@
   <tab id="Attachments" name="Bilagor"/>
   <tab id="Orders_1" name="Ordrar"/>
   <tab id="Invoices" name="Fakturor"/>
-  <tab id="Merchandise_Returns" name="Varureturer"/>
+  <!-- <tab id="Merchandise_Returns" name="Varureturer"/> -->
   <tab id="Delivery_Slips" name="Följesedel"/>
   <tab id="Credit_Slips" name="Kreditnota"/>
   <tab id="Statuses" name="Statusar"/>

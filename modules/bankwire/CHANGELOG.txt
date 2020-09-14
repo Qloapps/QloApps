@@ -1,4 +1,15 @@
 ------------------------------
+# V1.1.2 to V1.1.3
+------------------------------
+
+## Improved/Changed Features:
+
+* [CO] : Change the method to calculate the advance payment amount for the order.
+* [CO] : Changed confirm order validation
+* [CO] : Removed unnecessary files.
+
+
+------------------------------
 # V1.1.1 to V1.1.2
 ------------------------------
 

@@ -1,6 +1,6 @@
 <?php
 /**
-* 2010-2019 Webkul.
+* 2010-2020 Webkul.
 *
 * NOTICE OF LICENSE
 *
@@ -14,7 +14,7 @@
 * needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
 *
 *  @author    Webkul IN <support@webkul.com>
-*  @copyright 2010-2019 Webkul IN
+*  @copyright 2010-2020 Webkul IN
 *  @license   https://store.webkul.com/license.html
 */
 
@@ -49,6 +49,11 @@ class AdminRoomTypeGlobalDemandController extends ModuleAdminController
             0 => $this->l('No'),
         );
 
+        $priceCalcList = array(
+            HotelRoomTypeGlobalDemand::WK_PRICE_CALC_METHOD_EACH_DAY => $this->l('Yes'),
+            HotelRoomTypeGlobalDemand::WK_PRICE_CALC_METHOD_RANGE => $this->l('No'),
+        );
+
         $this->fields_list = array(
             'id_global_demand' => array(
                 'title' => $this->l('Id'),
@@ -59,6 +64,17 @@ class AdminRoomTypeGlobalDemandController extends ModuleAdminController
                 'align' => 'center',
                 'havingFilter' => true,
                 'filter_key' => 'global_name',
+            ),
+            'price_calc_method' => array(
+                'title' => $this->l('Per day price calculation'),
+                'hint' => $this->l('Yes, if price of the facility is charged for each day in the booking. No, If price of the facility is charged for entire date range of the booking.'),
+                'align' => 'center',
+                'type' => 'select',
+                'callback' => 'getPriceCalculationMethod',
+                'list' => $priceCalcList,
+                'class' => 'fixed-width-xs',
+                'havingFilter' => true,
+                'filter_key' => 'price_calc_method',
             ),
             'has_adv_option' => array(
                 'title' => $this->l('Advance Options'),
@@ -75,10 +91,10 @@ class AdminRoomTypeGlobalDemandController extends ModuleAdminController
             ),
             'global_price' => array(
                 'title' => $this->l('Price'),
+                'hint' => $this->l('If demand have advance options then you need to go to edit page of the demand to see  price information else price will be shown in the list.'),
                 'align' => 'center',
-                'type' => 'price',
-                'currency' => true,
                 'havingFilter' => true,
+                'callback' => 'getGlobalDemandPrice',
                 'filter_key' => 'global_price',
             ),
         );
@@ -90,6 +106,25 @@ class AdminRoomTypeGlobalDemandController extends ModuleAdminController
                 'confirm' => $this->l('Delete selected items?'),
             ),
         );
+    }
+
+    // return the yes/no for the price calculation method of the demand
+    public function getPriceCalculationMethod($priceCalcMethod, $row)
+    {
+        $this->context->smarty->assign('priceCalcMethod', $priceCalcMethod);
+        return $this->context->smarty->fetch(
+            _PS_MODULE_DIR_.$this->module->name.
+            '/views/templates/admin/room_type_global_demand/_partials/price_calc_method_badge.tpl'
+        );
+    }
+
+    public function getGlobalDemandPrice($price, $row)
+    {
+        if (isset($row['adv_options']) && $row['adv_options']) {
+            return '--';
+        } else {
+            return Tools::displayPrice($price);
+        }
     }
 
     public function initToolbar()

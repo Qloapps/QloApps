@@ -645,11 +645,10 @@ class InstallModelInstall extends InstallAbstractModel
         } else {
             $modules = array(
                 'hotelreservationsystem',
+                'wkroomsearchblock',
                 'blocknewsletter',
                 'blocksocial',
                 'wkfooterblock',
-                'wkroomsearchblock',
-                'wkhotelfiltersearchblock',
                 'wkhotelfilterblock',
                 'wkabouthotelblock',
                 'wkhotelfeaturesblock',
@@ -659,7 +658,6 @@ class InstallModelInstall extends InstallAbstractModel
                 'bankwire',
                 'cheque',
                 'paypal',
-                'wkpaypaladaptive',
                 'blockmyaccount',
                 'blocklanguages',
                 'blockcurrencies',

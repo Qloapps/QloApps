@@ -40,7 +40,7 @@ class AdminFeaturesControllerCore extends AdminController
         $this->list_id = 'feature';
         $this->identifier = 'id_feature';
         $this->lang = true;
-        $this->imageType = 'png';
+        $this->imageType = 'jpg';
         $this->fieldImageSettings = array(
             'name' => 'icon',
             'dir' => 'rf'
@@ -169,16 +169,17 @@ class AdminFeaturesControllerCore extends AdminController
         if (!($obj = $this->loadObject(true))) {
             return;
         }
-        $ps_img_url = _PS_IMG_DIR_.'rf/'.$obj->id.'.png';
-        if ($img_exist = file_exists($ps_img_url)) {
-            $img_url = _PS_IMG_.'rf/'.$obj->id.'.png';
+        // by webkul to get media link.
+        // $ps_img_url = _PS_IMG_DIR_.'rf/'.$obj->id.'.jpg';
+        $img_url = $this->context->link->getMediaLink(_PS_IMG_.'rf/'.$obj->id.'.jpg');
+        if ($img_exist = Tools::file_get_contents($img_url)) {
             $image = "<img class='img-thumbnail img-responsive' style='max-width:100px' src='".$img_url."'>";
         }
 
-        $this->toolbar_title = $this->l('Add a new feature');
+        $this->toolbar_title = $this->l('Add a new room feature');
         $this->fields_form = array(
             'legend' => array(
-                'title' => $this->l('Feature'),
+                'title' => $this->l('Room feature'),
                 'icon' => 'icon-info-sign'
             ),
             'input' => array(
@@ -188,16 +189,16 @@ class AdminFeaturesControllerCore extends AdminController
                     'name' => 'name',
                     'lang' => true,
                     'size' => 33,
-                    'hint' => $this->l('Enter a name for the feature. Invalid characters:').' <>;=#{}',
+                    'hint' => $this->l('Enter a name for the room feature. Invalid characters:').' <>;=#{}',
                     'required' => true
                 ),
                 array(
                     'type' => 'file',
-                    'label' => $this->l('Feature Logo'),
+                    'label' => $this->l('Room Feature Logo'),
                     'name' => 'logo',
                     'image' => $img_exist ? $image : false,
                     'display_image' => true,
-                    'hint' => $this->l('Upload a feature logo.'),
+                    'hint' => $this->l('Upload a room feature logo.'),
                     'required' => true
                 )
             )
@@ -223,21 +224,21 @@ class AdminFeaturesControllerCore extends AdminController
         if (empty($this->display)) {
             $this->page_header_toolbar_btn['new_feature'] = array(
                 'href' => self::$currentIndex.'&addfeature&token='.$this->token,
-                'desc' => $this->l('Add new feature', null, null, false),
+                'desc' => $this->l('Add new room feature', null, null, false),
                 'icon' => 'process-icon-new'
             );
 
-            $this->page_header_toolbar_btn['new_feature_value'] = array(
-                'href' => self::$currentIndex.'&addfeature_value&id_feature='.(int)Tools::getValue('id_feature').'&token='.$this->token,
-                'desc' => $this->l('Add new feature value', null, null, false),
-                'icon' => 'process-icon-new'
-            );
+            // $this->page_header_toolbar_btn['new_feature_value'] = array(
+            //     'href' => self::$currentIndex.'&addfeature_value&id_feature='.(int)Tools::getValue('id_feature').'&token='.$this->token,
+            //     'desc' => $this->l('Add new room feature value', null, null, false),
+            //     'icon' => 'process-icon-new'
+            // );
         }
 
         if ($this->display == 'view') {
             $this->page_header_toolbar_btn['new_feature_value'] = array(
                 'href' => self::$currentIndex.'&addfeature_value&id_feature='.(int)Tools::getValue('id_feature').'&token='.$this->token,
-                'desc' => $this->l('Add new feature value', null, null, false),
+                'desc' => $this->l('Add new room feature value', null, null, false),
                 'icon' => 'process-icon-new'
             );
         }
@@ -283,7 +284,7 @@ class AdminFeaturesControllerCore extends AdminController
             case 'view':
                 $this->toolbar_btn['newAttributes'] = array(
                     'href' => self::$currentIndex.'&addfeature_value&id_feature='.(int)Tools::getValue('id_feature').'&token='.$this->token,
-                    'desc' => $this->l('Add new feature values')
+                    'desc' => $this->l('Add new room feature values')
                 );
                 $this->toolbar_btn['back'] = array(
                     'href' => self::$currentIndex.'&token='.$this->token,
@@ -301,12 +302,12 @@ class AdminFeaturesControllerCore extends AdminController
 
         switch ($this->display) {
             case 'edit':
-                $bread_extended[] = $this->l('Edit New Feature');
+                $bread_extended[] = $this->l('Edit New Room Feature');
                 $this->addMetaTitle($bread_extended[count($bread_extended) - 1]);
                 break;
 
             case 'add':
-                $bread_extended[] = $this->l('Add New Feature');
+                $bread_extended[] = $this->l('Add New Room Feature');
                 $this->addMetaTitle($bread_extended[count($bread_extended) - 1]);
                 break;
 
@@ -351,13 +352,13 @@ class AdminFeaturesControllerCore extends AdminController
 
         $this->fields_form[0]['form'] = array(
             'legend' => array(
-                'title' => $this->l('Feature value'),
+                'title' => $this->l('Room feature value'),
                 'icon' => 'icon-info-sign'
             ),
             'input' => array(
                 array(
                     'type' => 'select',
-                    'label' => $this->l('Feature'),
+                    'label' => $this->l('Room feature'),
                     'name' => 'id_feature',
                     'options' => array(
                         'query' => Feature::getFeatures($this->context->language->id),
@@ -425,7 +426,7 @@ class AdminFeaturesControllerCore extends AdminController
         $helper->allow_employee_form_lang = $this->allow_employee_form_lang;
         $helper->fields_value = $this->getFieldsValue($feature_value);
         $helper->toolbar_btn = $this->toolbar_btn;
-        $helper->title = $this->l('Add a new feature value');
+        $helper->title = $this->l('Add a new room feature value');
         $this->content .= $helper->generateForm($this->fields_form);
     }
 
@@ -464,7 +465,7 @@ class AdminFeaturesControllerCore extends AdminController
             }
         } else {
             $url = '<a href="index.php?tab=AdminPerformance&token='.Tools::getAdminTokenLite('AdminPerformance').'#featuresDetachables">'.$this->l('Performance').'</a>';
-            $this->displayWarning(sprintf($this->l('This feature has been disabled. You can activate it here: %s.'), $url));
+            $this->displayWarning(sprintf($this->l('This room feature has been disabled. You can activate it here: %s.'), $url));
         }
 
         $this->context->smarty->assign(
@@ -581,7 +582,7 @@ class AdminFeaturesControllerCore extends AdminController
                 $sql = 'SELECT `position`+1
 						FROM `'._DB_PREFIX_.'feature`
 						ORDER BY position DESC';
-            // set the position of the new feature in $_POST for postProcess() method
+                // set the position of the new feature in $_POST for postProcess() method
                 $_POST['position'] = DB::getInstance()->getValue($sql);
             }
             // clean \n\r characters
@@ -607,15 +608,15 @@ class AdminFeaturesControllerCore extends AdminController
                 if (isset($featureImage['tmp_name']) && $featureImage['tmp_name']) {
                     // if already feature image then delete it once before uploading new image
                     if ($idFeature) {
-                        $currentImg = _PS_TMP_IMG_DIR_.'feature_mini_'.$objFeature->id.'_'.$this->context->shop->id.'.png';
+                        $currentImg = _PS_TMP_IMG_DIR_.'feature_mini_'.$objFeature->id.'_'.$this->context->shop->id.'.jpg';
                         if (file_exists($currentImg)) {
                             unlink($currentImg);
                         }
                     }
                     // upload feature image
-                    $imgPath = _PS_IMG_DIR_.'rf/'.$objFeature->id.'.png';
+                    $imgPath = _PS_IMG_DIR_.'rf/'.$objFeature->id.'.jpg';
                     if (!ImageManager::resize($featureImage['tmp_name'], $imgPath)) {
-                        $this->errors[] = $this->l('Some error occurred while uploding feature image. Please try again.');
+                        $this->errors[] = $this->l('Some error occurred while uploding room feature image. Please try again.');
                     }
                 }
 
@@ -627,9 +628,10 @@ class AdminFeaturesControllerCore extends AdminController
                 } else {
                     $objFeatureValue = new FeatureValue();
                 }
+
                 $objFeatureValue->id_feature = $objFeature->id;
                 foreach (Language::getLanguages(true) as $lang) {
-                    $objFeatureValue->value[$lang['id_lang']] = $objFeature->id.'.png';
+                    $objFeatureValue->value[$lang['id_lang']] = $objFeature->id.'.jpg';
                 }
                 $objFeatureValue->save();
                 return $objFeature;
@@ -695,12 +697,12 @@ class AdminFeaturesControllerCore extends AdminController
                 if (isset($pos[2]) && (int)$pos[2] === $idFeature) {
                     if ($feature = new Feature((int)$pos[2])) {
                         if (isset($position) && $feature->updatePosition($way, $position, $idFeature)) {
-                            echo 'ok position '.(int)$position.' for feature '.(int)$pos[1].'\r\n';
+                            echo 'ok position '.(int)$position.' for room feature '.(int)$pos[1].'\r\n';
                         } else {
-                            echo '{"hasError" : true, "errors" : "Can not update feature '.(int)$idFeature.' to position '.(int)$position.' "}';
+                            echo '{"hasError" : true, "errors" : "Can not update room feature '.(int)$idFeature.' to position '.(int)$position.' "}';
                         }
                     } else {
-                        echo '{"hasError" : true, "errors" : "This feature ('.(int)$idFeature.') can t be loaded"}';
+                        echo '{"hasError" : true, "errors" : "This room feature ('.(int)$idFeature.') can t be loaded"}';
                     }
 
                     break;

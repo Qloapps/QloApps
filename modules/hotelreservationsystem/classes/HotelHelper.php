@@ -1,6 +1,6 @@
 <?php
 /**
-* 2010-2018 Webkul.
+* 2010-2020 Webkul.
 *
 * NOTICE OF LICENSE
 *
@@ -14,12 +14,32 @@
 * needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
 *
 *  @author    Webkul IN <support@webkul.com>
-*  @copyright 2010-2018 Webkul IN
+*  @copyright 2010-2020 Webkul IN
 *  @license   https://store.webkul.com/license.html
 */
 
 class HotelHelper
 {
+    public static function assignDataTableVariables()
+    {
+        $objModule = new HotelreservationSystem();
+        $jsVars = array(
+                'display_name' => $objModule->l('Display', 'HotelHelper'),
+                'records_name' => $objModule->l('records per page', 'HotelHelper'),
+                'no_product' => $objModule->l('No records found', 'HotelHelper'),
+                'show_page' => $objModule->l('Showing page', 'HotelHelper'),
+                'show_of' => $objModule->l('of', 'HotelHelper'),
+                'no_record' => $objModule->l('No records available', 'HotelHelper'),
+                'filter_from' => $objModule->l('filtered from', 'HotelHelper'),
+                't_record' => $objModule->l('total records', 'HotelHelper'),
+                'search_item' => $objModule->l('Search', 'HotelHelper'),
+                'p_page' => $objModule->l('Previous', 'HotelHelper'),
+                'n_page' => $objModule->l('Next', 'HotelHelper'),
+            );
+
+        Media::addJsDef($jsVars);
+    }
+
     public function initCurl($params)
     {
         if (!$params) {
@@ -222,6 +242,7 @@ class HotelHelper
 
         Configuration::updateValue('WK_TITLE_HEADER_BLOCK', $home_banner_default_title);
         Configuration::updateValue('WK_CONTENT_HEADER_BLOCK', $home_banner_default_content);
+        Configuration::updateValue('WK_HOTEL_HEADER_IMAGE', 'hotel_header_image.jpg');
         Configuration::updateValue('WK_ALLOW_ADVANCED_PAYMENT', 1);
         Configuration::updateValue('WK_ADVANCED_PAYMENT_GLOBAL_MIN_AMOUNT', 10);
         Configuration::updateValue('WK_ADVANCED_PAYMENT_INC_TAX', 1);
@@ -296,65 +317,45 @@ class HotelHelper
         return true;
     }
 
-    public function deletePrestashopDefaultCategories()
-    {
-        $all_root_childrean_categories = Category::getAllCategoriesName();
-        foreach ($all_root_childrean_categories as $cat_key => $cat_value) {
-            if ($cat_value['id_category'] > 2) {
-                $obj_category = new Category($cat_value['id_category']);
-                $obj_category->delete();
-            }
-        }
-
-        return true;
-    }
-
-    public function deletePrestashopDefaultFeatures()
-    {
-        $context = Context::getContext();
-        $all_features = Feature::getFeatures($context->language->id);
-        foreach ($all_features as $ftr_k => $ftr_v) {
-            $obj_feature = new Feature($ftr_v['id_feature']);
-            $obj_feature->delete();
-        }
-
-        return true;
-    }
-
     public function createHotelRoomDefaultFeatures()
     {
         $htl_room_ftrs = array(
             'Wi-Fi',
             'News Paper',
             'Power BackUp',
-            'Refrigerator','Restaurant',
+            'Refrigerator',
+            'Restaurant',
             'Room Service',
             'Gym'
         );
-        $pos = 0;
+
+        // image value in rf/ folder
+        $pos = 1;
+
         foreach ($htl_room_ftrs as $room_ftr_k => $room_ftr_v) {
             $obj_feature = new Feature();
             foreach (Language::getLanguages(true) as $lang) {
                 $obj_feature->name[$lang['id_lang']] = $room_ftr_v;
             }
-            $obj_feature->position = $pos;
+            $obj_feature->position = $pos-1;
             $obj_feature->save();
             if ($obj_feature->id) {
                 $obj_feature_value = new FeatureValue();
                 $obj_feature_value->id_feature = $obj_feature->id;
 
                 foreach (Language::getLanguages(true) as $lang) {
-                    $obj_feature_value->value[$lang['id_lang']] = $obj_feature->id.'.png';
+                    $obj_feature_value->value[$lang['id_lang']] = $obj_feature->id.'.jpg';
                 }
 
                 $obj_feature_value->save();
                 if ($obj_feature_value->id) {
-                    if (file_exists(_PS_IMG_DIR_.'rf/'.$pos.'.png')) {
-                        rename(_PS_IMG_DIR_.'rf/'.$pos.'.png', _PS_IMG_DIR_.'rf/'.$obj_feature->id.'.png');
+                    if (file_exists(_PS_IMG_DIR_.'rf/'.$pos.'.jpg')) {
+                        rename(_PS_IMG_DIR_.'rf/'.$pos.'.jpg', _PS_IMG_DIR_.'rf/'.$obj_feature->id.'.jpg');
                     }
                 }
             }
-            ++$pos;
+
+            $pos++;
         }
 
         return true;
@@ -371,17 +372,6 @@ class HotelHelper
             ' ORDER BY pl.`name`'.
             ($limit > 0 ? ' LIMIT '.(int)$start.','.(int)$limit : '');
         return Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
-    }
-
-    public function deletePreviousPrestashopProducts()
-    {
-        //delete privious products of prestashop
-        if ($all_products = self::getPsProducts(Configuration::get('PS_LANG_DEFAULT'))) {
-            foreach ($all_products as $value_pro) {
-                $obj_product = new Product($value_pro['id_product']);
-                $obj_product->delete();
-            }
-        }
     }
 
     public function saveDummyHotelBranchInfo()
@@ -415,13 +405,7 @@ class HotelHelper
         }
         $obj_hotel_info->state_id = $state_id;
         $obj_hotel_info->country_id = $def_cont_id;
-        if (!$zipCode = self::getRandomZipcodeByForCountry($def_cont_id)) {
-            $objCountry = new Country($def_cont_id);
-            if (strtoupper($objCountry->iso_code) == 'GB') {
-                $zipCode = 'AA1A 1AA';
-            }
-        }
-        $obj_hotel_info->zipcode = $zipCode;
+        $obj_hotel_info->zipcode = self::getRandomZipcodeByForCountry($def_cont_id);
         $obj_hotel_info->address = 'Monticello Dr, Montgomery, AL 36117, USA';
         $obj_hotel_info->save();
 
@@ -510,13 +494,17 @@ class HotelHelper
 
             // assign all the categories of hotel and its parent to the product
             if (Validate::isLoadedObject($objHotel = new HotelBranchInformation($id_hotel))) {
-                if (Validate::isLoadedObject($objCategory = new Category($objHotel->id_category))) {
+                $hotelIdCategory = $objHotel->id_category;
+                if (Validate::isLoadedObject($objCategory = new Category($hotelIdCategory))) {
                     if ($hotelCategories = $objCategory->getParentsCategories()) {
                         $categoryIds = array();
                         foreach ($hotelCategories as $rowCateg) {
                             $categoryIds[] = $rowCateg['id_category'];
                         }
                         $product->addToCategories($categoryIds);
+                        // set the default category to the hotel category
+                        $product->id_category_default = $hotelIdCategory;
+                        $product->save();
                     }
                 }
             }
@@ -637,7 +625,6 @@ class HotelHelper
 
     public function createDummyDataForProject()
     {
-        $this->deletePreviousPrestashopProducts();
         $htl_id = $this->saveDummyHotelBranchInfo();
         $this->saveDummyHotelImages($htl_id);
         $this->saveDummyHotelFeatures($htl_id);
@@ -818,9 +805,31 @@ class HotelHelper
                     $randZipCode = str_replace('N', mt_rand(0, 9), $randZipCode);
                     $randZipCode = str_replace('L', $alphabet[mt_rand(0, Tools::strlen($alphabet) - 1)], $randZipCode);
                     $randZipCode = str_replace('C', $objCountry->iso_code, $randZipCode);
+                } else {
+                    for ($i = 0; $i < 5; ++$i) {
+                        $randZipCode .= mt_rand(0, 9);
+                    }
                 }
             }
         }
         return $randZipCode;
+    }
+
+    /**
+     * Get Super Admin Of Prestashop
+     * @return int Super Admin Employee ID
+     */
+    public static function getSupperAdmin()
+    {
+        if ($data = Db::getInstance()->executeS('SELECT * FROM `'._DB_PREFIX_.'employee` ORDER BY `id_employee`')) {
+            foreach ($data as $emp) {
+                $employee = new Employee($emp['id_employee']);
+                if ($employee->isSuperAdmin()) {
+                    return $emp['id_employee'];
+                }
+            }
+        }
+
+        return false;
     }
 }

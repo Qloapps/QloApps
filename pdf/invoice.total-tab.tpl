@@ -80,26 +80,6 @@
 		</td>
 	</tr>
 	{/if}
-
-	{if isset($order_adv_dtl)}
-		<tr class="bold big">
-			<td class="grey">
-				{l s='Advance Payment Amount' pdf='true'}
-			</td>
-			<td class="white">
-				{displayPrice currency=$order_adv_dtl.id_currency price=$order_adv_dtl.total_paid_amount}
-			</td>
-		</tr>
-		<tr class="bold big">
-			<td class="grey">
-				{l s='Total Due' pdf='true'}
-			</td>
-			<td class="white">
-				{displayPrice currency=$order_adv_dtl.id_currency price=($order_adv_dtl.total_order_amount - $order_adv_dtl.total_paid_amount)}
-			</td>
-		</tr>
-	{/if}
-
 	{if $footer.product_discounts_tax_excl > 0}
 		<tr>
 			<td class="grey" width="70%">
@@ -113,10 +93,21 @@
 
 	<tr class="bold big">
 		<td class="grey">
-			{l s='Total Order Amount' pdf='true'}
+			{l s='Final Booking Amount' pdf='true'}
 		</td>
 		<td class="white">
 			{displayPrice currency=$order->id_currency price=$footer.total_paid_tax_incl}
 		</td>
 	</tr>
+
+	{if $order->total_paid - $order->total_paid_real > 0}
+		<tr class="bold big">
+			<td class="grey">
+				{l s='Due Amount' pdf='true'}
+			</td>
+			<td class="white">
+				{displayPrice currency=$order->id_currency price=($order->total_paid - $order->total_paid_real)}
+			</td>
+		</tr>
+	{/if}
 </table>

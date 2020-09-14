@@ -1,0 +1,123 @@
+/**
+* 2010-2020 Webkul.
+*
+* NOTICE OF LICENSE
+*
+* All right is reserved,
+* Please go through this link for complete license : https://store.webkul.com/license.html
+*
+* DISCLAIMER
+*
+* Do not edit or add to this file if you wish to upgrade this module to newer
+* versions in the future. If you wish to customize this module for your
+* needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
+*
+*  @author    Webkul IN <support@webkul.com>
+*  @copyright 2010-2020 Webkul IN
+*  @license   https://store.webkul.com/license.html
+*/
+
+.header-rmsearch-wrapper {
+  display: none;
+  border-radius: 0px;
+  background: #1A4060;
+  box-shadow: 0 2px 6px 0 rgba(0,0,0,0.16);
+  padding: 20px 0px;}
+  .header-rmsearch-wrapper #search_hotel_block_form {
+    padding-left: 10px;
+    padding-right: 10px;}
+    .header-rmsearch-wrapper .filter_header {
+      font-size: 12px;
+      color: #FFFFFF;
+      line-height: 25px;}
+      .header-rmsearch-wrapper .filter_header p {
+      margin-bottom: 2px;}
+    .header-rmsearch-wrapper #search_hotel_block_form .header-rmsearch-input {
+      box-shadow: 0 2px 1px 0 rgba(0,0,0,0.18);
+      height: 49px;}
+    .header-rmsearch-wrapper #search_hotel_block_form #search_room_submit {
+      padding: 15px 20px;}
+    .header-rmsearch-wrapper .container {
+      position: relative;}
+    .header-rmsearch-wrapper .close_room_serach_wrapper {
+      position: absolute;
+      top: 0px;
+      right: 0px;}
+
+    /* hotel searched information wrapper css */
+    .header-rmsearch-details-wrapper {
+      padding: 30px 0px 0px 0px;
+      background-color: #FAFAFA;}
+    .header-rmsearch-details-wrapper .filter_header {
+      font-size: 12px;
+      color: #333;
+      line-height: 25px;}
+      .header-rmsearch-details-wrapper .filter_header p {
+        margin: 0px;}
+    .header-rmsearch-details-wrapper .search_result_info {
+      font-size: 15px;
+      font-weight: bold;
+      line-height: 30px;
+      color: #333333;}
+    .header-rmsearch-details-wrapper .modify_roomtype_search_btn {
+      border: 1px solid #777777;
+      font-weight: bold;
+      border-radius: 4px;
+      font-size: 13px;
+      padding: 15px 20px;
+      color: #333333;
+      text-align: center;
+      text-transform: uppercase;}
+    .header-rmsearch-details-wrapper .modify_roomtype_search_btn:hover {
+      background-color: #FAFAFA;}
+      .faded-txt {
+        color: #777777;}
+
+ /* .header-rmsearch-wrapper .location_search_results_ul {
+    top: 1px;}
+  .header-rmsearch-wrapper .hotel_dropdown_ul {
+    top: 46px;}*/
+#search_hotel_block_form #hotel_location, #search_hotel_block_form #id_hotel_button, #search_hotel_block_form #guest_occupancy {
+    padding-left: 40px;
+    padding-right: 30px;}
+.header-rmsearch-wrapper .location_search_results_ul li, .header-rmsearch-wrapper .hotel_dropdown_ul li {
+  padding: 13px 15px;}
+#search_hotel_block_form .input-date {
+  background-position: 95% 50%;}
+@media (min-width: 768px) and (max-width: 991px) {
+  .search_room_submit_block {
+    float: right;}
+}
+
+@media (max-width: 991px) {
+  .header-rmsearch-wrapper .close_room_serach_wrapper {
+    top: -8px;
+    right: 15px;}
+.close_room_serach_wrapper img {
+  width: 18px;}}
+
+@media (min-width: 768px) {
+  #search_hotel_block_form #hotel_location {
+    background-position: 3% 50%;}}
+@media (max-width: 767px) {
+  #search_hotel_block_form .input-date {
+    background-position: 96% 50%;}
+
+  .header-rmsearch-details-wrapper .modify_roomtype_search_btn {
+    width: 100%;}
+}
+@media (min-width: 480px) and (max-width: 767px) {
+  #search_hotel_block_form #hotel_location, #search_hotel_block_form #id_hotel_button, #search_hotel_block_form #guest_occupancy {
+    padding-left: 35px;
+    padding-right: 35px;
+    background-position: 2% 50%;}
+  #search_hotel_block_form #id_hotel_button {
+    background: url("../../views/img/icon-hotel.svg") no-repeat 2% 50%, url("../../views/img/icon-dropdown-arrow.svg") no-repeat 98% 50%;
+    background-color: #FFF;}
+  #search_hotel_block_form #guest_occupancy {
+    background: url("../../views/img/icon-users.svg") no-repeat 2% 50%, url("../../views/img/icon-dropdown-arrow.svg") no-repeat 98% 50%;
+    background-color: #FFF;}
+  #search_hotel_block_form .input-date {
+    background-position: 98% 50%;}
+}
+

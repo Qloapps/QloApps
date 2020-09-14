@@ -4,10 +4,9 @@
     <field name="color"/>
   </fields>
   <entities>
-    <order_return_state id="Waiting_for_confirmation" color="#4169E1"/>
-    <order_return_state id="Waiting_for_package" color="#8A2BE2"/>
-    <order_return_state id="Package_received" color="#32CD32"/>
-    <order_return_state id="Return_denied" color="#DC143C"/>
-    <order_return_state id="Return_completed" color="#108510"/>
+    <order_return_state id="Waiting_for_confirmation" color="#4169E1" send_email_to_customer="1" send_email_to_superadmin="1" send_email_to_employee="1" send_email_to_hotelier="1" denied="0" refunded="0"/>
+    <order_return_state id="Request_received" color="#32CD32" send_email_to_customer="1" send_email_to_superadmin="1" send_email_to_employee="1" send_email_to_hotelier="1" denied="0" refunded="0"/>
+    <order_return_state id="Refund_denied" color="#DC143C" send_email_to_customer="1" send_email_to_superadmin="1" send_email_to_employee="1" send_email_to_hotelier="1" denied="1" refunded="0"/>
+    <order_return_state id="Refund_completed" color="#108510" send_email_to_customer="1" send_email_to_superadmin="1" send_email_to_employee="1" send_email_to_hotelier="1" denied="0" refunded="1"/>
   </entities>
 </entity_order_return_state>

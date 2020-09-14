@@ -26,7 +26,7 @@
 		<div class="row margin-lr-0 footer-payment-block">
 			{if isset($allPaymentBlocks) && $allPaymentBlocks}
 				{foreach $allPaymentBlocks as $paymentBlock}
-					<img src="{$module_dir}/views/img/payment_img/{$paymentBlock['id_payment_block']}.jpg">
+					<img src="{$link->getMediaLink("`$module_dir`views/img/payment_img/`$paymentBlock['id_payment_block']`.jpg")}">
 				{/foreach}
 			{/if}
 		</div>

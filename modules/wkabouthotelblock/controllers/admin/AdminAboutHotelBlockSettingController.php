@@ -1,6 +1,6 @@
 <?php
 /**
-* 2010-2018 Webkul.
+* 2010-2020 Webkul.
 *
 * NOTICE OF LICENSE
 *
@@ -14,7 +14,7 @@
 * needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
 *
 *  @author    Webkul IN <support@webkul.com>
-*  @copyright 2010-2018 Webkul IN
+*  @copyright 2010-2020 Webkul IN
 *  @license   https://store.webkul.com/license.html
 */
 
@@ -154,9 +154,10 @@ class AdminAboutHotelBlockSettingController extends ModuleAdminController
 
     public function getInteriorImage($imgName)
     {
-        if (file_exists(_PS_MODULE_DIR_.$this->module->name.'/views/img/hotel_interior/'.$imgName)) {
-            return '<img src="'._MODULE_DIR_.'wkabouthotelblock/views/img/hotel_interior/'.$imgName.
-            '" class="img-thumbnail htlInteriorImg">';
+        // by webkul to get media link.
+        $imgUrl = $this->context->link->getMediaLink(_MODULE_DIR_.$this->module->name.'/views/img/hotel_interior/'.$imgName.'.jpg');
+        if (Tools::file_get_contents($imgUrl)) {
+            return '<img src="'.$imgUrl.'" class="img-thumbnail htlInteriorImg">';
         } else {
             return '--';
         }
@@ -171,16 +172,23 @@ class AdminAboutHotelBlockSettingController extends ModuleAdminController
             $objHtlInteriorImg = new WkHotelInteriorImage($idHtlInterior);
             $imgName = $objHtlInteriorImg->name;
 
-            $image = _PS_MODULE_DIR_.$this->module->name.'/views/img/hotel_interior/'.$imgName;
-            $imageUrl = ImageManager::thumbnail(
-                $image,
-                $this->table.'_'.(int)$idHtlInterior.'.'.$this->imageType,
-                350,
-                $this->imageType,
-                true,
-                true
-            );
-            $imageSize = file_exists($image) ? filesize($image) / 1000 : false;
+            // by webkul to get media link.
+            // $image = _PS_MODULE_DIR_.$this->module->name.'/views/img/hotel_interior/'.$imgName.'.jpg';
+            // $imageUrl = ImageManager::thumbnail(
+            //     $image,
+            //     $this->table.'_'.(int)$idHtlInterior.'.'.$this->imageType,
+            //     350,
+            //     $this->imageType,
+            //     true,
+            //     true
+            // );
+            // $imageSize = file_exists($image) ? filesize($image) / 1000 : false;
+
+            $imgUrl = $this->context->link->getMediaLink(_MODULE_DIR_.$this->module->name.'/views/img/hotel_interior/'.$imgName.'.jpg');
+            if ($imgExist = (bool)Tools::file_get_contents($imgUrl)) {
+                $image = "<img class='img-thumbnail img-responsive' style='max-width:250px' src='".$imgUrl."'>";
+            }
+
         }
         $this->fields_form = array(
             'legend' => array(
@@ -200,9 +208,9 @@ class AdminAboutHotelBlockSettingController extends ModuleAdminController
                     'name' => 'interior_img',
                     'required' => true,
                     'display_image' => true,
-                    'image' => $imageUrl ? $imageUrl : false,
-                    'size' => $imageSize,
-                    'col' => 6,
+                    'image' => $imgExist ? $image : false, // to get media link
+                    // 'size' => $imageSize,
+                    // 'col' => 6,
                     'hint' => sprintf(
                         $this->l('Maximum image size: %1s'),
                         Tools::formatBytes(Tools::getMaxUploadSize())
@@ -263,16 +271,17 @@ class AdminAboutHotelBlockSettingController extends ModuleAdminController
             }
 
             if (Tools::getValue("id_interior_image") && $file['size'] && !$file['error']) {
-                unlink(_PS_MODULE_DIR_.$this->module->name.'/views/img/hotel_interior/'.$objHtlInteriorImg->name);
+                $objHtlInteriorImg->deleteImage();
             }
-
             if ($file['size']) {
                 do {
-                    $tmp_name = uniqid().'.jpg';
-                } while (file_exists(_PS_MODULE_DIR_.$this->module->name.'/views/img/hotel_interior/'.$tmp_name));
+                    $tmp_name = uniqid();
+                } while ((bool)Tools::file_get_contents(
+                    $this->context->link->getMediaLink(_MODULE_DIR_.$this->module->name.'/views/img/hotel_interior/'.$tmp_name.'.jpg')
+                ));
                 ImageManager::resize(
                     $file['tmp_name'],
-                    _PS_MODULE_DIR_.$this->module->name.'/views/img/hotel_interior/'.$tmp_name
+                    _PS_MODULE_DIR_.$this->module->name.'/views/img/hotel_interior/'.$tmp_name.'.jpg'
                 );
 
                 $objHtlInteriorImg->name = $tmp_name;

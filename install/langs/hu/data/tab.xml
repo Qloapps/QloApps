@@ -31,7 +31,7 @@
   <tab id="Attachments" name="Csatolmányok"/>
   <tab id="Orders_1" name="Rendelések"/>
   <tab id="Invoices" name="Számlák"/>
-  <tab id="Merchandise_Returns" name="Áru visszatérítések"/>
+  <!-- <tab id="Merchandise_Returns" name="Áru visszatérítések"/> -->
   <tab id="Delivery_Slips" name="Delivery Slips"/>
   <tab id="Credit_Slips" name="Credit Slips"/>
   <tab id="Statuses" name="Statuses"/>

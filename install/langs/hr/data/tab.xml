@@ -31,7 +31,7 @@
   <tab id="Attachments" name="Privitci"/>
   <tab id="Orders_1" name="Narudžbi"/>
   <tab id="Invoices" name="Računi"/>
-  <tab id="Merchandise_Returns" name="Povrat robe"/>
+  <!-- <tab id="Merchandise_Returns" name="Povrat robe"/> -->
   <tab id="Delivery_Slips" name="Dostavnice"/>
   <tab id="Credit_Slips" name="Kreditne note"/>
   <tab id="Statuses" name="Statusi"/>

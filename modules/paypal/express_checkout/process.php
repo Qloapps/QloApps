@@ -119,6 +119,13 @@ class PaypalExpressCheckout extends Paypal
             return false;
         }
 
+        if(Module::isInstalled('hotelreservationsystem')) {
+            if(HotelOrderRestrictDate::validateOrderRestrictDateOnPayment($this->context->controller)) {
+                $this->logs = $this->context->controller->errors;
+                return false;
+            }
+        }
+
         $cart_currency = new Currency((int) $this->context->cart->id_currency);
         $currency_module = $this->getCurrency((int) $this->context->cart->id_currency);
 
@@ -304,7 +311,6 @@ class PaypalExpressCheckout extends Paypal
     private function setProductsList(&$fields, &$index, &$total)
     {
         // ojects needed to get advance paid amount
-        $objCustomerAdv = new HotelCustomerAdvancedPayment();
         $objAdvPayment = new HotelAdvancedPayment();
         $objCartBooking = new HotelCartBookingData();
 
@@ -320,9 +326,7 @@ class PaypalExpressCheckout extends Paypal
             $fields['L_PAYMENTREQUEST_0_DESC'.$index] = Tools::substr(strip_tags($product['description_short']), 0, 50).'...';
 
             // set advance product price if customer chhoses advance payment
-            if (Configuration::get('WK_ALLOW_ADVANCED_PAYMENT')
-                && $objCustomerAdv->getClientAdvPaymentDtl($this->context->cart->id, $this->context->cart->id_guest)
-            ) {
+            if ($this->context->cart->is_advance_payment) {
                 $product['price_wt'] = $objAdvPayment->getProductMinAdvPaymentAmountByIdCart(
                     $this->context->cart->id,
                     $product['id_product']
@@ -341,6 +345,16 @@ class PaypalExpressCheckout extends Paypal
                     )) {
                         $product['price_wt'] += $roomTotalPrice['total_price_tax_incl'];
                         $product['price'] += $roomTotalPrice['total_price_tax_excl'];
+                    }
+                    if($demandPrice = $objCartBooking->getCartExtraDemands(
+                        $cartRoomInfo['id_cart'],
+                        $cartRoomInfo['id_product'],
+                        $cartRoomInfo['id_room'],
+                        $cartRoomInfo['date_from'],
+                        $cartRoomInfo['date_to'],
+                        1
+                    )) {
+                        $product['price_wt'] += $demandPrice;
                     }
                 }
                 $product['quantity'] = 1;

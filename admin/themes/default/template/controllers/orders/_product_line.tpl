@@ -24,6 +24,11 @@
 *}
 
 <tr class="product-line-row" data-id_room="{$data.id_room}" data-id_product="{$data.id_product}" data-id_hotel="{$data.id_hotel}" data-date_from="{$data.date_from}" data-date_to="{$data.date_to}" data-product_price="{$data.unit_amt_tax_incl}" data-order_detail_id="{$data.id_order_detail}">
+	{if $refund_allowed}
+		<td class="standard_refund_fields" style="display:none">
+			<input type="checkbox" name="id_htl_booking[]" value="{$data.id|escape:'html':'UTF-8'}" {if isset($refundReqBookings) && ($data.id|in_array:$refundReqBookings)}disabled{/if}/>
+		</td>
+	{/if}
 	<td class="text-center">
 		{$data.room_num}
 	</td>
@@ -32,12 +37,12 @@
 	</td>
 	<td class="text-center">
 		<p>{$data.room_type}</p>
+		<p class="room_extra_demands {if !isset($data['extra_demands']) || !$data['extra_demands']}edit_product_fields{/if}" {if !isset($data['extra_demands']) || !$data['extra_demands']}style="display: none;"{/if}>
+			<a href="#" data-toggle="modal" data-target="#rooms_type_extra_demands" date_from="{$data['date_from']}" date_to="{$data['date_to']}" id_product="{$data['id_product']}" id_room="{$data['id_room']}" id_order="{$order->id}" class="open_room_extra_demands" id_htl_booking="{$data['id']}" edit_orde_line="0">
+				{l s='Additional Features'}
+			</a>
+		</p>
 		{if isset($data['extra_demands']) && $data['extra_demands']}
-			<p class="room_extra_demands">
-				<a href="#" data-toggle="modal" data-target="#rooms_type_extra_demands" date_from="{$data['date_from']}" date_to="{$data['date_to']}" id_product="{$data['id_product']}" id_room="{$data['id_room']}" id_order="{$order->id}" class="open_room_extra_demands">
-					{l s='Additional Features'}
-				</a>
-			</p>
 			<p>
 				{convertPriceWithCurrency price=$data['extra_demands_price_ti'] currency=$currency->id}
 			</p>
@@ -106,38 +111,29 @@
 		</div>
 		{/if}
 	</td>
-
-	<td class="text-center stage_name">
-		<p>
-			{if isset($data['stage_name']) && $data['stage_name']}
-				{$data['stage_name']}
-			{else}
-				--
+	{if isset($refundReqBookings) && $refundReqBookings}
+		<td class="text-center">
+			{if isset($data.refund_info) && $data.refund_info}
+				<span class="badge" style="background-color:{$data.refund_info.color|escape:'html':'UTF-8'}">{$data.refund_info.name|escape:'html':'UTF-8'}</span>
 			{/if}
-		</p>
-	</td>
-	<td class="text-center status_name">
-		<p>
-			{if $data['stage_name'] == 'Refunded' || $data['stage_name'] == 'Rejected'}
-				{l s="Done!"}
-			{else if $data['stage_name'] == 'Waiting' || $data['stage_name'] == 'Accepted'}
-				{l s="Pending..."}
-			{else}
-				--
+		</td>
+		<td class="text-center">
+			{if isset($data.refund_info) && $data.refund_info}
+				{convertPriceWithCurrency price=$data.refund_info.refunded_amount currency=$currency->id}
 			{/if}
-		</p>
-	</td>
+		</td>
+	{/if}
 
 	{if $data.booking_type == 1}
-	<td class="text-center">
-		{if $data['stage_name'] == 'Refunded' || $data['stage_name'] == 'Rejected'}
-			<p class="text-center">----</p>
-		{else}
-			<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#mySwappigModal" data-id_order="{$order->id}" data-room_num='{$data.room_num}' data-date_from='{$data.date_from}' data-date_to='{$data.date_to}' data-id_room='{$data.id_room}' data-cust_name='{$data.alloted_cust_name}' data-cust_email='{$data.alloted_cust_email}' data-avail_rm_swap='{$data.avail_rooms_to_swap|@json_encode}' data-avail_rm_realloc='{$data.avail_rooms_to_realloc|@json_encode}'>
-				{l s='Reallocate Room' mod='hotelreservationsystem'}
-			</button>
-		{/if}
-	</td>
+		<td class="text-center">
+			{if isset($data.refund_info) && ($data.refund_info.refunded || $data.refund_info.denied)}
+				<p class="text-center">--</p>
+			{else}
+				<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#mySwappigModal" data-id_order="{$order->id}" data-room_num='{$data.room_num}' data-date_from='{$data.date_from}' data-date_to='{$data.date_to}' data-id_room='{$data.id_room}' data-cust_name='{$data.alloted_cust_name}' data-cust_email='{$data.alloted_cust_email}' data-avail_rm_swap='{$data.avail_rooms_to_swap|@json_encode}' data-avail_rm_realloc='{$data.avail_rooms_to_realloc|@json_encode}'>
+					{l s='Reallocate Room' mod='hotelreservationsystem'}
+				</button>
+			{/if}
+		</td>
 	{/if}
 	{if ($can_edit && !$order->hasBeenDelivered())}
 		<td class="product_invoice" style="display: none;">

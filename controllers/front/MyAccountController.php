@@ -49,7 +49,7 @@ class MyAccountControllerCore extends FrontController
         $this->context->smarty->assign(array(
             'has_customer_an_address' => empty($has_address),
             'voucherAllowed' => (int)CartRule::isFeatureActive(),
-            'returnAllowed' => (int)Configuration::get('PS_ORDER_RETURN')
+            'refundAllowed' => (int)Configuration::get('WK_ORDER_REFUND_ALLOWED')
         ));
         $this->context->smarty->assign('HOOK_CUSTOMER_ACCOUNT', Hook::exec('displayCustomerAccount'));
 
