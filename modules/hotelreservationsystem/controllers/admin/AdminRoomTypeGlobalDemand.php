@@ -185,7 +185,6 @@ class AdminRoomTypeGlobalDemandController extends ModuleAdminController
         );
         $smartyVars['ps_img_dir'] = _PS_IMG_.'l/';
         $this->context->smarty->assign($smartyVars);
-        $this->context->smarty->assign($smartyVars);
 
         $this->fields_form = array(
             'submit' => array(
