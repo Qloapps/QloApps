@@ -100,7 +100,7 @@
 				{if isset($guestInformations['email']) && $guestInformations['email']}
 					<li class="row"><div class="col-sm-3 col-md-2 col-xs-6">{l s='Email'}</div><div class="col-sm-9 col-xs-6">{$guestInformations['email']|escape:'html':'UTF-8'}</div></li>
 				{/if}
-				{if isset($address_invoice->pshone_mobile) && $address_invoice->phone_mobile}
+				{if isset($address_invoice->phone_mobile) && $address_invoice->phone_mobile}
 					<li class="row"><div class="col-sm-3 col-md-2 col-xs-6">{l s='Mobile Number'}</div><div class="col-sm-9 col-xs-6">{$address_invoice->phone_mobile|escape:'html':'UTF-8'}</div></li>
 				{/if}
 				{if isset($address_invoice->phone) && $address_invoice->phone}
