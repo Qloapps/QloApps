@@ -76,7 +76,11 @@ class CookieCore
         $this->_name = 'PrestaShop-'.md5(($this->_standalone ? '' : _PS_VERSION_).$name.$this->_domain);
         $this->_allow_writing = true;
         $this->_salt = $this->_standalone ? str_pad('', 8, md5('ps'.__FILE__)) : _COOKIE_IV_;
-        $this->_cipherTool = new Rijndael(_RIJNDAEL_KEY_, _RIJNDAEL_IV_);
+        if(defined('_RIJNDAEL_KEY_')) {
+            $this->_cipherTool = new Rijndael(_RIJNDAEL_KEY_, _RIJNDAEL_IV_);
+        }else{
+            $this->_cipherTool = new Rijndael(_OPENSSL_KEY_, _OPENSSL_IV_);
+        }
         $this->_secure = (bool)$secure;
 
         $this->update();
