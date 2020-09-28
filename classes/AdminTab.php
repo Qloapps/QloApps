@@ -1672,7 +1672,7 @@ abstract class AdminTabCore
 
         $irow = 0;
         if ($this->_list && isset($this->fieldsDisplay['position'])) {
-            $positions = array_map(create_function('$elem', 'return (int)$elem[\'position\'];'), $this->_list);
+            $positions = array_map(function($elem) { return (int)$elem['position']; }, $this->_list);
             sort($positions);
         }
         if ($this->_list) {
