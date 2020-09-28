@@ -81,9 +81,9 @@ class AdminAttachmentsControllerCore extends AdminController
         parent::__construct();
     }
 
-    public function setMedia()
+    public function setMedia($isNewTheme = false)
     {
-        parent::setMedia();
+        parent::setMedia($isNewTheme);
 
         $this->addJs(_PS_JS_DIR_.'/admin/attachments.js');
         Media::addJsDefL('confirm_text', $this->l('This attachment is associated with the following products, do you really want to  delete it?', null, true, false));
