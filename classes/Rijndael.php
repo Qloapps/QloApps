@@ -119,11 +119,20 @@ class RijndaelCore
     protected function generateHmac($encrypted)
     {
         $macKey = $this->generateKeygenS2k('sha256', $this->_key, $this->_iv, 32);
-        return hash_hmac(
-            'sha256',
-            $this->_iv . MCRYPT_RIJNDAEL_128 . $encrypted,
-            $macKey
-        );
+		
+		if(defined('MCRYPT_RIJNDAEL_128')) {
+            return hash_hmac(
+                'sha256',
+                $this->_iv . MCRYPT_RIJNDAEL_128 . $encrypted,
+                $macKey
+            );
+        }else{
+            return hash_hmac(
+                'sha256',
+                $this->_iv  . $encrypted,
+				$macKey
+            );
+        }
     }
 
     /**
