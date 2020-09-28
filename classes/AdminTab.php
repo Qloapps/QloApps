@@ -508,7 +508,7 @@ abstract class AdminTabCore
         /* Checking for fields validity */
         foreach ($rules['validate'] as $field => $function) {
             if (($value = Tools::getValue($field)) !== false && !empty($value) && ($field != 'passwd')) {
-                if (!Validate::$function($value)) {
+                if (!Validate::{$function}($value)) {
                     $this->_errors[] = sprintf(Tools::displayError('The field %1$s (%2$s) is invalid.'), call_user_func(array($className, 'displayFieldName'), $field, $className));
                 }
             }
@@ -527,7 +527,7 @@ abstract class AdminTabCore
         foreach ($rules['validateLang'] as $fieldLang => $function) {
             foreach ($languages as $language) {
                 if (($value = Tools::getValue($fieldLang.'_'.$language['id_lang'])) !== false && !empty($value)) {
-                    if (!Validate::$function($value)) {
+                    if (!Validate::{$function}($value)) {
                         $this->_errors[] = sprintf(Tools::displayError('The field %1$s (%2$s) is invalid.'), call_user_func(array($className, 'displayFieldName'), $fieldLang, $className), $language['name']);
                     }
                 }
