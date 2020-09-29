@@ -255,6 +255,16 @@ if (defined('_RIJNDAEL_KEY_')) {
 if (defined('_RIJNDAEL_IV_')) {
     $datas[] = array('_RIJNDAEL_IV_', _RIJNDAEL_IV_);
 }
+if (defined('_OPENSSL_KEY_')) {
+    $datas[] = array('_OPENSSL_KEY_', _OPENSSL_KEY_);
+}else{
+    $datas[] = array('_OPENSSL_KEY_', _COOKIE_KEY_);
+}
+if (defined('_OPENSSL_IV_')) {
+    $datas[] = array('_OPENSSL_IV_', _OPENSSL_IV_);
+}else{
+    $datas[] = array('_OPENSSL_IV_', base64_encode(openssl_random_pseudo_bytes(openssl_cipher_iv_length('AES-128-CBC'))));
+}
 if (!defined('_PS_CACHE_ENABLED_')) {
     define('_PS_CACHE_ENABLED_', '0');
 }
