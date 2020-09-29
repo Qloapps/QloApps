@@ -1770,7 +1770,7 @@ abstract class ObjectModelCore implements Core_Foundation_Database_EntityInterfa
         }
 
         foreach ($data as $key => $value) {
-            if (array_key_exists($key, $this)) {
+            if (property_exists($this, $key)) {
                 $this->$key = $value;
             }
         }
