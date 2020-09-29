@@ -167,8 +167,8 @@ class ShopUrlCore extends ObjectModel
 			FROM '._DB_PREFIX_.'shop_url
 			WHERE main = 1
 			AND id_shop = '.($id_shop !== null ? (int)$id_shop : (int)Context::getContext()->shop->id));
-            self::$main_domain[(int)$id_shop] = $row['domain'];
-            self::$main_domain_ssl[(int)$id_shop] = $row['domain_ssl'];
+            self::$main_domain[(int)$id_shop] = $row['domain']?? null;
+            self::$main_domain_ssl[(int)$id_shop] = $row['domain_ssl']?? null;
         }
     }
 
@@ -180,12 +180,14 @@ class ShopUrlCore extends ObjectModel
 
     public static function getMainShopDomain($id_shop = null)
     {
+        $id_shop = ($id_shop !== null ? (int)$id_shop : (int)Context::getContext()->shop->id);
         ShopUrl::cacheMainDomainForShop($id_shop);
         return self::$main_domain[(int)$id_shop];
     }
 
     public static function getMainShopDomainSSL($id_shop = null)
     {
+        $id_shop = ($id_shop !== null ? (int)$id_shop : (int)Context::getContext()->shop->id);
         ShopUrl::cacheMainDomainForShop($id_shop);
         return self::$main_domain_ssl[(int)$id_shop];
     }
