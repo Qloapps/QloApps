@@ -2998,7 +2998,7 @@ class HTMLPurifier_Context
      */
     public function register($name, &$ref)
     {
-        if (property_exists($this->_storage, $name)) {
+        if (property_exists((object)$this->_storage, $name)) {
             trigger_error(
                 "Name $name produces collision, cannot re-register",
                 E_USER_ERROR
@@ -3016,7 +3016,7 @@ class HTMLPurifier_Context
      */
     public function &get($name, $ignore_error = false)
     {
-        if (!property_exists($this->_storage, $name)) {
+        if (!property_exists((object)$this->_storage, $name)) {
             if (!$ignore_error) {
                 trigger_error(
                     "Attempted to retrieve non-existent variable $name",
@@ -3035,7 +3035,7 @@ class HTMLPurifier_Context
      */
     public function destroy($name)
     {
-        if (!property_exists($this->_storage, $name)) {
+        if (!property_exists((object)$this->_storage, $name)) {
             trigger_error(
                 "Attempted to destroy non-existent variable $name",
                 E_USER_ERROR
@@ -3052,7 +3052,7 @@ class HTMLPurifier_Context
      */
     public function exists($name)
     {
-        return property_exists($this->_storage, $name);
+        return property_exists((object)$this->_storage, $name);
     }
 
     /**
@@ -7974,7 +7974,7 @@ class HTMLPurifier_PropertyList
      */
     public function has($name)
     {
-        return property_exists($this->data, $name);
+        return property_exists((object)$this->data, (string)$name);
     }
 
     /**
