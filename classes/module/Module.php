@@ -316,7 +316,7 @@ abstract class ModuleCore
                     $this->id = self::$modules_cache[$this->name]['id_module'];
                 }
                 foreach (self::$modules_cache[$this->name] as $key => $value) {
-                    if (array_key_exists($key, $this)) {
+                    if (property_exists($this, $key)) {
                         $this->{$key} = $value;
                     }
                 }
