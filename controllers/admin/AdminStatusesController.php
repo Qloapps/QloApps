@@ -322,7 +322,10 @@ class AdminStatusesControllerCore extends AdminController
 
     public function renderForm()
     {
-        if (Tools::isSubmit('updateorder_state') || Tools::isSubmit('addorder_state')) {
+        if (Tools::isSubmit('updateorder_state')
+            || Tools::isSubmit('addorder_state')
+            || Tools::isSubmit('submitAddorder_state')
+        ) {
             $this->fields_form = array(
                 'tinymce' => true,
                 'legend' => array(
