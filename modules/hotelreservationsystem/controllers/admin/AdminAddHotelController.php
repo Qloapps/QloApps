@@ -144,7 +144,6 @@ class AdminAddHotelController extends ModuleAdminController
             if ($hotelAllImages = $objHotelImage->getAllImagesByHotelId($idHotel)) {
                 foreach ($hotelAllImages as &$image) {
                     $image['image_link'] = $this->context->link->getMediaLink(_MODULE_DIR_.$this->module->name.'/views/img/hotel_img/'.$image['hotel_image_id'].'.jpg');
-                    $image['hotel_image_id'].'.jpg';
                 }
                 $smartyVars['hotelImages'] =  $hotelAllImages;
             }
