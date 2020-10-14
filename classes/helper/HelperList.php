@@ -623,7 +623,7 @@ class HelperListCore extends Helper
                     if (is_string($value)) {
                         $value = json_decode($value, true);
                     }
-                    if (isset($value[0]) && !Validate::isCleanHtml($value[0]) || isset($value[0]) && !Validate::isCleanHtml($value[1])) {
+                    if (isset($value[0]) && !Validate::isCleanHtml($value[0]) || isset($value[1]) && !Validate::isCleanHtml($value[1])) {
                         $value = '';
                     }
                     $name = $this->list_id.'Filter_'.(isset($params['filter_key']) ? $params['filter_key'] : $key);
