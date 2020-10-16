@@ -56,36 +56,17 @@ class WkRoomSearchBlock extends Module
             $this->context->controller->addJS(_PS_MODULE_DIR_.$this->name.'/views/js/wk-room-search-block.js');
 
             Media::addJsDef(
-                array(
-                    'autocomplete_search_url' => $this->context->link->getModuleLink('wkroomsearchblock', 'autocompletesearch'),
-                    'max_child_age' => Configuration::get('WK_GLOBAL_CHILD_MAX_AGE'),
-                    'max_child_in_room' => Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM'),
-                )
-            );
-            Media::addJsDef(
                 array (
+                    'autocomplete_search_url' => $this->context->link->getModuleLink(
+                        'wkroomsearchblock',
+                        'autocompletesearch'
+                    ),
                     'no_results_found_cond' => $this->l('No results found for this search'),
-                    'hotel_loc_cond' => $this->l('Please enter a hotel location'),
                     'hotel_name_cond' => $this->l('Please select a hotel name'),
                     'check_in_time_cond' => $this->l('Please enter Check In time'),
                     'check_out_time_cond' => $this->l('Please enter Check Out time'),
-                    'num_adults_cond' => $this->l('Please enter number of adults.'),
-                    'num_children_cond' => $this->l('Please enter number of children.'),
-                    'some_error_occur_cond' => $this->l('Some error occured. Please try again.'),
                     'less_checkin_date' => $this->l('Check In date can not be before current date.'),
                     'more_checkout_date' => $this->l('Check Out date must be greater than Check In date.'),
-                    'select_age_txt' => $this->l('Select age'),
-                    'under_1_age' => $this->l('Under 1'),
-                    'room_txt' => $this->l('Room'),
-                    'rooms_txt' => $this->l('Rooms'),
-                    'remove_txt' => $this->l('Remove'),
-                    'adult_txt' => $this->l('Adult'),
-                    'adults_txt' => $this->l('Adults'),
-                    'child_txt' => $this->l('Child'),
-                    'children_txt' => $this->l('Children'),
-                    'below_txt' => $this->l('Below'),
-                    'years_txt' => $this->l('years'),
-                    'all_children_txt' => $this->l('All Children'),
                     'select_htl_txt' => $this->l('Select Hotel'),
                 )
             );
@@ -157,13 +138,6 @@ class WkRoomSearchBlock extends Module
         $maxOrderDate = Tools::getValue('max_order_date');
         $maxOrderDate = date('Y-m-d', strtotime($maxOrderDate));
 
-        // Get guest occupnacy variables
-        $adults = Tools::getValue('num_adults');
-        $children = Tools::getValue('num_children');
-        if (!$childAges = Tools::getValue('child_ages')) {
-            $childAges = array();
-        }
-
         $objSearchHelper = new WkRoomSearchHelper();
         $this->context->controller->errors = array_merge(
             $this->context->controller->errors,
@@ -171,14 +145,11 @@ class WkRoomSearchBlock extends Module
         );
         // id there is no validation error the proceed to redirect on search result page
         if (!count($this->context->controller->errors)) {
+            $urlData = array (
+                'date_from' => $checkIn,
+                'date_to' => $checkOut,
+            );
             if (Configuration::get('PS_REWRITING_SETTINGS')) {
-                $urlData = array (
-                    'date_from' => $checkIn,
-                    'date_to' => $checkOut,
-                    'adults' => $adults,
-                    'children' => $children,
-                    'child_ages' => $childAges,
-                );
                 $redirectLink = $this->context->link->getCategoryLink(
                     new Category($hotelCategoryId, $this->context->language->id),
                     null,
@@ -189,7 +160,7 @@ class WkRoomSearchBlock extends Module
                     new Category($hotelCategoryId, $this->context->language->id),
                     null,
                     $this->context->language->id
-                ).http_build_query($urlData);
+                ).'&'.http_build_query($urlData);
             }
             Tools::redirect($redirectLink);
         }
