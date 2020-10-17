@@ -880,7 +880,8 @@ class HotelCartBookingData extends ObjectModel
                         $cartBookingDetails = $objCartBooking->getOnlyCartBookingData(
                             $context->cart->id,
                             $context->cart->id_guest,
-                            $product['id_product']
+                            $product['id_product'],
+                            $context->customer->id
                         );
                     } else {
                         $cartBookingDetails = $objCartBooking->getOnlyCartBookingData(
