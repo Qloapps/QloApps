@@ -3733,7 +3733,9 @@ exit;
             return;
         }
 
-        uasort($rows, function ($a, $b) { return $b['$column'] > $a['$column'] ? 1 : -1; });
+	$sort_function = create_function('$a, $b', "return \$b['$column'] > \$a['$column'] ? 1 : -1;");
+
+	uasort($rows, $sort_function)
 
         $unit = pow(10, $precision);
 
