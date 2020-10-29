@@ -202,7 +202,7 @@ function getDirContent($path)
     if (is_dir($path)) {
         $d = dir($path);
         while (false !== ($entry = $d->read())) {
-            if ($entry{0} != '.') {
+            if ($entry[0] != '.') {
                 $content[] = $entry;
             }
         }
