@@ -2369,7 +2369,7 @@ class ProductCore extends ObjectModel
 
         $id_address = $context->cart->{Configuration::get('PS_TAX_ADDRESS_TYPE')};
         $ids = Address::getCountryAndState($id_address);
-        $id_country = $ids['id_country'] ? (int)$ids['id_country'] : (int)Configuration::get('PS_COUNTRY_DEFAULT');
+	$id_country = $ids['id_country'] ? (int) $ids['id_country'] : (int) Configuration::get('PS_COUNTRY_DEFAULT');
 
         return SpecificPrice::getProductIdByDate(
             $context->shop->id,
@@ -3461,7 +3461,7 @@ class ProductCore extends ObjectModel
 			JOIN `'._DB_PREFIX_.'attribute` a ON (a.`id_attribute` = pac.`id_attribute`)
 			JOIN `'._DB_PREFIX_.'attribute_lang` al ON (a.`id_attribute` = al.`id_attribute` AND al.`id_lang` = '.(int)$id_lang.')
 			JOIN `'._DB_PREFIX_.'attribute_group` ag ON (a.id_attribute_group = ag.`id_attribute_group`)
-			WHERE pa.`id_product` IN ('.implode(array_map('intval', $products), ',').') AND ag.`is_color_group` = 1
+			WHERE pa.`id_product` IN ('.implode(',', array_map('intval', $products)).') AND ag.`is_color_group` = 1
 			GROUP BY pa.`id_product`, a.`id_attribute`, `group_by`
 			'.($check_stock ? 'HAVING qty > 0' : '').'
 			ORDER BY a.`position` ASC;'
@@ -3706,7 +3706,7 @@ class ProductCore extends ObjectModel
         $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS('
 		SELECT id_feature, id_product, id_feature_value
 		FROM `'._DB_PREFIX_.'feature_product`
-		WHERE `id_product` IN ('.implode($product_implode, ',').')');
+		WHERE `id_product` IN ('.implode( ',', $product_implode).')');
         foreach ($result as $row) {
             if (!array_key_exists($row['id_product'], self::$_cacheFeatures)) {
                 self::$_cacheFeatures[$row['id_product']] = array();
@@ -3738,7 +3738,7 @@ class ProductCore extends ObjectModel
 		LEFT JOIN '._DB_PREFIX_.'feature_value_lang fvl ON (fvl.id_feature_value = pf.id_feature_value AND fvl.id_lang = '.(int)$id_lang.')
 		LEFT JOIN '._DB_PREFIX_.'feature f ON (f.id_feature = pf.id_feature)
 		'.Shop::addSqlAssociation('feature', 'f').'
-		WHERE `id_product` IN ('.implode($product_implode, ',').')
+		WHERE `id_product` IN ('.implode(',', $product_implode).')
 		ORDER BY f.position ASC');
 
         foreach ($result as $row) {
