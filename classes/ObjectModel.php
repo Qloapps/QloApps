@@ -1258,7 +1258,7 @@ abstract class ObjectModelCore implements Core_Foundation_Database_EntityInterfa
             }
             if (isset($details['validate'])) {
                 $current_field['validateMethod'] = (
-                    array_key_exists('validateMethod', $resource_parameters['fields'][$field_name]) ?
+                    property_exists($resource_parameters['fields'][$field_name], 'validateMethod') ?
                                 array_merge($resource_parameters['fields'][$field_name]['validateMethod'], array($details['validate'])) :
                                 array($details['validate'])
                 );
@@ -1797,7 +1797,7 @@ abstract class ObjectModelCore implements Core_Foundation_Database_EntityInterfa
         $rows = array();
         if ($datas) {
             $definition = ObjectModel::getDefinition($class);
-            if (!array_key_exists($definition['primary'], $datas[0])) {
+            if (!property_exists($datas[0], $definition['primary'])) {
                 throw new PrestaShopException("Identifier '{$definition['primary']}' not found for class '$class'");
             }
 
