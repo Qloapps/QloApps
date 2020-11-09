@@ -43,11 +43,10 @@ class AdminCartsControllerCore extends AdminController
         $this->_orderWay = 'DESC';
         $this->context = Context::getContext();
 
-        $this->_select = 'CONCAT(LEFT(c.`firstname`, 1), \'. \', c.`lastname`) `customer`, a.id_cart total, ca.name carrier,
+        $this->_select = 'CONCAT(LEFT(c.`firstname`, 1), \'. \', c.`lastname`) `customer`, a.id_cart total,
 		IF (IFNULL(o.id_order, \''.$this->l('Non ordered').'\') = \''.$this->l('Non ordered').'\', IF(TIME_TO_SEC(TIMEDIFF(\''.pSQL(date('Y-m-d H:i:00', time())).'\', a.`date_add`)) > 86400, \''.$this->l('Abandoned cart').'\', \''.$this->l('Non ordered').'\'), o.id_order) AS status, IF(o.id_order, 1, 0) badge_success, IF(o.id_order, 0, 1) badge_danger, IF(co.id_guest, 1, 0) id_guest';
         $this->_join = 'LEFT JOIN '._DB_PREFIX_.'customer c ON (c.id_customer = a.id_customer)
 		LEFT JOIN '._DB_PREFIX_.'currency cu ON (cu.id_currency = a.id_currency)
-		LEFT JOIN '._DB_PREFIX_.'carrier ca ON (ca.id_carrier = a.id_carrier)
 		LEFT JOIN '._DB_PREFIX_.'orders o ON (o.id_cart = a.id_cart)
 		LEFT JOIN `'._DB_PREFIX_.'connections` co ON (a.id_guest = co.id_guest AND TIME_TO_SEC(TIMEDIFF(\''.pSQL(date('Y-m-d H:i:00', time())).'\', co.`date_add`)) < 1800)';
 
@@ -71,7 +70,7 @@ class AdminCartsControllerCore extends AdminController
             ),
             'customer' => array(
                 'title' => $this->l('Customer'),
-                'filter_key' => 'c!lastname'
+                'havingFilter' => true,
             ),
             'total' => array(
                 'title' => $this->l('Total'),
@@ -80,12 +79,6 @@ class AdminCartsControllerCore extends AdminController
                 'search' => false,
                 'align' => 'text-right',
                 'badge_success' => true
-            ),
-            'carrier' => array(
-                'title' => $this->l('Carrier'),
-                'align' => 'text-left',
-                'callback' => 'replaceZeroByShopName',
-                'filter_key' => 'ca!name'
             ),
             'date_add' => array(
                 'title' => $this->l('Date'),
@@ -921,11 +914,6 @@ class AdminCartsControllerCore extends AdminController
         $context->currency = new Currency((int)$context->cart->id_currency);
         $context->customer = new Customer((int)$context->cart->id_customer);
         return Cart::getTotalCart($id_cart, true, Cart::BOTH_WITHOUT_SHIPPING);
-    }
-
-    public static function replaceZeroByShopName($echo, $tr)
-    {
-        return ($echo == '0' ? Carrier::getCarrierNameFromShopName() : $echo);
     }
 
     public function displayDeleteLink($token = null, $id, $name = null)
