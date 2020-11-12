@@ -1104,7 +1104,7 @@ abstract class ObjectModelCore implements Core_Foundation_Database_EntityInterfa
         }
 
         $key = $class.'_'.md5($field);
-        return ((is_array($_FIELDS) && property_exists($_FIELDS, $key)) ? ($htmlentities ? htmlentities($_FIELDS[$key], ENT_QUOTES, 'utf-8') : $_FIELDS[$key]) : $field);
+        return ((is_array($_FIELDS) && array_key_exists($key, $_FIELDS)) ? ($htmlentities ? htmlentities($_FIELDS[$key], ENT_QUOTES, 'utf-8') : $_FIELDS[$key]) : $field);
     }
 
     /**
