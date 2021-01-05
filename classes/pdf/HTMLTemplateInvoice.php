@@ -77,6 +77,67 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
     }
 
     /**
+     * Returns the template's HTML footer
+     *
+     * @return string HTML footer
+     */
+    public function getFooter()
+    {
+        $order_product = $this->order_invoice->getProducts();
+        if ($order_product = array_shift($order_product)) {
+            $objRoomType = new HotelRoomType();
+            if ($productInfo = $objRoomType->getRoomTypeInfoByIdProduct($order_product['id_product'])) {
+                $objHotelInfo = new HotelBranchInformation();
+                if ($hotelInfo = $objHotelInfo->hotelBranchesInfo(false, 2, 1, $productInfo['id_hotel'])) {
+                    $address_fields = array();
+                    $address_fields[] = $hotelInfo['hotel_name'];
+                    $address_fields[] = $hotelInfo['address'];
+                    $address_fields[] = $hotelInfo['city'].', '.$hotelInfo['state_name'].', '.$hotelInfo['zipcode'];
+                    $address_fields[] = $hotelInfo['country_name'];
+                    $hotel_address = implode(' - ', $address_fields);
+
+                    $id_shop = (int)$this->shop->id;
+
+                    $this->smarty->assign(array(
+                        'available_in_your_account' => $this->available_in_your_account,
+                        'shop_address' => $hotel_address,
+                        'shop_fax' => Configuration::get('PS_SHOP_FAX', null, null, $id_shop),
+                        'shop_phone' => $hotelInfo['phone'],
+                        'shop_email' => $hotelInfo['email'],
+                        'free_text' => Configuration::get('PS_INVOICE_FREE_TEXT', (int)Context::getContext()->language->id, null, $id_shop)
+                    ));
+
+                    return $this->smarty->fetch($this->getTemplate('footer'));
+                }
+
+            }
+        }
+
+        return parent::getFooter();
+    }
+
+    /**
+     * Returns the hotel address
+     *
+     * @return string
+     */
+    protected function getHotelAddress($id_hotel)
+    {
+        $hotel_address = '';
+
+        if ($hotelInfo = $objHotelInfo->hotelBranchesInfo(false, 2, 1, $id_hotel)) {
+            $address_fields = array();
+            $address_fields[] = $hotelInfo['hotel_name'];
+            $address_fields[] = $hotelInfo['address'];
+            $address_fields[] = $hotelInfo['city'].', '.$hotelInfo['state_name'].', '.$hotelInfo['zipcode'];
+            $address_fields[] = $hotelInfo['country_name'];
+            $hotel_address = implode(' - ', $address_fields);
+        }
+
+        return $hotel_address;
+    }
+
+    /**
      * Compute layout elements size
      *
      * @param $params Array Layout elements
