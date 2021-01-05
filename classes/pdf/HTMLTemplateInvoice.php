@@ -117,27 +117,6 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
     }
 
     /**
-     * Returns the hotel address
-     *
-     * @return string
-     */
-    protected function getHotelAddress($id_hotel)
-    {
-        $hotel_address = '';
-
-        if ($hotelInfo = $objHotelInfo->hotelBranchesInfo(false, 2, 1, $id_hotel)) {
-            $address_fields = array();
-            $address_fields[] = $hotelInfo['hotel_name'];
-            $address_fields[] = $hotelInfo['address'];
-            $address_fields[] = $hotelInfo['city'].', '.$hotelInfo['state_name'].', '.$hotelInfo['zipcode'];
-            $address_fields[] = $hotelInfo['country_name'];
-            $hotel_address = implode(' - ', $address_fields);
-        }
-
-        return $hotel_address;
-    }
-
-    /**
      * Compute layout elements size
      *
      * @param $params Array Layout elements
