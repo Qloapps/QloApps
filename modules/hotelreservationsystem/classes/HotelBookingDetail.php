@@ -962,16 +962,19 @@ class HotelBookingDetail extends ObjectModel
     {
         $date_from = date('Y-m-d H:i:s', strtotime($date_from));
         $date_to = date('Y-m-d H:i:s', strtotime($date_to));
-        $table = 'htl_booking_detail';
-        $table2 = 'htl_cart_booking_data';
+        $table = 'htl_cart_booking_data';
+        $table2 = 'htl_booking_detail';
         $data = array('id_room' => $swapped_room_id);
         $where = 'date_from=\''.pSQL($date_from).'\' AND date_to=\''.pSQL($date_to).'\' AND id_room='.
         (int)$current_room_id;
-        $result = Db::getInstance()->update($table, $data, $where);
-        $result2 = Db::getInstance()->update($table2, $data, $where);
-        if ($result) {
-            $result2 = Db::getInstance()->update($table2, $data, $where);
-            if ($result2) {
+
+        if ($result = Db::getInstance()->update($table, $data, $where)) {
+            if($room_num = Db::getInstance()->getValue(
+                'SELECT `room_num` FROM `'._DB_PREFIX_.'htl_room_information` WHERE `id` = '.$swapped_room_id
+            )) {
+                $data['room_num'] = $room_num;
+            }
+            if ($result2 = Db::getInstance()->update($table2, $data, $where)) {
                 return true;
             }
             return false;
@@ -1002,19 +1005,21 @@ class HotelBookingDetail extends ObjectModel
             '\' AND `date_to`=\''.pSQL($date_to).'\' AND `id_room`='.(int)$current_room_id
         );
 
-        $id1 = Db::getInstance()->getValue(
-            'SELECT `id` FROM `'._DB_PREFIX_.'htl_booking_detail` WHERE `date_from`=\''.pSQL($date_from).
+        $swap_room = Db::getInstance()->getRow(
+            'SELECT `id`, `room_num` FROM `'._DB_PREFIX_.'htl_booking_detail` WHERE `date_from`=\''.pSQL($date_from).
             '\' AND `date_to`=\''.pSQL($date_to).'\' AND `id_room`='.(int)$swapped_room_id
         );
-        $id2 = Db::getInstance()->getValue(
-            'SELECT `id` FROM `'._DB_PREFIX_.'htl_booking_detail` WHERE `date_from`=\''.pSQL($date_from).
+        $curr_room = Db::getInstance()->getRow(
+            'SELECT `id`, `room_num` FROM `'._DB_PREFIX_.'htl_booking_detail` WHERE `date_from`=\''.pSQL($date_from).
             '\' AND `date_to`=\''.pSQL($date_to).'\' AND `id_room`='.(int)$current_room_id
         );
         $sql = 'UPDATE `'._DB_PREFIX_.'htl_cart_booking_data` SET `id_room`=IF(`id`='.(int)$idcrt1.','.
         (int)$current_room_id.','.(int)$swapped_room_id.') WHERE `id` IN('.(int)$idcrt1.','.(int)$idcrt2.')';
 
-        $sql1 = 'UPDATE `'._DB_PREFIX_.'htl_booking_detail` SET `id_room`=IF(`id`='.(int)$id1.','.(int)$current_room_id.
-        ','.(int)$swapped_room_id.') WHERE `id` IN('.(int)$id1.','.(int)$id2.')';
+        $sql1 = 'UPDATE `'._DB_PREFIX_.'htl_booking_detail`
+            SET `id_room`=IF(`id`='.(int)$swap_room['id'].','.(int)$current_room_id.','.(int)$swapped_room_id.'),
+            `room_num`=IF(`id`='.(int)$swap_room['id'].',\''.$curr_room['room_num'].'\',\''.$swap_room['room_num'].'\')
+            WHERE `id` IN('.(int)$swap_room['id'].','.(int)$curr_room.')';
 
         if ($result = Db::getInstance()->execute($sql)) {
             $result2 = Db::getInstance()->execute($sql1);
