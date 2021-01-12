@@ -428,8 +428,8 @@ abstract class ModuleCore
     {
         if (version_compare(_PS_VERSION_, $this->ps_versions_compliancy['min'], '<')
             || version_compare(_PS_VERSION_, $this->ps_versions_compliancy['max'], '>')
-            // || version_compare(_QLOAPPS_VERSION_, $this->qloapps_versions_compliancy['min'], '<')
-            // || version_compare(_QLOAPPS_VERSION_, $this->qloapps_versions_compliancy['max'], '>')
+            || version_compare(_QLOAPPS_VERSION_, $this->qloapps_versions_compliancy['min'], '<')
+            || version_compare(_QLOAPPS_VERSION_, $this->qloapps_versions_compliancy['max'], '>')
         ) {
             return false;
         } else {
