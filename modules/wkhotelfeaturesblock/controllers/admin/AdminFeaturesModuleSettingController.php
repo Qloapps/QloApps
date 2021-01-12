@@ -246,26 +246,26 @@ class AdminFeaturesModuleSettingController extends ModuleAdminController
         $defaultLangId = Configuration::get('PS_LANG_DEFAULT');
         $objDefaultLanguage = Language::getLanguage((int) $defaultLangId);
         $languages = Language::getLanguages(false);
-        if (!trim(Tools::getValue('feature_description_'.$defaultLangId))) {
-            $this->errors[] = $this->l('feature description is required at least in ').
-            $objDefaultLanguage['name'];
-        } else {
-            foreach ($languages as $lang) {
-                if (trim(Tools::getValue('feature_description_'.$lang['id_lang']))) {
-                    if (!Validate::isGenericName(Tools::getValue('feature_description_'.$lang['id_lang']))) {
-                        $this->errors[] = $this->l('Invalid feature description in ').$lang['name'];
-                    }
-                }
-            }
-        }
         if (!trim(Tools::getValue('feature_title_'.$defaultLangId))) {
-            $this->errors[] = $this->l('feature title is required at least in ').
+            $this->errors[] = $this->l('Amenity title is required at least in ').
             $objDefaultLanguage['name'];
         } else {
             foreach ($languages as $lang) {
                 if (trim(Tools::getValue('feature_title_'.$lang['id_lang']))) {
                     if (!Validate::isGenericName(Tools::getValue('feature_title_'.$lang['id_lang']))) {
-                        $this->errors[] = $this->l('Invalid feature title in ').$lang['name'];
+                        $this->errors[] = $this->l('Invalid amenity title in ').$lang['name'];
+                    }
+                }
+            }
+        }
+        if (!trim(Tools::getValue('feature_description_'.$defaultLangId))) {
+            $this->errors[] = $this->l('Amenity description is required at least in ').
+            $objDefaultLanguage['name'];
+        } else {
+            foreach ($languages as $lang) {
+                if (trim(Tools::getValue('feature_description_'.$lang['id_lang']))) {
+                    if (!Validate::isGenericName(Tools::getValue('feature_description_'.$lang['id_lang']))) {
+                        $this->errors[] = $this->l('Invalid amenity description in ').$lang['name'];
                     }
                 }
             }
