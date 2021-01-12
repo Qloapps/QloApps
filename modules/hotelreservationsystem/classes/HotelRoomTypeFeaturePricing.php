@@ -216,10 +216,11 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
      */
     public static function countFeaturePriceSpecialDays($specialDays, $date_from, $date_to)
     {
-        $totalDaySeconds = 24*60*60;
         $specialDaysCount = 0;
+        $date_from = date('Y-m-d', strtotime($date_from));
+        $date_to = date('Y-m-d', strtotime($date_to));
 
-        for ($date = strtotime($date_from); $date <= strtotime($date_to)-$totalDaySeconds; $date = ($date + $totalDaySeconds)) {
+        for($date = $date_from; $date < $date_to; $date = date('Y-m-d', strtotime('+1 day', strtotime($date)))) {
             if (in_array(strtolower(Date('D', $date)), $specialDays)) {
                 $specialDaysCount++;
             }
@@ -237,14 +238,15 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
      */
     public function getHotelRoomTypesRatesAndInventoryByDate($id_hotel, $id_product=0, $date_from, $date_to)
     {
-        $totalDaySeconds = 24*60*60;
         $hotelRoomType = new HotelRoomType();
         $context = Context::getContext();
         $roomTypeRatesAndInventory = array();
         $hotelCartBookingData = new HotelCartBookingData();
         $objBookingDetail = new HotelBookingDetail();
         $incr = 0;
-        for ($date = strtotime($date_from); $date <= strtotime($date_to); $date = ($date + $totalDaySeconds)) {
+        $date_from = date('Y-m-d', strtotime($date_from));
+        $date_to = date('Y-m-d', strtotime($date_to));
+        for($date = $date_from; $date < $date_to; $date = date('Y-m-d', strtotime('+1 day', strtotime($date)))) {
             $currentDate = date('Y-m-d', $date);
             $nextDayDate = date('Y-m-d', strtotime('+1 day', strtotime($currentDate)));
             if ($id_product) {
@@ -322,7 +324,6 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
         $moduleInstance = new HotelReservationSystem();
         $this->errors = array();
         if ($featurePricePlans) {
-            $totalDaySeconds = 24*60*60;
             if (isset($featurePricePlans['data']) && $featurePricePlans['data']) {
                 foreach ($featurePricePlans['data'] as $roomTypeRatesData) {
                     $dateFrom = date('Y-m-d', strtotime($roomTypeRatesData['dateFrom']));
@@ -391,7 +392,7 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
                                                     $this->errors[] = $this->moduleInstance->l('Some error occured while saving Feature Price Plan Info:: Date From : ', 'HotelRoomTypeFeaturePricing').$params['dateFrom'].$this->moduleInstance->l(' Date To : ', 'HotelRoomTypeFeaturePricing').$params['dateFrom'].$this->moduleInstance->l(' Room Type Id : ', 'HotelRoomTypeFeaturePricing').$params['roomTypeId'];
                                                 }
                                             } else {
-                                                for ($date = strtotime($dateFrom); $date <= strtotime($dateTo)-$totalDaySeconds; $date = ($date + $totalDaySeconds)) {
+                                                for($date = $date_from; $date < $date_to; $date = date('Y-m-d', strtotime('+1 day', strtotime($date)))) {
                                                     $currentDate = date('Y-m-d', $date);
                                                     $nextDayDate = date('Y-m-d', strtotime('+1 day', strtotime($currentDate)));
                                                     $params['dateFrom'] = $currentDate;
@@ -629,7 +630,6 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
      */
     public static function getRoomTypeTotalPrice($id_product, $date_from, $date_to, $quantity = 0, $id_group = 0)
     {
-        $totalDaySeconds = 24 * 60 * 60;
         $totalPrice = array();
         $totalPrice['total_price_tax_incl'] = 0;
         $totalPrice['total_price_tax_excl'] = 0;
@@ -650,14 +650,15 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
 
         // if date_from and date_to are same then date_to will be the next date date of date_from
         if (strtotime($date_from) == strtotime($date_to)) {
-            $date_to = date('Y-m-d', (strtotime($date_from) + $totalDaySeconds));
+            $date_to = date('Y-m-d', strtotime('+1 day', strtotime($date_from)));
         }
         $context = Context::getContext();
         $id_currency = Validate::isLoadedObject($context->currency) ? (int)$context->currency->id : (int)Configuration::get('PS_CURRENCY_DEFAULT');
 
         $hotelCartBookingData = new HotelCartBookingData();
-        for ($date = strtotime($date_from); $date <= (strtotime($date_to)-$totalDaySeconds); $date = ($date+$totalDaySeconds)) {
-            $currentDate = date('Y-m-d', $date);
+        $date_from = date('Y-m-d', strtotime($date_from));
+        $date_to = date('Y-m-d', strtotime($date_to));
+        for($currentDate = $date_from; $currentDate < $date_to; $currentDate = date('Y-m-d', strtotime('+1 day', strtotime($currentDate)))) {
             if ($featurePrice = $hotelCartBookingData->getProductFeaturePricePlanByDateByPriority(
                 $id_product,
                 $currentDate,
