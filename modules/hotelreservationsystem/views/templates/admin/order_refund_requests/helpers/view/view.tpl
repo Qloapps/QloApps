@@ -25,7 +25,7 @@
 									<strong>{l s='Customer Email' mod='hotelreservationsystem'} :</strong>
 								</div>
 								<div class="col-sm-9">
-									<a target="_blank" href="{$link->getAdminLink('AdminCustomers')|escape:'htmlall':'UTF-8'}&amp;id_customer={$bookingInfo['id_customer']|escape:'html':'UTF-8'}&amp;viewcustomer">{$customer_email|escape:'html':'UTF-8'}</a>
+									<a target="_blank" href="{$link->getAdminLink('AdminCustomers')|escape:'htmlall':'UTF-8'}&amp;id_customer={$orderReturnInfo['id_customer']|escape:'html':'UTF-8'}&amp;viewcustomer">{$customer_email|escape:'html':'UTF-8'}</a>
 								</div>
 							</div>
 						</div>
