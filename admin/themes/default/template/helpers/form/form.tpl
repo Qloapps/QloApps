@@ -698,7 +698,7 @@
 								<div class="form-group">
 									{foreach $input.options as $key => $select}
 									<div class="col-lg-2">
-										<select name="{$key}" class="fixed-width-lg{if isset($input.class)} {$input.class}{/if}">
+										<select name="{$key}" class="{if isset($input.class)} {$input.class}{/if}">
 											<option value="">-</option>
 											{if $key == 'months'}
 												{*
