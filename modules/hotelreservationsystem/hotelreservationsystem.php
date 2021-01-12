@@ -201,7 +201,7 @@ class hotelreservationsystem extends Module
             $objCurrency = new Currency(Configuration::get('PS_CURRENCY_DEFAULT'));
             // get room type additional services
             $objRoomDemand = new HotelRoomTypeDemand();
-            $roomDemandPrices = $objRoomDemand->getRoomTypeDemands($idProduct);
+            $roomDemandPrices = $objRoomDemand->getRoomTypeDemands($idProduct, 0, 0);
             $this->context->smarty->assign(
                 array(
                     'idProduct' => $idProduct,
