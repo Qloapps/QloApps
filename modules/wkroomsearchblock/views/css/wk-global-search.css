@@ -78,7 +78,6 @@
 .header-rmsearch-wrapper .hotel_dropdown_ul {
   position: absolute;
   font-size: 14px;
-  z-index: 100;
   font-weight: 400;
   padding: 0px;
   width: 100%;
