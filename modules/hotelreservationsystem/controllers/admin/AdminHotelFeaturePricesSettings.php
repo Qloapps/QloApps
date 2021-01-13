@@ -39,8 +39,10 @@ class AdminHotelFeaturePricesSettingsController extends ModuleAdminController
 
         $this->_join .= ' LEFT JOIN `'._DB_PREFIX_.'product_lang` pl ON (pl.`id_product` = a.`id_product` AND pl.`id_lang`='.(int) $this->context->language->id.')';
         $this->_join .= ' LEFT JOIN `'._DB_PREFIX_.'htl_room_type_feature_pricing_lang` fpl ON (a.id_feature_price = fpl.id_feature_price AND fpl.`id_lang` = '.(int) $this->context->language->id.')';
+        $this->_join .= ' LEFT JOIN `'._DB_PREFIX_.'htl_room_type` hrt ON (hrt.`id_product` = a.`id_product`)';
+        $this->_join .= ' LEFT JOIN `'._DB_PREFIX_.'htl_branch_info_lang` hbl ON (hbl.`id` = hrt.`id_hotel` AND hbl.`id_lang`='.(int) $this->context->language->id.')';
 
-        $this->_select .= ' fpl.`feature_price_name` as ftr_price_name, CONCAT(pl.`name`, " (#", a.`id_product`, ")") as product_name, IF(a.impact_type=1 , CONCAT(round(a.impact_value, 2), " ", "%"), a.impact_value) AS impact_value';
+        $this->_select .= ' fpl.`feature_price_name` as ftr_price_name, CONCAT(pl.`name`, " (#", a.`id_product`, ")") as product_name, hbl.`hotel_name`, IF(a.impact_type=1 , CONCAT(round(a.impact_value, 2), " ", "%"), a.impact_value) AS impact_value';
         $this->_select .= ' ,IF(a.impact_type=1 , \''.$this->l('Percentage').'\', \''.$this->l('Fixed Amount').'\')
         AS impact_type';
         $this->_select .= ' ,IF(a.impact_way=1 , \''.$this->l('Decrease').'\', \''.$this->l('Increase').'\')
@@ -57,16 +59,20 @@ class AdminHotelFeaturePricesSettingsController extends ModuleAdminController
                 'title' => $this->l('ID'),
                 'align' => 'center',
             ),
-            'product_name' => array(
-                'title' => $this->l('Room'),
-                'align' => 'center',
-                'havingFilter' => true,
-                'callback' => 'getRoomTypeLink',
-            ),
             'ftr_price_name' => array(
                 'title' => $this->l('Feature Name'),
                 'align' => 'center',
                 'havingFilter' => true,
+            ),
+            'product_name' => array(
+                'title' => $this->l('Room Type'),
+                'align' => 'center',
+                'havingFilter' => true,
+                'callback' => 'getRoomTypeLink',
+            ),
+            'hotel_name' => array(
+                'title' => $this->l('Hotel'),
+                'align' => 'center',
             ),
             'impact_way' => array(
                 'title' => $this->l('Impact Way'),
