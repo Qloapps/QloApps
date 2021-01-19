@@ -76,14 +76,19 @@ class ProductCommentsDefaultModuleFrontController extends ModuleFrontController
 			$errors[] = $module_instance->l('Product ID is incorrect', 'default');
 		if (!Tools::getValue('title')) {
 			$errors[] = $module_instance->l('Please provide your review title', 'default');
-		} elseif(!Validate::isGenericName(Tools::getValue('title')))
+		} elseif(!Validate::isGenericName(Tools::getValue('title'))) {
 			$errors[] = $module_instance->l('Review title is incorrect', 'default');
+		}
 		if (!Tools::getValue('content')) {
 			$errors[] = $module_instance->l('Please provide the description', 'default');
-		} elseif(!Validate::isMessage(Tools::getValue('content')))
+		} elseif(!Validate::isMessage(Tools::getValue('content'))) {
 			$errors[] = $module_instance->l('Review description is invalid', 'default');
-		if (!$id_customer && (!Tools::isSubmit('customer_name') || !Tools::getValue('customer_name') || !Validate::isGenericName(Tools::getValue('customer_name'))))
-			$errors[] = $module_instance->l('Customer name is incorrect', 'default');
+		}
+		if (!$id_customer && (!Tools::isSubmit('customer_name') || !Tools::getValue('customer_name'))) {
+			$errors[] = $module_instance->l('Customer name is required', 'default');
+		} elseif(!Validate::isGenericName(Tools::getValue('customer_name'))) {
+			$errors[] = $module_instance->l('Customer name is invalid', 'default');
+		}
 		if (!$this->context->customer->id && !Configuration::get('PRODUCT_COMMENTS_ALLOW_GUESTS'))
 			$errors[] = $module_instance->l('You must be connected in order to send a comment', 'default');
 		if (!count(Tools::getValue('criterion')))
