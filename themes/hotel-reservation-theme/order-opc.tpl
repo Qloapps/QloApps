@@ -34,8 +34,8 @@
 		<section id="content">
 			<div class="row">
 				{if $PS_CATALOG_MODE}
-					{capture name=path}{l s='Your shopping cart'}{/capture}
-					<h2 id="cart_title">{l s='Your shopping cart'}</h2>
+					{capture name=path}{l s='Your booking cart'}{/capture}
+					<h2 id="cart_title">{l s='Your booking cart'}</h2>
 					<p class="alert alert-warning">{l s='Your new order was not accepted.'}</p>
 				{else}
 					{if $productNumber && isset($cart_htl_data)}
@@ -324,8 +324,8 @@
 							{* End Voucher Block *}
 						</div>
 					{else}
-						{capture name=path}{l s='Your shopping cart'}{/capture}
-						<h2 class="page-heading">{l s='Your shopping cart'}</h2>
+						{capture name=path}{l s='Your booking cart'}{/capture}
+						<h2 class="page-heading">{l s='Your booking cart'}</h2>
 						{include file="$tpl_dir./errors.tpl"}
 
 						<p class="alert alert-warning">{l s='Till now you did not added any room in your cart.'}</p>
