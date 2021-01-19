@@ -23,6 +23,9 @@
 			<div class="panel-heading">
 				<i class="icon-user"></i> {l s='Room Type Additional Facilities' mod='hotelreservationsystem'}
 			</div>
+			<div class="alert alert-info">
+				{l s='To create new please visit' mod='hotelreservationsystem'} <a target="_blank" href="{$link->getAdminLink('AdminRoomTypeGlobalDemand')}">{l s='Additional facilities' mod='hotelreservationsystem'}</a> {l s='page' mod='hotelreservationsystem'}.
+			</div>
 			{if isset($allDemands) && $allDemands}
 				<div id="service_accordian">
 					{foreach $allDemands as $key => $demand}
@@ -86,20 +89,20 @@
 				<div class="panel-footer">
 					<a href="{$link->getAdminLink('AdminProducts')|escape:'html':'UTF-8'}{if isset($smarty.request.page) && $smarty.request.page > 1}&amp;submitFilterproduct={$smarty.request.page|intval}{/if}" class="btn btn-default">
 						<i class="process-icon-cancel"></i>
-						{l s='Cancel'}
+						{l s='Cancel' mod='hotelreservationsystem'}
 					</a>
 					<button type="submit" name="submitAddproduct" class="btn btn-default pull-right checkConfigurationClick" disabled="disabled">
 						<i class="process-icon-loading"></i>
-						{l s='Save'}
+						{l s='Save' mod='hotelreservationsystem'}
 					</button>
 					<button type="submit" name="submitAddproductAndStay" class="btn btn-default pull-right checkConfigurationClick"  disabled="disabled">
 						<i class="process-icon-loading"></i>
-							{l s='Save and stay'}
+							{l s='Save and stay' mod='hotelreservationsystem'}
 					</button>
 				</div>
 			{else}
 				<div class="alert alert-warning">
-					{l s='No additional facilities created yet. To create pelase visit' mod='hotelreservationsystem'} <a target="_blank" href="{$link->getAdminLink('AdminRoomTypeGlobalDemand')}">{l s='Additional facilities' mod='hotelreservationsystem'}</a> {l s='page' mod='hotelreservationsystem'}.
+					{l s='No additional facilities created yet. To create please visit' mod='hotelreservationsystem'} <a target="_blank" href="{$link->getAdminLink('AdminRoomTypeGlobalDemand')}">{l s='Additional facilities' mod='hotelreservationsystem'}</a> {l s='page' mod='hotelreservationsystem'}.
 				</div>
 			{/if}
 		</div>
