@@ -47,7 +47,7 @@
 				<li>
 					<a href="#hotel-refund-policies" data-toggle="tab">
 						<i class="icon-file"></i>
-						{l s='Redund Policies' mod='hotelreservationsystem'}
+						{l s='Refund Policies' mod='hotelreservationsystem'}
 					</a>
 				</li>
 			</ul>
