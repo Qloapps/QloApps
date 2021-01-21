@@ -1954,6 +1954,10 @@ class AdminProductsControllerCore extends AdminController
     {
         $this->checkProduct();
 
+        $id_hotel = Tools::getValue('id_hotel');
+        if (!$id_hotel || !Validate::isUnsignedInt($id_hotel)) {
+            $this->errors[] = Tools::displayError('Please select a hotel');
+        }
         if (!empty($this->errors)) {
             $this->display = 'add';
             return false;
@@ -1963,6 +1967,25 @@ class AdminProductsControllerCore extends AdminController
         $this->_removeTaxFromEcotax();
         $this->copyFromPost($this->object, $this->table);
         if ($this->object->add()) {
+
+            // associateroom type to hotel
+            $objRoomType = new HotelRoomType();
+            $objRoomType->id_product = $this->object->id;
+            $objRoomType->id_hotel = $id_hotel;
+            $objRoomType->save();
+            // Associate categories to Room Type
+            $objHotelInfo = new HotelBranchInformation($id_hotel);
+            $hotelIdCategory = $objHotelInfo->id_category;
+            $category = new Category($hotelIdCategory);
+            $hotelCategories = $category->getParentsCategories();
+            $categoryIds = array();
+
+            foreach ($hotelCategories as $rowCateg) {
+                $categoryIds[] = $rowCateg['id_category'];
+            }
+            $this->object->updateCategories($categoryIds);
+
+
             PrestaShopLogger::addLog(sprintf($this->l('%s addition', 'AdminTab', false, false), $this->className), 1, null, $this->className, (int)$this->object->id, true, (int)$this->context->employee->id);
             $this->addCarriers($this->object);
             $this->updateAccessories($this->object);
@@ -3476,28 +3499,9 @@ class AdminProductsControllerCore extends AdminController
                         if ($wk_id_room_type) {
                             $objRoomType = new HotelRoomType($wk_id_room_type);
                             $id_hotel = $objRoomType->id_hotel;
-                        } else {
-                            $objRoomType = new HotelRoomType();
-                            $objRoomType->id_product = $id_product;
-                            $objRoomType->id_hotel = $id_hotel;
                         }
-                        $objRoomType->save();
-
-                        $id_rm_type = $objRoomType->id;
 
                         // Associate categories to Room Type
-                        $product = new Product((int) $id_product);
-                        $objHotelInfo = new HotelBranchInformation($id_hotel);
-                        $hotelIdCategory = $objHotelInfo->id_category;
-                        $category = new Category($hotelIdCategory);
-                        $hotelCategories = $category->getParentsCategories();
-                        $categoryIds = array();
-                        foreach ($hotelCategories as $rowCateg) {
-                            $categoryIds[] = $rowCateg['id_category'];
-                        }
-                        $product->updateCategories($categoryIds);
-                        // Associate categories to Room Type
-
                         $id_room_info = Tools::getValue('id_room_info');
                         $objCartBookingData = new HotelCartBookingData();
                         foreach ($room_numbers as $key => $value) {
@@ -4592,6 +4596,15 @@ class AdminProductsControllerCore extends AdminController
             'PS_PRODUCT_SHORT_DESC_LIMIT' => Configuration::get('PS_PRODUCT_SHORT_DESC_LIMIT') ? Configuration::get('PS_PRODUCT_SHORT_DESC_LIMIT') : 400
         ));
         $data->assign($this->tpl_form_vars);
+
+        $objRoomType = new HotelRoomType();
+        $objHotelInfo = new HotelBranchInformation();
+        $data->assign('htl_info', $objHotelInfo->hotelsNameAndId());
+        if ($hotelRoomType = $objRoomType->getRoomTypeInfoByIdProduct($product->id)) {
+            $data->assign('htl_room_type', $hotelRoomType);
+            $hotelFullInfo = $objHotelInfo->hotelBranchInfoById($hotelRoomType['id_hotel']);
+            $data->assign('htl_full_info', $hotelFullInfo);
+        }
 
         $this->tpl_form_vars['product'] = $product;
         $this->tpl_form_vars['custom_form'] = $data->fetch();
