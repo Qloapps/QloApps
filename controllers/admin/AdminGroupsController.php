@@ -451,6 +451,7 @@ class AdminGroupsControllerCore extends AdminController
     {
         if (!$this->validateDiscount(Tools::getValue('reduction'))) {
             $this->errors[] = Tools::displayError('The discount value is incorrect (must be a percentage).');
+            $this->display = 'edit';
         } else {
             $this->updateCategoryReduction();
             $object = parent::processSave();
