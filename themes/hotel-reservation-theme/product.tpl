@@ -121,6 +121,7 @@
 										{/if}
 									</span>
 								{/if}
+								{hook h="displayRoomTypeImageExtraContent"}
 							</div> <!-- end image-block -->
 						</div>
 						<div class="col-xs-12 col-sm-3 col-sm-pull-9 col-md-2 col-md-pull-10">
