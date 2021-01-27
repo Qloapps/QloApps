@@ -28,7 +28,6 @@ class AdminHotelConfigurationSettingController extends ModuleAdminController
             'general_setting_link' => $this->context->link->getAdminLink('AdminHotelGeneralSettings'),
             'payment_setting_link' => $this->context->link->getAdminLink('AdminPaymentsSetting'),
             'order_restrict_setting_link' => $this->context->link->getAdminLink('AdminOrderRestrictSettings'),
-            'other_module_setting_link' => $this->context->link->getAdminLink('AdminOtherHotelModulesSetting'),
             'additional_demand_setting_link' => $this->context->link->getAdminLink('AdminRoomTypeGlobalDemand'),
         );
         // Reviews setting link if only productcomment module is enabled

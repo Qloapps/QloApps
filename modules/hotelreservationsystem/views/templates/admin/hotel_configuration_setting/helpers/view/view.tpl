@@ -40,15 +40,6 @@
 				<i class="icon-question-circle"></i>
 			</a>
 		</div>
-		<div class="btn-group setting-link-div col-sm-3 col-xs-12">
-			<a type="button" href="{$other_module_setting_link}" class="setting-link btn btn-default col-sm-10 col-xs-10">
-				<span class="col-sm-2 col-xs-2"><i class="icon-support"></i></span>
-				<span class="setting-title col-sm-10 col-xs-10">{l s='Other Modules' mod='hotelreservationsystem'}</span>
-			</a>
-			<a tabindex="0" class="btn btn-default col-sm-2 col-xs-2" role="button" data-toggle="popover" data-trigger="focus" title="{l s='Other Modules Settings' mod='hotelreservationsystem'}" data-content="{l s='Configure here settings of other modules of the software.' mod='hotelreservationsystem'}" data-placement="bottom">
-				<i class="icon-question-circle"></i>
-			</a>
-		</div>
 		<!-- Setting to set prices for date range -->
 		<div class="btn-group setting-link-div col-sm-3 col-xs-12">
 			<a type="button" href="{$feature_price_setting_link}" class="setting-link btn btn-default col-sm-10 col-xs-10">
