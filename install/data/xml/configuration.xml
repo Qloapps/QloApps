@@ -410,6 +410,9 @@
 	<configuration id="PS_OS_AWAITING_REMOTE_PAYMENT" name="PS_OS_AWAITING_REMOTE_PAYMENT">
 		<value>12</value>
 	</configuration>
+	<configuration id="PS_OS_PARTIAL_PAYMENT" name="PS_OS_PARTIAL_PAYMENT">
+		<value>13</value>
+	</configuration>
 	<configuration id="PS_LEGACY_IMAGES" name="PS_LEGACY_IMAGES">
 		<value>0</value>
 	</configuration>

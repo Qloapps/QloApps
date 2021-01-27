@@ -51,5 +51,8 @@
     <order_state id="Awaiting_remote_payment" invoice="0" send_email="0" color="#4169E1" unremovable="1" hidden="0" logable="0" delivery="0" shipped="0" paid="0" pdf_delivery="0" pdf_invoice="0">
       <module_name/>
     </order_state>
+    <order_state id="Partial_payment_accepted" invoice="1" send_email="0" color="#9dffa9" unremovable="1" hidden="0" logable="1" delivery="0" shipped="0" paid="0" pdf_delivery="0" pdf_invoice="0">
+      <module_name/>
+    </order_state>
   </entities>
 </entity_order_state>
