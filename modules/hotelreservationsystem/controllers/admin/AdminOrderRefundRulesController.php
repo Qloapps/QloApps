@@ -29,7 +29,7 @@ class AdminOrderRefundRulesController extends ModuleAdminController
 
         $this->fields_options = array(
             'modulesetting' => array(
-                'title' =>    $this->l('Hotel Testimonials Setting'),
+                'title' =>    $this->l('Order Refund Setting'),
                 'fields' =>    array(
                     'WK_ORDER_REFUND_ALLOWED' => array(
                         'title' => $this->l('Enable Order Refund'),
@@ -221,26 +221,26 @@ class AdminOrderRefundRulesController extends ModuleAdminController
 
         if ($paymentType == HotelOrderRefundRules::WK_REFUND_RULE_PAYMENT_TYPE_PERCENTAGE) {
             if (!Validate::isFloat($fullPayAmount)) {
-                $this->errors[] = $this->l('Enter a valid Deduction percentage.');
+                $this->errors[] = $this->l('Enter a valid deduction percentage for full payment.');
             } elseif ($fullPayAmount > 100 || $fullPayAmount < 0) {
-                $this->errors[] = $this->l('Enter a valid percentage(0 < % and 100 >= %).');
+                $this->errors[] = $this->l('Enter a valid percentage(0 < % and 100 >= %) for full payment.');
             }
             if (!Validate::isFloat($advPayAmount)) {
-                $this->errors[] = $this->l('Enter a valid Deduction percentage.');
+                $this->errors[] = $this->l('Enter a valid deduction percentage for advance payment.');
             } elseif ($advPayAmount > 100 || $advPayAmount < 0) {
-                $this->errors[] = $this->l('Enter a valid percentage(0 < % and 100 > %).');
+                $this->errors[] = $this->l('Enter a valid percentage(0 < % and 100 > %) for advance payment.');
             }
         } elseif ($paymentType == HotelOrderRefundRules::WK_REFUND_RULE_PAYMENT_TYPE_FIXED) {
             if (!Validate::isPrice($fullPayAmount)) {
-                $this->errors[] = $this->l('Enter a valid Deduction amount.');
+                $this->errors[] = $this->l('Enter a valid deduction amount for full payment.');
             }
             if (!Validate::isPrice($advPayAmount)) {
-                $this->errors[] = $this->l('Enter a valid Deduction amount.');
+                $this->errors[] = $this->l('Enter a valid deduction amount for advance payment.');
             }
         }
         $objRefundRule = new HotelOrderRefundRules($idRefundRule);
         if ($cancelationDays == '') {
-            $this->errors[] = $this->l('Enter How many days before Check In date rule will be aplied.');
+            $this->errors[] = $this->l('Enter before how many days of check in date, rule will be applied.');
         } else if (!Validate::isUnsignedInt($cancelationDays)) {
             $this->errors[] = $this->l('Enter valid number of days.');
         } else if ($objRefundRule->checkIfRuleExistsByCancelationdays($cancelationDays)) {
