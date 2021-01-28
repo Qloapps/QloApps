@@ -204,6 +204,8 @@ class OrderDetailControllerCore extends FrontController
                 $hasError = 0;
                 if (!$refundReason = Tools::getValue('cancellation_reason')) {
                     $hasError = 1;
+                } elseif (!Validate::isCleanHtml($refundReason)) {
+                    $hasError = 1;
                 }
                 if ($bookingRefunds = Tools::getValue('bookings_to_refund')) {
                     if (!count($bookingRefunds = Tools::jsonDecode($bookingRefunds, true))) {
