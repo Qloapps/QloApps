@@ -287,7 +287,7 @@ $(document).ready(function()
 	                {
 	                    if (key === dmy)
 	                    {
-	                        msg = 'Total Available : '+value.stats.num_avail+'&#013;Total Partial Available : '+value.stats.num_part_avai+'&#013;Total Unvailable : '+value.stats.num_unavail+'&#013;Total Booked : '+value.stats.num_booked;
+	                        msg = 'Total Available : '+value.stats.num_avail+'&#013;Total Partial Available : '+value.stats.num_part_avai+'&#013;Total Unavailable : '+value.stats.num_unavail+'&#013;Total Booked : '+value.stats.num_booked;
 	                        flag = 1;
 	                        return 1;
 	                    }
