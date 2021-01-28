@@ -106,30 +106,32 @@
                                 <span class="pull-left rm_price_txt">/{l s='Per Night'}</span>
                             </div>
 
-                            <a cat_rm_check_in="{$booking_date_from}" cat_rm_check_out="{$booking_date_to}" href="" rm_product_id="{$room_v['id_product']}" cat_rm_book_nm_days="{$num_days}" data-id-product-attribute="0" data-id-product="{$room_v['id_product']|intval}" class="btn btn-default button button-medium ajax_add_to_cart_button pull-right"><span>{l s='Book Now'}</span></a>
+                            {if !isset($restricted_country_mode) && !$PS_CATALOG_MODE && !$order_date_restrict}
+                                <a cat_rm_check_in="{$booking_date_from}" cat_rm_check_out="{$booking_date_to}" href="" rm_product_id="{$room_v['id_product']}" cat_rm_book_nm_days="{$num_days}" data-id-product-attribute="0" data-id-product="{$room_v['id_product']|intval}" class="btn btn-default button button-medium ajax_add_to_cart_button pull-right"><span>{l s='Book Now'}</span></a>
 
-                            <!-- ################################################ -->
+                                <!-- ################################################ -->
 
-                            <div class="rm_qty_cont pull-right clearfix" id="cat_rm_quantity_wanted_{$room_v['id_product']}">
-                                <span class="qty_txt">{l s='Qty.'}:</span>
-                                <div class="qty_sec_cont row">
-                                    <div class="qty_input_cont row margin-lr-0">
-                                        <input autocomplete="off" type="text" min="1" name="qty_{$room_v['id_product']}" id="cat_quantity_wanted_{$room_v['id_product']}" class="text-center form-control cat_quantity_wanted" value="1" id_room_product="{$room_v['id_product']}">
-                                    </div>
-                                    <div class="qty_direction">
-                                        <a href="#" data-room_id_product="{$room_v['id_product']}" data-field-qty="qty_{$room_v['id_product']}" class="btn btn-default cat_rm_quantity_up">
-                                            <span>
-                                                <i class="icon-plus"></i>
-                                            </span>
-                                        </a>
-                                        <a href="#" data-field-qty="qty_{$room_v['id_product']}" class="btn btn-default cat_rm_quantity_down">
-                                            <span>
-                                                <i class="icon-minus"></i>
-                                            </span>
-                                        </a>
+                                <div class="rm_qty_cont pull-right clearfix" id="cat_rm_quantity_wanted_{$room_v['id_product']}">
+                                    <span class="qty_txt">{l s='Qty.'}:</span>
+                                    <div class="qty_sec_cont row">
+                                        <div class="qty_input_cont row margin-lr-0">
+                                            <input autocomplete="off" type="text" min="1" name="qty_{$room_v['id_product']}" id="cat_quantity_wanted_{$room_v['id_product']}" class="text-center form-control cat_quantity_wanted" value="1" id_room_product="{$room_v['id_product']}">
+                                        </div>
+                                        <div class="qty_direction">
+                                            <a href="#" data-room_id_product="{$room_v['id_product']}" data-field-qty="qty_{$room_v['id_product']}" class="btn btn-default cat_rm_quantity_up">
+                                                <span>
+                                                    <i class="icon-plus"></i>
+                                                </span>
+                                            </a>
+                                            <a href="#" data-field-qty="qty_{$room_v['id_product']}" class="btn btn-default cat_rm_quantity_down">
+                                                <span>
+                                                    <i class="icon-minus"></i>
+                                                </span>
+                                            </a>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                            {/if}
 
 
                             <!-- <div id="cat_rm_quantity_wanted_{$room_v['id_product']}">

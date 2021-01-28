@@ -164,9 +164,15 @@ class CategoryControllerCore extends FrontController
                 $warning_num = Configuration::get('WK_ROOM_LEFT_WARNING_NUMBER');
 
                 /*Max date of ordering for order restrict*/
+                $order_date_restrict = false;
                 $max_order_date = HotelOrderRestrictDate::getMaxOrderDate($id_hotel);
                 if ($max_order_date) {
                     $max_order_date = date('Y-m-d', strtotime($max_order_date));
+                    if (strtotime('-1 day', strtotime($max_order_date)) < strtotime($date_from)
+                        || strtotime($max_order_date) < strtotime($date_to)
+                    ) {
+                        $order_date_restrict = true;
+                    }
                 }
                 /*End*/
 
@@ -188,6 +194,7 @@ class CategoryControllerCore extends FrontController
                     'ratting_img' => $ratting_img,
                     'currency' => $currency,
                     'max_order_date' => $max_order_date,
+                    'order_date_restrict' => $order_date_restrict
                 ));
             }
 
