@@ -35,8 +35,9 @@
 			<div class="row">
 				{if $PS_CATALOG_MODE}
 					{capture name=path}{l s='Your booking cart'}{/capture}
-					<h2 id="cart_title">{l s='Your booking cart'}</h2>
-					<p class="alert alert-warning">{l s='Your new order was not accepted.'}</p>
+					<h2 class="page-heading">{l s='Your booking cart'}</h2>
+
+					<p class="alert alert-warning">{l s='The hotel is currently no accepting any bookings.'}</p>
 				{else}
 					{if $productNumber && isset($cart_htl_data)}
 
