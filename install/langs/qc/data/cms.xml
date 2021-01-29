@@ -1,11 +1,12 @@
 <?xml version='1.0'?>
 <entity_cms>
-  <cms id='Delivery'>
-    <meta_title>Livraison</meta_title>
-    <meta_description>Nos conditions de livraison</meta_description>
-    <meta_keywords>conditions, livraison, délais, expédition, colis</meta_keywords>
-    <content>&lt;h2&gt;Expéditions et retours&lt;/h2&gt;&lt;h3&gt;Expédition de votre colis&lt;/h3&gt;&lt;p&gt;Les colis sont généralement expédiés dans un délai de 2 jours après réception du paiement. Ils sont expédiés via UPS avec un numéro de suivi et remis sans signature. Les colis peuvent également être expédiés via UPS Extra et remis contre signature. Veuillez nous contacter avant de choisir ce mode de livraison, car il induit des frais supplémentaires. Quel que soit le mode de livraison choisi, nous vous envoyons un lien pour suivre votre colis en ligne.&lt;/p&gt;&lt;p&gt;Les frais d&apos;expédition incluent les frais de préparation et d&apos;emballage ainsi que les frais de port. Les frais de préparation sont fixes, tandis que les frais de transport varient selon le poids total du colis. Nous vous recommandons de regrouper tous vos articles dans une seule commande. Nous ne pouvons regrouper deux commandes placées séparément et des frais d&apos;expédition s&apos;appliquent à chacune d&apos;entre elles. Votre colis est expédié à vos propres risques, mais une attention particulière est portée aux objets fragiles.&lt;br /&gt;&lt;br /&gt;Les dimensions des boîtes sont appropriées et vos articles sont correctement protégés.&lt;/p&gt;</content>
-    <link_rewrite>livraison</link_rewrite>
+  <cms id="Policies">
+    <meta_title>Policies</meta_title>
+    <meta_description>Our policies of hotel bookings</meta_description>
+    <meta_keywords>conditions, policy, guidelines, protocol, rule</meta_keywords>
+    <content><h2>Policies</h2><h3>Our policies for booking</h3><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Enim tortor at auctor urna nunc id cursus metus aliquam. Ut enim blandit volutpat maecenas volutpat blandit. Odio ut enim blandit volutpat maecenas volutpat. Hendrerit dolor magna eget est lorem ipsum dolor sit amet. Senectus et netus et malesuada fames ac. Posuere urna nec tincidunt praesent semper feugiat nibh sed. Eu consequat ac felis donec et. Viverra nibh cras pulvinar mattis nunc. Augue mauris augue neque gravida. Risus at ultrices mi tempus imperdiet nulla malesuada. Nibh cras pulvinar mattis nunc sed blandit. Maecenas volutpat blandit aliquam etiam erat velit scelerisque in.</p><p>Feugiat nibh sed pulvinar proin. Vestibulum sed arcu non odio euismod lacinia at quis risus. Turpis tincidunt id aliquet risus feugiat in. Varius morbi enim nunc faucibus a pellentesque sit amet porttitor. Posuere morbi leo urna molestie at elementum eu facilisis. Id eu nisl nunc mi. Aliquet risus feugiat in ante metus dictum at. Sed turpis tincidunt id aliquet risus. Ac orci phasellus egestas tellus rutrum. Non diam phasellus vestibulum lorem sed risus ultricies tristique nulla. Leo vel orci porta non pulvinar. Dictumst quisque sagittis purus sit amet. Scelerisque viverra mauris in aliquam sem fringilla ut morbi tincidunt. Egestas diam in arcu cursus euismod quis. Vestibulum morbi blandit cursus risus at ultrices.</p>
+    </content>
+    <link_rewrite>policies</link_rewrite>
   </cms>
   <cms id='Legal_Notice'>
     <meta_title>Mentions légales</meta_title>

@@ -1,11 +1,12 @@
 <?xml version='1.0'?>
 <entity_cms>
-  <cms id='Delivery'>
-    <meta_title>বিতরন</meta_title>
-    <meta_description>বিতরনের শর্ত সমূহ</meta_description>
-    <meta_keywords>conditions, delivery, delay, shipment, pack</meta_keywords>
-    <content>&lt;h2&gt;বিলি এবং ফেরত&lt;/h2&gt;&lt;h3&gt;আপনার প্যাক বিলিt&lt;/h3&gt;&lt;p&gt;প্যাকেজ সাধারণত পেমেন্ট প্রাপ্তির পর 2 দিনের মধ্যে প্রেষিত হয় এবং স্বাক্ষর ছাড়াই ট্র্যাকিং এবং ড্রপ অফ সঙ্গে ইউ.পি. মাধ্যমে প্রেরণ করা হয়. আপনি প্রয়োজনীয় স্বাক্ষর সঙ্গে অতিরিক্ত ইউ.পি. দ্বারা ডেলিভারি পছন্দ করেন, একটি অতিরিক্ত খরচ প্রয়োগ করা হবে, তাই এই পদ্ধতি চয়ন করার আগে আমাদের সাথে যোগাযোগ করুন. আপনি যেটা পছন্দ চালান, আমরা আপনাকে আপনার প্যাকেজ অনলাইন ট্র্যাক একটি লিঙ্ক প্রদান করা হবে.&lt;/p&gt;&lt;p&gt;শিপিং ফি ফি হিসেবে ডাকমাসুল খরচ সামলাচ্ছে ও প্যাকিং অন্তর্ভুক্ত. পরিবহন ফি চালানের মোট ওজন অনুযায়ী পরিবর্তন হওয়ার সম্ভাবনা রয়েছে, যেহেতু সামলাচ্ছে ফি, সংশোধন করা হয়. আমরা এক করার জন্য আপনার আইটেম গ্রুপে আপনাকে উপদেশ. আমরা আলাদা আলাদাভাবে স্থাপিত দুটি স্বতন্ত্র আদেশ গ্রুপ করতে পারবে না, এবং শিপিং ফি তাদের প্রতিটি ক্ষেত্রে প্রযোজ্য হবে. আপনার প্যাকেজ আপনার নিজের ঝুঁকিতে প্রেষিত করা হবে, কিন্তু ভঙ্গুর বস্তুর রক্ষা বিশেষ যত্ন নেওয়া হয়.&lt;br /&gt;&lt;br /&gt;বক্সগুলিতে যা আছে পর্যাপ্তভাবে মাপের এবং আপনার আইটেম ভাল সুরক্ষিত হয়.&lt;/p&gt;</content>
-    <link_rewrite>delivery</link_rewrite>
+  <cms id="Policies">
+    <meta_title>Policies</meta_title>
+    <meta_description>Our policies of hotel bookings</meta_description>
+    <meta_keywords>conditions, policy, guidelines, protocol, rule</meta_keywords>
+    <content><h2>Policies</h2><h3>Our policies for booking</h3><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Enim tortor at auctor urna nunc id cursus metus aliquam. Ut enim blandit volutpat maecenas volutpat blandit. Odio ut enim blandit volutpat maecenas volutpat. Hendrerit dolor magna eget est lorem ipsum dolor sit amet. Senectus et netus et malesuada fames ac. Posuere urna nec tincidunt praesent semper feugiat nibh sed. Eu consequat ac felis donec et. Viverra nibh cras pulvinar mattis nunc. Augue mauris augue neque gravida. Risus at ultrices mi tempus imperdiet nulla malesuada. Nibh cras pulvinar mattis nunc sed blandit. Maecenas volutpat blandit aliquam etiam erat velit scelerisque in.</p><p>Feugiat nibh sed pulvinar proin. Vestibulum sed arcu non odio euismod lacinia at quis risus. Turpis tincidunt id aliquet risus feugiat in. Varius morbi enim nunc faucibus a pellentesque sit amet porttitor. Posuere morbi leo urna molestie at elementum eu facilisis. Id eu nisl nunc mi. Aliquet risus feugiat in ante metus dictum at. Sed turpis tincidunt id aliquet risus. Ac orci phasellus egestas tellus rutrum. Non diam phasellus vestibulum lorem sed risus ultricies tristique nulla. Leo vel orci porta non pulvinar. Dictumst quisque sagittis purus sit amet. Scelerisque viverra mauris in aliquam sem fringilla ut morbi tincidunt. Egestas diam in arcu cursus euismod quis. Vestibulum morbi blandit cursus risus at ultrices.</p>
+    </content>
+    <link_rewrite>policies</link_rewrite>
   </cms>
   <cms id='Legal_Notice'>
     <meta_title>আইনি বিজ্ঞপ্তি</meta_title>

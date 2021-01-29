@@ -1,11 +1,12 @@
 <?xml version="1.0"?>
 <entity_cms>
-  <cms id="Delivery">
-    <meta_title>Livrare</meta_title>
-    <meta_description>Termenii și condițiile noaste de livrare</meta_description>
-    <meta_keywords>conditii, livrare, intarziere, expediere, ambalaj</meta_keywords>
-  <content>&lt;h2&gt;Expedieri și returnări&lt;/h2&gt;&lt;h3&gt;Expedierea pachetului dumneavoastră&lt;/h3&gt;&lt;p&gt;Pachetele sunt în general trimise în 2 zile de la primirea plății și sunt expediate prin UPS cu urmărire și livrare fără semnătură. Dacă preferați livrarea prin UPS Extra cu semnătură obligatorie, va fi aplicat un cost adițional, astfel că vă rugăm să ne contactați înainte de a alege această metodă. Orice metodă alegeți, veți avea o legătură pentru urmărirea online a pachetului dumneavoastră.&lt;/p&gt;&lt;p&gt;Costul livrării include costul procesării și ambalării, cât și costurile poștale. Costul procesării este fix, în timp ce costul transportului poate varia în funcție de greutatea totală a pachetului. Vă sfătuim să vă grupați toate articolele într-o singură comandă. Noi nu putem grupa comenzi distincte plasate separat, astfel că fiecăreia i se vor aplica costuril de livrareand shipping fees will apply to each of them. Riscurile aferente livrării cad în responsabilitatea dumneavoastră, dar luăm măsuri speciale pentru a proteja obiectele fragile.&lt;br /&gt;&lt;br /&gt;Cutiile sunt generos dimensionate și articolele dumneavoatră sunt bine protejate.&lt;/p&gt;</content>
-    <link_rewrite>livrare</link_rewrite>
+  <cms id="Policies">
+    <meta_title>Policies</meta_title>
+    <meta_description>Our policies of hotel bookings</meta_description>
+    <meta_keywords>conditions, policy, guidelines, protocol, rule</meta_keywords>
+    <content><h2>Policies</h2><h3>Our policies for booking</h3><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Enim tortor at auctor urna nunc id cursus metus aliquam. Ut enim blandit volutpat maecenas volutpat blandit. Odio ut enim blandit volutpat maecenas volutpat. Hendrerit dolor magna eget est lorem ipsum dolor sit amet. Senectus et netus et malesuada fames ac. Posuere urna nec tincidunt praesent semper feugiat nibh sed. Eu consequat ac felis donec et. Viverra nibh cras pulvinar mattis nunc. Augue mauris augue neque gravida. Risus at ultrices mi tempus imperdiet nulla malesuada. Nibh cras pulvinar mattis nunc sed blandit. Maecenas volutpat blandit aliquam etiam erat velit scelerisque in.</p><p>Feugiat nibh sed pulvinar proin. Vestibulum sed arcu non odio euismod lacinia at quis risus. Turpis tincidunt id aliquet risus feugiat in. Varius morbi enim nunc faucibus a pellentesque sit amet porttitor. Posuere morbi leo urna molestie at elementum eu facilisis. Id eu nisl nunc mi. Aliquet risus feugiat in ante metus dictum at. Sed turpis tincidunt id aliquet risus. Ac orci phasellus egestas tellus rutrum. Non diam phasellus vestibulum lorem sed risus ultricies tristique nulla. Leo vel orci porta non pulvinar. Dictumst quisque sagittis purus sit amet. Scelerisque viverra mauris in aliquam sem fringilla ut morbi tincidunt. Egestas diam in arcu cursus euismod quis. Vestibulum morbi blandit cursus risus at ultrices.</p>
+    </content>
+    <link_rewrite>policies</link_rewrite>
   </cms>
   <cms id="Legal_Notice">
     <meta_title>Notificare legală</meta_title>

@@ -1,11 +1,12 @@
 <?xml version='1.0'?>
 <entity_cms>
-  <cms id='Delivery'>
-    <meta_title>Envío</meta_title>
-    <meta_description>Nuestros términos y condiciones de envío</meta_description>
-    <meta_keywords>condiciones, entrega, plazo, envío, paquete</meta_keywords>
-    <content>&lt;h2&gt;Envíos y devoluciones&lt;/h2&gt;&lt;h3&gt;Envío del paquete&lt;/h3&gt;&lt;p&gt;Como norma general, los paquetes se envían dentro de las 48 horas siguientes a la recepción del pago, través de UPS con número de seguimiento y entrega sin firma. Si prefieres el envío certificado mediante UPS Extra, se aplicará un cargo adicional. Ponte en contacto con nosotros antes de solicitar esta opción. Sea cual sea la forma de envío que elijas, te proporcionaremos un enlace para que puedas seguir tu pedido en línea.&lt;/p&gt;&lt;p&gt;Los gastos de envío incluyen los gastos de manipulación y empaquetado, así como los gastos postales. Los gastos de manipulación tienen un precio fijo, mientras que los gastos de transporte pueden variar según el peso total del paquete. Te aconsejamos que agrupes todos tus artículos en un mismo pedido. No podemos combinar dos pedidos diferentes, y los gastos de envío se aplicarán para cada uno de manera individual. No nos hacemos responsables de los daños que pueda sufrir tu paquete tras el envío, pero hacemos todo lo posible para proteger todos los artículos frágiles.&lt;br /&gt;&lt;br /&gt;Las cajas son grandes y tus artículos estarán bien protegidos.&lt;/p&gt;</content>
-    <link_rewrite>entrega</link_rewrite>
+  <cms id="Policies">
+    <meta_title>Policies</meta_title>
+    <meta_description>Our policies of hotel bookings</meta_description>
+    <meta_keywords>conditions, policy, guidelines, protocol, rule</meta_keywords>
+    <content><h2>Policies</h2><h3>Our policies for booking</h3><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Enim tortor at auctor urna nunc id cursus metus aliquam. Ut enim blandit volutpat maecenas volutpat blandit. Odio ut enim blandit volutpat maecenas volutpat. Hendrerit dolor magna eget est lorem ipsum dolor sit amet. Senectus et netus et malesuada fames ac. Posuere urna nec tincidunt praesent semper feugiat nibh sed. Eu consequat ac felis donec et. Viverra nibh cras pulvinar mattis nunc. Augue mauris augue neque gravida. Risus at ultrices mi tempus imperdiet nulla malesuada. Nibh cras pulvinar mattis nunc sed blandit. Maecenas volutpat blandit aliquam etiam erat velit scelerisque in.</p><p>Feugiat nibh sed pulvinar proin. Vestibulum sed arcu non odio euismod lacinia at quis risus. Turpis tincidunt id aliquet risus feugiat in. Varius morbi enim nunc faucibus a pellentesque sit amet porttitor. Posuere morbi leo urna molestie at elementum eu facilisis. Id eu nisl nunc mi. Aliquet risus feugiat in ante metus dictum at. Sed turpis tincidunt id aliquet risus. Ac orci phasellus egestas tellus rutrum. Non diam phasellus vestibulum lorem sed risus ultricies tristique nulla. Leo vel orci porta non pulvinar. Dictumst quisque sagittis purus sit amet. Scelerisque viverra mauris in aliquam sem fringilla ut morbi tincidunt. Egestas diam in arcu cursus euismod quis. Vestibulum morbi blandit cursus risus at ultrices.</p>
+    </content>
+    <link_rewrite>policies</link_rewrite>
   </cms>
   <cms id='Legal_Notice'>
     <meta_title>Aviso legal</meta_title>
