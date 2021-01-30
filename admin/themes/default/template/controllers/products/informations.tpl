@@ -153,7 +153,7 @@
 
 	<div class="form-group">
 		{if isset($htl_room_type)}
-			<label class="control-label col-sm-3" for="hotel_place">
+			<label class="control-label col-sm-3 required" for="hotel_place">
 				{l s='Hotel'}
 			</label>
 			<div class="col-sm-5">
@@ -161,7 +161,7 @@
 				<input type="hidden" name="id_hotel" value="{$htl_room_type['id_hotel']}">
 			</div>
 		{else}
-			<label class="control-label col-sm-3" for="hotel_place">
+			<label class="control-label col-sm-3 required" for="hotel_place">
 				{l s='Select Hotel'}
 			</label>
 			<div class="col-sm-5">
