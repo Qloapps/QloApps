@@ -153,7 +153,6 @@ class CategoryControllerCore extends FrontController
 
                 $obj_booking_dtl = new HotelBookingDetail();
                 $booking_data = $obj_booking_dtl->DataForFrontSearch($date_from, $date_to, $id_hotel, 0, 0, 0, 0, -1, 0, 0, $id_cart, $id_guest);
-                // ddd($booking_data);
 
                 $feat_img_dir = _PS_IMG_.'rf/';
                 $ratting_img = _MODULE_DIR_.'hotelreservationsystem/views/img/Slices/icons-sprite.png';
@@ -170,14 +169,6 @@ class CategoryControllerCore extends FrontController
                 }
                 /*End*/
 
-                if (isset($booking_data['rm_data']) && $booking_data['rm_data']) {
-                    $useTax = HotelBookingDetail::useTax();
-                    foreach ($booking_data['rm_data'] as $key => $roomType) {
-                        $feature_price = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay($roomType['id_product'], $date_from, $date_to, $useTax);
-                        $booking_data['rm_data'][$key]['feature_price'] = $feature_price;
-                        $booking_data['rm_data'][$key]['feature_price_diff'] = (float)($roomType['price_without_reduction']-$feature_price);
-                    }
-                }
                 $this->context->smarty->assign(array(
                     'warning_num' => $warning_num,
                     'num_days' => $num_days,
