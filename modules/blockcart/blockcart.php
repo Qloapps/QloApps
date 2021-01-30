@@ -62,6 +62,7 @@ class blockcart extends Module
         $useTax = !($taxCalculationMethod == PS_TAX_EXC);
 
         $products = $params['cart']->getProducts(true);
+        $htlCartData = $this->getHotelCartBookingData();
         $nbTotalProducts = 0;
         foreach ($products as $product) {
             $nbTotalProducts += (int) $product['cart_quantity'];
@@ -159,6 +160,8 @@ class blockcart extends Module
             'ajax_allowed' => (int) (Configuration::get('PS_BLOCK_CART_AJAX')) == 1 ? true : false,
             'static_token' => Tools::getToken(false),
             'free_shipping' => $total_free_shipping,
+            'cart_htl_data' => $htlCartData['cart_htl_data'],
+            'total_rooms_in_cart' => $htlCartData['total_rooms_in_cart'],
         ));
         if (is_array($errors) && count($errors)) {
             $this->smarty->assign('errors', $errors);
@@ -207,61 +210,6 @@ class blockcart extends Module
         return true;
     }
 
-    public function hookRightColumn($params)
-    {
-        if (Configuration::get('PS_CATALOG_MODE')) {
-            return;
-        }
-        $total_rooms = 0;
-        if ($this->context->cart->id) {
-            if ($result = $this->getHotelCartBookingData()) {
-                $this->smarty->assign('cart_htl_data', $result['cart_htl_data']);
-                $total_rooms = $result['total_rooms_in_cart'];
-            }
-        }
-
-        $warning_num = Configuration::get('WK_ROOM_LEFT_WARNING_NUMBER');
-
-        /*Max date of ordering for order restrict*/
-        $current_page = Dispatcher::getInstance()->getController();
-        $max_order_date = 0;
-        if ($current_page == 'product') {
-            $id_product = Tools::getValue('id_product');
-            $obj_hotel_room_type = new HotelRoomType();
-            $room_info_by_product_id = $obj_hotel_room_type->getRoomTypeInfoByIdProduct($id_product);
-            $hotel_id = $room_info_by_product_id['id_hotel'];
-            if ($hotel_id) {
-                $max_order_date = HotelOrderRestrictDate::getMaxOrderDate($hotel_id);
-            }
-        } elseif ($current_page == 'category') {
-            $htl_id_category = Tools::getValue('id_category');
-            $hotel_id = HotelBranchInformation::getHotelIdByIdCategory($htl_id_category);
-            if ($hotel_id) {
-                $max_order_date = HotelOrderRestrictDate::getMaxOrderDate($hotel_id);
-            }
-        }
-        /*End*/
-
-        // @todo this variable seems not used
-        $this->smarty->assign(array(
-            'total_rooms_in_cart' => $total_rooms,
-            'max_order_date' => $max_order_date,
-            'warning_num' => $warning_num,
-            'module_dir' => _MODULE_DIR_,
-            'current_page' => $current_page,
-            'order_page' => (strpos($_SERVER['PHP_SELF'], 'order') !== false),
-            'blockcart_top' => (isset($params['blockcart_top']) && $params['blockcart_top']) ? true : false,
-        ));
-        $this->assignContentVars($params);
-
-        return $this->display(__FILE__, 'blockcart.tpl');
-    }
-
-    public function hookLeftColumn($params)
-    {
-        return $this->hookRightColumn($params);
-    }
-
     public function hookAjaxCall($params)
     {
         if (Configuration::get('PS_CATALOG_MODE')) {
@@ -276,9 +224,7 @@ class blockcart extends Module
             unset($this->context->cookie->avail_rooms);
         }
 
-        $result = $this->getHotelCartBookingData();
-        $res['cart_booking_data'] = $result['cart_htl_data'];
-        $res['total_rooms_in_cart'] = $result['total_rooms_in_cart'];
+
         if (is_array($res) && ($id_product = Tools::getValue('id_product')) && Configuration::get('PS_BLOCK_CART_SHOW_CROSSSELLING')) {
             $this->smarty->assign('orderProducts', OrderDetail::getCrossSells($id_product, $this->context->language->id, Configuration::get('PS_BLOCK_CART_XSELL_LIMIT')));
             $res['crossSelling'] = $this->display(__FILE__, 'crossselling.tpl');
@@ -316,20 +262,53 @@ class blockcart extends Module
     {
         $params['blockcart_top'] = true;
 
-        return $this->hookRightColumn($params);
+        if (Configuration::get('PS_CATALOG_MODE')) {
+            return;
+        }
+
+        $warning_num = Configuration::get('WK_ROOM_LEFT_WARNING_NUMBER');
+
+        /*Max date of ordering for order restrict*/
+        $current_page = Dispatcher::getInstance()->getController();
+        $max_order_date = 0;
+        if ($current_page == 'product') {
+            $id_product = Tools::getValue('id_product');
+            $obj_hotel_room_type = new HotelRoomType();
+            $room_info_by_product_id = $obj_hotel_room_type->getRoomTypeInfoByIdProduct($id_product);
+            $hotel_id = $room_info_by_product_id['id_hotel'];
+            if ($hotel_id) {
+                $max_order_date = HotelOrderRestrictDate::getMaxOrderDate($hotel_id);
+            }
+        } elseif ($current_page == 'category') {
+            $htl_id_category = Tools::getValue('id_category');
+            $hotel_id = HotelBranchInformation::getHotelIdByIdCategory($htl_id_category);
+            if ($hotel_id) {
+                $max_order_date = HotelOrderRestrictDate::getMaxOrderDate($hotel_id);
+            }
+        }
+        /*End*/
+
+        // @todo this variable seems not used
+        $this->smarty->assign(array(
+            'max_order_date' => $max_order_date,
+            'warning_num' => $warning_num,
+            'module_dir' => _MODULE_DIR_,
+            'current_page' => $current_page,
+            'order_page' => (strpos($_SERVER['PHP_SELF'], 'order') !== false),
+            'blockcart_top' => (isset($params['blockcart_top']) && $params['blockcart_top']) ? true : false,
+        ));
+        $this->assignContentVars($params);
+
+        return $this->display(__FILE__, 'blockcart.tpl');
     }
 
     public function hookDisplayNav($params)
     {
-        $params['blockcart_top'] = true;
-
         return $this->hookTop($params);
     }
 
     public function hookDisplayTopSubSecondaryBlock($params)
     {
-        $params['blockcart_top'] = true;
-
         return $this->hookTop($params);
     }
 

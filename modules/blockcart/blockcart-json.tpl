@@ -113,8 +113,10 @@
 	{$error|json_encode}
 	{if !$smarty.foreach.errors.last},{/if}
 {/foreach}
-]
+],
 {else}
-"hasError" : false
+"hasError" : false,
 {/if}
+"cart_booking_data" :{$cart_htl_data|json_encode},
+"total_rooms_in_cart" :{$total_rooms_in_cart|json_encode}
 {rdelim}
