@@ -277,6 +277,12 @@ class HotelBranchInformation extends ObjectModel
                                     unset($dataArray[$key]);
                                 }
                             }
+                        } else {
+                            if ($addAccessKey) {
+                                $dataArray[$key]['htl_access'] = 0;
+                            } else {
+                                unset($dataArray[$key]);
+                            }
                         }
                     } elseif (isset($row['id_product'])) {
                         $objRoomType = new HotelRoomType();
@@ -290,6 +296,12 @@ class HotelBranchInformation extends ObjectModel
                                 if (!in_array($roomTypeInfo['id_hotel'], $hotels)) {
                                     unset($dataArray[$key]);
                                 }
+                            }
+                        } else {
+                            if ($addAccessKey) {
+                                $dataArray[$key]['htl_access'] = 0;
+                            } else {
+                                unset($dataArray[$key]);
                             }
                         }
                     }
