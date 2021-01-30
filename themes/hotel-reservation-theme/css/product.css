@@ -1374,6 +1374,7 @@ Quick View Styles
   z-index: 100;
 }
 #product select {
+  max-width: 100%;
   background-color: #fff;
   height: 40px;
   border-radius: 4px;
