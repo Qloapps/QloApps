@@ -215,7 +215,7 @@ class blockcart extends Module
 
         $total_rooms = 0;
         if ($this->context->cart->id) {
-            if ($cartBookingData = HotelCartBookingData::getHotelCartBookingData()) {
+            if ($cartBookingData = HotelCartBookingData::getHotelCartBookingData(0)) {
                 $this->smarty->assign('cart_htl_data', $cartBookingData);
                 $total_rooms = array_sum(array_column($cartBookingData, 'total_num_rooms'));
             }
@@ -277,7 +277,7 @@ class blockcart extends Module
             unset($this->context->cookie->avail_rooms);
         }
 
-        if ($cartBookingData = HotelCartBookingData::getHotelCartBookingData()) {
+        if ($cartBookingData = HotelCartBookingData::getHotelCartBookingData(0)) {
             $res['cart_booking_data'] = $cartBookingData;
             $res['total_rooms_in_cart'] = array_sum(array_column($cartBookingData, 'total_num_rooms'));
         }
