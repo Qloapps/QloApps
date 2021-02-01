@@ -1954,10 +1954,6 @@ class AdminProductsControllerCore extends AdminController
     {
         $this->checkProduct();
 
-        $id_hotel = Tools::getValue('id_hotel');
-        if (!$id_hotel || !Validate::isUnsignedInt($id_hotel)) {
-            $this->errors[] = Tools::displayError('Please select a hotel');
-        }
         if (!empty($this->errors)) {
             $this->display = 'add';
             return false;
@@ -1969,22 +1965,11 @@ class AdminProductsControllerCore extends AdminController
         if ($this->object->add()) {
 
             // associateroom type to hotel
+            $id_hotel = Tools::getValue('id_hotel');
             $objRoomType = new HotelRoomType();
             $objRoomType->id_product = $this->object->id;
             $objRoomType->id_hotel = $id_hotel;
             $objRoomType->save();
-            // Associate categories to Room Type
-            $objHotelInfo = new HotelBranchInformation($id_hotel);
-            $hotelIdCategory = $objHotelInfo->id_category;
-            $category = new Category($hotelIdCategory);
-            $hotelCategories = $category->getParentsCategories();
-            $categoryIds = array();
-
-            foreach ($hotelCategories as $rowCateg) {
-                $categoryIds[] = $rowCateg['id_category'];
-            }
-            $this->object->updateCategories($categoryIds);
-
 
             PrestaShopLogger::addLog(sprintf($this->l('%s addition', 'AdminTab', false, false), $this->className), 1, null, $this->className, (int)$this->object->id, true, (int)$this->context->employee->id);
             $this->addCarriers($this->object);
@@ -2381,9 +2366,26 @@ class AdminProductsControllerCore extends AdminController
             }
         }
 
+        $id_hotel = Tools::getValue('id_hotel');
+        if (!$id_hotel || !Validate::isUnsignedInt($id_hotel)) {
+            $this->errors[] = Tools::displayError('Please select a hotel');
+        } else if (!Validate::isLoadedObject($objHotel = new HotelBranchInformation($id_hotel))) {
+            $this->errors[] = Tools::displayError('Selected Hotel not found');
+        } else {
+            $hotelIdCategory = $objHotel->id_category;
+            if (Validate::isLoadedObject($objCategory = new Category($hotelIdCategory))) {
+                foreach($objCategory->getParentsCategories() as $category) {
+                    $_POST['categoryBox'][] = $category['id_category'];
+                }
+                if(!Tools::getValue('id_category_default')) {
+                    $_POST['id_category_default'] = $hotelIdCategory;
+                }
+            }
+        }
+
         // Categories
         if ($this->isProductFieldUpdated('id_category_default') && (!Tools::isSubmit('categoryBox') || !count(Tools::getValue('categoryBox')))) {
-            $this->errors[] = $this->l('Products must be in at least one category.');
+            $this->errors[] = $this->l('This room type must be in at least one category.');
         }
 
         if ($this->isProductFieldUpdated('id_category_default') && (!is_array(Tools::getValue('categoryBox')) || !in_array(Tools::getValue('id_category_default'), Tools::getValue('categoryBox')))) {
@@ -3727,70 +3729,77 @@ class AdminProductsControllerCore extends AdminController
      */
     public function initFormAssociations($obj)
     {
-        $product = $obj;
         $data = $this->createTemplate($this->tpl_form);
-        // Prepare Categories tree for display in Associations tab
-        $root = Category::getRootCategory();
-        $default_category = $this->context->cookie->id_category_products_filter ? $this->context->cookie->id_category_products_filter : Context::getContext()->shop->id_category;
-        if (!$product->id || !$product->isAssociatedToShop()) {
-            $selected_cat = Category::getCategoryInformations(Tools::getValue('categoryBox', array($default_category)), $this->default_form_language);
-        } else {
-            if (Tools::isSubmit('categoryBox')) {
+
+        if ($obj->id) {
+            $product = $obj;
+            // Prepare Categories tree for display in Associations tab
+            $root = Category::getRootCategory();
+            $default_category = $this->context->cookie->id_category_products_filter ? $this->context->cookie->id_category_products_filter : Context::getContext()->shop->id_category;
+            if (!$product->id || !$product->isAssociatedToShop()) {
                 $selected_cat = Category::getCategoryInformations(Tools::getValue('categoryBox', array($default_category)), $this->default_form_language);
             } else {
-                $selected_cat = Product::getProductCategoriesFull($product->id, $this->default_form_language);
-            }
-        }
-
-        // Multishop block
-        $data->assign('feature_shop_active', Shop::isFeatureActive());
-        $helper = new HelperForm();
-        if ($this->object && $this->object->id) {
-            $helper->id = $this->object->id;
-        } else {
-            $helper->id = null;
-        }
-        $helper->table = $this->table;
-        $helper->identifier = $this->identifier;
-
-        // Accessories block
-        $accessories = Product::getAccessoriesLight($this->context->language->id, $product->id);
-
-        if ($post_accessories = Tools::getValue('inputAccessories')) {
-            $post_accessories_tab = explode('-', $post_accessories);
-            foreach ($post_accessories_tab as $accessory_id) {
-                if (!$this->haveThisAccessory($accessory_id, $accessories) && $accessory = Product::getAccessoryById($accessory_id)) {
-                    $accessories[] = $accessory;
+                if (Tools::isSubmit('categoryBox')) {
+                    $selected_cat = Category::getCategoryInformations(Tools::getValue('categoryBox', array($default_category)), $this->default_form_language);
+                } else {
+                    $selected_cat = Product::getProductCategoriesFull($product->id, $this->default_form_language);
                 }
             }
+
+            // Multishop block
+            $data->assign('feature_shop_active', Shop::isFeatureActive());
+            $helper = new HelperForm();
+            if ($this->object && $this->object->id) {
+                $helper->id = $this->object->id;
+            } else {
+                $helper->id = null;
+            }
+            $helper->table = $this->table;
+            $helper->identifier = $this->identifier;
+
+            // Accessories block
+            $accessories = Product::getAccessoriesLight($this->context->language->id, $product->id);
+
+            if ($post_accessories = Tools::getValue('inputAccessories')) {
+                $post_accessories_tab = explode('-', $post_accessories);
+                foreach ($post_accessories_tab as $accessory_id) {
+                    if (!$this->haveThisAccessory($accessory_id, $accessories) && $accessory = Product::getAccessoryById($accessory_id)) {
+                        $accessories[] = $accessory;
+                    }
+                }
+            }
+            $data->assign('accessories', $accessories);
+
+            $product->manufacturer_name = Manufacturer::getNameById($product->id_manufacturer);
+
+            $categories = array();
+            foreach ($selected_cat as $key => $category) {
+                $categories[] = $key;
+            }
+
+            $tree = new HelperTreeCategories('associated-categories-tree', 'Associated categories');
+            $tree->setTemplate('tree_associated_categories.tpl')
+                ->setHeaderTemplate('tree_associated_header.tpl')
+                ->setRootCategory((int)$root->id)
+                ->setUseCheckBox(true)
+                ->setUseSearch(false)
+                ->setFullTree(0)
+                ->setSelectedCategories($categories)
+                ->setUseBulkActions(false)
+                ->setDisablAllCategories(true);
+
+            $data->assign(array('default_category' => $default_category,
+                        'selected_cat_ids' => implode(',', array_keys($selected_cat)),
+                        'selected_cat' => $selected_cat,
+                        'id_category_default' => $product->getDefaultCategory(),
+                        'category_tree' => $tree->render(),
+                        'product' => $product,
+                        'link' => $this->context->link,
+                        'is_shop_context' => Shop::getContext() == Shop::CONTEXT_SHOP
+            ));
+        } else {
+            $this->displayWarning($this->l('You must save this room type before updating associations.'));
         }
-        $data->assign('accessories', $accessories);
-
-        $product->manufacturer_name = Manufacturer::getNameById($product->id_manufacturer);
-
-        $categories = array();
-        foreach ($selected_cat as $key => $category) {
-            $categories[] = $key;
-        }
-
-        $tree = new HelperTreeCategories('associated-categories-tree', 'Associated categories');
-        $tree->setTemplate('tree_associated_categories.tpl')
-            ->setHeaderTemplate('tree_associated_header.tpl')
-            ->setRootCategory((int)$root->id)
-            ->setUseCheckBox(true)
-            ->setUseSearch(false)
-            ->setFullTree(0)
-            ->setSelectedCategories($categories);
-
-        $data->assign(array('default_category' => $default_category,
-                    'selected_cat_ids' => implode(',', array_keys($selected_cat)),
-                    'selected_cat' => $selected_cat,
-                    'id_category_default' => $product->getDefaultCategory(),
-                    'category_tree' => $tree->render(),
-                    'product' => $product,
-                    'link' => $this->context->link,
-                    'is_shop_context' => Shop::getContext() == Shop::CONTEXT_SHOP
-        ));
 
         $this->tpl_form_vars['custom_form'] = $data->fetch();
     }
