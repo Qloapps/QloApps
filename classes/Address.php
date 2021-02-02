@@ -98,6 +98,9 @@ class AddressCore extends ObjectModel
     /** @var bool True if address has been deleted (staying in database as deleted) */
     public $deleted = 0;
 
+    /** @var bool True if address has been created automatically (by system) */
+    public $auto_generated;
+
     protected static $_idZones = array();
     protected static $_idCountries = array();
 
@@ -128,6 +131,7 @@ class AddressCore extends ObjectModel
             'phone_mobile' =>        array('type' => self::TYPE_STRING, 'validate' => 'isPhoneNumber', 'size' => 32),
             'dni' =>                array('type' => self::TYPE_STRING, 'validate' => 'isDniLite', 'size' => 16),
             'deleted' =>            array('type' => self::TYPE_BOOL, 'validate' => 'isBool', 'copy_post' => false),
+            'auto_generated' =>            array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
             'date_add' =>            array('type' => self::TYPE_DATE, 'validate' => 'isDate', 'copy_post' => false),
             'date_upd' =>            array('type' => self::TYPE_DATE, 'validate' => 'isDate', 'copy_post' => false),
         ),

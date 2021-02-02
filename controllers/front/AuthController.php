@@ -460,6 +460,7 @@ class AuthControllerCore extends FrontController
                             $_POST['alias'] = 'My address';
                             $_POST['id_country'] = $objHotel->country_id;
                             $_POST['id_state'] = $objHotel->state_id;
+                            $_POST['auto_generated'] = true;
                             // if form is shorter then address name will be customer name
                             $lastnameAddress = $_POST['lastname'];
                             $firstnameAddress = $_POST['firstname'];
