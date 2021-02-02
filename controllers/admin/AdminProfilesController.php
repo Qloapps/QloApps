@@ -115,4 +115,40 @@ class AdminProfilesControllerCore extends AdminController
 
         parent::initPageHeaderToolbar();
     }
+
+    public function processDelete()
+    {
+        if (Validate::isLoadedObject($object = $this->loadObject())) {
+            // check if any employee exists of this deleting profile before delete
+            $profileEmployees = Employee::getEmployeesByProfile($object->id);
+            if (empty($profileEmployees)) {
+                return parent::processDelete();
+            } else {
+                $this->errors[] = $this->l('Failed to delete profile, because it is assigned to at least one employee.');
+            }
+        } else {
+            $this->errors[] = $this->l('An error occurred while deleting the profile.').' '.$this->l('(cannot load object)');
+        }
+
+        return false;
+    }
+
+    protected function processBulkDelete()
+    {
+        if (is_array($this->boxes) && !empty($this->boxes)) {
+            foreach ($this->boxes as $idProfile) {
+                // check if any employee exists of this deleting profile before delete
+                $profileEmployees = Employee::getEmployeesByProfile($idProfile);
+                if (!empty($profileEmployees)) {
+                    $this->errors[] = $this->l('Failed to delete profile with id').' - #'.$idProfile.' '.$this->l('because it is assigned to at least one employee. Please remove it from selection.');
+                }
+            }
+        }
+
+        if (empty($this->errors)) {
+            return parent::processBulkDelete();
+        }
+
+        return false;
+    }
 }
