@@ -243,6 +243,7 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
                     'refundStatuses' => $refundStatuses,
                     'isRefundCompleted' => $objOrderReturn->hasBeenCompleted(),
                     'paymentMethods' => $paymentMethods,
+                    'name_controller' => Tools::getValue('controller')
                 )
             );
 
