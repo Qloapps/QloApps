@@ -159,6 +159,7 @@
 			<div class="col-sm-5">
 				<input type="text" class="form-control" value="{$htl_full_info['hotel_name']}" readonly>
 				<input type="hidden" name="id_hotel" value="{$htl_room_type['id_hotel']}">
+				<p class="help-block">{l s='Hotel once assigned cannot be reassigned'}</p>
 			</div>
 		{else}
 			<label class="control-label col-sm-3 required" for="hotel_place">
@@ -170,6 +171,7 @@
 						<option value="{$htl_dtl['id']}" >{$htl_dtl['hotel_name']}</option>
 					{/foreach}
 				</select>
+				<p class="help-block">{l s='Hotel once assigned cannot be reassigned'}</p>
 			</div>
 		{/if}
 	</div>
