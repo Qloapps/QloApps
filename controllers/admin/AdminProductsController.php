@@ -80,9 +80,9 @@ class AdminProductsControllerCore extends AdminController
 
         // START send access query information to the admin controller
         $this->access_select = ' SELECT a.`id_product` FROM '._DB_PREFIX_.'product a';
-        $this->access_join = ' INNER JOIN '._DB_PREFIX_.'htl_room_type hrt ON (hrt.id_product = a.id_product)';
+        $this->access_join = ' LEFT JOIN '._DB_PREFIX_.'htl_room_type hrt ON (hrt.id_product = a.id_product)';
         if ($acsHtls = HotelBranchInformation::getProfileAccessedHotels($this->context->employee->id_profile, 1, 1)) {
-            $this->access_where = ' WHERE hrt.id_hotel IN ('.implode(',', $acsHtls).')';
+            $this->access_where = ' WHERE (hrt.id_hotel IN ('.implode(',', $acsHtls).') OR hrt.id_hotel IS NULL)';
         }
 
         parent::__construct();
