@@ -3426,7 +3426,7 @@ class AdminProductsControllerCore extends AdminController
                 }
             }
         } else {
-            $this->errors[] = Tools::displayError('Please add dates for status temporary disable.');
+            $this->errors[] = Tools::displayError('Please add dates for status temporary inactive.');
         }
     }
 

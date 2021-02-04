@@ -598,7 +598,7 @@ class AdminFeaturesControllerCore extends AdminController
                         $this->errors[] = $error;
                     }
                 } else {
-                    $this->errors[] = $this->l('Please select an image for this feature.');
+                    $this->errors[] = $this->l('Please select a logo for this feature.');
                 }
             }
 
@@ -616,7 +616,7 @@ class AdminFeaturesControllerCore extends AdminController
                     // upload feature image
                     $imgPath = _PS_IMG_DIR_.'rf/'.$objFeature->id.'.jpg';
                     if (!ImageManager::resize($featureImage['tmp_name'], $imgPath)) {
-                        $this->errors[] = $this->l('Some error occurred while uploding room feature image. Please try again.');
+                        $this->errors[] = $this->l('Some error occurred while uploding room feature logo. Please try again.');
                     }
                 }
 
