@@ -856,13 +856,12 @@ class AdminControllerCore extends Controller
                     if (($type == 'date' || $type == 'datetime') && is_string($value)) {
                         $value = json_decode($value, true);
                     }
+                    $key = isset($tmp_tab[1]) ? $tmp_tab[0].'.`'.$tmp_tab[1].'`' : '`'.$tmp_tab[0].'`';
 
                     // as in database 0 means position 1 in the renderlist
                     if (isset($field['position'])) {
                         $value -= 1;
                     }
-
-                    $key = isset($tmp_tab[1]) ? $tmp_tab[0].'.`'.$tmp_tab[1].'`' : '`'.$tmp_tab[0].'`';
 
                     // Assignment by reference
                     if (array_key_exists('tmpTableFilter', $field)) {
@@ -3313,7 +3312,7 @@ class AdminControllerCore extends Controller
             $filter_modules_list = array($filter_modules_list);
         }
 
-        if (is_null($filter_modules_list) || !count($filter_modules_list)) {
+        if (is_null($filter_modules_list) || empty($filter_modules_list)) {
             return false;
         } //if there is no modules to display just return false;
 
@@ -3506,9 +3505,9 @@ class AdminControllerCore extends Controller
                 foreach ($languages as $language) {
                     if (($value = Tools::getValue($field_lang.'_'.$language['id_lang'])) !== false && !empty($value)) {
                         if (Tools::strtolower($function) == 'iscleanhtml' && Configuration::get('PS_ALLOW_HTML_IFRAME')) {
-                            $res = Validate::$function($value, true);
+                            $res = Validate::{$function}($value, true);
                         } else {
-                            $res = Validate::$function($value);
+                            $res = Validate::{$function}($value);
                         }
                         if (!$res) {
                             $this->errors[$field_lang.'_'.$language['id_lang']] = sprintf(
