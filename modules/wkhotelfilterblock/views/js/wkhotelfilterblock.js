@@ -170,7 +170,7 @@ $(document).ready(function()
 		if (filter_ajax)
 			filter_ajax.abort();
 
-		data = { ajax_filter : 1, filter_data: data};
+		data = { filter_data: data, ajax: 1, action:'FilterResults'};
 
 		if (sort_by && sort_value)
 		{
@@ -182,117 +182,16 @@ $(document).ready(function()
 		{
             url: cat_link,
             type: 'POST',
-            dataType: 'json',
+            dataType: 'html',
             data: data,
             success: function (result)
             {
-            	if (result)
-            	{
-            		$('#category_data_cont').empty();
-					if (result.rm_data.length) {
-						$.each(result.rm_data, function(key, value)
-						{
-							if (value.data.available.length)
-							{
-								var html  = '<div class="col-sm-12 room_cont">';
-										html += '<div class="row">';
-											html += '<div class="col-sm-4">';
-												html += '<a href="'+value.product_link+'">';
-													html += '<img src="'+value.image+'" class="img-responsive">';
-												html += '</a>';
-											html += '</div>';
-											html += '<div class="col-sm-8">';
-												html += '<p class="rm_heading">'+value.name+'</p>';
-												html += '<div class="rm_desc">'+value.description;
-													html += '&nbsp;<a href="'+value.product_link+'">'+viewMoreTxt+'....';
-													html += '</a>';
-												html += '</div>';
-												html += '<p><span class="capa_txt">Max Capacity:</span><span class="capa_data"> '+value.adult+' Adults, '+value.children+' child</span></p>';
-												html += '<div class="rm_review_cont pull-left">';
-													for (var i = 1; i <= 5; i++)
-													{
-														if (i <= value.ratting)
-														{
-															html += '<div class="rm_ratting_yes" style="background-image:url('+ratting_img+');"></div>'
-														}
-														else
-														{
-															html += '<div class="rm_ratting_no" style="background-image:url('+ratting_img+');"></div>';
-														}
-													}
-													html += '<span class="rm_review">'+value.num_review+' Reviews</span>';
-												html += '</div>';
-												if (typeof value.room_left != 'undefined')
-												{
-													html += '<span class="rm_left pull-right" ';
-													if (value.room_left > warning_num)
-													{
-														html += ' style="display:none;"';
-													}
-
-													html += '>Hurry! ';
-
-
-													html +='<span class="cat_remain_rm_qty_'+value.id_product+'">'+value.room_left+'</span>';
-													html +=' rooms left</span>';
-												}
-												if (value.feature.length)
-												{
-													html += '<div class="rm_amenities_cont">';
-														$.each(value.feature, function(f_k, f_v)
-														{
-															html += '<img src="'+feat_img_dir+f_v.value+'" class="rm_amen">';
-														});
-													html += '</div>';
-												}
-												html += '<div class="row margin-lr-0 pull-left rm_price_cont">';
-													if (value.price_without_reduction - value.feature_price > 0) {
-														html += '<span class="pull-left rm_price_val';
-														if (value.price_without_reduction-value.feature_price > 0) {
-															html += ' room_type_old_price';
-														}
-														html += '">';
-															html += currency_prefix+value.price_without_reduction.toFixed(2)+currency_suffix;
-														html += '</span>';
-													}
-													html += '<span class="pull-left rm_price_val">';
-														html += currency_prefix+value.feature_price.toFixed(2)+currency_suffix;
-													html += '</span>';
-													html += '<span class="pull-left rm_price_txt">/Per Night</span>';
-												html += '</div>';
-
-												// html += ' <a cat_rm_check_in="'+date_from+'" cat_rm_check_out="'+date_to+'" href="" rm_product_id="'+value.id_product+'" cat_rm_book_nm_days="'+num_days+'" class="btn rm_book_btn pull-right">Book Now</a>';
-												html += ' <a cat_rm_check_in="'+date_from+'" cat_rm_check_out="'+date_to+'" href="" rm_product_id="'+value.id_product+'" cat_rm_book_nm_days="'+num_days+'" data-id-product-attribute="0" data-id-product="'+value.id_product+'" class="btn btn-default button button-medium ajax_add_to_cart_button pull-right"><span>'+bookNowTxt+'</span></a>';
-
-												html += '<div class="rm_qty_cont pull-right clearfix" id="cat_rm_quantity_wanted_'+value.id_product+'">';
-													html += '<span class="qty_txt">Qty.:</span>';
-													html += '<div class="qty_sec_cont row">';
-														html += '<div class="qty_input_cont row margin-lr-0">';
-															html += '<input autocomplete="off" type="text" min="1" name="qty_'+value.id_product+'" id="cat_quantity_wanted_'+value.id_product+'" class="text-center form-control cat_quantity_wanted" value="1" id_room_product="'+value.id_product+'">';
-														html += '</div>';
-
-														html += '<div class="qty_direction">';
-															html += '<a href="#" data-room_id_product="'+value.id_product+'" data-field-qty="qty_'+value.id_product+'" class="btn btn-default cat_rm_quantity_up">';
-																html += '<span><i class="icon-plus"></i></span>';
-															html += '</a>';
-
-															html += '<a href="#" data-field-qty="qty_'+value.id_product+'" class="btn btn-default cat_rm_quantity_down">';
-																html += '<span><i class="icon-minus"></i></span>';
-															html += '</a>';
-														html += '</div>';
-													html += '</div>';
-												html += '</div>';
-											html += '</div>';
-										html += '</div>';
-									html += '</div>';
-									$('#category_data_cont').append(html);
-							}
-						});
-					} else {
-						var html = '<div class="noRoomsAvailAlert">'+noRoomAvailTxt+'</div>';
-						$('#category_data_cont').append(html);
-					}
-            	}
+            	if (result) {
+            		$('#category_data_cont').html(result);
+            	} else {
+					var html = '<div class="noRoomsAvailAlert">'+noRoomAvailTxt+'</div>';
+					$('#category_data_cont').html(html);
+				}
             }
         });
 		return 1;

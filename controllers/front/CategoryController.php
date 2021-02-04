@@ -120,109 +120,112 @@ class CategoryControllerCore extends FrontController
      */
     public function initContent()
     {
-        if (Tools::getValue('ajax_filter')) {
-            $this->filterResults();
-        } else {
-            parent::initContent();
+        parent::initContent();
 
-            $this->setTemplate(_PS_THEME_DIR_.'category.tpl');
+        $this->setTemplate(_PS_THEME_DIR_.'category.tpl');
 
-            if (!$this->customer_access) {
-                return;
-            }
-
-            $htl_id_category = Tools::getValue('id_category');
-
-            if (!($date_from = Tools::getValue('date_from'))) {
-                $date_from = date('Y-m-d');
-                $date_to = date('Y-m-d', strtotime($date_from) + 86400);
-            }
-            if (!($date_to = Tools::getValue('date_to'))) {
-                $date_to = date('Y-m-d', strtotime($date_from) + 86400);
-            }
-
-            $currency = new Currency($this->context->currency->id);
-
-            if (Module::isInstalled('hotelreservationsystem')) {
-                require_once _PS_MODULE_DIR_.'hotelreservationsystem/define.php';
-
-                $id_hotel = HotelBranchInformation::getHotelIdByIdCategory($htl_id_category);
-
-                $id_cart = $this->context->cart->id;
-                $id_guest = $this->context->cookie->id_guest;
-
-                $obj_booking_dtl = new HotelBookingDetail();
-                $booking_data = $obj_booking_dtl->DataForFrontSearch($date_from, $date_to, $id_hotel, 0, 0, 0, 0, -1, 0, 0, $id_cart, $id_guest);
-                // ddd($booking_data);
-
-                $feat_img_dir = _PS_IMG_.'rf/';
-                $ratting_img = _MODULE_DIR_.'hotelreservationsystem/views/img/Slices/icons-sprite.png';
-
-                $obj_booking_detail = new HotelBookingDetail();
-                $num_days = $obj_booking_detail->getNumberOfDays($date_from, $date_to);
-
-                $warning_num = Configuration::get('WK_ROOM_LEFT_WARNING_NUMBER');
-
-                /*Max date of ordering for order restrict*/
-                $max_order_date = HotelOrderRestrictDate::getMaxOrderDate($id_hotel);
-                if ($max_order_date) {
-                    $max_order_date = date('Y-m-d', strtotime($max_order_date));
-                }
-                /*End*/
-
-                if (isset($booking_data['rm_data']) && $booking_data['rm_data']) {
-                    $useTax = HotelBookingDetail::useTax();
-                    foreach ($booking_data['rm_data'] as $key => $roomType) {
-                        $feature_price = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay($roomType['id_product'], $date_from, $date_to, $useTax);
-                        $booking_data['rm_data'][$key]['feature_price'] = $feature_price;
-                        $booking_data['rm_data'][$key]['feature_price_diff'] = (float)($roomType['price_without_reduction']-$feature_price);
-                    }
-                }
-                $this->context->smarty->assign(array(
-                    'warning_num' => $warning_num,
-                    'num_days' => $num_days,
-                    'booking_date_from' => $date_from,
-                    'booking_date_to' => $date_to,
-                    'booking_data' => $booking_data,
-                    'feat_img_dir' => $feat_img_dir,
-                    'ratting_img' => $ratting_img,
-                    'currency' => $currency,
-                    'max_order_date' => $max_order_date,
-                ));
-            }
-
-            /*if (isset($this->context->cookie->id_compare))
-                $this->context->smarty->assign('compareProducts', CompareProduct::getCompareProducts((int)$this->context->cookie->id_compare));
-
-            // Product sort must be called before assignProductList()
-            $this->productSort();
-
-            $this->assignScenes();
-            $this->assignSubcategories();
-            $this->assignProductList();
-
-            $this->context->smarty->assign(array(
-                'category'             => $this->category,
-                'description_short'    => Tools::truncateString($this->category->description, 350),
-                'products'             => (isset($this->cat_products) && $this->cat_products) ? $this->cat_products : null,
-                'id_category'          => (int)$this->category->id,
-                'id_category_parent'   => (int)$this->category->id_parent,
-                'return_category_name' => Tools::safeOutput($this->category->name),
-                'path'                 => Tools::getPath($this->category->id),
-                'add_prod_display'     => Configuration::get('PS_ATTRIBUTE_CATEGORY_DISPLAY'),
-                'categorySize'         => Image::getSize(ImageType::getFormatedName('category')),
-                'mediumSize'           => Image::getSize(ImageType::getFormatedName('medium')),
-                'thumbSceneSize'       => Image::getSize(ImageType::getFormatedName('m_scene')),
-                'homeSize'             => Image::getSize(ImageType::getFormatedName('home')),
-                'allow_oosp'           => (int)Configuration::get('PS_ORDER_OUT_OF_STOCK'),
-                'comparator_max_item'  => (int)Configuration::get('PS_COMPARATOR_MAX_ITEM'),
-                'suppliers'            => Supplier::getSuppliers(),
-                'body_classes'         => array($this->php_self.'-'.$this->category->id, $this->php_self.'-'.$this->category->link_rewrite)
-            ));*/
+        if (!$this->customer_access) {
+            return;
         }
+
+        $htl_id_category = Tools::getValue('id_category');
+
+        if (!($date_from = Tools::getValue('date_from'))) {
+            $date_from = date('Y-m-d');
+            $date_to = date('Y-m-d', strtotime($date_from) + 86400);
+        }
+        if (!($date_to = Tools::getValue('date_to'))) {
+            $date_to = date('Y-m-d', strtotime($date_from) + 86400);
+        }
+
+        $currency = new Currency($this->context->currency->id);
+
+        if (Module::isInstalled('hotelreservationsystem')) {
+            require_once _PS_MODULE_DIR_.'hotelreservationsystem/define.php';
+
+            $id_hotel = HotelBranchInformation::getHotelIdByIdCategory($htl_id_category);
+
+            $id_cart = $this->context->cart->id;
+            $id_guest = $this->context->cookie->id_guest;
+
+            $obj_booking_dtl = new HotelBookingDetail();
+            $booking_data = $obj_booking_dtl->DataForFrontSearch($date_from, $date_to, $id_hotel, 0, 0, 0, 0, -1, 0, 0, $id_cart, $id_guest);
+            // ddd($booking_data);
+
+            $feat_img_dir = _PS_IMG_.'rf/';
+            $ratting_img = _MODULE_DIR_.'hotelreservationsystem/views/img/Slices/icons-sprite.png';
+
+            $obj_booking_detail = new HotelBookingDetail();
+            $num_days = $obj_booking_detail->getNumberOfDays($date_from, $date_to);
+
+            $warning_num = Configuration::get('WK_ROOM_LEFT_WARNING_NUMBER');
+
+            /*Max date of ordering for order restrict*/
+            $order_date_restrict = false;
+            $max_order_date = HotelOrderRestrictDate::getMaxOrderDate($id_hotel);
+            if ($max_order_date) {
+                $max_order_date = date('Y-m-d', strtotime($max_order_date));
+                if (strtotime('-1 day', strtotime($max_order_date)) < strtotime($date_from)
+                    || strtotime($max_order_date) < strtotime($date_to)
+                ) {
+                    $order_date_restrict = true;
+                }
+            }
+            /*End*/
+
+            if (isset($booking_data['rm_data']) && $booking_data['rm_data']) {
+                $useTax = HotelBookingDetail::useTax();
+                foreach ($booking_data['rm_data'] as $key => $roomType) {
+                    $feature_price = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay($roomType['id_product'], $date_from, $date_to, $useTax);
+                    $booking_data['rm_data'][$key]['feature_price'] = $feature_price;
+                    $booking_data['rm_data'][$key]['feature_price_diff'] = (float)($roomType['price_without_reduction']-$feature_price);
+                }
+            }
+            $this->context->smarty->assign(array(
+                'warning_num' => $warning_num,
+                'num_days' => $num_days,
+                'booking_date_from' => $date_from,
+                'booking_date_to' => $date_to,
+                'booking_data' => $booking_data,
+                'feat_img_dir' => $feat_img_dir,
+                'ratting_img' => $ratting_img,
+                'currency' => $currency,
+                'max_order_date' => $max_order_date,
+                'order_date_restrict' => $order_date_restrict
+            ));
+        }
+
+        /*if (isset($this->context->cookie->id_compare))
+            $this->context->smarty->assign('compareProducts', CompareProduct::getCompareProducts((int)$this->context->cookie->id_compare));
+
+        // Product sort must be called before assignProductList()
+        $this->productSort();
+
+        $this->assignScenes();
+        $this->assignSubcategories();
+        $this->assignProductList();
+
+        $this->context->smarty->assign(array(
+            'category'             => $this->category,
+            'description_short'    => Tools::truncateString($this->category->description, 350),
+            'products'             => (isset($this->cat_products) && $this->cat_products) ? $this->cat_products : null,
+            'id_category'          => (int)$this->category->id,
+            'id_category_parent'   => (int)$this->category->id_parent,
+            'return_category_name' => Tools::safeOutput($this->category->name),
+            'path'                 => Tools::getPath($this->category->id),
+            'add_prod_display'     => Configuration::get('PS_ATTRIBUTE_CATEGORY_DISPLAY'),
+            'categorySize'         => Image::getSize(ImageType::getFormatedName('category')),
+            'mediumSize'           => Image::getSize(ImageType::getFormatedName('medium')),
+            'thumbSceneSize'       => Image::getSize(ImageType::getFormatedName('m_scene')),
+            'homeSize'             => Image::getSize(ImageType::getFormatedName('home')),
+            'allow_oosp'           => (int)Configuration::get('PS_ORDER_OUT_OF_STOCK'),
+            'comparator_max_item'  => (int)Configuration::get('PS_COMPARATOR_MAX_ITEM'),
+            'suppliers'            => Supplier::getSuppliers(),
+            'body_classes'         => array($this->php_self.'-'.$this->category->id, $this->php_self.'-'.$this->category->link_rewrite)
+        ));*/
     }
 
-    public function filterResults()
+    public function displayAjaxFilterResults()
     {
         $this->display_header = false;
         $this->display_footer = false;
@@ -273,6 +276,12 @@ class CategoryControllerCore extends FrontController
             $obj_booking_dtl = new HotelBookingDetail();
             $booking_data = $obj_booking_dtl->DataForFrontSearch($date_from, $date_to, $id_hotel, 0, 0, $adult, $child, $ratting, $amenities, $price, $id_cart, $id_guest);
             if (isset($booking_data['rm_data']) && $booking_data['rm_data']) {
+                $useTax = HotelBookingDetail::useTax();
+                foreach ($booking_data['rm_data'] as $key => $roomType) {
+                    $feature_price = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay($roomType['id_product'], $date_from, $date_to, $useTax);
+                    $booking_data['rm_data'][$key]['feature_price'] = $feature_price;
+                    $booking_data['rm_data'][$key]['feature_price_diff'] = (float)($roomType['price_without_reduction']-$feature_price);
+                }
                 // reset array keys from 0
                 $booking_data['rm_data'] = array_values($booking_data['rm_data']);
             }
@@ -294,9 +303,9 @@ class CategoryControllerCore extends FrontController
 
                 array_multisort($indi_arr, $direction, $booking_data['rm_data']);
             }
-
-            die(Tools::jsonEncode($booking_data));
+            $this->context->smarty->assign(array('booking_data' => $booking_data));
         }
+        die($this->context->smarty->fetch(_PS_THEME_DIR_.'_partials/room_type_list.tpl'));
     }
 
     /**
