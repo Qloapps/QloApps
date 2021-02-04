@@ -53,10 +53,10 @@
 	</label>
 	<div class="col-lg-9">
 		<div class="row">
-			<div class="col-lg-3">
+			<div class="col-lg-4">
 				<input type="text" name="minimum_amount" value="{$currentTab->getFieldValue($currentObject, 'minimum_amount')|floatval}" />
 			</div>
-			<div class="col-lg-2">
+			<div class="col-lg-4">
 				<select name="minimum_amount_currency">
 				{foreach from=$currencies item='currency'}
 					<option value="{$currency.id_currency|intval}"
@@ -70,18 +70,19 @@
 				{/foreach}
 				</select>
 			</div>
-			<div class="col-lg-3">
+			<div class="col-lg-4">
 				<select name="minimum_amount_tax">
 					<option value="0" {if $currentTab->getFieldValue($currentObject, 'minimum_amount_tax') == 0}selected="selected"{/if}>{l s='Tax excluded'}</option>
 					<option value="1" {if $currentTab->getFieldValue($currentObject, 'minimum_amount_tax') == 1}selected="selected"{/if}>{l s='Tax included'}</option>
 				</select>
 			</div>
-			<div class="col-lg-4">
+			<input type="hidden" name="minimum_amount_shipping" value="0">
+			{* <div class="col-lg-4">
 				<select name="minimum_amount_shipping">
 					<option value="0" {if $currentTab->getFieldValue($currentObject, 'minimum_amount_shipping') == 0}selected="selected"{/if}>{l s='Shipping excluded'}</option>
 					<option value="1" {if $currentTab->getFieldValue($currentObject, 'minimum_amount_shipping') == 1}selected="selected"{/if}>{l s='Shipping included'}</option>
 				</select>
-			</div>
+			</div> *}
 		</div>
 	</div>
 </div>
