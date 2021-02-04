@@ -1367,6 +1367,45 @@ class CategoryCore extends ObjectModel
 		VALUES ('.(int)Context::getContext()->shop->getCategory().', '.(int)$id_group.')');
     }
 
+    /**
+     * Assign one (ore more) group to all categories
+     * @param int|array $id_group_list group id or list of group ids
+     * @param array $exception list of id Categories to ignore
+    */
+    public static function assignGroupToAllCategories($idGroupList, $exception = null)
+    {
+
+        if (!is_array($idGroupList)) {
+            $idGroupList = array($idGroupList);
+        }
+
+        Db::getInstance()->execute(
+            'DELETE FROM `'._DB_PREFIX_.'category_group`
+            WHERE `id_group` IN ('.join(',', $idGroupList).')'
+        );
+
+        $categoryList = Db::getInstance()->executeS(
+            'SELECT id_category FROM `'._DB_PREFIX_.'category` '.
+            (is_array($exception) ? ' WHERE  id_category NOT IN ('.join(',', $exception).')' : '')
+        );
+
+        if ($categoryList) {
+            $data = array();
+            foreach ($categoryList as $category) {
+                foreach ($idGroupList as $idGroup) {
+                    $data[] = array(
+                        'id_category' => $category['id_category'],
+                        'id_group' => $idGroup,
+                    );
+                }
+            }
+
+            return Db::getInstance()->insert('category_group', $data, false, false);
+        }
+
+        return true;
+    }
+
     public function updatePosition($way, $position)
     {
         if (!$res = Db::getInstance()->executeS('

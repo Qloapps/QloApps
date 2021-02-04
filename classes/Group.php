@@ -163,7 +163,7 @@ class GroupCore extends ObjectModel
     {
         Configuration::updateGlobalValue('PS_GROUP_FEATURE_ACTIVE', '1');
         if (parent::add($autodate, $null_values)) {
-            Category::setNewGroupForHome((int)$this->id);
+            Category::assignGroupToAllCategories((int)$this->id);
             Carrier::assignGroupToAllCarriers((int)$this->id);
             return true;
         }
