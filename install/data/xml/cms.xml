@@ -5,7 +5,7 @@
     <field name="active"/>
   </fields>
   <entities>
-    <cms id="Delivery" id_cms_category="Home" active="1"/>
+    <cms id="Policies" id_cms_category="Home" active="1"/>
     <cms id="Legal_Notice" id_cms_category="Home" active="1"/>
     <cms id="Terms_and_conditions_of_use" id_cms_category="Home" active="1"/>
     <cms id="About_us" id_cms_category="Home" active="1"/>
