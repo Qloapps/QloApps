@@ -858,6 +858,11 @@ class AdminControllerCore extends Controller
                     }
                     $key = isset($tmp_tab[1]) ? $tmp_tab[0].'.`'.$tmp_tab[1].'`' : '`'.$tmp_tab[0].'`';
 
+                    // as in database 0 means position 1 in the renderlist
+                    if (isset($field['position'])) {
+                        $value -= 1;
+                    }
+
                     // Assignment by reference
                     if (array_key_exists('tmpTableFilter', $field)) {
                         $sql_filter = & $this->_tmpTableFilter;

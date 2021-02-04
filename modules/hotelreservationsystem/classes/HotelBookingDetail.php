@@ -345,9 +345,40 @@ class HotelBookingDetail extends ObjectModel
                             INNER JOIN `'._DB_PREFIX_.'htl_room_disable_dates` AS hrdd ON (hrdd.`id_room_type` = hri.`id_product` AND hrdd.`id_room` = hri.`id`)
                             WHERE hri.`id_hotel`='.(int)$hotel_id.' AND hri.`id_product` ='.(int)$room_type['id_product'].' AND hri.`id_status` = 3 AND (hrdd.`date_from` <= \''.pSql($date_to).'\' AND hrdd.`date_to` >= \''.pSql($date_from).'\')';
 
-                        $sql = 'SELECT ri.`id` AS `id_room`, ri.`id_product`, ri.`id_hotel`, ri.`room_num`, ri.`comment` AS `room_comment`
-                                FROM `'._DB_PREFIX_.'htl_room_information` AS ri
-                                WHERE ri.`id_hotel`='.(int)$hotel_id.' AND ri.`id_product`='.(int)$room_type['id_product'].' AND ri.`id_status` != 2 AND ri.`id` NOT IN ('.$exclude_ids.')';
+                        $selectAvailRoomSearch = 'SELECT ri.`id` AS `id_room`, ri.`id_product`, ri.`id_hotel`, ri.`room_num`, ri.`comment` AS `room_comment`';
+
+                        $joinAvailRoomSearch = '';
+
+                        $whereAvailRoomSearch = 'WHERE ri.`id_hotel`='.(int)$hotel_id.' AND ri.`id_product`='.(int)$room_type['id_product'].' AND ri.`id_status` != 2 AND ri.`id` NOT IN ('.$exclude_ids.')';
+
+                        $groupByAvailRoomSearch = '';
+                        $orderByAvailRoomSearch = '';
+                        $orderWayAvailRoomSearch = '';
+
+                        Hook::exec('actionAvailRoomSearchSqlModifier',
+                            array(
+                                'select' => &$selectAvailRoomSearch,
+                                'join' => &$joinAvailRoomSearch,
+                                'where' => &$whereAvailRoomSearch,
+                                'group_by' => &$groupByAvailRoomSearch,
+                                'order_by' => &$orderByAvailRoomSearch,
+                                'order_way' => &$orderWayAvailRoomSearch,
+                                'params' => array(
+                                    'id_hotel' => $hotel_id,
+                                    'id_product' => $room_type['id_product'],
+                                    'date_from' => $date_from,
+                                    'date_to' => $date_to
+                                )
+                            )
+                        );
+
+                        $sql = $selectAvailRoomSearch;
+                        $sql .= ' FROM `'._DB_PREFIX_.'htl_room_information` AS ri';
+                        $sql .= ' '.$joinAvailRoomSearch;
+                        $sql .= ' '.$whereAvailRoomSearch;
+                        $sql .= ' '.$groupByAvailRoomSearch;
+                        $sql .= ' '.$orderByAvailRoomSearch;
+                        $sql .= ' '.$orderWayAvailRoomSearch;
 
                         $avai_rooms = Db::getInstance()->executeS($sql);
                         $num_avail += count($avai_rooms);

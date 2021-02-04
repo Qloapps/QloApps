@@ -365,12 +365,13 @@
 }
 #order-opc .avail_vouchers_block .avail_voucher_name {
 	font-size: 12px;
-	font-weight: 600;
-	color: #0000FF;
 	margin-bottom: 2px;
+    font-weight: 600;
 }
 #order-opc .avail_vouchers_block .avail_voucher_name>.voucher_name {
 	cursor: pointer;
+    font-size: 14px;
+    color: #0000FF;
 }
 #order-opc .avail_vouchers_block .avail_voucher_des {
 	font-size: 12px;
