@@ -236,12 +236,14 @@ $(document).ready(function(){
 
 							showOrder(1, $("input[name=id_order]").val(), historyUrl)
 			        	} else {
-			        		showErrorMessage(refund_request_sending_error);
+							showErrorMessage(refund_request_sending_error);
+							$('#submit_refund_reason').attr('disabled', false);
 						}
 						$(".loading_overlay").hide();
 			        },
 			        error: function(XMLHttpRequest, textStatus, errorThrown) {
 						showErrorMessage(textStatus);
+						$('#submit_refund_reason').attr('disabled', false);
 						$(".loading_overlay").hide();
 			        }
 		    	});
