@@ -12,7 +12,7 @@
 	<a href="https://forums.qloapps.com/"><img src="https://img.shields.io/badge/Forum-Help%2FSupport-green" alt="Forum"></a>
 	<a href="https://qloapps.com/addons/"><img src="https://img.shields.io/badge/Addons-Plugins-blueviolet" alt="Addons"></a>
 	<a href="https://qloapps.com/contact/"><img src="https://img.shields.io/badge/Contact-Get%20In%20Touch-blue" alt="Contact us"></a>
-	<a href="https://github.com/webkul/hotelcommerce/blob/develop/LICENSE"><img src="https://img.shields.io/badge/license-MIT-yellowgreen" alt="License"></a>
+	<a href="https://github.com/webkul/hotelcommerce/blob/develop/LICENSE"><img src="https://img.shields.io/badge/License-OSL%20V3-green" alt="License"></a>
 </p>
 
 ## Topics
@@ -68,7 +68,7 @@ docker pull webkul/qloapps_docker
 
 ### License
 
-QloApps is a truly opensource Hotel-Commerce platform which will always be free under the [MIT License](https://github.com/webkul/hotelcommerce/blob/develop/LICENSE).
+QloApps is a truly opensource Hotel-Commerce platform which is under the [Open Software License 3.0](https://github.com/webkul/hotelcommerce/blob/develop/LICENSE).
 
 ### Security Vulnerabilities
 
