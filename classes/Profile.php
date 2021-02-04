@@ -94,12 +94,17 @@ class ProfileCore extends ObjectModel
 
     public function delete()
     {
-        if (parent::delete()) {
-            return (
-                Db::getInstance()->execute('DELETE FROM `'._DB_PREFIX_.'access` WHERE `id_profile` = '.(int)$this->id)
-                && Db::getInstance()->execute('DELETE FROM `'._DB_PREFIX_.'module_access` WHERE `id_profile` = '.(int)$this->id)
-            );
+        // check if any employee exists of this deleting profile before delete
+        $profileEmployees = Employee::getEmployeesByProfile($this->id);
+        if (empty($profileEmployees)) {
+            if (parent::delete()) {
+                return (
+                    Db::getInstance()->execute('DELETE FROM `'._DB_PREFIX_.'access` WHERE `id_profile` = '.(int)$this->id)
+                    && Db::getInstance()->execute('DELETE FROM `'._DB_PREFIX_.'module_access` WHERE `id_profile` = '.(int)$this->id)
+                );
+            }
         }
+
         return false;
     }
 
