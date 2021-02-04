@@ -359,7 +359,7 @@ class hotelreservationsystem extends Module
 
         $obj_adv_payment = new HotelAdvancedPayment();
 
-        $orderProducts = $order->getProducts();
+        $orderProducts = $order->product_list;
         $vatAddress = new Address((int)$order->{Configuration::get('PS_TAX_ADDRESS_TYPE')});
 
         $idLang = (int)$cart->id_lang;
