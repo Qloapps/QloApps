@@ -199,14 +199,14 @@ class AdminPreferencesControllerCore extends AdminController
                     'cast' => 'intval',
                     'type' => 'bool'
                 ),
-                'PS_MULTISHOP_FEATURE_ACTIVE' => array(
-                    'title' => $this->l('Enable Multistore'),
-                    'desc' => $this->l('The multistore feature allows you to manage several e-shops with one Back Office. If this feature is enabled, a "Multistore" page will be available in the "Advanced Parameters" menu.'),
-                    'validation' => 'isBool',
-                    'cast' => 'intval',
-                    'type' => 'bool',
-                    'visibility' => Shop::CONTEXT_ALL
-                ),
+                // 'PS_MULTISHOP_FEATURE_ACTIVE' => array(
+                //     'title' => $this->l('Enable Multistore'),
+                //     'desc' => $this->l('The multistore feature allows you to manage several e-shops with one Back Office. If this feature is enabled, a "Multistore" page will be available in the "Advanced Parameters" menu.'),
+                //     'validation' => 'isBool',
+                //     'cast' => 'intval',
+                //     'type' => 'bool',
+                //     'visibility' => Shop::CONTEXT_ALL
+                // ),
                 'PS_SHOP_ACTIVITY' => array(
                     'title' => $this->l('Main Shop Activity'),
                     'validation' => 'isInt',

@@ -147,6 +147,35 @@
 		</div>
 	</div>
 
+	{if isset($htl_room_type)}
+		<input type="hidden" value="{$htl_room_type['id']}" name="wk_id_room_type">
+	{/if}
+
+	<div class="form-group">
+		{if isset($htl_room_type)}
+			<label class="control-label col-sm-3 required" for="hotel_place">
+				{l s='Hotel'}
+			</label>
+			<div class="col-sm-5">
+				<input type="text" class="form-control" value="{$htl_full_info['hotel_name']}" readonly>
+				<input type="hidden" name="id_hotel" value="{$htl_room_type['id_hotel']}">
+				<p class="help-block">{l s='Hotel once assigned cannot be reassigned'}</p>
+			</div>
+		{else}
+			<label class="control-label col-sm-3 required" for="hotel_place">
+				{l s='Select Hotel'}
+			</label>
+			<div class="col-sm-5">
+				<select name="id_hotel" id="hotel_place" class="form-control">
+					{foreach from=$htl_info item=htl_dtl}
+						<option value="{$htl_dtl['id']}" >{$htl_dtl['hotel_name']}</option>
+					{/foreach}
+				</select>
+				<p class="help-block">{l s='Hotel once assigned cannot be reassigned'}</p>
+			</div>
+		{/if}
+	</div>
+
 	<div class="form-group hidden">
 		<label class="control-label col-lg-3" for="reference">
 			<span class="label-tooltip" data-toggle="tooltip"
