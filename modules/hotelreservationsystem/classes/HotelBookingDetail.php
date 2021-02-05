@@ -897,6 +897,7 @@ class HotelBookingDetail extends ObjectModel
                                     $booking_data['rm_data'][$key]['price'] = $prod_price;
                                     $booking_data['rm_data'][$key]['price_without_reduction'] = $productPriceWithoutReduction;
                                     $booking_data['rm_data'][$key]['feature_price'] = $productFeaturePrice;
+                                    $booking_data['rm_data'][$key]['feature_price_diff'] = $productPriceWithoutReduction - $productFeaturePrice;
 
                                     // if ($room_left <= (int)Configuration::get('WK_ROOM_LEFT_WARNING_NUMBER'))
                                     $booking_data['rm_data'][$key]['room_left'] = $room_left;
