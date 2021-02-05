@@ -53,6 +53,40 @@ class AdminGroupsControllerCore extends AdminController
             Configuration::get('PS_CUSTOMER_GROUP')
         );
 
+        $this->fields_list = array(
+            'id_group' => array(
+                'title' => $this->l('ID'),
+                'align' => 'center',
+                'class' => 'fixed-width-xs'
+            ),
+            'name' => array(
+                'title' => $this->l('Group name'),
+                'filter_key' => 'b!name'
+            ),
+            'reduction' => array(
+                'title' => $this->l('Discount (%)'),
+                'align' => 'right',
+                'type' => 'percent'
+            ),
+            'nb' => array(
+                'title' => $this->l('Members'),
+                'align' => 'center',
+                'havingFilter' => true,
+            ),
+            'show_prices' => array(
+                'title' => $this->l('Show prices'),
+                'align' => 'center',
+                'type' => 'bool',
+                'callback' => 'printShowPricesIcon',
+                'orderby' => false
+            ),
+            'date_add' => array(
+                'title' => $this->l('Creation date'),
+                'type' => 'date',
+                'align' => 'right'
+            )
+        );
+
         $this->addRowActionSkipList('delete', $groups_to_keep);
 
         parent::__construct();
@@ -145,15 +179,17 @@ class AdminGroupsControllerCore extends AdminController
             $this->action = 'change_show_prices_val';
         }
 
-        parent::initProcess();
-    }
+        if (Tools::getIsset('viewgroup')) {
+            $this->list_id = 'customer_group';
 
-    public function postProcess()
-    {
-        if (isset($_POST['submitResetcustomer_group'])) {
-            $this->processResetFilters('customer_group');
+            if (isset($_POST['submitReset'.$this->list_id])) {
+                $this->processResetFilters();
+            }
+        } else {
+            $this->list_id = 'group';
         }
-        return parent::postProcess();
+
+        parent::initProcess();
     }
 
     public function renderView()
@@ -415,7 +451,6 @@ class AdminGroupsControllerCore extends AdminController
     {
         if (!$this->validateDiscount(Tools::getValue('reduction'))) {
             $this->errors[] = Tools::displayError('The discount value is incorrect (must be a percentage).');
-            $this->display = 'edit';
         } else {
             $this->updateCategoryReduction();
             $object = parent::processSave();
@@ -563,43 +598,6 @@ class AdminGroupsControllerCore extends AdminController
         $this->displayInformation($unidentified_group_information);
         $this->displayInformation($guest_group_information);
         $this->displayInformation($default_group_information);
-
-        $this->fields_list = array(
-            'id_group' => array(
-                'title' => $this->l('ID'),
-                'align' => 'center',
-                'class' => 'fixed-width-xs'
-            ),
-            'name' => array(
-                'title' => $this->l('Group name'),
-                'filter_key' => 'b!name'
-            ),
-            'reduction' => array(
-                'title' => $this->l('Discount (%)'),
-                'align' => 'right',
-                'type' => 'percent'
-            ),
-            'nb' => array(
-                'title' => $this->l('Members'),
-                'align' => 'center',
-                'havingFilter' => true,
-            ),
-            'show_prices' => array(
-                'title' => $this->l('Show prices'),
-                'align' => 'center',
-                'type' => 'bool',
-                'callback' => 'printShowPricesIcon',
-                'orderby' => false
-            ),
-            'date_add' => array(
-                'title' => $this->l('Creation date'),
-                'type' => 'date',
-                'align' => 'right'
-            )
-        );
-
-        $this->processFilter();
-
         return parent::renderList();
     }
 

@@ -327,9 +327,7 @@ class AdminAddressesControllerCore extends AdminController
                     'name' => 'phone',
                     'required' => in_array('phone', $required_fields) || Configuration::get('PS_ONE_PHONE_AT_LEAST'),
                     'col' => '4',
-                    Configuration::get('PS_ONE_PHONE_AT_LEAST') ?
-                    'hint' : '' => Configuration::get('PS_ONE_PHONE_AT_LEAST') ?
-                    sprintf($this->l('You must register at least one phone number.')) : ''
+                    'hint' => Configuration::get('PS_ONE_PHONE_AT_LEAST') ? sprintf($this->l('You must register at least one phone number.')) : ''
                 );
             } elseif ($addr_field_item == 'phone_mobile') {
                 $temp_fields[] = array(
@@ -338,9 +336,7 @@ class AdminAddressesControllerCore extends AdminController
                     'name' => 'phone_mobile',
                     'required' =>  in_array('phone_mobile', $required_fields) || Configuration::get('PS_ONE_PHONE_AT_LEAST'),
                     'col' => '4',
-                    Configuration::get('PS_ONE_PHONE_AT_LEAST') ?
-                    'hint' : '' => Configuration::get('PS_ONE_PHONE_AT_LEAST') ?
-                    sprintf($this->l('You must register at least one phone number.')) : ''
+                    'hint' => Configuration::get('PS_ONE_PHONE_AT_LEAST') ? sprintf($this->l('You must register at least one phone number.')) : ''
                 );
             }
         }
