@@ -65,7 +65,9 @@ class blockcart extends Module
 
         $totalRooms = 0;
         if ($htlCartData = HotelCartBookingData::getHotelCartBookingData(0)) {
-            $totalRooms = array_sum(array_column($htlCartData, 'total_num_rooms'));
+            foreach ($htlCartData as $roomTypeCart) {
+                $totalRooms += $roomTypeCart['total_num_rooms'];
+            }
         }
 
         $nbTotalProducts = 0;
