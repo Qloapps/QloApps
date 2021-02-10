@@ -734,14 +734,17 @@ abstract class PaymentModuleCore extends Module
 
                         // changing mail format
                         $cart_booking_data = $this->cartBookingDataForMail($order);
-                        $cart_booking_data_text = $this->getEmailTemplateContent('hotel-booking-cart-data.text', Mail::TYPE_TEXT, $cart_booking_data['cart_htl_data']);
+                        $cart_booking_data_text = $this->getEmailTemplateContent('hotel-booking-cart-data-text.tpl', Mail::TYPE_TEXT, $cart_booking_data['cart_htl_data']);
                         $cart_booking_data_html = $this->getEmailTemplateContent('hotel-booking-cart-data.tpl', Mail::TYPE_HTML, $cart_booking_data['cart_htl_data']);
 
                         $extra_demands_details_html = $this->getEmailTemplateContent('booking_extra_demands.tpl', Mail::TYPE_HTML, $cart_booking_data['cart_htl_data']);
+                        $extra_demands_details_text = $this->getEmailTemplateContent('booking_extra_demands_text.tpl', Mail::TYPE_HTML, $cart_booking_data['cart_htl_data']);
 
                         $data = array(
                             '{cart_booking_data_html}' => $cart_booking_data_html,
+                            '{cart_booking_data_text}' => $cart_booking_data_text,
                             '{extra_demands_details_html}' => $extra_demands_details_html,
+                            '{extra_demands_details_text}' => $extra_demands_details_text,
                             '{total_extra_demands_te}' => Tools::displayPrice(
                                 $cart_booking_data['total_extra_demands_te'],
                                 $this->context->currency,
@@ -1188,6 +1191,7 @@ abstract class PaymentModuleCore extends Module
                     $cart_htl_data[$type_key]['cover_img']    = $cover_img;
                     $cart_htl_data[$type_key]['name']        = $product->name;
                     $cart_htl_data[$type_key]['unit_price'] = $unit_price;
+                    $cart_htl_data[$type_key]['hotel_name'] = $rm_dtl['hotel_name'];
                     $cart_htl_data[$type_key]['adult']        = $rm_dtl['adult'];
                     $cart_htl_data[$type_key]['children']    = $rm_dtl['children'];
 

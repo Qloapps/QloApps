@@ -12,16 +12,17 @@ Order: {order_name} Placed on {date}
 Payment: {payment}
 Room Image
 Room Description
+Hotel
 Room Capcity
 Unit Price
 Rooms Qty
 Check-in Date
 Check-out Date
-
 Total
-{cart_booking_data_html}
 
-{extra_demands_details_html}
+{cart_booking_data_text}
+
+{extra_demands_details_text}
 
 {discounts}
 

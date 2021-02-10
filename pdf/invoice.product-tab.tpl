@@ -29,6 +29,7 @@
 				<th class="product header small">{l s='Room Image' pdf='true'}</th>
 			{/if}
 			<th class="product header small">{l s='Room Description' pdf='true'}</th>
+			<th class="product header small">{l s='Hotel' pdf='true'}</th>
 			<th class="product header small">{l s='Room Capcity' pdf='true'}</th>
 			<th class="product header small">{l s='Tax Rate(s)' pdf='true'}</th>
 			{* {if isset($layout.before_discount)}
@@ -56,6 +57,11 @@
 						<td class="product center">
 							<p class="product-name">
 								{$data_v['name']}
+							</p>
+						</td>
+						<td class="product center">
+							<p>
+								{$data_v['hotel_name']}
 							</p>
 						</td>
 						<td>

@@ -354,6 +354,7 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
                     $cart_htl_data[$type_key]['cover_img']    = $cover_img;
                     $cart_htl_data[$type_key]['adult']        = $rm_dtl['adult'];
                     $cart_htl_data[$type_key]['children']    = $rm_dtl['children'];
+                    $cart_htl_data[$type_key]['hotel_name']    = $rm_dtl['hotel_name'];
                     $objBookingDemand = new HotelBookingDemands();
                     foreach ($order_bk_data as $data_k => $data_v) {
                         $date_join = strtotime($data_v['date_from']).strtotime($data_v['date_to']);
