@@ -62,7 +62,14 @@ class blockcart extends Module
         $useTax = !($taxCalculationMethod == PS_TAX_EXC);
 
         $products = $params['cart']->getProducts(true);
-        $htlCartData = $this->getHotelCartBookingData();
+
+        $totalRooms = 0;
+        if ($htlCartData = HotelCartBookingData::getHotelCartBookingData(0)) {
+            foreach ($htlCartData as $roomTypeCart) {
+                $totalRooms += $roomTypeCart['total_num_rooms'];
+            }
+        }
+
         $nbTotalProducts = 0;
         foreach ($products as $product) {
             $nbTotalProducts += (int) $product['cart_quantity'];
@@ -160,8 +167,8 @@ class blockcart extends Module
             'ajax_allowed' => (int) (Configuration::get('PS_BLOCK_CART_AJAX')) == 1 ? true : false,
             'static_token' => Tools::getToken(false),
             'free_shipping' => $total_free_shipping,
-            'cart_htl_data' => $htlCartData['cart_htl_data'],
-            'total_rooms_in_cart' => $htlCartData['total_rooms_in_cart'],
+            'cart_htl_data' => $htlCartData,
+            'total_rooms_in_cart' => $totalRooms,
         ));
         if (is_array($errors) && count($errors)) {
             $this->smarty->assign('errors', $errors);
@@ -402,100 +409,5 @@ class blockcart extends Module
             'PS_BLOCK_CART_SHOW_CROSSSELLING' => (bool) Tools::getValue('PS_BLOCK_CART_SHOW_CROSSSELLING', Configuration::get('PS_BLOCK_CART_SHOW_CROSSSELLING')),
             'PS_BLOCK_CART_XSELL_LIMIT' => (int) Tools::getValue('PS_BLOCK_CART_XSELL_LIMIT', Configuration::get('PS_BLOCK_CART_XSELL_LIMIT')),
         );
-    }
-
-    //by webkul
-    public function getHotelCartBookingData()
-    {
-        $total_rooms = 0;
-        $cart_htl_data = array();
-        $priceDisplay = Group::getPriceDisplayMethod(Group::getCurrent()->id);
-        if (!$priceDisplay || $priceDisplay == 2) {
-            $price_tax = true;
-        } elseif ($priceDisplay == 1) {
-            $price_tax = false;
-        }
-        if (Module::isInstalled('hotelreservationsystem')) {
-            require_once _PS_MODULE_DIR_.'hotelreservationsystem/define.php';
-
-            $obj_cart_bk_data = new HotelCartBookingData();
-            $obj_htl_bk_dtl = new HotelBookingDetail();
-            $obj_rm_type = new HotelRoomType();
-
-            $htl_rm_types = $this->context->cart->getProducts();
-            if (!empty($htl_rm_types)) {
-                foreach ($htl_rm_types as $type_key => $type_value) {
-                    $product = new Product($type_value['id_product'], false, $this->context->language->id);
-                    $cover_image_arr = $product->getCover($type_value['id_product']);
-
-                    if (!empty($cover_image_arr)) {
-                        $cover_img = $this->context->link->getImageLink($product->link_rewrite, $product->id.'-'.$cover_image_arr['id_image'], 'small_default');
-                    } else {
-                        $cover_img = $this->context->link->getImageLink($product->link_rewrite, $this->context->language->iso_code.'-default', 'small_default');
-                    }
-
-                    $unit_price = Product::getPriceStatic($type_value['id_product'], $price_tax, null, 6, null, false, true, 1);
-
-                    if (isset($this->context->customer->id)) {
-                        $cart_bk_data = $obj_cart_bk_data->getOnlyCartBookingData($this->context->cart->id, $this->context->cart->id_guest, $type_value['id_product']);
-                    } else {
-                        $cart_bk_data = $obj_cart_bk_data->getOnlyCartBookingData($this->context->cart->id, $this->context->cart->id_guest, $type_value['id_product']);
-                    }
-                    $rm_dtl = $obj_rm_type->getRoomTypeInfoByIdProduct($type_value['id_product']);
-                    $cart_htl_data[$type_key]['total_num_rooms'] = 0;
-                    $cart_htl_data[$type_key]['id_product'] = $type_value['id_product'];
-                    $cart_htl_data[$type_key]['cover_img'] = $cover_img;
-                    $cart_htl_data[$type_key]['name'] = $product->name;
-                    $cart_htl_data[$type_key]['unit_price'] = $unit_price;
-                    $cart_htl_data[$type_key]['adult'] = $rm_dtl['adult'];
-                    $cart_htl_data[$type_key]['children'] = $rm_dtl['children'];
-                    if (isset($cart_bk_data) && $cart_bk_data) {
-                        foreach ($cart_bk_data as $data_k => $data_v) {
-                            $date_join = strtotime($data_v['date_from']).strtotime($data_v['date_to']);
-
-                            if (isset($cart_htl_data[$type_key]['date_diff'][$date_join])) {
-                                $cart_htl_data[$type_key]['date_diff'][$date_join]['num_rm'] += 1;
-                                $total_rooms += 1;
-                                $num_days = $cart_htl_data[$type_key]['date_diff'][$date_join]['num_days'];
-                                $vart_quant = (int) $cart_htl_data[$type_key]['date_diff'][$date_join]['num_rm'];
-
-                                //// By webkul New way to calculate product prices with feature Prices
-                                $roomTypeDateRangePrice = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice($type_value['id_product'], $data_v['date_from'], $data_v['date_to']);
-                                if (!$price_tax) {
-                                    $amount = $roomTypeDateRangePrice['total_price_tax_excl'];
-                                } else {
-                                    $amount = $roomTypeDateRangePrice['total_price_tax_incl'];
-                                }
-                                //END
-
-                                $cart_htl_data[$type_key]['date_diff'][$date_join]['amount'] = $amount * $vart_quant;
-                            } else {
-                                $num_days = $obj_htl_bk_dtl->getNumberOfDays($data_v['date_from'], $data_v['date_to']);
-                                $total_rooms += 1;
-                                $cart_htl_data[$type_key]['date_diff'][$date_join]['num_rm'] = 1;
-                                $cart_htl_data[$type_key]['date_diff'][$date_join]['data_form'] = date('Y-m-d', strtotime($data_v['date_from']));
-                                $cart_htl_data[$type_key]['date_diff'][$date_join]['data_to'] = date('Y-m-d', strtotime($data_v['date_to']));
-                                $cart_htl_data[$type_key]['date_diff'][$date_join]['num_days'] = $num_days;
-
-                                // By webkul New way to calculate product prices with feature Prices
-                                $roomTypeDateRangePrice = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice($type_value['id_product'], $data_v['date_from'], $data_v['date_to']);
-                                if (!$price_tax) {
-                                    $amount = $roomTypeDateRangePrice['total_price_tax_excl'];
-                                } else {
-                                    $amount = $roomTypeDateRangePrice['total_price_tax_incl'];
-                                }
-                                // END
-
-                                $cart_htl_data[$type_key]['date_diff'][$date_join]['amount'] = $amount;
-                            }
-                        }
-                        foreach ($cart_htl_data[$type_key]['date_diff'] as $key => $value) {
-                            $cart_htl_data[$type_key]['total_num_rooms'] += $value['num_rm'];
-                        }
-                    }
-                }
-            }
-        }
-        return array('cart_htl_data' => $cart_htl_data, 'total_rooms_in_cart' => $total_rooms);
     }
 }
