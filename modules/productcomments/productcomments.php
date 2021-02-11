@@ -156,6 +156,7 @@ class ProductComments extends Module
 			$id_product_comment = (int)Tools::getValue('id_product_comment');
 			$comment = new ProductComment($id_product_comment);
 			$comment->delete();
+			$this->_html .= '<div class="conf confirm alert alert-success">'.$this->l('Comment deleted').'</div>';
 		}
 		elseif (Tools::isSubmit('submitEditCriterion'))
 		{
@@ -214,7 +215,8 @@ class ProductComments extends Module
 		elseif ($id_product_comment = (int)Tools::getValue('approveComment'))
 		{
 			$comment = new ProductComment($id_product_comment);
-			$comment->validate();
+			if($comment->validate())
+				$this->_html .= '<div class="conf confirm alert alert-success">'.$this->l('Comment approved').'</div>';
 		}
 		elseif ($id_product_comment = (int)Tools::getValue('noabuseComment'))
 		{
