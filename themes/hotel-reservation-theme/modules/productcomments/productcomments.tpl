@@ -24,90 +24,87 @@
 *}
 <div id="idTab5" class="tab-pane card">
 	<div id="product_comments_block_tab">
-		{if $comments}
-			{if (!$too_early AND ($is_logged OR $allow_guests))}
-				<p class="align_center open-comment-block">
-					<a id="new_comment_tab_btn" class="btn button button-medium" href="#new_comment_form">
-						<span>{l s='Make a review' mod='productcomments'}</span>
-					</a>
-				</p>
-
-				<div class="new_comment_form_outer" style="display: none;">
-					<div id="new_comment_form">
-						<form id="id_new_comment_form" action="#">
-							<!-- <h2 class="page-subheading">
-								{l s='Write a review' mod='productcomments'}
-							</h2> -->
-							<div class="row">
-								<!-- {if isset($product) && $product}
-									<div class="product clearfix  col-xs-12 col-sm-6">
-										<img src="{$productcomment_cover_image}" height="{$mediumSize.height}" width="{$mediumSize.width}" alt="{$product->name|escape:'html':'UTF-8'}" />
-										<div class="product_desc">
-											<p class="product_name">
-												<strong>{$product->name}</strong>
-											</p>
-											{$product->description_short}
-										</div>
-									</div>
-								{/if} -->
-								<div class="new_comment_form_content col-xs-12 col-sm-12">
-									<div id="new_comment_form_error" class="error" style="display: none;background-color: #cd5d5d;color: #ffffff;font-size: 13px;padding-left: 10px;font-weight:400;">
-										<ul></ul>
-									</div>
-									<label for="comment_title">
-										{l s='Title:' mod='productcomments'} <sup class="required">*</sup>
-									</label>
-									<input id="comment_title" name="title" type="text" value=""/>
-									{if $criterions|@count > 0}
-										<ul id="criterions_list">
-										{foreach from=$criterions item='criterion'}
-											<li>
-												<label>{$criterion.name|escape:'html':'UTF-8'}:</label>
-												<div class="star_content">
-													<input class="star" type="radio" name="criterion[{$criterion.id_product_comment_criterion|round}]" value="1" />
-													<input class="star" type="radio" name="criterion[{$criterion.id_product_comment_criterion|round}]" value="2" />
-													<input class="star" type="radio" name="criterion[{$criterion.id_product_comment_criterion|round}]" value="3" />
-													<input class="star" type="radio" name="criterion[{$criterion.id_product_comment_criterion|round}]" value="4" checked="checked" />
-													<input class="star" type="radio" name="criterion[{$criterion.id_product_comment_criterion|round}]" value="5" />
-												</div>
-												<div class="clearfix"></div>
-											</li>
-										{/foreach}
-										</ul>
-									{/if}
-									<label for="content">
-										{l s='Description:' mod='productcomments'} <sup class="required">*</sup>
-									</label>
-									<textarea id="content" name="content"></textarea>
-									{if $allow_guests == true && !$is_logged}
-										<label>
-											{l s='Your name:' mod='productcomments'} <sup class="required">*</sup>
-										</label>
-										<input id="commentCustomerName" name="customer_name" type="text" value=""/>
-									{/if}
-									<div id="new_comment_form_footer">
-										<input id="id_product_comment_send" name="id_product" type="hidden" value='{$id_product_comment_form}' />
-										<!-- <p class="fl required"><sup>*</sup> {l s='Required fields' mod='productcomments'}</p> -->
-										<p class="fr review_submit_div">
-											<button id="submitNewMessage" name="submitMessage" type="submit" class="btn button button-medium">
-												<span>{l s='Make Review' mod='productcomments'}</span>
-											</button>&nbsp;
-											<!-- {l s='or' mod='productcomments'}&nbsp; -->
-											<button id="cancelreview" name="cancelreview" type="submit" class="btn button button-medium">
-												<span>{l s='Cancel' mod='productcomments'}</span>
-											</button>
+		{if (!$too_early AND ($is_logged OR $allow_guests))}
+			<p class="open-comment-block">
+				<a id="new_comment_tab_btn" class="btn button button-medium" href="#new_comment_form">
+					<span>
+						{if $comments}
+							{l s='Make a review' mod='productcomments'}
+						{else}
+							{l s='Be the first to write your review' mod='productcomments'}
+						{/if}
+					</span>
+				</a>
+			</p>
+			<div class="new_comment_form_outer" style="display: none;">
+				<div id="new_comment_form">
+					<form id="id_new_comment_form" action="#">
+						<!-- <h2 class="page-subheading">
+							{l s='Write a review' mod='productcomments'}
+						</h2> -->
+						<div class="row">
+							<!-- {if isset($product) && $product}
+								<div class="product clearfix  col-xs-12 col-sm-6">
+									<img src="{$productcomment_cover_image}" height="{$mediumSize.height}" width="{$mediumSize.width}" alt="{$product->name|escape:'html':'UTF-8'}" />
+									<div class="product_desc">
+										<p class="product_name">
+											<strong>{$product->name}</strong>
 										</p>
-										<div class="clearfix"></div>
-									</div> <!-- #new_comment_form_footer -->
+										{$product->description_short}
+									</div>
 								</div>
+							{/if} -->
+							<div class="new_comment_form_content col-xs-12 col-sm-12">
+								<div id="new_comment_form_error" class="error" style="display: none;background-color: #cd5d5d;color: #ffffff;font-size: 13px;padding-left: 10px;font-weight:400;">
+									<ul></ul>
+								</div>
+								<label for="comment_title">
+									{l s='Title:' mod='productcomments'} <sup class="required">*</sup>
+								</label>
+								<input id="comment_title" name="title" type="text" value=""/>
+								{if $criterions|@count > 0}
+									<ul id="criterions_list">
+									{foreach from=$criterions item='criterion'}
+										<li>
+											<label>{$criterion.name|escape:'html':'UTF-8'}:</label>
+											<div class="raty_star" data-score-name="criterion[{$criterion.id_product_comment_criterion|round}]"></div>
+											<div class="clearfix"></div>
+										</li>
+									{/foreach}
+									</ul>
+								{/if}
+								<label for="content">
+									{l s='Description:' mod='productcomments'} <sup class="required">*</sup>
+								</label>
+								<textarea id="content" name="content"></textarea>
+								{if $allow_guests == true && !$is_logged}
+									<label>
+										{l s='Your name:' mod='productcomments'} <sup class="required">*</sup>
+									</label>
+									<input id="commentCustomerName" name="customer_name" type="text" value=""/>
+								{/if}
+								<div id="new_comment_form_footer">
+									<input id="id_product_comment_send" name="id_product" type="hidden" value='{$id_product_comment_form}' />
+									<!-- <p class="fl required"><sup>*</sup> {l s='Required fields' mod='productcomments'}</p> -->
+									<p class="fr review_submit_div">
+										<button id="submitNewMessage" name="submitMessage" type="submit" class="btn button button-medium">
+											<span>{l s='Make Review' mod='productcomments'}</span>
+										</button>&nbsp;
+										<!-- {l s='or' mod='productcomments'}&nbsp; -->
+										<button id="cancelreview" name="cancelreview" type="submit" class="btn button button-medium">
+											<span>{l s='Cancel' mod='productcomments'}</span>
+										</button>
+									</p>
+									<div class="clearfix"></div>
+								</div> <!-- #new_comment_form_footer -->
 							</div>
-						</form><!-- /end new_comment_form_content -->
-					</div>
+						</div>
+					</form><!-- /end new_comment_form_content -->
 				</div>
-
-
-			{/if}
+			</div>
 			<hr>
+		{/if}
+		{if $comments}
 			{foreach from=$comments item=comment}
 				{if $comment.content}
 					<div class="reviews_blogs">
@@ -120,13 +117,7 @@
 								<p>{$comment.title}</p>
 							</div>
 							<div class="star_content clearfix"  itemprop="reviewRating" itemscope itemtype="http://schema.org/Rating">
-								{section name="i" start=0 loop=5 step=1}
-									{if $comment.grade le $smarty.section.i.index}
-										<div class="star"></div>
-									{else}
-										<div class="star star_on"></div>
-									{/if}
-								{/section}
+								<div class="raty_star readonly" data-score="{$comment.grade}"></div>
 		        				<meta itemprop="worstRating" content = "0" />
 								<meta itemprop="ratingValue" content = "{$comment.grade|escape:'html':'UTF-8'}" />
 		        				<meta itemprop="bestRating" content = "5" />
@@ -167,87 +158,7 @@
 				{/if}
 			{/foreach}
 		{else}
-			{if (!$too_early AND ($is_logged OR $allow_guests))}
-			<p class="align_center">
-				<a id="new_comment_tab_btn" class="btn button button-medium" href="#new_comment_form">
-					<span>{l s='Be the first to write your review' mod='productcomments'}</span>
-				</a>
-			</p>
-			<div class="new_comment_form_outer" style="display: none;">
-				<div id="new_comment_form">
-					<form id="id_new_comment_form" action="#">
-						<!-- <h2 class="page-subheading">
-							{l s='Write a review' mod='productcomments'}
-						</h2> -->
-						<div class="row">
-							<!-- {if isset($product) && $product}
-								<div class="product clearfix  col-xs-12 col-sm-6">
-									<img src="{$productcomment_cover_image}" height="{$mediumSize.height}" width="{$mediumSize.width}" alt="{$product->name|escape:'html':'UTF-8'}" />
-									<div class="product_desc">
-										<p class="product_name">
-											<strong>{$product->name}</strong>
-										</p>
-										{$product->description_short}
-									</div>
-								</div>
-							{/if} -->
-							<div class="new_comment_form_content col-xs-12 col-sm-12">
-								<div id="new_comment_form_error" class="error" style="display: none;background-color: #cd5d5d;color: #ffffff;font-size: 13px;padding-left: 10px;font-weight:400;">
-									<ul></ul>
-								</div>
-								<label for="comment_title">
-									{l s='Title:' mod='productcomments'} <sup class="required">*</sup>
-								</label>
-								<input id="comment_title" name="title" type="text" value=""/>
-								{if $criterions|@count > 0}
-									<ul id="criterions_list">
-									{foreach from=$criterions item='criterion'}
-										<li>
-											<label>{$criterion.name|escape:'html':'UTF-8'}:</label>
-											<div class="star_content">
-												<input class="star" type="radio" name="criterion[{$criterion.id_product_comment_criterion|round}]" value="1" />
-												<input class="star" type="radio" name="criterion[{$criterion.id_product_comment_criterion|round}]" value="2" />
-												<input class="star" type="radio" name="criterion[{$criterion.id_product_comment_criterion|round}]" value="3" />
-												<input class="star" type="radio" name="criterion[{$criterion.id_product_comment_criterion|round}]" value="4" checked="checked" />
-												<input class="star" type="radio" name="criterion[{$criterion.id_product_comment_criterion|round}]" value="5" />
-											</div>
-											<div class="clearfix"></div>
-										</li>
-									{/foreach}
-									</ul>
-								{/if}
-								<label for="content">
-									{l s='Description:' mod='productcomments'} <sup class="required">*</sup>
-								</label>
-								<textarea id="content" name="content"></textarea>
-								{if $allow_guests == true && !$is_logged}
-									<label>
-										{l s='Your name:' mod='productcomments'} <sup class="required">*</sup>
-									</label>
-									<input id="commentCustomerName" name="customer_name" type="text" value=""/>
-								{/if}
-								<div id="new_comment_form_footer">
-									<input id="id_product_comment_send" name="id_product" type="hidden" value='{$id_product_comment_form}' />
-									<!-- <p class="fl required"><sup>*</sup> {l s='Required fields' mod='productcomments'}</p> -->
-									<p class="fr review_submit_div">
-										<button id="submitNewMessage" name="submitMessage" type="submit" class="btn button button-medium">
-											<span>{l s='Make Review' mod='productcomments'}</span>
-										</button>&nbsp;
-										<!-- {l s='or' mod='productcomments'}&nbsp; -->
-										<button id="cancelreview" name="cancelreview" type="submit" class="btn button button-medium">
-											<span>{l s='Cancel' mod='productcomments'}</span>
-										</button>
-									</p>
-									<div class="clearfix"></div>
-								</div> <!-- #new_comment_form_footer -->
-							</div>
-						</div>
-					</form><!-- /end new_comment_form_content -->
-				</div>
-			</div>
-			{else}
 			<p class="align_center no_reviews_cond_block">{l s='No customer reviews for the moment.' mod='productcomments'}</p>
-			{/if}
 		{/if}
 	</div> <!-- #product_comments_block_tab -->
 </div>

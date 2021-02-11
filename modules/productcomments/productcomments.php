@@ -156,7 +156,6 @@ class ProductComments extends Module
 			$id_product_comment = (int)Tools::getValue('id_product_comment');
 			$comment = new ProductComment($id_product_comment);
 			$comment->delete();
-			$this->_html .= '<div class="conf confirm alert alert-success">'.$this->l('Comment deleted').'</div>';
 		}
 		elseif (Tools::isSubmit('submitEditCriterion'))
 		{
@@ -215,8 +214,7 @@ class ProductComments extends Module
 		elseif ($id_product_comment = (int)Tools::getValue('approveComment'))
 		{
 			$comment = new ProductComment($id_product_comment);
-			if($comment->validate())
-				$this->_html .= '<div class="conf confirm alert alert-success">'.$this->l('Comment approved').'</div>';
+			$comment->validate();
 		}
 		elseif ($id_product_comment = (int)Tools::getValue('noabuseComment'))
 		{
@@ -829,7 +827,6 @@ class ProductComments extends Module
 
 	public function hookProductTabContent($params)
 	{
-		$this->context->controller->addJS($this->_path.'js/jquery.rating.pack.js');
 		$this->context->controller->addJS($this->_path.'js/jquery.textareaCounter.plugin.js');
 		$this->context->controller->addJS($this->_path.'js/productcomments.js');
 
@@ -881,7 +878,7 @@ class ProductComments extends Module
 		$this->page_name = Dispatcher::getInstance()->getController();
 		if (in_array($this->page_name, array('product', 'productscomparison')))
 		{
-			$this->context->controller->addJS($this->_path.'js/jquery.rating.pack.js');
+			$this->context->controller->addJS($this->_path.'lib/jquery.raty.js');
 			if (in_array($this->page_name, array('productscomparison')))
 			{
 				$this->context->controller->addjqueryPlugin('cluetip');
