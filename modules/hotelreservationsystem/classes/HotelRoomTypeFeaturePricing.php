@@ -332,8 +332,7 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
                             $id_product = $key;
                             // feature price rates create and updates
                             if (isset($roomTypeRates['rate'])) {
-                                //$productPriceTE = Product::getPriceStatic((int) $id_product, false);
-                                $productPriceTE = 1000;
+                                $productPriceTE = Product::getPriceStatic((int) $id_product, false);
                                 if ($productPriceTE != $roomTypeRates['rate']) {
                                     if ($productPriceTE > $roomTypeRates['rate']) {
                                         $priceImpactWay = 1;
