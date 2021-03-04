@@ -29,7 +29,7 @@ class hotelreservationsystem extends Module
     public function __construct()
     {
         $this->name = 'hotelreservationsystem';
-        $this->version = '1.4.1';
+        $this->version = '1.4.2';
         $this->author = 'Webkul';
         $this->need_instance = 0;
         $this->bootstrap = true;

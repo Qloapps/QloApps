@@ -4,6 +4,21 @@
 
 ## Added Features:
 
+## Improved/changed features:
+
+## Bug/Issues Resolved:
+[-] CO : #162 Fix additional facility price changes for room type after saving
+[-] CO : #168 Fix room number is not getting updated in the view After reallocation.
+[-] CO : #169 Fix showing discount when feature price or discount are applied.
+[-] CO : #173 Resolved warning notice in order refund request controller.
+
+
+-------------------------
+# V1.4.0 to V1.4.1
+-------------------------
+
+## Added Features:
+
 [+] CO : Columns `active_refund` are added in 'htl_branch_info' table.
 [+] CO : Columns `total_paid_amount`, `available_for_order`, `hotel_name`, `room_type_name`, `city`, `state`, `country`, `zipcode`, `phone`, `email`, `check_in_time`, `check_out_time`, `room_num`, `adult`, `children` in 'htl_booking_detail' table.
 [+] CO : tables 'htl_room_type_feature_pricing_group', 'htl_branch_refund_rules', 'htl_order_refund_rules' added.
