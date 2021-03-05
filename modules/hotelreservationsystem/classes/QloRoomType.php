@@ -156,7 +156,7 @@ class QloRoomType extends QloWebservice
     //     }
 
     //     // convert object to array
-    //     $address = Tools::jsonDecode(Tools::jsonEncode($address), true);
+    //     $address = json_decode(json_encode($address), true);
 
     //     $this->output .= $this->objOutput->getObjectRender()->renderNodeHeader('address', array());
     //     $address['country'] = Country::getNameById($this->id_lang, $address['id_country']);

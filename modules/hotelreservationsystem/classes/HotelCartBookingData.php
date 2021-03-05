@@ -764,7 +764,7 @@ class HotelCartBookingData extends ObjectModel
                         AND fp.`active`=1 AND fp.`date_from` <= \''.pSQL($date).'\' AND fp.`date_to` >= \''.pSQL($date).'\''
                     )) {
                         foreach ($featurePrice as $fRow) {
-                            $specialDays = Tools::jsonDecode($fRow['special_days']);
+                            $specialDays = json_decode($fRow['special_days']);
                             if (in_array(strtolower(date('D', strtotime($date))), $specialDays)) {
                                 return $fRow;
                             }
@@ -1105,7 +1105,7 @@ class HotelCartBookingData extends ObjectModel
 
                 if ($getTotalPrice) {
                     if ($roomTypeDemands['extra_demands']
-                        && ($extraDemand = Tools::jsonDecode($roomTypeDemands['extra_demands'], true))
+                        && ($extraDemand = json_decode($roomTypeDemands['extra_demands'], true))
                     ) {
                         $totalDemandsPrice += $objRoomDemandPrice->getRoomTypeDemandsTotalPrice(
                             $roomTypeDemands['id_product'],
@@ -1116,7 +1116,7 @@ class HotelCartBookingData extends ObjectModel
                         );
                     }
                 } else {
-                    $roomTypeDemands['extra_demands'] = Tools::jsonDecode(
+                    $roomTypeDemands['extra_demands'] = json_decode(
                         $roomTypeDemands['extra_demands'],
                         true
                     );
@@ -1146,7 +1146,7 @@ class HotelCartBookingData extends ObjectModel
                 foreach ($roomTypeDemands as $key => &$demand) {
                     if ($getTotalPrice) {
                         if ($demand['extra_demands']
-                            && ($extraDemand = Tools::jsonDecode($demand['extra_demands'], true))
+                            && ($extraDemand = json_decode($demand['extra_demands'], true))
                         ) {
                             $totalDemandsPrice += $objRoomDemandPrice->getRoomTypeDemandsTotalPrice(
                                 $demand['id_product'],
@@ -1157,7 +1157,7 @@ class HotelCartBookingData extends ObjectModel
                             );
                         }
                     } else {
-                        $demand['extra_demands'] = Tools::jsonDecode(
+                        $demand['extra_demands'] = json_decode(
                             $demand['extra_demands'],
                             true
                         );
@@ -1193,7 +1193,7 @@ class HotelCartBookingData extends ObjectModel
     // Webservice :: get extra demands for the cart booking
     public function getWsExtraDemands()
     {
-        $extraDemands = Tools::jsonDecode($this->extra_demands, true);
+        $extraDemands = json_decode($this->extra_demands, true);
         if (count($extraDemands)) {
             foreach ($extraDemands as &$demnad) {
                 $demnad['id'] = $demnad['id_global_demand'];

@@ -299,7 +299,7 @@ class hotelreservationsystem extends Module
                                 if (Validate::isLoadedObject(
                                     $objCartBooking = new HotelCartBookingData($demandInfo['id'])
                                 )) {
-                                    $objCartBooking->extra_demands = Tools::jsonEncode($demandInfo['extra_demands']);
+                                    $objCartBooking->extra_demands = json_encode($demandInfo['extra_demands']);
                                     $objCartBooking->save();
                                 }
                             }
@@ -443,7 +443,7 @@ class hotelreservationsystem extends Module
                     if ($objHtlBkDtl->save()) {
                         // save extra demands info
                         if ($objCartBkData->extra_demands
-                            && ($extraDemands = Tools::jsonDecode($objCartBkData->extra_demands, true))
+                            && ($extraDemands = json_decode($objCartBkData->extra_demands, true))
                         ) {
                             $objRoomDemandPrice = new HotelRoomTypeDemandPrice();
                             foreach ($extraDemands as $demand) {

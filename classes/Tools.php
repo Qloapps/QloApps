@@ -1066,7 +1066,7 @@ class ToolsCore
 
         echo '
 			<script type="text/javascript">
-				console.'.$type.'('.Tools::jsonEncode($object).');
+				console.'.$type.'('.json_encode($object).');
 			</script>
 		';
     }
@@ -2660,19 +2660,15 @@ exit;
     /**
      * jsonDecode convert json string to php array / object
      *
-     * @param string $json
+     * @param string $data
      * @param bool $assoc  (since 1.4.2.4) if true, convert to associativ array
      * @return array
      */
-    public static function jsonDecode($json, $assoc = false)
+    public static function jsonDecode($data, $assoc = false, $depth = 512, $options = 0
+    )
     {
-        if (function_exists('json_decode')) {
-            return json_decode($json, $assoc);
-        } else {
-            include_once(_PS_TOOL_DIR_.'json/json.php');
-            $pear_json = new Services_JSON(($assoc) ? SERVICES_JSON_LOOSE_TYPE : 0);
-            return $pear_json->decode($json);
-        }
+        Tools::displayAsDeprecated();
+        return json_decode($data, $assoc, $depth, $options);
     }
 
     /**
@@ -2681,15 +2677,15 @@ exit;
      * @param array $data
      * @return string json
      */
-    public static function jsonEncode($data)
+    public static function jsonEncode($data, $options = 0, $depth = 512)
     {
-        if (function_exists('json_encode')) {
-            return json_encode($data);
-        } else {
-            include_once(_PS_TOOL_DIR_.'json/json.php');
-            $pear_json = new Services_JSON();
-            return $pear_json->encode($data);
+        Tools::displayAsDeprecated();
+        if (PHP_VERSION_ID < 50500) { /* PHP version < 5.5.0 */
+            return json_encode($data, $options);
         }
+
+        return json_encode($data, $options, $depth);
+
     }
 
     /**

@@ -191,7 +191,7 @@ class AdminSearchControllerCore extends AdminController
             $iso_lang = Tools::strtolower(Context::getContext()->language->iso_code);
             $iso_country = Tools::strtolower(Country::getIsoById(Configuration::get('PS_COUNTRY_DEFAULT')));
             if (($json_content = Tools::file_get_contents('https://api-addons.prestashop.com/'._PS_VERSION_.'/search/'.urlencode($this->query).'/'.$iso_country.'/'.$iso_lang.'/')) != false) {
-                $results = Tools::jsonDecode($json_content, true);
+                $results = json_decode($json_content, true);
                 if (isset($results['id'])) {
                     $this->_list['addons']  = array($results);
                 } else {

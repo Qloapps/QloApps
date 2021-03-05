@@ -224,7 +224,7 @@ class blockcart extends Module
         }
 
         $this->assignContentVars($params);
-        $res = Tools::jsonDecode($this->display(__FILE__, 'blockcart-json.tpl'), true);
+        $res = json_decode($this->display(__FILE__, 'blockcart-json.tpl'), true);
 
         if (isset($params['cookie']->avail_rooms)) {
             $res['avail_rooms'] = $params['cookie']->avail_rooms;
@@ -237,7 +237,7 @@ class blockcart extends Module
             $res['crossSelling'] = $this->display(__FILE__, 'crossselling.tpl');
         }
 
-        $res = Tools::jsonEncode($res);
+        $res = json_encode($res);
 
         return $res;
     }

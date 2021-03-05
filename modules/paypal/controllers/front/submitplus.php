@@ -68,7 +68,7 @@ class PayPalSubmitplusModuleFrontController extends ModuleFrontController
 
         if (!empty($this->id_cart) && !empty($this->paymentId) && !empty($this->token)) {
             $CallApiPaypalPlus = new CallApiPaypalPlus();
-            $payment = Tools::jsonDecode($CallApiPaypalPlus->lookUpPayment($this->paymentId));
+            $payment = json_decode($CallApiPaypalPlus->lookUpPayment($this->paymentId));
 
             if (isset($payment->state)) {
                 $this->context->smarty->assign('state', $payment->state);
@@ -172,7 +172,7 @@ class PayPalSubmitplusModuleFrontController extends ModuleFrontController
         $return = array();
         if (!$ajax) {
             $return['error'][] = $this->module->l('An error occured during the payment');
-            echo Tools::jsonEncode($return);
+            echo json_encode($return);
             die();
         }
 
@@ -187,7 +187,7 @@ class PayPalSubmitplusModuleFrontController extends ModuleFrontController
             && !empty($submit)
         ) {
             $CallApiPaypalPlus = new CallApiPaypalPlus();
-            $payment = Tools::jsonDecode($CallApiPaypalPlus->executePayment($payerID, $paymentId));
+            $payment = json_decode($CallApiPaypalPlus->executePayment($payerID, $paymentId));
 
 
             if (isset($payment->state)) {
@@ -230,7 +230,7 @@ class PayPalSubmitplusModuleFrontController extends ModuleFrontController
 
                         $paypal_plus_pui = new PaypalPlusPui();
                         $paypal_plus_pui->id_order = $id_order;
-                        $paypal_plus_pui->pui_informations = Tools::jsonEncode($payment->payment_instruction);
+                        $paypal_plus_pui->pui_informations = json_encode($payment->payment_instruction);
 
                         $paypal_plus_pui->save();
                     }
@@ -254,7 +254,7 @@ class PayPalSubmitplusModuleFrontController extends ModuleFrontController
             $return['error'][] = $this->module->l('An error occured during the payment');
         }
 
-        echo Tools::jsonEncode($return);
+        echo json_encode($return);
         die();
     }
 
