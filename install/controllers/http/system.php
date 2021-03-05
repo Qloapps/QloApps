@@ -99,6 +99,7 @@ class InstallControllerHttpSystem extends InstallControllerHttp
                         'max_execution_time' => $this->l('In the PHP configuration set max_execution_time to minimum 500'),
                         'upload_max_filesize' => $this->l('In the PHP configuration set upload_max_filesize to minimum 16M'),
                         'fopen' => $this->l('Cannot open external URLs (requires allow_url_fopen as On).'),
+                        'zip' => $this->l('ZIP extension is not enabled'),
                     )
                 ),
                 array(
