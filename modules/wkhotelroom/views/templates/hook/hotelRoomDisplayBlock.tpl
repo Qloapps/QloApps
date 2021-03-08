@@ -38,6 +38,7 @@
                         {/if}
                                 <div class="col-sm-12 col-md-6 margin-btm-30">
                                     <img src="{$roomDisplay.image|escape:'htmlall':'UTF-8'}" alt="{$roomDisplay.name|escape:'htmlall':'UTF-8'}" class="img-responsive width-100">
+                                    {hook h='displayHotelRoomsBlockImageAfter' room_type=$roomDisplay}
                                     <div class="hotelRoomDescContainer">
                                         <div class="row margin-lr-0">
                                             <p class="htlRoomTypeNameText pull-left">{$roomDisplay.name|escape:'htmlall':'UTF-8'}</p>
