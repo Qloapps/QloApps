@@ -23,9 +23,17 @@
 *  International Registered Trademark & Property of PrestaShop SA
 */
 $(document).ready(function(){
-	$('input.star').rating();
-	$('.auto-submit-star').rating();
-
+	$('.raty_star').raty({
+		starType : 'i',
+		starOff: 'icon-star-o',
+		starOn: 'icon-star',
+		halfShow: false,
+		score: 3,
+		hints: null,
+		readOnly: function() {
+			return $(this).hasClass('readonly');
+		}
+	});
 	$('#new_comment_tab_btn').on('click', function(e){
 		e.preventDefault();
 		$('.new_comment_form_outer').show();

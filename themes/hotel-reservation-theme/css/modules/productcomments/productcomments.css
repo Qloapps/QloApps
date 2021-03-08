@@ -7,22 +7,15 @@
   margin: 39px 0 22px; }
   #product_comments_block_extra .comments_note {
     margin-bottom: 5px; }
-  #product_comments_block_extra .comments_note span,
-  #product_comments_block_extra .star_content {
+  #product_comments_block_extra .comments_note span{
     float: left;
     color: #333; }
-  #product_comments_block_extra .star_content {
-    margin-top: 1px; }
-  #product_comments_block_extra div.star:after {
-    content: "\f006";
-    font-family: "FontAwesome";
-    display: inline-block;
-    color: #777676; }
-  #product_comments_block_extra div.star_on:after {
-    content: "\f005";
-    font-family: "FontAwesome";
-    display: inline-block;
-    color: #e9ce18; }
+  .raty_star i[class^="icon-"] {
+    font-size: 22px;
+    color: #e9ce18;
+  } .raty_star i.icon-star-o {
+    color: #777777;
+  }
   #product_comments_block_extra .comments_advices {
     clear: both; }
 
