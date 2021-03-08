@@ -11,7 +11,7 @@
 /**
  * The minimum interface for an Event.
  *
- * @author     Chris Corbyn
+ * @author Chris Corbyn
  */
 interface Swift_Events_Event
 {
@@ -25,7 +25,7 @@ interface Swift_Events_Event
     /**
      * Prevent this Event from bubbling any further up the stack.
      *
-     * @param bool    $cancel, optional
+     * @param bool $cancel, optional
      */
     public function cancelBubble($cancel = true);
 

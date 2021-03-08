@@ -11,7 +11,7 @@
 /**
  * SendmailTransport for sending mail through a Sendmail/Postfix (etc..) binary.
  *
- * @author     Chris Corbyn
+ * @author Chris Corbyn
  */
 class Swift_SendmailTransport extends Swift_Transport_SendmailTransport
 {
@@ -36,7 +36,7 @@ class Swift_SendmailTransport extends Swift_Transport_SendmailTransport
      *
      * @param string $command
      *
-     * @return Swift_SendmailTransport
+     * @return self
      */
     public static function newInstance($command = '/usr/sbin/sendmail -bs')
     {
