@@ -64,6 +64,7 @@
 [-] BO : Fixed : [#162] Additional facility price changes for room type after saving
 [-] BO : Fixed : [#147] Creating order status without entering "status name", page redirects to blank page
 [-] BO : Fixed : [#148] Creating order refund status without entering "status name", page redirects to list page
+[-] BO : Fixed : [#229] Resolved undefined variable error in Manage Order Refund Request Controller
 
 [-] FO : Fixed : [#212] Design issue of select in the ADDITIONAL FACILITIES if text exceeds from block in the product detail page
 [-] FO : Fixed : [#209] Errors on the search result page: If new group is created and only this group is assigned to the customer
