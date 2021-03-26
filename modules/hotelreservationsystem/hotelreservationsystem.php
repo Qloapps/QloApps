@@ -411,7 +411,7 @@ class hotelreservationsystem extends Module
                         $idLang
                     ))) {
                         $objHtlBkDtl->hotel_name = $objHotelBranch->hotel_name;
-                        $objHtlBkDtl->room_type_name = $product['product_name'];
+                        $objHtlBkDtl->room_type_name = $product['name'];
                         $objHtlBkDtl->city = $objHotelBranch->city;
                         $objHtlBkDtl->state = State::getNameById($objHotelBranch->state_id);
                         $objHtlBkDtl->country = Country::getNameById($idLang, $objHotelBranch->country_id);
