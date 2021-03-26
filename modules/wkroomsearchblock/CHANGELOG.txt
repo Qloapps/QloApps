@@ -1,4 +1,17 @@
 -----------------------------
+# V1.1.0 to V1.1.1
+-----------------------------
+
+## Improved/changed features:
+
+[*] FO : [#222] Disabled mobile keyboard pop up when using date-picker in home search
+
+## Bug/Issues Resolved:
+
+[-] FO : Fixed : [#151] Room search check-in && check-out don't change when friendly URL is disabled.
+[-] FO : Fixed : [#158] Hotel selection in search panel for mobile devices
+
+-----------------------------
 # V1.0.3 to V1.1.0
 -----------------------------
 
