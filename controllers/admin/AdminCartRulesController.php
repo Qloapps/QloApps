@@ -476,15 +476,21 @@ class AdminCartRulesControllerCore extends AdminController
             case 'products':
                 $products = array('selected' => array(), 'unselected' => array());
                 $results = Db::getInstance()->executeS('
-				SELECT DISTINCT name, p.id_product as id
+				SELECT DISTINCT name, hbl.`hotel_name`, p.id_product as id
 				FROM '._DB_PREFIX_.'product p
 				LEFT JOIN `'._DB_PREFIX_.'product_lang` pl
 					ON (p.`id_product` = pl.`id_product`
 					AND pl.`id_lang` = '.(int)Context::getContext()->language->id.Shop::addSqlRestrictionOnLang('pl').')
-				'.Shop::addSqlAssociation('product', 'p').'
-				WHERE id_lang = '.(int)Context::getContext()->language->id.'
+                '.Shop::addSqlAssociation('product', 'p').'
+                LEFT JOIN `'._DB_PREFIX_.'htl_room_type` hrt
+                ON (p.`id_product` = hrt.`id_product`)
+                LEFT JOIN `'._DB_PREFIX_.'htl_branch_info_lang` hbl
+                ON (hrt.`id_hotel` = hbl.`id` AND hbl.`id_lang` = '.(int)Context::getContext()->language->id.Shop::addSqlRestrictionOnLang('pl').')
 				ORDER BY name');
                 foreach ($results as $row) {
+                    if($row['hotel_name']) {
+                        $row['name'] .= ' / '.$row['hotel_name'];
+                    }
                     $products[in_array($row['id'], $selected) ? 'selected' : 'unselected'][] = $row;
                 }
                 // filter hotels as per accessed hotels
@@ -502,7 +508,6 @@ class AdminCartRulesControllerCore extends AdminController
                     1,
                     1
                 );
-
                 Context::getContext()->smarty->assign('product_rule_itemlist', $products);
                 $choose_content = $this->createTemplate('product_rule_itemlist.tpl')->fetch();
                 Context::getContext()->smarty->assign('product_rule_choose_content', $choose_content);

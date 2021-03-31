@@ -34,6 +34,19 @@
 							<td width="10">&nbsp;</td>
 							<td  class="text-center">
 								<font size="2" face="Open-sans, sans-serif" color="#555454">
+									{$data_v['hotel_name']}
+								</font>
+							</td>
+							<td width="10">&nbsp;</td>
+						</tr>
+					</table>
+				</td>
+				<td style="border:1px solid #D6D4D4;">
+					<table class="table">
+						<tr>
+							<td width="10">&nbsp;</td>
+							<td  class="text-center">
+								<font size="2" face="Open-sans, sans-serif" color="#555454">
 									<strong>
 										{$data_v['adult']} {l s='Adults'}, {$data_v['children']} {l s='Children'}
 									</strong>

@@ -316,7 +316,7 @@ abstract class ModuleCore
                     $this->id = self::$modules_cache[$this->name]['id_module'];
                 }
                 foreach (self::$modules_cache[$this->name] as $key => $value) {
-                    if (array_key_exists($key, $this)) {
+                    if (property_exists($this, $key)) {
                         $this->{$key} = $value;
                     }
                 }
@@ -428,8 +428,8 @@ abstract class ModuleCore
     {
         if (version_compare(_PS_VERSION_, $this->ps_versions_compliancy['min'], '<')
             || version_compare(_PS_VERSION_, $this->ps_versions_compliancy['max'], '>')
-            // || version_compare(_QLOAPPS_VERSION_, $this->qloapps_versions_compliancy['min'], '<')
-            // || version_compare(_QLOAPPS_VERSION_, $this->qloapps_versions_compliancy['max'], '>')
+            || version_compare(_QLOAPPS_VERSION_, $this->qloapps_versions_compliancy['min'], '<')
+            || version_compare(_QLOAPPS_VERSION_, $this->qloapps_versions_compliancy['max'], '>')
         ) {
             return false;
         } else {

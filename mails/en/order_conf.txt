@@ -3,8 +3,9 @@ Hi {firstname} {lastname},
 Thank you for selecting our hotel!
 Order details
 Order: {order_name} Placed on {date}
-Room Image<
-Room Description<
+Room Image
+Room Description
+Hotel
 Room Capcity
 Unit Price
 Rooms Qty
@@ -12,9 +13,9 @@ Check-in Date
 Check-out Date
 Total
 
-{cart_booking_data_html}
+{cart_booking_data_text}
 
-{extra_demands_details_html}
+{extra_demands_details_text}
 
 {discounts}
 

@@ -121,6 +121,7 @@
 										{/if}
 									</span>
 								{/if}
+								{hook h="displayRoomTypeImageAfter"}
 							</div> <!-- end image-block -->
 						</div>
 						<div class="col-xs-12 col-sm-3 col-sm-pull-9 col-md-2 col-md-pull-10">
@@ -398,6 +399,7 @@
 						</div>
 					{/if}
 				{/if}
+				{if isset($HOOK_EXTRA_RIGHT) && $HOOK_EXTRA_RIGHT}{$HOOK_EXTRA_RIGHT}{/if}
 			</div>
 
 		</div> <!-- end primary_block -->

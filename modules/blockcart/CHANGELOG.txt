@@ -1,4 +1,14 @@
 -----------------------------
+# V1.6.2 to V1.6.3
+-----------------------------
+
+## Improved/Changed Features:
+
+* [CO] : Removed unused hooks displayLeftColumn and displayrightColumn
+* [CO] : 'getHotelCartBookingData' function from blockcart.php is removed and called from HotelCartBookingData::getHotelCartBookingData()
+
+
+-----------------------------
 # V1.6.1 to V1.6.2
 -----------------------------
 

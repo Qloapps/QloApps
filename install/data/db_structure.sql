@@ -42,6 +42,7 @@ CREATE TABLE `PREFIX_address` (
   `date_upd` datetime NOT NULL,
   `active` tinyint(1) unsigned NOT NULL DEFAULT '1',
   `deleted` tinyint(1) unsigned NOT NULL DEFAULT '0',
+  `auto_generated` tinyint(1) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`id_address`),
   KEY `address_customer` (`id_customer`),
   KEY `id_country` (`id_country`),

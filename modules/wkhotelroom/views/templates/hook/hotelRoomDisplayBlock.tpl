@@ -38,6 +38,7 @@
                         {/if}
                                 <div class="col-sm-12 col-md-6 margin-btm-30">
                                     <img src="{$roomDisplay.image|escape:'htmlall':'UTF-8'}" alt="{$roomDisplay.name|escape:'htmlall':'UTF-8'}" class="img-responsive width-100">
+                                    {hook h='displayHotelRoomsBlockImageAfter' room_type=$roomDisplay}
                                     <div class="hotelRoomDescContainer">
                                         <div class="row margin-lr-0">
                                             <p class="htlRoomTypeNameText pull-left">{$roomDisplay.name|escape:'htmlall':'UTF-8'}</p>
@@ -57,7 +58,7 @@
                                             {$roomDisplay.description}
                                         </div>
                                         <div class="row margin-lr-0">
-                                            <a target="blank" class="btn btn-default button htlRoomTypeBookNow" href="{$link->getProductLink($roomDisplay.id_product)|escape:'html':'UTF-8'}"><span>{l s='book now' mod='wkhotelroom'}</span></a>
+                                            <a target="blank" class="btn btn-default button htlRoomTypeBookNow" href="{$link->getProductLink($roomDisplay.id_product)|escape:'html':'UTF-8'}"><span>{if !isset($restricted_country_mode) && !$PS_CATALOG_MODE}{l s='book now' mod='wkhotelroom'}{else}{l s='View' mod='wkhotelroom'}{/if}</span></a>
                                         </div>
                                     </div>
                                 </div>

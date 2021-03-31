@@ -31,6 +31,7 @@
 				</div><!-- #columns -->
 			</div><!-- .columns-container -->
 			{if isset($HOOK_FOOTER)}
+				{hook h='displayFooterBefore'}
 				<!-- Footer -->
 				<div class="footer-container">
 					<footer id="footer"  class="container">

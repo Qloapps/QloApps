@@ -31,7 +31,7 @@ class wkhotelfilterblock extends Module
         $this->name = 'wkhotelfilterblock';
         $this->author = 'webkul';
         $this->tab = 'front_office_features';
-        $this->version = '1.0.2';
+        $this->version = '1.0.3';
         $this->context = Context::getContext();
 
         $this->bootstrap = true;
@@ -40,6 +40,128 @@ class wkhotelfilterblock extends Module
         $this->displayName = $this->l('layered filters and sorting block');
         $this->description = $this->l('Hotel filter and sorting block');
         $this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
+    }
+
+    public function getContent()
+    {
+        if (Tools::isSubmit('btnConfigSubmit')) {
+            $this->postProcess();
+        } else {
+            $this->html .= '<br />';
+        }
+
+        $this->html .= $this->renderForm();
+
+        return $this->html;
+    }
+
+    public function renderForm()
+    {
+        $fields_form = array();
+        $fields_form['form'] = array(
+            'legend' => array(
+                'icon' => 'icon-cog',
+                'title' => $this->l('Search Results Filter Configuration'),
+            ),
+            'input' => array(
+                array(
+                    'type' => 'switch',
+                    'label' => $this->l('Show Guest Rating Filter'),
+                    'name' => 'SHOW_RATTING_FILTER',
+                    'is_bool' => true,
+                    'values' => array(
+                        array(
+                            'id' => 'active_on',
+                            'value' => 1,
+                        ),
+                        array(
+                            'id' => 'active_off',
+                            'value' => 0,
+                        ),
+                    ),
+                    'hint' => $this->l('If yes, it will display Guest Rating Filter.'),
+                ),
+                array(
+                    'type' => 'switch',
+                    'label' => $this->l('Show Amenities Filter'),
+                    'name' => 'SHOW_AMENITIES_FILTER',
+                    'is_bool' => true,
+                    'values' => array(
+                        array(
+                            'id' => 'active_on',
+                            'value' => 1,
+                        ),
+                        array(
+                            'id' => 'active_off',
+                            'value' => 0,
+                        ),
+                    ),
+                    'hint' => $this->l('If yes, it will display Amenities Filter.'),
+                ),
+                array(
+                    'type' => 'switch',
+                    'label' => $this->l('Show Price Filter'),
+                    'name' => 'SHOW_PRICE_FILTER',
+                    'is_bool' => true,
+                    'values' => array(
+                        array(
+                            'id' => 'active_on',
+                            'value' => 1,
+                        ),
+                        array(
+                            'id' => 'active_off',
+                            'value' => 0,
+                        ),
+                    ),
+                    'hint' => $this->l('If yes, it will display price Filter.'),
+                ),
+            ),
+            'submit' => array(
+                'title' => $this->l('Save'),
+                'name' => 'submit_conf_filter',
+            ),
+        );
+
+        $helper = new HelperForm();
+        $helper->show_toolbar = false;
+        $helper->table = $this->table;
+        $lang = new Language((int) Configuration::get('PS_LANG_DEFAULT'));
+        $helper->default_form_language = $lang->id;
+        $this->fields_form = array();
+        $helper->identifier = $this->identifier;
+        $helper->submit_action = 'btnConfigSubmit';
+        $helper->currentIndex = $this->context->link->getAdminLink('AdminModules', false).
+        '&configure='.$this->name.'&module_name='.$this->name;
+        $helper->token = Tools::getAdminTokenLite('AdminModules');
+
+        $helper->tpl_vars = array(
+            'fields_value' => $this->getConfigFieldsValues(),
+            'languages' => $this->context->controller->getLanguages(),
+            'id_language' => $this->context->language->id,
+        );
+
+        return $helper->generateForm(array($fields_form));
+    }
+
+    public function postProcess()
+    {
+        if (Tools::isSubmit('btnConfigSubmit')) {
+            Configuration::updateValue(
+                'SHOW_RATTING_FILTER',
+                Tools::getValue('SHOW_RATTING_FILTER')
+            );
+            Configuration::updateValue(
+                'SHOW_AMENITIES_FILTER',
+                Tools::getValue('SHOW_AMENITIES_FILTER')
+            );
+            Configuration::updateValue('SHOW_PRICE_FILTER', Tools::getValue('SHOW_PRICE_FILTER'));
+
+            // redirect after saving the configuration
+            Tools::redirectAdmin(
+                $this->context->link->getAdminLink('AdminModules').'&configure='.$this->name.'&tab_module='.$this->tab.
+                '&module_name='.$this->name.'&conf=4'
+            );
+        }
     }
 
     public function install()
@@ -51,43 +173,12 @@ class wkhotelfilterblock extends Module
             return false;
         }
 
-        //set default config variable
+        //set default config variable`
         Configuration::updateValue('SHOW_RATTING_FILTER', 1);
         Configuration::updateValue('SHOW_AMENITIES_FILTER', 1);
         Configuration::updateValue('SHOW_PRICE_FILTER', 1);
 
         return true;
-    }
-
-    public function hookAddOtherModuleSetting($params)
-    {
-        $params['fields_options']['categoryfiltersetting'] = array(
-            'title' => $this->l('Category Filter Configuration'),
-            'fields' => array(
-                'SHOW_RATTING_FILTER' => array(
-                    'title' => $this->l('Show Guest Rating Filter'),
-                    'hint' => $this->l('If yes, it will display Guest Rating Filter.'),
-                    'validation' => 'isBool',
-                    'cast' => 'intval',
-                    'type' => 'bool',
-                ),
-                'SHOW_AMENITIES_FILTER' => array(
-                    'title' => $this->l('Show Amenities Filter'),
-                    'hint' => $this->l('If yes, it will display Amenities Filter.'),
-                    'validation' => 'isBool',
-                    'cast' => 'intval',
-                    'type' => 'bool',
-                ),
-                'SHOW_PRICE_FILTER' => array(
-                    'title' => $this->l('Show Price Filter'),
-                    'hint' => $this->l('If yes, it will display Price Filter.'),
-                    'validation' => 'isBool',
-                    'cast' => 'intval',
-                    'type' => 'bool',
-                ),
-            ),
-            'submit' => array('title' => $this->l('Save')),
-        );
     }
 
     public function hookHeader()

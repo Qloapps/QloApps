@@ -185,28 +185,28 @@ class AdminPreferencesControllerCore extends AdminController
                     'type' => 'text',
                     'class' => 'fixed-width-xxl'
                 ),
-                'PS_DISPLAY_SUPPLIERS' => array(
-                    'title' => $this->l('Display suppliers and manufacturers'),
-                    'desc' => $this->l('Enable suppliers and manufacturers pages on your front office even when their respective modules are disabled.'),
-                    'validation' => 'isBool',
-                    'cast' => 'intval',
-                    'type' => 'bool'
-                ),
-                'PS_DISPLAY_BEST_SELLERS' => array(
-                    'title' => $this->l('Display best sellers'),
-                    'desc' => $this->l('Enable best sellers page on your front office even when its respective module is disabled.'),
-                    'validation' => 'isBool',
-                    'cast' => 'intval',
-                    'type' => 'bool'
-                ),
-                'PS_MULTISHOP_FEATURE_ACTIVE' => array(
-                    'title' => $this->l('Enable Multistore'),
-                    'desc' => $this->l('The multistore feature allows you to manage several e-shops with one Back Office. If this feature is enabled, a "Multistore" page will be available in the "Advanced Parameters" menu.'),
-                    'validation' => 'isBool',
-                    'cast' => 'intval',
-                    'type' => 'bool',
-                    'visibility' => Shop::CONTEXT_ALL
-                ),
+                // 'PS_DISPLAY_SUPPLIERS' => array(
+                //     'title' => $this->l('Display suppliers and manufacturers'),
+                //     'desc' => $this->l('Enable suppliers and manufacturers pages on your front office even when their respective modules are disabled.'),
+                //     'validation' => 'isBool',
+                //     'cast' => 'intval',
+                //     'type' => 'bool'
+                // ),
+                // 'PS_DISPLAY_BEST_SELLERS' => array(
+                //     'title' => $this->l('Display best sellers'),
+                //     'desc' => $this->l('Enable best sellers page on your front office even when its respective module is disabled.'),
+                //     'validation' => 'isBool',
+                //     'cast' => 'intval',
+                //     'type' => 'bool'
+                // ),
+                 // 'PS_MULTISHOP_FEATURE_ACTIVE' => array(
+                //     'title' => $this->l('Enable Multistore'),
+                //     'desc' => $this->l('The multistore feature allows you to manage several e-shops with one Back Office. If this feature is enabled, a "Multistore" page will be available in the "Advanced Parameters" menu.'),
+                //     'validation' => 'isBool',
+                //     'cast' => 'intval',
+                //     'type' => 'bool',
+                //     'visibility' => Shop::CONTEXT_ALL
+                // ),
                 'PS_SHOP_ACTIVITY' => array(
                     'title' => $this->l('Main Shop Activity'),
                     'validation' => 'isInt',

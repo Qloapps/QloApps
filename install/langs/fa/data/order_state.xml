@@ -48,4 +48,12 @@
         <name>Awaiting remote payment</name>
         <template/>
     </order_state>
+    <order_state id="Awaiting_partial_payment">
+        <name>Awaiting partial payment</name>
+        <template/>
+    </order_state>
+    <order_state id="Partial_payment_accepted">
+        <name>Partial payment accepted</name>
+        <template/>
+    </order_state>
 </entity_order_state>

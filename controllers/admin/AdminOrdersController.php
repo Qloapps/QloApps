@@ -685,7 +685,7 @@ class AdminOrdersControllerCore extends AdminController
                     }
                     foreach ($rules['validate'] as $field => $function) {
                         if (Tools::getValue($field)) {
-                            if (!Validate::$function(htmlentities(Tools::getValue($field), ENT_COMPAT, 'UTF-8'))) {
+                            if (!Validate::{$function}(htmlentities(Tools::getValue($field), ENT_COMPAT, 'UTF-8'))) {
                                 $this->errors[] = sprintf(Tools::displayError('field %s is invalid.'), $field);
                             }
                         }
@@ -881,7 +881,7 @@ class AdminOrdersControllerCore extends AdminController
                 if (($bad_delivery = (bool)!Address::isCountryActiveById((int)$cart->id_address_delivery))
                     || !Address::isCountryActiveById((int)$cart->id_address_invoice)) {
                     if ($bad_delivery) {
-                        $this->errors[] = Tools::displayError('This delivery address country is not active.');
+                        $this->errors[] = Tools::displayError('This booking address country is not active.');
                     } else {
                         $this->errors[] = Tools::displayError('This invoice address country is not active.');
                     }

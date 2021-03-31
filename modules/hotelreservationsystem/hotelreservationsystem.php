@@ -29,7 +29,7 @@ class hotelreservationsystem extends Module
     public function __construct()
     {
         $this->name = 'hotelreservationsystem';
-        $this->version = '1.4.1';
+        $this->version = '1.4.2';
         $this->author = 'Webkul';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -201,7 +201,7 @@ class hotelreservationsystem extends Module
             $objCurrency = new Currency(Configuration::get('PS_CURRENCY_DEFAULT'));
             // get room type additional services
             $objRoomDemand = new HotelRoomTypeDemand();
-            $roomDemandPrices = $objRoomDemand->getRoomTypeDemands($idProduct);
+            $roomDemandPrices = $objRoomDemand->getRoomTypeDemands($idProduct, 0, 0);
             $this->context->smarty->assign(
                 array(
                     'idProduct' => $idProduct,
@@ -359,7 +359,7 @@ class hotelreservationsystem extends Module
 
         $obj_adv_payment = new HotelAdvancedPayment();
 
-        $orderProducts = $order->getProducts();
+        $orderProducts = $order->product_list;
         $vatAddress = new Address((int)$order->{Configuration::get('PS_TAX_ADDRESS_TYPE')});
 
         $idLang = (int)$cart->id_lang;
@@ -411,7 +411,7 @@ class hotelreservationsystem extends Module
                         $idLang
                     ))) {
                         $objHtlBkDtl->hotel_name = $objHotelBranch->hotel_name;
-                        $objHtlBkDtl->room_type_name = $product['product_name'];
+                        $objHtlBkDtl->room_type_name = $product['name'];
                         $objHtlBkDtl->city = $objHotelBranch->city;
                         $objHtlBkDtl->state = State::getNameById($objHotelBranch->state_id);
                         $objHtlBkDtl->country = Country::getNameById($idLang, $objHotelBranch->country_id);
@@ -597,8 +597,6 @@ class hotelreservationsystem extends Module
         //Controllers which are to be used in this modules but we have not to create tab for those ontrollers...
         $this->installTab('AdminOrderRestrictSettings', 'order restrict configuration', false, false);
         $this->installTab('AdminHotelGeneralSettings', 'Hotel General configuration', false, false);
-        $this->installTab('AdminOtherHotelModulesSetting', 'other hotel configuration', false, false);
-        $this->installTab('AdminPaymentsSetting', 'payments configuration', false, false);
         $this->installTab('AdminHotelFeaturePricesSettings', 'feature pricing configuration', false, false);
         $this->installTab('AdminRoomTypeGlobalDemand', 'Additional demand configuration', false, false);
         $this->installTab('AdminAssignHotelFeatures', 'Assign Hotel Features', false, false);

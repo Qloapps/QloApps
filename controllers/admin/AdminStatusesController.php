@@ -56,6 +56,12 @@ class AdminStatusesControllerCore extends AdminController
         if (Tools::isSubmit('updateorder_return_state')) {
             $this->display = 'edit';
         }
+        if (Tools::isSubmit('submitAddorder_return_state')) {
+            $this->display = 'add';
+            if(Tools::getValue('id_order_return_state')) {
+                $this->display = 'edit';
+            }
+        }
 
         return parent::init();
     }
@@ -322,7 +328,10 @@ class AdminStatusesControllerCore extends AdminController
 
     public function renderForm()
     {
-        if (Tools::isSubmit('updateorder_state') || Tools::isSubmit('addorder_state')) {
+        if (Tools::isSubmit('updateorder_state')
+            || Tools::isSubmit('addorder_state')
+            || Tools::isSubmit('submitAddorder_state')
+        ) {
             $this->fields_form = array(
                 'tinymce' => true,
                 'legend' => array(
@@ -478,7 +487,10 @@ class AdminStatusesControllerCore extends AdminController
                 )
             );
             return $this->renderOrderStatusForm();
-        } elseif (Tools::isSubmit('updateorder_return_state') || Tools::isSubmit('addorder_return_state')) {
+        } elseif (Tools::isSubmit('updateorder_return_state')
+            || Tools::isSubmit('addorder_return_state')
+            || Tools::isSubmit('submitAddorder_return_state')
+        ) {
             return $this->renderOrderReturnsForm();
         } else {
             return parent::renderForm();

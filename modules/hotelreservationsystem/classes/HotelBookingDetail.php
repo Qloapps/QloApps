@@ -345,9 +345,40 @@ class HotelBookingDetail extends ObjectModel
                             INNER JOIN `'._DB_PREFIX_.'htl_room_disable_dates` AS hrdd ON (hrdd.`id_room_type` = hri.`id_product` AND hrdd.`id_room` = hri.`id`)
                             WHERE hri.`id_hotel`='.(int)$hotel_id.' AND hri.`id_product` ='.(int)$room_type['id_product'].' AND hri.`id_status` = 3 AND (hrdd.`date_from` <= \''.pSql($date_to).'\' AND hrdd.`date_to` >= \''.pSql($date_from).'\')';
 
-                        $sql = 'SELECT ri.`id` AS `id_room`, ri.`id_product`, ri.`id_hotel`, ri.`room_num`, ri.`comment` AS `room_comment`
-                                FROM `'._DB_PREFIX_.'htl_room_information` AS ri
-                                WHERE ri.`id_hotel`='.(int)$hotel_id.' AND ri.`id_product`='.(int)$room_type['id_product'].' AND ri.`id_status` != 2 AND ri.`id` NOT IN ('.$exclude_ids.')';
+                        $selectAvailRoomSearch = 'SELECT ri.`id` AS `id_room`, ri.`id_product`, ri.`id_hotel`, ri.`room_num`, ri.`comment` AS `room_comment`';
+
+                        $joinAvailRoomSearch = '';
+
+                        $whereAvailRoomSearch = 'WHERE ri.`id_hotel`='.(int)$hotel_id.' AND ri.`id_product`='.(int)$room_type['id_product'].' AND ri.`id_status` != 2 AND ri.`id` NOT IN ('.$exclude_ids.')';
+
+                        $groupByAvailRoomSearch = '';
+                        $orderByAvailRoomSearch = '';
+                        $orderWayAvailRoomSearch = '';
+
+                        Hook::exec('actionAvailRoomSearchSqlModifier',
+                            array(
+                                'select' => &$selectAvailRoomSearch,
+                                'join' => &$joinAvailRoomSearch,
+                                'where' => &$whereAvailRoomSearch,
+                                'group_by' => &$groupByAvailRoomSearch,
+                                'order_by' => &$orderByAvailRoomSearch,
+                                'order_way' => &$orderWayAvailRoomSearch,
+                                'params' => array(
+                                    'id_hotel' => $hotel_id,
+                                    'id_product' => $room_type['id_product'],
+                                    'date_from' => $date_from,
+                                    'date_to' => $date_to
+                                )
+                            )
+                        );
+
+                        $sql = $selectAvailRoomSearch;
+                        $sql .= ' FROM `'._DB_PREFIX_.'htl_room_information` AS ri';
+                        $sql .= ' '.$joinAvailRoomSearch;
+                        $sql .= ' '.$whereAvailRoomSearch;
+                        $sql .= ' '.$groupByAvailRoomSearch;
+                        $sql .= ' '.$orderByAvailRoomSearch;
+                        $sql .= ' '.$orderWayAvailRoomSearch;
 
                         $avai_rooms = Db::getInstance()->executeS($sql);
                         $num_avail += count($avai_rooms);
@@ -866,6 +897,7 @@ class HotelBookingDetail extends ObjectModel
                                     $booking_data['rm_data'][$key]['price'] = $prod_price;
                                     $booking_data['rm_data'][$key]['price_without_reduction'] = $productPriceWithoutReduction;
                                     $booking_data['rm_data'][$key]['feature_price'] = $productFeaturePrice;
+                                    $booking_data['rm_data'][$key]['feature_price_diff'] = $productPriceWithoutReduction - $productFeaturePrice;
 
                                     // if ($room_left <= (int)Configuration::get('WK_ROOM_LEFT_WARNING_NUMBER'))
                                     $booking_data['rm_data'][$key]['room_left'] = $room_left;
@@ -962,16 +994,19 @@ class HotelBookingDetail extends ObjectModel
     {
         $date_from = date('Y-m-d H:i:s', strtotime($date_from));
         $date_to = date('Y-m-d H:i:s', strtotime($date_to));
-        $table = 'htl_booking_detail';
-        $table2 = 'htl_cart_booking_data';
+        $table = 'htl_cart_booking_data';
+        $table2 = 'htl_booking_detail';
         $data = array('id_room' => $swapped_room_id);
         $where = 'date_from=\''.pSQL($date_from).'\' AND date_to=\''.pSQL($date_to).'\' AND id_room='.
         (int)$current_room_id;
-        $result = Db::getInstance()->update($table, $data, $where);
-        $result2 = Db::getInstance()->update($table2, $data, $where);
-        if ($result) {
-            $result2 = Db::getInstance()->update($table2, $data, $where);
-            if ($result2) {
+
+        if ($result = Db::getInstance()->update($table, $data, $where)) {
+            if($room_num = Db::getInstance()->getValue(
+                'SELECT `room_num` FROM `'._DB_PREFIX_.'htl_room_information` WHERE `id` = '.$swapped_room_id
+            )) {
+                $data['room_num'] = $room_num;
+            }
+            if ($result2 = Db::getInstance()->update($table2, $data, $where)) {
                 return true;
             }
             return false;
@@ -1002,19 +1037,21 @@ class HotelBookingDetail extends ObjectModel
             '\' AND `date_to`=\''.pSQL($date_to).'\' AND `id_room`='.(int)$current_room_id
         );
 
-        $id1 = Db::getInstance()->getValue(
-            'SELECT `id` FROM `'._DB_PREFIX_.'htl_booking_detail` WHERE `date_from`=\''.pSQL($date_from).
+        $swap_room = Db::getInstance()->getRow(
+            'SELECT `id`, `room_num` FROM `'._DB_PREFIX_.'htl_booking_detail` WHERE `date_from`=\''.pSQL($date_from).
             '\' AND `date_to`=\''.pSQL($date_to).'\' AND `id_room`='.(int)$swapped_room_id
         );
-        $id2 = Db::getInstance()->getValue(
-            'SELECT `id` FROM `'._DB_PREFIX_.'htl_booking_detail` WHERE `date_from`=\''.pSQL($date_from).
+        $curr_room = Db::getInstance()->getRow(
+            'SELECT `id`, `room_num` FROM `'._DB_PREFIX_.'htl_booking_detail` WHERE `date_from`=\''.pSQL($date_from).
             '\' AND `date_to`=\''.pSQL($date_to).'\' AND `id_room`='.(int)$current_room_id
         );
         $sql = 'UPDATE `'._DB_PREFIX_.'htl_cart_booking_data` SET `id_room`=IF(`id`='.(int)$idcrt1.','.
         (int)$current_room_id.','.(int)$swapped_room_id.') WHERE `id` IN('.(int)$idcrt1.','.(int)$idcrt2.')';
 
-        $sql1 = 'UPDATE `'._DB_PREFIX_.'htl_booking_detail` SET `id_room`=IF(`id`='.(int)$id1.','.(int)$current_room_id.
-        ','.(int)$swapped_room_id.') WHERE `id` IN('.(int)$id1.','.(int)$id2.')';
+        $sql1 = 'UPDATE `'._DB_PREFIX_.'htl_booking_detail`
+            SET `id_room`=IF(`id`='.(int)$swap_room['id'].','.(int)$current_room_id.','.(int)$swapped_room_id.'),
+            `room_num`=IF(`id`='.(int)$swap_room['id'].',\''.$curr_room['room_num'].'\',\''.$swap_room['room_num'].'\')
+            WHERE `id` IN('.(int)$swap_room['id'].','.(int)$curr_room.')';
 
         if ($result = Db::getInstance()->execute($sql)) {
             $result2 = Db::getInstance()->execute($sql1);

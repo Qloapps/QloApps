@@ -336,10 +336,10 @@ class MailCore extends ObjectModel
             }
 
             $template_vars['{shop_name}'] = Tools::safeOutput(Configuration::get('PS_SHOP_NAME', null, null, $id_shop));
-            $template_vars['{shop_url}'] = Context::getContext()->link->getPageLink('index', true, Context::getContext()->language->id, null, false, $id_shop);
-            $template_vars['{my_account_url}'] = Context::getContext()->link->getPageLink('my-account', true, Context::getContext()->language->id, null, false, $id_shop);
-            $template_vars['{guest_tracking_url}'] = Context::getContext()->link->getPageLink('guest-tracking', true, Context::getContext()->language->id, null, false, $id_shop);
-            $template_vars['{history_url}'] = Context::getContext()->link->getPageLink('history', true, Context::getContext()->language->id, null, false, $id_shop);
+            $template_vars['{shop_url}'] = Context::getContext()->link->getPageLink('index', true, $id_lang, null, false, $id_shop);
+            $template_vars['{my_account_url}'] = Context::getContext()->link->getPageLink('my-account', true, $id_lang, null, false, $id_shop);
+            $template_vars['{guest_tracking_url}'] = Context::getContext()->link->getPageLink('guest-tracking', true, $id_lang, null, false, $id_shop);
+            $template_vars['{history_url}'] = Context::getContext()->link->getPageLink('history', true, $id_lang, null, false, $id_shop);
             $template_vars['{color}'] = Tools::safeOutput(Configuration::get('PS_MAIL_COLOR', null, null, $id_shop));
             // Get extra template_vars
             $extra_template_vars = array();

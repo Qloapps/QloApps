@@ -45,14 +45,14 @@ class AdminPPreferencesControllerCore extends AdminController
             'products' => array(
                 'title' =>    $this->l('Products (general)'),
                 'fields' =>    array(
-                    /*'PS_CATALOG_MODE' => array(
+                    'PS_CATALOG_MODE' => array(
                         'title' => $this->l('Catalog mode'),
-                        'hint' => $this->l('When active, all shopping features will be disabled.'),
+                        'hint' => $this->l('When active, all booking features will be disabled.'),
                         'validation' => 'isBool',
                         'cast' => 'intval',
                         'required' => false,
                         'type' => 'bool'
-                    ),*/
+                    ),
                     // 'PS_COMPARATOR_MAX_ITEM' => array(
                     //     'title' => $this->l('Product comparison'),
                     //     'hint' => $this->l('Set the maximum number of products that can be selected for comparison. Set to "0" to disable this feature.'),

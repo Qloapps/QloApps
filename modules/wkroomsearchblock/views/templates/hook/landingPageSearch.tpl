@@ -88,7 +88,7 @@
                                 {else}
                                     col-sm-3
                                 {/if}">
-                                    <input type="text" class="form-control header-rmsearch-input input-date" id="check_in_time" name="check_in_time" autocomplete="off" placeholder="{l s='Check In Date' mod='wkroomsearchblock'}">
+                                    <input type="text" class="form-control header-rmsearch-input input-date" id="check_in_time" name="check_in_time" autocomplete="off" placeholder="{l s='Check In Date' mod='wkroomsearchblock'}" readonly>
                                 </div>
                                 <div class="form-group
                                 {if count($hotels_info) <= 1}
@@ -104,7 +104,7 @@
                                 {else}
                                     col-sm-3
                                 {/if}">
-                                    <input type="text" class="form-control header-rmsearch-input input-date" id="check_out_time" name="check_out_time" autocomplete="off" placeholder="{l s='Check Out Date' mod='wkroomsearchblock'}">
+                                    <input type="text" class="form-control header-rmsearch-input input-date" id="check_out_time" name="check_out_time" autocomplete="off" placeholder="{l s='Check Out Date' mod='wkroomsearchblock'}" readonly>
                                 </div>
                                 <div class="form-group
                                 {if count($hotels_info) <= 1}

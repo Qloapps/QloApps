@@ -46,7 +46,7 @@
 	        		{$HOOK_MAINTENANCE}
 	        		<div id="message">
 	             			<h1 class="maintenance-heading">{l s='We\'ll be back soon.'}</h1>
-							{l s='We are currently updating our shop and will be back really soon.'}
+							{l s='We are currently updating our site and will be back really soon.'}
 							<br />
 							{l s='Thanks for your patience.'}
 					</div>
