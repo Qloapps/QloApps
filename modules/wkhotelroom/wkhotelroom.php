@@ -94,6 +94,10 @@ class WkHotelRoom extends Module
                     'HOTEL_ROOM_DISPLAY_DESCRIPTION',
                     $this->context->language->id
                 ),
+                'PS_CATALOG_MODE' => Configuration::get(
+                    'PS_CATALOG_MODE',
+                    $this->context->language->id
+                ),
                 'hotelRoomDisplay' => $hotelRoomDisplay
             )
         );
