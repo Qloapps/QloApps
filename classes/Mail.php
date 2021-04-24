@@ -24,8 +24,6 @@
  * International Registered Trademark & Property of PrestaShop SA
  */
 
-include_once(_PS_SWIFT_DIR_.'swift_required.php');
-
 class MailCore extends ObjectModel
 {
     public $id;

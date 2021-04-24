@@ -39,8 +39,6 @@ class InstallModelMail extends InstallAbstractModel
     {
         parent::__construct();
 
-        require_once(_PS_CORE_DIR_.'/tools/swift/swift_required.php');
-
         $this->smtp_checked = $smtp_checked;
         $this->server = $server;
         $this->login = $login;
