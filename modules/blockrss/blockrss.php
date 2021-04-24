@@ -27,7 +27,6 @@
 if (!defined('_PS_VERSION_'))
 	exit;
 
-include_once(_PS_CLASS_DIR_.'../tools/pear/PEAR.php');
 include_once(_PS_PEAR_XML_PARSER_PATH_.'Parser.php');
 
 class Blockrss extends Module

@@ -930,8 +930,7 @@ class LanguageCore extends ObjectModel
         if (!file_exists($file)) {
             $errors[] = Tools::displayError('No language pack is available for your version.');
         } elseif ($install) {
-            require_once(_PS_TOOL_DIR_.'tar/Archive_Tar.php');
-            $gz = new Archive_Tar($file, true);
+            $gz = new \Archive_Tar($file, true);
             $files_list = AdminTranslationsController::filterTranslationFiles(Language::getLanguagePackListContent((string)$iso, $gz));
             $files_paths = AdminTranslationsController::filesListToPaths($files_list);
 
@@ -1018,7 +1017,7 @@ class LanguageCore extends ObjectModel
     {
         $key = 'Language::getLanguagePackListContent_'.$iso;
         if (!Cache::isStored($key)) {
-            if (!$tar instanceof Archive_Tar) {
+            if (!$tar instanceof \Archive_Tar) {
                 return false;
             }
             $result = $tar->listContent();
@@ -1030,8 +1029,6 @@ class LanguageCore extends ObjectModel
 
     public static function updateModulesTranslations(array $modules_list)
     {
-        require_once(_PS_TOOL_DIR_.'tar/Archive_Tar.php');
-
         $languages = Language::getLanguages(false);
         foreach ($languages as $lang) {
             $gz = false;
@@ -1043,7 +1040,7 @@ class LanguageCore extends ObjectModel
             $filegz = _PS_TRANSLATIONS_DIR_.$lang['iso_code'].'.gzip';
 
             foreach ($modules_list as $module_name) {
-                $gz = new Archive_Tar($filegz, true);
+                $gz = new \Archive_Tar($filegz, true);
                 $files_list = Language::getLanguagePackListContent($lang['iso_code'], $gz);
                 foreach ($files_list as $i => $file) {
                     if (strpos($file['filename'], 'modules/'.$module_name.'/') !== 0) {
