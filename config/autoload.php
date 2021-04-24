@@ -24,6 +24,8 @@
 *  International Registered Trademark & Property of PrestaShop SA
 */
 
+require_once __DIR__.'/../vendor/autoload.php';
+
 // Include some alias functions
 require_once(_PS_CONFIG_DIR_.'alias.php');
 require_once(_PS_CLASS_DIR_.'PrestaShopAutoload.php');
