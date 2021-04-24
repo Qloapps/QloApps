@@ -7,7 +7,8 @@
         "ext-zip": "*",
         "ext-soap": "*",
         "swiftmailer/swiftmailer": "5.2.2",
-        "pear/archive_tar": "^1.4.12"
+        "pear/archive_tar": "^1.4.12",
+        "tecnickcom/tcpdf": "6.2.12"
     },
     "name": "webkul/qloapps",
     "description": "QloApps is an Open-source and Free hotel reservation system and booking engine. With the help of QloApps, you can launch your hotel booking website without any cost and take & manage online bookings.",
