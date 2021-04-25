@@ -1,8 +1,0 @@
-HTML.TidyRemove
-TYPE: lookup
-VERSION: 2.0.0
-DEFAULT: array()
---DESCRIPTION--
-
-Fixes to remove from the default set of Tidy fixes as per your level.
---# vim: et sw=4 sts=4

@@ -1,8 +1,0 @@
-HTML.TargetBlank
-TYPE: bool
-VERSION: 4.4.0
-DEFAULT: FALSE
---DESCRIPTION--
-If enabled, <code>target=blank</code> attributes are added to all outgoing links.
-(This includes links from an HTTPS version of a page to an HTTP version.)
---# vim: et sw=4 sts=4

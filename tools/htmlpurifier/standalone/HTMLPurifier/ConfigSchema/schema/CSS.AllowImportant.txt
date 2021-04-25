@@ -1,8 +1,0 @@
-CSS.AllowImportant
-TYPE: bool
-DEFAULT: false
-VERSION: 3.1.0
---DESCRIPTION--
-This parameter determines whether or not !important cascade modifiers should
-be allowed in user CSS. If false, !important will stripped.
---# vim: et sw=4 sts=4

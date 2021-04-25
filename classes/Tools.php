@@ -3626,8 +3626,6 @@ exit;
 
     public static function purifyHTML($html, $uri_unescape = null, $allow_style = false)
     {
-        require_once(_PS_TOOL_DIR_.'htmlpurifier/HTMLPurifier.standalone.php');
-
         static $use_html_purifier = null;
         static $purifier = null;
 
