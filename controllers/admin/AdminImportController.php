@@ -1063,10 +1063,6 @@ class AdminImportControllerCore extends AdminController
             $parced_url['query'] = http_build_query($query_parts);
         }
 
-        if (!function_exists('http_build_url')) {
-            require_once(_PS_TOOL_DIR_.'http_build_url/http_build_url.php');
-        }
-
         $url = http_build_url('', $parced_url);
 
         $orig_tmpfile = $tmpfile;
