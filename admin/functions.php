@@ -96,15 +96,11 @@ function rewriteSettingsFile($base_urls = null, $theme = null, $array_db = null)
     $defines['_DB_PASSWD_'] = (($array_db && isset($array_db['_DB_PASSWD_'])) ? $array_db['_DB_PASSWD_'] : _DB_PASSWD_);
     $defines['_COOKIE_KEY_'] = addslashes(_COOKIE_KEY_);
     $defines['_COOKIE_IV_'] = addslashes(_COOKIE_IV_);
+    $defines['_NEW_COOKIE_KEY_'] = addslashes(_NEW_COOKIE_KEY_);
     $defines['_PS_CREATION_DATE_'] = addslashes(_PS_CREATION_DATE_);
 
-    if (defined('_RIJNDAEL_KEY_')) {
-        $defines['_RIJNDAEL_KEY_'] = addslashes(_RIJNDAEL_KEY_);
-    }
-    if (defined('_RIJNDAEL_IV_')) {
-        $defines['_RIJNDAEL_IV_'] = addslashes(_RIJNDAEL_IV_);
-    }
     $defines['_PS_VERSION_'] = addslashes(_PS_VERSION_);
+    $defines['_QLOAPPS_VERSION_'] = addslashes(_QLOAPPS_VERSION_);
     $content = "<?php\n\n";
     foreach ($defines as $k => $value) {
         if ($k == '_PS_VERSION_') {

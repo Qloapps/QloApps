@@ -87,6 +87,7 @@ class ConfigurationTestCore
                 'config_dir' => 'config',
                 'files' => false,
                 'mails_dir' => 'mails',
+                'openssl' => false,
                 'curl' => false,
                 'soap' => false,
                 'simplexml' => false,
@@ -112,7 +113,6 @@ class ConfigurationTestCore
             'new_phpversion' => false,
             'register_globals' => false,
             'gz' => false,
-            'mcrypt' => false,
             'mbstring' => false,
             'magicquotes' => false,
             'dom' => false,
@@ -145,12 +145,12 @@ class ConfigurationTestCore
 
     public static function test_phpversion()
     {
-        return version_compare(substr(phpversion(), 0, 5), '5.4.0', '>=');
+        return version_compare(substr(phpversion(), 0, 5), '5.6.0', '>=');
     }
 
     public static function test_new_phpversion()
     {
-        return version_compare(substr(phpversion(), 0, 5), '5.4.0', '>=');
+        return version_compare(substr(phpversion(), 0, 5), '5.6.0', '>=');
     }
 
     public static function test_mysql_support()
@@ -394,9 +394,9 @@ class ConfigurationTestCore
         return function_exists('mb_strtolower');
     }
 
-    public static function test_mcrypt()
+    public static function test_openssl()
     {
-        return function_exists('mcrypt_encrypt');
+        return function_exists('openssl_encrypt');
     }
 
     public static function test_sessions()
