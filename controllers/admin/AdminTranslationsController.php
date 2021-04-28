@@ -1019,7 +1019,7 @@ class AdminTranslationsControllerCore extends AdminController
         $arr_good_ext = array('.tpl', '.php');
 
         foreach ($files as $key => $file) {
-            if ($file{0} === '.' || in_array(substr($file, 0, strrpos($file, '.')), $this->all_iso_lang)) {
+            if ($file[0] === '.' || in_array(substr($file, 0, strrpos($file, '.')), $this->all_iso_lang)) {
                 unset($files[$key]);
             } elseif ($type_clear === 'file' && !in_array(substr($file, strrpos($file, '.')), $arr_good_ext)) {
                 unset($files[$key]);
@@ -2872,7 +2872,7 @@ class AdminTranslationsControllerCore extends AdminController
         $initial_root_dir = $root_dir;
         foreach ($modules as $module) {
             $root_dir = $initial_root_dir;
-            if ($module{0} == '.') {
+            if ($module[0] == '.') {
                 continue;
             }
 
