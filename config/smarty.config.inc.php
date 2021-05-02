@@ -29,7 +29,6 @@ define('_PS_SMARTY_DIR_', _PS_TOOL_DIR_.'smarty/');
 require_once(_PS_SMARTY_DIR_.'Smarty.class.php');
 
 global $smarty;
-$smarty = new SmartyCustom();
 if (Configuration::get('PS_SMARTY_LOCAL')) {
     $smarty = new SmartyCustom();
 } elseif (_PS_MODE_DEV_) {
