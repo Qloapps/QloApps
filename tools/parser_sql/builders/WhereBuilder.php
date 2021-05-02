@@ -31,35 +31,26 @@
  * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * @author    André Rothe <andre.rothe@phosco.info>
  * @copyright 2010-2014 Justin Swanhart and André Rothe
  * @license   http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
- * @version   SVN: $Id: WhereBuilder.php 830 2013-12-18 09:35:42Z phosco@gmx.de $
- * 
+ * @version   SVN: $Id$
+ *
  */
 
-require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
-require_once dirname(__FILE__) . '/../exceptions/UnableToCreateSQLException.php';
-require_once dirname(__FILE__) . '/ColumnReferenceBuilder.php';
-require_once dirname(__FILE__) . '/ConstantBuilder.php';
-require_once dirname(__FILE__) . '/OperatorBuilder.php';
-require_once dirname(__FILE__) . '/FunctionBuilder.php';
-require_once dirname(__FILE__) . '/InListBuilder.php';
-require_once dirname(__FILE__) . '/WhereExpressionBuilder.php';
-require_once dirname(__FILE__) . '/WhereBracketExpressionBuilder.php';
-require_once dirname(__FILE__) . '/UserVariableBuilder.php';
-require_once dirname(__FILE__) . '/SubQueryBuilder.php';
+namespace PHPSQLParser\builders;
+use PHPSQLParser\exceptions\UnableToCreateSQLException;
 
 /**
- * This class implements the builder for the WHERE part. 
+ * This class implements the builder for the WHERE part.
  * You can overwrite all functions to achieve another handling.
  *
  * @author  André Rothe <andre.rothe@phosco.info>
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
- *  
+ *
  */
-class WhereBuilder {
+class WhereBuilder implements Builder {
 
     protected function buildColRef($parsed) {
         $builder = new ColumnReferenceBuilder();
@@ -106,7 +97,12 @@ class WhereBuilder {
         return $builder->build($parsed);
     }
 
-    public function build($parsed) {
+    protected function buildReserved($parsed) {
+      $builder = new ReservedBuilder();
+      return $builder->build($parsed);
+    }
+
+    public function build(array $parsed) {
         $sql = "WHERE ";
         foreach ($parsed as $k => $v) {
             $len = strlen($sql);
@@ -120,7 +116,8 @@ class WhereBuilder {
             $sql .= $this->buildWhereExpression($v);
             $sql .= $this->buildWhereBracketExpression($v);
             $sql .= $this->buildUserVariable($v);
-
+            $sql .= $this->buildReserved($v);
+            
             if (strlen($sql) == $len) {
                 throw new UnableToCreateSQLException('WHERE', $k, $v, 'expr_type');
             }

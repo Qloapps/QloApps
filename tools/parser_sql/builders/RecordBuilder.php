@@ -35,15 +35,13 @@
  * @author    André Rothe <andre.rothe@phosco.info>
  * @copyright 2010-2014 Justin Swanhart and André Rothe
  * @license   http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
- * @version   SVN: $Id: RecordBuilder.php 830 2013-12-18 09:35:42Z phosco@gmx.de $
+ * @version   SVN: $Id$
  * 
  */
 
-require_once dirname(__FILE__) . '/../exceptions/UnableToCreateSQLException.php';
-require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
-require_once dirname(__FILE__) . '/OperatorBuilder.php';
-require_once dirname(__FILE__) . '/ConstantBuilder.php';
-require_once dirname(__FILE__) . '/FunctionBuilder.php';
+namespace PHPSQLParser\builders;
+use PHPSQLParser\exceptions\UnableToCreateSQLException;
+use PHPSQLParser\utils\ExpressionType;
 
 /**
  * This class implements the builder for the records within INSERT statement. 
@@ -53,7 +51,7 @@ require_once dirname(__FILE__) . '/FunctionBuilder.php';
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *  
  */
-class RecordBuilder {
+class RecordBuilder implements Builder {
 
     protected function buildOperator($parsed) {
         $builder = new OperatorBuilder();
@@ -70,9 +68,14 @@ class RecordBuilder {
         return $builder->build($parsed);
     }
 
-    public function build($parsed) {
+    protected function buildColRef($parsed) {
+        $builder = new ColumnReferenceBuilder();
+        return $builder->build($parsed);
+    }
+    
+    public function build(array $parsed) {
         if ($parsed['expr_type'] !== ExpressionType::RECORD) {
-            return "";
+            return isset($parsed['base_expr']) ? $parsed['base_expr'] : '';
         }
         $sql = "";
         foreach ($parsed['data'] as $k => $v) {
@@ -80,14 +83,15 @@ class RecordBuilder {
             $sql .= $this->buildConstant($v);
             $sql .= $this->buildFunction($v);
             $sql .= $this->buildOperator($v);
+            $sql .= $this->buildColRef($v);
 
             if ($len == strlen($sql)) {
                 throw new UnableToCreateSQLException(ExpressionType::RECORD, $k, $v, 'expr_type');
             }
 
-            $sql .= ",";
+            $sql .= ", ";
         }
-        $sql = substr($sql, 0, -1);
+        $sql = substr($sql, 0, -2);
         return "(" . $sql . ")";
     }
 

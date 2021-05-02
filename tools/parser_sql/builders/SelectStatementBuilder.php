@@ -35,16 +35,11 @@
  * @author    André Rothe <andre.rothe@phosco.info>
  * @copyright 2010-2014 Justin Swanhart and André Rothe
  * @license   http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
- * @version   SVN: $Id: SelectStatementBuilder.php 830 2013-12-18 09:35:42Z phosco@gmx.de $
+ * @version   SVN: $Id$
  * 
  */
 
-require_once dirname(__FILE__) . '/LimitBuilder.php';
-require_once dirname(__FILE__) . '/SelectBuilder.php';
-require_once dirname(__FILE__) . '/FromBuilder.php';
-require_once dirname(__FILE__) . '/WhereBuilder.php';
-require_once dirname(__FILE__) . '/GroupByBuilder.php';
-require_once dirname(__FILE__) . '/OrderByBuilder.php';
+namespace PHPSQLParser\builders;
 
 /**
  * This class implements the builder for the whole Select statement. You can overwrite
@@ -54,7 +49,7 @@ require_once dirname(__FILE__) . '/OrderByBuilder.php';
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *  
  */
-class SelectStatementBuilder {
+class SelectStatementBuilder implements Builder {
 
     protected function buildSELECT($parsed) {
         $builder = new SelectBuilder();
@@ -76,6 +71,11 @@ class SelectStatementBuilder {
         return $builder->build($parsed);
     }
 
+    protected function buildHAVING($parsed) {
+        $builder = new HavingBuilder();
+        return $builder->build($parsed);
+    }
+
     protected function buildORDER($parsed) {
         $builder = new OrderByBuilder();
         return $builder->build($parsed);
@@ -85,9 +85,22 @@ class SelectStatementBuilder {
         $builder = new LimitBuilder();
         return $builder->build($parsed);
     }
+    
+    protected function buildUNION($parsed) {
+    	$builder = new UnionStatementBuilder();
+    	return $builder->build($parsed);
+    }
+    
+    protected function buildUNIONALL($parsed) {
+    	$builder = new UnionAllStatementBuilder();
+    	return $builder->build($parsed);
+    }
 
-    public function build($parsed) {
-        $sql = $this->buildSELECT($parsed['SELECT']);
+    public function build(array $parsed) {
+        $sql = "";
+        if (isset($parsed['SELECT'])) {
+            $sql .= $this->buildSELECT($parsed['SELECT']);
+        }
         if (isset($parsed['FROM'])) {
             $sql .= " " . $this->buildFROM($parsed['FROM']);
         }
@@ -97,11 +110,20 @@ class SelectStatementBuilder {
         if (isset($parsed['GROUP'])) {
             $sql .= " " . $this->buildGROUP($parsed['GROUP']);
         }
+        if (isset($parsed['HAVING'])) {
+            $sql .= " " . $this->buildHAVING($parsed['HAVING']);
+        }
         if (isset($parsed['ORDER'])) {
             $sql .= " " . $this->buildORDER($parsed['ORDER']);
         }
         if (isset($parsed['LIMIT'])) {
             $sql .= " " . $this->buildLIMIT($parsed['LIMIT']);
+        }       
+        if (isset($parsed['UNION'])) {
+            $sql .= " " . $this->buildUNION($parsed);
+        }
+        if (isset($parsed['UNION ALL'])) {
+        	$sql .= " " . $this->buildUNIONALL($parsed);
         }
         return $sql;
     }

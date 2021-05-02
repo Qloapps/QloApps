@@ -35,12 +35,12 @@
  * @author    André Rothe <andre.rothe@phosco.info>
  * @copyright 2010-2014 Justin Swanhart and André Rothe
  * @license   http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
- * @version   SVN: $Id: LikeBuilder.php 830 2013-12-18 09:35:42Z phosco@gmx.de $
+ * @version   SVN: $Id$
  * 
  */
 
-require_once dirname(__FILE__) . '/../exceptions/UnableToCreateSQLException.php';
-require_once dirname(__FILE__) . '/TableBuilder.php';
+namespace PHPSQLParser\builders;
+use PHPSQLParser\exceptions\UnableToCreateSQLException;
 
 /**
  * This class implements the builder for the LIKE statement part of CREATE TABLE. 
@@ -50,17 +50,17 @@ require_once dirname(__FILE__) . '/TableBuilder.php';
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *  
  */
-class LikeBuilder {
+class LikeBuilder implements Builder {
 
     protected function buildTable($parsed, $index) {
         $builder = new TableBuilder();
         return $builder->build($parsed, $index);
     }
-    
-    public function build($parsed) {
+
+    public function build(array $parsed) {
         $sql = $this->buildTable($parsed, 0);
         if (strlen($sql) === 0) {
-            throw new UnableToCreateSQLException('LIKE', "", $like, 'table');
+            throw new UnableToCreateSQLException('LIKE', "", $parsed, 'table');
         }
         return "LIKE " . $sql;
     }

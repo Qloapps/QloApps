@@ -30,7 +30,7 @@
  * DAMAGE.
  */
 
-require_once(dirname(__FILE__) . '/AbstractProcessor.php');
+namespace PHPSQLParser\processors;
 
 /**
  * 
