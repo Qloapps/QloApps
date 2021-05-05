@@ -11,8 +11,8 @@
 /**
  * Analyzes characters for a specific character set.
  *
- * @author     Chris Corbyn
- * @author     Xavier De Cock <xdecock@gmail.com>
+ * @author Chris Corbyn
+ * @author Xavier De Cock <xdecock@gmail.com>
  */
 interface Swift_CharacterReader
 {
@@ -21,12 +21,12 @@ interface Swift_CharacterReader
     const MAP_TYPE_POSITIONS = 0x03;
 
     /**
-     * Returns the complete character map
+     * Returns the complete character map.
      *
-     * @param string  $string
-     * @param int     $startOffset
-     * @param array   $currentMap
-     * @param mixed   $ignoredChars
+     * @param string $string
+     * @param int    $startOffset
+     * @param array  $currentMap
+     * @param mixed  $ignoredChars
      *
      * @return int
      */
@@ -48,8 +48,8 @@ interface Swift_CharacterReader
      * A value of zero means this is already a valid character.
      * A value of -1 means this cannot possibly be a valid character.
      *
-     * @param integer[] $bytes
-     * @param int       $size
+     * @param int[] $bytes
+     * @param int   $size
      *
      * @return int
      */

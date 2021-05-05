@@ -11,7 +11,7 @@
 /**
  * A null KeyCache that does not cache at all.
  *
- * @author     Chris Corbyn
+ * @author Chris Corbyn
  */
 class Swift_KeyCache_NullKeyCache implements Swift_KeyCache
 {
@@ -20,10 +20,10 @@ class Swift_KeyCache_NullKeyCache implements Swift_KeyCache
      *
      * @see MODE_WRITE, MODE_APPEND
      *
-     * @param string  $nsKey
-     * @param string  $itemKey
-     * @param string  $string
-     * @param int     $mode
+     * @param string $nsKey
+     * @param string $itemKey
+     * @param string $string
+     * @param int    $mode
      */
     public function setString($nsKey, $itemKey, $string, $mode)
     {
