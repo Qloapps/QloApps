@@ -35,13 +35,13 @@
  * @author    André Rothe <andre.rothe@phosco.info>
  * @copyright 2010-2014 Justin Swanhart and André Rothe
  * @license   http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
- * @version   SVN: $Id: LikeExpressionBuilder.php 906 2014-01-07 14:38:08Z phosco@gmx.de $
+ * @version   SVN: $Id$
  * 
  */
 
-require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
-require_once dirname(__FILE__) . '/TableBuilder.php';
-require_once dirname(__FILE__) . '/ReservedBuilder.php';
+namespace PHPSQLParser\builders;
+use PHPSQLParser\exceptions\UnableToCreateSQLException;
+use PHPSQLParser\utils\ExpressionType;
 
 /**
  * This class implements the builder for the (LIKE) keyword within a 
@@ -53,7 +53,7 @@ require_once dirname(__FILE__) . '/ReservedBuilder.php';
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *  
  */
-class LikeExpressionBuilder {
+class LikeExpressionBuilder implements Builder {
 
     protected function buildTable($parsed, $index) {
         $builder = new TableBuilder();
@@ -65,7 +65,7 @@ class LikeExpressionBuilder {
         return $builder->build($parsed);
     }
 
-    public function build($parsed) {
+    public function build(array $parsed) {
         if ($parsed['expr_type'] !== ExpressionType::LIKE) {
             return "";
         }

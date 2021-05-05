@@ -2222,8 +2222,8 @@ class ToolsCore
     public static function parserSQL($sql)
     {
         if (strlen($sql) > 0) {
-            require_once(_PS_TOOL_DIR_.'parser_sql/PHPSQLParser.php');
-            $parser = new PHPSQLParser($sql);
+            require_once _PS_TOOL_DIR_.'parser_sql/php_sql_parser_autoload.php';
+            $parser = new PHPSQLParser\PHPSQLParser($sql);
             return $parser->parsed;
         }
         return false;

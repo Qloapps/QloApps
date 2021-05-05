@@ -35,16 +35,13 @@
  * @author    André Rothe <andre.rothe@phosco.info>
  * @copyright 2010-2014 Justin Swanhart and André Rothe
  * @license   http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
- * @version   SVN: $Id: ForeignKeyBuilder.php 927 2014-01-08 13:01:17Z phosco@gmx.de $
+ * @version   SVN: $Id$
  * 
  */
 
-require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
-require_once dirname(__FILE__) . '/../exceptions/UnableToCreateSQLException.php';
-require_once dirname(__FILE__) . '/ConstantBuilder.php';
-require_once dirname(__FILE__) . '/ReservedBuilder.php';
-require_once dirname(__FILE__) . '/ColumnListBuilder.php';
-require_once dirname(__FILE__) . '/ForeignRefBuilder.php';
+namespace PHPSQLParser\builders;
+use PHPSQLParser\exceptions\UnableToCreateSQLException;
+use PHPSQLParser\utils\ExpressionType;
 
 /**
  * This class implements the builder for the FOREIGN KEY statement part of CREATE TABLE. 
@@ -54,7 +51,7 @@ require_once dirname(__FILE__) . '/ForeignRefBuilder.php';
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *  
  */
-class ForeignKeyBuilder {
+class ForeignKeyBuilder implements Builder {
 
     protected function buildConstant($parsed) {
         $builder = new ConstantBuilder();
@@ -76,7 +73,7 @@ class ForeignKeyBuilder {
         return $builder->build($parsed);
     }
     
-    public function build($parsed) {
+    public function build(array $parsed) {
         if ($parsed['expr_type'] !== ExpressionType::FOREIGN_KEY) {
             return "";
         }
