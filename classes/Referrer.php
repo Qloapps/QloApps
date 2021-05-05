@@ -236,7 +236,7 @@ class ReferrerCore extends ObjectModel
         if ($implode) {
             $sql = 'SELECT COUNT(id_order) AS orders, SUM(total_paid_real / conversion_rate) AS sales
 					FROM '._DB_PREFIX_.'orders
-					WHERE id_order IN ('.implode($implode, ',').')
+					WHERE id_order IN ('.implode(',', $implode).')
 						'.Shop::addSqlRestriction(Shop::SHARE_ORDER).'
 						AND valid = 1';
             return Db::getInstance(_PS_USE_SQL_SLAVE_)->getRow($sql);

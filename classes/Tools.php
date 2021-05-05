@@ -104,65 +104,7 @@ class ToolsCore
             }
         }
 
-        if (function_exists('mcrypt_create_iv')) {
-            $bytes = mcrypt_create_iv($length, MCRYPT_DEV_URANDOM);
-
-            if ($bytes !== false && strlen($bytes) === $length) {
-                return $bytes;
-            }
-        }
-
-        // Else try to get $length bytes of entropy.
-        // Thanks to Zend
-
-        $result         = '';
-        $entropy        = '';
-        $msec_per_round = 400;
-        $bits_per_round = 2;
-        $total          = $length;
-        $hash_length    = 20;
-
-        while (strlen($result) < $length) {
-            $bytes  = ($total > $hash_length) ? $hash_length : $total;
-            $total -= $bytes;
-
-            for ($i=1; $i < 3; $i++) {
-                $t1 = microtime(true);
-                $seed = mt_rand();
-
-                for ($j=1; $j < 50; $j++) {
-                    $seed = sha1($seed);
-                }
-
-                $t2 = microtime(true);
-                $entropy .= $t1 . $t2;
-            }
-
-            $div = (int) (($t2 - $t1) * 1000000);
-
-            if ($div <= 0) {
-                $div = 400;
-            }
-
-            $rounds = (int) ($msec_per_round * 50 / $div);
-            $iter = $bytes * (int) (ceil(8 / $bits_per_round));
-
-            for ($i = 0; $i < $iter; $i ++) {
-                $t1 = microtime();
-                $seed = sha1(mt_rand());
-
-                for ($j = 0; $j < $rounds; $j++) {
-                    $seed = sha1($seed);
-                }
-
-                $t2 = microtime();
-                $entropy .= $t1 . $t2;
-            }
-
-            $result .= sha1($entropy, true);
-        }
-
-        return substr($result, 0, $length);
+        return false;
     }
 
     public static function strReplaceFirst($search, $replace, $subject, $cur = 0)
@@ -1822,10 +1764,10 @@ class ToolsCore
         return Tools::strtoupper(Tools::substr($str, 0, 1)).Tools::substr($str, 1);
     }
 
-    public static function ucwords($str)
+    public static function ucwords($str, $encoding = 'utf-8')
     {
         if (function_exists('mb_convert_case')) {
-            return mb_convert_case($str, MB_CASE_TITLE);
+            return mb_convert_case($str, MB_CASE_TITLE, $encoding);
         }
         return ucwords(Tools::strtolower($str));
     }

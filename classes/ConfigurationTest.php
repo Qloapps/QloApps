@@ -180,7 +180,7 @@ class ConfigurationTestCore
 
     public static function test_magicquotes()
     {
-        return !get_magic_quotes_gpc();
+        return function_exists('get_magic_quotes_gpc') ? !get_magic_quotes_gpc() : true;
     }
 
     public static function test_upload()

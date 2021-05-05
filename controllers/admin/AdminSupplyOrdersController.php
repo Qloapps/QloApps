@@ -719,7 +719,7 @@ class AdminSupplyOrdersControllerCore extends AdminController
                 }
 
                 $this->tpl_form_vars['products_list'] = $products;
-                $this->tpl_form_vars['product_ids'] = implode($product_ids, '|');
+                $this->tpl_form_vars['product_ids'] = implode('|', $product_ids);
                 $this->tpl_form_vars['product_ids_to_delete'] = '';
                 $this->tpl_form_vars['supplier_id'] = $supply_order->id_supplier;
                 $this->tpl_form_vars['currency'] = $currency;
