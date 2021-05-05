@@ -261,15 +261,14 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
         /*If Admin update the status of the order cancellation request*/
         if (Tools::isSubmit('submitRefundReqBookings')) {
             $idOrderReturn = Tools::getValue('id_order_return');
+            $idsReturnDetail = Tools::getValue('id_order_return_detail');
             if (Validate::isLoadedObject($objOrderReturn = new OrderReturn($idOrderReturn))) {
                 $objOrder = new Order($objOrderReturn->id_order);
+                $hasOrderPaid = $objOrder->hasBeenPaid();
                 $idRefundState = Tools::getValue('id_refund_state');
                 if (Validate::isLoadedObject($objRefundState = new OrderReturnState($idRefundState))) {
                     if ($objRefundState->refunded) {
                         $refundedAmounts = Tools::getValue('refund_amounts');
-                        $idsReturnDetail = Tools::getValue('id_order_return_detail');
-
-                        $hasOrderPaid = $objOrder->hasBeenPaid();
 
                         if ($hasOrderPaid) {
                             if ($idsReturnDetail && count($idsReturnDetail)) {

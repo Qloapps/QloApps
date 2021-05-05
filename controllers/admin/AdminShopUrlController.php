@@ -281,7 +281,7 @@ class AdminShopUrlControllerCore extends AdminController
         }
 
         $this->tpl_form_vars = array(
-            'js_shop_url' => Tools::jsonEncode($list_shop_with_url)
+            'js_shop_url' => json_encode($list_shop_with_url)
         );
 
         $this->fields_value = array(

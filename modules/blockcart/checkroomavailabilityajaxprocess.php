@@ -57,21 +57,21 @@
                                     break;
                                 }
                             }
-                            die(Tools::jsonEncode(array('status'=>'success', 'avail_rooms'=>$total_available_rooms)));
+                            die(json_encode(array('status'=>'success', 'avail_rooms'=>$total_available_rooms)));
                         } else {
-                            die(Tools::jsonEncode(array('status'=>'failed1')));
+                            die(json_encode(array('status'=>'failed1')));
                         }
                     } else {
-                        die(Tools::jsonEncode(array('status'=>'unavailable_quantity', 'avail_rooms'=>$total_available_rooms)));
+                        die(json_encode(array('status'=>'unavailable_quantity', 'avail_rooms'=>$total_available_rooms)));
                     }
                 } else {
-                    die(Tools::jsonEncode(array('status'=>'failed2')));
+                    die(json_encode(array('status'=>'failed2')));
                 }
             } else {
-                die(Tools::jsonEncode(array('status'=>'failed3')));
+                die(json_encode(array('status'=>'failed3')));
             }
         } else {
-            die(Tools::jsonEncode(array('status'=>'failed4')));
+            die(json_encode(array('status'=>'failed4')));
         }
     }
 
@@ -94,9 +94,9 @@
         $result = $obj_htl_cart_booking_data->deleteCartBookingData($id_cart, $id_product);
 
         if ($result) {
-            die(Tools::jsonEncode(array('status'=>'success', 'avail_rooms'=>$total_available_rooms)));
+            die(json_encode(array('status'=>'success', 'avail_rooms'=>$total_available_rooms)));
         } else {
-            die(Tools::jsonEncode(array('status'=>'failed')));
+            die(json_encode(array('status'=>'failed')));
         }
     }
 
@@ -109,10 +109,10 @@
             $cart_obj = new Cart($id_cart);
             $update_cart_product = $cart_obj->updateQty($num_rooms_to_decr_from_cart, $id_product, null, false, $operator = 'down', 0, null, true);
             if ($update_cart_product) {
-                die(Tools::jsonEncode(array('status'=>'success', 'msg'=>'successfully cart product updated.')));
+                die(json_encode(array('status'=>'success', 'msg'=>'successfully cart product updated.')));
             } else {
-                die(Tools::jsonEncode(array('status'=>'failed', 'msg'=>'error while updating cart product.')));
+                die(json_encode(array('status'=>'failed', 'msg'=>'error while updating cart product.')));
             }
         }
-        die(Tools::jsonEncode(array('status'=>'failed', 'msg'=>'error while deleting room from cart booking table.')));
+        die(json_encode(array('status'=>'failed', 'msg'=>'error while deleting room from cart booking table.')));
     }

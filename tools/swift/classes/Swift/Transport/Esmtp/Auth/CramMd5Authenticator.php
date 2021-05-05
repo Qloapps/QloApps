@@ -11,7 +11,7 @@
 /**
  * Handles CRAM-MD5 authentication.
  *
- * @author     Chris Corbyn
+ * @author Chris Corbyn
  */
 class Swift_Transport_Esmtp_Auth_CramMd5Authenticator implements Swift_Transport_Esmtp_Authenticator
 {
@@ -73,7 +73,7 @@ class Swift_Transport_Esmtp_Auth_CramMd5Authenticator implements Swift_Transport
         $k_ipad = substr($secret, 0, 64) ^ str_repeat(chr(0x36), 64);
         $k_opad = substr($secret, 0, 64) ^ str_repeat(chr(0x5C), 64);
 
-        $inner  = pack('H32', md5($k_ipad.$challenge));
+        $inner = pack('H32', md5($k_ipad.$challenge));
         $digest = md5($k_opad.$inner);
 
         return $digest;

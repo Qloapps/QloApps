@@ -1,4 +1,14 @@
 -----------------------------
+# V1.0.2 to V1.0.3
+-----------------------------
+
+## Improved/changed features:
+
+[*] BO : [#206] Removed filter settings from Other Modules setting from admin Hotel Reservation System -> Settings and added in module configuration.
+
+[*] FO : [#208] Room type listing on search result page moved to different template "room_type_listing.tpl" updated filter result.
+
+-----------------------------
 # V1.0.1 to V1.0.2
 -----------------------------
 

@@ -35,15 +35,12 @@
  * @author    André Rothe <andre.rothe@phosco.info>
  * @copyright 2010-2014 Justin Swanhart and André Rothe
  * @license   http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
- * @version   SVN: $Id: SelectBuilder.php 903 2014-01-06 11:29:19Z phosco@gmx.de $
+ * @version   SVN: $Id$
  * 
  */
-require_once dirname(__FILE__) . '/../exceptions/UnableToCreateSQLException.php';
-require_once dirname(__FILE__) . '/ConstantBuilder.php';
-require_once dirname(__FILE__) . '/FunctionBuilder.php';
-require_once dirname(__FILE__) . '/SelectExpressionBuilder.php';
-require_once dirname(__FILE__) . '/SelectBracketExpressionBuilder.php';
-require_once dirname(__FILE__) . '/ColumnReferenceBuilder.php';
+
+namespace PHPSQLParser\builders;
+use PHPSQLParser\exceptions\UnableToCreateSQLException;
 
 /**
  * This class implements the builder for the [SELECT] field. You can overwrite
@@ -53,7 +50,7 @@ require_once dirname(__FILE__) . '/ColumnReferenceBuilder.php';
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *  
  */
-class SelectBuilder {
+class SelectBuilder implements Builder {
 
     protected function buildConstant($parsed) {
         $builder = new ConstantBuilder();
@@ -92,10 +89,10 @@ class SelectBuilder {
      * @return a string, which is added right after the expression
      */
     protected function getDelimiter($parsed) {
-        return ($parsed['delim'] === false ? '' : (trim($parsed['delim']) . ' '));
+        return (!isset($parsed['delim']) || $parsed['delim'] === false ? '' : (trim($parsed['delim']) . ' '));
     }
 
-    public function build($parsed) {
+    public function build(array $parsed) {
         $sql = "";
         foreach ($parsed as $k => $v) {
             $len = strlen($sql);

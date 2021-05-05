@@ -19,7 +19,8 @@
  *   ->setPassword('YOUR_ACCESS_TOKEN');
  * </code>
  *
- * @author     xu.li<AthenaLightenedMyPath@gmail.com>
+ * @author xu.li<AthenaLightenedMyPath@gmail.com>
+ *
  * @see        https://developers.google.com/google-apps/gmail/xoauth2_protocol
  */
 class Swift_Transport_Esmtp_Auth_XOAuth2Authenticator implements Swift_Transport_Esmtp_Authenticator
@@ -47,7 +48,7 @@ class Swift_Transport_Esmtp_Auth_XOAuth2Authenticator implements Swift_Transport
     {
         try {
             $param = $this->constructXOAuth2Params($email, $token);
-            $agent->executeCommand("AUTH XOAUTH2 ".$param."\r\n", array(235));
+            $agent->executeCommand('AUTH XOAUTH2 '.$param."\r\n", array(235));
 
             return true;
         } catch (Swift_TransportException $e) {
@@ -58,7 +59,7 @@ class Swift_Transport_Esmtp_Auth_XOAuth2Authenticator implements Swift_Transport
     }
 
     /**
-     * Construct the auth parameter
+     * Construct the auth parameter.
      *
      * @see https://developers.google.com/google-apps/gmail/xoauth2_protocol#the_sasl_xoauth2_mechanism
      */

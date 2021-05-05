@@ -399,6 +399,7 @@
 						</div>
 					{/if}
 				{/if}
+				{if isset($HOOK_EXTRA_RIGHT) && $HOOK_EXTRA_RIGHT}{$HOOK_EXTRA_RIGHT}{/if}
 			</div>
 
 		</div> <!-- end primary_block -->

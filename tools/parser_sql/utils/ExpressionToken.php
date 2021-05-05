@@ -1,6 +1,9 @@
 <?php
 
-require_once dirname(__FILE__) . '/ExpressionType.php';
+namespace PHPSQLParser\utils;
+
+use PHPSQLParser\Options;
+use PHPSQLParser\processors\DefaultProcessor;
 
 class ExpressionToken {
 
@@ -30,7 +33,7 @@ class ExpressionToken {
     }
 
     public function isEnclosedWithinParenthesis() {
-        return ($this->upper[0] === '(' && substr($this->upper, -1) === ')');
+        return (!empty( $this->upper ) && $this->upper[0] === '(' && substr($this->upper, -1) === ')');
     }
 
     public function setSubTree($tree) {
@@ -53,10 +56,10 @@ class ExpressionToken {
         return $idx !== false ? $this->token[$idx] : $this->token;
     }
 
-    public function setNoQuotes($token, $qchars = '`') {
-        $this->noQuotes = ($token === null) ? null : $this->revokeQuotation($token, $qchars);
+    public function setNoQuotes($token, $qchars, Options $options) {
+        $this->noQuotes = ($token === null) ? null : $this->revokeQuotation($token, $options);
     }
-    
+
     public function setTokenType($type) {
         $this->tokenType = $type;
     }
@@ -84,7 +87,7 @@ class ExpressionToken {
     }
 
     public function isSubQueryToken() {
-        return preg_match("/^\\(\\s*SELECT/i", $this->trim);
+        return preg_match("/^\\(\\s*(-- [\\w\\s]+\\n)?\\s*SELECT/i", $this->trim);
     }
 
     public function isExpression() {
@@ -114,9 +117,13 @@ class ExpressionToken {
     public function isVariable() {
         return $this->tokenType === ExpressionType::GLOBAL_VARIABLE || $this->tokenType === ExpressionType::LOCAL_VARIABLE || $this->tokenType === ExpressionType::USER_VARIABLE;
     }
-    
+
     public function isAggregateFunction() {
         return $this->tokenType === ExpressionType::AGGREGATE_FUNCTION;
+    }
+
+    public function isCustomFunction() {
+        return $this->tokenType === ExpressionType::CUSTOM_FUNCTION;
     }
 
     public function isColumnReference() {
@@ -135,24 +142,17 @@ class ExpressionToken {
         return $this->tokenType === ExpressionType::SUBQUERY;
     }
 
-    private function revokeQuotation($token, $qchars = '`') {
-        $result = trim($token);
-        for ($i = 0; $i < strlen($qchars); $i++) {
-            $quote = $qchars[$i];
-            if (($result[0] === $quote) && ($result[strlen($result) - 1] === $quote)) {
-                $result = substr($result, 1, -1);
-                return trim(str_replace($quote.$quote, $quote, $result));
-            }
-        }
-        return $token;
+    private function revokeQuotation($token, Options $options) {
+        $defProc = new DefaultProcessor($options);
+        return $defProc->revokeQuotation($token);
     }
-    
+
     public function toArray() {
         $result = array();
         $result['expr_type'] = $this->tokenType;
         $result['base_expr'] = $this->token;
         if (!empty($this->noQuotes)) {
-            $result['no_quotes'] = $this->noQuotes;   
+            $result['no_quotes'] = $this->noQuotes;
         }
         $result['sub_tree'] = $this->subTree;
         return $result;

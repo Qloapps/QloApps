@@ -4,7 +4,8 @@
 			<div class="row">
 				<div class="col-sm-4">
 					<a href="{$room_v['product_link']}">
-					<img src="{$room_v['image']}" class="img-responsive">
+						<img src="{$room_v['image']}" class="img-responsive">
+						{hook h='displayRoomTypeListImageAfter' product=$room_v}
 					</a>
 				</div>
 				<div class="col-sm-8">

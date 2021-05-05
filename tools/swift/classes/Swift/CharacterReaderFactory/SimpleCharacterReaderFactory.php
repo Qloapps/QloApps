@@ -11,7 +11,7 @@
 /**
  * Standard factory for creating CharacterReaders.
  *
- * @author     Chris Corbyn
+ * @author Chris Corbyn
  */
 class Swift_CharacterReaderFactory_SimpleCharacterReaderFactory implements Swift_CharacterReaderFactory
 {

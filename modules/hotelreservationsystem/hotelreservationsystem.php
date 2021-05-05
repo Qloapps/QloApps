@@ -29,7 +29,7 @@ class hotelreservationsystem extends Module
     public function __construct()
     {
         $this->name = 'hotelreservationsystem';
-        $this->version = '1.4.1';
+        $this->version = '1.4.2';
         $this->author = 'Webkul';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -299,7 +299,7 @@ class hotelreservationsystem extends Module
                                 if (Validate::isLoadedObject(
                                     $objCartBooking = new HotelCartBookingData($demandInfo['id'])
                                 )) {
-                                    $objCartBooking->extra_demands = Tools::jsonEncode($demandInfo['extra_demands']);
+                                    $objCartBooking->extra_demands = json_encode($demandInfo['extra_demands']);
                                     $objCartBooking->save();
                                 }
                             }
@@ -411,7 +411,7 @@ class hotelreservationsystem extends Module
                         $idLang
                     ))) {
                         $objHtlBkDtl->hotel_name = $objHotelBranch->hotel_name;
-                        $objHtlBkDtl->room_type_name = $product['product_name'];
+                        $objHtlBkDtl->room_type_name = $product['name'];
                         $objHtlBkDtl->city = $objHotelBranch->city;
                         $objHtlBkDtl->state = State::getNameById($objHotelBranch->state_id);
                         $objHtlBkDtl->country = Country::getNameById($idLang, $objHotelBranch->country_id);
@@ -443,7 +443,7 @@ class hotelreservationsystem extends Module
                     if ($objHtlBkDtl->save()) {
                         // save extra demands info
                         if ($objCartBkData->extra_demands
-                            && ($extraDemands = Tools::jsonDecode($objCartBkData->extra_demands, true))
+                            && ($extraDemands = json_decode($objCartBkData->extra_demands, true))
                         ) {
                             $objRoomDemandPrice = new HotelRoomTypeDemandPrice();
                             foreach ($extraDemands as $demand) {

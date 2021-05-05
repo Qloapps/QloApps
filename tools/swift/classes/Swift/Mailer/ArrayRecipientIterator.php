@@ -11,7 +11,7 @@
 /**
  * Wraps a standard PHP array in an iterator.
  *
- * @author     Chris Corbyn
+ * @author Chris Corbyn
  */
 class Swift_Mailer_ArrayRecipientIterator implements Swift_Mailer_RecipientIterator
 {
@@ -44,7 +44,7 @@ class Swift_Mailer_ArrayRecipientIterator implements Swift_Mailer_RecipientItera
 
     /**
      * Returns an array where the keys are the addresses of recipients and the
-     * values are the names. e.g. ('foo@bar' => 'Foo') or ('foo@bar' => NULL)
+     * values are the names. e.g. ('foo@bar' => 'Foo') or ('foo@bar' => NULL).
      *
      * @return array
      */

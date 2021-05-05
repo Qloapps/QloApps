@@ -11,7 +11,7 @@
 /**
  * A base Event which all Event classes inherit from.
  *
- * @author     Chris Corbyn
+ * @author Chris Corbyn
  */
 class Swift_Events_EventObject implements Swift_Events_Event
 {
@@ -44,7 +44,7 @@ class Swift_Events_EventObject implements Swift_Events_Event
     /**
      * Prevent this Event from bubbling any further up the stack.
      *
-     * @param bool    $cancel, optional
+     * @param bool $cancel, optional
      */
     public function cancelBubble($cancel = true)
     {

@@ -83,7 +83,7 @@ class ConfigurationTestCore
                 ),
                 'phpversion' => false,
                 'gd' => false,
-                'mysql_support' => false,
+                'pdo_mysql' => false,
                 'config_dir' => 'config',
                 'files' => false,
                 'mails_dir' => 'mails',
@@ -95,6 +95,7 @@ class ConfigurationTestCore
                 'upload_max_filesize' => false,
                 'max_execution_time' => false,
                 'fopen' => false,
+                'zip' => false,
             ));
         }
 
@@ -116,7 +117,6 @@ class ConfigurationTestCore
             'mbstring' => false,
             'magicquotes' => false,
             'dom' => false,
-            'pdo_mysql' => false,
         );
     }
 
@@ -155,7 +155,7 @@ class ConfigurationTestCore
 
     public static function test_mysql_support()
     {
-        return extension_loaded('mysql') || extension_loaded('mysqli') || extension_loaded('pdo_mysql');
+        return extension_loaded('mysqli') || extension_loaded('pdo_mysql');
     }
 
     public static function test_pdo_mysql()
@@ -180,7 +180,7 @@ class ConfigurationTestCore
 
     public static function test_magicquotes()
     {
-        return !get_magic_quotes_gpc();
+        return function_exists('get_magic_quotes_gpc') ? !get_magic_quotes_gpc() : true;
     }
 
     public static function test_upload()
@@ -214,6 +214,12 @@ class ConfigurationTestCore
         }
         return false;
     }
+
+    public static function test_zip()
+    {
+        return extension_loaded('zip');
+    }
+
 
     public static function test_fopen()
     {

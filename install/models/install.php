@@ -652,7 +652,6 @@ class InstallModelInstall extends InstallAbstractModel
                 'wkhotelfeaturesblock',
                 'wkhotelroom',
                 'wktestimonialblock',
-                'socialsharing',
                 'bankwire',
                 'cheque',
                 'paypal',

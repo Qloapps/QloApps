@@ -23,6 +23,7 @@ class Smarty_Internal_Compile_Include_Php extends Smarty_Internal_CompileBase
      * @see Smarty_Internal_CompileBase
      */
     public $required_attributes = array('file');
+
     /**
      * Attribute definition: Overwrites base class.
      *
@@ -30,6 +31,7 @@ class Smarty_Internal_Compile_Include_Php extends Smarty_Internal_CompileBase
      * @see Smarty_Internal_CompileBase
      */
     public $shorttag_order = array('file');
+
     /**
      * Attribute definition: Overwrites base class.
      *
@@ -41,28 +43,32 @@ class Smarty_Internal_Compile_Include_Php extends Smarty_Internal_CompileBase
     /**
      * Compiles code for the {include_php} tag
      *
-     * @param  array  $args     array with attributes from parser
-     * @param  object $compiler compiler object
+     * @param array                                 $args     array with attributes from parser
+     * @param \Smarty_Internal_TemplateCompilerBase $compiler compiler object
      *
-     * @throws SmartyException
-     * @return string compiled code
+     * @return string
+     * @throws \SmartyCompilerException
+     * @throws \SmartyException
      */
-    public function compile($args, $compiler)
+    public function compile($args, Smarty_Internal_TemplateCompilerBase $compiler)
     {
         if (!($compiler->smarty instanceof SmartyBC)) {
             throw new SmartyException("{include_php} is deprecated, use SmartyBC class to enable");
         }
         // check and get attributes
         $_attr = $this->getAttributes($compiler, $args);
-
-        /** @var Smarty_Internal_Template $_smarty_tpl
+        /**
+         *
+         *
+         * @var Smarty_Internal_Template $_smarty_tpl
          * used in evaluated code
          */
         $_smarty_tpl = $compiler->template;
         $_filepath = false;
-        eval('$_file = ' . $_attr['file'] . ';');
+        $_file = null;
+        eval('$_file = @' . $_attr[ 'file' ] . ';');
         if (!isset($compiler->smarty->security_policy) && file_exists($_file)) {
-            $_filepath = $_file;
+            $_filepath = $compiler->smarty->_realpath($_file, true);
         } else {
             if (isset($compiler->smarty->security_policy)) {
                 $_dir = $compiler->smarty->security_policy->trusted_dir;
@@ -70,36 +76,33 @@ class Smarty_Internal_Compile_Include_Php extends Smarty_Internal_CompileBase
                 $_dir = $compiler->smarty->trusted_dir;
             }
             if (!empty($_dir)) {
-                foreach ((array) $_dir as $_script_dir) {
-                    $_script_dir = rtrim($_script_dir, '/\\') . DS;
-                    if (file_exists($_script_dir . $_file)) {
-                        $_filepath = $_script_dir . $_file;
+                foreach ((array)$_dir as $_script_dir) {
+                    $_path = $compiler->smarty->_realpath($_script_dir . DIRECTORY_SEPARATOR . $_file, true);
+                    if (file_exists($_path)) {
+                        $_filepath = $_path;
                         break;
                     }
                 }
             }
         }
-        if ($_filepath == false) {
-            $compiler->trigger_template_error("{include_php} file '{$_file}' is not readable", $compiler->lex->taglineno);
+        if ($_filepath === false) {
+            $compiler->trigger_template_error("{include_php} file '{$_file}' is not readable", null, true);
         }
-
         if (isset($compiler->smarty->security_policy)) {
             $compiler->smarty->security_policy->isTrustedPHPDir($_filepath);
         }
-
-        if (isset($_attr['assign'])) {
+        if (isset($_attr[ 'assign' ])) {
             // output will be stored in a smarty variable instead of being displayed
-            $_assign = $_attr['assign'];
+            $_assign = $_attr[ 'assign' ];
         }
         $_once = '_once';
-        if (isset($_attr['once'])) {
-            if ($_attr['once'] == 'false') {
+        if (isset($_attr[ 'once' ])) {
+            if ($_attr[ 'once' ] === 'false') {
                 $_once = '';
             }
         }
-
         if (isset($_assign)) {
-            return "<?php ob_start(); include{$_once} ('{$_filepath}'); \$_smarty_tpl->assign({$_assign},ob_get_contents()); ob_end_clean();?>";
+            return "<?php ob_start();\ninclude{$_once} ('{$_filepath}');\n\$_smarty_tpl->assign({$_assign},ob_get_clean());\n?>";
         } else {
             return "<?php include{$_once} ('{$_filepath}');?>\n";
         }

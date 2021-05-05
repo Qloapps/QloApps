@@ -1,5 +1,13 @@
 ------------------------------
-# V1.1.4 to V1.1.1.5
+# V1.1.5 to V1.1.6
+------------------------------
+
+## Added Features:
+
+[+] FO : [#198] display hook added after the interior block description "displayInteriorExtraContent"
+
+------------------------------
+# V1.1.4 to V1.1.5
 ------------------------------
 
 ## Improved/Changed Features:

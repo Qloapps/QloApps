@@ -82,7 +82,7 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
     public function __construct($id = null, $id_lang = null, $id_shop = null)
     {
         $this->moduleInstance = Module::getInstanceByName('hotelreservationsystem');
-        parent::__construct($id);
+        parent::__construct($id, $id_lang, $id_shop);
     }
 
     public function add($autodate = true, $null_values = true)
@@ -221,7 +221,7 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
         $date_to = date('Y-m-d', strtotime($date_to));
 
         for($date = $date_from; $date < $date_to; $date = date('Y-m-d', strtotime('+1 day', strtotime($date)))) {
-            if (in_array(strtolower(Date('D', $date)), $specialDays)) {
+            if (in_array(Tools::strtolower(Date('D', $date)), $specialDays)) {
                 $specialDaysCount++;
             }
         }
@@ -321,7 +321,6 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
      */
     public function updateRoomTypesFeaturePricesAvailability($featurePricePlans)
     {
-        $moduleInstance = new HotelReservationSystem();
         $this->errors = array();
         if ($featurePricePlans) {
             if (isset($featurePricePlans['data']) && $featurePricePlans['data']) {
@@ -333,8 +332,7 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
                             $id_product = $key;
                             // feature price rates create and updates
                             if (isset($roomTypeRates['rate'])) {
-                                //$productPriceTE = Product::getPriceStatic((int) $id_product, false);
-                                $productPriceTE = 1000;
+                                $productPriceTE = Product::getPriceStatic((int) $id_product, false);
                                 if ($productPriceTE != $roomTypeRates['rate']) {
                                     if ($productPriceTE > $roomTypeRates['rate']) {
                                         $priceImpactWay = 1;
@@ -361,7 +359,7 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
                                             $id_product,
                                             $dateFrom,
                                             $dateTo,
-                                            $type = 'specific_date'
+                                            'specific_date'
                                         );
                                         if ($featurePriceExists) {
                                             if (!$this->saveFeaturePricePlan($featurePriceExists['id'], 2, $params)) {
@@ -378,7 +376,7 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
                                             $id_product,
                                             $dateFrom,
                                             $dateTo,
-                                            $type='date_range'
+                                            'date_range'
                                         );
                                         if ($featurePriceExists) {
                                             if ($featurePriceExists['date_from'] == $dateFrom
@@ -392,7 +390,7 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
                                                     $this->errors[] = $this->moduleInstance->l('Some error occured while saving Feature Price Plan Info:: Date From : ', 'HotelRoomTypeFeaturePricing').$params['dateFrom'].$this->moduleInstance->l(' Date To : ', 'HotelRoomTypeFeaturePricing').$params['dateFrom'].$this->moduleInstance->l(' Room Type Id : ', 'HotelRoomTypeFeaturePricing').$params['roomTypeId'];
                                                 }
                                             } else {
-                                                for($date = $date_from; $date < $date_to; $date = date('Y-m-d', strtotime('+1 day', strtotime($date)))) {
+                                                for($date = $dateFrom; $date < $dateTo; $date = date('Y-m-d', strtotime('+1 day', strtotime($date)))) {
                                                     $currentDate = date('Y-m-d', $date);
                                                     $nextDayDate = date('Y-m-d', strtotime('+1 day', strtotime($currentDate)));
                                                     $params['dateFrom'] = $currentDate;
@@ -402,7 +400,7 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
                                                         $id_product,
                                                         $currentDate,
                                                         $nextDayDate,
-                                                        $type = 'specific_date'
+                                                        'specific_date'
                                                     );
                                                     if ($featurePriceExists) {
                                                         if (!$this->saveFeaturePricePlan(
@@ -431,7 +429,6 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
                             if (isset($roomTypeRates['inventory'])) {
                                 $totalAvailableNotBooked = 0;
                                 $totalAvailableRooms = 0;
-                                $totalRooms = 0;
                                 $hotelRoomType = new HotelRoomType();
                                 $hotelBookingDetail = new HotelBookingDetail();
                                 $hotelRoomInformation = new HotelRoomInformation();
@@ -458,17 +455,10 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
                                     );
                                     $countBookedRooms = count($bookedRoomsInfo);
                                     if (isset($roomTypeAvailabilityInfo['stats']['total_rooms'])) {
-                                        $totalRooms = $roomTypeAvailabilityInfo['stats']['total_rooms'];
                                         $totalAvailableNotBooked = $roomTypeAvailabilityInfo['stats']['total_rooms'] - $countBookedRooms;
                                         $totalAvailableRooms = $roomTypeAvailabilityInfo['stats']['num_avail'];
-                                        $totalAvailableNotBooked = 5;
-                                        $totalAvailableRooms = 3;
                                     }
 
-                                    /*p($totalAvailableRooms);
-                                    p($roomTypeRates['inventory']);
-                                    p($totalAvailableNotBooked);
-                                    die;*/
                                     if ($roomTypeRates['inventory'] <= $totalAvailableNotBooked) {
                                         if ($roomTypeRates['inventory'] < $totalAvailableRooms) {
                                             $numDisabledRooms = $totalAvailableRooms - $roomTypeRates['inventory'];
@@ -479,7 +469,7 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
                                                 $dateTo
                                             );
                                             if ($availableRooms) {
-                                                foreach ($availableRooms as $room_k => $room) {
+                                                foreach ($availableRooms as $room) {
                                                     $objRoomDisableDates = new HotelRoomDisableDates();
                                                     $params['id_room'] = $room['id'];
                                                     $params['date_from'] = $dateFrom;
@@ -519,7 +509,7 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
                                                 $dateTo
                                             );
                                             if ($disabledRooms) {
-                                                foreach ($disabledRooms as $k_rm => $disableRoom) {
+                                                foreach ($disabledRooms as $disableRoom) {
                                                     if ($roomsToEnable > 0) {
                                                         $hotelRoomInformation = new HotelRoomInformation($disableRoom['id']);
                                                         $objRoomDisableDates = new HotelRoomDisableDates();
@@ -572,13 +562,15 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
                 'HotelRoomTypeFeaturePricing'
             );
         }
-        die;
+
+        $result = array();
         if (count($this->errors)) {
             $result['status'] = 'failed';
             $result['errors'] = $this->errors;
         } else {
             $result['status'] = 'success';
         }
+
         return $result;
     }
 

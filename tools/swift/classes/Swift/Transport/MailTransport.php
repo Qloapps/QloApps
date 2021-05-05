@@ -19,7 +19,9 @@
  * due to limitations of PHP's internal mail() function.  You'll get an
  * all-or-nothing result from sending.
  *
- * @author     Chris Corbyn
+ * @author Chris Corbyn
+ *
+ * @deprecated since 5.4.5 (to be removed in 6.0)
  */
 class Swift_Transport_MailTransport implements Swift_Transport
 {
@@ -40,6 +42,8 @@ class Swift_Transport_MailTransport implements Swift_Transport
      */
     public function __construct(Swift_Transport_MailInvoker $invoker, Swift_Events_EventDispatcher $eventDispatcher)
     {
+        @trigger_error(sprintf('The %s class is deprecated since version 5.4.5 and will be removed in 6.0. Use the Sendmail or SMTP transport instead.', __CLASS__), E_USER_DEPRECATED);
+
         $this->_invoker = $invoker;
         $this->_eventDispatcher = $eventDispatcher;
     }
@@ -73,7 +77,7 @@ class Swift_Transport_MailTransport implements Swift_Transport
      *
      * @param string $params
      *
-     * @return Swift_Transport_MailTransport
+     * @return $this
      */
     public function setExtraParams($params)
     {
@@ -125,12 +129,10 @@ class Swift_Transport_MailTransport implements Swift_Transport
         $toHeader = $message->getHeaders()->get('To');
         $subjectHeader = $message->getHeaders()->get('Subject');
 
-        if (!$toHeader) {
-            throw new Swift_TransportException(
-                'Cannot send message without a recipient'
-                );
+        if (0 === $count) {
+            $this->_throwException(new Swift_TransportException('Cannot send message without a recipient'));
         }
-        $to = $toHeader->getFieldBody();
+        $to = $toHeader ? $toHeader->getFieldBody() : '';
         $subject = $subjectHeader ? $subjectHeader->getFieldBody() : '';
 
         $reversePath = $this->_getReversePath($message);
@@ -141,7 +143,9 @@ class Swift_Transport_MailTransport implements Swift_Transport
 
         $messageStr = $message->toString();
 
-        $message->getHeaders()->set($toHeader);
+        if ($toHeader) {
+            $message->getHeaders()->set($toHeader);
+        }
         $message->getHeaders()->set($subjectHeader);
 
         // Separate headers from body
@@ -158,15 +162,18 @@ class Swift_Transport_MailTransport implements Swift_Transport
         if ("\r\n" != PHP_EOL) {
             // Non-windows (not using SMTP)
             $headers = str_replace("\r\n", PHP_EOL, $headers);
+            $subject = str_replace("\r\n", PHP_EOL, $subject);
             $body = str_replace("\r\n", PHP_EOL, $body);
+            $to = str_replace("\r\n", PHP_EOL, $to);
         } else {
             // Windows, using SMTP
             $headers = str_replace("\r\n.", "\r\n..", $headers);
+            $subject = str_replace("\r\n.", "\r\n..", $subject);
             $body = str_replace("\r\n.", "\r\n..", $body);
+            $to = str_replace("\r\n.", "\r\n..", $to);
         }
 
-        if ($this->_invoker->mail($to, $subject, $body, $headers,
-            sprintf($this->_extraParams, $reversePath))) {
+        if ($this->_invoker->mail($to, $subject, $body, $headers, $this->_formatExtraParams($this->_extraParams, $reversePath))) {
             if ($evt) {
                 $evt->setResult(Swift_Events_SendEvent::RESULT_SUCCESS);
                 $evt->setFailedRecipients($failedRecipients);
@@ -204,6 +211,19 @@ class Swift_Transport_MailTransport implements Swift_Transport
         $this->_eventDispatcher->bindEventListener($plugin);
     }
 
+    /** Throw a TransportException, first sending it to any listeners */
+    protected function _throwException(Swift_TransportException $e)
+    {
+        if ($evt = $this->_eventDispatcher->createTransportExceptionEvent($this, $e)) {
+            $this->_eventDispatcher->dispatchEvent($evt, 'exceptionThrown');
+            if (!$evt->bubbleCancelled()) {
+                throw $e;
+            }
+        } else {
+            throw $e;
+        }
+    }
+
     /** Determine the best-use reverse path for this message */
     private function _getReversePath(Swift_Mime_Message $message)
     {
@@ -222,5 +242,56 @@ class Swift_Transport_MailTransport implements Swift_Transport
         }
 
         return $path;
+    }
+
+    /**
+     * Fix CVE-2016-10074 by disallowing potentially unsafe shell characters.
+     *
+     * Note that escapeshellarg and escapeshellcmd are inadequate for our purposes, especially on Windows.
+     *
+     * @param string $string The string to be validated
+     *
+     * @return bool
+     */
+    private function _isShellSafe($string)
+    {
+        // Future-proof
+        if (escapeshellcmd($string) !== $string || !in_array(escapeshellarg($string), array("'$string'", "\"$string\""))) {
+            return false;
+        }
+
+        $length = strlen($string);
+        for ($i = 0; $i < $length; ++$i) {
+            $c = $string[$i];
+            // All other characters have a special meaning in at least one common shell, including = and +.
+            // Full stop (.) has a special meaning in cmd.exe, but its impact should be negligible here.
+            // Note that this does permit non-Latin alphanumeric characters based on the current locale.
+            if (!ctype_alnum($c) && strpos('@_-.', $c) === false) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Return php mail extra params to use for invoker->mail.
+     *
+     * @param $extraParams
+     * @param $reversePath
+     *
+     * @return string|null
+     */
+    private function _formatExtraParams($extraParams, $reversePath)
+    {
+        if (false !== strpos($extraParams, '-f%s')) {
+            if (empty($reversePath) || false === $this->_isShellSafe($reversePath)) {
+                $extraParams = str_replace('-f%s', '', $extraParams);
+            } else {
+                $extraParams = sprintf($extraParams, $reversePath);
+            }
+        }
+
+        return !empty($extraParams) ? $extraParams : null;
     }
 }

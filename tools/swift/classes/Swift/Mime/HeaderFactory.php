@@ -11,7 +11,7 @@
 /**
  * Creates MIME headers.
  *
- * @author     Chris Corbyn
+ * @author Chris Corbyn
  */
 interface Swift_Mime_HeaderFactory extends Swift_Mime_CharsetObserver
 {
@@ -28,8 +28,8 @@ interface Swift_Mime_HeaderFactory extends Swift_Mime_CharsetObserver
     /**
      * Create a new Date header using $timestamp (UNIX time).
      *
-     * @param string  $name
-     * @param int     $timestamp
+     * @param string $name
+     * @param int    $timestamp
      *
      * @return Swift_Mime_Header
      */

@@ -1,4 +1,88 @@
 ####################################
+# V1.5.1
+####################################
+
+## Added Features:
+- Core:
+  - #208: "Catalog Mode" option added by which user can view room details but not abe to create booking
+
+
+## Improvements:
+- Back Office:
+  - #206: Removed Other Modules setting from admin Hotel Reservation System -> Settings
+  - #200: Removed shipping option from car rule condition.
+  - #199: Removed "Display suppliers and manufacturers" and "Display best sellers" options from Admin Preferences controller
+  - #193: Removed Payment Modules setting from admin Hotel Reservation System -> Settings
+  - #189: Moved hotel selection from configuration tab to information tab
+  - #179: Added hotel column in room type feature pricing list
+  - #177: Removed multishop option
+  - #149: Removed carrier column from Booking Carts Controller
+  - #183: Added hotel name along with room name when adding filter of room type for cart rule
+  - #204, #196, #182: Text Changes
+  - #110, #111: Code Optimization
+
+- Core:
+  - #223: getHotelCartBookingData() : function multiplication optimized
+  - #225: HotelRoomTypeFeaturePricing.php optimized (Removed unused variables, removed static values assigned)
+  - #218: Added hotel name column in order confirmation mail and invoice.
+  - #210: CMS page Delivery is not valid for hotel industry. So changed it to Policies page
+  - #205: Prevent deleting profile which is used by at least one employee
+  - #214: blockcart module :: Removed unused hooks displayLeftColumn and displayrightColumn
+  - #180: license file name changed from LICENSES to LICENSE
+  - #181: Readme file improvements with more information and links
+  - #221: dataforfrontsearch() function now calculate and provide "feature_price_diff" value in response
+  - #175: Changed QloApps versioning system (Ex: X.X.X.X)
+  - #175: Updated module compatibility check with QloApps version
+  - #215: "hotelreservationsystem.php" code optimization in hook "actionValidateOrder"
+  - #117, #118, #119, #120, #121, #122, #134, #137, #138, #139: Changes for PHP7 compatibility
+  - #178: Text Changes
+  - #198, #226: Multiple hooks are added in the different QloApps core files
+  - #217: `auto_generated` column in `address` table added to track address creation source
+  - #207: New order states 'Partial payment accepted' and 'Awaiting partial payment' added for the partial payment
+
+- Front Office:
+  - #222: Disabled mobile keyboard pop up when using date-picker in home search
+  - #208: Room type listing on search result page moved to different template "room_type_listing.tpl"
+  - #185: Replaced star rating plugin with jquery Raty in Product Comments module
+  - #156: "product.js" code multiplication optimized
+  - #215: "ajax-cart.js" add validation
+  - #125, #127, #141, #142: Changes for PHP7 compatibility
+  - #187: Display voucher name along with voucher code on order page
+
+
+## Bug Fixed:
+- Back Office:
+  - #211: Errors on cart rule page when add room type, which is not assigned to hotel, selected in room type condition
+  - #197: wrong theme information is displayed at Preferences -> Themes admin controller
+  - #195: Filter by position in the render lists of admin controllers
+  - #194: Entering wrong discount while Group creation, page redirects to list page
+  - #192: Using filter in customer Group list, page redirects to previous list
+  - #189: Room Type associations with its hotel parent category
+  - #176: Birthday input field width in Helper Form
+  - #173: Undefined varaible issue Manage Order Refund Request Controller
+  - #171: Multiple request on single click in Helper List
+  - #160: "Access Denied" issue when an employee other than super admin create a new room.
+  - #168: Room number not updating after room reallocation and swap
+  - #162: Additional facility price changes for room type after saving
+  - #147: Creating order status without entering "status name", page redirects to blank page
+  - #148: Creating order refund status without entering "status name", page redirects to list page
+  - #229: Resolved undefined variable error in Manage Order Refund Request Controller
+
+- Front Office:
+  - #212: Design issue of select in the ADDITIONAL FACILITIES if text exceeds from block in the product detail page
+  - #209: Errors on the search result page: If new group is created and only this group is assigned to the customer
+  - #203: Guest is unable to submit Refund Request again after entering invalid Refund Reason once
+  - #158: Hotel selection in search panel for mobile devices
+  - #169: Wrong price displayed when booking from 1 march to 30 march
+  - #151: Room search check-in && check-out don't change when friendly URL is disabled.
+
+- Core:
+  - #186: Links in mail for my-account, guest tracking and my orders pages are now localized to customer language.
+  - #109: updated invalid varaible "pshone_mobile" to "phone_mobile"
+  - #202: "global.css" added missing class for aligning images left and right in discription
+
+
+####################################
 # V1.5.0
 ####################################
 

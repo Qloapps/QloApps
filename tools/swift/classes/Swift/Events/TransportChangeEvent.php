@@ -11,7 +11,7 @@
 /**
  * Generated when the state of a Transport is changed (i.e. stopped/started).
  *
- * @author     Chris Corbyn
+ * @author Chris Corbyn
  */
 class Swift_Events_TransportChangeEvent extends Swift_Events_EventObject
 {

@@ -1,4 +1,38 @@
 -------------------------
+# V1.4.1 to V1.4.2
+-------------------------
+
+## Added Features:
+
+[+] CO : [#198] Multiple hooks are added in the different QloApps core files
+
+## Improved/changed features:
+
+[*] BO : [110, #111] Code Optimization
+[*] BO : [#179] Added hotel column in room type feature pricing list
+[*] BO : [#204, #196, #182] Text Changes
+[*] BO : [#193] Removed Payment Modules setting from admin Hotel Reservation System -> Settings
+[*] BO : [#206] Removed Other Modules setting from admin Hotel Reservation System -> Settings
+
+[*] CO : [#215] "hotelreservationsystem.php" code optimization in hook "actionValidateOrder"
+[*] CO : [#221] dataforfrontsearch() function now calculate and provide "feature_price_diff" value in response
+[*] CO : [#223] getHotelCartBookingData() : function multiplication optimized
+[*] CO : [#225] HotelRoomTypeFeaturePricing.php optimized (Removed unused variables, removed static values assigned)
+
+## Bug/Issues Resolved:
+
+[-] FO : Fixed : [#169] Wrong price displayed when booking from 1 march to 30 march
+[*] FO : [#215] "ajax-cart.js" add validation
+
+[-] BO : Fixed : [#162] Additional facility price changes for room type after saving
+[-] BO : Fixed : [#168] Room number not updating after room reallocation and swap
+[-] BO : Fixed : [#173] Undefined varaible issue Manage Order Refund Request Controller
+[-] BO : Fixed : [#211] Errors on cart rule page when add room type, which is not assigned to hotel, selected in room type condition
+[-] BO : Fixed : [#229] Resolved undefined variable error in Manage Order Refund Request Controller
+
+
+
+-------------------------
 # V1.4.0 to V1.4.1
 -------------------------
 

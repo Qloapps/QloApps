@@ -3,7 +3,7 @@
 <script type="text/javascript">
 <!--
 var install_is_done = '<?php echo addslashes($this->l('Done!')) ?>';
-var process_steps = <?php echo Tools::jsonEncode($this->process_steps) ?>;
+var process_steps = <?php echo json_encode($this->process_steps) ?>;
 var admin = '<?php echo(file_exists('../admin-dev') ? '../admin-dev' : '../admin') ?>';
 -->
 </script>
