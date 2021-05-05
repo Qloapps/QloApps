@@ -94,6 +94,7 @@ class ConfigurationTestCore
                 'upload_max_filesize' => false,
                 'max_execution_time' => false,
                 'fopen' => false,
+                'zip' => false,
             ));
         }
 
@@ -213,6 +214,12 @@ class ConfigurationTestCore
         }
         return false;
     }
+
+    public static function test_zip()
+    {
+        return extension_loaded('zip');
+    }
+
 
     public static function test_fopen()
     {
