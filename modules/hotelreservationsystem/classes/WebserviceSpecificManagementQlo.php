@@ -80,7 +80,7 @@ class WebserviceSpecificManagementQlo implements WebserviceSpecificManagementInt
             $outputXML = $this->objOutput->getObjectRender()->overrideContent($this->output);
             if (isset($this->wsObject->urlFragments['outputformat']) && $this->wsObject->urlFragments['outputformat'] == 'json') {
                 $outputXML = simplexml_load_string($outputXML, null, LIBXML_NOCDATA);
-                $json = Tools::jsonEncode($outputXML);
+                $json = json_encode($outputXML);
                 $content = preg_replace("/\\\\u([a-f0-9]{4})/e", "iconv('UCS-4LE','UTF-8',pack('V', hexdec('U$1')))", $json);
                 header('Content-Type: application/json');
                 die($content);
@@ -153,7 +153,7 @@ class WebserviceSpecificManagementQlo implements WebserviceSpecificManagementInt
             }
         } else {
             // If input type is json
-            $array = Tools::jsonDecode($inputXML, true);
+            $array = json_decode($inputXML, true);
             if (isset($array['json']) && $array['json'] && isset($array[$head])) {
                 return ($head ? $array[$head] : $array);
             } else {
@@ -172,7 +172,7 @@ class WebserviceSpecificManagementQlo implements WebserviceSpecificManagementInt
 
         $xmlEntities = $xml->children();
         // Convert multi-dimention xml into an array
-        $array = Tools::jsonDecode(Tools::jsonEncode($xmlEntities), true);
+        $array = json_decode(json_encode($xmlEntities), true);
 
         return ($head ? $array[$head] : $array);
     }

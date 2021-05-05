@@ -969,7 +969,7 @@ class ProductControllerCore extends FrontController
                             $totalPrice += $totalRoomPrice;
                             $demandsPrice = 0;
                             if ($roomDemand = Tools::getValue('room_demands')) {
-                                if ($roomDemand = Tools::jsonDecode($roomDemand, true)) {
+                                if ($roomDemand = json_decode($roomDemand, true)) {
                                     $objRoomDemandPrice = new HotelRoomTypeDemandPrice();
                                     $demandsPrice = $objRoomDemandPrice->getRoomTypeDemandsTotalPrice(
                                         $idProduct,
@@ -1009,6 +1009,6 @@ class ProductControllerCore extends FrontController
             $result['msg'] = 'failed3';
             $result['avail_rooms'] = 0;
         }
-        die(Tools::jsonEncode($result));
+        die(json_encode($result));
     }
 }

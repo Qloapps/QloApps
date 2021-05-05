@@ -305,7 +305,7 @@ class ContactControllerCore extends FrontController
         if (Configuration::get('WK_GOOGLE_ACTIVE_MAP')) {
             $hotelLocationArray = $objHotelInfo->getMapFormatHotelsInfo(Configuration::get('WK_MAP_HOTEL_ACTIVE_ONLY'));
             if ($hotelLocationArray) {
-                $this->context->smarty->assign('hotelLocationArray', Tools::jsonEncode($hotelLocationArray));
+                $this->context->smarty->assign('hotelLocationArray', json_encode($hotelLocationArray));
             }
         }
         //End

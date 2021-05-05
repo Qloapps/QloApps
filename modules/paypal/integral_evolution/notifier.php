@@ -108,6 +108,6 @@ class PayPalNotifier extends PayPal
 
 if ($custom = Tools::getValue('custom')) {
     $notifier = new PayPalNotifier();
-    $result = Tools::jsonDecode($custom, true);
+    $result = json_decode($custom, true);
     $notifier->confirmOrder($result);
 }

@@ -218,7 +218,7 @@ class AdminModulesControllerCore extends AdminController
 
     public function displayAjaxRefreshModuleList()
     {
-        echo Tools::jsonEncode(array('status' => $this->status));
+        echo json_encode(array('status' => $this->status));
     }
 
 
@@ -1091,7 +1091,7 @@ class AdminModulesControllerCore extends AdminController
 
         // Get the list of installed module ans prepare it for ajax call.
         if (($list = Tools::getValue('installed_modules'))) {
-            Context::getContext()->smarty->assign('installed_modules', Tools::jsonEncode(explode('|', $list)));
+            Context::getContext()->smarty->assign('installed_modules', json_encode(explode('|', $list)));
         }
 
         // If redirect parameter is present and module already installed, we redirect on configuration module page
@@ -1532,7 +1532,7 @@ class AdminModulesControllerCore extends AdminController
             }
 
             // AutoComplete array
-            $autocomplete_list .= Tools::jsonEncode(array(
+            $autocomplete_list .= json_encode(array(
                 'displayName' => (string)$module->displayName,
                 'desc' => (string)$module->description,
                 'name' => (string)$module->name,

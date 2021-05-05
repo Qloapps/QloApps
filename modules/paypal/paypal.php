@@ -699,7 +699,7 @@ class PayPal extends PaymentModule
             //'PayPal_version_tls_checked' => $tls_version,
             'Presta_version' => _PS_VERSION_,
             'Currencies' => Currency::getCurrencies(),
-            'PayPal_account_braintree' => (array) Tools::jsonDecode(Configuration::get('PAYPAL_ACCOUNT_BRAINTREE')),
+            'PayPal_account_braintree' => (array) json_decode(Configuration::get('PAYPAL_ACCOUNT_BRAINTREE')),
             'Currency_default'=> Configuration::get('PS_CURRENCY_DEFAULT'),
             //*TO DELETE* 'PayPal_braintree_public_key'=> Configuration::get('PAYPAL_BRAINTREE_PUBLIC_KEY'),
             //*TO DELETE* 'PayPal_braintree_private_key'=> Configuration::get('PAYPAL_BRAINTREE_PRIVATE_KEY'),
@@ -1070,7 +1070,7 @@ class PayPal extends PaymentModule
                     'currency' => new Currency((int) $cart->id_currency),
                     'customer' => $this->context->customer,
                     'business_account' => Configuration::get('PAYPAL_BUSINESS_ACCOUNT'),
-                    'custom' => Tools::jsonEncode(array('id_cart' => $cart->id, 'hash' => sha1(serialize($cart->nbProducts())))),
+                    'custom' => json_encode(array('id_cart' => $cart->id, 'hash' => sha1(serialize($cart->nbProducts())))),
                     'gift_price' => (float) $this->getGiftWrappingPrice(),
                     'billing_address' => $billing_address,
                     'delivery_address' => $delivery_address,
@@ -1879,7 +1879,7 @@ class PayPal extends PaymentModule
                 }
 
                 $account_brain = Tools::getValue('account_braintree');
-                Configuration::updateValue('PAYPAL_ACCOUNT_BRAINTREE', Tools::jsonEncode($account_brain));
+                Configuration::updateValue('PAYPAL_ACCOUNT_BRAINTREE', json_encode($account_brain));
 
                 $this->context->smarty->assign('PayPal_save_success', true);
 
@@ -1985,7 +1985,7 @@ class PayPal extends PaymentModule
 
             $callApiPaypalPlus = new CallApiPaypalPlus();
 
-            return Tools::jsonDecode($callApiPaypalPlus->executeRefund($id_transaction, $params));
+            return json_decode($callApiPaypalPlus->executeRefund($id_transaction, $params));
         }
     }
 
@@ -2052,7 +2052,7 @@ class PayPal extends PaymentModule
         $message = $this->l('Refund operation result:')." \r\n";
         foreach ($response as $key => $value) {
             if (is_object($value) || is_array($value)) {
-                $message .= $key.': '.Tools::jsonEncode($value)." \r\n";
+                $message .= $key.': '.json_encode($value)." \r\n";
             } else {
                 $message .= $key.': '.$value." \r\n";
             }
@@ -2587,7 +2587,7 @@ class PayPal extends PaymentModule
 
     public function set_good_context()
     {
-        $account_braintree = Tools::jsonDecode(Configuration::get('PAYPAL_ACCOUNT_BRAINTREE'), true);
+        $account_braintree = json_decode(Configuration::get('PAYPAL_ACCOUNT_BRAINTREE'), true);
         $currency = new Currency($this->context->cart->id_currency);
         $this->context_modified = false;
         $this->id_currency_origin_cart = $this->context->cart->id_currency;
@@ -2616,7 +2616,7 @@ class PayPal extends PaymentModule
             if (Validate::isLoadedObject($order = new Order($params['object']->id_order))) {
                 if ($order->module == $this->name) {
                     $order_detail = PaypalPlusPui::getByIdOrder($params['object']->id_order);
-                    $information = Tools::jsonDecode($order_detail['pui_informations'], true);
+                    $information = json_decode($order_detail['pui_informations'], true);
                     $tab = '<table style="border: solid 1pt black; padding:0 10pt">
                         <tr><td></td><td></td></tr>
                         <tr><td><b>'.$this->l('Bank name').'</b></td><td>'.$information['recipient_banking_instruction']['bank_name'].'</td></tr>

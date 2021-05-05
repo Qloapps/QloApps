@@ -665,7 +665,7 @@ class AdminImportControllerCore extends AdminController
             $_FILES['file']['filename'] = $filename_prefix.str_replace('\0', '', $_FILES['file']['name']);
         }
 
-        die(Tools::jsonEncode($_FILES));
+        die(json_encode($_FILES));
     }
 
     public function renderView()

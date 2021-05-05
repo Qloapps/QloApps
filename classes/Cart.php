@@ -4317,7 +4317,7 @@ class CartCore extends ObjectModel
         $postData = trim(file_get_contents('php://input'));
         libxml_use_internal_errors(true);
         $xml = simplexml_load_string(utf8_decode($postData));
-        $cartData = Tools::jsonDecode(Tools::jsonEncode($xml, true));
+        $cartData = json_decode(json_encode($xml, true));
 
         $this->id_address_delivery = $cartData->cart->id_address;
         $this->id_address_invoice = $cartData->cart->id_address;
@@ -4344,7 +4344,7 @@ class CartCore extends ObjectModel
         $postData = trim(file_get_contents('php://input'));
         libxml_use_internal_errors(true);
         $xml = simplexml_load_string(utf8_decode($postData));
-        $cartData = Tools::jsonDecode(Tools::jsonEncode($xml, true));
+        $cartData = json_decode(json_encode($xml, true));
 
         $this->id_address_delivery = $cartData->cart->id_address;
         $this->id_address_invoice = $cartData->cart->id_address;
@@ -4384,14 +4384,14 @@ class CartCore extends ObjectModel
 
             $extraDemands = null;
             foreach ($bookingRows as $booking) {
-                $booking = Tools::jsonDecode(Tools::jsonEncode($booking, true), true);
+                $booking = json_decode(json_encode($booking, true), true);
                 if (isset($booking['extra_demands']['extra_demand'])) {
                     $extraDemands = $booking['extra_demands']['extra_demand'];
                     if (isset($extraDemands['id_global_demand'])) {
                         $extraDemands = array($extraDemands);
                     }
-                    // $extraDemands = Tools::jsonDecode($extraDemands, true);
-                    $extraDemands = Tools::jsonEncode($extraDemands);
+                    // $extraDemands = json_decode($extraDemands, true);
+                    $extraDemands = json_encode($extraDemands);
                 }
 
                 // get room booking info

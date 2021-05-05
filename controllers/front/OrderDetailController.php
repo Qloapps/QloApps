@@ -208,7 +208,7 @@ class OrderDetailControllerCore extends FrontController
                     $hasError = 1;
                 }
                 if ($bookingRefunds = Tools::getValue('bookings_to_refund')) {
-                    if (!count($bookingRefunds = Tools::jsonDecode($bookingRefunds, true))) {
+                    if (!count($bookingRefunds = json_decode($bookingRefunds, true))) {
                         $hasError = 1;
                     } else {
                         foreach ($bookingRefunds as $idHtlBooking) {
@@ -248,9 +248,9 @@ class OrderDetailControllerCore extends FrontController
                     // Emails to customer, admin on refund request state change
                     $objOrderReturn->changeIdOrderReturnState(OrderReturnState::ORDER_RETRUN_FIRST_STATUS, $objOrderReturn->id);
 
-                    die(Tools::jsonEncode(array('status' => 1)));
+                    die(json_encode(array('status' => 1)));
                 }
-                die(Tools::jsonEncode(array('status' => 0)));
+                die(json_encode(array('status' => 0)));
             }
             // END ajax request handle
 
