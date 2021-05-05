@@ -83,7 +83,7 @@ class ConfigurationTestCore
                 ),
                 'phpversion' => false,
                 'gd' => false,
-                'mysql_support' => false,
+                'pdo_mysql' => false,
                 'config_dir' => 'config',
                 'files' => false,
                 'mails_dir' => 'mails',
@@ -116,7 +116,6 @@ class ConfigurationTestCore
             'mbstring' => false,
             'magicquotes' => false,
             'dom' => false,
-            'pdo_mysql' => false,
         );
     }
 
@@ -155,7 +154,7 @@ class ConfigurationTestCore
 
     public static function test_mysql_support()
     {
-        return extension_loaded('mysql') || extension_loaded('mysqli') || extension_loaded('pdo_mysql');
+        return extension_loaded('mysqli') || extension_loaded('pdo_mysql');
     }
 
     public static function test_pdo_mysql()
