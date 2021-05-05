@@ -35,13 +35,12 @@
  * @author    André Rothe <andre.rothe@phosco.info>
  * @copyright 2010-2014 Justin Swanhart and André Rothe
  * @license   http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
- * @version   SVN: $Id: CreateBuilder.php 833 2013-12-18 10:13:59Z phosco@gmx.de $
+ * @version   SVN: $Id$
  * 
  */
 
-require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
-require_once dirname(__FILE__) . '/CreateTableBuilder.php';
-require_once dirname(__FILE__) . '/SubTreeBuilder.php';
+namespace PHPSQLParser\builders;
+use PHPSQLParser\utils\ExpressionType;
 
 /**
  * This class implements the builder for the [CREATE] part. You can overwrite
@@ -51,27 +50,36 @@ require_once dirname(__FILE__) . '/SubTreeBuilder.php';
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *  
  */
-class CreateBuilder {
+class CreateBuilder implements Builder {
 
     protected function buildCreateTable($parsed) {
         $builder = new CreateTableBuilder();
         return $builder->build($parsed);
     }
 
+    protected function buildCreateIndex($parsed) {
+        $builder = new CreateIndexBuilder();
+        return $builder->build($parsed);
+    }
+    
     protected function buildSubTree($parsed) {
         $builder = new SubTreeBuilder();
         return $builder->build($parsed);
     }
 
-    public function build($parsed) {
+    public function build(array $parsed) {
         $create = $parsed['CREATE'];
         $sql = $this->buildSubTree($create);
 
         if (($create['expr_type'] === ExpressionType::TABLE)
             || ($create['expr_type'] === ExpressionType::TEMPORARY_TABLE)) {
-            $sql .= " " . $this->buildCreateTable($parsed['TABLE']);
+            $sql .= ' ' . $this->buildCreateTable($parsed['TABLE']);
         }
-        // TODO: add more expr_types here (like VIEW), if available
+        if ($create['expr_type'] === ExpressionType::INDEX) {
+            $sql .= ' ' . $this->buildCreateIndex($parsed['INDEX']);
+        }
+
+        // TODO: add more expr_types here (like VIEW), if available in parser output
         return "CREATE " . $sql;
     }
 

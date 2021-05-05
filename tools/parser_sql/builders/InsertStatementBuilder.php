@@ -35,12 +35,11 @@
  * @author    André Rothe <andre.rothe@phosco.info>
  * @copyright 2010-2014 Justin Swanhart and André Rothe
  * @license   http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
- * @version   SVN: $Id: InsertStatementBuilder.php 834 2013-12-18 10:14:26Z phosco@gmx.de $
+ * @version   SVN: $Id$
  * 
  */
 
-require_once dirname(__FILE__) . '/InsertBuilder.php';
-require_once dirname(__FILE__) . '/ValuesBuilder.php';
+namespace PHPSQLParser\builders;
 
 /**
  * This class implements the builder for the whole Insert statement. You can overwrite
@@ -50,7 +49,7 @@ require_once dirname(__FILE__) . '/ValuesBuilder.php';
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *  
  */
-class InsertStatementBuilder {
+class InsertStatementBuilder implements Builder {
 
     protected function buildVALUES($parsed) {
         $builder = new ValuesBuilder();
@@ -58,14 +57,33 @@ class InsertStatementBuilder {
     }
 
     protected function buildINSERT($parsed) {
-        $builder = new InsertBuilder($parsed);
+        $builder = new InsertBuilder();
         return $builder->build($parsed);
     }
 
-    public function build($parsed) {
+    protected function buildSELECT($parsed) {
+        $builder = new SelectStatementBuilder();
+        return $builder->build($parsed);
+    }
+    
+    protected function buildSET($parsed) {
+        $builder = new SetBuilder();
+        return $builder->build($parsed);
+    }
+    
+    public function build(array $parsed) {
         // TODO: are there more than one tables possible (like [INSERT][1])
-        return $this->buildINSERT($parsed['INSERT'][0]) . " " . $this->buildVALUES($parsed['VALUES']);
-        // TODO: subquery?
+        $sql = $this->buildINSERT($parsed['INSERT']);
+        if (isset($parsed['VALUES'])) {
+            $sql .= ' ' . $this->buildVALUES($parsed['VALUES']);
+        }
+        if (isset($parsed['SET'])) {
+            $sql .= ' ' . $this->buildSET($parsed['SET']);
+        }
+        if (isset($parsed['SELECT'])) {
+            $sql .= ' ' . $this->buildSELECT($parsed);
+        }
+        return $sql;
     }
 }
 ?>

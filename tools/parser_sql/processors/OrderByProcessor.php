@@ -4,49 +4,56 @@
  *
  * This file implements the processor for the ORDER-BY statements.
  *
- * Copyright (c) 2010-2012, Justin Swanhart
- * with contributions by André Rothe <arothe@phosco.info, phosco@gmx.de>
+ * PHP version 5
  *
+ * LICENSE:
+ * Copyright (c) 2010-2014 Justin Swanhart and André Rothe
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without modification,
- * are permitted provided that the following conditions are met:
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. The name of the author may not be used to endorse or promote products
+ *    derived from this software without specific prior written permission.
  *
- *   * Redistributions of source code must retain the above copyright notice,
- *     this list of conditions and the following disclaimer.
- *   * Redistributions in binary form must reproduce the above copyright notice,
- *     this list of conditions and the following disclaimer in the documentation
- *     and/or other materials provided with the distribution.
+ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
- * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT
- * SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
- * TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
- * BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
- * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * @author    André Rothe <andre.rothe@phosco.info>
+ * @copyright 2010-2014 Justin Swanhart and André Rothe
+ * @license   http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
+ * @version   SVN: $Id$
+ *
  */
 
-require_once(dirname(__FILE__) . '/AbstractProcessor.php');
-require_once(dirname(__FILE__) . '/SelectExpressionProcessor.php');
-require_once(dirname(__FILE__) . '/../utils/ExpressionType.php');
+namespace PHPSQLParser\processors;
+use PHPSQLParser\utils\ExpressionType;
 
 /**
- * 
  * This class processes the ORDER-BY statements.
- * 
- * @author arothe
- * 
+ *
+ * @author  André Rothe <andre.rothe@phosco.info>
+ * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
+ *
  */
 class OrderByProcessor extends AbstractProcessor {
 
-    private $selectExpressionProcessor;
-
-    public function __construct() {
-        $this->selectExpressionProcessor = new SelectExpressionProcessor();
+    protected function processSelectExpression($unparsed) {
+        $processor = new SelectExpressionProcessor($this->options);
+        return $processor->process($unparsed);
     }
 
     protected function initParseInfo() {
@@ -66,7 +73,7 @@ class OrderByProcessor extends AbstractProcessor {
             $parseInfo['no_quotes'] = $this->revokeQuotation($parseInfo['base_expr']);
             // search to see if the expression matches an alias
             foreach ($select as $clause) {
-                if (!$clause['alias']) {
+                if (empty($clause['alias'])) {
                     continue;
                 }
 
@@ -78,7 +85,7 @@ class OrderByProcessor extends AbstractProcessor {
         }
 
         if ($parseInfo['expr_type'] === ExpressionType::EXPRESSION) {
-            $expr = $this->selectExpressionProcessor->process($parseInfo['base_expr']);
+            $expr = $this->processSelectExpression($parseInfo['base_expr']);
             $expr['direction'] = $parseInfo['dir'];
             unset($expr['alias']);
             return $expr;
@@ -119,6 +126,11 @@ class OrderByProcessor extends AbstractProcessor {
                 break;
 
             default:
+                if ($this->isCommentToken($token)) {
+                    $out[] = parent::processComment($token);
+                    break;
+                }
+
                 $parseInfo['base_expr'] .= $token;
             }
         }

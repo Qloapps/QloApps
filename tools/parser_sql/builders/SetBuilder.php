@@ -35,12 +35,12 @@
  * @author    André Rothe <andre.rothe@phosco.info>
  * @copyright 2010-2014 Justin Swanhart and André Rothe
  * @license   http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
- * @version   SVN: $Id: SetBuilder.php 830 2013-12-18 09:35:42Z phosco@gmx.de $
+ * @version   SVN: $Id$
  * 
  */
 
-require_once dirname(__FILE__) . '/../exceptions/UnableToCreateSQLException.php';
-require_once dirname(__FILE__) . '/SetExpressionBuilder.php';
+namespace PHPSQLParser\builders;
+use PHPSQLParser\exceptions\UnableToCreateSQLException;
 
 /**
  * This class implements the builder for the SET part of INSERT statement. 
@@ -50,14 +50,14 @@ require_once dirname(__FILE__) . '/SetExpressionBuilder.php';
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *  
  */
-class SetBuilder {
+class SetBuilder implements Builder {
 
     protected function buildSetExpression($parsed) {
         $builder = new SetExpressionBuilder();
         return $builder->build($parsed);
     }
 
-    public function build($parsed) {
+    public function build(array $parsed) {
         $sql = "";
         foreach ($parsed as $k => $v) {
             $len = strlen($sql);

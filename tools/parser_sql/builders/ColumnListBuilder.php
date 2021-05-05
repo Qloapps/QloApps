@@ -35,13 +35,14 @@
  * @author    André Rothe <andre.rothe@phosco.info>
  * @copyright 2010-2014 Justin Swanhart and André Rothe
  * @license   http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
- * @version   SVN: $Id: ColumnListBuilder.php 894 2013-12-31 00:27:03Z phosco@gmx.de $
+ * @version   SVN: $Id$
  * 
  */
 
-require_once dirname(__FILE__) . '/../exceptions/UnableToCreateSQLException.php';
-require_once dirname(__FILE__) . '/IndexColumnBuilder.php';
-require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
+namespace PHPSQLParser\builders;
+use PHPSQLParser\exceptions\UnableToCreateSQLException;
+use PHPSQLParser\utils\ExpressionType;
+
 /**
  * This class implements the builder for column-list parts of CREATE TABLE. 
  * You can overwrite all functions to achieve another handling.
@@ -50,29 +51,35 @@ require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *  
  */
-class ColumnListBuilder {
+class ColumnListBuilder implements Builder {
 
     protected function buildIndexColumn($parsed) {
         $builder = new IndexColumnBuilder();
         return $builder->build($parsed);
     }
 
-    public function build($parsed) {
+    protected function buildColumnReference($parsed) {
+        $builder = new ColumnReferenceBuilder();
+        return $builder->build($parsed);
+    }
+    
+    public function build(array $parsed, $delim = ', ') {
         if ($parsed['expr_type'] !== ExpressionType::COLUMN_LIST) {
-            return "";
+            return '';
         }
-        $sql = "";
+        $sql = '';
         foreach ($parsed['sub_tree'] as $k => $v) {
             $len = strlen($sql);
             $sql .= $this->buildIndexColumn($v);
+            $sql .= $this->buildColumnReference($v);
 
             if ($len == strlen($sql)) {
                 throw new UnableToCreateSQLException('CREATE TABLE column-list subtree', $k, $v, 'expr_type');
             }
 
-            $sql .= " ";
-        } 
-        return "(" . substr($sql, 0, -1) . ")";
+            $sql .= $delim;
+        }
+        return '(' . substr($sql, 0, -strlen($delim)) . ')';
     }
 
 }

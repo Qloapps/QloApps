@@ -930,7 +930,7 @@ class LanguageCore extends ObjectModel
         if (!file_exists($file)) {
             $errors[] = Tools::displayError('No language pack is available for your version.');
         } elseif ($install) {
-            require_once(_PS_TOOL_DIR_.'tar/Archive_Tar.php');
+            require_once(_PS_TOOL_DIR_.'tar/Tar.php');
             $gz = new Archive_Tar($file, true);
             $files_list = AdminTranslationsController::filterTranslationFiles(Language::getLanguagePackListContent((string)$iso, $gz));
             $files_paths = AdminTranslationsController::filesListToPaths($files_list);
@@ -1030,7 +1030,7 @@ class LanguageCore extends ObjectModel
 
     public static function updateModulesTranslations(array $modules_list)
     {
-        require_once(_PS_TOOL_DIR_.'tar/Archive_Tar.php');
+        require_once(_PS_TOOL_DIR_.'tar/Tar.php');
 
         $languages = Language::getLanguages(false);
         foreach ($languages as $lang) {

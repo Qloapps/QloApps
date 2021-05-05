@@ -1,50 +1,66 @@
 <?php
 /**
- * UnionProcessor.php
+ * WhereProcessor.php
  *
  * This file implements the processor for the UNION statements.
  *
- * Copyright (c) 2010-2012, Justin Swanhart
- * with contributions by André Rothe <arothe@phosco.info, phosco@gmx.de>
+ * PHP version 5
  *
+ * LICENSE:
+ * Copyright (c) 2010-2014 Justin Swanhart and André Rothe
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without modification,
- * are permitted provided that the following conditions are met:
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. The name of the author may not be used to endorse or promote products
+ *    derived from this software without specific prior written permission.
  *
- *   * Redistributions of source code must retain the above copyright notice,
- *     this list of conditions and the following disclaimer.
- *   * Redistributions in binary form must reproduce the above copyright notice,
- *     this list of conditions and the following disclaimer in the documentation
- *     and/or other materials provided with the distribution.
+ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
- * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT
- * SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
- * TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
- * BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
- * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * @author    André Rothe <andre.rothe@phosco.info>
+ * @copyright 2010-2014 Justin Swanhart and André Rothe
+ * @license   http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
+ * @version   SVN: $Id$
+ *
  */
 
-require_once(dirname(__FILE__) . '/AbstractProcessor.php');
-require_once(dirname(__FILE__) . '/SQLProcessor.php');
-require_once(dirname(__FILE__) . '/DefaultProcessor.php');
-require_once(dirname(__FILE__) . '/../utils/ExpressionType.php');
+namespace PHPSQLParser\processors;
 
 /**
- * 
  * This class processes the UNION statements.
- * 
- * @author arothe
- * 
+ *
+ * @author  André Rothe <andre.rothe@phosco.info>
+ * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
+ *
  */
 class UnionProcessor extends AbstractProcessor {
 
-    public function isUnion($queries) {
+    protected function processDefault($token) {
+        $processor = new DefaultProcessor($this->options);
+        return $processor->process($token);
+    }
+
+    protected function processSQL($token) {
+        $processor = new SQLProcessor($this->options);
+        return $processor->process($token);
+    }
+
+    public static function isUnion($queries) {
         $unionTypes = array('UNION', 'UNION ALL');
         foreach ($unionTypes as $unionType) {
             if (!empty($queries[$unionType])) {
@@ -81,18 +97,63 @@ class UnionProcessor extends AbstractProcessor {
 
                     // starts with "(select"
                     if (preg_match("/^\\(\\s*select\\s*/i", $token)) {
-                        $processor = new DefaultProcessor();
-                        $queries[$unionType][$key] = $processor->process($this->removeParenthesisFromStart($token));
+                        $queries[$unionType][$key] = $this->processDefault($this->removeParenthesisFromStart($token));
                         break;
                     }
-
-                    $processor = new SQLProcessor();
-                    $queries[$unionType][$key] = $processor->process($queries[$unionType][$key]);
+                    $queries[$unionType][$key] = $this->processSQL($queries[$unionType][$key]);
                     break;
                 }
             }
         }
+
         // it can be parsed or not
+        return $queries;
+    }
+
+    /**
+     * Moves the final union query into a separate output, so the remainder (such as ORDER BY) can
+     * be processed separately.
+     */
+    protected function splitUnionRemainder($queries, $unionType, $outputArray)
+    {
+        $finalQuery = [];
+
+        //If this token contains a matching pair of brackets at the start and end, use it as the final query
+        $finalQueryFound = false;
+        if (count($outputArray) === 1) {
+            $tokenAsArray = str_split(trim($outputArray[0]));
+            if ($tokenAsArray[0] == '(' && $tokenAsArray[count($tokenAsArray)-1] == ')') {
+                $queries[$unionType][] = $outputArray;
+                $finalQueryFound = true;
+            }
+        }
+
+        if (!$finalQueryFound) {
+            foreach ($outputArray as $key => $token) {
+                if (strtoupper($token) == 'ORDER') {
+                    break;
+                } else {
+                    $finalQuery[] = $token;
+                    unset($outputArray[$key]);
+                }
+            }
+        }
+
+
+        $finalQueryString = trim(implode($finalQuery));
+
+        if (!empty($finalQuery) && $finalQueryString != '') {
+            $queries[$unionType][] = $finalQuery;
+        }
+
+        $defaultProcessor = new DefaultProcessor($this->options);
+        $rePrepareSqlString = trim(implode($outputArray));
+
+        if (!empty($rePrepareSqlString)) {
+            $remainingQueries = $defaultProcessor->process($rePrepareSqlString);
+            $queries[] = $remainingQueries;
+        }
+
         return $queries;
     }
 
@@ -155,7 +216,7 @@ class UnionProcessor extends AbstractProcessor {
         // or we don't have an UNION/UNION ALL
         if (!empty($outputArray)) {
             if ($unionType) {
-                $queries[$unionType][] = $outputArray;
+                $queries = $this->splitUnionRemainder($queries, $unionType, $outputArray);
             } else {
                 $queries[] = $outputArray;
             }
@@ -163,6 +224,5 @@ class UnionProcessor extends AbstractProcessor {
 
         return $this->processMySQLUnion($queries);
     }
-
 }
 ?>
