@@ -403,7 +403,7 @@ class AdminModulesControllerCore extends AdminController
                 }
             }
         } else {
-            require_once(_PS_TOOL_DIR_.'tar/Archive_Tar.php');
+            require_once _PS_TOOL_DIR_.'tar/Tar.php';
             $archive = new Archive_Tar($file);
             if ($archive->extract($tmp_folder)) {
                 $zip_folders = scandir($tmp_folder);
