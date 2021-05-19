@@ -224,7 +224,7 @@ class blockcart extends Module
         }
 
         $this->assignContentVars($params);
-        $res = Tools::jsonDecode($this->display(__FILE__, 'blockcart-json.tpl'), true);
+        $res = Tools::jsonDecode(Tools::removeHtmlComments($this->display(__FILE__, 'blockcart-json.tpl')), true);
 
         if (isset($params['cookie']->avail_rooms)) {
             $res['avail_rooms'] = $params['cookie']->avail_rooms;
@@ -249,7 +249,7 @@ class blockcart extends Module
         }
 
         $this->assignContentVars(array('cookie' => $this->context->cookie, 'cart' => $this->context->cart));
-        $params['json'] = $this->display(__FILE__, 'blockcart-json.tpl');
+        $params['json'] = Tools::removeHtmlComments($this->display(__FILE__, 'blockcart-json.tpl'));
     }
 
     public function hookHeader()
