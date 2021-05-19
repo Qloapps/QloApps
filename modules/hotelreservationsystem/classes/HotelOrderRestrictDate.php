@@ -54,10 +54,8 @@ class HotelOrderRestrictDate extends ObjectModel
         $obj_ord_rest = new self();
         $order_restrict_data = $obj_ord_rest->getDataByHotelId($id_hotel);
 
-        $max_order_date_restr = $order_restrict_data['max_order_date'];
-
-        if (isset($max_order_date_restr) && $max_order_date_restr) {
-            $max_order_date = $max_order_date_restr;
+        if (isset($order_restrict_data['max_order_date']) && $order_restrict_data['max_order_date']) {
+            $max_order_date = $order_restrict_data['max_order_date'];
         } elseif (isset($global_max_order_date) && $global_max_order_date) {
             $max_order_date = $global_max_order_date;
         } else {
