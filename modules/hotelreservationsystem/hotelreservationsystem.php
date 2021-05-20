@@ -669,7 +669,6 @@ class hotelreservationsystem extends Module
             || !$this->registerModuleHooks()
             || !$objHtlHelper->insertDefaultHotelEntries()
             || !$objHtlHelper->insertHotelRoomsStatus()
-            || !$objHtlHelper->insertHotelOrderStatus()
             || !$objHtlHelper->insertHotelRoomAllotmentType()
         ) {
             return false;
@@ -739,8 +738,7 @@ class hotelreservationsystem extends Module
             `'._DB_PREFIX_.'htl_room_type_demand_price`,
             `'._DB_PREFIX_.'htl_room_type_demand`,
             `'._DB_PREFIX_.'htl_room_disable_dates`,
-            `'._DB_PREFIX_.'htl_access`,
-            `'._DB_PREFIX_.'htl_order_status`,'
+            `'._DB_PREFIX_.'htl_access`'
         );
     }
 
