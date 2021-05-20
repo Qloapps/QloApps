@@ -3381,7 +3381,7 @@ class AdminOrdersControllerCore extends AdminController
 
         if (!count($this->errors)) {
             $objBookingDetail = new HotelBookingDetail();
-            if ($roomBookingInfo = $objBookingDetail->getRoomBookingData($idRoom, $idOrder)) {
+            if ($roomBookingInfo = $objBookingDetail->getRoomBookingData($idRoom, $idOrder, $dateFrom, $dateTo)) {
                 //  if admin choose Check-Out status
                 if ($newStatus == 3
                     && $roomBookingInfo['check_in'] ==  '0000-00-00 00:00:00'
