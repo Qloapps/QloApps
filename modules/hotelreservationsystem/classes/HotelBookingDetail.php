@@ -1050,8 +1050,10 @@ class HotelBookingDetail extends ObjectModel
 
         $sql1 = 'UPDATE `'._DB_PREFIX_.'htl_booking_detail`
             SET `id_room`=IF(`id`='.(int)$swap_room['id'].','.(int)$current_room_id.','.(int)$swapped_room_id.'),
-            `room_num`=IF(`id`='.(int)$swap_room['id'].',\''.$curr_room['room_num'].'\',\''.$swap_room['room_num'].'\')
-            WHERE `id` IN('.(int)$swap_room['id'].','.(int)$curr_room.')';
+            `room_num`=IF(
+                `id`='.(int)$swap_room['id'].',\''.pSQL($curr_room['room_num']).'\',\''.pSQL($swap_room['room_num']).'\'
+            )
+            WHERE `id` IN('.(int)$swap_room['id'].','.(int)$curr_room['id'].')';
 
         if ($result = Db::getInstance()->execute($sql)) {
             $result2 = Db::getInstance()->execute($sql1);
