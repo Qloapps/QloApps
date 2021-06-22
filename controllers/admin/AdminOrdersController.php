@@ -133,6 +133,7 @@ class AdminOrdersControllerCore extends AdminController
                 'align' => 'text-right',
                 'type' => 'price',
                 'currency' => true,
+                'havingFilter' => true,
                 'callback' => 'setOrderCurrency',
                 'badge_success' => true,
             ),
