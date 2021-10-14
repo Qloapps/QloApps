@@ -31,33 +31,26 @@
  * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * @author    André Rothe <andre.rothe@phosco.info>
  * @copyright 2010-2014 Justin Swanhart and André Rothe
  * @license   http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
- * @version   SVN: $Id: SubTreeBuilder.php 830 2013-12-18 09:35:42Z phosco@gmx.de $
- * 
+ * @version   SVN: $Id$
+ *
  */
 
-require_once dirname(__FILE__) . '/../exceptions/UnableToCreateSQLException.php';
-require_once dirname(__FILE__) . '/ReservedBuilder.php';
-require_once dirname(__FILE__) . '/SelectBracketExpressionBuilder.php';
-require_once dirname(__FILE__) . '/ColumnReferenceBuilder.php';
-require_once dirname(__FILE__) . '/FunctionBuilder.php';
-require_once dirname(__FILE__) . '/OperatorBuilder.php';
-require_once dirname(__FILE__) . '/ConstantBuilder.php';
-require_once dirname(__FILE__) . '/SubQueryBuilder.php';
-require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
+namespace PHPSQLParser\builders;
+use PHPSQLParser\exceptions\UnableToCreateSQLException;
 
 /**
- * This class implements the builder for [sub_tree] fields. 
+ * This class implements the builder for [sub_tree] fields.
  * You can overwrite all functions to achieve another handling.
  *
  * @author  André Rothe <andre.rothe@phosco.info>
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
- *  
+ *
  */
-class SubTreeBuilder {
+class SubTreeBuilder implements Builder {
 
     protected function buildColRef($parsed) {
         $builder = new ColumnReferenceBuilder();
@@ -79,6 +72,11 @@ class SubTreeBuilder {
         return $builder->build($parsed);
     }
 
+    protected function buildInList($parsed) {
+        $builder = new InListBuilder();
+        return $builder->build($parsed);
+    }
+
     protected function buildReserved($parsed) {
         $builder = new ReservedBuilder();
         return $builder->build($parsed);
@@ -89,13 +87,28 @@ class SubTreeBuilder {
         return $builder->build($parsed);
     }
 
+    protected function buildQuery($parsed) {
+        $builder = new QueryBuilder();
+        return $builder->build($parsed);
+    }
+
     protected function buildSelectBracketExpression($parsed) {
         $builder = new SelectBracketExpressionBuilder();
         return $builder->build($parsed);
     }
 
-    public function build($parsed, $delim = " ") {
-        if ($parsed['sub_tree'] === '') {
+    protected function buildUserVariable($parsed) {
+        $builder = new UserVariableBuilder();
+        return $builder->build($parsed);
+    }
+
+    protected function buildSign($parsed) {
+        $builder = new SignBuilder();
+        return $builder->build($parsed);
+    }
+
+    public function build(array $parsed, $delim = " ") {
+        if ($parsed['sub_tree'] === '' || $parsed['sub_tree'] === false) {
             return "";
         }
         $sql = "";
@@ -105,15 +118,23 @@ class SubTreeBuilder {
             $sql .= $this->buildFunction($v);
             $sql .= $this->buildOperator($v);
             $sql .= $this->buildConstant($v);
+            $sql .= $this->buildInList($v);
             $sql .= $this->buildSubQuery($v);
             $sql .= $this->buildSelectBracketExpression($v);
             $sql .= $this->buildReserved($v);
+            $sql .= $this->buildQuery($v);
+            $sql .= $this->buildUserVariable($v);
+            $sign = $this->buildSign($v);
+            $sql .= $sign;
 
             if ($len == strlen($sql)) {
                 throw new UnableToCreateSQLException('expression subtree', $k, $v, 'expr_type');
             }
 
-            $sql .= $delim;
+            // We don't need whitespace between a sign and the following part.
+            if ($sign === '') {
+                $sql .= $delim;
+            }
         }
         return substr($sql, 0, -strlen($delim));
     }

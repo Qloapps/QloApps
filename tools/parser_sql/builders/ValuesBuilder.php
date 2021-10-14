@@ -35,12 +35,12 @@
  * @author    André Rothe <andre.rothe@phosco.info>
  * @copyright 2010-2014 Justin Swanhart and André Rothe
  * @license   http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
- * @version   SVN: $Id: ValuesBuilder.php 830 2013-12-18 09:35:42Z phosco@gmx.de $
+ * @version   SVN: $Id$
  * 
  */
 
-require_once dirname(__FILE__) . '/../exceptions/UnableToCreateSQLException.php';
-require_once dirname(__FILE__) . '/RecordBuilder.php';
+namespace PHPSQLParser\builders;
+use PHPSQLParser\exceptions\UnableToCreateSQLException;
 
 /**
  * This class implements the builder for the VALUES part of INSERT statement. 
@@ -50,14 +50,14 @@ require_once dirname(__FILE__) . '/RecordBuilder.php';
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *  
  */
-class ValuesBuilder {
+class ValuesBuilder implements Builder {
 
     protected function buildRecord($parsed) {
         $builder = new RecordBuilder();
         return $builder->build($parsed);
     }
 
-    public function build($parsed) {
+    public function build(array $parsed) {
         $sql = "";
         foreach ($parsed as $k => $v) {
             $len = strlen($sql);
@@ -67,10 +67,13 @@ class ValuesBuilder {
                 throw new UnableToCreateSQLException('VALUES', $k, $v, 'expr_type');
             }
 
-            $sql .= ",";
+            $sql .= $this->getRecordDelimiter($v);
         }
-        $sql = substr($sql, 0, -1);
-        return "VALUES " . $sql;
-    }    
+        return "VALUES " . trim($sql);
+    }
+
+    protected function getRecordDelimiter($parsed) {
+        return empty($parsed['delim']) ? ' ' : $parsed['delim'] . ' ';
+    }
 }
 ?>

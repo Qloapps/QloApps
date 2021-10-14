@@ -35,12 +35,12 @@
  * @author    André Rothe <andre.rothe@phosco.info>
  * @copyright 2010-2014 Justin Swanhart and André Rothe
  * @license   http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
- * @version   SVN: $Id: InsertBuilder.php 830 2013-12-18 09:35:42Z phosco@gmx.de $
+ * @version   SVN: $Id$
  * 
  */
 
-require_once dirname(__FILE__) . '/../exceptions/UnableToCreateSQLException.php';
-require_once dirname(__FILE__) . '/ColumnReferenceBuilder.php';
+namespace PHPSQLParser\builders;
+use PHPSQLParser\exceptions\UnableToCreateSQLException;
 
 /**
  * This class implements the builder for the [INSERT] statement parts. 
@@ -50,39 +50,51 @@ require_once dirname(__FILE__) . '/ColumnReferenceBuilder.php';
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *  
  */
-class InsertBuilder {
+class InsertBuilder implements Builder {
 
-    protected function buildColRef($parsed) {
-        $builder = new ColumnReferenceBuilder();
+    protected function buildTable($parsed) {
+        $builder = new TableBuilder();
+        return $builder->build($parsed, 0);
+    }
+
+    protected function buildSubQuery($parsed) {
+        $builder = new SubQueryBuilder();
+        return $builder->build($parsed, 0);
+    }
+
+    protected function buildReserved($parsed) {
+        $builder = new ReservedBuilder();
         return $builder->build($parsed);
     }
 
-    public function build($parsed) {
-        $sql = "INSERT INTO " . $parsed['table'];
+    protected function buildBracketExpression($parsed) {
+        $builder = new SelectBracketExpressionBuilder();
+        return $builder->build($parsed);
+    }
 
-        if ($parsed['columns'] === false) {
-            return $sql;
-        }
+    protected function buildColumnList($parsed) {
+        $builder = new InsertColumnListBuilder();
+        return $builder->build($parsed, 0);
+    }
 
-        $columns = "";
-        foreach ($parsed['columns'] as $k => $v) {
-            $len = strlen($columns);
-            $columns .= $this->buildColRef($v);
+    public function build(array $parsed) {
+        $sql = '';
+        foreach ($parsed as $k => $v) {
+            $len = strlen($sql);
+            $sql .= $this->buildTable($v);
+            $sql .= $this->buildSubQuery($v);
+            $sql .= $this->buildColumnList($v);
+            $sql .= $this->buildReserved($v);
+            $sql .= $this->buildBracketExpression($v);
 
-            if ($len == strlen($columns)) {
-                throw new UnableToCreateSQLException('INSERT[columns]', $k, $v, 'expr_type');
+            if ($len == strlen($sql)) {
+                throw new UnableToCreateSQLException('INSERT', $k, $v, 'expr_type');
             }
 
-            $columns .= ",";
+            $sql .= " ";
         }
-
-        if ($columns !== "") {
-            $columns = " (" . substr($columns, 0, -1) . ")";
-        }
-
-        $sql .= $columns;
-        return $sql;
+        return 'INSERT ' . substr($sql, 0, -1);
     }
-    
+
 }
 ?>

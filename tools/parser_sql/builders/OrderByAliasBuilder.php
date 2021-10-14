@@ -35,12 +35,12 @@
  * @author    André Rothe <andre.rothe@phosco.info>
  * @copyright 2010-2014 Justin Swanhart and André Rothe
  * @license   http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
- * @version   SVN: $Id: OrderByAliasBuilder.php 830 2013-12-18 09:35:42Z phosco@gmx.de $
+ * @version   SVN: $Id$
  * 
  */
 
-require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
-require_once dirname(__FILE__) . '/DirectionBuilder.php';
+namespace PHPSQLParser\builders;
+use PHPSQLParser\utils\ExpressionType;
 
 /**
  * This class implements the builder for an alias within the ORDER-BY clause. 
@@ -50,14 +50,14 @@ require_once dirname(__FILE__) . '/DirectionBuilder.php';
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *  
  */
-class OrderByAliasBuilder {
+class OrderByAliasBuilder implements Builder {
 
     protected function buildDirection($parsed) {
         $builder = new DirectionBuilder();
         return $builder->build($parsed);
     }
 
-    public function build($parsed) {
+    public function build(array $parsed) {
         if ($parsed['expr_type'] !== ExpressionType::ALIAS) {
             return "";
         }
