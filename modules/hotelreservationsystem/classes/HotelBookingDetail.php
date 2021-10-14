@@ -1753,11 +1753,12 @@ class HotelBookingDetail extends ObjectModel
         );
     }
 
-    public function getRoomBookingData($idRoom, $idOrder)
+    public function getRoomBookingData($idRoom, $idOrder, $date_from, $date_to)
     {
         $sql = 'SELECT `id_product`, `id_order_detail`, `id_hotel`, `id_customer`, `booking_type`, `id_status`, `check_in`, `check_out`
                 FROM `'._DB_PREFIX_.'htl_booking_detail`
-                WHERE `id_order`='.(int)$idOrder.' AND `id_room`='.(int)$idRoom;
+                WHERE `id_order`='.(int)$idOrder.' AND `id_room`='.(int)$idRoom.'
+                AND `date_from`=\''.pSQL($date_from).'\' AND `date_to`= \''.pSQL($date_to).'\'';
 
         return Db::getInstance()->getRow($sql);
     }
