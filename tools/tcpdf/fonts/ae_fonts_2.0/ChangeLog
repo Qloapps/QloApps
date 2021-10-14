@@ -1,0 +1,863 @@
+2007-08-20 00:48  Youssef Chahibi <chahibi@gmail.com>
+
+	* sfd/ae_AlArabiya.sfd: Diagonal marks
+
+2007-08-20 00:25  Khaled Hosny <khaledhosny@eglug.org>
+
+	* README: Added Release notes, preparing for 2.0 release.
+
+2007-08-19 23:19  Youssef Chahibi <chahibi@gmail.com>
+
+	* sfd/ae_AlArabiya.sfd: Stack diacritics definition
+
+2007-08-19 22:56  Khaled Hosny <khaledhosny@eglug.org>
+
+	* sfd/ae_Tholoth.sfd:
+	  * Added 'rlg' lookup table and subtable and registered stacked
+	  diacritic ligatures.
+	  * kasrah and kasratan were too close to the base glyph, fixed.
+
+2007-08-19 22:28  Khaled Hosny <khaledhosny@eglug.org>
+
+	* sfd/: ae_AlHor.sfd, ae_AlMateen-Bold.sfd, ae_AlMohanad.sfd,
+	  ae_AlYarmook.sfd, ae_Arab.sfd, ae_Cortoba.sfd, ae_Furat.sfd,
+	  ae_Graph.sfd, ae_Kayrawan.sfd, ae_Khalid.sfd, ae_Mashq-Bold.sfd,
+	  ae_Mashq.sfd, ae_Metal.sfd, ae_Nada.sfd, ae_Nagham.sfd,
+	  ae_Ostorah.sfd, ae_Ouhod-Bold.sfd, ae_Petra.sfd,
+	  ae_Rasheeq-Bold.sfd, ae_Rehan.sfd, ae_Salem.sfd, ae_Shado.sfd,
+	  ae_Sharjah.sfd, ae_Sindbad.sfd, ae_Tarablus.sfd: Scaled up
+	  diacritic glyphs, this makes them more readable.
+
+2007-08-19 22:03  Youssef Chahibi <chahibi@gmail.com>
+
+	* sfd/ae_AlArabiya.sfd: New sukun, removed wrong anchors from
+	  kasrah
+
+2007-08-19 20:26  Khaled Hosny <khaledhosny@eglug.org>
+
+	* sfd/ae_AlMothnna-Bold.sfd: Added 'rlg' lookup table and subtable
+	  and registered stacked diacritic ligatures.
+
+2007-08-19 18:28  Youssef Chahibi <chahibi@gmail.com>
+
+	* sfd/ae_AlMothnna-Bold.sfd: Fixed shaddas
+
+2007-08-19 18:01  Youssef Chahibi <chahibi@gmail.com>
+
+	* sfd/ae_AlMothnna-Bold.sfd: Stacked diacrititcs
+
+2007-08-19 14:49  Khaled Hosny <khaledhosny@eglug.org>
+
+	* sfd/ae_AlArabiya.sfd: Removed mark2mark anchors, now we use
+	  ligature substitution for stacked	diacritics instead of anchors.
+	  Added 'rlg' lookup table and subtable and registered stacked
+	  diacritic ligatures.
+
+2007-08-19 02:30  Youssef Chahibi <chahibi@gmail.com>
+
+	* sfd/ae_AlArabiya.sfd: Stacked diacritics added
+
+2007-08-19 01:53  Khaled Hosny <khaledhosny@eglug.org>
+
+	* sfd/ArabicReesha.sfd:
+	  * Added to new ligatures; <fathatan><alef isolated> and
+	  <fathatan><alef final>.
+	  * Small fixes to Jeem isolated width.
+
+2007-08-18 21:30  Youssef Chahibi <chahibi@gmail.com>
+
+	* sfd/ae_AlMothnna-Bold.sfd: Diacritics fixed except allahisolated
+	  ligature
+
+2007-08-18 20:13  Khaled Hosny <khaledhosny@eglug.org>
+
+	* sfd/ae_AlMothnna-Bold.sfd: Removed old, buggy, anchors and auto
+	  added new ones, needs manual editing.
+
+2007-08-18 19:11  Youssef Chahibi <chahibi@gmail.com>
+
+	* sfd/ae_AlMothnna-Bold.sfd: New shadda, modified sukun to meet the
+	  other marks
+
+2007-08-18 17:20  Youssef Chahibi <chahibi@gmail.com>
+
+	* sfd/ae_AlArabiya.sfd: New diacritics for ae_AlArabiya.sfd
+
+2007-08-17 23:19  Afief Halumi <afief.h@gmail.com>
+
+	* sfd/ae_Tholoth.sfd: ae_Tholoth.sfd: Added glyphs U+FC5E - U+FC62.
+
+2007-08-16 14:56  Khaled Hosny <khaledhosny@eglug.org>
+
+	* sfd/ae_AlMohanad.sfd: AlMohanad: Fixed U+FEDA (kaf final) to take
+	  the shape of ordinary final kaf rather than the long variant.
+
+2007-08-15 14:25  Khaled Hosny <khaledhosny@eglug.org>
+
+	* sfd/ArabicReesha.sfd: ArabicReesha.sfd: Fixed a bug that caused
+	  some isolated glyphs to have more space to the right.
+
+2007-08-15 12:02  Khaled Hosny <khaledhosny@eglug.org>
+
+	* sfd/: ae_AlMateen-Bold.sfd, ae_AlMohanad.sfd, ae_AlYarmook.sfd,
+	  ae_Electron.sfd, ae_Hani.sfd, ae_Haramain.sfd, ae_Khalid.sfd,
+	  ae_Rasheeq-Bold.sfd, ae_Rehan.sfd, ae_Sharjah.sfd,
+	  ae_Tarablus.sfd, ae_Tholoth.sfd: Add new 'liga' table without
+	  "Ignore Combining Marks" flag, allahisolated ligature belong to that
+	  table now, so when allahisolated has a tashkil on it, the ligature
+	  will be ignored and will use normal glyphs instead.
+
+2007-08-15 11:05  Khaled Hosny <khaledhosny@eglug.org>
+
+	* sfd/: ae_Granada.sfd, ae_Graph.sfd, ae_Haramain.sfd,
+	  ae_Nagham.sfd, ae_Nice.sfd, ae_Ostorah.sfd, ae_Sindbad.sfd,
+	  ae_Tarablus.sfd: Added "Ignore Combining Marks flag" to 'liga'
+	  table.
+
+2007-08-15 10:35  Khaled Hosny <khaledhosny@eglug.org>
+
+	* sfd/ArabicReesha.sfd: ArabicReesha: New font based on SIL's
+	  Scheherazade, first version.
+
+2007-08-15 00:23  Khaled Hosny <khaledhosny@eglug.org>
+
+	* sfd/ae_AlArabiya.sfd: Shadda was missing mark2mark below anchor.
+
+2007-08-14 23:28  Mohammed Adnene Trojette <adn@diwi.org>
+
+	* Makefile: GPL has been removed
+
+2007-08-14 23:21  Mohammed Adnene Trojette <adn@diwi.org>
+
+	* COPYING, README: Copyright informations
+
+2007-08-14 23:05  Khaled Hosny <khaledhosny@eglug.org>
+
+	* COPYING: Updated to refer to FreeFonts project.
+
+2007-08-14 22:56  Khaled Hosny <khaledhosny@eglug.org>
+
+	* sfd/ae_Salem.sfd: Updated the copyright statement, to mention GPL
+	  font exception and FreeFonts project, again
+
+2007-08-14 22:43  Afief Halumi <afief.h@gmail.com>
+
+	* sfd/ae_Salem.sfd: Revert to 1.7 and added Allah anchors(again).
+
+2007-08-14 21:35  Afief Halumi <afief.h@gmail.com>
+
+	* sfd/ae_Tholoth.sfd: Minor positioning fix
+
+2007-08-14 21:12  Khaled Hosny <khaledhosny@eglug.org>
+
+	* sfd/ae_Tholoth.sfd: Added missed U+0647.
+
+2007-08-14 18:37  Khaled Hosny <khaledhosny@eglug.org>
+
+	* sfd/: ae_AlArabiya.sfd, ae_AlBattar.sfd, ae_AlHor.sfd,
+	  ae_AlManzomah.sfd, ae_AlMateen-Bold.sfd, ae_AlMohanad.sfd,
+	  ae_AlMothnna-Bold.sfd, ae_AlYarmook.sfd, ae_Arab.sfd,
+	  ae_Cortoba.sfd, ae_Dimnah.sfd, ae_Electron.sfd, ae_Furat.sfd,
+	  ae_Granada.sfd, ae_Graph.sfd, ae_Hani.sfd, ae_Haramain.sfd,
+	  ae_Hor.sfd, ae_Japan.sfd, ae_Jet.sfd, ae_Kayrawan.sfd,
+	  ae_Khalid.sfd, ae_Mashq-Bold.sfd, ae_Mashq.sfd, ae_Metal.sfd,
+	  ae_Nada.sfd, ae_Nagham.sfd, ae_Nice.sfd, ae_Ostorah.sfd,
+	  ae_Ouhod-Bold.sfd, ae_Petra.sfd, ae_Rasheeq-Bold.sfd,
+	  ae_Rehan.sfd, ae_Salem.sfd, ae_Shado.sfd, ae_Sharjah.sfd,
+	  ae_Sindbad.sfd, ae_Tarablus.sfd, ae_Tholoth.sfd: Updated the
+	  copyright statement, to mention GPL font exception and FreeFonts
+	  project.
+
+2007-08-13 22:18  Khaled Hosny <khaledhosny@eglug.org>
+
+	* sfd/: ae_AlArabiya.sfd, ae_AlBattar.sfd, ae_AlManzomah.sfd,
+	  ae_AlMateen-Bold.sfd, ae_AlMohanad.sfd, ae_AlMothnna-Bold.sfd,
+	  ae_Arab.sfd, ae_Cortoba.sfd, ae_Electron.sfd, ae_Furat.sfd,
+	  ae_Granada.sfd, ae_Graph.sfd, ae_Hani.sfd, ae_Haramain.sfd,
+	  ae_Hor.sfd, ae_Jet.sfd, ae_Kayrawan.sfd, ae_Mashq-Bold.sfd,
+	  ae_Mashq.sfd, ae_Nada.sfd, ae_Nagham.sfd, ae_Nice.sfd,
+	  ae_Ostorah.sfd, ae_Ouhod-Bold.sfd, ae_Petra.sfd,
+	  ae_Rasheeq-Bold.sfd, ae_Rehan.sfd, ae_Salem.sfd, ae_Shado.sfd,
+	  ae_Sharjah.sfd, ae_Sindbad.sfd, ae_Tarablus.sfd, ae_Tholoth.sfd:
+	  * Add missed mark2mark anchors in the affected files, though we
+	  aren't going to use this on the long run, but I'll leave that task
+	  for 2.1 .
+	  * Reencoded all files to unicode glyph map.
+
+2007-08-13 14:47  Khaled Hosny <khaledhosny@eglug.org>
+
+	* sfd/: ae_Petra.sfd, ae_Shado.sfd: ae_Petra.sfd, ae_Shado.sfd:
+	  Full support for diacritics positioning by Osama Khalid.
+
+2007-08-13 10:38  Khaled Hosny <khaledhosny@eglug.org>
+
+	* sfd/: ae_Hor.sfd, ae_Sharjah.sfd:
+	  * ae_Hor: Full support for diacritics positioning by Fahd.
+	  * ae_Sharjah: Full support for diacritics positioning by Fahd.
+
+2007-08-13 05:34  Youssef Chahibi <chahibi@gmail.com>
+
+	* sfd/: ae_Nice.sfd, ae_Tarablus.sfd: Full diacritics supports,
+	  needs a check
+
+2007-08-13 05:24  Youssef Chahibi <chahibi@gmail.com>
+
+	* sfd/ae_Nagham.sfd: Full diacritics supports, needs a check
+
+2007-08-13 05:08  Youssef Chahibi <chahibi@gmail.com>
+
+	* sfd/ae_Haramain.sfd: Full diacritics supports, needs a check
+
+2007-08-13 04:42  Youssef Chahibi <chahibi@gmail.com>
+
+	* sfd/ae_Graph.sfd: Full diacritics supports, needs a check
+
+2007-08-13 04:38  Youssef Chahibi <chahibi@gmail.com>
+
+	* sfd/ae_Granada.sfd: Full diacritics supports, needs a check
+
+2007-08-13 03:28  Afief Halumi <afief.h@gmail.com>
+
+	* sfd/ae_Ostorah.sfd: ae_Ostorah.sfd: Full support for diacritic
+	  positioning.
+
+2007-08-13 02:13  Youssef Chahibi <chahibi@gmail.com>
+
+	* sfd/ae_Haramain.sfd: Done: replaced ugly marks, repositioned
+	  below marks
+
+2007-08-13 01:31  Youssef Chahibi <chahibi@gmail.com>
+
+	* sfd/ae_Graph.sfd: Done, needs to be checked
+
+2007-08-13 01:16  Youssef Chahibi <chahibi@gmail.com>
+
+	* sfd/ae_Granada.sfd: Done, needs to be checked
+
+2007-08-12 23:05  Youssef Chahibi <chahibi@gmail.com>
+
+	* sfd/: ae_Tarablus.sfd: First steps
+
+2007-08-12 18:24  Afief Halumi <afief.h@gmail.com>
+
+	* sfd/ae_Electron.sfd: ae_Electron.sfd: Full support for diacritic
+	  positioning.
+
+2007-08-12 16:06  Khaled Hosny <khaledhosny@eglug.org>
+
+	* sfd/ae_Hani.sfd: ae_Hani.sfd: Full support for diacritic
+	  positioning by Osama Khaled
+
+2007-08-11 23:33  Afief Halumi <afief.h@gmail.com>
+
+	* sfd/ae_Ouhod-Bold.sfd: ae_Ouhod-Bold.sfd: Full support for
+	  diacritic positioning.
+
+2007-08-11 21:28  Afief Halumi <afief.h@gmail.com>
+
+	* sfd/ae_Rasheeq-Bold.sfd: ae_Rasheeq-Bold.sfd: Full diacritic
+	  support.
+
+2007-08-11 15:09  Khaled Hosny <khaledhosny@eglug.org>
+
+	* sfd/ae_Hor.sfd: some fixes
+
+2007-08-11 14:55  Khaled Hosny <khaledhosny@eglug.org>
+
+	* sfd/: ae_Electron.sfd, ae_Granada.sfd, ae_Graph.sfd,
+	  ae_Haramain.sfd, ae_Nagham.sfd, ae_Nice.sfd, ae_Ostorah.sfd,
+	  ae_Ouhod-Bold.sfd, ae_Rasheeq-Bold.sfd, ae_Shado.sfd,
+	  ae_Sharjah.sfd, ae_Tarablus.sfd: More tweaking, it is ready for
+	  manual editing now (I hope so).
+
+2007-08-11 11:08  Khaled Hosny <khaledhosny@eglug.org>
+
+	* sfd/ae_Hor.sfd: Fahd: I updated the anchor points, please use
+	  this instead of the old version.
+
+2007-08-11 10:45  Khaled Hosny <khaledhosny@eglug.org>
+
+	* sfd/: ae_Electron.sfd, ae_Granada.sfd, ae_Graph.sfd, ae_Hani.sfd,
+	  ae_Haramain.sfd, ae_Nagham.sfd, ae_Nice.sfd, ae_Ostorah.sfd,
+	  ae_Ouhod-Bold.sfd, ae_Petra.sfd, ae_Rasheeq-Bold.sfd,
+	  ae_Shado.sfd, ae_Sharjah.sfd, ae_Tarablus.sfd: Replaced old
+	  anchor points with new ones and better automatic positioning using
+	  the improved addanchors.pe script. Please update your local copy
+	  before doing any further work, this will make our life easier.
+
+2007-08-11 10:25  Khaled Hosny <khaledhosny@eglug.org>
+
+	* tools/addanchors.pe: Now X and Y values are computed to produce a
+	  far better result, the needed manual tweaking is very little now.
+
+2007-08-10 01:27  Khaled Hosny <khaledhosny@eglug.org>
+
+	* sfd/ae_Nada.sfd: ae_Nada.sfd: Full support for diacritic
+	  positioning by Fahd AlSaidi.
+
+2007-08-07 23:47  Khaled Hosny <khaledhosny@eglug.org>
+
+	* sfd/ae_AlYarmook.sfd:
+	  * ae_AlYarmook.sfd: Changed font name and other related feilds from
+	  AlYermook to AlYarmook
+	  * ae_AlYarmook.sfd: Full support for diacritic positioning.
+
+2007-08-07 00:22  Khaled Hosny <khaledhosny@eglug.org>
+
+	* sfd/ae_Mashq-Bold.sfd: sfd/ae_Mashq-Bold.sfd: Full support for
+	  diacritic positioning.
+
+2007-08-06 02:58  Khaled Hosny <khaledhosny@eglug.org>
+
+	* sfd/ae_Rehan.sfd: Mark to mark ligatures were too close, fixed.
+
+2007-08-04 20:14  Afief Halumi <afief.h@gmail.com>
+
+	* sfd/ae_Rehan.sfd: ae_Rehan.sfd: Full support for diacritic
+	  positioning.
+
+2007-08-04 01:22  Khaled Hosny <khaledhosny@eglug.org>
+
+	* sfd/ae_Mashq.sfd: ae_Mashq.sfd: Full support for diacritic
+	  positioning.
+
+2007-08-04 01:19  Khaled Hosny <khaledhosny@eglug.org>
+
+	* sfd/ae_Khalid.sfd: Reencoded the file to Unicode.
+
+2007-08-04 01:16  Khaled Hosny <khaledhosny@eglug.org>
+
+	* sfd/ae_Kayrawan.sfd: Fixed ArabicMark2MarkBelow anchor point.
+	  Reencoded the file to Unicode.
+
+2007-08-03 06:12  Youssef Chahibi <chahibi@gmail.com>
+
+	* sfd/ae_Kayrawan.sfd: Fixed two letters ligatures diacritics
+
+2007-08-03 05:55  Youssef Chahibi <chahibi@gmail.com>
+
+	* sfd/ae_Kayrawan.sfd: Added لله ligature diacritics
+
+2007-08-03 05:01  Youssef Chahibi <chahibi@gmail.com>
+
+	* sfd/ae_Kayrawan.sfd: Ignore combining marks set
+
+2007-08-03 04:51  Youssef Chahibi <chahibi@gmail.com>
+
+	* sfd/ae_Kayrawan.sfd: Full diacritics support -
+	  ArabicMark2MarkBelow need to be checked
+
+2007-08-03 02:40  Afief Halumi <afief.h@gmail.com>
+
+	* sfd/ae_Salem.sfd: Added and positioned anchors for Allah glyph.
+
+2007-08-03 02:32  Khaled Hosny <khaledhosny@eglug.org>
+
+	* sfd/ae_Dimnah.sfd: ae_Dimnah.sfd: Full support for diacritic
+	  positioning.
+
+2007-08-03 01:26  Youssef Chahibi <chahibi@gmail.com>
+
+	* sfd/ae_Kayrawan.sfd: First steps in font editing
+
+2007-08-03 00:10  Afief Halumi <afief.h@gmail.com>
+
+	* sfd/ae_Salem.sfd: ae_Salem.sfd: Full diacritic support.
+
+2007-08-02 04:50  Khaled Hosny <khaledhosny@eglug.org>
+
+	* sfd/ae_Arab.sfd: Fixed ligatures anchor points.
+
+2007-08-02 02:15  Khaled Hosny <khaledhosny@eglug.org>
+
+	* sfd/ae_Arab.sfd: Support for diacritic positioning by Osama
+	  Khalid.
+
+2007-08-01 23:09  Khaled Hosny <khaledhosny@eglug.org>
+
+	* sfd/ae_AlManzomah.sfd: ae_AlManzomah.sfd: Full support for
+	  diacritic positioning.
+
+2007-08-01 01:56  Khaled Hosny <khaledhosny@eglug.org>
+
+	* sfd/ae_Khalid.sfd: ae_Khalid.sfd: Full support for diacritic
+	  positioning.
+
+2007-07-28 11:43  Khaled Hosny <khaledhosny@eglug.org>
+
+	* sfd/ae_AlMateen-Bold.sfd: ae_AlMateen-Bold.sfd: Full support for
+	  diacritic positioning.
+
+2007-07-27 22:16  Afief Halumi <afief.h@gmail.com>
+
+	* Makefile: New make targets as requested by KhaledHosney.
+
+2007-07-27 21:04  Khaled Hosny <khaledhosny@eglug.org>
+
+	* sfd/ae_AlHor.sfd: ae_AlHor.sfd: Full diacritic support
+
+2007-07-26 10:14  Afief Halumi <afief.h@gmail.com>
+
+	* sfd/ae_Jet.sfd: ./sfd/ae_Jet.sfd: Full diacritic support.
+
+2007-07-26 01:38  Khaled Hosny <khaledhosny@eglug.org>
+
+	* sfd/ae_Japan.sfd: Aeif, you forgot the ligatures and letter beh
+	  isolated, fixed
+
+2007-07-25 14:41  Khaled Hosny <khaledhosny@eglug.org>
+
+	* sfd/ae_Metal.sfd: Add anchor points for لله ligature
+
+2007-07-25 12:52  Afief Halumi <afief.h@gmail.com>
+
+	* sfd/ae_Metal.sfd: ae_Metal: Full diacritic support.
+
+2007-07-25 01:36  Afief Halumi <afief.h@gmail.com>
+
+	* sfd/ae_Japan.sfd: ae_Japan: Full diacritic support.
+
+2007-07-25 01:28  Khaled Hosny <khaledhosny@eglug.org>
+
+	* sfd/ae_Cortoba.sfd: minor fix
+
+2007-07-25 00:24  Khaled Hosny <khaledhosny@eglug.org>
+
+	* sfd/ae_Cortoba.sfd:
+
+	  ----------------------------------------------------------------------ae_Cortoba.sfd: Full support for diacritic positioning.
+
+2007-07-24 18:34  Khaled Hosny <khaledhosny@eglug.org>
+
+	* tools/generate.sh: not needed any more, use 'make' instead
+
+2007-07-24 18:31  Khaled Hosny <khaledhosny@eglug.org>
+
+	* sfd/ae_Sindbad.sfd: Add anchor points for لله ligature
+
+2007-07-24 18:04  Khaled Hosny <khaledhosny@eglug.org>
+
+	* sfd/ae_AlArabiya.sfd: Fixed ligatures anchor points
+
+2007-07-24 17:55  Khaled Hosny <khaledhosny@eglug.org>
+
+	* sfd/ae_Furat.sfd: Add anchor points for لله ligature
+
+2007-07-23 23:16  Khaled Hosny <khaledhosny@eglug.org>
+
+	* README, README.cvs:
+	  - new readme file to explain how to build ttf onts from our cvs
+	  tree.
+
+2007-07-23 23:01  Khaled Hosny <khaledhosny@eglug.org>
+
+	* sfd/ae_AlBattar.sfd: few fixes in the diacritic positions
+
+2007-07-23 13:56  Khaled Hosny <khaledhosny@eglug.org>
+
+	* sfd/ae_AlBattar.sfd: ae_AlBattar.sfd, full support for diacritic
+	  positioning.
+
+2007-07-23 05:28  Afief Halumi <afief.h@gmail.com>
+
+	* Makefile: Now doesn't rebuild untouched fonts, should save some
+	  server cycles.
+
+2007-07-23 04:00  Khaled Hosny <khaledhosny@eglug.org>
+
+	* sfd/ae_Sindbad.sfd: Unchecked 'compact' option
+
+2007-07-23 00:16  Khaled Hosny <khaledhosny@eglug.org>
+
+	* sfd/ae_Sindbad.sfd:
+	  - Add the missed "Ignore Combining Marks" feature to Arabic liga
+	  lookuptable, Afief please remember this.
+	  - Few changes in ArabicBelow anchor points placement.
+
+2007-07-22 14:42  Khaled Hosny <khaledhosny@eglug.org>
+
+	* sfd/ae_AlBattar.sfd: Diacritic support, for isolated glyphs only.
+
+2007-07-22 00:43  Afief Halumi <afief.h@gmail.com>
+
+	* sfd/ae_Sindbad.sfd: Full support for diacritic positioning.
+
+2007-07-21 21:38  Khaled Hosny <khaledhosny@eglug.org>
+
+	* Makefile: fixed "clean" to remove the bzipped archive.
+
+2007-07-21 21:34  Khaled Hosny <khaledhosny@eglug.org>
+
+	* Makefile:
+	  - All files are under ae_fonts dir now.
+	  - The archive is bzipped.
+
+2007-07-21 20:05  Afief Halumi <afief.h@gmail.com>
+
+	* Makefile: Committed the Makefile. Hope you like it.
+
+2007-07-21 19:11  Khaled Hosny <khaledhosny@eglug.org>
+
+	* tools/generate.pe: Add a usage note.
+
+2007-07-21 19:09  Khaled Hosny <khaledhosny@eglug.org>
+
+	* tools/generate.pe: Now accepts a 2nd argument for the .ttf file
+	  name.
+
+2007-07-21 18:52  Afief Halumi <afief.h@gmail.com>
+
+	* sfd/ae_Tholoth.sfd: A few fixes in positioning.
+
+2007-07-21 16:48  Afief Halumi <afief.h@gmail.com>
+
+	* sfd/ae_Tholoth.sfd: Finished work on ae_Tholoth.sfd; Added a few
+	  better glyphs and full support for diacritic positioning.
+
+2007-07-21 00:04  Khaled Hosny <khaledhosny@eglug.org>
+
+	* sfd/ae_Tholoth.sfd:
+
+	  Diacritics work by afief
+
+2007-07-19 23:49  Khaled Hosny <khaledhosny@eglug.org>
+
+	* tools/addanchors.pe: Add support for mark2glyph anchor points,
+	  thanks George Williams for fixing fontforge's bug.
+
+2007-07-19 23:16  Khaled Hosny <khaledhosny@eglug.org>
+
+	* sfd/: ae_AlBattar.sfd, ae_AlHor.sfd, ae_AlManzomah.sfd,
+	  ae_AlMateen-Bold.sfd, ae_AlYarmook.sfd, ae_Arab.sfd,
+	  ae_Cortoba.sfd, ae_Dimnah.sfd, ae_Electron.sfd, ae_Granada.sfd,
+	  ae_Graph.sfd, ae_Hani.sfd, ae_Haramain.sfd, ae_Hor.sfd,
+	  ae_Japan.sfd, ae_Jet.sfd, ae_Kayrawan.sfd, ae_Khalid.sfd,
+	  ae_Mashq-Bold.sfd, ae_Mashq.sfd, ae_Metal.sfd, ae_Nada.sfd,
+	  ae_Nagham.sfd, ae_Nice.sfd, ae_Ostorah.sfd, ae_Ouhod-Bold.sfd,
+	  ae_Petra.sfd, ae_Rasheeq-Bold.sfd, ae_Rehan.sfd, ae_Salem.sfd,
+	  ae_Shado.sfd, ae_Sharjah.sfd, ae_Sindbad.sfd, ae_Tarablus.sfd,
+	  ae_Tholoth.sfd:
+
+	  - Removed Cyrillic and Greek glyphs, this makes the font more
+	  lighter.
+	  - Add all needed anchor points, still needs to be manually adjusted.
+
+2007-07-19 23:15  Khaled Hosny <khaledhosny@eglug.org>
+
+	* sfd/: ae_AlMohanad.sfd, ae_AlMothnna-Bold.sfd, ae_Furat.sfd:
+	  Removed Cyrillic and Greek glyphs, this makes the font more lighter.
+
+2007-07-19 23:12  Khaled Hosny <khaledhosny@eglug.org>
+
+	* sfd/ae_AlArabiya.sfd: full support for diacritic positioning
+
+2007-07-18 14:57  Khaled Hosny <khaledhosny@eglug.org>
+
+	* sfd/ae_AlArabiya.sfd:
+
+	  Full mark2base and mark2mark anchor points
+
+2007-07-16 20:53  Khaled Hosny <khaledhosny@eglug.org>
+
+	* sfd/ae_Nada.sfd:
+
+	  Removed obsolete reference to Btstream copyright, we don't include
+	  any Bitstream copyrighted glyphs anymore.
+
+2007-07-16 20:03  Khaled Hosny <khaledhosny@eglug.org>
+
+	* tools/: addanchors.pe, addlookups.pe, cp.pe, generate.pe:
+
+	  use "#!/usr/bin/env fontforge" instead of "#!/usr/bin/fontforge"
+
+2007-07-16 13:47  Khaled Hosny <khaledhosny@eglug.org>
+
+	* sfd/ae_AlMohanad.sfd:
+
+	  Full support for proper diacritics positioning
+
+2007-07-16 00:16  Khaled Hosny <khaledhosny@eglug.org>
+
+	* tools/: addanchors.pe, addlookups.pe, cp.pe, generate.pe: Now the
+	  scripts require Fotforge 20070501 or newer, older versions use older
+	  SFD formate which we don't suport.
+
+2007-07-16 00:09  Khaled Hosny <khaledhosny@eglug.org>
+
+	* sfd/ae_AlArabiya.sfd: Add support for proper diacritic
+	  positioning by Afief Halumi, still in progress
+
+2007-07-15 23:48  Khaled Hosny <khaledhosny@eglug.org>
+
+	* sfd/ae_Furat.sfd: full support for diacritic positioning
+
+2007-07-15 20:08  Khaled Hosny <khaledhosny@eglug.org>
+
+	* sfd/: ae_AlBattar.sfd, ae_AlHor.sfd, ae_AlManzomah.sfd,
+	  ae_AlMateen-Bold.sfd, ae_AlMohanad.sfd, ae_AlYarmook.sfd,
+	  ae_Arab.sfd, ae_Cortoba.sfd, ae_Dimnah.sfd, ae_Electron.sfd,
+	  ae_Granada.sfd, ae_Graph.sfd, ae_Hani.sfd, ae_Haramain.sfd,
+	  ae_Hor.sfd, ae_Japan.sfd, ae_Jet.sfd, ae_Kayrawan.sfd,
+	  ae_Khalid.sfd, ae_Mashq-Bold.sfd, ae_Mashq.sfd, ae_Metal.sfd,
+	  ae_Nada.sfd, ae_Nagham.sfd, ae_Nice.sfd, ae_Ostorah.sfd,
+	  ae_Ouhod-Bold.sfd, ae_Petra.sfd, ae_Rasheeq-Bold.sfd,
+	  ae_Rehan.sfd, ae_Salem.sfd, ae_Shado.sfd, ae_Sharjah.sfd,
+	  ae_Sindbad.sfd, ae_Tarablus.sfd, ae_Tholoth.sfd: removed traces
+	  of ae_ prefix
+
+2007-07-15 19:44  Khaled Hosny <khaledhosny@eglug.org>
+
+	* sfd/ae_AlArabiya.sfd: removed traces of ae_ prefix
+
+2007-07-13 20:14  Khaled Hosny <khaledhosny@eglug.org>
+
+	* sfd/ae_AlMothnna-Bold.sfd:
+	  - Removed traces of ae_ prefix.
+	  - Full support for proper Arabic diacritics positioning.
+
+2007-07-13 19:38  Khaled Hosny <khaledhosny@eglug.org>
+
+	* sfd/ae_Furat.sfd:
+	  - Removed traces of ae_ prefix.
+	  - add anchor points for Arabic diacritics, needs manual tuning.
+
+2007-07-13 19:09  Khaled Hosny <khaledhosny@eglug.org>
+
+	* tools/: addanchors.pe, addlookups.pe: scripts to assist adding
+	  lookup tables and anchor points needed for proper diacritics
+	  (harakat) support.
+
+2007-07-01 03:31  Khaled Hosny <khaledhosny@eglug.org>
+
+	* sfd/: ae_AlArabiya.sfd, ae_AlBattar.sfd, ae_AlHor.sfd,
+	  ae_AlManzomah.sfd, ae_AlMateen-Bold.sfd, ae_AlMohanad.sfd,
+	  ae_AlMothnna-Bold.sfd, ae_AlYarmook.sfd, ae_Arab.sfd,
+	  ae_Cortoba.sfd, ae_Dimnah.sfd, ae_Electron.sfd, ae_Furat.sfd,
+	  ae_Granada.sfd, ae_Graph.sfd, ae_Hani.sfd, ae_Haramain.sfd,
+	  ae_Hor.sfd, ae_Japan.sfd, ae_Jet.sfd, ae_Kayrawan.sfd,
+	  ae_Khalid.sfd, ae_Mashq-Bold.sfd, ae_Mashq.sfd, ae_Metal.sfd,
+	  ae_Nada.sfd, ae_Nagham.sfd, ae_Nice.sfd, ae_Ostorah.sfd,
+	  ae_Ouhod-Bold.sfd, ae_Petra.sfd, ae_Rasheeq-Bold.sfd,
+	  ae_Rehan.sfd, ae_Salem.sfd, ae_Shado.sfd, ae_Sharjah.sfd,
+	  ae_Sindbad.sfd, ae_Tarablus.sfd, ae_Tholoth.sfd: Removed ae_
+	  prefix from all fonts, see
+	  http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=361965
+
+2007-06-30 22:02  Khaled Hosny <khaledhosny@eglug.org>
+
+	* README: Initial README file
+
+2007-06-30 20:20  Khaled Hosny <khaledhosny@eglug.org>
+
+	* tools/: generate.pe, generate.sh: Scripts to generate TTF files
+	  from SFD ones.
+
+2007-06-30 19:58  Khaled Hosny <khaledhosny@eglug.org>
+
+	* sfd/ae_Tarablus.sfd: add the missed U+F6BE that caused bug in 'j'
+	  glyph, CVS_SILENT
+
+2007-06-30 19:48  Khaled Hosny <khaledhosny@eglug.org>
+
+	* sfd/ae_Sindbad.sfd:
+	   add the missed U+F6BE that caused bug in 'j' glyph, CVS_SILENT
+
+2007-06-23 22:29  Khaled Hosny <khaledhosny@eglug.org>
+
+	* sfd/: ae_Shado.sfd, ae_Sharjah.sfd: add the missed U+F6BE that
+	  caused bug in 'j' glyph
+
+2007-06-23 22:26  Khaled Hosny <khaledhosny@eglug.org>
+
+	* sfd/: ae_Rasheeq-Bold.sfd, ae_Rehan.sfd, ae_Salem.sfd: add the
+	  missed U+F6BE that caused bug in 'j' glyph
+
+2007-06-23 22:22  Khaled Hosny <khaledhosny@eglug.org>
+
+	* sfd/: ae_Nice.sfd, ae_Ostorah.sfd, ae_Ouhod-Bold.sfd,
+	  ae_Petra.sfd: add the missed U+F6BE that caused bug in 'j' glyph
+
+2007-06-23 22:19  Khaled Hosny <khaledhosny@eglug.org>
+
+	* sfd/: ae_Metal.sfd, ae_Nada.sfd, ae_Nagham.sfd: add the missed
+	  U+F6BE that caused bug in 'j' glyph
+
+2007-06-23 22:16  Khaled Hosny <khaledhosny@eglug.org>
+
+	* sfd/: ae_Kayrawan.sfd, ae_Khalid.sfd, ae_Mashq-Bold.sfd,
+	  ae_Mashq.sfd: add the missed U+F6BE that caused bug in 'j' glyph
+
+2007-06-23 22:12  Khaled Hosny <khaledhosny@eglug.org>
+
+	* sfd/: ae_Haramain.sfd, ae_Hor.sfd, ae_Japan.sfd, ae_Jet.sfd: add
+	  the missed U+F6BE that caused bug in 'j' glyph
+
+2007-06-23 22:09  Khaled Hosny <khaledhosny@eglug.org>
+
+	* sfd/: ae_Granada.sfd, ae_Graph.sfd, ae_Hani.sfd: add the missed
+	  U+F6BE that caused bug in 'j' glyph
+
+2007-06-23 22:05  Khaled Hosny <khaledhosny@eglug.org>
+
+	* sfd/: ae_Electron.sfd, ae_Furat.sfd: add the missed U+F6BE that
+	  caused bug in 'j' glyph
+
+2007-06-23 22:02  Khaled Hosny <khaledhosny@eglug.org>
+
+	* sfd/: ae_Cortoba.sfd, ae_Dimnah.sfd: add the missed U+F6BE that
+	  caused bug in 'j' glyph
+
+2007-06-23 21:59  Khaled Hosny <khaledhosny@eglug.org>
+
+	* sfd/: ae_AlYarmook.sfd, ae_Arab.sfd: add the missed U+F6BE that
+	  caused bug in 'j' glyph
+
+2007-06-23 21:19  Khaled Hosny <khaledhosny@eglug.org>
+
+	* sfd/: ae_AlArabiya.sfd, ae_AlBattar.sfd, ae_AlHor.sfd,
+	  ae_AlManzomah.sfd, ae_AlMateen-Bold.sfd, ae_AlMohanad.sfd,
+	  ae_AlMothnna-Bold.sfd: Added the missed U+U+F6BE glyphs which
+	  caused a bug in "j" glyph
+
+2007-06-23 18:30  Khaled Hosny <khaledhosny@eglug.org>
+
+	* COPYING: -Moved GPL to a separate file.  -Added GPL font
+	  exception to COPYING.
+
+2007-06-23 18:12  Khaled Hosny <khaledhosny@eglug.org>
+
+	* sfd/ae_Tholoth.sfd:
+	  - New glyphs (covering every thing outside Arabic block) based on
+	  the GPL'd FreeFont project [http://www.nongnu.org/freefont/].
+	  - Arabic diacritic marks (harakat) are set to have zero advance
+	  width and OT class as 'mark' nstead of 'base glyph'
+
+2007-06-23 18:07  Khaled Hosny <khaledhosny@eglug.org>
+
+	* sfd/: ae_Shado.sfd, ae_Sharjah.sfd, ae_Sindbad.sfd,
+	  ae_Tarablus.sfd:
+	  - New glyphs (covering every thing outside Arabic block) based on
+	  the GPL'd FreeFont project [http://www.nongnu.org/freefont/].
+	  - Arabic diacritic marks (harakat) are set to have zero advance
+	  width and OT class as 'mark' nstead of 'base glyph'
+
+2007-06-23 18:04  Khaled Hosny <khaledhosny@eglug.org>
+
+	* sfd/: ae_Petra.sfd, ae_Rasheeq-Bold.sfd, ae_Rehan.sfd,
+	  ae_Salem.sfd:
+	  - New glyphs (covering every thing outside Arabic block) based on
+	  the GPL'd FreeFont project [http://www.nongnu.org/freefont/].
+	  - Arabic diacritic marks (harakat) are set to have zero advance
+	  width and OT class as 'mark' nstead of 'base glyph'
+
+2007-06-23 18:01  Khaled Hosny <khaledhosny@eglug.org>
+
+	* sfd/: ae_Nagham.sfd, ae_Nice.sfd, ae_Ostorah.sfd,
+	  ae_Ouhod-Bold.sfd:
+	  - New glyphs (covering every thing outside Arabic block) based on
+	  the GPL'd FreeFont project [http://www.nongnu.org/freefont/].
+	  - Arabic diacritic marks (harakat) are set to have zero advance
+	  width and OT class as 'mark' nstead of 'base glyph'
+
+2007-06-23 17:57  Khaled Hosny <khaledhosny@eglug.org>
+
+	* sfd/: ae_Metal.sfd, ae_Nada.sfd:
+	  - New glyphs (covering every thing outside Arabic block) based on
+	  the GPL'd FreeFont project [http://www.nongnu.org/freefont/].
+	  - Arabic diacritic marks (harakat) are set to have zero advance
+	  width and OT class as 'mark' nstead of 'base glyph'
+
+2007-06-23 17:54  Khaled Hosny <khaledhosny@eglug.org>
+
+	* sfd/: ae_Kayrawan.sfd, ae_Khalid.sfd, ae_Mashq-Bold.sfd,
+	  ae_Mashq.sfd:
+	  - New glyphs (covering every thing outside Arabic block) based on
+	  the GPL'd FreeFont project [http://www.nongnu.org/freefont/].
+	  - Arabic diacritic marks (harakat) are set to have zero advance
+	  width and OT class as 'mark' nstead of 'base glyph'
+
+2007-06-23 17:51  Khaled Hosny <khaledhosny@eglug.org>
+
+	* sfd/: ae_Haramain.sfd, ae_Hor.sfd, ae_Japan.sfd, ae_Jet.sfd:
+	  - New glyphs (covering every thing outside Arabic block) based on
+	  the GPL'd FreeFont project [http://www.nongnu.org/freefont/].
+	  - Arabic diacritic marks (harakat) are set to have zero advance
+	  width and OT class as 'mark' nstead of 'base glyph'
+
+2007-06-23 17:47  Khaled Hosny <khaledhosny@eglug.org>
+
+	* sfd/: ae_Furat.sfd, ae_Granada.sfd, ae_Graph.sfd, ae_Hani.sfd:
+	  - New glyphs (covering every thing outside Arabic block) based on
+	  the GPL'd FreeFont project [http://www.nongnu.org/freefont/].
+	  - Arabic diacritic marks (harakat) are set to have zero advance
+	  width and OT class as 'mark' nstead of 'base glyph'
+
+2007-06-23 17:43  Khaled Hosny <khaledhosny@eglug.org>
+
+	* sfd/: ae_Arab.sfd, ae_Cortoba.sfd, ae_Dimnah.sfd,
+	  ae_Electron.sfd:
+	  - New glyphs (covering every thing outside Arabic block) based on
+	  the GPL'd FreeFont project [http://www.nongnu.org/freefont/].
+	  - Arabic diacritic marks (harakat) are set to have zero advance
+	  width and OT class as 'mark' nstead of 'base glyph'
+
+2007-06-23 17:40  Khaled Hosny <khaledhosny@eglug.org>
+
+	* sfd/: ae_AlMateen-Bold.sfd, ae_AlMohanad.sfd,
+	  ae_AlMothnna-Bold.sfd, ae_AlYarmook.sfd:
+	  - New glyphs (covering every thing outside Arabic block) based on
+	  the GPL'd FreeFont project [http://www.nongnu.org/freefont/].
+	  - Arabic diacritic marks (harakat) are set to have zero advance
+	  width and OT class as 'mark' nstead of 'base glyph'
+
+2007-06-23 17:37  Khaled Hosny <khaledhosny@eglug.org>
+
+	* sfd/: ae_AlArabiya.sfd, ae_AlBattar.sfd, ae_AlHor.sfd,
+	  ae_AlManzomah.sfd:
+	  - New glyphs (covering every thing outside Arabic block) based on
+	  the GPL'd FreeFont project [http://www.nongnu.org/freefont/].
+	  - Arabic diacritic marks (harakat) are set to have zero advance
+	  width and OT class as 'mark' nstead of 'base glyph'
+
+2007-06-21 05:57  Khaled Hosny <khaledhosny@eglug.org>
+
+	* tools/cp.pe: Simple ff script to copy a specific range of glyphs
+	  from on font to another.
+
+2007-06-16 01:54  Khaled Hosny <khaledhosny@eglug.org>
+
+	* sfd/ae_AlMothnna-Bold.sfd:
+	  - Identical glyphs (or parts of glyphs) are referenced to one common
+	  glyph instead of copying the same shape each time.
+	  - Add few missed Arabic glyphs, DOTLESS QAF, DOTLESS BEH, HAMZA
+	  ABOVE, HAMZA BELOW and EXTENDED ARABIC-INDIC DIGIT ZERO, ONE, TWO,
+	  THREE, SEVEN, EIGHT, NINE.
+
+2007-06-15 07:10  Khaled Hosny <khaledhosny@eglug.org>
+
+	* sfd/: ae_AlArabiya.sfd, ae_AlBattar.sfd, ae_AlHor.sfd,
+	  ae_AlManzomah.sfd, ae_AlMateen-Bold.sfd, ae_AlMohanad.sfd,
+	  ae_AlMothnna-Bold.sfd, ae_AlYarmook.sfd, ae_Arab.sfd,
+	  ae_Cortoba.sfd, ae_Dimnah.sfd, ae_Electron.sfd, ae_Furat.sfd,
+	  ae_Granada.sfd, ae_Graph.sfd, ae_Hani.sfd, ae_Haramain.sfd,
+	  ae_Hor.sfd, ae_Japan.sfd, ae_Jet.sfd, ae_Kayrawan.sfd,
+	  ae_Khalid.sfd, ae_Mashq-Bold.sfd, ae_Mashq.sfd, ae_Metal.sfd,
+	  ae_Nada.sfd, ae_Nagham.sfd, ae_Nice.sfd, ae_Ostorah.sfd,
+	  ae_Ouhod-Bold.sfd, ae_Petra.sfd, ae_Rasheeq-Bold.sfd,
+	  ae_Rehan.sfd, ae_Salem.sfd, ae_Shado.sfd, ae_Sharjah.sfd,
+	  ae_Sindbad.sfd, ae_Tarablus.sfd, ae_Tholoth.sfd: Preparing to
+	  work
+
+2007-06-02 21:25  Khaled Hosny <khaledhosny@eglug.org>
+
+	* sfd/ae_AlMothnna-Bold.sfd:
+	  - A modified version of "AlMothnna", partially fixes the vowel marks
+	  issues.
+	  - This is fontforg's sfd file.
+
+2004-07-10 09:48  nadim
+
+	* COPYING: + Minor mods to the GPL license mention (their address
+	  changed) + Added disclaimer + Renamed file from license.txt for
+	  consistency
+
