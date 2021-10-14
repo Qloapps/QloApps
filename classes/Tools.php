@@ -868,6 +868,11 @@ class ToolsCore
         return html_entity_decode((string)$string, ENT_QUOTES, 'utf-8');
     }
 
+    public static function removeHtmlComments($html)
+    {
+        return preg_replace('/<!--(.|\s)*?-->/', '', $html);
+    }
+
     public static function safePostVars()
     {
         if (!isset($_POST) || !is_array($_POST)) {
