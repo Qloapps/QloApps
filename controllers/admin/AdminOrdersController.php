@@ -1548,7 +1548,7 @@ class AdminOrdersControllerCore extends AdminController
         $bookingOrderInfo = $objBookingDetail->getBookingDataByOrderId($order->id);
 
         // hotel booking statuses
-        $htlOrderStatus = HotelOrderStatus::getAllHotelOrderStatus();
+        $htlOrderStatus = HotelBookingDetail::getAllHotelOrderStatus();
 
         $this->tpl_view_vars = array(
             // refund info
@@ -3369,7 +3369,10 @@ class AdminOrdersControllerCore extends AdminController
 
         if (!$newStatus) {
             $this->errors[] = Tools::displayError('Invalid booking status found.');
-        } elseif ($newStatus == 2 || $newStatus == 3) {
+        } elseif (
+            $newStatus == HotelBookingDetail::STATUS_CHECKED_IN
+            || $newStatus == HotelBookingDetail::STATUS_CHECKED_OUT
+        ) {
             if (!$statusDate || !Validate::isDate($statusDate)) {
                 $this->errors[] = Tools::displayError('Invalid dates found.');
             } elseif ((strtotime($statusDate) < strtotime($dateFrom))
@@ -3383,22 +3386,22 @@ class AdminOrdersControllerCore extends AdminController
             $objBookingDetail = new HotelBookingDetail();
             if ($roomBookingInfo = $objBookingDetail->getRoomBookingData($idRoom, $idOrder, $dateFrom, $dateTo)) {
                 //  if admin choose Check-Out status
-                if ($newStatus == 3
+                if ($newStatus == HotelBookingDetail::STATUS_CHECKED_OUT
                     && $roomBookingInfo['check_in'] ==  '0000-00-00 00:00:00'
                 ) {
                     $this->errors[] = Tools::displayError('Room status must be set to Check-In before setting the room status to Check-Out.');
-                } elseif ($newStatus == 3
+                } elseif ($newStatus == HotelBookingDetail::STATUS_CHECKED_OUT
                     && $roomBookingInfo['check_in'] !=  '0000-00-00 00:00:00'
                     && strtotime($roomBookingInfo['check_in']) >= strtotime($statusDate)
                 ) {
                     $this->errors[] = Tools::displayError('Check-Out date can not be before Check-In date').
                     '('.date('d-m-Y', strtotime($roomBookingInfo['check_in'])).')';
-                } elseif ($newStatus == 2 && $roomBookingInfo['check_out'] ==  '0000-00-00 00:00:00'
+                } elseif ($newStatus == HotelBookingDetail::STATUS_CHECKED_IN && $roomBookingInfo['check_out'] ==  '0000-00-00 00:00:00'
                     && strtotime($roomBookingInfo['check_in']) >= strtotime($dateTo)
                 ) {
                     $this->errors[] = Tools::displayError('Check-In date can not be after Check-Out date').
                     '('.date('d-m-Y', strtotime($roomBookingInfo['date_to'])).')';
-                } elseif ($newStatus == 2 && $roomBookingInfo['check_out'] !=  '0000-00-00 00:00:00'
+                } elseif ($newStatus == HotelBookingDetail::STATUS_CHECKED_IN && $roomBookingInfo['check_out'] !=  '0000-00-00 00:00:00'
                     && strtotime($roomBookingInfo['check_out']) <= strtotime($statusDate)
                 ) {
                     $this->errors[] = Tools::displayError('Check-In date can not be after Check-Out date').
