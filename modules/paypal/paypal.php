@@ -2550,9 +2550,9 @@ class PayPal extends PaymentModule
 
                 // check digit-by-digit, if they have a difference, return 1 or -1 (greater/lower than)
                 for ($i = 0; $i < Tools::strlen($num1); $i++) {
-                    if ((int) $num1{$i} > (int) $num2{$i}) {
+                    if ((int) $num1[$i] > (int) $num2[$i]) {
                         return 1;
-                    } elseif ((int) $num1{$i} < (int) $num2{$i}) {
+                    } elseif ((int) $num1[$i] < (int) $num2[$i]) {
                         return -1;
                     }
 
@@ -2575,7 +2575,7 @@ class PayPal extends PaymentModule
             'address_billing' => new Address($this->context->cart->id_address_invoice),
             'cart' => $this->context->cart,
             'patternRules' => array('avoid' => array()),
-            'cart_image_size' => version_compare(_PS_VERSION_, '1.5', '<') ? 'small' : version_compare(_PS_VERSION_, '1.6', '<') ? 'small_default' : 'cart_default',
+            'cart_image_size' => version_compare(_PS_VERSION_, '1.5', '<') ? 'small' : (version_compare(_PS_VERSION_, '1.6', '<') ? 'small_default' : 'cart_default'),
             'useStyle14' => version_compare(_PS_VERSION_, '1.5', '<'),
             'useStyle15' => version_compare(_PS_VERSION_, '1.5', '>') && version_compare(_PS_VERSION_, '1.6', '<'),
         ));

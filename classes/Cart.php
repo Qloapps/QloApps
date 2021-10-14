@@ -2632,6 +2632,9 @@ class CartCore extends ObjectModel
      */
     public static function desintifier($int, $delimiter = ',')
     {
+        if (!$int)
+            return;
+
         $delimiter_len = $int[0];
         $int = strrev(substr($int, 1));
         $elm = explode(str_repeat('0', $delimiter_len + 1), $int);

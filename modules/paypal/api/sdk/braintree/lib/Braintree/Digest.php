@@ -52,8 +52,8 @@ class Digest
         $outerPad = str_repeat(chr(0x5C), 64);
 
         for ($i = 0; $i < 20; $i++) {
-            $innerPad{$i} = $keyDigest{$i} ^ $innerPad{$i};
-            $outerPad{$i} = $keyDigest{$i} ^ $outerPad{$i};
+            $innerPad[$i] = $keyDigest[$i] ^ $innerPad[$i];
+            $outerPad[$i] = $keyDigest[$i] ^ $outerPad[$i];
         }
 
         return sha1($outerPad.pack($pack, sha1($innerPad.$message)));

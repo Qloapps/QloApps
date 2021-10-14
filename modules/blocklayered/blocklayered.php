@@ -1862,7 +1862,7 @@ class BlockLayered extends Module
 				break;
 
 				case 'manufacturer':
-					$query_filters_where .= ' AND p.id_manufacturer IN ('.implode($selected_filters['manufacturer'], ',').')';
+					$query_filters_where .= ' AND p.id_manufacturer IN ('.implode(',', $selected_filters['manufacturer']).')';
 				break;
 
 				case 'condition':
@@ -2005,7 +2005,7 @@ class BlockLayered extends Module
 			$this->products = array();
 		else
 		{
-			$product_per_page = isset($this->context->cookie->nb_item_per_page) ? (int)$this->context->cookie->nb_item_per_page : Configuration::get('PS_PRODUCTS_PER_PAGE'); 
+			$product_per_page = isset($this->context->cookie->nb_item_per_page) ? (int)$this->context->cookie->nb_item_per_page : Configuration::get('PS_PRODUCTS_PER_PAGE');
 			$n = (int)Tools::getValue('n', Configuration::get('PS_PRODUCTS_PER_PAGE'));
 			$nb_day_new_product = (Validate::isUnsignedInt(Configuration::get('PS_NB_DAYS_NEW_PRODUCT')) ? Configuration::get('PS_NB_DAYS_NEW_PRODUCT') : 20);
 
@@ -3049,8 +3049,8 @@ class BlockLayered extends Module
 			$query_filters = '';
 		else
 		{
-			array_walk($filter_value, create_function('&$id_manufacturer', '$id_manufacturer = (int)$id_manufacturer;'));
-			$query_filters = ' AND p.id_manufacturer IN ('.implode($filter_value, ',').')';
+			array_walk($filter_value, function (&$id_manufacturer) {$id_manufacturer = (int)$id_manufacturer;});
+			$query_filters = ' AND p.id_manufacturer IN ('.implode(',', $filter_value).')';
 		}
 			if ($ignore_join)
 				return array('where' => $query_filters);
