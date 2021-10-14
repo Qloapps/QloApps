@@ -31,7 +31,7 @@ class ConfigurationTestCore
         '/classes/log/index.php',
         '/classes/cache/index.php',
         '/config/index.php',
-        '/tools/tar/Archive_Tar.php',
+        '/tools/tar/Tar.php',
         '/tools/pear/PEAR.php',
         '/controllers/admin/AdminLoginController.php',
         '/css/index.php',

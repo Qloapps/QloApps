@@ -481,7 +481,7 @@ class AdminTranslationsControllerCore extends AdminController
             $this->exportTabs();
             $items = array_flip(Language::getFilesList($this->lang_selected->iso_code, $this->theme_selected, false, false, false, false, true));
             $file_name = _PS_TRANSLATIONS_DIR_.'/export/'.$this->lang_selected->iso_code.'.gzip';
-            require_once(_PS_TOOL_DIR_.'tar/Archive_Tar.php');
+            require_once(_PS_TOOL_DIR_.'tar/Tar.php');
             $gz = new Archive_Tar($file_name, true);
             if ($gz->createModify($items, null, _PS_ROOT_DIR_)) {
                 ob_start();
@@ -718,7 +718,7 @@ class AdminTranslationsControllerCore extends AdminController
         if (!isset($_FILES['file']['tmp_name']) || !$_FILES['file']['tmp_name']) {
             $this->errors[] = Tools::displayError('No file has been selected.');
         } else {
-            require_once(_PS_TOOL_DIR_.'tar/Archive_Tar.php');
+            require_once(_PS_TOOL_DIR_.'tar/Tar.php');
             $gz = new Archive_Tar($_FILES['file']['tmp_name'], true);
             $filename = $_FILES['file']['name'];
             $iso_code = str_replace(array('.tar.gz', '.gzip'), '', $filename);
@@ -859,7 +859,7 @@ class AdminTranslationsControllerCore extends AdminController
             if ($content) {
                 $file = _PS_TRANSLATIONS_DIR_.$arr_import_lang[0].'.gzip';
                 if ((bool)@file_put_contents($file, $content)) {
-                    require_once(_PS_TOOL_DIR_.'/tar/Archive_Tar.php');
+                    require_once(_PS_TOOL_DIR_.'/tar/Tar.php');
                     $gz = new Archive_Tar($file, true);
                     if (_PS_MODE_DEV_) {
                         $gz->setErrorHandling(PEAR_ERROR_TRIGGER, E_USER_WARNING);
