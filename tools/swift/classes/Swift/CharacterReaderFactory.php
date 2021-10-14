@@ -11,7 +11,7 @@
 /**
  * A factory for creating CharacterReaders.
  *
- * @author     Chris Corbyn
+ * @author Chris Corbyn
  */
 interface Swift_CharacterReaderFactory
 {

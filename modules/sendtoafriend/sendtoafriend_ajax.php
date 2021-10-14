@@ -35,7 +35,7 @@ if (Module::isEnabled('sendtoafriend') && Tools::getValue('action') == 'sendToMy
 		// Retrocompatibilty with old theme
 		if($friend = Tools::getValue('friend'))
 		{
-			$friend = Tools::jsonDecode($friend, true);
+			$friend = json_decode($friend, true);
 
 			foreach ($friend as $key => $value)
 			{

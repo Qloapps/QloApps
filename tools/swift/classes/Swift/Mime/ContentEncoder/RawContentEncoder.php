@@ -12,16 +12,17 @@
  * Handles raw Transfer Encoding in Swift Mailer.
  *
  *
- * @author     Sebastiaan Stok <s.stok@rollerscapes.net>
+ * @author Sebastiaan Stok <s.stok@rollerscapes.net>
  */
 class Swift_Mime_ContentEncoder_RawContentEncoder implements Swift_Mime_ContentEncoder
 {
     /**
      * Encode a given string to produce an encoded string.
      *
-     * @param  string $string
-     * @param  int    $firstLineOffset ignored
-     * @param  int    $maxLineLength   ignored
+     * @param string $string
+     * @param int    $firstLineOffset ignored
+     * @param int    $maxLineLength   ignored
+     *
      * @return string
      */
     public function encodeString($string, $firstLineOffset = 0, $maxLineLength = 0)

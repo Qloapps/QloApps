@@ -11,7 +11,7 @@
 /**
  * A MIME part, in a multipart message.
  *
- * @author     Chris Corbyn
+ * @author Chris Corbyn
  */
 class Swift_Mime_MimePart extends Swift_Mime_SimpleMimeEntity
 {
@@ -40,7 +40,7 @@ class Swift_Mime_MimePart extends Swift_Mime_SimpleMimeEntity
     {
         parent::__construct($headers, $encoder, $cache, $grammar);
         $this->setContentType('text/plain');
-        if (!is_null($charset)) {
+        if (null !== $charset) {
             $this->setCharset($charset);
         }
     }
@@ -53,7 +53,7 @@ class Swift_Mime_MimePart extends Swift_Mime_SimpleMimeEntity
      * @param string $contentType optional
      * @param string $charset     optional
      *
-     * @return Swift_Mime_MimePart
+     * @return $this
      */
     public function setBody($body, $contentType = null, $charset = null)
     {
@@ -82,7 +82,7 @@ class Swift_Mime_MimePart extends Swift_Mime_SimpleMimeEntity
      *
      * @param string $charset
      *
-     * @return Swift_Mime_MimePart
+     * @return $this
      */
     public function setCharset($charset)
     {
@@ -111,7 +111,7 @@ class Swift_Mime_MimePart extends Swift_Mime_SimpleMimeEntity
      *
      * @param string $format
      *
-     * @return Swift_Mime_MimePart
+     * @return $this
      */
     public function setFormat($format)
     {
@@ -128,17 +128,15 @@ class Swift_Mime_MimePart extends Swift_Mime_SimpleMimeEntity
      */
     public function getDelSp()
     {
-        return ($this->_getHeaderParameter('Content-Type', 'delsp') == 'yes')
-            ? true
-            : false;
+        return 'yes' == $this->_getHeaderParameter('Content-Type', 'delsp') ? true : false;
     }
 
     /**
      * Turn delsp on or off for this entity.
      *
-     * @param bool    $delsp
+     * @param bool $delsp
      *
-     * @return Swift_Mime_MimePart
+     * @return $this
      */
     public function setDelSp($delsp = true)
     {
@@ -196,7 +194,7 @@ class Swift_Mime_MimePart extends Swift_Mime_SimpleMimeEntity
     protected function _convertString($string)
     {
         $charset = strtolower($this->getCharset());
-        if (!in_array($charset, array('utf-8', 'iso-8859-1', ''))) {
+        if (!in_array($charset, array('utf-8', 'iso-8859-1', 'iso-8859-15', ''))) {
             // mb_convert_encoding must be the first one to check, since iconv cannot convert some words.
             if (function_exists('mb_convert_encoding')) {
                 $string = mb_convert_encoding($string, $charset, 'utf-8');

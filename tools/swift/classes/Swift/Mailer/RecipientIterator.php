@@ -11,7 +11,7 @@
 /**
  * Provides an abstract way of specifying recipients for batch sending.
  *
- * @author     Chris Corbyn
+ * @author Chris Corbyn
  */
 interface Swift_Mailer_RecipientIterator
 {
@@ -24,7 +24,7 @@ interface Swift_Mailer_RecipientIterator
 
     /**
      * Returns an array where the keys are the addresses of recipients and the
-     * values are the names. e.g. ('foo@bar' => 'Foo') or ('foo@bar' => NULL)
+     * values are the names. e.g. ('foo@bar' => 'Foo') or ('foo@bar' => NULL).
      *
      * @return array
      */

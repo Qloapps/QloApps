@@ -34,7 +34,7 @@ class blockcart extends Module
     {
         $this->name = 'blockcart';
         $this->tab = 'front_office_features';
-        $this->version = '1.6.2';
+        $this->version = '1.6.3';
         $this->author = 'PrestaShop';
         $this->need_instance = 0;
 
@@ -224,7 +224,8 @@ class blockcart extends Module
         }
 
         $this->assignContentVars($params);
-        $res = Tools::jsonDecode(Tools::removeHtmlComments($this->display(__FILE__, 'blockcart-json.tpl')), true);
+
+        $res = json_decode(Tools::removeHtmlComments($this->display(__FILE__, 'blockcart-json.tpl')), true);
 
         if (isset($params['cookie']->avail_rooms)) {
             $res['avail_rooms'] = $params['cookie']->avail_rooms;
@@ -237,7 +238,7 @@ class blockcart extends Module
             $res['crossSelling'] = $this->display(__FILE__, 'crossselling.tpl');
         }
 
-        $res = Tools::jsonEncode($res);
+        $res = json_encode($res);
 
         return $res;
     }

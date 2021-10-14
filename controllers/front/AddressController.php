@@ -204,7 +204,7 @@ class AddressControllerCore extends FrontController
                     'hasError' => (bool)$this->errors,
                     'errors' => $this->errors
                 );
-                $this->ajaxDie(Tools::jsonEncode($return));
+                $this->ajaxDie(json_encode($return));
             }
         }
 
@@ -231,7 +231,7 @@ class AddressControllerCore extends FrontController
                     'id_address_delivery' => (int)$this->context->cart->id_address_delivery,
                     'id_address_invoice' => (int)$this->context->cart->id_address_invoice
                 );
-                $this->ajaxDie(Tools::jsonEncode($return));
+                $this->ajaxDie(json_encode($return));
             }
 
             // Redirect to old page or current page
@@ -364,7 +364,7 @@ class AddressControllerCore extends FrontController
                 'hasError' => !empty($this->errors),
                 'errors' => $this->errors
             );
-            $this->ajaxDie(Tools::jsonEncode($return));
+            $this->ajaxDie(json_encode($return));
         }
     }
 }

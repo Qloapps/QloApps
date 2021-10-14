@@ -840,7 +840,7 @@ class HotelBranchInformation extends ObjectModel
             libxml_use_internal_errors(true);
             $xml = simplexml_load_string(utf8_decode($postData));
 
-            $hotelData = Tools::jsonDecode(Tools::jsonEncode($xml));
+            $hotelData = json_decode(json_encode($xml));
             if (isset($hotelData->hotel->max_order_date)) {
                 if ($maxOrderDate = $hotelData->hotel->max_order_date) {
                     $this->setWsMaxOrderDate($maxOrderDate);
@@ -863,7 +863,7 @@ class HotelBranchInformation extends ObjectModel
             libxml_use_internal_errors(true);
             $xml = simplexml_load_string(utf8_decode($postData));
 
-            $hotelData = Tools::jsonDecode(Tools::jsonEncode($xml));
+            $hotelData = json_decode(json_encode($xml));
             if (isset($hotelData->hotel->max_order_date)) {
                 if ($maxOrderDate = $hotelData->hotel->max_order_date) {
                     $this->setWsMaxOrderDate($maxOrderDate);

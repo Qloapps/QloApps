@@ -11,7 +11,7 @@
 /**
  * An abstract base MIME Header.
  *
- * @author     Chris Corbyn
+ * @author Chris Corbyn
  */
 class Swift_Mime_Headers_ParameterizedHeader extends Swift_Mime_Headers_UnstructuredHeader implements Swift_Mime_ParameterizedHeader
 {
@@ -98,9 +98,7 @@ class Swift_Mime_Headers_ParameterizedHeader extends Swift_Mime_Headers_Unstruct
     {
         $params = $this->getParameters();
 
-        return array_key_exists($parameter, $params)
-            ? $params[$parameter]
-            : null;
+        return array_key_exists($parameter, $params) ? $params[$parameter] : null;
     }
 
     /**
@@ -133,7 +131,7 @@ class Swift_Mime_Headers_ParameterizedHeader extends Swift_Mime_Headers_Unstruct
     {
         $body = parent::getFieldBody();
         foreach ($this->_params as $name => $value) {
-            if (!is_null($value)) {
+            if (null !== $value) {
                 // Add the parameter
                 $body .= '; '.$this->_createParameter($name, $value);
             }
@@ -158,9 +156,9 @@ class Swift_Mime_Headers_ParameterizedHeader extends Swift_Mime_Headers_Unstruct
 
         // Try creating any parameters
         foreach ($this->_params as $name => $value) {
-            if (!is_null($value)) {
+            if (null !== $value) {
                 // Add the semi-colon separator
-                $tokens[count($tokens)-1] .= ';';
+                $tokens[count($tokens) - 1] .= ';';
                 $tokens = array_merge($tokens, $this->generateTokenLines(
                     ' '.$this->_createParameter($name, $value)
                     ));
@@ -235,9 +233,9 @@ class Swift_Mime_Headers_ParameterizedHeader extends Swift_Mime_Headers_Unstruct
     /**
      * Returns the parameter value from the "=" and beyond.
      *
-     * @param string  $value     to append
-     * @param bool    $encoded
-     * @param bool    $firstLine
+     * @param string $value     to append
+     * @param bool   $encoded
+     * @param bool   $firstLine
      *
      * @return string
      */

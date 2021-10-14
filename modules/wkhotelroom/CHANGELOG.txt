@@ -1,4 +1,16 @@
 -----------------------------
+# V1.1.5 to V1.1.6
+-----------------------------
+
+## Added Features:
+
+[+] FO : [#226] display hook added after the hotel rooms block image "displayHotelRoomsBlockImageAfter"
+
+## Improved/changed features:
+
+[*] CO : [#208] Updated changes for  "Catalog Mode" option.
+
+-----------------------------
 # V1.1.4 to V1.1.5
 -----------------------------
 

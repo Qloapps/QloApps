@@ -70,7 +70,7 @@ function displayConfirm($context)
 
     if (!empty($id_cart) && !empty($paymentId) && !empty($token)) {
         $CallApiPaypalPlus = new CallApiPaypalPlus();
-        $payment = Tools::jsonDecode($CallApiPaypalPlus->lookUpPayment($paymentId));
+        $payment = json_decode($CallApiPaypalPlus->lookUpPayment($paymentId));
 
         if (isset($payment->state)) {
             $context->smarty->assign('state', $payment->state);
@@ -158,7 +158,7 @@ function displayAjax($context)
         include_once _PS_MODULE_DIR_.'paypal/paypal.php';
 
         $CallApiPaypalPlus = new CallApiPaypalPlus();
-        $payment = Tools::jsonDecode($CallApiPaypalPlus->executePayment($payerID, $paymentId));
+        $payment = json_decode($CallApiPaypalPlus->executePayment($payerID, $paymentId));
 
         if (isset($payment->state)) {
             $transaction = array(
@@ -198,7 +198,7 @@ function displayAjax($context)
                     $order = Order::getOrderByCartId($id_cart);
                     $paypal_plus_pui = new PaypalPlusPui();
                     $paypal_plus_pui->id_order = $order->id;
-                    $paypal_plus_pui->pui_informations = Tools::jsonEncode($payment->payment_instruction);
+                    $paypal_plus_pui->pui_informations = json_encode($payment->payment_instruction);
                 }
             } elseif ($submit == 'confirmCancel') {
                 $paypal->validateOrder(
@@ -220,7 +220,7 @@ function displayAjax($context)
         $return['error'][] = $paypal->l('An error occured during the payment');
     }
 
-    echo Tools::jsonEncode($return);
+    echo json_encode($return);
     die();
 }
 

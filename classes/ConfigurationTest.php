@@ -94,6 +94,7 @@ class ConfigurationTestCore
                 'upload_max_filesize' => false,
                 'max_execution_time' => false,
                 'fopen' => false,
+                'zip' => false,
             ));
         }
 
@@ -180,7 +181,7 @@ class ConfigurationTestCore
 
     public static function test_magicquotes()
     {
-        return !get_magic_quotes_gpc();
+        return function_exists('get_magic_quotes_gpc') ? !get_magic_quotes_gpc() : true;
     }
 
     public static function test_upload()
@@ -214,6 +215,12 @@ class ConfigurationTestCore
         }
         return false;
     }
+
+    public static function test_zip()
+    {
+        return extension_loaded('zip');
+    }
+
 
     public static function test_fopen()
     {

@@ -51,7 +51,7 @@ class BlockWishListMyWishListModuleFrontController extends ModuleFrontController
 		elseif (!empty($action) && method_exists($this, 'ajaxProcess'.Tools::toCamelCase($action)))
 			$this->{'ajaxProcess'.Tools::toCamelCase($action)}();
 		else
-			die(Tools::jsonEncode(array('error' => 'method doesn\'t exist')));
+			die(json_encode(array('error' => 'method doesn\'t exist')));
 	}
 
 	/**
@@ -150,7 +150,7 @@ class BlockWishListMyWishListModuleFrontController extends ModuleFrontController
 	public function ajaxProcessDeleteList()
 	{
 		if (!$this->context->customer->isLogged())
-			die(Tools::jsonEncode(array('success' => false,
+			die(json_encode(array('success' => false,
 				'error' => $this->module->l('You aren\'t logged in', 'mywishlist'))));
 
 		$default = Tools::getIsset('default');
@@ -165,7 +165,7 @@ class BlockWishListMyWishListModuleFrontController extends ModuleFrontController
 			$wishlist->delete();
 		}
 		else
-			die(Tools::jsonEncode(array('success' => false,
+			die(json_encode(array('success' => false,
 				'error' => $this->module->l('Cannot delete this wishlist', 'mywishlist'))));
 
 		if ($default_change)
@@ -173,19 +173,19 @@ class BlockWishListMyWishListModuleFrontController extends ModuleFrontController
 			$array = WishList::getDefault($id_customer);
 
 			if (count($array))
-				die(Tools::jsonEncode(array(
+				die(json_encode(array(
 					'success' => true,
 					'id_default' => $array[0]['id_wishlist']
 					)));
 		}
 
-		die(Tools::jsonEncode(array('success' => true)));
+		die(json_encode(array('success' => true)));
 	}
 
 	public function ajaxProcessSetDefault()
 	{
 		if (!$this->context->customer->isLogged())
-			die(Tools::jsonEncode(array('success' => false,
+			die(json_encode(array('success' => false,
 				'error' => $this->module->l('You aren\'t logged in', 'mywishlist'))));
 
 		$default = Tools::getIsset('default');
@@ -196,16 +196,16 @@ class BlockWishListMyWishListModuleFrontController extends ModuleFrontController
 		{
 			$wishlist = new WishList((int)$id_wishlist);
 			if (Validate::isLoadedObject($wishlist) && $wishlist->id_customer == $this->context->customer->id && $wishlist->setDefault())
-				die(Tools::jsonEncode(array('success' => true)));
+				die(json_encode(array('success' => true)));
 		}
 
-		die(Tools::jsonEncode(array('error' => true)));
+		die(json_encode(array('error' => true)));
 	}
 
 	public function ajaxProcessProductChangeWishlist()
 	{
 		if (!$this->context->customer->isLogged())
-			die(Tools::jsonEncode(array('success' => false,
+			die(json_encode(array('success' => false,
 				'error' => $this->module->l('You aren\'t logged in', 'mywishlist'))));
 
 		$id_product = (int)Tools::getValue('id_product');
@@ -222,7 +222,7 @@ class BlockWishListMyWishListModuleFrontController extends ModuleFrontController
 			!is_int($priority) || ($priority < 0 && $priority > 2) || !$id_old_wishlist || !$id_new_wishlist ||
 			(Validate::isLoadedObject($new_wishlist) && $new_wishlist->id_customer != $this->context->customer->id) ||
 			(Validate::isLoadedObject($old_wishlist) && $old_wishlist->id_customer != $this->context->customer->id))
-			die(Tools::jsonEncode(array('success' => false, 'error' => $this->module->l('Error while moving product to another list', 'mywishlist'))));
+			die(json_encode(array('success' => false, 'error' => $this->module->l('Error while moving product to another list', 'mywishlist'))));
 
 		$res = true;
 		$check = (int)Db::getInstance()->getValue('SELECT quantity FROM '._DB_PREFIX_.'wishlist_product
@@ -240,7 +240,7 @@ class BlockWishListMyWishListModuleFrontController extends ModuleFrontController
 		}
 
 		if (!$res)
-			die(Tools::jsonEncode(array('success' => false, 'error' => $this->module->l('Error while moving product to another list', 'mywishlist'))));
-		die(Tools::jsonEncode(array('success' => true, 'msg' => $this->module->l('The product has been correctly moved', 'mywishlist'))));
+			die(json_encode(array('success' => false, 'error' => $this->module->l('Error while moving product to another list', 'mywishlist'))));
+		die(json_encode(array('success' => true, 'msg' => $this->module->l('The product has been correctly moved', 'mywishlist'))));
 	}
 }
