@@ -11,7 +11,7 @@
 /**
  * Interface for all Transfer Encoding schemes.
  *
- * @author     Chris Corbyn
+ * @author Chris Corbyn
  */
 interface Swift_Mime_ContentEncoder extends Swift_Encoder
 {

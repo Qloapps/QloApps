@@ -11,7 +11,7 @@
 /**
  * An ID MIME Header for something like Message-ID or Content-ID.
  *
- * @author     Chris Corbyn
+ * @author Chris Corbyn
  */
 class Swift_Mime_Headers_IdentificationHeader extends Swift_Mime_Headers_AbstractHeader
 {
@@ -139,9 +139,9 @@ class Swift_Mime_Headers_IdentificationHeader extends Swift_Mime_Headers_Abstrac
      *
      * @see toString()
      *
-     * @return string
-     *
      * @throws Swift_RfcComplianceException
+     *
+     * @return string
      */
     public function getFieldBody()
     {

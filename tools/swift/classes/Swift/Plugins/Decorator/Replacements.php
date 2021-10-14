@@ -11,7 +11,7 @@
 /**
  * Allows customization of Messages on-the-fly.
  *
- * @author     Chris Corbyn
+ * @author Chris Corbyn
  */
 interface Swift_Plugins_Decorator_Replacements
 {

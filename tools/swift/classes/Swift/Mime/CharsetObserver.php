@@ -11,7 +11,7 @@
 /**
  * Observes changes in an Mime entity's character set.
  *
- * @author     Chris Corbyn
+ * @author Chris Corbyn
  */
 interface Swift_Mime_CharsetObserver
 {

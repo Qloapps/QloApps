@@ -11,7 +11,7 @@
 /**
  * Logs events in the Transport system.
  *
- * @author     Chris Corbyn
+ * @author Chris Corbyn
  */
 interface Swift_Plugins_Logger
 {
