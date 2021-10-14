@@ -103,7 +103,7 @@ class PayPalLogin
             fclose($handle);
         }*/
 
-        $result = Tools::jsonDecode($result);
+        $result = json_decode($result);
 
         if ($result) {
 
@@ -161,7 +161,7 @@ class PayPalLogin
         }
         */
 
-        $result = Tools::jsonDecode($result);
+        $result = json_decode($result);
 
         if ($result) {
             $login->access_token = $result->access_token;
@@ -199,7 +199,7 @@ class PayPalLogin
         }
         */
 
-        $result = Tools::jsonDecode($result);
+        $result = json_decode($result);
 
         if ($result) {
             $customer = new Customer();

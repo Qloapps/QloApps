@@ -113,7 +113,7 @@
 		$this->loader->setDefaultPath();
 		?>
 		<script type="text/javascript">
-		var dependencies = <?php echo Tools::jsonEncode($dependencies) ?>;
+		var dependencies = <?php echo json_encode($dependencies) ?>;
 		</script>
 		<form action="" method="post">
 			Selectionnez la liste des entités à resynchroniser. Afin d'éviter au maximum les erreurs, sélectionnez uniquement les entitiés que vous avez modifier.

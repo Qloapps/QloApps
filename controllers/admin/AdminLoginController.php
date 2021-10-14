@@ -219,14 +219,14 @@ class AdminLoginControllerCore extends AdminController
                 }
 
                 if (Tools::isSubmit('ajax')) {
-                    die(Tools::jsonEncode(array('hasErrors' => false, 'redirect' => $url)));
+                    die(json_encode(array('hasErrors' => false, 'redirect' => $url)));
                 } else {
                     $this->redirect_after = $url;
                 }
             }
         }
         if (Tools::isSubmit('ajax')) {
-            die(Tools::jsonEncode(array('hasErrors' => true, 'errors' => $this->errors)));
+            die(json_encode(array('hasErrors' => true, 'errors' => $this->errors)));
         }
     }
 
@@ -270,19 +270,19 @@ class AdminLoginControllerCore extends AdminController
                 if (!$result) {
                     $this->errors[] = Tools::displayError('An error occurred while attempting to change your password.');
                 } else {
-                    die(Tools::jsonEncode(array(
+                    die(json_encode(array(
                         'hasErrors' => false,
                         'confirm' => $this->l('Your password has been emailed to you.', 'AdminTab', false, false)
                     )));
                 }
             } else {
-                die(Tools::jsonEncode(array(
+                die(json_encode(array(
                     'hasErrors' => true,
                     'errors' => array(Tools::displayError('An error occurred while attempting to change your password.'))
                 )));
             }
         } elseif (Tools::isSubmit('ajax')) {
-            die(Tools::jsonEncode(array('hasErrors' => true, 'errors' => $this->errors)));
+            die(json_encode(array('hasErrors' => true, 'errors' => $this->errors)));
         }
     }
 }

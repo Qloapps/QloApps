@@ -99,7 +99,7 @@ class ApiPaypalPlus
         /*
          * Init variable
          */
-        $oPayPalToken = Tools::jsonDecode($result);
+        $oPayPalToken = json_decode($result);
 
         if (isset($oPayPalToken->error)) {
             return false;
@@ -159,7 +159,7 @@ class ApiPaypalPlus
                 'Authorization:Bearer '.$accessToken,
             );
 
-            $result = Tools::jsonDecode($this->sendByCURL(URL_PPP_WEBPROFILE, Tools::jsonEncode($data), $header));
+            $result = json_decode($this->sendByCURL(URL_PPP_WEBPROFILE, json_encode($data), $header));
             if (isset($result->id)) {
                 return $result->id;
             } else {
@@ -189,7 +189,7 @@ class ApiPaypalPlus
                 'Authorization:Bearer '.$accessToken,
             );
 
-            return Tools::jsonDecode($this->sendByCURL(URL_PPP_WEBPROFILE, false, $header));
+            return json_decode($this->sendByCURL(URL_PPP_WEBPROFILE, false, $header));
         }
     }
 
@@ -358,7 +358,7 @@ class ApiPaypalPlus
             'Authorization:Bearer '.$access_token,
         );
 
-        $result = $this->sendByCURL(URL_PPP_CREATE_PAYMENT, Tools::jsonEncode($data), $header);
+        $result = $this->sendByCURL(URL_PPP_CREATE_PAYMENT, json_encode($data), $header);
         return $result;
     }
 

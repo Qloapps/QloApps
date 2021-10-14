@@ -524,8 +524,8 @@ function runAdminTab($tab, $ajax_mode = false)
                         }
 
                         // we can display the correct url
-                        // die(Tools::jsonEncode(array(Translate::getAdminTranslation('Invalid security token'),$url)));
-                        die(Tools::jsonEncode(Translate::getAdminTranslation('Invalid security token')));
+                        // die(json_encode(array(Translate::getAdminTranslation('Invalid security token'),$url)));
+                        die(json_encode(Translate::getAdminTranslation('Invalid security token')));
                     } else {
                         // If this is an XSS attempt, then we should only display a simple, secure page
                         if (ob_get_level() && ob_get_length() > 0) {

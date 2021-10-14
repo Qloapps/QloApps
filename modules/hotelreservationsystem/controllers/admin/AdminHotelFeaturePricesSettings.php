@@ -190,7 +190,7 @@ class AdminHotelFeaturePricesSettingsController extends ModuleAdminController
                 }
             }
             if ($objFeaturePrice->special_days) {
-                $smartyVars['special_days'] =  Tools::jsonDecode($objFeaturePrice->special_days, true);
+                $smartyVars['special_days'] =  json_decode($objFeaturePrice->special_days, true);
             }
             $smartyVars['objFeaturePrice'] = $objFeaturePrice;
             $smartyVars['edit'] = 1;
@@ -247,7 +247,7 @@ class AdminHotelFeaturePricesSettingsController extends ModuleAdminController
         $impactValue = Tools::getValue('impact_value');
         $dateSelectionType = Tools::getValue('date_selection_type');
         $specificDate = date('Y-m-d', strtotime(Tools::getValue('specific_date')));
-        $jsonSpecialDays = Tools::jsonEncode($specialDays);
+        $jsonSpecialDays = json_encode($specialDays);
         $defaultLangId = Configuration::get('PS_LANG_DEFAULT');
 
         $objFeaturePricing = new HotelRoomTypeFeaturePricing();
@@ -437,18 +437,18 @@ class AdminHotelFeaturePricesSettingsController extends ModuleAdminController
                         $product['name'].= ' / '.$onjBranchInfo->hotel_name;
                     }
                 }
-                echo Tools::jsonEncode($productsByName, true);
+                echo json_encode($productsByName, true);
                 die;
             } else {
                 die(
-                    Tools::jsonEncode(
+                    json_encode(
                         array('status' => 'failed', 'msg' => $this->l('No match found for entered room type name.'))
                     )
                 );
             }
         } else {
             die(
-                Tools::jsonEncode(
+                json_encode(
                     array('status' => 'failed', 'msg' => $this->l('No match found for entered room type name.'))
                 )
             );

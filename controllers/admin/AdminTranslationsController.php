@@ -179,8 +179,8 @@ class AdminTranslationsControllerCore extends AdminController
         $file_name = $this->link_lang_pack.'?version='._PS_VERSION_;
         $array_stream_context = @stream_context_create(array('http' => array('method' => 'GET', 'timeout' => 8)));
         if ($lang_packs = Tools::file_get_contents($file_name, false, $array_stream_context)) {
-            // Notice : for php < 5.2 compatibility, Tools::jsonDecode. The second parameter to true will set us
-            if ($lang_packs != '' && $lang_packs = Tools::jsonDecode($lang_packs, true)) {
+            // Notice : for php < 5.2 compatibility, json_decode. The second parameter to true will set us
+            if ($lang_packs != '' && $lang_packs = json_decode($lang_packs, true)) {
                 foreach ($lang_packs as $key => $lang_pack) {
                     if (!Language::isInstalled($lang_pack['iso_code'])) {
                         $packs_to_install[$key] = $lang_pack;

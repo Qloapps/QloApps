@@ -860,6 +860,6 @@ class AdminShopControllerCore extends AdminController
             'children' => $tree,
         ));
 
-        die(Tools::jsonEncode($tree));
+        die(json_encode($tree));
     }
 }

@@ -349,6 +349,6 @@ class ReferrerCore extends ObjectModel
             'percent_fee' => Tools::displayPrice($stats_sales['sales'] * $referrer->percent_fee / 100, $currency),
         );
 
-        die('['.Tools::jsonEncode($json_array).']');
+        die('['.json_encode($json_array).']');
     }
 }
