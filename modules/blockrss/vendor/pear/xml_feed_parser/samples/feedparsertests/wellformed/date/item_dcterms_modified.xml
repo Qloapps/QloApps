@@ -1,0 +1,11 @@
+<!--
+Description: item dcterms_modified, W3DTF format, UTC
+Expect:      not bozo and entries[0]['modified'] == u'2003-12-31T10:14:55Z'
+-->
+<rss version="2.0" xmlns:dcterms="http://purl.org/dc/terms/">
+<channel>
+<item>
+<dcterms:modified>2003-12-31T10:14:55Z</dcterms:modified>
+</item>
+</channel>
+</rss>
