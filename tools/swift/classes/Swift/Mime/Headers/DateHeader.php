@@ -11,7 +11,7 @@
 /**
  * A Date MIME Header for Swift Mailer.
  *
- * @author     Chris Corbyn
+ * @author Chris Corbyn
  */
 class Swift_Mime_Headers_DateHeader extends Swift_Mime_Headers_AbstractHeader
 {
@@ -59,7 +59,7 @@ class Swift_Mime_Headers_DateHeader extends Swift_Mime_Headers_AbstractHeader
      *
      * This method takes a UNIX timestamp.
      *
-     * @param int     $model
+     * @param int $model
      */
     public function setFieldBodyModel($model)
     {
@@ -91,11 +91,11 @@ class Swift_Mime_Headers_DateHeader extends Swift_Mime_Headers_AbstractHeader
     /**
      * Set the UNIX timestamp of the Date in this Header.
      *
-     * @param int     $timestamp
+     * @param int $timestamp
      */
     public function setTimestamp($timestamp)
     {
-        if (!is_null($timestamp)) {
+        if (null !== $timestamp) {
             $timestamp = (int) $timestamp;
         }
         $this->clearCachedValueIf($this->_timestamp != $timestamp);

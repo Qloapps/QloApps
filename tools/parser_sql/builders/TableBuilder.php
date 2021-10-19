@@ -31,32 +31,34 @@
  * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * @author    André Rothe <andre.rothe@phosco.info>
  * @copyright 2010-2014 Justin Swanhart and André Rothe
  * @license   http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
- * @version   SVN: $Id: TableBuilder.php 830 2013-12-18 09:35:42Z phosco@gmx.de $
- * 
+ * @version   SVN: $Id$
+ *
  */
 
-require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
-require_once dirname(__FILE__) . '/AliasBuilder.php';
-require_once dirname(__FILE__) . '/JoinBuilder.php';
-require_once dirname(__FILE__) . '/RefTypeBuilder.php';
-require_once dirname(__FILE__) . '/RefClauseBuilder.php';
+namespace PHPSQLParser\builders;
+use PHPSQLParser\utils\ExpressionType;
 
 /**
- * This class implements the builder for the table name and join options. 
+ * This class implements the builder for the table name and join options.
  * You can overwrite all functions to achieve another handling.
  *
  * @author  André Rothe <andre.rothe@phosco.info>
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
- *  
+ *
  */
-class TableBuilder {
+class TableBuilder implements Builder {
 
     protected function buildAlias($parsed) {
         $builder = new AliasBuilder();
+        return $builder->build($parsed);
+    }
+
+    protected function buildIndexHintList($parsed) {
+        $builder = new IndexHintListBuilder();
         return $builder->build($parsed);
     }
 
@@ -64,29 +66,30 @@ class TableBuilder {
         $builder = new JoinBuilder();
         return $builder->build($parsed);
     }
-    
+
     protected function buildRefType($parsed) {
         $builder = new RefTypeBuilder();
         return $builder->build($parsed);
     }
-    
+
     protected function buildRefClause($parsed) {
         $builder = new RefClauseBuilder();
         return $builder->build($parsed);
     }
 
-    public function build($parsed, $index) {
+    public function build(array $parsed, $index = 0) {
         if ($parsed['expr_type'] !== ExpressionType::TABLE) {
-            return "";
+            return '';
         }
 
         $sql = $parsed['table'];
         $sql .= $this->buildAlias($parsed);
+        $sql .= $this->buildIndexHintList($parsed);
 
         if ($index !== 0) {
             $sql = $this->buildJoin($parsed['join_type']) . $sql;
             $sql .= $this->buildRefType($parsed['ref_type']);
-            $sql .= $this->buildRefClause($parsed['ref_clause']);
+            $sql .= $parsed['ref_clause'] === false ? '' : $this->buildRefClause($parsed['ref_clause']);
         }
         return $sql;
     }

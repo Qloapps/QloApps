@@ -148,7 +148,7 @@ class PayPalIPN extends PayPal
 
         $cart_details = Context::getContext()->cart->getSummaryDetails(null, true);
         $cart_hash = sha1(serialize(Context::getContext()->cart->nbProducts()));
-        $custom = Tools::jsonDecode(Tools::getValue('custom'), true);
+        $custom = json_decode(Tools::getValue('custom'), true);
 
         $shipping = $cart_details['total_shipping_tax_exc'];
         $subtotal = $cart_details['total_price_without_tax'] - $cart_details['total_shipping_tax_exc'];
@@ -234,7 +234,7 @@ if (Tools::getValue('receiver_email') == Configuration::get('PAYPAL_BUSINESS_ACC
 
     if (Tools::getIsset('custom')) {
         $ipn = new PayPalIPN();
-        $custom = Tools::jsonDecode(Tools::getValue('custom'), true);
+        $custom = json_decode(Tools::getValue('custom'), true);
         $ipn->confirmOrder($custom);
     }
 }

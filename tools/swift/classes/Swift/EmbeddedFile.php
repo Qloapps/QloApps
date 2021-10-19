@@ -11,7 +11,7 @@
 /**
  * An embedded file, in a multipart message.
  *
- * @author     Chris Corbyn
+ * @author Chris Corbyn
  */
 class Swift_EmbeddedFile extends Swift_Mime_EmbeddedFile
 {

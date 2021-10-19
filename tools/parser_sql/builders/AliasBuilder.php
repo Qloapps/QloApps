@@ -35,9 +35,11 @@
  * @author    André Rothe <andre.rothe@phosco.info>
  * @copyright 2010-2014 Justin Swanhart and André Rothe
  * @license   http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
- * @version   SVN: $Id: AliasBuilder.php 830 2013-12-18 09:35:42Z phosco@gmx.de $
+ * @version   SVN: $Id$
  * 
  */
+
+namespace PHPSQLParser\builders;
 
 /**
  * This class implements the builder for aliases. 
@@ -47,19 +49,19 @@
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *  
  */
-class AliasBuilder {
+class AliasBuilder implements Builder {
 
     public function hasAlias($parsed) {
         return isset($parsed['alias']);
     }
 
-    public function build($parsed) {
+    public function build(array $parsed) {
         if (!isset($parsed['alias']) || $parsed['alias'] === false) {
             return "";
         }
         $sql = "";
         if ($parsed['alias']['as']) {
-            $sql .= " as";
+            $sql .= " AS";
         }
         $sql .= " " . $parsed['alias']['name'];
         return $sql;

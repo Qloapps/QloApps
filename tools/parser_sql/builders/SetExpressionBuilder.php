@@ -35,16 +35,13 @@
  * @author    André Rothe <andre.rothe@phosco.info>
  * @copyright 2010-2014 Justin Swanhart and André Rothe
  * @license   http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
- * @version   SVN: $Id: SetExpressionBuilder.php 830 2013-12-18 09:35:42Z phosco@gmx.de $
+ * @version   SVN: $Id$
  * 
  */
 
-require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
-require_once dirname(__FILE__) . '/../exceptions/UnableToCreateSQLException.php';
-require_once dirname(__FILE__) . '/ColumnReferenceBuilder.php';
-require_once dirname(__FILE__) . '/ConstantBuilder.php';
-require_once dirname(__FILE__) . '/OperatorBuilder.php';
-require_once dirname(__FILE__) . '/FunctionBuilder.php';
+namespace PHPSQLParser\builders;
+use PHPSQLParser\exceptions\UnableToCreateSQLException;
+use PHPSQLParser\utils\ExpressionType;
 
 /**
  * This class implements the builder for the SET part of INSERT statement. 
@@ -54,7 +51,7 @@ require_once dirname(__FILE__) . '/FunctionBuilder.php';
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *  
  */
-class SetExpressionBuilder {
+class SetExpressionBuilder implements Builder {
 
     protected function buildColRef($parsed) {
         $builder = new ColumnReferenceBuilder();
@@ -76,23 +73,42 @@ class SetExpressionBuilder {
         return $builder->build($parsed);
     }
     
-    public function build($parsed) {
+    protected function buildBracketExpression($parsed) {
+        $builder = new SelectBracketExpressionBuilder();
+        return $builder->build($parsed);
+    }
+    
+    protected function buildSign($parsed) {
+        $builder = new SignBuilder();
+        return $builder->build($parsed);
+    }
+    
+    public function build(array $parsed) {
         if ($parsed['expr_type'] !== ExpressionType::EXPRESSION) {
-            return "";
+            return '';
         }
-        $sql = "";
+        $sql = '';
         foreach ($parsed['sub_tree'] as $k => $v) {
+            $delim = ' ';
             $len = strlen($sql);
             $sql .= $this->buildColRef($v);
             $sql .= $this->buildConstant($v);
             $sql .= $this->buildOperator($v);
             $sql .= $this->buildFunction($v);
-
+            $sql .= $this->buildBracketExpression($v);
+                        
+            // we don't need whitespace between the sign and 
+            // the following part
+            if ($this->buildSign($v) !== '') {
+                $delim = '';
+            }
+            $sql .= $this->buildSign($v);
+            
             if ($len == strlen($sql)) {
                 throw new UnableToCreateSQLException('SET expression subtree', $k, $v, 'expr_type');
             }
 
-            $sql .= " ";
+            $sql .= $delim;
         }
         $sql = substr($sql, 0, -1);
         return $sql;

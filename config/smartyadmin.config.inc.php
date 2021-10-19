@@ -33,7 +33,7 @@ $smarty->force_compile = (Configuration::get('PS_SMARTY_FORCE_COMPILE') == _PS_S
 // But force compile_check since the performance impact is small and it is better for debugging
 $smarty->compile_check = true;
 
-function smartyTranslate($params, &$smarty)
+function smartyTranslate($params, $smarty)
 {
     $htmlentities = !isset($params['js']);
     $pdf = isset($params['pdf']);

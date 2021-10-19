@@ -11,7 +11,7 @@
 /**
  * Interface for spools.
  *
- * @author  Fabien Potencier
+ * @author Fabien Potencier
  */
 interface Swift_Spool
 {
@@ -37,7 +37,7 @@ interface Swift_Spool
      *
      * @param Swift_Mime_Message $message The message to store
      *
-     * @return bool    Whether the operation has succeeded
+     * @return bool Whether the operation has succeeded
      */
     public function queueMessage(Swift_Mime_Message $message);
 
@@ -47,7 +47,7 @@ interface Swift_Spool
      * @param Swift_Transport $transport        A transport instance
      * @param string[]        $failedRecipients An array of failures by-reference
      *
-     * @return int     The number of sent emails
+     * @return int The number of sent emails
      */
     public function flushQueue(Swift_Transport $transport, &$failedRecipients = null);
 }

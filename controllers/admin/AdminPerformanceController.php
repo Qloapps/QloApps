@@ -1014,7 +1014,7 @@ class AdminPerformanceControllerCore extends AdminController
                         $res      = @memcache_get_server_status($memcache, $host, $port);
                     }
                 }
-                die(Tools::jsonEncode(array($res)));
+                die(json_encode(array($res)));
             }
         }
         die;

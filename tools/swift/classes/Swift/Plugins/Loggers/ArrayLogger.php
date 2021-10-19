@@ -11,7 +11,7 @@
 /**
  * Logs to an Array backend.
  *
- * @author     Chris Corbyn
+ * @author Chris Corbyn
  */
 class Swift_Plugins_Loggers_ArrayLogger implements Swift_Plugins_Logger
 {
@@ -32,7 +32,7 @@ class Swift_Plugins_Loggers_ArrayLogger implements Swift_Plugins_Logger
     /**
      * Create a new ArrayLogger with a maximum of $size entries.
      *
-     * @var int $size
+     * @var int
      */
     public function __construct($size = 50)
     {

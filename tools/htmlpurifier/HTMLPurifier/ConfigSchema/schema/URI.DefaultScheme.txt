@@ -1,0 +1,15 @@
+URI.DefaultScheme
+TYPE: string/null
+DEFAULT: 'http'
+--DESCRIPTION--
+
+<p>
+    Defines through what scheme the output will be served, in order to
+    select the proper object validator when no scheme information is present.
+</p>
+
+<p>
+    Starting with HTML Purifier 4.9.0, the default scheme can be null, in
+    which case we reject all URIs which do not have explicit schemes.
+</p>
+--# vim: et sw=4 sts=4

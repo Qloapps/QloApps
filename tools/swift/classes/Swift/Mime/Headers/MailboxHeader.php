@@ -11,7 +11,7 @@
 /**
  * A Mailbox Address MIME Header for something like From or Sender.
  *
- * @author     Chris Corbyn
+ * @author Chris Corbyn
  */
 class Swift_Mime_Headers_MailboxHeader extends Swift_Mime_Headers_AbstractHeader
 {
@@ -68,9 +68,9 @@ class Swift_Mime_Headers_MailboxHeader extends Swift_Mime_Headers_AbstractHeader
      *
      * This method returns an associative array like {@link getNameAddresses()}
      *
-     * @return array
-     *
      * @throws Swift_RfcComplianceException
+     *
+     * @return array
      */
     public function getFieldBodyModel()
     {
@@ -128,9 +128,9 @@ class Swift_Mime_Headers_MailboxHeader extends Swift_Mime_Headers_AbstractHeader
      * @see getNameAddresses()
      * @see toString()
      *
-     * @return string[]
-     *
      * @throws Swift_RfcComplianceException
+     *
+     * @return string[]
      */
     public function getNameAddressStrings()
     {
@@ -224,21 +224,19 @@ class Swift_Mime_Headers_MailboxHeader extends Swift_Mime_Headers_AbstractHeader
      *
      * @see toString()
      *
-     * @return string
-     *
      * @throws Swift_RfcComplianceException
+     *
+     * @return string
      */
     public function getFieldBody()
     {
         // Compute the string value of the header only if needed
-        if (is_null($this->getCachedValue())) {
+        if (null === $this->getCachedValue()) {
             $this->setCachedValue($this->createMailboxListString($this->_mailboxes));
         }
 
         return $this->getCachedValue();
     }
-
-    // -- Points of extension
 
     /**
      * Normalizes a user-input list of mailboxes into consistent key=>value pairs.
@@ -270,16 +268,14 @@ class Swift_Mime_Headers_MailboxHeader extends Swift_Mime_Headers_AbstractHeader
     /**
      * Produces a compliant, formatted display-name based on the string given.
      *
-     * @param string  $displayName as displayed
-     * @param bool    $shorten     the first line to make remove for header name
+     * @param string $displayName as displayed
+     * @param bool   $shorten     the first line to make remove for header name
      *
      * @return string
      */
     protected function createDisplayNameString($displayName, $shorten = false)
     {
-        return $this->createPhrase($this, $displayName,
-            $this->getCharset(), $this->getEncoder(), $shorten
-            );
+        return $this->createPhrase($this, $displayName, $this->getCharset(), $this->getEncoder(), $shorten);
     }
 
     /**
@@ -287,9 +283,9 @@ class Swift_Mime_Headers_MailboxHeader extends Swift_Mime_Headers_AbstractHeader
      *
      * @param string[] $mailboxes
      *
-     * @return string
-     *
      * @throws Swift_RfcComplianceException
+     *
+     * @return string
      */
     protected function createMailboxListString(array $mailboxes)
     {
@@ -299,8 +295,9 @@ class Swift_Mime_Headers_MailboxHeader extends Swift_Mime_Headers_AbstractHeader
     /**
      * Redefine the encoding requirements for mailboxes.
      *
-     * Commas and semicolons are used to separate
-     * multiple addresses, and should therefore be encoded
+     * All "specials" must be encoded as the full header value will not be quoted
+     *
+     * @see RFC 2822 3.2.1
      *
      * @param string $token
      *
@@ -308,7 +305,7 @@ class Swift_Mime_Headers_MailboxHeader extends Swift_Mime_Headers_AbstractHeader
      */
     protected function tokenNeedsEncoding($token)
     {
-        return preg_match('/[,;]/', $token) || parent::tokenNeedsEncoding($token);
+        return preg_match('/[()<>\[\]:;@\,."]/', $token) || parent::tokenNeedsEncoding($token);
     }
 
     /**
@@ -324,7 +321,7 @@ class Swift_Mime_Headers_MailboxHeader extends Swift_Mime_Headers_AbstractHeader
 
         foreach ($mailboxes as $email => $name) {
             $mailboxStr = $email;
-            if (!is_null($name)) {
+            if (null !== $name) {
                 $nameStr = $this->createDisplayNameString($name, empty($strings));
                 $mailboxStr = $nameStr.' <'.$mailboxStr.'>';
             }

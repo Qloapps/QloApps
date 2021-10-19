@@ -5776,7 +5776,7 @@ class ProductCore extends ObjectModel
             libxml_use_internal_errors(true);
             $xml = simplexml_load_string(utf8_decode($postData));
 
-            $roomtypeData = Tools::jsonDecode(Tools::jsonEncode($xml), true);
+            $roomtypeData = json_decode(json_encode($xml), true);
 
             // set room  map info for the hotel from request
             return Db::getInstance()->execute('INSERT INTO `'._DB_PREFIX_.'htl_room_type` (`id_product`, `id_hotel`, `adult`, `children`, `date_add`, `date_upd`) VALUES ('.(int)$this->id.', '.(int) $roomtypeData['room_type']['id_hotel'].', '.(int) $roomtypeData['room_type']['adults'].', '.(int) $roomtypeData['room_type']['children'].', \''.date('Y-m-d h:i:s').'\', \''.date('Y-m-d h:i:s').'\')');

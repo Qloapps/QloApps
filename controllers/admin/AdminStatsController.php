@@ -542,7 +542,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
                 }
                 $value .= '%';
 
-                // ConfigurationKPI::updateValue('CONVERSION_RATE_CHART', Tools::jsonEncode($data));
+                // ConfigurationKPI::updateValue('CONVERSION_RATE_CHART', json_encode($data));
                 ConfigurationKPI::updateValue('CONVERSION_RATE', $value);
                 ConfigurationKPI::updateValue('CONVERSION_RATE_EXPIRE', strtotime(date('Y-m-d 00:00:00', strtotime('+1 day'))));
                 break;
@@ -793,8 +793,8 @@ class AdminStatsControllerCore extends AdminStatsTabController
             if (isset($data)) {
                 $array['data'] = $data;
             }
-            die(Tools::jsonEncode($array));
+            die(json_encode($array));
         }
-        die(Tools::jsonEncode(array('has_errors' => true)));
+        die(json_encode(array('has_errors' => true)));
     }
 }

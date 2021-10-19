@@ -35,12 +35,12 @@
  * @author    André Rothe <andre.rothe@phosco.info>
  * @copyright 2010-2014 Justin Swanhart and André Rothe
  * @license   http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
- * @version   SVN: $Id: ConstraintBuilder.php 891 2013-12-31 00:20:19Z phosco@gmx.de $
+ * @version   SVN: $Id$
  * 
  */
 
-require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
-require_once dirname(__FILE__) . '/ConstantBuilder.php';
+namespace PHPSQLParser\builders;
+use PHPSQLParser\utils\ExpressionType;
 
 /**
  * This class implements the builder for the constraint statement part of CREATE TABLE. 
@@ -50,18 +50,18 @@ require_once dirname(__FILE__) . '/ConstantBuilder.php';
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *  
  */
-class ConstraintBuilder {
+class ConstraintBuilder implements Builder {
 
     protected function buildConstant($parsed) {
         $builder = new ConstantBuilder();
         return $builder->build($parsed);
     }
 
-    public function build($parsed) {
+    public function build(array $parsed) {
         if ($parsed['expr_type'] !== ExpressionType::CONSTRAINT) {
-            return "";
+            return '';
         }
-        $sql = $this->buildConstant($parsed['sub_tree']);
+        $sql = $parsed['sub_tree'] === false ? '' : $this->buildConstant($parsed['sub_tree']);
         return "CONSTRAINT" . (empty($sql) ? '' : (' ' . $sql));
     }
 

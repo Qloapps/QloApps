@@ -35,9 +35,11 @@
  * @author    André Rothe <andre.rothe@phosco.info>
  * @copyright 2010-2014 Justin Swanhart and André Rothe
  * @license   http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
- * @version   SVN: $Id: DeleteBuilder.php 830 2013-12-18 09:35:42Z phosco@gmx.de $
+ * @version   SVN: $Id$
  * 
  */
+
+namespace PHPSQLParser\builders;
 
 /**
  * This class implements the builder for the [DELETE] part. You can overwrite
@@ -47,14 +49,26 @@
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *  
  */
-class DeleteBuilder {
+class DeleteBuilder implements Builder {
 
-    public function build($parsed) {
-        $sql = "DELETE";
-        foreach ($parsed['TABLES'] as $k => $v) {
-            $sql .= $v . ",";
+    public function build(array $parsed) {
+        $sql = "DELETE ";
+        $right = -1;
+
+        if ($parsed['options'] !== false) {
+            foreach ($parsed['options'] as $k => $v) {
+                $sql .= $v . " ";
+            }
         }
-        return substr($sql, 0, -1);
+
+        if ($parsed['tables'] !== false) {
+            foreach ($parsed['tables'] as $k => $v) {
+                $sql .= $v . ", ";
+                $right = -2;
+            }
+        }
+
+        return substr($sql, 0, $right);
     }
 }
 ?>

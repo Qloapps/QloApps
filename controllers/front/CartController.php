@@ -105,7 +105,7 @@ class CartControllerCore extends FrontController
             }
         } elseif (!$this->isTokenValid()) {
             if (Tools::getValue('ajax')) {
-                $this->ajaxDie(Tools::jsonEncode(array(
+                $this->ajaxDie(json_encode(array(
                     'hasError' => true,
                     'errors' => array(Tools::displayError('Impossible to add the product to the cart. Please refresh page.')),
                 )));
@@ -137,7 +137,7 @@ class CartControllerCore extends FrontController
             }
 
             if ($total_quantity < $minimal_quantity) {
-                $this->ajaxDie(Tools::jsonEncode(array(
+                $this->ajaxDie(json_encode(array(
                         'hasError' => true,
                         'errors' => array(sprintf(Tools::displayError('You must add %d minimum quantity', !Tools::getValue('ajax')), $minimal_quantity)),
                 )));
@@ -210,7 +210,7 @@ class CartControllerCore extends FrontController
         $new_id_address_delivery = (int)Tools::getValue('new_id_address_delivery');
 
         if (!count(Carrier::getAvailableCarrierList(new Product($this->id_product), null, $new_id_address_delivery))) {
-            $this->ajaxDie(Tools::jsonEncode(array(
+            $this->ajaxDie(json_encode(array(
                 'hasErrors' => true,
                 'error' => Tools::displayError('It is not possible to deliver this product to the selected address.', false),
             )));
@@ -312,7 +312,7 @@ class CartControllerCore extends FrontController
                             if (isset($hotel_room_data['stats']['num_avail'])) {
                                 $total_available_rooms = $hotel_room_data['stats']['num_avail'];
                                 if ($total_available_rooms < $req_rm) {
-                                    die(Tools::jsonEncode(array('status' => 'unavailable_quantity', 'avail_rooms' => $total_available_rooms)));
+                                    die(json_encode(array('status' => 'unavailable_quantity', 'avail_rooms' => $total_available_rooms)));
                                 }
                             } else {
                                 $this->errors[] = Tools::displayError('Rooms are unavailable. Please try with different dates');
@@ -322,10 +322,10 @@ class CartControllerCore extends FrontController
                         }
                     }
                 } else {
-                    die(Tools::jsonEncode(array('status' => 'failed3')));
+                    die(json_encode(array('status' => 'failed3')));
                 }
             } else {
-                die(Tools::jsonEncode(array('status' => 'failed4')));
+                die(json_encode(array('status' => 'failed4')));
             }
         }
 
@@ -416,8 +416,8 @@ class CartControllerCore extends FrontController
                 foreach ($hotel_room_info_arr as $key_hotel_room_info => $val_hotel_room_info) {
                     if ($chkQty < $req_rm) {
                         $roomDemand = Tools::getValue('roomDemands');
-                        $roomDemand = Tools::jsonDecode($roomDemand, true);
-                        $roomDemand = Tools::jsonEncode($roomDemand);
+                        $roomDemand = json_decode($roomDemand, true);
+                        $roomDemand = json_encode($roomDemand);
                         $obj_htl_cart_booking_data = new HotelCartBookingData();
                         $obj_htl_cart_booking_data->id_cart = $this->context->cart->id;
                         $obj_htl_cart_booking_data->id_guest = $this->context->cart->id_guest;
@@ -519,10 +519,10 @@ class CartControllerCore extends FrontController
     public function displayAjax()
     {
         if ($this->errors) {
-            $this->ajaxDie(Tools::jsonEncode(array('hasError' => true, 'errors' => $this->errors)));
+            $this->ajaxDie(json_encode(array('hasError' => true, 'errors' => $this->errors)));
         }
         if ($this->ajax_refresh) {
-            $this->ajaxDie(Tools::jsonEncode(array('refresh' => true)));
+            $this->ajaxDie(json_encode(array('refresh' => true)));
         }
 
         // write cookie if can't on destruct
@@ -560,7 +560,7 @@ class CartControllerCore extends FrontController
 
             $json = '';
             Hook::exec('actionCartListOverride', array('summary' => $result, 'json' => &$json));
-            $this->ajaxDie(Tools::jsonEncode(array_merge($result, (array)Tools::jsonDecode($json, true))));
+            $this->ajaxDie(json_encode(array_merge($result, (array)json_decode($json, true))));
         }
         // @todo create a hook
         elseif (file_exists(_PS_MODULE_DIR_.'/blockcart/blockcart-ajax.php')) {

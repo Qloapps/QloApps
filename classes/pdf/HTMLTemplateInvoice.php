@@ -142,8 +142,8 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
      */
     public function getContent()
     {
-        $invoiceAddressPatternRules = Tools::jsonDecode(Configuration::get('PS_INVCE_INVOICE_ADDR_RULES'), true);
-        $deliveryAddressPatternRules = Tools::jsonDecode(Configuration::get('PS_INVCE_DELIVERY_ADDR_RULES'), true);
+        $invoiceAddressPatternRules = json_decode(Configuration::get('PS_INVCE_INVOICE_ADDR_RULES'), true);
+        $deliveryAddressPatternRules = json_decode(Configuration::get('PS_INVCE_DELIVERY_ADDR_RULES'), true);
 
         $invoice_address = new Address((int)$this->order->id_address_invoice);
         $country = new Country((int)$invoice_address->id_country);
@@ -444,8 +444,8 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
                             $num_days = $obj_htl_bk_dtl->getNumberOfDays($data_v['date_from'], $data_v['date_to']);
 
                             $cart_htl_data[$type_key]['date_diff'][$date_join]['num_rm'] = 1;
-                            $cart_htl_data[$type_key]['date_diff'][$date_join]['data_form'] = $data_v['date_from'];
-                            $cart_htl_data[$type_key]['date_diff'][$date_join]['data_to'] = $data_v['date_to'];
+                            $cart_htl_data[$type_key]['date_diff'][$date_join]['data_form'] = Tools::displayDate($data_v['date_from']);
+                            $cart_htl_data[$type_key]['date_diff'][$date_join]['data_to'] = Tools::displayDate($data_v['date_to']);
                             $cart_htl_data[$type_key]['date_diff'][$date_join]['num_days'] = $num_days;
 
                             $cart_htl_data[$type_key]['date_diff'][$date_join]['paid_unit_price_tax_excl'] = $data_v['total_price_tax_excl']/$num_days;
