@@ -91,7 +91,7 @@ class InstallControllerHttpSystem extends InstallControllerHttp
                         'upload' => $this->l('Cannot upload files'),
                         'system' => $this->l('Cannot create new files and folders'),
                         'gd' => $this->l('GD library is not installed'),
-                        'mysql_support' => $this->l('MySQL support is not activated'),
+                        'pdo_mysql' => $this->l('PDO MySQL extension is not loaded'),
                         'curl' => $this->l('Curl extension is not loaded'),
                         'soap' => $this->l('SOAP extension is not loaded'),
                         'simplexml' => $this->l('SimpleXml extension is not loaded'),
@@ -140,7 +140,6 @@ class InstallControllerHttpSystem extends InstallControllerHttp
                         'mbstring' => $this->l('Mbstring extension is not enabled'),
                         'magicquotes' => $this->l('PHP magic quotes option is enabled'),
                         'dom' => $this->l('Dom extension is not loaded'),
-                        'pdo_mysql' => $this->l('PDO MySQL extension is not loaded')
                     )
                 ),
             ),
