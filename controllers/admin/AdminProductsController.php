@@ -3324,8 +3324,8 @@ class AdminProductsControllerCore extends AdminController
                 $objHotelInfo = new HotelBranchInformation();
                 $hotelInfo = $objHotelInfo->hotelsNameAndId();
                 if ($hotelInfo) {
-                    $objRoomStatus = new HotelRoomStatus();
-                    $roomStatus = $objRoomStatus->getAllRoomStatus();
+                    $objRoomInfo = new HotelRoomInformation();
+                    $roomStatus = $objRoomInfo->getAllRoomStatus();
 
                     $objRoomType = new HotelRoomType();
                     if ($hotelRoomType = $objRoomType->getRoomTypeInfoByIdProduct($obj->id)) {
@@ -3334,12 +3334,11 @@ class AdminProductsControllerCore extends AdminController
                         $hotelFullInfo = $objHotelInfo->hotelBranchInfoById($hotelRoomType['id_hotel']);
                         $data->assign('htl_full_info', $hotelFullInfo);
 
-                        $objRoomInfo = new HotelRoomInformation();
                         $objRoomDisableDates = new HotelRoomDisableDates();
                         $hotelRoomInfo = $objRoomInfo->getHotelRoomInfo($obj->id, $hotelRoomType['id_hotel']);
                         if ($hotelRoomInfo) {
                             foreach ($hotelRoomInfo as &$room) {
-                                if ($room['id_status'] == 3) {
+                                if ($room['id_status'] == HotelRoomInformation::STATUS_TEMPORARY_INACTIVE) {
                                     $disabledDates = $objRoomDisableDates->getRoomDisableDates($room['id']);
                                     $room['disabled_dates_json'] = json_encode($disabledDates);
                                 }
@@ -3493,7 +3492,7 @@ class AdminProductsControllerCore extends AdminController
                         //validate room status
                         $disableDtsArr = array();
                         foreach ($room_status as $key => $status) {
-                            if ($status == 3) {
+                            if ($status == HotelRoomInformation::STATUS_TEMPORARY_INACTIVE) {
                                 $disableDtsArr[$key] = json_decode($disable_dates[$key], true);
                                 $this->validateDisableDateRanges($disableDtsArr[$key]);
                             }
@@ -3529,7 +3528,7 @@ class AdminProductsControllerCore extends AdminController
                                 $objRoomInfo->floor = $room_floor[$key];
                                 $objRoomInfo->comment = $room_comment[$key];
                                 if ($objRoomInfo->save()) {
-                                    if ($room_status[$key] == 3) {
+                                    if ($room_status[$key] == HotelRoomInformation::STATUS_TEMPORARY_INACTIVE) {
                                         $objDisDts = new HotelRoomDisableDates();
                                         $objDisDts->deleteRoomDisableDates($objRoomInfo->id);
                                         if (isset($disableDtsArr[$key]) && $disableDtsArr[$key]) {
