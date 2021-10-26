@@ -1,0 +1,9 @@
+<!--
+Description: parsed pubDate in Hungarian
+Expect:      not bozo and feed['date_parsed'] == (2004, 7, 13, 14, 15, 0, 1, 195, 0)
+-->
+<rss version="2.0">
+<channel>
+<pubDate>2004-július-13T9:15-05:00</pubDate>
+</channel>
+</rss>

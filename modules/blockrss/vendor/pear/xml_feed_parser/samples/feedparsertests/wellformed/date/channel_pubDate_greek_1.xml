@@ -1,0 +1,9 @@
+<!--
+Description: parsed pubDate in Greek
+Expect:      not bozo and feed['date_parsed'] == (2004, 7, 11, 17, 0, 0, 6, 193, 0)
+-->
+<rss version="2.0">
+<channel>
+<pubDate>Κυρ, 11 Ιούλ 2004 12:00:00 EST</pubDate>
+</channel>
+</rss>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="EuC-JP"?>  
+<!DOCTYPE rss SYSTEM "http://my.netscape.com/publish/formats/rss-0.91.dtd">
+<rss version="0.91">
+<channel>
+<title>è†®ŸÛë´é´Ì´×´è´ŒÁ¹´Õ</title>
+<link>http://www.mozilla.org</link>
+<description>è†®ŸÛë´é´Ì´×´è´ŒÁ¹´Õ</description>
+<language>ja</language>  <!-- tagged as Japanese content -->
+<item>
+<title>NYÒ™Á¢¸»ÌêÛì15285.25´ƒ´‘Á£´Û´—´ÀÁ¹´ê´Ì´éÒ™Ûì¡êçÒÕ‰ÌêÁ£</title>
+<link>http://www.mozilla.org/status/</link>
+<description>This is an item description...</description>
+</item>
+<item>
+<title>‚§±Çç¡ËßÛÂÒéøÓ¸Á£Ë²®Ÿè†Ûèå±ÇÌ’¡Íæ—éøë‡Á£</title>
+<link>http://www.mozilla.org/status/</link>
+<description>This is an item description...</description>
+</item>
+<item>
+<title>ËÜË”ïÌëÈšÁ¢È†Ë§æàÀè±ŽË‰Û‚Á¢Ë‚åÜ¼šÛ˜íËüËÁ£</title>
+<link>http://www.mozilla.org/status/</link>
+<description>This is an item description...</description>
+</item>
+<item>
+<title>2000‚øíŠåÁ¢«‘¦éÛë¹ÛçéÛ§ÛÂè†ÒæÓ¸Á£Ì¾«…æ—ÕÝéøƒ¸Á£</title>
+<link>http://www.mozilla.org/status/</link>
+<description>This is an item description...</description>
+</item>
+</channel>
+</rss>

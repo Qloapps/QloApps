@@ -1,0 +1,35 @@
+{
+    "authors": [
+        {
+            "email": "james@jystewart.net",
+            "name": "James Stewart",
+            "role": "Lead"
+        }
+    ],
+    "autoload": {
+        "psr-0": {
+            "XML": "./"
+        }
+    },
+    "description": "More info available on: http://pear.php.net/package/XML_Feed_Parser",
+    "include-path": [
+        "./"
+    ],
+    "license": "LGPL",
+    "name": "pear/xml_feed_parser",
+    "support": {
+        "issues": "http://pear.php.net/bugs/search.php?cmd=display&package_name[]=XML_Feed_Parser",
+        "source": "https://github.com/pear/XML_Feed_Parser"
+    },
+    "type": "library",
+    "suggest": {
+        "ext-tidy": "May require the tidy PHP extension"
+    },
+    "require": {
+        "pear/pear_exception": "*",
+        "pear/log": "*"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "*"
+    }
+}

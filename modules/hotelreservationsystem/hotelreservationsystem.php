@@ -668,7 +668,6 @@ class hotelreservationsystem extends Module
             || !$this->callInstallTab()
             || !$this->registerModuleHooks()
             || !$objHtlHelper->insertDefaultHotelEntries()
-            || !$objHtlHelper->insertHotelRoomsStatus()
             || !$objHtlHelper->insertHotelRoomAllotmentType()
         ) {
             return false;

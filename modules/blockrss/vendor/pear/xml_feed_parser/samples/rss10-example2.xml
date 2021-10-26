@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?> 
+
+<rdf:RDF 
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" 
+  xmlns:dc="http://purl.org/dc/elements/1.1/"
+  xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+  xmlns:co="http://purl.org/rss/1.0/modules/company/"
+  xmlns:ti="http://purl.org/rss/1.0/modules/textinput/"
+  xmlns="http://purl.org/rss/1.0/"
+> 
+
+  <channel rdf:about="http://meerkat.oreillynet.com/?_fl=rss1.0">
+    <title>Meerkat</title>
+    <link>http://meerkat.oreillynet.com</link>
+    <description>Meerkat: An Open Wire Service</description>
+    <dc:publisher>The O'Reilly Network</dc:publisher>
+    <dc:creator>Rael Dornfest (mailto:rael@oreilly.com)</dc:creator>
+    <dc:rights>Copyright &#169; 2000 O'Reilly &amp; Associates, Inc.</dc:rights>
+    <dc:date>2000-01-01T12:00+00:00</dc:date>
+    <sy:updatePeriod>hourly</sy:updatePeriod>
+    <sy:updateFrequency>2</sy:updateFrequency>
+    <sy:updateBase>2000-01-01T12:00+00:00</sy:updateBase>
+
+    <image rdf:resource="http://meerkat.oreillynet.com/icons/meerkat-powered.jpg" />
+
+    <items>
+      <rdf:Seq>
+        <rdf:li resource="http://c.moreover.com/click/here.pl?r123" />
+      </rdf:Seq>
+    </items>
+
+    <textinput rdf:resource="http://meerkat.oreillynet.com" />
+
+  </channel>
+
+  <image rdf:about="http://meerkat.oreillynet.com/icons/meerkat-powered.jpg">
+    <title>Meerkat Powered!</title>
+    <url>http://meerkat.oreillynet.com/icons/meerkat-powered.jpg</url>
+    <link>http://meerkat.oreillynet.com</link>
+  </image>
+
+  <item rdf:about="http://c.moreover.com/click/here.pl?r123">
+    <title>XML: A Disruptive Technology</title> 
+    <link>http://c.moreover.com/click/here.pl?r123</link>
+    <dc:description>
+      XML is placing increasingly heavy loads on the existing technical
+      infrastructure of the Internet.
+    </dc:description>
+    <dc:publisher>The O'Reilly Network</dc:publisher>
+    <dc:creator>Simon St.Laurent (mailto:simonstl@simonstl.com)</dc:creator>
+    <dc:rights>Copyright &#169; 2000 O'Reilly &amp; Associates, Inc.</dc:rights>
+    <dc:subject>XML</dc:subject>
+    <co:name>XML.com</co:name>
+    <co:market>NASDAQ</co:market>
+    <co:symbol>XML</co:symbol>
+  </item> 
+
+  <textinput rdf:about="http://meerkat.oreillynet.com">
+    <title>Search Meerkat</title>
+    <description>Search Meerkat's RSS Database...</description>
+    <name>s</name>
+    <link>http://meerkat.oreillynet.com/</link>
+    <ti:function>search</ti:function>
+    <ti:inputType>regex</ti:inputType>
+  </textinput>
+
+</rdf:RDF>
