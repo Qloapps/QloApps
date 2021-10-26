@@ -1,0 +1,9 @@
+<!--
+Description: parsed pubDate, W3DTF format, year only
+Expect:      not bozo and feed['date_parsed'] == (2003, 1, 1, 0, 0, 0, 2, 1, 0)
+-->
+<rss version="2.0">
+<channel>
+<pubDate>2003</pubDate>
+</channel>
+</rss>

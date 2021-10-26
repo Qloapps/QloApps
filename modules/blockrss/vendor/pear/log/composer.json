@@ -1,0 +1,42 @@
+{
+    "name": "pear/log",
+    "type": "library",
+    "description": "PEAR Logging Framework",
+    "keywords": [
+        "log",
+        "logging"
+    ],
+    "license": "MIT",
+    "require": {
+        "php": ">5.2",
+        "pear/pear_exception": "1.0.1 || 1.0.2"
+    },
+    "autoload": {
+        "psr-0": {
+            "Log": "./"
+        },
+        "exclude-from-classmap": ["/examples/"]
+    },
+    "include-path": [
+        ""
+    ],
+    "authors": [
+        {
+            "name": "Jon Parise",
+            "email": "jon@php.net",
+            "homepage": "http://www.indelible.org",
+            "role": "Developer"
+        }
+    ],
+    "homepage": "http://pear.github.io/Log/",
+    "support": {
+        "issues": "https://github.com/pear/Log/issues",
+        "source": "https://github.com/pear/Log"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "*"
+    },
+    "suggest": {
+        "pear/db": "Install optionally via your project's composer.json"
+    }
+}

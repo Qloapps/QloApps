@@ -1,0 +1,9 @@
+<!--
+Description: parsed pubDate, W3DTF format, rollover past midnight on feb 28 in leap year on century divisible by 400
+Expect:      not bozo and feed['date_parsed'] == (2000, 2, 29, 2, 14, 55, 1, 60, 0)
+-->
+<rss version="2.0">
+<channel>
+<pubDate>2000-02-28T18:14:55-08:00</pubDate>
+</channel>
+</rss>

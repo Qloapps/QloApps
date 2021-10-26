@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="euc-kr"?>
+<!--
+SkipUnless:   __import__('codecs').lookup('euc-kr')
+Description:  euc-kr character in pubDate
+Expect:       not bozo and entries[0]['modified_parsed'] == (2004, 5, 27, 16, 31, 15, 3, 148, 0)
+-->
+<rss version="2.0">
+<channel>
+  <item>
+    <pubDate>2004년 05월 28일  01:31:15</pubDate>
+  </item>
+</channel>
+</rss>
