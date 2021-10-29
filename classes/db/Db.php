@@ -284,11 +284,15 @@ abstract class DbCore
      */
     public static function getClass()
     {
-        $class = 'MySQL';
+        $class = '';
         if (PHP_VERSION_ID >= 50200 && extension_loaded('pdo_mysql')) {
             $class = 'DbPDO';
         } elseif (extension_loaded('mysqli')) {
             $class = 'DbMySQLi';
+        }
+
+        if (empty($class)) {
+            throw new PrestaShopException('Cannot select any valid SQL engine.');
         }
 
         return $class;

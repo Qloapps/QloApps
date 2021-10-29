@@ -89,7 +89,7 @@ class SEKeywords extends ModuleGraph
 
     public function hookTop($params)
     {
-        if (!isset($_SERVER['HTTP_REFERER']) || strpos($_SERVER['HTTP_REFERER'], Tools::getHttpHost(false, false) == 0)) {
+        if (!isset($_SERVER['HTTP_REFERER']) || strpos($_SERVER['HTTP_REFERER'], Tools::getHttpHost(false, false)) == 0) {
             return;
         }
 

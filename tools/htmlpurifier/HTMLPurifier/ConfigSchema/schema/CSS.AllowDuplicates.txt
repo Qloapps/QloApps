@@ -1,0 +1,11 @@
+CSS.AllowDuplicates
+TYPE: bool
+DEFAULT: false
+VERSION: 4.8.0
+--DESCRIPTION--
+<p>
+  By default, HTML Purifier removes duplicate CSS properties,
+  like <code>color:red; color:blue</code>.  If this is set to
+  true, duplicate properties are allowed.
+</p>
+--# vim: et sw=4 sts=4

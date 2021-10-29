@@ -35,16 +35,12 @@
  * @author    André Rothe <andre.rothe@phosco.info>
  * @copyright 2010-2014 Justin Swanhart and André Rothe
  * @license   http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
- * @version   SVN: $Id: SubQueryBuilder.php 830 2013-12-18 09:35:42Z phosco@gmx.de $
+ * @version   SVN: $Id$
  * 
  */
 
-require_once dirname(__FILE__) . '/RefClauseBuilder.php';
-require_once dirname(__FILE__) . '/RefTypeBuilder.php';
-require_once dirname(__FILE__) . '/JoinBuilder.php';
-require_once dirname(__FILE__) . '/AliasBuilder.php';
-require_once dirname(__FILE__) . '/AliasBuilder.php';
-require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
+namespace PHPSQLParser\builders;
+use PHPSQLParser\utils\ExpressionType;
 
 /**
  * This class implements the builder for sub-queries. 
@@ -54,7 +50,7 @@ require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *  
  */
-class SubQueryBuilder {
+class SubQueryBuilder implements Builder {
 
     protected function buildRefClause($parsed) {
         $builder = new RefClauseBuilder();
@@ -81,19 +77,20 @@ class SubQueryBuilder {
         return $builder->build($parsed);
     }
 
-    public function build($parsed, $index = 0) {
+    public function build(array $parsed, $index = 0) {
         if ($parsed['expr_type'] !== ExpressionType::SUBQUERY) {
-            return "";
+            return '';
         }
 
+        // TODO: should we add a numeric level (0) between sub_tree and SELECT?
         $sql = $this->buildSelectStatement($parsed['sub_tree']);
-        $sql = "(" . $sql . ")";
+        $sql = '(' . $sql . ')';
         $sql .= $this->buildAlias($parsed);
 
         if ($index !== 0) {
             $sql = $this->buildJoin($parsed['join_type']) . $sql;
-            $sql .= $this - buildRefType($parsed['ref_type']);
-            $sql .= $this->buildRefClause($parsed['ref_clause']);
+            $sql .= $this->buildRefType($parsed['ref_type']);
+            $sql .= $parsed['ref_clause'] === false ? '' : $this->buildRefClause($parsed['ref_clause']);
         }
         return $sql;
     }

@@ -35,14 +35,12 @@
  * @author    André Rothe <andre.rothe@phosco.info>
  * @copyright 2010-2014 Justin Swanhart and André Rothe
  * @license   http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
- * @version   SVN: $Id: CreateTableOptionsBuilder.php 923 2014-01-08 12:20:30Z phosco@gmx.de $
+ * @version   SVN: $Id$
  * 
  */
 
-require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
-require_once dirname(__FILE__) . '/SelectExpressionBuilder.php';
-require_once dirname(__FILE__) . '/CharacterSetBuilder.php';
-require_once dirname(__FILE__) . '/CollationBuilder.php';
+namespace PHPSQLParser\builders;
+use PHPSQLParser\exceptions\UnableToCreateSQLException;
 
 /**
  * This class implements the builder for the table-options statement part of CREATE TABLE. 
@@ -52,23 +50,23 @@ require_once dirname(__FILE__) . '/CollationBuilder.php';
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *  
  */
-class CreateTableOptionsBuilder {
+class CreateTableOptionsBuilder implements Builder {
 
     protected function buildExpression($parsed) {
         $builder = new SelectExpressionBuilder();
         return $builder->build($parsed);
     }
-	
+
     protected function buildCharacterSet($parsed) {
         $builder = new CharacterSetBuilder();
         return $builder->build($parsed);
     }
-    
+
     protected function buildCollation($parsed) {
         $builder = new CollationBuilder();
         return $builder->build($parsed);
     }
-    
+
     /**
      * Returns a well-formatted delimiter string. If you don't need nice SQL,
      * you could simply return $parsed['delim'].
@@ -79,8 +77,8 @@ class CreateTableOptionsBuilder {
     protected function getDelimiter($parsed) {
         return ($parsed['delim'] === false ? '' : (trim($parsed['delim']) . ' '));
     }
-     
-    public function build($parsed) {
+
+    public function build(array $parsed) {
         if (!isset($parsed['options']) || $parsed['options'] === false) {
             return "";
         }

@@ -673,6 +673,6 @@ class AdminEmployeesControllerCore extends AdminController
                 }
             }
         }
-        die(Tools::jsonEncode($this->tabs_list));
+        die(json_encode($this->tabs_list));
     }
 }

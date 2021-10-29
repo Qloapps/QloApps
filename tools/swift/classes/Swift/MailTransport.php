@@ -11,7 +11,9 @@
 /**
  * Sends Messages using the mail() function.
  *
- * @author     Chris Corbyn
+ * @author Chris Corbyn
+ *
+ * @deprecated since 5.4.5 (to be removed in 6.0)
  */
 class Swift_MailTransport extends Swift_Transport_MailTransport
 {
@@ -36,7 +38,7 @@ class Swift_MailTransport extends Swift_Transport_MailTransport
      *
      * @param string $extraParams To be passed to mail()
      *
-     * @return Swift_MailTransport
+     * @return self
      */
     public static function newInstance($extraParams = '-f%s')
     {

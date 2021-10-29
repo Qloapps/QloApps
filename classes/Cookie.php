@@ -66,7 +66,7 @@ class CookieCore
         $this->_standalone = $standalone;
         $this->_expire = is_null($expire) ? time() + 1728000 : (int)$expire;
         $this->_path = trim(($this->_standalone ? '' : Context::getContext()->shop->physical_uri).$path, '/\\').'/';
-        if ($this->_path{0} != '/') {
+        if ($this->_path[0] != '/') {
             $this->_path = '/'.$this->_path;
         }
         $this->_path = rawurlencode($this->_path);
@@ -76,7 +76,7 @@ class CookieCore
         $this->_name = 'PrestaShop-'.md5(($this->_standalone ? '' : _PS_VERSION_).$name.$this->_domain);
         $this->_allow_writing = true;
         $this->_salt = $this->_standalone ? str_pad('', 8, md5('ps'.__FILE__)) : _COOKIE_IV_;
-        $this->_cipherTool = new Rijndael(_RIJNDAEL_KEY_, _RIJNDAEL_IV_);
+        $this->_cipherTool = new PhpEncryption(_NEW_COOKIE_KEY_);
         $this->_secure = (bool)$secure;
 
         $this->update();
@@ -324,6 +324,11 @@ class CookieCore
      */
     protected function _setcookie($cookie = null)
     {
+        $length = (ini_get('mbstring.func_overload') & 2) ? mb_strlen($cookie, ini_get('default_charset')) : strlen($cookie);
+        if ($length >= 1048576) {
+            return false;
+        }
+
         if ($cookie) {
             $content = $this->_cipherTool->encrypt($cookie);
             $time = $this->_expire;

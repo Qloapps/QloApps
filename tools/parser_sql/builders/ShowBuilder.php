@@ -35,18 +35,12 @@
  * @author    André Rothe <andre.rothe@phosco.info>
  * @copyright 2010-2014 Justin Swanhart and André Rothe
  * @license   http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
- * @version   SVN: $Id: ShowBuilder.php 830 2013-12-18 09:35:42Z phosco@gmx.de $
+ * @version   SVN: $Id$
  * 
  */
 
-require_once dirname(__FILE__) . '/../exceptions/UnableToCreateSQLException.php';
-require_once dirname(__FILE__) . '/ReservedBuilder.php';
-require_once dirname(__FILE__) . '/ConstantBuilder.php';
-require_once dirname(__FILE__) . '/EngineBuilder.php';
-require_once dirname(__FILE__) . '/FunctionBuilder.php';
-require_once dirname(__FILE__) . '/ProcedureBuilder.php';
-require_once dirname(__FILE__) . '/DatabaseBuilder.php';
-require_once dirname(__FILE__) . '/TableBuilder.php';
+namespace PHPSQLParser\builders;
+use PHPSQLParser\exceptions\UnableToCreateSQLException;
 
 /**
  * This class implements the builder for the SHOW statement. 
@@ -56,44 +50,44 @@ require_once dirname(__FILE__) . '/TableBuilder.php';
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *  
  */
-class ShowBuilder {
+class ShowBuilder implements Builder {
 
     protected function buildTable($parsed, $delim) {
         $builder = new TableBuilder();
         return $builder->build($parsed, $delim);
     }
-    
+
     protected function buildFunction($parsed) {
         $builder = new FunctionBuilder();
         return $builder->build($parsed);
     }
-    
+
     protected function buildProcedure($parsed) {
         $builder = new ProcedureBuilder();
         return $builder->build($parsed);
     }
-    
+
     protected function buildDatabase($parsed) {
         $builder = new DatabaseBuilder();
         return $builder->build($parsed);
     }
-    
+
     protected function buildEngine($parsed) {
         $builder = new EngineBuilder();
         return $builder->build($parsed);
     }
-    
+
     protected function buildConstant($parsed) {
         $builder = new ConstantBuilder();
         return $builder->build($parsed);
     }
-    
+
     protected function buildReserved($parsed) {
         $builder = new ReservedBuilder();
         return $builder->build($parsed);
     }
-    
-    public function build($parsed) {
+
+    public function build(array $parsed) {
         $show = $parsed['SHOW'];
         $sql = "";
         foreach ($show as $k => $v) {
@@ -115,6 +109,6 @@ class ShowBuilder {
 
         $sql = substr($sql, 0, -1);
         return "SHOW " . $sql;
-    }    
+    }
 }
 ?>

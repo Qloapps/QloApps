@@ -301,11 +301,11 @@
 															<div class="col-sm-7">
 																<select name="booking_order_status" class="form-control booking_order_status margin-bottom-5">
 																	{foreach from=$hotel_order_status item=state}
-																		<option value="{$state['id']|intval}" {if isset($data.id_status) && $state.id == $data.id_status} selected="selected" disabled="disabled"{/if}>{$state.status|escape}</option>
+																		<option value="{$state['id_status']|intval}" {if isset($data.id_status) && $state.id_status == $data.id_status} selected="selected" disabled="disabled"{/if}>{$state.name|escape}</option>
 																	{/foreach}
 																</select>
 
-																{if $data['id_status'] == 2}<span class="badge badge-success margin-bottom-5">{l s='checked in on'} {$data['check_in']|date_format:"%d-%m-%Y"}</span>{elseif $data['id_status'] == 3}<span class="badge badge-success margin-bottom-5">{l s='checked out on'} {$data['check_out']|date_format:"%d-%m-%Y"}</span>{/if}
+																{if $data['id_status'] == $hotel_order_status['STATUS_CHECKED_IN']['id_status']}<span class="badge badge-success margin-bottom-5">{l s='checked in on'} {$data['check_in']|date_format:"%d-%m-%Y"}</span>{elseif $data['id_status'] == $hotel_order_status['STATUS_CHECKED_OUT']['id_status']}<span class="badge badge-success margin-bottom-5">{l s='checked out on'} {$data['check_out']|date_format:"%d-%m-%Y"}</span>{/if}
 
 																{* field for the current date *}
 																<input class="room_status_date wk-input-date" type="text" name="status_date" value="{$data['date_from']|date_format:"%d-%m-%Y"}" readonly/>

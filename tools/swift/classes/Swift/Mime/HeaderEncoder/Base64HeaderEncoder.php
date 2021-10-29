@@ -11,7 +11,7 @@
 /**
  * Handles Base64 (B) Header Encoding in Swift Mailer.
  *
- * @author     Chris Corbyn
+ * @author Chris Corbyn
  */
 class Swift_Mime_HeaderEncoder_Base64HeaderEncoder extends Swift_Encoder_Base64Encoder implements Swift_Mime_HeaderEncoder
 {
@@ -32,10 +32,10 @@ class Swift_Mime_HeaderEncoder_Base64HeaderEncoder extends Swift_Encoder_Base64E
      * If the charset is iso-2022-jp, it uses mb_encode_mimeheader instead of
      * default encodeString, otherwise pass to the parent method.
      *
-     * @param string  $string          string to encode
-     * @param int     $firstLineOffset
-     * @param int     $maxLineLength   optional, 0 indicates the default of 76 bytes
-     * @param string  $charset
+     * @param string $string          string to encode
+     * @param int    $firstLineOffset
+     * @param int    $maxLineLength   optional, 0 indicates the default of 76 bytes
+     * @param string $charset
      *
      * @return string
      */

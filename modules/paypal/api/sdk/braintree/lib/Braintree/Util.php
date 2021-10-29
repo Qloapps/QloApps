@@ -202,7 +202,7 @@ class Util
         // every time this function is called.
         static $callback = null;
         if ($callback === null) {
-            $callback = create_function('$matches', 'return strtoupper($matches[1]);');
+            $callback = function ($matches) { return strtoupper($matches[1]); };
         }
 
         return preg_replace_callback('/' . $delimiter . '(\w)/', $callback, $string);

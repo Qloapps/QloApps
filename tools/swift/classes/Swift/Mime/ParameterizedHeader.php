@@ -11,7 +11,7 @@
 /**
  * A MIME Header with parameters.
  *
- * @author     Chris Corbyn
+ * @author Chris Corbyn
  */
 interface Swift_Mime_ParameterizedHeader extends Swift_Mime_Header
 {

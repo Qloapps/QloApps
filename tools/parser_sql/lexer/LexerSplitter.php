@@ -36,9 +36,11 @@
  * @author    André Rothe <andre.rothe@phosco.info>
  * @copyright 2010-2014 Justin Swanhart and André Rothe
  * @license   http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
- * @version   SVN: $Id: LexerSplitter.php 842 2013-12-30 08:57:53Z phosco@gmx.de $
+ * @version   SVN: $Id$
  * 
  */
+
+namespace PHPSQLParser\lexer;
 
 /**
  * This class holds a sorted array of characters, which are used as stop token.
@@ -54,8 +56,11 @@ class LexerSplitter {
     protected static $splitters = array("<=>", "\r\n", "!=", ">=", "<=", "<>", "<<", ">>", ":=", "\\", "&&", "||", ":=",
                                        "/*", "*/", "--", ">", "<", "|", "=", "^", "(", ")", "\t", "\n", "'", "\"", "`",
                                        ",", "@", " ", "+", "-", "*", "/", ";");
-    protected $tokenSize;
-    protected $hashSet;
+
+	/**
+	 * @var string Regex string pattern of splitters.
+	 */
+    protected $splitterPattern;
 
     /**
      * Constructor.
@@ -63,32 +68,60 @@ class LexerSplitter {
      * It initializes some fields.
      */
     public function __construct() {
-        $this->tokenSize = strlen(self::$splitters[0]); // should be the largest one
-        $this->hashSet = array_flip(self::$splitters);
+        $this->splitterPattern = $this->convertSplittersToRegexPattern( self::$splitters );
     }
 
-    /**
-     * Get the maximum length of a split token.
-     * 
-     * The largest element must be on position 0 of the internal $_splitters array,
-     * so the function returns the length of that token. It must be > 0.
-     * 
-     * @return int The number of characters for the largest split token.
-     */
-    public function getMaxLengthOfSplitter() {
-        return $this->tokenSize;
+	/**
+	 * Get the regex pattern string of all the splitters
+	 *
+	 * @return string
+	 */
+    public function getSplittersRegexPattern () {
+	    return $this->splitterPattern;
     }
 
-    /**
-     * Looks into the internal split token array and compares the given token with
-     * the array content. It returns true, if the token will be found, false otherwise. 
-     *  
-     * @param String $token a string, which could be a split token. 
-     * 
-     * @return boolean true, if the given string will be a split token, false otherwise
-     */
-    public function isSplitter($token) {
-        return isset($this->hashSet[$token]);
+	/**
+	 * Convert an array of splitter tokens to a regex pattern string.
+	 *
+	 * @param array $splitters
+	 *
+	 * @return string
+	 */
+    public function convertSplittersToRegexPattern( $splitters ) {
+	    $regex_parts = array();
+	    foreach ( $splitters as $part ) {
+		    $part = preg_quote( $part );
+
+		    switch ( $part ) {
+			    case "\r\n":
+				    $part = '\r\n';
+				    break;
+			    case "\t":
+				    $part = '\t';
+				    break;
+			    case "\n":
+				    $part = '\n';
+				    break;
+			    case " ":
+				    $part = '\s';
+				    break;
+			    case "/":
+				    $part = "\/";
+				    break;
+			    case "/\*":
+				    $part = "\/\*";
+				    break;
+			    case "\*/":
+				    $part = "\*\/";
+				    break;
+		    }
+
+		    $regex_parts[] = $part;
+	    }
+
+	    $pattern = implode( '|', $regex_parts );
+
+	    return '/(' . $pattern . ')/';
     }
 }
 

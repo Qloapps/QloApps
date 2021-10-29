@@ -600,7 +600,7 @@ class AdminProductsControllerCore extends AdminController
     public function ajaxProcessAddAttachment()
     {
         if ($this->tabAccess['edit'] === '0') {
-            return die(Tools::jsonEncode(array('error' => $this->l('You do not have the right permission'))));
+            return die(json_encode(array('error' => $this->l('You do not have the right permission'))));
         }
         if (isset($_FILES['attachment_file'])) {
             if ((int)$_FILES['attachment_file']['error'] === 1) {
@@ -720,7 +720,7 @@ class AdminProductsControllerCore extends AdminController
                 }
             }
 
-            die(Tools::jsonEncode($_FILES));
+            die(json_encode($_FILES));
         }
     }
 
@@ -1296,7 +1296,7 @@ class AdminProductsControllerCore extends AdminController
             );
         }
 
-        die(Tools::jsonEncode($json));
+        die(json_encode($json));
     }
 
     public function processSpecificPricePriorities()
@@ -1632,7 +1632,7 @@ class AdminProductsControllerCore extends AdminController
             );
         }
 
-        die(Tools::jsonEncode($json));
+        die(json_encode($json));
     }
 
     public function ajaxProcessDefaultProductAttribute()
@@ -1656,7 +1656,7 @@ class AdminProductsControllerCore extends AdminController
                 );
             }
 
-            die(Tools::jsonEncode($json));
+            die(json_encode($json));
         }
     }
 
@@ -1671,7 +1671,7 @@ class AdminProductsControllerCore extends AdminController
                     $combinations[$key]['attributes'][] = array($combination['group_name'], $combination['attribute_name'], $combination['id_attribute']);
                 }
 
-                die(Tools::jsonEncode($combinations));
+                die(json_encode($combinations));
             }
         }
     }
@@ -1732,13 +1732,13 @@ class AdminProductsControllerCore extends AdminController
     public function ajaxProcessUpdateImagePosition()
     {
         if ($this->tabAccess['edit'] === '0') {
-            return die(Tools::jsonEncode(array('error' => $this->l('You do not have the right permission'))));
+            return die(json_encode(array('error' => $this->l('You do not have the right permission'))));
         }
         $res = false;
         if ($json = Tools::getValue('json')) {
             $res = true;
             $json = stripslashes($json);
-            $images = Tools::jsonDecode($json, true);
+            $images = json_decode($json, true);
             foreach ($images as $id => $position) {
                 $img = new Image((int)$id);
                 $img->position = (int)$position;
@@ -1755,7 +1755,7 @@ class AdminProductsControllerCore extends AdminController
     public function ajaxProcessUpdateCover()
     {
         if ($this->tabAccess['edit'] === '0') {
-            return die(Tools::jsonEncode(array('error' => $this->l('You do not have the right permission'))));
+            return die(json_encode(array('error' => $this->l('You do not have the right permission'))));
         }
         Image::deleteCover((int)Tools::getValue('id_product'));
         $img = new Image((int)Tools::getValue('id_image'));
@@ -2742,7 +2742,7 @@ class AdminProductsControllerCore extends AdminController
         if ($manufacturers) {
             foreach ($manufacturers as $manufacturer) {
                 $tmp = array("optionValue" => $manufacturer['id_manufacturer'], "optionDisplay" => htmlspecialchars(trim($manufacturer['name'])));
-                $jsonArray[] = Tools::jsonEncode($tmp);
+                $jsonArray[] = json_encode($tmp);
             }
         }
 
@@ -2925,7 +2925,9 @@ class AdminProductsControllerCore extends AdminController
     public function renderForm()
     {
         // This nice code (irony) is here to store the product name, because the row after will erase product name in multishop context
-        $this->product_name = $this->object->name[$this->context->language->id];
+        if (Validate::isLoadedObject(($this->object))) {
+            $this->product_name = $this->object->name[$this->context->language->id];
+        }
 
         if (!method_exists($this, 'initForm'.$this->tab_display)) {
             return;
@@ -2965,7 +2967,7 @@ class AdminProductsControllerCore extends AdminController
         $this->tpl_form_vars['token'] = $this->token;
         $this->tpl_form_vars['combinationImagesJs'] = $this->getCombinationImagesJs();
         $this->tpl_form_vars['PS_ALLOW_ACCENTED_CHARS_URL'] = (int)Configuration::get('PS_ALLOW_ACCENTED_CHARS_URL');
-        $this->tpl_form_vars['post_data'] = Tools::jsonEncode($_POST);
+        $this->tpl_form_vars['post_data'] = json_encode($_POST);
         $this->tpl_form_vars['save_error'] = !empty($this->errors);
         $this->tpl_form_vars['mod_evasive'] = Tools::apacheModExists('evasive');
         $this->tpl_form_vars['mod_security'] = Tools::apacheModExists('security');
@@ -3322,8 +3324,8 @@ class AdminProductsControllerCore extends AdminController
                 $objHotelInfo = new HotelBranchInformation();
                 $hotelInfo = $objHotelInfo->hotelsNameAndId();
                 if ($hotelInfo) {
-                    $objRoomStatus = new HotelRoomStatus();
-                    $roomStatus = $objRoomStatus->getAllRoomStatus();
+                    $objRoomInfo = new HotelRoomInformation();
+                    $roomStatus = $objRoomInfo->getAllRoomStatus();
 
                     $objRoomType = new HotelRoomType();
                     if ($hotelRoomType = $objRoomType->getRoomTypeInfoByIdProduct($obj->id)) {
@@ -3332,14 +3334,13 @@ class AdminProductsControllerCore extends AdminController
                         $hotelFullInfo = $objHotelInfo->hotelBranchInfoById($hotelRoomType['id_hotel']);
                         $data->assign('htl_full_info', $hotelFullInfo);
 
-                        $objRoomInfo = new HotelRoomInformation();
                         $objRoomDisableDates = new HotelRoomDisableDates();
                         $hotelRoomInfo = $objRoomInfo->getHotelRoomInfo($obj->id, $hotelRoomType['id_hotel']);
                         if ($hotelRoomInfo) {
                             foreach ($hotelRoomInfo as &$room) {
-                                if ($room['id_status'] == 3) {
+                                if ($room['id_status'] == HotelRoomInformation::STATUS_TEMPORARY_INACTIVE) {
                                     $disabledDates = $objRoomDisableDates->getRoomDisableDates($room['id']);
-                                    $room['disabled_dates_json'] = Tools::jsonEncode($disabledDates);
+                                    $room['disabled_dates_json'] = json_encode($disabledDates);
                                 }
                             }
                             $data->assign('htl_room_info', $hotelRoomInfo);
@@ -3491,8 +3492,8 @@ class AdminProductsControllerCore extends AdminController
                         //validate room status
                         $disableDtsArr = array();
                         foreach ($room_status as $key => $status) {
-                            if ($status == 3) {
-                                $disableDtsArr[$key] = Tools::jsonDecode($disable_dates[$key], true);
+                            if ($status == HotelRoomInformation::STATUS_TEMPORARY_INACTIVE) {
+                                $disableDtsArr[$key] = json_decode($disable_dates[$key], true);
                                 $this->validateDisableDateRanges($disableDtsArr[$key]);
                             }
                         }
@@ -3527,7 +3528,7 @@ class AdminProductsControllerCore extends AdminController
                                 $objRoomInfo->floor = $room_floor[$key];
                                 $objRoomInfo->comment = $room_comment[$key];
                                 if ($objRoomInfo->save()) {
-                                    if ($room_status[$key] == 3) {
+                                    if ($room_status[$key] == HotelRoomInformation::STATUS_TEMPORARY_INACTIVE) {
                                         $objDisDts = new HotelRoomDisableDates();
                                         $objDisDts->deleteRoomDisableDates($objRoomInfo->id);
                                         if (isset($disableDtsArr[$key]) && $disableDtsArr[$key]) {
@@ -3714,7 +3715,7 @@ class AdminProductsControllerCore extends AdminController
         }
 
         if ($booking_calendar_data) {
-            die(Tools::jsonEncode($booking_calendar_data));
+            die(json_encode($booking_calendar_data));
         } else {
             die(0);
         }
@@ -4793,7 +4794,7 @@ class AdminProductsControllerCore extends AdminController
             }
         }
 
-        die(Tools::jsonEncode(array($image_uploader->getName() => $files)));
+        die(json_encode(array($image_uploader->getName() => $files)));
     }
 
     /**
@@ -5421,28 +5422,28 @@ class AdminProductsControllerCore extends AdminController
     public function ajaxProcessProductQuantity()
     {
         if ($this->tabAccess['edit'] === '0') {
-            return die(Tools::jsonEncode(array('error' => $this->l('You do not have the right permission'))));
+            return die(json_encode(array('error' => $this->l('You do not have the right permission'))));
         }
         if (!Tools::getValue('actionQty')) {
-            return Tools::jsonEncode(array('error' => $this->l('Undefined action')));
+            return json_encode(array('error' => $this->l('Undefined action')));
         }
 
         $product = new Product((int)Tools::getValue('id_product'), true);
         switch (Tools::getValue('actionQty')) {
             case 'depends_on_stock':
                 if (Tools::getValue('value') === false) {
-                    die(Tools::jsonEncode(array('error' =>  $this->l('Undefined value'))));
+                    die(json_encode(array('error' =>  $this->l('Undefined value'))));
                 }
                 if ((int)Tools::getValue('value') != 0 && (int)Tools::getValue('value') != 1) {
-                    die(Tools::jsonEncode(array('error' =>  $this->l('Incorrect value'))));
+                    die(json_encode(array('error' =>  $this->l('Incorrect value'))));
                 }
                 if (!$product->advanced_stock_management && (int)Tools::getValue('value') == 1) {
-                    die(Tools::jsonEncode(array('error' =>  $this->l('Not possible if advanced stock management is disabled. '))));
+                    die(json_encode(array('error' =>  $this->l('Not possible if advanced stock management is disabled. '))));
                 }
                 if (Configuration::get('PS_ADVANCED_STOCK_MANAGEMENT') && (int)Tools::getValue('value') == 1 && (Pack::isPack($product->id) && !Pack::allUsesAdvancedStockManagement($product->id)
                     && ($product->pack_stock_type == 2 || $product->pack_stock_type == 1 ||
                         ($product->pack_stock_type == 3 && (Configuration::get('PS_PACK_STOCK_TYPE') == 1 || Configuration::get('PS_PACK_STOCK_TYPE') == 2))))) {
-                    die(Tools::jsonEncode(array('error' => $this->l('You cannot use advanced stock management for this pack because').'<br />'.
+                    die(json_encode(array('error' => $this->l('You cannot use advanced stock management for this pack because').'<br />'.
                         $this->l('- advanced stock management is not enabled for these room types').'<br />'.
                         $this->l('- you have chosen to decrement room types quantities.'))));
                 }
@@ -5453,15 +5454,15 @@ class AdminProductsControllerCore extends AdminController
             case 'pack_stock_type':
                 $value = Tools::getValue('value');
                 if ($value === false) {
-                    die(Tools::jsonEncode(array('error' =>  $this->l('Undefined value'))));
+                    die(json_encode(array('error' =>  $this->l('Undefined value'))));
                 }
                 if ((int)$value != 0 && (int)$value != 1
                     && (int)$value != 2 && (int)$value != 3) {
-                    die(Tools::jsonEncode(array('error' =>  $this->l('Incorrect value'))));
+                    die(json_encode(array('error' =>  $this->l('Incorrect value'))));
                 }
                 if ($product->depends_on_stock && !Pack::allUsesAdvancedStockManagement($product->id) && ((int)$value == 1
                     || (int)$value == 2 || ((int)$value == 3 && (Configuration::get('PS_PACK_STOCK_TYPE') == 1 || Configuration::get('PS_PACK_STOCK_TYPE') == 2)))) {
-                    die(Tools::jsonEncode(array('error' => $this->l('You cannot use this stock management option because:').'<br />'.
+                    die(json_encode(array('error' => $this->l('You cannot use this stock management option because:').'<br />'.
                         $this->l('- advanced stock management is not enabled for these room types').'<br />'.
                         $this->l('- advanced stock management is enabled for the pack'))));
                 }
@@ -5471,10 +5472,10 @@ class AdminProductsControllerCore extends AdminController
 
             case 'out_of_stock':
                 if (Tools::getValue('value') === false) {
-                    die(Tools::jsonEncode(array('error' =>  $this->l('Undefined value'))));
+                    die(json_encode(array('error' =>  $this->l('Undefined value'))));
                 }
                 if (!in_array((int)Tools::getValue('value'), array(0, 1, 2))) {
-                    die(Tools::jsonEncode(array('error' =>  $this->l('Incorrect value'))));
+                    die(json_encode(array('error' =>  $this->l('Incorrect value'))));
                 }
 
                 StockAvailable::setProductOutOfStock($product->id, (int)Tools::getValue('value'));
@@ -5482,10 +5483,10 @@ class AdminProductsControllerCore extends AdminController
 
             case 'set_qty':
                 if (Tools::getValue('value') === false || (!is_numeric(trim(Tools::getValue('value'))))) {
-                    die(Tools::jsonEncode(array('error' =>  $this->l('Undefined value'))));
+                    die(json_encode(array('error' =>  $this->l('Undefined value'))));
                 }
                 if (Tools::getValue('id_product_attribute') === false) {
-                    die(Tools::jsonEncode(array('error' =>  $this->l('Undefined id room type attribute'))));
+                    die(json_encode(array('error' =>  $this->l('Undefined id room type attribute'))));
                 }
 
                 StockAvailable::setQuantity($product->id, (int)Tools::getValue('id_product_attribute'), (int)Tools::getValue('value'));
@@ -5495,18 +5496,18 @@ class AdminProductsControllerCore extends AdminController
                 $error = ob_get_contents();
                 if (!empty($error)) {
                     ob_end_clean();
-                    die(Tools::jsonEncode(array('error' => $error)));
+                    die(json_encode(array('error' => $error)));
                 }
                 break;
             case 'advanced_stock_management' :
                 if (Tools::getValue('value') === false) {
-                    die(Tools::jsonEncode(array('error' =>  $this->l('Undefined value'))));
+                    die(json_encode(array('error' =>  $this->l('Undefined value'))));
                 }
                 if ((int)Tools::getValue('value') != 1 && (int)Tools::getValue('value') != 0) {
-                    die(Tools::jsonEncode(array('error' =>  $this->l('Incorrect value'))));
+                    die(json_encode(array('error' =>  $this->l('Incorrect value'))));
                 }
                 if (!Configuration::get('PS_ADVANCED_STOCK_MANAGEMENT') && (int)Tools::getValue('value') == 1) {
-                    die(Tools::jsonEncode(array('error' =>  $this->l('Not possible if advanced stock management is disabled. '))));
+                    die(json_encode(array('error' =>  $this->l('Not possible if advanced stock management is disabled. '))));
                 }
 
                 $product->setAdvancedStockManagement((int)Tools::getValue('value'));
@@ -5516,7 +5517,7 @@ class AdminProductsControllerCore extends AdminController
                 break;
 
         }
-        die(Tools::jsonEncode(array('error' => false)));
+        die(json_encode(array('error' => false)));
     }
 
     public function getCombinationImagesJS()
@@ -5666,7 +5667,7 @@ class AdminProductsControllerCore extends AdminController
 					GROUP BY pl.`id_product`
 					LIMIT '.(int)$limit);
             }
-            die(Tools::jsonEncode($result));
+            die(json_encode($result));
         }
     }
 

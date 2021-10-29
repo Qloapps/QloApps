@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<!DOCTYPE rss SYSTEM "http://my.netscape.com/publish/formats/rss-0.91.dtd">
+<rss version="0.91">
+<channel>
+<copyright>Copyright 1997-1999 UserLand Software, Inc.</copyright>
+<pubDate>Thu, 08 Jul 1999 07:00:00 GMT</pubDate>
+<lastBuildDate>Thu, 08 Jul 1999 16:20:26 GMT</lastBuildDate>
+<docs>http://my.userland.com/stories/storyReader$11</docs>
+<description>News and commentary from the cross-platform scripting community.</description>
+<link>http://www.scripting.com/</link>
+<title>Scripting News</title>
+<image>
+<link>http://www.scripting.com/</link>
+<title>Scripting News</title>
+<url>http://www.scripting.com/gifs/tinyScriptingNews.gif</url>
+<height>40</height>
+<width>78</width>
+<description>What is this used for?</description>
+</image>
+<managingEditor>dave@userland.com (Dave Winer)</managingEditor>
+<webMaster>dave@userland.com (Dave Winer)</webMaster>
+<language>en-us</language>
+<skipHours>
+<hour>6</hour>
+<hour>7</hour>
+<hour>8</hour>
+<hour>9</hour>
+<hour>10</hour>
+<hour>11</hour>
+</skipHours>
+<skipDays>
+<day>Sunday</day>
+</skipDays>
+<rating>(PICS-1.1 "http://www.rsac.org/ratingsv01.html" l gen true comment "RSACi North America Server" for "http://www.rsac.org" on "1996.04.16T08:15-0500" r (n 0 s 0 v 0 l 0))</rating>
+<item>
+<title>stuff</title>
+<link>http://bar</link>
+<description>This is an article about some stuff</description>
+</item>
+<textinput>
+<title>Search Now!</title>
+<description>Enter your search &lt;terms&gt;</description>
+<name>find</name>
+<link>http://my.site.com/search.cgi</link>
+</textinput>
+</channel>
+</rss>

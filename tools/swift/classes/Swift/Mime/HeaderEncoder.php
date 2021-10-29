@@ -11,7 +11,7 @@
 /**
  * Interface for all Header Encoding schemes.
  *
- * @author     Chris Corbyn
+ * @author Chris Corbyn
  */
 interface Swift_Mime_HeaderEncoder extends Swift_Encoder
 {

@@ -1,0 +1,14 @@
+AutoFormat.RemoveEmpty.Predicate
+TYPE: hash
+VERSION: 4.7.0
+DEFAULT: array('colgroup' => array(), 'th' => array(), 'td' => array(), 'iframe' => array('src'))
+--DESCRIPTION--
+<p>
+  Given that an element has no contents, it will be removed by default, unless
+  this predicate dictates otherwise.  The predicate can either be an associative
+  map from tag name to list of attributes that must be present for the element
+  to be considered preserved: thus, the default always preserves <code>colgroup</code>,
+  <code>th</code> and <code>td</code>, and also <code>iframe</code> if it
+  has a <code>src</code>.
+</p>
+--# vim: et sw=4 sts=4

@@ -299,7 +299,7 @@ class hotelreservationsystem extends Module
                                 if (Validate::isLoadedObject(
                                     $objCartBooking = new HotelCartBookingData($demandInfo['id'])
                                 )) {
-                                    $objCartBooking->extra_demands = Tools::jsonEncode($demandInfo['extra_demands']);
+                                    $objCartBooking->extra_demands = json_encode($demandInfo['extra_demands']);
                                     $objCartBooking->save();
                                 }
                             }
@@ -443,7 +443,7 @@ class hotelreservationsystem extends Module
                     if ($objHtlBkDtl->save()) {
                         // save extra demands info
                         if ($objCartBkData->extra_demands
-                            && ($extraDemands = Tools::jsonDecode($objCartBkData->extra_demands, true))
+                            && ($extraDemands = json_decode($objCartBkData->extra_demands, true))
                         ) {
                             $objRoomDemandPrice = new HotelRoomTypeDemandPrice();
                             foreach ($extraDemands as $demand) {
@@ -668,8 +668,6 @@ class hotelreservationsystem extends Module
             || !$this->callInstallTab()
             || !$this->registerModuleHooks()
             || !$objHtlHelper->insertDefaultHotelEntries()
-            || !$objHtlHelper->insertHotelRoomsStatus()
-            || !$objHtlHelper->insertHotelOrderStatus()
             || !$objHtlHelper->insertHotelRoomAllotmentType()
         ) {
             return false;
@@ -739,8 +737,7 @@ class hotelreservationsystem extends Module
             `'._DB_PREFIX_.'htl_room_type_demand_price`,
             `'._DB_PREFIX_.'htl_room_type_demand`,
             `'._DB_PREFIX_.'htl_room_disable_dates`,
-            `'._DB_PREFIX_.'htl_access`,
-            `'._DB_PREFIX_.'htl_order_status`,'
+            `'._DB_PREFIX_.'htl_access`'
         );
     }
 

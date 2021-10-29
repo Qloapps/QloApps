@@ -546,7 +546,7 @@ class AdminTaxRulesGroupControllerCore extends AdminController
             foreach ($tax_rules as $key => $result) {
                 $output[$key] = $result;
             }
-            die(Tools::jsonEncode($output));
+            die(json_encode($output));
         }
     }
 

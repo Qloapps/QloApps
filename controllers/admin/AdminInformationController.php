@@ -127,8 +127,10 @@ class AdminInformationControllerCore extends AdminController
             'fopen' => $this->l('Allow the PHP fopen() function on your server.'),
             'register_globals' => $this->l('Set PHP "register_globals" option to "Off".'),
             'gz' => $this->l('Enable GZIP compression on your server.'),
-            'files' => $this->l('Some PrestaShop files are missing from your server.'),
-            'new_phpversion' => sprintf($this->l('You are using PHP %s version. Soon, the latest PHP version supported by PrestaShop will be PHP 5.4. To make sure you’re ready for the future, we recommend you to upgrade to PHP 5.4 now!'), phpversion())
+            'files' => $this->l('Some QloApps files are missing from your server.'),
+            'new_phpversion' => sprintf($this->l('You are using PHP %s version. Soon, the latest PHP version supported by QloApps will be PHP 5.4. To make sure you’re ready for the future, we recommend you to upgrade to PHP 5.4 now!'), phpversion()),
+            'pdo_mysql' => $this->l('PDO MySQL extension is not loaded')
+            'openssl' => $this->l('PHP OpenSSL extension is not loaded'),
         );
 
         // Functions list to test with 'test_system'
@@ -169,11 +171,11 @@ class AdminInformationControllerCore extends AdminController
         $this->file_list = array('missing' => array(), 'updated' => array());
         $xml = @simplexml_load_file(_PS_API_URL_.'/xml/md5/'._PS_VERSION_.'.xml');
         if (!$xml || !isset($xml->ps_root_dir[0])) {
-            die(Tools::jsonEncode($this->file_list));
+            die(json_encode($this->file_list));
         }
 
         $this->getListOfUpdatedFiles($xml->ps_root_dir[0]);
-        die(Tools::jsonEncode($this->file_list));
+        die(json_encode($this->file_list));
     }
 
     public function getListOfUpdatedFiles(SimpleXMLElement $dir, $path = '')

@@ -35,12 +35,13 @@
  * @author    André Rothe <andre.rothe@phosco.info>
  * @copyright 2010-2014 Justin Swanhart and André Rothe
  * @license   http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
- * @version   SVN: $Id: IndexColumnBuilder.php 917 2014-01-08 11:47:42Z phosco@gmx.de $
+ * @version   SVN: $Id$
  * 
  */
 
-require_once dirname(__FILE__) . '/../exceptions/UnsupportedFeatureException.php';
-require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
+namespace PHPSQLParser\builders;
+use PHPSQLParser\utils\ExpressionType;
+
 /**
  * This class implements the builder for index column entries of the column-list 
  * parts of CREATE TABLE. 
@@ -50,7 +51,7 @@ require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *  
  */
-class IndexColumnBuilder {
+class IndexColumnBuilder implements Builder {
 
     protected function buildLength($parsed) {
         return ($parsed === false ? '' : ('(' . $parsed . ')'));
@@ -59,8 +60,8 @@ class IndexColumnBuilder {
     protected function buildDirection($parsed) {
         return ($parsed === false ? '' : (' ' . $parsed));
     }
-    
-    public function build($parsed) {
+
+    public function build(array $parsed) {
         if ($parsed['expr_type'] !== ExpressionType::INDEX_COLUMN) {
             return "";
         }

@@ -41,10 +41,10 @@
 									</select>
 								</td>
 								<td class="center col-sm-6">
-									<a class="btn btn-default deactiveDatesModal" data-toggle="modal" data-target="#deactiveDatesModal" {if $info['id_status'] != 3 }style="display: none;"{/if}>{if $info['id_status'] != 3 }{l s='Add Dates'}{else}{l s='View Dates'}{/if}
+									<a class="btn btn-default deactiveDatesModal" data-toggle="modal" data-target="#deactiveDatesModal" {if $info['id_status'] != $rm_status['STATUS_TEMPORARY_INACTIVE']['id'] }style="display: none;"{/if}>{if $info['id_status'] != $rm_status['STATUS_TEMPORARY_INACTIVE']['id'] }{l s='Add Dates'}{else}{l s='View Dates'}{/if}
 									</a>
-									<input type="text" class="form-control room_comment" value="{$info['comment']}" name="room_comment[]" {if $info['id_status'] == 3 }style="display: none;"{/if}>
-									<input type="hidden" class="form-control disableDatesJSON" name="disableDatesJSON[]" {if $info['id_status'] == 3}value="{$info['disabled_dates_json']|escape:'html':'UTF-8'}"{/if}>
+									<input type="text" class="form-control room_comment" value="{$info['comment']}" name="room_comment[]" {if $info['id_status'] == $rm_status['STATUS_TEMPORARY_INACTIVE']['id'] }style="display: none;"{/if}>
+									<input type="hidden" class="form-control disableDatesJSON" name="disableDatesJSON[]" {if $info['id_status'] == $rm_status['STATUS_TEMPORARY_INACTIVE']['id']}value="{$info['disabled_dates_json']|escape:'html':'UTF-8'}"{/if}>
 								</td>
 								<td class="center col-sm-1">
 									<a href="#" class="rm_htl_room btn btn-default" data-id-htl-info="{$info['id']}"><i class="icon-trash"></i></a>
@@ -337,7 +337,7 @@
 		// on changing the room status as disabled for some date range.....
 		$(document).on("change", ".room_status", function(){
 			var status_val = $(this).val();
-			if (status_val == 3) {
+			if (status_val == rm_status.STATUS_TEMPORARY_INACTIVE.id) {
 				$(this).closest('.room_data_values').find('.room_comment, .deactiveDatesModal').toggle();
 			} else {
 				$(this).closest('.room_data_values').find('.room_comment').show();

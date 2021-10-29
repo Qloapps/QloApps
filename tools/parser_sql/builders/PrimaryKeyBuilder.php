@@ -35,18 +35,13 @@
  * @author    André Rothe <andre.rothe@phosco.info>
  * @copyright 2010-2014 Justin Swanhart and André Rothe
  * @license   http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
- * @version   SVN: $Id: PrimaryKeyBuilder.php 919 2014-01-08 11:49:02Z phosco@gmx.de $
+ * @version   SVN: $Id$
  * 
  */
 
-require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
-require_once dirname(__FILE__) . '/../exceptions/UnableToCreateSQLException.php';
-require_once dirname(__FILE__) . '/ColumnListBuilder.php';
-require_once dirname(__FILE__) . '/ConstraintBuilder.php';
-require_once dirname(__FILE__) . '/ReservedBuilder.php';
-require_once dirname(__FILE__) . '/IndexTypeBuilder.php';
-require_once dirname(__FILE__) . '/IndexSizeBuilder.php';
-require_once dirname(__FILE__) . '/IndexParserBuilder.php';
+namespace PHPSQLParser\builders;
+use PHPSQLParser\exceptions\UnableToCreateSQLException;
+use PHPSQLParser\utils\ExpressionType;
 
 /**
  * This class implements the builder for the PRIMARY KEY  statement part of CREATE TABLE. 
@@ -56,7 +51,7 @@ require_once dirname(__FILE__) . '/IndexParserBuilder.php';
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *  
  */
-class PrimaryKeyBuilder {
+class PrimaryKeyBuilder implements Builder {
 
     protected function buildColumnList($parsed) {
         $builder = new ColumnListBuilder();
@@ -77,18 +72,18 @@ class PrimaryKeyBuilder {
         $builder = new IndexTypeBuilder();
         return $builder->build($parsed);
     }
-    
+
     protected function buildIndexSize($parsed) {
         $builder = new IndexSizeBuilder();
         return $builder->build($parsed);
     }
-    
+
     protected function buildIndexParser($parsed) {
         $builder = new IndexParserBuilder();
         return $builder->build($parsed);
     }
-    
-    public function build($parsed) {
+
+    public function build(array $parsed) {
         if ($parsed['expr_type'] !== ExpressionType::PRIMARY_KEY) {
             return "";
         }

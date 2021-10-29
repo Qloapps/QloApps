@@ -1,0 +1,9 @@
+HTML.CustomDoctype
+TYPE: string/null
+VERSION: 2.0.1
+DEFAULT: NULL
+--DESCRIPTION--
+
+A custom doctype for power-users who defined their own document
+type. This directive only applies when %HTML.Doctype is blank.
+--# vim: et sw=4 sts=4

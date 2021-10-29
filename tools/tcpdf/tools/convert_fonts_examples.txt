@@ -1,0 +1,28 @@
+./tcpdf_addfont.php -b -t Type1 -f 4 -e symbol -i pdfasymbol.pfb
+./tcpdf_addfont.php -b -t Type1 -f 4 -i pdfazapfdingbats.pfb
+./tcpdf_addfont.php -b -t Type1 -f 32 -e cp1252 -i pdfatimes.pfb,pdfatimesb.pfb,pdfahelvetica.pfb,pdfahelveticab.pfb
+./tcpdf_addfont.php -b -t Type1 -f 33 -e cp1252 -i pdfacourier.pfb,pdfacourierb.pfb
+./tcpdf_addfont.php -b -t Type1 -f 96 -e cp1252 -i pdfahelveticabi.pfb,pdfahelveticai.pfb,pdfatimesi.pfb,pdfatimesbi.pfb
+./tcpdf_addfont.php -b -t Type1 -f 97 -e cp1252 -i pdfacourieri.pfb,pdfacourierbi.pfb
+
+
+./tcpdf_addfont.php -b -t TrueTypeUnicode -f 32 -i DejaVuSans.ttf,DejaVuSans-Bold.ttf,DejaVuSansCondensed.ttf,DejaVuSansCondensed-Bold.ttf,DejaVuSans-ExtraLight.ttf,DejaVuSerif.ttf,DejaVuSerif-Bold.ttf,DejaVuSerifCondensed.ttf,DejaVuSerifCondensed-Bold.ttf
+./tcpdf_addfont.php -b -t TrueTypeUnicode -f 33 -i DejaVuSansMono.ttf,DejaVuSansMono-Bold.ttf
+./tcpdf_addfont.php -b -t TrueTypeUnicode -f 96 -i DejaVuSans-BoldOblique.ttf,DejaVuSansCondensed-BoldOblique.ttf,DejaVuSansCondensed-Oblique.ttf,DejaVuSerifCondensed-BoldItalic.ttf,DejaVuSerifCondensed-Italic.ttf,DejaVuSerif-Italic.ttf,DejaVuSerif-BoldItalic.ttf,DejaVuSans-Oblique.ttf
+./tcpdf_addfont.php -b -t TrueTypeUnicode -f 97 -i DejaVuSansMono-BoldOblique.ttf,DejaVuSansMono-Oblique.ttf
+
+
+
+./tcpdf_addfont.php -b -t TrueTypeUnicode -f 32 -i FreeSans.ttf,FreeSansBold.ttf,FreeSerif.ttf,FreeSerifBold.ttf
+./tcpdf_addfont.php -b -t TrueTypeUnicode -f 33 -i FreeMono.ttf,FreeMonoBold.ttf
+./tcpdf_addfont.php -b -t TrueTypeUnicode -f 96 -i FreeSansBoldOblique.ttf,FreeSansOblique.ttf,FreeSerifBoldItalic.ttf,FreeSerifItalic.ttf
+./tcpdf_addfont.php -b -t TrueTypeUnicode -f 97 -i FreeMonoBoldOblique.ttf,FreeMonoOblique.ttf
+
+
+./tcpdf_addfont.php -b -t TrueTypeUnicode -i aeAlArabiya.ttf,aeFurat.ttf
+
+
+./tcpdf_addfont.php -b -t CID0JP -f 32 -i cid0jp.ttf
+./tcpdf_addfont.php -b -t CID0KR -f 32 -i cid0kr.ttf
+./tcpdf_addfont.php -b -t CID0CS -f 32 -i cid0cs.ttf
+./tcpdf_addfont.php -b -t CID0CT -f 32 -i cid0ct.ttf

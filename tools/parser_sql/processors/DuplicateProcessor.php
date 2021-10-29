@@ -30,19 +30,19 @@
  * DAMAGE.
  */
 
-require_once(dirname(__FILE__) . '/SetProcessor.php');
+namespace PHPSQLParser\processors;
 
 /**
- *
+ * 
  * This class processes the DUPLICATE statements.
- *
+ * 
  * @author arothe
- *
+ * 
  */
 class DuplicateProcessor extends SetProcessor {
 
     public function process($tokens, $isUpdate = false) {
-        return parent::process($tokens, false);
+        return parent::process($tokens, $isUpdate);
     }
 
 }
