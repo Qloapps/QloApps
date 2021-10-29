@@ -144,7 +144,7 @@ class ProductCommentsDefaultModuleFrontController extends ModuleFrontController
 		else
 			$result = false;
 
-		die(Tools::jsonEncode(array(
+		die(json_encode(array(
 			'result' => $result,
 			'errors' => $errors
 		)));

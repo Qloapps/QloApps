@@ -12,7 +12,7 @@
  * Base Class of Signer Infrastructure.
  *
  *
- * @author     Xavier De Cock <xdecock@gmail.com>
+ * @author Xavier De Cock <xdecock@gmail.com>
  */
 interface Swift_Signer
 {

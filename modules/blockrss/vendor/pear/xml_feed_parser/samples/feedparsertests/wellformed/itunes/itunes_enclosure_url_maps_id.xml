@@ -1,0 +1,11 @@
+<!--
+Description: iTunes enclosure URL maps to ID if no ID is present
+Expect:      not bozo and entries[0]['id'] == u'http://example.com/movie.mp4'
+-->
+<rss xmlns:itunes="http://www.itunes.com/DTDs/Podcast-1.0.dtd">
+<channel>
+<item>
+<enclosure url="http://example.com/movie.mp4"></enclosure>
+</item>
+</channel>
+</rss>

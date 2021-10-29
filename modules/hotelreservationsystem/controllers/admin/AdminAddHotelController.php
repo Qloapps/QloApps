@@ -493,7 +493,7 @@ class AdminAddHotelController extends ModuleAdminController
                 }
             }
         }
-        die(Tools::jsonEncode($states));
+        die(json_encode($states));
     }
 
     public function ajaxProcessUploadHotelImages()
@@ -514,19 +514,19 @@ class AdminAddHotelController extends ModuleAdminController
                 $hotelImgPath = _PS_MODULE_DIR_.'hotelreservationsystem/views/img/hotel_img/';
                 $imageDetail = $objHotelImage->uploadHotelImages($_FILES['hotel_image'], $idHotel, $hotelImgPath);
                 if ($imageDetail) {
-                    die(Tools::jsonEncode($imageDetail));
+                    die(json_encode($imageDetail));
                 } else {
-                    die(Tools::jsonEncode(array('hasError' => true)));
+                    die(json_encode(array('hasError' => true)));
                 }
             } else {
                 die(
-                    Tools::jsonEncode(
+                    json_encode(
                         array('hasError' => true, 'message' => $_FILES['hotel_image']['name'].': '.$invalidImg)
                     )
                 );
             }
         } else {
-            die(Tools::jsonEncode(array('hasError' => true)));
+            die(json_encode(array('hasError' => true)));
         }
     }
 

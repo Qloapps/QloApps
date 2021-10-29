@@ -9,55 +9,55 @@
  */
 
 /**
- * Header Signer Interface used to apply Header-Based Signature to a message
+ * Header Signer Interface used to apply Header-Based Signature to a message.
  *
- * @author     Xavier De Cock <xdecock@gmail.com>
+ * @author Xavier De Cock <xdecock@gmail.com>
  */
 interface Swift_Signers_HeaderSigner extends Swift_Signer, Swift_InputByteStream
 {
     /**
-     * Exclude an header from the signed headers
+     * Exclude an header from the signed headers.
      *
      * @param string $header_name
      *
-     * @return Swift_Signers_HeaderSigner
+     * @return self
      */
     public function ignoreHeader($header_name);
 
     /**
-     * Prepare the Signer to get a new Body
+     * Prepare the Signer to get a new Body.
      *
-     * @return Swift_Signers_HeaderSigner
+     * @return self
      */
     public function startBody();
 
     /**
-     * Give the signal that the body has finished streaming
+     * Give the signal that the body has finished streaming.
      *
-     * @return Swift_Signers_HeaderSigner
+     * @return self
      */
     public function endBody();
 
     /**
-     * Give the headers already given
+     * Give the headers already given.
      *
      * @param Swift_Mime_SimpleHeaderSet $headers
      *
-     * @return Swift_Signers_HeaderSigner
+     * @return self
      */
     public function setHeaders(Swift_Mime_HeaderSet $headers);
 
     /**
-     * Add the header(s) to the headerSet
+     * Add the header(s) to the headerSet.
      *
      * @param Swift_Mime_HeaderSet $headers
      *
-     * @return Swift_Signers_HeaderSigner
+     * @return self
      */
     public function addSignature(Swift_Mime_HeaderSet $headers);
 
     /**
-     * Return the list of header a signer might tamper
+     * Return the list of header a signer might tamper.
      *
      * @return array
      */

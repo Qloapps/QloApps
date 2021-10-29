@@ -52,7 +52,7 @@ if (Tools::getValue('action') && Tools::getValue('id_product_comment') && Contex
 }
 else if (Tools::getValue('action') && Tools::getValue('secure_key') == $productCom->secure_key)
 {
-		$review = Tools::jsonDecode(Tools::getValue('review'));
+		$review = json_decode(Tools::getValue('review'));
 		$id_product = 0;
 		$content = null;
 		$title = null;

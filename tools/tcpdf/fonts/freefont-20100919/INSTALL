@@ -1,0 +1,86 @@
+                          Installing GNU FreeFont
+                          =======================
+
+GNU FreeFont can be used in any modern operating system.
+
+This document explains how to install FreeFont on some common systems.
+
+UNIX/GNU/Linux/BSD Systems
+--------------------------
+
+FreeFont works with any system using the free font rasterizer FreeType
+<http://www.freetype.org/>.
+
+* Debian GNU/Linux
+
+Users of Debian GNU/Linux system will probably want to use the Debian package,
+available from the Debian site, 
+
+	<http://packages.debian.org/unstable/x11/ttf-freefont.html>,
+
+or any of its mirrors.
+
+Install them by issuing the command
+	apt-get install ttf-freefont
+
+
+* KDE local installation
+
+Users of KDE can install .ttf files on a per-user basis using the KDE 
+Control Center module "kcmfontinst", which may appear in the menu as
+
+	Settings -> System Administration -> Font Installer
+
+This is especially helpful for developers and testers.
+
+
+* Generic X-windows
+
+	1) Fetch the freefont-ttf.tar.gz package with Free UCS outline fonts
+	   in the TrueType format.
+
+	2) Unpack TrueType fonts into a suitable directory,
+	   e.g. /usr/local/share/fonts/default/TrueType/
+
+	3) If you have chosen any other directory, make sure the directory you
+	   used to install the fonts is listed in the path searched by the X
+	   Font Server by editing the config file in /etc/X11/.
+
+	   In some systems, you list the directory in the item "catalogue="
+	   in the file /etc/X11/fs/config.
+
+	4) Run ttmkfdir in the directory where you unpacked the fonts.
+
+
+Windows 95/98/NT/2000/XP; Vista
+-------------------------------
+
+Note that in at least Vista, XP and 2000, the OpenType versions perform much
+better than, and are recommended over, the TrueType ones.
+
+* Vista:
+	1) From the Start menu, open Control Panels
+	2) Drag-n-drop font files onto Fonts control panel
+           You may get a dialog saying
+        	"Windows needs your permission to continue"
+	   a) Click Continue
+
+* 95/98/NT:
+	The font installation is similar to Vista.
+
+	In order to use OpenType, users of Windows 95, 98 and NT 4.0 can
+	install Adobe's 'Type Manager Light'.  It is available for download
+	without cost from Adobe's web site.
+
+	Otherwise, use the TrueType versions.
+
+Mac OS X
+--------
+
+Installing on Mac OS X consists of moving the .ttf files to either
+	/Library/Fonts/  or  ~/Library/Fonts/
+depending on whether they should be available to all users on your system
+or just to yourself.
+
+--------------------------------------------------------------------------
+$Id: INSTALL,v 1.7 2008/12/26 12:33:31 Stevan_White Exp $

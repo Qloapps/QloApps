@@ -11,7 +11,7 @@
 /**
  * The EventDispatcher which handles the event dispatching layer.
  *
- * @author     Chris Corbyn
+ * @author Chris Corbyn
  */
 class Swift_Events_SimpleEventDispatcher implements Swift_Events_EventDispatcher
 {

@@ -1,0 +1,11 @@
+HTML.Forms
+TYPE: bool
+VERSION: 4.13.0
+DEFAULT: false
+--DESCRIPTION--
+<p>
+    Whether or not to permit form elements in the user input, regardless of
+    %HTML.Trusted value. Please be very careful when using this functionality, as
+    enabling forms in untrusted documents may allow for phishing attacks.
+</p>
+--# vim: et sw=4 sts=4

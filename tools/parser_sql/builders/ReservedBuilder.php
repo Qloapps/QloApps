@@ -35,11 +35,12 @@
  * @author    André Rothe <andre.rothe@phosco.info>
  * @copyright 2010-2014 Justin Swanhart and André Rothe
  * @license   http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
- * @version   SVN: $Id: ReservedBuilder.php 830 2013-12-18 09:35:42Z phosco@gmx.de $
+ * @version   SVN: $Id$
  * 
  */
 
-require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
+namespace PHPSQLParser\builders;
+use PHPSQLParser\utils\ExpressionType;
 
 /**
  * This class implements the builder for reserved keywords.
@@ -49,13 +50,13 @@ require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *  
  */
-class ReservedBuilder {
+class ReservedBuilder implements Builder {
 
     public function isReserved($parsed) {
-        return ($parsed['expr_type'] === ExpressionType::RESERVED);
+        return (isset($parsed['expr_type']) && $parsed['expr_type'] === ExpressionType::RESERVED);
     }
-    
-    public function build($parsed) {
+
+    public function build(array $parsed) {
         if (!$this->isReserved($parsed)) {
             return "";
         }

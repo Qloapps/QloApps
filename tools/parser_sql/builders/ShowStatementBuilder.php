@@ -35,12 +35,11 @@
  * @author    André Rothe <andre.rothe@phosco.info>
  * @copyright 2010-2014 Justin Swanhart and André Rothe
  * @license   http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
- * @version   SVN: $Id: ShowStatementBuilder.php 830 2013-12-18 09:35:42Z phosco@gmx.de $
+ * @version   SVN: $Id$
  * 
  */
 
-require_once dirname(__FILE__) . '/ShowBuilder.php';
-require_once dirname(__FILE__) . '/WhereBuilder.php';
+namespace PHPSQLParser\builders;
 
 /**
  * This class implements the builder for the SHOW statement. 
@@ -50,19 +49,19 @@ require_once dirname(__FILE__) . '/WhereBuilder.php';
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *  
  */
-class ShowStatementBuilder {
+class ShowStatementBuilder implements Builder {
 
     protected function buildWHERE($parsed) {
         $builder = new WhereBuilder();
         return $builder->build($parsed);
     }
-    
+
     protected function buildSHOW($parsed) {
         $builder = new ShowBuilder();
         return $builder->build($parsed);
     }
-    
-   public function build($parsed) {
+
+    public function build(array $parsed) {
         $sql = $this->buildSHOW($parsed);
         if (isset($parsed['WHERE'])) {
             $sql .= " " . $this->buildWHERE($parsed['WHERE']);

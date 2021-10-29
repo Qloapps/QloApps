@@ -35,14 +35,12 @@
  * @author    André Rothe <andre.rothe@phosco.info>
  * @copyright 2010-2014 Justin Swanhart and André Rothe
  * @license   http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
- * @version   SVN: $Id: GroupByBuilder.php 830 2013-12-18 09:35:42Z phosco@gmx.de $
+ * @version   SVN: $Id$
  * 
  */
 
-require_once dirname(__FILE__) . '/../exceptions/UnableToCreateSQLException.php';
-require_once dirname(__FILE__) . '/PositionBuilder.php';
-require_once dirname(__FILE__) . '/ColumnReferenceBuilder.php';
-require_once dirname(__FILE__) . '/FunctionBuilder.php';
+namespace PHPSQLParser\builders;
+use PHPSQLParser\exceptions\UnableToCreateSQLException;
 
 /**
  * This class implements the builder for the GROUP-BY clause. 
@@ -52,7 +50,7 @@ require_once dirname(__FILE__) . '/FunctionBuilder.php';
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *  
  */
-class GroupByBuilder {
+class GroupByBuilder implements Builder {
 
     protected function buildColRef($parsed) {
         $builder = new ColumnReferenceBuilder();
@@ -68,15 +66,27 @@ class GroupByBuilder {
         $builder = new FunctionBuilder();
         return $builder->build($parsed);
     }
-        
-    public function build($parsed) {
+
+    protected function buildGroupByAlias($parsed) {
+        $builder = new GroupByAliasBuilder();
+        return $builder->build($parsed);
+    }
+    
+    protected function buildGroupByExpression($parsed) {
+    	$builder = new GroupByExpressionBuilder();
+        return $builder->build($parsed);
+    }
+
+    public function build(array $parsed) {
         $sql = "";
         foreach ($parsed as $k => $v) {
             $len = strlen($sql);
             $sql .= $this->buildColRef($v);
             $sql .= $this->buildPosition($v);
             $sql .= $this->buildFunction($v);
-
+            $sql .= $this->buildGroupByExpression($v);
+            $sql .= $this->buildGroupByAlias($v);
+            
             if ($len == strlen($sql)) {
                 throw new UnableToCreateSQLException('GROUP', $k, $v, 'expr_type');
             }
@@ -86,6 +96,6 @@ class GroupByBuilder {
         $sql = substr($sql, 0, -2);
         return "GROUP BY " . $sql;
     }
-    
+
 }
 ?>

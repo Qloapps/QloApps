@@ -35,9 +35,13 @@
  * @author    André Rothe <andre.rothe@phosco.info>
  * @copyright 2010-2014 Justin Swanhart and André Rothe
  * @license   http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
- * @version   SVN: $Id: UpdateBuilder.php 830 2013-12-18 09:35:42Z phosco@gmx.de $
+ * @version   SVN: $Id$
  * 
  */
+
+namespace PHPSQLParser\builders;
+use PHPSQLParser\exceptions\UnableToCreateSQLException;
+use PHPSQLParser\utils\ExpressionType;
 
 /**
  * This class implements the builder for the UPDATE statement parts. 
@@ -47,10 +51,25 @@
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *  
  */
-class UpdateBuilder {
+class UpdateBuilder implements Builder {
 
-    public function build($parsed) {
-        return "UPDATE " . $parsed[0]['table'];
+    protected function buildTable($parsed, $idx) {
+        $builder = new TableBuilder();
+        return $builder->build($parsed, $idx);
+    }
+
+    public function build(array $parsed) {
+        $sql = '';
+
+        foreach ($parsed as $k => $v) {
+            $len = strlen($sql);
+            $sql .= $this->buildTable($v, $k);
+
+            if ($len == strlen($sql)) {
+                throw new UnableToCreateSQLException('UPDATE table list', $k, $v, 'expr_type');
+            }
+        }
+        return 'UPDATE ' . $sql;
     }
 }
 ?>

@@ -961,14 +961,14 @@ class AdminCategoriesControllerCore extends AdminController
     public function ajaxProcessStatusCategory()
     {
         if (!$id_category = (int)Tools::getValue('id_category')) {
-            die(Tools::jsonEncode(array('success' => false, 'error' => true, 'text' => $this->l('Failed to update the status'))));
+            die(json_encode(array('success' => false, 'error' => true, 'text' => $this->l('Failed to update the status'))));
         } else {
             $category = new Category((int)$id_category);
             if (Validate::isLoadedObject($category)) {
                 $category->active = $category->active == 1 ? 0 : 1;
                 $category->save() ?
-                die(Tools::jsonEncode(array('success' => true, 'text' => $this->l('The status has been updated successfully')))) :
-                die(Tools::jsonEncode(array('success' => false, 'error' => true, 'text' => $this->l('Failed to update the status'))));
+                die(json_encode(array('success' => true, 'text' => $this->l('The status has been updated successfully')))) :
+                die(json_encode(array('success' => false, 'error' => true, 'text' => $this->l('Failed to update the status'))));
             }
         }
     }

@@ -1,0 +1,82 @@
+<?php
+
+require_once 'HTMLPurifier/DefinitionCache/Decorator.php';
+
+/**
+ * Definition cache decorator template.
+ */
+class HTMLPurifier_DefinitionCache_Decorator_Template extends HTMLPurifier_DefinitionCache_Decorator
+{
+
+    /**
+     * @type string
+     */
+    public $name = 'Template'; // replace this
+
+    public function copy()
+    {
+        // replace class name with yours
+        return new HTMLPurifier_DefinitionCache_Decorator_Template();
+    }
+
+    // remove methods you don't need
+
+    /**
+     * @param HTMLPurifier_Definition $def
+     * @param HTMLPurifier_Config $config
+     * @return mixed
+     */
+    public function add($def, $config)
+    {
+        return parent::add($def, $config);
+    }
+
+    /**
+     * @param HTMLPurifier_Definition $def
+     * @param HTMLPurifier_Config $config
+     * @return mixed
+     */
+    public function set($def, $config)
+    {
+        return parent::set($def, $config);
+    }
+
+    /**
+     * @param HTMLPurifier_Definition $def
+     * @param HTMLPurifier_Config $config
+     * @return mixed
+     */
+    public function replace($def, $config)
+    {
+        return parent::replace($def, $config);
+    }
+
+    /**
+     * @param HTMLPurifier_Config $config
+     * @return mixed
+     */
+    public function get($config)
+    {
+        return parent::get($config);
+    }
+
+    /**
+     * @param HTMLPurifier_Config $config
+     * @return mixed
+     */
+    public function flush($config)
+    {
+        return parent::flush($config);
+    }
+
+    /**
+     * @param HTMLPurifier_Config $config
+     * @return mixed
+     */
+    public function cleanup($config)
+    {
+        return parent::cleanup($config);
+    }
+}
+
+// vim: et sw=4 sts=4

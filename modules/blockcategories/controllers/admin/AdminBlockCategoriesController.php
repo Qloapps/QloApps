@@ -48,7 +48,7 @@ class AdminBlockCategoriesController extends ModuleAdminController
 	}
 
 	public function ajaxProcessuploadThumbnailImages()
-	{		
+	{
 		$category = new Category((int)Tools::getValue('id_category'));
 
 		if (isset($_FILES['thumbnail']))
@@ -74,7 +74,7 @@ class AdminBlockCategoriesController extends ModuleAdminController
 			{
 				$total_errors['name'] = sprintf(Tools::displayError('An error occurred while uploading the image :'));
 				$total_errors['error'] = sprintf(Tools::displayError('You cannot upload more files'));
-				die(Tools::jsonEncode(array('thumbnail' => array($total_errors))));
+				die(json_encode(array('thumbnail' => array($total_errors))));
 			}
 
 			foreach ($files as $key => &$file)
@@ -99,7 +99,7 @@ class AdminBlockCategoriesController extends ModuleAdminController
 					unset($file['save_path']);
 
 				if (isset($file['tmp_name']))
-					unset($file['tmp_name']);				
+					unset($file['tmp_name']);
 
 				//Add image preview and delete url
 				$file['image'] = ImageManager::thumbnail(_PS_CAT_IMG_DIR_.(int)$category->id.'-'.$id.'_thumb.jpg',
@@ -113,7 +113,7 @@ class AdminBlockCategoriesController extends ModuleAdminController
 			else
 				Tools::clearSmartyCache();
 
-			die(Tools::jsonEncode(array('thumbnail' => $files)));
+			die(json_encode(array('thumbnail' => $files)));
 		}
 	}
 }

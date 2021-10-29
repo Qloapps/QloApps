@@ -1,0 +1,16 @@
+Core.AggressivelyRemoveScript
+TYPE: bool
+VERSION: 4.9.0
+DEFAULT: true
+--DESCRIPTION--
+<p>
+    This directive enables aggressive pre-filter removal of
+    script tags.  This is not necessary for security,
+    but it can help work around a bug in libxml where embedded
+    HTML elements inside script sections cause the parser to
+    choke.  To revert to pre-4.9.0 behavior, set this to false.
+    This directive has no effect if %Core.Trusted is true,
+    %Core.RemoveScriptContents is false, or %Core.HiddenElements
+    does not contain script.
+</p>
+--# vim: et sw=4 sts=4

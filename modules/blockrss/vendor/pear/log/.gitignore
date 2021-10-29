@@ -1,0 +1,18 @@
+
+# /
+/*.tgz
+
+# /docs/
+/docs/api
+
+# /tests/
+/tests/*.diff
+/tests/*.exp
+/tests/*.log
+/tests/*.out
+/tests/sqlite-log.db
+
+# composer related
+composer.lock
+composer.phar
+vendor

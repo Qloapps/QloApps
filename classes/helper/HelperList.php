@@ -435,7 +435,7 @@ class HelperListCore extends Helper
             'token' => $token != null ? $token : $this->token,
             'action' => self::$cache_lang['Details'],
             'params' => $ajax_params,
-            'json_params' => Tools::jsonEncode($ajax_params)
+            'json_params' => json_encode($ajax_params)
         ));
         return $tpl->fetch();
     }

@@ -24,6 +24,8 @@
 *  International Registered Trademark & Property of PrestaShop SA
 */
 
+require_once (_PS_TOOL_DIR_.'defuse/php-encryption/defuse-crypto.phar');
+
 class InstallModelInstall extends InstallAbstractModel
 {
     const SETTINGS_FILE = 'config/settings.inc.php';
@@ -69,6 +71,7 @@ class InstallModelInstall extends InstallAbstractModel
             $this->setError($this->language->l('%s folder is not writable (check permissions)', dirname(self::SETTINGS_FILE)));
             return false;
         }
+        $key = \Defuse\Crypto\Key::createNewRandomKey();
 
         // Generate settings content and write file
         $settings_constants = array(
@@ -82,16 +85,11 @@ class InstallModelInstall extends InstallAbstractModel
             '_PS_CACHE_ENABLED_' => '0',
             '_COOKIE_KEY_' => Tools::passwdGen(56),
             '_COOKIE_IV_' => Tools::passwdGen(8),
+            '_NEW_COOKIE_KEY_' => $key->saveToAsciiSafeString(),
             '_PS_CREATION_DATE_' => date('Y-m-d'),
             '_PS_VERSION_' => _PS_INSTALL_VERSION_,
             '_QLOAPPS_VERSION_' => _QLO_INSTALL_VERSION_,
         );
-
-        // If mcrypt is activated, add Rijndael 128 configuration
-        if (function_exists('mcrypt_encrypt')) {
-            $settings_constants['_RIJNDAEL_KEY_'] = Tools::passwdGen(mcrypt_get_key_size(MCRYPT_RIJNDAEL_128, MCRYPT_MODE_CBC));
-            $settings_constants['_RIJNDAEL_IV_'] = base64_encode(mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_128, MCRYPT_MODE_CBC), MCRYPT_RAND));
-        }
 
         $settings_content = "<?php\n";
 

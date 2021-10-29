@@ -4,105 +4,139 @@
  *
  * This file implements the processor for the DROP statements.
  *
- * Copyright (c) 2010-2012, Justin Swanhart
- * with contributions by André Rothe <arothe@phosco.info, phosco@gmx.de>
+ * PHP version 5
  *
+ * LICENSE:
+ * Copyright (c) 2010-2014 Justin Swanhart and André Rothe
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without modification,
- * are permitted provided that the following conditions are met:
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. The name of the author may not be used to endorse or promote products
+ *    derived from this software without specific prior written permission.
  *
- *   * Redistributions of source code must retain the above copyright notice,
- *     this list of conditions and the following disclaimer.
- *   * Redistributions in binary form must reproduce the above copyright notice,
- *     this list of conditions and the following disclaimer in the documentation
- *     and/or other materials provided with the distribution.
+ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
- * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT
- * SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
- * TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
- * BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
- * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * @author    André Rothe <andre.rothe@phosco.info>
+ * @copyright 2010-2014 Justin Swanhart and André Rothe
+ * @license   http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
+ * @version   SVN: $Id$
+ *
  */
 
-require_once(dirname(__FILE__) . '/../utils/ExpressionToken.php');
-require_once(dirname(__FILE__) . '/../utils/ExpressionType.php');
-require_once(dirname(__FILE__) . '/AbstractProcessor.php');
+namespace PHPSQLParser\processors;
+use PHPSQLParser\utils\ExpressionType;
 
 /**
- * 
  * This class processes the DROP statements.
- * 
- * @author arothe
- * 
+ *
+ * @author  André Rothe <andre.rothe@phosco.info>
+ * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
+ *
  */
 class DropProcessor extends AbstractProcessor {
 
-    // TODO: we should enhance it to get the positions for the IF EXISTS keywords
-    // look into the CreateProcessor to get an idea.
     public function process($tokenList) {
-        $skip = 0;
-        $warning = true;
-        $base_expr = "";
-        $expr_type = false;
+        $exists = false;
+        $base_expr = '';
+        $objectType = '';
+        $subTree = array();
         $option = false;
-        $resultList = array();
 
-        foreach ($tokenList as $k => $v) {
-            $token = new ExpressionToken($k, $v);
+        foreach ($tokenList as $token) {
+            $base_expr .= $token;
+            $trim = trim($token);
 
-            if ($token->isWhitespaceToken()) {
+            if ($trim === '') {
                 continue;
             }
 
-            if ($skip > 0) {
-                $skip --;
-                continue;
-            }
-
-            switch ($token->getUpper()) {
+            $upper = strtoupper($trim);
+            switch ($upper) {
             case 'VIEW':
             case 'SCHEMA':
             case 'DATABASE':
             case 'TABLE':
-                $expr_type = strtolower($token->getTrim());
+                if ($objectType === '') {
+                    $objectType = constant('PHPSQLParser\utils\ExpressionType::' . $upper);
+                }
+                $base_expr = '';
                 break;
-
+            case 'INDEX':
+	            if ( $objectType === '' ) {
+		            $objectType = constant( 'PHPSQLParser\utils\ExpressionType::' . $upper );
+	            }
+	            $base_expr = '';
+	            break;
             case 'IF':
-                $warning = false;
-                $skip = 1;
+            case 'EXISTS':
+                $exists = true;
+                $base_expr = '';
                 break;
 
             case 'TEMPORARY':
-                $expr_type = ExpressionType::TEMPORARY_TABLE;
-                $skip = 1;
+                $objectType = ExpressionType::TEMPORARY_TABLE;
+                $base_expr = '';
                 break;
 
             case 'RESTRICT':
             case 'CASCADE':
-                $option = $token->getUpper();
+                $option = $upper;
+                if (!empty($objectList)) {
+                    $subTree[] = array('expr_type' => ExpressionType::EXPRESSION,
+                                       'base_expr' => trim(substr($base_expr, 0, -strlen($token))),
+                                       'sub_tree' => $objectList);
+                    $objectList = array();
+                }
+                $base_expr = '';
                 break;
 
             case ',':
-                $resultList[] = array('expr_type' => $expr_type, 'base_expr' => $base_expr);
-                $base_expr = "";
-                break;
+                $last = array_pop($objectList);
+                $last['delim'] = $trim;
+                $objectList[] = $last;
+                continue 2;
 
             default:
-                $base_expr .= $token->getToken();
+                $object = array();
+                $object['expr_type'] = $objectType;
+                if ($objectType === ExpressionType::TABLE || $objectType === ExpressionType::TEMPORARY_TABLE) {
+                    $object['table'] = $trim;
+                    $object['no_quotes'] = false;
+                    $object['alias'] = false;
+                }
+                $object['base_expr'] = $trim;
+                $object['no_quotes'] = $this->revokeQuotation($trim);
+                $object['delim'] = false;
+
+                $objectList[] = $object;
+                continue 2;
             }
+
+            $subTree[] = array('expr_type' => ExpressionType::RESERVED, 'base_expr' => $trim);
         }
 
-        if ($base_expr !== "") {
-            $resultList[] = array('expr_type' => $expr_type, 'base_expr' => $base_expr);
+        if (!empty($objectList)) {
+            $subTree[] = array('expr_type' => ExpressionType::EXPRESSION, 'base_expr' => trim($base_expr),
+                               'sub_tree' => $objectList);
         }
 
-        return array('option' => $option, 'warning' => $warning, 'object_list' => $resultList);
+        return array('expr_type' => $objectType, 'option' => $option, 'if-exists' => $exists, 'sub_tree' => $subTree);
     }
 }
 ?>

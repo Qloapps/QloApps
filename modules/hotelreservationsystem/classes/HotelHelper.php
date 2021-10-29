@@ -281,30 +281,6 @@ class HotelHelper
         return true;
     }
 
-    public function insertHotelRoomsStatus()
-    {
-        $room_status_arr = array('Active','Inactive','temporarily Inactive');
-        foreach ($room_status_arr as $key => $value) {
-            $obj_room_status = new HotelRoomStatus();
-            $obj_room_status->status = $value;
-            $obj_room_status->save();
-        }
-
-        return true;
-    }
-
-    public function insertHotelOrderStatus()
-    {
-        $order_status_arr = array('Alloted','Checked In','Checked Out');
-        foreach ($order_status_arr as $key => $value) {
-            $obj_order_status = new HotelOrderStatus();
-            $obj_order_status->status = $value;
-            $obj_order_status->save();
-        }
-
-        return true;
-    }
-
     public function insertHotelRoomAllotmentType()
     {
         $altment_type_arr = array('Random Allotment','Manual Allotment');

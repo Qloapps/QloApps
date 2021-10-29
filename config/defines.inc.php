@@ -107,7 +107,6 @@ if (!defined('_PS_GEOIP_DIR_')) {
 if (!defined('_PS_GEOIP_CITY_FILE_')) {
     define('_PS_GEOIP_CITY_FILE_',       'GeoLiteCity.dat');
 }
-define('_PS_PEAR_XML_PARSER_PATH_',  _PS_TOOL_DIR_.'pear_xml_parser/');
 define('_PS_SWIFT_DIR_',             _PS_TOOL_DIR_.'swift/');
 define('_PS_TAASC_PATH_',            _PS_TOOL_DIR_.'taasc/');
 define('_PS_TCPDF_PATH_',            _PS_TOOL_DIR_.'tcpdf/');
@@ -140,7 +139,7 @@ define('_PS_TMP_IMG_DIR_',           _PS_IMG_DIR_.'tmp/');
 define('_PS_TRANS_PATTERN_',            '(.*[^\\\\])');
 define('_PS_MIN_TIME_GENERATE_PASSWD_', '360');
 if (!defined('_PS_MAGIC_QUOTES_GPC_')) {
-    define('_PS_MAGIC_QUOTES_GPC_',         get_magic_quotes_gpc());
+    define('_PS_MAGIC_QUOTES_GPC_', function_exists('get_magic_quotes_gpc')? @get_magic_quotes_gpc() : false);
 }
 
 define('_CAN_LOAD_FILES_', 1);

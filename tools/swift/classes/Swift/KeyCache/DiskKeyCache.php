@@ -11,7 +11,7 @@
 /**
  * A KeyCache which streams to and from disk.
  *
- * @author     Chris Corbyn
+ * @author Chris Corbyn
  */
 class Swift_KeyCache_DiskKeyCache implements Swift_KeyCache
 {
@@ -74,10 +74,10 @@ class Swift_KeyCache_DiskKeyCache implements Swift_KeyCache
      *
      * @see MODE_WRITE, MODE_APPEND
      *
-     * @param string  $nsKey
-     * @param string  $itemKey
-     * @param string  $string
-     * @param int     $mode
+     * @param string $nsKey
+     * @param string $itemKey
+     * @param string $string
+     * @param int    $mode
      *
      * @throws Swift_IoException
      */
@@ -167,9 +167,9 @@ class Swift_KeyCache_DiskKeyCache implements Swift_KeyCache
      * @param string $nsKey
      * @param string $itemKey
      *
-     * @return string
-     *
      * @throws Swift_IoException
+     *
+     * @return string
      */
     public function getString($nsKey, $itemKey)
     {
@@ -280,19 +280,16 @@ class Swift_KeyCache_DiskKeyCache implements Swift_KeyCache
     /**
      * Get a file handle on the cache item.
      *
-     * @param string  $nsKey
-     * @param string  $itemKey
-     * @param int     $position
+     * @param string $nsKey
+     * @param string $itemKey
+     * @param int    $position
      *
      * @return resource
      */
     private function _getHandle($nsKey, $itemKey, $position)
     {
         if (!isset($this->_keys[$nsKey][$itemKey])) {
-            $openMode = $this->hasKey($nsKey, $itemKey)
-                ? 'r+b'
-                : 'w+b'
-                ;
+            $openMode = $this->hasKey($nsKey, $itemKey) ? 'r+b' : 'w+b';
             $fp = fopen($this->_path.'/'.$nsKey.'/'.$itemKey, $openMode);
             $this->_keys[$nsKey][$itemKey] = $fp;
         }

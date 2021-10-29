@@ -143,7 +143,7 @@ class HotelRoomTypeDemandPrice extends ObjectModel
                     }
                     if ($cartChanged) {
                         if (Validate::isLoadedObject($objCartBooking = new HotelCartBookingData($demandInfo['id']))) {
-                            $objCartBooking->extra_demands = Tools::jsonEncode($demandInfo['extra_demands']);
+                            $objCartBooking->extra_demands = json_encode($demandInfo['extra_demands']);
                             $objCartBooking->save();
                         }
                     }

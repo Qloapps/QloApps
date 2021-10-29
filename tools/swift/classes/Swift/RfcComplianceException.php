@@ -11,7 +11,7 @@
 /**
  * RFC Compliance Exception class.
  *
- * @author  Chris Corbyn
+ * @author Chris Corbyn
  */
 class Swift_RfcComplianceException extends Swift_SwiftException
 {

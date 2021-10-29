@@ -57,7 +57,7 @@ class CallApiPaypalPlus extends ApiPaypalPlus
 
         if ($accessToken != false) {
 
-            $result = Tools::jsonDecode($this->createPayment($this->customer, $this->cart, $accessToken));
+            $result = json_decode($this->createPayment($this->customer, $this->cart, $accessToken));
 
             if (isset($result->links)) {
 
@@ -105,7 +105,7 @@ class CallApiPaypalPlus extends ApiPaypalPlus
         );
 
         $data = array('payer_id' => $payer_id);
-        $response = $this->sendByCURL(URL_PPP_EXECUTE_PAYMENT.$paymentId.'/execute/', Tools::jsonEncode($data), $header);
+        $response = $this->sendByCURL(URL_PPP_EXECUTE_PAYMENT.$paymentId.'/execute/', json_encode($data), $header);
 
         return $response;
     }
@@ -124,7 +124,7 @@ class CallApiPaypalPlus extends ApiPaypalPlus
             'Authorization:Bearer '.$accessToken,
         );
 
-        return $this->sendByCURL(URL_PPP_EXECUTE_REFUND.$paymentId.'/refund', Tools::jsonEncode($data), $header);
+        return $this->sendByCURL(URL_PPP_EXECUTE_REFUND.$paymentId.'/refund', json_encode($data), $header);
     }
 
     public function patch($id_payment, $address)
@@ -203,7 +203,7 @@ class CallApiPaypalPlus extends ApiPaypalPlus
             'Content-Type:application/json',
             'Authorization:Bearer '.$accessToken,
         );
-        $body = str_replace('\/transactions\/0\/item_list\/shipping_address', '/transactions/0/item_list/shipping_address', Tools::jsonEncode($payment));
+        $body = str_replace('\/transactions\/0\/item_list\/shipping_address', '/transactions/0/item_list/shipping_address', json_encode($payment));
         return $this->sendByCURL(URL_PPP_PATCH.$id_payment, $body, $header, false, 'PATCH');
     }
 }

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="euc-kr"?>
+<!--
+SkipUnless:  __import__('codecs').lookup('euc-kr')
+Description: parsed pubDate in "Nate" format (seen on Korean blogs)
+Expect:      not bozo and feed['date_parsed'] == (2004, 5, 25, 14, 23, 17, 1, 146, 0)
+-->
+<rss version="2.0">
+<channel>
+<pubDate>2004-05-25 오후 11:23:17</pubDate>
+</channel>
+</rss>
