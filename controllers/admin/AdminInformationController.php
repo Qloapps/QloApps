@@ -129,7 +129,7 @@ class AdminInformationControllerCore extends AdminController
             'gz' => $this->l('Enable GZIP compression on your server.'),
             'files' => $this->l('Some QloApps files are missing from your server.'),
             'new_phpversion' => sprintf($this->l('You are using PHP %s version. Soon, the latest PHP version supported by QloApps will be PHP 5.4. To make sure you’re ready for the future, we recommend you to upgrade to PHP 5.4 now!'), phpversion()),
-            'pdo_mysql' => $this->l('PDO MySQL extension is not loaded')
+            'pdo_mysql' => $this->l('PDO MySQL extension is not loaded'),
             'openssl' => $this->l('PHP OpenSSL extension is not loaded'),
         );
 
