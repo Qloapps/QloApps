@@ -993,11 +993,14 @@ class HotelBookingDetail extends ObjectModel
     public function getAvailableRoomsForSwapping($date_from, $date_to, $room_type, $hotel_id, $id_room)
     {
         $sql = 'SELECT `id` AS `id_room`, `id_product`, `id_hotel`, `room_num`, `comment` AS `room_comment`
-            FROM `'._DB_PREFIX_.'htl_room_information` WHERE `id_hotel`='.(int)$hotel_id.'
-            AND `id_product`='.(int)$room_type.' AND `id_status` = '. HotelRoomInformation::STATUS_ACTIVE .'
-            AND `id` IN (SELECT `id_room` FROM `'._DB_PREFIX_.'htl_booking_detail`
+            FROM `'._DB_PREFIX_.'htl_room_information`
+            WHERE `id_hotel`='.(int)$hotel_id.' AND `id_product`='.(int)$room_type.'
+            AND (id_status = '. HotelRoomInformation::STATUS_ACTIVE .' or id_status = '. HotelRoomInformation::STATUS_TEMPORARY_INACTIVE .') 
+            AND `id` IN (
+                SELECT `id_room` FROM `'._DB_PREFIX_.'htl_booking_detail`
                 WHERE `date_from` = \''.pSQL($date_from).'\' AND `date_to` = \''.pSQL($date_to).'\'
-                AND `id_room`!='.(int)$id_room.' AND `is_refunded`=0 AND `is_back_order`=0)';
+                AND `id_room`!='.(int)$id_room.' AND `is_refunded`=0 AND `is_back_order`=0
+            )';
 
         return Db::getInstance()->executeS($sql);
     }
@@ -1050,29 +1053,35 @@ class HotelBookingDetail extends ObjectModel
         $date_to = date('Y-m-d H:i:s', strtotime($date_to));
 
         $idcrt1 = Db::getInstance()->getValue(
-            'SELECT `id` FROM `'._DB_PREFIX_.'htl_cart_booking_data` WHERE `date_from`=\''.pSQL($date_from).
-            '\' AND `date_to`=\''.pSQL($date_to).'\' AND `id_room`='.(int)$swapped_room_id
+            'SELECT `id` FROM `'._DB_PREFIX_.'htl_cart_booking_data` WHERE `is_refunded` = 0
+            AND `date_from`=\''.pSQL($date_from).'\' AND `date_to`=\''.pSQL($date_to).'\'
+            AND `id_room`='.(int)$swapped_room_id
         );
         $idcrt2 = Db::getInstance()->getValue(
-            'SELECT `id` FROM `'._DB_PREFIX_.'htl_cart_booking_data` WHERE `date_from`=\''.pSQL($date_from).
-            '\' AND `date_to`=\''.pSQL($date_to).'\' AND `id_room`='.(int)$current_room_id
+            'SELECT `id` FROM `'._DB_PREFIX_.'htl_cart_booking_data` WHERE `is_refunded` = 0
+            AND `date_from`=\''.pSQL($date_from).'\' AND `date_to`=\''.pSQL($date_to).'\'
+            AND `id_room`='.(int)$current_room_id
         );
 
         $swap_room = Db::getInstance()->getRow(
-            'SELECT `id`, `room_num` FROM `'._DB_PREFIX_.'htl_booking_detail` WHERE `date_from`=\''.pSQL($date_from).
-            '\' AND `date_to`=\''.pSQL($date_to).'\' AND `id_room`='.(int)$swapped_room_id
+            'SELECT `id`, `room_num` FROM `'._DB_PREFIX_.'htl_booking_detail` WHERE `is_refunded` = 0
+            AND `date_from`=\''.pSQL($date_from).'\' AND `date_to`=\''.pSQL($date_to).'\'
+            AND `id_room`='.(int)$swapped_room_id
         );
         $curr_room = Db::getInstance()->getRow(
-            'SELECT `id`, `room_num` FROM `'._DB_PREFIX_.'htl_booking_detail` WHERE `date_from`=\''.pSQL($date_from).
-            '\' AND `date_to`=\''.pSQL($date_to).'\' AND `id_room`='.(int)$current_room_id
+            'SELECT `id`, `room_num` FROM `'._DB_PREFIX_.'htl_booking_detail` WHERE `is_refunded` = 0
+            AND `date_from`=\''.pSQL($date_from).'\' AND `date_to`=\''.pSQL($date_to).'\'
+            AND `id_room`='.(int)$current_room_id
         );
         $sql = 'UPDATE `'._DB_PREFIX_.'htl_cart_booking_data` SET `id_room`=IF(`id`='.(int)$idcrt1.','.
         (int)$current_room_id.','.(int)$swapped_room_id.') WHERE `id` IN('.(int)$idcrt1.','.(int)$idcrt2.')';
 
         $sql1 = 'UPDATE `'._DB_PREFIX_.'htl_booking_detail`
             SET `id_room`=IF(`id`='.(int)$swap_room['id'].','.(int)$current_room_id.','.(int)$swapped_room_id.'),
-            `room_num`=IF(`id`='.(int)$swap_room['id'].',\''.$curr_room['room_num'].'\',\''.$swap_room['room_num'].'\')
-            WHERE `id` IN('.(int)$swap_room['id'].','.(int)$curr_room.')';
+            `room_num`=IF(
+                `id`='.(int)$swap_room['id'].',\''.pSQL($curr_room['room_num']).'\',\''.pSQL($swap_room['room_num']).'\'
+            )
+            WHERE `id` IN('.(int)$swap_room['id'].','.(int)$curr_room['id'].')';
 
         if ($result = Db::getInstance()->execute($sql)) {
             $result2 = Db::getInstance()->execute($sql1);
