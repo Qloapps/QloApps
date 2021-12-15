@@ -67,5 +67,5 @@
 	</div>
 {/if}
 <div class="alert alert-addons row-margin-top">
-	<a href="http://addons.prestashop.com/?utm_source=back-office&amp;utm_medium=dispatch&amp;utm_campaign=back-office-{$lang_iso|upper}&amp;utm_content={if $host_mode}cloud{else}download{/if}" onclick="return !window.open(this.href);">{l s='More modules on addons.prestashop.com'}</a>
+	<a href="https://qloapps.com/addons" onclick="return !window.open(this.href);">{l s='More modules on qloapps.com/addons/'}</a>
 </div>

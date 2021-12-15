@@ -82,6 +82,8 @@ define('_MODULE_DIR_',                    __PS_BASE_URI__.'modules/');
 /* Define API URLs if not defined before */
 Tools::safeDefine('_PS_API_DOMAIN_',                'api.prestashop.com');
 Tools::safeDefine('_PS_API_URL_',                    'http://'._PS_API_DOMAIN_);
-Tools::safeDefine('_PS_TAB_MODULE_LIST_URL_',        _PS_API_URL_.'/xml/tab_modules_list.xml');
-Tools::safeDefine('_PS_API_MODULES_LIST_16_',        _PS_API_DOMAIN_.'/xml/modules_list_16.xml');
 Tools::safeDefine('_PS_CURRENCY_FEED_URL_',            _PS_API_URL_.'/xml/currencies.xml');
+Tools::safeDefine('_QLO_API_DOMAIN_',                'api.qloapps.com');
+Tools::safeDefine('_QLO_API_URL_',                    'http://'._QLO_API_DOMAIN_);
+Tools::safeDefine('_QLO_TAB_MODULE_LIST_URL_',        _QLO_API_URL_.'/xml/tab_modules_list.xml');
+Tools::safeDefine('_QLO_NATIVE_MODULES_LIST_',_QLO_API_DOMAIN_.'/xml/'.str_replace('.', '', _QLOAPPS_VERSION_).'.xml');

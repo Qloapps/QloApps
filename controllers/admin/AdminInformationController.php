@@ -169,7 +169,7 @@ class AdminInformationControllerCore extends AdminController
     public function displayAjaxCheckFiles()
     {
         $this->file_list = array('missing' => array(), 'updated' => array());
-        $xml = @simplexml_load_file(_PS_API_URL_.'/xml/md5/'._PS_VERSION_.'.xml');
+        $xml = @simplexml_load_file(_QLO_API_URL_.'/xml/md5/'._QLOAPPS_VERSION_.'.xml');
         if (!$xml || !isset($xml->ps_root_dir[0])) {
             die(json_encode($this->file_list));
         }
