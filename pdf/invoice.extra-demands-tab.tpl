@@ -48,7 +48,7 @@
 									{if $smarty.foreach.demandRow.first}
 										<td rowspan="{$roomDemand['extra_demands']|count}">
 											{$data_v['name']}<br>
-											{$rm_v['data_form']|date_format:"%d-%m-%Y"} {l s='to' pdf='true'} {$rm_v['data_to']|date_format:"%d-%m-%Y"}<br>
+											{$rm_v['data_form']} {l s='to' pdf='true'} {$rm_v['data_to']}<br>
 											<strong>{l s='Room' pdf='true'} - {$roomCount}</strong>
 										</td>
 									{/if}
