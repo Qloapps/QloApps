@@ -1,9 +1,0 @@
-	Hola,
-
-	Informe de error a partir de su módulo PayPalAPI
-
-	Un cliente ha encontrado un problema con el módulo PayPalAPI:
-
-	{logs}
-
-	{shop_url} lanzado por Webkul™

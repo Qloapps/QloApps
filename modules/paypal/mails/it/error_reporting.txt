@@ -1,9 +1,0 @@
-	Salve,
-
-	Errore dal tuo modulo PayPalAPI
-
-	Un cliente ha avuto un problema con il modulo PayPalAPI, vedi il rapporto:
-
-	{logs}
-
-	{shop_url} powered by Webkul™

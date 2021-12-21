@@ -1,9 +1,0 @@
-	Hallo,
-
-	Fehlerbericht aus Ihrem PayPalAPI Modul
-
-	Bei einem Kunden ist ein Problem mit dem PayPalAPI Modul aufgetreten, lesen Sie den Bericht:
-
-	{logs}
-
-	{shop_url} powered by Webkul™
