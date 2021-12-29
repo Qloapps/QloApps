@@ -155,7 +155,7 @@ class AdminStatusesControllerCore extends AdminController
                 'type' => 'bool',
                 'ajax' => true,
                 'orderby' => false,
-                'class' => 'fixed-width-sm'
+                'class' => 'fixed-width-sm state-refunded'
             ),
             'denied' => array(
                 'title' => $this->l('Denied'),
@@ -164,12 +164,12 @@ class AdminStatusesControllerCore extends AdminController
                 'type' => 'bool',
                 'ajax' => true,
                 'orderby' => false,
-                'class' => 'fixed-width-sm'
+                'class' => 'fixed-width-sm state-denied'
             ),
             'send_email_to_customer' => array(
                 'title' => $this->l('Send email to customer'),
                 'align' => 'text-center',
-                'active' => 'sendEmailToSuperAdmin',
+                'active' => 'sendEmailToCustomer',
                 'type' => 'bool',
                 'ajax' => true,
                 'orderby' => false,
@@ -178,7 +178,7 @@ class AdminStatusesControllerCore extends AdminController
             'send_email_to_superadmin' => array(
                 'title' => $this->l('Send email to super admin'),
                 'align' => 'text-center',
-                'active' => 'sendEmailToCustomer',
+                'active' => 'sendEmailToSuperAdmin',
                 'type' => 'bool',
                 'ajax' => true,
                 'orderby' => false,
@@ -202,12 +202,6 @@ class AdminStatusesControllerCore extends AdminController
                 'orderby' => false,
                 'class' => 'fixed-width-sm'
             ),
-            // 'customer_template' => array(
-            //     'title' => $this->l('Customer Email template')
-            // ),
-            // 'admin_template' => array(
-            //     'title' => $this->l('Admin Email template')
-            // ),
         );
     }
 
@@ -990,8 +984,15 @@ class AdminStatusesControllerCore extends AdminController
     public function ajaxProcessRefundedOrderReturnState()
     {
         $id_order_return_state = (int)Tools::getValue('id_order_return_state');
+        $objOrdRtrnState = new OrderReturnState($id_order_return_state);
 
-        $sql = 'UPDATE '._DB_PREFIX_.'order_return_state SET `refunded`= NOT `refunded` WHERE id_order_return_state='.(int)$id_order_return_state;
+        $sql = 'UPDATE '._DB_PREFIX_.'order_return_state SET `refunded`= NOT `refunded`';
+        // check condition as booth refunded and denied can not be true together
+        if (!$objOrdRtrnState->refunded && $objOrdRtrnState->denied) {
+            $sql .= ', `denied`= NOT `denied`';
+        }
+        $sql .= ' WHERE id_order_return_state='.(int)$id_order_return_state;
+
         $result = Db::getInstance()->execute($sql);
 
         if ($result) {
@@ -1004,8 +1005,15 @@ class AdminStatusesControllerCore extends AdminController
     public function ajaxProcessDeniedOrderReturnState()
     {
         $id_order_return_state = (int)Tools::getValue('id_order_return_state');
+        $objOrdRtrnState = new OrderReturnState($id_order_return_state);
 
-        $sql = 'UPDATE '._DB_PREFIX_.'order_return_state SET `denied`= NOT `denied` WHERE id_order_return_state='.(int)$id_order_return_state;
+        $sql = 'UPDATE '._DB_PREFIX_.'order_return_state SET `denied`= NOT `denied`';
+        // check condition as booth refunded and denied can not be true together
+        if (!$objOrdRtrnState->denied && $objOrdRtrnState->refunded) {
+            $sql .= ', `refunded`= NOT `refunded`';
+        }
+        $sql .= ' WHERE id_order_return_state='.(int)$id_order_return_state;
+
         $result = Db::getInstance()->execute($sql);
 
         if ($result) {
@@ -1019,8 +1027,6 @@ class AdminStatusesControllerCore extends AdminController
     {
         parent::setMedia();
 
-        if ($this->tabAccess['edit'] == 1 && $this->display == 'edit') {
-            $this->addJS(_PS_JS_DIR_.'admin/order_states.js');
-        }
+        $this->addJS(_PS_JS_DIR_.'admin/order_states.js');
     }
 }

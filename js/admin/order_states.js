@@ -24,4 +24,33 @@ $(document).ready(function() {
 			$(this).prop('checked', true);
 		}
 	});
+
+	// for refunded and denied options we have to load page
+	// Because both options are changing and default js showing only state change in click action
+	$(".ajax_table_link").click(function () {
+		var statusLink = $(this);
+		if (statusLink.closest('td').hasClass('state-refunded') || statusLink.closest('td').hasClass('state-denied')) {
+			$(document).off().on('ajaxComplete', function( e, xhr, settings ) {
+				if (typeof xhr.responseJSON.success !== 'undefined' && xhr.responseJSON.success == 1) {
+					if (statusLink.hasClass('action-enabled')){
+						if (statusLink.closest('td').hasClass('state-refunded')) {
+							var toChangeStatus = statusLink.closest('tr').find('.state-denied .ajax_table_link');
+						} else if (statusLink.closest('td').hasClass('state-denied')) {
+							var toChangeStatus = statusLink.closest('tr').find('.state-refunded .ajax_table_link');
+						}
+						if (toChangeStatus.hasClass('action-enabled')) {
+							toChangeStatus.removeClass('action-enabled').addClass('action-disabled');
+							toChangeStatus.children().each(function () {
+								if ($(this).hasClass('hidden')) {
+									$(this).removeClass('hidden');
+								} else {
+									$(this).addClass('hidden');
+								}
+							});
+						}
+					}
+				}
+			});
+		}
+	});
 });
