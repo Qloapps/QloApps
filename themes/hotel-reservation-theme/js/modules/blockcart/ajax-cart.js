@@ -166,78 +166,12 @@ var ajaxCart = {
             if ($('#booking_dates_container_' + id_product).find('.rooms_remove_container .remove_rooms_from_cart_link').length == 1) {
                 $(this).closest(".rooms_remove_container").parents("div.cart_prod_cont").siblings(".remove_link").find("a.ajax_cart_block_remove_link").click();
             } else {
+
                 var date_from = $(this).attr('date_from');
                 var date_to = $(this).attr('date_to');
                 var num_rooms = $(this).attr('num_rooms');
                 var $current = $(this);
-                $.ajax({
-                    type: 'POST',
-                    url: rm_avail_process_lnk,
-                    async: false,
-                    dataType: 'JSON',
-                    data: 'delete_room_form_cart=1&id_product=' + id_product + '&num_rooms=' + num_rooms + '&date_from=' + date_from + '&date_to=' + date_to,
-                    success: function(data) {
-                        if (data.status = 'success') {
-                            var total_cart_price = $('.ajax_block_cart_total').attr('total_cart_price');
-                            var total_prod_prc = parseFloat($(".rm_product_info_" + id_product + " .price").attr('ttl_prod_price'));
-                            var room_prc = parseFloat($current.attr('rm_price'));
-                            var new_ttl = parseFloat($(".rm_product_info_" + id_product + " .price").attr('ttl_prod_price')) - parseFloat($current.attr('rm_price'));
-                            var nw_ttl_cart_price = parseFloat(total_cart_price) - parseFloat(room_prc);
-
-                            $('.ajax_block_cart_total').text(formatCurrency(parseFloat(nw_ttl_cart_price), currency_format, currency_sign, currency_blank));
-                            $('.ajax_block_cart_total').attr('total_cart_price', nw_ttl_cart_price);
-
-                            $(".rm_product_info_" + id_product + " .price").attr('ttl_prod_price', new_ttl);
-
-
-                            $(".rm_product_info_" + id_product + " .price").text(formatCurrency(parseFloat(new_ttl), currency_format, currency_sign, currency_blank));
-
-                            $(".rm_product_info_" + id_product + " .quantity-formated .quantity").text(parseInt($(".rm_product_info_" + id_product + " .quantity-formated .quantity").text()) - parseInt(num_rooms));
-                            if ($(".shopping_cart .ajax_cart_quantity").text() == '')
-                                var prev_ajax_cart_quantity = 0;
-                            else
-                                var prev_ajax_cart_quantity = parseInt($(".shopping_cart .ajax_cart_quantity").text());
-
-                            $(".shopping_cart .ajax_cart_quantity").text(prev_ajax_cart_quantity - parseInt(num_rooms));
-
-                            if (pagename == 'product') {
-                                var date_checkIn = $('#room_check_in').val();
-                                var date_checkOut = $('#room_check_out').val();
-                                if (data.avail_rooms <= room_warning_num) {
-                                    $('.num_quantity_alert').show();
-                                } else {
-                                    $('.num_quantity_alert').hide();
-                                }
-                                var product_page_id_product = $('#product_page_product_id').val();
-
-                                if (id_product == product_page_id_product && date_from < date_checkOut && date_to >= date_checkIn) {
-                                    $("#max_avail_type_qty").val(data.avail_rooms);
-                                    $(".num_searched_avail_rooms").text(data.avail_rooms);
-                                    $('.sold_out_alert').hide();
-                                    disableRoomTypeDemands(0);
-                                    $('.unvail_rooms_cond_display').show();
-                                }
-                            } else if (pagename == 'orderopc') {
-                                location.reload();
-                            } else {
-                                var date_checkIn = $('#check_in_time').val();
-                                var date_checkOut = $('#check_out_time').val();
-                                if (data.avail_rooms <= room_warning_num) {
-                                    $(".cat_remain_rm_qty_" + id_product).closest('.rm_left').show();
-                                } else {
-                                    $(".cat_remain_rm_qty_" + id_product).closest('.rm_left').hide();
-                                }
-                                if (id_product && date_from < date_checkOut && date_to >= date_checkIn) {
-                                    $(".cat_remain_rm_qty_" + id_product).text(data.avail_rooms);
-                                    $(".cat_remain_rm_qty_" + id_product).closest('.room_cont').show();
-                                }
-                            }
-                            $current.closest(".rooms_remove_container").remove();
-                        } else {
-                            alert(someErrorCondition);
-                        }
-                    }
-                });
+                ajaxCart.update(id_product, false, false, true, num_rooms, false, date_from, date_to);
             }
         });
 
@@ -511,6 +445,153 @@ var ajaxCart = {
                 }
 
                 emptyCustomizations();
+
+            },
+            error: function(XMLHttpRequest, textStatus, errorThrown) {
+                var error = "Impossible to add the room to the cart.<br/>textStatus: '" + textStatus + "'<br/>errorThrown: '" + errorThrown + "'<br/>responseText:<br/>" + XMLHttpRequest.responseText;
+                if (!!$.prototype.fancybox)
+                    $.fancybox.open([{
+                        type: 'inline',
+                        autoScale: true,
+                        minHeight: 30,
+                        content: '<p class="fancybox-error">' + error + '</p>'
+                    }], {
+                        padding: 0
+                    });
+                else
+                    alert(error);
+                //reactive the button when adding has finished
+                if (addedFromProductPage)
+                    $('#add_to_cart button').removeProp('disabled').removeClass('disabled');
+                else
+                    $(callerElement).removeProp('disabled');
+            }
+        });
+    },
+
+    update: function(idProduct, idCombination, customizationId, updatedFromProductPage, quantity, whishlist, dateFrom, dateTo) {
+        if (updatedFromProductPage && !checkCustomizations()) {
+            if (contentOnly) {
+                var productUrl = window.document.location.href + '';
+                var data = productUrl.replace('content_only=1', '');
+                window.parent.document.location.href = data;
+                return;
+            }
+            if (!!$.prototype.fancybox)
+                $.fancybox.open([{
+                    type: 'inline',
+                    autoScale: true,
+                    minHeight: 30,
+                    content: '<p class="fancybox-error">' + fieldRequired + '</p>'
+                }], {
+                    padding: 0
+                });
+            else
+                alert(fieldRequired);
+            return;
+        }
+        $.ajax({
+            type: 'POST',
+            headers: {
+                "cache-control": "no-cache"
+            },
+            url: baseUri + '?rand=' + new Date().getTime(),
+            async: true,
+            cache: false,
+            dataType: "json",
+            data: 'controller=cart&add=1&op=down&dateFrom=' + dateFrom + '&dateTo=' + dateTo + '&ajax=true&qty=' + ((quantity && quantity != null) ? quantity : '1') + '&id_product=' + idProduct + '&token=' + static_token + ((parseInt(idCombination) && idCombination != null) ? '&ipa=' + parseInt(idCombination) : '' + '&id_customization=' + ((typeof customizationId !== 'undefined') ? customizationId : 0)),
+            success: function(jsonData, textStatus, jqXHR) {
+                /*by webkul checking and setting availability of rooms*/
+                /*for product page add to cart quantity management*/
+                if (pagename == 'product') {
+                    var date_checkIn = $('#room_check_in').val();
+                    var date_checkOut = $('#room_check_out').val();
+                    var product_page_id_product = $('#product_page_product_id').val();
+                    console.log(idProduct == product_page_id_product);
+                    console.log(dateFrom);
+                    console.log(date_checkOut);
+                    console.log(dateTo);
+                    console.log(date_checkIn);
+                    if (idProduct == product_page_id_product && dateFrom < date_checkOut && dateTo >= date_checkIn) {
+                        if (jsonData.avail_rooms <= room_warning_num) {
+                            $('.num_quantity_alert').show();
+                        } else {
+                            $('.num_quantity_alert').hide();
+                        }
+                        $("#max_avail_type_qty").val(jsonData.avail_rooms);
+                        $(".num_searched_avail_rooms").text(jsonData.avail_rooms);
+
+                        if (jsonData.avail_rooms == 0) {
+                            $('.num_quantity_alert').hide();
+                            $('.sold_out_alert').show();
+                            disableRoomTypeDemands(1);
+                            $('.unvail_rooms_cond_display').hide();
+                        }
+                    }
+                }
+
+                if (pagename == 'category') {
+                    if (jsonData.avail_rooms <= room_warning_num) {
+                        $(".cat_remain_rm_qty_" + idProduct).closest('.rm_left').show();
+                    } else {
+                        $("cat_remain_rm_qty_" + idProduct).closest('.rm_left').hide();
+                    }
+
+                    /*for category page add to cart quantity management*/
+
+                    $(".cat_remain_rm_qty_" + idProduct).text(jsonData.avail_rooms);
+                    if (jsonData.avail_rooms == 0) {
+                        $(".cat_remain_rm_qty_" + idProduct).closest('.room_cont').hide();
+                    }
+                    //$('#cat_quantity_wanted_'+idProduct).val(1);
+                }
+
+                ajaxCart.updateCart(jsonData);
+
+
+            //     // add appliance to whishlist module
+            //     if (whishlist && !jsonData.errors)
+            //         WishlistAddProductCart(whishlist[0], idProduct, idCombination, whishlist[1]);
+
+            //     if (!jsonData.hasError) {
+            //         if (contentOnly)
+            //             window.parent.ajaxCart.updateCartInformation(jsonData, addedFromProductPage);
+            //         else
+            //             ajaxCart.updateCartInformation(jsonData, addedFromProductPage);
+
+            //         if (jsonData.crossSelling)
+            //             $('.crossseling').html(jsonData.crossSelling);
+
+            //         if (idCombination)
+            //             $(jsonData.products).each(function() {
+            //                 if (this.id != undefined && this.id == parseInt(idProduct) && this.idCombination == parseInt(idCombination))
+            //                     if (contentOnly)
+            //                         window.parent.ajaxCart.updateLayer(this);
+            //                     else
+            //                         ajaxCart.updateLayer(this);
+            //             });
+            //         else
+            //             $(jsonData.products).each(function() {
+            //                 if (this.id != undefined && this.id == parseInt(idProduct))
+            //                     if (contentOnly)
+            //                         window.parent.ajaxCart.updateLayer(this);
+            //                     else
+            //                         ajaxCart.updateLayer(this);
+            //             });
+            //         if (contentOnly)
+            //             parent.$.fancybox.close();
+            //     } else {
+            //         if (contentOnly)
+            //             window.parent.ajaxCart.updateCart(jsonData);
+            //         else
+            //             ajaxCart.updateCart(jsonData);
+            //         if (addedFromProductPage)
+            //             $('#add_to_cart button').removeProp('disabled').removeClass('disabled');
+            //         else
+            //             $(callerElement).removeProp('disabled');
+            //     }
+
+            //     emptyCustomizations();
 
             },
             error: function(XMLHttpRequest, textStatus, errorThrown) {
@@ -1020,13 +1101,13 @@ var ajaxCart = {
 
     //update general cart informations everywhere in the page
     updateCartEverywhere: function(jsonData) {
-        $('.ajax_cart_total').text($.trim(jsonData.productTotal));
+        $('.ajax_cart_total').text($.trim(jsonData.product_total));
 
         if (typeof hasDeliveryAddress == 'undefined')
             hasDeliveryAddress = false;
 
-        if (parseFloat(jsonData.shippingCostFloat) > 0)
-            $('.ajax_cart_shipping_cost').text(jsonData.shippingCost).parent().find('.unvisible').show();
+        if (parseFloat(jsonData.shipping_cost_float) > 0)
+            $('.ajax_cart_shipping_cost').text(jsonData.shipping_cost).parent().find('.unvisible').show();
         else if ((hasDeliveryAddress || typeof(orderProcess) !== 'undefined' && orderProcess == 'order-opc') && typeof(freeShippingTranslation) != 'undefined')
             $('.ajax_cart_shipping_cost').html(freeShippingTranslation);
         else if (!hasDeliveryAddress)
@@ -1036,30 +1117,30 @@ var ajaxCart = {
             $('.ajax_cart_shipping_cost').parent().find('.unvisible').show();
 
         $('.ajax_cart_tax_cost').text(jsonData.taxCost);
-        $('.cart_block_wrapping_cost').text(jsonData.wrappingCost);
+        $('.cart_block_wrapping_cost').text(jsonData.wrapping_cost);
 
         $('.ajax_block_cart_total').text(jsonData.total);
         $('.ajax_block_cart_total').attr('total_cart_price', jsonData.totalToPay);
 
-        $('.ajax_block_products_total').text(jsonData.productTotal);
-        $('.ajax_cart_extra_demands_cost').text(jsonData.totalDemandsPriceFormat);
+        $('.ajax_block_products_total').text(jsonData.product_total);
+        $('.ajax_cart_extra_demands_cost').text(jsonData.total_extra_demands_format);
         $('.ajax_total_price_wt').text(jsonData.total_price_wt);
 
-        if (parseFloat(jsonData.freeShippingFloat) > 0) {
-            $('.ajax_cart_free_shipping').html(jsonData.freeShipping);
+        if (parseFloat(jsonData.free_shipping_float) > 0) {
+            $('.ajax_cart_free_shipping').html(jsonData.free_shipping);
             $('.freeshipping').fadeIn(0);
-        } else if (parseFloat(jsonData.freeShippingFloat) == 0)
+        } else if (parseFloat(jsonData.free_shipping_float) == 0)
             $('.freeshipping').fadeOut(0);
 
-        this.nb_total_products = jsonData.nbTotalProducts;
+        this.nb_total_products = jsonData.nb_total_products;
 
-        if (parseInt(jsonData.nbTotalProducts) > 0) {
+        if (parseInt(jsonData.nb_total_products) > 0) {
             $('.ajax_cart_no_product').hide();
             $('.ajax_cart_quantity').text(jsonData.total_rooms_in_cart);
             $('.ajax_cart_quantity').fadeIn('slow');
             $('.ajax_cart_total').fadeIn('slow');
 
-            if (parseInt(jsonData.nbTotalProducts) > 1) {
+            if (parseInt(jsonData.nb_total_products) > 1) {
                 $('.ajax_cart_product_txt').each(function() {
                     $(this).hide();
                 });

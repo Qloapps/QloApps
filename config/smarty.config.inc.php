@@ -31,7 +31,7 @@ require_once(_PS_SMARTY_DIR_.'Smarty.class.php');
 global $smarty;
 if (Configuration::get('PS_SMARTY_LOCAL')) {
     $smarty = new SmartyCustom();
-} elseif (_PS_MODE_DEV_) {
+} elseif (_PS_MODE_DEV_ && !defined('_PS_ADMIN_DIR_')) {
     $smarty = new SmartyDev();
 } else {
     $smarty = new Smarty();
