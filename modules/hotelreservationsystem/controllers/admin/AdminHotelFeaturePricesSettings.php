@@ -190,7 +190,7 @@ class AdminHotelFeaturePricesSettingsController extends ModuleAdminController
                 }
             }
             if ($objFeaturePrice->special_days) {
-                $smartyVars['special_days'] =  json_decode($objFeaturePrice->special_days, true);
+                $smartyVars['special_days'] =  (array)json_decode($objFeaturePrice->special_days);
             }
             $smartyVars['objFeaturePrice'] = $objFeaturePrice;
             $smartyVars['edit'] = 1;
