@@ -64,13 +64,13 @@
 										<div class="cart-info">
 											<div class="product-name">
 											<!-- quantity changed for number of rooms -->
-												<!-- <span class="quantity-formated"><span class="quantity">{$cart_htl_data[$data_k]['total_num_rooms']}</span>&nbsp;x&nbsp;</span> -->
+												<!-- <span class="quantity-formated"><span class="quantity">{$cart_booking_data[$data_k]['total_num_rooms']}</span>&nbsp;x&nbsp;</span> -->
 												<a class="cart_block_product_name" href="{$link->getProductLink($product, $product.link_rewrite, $product.category, null, null, $product.id_shop, $product.id_product_attribute)|escape:'html':'UTF-8'}" title="{$product.name|escape:'html':'UTF-8'}">{$product.name|truncate:30:'...':true|escape:'html':'UTF-8'}</a>
 											</div>
 											<!-- extra fields added by webkul to show on the cart  -->
 											<div class="room-capacity cart-info-sec">
 												<span class="product_info_label">{l s='Capacity' mod='blockcart'}:</span>
-												<span class="product_info_data">&nbsp;{$cart_htl_data[$data_k]['adult']}&nbsp;{l s='Adults' mod='blockcart'}&nbsp;&&nbsp;{$cart_htl_data[$data_k]['children']}&nbsp;{l s='Children' mod='blockcart'}</span>
+												<span class="product_info_data">&nbsp;{$cart_booking_data[$data_k]['adult']}&nbsp;{l s='Adults' mod='blockcart'}&nbsp;&&nbsp;{$cart_booking_data[$data_k]['children']}&nbsp;{l s='Children' mod='blockcart'}</span>
 											</div>
 
 											{if isset($product.attributes_small)}
@@ -95,7 +95,7 @@
 											<div class="cart-info-sec rm_product_info_{$product.id_product}">
 												<span class="product_info_label">{l s='Total Qty.' mod='blockcart'}:</span>
 												<span class="quantity-formated">
-													<span class="quantity product_info_data">{$cart_htl_data[$data_k]['total_num_rooms']}</span>
+													<span class="quantity product_info_data">{$cart_booking_data[$data_k]['total_num_rooms']}</span>
 												</span>
 											</div>
 										</div>
@@ -115,7 +115,7 @@
 															<th>{l s='Price' mod='blockcart'}</th>
 															<th>&nbsp;<!-- {l s='Remove' mod='blockcart'} --></th>
 														</tr>
-														{foreach from=$cart_htl_data[$data_k]['date_diff'] key=data_k1 item=data_v}
+														{foreach from=$cart_booking_data[$data_k]['date_diff'] key=data_k1 item=data_v}
 															<tr class="rooms_remove_container">
 																<td>
 																	{$data_v['data_form']|date_format:"%d %b %Y"}&nbsp;-&nbsp;{$data_v['data_to']|date_format:"%d %b %Y"}
@@ -186,8 +186,8 @@
 							</table>
 						{/if}
 						<div class="cart-prices">
-							<div class="cart-prices-line first-line">
-								<!-- <span class="price cart_block_shipping_cost ajax_cart_shipping_cost{if !($page_name == 'order-opc') && $shipping_cost_float == 0 && (!isset($cart->id_address_delivery) || !$cart->id_address_delivery)} unvisible{/if}">
+							<!-- <div class="cart-prices-line first-line">
+								<span class="price cart_block_shipping_cost ajax_cart_shipping_cost{if !($page_name == 'order-opc') && $shipping_cost_float == 0 && (!isset($cart->id_address_delivery) || !$cart->id_address_delivery)} unvisible{/if}">
 									{if $shipping_cost_float == 0}
 										 {if !($page_name == 'order-opc') && (!isset($cart->id_address_delivery) || !$cart->id_address_delivery)}{l s='To be determined' mod='blockcart'}{else}{l s='Free shipping!' mod='blockcart'}{/if}
 									{else}
@@ -196,9 +196,9 @@
 								</span>
 								<span{if !($page_name == 'order-opc') && $shipping_cost_float == 0 && (!isset($cart->id_address_delivery) || !$cart->id_address_delivery)} class="unvisible"{/if}>
 									{l s='Shipping' mod='blockcart'}
-								</span> --><!-- commented by webkul unnecessary data -->
+								</span>
 							</div>
-							<!-- {if $show_wrapping}
+							{if $show_wrapping}
 								<div class="cart-prices-line">
 									{assign var='cart_flag' value='Cart::ONLY_WRAPPING'|constant}
 									<span class="price cart_block_wrapping_cost">
@@ -215,6 +215,12 @@
 								<div class="cart-prices-line">
 									<span class="price cart_block_tax_cost ajax_cart_tax_cost">{$tax_cost}</span>
 									<span>{l s='Tax' mod='blockcart'}</span>
+								</div>
+							{/if}
+							{if isset($total_extra_demands)}
+								<div class="cart-prices-line">
+									<span class="price cart_block_additional_facilities_cost ajax_cart_extra_demands_cost">{convertPrice price=$total_extra_demands}</span>
+									<span class="price">{l s='Additional Facilities Cost' mod='blockcart'}</strong>
 								</div>
 							{/if}
 							<div class="cart-prices-line last-line">
@@ -338,16 +344,16 @@
 						{/if}
 					</span>
 				</div> -->
-				{if $show_tax && isset($tax_cost)}
-					<div class="layer_cart_row">
-						<strong class="dark">{l s='Tax' mod='blockcart'}</strong>
-						<span class="price cart_block_tax_cost ajax_cart_tax_cost">{$tax_cost}</span>
-					</div>
-				{/if}
 				{if isset($total_extra_demands)}
 					<div class="layer_cart_row">
 						<strong class="dark">{l s='Total Additional Facilities Cost' mod='blockcart'}</strong>
 						<span class="price ajax_cart_extra_demands_cost">{convertPrice price=$total_extra_demands}</span>
+					</div>
+				{/if}
+				{if $show_tax && isset($tax_cost)}
+					<div class="layer_cart_row">
+						<strong class="dark">{l s='Tax' mod='blockcart'}</strong>
+						<span class="price cart_block_tax_cost ajax_cart_tax_cost">{$tax_cost}</span>
 					</div>
 				{/if}
 				<div class="layer_cart_row">

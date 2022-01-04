@@ -186,7 +186,7 @@
       width: 300px; } }
     @media (max-width: 355px) {
     #header .cart_block {
-      width: 270px; } }    
+      width: 270px; } }
  /* @media (max-width: 1200px) {
     #header .cart_block {
       width: 100%; } }*/
@@ -233,7 +233,8 @@
 .cart_block .cart_block_shipping_cost,
 .cart_block .cart_block_tax_cost,
 .cart_block .cart_block_total,
-.cart_block .cart_block_wrapping_cost {
+.cart_block .cart_block_wrapping_cost,
+.cart_block .cart_block_additional_facilities_cost {
   float: right; }
 
 .cart_block table.vouchers {
@@ -501,14 +502,14 @@
     color: #EDEDED;
 }
 
-#header .cart_block .product_info_data 
+#header .cart_block .product_info_data
 {
     font-size: 14px;
     font-weight: 400;
     color: #AEAEAE;
 }
 
-#header .cart_block .product-name 
+#header .cart_block .product-name
 {
     font-size: 16px;
     font-weight: 700;
@@ -517,7 +518,7 @@
 
 .cart-info-sec
 {
-    padding-bottom: 1px; 
+    padding-bottom: 1px;
 }
 
 .cart_block .cart_prod_cont .table td, .cart_prod_cont .table th
@@ -531,18 +532,18 @@
     margin-bottom: 0px;
 }
 
-.cart_block .table-responsive 
+.cart_block .table-responsive
 {
     overflow-x:auto;
 }
 
 @media (max-width: 768px) {
-    .cart_block .table-responsive > .table 
+    .cart_block .table-responsive > .table
     {
         background-color: transparent;
     }
 
-    .cart_block .table-responsive 
+    .cart_block .table-responsive
     {
         border: none;
     }
