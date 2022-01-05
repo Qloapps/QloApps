@@ -4609,7 +4609,16 @@ class AdminProductsControllerCore extends AdminController
 
         $objRoomType = new HotelRoomType();
         $objHotelInfo = new HotelBranchInformation();
-        $data->assign('htl_info', $objHotelInfo->hotelsNameAndId());
+        $idsHotel = $objHotelInfo->getProfileAccessedHotels($this->context->employee->id_profile, 1, 1);
+        $hotelsInfo = array();
+        foreach ($idsHotel as $idHotel) {
+            $objHotelBranchInfo = new HotelBranchInformation($idHotel, $this->context->language->id);
+            $hotelsInfo[] = array(
+                'id' => (int)$idHotel,
+                'hotel_name' => $objHotelBranchInfo->hotel_name,
+            );
+        }
+        $data->assign('htl_info', $hotelsInfo);
         if ($hotelRoomType = $objRoomType->getRoomTypeInfoByIdProduct($product->id)) {
             $data->assign('htl_room_type', $hotelRoomType);
             $hotelFullInfo = $objHotelInfo->hotelBranchInfoById($hotelRoomType['id_hotel']);
