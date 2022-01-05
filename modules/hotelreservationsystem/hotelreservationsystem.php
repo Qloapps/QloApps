@@ -95,8 +95,8 @@ class hotelreservationsystem extends Module
             }
         }
         //End
-        $this->context->controller->addCSS(_PS_MODULE_DIR_.$this->name.'/views/css/HotelReservationFront.css');
-        $this->context->controller->addJS(_PS_MODULE_DIR_.$this->name.'/views/js/HotelReservationFront.js');
+        $this->context->controller->addCSS($this->_path.'/views/css/HotelReservationFront.css');
+        $this->context->controller->addJS($this->_path.'/views/js/HotelReservationFront.js');
     }
 
     public function hookDisplayAfterHookTop()

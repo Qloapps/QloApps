@@ -53,22 +53,12 @@ class WkTestimonialBlock extends Module
 
     public function hookDisplayHome()
     {
-        // These files are already included in "wkabouthotelblock" module
-        if (!(Module::isInstalled('wkabouthotelblock') && Module::isEnabled('wkabouthotelblock'))) {
-            // owl.carousel Plug-in files
-            $this->context->controller->addCSS(
-                _PS_MODULE_DIR_.'hotelreservationsystem/libs/owl.carousel/assets/owl.carousel.min.css'
-            );
-            $this->context->controller->addCSS(
-                _PS_MODULE_DIR_.'hotelreservationsystem/libs/owl.carousel/assets/owl.theme.default.min.css'
-            );
-            $this->context->controller->addJS(
-                _PS_MODULE_DIR_.'hotelreservationsystem/libs/owl.carousel/owl.carousel.min.js'
-            );
-        }
-        /*---- Module Files ----*/
-        $this->context->controller->addCSS(_PS_MODULE_DIR_.$this->name.'/views/css/WkTestimonialBlockFront.css');
-        $this->context->controller->addJS(_PS_MODULE_DIR_.$this->name.'/views/js/WkTestimonialBlockFront.js');
+        $this->context->controller->addCSS(_PS_JS_DIR_.'/owl-carousel/assets/owl.carousel.min.css');
+        $this->context->controller->addCSS(_PS_JS_DIR_.'/owl-carousel/assets/owl.theme.default.min.css');
+        $this->context->controller->addJS(_PS_JS_DIR_.'/owl-carousel/owl.carousel.min');
+
+        $this->context->controller->addCSS($this->_path.'/views/css/WkTestimonialBlockFront.css');
+        $this->context->controller->addJS($this->_path.'/views/js/WkTestimonialBlockFront.js');
 
         $HOTEL_TESIMONIAL_BLOCK_HEADING = Configuration::get(
             'HOTEL_TESIMONIAL_BLOCK_HEADING',

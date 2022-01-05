@@ -601,15 +601,8 @@ class AdminAddHotelController extends ModuleAdminController
         parent::setMedia();
 
         HotelHelper::assignDataTableVariables();
-        $this->context->controller->addJS(
-            _MODULE_DIR_.$this->module->name.'/libs/datatable/jquery.dataTables.min.js'
-        );
-        $this->context->controller->addJS(
-            _MODULE_DIR_.$this->module->name.'/libs/datatable/dataTables.bootstrap.js'
-        );
-        $this->context->controller->addCSS(
-            _MODULE_DIR_.$this->module->name.'/views/css/libs/datatable/datatable_bootstrap.css'
-        );
+        $this->context->controller->addJS(_PS_JS_DIR_.'/datatable/jquery.dataTables.min.js');
+        $this->context->controller->addJS(_PS_JS_DIR_.'/datatable/dataTables.bootstrap.js');
 
         Media::addJsDef(
             array(
