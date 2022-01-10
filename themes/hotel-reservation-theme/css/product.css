@@ -1182,6 +1182,12 @@ Quick View Styles
   color: #000000;}
   .room_info_content .refund-rule-name {
     font-weight: 600;}
+  .room_info_content .rm_ftr_wrapper {
+    white-space: nowrap;
+    overflow: hidden;
+    line-height: 28px;}
+      .room_info_content .rm_ftr_wrapper img {
+        width: 13px;}
 
 .non_refundable_txt {
   font-weight: 600;
