@@ -64,8 +64,6 @@ class AuthControllerCore extends FrontController
             $this->addCSS(_THEME_CSS_DIR_.'authentication.css');
         }
 
-        $this->addCSS(_THEME_CSS_DIR_.'htl-reservation-general.css');// webkul
-
         $this->addJqueryPlugin('typewatch');
         $this->addJS(array(
             _THEME_JS_DIR_.'tools/vatManagement.js',
