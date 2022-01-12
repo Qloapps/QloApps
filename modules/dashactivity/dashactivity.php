@@ -78,8 +78,9 @@ class Dashactivity extends Module
                 array(
                     _PS_JS_DIR_.'date.js',
                     _PS_JS_DIR_.'tools.js'
-                ) // retro compat themes 1.5
-            );
+                    ) // retro compat themes 1.5
+                );
+            $this->context->controller->addCSS($this->_path.'views/css/'.$this->name.'.css');
         }
     }
 

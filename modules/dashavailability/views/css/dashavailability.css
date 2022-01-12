@@ -1,0 +1,234 @@
+                                                                                /**
+* 2010-2021 Webkul.
+*
+* NOTICE OF LICENSE
+*
+* All right is reserved,
+* Please go through LICENSE.txt file inside our module
+*
+* DISCLAIMER
+*
+* Do not edit or add to this file if you wish to upgrade this module to newer
+* versions in the future. If you wish to customize this module for your
+* needs please refer to CustomizationPolicy.txt file inside our module for more information.
+*
+* @author Webkul IN
+* @copyright 2010-2021 Webkul IN
+* @license LICENSE.txt
+*/
+                                                                                
+.avil-chart-head {
+    padding-top: 15px;
+    height: 115px;
+}
+
+.avil-chart-svg {
+    height: 380px;
+}
+
+.avail-bar-btn {
+    height: 40px;
+    background: #FFFFFF;
+    border: 1px solid #00AFF0 !important;
+    box-sizing: border-box;
+    box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.15);
+    border-radius: 5px !important;
+    font-weight: bold !important;
+    color: #00AFF0;
+    padding: 0 14px;
+    width: 100%;
+}
+
+.bar-btn-active {
+    background: #00AFF0;
+    color: #FFFFFF;
+}
+
+.avail-bar-date {
+    height: 40px;
+    background: #FFFFFF;
+    border: 1px solid #00AFF0;
+    box-sizing: border-box;
+    border-radius: 5px;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 14px;
+    line-height: 18px;
+    color: #555555;
+    padding: 0 14px;
+}
+
+.avail-bar-date strong {
+    color: #00AFF0;
+}
+
+.avail-bar-date:hover strong {
+    color: #FFFFFF;
+}
+
+.avail-bar-date:hover {
+    background: #00AFF0;
+}
+
+.avail-bar-btn:hover {
+    color: #ffffff !important;
+    background: #00AFF0;
+}
+
+#bardate {
+    position: absolute;
+    left: 0;
+    width: 49.5%;
+    height: 40px;
+    margin-top: -40px;
+    z-index: -1;
+    border: none;
+    outline: none;
+}
+
+@media screen and (max-width:900px) {
+    .avail-bar-btn {
+        white-space: none !important;
+    }
+}
+/* ====================================================== */
+
+.ui-datepicker {
+    width: auto;
+    height: auto;
+    margin: 5px auto 0;
+    font: 12pt Arial, sans-serif;
+    z-index: 999;
+}
+
+.ui-datepicker table {
+    width: 100%;
+}
+
+.ui-datepicker .ui-datepicker-header {
+    background-color: #00AFF0 !important;
+}
+
+.ui-datepicker .ui-datepicker-title {
+    color: #fff;
+    text-transform: uppercase;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 20px;
+}
+
+.ui-datepicker-prev {
+    float: left;
+    cursor: pointer;
+    left: 15px !important;
+}
+
+.ui-datepicker-prev::before {
+    background-position: center -30px;
+    font-weight: 200;
+    font-size: 20px;
+    color: #fff;
+    content: "\f104";
+    font-family: FontAwesome;
+}
+
+.ui-datepicker-next {
+    float: right;
+    cursor: pointer;
+}
+
+.ui-datepicker-next::before {
+    background-position: center -30px;
+    font-weight: 200;
+    font-size: 20px;
+    color: #fff;
+    content: "\f105";
+    font-family: FontAwesome;
+}
+
+.ui-datepicker .ui-datepicker-next-hover {
+    right: 2px;
+}
+
+.ui-state-hover,
+.ui-widget-content .ui-state-hover,
+.ui-widget-header .ui-state-hover,
+.ui-state-focus,
+.ui-widget-content .ui-state-focus,
+.ui-widget-header .ui-state-focus {
+    border: unset;
+    background: none;
+    font-weight: none;
+    color: none;
+}
+
+.ui-datepicker thead {
+    background-color: #f7f7f7;
+}
+
+.ui-datepicker th {
+    font-family: Oxygen;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 17px;
+    line-height: 23px;
+    /* identical to box height */
+    color: #555555;
+}
+
+.ui-datepicker tbody td:last-child {
+    border-right: 0px;
+}
+
+.ui-datepicker tbody tr {
+    border-bottom: 1px solid #bbb;
+}
+
+.ui-datepicker tbody tr:last-child {
+    border-bottom: 0px;
+}
+
+.ui-datepicker a {
+    text-decoration: none;
+}
+
+.ui-datepicker td span,
+.ui-datepicker td a {
+    display: inline-block;
+    text-align: center;
+    width: 25px;
+    height: 25px;
+    line-height: 25px;
+    color: #ffffff;
+}
+
+.ui-datepicker-calendar .ui-state-default {
+    background: #fff;
+    color: #949494;
+    height: 32px;
+    width: 35px;
+}
+
+.ui-datepicker .ui-datepicker-prev,
+.ui-datepicker .ui-datepicker-next {
+    top: 10px;
+}
+
+.ui-state-default,
+.ui-widget-content .ui-state-default,
+.ui-widget-header .ui-state-default {
+    border: none;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 15px;
+    line-height: 23px;
+    color: #555555;
+}
+
+.ui-datepicker tbody tr {
+    border: none;
+}
+
+.ui-widget-content .ui-icon {
+    background-image: none;
+}

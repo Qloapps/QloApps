@@ -39,7 +39,7 @@ class Dashtrends extends Module
 	{
 		$this->name = 'dashtrends';
 		$this->tab = 'dashboard';
-		$this->version = '1.0.0';
+		$this->version = '1.0.1';
 		$this->author = 'PrestaShop';
 
 		$this->push_filename = _PS_CACHE_DIR_.'push/trends';
@@ -65,13 +65,14 @@ class Dashtrends extends Module
 	{
 		if (get_class($this->context->controller) == 'AdminDashboardController')
 			$this->context->controller->addJs($this->_path.'views/js/'.$this->name.'.js');
+			$this->context->controller->addCSS($this->_path.'views/css/'.$this->name.'.css');
 	}
 
 	public function hookDashboardZoneTwo($params)
 	{
 		$this->context->smarty->assign(array(
 			'currency' => $this->context->currency,
-            '_PS_PRICE_DISPLAY_PRECISION_' => _PS_PRICE_DISPLAY_PRECISION_
+            '_PS_PRICE_DISPLAY_PRECISION_' => _PS_PRICE_DISPLAY_PRECISION_,
 		));
 		return $this->display(__FILE__, 'dashboard_zone_two.tpl');
 	}
@@ -87,12 +88,10 @@ class Dashtrends extends Module
 			'total_expenses' => array()
 		);
 
-		if (Configuration::get('PS_DASHBOARD_SIMULATION'))
-		{
+		if (Configuration::get('PS_DASHBOARD_SIMULATION')) {
 			$from = strtotime($date_from.' 00:00:00');
 			$to = min(time(), strtotime($date_to.' 23:59:59'));
-			for ($date = $from; $date <= $to; $date = strtotime('+1 day', $date))
-			{
+			for ($date = $from; $date <= $to; $date = strtotime('+1 day', $date)) {
 				$tmp_data['visits'][$date] = round(rand(2000, 20000));
 				$tmp_data['conversion_rate'][$date] = rand(80, 250) / 100;
 				$tmp_data['average_cart_value'][$date] = round(rand(60, 200), 2);
@@ -101,9 +100,7 @@ class Dashtrends extends Module
 				$tmp_data['total_purchases'][$date] = $tmp_data['total_paid_tax_excl'][$date] * rand(50, 70) / 100;
 				$tmp_data['total_expenses'][$date] = $tmp_data['total_paid_tax_excl'][$date] * rand(0, 10) / 100;
 			}
-		}
-		else
-		{
+		} else {
 			$tmp_data['visits'] = AdminStatsController::getVisits(false, $date_from, $date_to, 'day');
 			$tmp_data['orders'] = AdminStatsController::getOrders($date_from, $date_to, 'day');
 			$tmp_data['total_paid_tax_excl'] = AdminStatsController::getTotalSales($date_from, $date_to, 'day');
@@ -248,7 +245,7 @@ class Dashtrends extends Module
 
     protected function addTaxSuffix()
     {
-        return ' <small>'.$this->l('tax excl.').'</small>';
+        return ' <br><small>'.$this->l('tax excl.').'</small>';
     }
 
 	protected function translateCompareData($normal, $compare)
@@ -317,17 +314,18 @@ class Dashtrends extends Module
 			'net_profits' => $this->l('Net Profit')
 		);
 
-		$gfx_color = array('#1777B6','#2CA121','#E61409','#FF7F00','#6B399C','#B3591F');
-		$gfx_color_compare = array('#A5CEE4','#B1E086','#FD9997','#FFC068','#CAB1D7','#D2A689');
+		$gfx_color = array('#72C3F0','#56CE56','#FF4036','#FF7F0E','#A569DF','#AF8A42');
+		$gfx_color_border = array('#11f0fc','#118c11','#9e1010','#af5c13','#681daf','#845c0d');
+		$gfx_color_compare = array('#1777B6','#19900d','#b9140c','#bf6307','#6B399C','#B3591F');
 
 		$i = 0;
 		$data = array('chart_type' => 'line_chart_trends', 'date_format' => $this->context->language->date_format_lite, 'data' => array());
-		foreach ($charts as $key => $title)
-		{
+		foreach ($charts as $key => $title) {
 			$data['data'][] = array(
 				'id' => $key,
 				'key' => $title,
 				'color' => $gfx_color[$i],
+				'border_color' => $gfx_color_border[$i],
 				'values' => $chart_data[$key],
 				'disabled' => ($key == 'sales' ? false : true)
 			);

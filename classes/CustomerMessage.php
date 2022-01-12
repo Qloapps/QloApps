@@ -118,4 +118,13 @@ class CustomerMessageCore extends ObjectModel
         }
         return parent::delete();
     }
+    
+    public static function getMessagesByDate($date)
+    {
+        return Db::getInstance()->getValue(
+            'SELECT COUNT(cm.`id_customer_message`)
+            FROM `'._DB_PREFIX_.'customer_message` cm
+            WHERE cm.`date_add` BETWEEN "'.pSQL($date).' 00:00:00" AND "'.pSQL($date).' 23:59:59"'
+        );
+    }
 }

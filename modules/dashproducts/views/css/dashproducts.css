@@ -1,0 +1,73 @@
+/**
+* 2010-2021 Webkul.
+*
+* NOTICE OF LICENSE
+*
+* All right is reserved,
+* Please go through LICENSE.txt file inside our module
+*
+* DISCLAIMER
+*
+* Do not edit or add to this file if you wish to upgrade this module to newer
+* versions in the future. If you wish to customize this module for your
+* needs please refer to CustomizationPolicy.txt file inside our module for more information.
+*
+* @author Webkul IN
+* @copyright 2010-2021 Webkul IN
+* @license LICENSE.txt
+*/
+
+/* start */
+.bootstrap #dashboard #dashproducts nav {
+	margin-bottom: 10px;
+	font: 400 1.1em/120% "Ubuntu Condensed", Helvetica, Arial, sans-serif;
+	text-transform: uppercase;
+  }
+/* end */
+
+.bootstrap #dashboard #dashproducts nav {
+	margin-top: 16px;
+	margin-bottom: 16px;
+	text-align: center;
+}
+
+#content.bootstrap #dashproducts section:last-child .tab-content.panel {
+	border-radius: 5px;
+	margin: 0 10px;
+}
+
+#dashproducts #table_top_10_most_search .hotel-thumbnail {
+	width: 55px;
+}
+
+#dashproducts section .nav-pills {
+	padding: 0 15%;
+	margin-top: 30px;
+	margin-bottom: 30px;
+}
+
+@media (max-width: 500px) {
+	#dashproducts section .nav-pills {
+		padding: 0 5%;
+	}	
+}
+
+
+@media (max-width: 900px) {
+	#dashproducts section .nav-pills {
+		padding: 0 10%;
+	}
+}
+
+#dashproducts section .nav-pills .nav-item {
+	margin-bottom: 2px;
+}
+
+#dashproducts section .nav-pills .nav-item a {
+	border: 1px solid #00AFF0;
+	border-radius:  5px;
+}
+
+#dashproducts section .nav-pills .nav-item + .nav-item {
+	margin-left: 0px;
+}
