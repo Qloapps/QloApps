@@ -172,6 +172,12 @@ class AddressCore extends ObjectModel
      */
     public function add($autodate = true, $null_values = false)
     {
+        // for customer address we need to check of customer address already exists.
+        if ($this->id_customer) {
+            if ($id_address = Customer::getCustomerIdAddress($this->id_customer)) {
+                return false;
+            }
+        }
         if (!parent::add($autodate, $null_values)) {
             return false;
         }
@@ -237,6 +243,15 @@ class AddressCore extends ObjectModel
     public function validateController($htmlentities = true)
     {
         $errors = parent::validateController($htmlentities);
+
+        // for customer address we need to check of customer address already exists.
+        if ($idCustomer = Tools::getValue('id_customer')) {
+            if ($id_address = Customer::getCustomerIdAddress($idCustomer)) {
+                
+                $errors[] =  sprintf(Tools::displayError('Customer address already exists. Id address: #%d'), $id_address); 
+            }
+        }
+        
         if (!Configuration::get('VATNUMBER_MANAGEMENT') || !Configuration::get('VATNUMBER_CHECKING')) {
             return $errors;
         }
