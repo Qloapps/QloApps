@@ -344,11 +344,23 @@ class AdminAddressesControllerCore extends AdminController
         return parent::renderForm();
     }
 
+    // public function postProcess()
+    // {
+
+    //     $address = new Address();
+    //     $this->errors = $address->validateController();
+
+    //     return parent::postProcess();
+    // }
+
     public function processSave()
     {
         if (Tools::getValue('submitFormAjax')) {
             $this->redirect_after = false;
         }
+
+        $address = new Address();
+        $this->errors = $address->validateController();
 
         // Transform e-mail in id_customer for parent processing
         if (Validate::isEmail(Tools::getValue('email'))) {

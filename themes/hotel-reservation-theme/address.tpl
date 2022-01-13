@@ -34,7 +34,7 @@
 				{if isset($address->alias)}"{$address->alias|escape:'html':'UTF-8'}"{/if}
 			{/if}
 		{else}
-			{l s='To add a new address, please fill out the form below.'}
+			{l s='To add an address, please fill out the form below.'}
 		{/if}
 	</p>
 	{include file="$tpl_dir./errors.tpl"}
