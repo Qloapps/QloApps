@@ -36,7 +36,7 @@ class PSCleaner extends Module
     {
         $this->name = 'pscleaner';
         $this->tab = 'administration';
-        $this->version = '1.0.1';
+        $this->version = '1.0.2';
         $this->author = 'PrestaShop';
         $this->need_instance = 0;
         if (version_compare(_PS_VERSION_, '1.6.0.0 ', '>=')) {
@@ -75,60 +75,30 @@ class PSCleaner extends Module
         if (Tools::isSubmit('submitCheckAndFix')) {
             $logs = self::checkAndFix();
             if (count($logs)) {
-                $conf = $this->l('The following queries successfuly fixed broken data:').'<br /><ul>';
-                foreach ($logs as $query => $entries) {
-                    $conf .= '<li>'.Tools::htmlentitiesUTF8($query).'<br />'.sprintf($this->l('%d line(s)'), $entries).'</li>';
-                }
-                $conf .= '</ul>';
+                $this->context->smarty->assign('logs', $logs);
+                $conf = $this->context->smarty->fetch(_PS_MODULE_DIR_.$this->name.'/views/templates/admin/functional_integrity_conf.tpl');
             } else {
-                $conf = $this->l('Nothing that need to be fixed');
+                $conf = $this->l('Nothing that need to be fixed please run database cleaning to clean your database');
             }
             $html .= $this->displayConfirmation($conf);
         } elseif (Tools::isSubmit('submitCleanAndOptimize')) {
             $logs = self::cleanAndOptimize();
             if (count($logs)) {
-                $conf = $this->l('The following queries successfuly cleaned your database:').'<br /><ul>';
-                foreach ($logs as $query => $entries) {
-                    $conf .= '<li>'.Tools::htmlentitiesUTF8($query).'<br />'.sprintf($this->l('%d line(s)'), $entries).'</li>';
-                }
-                $conf .= '</ul>';
+                $this->context->smarty->assign('logs', $logs);
+                $conf = $this->context->smarty->fetch(_PS_MODULE_DIR_.$this->name.'/views/templates/admin/databases_cleaning_conf.tpl');
             } else {
                 $conf = $this->l('Nothing that need to be cleaned');
             }
             $html .= $this->displayConfirmation($conf);
         } elseif (Tools::getValue('submitTruncateCatalog') && Tools::getValue('checkTruncateCatalog')) {
             self::truncate('catalog');
-            $html .= $this->displayConfirmation($this->l('Catalog truncated'));
+            $html .= $this->displayConfirmation($this->l('Catalog truncated successfuly please run functional Integrity constraints. to make integrity in data tables'));
         } elseif (Tools::getValue('submitTruncateSales') && Tools::getValue('checkTruncateSales')) {
             self::truncate('sales');
-            $html .= $this->displayConfirmation($this->l('Orders and customers truncated'));
+            $html .= $this->displayConfirmation($this->l('Orders and customers truncated successfuly please run functional Integrity constraints. to make integrity in data tables'));
         }
 
-        $html .= '
-		<script type="text/javascript">
-			$(document).ready(function(){
-				$("#submitTruncateCatalog").click(function(){
-					if ($(\'#checkTruncateCatalog_on\').attr(\'checked\') != "checked")
-					{
-						alert(\''.addslashes(html_entity_decode($this->l('Please read the disclaimer and click "Yes" above'))).'\');
-						return false;
-					}
-					if (confirm(\''.addslashes(html_entity_decode($this->l('Are you sure that you want to delete all catalog data?'))).'\'))
-						return true;
-					return false;
-				});
-				$("#submitTruncateSales").click(function(){
-					if ($(\'#checkTruncateSales_on\').attr(\'checked\') != "checked")
-					{
-						alert(\''.addslashes(html_entity_decode($this->l('Please read the disclaimer and click "Yes" above'))).'\');
-						return false;
-					}
-					if (confirm(\''.addslashes(html_entity_decode($this->l('Are you sure that you want to delete all sales data?'))).'\'))
-						return true;
-					return false;
-				});
-			});
-		</script>';
+        $html .= $this->context->smarty->fetch(_PS_MODULE_DIR_.$this->name.'/views/templates/admin/pscleaner_script.tpl');
 
         return $html.$this->renderForm();
     }
@@ -363,6 +333,13 @@ class PSCleaner extends Module
             }
         }
 
+        $query = 'DELETE FROM `'._DB_PREFIX_.'htl_order_refund_rules_lang`';
+        if (Db::getInstance()->Execute($query)) {
+            if ($affected_rows = Db::getInstance()->Affected_Rows()) {
+                $logs[$query] = $affected_rows;
+            }
+        }
+
         $parents = Db::getInstance()->ExecuteS('SELECT DISTINCT id_parent FROM '._DB_PREFIX_.'tab');
         foreach ($parents as $parent) {
             $children = Db::getInstance()->ExecuteS('SELECT id_tab FROM '._DB_PREFIX_.'tab WHERE id_parent = '.(int)$parent['id_parent'].' ORDER BY IF(class_name IN ("AdminHome", "AdminDashboard"), 1, 2), position ASC');
@@ -486,6 +463,7 @@ class PSCleaner extends Module
                     'title' => $this->l('Functional integrity constraints'),
                     'icon' => 'icon-cogs'
                 ),
+                'description' => $this->l('integrity constraint is used to protect the database from accidental damage.'),
                 'submit' => array(
                     'title' => $this->l('Check & fix'),
                     'class' => 'btn btn-default pull-right',
@@ -499,6 +477,7 @@ class PSCleaner extends Module
                     'title' => $this->l('Database Cleaning'),
                     'icon' => 'icon-cogs'
                 ),
+                'description' => $this->l('Cleaning your database will reclaim unused space in your tables, reducing storage space and improving table access efficiency.'),
                 'submit' => array(
                     'title' => $this->l('Clean & Optimize'),
                     'class' => 'btn btn-default pull-right',
@@ -681,6 +660,17 @@ class PSCleaner extends Module
                 array('warehouse_carrier', 'id_carrier', 'carrier', 'id_carrier'),
                 array('warehouse_product_location', 'id_product', 'product', 'id_product'),
                 array('warehouse_product_location', 'id_warehouse', 'warehouse', 'id_warehouse'),
+                array('product_comment', 'id_product', 'product', 'id_product'),
+                array('specific_price', 'id_product', 'customer', 'id_customer'),
+                array('specific_price', 'id_group', 'group', 'id_group'),
+                array('htl_features_block_data_lang', 'id_features_block', 'htl_features_block_data', 'id_features_block'),
+                array('cart_rule', 'id_customer', 'customer', 'id_customer'),
+                array('htl_testimonials_block_data_lang', 'id_testimonial_block', 'htl_testimonials_block_data', 'id_testimonial_block'),
+                array('htl_room_type_global_demand_advance_option', 'id_global_demand', 'htl_room_type_global_demand', 'id_global_demand'),
+                array('htl_room_type_global_demand_advance_option_lang', 'id_option', 'htl_room_type_global_demand_advance_option', 'id_option'),
+                array('htl_room_type_global_demand_lang', 'id_global_demand', 'htl_room_type_global_demand', 'id_global_demand'),
+
+
             )
         );
     }
@@ -780,6 +770,11 @@ class PSCleaner extends Module
                 'htl_room_type_demand_price',
                 'htl_room_type_demand',
                 'htl_room_disable_dates',
+                'htl_interior_image',
+                'htl_room_block_data',
+                'htl_features_block_data',
+                'htl_testimonials_block_data',
+                'htl_room_type_global_demand'
             )
         );
     }
