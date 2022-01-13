@@ -86,6 +86,10 @@ class ProductControllerCore extends FrontController
 
         if ($id_product = (int) Tools::getValue('id_product')) {
             $this->product = new Product($id_product, true, $this->context->language->id, $this->context->shop->id);
+            $productCapacity = array();
+            $productCapacity['adult'] = $this->product->getWsAdults();
+            $productCapacity['children'] = $this->product->getWsChildren();
+            $this->product->capacity = $productCapacity;
         }
 
         if (!Validate::isLoadedObject($this->product)) {
