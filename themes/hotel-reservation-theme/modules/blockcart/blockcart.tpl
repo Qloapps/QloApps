@@ -378,9 +378,9 @@
 					</span>
 				</div>
 				<div class="button-container">
-					<span class="continue btn btn-default button exclusive-medium" title="{l s='Continue shopping' mod='blockcart'}">
+					<span class="continue btn btn-default button exclusive-medium" title="{l s='Continue browsing' mod='blockcart'}">
 						<span>
-							<i class="icon-chevron-left left"></i>{l s='Continue shopping' mod='blockcart'}
+							<i class="icon-chevron-left left"></i>{l s='Continue browsing' mod='blockcart'}
 						</span>
 					</span>
 					<a class="btn btn-default button button-medium"	href="{$link->getPageLink("$order_process", true)|escape:"html":"UTF-8"}" title="{l s='Proceed to checkout' mod='blockcart'}" rel="nofollow">
