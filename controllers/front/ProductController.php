@@ -409,6 +409,7 @@ class ProductControllerCore extends FrontController
             $this->context->smarty->assign(
                 array(
                     'room_type_demands' => $roomTypeDemands,
+                    'WK_PRICE_CALC_METHOD_EACH_DAY' => HotelRoomTypeGlobalDemand::WK_PRICE_CALC_METHOD_EACH_DAY,
                     'product_id_hotel' => $hotel_id,
                     'stock_management' => Configuration::get('PS_STOCK_MANAGEMENT'),
                     'customizationFields' => $customization_fields,
