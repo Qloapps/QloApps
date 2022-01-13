@@ -1159,8 +1159,14 @@ Quick View Styles
   font-family: inherit;
   color: #404040;
   font-size: 18px;
-  font-weight: 700;
-  border-bottom: 4px solid #379aef;}
+  font-weight: 700;}
+  .product_description_tabs li.active:after {
+    content: '';
+    position: absolute;
+    top: 36px;
+    width: 100%;
+    height: 4px;
+    background: #379aef;}
 .product_description_tabs_contents
 {
   margin-top: 0px!important;
