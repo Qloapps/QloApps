@@ -245,9 +245,11 @@ class AdminAddHotelController extends ModuleAdminController
         if ($check_in == '') {
             $this->errors[] = $this->l('Check In time is required field.');
         }
-
         if ($check_out == '') {
             $this->errors[] = $this->l('Check Out Time is required field.');
+        }
+        if ($check_in && $check_out && strtotime($check_out) > strtotime($check_in)) {
+            $this->errors[] = $this->l('Check Out time must be before Check In time.');
         }
 
         if (!$rating) {
