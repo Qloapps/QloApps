@@ -125,8 +125,8 @@ class PSCleaner extends Module
 
         // Remove inexisting or monolanguage configuration value from configuration_lang
         $query = 'DELETE FROM `'._DB_PREFIX_.'configuration_lang`
-		WHERE `id_configuration` NOT IN (SELECT `id_configuration` FROM `'._DB_PREFIX_.'configuration`)
-		OR `id_configuration` IN (SELECT `id_configuration` FROM `'._DB_PREFIX_.'configuration` WHERE name IS NULL OR name = "")';
+        WHERE `id_configuration` NOT IN (SELECT `id_configuration` FROM `'._DB_PREFIX_.'configuration`)
+        OR `id_configuration` IN (SELECT `id_configuration` FROM `'._DB_PREFIX_.'configuration` WHERE name IS NULL OR name = "")';
         if ($db->Execute($query)) {
             if ($affected_rows = $db->Affected_Rows()) {
                 $logs[$query] = $affected_rows;
@@ -302,9 +302,9 @@ class PSCleaner extends Module
         $logs = array();
 
         $query = '
-		DELETE FROM `'._DB_PREFIX_.'cart`
-		WHERE id_cart NOT IN (SELECT id_cart FROM `'._DB_PREFIX_.'orders`)
-		AND date_add < "'.pSQL(date('Y-m-d', strtotime('-1 month'))).'"';
+        DELETE FROM `'._DB_PREFIX_.'cart`
+        WHERE id_cart NOT IN (SELECT id_cart FROM `'._DB_PREFIX_.'orders`)
+        AND date_add < "'.pSQL(date('Y-m-d', strtotime('-1 month'))).'"';
         if (Db::getInstance()->Execute($query)) {
             if ($affected_rows = Db::getInstance()->Affected_Rows()) {
                 $logs[$query] = $affected_rows;
@@ -312,13 +312,13 @@ class PSCleaner extends Module
         }
 
         $query = '
-		DELETE FROM `'._DB_PREFIX_.'cart_rule`
-		WHERE (
-			active = 0
-			OR quantity = 0
-			OR date_to < "'.pSQL(date('Y-m-d')).'"
-		)
-		AND date_add < "'.pSQL(date('Y-m-d', strtotime('-1 month'))).'"';
+        DELETE FROM `'._DB_PREFIX_.'cart_rule`
+        WHERE (
+            active = 0
+            OR quantity = 0
+            OR date_to < "'.pSQL(date('Y-m-d')).'"
+        )
+        AND date_add < "'.pSQL(date('Y-m-d', strtotime('-1 month'))).'"';
         if (Db::getInstance()->Execute($query)) {
             if ($affected_rows = Db::getInstance()->Affected_Rows()) {
                 $logs[$query] = $affected_rows;
@@ -666,11 +666,44 @@ class PSCleaner extends Module
                 array('htl_features_block_data_lang', 'id_features_block', 'htl_features_block_data', 'id_features_block'),
                 array('cart_rule', 'id_customer', 'customer', 'id_customer'),
                 array('htl_testimonials_block_data_lang', 'id_testimonial_block', 'htl_testimonials_block_data', 'id_testimonial_block'),
+                array('htl_room_type_global_demand', 'id_tax_rules_group', 'tax_rules_group', 'id_tax_rules_group'),
                 array('htl_room_type_global_demand_advance_option', 'id_global_demand', 'htl_room_type_global_demand', 'id_global_demand'),
                 array('htl_room_type_global_demand_advance_option_lang', 'id_option', 'htl_room_type_global_demand_advance_option', 'id_option'),
                 array('htl_room_type_global_demand_lang', 'id_global_demand', 'htl_room_type_global_demand', 'id_global_demand'),
-
-
+                array('htl_branch_info_lang', 'id_lang', 'lang', 'id_lang'),
+                array('htl_branch_info_lang', 'id', 'htl_branch_info', 'id'),
+                array('htl_features_lang', 'id_lang', 'lang', 'id_lang'),
+                array('htl_features_lang', 'id', 'htl_features', 'id'),
+                array('htl_room_type_demand', 'id_product', 'product', 'id_product'),
+                array('htl_room_type_demand_price', 'id_product', 'product', 'id_product'),
+                array('htl_room_type_global_demand_advance_option_lang', 'id_lang', 'lang', 'id_lang'),
+                array('htl_room_type_global_demand_advance_option_lang', 'id_option', 'htl_room_type_global_demand_advance_option', 'id_option'),
+                array('htl_room_type_feature_pricing_group', 'id_lang', 'lang', 'id_lang'),
+                array('htl_booking_demands_tax', 'id_tax', 'tax', 'id_tax'),
+                array('htl_booking_detail', 'id_product', 'product', 'id_product'),
+                array('htl_booking_detail', 'id_order', 'orders', 'id_order'),
+                array('htl_booking_demands', 'id_htl_booking', 'htl_booking_detail', 'id_htl_booking'),
+                array('htl_cart_booking_data', 'id_order', 'orders', 'id_order'),
+                array('htl_cart_booking_data', 'id_customer', 'customer', 'id_customer'),
+                array('htl_branch_features', 'id_hotel', 'htl_branch_info', 'id'),
+                array('htl_image', 'id_hotel', 'htl_branch_info', 'id'),
+                array('htl_branch_info', 'id_category', 'category', 'id_category'),
+                array('htl_room_information', 'id_product', 'product', 'id_product'),
+                array('htl_room_information', 'id_hotel', 'htl_branch_info', 'id'),
+                array('htl_room_type', 'id_product', 'product', 'id_product'),
+                array('htl_room_type', 'id_hotel', 'htl_branch_info', 'id'),
+                array('profile_lang', 'id_profile', 'profile', 'id_profile'),
+                array('profile_lang', 'id_lang', 'lang', 'id_lang'),
+                array('htl_access', 'id_profile', 'profile', 'id_profile'),
+                array('htl_access', 'id_hotel', 'htl_branch_info', 'id'),
+                array('htl_room_disable_dates', 'id_room_type', 'htl_room_type', 'id'),
+                array('htl_room_type_feature_pricing_lang', 'id_feature_price', 'htl_room_type_feature_pricing', 'id_feature_price'),
+                array('htl_room_type_feature_pricing_lang', 'id_lang', 'lang', 'id_lang'),
+                array('htl_order_restrict_date', 'id_hotel', 'htl_branch_info', 'id'),
+                array('htl_branch_refund_rules', 'id_hotel', 'htl_branch_info', 'id'),
+                array('htl_branch_refund_rules', 'id_hotel_refund_rule', 'htl_branch_refund_rules', 'id_hotel_refund_rule'),
+                array('htl_order_refund_rules_lang', 'id_refund_rule', 'htl_branch_refund_rules', 'id_refund_rule'),
+                array('htl_advance_payment', 'id_product', 'product', 'id_product'),
             )
         );
     }
