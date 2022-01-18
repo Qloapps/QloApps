@@ -92,10 +92,10 @@ class PSCleaner extends Module
             $html .= $this->displayConfirmation($conf);
         } elseif (Tools::getValue('submitTruncateCatalog') && Tools::getValue('checkTruncateCatalog')) {
             self::truncate('catalog');
-            $html .= $this->displayConfirmation($this->l('Catalog truncated successfuly please run functional Integrity constraints. to make integrity in data tables'));
+            $html .= $this->displayConfirmation($this->l('Catalog truncated successfuly, please run functional Integrity constraints to clean the database.'));
         } elseif (Tools::getValue('submitTruncateSales') && Tools::getValue('checkTruncateSales')) {
             self::truncate('sales');
-            $html .= $this->displayConfirmation($this->l('Orders and customers truncated successfuly please run functional Integrity constraints. to make integrity in data tables'));
+            $html .= $this->displayConfirmation($this->l('Orders and customers truncated successfuly, please run functional Integrity constraints to clean the database'));
         }
 
         $html .= $this->context->smarty->fetch(_PS_MODULE_DIR_.$this->name.'/views/templates/admin/pscleaner_script.tpl');
@@ -463,7 +463,7 @@ class PSCleaner extends Module
                     'title' => $this->l('Functional integrity constraints'),
                     'icon' => 'icon-cogs'
                 ),
-                'description' => $this->l('integrity constraint is used to protect the database from accidental damage.'),
+                'description' => $this->l('Integrity constraint is used to maintain the quality of information.'),
                 'submit' => array(
                     'title' => $this->l('Check & fix'),
                     'class' => 'btn btn-default pull-right',
@@ -678,7 +678,7 @@ class PSCleaner extends Module
                 array('htl_room_type_demand_price', 'id_product', 'product', 'id_product'),
                 array('htl_room_type_global_demand_advance_option_lang', 'id_lang', 'lang', 'id_lang'),
                 array('htl_room_type_global_demand_advance_option_lang', 'id_option', 'htl_room_type_global_demand_advance_option', 'id_option'),
-                array('htl_room_type_feature_pricing_group', 'id_lang', 'lang', 'id_lang'),
+                array('htl_room_type_feature_pricing_group', 'id_group', 'group', 'id_group'),
                 array('htl_booking_demands_tax', 'id_tax', 'tax', 'id_tax'),
                 array('htl_booking_detail', 'id_product', 'product', 'id_product'),
                 array('htl_booking_detail', 'id_order', 'orders', 'id_order'),
@@ -701,7 +701,6 @@ class PSCleaner extends Module
                 array('htl_room_type_feature_pricing_lang', 'id_lang', 'lang', 'id_lang'),
                 array('htl_order_restrict_date', 'id_hotel', 'htl_branch_info', 'id'),
                 array('htl_branch_refund_rules', 'id_hotel', 'htl_branch_info', 'id'),
-                array('htl_branch_refund_rules', 'id_hotel_refund_rule', 'htl_branch_refund_rules', 'id_hotel_refund_rule'),
                 array('htl_order_refund_rules_lang', 'id_refund_rule', 'htl_branch_refund_rules', 'id_refund_rule'),
                 array('htl_advance_payment', 'id_product', 'product', 'id_product'),
             )
