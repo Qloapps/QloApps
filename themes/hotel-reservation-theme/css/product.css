@@ -1441,21 +1441,7 @@ Quick View Styles
 	margin-bottom: 15px;
 	text-transform: uppercase;}
 
-/* fancybox accordian css */
-/* #rooms_extra_demands .accordion, #rooms_extra_demands .accordion * {
-	-webkit-box-sizing:border-box;
-	-moz-box-sizing:border-box;
-	box-sizing:border-box;}
-#rooms_extra_demands .accordion {
-	overflow:hidden;
-	border-bottom: 1px solid #CCCCCC;}
-#rooms_extra_demands .accordion-section-title {
-	width:100%;
-	display:inline-block;
-	transition:all linear 0.15s;
-	color:#252525 !important;
-	text-decoration:none !important;}
-#rooms_extra_demands .accordion-section-content {
-	display:none;
-	border-top: 1px solid #eee;
-	padding-top: 15px;} */
+/* jqZoom overrides */
+.zoomWrapperImage img {
+  height: initial !important;
+}
