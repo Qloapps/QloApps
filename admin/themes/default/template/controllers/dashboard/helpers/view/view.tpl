@@ -38,7 +38,7 @@
 			<div class="alert alert-warning">{$warning}</div>
 {/if}
 			<div id="calendar" class="panel">
-				<form action="{$action|escape}" method="get" id="calendar_form" name="calendar_form" class="form-inline">
+				<form action="{$action|escape}" method="post" id="calendar_form" name="calendar_form" class="form-inline">
 					<div class="btn-group">
 						<button type="button" name="submitDateDay" class="btn btn-default submitDateDay{if (!isset($preselect_date_range) || !$preselect_date_range) || (isset($preselect_date_range) && $preselect_date_range == 'day')} active{/if}">
 							{l s='Day'}
@@ -74,8 +74,8 @@
 							</span>
 							<i class="icon-caret-down"></i>
 						</button>
+						{$calendar}
 					</div>
-					{$calendar}
 				</form>
 			</div>
 		</div>
