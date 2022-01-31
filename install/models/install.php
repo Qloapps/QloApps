@@ -656,7 +656,6 @@ class InstallModelInstall extends InstallAbstractModel
                 'wktestimonialblock',
                 'bankwire',
                 'cheque',
-                'paypal',
                 'blockmyaccount',
                 'blocklanguages',
                 'blockcurrencies',
