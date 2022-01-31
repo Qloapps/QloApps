@@ -1482,7 +1482,6 @@ class AdminOrdersControllerCore extends AdminController
         if ($order_detail_data = $objBookingDetail->getOrderFormatedBookinInfoByIdOrder($order->id)) {
             $objBookingDemand = new HotelBookingDemands();
             foreach ($order_detail_data as $key => $value) {
-
                 $order_detail_data[$key]['extra_demands'] = $objBookingDemand->getRoomTypeBookingExtraDemands(
                     $order->id,
                     $value['id_product'],
@@ -2590,8 +2589,59 @@ class AdminOrdersControllerCore extends AdminController
             )));
         }
 
+        // get extra demands of the room before changing in the booking table
+        $objBookingDemand = new HotelBookingDemands();
+        $extraDemands = $objBookingDemand->getRoomTypeBookingExtraDemands(
+            $id_order,
+            0,
+            $id_room,
+            $old_date_from,
+            $old_date_to
+        );
+
         /*By webkul to edit the Hotel Cart and Hotel Order tables when editing the room for the order detail page*/
-        $update_htl_tables = $obj_booking_detail->UpdateHotelCartHotelOrderOnOrderEdit($id_order, $id_room, $old_date_from, $old_date_to, $new_date_from, $new_date_to);
+        if ($update_htl_tables = $obj_booking_detail->UpdateHotelCartHotelOrderOnOrderEdit(
+            $id_order,
+            $id_room,
+            $old_date_from,
+            $old_date_to,
+            $new_date_from,
+            $new_date_to
+        )) {
+            // update extra demands total prices if dates are changes (price calc method for each day)
+            if ($extraDemands) {
+                $objOrder = new Order($id_order);
+                foreach ($extraDemands as $demand) {
+                    if (isset($demand['extra_demands']) && $demand['extra_demands']) {
+                        foreach ($demand['extra_demands'] as $rDemand) {
+                            if ($rDemand['price_calc_method'] == HotelRoomTypeGlobalDemand::WK_PRICE_CALC_METHOD_EACH_DAY) {
+                                $objBookingDemand = new HotelBookingDemands($rDemand['id_booking_demand']);
+
+                                // change order total
+                                $objOrder->total_paid_tax_excl -= $objBookingDemand->total_price_tax_excl;
+                                $objOrder->total_paid_tax_incl -= $objBookingDemand->total_price_tax_incl;
+                                $objOrder->total_paid -= $objBookingDemand->total_price_tax_incl;
+
+                                $numDays = $obj_booking_detail->getNumberOfDays($new_date_from, $new_date_to);
+                                $demandPriceTE = $objBookingDemand->unit_price_tax_excl * $numDays;
+                                $demandPriceTI = $objBookingDemand->unit_price_tax_incl * $numDays;
+
+                                $objOrder->total_paid_tax_excl += $demandPriceTE;
+                                $objOrder->total_paid_tax_incl += $demandPriceTI;
+                                $objOrder->total_paid += $demandPriceTI;
+
+                                $objBookingDemand->total_price_tax_excl = $demandPriceTE;
+                                $objBookingDemand->total_price_tax_incl = $demandPriceTI;
+
+                                $objBookingDemand->save();
+                            }
+                        }
+                    }
+                }
+                // change order total save
+                $objOrder->save();
+            }
+        }
 
         if (is_array(Tools::getValue('product_quantity'))) {
             $view = $this->createTemplate('_customized_data.tpl')->fetch();
@@ -3295,8 +3345,8 @@ class AdminOrdersControllerCore extends AdminController
                         $qty = 1;
                         if ($objGlobalDemand->price_calc_method == HotelRoomTypeGlobalDemand::WK_PRICE_CALC_METHOD_EACH_DAY) {
                             $numDays = $objHtlBkDtl->getNumberOfDays(
-                                $objHtlBkDtl->date_from,
-                                $objHtlBkDtl->date_to
+                                $objBookingDetail->date_from,
+                                $objBookingDetail->date_to
                             );
                             if ($numDays > 1) {
                                 $qty *= $numDays;
@@ -3304,6 +3354,11 @@ class AdminOrdersControllerCore extends AdminController
                         }
                         $objBookingDemand->total_price_tax_excl = $objBookingDemand->unit_price_tax_excl * $qty;
                         $objBookingDemand->total_price_tax_incl = $objBookingDemand->unit_price_tax_incl * $qty;
+
+                        // change order total
+                        $order->total_paid_tax_excl += $objBookingDemand->total_price_tax_excl;
+                        $order->total_paid_tax_incl += $objBookingDemand->total_price_tax_incl;
+                        $order->total_paid += $objBookingDemand->total_price_tax_incl;
 
                         $objBookingDemand->price_calc_method = $objGlobalDemand->price_calc_method;
                         $objBookingDemand->id_tax_rules_group = $objGlobalDemand->id_tax_rules_group;
@@ -3320,6 +3375,7 @@ class AdminOrdersControllerCore extends AdminController
                             $objBookingDemand->setBookingDemandTaxDetails();
                         }
                     }
+                    $order->save();
 
                     die('1');
                 }
@@ -3336,6 +3392,14 @@ class AdminOrdersControllerCore extends AdminController
                 // first delete the tax details of the booking demand
                 if ($objBookingDemand->deleteBookingDemandTaxDetails($idBookingDemand)) {
                     if ($objBookingDemand->delete()) {
+                        if (Validate::isLoadedObject($objBookingDetail = new HotelBookingDetail($objBookingDemand->id_htl_booking))) {
+                            // change order total
+                            $order = new Order($objBookingDetail->id_order);
+                            $order->total_paid_tax_excl -= $objBookingDemand->total_price_tax_excl;
+                            $order->total_paid_tax_incl -= $objBookingDemand->total_price_tax_incl;
+                            $order->total_paid -= $objBookingDemand->total_price_tax_incl;
+                            $order->save();
+                        }
                         die('1');
                     }
                 }
