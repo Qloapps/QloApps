@@ -355,7 +355,11 @@ abstract class PaymentModuleCore extends Module
 
                     // advance payment information
                     $order->is_advance_payment = $this->context->cart->is_advance_payment;
-                    $order->advance_paid_amount = $cart_total_paid;
+                    if ($order->is_advance_payment) {
+                        $order->advance_paid_amount = (float)Tools::ps_round((float)$this->context->cart->getOrderTotal(true, Cart::ADVANCE_PAYMENT, $order->product_list, $id_carrier), _PS_PRICE_COMPUTE_PRECISION_);
+                    } else {
+                        $order->advance_paid_amount = (float)Tools::ps_round((float)$this->context->cart->getOrderTotal(true, Cart::BOTH, $order->product_list, $id_carrier), _PS_PRICE_COMPUTE_PRECISION_);
+                    }
 
                     // Creating order
                     $result = $order->add();
