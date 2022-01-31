@@ -256,7 +256,6 @@ class OrderCore extends ObjectModel
             'id_currency' => array('xlink_resource'=> 'currencies'),
             'id_lang' => array('xlink_resource'=> 'languages'),
             'id_customer' => array('xlink_resource'=> 'customers'),
-            'id_carrier' => array('xlink_resource'=> 'carriers'),
             'current_state' => array(
                 'xlink_resource'=> 'order_states',
                 'setter' => 'setWsCurrentState'
@@ -264,31 +263,33 @@ class OrderCore extends ObjectModel
             'module' => array('required' => true),
             'invoice_number' => array(),
             'invoice_date' => array(),
-            // 'delivery_number' => array(),
-            // 'delivery_date' => array(),
             'valid' => array(),
             'date_add' => array(),
             'date_upd' => array(),
-            // 'shipping_number' => array(
-            //     'getter' => 'getWsShippingNumber',
-            //     'setter' => 'setWsShippingNumber'
-            // ),
+        ),
+        'hidden_fields' => array (
+            'total_shipping',
+            'total_shipping_tax_incl',
+            'total_shipping_tax_excl',
+            'carrier_tax_rate',
+            'id_carrier',
+            'total_wrapping',
+            'total_wrapping_tax_incl',
+            'total_wrapping_tax_excl',
+            'delivery_date',
+            'delivery_number',
+            'shipping_number',
+            'id_shop',
+            'id_shop_group',
+            'recyclable',
+            'gift',
+            'gift_message',
+            'mobile_theme',
+            'round_mode',
+            'round_type',
+            'reference',
         ),
         'associations' => array(
-            // 'order_rows' => array('resource' => 'order_row', 'setter' => false, 'virtual_entity' => true,
-            //     'fields' => array(
-            //         'id' =>  array(),
-            //         'product_id' => array('required' => true),
-            //         'product_attribute_id' => array('required' => true),
-            //         'product_quantity' => array('required' => true),
-            //         'product_name' => array('setter' => false),
-            //         'product_reference' => array('setter' => false),
-            //         'product_ean13' => array('setter' => false),
-            //         'product_upc' => array('setter' => false),
-            //         'product_price' => array('setter' => false),
-            //         'unit_price_tax_incl' => array('setter' => false),
-            //         'unit_price_tax_excl' => array('setter' => false),
-            //     )),
             'bookings' => array(
                 'resource' => 'booking',
                 'setter' => false,
@@ -1600,6 +1601,7 @@ class OrderCore extends ObjectModel
     {
         /** @var PaymentModule $payment_module */
         $payment_module = Module::getInstanceByName($this->module);
+        $payment_module->orderSource = $this->source;
         $customer = new Customer($this->id_customer);
         $payment_module->validateOrder($this->id_cart, Configuration::get('PS_OS_WS_PAYMENT'), $this->total_paid, $this->payment, null, array(), null, false, $customer->secure_key);
         $this->id = $payment_module->currentOrder;
