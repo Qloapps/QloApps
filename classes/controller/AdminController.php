@@ -239,6 +239,9 @@ class AdminControllerCore extends Controller
     /** @var HelperList */
     protected $helper;
 
+    /** @var bool */
+    protected static $is_qloapps_up = true;
+
     /**
      * Actions to execute on multiple selections.
      *
@@ -2126,7 +2129,7 @@ class AdminControllerCore extends Controller
             @file_put_contents(_PS_ROOT_DIR_.Module::CACHE_FILE_MUST_HAVE_MODULES_LIST, Tools::addonsRequest('must-have'));
         }
         if (!$this->isFresh(Module::CACHE_FILE_TAB_MODULES_LIST, 604800)) {
-            $this->refresh(Module::CACHE_FILE_TAB_MODULES_LIST, _PS_TAB_MODULE_LIST_URL_);
+            $this->refresh(Module::CACHE_FILE_TAB_MODULES_LIST, _QLO_TAB_MODULE_LIST_URL_);
         }
 
         $this->tab_modules_list = Tab::getTabModulesList($this->id);
@@ -4042,9 +4045,6 @@ class AdminControllerCore extends Controller
         return false;
     }
 
-    /** @var bool */
-    protected static $is_prestashop_up = true;
-
     /**
      * @param string $file_to_refresh
      * @param string $external_file
@@ -4052,10 +4052,10 @@ class AdminControllerCore extends Controller
      */
     public function refresh($file_to_refresh, $external_file)
     {
-        if (self::$is_prestashop_up && $content = Tools::file_get_contents($external_file)) {
+        if (self::$is_qloapps_up && $content = Tools::file_get_contents($external_file)) {
             return (bool)file_put_contents(_PS_ROOT_DIR_.$file_to_refresh, $content);
         }
-        self::$is_prestashop_up = false;
+        self::$is_qloapps_up = false;
         return false;
     }
 

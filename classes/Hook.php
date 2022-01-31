@@ -476,13 +476,6 @@ class HookCore extends ObjectModel
 
         if ($disable_non_native_modules && !isset(Hook::$native_module)) {
             Hook::$native_module = Module::getNativeModuleList();
-            if (Module::isInstalled('hotelreservationsystem')) {
-                include_once _PS_MODULE_DIR_.'hotelreservationsystem/classes/HotelHelper.php';
-                $qloNativeMods = array();
-                if ($qloNativeMods = HotelHelper::getQloNativeModules()) {
-                    Hook::$native_module = array_merge(Hook::$native_module, $qloNativeMods);
-                }
-            }
         }
 
         $different_shop = false;
