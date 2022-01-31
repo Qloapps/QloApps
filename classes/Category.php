@@ -122,7 +122,7 @@ class CategoryCore extends ObjectModel
         'objectsNodeName' => 'categories',
         'hidden_fields' => array('nleft', 'nright', 'groupBox'),
         'fields' => array(
-            'id_parent' => array('xlink_resource'=> 'categories'),
+            'id_parent' => array('xlink_resource'=> 'categories', 'setter' => 'setWsParentCategory'),
             'level_depth' => array('setter' => false),
             'nb_products_recursive' => array('getter' => 'getWsNbProductsRecursive', 'setter' => false),
         ),
@@ -1885,5 +1885,17 @@ class CategoryCore extends ObjectModel
 		FROM `'._DB_PREFIX_.'category_shop`
 		WHERE `id_category` = '.(int)$this->id.'
 		AND `id_shop` = '.(int)$id_shop);
+    }
+
+    public function setWsParentCategory($id_parent_category)
+    {
+        if (!$id_parent_category || !Validate::isLoadedObject(new Category((int)$id_parent_category))) {
+            WebserviceRequest::getInstance()->setError(400, 'Wrong parent category id passed.', 134);
+            return false;
+        }
+
+        $this->id_parent = $id_parent_category;
+
+        return true;
     }
 }
