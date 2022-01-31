@@ -2232,11 +2232,14 @@ class AdminOrdersControllerCore extends AdminController
                 $objHtlBkDtl->booking_type = $obj_cart_bk_data->booking_type;
                 $objHtlBkDtl->id_status = 1;
                 $objHtlBkDtl->comment = $obj_cart_bk_data->comment;
+                $objHtlBkDtl->room_type_name = Product::getProductName($idProduct, null, $order->id_lang);
+
                 $objHtlBkDtl->date_from = $obj_cart_bk_data->date_from;
                 $objHtlBkDtl->date_to = $obj_cart_bk_data->date_to;
                 $total_price = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice($idProduct, $obj_cart_bk_data->date_from, $obj_cart_bk_data->date_to);
                 $objHtlBkDtl->total_price_tax_excl = $total_price['total_price_tax_excl'];
                 $objHtlBkDtl->total_price_tax_incl = $total_price['total_price_tax_incl'];
+                $objHtlBkDtl->total_paid_amount = Tools::ps_round($total_price['total_price_tax_incl'], 5);
 
                 // Save hotel information/location/contact
                 if (Validate::isLoadedObject($objRoom = new HotelRoomInformation($obj_cart_bk_data->id_room))) {
@@ -2661,6 +2664,7 @@ class AdminOrdersControllerCore extends AdminController
 
         /*END*/
         $this->doDeleteProductLineValidation($order_detail, $order);
+        Hook::exec('actionOrderProductLineDeleteBefore', array('order' => $order));
         $bookingInfo = $obj_booking_detail->getRowByIdOrderIdProductInDateRange($id_order, $id_product, $date_from, $date_to, $id_room);
         $idHotelBooking = $bookingInfo['id'];
 

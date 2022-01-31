@@ -1031,6 +1031,15 @@ class HotelBookingDetail extends ObjectModel
                 $data['room_num'] = $room_num;
             }
             if ($result2 = Db::getInstance()->update($table2, $data, $where)) {
+                Hook::exec(
+                    'actionRoomReAllocateAfter',
+                    array(
+                        'room_id' => $current_room_id,
+                        'realloc_room_id' => $swapped_room_id,
+                        'date_from' => $date_from,
+                        'date_to' => $date_to,
+                    )
+                );            
                 return true;
             }
             return false;
@@ -1086,6 +1095,15 @@ class HotelBookingDetail extends ObjectModel
         if ($result = Db::getInstance()->execute($sql)) {
             $result2 = Db::getInstance()->execute($sql1);
             if ($result2) {
+                Hook::exec(
+                    'actionRoomSwapAfter',
+                    array(
+                        'room_id' => $current_room_id,
+                        'swapped_room_id' => $swapped_room_id,
+                        'date_from' => $date_from,
+                        'date_to' => $date_to,
+                    )
+                );            
                 return true;
             }
             return false;
