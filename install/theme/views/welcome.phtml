@@ -8,7 +8,7 @@
 	<div class="warnBlock">
 		<img src="theme/img/pict_error.png" alt="" style="vertical-align: middle;" /> &nbsp;
 		<?php echo $this->l(
-			'<b>Warning: You cannot use this tool to upgrade your Qloapps anymore.</b><br /><br />You already have <b>QloApps version %1$s installed</b>.<br /><br />If you want to upgrade to the latest version, please contact us at <a href="%2$s">%2$s</a>',
+			'<b>Warning: You cannot use this tool to upgrade your QloApps anymore.</b><br /><br />You already have <b>QloApps version %1$s installed</b>.<br /><br />If you want to upgrade to the latest version, please contact us at <a href="%2$s">%2$s</a>',
 			_QLO_INSTALL_VERSION_, $this->getDocumentationUpgradeLink()
 		) ?></div>
 <?php endif; ?>
@@ -29,6 +29,6 @@
 		</select>
 <?php endif; ?>
 
-<p><?php echo $this->l('The language selection above only applies to the Installation Assistant. Once Qloapps is installed, you can choose the language of your store from over %d translations, all for free!', 60); ?> </p>
+<p><?php echo $this->l('The language selection above only applies to the Installation Assistant. Once QloApps is installed, you can choose the language of your website from over %d translations, all for free!', 60); ?> </p>
 
 <?php $this->displayTemplate('footer') ?>

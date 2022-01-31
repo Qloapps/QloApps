@@ -8,11 +8,11 @@ var default_iso = '<?php echo $this->session->shop_country ?>';
 
 <!-- Configuration form -->
 <div id="infosShopBlock">
-	<h2><?php echo $this->l('Information about your Store') ?></h2>
+	<h2><?php echo $this->l('Information about your Website') ?></h2>
 
 	<!-- Shop name -->
 	<div class="field clearfix">
-		<label for="infosShop" class="aligned"><?php echo $this->l('Shop name') ?> </label>
+		<label for="infosShop" class="aligned"><?php echo $this->l('Website name') ?> </label>
 		<div class="contentinput">
 			<input class="text required" type="text" id="infosShop" name="shop_name" value="<?php echo htmlspecialchars($this->session->shop_name) ?>" /> <sup class="required">*</sup>
 		</div>
@@ -20,6 +20,7 @@ var default_iso = '<?php echo $this->session->shop_country ?>';
 	</div>
 
 	<!-- Activity -->
+	<?php /*
 	<div class="field clearfix">
 		<label for="infosActivity" class="aligned"><?php echo $this->l('Main activity') ?></label>
 		<div class="contentinput">
@@ -33,6 +34,7 @@ var default_iso = '<?php echo $this->session->shop_country ?>';
 		</div>
 		<p class="userInfos aligned"><?php echo $this->l('Help us learn more about your store so we can offer you optimal guidance and the best features for your business!') ?></p>
 	</div>
+	*/ ?>
 
 	<?php if (_PS_MODE_DEV_): ?>
 	<!-- Install type (with fixtures or not) -->
@@ -71,7 +73,7 @@ var default_iso = '<?php echo $this->session->shop_country ?>';
 
 	<!-- Timezone list -->
 	<div id="timezone_div" class="field clearfix" <?php if (!in_array($this->session->shop_timezone, array('us','ca','au','ru','me','id'))) echo 'style="display:none"'; ?>>
-		<label for="infosTimezone" class="aligned"><?php echo $this->l('Shop timezone') ?></label>
+		<label for="infosTimezone" class="aligned"><?php echo $this->l('Website timezone') ?></label>
 		<div class="contentinput">
 			<select name="shop_timezone" id="infosTimezone" class="chosen no-chosen">
 				<option value="0" style="font-weight: bold"><?php echo $this->l('Select your timezone') ?></option>
@@ -128,13 +130,13 @@ var default_iso = '<?php echo $this->session->shop_country ?>';
 			<input type="text" class="text required" id="infosEmail" name="admin_email" value="<?php echo htmlspecialchars($this->session->admin_email) ?>" />
 			<sup class="required">*</sup>
 		</div>
-		<p class="userInfos aligned"><?php echo $this->l('This email address will be your username to access your store\'s back office.') ?></p>
+		<p class="userInfos aligned"><?php echo $this->l('This email address will be your username to access your website\'s back office.') ?></p>
 		<?php echo $this->displayError('admin_email') ?>
 	</div>
 
 	<!-- Admin password -->
 	<div class="field clearfix">
-		<label for="infosPassword" class="aligned"><?php echo $this->l('Shop password') ?> </label>
+		<label for="infosPassword" class="aligned"><?php echo $this->l('Password') ?> </label>
 		<div class="contentinput">
 			<input autocomplete="off" type="password" class="text required" id="infosPassword" name="admin_password" value="<?php echo htmlspecialchars($this->session->admin_password) ?>" />
 			<sup class="required">*</sup>
