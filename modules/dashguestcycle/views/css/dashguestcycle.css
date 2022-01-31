@@ -1,0 +1,108 @@
+/**
+* 2010-2021 Webkul.
+*
+* NOTICE OF LICENSE
+*
+* All right is reserved,
+* Please go through LICENSE.txt file inside our module
+*
+* DISCLAIMER
+*
+* Do not edit or add to this file if you wish to upgrade this module to newer
+* versions in the future. If you wish to customize this module for your
+* needs please refer to CustomizationPolicy.txt file inside our module for more information.
+*
+* @author Webkul IN
+* @copyright 2010-2021 Webkul IN
+* @license LICENSE.txt
+*/
+
+/* scrollbar design - start */
+#dashguestcycle ::-webkit-scrollbar {
+	height: 12px;
+	margin-bottom: 5px;
+}
+ 
+#dashguestcycle ::-webkit-scrollbar-track {
+	background-color: #DDD;
+	margin: 0 6px;
+	border-radius: 10px;
+}
+ 
+#dashguestcycle ::-webkit-scrollbar-thumb {
+	background-color: #BBB;
+	border-radius: 10px;
+	margin-bottom: 5px;
+
+}
+/* scrollbar design - end */
+
+#dashguestcycle {
+	padding-bottom: 5px;
+}
+
+#dashguestcycle .badges-wrapper {
+	white-space: nowrap;
+	overflow: auto;
+	margin: -5px;
+	margin-bottom: 0px;
+	padding-bottom: 10px;
+	font-size: 0;
+}
+
+#dashguestcycle .badge-wrapper {
+	display: inline-block;
+	width: 14.28%;
+	min-width: 145px;
+	padding: 5px;
+}
+
+#dashguestcycle .badge-item {
+	position: relative;
+	min-width: 135px;
+	height: 80px;
+	border-radius: 10px;
+	background: #FFFFFF;
+	box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.15);
+}
+
+#dashguestcycle .badge-strip {
+	position: absolute;
+	width: 10px;
+	height: 100%;
+	border-top-left-radius: 10px;
+	border-bottom-left-radius: 10px;
+}
+
+#dashguestcycle .badge-content-wrapper {
+	height: 100%;
+}
+
+#dashguestcycle .badge-content-wrapper p {
+	color: #00AFF0;
+	margin-bottom: 0;
+}
+
+#dashguestcycle .title-wrapper, #dashguestcycle .value-wrapper {
+	display: table;
+	width: 100%;
+	height: 50%;
+	padding: 0 10px;
+}
+
+#dashguestcycle .title-wrapper p {
+	display: table-cell;
+	vertical-align: middle;
+	font-weight: normal;
+	font-size: 13px;
+	line-height: 15px;
+	white-space: normal;
+}
+
+#dashguestcycle .value-wrapper p {
+	display: table-cell;
+	vertical-align: top;
+	font-weight: bold;
+	font-size: 24px;
+	line-height: 30px;
+}

@@ -32,7 +32,8 @@ function pie_chart_trends(widget_name, chart_details)
 			.color(d3.scale.category10().range())
 			.donut(true)
 			.showLabels(false)
-			.showLegend(false);
+			.showLegend(false)
+			.donutRatio(0.4);
 
 		d3.select("#dash_traffic_chart2 svg")
 			.datum(chart_details.data)
