@@ -577,12 +577,16 @@ class AuthControllerCore extends FrontController
                     $this->errors[] = Tools::displayError('The Zip / Postal code is invalid.');
                 }
 
-                if ($country->need_identification_number && (!Tools::getValue('dni') || !Validate::isDniLite(Tools::getValue('dni')))) {
-                    $this->errors[] = Tools::displayError('The identification number is incorrect or has already been used.');
+                if ($country->need_identification_number) {
+                    if (!Configuration::get('PS_CUSTOMER_ADDRESS_CREATION')) {
+                        $$addresses_type->dni = null;
+                    } elseif (!Tools::getValue('dni') || !Validate::isDniLite(Tools::getValue('dni'))) {
+                        $this->errors[] = Tools::displayError('The identification number is incorrect or has already been used.');
+                    }
                 } elseif (!$country->need_identification_number) {
                     $$addresses_type->dni = null;
                 }
-
+                
                 if (Tools::isSubmit('submitAccount') || Tools::isSubmit('submitGuestAccount')) {
                     if (!($country = new Country($$addresses_type->id_country, Configuration::get('PS_LANG_DEFAULT'))) || !Validate::isLoadedObject($country)) {
                         $this->errors[] = Tools::displayError('Country is invalid');
