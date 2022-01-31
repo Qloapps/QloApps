@@ -283,7 +283,7 @@
 						{assign var=stateExist value=false}
 						{assign var=postCodeExist value=false}
 						{assign var=dniExist value=false}
-						<h3 class="page-subheading top-indent htl-reservation-page-sub-heading">{l s='Invoice address'}</h3>
+						<h3 class="page-subheading top-indent">{l s='Invoice address'}</h3>
 						{foreach from=$inv_all_fields item=field_name}
 						{if $field_name eq "company"}
 						<div class="form-group">
@@ -427,7 +427,7 @@
 	<form action="{$link->getPageLink('authentication', true)|escape:'html':'UTF-8'}" method="post" id="account-creation_form" class="std box">
 		{$HOOK_CREATE_ACCOUNT_TOP}
 		<div class="account_creation">
-			<h3 class="page-subheading htl-reservation-page-sub-heading">{l s='Your personal information'}</h3>
+			<h3 class="page-subheading">{l s='Your personal information'}</h3>
 			<div class="clearfix">
 				<label>{l s='Title'}</label>
 				<br />
@@ -521,7 +521,7 @@
 		</div>
 		{if $b2b_enable}
 			<div class="account_creation">
-				<h3 class="page-subheading htl-reservation-page-sub-heading">{l s='Your company information'}</h3>
+				<h3 class="page-subheading">{l s='Your company information'}</h3>
 				<p class="form-group">
 					<label for="">{l s='Company'}</label>
 					<input type="text" class="form-control" id="company" name="company" value="{if isset($smarty.post.company)}{$smarty.post.company}{/if}" />
@@ -542,7 +542,7 @@
 		{/if}
 		{if isset($PS_REGISTRATION_PROCESS_TYPE) && $PS_REGISTRATION_PROCESS_TYPE}
 			<div class="account_creation">
-				<h3 class="page-subheading htl-reservation-page-sub-heading">{l s='Your address'}</h3>
+				<h3 class="page-subheading">{l s='Your address'}</h3>
 				{foreach from=$dlv_all_fields item=field_name}
 					{if $field_name eq "company"}
 						{if !$b2b_enable}
