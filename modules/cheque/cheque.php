@@ -173,28 +173,33 @@ class Cheque extends PaymentModule
             return;
 		}
 		$objOrder = $params['objOrder'];
-        $cart = new Cart($objOrder->id_cart);
-        $state = $objOrder->getCurrentState();
-        if (in_array($state, array(Configuration::get('PS_OS_CHEQUE'), Configuration::get('PS_OS_OUTOFSTOCK'), Configuration::get('PS_OS_OUTOFSTOCK_UNPAID')))) {
-            if ($objOrder->is_advance_payment) {
-                $order_total = $objOrder->advance_paid_amount;
+        $orderState = $objOrder->getCurrentState();
+        if (in_array(
+			$orderState,
+			array(
+				Configuration::get('PS_OS_CHEQUE'),
+				Configuration::get('PS_OS_OUTOFSTOCK'),
+				Configuration::get('PS_OS_OUTOFSTOCK_UNPAID')
+			)
+		)) {
+			$objCart = new Cart($objOrder->id_cart);
+            if ($objCart->is_advance_payment) {
+                $cartTotal = $objOrder->getOrdersTotalPaid(1);
             } else {
-                $order_total = $objOrder->total_paid;
+                $cartTotal = $objOrder->getOrdersTotalPaid();
 			}
 
-			$this->smarty->assign(array(
-				'total_to_pay' => Tools::displayPrice($order_total, $params['currencyObj'], false),
-				'chequeName' => $this->chequeName,
-				'chequeAddress' => Tools::nl2br($this->address),
-				'status' => 'ok',
-				'id_order' => $objOrder->id
-			));
-			if (isset($objOrder->reference) && !empty($objOrder->reference))
-				$this->smarty->assign('reference', $objOrder->reference);
+			$smartyVars['total_to_pay'] = Tools::displayPrice($cartTotal, $params['currencyObj'], false);
+            $smartyVars['chequeName'] = $this->chequeName;
+            $smartyVars['chequeAddress'] = Tools::nl2br($this->address);
+            $smartyVars['status'] = 'ok';
+            $smartyVars['id_order'] = $objOrder->id;
+            $smartyVars['reference'] = $objOrder->reference;
 		} else {
-			$this->smarty->assign('status', 'failed');
+			$smartyVars['status'] = 'failed';
 		}
 
+		$this->smarty->assign($smartyVars);
 		return $this->display(__FILE__, 'payment_return.tpl');
 	}
 
