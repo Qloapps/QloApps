@@ -37,16 +37,16 @@ class HotelOrderRefundRules extends ObjectModel
         'primary' => 'id_refund_rule',
         'multilang' => true,
         'fields' => array(
-            'payment_type' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
-            'days' => array('type' => self::TYPE_FLOAT),
-            'deduction_value_full_pay' => array('type' => self::TYPE_FLOAT),
-            'deduction_value_adv_pay' => array('type' => self::TYPE_FLOAT),
+            'payment_type' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => true),
+            'days' => array('type' => self::TYPE_FLOAT, 'required' => true),
+            'deduction_value_full_pay' => array('type' => self::TYPE_FLOAT, 'required' => true),
+            'deduction_value_adv_pay' => array('type' => self::TYPE_FLOAT, 'required' => true),
             'date_add' => array('type' => self::TYPE_DATE, 'validate' => 'isDate', 'copy_post' => false),
             'date_upd' => array('type' => self::TYPE_DATE, 'validate' => 'isDate', 'copy_post' => false),
 
             // lang fields
-            'name' => array('type' => self::TYPE_STRING, 'lang' => true),
-            'description' => array('type' => self::TYPE_HTML, 'validate' => 'isCleanHtml', 'lang' => true),
+            'name' => array('type' => self::TYPE_STRING, 'validate' => 'isCatalogName', 'lang' => true, 'required' => true),
+            'description' => array('type' => self::TYPE_HTML, 'validate' => 'isCleanHtml', 'lang' => true, 'required' => true),
     ));
 
     protected $webserviceParameters = array(
