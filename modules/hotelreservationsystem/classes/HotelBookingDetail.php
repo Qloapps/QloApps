@@ -72,40 +72,40 @@ class HotelBookingDetail extends ObjectModel
         'table' => 'htl_booking_detail',
         'primary' => 'id',
         'fields' => array(
-            'id_product' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
-            'id_order' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
-            'id_order_detail' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
-            'id_cart' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
-            'id_room' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
-            'id_hotel' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
-            'id_customer' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
-            'booking_type' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
-            'id_status' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
+            'id_product' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => true),
+            'id_order' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => true),
+            'id_order_detail' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => true),
+            'id_cart' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => true),
+            'id_room' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => true),
+            'id_hotel' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => true),
+            'id_customer' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => true),
+            'booking_type' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => true),
+            'id_status' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => true),
             'comment' => array('type' => self::TYPE_STRING),
             'check_in' => array('type' => self::TYPE_DATE),
             'check_out' => array('type' => self::TYPE_DATE),
-            'date_from' => array('type' => self::TYPE_DATE, 'validate' => 'isDate'),
-            'date_to' => array('type' => self::TYPE_DATE, 'validate' => 'isDate'),
-            'total_price_tax_excl' => array('type' => self::TYPE_FLOAT, 'validate' => 'isPrice'),
-            'total_price_tax_incl' => array('type' => self::TYPE_FLOAT, 'validate' => 'isPrice'),
-            'total_paid_amount' => array('type' => self::TYPE_FLOAT, 'validate' => 'isPrice', 'default' => 0),
+            'date_from' => array('type' => self::TYPE_DATE, 'validate' => 'isDate', 'required' => true),
+            'date_to' => array('type' => self::TYPE_DATE, 'validate' => 'isDate', 'required' => true),
+            'total_price_tax_excl' => array('type' => self::TYPE_FLOAT, 'validate' => 'isPrice', 'required' => true),
+            'total_price_tax_incl' => array('type' => self::TYPE_FLOAT, 'validate' => 'isPrice', 'required' => true),
+            'total_paid_amount' => array('type' => self::TYPE_FLOAT, 'validate' => 'isPrice', 'default' => 0, 'required' => true),
             'is_refunded' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
             // 'available_for_order' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
             'is_back_order' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
 
             // hotel information/location/contact
-            'room_num' => array('type' => self::TYPE_STRING),
-            'room_type_name' => array('type' => self::TYPE_STRING),
-            'hotel_name' => array('type' => self::TYPE_STRING),
-            'city' => array('type' => self::TYPE_STRING, 'validate' => 'isCityName', 'size' => 64),
+            'room_num' => array('type' => self::TYPE_STRING, 'required' => true),
+            'room_type_name' => array('type' => self::TYPE_STRING, 'required' => true),
+            'hotel_name' => array('type' => self::TYPE_STRING, 'required' => true),
+            'city' => array('type' => self::TYPE_STRING, 'validate' => 'isCityName', 'size' => 64, 'required' => true),
             'state' => array('type' => self::TYPE_STRING),
-            'country' => array('type' => self::TYPE_STRING),
+            'country' => array('type' => self::TYPE_STRING, 'required' => true),
             'zipcode' => array('type' => self::TYPE_STRING),
-            'phone' => array('type' => self::TYPE_STRING, 'validate' => 'isPhoneNumber', 'size' => 32),
-            'email' => array('type' => self::TYPE_STRING, 'validate' => 'isEmail', 'size' => 255),
-            'check_in_time' => array('type' => self::TYPE_STRING),
-            'check_out_time' => array('type' => self::TYPE_STRING),
-            'adult' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
+            'phone' => array('type' => self::TYPE_STRING, 'validate' => 'isPhoneNumber', 'size' => 32, 'required' => true),
+            'email' => array('type' => self::TYPE_STRING, 'validate' => 'isEmail', 'size' => 255, 'required' => true),
+            'check_in_time' => array('type' => self::TYPE_STRING, 'required' => true),
+            'check_out_time' => array('type' => self::TYPE_STRING, 'required' => true),
+            'adult' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => true),
             'children' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
 
             'date_add' => array('type' => self::TYPE_DATE, 'validate' => 'isDate'),
@@ -995,7 +995,7 @@ class HotelBookingDetail extends ObjectModel
         $sql = 'SELECT `id` AS `id_room`, `id_product`, `id_hotel`, `room_num`, `comment` AS `room_comment`
             FROM `'._DB_PREFIX_.'htl_room_information`
             WHERE `id_hotel`='.(int)$hotel_id.' AND `id_product`='.(int)$room_type.'
-            AND (id_status = '. HotelRoomInformation::STATUS_ACTIVE .' or id_status = '. HotelRoomInformation::STATUS_TEMPORARY_INACTIVE .') 
+            AND (id_status = '. HotelRoomInformation::STATUS_ACTIVE .' or id_status = '. HotelRoomInformation::STATUS_TEMPORARY_INACTIVE .')
             AND `id` IN (
                 SELECT `id_room` FROM `'._DB_PREFIX_.'htl_booking_detail`
                 WHERE `date_from` = \''.pSQL($date_from).'\' AND `date_to` = \''.pSQL($date_to).'\'
