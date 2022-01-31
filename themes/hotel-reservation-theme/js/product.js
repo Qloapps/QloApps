@@ -1100,6 +1100,10 @@ $(document).ready(function() {
         showOtherMonths: true,
         dateFormat: 'dd-mm-yy',
         minDate: 0,
+        beforeShow: function (input, instance) {
+            // So that on translating page date is translated to NaN-NaN-NaN
+            $('.ui-datepicker').addClass('notranslate');
+        },
         beforeShowDay: function (date) {
             // highlight dates of the selected date range
             return highlightSelectedDateRange(date, $("#room_check_in").val(), $("#room_check_out").val());
@@ -1156,6 +1160,9 @@ $(document).ready(function() {
         showOtherMonths: true,
         dateFormat: 'dd-mm-yy',
         beforeShow: function (input, instance) {
+            // So that on translating page date is translated to NaN-NaN-NaN
+            $('.ui-datepicker').addClass('notranslate');
+
             var date_to = $('#room_check_in').val();
             if (typeof date_to != 'undefined' && date_to != '') {
                 var date_format = date_to.split("-");
