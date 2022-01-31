@@ -198,9 +198,13 @@
 											<div class="room_info_heading">
 												<span>{l s='Room Features'}</span>
 											</div>
-											<div class="room_info_content">
+											<div class="room_info_content row">
 												{foreach from=$features key=ftr_k item=ftr_v}
-													<img title="{$ftr_v.name|escape:'html':'UTF-8'}" alt="{$ftr_v.name|escape:'html':'UTF-8'}" width="15px" src="{$link->getMediaLink("`$ftr_img_src|escape:'html':'UTF-8'`{$ftr_v.value|escape:'html':'UTF-8'}")}">&nbsp;
+													<div class="col-md-3 col-sm-4 col-xs-6">
+														<div class="rm_ftr_wrapper" title="{$ftr_v.name|escape:'html':'UTF-8'}" alt="{$ftr_v.name|escape:'html':'UTF-8'}" >
+															<img src="{$link->getMediaLink("`$ftr_img_src|escape:'html':'UTF-8'`{$ftr_v.value|escape:'html':'UTF-8'}")}">  {$ftr_v.name|escape:'html':'UTF-8'}
+														</div>
+													</div>
 												{/foreach}
 											</div>
 										</div>
