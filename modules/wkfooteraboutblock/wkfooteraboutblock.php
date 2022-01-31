@@ -46,7 +46,7 @@ class WkFooterAboutBlock extends Module
             array('WK_HTL_SHORT_DESC' => Configuration::get('WK_HTL_SHORT_DESC', $this->context->language->id))
         );
 
-        $this->context->controller->addCSS(_PS_MODULE_DIR_.$this->name.'/views/css/wkFooterAboutBlockFront.css');
+        $this->context->controller->addCSS($this->_path.'/views/css/wkFooterAboutBlockFront.css');
         return $this->display(__FILE__, 'wkFooterAboutBlock.tpl');
     }
 

@@ -98,7 +98,7 @@ class WkHotelRoom extends Module
             )
         );
 
-        $this->context->controller->addCSS(_PS_MODULE_DIR_.$this->name.'/views/css/WkHotelRoomBlockFront.css');
+        $this->context->controller->addCSS($this->_path.'/views/css/WkHotelRoomBlockFront.css');
 
         return $this->display(__FILE__, 'hotelRoomDisplayBlock.tpl');
     }

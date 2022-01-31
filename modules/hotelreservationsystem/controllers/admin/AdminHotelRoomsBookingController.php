@@ -676,6 +676,6 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
         parent::setMedia();
 
         $this->addCSS(array(_MODULE_DIR_.'hotelreservationsystem/views/css/HotelReservationAdmin.css'));
-        $this->addJs(_PS_MODULE_DIR_.$this->module->name.'/views/js/HotelReservationAdmin.js');
+        $this->addJs(_MODULE_DIR_.$this->module->name.'/views/js/HotelReservationAdmin.js');
     }
 }

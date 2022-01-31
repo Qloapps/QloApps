@@ -200,8 +200,8 @@ class wkhotelfilterblock extends Module
         if ($this->context->controller->php_self == 'category') {
             Media::addJsDef(array('noRoomAvailTxt' => $this->l('No room available')));
 
-            $this->context->controller->addJS(_PS_MODULE_DIR_.$this->name.'/views/js/wkhotelfilterblock.js');
-            $this->context->controller->addCSS(_PS_MODULE_DIR_.$this->name.'/views/css/wkhotelfilterblock.css');
+            $this->context->controller->addJS($this->_path.'/views/js/wkhotelfilterblock.js');
+            $this->context->controller->addCSS($this->_path.'/views/css/wkhotelfilterblock.css');
             $id_lang = $this->context->language->id;
             $all_feat = FeatureCore::getFeatures($id_lang);
 

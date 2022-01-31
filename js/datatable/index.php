@@ -1,6 +1,6 @@
 <?php
 /**
-* 2010-2020 Webkul.
+* 2010-2021 Webkul.
 *
 * NOTICE OF LICENSE
 *
@@ -14,7 +14,7 @@
 * needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
 *
 *  @author    Webkul IN <support@webkul.com>
-*  @copyright 2010-2020 Webkul IN
+*  @copyright 2010-2021 Webkul IN
 *  @license   https://store.webkul.com/license.html
 */
 
@@ -25,5 +25,5 @@ header('Cache-Control: no-store, no-cache, must-revalidate');
 header('Cache-Control: post-check=0, pre-check=0', false);
 header('Pragma: no-cache');
 
-header('Location: ../../../');
+header('Location: ../../');
 exit;

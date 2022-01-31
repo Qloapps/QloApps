@@ -458,7 +458,6 @@ class AdminHotelFeaturePricesSettingsController extends ModuleAdminController
     public function setMedia()
     {
         parent::setMedia();
-        $this->addCSS(_MODULE_DIR_.'hotelreservationsystem/views/css/datepickerCustom.css');
         $this->addCSS(_MODULE_DIR_.'hotelreservationsystem/views/css/HotelReservationAdmin.css');
         $this->addJs(_MODULE_DIR_.'hotelreservationsystem/views/js/HotelReservationAdmin.js');
     }

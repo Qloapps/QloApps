@@ -49,7 +49,7 @@ class WkFooterPaymentBlock extends Module
         $objPaymentBlockInfo = new WkFooterPaymentBlockInfo();
         if ($allPaymentBlocks = $objPaymentBlockInfo->getAllPaymentBlocks(1, 'position')) {
             $this->context->smarty->assign('allPaymentBlocks', $allPaymentBlocks);
-            $this->context->controller->addCSS(_PS_MODULE_DIR_.$this->name.'/views/css/wkFooterPaymentBlockFront.css');
+            $this->context->controller->addCSS($this->_path.'/views/css/wkFooterPaymentBlockFront.css');
             return $this->display(__FILE__, 'wkFooterPaymentBlock.tpl');
         }
     }
