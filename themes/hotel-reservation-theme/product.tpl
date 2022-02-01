@@ -395,7 +395,7 @@
 										</div>
 									{/if}
 									<div class="col-xs-11 demand_adv_option_block">
-										<p>{$demand['name']|escape:'html':'UTF-8'} {if $product->show_price && !isset($restricted_country_mode) && !$PS_CATALOG_MODE}<span class="pull-right extra_demand_option_price">{convertPrice price = {$demand['price']}}</span>{/if}</p>
+										<p>{$demand['name']|escape:'html':'UTF-8'} {if $product->show_price && !isset($restricted_country_mode) && !$PS_CATALOG_MODE}<span class="pull-right"><span class="extra_demand_option_price">{convertPrice price = $demand['price']}</span>{if $demand['price_calc_method'] == $WK_PRICE_CALC_METHOD_EACH_DAY}{l s='/night'}{/if}</span>{/if}</p>
 										{if isset($demand['adv_option']) && $demand['adv_option']}
 											<select class="id_option">
 												{foreach $demand['adv_option'] as $idOption => $option}

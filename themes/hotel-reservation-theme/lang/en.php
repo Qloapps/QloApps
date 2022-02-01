@@ -13,7 +13,6 @@ $_LANG['404_8cf04a9734132302f96da8e113e80ce5'] = 'Home';
 $_LANG['404_7b19b37e7fc3dfe3c3e1ad5b84c7f565'] = 'Home page';
 $_LANG['addresses_d95cf4ab2cbf1dfb63f066b50558b07d'] = 'My account';
 $_LANG['addresses_e45be0a0d4a0b62b15694c1a631e6e62'] = 'My addresses';
-$_LANG['addresses_a6d373cdb986fc009a5a040a4c3d8c1d'] = 'Please configure your default billing and delivery addresses when placing an order. You may also add additional addresses, which can be useful for sending gifts or receiving an order at your office.';
 $_LANG['addresses_aa5e970d64eb228f31669d3411171f92'] = 'Your addresses are listed below.';
 $_LANG['addresses_e380ae58f85252c076e131862857de35'] = 'Be sure to update your personal information if it has changed.';
 $_LANG['addresses_06933067aafd48425d67bcb01bba5cb6'] = 'Update';

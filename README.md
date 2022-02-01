@@ -16,20 +16,27 @@
 </p>
 
 ## Topics
-1. [Introduction](#introduction)
-2. [Requirements](#requirements)
-3. [Installation & Configuration](#installation-and-configuration)
-4. [License](#license)
-5. [Security Vulnerabilities](#security-vulnerabilities)
-6. [Documentation & Demo](#documentation--demo)
-7. [Contribute](#contribute)
-8. [Credits](#credits)
+- [Introduction](#introduction)
+- [Requirements](#requirements)
+	- [Hosted Server Configurations](#hosted-server-configurations)
+	- [Local Server Configurations](#local-server-configurations)
+- [Installation and Configuration](#installation-and-configuration)
+- [License](#license)
+- [Security Vulnerabilities](#security-vulnerabilities)
+- [Documentation & Demo](#documentation--demo)
+	- [QloApps Documentation https://qloapps.com/qlo-reservation-system](#qloapps-documentation-httpsqloappscomqlo-reservation-system)
+	- [QloApps Demo](#qloapps-demo)
+- [Contribute](#contribute)
+- [Credits](#credits)
 
 
 ### Introduction
 
-QloApps also known as Qlo is an **Open-source and Free hotel reservation system** and booking engine. <br>
-With the help of QloApps, you can launch your hotel booking website without any cost and take & manage online bookings . You can manage your online & On-Desk booking easily with QloApps.
+QloApps is one kind of a true open-source hotel reservation system and a booking engine. The system is dedicated to channeling the power of the open-source community to serve the hospitality industry.
+
+From small independent hotels to big hotel chains, QloApps is a one-stop solution for all your hotel business needs.
+
+You will be able to launch your hotel website, showcase your property and take and manage bookings.
 
 ### Requirements
 
