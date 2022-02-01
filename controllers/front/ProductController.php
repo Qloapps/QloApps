@@ -268,6 +268,10 @@ class ProductControllerCore extends FrontController
             $htl_features = array();
             $obj_hotel_room_type = new HotelRoomType();
             $room_info_by_product_id = $obj_hotel_room_type->getRoomTypeInfoByIdProduct($this->product->id);
+            $productCapacity = array();
+            $productCapacity['adult'] = $room_info_by_product_id['adult'];
+            $productCapacity['children'] = $room_info_by_product_id['children'];
+            $this->product->capacity = $productCapacity;
             $hotel_id = $room_info_by_product_id['id_hotel'];
             $useTax = HotelBookingDetail::useTax();
             if (isset($hotel_id) && $hotel_id) {
