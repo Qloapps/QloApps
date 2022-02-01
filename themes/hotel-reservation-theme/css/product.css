@@ -27,8 +27,8 @@
 
 .primary_block .pb-left-column img {
   max-width: 100%;
+  height: auto; }
 
-  height: 100%; }
 a.fancybox-nav {
   outline: 0; }
 
