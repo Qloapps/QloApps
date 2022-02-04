@@ -36,7 +36,7 @@ class sendToAFriend extends Module
 	function __construct($dontTranslate = false)
  	{
  	 	$this->name = 'sendtoafriend';
-		$this->version = '1.9.0';
+		$this->version = '1.9.1';
 		$this->author = 'PrestaShop';
  	 	$this->tab = 'front_office_features';
 		$this->need_instance = 0;

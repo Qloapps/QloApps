@@ -1,4 +1,14 @@
 ------------------------------
+# V2.6.4 to V2.6.5
+------------------------------
+
+## Improved/Changed Features:
+
+* [CO] : [#280] Fixed wrong amount in the payment gateway PaymentReturn Hook.
+* [FO] : [#301] Unused classes removed
+
+
+------------------------------
 # V2.6.3 to V2.6.4
 ------------------------------
 

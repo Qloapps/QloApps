@@ -1,3 +1,16 @@
+------------------------------
+# V1.1.1 to V1.1.2
+------------------------------
+
+## Improved/Changed Features:
+
+[*] FO : [#290] Using $this->_path for including css and js
+[*] CO : [#244] Changed Tools::jsonEncode to json_encode
+
+## Bug/Issues Resolved:
+
+[-] FO : Resolved: On translating page checking and checkout dates are changed to NaN-NaN-NaN #302
+
 -----------------------------
 # V1.1.0 to V1.1.1
 -----------------------------
