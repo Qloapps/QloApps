@@ -35,7 +35,7 @@
 		<div class="row text-center avil-chart-head">
 			<div class="col-md-4 col-xs-4">
 				<div class="row">
-					<div class="col-md-11 col-lg-11 avail-pie-label-container" style="background: #A569DF;">
+					<div class="col-md-11 label-tooltip col-lg-11 avail-pie-label-container" style="background: #A569DF;"  data-toggle="tooltip" data-original-title="The total number of booked rooms among all the rooms.">
 						<div class="">
 							<p class="avail-pie-text">
 								{l s='Occupied' mod='dashoccupancy'}
@@ -51,7 +51,7 @@
 			</div>
 			<div class="col-md-4 col-xs-4">
 				<div class="row">
-					<div class="col-md-11 col-lg-11 avail-pie-label-container" style="background: #56CE56;">
+					<div class="col-md-11 col-lg-11 avail-pie-label-container label-tooltip" style="background: #56CE56;" data-toggle="tooltip" data-original-title="The total number of available rooms for booking.">
 						<div class="">
 							<p class="avail-pie-text">
 								{l s='Available' mod='dashoccupancy'}
@@ -67,10 +67,10 @@
 			</div>
 			<div class="col-md-4 col-xs-4">
 				<div class="row">
-					<div class="col-md-11 col-lg-11 avail-pie-label-container" style="background: #FF655C;">
+					<div class="col-md-11 col-lg-11 avail-pie-label-container label-tooltip" style="background: #FF655C;" data-toggle="tooltip" data-original-title="Rooms not available for booking.">
 						<div class="">
 							<p class="avail-pie-text">
-								{l s='Inactive/ maintainance' mod='dashoccupancy'}
+								{l s='Inactive' mod='dashoccupancy'}
 							</p>
 							<div class="avail-pie-value-container">
 								<p class="avail-pie-value" id="pie_inactive_text">

@@ -86,7 +86,7 @@
 		</div>
 		<div class="col-sm-12 ">
 			<p id="no-chart-info" class="alert alert-info no-chart-info">
-				{l s='The graph is unavilable when selecting a date range of a single day. Select another date range for graph.' mod='dashtrends'}
+				{l s='The graph is unavailable when selecting this date range. Select another date range for the graph.' mod='dashtrends'}
 			</p>
 		</div>
 		<div class='clearfix'></div>
