@@ -86,9 +86,12 @@ class DashOccupancy extends Module
 
 		if (Configuration::get('PS_DASHBOARD_SIMULATION'))
 		{
-			$data['occupied'] = round(rand(0, 20));
-			$data['available'] = round(rand(0, 20));
-			$data['inactive'] = round(rand(0, 20));
+            		$totalRoomsTemp = $totalRooms;
+			$data['occupied'] = round(rand(0, $totalRoomsTemp));
+            		$totalRoomsTemp = $totalRoomsTemp - $data['occupied'];
+			$data['available'] = round(rand(0, $totalRoomsTemp));
+            		$totalRoomsTemp = $totalRoomsTemp - $data['available'];
+			$data['inactive'] = $totalRoomsTemp;
 			$availPieChartData = array();
 			$objChartData = array();
 			$objChartData['label'] = $this->l('Occupied');;

@@ -90,7 +90,7 @@
 				</li>
 				<li>
 					<span class="item-label">
-						<a href="{$link->getAdminLink("AdminReturn")|escape:"html":"UTF-8"}" target="_blank">
+						<a href="{$link->getAdminLink("AdminOrderRefundRequests")|escape:"html":"UTF-8"}" target="_blank">
 							<span>{l s="Refunds" mod="dashactivity"}</span>
 						</a>
 					</span>

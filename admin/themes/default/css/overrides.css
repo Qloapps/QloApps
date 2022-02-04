@@ -5,17 +5,43 @@
 	background:  #fff;
 	position: absolute;
 	z-index: 99999;
-	width: 14rem;
+	width: 18rem;
+    right: -10rem;
 }
 
 .bootstrap #datepicker .daterangepicker thead tr th {
-    color: #fff;
-    font-size: .8em;
-    height: 2.5em;
+	background-color: #fff !important;	
+	color: #555555 !important;
+	font-family: Oxygen;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 14px;
+    line-height: 23px;
+	padding: 5px !important;
+}
+
+.form-date-actions .btn:hover, .form-date-actions .btn:focus, .form-date-actions .btn:active{
+	outline: unset !important; 
+	text-decoration: none;
 }
 
 .bootstrap #datepicker .daterangepicker thead tr:first-child th {
-    font-size: 1.2em;
+	font-size: 16px;
+    font-weight: bold;
+    background-color: #00AFF0 !important;
+    color: #fff !important;
+    padding: 1px !important;
+    text-transform: capitalize;
+}
+
+.bootstrap #datepicker .daterangepicker thead tr:first-child th .icon-angle-left {
+	font-weight: bold;
+	padding: 10px;
+}
+
+.bootstrap #datepicker .daterangepicker thead tr:first-child th .icon-angle-right {
+	font-weight: bold;
+	padding: 10px;
 }
 
 .form-date-actions {

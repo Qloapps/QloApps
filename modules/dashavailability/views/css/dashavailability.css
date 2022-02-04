@@ -97,8 +97,8 @@
     width: auto;
     height: auto;
     margin: 5px auto 0;
-    font: 12pt Arial, sans-serif;
-    z-index: 999;
+    font: Oxygen;
+    z-index: 999 !important;
 }
 
 .ui-datepicker table {
@@ -111,10 +111,10 @@
 
 .ui-datepicker .ui-datepicker-title {
     color: #fff;
-    text-transform: uppercase;
     font-style: normal;
     font-weight: bold;
-    font-size: 20px;
+    font-size: 16px;
+    font-family: Oxygen;
 }
 
 .ui-datepicker-prev {
@@ -125,8 +125,8 @@
 
 .ui-datepicker-prev::before {
     background-position: center -30px;
-    font-weight: 200;
-    font-size: 20px;
+    font-weight: bold;
+    font-size: 16px;
     color: #fff;
     content: "\f104";
     font-family: FontAwesome;
@@ -139,8 +139,8 @@
 
 .ui-datepicker-next::before {
     background-position: center -30px;
-    font-weight: 200;
-    font-size: 20px;
+    font-weight: bold;
+    font-size: 16px;
     color: #fff;
     content: "\f105";
     font-family: FontAwesome;
@@ -170,7 +170,7 @@
     font-family: Oxygen;
     font-style: normal;
     font-weight: bold;
-    font-size: 17px;
+    font-size: 15px;
     line-height: 23px;
     /* identical to box height */
     color: #555555;
@@ -211,7 +211,7 @@
 
 .ui-datepicker .ui-datepicker-prev,
 .ui-datepicker .ui-datepicker-next {
-    top: 10px;
+    top: 5px;
 }
 
 .ui-state-default,
@@ -220,9 +220,9 @@
     border: none;
     font-style: normal;
     font-weight: normal;
-    font-size: 15px;
+    font-size: 14px;
     line-height: 23px;
-    color: #555555;
+    color: #00A4E7;
 }
 
 .ui-datepicker tbody tr {
