@@ -2041,7 +2041,7 @@ class AdminThemesControllerCore extends AdminController
     {
         $protocols = array('https://', 'http://');
         foreach ($protocols as $protocol) {
-            if($xml = @simplexml_load_string(Tools::file_get_contents($protocol._QLO_NATIVE_MODULES_LIST_))) {
+            if($xml = @simplexml_load_string(Tools::file_get_contents($protocol._QLO_API_DOMAIN_.'/xml/'.str_replace('.', '', _QLOAPPS_VERSION_).'.xml'))) {
                 break;
             }
         }
