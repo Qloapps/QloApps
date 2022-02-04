@@ -548,8 +548,8 @@ class HotelHelper
             $htl_rm_type->save();
 
             // Add features to the product
-            $ftr_arr = array(0 => 8, 1 => 9, 2 => 10, 3 => 11);
-            $ftr_val_arr = array(0 => 34, 1 => 35, 2 => 36, 3 => 37);
+            $ftr_arr = array(0 => 1, 1 => 2, 2 => 3, 3 => 4);
+            $ftr_val_arr = array(0 => 1, 1 => 2, 2 => 3, 3 => 4);
             foreach ($ftr_arr as $key_htl_ftr => $val_htl_ftr) {
                 $product->addFeaturesToDB($val_htl_ftr, $ftr_val_arr[$key_htl_ftr]);
             }
