@@ -169,7 +169,7 @@ class ImageTypeCore extends ObjectModel
         $name_without_theme_name = str_replace(array('_'.$theme_name, $theme_name.'_'), '', $name);
 
         //check if the theme name is already in $name if yes only return $name
-        if (strstr($name, $theme_name) && self::getByNameNType($name)) {
+        if ($theme_name !== null && strstr($name, $theme_name) && self::getByNameNType($name)) {
             return $name;
         } elseif (self::getByNameNType($name_without_theme_name.'_'.$theme_name)) {
             return $name_without_theme_name.'_'.$theme_name;

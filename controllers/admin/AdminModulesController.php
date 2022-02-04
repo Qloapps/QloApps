@@ -60,8 +60,6 @@ class AdminModulesControllerCore extends AdminController
     protected $iso_default_country;
     protected $filter_configuration = array();
 
-    protected $xml_modules_list = _QLO_NATIVE_MODULES_LIST_;
-
     /**
      * Admin Modules Controller Constructor
      * Init list modules categories
@@ -166,11 +164,13 @@ class AdminModulesControllerCore extends AdminController
 
     public function ajaxProcessRefreshModuleList($force_reload_cache = false)
     {
+        $xml_modules_list = _QLO_API_DOMAIN_.'/xml/'.str_replace('.', '', _QLOAPPS_VERSION_).'.xml';
+
         // Refresh modules_list.xml every week
         if (!$this->isFresh(Module::CACHE_FILE_MODULES_LIST, 86400) || $force_reload_cache) {
-            if ($this->refresh(Module::CACHE_FILE_MODULES_LIST, 'https://'.$this->xml_modules_list)) {
+            if ($this->refresh(Module::CACHE_FILE_MODULES_LIST, 'https://'.$xml_modules_list)) {
                 $this->status = 'refresh';
-            } elseif ($this->refresh(Module::CACHE_FILE_MODULES_LIST, 'http://'.$this->xml_modules_list)) {
+            } elseif ($this->refresh(Module::CACHE_FILE_MODULES_LIST, 'http://'.$xml_modules_list)) {
                 $this->status = 'refresh';
             } else {
                 $this->status = 'error';
