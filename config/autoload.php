@@ -24,6 +24,8 @@
 *  International Registered Trademark & Property of PrestaShop SA
 */
 require_once (_PS_TOOL_DIR_.'defuse/php-encryption/defuse-crypto.phar');
+require_once (_PS_TOOL_DIR_.'random_compat/lib/random.php');
+
 
 // Include some alias functions
 require_once(_PS_CONFIG_DIR_.'alias.php');
