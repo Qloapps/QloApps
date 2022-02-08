@@ -224,7 +224,7 @@
 				month = d.getMonth(),
 				currentDate = this.date.valueOf();
 			this.picker.find('.daterangepicker-days th:eq(1)')
-						.text(year+' / '+DPGlobal.dates.months[month]).append('&nbsp;<small><i class="icon-angle-down"></i><small>');
+						.html(DPGlobal.dates.months[month]+'&nbsp;'+year).append('&nbsp;<small><i class="icon-angle-down"></i><small>');
 			var prevMonth = new Date(year, month-1, 28,0,0,0,0),
 				day = DPGlobal.getDaysInMonth(prevMonth.getFullYear(), prevMonth.getMonth());
 			prevMonth.setDate(day);

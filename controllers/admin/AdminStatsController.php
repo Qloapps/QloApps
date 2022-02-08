@@ -927,7 +927,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
         $newFromDate = $date_from;
         $availability_data = array();
         $from = strtotime($date_from." 00:00:00");
-		$to = min(time(), strtotime($date_from."+".$days." day 23:59:59"));
+		$to = strtotime($date_from."+".$days." day 23:59:59");
 
         for ($date = $from; $date <= $to; $date = strtotime("+1 days", $date)) { 
             $newFromDate = date('Y-m-d', strtotime($newFromDate.'+'.($days/5).'days'));
@@ -995,10 +995,12 @@ class AdminStatsControllerCore extends AdminStatsTabController
     public static function getRevenue($dateFrom, $dateTo)
     {
         $result = Db::getInstance()->getValue(
-            'SELECT SUM(`total_paid_tax_excl` / `conversion_rate`)
-            FROM `'._DB_PREFIX_.'orders`
-            WHERE `invoice_date` BETWEEN "'.pSQL($dateFrom).' 00:00:00" AND "'.pSQL($dateTo).' 23:59:59"'
+            'SELECT (SUM(`total_paid_tax_excl` / `conversion_rate`) - SUM(`refunded_amount`))
+             FROM `'._DB_PREFIX_.'orders`
+             LEFT JOIN `' ._DB_PREFIX_.'order_return`  ON '._DB_PREFIX_.'orders.`id_order` = '._DB_PREFIX_.'order_return.`id_order`
+             WHERE ' ._DB_PREFIX_.'orders.`invoice_date` BETWEEN "'.pSQL($dateFrom).' 00:00:00" AND "'.pSQL($dateTo).' 23:59:59"'
         );
+
         return Tools::displayPrice($result ? $result : 0);
     }
 

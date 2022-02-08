@@ -81,8 +81,7 @@ class DashAvailability extends Module
         }
         if (Configuration::get("PS_DASHBOARD_SIMULATION")) {
             $from = strtotime($dateFrom." 00:00:00");
-			$to = min(time(), strtotime($dateFrom."+".$days." days 23:59:59"));
-
+			$to = strtotime($dateFrom."+".$days." days 23:59:59");
 	        $data = array();
 	        for ($date = $from; $date <= $to; $date = strtotime("+1 days", $date)) {
                 $availability_data["values"][] = array($date, round(rand(0, 20)));
@@ -94,7 +93,7 @@ class DashAvailability extends Module
                     "key" => $this->l("Availabilities"),
                     "border_color" => "#11f0fc",
                     "color" => "#72C3F0",                   
-                ),
+                )
             );
             $data[] = $availability_data;
 
@@ -110,7 +109,7 @@ class DashAvailability extends Module
                     "key" => $this->l("Availabilities"),
                     "border_color" => "#11f0fc",
                     "color" => "#72C3F0",                   
-                ),
+                )
             );
             $data[] = $availability_data;
 		}
