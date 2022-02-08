@@ -1,3 +1,12 @@
+-----------------------------
+# V2.9.4 to V2.9.5
+-----------------------------
+
+## Improved/Changed Features:
+
+* [CO] : [#244] Changed Tools::jsonEncode to json_encode
+
+
 2014-04-22 18:56:57 +0200	// Changelog updated
 2014-04-01 14:17:21 +0200	// blockcategories new module version
 2014-03-27 11:46:01 +0100	// follow up #PSCSX-1405 again

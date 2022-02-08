@@ -1,4 +1,14 @@
 ------------------------------
+# V1.1.3 to V1.1.4
+------------------------------
+
+## Improved/Changed Features:
+
+* [CO] : [#280] Fixed wrong amount in the payment gateway PaymentReturn Hook.
+* [FO] : [#301] Unused classes removed
+
+
+------------------------------
 # V1.1.2 to V1.1.3
 ------------------------------
 

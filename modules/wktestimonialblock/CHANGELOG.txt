@@ -1,3 +1,11 @@
+# V1.1.4 to V1.1.5
+------------------------------
+
+## Improved/Changed Features:
+
+[*] FO : Using $this->_path for including css and js
+
+
 -----------------------------
 # V1.1.3 to V1.1.4
 -----------------------------

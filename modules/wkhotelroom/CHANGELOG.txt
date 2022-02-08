@@ -1,3 +1,13 @@
+------------------------------
+# V1.1.7 to V1.1.7
+------------------------------
+
+## Improved/Changed Features:
+
+[*] FO : [#290] Using $this->_path for including css and js
+[*] FO : [#312] Updated view room link target attribute
+
+
 -----------------------------
 # V1.1.5 to V1.1.6
 -----------------------------
