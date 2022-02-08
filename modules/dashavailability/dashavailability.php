@@ -94,7 +94,7 @@ class DashAvailability extends Module
                     "key" => $this->l("Availabilities"),
                     "border_color" => "#11f0fc",
                     "color" => "#72C3F0",                   
-                ),
+                )
             );
             $data[] = $availability_data;
 
@@ -110,7 +110,7 @@ class DashAvailability extends Module
                     "key" => $this->l("Availabilities"),
                     "border_color" => "#11f0fc",
                     "color" => "#72C3F0",                   
-                ),
+                )
             );
             $data[] = $availability_data;
 		}
