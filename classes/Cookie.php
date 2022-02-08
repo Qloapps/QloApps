@@ -76,7 +76,13 @@ class CookieCore
         $this->_name = 'PrestaShop-'.md5(($this->_standalone ? '' : _PS_VERSION_).$name.$this->_domain);
         $this->_allow_writing = true;
         $this->_salt = $this->_standalone ? str_pad('', 8, md5('ps'.__FILE__)) : _COOKIE_IV_;
-        $this->_cipherTool = new PhpEncryption(_NEW_COOKIE_KEY_);
+        if ($this->_standalone) {
+            $asciiSafeString = \Defuse\Crypto\Encoding::saveBytesToChecksummedAsciiSafeString(Key::KEY_CURRENT_VERSION, str_pad($name, Key::KEY_BYTE_SIZE, md5(__FILE__)));
+            $this->_cipherTool = new PhpEncryption($asciiSafeString);
+        } else {
+            $this->_cipherTool = new PhpEncryption(_NEW_COOKIE_KEY_);
+        }
+        
         $this->_secure = (bool)$secure;
 
         $this->update();
