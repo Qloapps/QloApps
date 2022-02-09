@@ -21,7 +21,7 @@
   - #267: Removed mysql support, pdomysql now required
   - #269: Replaced mcrypt with openssl
   - #272: Changed default DB prefix to qlo_ 
-  - #276: Paypal module updated and PaypalUSA module removed 
+  - #276: Paypal and PaypalUSA module removed 
   - #290: Updated path for including css and js in modules | Moved plugins to core js folder 
   - #299: Added composer.json file 
 
@@ -31,6 +31,8 @@
 
 - Back Office
   - #297: Changed import button icon on Localization page 
+  - #310: Dashboard improvement 
+  - #327: Resolved QloApps dashboard issues
 
 
 ## Bug Fixed:
@@ -48,10 +50,8 @@
   - #288: Resolved: No validation for field 'id_parent in' in 'categories' API. 
   - #289: Validations added to the fields of "bookings" API for POST / PUT API requests 
   - #307: Cart and Order API Issues resolved 
-  - #310: Dashboard improvement 
   - #312: Text issues solved 
   - #321: Fixed QloApps installation issues
-  - #322: Resolved QloApps dashboard issues
   - #324: Resolved compatibility issue with php5.6
   
 - Back Office:
