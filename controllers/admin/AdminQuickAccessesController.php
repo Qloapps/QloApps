@@ -153,7 +153,7 @@ class AdminQuickAccessesControllerCore extends AdminController
     public function getQuickAccessesList()
     {
         $links = QuickAccess::getQuickAccesses($this->context->language->id);
-        return Tools::jsonEncode(array_map(array($this, 'getLinkToken'), $links));
+        return json_encode(array_map(array($this, 'getLinkToken'), $links));
     }
 
     public function getLinkToken($item)
@@ -195,7 +195,7 @@ class AdminQuickAccessesControllerCore extends AdminController
         $this->errors = array_unique($this->errors);
         if (!empty($this->errors)) {
             $this->errors['has_errors'] = true;
-            $this->ajaxDie(Tools::jsonEncode($this->errors));
+            $this->ajaxDie(json_encode($this->errors));
             return false;
         }
         return $this->getQuickAccessesList();

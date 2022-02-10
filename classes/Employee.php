@@ -127,6 +127,7 @@ class EmployeeCore extends ObjectModel
 
     protected $webserviceParameters = array(
         'fields' => array(
+            'email' => array('setter' => 'setWsEmail'),
             'id_lang' => array('xlink_resource' => 'languages'),
             'last_passwd_gen' => array('setter' => null),
             'stats_date_from' => array('setter' => null),
@@ -344,15 +345,41 @@ class EmployeeCore extends ObjectModel
         );
     }
 
+    // validate and set email for the employee
+    public function setWsEmail($email)
+    {
+        if (Validate::isEmail($email)
+            && Employee::employeeExists($email)
+            && (!$this->email || ($employee = new Employee((int)$this->id)) && $employee->email != $email)
+        ) {
+            WebserviceRequest::getInstance()->setError(400, 'An account already exists for this email address: '.$email, 134);
+
+            return false;
+        }
+        $this->email = $email;
+
+        return true;
+    }
+
+    // validate and set password for the employee
     public function setWsPasswd($passwd)
     {
         if ($this->id != 0) {
             if ($this->passwd != $passwd) {
-                $this->passwd = Tools::encrypt($passwd);
+                if (!Validate::isPasswd($passwd, Validate::ADMIN_PASSWORD_LENGTH)) {
+                    WebserviceRequest::getInstance()->setError(400, 'The password must be at least '.Validate::ADMIN_PASSWORD_LENGTH.' characters long.', 134);
+                } else {
+                    $this->passwd = Tools::encrypt($passwd);
+                }
             }
         } else {
-            $this->passwd = Tools::encrypt($passwd);
+            if (!Validate::isPasswd($passwd, Validate::ADMIN_PASSWORD_LENGTH)) {
+                WebserviceRequest::getInstance()->setError(400, 'The password must be at least '.Validate::ADMIN_PASSWORD_LENGTH.' characters long.', 134);
+            } else {
+                $this->passwd = Tools::encrypt($passwd);
+            }
         }
+
         return true;
     }
 

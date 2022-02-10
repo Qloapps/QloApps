@@ -1,0 +1,9 @@
+<!--
+Description: entry parsed modified, W3DTF format, UTC
+Expect:      not bozo and entries[0]['modified_parsed'] == (2003, 12, 31, 10, 14, 55, 2, 365, 0)
+-->
+<feed version="0.3" xmlns="http://purl.org/atom/ns#">
+<entry>
+<modified>2003-12-31T10:14:55Z</modified>
+</entry>
+</feed>

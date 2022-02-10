@@ -11,7 +11,7 @@
 /**
  * Swift Mailer class.
  *
- * @author  Chris Corbyn
+ * @author Chris Corbyn
  */
 class Swift_Mailer
 {
@@ -33,7 +33,7 @@ class Swift_Mailer
      *
      * @param Swift_Transport $transport
      *
-     * @return Swift_Mailer
+     * @return self
      */
     public static function newInstance(Swift_Transport $transport)
     {
@@ -69,7 +69,7 @@ class Swift_Mailer
      * @param Swift_Mime_Message $message
      * @param array              $failedRecipients An array of failures by-reference
      *
-     * @return int
+     * @return int The number of successful recipients. Can be 0 which indicates failure
      */
     public function send(Swift_Mime_Message $message, &$failedRecipients = null)
     {

@@ -63,6 +63,9 @@ $(document).ready(function() {
             return highlightSelectedDateRange(date, $("#check_in_time").val(), $("#check_out_time").val());
         },
         beforeShow: function (input, instance) {
+            // So that on translating page date is translated to NaN-NaN-NaN
+            $('.ui-datepicker').addClass('notranslate');
+
             var date_to = $('#check_in_time').val();
             if (typeof date_to != 'undefined' && date_to != '') {
                 var date_format = date_to.split("-");
@@ -82,6 +85,10 @@ $(document).ready(function() {
         dateFormat: 'dd-mm-yy',
         minDate: 0,
         dayNamesMin: [ "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+        beforeShow: function (input, instance) {
+            // So that on translating page date is translated to NaN-NaN-NaN
+            $('.ui-datepicker').addClass('notranslate');
+        },
         //for calender Css
         beforeShowDay: function (date) {
             // highlight dates of the selected date range

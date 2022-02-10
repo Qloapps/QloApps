@@ -38,7 +38,7 @@ class SEKeywords extends ModuleGraph
     {
         $this->name = 'sekeywords';
         $this->tab = 'analytics_stats';
-        $this->version = '1.4.1';
+        $this->version = '1.4.2';
         $this->author = 'PrestaShop';
         $this->need_instance = 0;
 
@@ -89,7 +89,7 @@ class SEKeywords extends ModuleGraph
 
     public function hookTop($params)
     {
-        if (!isset($_SERVER['HTTP_REFERER']) || strpos($_SERVER['HTTP_REFERER'], Tools::getHttpHost(false, false) == 0)) {
+        if (!isset($_SERVER['HTTP_REFERER']) || strpos($_SERVER['HTTP_REFERER'], Tools::getHttpHost(false, false)) == 0) {
             return;
         }
 

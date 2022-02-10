@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- ======================================================================
+ * Author: Dino Morelli
+ * Began: 2004-Feb-18
+ * Build #: 0001
+ * Version: 0.1
+ * E-Mail: dino.morelli@snet.net
+ * URL: (none yet)
+ * License: (none yet)
+ * 
+ * ========================================================================
+ * 
+ * RSS v2.0 Relax NG schema
+ * 
+ * ==================================================================== -->
+
+
+<grammar xmlns="http://relaxng.org/ns/structure/1.0">
+
+  <start>
+    <ref name="element-rss" />
+  </start>
+
+  <define name="element-title">
+    <element name="title">
+
+      <text />
+    </element>
+  </define>
+
+  <define name="element-description">
+    <element name="description">
+      <text />
+    </element>
+  </define>
+
+  <define name="element-link">
+    <element name="link">
+      <text />
+    </element>
+  </define>
+
+  <define name="element-category">
+    <element name="category">
+      <optional>
+
+        <attribute name="domain" />
+      </optional>
+      <text />
+    </element>
+  </define>
+
+  <define name="element-rss">
+    <element name="rss">
+      <attribute name="version">
+
+        <value>2.0</value>
+      </attribute>
+      <element name="channel">
+        <interleave>
+          <ref name="element-title" />
+          <ref name="element-link" />
+          <ref name="element-description" />
+          <optional>
+
+            <element name="language"><text /></element>
+          </optional>
+          <optional>
+            <element name="copyright"><text /></element>
+          </optional>
+          <optional>
+            <element name="lastBuildDate"><text /></element>
+          </optional>
+          <optional>
+
+            <element name="docs"><text /></element>
+          </optional>
+          <optional>
+            <element name="generator"><text /></element>
+          </optional>
+          <optional>
+            <ref name="element-category" />
+          </optional>
+          <optional>
+
+            <element name="managingEditor"><text /></element>
+          </optional>
+          <optional>
+            <element name="webMaster"><text /></element>
+          </optional>
+          <optional>
+            <element name="pubDate"><text /></element>
+          </optional>
+          <optional>
+
+            <element name="rating"><text /></element>
+          </optional>
+          <optional>
+            <element name="image">
+              <interleave>
+                <element name="url"><text /></element>
+                <ref name="element-title" />
+                <ref name="element-link" />
+                <optional>
+
+                  <element name="width"><text /></element>
+                </optional>
+                <optional>
+                  <element name="height"><text /></element>
+                </optional>
+                <optional>
+                  <ref name="element-description" />
+                </optional>
+              </interleave>
+
+            </element>
+          </optional>
+          <optional>
+            <element name="cloud">
+              <attribute name="domain" />
+              <attribute name="port" />
+              <attribute name="path" />
+              <attribute name="registerProcedure" />
+              <attribute name="protocol" />
+
+            </element>
+          </optional>
+          <optional>
+            <element name="textInput">
+              <interleave>
+                <ref name="element-title" />
+                <ref name="element-description" />
+                <element name="name"><text /></element>
+                <ref name="element-link" />
+
+              </interleave>
+            </element>
+          </optional>
+          <optional>
+            <element name="skipHours">
+              <oneOrMore>
+                <element name="hour">
+                  <choice>
+                    <value>0</value>
+
+                    <value>1</value>
+                    <value>2</value>
+                    <value>3</value>
+                    <value>4</value>
+                    <value>5</value>
+                    <value>6</value>
+
+                    <value>7</value>
+                    <value>8</value>
+                    <value>9</value>
+                    <value>10</value>
+                    <value>11</value>
+                    <value>12</value>
+
+                    <value>13</value>
+                    <value>14</value>
+                    <value>15</value>
+                    <value>16</value>
+                    <value>17</value>
+                    <value>18</value>
+
+                    <value>19</value>
+                    <value>20</value>
+                    <value>21</value>
+                    <value>22</value>
+                    <value>23</value>
+                  </choice>
+
+                </element>
+              </oneOrMore>
+            </element>
+          </optional>
+          <optional>
+            <element name="skipDays">
+              <oneOrMore>
+                <element name="day">
+                  <choice>
+
+                    <value>0</value>
+                    <value>1</value>
+                    <value>2</value>
+                    <value>3</value>
+                    <value>4</value>
+                    <value>5</value>
+
+                    <value>6</value>
+                    <value>7</value>
+                    <value>8</value>
+                    <value>9</value>
+                    <value>10</value>
+                    <value>11</value>
+
+                    <value>12</value>
+                    <value>13</value>
+                    <value>14</value>
+                    <value>15</value>
+                    <value>16</value>
+                    <value>17</value>
+
+                    <value>18</value>
+                    <value>19</value>
+                    <value>20</value>
+                    <value>21</value>
+                    <value>22</value>
+                    <value>23</value>
+
+                    <value>24</value>
+                    <value>25</value>
+                    <value>26</value>
+                    <value>27</value>
+                    <value>28</value>
+                    <value>29</value>
+
+                    <value>30</value>
+                    <value>31</value>
+                  </choice>
+                </element>
+              </oneOrMore>
+            </element>
+          </optional>
+          <optional>
+
+            <element name="ttl"><text /></element>
+          </optional>
+          <zeroOrMore>
+            <element name="item">
+              <interleave>
+                <choice>
+                  <ref name="element-title" />
+                  <ref name="element-description" />
+                  <interleave>
+
+                    <ref name="element-title" />
+                    <ref name="element-description" />
+                  </interleave>
+                </choice>
+                <optional>
+                  <ref name="element-link" />
+                </optional>
+                <optional>
+                  <element name="author"><text /></element>
+
+                </optional>
+                <optional>
+                  <ref name="element-category" />
+                </optional>
+                <optional>
+                  <element name="comments"><text /></element>
+                </optional>
+                <optional>
+                  <element name="enclosure">
+
+                    <attribute name="url" />
+                    <attribute name="length" />
+                    <attribute name="type" />
+                    <text />
+                  </element>
+                </optional>
+                <optional>
+                  <element name="guid">
+                    <optional>
+
+                      <attribute name="isPermaLink">
+                        <choice>
+                          <value>true</value>
+                          <value>false</value>
+                        </choice>
+                      </attribute>
+                    </optional>
+                    <text />
+
+                  </element>
+                </optional>
+                <optional>
+                  <element name="pubDate"><text /></element>
+                </optional>
+                <optional>
+                  <element name="source">
+                    <attribute name="url" />
+                    <text />
+
+                  </element>
+                </optional>
+              </interleave>
+            </element>
+          </zeroOrMore>
+        </interleave>
+      </element>
+    </element>
+  </define>
+
+</grammar>

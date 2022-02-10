@@ -87,8 +87,8 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
                 'title' => $this->l('Configuration'),
                 'fields' => array(
                     'WK_ROOM_LEFT_WARNING_NUMBER' => array(
-                        'title' => $this->l('Display remaining Number ofrooms when therooms are lower than or equal to'),
-                        'hint' => $this->l('Mention the minimum quantity ofrooms after which alert message of remainingrooms will get displayed to users.'),
+                        'title' => $this->l('Display remaining Number of rooms when the rooms are lower than or equal to'),
+                        'hint' => $this->l('Mention the minimum quantity of rooms after which alert message of remaining rooms will get displayed to users.'),
                         'validation' => 'isInt',
                         'cast' => 'intval',
                         'type' => 'text',

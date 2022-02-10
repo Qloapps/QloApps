@@ -80,6 +80,7 @@ class HotelRoomTypeDemand extends ObjectModel
             foreach ($roomTypeDemands as &$demand) {
                 $idGlobalDemand = $demand['id_global_demand'];
                 $roomTypeDemandInfo[$idGlobalDemand]['name'] = $demand['name'];
+                $roomTypeDemandInfo[$idGlobalDemand]['price_calc_method'] = $demand['price_calc_method'];
 
                 $roomTypeDemandInfo[$idGlobalDemand]['price'] = HotelRoomTypeDemand::getPriceStatic(
                     $idProduct,

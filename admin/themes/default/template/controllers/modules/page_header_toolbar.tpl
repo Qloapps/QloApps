@@ -36,7 +36,7 @@
 <div class="page-bar toolbarBox">
 	<div class="btn-toolbar">
 		<ul class="nav nav-pills pull-right">
-			{* {if isset($upgrade_available) && $upgrade_available|@count}
+			{if isset($upgrade_available) && $upgrade_available|@count}
 				{assign var='modules' value=''}
 				{foreach from=$upgrade_available item='module'}
 					{assign var='modules' value=$modules|cat:$module.name:'|'}
@@ -55,7 +55,7 @@
 						<div>{l s='Check for update'}</div>
 					</a>
 				</li>
-			{/if} *}
+			{/if}
 			{if $add_permission eq '1' && ($context_mode != Context::MODE_HOST)}
 			<li>
 				<a id="desc-module-new" class="toolbar_btn anchor" href="#" onclick="$('#module_install').slideToggle();" title="{l s='Add a new module'}">

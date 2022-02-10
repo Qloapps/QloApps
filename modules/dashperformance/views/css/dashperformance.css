@@ -1,0 +1,60 @@
+/**
+* 2010-2021 Webkul.
+*
+* NOTICE OF LICENSE
+*
+* All right is reserved,
+* Please go through LICENSE.txt file inside our module
+*
+* DISCLAIMER
+*
+* Do not edit or add to this file if you wish to upgrade this module to newer
+* versions in the future. If you wish to customize this module for your
+* needs please refer to CustomizationPolicy.txt file inside our module for more information.
+*
+* @author Webkul IN
+* @copyright 2010-2021 Webkul IN
+* @license LICENSE.txt
+*/
+
+/* square columns setup - start */
+#dashperformance .circles-wrapper > div {
+    padding: 15px !important;
+}
+
+#dashperformance .circle-wrapper {
+    position: relative;
+    width: 100%;
+    padding-bottom: 100%;
+}
+
+#dashperformance .circle {
+    position: absolute;
+}
+/* square columns setup - end */
+
+#dashperformance .circle {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+	cursor: pointer;
+}
+
+#dashperformance .circle-content-wrapper {
+	height: 100%;
+	display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+#dashperformance .title-wrapper p {
+	font-weight: bold;
+	font-size: 14px;
+	line-height: 18px;
+}
+
+#dashperformance .value-wrapper p {
+	font-weight: bold;
+	font-size: 24px;
+	line-height: 30px;
+}

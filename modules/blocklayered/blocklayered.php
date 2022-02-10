@@ -37,7 +37,7 @@ class BlockLayered extends Module
 	{
 		$this->name = 'blocklayered';
 		$this->tab = 'front_office_features';
-		$this->version = '2.1.2';
+		$this->version = '2.1.3';
 		$this->author = 'PrestaShop';
 		$this->need_instance = 0;
 		$this->bootstrap = true;
@@ -1621,7 +1621,7 @@ class BlockLayered extends Module
 				'template_name' => $template['name'],
 				'attribute_groups' => $attribute_groups,
 				'features' => $features,
-				'filters' => Tools::jsonEncode($filters),
+				'filters' => json_encode($filters),
 				'total_filters' => 6+count($attribute_groups)+count($features)
 			));
 
@@ -1862,7 +1862,7 @@ class BlockLayered extends Module
 				break;
 
 				case 'manufacturer':
-					$query_filters_where .= ' AND p.id_manufacturer IN ('.implode($selected_filters['manufacturer'], ',').')';
+					$query_filters_where .= ' AND p.id_manufacturer IN ('.implode(',', $selected_filters['manufacturer']).')';
 				break;
 
 				case 'condition':
@@ -2005,7 +2005,7 @@ class BlockLayered extends Module
 			$this->products = array();
 		else
 		{
-			$product_per_page = isset($this->context->cookie->nb_item_per_page) ? (int)$this->context->cookie->nb_item_per_page : Configuration::get('PS_PRODUCTS_PER_PAGE'); 
+			$product_per_page = isset($this->context->cookie->nb_item_per_page) ? (int)$this->context->cookie->nb_item_per_page : Configuration::get('PS_PRODUCTS_PER_PAGE');
 			$n = (int)Tools::getValue('n', Configuration::get('PS_PRODUCTS_PER_PAGE'));
 			$nb_day_new_product = (Validate::isUnsignedInt(Configuration::get('PS_NB_DAYS_NEW_PRODUCT')) ? Configuration::get('PS_NB_DAYS_NEW_PRODUCT') : 20);
 
@@ -3049,8 +3049,8 @@ class BlockLayered extends Module
 			$query_filters = '';
 		else
 		{
-			array_walk($filter_value, create_function('&$id_manufacturer', '$id_manufacturer = (int)$id_manufacturer;'));
-			$query_filters = ' AND p.id_manufacturer IN ('.implode($filter_value, ',').')';
+			array_walk($filter_value, function (&$id_manufacturer) {$id_manufacturer = (int)$id_manufacturer;});
+			$query_filters = ' AND p.id_manufacturer IN ('.implode(',', $filter_value).')';
 		}
 			if ($ignore_join)
 				return array('where' => $query_filters);
@@ -3177,7 +3177,7 @@ class BlockLayered extends Module
 			$vars = array_merge($vars, array('pagination_bottom' => $smarty->assign('paginationId', 'bottom')
 				->fetch(_PS_THEME_DIR_.'pagination.tpl')));
 		/* We are sending an array in jSon to the .js controller, it will update both the filters and the products zones */
-		return Tools::jsonEncode($vars);
+		return json_encode($vars);
 	}
 
 	public function getProducts($selected_filters, &$products, &$nb_products, &$p, &$n, &$pages_nb, &$start, &$stop, &$range)

@@ -36,7 +36,7 @@ class Dashactivity extends Module
     {
         $this->name = 'dashactivity';
         $this->tab = 'dashboard';
-        $this->version = '1.0.0';
+        $this->version = '1.0.1';
         $this->author = 'PrestaShop';
         $this->push_filename = _PS_CACHE_DIR_.'push/activity';
         $this->allow_push = true;
@@ -78,8 +78,9 @@ class Dashactivity extends Module
                 array(
                     _PS_JS_DIR_.'date.js',
                     _PS_JS_DIR_.'tools.js'
-                ) // retro compat themes 1.5
-            );
+                    ) // retro compat themes 1.5
+                );
+            $this->context->controller->addCSS($this->_path.'views/css/'.$this->name.'.css');
         }
     }
 

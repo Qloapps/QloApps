@@ -46,8 +46,7 @@ class ProductControllerCore extends FrontController
             $this->addCSS(_THEME_CSS_DIR_.'product.css');
             $this->addCSS(_THEME_CSS_DIR_.'print.css', 'print');
             $this->addJqueryPlugin(array('fancybox', 'idTabs', 'scrollTo', 'serialScroll', 'bxslider'));
-            // for the search block By webkul
-            $this->addCSS(_PS_MODULE_DIR_.'hotelreservationsystem/views/css/datepickerCustom.css');
+            $this->addCSS(_THEME_CSS_DIR_.'datepicker.css');
             $this->addJS(array(
                 _THEME_JS_DIR_.'tools.js',  // retro compat themes 1.5
                 _THEME_JS_DIR_.'product.js'
@@ -269,6 +268,10 @@ class ProductControllerCore extends FrontController
             $htl_features = array();
             $obj_hotel_room_type = new HotelRoomType();
             $room_info_by_product_id = $obj_hotel_room_type->getRoomTypeInfoByIdProduct($this->product->id);
+            $productCapacity = array();
+            $productCapacity['adult'] = $room_info_by_product_id['adult'];
+            $productCapacity['children'] = $room_info_by_product_id['children'];
+            $this->product->capacity = $productCapacity;
             $hotel_id = $room_info_by_product_id['id_hotel'];
             $useTax = HotelBookingDetail::useTax();
             if (isset($hotel_id) && $hotel_id) {
@@ -409,6 +412,7 @@ class ProductControllerCore extends FrontController
             $this->context->smarty->assign(
                 array(
                     'room_type_demands' => $roomTypeDemands,
+                    'WK_PRICE_CALC_METHOD_EACH_DAY' => HotelRoomTypeGlobalDemand::WK_PRICE_CALC_METHOD_EACH_DAY,
                     'product_id_hotel' => $hotel_id,
                     'stock_management' => Configuration::get('PS_STOCK_MANAGEMENT'),
                     'customizationFields' => $customization_fields,
@@ -969,7 +973,7 @@ class ProductControllerCore extends FrontController
                             $totalPrice += $totalRoomPrice;
                             $demandsPrice = 0;
                             if ($roomDemand = Tools::getValue('room_demands')) {
-                                if ($roomDemand = Tools::jsonDecode($roomDemand, true)) {
+                                if ($roomDemand = json_decode($roomDemand, true)) {
                                     $objRoomDemandPrice = new HotelRoomTypeDemandPrice();
                                     $demandsPrice = $objRoomDemandPrice->getRoomTypeDemandsTotalPrice(
                                         $idProduct,
@@ -1009,6 +1013,6 @@ class ProductControllerCore extends FrontController
             $result['msg'] = 'failed3';
             $result['avail_rooms'] = 0;
         }
-        die(Tools::jsonEncode($result));
+        die(json_encode($result));
     }
 }

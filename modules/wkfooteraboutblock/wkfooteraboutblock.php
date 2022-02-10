@@ -28,7 +28,7 @@ class WkFooterAboutBlock extends Module
     {
         $this->name = 'wkfooteraboutblock';
         $this->tab = 'front_office_features';
-        $this->version = '1.0.2';
+        $this->version = '1.0.3';
         $this->author = 'webkul';
         $this->need_instance = 0;
 
@@ -46,7 +46,7 @@ class WkFooterAboutBlock extends Module
             array('WK_HTL_SHORT_DESC' => Configuration::get('WK_HTL_SHORT_DESC', $this->context->language->id))
         );
 
-        $this->context->controller->addCSS(_PS_MODULE_DIR_.$this->name.'/views/css/wkFooterAboutBlockFront.css');
+        $this->context->controller->addCSS($this->_path.'/views/css/wkFooterAboutBlockFront.css');
         return $this->display(__FILE__, 'wkFooterAboutBlock.tpl');
     }
 

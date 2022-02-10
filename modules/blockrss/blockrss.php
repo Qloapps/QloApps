@@ -27,8 +27,9 @@
 if (!defined('_PS_VERSION_'))
 	exit;
 
-include_once(_PS_CLASS_DIR_.'../tools/pear/PEAR.php');
-include_once(_PS_PEAR_XML_PARSER_PATH_.'Parser.php');
+include_once _PS_CLASS_DIR_.'../tools/pear/PEAR.php';
+require_once dirname(__FILE__).'/vendor/autoload.php';
+
 
 class Blockrss extends Module
 {
@@ -47,7 +48,7 @@ class Blockrss extends Module
 		$this->displayName = $this->l('RSS feed block');
 		$this->description = $this->l('Adds a block displaying a RSS feed.');
 
-		$this->version = '1.3.2';
+		$this->version = '1.3.3';
 		$this->author = 'PrestaShop';
 		$this->error = false;
 		$this->valid = false;

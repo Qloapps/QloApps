@@ -377,7 +377,7 @@ class Crypt_Blowfish
         for ($i = 0; $i < 18; $i++) {
             $data = 0;
             for ($j = 4; $j > 0; $j--) {
-                $data = $data << 8 | ord($key{$k});
+                $data = $data << 8 | ord($key[$k]);
                 $k = ($k + 1) % $len;
             }
             $this->_P[$i] ^= $data;

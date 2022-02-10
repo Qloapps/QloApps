@@ -136,7 +136,7 @@ class ConnectionCore extends ObjectModel
 					'.Shop::addSqlRestriction(Shop::SHARE_CUSTOMER).'
 				ORDER BY `date_add` DESC';
         $result = Db::getInstance()->getRow($sql, false);
-        if (!$result['id_guest'] && (int)$cookie->id_guest) {
+        if (!isset($result['id_guest']) && (int)$cookie->id_guest) {
             // The old connections details are removed from the database in order to spare some memory
             Connection::cleanConnectionsPages();
 

@@ -82,7 +82,7 @@
 			</a>
 			{*By webkul To Check Order restrict condition before Payment by the customer*}
             {if !$restrict_order}
-                <button class="btn pull-right htl-reservation-form-btn-default" type="submit">
+                <button class="btn pull-right" type="submit">
                     <span>{l s='I confirm my order' mod='bankwire'}&nbsp;<i class="icon-chevron-right right"></i></span>
                 </button>
             {/if}

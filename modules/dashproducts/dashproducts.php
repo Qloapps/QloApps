@@ -24,8 +24,9 @@
 *  International Registered Trademark & Property of PrestaShop SA
 */
 
-if (!defined('_PS_VERSION_'))
+if (!defined('_PS_VERSION_')) {
 	exit;
+}
 
 class DashProducts extends Module
 {
@@ -33,7 +34,7 @@ class DashProducts extends Module
 	{
 		$this->name = 'dashproducts';
 		$this->tab = 'dashboard';
-		$this->version = '1.0.0';
+		$this->version = '1.0.1';
 		$this->author = 'PrestaShop';
 
 		$this->push_filename = _PS_CACHE_DIR_.'push/activity';
@@ -55,9 +56,17 @@ class DashProducts extends Module
 		return (parent::install()
 			&& $this->registerHook('dashboardZoneTwo')
 			&& $this->registerHook('dashboardData')
+			&& $this->registerHook('actionAdminControllerSetMedia')
 			&& $this->registerHook('actionObjectOrderAddAfter')
 			&& $this->registerHook('actionSearch')
 		);
+	}
+
+	public function hookActionAdminControllerSetMedia()
+	{
+		if (Tools::getValue('controller') == 'AdminDashboard') {
+			$this->context->controller->addCSS($this->_path.'views/css/dashproducts.css');
+		}
 	}
 
 	public function hookDashboardZoneTwo($params)
@@ -101,10 +110,12 @@ class DashProducts extends Module
 	{
 		$header = array(
 			array('title' => $this->l('Customer Name'), 'class' => 'text-left'),
-			array('title' => $this->l('Products'), 'class' => 'text-center'),
-			array('title' => $this->l('Total').' '.$this->l('Tax excl.'), 'class' => 'text-center'),
-			array('title' => $this->l('Date'), 'class' => 'text-center'),
-			array('title' => $this->l('Status'), 'class' => 'text-center'),
+			array('title' => $this->l('Total Rooms'), 'class' => 'text-left'),
+			array('title' => $this->l('Order'), 'class' => 'text-left'),
+			array('title' => $this->l('Hotel'), 'class' => 'text-left'),
+			array('title' => $this->l('Total').' '.$this->l('Tax excl.'), 'class' => 'text-left'),
+			array('title' => $this->l('Date'), 'class' => 'text-left'),
+			array('title' => $this->l('Status'), 'class' => 'text-left'),
 			array('title' => '', 'class' => 'text-right'),
 		);
 
@@ -112,8 +123,13 @@ class DashProducts extends Module
 		$orders = Order::getOrdersWithInformations($limit);
 
 		$body = array();
-		foreach ($orders as $order)
-		{
+		foreach ($orders as $order) {
+			$bookingInfo = Db::getInstance()->getRow(
+				'SELECT COUNT(*) AS `total_rooms`, hbd.`id_hotel`, hbd.`hotel_name`
+				FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+				WHERE `id_order` = '.(int)$order['id_order']
+			);
+
 			$currency = Currency::getCurrency((int)$order['id_currency']);
 			$tr = array();
 			$tr[] = array(
@@ -123,25 +139,38 @@ class DashProducts extends Module
 			);
 			$tr[] = array(
 				'id' => 'total_products',
-				'value' => count(OrderDetail::getList((int)$order['id_order'])),
-				'class' => 'text-center',
+				'value' => $bookingInfo['total_rooms'],
+				'class' => 'text-left',
+			);
+			$tr[] = array(
+				'id' => 'order',
+				'value' => '<a href="'.$this->context->link->getAdminLink('AdminOrders', true).
+					'&id_order='.$order['id_order'].'&vieworder" target="_blank">#'.$order['id_order'].'</a>',
+				'class' => 'text-left',
+			);
+			$tr[] = array(
+				'id' => 'hotel',
+				'value' => '<a href="'.$this->context->link->getAdminLink('AdminAddHotel', true).
+					'&id='.$bookingInfo['id_hotel'].'&updatehtl_branch_info" target="_blank">'.
+					Tools::htmlentitiesUTF8($bookingInfo['hotel_name']).'</a>',
+				'class' => 'text-left',
 			);
 			$tr[] = array(
 				'id' => 'total_paid',
 				'value' => Tools::displayPrice((float)$order['total_paid'], $currency),
-				'class' => 'text-center',
+				'class' => 'text-left',
 				'wrapper_start' => $order['valid'] ? '<span class="badge badge-success">' : '',
 				'wrapper_end' => '<span>',
 			);
 			$tr[] = array(
 				'id' => 'date_add',
 				'value' => Tools::displayDate($order['date_add']),
-				'class' => 'text-center',
+				'class' => 'text-left',
 			);
 			$tr[] = array(
 				'id' => 'status',
 				'value' => Tools::htmlentitiesUTF8($order['state_name']),
-				'class' => 'text-center',
+				'class' => 'text-left',
 			);
 			$tr[] = array(
 				'id' => 'details',
@@ -167,17 +196,17 @@ class DashProducts extends Module
 			),
 			array(
 				'id' => 'product',
-				'title' => $this->l('Product'),
+				'title' => $this->l('Room type'),
 				'class' => 'text-center',
 			),
 			array(
 				'id' => 'category',
-				'title' => $this->l('Category'),
+				'title' => $this->l('Hotel'),
 				'class' => 'text-center',
 			),
 			array(
 				'id' => 'total_sold',
-				'title' => $this->l('Total sold'),
+				'title' => $this->l('Total bookings'),
 				'class' => 'text-center',
 			),
 			array(
@@ -185,42 +214,33 @@ class DashProducts extends Module
 				'title' => $this->l('Sales'),
 				'class' => 'text-center',
 			),
-			array(
-				'id' => 'net_profit',
-				'title' => $this->l('Net profit'),
-				'class' => 'text-center',
-			)
 		);
 
 		$products = Db::getInstance()->ExecuteS(
-			'
-					SELECT
-						product_id,
-						product_name,
-						SUM(product_quantity) as total,
-						p.price as price,
-						pa.price as price_attribute,
-						SUM(total_price_tax_excl / conversion_rate) as sales,
-						SUM(product_quantity * purchase_supplier_price / conversion_rate) as expenses
-					FROM `'._DB_PREFIX_.'orders` o
-		LEFT JOIN `'._DB_PREFIX_.'order_detail` od ON o.id_order = od.id_order
-		LEFT JOIN `'._DB_PREFIX_.'product` p ON p.id_product = product_id
-		LEFT JOIN `'._DB_PREFIX_.'product_attribute` pa ON pa.id_product_attribute = od.product_attribute_id
-		WHERE `invoice_date` BETWEEN "'.pSQL($date_from).' 00:00:00" AND "'.pSQL($date_to).' 23:59:59"
-		AND valid = 1
-		'.Shop::addSqlRestriction(false, 'o').'
-		GROUP BY product_id, product_attribute_id
-		ORDER BY total DESC
-		LIMIT '.(int)Configuration::get('DASHPRODUCT_NBR_SHOW_BEST_SELLER', 10)
+			'SELECT
+				hbd.`id_product`,
+				hbd.`room_type_name` AS `product_name`,
+				COUNT(hbd.`id_room`) AS `total`,
+				hbd.`total_price_tax_excl` AS `price`,
+				SUM(hbd.`total_price_tax_excl`) AS `sales`
+			FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+			LEFT JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = hbd.`id_order`)
+			WHERE o.`invoice_date` BETWEEN "'.pSQL($date_from).' 00:00:00" AND "'.pSQL($date_to).' 23:59:59"
+			AND o.`valid` = 1 AND hbd.`is_refunded` = 0
+			GROUP BY hbd.`id_product`
+			ORDER BY `sales` DESC
+			LIMIT '.(int)Configuration::get('DASHPRODUCT_NBR_SHOW_BEST_SELLER', 10)
 		);
 
 		$body = array();
-		foreach ($products as $product)
-		{
-			$product_obj = new Product((int)$product['product_id'], false, $this->context->language->id);
-			if (!Validate::isLoadedObject($product_obj))
+		foreach ($products as $product) {
+			$product_obj = new Product((int)$product['id_product'], false, $this->context->language->id);
+			if (!Validate::isLoadedObject($product_obj)) {
 				continue;
-			$category = new Category($product_obj->getDefaultCategory(), $this->context->language->id);
+			}
+
+			$objHotelRoomType = new HotelRoomType();
+			$roomTypeInfo = $objHotelRoomType->getRoomTypeInfoByIdProduct($product_obj->id);
 
 			$img = '';
 			if (($row_image = Product::getCover($product_obj->id)) && $row_image['id_image'])
@@ -231,9 +251,6 @@ class DashProducts extends Module
 			}
 			
 			$productPrice = $product['price'];
-            		if (isset($product['price_attribute']) && $product['price_attribute'] != '0.000000') {
-                		$productPrice = $product['price_attribute'];
-            		}
 
 			$body[] = array(
 				array(
@@ -243,12 +260,17 @@ class DashProducts extends Module
 				),
 				array(
 					'id' => 'product',
-					'value' => '<a href="'.$this->context->link->getAdminLink('AdminProducts', true).'&id_product='.$product_obj->id.'&updateproduct">'.Tools::htmlentitiesUTF8($product['product_name']).'</a>'.'<br/>'.Tools::displayPrice($productPrice),
+					'value' => '<a href="'.$this->context->link->getAdminLink('AdminProducts', true).
+						'&id_product='.$product_obj->id.'&updateproduct" target="_blank">'.
+						Tools::htmlentitiesUTF8($product['product_name']).'</a>'.
+						'<br/>'.Tools::displayPrice($productPrice),
 					'class' => 'text-center'
 				),
 				array(
 					'id' => 'category',
-					'value' => $category->name,
+					'value' => '<a href="'.$this->context->link->getAdminLink('AdminAddHotel', true).
+						'&id='.$roomTypeInfo['id_hotel'].'&updatehtl_branch_info" target="_blank">'.
+						Tools::htmlentitiesUTF8($roomTypeInfo['hotel_name']).'</a>',
 					'class' => 'text-center'
 				),
 				array(
@@ -261,11 +283,6 @@ class DashProducts extends Module
 					'value' => Tools::displayPrice($product['sales']),
 					'class' => 'text-center'
 				),
-				array(
-					'id' => 'net_profit',
-					'value' => Tools::displayPrice($product['sales'] - $product['expenses']),
-					'class' => 'text-center'
-				)
 			);
 		}
 
@@ -282,7 +299,12 @@ class DashProducts extends Module
 			),
 			array(
 				'id' => 'product',
-				'title' => $this->l('Product'),
+				'title' => $this->l('Room type'),
+				'class' => 'text-center',
+			),
+			array(
+				'id' => 'hotel',
+				'title' => $this->l('Hotel'),
 				'class' => 'text-center',
 			),
 			array(
@@ -297,34 +319,35 @@ class DashProducts extends Module
 			),
 			array(
 				'id' => 'purchased',
-				'title' => $this->l('Purchased'),
+				'title' => $this->l('Booked'),
 				'class' => 'text-center',
 			),
 			array(
 				'id' => 'rate',
-				'title' => $this->l('Percentage'),
+				'title' => $this->l('Conversion rate'),
 				'class' => 'text-center',
 			)
 		);
 
-		if (Configuration::get('PS_STATSDATA_PAGESVIEWS'))
-		{
+		if (Configuration::get('PS_STATSDATA_PAGESVIEWS')) {
 			$products = $this->getTotalViewed($date_from, $date_to, (int)Configuration::get('DASHPRODUCT_NBR_SHOW_MOST_VIEWED'));
 			$body = array();
-			if (is_array($products) && count($products))
-				foreach ($products as $product)
-				{
+			if (is_array($products) && count($products)) {
+				foreach ($products as $product) {
 					$product_obj = new Product((int)$product['id_object'], true, $this->context->language->id);
-					if (!Validate::isLoadedObject($product_obj))
+					if (!Validate::isLoadedObject($product_obj)) {
 						continue;
+					}
 
 					$img = '';
-					if (($row_image = Product::getCover($product_obj->id)) && $row_image['id_image'])
-					{
+					if (($row_image = Product::getCover($product_obj->id)) && $row_image['id_image']) {
 						$image = new Image($row_image['id_image']);
 						$path_to_image = _PS_PROD_IMG_DIR_.$image->getExistingImgPath().'.'.$this->context->controller->imageType;
 						$img = ImageManager::thumbnail($path_to_image, 'product_mini_'.$product_obj->id.'.'.$this->context->controller->imageType, 45, $this->context->controller->imageType);
 					}
+
+					$objHRT = new HotelRoomType($product_obj->id);
+					$objHBI = new HotelBranchInformation($objHRT->id_hotel, $this->context->language->id);
 
 					$tr = array();
 					$tr[] = array(
@@ -334,7 +357,17 @@ class DashProducts extends Module
 					);
 					$tr[] = array(
 						'id' => 'product',
-						'value' => Tools::htmlentitiesUTF8($product_obj->name).'<br/>'.Tools::displayPrice(Product::getPriceStatic((int)$product_obj->id)),
+						'value' => '<a href="'.$this->context->link->getAdminLink('AdminProducts', true).
+							'&id_product='.$product_obj->id.'&updateproduct" target="_blank">'.
+							Tools::htmlentitiesUTF8($product_obj->name).'</a>'.'<br/>'.
+							Tools::displayPrice(Product::getPriceStatic((int)$product_obj->id)),
+						'class' => 'text-center',
+					);
+					$tr[] = array(
+						'id' => 'hotel',
+						'value' => '<a href="'.$this->context->link->getAdminLink('AdminAddHotel', true).
+							'&id='.$objHBI->id.'&updatehtl_branch_info" target="_blank">'.
+							Tools::htmlentitiesUTF8($objHBI->hotel_name).'</a>',
 						'class' => 'text-center',
 					);
 					$tr[] = array(
@@ -351,7 +384,7 @@ class DashProducts extends Module
 					$purchased = $this->getTotalProductPurchased($date_from, $date_to, (int)$product_obj->id);
 					$tr[] = array(
 						'id' => 'purchased',
-						'value' => $this->getTotalProductPurchased($date_from, $date_to, (int)$product_obj->id),
+						'value' => $purchased,
 						'class' => 'text-center',
 					);
 					$tr[] = array(
@@ -361,9 +394,10 @@ class DashProducts extends Module
 					);
 					$body[] = $tr;
 				}
+			}
 		}
 		else
-			$body = '<div class="alert alert-info">'.$this->l('You must enable the "Save global page views" option from the "Data mining for statistics" module in order to display the most viewed products, or use the Google Analytics module.').'</div>';
+			$body = '<div class="alert alert-info">'.$this->l('You must enable the "Save global page views" option from the "Data mining for statistics" module in order to display the most viewed room types, or use the Google Analytics module.').'</div>';
 		return array('header' => $header, 'body' => $body);
 	}
 
@@ -372,47 +406,91 @@ class DashProducts extends Module
 		$header = array(
 			array(
 				'id' => 'reference',
-				'title' => $this->l('Term'),
-				'class' => 'text-left'
-			),
-			array(
-				'id' => 'name',
-				'title' => $this->l('Search'),
+				'title' => $this->l('Hotel'),
 				'class' => 'text-center'
 			),
 			array(
-				'id' => 'totalQuantitySold',
-				'title' => $this->l('Results'),
+				'id' => 'image',
+				'title' => $this->l('Cover image'),
 				'class' => 'text-center'
-			)
+			),
+			array(
+				'id' => 'location',
+				'title' => $this->l('Location'),
+				'class' => 'text-center'
+			),
+			array(
+				'id' => 'count',
+				'title' => $this->l('Count'),
+				'class' => 'text-center'
+			),
+			// array(
+			// 	'id' => 'totalQuantitySold',
+			// 	'title' => $this->l('Results'),
+			// 	'class' => 'text-center'
+			// )
 		);
 
-		$terms = $this->getMostSearchTerms($date_from, $date_to, (int)Configuration::get('DASHPRODUCT_NBR_SHOW_TOP_SEARCH'));
-		$body = array();
-		if (is_array($terms) && count($terms))
-			foreach ($terms as $term)
-			{
-				$tr = array();
-				$tr[] = array(
-					'id' => 'product',
-					'value' => $term['keywords'],
-					'class' => 'text-left',
-				);
-				$tr[] = array(
-					'id' => 'product',
-					'value' => $term['count_keywords'],
-					'class' => 'text-center',
-				);
-				$tr[] = array(
-					'id' => 'product',
-					'value' => $term['results'],
-					'class' => 'text-center',
-				);
-				$body[] = $tr;
-			}
+		if (Configuration::get('PS_STATSDATA_PAGESVIEWS')) {
+			$hotels = $this->getMostSearchedHotels(
+				$date_from,
+				$date_to,
+				(int)Configuration::get('DASHPRODUCT_NBR_SHOW_TOP_SEARCH')
+			);
+
+			$body = array();
+			if (is_array($hotels) && count($hotels))
+				foreach ($hotels as $hotel) {
+					$objHBI = new HotelBranchInformation($hotel['id_hotel'], $this->context->language->id);
+					$tr = array();
+					$tr[] = array(
+						'id' => 'reference',
+						'value' => '<a href="'.$this->context->link->getAdminLink('AdminAddHotel', true).
+						'&id='.$hotel['id_hotel'].'&updatehtl_branch_info" target="_blank">'.
+						Tools::htmlentitiesUTF8($hotel['hotel_name']).'</a>',
+						'class' => 'text-center',
+					);
+					$tr[] = array(
+						'id' => 'image',
+						'value' => $this->getHotelImage($objHBI->id),
+						'class' => 'text-center',
+					);
+					$tr[] = array(
+						'id' => 'location',
+						'value' => $objHBI->address,
+						'class' => 'text-center',
+					);
+					$tr[] = array(
+						'id' => 'views',
+						'value' => $hotel['views'],
+						'class' => 'text-center',
+					);
+					$body[] = $tr;
+				}
+		} else {
+			$body = '<div class="alert alert-info">'.
+			$this->l('You must enable the "Save global page views" option from the "Data mining for statistics" module in order to display the most viewed room types, or use the Google Analytics module.').
+			'</div>';
+		}
 
 		return array('header' => $header, 'body' => $body);
 	}
+
+    public function getHotelImage($idHotel)
+    {
+        $imageDir = _MODULE_DIR_.'hotelreservationsystem/views/img/hotel_img/';
+        $noPictureImagePath = _PS_IMG_.'p/en.jpg';
+        $hotelImage = HotelImage::getCover($idHotel);
+        $imgLink = '';
+        if (is_array($hotelImage) && count($hotelImage)) {
+            $imagePath = $imageDir.$hotelImage['hotel_image_id'].'.jpg';
+            $imgLink = $imagePath;
+        } else {
+            $imgLink = $noPictureImagePath;
+        }
+
+        return '<img src="'.$imgLink.'" class="img img-thumbnail hotel-thumbnail">';
+    }
 
 	public function getTableTop5Search()
 	{
@@ -436,7 +514,7 @@ class DashProducts extends Module
 				WHERE od.`product_id` = '.(int)$id_product.'
 					'.Shop::addSqlRestriction(Shop::SHARE_ORDER, 'o').'
 					AND o.valid = 1
-					AND o.`date_add` BETWEEN "'.pSQL($date_from).'" AND "'.pSQL($date_to).'"';
+					AND o.`date_add` BETWEEN "'.pSQL($date_from).' 00:00:00" AND "'.pSQL($date_to).' 23:59:59"';
 
 		return (int)Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue($sql);
 	}
@@ -448,26 +526,23 @@ class DashProducts extends Module
 		FROM `'._DB_PREFIX_.'cart_product` cp
 		WHERE cp.`id_product` = '.(int)$id_product.'
 		'.Shop::addSqlRestriction(false, 'cp').'
-		AND cp.`date_add` BETWEEN "'.pSQL($date_from).'" AND "'.pSQL($date_to).'"');
+		AND cp.`date_add` BETWEEN "'.pSQL($date_from).' 00:00:00" AND "'.pSQL($date_to).' 23:59:59"');
 	}
 
 	public function getTotalProductPurchased($date_from, $date_to, $id_product)
 	{
-		return Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
-		SELECT count(`product_id`) as count
-		FROM `'._DB_PREFIX_.'order_detail` od
-		JOIN `'._DB_PREFIX_.'orders` o ON o.`id_order` = od.`id_order`
-		WHERE od.`product_id` = '.(int)$id_product.'
-		'.Shop::addSqlRestriction(false, 'od').'
-		AND o.valid = 1
-		AND o.`date_add` BETWEEN "'.pSQL($date_from).'" AND "'.pSQL($date_to).'"');
+		return Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue(
+			'SELECT COUNT(hbd.`id_product`) AS `count`
+			FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+			WHERE hbd.`is_refunded` = 0 AND hbd.`is_back_order` = 0 AND hbd.`id_product` = '.(int)$id_product.'
+			AND hbd.`date_add` BETWEEN "'.pSQL($date_from).' 00:00:00" AND "'.pSQL($date_to).' 23:59:59"'
+		);
 	}
 
 	public function getTotalViewed($date_from, $date_to, $limit = 10)
 	{
 		$gapi = Module::isInstalled('gapi') ? Module::getInstanceByName('gapi') : false;
-		if (Validate::isLoadedObject($gapi) && $gapi->isConfigured())
-		{
+		if (Validate::isLoadedObject($gapi) && $gapi->isConfigured()) {
 			$products = array();
 			// Only works with the default product URL pattern at this time
 			if ($result = $gapi->requestReportData('ga:pagePath', 'ga:visits', $date_from, $date_to, '-ga:visits', 'ga:pagePath=~/([a-z]{2}/)?([a-z]+/)?[0-9][0-9]*\-.*\.html$', 1, 10))
@@ -479,33 +554,44 @@ class DashProducts extends Module
 
 			return $products;
 		}
-		else
+		else {
 			return Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS('
-			SELECT p.id_object, pv.counter
+			SELECT p.id_object, SUM(pv.counter) AS `counter`
 			FROM `'._DB_PREFIX_.'page_viewed` pv
 			LEFT JOIN `'._DB_PREFIX_.'date_range` dr ON pv.`id_date_range` = dr.`id_date_range`
 			LEFT JOIN `'._DB_PREFIX_.'page` p ON pv.`id_page` = p.`id_page`
 			LEFT JOIN `'._DB_PREFIX_.'page_type` pt ON pt.`id_page_type` = p.`id_page_type`
 			WHERE pt.`name` = \'product\'
 			'.Shop::addSqlRestriction(false, 'pv').'
-			AND dr.`time_start` BETWEEN "'.pSQL($date_from).'" AND "'.pSQL($date_to).'"
-			AND dr.`time_end` BETWEEN "'.pSQL($date_from).'" AND "'.pSQL($date_to).'"
+			AND dr.`time_start` BETWEEN "'.pSQL($date_from).' 00:00:00" AND "'.pSQL($date_to).' 23:59:59"
+			AND dr.`time_end` BETWEEN "'.pSQL($date_from).' 00:00:00" AND "'.pSQL($date_to).' 23:59:59"
+			GROUP BY p.id_object
+			ORDER BY `counter` DESC
 			LIMIT '.(int)$limit);
+		}
 	}
 
-	public function getMostSearchTerms($date_from, $date_to, $limit = 10)
+	public function getMostSearchedHotels($date_from, $date_to, $limit = 10)
 	{
-		if (!Module::isInstalled('statssearch'))
+		if (!Module::isInstalled('statsdata')) {
 			return array();
+		}
 
-		return Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS('
-		SELECT `keywords`, count(`id_statssearch`) as count_keywords, `results`
-		FROM `'._DB_PREFIX_.'statssearch` ss
-		WHERE ss.`date_add` BETWEEN "'.pSQL($date_from).'" AND "'.pSQL($date_to).'"
-		'.Shop::addSqlRestriction(false, 'ss').'
-		GROUP BY ss.`keywords`
-		ORDER BY `count_keywords` DESC
-		LIMIT '.(int)$limit);
+		$pageType = Page::getPageTypeByName('category');
+		return Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS(
+			'SELECT hbi.`id` AS `id_hotel`, cl.`name` AS `hotel_name`, pv.`counter` AS `views`
+			FROM `'._DB_PREFIX_.'page_viewed` pv
+			LEFT JOIN `'._DB_PREFIX_.'page` p ON (p.`id_page` = pv.`id_page`)
+			LEFT JOIN `'._DB_PREFIX_.'page_type` pt ON (pt.`id_page_type` = p.`id_page_type`)
+			LEFT JOIN `'._DB_PREFIX_.'category_lang` cl ON (cl.`id_category` = p.`id_object`)
+			LEFT JOIN `'._DB_PREFIX_.'htl_branch_info` hbi ON (hbi.`id_category` = hbi.`id_category`)
+			LEFT JOIN `'._DB_PREFIX_.'date_range` dr ON (pv.`id_date_range` = dr.`id_date_range`)
+			WHERE pt.`name` = "'.pSQL('category').'"
+			AND dr.`time_start` BETWEEN "'.pSQL($date_from).' 00:00:00" AND "'.pSQL($date_to).' 23:59:59"
+			AND dr.`time_end` BETWEEN "'.pSQL($date_from).' 00:00:00" AND "'.pSQL($date_to).' 23:59:59"
+			GROUP BY p.`id_page_type`, p.`id_object`
+			LIMIT '.(int)$limit
+		);
 	}
 
 	public function renderConfigForm()
@@ -526,11 +612,11 @@ class DashProducts extends Module
 
 		$inputs = array(
 			array(
-				'label' => $this->l('Number of "Recent Orders" to display'),
+				'label' => $this->l('Number of "Recent Bookings" to display'),
 				'config_name' => 'DASHPRODUCT_NBR_SHOW_LAST_ORDER'
 			),
 			array(
-				'label' => $this->l('Number of "Best Sellers" to display'),
+				'label' => $this->l('Number of "Best Selling" to display'),
 				'config_name' => 'DASHPRODUCT_NBR_SHOW_BEST_SELLER'
 			),
 			array(

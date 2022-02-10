@@ -207,14 +207,14 @@ class AdminPreferencesControllerCore extends AdminController
                 //     'type' => 'bool',
                 //     'visibility' => Shop::CONTEXT_ALL
                 // ),
-                'PS_SHOP_ACTIVITY' => array(
-                    'title' => $this->l('Main Shop Activity'),
-                    'validation' => 'isInt',
-                    'cast' => 'intval',
-                    'type' => 'select',
-                    'list' => $activities2,
-                    'identifier' => 'value'
-                ),
+                // 'PS_SHOP_ACTIVITY' => array(
+                //     'title' => $this->l('Main Shop Activity'),
+                //     'validation' => 'isInt',
+                //     'cast' => 'intval',
+                //     'type' => 'select',
+                //     'list' => $activities2,
+                //     'identifier' => 'value'
+                // ),
             ));
 
             // No HTTPS activation if you haven't already.

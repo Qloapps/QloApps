@@ -193,14 +193,28 @@
 											{$product->description}
 										</div>
 									</div>
+									{if isset($product->capacity['adult']) && isset($product->capacity['children']) }
+										<div class="info_margin_div">
+											<div class="room_info_heading">
+												<span>{l s='Max Capacity'}</span>
+											</div>
+											<div class="room_info_content">
+												<p> {$product->capacity['adult']} {l s='Adults'}, {$product->capacity['children']} {l s='child'}</p>
+											</div>
+										</div>
+									{/if}
 									{if isset($features) && $features}
 										<div class="info_margin_div">
 											<div class="room_info_heading">
 												<span>{l s='Room Features'}</span>
 											</div>
-											<div class="room_info_content">
+											<div class="room_info_content row">
 												{foreach from=$features key=ftr_k item=ftr_v}
-													<img title="{$ftr_v.name|escape:'html':'UTF-8'}" alt="{$ftr_v.name|escape:'html':'UTF-8'}" width="15px" src="{$link->getMediaLink("`$ftr_img_src|escape:'html':'UTF-8'`{$ftr_v.value|escape:'html':'UTF-8'}")}">&nbsp;
+													<div class="col-md-3 col-sm-4 col-xs-6">
+														<div class="rm_ftr_wrapper" title="{$ftr_v.name|escape:'html':'UTF-8'}" alt="{$ftr_v.name|escape:'html':'UTF-8'}" >
+															<img src="{$link->getMediaLink("`$ftr_img_src|escape:'html':'UTF-8'`{$ftr_v.value|escape:'html':'UTF-8'}")}">  {$ftr_v.name|escape:'html':'UTF-8'}
+														</div>
+													</div>
 												{/foreach}
 											</div>
 										</div>
@@ -381,7 +395,7 @@
 										</div>
 									{/if}
 									<div class="col-xs-11 demand_adv_option_block">
-										<p>{$demand['name']|escape:'html':'UTF-8'} {if $product->show_price && !isset($restricted_country_mode) && !$PS_CATALOG_MODE}<span class="pull-right extra_demand_option_price">{convertPrice price = {$demand['price']}}</span>{/if}</p>
+										<p>{$demand['name']|escape:'html':'UTF-8'} {if $product->show_price && !isset($restricted_country_mode) && !$PS_CATALOG_MODE}<span class="pull-right"><span class="extra_demand_option_price">{convertPrice price = $demand['price']}</span>{if $demand['price_calc_method'] == $WK_PRICE_CALC_METHOD_EACH_DAY}{l s='/night'}{/if}</span>{/if}</p>
 										{if isset($demand['adv_option']) && $demand['adv_option']}
 											<select class="id_option">
 												{foreach $demand['adv_option'] as $idOption => $option}

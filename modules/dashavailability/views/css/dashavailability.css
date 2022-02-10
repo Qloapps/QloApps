@@ -1,0 +1,93 @@
+                                                                                /**
+* 2010-2021 Webkul.
+*
+* NOTICE OF LICENSE
+*
+* All right is reserved,
+* Please go through LICENSE.txt file inside our module
+*
+* DISCLAIMER
+*
+* Do not edit or add to this file if you wish to upgrade this module to newer
+* versions in the future. If you wish to customize this module for your
+* needs please refer to CustomizationPolicy.txt file inside our module for more information.
+*
+* @author Webkul IN
+* @copyright 2010-2021 Webkul IN
+* @license LICENSE.txt
+*/
+                                                                                
+.avil-chart-head {
+    padding-top: 15px;
+    height: 115px;
+}
+
+.avil-chart-svg {
+    height: 380px;
+}
+
+.avail-bar-btn {
+    height: 40px;
+    background: #FFFFFF;
+    border: 1px solid #00AFF0 !important;
+    box-sizing: border-box;
+    box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.15);
+    border-radius: 5px !important;
+    font-weight: bold !important;
+    color: #00AFF0;
+    padding: 0 14px;
+    width: 100%;
+}
+
+.bar-btn-active {
+    background: #00AFF0;
+    color: #FFFFFF;
+}
+
+.avail-bar-date {
+    height: 40px;
+    background: #FFFFFF;
+    border: 1px solid #00AFF0;
+    box-sizing: border-box;
+    border-radius: 5px;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 14px;
+    line-height: 18px;
+    color: #555555;
+    padding: 0 14px;
+}
+
+.avail-bar-date strong {
+    color: #00AFF0;
+}
+
+.avail-bar-date:hover strong {
+    color: #FFFFFF;
+}
+
+.avail-bar-date:hover {
+    background: #00AFF0;
+}
+
+.avail-bar-btn:hover {
+    color: #ffffff !important;
+    background: #00AFF0;
+}
+
+#bardate {
+    position: absolute;
+    left: 0;
+    width: 49.5%;
+    height: 40px;
+    margin-top: -40px;
+    z-index: -1;
+    border: none;
+    outline: none;
+}
+
+@media screen and (max-width:900px) {
+    .avail-bar-btn {
+        white-space: none !important;
+    }
+}

@@ -264,11 +264,11 @@ class AdminDashboardControllerCore extends AdminController
         $this->tpl_view_vars = array(
             'date_from' => $this->context->employee->stats_date_from,
             'date_to' => $this->context->employee->stats_date_to,
+            'hookDashboardTop' => Hook::exec('dashboardTop', $params),
             'hookDashboardZoneOne' => Hook::exec('dashboardZoneOne', $params),
             'hookDashboardZoneTwo' => Hook::exec('dashboardZoneTwo', $params),
-            'hookDashboardZoneThree' => Hook::exec('dashboardZoneThree', $params),
             //'translations' => $translations,
-            'action' => '#',
+            'action' => self::$currentIndex,
             'warning' => $this->getWarningDomainName(),
             'new_version_url' => Tools::getCurrentUrlProtocolPrefix()._PS_API_DOMAIN_.'/version/check_version.php?v='._PS_VERSION_.'&lang='.$this->context->language->iso_code.'&autoupgrade='.(int)(Module::isInstalled('autoupgrade') && Module::isEnabled('autoupgrade')).'&hosted_mode='.(int)defined('_PS_HOST_MODE_'),
             'dashboard_use_push' => Configuration::get('PS_DASHBOARD_USE_PUSH'),
@@ -324,6 +324,7 @@ class AdminDashboardControllerCore extends AdminController
                 }
 
                 $this->context->employee->update();
+                Tools::redirectAdmin(self::$currentIndex);
             }
         }
 
@@ -367,10 +368,10 @@ class AdminDashboardControllerCore extends AdminController
             'compare_from' => $this->context->employee->stats_compare_from,
             'compare_to' => $this->context->employee->stats_compare_to,
             'dashboard_use_push' => (int)Tools::getValue('dashboard_use_push'),
-            'extra' => (int)Tools::getValue('extra')
+            'extra' => Tools::getValue('extra')
         );
 
-        die(Tools::jsonEncode(Hook::exec('dashboardData', $params, $id_module, true, true, (int)Tools::getValue('dashboard_use_push'))));
+        die(json_encode(Hook::exec('dashboardData', $params, $id_module, true, true, (int)Tools::getValue('dashboard_use_push'))));
     }
 
     public function ajaxProcessSetSimulationMode()
@@ -437,7 +438,7 @@ class AdminDashboardControllerCore extends AdminController
                 }
             }
         }
-        die(Tools::jsonEncode($return));
+        die(json_encode($return));
     }
 
     public function ajaxProcessSaveDashConfig()
@@ -475,6 +476,6 @@ class AdminDashboardControllerCore extends AdminController
             $return['widget_html'] = $module_obj->$hook($params);
         }
 
-        die(Tools::jsonEncode($return));
+        die(json_encode($return));
     }
 }

@@ -44,7 +44,7 @@ class GraphNvD3 extends ModuleGraphEngine
 
         $this->name = 'graphnvd3';
         $this->tab = 'administration';
-        $this->version = '1.5.1';
+        $this->version = '1.5.2';
         $this->author = 'PrestaShop';
         $this->need_instance = 0;
 
@@ -176,6 +176,6 @@ class GraphNvD3 extends ModuleGraphEngine
                 $array['data'][] = array('values' => $nvd3_values, 'key' => $this->_titles['main'][$layer]);
             }
         }
-        die(preg_replace('/"([0-9]+)"/', '$1', Tools::jsonEncode($array)));
+        die(preg_replace('/"([0-9]+)"/', '$1', json_encode($array)));
     }
 }

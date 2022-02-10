@@ -1,3 +1,12 @@
+-----------------------------
+# V1.3.1 to V1.3.2
+-----------------------------
+
+## Improved/Changed Features:
+
+* [CO] : [#244] Changed Tools::jsonEncode to json_encode
+
+
 2014-04-22 14:58:26 +0200	// blockwishlist: attempt at better wording.
 2014-04-07 12:22:33 +0200	// managewishlist: better wording.
 2014-03-25 10:21:04 +0100	[-] : Blockwishlist Fix bug #PSCSX-654, could not delete a wishlist

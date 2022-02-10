@@ -1,4 +1,16 @@
 -----------------------------
+# V1.6.3 to V1.6.4
+-----------------------------
+
+## Improved/Changed Features:
+
+* [FO] : [#304] Text changes
+* [CO] : [#281] Optimized ajax cart functions, new function ajaxcart.update added
+* [CO] : [#281] Updated assignContentVars function, now function returns json encoded content without fetching from tpl 
+* [CO] : [#244] Changed Tools::jsonEncode to json_encode
+
+
+-----------------------------
 # V1.6.2 to V1.6.3
 -----------------------------
 

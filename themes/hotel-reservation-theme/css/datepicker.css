@@ -1,0 +1,84 @@
+/**
+* 2010-2021 Webkul.
+*
+* NOTICE OF LICENSE
+*
+* All right is reserved,
+* Please go through this link for complete license : https://store.webkul.com/license.html
+*
+* DISCLAIMER
+*
+* Do not edit or add to this file if you wish to upgrade this module to newer
+* versions in the future. If you wish to customize this module for your
+* needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
+*
+*  @author    Webkul IN <support@webkul.com>
+*  @copyright 2010-2021 Webkul IN
+*  @license   https://store.webkul.com/license.html
+*/
+
+/*datepicker on search css*/
+#ui-datepicker-div {
+  border: none;
+  background: #FFFFFF;
+  box-shadow: 0 4px 10px 0 rgba(0,0,0,0.26);
+  padding: 12px;
+  width: auto;
+  z-index: 111111 !important;}
+.ui-datepicker-header {
+  background: none;
+  border: none;}
+.ui-datepicker-year, .ui-datepicker-month {
+  color: #333;
+  font-size: 16px;
+  font-weight: 400;}
+.ui-datepicker-calendar thead th {
+  font-size: 12px;
+  font-weight: 600;
+  color: #777;
+  text-transform: uppercase;}
+.ui-datepicker-unselectable {
+  color: #777 !important;
+  font-size: 14px;}
+.ui-datepicker-calendar .ui-state-default {
+  text-align: center !important;
+  color: #333 !important;
+  font-size: 14px;
+  border: none !important;
+  background: none !important;}
+.ui-datepicker .ui-datepicker-prev, .ui-datepicker .ui-datepicker-next {
+  background-color: #F0F0F0;
+  border: none;
+  border-radius: 50%;}
+  .ui-datepicker .ui-datepicker-prev-hover, .ui-datepicker .ui-datepicker-next-hover {
+    background: #DADADA;
+    cursor: pointer;
+    top: 2px;
+    border: none;}
+  .ui-datepicker .ui-datepicker-next-hover {
+    right: 2px;}
+  .ui-datepicker .ui-datepicker-prev-hover {
+    left: 2px;}
+.ui-datepicker-header .ui-icon-circle-triangle-w {
+  border: none !important;
+  background-position: -97px 1px;}
+.ui-datepicker-header .ui-icon-circle-triangle-e {
+  border: none !important;
+  background-position: -33px 1px;}
+.ui-datepicker td span, .ui-datepicker td a {
+    padding: 10px;}
+.in-select-date-range {
+  background: #f2f2f2;}
+.selectedCheckedDate {
+  opacity: 1!important;
+  background-color: #1292FF;
+  border-color: #285e8e;}
+  .selectedCheckedDate .ui-state-default {
+    color: #fff!important;}
+
+/* set datepicker area doe small devices */
+@media (max-width: 375px) {
+  #ui-datepicker-div {
+    padding: 7px;}
+  .ui-datepicker td span, .ui-datepicker td a {
+    padding: 7px;}}

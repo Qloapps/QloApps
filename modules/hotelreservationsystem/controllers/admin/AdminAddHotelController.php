@@ -245,9 +245,11 @@ class AdminAddHotelController extends ModuleAdminController
         if ($check_in == '') {
             $this->errors[] = $this->l('Check In time is required field.');
         }
-
         if ($check_out == '') {
             $this->errors[] = $this->l('Check Out Time is required field.');
+        }
+        if ($check_in && $check_out && strtotime($check_out) > strtotime($check_in)) {
+            $this->errors[] = $this->l('Check Out time must be before Check In time.');
         }
 
         if (!$rating) {
@@ -493,7 +495,7 @@ class AdminAddHotelController extends ModuleAdminController
                 }
             }
         }
-        die(Tools::jsonEncode($states));
+        die(json_encode($states));
     }
 
     public function ajaxProcessUploadHotelImages()
@@ -514,19 +516,19 @@ class AdminAddHotelController extends ModuleAdminController
                 $hotelImgPath = _PS_MODULE_DIR_.'hotelreservationsystem/views/img/hotel_img/';
                 $imageDetail = $objHotelImage->uploadHotelImages($_FILES['hotel_image'], $idHotel, $hotelImgPath);
                 if ($imageDetail) {
-                    die(Tools::jsonEncode($imageDetail));
+                    die(json_encode($imageDetail));
                 } else {
-                    die(Tools::jsonEncode(array('hasError' => true)));
+                    die(json_encode(array('hasError' => true)));
                 }
             } else {
                 die(
-                    Tools::jsonEncode(
+                    json_encode(
                         array('hasError' => true, 'message' => $_FILES['hotel_image']['name'].': '.$invalidImg)
                     )
                 );
             }
         } else {
-            die(Tools::jsonEncode(array('hasError' => true)));
+            die(json_encode(array('hasError' => true)));
         }
     }
 
@@ -601,15 +603,8 @@ class AdminAddHotelController extends ModuleAdminController
         parent::setMedia();
 
         HotelHelper::assignDataTableVariables();
-        $this->context->controller->addJS(
-            _MODULE_DIR_.$this->module->name.'/libs/datatable/jquery.dataTables.min.js'
-        );
-        $this->context->controller->addJS(
-            _MODULE_DIR_.$this->module->name.'/libs/datatable/dataTables.bootstrap.js'
-        );
-        $this->context->controller->addCSS(
-            _MODULE_DIR_.$this->module->name.'/views/css/libs/datatable/datatable_bootstrap.css'
-        );
+        $this->context->controller->addJS(_PS_JS_DIR_.'/datatable/jquery.dataTables.min.js');
+        $this->context->controller->addJS(_PS_JS_DIR_.'/datatable/dataTables.bootstrap.js');
 
         Media::addJsDef(
             array(

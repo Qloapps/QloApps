@@ -137,7 +137,7 @@ if ($items && ($excludeIds || strpos($_SERVER['HTTP_REFERER'], 'AdminScenes') !=
         }
     }
     $results = array_values($results);
-    echo Tools::jsonEncode($results);
+    echo json_encode($results);
 } else {
-    Tools::jsonEncode(new stdClass);
+    json_encode(new stdClass);
 }

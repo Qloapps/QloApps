@@ -1,0 +1,9 @@
+<!--
+Description: parsed modified in asctime format
+Expect:      not bozo and feed['modified_parsed'] == (2004, 1, 5, 0, 29, 6, 0, 5, 0)
+-->
+<feed version="0.3" xmlns="http://purl.org/atom/ns#">
+
+<modified>Sun Jan  4 16:29:06 PST 2004</modified>
+
+</feed>

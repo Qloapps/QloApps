@@ -133,6 +133,7 @@ class AdminOrdersControllerCore extends AdminController
                 'align' => 'text-right',
                 'type' => 'price',
                 'currency' => true,
+                'havingFilter' => true,
                 'callback' => 'setOrderCurrency',
                 'badge_success' => true,
             ),
@@ -1481,7 +1482,6 @@ class AdminOrdersControllerCore extends AdminController
         if ($order_detail_data = $objBookingDetail->getOrderFormatedBookinInfoByIdOrder($order->id)) {
             $objBookingDemand = new HotelBookingDemands();
             foreach ($order_detail_data as $key => $value) {
-
                 $order_detail_data[$key]['extra_demands'] = $objBookingDemand->getRoomTypeBookingExtraDemands(
                     $order->id,
                     $value['id_product'],
@@ -1548,7 +1548,7 @@ class AdminOrdersControllerCore extends AdminController
         $bookingOrderInfo = $objBookingDetail->getBookingDataByOrderId($order->id);
 
         // hotel booking statuses
-        $htlOrderStatus = HotelOrderStatus::getAllHotelOrderStatus();
+        $htlOrderStatus = HotelBookingDetail::getAllHotelOrderStatus();
 
         $this->tpl_view_vars = array(
             // refund info
@@ -1715,7 +1715,7 @@ class AdminOrdersControllerCore extends AdminController
             $to_return = array('found' => false);
         }
 
-        $this->content = Tools::jsonEncode($to_return);
+        $this->content = json_encode($to_return);
     }
 
     public function ajaxProcessSendMailValidateOrder()
@@ -1745,11 +1745,11 @@ class AdminOrdersControllerCore extends AdminController
                         true,
                         $cart->id_shop
                     )) {
-                        die(Tools::jsonEncode(array('errors' => false, 'result' => $this->l('The email was sent to your customer.'))));
+                        die(json_encode(array('errors' => false, 'result' => $this->l('The email was sent to your customer.'))));
                     }
                 }
             }
-            $this->content = Tools::jsonEncode(array('errors' => true, 'result' => $this->l('Error in sending the email to your customer.')));
+            $this->content = json_encode(array('errors' => true, 'result' => $this->l('Error in sending the email to your customer.')));
         }
     }
 
@@ -1759,7 +1759,7 @@ class AdminOrdersControllerCore extends AdminController
         $id_order = (int) Tools::getValue('id_order');
         $order = new Order($id_order);
         if (!Validate::isLoadedObject($order)) {
-            die(Tools::jsonEncode(array(
+            die(json_encode(array(
                 'result' => false,
                 'error' => Tools::displayError('The order object cannot be loaded.')
             )));
@@ -1768,7 +1768,7 @@ class AdminOrdersControllerCore extends AdminController
         $old_cart_rules = Context::getContext()->cart->getCartRules();
 
         if ($order->hasBeenShipped()) {
-            die(Tools::jsonEncode(array(
+            die(json_encode(array(
                 'result' => false,
                 'error' => Tools::displayError('You cannot add products to delivered orders. ')
             )));
@@ -1782,37 +1782,37 @@ class AdminOrdersControllerCore extends AdminController
         $curr_date = date('Y-m-d');
         /*Validations*/
         if ($date_from == '') {
-            die(Tools::jsonEncode(array(
+            die(json_encode(array(
                 'result' => false,
                 'error' => Tools::displayError('Please Enter Check In Date.'),
             )));
         } elseif (!Validate::isDateFormat($date_from)) {
-            die(Tools::jsonEncode(array(
+            die(json_encode(array(
                 'result' => false,
                 'error' => Tools::displayError('Please Enter a Valid Check In Date.'),
             )));
         } elseif ($date_to == '') {
-            die(Tools::jsonEncode(array(
+            die(json_encode(array(
                 'result' => false,
                 'error' => Tools::displayError('Please Enter Check Out Date.'),
             )));
         } elseif (!Validate::isDateFormat($date_to)) {
-            die(Tools::jsonEncode(array(
+            die(json_encode(array(
                 'result' => false,
                 'error' => Tools::displayError('Please Enter a valid Check out Date.'),
             )));
         } elseif ($date_from < $curr_date) {
-            die(Tools::jsonEncode(array(
+            die(json_encode(array(
                 'result' => false,
                 'error' => Tools::displayError('Check In date should not be date before current date.'),
             )));
         } elseif ($date_to <= $date_from) {
-            die(Tools::jsonEncode(array(
+            die(json_encode(array(
                 'result' => false,
                 'error' => Tools::displayError('Check out Date Should be after Check In date.'),
             )));
         } elseif (!Validate::isUnsignedInt($product_informations['product_quantity'])) {
-            die(Tools::jsonEncode(array(
+            die(json_encode(array(
                 'result' => false,
                 'error' => Tools::displayError('Please Enter a valid Quantity.'),
             )));
@@ -1836,19 +1836,19 @@ class AdminOrdersControllerCore extends AdminController
                 $total_available_rooms = $hotel_room_data['stats']['num_avail'];
 
                 if ($total_available_rooms < $req_rm) {
-                    die(Tools::jsonEncode(array(
+                    die(json_encode(array(
                         'result' => false,
                         'error' => Tools::displayError('Required number of rooms are not available.'),
                         )));
                 }
             } else {
-                die(Tools::jsonEncode(array(
+                die(json_encode(array(
                     'result' => false,
                     'error' => Tools::displayError('Some error occured Please try again.'),
                     )));
             }
         } else {
-            die(Tools::jsonEncode(array(
+            die(json_encode(array(
                 'result' => false,
                 'error' => Tools::displayError('Some error occured Please try again.'),
             )));
@@ -1865,7 +1865,7 @@ class AdminOrdersControllerCore extends AdminController
         $idProduct = $product_informations['product_id'];
         $product = new Product($idProduct, false, $order->id_lang);
         if (!Validate::isLoadedObject($product)) {
-            die(Tools::jsonEncode(array(
+            die(json_encode(array(
                 'result' => false,
                 'error' => Tools::displayError('The product object cannot be loaded.')
             )));
@@ -1874,7 +1874,7 @@ class AdminOrdersControllerCore extends AdminController
         if (isset($product_informations['product_attribute_id']) && $product_informations['product_attribute_id']) {
             $combination = new Combination($product_informations['product_attribute_id']);
             if (!Validate::isLoadedObject($combination)) {
-                die(Tools::jsonEncode(array(
+                die(json_encode(array(
                 'result' => false,
                 'error' => Tools::displayError('The combination object cannot be loaded.')
             )));
@@ -1986,9 +1986,9 @@ class AdminOrdersControllerCore extends AdminController
         if ($update_quantity < 0) {
             // If product has attribute, minimal quantity is set with minimal quantity of attribute
             $minimal_quantity = ($product_informations['product_attribute_id']) ? Attribute::getAttributeMinimalQty($product_informations['product_attribute_id']) : $product->minimal_quantity;
-            die(Tools::jsonEncode(array('error' => sprintf(Tools::displayError('You must add %d minimum quantity', false), $minimal_quantity))));
+            die(json_encode(array('error' => sprintf(Tools::displayError('You must add %d minimum quantity', false), $minimal_quantity))));
         } elseif (!$update_quantity) {
-            die(Tools::jsonEncode(array('error' => Tools::displayError('You already have the maximum quantity available for this product.', false))));
+            die(json_encode(array('error' => Tools::displayError('You already have the maximum quantity available for this product.', false))));
         }
 
         // If order is valid, we can create a new invoice or edit an existing invoice
@@ -2231,11 +2231,14 @@ class AdminOrdersControllerCore extends AdminController
                 $objHtlBkDtl->booking_type = $obj_cart_bk_data->booking_type;
                 $objHtlBkDtl->id_status = 1;
                 $objHtlBkDtl->comment = $obj_cart_bk_data->comment;
+                $objHtlBkDtl->room_type_name = Product::getProductName($idProduct, null, $order->id_lang);
+
                 $objHtlBkDtl->date_from = $obj_cart_bk_data->date_from;
                 $objHtlBkDtl->date_to = $obj_cart_bk_data->date_to;
                 $total_price = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice($idProduct, $obj_cart_bk_data->date_from, $obj_cart_bk_data->date_to);
                 $objHtlBkDtl->total_price_tax_excl = $total_price['total_price_tax_excl'];
                 $objHtlBkDtl->total_price_tax_incl = $total_price['total_price_tax_incl'];
+                $objHtlBkDtl->total_paid_amount = Tools::ps_round($total_price['total_price_tax_incl'], 5);
 
                 // Save hotel information/location/contact
                 if (Validate::isLoadedObject($objRoom = new HotelRoomInformation($obj_cart_bk_data->id_room))) {
@@ -2264,7 +2267,7 @@ class AdminOrdersControllerCore extends AdminController
             }
         }
 
-        die(Tools::jsonEncode(array(
+        die(json_encode(array(
             'result' => true,
             //'view' => $this->createTemplate('_product_line.tpl')->fetch(),
             'can_edit' => $this->tabAccess['add'],
@@ -2290,7 +2293,7 @@ class AdminOrdersControllerCore extends AdminController
     {
         // $order_detail = new OrderDetail(Tools::getValue('id_order_detail'));
         // if (!Validate::isLoadedObject($order_detail))
-        // 	die(Tools::jsonEncode(array(
+        // 	die(json_encode(array(
         // 		'result' => false,
         // 		'error' => Tools::displayError('The OrderDetail object cannot be loaded.')
         // 	)));
@@ -2298,7 +2301,7 @@ class AdminOrdersControllerCore extends AdminController
         $id_product = Tools::getValue('id_product');
         $product = new Product($id_product);
         if (!Validate::isLoadedObject($product)) {
-            die(Tools::jsonEncode(array(
+            die(json_encode(array(
                 'result' => false,
                 'error' => Tools::displayError('The product object cannot be loaded.')
             )));
@@ -2306,13 +2309,13 @@ class AdminOrdersControllerCore extends AdminController
 
         $address = new Address(Tools::getValue('id_address'));
         if (!Validate::isLoadedObject($address)) {
-            die(Tools::jsonEncode(array(
+            die(json_encode(array(
                 'result' => false,
                 'error' => Tools::displayError('The address object cannot be loaded.')
             )));
         }
 
-        die(Tools::jsonEncode(array(
+        die(json_encode(array(
             'result' => true,
             'product' => $product,
             'tax_rate' => $product->getTaxesRate($address),
@@ -2354,47 +2357,47 @@ class AdminOrdersControllerCore extends AdminController
         $qty_diff = $product_quantity - $old_product_quantity;
         /*By webkul to validate fields before deleting the cart and order data form the tables*/
         if ($id_hotel == '') {
-            die(Tools::jsonEncode(array(
+            die(json_encode(array(
                 'result' => false,
                 'error' => Tools::displayError('Hotel Id is mising.'),
             )));
         } elseif ($id_room == '') {
-            die(Tools::jsonEncode(array(
+            die(json_encode(array(
                 'result' => false,
                 'error' => Tools::displayError('Room Id is missing.'),
             )));
         } elseif ($new_date_from == '') {
-            die(Tools::jsonEncode(array(
+            die(json_encode(array(
                 'result' => false,
                 'error' => Tools::displayError('Please Enter Check In Date.'),
             )));
         } elseif (!Validate::isDateFormat($new_date_from)) {
-            die(Tools::jsonEncode(array(
+            die(json_encode(array(
                 'result' => false,
                 'error' => Tools::displayError('Please Enter a Valid Check In Date.'),
             )));
         } elseif ($new_date_to == '') {
-            die(Tools::jsonEncode(array(
+            die(json_encode(array(
                 'result' => false,
                 'error' => Tools::displayError('Please Enter Check Out Date.'),
             )));
         } elseif (!Validate::isDateFormat($new_date_to)) {
-            die(Tools::jsonEncode(array(
+            die(json_encode(array(
                 'result' => false,
                 'error' => Tools::displayError('Please Enter a valid Check out Date.'),
             )));
         } elseif ($new_date_from < $curr_date) {
-            die(Tools::jsonEncode(array(
+            die(json_encode(array(
                 'result' => false,
                 'error' => Tools::displayError('Check In date should not be after current date.'),
             )));
         } elseif ($new_date_to <= $new_date_from) {
-            die(Tools::jsonEncode(array(
+            die(json_encode(array(
                 'result' => false,
                 'error' => Tools::displayError('Check out Date Should be after Check In date.'),
             )));
         } elseif (!Validate::isUnsignedInt($product_quantity)) {
-            die(Tools::jsonEncode(array(
+            die(json_encode(array(
                 'result' => false,
                 'error' => Tools::displayError('Invalid quantity.'),
             )));
@@ -2402,7 +2405,7 @@ class AdminOrdersControllerCore extends AdminController
 
         $rooms_booked = $obj_booking_detail->getRoomBookinInformationForDateRangeByOrder($id_room, $old_date_from, $old_date_to, $new_date_from, $new_date_to);
         if ($rooms_booked) {
-            die(Tools::jsonEncode(array(
+            die(json_encode(array(
                 'result' => false,
                 'error' => Tools::displayError('This Room Unavailable For Selected Duration.'),
             )));
@@ -2580,14 +2583,65 @@ class AdminOrdersControllerCore extends AdminController
         ));
 
         if (!$res) {
-            die(Tools::jsonEncode(array(
+            die(json_encode(array(
                 'result' => $res,
                 'error' => Tools::displayError('An error occurred while editing the product line.')
             )));
         }
 
+        // get extra demands of the room before changing in the booking table
+        $objBookingDemand = new HotelBookingDemands();
+        $extraDemands = $objBookingDemand->getRoomTypeBookingExtraDemands(
+            $id_order,
+            0,
+            $id_room,
+            $old_date_from,
+            $old_date_to
+        );
+
         /*By webkul to edit the Hotel Cart and Hotel Order tables when editing the room for the order detail page*/
-        $update_htl_tables = $obj_booking_detail->UpdateHotelCartHotelOrderOnOrderEdit($id_order, $id_room, $old_date_from, $old_date_to, $new_date_from, $new_date_to);
+        if ($update_htl_tables = $obj_booking_detail->UpdateHotelCartHotelOrderOnOrderEdit(
+            $id_order,
+            $id_room,
+            $old_date_from,
+            $old_date_to,
+            $new_date_from,
+            $new_date_to
+        )) {
+            // update extra demands total prices if dates are changes (price calc method for each day)
+            if ($extraDemands) {
+                $objOrder = new Order($id_order);
+                foreach ($extraDemands as $demand) {
+                    if (isset($demand['extra_demands']) && $demand['extra_demands']) {
+                        foreach ($demand['extra_demands'] as $rDemand) {
+                            if ($rDemand['price_calc_method'] == HotelRoomTypeGlobalDemand::WK_PRICE_CALC_METHOD_EACH_DAY) {
+                                $objBookingDemand = new HotelBookingDemands($rDemand['id_booking_demand']);
+
+                                // change order total
+                                $objOrder->total_paid_tax_excl -= $objBookingDemand->total_price_tax_excl;
+                                $objOrder->total_paid_tax_incl -= $objBookingDemand->total_price_tax_incl;
+                                $objOrder->total_paid -= $objBookingDemand->total_price_tax_incl;
+
+                                $numDays = $obj_booking_detail->getNumberOfDays($new_date_from, $new_date_to);
+                                $demandPriceTE = $objBookingDemand->unit_price_tax_excl * $numDays;
+                                $demandPriceTI = $objBookingDemand->unit_price_tax_incl * $numDays;
+
+                                $objOrder->total_paid_tax_excl += $demandPriceTE;
+                                $objOrder->total_paid_tax_incl += $demandPriceTI;
+                                $objOrder->total_paid += $demandPriceTI;
+
+                                $objBookingDemand->total_price_tax_excl = $demandPriceTE;
+                                $objBookingDemand->total_price_tax_incl = $demandPriceTI;
+
+                                $objBookingDemand->save();
+                            }
+                        }
+                    }
+                }
+                // change order total save
+                $objOrder->save();
+            }
+        }
 
         if (is_array(Tools::getValue('product_quantity'))) {
             $view = $this->createTemplate('_customized_data.tpl')->fetch();
@@ -2597,7 +2651,7 @@ class AdminOrdersControllerCore extends AdminController
 
         $this->sendChangedNotification($order);
 
-        die(Tools::jsonEncode(array(
+        die(json_encode(array(
             'result' => $res,
             'view' => $view,
             'can_edit' => $this->tabAccess['add'],
@@ -2627,32 +2681,32 @@ class AdminOrdersControllerCore extends AdminController
         $product_quantity = (int) $obj_booking_detail->getNumberOfDays($date_from, $date_to);
         /*By webkul to validate fields before deleting the cart and order data form the tables*/
         if ($id_hotel == '') {
-            die(Tools::jsonEncode(array(
+            die(json_encode(array(
                 'result' => false,
                 'error' => Tools::displayError('Hotel Id is mising.'),
             )));
         } elseif ($id_room == '') {
-            die(Tools::jsonEncode(array(
+            die(json_encode(array(
                 'result' => false,
                 'error' => Tools::displayError('Room Id is missing.'),
             )));
         } elseif ($date_from == '') {
-            die(Tools::jsonEncode(array(
+            die(json_encode(array(
                 'result' => false,
                 'error' => Tools::displayError('Check In Date is missing.'),
             )));
         } elseif ($date_to == '') {
-            die(Tools::jsonEncode(array(
+            die(json_encode(array(
                 'result' => false,
                 'error' => Tools::displayError('Check Out Date is missing.'),
             )));
         } elseif ($date_to == '') {
-            die(Tools::jsonEncode(array(
+            die(json_encode(array(
                 'result' => false,
                 'error' => Tools::displayError('Check Out Date is missing.'),
             )));
         } elseif (!Validate::isUnsignedInt($product_quantity)) {
-            die(Tools::jsonEncode(array(
+            die(json_encode(array(
                 'result' => false,
                 'error' => Tools::displayError('Invalid quantity.'),
             )));
@@ -2660,6 +2714,7 @@ class AdminOrdersControllerCore extends AdminController
 
         /*END*/
         $this->doDeleteProductLineValidation($order_detail, $order);
+        Hook::exec('actionOrderProductLineDeleteBefore', array('order' => $order));
         $bookingInfo = $obj_booking_detail->getRowByIdOrderIdProductInDateRange($id_order, $id_product, $date_from, $date_to, $id_room);
         $idHotelBooking = $bookingInfo['id'];
 
@@ -2757,7 +2812,7 @@ class AdminOrdersControllerCore extends AdminController
         }
 
         if (!$res) {
-            die(Tools::jsonEncode(array(
+            die(json_encode(array(
                 'result' => $res,
                 'error' => Tools::displayError('An error occurred while attempting to delete the product line.')
             )));
@@ -2795,7 +2850,7 @@ class AdminOrdersControllerCore extends AdminController
 
         $this->sendChangedNotification($order);
 
-        die(Tools::jsonEncode(array(
+        die(json_encode(array(
             'result' => $res,
             'order' => $order,
             'invoices' => $invoice_array,
@@ -2807,28 +2862,28 @@ class AdminOrdersControllerCore extends AdminController
     protected function doEditProductValidation(OrderDetail $order_detail, Order $order, OrderInvoice $order_invoice = null)
     {
         if (!Validate::isLoadedObject($order_detail)) {
-            die(Tools::jsonEncode(array(
+            die(json_encode(array(
                 'result' => false,
                 'error' => Tools::displayError('The Order Detail object could not be loaded.')
             )));
         }
 
         if (!empty($order_invoice) && !Validate::isLoadedObject($order_invoice)) {
-            die(Tools::jsonEncode(array(
+            die(json_encode(array(
                 'result' => false,
                 'error' => Tools::displayError('The invoice object cannot be loaded.')
             )));
         }
 
         if (!Validate::isLoadedObject($order)) {
-            die(Tools::jsonEncode(array(
+            die(json_encode(array(
                 'result' => false,
                 'error' => Tools::displayError('The order object cannot be loaded.')
             )));
         }
 
         if ($order_detail->id_order != $order->id) {
-            die(Tools::jsonEncode(array(
+            die(json_encode(array(
                 'result' => false,
                 'error' => Tools::displayError('You cannot edit the order detail for this order.')
             )));
@@ -2836,14 +2891,14 @@ class AdminOrdersControllerCore extends AdminController
 
         // We can't edit a delivered order
         if ($order->hasBeenDelivered()) {
-            die(Tools::jsonEncode(array(
+            die(json_encode(array(
                 'result' => false,
                 'error' => Tools::displayError('You cannot edit a delivered order.')
             )));
         }
 
         if (!empty($order_invoice) && $order_invoice->id_order != Tools::getValue('id_order')) {
-            die(Tools::jsonEncode(array(
+            die(json_encode(array(
                 'result' => false,
                 'error' => Tools::displayError('You cannot use this invoice for the order')
             )));
@@ -2854,21 +2909,21 @@ class AdminOrdersControllerCore extends AdminController
         $product_price_tax_excl = str_replace(',', '.', Tools::getValue('product_price_tax_excl'));
 
         if (!Validate::isPrice($product_price_tax_incl) || !Validate::isPrice($product_price_tax_excl)) {
-            die(Tools::jsonEncode(array(
+            die(json_encode(array(
                 'result' => false,
                 'error' => Tools::displayError('Invalid price')
             )));
         }
         //commented by webkul here quantity is gap between booking days which is calulated and validated in ajaxProcessEditProductOnOrder();
         /*if (!is_array(Tools::getValue('product_quantity')) && !Validate::isUnsignedInt(Tools::getValue('product_quantity')))
-            die(Tools::jsonEncode(array(
+            die(json_encode(array(
                 'result' => false,
                 'error' => Tools::displayError('Invalid quantity')
             )));
         elseif (is_array(Tools::getValue('product_quantity')))
             foreach (Tools::getValue('product_quantity') as $qty)
                 if (!Validate::isUnsignedInt($qty))
-                    die(Tools::jsonEncode(array(
+                    die(json_encode(array(
                         'result' => false,
                         'error' => Tools::displayError('Invalid quantity')
                     )));*/
@@ -2877,21 +2932,21 @@ class AdminOrdersControllerCore extends AdminController
     protected function doDeleteProductLineValidation(OrderDetail $order_detail, Order $order)
     {
         if (!Validate::isLoadedObject($order_detail)) {
-            die(Tools::jsonEncode(array(
+            die(json_encode(array(
                 'result' => false,
                 'error' => Tools::displayError('The Order Detail object could not be loaded.')
             )));
         }
 
         if (!Validate::isLoadedObject($order)) {
-            die(Tools::jsonEncode(array(
+            die(json_encode(array(
                 'result' => false,
                 'error' => Tools::displayError('The order object cannot be loaded.')
             )));
         }
 
         if ($order_detail->id_order != $order->id) {
-            die(Tools::jsonEncode(array(
+            die(json_encode(array(
                 'result' => false,
                 'error' => Tools::displayError('You cannot delete the order detail.')
             )));
@@ -2899,7 +2954,7 @@ class AdminOrdersControllerCore extends AdminController
 
         // We can't edit a delivered order
         if ($order->hasBeenDelivered()) {
-            die(Tools::jsonEncode(array(
+            die(json_encode(array(
                 'result' => false,
                 'error' => Tools::displayError('You cannot edit a delivered order.')
             )));
@@ -2916,13 +2971,13 @@ class AdminOrdersControllerCore extends AdminController
             $StockAvailable = StockAvailable::getQuantityAvailableByProduct($order_detail->product_id, $order_detail->product_attribute_id, $order_detail->id_shop);
             $product = new Product($order_detail->product_id, true, null, $order_detail->id_shop);
             if (!Validate::isLoadedObject($product)) {
-                die(Tools::jsonEncode(array(
+                die(json_encode(array(
                     'result' => false,
                     'error' => Tools::displayError('The Product object could not be loaded.')
                 )));
             } else {
                 if (($StockAvailable < $add_quantity) && (!$product->isAvailableWhenOutOfStock((int)$product->out_of_stock))) {
-                    die(Tools::jsonEncode(array(
+                    die(json_encode(array(
                         'result' => false,
                         'error' => Tools::displayError('This product is no longer in stock with those attributes ')
                     )));
@@ -3074,7 +3129,7 @@ class AdminOrdersControllerCore extends AdminController
         $authorized_modules = array();
 
         if (!Validate::isLoadedObject($customer) || !is_array($modules)) {
-            die(Tools::jsonEncode(array('result' => false)));
+            die(json_encode(array('result' => false)));
         }
 
         foreach ($modules as $module) {
@@ -3093,7 +3148,7 @@ class AdminOrdersControllerCore extends AdminController
             'payment_modules' => $payment_modules,
         ));
 
-        die(Tools::jsonEncode(array(
+        die(json_encode(array(
             'result' => true,
             'view' => $this->createTemplate('_select_payment.tpl')->fetch(),
         )));
@@ -3128,7 +3183,7 @@ class AdminOrdersControllerCore extends AdminController
             $result['status'] = 'failed';
         }
 
-        die(Tools::jsonEncode($result));
+        die(json_encode($result));
     }
 
     // To show rooms extra demands in the modal box in order details view page
@@ -3238,8 +3293,8 @@ class AdminOrdersControllerCore extends AdminController
         if ($idCartBooking = Tools::getValue('id_cart_booking')) {
             if (Validate::isLoadedObject($objCartbookingCata = new HotelCartBookingData($idCartBooking))) {
                 $roomDemands = Tools::getValue('room_demands');
-                $roomDemands = Tools::jsonDecode($roomDemands, true);
-                $roomDemands = Tools::jsonEncode($roomDemands);
+                $roomDemands = json_decode($roomDemands, true);
+                $roomDemands = json_encode($roomDemands);
                 $objCartbookingCata->extra_demands = $roomDemands;
                 if ($objCartbookingCata->save()) {
                     die('1');
@@ -3255,7 +3310,7 @@ class AdminOrdersControllerCore extends AdminController
         if ($idHtlBooking = Tools::getValue('id_htl_booking')) {
             if (Validate::isLoadedObject($objBookingDetail = new HotelBookingDetail($idHtlBooking))) {
                 $roomDemands = Tools::getValue('room_demands');
-                if ($roomDemands = Tools::jsonDecode($roomDemands, true)) {
+                if ($roomDemands = json_decode($roomDemands, true)) {
                     $order = new Order($objBookingDetail->id_order);
                     $vatAddress = new Address((int)$order->{Configuration::get('PS_TAX_ADDRESS_TYPE')});
                     $idLang = (int)$order->id_lang;
@@ -3290,8 +3345,8 @@ class AdminOrdersControllerCore extends AdminController
                         $qty = 1;
                         if ($objGlobalDemand->price_calc_method == HotelRoomTypeGlobalDemand::WK_PRICE_CALC_METHOD_EACH_DAY) {
                             $numDays = $objHtlBkDtl->getNumberOfDays(
-                                $objHtlBkDtl->date_from,
-                                $objHtlBkDtl->date_to
+                                $objBookingDetail->date_from,
+                                $objBookingDetail->date_to
                             );
                             if ($numDays > 1) {
                                 $qty *= $numDays;
@@ -3299,6 +3354,11 @@ class AdminOrdersControllerCore extends AdminController
                         }
                         $objBookingDemand->total_price_tax_excl = $objBookingDemand->unit_price_tax_excl * $qty;
                         $objBookingDemand->total_price_tax_incl = $objBookingDemand->unit_price_tax_incl * $qty;
+
+                        // change order total
+                        $order->total_paid_tax_excl += $objBookingDemand->total_price_tax_excl;
+                        $order->total_paid_tax_incl += $objBookingDemand->total_price_tax_incl;
+                        $order->total_paid += $objBookingDemand->total_price_tax_incl;
 
                         $objBookingDemand->price_calc_method = $objGlobalDemand->price_calc_method;
                         $objBookingDemand->id_tax_rules_group = $objGlobalDemand->id_tax_rules_group;
@@ -3315,6 +3375,7 @@ class AdminOrdersControllerCore extends AdminController
                             $objBookingDemand->setBookingDemandTaxDetails();
                         }
                     }
+                    $order->save();
 
                     die('1');
                 }
@@ -3331,6 +3392,14 @@ class AdminOrdersControllerCore extends AdminController
                 // first delete the tax details of the booking demand
                 if ($objBookingDemand->deleteBookingDemandTaxDetails($idBookingDemand)) {
                     if ($objBookingDemand->delete()) {
+                        if (Validate::isLoadedObject($objBookingDetail = new HotelBookingDetail($objBookingDemand->id_htl_booking))) {
+                            // change order total
+                            $order = new Order($objBookingDetail->id_order);
+                            $order->total_paid_tax_excl -= $objBookingDemand->total_price_tax_excl;
+                            $order->total_paid_tax_incl -= $objBookingDemand->total_price_tax_incl;
+                            $order->total_paid -= $objBookingDemand->total_price_tax_incl;
+                            $order->save();
+                        }
                         die('1');
                     }
                 }
@@ -3369,7 +3438,10 @@ class AdminOrdersControllerCore extends AdminController
 
         if (!$newStatus) {
             $this->errors[] = Tools::displayError('Invalid booking status found.');
-        } elseif ($newStatus == 2 || $newStatus == 3) {
+        } elseif (
+            $newStatus == HotelBookingDetail::STATUS_CHECKED_IN
+            || $newStatus == HotelBookingDetail::STATUS_CHECKED_OUT
+        ) {
             if (!$statusDate || !Validate::isDate($statusDate)) {
                 $this->errors[] = Tools::displayError('Invalid dates found.');
             } elseif ((strtotime($statusDate) < strtotime($dateFrom))
@@ -3381,24 +3453,24 @@ class AdminOrdersControllerCore extends AdminController
 
         if (!count($this->errors)) {
             $objBookingDetail = new HotelBookingDetail();
-            if ($roomBookingInfo = $objBookingDetail->getRoomBookingData($idRoom, $idOrder)) {
+            if ($roomBookingInfo = $objBookingDetail->getRoomBookingData($idRoom, $idOrder, $dateFrom, $dateTo)) {
                 //  if admin choose Check-Out status
-                if ($newStatus == 3
+                if ($newStatus == HotelBookingDetail::STATUS_CHECKED_OUT
                     && $roomBookingInfo['check_in'] ==  '0000-00-00 00:00:00'
                 ) {
                     $this->errors[] = Tools::displayError('Room status must be set to Check-In before setting the room status to Check-Out.');
-                } elseif ($newStatus == 3
+                } elseif ($newStatus == HotelBookingDetail::STATUS_CHECKED_OUT
                     && $roomBookingInfo['check_in'] !=  '0000-00-00 00:00:00'
                     && strtotime($roomBookingInfo['check_in']) >= strtotime($statusDate)
                 ) {
                     $this->errors[] = Tools::displayError('Check-Out date can not be before Check-In date').
                     '('.date('d-m-Y', strtotime($roomBookingInfo['check_in'])).')';
-                } elseif ($newStatus == 2 && $roomBookingInfo['check_out'] ==  '0000-00-00 00:00:00'
+                } elseif ($newStatus == HotelBookingDetail::STATUS_CHECKED_IN && $roomBookingInfo['check_out'] ==  '0000-00-00 00:00:00'
                     && strtotime($roomBookingInfo['check_in']) >= strtotime($dateTo)
                 ) {
                     $this->errors[] = Tools::displayError('Check-In date can not be after Check-Out date').
                     '('.date('d-m-Y', strtotime($roomBookingInfo['date_to'])).')';
-                } elseif ($newStatus == 2 && $roomBookingInfo['check_out'] !=  '0000-00-00 00:00:00'
+                } elseif ($newStatus == HotelBookingDetail::STATUS_CHECKED_IN && $roomBookingInfo['check_out'] !=  '0000-00-00 00:00:00'
                     && strtotime($roomBookingInfo['check_out']) <= strtotime($statusDate)
                 ) {
                     $this->errors[] = Tools::displayError('Check-In date can not be after Check-Out date').

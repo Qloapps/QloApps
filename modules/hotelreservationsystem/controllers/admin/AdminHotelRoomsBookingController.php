@@ -292,7 +292,7 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
         $hotel_id  = Tools::getValue('hotel_id');
         $obj_room_type = new HotelRoomType();
         $room_type_info = $obj_room_type->getRoomTypeByHotelId($hotel_id, Configuration::get('PS_LANG_DEFAULT'), 1);
-        die(Tools::jsonEncode($room_type_info));
+        die(json_encode($room_type_info));
     }
 
     public function ajaxProcessAddDataToCart()
@@ -412,7 +412,7 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
                                 'id_cart_book_data' => $obj_cart_book_data->id);
 
             if ($obj_cart_book_data->id) {
-                die(Tools::jsonEncode($cart_data));
+                die(json_encode($cart_data));
             } else {
                 die(0);
             }
@@ -495,7 +495,7 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
                         'booking_data' => $booking_data,
                     );
                 }
-                die(Tools::jsonEncode($cart_data));
+                die(json_encode($cart_data));
             } else {
                 die(0);
             }
@@ -534,7 +534,7 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
             $start_date = date('Y-m-d', strtotime('+1 day', strtotime($start_date)));
         }
         if ($booking_calendar_data) {
-            die(Tools::jsonEncode($booking_calendar_data));
+            die(json_encode($booking_calendar_data));
         } else {
             die(0);
         }
@@ -676,6 +676,6 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
         parent::setMedia();
 
         $this->addCSS(array(_MODULE_DIR_.'hotelreservationsystem/views/css/HotelReservationAdmin.css'));
-        $this->addJs(_PS_MODULE_DIR_.$this->module->name.'/views/js/HotelReservationAdmin.js');
+        $this->addJs(_MODULE_DIR_.$this->module->name.'/views/js/HotelReservationAdmin.js');
     }
 }

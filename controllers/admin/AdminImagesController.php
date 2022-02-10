@@ -58,9 +58,9 @@ class AdminImagesControllerCore extends AdminController
             'height' => array('title' => $this->l('Height'),  'suffix' => ' px'),
             'products' => array('title' => $this->l('Products'), 'align' => 'center', 'type' => 'bool', 'callback' => 'printEntityActiveIcon', 'orderby' => false),
             'categories' => array('title' => $this->l('Categories'), 'align' => 'center', 'type' => 'bool', 'callback' => 'printEntityActiveIcon', 'orderby' => false),
-            'manufacturers' => array('title' => $this->l('Manufacturers'), 'align' => 'center', 'type' => 'bool', 'callback' => 'printEntityActiveIcon', 'orderby' => false),
-            'suppliers' => array('title' => $this->l('Suppliers'), 'align' => 'center', 'type' => 'bool', 'callback' => 'printEntityActiveIcon', 'orderby' => false),
-            'stores' => array('title' => $this->l('Stores'), 'align' => 'center', 'type' => 'bool', 'callback' => 'printEntityActiveIcon', 'orderby' => false)
+            // 'manufacturers' => array('title' => $this->l('Manufacturers'), 'align' => 'center', 'type' => 'bool', 'callback' => 'printEntityActiveIcon', 'orderby' => false),
+            // 'suppliers' => array('title' => $this->l('Suppliers'), 'align' => 'center', 'type' => 'bool', 'callback' => 'printEntityActiveIcon', 'orderby' => false),
+            // 'stores' => array('title' => $this->l('Stores'), 'align' => 'center', 'type' => 'bool', 'callback' => 'printEntityActiveIcon', 'orderby' => false)
         );
 
         // Scenes tab has been removed by default from the installation, but may still exists in updates
@@ -267,46 +267,46 @@ class AdminImagesControllerCore extends AdminController
                         ),
                     )
                 ),
-                array(
-                    'type' => 'switch',
-                    'label' => $this->l('Manufacturers'),
-                    'name' => 'manufacturers',
-                    'required' => false,
-                    'is_bool' => true,
-                    'hint' => $this->l('This type will be used for Manufacturer images.'),
-                    'values' => array(
-                        array(
-                            'id' => 'manufacturers_on',
-                            'value' => 1,
-                            'label' => $this->l('Enabled')
-                        ),
-                        array(
-                            'id' => 'manufacturers_off',
-                            'value' => 0,
-                            'label' => $this->l('Disabled')
-                        ),
-                    )
-                ),
-                array(
-                    'type' => 'switch',
-                    'label' => $this->l('Suppliers'),
-                    'name' => 'suppliers',
-                    'required' => false,
-                    'is_bool' => true,
-                    'hint' => $this->l('This type will be used for Supplier images.'),
-                    'values' => array(
-                        array(
-                            'id' => 'suppliers_on',
-                            'value' => 1,
-                            'label' => $this->l('Enabled')
-                        ),
-                        array(
-                            'id' => 'suppliers_off',
-                            'value' => 0,
-                            'label' => $this->l('Disabled')
-                        ),
-                    )
-                ),
+                // array(
+                //     'type' => 'switch',
+                //     'label' => $this->l('Manufacturers'),
+                //     'name' => 'manufacturers',
+                //     'required' => false,
+                //     'is_bool' => true,
+                //     'hint' => $this->l('This type will be used for Manufacturer images.'),
+                //     'values' => array(
+                //         array(
+                //             'id' => 'manufacturers_on',
+                //             'value' => 1,
+                //             'label' => $this->l('Enabled')
+                //         ),
+                //         array(
+                //             'id' => 'manufacturers_off',
+                //             'value' => 0,
+                //             'label' => $this->l('Disabled')
+                //         ),
+                //     )
+                // ),
+                // array(
+                //     'type' => 'switch',
+                //     'label' => $this->l('Suppliers'),
+                //     'name' => 'suppliers',
+                //     'required' => false,
+                //     'is_bool' => true,
+                //     'hint' => $this->l('This type will be used for Supplier images.'),
+                //     'values' => array(
+                //         array(
+                //             'id' => 'suppliers_on',
+                //             'value' => 1,
+                //             'label' => $this->l('Enabled')
+                //         ),
+                //         array(
+                //             'id' => 'suppliers_off',
+                //             'value' => 0,
+                //             'label' => $this->l('Disabled')
+                //         ),
+                //     )
+                // ),
                 array(
                     'type' => 'switch',
                     'label' => $this->l('Scenes'),
@@ -328,26 +328,26 @@ class AdminImagesControllerCore extends AdminController
                         ),
                     )
                 ),
-                array(
-                    'type' => 'switch',
-                    'label' => $this->l('Stores'),
-                    'name' => 'stores',
-                    'required' => false,
-                    'is_bool' => true,
-                    'hint' => $this->l('This type will be used for Store images.'),
-                    'values' => array(
-                        array(
-                            'id' => 'stores_on',
-                            'value' => 1,
-                            'label' => $this->l('Enabled')
-                        ),
-                        array(
-                            'id' => 'stores_off',
-                            'value' => 0,
-                            'label' => $this->l('Disabled')
-                        ),
-                    )
-                ),
+                // array(
+                //     'type' => 'switch',
+                //     'label' => $this->l('Stores'),
+                //     'name' => 'stores',
+                //     'required' => false,
+                //     'is_bool' => true,
+                //     'hint' => $this->l('This type will be used for Store images.'),
+                //     'values' => array(
+                //         array(
+                //             'id' => 'stores_on',
+                //             'value' => 1,
+                //             'label' => $this->l('Enabled')
+                //         ),
+                //         array(
+                //             'id' => 'stores_off',
+                //             'value' => 0,
+                //             'label' => $this->l('Disabled')
+                //         ),
+                //     )
+                // ),
             ),
             'submit' => array(
                 'title' => $this->l('Save')

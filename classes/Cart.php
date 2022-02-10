@@ -135,31 +135,34 @@ class CartCore extends ObjectModel
             'add' => 'addWs',
             'update' => 'updateWs'
         ),
-        'fields' => array(
-            'id_address' => array(
-                'xlink_resource' => 'addresses',
-                'getter' => 'getWsIdAddress',
-                'setter' => 'setWsIdAddress',
-            ),
-            'id_currency' => array('xlink_resource' => 'currencies'),
-            'id_customer' => array('xlink_resource' => 'customers'),
-            'id_guest' => array('xlink_resource' => 'guests'),
-            'id_lang' => array('xlink_resource' => 'languages'),
+        'fields' => [
+            'id_currency' => ['xlink_resource' => 'currencies'],
+            'id_customer' => ['xlink_resource' => 'customers'],
+            'id_guest' => ['xlink_resource' => 'guests'],
+            'id_lang' => ['xlink_resource' => 'languages'],
+            'id_address_delivery' => ['xlink_resource' => 'addresses'],
+            'id_address_invoice' => ['xlink_resource' => 'addresses'],
+        ],
+        'hidden_fields' => array (
+            'id_shop',
+            'id_shop_group',
+            'id_carrier',
+            'delivery_option',
+            'allow_seperated_package',
+            'gift',
+            'gift_message',
+            'mobile_theme',
+            'recyclable',
         ),
-
         'associations' => array(
-            // 'cart_rows' => array('resource' => 'cart_row', 'virtual_entity' => true, 'fields' => array(
-            //     'id_product' => array('required' => true, 'xlink_resource' => 'products'),
-            //     'id_product_attribute' => array('required' => true, 'xlink_resource' => 'combinations'),
-            //     'id_address_delivery' => array('required' => true, 'xlink_resource' => 'addresses'),
-            //     'quantity' => array('required' => true),
-            //     )
-            // ),
-
             'cart_bookings' => array(
-                'setter' => false,
                 'resource' => 'booking',
-                'fields' => array('id' => array('required' => true))
+                'fields' => array(
+                    'id_hotel' => array('validate' => 'isUnsignedId', 'required' => true),
+                    'id_product' => array('validate' => 'isUnsignedId', 'required' => true),
+                    'date_from' => array('validate' => 'isDate', 'required' => true),
+                    'date_to' => array('validate' => 'isDate', 'required' => true),
+                )
             ),
         ),
     );
@@ -2632,6 +2635,9 @@ class CartCore extends ObjectModel
      */
     public static function desintifier($int, $delimiter = ',')
     {
+        if (!$int)
+            return;
+
         $delimiter_len = $int[0];
         $int = strrev(substr($int, 1));
         $elm = explode(str_repeat('0', $delimiter_len + 1), $int);
@@ -4275,28 +4281,6 @@ class CartCore extends ObjectModel
         return 0;
     }
 
-    // Webservice:: Get id_address in the cart
-    public function getWsIdAddress()
-    {
-        return Db::getInstance()->getValue(
-            'SELECT id_address_delivery FROM `'._DB_PREFIX_.'cart`
-            WHERE id_cart = '.(int)$this->id
-        );
-    }
-
-    // Webservice :: Set id_address in the cart
-    public function setWsIdAddress($id_address)
-    {
-        if ($this->id) {
-            return Db::getInstance()->execute(
-                'UPDATE `'._DB_PREFIX_.'cart`
-                SET `id_address_delivery` = '.(int)$id_address.', `id_address_invoice` = '.(int)$id_address.'
-                WHERE `id_cart` = '.(int)$this->id
-            );
-        }
-        return false;
-    }
-
     // Webservice:: Get booking rows
     public function getWsCartBookings()
     {
@@ -4317,10 +4301,10 @@ class CartCore extends ObjectModel
         $postData = trim(file_get_contents('php://input'));
         libxml_use_internal_errors(true);
         $xml = simplexml_load_string(utf8_decode($postData));
-        $cartData = Tools::jsonDecode(Tools::jsonEncode($xml, true));
+        $cartData = json_decode(json_encode($xml, true));
 
-        $this->id_address_delivery = $cartData->cart->id_address;
-        $this->id_address_invoice = $cartData->cart->id_address;
+        $this->id_address_delivery = $cartData->cart->id_address_delivery;
+        $this->id_address_invoice = $cartData->cart->id_address_invoice;
 
         if ($this->add($autodate, $null_values)) {
             // set bookings for the cart
@@ -4328,6 +4312,8 @@ class CartCore extends ObjectModel
             if (isset($bookingRows->id_hotel)) {
                 $bookingRows = array($bookingRows);
             }
+            $this->setWsCartRooms($bookingRows);
+
             return true;
         }
 
@@ -4344,10 +4330,11 @@ class CartCore extends ObjectModel
         $postData = trim(file_get_contents('php://input'));
         libxml_use_internal_errors(true);
         $xml = simplexml_load_string(utf8_decode($postData));
-        $cartData = Tools::jsonDecode(Tools::jsonEncode($xml, true));
+        $cartData = json_decode(json_encode($xml, true));
 
-        $this->id_address_delivery = $cartData->cart->id_address;
-        $this->id_address_invoice = $cartData->cart->id_address;
+
+        $this->id_address_delivery = $cartData->cart->id_address_delivery;
+        $this->id_address_invoice = $cartData->cart->id_address_invoice;
 
         if ($this->update($autodate, $null_values)) {
             // set bookings for the cart
@@ -4384,14 +4371,13 @@ class CartCore extends ObjectModel
 
             $extraDemands = null;
             foreach ($bookingRows as $booking) {
-                $booking = Tools::jsonDecode(Tools::jsonEncode($booking, true), true);
+                $booking = json_decode(json_encode($booking, true), true);
                 if (isset($booking['extra_demands']['extra_demand'])) {
                     $extraDemands = $booking['extra_demands']['extra_demand'];
                     if (isset($extraDemands['id_global_demand'])) {
                         $extraDemands = array($extraDemands);
                     }
-                    // $extraDemands = Tools::jsonDecode($extraDemands, true);
-                    $extraDemands = Tools::jsonEncode($extraDemands);
+                    $extraDemands = json_encode($extraDemands);
                 }
 
                 // get room booking info

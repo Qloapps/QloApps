@@ -11,7 +11,7 @@
 /**
  * A MIME entity, such as an attachment.
  *
- * @author     Chris Corbyn
+ * @author Chris Corbyn
  */
 interface Swift_Mime_MimeEntity extends Swift_Mime_CharsetObserver, Swift_Mime_EncodingObserver
 {
@@ -31,6 +31,7 @@ interface Swift_Mime_MimeEntity extends Swift_Mime_CharsetObserver, Swift_Mime_E
      * Get the level at which this entity shall be nested in final document.
      *
      * The lower the value, the more outermost the entity will be nested.
+     *
      * @see LEVEL_TOP, LEVEL_MIXED, LEVEL_RELATED, LEVEL_ALTERNATIVE
      *
      * @return int
@@ -39,6 +40,7 @@ interface Swift_Mime_MimeEntity extends Swift_Mime_CharsetObserver, Swift_Mime_E
 
     /**
      * Get the qualified content-type of this mime entity.
+     *
      * @return string
      */
     public function getContentType();

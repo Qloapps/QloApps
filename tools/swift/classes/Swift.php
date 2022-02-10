@@ -16,11 +16,11 @@
  */
 abstract class Swift
 {
-    public static $initialized = false;
-    public static $inits = array();
-
     /** Swift Mailer Version number generated during dist release process */
     const VERSION = '@SWIFT_VERSION_NUMBER@';
+
+    public static $initialized = false;
+    public static $inits = array();
 
     /**
      * Registers an initializer callable that will be called the first time
@@ -47,7 +47,7 @@ abstract class Swift
             return;
         }
 
-        $path = dirname(__FILE__).'/'.str_replace('_', '/', $class).'.php';
+        $path = __DIR__.'/'.str_replace('_', '/', $class).'.php';
 
         if (!file_exists($path)) {
             return;

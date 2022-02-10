@@ -1,0 +1,12 @@
+<!--
+Note:        support for RSS source element was dropped in 4.0
+Description: item source url
+Expect:      1
+-->
+<rss version="2.0">
+<channel>
+<item>
+<source url="http://example.com/">Example source</source>
+</item>
+</channel>
+</rss>

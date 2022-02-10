@@ -64,44 +64,48 @@ class HotelBookingDetail extends ObjectModel
     public $date_add;
     public $date_upd;
 
+    const STATUS_ALLOTED = 1;
+    const STATUS_CHECKED_IN = 2;
+    const STATUS_CHECKED_OUT = 3;
+
     public static $definition = array(
         'table' => 'htl_booking_detail',
         'primary' => 'id',
         'fields' => array(
-            'id_product' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
-            'id_order' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
-            'id_order_detail' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
-            'id_cart' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
-            'id_room' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
-            'id_hotel' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
-            'id_customer' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
-            'booking_type' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
-            'id_status' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
+            'id_product' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => true),
+            'id_order' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => true),
+            'id_order_detail' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => true),
+            'id_cart' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => true),
+            'id_room' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => true),
+            'id_hotel' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => true),
+            'id_customer' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => true),
+            'booking_type' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => true),
+            'id_status' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => true),
             'comment' => array('type' => self::TYPE_STRING),
             'check_in' => array('type' => self::TYPE_DATE),
             'check_out' => array('type' => self::TYPE_DATE),
-            'date_from' => array('type' => self::TYPE_DATE, 'validate' => 'isDate'),
-            'date_to' => array('type' => self::TYPE_DATE, 'validate' => 'isDate'),
-            'total_price_tax_excl' => array('type' => self::TYPE_FLOAT, 'validate' => 'isPrice'),
-            'total_price_tax_incl' => array('type' => self::TYPE_FLOAT, 'validate' => 'isPrice'),
-            'total_paid_amount' => array('type' => self::TYPE_FLOAT, 'validate' => 'isPrice', 'default' => 0),
+            'date_from' => array('type' => self::TYPE_DATE, 'validate' => 'isDate', 'required' => true),
+            'date_to' => array('type' => self::TYPE_DATE, 'validate' => 'isDate', 'required' => true),
+            'total_price_tax_excl' => array('type' => self::TYPE_FLOAT, 'validate' => 'isPrice', 'required' => true),
+            'total_price_tax_incl' => array('type' => self::TYPE_FLOAT, 'validate' => 'isPrice', 'required' => true),
+            'total_paid_amount' => array('type' => self::TYPE_FLOAT, 'validate' => 'isPrice', 'default' => 0, 'required' => true),
             'is_refunded' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
             // 'available_for_order' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
             'is_back_order' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
 
             // hotel information/location/contact
-            'room_num' => array('type' => self::TYPE_STRING),
-            'room_type_name' => array('type' => self::TYPE_STRING),
-            'hotel_name' => array('type' => self::TYPE_STRING),
-            'city' => array('type' => self::TYPE_STRING, 'validate' => 'isCityName', 'size' => 64),
+            'room_num' => array('type' => self::TYPE_STRING, 'required' => true),
+            'room_type_name' => array('type' => self::TYPE_STRING, 'required' => true),
+            'hotel_name' => array('type' => self::TYPE_STRING, 'required' => true),
+            'city' => array('type' => self::TYPE_STRING, 'validate' => 'isCityName', 'size' => 64, 'required' => true),
             'state' => array('type' => self::TYPE_STRING),
-            'country' => array('type' => self::TYPE_STRING),
+            'country' => array('type' => self::TYPE_STRING, 'required' => true),
             'zipcode' => array('type' => self::TYPE_STRING),
-            'phone' => array('type' => self::TYPE_STRING, 'validate' => 'isPhoneNumber', 'size' => 32),
-            'email' => array('type' => self::TYPE_STRING, 'validate' => 'isEmail', 'size' => 255),
-            'check_in_time' => array('type' => self::TYPE_STRING),
-            'check_out_time' => array('type' => self::TYPE_STRING),
-            'adult' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
+            'phone' => array('type' => self::TYPE_STRING, 'validate' => 'isPhoneNumber', 'size' => 32, 'required' => true),
+            'email' => array('type' => self::TYPE_STRING, 'validate' => 'isEmail', 'size' => 255, 'required' => true),
+            'check_in_time' => array('type' => self::TYPE_STRING, 'required' => true),
+            'check_out_time' => array('type' => self::TYPE_STRING, 'required' => true),
+            'adult' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => true),
             'children' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
 
             'date_add' => array('type' => self::TYPE_DATE, 'validate' => 'isDate'),
@@ -273,7 +277,7 @@ class HotelBookingDetail extends ObjectModel
                         $sql = 'SELECT bd.`id_product`, bd.`id_room`, bd.`id_hotel`, bd.`id_customer`, bd.`booking_type`, bd.`id_status` AS booking_status, bd.`comment`, rf.`room_num`, bd.`date_from`, bd.`date_to`
                             FROM `'._DB_PREFIX_.'htl_booking_detail` AS bd
                             INNER JOIN `'._DB_PREFIX_.'htl_room_information` AS rf ON (rf.`id` = bd.`id_room`)
-                            WHERE bd.`id_hotel`='.(int)$hotel_id.' AND bd.`id_product` ='.(int)$room_type['id_product'].' AND bd.`is_refunded` = 0 AND bd.`is_back_order` = 0 AND IF(bd.`id_status` = 3, bd.`date_from` <= \''.pSQL($date_from).'\' AND bd.`check_out` >= \''.pSQL($date_to).'\', bd.`date_from` <= \''.pSQL($date_from).'\' AND bd.date_to >= \''.pSQL($date_to).'\')';
+                            WHERE bd.`id_hotel`='.(int)$hotel_id.' AND bd.`id_product` ='.(int)$room_type['id_product'].' AND bd.`is_refunded` = 0 AND bd.`is_back_order` = 0 AND IF(bd.`id_status` = '. self::STATUS_CHECKED_OUT .', bd.`date_from` <= \''.pSQL($date_from).'\' AND bd.`check_out` >= \''.pSQL($date_to).'\', bd.`date_from` <= \''.pSQL($date_from).'\' AND bd.date_to >= \''.pSQL($date_to).'\')';
 
                         $booked_rooms = Db::getInstance()->executeS($sql);
 
@@ -301,12 +305,12 @@ class HotelBookingDetail extends ObjectModel
                     if ($search_unavai) {
                         $sql1 = 'SELECT `id_product`, `id_hotel`, `room_num`, `comment` AS `room_comment`
                                 FROM `'._DB_PREFIX_.'htl_room_information`
-                                WHERE `id_hotel`='.(int)$hotel_id.' AND `id_product` ='.(int)$room_type['id_product'].' AND `id_status` = 2';
+                                WHERE `id_hotel`='.(int)$hotel_id.' AND `id_product` ='.(int)$room_type['id_product'].' AND `id_status` = '. HotelRoomInformation::STATUS_INACTIVE;
 
                         $sql2 = 'SELECT hri.`id_product`, hri.`id_hotel`, hri.`room_num`, hri.`comment` AS `room_comment`
                                 FROM `'._DB_PREFIX_.'htl_room_information` AS hri
                                 INNER JOIN `'._DB_PREFIX_.'htl_room_disable_dates` AS hrdd ON (hrdd.`id_room_type` = hri.`id_product` AND hrdd.	id_room = hri.`id`)
-                                WHERE hri.`id_hotel`='.$hotel_id.' AND hri.`id_product` ='.$room_type['id_product'].' AND hri.`id_status` = 3 AND hrdd.`date_from` <= \''.pSql($date_from).'\' AND hrdd.`date_to` >= \''.pSql($date_to).'\'';
+                                WHERE hri.`id_hotel`='.$hotel_id.' AND hri.`id_product` ='.$room_type['id_product'].' AND hri.`id_status` = '. HotelRoomInformation::STATUS_TEMPORARY_INACTIVE .' AND hrdd.`date_from` <= \''.pSql($date_from).'\' AND hrdd.`date_to` >= \''.pSql($date_to).'\'';
 
                         $sql = $sql1.' UNION '.$sql2;
 
@@ -317,7 +321,7 @@ class HotelBookingDetail extends ObjectModel
                     if ($search_available) {
                         $exclude_ids = 'SELECT `id_room`
                         FROM `'._DB_PREFIX_.'htl_booking_detail`
-                        WHERE `is_back_order` = 0 AND `is_refunded` = 0 AND IF(`id_status` = 3, (
+                        WHERE `is_back_order` = 0 AND `is_refunded` = 0 AND IF(`id_status` = '. self::STATUS_CHECKED_OUT.', (
                             (DATE_FORMAT(`check_out`,  "%Y-%m-%d") > \''.pSQL($date_from).'\' AND DATE_FORMAT(`check_out`,  "%Y-%m-%d") <= \''.PSQL($date_to).'\') AND (
                                 (`date_from` <= \''.pSQL($date_from).'\' AND `check_out` > \''.pSQL($date_from).'\' AND `check_out` <= \''.PSQL($date_to).'\') OR
                                 (`date_from` >= \''.pSQL($date_from).'\' AND `check_out` > \''.pSQL($date_from).'\' AND `check_out` <= \''.pSQL($date_to).'\') OR
@@ -343,13 +347,13 @@ class HotelBookingDetail extends ObjectModel
                             SELECT hri.`id` AS id_room
                             FROM `'._DB_PREFIX_.'htl_room_information` AS hri
                             INNER JOIN `'._DB_PREFIX_.'htl_room_disable_dates` AS hrdd ON (hrdd.`id_room_type` = hri.`id_product` AND hrdd.`id_room` = hri.`id`)
-                            WHERE hri.`id_hotel`='.(int)$hotel_id.' AND hri.`id_product` ='.(int)$room_type['id_product'].' AND hri.`id_status` = 3 AND (hrdd.`date_from` <= \''.pSql($date_to).'\' AND hrdd.`date_to` >= \''.pSql($date_from).'\')';
+                            WHERE hri.`id_hotel`='.(int)$hotel_id.' AND hri.`id_product` ='.(int)$room_type['id_product'].' AND hri.`id_status` = '. HotelRoomInformation::STATUS_TEMPORARY_INACTIVE .' AND (hrdd.`date_from` <= \''.pSql($date_to).'\' AND hrdd.`date_to` >= \''.pSql($date_from).'\')';
 
                         $selectAvailRoomSearch = 'SELECT ri.`id` AS `id_room`, ri.`id_product`, ri.`id_hotel`, ri.`room_num`, ri.`comment` AS `room_comment`';
 
                         $joinAvailRoomSearch = '';
 
-                        $whereAvailRoomSearch = 'WHERE ri.`id_hotel`='.(int)$hotel_id.' AND ri.`id_product`='.(int)$room_type['id_product'].' AND ri.`id_status` != 2 AND ri.`id` NOT IN ('.$exclude_ids.')';
+                        $whereAvailRoomSearch = 'WHERE ri.`id_hotel`='.(int)$hotel_id.' AND ri.`id_product`='.(int)$room_type['id_product'].' AND ri.`id_status` != '. HotelRoomInformation::STATUS_INACTIVE .' AND ri.`id` NOT IN ('.$exclude_ids.')';
 
                         $groupByAvailRoomSearch = '';
                         $orderByAvailRoomSearch = '';
@@ -385,10 +389,10 @@ class HotelBookingDetail extends ObjectModel
                     }
 
                     if ($search_partial) {
-                        $sql1 = 'SELECT bd.`id_product`, bd.`id_room`, bd.`id_hotel`, bd.`id_customer`, bd.`booking_type`, bd.`id_status` AS booking_status, bd.`comment` AS `room_comment`, rf.`room_num`, bd.`date_from`, IF(bd.`id_status` = 3, bd.`check_out`, bd.`date_to`) AS `date_to`
+                        $sql1 = 'SELECT bd.`id_product`, bd.`id_room`, bd.`id_hotel`, bd.`id_customer`, bd.`booking_type`, bd.`id_status` AS booking_status, bd.`comment` AS `room_comment`, rf.`room_num`, bd.`date_from`, IF(bd.`id_status` = '. self::STATUS_CHECKED_OUT .', bd.`check_out`, bd.`date_to`) AS `date_to`
                             FROM `'._DB_PREFIX_.'htl_booking_detail` AS bd
                             INNER JOIN `'._DB_PREFIX_.'htl_room_information` AS rf ON (rf.`id` = bd.`id_room`)
-                            WHERE bd.`id_hotel`='.(int)$hotel_id.' AND bd.`id_product`='.(int)$room_type['id_product'].' AND rf.`id_status` != 2 AND bd.`is_back_order` = 0 AND bd.`is_refunded` = 0 AND IF(bd.`id_status` = 3, (
+                            WHERE bd.`id_hotel`='.(int)$hotel_id.' AND bd.`id_product`='.(int)$room_type['id_product'].' AND rf.`id_status` != '. HotelRoomInformation::STATUS_INACTIVE .' AND bd.`is_back_order` = 0 AND bd.`is_refunded` = 0 AND IF(bd.`id_status` = '. self::STATUS_CHECKED_OUT .', (
                                 (DATE_FORMAT(`check_out`,  "%Y-%m-%d") > \''.pSQL($date_from).'\' AND DATE_FORMAT(`check_out`,  "%Y-%m-%d") < \''.PSQL($date_to).'\') AND (
                                     (bd.`date_from` <= \''.pSQL($date_from).'\' AND bd.`check_out` > \''.pSQL($date_from).'\' AND bd.`check_out` < \''.pSQL($date_to).'\') OR
                                     (bd.`date_from` > \''.pSQL($date_from).'\' AND bd.`date_from` < \''.pSQL($date_to).'\' AND bd.`check_out` >= \''.pSQL($date_to).'\') OR
@@ -404,7 +408,7 @@ class HotelBookingDetail extends ObjectModel
                             FROM `'._DB_PREFIX_.'htl_room_information` AS hri
                             INNER JOIN `'._DB_PREFIX_.'htl_room_disable_dates` AS hrdd ON (hrdd.`id_room_type` = hri.`id_product` AND hrdd.`id_room` = hri.`id`)
                             WHERE hri.`id_hotel`='.(int)$hotel_id.' AND hri.`id_product`='.(int)$room_type['id_product'].' AND
-                            hri.`id_status` = 3 AND (
+                            hri.`id_status` = '. HotelRoomInformation::STATUS_TEMPORARY_INACTIVE .' AND (
                                 (hrdd.`date_from` <= \''.pSQL($date_from).'\' AND hrdd.`date_to` > \''.pSQL($date_from).'\' AND hrdd.`date_to` < \''.pSQL($date_to).'\') OR
                                 (hrdd.`date_from` > \''.pSQL($date_from).'\' AND hrdd.`date_from` < \''.pSQL($date_to).'\' AND hrdd.`date_to` >= \''.pSQL($date_to).'\') OR
                                 (hrdd.`date_from` > \''.pSQL($date_from).'\' AND hrdd.`date_from` < \''.pSQL($date_to).'\' AND hrdd.`date_to` < \''.pSQL($date_to).'\')
@@ -764,12 +768,12 @@ class HotelBookingDetail extends ObjectModel
         $table = 'htl_booking_detail';
 
         // create date to update in the table
-        if ($new_status == 2) {
+        if ($new_status == self::STATUS_CHECKED_IN) {
             $data = array(
                 'id_status' => $new_status,
                 'check_in' => ($status_date > $date_to ? $date_to : $status_date)
             );
-        } elseif ($new_status == 3) {
+        } elseif ($new_status == self::STATUS_CHECKED_OUT) {
             $data = array(
                 'id_status' => $new_status,
                 'check_out' => ($status_date > $date_to ? $date_to : $status_date)
@@ -943,18 +947,31 @@ class HotelBookingDetail extends ObjectModel
         if (isset($_COOKIE['wk_id_cart'])) {
             $current_admin_cart_id = $_COOKIE['wk_id_cart'];
         }
+        $exclude_ids = 'SELECT `id_room` FROM `'._DB_PREFIX_.'htl_booking_detail`
+            WHERE `date_from` < \''.pSQL($date_to).'\' AND `date_to` > \''.pSQL($date_from).'\'
+            AND `is_refunded`=0 AND `is_back_order`=0
+            UNION
+            SELECT hri.`id` AS id_room
+            FROM `'._DB_PREFIX_.'htl_room_information` AS hri
+            INNER JOIN `'._DB_PREFIX_.'htl_room_disable_dates` AS hrdd ON (hrdd.`id_room_type` = hri.`id_product` AND hrdd.`id_room` = hri.`id`)
+            WHERE hri.`id_hotel`='.(int)$hotel_id.' AND hri.`id_product` ='.(int)$room_type.'
+            AND hri.`id_status` = '. HotelRoomInformation::STATUS_TEMPORARY_INACTIVE .'
+            AND (hrdd.`date_from` <= \''.pSql($date_to).'\' AND hrdd.`date_to` >= \''.pSql($date_from).'\')';
 
         if (isset($current_admin_cart_id) && $current_admin_cart_id) {
             $sql = 'SELECT `id` AS `id_room`, `id_product`, `id_hotel`, `room_num`, `comment` AS `room_comment`
             FROM `'._DB_PREFIX_.'htl_room_information`
-            WHERE `id_hotel`='.(int)$hotel_id.' AND `id_product`='.(int)$room_type.' AND id_status = 1
-            AND `id` NOT IN (SELECT `id_room` FROM `'._DB_PREFIX_.'htl_booking_detail` WHERE `date_from` < \''.
-            pSQL($date_to).'\' AND `date_to` > \''.pSQL($date_from).'\' AND `is_refunded`=0 AND `is_back_order`=0)
+            WHERE `id_hotel`='.(int)$hotel_id.' AND `id_product`='.(int)$room_type.'
+            AND (id_status = '. HotelRoomInformation::STATUS_ACTIVE .' or id_status = '. HotelRoomInformation::STATUS_TEMPORARY_INACTIVE .')
+            AND `id` NOT IN ('.$exclude_ids.')
             AND `id` NOT IN (SELECT `id_room` FROM `'._DB_PREFIX_.'htl_cart_booking_data` WHERE `id_cart`='.
             (int)$current_admin_cart_id.')';
         } else {
             $sql = 'SELECT `id` AS `id_room`, `id_product`, `id_hotel`, `room_num`, `comment` AS `room_comment`
-            FROM `'._DB_PREFIX_.'htl_room_information` WHERE `id_hotel`='.(int)$hotel_id.' AND `id_product`='.(int)$room_type.' AND id_status = 1 AND `id` NOT IN (SELECT `id_room` FROM `'._DB_PREFIX_.'htl_booking_detail` WHERE `date_from` < \''.pSQL($date_to).'\' AND `date_to` > \''.pSQL($date_from).'\' AND `is_refunded`=0 AND `is_back_order`=0)';
+            FROM `'._DB_PREFIX_.'htl_room_information`
+            WHERE `id_hotel`='.(int)$hotel_id.' AND `id_product`='.(int)$room_type.'
+            AND (id_status = '. HotelRoomInformation::STATUS_ACTIVE .' or id_status = '. HotelRoomInformation::STATUS_TEMPORARY_INACTIVE .')
+            AND `id` NOT IN ('.$exclude_ids.')';
         }
         $avail_rooms = Db::getInstance()->executeS($sql);
         if ($avail_rooms) {
@@ -975,8 +992,15 @@ class HotelBookingDetail extends ObjectModel
         */
     public function getAvailableRoomsForSwapping($date_from, $date_to, $room_type, $hotel_id, $id_room)
     {
-        $sql = 'SELECT `id` AS `id_room`, `id_product`, `id_hotel`, `room_num`, `comment` AS `room_comment` FROM `'._DB_PREFIX_.'htl_room_information` WHERE `id_hotel`='.(int)$hotel_id.' AND `id_product`='.(int)$room_type.
-        ' AND `id_status` = 1 AND `id` IN (SELECT `id_room` FROM `'._DB_PREFIX_.'htl_booking_detail` WHERE `date_from` = \''.pSQL($date_from).'\' AND `date_to` = \''.pSQL($date_to).'\' AND `id_room`!='.(int)$id_room.' AND `is_refunded`=0 AND `is_back_order`=0)';
+        $sql = 'SELECT `id` AS `id_room`, `id_product`, `id_hotel`, `room_num`, `comment` AS `room_comment`
+            FROM `'._DB_PREFIX_.'htl_room_information`
+            WHERE `id_hotel`='.(int)$hotel_id.' AND `id_product`='.(int)$room_type.'
+            AND (id_status = '. HotelRoomInformation::STATUS_ACTIVE .' or id_status = '. HotelRoomInformation::STATUS_TEMPORARY_INACTIVE .')
+            AND `id` IN (
+                SELECT `id_room` FROM `'._DB_PREFIX_.'htl_booking_detail`
+                WHERE `date_from` = \''.pSQL($date_from).'\' AND `date_to` = \''.pSQL($date_to).'\'
+                AND `id_room`!='.(int)$id_room.' AND `is_refunded`=0 AND `is_back_order`=0
+            )';
 
         return Db::getInstance()->executeS($sql);
     }
@@ -1007,6 +1031,15 @@ class HotelBookingDetail extends ObjectModel
                 $data['room_num'] = $room_num;
             }
             if ($result2 = Db::getInstance()->update($table2, $data, $where)) {
+                Hook::exec(
+                    'actionRoomReAllocateAfter',
+                    array(
+                        'room_id' => $current_room_id,
+                        'realloc_room_id' => $swapped_room_id,
+                        'date_from' => $date_from,
+                        'date_to' => $date_to,
+                    )
+                );            
                 return true;
             }
             return false;
@@ -1029,33 +1062,48 @@ class HotelBookingDetail extends ObjectModel
         $date_to = date('Y-m-d H:i:s', strtotime($date_to));
 
         $idcrt1 = Db::getInstance()->getValue(
-            'SELECT `id` FROM `'._DB_PREFIX_.'htl_cart_booking_data` WHERE `date_from`=\''.pSQL($date_from).
-            '\' AND `date_to`=\''.pSQL($date_to).'\' AND `id_room`='.(int)$swapped_room_id
+            'SELECT `id` FROM `'._DB_PREFIX_.'htl_cart_booking_data` WHERE `is_refunded` = 0
+            AND `date_from`=\''.pSQL($date_from).'\' AND `date_to`=\''.pSQL($date_to).'\'
+            AND `id_room`='.(int)$swapped_room_id
         );
         $idcrt2 = Db::getInstance()->getValue(
-            'SELECT `id` FROM `'._DB_PREFIX_.'htl_cart_booking_data` WHERE `date_from`=\''.pSQL($date_from).
-            '\' AND `date_to`=\''.pSQL($date_to).'\' AND `id_room`='.(int)$current_room_id
+            'SELECT `id` FROM `'._DB_PREFIX_.'htl_cart_booking_data` WHERE `is_refunded` = 0
+            AND `date_from`=\''.pSQL($date_from).'\' AND `date_to`=\''.pSQL($date_to).'\'
+            AND `id_room`='.(int)$current_room_id
         );
 
         $swap_room = Db::getInstance()->getRow(
-            'SELECT `id`, `room_num` FROM `'._DB_PREFIX_.'htl_booking_detail` WHERE `date_from`=\''.pSQL($date_from).
-            '\' AND `date_to`=\''.pSQL($date_to).'\' AND `id_room`='.(int)$swapped_room_id
+            'SELECT `id`, `room_num` FROM `'._DB_PREFIX_.'htl_booking_detail` WHERE `is_refunded` = 0
+            AND `date_from`=\''.pSQL($date_from).'\' AND `date_to`=\''.pSQL($date_to).'\'
+            AND `id_room`='.(int)$swapped_room_id
         );
         $curr_room = Db::getInstance()->getRow(
-            'SELECT `id`, `room_num` FROM `'._DB_PREFIX_.'htl_booking_detail` WHERE `date_from`=\''.pSQL($date_from).
-            '\' AND `date_to`=\''.pSQL($date_to).'\' AND `id_room`='.(int)$current_room_id
+            'SELECT `id`, `room_num` FROM `'._DB_PREFIX_.'htl_booking_detail` WHERE `is_refunded` = 0
+            AND `date_from`=\''.pSQL($date_from).'\' AND `date_to`=\''.pSQL($date_to).'\'
+            AND `id_room`='.(int)$current_room_id
         );
         $sql = 'UPDATE `'._DB_PREFIX_.'htl_cart_booking_data` SET `id_room`=IF(`id`='.(int)$idcrt1.','.
         (int)$current_room_id.','.(int)$swapped_room_id.') WHERE `id` IN('.(int)$idcrt1.','.(int)$idcrt2.')';
 
         $sql1 = 'UPDATE `'._DB_PREFIX_.'htl_booking_detail`
             SET `id_room`=IF(`id`='.(int)$swap_room['id'].','.(int)$current_room_id.','.(int)$swapped_room_id.'),
-            `room_num`=IF(`id`='.(int)$swap_room['id'].',\''.$curr_room['room_num'].'\',\''.$swap_room['room_num'].'\')
-            WHERE `id` IN('.(int)$swap_room['id'].','.(int)$curr_room.')';
+            `room_num`=IF(
+                `id`='.(int)$swap_room['id'].',\''.pSQL($curr_room['room_num']).'\',\''.pSQL($swap_room['room_num']).'\'
+            )
+            WHERE `id` IN('.(int)$swap_room['id'].','.(int)$curr_room['id'].')';
 
         if ($result = Db::getInstance()->execute($sql)) {
             $result2 = Db::getInstance()->execute($sql1);
             if ($result2) {
+                Hook::exec(
+                    'actionRoomSwapAfter',
+                    array(
+                        'room_id' => $current_room_id,
+                        'swapped_room_id' => $swapped_room_id,
+                        'date_from' => $date_from,
+                        'date_to' => $date_to,
+                    )
+                );            
                 return true;
             }
             return false;
@@ -1660,7 +1708,7 @@ class HotelBookingDetail extends ObjectModel
                     $objHtlBooking->id_hotel = $objCartBooking->id_hotel;
                     $objHtlBooking->id_customer = $cart->id_customer;
                     $objHtlBooking->booking_type = $objCartBooking->booking_type;
-                    $objHtlBooking->id_status = 1;
+                    $objHtlBooking->id_status = self::STATUS_ALLOTED;
                     $objHtlBooking->comment = $objCartBooking->comment;
 
                     // For Back Order(Because of cart lock)
@@ -1753,13 +1801,35 @@ class HotelBookingDetail extends ObjectModel
         );
     }
 
-    public function getRoomBookingData($idRoom, $idOrder)
+    public function getRoomBookingData($idRoom, $idOrder, $date_from, $date_to)
     {
         $sql = 'SELECT `id_product`, `id_order_detail`, `id_hotel`, `id_customer`, `booking_type`, `id_status`, `check_in`, `check_out`
                 FROM `'._DB_PREFIX_.'htl_booking_detail`
-                WHERE `id_order`='.(int)$idOrder.' AND `id_room`='.(int)$idRoom;
+                WHERE `id_order`='.(int)$idOrder.' AND `id_room`='.(int)$idRoom.'
+                AND `date_from`=\''.pSQL($date_from).'\' AND `date_to`= \''.pSQL($date_to).'\'';
 
         return Db::getInstance()->getRow($sql);
+    }
+
+    public static function getAllHotelOrderStatus()
+    {
+        $moduleInstance = Module::getInstanceByName('hotelreservationsystem');
+
+        $pages = array(
+            'STATUS_ALLOTED' => array(
+                'id_status' => self::STATUS_ALLOTED,
+                'name' => $moduleInstance->l('Alloted', 'hotelreservationsystem')
+            ),
+            'STATUS_CHECKED_IN' => array(
+                'id_status' => self::STATUS_CHECKED_IN,
+                'name' => $moduleInstance->l('Checked In', 'hotelreservationsystem')
+            ),
+            'STATUS_CHECKED_OUT' => array(
+                'id_status' => self::STATUS_CHECKED_OUT,
+                'name' => $moduleInstance->l('Checked Out', 'hotelreservationsystem')
+            ),
+        );
+        return $pages;
     }
 
     // Webservice funcions

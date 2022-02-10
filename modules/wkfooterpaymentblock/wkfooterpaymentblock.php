@@ -32,7 +32,7 @@ class WkFooterPaymentBlock extends Module
     {
         $this->name = 'wkfooterpaymentblock';
         $this->tab = 'front_office_features';
-        $this->version = '1.1.3';
+        $this->version = '1.1.4';
         $this->author = 'webkul';
         $this->need_instance = 0;
 
@@ -49,7 +49,7 @@ class WkFooterPaymentBlock extends Module
         $objPaymentBlockInfo = new WkFooterPaymentBlockInfo();
         if ($allPaymentBlocks = $objPaymentBlockInfo->getAllPaymentBlocks(1, 'position')) {
             $this->context->smarty->assign('allPaymentBlocks', $allPaymentBlocks);
-            $this->context->controller->addCSS(_PS_MODULE_DIR_.$this->name.'/views/css/wkFooterPaymentBlockFront.css');
+            $this->context->controller->addCSS($this->_path.'/views/css/wkFooterPaymentBlockFront.css');
             return $this->display(__FILE__, 'wkFooterPaymentBlock.tpl');
         }
     }

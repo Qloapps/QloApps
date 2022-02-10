@@ -1,23 +1,45 @@
-<div id="datepicker" class="row row-padding-top hide">
+<div id="datepicker" class="row hide">
 	<div class="col-lg-12">
 		<div class="daterangepicker-days">
 			<div class="row">
 				{if $is_rtl}
 				<div class="col-sm-6 col-lg-4">
-					<div class="datepicker2" data-date="{$date_to}" data-date-format="{$date_format}"></div>
+					<div class="datepicker2" data-date="{$date_to}" data-date-format="{$date_format}">
+						<div class='form-date-actions'>
+							<button class='btn btn-link' type='button' id="datepicker-cancel" tabindex="7">
+								<i class='icon-remove'></i>
+								{l s='Cancel'}
+							</button>
+							<button class='btn btn-default pull-right' type='submit' name="submitDateRange" tabindex="6">
+								<i class='icon-ok text-success'></i>
+								{l s='Apply'}
+							</button>
+						</div>
+					</div>
 				</div>
-				<div class="col-sm-6 col-lg-4">
+				<div class="col-sm-6 col-lg-4 hide">
 					<div class="datepicker1" data-date="{$date_from}" data-date-format="{$date_format}"></div>
 				</div>
 				{else}
-				<div class="col-sm-6 col-lg-4">
+				<div class="col-sm-6 col-lg-4 hide">
 					<div class="datepicker1" data-date="{$date_from}" data-date-format="{$date_format}"></div>
 				</div>
 				<div class="col-sm-6 col-lg-4">
-					<div class="datepicker2" data-date="{$date_to}" data-date-format="{$date_format}"></div>
+					<div class="datepicker2" data-date="{$date_to}" data-date-format="{$date_format}">
+						<div class='form-date-actions'>
+							<button class='btn btn-link' type='button' id="datepicker-cancel" tabindex="7">
+								<i class='icon-remove'></i>
+								{l s='Cancel'}
+							</button>
+							<button class='btn btn-default pull-right' type='submit' name="submitDateRange" tabindex="6">
+								<i class='icon-ok text-success'></i>
+								{l s='Apply'}
+							</button>
+						</div>
+					</div>
 				</div>
 				{/if}
-				<div class="col-xs-12 col-sm-6 col-lg-4 pull-right">
+				<div class="col-xs-12 col-sm-6 col-lg-4 pull-right hide">
 					<div id='datepicker-form' class='form-inline'>
 						<div id='date-range' class='form-date-group'>
 							<div  class='form-date-heading'>

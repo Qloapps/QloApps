@@ -1,3 +1,12 @@
+-----------------------------
+# V1.5.1 to V1.5.2
+-----------------------------
+
+## Improved/Changed Features:
+
+* [CO] : [#244] Changed Tools::jsonEncode to json_encode
+
+
 2014-04-22 18:58:39 +0200	// Changelog updated
 2014-04-17 11:58:28 +0200	[-] MO : graphnvd3 - Fix 1.5 ps_version_compliancy issue
 2014-03-24 15:21:45 +0100	/ MO graphnvd3 : ps_versions_compliancy added

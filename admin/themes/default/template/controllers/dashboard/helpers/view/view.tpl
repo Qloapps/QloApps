@@ -31,6 +31,7 @@
 </script>
 
 <div id="dashboard">
+	{$hookDashboardTop}
 	<div class="row">
 		<div class="col-lg-12">
 {if $warning}
@@ -39,10 +40,10 @@
 			<div id="calendar" class="panel">
 				<form action="{$action|escape}" method="post" id="calendar_form" name="calendar_form" class="form-inline">
 					<div class="btn-group">
-						<button type="button" name="submitDateDay" class="btn btn-default submitDateDay{if isset($preselect_date_range) && $preselect_date_range == 'day'} active{/if}">
+						<button type="button" name="submitDateDay" class="btn btn-default submitDateDay{if (!isset($preselect_date_range) || !$preselect_date_range) || (isset($preselect_date_range) && $preselect_date_range == 'day')} active{/if}">
 							{l s='Day'}
 						</button>
-						<button type="button" name="submitDateMonth" class="btn btn-default submitDateMonth{if (!isset($preselect_date_range) || !$preselect_date_range) || (isset($preselect_date_range) && $preselect_date_range == 'month')} active{/if}">
+						<button type="button" name="submitDateMonth" class="btn btn-default submitDateMonth {if isset($preselect_date_range) && $preselect_date_range == 'month'}active{/if}">
 							{l s='Month'}
 						</button>
 						<button type="button" name="submitDateYear" class="btn btn-default submitDateYear{if isset($preselect_date_range) && $preselect_date_range == 'year'} active{/if}">
@@ -57,10 +58,6 @@
 						<button type="button" name="submitDateYearPrev" class="btn btn-default submitDateYearPrev{if isset($preselect_date_range) && $preselect_date_range == 'prev-year'} active{/if}">
 							{l s='Year'}-1
 						</button>
-						<!--
-						<button type="submit" name="submitDateRealTime" class="hide btn btn-default submitDateRealTime {if $dashboard_use_push}active{/if}" value="{!$dashboard_use_push|intval}">
-							{l s='Real Time'}
-						</button> -->
 					</div>
 					<input type="hidden" name="datepickerFrom" id="datepickerFrom" value="{$date_from|escape}" class="form-control">
 					<input type="hidden" name="datepickerTo" id="datepickerTo" value="{$date_to|escape}" class="form-control">
@@ -77,8 +74,8 @@
 							</span>
 							<i class="icon-caret-down"></i>
 						</button>
+						{$calendar}
 					</div>
-					{$calendar}
 				</form>
 			</div>
 		</div>
@@ -87,30 +84,10 @@
 		<div class="col-md-4 col-lg-3" id="hookDashboardZoneOne">
 			{$hookDashboardZoneOne}
 		</div>
-		<div class="col-md-8 col-lg-7" id="hookDashboardZoneTwo">
-			{$hookDashboardZoneTwo}
-		</div>
-		<div class="col-md-12 col-lg-2">
-			{$hookDashboardZoneThree}
-			<section class="dash_links panel">
-				<h3><i class="icon-link"></i> {l s="Useful links"}</h3>
-					<dl>
-						<dt><a href="https://qloapps.com/qlo-reservation-system/" class="_blank">{l s="Official Documentation"}</a></dt>
-						<dd>{l s="Qloapps User Guide"}</dd>
-					</dl>
-					<dl>
-						<dt><a href="https://forums.qloapps.com/" class="_blank">{l s="Qloapps Forum"}</a></dt>
-						<dd>{l s="Connect with the Qloapps community"}</dd>
-					</dl>
-					<dl>
-						<dt><a href="https://qloapps.com/addons/" class="_blank">{l s="Qloapps Addons"}</a></dt>
-						<dd>{l s="Enhance your store Qloapps modules"}</dd>
-					</dl>
-					<dl>
-						<dt><a href="https://qloapps.com/contact/" class="_blank">{l s="Contact Us!"}</a></dt>
-						<dd>{l s="Contact us for any help"}</dd>
-					</dl>
-			</section>
+		<div class="col-md-8 col-lg-9" id="hookDashboardZoneTwo">
+			<div class='row'>
+				{$hookDashboardZoneTwo}
+			</div>
 		</div>
 	</div>
 </div>

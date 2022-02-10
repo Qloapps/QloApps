@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="iso-8859-2"?>
+<!DOCTYPE rss [<!ENTITY % HTMLlat1 PUBLIC "-//W3C//ENTITIES Latin 1 for XHTML//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml-lat1.ent">]>
+<rss version="0.92" xml:base="http://weblabor.hu">
+<channel>
+ <title>Weblabor - Kommunikáció a fontosabb PHP projektek és a nyelv fejlesztői között - Hozzászólások</title>
+ <link>http://weblabor.hu/hirek/20051008/phpkapcsolat</link>
+ <description>Hozzászólások: Kommunikáció a fontosabb PHP projektek és a nyelv fejlesztői között</description>
+ <language>hu</language>
+<item>
+ <title>Kommunikáció a fontosabb PHP projektek és a nyelv fejlesztői között</title>
+ <link>http://weblabor.hu/hirek/20051008/phpkapcsolat</link>
+ <description>Nemrég elég nagy vihart kavart a PHP 4.4.0 (és az 5.0.5) megjelenése, amik olyan súlyos referenciákkal kapcsolatos hibákat javítottak, melyek eltűnésével stabilabb programok fejlesztése vált lehetővé. A problémákat persze nem a hibajavítás okozta, hanem az, hogy mellékhatásaként számos bevett gyakorlatot tett működésképtelenné, hiszen korábban sok helyen megengedte a PHP, hogy érték szerint adjunk át paramétereket valahol, ahol referenciát várt volna a motor. A választás tehát nehéz volt: ismert hibákat javítani vagy megtartani a korábbi fagyásokhoz vezető viselkedést.</description>
+ <pubDate>Sat, 08 Oct 2005 19:13:28 +0200</pubDate>
+</item>
+</channel>
+</rss>

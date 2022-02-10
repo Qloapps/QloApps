@@ -76,89 +76,103 @@ class HotelAdvancedPayment extends ObjectModel
         return false;
     }
 
-
-    public function getProductMinAdvPaymentAmountByIdCart($id_cart, $id_product, $adv_global_percent = 0, $adv_global_tax_incl = 0, $with_taxes = 1)
-    {
-        if (!$adv_global_percent) {
-            $adv_global_percent = Configuration::get('WK_ADVANCED_PAYMENT_GLOBAL_MIN_AMOUNT');
+    /**
+     * Get the advance payment amount of the room type in the cart
+     * @param [int] $idCart : cart id
+     * @param [int] $idProduct : id_product of room type
+     * @param integer $advGlobalPercent
+     * @param integer $advGlobalTaxIncl
+     * @param integer $withTaxes : Amount with(1) or without tax (0)
+     * @return [float] advance payment amount of the room type in the cart
+     */
+    public function getProductMinAdvPaymentAmountByIdCart(
+        $idCart,
+        $idProduct,
+        $advGlobalPercent = 0,
+        $advGlobalTaxIncl = 0,
+        $withTaxes = 1
+    ) {
+        if (!$advGlobalPercent) {
+            $advGlobalPercent = Configuration::get('WK_ADVANCED_PAYMENT_GLOBAL_MIN_AMOUNT');
+        }
+        if (!$advGlobalTaxIncl) {
+            $advGlobalTaxIncl = Configuration::get('WK_ADVANCED_PAYMENT_INC_TAX');
         }
 
-        if (!$adv_global_tax_incl) {
-            $adv_global_tax_incl = Configuration::get('WK_ADVANCED_PAYMENT_INC_TAX');
-        }
-        $price_with_tax = Product::getPriceStatic($id_product, true, null, 6, null, false, true);
-        $price_without_tax = Product::getPriceStatic($id_product, false, null, 6, null, false, true);
-        $hotelCartBookingData = new HotelCartBookingData();
-        $roomTypesByIdProduct = $hotelCartBookingData->getCartInfoIdCartIdProduct((int) $id_cart, (int)$id_product);
-        $totalPriceByProductTaxIncl = 0;
-        $totalPriceByProductTaxExcl = 0;
+        $roomTypeTotalTI = 0;
+        $roomTypeTotalTE = 0;
         $productCartQuantity = 0;
-        foreach ($roomTypesByIdProduct as $key => $cartRoomInfo) {
-            $roomTotalPrice = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice($cartRoomInfo['id_product'], $cartRoomInfo['date_from'], $cartRoomInfo['date_to']);
-            $totalPriceByProductTaxIncl += $roomTotalPrice['total_price_tax_incl'];
-            $totalPriceByProductTaxExcl += $roomTotalPrice['total_price_tax_excl'];
-            $productCartQuantity += $cartRoomInfo['quantity'];
-        }
-        $prod_adv = $this->getIdAdvPaymentByIdProduct($id_product);
-        if ($prod_adv) {
-            if ($prod_adv['active']) {
-                if ($prod_adv['calculate_from']) { // Advanced payment is calculated by product advanced payment setting
-                    if ($prod_adv['payment_type'] == self::WK_ADVANCE_PAYMENT_TYPE_PERCENTAGE) { // Percentage
-                        if ($prod_adv['tax_include']) {
-                            $prod_price = $totalPriceByProductTaxIncl;
-                        } else {
-                            $prod_price = $totalPriceByProductTaxExcl;
-                        }
-                        $adv_amount = ($prod_price*$prod_adv['value'])/100 ;
-                    } else {
-                        $prod_adv['value'] = Tools::convertPrice($prod_adv['value']);
+        $objHtlCartBook = new HotelCartBookingData();
+        if ($roomTypesByIdProduct = $objHtlCartBook->getCartInfoIdCartIdProduct((int) $idCart, (int)$idProduct)) {
+            foreach ($roomTypesByIdProduct as $cartRoomInfo) {
+                $roomTotalPrices = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
+                    $cartRoomInfo['id_product'],
+                    $cartRoomInfo['date_from'],
+                    $cartRoomInfo['date_to']
+                );
 
-                        if ($prod_adv['tax_include']) { //Fixed
-                            if ($price_with_tax < $prod_adv['value']) {
-                                $adv_amount = $totalPriceByProductTaxIncl;
-                            } else {
-                                $adv_amount = $prod_adv['value'] * $productCartQuantity;
-                            }
+                $roomTypeTotalTI += $roomTotalPrices['total_price_tax_incl'];
+                $roomTypeTotalTE += $roomTotalPrices['total_price_tax_excl'];
+                $productCartQuantity += $cartRoomInfo['quantity'];
+            }
+        }
+
+        $advPaymentAmount = 0;
+        if ($prodAdvPayInfo = $this->getIdAdvPaymentByIdProduct($idProduct)) {
+            if ($prodAdvPayInfo['active']) {
+                // Advanced payment is calculated by product advanced payment setting
+                if ($prodAdvPayInfo['calculate_from']) {
+                    // room type original prices
+                    $prodRawPriceTI = Product::getPriceStatic($idProduct, true, null, 6, null, false, true);
+                    $prodRawPriceTE = Product::getPriceStatic($idProduct, false, null, 6, null, false, true);
+
+                    if ($prodAdvPayInfo['payment_type'] == self::WK_ADVANCE_PAYMENT_TYPE_PERCENTAGE) { // Percentage
+                        $advPaymentAmount = ($roomTypeTotalTE * $prodAdvPayInfo['value']) / 100 ;
+                    } else {
+                        $prodAdvPayInfo['value'] = Tools::convertPrice($prodAdvPayInfo['value']);
+
+                        if ($prodRawPriceTE < $prodAdvPayInfo['value']) {
+                            $advPaymentAmount = $prodRawPriceTE * $productCartQuantity;
                         } else {
-                            if ($price_without_tax < $prod_adv['value']) {
-                                $adv_amount = $price_without_tax * $productCartQuantity;
-                            } else {
-                                $adv_amount = $prod_adv['value'] * $productCartQuantity;
-                            }
+                            $advPaymentAmount = $prodAdvPayInfo['value'] * $productCartQuantity;
                         }
-                        if ($with_taxes) {
-                            if ($price_without_tax) {
-                                $taxRate = (($price_with_tax-$price_without_tax)/$price_without_tax)*100;
-                            } else {
-                                $taxRate = 0;
-                            }
-                            $taxRate = HotelRoomType::getRoomTypeTaxRate($id_product);
-                            $taxPrice = ($adv_amount * $taxRate) / 100;
-                            $adv_amount += $taxPrice;
+                    }
+
+                    // add taxes to the advance room type price
+                    if ($withTaxes && $prodAdvPayInfo['tax_include']) {
+                        if ($prodRawPriceTE) {
+                            $taxRate = (($prodRawPriceTI - $prodRawPriceTE) / $prodRawPriceTE) * 100;
+                        } else {
+                            $taxRate = 0;
                         }
+                        $taxRate = HotelRoomType::getRoomTypeTaxRate($idProduct);
+                        $taxPrice = ($advPaymentAmount * $taxRate) / 100;
+                        $advPaymentAmount += $taxPrice;
                     }
                 } else { // Advanced payment is calculated by Global advanced payment setting
-                    if ($adv_global_tax_incl && $with_taxes) {
-                        $adv_amount = ($totalPriceByProductTaxIncl*$adv_global_percent)/100 ;
+                    if ($advGlobalTaxIncl && $withTaxes) {
+                        $advPaymentAmount = ($roomTypeTotalTI * $advGlobalPercent) / 100 ;
                     } else {
-                        $adv_amount = ($totalPriceByProductTaxExcl*$adv_global_percent)/100 ;
+                        $advPaymentAmount = ($roomTypeTotalTE * $advGlobalPercent) / 100 ;
                     }
                 }
-            } else {
-                $prod_price = $totalPriceByProductTaxIncl;
-                $adv_amount = $prod_price;
+            } else { // if advance payment is disabled for this room type then send the room type full price
+                if ($withTaxes) {
+                    $advPaymentAmount = $roomTypeTotalTI;
+                } else {
+                    $advPaymentAmount = $roomTypeTotalTE;
+                }
             }
-        } else {
-            if ($adv_global_tax_incl && $with_taxes) {
-                $adv_amount = ($totalPriceByProductTaxIncl*$adv_global_percent)/100 ;
+        } else { // if no advance payment info for the room type the calculate from Global settings
+            if ($withTaxes && $advGlobalTaxIncl) {
+                $advPaymentAmount = ($roomTypeTotalTI * $advGlobalPercent) / 100 ;
             } else {
-                $adv_amount = ($totalPriceByProductTaxExcl*$adv_global_percent)/100 ;
+                $advPaymentAmount = ($roomTypeTotalTE * $advGlobalPercent) / 100 ;
             }
         }
 
-        return $adv_amount;
+        return $advPaymentAmount;
     }
-
 
     /**
      * [getProductMinAdvPaymentAmount :: To get minimum advance payment amount paid by the customer for a particular product for a given quantities product]
@@ -297,74 +311,86 @@ class HotelAdvancedPayment extends ObjectModel
         return false;
     }
 
-    public function getRoomMinAdvPaymentAmount($id_product, $date_from, $date_to)
+    /**
+     * Get the advance payment amount of the room type booking in the cart
+     * @param [int] $idProduct : id_product of room type
+     * * @param [date] $dateFrom : date from of the booking
+     * * @param [date] $dateFrom : date to of the booking
+     * @param integer $withTaxes : Amount with(1) or without tax (0)
+     * @return [float] advance payment amount of the room type in the cart
+     */
+    public function getRoomMinAdvPaymentAmount($idProduct, $dateFrom, $dateTo, $withTaxes = 1)
     {
-        $date_from = date('Y-m-d', strtotime($date_from));
-        $date_to = date('Y-m-d', strtotime($date_to));
-        $adv_global_percent = Configuration::get('WK_ADVANCED_PAYMENT_GLOBAL_MIN_AMOUNT');
-        $adv_global_tax_incl = Configuration::get('WK_ADVANCED_PAYMENT_INC_TAX');
+        $dateFrom = date('Y-m-d', strtotime($dateFrom));
+        $dateTo = date('Y-m-d', strtotime($dateTo));
 
-        $price_with_tax = Product::getPriceStatic($id_product, true, null, 6, null, false, true);
-        $price_without_tax = Product::getPriceStatic($id_product, false, null, 6, null, false, true);
-        $hotelCartBookingData = new HotelCartBookingData();
-        $productCartQuantity = 0;
-        $roomTotalPrice = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice($id_product, $date_from, $date_to);
-        $totalPriceByProductTaxIncl = $roomTotalPrice['total_price_tax_incl'];
-        $totalPriceByProductTaxExcl = $roomTotalPrice['total_price_tax_excl'];
-        $obj_booking_detail = new HotelBookingDetail();
-        $productCartQuantity = $obj_booking_detail->getNumberOfDays($date_from, $date_to);
+        // Advance payment information from global settings
+        $advGlobalPercent = Configuration::get('WK_ADVANCED_PAYMENT_GLOBAL_MIN_AMOUNT');
+        $advGlobalTaxIncl = Configuration::get('WK_ADVANCED_PAYMENT_INC_TAX');
 
-        $prod_adv = $this->getIdAdvPaymentByIdProduct($id_product);
-        if ($prod_adv) {
-            if ($prod_adv['active']) {
-                if ($prod_adv['calculate_from']) { // Advanced payment is calculated by product advanced payment setting
-                    if ($prod_adv['payment_type'] == 1) { // Percentage
-                        if ($prod_adv['tax_include']) {
-                            $prod_price = $totalPriceByProductTaxIncl;
-                        } else {
-                            $prod_price = $totalPriceByProductTaxExcl;
-                        }
-                        $adv_amount = ($prod_price * $prod_adv['value']) / 100 ;
+        $roomTotalPrices = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice($idProduct, $dateFrom, $dateTo);
+        $roomTypeTotalTI = $roomTotalPrices['total_price_tax_incl'];
+        $roomTypeTotalTE = $roomTotalPrices['total_price_tax_excl'];
+
+        $advPaymentAmount = 0;
+        if ($prodAdvPayInfo = $this->getIdAdvPaymentByIdProduct($idProduct)) {
+            if ($prodAdvPayInfo['active']) {
+                // Advanced payment is calculated by product advanced payment setting
+                if ($prodAdvPayInfo['calculate_from']) {
+                    // room type original prices
+                    $prodRawPriceTI = Product::getPriceStatic($idProduct, true, null, 6, null, false, true);
+                    $prodRawPriceTE = Product::getPriceStatic($idProduct, false, null, 6, null, false, true);
+
+                    if ($prodAdvPayInfo['payment_type'] == self::WK_ADVANCE_PAYMENT_TYPE_PERCENTAGE) { // Percentage
+                        $advPaymentAmount = ($roomTypeTotalTE * $prodAdvPayInfo['value']) / 100 ;
                     } else {
-                        $prod_adv['value'] = Tools::convertPrice($prod_adv['value']);
+                        $prodAdvPayInfo['value'] = Tools::convertPrice($prodAdvPayInfo['value']);
 
-                        if ($prod_adv['tax_include']) { //Fixed
-                            if ($price_with_tax < $prod_adv['value']) {
-                                $adv_amount = $totalPriceByProductTaxIncl;
-                            } else {
-                                $adv_amount = $prod_adv['value'] * $productCartQuantity;
-                            }
+                        $numdays = 0;
+                        $objBookingDtl = new HotelBookingDetail();
+                        $numdays = $objBookingDtl->getNumberOfDays($dateFrom, $dateTo);
+
+                        if ($prodRawPriceTE < $prodAdvPayInfo['value']) {
+                            $advPaymentAmount = $prodRawPriceTE * $numdays;
                         } else {
-                            if ($price_without_tax < $prod_adv['value']) {
-                                $adv_amount = $price_without_tax * $productCartQuantity;
-                            } else {
-                                $adv_amount = $prod_adv['value'] * $productCartQuantity;
-                            }
+                            $advPaymentAmount = $prodAdvPayInfo['value'] * $numdays;
                         }
+                    }
+
+                    // add taxes to the advance room type price
+                    if ($withTaxes && $prodAdvPayInfo['tax_include']) {
+                        if ($prodRawPriceTE) {
+                            $taxRate = (($prodRawPriceTI - $prodRawPriceTE) / $prodRawPriceTE) * 100;
+                        } else {
+                            $taxRate = 0;
+                        }
+                        $taxRate = HotelRoomType::getRoomTypeTaxRate($idProduct);
+                        $taxPrice = ($advPaymentAmount * $taxRate) / 100;
+                        $advPaymentAmount += $taxPrice;
                     }
                 } else { // Advanced payment is calculated by Global advanced payment setting
-                    if ($adv_global_tax_incl) {
-                        $adv_amount = ($totalPriceByProductTaxIncl * $adv_global_percent) / 100 ;
+                    if ($advGlobalTaxIncl && $withTaxes) {
+                        $advPaymentAmount = ($roomTypeTotalTI * $advGlobalPercent) / 100 ;
                     } else {
-                        $adv_amount = ($totalPriceByProductTaxExcl * $adv_global_percent) / 100 ;
+                        $advPaymentAmount = ($roomTypeTotalTE * $advGlobalPercent) / 100 ;
                     }
                 }
-            } else {
-                if ($with_taxes) {
-                    $adv_amount = $totalPriceByProductTaxIncl;
+            } else { // if advance payment is disabled for this room type then send the room type full price
+                if ($withTaxes) {
+                    $advPaymentAmount = $roomTypeTotalTI;
                 } else {
-                    $adv_amount = $totalPriceByProductTaxExcl;
+                    $advPaymentAmount = $roomTypeTotalTE;
                 }
             }
-        } else {
-            if ($adv_global_tax_incl) {
-                $adv_amount = ($totalPriceByProductTaxIncl * $adv_global_percent) / 100 ;
+        } else { // if no advance payment info for the room type the calculate from Global settings
+            if ($withTaxes && $advGlobalTaxIncl) {
+                $advPaymentAmount = ($roomTypeTotalTI * $advGlobalPercent) / 100 ;
             } else {
-                $adv_amount = ($totalPriceByProductTaxExcl * $adv_global_percent) / 100 ;
+                $advPaymentAmount = ($roomTypeTotalTE * $advGlobalPercent) / 100 ;
             }
         }
 
-        return $adv_amount;
+        return $advPaymentAmount;
     }
 
     // check if advance payment is available for the current cart

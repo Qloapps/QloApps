@@ -1,0 +1,177 @@
+/**
+* 2007-2015 PrestaShop
+*
+* NOTICE OF LICENSE
+*
+* This source file is subject to the Academic Free License (AFL 3.0)
+* that is bundled with this package in the file LICENSE.txt.
+* It is also available through the world-wide-web at this URL:
+* http://opensource.org/licenses/afl-3.0.php
+* If you did not receive a copy of the license and are unable to
+* obtain it through the world-wide-web, please send an email
+* to license@prestashop.com so we can send you a copy immediately.
+*
+* DISCLAIMER
+*
+* Do not edit or add to this file if you wish to upgrade PrestaShop to newer
+* versions in the future. If you wish to customize PrestaShop for your
+* needs please refer to http://www.prestashop.com for more information.
+*
+*  @author    PrestaShop SA <contact@prestashop.com>
+*  @copyright 2007-2015 PrestaShop SA
+*  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+*  International Registered Trademark & Property of PrestaShop SA
+
+/* start */
+#dashtrends header {
+    margin-bottom: 0;
+  }
+  .bootstrap #dashboard #dashtrends #dashtrends_toolbar {
+    margin: 0 -16px 10px;
+  }
+  .bootstrap #dashboard #dashtrends #dashtrends_toolbar dl {
+    -webkit-box-shadow: 0 0 0 2px white inset;
+    box-shadow: 0 0 0 2px white inset;
+  }
+  .bootstrap #dashboard #dashtrends #dashtrends_toolbar dl dt {
+    color: #777;
+    padding: 0;
+    margin: 0;
+    height: 2.6em;
+  }
+  .bootstrap #dashboard #dashtrends #dashtrends_toolbar dl dd.data_value {
+    color: #aaa;
+  }
+  .bootstrap #dashboard #dashtrends #dashtrends_toolbar dl dd.data_value small {
+    font-size: 0.5em;
+  }
+  .bootstrap #dashboard #dashtrends #dashtrends_toolbar dl dd.dash_trend {
+    background-color: white;
+    width: 80px;
+    margin: 0 auto;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+  }
+  .bootstrap #dashboard #dashtrends #dashtrends_toolbar dl:hover dt, .bootstrap #dashboard #dashtrends #dashtrends_toolbar dl:hover dd.data_value {
+    color: #00aff0;
+  }
+  .bootstrap #dashboard #dashtrends #dashtrends_toolbar dl:hover dt {
+    text-decoration: underline;
+  }
+  .bootstrap #dashboard #dashtrends #dashtrends_toolbar dl.active dt, .bootstrap #dashboard #dashtrends #dashtrends_toolbar dl.active dd.data_value {
+    color: white;
+  }
+  .bootstrap #dashboard #dashtrends dl {
+    cursor: pointer;
+    margin: 0;
+    min-height: 70px;
+    text-align: center;
+    background-color: white;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    border-left: 1px solid #ddd;
+  }
+  .bootstrap #dashboard #dashtrends dl:first-child {
+    border-left: none;
+  }
+  .bootstrap #dashboard #dashtrends dl.active {
+    background-color: #00aff0;
+    -webkit-box-shadow: white 0 0 0 2px inset;
+    box-shadow: white 0 0 0 2px inset;
+  }
+  .bootstrap #dashboard #dashtrends dl.active dt {
+    color: white;
+  }
+  .bootstrap #dashboard #dashtrends dt {
+    text-align: center;
+    height: 37px;
+    line-height: 1em;
+    font: 400 1.1em/120% "Ubuntu Condensed", Helvetica, Arial, sans-serif;
+  }
+  .bootstrap #dashboard #dashtrends dd span {
+    font-size: 0.9em;
+    white-space: nowrap;
+  }
+  .bootstrap #dashboard #dashtrends svg {
+    height: 350px;
+  }
+
+  .bootstrap .clearfix:before, .bootstrap #dashboard #dashtrends #dashtrends_toolbar dl dd.data_value:before, .bootstrap .clearfix:after, .bootstrap #dashboard #dashtrends #dashtrends_toolbar dl dd.data_value:after {
+    content: " ";
+    display: table;
+  }
+  .bootstrap .clearfix:after, .bootstrap #dashboard #dashtrends #dashtrends_toolbar dl dd.data_value:after {
+    clear: both;
+  }
+/* end */
+
+
+/*revenue chart*/
+.bootstrap #dashboard #dashtrends dl {
+    border-radius: 10px;
+    min-height: 85px;
+    border: 1px solid #fff;
+}
+
+.bootstrap #dashboard #dashtrends #dashtrends_toolbar dl {
+    -webkit-box-shadow: none !important;
+    box-shadow: none !important;
+    margin: 1px;
+}
+
+.bootstrap #dashboard #dashtrends #dashtrends_toolbar {
+    padding-top: 5%;
+    padding-left: 5%;
+    padding-bottom: 5%;
+    margin: 0 -16px -16px;
+}
+
+.bootstrap #dashboard #dashtrends #dashtrends_toolbar dl dt{
+	padding: 8px;
+    height: 1.4rem;
+    color: #ffffff;
+}
+
+.bootstrap #dashboard #dashtrends #dashtrends_toolbar dl dt:hover {
+	text-decoration: none !important;
+    color: #ffffff;
+}
+
+.bootstrap #dashboard #dashtrends #dashtrends_toolbar dl:hover dt{
+	text-decoration: none !important;
+    color: #ffffff;
+}
+
+.bootstrap dt, .bootstrap dd {
+    line-height: 0.6 !important;
+}
+
+.bootstrap #dashboard #dashtrends dd span {
+    font-weight: bold;
+    color: #ffffff;
+}
+
+.bootstrap #dashboard #dashtrends #dashtrends_toolbar dl dt, .bootstrap #dashboard #dashtrends #dashtrends_toolbar dl.active dd.data_value {
+	height: 30px;
+}
+
+.bootstrap #dashboard #dashtrends dl.active {
+    border : 1px solid #113cfc !important;
+}
+
+.bootstrap #dashboard #dashtrends div#dash_trends_chart1 {
+    padding: 60px;
+}
+
+.bootstrap #dashboard #dashtrends dl:first-child {
+    border-left: 1px solid #fff;
+}
+
+.bootstrap #dashboard #dashtrends #dashtrends_toolbar .label-tooltip {
+    width: 15%;
+}
+
+#dashtrends  p.no-chart-info {
+    margin-top: 10px;
+    display: none;
+}

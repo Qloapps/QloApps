@@ -30,6 +30,10 @@ class HotelRoomInformation extends ObjectModel
     public $date_add;
     public $date_upd;
 
+    const STATUS_ACTIVE = 1;
+    const STATUS_INACTIVE = 2;
+    const STATUS_TEMPORARY_INACTIVE = 3;
+
     public static $definition = array(
         'table' => 'htl_room_information',
         'primary' => 'id',
@@ -130,6 +134,27 @@ class HotelRoomInformation extends ObjectModel
             }
         }
         return true;
+    }
+
+    public function getAllRoomStatus()
+    {
+        $moduleInstance = Module::getInstanceByName('hotelreservationsystem');
+
+        $status = array(
+            'STATUS_ACTIVE' => array(
+                'id' => self::STATUS_ACTIVE,
+                'status' => $moduleInstance->l('Active', 'hotelreservationsystem')
+            ),
+            'STATUS_INACTIVE' => array(
+                'id' => self::STATUS_INACTIVE,
+                'status' => $moduleInstance->l('Inactive', 'hotelreservationsystem')
+            ),
+            'STATUS_TEMPORARY_INACTIVE' => array(
+                'id' => self::STATUS_TEMPORARY_INACTIVE,
+                'status' => $moduleInstance->l('Temporarily Inactive', 'hotelreservationsystem')
+            ),
+        );
+        return $status;
     }
 
     /**

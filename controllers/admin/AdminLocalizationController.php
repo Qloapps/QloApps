@@ -356,7 +356,7 @@ class AdminLocalizationControllerCore extends AdminController
             ),
             'submit' => array(
                 'title' => $this->l('Import'),
-                'icon' => 'process-icon-import',
+                'icon' => 'process-icon-download',
                 'name' => 'submitLocalizationPack'
             ),
         );

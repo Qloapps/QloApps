@@ -32,13 +32,13 @@ class HotelFeatures extends ObjectModel
         'primary' => 'id',
         'multilang' => true,
         'fields' => array(
-            'parent_feature_id' => array('type' => self::TYPE_INT),
+            'parent_feature_id' => array('type' => self::TYPE_INT, 'required' => true),
             'position' => array('type' => self::TYPE_INT),
-            'active' => array('type' => self::TYPE_INT),
+            'active' => array('type' => self::TYPE_INT, 'required' => true),
             'date_add' => array('type' => self::TYPE_DATE, 'validate' => 'isDate', 'copy_post' => false),
             'date_upd' => array('type' => self::TYPE_DATE, 'validate' => 'isDate', 'copy_post' => false),
             //lang fields
-            'name' => array('type' => self::TYPE_STRING, 'lang' => true),
+            'name' => array('type' => self::TYPE_STRING, 'lang' => true, 'required' => true),
         )
     );
 

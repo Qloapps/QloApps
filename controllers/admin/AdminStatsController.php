@@ -793,8 +793,229 @@ class AdminStatsControllerCore extends AdminStatsTabController
             if (isset($data)) {
                 $array['data'] = $data;
             }
-            die(Tools::jsonEncode($array));
+            die(json_encode($array));
         }
-        die(Tools::jsonEncode(array('has_errors' => true)));
+        die(json_encode(array('has_errors' => true)));
+    }
+
+    public static function getArrivalsByDate($date)
+    {
+        $totalArrivals = Db::getInstance()->getValue(
+            'SELECT COUNT(hbd.`id_room`)
+            FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+            WHERE hbd.`is_refunded` = 0 AND hbd.`is_back_order` = 0
+            AND hbd.`date_from` BETWEEN "'.pSQL($date).' 00:00:00" AND "'.pSQL($date).' 23:59:59"'
+        );
+
+        $arrived = Db::getInstance()->getValue(
+            'SELECT COUNT(hbd.`id_room`)
+            FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+            WHERE hbd.`is_refunded` = 0 AND hbd.`is_back_order` = 0
+            AND hbd.`date_from` BETWEEN "'.pSQL($date).' 00:00:00" AND "'.pSQL($date).' 23:59:59"
+            AND hbd.`id_status` = '.(int)HotelBookingDetail::STATUS_CHECKED_IN
+        );
+
+        return array('arrived' => $arrived, 'total_arrivals' => $totalArrivals);
+    }
+
+    public static function getDeparturesByDate($date)
+    {
+        $totalDepartures = Db::getInstance()->getValue(
+            'SELECT COUNT(hbd.`id_room`)
+            FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+            WHERE hbd.`is_refunded` = 0 AND hbd.`is_back_order` = 0
+            AND hbd.`date_to` BETWEEN "'.pSQL($date).' 00:00:00" AND "'.pSQL($date).' 23:59:59"'
+        );
+
+        $departed = Db::getInstance()->getValue(
+            'SELECT COUNT(hbd.`id_room`)
+            FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+            WHERE hbd.`is_refunded` = 0 AND hbd.`is_back_order` = 0
+            AND hbd.`date_to` BETWEEN "'.pSQL($date).' 00:00:00" AND "'.pSQL($date).' 23:59:59"
+            AND hbd.`id_status` = '.(int)HotelBookingDetail::STATUS_CHECKED_OUT
+        );
+
+        return array('departed' => $departed, 'total_departures' => $totalDepartures);
+    }
+
+    public static function getBookingsByDate($date)
+    {
+        return Db::getInstance()->getValue(
+            'SELECT COUNT(o.`id_order`)
+            FROM `'._DB_PREFIX_.'orders` o
+            WHERE o.`date_add` BETWEEN "'.pSQL($date).' 00:00:00" AND "'.pSQL($date).' 23:59:59"'
+        );
+    }
+
+    public static function getStayOversByDate($date)
+    {
+        return Db::getInstance()->getValue(
+            'SELECT COUNT(hbd.`id_room`)
+            FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+            WHERE hbd.`is_refunded` = 0 AND hbd.`is_back_order` = 0
+            AND hbd.`id_status` = '.(int)HotelBookingDetail::STATUS_CHECKED_IN.'
+            AND hbd.`date_to` > "'.pSQL($date).' 00:00:00"'
+        );
+    }
+
+    public static function getCancelledBookingsByDate($date)
+    {
+        return Db::getInstance()->getValue(
+            'SELECT COUNT(o.`id_order`)
+            FROM `'._DB_PREFIX_.'orders` o
+            LEFT JOIN `'._DB_PREFIX_.'order_state` os ON (os.`id_order_state` = o.`current_state`)
+            WHERE o.`date_upd` BETWEEN "'.pSQL($date).' 00:00:00" AND "'.pSQL($date).' 23:59:59"
+            AND o.`current_state` = '.(int)Configuration::get('PS_OS_CANCELED')
+        );
+    }
+
+    public static function getGuestsByDate($date)
+    {
+        return Db::getInstance()->getRow(
+            'SELECT SUM(hbd.`adult`) AS `adults`, SUM(hbd.`children`) AS `children`
+            FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+            WHERE hbd.`is_refunded` = 0 AND hbd.`is_back_order` = 0
+            AND hbd.`date_from` BETWEEN "'.pSQL($date).' 00:00:00" AND "'.pSQL($date).' 23:59:59"'
+        );
+    }
+
+    public static function getTotalRooms()
+    {
+        return Db::getInstance()->getValue(
+            'SELECT COUNT("id") FROM `'._DB_PREFIX_.'htl_room_information`'
+        );
+    }
+
+    public static function getAvailPieChartData($date_from, $date_to)
+    {
+        $bookedRoomSql = 'SELECT hri.id  FROM `'._DB_PREFIX_.'htl_booking_detail` as hbd LEFT JOIN  
+        `'._DB_PREFIX_.'htl_room_information` as hri ON hbd.id_room = hri.id  WHERE hbd.date_from BETWEEN "'
+        .pSQL($date_from).'" and "'.pSQL($date_to).'" OR hbd.date_to BETWEEN "'.pSQL($date_from).'" and "'
+        .pSQL($date_to).'" AND is_refunded = 0 AND is_back_order = 0';
+
+        $tempBookedRoomIds = Db::getInstance()->ExecuteS($bookedRoomSql);
+        $bookedRoomIds = array();
+        if (count($tempBookedRoomIds)) {
+            foreach ($tempBookedRoomIds as $value) {
+               if ($value['id']) {
+                   $bookedRoomIds[] = $value['id'];
+               }
+            }
+        } else {
+            $bookedRoomIds[] = "0";
+        }
+
+        $availRoomSql = 'SELECT COUNT("id")  FROM `'._DB_PREFIX_.'htl_room_information` WHERE id NOT IN 
+        ('.implode(',', $bookedRoomIds).') AND id_status != '.(int)HotelRoomInformation::STATUS_INACTIVE.
+        ' AND id_status != '.(int)HotelRoomInformation::STATUS_TEMPORARY_INACTIVE;
+        $availRoomIds = Db::getInstance()->getValue($availRoomSql);
+
+        $inactiveSql = 'SELECT COUNT("id") FROM `'._DB_PREFIX_.'htl_room_information` WHERE id_status = 2 OR 
+        id_status = 3';
+        $inactiveRoomIds = Db::getInstance()->getValue($inactiveSql);
+
+
+        $data = array();
+        $data['occupied'] = sprintf("%02d", count($tempBookedRoomIds));
+        $data['available'] = sprintf("%02d", $availRoomIds);
+        $data['inactive'] = sprintf("%02d", $inactiveRoomIds);
+        return $data;
+    }
+
+    public static function getAvailBarChartData($days, $date_from)
+    {   
+        $newFromDate = $date_from;
+        $availability_data = array();
+        $from = strtotime($date_from." 00:00:00");
+		$to = strtotime($date_from."+".$days." day 23:59:59");
+
+        for ($date = $from; $date <= $to; $date = strtotime("+1 days", $date)) { 
+            $newFromDate = date('Y-m-d', strtotime($newFromDate.'+'.($days/5).'days'));
+            $bookedRoomSql = 'SELECT hri.id  FROM `'._DB_PREFIX_.
+            'htl_booking_detail` as hbd LEFT JOIN  `'._DB_PREFIX_
+            .'htl_room_information` as hri ON hbd.id_room = hri.id  WHERE hbd.date_from <= "'.pSQL($newFromDate)
+            .'" and hbd.date_to >= "'.pSQL(date('Y-m-d' ,strtotime($newFromDate."+1 days"))).'" AND is_refunded = 0 AND is_back_order = 0';
+
+            $tempBookedRoomIds = Db::getInstance()->ExecuteS($bookedRoomSql);
+            $bookedRoomIds = array();
+            if (count($tempBookedRoomIds)) {
+                foreach ($tempBookedRoomIds as $value) {
+                   if ($value['id']) {
+                       $bookedRoomIds[] = $value['id'];
+                   }
+                }
+            } else {
+                $bookedRoomIds[] = "0";
+            }
+
+            $availRoomSql = 'SELECT COUNT("id")  FROM `'._DB_PREFIX_.'htl_room_information` WHERE id NOT IN 
+            ('.implode(',', $bookedRoomIds).') AND id_status != '.(int)HotelRoomInformation::STATUS_INACTIVE.' 
+            AND id_status != '.(int)HotelRoomInformation::STATUS_TEMPORARY_INACTIVE;
+            $availRoomIds = Db::getInstance()->getValue($availRoomSql);
+
+            $availability_data["values"][] = array($date, sprintf("%02d", $availRoomIds));
+        }
+        return $availability_data;
+    }
+
+    public static function getAverageDailyRate($dateFrom, $dateTo)
+    {
+        $result = Db::getInstance()->getRow(
+            'SELECT
+                SUM(hbd.`total_price_tax_excl`) AS `rooms_revenue`,
+                COUNT(hbd.`id_room`) AS `room_sold`
+            FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+            WHERE hbd.`is_refunded` = 0 AND hbd.`is_back_order` = 0
+            AND hbd.`date_add` BETWEEN "'.pSQL($dateFrom).' 00:00:00" AND "'.pSQL($dateTo).' 23:59:59"'
+        );
+        return Tools::displayPrice($result['rooms_revenue'] ? $result['rooms_revenue'] / $result['room_sold'] : 0);
+    }
+
+    public static function getCancellationRate($dateFrom, $dateTo)
+    {
+        $numAllOrders = Db::getInstance()->getValue(
+            'SELECT COUNT(o.`id_order`) FROM `'._DB_PREFIX_.'orders` o
+            WHERE o.`date_add` BETWEEN "'.pSQL($dateFrom).' 00:00:00" AND "'.pSQL($dateTo).' 23:59:59"'
+        );
+
+        $numCancelledOrders = Db::getInstance()->getValue(
+            'SELECT COUNT(o.`id_order`) FROM `'._DB_PREFIX_.'orders` o
+            LEFT JOIN `'._DB_PREFIX_.'order_state` os ON (os.`id_order_state` = o.`current_state`)
+            WHERE o.`date_add` BETWEEN "'.pSQL($dateFrom).' 00:00:00" AND "'.pSQL($dateTo).' 23:59:59"
+            AND o.`current_state` = '.(int)Configuration::get('PS_OS_CANCELED')
+        );
+        
+        if ($numCancelledOrders != 0) {
+            return round(($numCancelledOrders / $numAllOrders) * 100, 2).'%';
+        } else {
+            return '0.00%';
+        }
+    }
+
+    public static function getRevenue($dateFrom, $dateTo)
+    {
+        $result = Db::getInstance()->getValue(
+            'SELECT (SUM(`total_paid_tax_excl` / `conversion_rate`) - SUM(`refunded_amount`))
+             FROM `'._DB_PREFIX_.'orders`
+             LEFT JOIN `' ._DB_PREFIX_.'order_return`  ON '._DB_PREFIX_.'orders.`id_order` = '._DB_PREFIX_.'order_return.`id_order`
+             WHERE ' ._DB_PREFIX_.'orders.`invoice_date` BETWEEN "'.pSQL($dateFrom).' 00:00:00" AND "'.pSQL($dateTo).' 23:59:59"'
+        );
+
+        return Tools::displayPrice($result ? $result : 0);
+    }
+
+    public static function getNightsStayed($dateFrom, $dateTo)
+    {
+        return Db::getInstance()->getValue(
+            'SELECT COUNT(a.`id`)
+            FROM `'._DB_PREFIX_.'htl_booking_detail` a
+            WHERE a.`is_refunded` = 0 AND a.`is_back_order` = 0
+            AND ((a.`id_status` = '.(int)HotelBookingDetail::STATUS_CHECKED_IN.'
+            AND a.`check_in` <= "'.pSQL($dateFrom).' 00:00:00" AND a.`check_out` > "'.pSQL($dateFrom).' 23:59:59") OR (
+            a.`id_status` = '.(int)HotelBookingDetail::STATUS_CHECKED_OUT.'
+            AND a.`check_in` >= "'.pSQL($dateFrom).' 00:00:00" AND a.`check_out` <= "'.pSQL($dateTo).' 23:59:59") OR (
+            a.`id_status` = '.(int)HotelBookingDetail::STATUS_CHECKED_IN.'
+            AND a.`check_in` <= "'.pSQL($dateTo).' 00:00:00" AND a.`check_out` > "'.pSQL($dateTo).' 23:59:59"))'
+        );
     }
 }

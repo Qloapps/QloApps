@@ -281,30 +281,6 @@ class HotelHelper
         return true;
     }
 
-    public function insertHotelRoomsStatus()
-    {
-        $room_status_arr = array('Active','Inactive','temporarily Inactive');
-        foreach ($room_status_arr as $key => $value) {
-            $obj_room_status = new HotelRoomStatus();
-            $obj_room_status->status = $value;
-            $obj_room_status->save();
-        }
-
-        return true;
-    }
-
-    public function insertHotelOrderStatus()
-    {
-        $order_status_arr = array('Alloted','Checked In','Checked Out');
-        foreach ($order_status_arr as $key => $value) {
-            $obj_order_status = new HotelOrderStatus();
-            $obj_order_status->status = $value;
-            $obj_order_status->save();
-        }
-
-        return true;
-    }
-
     public function insertHotelRoomAllotmentType()
     {
         $altment_type_arr = array('Random Allotment','Manual Allotment');
@@ -572,8 +548,8 @@ class HotelHelper
             $htl_rm_type->save();
 
             // Add features to the product
-            $ftr_arr = array(0 => 8, 1 => 9, 2 => 10, 3 => 11);
-            $ftr_val_arr = array(0 => 34, 1 => 35, 2 => 36, 3 => 37);
+            $ftr_arr = array(0 => 1, 1 => 2, 2 => 3, 3 => 4);
+            $ftr_val_arr = array(0 => 1, 1 => 2, 2 => 3, 3 => 4);
             foreach ($ftr_arr as $key_htl_ftr => $val_htl_ftr) {
                 $product->addFeaturesToDB($val_htl_ftr, $ftr_val_arr[$key_htl_ftr]);
             }

@@ -1,0 +1,9 @@
+<!--
+Description: parsed modified, W3DTF format, rollover past midnight on feb 28 in leap year
+Expect:      not bozo and feed['modified_parsed'] == (2004, 2, 29, 2, 14, 55, 6, 60, 0)
+-->
+<feed version="0.3" xmlns="http://purl.org/atom/ns#">
+
+<modified>2004-02-28T18:14:55-08:00</modified>
+
+</feed>

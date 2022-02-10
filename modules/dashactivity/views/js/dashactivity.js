@@ -30,9 +30,11 @@ function pie_chart_trends(widget_name, chart_details)
 			.x(function(d) { return d.key })
 			.y(function(d) { return d.y })
 			.color(d3.scale.category10().range())
+			.valueFormat(d3.format(".0f"))
 			.donut(true)
 			.showLabels(false)
-			.showLegend(false);
+			.showLegend(false)
+			.donutRatio(0.4);
 
 		d3.select("#dash_traffic_chart2 svg")
 			.datum(chart_details.data)

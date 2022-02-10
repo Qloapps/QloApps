@@ -32,7 +32,7 @@ class WkHotelFeaturesBlock extends Module
     {
         $this->name = 'wkhotelfeaturesblock';
         $this->tab = 'front_office_features';
-        $this->version = '2.0.4';
+        $this->version = '2.0.5';
         $this->author = 'webkul';
         $this->bootstrap = true;
         parent::__construct();
@@ -44,8 +44,8 @@ class WkHotelFeaturesBlock extends Module
 
     public function hookDisplayHome()
     {
-        $this->context->controller->addCSS(_PS_MODULE_DIR_.$this->name.'/views/css/wkHotelFeaturesBlockFront.css');
-        $this->context->controller->addJS(_PS_MODULE_DIR_.$this->name.'/views/js/wkHotelFeaturesBlockFront.js');
+        $this->context->controller->addCSS($this->_path.'/views/css/wkHotelFeaturesBlockFront.css');
+        $this->context->controller->addJS($this->_path.'/views/js/wkHotelFeaturesBlockFront.js');
 
         $objFeaturesData = new WkHotelFeaturesData();
         $hotelAmenities = $objFeaturesData->getHotelAmenities(1);

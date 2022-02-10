@@ -1473,7 +1473,100 @@ abstract class ModuleCore
                 }
             }
         }
-        //INFO:: addons module are removed from the module lists
+
+        $files_list = array(
+            array('type' => 'addonsNative', 'file' => _PS_ROOT_DIR_.self::CACHE_FILE_DEFAULT_COUNTRY_MODULES_LIST, 'loggedOnAddons' => 0),
+            array('type' => 'addonsMustHave', 'file' => _PS_ROOT_DIR_.self::CACHE_FILE_MUST_HAVE_MODULES_LIST, 'loggedOnAddons' => 0),
+            array('type' => 'addonsBought', 'file' => _PS_ROOT_DIR_.self::CACHE_FILE_CUSTOMER_MODULES_LIST, 'loggedOnAddons' => 1),
+        );
+        foreach ($files_list as $f) {
+            if (file_exists($f['file']) && ($f['loggedOnAddons'] == 0 || $logged_on_addons)) {
+                if (Module::useTooMuchMemory()) {
+                    $errors[] = Tools::displayError('All modules cannot be loaded due to memory limit restrictions, please increase your memory_limit value on your server configuration');
+                    break;
+                }
+
+                $file = $f['file'];
+                $content = Tools::file_get_contents($file);
+                $xml = @simplexml_load_string($content, null, LIBXML_NOCDATA);
+                if ($xml && isset($xml->module)) {
+                    foreach ($xml->module as $modaddons) {
+                        $flag_found = 0;
+
+                        foreach ($module_list as $k => &$m) {
+                            if (Tools::strtolower($m->name) == Tools::strtolower($modaddons->name) && !isset($m->available_on_addons)) {
+                                $flag_found = 1;
+                                if ($m->version != $modaddons->version && version_compare($m->version, $modaddons->version) === -1) {
+                                    $module_list[$k]->version_addons = $modaddons->version;
+                                }
+                            }
+                        }
+
+                        if ($flag_found == 0) {
+                            $item = new stdClass();
+                            $item->id = 0;
+                            $item->warning = '';
+                            $item->type = strip_tags((string)$f['type']);
+                            $item->name = strip_tags((string)$modaddons->name);
+                            $item->version = strip_tags((string)$modaddons->version);
+                            $item->tab = strip_tags((string)$modaddons->tab);
+                            $item->displayName = strip_tags((string)$modaddons->displayName);
+                            $item->description = stripslashes(strip_tags((string)$modaddons->description));
+                            $item->description_full = stripslashes(strip_tags((string)$modaddons->description_full));
+                            $item->author = strip_tags((string)$modaddons->author);
+                            $item->limited_countries = array();
+                            $item->parent_class = '';
+                            $item->onclick_option = false;
+                            $item->is_configurable = 0;
+                            $item->need_instance = 0;
+                            $item->not_on_disk = 1;
+                            $item->available_on_addons = 1;
+                            $item->trusted = Module::isModuleTrusted($item->name);
+                            $item->active = 0;
+                            $item->description_full = stripslashes($modaddons->description_full);
+                            $item->additional_description = isset($modaddons->additional_description) ? stripslashes($modaddons->additional_description) : null;
+                            $item->compatibility = isset($modaddons->compatibility) ? (array)$modaddons->compatibility : null;
+                            $item->nb_rates = isset($modaddons->nb_rates) ? (array)$modaddons->nb_rates : null;
+                            $item->avg_rate = isset($modaddons->avg_rate) ? (array)$modaddons->avg_rate : null;
+                            $item->badges = isset($modaddons->badges) ? (array)$modaddons->badges : null;
+                            $item->url = isset($modaddons->url) ? $modaddons->url : null;
+
+                            if (isset($modaddons->img)) {
+                                if (!file_exists(_PS_TMP_IMG_DIR_.md5((int)$modaddons->id.'-'.$modaddons->name).'.jpg')) {
+                                    if (!file_put_contents(_PS_TMP_IMG_DIR_.md5((int)$modaddons->id.'-'.$modaddons->name).'.jpg', Tools::file_get_contents($modaddons->img))) {
+                                        copy(_PS_IMG_DIR_.'404.gif', _PS_TMP_IMG_DIR_.md5((int)$modaddons->id.'-'.$modaddons->name).'.jpg');
+                                    }
+                                }
+
+                                if (file_exists(_PS_TMP_IMG_DIR_.md5((int)$modaddons->id.'-'.$modaddons->name).'.jpg')) {
+                                    $item->image = '../img/tmp/'.md5((int)$modaddons->id.'-'.$modaddons->name).'.jpg';
+                                }
+                            }
+
+                            if ($item->type == 'addonsMustHave') {
+                                $item->addons_buy_url = strip_tags((string)$modaddons->url);
+                                $prices = (array)$modaddons->price;
+                                $id_default_currency = Configuration::get('PS_CURRENCY_DEFAULT');
+
+                                foreach ($prices as $currency => $price) {
+                                    if ($id_currency = Currency::getIdByIsoCode($currency)) {
+                                        $item->price = (float)$price;
+                                        $item->id_currency = (int)$id_currency;
+
+                                        if ($id_default_currency == $id_currency) {
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+
+                            $module_list[$modaddons->id.'-'.$item->name] = $item;
+                        }
+                    }
+                }
+            }
+        }
+
         foreach ($module_list as $key => &$module) {
             if (defined('_PS_HOST_MODE_') && in_array($module->name, self::$hosted_modules_blacklist)) {
                 unset($module_list[$key]);
@@ -1669,9 +1762,6 @@ abstract class ModuleCore
             }
             // The module seems to be trusted, but it does not seem to be dedicated to this country
             return 2;
-        // Check if module is from webkul then it will be considered as trusted module
-        } elseif (isset($objModule->author) && (strtolower($objModule->author) == 'webkul')) {
-            return 1;
         } elseif (stripos($untrusted_modules_list_content, $module_name) !== false) {
             // If the module is already in the untrusted list, then return 0 (untrusted)
             return 0;

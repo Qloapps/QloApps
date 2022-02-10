@@ -493,6 +493,7 @@ function init()
 
 			if (go)
 			{
+				$('#submitAddProduct').attr('disabled', true);
 				var query = 'ajax=1&token='+token+'&action=addProductOnOrder&id_order='+id_order+'&';
 
 				query += $('#add_product_warehouse').serialize()+'&';
@@ -537,6 +538,9 @@ function init()
 					},
 					error : function(XMLHttpRequest, textStatus, errorThrown) {
 						jAlert("Impossible to add the room to the cart.\n\ntextStatus: '" + textStatus + "'\nerrorThrown: '" + errorThrown + "'\nresponseText:\n" + XMLHttpRequest.responseText);
+					},
+					complete: function() { 
+						$('#submitAddProduct').removeAttr('disabled');
 					}
 				});
 				ajaxQueries.push(ajax_query);

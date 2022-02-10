@@ -2039,7 +2039,12 @@ class AdminThemesControllerCore extends AdminController
      */
     private function getNativeModule($type = 0)
     {
-        $xml = @simplexml_load_string(Tools::file_get_contents(_PS_API_URL_.'/xml/modules_list_16.xml'));
+        $protocols = array('https://', 'http://');
+        foreach ($protocols as $protocol) {
+            if($xml = @simplexml_load_string(Tools::file_get_contents($protocol._QLO_API_DOMAIN_.'/xml/'.str_replace('.', '', _QLOAPPS_VERSION_).'.xml'))) {
+                break;
+            }
+        }
 
         if ($xml) {
             $natives = array();

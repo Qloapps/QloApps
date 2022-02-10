@@ -272,7 +272,7 @@
 			{
 				e.preventDefault();
 				id = $(this).parent().parent().attr('id');
-				if (confirm("{/literal}{l s='Are you sure?' js=1}{literal}"))
+				if (confirm("{/literal}{l s='Delete selected item?' js=1}{literal}"))
 				doAdminAjax({
 						"action":"deleteProductImage",
 						"id_image":id,

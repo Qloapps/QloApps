@@ -223,7 +223,7 @@
         <image name="small_default" width="98" height="98" products="true" categories="false" manufacturers="true" suppliers="true" scenes="false"/>
         <image name="medium_default" width="125" height="125" products="true" categories="true" manufacturers="true" suppliers="true" scenes="false"/>
         <image name="home_default" width="250" height="250" products="true" categories="false" manufacturers="false" suppliers="false" scenes="false"/>
-        <image name="large_default" width="458" height="458" products="true" categories="false" manufacturers="true" suppliers="true" scenes="false"/>
+        <image name="large_default" width="720" height="720" products="true" categories="false" manufacturers="true" suppliers="true" scenes="false"/>
         <image name="thickbox_default" width="800" height="800" products="true" categories="false" manufacturers="false" suppliers="false" scenes="false"/>
         <image name="category_default" width="870" height="217" products="false" categories="true" manufacturers="false" suppliers="false" scenes="false"/>
         <image name="scene_default" width="870" height="270" products="false" categories="false" manufacturers="false" suppliers="false" scenes="true"/>
