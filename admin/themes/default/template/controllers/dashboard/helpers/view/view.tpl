@@ -31,7 +31,7 @@
 </script>
 
 <div id="dashboard">
-	{$hookDashboardUnnamedOne}
+	{$hookDashboardTop}
 	<div class="row">
 		<div class="col-lg-12">
 {if $warning}

@@ -268,7 +268,7 @@ function saveDashConfig(widget_name) {
         success: function(jsonData) {
 
             if (!jsonData.has_errors) {
-                if (widget_name == 'dashactivity') {
+                if (in_array(widget_name, ['dashactivity', 'dashproducts'])) {
                     location.reload();
                 } else {
                     $('#' + widget_name).find('section').not('.dash_config').remove();

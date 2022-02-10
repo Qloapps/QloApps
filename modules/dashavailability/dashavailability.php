@@ -81,8 +81,7 @@ class DashAvailability extends Module
         }
         if (Configuration::get("PS_DASHBOARD_SIMULATION")) {
             $from = strtotime($dateFrom." 00:00:00");
-			$to = min(time(), strtotime($dateFrom."+".$days." days 23:59:59"));
-
+			$to = strtotime($dateFrom."+".$days." days 23:59:59");
 	        $data = array();
 	        for ($date = $from; $date <= $to; $date = strtotime("+1 days", $date)) {
                 $availability_data["values"][] = array($date, round(rand(0, 20)));

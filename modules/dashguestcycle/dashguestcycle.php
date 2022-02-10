@@ -43,7 +43,7 @@ class DashGuestCycle extends Module
     public function install()
     {
         return (parent::install()
-            && $this->registerHook('dashboardUnnamedOne')
+            && $this->registerHook('dashboardTop')
             && $this->registerHook('dashboardData')
             && $this->registerHook('actionAdminControllerSetMedia')
         );
@@ -56,7 +56,7 @@ class DashGuestCycle extends Module
         }
     }
 
-    public function hookDashboardUnnamedOne($params)
+    public function hookDashboardTop($params)
     {
         return $this->display(__FILE__, 'dashboard-top.tpl');
     }
