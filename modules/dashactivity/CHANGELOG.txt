@@ -1,4 +1,14 @@
 ------------------------------
+# V1.0.0 to V1.0.1
+------------------------------
+
+## Improved/Changed Features:
+
+* [BO] : [#310] Updated Activity Overview section
+* [BO] : [#310] Removed notifications section.
+
+
+------------------------------
 # V0.5.0 to V1.0.0
 ------------------------------
 

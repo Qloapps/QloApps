@@ -1,4 +1,33 @@
 -------------------------
+# V1.4.2 to V1.4.3
+-------------------------
+
+## Improved/changed features:
+
+[*] BO : [#253] Using room status as constants instead in values, removed HotelOrderStatus class
+[*] BO : [#270] Using room availability status as constants instead in values, removed HotelRoomStatus class
+[*] CO : [#244] Changed Tools::jsonEncode to json_encode
+[*] CO : [#283] Invalid value inserted in 'special_days' field in htl_room_type_feature_pricing table through API
+[*] CO : [#284] Resolved: No validation for the fields in 'hotel_refund_rules' API for add and update. 
+[*] CO : [#289] Validations added to the fields of "bookings" API for POST / PUT API requests
+[*] CO : [#274, #274] Text changes
+[*] CO : [#290] Using $this->_path for including css and js | Moved plugins to core js folder 
+
+
+## Bug/Issues Resolved:
+
+[-] BO : [#259] fixed room reallocation availability list for temporary unavailable rooms 
+[-] BO : [#256] Fixed Swap rooms leads to reservations duplications 
+[-] CO : [#252] Fixed getRoomBookingData function always return the first room for same room in order with different dates
+[-] CO : [#291] Resolved: Wrong price return by advance payment functions in HotelAdvancedPayment class
+[-] CO : [#294] Resolve order edit issues, Added hooks in order edit process
+[-] CO : [#303] In ' Manage Hotel' Controller, validation added for 'check-out time must be before check in'
+
+
+
+
+
+-------------------------
 # V1.4.1 to V1.4.2
 -------------------------
 

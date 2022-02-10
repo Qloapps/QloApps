@@ -44,7 +44,7 @@ class GraphNvD3 extends ModuleGraphEngine
 
         $this->name = 'graphnvd3';
         $this->tab = 'administration';
-        $this->version = '1.5.1';
+        $this->version = '1.5.2';
         $this->author = 'PrestaShop';
         $this->need_instance = 0;
 

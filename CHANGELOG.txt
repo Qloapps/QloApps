@@ -1,4 +1,91 @@
 ####################################
+# V1.5.2
+####################################
+
+## Added Features:
+- #264: Added SECURITY.md file.
+- #313: Update for module upgrade and suggestion
+
+
+## Improvements:
+- core
+  - #240: Updated TCPDF library
+  - #242: Changes for PHP7 compatibility
+  - #243: Removed pclzip library 
+  - #244: Removed pear JSON lib instead use PHP JSON library 
+  - #245: Updated swift mailer 
+  - #246: Updated htmlpurifier 
+  - #247: Updated Smarty library 
+  - #249: Updated Sql Parser Library 
+  - #250: Updated Pear and Archive tar library 
+  - #267: Removed mysql support, pdomysql now required
+  - #269: Replaced mcrypt with openssl
+  - #272: Changed default DB prefix to qlo_ 
+  - #276: Paypal and PaypalUSA module removed 
+  - #290: Updated path for including css and js in modules | Moved plugins to core js folder 
+  - #299: Added composer.json file 
+
+- Front Office:
+  - #296: Improved Social Sharing module 
+  - #316: Display Room Capacity on room type detail page
+
+- Back Office
+  - #297: Changed import button icon on Localization page 
+  - #310: Dashboard improvement 
+  - #327: Resolved QloApps dashboard issues
+
+
+## Bug Fixed:
+- core:
+  - #238: Update date format in invoice according to format provided in language
+  - #253: Using room status as constants instead in values 
+  - #270: Using room availability status as constants instead in values 
+  - #273: Fixed date format for additional facilities in invoice 
+  - #281: Resolved smarty html comments issue. 
+  - #283: Invalid value inserted in 'special_days' field in htl_room_type_feature_pricing table through API 
+  - #284: Resolved: No validation for the fields in 'hotel_refund_rules' API for add and update. 
+  - #285: Resolved: No validation for the fields in 'hotel_features' API for add and update 
+  - #286: Validations added for 'password' and 'email' fields for the 'employees' API. 
+  - #287: Resolved fatal error while generating class index file 
+  - #288: Resolved: No validation for field 'id_parent in' in 'categories' API. 
+  - #289: Validations added to the fields of "bookings" API for POST / PUT API requests 
+  - #307: Cart and Order API Issues resolved 
+  - #312: Text issues solved 
+  - #321: Fixed QloApps installation issues
+  - #324: Resolved compatibility issue with php5.6
+  
+- Back Office:
+  - #255: Fixed filter by Due amount results in "Bad SQL query" 
+  - #259: Fixed room reallocation availability list for temporary unavailable rooms 
+  - #256: Fixed Swap rooms leads to reservations duplications 
+  - #251: Removed unused options from images controller 
+  - #271: Fixed syntax issue in admin information cont 
+  - #275: Resolve order total update issue on additional facilities update 
+  - #282: Order refund states 'Refunded' and 'Denied' should not enabled together from render list 
+  - #293: Add profile access restriction when adding room types 
+  - #294: Resolve order edit issues, Added hooks in order edit process 
+  - #303: In 'Manage Hotel' Controller, validation added for 'check-out time must be before check in' 
+  - #304, #315: Text change.
+  - #318: Resolve multiple rooms addition issue on AdminOrdersController
+  - #320: Resolved new room features automatically mapping to all the room types
+
+- Front Office:
+  - #252: Update function getRoomBookingData
+  - #268: Update blockrss module
+  - #277: In _DB_PREFIX__orders table column advance_paid_amount value is wrong 
+  - #280: Wrong amount displayed in Order confirmation page in the payment gateways PaymentReturn Hook 
+  - #291: Resolved: Wrong price return by advance payment functions in HotelAdvancedPayment class 
+  - #295: Resolve DNI field issue during guest checkout 
+  - #298, #274: QloApps text changes 
+  - #300: Room amenities name shown with feature icon in room type details page 
+  - #301: Unused CSS file htl-reservation-general.css and its classes are removed 
+  - #302: Resolved: On translating page checking and checkout dates are changed to NaN-NaN-NaN 
+  - #305: Resolve tab design issue on room type detail page 
+  - #317: Resolve jQZoom issue on room type detail page
+  - #319: Resolved smarty minify HTML issue
+
+
+####################################
 # V1.5.1
 ####################################
 

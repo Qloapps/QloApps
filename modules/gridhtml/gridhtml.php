@@ -40,7 +40,7 @@ class GridHtml extends ModuleGridEngine
 		{
 			$this->name = 'gridhtml';
 			$this->tab = 'administration';
-			$this->version = '1.3.1';
+			$this->version = '1.3.2';
 			$this->author = 'PrestaShop';
 			$this->need_instance = 0;
 
