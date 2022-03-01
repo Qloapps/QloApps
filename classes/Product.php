@@ -2876,6 +2876,12 @@ class ProductCore extends ObjectModel
             $id_customer = $context->customer->id;
         }
 
+        $objCartBookingData = new HotelCartBookingData();
+        $roomTypesByIdProduct = $objCartBookingData->getCartInfoIdCartIdProduct(
+            $cur_cart->id,
+            $id_product
+        );
+
         $return = Product::priceCalculation(
             $context->shop->id,
             $id_product,
@@ -2885,7 +2891,7 @@ class ProductCore extends ObjectModel
             $zipcode,
             $id_currency,
             $id_group,
-            $quantity,
+            array_sum(array_column($roomTypesByIdProduct, 'quantity')),
             $usetax,
             $decimals,
             $only_reduc,
@@ -2898,7 +2904,6 @@ class ProductCore extends ObjectModel
             $id_cart,
             $cart_quantity
         );
-
         return $return;
     }
 
