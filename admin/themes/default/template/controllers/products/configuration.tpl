@@ -11,69 +11,96 @@
 					<tr class="nodrag nodrop">
 						<th class="col-sm-2 center">
 							<label class="control-label">
-								<span class="label-tooltip" data-toggle="tooltip" title="" data-original-title="Enter the name of the Room for ex. A-101. Invalid characters <>;=#{}">{l s='Room No.'}</span>
+								<span class="label-tooltip" data-toggle="tooltip" title="" data-original-title="Enter room number. For eg. A-101, A-102 etc. Invalid characters <>;=#{}">
+									{l s='Room No.'}
+								</span>
 							</label>
 						</th>
 						<th class="col-sm-2 center">
-							<span>{l s='Floor'}</span>
+							<label class="control-label">
+								<span class="label-tooltip" data-toggle="tooltip" title="" data-original-title="Enter floor of the room. For eg. First, Second etc. Invalid characters <>;=#{}">
+									{l s='Floor'}
+								</span>
+							</label>
 						</th>
-						<th class="col-sm-2">
-							<span>{l s='Status'}</span>
+						<th class="col-sm-2 center">
+							<label class="control-label">
+								<span class="label-tooltip" data-toggle="tooltip" title="" data-original-title="Select status of the room.">
+									{l s='Status'}
+								</span>
+							</label>
 						</th>
 						<th class="col-sm-6 center">
-							<span>{l s='Extra Information'}</span>
+							<label class="control-label">
+								<span class="label-tooltip" data-toggle="tooltip" title="" data-original-title="Enter extra information about this room. Leave empty if not required.">
+									{l s='Extra Information'}
+								</span>
+							</label>
 						</th>
 					</tr>
-					{if isset($htl_room_info) && $htl_room_info}
-						{foreach from=$htl_room_info key=key item=info}
+				</thead>
+				<tbody>
+					{if isset($smarty.post.rooms_info) && is_array($smarty.post.rooms_info) && count($smarty.post.rooms_info)}
+						{assign var="rooms_info" value=$smarty.post.rooms_info}
+					{elseif isset($htl_room_info) && is_array($htl_room_info) && count($htl_room_info)}
+						{assign var="rooms_info" value=$htl_room_info}
+					{/if}
+					{if is_array($rooms_info) && count($rooms_info)}
+						{foreach from=$rooms_info key=key item=room_info}
+							{assign var="var_name_room_info" value="rooms_info[`$key`]"}
 							<tr class="room_data_values" id="row_index{$key}" data-rowKey="{$key}">
 								<td class="col-sm-1 center">
-									<input class="form-control" type="text" value="{$info['room_num']}" name="room_num[]">
+									<input class="form-control" type="text" value="{$room_info['room_num']}" name="{$var_name_room_info|cat:'[room_num]'}">
 								</td>
 								<td class="col-sm-2 center">
-									<input class="form-control" type="text" value="{$info['floor']}" name="room_floor[]">
+									<input class="form-control" type="text" value="{$room_info['floor']}" name="{$var_name_room_info|cat:'[floor]'}">
 								</td>
 								<td class="col-sm-2 center">
-									<select class="form-control room_status" name="room_status[]">
+									<select class="form-control room_status" name="{$var_name_room_info|cat:'[id_status]'}">
 										{foreach from=$rm_status item=room_stauts}
-											<option value="{$room_stauts['id']}" {if $info['id_status'] == {$room_stauts['id']}}selected="selected"{/if}>{$room_stauts['status']}</option>
+											<option value="{$room_stauts['id']}" {if $room_info['id_status'] == {$room_stauts['id']}}selected="selected"{/if}>{$room_stauts['status']}</option>
 										{/foreach}
 									</select>
 								</td>
 								<td class="center col-sm-6">
-									<a class="btn btn-default deactiveDatesModal" data-toggle="modal" data-target="#deactiveDatesModal" {if $info['id_status'] != $rm_status['STATUS_TEMPORARY_INACTIVE']['id'] }style="display: none;"{/if}>{if $info['id_status'] != $rm_status['STATUS_TEMPORARY_INACTIVE']['id'] }{l s='Add Dates'}{else}{l s='View Dates'}{/if}
+									<a class="btn btn-default deactiveDatesModal" data-toggle="modal" data-target="#deactiveDatesModal" {if $room_info['id_status'] != $rm_status['STATUS_TEMPORARY_INACTIVE']['id'] }style="display: none;"{/if}>{if $room_info['id_status'] != $rm_status['STATUS_TEMPORARY_INACTIVE']['id'] }{l s='Add Dates'}{else}{l s='View Dates'}{/if}
 									</a>
-									<input type="text" class="form-control room_comment" value="{$info['comment']}" name="room_comment[]" {if $info['id_status'] == $rm_status['STATUS_TEMPORARY_INACTIVE']['id'] }style="display: none;"{/if}>
-									<input type="hidden" class="form-control disableDatesJSON" name="disableDatesJSON[]" {if $info['id_status'] == $rm_status['STATUS_TEMPORARY_INACTIVE']['id']}value="{$info['disabled_dates_json']|escape:'html':'UTF-8'}"{/if}>
+									<input type="text" class="form-control room_comment" value="{$room_info['comment']}" name="{$var_name_room_info|cat:'[comment]'}" {if $room_info['id_status'] == $rm_status['STATUS_TEMPORARY_INACTIVE']['id'] }style="display: none;"{/if}>
+									<input type="hidden" class="form-control disableDatesJSON" name="{$var_name_room_info|cat:'[disable_dates_json]'}" {if $room_info['id_status'] == $rm_status['STATUS_TEMPORARY_INACTIVE']['id']}value="{$room_info['disable_dates_json']|escape:'html':'UTF-8'}"{/if}>
 								</td>
 								<td class="center col-sm-1">
-									<a href="#" class="rm_htl_room btn btn-default" data-id-htl-info="{$info['id']}"><i class="icon-trash"></i></a>
-									<input type="hidden" name="id_room_info[]" value="{$info['id']}">
+									{if isset($room_info['id'])}
+										<a href="#" class="rm_htl_room btn btn-default" data-id-htl-info="{$room_info['id']}"><i class="icon-trash"></i></a>
+										<input type="hidden" name="{$var_name_room_info|cat:'[id]'}" value="{$room_info['id']}">
+									{else}
+										<a href="#" class="remove-rooms-button btn btn-default"><i class="icon-trash"></i></a>
+									{/if}
 								</td>
 							</tr>
 						{/foreach}
 					{else}
 						{for $k=0 to 1}
+							{assign var="var_name_room_info" value="rooms_info[`$k`]"}
 							<tr class="room_data_values" id="row_index{$k}" data-rowKey="{$k}">
 								<td class="col-sm-2 center">
-									<input class="form-control" type="text" name="room_num[]">
+									<input class="form-control" type="text" name="{$var_name_room_info|cat:'[room_num]'}">
 								</td>
 								<td class="col-sm-2 center">
-									<input class="form-control" type="text" name="room_floor[]">
+									<input class="form-control" type="text" name="{$var_name_room_info|cat:'[floor]'}">
 								</td>
 								<td class="col-sm-2 center">
-									<select class="form-control room_status" name="room_status[]">
+									<select class="form-control room_status" name="{$var_name_room_info|cat:'[id_status]'}">
 										{foreach from=$rm_status item=room_stauts}
 											<option value="{$room_stauts['id']}">{$room_stauts['status']}</option>
 										{/foreach}
 									</select>
 								</td>
 								<td class="center col-sm-6">
-									<a class="deactiveDatesModal" data-toggle="modal" data-target="#deactiveDatesModal" style="display: none;">
-										{l s='add Dates'}
+									<a class="btn btn-default deactiveDatesModal" data-toggle="modal" data-target="#deactiveDatesModal" style="display: none;">
+										{l s='Add Dates'}
 									</a>
-									<input type="hidden" class="form-control disableDatesJSON" name="disableDatesJSON" value="0">
-									<input type="text" class="form-control room_comment" name="room_comment[]">
+									<input type="text" class="form-control room_comment" name="{$var_name_room_info|cat:'[comment]'}">
+									<input type="hidden" class="form-control disable_dates_json" name="{$var_name_room_info|cat:'[disable_dates_json]'}" value="0">
 								</td>
 								{if $k == 1}
 									<td class="center col-sm-1">
@@ -83,12 +110,12 @@
 							</tr>
 						{/for}
 					{/if}
-				</thead>
+				</tbody>
 			</table>
 			<div class="form-group">
 				<div class="col-sm-12">
 					<button id="add-more-rooms-button" class="btn btn-default" type="button" data-size="s" data-style="expand-right">
-						<i class="icon-folder-open"></i>
+						<i class="icon icon-plus"></i>
 						{l s='Add More Rooms'}
 					</button>
 				</div>
@@ -264,18 +291,19 @@
 
 		// Add new room detail
 		$('#add-more-rooms-button').on('click',function() {
-			var lengthRooms = $('.room_data_values').length;
+			var lengthRooms = parseInt($('.room_data_values').length);
+
+			var prefix = 'rooms_info['+lengthRooms+']';
 			html = '<tr class="room_data_values" id="row_index'+lengthRooms+'" data-rowKey="'+lengthRooms+'">';
 				html += '<td class="col-sm-1 center">';
-					html += '<input class="form-control" type="text" name="room_num[]">';
+					html += '<input class="form-control" type="text" name="'+prefix+'[room_num]">';
 				html += '</td>';
 				html += '<td class="col-sm-2 center">';
-					html += '<input class="form-control" type="text" name="room_floor[]">';
+					html += '<input class="form-control" type="text" name="'+prefix+'[floor]">';
 				html += '</td>';
 				html += '<td class="col-sm-2 center">';
-					html += '<select class="form-control room_status" name="room_status[]">';
-						$.each(rm_status, function(key, value)
-						{
+					html += '<select class="form-control room_status" name="'+prefix+'[id_status]">';
+						$.each(rm_status, function(key, value) {
 							html += '<option value="'+value.id+'">'+value.status+'</option>';
 						});
 					html += '</select>';
@@ -284,15 +312,15 @@
 					html += '<a class="btn btn-default deactiveDatesModal" data-toggle="modal" data-target="#deactiveDatesModal" style="display: none;">';
 						html += "{l s='Add Dates'}";
 					html += '</a>';
-					html += '<input type="hidden" class="form-control disableDatesJSON" name="disableDatesJSON[]" value="0">';
-					html += '<input type="text" class="form-control room_comment" name="room_comment[]">';
+					html += '<input type="hidden" class="form-control disableDatesJSON" name="'+prefix+'[comment]" value="0">';
+					html += '<input type="text" class="form-control room_comment" name="'+prefix+'[disable_dates_json]">';
 				html += '</td>';
 				html += '<td class="center col-sm-1">';
 					html += '<a href="#" class="remove-rooms-button btn btn-default"><i class="icon-trash"></i></a>';
 				html += '</td>';
 			html += '</tr>';
 
-			$('.hotel-room').append(html);
+			$('table.hotel-room tbody').append(html);
 		});
 
 		// delete room
