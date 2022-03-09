@@ -27,19 +27,18 @@
 if (!defined('_PS_VERSION_'))
 	exit;
 
-include_once(dirname(__FILE__).'/WishList.php');
+include_once (dirname(__FILE__).'/classes/BlockWishlistDb.php');
+include_once (dirname(__FILE__).'/WishList.php');
 
 class BlockWishList extends Module
 {
-	const INSTALL_SQL_FILE = 'install.sql';
-
 	private $html = '';
 
 	public function __construct()
 	{
 		$this->name = 'blockwishlist';
 		$this->tab = 'front_office_features';
-		$this->version = '1.3.2';
+		$this->version = '1.3.3';
 		$this->author = 'PrestaShop';
 		$this->need_instance = 0;
 
@@ -57,18 +56,11 @@ class BlockWishList extends Module
 
 	public function install($delete_params = true)
 	{
-		if ($delete_params)
-		{
-			if (!file_exists(dirname(__FILE__).'/'.self::INSTALL_SQL_FILE))
-				return (false);
-			else if (!$sql = file_get_contents(dirname(__FILE__).'/'.self::INSTALL_SQL_FILE))
-				return (false);
-			$sql = str_replace(array('PREFIX_', 'ENGINE_TYPE'), array(_DB_PREFIX_, _MYSQL_ENGINE_), $sql);
-			$sql = preg_split("/;\s*[\r\n]+/", $sql);
-			foreach ($sql as $query)
-				if ($query)
-					if (!Db::getInstance()->execute(trim($query)))
-						return false;
+		if ($delete_params) {
+			$objBlockWishListDb = new BlockWishlistDb();
+			if (!$objBlockWishListDb->createTables()) {
+				return false;
+			}
 		}
 
 		if (!parent::install() ||
@@ -89,8 +81,10 @@ class BlockWishList extends Module
 
 	public function uninstall($delete_params = true)
 	{
-		if (($delete_params && !$this->deleteTables()) || !parent::uninstall())
+		$objBlockWishListDb = new BlockWishlistDb();
+		if (($delete_params && !$objBlockWishListDb->dropTables()) || !parent::uninstall()) {
 			return false;
+		}
 
 		return true;
 	}

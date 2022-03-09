@@ -26,13 +26,12 @@ require_once dirname(__FILE__).'/define.php';
 
 class WkAboutHotelBlock extends Module
 {
-    const INSTALL_SQL_FILE = 'install.sql';
     public function __construct()
     {
         $this->name = 'wkabouthotelblock';
         $this->tab = 'front_office_features';
-        $this->version = '1.1.7';
-        $this->author = 'webkul';
+        $this->version = '1.1.8';
+        $this->author = 'Webkul';
         $this->need_instance = 0;
 
         $this->bootstrap = true;
@@ -90,22 +89,11 @@ class WkAboutHotelBlock extends Module
 
     public function install()
     {
-        if (!file_exists(dirname(__FILE__).'/'.self::INSTALL_SQL_FILE)) {
-            return false;
-        } elseif (!$sql = Tools::file_get_contents(dirname(__FILE__).'/'.self::INSTALL_SQL_FILE)) {
+        $objAboutHotelBlockDb = new WkAboutHotelBlockDb();
+        if (!$objAboutHotelBlockDb->createTables()) {
             return false;
         }
 
-        $sql = str_replace(array('PREFIX_',  'ENGINE_TYPE'), array(_DB_PREFIX_, _MYSQL_ENGINE_), $sql);
-        $sql = preg_split("/;\s*[\r\n]+/", $sql);
-
-        foreach ($sql as $query) {
-            if ($query) {
-                if (!Db::getInstance()->execute(trim($query))) {
-                    return false;
-                }
-            }
-        }
         $objHtlInteriorImg = new WkHotelInteriorImage();
         if (!parent::install()
             || !$this->registerModuleHooks()
@@ -161,9 +149,10 @@ class WkAboutHotelBlock extends Module
 
     public function uninstall()
     {
+        $objAboutHotelBlockDb = new WkAboutHotelBlockDb();
         if (!parent::uninstall()
             || !$this->deleteHotelInterierImg()
-            || !$this->deleteTables()
+            || !$objAboutHotelBlockDb->dropTables()
             || !$this->deleteConfigKeys()
             || !$this->uninstallTab()
         ) {
@@ -206,13 +195,5 @@ class WkAboutHotelBlock extends Module
             }
         }
         return true;
-    }
-
-    public function deleteTables()
-    {
-        return Db::getInstance()->execute(
-            'DROP TABLE IF EXISTS
-            `'._DB_PREFIX_.'htl_interior_image`'
-        );
     }
 }

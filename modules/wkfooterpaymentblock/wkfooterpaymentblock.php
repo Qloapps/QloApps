@@ -22,18 +22,17 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
+require_once dirname(__FILE__).'/classes/WkFooterPaymentBlockDb.php';
 require_once dirname(__FILE__).'/classes/WkFooterPaymentBlockInfo.php';
 
 class WkFooterPaymentBlock extends Module
 {
-    const INSTALL_SQL_FILE = 'install.sql';
-
     public function __construct()
     {
         $this->name = 'wkfooterpaymentblock';
         $this->tab = 'front_office_features';
-        $this->version = '1.1.4';
-        $this->author = 'webkul';
+        $this->version = '1.1.5';
+        $this->author = 'Webkul';
         $this->need_instance = 0;
 
         $this->bootstrap = true;
@@ -99,22 +98,11 @@ class WkFooterPaymentBlock extends Module
 
     public function install()
     {
-        if (!file_exists(dirname(__FILE__).'/'.self::INSTALL_SQL_FILE)) {
-            return false;
-        } elseif (!$sql = Tools::file_get_contents(dirname(__FILE__).'/'.self::INSTALL_SQL_FILE)) {
+        $objFooterPaymentBlockDb = new WkFooterPaymentBlockDb();
+        if (!$objFooterPaymentBlockDb->createTables()) {
             return false;
         }
 
-        $sql = str_replace(array('PREFIX_',  'ENGINE_TYPE'), array(_DB_PREFIX_, _MYSQL_ENGINE_), $sql);
-        $sql = preg_split("/;\s*[\r\n]+/", $sql);
-
-        foreach ($sql as $query) {
-            if ($query) {
-                if (!Db::getInstance()->execute(trim($query))) {
-                    return false;
-                }
-            }
-        }
         if (!parent::install()
             ||!$this->registerHook('displayFooterPaymentInfo')
             ||!$this->registerHook('displayAddModuleSettingLink')
@@ -128,9 +116,10 @@ class WkFooterPaymentBlock extends Module
 
     public function uninstall()
     {
+        $objFooterPaymentBlockDb = new WkFooterPaymentBlockDb();
         if (!parent::uninstall()
             || !$this->uninstallTab()
-            || !$this->dropTables()
+            || !$objFooterPaymentBlockDb->dropTables()
         ) {
             return false;
         }
@@ -148,13 +137,6 @@ class WkFooterPaymentBlock extends Module
         }
 
         return true;
-    }
-
-    private function dropTables()
-    {
-        return Db::getInstance()->execute(
-            'DROP TABLE IF EXISTS `'._DB_PREFIX_.'htl_footer_payment_block_info`'
-        );
     }
 
     public function insertDefaultModuleData()

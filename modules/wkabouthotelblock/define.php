@@ -18,4 +18,5 @@
 *  @license   https://store.webkul.com/license.html
 */
 
+require_once 'classes/WkAboutHotelBlockDb.php';
 require_once 'classes/WkHotelInteriorImage.php';

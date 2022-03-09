@@ -25,11 +25,10 @@ include_once 'define.php';
 
 class hotelreservationsystem extends Module
 {
-    const INSTALL_SQL_FILE = 'install.sql';
     public function __construct()
     {
         $this->name = 'hotelreservationsystem';
-        $this->version = '1.4.3';
+        $this->version = '1.4.4';
         $this->author = 'Webkul';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -636,21 +635,9 @@ class hotelreservationsystem extends Module
 
     public function install()
     {
-        if (!file_exists(dirname(__FILE__).'/'.self::INSTALL_SQL_FILE)) {
+        $objModuleDb = new HotelReservationSystemDb();
+        if (!$objModuleDb->createTables()) {
             return false;
-        } elseif (!$sql = Tools::file_get_contents(dirname(__FILE__).'/'.self::INSTALL_SQL_FILE)) {
-            return false;
-        }
-
-        $sql = str_replace(array('PREFIX_',  'ENGINE_TYPE'), array(_DB_PREFIX_, _MYSQL_ENGINE_), $sql);
-        $sql = preg_split("/;\s*[\r\n]+/", $sql);
-
-        foreach ($sql as $query) {
-            if ($query) {
-                if (!Db::getInstance()->execute(trim($query))) {
-                    return false;
-                }
-            }
         }
 
         // if module should be populated while installation
@@ -672,7 +659,6 @@ class hotelreservationsystem extends Module
         ) {
             return false;
         }
-
 
         return true;
     }
@@ -701,43 +687,6 @@ class hotelreservationsystem extends Module
                 'actionObjectGroupDeleteBefore',
                 'actionOrderStatusPostUpdate'
             )
-        );
-    }
-
-    public function deleteTables()
-    {
-        return Db::getInstance()->execute(
-            'DROP TABLE IF EXISTS
-            `'._DB_PREFIX_.'htl_room_type`,
-            `'._DB_PREFIX_.'htl_room_information`,
-            `'._DB_PREFIX_.'htl_branch_info`,
-            `'._DB_PREFIX_.'htl_branch_info_lang`,
-            `'._DB_PREFIX_.'htl_image`,
-            `'._DB_PREFIX_.'htl_branch_features`,
-            `'._DB_PREFIX_.'htl_features`,
-            `'._DB_PREFIX_.'htl_features_lang`,
-            `'._DB_PREFIX_.'htl_cart_booking_data`,
-            `'._DB_PREFIX_.'htl_booking_detail`,
-            `'._DB_PREFIX_.'htl_booking_demands`,
-            `'._DB_PREFIX_.'htl_booking_demands_tax`,
-            `'._DB_PREFIX_.'htl_room_status`,
-            `'._DB_PREFIX_.'htl_room_allotment_type`,
-            `'._DB_PREFIX_.'htl_advance_payment`,
-            `'._DB_PREFIX_.'htl_order_refund_rules`,
-            `'._DB_PREFIX_.'htl_order_refund_rules_lang`,
-            `'._DB_PREFIX_.'htl_branch_refund_rules`,
-            `'._DB_PREFIX_.'htl_order_restrict_date`,
-            `'._DB_PREFIX_.'htl_room_type_feature_pricing`,
-            `'._DB_PREFIX_.'htl_room_type_feature_pricing_lang`,
-            `'._DB_PREFIX_.'htl_room_type_feature_pricing_group`,
-            `'._DB_PREFIX_.'htl_room_type_global_demand`,
-            `'._DB_PREFIX_.'htl_room_type_global_demand_lang`,
-            `'._DB_PREFIX_.'htl_room_type_global_demand_advance_option`,
-            `'._DB_PREFIX_.'htl_room_type_global_demand_advance_option_lang`,
-            `'._DB_PREFIX_.'htl_room_type_demand_price`,
-            `'._DB_PREFIX_.'htl_room_type_demand`,
-            `'._DB_PREFIX_.'htl_room_disable_dates`,
-            `'._DB_PREFIX_.'htl_access`'
         );
     }
 
@@ -783,9 +732,10 @@ class hotelreservationsystem extends Module
 
     public function uninstall()
     {
+        $objModuleDb = new HotelReservationSystemDb();
         if (!parent::uninstall()
             || !$this->deleteConfigVars()
-            || !$this->deleteTables()
+            || !$objModuleDb->dropTables()
             || !$this->uninstallTab()
         ) {
             return false;

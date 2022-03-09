@@ -27,10 +27,10 @@
 if (!defined('_PS_VERSION_'))
 	exit;
 
+include_once (dirname(__FILE__).'/classes/ProductCommentsDb.php');
+
 class ProductComments extends Module
 {
-	const INSTALL_SQL_FILE = 'install.sql';
-
 	private $_html = '';
 	private $_postErrors = array();
 	private $_filters = array();
@@ -42,7 +42,7 @@ class ProductComments extends Module
 	{
 		$this->name = 'productcomments';
 		$this->tab = 'front_office_features';
-		$this->version = '3.6.1';
+		$this->version = '3.6.2';
 		$this->author = 'PrestaShop';
 		$this->need_instance = 0;
 		$this->bootstrap = true;
@@ -59,19 +59,11 @@ class ProductComments extends Module
 
 	public function install($keep = true)
 	{
-		if ($keep)
-		{
-			if (!file_exists(dirname(__FILE__).'/'.self::INSTALL_SQL_FILE))
+		if ($keep) {
+			$objProductCommentsDb = new ProductCommentsDb();
+			if (!$objProductCommentsDb->createTables()) {
 				return false;
-			else if (!$sql = file_get_contents(dirname(__FILE__).'/'.self::INSTALL_SQL_FILE))
-				return false;
-			$sql = str_replace(array('PREFIX_', 'ENGINE_TYPE'), array(_DB_PREFIX_, _MYSQL_ENGINE_), $sql);
-			$sql = preg_split("/;\s*[\r\n]+/", trim($sql));
-
-			foreach ($sql as $query)
-				if (!Db::getInstance()->execute(trim($query)))
-					return false;
-
+			}
 		}
 
 		if (parent::install() == false ||
@@ -90,7 +82,8 @@ class ProductComments extends Module
 
 	public function uninstall($keep = true)
 	{
-		if (!parent::uninstall() || ($keep && !$this->deleteTables()) ||
+		$objProductCommentsDb = new ProductCommentsDb();
+		if (!parent::uninstall() || ($keep && !$objProductCommentsDb->dropTables()) ||
 			!Configuration::deleteByName('PRODUCT_COMMENTS_MODERATE') ||
 			!Configuration::deleteByName('PRODUCT_COMMENTS_ALLOW_GUESTS') ||
 			!Configuration::deleteByName('PRODUCT_COMMENTS_MINIMAL_TIME') ||
@@ -112,20 +105,6 @@ class ProductComments extends Module
 		if (!$this->install(false))
 			return false;
 		return true;
-	}
-
-	public function deleteTables()
-	{
-		return Db::getInstance()->execute('
-			DROP TABLE IF EXISTS
-			`'._DB_PREFIX_.'product_comment`,
-			`'._DB_PREFIX_.'product_comment_criterion`,
-			`'._DB_PREFIX_.'product_comment_criterion_product`,
-			`'._DB_PREFIX_.'product_comment_criterion_lang`,
-			`'._DB_PREFIX_.'product_comment_criterion_category`,
-			`'._DB_PREFIX_.'product_comment_grade`,
-			`'._DB_PREFIX_.'product_comment_usefulness`,
-			`'._DB_PREFIX_.'product_comment_report`');
 	}
 
 	public function getCacheId($id_product = null)
@@ -495,7 +474,6 @@ class ProductComments extends Module
 
 		return $helper->generateList($comments, $fields_list);
 	}
-
 
 	public function getConfigFieldsValues()
 	{

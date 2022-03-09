@@ -18,6 +18,7 @@
 *  @license   https://store.webkul.com/license.html
 */
 
+require_once 'classes/HotelReservationSystemDb.php';
 require_once 'classes/HotelRoomType.php';
 require_once 'classes/HotelRoomInformation.php';
 require_once 'classes/HotelBranchInformation.php';
