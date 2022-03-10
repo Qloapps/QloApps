@@ -68,6 +68,10 @@ class HotelBookingDetail extends ObjectModel
     const STATUS_CHECKED_IN = 2;
     const STATUS_CHECKED_OUT = 3;
 
+    // booking allotment types
+    const ALLOTMENT_AUTO = 1;
+    const ALLOTMENT_MANUAL = 2;
+
     public static $definition = array(
         'table' => 'htl_booking_detail',
         'primary' => 'id',
@@ -1830,6 +1834,22 @@ class HotelBookingDetail extends ObjectModel
             ),
         );
         return $pages;
+    }
+
+    public static function getAllAllotmentTypes()
+    {
+        $moduleInstance = Module::getInstanceByName('hotelreservationsystem');
+        $allotments = array(
+            array(
+                'id_allotment' => self::ALLOTMENT_AUTO,
+                'name' => $moduleInstance->l('Auto Allotment', 'hotelreservationsystem')
+            ),
+            array(
+                'id_allotment' => self::ALLOTMENT_MANUAL,
+                'name' => $moduleInstance->l('Manual Allotment', 'hotelreservationsystem')
+            ),
+        );
+        return $allotments;
     }
 
     // Webservice funcions

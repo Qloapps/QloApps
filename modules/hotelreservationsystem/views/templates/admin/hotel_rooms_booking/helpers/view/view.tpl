@@ -218,15 +218,13 @@
 														<td>{$date_from|escape:'htmlall':'UTF-8'|date_format:'%d-%m-%Y'} - {$date_to|escape:'htmlall':'UTF-8'|date_format:'%d-%m-%Y'}</td>
 														<td>{$avai_v['room_comment']|escape:'htmlall':'UTF-8'}</td>
 														<td>
-															<label class="control-label">
-																<input type="radio" value="1" name="bk_type_{$avai_v['id_room']|escape:'htmlall':'UTF-8'}" data-id-room="{$avai_v['id_room']|escape:'htmlall':'UTF-8'}" class="avai_bk_type" checked>
-																<span>{l s='Auto Allotment' mod='hotelreservationsystem'}</span>
-															</label>
-															<label class="control-label">
-																<input type="radio" value="2" name="bk_type_{$avai_v['id_room']|escape:'htmlall':'UTF-8'}" data-id-room="{$avai_v['id_room']|escape:'htmlall':'UTF-8'}" class="avai_bk_type">
-																<span>{l s='Manual Allotment' mod='hotelreservationsystem'}</span>
-															</label>
-															<input type="text" id="comment_{$avai_v['id_room']|escape:'htmlall':'UTF-8'}" class="form-control avai_comment">
+															{foreach $allotment_types as $allotment_type}
+																<label class="control-label">
+																	<input type="radio" value="{$allotment_type.id_allotment|intval}" name="bk_type_{$avai_v['id_room']|escape:'htmlall':'UTF-8'}" data-id-room="{$avai_v['id_room']|escape:'htmlall':'UTF-8'}" class="avai_bk_type" {if $allotment_type@first}checked="checked"{/if}>
+																	<span>{$allotment_type.name|escape:'htmlall':'UTF-8'}</span>
+																</label>
+															{/foreach}
+															<input type="text" id="comment_{$avai_v['id_room']|escape:'htmlall':'UTF-8'}" class="form-control avai_comment" placeholder="{l s='Allotment message' mod='hotelreservationsystem'}">
 														</td>
 														<td>
 															<button type="button" data-id-cart="" data-id-cart-book-data="" data-id-product="{$avai_v['id_product']|escape:'htmlall':'UTF-8'}" data-id-room="{$avai_v['id_room']|escape:'htmlall':'UTF-8'}" data-id-hotel="{$avai_v['id_hotel']}" data-date-from="{$date_from|escape:'htmlall':'UTF-8'|date_format:'%Y-%m-%d'}" data-date-to ="{$date_to|escape:'htmlall':'UTF-8'|date_format:'%Y-%m-%d'}" class="btn btn-primary avai_add_cart">{l s='Add To Cart' mod='hotelreservationsystem'}</button>
@@ -244,7 +242,7 @@
 												<tr>
 													<th><span class="title_box">{l s='Room No.' mod='hotelreservationsystem'}</span></th>
 													<th class="text-center"><span class="title_box">{l s='Duration' mod='hotelreservationsystem'}</span></th>
-													<th class="text-center"><span class="title_box">{l s='Allotment Type' mod='hotelreservationsystem'}</span></th>
+													<th class="text-left"><span class="title_box">{l s='Allotment Type' mod='hotelreservationsystem'}</span></th>
 													<th class="text-center"><span class="title_box">{l s='Action' mod='hotelreservationsystem'}</span></th>
 												</tr>
 											</thead>
@@ -259,16 +257,14 @@
 																		<td class="text-center">
 																			<p>{$sub_part_v['date_from']|escape:'htmlall':'UTF-8'|date_format:'%d-%m-%Y'} - {$sub_part_v['date_to']|escape:'htmlall':'UTF-8'|date_format:'%d-%m-%Y'}</p>
 																		</td>
-																		<td class="text-center">
-																			<label class="control-label">
-																				<input type="radio" value="1" class="par_bk_type" name="bk_type_{$part_v['id_room']|escape:'htmlall':'UTF-8'}_{$sub_part_k|escape:'htmlall':'UTF-8'}" data-id-room="{$part_v['id_room']|escape:'htmlall':'UTF-8'}" data-sub-key="{$sub_part_k|escape:'htmlall':'UTF-8'}" checked>
-																				<span>{l s='Auto Allotment' mod='hotelreservationsystem'}</span>
-																			</label>
-																			<label class="control-label">
-																				<input type="radio" value="2" class="par_bk_type" name="bk_type_{$part_v['id_room']|escape:'htmlall':'UTF-8'}_{$sub_part_k|escape:'htmlall':'UTF-8'}" data-id-room="{$part_v['id_room']|escape:'htmlall':'UTF-8'}" data-sub-key="{$sub_part_k|escape:'htmlall':'UTF-8'}">
-																				<span>{l s='Manual Allotment' mod='hotelreservationsystem'}</span>
-																			</label>
-																			<input type="text" id="comment_{$part_v['id_room']|escape:'htmlall':'UTF-8'}_{$sub_part_k|escape:'htmlall':'UTF-8'}" class="form-control par_comment">
+																		<td class="text-left">
+																			{foreach $allotment_types as $allotment_type}
+																				<label class="control-label">
+																					<input type="radio" value="{$allotment_type.id_allotment|intval}" class="par_bk_type" name="bk_type_{$part_v['id_room']|escape:'htmlall':'UTF-8'}_{$sub_part_k|escape:'htmlall':'UTF-8'}" data-id-room="{$part_v['id_room']|escape:'htmlall':'UTF-8'}" data-sub-key="{$sub_part_k|escape:'htmlall':'UTF-8'}" {if $allotment_type@first}checked="checked"{/if}>
+																					<span>{$allotment_type.name|escape:'htmlall':'UTF-8'}</span>
+																				</label>
+																			{/foreach}
+																			<input type="text" id="comment_{$part_v['id_room']|escape:'htmlall':'UTF-8'}_{$sub_part_k|escape:'htmlall':'UTF-8'}" class="form-control par_comment" placeholder="{l s='Allotment message' mod='hotelreservationsystem'}">
 																		</td>
 																		<td class="text-center">
 																			<button type="button" data-id-cart="" data-id-cart-book-data="" data-id-product="{$part_v['id_product']|escape:'htmlall':'UTF-8'}" data-id-room="{$part_v['id_room']|escape:'htmlall':'UTF-8'}" data-id-hotel="{$part_v['id_hotel']|escape:'htmlall':'UTF-8'}" data-date-from="{$sub_part_v['date_from']|escape:'htmlall':'UTF-8'|date_format:'%Y-%m-%d'}" data-date-to ="{$sub_part_v['date_to']|escape:'htmlall':'UTF-8'|date_format:'%Y-%m-%d'}" data-sub-key="{$sub_part_k|escape:'htmlall':'UTF-8'}" class="btn btn-primary par_add_cart">{l s='Add To Cart' mod='hotelreservationsystem'}</button>
@@ -306,10 +302,10 @@
 																		<td class="col-xs-3">{$rm_dtl_v['date_from']|escape:'htmlall':'UTF-8'|date_format:'%d-%m-%Y'} - {$rm_dtl_v['date_to']|escape:'htmlall':'UTF-8'|date_format:'%d-%m-%Y'}</td>
 																		<td class="col-xs-3">{$rm_dtl_v['comment']|escape:'htmlall':'UTF-8'}</td>
 																		<td class="col-xs-3">
-																			{if $rm_dtl_v['booking_type'] == 1}{l s='Auto Allotment' mod='hotelreservationsystem'}{elseif $rm_dtl_v['booking_type'] == 2}{l s='Manual Allotment' mod='hotelreservationsystem'}{/if}
+																			{if $rm_dtl_v['booking_type'] == HotelBookingDetail::ALLOTMENT_AUTO}{l s='Auto Allotment' mod='hotelreservationsystem'}{elseif $rm_dtl_v['booking_type'] == HotelBookingDetail::ALLOTMENT_MANUAL}{l s='Manual Allotment' mod='hotelreservationsystem'}{/if}
 																		</td>
 																		<td>
-																			{if $rm_dtl_v['booking_type'] == 1}
+																			{if $rm_dtl_v['booking_type'] == HotelBookingDetail::ALLOTMENT_AUTO}
 																				<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#mySwappigModal" data-room_num={$booked_v['room_num']|escape:'htmlall':'UTF-8'} data-date_from={$rm_dtl_v['date_from']|escape:'htmlall':'UTF-8'} data-date_to={$rm_dtl_v['date_to']|escape:'htmlall':'UTF-8'} data-id_room={$booked_v['id_room']|escape:'htmlall':'UTF-8'} data-cust_name="{$rm_dtl_v['alloted_cust_name']|escape:'htmlall':'UTF-8'}" data-cust_email="{$rm_dtl_v['alloted_cust_email']|escape:'htmlall':'UTF-8'}" data-avail_rm_realloc={$rm_dtl_v['avail_rooms_to_realloc']|@json_encode} data-avail_rm_swap={$rm_dtl_v['avail_rooms_to_swap']|@json_encode}>
 																					{l s='Reallocate Room' mod='hotelreservationsystem'}
 																				</button>
@@ -421,12 +417,12 @@
 
 <!-- Modal for reallocation of rooms -->
 <div class="modal fade" id="mySwappigModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-    	<ul class="nav nav-tabs" role="tablist">
-		    <li role="presentation" class="active"><a href="#reallocate_room_tab" aria-controls="reallocate" role="tab" data-toggle="tab">{l s='Room Reallocation' mod='hotelreservationsystem'}</a></li>
-		    <li role="presentation"><a href="#swap_room_tab" aria-controls="swap" role="tab" data-toggle="tab">{l s='Swap Room' mod='hotelreservationsystem'}</a></li>
-		 </ul>
+	<div class="modal-dialog" role="document">
+	<div class="modal-content">
+		<ul class="nav nav-tabs" role="tablist">
+			<li role="presentation" class="active"><a href="#reallocate_room_tab" aria-controls="reallocate" role="tab" data-toggle="tab">{l s='Room Reallocation' mod='hotelreservationsystem'}</a></li>
+			<li role="presentation"><a href="#swap_room_tab" aria-controls="swap" role="tab" data-toggle="tab">{l s='Swap Room' mod='hotelreservationsystem'}</a></li>
+			</ul>
 		<div class="tab-content panel active">
 			<div role="tabpanel" class="tab-pane active" id="reallocate_room_tab">
 				<form method="post" action="{$formAction|escape:'htmlall':'UTF-8'}">
@@ -543,39 +539,36 @@
 {/if}
 <script type="text/javascript">
 
-$(document).ready(function()
-{
+$(document).ready(function() {
+	var allotmentTypes = {
+		auto: {HotelBookingDetail::ALLOTMENT_AUTO},
+		manual: {HotelBookingDetail::ALLOTMENT_MANUAL},
+	};
+
 	$('.avai_comment, .par_comment').hide();
+	$('.avai_bk_type').on('change', function() {
+		var id_room = $(this).attr('data-id-room');
+		var booking_type = $(this).val();
 
-    $('.avai_bk_type').on('change', function()
-    {
-        var id_room = $(this).attr('data-id-room');
-        var booking_type = $(this).val();
+		if (booking_type == allotmentTypes.auto) {
+			$('#comment_'+id_room).hide().val('');
+		} else if (booking_type == allotmentTypes.manual) {
+			$('#comment_'+id_room).show();
+		}
+	});
 
-        if (booking_type == 1)
-        {
-            $('#comment_'+id_room).hide().val('');
-        }
-        else if (booking_type == 2)
-            $('#comment_'+id_room).show();
-    });
+	$('.par_bk_type').on('change', function() {
+		var id_room = $(this).attr('data-id-room');
+		var sub_key = $(this).attr('data-sub-key');
+		var booking_type = $(this).val();
 
-    $('.par_bk_type').on('change', function()
-    {
-        var id_room = $(this).attr('data-id-room');
-        var sub_key = $(this).attr('data-sub-key');
-        var booking_type = $(this).val();
-
-        if (booking_type == 1)
-        {
-            $('#comment_'+id_room+'_'+sub_key).hide().val('');
-        }
-        else if (booking_type == 2)
-        {
-            $('#comment_'+id_room+'_'+sub_key).show();
-        }
-    });
+		if (booking_type == allotmentTypes.auto) {
+			$('#comment_'+id_room+'_'+sub_key).hide().val('');
+		} else if (booking_type == allotmentTypes.manual) {
+			$('#comment_'+id_room+'_'+sub_key).show();
+		}
+	});
 });
 
 </script>
-
+	
