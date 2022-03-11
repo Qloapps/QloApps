@@ -25,6 +25,9 @@ class HotelRoomType extends ObjectModel
     public $id_hotel;
     public $adult;
     public $children;
+    public $max_adults;
+	public $max_children;
+    public $max_guests;
     public $min_los;
     public $max_los;
     public $date_add;
@@ -38,6 +41,9 @@ class HotelRoomType extends ObjectModel
             'id_hotel' => array('type' => self::TYPE_INT, 'validate' => 'isInt'),
             'adult' => array('type' => self::TYPE_INT, 'validate' => 'isInt'),
             'children' => array('type' => self::TYPE_INT, 'validate' => 'isInt'),
+            'max_adults' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedInt', 'default' => 2),
+            'max_children' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedInt'),
+            'max_guests' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedInt', 'default' => 2),
             'min_los' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedInt', 'default' => 1),
             'max_los' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedInt', 'default' => 0),
             'date_add' => array('type' => self::TYPE_DATE, 'validate' => 'isDate'),
@@ -220,8 +226,7 @@ class HotelRoomType extends ObjectModel
         if (!$idLang) {
             $idLang = Context::getContext()->language->id;
         }
-
-        $sql = 'SELECT hrt.`id`,hrt.`id_hotel`, hrt.`adult`, hrt.`children`, hbl.`hotel_name`, hrt.`min_los`, hrt.`max_los`
+        $sql = 'SELECT hrt.*, hbl.`hotel_name`
                 FROM `'._DB_PREFIX_.'htl_room_type` AS hrt
                 INNER JOIN `'._DB_PREFIX_.'htl_branch_info_lang` AS hbl
                 ON (hbl.`id` = hrt.`id_hotel` AND hbl.`id_lang` = '.(int)$idLang.')
@@ -269,25 +274,39 @@ class HotelRoomType extends ObjectModel
     }
 
     /**
+     * @param [int] $roomTypesList: string of idRoomTypes seperated by ","
+     */
+    public function getRoomTypeDetailByRoomTypeIds($roomTypesList)
+    {
+        $sql = 'SELECT COUNT(hri.`id`) AS `numberOfRooms`, hrt.`id_product`, `adult`, `children`, `max_adults`, `max_children`, `max_guests`
+                FROM `'._DB_PREFIX_.'htl_room_type` AS `hrt`
+                INNER JOIN `'._DB_PREFIX_.'htl_room_information` AS `hri` ON (hri.`id_product` = hrt.`id_product`)
+                WHERE hrt.`id_product` IN ('.$roomTypesList.')
+                GROUP BY hrt.`id_product`';
+
+        return Db::getInstance()->executeS($sql);
+    }
+
+    /**
      * [getIdProductByHotelId ::   	if (0)
      *                          	{
-     *                          		returns array containing all rooms types information belongs to the hotel which id is passed 										as $hotel_id
+     *                          		returns array containing all rooms types information belongs to the hotel which id is passed 										as $idHotel
      *                          	}
      *                          	else
      *                          	{
-     *                          		returns array containing rooms type information which produt_id=$room_type belongs to the 											hotel which id is passed as $hotel_id
+     *                          		returns array containing rooms type information which produt_id=$idRoomType belongs to the 											hotel which id is passed as $idHotel
      *                          	}].
      *
-     * @param [type] $hotel_id        [Id of the hotel ]
-     * @param [int]  $room_type       [
+     * @param [type] $idHotel        [Id of the hotel ]
+     * @param [int]  $idRoomType       [
      *                                Id of the product
      *                                if (0)
      *                                {
-     *                                returns array containing all rooms types information belongs to the hotel which id is passed 										as $hotel_id
+     *                                returns array containing all rooms types information belongs to the hotel which id is passed 										as $idHotel
      *                                }
      *                                else
      *                                {
-     *                                returns array containing rooms type information which produt_id=$room_type belongs to the 											hotel which id is passed as $hotel_id
+     *                                returns array containing rooms type information which produt_id=$idRoomType belongs to the 											hotel which id is passed as $idHotel
      *                                }
      *                                ]
      * @param [1|0]  $onlyActiveProd  [1 for only active products data and 0 for all products data]
@@ -295,10 +314,10 @@ class HotelRoomType extends ObjectModel
      *
      * @return [array|false] [If data found returns array containing information of the room types else returns false ]
      */
-    public function getIdProductByHotelId($hotel_id, $room_type = 0, $onlyActiveProd = 0, $onlyActiveHotel = 0)
+    public function getIdProductByHotelId($idHotel, $idRoomType = 0, $onlyActiveProd = 0, $onlyActiveHotel = 0)
     {
-        $sql = 'SELECT DISTINCT hrt.`id_product`, hrt.`adult`, hrt.`children`, hrt.`id`	FROM `'._DB_PREFIX_.
-        'htl_room_type` AS hrt ';
+        $sql = 'SELECT DISTINCT hrt.`id_product`, hrt.`adult`, hrt.`children`, hrt.`id`
+                FROM `'._DB_PREFIX_.'htl_room_type` AS hrt ';
 
         if ($onlyActiveHotel) {
             $sql .= 'INNER JOIN `'._DB_PREFIX_.'htl_branch_info` AS hti ON (hti.id = hrt.id_hotel AND hti.active = 1)';
@@ -306,24 +325,21 @@ class HotelRoomType extends ObjectModel
         if ($onlyActiveProd) {
             $sql .= 'INNER JOIN `'._DB_PREFIX_.'product` AS pp ON (hrt.id_product = pp.id_product AND pp.active = 1)';
         }
-        $sql .= 'WHERE hrt.`id_hotel`='.$hotel_id;
+        $sql .= 'WHERE hrt.`id_hotel`='. (int)$idHotel;
 
-        if ($room_type) {
-            $sql .= ' AND hrt.`id_product` ='.$room_type;
+        if ($idRoomType) {
+            $sql .= ' AND hrt.`id_product` = '. (int)$idRoomType;
         }
-        $rm_type = Db::getInstance()->executeS($sql);
-        if ($rm_type) {
-            return $rm_type;
-        }
-        return false;
+        return Db::getInstance()->executeS($sql);
     }
 
+
     /**
-     * [getMaxAdults :: To get Maximum number of adults can be in a room type for a hotel].
+     * [getMaxAdults :: To get Maximum number of adult can be in a room type for a hotel].
      *
-     * @param [int] $id_hotel [Id of the hotel for Maximum number of adults data you want]
+     * @param [int] $id_hotel [Id of the hotel for Maximum number of adult data you want]
      *
-     * @return [int|false] [If data found returns number of maximum adults can be in a room type for hotel else returns false ]
+     * @return [int|false] [If data found returns number of maximum adult can be in a room type for hotel else returns false ]
      */
     public static function getMaxAdults($id_hotel)
     {

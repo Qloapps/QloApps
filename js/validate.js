@@ -184,9 +184,7 @@ function validate_field(that)
 			var selector = '#id_country';
 			if ($(that).attr('name') == 'postcode_invoice')
 				selector += '_invoice';
-
 			var id_country = $(selector + ' option:selected').val();
-
 			if (typeof(countriesNeedZipCode[id_country]) != 'undefined' && typeof(countries[id_country]) != 'undefined')
 				var result = window['validate_'+$(that).attr('data-validate')]($(that).val(), countriesNeedZipCode[id_country], countries[id_country]['iso_code']);
 		}

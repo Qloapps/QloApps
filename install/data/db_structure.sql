@@ -673,7 +673,6 @@ CREATE TABLE `PREFIX_customer_thread` (
 	KEY `id_product` (`id_product`)
 ) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8 COLLATION;
 
-
 CREATE TABLE `PREFIX_customization` (
   `id_customization` int(10) unsigned NOT NULL auto_increment,
   `id_product_attribute` int(10) unsigned NOT NULL DEFAULT '0',
@@ -1139,6 +1138,7 @@ CREATE TABLE `PREFIX_orders` (
   `valid` int(1) unsigned NOT NULL DEFAULT '0',
   `is_advance_payment` tinyint(1) NOT NULL DEFAULT '0',
   `advance_paid_amount` decimal(20,6) NOT NULL DEFAULT '0.00',
+  `is_occupnacy_provided` tinyint(1) NOT NULL DEFAULT '0',
   `date_add` datetime NOT NULL,
   `date_upd` datetime NOT NULL,
   PRIMARY KEY (`id_order`),

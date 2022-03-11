@@ -112,7 +112,7 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
         $all_room_type = array();
         $rms_in_cart = 0;
         $hotel_id = 0;
-        $room_type = 0;
+        $id_room_type = 0;
         $booking_data = false;
         $id_cart = $this->context->cart->id;
         $id_guest = $this->context->cookie->id_guest;
@@ -173,20 +173,27 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
             }
         }
         if (Tools::getValue('id_rt')) {
-            $room_type = Tools::getValue('id_rt');
+            $id_room_type = Tools::getValue('id_rt');
+        }
+        if (Tools::getValue('sr_occupancy')) {
+            $occupancy = Tools::getValue('sr_occupancy');
+        } else {
+            $occupancy = array();
         }
         $formAction = '';
         if (Tools::isSubmit('search_hotel_list')) {
             $date_from = Tools::getValue('from_date');
             $date_to = Tools::getValue('to_date');
             $hotel_id = Tools::getValue('hotel_id');
-            $room_type = Tools::getValue('room_type');
-
+            $occupancy = Tools::getValue('occupancy');
+            $id_room_type = Tools::getValue('room_type');
             $formAction = $this->context->link->getAdminLink('AdminHotelRoomsBooking').
-            '&dt_f='.$date_from.'&dt_t='.$date_to.'&id_htl='.$hotel_id.'&id_rt='.$room_type;
+            '&dt_f='.$date_from.'&dt_t='.$date_to.'&id_htl='.$hotel_id.'&id_rt='.$id_room_type.
+            '&'.http_build_query(array('sr_occupancy' => $occupancy));
             Tools::redirectAdmin($formAction);
 
         }
+
         if ($date_from == '') {
             $this->errors[] = $this->l('Date from is required field.');
         }
@@ -206,9 +213,8 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
                 $date_from,
                 $date_to,
                 $hotel_id,
-                $room_type,
-                $adult,
-                $children,
+                $id_room_type,
+                $occupancy,
                 $num_rooms,
                 $id_cart,
                 $id_guest
@@ -220,11 +226,10 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
 
             $bookingParams = array();
             $bookingParams['hotel_id'] = $hotel_id;
-            $bookingParams['room_type'] = $room_type;
+            $bookingParams['id_room_type'] = $id_room_type;
             $bookingParams['adult'] = $adult;
             $bookingParams['children'] = $children;
             $bookingParams['num_rooms'] = $num_rooms;
-            $bookingParams['for_calendar'] = 1;
             $bookingParams['search_available'] = 1;
             $bookingParams['search_partial'] = 1;
             $bookingParams['search_booked'] = 1;
@@ -238,7 +243,6 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
                 $cal_date_to = date('Y-m-d', strtotime('+1 day', strtotime($cal_date_from)));
                 $bookingParams['date_from'] = $cal_date_from;
                 $bookingParams['date_to'] = $cal_date_to;
-
                 $booking_calendar_data[$cal_date_from] = $obj_booking_dtl->getBookingData($bookingParams);
                 $start_date = date('Y-m-d', strtotime('+1 day', strtotime($start_date)));
             }
@@ -268,12 +272,14 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
         $currency = new Currency((int)Configuration::get('PS_CURRENCY_DEFAULT'));
         // booking allotment types
         $allotmentTypes = HotelBookingDetail::getAllAllotmentTypes();
+
         $this->tpl_view_vars = array(
             'check_calender_var' => $check_calender_var,
             'date_from' => $date_from,
             'date_to' => $date_to,
             'hotel_id' => $hotel_id,
-            'room_type' => $room_type,
+            'occupancies' => $occupancy,
+            'room_type' => $id_room_type,
             'adult' => $adult,
             'children' => $children,
             'num_rooms' => $num_rooms,
@@ -286,7 +292,19 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
             'allotment_types' => $allotmentTypes,
             'rms_in_cart' => $rms_in_cart,
             'formAction' => $formAction,
+            'max_child_age' => Configuration::get('WK_GLOBAL_CHILD_MAX_AGE'),
+            'max_child_in_room' => Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM'),
         );
+        $this->tpl_view_vars['occupancy_wise_booking'] = Configuration::get('PS_BACKOFFICE_OCCUPANCY_WISE_BOOKING');
+
+        if (Configuration::get('PS_BACKOFFICE_SEARCH_TYPE') == HotelBookingDetail::SEARCH_TYPE_OWS ) {
+            $this->tpl_view_vars['occupancy_adults'] = array_sum(array_column($occupancy, 'adult'));
+            $this->tpl_view_vars['occupancy_children'] = array_sum(array_column($occupancy, 'children'));
+            $this->tpl_view_vars['occupancy_child_ages'] = array_sum(array_column($occupancy, 'child_ages'));
+            $this->tpl_view_vars['occupancy_wise_search'] = true;
+        } else {
+            $this->tpl_view_vars['occupancy_wise_search'] = false;
+        }
         return parent::renderView();
     }
 
@@ -310,6 +328,7 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
         $id_product = Tools::getValue('id_prod');
         $date_from = Tools::getValue('date_from');
         $date_to = Tools::getValue('date_to');
+        $occupancy = Tools::getValue('occupancy');
 
         $date_from = date("Y-m-d", strtotime($date_from));
         $date_to = date("Y-m-d", strtotime($date_to));
@@ -356,6 +375,10 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
         $obj_cart_book_data = new HotelCartBookingData();
         $total_amount = $this->context->cart->getOrderTotal();
         if ($opt) {
+            if (!Configuration::get('PS_BACKOFFICE_OCCUPANCY_WISE_BOOKING')) {
+                $objRoomType = new HotelRoomType();
+                $roomTypeInfo = $objRoomType->getRoomTypeInfoByIdProduct($id_product);
+            }
             $obj_cart_book_data->id_cart = $id_cart;
             $obj_cart_book_data->id_guest = $id_guest;
             $obj_cart_book_data->id_product = $id_product;
@@ -367,6 +390,16 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
             $obj_cart_book_data->comment = $comment;
             $obj_cart_book_data->date_from = $date_from;
             $obj_cart_book_data->date_to = $date_to;
+            if (Configuration::get('PS_BACKOFFICE_OCCUPANCY_WISE_BOOKING')) {
+                $room_occupancy = array_shift($occupancy);
+                $obj_cart_book_data->adult = $room_occupancy['adult'];
+                $obj_cart_book_data->children = $room_occupancy['children'];
+                $obj_cart_book_data->child_ages = $room_occupancy['children'] ? json_encode($room_occupancy['child_ages']) : json_encode(array());
+            } else {
+                $obj_cart_book_data->adult = $roomTypeInfo['adult'];
+                $obj_cart_book_data->children = $roomTypeInfo['children'];
+                $obj_cart_book_data->child_ages = json_encode(array());
+            }
             $obj_cart_book_data->save();
 
             $obj_rm_info = new HotelRoomInformation($id_room);
@@ -377,11 +410,10 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
             $bookingParams['date_from'] = $search_date_from;
             $bookingParams['date_to'] = $search_date_to;
             $bookingParams['hotel_id'] = $id_hotel;
-            $bookingParams['room_type'] = $search_id_prod;
+            $bookingParams['id_room_type'] = $search_id_prod;
             $bookingParams['adult'] = 0;
             $bookingParams['children'] = 0;
             $bookingParams['num_rooms'] = 1;
-            $bookingParams['for_calendar'] = 1;
             $bookingParams['search_available'] = 1;
             $bookingParams['search_partial'] = 1;
             $bookingParams['search_booked'] = 0;
@@ -428,11 +460,10 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
                     $bookingParams['date_from'] = $search_date_from;
                     $bookingParams['date_to'] = $search_date_to;
                     $bookingParams['hotel_id'] = $id_hotel;
-                    $bookingParams['room_type'] = $search_id_prod;
+                    $bookingParams['id_room_type'] = $search_id_prod;
                     $bookingParams['adult'] = 0;
                     $bookingParams['children'] = 0;
                     $bookingParams['num_rooms'] = 1;
-                    $bookingParams['for_calendar'] = 1;
                     $bookingParams['search_available'] = 1;
                     $bookingParams['search_partial'] = 1;
                     $bookingParams['search_booked'] = 0;
@@ -461,8 +492,10 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
                     );
 
                     // No use of adult, child, num_rooms
-                    $adult = 0;
-                    $children = 0;
+                    // $adult = 0;
+                    // $children = 0;
+                    // @todo shreesh
+                    $occupancy = array();
                     $num_rooms = 1;
 
                     $booking_data = array();
@@ -472,8 +505,7 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
                         $search_date_to,
                         $id_hotel,
                         $search_id_prod,
-                        $adult,
-                        $children,
+                        $occupancy,
                         $num_rooms,
                         $id_cart,
                         $id_guest
@@ -511,7 +543,7 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
         $start_date = date('Y-m-01', strtotime($query_date)); // hard-coded '01' for first day
         $last_day_this_month  = date('Y-m-t', strtotime($query_date));
         $hotel_id = 1;
-        $room_type = 0;
+        $id_room_type = 0;
         $adult = 1;
         $children = 0;
         $num_rooms = 1;
@@ -520,7 +552,7 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
 
         $bookingParams = array();
         $bookingParams['hotel_id'] = $hotel_id;
-        $bookingParams['room_type'] = $room_type;
+        $bookingParams['id_room_type'] = $id_room_type;
         $bookingParams['adult'] = $adult;
         $bookingParams['children'] = $children;
         $bookingParams['num_rooms'] = $num_rooms;
@@ -616,9 +648,8 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
         $date_from,
         $date_to,
         $hotel_id,
-        $room_type,
-        $adult,
-        $children,
+        $id_room_type,
+        $occupancy,
         $num_rooms,
         $id_cart,
         $id_guest
@@ -630,11 +661,9 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
         $bookingParams['date_from'] = $date_from;
         $bookingParams['date_to'] = $date_to;
         $bookingParams['hotel_id'] = $hotel_id;
-        $bookingParams['room_type'] = $room_type;
-        $bookingParams['adult'] = $adult;
-        $bookingParams['children'] = $children;
+        $bookingParams['id_room_type'] = $id_room_type;
+        $bookingParams['occupancy'] = $occupancy;
         $bookingParams['num_rooms'] = $num_rooms;
-        $bookingParams['for_calendar'] = 0;
         $bookingParams['search_available'] = 1;
         $bookingParams['search_partial'] = 1;
         $bookingParams['search_booked'] = 1;
@@ -644,8 +673,11 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
         $bookingParams['search_cart_rms'] = 1;
 
         $booking_data = $obj_booking_dtl->getBookingData($bookingParams);
+
         if ($booking_data) {
+            $objHotelRoomType = new HotelRoomType();
             foreach ($booking_data['rm_data'] as $key_bk_data => $value_bk_data) {
+                $booking_data['rm_data'][$key_bk_data]['room_type_info'] = $objHotelRoomType->getRoomTypeInfoByIdProduct($value_bk_data['id_product']);
                 if (isset($value_bk_data['data']['booked']) && $value_bk_data['data']['booked']) {
                     foreach ($value_bk_data['data']['booked'] as $booked_k1 => $booked_v1) {
                         if (isset($booked_v1['detail']) && $booked_v1['detail']) {

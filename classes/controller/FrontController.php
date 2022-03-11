@@ -435,6 +435,10 @@ class FrontControllerCore extends Controller
             $compared_products = CompareProduct::getCompareProducts($this->context->cookie->id_compare);
         }
 
+        $occupancyWiseSearch = false;
+        if (Configuration::get('PS_FRONT_SEARCH_TYPE') == HotelBookingDetail::SEARCH_TYPE_OWS) {
+            $occupancyWiseSearch = true;
+        }
         $this->context->smarty->assign(array(
             // Useful for layout.tpl
             'mobile_device'       => $this->context->getMobileDevice(),
@@ -482,6 +486,10 @@ class FrontControllerCore extends Controller
             'currencySign'        => $currency->sign, // backward compat, see global.tpl
             'currencyFormat'      => $currency->format, // backward compat
             'currencyBlank'       => $currency->blank, // backward compat
+            'occupancy_wise_search'    => $occupancyWiseSearch,
+            'occupancy_wise_booking' => Configuration::get('PS_FRONT_OCCUPANCY_WISE_BOOKING'),
+            'max_child_age' => Configuration::get('WK_GLOBAL_CHILD_MAX_AGE'),
+            'max_child_in_room' => Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM'),
         ));
 
         // Add the tpl files directory for mobile
@@ -1058,6 +1066,12 @@ class FrontControllerCore extends Controller
                 }
             }
         }
+
+        $this->addJS(_PS_JS_DIR_.'daterangepicker/moment.min.js');
+        $this->addjqueryPlugin('daterangepicker.min', _PS_JS_DIR_.'daterangepicker/');
+        $this->addJS(_PS_JS_DIR_.'daterangepicker/qlodaterangepicker.js');
+
+        $this->addCSS(_THEME_CSS_DIR_.'daterangepicker.css');
 
         if (Tools::isSubmit('live_edit') && Tools::getValue('ad') && Tools::getAdminToken('AdminModulesPositions'.(int)Tab::getIdFromClassName('AdminModulesPositions').(int)Tools::getValue('id_employee'))) {
             $this->addJqueryUI('ui.sortable');

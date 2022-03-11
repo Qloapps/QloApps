@@ -362,7 +362,7 @@ class StatsProduct extends ModuleGraph
                 $availRooms = 0;
                 if ($roomTypeInfo = $objHotelRoomType->getRoomTypeInfoByIdProduct($product['id_product'])) {
                     $bookingParams['hotel_id'] = $roomTypeInfo['id_hotel'];
-                    $bookingParams['room_type'] = $product['id_product'];
+                    $bookingParams['id_room_type'] = $product['id_product'];
                     if ($booking_data = $objBookingDtl->getBookingData($bookingParams)) {
                         if (isset($booking_data['stats']['num_avail'])) {
                             $availRooms = $booking_data['stats']['num_avail'];

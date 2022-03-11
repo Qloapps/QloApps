@@ -951,6 +951,76 @@ class AdminCartsControllerCore extends AdminController
         }
     }
 
+    public function ajaxProcessUpdateProductOccupancy()
+    {
+        $params = Tools::getValue('params');
+        $id_booking_data = (int) $params['id_booking_data'];
+        $id_cart = (int) $params['id_cart'];
+        $occupancy =  $params['occupancy'];
+
+        $this->context->cart = new Cart($id_cart);
+
+        if ($this->tabAccess['edit'] === '1') {
+            // validate occupancy is correct
+            $hasError = false;
+            if (is_array($occupancy)) {
+                if (!$occupancy['adult'] || !Validate::isUnsignedInt($occupancy['adult'])) {
+                    $hasError = true;
+                }
+                if (!Validate::isUnsignedInt($occupancy['children'])) {
+                    $hasError = true;
+                }
+                if ($occupancy['children']) {
+                    if (!isset($occupancy['child_ages']) || $occupancy['children'] != count($occupancy['child_ages'])) {
+                        $hasError = true;
+                    } else {
+                        foreach($occupancy['child_ages'] as $age) {
+                            if (!Validate::isUnsignedInt($occupancy['adult'])) {
+                                $hasError = true;
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (!$hasError) {
+                $objHotelCartBookingData = new HotelCartBookingData($id_booking_data);
+                $objRoomType = new HotelRoomType();
+                if ($roomTypeInfo = $objRoomType->getRoomTypeInfoByIdProduct($objHotelCartBookingData->id_product)) {
+                    if ($occupancy['adult'] > $roomTypeInfo['max_adults']) {
+                        $hasError = true;
+                    }
+                    if ($occupancy['children'] > $roomTypeInfo['max_children']) {
+                        $hasError = true;
+                    }
+                    if ($occupancy['adult'] + $occupancy['children'] > $roomTypeInfo['max_guests']) {
+                        $hasError = true;
+                    }
+                    if (!$hasError) {
+                        $objHotelCartBookingData->adult = $occupancy['adult'];
+                        $objHotelCartBookingData->children = $occupancy['children'];
+                        $objHotelCartBookingData->child_ages = json_encode($occupancy['child_ages']);
+                        $objHotelCartBookingData->save();
+                    }
+                }
+            }
+            $bookingsInfo = $objHotelCartBookingData->getCartFormatedBookinInfoByIdCart($id_cart);
+            foreach ($bookingsInfo as &$bookingInfo) {
+                if ($bookingInfo['id'] == $id_booking_data) {
+                    $amt_with_qty = $bookingInfo['amt_with_qty'];
+                    $bookingInfo['amt_with_qty'] = Tools::displayPrice($amt_with_qty);
+                    $bookingInfo['total_price'] = Tools::displayPrice($amt_with_qty + $bookingInfo['demand_price']);
+                    $response = array(
+                        'curr_booking_info' => $bookingInfo,
+                        'cart_info' => $this->ajaxReturnVars(),
+                    );
+
+                    die(json_encode($response));
+                }
+            }
+        }
+    }
+
     public static function getOrderTotalUsingTaxCalculationMethod($id_cart)
     {
         $context = Context::getContext();

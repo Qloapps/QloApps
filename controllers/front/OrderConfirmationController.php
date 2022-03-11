@@ -157,6 +157,7 @@ class OrderConfirmationControllerCore extends FrontController
                             $cart_htl_data[$type_key]['cover_img'] = $cover_img;
                             $cart_htl_data[$type_key]['adult'] = $rm_dtl['adult'];
                             $cart_htl_data[$type_key]['children'] = $rm_dtl['children'];
+
                             foreach ($order_bk_data as $data_k => $data_v) {
                                 $date_join = strtotime($data_v['date_from']).strtotime($data_v['date_to']);
                                 /*Product price when order was created*/
@@ -176,6 +177,9 @@ class OrderConfirmationControllerCore extends FrontController
                                     $num_days = $cart_htl_data[$type_key]['date_diff'][$date_join]['num_days'];
                                     $var_quant = (int) $cart_htl_data[$type_key]['date_diff'][$date_join]['num_rm'];
 
+                                    $cart_htl_data[$type_key]['date_diff'][$date_join]['adult'] += $data_v['adult'];
+                                    $cart_htl_data[$type_key]['date_diff'][$date_join]['children'] += $data_v['children'];
+
                                     //// By webkul New way to calculate product prices with feature Prices
                                     $cart_htl_data[$type_key]['date_diff'][$date_join]['paid_unit_price_tax_excl'] = $data_v['total_price_tax_excl']/$num_days;
                                     $cart_htl_data[$type_key]['date_diff'][$date_join]['paid_unit_price_tax_incl'] = $data_v['total_price_tax_incl']/$num_days;
@@ -194,6 +198,10 @@ class OrderConfirmationControllerCore extends FrontController
                                     $cart_htl_data[$type_key]['date_diff'][$date_join]['data_form'] = $data_v['date_from'];
                                     $cart_htl_data[$type_key]['date_diff'][$date_join]['data_to'] = $data_v['date_to'];
                                     $cart_htl_data[$type_key]['date_diff'][$date_join]['num_days'] = $num_days;
+
+                                    $cart_htl_data[$type_key]['date_diff'][$date_join]['adult'] = $data_v['adult'];
+                                    $cart_htl_data[$type_key]['date_diff'][$date_join]['children'] = $data_v['children'];
+
 
                                     // By webkul New way to calculate product prices with feature Prices
                                     $cart_htl_data[$type_key]['date_diff'][$date_join]['paid_unit_price_tax_excl'] = $data_v['total_price_tax_excl']/$num_days;

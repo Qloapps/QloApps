@@ -32,74 +32,29 @@
       float: left;
       margin-top: 0px;
       border-top: 3px solid #FFF;}
-  .header-rmsearch-wrapper #search_hotel_block_form .header-rmsearch-input {
-    box-shadow: 0 2px 1px 0 rgba(0,0,0,0.18);
-    height: 43px;}
-  .header-rmsearch-wrapper #search_hotel_block_form #search_room_submit {
-    padding: 15px 20px;
-    text-align: unset;}
-  .header-rmsearch-wrapper  #search_hotel_block_form #search_room_submit .icon-arrow-right {
-    font-size: 16px;}
-  #search_hotel_block_form #hotel_location, #search_hotel_block_form #id_hotel_button, #search_hotel_block_form #guest_occupancy {
-    padding-left: 35px};
-
-
-#search_hotel_block_form .input-date {
-  padding-right: 35px;}
-/*.header-rmsearch-wrapper .location_search_results_ul {
-  top: 1px;}
-.header-rmsearch-wrapper .hotel_dropdown_ul {
-  top: 41px;}*/
-  .header-rmsearch-wrapper .location_search_results_ul li, .header-rmsearch-wrapper .hotel_dropdown_ul li {
-    padding: 10px 15px;}
-
-#search_hotel_block_form #hotel_location, #search_hotel_block_form #id_hotel_button, #search_hotel_block_form #guest_occupancy {
-  padding-left: 35px;
-  padding-right: 35px;}
-#search_hotel_block_form #hotel_location {
-  padding-right: 15px;}
-.occupancy_info_block .occupancy_count {
-  padding: 18px;
-}
-#search_hotel_block_form .form-group {
-  margin-bottom: 15px;
-}
-@media (min-width: 480px) and (max-width: 767px) {
-  #search_hotel_block_form #hotel_location, #search_hotel_block_form #id_hotel_button, #search_hotel_block_form #guest_occupancy {
-    padding-left: 35px;
-    padding-right: 35px;
-    background-position: 2% 50%;}
-  #search_hotel_block_form #id_hotel_button {
-    background: url("../../views/img/icon-hotel.svg") no-repeat 2% 50%, url("../../views/img/icon-dropdown-arrow.svg") no-repeat 98% 50%;
-    background-color: #FFF;}
-  #search_hotel_block_form #guest_occupancy {
-    background: url("../../views/img/icon-users.svg") no-repeat 2% 50%, url("../../views/img/icon-dropdown-arrow.svg") no-repeat 98% 50%;
-    background-color: #FFF;}
-  #search_hotel_block_form .input-date {
-    background-position: 98% 50%;}
+  .header-rmsearch-wrapper #search_hotel_block_form {
+    grid-template-columns: 1fr;
   }
-@media (min-width: 768px) {
-  .occupancy_info_block .occupancy_count_block {
-    width: 100%;}
-    .occupancy_info_block .occupancy_count {
-      width: 80%;}
-    #search_hotel_block_form #hotel_location, #search_hotel_block_form #id_hotel_button, #search_hotel_block_form #guest_occupancy {
-    padding-left: 30px;
-    padding-right: 20px;}
-}
-@media (min-width: 768px) and (max-width: 768px) {
+  .header-rmsearch-wrapper #search_hotel_block_form #daterange_value.grid {
+    display: grid;
+    column-gap: 5px;
+    grid-template-columns: 1fr;
+  }
+  #search_hotel_block_form .header-rmsearch-input {
+    height: unset;
+    min-height: 45px;
+  }
+  /* #search_hotel_block_form #search_room_submit {
+    height: 45px;
+  } */
+  #search_hotel_block_form {
+    grid-template-columns: 1fr;
+  }
+  #search_hotel_block_form > div {
+    grid-column-end: unset!important;
+    grid-column: unset!important;}
+@media (min-width: 768px) and (max-width: 991px) {
   .header-rmsearch-wrapper {
     padding: 10px 5px;}
-  #search_hotel_block_form #search_room_submit {
-    font-size: 12px;}
-  .header-rmsearch-wrapper #search_hotel_block_form #search_room_submit .icon-arrow-right {
-    font-size: 12px;}
-  #search_hotel_block_form .header-rmsearch-input {
-    font-size: 13px;}
-  .header-rmsearch-wrapper #search_hotel_block_form #search_room_submit {
-    padding: 15px 10px;}
-  .children_ages div {
-    width: 100%;}
-  .occupancy_info_block .occupancy_count {
-    width: 75%;}
-}     
+
+}

@@ -82,7 +82,7 @@ class CookieCore
         } else {
             $this->_cipherTool = new PhpEncryption(_NEW_COOKIE_KEY_);
         }
-        
+
         $this->_secure = (bool)$secure;
 
         $this->update();

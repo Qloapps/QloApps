@@ -5631,7 +5631,7 @@ class ProductCore extends ObjectModel
             $roomtypeData = json_decode(json_encode($xml), true);
 
             // set room  map info for the hotel from request
-            return Db::getInstance()->execute('INSERT INTO `'._DB_PREFIX_.'htl_room_type` (`id_product`, `id_hotel`, `adult`, `children`, `date_add`, `date_upd`) VALUES ('.(int)$this->id.', '.(int) $roomtypeData['room_type']['id_hotel'].', '.(int) $roomtypeData['room_type']['adults'].', '.(int) $roomtypeData['room_type']['children'].', \''.date('Y-m-d h:i:s').'\', \''.date('Y-m-d h:i:s').'\')');
+            return Db::getInstance()->execute('INSERT INTO `'._DB_PREFIX_.'htl_room_type` (`id_product`, `id_hotel`, `adult`, `children`, `date_add`, `date_upd`) VALUES ('.(int)$this->id.', '.(int) $roomtypeData['room_type']['id_hotel'].', '.(int) $roomtypeData['room_type']['adult'].', '.(int) $roomtypeData['room_type']['children'].', \''.date('Y-m-d h:i:s').'\', \''.date('Y-m-d h:i:s').'\')');
         }
 
         return true;
@@ -6098,12 +6098,12 @@ class ProductCore extends ObjectModel
         return true;
     }
 
-    public function setWsAdults($adults)
+    public function setWsAdults($adult)
     {
         if ($this->id) {
             return Db::getInstance()->execute(
                 'UPDATE `'._DB_PREFIX_.'htl_room_type` '.'
-                SET `adults` = '.(int) $adults.'
+                SET `adult` = '.(int) $adult.'
                 WHERE `id_product` = '.(int)$this->id
             );
         }

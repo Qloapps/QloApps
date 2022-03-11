@@ -217,6 +217,9 @@ class HotelHelper
         Configuration::updateValue('WK_ADVANCED_PAYMENT_GLOBAL_MIN_AMOUNT', 10);
         Configuration::updateValue('WK_ADVANCED_PAYMENT_INC_TAX', 1);
 
+        Configuration::updateValue('WK_GLOBAL_CHILD_MAX_AGE', 15);
+        Configuration::updateValue('WK_GLOBAL_MAX_CHILD_IN_ROOM', 3);
+
         Configuration::updateValue(
             'MAX_GLOBAL_BOOKING_DATE',
             date('d-m-Y', strtotime(date('Y-m-d', time()).' + 1 year'))
@@ -247,6 +250,14 @@ class HotelHelper
         Configuration::updateValue('WK_HTL_CHAIN_NAME', $WK_HTL_CHAIN_NAME);
         Configuration::updateValue('WK_HTL_TAG_LINE', $WK_HTL_TAG_LINE);
         Configuration::updateValue('WK_HTL_SHORT_DESC', $WK_HTL_SHORT_DESC);
+
+        // Search Fields
+        Configuration::updateValue('PS_FRONT_SEARCH_TYPE', HotelBookingDetail::SEARCH_TYPE_OWS);
+        Configuration::updateValue('PS_FRONT_OWS_SEARCH_ALGO_TYPE', HotelBookingDetail::SEARCH_EXACT_ROOM_TYPE_ALGO);
+        Configuration::updateValue('PS_FRONT_OCCUPANCY_WISE_BOOKING', true);
+        Configuration::updateValue('PS_BACKOFFICE_SEARCH_TYPE', HotelBookingDetail::SEARCH_TYPE_OWS);
+        Configuration::updateValue('PS_BACKOFFICE_OWS_SEARCH_ALGO_TYPE', HotelBookingDetail::SEARCH_ALL_ROOM_TYPE_ALGO);
+        Configuration::updateValue('PS_BACKOFFICE_OCCUPANCY_WISE_BOOKING', true);
 
         return true;
     }
@@ -513,6 +524,10 @@ class HotelHelper
             $htl_rm_type->id_hotel = $id_hotel;
             $htl_rm_type->adult = 2;
             $htl_rm_type->children = 2;
+            $htl_rm_type->max_adults = 2;
+            $htl_rm_type->max_children = 2;
+            $htl_rm_type->max_guests = 4;
+
             $htl_rm_type->save();
 
             // Add features to the product
@@ -720,5 +735,32 @@ class HotelHelper
             }
         }
         return $randZipCode;
+    }
+
+    /**
+     * Get Super Admin Of Prestashop
+     * @return int Super Admin Employee ID
+     */
+    public static function getSupperAdmin()
+    {
+        if ($data = Db::getInstance()->executeS('SELECT * FROM `'._DB_PREFIX_.'employee` ORDER BY `id_employee`')) {
+            foreach ($data as $emp) {
+                $employee = new Employee($emp['id_employee']);
+                if ($employee->isSuperAdmin()) {
+                    return $emp['id_employee'];
+                }
+            }
+        }
+
+        return false;
+    }
+
+    public static function getNumberOfDays($dateFrom, $dateTo)
+    {
+        $startDate = new DateTime($dateFrom);
+        $endDate = new DateTime($dateTo);
+        $daysDifference = $startDate->diff($endDate)->days;
+
+        return $daysDifference;
     }
 }

@@ -354,6 +354,10 @@ abstract class PaymentModuleCore extends Module
                         PrestaShopLogger::addLog('PaymentModule::validateOrder - Order is about to be added', 1, null, 'Cart', (int)$id_cart, true);
                     }
 
+                    // if (Configuration::get('PS_FRONT_SEARCH_TYPE') == HotelBookingDetail::SEARCH_TYPE_OWS) {
+                    //     $order->is_occupnacy_provided = 1;
+                    // }
+
                     // advance payment information
                     $order->is_advance_payment = $this->context->cart->is_advance_payment;
                     if ($order->is_advance_payment) {
@@ -740,6 +744,9 @@ abstract class PaymentModuleCore extends Module
                                 $objBookingDetail->date_to = $objCartBookingData->date_to;
                                 $objBookingDetail->total_price_tax_excl = Tools::ps_round($total_price['total_price_tax_excl'], 6);
                                 $objBookingDetail->total_price_tax_incl = Tools::ps_round($total_price['total_price_tax_incl'], 6);
+                                $objBookingDetail->adult = $objCartBookingData->adult;
+                                $objBookingDetail->children = $objCartBookingData->children;
+                                $objBookingDetail->child_ages = $objCartBookingData->child_ages;
 
                                 // Save hotel information/location/contact
                                 if (Validate::isLoadedObject($objRoom = new HotelRoomInformation($objCartBookingData->id_room))) {
@@ -761,10 +768,6 @@ abstract class PaymentModuleCore extends Module
                                         $objBookingDetail->zipcode = $hotelAddress['postcode'];
                                         $objBookingDetail->phone = $hotelAddress['phone'];
                                     }
-                                }
-                                if ($roomTypeInfo = $objRoomType->getRoomTypeInfoByIdProduct($idProduct)) {
-                                    $objBookingDetail->adult = $roomTypeInfo['adult'];
-                                    $objBookingDetail->children = $roomTypeInfo['children'];
                                 }
 
                                 /*for saving details of the advance payment product wise*/
@@ -1362,8 +1365,6 @@ abstract class PaymentModuleCore extends Module
                     $cart_htl_data[$type_key]['cover_img']    = $cover_img;
                     $cart_htl_data[$type_key]['name']        = $product->name;
                     $cart_htl_data[$type_key]['hotel_name'] = $rm_dtl['hotel_name'];
-                    $cart_htl_data[$type_key]['adult']        = $rm_dtl['adult'];
-                    $cart_htl_data[$type_key]['children']    = $rm_dtl['children'];
 
                     foreach ($cart_bk_data as $data_k => $data_v) {
                         $date_join = strtotime($data_v['date_from']).strtotime($data_v['date_to']);
@@ -1372,6 +1373,9 @@ abstract class PaymentModuleCore extends Module
                             $cart_htl_data[$type_key]['date_diff'][$date_join]['num_rm'] += 1;
 
                             $num_days = $cart_htl_data[$type_key]['date_diff'][$date_join]['num_days'];
+
+                            $cart_htl_data[$type_key]['date_diff'][$date_join]['adult'] += $data_v['adult'];
+                            $cart_htl_data[$type_key]['date_diff'][$date_join]['children'] += $data_v['children'];
 
                             $cart_htl_data[$type_key]['date_diff'][$date_join]['paid_unit_price_tax_incl'] = $data_v['total_price_tax_incl']/$num_days;
                             $cart_htl_data[$type_key]['date_diff'][$date_join]['avg_paid_unit_price_tax_incl'] += $cart_htl_data[$type_key]['date_diff'][$date_join]['paid_unit_price_tax_incl'];
@@ -1412,6 +1416,8 @@ abstract class PaymentModuleCore extends Module
                             $cart_htl_data[$type_key]['date_diff'][$date_join]['data_form'] = $data_v['date_from'];
                             $cart_htl_data[$type_key]['date_diff'][$date_join]['data_to'] = $data_v['date_to'];
                             $cart_htl_data[$type_key]['date_diff'][$date_join]['num_days'] = $num_days;
+                            $cart_htl_data[$type_key]['date_diff'][$date_join]['adult'] = $data_v['adult'];
+                            $cart_htl_data[$type_key]['date_diff'][$date_join]['children'] = $data_v['children'];
 
                             $cart_htl_data[$type_key]['date_diff'][$date_join]['paid_unit_price_tax_incl'] = $data_v['total_price_tax_incl']/$num_days;
                             $cart_htl_data[$type_key]['date_diff'][$date_join]['avg_paid_unit_price_tax_incl'] = $cart_htl_data[$type_key]['date_diff'][$date_join]['paid_unit_price_tax_incl'];

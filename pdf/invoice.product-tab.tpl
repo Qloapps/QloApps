@@ -30,14 +30,13 @@
 			{/if}
 			<th class="product header small">{l s='Room Description' pdf='true'}</th>
 			<th class="product header small">{l s='Hotel' pdf='true'}</th>
-			<th class="product header small">{l s='Room Capcity' pdf='true'}</th>
 			<th class="product header small">{l s='Tax Rate(s)' pdf='true'}</th>
 			{* {if isset($layout.before_discount)}
 				<th class="product header small">{l s='Base price' pdf='true'} <br /> {l s='(Tax excl.)' pdf='true'}</th>
 			{/if} *}
 
 			<th class="product header small" width="{$layout.unit_price_tax_excl.width}%">{l s='Unit Price' pdf='true'} <br /> {l s='(Tax excl.)' pdf='true'}</th>
-			<th class="product header small">{l s='Rooms Qty' pdf='true'}</th>
+			<th class="product header small">{l s='Rooms' pdf='true'}</th>
 			<th class="product header small">{l s='Check-in Date' pdf='true'}</th>
 			<th class="product header small">{l s='Check-out Date' pdf='true'}</th>
 			<th class="product header small">{l s='Total' pdf='true'} <br /> {l s='(Tax excl.)' pdf='true'}</th>
@@ -64,11 +63,11 @@
 								{$data_v['hotel_name']}
 							</p>
 						</td>
-						<td>
+						{* <td>
 							<p class="text-left">
 								{$data_v['adult']} {l s='Adults'}, {$data_v['children']} {l s='Children'}
 							</p>
-						</td>
+						</td> *}
 						<td class="product center">
 							{$data_v['order_detail_tax_label']}
 						</td>
@@ -79,7 +78,7 @@
 						</td>
 						<td class="product center">
 							<p class="text-left">
-								{$rm_v['num_rm']}
+								{if $rm_v['adult'] <= 9}0{$rm_v['adult']}{else}{$rm_v['adult']}{/if} {if $rm_v['adult'] > 1}{l s='Adults' mod='wkroomsearchblock'}{else}{l s='Adult' mod='wkroomsearchblock'}{/if}{if $rm_v['children']}, {if $rm_v['children'] <= 9}0{$rm_v['children']}{else} {$rm_v['children']}{/if} {if $rm_v['children'] > 1}{l s='Children' mod='wkroomsearchblock'}{else}{l s='Child' mod='wkroomsearchblock'}{/if}{/if}<br>{if $rm_v['num_rm'] <= 9}0{/if}{$rm_v['num_rm']} {if $rm_v['num_rm'] > 1}{l s='Rooms'}{else}{l s='Room'}{/if}
 							</p>
 						</td>
 						<td class="product center">

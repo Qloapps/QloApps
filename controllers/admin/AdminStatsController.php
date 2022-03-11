@@ -850,7 +850,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
     public static function getGuestsByDate($date, $idHotel = false)
     {
         return Db::getInstance()->getRow(
-            'SELECT SUM(hbd.`adult`) AS `adults`, SUM(hbd.`children`) AS `children`
+            'SELECT SUM(hbd.`adult`) AS `adult`, SUM(hbd.`children`) AS `children`
             FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
             WHERE hbd.`is_refunded` = 0 AND hbd.`is_back_order` = 0
             AND hbd.`date_from` BETWEEN "'.pSQL($date).' 00:00:00" AND "'.pSQL($date).' 23:59:59"'.

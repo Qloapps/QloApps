@@ -109,15 +109,80 @@ class AdminPPreferencesControllerCore extends AdminController
                         'cast' => 'intval',
                         'required' => false,
                         'type' => 'bool'
+                    )
+                ),
+                'submit' => array('title' => $this->l('Save'))
+            ),
+            'search' => array(
+                'title' =>    $this->l('Search'),
+                'fields' =>    array(
+                    'PS_FRONT_SEARCH_TYPE' => array(
+                        'title' => $this->l('Front end search type'),
+                        'hint' => $this->l('Select search type for frontend. In "Occupancy wise search", occupancy field will be shown in the search panel and search will be based on required occupancy by the guest. In "Search without occupancy", All available room types will be shown for the search dates without any occupancy filter.'),
+                        'cast' => 'intval',
+                        'type' => 'select',
+                        'list' => array(
+                            array('id' => HotelBookingDetail::SEARCH_TYPE_OWS, 'name' => $this->l('Occupancy wise search')),
+                            array('id' => HotelBookingDetail::SEARCH_TYPE_NORMAL, 'name' => $this->l('Search without occupancy'))
+                        ),
+                        'identifier' => 'id',
+                        'desc' => $this->l('Choose "Occupancy wise search" or "Search without occupancy". Occupancy search restriction will depend on this option selection at front end.'),
+                    ),
+                    'PS_FRONT_OWS_SEARCH_ALGO_TYPE' => array(
+                        'title' => $this->l('Front end occupancy wise search algorithm '),
+                        'hint' => $this->l('In occupancy wise search at front end, you want to display only room types which are fully satisfing searched occupancy or you want to display all the available room types for the dates searched'),
+                        'cast' => 'intval',
+                        'type' => 'select',
+                        'list' => array(
+                            array('id' => HotelBookingDetail::SEARCH_EXACT_ROOM_TYPE_ALGO, 'name' => $this->l('Show room types satisfing required occupancy')),
+                            array('id' => HotelBookingDetail::SEARCH_ALL_ROOM_TYPE_ALGO, 'name' => $this->l('Show all available room types'))
+                        ),
+                        'identifier' => 'id'
+                    ),
+                    'PS_FRONT_OCCUPANCY_WISE_BOOKING' => array(
+                        'title' => $this->l('Front end occupancy required for booking'),
+                        'hint' => $this->l('Select occupancy is required for booking a room for frontend. When enabled occupancy field will be shown in the booking form.'),
+                        'cast' => 'intval',
+                        'type' => 'bool',
+                    ),
+                    'PS_BACKOFFICE_SEARCH_TYPE' => array(
+                        'title' => $this->l('Back-office search type'),
+                        'hint' => $this->l('Select search type for Back-office. In "Occupancy wise search", occupancy field will be shown in the search panel and search will be based on required occupancy by the employee. In "Search without occupancy", All available room types will be shown for the search dates without any occupancy filter.'),
+                        'cast' => 'intval',
+                        'type' => 'select',
+                        'list' => array(
+                            array('id' => HotelBookingDetail::SEARCH_TYPE_OWS, 'name' => $this->l('Occupancy wise search')),
+                            array('id' => HotelBookingDetail::SEARCH_TYPE_NORMAL, 'name' => $this->l('Search without occupancy'))
+                        ),
+                        'identifier' => 'id',
+                        'desc' => $this->l('Choose "Occupancy wise search" or "Search without occupancy". Occupancy search restriction will depend on this option selection at back-office.'),
+                    ),
+                    'PS_BACKOFFICE_OWS_SEARCH_ALGO_TYPE' => array(
+                        'title' => $this->l('Back-office occupancy wise search algorithm'),
+                        'hint' => $this->l('In occupancy wise search at back-office, you want to display only room types which are fully satisfing searched occupancy or you want to display all the available room types for the dates searched.'),
+                        'cast' => 'intval',
+                        'type' => 'select',
+                        'list' => array(
+                            array('id' => HotelBookingDetail::SEARCH_EXACT_ROOM_TYPE_ALGO, 'name' => $this->l('Show room types satisfing required occupancy')),
+                            array('id' => HotelBookingDetail::SEARCH_ALL_ROOM_TYPE_ALGO, 'name' => $this->l('Show all available room types'))
+                        ),
+                        'identifier' => 'id',
+                        'desc' => $this->l('This option is only for fully available rooms. For partially available rooms, always all possible rooms will be displayed.'),
+                    ),
+                    'PS_BACKOFFICE_OCCUPANCY_WISE_BOOKING' => array(
+                        'title' => $this->l('Back-office occupancy required for booking'),
+                        'hint' => $this->l('Select occupancy is required for booking a room for frontend. When enabled occupancy field will be shown in the booking form.'),
+                        'cast' => 'intval',
+                        'type' => 'bool',
                     ),
                     'PS_LOS_RESTRICTION_BO' => array(
-                        'title' => $this->l('Apply Min and Max lenght of stay restrictions for back-office bookings'),
-                        'hint' => $this->l('While creating bookings from back-office, apply minimum and maximum lenght of stay restrictions'),
+                        'title' => $this->l('Apply Min and Max lenght of stay restrictions for back-office search'),
+                        'hint' => $this->l('While searching for available rooms from back-office, apply minimum and maximum lenght of stay restrictions'),
                         'validation' => 'isBool',
                         'cast' => 'intval',
                         'required' => false,
                         'type' => 'bool'
-                    )
+                    ),
                 ),
                 'submit' => array('title' => $this->l('Save'))
             ),

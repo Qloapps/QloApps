@@ -260,7 +260,7 @@ class StatsCheckUp extends Module
             $row['stock'] = 0;
             if ($roomTypeInfo = $objHotelRoomType->getRoomTypeInfoByIdProduct($row['id_product'])) {
                 $bookingParams['hotel_id'] = $roomTypeInfo['id_hotel'];
-                $bookingParams['room_type'] = $row['id_product'];
+                $bookingParams['id_room_type'] = $row['id_product'];
                 if ($booking_data = $objBookingDtl->getBookingData($bookingParams)) {
                     if (isset($booking_data['stats']['num_avail'])) {
                         $row['stock'] = $booking_data['stats']['num_avail'];

@@ -3433,6 +3433,7 @@ class AdminProductsControllerCore extends AdminController
         } else {
             $this->displayWarning($this->l('You must save this room type before managing occupancy.'));
         }
+        $smartyVars['currency'] = $this->context->currency;
         $data->assign($smartyVars);
         $this->tpl_form_vars['custom_form'] = $data->fetch();
     }
@@ -3449,16 +3450,46 @@ class AdminProductsControllerCore extends AdminController
                 if (Validate::isLoadedObject($objRoomType = new HotelRoomType($idHtlRoomType))) {
                     $baseAdults = Tools::getValue('base_adults');
                     $baseChildren = Tools::getValue('base_children');
+                    $maxAdults = Tools::getValue('max_adults');
+                    $maxChildren = Tools::getValue('max_children');
+                    $maxGuests = Tools::getValue('max_guests');
 
                     if (!$baseAdults || !Validate::isUnsignedInt($baseAdults)) {
-                        $this->errors[] = Tools::displayError('Invalid base adults');
+                        $this->errors[] = Tools::displayError('Invalid base adult');
                     }
-                    if (!Validate::isUnsignedInt($baseChildren)) {
+                    if ($baseChildren == '' || !Validate::isUnsignedInt($baseChildren)) {
                         $this->errors[] = Tools::displayError('Invalid base children');
+                    } else if (Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM')) {
+                        if ($baseChildren > Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM')) {
+                            $this->errors[] = sprintf(Tools::displayError('Base children cannot be greater than max childern allowed on your website (Max: %s)'), Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM'));
+                        }
                     }
+                    if (!$maxAdults || !Validate::isUnsignedInt($maxAdults)) {
+                        $this->errors[] = Tools::displayError('Invalid maximum number of adult');
+                    } elseif ($maxAdults < $baseAdults) {
+                        $this->errors[] = Tools::displayError('Maximum number of adult cannot be less than base adult');
+                    }
+                    if ($maxChildren == '' || !Validate::isUnsignedInt($maxChildren)) {
+                        $this->errors[] = Tools::displayError('Invalid maximum number of children');
+                    } else if (Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM')) {
+                        if ($maxChildren > Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM')) {
+                            $this->errors[] = sprintf(Tools::displayError('Maximum number of children cannot be greater than max childern allowed on your website (Max: %s)'), Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM'));
+                        }
+                    } elseif ($maxChildren < $baseChildren) {
+                        $this->errors[] = Tools::displayError('Maximum number of children cannot be less than base children');
+                    }
+                    if (!$maxGuests || !Validate::isUnsignedInt($maxGuests)) {
+                        $this->errors[] = Tools::displayError('Invalid maximum number of guests');
+                    } elseif ($maxGuests < ($baseAdults + $baseChildren)) {
+                        $this->errors[] = Tools::displayError('Maximum number of guests cannot be less than base occupancy of adult and children');
+                    }
+
                     if (!count($this->errors)) {
                         $objRoomType->adult = $baseAdults;
                         $objRoomType->children = $baseChildren;
+                        $objRoomType->max_adults = $maxAdults;
+                        $objRoomType->max_children = $maxChildren;
+                        $objRoomType->max_guests = $maxGuests;
                         $objRoomType->save();
                     }
                 } else {
@@ -3469,7 +3500,7 @@ class AdminProductsControllerCore extends AdminController
             }
         }
     }
-  
+
     // send information for the length of stay tab
     public function initFormLengthOfStay($product)
     {

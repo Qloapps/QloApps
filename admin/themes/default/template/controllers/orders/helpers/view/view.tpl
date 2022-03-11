@@ -981,6 +981,7 @@
 										<th class="text-center"><span class="title_box">{l s='Room Type'}</span></th>
 										<th class="text-center"><span class="title_box">{l s='Hotel Name'}</span></th>
 										<th class="text-center"><span class="title_box">{l s='Duration'}</span></th>
+										<th class="text-center fixed-width-lg"><span class="title_box">{l s='Occupancy'}</span></th>
 										<th class="text-center"><span class="title_box">{l s='Unit Price (Tax excl.)'}</span></th>
 										<th class="text-center"><span class="title_box">{l s='Total Price (Tax incl.)'}</span></th>
 										{if isset($refundReqBookings) && $refundReqBookings}
@@ -1412,6 +1413,21 @@
 	{addJsDefL name=txtSomeErr}{l s='Some error occurred. Please try again.' js=1}{/addJsDefL}
 	{addJsDefL name=txtDeleteSucc}{l s='Deleted successfully' js=1}{/addJsDefL}
 	{addJsDefL name=txtInvalidDemandVal}{l s='Invalid demand value found' js=1}{/addJsDefL}
+	{addJsDefL name='select_age_txt'}{l s='Select age' js=1}{/addJsDefL}
+	{addJsDefL name='under_1_age'}{l s='Under 1' js=1}{/addJsDefL}
+	{addJsDefL name='room_txt'}{l s='Room' js=1}{/addJsDefL}
+	{addJsDefL name='rooms_txt'}{l s='Rooms' js=1}{/addJsDefL}
+	{addJsDefL name='remove_txt'}{l s='Remove' js=1}{/addJsDefL}
+	{addJsDefL name='adult_txt'}{l s='Adult' js=1}{/addJsDefL}
+	{addJsDefL name='adults_txt'}{l s='Adults' js=1}{/addJsDefL}
+	{addJsDefL name='child_txt'}{l s='Child' js=1}{/addJsDefL}
+	{addJsDefL name='children_txt'}{l s='Children' js=1}{/addJsDefL}
+	{addJsDefL name='below_txt'}{l s='Below' js=1}{/addJsDefL}
+	{addJsDefL name='years_txt'}{l s='years' js=1}{/addJsDefL}
+	{addJsDefL name='all_children_txt'}{l s='years' js=1}{/addJsDefL}
+	{addJsDefL name='invalid_occupancy_txt'}{l s='Invalid occupancy(adults/children) found.' js=1}{/addJsDefL}
+	{addJsDef max_child_age=$max_child_age|escape:'quotes':'UTF-8'}
+	{addJsDef max_child_in_room=$max_child_in_room|escape:'quotes':'UTF-8'}
 {/strip}
 
 {* Apply javascript for the page *}

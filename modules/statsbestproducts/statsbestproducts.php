@@ -199,7 +199,7 @@ class StatsBestProducts extends ModuleGrid
         $bookingParams['date_to'] = $dateTo;
         foreach ($values as &$value) {
             $bookingParams['hotel_id'] = $value['id_hotel'];
-            $bookingParams['room_type'] = $value['id_product'];
+            $bookingParams['id_room_type'] = $value['id_product'];
             $booking_data = $objBookingDtl->getBookingData($bookingParams);
             if (isset($booking_data['stats']['num_avail'])) {
                 $value['avail_rooms'] = $booking_data['stats']['num_avail'];

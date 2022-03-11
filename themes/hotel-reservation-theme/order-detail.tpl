@@ -144,7 +144,6 @@
 					<th class="cart_product">{l s='Room Image'}</th>
 					<th class="cart_description">{l s='Room Description'}</th>
 					<th>{l s='Hotel Name'}</th>
-					<th>{l s='Room Capacity'}</th>
 					<th class="cart_unit">{l s='Unit Price'}</th>
 					<th>{l s='Rooms'}</th>
 					<th>{l s='Check-in Date'}</th>
@@ -350,11 +349,6 @@
 									{/if}
 								</td>
 								<td>{$data_v['hotel_name']|escape:'html':'UTF-8'}</td>
-								<td>
-									<p class="text-left">
-										{$data_v['adult']|escape:'html':'UTF-8'} {l s='Adults'}, {$data_v['children']|escape:'html':'UTF-8'} {l s='Children'}
-									</p>
-								</td>
 								<td class="cart_unit">
 									<p class="text-center">
 										{if $group_use_tax}
@@ -378,7 +372,11 @@
 										{/if}
 									</p>
 								</td>
-								<td class="text-center">{$rm_v['num_rm']|escape:'html':'UTF-8'}</td>
+								<td class="text-center">
+									<p>
+										{if $rm_v['adult'] <= 9}0{$rm_v['adult']}{else}{$rm_v['adult']}{/if} {if $rm_v['adult'] > 1}{l s='Adults' mod='wkroomsearchblock'}{else}{l s='Adult' mod='wkroomsearchblock'}{/if}{if $rm_v['children']}, {if $rm_v['children'] <= 9}0{$rm_v['children']}{else} {$rm_v['children']}{/if} {if $rm_v['children'] > 1}{l s='Children' mod='wkroomsearchblock'}{else}{l s='Child' mod='wkroomsearchblock'}{/if}{/if}<br>{if $rm_v['num_rm'] <= 9}0{/if}{$rm_v['num_rm']} {if $rm_v['num_rm'] > 1}{l s='Rooms'}{else}{l s='Room'}{/if}
+									</p>
+								</td>
 								<td class="text-center">{$rm_v['data_form']|date_format:"%d-%m-%Y"}</td>
 								<td class="text-center">{$rm_v['data_to']|date_format:"%d-%m-%Y"}</td>
 								<td class="cart_total text-left">

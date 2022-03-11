@@ -23,7 +23,7 @@
 		{l s='Cart Details'}
 	</div>
 	<div class="row">
-		<div class="col-lg-12">
+		<div class="col-lg-12 table-responsive">
 			<table class="table" id="customer_cart_details_table">
 				<thead>
 					<tr>
@@ -31,6 +31,9 @@
 						<th><span class="title_box">{l s='Room Image'}</th>
 						<th><span class="title_box">{l s='Room Type'}</span></th>
 						<th><span class="title_box">{l s='Duration'}</span></th>
+						{if $occupancy_wise_booking}
+							<th><span class="fixed-width-lg title_box">{l s='Occupancy'}</span></th>
+						{/if}
 						<th><span class="title_box">{l s='Unit Price (tax excl)'}</span></th>
 						<th><span class="title_box">{l s='Additinal Facilities (tax excl)'}</span></th>
 						<th><span class="title_box">{l s='Total Rooms Price (tax excl)'}</span></th>
@@ -42,7 +45,7 @@
 				{if isset($cart_detail_data) && $cart_detail_data}
 					{assign var=curr_id value=$cart->id_currency|intval}
 					{foreach from=$cart_detail_data item=data}
-						<tr>
+						<tr  data-id-booking-data="{$data.id}" data-id-product="{$data.id_product}" data-id-room="{$data.id_room}" data-date-from="{$data.date_from}" data-date-to="{$data.date_to}" >
 							<td>{$data.room_num|escape:'html':'UTF-8'}</td>
 							<td><img src="{$data.image_link|escape:'html':'UTF-8'}" title="Room image" /></td>
 							<td>
@@ -58,13 +61,71 @@
 								{/if}
 							</td>
 							<td>{dateFormat date=$data.date_from} - {dateFormat date=$data.date_to}</td>
+							{if $occupancy_wise_booking}
+								<td>
+									<div class="dropdown">
+										<button class="booking_guest_occupancy btn btn-default btn-left btn-block input-occupancy" type="button">
+											<span>
+												{if $data['adult']}{$data['adult']}{/if} {if $data['adult'] > 1}{l s='Adults'}{else}{l s='Adult'}{/if}{if {$data['children']}}, {$data['children']} {if $data['children'] > 1}{l s='Children'}{else}{l s='Child'}{/if}{/if}
+											</span>
+										</button>
+										<div class="dropdown-menu booking_occupancy_wrapper fixed-width-xxl">
+											<div class="booking_occupancy_inner">
+												<input type="hidden" class="max_adults" value="{if isset($data['room_type_info'])}{$data['room_type_info']['max_adults']|escape:'html':'UTF-8'}{/if}">
+												<input type="hidden" class="max_children" value="{if isset($data['room_type_info'])}{$data['room_type_info']['max_children']|escape:'html':'UTF-8'}{/if}">
+												<input type="hidden" class="max_guests" value="{if isset($data['room_type_info'])}{$data['room_type_info']['max_guests']|escape:'html':'UTF-8'}{/if}">
+												<div class="occupancy_info_block selected" occ_block_index="0">
+													<div class="occupancy_info_head col-sm-12"><span class="room_num_wrapper">{l s='Room - 1'}</span></div>
+													<div class="row">
+														<div class="col-xs-6 occupancy_count_block">
+															<div class="col-sm-12">
+																<label>{l s='Adults'}</label>
+																<input type="number" class="form-control num_occupancy num_adults" name="occupancy[0][adult]" value="{$data['adult']}" min="1" max="{$data['room_type_info']['max_adults']|escape:'html':'UTF-8'}">
+															</div>
+														</div>
+														<div class="col-xs-6 occupancy_count_block">
+															<div class="col-sm-12">
+																<label>{l s='Child'} <span class="label-desc-txt"></span></label>
+																<input type="number" class="form-control num_occupancy num_children" name="occupancy[0][children]" value="{$data['children']}" min="0" max="{$data['room_type_info']['max_children']|escape:'html':'UTF-8'}">
+																({l s='Below'}  {$max_child_age|escape:'htmlall':'UTF-8'} {l s='years'})
+															</div>
+														</div>
+													</div>
+													<div class="row children_age_info_block" {if !isset($data['child_ages']) || !$data['child_ages']}style="display:none"{/if}>
+														<div class="col-sm-12">
+															<label class="col-sm-12">{l s='All Children'}</label>
+															<div class="col-sm-12">
+																<div class="row children_ages">
+																	{if isset($data['child_ages']) && $data['child_ages']}
+																		{foreach $data['child_ages'] as $childAge}
+																			<p class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+																				<select class="guest_child_age room_occupancies" name="occupancy[0][child_ages][]">
+																					<option value="-1" {if $childAge == -1}selected{/if}>{l s='Select 1'}</option>
+																					<option value="0" {if $childAge == 0}selected{/if}>{l s='Under 1'}</option>
+																					{for $age=1 to ($max_child_age-1)}
+																						<option value="{$age|escape:'htmlall':'UTF-8'}" {if $childAge == $age}selected{/if}>{$age|escape:'htmlall':'UTF-8'}</option>
+																					{/for}
+																				</select>
+																			</p>
+																		{/foreach}
+																	{/if}
+																</div>
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</td>
+							{/if}
 							<td id="cart_detail_data_unit_price_{$data.id|escape:'html':'UTF-8'}">
 								{if $data.feature_price_diff != 0}
 									{assign var=shown_room_type_price value=$data.feature_price_tax_excl}
 								{else}
 									{assign var=shown_room_type_price value=$data.product_price_tax_excl}
 								{/if}
-								<input type="text" class="room_unit_price" data-id-booking-data="{$data.id}" data-id-product="{$data.id_product}" data-id-room="{$data.id_room}" data-date-from="{$data.date_from}" data-date-to="{$data.date_to}" value="{$shown_room_type_price|escape:'html':'UTF-8'}">
+								<input type="text" class="room_unit_price" value="{$shown_room_type_price|escape:'html':'UTF-8'}">
 							</td>
 							<td>
 								{if isset($data.extra_demands) && $data.extra_demands}

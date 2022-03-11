@@ -138,6 +138,9 @@ class CategoryControllerCore extends FrontController
             $date_to = date('Y-m-d', strtotime($date_from) + 86400);
         }
 
+        // get occupancy of the search
+        $occupancy = Tools::getValue('occupancy');
+
         $currency = new Currency($this->context->currency->id);
 
         if (Module::isInstalled('hotelreservationsystem')) {
@@ -148,8 +151,18 @@ class CategoryControllerCore extends FrontController
             $id_cart = $this->context->cart->id;
             $id_guest = $this->context->cookie->id_guest;
 
-            $obj_booking_dtl = new HotelBookingDetail();
-            $booking_data = $obj_booking_dtl->DataForFrontSearch($date_from, $date_to, $id_hotel, 0, 0, 0, 0, -1, 0, 0, $id_cart, $id_guest);
+            $objBookingDetail = new HotelBookingDetail();
+            $bookingParams = array(
+                'date_from' => $date_from,
+                'date_to' => $date_to,
+                'occupancy' => $occupancy,
+                'hotel_id' => $id_hotel,
+                'get_total_rooms' => 0,
+                'id_cart' => $id_cart,
+                'id_guest' => $id_guest,
+            );
+
+            $booking_data = $objBookingDetail->dataForFrontSearch($bookingParams);
 
             $feat_img_dir = _PS_IMG_.'rf/';
             $ratting_img = _MODULE_DIR_.'hotelreservationsystem/views/img/Slices/icons-sprite.png';
@@ -227,6 +240,10 @@ class CategoryControllerCore extends FrontController
         $date_to = Tools::getValue('date_to');
         $htl_id_category = Tools::getValue('id_category');
 
+        // occupancy of the search
+        // @todo send occupancy in the search function
+        $occupancy = Tools::getValue('occupancy');
+
         $sort_by = Tools::getValue('sort_by');
         $sort_value = Tools::getValue('sort_value');
         $filter_data = Tools::getValue('filter_data');
@@ -263,11 +280,23 @@ class CategoryControllerCore extends FrontController
 
             $id_hotel = HotelBranchInformation::getHotelIdByIdCategory($htl_id_category);
 
-            $id_cart = $this->context->cart->id;
-            $id_guest = $this->context->cookie->id_guest;
+            $objBookingDetail = new HotelBookingDetail();
 
-            $obj_booking_dtl = new HotelBookingDetail();
-            $booking_data = $obj_booking_dtl->DataForFrontSearch($date_from, $date_to, $id_hotel, 0, 0, $adult, $child, $ratting, $amenities, $price, $id_cart, $id_guest);
+            $bookingParams = array(
+                'date_from' => $date_from,
+                'date_to' => $date_to,
+                'hotel_id' => $id_hotel,
+                'adult' => $adult,
+                'children' => $child,
+                'ratting' => $ratting,
+                'amenities' => $amenities,
+                'price' => $price,
+                'get_total_rooms' => 0,
+                'id_cart' => $this->context->cart->id,
+                'id_guest' => $this->context->cookie->id_guest,
+            );
+
+            $booking_data = $objBookingDetail->dataForFrontSearch($bookingParams);
             // reset array keys from 0
             $booking_data['rm_data'] = array_values($booking_data['rm_data']);
             if ($sort_by && $sort_value) {

@@ -212,8 +212,6 @@ class wkhotelfilterblock extends Module
             $max_adult = HotelRoomType::getMaxAdults($id_hotel);
             $max_child = HotelRoomType::getMaxChild($id_hotel);
 
-            $category = new Category($htl_id_category);
-
             if (!($date_from = Tools::getValue('date_from'))) {
                 $date_from = date('Y-m-d');
                 $date_to = date('Y-m-d', strtotime($date_from) + 86400);
@@ -231,10 +229,27 @@ class wkhotelfilterblock extends Module
                     $prod_price[] = Product::getPriceStatic($value['id_product'], HotelBookingDetail::useTax());
                 }
             }
+
+            // Create URL of category
+            $occupancy = Tools::getValue('occupancy');
+            $urlData = array (
+                'date_from' => $date_from,
+                'date_to' => $date_to,
+                'occupancy' => $occupancy,
+            );
+
             if (Configuration::get('PS_REWRITING_SETTINGS')) {
-                $cat_link = $this->context->link->getCategoryLink($category, is_array($category->link_rewrite) ? $category->link_rewrite[$id_lang] : $this->link_rewrite, $id_lang).'?date_from='.$date_from.'&date_to='.$date_to;
+                $categoryUrl = $this->context->link->getCategoryLink(
+                    new Category($htl_id_category, $this->context->language->id),
+                    null,
+                    $this->context->language->id
+                ).'?'.http_build_query($urlData);
             } else {
-                $cat_link = $this->context->link->getCategoryLink($category, is_array($category->link_rewrite) ? $category->link_rewrite[$id_lang] : $this->link_rewrite, $id_lang).'&date_from='.$date_from.'&date_to='.$date_to;
+                $categoryUrl = $this->context->link->getCategoryLink(
+                    new Category($htl_id_category, $this->context->language->id),
+                    null,
+                    $this->context->language->id
+                ).'&'.http_build_query($urlData);
             }
             $currency = $this->context->currency;
 
@@ -252,9 +267,9 @@ class wkhotelfilterblock extends Module
                 'all_feat' => $all_feat,
                 'max_adult' => $max_adult,
                 'max_child' => $max_child,
-                'cat_link' => $cat_link,
+                'cat_link' => $categoryUrl,
                 'ratting_img' => $ratting_img,
-                'currency' => $currency,
+                'currency' => $this->context->currency,
                 'date_from' => $date_from,
                 'date_to' => $date_to,
                 'num_days' => $num_days,

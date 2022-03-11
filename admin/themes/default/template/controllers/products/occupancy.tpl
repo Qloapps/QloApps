@@ -24,16 +24,14 @@
 		<h3 class="tab"> <i class="icon-users"></i> {l s='Occupancy'}</h3>
 
         <div class="alert alert-info">
-            {l s='Set the occupancy of this room type. Enter how much adults and children this room type can accomodate.'}
-			<br /><br />
-			<b>{l s='Note'} : {l s='These occupancy settings will not affect "ROOM TYPE ADDITIONAL FACILITIES" any way. It will work separately.'}</b>
+            {l s='Below, enter the base occupancy of this room type.'}
         </div>
 
 		<div class="form-group">
 			<label class="control-label col-sm-2" for="base_adults">
                 <span class="label-tooltip" data-toggle="tooltip"
 				title="{l s=''}">
-                    {l s='Adults'}
+                    {l s='Base adults'}
                 </span>
 			</label>
 			<div class="col-sm-3">
@@ -44,7 +42,7 @@
 			<label class="control-label col-sm-2" for="base_children">
                 <span class="label-tooltip" data-toggle="tooltip"
 				title="{l s=''}">
-                    {l s='Children'}
+                    {l s='Base children'}
                 </span>
 			</label>
 			<div class="col-sm-3">
@@ -52,6 +50,46 @@
 			</div>
 		</div>
         <input id="is_occupancy_submit" type="hidden" name="is_occupancy_submit" class="form-control" value="0">
+
+        <hr>
+
+        <div class="alert alert-info">
+            {l s='Below, enter the maximum of adult or children which can be accommodated in a room of this room type. Also, enter maximum number of guests for this room type.'}
+        </div>
+
+        <div class="form-group">
+			<label class="control-label col-sm-2" for="max_adults">
+                <span class="label-tooltip" data-toggle="tooltip"
+				title="{l s='Enter maximum number of adult can be accommodated in a room of this room type.'}">
+                    {l s='Maximum adult'}
+                </span>
+			</label>
+			<div class="col-sm-3">
+				<input id="max_adults" type="text" name="max_adults" class="form-control" {if isset($roomTypeInfo)}value="{$roomTypeInfo['max_adults']|escape:'htmlall':'UTF-8'}"{/if}>
+			</div>
+		</div>
+        <div class="form-group">
+			<label class="control-label col-sm-2" for="max_children">
+                <span class="label-tooltip" data-toggle="tooltip"
+				title="{l s='Enter maximum number of children can be accommodated in a room of this room type.'}">
+                    {l s='Maximum children'}
+                </span>
+			</label>
+			<div class="col-sm-3">
+				<input id="max_children" type="text" name="max_children" class="form-control" {if isset($roomTypeInfo)}value="{$roomTypeInfo['max_children']|escape:'htmlall':'UTF-8'}"{/if}>
+			</div>
+		</div>
+        <div class="form-group">
+			<label class="control-label col-sm-2" for="max_guests">
+                <span class="label-tooltip" data-toggle="tooltip"
+				title="{l s='Enter maximum number of guests can be accommodated in a room of this room type.'}">
+                    {l s='Maximum room occupancy'}
+                </span>
+			</label>
+			<div class="col-sm-3">
+				<input id="max_guests" type="text" name="max_guests" class="form-control" {if isset($roomTypeInfo)}value="{$roomTypeInfo['max_guests']|escape:'htmlall':'UTF-8'}"{/if}>
+			</div>
+		</div>
 
 		<div class="panel-footer">
 			<a href="{$link->getAdminLink('AdminProducts')|escape:'html':'UTF-8'}{if isset($smarty.request.page) && $smarty.request.page > 1}&amp;submitFilterproduct={$smarty.request.page|intval}{/if}" class="btn btn-default">
