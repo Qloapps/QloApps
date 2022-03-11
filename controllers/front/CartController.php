@@ -177,13 +177,14 @@ class CartControllerCore extends FrontController
             if ($roomTypeInfo = $objRoomType->getRoomTypeInfoByIdProduct($id_product)) {
                 if ($id_hotel = $roomTypeInfo['id_hotel']) {
                     $obj_booking_dtl = new HotelBookingDetail();
-                    if ($hotel_room_data = $obj_booking_dtl->DataForFrontSearch(
-                        $date_from,
-                        $date_to,
-                        $id_hotel,
-                        $id_product,
-                        1
-                    )) {
+                    $booking_params = array(
+                        'date_from' => $date_from,
+                        'date_to' => $date_to,
+                        'hotel_id' => $id_hotel,
+                        'room_type' => $id_product,
+                        'for_room_type' => 1,
+                    );
+                    if ($hotel_room_data = $obj_booking_dtl->DataForFrontSearch($booking_params)) {
                         $total_available_rooms = $hotel_room_data['stats']['num_avail'];
                     }
                 }
@@ -313,20 +314,16 @@ class CartControllerCore extends FrontController
                             $req_rm = $this->qty;
                             $this->qty = $this->qty * (int) $num_days;
                             $obj_booking_dtl = new HotelBookingDetail();
-                            if ($hotel_room_data = $obj_booking_dtl->DataForFrontSearch(
-                                $date_from,
-                                $date_to,
-                                $id_hotel,
-                                $this->id_product,
-                                1,
-                                0,
-                                0,
-                                -1,
-                                0,
-                                0,
-                                $id_cart,
-                                $id_guest
-                            )) {
+                            $booking_params = array(
+                                'date_from' => $date_from,
+                                'date_to' => $date_to,
+                                'hotel_id' => $id_hotel,
+                                'room_type' => $this->id_product,
+                                'for_room_type' => 1,
+                                'id_cart' => $id_cart,
+                                'id_guest' => $id_guest,
+                            );
+                            if ($hotel_room_data = $obj_booking_dtl->DataForFrontSearch($booking_params)) {
                                 if (isset($hotel_room_data['stats']['num_avail'])) {
                                     $total_available_rooms = $hotel_room_data['stats']['num_avail'];
                                     if (Tools::getValue('op', 'up') == 'up') {

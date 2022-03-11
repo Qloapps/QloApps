@@ -196,6 +196,36 @@ class HotelBookingDetail extends ObjectModel
         if (!isset($params['only_active_hotel'])) {
             $params['only_active_hotel'] = 1;
         }
+
+        if (!isset($params['for_room_type'])) {
+            $params['for_room_type'] = 0;
+        }
+        if (!isset($params['adult'])) {
+            $params['adult'] = 0;
+        }
+        if (!isset($params['children'])) {
+            $params['children'] = 0;
+        }
+        if (!isset($params['ratting'])) {
+            $params['ratting'] = -1;
+        }
+        if (!isset($params['amenities'])) {
+            $params['amenities'] = 0;
+        }
+        if (!isset($params['price'])) {
+            $params['price'] = 0;
+        }
+
+        if (!isset($params['page'])) {
+            $params['page'] = 1;
+        }
+        if (!isset($params['num_results'])) {
+            $params['num_results'] = 0;
+        }
+        if (!isset($params['get_total_rooms'])) {
+            $params['get_total_rooms'] = 0;
+        }
+
         return $params;
     }
 
@@ -227,6 +257,7 @@ class HotelBookingDetail extends ObjectModel
     {
         // extract all keys and values of the array [$params] into variables and values
         extract($this->getBookingDataParams($params));
+
         if ($date_from && $date_to && $hotel_id) {
             $date_from = date('Y-m-d H:i:s', strtotime($date_from));
             $date_to = date('Y-m-d H:i:s', strtotime($date_to));
@@ -816,7 +847,7 @@ class HotelBookingDetail extends ObjectModel
      * @return [array] [Returns true if successfully updated else returns false]
      *                 Note:: $for_room_type is used for product page and category page for block cart
      */
-    public function DataForFrontSearch($date_from, $date_to, $id_hotel, $id_product = 0, $for_room_type = 0, $adult = 0, $children = 0, $ratting = -1, $amenities = 0, $price = 0, $id_cart = 0, $id_guest = 0)
+    public function DataForFrontSearch($bookingParams)
     {
         if (Module::isInstalled('productcomments')) {
             require_once _PS_MODULE_DIR_.'productcomments/ProductComment.php';
@@ -824,23 +855,14 @@ class HotelBookingDetail extends ObjectModel
 
         $this->context = Context::getContext();
 
-        $bookingParams = array();
-        $bookingParams['date_from'] = $date_from;
-        $bookingParams['date_to'] = $date_to;
-        $bookingParams['hotel_id'] = $id_hotel;
-        $bookingParams['room_type'] = $id_product;
-        $bookingParams['adult'] = $adult;
-        $bookingParams['children'] = $children;
-        $bookingParams['num_rooms'] = 0;
-        $bookingParams['for_calendar'] = 0;
         $bookingParams['search_available'] = 1;
         $bookingParams['search_partial'] = 0;
         $bookingParams['search_booked'] = 0;
         $bookingParams['search_unavai'] = 0;
-        $bookingParams['id_cart'] = $id_cart;
-        $bookingParams['id_guest'] = $id_guest;
 
         $booking_data = $this->getBookingData($bookingParams);
+
+        extract($this->getBookingDataParams($bookingParams));
 
         if (!$for_room_type) {
             if (!empty($booking_data)) {
@@ -1043,7 +1065,7 @@ class HotelBookingDetail extends ObjectModel
                         'date_from' => $date_from,
                         'date_to' => $date_to,
                     )
-                );            
+                );
                 return true;
             }
             return false;
@@ -1107,7 +1129,7 @@ class HotelBookingDetail extends ObjectModel
                         'date_from' => $date_from,
                         'date_to' => $date_to,
                     )
-                );            
+                );
                 return true;
             }
             return false;
@@ -1586,7 +1608,16 @@ class HotelBookingDetail extends ObjectModel
                 }
                 /*END*/
                 $obj_booking_dtl = new HotelBookingDetail();
-                $hotel_room_data = $obj_booking_dtl->DataForFrontSearch($date_from, $date_to, $id_hotel, $id_product, 1, 0, 0, -1, 0, 0, $id_cart, $this->context->cookie->id_guest);
+                $booking_params = array(
+                    'date_from' => $date_from,
+                    'date_to' => $date_to,
+                    'hotel_id' => $id_hotel,
+                    'room_type' => $id_product,
+                    'for_room_type' => 1,
+                    'id_cart' => $id_cart,
+                    'id_guest' => $this->context->cookie->id_guest,
+                );
+                $hotel_room_data = $obj_booking_dtl->DataForFrontSearch($booking_params);
                 $total_available_rooms = $hotel_room_data['stats']['num_avail'];
 
                 if ($total_available_rooms < $params['req_qty']) {

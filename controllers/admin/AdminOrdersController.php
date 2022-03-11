@@ -159,7 +159,7 @@ class AdminOrdersControllerCore extends AdminController
                 'remove_onclick' => true
             )
         ));
-        
+
         $this->shopLinkType = 'shop';
         $this->shopShareDatas = Shop::SHARE_ORDER;
 
@@ -321,7 +321,7 @@ class AdminOrdersControllerCore extends AdminController
 
         $this->addJqueryUI('ui.datepicker');
         $this->addJS(_PS_JS_DIR_.'vendor/d3.v3.min.js');
-        
+
         if ($this->tabAccess['edit'] == 1 && $this->display == 'view') {
             $this->addJS(_PS_JS_DIR_.'admin/orders.js');
             $this->addJS(_PS_JS_DIR_.'tools.js');
@@ -1795,8 +1795,16 @@ class AdminOrdersControllerCore extends AdminController
 
             if ($id_hotel) {
                 $obj_booking_dtl = new HotelBookingDetail();
-                $hotel_room_data = $obj_booking_dtl->DataForFrontSearch($date_from, $date_to, $id_hotel, $product_informations['product_id'], 1, 0, 0, -1, 0, 0, $id_cart, $id_guest);
-
+                $booking_params = array(
+                    'date_from' => $date_from,
+                    'date_to' => $date_to,
+                    'hotel_id' => $id_hotel,
+                    'room_type' => $product_informations['product_id'],
+                    'for_room_type' => 1,
+                    'id_cart' => $id_cart,
+                    'id_guest' => $id_guest,
+                );
+                $hotel_room_data = $obj_booking_dtl->DataForFrontSearch($booking_params);
                 $total_available_rooms = $hotel_room_data['stats']['num_avail'];
 
                 if ($total_available_rooms < $req_rm) {

@@ -4402,20 +4402,16 @@ class CartCore extends ObjectModel
                             $prodQty = $prodQty * (int) $numDays;
                             $reqRooms = 1;
 
-                            if ($hotelRoomData = $objBookingDtl->DataForFrontSearch(
-                                $dateFrom,
-                                $dateTo,
-                                $idHotel,
-                                $idProduct,
-                                1,
-                                0,
-                                0,
-                                -1,
-                                0,
-                                0,
-                                $idCart,
-                                $idGuest
-                            )) {
+                            $booking_params = array(
+                                'date_from' => $dateFrom,
+                                'date_to' => $dateTo,
+                                'hotel_id' => $idHotel,
+                                'room_type' => $idProduct,
+                                'for_room_type' => 1,
+                                'id_cart' => $idCart,
+                                'id_guest' => $idGuest,
+                            );
+                            if ($hotelRoomData = $obj_booking_dtl->DataForFrontSearch($booking_params)) {
                                 if (isset($hotelRoomData['stats']['num_avail'])) {
                                     $totalAvailRooms = $hotelRoomData['stats']['num_avail'];
                                     if ($totalAvailRooms < $reqRooms) {

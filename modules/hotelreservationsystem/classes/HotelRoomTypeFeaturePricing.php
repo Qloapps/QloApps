@@ -253,18 +253,14 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
             $currentDate = date('Y-m-d', $date);
             $nextDayDate = date('Y-m-d', strtotime('+1 day', strtotime($currentDate)));
             if ($id_product) {
-                $roomTypeAvailabilityInfo = $objBookingDetail->DataForFrontSearch(
-                    $currentDate,
-                    $nextDayDate,
-                    $id_hotel,
-                    $id_product,
-                    1,
-                    0,
-                    0,
-                    -1,
-                    0,
-                    0
+                $booking_params = array(
+                    'date_from' => $currentDate,
+                    'date_to' => $nextDayDate,
+                    'hotel_id' => $id_hotel,
+                    'room_type' => $id_product,
+                    'for_room_type' => 1,
                 );
+                $roomTypeAvailabilityInfo = $objBookingDetail->DataForFrontSearch($booking_params);
                 if (isset($roomTypeAvailabilityInfo['stats']['num_avail'])) {
                     $totalAvailableRooms = $roomTypeAvailabilityInfo['stats']['num_avail'];
                 } else {
@@ -286,18 +282,14 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
                             $currentDate,
                             $nextDayDate
                         );
-                        $roomTypeAvailabilityInfo = $objBookingDetail->DataForFrontSearch(
-                            $currentDate,
-                            $nextDayDate,
-                            $id_hotel,
-                            $product['id_product'],
-                            1,
-                            0,
-                            0,
-                            -1,
-                            0,
-                            0
+                        $booking_params = array(
+                            'date_from' => $currentDate,
+                            'date_to' => $nextDayDate,
+                            'hotel_id' => $id_hotel,
+                            'room_type' => $product['id_product'],
+                            'for_room_type' => 1,
                         );
+                        $roomTypeAvailabilityInfo = $objBookingDetail->DataForFrontSearch($booking_params);
                         if (isset($roomTypeAvailabilityInfo['stats']['num_avail'])) {
                             $totalAvailableRooms = $roomTypeAvailabilityInfo['stats']['num_avail'];
                         } else {
@@ -438,18 +430,14 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
                                 $roomTypeInfo = $hotelRoomType->getRoomTypeInfoByIdProduct($id_product);
                                 $id_hotel = $roomTypeInfo['id_hotel'];
                                 if ($id_hotel) {
-                                    $roomTypeAvailabilityInfo = $hotelBookingDetail->DataForFrontSearch(
-                                        $dateFrom,
-                                        $dateTo,
-                                        $id_hotel,
-                                        $id_product,
-                                        1,
-                                        0,
-                                        0,
-                                        -1,
-                                        0,
-                                        0
+                                    $booking_params = array(
+                                        'date_from' => $dateFrom,
+                                        'date_to' => $dateTo,
+                                        'hotel_id' => $id_hotel,
+                                        'room_type' => $id_product,
+                                        'for_room_type' => 1,
                                     );
+                                    $roomTypeAvailabilityInfo = $hotelBookingDetail->DataForFrontSearch($booking_params);
                                     $bookedRoomsInfo = $hotelRoomInformation->getRoomTypeBookedRoomsForDateRange(
                                         $id_hotel,
                                         $id_product,

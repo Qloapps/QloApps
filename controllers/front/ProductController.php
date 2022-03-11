@@ -318,8 +318,15 @@ class ProductControllerCore extends FrontController
                 }
                 //END
                 $obj_booking_dtl = new HotelBookingDetail();
-                $hotel_room_data = $obj_booking_dtl->DataForFrontSearch($date_from, $date_to, $hotel_id, $this->product->id, 1);
+                $booking_params = array(
+                    'date_from' => $date_from,
+                    'date_to' => $date_to,
+                    'hotel_id' => $hotel_id,
+                    'room_type' => $this->product->id,
+                    'for_room_type' => 1
+                );
 
+                $hotel_room_data = $obj_booking_dtl->DataForFrontSearch($booking_params);
                 if ($hotel_room_data) {
                     $total_available_rooms = $hotel_room_data['stats']['num_avail'];
                 }
@@ -933,20 +940,17 @@ class ProductControllerCore extends FrontController
                 $quantity = Tools::getValue('qty');
                 if ($idHotel = $roomTypeInfo['id_hotel']) {
                     $objBookingDetail = new HotelBookingDetail();
-                    if ($hotelRoomData = $objBookingDetail->DataForFrontSearch(
-                        $dateFrom,
-                        $dateTo,
-                        $idHotel,
-                        $idProduct,
-                        1,
-                        0,
-                        0,
-                        -1,
-                        0,
-                        0,
-                        $this->context->cart->id,
-                        $this->context->cart->id_guest
-                    )) {
+                    $booking_params = array(
+                        'date_from' => $dateFrom,
+                        'date_to' => $dateFrom,
+                        'hotel_id' => $idHotel,
+                        'room_type' => $idProduct,
+                        'for_room_type' => 1,
+                        'id_cart' => $this->context->cart->id,
+                        'id_guest' => $this->context->cart->id_guest
+                    );
+
+                    if ($hotelRoomData = $objBookingDetail->DataForFrontSearch($booking_params)) {
                         $totalAvailRooms = $hotelRoomData['stats']['num_avail'];
                         if ($totalAvailRooms >= $quantity) {
                             $totalPrice = 0;
