@@ -769,6 +769,10 @@ class AdminProductsControllerCore extends AdminController
                 }
             }
 
+            // update lang fields
+            foreach (Language::getLanguages(true) as $language) {
+                $product->link_rewrite[$language['id_lang']] = Tools::str2url($product->name[$language['id_lang']]);
+            }
             if ($product->add()
                 // && Category::duplicateProductCategories($id_product_old, $product->id)
                 && Product::duplicateSuppliers($id_product_old, $product->id)
@@ -801,6 +805,11 @@ class AdminProductsControllerCore extends AdminController
                         $id_hotel_new
                     )) {
                         $this->errors[] = Tools::displayError('An error occurred while duplicating rooms.');
+                    }
+                    if (!HotelRoomTypeDemand::duplicateRoomTypeDemands($id_product_old, $product->id)) {
+                        $this->errors[] = Tools::displayError(
+                            'An error occurred while duplicating additional facilities.'
+                        );
                     }
                 } else {
                     $this->errors[] = Tools::displayError('An error occurred while duplicating room type.');
