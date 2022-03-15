@@ -60,7 +60,7 @@ class AdminOrdersControllerCore extends AdminController
         (a.total_paid - a.total_paid_real) AS `amount_due`, a.source AS order_source,
         a.id_currency,
         a.id_order AS id_pdf,
-        CONCAT(LEFT(c.`firstname`, 1), \'. \', c.`lastname`) AS `customer`,
+        CONCAT(c.`firstname`, \' \', c.`lastname`) AS `customer`,
         osl.`name` AS `osname`,
         os.`color`,
         IF((SELECT so.id_order FROM `'._DB_PREFIX_.'orders` so WHERE so.id_customer = a.id_customer AND so.id_order < a.id_order LIMIT 1) > 0, 0, 1) as new,
