@@ -30,7 +30,7 @@ class WkHotelRoom extends Module
     {
         $this->name = 'wkhotelroom';
         $this->tab = 'front_office_features';
-        $this->version = '1.1.8';
+        $this->version = '1.1.7';
         $this->author = 'Webkul';
         $this->bootstrap = true;
         parent::__construct();
@@ -179,11 +179,8 @@ class WkHotelRoom extends Module
     public function install()
     {
         $objHotelRoomDb = new WkHotelRoomDb();
-        if (!$objHotelRoomDb->createTables()) {
-            return false;
-        }
-
         if (!parent::install()
+            || !$objHotelRoomDb->createTables()
             || !$this->registerModuleHooks()
             || !$this->callInstallTab()
         ) {

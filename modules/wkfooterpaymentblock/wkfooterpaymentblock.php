@@ -31,7 +31,7 @@ class WkFooterPaymentBlock extends Module
     {
         $this->name = 'wkfooterpaymentblock';
         $this->tab = 'front_office_features';
-        $this->version = '1.1.5';
+        $this->version = '1.1.4';
         $this->author = 'Webkul';
         $this->need_instance = 0;
 
@@ -99,11 +99,8 @@ class WkFooterPaymentBlock extends Module
     public function install()
     {
         $objFooterPaymentBlockDb = new WkFooterPaymentBlockDb();
-        if (!$objFooterPaymentBlockDb->createTables()) {
-            return false;
-        }
-
         if (!parent::install()
+            || !$objFooterPaymentBlockDb->createTables()
             ||!$this->registerHook('displayFooterPaymentInfo')
             ||!$this->registerHook('displayAddModuleSettingLink')
             || !$this->callInstallTab()
@@ -123,7 +120,6 @@ class WkFooterPaymentBlock extends Module
         ) {
             return false;
         }
-
         return true;
     }
 

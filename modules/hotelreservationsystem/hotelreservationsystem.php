@@ -28,7 +28,7 @@ class hotelreservationsystem extends Module
     public function __construct()
     {
         $this->name = 'hotelreservationsystem';
-        $this->version = '1.4.4';
+        $this->version = '1.4.3';
         $this->author = 'Webkul';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -636,12 +636,18 @@ class hotelreservationsystem extends Module
     public function install()
     {
         $objModuleDb = new HotelReservationSystemDb();
-        if (!$objModuleDb->createTables()) {
+        $objHtlHelper = new HotelHelper();
+        if (!parent::install()
+            || !$objModuleDb->createTables()
+            || !$this->registerModuleHooks()
+            || !$this->callInstallTab()
+            || !$objHtlHelper->insertDefaultHotelEntries()
+            || !$objHtlHelper->insertHotelRoomAllotmentType()
+        ) {
             return false;
         }
 
         // if module should be populated while installation
-        $objHtlHelper = new HotelHelper();
         if (isset($this->populateData) && $this->populateData) {
             if (!$objHtlHelper->createHotelRoomDefaultFeatures()
                 || !$objHtlHelper->insertHotelCommonFeatures()
@@ -649,15 +655,6 @@ class hotelreservationsystem extends Module
             ) {
                 return false;
             }
-        }
-
-        if (!parent::install()
-            || !$this->callInstallTab()
-            || !$this->registerModuleHooks()
-            || !$objHtlHelper->insertDefaultHotelEntries()
-            || !$objHtlHelper->insertHotelRoomAllotmentType()
-        ) {
-            return false;
         }
 
         return true;

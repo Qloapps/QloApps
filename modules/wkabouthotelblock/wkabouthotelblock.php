@@ -30,7 +30,7 @@ class WkAboutHotelBlock extends Module
     {
         $this->name = 'wkabouthotelblock';
         $this->tab = 'front_office_features';
-        $this->version = '1.1.8';
+        $this->version = '1.1.7';
         $this->author = 'Webkul';
         $this->need_instance = 0;
 
@@ -90,12 +90,9 @@ class WkAboutHotelBlock extends Module
     public function install()
     {
         $objAboutHotelBlockDb = new WkAboutHotelBlockDb();
-        if (!$objAboutHotelBlockDb->createTables()) {
-            return false;
-        }
-
         $objHtlInteriorImg = new WkHotelInteriorImage();
         if (!parent::install()
+            || !$objAboutHotelBlockDb->createTables()
             || !$this->registerModuleHooks()
             || !$this->callInstallTab()
             || !$objHtlInteriorImg->insertModuleDemoData()

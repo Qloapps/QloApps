@@ -1,10 +1,3 @@
-# V1.1.5 to V1.1.6
-------------------------------
-
-## Improved/Changed Features:
-
-[*] CO : Removed install.sql
-
 # V1.1.4 to V1.1.5
 ------------------------------
 

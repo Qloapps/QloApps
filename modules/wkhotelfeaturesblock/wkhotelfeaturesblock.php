@@ -32,7 +32,7 @@ class WkHotelFeaturesBlock extends Module
     {
         $this->name = 'wkhotelfeaturesblock';
         $this->tab = 'front_office_features';
-        $this->version = '2.0.6';
+        $this->version = '2.0.5';
         $this->author = 'Webkul';
         $this->bootstrap = true;
         parent::__construct();
@@ -122,12 +122,9 @@ class WkHotelFeaturesBlock extends Module
     public function install()
     {
         $objHotelFeaturesBlockDb = new WkHotelFeaturesBlockDb();
-        if (!$objHotelFeaturesBlockDb->createTables()) {
-            return false;
-        }
-
         $objFeaturesData = new WkHotelFeaturesData();
         if (!parent::install()
+            || !$objHotelFeaturesBlockDb->createTables()
             || !$this->registerModuleHooks()
             || !$this->callInstallTab()
             || !$objFeaturesData->insertModuleDemoData()

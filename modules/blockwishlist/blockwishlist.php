@@ -24,8 +24,9 @@
 *  International Registered Trademark & Property of PrestaShop SA
 */
 
-if (!defined('_PS_VERSION_'))
+if (!defined('_PS_VERSION_')) {
 	exit;
+}
 
 include_once (dirname(__FILE__).'/classes/BlockWishlistDb.php');
 include_once (dirname(__FILE__).'/WishList.php');
@@ -38,7 +39,7 @@ class BlockWishList extends Module
 	{
 		$this->name = 'blockwishlist';
 		$this->tab = 'front_office_features';
-		$this->version = '1.3.3';
+		$this->version = '1.3.2';
 		$this->author = 'PrestaShop';
 		$this->need_instance = 0;
 
@@ -54,16 +55,11 @@ class BlockWishList extends Module
 		$this->html = '';
 	}
 
-	public function install($delete_params = true)
+	public function install()
 	{
-		if ($delete_params) {
-			$objBlockWishListDb = new BlockWishlistDb();
-			if (!$objBlockWishListDb->createTables()) {
-				return false;
-			}
-		}
-
+		$objBlockWishListDb = new BlockWishlistDb();
 		if (!parent::install() ||
+			!$objBlockWishListDb->createTables() ||
 			!$this->registerHook('rightColumn') ||
 			!$this->registerHook('productActions') ||
 			!$this->registerHook('cart') ||
@@ -71,21 +67,24 @@ class BlockWishList extends Module
 			!$this->registerHook('header') ||
 			!$this->registerHook('adminCustomers') ||
 			!$this->registerHook('displayProductListFunctionalButtons') ||
-			!$this->registerHook('top'))
+			!$this->registerHook('top')
+		) {
 			return false;
+		}
 		/* This hook is optional */
 		$this->registerHook('displayMyAccountBlock');
 
 		return true;
 	}
 
-	public function uninstall($delete_params = true)
+	public function uninstall($delete_data = true)
 	{
 		$objBlockWishListDb = new BlockWishlistDb();
-		if (($delete_params && !$objBlockWishListDb->dropTables()) || !parent::uninstall()) {
+		if (!parent::uninstall()
+			|| ($delete_data && !$objBlockWishListDb->dropTables())
+		) {
 			return false;
 		}
-
 		return true;
 	}
 
@@ -102,11 +101,12 @@ class BlockWishList extends Module
 
 	public function reset()
 	{
-		if (!$this->uninstall(false))
+		if (!$this->uninstall(false)) {
 			return false;
-		if (!$this->install(false))
+		}
+		if (!$this->install()) {
 			return false;
-
+		}
 		return true;
 	}
 

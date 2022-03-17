@@ -32,7 +32,7 @@ class WkTestimonialBlock extends Module
     {
         $this->name = 'wktestimonialblock';
         $this->tab = 'front_office_features';
-        $this->version = '1.1.6';
+        $this->version = '1.1.5';
         $this->author = 'webkul';
         $this->need_instance = 0;
 
@@ -114,12 +114,9 @@ class WkTestimonialBlock extends Module
     public function install()
     {
         $objTestimonialBlockDb = new WkTestimonialBlockDb();
-        if (!$objTestimonialBlockDb->createTables()) {
-            return false;
-        }
-
         $objTestimonialData = new WkHotelTestimonialData();
         if (!parent::install()
+            || !$objTestimonialBlockDb->createTables()
             || !$this->registerModuleHooks()
             || !$this->callInstallTab()
             || !$objTestimonialData->insertModuleDemoData()
