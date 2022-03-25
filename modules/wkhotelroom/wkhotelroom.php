@@ -21,18 +21,17 @@
 if (!defined('_PS_VERSION_')) {
     exit;
 }
+
 require_once dirname(__FILE__).'/define.php';
 
 class WkHotelRoom extends Module
 {
-    const INSTALL_SQL_FILE = 'install.sql';
-
     public function __construct()
     {
         $this->name = 'wkhotelroom';
         $this->tab = 'front_office_features';
         $this->version = '1.1.7';
-        $this->author = 'webkul';
+        $this->author = 'Webkul';
         $this->bootstrap = true;
         parent::__construct();
 
@@ -179,24 +178,9 @@ class WkHotelRoom extends Module
 
     public function install()
     {
-        if (!file_exists(dirname(__FILE__).'/'.self::INSTALL_SQL_FILE)) {
-            return false;
-        } elseif (!$sql = Tools::file_get_contents(dirname(__FILE__).'/'.self::INSTALL_SQL_FILE)) {
-            return false;
-        }
-
-        $sql = str_replace(array('PREFIX_',  'ENGINE_TYPE'), array(_DB_PREFIX_, _MYSQL_ENGINE_), $sql);
-        $sql = preg_split("/;\s*[\r\n]+/", $sql);
-
-        foreach ($sql as $query) {
-            if ($query) {
-                if (!Db::getInstance()->execute(trim($query))) {
-                    return false;
-                }
-            }
-        }
-
+        $objHotelRoomDb = new WkHotelRoomDb();
         if (!parent::install()
+            || !$objHotelRoomDb->createTables()
             || !$this->registerModuleHooks()
             || !$this->callInstallTab()
         ) {
@@ -230,24 +214,17 @@ class WkHotelRoom extends Module
 
     public function uninstall()
     {
+        $objHotelRoomDb = new WkHotelRoomDb();
         if (!parent::uninstall()
             || !$this->uninstallTab()
-            || !$this->deleteTables()
+            || !$objHotelRoomDb->dropTables()
             || !$this->deleteConfigKeys()
         ) {
             return false;
         }
         return true;
     }
-
-    public function deleteTables()
-    {
-        return Db::getInstance()->execute(
-            'DROP TABLE IF EXISTS
-            `'._DB_PREFIX_.'htl_room_block_data`'
-        );
-    }
-
+    
     public function deleteConfigKeys()
     {
         $configVars = array(
