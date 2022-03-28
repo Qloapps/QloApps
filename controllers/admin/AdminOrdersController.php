@@ -1917,7 +1917,7 @@ class AdminOrdersControllerCore extends AdminController
                     $obj_htl_cart_booking_data->id_product = $room_info['id_product'];
                     $obj_htl_cart_booking_data->id_room = $room_info['id_room'];
                     $obj_htl_cart_booking_data->id_hotel = $room_info['id_hotel'];
-                    $obj_htl_cart_booking_data->booking_type = 1;
+                    $obj_htl_cart_booking_data->booking_type = HotelBookingDetail::ALLOTMENT_AUTO;
                     $obj_htl_cart_booking_data->quantity = $num_days;
                     $obj_htl_cart_booking_data->date_from = $date_from;
                     $obj_htl_cart_booking_data->date_to = $date_to;
