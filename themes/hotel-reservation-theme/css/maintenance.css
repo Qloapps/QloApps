@@ -4,18 +4,119 @@
 #body {
   background-color: #F7F7F7; }
 
-#maintenance {
-  margin: 50px 0 0 0;
-  background-color: #fff;
-  -moz-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-  -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3); }
-  @media (min-width: 1200px) {
-    #maintenance {
-      margin: 126px 0 0 0;
-      padding: 50px; } }
+h1 {
+    font-size: 50px;
+}
+
+p {
+    font-size: 16px;
+    color: #666;
+}
+
+.blue {
+    color: #1A7EFF;
+    text-decoration: none;
+}
+
+.containter {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    column-gap: 60px;
+}
+
+.left {
+    text-align: right;
+}
+
+.clicker {
+    outline: none;
+    cursor: pointer;
+}
+
+.hiddendiv {
+    display: none;
+    width: 300px;
+}
+
+.text-center {
+  text-align: center;
+}
+
+input[type='text'],
+input[type='email'],
+input[type='password'] {
+    border: 1px solid #c9c9c9;
+    width: 90%;
+    padding: 10px 14px;
+    font-size: 14px;
+    margin-bottom: 14px;
+    border-radius: 4px;
+}
+
+button[type='submit'] {
+    border: 1px solid #1A7EFF;
+    background-color: #1A7EFF;
+    padding: 10px 20px;
+    font-size: 14px;
+    margin-bottom: 14px;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button[type='button'].cancel-login {
+    border: 1px solid #c5c5c5;
+    background-color: #fff;
+    padding: 10px 20px;
+    font-size: 14px;
+    margin-bottom: 14px;
+    color: #333;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+@media screen and (max-width: 780px) {
+    .containter {
+        flex-direction:column;
+    }
+}
+
+.alert {
+  padding: 5px;
+  margin-bottom: 10px;
+  border: 1px solid transparent;
+  border-radius: 0px;
+  font-weight: bold;
+}
+
+.alert.alert-danger p {
+  color: #FFF;
+}
+
+.alert.alert-danger li {
+  font-size: 14px;
+}
+
+.alert-danger {
+  background-color: #FD6E6A;
+  border-color: #FD6E6A;
+  color: #fff;
+}
+
+.alert.alert-danger {
+  text-shadow: 1px 1px rgb(0 0 0 / 10%);
+}
+
+.alert-danger .alert-link {
+  font-weight: bold;
+  font-size: 16px;
+  color: #FFF;
+}
+
   #maintenance .logo {
-    margin: 0 0 31px 0;
+    padding: 12px;
     text-align: center; }
   #maintenance h1 {
     font: 24px "Open Sans", sans-serif;

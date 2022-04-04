@@ -28,30 +28,74 @@
 <head>
 	<meta charset="utf-8">
 	<title>{$meta_title|escape:'html':'UTF-8'}</title>
-{if isset($meta_description)}
-	<meta name="description" content="{$meta_description|escape:'html':'UTF-8'}">
-{/if}
-{if isset($meta_keywords)}
-	<meta name="keywords" content="{$meta_keywords|escape:'html':'UTF-8'}">
-{/if}
+	{if isset($meta_description)}
+		<meta name="description" content="{$meta_description|escape:'html':'UTF-8'}">
+	{/if}
+	{if isset($meta_keywords)}
+		<meta name="keywords" content="{$meta_keywords|escape:'html':'UTF-8'}">
+	{/if}
 	<meta name="robots" content="{if isset($nobots)}no{/if}index,follow">
 	<link rel="shortcut icon" href="{$favicon_url}">
-       	<link href="{$css_dir}maintenance.css" rel="stylesheet">
-       	<link href='//fonts.googleapis.com/css?family=Open+Sans:600' rel='stylesheet'>
+	<link href="{$css_dir}maintenance.css" rel="stylesheet">
+	<script src="{$base_dir}js/jquery/jquery-1.11.0.min.js"></script>
+	<script src="{$base_dir}js/maintenance.js"></script>
+	<link href='//fonts.googleapis.com/css?family=Open+Sans:600' rel='stylesheet'>
 </head>
 <body>
-    	<div class="container">
-			<div id="maintenance">
-				<div class="logo"><img src="{$logo_url}" {if $logo_image_width}width="{$logo_image_width}"{/if} {if $logo_image_height}height="{$logo_image_height}"{/if} alt="logo" /></div>
-	        		{$HOOK_MAINTENANCE}
-	        		<div id="message">
-	             			<h1 class="maintenance-heading">{l s='We\'ll be back soon.'}</h1>
-							{l s='We are currently updating our site and will be back really soon.'}
-							<br />
-							{l s='Thanks for your patience.'}
-					</div>
-				</div>
-	        </div>
+	<div id="maintenance">
+		<div class="logo">
+			<img src="{$logo_url}" {if $logo_image_width}width="{$logo_image_width}" {/if} {if $logo_image_height}height="{$logo_image_height}" {/if} alt="logo" />
 		</div>
+		<div class="margin-l-r">
+			{include file="$tpl_dir./errors.tpl"}
+		</div>
+		<div class="containter">
+			<div class="left">
+				<div class="">
+					<img class="" src="{$img_ps_dir}maintenance_banner.png"></img>
+				</div>
+			</div>
+			<div class="right">
+				<h2>{l s='We\'ll be back soon.'}</h2>
+				<p>{l s='We are currently updating our site and will be back really soon.'}</p>
+				<p>{l s='Thanks for your patience!'}</p>
+				{if isset($allowEmployee) && $allowEmployee}
+				<div>
+					<p class="clicker blue" tabindex="1">Are you member?</p>
+					<div class="hiddendiv">
+							<div class="allow-conatainer">
+								<form action="index.php" method="post">
+									<div class="form_content clearfix">
+										<div class="form-group form-ok">
+											<label class="" for="email">Email address</label>
+											<br>
+											<input class="form-control" placeholder="Email" type="email" id="email"
+												name="email" value="">
+										</div>
+										<div class="form-group form-ok">
+											<label class="" for="passwd">Password</label>
+											<br>
+											<input class="form-control" type="password" placeholder="Password" id="passwd"
+												name="passwd" value="">
+										</div>
+										<button type="submit" id="SubmitLogin" name="SubmitLogin" class="btn btn-primary">
+											<span>
+												Log in
+											</span>
+										</button>
+										<button type="button" id="cancelLogin" name="cancelLogin" class="btn btn-primary cancel-login">
+											<span>
+												Cancel
+											</span>
+										</button>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+				{/if}
+			</div>
+		</div>
+	</div>
 </body>
 </html>
