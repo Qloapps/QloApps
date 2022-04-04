@@ -36,7 +36,7 @@
 <div class="form-group">
 	<label class="control-label col-lg-3">
 		<span class="label-tooltip" data-toggle="tooltip"
-		title="{l s='For your eyes only. This will never be displayed to the customer.'}">
+		title="{l s='This is the voucher description which is displayed in the cart summary.'}">
 			{l s='Description'}
 		</span>
 	</label>
