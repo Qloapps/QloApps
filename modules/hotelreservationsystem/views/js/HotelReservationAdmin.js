@@ -215,7 +215,10 @@ var GoogleMapsManager = {
 }
 
 function initGoogleMaps() {
-    if (parseInt(enabledDisplayMap) && typeof google === 'object' && $('#googleMapContainer').length) {
+    if (typeof enabledDisplayMap != 'undefined'
+        && typeof google === 'object'
+        && $('#googleMapContainer').length
+    ) {
         GoogleMapsManager.init($('#map'));
         GoogleMapsManager.initMap();
         GoogleMapsManager.initAutocomplete($('#pac-input'));
