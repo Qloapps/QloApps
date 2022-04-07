@@ -762,7 +762,7 @@ class AuthControllerCore extends FrontController
             $_POST['email'] = trim(Tools::getValue('email_create'));
             unset($_POST['email_create']);
         } elseif ($id_customer = Customer::customerExists($email, true, false)) {
-            $this->informations[] = Tools::displayError('You are already registered as a guest with this email address.').'&nbsp;<button type="submit" class="btn btn-link alert-link btn-transform" name="submitTransformAccount">'.Tools::displayError('Click here').'</button>'.Tools::displayError('').' to transform your account.';
+            $this->informations[] = Tools::displayError('You are already registered as a guest with this email address.').'&nbsp;<button type="submit" class="btn btn-link alert-link btn-transform" name="submitTransformAccount">'.Tools::displayError('Click here').'</button>'.Tools::displayError('').' to generate a password for your account.';
         } else {
             $this->create_account = true;
             $this->context->smarty->assign('email_create', Tools::safeOutput($email));
