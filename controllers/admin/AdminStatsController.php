@@ -995,10 +995,10 @@ class AdminStatsControllerCore extends AdminStatsTabController
     public static function getRevenue($dateFrom, $dateTo)
     {
         $result = Db::getInstance()->getValue(
-            'SELECT (SUM(`total_paid_tax_excl` / `conversion_rate`) - SUM(`refunded_amount`))
-             FROM `'._DB_PREFIX_.'orders`
-             LEFT JOIN `' ._DB_PREFIX_.'order_return`  ON '._DB_PREFIX_.'orders.`id_order` = '._DB_PREFIX_.'order_return.`id_order`
-             WHERE ' ._DB_PREFIX_.'orders.`invoice_date` BETWEEN "'.pSQL($dateFrom).' 00:00:00" AND "'.pSQL($dateTo).' 23:59:59"'
+            'SELECT (SUM(o.`total_paid_tax_excl` / o.`conversion_rate`) - COALESCE(SUM(orr.`refunded_amount`), 0))
+            FROM `'._DB_PREFIX_.'orders` o
+            LEFT JOIN `'._DB_PREFIX_.'order_return` orr ON orr.`id_order` = o.`id_order`
+            WHERE o.`invoice_date` BETWEEN "'.pSQL($dateFrom).' 00:00:00" AND "'.pSQL($dateTo).' 23:59:59"'
         );
 
         return Tools::displayPrice($result ? $result : 0);
