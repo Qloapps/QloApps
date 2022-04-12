@@ -41,6 +41,11 @@ class blocknavigationmenu extends Module
         $this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
     }
 
+    public function getContent()
+    {
+        Tools::redirectAdmin($this->context->link->getAdminLink('AdminCustomNavigationLinkSetting'));
+    }
+
     public function hookTop($params)
     {
         return $this->hookDisplayTopSubSecondaryBlock($params);
@@ -98,15 +103,6 @@ class blocknavigationmenu extends Module
         }
     }
 
-    public function hookDisplayAddModuleSettingLink()
-    {
-        $this->context->smarty->assign(
-            'custom_navigation_link_setting_url',
-            $this->context->link->getAdminLink('AdminCustomNavigationLinkSetting')
-        );
-        return $this->display(__FILE__, 'customNavigationLinkSetting.tpl');
-    }
-
     public function install()
     {
         $objModuleDb = new WkBlockNavigationMenuDb();
@@ -128,7 +124,6 @@ class blocknavigationmenu extends Module
         return $this->registerHook(
             array (
                 'footer',
-                'displayAddModuleSettingLink',
                 'actionObjectLanguageAddAfter',
                 'displayDefaultNavigationHook',
                 'displayNavigationHook',
