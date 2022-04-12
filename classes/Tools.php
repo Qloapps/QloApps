@@ -2648,7 +2648,7 @@ exit;
         if ($message === null) {
             $message = 'The function '.$callee['function'].' (Line '.$callee['line'].') is deprecated and will be removed in the next major version.';
         }
-        $error = 'Function: '.$callee['function'].'() is deprecated in file: '.$callee['file'].' on line: '.$callee['line'].'<br />';
+        $error = 'Function: <b>'.$callee['function'].'()</b> is deprecated in file: <b>'.$callee['file'].'</b> on line: <b>'.$callee['line'].'</b><br />';
 
         Tools::throwDeprecated($error, $message, $class);
     }

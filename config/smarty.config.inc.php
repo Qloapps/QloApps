@@ -93,8 +93,6 @@ smartyRegisterFunction($smarty, 'function', 'd', 'smartyDieObject'); // Debug on
 smartyRegisterFunction($smarty, 'function', 'l', 'smartyTranslate', false);
 smartyRegisterFunction($smarty, 'function', 'hook', 'smartyHook');
 smartyRegisterFunction($smarty, 'function', 'toolsConvertPrice', 'toolsConvertPrice');
-smartyRegisterFunction($smarty, 'modifier', 'json_encode', 'json_encode');
-smartyRegisterFunction($smarty, 'modifier', 'json_decode', 'json_decode');
 smartyRegisterFunction($smarty, 'function', 'dateFormat', array('Tools', 'dateFormat'));
 smartyRegisterFunction($smarty, 'function', 'convertPrice', array('Product', 'convertPrice'));
 smartyRegisterFunction($smarty, 'function', 'convertPriceWithCurrency', array('Product', 'convertPriceWithCurrency'));
