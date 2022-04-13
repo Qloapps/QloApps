@@ -687,6 +687,166 @@ abstract class PaymentModuleCore extends Module
                         }
                     }
 
+                    // update order in hlt tables
+                    $objCartBookingData = new HotelCartBookingData();
+                    $objBookingDetail = new HotelBookingDetail();
+                    $objRoomType = new HotelRoomType();
+
+                    $objAdvancedPayment = new HotelAdvancedPayment();
+
+                    $vatAddress = new Address((int)$order->{Configuration::get('PS_TAX_ADDRESS_TYPE')});
+
+                    $idLang = (int)$this->context->cart->id_lang;
+
+                    foreach ($order->product_list as $product) {
+                        $objCartBookingData = new HotelCartBookingData();
+                        $idProduct = $product['id_product'];
+                        $cartBookingData = $objCartBookingData->getOnlyCartBookingData($this->context->cart->id, $this->context->cart->id_guest, $idProduct);
+                        if ($cartBookingData) {
+                            foreach ($cartBookingData as $bookingInfo) {
+                                $objCartBookingData = new HotelCartBookingData($bookingInfo['id']);
+                                $objCartBookingData->id_order = $order->id;
+                                $objCartBookingData->id_customer = $this->context->customer->id;
+                                $objCartBookingData->save();
+
+                                $objBookingDetail = new HotelBookingDetail();
+                                $id_order_detail = $objBookingDetail->getPsOrderDetailIdByIdProduct($idProduct, $order->id);
+                                $objBookingDetail->id_product = $idProduct;
+                                $objBookingDetail->id_order = $order->id;
+                                $objBookingDetail->id_order_detail = $id_order_detail;
+                                $objBookingDetail->id_cart = $this->context->cart->id;
+                                $objBookingDetail->id_room = $objCartBookingData->id_room;
+                                $objBookingDetail->id_hotel = $objCartBookingData->id_hotel;
+                                $objBookingDetail->id_customer = $this->context->customer->id;
+                                $objBookingDetail->booking_type = $objCartBookingData->booking_type;
+                                $objBookingDetail->id_status = 1;
+                                $objBookingDetail->comment = $objCartBookingData->comment;
+
+                                // For Back Order(Because of cart lock)
+                                if ($objCartBookingData->is_back_order) {
+                                    $objBookingDetail->is_back_order = 1;
+                                }
+                                $total_price = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
+                                    $idProduct,
+                                    $objCartBookingData->date_from,
+                                    $objCartBookingData->date_to
+                                );
+                                $objBookingDetail->date_from = $objCartBookingData->date_from;
+                                $objBookingDetail->date_to = $objCartBookingData->date_to;
+                                $objBookingDetail->total_price_tax_excl = Tools::ps_round($total_price['total_price_tax_excl'], 6);
+                                $objBookingDetail->total_price_tax_incl = Tools::ps_round($total_price['total_price_tax_incl'], 6);
+
+                                // Save hotel information/location/contact
+                                if (Validate::isLoadedObject($objRoom = new HotelRoomInformation($objCartBookingData->id_room))) {
+                                    $objBookingDetail->room_num = $objRoom->room_num;
+                                }
+                                if (Validate::isLoadedObject($objHotelBranch = new HotelBranchInformation(
+                                    $objCartBookingData->id_hotel,
+                                    $idLang
+                                ))) {
+                                    $objBookingDetail->hotel_name = $objHotelBranch->hotel_name;
+                                    $objBookingDetail->room_type_name = $product['name'];
+                                    $objBookingDetail->city = $objHotelBranch->city;
+                                    $objBookingDetail->state = State::getNameById($objHotelBranch->state_id);
+                                    $objBookingDetail->country = Country::getNameById($idLang, $objHotelBranch->country_id);
+                                    $objBookingDetail->zipcode = $objHotelBranch->zipcode;
+                                    $objBookingDetail->phone = $objHotelBranch->phone;
+                                    $objBookingDetail->email = $objHotelBranch->email;
+                                    $objBookingDetail->check_in_time = $objHotelBranch->check_in;
+                                    $objBookingDetail->check_out_time = $objHotelBranch->check_out;
+                                }
+                                if ($roomTypeInfo = $objRoomType->getRoomTypeInfoByIdProduct($idProduct)) {
+                                    $objBookingDetail->adult = $roomTypeInfo['adult'];
+                                    $objBookingDetail->children = $roomTypeInfo['children'];
+                                }
+
+                                /*for saving details of the advance payment product wise*/
+                                $objBookingDetail->total_paid_amount = Tools::ps_round($total_price['total_price_tax_incl'], 5);
+                                if ($this->context->cart->is_advance_payment) {
+                                    $prod_adv_payment = $objAdvancedPayment->getIdAdvPaymentByIdProduct($idProduct);
+                                    if (!$prod_adv_payment
+                                        || (isset($prod_adv_payment['payment_type']) && $prod_adv_payment['payment_type'])
+                                    ) {
+                                        $objBookingDetail->total_paid_amount = $objAdvancedPayment->getRoomMinAdvPaymentAmount(
+                                            $idProduct,
+                                            $objCartBookingData->date_from,
+                                            $objCartBookingData->date_to
+                                        );
+                                    }
+                                }
+                                if ($objBookingDetail->save()) {
+                                    // save extra demands info
+                                    if ($objCartBookingData->extra_demands
+                                        && ($extraDemands = json_decode($objCartBookingData->extra_demands, true))
+                                    ) {
+                                        $objRoomDemandPrice = new HotelRoomTypeDemandPrice();
+                                        foreach ($extraDemands as $demand) {
+                                            $idGlobalDemand = $demand['id_global_demand'];
+                                            $idOption = $demand['id_option'];
+                                            $objBookingDemand = new HotelBookingDemands();
+                                            $objBookingDemand->id_htl_booking = $objBookingDetail->id;
+                                            $objGlobalDemand = new HotelRoomTypeGlobalDemand($idGlobalDemand, $idLang);
+                                            if ($idOption) {
+                                                $objOption = new HotelRoomTypeGlobalDemandAdvanceOption($idOption, $idLang);
+                                                $objBookingDemand->name = $objOption->name;
+                                            } else {
+                                                $idOption = 0;
+                                                $objBookingDemand->name = $objGlobalDemand->name;
+                                            }
+                                            $objBookingDemand->unit_price_tax_excl = HotelRoomTypeDemand::getPriceStatic(
+                                                $idProduct,
+                                                $idGlobalDemand,
+                                                $idOption,
+                                                0
+                                            );
+                                            $objBookingDemand->unit_price_tax_incl = HotelRoomTypeDemand::getPriceStatic(
+                                                $idProduct,
+                                                $idGlobalDemand,
+                                                $idOption,
+                                                1
+                                            );
+                                            $qty = 1;
+                                            if ($objGlobalDemand->price_calc_method == HotelRoomTypeGlobalDemand::WK_PRICE_CALC_METHOD_EACH_DAY) {
+                                                $numDays = $objBookingDetail->getNumberOfDays(
+                                                    $objBookingDetail->date_from,
+                                                    $objBookingDetail->date_to
+                                                );
+                                                if ($numDays > 1) {
+                                                    $qty *= $numDays;
+                                                }
+                                            }
+                                            $objBookingDemand->total_price_tax_excl = $objBookingDemand->unit_price_tax_excl * $qty;
+                                            $objBookingDemand->total_price_tax_incl = $objBookingDemand->unit_price_tax_incl * $qty;
+
+                                            $objBookingDemand->price_calc_method = $objGlobalDemand->price_calc_method;
+                                            $objBookingDemand->id_tax_rules_group = $objGlobalDemand->id_tax_rules_group;
+                                            $taxManager = TaxManagerFactory::getManager(
+                                                $vatAddress,
+                                                $objGlobalDemand->id_tax_rules_group
+                                            );
+                                            $taxCalc = $taxManager->getTaxCalculator();
+                                            $objBookingDemand->tax_computation_method = (int)$taxCalc->computation_method;
+                                            if ($objBookingDemand->save()) {
+                                                $objBookingDemand->tax_calculator = $taxCalc;
+                                                $objBookingDemand->id_global_demand = $idGlobalDemand;
+                                                // Now save tax details of the extra demand
+                                                $objBookingDemand->setBookingDemandTaxDetails();
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    if (isset($_COOKIE['wk_id_cart'])) {
+                        setcookie('wk_id_cart', ' ', time() - 86400, '/');
+                        setcookie('wk_id_guest', ' ', time() - 86400, '/');
+
+                        unset($_COOKIE['wk_id_cart']);
+                        unset($_COOKIE['wk_id_guest']);
+                    }
+
                     if (self::DEBUG_MODE) {
                         PrestaShopLogger::addLog('PaymentModule::validateOrder - Hook validateOrder is about to be called', 1, null, 'Cart', (int)$id_cart, true);
                     }
