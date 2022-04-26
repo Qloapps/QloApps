@@ -2091,7 +2091,6 @@ class AdminThemesControllerCore extends AdminController
             'blockcategories',
             'blockcms',
             'blockcmsinfo',
-            'blockcontact',
             'blockcontactinfos',
             'blockcurrencies',
             'blockcustomerprivacy',
