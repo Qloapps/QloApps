@@ -93,8 +93,6 @@
         <module action="disable" name="homefeatured"/>
         <module action="disable" name="homeslider"/>
         <module action="disable" name="productpaymentlogos"/>
-        <module action="disable" name="productscategory"/>
-        <module action="disable" name="producttooltip"/>
         <module action="disable" name="pscleaner"/>
         <module action="disable" name="sendtoafriend"/>
         <module action="disable" name="trackingfront"/>
