@@ -602,9 +602,6 @@
 	<configuration id="PS_STATS_GRID_RENDER" name="PS_STATS_GRID_RENDER">
 		<value>gridhtml</value>
 	</configuration>
-	<configuration id="BLOCKTAGS_NBR" name="BLOCKTAGS_NBR">
-		<value>10</value>
-	</configuration>
 	<configuration id="CHECKUP_DESCRIPTIONS_LT" name="CHECKUP_DESCRIPTIONS_LT">
 		<value>100</value>
 	</configuration>

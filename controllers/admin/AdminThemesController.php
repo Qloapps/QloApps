@@ -2105,7 +2105,6 @@ class AdminThemesControllerCore extends AdminController
             'blocksharefb',
             'blocksocial',
             'blocksupplier',
-            'blocktags',
             'blockuserinfo',
             'carriercompare',
             'cashondelivery',
