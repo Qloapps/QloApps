@@ -2086,7 +2086,6 @@ class AdminThemesControllerCore extends AdminController
             'addsharethis',
             'bankwire',
             'blockadvertising',
-            'blockbanner',
             'blockbestsellers',
             'blockcart',
             'blockcategories',
