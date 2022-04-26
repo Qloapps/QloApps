@@ -2121,7 +2121,6 @@ class AdminThemesControllerCore extends AdminController
             'followup',
             'gapi',
             'graphnvd3',
-            'gridhtml',
             'loyalty',
             'mailalerts',
             'newsletter',
