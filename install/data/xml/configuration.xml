@@ -641,9 +641,6 @@
 	<configuration id="BLOCKADVERT_LINK" name="BLOCKADVERT_LINK">
 		<value>http://www.qloapps.com</value>
 	</configuration>
-	<configuration id="BLOCKSTORE_IMG" name="BLOCKSTORE_IMG">
-		<value>store.jpg</value>
-	</configuration>
 	<configuration id="BLOCKADVERT_IMG_EXT" name="BLOCKADVERT_IMG_EXT">
 		<value>jpg</value>
 	</configuration>

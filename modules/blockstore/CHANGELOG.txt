@@ -1,7 +1,0 @@
-2014-04-22 18:57:51 +0200	// Changelog updated
-2014-04-03 11:53:18 +0200	[-] Replace Lorem Ipsum by text from configuration
-2014-03-24 12:22:58 +0100	Merge branch 'master' of https://github.com/PrestaShop/blockstore
-2014-03-24 11:43:29 +0100	/ MO blockstore : ps_versions_compliancy modified (1.5.6.1 => 1.6)
-2014-03-24 11:04:08 +0100	/ MO blockstore : ps_versions_compliancy added
-2014-03-24 10:19:32 +0100	[-] BO : Add Text field, cf #PSCSX-1274
-2014-03-20 14:25:32 +0100	Initial commit
