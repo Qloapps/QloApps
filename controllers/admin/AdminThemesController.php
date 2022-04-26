@@ -2123,7 +2123,6 @@ class AdminThemesControllerCore extends AdminController
             'carriercompare',
             'cashondelivery',
             'cheque',
-            'crossselling',
             'dashactivity',
             'dashgoals',
             'dashproducts',
