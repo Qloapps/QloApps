@@ -62,7 +62,6 @@
         <module action="enable" name="blockcart"/>
         <module action="enable" name="blockuserinfo"/>
         <module action="disable" name="blockadvertising"/>
-        <module action="disable" name="blockbestsellers"/>
         <module action="disable" name="blockcategories"/>
         <module action="disable" name="blockcms"/>
         <module action="disable" name="blockcmsinfo"/>
