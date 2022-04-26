@@ -80,7 +80,6 @@
         <module action="disable" name="blockstore"/>
         <module action="disable" name="blocksupplier"/>
         <module action="disable" name="blocktags"/>
-        <module action="disable" name="homeslider"/>
         <module action="disable" name="productpaymentlogos"/>
         <module action="disable" name="pscleaner"/>
         <module action="disable" name="sendtoafriend"/>
