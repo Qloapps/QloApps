@@ -2129,7 +2129,6 @@ class AdminThemesControllerCore extends AdminController
             'newsletter',
             'pagesnotfound',
             'productcomments',
-            'productpaymentlogos',
             'pscleaner',
             'referralprogram',
             'sekeywords',
