@@ -74,7 +74,6 @@
         <module action="disable" name="blockrss"/>
         <module action="disable" name="blocksearch"/>
         <module action="disable" name="blocksharefb"/>
-        <module action="disable" name="blockspecials"/>
         <module action="disable" name="blocksupplier"/>
         <module action="disable" name="blocktags"/>
         <module action="disable" name="pscleaner"/>
