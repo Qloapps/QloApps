@@ -2119,7 +2119,6 @@ class AdminThemesControllerCore extends AdminController
             'blocktopmenu',
             'blockuserinfo',
             'blockviewed',
-            'blockwishlist',
             'carriercompare',
             'cashondelivery',
             'cheque',

@@ -88,7 +88,6 @@
         <module action="disable" name="blocktags"/>
         <module action="disable" name="blocktopmenu"/>
         <module action="disable" name="blockviewed"/>
-        <module action="disable" name="blockwishlist"/>
         <module action="disable" name="homeslider"/>
         <module action="disable" name="productpaymentlogos"/>
         <module action="disable" name="pscleaner"/>
