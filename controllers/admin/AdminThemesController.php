@@ -2136,7 +2136,6 @@ class AdminThemesControllerCore extends AdminController
             'gapi',
             'graphnvd3',
             'gridhtml',
-            'homefeatured',
             'homeslider',
             'loyalty',
             'mailalerts',

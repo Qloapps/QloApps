@@ -130,10 +130,6 @@ UPDATE `PREFIX_hook_module` SET position = 1
 WHERE id_module = (SELECT id_module FROM `PREFIX_module` WHERE name = 'blocknewproducts')
 AND id_hook IN (@id_hook, @id_hook2);
 
-UPDATE `PREFIX_hook_module` SET position = 2
-WHERE id_module = (SELECT id_module FROM `PREFIX_module` WHERE name = 'homefeatured')
-AND id_hook IN (@id_hook, @id_hook2);
-
 UPDATE `PREFIX_hook_module` SET position = 3
 WHERE id_module = (SELECT id_module FROM `PREFIX_module` WHERE name = 'blockbestsellers')
 AND id_hook IN (@id_hook, @id_hook2);
