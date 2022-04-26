@@ -63,7 +63,6 @@
         <module action="enable" name="blockuserinfo"/>
         <module action="disable" name="blockadvertising"/>
         <module action="disable" name="blockcategories"/>
-        <module action="disable" name="blockcms"/>
         <module action="disable" name="blockcmsinfo"/>
         <module action="disable" name="blockcustomerprivacy"/>
         <module action="disable" name="blockfacebook"/>
