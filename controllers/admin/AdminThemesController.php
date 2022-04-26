@@ -2107,7 +2107,6 @@ class AdminThemesControllerCore extends AdminController
             'blocknewsletter',
             'blockpaymentlogo',
             'blockpermanentlinks',
-            'blockreinsurance',
             'blockrss',
             'blocksearch',
             'blocksharefb',
