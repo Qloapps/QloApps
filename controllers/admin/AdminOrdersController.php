@@ -3355,6 +3355,16 @@ class AdminOrdersControllerCore extends AdminController
                         $objBookingDemand->total_price_tax_excl = $objBookingDemand->unit_price_tax_excl * $qty;
                         $objBookingDemand->total_price_tax_incl = $objBookingDemand->unit_price_tax_incl * $qty;
 
+                        $order_detail = new OrderDetail($objBookingDetail->id_order_detail);
+                        // Update OrderInvoice of this OrderDetail
+                        if ($order_detail->id_order_invoice != 0) {
+                            // values changes as values are calculated accoding to the quantity of the product by webkul
+                            $order_invoice = new OrderInvoice($order_detail->id_order_invoice);
+                            $order_invoice->total_paid_tax_excl += $objBookingDemand->total_price_tax_excl;
+                            $order_invoice->total_paid_tax_incl += $objBookingDemand->total_price_tax_incl;
+                            $res &= $order_invoice->update();
+                        }
+
                         // change order total
                         $order->total_paid_tax_excl += $objBookingDemand->total_price_tax_excl;
                         $order->total_paid_tax_incl += $objBookingDemand->total_price_tax_incl;
@@ -3399,6 +3409,16 @@ class AdminOrdersControllerCore extends AdminController
                             $order->total_paid_tax_incl -= $objBookingDemand->total_price_tax_incl;
                             $order->total_paid -= $objBookingDemand->total_price_tax_incl;
                             $order->save();
+
+                            $order_detail = new OrderDetail($objBookingDetail->id_order_detail);
+                            // Update OrderInvoice of this OrderDetail
+                            if ($order_detail->id_order_invoice != 0) {
+                                // values changes as values are calculated accoding to the quantity of the product by webkul
+                                $order_invoice = new OrderInvoice($order_detail->id_order_invoice);
+                                $order_invoice->total_paid_tax_excl -= $objBookingDemand->total_price_tax_excl;
+                                $order_invoice->total_paid_tax_incl -= $objBookingDemand->total_price_tax_incl;
+                                $res &= $order_invoice->update();
+                            }
                         }
                         die('1');
                     }
