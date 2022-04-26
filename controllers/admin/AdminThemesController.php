@@ -2149,7 +2149,6 @@ class AdminThemesControllerCore extends AdminController
             'statsproduct',
             'statsregistrations',
             'statssales',
-            'statssearch',
             'statsstock',
             'statsvisits',
             'themeconfigurator',
