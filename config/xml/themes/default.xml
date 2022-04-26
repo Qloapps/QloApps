@@ -76,7 +76,6 @@
         <module action="disable" name="blocklink"/>
         <module action="disable" name="blockmanufacturer"/>
         <module action="disable" name="blockmyaccountfooter"/>
-        <module action="disable" name="blocknewproducts"/>
         <module action="disable" name="blockpaymentlogo"/>
         <module action="disable" name="blockpermanentlinks"/>
         <module action="disable" name="blockrss"/>

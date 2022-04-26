@@ -2103,7 +2103,6 @@ class AdminThemesControllerCore extends AdminController
             'blockmanufacturer',
             'blockmyaccount',
             'blockmyaccountfooter',
-            'blocknewproducts',
             'blocknewsletter',
             'blockpaymentlogo',
             'blockpermanentlinks',
