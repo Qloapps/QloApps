@@ -2087,7 +2087,6 @@ class AdminThemesControllerCore extends AdminController
             'bankwire',
             'blockadvertising',
             'blockcart',
-            'blockcategories',
             'blockcmsinfo',
             'blockcurrencies',
             'blockcustomerprivacy',

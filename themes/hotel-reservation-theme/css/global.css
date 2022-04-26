@@ -7380,8 +7380,6 @@ div.star a:hover {
             padding-right: 12px;
             float: left;
             color: #908f8f; }
-    .footer-container #footer .blockcategories_footer {
-      clear: left; }
     .footer-container #footer #social_block {
       /* By Webkul */
       /*display: table;
@@ -8423,9 +8421,6 @@ div.star.star_hover:after {
   width: 191px;
   margin-bottom: 1em;
   text-align: center; }
-
-.blockcategories_footer ul ul {
-  display: none !important; }
 
 .form-group.form-error input, .form-group.form-error textarea {
   border: 1px solid #f13340;

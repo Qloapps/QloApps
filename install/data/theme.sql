@@ -144,10 +144,6 @@ UPDATE `PREFIX_hook_module` SET position = 2
 WHERE id_module = (SELECT id_module FROM `PREFIX_module` WHERE name = 'blocksocial')
 AND id_hook = @id_hook;
 
-UPDATE `PREFIX_hook_module` SET position = 3
-WHERE id_module = (SELECT id_module FROM `PREFIX_module` WHERE name = 'blockcategories')
-AND id_hook = @id_hook;
-
 UPDATE `PREFIX_hook_module` SET position = 5
 WHERE id_module = (SELECT id_module FROM `PREFIX_module` WHERE name = 'blockmyaccountfooter')
 AND id_hook = @id_hook;
