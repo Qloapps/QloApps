@@ -77,7 +77,6 @@
         <module action="disable" name="blocksupplier"/>
         <module action="disable" name="blocktags"/>
         <module action="disable" name="pscleaner"/>
-        <module action="disable" name="sendtoafriend"/>
         <module action="disable" name="trackingfront"/>
         <module action="disable" name="vatnumber"/>
         <hooks>

@@ -2129,7 +2129,6 @@ class AdminThemesControllerCore extends AdminController
             'pscleaner',
             'referralprogram',
             'sekeywords',
-            'sendtoafriend',
             'statsbestcategories',
             'statsbestcustomers',
             'statsbestmanufacturers',
