@@ -2140,7 +2140,6 @@ class AdminThemesControllerCore extends AdminController
             'referralprogram',
             'sekeywords',
             'sendtoafriend',
-            'socialsharing',
             'statsbestcategories',
             'statsbestcustomers',
             'statsbestmanufacturers',
