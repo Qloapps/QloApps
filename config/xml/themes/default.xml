@@ -86,7 +86,6 @@
         <module action="disable" name="blockstore"/>
         <module action="disable" name="blocksupplier"/>
         <module action="disable" name="blocktags"/>
-        <module action="disable" name="blocktopmenu"/>
         <module action="disable" name="blockviewed"/>
         <module action="disable" name="homeslider"/>
         <module action="disable" name="productpaymentlogos"/>

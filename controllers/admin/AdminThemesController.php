@@ -2116,7 +2116,6 @@ class AdminThemesControllerCore extends AdminController
             'blockstore',
             'blocksupplier',
             'blocktags',
-            'blocktopmenu',
             'blockuserinfo',
             'blockviewed',
             'carriercompare',
