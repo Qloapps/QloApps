@@ -659,20 +659,6 @@
 	<configuration id="blocksocial_twitter" name="BLOCKSOCIAL_TWITTER">
 		<value>http://www.twitter.com/qloapps</value>
 	</configuration>
-	<configuration id="blockcontactinfos_company" name="BLOCKCONTACTINFOS_COMPANY">
-		<value>Your company</value>
-	</configuration>
-	<configuration id="blockcontactinfos_address" name="BLOCKCONTACTINFOS_ADDRESS">
-		<value>Address line 1
-City
-Country</value>
-	</configuration>
-	<configuration id="blockcontactinfos_phone" name="BLOCKCONTACTINFOS_PHONE">
-		<value>0123-456-789</value>
-	</configuration>
-	<configuration id="blockcontactinfos_email" name="BLOCKCONTACTINFOS_EMAIL">
-		<value>pub@qloapps.com</value>
-	</configuration>
 	<configuration id="SUPPLIER_DISPLAY_TEXT" name="SUPPLIER_DISPLAY_TEXT">
 		<value>1</value>
 	</configuration>
