@@ -67,7 +67,6 @@
         <module action="disable" name="blockfacebook"/>
         <module action="disable" name="blocklayered"/>
         <module action="disable" name="blocklink"/>
-        <module action="disable" name="blockmyaccountfooter"/>
         <module action="disable" name="pscleaner"/>
         <module action="disable" name="trackingfront"/>
         <module action="disable" name="vatnumber"/>

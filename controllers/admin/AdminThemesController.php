@@ -2095,7 +2095,6 @@ class AdminThemesControllerCore extends AdminController
             'blocklayered',
             'blocklink',
             'blockmyaccount',
-            'blockmyaccountfooter',
             'blocknewsletter',
             'blocksocial',
             'blockuserinfo',
