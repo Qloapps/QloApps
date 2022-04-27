@@ -67,14 +67,12 @@
         <module action="disable" name="blockfacebook"/>
         <module action="disable" name="blocklayered"/>
         <module action="disable" name="blocklink"/>
-        <module action="disable" name="blockmanufacturer"/>
         <module action="disable" name="blockmyaccountfooter"/>
         <module action="disable" name="blockpaymentlogo"/>
         <module action="disable" name="blockpermanentlinks"/>
         <module action="disable" name="blockrss"/>
         <module action="disable" name="blocksearch"/>
         <module action="disable" name="blocksharefb"/>
-        <module action="disable" name="blocksupplier"/>
         <module action="disable" name="pscleaner"/>
         <module action="disable" name="trackingfront"/>
         <module action="disable" name="vatnumber"/>

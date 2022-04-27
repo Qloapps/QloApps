@@ -1582,17 +1582,10 @@ class FrontControllerCore extends Controller
      */
     public function setMobileTemplate($template)
     {
-        // Needed for site map
-        $blockmanufacturer = Module::getInstanceByName('blockmanufacturer');
-        $blocksupplier     = Module::getInstanceByName('blocksupplier');
-
         $this->context->smarty->assign(array(
             'categoriesTree'            => Category::getRootCategory()->recurseLiteCategTree(0),
             'categoriescmsTree'         => CMSCategory::getRecurseCategory($this->context->language->id, 1, 1, 1),
             'voucherAllowed'            => (int)CartRule::isFeatureActive(),
-            'display_manufacturer_link' => (bool)$blockmanufacturer->active,
-            'display_supplier_link'     => (bool)$blocksupplier->active,
-            'PS_DISPLAY_SUPPLIERS'      => Configuration::get('PS_DISPLAY_SUPPLIERS'),
             'PS_DISPLAY_BEST_SELLERS'   => Configuration::get('PS_DISPLAY_BEST_SELLERS'),
             'display_store'             => Configuration::get('PS_STORES_DISPLAY_SITEMAP'),
             'conditions'                => Configuration::get('PS_CONDITIONS'),
