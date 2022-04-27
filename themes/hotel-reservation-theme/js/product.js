@@ -1099,6 +1099,8 @@ $(document).ready(function() {
     $("#room_check_in").datepicker({
         showOtherMonths: true,
         dateFormat: 'dd-mm-yy',
+        altFormat: 'yy-mm-dd',
+        altField: '#room_check_in_formatted',
         minDate: 0,
         beforeShow: function (input, instance) {
             // So that on translating page date is translated to NaN-NaN-NaN
@@ -1109,70 +1111,40 @@ $(document).ready(function() {
             return highlightSelectedDateRange(date, $("#room_check_in").val(), $("#room_check_out").val());
         },
         onClose: function() {
-            var checkOut = $("#room_check_out").val();
-            var selectedDate = $("#room_check_in").val();
-
-            var date_from_format = selectedDate.split("-");
-            var selectedDate = new Date($.datepicker.formatDate('yy-mm-dd', new Date(date_from_format[2], date_from_format[1] - 1, date_from_format[0])));
-            var date_in = $.datepicker.formatDate('yy-mm-dd', selectedDate);
-
-            var date_to_format = $('#room_check_out').val().split("-");
-            var selectedDateTo = new Date($.datepicker.formatDate('yy-mm-dd', new Date(date_to_format[2], date_to_format[1] - 1, date_to_format[0])));
-
-            var date_out = $.datepicker.formatDate('yy-mm-dd', selectedDateTo);
-
-            if (date_in >= date_out) {
+            var dateIn = $('#room_check_in_formatted').val();
+            var dateOut = $('#room_check_out_formatted').val();
+            var selectedDate = new Date(dateIn);
+            if (dateIn >= dateOut) {
                 selectedDate.setDate(selectedDate.getDate() + 1);
                 $("#room_check_out").datepicker("option", "minDate", selectedDate);
                 $("#room_check_out").val($.datepicker.formatDate('dd-mm-yy', selectedDate));
-                var date_out = $.datepicker.formatDate('yy-mm-dd', selectedDate);
+                var dateOut = $.datepicker.formatDate('yy-mm-dd', selectedDate);
+                $("#room_check_out_formatted").val(dateOut);
+
+                $("#room_check_out").datepicker("show");
             }
 
-            /* open datepicker of chechout date only if
-            checkout date is empty or checkin selected is equal or more than check out date */
-            if (checkOut == '') {
-                $("#room_check_out").datepicker( "show" );
-            } else {
-                // Lets make the date in the required format
-                var currentDate = selectedDate.getDate();
-                var currentMonth = selectedDate.getMonth() + 1;
-                if (currentMonth < 10) {
-                    currentMonth = '0' + currentMonth;
-                }
-                if (currentDate < 10) {
-                    currentDate = '0' + currentDate;
-                }
-
-                dmy = selectedDate.getFullYear() + "-" + currentMonth + "-" + currentDate;
-                checkOut = checkOut.split("-");
-                checkOut = (checkOut[2]) + '-' + (checkOut[1]) + '-' + (checkOut[0]);
-
-                if (checkOut <= dmy) {
-                    $("#room_check_out").datepicker('show');
-                }
-            }
-
-            changeRoomDate(date_in, date_out);
+            changeRoomDate(dateIn, dateOut);
         }
     });
 
     $("#room_check_out").datepicker({
         showOtherMonths: true,
         dateFormat: 'dd-mm-yy',
+        altFormat: 'yy-mm-dd',
+        altField: '#room_check_out_formatted',
         beforeShow: function (input, instance) {
             // So that on translating page date is translated to NaN-NaN-NaN
             $('.ui-datepicker').addClass('notranslate');
 
-            var date_to = $('#room_check_in').val();
-            if (typeof date_to != 'undefined' && date_to != '') {
-                var date_format = date_to.split("-");
-                var selectedDate = new Date($.datepicker.formatDate('yy-mm-dd', new Date(date_format[2], date_format[1] - 1, date_format[0])));
-                selectedDate.setDate(selectedDate.getDate()+1);
+            var dateIn = $('#room_check_in_formatted').val();
+            if (typeof dateIn != 'undefined' && dateIn != '') {
+                var selectedDate = new Date(dateIn);
+                selectedDate.setDate(selectedDate.getDate() + 1);
                 $("#room_check_out").datepicker("option", "minDate", selectedDate);
             } else {
-                var date_format = new Date();
                 var selectedDate = new Date($.datepicker.formatDate('yy-mm-dd', new Date()));
-                selectedDate.setDate(selectedDate.getDate()+1);
+                selectedDate.setDate(selectedDate.getDate() + 1);
                 $("#room_check_out").datepicker("option", "minDate", selectedDate);
             }
         },
@@ -1181,24 +1153,19 @@ $(document).ready(function() {
             return highlightSelectedDateRange(date, $("#room_check_in").val(), $("#room_check_out").val());
         },
         onSelect: function(dateText, inst) {
-            var date_from_format = $('#room_check_in').val().split("-");
-            var selectedDateFrom = new Date($.datepicker.formatDate('yy-mm-dd', new Date(date_from_format[2], date_from_format[1] - 1, date_from_format[0])));
-            var date_in = $.datepicker.formatDate('yy-mm-dd', selectedDateFrom);
-            var date_to_format = $('#room_check_out').val().split("-");
-            var selectedDateTo = new Date($.datepicker.formatDate('yy-mm-dd', new Date(date_to_format[2], date_to_format[1] - 1, date_to_format[0])));
-            var date_out = $.datepicker.formatDate('yy-mm-dd', selectedDateTo);
+            var dateIn = $('#room_check_in_formatted').val();
+            var dateOut = $('#room_check_out_formatted').val();
 
-            if (date_in >= date_out) {
+            if (dateIn >= dateOut) {
                 $(this).val(inst.lastVal);
                 $('.room_unavailability_date_error_div').text(correct_date_cond);
                 $('.room_unavailability_date_error_div').css('display', 'block');
 
                 setTimeout(function() {
-                        $('.room_unavailability_date_error_div').css('display', 'none');
-                    },
-                    3000);
+                    $('.room_unavailability_date_error_div').css('display', 'none');
+                }, 3000);
             } else {
-                changeRoomDate(date_in, date_out);
+                changeRoomDate(dateIn, dateOut);
             }
         }
     });
@@ -1292,8 +1259,8 @@ function changeRoomTypeDemands() {
             dataType: 'JSON',
             cache: false,
             data: {
-                date_from: $('#room_check_in').val(),
-                date_to: $('#room_check_out').val(),
+                date_from: $('#room_check_in_formatted').val(),
+                date_to: $('#room_check_out_formatted').val(),
                 product_quantity_down: 1,
                 qty: qty_wntd,
                 id_product: $('#product_page_product_id').val(),

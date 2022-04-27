@@ -292,10 +292,12 @@
 										<div class="form-group col-sm-6">
 											<label for="" class="control-label">{l s='Check In Date'}</label>
 											<input type="text" class="form-control input-date" name="room_check_in" id="room_check_in" value="{if isset($date_from)}{$date_from|date_format:"%d-%m-%Y"}{/if}" autocomplete="off" readonly />
+											<input type="hidden" id="room_check_in_formatted" value="" >
 										</div>
 										<div class="form-group col-sm-6">
 											<label for="" class="control-label">{l s='Check Out Date'}</label>
 											<input type="text" class="form-control input-date" name="room_check_out" id="room_check_out" value="{if isset($date_to)}{$date_to|escape:'html':'UTF-8'|date_format:"%d-%m-%Y"}{/if}" autocomplete="off" readonly />
+											<input type="hidden" id="room_check_out_formatted" value="" >
 										</div>
 									</div>
 									<div class="room_unavailability_date_error_div"></div>
