@@ -2135,7 +2135,6 @@ class AdminThemesControllerCore extends AdminController
             'statssales',
             'statsvisits',
             'themeconfigurator',
-            'trackingfront',
             'vatnumber',
             'watermark'
         );

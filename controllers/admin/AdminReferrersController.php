@@ -230,17 +230,6 @@ class AdminReferrersControllerCore extends AdminController
             'submit' => array('title' => $this->l('Save')),
         ));
 
-        if (Module::isInstalled('trackingfront')) {
-            $this->fields_form[0]['form']['desc'] = array(
-                $this->l('Affiliates can access their data with this name and password.'),
-                $this->l('Front access:').' <a class="btn btn-link" href="'.$uri.'modules/trackingfront/stats.php" onclick="return !window.open(this.href);"><i class="icon-external-link-sign"></i> '.$uri.'modules/trackingfront/stats.php</a>'
-            );
-        } else {
-            $this->fields_form[0]['form']['desc'] = array(
-                sprintf($this->l('Please install the "%s" module in order to give your affiliates access their own statistics.'), Module::getModuleName('trackingfront'))
-            );
-        }
-
         $this->fields_form[1] = array('form' => array(
             'legend' => array(
                 'title' => $this->l('Commission plan'),
