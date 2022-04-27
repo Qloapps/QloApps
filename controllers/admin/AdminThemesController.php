@@ -2097,7 +2097,6 @@ class AdminThemesControllerCore extends AdminController
             'blockmyaccount',
             'blockmyaccountfooter',
             'blocknewsletter',
-            'blockpaymentlogo',
             'blocksocial',
             'blockuserinfo',
             'carriercompare',
