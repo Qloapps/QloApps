@@ -420,7 +420,4 @@
     {if isset($countries)}
         {addJsDef countries=$countries}
     {/if}
-    {if isset($vatnumber_ajax_call) && $vatnumber_ajax_call}
-        {addJsDef vatnumber_ajax_call=$vatnumber_ajax_call}
-    {/if}
 {/strip}

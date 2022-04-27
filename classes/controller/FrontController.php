@@ -465,7 +465,6 @@ class FrontControllerCore extends Controller
             'use_taxes'           => (int)Configuration::get('PS_TAX'),
             'show_taxes'          => (int)(Configuration::get('PS_TAX_DISPLAY') == 1 && (int)Configuration::get('PS_TAX')),
             'display_tax_label'   => (bool)$display_tax_label,
-            'vat_management'      => (int)Configuration::get('VATNUMBER_MANAGEMENT'),
             'opc'                 => (bool)Configuration::get('PS_ORDER_PROCESS_TYPE'),
             'PS_CATALOG_MODE'     => (bool)Configuration::get('PS_CATALOG_MODE') || (Group::isFeatureActive() && !(bool)Group::getCurrent()->show_prices),
             'b2b_enable'          => (bool)Configuration::get('PS_B2B_ENABLE'),

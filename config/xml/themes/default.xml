@@ -62,7 +62,6 @@
         <module action="enable" name="blockcart"/>
         <module action="enable" name="blockuserinfo"/>
         <module action="disable" name="pscleaner"/>
-        <module action="disable" name="vatnumber"/>
         <hooks>
             <hook module="hotelreservationsystem" hook="actionValidateOrder" position="1"/>
             <hook module="hotelreservationsystem" hook="Header" position="1"/>

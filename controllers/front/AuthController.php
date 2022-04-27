@@ -209,7 +209,6 @@ class AuthControllerCore extends FrontController
                 'countries' => $countries,
                 'PS_REGISTRATION_PROCESS_TYPE' => Configuration::get('PS_REGISTRATION_PROCESS_TYPE'),
                 'sl_country' => (int)$this->id_country,
-                'vat_management' => Configuration::get('VATNUMBER_MANAGEMENT')
             ));
     }
 

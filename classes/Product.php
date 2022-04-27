@@ -591,13 +591,6 @@ class ProductCore extends ObjectModel
                 $id_address = (int)$cur_cart->{Configuration::get('PS_TAX_ADDRESS_TYPE')};
             }
             $address_infos = Address::getCountryAndState($id_address);
-
-            if (self::$_taxCalculationMethod != PS_TAX_EXC
-                && !empty($address_infos['vat_number'])
-                && $address_infos['id_country'] != Configuration::get('VATNUMBER_COUNTRY')
-                && Configuration::get('VATNUMBER_MANAGEMENT')) {
-                self::$_taxCalculationMethod = PS_TAX_EXC;
-            }
         } else {
             self::$_taxCalculationMethod = Group::getPriceDisplayMethod(Group::getCurrent()->id);
         }
@@ -2862,13 +2855,6 @@ class ProductCore extends ObjectModel
         }
 
         if (Tax::excludeTaxeOption()) {
-            $usetax = false;
-        }
-
-        if ($usetax != false
-            && !empty($address_infos['vat_number'])
-            && $address_infos['id_country'] != Configuration::get('VATNUMBER_COUNTRY')
-            && Configuration::get('VATNUMBER_MANAGEMENT')) {
             $usetax = false;
         }
 
