@@ -64,7 +64,6 @@
         <module action="disable" name="blockadvertising"/>
         <module action="disable" name="blockcmsinfo"/>
         <module action="disable" name="blockcustomerprivacy"/>
-        <module action="disable" name="blockfacebook"/>
         <module action="disable" name="blocklayered"/>
         <module action="disable" name="blocklink"/>
         <module action="disable" name="pscleaner"/>
