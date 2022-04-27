@@ -61,7 +61,6 @@
         <module action="enable" name="statsdata"/>
         <module action="enable" name="blockcart"/>
         <module action="enable" name="blockuserinfo"/>
-        <module action="disable" name="blockcmsinfo"/>
         <module action="disable" name="blocklayered"/>
         <module action="disable" name="blocklink"/>
         <module action="disable" name="pscleaner"/>
