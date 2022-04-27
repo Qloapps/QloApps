@@ -2089,7 +2089,6 @@ class AdminThemesControllerCore extends AdminController
             'blockcurrencies',
             'blocklanguages',
             'blocklayered',
-            'blocklink',
             'blockmyaccount',
             'blocknewsletter',
             'blocksocial',
