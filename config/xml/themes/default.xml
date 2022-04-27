@@ -70,7 +70,6 @@
         <module action="disable" name="blockmyaccountfooter"/>
         <module action="disable" name="blockpaymentlogo"/>
         <module action="disable" name="blockpermanentlinks"/>
-        <module action="disable" name="blockrss"/>
         <module action="disable" name="blocksearch"/>
         <module action="disable" name="blocksharefb"/>
         <module action="disable" name="pscleaner"/>
