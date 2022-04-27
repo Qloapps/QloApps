@@ -69,7 +69,6 @@
         <module action="disable" name="blocklink"/>
         <module action="disable" name="blockmyaccountfooter"/>
         <module action="disable" name="blockpaymentlogo"/>
-        <module action="disable" name="blockpermanentlinks"/>
         <module action="disable" name="pscleaner"/>
         <module action="disable" name="trackingfront"/>
         <module action="disable" name="vatnumber"/>
