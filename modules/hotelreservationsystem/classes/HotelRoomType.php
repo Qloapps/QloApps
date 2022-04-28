@@ -98,6 +98,22 @@ class HotelRoomType extends ObjectModel
     }
 
     /**
+     * [getHotelIdAddressByIdProduct: get room type location by id_product]
+     *
+     * @param [int] $id_product
+     * @return int
+     */
+    public static function getHotelIdAddressByIdProduct($id_product)
+    {
+        return Db::getInstance()->getValue(
+            'SELECT `id_address` from `'._DB_PREFIX_.'address` a
+            INNER JOIN `'._DB_PREFIX_.'htl_room_type` hrt
+            ON (hrt.`id_hotel` = a.`id_hotel`)
+            WHERE hrt.`id_product` = '.(int)$id_product.' AND a.`deleted` = 0
+        ');
+    }
+
+    /**
      * [getRoomTypeByHotelId :: To get All room types informations which belong to the hotel having id passed as $hotel_id].
      *
      * @param [int] $hotel_id [Id of the hotel Which room types information you want]

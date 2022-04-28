@@ -146,23 +146,16 @@ class HotelRoomTypeDemand extends ObjectModel
         $idState = 0;
         $zipcode = 0;
 
-        if (!$id_address && Validate::isLoadedObject($curCart)) {
-            $id_address = $curCart->{Configuration::get('PS_TAX_ADDRESS_TYPE')};
-        }
-
         if ($id_address) {
             $addressInfos = Address::getCountryAndState($id_address);
-            if ($addressInfos['id_country']) {
-                $idCountry = (int)$addressInfos['id_country'];
-                $idState = (int)$addressInfos['id_state'];
-                $zipcode = $addressInfos['postcode'];
-            }
-        } elseif (isset($context->customer->geoloc_id_country)) {
-            $idCountry = (int)$context->customer->geoloc_id_country;
-            $idState = (int)$context->customer->id_state;
-            $zipcode = $context->customer->postcode;
+        } else {
+            $addressInfos = Address::getCountryAndState(Cart::getIdAddressForTaxCalculation($idProduct));
         }
-
+        if ($addressInfos['id_country']) {
+            $idCountry = (int)$addressInfos['id_country'];
+            $idState = (int)$addressInfos['id_state'];
+            $zipcode = $addressInfos['postcode'];
+        }
         if (Tax::excludeTaxeOption()) {
             $useTax = false;
         }

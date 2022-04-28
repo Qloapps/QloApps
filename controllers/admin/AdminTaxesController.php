@@ -71,21 +71,22 @@ class AdminTaxesControllerCore extends AdminController
                         'desc' => $this->l('Select whether or not to display tax on a distinct line in the cart.'),
                         'cast' => 'intval',
                         'type' => 'bool'),
-                    'PS_TAX_ADDRESS_TYPE' => array(
-                        'title' => $this->l('Based on'),
-                        'cast' => 'pSQL',
-                        'type' => 'select',
-                        'list' => array(
-                            array(
-                                'name' => $this->l('Invoice address'),
-                                'id' => 'id_address_invoice'
-                                ),
-                            array(
-                                'name' => $this->l('Delivery address'),
-                                'id' => 'id_address_delivery')
-                                ),
-                        'identifier' => 'id'
-                        ),
+                    // 'PS_TAX_ADDRESS_TYPE' => array(
+                    //     'title' => $this->l('Based on'),
+                    //     'cast' => 'pSQL',
+                    //     'type' => 'select',
+                    //     'list' => array(
+                    //         array(
+                    //             'name' => $this->l('Invoice address'),
+                    //             'id' => 'id_address_invoice'
+                    //         ),
+                    //         array(
+                    //             'name' => $this->l('Delivery address'),
+                    //             'id' => 'id_address_delivery')
+                    //         ),
+                    //     ),
+                    //     'identifier' => 'id'
+                    // ),
                     'PS_USE_ECOTAX' => array(
                         'title' => $this->l('Use ecotax'),
                         'desc' => $ecotax_desc,

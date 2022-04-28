@@ -352,10 +352,8 @@ class HotelHelper
 
     public function saveDummyHotelBranchInfo()
     {
-        $def_cont_id = Country::getDefaultCountryId();
         $obj_hotel_info = new HotelBranchInformation();
         $obj_hotel_info->active = 1;
-        $obj_hotel_info->phone = '0987654321';
         $obj_hotel_info->email = 'hotelprime@htl.com';
         $obj_hotel_info->check_in = '12:00';
         $obj_hotel_info->check_out = '11:00';
@@ -373,19 +371,31 @@ class HotelHelper
         }
 
         $obj_hotel_info->rating = 3;
-        $obj_hotel_info->city = 'DefCity';
+
+        $obj_hotel_info->save();
+        $htl_id = $obj_hotel_info->id;
+
+        // add hotel address info
+        $def_cont_id = Country::getDefaultCountryId();
+
         if ($states = State::getStatesByIdCountry($def_cont_id)) {
             $state_id = $states[0]['id_state'];
         } else {
             $state_id = 0;
         }
-        $obj_hotel_info->state_id = $state_id;
-        $obj_hotel_info->country_id = $def_cont_id;
-        $obj_hotel_info->zipcode = self::getRandomZipcodeByForCountry($def_cont_id);
-        $obj_hotel_info->address = 'Monticello Dr, Montgomery, AL 36117, USA';
-        $obj_hotel_info->save();
+        $objAddress = new Address();
+        $objAddress->id_hotel = $htl_id;
+        $objAddress->phone = '0987654321';
+        $objAddress->city = 'DefCity';
+        $objAddress->id_state = $state_id;
+        $objAddress->id_country = $def_cont_id;
+        $objAddress->postcode = self::getRandomZipcodeByForCountry($def_cont_id);
+        $objAddress->address1 = 'Monticello Dr, Montgomery, AL 36117, USA';
+        $objAddress->alias = 'The Hotel Prime';
+        $objAddress->lastname = 'The Hotel Prime';
+        $objAddress->firstname = 'The Hotel Prime';
 
-        $htl_id = $obj_hotel_info->id;
+        $objAddress->save();
 
         $grp_ids = array();
         $obj_grp = new Group();

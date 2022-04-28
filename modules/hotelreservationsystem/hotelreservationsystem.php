@@ -359,7 +359,7 @@ class hotelreservationsystem extends Module
         $obj_adv_payment = new HotelAdvancedPayment();
 
         $orderProducts = $order->product_list;
-        $vatAddress = new Address((int)$order->{Configuration::get('PS_TAX_ADDRESS_TYPE')});
+        $vatAddress = new Address((int)$order->id_address_tax);
 
         $idLang = (int)$cart->id_lang;
 
@@ -411,14 +411,16 @@ class hotelreservationsystem extends Module
                     ))) {
                         $objHtlBkDtl->hotel_name = $objHotelBranch->hotel_name;
                         $objHtlBkDtl->room_type_name = $product['name'];
-                        $objHtlBkDtl->city = $objHotelBranch->city;
-                        $objHtlBkDtl->state = State::getNameById($objHotelBranch->state_id);
-                        $objHtlBkDtl->country = Country::getNameById($idLang, $objHotelBranch->country_id);
-                        $objHtlBkDtl->zipcode = $objHotelBranch->zipcode;
-                        $objHtlBkDtl->phone = $objHotelBranch->phone;
                         $objHtlBkDtl->email = $objHotelBranch->email;
                         $objHtlBkDtl->check_in_time = $objHotelBranch->check_in;
                         $objHtlBkDtl->check_out_time = $objHotelBranch->check_out;
+                        if ($hotelAddress = $objHotelBranch->getAddress($objCartBkData->id_hotel)) {
+                            $objHtlBkDtl->city = $hotelAddress['city'];
+                            $objHtlBkDtl->state = $hotelAddress['state'];
+                            $objHtlBkDtl->country = $hotelAddress['country'];
+                            $objHtlBkDtl->zipcode = $hotelAddress['postcode'];
+                            $objHtlBkDtl->phone = $hotelAddress['phone'];
+                        }
                     }
                     if ($roomTypeInfo = $objRoomType->getRoomTypeInfoByIdProduct($idProduct)) {
                         $objHtlBkDtl->adult = $roomTypeInfo['adult'];
