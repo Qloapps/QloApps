@@ -17,12 +17,12 @@
 *  @license   https://store.webkul.com/license.html
 *}
 
-<p>{l s='The following queries successfuly cleaned your database:' mod='pscleaner'}<p>
+<p>{l s='The following queries successfuly cleaned your database:' mod='qlocleaner'}<p>
 <ul>
 	{foreach $logs as $query => $entries}
     <li> 
     	{$query|escape:'htmlall':'UTF-8'} <br /> 
-    	{l s='%d line(s)' sprintf=[$entries] mod='pscleaner'} 
+    	{l s='%d line(s)' sprintf=[$entries] mod='qlocleaner'} 
     </li>
 	{/foreach}
 </ul>

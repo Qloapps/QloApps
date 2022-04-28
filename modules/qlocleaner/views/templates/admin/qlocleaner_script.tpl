@@ -22,20 +22,20 @@
 		$("#submitTruncateCatalog").click(function(){
 			if ($(\'#checkTruncateCatalog_on\').attr(\'checked\') != "checked")
 			{
-				alert({l s='Please read the disclaimer and click "Yes" above' mod='pscleaner'});
+				alert({l s='Please read the disclaimer and click "Yes" above' mod='qlocleaner'});
 				return false;
 			}
-			if (confirm({l s='Are you sure that you want to delete all catalog data?' mod='pscleaner'})
+			if (confirm({l s='Are you sure that you want to delete all catalog data?' mod='qlocleaner'})
 				return true;
 			return false;
 		});
 		$("#submitTruncateSales").click(function(){
 			if ($(\'#checkTruncateSales_on\').attr(\'checked\') != "checked")
 			{
-				alert({l s='Please read the disclaimer and click "Yes" above' mod='pscleaner'});
+				alert({l s='Please read the disclaimer and click "Yes" above' mod='qlocleaner'});
 				return false;
 			}
-			if (confirm({l s='Are you sure that you want to delete all booking data?' mod='pscleaner'})
+			if (confirm({l s='Are you sure that you want to delete all booking data?' mod='qlocleaner'})
 				return true;
 			return false;
 		});

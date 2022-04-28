@@ -28,20 +28,19 @@
 if (!defined('_CAN_LOAD_FILES_')) {
     exit;
 }
-require_once dirname(__FILE__).'/classes/WkPsCleanerHelper.php';
 
-class PSCleaner extends Module
+require_once dirname(__FILE__).'/classes/QcCleanerHelper.php';
+
+class QloCleaner extends Module
 {
     public function __construct()
     {
-        $this->name = 'pscleaner';
+        $this->name = 'qlocleaner';
         $this->tab = 'administration';
-        $this->version = '1.0.2';
+        $this->version = '1.0.0';
         $this->author = 'PrestaShop';
         $this->need_instance = 0;
-        if (version_compare(_PS_VERSION_, '1.6.0.0 ', '>=')) {
-            $this->multishop_context = Shop::CONTEXT_ALL;
-        }
+        $this->multishop_context = Shop::CONTEXT_ALL;
 
         $this->bootstrap = true;
         parent::__construct();
@@ -49,24 +48,6 @@ class PSCleaner extends Module
         $this->displayName = $this->l('QloApps Data Cleaner');
         $this->description = $this->l('Check and fix functional integrity constraints and remove default data');
         $this->secure_key = Tools::encrypt($this->name);
-    }
-
-    protected function getMultiShopValues($key)
-    {
-        if (version_compare(_PS_VERSION_, '1.6.0.3', '>=') === true) {
-            return Configuration::getMultiShopValues($key);
-        } else {
-            $shops = Shop::getShops(false, null, true);
-            $id_lang = (int) $this->context->language->id;
-            $results = array();
-            array_push($results, Configuration::get($key));
-
-            foreach ($shops as $id_shop) {
-                array_push($results, Configuration::get($key, $id_lang, null, $id_shop));
-            }
-
-            return $results;
-        }
     }
 
     public function getContent()
@@ -98,7 +79,7 @@ class PSCleaner extends Module
             $html .= $this->displayConfirmation($this->l('Orders and customers truncated successfuly, please run functional Integrity constraints to clean the database'));
         }
 
-        $html .= $this->context->smarty->fetch(_PS_MODULE_DIR_.$this->name.'/views/templates/admin/pscleaner_script.tpl');
+        $html .= $this->context->smarty->fetch(_PS_MODULE_DIR_.$this->name.'/views/templates/admin/qlocleaner_script.tpl');
 
         return $html.$this->renderForm();
     }
@@ -223,8 +204,8 @@ class PSCleaner extends Module
 
         switch ($case) {
             case 'catalog':
-                $id_home = $this->getMultiShopValues('PS_HOME_CATEGORY');
-                $id_root = $this->getMultiShopValues('PS_ROOT_CATEGORY');
+                $id_home = Configuration::getMultiShopValues('PS_HOME_CATEGORY');
+                $id_root = Configuration::getMultiShopValues('PS_ROOT_CATEGORY');
                 $db->execute('DELETE FROM `'._DB_PREFIX_.'category` WHERE id_category NOT IN ('.implode(',', array_map('intval', $id_home)).', '.implode(',', array_map('intval', $id_root)).')');
                 $db->execute('DELETE FROM `'._DB_PREFIX_.'category_lang` WHERE id_category NOT IN ('.implode(',', array_map('intval', $id_home)).', '.implode(',', array_map('intval', $id_root)).')');
                 $db->execute('DELETE FROM `'._DB_PREFIX_.'category_shop` WHERE id_category NOT IN ('.implode(',', array_map('intval', $id_home)).', '.implode(',', array_map('intval', $id_root)).')');
@@ -256,17 +237,17 @@ class PSCleaner extends Module
                 }
 
                 // Delete qlo modules's images
-                WkPsCleanerHelper::deleteFolderImages(
+                QcCleanerHelper::deleteFolderImages(
                     _PS_MODULE_DIR_.'wkabouthotelblock/views/img/hotel_interior/'
                 );
-                WkPsCleanerHelper::deleteFolderImages(
+                QcCleanerHelper::deleteFolderImages(
                     _PS_MODULE_DIR_.'wkhotelfeaturesblock/views/img/hotels_features_img/'
                 );
-                WkPsCleanerHelper::deleteFolderImages(
+                QcCleanerHelper::deleteFolderImages(
                     _PS_MODULE_DIR_.'wktestimonialblock/views/img/hotels_testimonials_img/'
                 );
                 //delete Qlo modules configurations from configuration table
-                WkPsCleanerHelper::deleteModulesConfigurations();
+                QcCleanerHelper::deleteModulesConfigurations();
 
                 break;
 
