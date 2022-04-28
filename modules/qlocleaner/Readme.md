@@ -1,1 +1,1 @@
-**Qloapps Data Cleaner 1.0.0**
+**QloApps Data Cleaner 1.0.0**
