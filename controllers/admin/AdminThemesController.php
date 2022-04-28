@@ -2098,6 +2098,7 @@ class AdminThemesControllerCore extends AdminController
             'blockcustomerprivacy',
             'blockfacebook',
             'blocklanguages',
+            'qloblockcontact',
             'blocklayered',
             'blocklink',
             'blockmanufacturer',

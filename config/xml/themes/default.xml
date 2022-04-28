@@ -52,6 +52,7 @@
         <module action="enable" name="blocksocial"/>
         <module action="enable" name="socialsharing"/>
         <module action="enable" name="blockmyaccount"/>
+        <module action="enable" name="qloblockcontact"/>
         <module action="enable" name="blocklanguages"/>
         <module action="enable" name="blockcurrencies"/>
         <module action="enable" name="productcomments"/>
@@ -149,9 +150,8 @@
             <hook module="wkfooterlangcurrencyblock" hook="displayFooter" position="3"/>
             <hook module="wkfooterpaymentinfoblockcontainer" hook="displayFooter" position="4"/>
             <hook module="wkfooteraboutblock" hook="displayFooterMostLeftBlock" position="3"/>
-            <hook module="wkfooteraboutblock" hook="displayFooterPaymentInfo" position="1"/>
             <hook module="wkfooterpaymentblock" hook="displayAddModuleSettingLink" position="6"/>
-            <hook module="wkfooterpaymentblock" hook="displayFooterPaymentInfo" position="2"/>
+            <hook module="wkfooterpaymentblock" hook="displayFooterPaymentInfo" position="1"/>
             <hook module="wkfooternotificationblock" hook="displayFooter" position="5"/>
             <hook module="blocknavigationmenu" hook="displayTop" position="2"/>
             <hook module="blocknavigationmenu" hook="displayFooter" position="6"/>
@@ -178,10 +178,6 @@
             <hook module="blockmyaccount" hook="Header" position="8"/>
             <hook module="blockmyaccount" hook="actionModuleRegisterHookAfter" position="1"/>
             <hook module="blockmyaccount" hook="actionModuleUnRegisterHookAfter" position="1"/>
-            <hook module="blocklanguages" hook="Header" position="9"/>
-            <hook module="blocklanguages" hook="displayFooterMostLeftBlock" position="1"/>
-            <hook module="blockcurrencies" hook="Header" position="10"/>
-            <hook module="blockcurrencies" hook="displayFooterMostLeftBlock" position="2"/>
             <hook module="productcomments" hook="Header" position="11"/>
             <hook module="productcomments" hook="displayRightColumnProduct" position="2"/>
             <hook module="productcomments" hook="displayProductTab" position="1"/>
@@ -216,6 +212,12 @@
             <hook module="blockuserinfo" hook="Header" position="13"/>
             <hook module="blockuserinfo" hook="displayTop" position="6"/>
             <hook module="blockuserinfo" hook="displayExternalNavigationHook" position="1"/>
+            <hook module="blockcurrencies" hook="displayNav" position="1"/>
+            <hook module="blockcurrencies" hook="displayExternalNavigationHook" position="2"/>
+            <hook module="blocklanguages" hook="displayNav" position="2"/>
+            <hook module="blocklanguages" hook="displayExternalNavigationHook" position="3"/>
+            <hook module="qloblockcontact" hook="displayNav" position="3"/>
+            <hook module="qloblockcontact" hook="displayExternalNavigationHook" position="4"/>
         </hooks>
     </modules>
     <images>
