@@ -178,19 +178,14 @@ $(document).ready(function()
 			data.sort_value = sort_value;
 		}
 
-		filter_ajax = $.ajax(
-		{
-            url: cat_link,
-            type: 'POST',
-            dataType: 'html',
-            data: data,
-            success: function (result)
-            {
-            	if (result) {
-            		$('#category_data_cont').html(result);
-            	} else {
-					var html = '<div class="noRoomsAvailAlert">'+noRoomAvailTxt+'</div>';
-					$('#category_data_cont').html(html);
+		filter_ajax = $.ajax({
+			url: cat_link,
+			type: 'POST',
+			dataType: 'JSON',
+			data: data,
+			success: function (response) {
+				if (response.status == 'ok') {
+					$('#category_data_cont').html(response.html_room_type_list);
 				}
             }
         });
