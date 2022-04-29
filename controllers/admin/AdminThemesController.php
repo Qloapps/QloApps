@@ -2111,7 +2111,7 @@ class AdminThemesControllerCore extends AdminController
             'mailalerts',
             'newsletter',
             'pagesnotfound',
-            'productcomments',
+            'qlohotelreview',
             'referralprogram',
             'sekeywords',
             'statsbestcategories',

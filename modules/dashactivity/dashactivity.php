@@ -126,7 +126,6 @@ class Dashactivity extends Module
                     'abandoned_cart' => round(rand(5, 50)),
                     'products_out_of_stock' => round(rand(1, 10)),
                     'new_messages' => round(rand(1, 10) * $days),
-                    'product_reviews' => round(rand(5, 50) * $days),
                     'new_customers' => round(rand(1, 5) * $days),
                     'online_visitor' => round($online_visitor),
                     'active_shopping_cart' => round($online_visitor / 10),
@@ -289,19 +288,6 @@ class Dashactivity extends Module
             );
         }
 
-        $product_reviews = 0;
-        if (Module::isInstalled('productcomments')) {
-            $product_reviews += Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
-				SELECT COUNT(*)
-				FROM `'._DB_PREFIX_.'product_comment` pc
-				LEFT JOIN `'._DB_PREFIX_.'product` p ON (pc.id_product = p.id_product)
-				'.Shop::addSqlAssociation('product', 'p').'
-				WHERE pc.deleted = 0
-				AND pc.`date_add` BETWEEN "'.pSQL($params['date_from']).'" AND "'.pSQL($params['date_to']).'"
-				'.Shop::addSqlRestriction(Shop::SHARE_ORDER)
-            );
-        }
-
         return array(
             'data_value' => array(
                 'pending_orders' => (int)$pending_orders,
@@ -309,7 +295,6 @@ class Dashactivity extends Module
                 'abandoned_cart' => (int)$abandoned_cart,
                 'products_out_of_stock' => (int)$products_out_of_stock,
                 'new_messages' => (int)$new_messages,
-                'product_reviews' => (int)$product_reviews,
                 'new_customers' => (int)$new_customers,
                 'online_visitor' => (int)$online_visitor,
                 'active_shopping_cart' => (int)$active_shopping_cart,
