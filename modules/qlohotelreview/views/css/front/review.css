@@ -1,0 +1,129 @@
+/**
+* 2010-2022 Webkul.
+*
+* NOTICE OF LICENSE
+*
+* All right is reserved,
+* Please go through LICENSE.txt file inside our module
+*
+* DISCLAIMER
+*
+* Do not edit or add to this file if you wish to upgrade this module to newer
+* versions in the future. If you wish to customize this module for your
+* needs please refer to CustomizationPolicy.txt file inside our module for more information.
+*
+* @author Webkul IN
+* @copyright 2010-2022 Webkul IN
+* @license LICENSE.txt
+*/
+
+.btn-review {
+    background-color: #1292FF;
+    border: 1px solid #1292FF;
+    color: #FFF;
+}
+
+.btn-review:hover {
+    border: 1px solid #1292FF;
+    background-color: #1292FF;
+    color: #FFF;
+    opacity: 0.8;
+}
+
+#add-review-popup {
+    width: 650px;
+    margin: 0 auto;
+    padding-right: 20px;
+    padding-bottom: 20px;
+}
+
+#add-review-popup .form-group {
+    margin-bottom: 20px;
+}
+
+#add-review-popup label {
+    font-size: 14px;
+    text-transform: uppercase;
+}
+
+#add-review-popup .form-control {
+    padding: 18px 10px;
+    font-size: 14px;
+    line-height: 18px;
+    border-radius: 4px;
+}
+
+#add-review-popup .hotel-name {
+    font-size: 18px;
+}
+
+#add-review-popup .form-control.description {
+    padding: 10px 10px;
+}
+
+#add-review-popup .review-error {
+    margin-top: 2px;
+    color: #E85757;
+}
+
+#add-review-popup .categories-wrap .form-group:first-of-type {
+    margin-bottom: 0px;
+}
+
+#add-review-popup .categories-wrap .label-category {
+    font-size: 12px;
+}
+
+#add-review-popup .review-actions-wrap .btn-review {
+    font-size: 14px;
+    padding: 12px 30px;
+    font-weight: 600;
+    text-transform: uppercase;
+    text-align: center;
+    margin-left: 10px;
+}
+
+#add-review-popup .image-input-btn {
+    width: 100px;
+    height: 100px;
+    border-radius: 4px;
+    border: 1px dashed #999;
+    display: table-cell;
+    vertical-align: middle;
+    cursor: pointer;
+}
+
+#add-review-popup .image-input-btn .img-camera-plus {
+    content: url('../../img/icons/camera-plus.png');
+    display: block;
+    margin: 0 auto;
+}
+
+#add-review-popup input.input-images {
+    display: none;
+}
+
+#add-review-popup .previews-wrap {
+    margin-bottom: 15px;
+}
+
+#add-review-popup .previews-wrap .img-preview {
+    max-height: 100px;
+    width: auto;
+    border-radius: 4px;
+    margin-right: 10px;
+    margin-bottom: 4px;
+}
+
+/* success popup */
+.fancybox-add-review-success {
+    top: 80px !important;
+}
+
+.add-review-success-popup {
+    width: 650px;
+}
+
+.add-review-success-popup i {
+    font-size: 40px;
+}

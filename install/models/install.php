@@ -656,7 +656,7 @@ class InstallModelInstall extends InstallAbstractModel
                 'blockmyaccount',
                 'blocklanguages',
                 'blockcurrencies',
-                'productcomments',
+                'qlohotelreview',
                 'wkfooterlangcurrencyblock',
                 'wkfooterpaymentinfoblockcontainer',
                 'wkfooteraboutblock',

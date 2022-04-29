@@ -2142,7 +2142,7 @@ class AdminThemesControllerCore extends AdminController
             'mailalerts',
             'newsletter',
             'pagesnotfound',
-            'productcomments',
+            'qlohotelreview',
             'productpaymentlogos',
             'productscategory',
             'producttooltip',
