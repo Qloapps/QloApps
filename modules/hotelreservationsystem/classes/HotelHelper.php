@@ -437,7 +437,7 @@ class HotelHelper
 
     public function saveDummyProductsAndRelatedInfo($id_hotel)
     {
-        $prod_arr = array('General Rooms', 'Delux Rooms', 'Executive Rooms', 'luxury Rooms');
+        $prod_arr = array('General Rooms', 'Delux Rooms', 'Executive Rooms', 'Luxury Rooms');
         $prod_price_arr = array(1000, 1500, 2000, 2500);
         foreach ($prod_arr as $key => $value_prod) {
             // Add Product
