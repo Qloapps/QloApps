@@ -111,10 +111,6 @@
 						<div class="color_indicate bg-red"></div>
 						<span class="indi_label">{l s='Unavailable Rooms'}</span>
 					</div>
-					<div class="col-sm-6 indi_cont clearfix">
-						<div class="color_indicate bg-gray"></div>
-						<span class="indi_label">{l s='Hold For Maintenance'}</span>
-					</div>
 				</div>
 			</div>
 		</div>
