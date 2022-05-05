@@ -989,7 +989,7 @@
 											<th class="text-center"><span class="title_box">{l s='Refund State'}</span></th>
 											<th class="text-center"><span class="title_box">{l s='Refunded amount'}</span></th>
 										{/if}
-										<th class="text-center"><span class="title_box">{l s='Reallocate Room'}</span></th>
+										<th class="text-center fixed-width-xxl"><span class="title_box">{l s='Reallocate Room'}</span></th>
 										{if ($can_edit && !$order->hasBeenDelivered())}
 										<th class="text-center"><span class="title_box">{l s='Edit Order'}</th>
 										{/if}

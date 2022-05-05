@@ -4475,7 +4475,7 @@ class CartCore extends ObjectModel
                                 $objCartBooking->id_product = $val_hotel_room_info['id_product'];
                                 $objCartBooking->id_room = $val_hotel_room_info['id_room'];
                                 $objCartBooking->id_hotel = $val_hotel_room_info['id_hotel'];
-                                $objCartBooking->booking_type = 1;
+                                $objCartBooking->booking_type = HotelBookingDetail::ALLOTMENT_AUTO;
                                 $objCartBooking->quantity = $numDays;
                                 $objCartBooking->extra_demands = $extraDemands;
                                 $objCartBooking->date_from = $dateFrom;
