@@ -87,7 +87,7 @@ class InstallControllerHttpSystem extends InstallControllerHttp
                     'title' => $this->l('Required PHP parameters'),
                     'success' => 1,
                     'checks' => array(
-                        'phpversion' => $this->l('Minimum PHP 5.6.0 or later is required'),
+                        'phpversion' => $this->l('The required PHP version is between 5.6 to 7.4'),
                         'upload' => $this->l('Cannot upload files'),
                         'system' => $this->l('Cannot create new files and folders'),
                         'gd' => $this->l('GD library is not installed'),

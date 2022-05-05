@@ -137,7 +137,7 @@
 			<div id="submitAddLangContent" class="form-group">
 				<p class="alert alert-info">
 					{l s='You can add or update a language directly from the QloApps website here.'}<br/>
-					{l s='If you choose to update an existing language pack, all of your previous customizations in the theme named "Default-bootstrap" will be lost. This includes front office expressions and default email templates.'}
+					{l s='If you choose to update an existing language pack, all of your previous customizations in the theme named "hotel-reservation-theme" will be lost. This includes front office expressions and default email templates.'}
 				</p>
 				{if $packs_to_update || $packs_to_install}
 					<label class="control-label col-lg-3" for="params_import_language">{l s='Please select the language you want to add or update'}</label>
