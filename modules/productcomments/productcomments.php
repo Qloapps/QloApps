@@ -24,13 +24,14 @@
 *  International Registered Trademark & Property of PrestaShop SA
 */
 
-if (!defined('_PS_VERSION_'))
+if (!defined('_PS_VERSION_')) {
 	exit;
+}
+
+include_once (dirname(__FILE__).'/classes/ProductCommentsDb.php');
 
 class ProductComments extends Module
 {
-	const INSTALL_SQL_FILE = 'install.sql';
-
 	private $_html = '';
 	private $_postErrors = array();
 	private $_filters = array();
@@ -57,24 +58,11 @@ class ProductComments extends Module
 		$this->description = $this->l('Allows users to post reviews and rate products on specific criteria.');
 	}
 
-	public function install($keep = true)
+	public function install()
 	{
-		if ($keep)
-		{
-			if (!file_exists(dirname(__FILE__).'/'.self::INSTALL_SQL_FILE))
-				return false;
-			else if (!$sql = file_get_contents(dirname(__FILE__).'/'.self::INSTALL_SQL_FILE))
-				return false;
-			$sql = str_replace(array('PREFIX_', 'ENGINE_TYPE'), array(_DB_PREFIX_, _MYSQL_ENGINE_), $sql);
-			$sql = preg_split("/;\s*[\r\n]+/", trim($sql));
-
-			foreach ($sql as $query)
-				if (!Db::getInstance()->execute(trim($query)))
-					return false;
-
-		}
-
+		$objProductCommentsDb = new ProductCommentsDb();
 		if (parent::install() == false ||
+			!$objProductCommentsDb->createTables() ||
 			!$this->registerHook('productTab') ||
 			!$this->registerHook('extraProductComparison') ||
 			!$this->registerHook('productTabContent') ||
@@ -83,14 +71,17 @@ class ProductComments extends Module
 			!$this->registerHook('displayProductListReviews') ||
 			!Configuration::updateValue('PRODUCT_COMMENTS_MINIMAL_TIME', 30) ||
 			!Configuration::updateValue('PRODUCT_COMMENTS_ALLOW_GUESTS', 0) ||
-			!Configuration::updateValue('PRODUCT_COMMENTS_MODERATE', 1))
+			!Configuration::updateValue('PRODUCT_COMMENTS_MODERATE', 1)
+		) {
 			return false;
+		}
 		return true;
 	}
 
-	public function uninstall($keep = true)
+	public function uninstall($delete_data = true)
 	{
-		if (!parent::uninstall() || ($keep && !$this->deleteTables()) ||
+		$objProductCommentsDb = new ProductCommentsDb();
+		if (!parent::uninstall() || ($delete_data && !$objProductCommentsDb->dropTables()) ||
 			!Configuration::deleteByName('PRODUCT_COMMENTS_MODERATE') ||
 			!Configuration::deleteByName('PRODUCT_COMMENTS_ALLOW_GUESTS') ||
 			!Configuration::deleteByName('PRODUCT_COMMENTS_MINIMAL_TIME') ||
@@ -100,32 +91,22 @@ class ProductComments extends Module
 			!$this->unregisterHook('header') ||
 			!$this->unregisterHook('productTab') ||
 			!$this->unregisterHook('top') ||
-			!$this->unregisterHook('displayProductListReviews'))
+			!$this->unregisterHook('displayProductListReviews')
+		) {
 			return false;
+		}
 		return true;
 	}
 
 	public function reset()
 	{
-		if (!$this->uninstall(false))
+		if (!$this->uninstall(false)) {
 			return false;
-		if (!$this->install(false))
+		}
+		if (!$this->install()) {
 			return false;
+		}
 		return true;
-	}
-
-	public function deleteTables()
-	{
-		return Db::getInstance()->execute('
-			DROP TABLE IF EXISTS
-			`'._DB_PREFIX_.'product_comment`,
-			`'._DB_PREFIX_.'product_comment_criterion`,
-			`'._DB_PREFIX_.'product_comment_criterion_product`,
-			`'._DB_PREFIX_.'product_comment_criterion_lang`,
-			`'._DB_PREFIX_.'product_comment_criterion_category`,
-			`'._DB_PREFIX_.'product_comment_grade`,
-			`'._DB_PREFIX_.'product_comment_usefulness`,
-			`'._DB_PREFIX_.'product_comment_report`');
 	}
 
 	public function getCacheId($id_product = null)
@@ -495,7 +476,6 @@ class ProductComments extends Module
 
 		return $helper->generateList($comments, $fields_list);
 	}
-
 
 	public function getConfigFieldsValues()
 	{

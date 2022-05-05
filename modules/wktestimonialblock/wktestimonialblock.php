@@ -22,12 +22,12 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
+require_once dirname(__FILE__).'/../wktestimonialblock/classes/WkTestimonialBlockDb.php';
 require_once dirname(__FILE__).'/../wktestimonialblock/classes/WkHotelTestimonialData.php';
 require_once _PS_MODULE_DIR_.'hotelreservationsystem/define.php';
 
 class WkTestimonialBlock extends Module
 {
-    const INSTALL_SQL_FILE = 'install.sql';
     public function __construct()
     {
         $this->name = 'wktestimonialblock';
@@ -113,23 +113,10 @@ class WkTestimonialBlock extends Module
 
     public function install()
     {
-        if (!file_exists(dirname(__FILE__).'/'.self::INSTALL_SQL_FILE)) {
-            return false;
-        } elseif (!$sql = Tools::file_get_contents(dirname(__FILE__).'/'.self::INSTALL_SQL_FILE)) {
-            return false;
-        }
-        $sql = str_replace(array('PREFIX_',  'ENGINE_TYPE'), array(_DB_PREFIX_, _MYSQL_ENGINE_), $sql);
-        $sql = preg_split("/;\s*[\r\n]+/", $sql);
-
-        foreach ($sql as $query) {
-            if ($query) {
-                if (!Db::getInstance()->execute(trim($query))) {
-                    return false;
-                }
-            }
-        }
+        $objTestimonialBlockDb = new WkTestimonialBlockDb();
         $objTestimonialData = new WkHotelTestimonialData();
         if (!parent::install()
+            || !$objTestimonialBlockDb->createTables()
             || !$this->registerModuleHooks()
             || !$this->callInstallTab()
             || !$objTestimonialData->insertModuleDemoData()
@@ -192,15 +179,6 @@ class WkTestimonialBlock extends Module
         return true;
     }
 
-    public function deleteTables()
-    {
-        return Db::getInstance()->execute(
-            'DROP TABLE IF EXISTS
-            `'._DB_PREFIX_.'htl_testimonials_block_data`,
-            `'._DB_PREFIX_.'htl_testimonials_block_data_lang`'
-        );
-    }
-
     public function uninstallTab()
     {
         $moduleTabs = Tab::getCollectionFromModule($this->name);
@@ -215,9 +193,10 @@ class WkTestimonialBlock extends Module
 
     public function uninstall()
     {
+        $objTestimonialBlockDb = new WkTestimonialBlockDb();
         if (!parent::uninstall()
             || !$this->deleteTestimonialUserImage()
-            || !$this->deleteTables()
+            || !$objTestimonialBlockDb->dropTables()
             || !$this->uninstallTab()
             || !$this->deleteConfigKeys()
         ) {

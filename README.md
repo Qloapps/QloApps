@@ -16,18 +16,19 @@
 </p>
 
 ## Topics
-- [Introduction](#introduction)
-- [Requirements](#requirements)
-	- [Hosted Server Configurations](#hosted-server-configurations)
-	- [Local Server Configurations](#local-server-configurations)
-- [Installation and Configuration](#installation-and-configuration)
-- [License](#license)
-- [Security Vulnerabilities](#security-vulnerabilities)
-- [Documentation & Demo](#documentation--demo)
-	- [QloApps Documentation https://qloapps.com/qlo-reservation-system](#qloapps-documentation-httpsqloappscomqlo-reservation-system)
-	- [QloApps Demo](#qloapps-demo)
-- [Contribute](#contribute)
-- [Credits](#credits)
+- [Topics](#topics)
+	- [Introduction](#introduction)
+	- [Requirements](#requirements)
+		- [Hosted Server Configurations](#hosted-server-configurations)
+		- [Local Server Configurations](#local-server-configurations)
+	- [Installation and Configuration](#installation-and-configuration)
+	- [License](#license)
+	- [Security Vulnerabilities](#security-vulnerabilities)
+	- [Documentation & Demo](#documentation--demo)
+		- [QloApps Documentation https://qloapps.com/qlo-reservation-system](#qloapps-documentation-httpsqloappscomqlo-reservation-system)
+		- [QloApps Demo](#qloapps-demo)
+	- [Contribute](#contribute)
+	- [Credits](#credits)
 
 
 ### Introduction
@@ -85,8 +86,7 @@ Please don't disclose security vulnerabilities publicly. If you find any securit
 
 #### QloApps Documentation [https://qloapps.com/qlo-reservation-system](https://qloapps.com/qlo-reservation-system)
 #### QloApps Demo
-**FrontEnd** : https://demo.qloapps.com </br>
-**Backend** : https://demo.qloapps.com/adminhtl/index.php </br>
+**Link** : https://demo.qloapps.com </br>
 **username** : demo@demo.com </br>
 **Password** : demodemo </br>
 
