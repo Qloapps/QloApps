@@ -787,9 +787,6 @@
 												<hr />{$addresses.delivery->other}<br />
 											{/if}
 										</div>
-										<div class="col-sm-6 hidden-print">
-											<div id="map-delivery-canvas" style="height: 190px"></div>
-										</div>
 									</div>
 								</div>
 							{/if}
@@ -836,9 +833,6 @@
 										{if $addresses.invoice->other}
 											<hr />{$addresses.invoice->other}<br />
 										{/if}
-									</div>
-									<div class="col-sm-6 hidden-print">
-										<div id="map-invoice-canvas" style="height: 190px"></div>
 									</div>
 								</div>
 							</div>
@@ -1418,9 +1412,6 @@
 
 {* Apply javascript for the page *}
 <script>
-	var geocoder = new google.maps.Geocoder();
-	var delivery_map, invoice_map;
-
 	$(document).ready(function() {
 		{* check id reason is inserted before submitting the refund *}
 		$('#initiateRefund').on('click', function(e) {
@@ -1681,48 +1672,6 @@
 
 		$(".textarea-autosize").autosize();
 
-		geocoder.geocode({
-			address: '{$addresses.delivery->address1|@addcslashes:'\''},{$addresses.delivery->postcode|@addcslashes:'\''},{$addresses.delivery->city|@addcslashes:'\''}{if isset($addresses.deliveryState->name) && $addresses.delivery->id_state},{$addresses.deliveryState->name|@addcslashes:'\''}{/if},{$addresses.delivery->country|@addcslashes:'\''}'
-			}, function(results, status) {
-			if (status === google.maps.GeocoderStatus.OK)
-			{
-				delivery_map = new google.maps.Map(document.getElementById('map-delivery-canvas'), {
-					zoom: 10,
-					mapTypeId: google.maps.MapTypeId.ROADMAP,
-					center: results[0].geometry.location
-				});
-				var delivery_marker = new google.maps.Marker({
-					map: delivery_map,
-					position: results[0].geometry.location,
-					url: 'http://maps.google.com?q={$addresses.delivery->address1|urlencode},{$addresses.delivery->postcode|urlencode},{$addresses.delivery->city|urlencode}{if isset($addresses.deliveryState->name) && $addresses.delivery->id_state},{$addresses.deliveryState->name|urlencode}{/if},{$addresses.delivery->country|urlencode}'
-				});
-				google.maps.event.addListener(delivery_marker, 'click', function() {
-					window.open(delivery_marker.url);
-				});
-			}
-		});
-
-		geocoder.geocode({
-			address: '{$addresses.invoice->address1|@addcslashes:'\''},{$addresses.invoice->postcode|@addcslashes:'\''},{$addresses.invoice->city|@addcslashes:'\''}{if isset($addresses.deliveryState->name) && $addresses.invoice->id_state},{$addresses.deliveryState->name|@addcslashes:'\''}{/if},{$addresses.invoice->country|@addcslashes:'\''}'
-			}, function(results, status) {
-			if (status === google.maps.GeocoderStatus.OK)
-			{
-				invoice_map = new google.maps.Map(document.getElementById('map-invoice-canvas'), {
-					zoom: 10,
-					mapTypeId: google.maps.MapTypeId.ROADMAP,
-					center: results[0].geometry.location
-				});
-				invoice_marker = new google.maps.Marker({
-					map: invoice_map,
-					position: results[0].geometry.location,
-					url: 'http://maps.google.com?q={$addresses.invoice->address1|urlencode},{$addresses.invoice->postcode|urlencode},{$addresses.invoice->city|urlencode}{if isset($addresses.deliveryState->name) && $addresses.invoice->id_state},{$addresses.deliveryState->name|urlencode}{/if},{$addresses.invoice->country|urlencode}'
-				});
-				google.maps.event.addListener(invoice_marker, 'click', function() {
-					window.open(invoice_marker.url);
-				});
-			}
-		});
-
 		var date = new Date();
 		var hours = date.getHours();
 		if (hours < 10)
@@ -1739,21 +1688,6 @@
 			nextText: '',
 			dateFormat: 'yy-mm-dd ' + hours + ':' + mins + ':' + secs
 		});
-	});
-
-	// Fix wrong maps center when map is hidden
-	$('#tabAddresses').click(function(){
-		x = delivery_map.getZoom();
-		c = delivery_map.getCenter();
-		google.maps.event.trigger(delivery_map, 'resize');
-		delivery_map.setZoom(x);
-		delivery_map.setCenter(c);
-
-		x = invoice_map.getZoom();
-		c = invoice_map.getCenter();
-		google.maps.event.trigger(invoice_map, 'resize');
-		invoice_map.setZoom(x);
-		invoice_map.setCenter(c);
 	});
 </script>
 
