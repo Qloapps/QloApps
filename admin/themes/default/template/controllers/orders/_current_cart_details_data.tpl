@@ -64,14 +64,7 @@
 								{else}
 									{assign var=shown_room_type_price value=$data.product_price_tax_excl}
 								{/if}
-								<input type="text"
-									class="room_unit_price"
-									data-id-booking-data="{$data.id}"
-									data-id-product="{$data.id_product}"
-									data-id-room="{$data.id_room}"
-									data-date-from="{$data.date_from}"
-									data-date-to="{$data.date_to}"
-									value="{$shown_room_type_price|escape:'html':'UTF-8'}">
+								<input type="text" class="room_unit_price" data-id-booking-data="{$data.id}" data-id-product="{$data.id_product}" data-id-room="{$data.id_room}" data-date-from="{$data.date_from}" data-date-to="{$data.date_to}" value="{$shown_room_type_price|escape:'html':'UTF-8'}">
 							</td>
 							<td>
 								{if isset($data.extra_demands) && $data.extra_demands}
