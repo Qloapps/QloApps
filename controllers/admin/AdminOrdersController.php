@@ -60,18 +60,13 @@ class AdminOrdersControllerCore extends AdminController
         (a.total_paid - a.total_paid_real) AS `amount_due`, a.source AS order_source,
         a.id_currency,
         a.id_order AS id_pdf,
-        CONCAT(LEFT(c.`firstname`, 1), \'. \', c.`lastname`) AS `customer`,
-        osl.`name` AS `osname`,
-        os.`color`,
+        CONCAT(c.`firstname`, \' \', c.`lastname`) AS `customer`,
+        osl.`name` AS `osname`, os.`color`,
         IF((SELECT so.id_order FROM `'._DB_PREFIX_.'orders` so WHERE so.id_customer = a.id_customer AND so.id_order < a.id_order LIMIT 1) > 0, 0, 1) as new,
-        country_lang.name as cname,
         IF(a.valid, 1, 0) badge_success';
 
         $this->_join = '
         LEFT JOIN `'._DB_PREFIX_.'customer` c ON (c.`id_customer` = a.`id_customer`)
-        INNER JOIN `'._DB_PREFIX_.'address` address ON address.id_address = a.id_address_delivery
-        INNER JOIN `'._DB_PREFIX_.'country` country ON address.id_country = country.id_country
-        INNER JOIN `'._DB_PREFIX_.'country_lang` country_lang ON (country.`id_country` = country_lang.`id_country` AND country_lang.`id_lang` = '.(int) $this->context->language->id.')
         LEFT JOIN `'._DB_PREFIX_.'order_state` os ON (os.`id_order_state` = a.`current_state`)
         LEFT JOIN `'._DB_PREFIX_.'order_state_lang` osl ON (os.`id_order_state` = osl.`id_order_state` AND osl.`id_lang` = '.(int) $this->context->language->id.')';
         $this->_orderBy = 'id_order';
@@ -164,35 +159,7 @@ class AdminOrdersControllerCore extends AdminController
                 'remove_onclick' => true
             )
         ));
-
-        if (Country::isCurrentlyUsed('country', true)) {
-            $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->ExecuteS('
-			SELECT DISTINCT c.id_country, cl.`name`
-			FROM `'._DB_PREFIX_.'orders` o
-			'.Shop::addSqlAssociation('orders', 'o').'
-			INNER JOIN `'._DB_PREFIX_.'address` a ON a.id_address = o.id_address_delivery
-			INNER JOIN `'._DB_PREFIX_.'country` c ON a.id_country = c.id_country
-			INNER JOIN `'._DB_PREFIX_.'country_lang` cl ON (c.`id_country` = cl.`id_country` AND cl.`id_lang` = '.(int)$this->context->language->id.')
-			ORDER BY cl.name ASC');
-
-            $country_array = array();
-            foreach ($result as $row) {
-                $country_array[$row['id_country']] = $row['name'];
-            }
-
-            $part1 = array_slice($this->fields_list, 0, 3);
-            $part2 = array_slice($this->fields_list, 3);
-            $part1['cname'] = array(
-                'title' => $this->l('Delivery'),
-                'type' => 'select',
-                'list' => $country_array,
-                'filter_key' => 'country!id_country',
-                'filter_type' => 'int',
-                'order_key' => 'cname'
-            );
-            $this->fields_list = array_merge($part1, $part2);
-        }
-
+        
         $this->shopLinkType = 'shop';
         $this->shopShareDatas = Shop::SHARE_ORDER;
 
