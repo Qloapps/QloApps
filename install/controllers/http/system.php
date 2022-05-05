@@ -133,7 +133,7 @@ class InstallControllerHttpSystem extends InstallControllerHttp
                     'title' => $this->l('Recommended PHP parameters'),
                     'success' => $this->tests['optional']['success'],
                     'checks' => array(
-                        'new_phpversion' => sprintf($this->l('You are using PHP %s version. Soon, the latest PHP version supported by Qloapps will be PHP 5.4. To make sure you’re ready for the future, we recommend you to upgrade to PHP 5.4 now!'), phpversion()),
+                        'new_phpversion' => sprintf($this->l('You are using PHP %s version. Soon, the latest PHP version supported by QloApps will be PHP 5.4. To make sure you’re ready for the future, we recommend you to upgrade to PHP 5.4 now!'), phpversion()),
                         'register_globals' => $this->l('PHP register_globals option is enabled'),
                         'gz' => $this->l('GZIP compression is not activated'),
                         'mcrypt' => $this->l('Mcrypt extension is not enabled'),

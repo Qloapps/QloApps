@@ -47,8 +47,8 @@
 			<button data-dismiss="alert" class="close" type="button">×</button>
 			<h4>{l s='Disclaimer before creating a new backup'}</h4>
 			<ol>
-				<li>{l s='Qloapps is not responsible for your database, its backups and/or recovery.'}</li>
-				<li>{l s='Qloapps is open-source software. You are using it at your own risk under the license agreement.'}</li>
+				<li>{l s='QloApps is not responsible for your database, its backups and/or recovery.'}</li>
+				<li>{l s='QloApps is open-source software. You are using it at your own risk under the license agreement.'}</li>
 				<li>{l s='You should back up your data on a regular basis (both files and database).'}</li>
 				<li>{l s='This function only backs up your database, not your files.'}</li>
 				<li>{l s='By default, your existing database tables will be dropped during the backup recovery (see "Backup options" below).'}</li>

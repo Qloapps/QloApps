@@ -61,7 +61,7 @@ $(document).ready(function()
 });
 
 function psinstall_twitter_click(message) {
-	window.open('https://twitter.com/intent/tweet?button_hashtag=Qloapps&text=' + message, 'sharertwt', 'toolbar=0,status=0,width=640,height=445');
+	window.open('https://twitter.com/intent/tweet?button_hashtag=QloApps&text=' + message, 'sharertwt', 'toolbar=0,status=0,width=640,height=445');
 }
 
 function psinstall_facebook_click() {
@@ -77,5 +77,5 @@ function psinstall_pinterest_click() {
 }
 
 function psinstall_linkedin_click() {
-	window.open('https://www.linkedin.com/shareArticle?title=Qloapps&url=www.qloapps.com/download/', 'sharerlinkedin', 'toolbar=0,status=0,width=600,height=450');
+	window.open('https://www.linkedin.com/shareArticle?title=QloApps&url=www.qloapps.com/download/', 'sharerlinkedin', 'toolbar=0,status=0,width=600,height=450');
 }

@@ -1395,7 +1395,7 @@ class HotelBookingDetail extends ObjectModel
     }
 
     /**
-     * [createQloAppsBookingByChannels create booking on Qloapps commig from different channels]
+     * [createQloAppsBookingByChannels create booking on QloApps commig from different channels]
      * @param  [array] $params [array containing details of orders]
      * @return [boolean] [true if order is created or returns false]
      */
@@ -1437,7 +1437,7 @@ class HotelBookingDetail extends ObjectModel
     }
 
     /**
-     * [createQloCustomerChannelCustomerInfo create customer in Qloapps from supplied information from channel manager]
+     * [createQloCustomerChannelCustomerInfo create customer in QloApps from supplied information from channel manager]
      * @param  [array] $params [array containg customer information]
      * @return [int|false]     [return customer Id if customer created successfully else returns false]
      */
@@ -1469,7 +1469,7 @@ class HotelBookingDetail extends ObjectModel
     }
 
     /**
-     * [createQloCustomerAddressByChannelCustomerInfo create customer's Address in Qloapps from supplied information from channel manager]
+     * [createQloCustomerAddressByChannelCustomerInfo create customer's Address in QloApps from supplied information from channel manager]
      * @param  [array] $params [array containg customer information]
      * @return [int|false]     [return customer address Id if address created successfully else returns false]
      */
@@ -1498,7 +1498,7 @@ class HotelBookingDetail extends ObjectModel
     }
 
     /**
-     * [createQloCartForBookingFromChannel create cart in Qloapps from supplied cart information from channel manager]
+     * [createQloCartForBookingFromChannel create cart in QloApps from supplied cart information from channel manager]
      * @param  [array] $params [array containg channel cart information]
      * @return [int|false]     [return cart Id if cart created successfully else returns false]
      */
