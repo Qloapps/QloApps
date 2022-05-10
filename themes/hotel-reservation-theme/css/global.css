@@ -599,7 +599,6 @@ pre {
 .col-sm-2,
 .col-sm-3,
 .col-sm-4,
-header .row #header_logo,
 .col-sm-5,
 .col-sm-6,
 .col-sm-7,
@@ -694,7 +693,6 @@ header .row #header_logo,
   .col-sm-2,
   .col-sm-3,
   .col-sm-4,
-  header .row #header_logo,
   .col-sm-5,
   .col-sm-6,
   .col-sm-7,
@@ -713,7 +711,7 @@ header .row #header_logo,
   .col-sm-3 {
     width: 25%; }
 
-  .col-sm-4, header .row #header_logo {
+  .col-sm-4 {
   width: 33.333%; }
 
   .col-sm-5 {
@@ -5806,22 +5804,29 @@ header {
     position: relative; }
     header .row > .container {
       position: relative; }
+    header .header-top > div > div > div {
+      display: flex;
+      align-items: center;
+      justify-content: space-between; }
     header .row #header_logo {
-      padding-top: 20px; }
-      @media (max-width: 992px) {
-        header .row #header_logo {
-          padding-top: 25px; } }
-      @media (max-width: 767px) {
-        header .row #header_logo {
-          padding-top: 15px; }
-          header .row #header_logo img {
-            margin: 0 auto; } }
-  @media (min-width: 767px) {
-    header .col-sm-4 + .col-sm-4 + .col-sm-4, header .row #header_logo + .col-sm-4 + .col-sm-4, header .row .col-sm-4 + #header_logo + .col-sm-4, header .row #header_logo + #header_logo + .col-sm-4, header .row .col-sm-4 + .col-sm-4 + #header_logo, header .row #header_logo + .col-sm-4 + #header_logo, header .row .col-sm-4 + #header_logo + #header_logo, header .row #header_logo + #header_logo + #header_logo {
-      float: right; } }
-
-.ie8 #header #header_logo {
-  width: 350px; }
+      padding: 10px 0; }
+    header .row #header_logo img {
+      max-width: 120px;
+      max-height: 120px; }
+    header .header-top > div > div > div .header-top-menu {
+      display: flex;
+      flex-direction: row-reverse;
+      align-items: center;
+      justify-content: end; }
+    header .header-top > div > div > div .header-top-item {
+      position: relative;
+      margin-left: 30px; }
+    header .header-top-item .header-top-link {
+      padding: 6px 12px;
+      font-size: 17px;
+      color: #fff; }
+    header .header-top-item .header-top-link:hover {
+      border-bottom: 1px solid #fff; }
 
 #center_column .page_product_box h3 {
   color: #555454;
@@ -8715,20 +8720,6 @@ div.star.star_hover:after {
 .padding-top-5 {
   padding-top: 5px;
 }
-
-.nav_menu_padding {
-  padding-top: 25px;
-  padding-right: 15px;
-  padding-left: 10px; }
-  @media (max-width: 767px) {
-    .nav_menu_padding {
-      padding-top: 15px; }
-  }
-  @media (max-width: 450px) {
-    .nav_menu_padding {
-      padding-left: 0px; }
-  }
-
 
 .error_msg {
   color: #FF4B4B;
