@@ -597,21 +597,13 @@ class AdminCustomersControllerCore extends AdminController
             'title' => $this->l('Save'),
         );
 
-        if (Tools::isSubmit('submitAddcustomer')) {
-            $this->fields_value = array(
-                'years' => Tools::getValue('years'),
-                'months' => Tools::getValue('months'),
-                'days' => Tools::getValue('days'),
-            );
-        } else {
-            $birthday = explode('-', $this->getFieldValue($obj, 'birthday'));
-            
-            $this->fields_value = array(
-                'years' => $this->getFieldValue($obj, 'birthday') ? $birthday[0] : 0,
-                'months' => $this->getFieldValue($obj, 'birthday') ? $birthday[1] : 0,
-                'days' => $this->getFieldValue($obj, 'birthday') ? $birthday[2] : 0,
-            );
-        }
+        $birthday = explode('-', $this->getFieldValue($obj, 'birthday'));
+        
+        $this->fields_value = array(
+            'years' => Tools::getValue('years', $this->getFieldValue($obj, 'birthday') ? $birthday[0] : 0),
+            'months' => Tools::getValue('months', $this->getFieldValue($obj, 'birthday') ? $birthday[1] : 0),
+            'days' => Tools::getValue('days', $this->getFieldValue($obj, 'birthday') ? $birthday[2] : 0),
+        );
 
 
         // Added values of object Group
@@ -974,13 +966,7 @@ class AdminCustomersControllerCore extends AdminController
         $months = Tools::getValue('months');
         $years = Tools::getValue('years');
         
-        if (!$days
-            && !$months
-            && !$years
-        ) {
-            $customer = new Customer();
-            $this->errors = array_merge($this->errors, $customer->validateFieldsRequiredDatabase());
-        } else {
+        if ($days || $months || $years) {
             if (!$days) {
                 $this->errors[] = Tools::displayError("Please select a valid date of birthday");
             }
@@ -991,6 +977,9 @@ class AdminCustomersControllerCore extends AdminController
                 $this->errors[] = Tools::displayError("Please select a valid month of birthday");
             }
         }
+        
+        $customer = new Customer();
+        $this->errors = array_merge($this->errors, $customer->validateFieldsRequiredDatabase());
         
         return parent::processSave();
     }
