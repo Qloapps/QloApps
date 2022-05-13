@@ -373,7 +373,7 @@ class HotelHelper
         }
 
         $obj_hotel_info->rating = 3;
-        $obj_hotel_info->city = 'DefCity';
+        $obj_hotel_info->city = 'Demo City';
         if ($states = State::getStatesByIdCountry($def_cont_id)) {
             $state_id = $states[0]['id_state'];
         } else {
@@ -407,10 +407,10 @@ class HotelHelper
         }
         if (count($states) > 0) {
             if ($cat_state) {
-                $cat_city = $this->addCategory('DefCity', $cat_state, $grp_ids);
+                $cat_city = $this->addCategory('Demo City', $cat_state, $grp_ids);
             }
         } else {
-            $cat_city = $this->addCategory('DefCity', $cat_country, $grp_ids);
+            $cat_city = $this->addCategory('Demo City', $cat_country, $grp_ids);
         }
         if ($cat_city) {
             $cat_hotel = $this->addCategory('The Hotel Prime', $cat_city, $grp_ids, 1, $htl_id);
