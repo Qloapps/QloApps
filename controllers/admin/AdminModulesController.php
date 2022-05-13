@@ -1301,7 +1301,8 @@ class AdminModulesControllerCore extends AdminController
         $time = time();
         $kpis = array();
 
-        /* The data generation is located in AdminStatsControllerCore */
+        $statsController = new AdminStatsController();
+        $this->context->controller = $this;
 
         $helper = new HelperKpi();
         $helper->id = 'box-installed-modules';
@@ -1310,6 +1311,8 @@ class AdminModulesControllerCore extends AdminController
         $helper->title = $this->l('Installed Modules', null, null, false);
         if (ConfigurationKPI::get('INSTALLED_MODULES') !== false && ConfigurationKPI::get('INSTALLED_MODULES') != '') {
             $helper->value = ConfigurationKPI::get('INSTALLED_MODULES');
+        } else {
+            $helper->value = $statsController->getLatestKpiValue('installed_modules');
         }
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=installed_modules';
         $helper->refresh = (bool)(ConfigurationKPI::get('INSTALLED_MODULES_EXPIRE') < $time);
@@ -1322,6 +1325,8 @@ class AdminModulesControllerCore extends AdminController
         $helper->title = $this->l('Disabled Modules', null, null, false);
         if (ConfigurationKPI::get('DISABLED_MODULES') !== false && ConfigurationKPI::get('DISABLED_MODULES') != '') {
             $helper->value = ConfigurationKPI::get('DISABLED_MODULES');
+        } else {
+            $helper->value = $statsController->getLatestKpiValue('disabled_modules');
         }
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=disabled_modules';
         $helper->refresh = (bool)(ConfigurationKPI::get('DISABLED_MODULES_EXPIRE') < $time);
@@ -1334,6 +1339,8 @@ class AdminModulesControllerCore extends AdminController
         $helper->title = $this->l('Modules to update', null, null, false);
         if (ConfigurationKPI::get('UPDATE_MODULES') !== false && ConfigurationKPI::get('UPDATE_MODULES') != '') {
             $helper->value = ConfigurationKPI::get('UPDATE_MODULES');
+        } else {
+            $helper->value = $statsController->getLatestKpiValue('update_modules');
         }
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=update_modules';
         $helper->refresh = (bool)(ConfigurationKPI::get('UPDATE_MODULES_EXPIRE') < $time);

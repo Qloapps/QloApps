@@ -642,7 +642,8 @@ class AdminCustomersControllerCore extends AdminController
         $time = time();
         $kpis = array();
 
-        /* The data generation is located in AdminStatsControllerCore */
+        $statsController = new AdminStatsController();
+        $this->context->controller = $this;
 
         $helper = new HelperKpi();
         $helper->id = 'box-gender';
@@ -652,6 +653,8 @@ class AdminCustomersControllerCore extends AdminController
         $helper->subtitle = $this->l('All Time', null, null, false);
         if (ConfigurationKPI::get('CUSTOMER_MAIN_GENDER', $this->context->language->id) !== false) {
             $helper->value = ConfigurationKPI::get('CUSTOMER_MAIN_GENDER', $this->context->language->id);
+        } else {
+            $helper->value = $statsController->getLatestKpiValue('customer_main_gender');
         }
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=customer_main_gender';
         $helper->refresh = (bool)(ConfigurationKPI::get('CUSTOMER_MAIN_GENDER_EXPIRE', $this->context->language->id) < $time);
@@ -665,6 +668,8 @@ class AdminCustomersControllerCore extends AdminController
         $helper->subtitle = $this->l('All Time', null, null, false);
         if (ConfigurationKPI::get('AVG_CUSTOMER_AGE', $this->context->language->id) !== false) {
             $helper->value = ConfigurationKPI::get('AVG_CUSTOMER_AGE', $this->context->language->id);
+        } else {
+            $helper->value = $statsController->getLatestKpiValue('avg_customer_age');
         }
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=avg_customer_age';
         $helper->refresh = (bool)(ConfigurationKPI::get('AVG_CUSTOMER_AGE_EXPIRE', $this->context->language->id) < $time);
@@ -678,6 +683,8 @@ class AdminCustomersControllerCore extends AdminController
         $helper->subtitle = $this->l('All Time', null, null, false);
         if (ConfigurationKPI::get('ORDERS_PER_CUSTOMER') !== false) {
             $helper->value = ConfigurationKPI::get('ORDERS_PER_CUSTOMER');
+        } else {
+            $helper->value = $statsController->getLatestKpiValue('orders_per_customer');
         }
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=orders_per_customer';
         $helper->refresh = (bool)(ConfigurationKPI::get('ORDERS_PER_CUSTOMER_EXPIRE') < $time);
@@ -691,6 +698,8 @@ class AdminCustomersControllerCore extends AdminController
         $helper->subtitle = $this->l('All Time', null, null, false);
         if (ConfigurationKPI::get('NEWSLETTER_REGISTRATIONS') !== false) {
             $helper->value = ConfigurationKPI::get('NEWSLETTER_REGISTRATIONS');
+        } else {
+            $helper->value = $statsController->getLatestKpiValue('newsletter_registrations');
         }
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=newsletter_registrations';
         $helper->refresh = (bool)(ConfigurationKPI::get('NEWSLETTER_REGISTRATIONS_EXPIRE') < $time);

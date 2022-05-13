@@ -516,8 +516,22 @@ class AdminStatsControllerCore extends AdminStatsTabController
 
     public function displayAjaxGetKpi()
     {
+        $value = $this->getLatestKpiValue(Tools::getValue('kpi'));
+        if ($value !== false) {
+            $array = array('value' => $value);
+            if (isset($data)) {
+                $array['data'] = $data;
+            }
+            die(json_encode($array));
+        }
+        die(json_encode(array('has_errors' => true)));
+    }
+
+    public function getLatestKpiValue($kpi)
+    {
         $currency = new Currency(Configuration::get('PS_CURRENCY_DEFAULT'));
-        switch (Tools::getValue('kpi')) {
+        $value = false;
+        switch ($kpi) {
             case 'conversion_rate':
                 $visitors = AdminStatsController::getVisits(true, date('Y-m-d', strtotime('-31 day')), date('Y-m-d', strtotime('-1 day')), false /*'day'*/);
                 $orders = AdminStatsController::getOrders(date('Y-m-d', strtotime('-31 day')), date('Y-m-d', strtotime('-1 day')), false /*'day'*/);
@@ -657,16 +671,16 @@ class AdminStatsControllerCore extends AdminStatsTabController
 
             case 'newsletter_registrations':
                 $value = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
-				SELECT COUNT(*)
-				FROM `'._DB_PREFIX_.'customer`
-				WHERE newsletter = 1
-				'.Shop::addSqlRestriction(Shop::SHARE_ORDER));
+                SELECT COUNT(*)
+                FROM `'._DB_PREFIX_.'customer`
+                WHERE newsletter = 1
+                '.Shop::addSqlRestriction(Shop::SHARE_ORDER));
                 if (Module::isInstalled('blocknewsletter')) {
                     $value += Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
-					SELECT COUNT(*)
-					FROM `'._DB_PREFIX_.'newsletter`
-					WHERE active = 1
-					'.Shop::addSqlRestriction(Shop::SHARE_ORDER));
+                    SELECT COUNT(*)
+                    FROM `'._DB_PREFIX_.'newsletter`
+                    WHERE active = 1
+                    '.Shop::addSqlRestriction(Shop::SHARE_ORDER));
                 }
 
                 ConfigurationKPI::updateValue('NEWSLETTER_REGISTRATIONS', $value);
@@ -714,16 +728,16 @@ class AdminStatsControllerCore extends AdminStatsTabController
 
             case 'orders_per_customer':
                 $value = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
-				SELECT COUNT(*)
-				FROM `'._DB_PREFIX_.'customer` c
-				WHERE c.active = 1
-				'.Shop::addSqlRestriction());
+                SELECT COUNT(*)
+                FROM `'._DB_PREFIX_.'customer` c
+                WHERE c.active = 1
+                '.Shop::addSqlRestriction());
                 if ($value) {
                     $orders = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
-					SELECT COUNT(*)
-					FROM `'._DB_PREFIX_.'orders` o
-					WHERE o.valid = 1
-					'.Shop::addSqlRestriction());
+                    SELECT COUNT(*)
+                    FROM `'._DB_PREFIX_.'orders` o
+                    WHERE o.valid = 1
+                    '.Shop::addSqlRestriction());
                     $value = round($orders / $value, 2);
                 }
 
@@ -733,12 +747,12 @@ class AdminStatsControllerCore extends AdminStatsTabController
 
             case 'average_order_value':
                 $row = Db::getInstance(_PS_USE_SQL_SLAVE_)->getRow('
-				SELECT
-					COUNT(`id_order`) as orders,
-					SUM(`total_paid_tax_excl` / `conversion_rate`) as total_paid_tax_excl
-				FROM `'._DB_PREFIX_.'orders`
-				WHERE `invoice_date` BETWEEN "'.pSQL(date('Y-m-d', strtotime('-31 day'))).' 00:00:00" AND "'.pSQL(date('Y-m-d', strtotime('-1 day'))).' 23:59:59"
-				'.Shop::addSqlRestriction());
+                SELECT
+                    COUNT(`id_order`) as orders,
+                    SUM(`total_paid_tax_excl` / `conversion_rate`) as total_paid_tax_excl
+                FROM `'._DB_PREFIX_.'orders`
+                WHERE `invoice_date` BETWEEN "'.pSQL(date('Y-m-d', strtotime('-31 day'))).' 00:00:00" AND "'.pSQL(date('Y-m-d', strtotime('-1 day'))).' 23:59:59"
+                '.Shop::addSqlRestriction());
                 $value = Tools::displayPrice($row['orders'] ? $row['total_paid_tax_excl'] / $row['orders'] : 0, $currency);
                 ConfigurationKPI::updateValue('AVG_ORDER_VALUE', $value);
                 ConfigurationKPI::updateValue('AVG_ORDER_VALUE_EXPIRE', strtotime(date('Y-m-d 00:00:00', strtotime('+1 day'))));
@@ -784,18 +798,10 @@ class AdminStatsControllerCore extends AdminStatsTabController
                     ConfigurationKPI::updateValue('TOP_CATEGORY', array($this->context->language->id => $value));
                     ConfigurationKPI::updateValue('TOP_CATEGORY_EXPIRE', array($this->context->language->id => strtotime('+1 day')));
                     break;
-
             default:
                 $value = false;
         }
-        if ($value !== false) {
-            $array = array('value' => $value);
-            if (isset($data)) {
-                $array['data'] = $data;
-            }
-            die(json_encode($array));
-        }
-        die(json_encode(array('has_errors' => true)));
+        return $value;
     }
 
     public static function getArrivalsByDate($date)

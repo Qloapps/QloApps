@@ -1244,7 +1244,8 @@ class AdminOrdersControllerCore extends AdminController
         $time = time();
         $kpis = array();
 
-        /* The data generation is located in AdminStatsControllerCore */
+        $statsController = new AdminStatsController();
+        $this->context->controller = $this;
 
         $helper = new HelperKpi();
         $helper->id = 'box-conversion-rate';
@@ -1255,6 +1256,8 @@ class AdminOrdersControllerCore extends AdminController
         $helper->subtitle = $this->l('30 days', null, null, false);
         if (ConfigurationKPI::get('CONVERSION_RATE') !== false) {
             $helper->value = ConfigurationKPI::get('CONVERSION_RATE');
+        } else {
+            $helper->value = $statsController->getLatestKpiValue('conversion_rate');
         }
         if (ConfigurationKPI::get('CONVERSION_RATE_CHART') !== false) {
             $helper->data = ConfigurationKPI::get('CONVERSION_RATE_CHART');
@@ -1272,6 +1275,8 @@ class AdminOrdersControllerCore extends AdminController
         $helper->href = $this->context->link->getAdminLink('AdminCarts').'&action=filterOnlyAbandonedCarts';
         if (ConfigurationKPI::get('ABANDONED_CARTS') !== false) {
             $helper->value = ConfigurationKPI::get('ABANDONED_CARTS');
+        } else {
+            $helper->value = $statsController->getLatestKpiValue('abandoned_cart');
         }
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=abandoned_cart';
         $helper->refresh = (bool)(ConfigurationKPI::get('ABANDONED_CARTS_EXPIRE') < $time);
@@ -1285,6 +1290,8 @@ class AdminOrdersControllerCore extends AdminController
         $helper->subtitle = $this->l('30 days', null, null, false);
         if (ConfigurationKPI::get('AVG_ORDER_VALUE') !== false) {
             $helper->value = sprintf($this->l('%s tax excl.'), ConfigurationKPI::get('AVG_ORDER_VALUE'));
+        } else {
+            $helper->value = $statsController->getLatestKpiValue('average_order_value');
         }
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=average_order_value';
         $helper->refresh = (bool)(ConfigurationKPI::get('AVG_ORDER_VALUE_EXPIRE') < $time);
@@ -1298,6 +1305,8 @@ class AdminOrdersControllerCore extends AdminController
         $helper->subtitle = $this->l('30 days', null, null, false);
         if (ConfigurationKPI::get('NETPROFIT_VISIT') !== false) {
             $helper->value = ConfigurationKPI::get('NETPROFIT_VISIT');
+        } else {
+            $helper->value = $statsController->getLatestKpiValue('netprofit_visit');
         }
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=netprofit_visit';
         $helper->refresh = (bool)(ConfigurationKPI::get('NETPROFIT_VISIT_EXPIRE') < $time);
