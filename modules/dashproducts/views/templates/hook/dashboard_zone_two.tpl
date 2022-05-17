@@ -38,7 +38,7 @@
 
 		<section>
 			<nav>
-				<ul class="nav nav-pills">
+				<ul class="nav nav-pills row">
 					<li class="col-xs-6 col-sm-3 nav-item active">
 						<a href="#dash_recent_orders" data-toggle="tab">
 							<span>{l s="Recent Bookings" mod="dashproducts"}</span>

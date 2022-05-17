@@ -214,8 +214,10 @@ class Dashactivity extends Module
 			SELECT COUNT(*)
 			FROM `'._DB_PREFIX_.'orders` o
 			LEFT JOIN `'._DB_PREFIX_.'order_state` os ON (o.current_state = os.id_order_state)
+            LEFT JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd ON (hbd.`id_order` = o.`id_order`)
 			WHERE os.paid = 1 AND os.shipped = 0
-			'.Shop::addSqlRestriction(Shop::SHARE_ORDER)
+			'.Shop::addSqlRestriction(Shop::SHARE_ORDER).
+            (!is_null($params['id_hotel']) ? HotelBranchInformation::addHotelRestriction($params['id_hotel'], 'hbd') : '')
         );
 
         $abandoned_cart = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
