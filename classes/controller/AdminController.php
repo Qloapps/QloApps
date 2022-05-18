@@ -2245,6 +2245,20 @@ class AdminControllerCore extends Controller
         $this->layout = 'invalid_token.tpl';
     }
 
+    public function setAccessDeniedPageVars()
+    {
+        $breadcrumbs2 = array(
+            'container' => array('name' => $this->l('Access denied'), 'href' => '#'),
+            'tab' => array('name' => '', 'href' => ''),
+        );
+        $this->show_page_header_toolbar = true;
+        $this->context->smarty->assign(array(
+            'title' => $this->l('Access denied'),
+            'toolbar_btn' => array(),
+            'breadcrumbs2' => $breadcrumbs2,
+        ));
+    }
+
     /**
      * Assign smarty variables for the footer
      */
