@@ -1589,7 +1589,9 @@ class AdminProductsControllerCore extends AdminController
             _PS_JS_DIR_.'admin/products.js',
         ));
 
-        if ($this->display == 'edit' || $this->display == 'add') {
+        if (in_array($this->display, array('add', 'edit'))
+            && $this->tabAccess[$this->display] == '1'
+        ) {
             $this->addJqueryUI(array(
                 'ui.core',
                 'ui.widget'
