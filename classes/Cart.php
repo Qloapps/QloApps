@@ -1789,7 +1789,17 @@ class CartCore extends ObjectModel
                 }
             }
             $order_total_discount = min(Tools::ps_round($order_total_discount, 2), (float)$order_total_products) + (float)$order_shipping_discount;
-            $order_total -= $order_total_discount;
+            if ($type == Cart::ADVANCE_PAYMENT) {
+                // if discount is greater than due amount then only decrease the price of advance payment amount
+                // otherwise discount will be applied on due amount not advance payment amount
+                $total_without_discount = self::getOrderTotal() + $order_total_discount;
+                $due_amount = $total_without_discount - $order_total;
+                if ($order_total_discount > $due_amount) {
+                    $order_total -= ($order_total_discount - $due_amount);
+                }
+            } else {
+                $order_total -= $order_total_discount;
+            }
         }
 
         if ($type == Cart::BOTH || $type == Cart::ADVANCE_PAYMENT) {
