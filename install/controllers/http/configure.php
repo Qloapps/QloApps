@@ -43,6 +43,7 @@ class InstallControllerHttpConfigure extends InstallControllerHttp
             $this->session->install_type = Tools::getValue('db_mode');
             $this->session->shop_country = Tools::getValue('shop_country');
             $this->session->shop_timezone = Tools::getValue('shop_timezone');
+            $this->session->enable_ssl = Tools::getValue('enable_ssl');
 
             // Save admin configuration
             $this->session->admin_firstname = trim(Tools::getValue('admin_firstname'));
