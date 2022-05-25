@@ -1,0 +1,325 @@
+<?php
+
+/*
+ * This file is part of Twig.
+ *
+ * (c) Fabien Potencier
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Twig\Error;
+
+use Twig\Source;
+use Twig\Template;
+
+/**
+ * Twig base exception.
+ *
+ * This exception class and its children must only be used when
+ * an error occurs during the loading of a template, when a syntax error
+ * is detected in a template, or when rendering a template. Other
+ * errors must use regular PHP exception classes (like when the template
+ * cache directory is not writable for instance).
+ *
+ * To help debugging template issues, this class tracks the original template
+ * name and line where the error occurred.
+ *
+ * Whenever possible, you must set these information (original template name
+ * and line number) yourself by passing them to the constructor. If some or all
+ * these information are not available from where you throw the exception, then
+ * this class will guess them automatically (when the line number is set to -1
+ * and/or the name is set to null). As this is a costly operation, this
+ * can be disabled by passing false for both the name and the line number
+ * when creating a new instance of this class.
+ *
+ * @author Fabien Potencier <fabien@symfony.com>
+ */
+class Error extends \Exception
+{
+    protected $lineno;
+    // to be renamed to name in 2.0
+    protected $filename;
+    protected $rawMessage;
+
+    private $sourcePath;
+    private $sourceCode;
+
+    /**
+     * Constructor.
+     *
+     * Set the line number to -1 to enable its automatic guessing.
+     * Set the name to null to enable its automatic guessing.
+     *
+     * @param string             $message  The error message
+     * @param int                $lineno   The template line where the error occurred
+     * @param Source|string|null $source   The source context where the error occurred
+     * @param \Exception         $previous The previous exception
+     */
+    public function __construct($message, $lineno = -1, $source = null, \Exception $previous = null)
+    {
+        if (null === $source) {
+            $name = null;
+        } elseif (!$source instanceof Source) {
+            // for compat with the Twig C ext., passing the template name as string is accepted
+            $name = $source;
+        } else {
+            $name = $source->getName();
+            $this->sourceCode = $source->getCode();
+            $this->sourcePath = $source->getPath();
+        }
+        parent::__construct('', 0, $previous);
+
+        $this->lineno = $lineno;
+        $this->filename = $name;
+        $this->rawMessage = $message;
+        $this->updateRepr();
+    }
+
+    /**
+     * Gets the raw message.
+     *
+     * @return string The raw message
+     */
+    public function getRawMessage()
+    {
+        return $this->rawMessage;
+    }
+
+    /**
+     * Gets the logical name where the error occurred.
+     *
+     * @return string The name
+     *
+     * @deprecated since 1.27 (to be removed in 2.0). Use getSourceContext() instead.
+     */
+    public function getTemplateFile()
+    {
+        @trigger_error(sprintf('The "%s" method is deprecated since version 1.27 and will be removed in 2.0. Use getSourceContext() instead.', __METHOD__), E_USER_DEPRECATED);
+
+        return $this->filename;
+    }
+
+    /**
+     * Sets the logical name where the error occurred.
+     *
+     * @param string $name The name
+     *
+     * @deprecated since 1.27 (to be removed in 2.0). Use setSourceContext() instead.
+     */
+    public function setTemplateFile($name)
+    {
+        @trigger_error(sprintf('The "%s" method is deprecated since version 1.27 and will be removed in 2.0. Use setSourceContext() instead.', __METHOD__), E_USER_DEPRECATED);
+
+        $this->filename = $name;
+
+        $this->updateRepr();
+    }
+
+    /**
+     * Gets the logical name where the error occurred.
+     *
+     * @return string The name
+     *
+     * @deprecated since 1.29 (to be removed in 2.0). Use getSourceContext() instead.
+     */
+    public function getTemplateName()
+    {
+        @trigger_error(sprintf('The "%s" method is deprecated since version 1.29 and will be removed in 2.0. Use getSourceContext() instead.', __METHOD__), E_USER_DEPRECATED);
+
+        return $this->filename;
+    }
+
+    /**
+     * Sets the logical name where the error occurred.
+     *
+     * @param string $name The name
+     *
+     * @deprecated since 1.29 (to be removed in 2.0). Use setSourceContext() instead.
+     */
+    public function setTemplateName($name)
+    {
+        @trigger_error(sprintf('The "%s" method is deprecated since version 1.29 and will be removed in 2.0. Use setSourceContext() instead.', __METHOD__), E_USER_DEPRECATED);
+
+        $this->filename = $name;
+        $this->sourceCode = $this->sourcePath = null;
+
+        $this->updateRepr();
+    }
+
+    /**
+     * Gets the template line where the error occurred.
+     *
+     * @return int The template line
+     */
+    public function getTemplateLine()
+    {
+        return $this->lineno;
+    }
+
+    /**
+     * Sets the template line where the error occurred.
+     *
+     * @param int $lineno The template line
+     */
+    public function setTemplateLine($lineno)
+    {
+        $this->lineno = $lineno;
+
+        $this->updateRepr();
+    }
+
+    /**
+     * Gets the source context of the Twig template where the error occurred.
+     *
+     * @return Source|null
+     */
+    public function getSourceContext()
+    {
+        return $this->filename ? new Source($this->sourceCode, $this->filename, $this->sourcePath) : null;
+    }
+
+    /**
+     * Sets the source context of the Twig template where the error occurred.
+     */
+    public function setSourceContext(Source $source = null)
+    {
+        if (null === $source) {
+            $this->sourceCode = $this->filename = $this->sourcePath = null;
+        } else {
+            $this->sourceCode = $source->getCode();
+            $this->filename = $source->getName();
+            $this->sourcePath = $source->getPath();
+        }
+
+        $this->updateRepr();
+    }
+
+    public function guess()
+    {
+        $this->guessTemplateInfo();
+        $this->updateRepr();
+    }
+
+    public function appendMessage($rawMessage)
+    {
+        $this->rawMessage .= $rawMessage;
+        $this->updateRepr();
+    }
+
+    /**
+     * @internal
+     */
+    protected function updateRepr()
+    {
+        $this->message = $this->rawMessage;
+
+        if ($this->sourcePath && $this->lineno > 0) {
+            $this->file = $this->sourcePath;
+            $this->line = $this->lineno;
+
+            return;
+        }
+
+        $dot = false;
+        if ('.' === substr($this->message, -1)) {
+            $this->message = substr($this->message, 0, -1);
+            $dot = true;
+        }
+
+        $questionMark = false;
+        if ('?' === substr($this->message, -1)) {
+            $this->message = substr($this->message, 0, -1);
+            $questionMark = true;
+        }
+
+        if ($this->filename) {
+            if (\is_string($this->filename) || (\is_object($this->filename) && method_exists($this->filename, '__toString'))) {
+                $name = sprintf('"%s"', $this->filename);
+            } else {
+                $name = json_encode($this->filename);
+            }
+            $this->message .= sprintf(' in %s', $name);
+        }
+
+        if ($this->lineno && $this->lineno >= 0) {
+            $this->message .= sprintf(' at line %d', $this->lineno);
+        }
+
+        if ($dot) {
+            $this->message .= '.';
+        }
+
+        if ($questionMark) {
+            $this->message .= '?';
+        }
+    }
+
+    /**
+     * @internal
+     */
+    protected function guessTemplateInfo()
+    {
+        $template = null;
+        $templateClass = null;
+
+        $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS | DEBUG_BACKTRACE_PROVIDE_OBJECT);
+        foreach ($backtrace as $trace) {
+            if (isset($trace['object']) && $trace['object'] instanceof Template && 'Twig_Template' !== \get_class($trace['object'])) {
+                $currentClass = \get_class($trace['object']);
+                $isEmbedContainer = 0 === strpos($templateClass, $currentClass);
+                if (null === $this->filename || ($this->filename == $trace['object']->getTemplateName() && !$isEmbedContainer)) {
+                    $template = $trace['object'];
+                    $templateClass = \get_class($trace['object']);
+                }
+            }
+        }
+
+        // update template name
+        if (null !== $template && null === $this->filename) {
+            $this->filename = $template->getTemplateName();
+        }
+
+        // update template path if any
+        if (null !== $template && null === $this->sourcePath) {
+            $src = $template->getSourceContext();
+            $this->sourceCode = $src->getCode();
+            $this->sourcePath = $src->getPath();
+        }
+
+        if (null === $template || $this->lineno > -1) {
+            return;
+        }
+
+        $r = new \ReflectionObject($template);
+        $file = $r->getFileName();
+
+        $exceptions = [$e = $this];
+        while ($e instanceof self && $e = $e->getPrevious()) {
+            $exceptions[] = $e;
+        }
+
+        while ($e = array_pop($exceptions)) {
+            $traces = $e->getTrace();
+            array_unshift($traces, ['file' => $e->getFile(), 'line' => $e->getLine()]);
+
+            while ($trace = array_shift($traces)) {
+                if (!isset($trace['file']) || !isset($trace['line']) || $file != $trace['file']) {
+                    continue;
+                }
+
+                foreach ($template->getDebugInfo() as $codeLine => $templateLine) {
+                    if ($codeLine <= $trace['line']) {
+                        // update template line
+                        $this->lineno = $templateLine;
+
+                        return;
+                    }
+                }
+            }
+        }
+    }
+}
+
+class_alias('Twig\Error\Error', 'Twig_Error');
