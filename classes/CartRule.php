@@ -1012,6 +1012,22 @@ class CartRuleCore extends ObjectModel
                 }
 
                 $reduction_amount = $this->reduction_amount;
+
+                // If the cart rule is restricted to one room type it can't exceed this room type price
+                if ($this->reduction_product > 0) {
+                    foreach ($all_products as $product) {
+                        if ($product['id_product'] == $this->reduction_product) {
+                            if ($this->reduction_tax) {
+                                $max_reduction_amount = (int)$product['cart_quantity'] * (float)$product['price_wt'];
+                            } else {
+                                $max_reduction_amount = (int)$product['cart_quantity'] * (float)$product['price'];
+                            }
+                            $reduction_amount = min($reduction_amount, $max_reduction_amount);
+                            break;
+                        }
+                    }
+                }
+
                 // If we need to convert the voucher value to the cart currency
                 if (isset($context->currency) && $this->reduction_currency != $context->currency->id) {
                     $voucherCurrency = new Currency($this->reduction_currency);
