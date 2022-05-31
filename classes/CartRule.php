@@ -1016,7 +1016,7 @@ class CartRuleCore extends ObjectModel
                 $reduction_value += $selected_products_reduction * $this->reduction_percent / 100;
             }
 
-            // Discount (¤)
+            // Discount (by amount)
             if ((float)$this->reduction_amount > 0) {
                 $prorata = 1;
                 if (!is_null($package) && count($all_products)) {
@@ -1026,7 +1026,31 @@ class CartRuleCore extends ObjectModel
                     }
                 }
 
+                $restricted_product = null;
+                // If the cart rule is restricted to one room type it can't exceed this room type price
+                if ($this->reduction_product > 0) {
+                    foreach ($package_products as $product) {
+                        if ($product['id_product'] == $this->reduction_product) {
+                            $restricted_product = $product;
+                        }
+                    }
+                }
+
                 $reduction_amount = $this->reduction_amount;
+                if ($this->reduction_product) {
+                    if ($restricted_product) {
+                        $prorata = 1; // do not split this cart rule
+                        if ($this->reduction_tax) {
+                            $max_reduction_amount = (int)$restricted_product['cart_quantity'] * (float)$restricted_product['price_wt'];
+                        } else {
+                            $max_reduction_amount = (int)$restricted_product['cart_quantity'] * (float)$restricted_product['price'];
+                        }
+                        $reduction_amount = min($reduction_amount, $max_reduction_amount);
+                    } else {
+                        $reduction_amount = 0;
+                    }
+                }
+
                 // If we need to convert the voucher value to the cart currency
                 if (isset($context->currency) && $this->reduction_currency != $context->currency->id) {
                     $voucherCurrency = new Currency($this->reduction_currency);
@@ -1073,7 +1097,7 @@ class CartRuleCore extends ObjectModel
                             }
                         }
                     }
-                    // Discount (¤) on the whole order
+                    // Discount (by amount) on the whole order
                     elseif ($this->reduction_product == 0) {
                         $cart_amount_te = null;
                         $cart_amount_ti = null;
