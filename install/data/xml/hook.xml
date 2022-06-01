@@ -217,6 +217,12 @@
     <hook id="actionBeforeAuthentication" live_edit="0">
       <name>actionBeforeAuthentication</name><title>Before authentication</title><description>This hook is displayed before the customer's authentication</description>
     </hook>
+    <hook id="actionSubmitIdentityBefore" live_edit="0">
+      <name>actionSubmitIdentityBefore</name><title>Before identity modification</title><description>This hook is called before customer's identity modification</description>
+    </hook>
+    <hook id="displayCartRoomImageAfter" live_edit="0">
+      <name>displayCartRoomImageAfter</name><title>After cart room image on checkout page</title><description>This hook is displayed after cart room image on checkout page</description>
+    </hook>
     <hook id="displayPaymentTop" live_edit="0">
       <name>displayPaymentTop</name><title>Top of payment page</title><description>This hook is displayed at the top of the payment page</description>
     </hook>
