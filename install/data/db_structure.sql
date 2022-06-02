@@ -1455,6 +1455,15 @@ CREATE TABLE `PREFIX_order_payment` (
 	KEY `order_reference`(`order_reference`)
 ) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8 COLLATION;
 
+CREATE TABLE `PREFIX_order_payment_detail` (
+	`id_order_payment_detail` INT(10) unsigned NOT NULL auto_increment,
+	`id_order_payment` INT(10) unsigned NOT NULL,
+	`id_order` INT(10) unsigned NOT NULL,
+	`amount` DECIMAL(10,2) NOT NULL,
+	`date_add` DATETIME NOT NULL,
+	PRIMARY KEY (`id_order_payment_detail`),
+) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8 COLLATION;
+
 CREATE TABLE `PREFIX_product` (
   `id_product` int(10) unsigned NOT NULL auto_increment,
   `id_supplier` int(10) unsigned DEFAULT NULL,
@@ -2605,6 +2614,7 @@ CREATE TABLE `PREFIX_tab_module_preference` (
 CREATE TABLE `PREFIX_order_invoice_payment` (
 	`id_order_invoice` int(11) unsigned NOT NULL,
 	`id_order_payment` int(11) unsigned NOT NULL,
+	`id_order_payment_detail` int(11) unsigned NOT NULL,
 	`id_order` int(11) unsigned NOT NULL,
 	PRIMARY KEY (`id_order_invoice`,`id_order_payment`),
 	KEY `order_payment` (`id_order_payment`),

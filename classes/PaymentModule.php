@@ -431,9 +431,13 @@ abstract class PaymentModuleCore extends Module
                     $transaction_id = null;
                 }
 
-                if (!isset($order) || !Validate::isLoadedObject($order) || !$order->addOrderPayment($amount_paid, null, $transaction_id)) {
+                if (!isset($order) || !Validate::isLoadedObject($order) || !$order->addOrderPayment($amount_paid, null, $transaction_id, null, null, null, false)) {
                     PrestaShopLogger::addLog('PaymentModule::validateOrder - Cannot save Order Payment', 3, null, 'Cart', (int)$id_cart, true);
                     throw new PrestaShopException('Can\'t save Order Payment');
+                }
+
+                foreach($order_list as $order) {
+                    $order->addOrderPaymentDetail($order->advance_paid_amount);
                 }
             }
 
@@ -713,7 +717,11 @@ abstract class PaymentModuleCore extends Module
                     // Set the order status
                     $new_history = new OrderHistory();
                     $new_history->id_order = (int)$order->id;
-                    $new_history->changeIdOrderState((int)$id_order_state, $order, true);
+                    if ($order->is_advance_payment && $order->advance_paid_amount < $order->total_paid_tax_incl) {
+                        $new_history->changeIdOrderState((int)Configuration::get('PS_OS_PARTIAL_PAYMENT'), $order, true);
+                    } else {
+                        $new_history->changeIdOrderState((int)$id_order_state, $order, true);
+                    }
                     $new_history->addWithemail(true, $extra_vars);
 
                     // Switch to back order if needed

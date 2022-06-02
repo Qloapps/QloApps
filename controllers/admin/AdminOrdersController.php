@@ -159,7 +159,7 @@ class AdminOrdersControllerCore extends AdminController
                 'remove_onclick' => true
             )
         ));
-        
+
         $this->shopLinkType = 'shop';
         $this->shopShareDatas = Shop::SHARE_ORDER;
 
@@ -321,7 +321,7 @@ class AdminOrdersControllerCore extends AdminController
 
         $this->addJqueryUI('ui.datepicker');
         $this->addJS(_PS_JS_DIR_.'vendor/d3.v3.min.js');
-        
+
         if ($this->tabAccess['edit'] == 1 && $this->display == 'view') {
             $this->addJS(_PS_JS_DIR_.'admin/orders.js');
             $this->addJS(_PS_JS_DIR_.'tools.js');
@@ -1432,6 +1432,16 @@ class AdminOrdersControllerCore extends AdminController
         foreach ($history as &$order_state) {
             $order_state['text-color'] = Tools::getBrightness($order_state['color']) < 128 ? 'white' : 'black';
         }
+
+        $order_payment_detail = $order->getOrderPaymentDetailCollection();
+        foreach ($order_payment_detail as &$payment_detail) {
+            $payment = new OrderPayment($payment_detail['id_order_payment']);
+            if ($invoice = $payment->getOrderInvoice($order->id)) {
+                $payment_detail['invoice_number'] = $invoice->getInvoiceNumberFormatted($this->context->language->id, $order->id_shop);
+            }
+        }
+
+
         //by webkul to get data to show hotel rooms order data on order detail page
 
         $cart_id = Cart::getCartIdByOrderId(Tools::getValue('id_order'));
@@ -1544,13 +1554,14 @@ class AdminOrdersControllerCore extends AdminController
             'customerStats' => $customer->getStats(),
             'products' => $products,
             'discounts' => $order->getCartRules(),
-            'orders_total_paid_tax_incl' => $order->getOrdersTotalPaid(), // Get the sum of total_paid_tax_incl of the order with similar reference
+            'orders_total_paid_tax_incl' => $order->total_paid_tax_incl, // Get the sum of total_paid_tax_incl of the order with similar reference
             'total_paid' => $order->getTotalPaid(),
             'customer_thread_message' => CustomerThread::getCustomerMessages($order->id_customer, null, $order->id),
             'orderMessages' => OrderMessage::getOrderMessages($order->id_lang),
             'messages' => Message::getMessagesByOrderId($order->id, true),
             'carrier' => new Carrier($order->id_carrier),
             'history' => $history,
+            'order_payment_detail' => $order_payment_detail,
             'states' => OrderState::getOrderStates($this->context->language->id),
             'warehouse_list' => $warehouse_list,
             'sources' => ConnectionsSource::getOrderSources($order->id),

@@ -880,6 +880,11 @@ class OrderInvoiceCore extends ObjectModel
         return OrderPayment::getByInvoiceId($this->id);
     }
 
+    public function getOrderPaymentDetailCollection()
+    {
+        return OrderPaymentDetail::getByInvoiceId($this->id);
+    }
+
     /**
      * Get the formatted number of invoice
      * @since 1.5.0.2
