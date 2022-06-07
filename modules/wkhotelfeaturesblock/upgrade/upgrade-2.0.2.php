@@ -18,26 +18,11 @@
 *  @license   https://store.webkul.com/license.html
 */
 
-/**
- * updates existing feature images from png to jpg for Qlo 1.5.0
- *
- * @return void
- */
-function change_feature_image_to_jpg()
+if (!defined('_PS_VERSION_'))
+	exit;
+
+function upgrade_module_2_0_2($module)
 {
-    $featuresFilePath = _PS_IMG_DIR_.'rf/';
-    $files = scandir($featuresFilePath);
-    foreach ($files as $file) {
-        if ($file[0] === '.') {
-            continue;
-        }
 
-        if (strpos($file, '.png')) {
-            if(ImageManager::resize($featuresFilePath.$file, $featuresFilePath.explode('.', $file)[0].'.jpg')) {
-                @unlink($featuresFilePath.$file);
-
-            }
-        }
-    }
-    return true;
+    return $module->unregisterHook('displayDefaultNavigationHook');
 }

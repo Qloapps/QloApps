@@ -18,26 +18,26 @@
 *  @license   https://store.webkul.com/license.html
 */
 
-/**
- * updates existing feature images from png to jpg for Qlo 1.5.0
- *
- * @return void
- */
-function change_feature_image_to_jpg()
+if (!defined('_PS_VERSION_'))
+	exit;
+
+function upgrade_module_1_1_5($module)
 {
-    $featuresFilePath = _PS_IMG_DIR_.'rf/';
-    $files = scandir($featuresFilePath);
-    foreach ($files as $file) {
-        if ($file[0] === '.') {
-            continue;
-        }
+    return updateTableData();
+}
 
-        if (strpos($file, '.png')) {
-            if(ImageManager::resize($featuresFilePath.$file, $featuresFilePath.explode('.', $file)[0].'.jpg')) {
-                @unlink($featuresFilePath.$file);
+function updateTableData()
+{
+    $interiorImages = $htlBookings = Db::getInstance()->executes(
+        'SELECT `id_interior_image` FROM `'._DB_PREFIX_.'htl_interior_image`'
+    );
 
-            }
+    foreach ($interiorImages as $img) {
+        $objHtlInteriorImg = new WkHotelInteriorImage($img['id_interior_image']);
+        if(explode('.', $objHtlInteriorImg->name)[0]) {
+            $objHtlInteriorImg->name = explode('.', $objHtlInteriorImg->name)[0];
         }
+        $objHtlInteriorImg->save();
     }
     return true;
 }
