@@ -63,7 +63,6 @@ $(document).ready(function()
 				$('.is_customer_param').show();
 				$('#opc_account_form').slideDown('slow');
 				$('#is_new_customer').val('1');
-				$('#opc_account_choice, #opc_invoice_address').hide();
 				if (typeof bindUniform !=='undefined')
 					bindUniform();
 			});
@@ -72,7 +71,6 @@ $(document).ready(function()
 				$('.is_customer_param').hide();
 				$('#opc_account_form').slideDown('slow');
 				$('#is_new_customer').val('0');
-				$('#opc_account_choice, #opc_invoice_address').hide();
 				$('#new_account_title').html(txtInstantCheckout);
 				$('#submitAccount').attr({id : 'submitGuestAccount', name : 'submitGuestAccount'});
 				if (typeof bindUniform !=='undefined')
@@ -98,11 +96,19 @@ $(document).ready(function()
 		// LOGIN FORM
 		$(document).on('click', '#openLoginFormBlock', function(e){
 			e.preventDefault();
-			$('#openNewAccountBlock').show();
-			$('.already_registered_block').hide();
-			$('#login_form_content').slideDown('slow');
-			$('#new_account_form').slideUp('slow');
+			$('#openNewAccountBlock').show(200);
+			$('.already_registered_block').hide(200);
+			$('#login_form_content').slideDown(200);
+			$('#new_account_form').slideUp(200);
 		});
+
+		$(document).on('click', '#idAccountChoice', function(e) {
+			e.preventDefault();
+			$('#login_form_content').slideUp(200);
+			$('#new_account_form').slideDown(200);
+			$('.already_registered_block').show(200);
+		});
+
 		// LOGIN FORM SENDING
 		$(document).on('click', '#SubmitLogin', function(e)
 		{
@@ -165,6 +171,7 @@ $(document).ready(function()
 			var callingFile = '';
             var advApiParam = '';
             var params = '';
+			var isTransforming = false;
 
             if ($(this).attr('data-adv-api')) {
                 advApiParam = '&isAdvApi=1';
@@ -177,8 +184,12 @@ $(document).ready(function()
 			}
 			else
 			{
-				callingFile = orderOpcUrl;
-				params = 'method=editCustomer&';
+				if ($('#opc_account_form #passwd').val().length > 0) {
+					params = 'method=transformGuestAccount&';
+					isTransforming = true;
+				} else {
+					params = 'method=editCustomer&';
+				}
 			}
 
 			$('#opc_account_form input:visible, #opc_account_form input[type=hidden]').each(function() {
@@ -199,8 +210,6 @@ $(document).ready(function()
 			$('#opc_account_form select:visible').each(function() {
 				params += encodeURIComponent($(this).attr('name'))+'='+encodeURIComponent($(this).val())+'&';
 			});
-			params += 'customer_lastname='+encodeURIComponent($('#customer_lastname').val())+'&';
-			params += 'customer_firstname='+encodeURIComponent($('#customer_firstname').val())+'&';
 			params += 'alias='+encodeURIComponent($('#alias').val())+'&';
 			params += 'other='+encodeURIComponent($('#other').val())+'&';
 			params += 'is_new_customer='+encodeURIComponent($('#is_new_customer').val())+'&';
@@ -214,7 +223,7 @@ $(document).ready(function()
 				async: false,
 				cache: false,
 				dataType : "json",
-				data: 'ajax=true&'+params+'&token=' + static_token ,
+				data: 'ajax=true&'+params+'&token=' + static_token,
 				success: function(jsonData)
 				{
 					if (jsonData.hasError)
@@ -241,6 +250,10 @@ $(document).ready(function()
 						$('#opc_account_errors').slideUp('slow', function(){
 							$(this).html('');
 						});
+
+						if (isTransforming) {
+							location.reload();
+						}
 					}
 
 					isGuest = parseInt($('#is_new_customer').val()) == 1 ? 0 : 1;
@@ -256,18 +269,18 @@ $(document).ready(function()
 						static_token = jsonData.token;
 
 						// It's not a new customer
-						if ($('#opc_id_customer').val() !== '0')
+						if (PS_CUSTOMER_ADDRESS_CREATION && $('#opc_id_customer').val() !== '0')
 							if (!saveAddress('delivery'))
 								return false;
 
 						// update id_customer
 						$('#opc_id_customer').val(jsonData.id_customer);
 
-						if ($('#invoice_address:checked').length !== 0)
-						{
-							if (!saveAddress('invoice'))
-								return false;
-						}
+						// if ($('#invoice_address:checked').length !== 0)
+						// {
+						// 	if (!saveAddress('invoice'))
+						// 		return false;
+						// }
 
 						// update id_customer
 						$('#opc_id_customer').val(jsonData.id_customer);
@@ -1202,3 +1215,9 @@ function multishippingMode(it)
 		bindUniform();
 	}
 }
+
+$(document).on('click', '.btn-edit-guest-info', function(e) {
+	e.preventDefault();
+	$('#collapse-guest-info .card-body:nth-child(1)').hide();
+	$('#collapse-guest-info .card-body:nth-child(2)').toggleClass('hidden');
+});
