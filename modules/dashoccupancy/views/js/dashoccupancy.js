@@ -41,22 +41,24 @@ function generateAvailablityPieChart(chartData) {
 }
 
 $(document).ready(function() {
-    if (typeof date_occupancy_range === "undefined")
-        var date_occupancy_range = '(from %s to %s)';
+    if (typeof date_subtitle === 'undefined') {
+        date_subtitle = '(from %s to %s)';
+    }
 
-    if (typeof date_occupancy_avail_format === "undefined")
-        var date_occupancy_avail_format = 'Y-mm-dd';
+    if (typeof date_format === 'undefined')
+        date_format = 'Y-mm-dd';
 
     $('#date-start').change(function() {
         start = Date.parseDate($('#date-start').val(), 'Y-m-d');
         end = Date.parseDate($('#date-end').val(), 'Y-m-d');
-        $('#dashoccupancy_date_range').html(sprintf(date_occupancy_range, start.format(date_occupancy_avail_format), end.format(date_occupancy_avail_format)));
+
+        $('#dashoccupancy_date_range').html(sprintf(date_subtitle, start.format(date_format), end.format(date_format)));
     });
 
     $('#date-end').change(function() {
         start = Date.parseDate($('#date-start').val(), 'Y-m-d');
         end = Date.parseDate($('#date-end').val(), 'Y-m-d');
 
-        $('#dashoccupancy_date_range').html(sprintf(date_occupancy_range, start.format(date_occupancy_avail_format), end.format(date_occupancy_avail_format)));
+        $('#dashoccupancy_date_range').html(sprintf(date_subtitle, start.format(date_format), end.format(date_format)));
     });
 });

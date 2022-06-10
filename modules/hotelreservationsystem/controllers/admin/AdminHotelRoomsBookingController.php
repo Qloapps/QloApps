@@ -401,16 +401,16 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
                 $date_from,
                 $date_to
             );
-            $rm_amount = $roomTypeDateRangePrice['total_price_tax_incl'];
+            $rm_amount = $roomTypeDateRangePrice['total_price_tax_excl'];
 
             $cart_data = array('room_num' => $obj_rm_info->room_num,
                                 'room_type' => Product::getProductName((int)$id_product),
-                                'date_from' => date('Y-M-d', strtotime($date_from)),
-                                'date_to' => date('Y-M-d', strtotime($date_to)),
-                                'amount' => $rm_amount,
+                                'date_from' => Tools::displayDate($date_from),
+                                'date_to' => Tools::displayDate($date_to),
+                                'amount' => Tools::displayPrice($rm_amount),
                                 'qty' => $num_day,
                                 'rms_in_cart' => $rms_in_cart,
-                                'total_amount' => $total_amount,
+                                'total_amount' => Tools::displayPrice($total_amount),
                                 'booking_stats' => $booking_stats,
                                 'id_cart_book_data' => $obj_cart_book_data->id);
 
@@ -445,7 +445,7 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
 
                     $booking_stats = $obj_booking_dtl->getBookingData($bookingParams);
                     $cart_data = array(
-                        'total_amount' => $total_amount,
+                        'total_amount' => Tools::displayPrice($total_amount),
                         'rms_in_cart' => $rms_in_cart,
                         'booking_stats' => $booking_stats
                     );
@@ -483,16 +483,16 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
                     $this->context->smarty->assign(
                         array(
                             'date_from' => $search_date_from,
-                            'date_to'=>$search_date_to,
-                            'booking_data'=>$booking_data,
-                            'ajax_delete'=>$ajax_delete,
+                            'date_to' => $search_date_to,
+                            'booking_data' => $booking_data,
+                            'ajax_delete' => $ajax_delete,
                         )
                     );
                     $tpl_path = 'hotelreservationsystem/views/templates/admin/hotel_rooms_booking/helpers/view/view.tpl';
                     $room_tpl = $this->context->smarty->fetch(_PS_MODULE_DIR_.$tpl_path);
 
                     $cart_data = array(
-                        'total_amount' => $total_amount,
+                        'total_amount' => Tools::displayPrice($total_amount),
                         'room_tpl' => $room_tpl,
                         'rms_in_cart' => $rms_in_cart,
                         'booking_data' => $booking_data,

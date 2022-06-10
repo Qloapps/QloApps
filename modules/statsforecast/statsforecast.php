@@ -200,7 +200,7 @@ class StatsForecast extends Module
 
             $this->html .= '
 			<tr>
-				<td>'.$row['fix_date'].'</td>
+				<td>'.Tools::displayDate($row['fix_date']).'</td>
 				<td class="text-left">'.$visits_today.'</td>
 				<td class="text-left">'.(int)$row['registrations'].'</td>
 				<td class="text-left">'.(int)$row['countOrders'].'</td>

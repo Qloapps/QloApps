@@ -291,10 +291,10 @@
 														</a>
 													</td>
 													<td>
-														{$data['date_from']|date_format:"%d-%m-%Y"}
+														{dateFormat date=$data['date_from'] full=0}
 													</td>
 													<td>
-														{$data['date_to']|date_format:"%d-%m-%Y"}
+														{dateFormat date=$data['date_to'] full=0}
 													</td>
 													<td>
 														<form action="" method="post" class="form-horizontal row room_status_info_form">
@@ -305,7 +305,11 @@
 																	{/foreach}
 																</select>
 
-																{if $data['id_status'] == $hotel_order_status['STATUS_CHECKED_IN']['id_status']}<span class="badge badge-success margin-bottom-5">{l s='checked in on'} {$data['check_in']|date_format:"%d-%m-%Y"}</span>{elseif $data['id_status'] == $hotel_order_status['STATUS_CHECKED_OUT']['id_status']}<span class="badge badge-success margin-bottom-5">{l s='checked out on'} {$data['check_out']|date_format:"%d-%m-%Y"}</span>{/if}
+																{if $data['id_status'] == $hotel_order_status['STATUS_CHECKED_IN']['id_status']}
+																	<p class="text-center"><span class="badge badge-success margin-bottom-5">{l s='Checked in on'} {dateFormat date=$data['check_in'] full=0}</span></p>
+																{elseif $data['id_status'] == $hotel_order_status['STATUS_CHECKED_OUT']['id_status']}
+																	<p class="text-center"><span class="badge badge-success margin-bottom-5">{l s='Checked out on'} {dateFormat date=$data['check_out'] full=0}</span></p>
+																{/if}
 
 																{* field for the current date *}
 																<input class="room_status_date wk-input-date" type="text" name="status_date" value="{$data['date_from']|date_format:"%d-%m-%Y"}" readonly/>
