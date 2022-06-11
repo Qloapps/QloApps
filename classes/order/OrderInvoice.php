@@ -738,10 +738,10 @@ class OrderInvoiceCore extends ObjectModel
         $cache_id = 'order_invoice_paid_'.(int)$this->id;
         if (!Cache::isStored($cache_id)) {
             $amount = 0;
-            $payments = OrderPayment::getByInvoiceId($this->id);
+            $payments = OrderPaymentDetail::getByInvoiceId($this->id);
             foreach ($payments as $payment) {
                 /** @var OrderPayment $payment */
-                $amount += $payment->amount;
+                $amount += $payment['amount'];
             }
             Cache::store($cache_id, $amount);
             return $amount;
