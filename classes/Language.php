@@ -795,10 +795,9 @@ class LanguageCore extends ObjectModel
         $lang->iso_code = Tools::strtolower($iso_code);
         $lang->language_code = $iso_code; // Rewritten afterwards if the language code is available
         $lang->active = true;
-
         // If the language pack has not been provided, retrieve it from prestashop.com
         if (!$lang_pack) {
-            $lang_pack = json_decode(Tools::file_get_contents('http://www.prestashop.com/download/lang_packs/get_language_pack.php?version='._PS_VERSION_.'&iso_lang='.$iso_code));
+            $lang_pack = json_decode(Tools::file_get_contents(_QLO_API_URL_.'/lang_pack/get_lang_pack.php?version='._PS_VERSION_.'&iso_lang='.$iso_code));
         }
 
         // If a language pack has been found or provided, prefill the language object with the value
@@ -831,7 +830,7 @@ class LanguageCore extends ObjectModel
             Configuration::updateGlobalValue('PS_ALLOW_ACCENTED_CHARS_URL', 1);
         }
 
-        $flag = Tools::file_get_contents('http://www.prestashop.com/download/lang_packs/flags/jpeg/'.$iso_code.'.jpg');
+        $flag = Tools::file_get_contents(_QLO_API_URL_.'/download/lang_pack/flags/'.$iso_code.'.jpg');
         if ($flag != null && !preg_match('/<body>/', $flag)) {
             $file = fopen(_PS_ROOT_DIR_.'/img/l/'.(int)$lang->id.'.jpg', 'w');
             if ($file) {
@@ -912,11 +911,11 @@ class LanguageCore extends ObjectModel
         $errors = array();
         $file = _PS_TRANSLATIONS_DIR_.(string)$iso.'.gzip';
 
-        if (!$lang_pack_link = Tools::file_get_contents('http://www.prestashop.com/download/lang_packs/get_language_pack.php?version='.$version.'&iso_lang='.Tools::strtolower((string)$iso))) {
+        if (!$lang_pack_link = Tools::file_get_contents(_QLO_API_URL_.'/lang_pack/get_lang_pack.php?version='.$version.'&iso_lang='.Tools::strtolower((string)$iso))) {
             $errors[] = Tools::displayError('Archive cannot be downloaded from prestashop.com.');
         } elseif (!$lang_pack = json_decode($lang_pack_link)) {
             $errors[] = Tools::displayError('Error occurred when language was checked according to your Prestashop version.');
-        } elseif (empty($lang_pack->error) && ($content = Tools::file_get_contents('http://translations.prestashop.com/download/lang_packs/gzip/'.$lang_pack->version.'/'.Tools::strtolower($lang_pack->iso_code.'.gzip')))) {
+        } elseif (empty($lang_pack->error) && ($content = Tools::file_get_contents(_QLO_API_URL_.'/download/lang_pack/'.$lang_pack->version.'/'.Tools::strtolower($lang_pack->iso_code.'.gzip')))) {
             if (!@file_put_contents($file, $content)) {
                 if (is_writable(dirname($file))) {
                     @unlink($file);
@@ -934,7 +933,6 @@ class LanguageCore extends ObjectModel
             $gz = new Archive_Tar($file, true);
             $files_list = AdminTranslationsController::filterTranslationFiles(Language::getLanguagePackListContent((string)$iso, $gz));
             $files_paths = AdminTranslationsController::filesListToPaths($files_list);
-
             $i = 0;
             $tmp_array = array();
 
@@ -977,8 +975,6 @@ class LanguageCore extends ObjectModel
                 AdminTranslationsController::checkAndAddMailsFiles((string)$iso, $files_list);
                 AdminTranslationsController::addNewTabs((string)$iso, $files_list);
             }
-            //By webkul....Replace our customized mail files in the mail folder.....
-            Language::replaceCustomizedMailFiles($iso);
         }
 
         return count($errors) ? $errors : true;
