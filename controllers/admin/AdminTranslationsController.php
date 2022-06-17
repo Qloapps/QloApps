@@ -1410,7 +1410,8 @@ class AdminTranslationsControllerCore extends AdminController
         $time = time();
         $kpis = array();
 
-        /* The data generation is located in AdminStatsControllerCore */
+        $statsController = new AdminStatsController();
+        $this->context->controller = $this;
 
         $helper = new HelperKpi();
         $helper->id = 'box-languages';
@@ -1420,6 +1421,8 @@ class AdminTranslationsControllerCore extends AdminController
         $helper->title = $this->l('Enabled Languages', null, null, false);
         if (ConfigurationKPI::get('ENABLED_LANGUAGES') !== false) {
             $helper->value = ConfigurationKPI::get('ENABLED_LANGUAGES');
+        } else {
+            $helper->value = $statsController->getLatestKpiValue('enabled_languages');
         }
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=enabled_languages';
         $helper->refresh = (bool)(ConfigurationKPI::get('ENABLED_LANGUAGES_EXPIRE') < $time);
@@ -1433,6 +1436,8 @@ class AdminTranslationsControllerCore extends AdminController
         $helper->subtitle = $this->l('30 Days', null, null, false);
         if (ConfigurationKPI::get('MAIN_COUNTRY', $this->context->language->id) !== false) {
             $helper->value = ConfigurationKPI::get('MAIN_COUNTRY', $this->context->language->id);
+        } else {
+            $helper->value = $statsController->getLatestKpiValue('main_country');
         }
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=main_country';
         $helper->refresh = (bool)(ConfigurationKPI::get('MAIN_COUNTRY_EXPIRE', $this->context->language->id) < $time);
@@ -1445,6 +1450,8 @@ class AdminTranslationsControllerCore extends AdminController
         $helper->title = $this->l('Front office Translations', null, null, false);
         if (ConfigurationKPI::get('FRONTOFFICE_TRANSLATIONS') !== false) {
             $helper->value = ConfigurationKPI::get('FRONTOFFICE_TRANSLATIONS');
+        } else {
+            $helper->value = $statsController->getLatestKpiValue('frontoffice_translations');
         }
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=frontoffice_translations';
         $helper->refresh = (bool)(ConfigurationKPI::get('FRONTOFFICE_TRANSLATIONS_EXPIRE') < $time);
