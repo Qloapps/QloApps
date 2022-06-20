@@ -536,7 +536,7 @@ class HotelHelper
                 $htl_room_info_obj->id_hotel = $id_hotel;
                 $htl_room_info_obj->room_num = 'A-10'.$k;
                 $htl_room_info_obj->id_status = 1;
-                $htl_room_info_obj->floor = 'first';
+                $htl_room_info_obj->floor = 'First';
                 $htl_room_info_obj->save();
             }
 
