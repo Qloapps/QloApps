@@ -11,28 +11,28 @@
 					<tr class="nodrag nodrop">
 						<th class="col-sm-2 center">
 							<label class="control-label">
-								<span class="label-tooltip" data-toggle="tooltip" title="" data-original-title="Enter room number. For eg. A-101, A-102 etc. Invalid characters <>;=#{}">
+								<span class="label-tooltip" data-toggle="tooltip" data-original-title="{l s='Enter room number. For eg. A-101, A-102 etc. Invalid characters <>;=#{}'}">
 									{l s='Room No.'}
 								</span>
 							</label>
 						</th>
 						<th class="col-sm-2 center">
 							<label class="control-label">
-								<span class="label-tooltip" data-toggle="tooltip" title="" data-original-title="Enter floor of the room. For eg. First, Second etc. Invalid characters <>;=#{}">
+								<span class="label-tooltip" data-toggle="tooltip" data-original-title="{l s='Enter floor of the room. For eg. First, Second etc. Invalid characters <>;=#{}'}">
 									{l s='Floor'}
 								</span>
 							</label>
 						</th>
 						<th class="col-sm-2 center">
 							<label class="control-label">
-								<span class="label-tooltip" data-toggle="tooltip" title="" data-original-title="Select status of the room.">
+								<span class="label-tooltip" data-toggle="tooltip" data-original-title="{l s='Select status of the room.'}">
 									{l s='Status'}
 								</span>
 							</label>
 						</th>
 						<th class="col-sm-6 center">
 							<label class="control-label">
-								<span class="label-tooltip" data-toggle="tooltip" title="" data-original-title="Enter extra information about this room. Leave empty if not required.">
+								<span class="label-tooltip" data-toggle="tooltip" data-original-title="{l s='Enter extra information about this room. Leave empty if not required.'}">
 									{l s='Extra Information'}
 								</span>
 							</label>
