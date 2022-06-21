@@ -149,6 +149,9 @@
 				<h4 class="modal-title"><i class="icon-calendar"></i>&nbsp; {l s='Disable dates'}</h4>
 			</div>
 			<div class="modal-body">
+				<div class="alert alert-info">
+					<p>{l s='Please note that the date chosen for field \'Date To\' is not considered as a blocking date.'}</p>
+				</div>
 				<div class="from-group table-responsive-row clearfix">
 					<table class="table room-disable-dates">
 						<thead>
@@ -218,10 +221,10 @@
 				$.each(disableDatesObj, function(disKey, disabledRange) {
 					html += '<tr class="disabledDatesTr">';
 						html += '<td class="col-sm-2 center">';
-							html += '<input class="disabled_date_from form-control" type="text" value="'+disabledRange.date_from+'" name="disabled_date_from'+rowKey+'[]">';
+							html += '<input class="disabled_date_from form-control" type="text" value="'+disabledRange.date_from+'" name="disabled_date_from'+rowKey+'[]" readonly>';
 						html += '</td>';
 						html += '<td class="col-sm-2 center">';
-							html += '<input class="disabled_date_to form-control" type="text" value="'+disabledRange.date_to+'" name="disabled_date_to'+rowKey+'[]">';
+							html += '<input class="disabled_date_to form-control" type="text" value="'+disabledRange.date_to+'" name="disabled_date_to'+rowKey+'[]" readonly>';
 						html += '<td class="center col-sm-6">';
 							html += '<input type="text" class="form-control room_disable_reason" value="'+disabledRange.reason+'" name="room_disable_reason'+rowKey+'[]">';
 						html += '</td>';
@@ -233,10 +236,10 @@
 			} else {
 				html += '<tr class="disabledDatesTr">';
 					html += '<td class="col-sm-2 center">';
-						html += '<input class="disabled_date_from form-control" type="text" value="" name="disabled_date_from'+rowKey+'[]">';
+						html += '<input class="disabled_date_from form-control" type="text" value="" name="disabled_date_from'+rowKey+'[]" readonly>';
 					html += '</td>';
 					html += '<td class="col-sm-2 center">';
-						html += '<input class="disabled_date_to form-control" type="text" value="" name="disabled_date_to'+rowKey+'[]">';
+						html += '<input class="disabled_date_to form-control" type="text" value="" name="disabled_date_to'+rowKey+'[]" readonly>';
 					html += '<td class="center col-sm-6">';
 						html += '<input type="text" class="form-control room_disable_reason" value="" name="room_disable_reason'+rowKey+'[]">';
 					html += '</td>';
@@ -380,13 +383,28 @@
 		        minDate: 0,
 		        //for calender Css
 		        onSelect: function(selectedDate) {
-		            $(this).closest('tr').find(".disabled_date_to").datepicker("option", "minDate", selectedDate).val('');
+					var date_format = selectedDate.split("-");
+            		selectedDate = new Date($.datepicker.formatDate('yy-mm-dd', new Date(date_format[0], date_format[1] - 1, date_format[2])));
+					selectedDate.setDate(selectedDate.getDate() + 1);
+		            $(this).closest('tr').find('.disabled_date_to').datepicker('option', 'minDate', selectedDate);
 		        },
 		    });
 		    $(".disabled_date_to").datepicker({
 		        showOtherMonths: true,
 		        dateFormat: 'yy-mm-dd',
 		        minDate: 0,
+				beforeShow: function (input, instance) {
+					var date_to = $(this).closest('tr').find('.disabled_date_from').val();
+					if (typeof date_to != 'undefined' && date_to != '') {
+						var date_format = date_to.split("-");
+						var selectedDate = new Date($.datepicker.formatDate('yy-mm-dd', new Date(date_format[0], date_format[1] - 1, date_format[2])));
+					} else {
+						var date_format = new Date();
+						var selectedDate = new Date($.datepicker.formatDate('yy-mm-dd', new Date()));
+					}
+					selectedDate.setDate(selectedDate.getDate()+1);
+						$(this).datepicker("option", "minDate", selectedDate);
+				},
 		    });
 		});
 
@@ -394,10 +412,10 @@
 	    	var rowKey = $(this).closest(".room_data_values").attr('data-rowKey');
 			html = '<tr class="disabledDatesTr">';
 				html += '<td class="col-sm-2 center">';
-					html += '<input class="disabled_date_from form-control" type="text" value="" name="disabled_date_from'+rowKey+'[]">';
+					html += '<input class="disabled_date_from form-control" type="text" value="" name="disabled_date_from'+rowKey+'[]" readonly>';
 				html += '</td>';
 				html += '<td class="col-sm-2 center">';
-					html += '<input class="disabled_date_to form-control" type="text" value="" name="disabled_date_to'+rowKey+'[]">';
+					html += '<input class="disabled_date_to form-control" type="text" value="" name="disabled_date_to'+rowKey+'[]" readonly>';
 				html += '<td class="center col-sm-6">';
 					html += '<input type="text" class="form-control room_disable_reason" value="" name="room_disable_reason'+rowKey+'[]">';
 				html += '</td>';
