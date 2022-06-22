@@ -213,6 +213,13 @@ class AdminPPreferencesControllerCore extends AdminController
                         'required' => false,
                         'type' => 'bool'
                     ),
+                    'PS_HOTEL_IMAGES_PER_PAGE' => array(
+                        'title' => $this->l('Number of hotel images per page'),
+                        'hint' => $this->l('Number of hotel images displayed per page. Default is 9.'),
+                        'validation' => 'isUnsignedInt',
+                        'cast' => 'intval',
+                        'type' => 'text'
+                    ),
                 ),
                 'submit' => array('title' => $this->l('Save'))
             ),

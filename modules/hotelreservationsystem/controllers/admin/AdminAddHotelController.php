@@ -141,7 +141,7 @@ class AdminAddHotelController extends ModuleAdminController
             $smartyVars['hotel_info'] =  $hotelBranchInfo;
             //Hotel Images
             $objHotelImage = new HotelImage();
-            if ($hotelAllImages = $objHotelImage->getAllImagesByHotelId($idHotel)) {
+            if ($hotelAllImages = $objHotelImage->getImagesByHotelId($idHotel)) {
                 foreach ($hotelAllImages as &$image) {
                     $image['image_link'] = $this->context->link->getMediaLink(_MODULE_DIR_.$this->module->name.'/views/img/hotel_img/'.$image['hotel_image_id'].'.jpg');
                 }
@@ -562,7 +562,7 @@ class AdminAddHotelController extends ModuleAdminController
                 if (Validate::isLoadedObject($objHtlImage = new HotelImage((int) $idImage))) {
                     if ($objHtlImage->delete()) {
                         if (!HotelImage::getCover($idHotel)) {
-                            $images = $objHtlImage->getAllImagesByHotelId($idHotel);
+                            $images = $objHtlImage->getImagesByHotelId($idHotel);
                             if ($images) {
                                 $objHtlImage = new HotelImage($images[0]['id']);
                                 $objHtlImage->cover = 1;

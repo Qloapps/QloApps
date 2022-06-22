@@ -616,7 +616,7 @@ class HotelBranchInformation extends ObjectModel
                     'HotelBranchInformation'
                 );
             }
-            $hotelAllImages = $objHotelImage->getAllImagesByHotelId($idHotel);
+            $hotelAllImages = $objHotelImage->getImagesByHotelId($idHotel);
             if ($hotelAllImages) {
                 foreach ($hotelAllImages as $key_img => $value_img) {
                     if (Validate::isLoadedObject($objHotelImage = new HotelImage((int) $value_img['id']))) {

@@ -204,6 +204,8 @@ $(document).ready(function() {
         if (url.indexOf('#') != -1)
             getProductAttribute();
     }
+
+    loadHotelImages();
 });
 
 $(window).resize(function() {
@@ -1429,5 +1431,67 @@ function changeRoomDate(date_in, date_out){
 		alert(some_error_cond);
 	    }
 	}
+    });
+}
+
+function loadHotelImages() {
+    const btnShowMore = $('.btn-show-more-images');
+
+    $.ajax({
+        url: product_controller_url,
+        type: 'POST',
+        dataType: 'JSON',
+        data: {
+            ajax: true,
+            action: 'getHotelImages',
+            id_product: id_product,
+            page: 1,
+        },
+        success: function(response) {
+            if (response.message == 'HTML_OK') {
+                $('#room_info_hotel_images').append(response.html);
+                $('.hotel-images-fancybox').fancybox();
+            } else {
+                $('.room_info_hotel_images_wrap').hide();
+            }
+
+            if (!response.has_next_page) {
+                $(btnShowMore).hide(200);
+            }
+        }
+    });
+}
+
+$(document).on('click', '.btn-show-more-images', function () {
+    loadMoreHotelImages();
+});
+
+function loadMoreHotelImages() {
+    const btnShowMore = $('.btn-show-more-images');
+    const page = parseInt($(btnShowMore).attr('data-next-page'));
+
+    $.ajax({
+        url: product_controller_url,
+        type: 'POST',
+        dataType: 'JSON',
+        data: {
+            ajax: true,
+            action: 'getHotelImages',
+            id_product: id_product,
+            page: page,
+        },
+        success: function(response) {
+            if (response.message == 'HTML_OK') {
+                $('#room_info_hotel_images').append(response.html);
+                $('.hotel-images-fancybox').fancybox();
+            }
+
+            if (response.has_next_page) {
+                $(btnShowMore).show(200);
+                $(btnShowMore).attr('data-next-page', page + 1);
+            } else {
+                $(btnShowMore).hide(200);
+            }
+        }
     });
 }

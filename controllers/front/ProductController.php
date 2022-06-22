@@ -1015,4 +1015,40 @@ class ProductControllerCore extends FrontController
         }
         die(json_encode($result));
     }
+
+    public function displayAjaxGetHotelImages()
+    {
+        $response = array('status' => 'ko');
+        $idProduct = (int) Tools::getValue('id_product');
+        $page = (int) Tools::getValue('page');
+        $imagesPerPage = (int) Configuration::get('PS_HOTEL_IMAGES_PER_PAGE');
+
+        $objHotelRoomType = new HotelRoomType();
+        $objHotelImage = new HotelImage();
+
+        $roomTypeInfo = $objHotelRoomType->getRoomTypeInfoByIdProduct($idProduct);
+        $idHotel = $roomTypeInfo['id_hotel'];
+        $hotelImages = $objHotelImage->getImagesByHotelId($idHotel, $page, $imagesPerPage);
+        $hasNextPage = ($objHotelImage->getImagesByHotelId($idHotel, $page + 1, $imagesPerPage)) ? true : false;
+        $hotelImagesBaseDir = _MODULE_DIR_.'hotelreservationsystem/views/img/hotel_img/';
+        foreach ($hotelImages as &$hotelImage) {
+            $hotelImage['link'] = $this->context->link->getMediaLink(
+                $hotelImagesBaseDir.$hotelImage['hotel_image_id'].'.jpg'
+            );
+        }
+
+        if (is_array($hotelImages) && count($hotelImages)) {
+            $this->context->smarty->assign(array('hotel_images' => $hotelImages));
+            $html = $this->context->smarty->fetch(
+                $this->getTemplatePath('_partials/hotel_images.tpl')
+            );
+
+            $response['html'] = $html;
+            $response['status'] = 'ok';
+            $response['has_next_page'] = $hasNextPage;
+            $response['message'] = 'HTML_OK';
+        }
+
+        die(json_encode($response));
+    }
 }
