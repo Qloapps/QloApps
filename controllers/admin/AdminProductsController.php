@@ -1271,7 +1271,7 @@ class AdminProductsControllerCore extends AdminController
         $id_group = Tools::getValue('sp_id_group');
         $id_customer = Tools::getValue('sp_id_customer');
         $price = Tools::getValue('leave_bprice') ? '-1' : Tools::getValue('sp_price');
-        $from_quantity = Tools::getValue('sp_from_quantity');
+        $from_quantity = 1;
         $reduction = (float)(Tools::getValue('sp_reduction'));
         $reduction_tax = Tools::getValue('sp_reduction_tax');
         $reduction_type = !$reduction ? 'amount' : Tools::getValue('sp_reduction_type');
@@ -4295,7 +4295,6 @@ class AdminProductsControllerCore extends AdminController
 						<td>'.$fixed_price.'</td>
 						<td>'.$impact.'</td>
 						<td>'.$period.'</td>
-						<td>'.$specific_price['from_quantity'].'</th>
 						<td>'.((!$rule->id && $can_delete_specific_prices) ? '<a class="btn btn-default" name="delete_link" href="'.self::$currentIndex.'&id_product='.(int)Tools::getValue('id_product').'&action=deleteSpecificPrice&id_specific_price='.(int)($specific_price['id_specific_price']).'&token='.Tools::getValue('token').'"><i class="icon-trash"></i></a>': '').'</td>
 					</tr>';
                     $i++;
@@ -5484,7 +5483,7 @@ class AdminProductsControllerCore extends AdminController
         }
         $this->tpl_form_vars['custom_form'] = $data->fetch();
     }
-    
+
     public function getModalDuplicateOptions()
     {
         $tpl = $this->createTemplate('modal-duplicate-options.tpl');
