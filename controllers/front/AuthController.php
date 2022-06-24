@@ -66,7 +66,6 @@ class AuthControllerCore extends FrontController
 
         $this->addJqueryPlugin('typewatch');
         $this->addJS(array(
-            _THEME_JS_DIR_.'tools/vatManagement.js',
             _THEME_JS_DIR_.'tools/statesManagement.js',
             _THEME_JS_DIR_.'authentication.js',
             _PS_JS_DIR_.'validate.js'
