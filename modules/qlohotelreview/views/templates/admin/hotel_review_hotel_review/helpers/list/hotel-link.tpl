@@ -17,16 +17,6 @@
 * @license LICENSE.txt
 *}
 
-<div class="review-list">
-    {foreach $reviews as $review}
-        {include file='./review.tpl' review=$review}
-    {/foreach}
-</div>
-
-{if isset($show_load_more_btn) && $show_load_more_btn}
-    <div class="text-left">
-        <a href="#" class="btn btn-primary btn-primary-review" id="btn-load-more-reviews" data-id-hotel="{$id_hotel}" data-next-page="2">
-            <span>{l s='LOAD MORE' mod='qlohotelreview'}</span>
-        </a>
-    </div>
-{/if}
+<a href="{$link->getAdminLink('AdminAddHotel')}&id={$id_hotel|intval}&updatehtl_branch_info" target='_blank'>
+    {$hotel_name|escape:'html':'UTF-8'} (#{$id_hotel|intval})
+</a>

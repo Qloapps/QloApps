@@ -17,10 +17,6 @@
 * @license LICENSE.txt
 *}
 
-<a class="btn btn-default btn-review pull-right"
-    id="add-review-btn"
-    data-id-order="{$id_order}"
-    data-id-hotel="{$id_hotel}"
-    data-hotel-name="{$hotel_name}">
+<a class="btn btn-default btn-review pull-right" id="add-review-btn" data-id-order="{$id_order}" data-id-hotel="{$id_hotel}" data-hotel-name="{$hotel_name}">
     {l s='Write a Review' mod='qlohotelreview'}
 </a>

@@ -327,21 +327,12 @@ class ProductControllerCore extends FrontController
                 if (Tools::getValue('error')) {
                     $this->context->smarty->assign('error', Tools::getValue('error'));
                 }
-                if (Module::isEnabled('qlohotelreview')) {
-                    $this->context->smarty->assign(
-                        array(
-                            'num_reviews' => QhrHotelReview::getReviewCountByIdHotel($hotel_id),
-                            'ratting' => QhrHotelReview::getAverageRatingByIdHotel($hotel_id),
-                        )
-                    );
-                }
 
                 $this->context->smarty->assign(
                     array(
                         'isHotelRefundable' => $hotel_branch_obj->isRefundable(),
                         'max_order_date' => $max_order_date,
                         'warning_num' => Configuration::get('WK_ROOM_LEFT_WARNING_NUMBER'),
-                        'ratting_img_path' => _MODULE_DIR_.'hotelreservationsystem/views/img/Slices/icons-sprite.png',
                         'total_available_rooms' => $total_available_rooms,
                         'product_controller_url' => $this->context->link->getPageLink('product'),
                         'date_from' => $date_from,

@@ -67,6 +67,7 @@ class QloHotelReview extends Module
                 'displayProductTab',
                 'displayProductTabContent',
                 'displayFooterBefore',
+                'displayRoomTypeDetailRoomTypeNameAfter',
                 'actionRoomBookingStatusUpdateAfter',
                 'displayBookingAction',
                 'displayBackOfficeHeader',
@@ -94,6 +95,9 @@ class QloHotelReview extends Module
 
         // review list resources
         $this->reviewListResources();
+
+        // room type detail page resources
+        $this->roomTypeDetailResources();
     }
 
     public function reviewPopupResources()
@@ -124,17 +128,29 @@ class QloHotelReview extends Module
             Media::addJsDef(array('qlo_hotel_review_js_vars' => array(
                 'review_ajax_link' => $this->context->link->getModuleLink($this->name),
                 'review_ajax_token' => $this->secure_key,
-                'raty_path' => $this->getPathUri().'views/img/raty',
+                'raty_img_path' => $this->getPathUri().'views/img/raty',
                 'review_images' => $reviewImages,
             )));
 
-            $this->context->controller->addCSS($this->getPathUri().'libs/js/raty/jquery.raty.css');
-            $this->context->controller->addJS($this->getPathUri().'libs/js/raty/jquery.raty.js');
-            $this->context->controller->addJS(
-                $this->getPathUri().'libs/js/jquery-circle-progress/circle-progress.min-1.2.2.js'
-            );
+            $this->context->controller->addCSS(_PS_JS_DIR_.'raty/jquery.raty.css');
+            $this->context->controller->addJS(_PS_JS_DIR_.'raty/jquery.raty.js');
+            $this->context->controller->addJS(_PS_JS_DIR_.'jquery-circle-progress/circle-progress.min-1.2.2.js');
             $this->context->controller->addCSS($this->getPathUri().'views/css/front/review-list.css');
             $this->context->controller->addJS($this->getPathUri().'views/js/front/review-list.js');
+        }
+    }
+
+    public function roomTypeDetailResources()
+    {
+        if (Tools::getValue('controller') == 'product') {
+            Media::addJsDef(array('qlo_hotel_review_rtd_js_vars' => array(
+                'raty_img_path' => $this->getPathUri().'views/img/raty',
+            )));
+
+            $this->context->controller->addCSS(_PS_JS_DIR_.'raty/jquery.raty.css');
+            $this->context->controller->addJS(_PS_JS_DIR_.'raty/jquery.raty.js');
+            $this->context->controller->addCSS($this->getPathUri().'views/css/front/room-type-detail.css');
+            $this->context->controller->addJS($this->getPathUri().'views/js/front/room-type-detail.js');
         }
     }
 
@@ -145,7 +161,7 @@ class QloHotelReview extends Module
             'link' => $this->context->link->getPageLink('order-detail', true),
             'review_ajax_link' => $this->context->link->getModuleLink($this->name),
             'review_ajax_token' => $this->secure_key,
-            'raty_path' => $this->getPathUri().'views/img/raty',
+            'raty_img_path' => $this->getPathUri().'views/img/raty',
             'num_images_max' => (int) Configuration::get('QHR_MAX_IMAGES_PER_REVIEW'),
             'admin_approval_enabled' => (int) Configuration::get('QHR_ADMIN_APPROVAL_ENABLED'),
             'texts' => array(
@@ -156,8 +172,8 @@ class QloHotelReview extends Module
             ),
         )));
 
-        $this->context->controller->addCSS($this->getPathUri().'libs/js/raty/jquery.raty.css');
-        $this->context->controller->addJS($this->getPathUri().'libs/js/raty/jquery.raty.js');
+        $this->context->controller->addCSS(_PS_JS_DIR_.'raty/jquery.raty.css');
+        $this->context->controller->addJS(_PS_JS_DIR_.'raty/jquery.raty.js');
         $this->context->controller->addCSS($this->getPathUri().'views/css/front/review.css');
         $this->context->controller->addJS($this->getPathUri().'views/js/hook/review.js');
     }
@@ -192,6 +208,21 @@ class QloHotelReview extends Module
         }
     }
 
+    public function hookDisplayRoomTypeDetailRoomTypeNameAfter($params)
+    {
+        $idProduct = $params['id_product'];
+        $objHotelRoomType = new HotelRoomType();
+        $roomTypeInfo = $objHotelRoomType->getRoomTypeInfoByIdProduct($idProduct);
+        $idHotel = $roomTypeInfo['id_hotel'];
+        $this->smarty->assign(array(
+            'num_reviews' => QhrHotelReview::getReviewCountByIdHotel($idHotel),
+            'avg_rating' => QhrHotelReview::getAverageRatingByIdHotel($idHotel),
+            'ratting_img_path' => _MODULE_DIR_.'hotelreservationsystem/views/img/Slices/icons-sprite.png',
+        ));
+
+        return $this->display(__FILE__, 'room-type-name-after.tpl');
+    }
+
     public function hookActionRoomBookingStatusUpdateAfter($params)
     {
         $idOrder = $params['id_order'];
@@ -219,6 +250,7 @@ class QloHotelReview extends Module
             QhrHotelReview::QHR_SORT_BY_TIME_NEW,
             $this->context->cookie->id_customer
         );
+
         if (is_array($reviews) && count($reviews)) {
             foreach ($reviews as &$review) {
                 $review['images'] = QhrHotelReview::getImagesById($review['id_hotel_review']);

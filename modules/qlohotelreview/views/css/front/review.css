@@ -107,6 +107,20 @@
     margin-bottom: 15px;
 }
 
+#add-review-popup .previews-wrap span {
+    position: relative;
+    display: inline-block;
+}
+
+#add-review-popup .previews-wrap span i {
+    position: absolute;
+    top: 3px;
+    right: 14px;
+    font-size: 21px;
+    color: #7f7f7f;
+    cursor: pointer;
+}
+
 #add-review-popup .previews-wrap .img-preview {
     max-height: 100px;
     width: auto;

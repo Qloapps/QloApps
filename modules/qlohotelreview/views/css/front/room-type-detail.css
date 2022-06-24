@@ -1,4 +1,4 @@
-{**
+/**
 * 2010-2022 Webkul.
 *
 * NOTICE OF LICENSE
@@ -15,18 +15,19 @@
 * @author Webkul IN
 * @copyright 2010-2022 Webkul IN
 * @license LICENSE.txt
-*}
+*/
 
-<div class="review-list">
-    {foreach $reviews as $review}
-        {include file='./review.tpl' review=$review}
-    {/foreach}
-</div>
+.pb-left-column .num_reviews {
+    font-size: 14px;
+    color: #0000FF;
+    margin-left: 10px;
+}
 
-{if isset($show_load_more_btn) && $show_load_more_btn}
-    <div class="text-left">
-        <a href="#" class="btn btn-primary btn-primary-review" id="btn-load-more-reviews" data-id-hotel="{$id_hotel}" data-next-page="2">
-            <span>{l s='LOAD MORE' mod='qlohotelreview'}</span>
-        </a>
-    </div>
-{/if}
+.hotel_name_block + div {
+    margin-top: 3px;
+}
+
+.room_hotel_name_block .raty {
+    position: relative;
+    top: -2px
+}

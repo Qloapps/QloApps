@@ -120,6 +120,12 @@ class QhrHotelReviewHelper
         );
     }
 
+    public static function getPathForCreation($idHotelReview)
+    {
+        $folders = str_split((string)$id_image);
+        return implode('/', $folders).'/';
+    }
+
     public static function createDirectory($dir)
     {
         if (!file_exists($dir)) {

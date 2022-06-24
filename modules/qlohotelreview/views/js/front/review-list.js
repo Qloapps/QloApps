@@ -79,7 +79,7 @@ var QhrReview = {
                 if (response.status == 'ok' && response.message == 'HTML_OK') {
                     $('.review-list').animate({opacity: 0}, 250, 'linear', function() {
                         $('.review-list').html(response.html);
-                        initRaty(qlo_hotel_review_js_vars.raty_path, '.review-list .raty');
+                        initRaty(qlo_hotel_review_js_vars.raty_img_path, '.review-list .raty');
                         $('.review-list').animate({opacity: 1}, 250, 'linear', function() {
                             if (response.has_next_page) {
                                 $(btnLoadMore).attr('data-next-page', 2);
@@ -110,7 +110,7 @@ var QhrReview = {
             success: function(response) {
                 if (response.message == 'HTML_OK') {
                     $('.review-list').append(response.html);
-                    initRaty(qlo_hotel_review_js_vars.raty_path, '.review-list .raty');
+                    initRaty(qlo_hotel_review_js_vars.raty_img_path, '.review-list .raty');
 
                     if (response.has_next_page) {
                         $(btnLoadMore).show(200);
@@ -198,10 +198,13 @@ $(document).ready(function () {
     }
 
     // init raty
-    if (typeof qlo_hotel_review_js_vars === 'object' && qlo_hotel_review_js_vars.raty_path) {
-        initRaty(qlo_hotel_review_js_vars.raty_path);
+    if (typeof qlo_hotel_review_js_vars === 'object' && qlo_hotel_review_js_vars.raty_img_path) {
+        initRaty(qlo_hotel_review_js_vars.raty_img_path);
     }
 
     // init circle scores
     initCircleProgress();
+
+    // init fancybox
+    $('.review-images-fancybox').fancybox();
 });

@@ -35,7 +35,7 @@
         <div class="images-wrap">
             {foreach $review.images as $image}
                 <div class="image-wrap">
-                    <a href="{$image}">
+                    <a class="review-images-fancybox" rel="review-images-gallery-{$review.id_hotel_review}" href="{$image}">
                         <img class="img img-responsive" src="{$image}">
                     </a>
                 </div>
@@ -51,8 +51,7 @@
                     <i class="icon icon-thumbs-o-up text-primary"></i>
                 </a>
             {/if}
-            <p class="helpful-count">
-                {l s='%1$d people found it helpful.' sprintf=[$review.total_useful] mod='qlohotelreview'}</p>
+            <p class="helpful-count">{l s='%1$d people found it helpful.' sprintf=[$review.total_useful] mod='qlohotelreview'}</p>
         </div>
         {if $logged && !$review.response_report}
             <div class="col-sm-6 text-right">
@@ -70,7 +69,7 @@
                     <div class="reply-box">
                         <div class="reply-header">
                             <p class="heading-primary">{$review.hotel_name|escape:'html':'UTF-8'}</p>
-                            <p class="heading-secondary">{l s='has replied' mod='qlohotelreview'}</p>
+                            <p class="heading-secondary">{l s='has replied on' mod='qlohotelreview'} {$review.reply_date|date_format}</p>
                         </div>
                         <div class="reply-message">
                             <p>{$review.message|escape:'html':'UTF-8'}</p>

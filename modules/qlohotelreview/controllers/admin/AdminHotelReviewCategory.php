@@ -27,9 +27,9 @@ class AdminHotelReviewCategoryController extends ModuleAdminController
         $this->table = 'qhr_category';
         $this->identifier = 'id_category';
         $this->lang = true;
-        
+
         parent::__construct();
-        
+
         $this->addRowAction('edit');
         $this->addRowAction('delete');
 

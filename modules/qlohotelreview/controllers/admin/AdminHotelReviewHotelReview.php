@@ -26,7 +26,7 @@ class AdminHotelReviewHotelReviewController extends ModuleAdminController
         $this->className = 'QhrHotelReview';
         $this->table = 'qhr_hotel_review';
         $this->identifier = 'id_hotel_review';
-        
+
         parent::__construct();
 
         $this->_select .= ' hbl.`hotel_name`, c.`id_customer`,
@@ -40,10 +40,10 @@ class AdminHotelReviewHotelReviewController extends ModuleAdminController
         ON (hbl.`id` = a.`id_hotel` AND hbl.`id_lang` = '.(int) $this->context->language->id.')';
         $this->_orderBy .= 'a.date_add';
         $this->_orderWay .= 'DESC';
-        
+
         $this->addRowAction('view');
         $this->addRowAction('approve');
-        $this->addRowAction('unapprove');
+        $this->addRowAction('disapprove');
         $this->addRowAction('delete');
 
         $this->fields_list = array(
@@ -87,14 +87,14 @@ class AdminHotelReviewHotelReviewController extends ModuleAdminController
                 'class' => 'fixed-width-md',
                 'callback' => 'getTotalReports',
             ),
-            'approved' => array(
+            'status' => array(
                 'title' => $this->l('Approval Status'),
                 'hint' => $this->l('Approval status of the review.'),
                 'align' => 'center',
-                'callback' => 'getApprovalStatus',
+                'callback' => 'getStatus',
                 'type' => 'select',
-                'filter_key' => 'a!approved',
-                'list' => array(0 => $this->l('Unapproved'), 1 => $this->l('Approved')),
+                'filter_key' => 'a!status',
+                'list' => QhrHotelReview::getStatuses(),
             ),
             'date_add' => array(
                 'title' => $this->l('Date'),
@@ -116,20 +116,25 @@ class AdminHotelReviewHotelReviewController extends ModuleAdminController
 
         $this->_conf[101] = $this->l('Reply has been added successfully.');
         $this->_conf[102] = $this->l('Review has been approved successfully.');
-        $this->_conf[103] = $this->l('Review has been unapproved successfully.');
+        $this->_conf[103] = $this->l('Review has been disapproved successfully.');
+        $this->_conf[104] = $this->l('Review has been marked not abusive successfully.');
 
-        $this->cacheApproved = array();
+        $this->cacheStatus = array();
+
+        $this->tpls_base_dir = $this->module->getLocalPath().'views/templates/admin/'.$this->tpl_folder;
     }
 
     public function getOverallRating($rating)
     {
-        if ($rating < 2) {
-            return '<span class="badge badge-danger">'.$rating.'</span>';
-        } elseif ($rating < 3.5) {
-            return '<span class="badge badge-warning">'.$rating.'</span>';
-        } else {
-            return '<span class="badge badge-success">'.$rating.'</span>';
-        }
+        $tpl = $this->context->smarty->createTemplate(
+            $this->tpls_base_dir.'helpers/list/overall-rating.tpl'
+        );
+
+        $tpl->assign(array(
+            'rating' => $rating,
+        ));
+
+        return $tpl->fetch();
     }
 
     public function getSubject($subject)
@@ -139,71 +144,113 @@ class AdminHotelReviewHotelReviewController extends ModuleAdminController
 
     public function getCustomerLink($fullname, $tr)
     {
-        $href = $this->context->link->getAdminLink('AdminCustomers').
-        '&viewcustomer&id_customer='.(int) $tr['id_customer'];
-        return "<a href='$href' target='_blank'>".$fullname." (#".(int) $tr['id_customer'].")</a>";
+        $tpl = $this->context->smarty->createTemplate(
+            $this->tpls_base_dir.'helpers/list/customer-link.tpl'
+        );
+
+        $tpl->assign(array(
+            'fullname' => $fullname,
+            'id_customer' => $tr['id_customer'],
+        ));
+
+        return $tpl->fetch();
     }
 
-    public function getHotelLink($hotelName, $row)
+    public function getHotelLink($hotelName, $tr)
     {
-        $idHotel = $row['id_hotel'];
-        $link = $this->context->link->getAdminLink('AdminAddHotel').'&id='.$idHotel.'&updatehtl_branch_info';
-        return "<a target='_blank' href='$link'>$hotelName (#$idHotel)</a>";
+        $tpl = $this->context->smarty->createTemplate(
+            $this->tpls_base_dir.'helpers/list/hotel-link.tpl'
+        );
+
+        $tpl->assign(array(
+            'hotel_name' => $hotelName,
+            'id_hotel' => $tr['id_hotel'],
+        ));
+
+        return $tpl->fetch();
     }
 
-    public function getTotalReports($totalReports, $row)
+    public function getTotalReports($totalReports)
     {
-        return "<span class='badge badge-danger'>$totalReports</span>";
+        $tpl = $this->context->smarty->createTemplate(
+            $this->tpls_base_dir.'helpers/list/total-reports.tpl'
+        );
+
+        $tpl->assign(array(
+            'total_reports' => $totalReports,
+        ));
+
+        return $tpl->fetch();
     }
 
-    public function getApprovalStatus($approved, $row)
+    public function getStatus($status)
     {
-        if ($approved) {
-            return '<span class="badge badge-success">'.$this->l('Approved').'</span>';
-        } else {
-            return '<span class="badge badge-danger">'.$this->l('Unapproved').'</span>';
-        }
+        $tpl = $this->context->smarty->createTemplate(
+            $this->tpls_base_dir.'helpers/list/status.tpl'
+        );
+
+        $tpl->assign(array(
+            'status' => $status,
+        ));
+
+        return $tpl->fetch();
     }
 
     public function displayApproveLink($token = null, $id, $name = null)
     {
         $status = null;
-        if (array_key_exists($id, $this->cacheApproved)) {
-            $status = $this->cacheApproved[$id];
+        if (array_key_exists($id, $this->cacheStatus)) {
+            $status = $this->cacheStatus[$id];
         } else {
             $objHotelReview = new QhrHotelReview((int) $id);
-            $status = $objHotelReview->approved;
-            $this->cacheApproved[$id] = $status;
+            $status = $objHotelReview->status;
+            $this->cacheStatus[$id] = $status;
         }
 
-        if ($status) {
-            $this->addRowActionSkipList('approve', $id);
-        } else {
-            $href = self::$currentIndex.'&'.$this->identifier.'='.$id.'&action=approveHotelReview'.'&token='.
+        if ($status != QhrHotelReview::QHR_STATUS_APPROVED) {
+            $tpl = $this->context->smarty->createTemplate(
+                $this->tpls_base_dir.'helpers/list/approve-link.tpl'
+            );
+
+            $link = self::$currentIndex.'&'.$this->identifier.'='.$id.'&action=approveHotelReview'.'&token='.
             ($token != null ? $token : $this->token);
-            $action = $this->l('Approve');
-            return "<a href='$href' title='$action' class='approve'><i class='icon-check'></i>$action</a>";
+
+            $tpl->assign(array(
+                'link' => $link,
+            ));
+
+            return $tpl->fetch();
+        } else {
+            $this->addRowActionSkipList('approve', $id);
         }
     }
 
-    public function displayUnapproveLink($token = null, $id, $name = null)
+    public function displayDisapproveLink($token = null, $id, $name = null)
     {
         $status = null;
-        if (array_key_exists($id, $this->cacheApproved)) {
-            $status = $this->cacheApproved[$id];
+        if (array_key_exists($id, $this->cacheStatus)) {
+            $status = $this->cacheStatus[$id];
         } else {
             $objHotelReview = new QhrHotelReview((int) $id);
-            $status = $objHotelReview->approved;
-            $this->cacheApproved[$id] = $status;
+            $status = $objHotelReview->status;
+            $this->cacheStatus[$id] = $status;
         }
 
-        if (!$status) {
-            $this->addRowActionSkipList('unapprove', $id);
-        } else {
-            $href = self::$currentIndex.'&'.$this->identifier.'='.$id.'&action=unapproveHotelReview'.'&token='.
+        if ($status != QhrHotelReview::QHR_STATUS_DISAPPROVED) {
+            $tpl = $this->context->smarty->createTemplate(
+                $this->tpls_base_dir.'helpers/list/disapprove-link.tpl'
+            );
+
+            $link = self::$currentIndex.'&'.$this->identifier.'='.$id.'&action=disapproveHotelReview'.'&token='.
             ($token != null ? $token : $this->token);
-            $action = $this->l('Unapprove');
-            return "<a href='$href' title='$action' class='approve'><i class='icon-check'></i>$action</a>";
+
+            $tpl->assign(array(
+                'link' => $link,
+            ));
+
+            return $tpl->fetch();
+        } else {
+            $this->addRowActionSkipList('disapprove', $id);
         }
     }
 
@@ -238,15 +285,15 @@ class AdminHotelReviewHotelReviewController extends ModuleAdminController
             $smartyVars['currentObject'] = $this->object;
             $smartyVars['images'] = $this->object->getImages();
             $smartyVars['reply'] = $this->object->getManagementReply();
+            $smartyVars['total_reports'] = $this->object->getTotalReports();
             $smartyVars['obj_customer'] = $objCustomer;
             $smartyVars['obj_hotel'] = $objHotel;
-            $smartyVars['img_dir'] = $this->object->img_dir;
 
             $this->context->smarty->assign($smartyVars);
             return parent::renderView();
         }
     }
-    
+
     public function postProcess()
     {
         if (Tools::isSubmit('submitReply')) {
@@ -276,10 +323,10 @@ class AdminHotelReviewHotelReviewController extends ModuleAdminController
                     $this->display = 'view';
                 }
             }
-        } elseif (Tools::isSubmit('submitUnapprove')) {
+        } elseif (Tools::isSubmit('submitDisapprove')) {
             $this->loadObject(false);
             if (!count($this->errors)) {
-                if ($this->object->unapproveReview()) {
+                if ($this->object->disapproveReview()) {
                     Tools::redirectAdmin(self::$currentIndex.'&conf=103&token='.$this->token.
                     '&viewqhr_hotel_review&id_hotel_review='.$this->id_object);
                 } else {
@@ -294,7 +341,7 @@ class AdminHotelReviewHotelReviewController extends ModuleAdminController
                 }
             }
         }
-        
+
         parent::postProcess();
     }
 
@@ -308,12 +355,22 @@ class AdminHotelReviewHotelReviewController extends ModuleAdminController
         }
     }
 
-    public function processUnapproveHotelReview()
+    public function processDisapproveHotelReview()
     {
         $this->loadObject(false);
         if (!count($this->errors)) {
-            if ($this->object->unapproveReview()) {
+            if ($this->object->disapproveReview()) {
                 Tools::redirectAdmin(self::$currentIndex.'&conf=103&token='.$this->token);
+            }
+        }
+    }
+
+    public function processMarkNotAbusive()
+    {
+        $this->loadObject(false);
+        if (!count($this->errors)) {
+            if ($this->object->markNotAbusive()) {
+                Tools::redirectAdmin(self::$currentIndex.'&conf=104&token='.$this->token);
             }
         }
     }

@@ -137,6 +137,7 @@
             <hook module="qlohotelreview" hook="displayProductTab" position="1"/>
             <hook module="qlohotelreview" hook="displayProductTabContent" position="1"/>
             <hook module="qlohotelreview" hook="displayFooterBefore" position="1"/>
+            <hook module="qlohotelreview" hook="displayRoomTypeDetailRoomTypeNameAfter" position="1"/>
             <hook module="qlohotelreview" hook="actionRoomBookingStatusUpdateAfter" position="1"/>
             <hook module="qlohotelreview" hook="displayBookingAction" position="1"/>
             <hook module="qlohotelreview" hook="displayBackOfficeHeader" position="2"/>

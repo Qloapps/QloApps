@@ -25,9 +25,7 @@
 
             <div class="alert alert-danger" id="review-general-errors" style="display:none;"></div>
             <div class="form-group">
-                <label>
-                    {l s='Hotel Name' mod='qlohotelreview'}
-                </label>
+                <label>{l s='Hotel Name' mod='qlohotelreview'}</label>
                 <p class="hotel-name" type="text" name=""></p>
             </div>
 
@@ -65,9 +63,7 @@
                                 {$category.name|escape:'html':'UTF-8'}
                             </label>
                             <div class="stars-wrap">
-                                <div class="raty"
-                                    data-score-name="rating_categories[{$category.id_category}]"
-                                    data-score="0"></div>
+                                <div class="raty" data-score-name="rating_categories[{$category.id_category}]" data-score="0"></div>
                             </div>
                         </div>
                     {/foreach}
@@ -86,10 +82,7 @@
                 <label>
                     {l s='Write in detail' mod='qlohotelreview'}
                 </label>
-                <textarea class="form-control description"
-                    type="text"
-                    rows="5"
-                    name="description"></textarea>
+                <textarea class="form-control description" type="text" rows="5" name="description"></textarea>
                 <p class="review-error description"></p>
             </div>
 

@@ -1,5 +1,4 @@
-<?php
-/**
+{**
 * 2010-2022 Webkul.
 *
 * NOTICE OF LICENSE
@@ -16,14 +15,9 @@
 * @author Webkul IN
 * @copyright 2010-2022 Webkul IN
 * @license LICENSE.txt
-*/
+*}
 
-header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
-header('Last-Modified: '.gmdate('D, d M Y H:i:s').' GMT');
-
-header('Cache-Control: no-store, no-cache, must-revalidate');
-header('Cache-Control: post-check=0, pre-check=0', false);
-header('Pragma: no-cache');
-
-header('Location: ../');
-exit;
+<div>
+    <span class="raty readonly" data-score="{$avg_rating}"></span>
+    <span class="num_reviews">{$num_reviews} {if $num_reviews|intval > 1}{l s='Review(s)' mod='qlohotelreview'}{else}{l s='Review' mod='qlohotelreview'}{/if}</span>
+</div>

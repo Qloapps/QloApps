@@ -29,28 +29,24 @@
         <div class="form-wrapper">
             <div class="form-group">
                 <label class="control-label col-lg-3">
-                    <span class="label-tooltip" data-toggle="tooltip" data-html="true"
-                        title="{l s='Enable to use this category.' mod='qlohotelreview'}">
+                    <span class="label-tooltip" data-toggle="tooltip" data-html="true" title="{l s='Enable to use this category.' mod='qlohotelreview'}">
                         {l s='Enabled' mod='qlohotelreview'}
                     </span>
                 </label>
                 <div class="col-lg-9">
                     <span class="switch prestashop-switch fixed-width-lg">
-                        <input type="radio" name="active" id="active_on" value="1"
-                            {if $currentTab->getFieldValue($currentObject, "active")|intval}checked="checked"{/if}>
+                        <input type="radio" name="active" id="active_on" value="1" {if $currentTab->getFieldValue($currentObject, 'active')|intval}checked="checked"{/if}>
                         <label for="active_on">{l s='Yes' mod='qlohotelreview'}</label>
-                        <input type="radio" name="active" id="active_off" value="0"
-                            {if !$currentTab->getFieldValue($currentObject, "active")|intval}checked="checked"{/if}>
+                        <input type="radio" name="active" id="active_off" value="0" {if !$currentTab->getFieldValue($currentObject, 'active')|intval}checked="checked"{/if}>
                         <label for="active_off">{l s='No' mod='qlohotelreview'}</label>
                         <a class="slide-button btn"></a>
                     </span>
                 </div>
             </div>
-            
+
             <div class="form-group">
                 <label class="control-label col-lg-3 required">
-                    <span class="label-tooltip" data-toggle="tooltip" data-html="true"
-                        title="{l s='Enter a name for this category.' mod='qlohotelreview'}">
+                    <span class="label-tooltip" data-toggle="tooltip" data-html="true" title="{l s='Enter a name for this category.' mod='qlohotelreview'}">
                         {l s='Name' mod='qlohotelreview'}
                     </span>
                 </label>

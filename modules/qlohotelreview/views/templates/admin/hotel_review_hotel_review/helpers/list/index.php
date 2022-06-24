@@ -1,4 +1,5 @@
-{**
+<?php
+/**
 * 2010-2022 Webkul.
 *
 * NOTICE OF LICENSE
@@ -15,18 +16,14 @@
 * @author Webkul IN
 * @copyright 2010-2022 Webkul IN
 * @license LICENSE.txt
-*}
+*/
 
-<div class="review-list">
-    {foreach $reviews as $review}
-        {include file='./review.tpl' review=$review}
-    {/foreach}
-</div>
+header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
+header('Last-Modified: '.gmdate('D, d M Y H:i:s').' GMT');
 
-{if isset($show_load_more_btn) && $show_load_more_btn}
-    <div class="text-left">
-        <a href="#" class="btn btn-primary btn-primary-review" id="btn-load-more-reviews" data-id-hotel="{$id_hotel}" data-next-page="2">
-            <span>{l s='LOAD MORE' mod='qlohotelreview'}</span>
-        </a>
-    </div>
-{/if}
+header('Cache-Control: no-store, no-cache, must-revalidate');
+header('Cache-Control: post-check=0, pre-check=0', false);
+header('Pragma: no-cache');
+
+header('Location: ../../../');
+exit;

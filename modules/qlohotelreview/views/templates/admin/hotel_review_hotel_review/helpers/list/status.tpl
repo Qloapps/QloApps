@@ -17,16 +17,10 @@
 * @license LICENSE.txt
 *}
 
-<div class="review-list">
-    {foreach $reviews as $review}
-        {include file='./review.tpl' review=$review}
-    {/foreach}
-</div>
-
-{if isset($show_load_more_btn) && $show_load_more_btn}
-    <div class="text-left">
-        <a href="#" class="btn btn-primary btn-primary-review" id="btn-load-more-reviews" data-id-hotel="{$id_hotel}" data-next-page="2">
-            <span>{l s='LOAD MORE' mod='qlohotelreview'}</span>
-        </a>
-    </div>
+{if $status == QhrHotelReview::QHR_STATUS_PENDING}
+    <span class="badge badge-warning">{l s='Pending' mod='qlohotelreview'}</span>
+{elseif $status == QhrHotelReview::QHR_STATUS_DISAPPROVED}
+    <span class="badge badge-danger">{l s='Disapproved' mod='qlohotelreview'}</span>
+{elseif $status == QhrHotelReview::QHR_STATUS_APPROVED}
+    <span class="badge badge-success">{l s='Approved' mod='qlohotelreview'}</span>
 {/if}
