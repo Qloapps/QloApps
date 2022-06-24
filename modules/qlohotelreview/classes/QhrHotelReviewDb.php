@@ -44,7 +44,8 @@ class QhrHotelReviewDb
                 `rating` FLOAT UNSIGNED NOT NULL,
                 `subject` VARCHAR(255) NOT NULL,
                 `description` TEXT NOT NULL,
-                `approved` TINYINT(1) DEFAULT 0,
+                `status_abusive` TINYINT(1) DEFAULT 0,
+                `status` TINYINT(1) DEFAULT 0,
                 `date_add` DATETIME NOT NULL,
                 `date_upd` DATETIME NOT NULL,
                 PRIMARY KEY (`id_hotel_review`)
@@ -89,6 +90,7 @@ class QhrHotelReviewDb
                 `id_hotel_review` INT(10) NOT NULL,
                 `id_employee` INT(10) NOT NULL DEFAULT 0,
                 `message` TEXT NOT NULL,
+                `date_add` DATETIME NOT NULL,
                 PRIMARY KEY (`id_review_reply`)
             ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8",
         );

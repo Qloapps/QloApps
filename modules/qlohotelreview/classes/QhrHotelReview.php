@@ -26,11 +26,19 @@ class QhrHotelReview extends ObjectModel
     public $rating;
     public $subject;
     public $description;
-    public $approved;
+    public $status_abusive = self::QHR_STATUS_ABUSIVE_NOT_ABUSIVE;
+    public $status;
     public $date_add;
     public $date_upd;
 
-    const QHR_SORT_BY_RELEVENCE = 1;
+    const QHR_STATUS_ABUSIVE_REPORTED_ABUSE = 1;
+    const QHR_STATUS_ABUSIVE_NOT_ABUSIVE = 2;
+
+    const QHR_STATUS_PENDING = 1;
+    const QHR_STATUS_DISAPPROVED = 2;
+    const QHR_STATUS_APPROVED = 3;
+
+    const QHR_SORT_BY_RELEVANCE = 1;
     const QHR_SORT_BY_TIME_NEW = 2;
     const QHR_SORT_BY_TIME_OLD = 3;
     const QHR_SORT_BY_RATING_HIGH = 4;
@@ -46,7 +54,8 @@ class QhrHotelReview extends ObjectModel
             'rating' => array('type' => self::TYPE_FLOAT, 'validate' => 'isFloat'),
             'subject' => array('type' => self::TYPE_STRING, 'validate' => 'isMessage', 'size' => 255, 'required' => true),
             'description' => array('type' => self::TYPE_STRING, 'validate' => 'isMessage', 'size' => 65535, 'required' => true),
-            'approved' => array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
+            'status_abusive' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedInt'),
+            'status' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedInt'),
             'date_add' => array('type' => self::TYPE_DATE, 'validate' => 'isDate', 'copy_post' => false),
             'date_upd' => array('type' => self::TYPE_DATE, 'validate' => 'isDate', 'copy_post' => false),
         ),
@@ -57,8 +66,10 @@ class QhrHotelReview extends ObjectModel
         parent::__construct($id, $id_lang);
         if ($id) {
             $this->category_ratings = self::getCategoryRatings($id);
-            $this->full_img_dir = _PS_MODULE_DIR_.'qlohotelreview/views/img/review/'.$this->id.'/';
-            $this->img_dir = _MODULE_DIR_.'qlohotelreview/views/img/review/'.$this->id.'/';
+            $this->full_img_dir = _PS_MODULE_DIR_.'qlohotelreview/views/img/review/'.
+            Image::getImgFolderStatic($this->id);
+            $this->img_dir = _MODULE_DIR_.'qlohotelreview/views/img/review/'.
+            Image::getImgFolderStatic($this->id);
         }
     }
 
@@ -78,6 +89,17 @@ class QhrHotelReview extends ObjectModel
 
         Tools::deleteDirectory($this->full_img_dir);
         return parent::delete();
+    }
+
+    public static function getStatuses()
+    {
+        $objModule = Module::getInstanceByName('qlohotelreview');
+
+        return array(
+            self::QHR_STATUS_PENDING => $objModule->l('Pending', 'qlohotelreview'),
+            self::QHR_STATUS_DISAPPROVED => $objModule->l('Disapproved', 'qlohotelreview'),
+            self::QHR_STATUS_APPROVED => $objModule->l('Approved', 'qlohotelreview'),
+        );
     }
 
     public static function cleanImagesDirectory()
@@ -100,8 +122,9 @@ class QhrHotelReview extends ObjectModel
         $cache_id = 'QhrHotelReview::getAverageRatingByIdHotel_'.(int) $id_hotel.'-'.(int) $validate;
         if (!Cache::isStored($cache_id)) {
             $result = Db::getInstance()->getValue(
-                'SELECT SUM(hr.`rating`) FROM `'._DB_PREFIX_.'qhr_hotel_review` hr
-                WHERE hr.`id_hotel` = '.(int) ($id_hotel).($validate == '1' ? ' AND hr.`approved` = 1' : '')
+                'SELECT SUM(hr.`rating`) / COUNT(hr.`rating`) FROM `'._DB_PREFIX_.'qhr_hotel_review` hr
+                WHERE hr.`id_hotel` = '.(int) ($id_hotel).
+                ($validate == '1' ? ' AND hr.`status` = '. (int) self::QHR_STATUS_APPROVED : '')
             );
             Cache::store($cache_id, $result);
         }
@@ -115,7 +138,8 @@ class QhrHotelReview extends ObjectModel
         if (!Cache::isStored($cache_id)) {
             $result = Db::getInstance()->getValue(
                 'SELECT COUNT(*) FROM `'._DB_PREFIX_.'qhr_hotel_review` hr
-                WHERE hr.`id_hotel` = '.(int) ($id_hotel).($validate == '1' ? ' AND hr.`approved` = 1' : '')
+                WHERE hr.`id_hotel` = '.(int) ($id_hotel).($validate == '1' ?
+                ' AND hr.`status` = '. (int) self::QHR_STATUS_APPROVED : '')
             );
             Cache::store($cache_id, $result);
         }
@@ -129,7 +153,7 @@ class QhrHotelReview extends ObjectModel
         }
         // delete all first
         Db::getInstance()->delete('qhr_review_category_rating', 'id_hotel_review = '.(int) $this->id);
-        
+
         // insert now
         $rows = array();
         foreach ($categoryRatings as $idCategory => $rating) {
@@ -156,16 +180,28 @@ class QhrHotelReview extends ObjectModel
 
         // delete all first
         Db::getInstance()->delete('qhr_review_reply', 'id_hotel_review = '.(int) $this->id);
-        
+
         // insert now
         $row = array(
             'id_hotel_review' => (int) $this->id,
             'id_employee' => (int) $idEmployee,
-            'message' => pSQL($reply)
+            'message' => pSQL($reply),
+            'date_add' => date('Y-m-d H:i:s'),
         );
 
         Db::getInstance()->insert('qhr_review_reply', $row);
+
         return true;
+    }
+
+    public function getTotalReports()
+    {
+        $sql = new DbQuery();
+        $sql->select('COUNT(*)');
+        $sql->from('qhr_review_report', 'rr');
+        $sql->where('rr.`id_hotel_review` = '.(int) $this->id);
+
+        return Db::getInstance()->getValue($sql);
     }
 
     public function getCustomer()
@@ -175,6 +211,7 @@ class QhrHotelReview extends ObjectModel
         }
 
         $objOrder = new Order($this->id_order);
+
         return $objOrder->getCustomer();
     }
 
@@ -184,6 +221,7 @@ class QhrHotelReview extends ObjectModel
         $sql->select('*');
         $sql->from('qhr_review_reply', 'rr');
         $sql->where('rr.`id_hotel_review` = '.(int) $this->id);
+
         return Db::getInstance()->getRow($sql);
     }
 
@@ -193,7 +231,7 @@ class QhrHotelReview extends ObjectModel
         if (is_array($files) && count($files)) {
             foreach ($files as $key => $file) {
                 $ext = pathinfo($file['rename'], PATHINFO_EXTENSION);
-                $dir = _PS_MODULE_DIR_.'qlohotelreview/views/img/review/'.(string) $this->id.'/';
+                $dir = _PS_MODULE_DIR_.'qlohotelreview/views/img/review/'.Image::getImgFolderStatic($this->id);
                 QhrHotelReviewHelper::createDirectory($dir);
                 $useSameExt = false;
                 if ($useSameExt) {
@@ -208,19 +246,41 @@ class QhrHotelReview extends ObjectModel
 
     public function approveReview()
     {
-        return Db::getInstance()->update(
-            'qhr_hotel_review',
-            array('approved' => 1),
-            '`id_hotel_review` = '.(int) $this->id
-        );
+        if (Validate::isLoadedObject($this)) {
+            $this->status = self::QHR_STATUS_APPROVED;
+            return $this->save();
+        }
+
+        return false;
     }
 
-    public function unapproveReview()
+    public function disapproveReview()
     {
-        return Db::getInstance()->update(
-            'qhr_hotel_review',
-            array('approved' => 0),
-            '`id_hotel_review` = '.(int) $this->id
+        if (Validate::isLoadedObject($this)) {
+            $this->status = self::QHR_STATUS_DISAPPROVED;
+            return $this->save();
+        }
+
+        return false;
+    }
+
+    public function markNotAbusive()
+    {
+        if (Validate::isLoadedObject($this)) {
+            $this->status_abusive = self::QHR_STATUS_ABUSIVE_NOT_ABUSIVE;
+            if ($this->save()) {
+                return $this->removeAllReports();
+            }
+        }
+
+        return false;
+    }
+
+    public function removeAllReports()
+    {
+        return Db::getInstance()->delete(
+            'qhr_review_report',
+            'id_hotel_review = '.(int) $this->id
         );
     }
 
@@ -282,7 +342,7 @@ class QhrHotelReview extends ObjectModel
         (int) $id_customer.'-'.(bool) $validate;
         if (!Cache::isStored($cache_id)) {
             $sql = 'SELECT hr.*, CONCAT(c.`firstname`, " ", c.`lastname`) as `customer_name`,
-            hbil.`hotel_name`, qrr.`id_employee`, qrr.`message`,
+            hbil.`hotel_name`, qrr.`id_employee`, qrr.`message`, qrr.`date_add` AS `reply_date`,
             (SELECT COUNT(*) FROM `'._DB_PREFIX_.'qhr_review_usefulness` ru
                 WHERE ru.`id_hotel_review` = hr.`id_hotel_review`) AS `total_useful`,
             (SELECT COUNT(*) FROM `'._DB_PREFIX_.'qhr_review_report` rr
@@ -299,9 +359,10 @@ class QhrHotelReview extends ObjectModel
             LEFT JOIN `'._DB_PREFIX_.'qhr_review_reply` qrr ON qrr.`id_hotel_review` = hr.`id_hotel_review`
             LEFT JOIN `'._DB_PREFIX_.'htl_branch_info_lang` hbil
             ON hbil.`id` = hr.`id_hotel` AND hbil.`id_lang` = '.(int) $id_lang.'
-            WHERE hr.`id_hotel` = '.(int) ($id_hotel).($validate == '1' ? ' AND hr.`approved` = 1' : '');
+            WHERE hr.`id_hotel` = '.(int) ($id_hotel).($validate == '1' ? ' AND
+            hr.`status` = '.(int) self::QHR_STATUS_APPROVED : '');
 
-            if ($sort_by == self::QHR_SORT_BY_RELEVENCE) {
+            if ($sort_by == self::QHR_SORT_BY_RELEVANCE) {
                 $sql .= ' ORDER BY `total_useful` DESC ';
             } elseif ($sort_by == self::QHR_SORT_BY_TIME_NEW) {
                 $sql .= ' ORDER BY hr.`date_add` DESC ';
@@ -336,12 +397,14 @@ class QhrHotelReview extends ObjectModel
         if (!Cache::isStored($cache_id)) {
             $sql = 'SELECT *
             FROM `'._DB_PREFIX_.'qhr_hotel_review` hr
-            WHERE hr.`id_hotel` = '.(int) ($id_hotel).($validate == '1' ? ' AND hr.`approved` = 1' : '');
+            WHERE hr.`id_hotel` = '.(int) ($id_hotel).($validate == '1' ?
+            ' AND hr.`status` = '. (int) self::QHR_STATUS_APPROVED : '');
             $sql .= ($n ? ' LIMIT '.(int) (($p - 1) * $n).', '.(int) ($n) : '');
             $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
             $result = (is_array($result) && count($result)) ? true : false;
             Cache::store($cache_id, $result);
         }
+
         return Cache::retrieve($cache_id);
     }
 
@@ -352,7 +415,8 @@ class QhrHotelReview extends ObjectModel
         $sql = 'SELECT (SUM(hr.`rating`) / COUNT(hr.`rating`)) AS `average`, MIN(hr.`rating`) AS `minimum`,
         MAX(hr.`rating`) AS `maximum`, COUNT(hr.`id_hotel_review`) AS `total_reviews`
         FROM `'._DB_PREFIX_.'qhr_hotel_review` hr
-        WHERE hr.`id_hotel` = '.(int) ($id_hotel).($validate == '1' ? ' AND hr.`approved` = 1' : '');
+        WHERE hr.`id_hotel` = '.(int) ($id_hotel).($validate == '1' ?
+        ' AND hr.`status` = '. (int) self::QHR_STATUS_APPROVED : '');
         $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->getRow($sql);
 
         $sql2 = 'SELECT rcr.`id_category`, cl.`name`, SUM(rcr.`rating`) / COUNT(rcr.`rating`) AS `average`
@@ -364,10 +428,11 @@ class QhrHotelReview extends ObjectModel
         LEFT JOIN `'._DB_PREFIX_.'qhr_category_lang` cl
         ON cl.`id_category` = rcr.`id_category` AND cl.`id_lang` = '.(int) $id_lang.'
         WHERE c.`active` = 1 AND hr.`id_hotel` = '.(int) ($id_hotel).
-        ($validate == '1' ? ' AND hr.`approved` = 1' : '').'
+        ($validate == '1' ? ' AND hr.`status` = '. (int) self::QHR_STATUS_APPROVED : '').'
         GROUP BY hr.`id_hotel`, rcr.`id_category`';
         $result2 = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql2);
         $result['categories'] = $result2;
+
         return $result;
     }
 
@@ -376,12 +441,13 @@ class QhrHotelReview extends ObjectModel
         if (!$this->id) {
             return false;
         }
+
         return self::getImagesById($this->id);
     }
 
     public static function getImagesById($id_hotel_review)
     {
-        $full_img_dir = _PS_MODULE_DIR_.'qlohotelreview/views/img/review/'.$id_hotel_review.'/';
+        $full_img_dir = _PS_MODULE_DIR_.'qlohotelreview/views/img/review/'.Image::getImgFolderStatic($id_hotel_review);
         $files = glob($full_img_dir.'*');
         $files = array_filter($files, function ($item) {
             return !strpos($item, 'index.php');
@@ -414,13 +480,15 @@ class QhrHotelReview extends ObjectModel
         }
 
         $id_lang = Context::getContext()->language->id;
+
         return Db::getInstance()->executeS(
-        'SELECT * FROM `'._DB_PREFIX_.'qhr_category` qc
-        LEFT JOIN `'._DB_PREFIX_.'qhr_category_lang` qcl
-        ON qcl.`id_category` = qc.`id_category` AND qcl.`id_lang` = '.(int) $id_lang.'
-        LEFT JOIN `'._DB_PREFIX_.'qhr_review_category_rating` qrcr
-        ON qrcr.`id_category` = qc.`id_category`
-        WHERE qc.`active` = 1 AND qrcr.`id_hotel_review` = '.(int) $id_hotel_review);
+            'SELECT * FROM `'._DB_PREFIX_.'qhr_category` qc
+            LEFT JOIN `'._DB_PREFIX_.'qhr_category_lang` qcl
+            ON qcl.`id_category` = qc.`id_category` AND qcl.`id_lang` = '.(int) $id_lang.'
+            LEFT JOIN `'._DB_PREFIX_.'qhr_review_category_rating` qrcr
+            ON qrcr.`id_category` = qc.`id_category`
+            WHERE qc.`active` = 1 AND qrcr.`id_hotel_review` = '.(int) $id_hotel_review
+        );
     }
 
     public static function isAlreadyMarkedHelpful($id_hotel_review, $id_customer)

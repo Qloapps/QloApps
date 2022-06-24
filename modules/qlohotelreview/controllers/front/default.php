@@ -40,7 +40,6 @@ class QloHotelReviewDefaultModuleFrontController extends ModuleFrontController
         $subject = Tools::getValue('subject');
         $description = Tools::getValue('description');
 
-        $approvalEnabled = Configuration::get('QHR_ADMIN_APPROVAL_ENABLED');
         $maxImages = (int) Configuration::get('QHR_MAX_IMAGES_PER_REVIEW');
 
         $status = 'ko';
@@ -69,7 +68,7 @@ class QloHotelReviewDefaultModuleFrontController extends ModuleFrontController
         } elseif(!Validate::isMessage($description)) {
             $errors['by_key']['description'] = $objModule->l('Review description is invalid.', 'default');
         }
-        
+
         if (is_array($_FILES) && array_key_exists('images', $_FILES)) {
             if (count($_FILES['images']['name']) > $maxImages) {
                 $errors['general'][] = sprintf(
@@ -92,7 +91,8 @@ class QloHotelReviewDefaultModuleFrontController extends ModuleFrontController
                 $objHotelReview->description = strip_tags($description);
                 $objHotelReview->subject = $subject;
                 $objHotelReview->rating = $ratingOverall;
-                $objHotelReview->approved = (int) !$approvalEnabled;
+                $objHotelReview->status_abusive = QhrHotelReview::QHR_STATUS_ABUSIVE_NOT_ABUSIVE;
+                $objHotelReview->status = QhrHotelReview::QHR_STATUS_PENDING;
                 if ($objHotelReview->save()) {
                     $objHotelReview->addCategoryRatings($ratingCategories);
                     if ($maxImages) {
@@ -126,7 +126,7 @@ class QloHotelReviewDefaultModuleFrontController extends ModuleFrontController
         if (!$idHotelReview) {
             die(json_encode($response));
         }
-        
+
         if (QhrHotelReview::isAlreadyMarkedHelpful($idHotelReview, $this->context->cookie->id_customer)) {
             die(json_encode($response));
         }

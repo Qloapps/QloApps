@@ -21,8 +21,7 @@
     <label class="control-label col-lg-3">{l s='Customer' mod='qlohotelreview'}</label>
     <div class="col-lg-9">
         <p class="form-control-static">
-            <a href="{$link->getAdminLink('AdminCustomers')}&viewcustomer&id_customer={$obj_customer->id}"
-                target="_blank">
+            <a href="{$link->getAdminLink('AdminCustomers')}&viewcustomer&id_customer={$obj_customer->id}" target="_blank">
                 {$obj_customer->firstname} {$obj_customer->lastname} (#{$obj_customer->id})
             </a>
         </p>
@@ -33,8 +32,7 @@
     <label class="control-label col-lg-3">{l s='Hotel' mod='qlohotelreview'}</label>
     <div class="col-lg-9">
         <p class="form-control-static">
-            <a href="{$link->getAdminLink('AdminAddHotel')}&updatehtl_branch_info&id={$currentObject->id_hotel}"
-                target="_blank">
+            <a href="{$link->getAdminLink('AdminAddHotel')}&updatehtl_branch_info&id={$currentObject->id_hotel}" target="_blank">
                 {$obj_hotel->hotel_name} (#{$obj_hotel->id})
             </a>
         </p>
@@ -121,5 +119,21 @@
     <label class="control-label col-lg-3">{l s='Date Added' mod='qlohotelreview'}</label>
     <div class="col-lg-9">
         <p class="form-control-static">{$currentObject->date_add}</p>
+    </div>
+</div>
+
+<div class="row">
+    <label class="control-label col-lg-3">{l s='Total Reports' mod='qlohotelreview'}</label>
+    <div class="col-lg-9">
+        <p class="form-control-static">
+            <span class="badge badge-danger">{$total_reports|escape:'html':'UTF-8'}</span>
+        </p>
+        {if $total_reports|intval > 0}
+            <p>
+                <a class="btn btn-primary" href="{$current|escape:'html':'UTF-8'}&token={$token|escape:'html':'UTF-8'}&id_hotel_review={$currentObject->id_hotel_review}&action=markNotAbusive">
+                    {l s='Not Abusive' mod='qlohotelreview'}
+                </a>
+            </p>
+        {/if}
     </div>
 </div>

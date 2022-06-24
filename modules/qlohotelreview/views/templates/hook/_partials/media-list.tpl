@@ -32,7 +32,7 @@
             {/for}
         </div>
         <a class="btn btn-primary btn-primary-review view-all">
-            {l s='VIEW ALL' mod='qlohotelreview'}
+            {l s='VIEW ALL IMAGES' mod='qlohotelreview'}
         </a>
     </div>
 {/if}

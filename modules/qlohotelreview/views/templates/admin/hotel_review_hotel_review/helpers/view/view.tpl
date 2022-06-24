@@ -35,17 +35,12 @@
 
                 <div class="form-group">
                     <label for="disapproval_message" class="control-label col-lg-3">
-                        <span class="label-tooltip" data-toggle="tooltip" data-html="true"
-                            title="{l s='Post a reply to this review.' mod='qlohotelreview'}">
+                        <span class="label-tooltip" data-toggle="tooltip" data-html="true" title="{l s='Post a reply to this review.' mod='qlohotelreview'}">
                             {l s='Management reply' mod='qlohotelreview'}
                         </span>
                     </label>
                     <div class="col-lg-5">
-                        <textarea
-                        class="textarea-autoresize"
-                        id="management_reply"
-                        name="management_reply"
-                        rows="4">{if is_array($reply)}{$reply.message}{/if}</textarea>
+                        <textarea class="textarea-autoresize" id="management_reply" name="management_reply" rows="4">{if is_array($reply)}{$reply.message}{/if}</textarea>
                     </div>
                 </div>
 
@@ -53,13 +48,14 @@
                     <button type="submit" name="submitDelete" class="btn btn-default pull-right submit-delete">
                         <i class="process-icon- icon-trash"></i> {l s='Delete' mod='qlohotelreview'}
                     </button>
-                    {if !$currentObject->approved}
+                    {if $currentObject->status != QhrHotelReview::QHR_STATUS_APPROVED}
                         <button type="submit" name="submitApprove" class="btn btn-default pull-right">
                             <i class="process-icon- icon-check"></i> {l s='Approve' mod='qlohotelreview'}
                         </button>
-                    {else}
-                        <button type="submit" name="submitUnapprove" class="btn btn-default pull-right">
-                            <i class="process-icon- icon-times"></i> {l s='Unapprove' mod='qlohotelreview'}
+                    {/if}
+                    {if $currentObject->status != QhrHotelReview::QHR_STATUS_DISAPPROVED}
+                        <button type="submit" name="submitDisapprove" class="btn btn-default pull-right">
+                            <i class="process-icon- icon-times"></i> {l s='Disapprove' mod='qlohotelreview'}
                         </button>
                     {/if}
                     <button type="submit" name="submitReply" class="btn btn-default pull-right">

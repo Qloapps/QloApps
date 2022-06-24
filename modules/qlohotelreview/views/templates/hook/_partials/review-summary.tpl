@@ -44,10 +44,7 @@
                             {foreach from=$summary.categories item=category}
                                 <div class="col-xs-2 class-list-item-wrap">
                                     <div class="score-circle-wrap">
-                                        <div class="score-circle"
-                                            data-value="{$category.average / 5|string_format:'%.1f'}"
-                                            data-color="{$category.color}">
-                                        </div>
+                                        <div class="score-circle" data-value="{$category.average / 5|string_format:'%.1f'}" data-color="{$category.color}"></div>
                                     </div>
                                     <div class="title">{$category.average|string_format:'%.1f'}</div>
                                     <p class="name">{$category.name}</p>
