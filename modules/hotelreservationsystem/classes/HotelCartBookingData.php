@@ -779,7 +779,7 @@ class HotelCartBookingData extends ObjectModel
         $id_guest = 0,
         $id_room = 0
     ) {
-        if ($id_cart && $id_guest && $id_room) {
+        if ($id_cart && $id_room) {
             if ($featurePrice = Db::getInstance()->getRow(
                 'SELECT * FROM `'._DB_PREFIX_.'htl_room_type_feature_pricing` fp
                 WHERE fp.`id_product` = '.(int) $id_product.' AND fp.`id_cart` = '.(int) $id_cart.'

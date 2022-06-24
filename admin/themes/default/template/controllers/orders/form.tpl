@@ -408,7 +408,8 @@
 				params: params,
 			},
 			success : function(response) {
-				updateCartLine(response, cart_row);
+				updateCartLine(response.curr_booking_info, cart_row);
+				updateCartSummaryData(response.cart_info);
 			}
 		});
 	}
@@ -416,6 +417,15 @@
 	function updateCartLine(data, cart_row) {
 		$(cart_row).find('.cart_line_total_rooms_price').html(data.amt_with_qty);
 		$(cart_row).find('.cart_line_total_price').html(data.total_price);
+	}
+
+	function updateCartSummaryData(summaryData) {
+		$('#total_products').html(formatCurrency(parseFloat(summaryData.summary.total_products), currency_format, currency_sign, currency_blank));
+		$('#total_extra_demands').html(formatCurrency(parseFloat(summaryData.summary.total_extra_demands_tax_exc), currency_format, currency_sign, currency_blank));
+		$('#total_vouchers').html(formatCurrency(parseFloat(summaryData.summary.total_discounts_tax_exc), currency_format, currency_sign, currency_blank));
+		$('#total_without_taxes').html(formatCurrency(parseFloat(summaryData.summary.total_price_without_tax), currency_format, currency_sign, currency_blank));
+		$('#total_taxes').html(formatCurrency(parseFloat(summaryData.summary.total_tax), currency_format, currency_sign, currency_blank));
+		$('#total_with_taxes').html(formatCurrency(parseFloat(summaryData.summary.total_price), currency_format, currency_sign, currency_blank));
 	}
 
 	function displayQtyInStock(id)

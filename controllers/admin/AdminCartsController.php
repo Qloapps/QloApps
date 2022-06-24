@@ -893,6 +893,8 @@ class AdminCartsControllerCore extends AdminController
         $date_to = $params['date_to'];
         $price = (float) $params['price'];
 
+        $this->context->cart = new Cart($id_cart);
+
         $date_from = date('Y-m-d', strtotime($date_from));
         $date_to = date('Y-m-d', strtotime($date_to));
 
@@ -928,7 +930,12 @@ class AdminCartsControllerCore extends AdminController
                     $amt_with_qty = $bookingInfo['amt_with_qty'];
                     $bookingInfo['amt_with_qty'] = Tools::displayPrice($amt_with_qty);
                     $bookingInfo['total_price'] = Tools::displayPrice($amt_with_qty + $bookingInfo['demand_price']);
-                    die(json_encode($bookingInfo));
+                    $response = array(
+                        'curr_booking_info' => $bookingInfo,
+                        'cart_info' => $this->ajaxReturnVars(),
+                    );
+
+                    die(json_encode($response));
                 }
             }
         }
