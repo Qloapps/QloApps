@@ -46,7 +46,7 @@
 			{/if} --><!-- by webkul -->
 			{if isset($adminActionDisplay) && $adminActionDisplay}
 				<div id="admin-action" class="container">
-					<p class="alert alert-info">{l s='This product is not visible to your customers.'}
+					<p class="alert alert-info">{l s='This room type is not visible to your customers.'}
 						<input type="hidden" id="admin-action-product-id" value="{$product->id}" />
 						<a id="publish_button" class="btn btn-default button button-small" href="#">
 							<span>{l s='Publish'}</span>

@@ -77,7 +77,7 @@ class AdminAdminPreferencesControllerCore extends AdminController
                     ),
                     'PS_COOKIE_LIFETIME_BO' => array(
                         'title' => $this->l('Lifetime of back office cookies'),
-                        'hint' => $this->l('Set the amount of hours during which the back office cookies are valid. After that amount of time, the Qloapps user will have to log in again.'),
+                        'hint' => $this->l('Set the amount of hours during which the back office cookies are valid. After that amount of time, the QloApps user will have to log in again.'),
                         'validation' => 'isInt',
                         'cast' => 'intval',
                         'type' => 'text',

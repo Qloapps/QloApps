@@ -67,7 +67,7 @@ class AdminTaxesControllerCore extends AdminController
                         'desc' => $this->l('Select whether or not to include tax on purchases.'),
                         'cast' => 'intval', 'type' => 'bool'),
                     'PS_TAX_DISPLAY' => array(
-                        'title' => $this->l('Display tax in the shopping cart'),
+                        'title' => $this->l('Display tax in the booking cart'),
                         'desc' => $this->l('Select whether or not to display tax on a distinct line in the cart.'),
                         'cast' => 'intval',
                         'type' => 'bool'),

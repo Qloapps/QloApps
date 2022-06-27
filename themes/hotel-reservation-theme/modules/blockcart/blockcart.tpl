@@ -122,7 +122,7 @@
 																</td>
 																<td class="num_rooms_in_date">{$data_v['num_rm']}</td>
 																<td>{convertPrice price=$data_v['amount']}</td>
-																<td><a class="remove_rooms_from_cart_link" href="#" rm_price="{$data_v['amount']}" id_product="{$product.id_product|intval}" date_from="{$data_v['data_form']}" date_to="{$data_v['data_to']}" num_rooms="{$data_v['num_rm']}" title="{l s='remove this room from my cart' mod='blockcart'}"></a></td>
+																<td><a class="remove_rooms_from_cart_link" href="#" rm_price="{$data_v['amount']}" id_product="{$product.id_product|intval}" date_from="{$data_v['data_form']}" date_to="{$data_v['data_to']}" num_rooms="{$data_v['num_rm']}" title="{l s='Remove this room from my cart' mod='blockcart'}"></a></td>
 															</tr>
 														{/foreach}
 													</tbody>
@@ -427,7 +427,7 @@
 {addJsDefL name=qty_txt}{l s='Qty' mod='blockcart' js=1}{/addJsDefL}
 {addJsDefL name=duration_txt}{l s='Duration' mod='blockcart' js=1}{/addJsDefL}
 {addJsDefL name=capacity_txt}{l s='Capacity' mod='blockcart' js=1}{/addJsDefL}
-{addJsDefL name=remove_rm_title}{l s='remove this room from my cart' mod='blockcart' js=1}{/addJsDefL}
+{addJsDefL name=remove_rm_title}{l s='Remove this room from my cart' mod='blockcart' js=1}{/addJsDefL}
 
 {addJsDef rm_avail_process_lnk = $link->getModuleLink('blockcart', 'checkroomavailabilityajaxprocess')}
 {addJsDef pagename = $current_page}
