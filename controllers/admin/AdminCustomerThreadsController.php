@@ -366,6 +366,7 @@ class AdminCustomerThreadsControllerCore extends AdminController
                         $current_employee->email,
                         $current_employee->firstname.' '.$current_employee->lastname,
                         null, null, _PS_MAIL_DIR_, true)) {
+                        $cm->id_employee = (int)$employee->id;
                         $cm->private = 1;
                         $cm->message = $this->l('Message forwarded to').' '.$employee->firstname.' '.$employee->lastname."\n".$this->l('Comment:').' '.$message;
                         $cm->add();
