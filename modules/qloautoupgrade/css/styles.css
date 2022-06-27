@@ -1,0 +1,21 @@
+.upgradestep { margin-right: 5px;padding-left: 10px; padding-right: 5px;}
+.processing {border:2px outset gray;margin-top:1px;overflow: auto;}
+#infoStep {height:100px;}
+#infoError {height:100px;}
+#quickInfo {height:200px;}
+#errorDuringUpgrade {color: #CC0000}
+#checkPrestaShopFilesVersion, #checkPrestaShopModifiedFiles{margin-bottom:20px;}
+.changedFileList {margin-left:20px; padding-left:5px;}
+.changedNotice li{color:gray;}
+.changedImportant li{color:red;font-weight:bold}
+.upgradeDbError{background-color:#FEEFB3}
+.upgradeDbOk{background-color:#DFF2BF}
+.small_label{font-weight:normal;width:300px;float:none;text-align:left;padding:0}
+.ocu-feature-list{margin:0;padding:0;list-style:none}
+.ocu-feature-list li{background:url(../img/admin/enabled.gif) no-repeat; padding-left:20px;margin:0;}
+.label-small {width: 130px;}
+.margin-form-small {padding: 0 0 1em 130px;}
+.nextStep {font-weight: bold;}
+#diffList, #changedList {margin-top: 20px;}
+#autoupgradePhpWarningMainIcon {font-size: 3em;}
+#autoupgradePhpWarn .icon-stack-text {color: white;}
