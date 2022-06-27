@@ -367,6 +367,8 @@ class ProductControllerCore extends FrontController
                         'num_days' => $num_days,
                         'date_from' => $date_from,
                         'date_to' => $date_to,
+                        'hotel_check_in' => date('h:i a', strtotime($hotel_branch_obj->check_in)),
+                        'hotel_check_out' => date('h:i a', strtotime($hotel_branch_obj->check_out)),
                         'hotel_location' => $hotel_location,
                         'hotel_name' => $hotel_name,
                         'hotel_policies' => $hotel_policies,
