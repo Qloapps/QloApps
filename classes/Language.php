@@ -416,9 +416,14 @@ class LanguageCore extends ObjectModel
         $tables = Db::getInstance()->executeS('SHOW TABLES LIKE \''.str_replace('_', '\\_', _DB_PREFIX_).'%\_lang\' ');
         $langTables = array();
 
+        $exceptions = array(
+            _DB_PREFIX_.'configuration_lang',
+            _DB_PREFIX_.'configuration_kpi_lang',
+        );
+
         foreach ($tables as $table) {
             foreach ($table as $t) {
-                if ($t != _DB_PREFIX_.'configuration_lang') {
+                if (!in_array($t, $exceptions)) {
                     $langTables[] = $t;
                 }
             }
