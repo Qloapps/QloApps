@@ -1,0 +1,45 @@
+
+<script>
+  var jQueryVersionPS = parseInt($().jquery.replace(/\./g, ""));
+</script>
+<script src="{{ psBaseUri }}modules/qloautoupgrade/js/jquery-1.6.2.min.js"></script>
+<script>
+  if (jQueryVersionPS >= 162) {
+    jq162 = jQuery.noConflict(true);
+  }
+</script>
+<link type="text/css" rel="stylesheet" href="{{ psBaseUri }}modules/qloautoupgrade/css/styles.css" />
+<div class="bootstrap" id="informationBlock">
+    <div class="panel">
+        <div class="panel-heading">
+            {{ 'Welcome!'|trans }}
+        </div>
+        <p>
+            {{ 'With the QloApps 1-Click Upgrade module, upgrading your store to the latest version available has never been easier!'|trans }}<br><br>
+            <span style="color:#CC0000;font-weight:bold">{{ 'Please always perform a full manual backup of your files and database before starting any upgrade.'|trans }}</span><br>
+            {{ 'Double-check the integrity of your backup and that you can easily manually roll-back if necessary.'|trans }}<br>
+            {{ 'If you do not know how to proceed, ask your hosting provider.'|trans }}
+        </p>
+    </div>
+</div>
+
+{# content #}
+{{ currentConfig|raw }}
+{{ upgradeButtonBlock|raw }}
+
+{% include '@ModuleAutoUpgrade/block/versionComparison.twig' %}
+{% include '@ModuleAutoUpgrade/block/activityLog.twig' %}
+
+{{ rollbackForm|raw }}
+
+<br>
+<form action="{{ currentIndex }}&amp;customSubmitAutoUpgrade=1&amp;token={{ token }}" method="post" class="form-horizontal" enctype="multipart/form-data">
+    {{ backupOptions|raw }}
+    {{ upgradeOptions|raw }}
+</form>
+
+<script src="{{ psBaseUri }}modules/qloautoupgrade/js/jquery.xml2json.js"></script>
+<script>
+  var input = {{ jsParams|json_encode|raw }};
+</script>
+<script src="{{ psBaseUri }}modules/qloautoupgrade/js/upgrade.js"></script>

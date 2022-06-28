@@ -87,9 +87,9 @@
     <!-- <tab id="Suppliers" id_parent="Catalog" active="1" hide_host_mode="0">
       <class_name>AdminSuppliers</class_name>
     </tab> -->
-    <tab id="Tags" id_parent="Catalog" active="1" hide_host_mode="0">
+    <!-- <tab id="Tags" id_parent="Catalog" active="1" hide_host_mode="0">
       <class_name>AdminTags</class_name>
-    </tab>
+    </tab> -->
     <!-- <tab id="Attachments" id_parent="Catalog" active="1" hide_host_mode="0">
       <class_name>AdminAttachments</class_name>
     </tab> -->

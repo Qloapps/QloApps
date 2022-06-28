@@ -124,17 +124,18 @@
 		</td>
 	{/if}
 
-	{if $data.booking_type == 1}
-		<td class="text-center">
-			{if isset($data.refund_info) && ($data.refund_info.refunded || $data.refund_info.denied)}
-				<p class="text-center">--</p>
-			{else}
-				<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#mySwappigModal" data-id_order="{$order->id}" data-room_num='{$data.room_num}' data-date_from='{$data.date_from}' data-date_to='{$data.date_to}' data-id_room='{$data.id_room}' data-cust_name='{$data.alloted_cust_name}' data-cust_email='{$data.alloted_cust_email}' data-avail_rm_swap='{$data.avail_rooms_to_swap|@json_encode}' data-avail_rm_realloc='{$data.avail_rooms_to_realloc|@json_encode}'>
-					{l s='Reallocate Room' mod='hotelreservationsystem'}
-				</button>
-			{/if}
-		</td>
-	{/if}
+	<td class="text-center">
+		{if $data.booking_type == HotelBookingDetail::ALLOTMENT_MANUAL && $data.comment|count_characters > 0}
+			<p><strong>{l s='Message: '}</strong> <span>{$data.comment|escape:'htmlall':'UTF-8'}</span></p>
+		{/if}
+		{if isset($data.refund_info) && ($data.refund_info.refunded || $data.refund_info.denied)}
+			<p class="text-center">--</p>
+		{else}
+			<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#mySwappigModal" data-id_order="{$order->id}" data-room_num='{$data.room_num}' data-date_from='{$data.date_from}' data-date_to='{$data.date_to}' data-id_room='{$data.id_room}' data-cust_name='{$data.alloted_cust_name}' data-cust_email='{$data.alloted_cust_email}' data-avail_rm_swap='{$data.avail_rooms_to_swap|@json_encode}' data-avail_rm_realloc='{$data.avail_rooms_to_realloc|@json_encode}'>
+				{l s='Reallocate Room' mod='hotelreservationsystem'}
+			</button>
+		{/if}
+	</td>
 	{if ($can_edit && !$order->hasBeenDelivered())}
 		<td class="product_invoice" style="display: none;">
 		{if sizeof($invoices_collection)}

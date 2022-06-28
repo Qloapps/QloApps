@@ -633,11 +633,12 @@ class AdminAddHotelController extends ModuleAdminController
         // GOOGLE MAP
         $language = $this->context->language;
         $country = $this->context->country;
-        $PS_API_KEY = Configuration::get('PS_API_KEY');
-        $this->addJs(
-            'https://maps.googleapis.com/maps/api/js?key='.$PS_API_KEY.'&libraries=places&language='.
-            $language->iso_code.'&region='.$country->iso_code
-        );
+        if ($PS_API_KEY = Configuration::get('PS_API_KEY')) {
+            $this->addJS(
+                'https://maps.googleapis.com/maps/api/js?key='.$PS_API_KEY.'&libraries=places&language='.
+                $language->iso_code.'&region='.$country->iso_code
+            );
+        }
         //tinymce
         $this->addJS(_PS_JS_DIR_.'tiny_mce/tiny_mce.js');
         if (version_compare(_PS_VERSION_, '1.6.0.11', '>')) {

@@ -44,6 +44,10 @@ class AuthControllerCore extends FrontController
     {
         parent::init();
 
+        $this->confirmations = array();
+        $this->informations = array();
+        $this->errors = array();
+
         if (!Tools::getIsset('step') && $this->context->customer->isLogged() && !$this->ajax) {
             Tools::redirect('index.php?controller='.(($this->authRedirection !== false) ? urlencode($this->authRedirection) : 'my-account'));
         }
@@ -161,6 +165,10 @@ class AuthControllerCore extends FrontController
                 ));
 
             $return = array(
+                'hasConfirmation' => !empty($this->confirmations),
+                'confirmations' => $this->confirmations,
+                'hasInformation' => !empty($this->informations),
+                'informations' => $this->informations,
                 'hasError' => !empty($this->errors),
                 'errors' => $this->errors,
                 'page' => $this->context->smarty->fetch($this->template),
@@ -256,6 +264,10 @@ class AuthControllerCore extends FrontController
 
         if (Tools::isSubmit('submitAccount') || Tools::isSubmit('submitGuestAccount')) {
             $this->processSubmitAccount();
+        }
+
+        if (Tools::isSubmit('submitTransformAccount')) {
+            $this->processTransformAccount();
         }
 
         if (Tools::isSubmit('SubmitLogin')) {
@@ -747,13 +759,32 @@ class AuthControllerCore extends FrontController
         if (!Validate::isEmail($email = trim(Tools::getValue('email_create'))) || empty($email)) {
             $this->errors[] = Tools::displayError('Invalid email address.');
         } elseif (Customer::customerExists($email)) {
-            $this->errors[] = Tools::displayError('An account using this email address has already been registered. Please enter a valid password or request a new one. ', false);
+            $this->errors[] = Tools::displayError('An account using this email address has already been registered. Please choose another one or sign in.', false);
             $_POST['email'] = trim(Tools::getValue('email_create'));
             unset($_POST['email_create']);
+        } elseif ($id_customer = Customer::customerExists($email, true, false)) {
+            $this->informations[] = Tools::displayError('You are already registered as a guest with this email address.').'&nbsp;<button type="submit" class="btn btn-link alert-link btn-transform" name="submitTransformAccount">'.Tools::displayError('Click here').'</button>'.Tools::displayError('').' to generate a password for your account.';
         } else {
             $this->create_account = true;
             $this->context->smarty->assign('email_create', Tools::safeOutput($email));
             $_POST['email'] = $email;
+        }
+    }
+
+    /**
+     * Process submit for account transformation
+     */
+    protected function processTransformAccount()
+    {
+        if (!Validate::isEmail($email = trim(Tools::getValue('email_create'))) || empty($email)) {
+            $this->errors[] = Tools::displayError('Invalid email address.');
+        } elseif ($id_customer = Customer::customerExists($email, true, false)) {
+            $customer = new Customer($id_customer);
+            if ($customer->transformToCustomer($this->context->language->id)) {
+                $this->confirmations[] = 'TRANSFORM_OK';
+            } else {
+                $this->errors[] = Tools::displayError('Your guest account could not be transformed to a customer account.');
+            }
         }
     }
 

@@ -1,3 +1,22 @@
+{**
+* 2010-2022 Webkul.
+*
+* NOTICE OF LICENSE
+*
+* All right is reserved,
+* Please go through LICENSE.txt file inside our module
+*
+* DISCLAIMER
+*
+* Do not edit or add to this file if you wish to upgrade this module to newer
+* versions in the future. If you wish to customize this module for your
+* needs please refer to CustomizationPolicy.txt file inside our module for more information.
+*
+* @author Webkul IN
+* @copyright 2010-2022 Webkul IN
+* @license LICENSE.txt
+*}
+
 <div class="panel">
 	<div class="panel-heading">
 		{if isset($edit)}
@@ -246,13 +265,13 @@
 					</div>
 					{if isset($enabledDisplayMap) && $enabledDisplayMap}
 						<div class="form-group">
-							<label class="col-sm-3 control-label">{l s='Map :' mod='hotelreservationsystem'}</label>
+							<label class="col-sm-3 control-label">{l s='Map:' mod='hotelreservationsystem'}</label>
 							<div class="col-sm-6" id="googleMapContainer">
 								<input type="hidden" id="loclatitude" name="loclatitude" value="{if isset($edit)}{$hotel_info.latitude|escape:'htmlall':'UTF-8'}{/if}" />
 								<input type="hidden" id="loclongitude" name="loclongitude" value="{if isset($edit)}{$hotel_info.longitude|escape:'htmlall':'UTF-8'}{/if}" />
 								<input type="hidden" id="locformatedAddr" name="locformatedAddr" value="{if isset($edit)}{$hotel_info.map_formated_address}{/if}" />
 								<input type="hidden" id="googleInputField" name="googleInputField" value="{if isset($edit)}{$hotel_info.map_input_text}{/if}" />
-								<input id="pac-input" class="controls" type="text" placeholder="Enter a location">
+								<input id="pac-input" class="controls" type="text" placeholder="{l s='Search' mod='hotelreservationsystem'}">
 								<div id="map"></div>
 							</div>
 						</div>

@@ -50,7 +50,7 @@ class AdminMaintenanceControllerCore extends AdminController
                     ),
                     'PS_MAINTENANCE_IP' => array(
                         'title' => $this->l('Maintenance IP'),
-                        'hint' => $this->l('IP addresses allowed to access the front office even if the shop is disabled. Please use a comma to separate them (e.g. 42.24.4.2,127.0.0.1,99.98.97.96)'),
+                        'hint' => $this->l('IP addresses allowed to access the front office even if the site is disabled. Please use a comma to separate them (e.g. 42.24.4.2,127.0.0.1,99.98.97.96)'),
                         'validation' => 'isGenericName',
                         'type' => 'maintenance_ip',
                         'default' => ''

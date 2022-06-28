@@ -386,7 +386,7 @@ class HotelHelper
         $objAddress = new Address();
         $objAddress->id_hotel = $htl_id;
         $objAddress->phone = '0987654321';
-        $objAddress->city = 'DefCity';
+        $objAddress->city = 'Demo City';
         $objAddress->id_state = $state_id;
         $objAddress->id_country = $def_cont_id;
         $objAddress->postcode = self::getRandomZipcodeByForCountry($def_cont_id);
@@ -417,10 +417,10 @@ class HotelHelper
         }
         if (count($states) > 0) {
             if ($cat_state) {
-                $cat_city = $this->addCategory('DefCity', $cat_state, $grp_ids);
+                $cat_city = $this->addCategory('Demo City', $cat_state, $grp_ids);
             }
         } else {
-            $cat_city = $this->addCategory('DefCity', $cat_country, $grp_ids);
+            $cat_city = $this->addCategory('Demo City', $cat_country, $grp_ids);
         }
         if ($cat_city) {
             $cat_hotel = $this->addCategory('The Hotel Prime', $cat_city, $grp_ids, 1, $htl_id);
@@ -447,7 +447,7 @@ class HotelHelper
 
     public function saveDummyProductsAndRelatedInfo($id_hotel)
     {
-        $prod_arr = array('General Rooms', 'Delux Rooms', 'Executive Rooms', 'luxury Rooms');
+        $prod_arr = array('General Rooms', 'Delux Rooms', 'Executive Rooms', 'Luxury Rooms');
         $prod_price_arr = array(1000, 1500, 2000, 2500);
         foreach ($prod_arr as $key => $value_prod) {
             // Add Product
@@ -546,7 +546,7 @@ class HotelHelper
                 $htl_room_info_obj->id_hotel = $id_hotel;
                 $htl_room_info_obj->room_num = 'A-10'.$k;
                 $htl_room_info_obj->id_status = 1;
-                $htl_room_info_obj->floor = 'first';
+                $htl_room_info_obj->floor = 'First';
                 $htl_room_info_obj->save();
             }
 

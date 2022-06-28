@@ -267,7 +267,7 @@ class AdminCountriesControllerCore extends AdminController
                     'label' => $this->l('Zip/postal code format'),
                     'name' => 'zip_code_format',
                     'required' => true,
-                    'desc' => $this->l('Indicate the format of the postal code: use L for a letter, N for a number, and C for the country\'s ISO 3166-1 alpha-2 code. For example, NNNNN for the United States, France, Poland and many other; LNNNNLLL for Argentina, etc. If you do not want Qloapps to verify the postal code for this country, leave it blank.')
+                    'desc' => $this->l('Indicate the format of the postal code: use L for a letter, N for a number, and C for the country\'s ISO 3166-1 alpha-2 code. For example, NNNNN for the United States, France, Poland and many other; LNNNNLLL for Argentina, etc. If you do not want QloApps to verify the postal code for this country, leave it blank.')
                 ),
                 array(
                     'type' => 'address_layout',

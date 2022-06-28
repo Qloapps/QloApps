@@ -35,18 +35,23 @@
 									<input class="selected_demand" type="checkbox" name="selected_demand[]" value="{$demand['id_global_demand']|escape:'html':'UTF-8'}" {if isset($roomDemandPrices[$demand['id_global_demand']])}checked{/if} /> &nbsp;&nbsp;<span>{$demand['name']|escape:'html':'UTF-8'}<span class="pull-right"> <i class="icon-angle-left"></i>
 								</a>
 								<div id="accordion_{$key|escape:'html':'UTF-8'}" class="accordion-section-content">
-									<div class="form-group">
-										<label class="col-sm-3 control-label required" >
-											{l s='Price' mod='hotelreservationsystem'}({l s='tax excl.' mod='hotelreservationsystem'})
-										</label>
-										<div class="col-sm-3">
-											<div class="input-group">
-												<span class="input-group-addon">{$defaultcurrencySign|escape:'html':'UTF-8'}</span>
-												<input type="text" name="demand_price_{$demand['id_global_demand']|escape:'html':'UTF-8'}"
-												value="{if isset($roomDemandPrices[$demand['id_global_demand']]['price'])}{$roomDemandPrices[$demand['id_global_demand']]['price']|escape:'html':'UTF-8'}{elseif isset($demand['price'])}{$demand['price']|escape:'html':'UTF-8'}{/if}"/>
+									{if isset($demand['adv_option']) && count($demand['adv_option'])}
+										<input type="hidden" name="demand_price_{$demand['id_global_demand']|escape:'html':'UTF-8'}"
+										value="{if isset($roomDemandPrices[$demand['id_global_demand']]['price'])}{$roomDemandPrices[$demand['id_global_demand']]['price']|escape:'html':'UTF-8'}{elseif isset($demand['price'])}{$demand['price']|escape:'html':'UTF-8'}{/if}"/>
+									{else}
+										<div class="form-group">
+											<label class="col-sm-3 control-label required" >
+												{l s='Price' mod='hotelreservationsystem'}({l s='tax excl.' mod='hotelreservationsystem'})
+											</label>
+											<div class="col-sm-3">
+												<div class="input-group">
+													<span class="input-group-addon">{$defaultcurrencySign|escape:'html':'UTF-8'}</span>
+													<input type="text" name="demand_price_{$demand['id_global_demand']|escape:'html':'UTF-8'}"
+													value="{if isset($roomDemandPrices[$demand['id_global_demand']]['price'])}{$roomDemandPrices[$demand['id_global_demand']]['price']|escape:'html':'UTF-8'}{elseif isset($demand['price'])}{$demand['price']|escape:'html':'UTF-8'}{/if}"/>
+												</div>
 											</div>
 										</div>
-									</div>
+									{/if}
 									{if isset($demand['adv_option']) && $demand['adv_option']}
 										<div class="adv_options_dtl form-group">
 											<label class="col-sm-3 control-label">
@@ -55,14 +60,16 @@
 											<div class="col-sm-9">
 												<div class="table-responsive-row clearfix">
 													<table class="table table-bordered adv_option_table">
-														<tr>
-															<th>
-																<span>{l s='Option Name' mod='hotelreservationsystem'}</span>
-															</th>
-															<th>
-																<span>{l s='Price' mod='hotelreservationsystem'}</span>
-															</th>
-														</tr>
+														<thead>
+															<tr>
+																<th>
+																	<span>{l s='Option Name' mod='hotelreservationsystem'}</span>
+																</th>
+																<th>
+																	<span>{l s='Price' mod='hotelreservationsystem'}</span>
+																</th>
+															</tr>
+														</thead>
 														{foreach from=$demand['adv_option'] key=key item=info}
 															<tr>
 																<td>

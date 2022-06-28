@@ -1,0 +1,31 @@
+<div class="bootstrap" id="rollbackForm">
+    <div class="panel">
+        <div class="panel-heading">
+            {{ 'Rollback'|trans }}
+        </div>
+        <p class="alert alert-info">
+            {{ 'After upgrading your shop, you can rollback to the previous database and files. Use this function if your theme or an essential module is not working correctly.'|trans }}
+        </p>
+
+        <div class="row" id="restoreBackupContainer">
+            <label class="col-lg-3 control-label text-right">{{ 'Choose your backup:'|trans }}</label>
+            <div class="col-lg-9">
+                <select name="restoreName">
+                    <option value="0">{{ '-- Choose a backup to restore --'|trans }}</option>';
+                    {% if availableBackups is not empty %}
+                        {% for backupName in availableBackups %}
+                        <option value="{{ backupName }}">{{ backupName }}</option>
+                        {% endfor %}
+                    {% endif %}
+                </select>
+                <span id="buttonDeleteBackup"></span>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <p id="rollbackContainer" class="col-lg-offset-3 col-lg-9">
+                <a disabled="disabled" class="upgradestep button btn btn-primary" href="" id="rollback">{{ 'Rollback'|trans }}</a>
+            </p>
+        </div>
+    </div>
+</div>

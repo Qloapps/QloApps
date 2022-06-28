@@ -12,6 +12,12 @@
     margin-bottom: 8px; }
   #create-account_form .form-group {
     margin: 0 0 20px 0; }
+    #create-account_form .btn-transform {
+      padding: 0;
+      font-size: 16px;
+      cursor: pointer;
+      vertical-align: initial;
+      text-decoration: underline; }
 
 #login_form {
   min-height: 297px; }

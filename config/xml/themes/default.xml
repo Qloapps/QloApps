@@ -150,13 +150,11 @@
             <hook module="wkfooterpaymentinfoblockcontainer" hook="displayFooter" position="4"/>
             <hook module="wkfooteraboutblock" hook="displayFooterMostLeftBlock" position="3"/>
             <hook module="wkfooteraboutblock" hook="displayFooterPaymentInfo" position="1"/>
-            <hook module="wkfooterpaymentblock" hook="displayAddModuleSettingLink" position="6"/>
             <hook module="wkfooterpaymentblock" hook="displayFooterPaymentInfo" position="2"/>
             <hook module="wkfooternotificationblock" hook="displayFooter" position="5"/>
             <hook module="blocknavigationmenu" hook="displayTop" position="2"/>
             <hook module="blocknavigationmenu" hook="displayFooter" position="6"/>
             <hook module="blocknavigationmenu" hook="actionObjectLanguageAddAfter" position="6"/>
-            <hook module="blocknavigationmenu" hook="displayAddModuleSettingLink" position="7"/>
             <hook module="blocknavigationmenu" hook="displayDefaultNavigationHook" position="1"/>
             <hook module="blocknavigationmenu" hook="displayNavigationHook" position="1"/>
             <hook module="blocknewsletter" hook="Header" position="3"/>

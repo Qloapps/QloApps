@@ -65,6 +65,132 @@ class HotelRoomType extends ObjectModel
     );
 
     /**
+     * [duplicateRoomType :: duplicates room type].
+     *
+     * @param [int] $idHotelRoomTypeOld [Id of room type from which information will be used]
+     *
+     * @param [int] $idHotelRoomTypeNew [Id of room type to which information will be assigned]
+     *
+     * @param [int] $idHotelNew [Id of hotel to which room type will be assigned]
+     *
+     * @param [bool] $returnId [Decides whether to return new id or not]
+     *
+     * @return [bool] [Returns true if successful, false otherwise]
+     */
+    public static function duplicateRoomType($idProductOld, $idProductNew, $idHotelNew = null, $returnId = true)
+    {
+        $roomType = Db::getInstance()->getRow(
+            'SELECT * FROM `'._DB_PREFIX_.'htl_room_type` hrt
+            WHERE hrt.`id_product` = '.(int)$idProductOld
+        );
+
+        if (!Db::getInstance()->NumRows()) {
+            return true;
+        }
+
+        if (!$idHotelNew) {
+            $idHotelNew = $roomType['id_hotel'];
+        }
+
+        $objHotelRoomType = new HotelRoomType();
+        $objHotelRoomType->id_product = $idProductNew;
+        $objHotelRoomType->id_hotel = $idHotelNew;
+        $objHotelRoomType->adult = $roomType['adult'];
+        $objHotelRoomType->children = $roomType['children'];
+        if ($objHotelRoomType->save()) {
+            $objHotelRoomType->updateCategories();
+            return $returnId ? $objHotelRoomType->id : true;
+        }
+        return false;
+    }
+
+    /**
+     * [duplicateRooms :: duplicates rooms].
+     *
+     * @param [int] $idProductOld [Id product of room type from which rooms will be used]
+     *
+     * @param [int] $idHotelRoomTypeNew [Id of room type to which rooms will be assigned]
+     *
+     * @param [int] $idProductNew [id_product of the new room type]
+     *
+     * @param [int] $idHotelNew [Id of hotel to which rooms will be assigned]
+     *
+     * @return [bool] [Returns true if successful, false otherwise]
+     */
+    public static function duplicateRooms($idProductOld, $idHotelRoomTypeNew, $idProductNew, $idHotelNew = null)
+    {
+        $rooms = Db::getInstance()->executeS(
+            'SELECT * FROM `'._DB_PREFIX_.'htl_room_information` hri
+            WHERE hri.`id_product` = '.(int)$idProductOld
+        );
+
+        if (!Db::getInstance()->NumRows()) {
+            return true;
+        }
+
+        if (!$idHotelNew) {
+            $idHotelNew = $rooms[0]['id_hotel'];
+        }
+        foreach ($rooms as $room) {
+            $objHRInformation = new HotelRoomInformation();
+            $objHRInformation->id_product = $idProductNew;
+            $objHRInformation->id_hotel = $idHotelNew;
+            $objHRInformation->room_num = $room['room_num'];
+            $objHRInformation->id_status = $room['id_status'];
+            $objHRInformation->floor = $room['floor'];
+            $objHRInformation->comment = $room['comment'];
+            if ($objHRInformation->save()) {
+                $idRoom = $objHRInformation->id;
+                if ((int)$room['id_status'] === (int)HotelRoomInformation::STATUS_TEMPORARY_INACTIVE) {
+                    $disableDates = Db::getInstance()->executeS(
+                        'SELECT * FROM `'._DB_PREFIX_.'htl_room_disable_dates` hrdd
+                        WHERE hrdd.`id_room` = '.(int)$room['id']
+                    );
+
+                    if (is_array($disableDates) && count($disableDates)) {
+                        foreach ($disableDates as $disableDate) {
+                            $objHRDisableDates = new HotelRoomDisableDates();
+                            $objHRDisableDates->id_room_type = $idHotelRoomTypeNew;
+                            $objHRDisableDates->id_room = $idRoom;
+                            $objHRDisableDates->date_from = $disableDate['date_from'];
+                            $objHRDisableDates->date_to = $disableDate['date_to'];
+                            $objHRDisableDates->reason = $disableDate['reason'];
+                            if (!$objHRDisableDates->save()) {
+                                return false;
+                            }
+                        }
+                    }
+                }
+            } else {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public function updateCategories()
+    {
+        $objProduct = new Product($this->id_product);
+        if (!Validate::isLoadedObject($objProduct)) {
+            return false;
+        }
+
+        $objHBInformation = new HotelBranchInformation($this->id_hotel);
+        if (!Validate::isLoadedObject($objHBInformation)) {
+            return false;
+        }
+
+        $objCategory = new Category($objHBInformation->id_category);
+        if (!Validate::isLoadedObject($objCategory)) {
+            return false;
+        }
+
+        $categories = $objCategory->getParentsCategories();
+        $categories = array_column($categories, 'id_category');
+        return $objProduct->updateCategories($categories);
+    }
+
+    /**
      * [deleteByProductId :: delete rows from the table where passed product Id matched].
      *
      * @param [int] $id_product [Id of the product]
