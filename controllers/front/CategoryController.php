@@ -104,7 +104,7 @@ class CategoryControllerCore extends FrontController
         if (!$this->category->active || !Validate::isLoadedObject($this->category) || !$this->category->inShop() || !$this->category->isAssociatedToShop() || in_array($this->category->id, array(Configuration::get('PS_HOME_CATEGORY'), Configuration::get('PS_ROOT_CATEGORY')))) {
             header('HTTP/1.1 404 Not Found');
             header('Status: 404 Not Found');
-            Tools::redirect('index.php?controller=404');
+            Tools::redirect($this->context->link->getPageLink('pagenotfound'));
         } else
             // Check if category can be accessible by current customer and return 403 if not
             if (!$this->category->checkAccess($this->context->customer->id)) {
