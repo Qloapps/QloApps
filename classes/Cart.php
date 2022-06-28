@@ -335,11 +335,7 @@ class CartCore extends ObjectModel
         foreach ($products as $product) {
             // products refer to the cart details
 
-            if (Configuration::get('PS_TAX_ADDRESS_TYPE') == 'id_address_invoice') {
-                $address_id = (int)$cart->id_address_invoice;
-            } else {
-                $address_id = (int)$product['id_address_delivery'];
-            } // Get delivery address of the product from the cart
+            $address_id = Cart::getIdAddressForTaxCalculation($product['id_product']);
             if (!Address::addressExists($address_id)) {
                 $address_id = null;
             }
@@ -630,8 +626,6 @@ class CartCore extends ObjectModel
             return array();
         }
 
-        $ecotax_rate = (float)Tax::getProductEcotaxRate($this->{Configuration::get('PS_TAX_ADDRESS_TYPE')});
-        $apply_eco_tax = Product::$_taxCalculationMethod == PS_TAX_INC && (int)Configuration::get('PS_TAX');
         $cart_shop_context = Context::getContext()->cloneContext();
 
         foreach ($result as &$row) {
@@ -647,11 +641,8 @@ class CartCore extends ObjectModel
                 $row['weight'] = (float)$row['weight_attribute'];
             }
 
-            if (Configuration::get('PS_TAX_ADDRESS_TYPE') == 'id_address_invoice') {
-                $address_id = (int)$this->id_address_invoice;
-            } else {
-                $address_id = (int)$row['id_address_delivery'];
-            }
+            // hotel address for tax calculation
+            $address_id = Cart::getIdAddressForTaxCalculation($row['id_product']);
             if (!Address::addressExists($address_id)) {
                 $address_id = null;
             }
@@ -1492,7 +1483,6 @@ class CartCore extends ObjectModel
         $price_calculator    = Adapter_ServiceLocator::get('Adapter_ProductPriceCalculator');
         $configuration        = Adapter_ServiceLocator::get('Core_Business_ConfigurationInterface');
 
-        $ps_tax_address_type = $configuration->get('PS_TAX_ADDRESS_TYPE');
         $ps_use_ecotax = $configuration->get('PS_USE_ECOTAX');
         $ps_round_type = $configuration->get('PS_ROUND_TYPE');
         $ps_ecotax_tax_rules_group_id = $configuration->get('PS_ECOTAX_TAX_RULES_GROUP_ID');
@@ -1590,11 +1580,8 @@ class CartCore extends ObjectModel
                 $virtual_context->shop = new Shop((int)$product['id_shop']);
             }
 
-            if ($ps_tax_address_type == 'id_address_invoice') {
-                $id_address = (int)$this->id_address_invoice;
-            } else {
-                $id_address = (int)$product['id_address_delivery'];
-            } // Get delivery address of the product from the cart
+            // hotel address for tax calculation
+            $id_address = Cart::getIdAddressForTaxCalculation($product['id_product']);
             if (!$address_factory->addressExists($id_address)) {
                 $id_address = null;
             }
@@ -2689,6 +2676,11 @@ class CartCore extends ObjectModel
             }
         }
         return $collection;
+    }
+
+    public static function getIdAddressForTaxCalculation($id_product)
+    {
+        return HotelRoomType::getHotelIdAddressByIdProduct($id_product);
     }
 
     /**

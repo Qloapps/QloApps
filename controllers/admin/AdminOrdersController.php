@@ -1908,7 +1908,7 @@ class AdminOrdersControllerCore extends AdminController
             false,
             $order->id_customer,
             $cart->id,
-            $order->{Configuration::get('PS_TAX_ADDRESS_TYPE', null, null, $order->id_shop)}
+            $order->id_address_tax
         );
 
         // Creating specific price if needed
@@ -2212,12 +2212,13 @@ class AdminOrdersControllerCore extends AdminController
                     $obj_cart_bk_data->id_hotel,
                     $idLang
                 ))) {
+                    $addressInfo = $objHotelBranch->getAddress($obj_cart_bk_data->id_hotel);
                     $objHtlBkDtl->hotel_name = $objHotelBranch->hotel_name;
-                    $objHtlBkDtl->city = $objHotelBranch->city;
-                    $objHtlBkDtl->state = State::getNameById($objHotelBranch->state_id);
-                    $objHtlBkDtl->country = Country::getNameById($idLang, $objHotelBranch->country_id);
-                    $objHtlBkDtl->zipcode = $objHotelBranch->zipcode;
-                    $objHtlBkDtl->phone = $objHotelBranch->phone;
+                    $objHtlBkDtl->city = $addressInfo['city'];
+                    $objHtlBkDtl->state = State::getNameById($addressInfo['id_state']);
+                    $objHtlBkDtl->country = Country::getNameById($idLang, $addressInfo['id_country']);
+                    $objHtlBkDtl->zipcode = $addressInfo['postcode'];;
+                    $objHtlBkDtl->phone = $addressInfo['phone'];
                     $objHtlBkDtl->email = $objHotelBranch->email;
                     $objHtlBkDtl->check_in_time = $objHotelBranch->check_in;
                     $objHtlBkDtl->check_out_time = $objHotelBranch->check_out;
@@ -3290,7 +3291,7 @@ class AdminOrdersControllerCore extends AdminController
                 $roomDemands = Tools::getValue('room_demands');
                 if ($roomDemands = json_decode($roomDemands, true)) {
                     $order = new Order($objBookingDetail->id_order);
-                    $vatAddress = new Address((int)$order->{Configuration::get('PS_TAX_ADDRESS_TYPE')});
+                    $vatAddress = new Address((int)$order->id_address_tax);
                     $idLang = (int)$order->id_lang;
                     $idProduct = $objBookingDetail->id_product;
                     $objHtlBkDtl = new HotelBookingDetail();

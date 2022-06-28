@@ -280,9 +280,9 @@ class ProductControllerCore extends FrontController
                 $hotel_policies = $hotel_info_by_id['policies'];
                 $hotel_name = $hotel_info_by_id['hotel_name'];
 
-                $country = Country::getNameById($this->context->language->id, $hotel_info_by_id['country_id']);
-                $state = State::getNameById($hotel_info_by_id['state_id']);
-                $hotel_location = $hotel_info_by_id['city'].', '.$state.', '.$country;
+                $addressInfo = $obj_hotel_branch->getAddress($room_info_by_product_id['id_hotel']);
+                $hotel_location = $addressInfo['city'].
+                    ($addressInfo['id_state']?', '.$addressInfo['state']:'').', '.$addressInfo['country'];
 
                 $obj_hotel_feaures_ids = $obj_hotel_branch->getFeaturesOfHotelByHotelId($hotel_id);
 
@@ -472,7 +472,7 @@ class ProductControllerCore extends FrontController
         }
 
         // Tax
-        $tax = (float)$this->product->getTaxesRate(new Address((int)$this->context->cart->{Configuration::get('PS_TAX_ADDRESS_TYPE')}));
+        $tax = (float)$this->product->getTaxesRate();
         $this->context->smarty->assign('tax_rate', $tax);
 
         $product_price_with_tax = Product::getPriceStatic($this->product->id, true, null, 6);
@@ -481,7 +481,7 @@ class ProductControllerCore extends FrontController
         }
         $product_price_without_eco_tax = (float)$product_price_with_tax - $this->product->ecotax;
 
-        $ecotax_rate = (float)Tax::getProductEcotaxRate($this->context->cart->{Configuration::get('PS_TAX_ADDRESS_TYPE')});
+        $ecotax_rate = (float)Tax::getProductEcotaxRate(Cart::getIdAddressForTaxCalculation($this->product->id));
         if (Product::$_taxCalculationMethod == PS_TAX_INC && (int)Configuration::get('PS_TAX')) {
             $ecotax_tax_amount = Tools::ps_round($this->product->ecotax * (1 + $ecotax_rate / 100), 2);
         } else {
@@ -512,7 +512,7 @@ class ProductControllerCore extends FrontController
             }
         }
 
-        $address = new Address($this->context->cart->{Configuration::get('PS_TAX_ADDRESS_TYPE')});
+        $address = new Address(Cart::getIdAddressForTaxCalculation($this->product->id));
         $this->context->smarty->assign(
             array(
                 'quantity_discounts' => $this->formatQuantityDiscounts($quantity_discounts, null, (float)$tax, $ecotax_tax_amount),
