@@ -748,6 +748,28 @@ class HotelBranchInformation extends ObjectModel
         return (Configuration::get('WK_ORDER_REFUND_ALLOWED') && $this->active_refund);
     }
 
+    public static function addHotelRestriction($idsHotel, $alias = null, $identifier = 'id_hotel', $idProfile = null)
+    {
+        if (!$idProfile) {
+            $idProfile = Context::getContext()->employee->id_profile;
+        }
+
+        if (!$idsHotel) {
+            $idsHotel = self::getProfileAccessedHotels($idProfile, 1, 1);
+        } else {
+            $idsHotel = array($idsHotel);
+        }
+
+        if ($alias) {
+            $alias .= '.';
+        }
+
+        $identifier = "`$identifier`";
+        $restriction = ' AND '.$alias.$identifier.' IN ('.implode(', ', $idsHotel).') ';
+
+        return $restriction;
+    }
+
     // Webservice getter : get virtual field id_default_image
     public function getCoverWs()
     {

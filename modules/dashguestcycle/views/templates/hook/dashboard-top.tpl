@@ -23,7 +23,7 @@
 			<div class="badges-wrapper">
 				{hook h="displayDashboardBadgeListBefore"}
 				<div class="badge-wrapper">
-					<div class="badge-item label-tooltip" data-toggle="tooltip" data-original-title="Current status for arrived guest.">
+					<div class="badge-item label-tooltip" data-toggle="tooltip" data-original-title="{l s='The number of arrivals scheduled for today.' mod='dashguestcycle'}">
 						<div class="badge-strip" style="background-color: #266FFE;"></div>
 						<div class="badge-content-wrapper">
 							<div class="title-wrapper">
@@ -38,7 +38,7 @@
 					</div>
 				</div>
 				<div class="badge-wrapper">
-					<div class="badge-item label-tooltip" data-toggle="tooltip" data-original-title="Number of guest departs till now.">
+					<div class="badge-item label-tooltip" data-toggle="tooltip" data-original-title="{l s='The number of departures scheduled for today.' mod='dashguestcycle'}">
 						<div class="badge-strip" style="background-color: #72C3F0;"></div>
 						<div class="badge-content-wrapper">
 							<div class="title-wrapper">
@@ -53,7 +53,7 @@
 					</div>
 				</div>
 				<div class="badge-wrapper">
-					<div class="badge-item label-tooltip" data-toggle="tooltip" data-original-title="Current status for new bookings.">
+					<div class="badge-item label-tooltip" data-toggle="tooltip" data-original-title="{l s='The number of new bookings created today so far.' mod='dashguestcycle'}">
 						<div class="badge-strip" style="background-color: #56CE56;"></div>
 						<div class="badge-content-wrapper">
 							<div class="title-wrapper">
@@ -68,7 +68,7 @@
 					</div>
 				</div>
 				<div class="badge-wrapper">
-					<div class="badge-item label-tooltip" data-toggle="tooltip" data-original-title="Total number of checkout that turned away/refused.">
+					<div class="badge-item label-tooltip" data-toggle="tooltip" data-original-title="{l s='The number of stay overs scheduled for today.' mod='dashguestcycle'}">
 						<div class="badge-strip" style="background-color: #FFC148;"></div>
 						<div class="badge-content-wrapper">
 							<div class="title-wrapper">
@@ -83,7 +83,7 @@
 					</div>
 				</div>
 				<div class="badge-wrapper">
-					<div class="badge-item label-tooltip" data-toggle="tooltip" data-original-title="Total number of messages received from the guest.">
+					<div class="badge-item label-tooltip" data-toggle="tooltip" data-original-title="{l s='The number of new messages received from guests today.' mod='dashguestcycle'}">
 						<div class="badge-strip" style="background-color: #A569DF;"></div>
 						<div class="badge-content-wrapper">
 							<div class="title-wrapper">
@@ -100,7 +100,7 @@
 					</div>
 				</div>
 				<div class="badge-wrapper">
-					<div class="badge-item label-tooltip" data-toggle="tooltip" data-original-title="The number of bookings canceled so far.">
+					<div class="badge-item label-tooltip" data-toggle="tooltip" data-original-title="{l s='The number of bookings cancelled today so far.' mod='dashguestcycle'}">
 						<div class="badge-strip" style="background-color: #FF4036;"></div>
 						<div class="badge-content-wrapper">
 							<div class="title-wrapper">
@@ -117,7 +117,7 @@
 					</div>
 				</div>
 				<div class="badge-wrapper">
-					<div class="badge-item label-tooltip" data-toggle="tooltip" data-original-title="The total number of adults and children.">
+					<div class="badge-item label-tooltip" data-toggle="tooltip" data-original-title="{l s='The number of adults and children scheduled to stay today.' mod='dashguestcycle'}">
 						<div class="badge-strip" style="background-color: #FF809E;"></div>
 						<div class="badge-content-wrapper">
 							<div class="title-wrapper">

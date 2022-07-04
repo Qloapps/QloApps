@@ -17,44 +17,27 @@
 * @license LICENSE.txt
 */
 
-/* square columns setup - start */
-#dashperformance .circles-wrapper > div {
-    padding: 15px !important;
+.preformance-index-wrapper {
+    padding: 20px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 500;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+    margin-bottom: 25px;
 }
-
-#dashperformance .circle-wrapper {
-    position: relative;
-    width: 100%;
-    padding-bottom: 100%;
+.preformance-index-wrapper .value-wrapper {
+    font-size: 18px;
+    font-weight: 700;
 }
-
-#dashperformance .circle {
-    position: absolute;
+#dashperformance .preformance-index-wrapper.avg-daily-rate {
+    background-color: #B7F0FF;
 }
-/* square columns setup - end */
-
-#dashperformance .circle {
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-	cursor: pointer;
+#dashperformance .preformance-index-wrapper.cancellation-rate {
+    background-color: #FFBBB8;
 }
-
-#dashperformance .circle-content-wrapper {
-	height: 100%;
-	display: flex;
-    flex-direction: column;
-    justify-content: center;
+#dashperformance .preformance-index-wrapper.revenue {
+    background-color: #B6FFB6;
 }
-
-#dashperformance .title-wrapper p {
-	font-weight: bold;
-	font-size: 14px;
-	line-height: 18px;
-}
-
-#dashperformance .value-wrapper p {
-	font-weight: bold;
-	font-size: 24px;
-	line-height: 30px;
+#dashperformance .preformance-index-wrapper.nights-stayed {
+    background-color: #FFE5B4;
 }

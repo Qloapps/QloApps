@@ -31,18 +31,26 @@
 	height: 115px;
 }
 
-.avil-chart-svg{
-	height: 380px;
+#availablePieChart {
+	position: relative;
+	padding-top: 100%;
+
+}
+#availablePieChart svg{
+	position: absolute;
+	top: -50px;
+	bottom: 50px;
+	left: -50px;
+	right: 50px;
+	width: calc(100% + 100px);
+	height: calc(100% + 100px);
 }
 
 .avail-pie-value{
 	font-style: normal;
 	font-weight: bold;
 	font-size: 24px;
-	/* line-height: 30px; */
 	color: #FFFFFF;
-	/* line-height: 15px; */
-    /* height: 30px; */
 	padding-bottom: 2px;
 }
 
@@ -57,7 +65,6 @@
 .avail-pie-label-container{
 	margin:4px;
 	height: 80px;
-	box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.15);
 	border-radius: 10px;
 	text-align: center;
 }
