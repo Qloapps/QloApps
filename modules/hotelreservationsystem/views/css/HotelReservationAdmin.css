@@ -521,10 +521,12 @@ a.deleteHtlImage {
  #googleMapContainer {
     height: 500px;
 }
+
 #map {
     width: 100%;
     height: 100%;
 }
+
 .controls {
     margin-top: 10px;
     border: 1px solid transparent;
@@ -533,28 +535,20 @@ a.deleteHtlImage {
     -moz-box-sizing: border-box;
     height: 32px;
     outline: none;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
 }
 
 #pac-input {
     background-color: #fff;
-    font-family: Roboto;
-    font-size: 15px;
-    font-weight: 300;
-    margin-left: 12px;
-    padding: 0 11px 0 13px;
-    text-overflow: ellipsis;
+    height: 38px;
     width: 300px;
+    font-size: 14px;
+    text-overflow: ellipsis;
 }
 
 #pac-input:focus {
     border-color: #4d90fe;
 }
-
-.pac-container {
-    font-family: Roboto;
-}
-
 
 /* ==== AdminHotelFeaturePricesSettingsController ==== */
 .week_days {

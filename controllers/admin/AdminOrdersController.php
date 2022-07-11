@@ -60,18 +60,13 @@ class AdminOrdersControllerCore extends AdminController
         (a.total_paid - a.total_paid_real) AS `amount_due`, a.source AS order_source,
         a.id_currency,
         a.id_order AS id_pdf,
-        CONCAT(LEFT(c.`firstname`, 1), \'. \', c.`lastname`) AS `customer`,
-        osl.`name` AS `osname`,
-        os.`color`,
+        CONCAT(c.`firstname`, \' \', c.`lastname`) AS `customer`,
+        osl.`name` AS `osname`, os.`color`,
         IF((SELECT so.id_order FROM `'._DB_PREFIX_.'orders` so WHERE so.id_customer = a.id_customer AND so.id_order < a.id_order LIMIT 1) > 0, 0, 1) as new,
-        country_lang.name as cname,
         IF(a.valid, 1, 0) badge_success';
 
         $this->_join = '
         LEFT JOIN `'._DB_PREFIX_.'customer` c ON (c.`id_customer` = a.`id_customer`)
-        INNER JOIN `'._DB_PREFIX_.'address` address ON address.id_address = a.id_address_delivery
-        INNER JOIN `'._DB_PREFIX_.'country` country ON address.id_country = country.id_country
-        INNER JOIN `'._DB_PREFIX_.'country_lang` country_lang ON (country.`id_country` = country_lang.`id_country` AND country_lang.`id_lang` = '.(int) $this->context->language->id.')
         LEFT JOIN `'._DB_PREFIX_.'order_state` os ON (os.`id_order_state` = a.`current_state`)
         LEFT JOIN `'._DB_PREFIX_.'order_state_lang` osl ON (os.`id_order_state` = osl.`id_order_state` AND osl.`id_lang` = '.(int) $this->context->language->id.')';
         $this->_orderBy = 'id_order';
@@ -164,35 +159,7 @@ class AdminOrdersControllerCore extends AdminController
                 'remove_onclick' => true
             )
         ));
-
-        if (Country::isCurrentlyUsed('country', true)) {
-            $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->ExecuteS('
-			SELECT DISTINCT c.id_country, cl.`name`
-			FROM `'._DB_PREFIX_.'orders` o
-			'.Shop::addSqlAssociation('orders', 'o').'
-			INNER JOIN `'._DB_PREFIX_.'address` a ON a.id_address = o.id_address_delivery
-			INNER JOIN `'._DB_PREFIX_.'country` c ON a.id_country = c.id_country
-			INNER JOIN `'._DB_PREFIX_.'country_lang` cl ON (c.`id_country` = cl.`id_country` AND cl.`id_lang` = '.(int)$this->context->language->id.')
-			ORDER BY cl.name ASC');
-
-            $country_array = array();
-            foreach ($result as $row) {
-                $country_array[$row['id_country']] = $row['name'];
-            }
-
-            $part1 = array_slice($this->fields_list, 0, 3);
-            $part2 = array_slice($this->fields_list, 3);
-            $part1['cname'] = array(
-                'title' => $this->l('Delivery'),
-                'type' => 'select',
-                'list' => $country_array,
-                'filter_key' => 'country!id_country',
-                'filter_type' => 'int',
-                'order_key' => 'cname'
-            );
-            $this->fields_list = array_merge($part1, $part2);
-        }
-
+        
         $this->shopLinkType = 'shop';
         $this->shopShareDatas = Shop::SHARE_ORDER;
 
@@ -354,10 +321,7 @@ class AdminOrdersControllerCore extends AdminController
 
         $this->addJqueryUI('ui.datepicker');
         $this->addJS(_PS_JS_DIR_.'vendor/d3.v3.min.js');
-        $api_key = (Configuration::get('PS_API_KEY')) ? 'key=' . Configuration::get('PS_API_KEY') . '&' : '';
-        $protocol = (Configuration::get('PS_SSL_ENABLED') && Configuration::get('PS_SSL_ENABLED_EVERYWHERE')) ? 'https' : 'http';
-        $this->addJS($protocol . '://maps.google.com/maps/api/js?' . $api_key);
-
+        
         if ($this->tabAccess['edit'] == 1 && $this->display == 'view') {
             $this->addJS(_PS_JS_DIR_.'admin/orders.js');
             $this->addJS(_PS_JS_DIR_.'tools.js');
@@ -1917,7 +1881,7 @@ class AdminOrdersControllerCore extends AdminController
                     $obj_htl_cart_booking_data->id_product = $room_info['id_product'];
                     $obj_htl_cart_booking_data->id_room = $room_info['id_room'];
                     $obj_htl_cart_booking_data->id_hotel = $room_info['id_hotel'];
-                    $obj_htl_cart_booking_data->booking_type = 1;
+                    $obj_htl_cart_booking_data->booking_type = HotelBookingDetail::ALLOTMENT_AUTO;
                     $obj_htl_cart_booking_data->quantity = $num_days;
                     $obj_htl_cart_booking_data->date_from = $date_from;
                     $obj_htl_cart_booking_data->date_to = $date_to;
@@ -1944,7 +1908,7 @@ class AdminOrdersControllerCore extends AdminController
             false,
             $order->id_customer,
             $cart->id,
-            $order->{Configuration::get('PS_TAX_ADDRESS_TYPE', null, null, $order->id_shop)}
+            $order->id_address_tax
         );
 
         // Creating specific price if needed
@@ -2248,12 +2212,13 @@ class AdminOrdersControllerCore extends AdminController
                     $obj_cart_bk_data->id_hotel,
                     $idLang
                 ))) {
+                    $addressInfo = $objHotelBranch->getAddress($obj_cart_bk_data->id_hotel);
                     $objHtlBkDtl->hotel_name = $objHotelBranch->hotel_name;
-                    $objHtlBkDtl->city = $objHotelBranch->city;
-                    $objHtlBkDtl->state = State::getNameById($objHotelBranch->state_id);
-                    $objHtlBkDtl->country = Country::getNameById($idLang, $objHotelBranch->country_id);
-                    $objHtlBkDtl->zipcode = $objHotelBranch->zipcode;
-                    $objHtlBkDtl->phone = $objHotelBranch->phone;
+                    $objHtlBkDtl->city = $addressInfo['city'];
+                    $objHtlBkDtl->state = State::getNameById($addressInfo['id_state']);
+                    $objHtlBkDtl->country = Country::getNameById($idLang, $addressInfo['id_country']);
+                    $objHtlBkDtl->zipcode = $addressInfo['postcode'];;
+                    $objHtlBkDtl->phone = $addressInfo['phone'];
                     $objHtlBkDtl->email = $objHotelBranch->email;
                     $objHtlBkDtl->check_in_time = $objHotelBranch->check_in;
                     $objHtlBkDtl->check_out_time = $objHotelBranch->check_out;
@@ -2355,6 +2320,7 @@ class AdminOrdersControllerCore extends AdminController
         $product_quantity = (int) $obj_booking_detail->getNumberOfDays($new_date_from, $new_date_to);
         $old_product_quantity =  (int) $obj_booking_detail->getNumberOfDays($old_date_from, $old_date_to);
         $qty_diff = $product_quantity - $old_product_quantity;
+        
         /*By webkul to validate fields before deleting the cart and order data form the tables*/
         if ($id_hotel == '') {
             die(json_encode(array(
@@ -2638,6 +2604,19 @@ class AdminOrdersControllerCore extends AdminController
                         }
                     }
                 }
+
+                if (isset($order_invoice)) {
+                    // Apply changes on OrderInvoice
+                    $order_invoice->total_paid_tax_excl = $objOrder->total_paid_tax_excl;
+                    $order_invoice->total_paid_tax_incl = $objOrder->total_paid_tax_incl;
+                }
+
+
+                // Save order invoice
+                if (isset($order_invoice)) {
+                    $res &= $order_invoice->update();
+                }
+
                 // change order total save
                 $objOrder->save();
             }
@@ -3312,7 +3291,7 @@ class AdminOrdersControllerCore extends AdminController
                 $roomDemands = Tools::getValue('room_demands');
                 if ($roomDemands = json_decode($roomDemands, true)) {
                     $order = new Order($objBookingDetail->id_order);
-                    $vatAddress = new Address((int)$order->{Configuration::get('PS_TAX_ADDRESS_TYPE')});
+                    $vatAddress = new Address((int)$order->id_address_tax);
                     $idLang = (int)$order->id_lang;
                     $idProduct = $objBookingDetail->id_product;
                     $objHtlBkDtl = new HotelBookingDetail();
@@ -3354,6 +3333,16 @@ class AdminOrdersControllerCore extends AdminController
                         }
                         $objBookingDemand->total_price_tax_excl = $objBookingDemand->unit_price_tax_excl * $qty;
                         $objBookingDemand->total_price_tax_incl = $objBookingDemand->unit_price_tax_incl * $qty;
+
+                        $order_detail = new OrderDetail($objBookingDetail->id_order_detail);
+                        // Update OrderInvoice of this OrderDetail
+                        if ($order_detail->id_order_invoice != 0) {
+                            // values changes as values are calculated accoding to the quantity of the product by webkul
+                            $order_invoice = new OrderInvoice($order_detail->id_order_invoice);
+                            $order_invoice->total_paid_tax_excl += $objBookingDemand->total_price_tax_excl;
+                            $order_invoice->total_paid_tax_incl += $objBookingDemand->total_price_tax_incl;
+                            $res &= $order_invoice->update();
+                        }
 
                         // change order total
                         $order->total_paid_tax_excl += $objBookingDemand->total_price_tax_excl;
@@ -3399,6 +3388,16 @@ class AdminOrdersControllerCore extends AdminController
                             $order->total_paid_tax_incl -= $objBookingDemand->total_price_tax_incl;
                             $order->total_paid -= $objBookingDemand->total_price_tax_incl;
                             $order->save();
+
+                            $order_detail = new OrderDetail($objBookingDetail->id_order_detail);
+                            // Update OrderInvoice of this OrderDetail
+                            if ($order_detail->id_order_invoice != 0) {
+                                // values changes as values are calculated accoding to the quantity of the product by webkul
+                                $order_invoice = new OrderInvoice($order_detail->id_order_invoice);
+                                $order_invoice->total_paid_tax_excl -= $objBookingDemand->total_price_tax_excl;
+                                $order_invoice->total_paid_tax_incl -= $objBookingDemand->total_price_tax_incl;
+                                $res &= $order_invoice->update();
+                            }
                         }
                         die('1');
                     }

@@ -132,69 +132,11 @@
 		.data_value
 			display: block
 			text-align: center
-			
-	#dashtrends
-		header
-			margin-bottom: 0
-		#dashtrends_toolbar
-			margin: 0 -16px 10px
-			dl
-				@include box-shadow(0 0 0 2px white inset)
-				dt
-					color: #777
-					padding: 0
-					margin: 0
-					height: 2.6em
-				dd.data_value
-					color: #aaa
-					@extend .clearfix
-					small
-						font-size: 0.5em
-				dd.dash_trend
-					background-color: white
-					width: 80px
-					margin: 0 auto
-					@include border-radius(3px)
-				&:hover
-					dt, dd.data_value
-						color: $brand-primary
-					dt
-						text-decoration: underline
-				&.active
-					dt, dd.data_value
-						color: white
-		dl
-			cursor: pointer
-			margin: 0
-			min-height: 70px
-			text-align: center
-			background-color: white
-			padding: 10px
-			border-bottom: 1px solid #ddd
-			@include border-left(1px solid #ddd)
-			&:first-child
-				@include border-left(none)
-			&.active
-				background-color: $brand-primary
-				@include box-shadow(white 0 0 0 2px inset)
-				dt
-					color: white
-		dt
-			text-align: center
-			height: 37px
-			line-height: 1em
-			font: 400 1.1em/120% $headings-font-family
-		dd
-			span
-				font-size: 0.9em
-				white-space: nowrap
-		svg
-			height: 350px
 
 	#dashgoals
 		svg
 			height: 250px
-			
+
 	#dashproducts
 		nav
 			margin-bottom: 10px

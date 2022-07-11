@@ -30,8 +30,7 @@ function line_chart_trends(widget_name, chart_details)
 			if (value.id == 'sales' || value.id == 'sales_compare')
 			{
 				if (value.id == 'sales'){
-					$('#dashtrends_toolbar dl:first').css("border-color", value.border_color); 
-					// $('#dashtrends_toolbar dl:first').addClass('active');
+					$('#dashtrends_toolbar dl:first').addClass('active').css("border-color", value.border_color);
 				}
 				first_data.push(chart_details.data[index]);
 			}
@@ -61,8 +60,8 @@ function selectDashtrendsChart(element, type)
 		{
 			if (value.id == type)
 			{
-				$(element).siblings().css("border-color", '#fff'); 
-				$(element).css("border-color", value.border_color); 
+				$(element).parent().siblings().find('dl').css("border-color", '#fff');
+				$(element).css("border-color", value.border_color);
 			}
 
 			current_charts.push(dashtrends_data[index]);

@@ -2643,10 +2643,12 @@ exit;
         $backtrace = debug_backtrace();
         $callee = next($backtrace);
         $class = isset($callee['class']) ? $callee['class'] : null;
+        $callee['file'] = isset($callee['file']) ? $callee['file'] : '<undefined>';
+        $callee['line'] = isset($callee['line']) ? $callee['line'] : '<undefined>';
         if ($message === null) {
             $message = 'The function '.$callee['function'].' (Line '.$callee['line'].') is deprecated and will be removed in the next major version.';
         }
-        $error = 'Function <b>'.$callee['function'].'()</b> is deprecated in <b>'.$callee['file'].'</b> on line <b>'.$callee['line'].'</b><br />';
+        $error = 'Function: <b>'.$callee['function'].'()</b> is deprecated in file: <b>'.$callee['file'].'</b> on line: <b>'.$callee['line'].'</b><br />';
 
         Tools::throwDeprecated($error, $message, $class);
     }

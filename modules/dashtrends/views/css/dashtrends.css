@@ -23,155 +23,50 @@
 *  International Registered Trademark & Property of PrestaShop SA
 
 /* start */
-#dashtrends header {
-    margin-bottom: 0;
-  }
-  .bootstrap #dashboard #dashtrends #dashtrends_toolbar {
-    margin: 0 -16px 10px;
-  }
-  .bootstrap #dashboard #dashtrends #dashtrends_toolbar dl {
-    -webkit-box-shadow: 0 0 0 2px white inset;
-    box-shadow: 0 0 0 2px white inset;
-  }
-  .bootstrap #dashboard #dashtrends #dashtrends_toolbar dl dt {
-    color: #777;
-    padding: 0;
-    margin: 0;
-    height: 2.6em;
-  }
-  .bootstrap #dashboard #dashtrends #dashtrends_toolbar dl dd.data_value {
-    color: #aaa;
-  }
-  .bootstrap #dashboard #dashtrends #dashtrends_toolbar dl dd.data_value small {
-    font-size: 0.5em;
-  }
-  .bootstrap #dashboard #dashtrends #dashtrends_toolbar dl dd.dash_trend {
-    background-color: white;
-    width: 80px;
-    margin: 0 auto;
-    -webkit-border-radius: 3px;
-    border-radius: 3px;
-  }
-  .bootstrap #dashboard #dashtrends #dashtrends_toolbar dl:hover dt, .bootstrap #dashboard #dashtrends #dashtrends_toolbar dl:hover dd.data_value {
-    color: #00aff0;
-  }
-  .bootstrap #dashboard #dashtrends #dashtrends_toolbar dl:hover dt {
-    text-decoration: underline;
-  }
-  .bootstrap #dashboard #dashtrends #dashtrends_toolbar dl.active dt, .bootstrap #dashboard #dashtrends #dashtrends_toolbar dl.active dd.data_value {
-    color: white;
-  }
-  .bootstrap #dashboard #dashtrends dl {
-    cursor: pointer;
-    margin: 0;
-    min-height: 70px;
-    text-align: center;
-    background-color: white;
-    padding: 10px;
-    border-bottom: 1px solid #ddd;
-    border-left: 1px solid #ddd;
-  }
-  .bootstrap #dashboard #dashtrends dl:first-child {
-    border-left: none;
-  }
-  .bootstrap #dashboard #dashtrends dl.active {
-    background-color: #00aff0;
-    -webkit-box-shadow: white 0 0 0 2px inset;
-    box-shadow: white 0 0 0 2px inset;
-  }
-  .bootstrap #dashboard #dashtrends dl.active dt {
-    color: white;
-  }
-  .bootstrap #dashboard #dashtrends dt {
-    text-align: center;
-    height: 37px;
-    line-height: 1em;
-    font: 400 1.1em/120% "Ubuntu Condensed", Helvetica, Arial, sans-serif;
-  }
-  .bootstrap #dashboard #dashtrends dd span {
-    font-size: 0.9em;
-    white-space: nowrap;
-  }
-  .bootstrap #dashboard #dashtrends svg {
-    height: 350px;
-  }
-
-  .bootstrap .clearfix:before, .bootstrap #dashboard #dashtrends #dashtrends_toolbar dl dd.data_value:before, .bootstrap .clearfix:after, .bootstrap #dashboard #dashtrends #dashtrends_toolbar dl dd.data_value:after {
-    content: " ";
-    display: table;
-  }
-  .bootstrap .clearfix:after, .bootstrap #dashboard #dashtrends #dashtrends_toolbar dl dd.data_value:after {
-    clear: both;
-  }
-/* end */
-
-
-/*revenue chart*/
-.bootstrap #dashboard #dashtrends dl {
-    border-radius: 10px;
-    min-height: 85px;
-    border: 1px solid #fff;
-}
-
-.bootstrap #dashboard #dashtrends #dashtrends_toolbar dl {
-    -webkit-box-shadow: none !important;
-    box-shadow: none !important;
-    margin: 1px;
-}
-
 .bootstrap #dashboard #dashtrends #dashtrends_toolbar {
-    padding-top: 5%;
-    padding-left: 5%;
-    padding-bottom: 5%;
-    margin: 0 -16px -16px;
+  margin: 25px 0;
+  display: flex;
+  flex-grow: 1;
+  flex-wrap: wrap;
 }
-
-.bootstrap #dashboard #dashtrends #dashtrends_toolbar dl dt{
-	padding: 8px;
-    height: 1.4rem;
-    color: #ffffff;
+.bootstrap #dashboard #dashtrends #dashtrends_toolbar > div{
+  display: flex;
 }
-
-.bootstrap #dashboard #dashtrends #dashtrends_toolbar dl dt:hover {
-	text-decoration: none !important;
-    color: #ffffff;
-}
-
-.bootstrap #dashboard #dashtrends #dashtrends_toolbar dl:hover dt{
-	text-decoration: none !important;
-    color: #ffffff;
-}
-
-.bootstrap dt, .bootstrap dd {
-    line-height: 0.6 !important;
-}
-
-.bootstrap #dashboard #dashtrends dd span {
-    font-weight: bold;
-    color: #ffffff;
-}
-
-.bootstrap #dashboard #dashtrends #dashtrends_toolbar dl dt, .bootstrap #dashboard #dashtrends #dashtrends_toolbar dl.active dd.data_value {
-	height: 30px;
+.bootstrap #dashboard #dashtrends #dashtrends_toolbar dl {
+  text-align: center;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  width: 100%;
+  -webkit-box-shadow: none;
+  box-shadow: 0px 4px 8px 0px rgba(0,0,0,0.2);
+  transition: 0.25s;}
+.bootstrap #dashboard #dashtrends #dashtrends_toolbar dl:hover {
+  transform: translate(0px, -3px);
 }
 
 .bootstrap #dashboard #dashtrends dl.active {
-    border : 1px solid #113cfc !important;
+  background-color: #00aff0;
+  -webkit-box-shadow: white 0 0 0 2px inset;
+  box-shadow: white 0 0 0 2px inset;
 }
-
-.bootstrap #dashboard #dashtrends div#dash_trends_chart1 {
-    padding: 60px;
+.bootstrap #dashboard #dashtrends #dashtrends_toolbar dl dt, .bootstrap #dashboard #dashtrends #dashtrends_toolbar dl dd.data_value{
+    color: #ffffff;
 }
-
-.bootstrap #dashboard #dashtrends dl:first-child {
-    border-left: 1px solid #fff;
+.bootstrap #dashboard #dashtrends #dashtrends_toolbar dl dt{
+	padding: 8px;
+  height: unset;
 }
-
-.bootstrap #dashboard #dashtrends #dashtrends_toolbar .label-tooltip {
-    width: 15%;
+.bootstrap #dashboard #dashtrends #dashtrends_toolbar dl dd span {
+  font-size: 18px;
+  font-weight: bold;
 }
-
-#dashtrends  p.no-chart-info {
-    margin-top: 10px;
-    display: none;
+.bootstrap #dashboard #dashtrends #dashtrends_toolbar dl dd span.small {
+  font-size: 12px;
+}
+.bootstrap #dashboard #dashtrends #dashtrends_toolbar dl:hover dt, .bootstrap #dashboard #dashtrends #dashtrends_toolbar dl:hover dd.data_value {
+  color: #ffffff;
+  text-decoration: none;
+}
+.bootstrap #dashboard #dashtrends svg {
+  height: 350px;
 }

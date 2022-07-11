@@ -17,8 +17,8 @@
  * @license LICENSE.txt
  */
 
-var dashtrends_data;
-var dashtrends_chart;
+var dashavailability_data;
+var dashavailability_chart;
 
 function line_chart_availability(widget_name, chart_details) {
     nv.addGraph(function() {
@@ -40,10 +40,12 @@ function line_chart_availability(widget_name, chart_details) {
             return parseInt(d);
         });
 
-        dashtrends_data = chart_details.data;
-        dashtrends_chart = chart;
+        chart.legend.updateState(false);
+
+        dashavailability_data = chart_details.data;
+        dashavailability_chart = chart;
         d3.select('#availableBarChart svg')
-            .datum(dashtrends_data)
+            .datum(dashavailability_data)
             .call(chart);
         nv.utils.windowResize(chart.update);
 
@@ -51,26 +53,38 @@ function line_chart_availability(widget_name, chart_details) {
     });
 }
 
-// select fetch bar chart data 
+function refreshAvailabilityBarData() {
+    var days = parseInt($('#dashavailability').find('.avail-bar-btn.bar-btn-active').attr('data-days'));
+    fetchAvailablityBarData(days, $("#bardate").val());
+}
+
+// select fetch bar chart data
 function fetchAvailablityBarData(days, date_from = false) {
     if (!date_from) {
         date_from = $("#bardate").val();
     }
-    $(".avail-bar-btn").removeClass('bar-btn-active');
-    $("#avail_bar_day_" + days).addClass('bar-btn-active');
-    refreshDashboard('dashavailability', days, date_from);
-}
 
+    var extra = JSON.stringify({
+        date_from: date_from,
+        days: days,
+    });
+
+    refreshDashboard('dashavailability', true, extra);
+}
 
 function availDatePicker() {
     $('#bardate').datepicker('show');
 }
 
+$(document).on('click', '.avail-bar-btn', function() {
+    $('.avail-bar-btn').removeClass('bar-btn-active');
+    $(this).addClass('bar-btn-active');
+    refreshAvailabilityBarData();
+});
+
 $(document).ready(function() {
     $("#bardate").val($("#date-start").val());
     $(".bar-date").find("strong").text($("#date-start").val());
-
-    fetchAvailablityBarData(5, $("#bardate").val());
 
     $("#bardate").datepicker({
         dateFormat: 'yy-mm-dd',
@@ -84,8 +98,7 @@ $(document).ready(function() {
         },
         onSelect: function(date) {
             $(".bar-date").find("strong").text(date);
-            fetchAvailablityBarData(5, $("#bardate").val());
+            refreshAvailabilityBarData();
         }
     });
-
 });

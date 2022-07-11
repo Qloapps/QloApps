@@ -37,7 +37,7 @@
 		{if isset($meta_keywords) AND $meta_keywords}
 			<meta name="keywords" content="{$meta_keywords|escape:'html':'UTF-8'}" />
 		{/if}
-		<meta name="generator" content="PrestaShop" />
+		<meta name="generator" content="QloApps" />
 		<meta name="robots" content="{if isset($nobots)}no{/if}index,{if isset($nofollow) && $nofollow}no{/if}follow" />
 		<meta name="viewport" content="width=device-width, minimum-scale=0.25, maximum-scale=1.6, initial-scale=1.0" />
 		<meta name="apple-mobile-web-app-capable" content="yes" />

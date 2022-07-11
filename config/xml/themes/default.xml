@@ -156,7 +156,6 @@
             <hook module="blocknavigationmenu" hook="displayTop" position="2"/>
             <hook module="blocknavigationmenu" hook="displayFooter" position="6"/>
             <hook module="blocknavigationmenu" hook="actionObjectLanguageAddAfter" position="6"/>
-            <hook module="blocknavigationmenu" hook="displayAddModuleSettingLink" position="7"/>
             <hook module="blocknavigationmenu" hook="displayDefaultNavigationHook" position="1"/>
             <hook module="blocknavigationmenu" hook="displayNavigationHook" position="1"/>
             <hook module="blocknewsletter" hook="Header" position="3"/>

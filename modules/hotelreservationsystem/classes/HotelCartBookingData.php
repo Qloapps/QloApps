@@ -863,9 +863,12 @@ class HotelCartBookingData extends ObjectModel
                                 1,
                                 $roomDetail['id_hotel']
                             )) {
-                                $hotelInfo['location'] = $hotelInfo['hotel_name'].', '.$hotelInfo['city'].', '.State::getNameById($hotelInfo['state_id']).', '.
-                                Country::getNameById($idLang, $hotelInfo['country_id'])
-                                .', '.$hotelInfo['zipcode'];
+                                $addressInfo = $objHotelBranch->getAddress($roomDetail['id_hotel']);
+
+                                $hotelInfo['location'] = $hotelInfo['hotel_name'].', '.$addressInfo['city'].
+                                ($addressInfo['id_state']?', '.$addressInfo['state']:'').', '.
+                                $addressInfo['country'].', '.$addressInfo['postcode'];
+
 
                                 // append hotel features
                                 if ($hotelFeaureIds = $objHotelBranch->getFeaturesOfHotelByHotelId($roomDetail['id_hotel'])) {

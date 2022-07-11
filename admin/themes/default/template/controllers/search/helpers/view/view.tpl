@@ -178,20 +178,20 @@ $(function() {
 <div class="row">
 	<div class="col-lg-4">
 		<div class="panel">
-			<h3>{l s='Search doc.prestashop.com'}</h3>
-			<a href="http://doc.prestashop.com/dosearchsite.action?spaceSearch=true&amp;queryString={$query}&amp;utm_source=back-office&amp;utm_medium=search&amp;utm_campaign=back-office-{$lang_iso|upper}&amp;utm_content={if $host_mode}cloud{else}download{/if}" class="btn btn-default _blank">{l s='Go to the documentation'}</a>
+			<h3>{l s='Search qloapps.com/blog'}</h3>
+			<a href="https://qloapps.com/?s={$query}" class="btn btn-default _blank">{l s='Go to the documentation'}</a>
 		</div>
 	</div>
 	<div class="col-lg-4">
 		<div class="panel">
-			<h3>{l s='Search addons.prestashop.com'}</h3>
-			<a href="http://addons.prestashop.com/search.php?search_query={$query}&amp;utm_source=back-office&amp;utm_medium=search&amp;utm_campaign=back-office-{$lang_iso|upper}&amp;utm_content={if $host_mode}cloud{else}download{/if}" class="btn btn-default _blank">{l s='Go to Addons'}</a>
+			<h3>{l s='Search qloapps.com/addons'}</h3>
+			<a href="https://qloapps.com/addons/?add={$query}" class="btn btn-default _blank">{l s='Go to Addons'}</a>
 		</div>
 	</div>
 	<div class="col-lg-4">
 		<div class="panel">
-			<h3>{l s='Search prestashop.com forum'}</h3>
-			<a href="https://www.google.fr/search?q=site%3Aprestashop.com%2Fforums%2F+{$query}" class="btn btn-default _blank">{l s='Go to the Forum'}</a>
+			<h3>{l s='Search forums.qloapps.com'}</h3>
+			<a href="https://forums.qloapps.com/search?term={$query}" class="btn btn-default _blank">{l s='Go to the Forum'}</a>
 		</div>
 	</div>
 </div>

@@ -36,7 +36,7 @@ class DashGuestCycle extends Module
         $this->displayName = $this->l('Dashboard Guest Cycle');
         $this->description = $this->l('Adds a block with a graphical representation of guest cycle stats.');
         $this->confirmUnsinstall = $this->l('Are you sure you want to uninstall?');
-        
+
         $this->allow_push = true;
     }
 
@@ -77,17 +77,17 @@ class DashGuestCycle extends Module
             $data['dgc_guests_children'] = sprintf('%02d', rand(0, $data['dgc_guests_adults']));
         } else {
             $dateToday = date('Y-m-d');
-            $arrivalsData = AdminStatsController::getArrivalsByDate($dateToday);
-            $departuresData = AdminStatsController::getDeparturesByDate($dateToday);
-            $guestsData = AdminStatsController::getGuestsByDate($dateToday);
+            $arrivalsData = AdminStatsController::getArrivalsByDate($dateToday, $params['id_hotel']);
+            $departuresData = AdminStatsController::getDeparturesByDate($dateToday, $params['id_hotel']);
+            $guestsData = AdminStatsController::getGuestsByDate($dateToday, $params['id_hotel']);
             $data['dgc_arrived'] = sprintf('%02d', $arrivalsData['arrived']);
             $data['dgc_total_arrivals'] = sprintf('%02d', $arrivalsData['total_arrivals']);
             $data['dgc_departed'] = sprintf('%02d', $departuresData['departed']);
             $data['dgc_total_departures'] = sprintf('%02d', $departuresData['total_departures']);
-            $data['dgc_new_bookings'] = sprintf('%02d', AdminStatsController::getBookingsByDate($dateToday));
-            $data['dgc_stay_overs'] = sprintf('%02d', AdminStatsController::getStayOversByDate($dateToday));
+            $data['dgc_new_bookings'] = sprintf('%02d', AdminStatsController::getBookingsByDate($dateToday, $params['id_hotel']));
+            $data['dgc_stay_overs'] = sprintf('%02d', AdminStatsController::getStayOversByDate($dateToday, $params['id_hotel']));
             $data['dgc_new_messages'] = sprintf('%02d', CustomerMessage::getMessagesByDate($dateToday));
-            $data['dgc_cancelled_bookings'] = sprintf('%02d', AdminStatsController::getCancelledBookingsByDate($dateToday));
+            $data['dgc_cancelled_bookings'] = sprintf('%02d', AdminStatsController::getCancelledBookingsByDate($dateToday, $params['id_hotel']));
             $data['dgc_guests_adults'] = sprintf('%02d', $guestsData['adults']);
             $data['dgc_guests_children'] = sprintf('%02d', $guestsData['children']);
         }

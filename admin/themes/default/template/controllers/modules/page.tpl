@@ -24,7 +24,7 @@
 *}
 <div class="alert bg-info">
 	<div class="row modules-addons-info">
-		<h4>{l s='Explore all addon of Qloapps '}<a class="btn btn-default _blank" href="https://qloapps.com/addons/"> @{l s='Qloapps addons'}</a></h4>
+		<h4>{l s='Explore all QloApps addons'} <a class="btn btn-default _blank" href="https://qloapps.com/addons/"> {l s='QloApps addons'}</a></h4>
 	</div>
 </div>
 {$kpis}
