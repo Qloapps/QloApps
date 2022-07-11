@@ -311,7 +311,7 @@ class ParentOrderControllerCore extends FrontController
                 $productAttributeId = (int)isset($productUpdate['id_product_attribute']) ? $productUpdate['id_product_attribute'] : $productUpdate['product_attribute_id'];
 
                 if (isset($customizedDatas[$productId][$productAttributeId])) {
-                    $productUpdate['tax_rate'] = Tax::getProductTaxRate($productId, $this->context->cart->{Configuration::get('PS_TAX_ADDRESS_TYPE')});
+                    $productUpdate['tax_rate'] = Tax::getProductTaxRate($productId, Cart::getIdAddressForTaxCalculation($productId));
                 }
             }
 

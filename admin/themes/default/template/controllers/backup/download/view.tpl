@@ -45,8 +45,8 @@
 			<button data-dismiss="alert" class="close" type="button">×</button>
 			<p>{l s='Disclaimer before creating a new backup'}</p>
 			<ol>
-				<li>{l s='PrestaShop is not responsible for your database, its backups and/or recovery.'}</li>
-				<li>{l s='PrestaShop is open-source software. You are using it at your own risk under the license agreement.'}</li>
+				<li>{l s='QloApps is not responsible for your database, its backups and/or recovery.'}</li>
+				<li>{l s='QloApps is open-source software. You are using it at your own risk under the license agreement.'}</li>
 				<li>{l s='You should back up your data on a regular basis (both files and database).'}</li>
 				<li>{l s='This function only backs up your database, not your files.'}</li>
 				<li>{l s='By default, your existing database tables will be dropped during the backup recovery (see "Backup options" below).'}</li>
@@ -68,7 +68,7 @@
 		<div class="alert alert-info">
 			<p>{l s='How to restore a database backup in 10 easy steps:'}</p>
 			<ol>
-				<li>{l s='Set "Enable Shop" to "No" in the "Maintenance" page under the "Preferences" menu.'}</li>
+				<li>{l s='Set "Enable Site" to "No" in the "Maintenance" page under the "Preferences" menu.'}</li>
 				<li>{l s='Download the backup from the list below or from your FTP server (in the folder "admin/backups").'}</li>
 				<li>{l s='Check the backup integrity: Look for errors, incomplete file, etc... Be sure to verify all of your data.'}</li>
 				<li>{l s='Please ask your hosting provider for "phpMyAdmin" access to your database.'}</li>

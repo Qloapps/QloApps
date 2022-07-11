@@ -93,7 +93,9 @@ function showOrder(mode, var_content, file)
 					return sendOrderMessage();
 			});
 			$(this).fadeIn('slow', function() {
-				$.scrollTo(this, 1200);
+				$('html, body').animate({
+					scrollTop: $('#block-order-detail').offset().top
+				}, 1200);
 			});
 		});
 	});

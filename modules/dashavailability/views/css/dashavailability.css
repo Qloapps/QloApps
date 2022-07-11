@@ -16,7 +16,7 @@
 * @copyright 2010-2021 Webkul IN
 * @license LICENSE.txt
 */
-                                                                                
+
 .avil-chart-head {
     padding-top: 15px;
     height: 115px;
@@ -31,7 +31,6 @@
     background: #FFFFFF;
     border: 1px solid #00AFF0 !important;
     box-sizing: border-box;
-    box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.15);
     border-radius: 5px !important;
     font-weight: bold !important;
     color: #00AFF0;

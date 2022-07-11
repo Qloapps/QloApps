@@ -297,9 +297,9 @@
 {/if}
 				<ul id="header_employee_box">
 					<li class="hidden-sm hidden-xs">
-						<a target="_blank" href="https://qloapps.com/addons/" class="toolbar_btn" title="{l s='Explore Qloapps Addons'}">
+						<a target="_blank" href="https://qloapps.com/addons/" class="toolbar_btn" title="{l s='Explore QloApps Addons'}">
 							<i class="icon-chain-broken"></i>
-							{l s='Explore Qloapps Addons'}
+							{l s='Explore QloApps Addons'}
 						</a>
 					</li>
 					{if {$base_url}}
