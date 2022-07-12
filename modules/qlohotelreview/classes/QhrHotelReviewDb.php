@@ -116,6 +116,8 @@ class QhrHotelReviewDb
             'QHR_ADMIN_APPROVAL_ENABLED' => 1,
             'QHR_MAX_IMAGES_PER_REVIEW' => 5,
             'QHR_REVIEWS_PER_PAGE' => 3,
+            'QHR_REVIEW_APPROVAL_EMAIL_ENABLED' => 0,
+            'QHR_REVIEW_MGMT_REPLY_EMAIL_ENABLED' => 0,
         );
     }
 }

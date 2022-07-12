@@ -279,8 +279,8 @@ class QloHotelReview extends Module
     {
         $tabs = array(
             array('AdminParentHotelReview', 'Hotel Reviews', false, true),
-            array('AdminHotelReviewCategory', 'Configuration', 'AdminParentHotelReview', false),
-            array('AdminHotelReviewHotelReview', 'Reviews', 'AdminParentHotelReview', false),
+            array('AdminHotelReviewCategory', 'Configuration', 'AdminParentHotelReview', true),
+            array('AdminHotelReviewHotelReview', 'Manage Reviews', 'AdminHotelReservationSystemManagement', false),
         );
 
         foreach ($tabs as $tab) {

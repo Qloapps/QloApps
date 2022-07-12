@@ -30,6 +30,10 @@ $_MODULE['<{qlohotelreview}prestashop>adminhotelreviewcategory_fbb6a0405374ac045
 $_MODULE['<{qlohotelreview}prestashop>adminhotelreviewcategory_b4e22e7b773b2cfc532e12ea67fb3a2e'] = 'Максимальное количество изображений, которые можно загрузить с обзором.';
 $_MODULE['<{qlohotelreview}prestashop>adminhotelreviewcategory_60370f309bf176f5697f87ff305ee95d'] = 'Количество отзывов на странице';
 $_MODULE['<{qlohotelreview}prestashop>adminhotelreviewcategory_8df916dfcf72ad43fd0afbeb7ae99e67'] = 'Количество отзывов, отображаемых на странице.';
+$_MODULE['<{qlohotelreview}prestashop>adminhotelreviewcategory_e86731aaa229c9dbbc2a98e3952e3973'] = 'Проверить подтверждение по электронной почте';
+$_MODULE['<{qlohotelreview}prestashop>adminhotelreviewcategory_74fdd0caf61978645b6850941cb61154'] = 'Включите, если вы хотите отправить электронное письмо клиенту, когда его отзыв будет одобрен.';
+$_MODULE['<{qlohotelreview}prestashop>adminhotelreviewcategory_aaa8d2e2f80851d3bc39720ad57e04b2'] = 'Электронное письмо с ответом администрации';
+$_MODULE['<{qlohotelreview}prestashop>adminhotelreviewcategory_b8d21242ee122a19575475056ad0ee46'] = 'Включите, если хотите отправлять электронное письмо клиенту, когда ответ руководства публикуется на его отзыв.';
 $_MODULE['<{qlohotelreview}prestashop>adminhotelreviewcategory_c9cc8cce247e49bae79f15173ce97354'] = 'Сохранять';
 $_MODULE['<{qlohotelreview}prestashop>adminhotelreviewcategory_af1b98adf7f686b84cd0b443e022b7a0'] = 'Категории';
 $_MODULE['<{qlohotelreview}prestashop>adminhotelreviewcategory_ee6fe0ccbee9cd314aba77e8a6babd8c'] = 'Пожалуйста, введите максимальное количество изображений для одного отзыва.';
@@ -66,9 +70,10 @@ $_MODULE['<{qlohotelreview}prestashop>default_28abaec9b98b71367b02a475dcc43aa5']
 $_MODULE['<{qlohotelreview}prestashop>default_deaca574f1a37b7cb33ef8277cfecade'] = 'Неверный идентификатор заказа.';
 $_MODULE['<{qlohotelreview}prestashop>default_703e6241b109f4eabe0b1d6ae41dca42'] = 'Это поле не может быть пустым.';
 $_MODULE['<{qlohotelreview}prestashop>default_5d332d96e4a2c480629c66ec0e0b9715'] = 'Это поле недействительно.';
+$_MODULE['<{qlohotelreview}prestashop>default_3577700536f3f42f4f0882dbbe1d1d28'] = 'Это поле слишком длинное.';
 $_MODULE['<{qlohotelreview}prestashop>default_666df5b26905f1737fe6a6d5d1fce032'] = 'Описание отзыва не может быть пустым.';
 $_MODULE['<{qlohotelreview}prestashop>default_397dcf8a6f1b795d335192a95307fce0'] = 'Недопустимое описание отзыва.';
-$_MODULE['<{qlohotelreview}prestashop>default_2a7705ef2541560aa28d38af80caa692'] = 'Пожалуйста, загрузите не более %d изображений.';
+$_MODULE['<{qlohotelreview}prestashop>default_2a7705ef2541560aa28d38af80caa692'] = 'Загрузите не более %d изображений.';
 $_MODULE['<{qlohotelreview}prestashop>default_7c7efec2d1dfd66eb653cf98d4cc865c'] = 'Что-то пошло не так.';
 $_MODULE['<{qlohotelreview}prestashop>form_8e8690632870bb892a334c62307373f3'] = 'Информация о категории';
 $_MODULE['<{qlohotelreview}prestashop>form_07b7da542c4f7a94050e04f6ce50aaaa'] = 'Включите, чтобы использовать эту категорию.';
@@ -85,7 +90,7 @@ $_MODULE['<{qlohotelreview}prestashop>disapprove-link_0fdc67cb221b434e38f322b019
 $_MODULE['<{qlohotelreview}prestashop>status_2d13df6f8b5e4c5af9f87e0dc39df69d'] = 'В ожидании';
 $_MODULE['<{qlohotelreview}prestashop>status_27590e5bda23b4a9c8d2a67c01ac68c1'] = 'Отклонено';
 $_MODULE['<{qlohotelreview}prestashop>status_6f8063417ab31f38d864c28302f3de2f'] = 'Одобренный';
-$_MODULE['<{qlohotelreview}prestashop>view_659514b42799e5982d28793d9e003ae3'] = 'Обзор информации';
+$_MODULE['<{qlohotelreview}prestashop>view_659514b42799e5982d28793d9e003ae3'] = 'Информация о просмотре';
 $_MODULE['<{qlohotelreview}prestashop>view_5065c9de688007864184a848530cd4f6'] = 'Опубликовать ответ на этот отзыв.';
 $_MODULE['<{qlohotelreview}prestashop>view_2068627ae0c47d1dd08d85a65cd48d5d'] = 'Ответ руководства';
 $_MODULE['<{qlohotelreview}prestashop>view_f2a6c498fb90ee345d997f888fce3b18'] = 'Удалить';

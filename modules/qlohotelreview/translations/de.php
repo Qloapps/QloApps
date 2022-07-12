@@ -30,6 +30,10 @@ $_MODULE['<{qlohotelreview}prestashop>adminhotelreviewcategory_fbb6a0405374ac045
 $_MODULE['<{qlohotelreview}prestashop>adminhotelreviewcategory_b4e22e7b773b2cfc532e12ea67fb3a2e'] = 'Die maximale Anzahl von Bildern, die mit einer Bewertung hochgeladen werden können.';
 $_MODULE['<{qlohotelreview}prestashop>adminhotelreviewcategory_60370f309bf176f5697f87ff305ee95d'] = 'Bewertungen pro Seite';
 $_MODULE['<{qlohotelreview}prestashop>adminhotelreviewcategory_8df916dfcf72ad43fd0afbeb7ae99e67'] = 'Die Anzahl der Bewertungen, die pro Seite angezeigt werden.';
+$_MODULE['<{qlohotelreview}prestashop>adminhotelreviewcategory_e86731aaa229c9dbbc2a98e3952e3973'] = 'Überprüfen Sie die Genehmigungs-E-Mail';
+$_MODULE['<{qlohotelreview}prestashop>adminhotelreviewcategory_74fdd0caf61978645b6850941cb61154'] = 'Aktivieren Sie diese Option, wenn Sie eine E-Mail an den Kunden senden möchten, wenn seine Bewertung genehmigt wurde.';
+$_MODULE['<{qlohotelreview}prestashop>adminhotelreviewcategory_aaa8d2e2f80851d3bc39720ad57e04b2'] = 'Antwort-E-Mail des Managements';
+$_MODULE['<{qlohotelreview}prestashop>adminhotelreviewcategory_b8d21242ee122a19575475056ad0ee46'] = 'Aktivieren Sie diese Option, wenn Sie eine E-Mail an den Kunden senden möchten, wenn eine Management-Antwort auf seine Bewertung gepostet wird.';
 $_MODULE['<{qlohotelreview}prestashop>adminhotelreviewcategory_c9cc8cce247e49bae79f15173ce97354'] = 'Speichern';
 $_MODULE['<{qlohotelreview}prestashop>adminhotelreviewcategory_af1b98adf7f686b84cd0b443e022b7a0'] = 'Kategorien';
 $_MODULE['<{qlohotelreview}prestashop>adminhotelreviewcategory_ee6fe0ccbee9cd314aba77e8a6babd8c'] = 'Bitte geben Sie die maximale Anzahl an Bildern pro Bewertung ein.';
@@ -66,6 +70,7 @@ $_MODULE['<{qlohotelreview}prestashop>default_28abaec9b98b71367b02a475dcc43aa5']
 $_MODULE['<{qlohotelreview}prestashop>default_deaca574f1a37b7cb33ef8277cfecade'] = 'Ungültige Auftrags-ID.';
 $_MODULE['<{qlohotelreview}prestashop>default_703e6241b109f4eabe0b1d6ae41dca42'] = 'Dieses Feld kann nicht leer sein.';
 $_MODULE['<{qlohotelreview}prestashop>default_5d332d96e4a2c480629c66ec0e0b9715'] = 'Dieses Feld ist ungültig.';
+$_MODULE['<{qlohotelreview}prestashop>default_3577700536f3f42f4f0882dbbe1d1d28'] = 'Dieses Feld ist zu lang.';
 $_MODULE['<{qlohotelreview}prestashop>default_666df5b26905f1737fe6a6d5d1fce032'] = 'Bewertungsbeschreibung darf nicht leer sein.';
 $_MODULE['<{qlohotelreview}prestashop>default_397dcf8a6f1b795d335192a95307fce0'] = 'Bewertungsbeschreibung ist ungültig.';
 $_MODULE['<{qlohotelreview}prestashop>default_2a7705ef2541560aa28d38af80caa692'] = 'Bitte laden Sie maximal %d Bilder hoch.';

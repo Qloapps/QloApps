@@ -34,11 +34,9 @@
                 <div class="previews-wrap"></div>
                 <div class="inputs-wrap"></div>
 
-                <span class="span-icon">
-                    <div class="image-input-btn">
-                        <img class="img-camera-plus">
-                    </div>
-                </span>
+                <div class="image-input-btn">
+                    <img class="img-camera-plus">
+                </div>
             </div>
 
             <div class="form-group">

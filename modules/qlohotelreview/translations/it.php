@@ -30,6 +30,10 @@ $_MODULE['<{qlohotelreview}prestashop>adminhotelreviewcategory_fbb6a0405374ac045
 $_MODULE['<{qlohotelreview}prestashop>adminhotelreviewcategory_b4e22e7b773b2cfc532e12ea67fb3a2e'] = 'Il numero massimo di immagini che possono essere caricate con una recensione.';
 $_MODULE['<{qlohotelreview}prestashop>adminhotelreviewcategory_60370f309bf176f5697f87ff305ee95d'] = 'Recensioni per pagina';
 $_MODULE['<{qlohotelreview}prestashop>adminhotelreviewcategory_8df916dfcf72ad43fd0afbeb7ae99e67'] = 'Il numero di recensioni visualizzate per pagina.';
+$_MODULE['<{qlohotelreview}prestashop>adminhotelreviewcategory_e86731aaa229c9dbbc2a98e3952e3973'] = 'Esamina l\'e-mail di approvazione';
+$_MODULE['<{qlohotelreview}prestashop>adminhotelreviewcategory_74fdd0caf61978645b6850941cb61154'] = 'Abilita se desideri inviare e-mail al cliente quando la sua recensione viene approvata.';
+$_MODULE['<{qlohotelreview}prestashop>adminhotelreviewcategory_aaa8d2e2f80851d3bc39720ad57e04b2'] = 'Email di risposta della direzione';
+$_MODULE['<{qlohotelreview}prestashop>adminhotelreviewcategory_b8d21242ee122a19575475056ad0ee46'] = 'Abilita se desideri inviare e-mail al cliente quando viene pubblicata una risposta della direzione alla sua recensione.';
 $_MODULE['<{qlohotelreview}prestashop>adminhotelreviewcategory_c9cc8cce247e49bae79f15173ce97354'] = 'Salva';
 $_MODULE['<{qlohotelreview}prestashop>adminhotelreviewcategory_af1b98adf7f686b84cd0b443e022b7a0'] = 'Categorie';
 $_MODULE['<{qlohotelreview}prestashop>adminhotelreviewcategory_ee6fe0ccbee9cd314aba77e8a6babd8c'] = 'Inserisci il numero massimo di immagini per recensione.';
@@ -66,6 +70,7 @@ $_MODULE['<{qlohotelreview}prestashop>default_28abaec9b98b71367b02a475dcc43aa5']
 $_MODULE['<{qlohotelreview}prestashop>default_deaca574f1a37b7cb33ef8277cfecade'] = 'ID ordine non valido.';
 $_MODULE['<{qlohotelreview}prestashop>default_703e6241b109f4eabe0b1d6ae41dca42'] = 'Questo campo non può essere vuoto.';
 $_MODULE['<{qlohotelreview}prestashop>default_5d332d96e4a2c480629c66ec0e0b9715'] = 'Questo campo non è valido.';
+$_MODULE['<{qlohotelreview}prestashop>default_3577700536f3f42f4f0882dbbe1d1d28'] = 'Questo campo è troppo lungo.';
 $_MODULE['<{qlohotelreview}prestashop>default_666df5b26905f1737fe6a6d5d1fce032'] = 'La descrizione della recensione non può essere vuota.';
 $_MODULE['<{qlohotelreview}prestashop>default_397dcf8a6f1b795d335192a95307fce0'] = 'La descrizione della recensione non è valida.';
 $_MODULE['<{qlohotelreview}prestashop>default_2a7705ef2541560aa28d38af80caa692'] = 'Carica un massimo di %d immagini.';
@@ -75,7 +80,7 @@ $_MODULE['<{qlohotelreview}prestashop>form_07b7da542c4f7a94050e04f6ce50aaaa'] = 
 $_MODULE['<{qlohotelreview}prestashop>form_00d23a76e43b46dae9ec7aa9dcbebb32'] = 'Abilitato';
 $_MODULE['<{qlohotelreview}prestashop>form_93cba07454f06a4a960172bbd6e2a435'] = 'sì';
 $_MODULE['<{qlohotelreview}prestashop>form_bafd7322c6e97d25b6299b5d6fe8920b'] = 'No';
-$_MODULE['<{qlohotelreview}prestashop>form_2ca3d633378458ff5c5f131ed7871f08'] = 'Inserisci un nome per questa categoria.';
+$_MODULE['<{qlohotelreview}prestashop>form_2ca3d633378458ff5c5f131ed7871f08'] = 'Immettere un nome per questa categoria.';
 $_MODULE['<{qlohotelreview}prestashop>form_49ee3087348e8d44e1feda1917443987'] = 'Nome';
 $_MODULE['<{qlohotelreview}prestashop>form_c9cc8cce247e49bae79f15173ce97354'] = 'Salva';
 $_MODULE['<{qlohotelreview}prestashop>form_9ea67be453eaccf020697b4654fc021a'] = 'Risparmia e resta';
@@ -139,5 +144,5 @@ $_MODULE['<{qlohotelreview}prestashop>review-summary_1c67665285fb6a7d761414e1257
 $_MODULE['<{qlohotelreview}prestashop>review-summary_af1b98adf7f686b84cd0b443e022b7a0'] = 'Categorie';
 $_MODULE['<{qlohotelreview}prestashop>review_a0f942858344588234dda2fae9516ce9'] = 'Lo trovi utile?';
 $_MODULE['<{qlohotelreview}prestashop>review_4f887556bd5dd9354f971969048e9364'] = '%1$d persone l\'hanno trovato utile.';
-$_MODULE['<{qlohotelreview}prestashop>review_28b3b1e564a00f572c5d4e21da986d49'] = 'Segnala un abuso';
+$_MODULE['<{qlohotelreview}prestashop>review_28b3b1e564a00f572c5d4e21da986d49'] = 'Segnala abuso';
 $_MODULE['<{qlohotelreview}prestashop>review_5337e185f4fe875860eb0258b7cf9b6f'] = 'ha risposto su';

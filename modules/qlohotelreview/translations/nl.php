@@ -7,7 +7,7 @@ $_MODULE['<{qlohotelreview}prestashop>qlohotelreview_9269dcd46986ee01fa3d6b17266
 $_MODULE['<{qlohotelreview}prestashop>qlohotelreview_876f23178c29dc2552c0b48bf23cd9bd'] = 'Weet u zeker dat u de installatie ongedaan wilt maken?';
 $_MODULE['<{qlohotelreview}prestashop>qlohotelreview_9f5f2af7d30e6cd67f2053929c5b1804'] = 'U kunt maximaal %d afbeeldingen uploaden.';
 $_MODULE['<{qlohotelreview}prestashop>qhrhotelreview_2d13df6f8b5e4c5af9f87e0dc39df69d'] = 'In afwachting';
-$_MODULE['<{qlohotelreview}prestashop>qhrhotelreview_27590e5bda23b4a9c8d2a67c01ac68c1'] = 'afgekeurd';
+$_MODULE['<{qlohotelreview}prestashop>qhrhotelreview_27590e5bda23b4a9c8d2a67c01ac68c1'] = 'Afgekeurd';
 $_MODULE['<{qlohotelreview}prestashop>qhrhotelreview_6f8063417ab31f38d864c28302f3de2f'] = 'Goedgekeurd';
 $_MODULE['<{qlohotelreview}prestashop>adminhotelreviewcategory_b718adec73e04ce3ec720dd11a06a308'] = 'ID kaart';
 $_MODULE['<{qlohotelreview}prestashop>adminhotelreviewcategory_c0f5e840bfd9d8c6e864805097b127f9'] = 'ID van de categorie.';
@@ -30,6 +30,10 @@ $_MODULE['<{qlohotelreview}prestashop>adminhotelreviewcategory_fbb6a0405374ac045
 $_MODULE['<{qlohotelreview}prestashop>adminhotelreviewcategory_b4e22e7b773b2cfc532e12ea67fb3a2e'] = 'Het maximale aantal afbeeldingen dat bij een recensie kan worden geüpload.';
 $_MODULE['<{qlohotelreview}prestashop>adminhotelreviewcategory_60370f309bf176f5697f87ff305ee95d'] = 'Beoordelingen per pagina';
 $_MODULE['<{qlohotelreview}prestashop>adminhotelreviewcategory_8df916dfcf72ad43fd0afbeb7ae99e67'] = 'Het aantal beoordelingen dat per pagina wordt weergegeven.';
+$_MODULE['<{qlohotelreview}prestashop>adminhotelreviewcategory_e86731aaa229c9dbbc2a98e3952e3973'] = 'Goedkeurings-e-mail bekijken';
+$_MODULE['<{qlohotelreview}prestashop>adminhotelreviewcategory_74fdd0caf61978645b6850941cb61154'] = 'Schakel deze optie in als u een e-mail naar de klant wilt sturen wanneer zijn beoordeling is goedgekeurd.';
+$_MODULE['<{qlohotelreview}prestashop>adminhotelreviewcategory_aaa8d2e2f80851d3bc39720ad57e04b2'] = 'E-mail voor antwoord van het management';
+$_MODULE['<{qlohotelreview}prestashop>adminhotelreviewcategory_b8d21242ee122a19575475056ad0ee46'] = 'Schakel deze optie in als u een e-mail naar de klant wilt sturen wanneer een managementantwoord op zijn beoordeling is geplaatst.';
 $_MODULE['<{qlohotelreview}prestashop>adminhotelreviewcategory_c9cc8cce247e49bae79f15173ce97354'] = 'Opslaan';
 $_MODULE['<{qlohotelreview}prestashop>adminhotelreviewcategory_af1b98adf7f686b84cd0b443e022b7a0'] = 'Categorieën';
 $_MODULE['<{qlohotelreview}prestashop>adminhotelreviewcategory_ee6fe0ccbee9cd314aba77e8a6babd8c'] = 'Vul a.u.b. maximaal aantal afbeeldingen per review in.';
@@ -49,7 +53,7 @@ $_MODULE['<{qlohotelreview}prestashop>adminhotelreviewhotelreview_ee280c08b83b1c
 $_MODULE['<{qlohotelreview}prestashop>adminhotelreviewhotelreview_f026d77fb70bf56807f74b112548c178'] = 'Totaal aantal rapporten';
 $_MODULE['<{qlohotelreview}prestashop>adminhotelreviewhotelreview_adfa8ba04f1b717175c74f273f46d75b'] = 'Aantal keren dat deze review is gerapporteerd.';
 $_MODULE['<{qlohotelreview}prestashop>adminhotelreviewhotelreview_642826207c217f20e99b154c15ae472c'] = 'Goedkeuringsstatus';
-$_MODULE['<{qlohotelreview}prestashop>adminhotelreviewhotelreview_a0f19e563e79d5e8030c2ceb52926e53'] = 'Goedkeuringsstatus van de review.';
+$_MODULE['<{qlohotelreview}prestashop>adminhotelreviewhotelreview_a0f19e563e79d5e8030c2ceb52926e53'] = 'Goedkeuringsstatus van de beoordeling.';
 $_MODULE['<{qlohotelreview}prestashop>adminhotelreviewhotelreview_44749712dbec183e983dcd78a7736c41'] = 'Datum';
 $_MODULE['<{qlohotelreview}prestashop>adminhotelreviewhotelreview_2bd2adb2f861a277935470d0285903c2'] = 'Datum en tijd waarop deze recensie is toegevoegd.';
 $_MODULE['<{qlohotelreview}prestashop>adminhotelreviewhotelreview_d3b206d196cd6be3a2764c1fb90b200f'] = 'Verwijder geselecteerde';
@@ -66,6 +70,7 @@ $_MODULE['<{qlohotelreview}prestashop>default_28abaec9b98b71367b02a475dcc43aa5']
 $_MODULE['<{qlohotelreview}prestashop>default_deaca574f1a37b7cb33ef8277cfecade'] = 'Ongeldige bestellings-ID.';
 $_MODULE['<{qlohotelreview}prestashop>default_703e6241b109f4eabe0b1d6ae41dca42'] = 'Dit veld kan niet leeg zijn.';
 $_MODULE['<{qlohotelreview}prestashop>default_5d332d96e4a2c480629c66ec0e0b9715'] = 'Dit veld is ongeldig.';
+$_MODULE['<{qlohotelreview}prestashop>default_3577700536f3f42f4f0882dbbe1d1d28'] = 'Dit veld is te lang.';
 $_MODULE['<{qlohotelreview}prestashop>default_666df5b26905f1737fe6a6d5d1fce032'] = 'Reviewbeschrijving mag niet leeg zijn.';
 $_MODULE['<{qlohotelreview}prestashop>default_397dcf8a6f1b795d335192a95307fce0'] = 'Reviewbeschrijving is ongeldig.';
 $_MODULE['<{qlohotelreview}prestashop>default_2a7705ef2541560aa28d38af80caa692'] = 'Upload a.u.b. maximaal %d afbeeldingen.';
@@ -83,7 +88,7 @@ $_MODULE['<{qlohotelreview}prestashop>form_ea4788705e6873b424c65e91c2846b19'] = 
 $_MODULE['<{qlohotelreview}prestashop>approve-link_6f7351657f795bc1357a53142b1184cc'] = 'Goedkeuren';
 $_MODULE['<{qlohotelreview}prestashop>disapprove-link_0fdc67cb221b434e38f322b0193feac1'] = 'Afkeuren';
 $_MODULE['<{qlohotelreview}prestashop>status_2d13df6f8b5e4c5af9f87e0dc39df69d'] = 'In afwachting';
-$_MODULE['<{qlohotelreview}prestashop>status_27590e5bda23b4a9c8d2a67c01ac68c1'] = 'afgekeurd';
+$_MODULE['<{qlohotelreview}prestashop>status_27590e5bda23b4a9c8d2a67c01ac68c1'] = 'Afgekeurd';
 $_MODULE['<{qlohotelreview}prestashop>status_6f8063417ab31f38d864c28302f3de2f'] = 'Goedgekeurd';
 $_MODULE['<{qlohotelreview}prestashop>view_659514b42799e5982d28793d9e003ae3'] = 'Review-informatie';
 $_MODULE['<{qlohotelreview}prestashop>view_5065c9de688007864184a848530cd4f6'] = 'Plaats een reactie op deze recensie.';
@@ -103,7 +108,7 @@ $_MODULE['<{qlohotelreview}prestashop>review_574cf6d2ea2a10d3f732d90f5d1b31cf'] 
 $_MODULE['<{qlohotelreview}prestashop>review_fff0d600f8a0b5e19e88bfb821dd1157'] = 'Afbeeldingen';
 $_MODULE['<{qlohotelreview}prestashop>review_93a524d9a34a84b2c8b9f0575c08b6c8'] = 'Datum toegevoegd';
 $_MODULE['<{qlohotelreview}prestashop>review_f026d77fb70bf56807f74b112548c178'] = 'Totaal aantal rapporten';
-$_MODULE['<{qlohotelreview}prestashop>review_59d1880d8f037561eea191c1a8c782e0'] = 'niet beledigend';
+$_MODULE['<{qlohotelreview}prestashop>review_59d1880d8f037561eea191c1a8c782e0'] = 'Niet beledigend';
 $_MODULE['<{qlohotelreview}prestashop>add-review-popup_c33dd1013c05a6055b81dfde8d9248a4'] = 'Hotel naam';
 $_MODULE['<{qlohotelreview}prestashop>add-review-popup_fff0d600f8a0b5e19e88bfb821dd1157'] = 'Afbeeldingen';
 $_MODULE['<{qlohotelreview}prestashop>add-review-popup_6acfb5f6d1e0cbbb23eeaa553946db54'] = 'Vertel ons over uw Algemene ervaring';
@@ -112,7 +117,7 @@ $_MODULE['<{qlohotelreview}prestashop>add-review-popup_e8e1e13ec7923474eb2effe9a
 $_MODULE['<{qlohotelreview}prestashop>add-review-popup_c46a69adeb34e733599885d42e5cb9ee'] = 'Schrijf in detail';
 $_MODULE['<{qlohotelreview}prestashop>add-review-popup_758c668e973a3d689b89ec238413066a'] = 'Beoordeling maken';
 $_MODULE['<{qlohotelreview}prestashop>add-review-popup_ea4788705e6873b424c65e91c2846b19'] = 'Annuleren';
-$_MODULE['<{qlohotelreview}prestashop>add-review-popup_70e4aa0847af7241ec77dc0891951739'] = 'Review succesvol toegevoegd.';
+$_MODULE['<{qlohotelreview}prestashop>add-review-popup_70e4aa0847af7241ec77dc0891951739'] = 'Beoordeling succesvol toegevoegd.';
 $_MODULE['<{qlohotelreview}prestashop>add-review-popup_4442262d2dda3569a7cb922d203be9dd'] = 'Uw recensie is succesvol toegevoegd.';
 $_MODULE['<{qlohotelreview}prestashop>add-review-popup_aa036f5bddc44964c34e546bc9d1bc12'] = 'Beoordeling succesvol ingediend.';
 $_MODULE['<{qlohotelreview}prestashop>add-review-popup_203dba62a36e6b859f81c63577c24faf'] = 'Uw beoordeling is ter goedkeuring ingediend.';
