@@ -872,7 +872,7 @@ class AdminOrdersControllerCore extends AdminController
                         unset($_COOKIE['wk_id_guest']);
                     */
                     if ($payment_module->currentOrder) {
-                        Tools::redirectAdmin(self::$currentIndex.'&id_order='.$payment_module->currentOrder.'&vieworder'.'&token='.$this->token);
+                        Tools::redirectAdmin(self::$currentIndex.'&id_order='.$payment_module->currentOrder.'&vieworder'.'&token='.$this->token.'&conf=3');
                     }
                 }
             } else {
