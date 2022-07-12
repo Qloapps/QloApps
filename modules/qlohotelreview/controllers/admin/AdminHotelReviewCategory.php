@@ -150,6 +150,20 @@ class AdminHotelReviewCategoryController extends ModuleAdminController
                         'required' => true,
                         'cast' => 'intval',
                     ),
+                    'QHR_REVIEW_APPROVAL_EMAIL_ENABLED' => array(
+                        'type' => 'bool',
+                        'title' => $this->l('Review approval email'),
+                        'hint' => $this->l('Enable if you want to send email to customer when his review is approved.'),
+                        'validation' => 'isBool',
+                        'cast' => 'intval',
+                    ),
+                    'QHR_REVIEW_MGMT_REPLY_EMAIL_ENABLED' => array(
+                        'type' => 'bool',
+                        'title' => $this->l('Management reply email'),
+                        'hint' => $this->l('Enable if you want to send email to customer when a management reply is posted to his review.'),
+                        'validation' => 'isBool',
+                        'cast' => 'intval',
+                    ),
                 ),
                 'submit' => array(
                     'title' => $this->l('Save'),
@@ -224,6 +238,8 @@ class AdminHotelReviewCategoryController extends ModuleAdminController
                 Configuration::updateValue('QHR_ADMIN_APPROVAL_ENABLED', Tools::getValue('QHR_ADMIN_APPROVAL_ENABLED'));
                 Configuration::updateValue('QHR_MAX_IMAGES_PER_REVIEW', $imagesPerReview);
                 Configuration::updateValue('QHR_REVIEWS_PER_PAGE', $reviewsPerPage);
+                Configuration::updateValue('QHR_REVIEW_APPROVAL_EMAIL_ENABLED', Tools::getValue('QHR_REVIEW_APPROVAL_EMAIL_ENABLED'));
+                Configuration::updateValue('QHR_REVIEW_MGMT_REPLY_EMAIL_ENABLED', Tools::getValue('QHR_REVIEW_MGMT_REPLY_EMAIL_ENABLED'));
                 Tools::redirectAdmin(self::$currentIndex.'&conf=6&token='.$this->token);
             }
         } elseif (Tools::isSubmit('submitCategory') || Tools::isSubmit('submitCategoryAndStay')) {

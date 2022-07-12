@@ -26,6 +26,21 @@ class AdminHotelReviewHotelReviewController extends ModuleAdminController
         $this->className = 'QhrHotelReview';
         $this->table = 'qhr_hotel_review';
         $this->identifier = 'id_hotel_review';
+        $this->context = Context::getContext();
+
+        // add profile access restriction
+        $this->access_select = 'SELECT a.`id_hotel_review`
+        FROM `'._DB_PREFIX_.'qhr_hotel_review` a';
+
+        $accessibleHotels = HotelBranchInformation::getProfileAccessedHotels(
+            $this->context->employee->id_profile,
+            1,
+            1
+        );
+
+        if ($accessibleHotels) {
+            $this->access_where = ' WHERE a.`id_hotel` IN ('.implode(',', $accessibleHotels).')';
+        }
 
         parent::__construct();
 
@@ -307,6 +322,9 @@ class AdminHotelReviewHotelReviewController extends ModuleAdminController
             $this->loadObject(false);
             if (!count($this->errors)) {
                 if ($this->object->addManagementReply($reply)) {
+                    if (Configuration::get('QHR_REVIEW_MGMT_REPLY_EMAIL_ENABLED')) {
+                        $this->object->sendManagementReplyEmail();
+                    }
                     Tools::redirectAdmin(self::$currentIndex.'&conf=101&token='.$this->token.
                     '&viewqhr_hotel_review&id_hotel_review='.$this->id_object);
                 } else {
@@ -317,6 +335,9 @@ class AdminHotelReviewHotelReviewController extends ModuleAdminController
             $this->loadObject(false);
             if (!count($this->errors)) {
                 if ($this->object->approveReview()) {
+                    if (Configuration::get('QHR_REVIEW_APPROVAL_EMAIL_ENABLED')) {
+                        $this->object->sendApprovalEmail();
+                    }
                     Tools::redirectAdmin(self::$currentIndex.'&conf=102&token='.$this->token.
                     '&viewqhr_hotel_review&id_hotel_review='.$this->id_object);
                 } else {
@@ -350,6 +371,9 @@ class AdminHotelReviewHotelReviewController extends ModuleAdminController
         $this->loadObject(false);
         if (!count($this->errors)) {
             if ($this->object->approveReview()) {
+                if (Configuration::get('QHR_REVIEW_APPROVAL_EMAIL_ENABLED')) {
+                    $this->object->sendApprovalEmail();
+                }
                 Tools::redirectAdmin(self::$currentIndex.'&conf=102&token='.$this->token);
             }
         }

@@ -200,7 +200,7 @@
 								</span>
 								<br />
 								<span class="subtitle" style="font-weight:500;font-size:16px;text-transform:uppercase;line-height:25px">
-									Thank you for choosing our hotel for your recent stay!
+									Hotel management has replied to your review
 								</span>
 							</font>
 						</td>
@@ -216,11 +216,33 @@
 									<td style="padding:7px 0">
 										<font size="2" face="Open-sans, sans-serif" color="#555454">
 											<p data-html-only="1" style="border-bottom:1px solid #D6D4D4;margin:3px 0 7px;text-transform:uppercase;font-weight:500;font-size:18px;padding-bottom:10px">
-												Please review us!
+												Management reply
 											</p>
+											<span style="color:#777;">
+												Your review regarding your recent stay at our hotel <b>{hotel_name}</b> has been replied. Here are the details.
+											</span>
+											<br />
+											<br />
+											<span>
+												<strong>Review subject:</strong>
+												<span style="color:#777;">{review_subject}</span>
+											</span>
+											<br />
+											<span>
+												<strong>Review description:</strong>
+												<span style="color:#777;">{review_description}</span>
+											</span>
+											<br />
+											<br />
+											<span>
+												<strong>Management reply:</strong>
+												<span style="color:#777; white-space: break-spaces;">{management_reply}</span>
+											</span>
+
+											<br />
+											<br />
 											<span style="color:#777">
-												Could you please take a moment to review us? Please review your stay at <b>{hotel_name}</b> by clicking <a href='{review_link}'>here</a>.
-												We would love to hear your feedback and use it to improve our services!
+												You can view your review from <a href="{review_view_url}">here.</a>
 											</span>
 										</font>
 									</td>

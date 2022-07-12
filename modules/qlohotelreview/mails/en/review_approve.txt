@@ -2,13 +2,14 @@
 
 Dear {firstname} {lastname},
 
-Thank you for choosing {hotel_name} for your recent stay!
+Your review has been approved
 
-Could you please take a moment to review us?
+Your review regarding your recent stay at our hotel {hotel_name} has been approved and is now visible to everyone.
 
-Please review your stay at [{review_link}].
+Review subject: {review_subject}
+Review description: {review_description}
 
-We love to hear your feedback and use it to improve our services!
+You can view your review from "here" [/{review_view_url}].
 
 You can review your order and download your invoice from the
 "Order history" [/{history_url}] section of your customer account by

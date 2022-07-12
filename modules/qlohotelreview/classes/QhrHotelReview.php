@@ -194,6 +194,51 @@ class QhrHotelReview extends ObjectModel
         return true;
     }
 
+    public function sendManagementReplyEmail()
+    {
+        if (!Validate::isLoadedObject($this)) {
+            return false;
+        }
+
+        $objOrder = new Order($this->id_order);
+        if (!Validate::isLoadedObject($objOrder)) {
+            return false;
+        }
+
+        $objCustomer = new Customer($objOrder->id_customer);
+        if (!Validate::isLoadedObject($objCustomer)) {
+            return false;
+        }
+
+        $context = Context::getContext();
+        $mailVars = array(
+            '{firstname}' => $objCustomer->firstname,
+            '{lastname}' => $objCustomer->lastname,
+            '{hotel_name}' => QhrHotelReviewHelper::getHotelByOrder($this->id_order)['hotel_name'],
+            '{review_subject}' => $this->subject,
+            '{review_description}' => $this->description,
+            '{management_reply}' => $this->getManagementReply()['message'],
+            '{review_view_url}' => $this->getReviewViewLink(),
+        );
+
+        return Mail::Send(
+            $context->language->id,
+            'review_reply',
+            Mail::l('Your review has a reply!', $context->language->id),
+            $mailVars,
+            $objCustomer->email,
+            $objCustomer->firstname.' '.$objCustomer->lastname,
+            null,
+            null,
+            null,
+            null,
+            _PS_MODULE_DIR_.'qlohotelreview/mails/',
+            false,
+            null,
+            null
+        );
+    }
+
     public function getTotalReports()
     {
         $sql = new DbQuery();
@@ -252,6 +297,50 @@ class QhrHotelReview extends ObjectModel
         }
 
         return false;
+    }
+
+    public function sendApprovalEmail()
+    {
+        if (!Validate::isLoadedObject($this)) {
+            return false;
+        }
+
+        $objOrder = new Order($this->id_order);
+        if (!Validate::isLoadedObject($objOrder)) {
+            return false;
+        }
+
+        $objCustomer = new Customer($objOrder->id_customer);
+        if (!Validate::isLoadedObject($objCustomer)) {
+            return false;
+        }
+
+        $context = Context::getContext();
+        $mailVars = array(
+            '{firstname}' => $objCustomer->firstname,
+            '{lastname}' => $objCustomer->lastname,
+            '{hotel_name}' => QhrHotelReviewHelper::getHotelByOrder($this->id_order)['hotel_name'],
+            '{review_subject}' => $this->subject,
+            '{review_description}' => $this->description,
+            '{review_view_url}' => $this->getReviewViewLink(),
+        );
+
+        return Mail::Send(
+            $context->language->id,
+            'review_approve',
+            Mail::l('Your review has been approved!', $context->language->id),
+            $mailVars,
+            $objCustomer->email,
+            $objCustomer->firstname.' '.$objCustomer->lastname,
+            null,
+            null,
+            null,
+            null,
+            _PS_MODULE_DIR_.'qlohotelreview/mails/',
+            false,
+            null,
+            null
+        );
     }
 
     public function disapproveReview()
@@ -525,5 +614,16 @@ class QhrHotelReview extends ObjectModel
             INSERT INTO `'._DB_PREFIX_.'qhr_review_report` (`id_hotel_review`, `id_customer`)
             VALUES ('.(int) $id_hotel_review.', '.(int) $id_customer.')'
         );
+    }
+
+    public function getReviewViewLink()
+    {
+        $objHotelBookingDetail = new HotelBookingDetail();
+        $bookingData = $objHotelBookingDetail->getBookingDataByOrderId($this->id_order);
+        if (!$bookingData) {
+            return '#';
+        }
+
+        return Context::getContext()->link->getProductLink($bookingData[0]['id_product']);
     }
 }

@@ -41,6 +41,7 @@ class QloHotelReviewDefaultModuleFrontController extends ModuleFrontController
         $description = Tools::getValue('description');
 
         $maxImages = (int) Configuration::get('QHR_MAX_IMAGES_PER_REVIEW');
+        $approvalEnabled = (int) Configuration::get('QHR_ADMIN_APPROVAL_ENABLED');
 
         $status = 'ko';
         $errors = array('by_key' => array(), 'general' => array());
@@ -61,12 +62,16 @@ class QloHotelReviewDefaultModuleFrontController extends ModuleFrontController
             $errors['by_key']['subject'] = $objModule->l('This field can not be empty.', 'default');
         } elseif(!Validate::isGenericName($subject)) {
             $errors['by_key']['subject'] = $objModule->l('This field is invalid.', 'default');
+        } elseif(Tools::strlen($subject) > 255) {
+            $errors['by_key']['subject'] = $objModule->l('This field is too long.', 'default');
         }
 
         if (!$description) {
             $errors['by_key']['description'] = $objModule->l('Review description can not be empty.', 'default');
         } elseif(!Validate::isMessage($description)) {
             $errors['by_key']['description'] = $objModule->l('Review description is invalid.', 'default');
+        } elseif(Tools::strlen($description) > 65535) {
+            $errors['by_key']['description'] = $objModule->l('This field is too long.', 'default');
         }
 
         if (is_array($_FILES) && array_key_exists('images', $_FILES)) {
@@ -92,7 +97,8 @@ class QloHotelReviewDefaultModuleFrontController extends ModuleFrontController
                 $objHotelReview->subject = $subject;
                 $objHotelReview->rating = $ratingOverall;
                 $objHotelReview->status_abusive = QhrHotelReview::QHR_STATUS_ABUSIVE_NOT_ABUSIVE;
-                $objHotelReview->status = QhrHotelReview::QHR_STATUS_PENDING;
+                $objHotelReview->status = $approvalEnabled ? QhrHotelReview::QHR_STATUS_PENDING :
+                QhrHotelReview::QHR_STATUS_APPROVED;
                 if ($objHotelReview->save()) {
                     $objHotelReview->addCategoryRatings($ratingCategories);
                     if ($maxImages) {

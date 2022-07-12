@@ -170,6 +170,12 @@ var QhrReviewImages = {
     removeLastInput: function() {
         $('.images-field').find('.inputs-wrap input.input-images').last().remove(0);
     },
+    hideAddImagesButton: function() {
+        $('.image-input-btn').hide(200);
+    },
+    showAddImagesButton: function() {
+        $('.image-input-btn').show(200);
+    },
 }
 
 function initRaty(path) {
@@ -209,6 +215,7 @@ $(document).on('click', '.img-preview + i', function(e) {
     var iFile = parseInt($(img).attr('data-i-file'));
     QhrReviewImages.removeFile(iInput, iFile);
     $(this).closest('span').remove();
+    QhrReviewImages.showAddImagesButton();
 });
 
 $(document).on('change', 'input.input-images', function(e) {
@@ -218,11 +225,16 @@ $(document).on('change', 'input.input-images', function(e) {
         return;
     }
 
-    if (QhrReviewImages.getFilesCount() > qlo_hotel_review_js_vars.num_images_max) {
+    var filesCount = QhrReviewImages.getFilesCount();
+    if (filesCount > qlo_hotel_review_js_vars.num_images_max) {
         QhrReviewImages.removeLastInput();
         alert(qlo_hotel_review_js_vars.texts.num_files);
     } else {
         QhrReviewImages.updatePreviews();
+
+        if (filesCount == qlo_hotel_review_js_vars.num_images_max) {
+            QhrReviewImages.hideAddImagesButton();
+        }
     }
 });
 
