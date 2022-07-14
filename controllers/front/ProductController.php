@@ -1038,7 +1038,7 @@ class ProductControllerCore extends FrontController
 
     public function displayAjaxRefreshBookingForm()
     {
-        $response = array('status' => 'ko');
+        $response = array('status' => false);
         $idProduct = (int) Tools::getValue('id_product');
         $dateFrom = Tools::getValue('date_from');
         $dateTo = Tools::getValue('date_to');
@@ -1056,7 +1056,7 @@ class ProductControllerCore extends FrontController
             $roomTypeDemands
         )) {
             $html = $this->context->smarty->fetch('_partials/booking-form.tpl');
-            $response['status'] = 'ok';
+            $response['status'] = true;
             $response['html_booking_form'] = $html;
         }
 

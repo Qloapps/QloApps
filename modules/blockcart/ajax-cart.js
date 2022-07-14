@@ -523,6 +523,7 @@ var ajaxCart = {
                             $('.unvail_rooms_cond_display').hide();
                         }
                     }
+                    BookingForm.refresh();
                 }
 
                 if (pagename == 'category') {
@@ -538,9 +539,56 @@ var ajaxCart = {
                     if (jsonData.avail_rooms == 0) {
                         $(".cat_remain_rm_qty_" + idProduct).closest('.room_cont').hide();
                     }
+                    //$('#cat_quantity_wanted_'+idProduct).val(1);
                 }
 
                 ajaxCart.updateCart(jsonData);
+
+
+            //     // add appliance to whishlist module
+            //     if (whishlist && !jsonData.errors)
+            //         WishlistAddProductCart(whishlist[0], idProduct, idCombination, whishlist[1]);
+
+            //     if (!jsonData.hasError) {
+            //         if (contentOnly)
+            //             window.parent.ajaxCart.updateCartInformation(jsonData, addedFromProductPage);
+            //         else
+            //             ajaxCart.updateCartInformation(jsonData, addedFromProductPage);
+
+            //         if (jsonData.crossSelling)
+            //             $('.crossseling').html(jsonData.crossSelling);
+
+            //         if (idCombination)
+            //             $(jsonData.products).each(function() {
+            //                 if (this.id != undefined && this.id == parseInt(idProduct) && this.idCombination == parseInt(idCombination))
+            //                     if (contentOnly)
+            //                         window.parent.ajaxCart.updateLayer(this);
+            //                     else
+            //                         ajaxCart.updateLayer(this);
+            //             });
+            //         else
+            //             $(jsonData.products).each(function() {
+            //                 if (this.id != undefined && this.id == parseInt(idProduct))
+            //                     if (contentOnly)
+            //                         window.parent.ajaxCart.updateLayer(this);
+            //                     else
+            //                         ajaxCart.updateLayer(this);
+            //             });
+            //         if (contentOnly)
+            //             parent.$.fancybox.close();
+            //     } else {
+            //         if (contentOnly)
+            //             window.parent.ajaxCart.updateCart(jsonData);
+            //         else
+            //             ajaxCart.updateCart(jsonData);
+            //         if (addedFromProductPage)
+            //             $('#add_to_cart button').removeProp('disabled').removeClass('disabled');
+            //         else
+            //             $(callerElement).removeProp('disabled');
+            //     }
+
+            //     emptyCustomizations();
+
             },
             error: function(XMLHttpRequest, textStatus, errorThrown) {
                 var error = "Impossible to add the room to the cart.<br/>textStatus: '" + textStatus + "'<br/>errorThrown: '" + errorThrown + "'<br/>responseText:<br/>" + XMLHttpRequest.responseText;

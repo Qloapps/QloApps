@@ -294,31 +294,37 @@ if (typeof(contentOnly) != 'undefined' && contentOnly) {
     });
 }
 
-// The button to increment the product value
+// The button to increase the number of rooms value
 $(document).on('click', '.product_quantity_up', function(e) {
     e.preventDefault();
-    fieldName = $(this).data('field-qty');
-    var currentVal = parseInt($('input[name=' + fieldName + ']').val());
 
-    if (!allowBuyWhenOutOfStock && quantityAvailable > 0)
-        quantityAvailableT = quantityAvailable;
-    else
-        quantityAvailableT = 100000000;
-    if (!isNaN(currentVal) && currentVal < quantityAvailableT)
-        $('input[name=' + fieldName + ']').val(currentVal + 1).trigger('focusout');
-    else
-        $('input[name=' + fieldName + ']').val(quantityAvailableT);
+    let numRoomsWanted = parseInt($('#quantity_wanted').val());
+    let numRoomsMaxAvailable = parseInt($('#max_avail_type_qty').val());
+
+    if (numRoomsWanted <= numRoomsMaxAvailable) {
+        if (numRoomsWanted < numRoomsMaxAvailable) {
+            $('#quantity_wanted').val(numRoomsWanted + 1);
+        }
+        BookingForm.refresh();
+    } else if ((numRoomsWanted < 1 || numRoomsWanted > numRoomsMaxAvailable) && numRoomsMaxAvailable > 0) {
+        $('#quantity_wanted').val(numRoomsMaxAvailable);
+        setTimeout(function() {
+            $('.room_unavailability_qty_error_div').hide();
+        }, 2000);
+    }
 });
 
-// The button to decrement the product value
+// The button to decrease the number of rooms value
 $(document).on('click', '.product_quantity_down', function(e) {
     e.preventDefault();
-    fieldName = $(this).data('field-qty');
-    var currentVal = parseInt($('input[name=' + fieldName + ']').val());
-    if (!isNaN(currentVal) && currentVal > 1)
-        $('input[name=' + fieldName + ']').val(currentVal - 1).trigger('focusout');
-    else
-        $('input[name=' + fieldName + ']').val(1);
+
+    let numRoomsWanted = parseInt($('#quantity_wanted').val());
+    let numRoomsMaxAvailable = parseInt($('#max_avail_type_qty').val());
+
+    if (numRoomsWanted > 1) {
+        $('#quantity_wanted').val(numRoomsWanted - 1);
+        BookingForm.refresh();
+    }
 });
 
 if (typeof minimalQuantity != 'undefined' && minimalQuantity) {
@@ -1192,6 +1198,7 @@ var BookingForm = {
                     selectedDate.setDate(selectedDate.getDate() + 1);
                     $("#room_check_out").datepicker("option", "minDate", selectedDate);
                     $("#room_check_out").val($.datepicker.formatDate('dd-mm-yy', selectedDate));
+                    $('#room_check_out').datepicker('show');
                 }
                 BookingForm.refresh();
             }
@@ -1258,13 +1265,9 @@ var BookingForm = {
                 action: 'refreshBookingForm',
             }, BookingForm.getFormData()),
             success: function(response) {
-                if (response.status == 'ok') {
-                    $('.booking-form').animate({opacity: 0}, 250, 'linear', function() {
-                        $('.booking-form').replaceWith(response.html_booking_form);
-                        $('.booking-form').animate({opacity: 1}, 250, 'linear', function() {
-                            BookingForm.init();
-                        });
-                    })
+                if (response.status == true) {
+                    $('.booking-form').replaceWith(response.html_booking_form);
+                    BookingForm.init();
                 }
             }
         });
