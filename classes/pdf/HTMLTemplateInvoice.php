@@ -532,7 +532,7 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
     {
         $debug = Tools::getValue('debug');
 
-        $address = new Address((int)$this->order->{Configuration::get('PS_TAX_ADDRESS_TYPE')});
+        $address = new Address((int)$this->order->id_address_tax);
         $carrier = new Carrier($this->order->id_carrier);
 
         // code to send name of the taxes applied on the order to show names od taxes in the invoice for GST

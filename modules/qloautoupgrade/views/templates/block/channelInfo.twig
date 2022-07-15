@@ -1,0 +1,47 @@
+<div id="channel-infos" ><br>
+    {% if upgradeInfo.branch is not empty %}
+        <div style="clear:both">
+            <label class="label-small">{{ 'Branch:'|trans }}</label>
+            <span class="available">
+                <img src="../img/admin/{% if upgradeInfo.available is not empty %}enabled{% else %}disabled{% endif %}.gif">
+                {% if upgradeInfo.available is not empty %}
+                    {{ 'Available'|trans({}, 'Admin.Global') }}
+                {% else %}
+                    {{ 'Unavailable'|trans({}, 'Admin.Global') }}
+                {% endif %}
+            </span>
+        </div>
+    {% endif %}
+    <div class="all-infos">
+        {% if upgradeInfo.version_name is not empty %}
+            <div style="clear:both;">
+                <label class="label-small">{{ 'Name:'|trans({}, 'Admin.Global') }}</label>
+                <span class="name">{{ upgradeInfo.version_name }}</span>
+            </div>
+        {% endif %}
+        {% if upgradeInfo.version_num is not empty %}
+            <div style="clear:both;">
+                <label class="label-small">{{ 'Version number:'|trans }}</label>
+                <span class="version">{{ upgradeInfo.version_num }}</span>
+            </div>
+        {% endif %}
+        {% if upgradeInfo.link is not empty %}
+            <div style="clear:both;">
+                <label class="label-small">{{ 'URL:'|trans }}</label>
+                <a class="url" href="{{ upgradeInfo.link }}">{{ upgradeInfo.link }}</a>
+            </div>
+        {% endif %}
+        {% if upgradeInfo.md5 is not empty %}
+            <div style="clear:both;">
+                <label class="label-small">{{ 'MD5 hash:'|trans }}</label>
+                <span class="md5">{{ upgradeInfo.md5 }}</span>
+            </div>
+        {% endif %}
+        {% if upgradeInfo.changelog is not empty %}
+            <div style="clear:both;">
+                <label class="label-small">{{ 'Changelog:'|trans }}</label>
+                <a class="changelog" href="{{ upgradeInfo.changelog }}">{{ 'see changelog'|trans }}</a>
+            </div>
+        {% endif %}
+    </div>
+</div>

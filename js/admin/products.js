@@ -1883,7 +1883,29 @@ var ProductMultishop = new function()
 var tabs_manager = new ProductTabsManager();
 tabs_manager.setTabs(product_tabs);
 
+function initDuplicateRoomType(idProduct) {
+	$('#modal-duplicate-options').modal('show');
+	$('#modal-duplicate-options #duplicate_id_product').attr('value', idProduct);
+	var url = 'index.php?controller=AdminProducts&token=' + token;
+	var data = {
+		ajax: true,
+		action: 'getIdHotelByIdProduct',
+		id_product: parseInt(idProduct),
+	};
+	
+	$.post(url, data,
+		function(response) {
+			if (response.status == 'success') {
+				var idHotel = response.id_hotel;
+				$('#modal-duplicate-options #duplicate_id_hotel option[value="'+idHotel+'"]').attr('selected', 'selected');
+			}
+		},
+		'JSON'
+	);
+}
+
 $(document).ready(function() {
+	id_lang_default = default_language;
 	// The manager schedules the onReady() methods of each tab to be called when the tab is loaded
 	tabs_manager.init();
 	updateCurrentText();
@@ -1907,5 +1929,9 @@ $(document).ready(function() {
 	$('#product_form').submit(function(e) {
 		$('#selectedCarriers option').attr('selected', 'selected');
 		$('#selectAttachment1 option').attr('selected', 'selected');
+	});
+
+	$('#modal-duplicate-options .submit-duplicate').on('click', function (e) {
+		$('#modal-duplicate-options form.duplicate-options').submit();
 	});
 });

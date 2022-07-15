@@ -92,6 +92,7 @@
 						<p class="room_remove_block">
 							<a href="{$rm_v['link']}"><i class="icon-trash"></i> &nbsp;{l s='Remove'}</a>
 						</p>
+						{hook h='displayCartRoomImageAfter' id_product=$data_v['id_product']}
 					</div>
 					<div class="col-sm-10">
 						<div class="room-info-container">

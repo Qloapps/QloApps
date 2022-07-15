@@ -46,7 +46,7 @@
 			{/if} --><!-- by webkul -->
 			{if isset($adminActionDisplay) && $adminActionDisplay}
 				<div id="admin-action" class="container">
-					<p class="alert alert-info">{l s='This product is not visible to your customers.'}
+					<p class="alert alert-info">{l s='This room type is not visible to your customers.'}
 						<input type="hidden" id="admin-action-product-id" value="{$product->id}" />
 						<a id="publish_button" class="btn btn-default button button-small" href="#">
 							<span>{l s='Publish'}</span>
@@ -203,6 +203,15 @@
 											</div>
 										</div>
 									{/if}
+									<div class="info_margin_div">
+										<div class="room_info_heading">
+											<span>{l s='Check-in and check-out time'}</span>
+										</div>
+										<div class="room_info_content">
+											<p>{l s='Check-in: '}{$hotel_check_in|escape:'html':'UTF-8'}</p>
+											<p>{l s='Check-out: '}{$hotel_check_out|escape:'html':'UTF-8'}</p>
+										</div>
+									</div>
 									{if isset($features) && $features}
 										<div class="info_margin_div">
 											<div class="room_info_heading">

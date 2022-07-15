@@ -37,7 +37,7 @@
 					{capture name=path}{l s='Your booking cart'}{/capture}
 					<h2 class="page-heading">{l s='Your booking cart'}</h2>
 
-					<p class="alert alert-warning">{l s='The hotel is currently no accepting any bookings.'}</p>
+					<p class="alert alert-warning">{l s='The hotel is currently not accepting any bookings.'}</p>
 				{else}
 					{if $productNumber && isset($cart_htl_data)}
 
@@ -329,7 +329,7 @@
 						<h2 class="page-heading">{l s='Your booking cart'}</h2>
 						{include file="$tpl_dir./errors.tpl"}
 
-						<p class="alert alert-warning">{l s='Till now you did not added any room in your cart.'}</p>
+						<p class="alert alert-warning">{l s='You have not added any room to your cart yet.'}</p>
 					{/if}
 					{strip}
 						{addJsDef imgDir=$img_dir}

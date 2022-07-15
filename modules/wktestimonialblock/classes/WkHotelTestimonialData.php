@@ -141,7 +141,7 @@ class WkHotelTestimonialData extends ObjectModel
         $HOTEL_TESIMONIAL_BLOCK_HEADING = array();
         $HOTEL_TESIMONIAL_BLOCK_CONTENT = array();
         foreach ($languages as $lang) {
-            $HOTEL_TESIMONIAL_BLOCK_HEADING[$lang['id_lang']] = 'What our Guest say?';
+            $HOTEL_TESIMONIAL_BLOCK_HEADING[$lang['id_lang']] = 'What our guests say?';
             $HOTEL_TESIMONIAL_BLOCK_CONTENT[$lang['id_lang']] = 'Fap put a bird on it next level, sustainable disrupt polaroid flannel Helvetica Kickstarter quinoa bicycle rights narwhal wolf Fap put a bird on it next level.';
         }
         Configuration::updateValue('HOTEL_TESIMONIAL_BLOCK_NAV_LINK', 1);

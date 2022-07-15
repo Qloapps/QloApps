@@ -36,7 +36,7 @@ class DashPerformance extends Module
         $this->displayName = $this->l('Dashboard Performance');
         $this->description = $this->l('Adds a block with a graphical representation of performance of your website.');
         $this->confirmUnsinstall = $this->l('Are you sure you want to uninstall?');
-        
+
         $this->allow_push = true;
     }
 
@@ -53,8 +53,8 @@ class DashPerformance extends Module
     {
         if (get_class($this->context->controller) == 'AdminDashboardController') {
             $this->context->controller->addJs($this->_path.'views/js/'.$this->name.'.js');
+            $this->context->controller->addCSS($this->_path.'views/css/'.$this->name.'.css');
         }
-        $this->context->controller->addCSS($this->_path.'views/css/'.$this->name.'.css');
     }
 
     public function hookDashboardZoneTwo($params)
@@ -73,19 +73,23 @@ class DashPerformance extends Module
         } else {
             $data['dp_average_daily_rate'] = AdminStatsController::getAverageDailyRate(
                 $params['date_from'],
-                $params['date_to']
+                $params['date_to'],
+                $params['id_hotel']
             );
             $data['dp_cancellation_rate'] = AdminStatsController::getCancellationRate(
                 $params['date_from'],
-                $params['date_to']
+                $params['date_to'],
+                $params['id_hotel']
             );
             $data['dp_revenue'] = AdminStatsController::getRevenue(
                 $params['date_from'],
-                $params['date_to']
+                $params['date_to'],
+                $params['id_hotel']
             );
             $data['dp_nights_stayed'] = AdminStatsController::getNightsStayed(
                 $params['date_from'],
-                $params['date_to']
+                $params['date_to'],
+                $params['id_hotel']
             );
         }
 

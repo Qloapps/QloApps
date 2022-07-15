@@ -198,7 +198,7 @@ class HTMLTemplateOrderSlipCore extends HTMLTemplateInvoice
      */
     public function getTaxTabContent()
     {
-        $address = new Address((int)$this->order->{Configuration::get('PS_TAX_ADDRESS_TYPE')});
+        $address = new Address((int)$this->order->id_address_tax);
         $this->smarty->assign(array(
             'product_tax_breakdown' => $this->getProductTaxesBreakdown(),
             'shipping_tax_breakdown' => $this->getShippingTaxesBreakdown(),

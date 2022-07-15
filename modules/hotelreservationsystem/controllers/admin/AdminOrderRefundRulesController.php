@@ -240,7 +240,7 @@ class AdminOrderRefundRulesController extends ModuleAdminController
         }
         $objRefundRule = new HotelOrderRefundRules($idRefundRule);
         if ($cancelationDays == '') {
-            $this->errors[] = $this->l('Enter before how many days of check in date, rule will be applied.');
+            $this->errors[] = $this->l('Enter number of days before check-in date for this rule to be applicable.');
         } else if (!Validate::isUnsignedInt($cancelationDays)) {
             $this->errors[] = $this->l('Enter valid number of days.');
         } else if ($objRefundRule->checkIfRuleExistsByCancelationdays($cancelationDays)) {

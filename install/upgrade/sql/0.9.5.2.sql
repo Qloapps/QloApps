@@ -1,5 +1,0 @@
-/* STRUCTURE */
-
-/*  CONTENTS */
-
-/* CONFIGURATION VARIABLE */

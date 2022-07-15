@@ -50,6 +50,74 @@ class HotelRoomTypeDemand extends ObjectModel
         ),
     );
 
+    public static function duplicateRoomTypeDemands($idProductOld, $idProductNew)
+    {
+        $idLang = Context::getContext()->language->id;
+        $roomTypeDemands = Db::getInstance()->executeS(
+            'SELECT * FROM `'._DB_PREFIX_.'htl_room_type_demand` rd
+            LEFT JOIN `'._DB_PREFIX_.'htl_room_type_global_demand` rgd
+            ON (rd.`id_global_demand` = rgd.`id_global_demand`)
+            LEFT JOIN `'._DB_PREFIX_.'htl_room_type_global_demand_lang` rgdl
+            ON (rgd.`id_global_demand` = rgdl.`id_global_demand` AND rgdl.`id_lang` = '.(int)$idLang.')
+            WHERE rd.`id_product`='.(int)$idProductOld
+        );
+
+        if (is_array($roomTypeDemands) && count($roomTypeDemands)) {
+            $globalDemandOption = new HotelRoomTypeGlobalDemandAdvanceOption();
+            foreach ($roomTypeDemands as $roomTypeDemand) {
+                $idGlobalDemand = $roomTypeDemand['id_global_demand'];
+                $objGlobalDemand = new HotelRoomTypeGlobalDemand($idGlobalDemand);
+                $hotelRoomTypeDemandPrice = new HotelRoomTypeDemandPrice();
+
+                $objHRTDemand = new self();
+                $objHRTDemand->id_product = $idProductNew;
+                $objHRTDemand->id_global_demand = $idGlobalDemand;
+                if (!$objHRTDemand->save()) {
+                    return false;
+                }
+
+                $demandPrice = $roomTypeDemand['price'];
+                if (Validate::isPrice($demandPrice)) {
+                    if ($objGlobalDemand->price != $demandPrice) {
+                        $objHRTDemandPrice = new HotelRoomTypeDemandPrice();
+                        $objHRTDemandPrice->id_product = $idProductNew;
+                        $objHRTDemandPrice->id_global_demand = $idGlobalDemand;
+                        $objHRTDemandPrice->id_option = 0;
+                        $objHRTDemandPrice->price = $demandPrice;
+                        if (!$objHRTDemandPrice->save()) {
+                            return false;
+                        }
+                    }
+                }
+
+                $advOptions = $globalDemandOption->getGlobalDemandAdvanceOptions($idGlobalDemand, $idLang);
+                if (is_array($advOptions) && count($advOptions)) {
+                    foreach ($advOptions as $option) {
+                        $objAdvOption = new HotelRoomTypeGlobalDemandAdvanceOption($option['id'], $idLang);
+                        $oldOptionPrice = $hotelRoomTypeDemandPrice->getRoomTypeDemandPrice(
+                            $idProductOld,
+                            $objAdvOption->id_global_demand,
+                            $option['id']
+                        );
+                        if (Validate::isPrice($oldOptionPrice)) {
+                            if ($oldOptionPrice != $objAdvOption->price) {
+                                $objHRTDemandPrice = new HotelRoomTypeDemandPrice();
+                                $objHRTDemandPrice->id_product = $idProductNew;
+                                $objHRTDemandPrice->id_global_demand = $idGlobalDemand;
+                                $objHRTDemandPrice->id_option = $option['id'];
+                                $objHRTDemandPrice->price = $oldOptionPrice;
+                                if (!$objHRTDemandPrice->save()) {
+                                    return false;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
     public function getRoomTypeDemands($idProduct, $idLang = 0, $useTax = null)
     {
         if (!$idLang) {
@@ -146,23 +214,16 @@ class HotelRoomTypeDemand extends ObjectModel
         $idState = 0;
         $zipcode = 0;
 
-        if (!$id_address && Validate::isLoadedObject($curCart)) {
-            $id_address = $curCart->{Configuration::get('PS_TAX_ADDRESS_TYPE')};
-        }
-
         if ($id_address) {
             $addressInfos = Address::getCountryAndState($id_address);
-            if ($addressInfos['id_country']) {
-                $idCountry = (int)$addressInfos['id_country'];
-                $idState = (int)$addressInfos['id_state'];
-                $zipcode = $addressInfos['postcode'];
-            }
-        } elseif (isset($context->customer->geoloc_id_country)) {
-            $idCountry = (int)$context->customer->geoloc_id_country;
-            $idState = (int)$context->customer->id_state;
-            $zipcode = $context->customer->postcode;
+        } else {
+            $addressInfos = Address::getCountryAndState(Cart::getIdAddressForTaxCalculation($idProduct));
         }
-
+        if ($addressInfos['id_country']) {
+            $idCountry = (int)$addressInfos['id_country'];
+            $idState = (int)$addressInfos['id_state'];
+            $zipcode = $addressInfos['postcode'];
+        }
         if (Tax::excludeTaxeOption()) {
             $useTax = false;
         }

@@ -45,6 +45,9 @@
 		</div>
 		<div id="opc_account_form" class="unvisible">
 			{$HOOK_CREATE_ACCOUNT_TOP}
+			<div style="display: none;" id="opc_account_saved" class="alert alert-success">
+				{l s='Account information saved successfully.'}
+			</div>
 			<!-- Error return block -->
 			<div id="opc_account_errors" class="alert alert-danger" style="display:none;"></div>
 			<!-- END Error return block -->
@@ -379,9 +382,6 @@
 			<div class="submit opc-add-save clearfix">
 				<button type="submit" name="submitAccount" id="submitAccount" class="btn btn-default button button-medium pull-right"><span>{l s='Save'}<i class="icon-chevron-right right"></i></span></button>
 
-			</div>
-			<div style="display: none;" id="opc_account_saved" class="alert alert-success">
-				{l s='Account information saved successfully'}
 			</div>
 		<!-- END Account -->
 		</div>
