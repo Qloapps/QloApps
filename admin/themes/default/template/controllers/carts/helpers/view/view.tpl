@@ -66,9 +66,11 @@
 	<div class="col-lg-6">
 		<div class="panel">
 			<h3><i class="icon-shopping-cart"></i> {l s='Order information'}</h3>
-			{if $order->id}
-				<h2><a href="{$link->getAdminLink('AdminOrders')|escape:'html':'UTF-8'}&amp;id_order={$order->id|intval}&amp;vieworder"> {l s='Order #%d' sprintf=$order->id|string_format:"%06d"}</a></h2>
-				{l s='Made on:'} {dateFormat date=$order->date_add}
+			{if is_array($cart_orders) && count($cart_orders)}
+				{foreach from=$cart_orders item=$cart_order}
+					<h2><a href="{$link->getAdminLink('AdminOrders')|escape:'html':'UTF-8'}&amp;id_order={$cart_order.id_order|intval}&amp;vieworder"> {l s='Order #%d' sprintf=$cart_order.id_order|string_format:"%06d"}</a></h2>
+				{/foreach}
+				{l s='Created on:'} {dateFormat date=$cart_order.date_add}
 			{else}
 				<h2>{l s='No order was created from this cart.'}</h2>
 				{if $customer->id}
@@ -80,113 +82,60 @@
 </div>
 <div class="panel">
 	<h3><i class="icon-archive"></i> {l s='Cart summary'}</h3>
-		<div class="row">
-			<table class="table" id="orderProducts">
-				<thead>
-					<tr>
-						<th class="fixed-width-xs">&nbsp;</th>
-						<th><span class="title_box">{l s='Product'}</span></th>
-						<th class="text-right fixed-width-md"><span class="title_box">{l s='Unit price'}</span></th>
-						<th class="text-center fixed-width-md"><span class="title_box">{l s='Quantity'}</span></th>
-						<th class="text-center fixed-width-sm"><span class="title_box">{l s='Stock'}</span></th>
-						<th class="text-right fixed-width-sm"><span class="title_box">{l s='Total'}</span></th>
-					</tr>
-				</thead>
-				<tbody>
-				{foreach from=$products item='product'}
-					{if isset($customized_datas[$product.id_product][$product.id_product_attribute][$product.id_address_delivery])}
-						<tr>
-							<td>{$product.image}</td>
-							<td><a href="{$link->getAdminLink('AdminProducts')|escape:'html':'UTF-8'}&amp;id_product={$product.id_product}&amp;updateproduct">
-										<span class="productName">{$product.name}</span>{if isset($product.attributes)}<br />{$product.attributes}{/if}<br />
-									{if $product.reference}{l s='Ref:'} {$product.reference}{/if}
-									{if $product.reference && $product.supplier_reference} / {$product.supplier_reference}{/if}
-								</a>
-							</td>
-							<td class="text-right">{displayWtPriceWithCurrency price=$product.price_wt currency=$currency}</td>
-							<td class="text-center">{$product.customizationQuantityTotal}</td>
-							<td class="text-center">{$product.qty_in_stock}</td>
-							<td class="text-right">{displayWtPriceWithCurrency price=$product.total_customization_wt currency=$currency}</td>
-						</tr>
-						{foreach from=$customized_datas[$product.id_product][$product.id_product_attribute][$product.id_address_delivery] item='customization'}
-						<tr>
-							<td colspan="2">
-							{foreach from=$customization.datas key='type' item='datas'}
-								{if $type == constant('Product::CUSTOMIZE_FILE')}
-									<ul style="margin: 0; padding: 0; list-style-type: none;">
-									{foreach from=$datas key='index' item='data'}
-											<li style="display: inline; margin: 2px;">
-												<a href="displayImage.php?img={$data.value}&name={$order->id|intval}-file{$index}" class="_blank">
-												<img src="{$pic_dir}{$data.value}_small" alt="" /></a>
-											</li>
-									{/foreach}
-									</ul>
-								{elseif $type == constant('Product::CUSTOMIZE_TEXTFIELD')}
-									<div class="form-horizontal">
-										{foreach from=$datas key='index' item='data'}
-											<div class="form-group">
-												<span class="control-label col-lg-3"><strong>{if $data.name}{$data.name}{else}{l s='Text #'}{$index}{/if}</strong></span>
-												<div class="col-lg-9">
-													<p class="form-control-static">{$data.value}</p>
-												</div>
-											</div>
-										{/foreach}
-									</div>
-								{/if}
-							{/foreach}
-							</td>
-							<td></td>
-							<td class="text-center">{$customization.quantity}</td>
-							<td></td>
-							<td></td>
-						</tr>
-						{/foreach}
-					{/if}
-
-					{if !isset($product.customizationQuantityTotal) || $product.cart_quantity > $product.customizationQuantityTotal}
-						<tr>
-							<td>{$product.image}</td>
-							<td>
-								<a href="{$link->getAdminLink('AdminProducts')|escape:'html':'UTF-8'}&amp;id_product={$product.id_product}&amp;updateproduct">
-									<span class="productName">{$product.name}</span>{if isset($product.attributes)}<br />{$product.attributes}{/if}<br />
-									{if $product.reference}{l s='Ref:'} {$product.reference}{/if}
-									{if $product.reference && $product.supplier_reference} / {$product.supplier_reference}{/if}
-								</a>
-							</td>
-							<td class="text-right">{displayWtPriceWithCurrency price=$product.product_price currency=$currency}</td>
-							<td class="text-center">{if isset($product.customizationQuantityTotal)}{math equation='x - y' x=$product.cart_quantity y=$product.customizationQuantityTotal|intval}{else}{math equation='x - y' x=$product.cart_quantity y=$product.customization_quantity|intval}{/if}</td>
-							<td class="text-center">{$product.qty_in_stock}</td>
-							<td class="text-right">{displayWtPriceWithCurrency price=$product.product_total currency=$currency}</td>
-						</tr>
-					{/if}
-				{/foreach}
+	<div class="row">
+		<table class="table" id="orderProducts">
+			<thead>
 				<tr>
-					<td colspan="5">{l s='Total cost of products:'}</td>
+					<th class="fixed-width-xs"><span class="title_box">{l s='Image'}</span></th>
+					<th class="text-center"><span class="title_box">{l s='Room Type'}</span></th>
+					<th class="text-center"><span class="title_box">{l s='Unit Price'}</span></th>
+					<th class="text-right"><span class="title_box">{l s='Total'}</span></th>
+				</tr>
+			</thead>
+			<tbody>
+				{foreach from=$products item='product'}
+					<tr>
+						<td>{$product.image}</td>
+						<td class="text-center">
+							<a href="{$link->getAdminLink('AdminProducts')|escape:'html':'UTF-8'}&amp;id_product={$product.id_product}&amp;updateproduct">
+								<span class="productName">{$product.name}</span>{if isset($product.attributes)}<br />{$product.attributes}{/if}<br />
+								{if $product.reference}{l s='Ref:'} {$product.reference}{/if}
+								{if $product.reference && $product.supplier_reference} / {$product.supplier_reference}{/if}
+							</a>
+						</td>
+						<td class="text-center">{displayWtPriceWithCurrency price=$product.product_price currency=$currency}</td>
+						<td class="text-right">{displayWtPriceWithCurrency price=$product.product_total currency=$currency}</td>
+					</tr>
+				{/foreach}
+			</tbody>
+			<tfoot>
+				<tr>
+					<td colspan="3">{l s='Total cost of room types:'}</td>
 					<td class="text-right">{displayWtPriceWithCurrency price=$total_products currency=$currency}</td>
 				</tr>
 				{if $total_discounts != 0}
 				<tr>
-					<td colspan="5">{l s='Total value of vouchers:'}</td>
+					<td colspan="3">{l s='Total value of vouchers:'}</td>
 					<td class="text-right">{displayWtPriceWithCurrency price=$total_discounts currency=$currency}</td>
 				</tr>
 				{/if}
 				{if $total_wrapping > 0}
 				<tr>
-					<td colspan="5">{l s='Total cost of gift wrapping:'}</td>
+					<td colspan="3">{l s='Total cost of gift wrapping:'}</td>
 					<td class="text-right">{displayWtPriceWithCurrency price=$total_wrapping currency=$currency}</td>
 				</tr>
 				{/if}
 				{if $cart->getOrderTotal(true, Cart::ONLY_SHIPPING) > 0}
 				<tr>
-					<td colspan="5">{l s='Total cost of shipping:'}</td>
+					<td colspan="3">{l s='Total cost of shipping:'}</td>
 					<td class="text-right">{displayWtPriceWithCurrency price=$total_shipping currency=$currency}</td>
 				</tr>
 				{/if}
 				<tr>
-					<td colspan="5" class=" success"><strong>{l s='Total:'}</strong></td>
+					<td colspan="3" class=" success"><strong>{l s='Total:'}</strong></td>
 					<td class="text-right success"><strong>{displayWtPriceWithCurrency price=$total_price currency=$currency}</strong></td>
 				</tr>
-			</tbody>
+			</tfoot>
 		</table>
 	</div>
 	{if $discounts}

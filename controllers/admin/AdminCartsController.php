@@ -218,15 +218,17 @@ class AdminCartsControllerCore extends AdminController
         Product::addCustomizationPrice($products, $customized_datas);
         $summary = $cart->getSummaryDetails();
 
-        /* Display order information */
-        $id_order = (int)Order::getOrderByCartId($cart->id);
-        $order = new Order($id_order);
-        if (Validate::isLoadedObject($order)) {
-            $tax_calculation_method = $order->getTaxCalculationMethod();
-            $id_shop = (int)$order->id_shop;
-        } else {
-            $id_shop = (int)$cart->id_shop;
-            $tax_calculation_method = Group::getPriceDisplayMethod(Group::getCurrent()->id);
+        /* Display orders information */
+        $cartOrders = Order::getAllOrdersByCartId($cart->id);
+        if ($cartOrders) {
+            $objOrder = new Order($cartOrders[0]['id_order']);
+            if (Validate::isLoadedObject($objOrder)) {
+                $tax_calculation_method = $objOrder->getTaxCalculationMethod();
+                $id_shop = (int)$objOrder->id_shop;
+            } else {
+                $id_shop = (int)$cart->id_shop;
+                $tax_calculation_method = Group::getPriceDisplayMethod(Group::getCurrent()->id);
+            }
         }
 
         if ($tax_calculation_method == PS_TAX_EXC) {
@@ -304,7 +306,7 @@ class AdminCartsControllerCore extends AdminController
             'kpi' => $kpi,
             'products' => $products,
             'discounts' => $cart->getCartRules(),
-            'order' => $order,
+            'cart_orders' => $cartOrders,
             'cart' => $cart,
             'currency' => $currency,
             'customer' => $customer,
