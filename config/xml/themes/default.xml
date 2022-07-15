@@ -119,6 +119,7 @@
             <hook module="hotelreservationsystem" hook="actionObjectProfileAddAfter" position="1"/>
             <hook module="hotelreservationsystem" hook="actionObjectProfileDeleteBefore" position="1"/>
             <hook module="hotelreservationsystem" hook="actionObjectGroupDeleteBefore" position="1"/>
+            <hook module="hotelreservationsystem" hook="displayLeftColumn" position="4"/>
             <hook module="wkroomsearchblock" hook="displayLeftColumn" position="1"/>
             <hook module="wkroomsearchblock" hook="Header" position="2"/>
             <hook module="wkroomsearchblock" hook="displayAfterHookTop" position="2"/>

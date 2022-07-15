@@ -268,6 +268,7 @@ class ContactControllerCore extends FrontController
         $objHotelInfo = new HotelBranchInformation();
         if ($hotelsInfo = $objHotelInfo->hotelBranchesInfo(false, 1, 1)) {
             foreach ($hotelsInfo as &$hotel) {
+                $hotel['address_info'] = $objHotelInfo->getAddress($hotel['id']);
                 if (isset($hotel['id_cover_img'])
                     && $hotel['id_cover_img']
                     && Validate::isLoadedObject(
@@ -287,7 +288,8 @@ class ContactControllerCore extends FrontController
                 }
             }
         }
-	$contactKey = md5(uniqid(microtime(), true));
+
+	    $contactKey = md5(uniqid(microtime(), true));
         $this->context->cookie->__set('contactFormKey', $contactKey);
         $this->context->smarty->assign(
             array(
@@ -297,7 +299,7 @@ class ContactControllerCore extends FrontController
                 'gblHtlAddress' => $gblHtlAddress,
                 'contacts' => Contact::getContacts($this->context->language->id),
                 'message' => html_entity_decode(Tools::getValue('message')),
-	        'contactKey' => $contactKey,
+	            'contactKey' => $contactKey,
             )
         );
 
