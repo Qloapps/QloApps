@@ -86,24 +86,6 @@ class HotelImage extends ObjectModel
         );
     }
 
-    /**
-     * [validAddHotelMainImage :: To validate the image of the hotel before saving it]
-     * @param  [array] $image [variable having image information of the hotel]
-     * @return [boolean]        [returns true if image is valid]
-     */
-    public static function validateImage($image)
-    {
-        if ($image['size'] > 0) {
-            if ($image['tmp_name'] != "") {
-                if (!ImageManager::isCorrectImageFileExt($image['name'])) {
-                    return true;
-                }
-            }
-        } else {
-            return true;
-        }
-    }
-
     public function uploadHotelImages($images, $idHotel, $destPath)
     {
         if (isset($images) && $idHotel && $destPath) {

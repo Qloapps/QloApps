@@ -202,12 +202,6 @@ class HotelReservationSystemDb
                 PRIMARY KEY (`id`)
             ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;",
 
-            "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_room_allotment_type` (
-                `id` int(11) NOT NULL AUTO_INCREMENT,
-                `type` text NOT NULL,
-                PRIMARY KEY (`id`)
-            ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;",
-
             "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_advance_payment` (
                 `id` int(11) NOT NULL AUTO_INCREMENT,
                 `id_product` int(11) NOT NULL,
