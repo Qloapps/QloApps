@@ -206,6 +206,9 @@
 					<option value="2" {if isset($objFeaturePrice->impact_way) && $objFeaturePrice->impact_way == 2}selected = "selected"{/if}>
 					  {l s='Increase Price' mod='hotelreservationsystem'}
 					</option>
+					<option value="3" {if isset($objFeaturePrice->impact_way) && $objFeaturePrice->impact_way == 3}selected = "selected"{/if}>
+						{l s='Fix Price' mod='hotelreservationsystem'}
+					</option>
 				</select>
 			</div>
 		</div>
@@ -215,7 +218,7 @@
               {l s='Impact Type :' mod='hotelreservationsystem'}
             </label>
             <div class="col-lg-3">
-				<select class="form-control" name="price_impact_type" id="price_impact_type">
+				<select class="form-control" name="price_impact_type" id="price_impact_type" {if isset($objFeaturePrice->impact_way) && $objFeaturePrice->impact_way == 3}disabled="disabled"{/if}>
 					<option value="1" {if isset($objFeaturePrice->impact_type) && $objFeaturePrice->impact_type == 1}selected = "selected"{/if}>
 					  {l s='Percentage' mod='hotelreservationsystem'}
 					</option>
@@ -223,6 +226,7 @@
 					  {l s='Fixed Price' mod='hotelreservationsystem'}
 					</option>
 				</select>
+				<input type="hidden" id="price_impact_type_input" name="price_impact_type" value="{if isset($objFeaturePrice->impact_type)}{$objFeaturePrice->impact_type}{/if}">
 			</div>
 		</div>
 

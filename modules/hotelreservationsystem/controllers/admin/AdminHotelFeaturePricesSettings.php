@@ -45,11 +45,16 @@ class AdminHotelFeaturePricesSettingsController extends ModuleAdminController
         $this->_select .= ' fpl.`feature_price_name` as ftr_price_name, CONCAT(pl.`name`, " (#", a.`id_product`, ")") as product_name, hbl.`hotel_name`, IF(a.impact_type=1 , CONCAT(round(a.impact_value, 2), " ", "%"), a.impact_value) AS impact_value';
         $this->_select .= ' ,IF(a.impact_type=1 , \''.$this->l('Percentage').'\', \''.$this->l('Fixed Amount').'\')
         AS impact_type';
-        $this->_select .= ' ,IF(a.impact_way=1 , \''.$this->l('Decrease').'\', \''.$this->l('Increase').'\')
-        AS impact_way';
+        $this->_select .= ', CASE
+            WHEN a.`impact_way` = 1 THEN \''.$this->l('Decrease').'\'
+            WHEN a.`impact_way` = 2 THEN \''.$this->l('Increase').'\'
+            WHEN a.`impact_way` = 3 THEN \''.$this->l('Fix').'\'
+        END AS `impact_way`';
 
-        $impactWays = array(1 => 'decrease', 2 => 'increase');
-        $impactTypes = array(1 => 'Percentage', 2 => 'Fixed Price');
+        $this->_where = ' AND a.`id_cart` = 0 AND a.`id_guest` = 0 AND a.`id_room` = 0';
+
+        $impactWays = array(1 => $this->l('Decrease'), 2 => $this->l('Increase'), 3 => $this->l('Fix'));
+        $impactTypes = array(1 => $this->l('Percentage'), 2 => $this->l('Fixed Price'));
 
         $priorities = Configuration::get('HTL_FEATURE_PRICING_PRIORITY');
         $this->context->smarty->assign('featurePricePriority', explode(';', $priorities));

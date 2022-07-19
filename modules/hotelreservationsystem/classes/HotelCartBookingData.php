@@ -145,7 +145,16 @@ class HotelCartBookingData extends ObjectModel
         if ($cart_book_data) {
             foreach ($cart_book_data as $key => $value) {
                 // By webkul New way to calculate product prices with feature Prices
-                $roomTypeDateRangePrice = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice($value['id_product'], $value['date_from'], $value['date_to']);
+                $roomTypeDateRangePrice = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
+                    $value['id_product'],
+                    $value['date_from'],
+                    $value['date_to'],
+                    0,
+                    (int)Group::getCurrent()->id,
+                    $id_cart,
+                    $id_guest,
+                    $value['id_room']
+                );
                 $cart_book_data[$key]['amt_with_qty'] = $roomTypeDateRangePrice['total_price_tax_excl'];
             }
 
@@ -620,11 +629,8 @@ class HotelCartBookingData extends ObjectModel
             $objRoomDemands = new HotelRoomTypeDemand();
             foreach ($cart_detail_data as $key => $value) {
                 $product_image_id = Product::getCover($value['id_product']);
-
                 $productObj = new Product((int) $value['id_product'], false, (int) Configuration::get('PS_LANG_DEFAULT'));
-
                 $link_rewrite = $productObj->link_rewrite;
-
                 if ($product_image_id) {
                     $cart_detail_data[$key]['image_link'] = $context->link->getImageLink($link_rewrite, $product_image_id['id_image'], 'small_default');
                 } else {
@@ -640,8 +646,26 @@ class HotelCartBookingData extends ObjectModel
                 $unit_price = Product::getPriceStatic($value['id_product'], true);
                 $unit_price_tax_excl = Product::getPriceStatic($value['id_product'], false);
                 $productPriceWithoutReduction = $productObj->getPriceWithoutReduct(false);
-                $feature_price = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay($value['id_product'], $value['date_from'], $value['date_to'], true);
-                $feature_price_tax_excl = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay($value['id_product'], $value['date_from'], $value['date_to'], false);
+                $feature_price = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay(
+                    $value['id_product'],
+                    $value['date_from'],
+                    $value['date_to'],
+                    true,
+                    0,
+                    $id_cart,
+                    $value['id_guest'],
+                    $value['id_room']
+                );
+                $feature_price_tax_excl = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay(
+                    $value['id_product'],
+                    $value['date_from'],
+                    $value['date_to'],
+                    false,
+                    0,
+                    $id_cart,
+                    $value['id_guest'],
+                    $value['id_room']
+                );
                 $feature_price_diff = (float)($productPriceWithoutReduction - $feature_price);
                 $cart_detail_data[$key]['product_price'] = $unit_price;
                 $cart_detail_data[$key]['product_price_tax_excl'] = $unit_price_tax_excl;
@@ -670,7 +694,16 @@ class HotelCartBookingData extends ObjectModel
                     1
                 );
                 // By webkul New way to calculate product prices with feature Prices
-                $roomTypeDateRangePrice = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice($value['id_product'], $value['date_from'], $value['date_to']);
+                $roomTypeDateRangePrice = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
+                    $value['id_product'],
+                    $value['date_from'],
+                    $value['date_to'],
+                    0,
+                    0,
+                    $id_cart,
+                    $value['id_guest'],
+                    $value['id_room']
+                );
 
                 $cart_detail_data[$key]['amt_with_qty'] = $roomTypeDateRangePrice['total_price_tax_excl'];
             }
@@ -738,8 +771,24 @@ class HotelCartBookingData extends ObjectModel
      * @param [int] $id_group    [id_group for which price is need (if available for the passed group)]
      * @return [array|false] [returns array containg info of the feature plan if foung otherwise returns false]
      */
-    public function getProductFeaturePricePlanByDateByPriority($id_product, $date, $id_group)
-    {
+    public function getProductFeaturePricePlanByDateByPriority(
+        $id_product,
+        $date,
+        $id_group,
+        $id_cart = 0,
+        $id_guest = 0,
+        $id_room = 0
+    ) {
+        if ($id_cart && $id_room) {
+            if ($featurePrice = Db::getInstance()->getRow(
+                'SELECT * FROM `'._DB_PREFIX_.'htl_room_type_feature_pricing` fp
+                WHERE fp.`id_product` = '.(int) $id_product.' AND fp.`id_cart` = '.(int) $id_cart.'
+                AND fp.`id_guest` = '.(int) $id_guest.' AND fp.`id_room` = '.(int) $id_room.' AND fp.`active` = 1')
+            ) {
+                return $featurePrice;
+            }
+        }
+
         //Get priority
         $featurePricePriority = Configuration::get('HTL_FEATURE_PRICING_PRIORITY');
         $featurePricePriority = explode(';', $featurePricePriority);
@@ -750,7 +799,7 @@ class HotelCartBookingData extends ObjectModel
                         'SELECT * FROM `'._DB_PREFIX_.'htl_room_type_feature_pricing` fp
                         INNER JOIN `'._DB_PREFIX_.'htl_room_type_feature_pricing_group` fpg
                         ON (fp.`id_feature_price` = fpg.`id_feature_price` AND fpg.`id_group` = '.(int) $id_group.')
-                        WHERE fp.`id_product`='.(int) $id_product.' AND fp.`active`=1
+                        WHERE fp.`id_cart` = 0 AND fp.`id_product`='.(int) $id_product.' AND fp.`active`=1
                         AND fp.`date_selection_type`=2 AND fp.`date_from` = \''.pSQL($date).'\''
                     )) {
                         return $featurePrice;
@@ -760,8 +809,9 @@ class HotelCartBookingData extends ObjectModel
                         'SELECT * FROM `'._DB_PREFIX_.'htl_room_type_feature_pricing` fp
                         INNER JOIN `'._DB_PREFIX_.'htl_room_type_feature_pricing_group` fpg
                         ON (fp.`id_feature_price` = fpg.`id_feature_price` AND fpg.`id_group` = '.(int) $id_group.')
-                        WHERE fp.`id_product`='.(int) $id_product.' AND fp.`is_special_days_exists`=1
-                        AND fp.`active`=1 AND fp.`date_from` <= \''.pSQL($date).'\' AND fp.`date_to` >= \''.pSQL($date).'\''
+                        WHERE fp.`id_cart` = 0 AND fp.`id_product`='.(int) $id_product.'
+                        AND fp.`is_special_days_exists`=1 AND fp.`active`=1 AND fp.`date_from` <= \''.pSQL($date).'\'
+                        AND fp.`date_to` >= \''.pSQL($date).'\''
                     )) {
                         foreach ($featurePrice as $fRow) {
                             $specialDays = json_decode($fRow['special_days']);
@@ -775,7 +825,7 @@ class HotelCartBookingData extends ObjectModel
                         'SELECT * FROM `'._DB_PREFIX_.'htl_room_type_feature_pricing` fp
                         INNER JOIN `'._DB_PREFIX_.'htl_room_type_feature_pricing_group` fpg
                         ON (fp.`id_feature_price` = fpg.`id_feature_price` AND fpg.`id_group` = '.(int) $id_group.')
-                        WHERE fp.`id_product`='.(int) $id_product.' AND fp.`date_selection_type`=1
+                        WHERE fp.`id_cart` = 0 AND fp.`id_product`='.(int) $id_product.' AND fp.`date_selection_type`=1
                         AND `is_special_days_exists`=0 AND `active`=1
                         AND fp.`date_from` <= \''.pSQL($date).'\' AND fp.`date_to` >= \''.pSQL($date).'\''
                     )) {

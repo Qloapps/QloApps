@@ -906,26 +906,37 @@ $(document).ready(function() {
 
     $('#date_selection_type').on('change', function() {
         if ($('#date_selection_type').val() == 2) {
-            $(".specific_date_type").show();
-            $(".date_range_type").hide();
-            $(".special_days_content").hide();
+            $(".specific_date_type").show(200);
+            $(".date_range_type").hide(200);
+            $(".special_days_content").hide(200);
         } else if ($('#date_selection_type').val() == 1) {
-            $(".specific_date_type").hide();
-            $(".date_range_type").show();
-            $(".special_days_content").show();
+            $(".specific_date_type").hide(200);
+            $(".date_range_type").show(200);
+            $(".special_days_content").show(200);
         } else {
-            $(".specific_date_type").hide();
-            $(".date_range_type").show();
-            $(".special_days_content").show();
+            $(".specific_date_type").hide(200);
+            $(".date_range_type").show(200);
+            $(".special_days_content").show(200);
         }
     });
 
 
     $(".is_special_days_exists").on ('click', function() {
         if ($(this).is(':checked')) {
-            $('.week_days').show();
+            $('.week_days').show(200);
         } else {
-            $('.week_days').hide();
+            $('.week_days').hide(200);
+        }
+    });
+
+    $('#price_impact_way').on('change', function() {
+        if ($('#price_impact_way').val() == 3) {
+            $('#price_impact_type option[value="2"]').attr('selected', 'selected');
+            $('#price_impact_type_input').removeAttr('disabled').val(2);
+            $('#price_impact_type').trigger('change').attr('disabled', 'disabled');
+        } else {
+            $('#price_impact_type_input').attr('disabled', 'disabled');
+            $('#price_impact_type').removeAttr('disabled');
         }
     });
 

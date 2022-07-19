@@ -689,7 +689,7 @@ abstract class PaymentModuleCore extends Module
                         }
                     }
 
-                    // update order in hlt tables
+                    // update order in htl tables
                     $objCartBookingData = new HotelCartBookingData();
                     $objBookingDetail = new HotelBookingDetail();
                     $objRoomType = new HotelRoomType();
@@ -731,7 +731,12 @@ abstract class PaymentModuleCore extends Module
                                 $total_price = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
                                     $idProduct,
                                     $objCartBookingData->date_from,
-                                    $objCartBookingData->date_to
+                                    $objCartBookingData->date_to,
+                                    0,
+                                    Group::getCurrent()->id,
+                                    $objCartBookingData->id_cart,
+                                    $objCartBookingData->id_guest,
+                                    $objCartBookingData->id_room
                                 );
                                 $objBookingDetail->date_from = $objCartBookingData->date_from;
                                 $objBookingDetail->date_to = $objCartBookingData->date_to;
@@ -752,11 +757,11 @@ abstract class PaymentModuleCore extends Module
                                     $objBookingDetail->check_in_time = $objHotelBranch->check_in;
                                     $objBookingDetail->check_out_time = $objHotelBranch->check_out;
                                     if ($hotelAddress = $objHotelBranch->getAddress($objCartBkData->id_hotel)) {
-                                        $objHtlBkDtl->city = $hotelAddress['city'];
-                                        $objHtlBkDtl->state = $hotelAddress['state'];
-                                        $objHtlBkDtl->country = $hotelAddress['country'];
-                                        $objHtlBkDtl->zipcode = $hotelAddress['postcode'];
-                                        $objHtlBkDtl->phone = $hotelAddress['phone'];
+                                        $objBookingDetail->city = $hotelAddress['city'];
+                                        $objBookingDetail->state = $hotelAddress['state'];
+                                        $objBookingDetail->country = $hotelAddress['country'];
+                                        $objBookingDetail->zipcode = $hotelAddress['postcode'];
+                                        $objBookingDetail->phone = $hotelAddress['phone'];
                                     }
                                 }
                                 if ($roomTypeInfo = $objRoomType->getRoomTypeInfoByIdProduct($idProduct)) {
@@ -842,6 +847,9 @@ abstract class PaymentModuleCore extends Module
                             }
                         }
                     }
+
+                    // delete cart feature prices after booking creation success
+                    HotelRoomTypeFeaturePricing::deleteByIdCart($cart->id);
 
                     if (isset($_COOKIE['wk_id_cart'])) {
                         setcookie('wk_id_cart', ' ', time() - 86400, '/');
