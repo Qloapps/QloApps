@@ -1908,7 +1908,7 @@ class AdminOrdersControllerCore extends AdminController
             false,
             $order->id_customer,
             $cart->id,
-            $order->{Configuration::get('PS_TAX_ADDRESS_TYPE', null, null, $order->id_shop)}
+            $order->id_address_tax
         );
 
         // Creating specific price if needed
@@ -2212,12 +2212,13 @@ class AdminOrdersControllerCore extends AdminController
                     $obj_cart_bk_data->id_hotel,
                     $idLang
                 ))) {
+                    $addressInfo = $objHotelBranch->getAddress($obj_cart_bk_data->id_hotel);
                     $objHtlBkDtl->hotel_name = $objHotelBranch->hotel_name;
-                    $objHtlBkDtl->city = $objHotelBranch->city;
-                    $objHtlBkDtl->state = State::getNameById($objHotelBranch->state_id);
-                    $objHtlBkDtl->country = Country::getNameById($idLang, $objHotelBranch->country_id);
-                    $objHtlBkDtl->zipcode = $objHotelBranch->zipcode;
-                    $objHtlBkDtl->phone = $objHotelBranch->phone;
+                    $objHtlBkDtl->city = $addressInfo['city'];
+                    $objHtlBkDtl->state = State::getNameById($addressInfo['id_state']);
+                    $objHtlBkDtl->country = Country::getNameById($idLang, $addressInfo['id_country']);
+                    $objHtlBkDtl->zipcode = $addressInfo['postcode'];;
+                    $objHtlBkDtl->phone = $addressInfo['phone'];
                     $objHtlBkDtl->email = $objHotelBranch->email;
                     $objHtlBkDtl->check_in_time = $objHotelBranch->check_in;
                     $objHtlBkDtl->check_out_time = $objHotelBranch->check_out;
@@ -2319,6 +2320,7 @@ class AdminOrdersControllerCore extends AdminController
         $product_quantity = (int) $obj_booking_detail->getNumberOfDays($new_date_from, $new_date_to);
         $old_product_quantity =  (int) $obj_booking_detail->getNumberOfDays($old_date_from, $old_date_to);
         $qty_diff = $product_quantity - $old_product_quantity;
+        
         /*By webkul to validate fields before deleting the cart and order data form the tables*/
         if ($id_hotel == '') {
             die(json_encode(array(
@@ -2602,6 +2604,19 @@ class AdminOrdersControllerCore extends AdminController
                         }
                     }
                 }
+
+                if (isset($order_invoice)) {
+                    // Apply changes on OrderInvoice
+                    $order_invoice->total_paid_tax_excl = $objOrder->total_paid_tax_excl;
+                    $order_invoice->total_paid_tax_incl = $objOrder->total_paid_tax_incl;
+                }
+
+
+                // Save order invoice
+                if (isset($order_invoice)) {
+                    $res &= $order_invoice->update();
+                }
+
                 // change order total save
                 $objOrder->save();
             }
@@ -3276,7 +3291,7 @@ class AdminOrdersControllerCore extends AdminController
                 $roomDemands = Tools::getValue('room_demands');
                 if ($roomDemands = json_decode($roomDemands, true)) {
                     $order = new Order($objBookingDetail->id_order);
-                    $vatAddress = new Address((int)$order->{Configuration::get('PS_TAX_ADDRESS_TYPE')});
+                    $vatAddress = new Address((int)$order->id_address_tax);
                     $idLang = (int)$order->id_lang;
                     $idProduct = $objBookingDetail->id_product;
                     $objHtlBkDtl = new HotelBookingDetail();
@@ -3318,6 +3333,16 @@ class AdminOrdersControllerCore extends AdminController
                         }
                         $objBookingDemand->total_price_tax_excl = $objBookingDemand->unit_price_tax_excl * $qty;
                         $objBookingDemand->total_price_tax_incl = $objBookingDemand->unit_price_tax_incl * $qty;
+
+                        $order_detail = new OrderDetail($objBookingDetail->id_order_detail);
+                        // Update OrderInvoice of this OrderDetail
+                        if ($order_detail->id_order_invoice != 0) {
+                            // values changes as values are calculated accoding to the quantity of the product by webkul
+                            $order_invoice = new OrderInvoice($order_detail->id_order_invoice);
+                            $order_invoice->total_paid_tax_excl += $objBookingDemand->total_price_tax_excl;
+                            $order_invoice->total_paid_tax_incl += $objBookingDemand->total_price_tax_incl;
+                            $res &= $order_invoice->update();
+                        }
 
                         // change order total
                         $order->total_paid_tax_excl += $objBookingDemand->total_price_tax_excl;
@@ -3363,6 +3388,16 @@ class AdminOrdersControllerCore extends AdminController
                             $order->total_paid_tax_incl -= $objBookingDemand->total_price_tax_incl;
                             $order->total_paid -= $objBookingDemand->total_price_tax_incl;
                             $order->save();
+
+                            $order_detail = new OrderDetail($objBookingDetail->id_order_detail);
+                            // Update OrderInvoice of this OrderDetail
+                            if ($order_detail->id_order_invoice != 0) {
+                                // values changes as values are calculated accoding to the quantity of the product by webkul
+                                $order_invoice = new OrderInvoice($order_detail->id_order_invoice);
+                                $order_invoice->total_paid_tax_excl -= $objBookingDemand->total_price_tax_excl;
+                                $order_invoice->total_paid_tax_incl -= $objBookingDemand->total_price_tax_incl;
+                                $res &= $order_invoice->update();
+                            }
                         }
                         die('1');
                     }

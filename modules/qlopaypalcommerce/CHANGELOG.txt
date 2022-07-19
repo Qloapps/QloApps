@@ -1,0 +1,27 @@
+-----------------------------
+# V1.0.1 to V1.0.2
+-----------------------------
+
+## Fixed Bug:
+
+- [FO] : Resolved : Rounding issue (item total and item details total prices mismatch). PayPal said not to send item details
+
+
+## Update Policy
+
+- Module need only file update, can be updated only by UPLOADING new version on module
+
+
+-----------------------------
+# V1.0.0 to V1.0.1
+-----------------------------
+
+## Fixed Bug:
+
+- [FO] : Resolved : Issue while adding additional facility in the cart. Item total is wrong.
+- [FO] : Resolved : Issue while advance payment (when same room type with different date ranges and multiple quantity is added). Item total is wrong.
+- [FO] : Resolved : Issue Price_mismatch while adding discount with tax incl or excl settings.
+
+## Update Policy
+
+- Module need only file update, can be updated only by UPLOADING new version on module

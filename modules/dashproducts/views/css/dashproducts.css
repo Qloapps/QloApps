@@ -33,7 +33,6 @@
 
 #content.bootstrap #dashproducts section:last-child .tab-content.panel {
 	border-radius: 5px;
-	margin: 0 10px;
 }
 
 #dashproducts #table_top_10_most_search .hotel-thumbnail {
@@ -41,7 +40,6 @@
 }
 
 #dashproducts section .nav-pills {
-	padding: 0 15%;
 	margin-top: 30px;
 	margin-bottom: 30px;
 }
@@ -49,7 +47,7 @@
 @media (max-width: 500px) {
 	#dashproducts section .nav-pills {
 		padding: 0 5%;
-	}	
+	}
 }
 
 
@@ -60,7 +58,7 @@
 }
 
 #dashproducts section .nav-pills .nav-item {
-	margin-bottom: 2px;
+	margin-bottom: 25px;
 }
 
 #dashproducts section .nav-pills .nav-item a {

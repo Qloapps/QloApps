@@ -392,6 +392,9 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
 
                 $objOrderReturn->refunded_amount = $totalRefundedAmount;
                 if ($objOrderReturn->save()) {
+                    // change state of the order refund
+                    $objOrderReturn->changeIdOrderReturnState($idRefundState, $idOrderReturn);
+
                     if ($objRefundState->refunded || $objRefundState->denied) {
                         // check if order is paid the set status of the order to refunded
                         $objOrderHistory = new OrderHistory();
@@ -502,9 +505,6 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
                             }
                         }
                     }
-
-                    // change state of the order refund
-                    $objOrderReturn->changeIdOrderReturnState($idRefundState, $idOrderReturn);
 
                     // redirect with success if process completed successfully
                     Tools::redirectAdmin(
