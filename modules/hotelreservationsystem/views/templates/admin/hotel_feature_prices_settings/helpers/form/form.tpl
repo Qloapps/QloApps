@@ -141,7 +141,7 @@
 						|| (isset($special_days) && $special_days && in_array('mon', $special_days))}
 						checked="checked"
 					{/if}/>
-					<p>{l s='mon' mod='hotelreservationsystem'}</p>
+					<p>{l s='Mon' mod='hotelreservationsystem'}</p>
 				</div>
 				<div class="col-sm-1">
 					<input type="checkbox" name="special_days[]" value="tue"
@@ -149,7 +149,7 @@
 						|| (isset($special_days) && $special_days && in_array('tue', $special_days))}
 						checked="checked"
 					{/if}/>
-					<p>{l s='tue' mod='hotelreservationsystem'}</p>
+					<p>{l s='Tue' mod='hotelreservationsystem'}</p>
 				</div>
 				<div class="col-sm-1">
 					<input type="checkbox" name="special_days[]" value="wed"
@@ -157,7 +157,7 @@
 						|| (isset($special_days) && $special_days && in_array('wed', $special_days))}
 						checked="checked"
 					{/if}/>
-					<p>{l s='wed' mod='hotelreservationsystem'}</p>
+					<p>{l s='Wed' mod='hotelreservationsystem'}</p>
 				</div>
 				<div class="col-sm-1">
 					<input type="checkbox" name="special_days[]" value="thu"
@@ -165,7 +165,7 @@
 						|| (isset($special_days) && $special_days && in_array('thu', $special_days))}
 						checked="checked"
 					{/if}/>
-					<p>{l s='thu' mod='hotelreservationsystem'}</p>
+					<p>{l s='Thu' mod='hotelreservationsystem'}</p>
 				</div>
 				<div class="col-sm-1">
 					<input type="checkbox" name="special_days[]" value="fri"
@@ -173,7 +173,7 @@
 						|| (isset($special_days) && $special_days && in_array('fri', $special_days))}
 						checked="checked"
 					{/if}/>
-					<p>{l s='fri' mod='hotelreservationsystem'}</p>
+					<p>{l s='Fri' mod='hotelreservationsystem'}</p>
 				</div>
 				<div class="col-sm-1">
 					<input type="checkbox" name="special_days[]" value="sat"
@@ -181,7 +181,7 @@
 						|| (isset($special_days) && $special_days && in_array('sat', $special_days))}
 						checked="checked"
 					{/if}/>
-					<p>{l s='sat' mod='hotelreservationsystem'}</p>
+					<p>{l s='Sat' mod='hotelreservationsystem'}</p>
 				</div>
 				<div class="col-sm-1">
 					<input type="checkbox" name="special_days[]" value="sun"
@@ -189,7 +189,7 @@
 						|| (isset($special_days) && $special_days && in_array('sun', $special_days))}
 						checked="checked"
 					{/if}/>
-					<p>{l s='sun' mod='hotelreservationsystem'}</p>
+					<p>{l s='Sun' mod='hotelreservationsystem'}</p>
 				</div>
 			</div>
 		</div>

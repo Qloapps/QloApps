@@ -598,12 +598,13 @@ class AdminCustomersControllerCore extends AdminController
         );
 
         $birthday = explode('-', $this->getFieldValue($obj, 'birthday'));
-
+        
         $this->fields_value = array(
-            'years' => $this->getFieldValue($obj, 'birthday') ? $birthday[0] : 0,
-            'months' => $this->getFieldValue($obj, 'birthday') ? $birthday[1] : 0,
-            'days' => $this->getFieldValue($obj, 'birthday') ? $birthday[2] : 0,
+            'years' => Tools::getValue('years', $this->getFieldValue($obj, 'birthday') ? $birthday[0] : 0),
+            'months' => Tools::getValue('months', $this->getFieldValue($obj, 'birthday') ? $birthday[1] : 0),
+            'days' => Tools::getValue('days', $this->getFieldValue($obj, 'birthday') ? $birthday[2] : 0),
         );
+
 
         // Added values of object Group
         if (!Validate::isUnsignedId($obj->id)) {
@@ -878,7 +879,6 @@ class AdminCustomersControllerCore extends AdminController
             'referrers' => $referrers,
             'show_toolbar' => true
         );
-
         return parent::renderView();
     }
 
@@ -962,10 +962,25 @@ class AdminCustomersControllerCore extends AdminController
             $this->errors[] = Tools::displayError('A default customer group must be selected in group box.');
         }
 
-        // Check the requires fields which are settings in the BO
+        $days = Tools::getValue('days');
+        $months = Tools::getValue('months');
+        $years = Tools::getValue('years');
+        
+        if ($days || $months || $years) {
+            if (!$days) {
+                $this->errors[] = Tools::displayError("Please select a valid date of birthday");
+            }
+            if (!$months) {
+                $this->errors[] = Tools::displayError("Please select a valid year of birthday");
+            }
+            if (!$years) {
+                $this->errors[] = Tools::displayError("Please select a valid month of birthday");
+            }
+        }
+        
         $customer = new Customer();
         $this->errors = array_merge($this->errors, $customer->validateFieldsRequiredDatabase());
-
+        
         return parent::processSave();
     }
 
