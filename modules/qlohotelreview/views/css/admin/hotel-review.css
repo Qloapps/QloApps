@@ -17,6 +17,10 @@
 * @license LICENSE.txt
 */
 
+.rich-text {
+    white-space: break-spaces;
+}
+
 .image-row {
     padding-top: 10px;
 }

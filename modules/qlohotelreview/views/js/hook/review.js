@@ -36,6 +36,7 @@ var QhrReviewForm = {
     },
     beforeSubmit: function() {
         QhrReviewForm.hideGeneralErrors();
+        QhrReviewForm.disableSubmitButton();
     },
     submit: function() {
         QhrReviewForm.beforeSubmit();
@@ -51,7 +52,7 @@ var QhrReviewForm = {
             type: 'POST',
             success: function(response) {
                 var jsonResponse = JSON.parse(response);
-                if (jsonResponse.status == 'ok') {
+                if (jsonResponse.status == true) {
                     QhrReviewForm.close();
                     QhrReviewForm.showSuccessMessage();
                     QhrReviewForm.removeBtn();
@@ -63,7 +64,10 @@ var QhrReviewForm = {
                 } else {
                     QhrReviewForm.showGeneralErrors(jsonResponse.errors.general);
                 }
-            }
+            },
+            complete: function() {
+                QhrReviewForm.enableSubmitButton();
+            },
         });
     },
     showGeneralErrors: function(errors) {
@@ -74,6 +78,12 @@ var QhrReviewForm = {
         $('#review-general-errors').hide('slow', function() {
             $('#review-general-errors').html('');
         });
+    },
+    enableSubmitButton: function() {
+        $('#btn-submit-review').removeClass('disabled');
+    },
+    disableSubmitButton: function() {
+        $('#btn-submit-review').addClass('disabled');
     },
     showSuccessMessage: function() {
         var href = '';

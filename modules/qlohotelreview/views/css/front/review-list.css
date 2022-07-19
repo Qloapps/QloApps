@@ -175,6 +175,7 @@
     font-size: 14px;
     line-height: 24px;
     color: #333;
+    white-space: break-spaces;
 }
 
 #hotel-reviews .btn-helpful span {

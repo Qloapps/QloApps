@@ -83,6 +83,11 @@
     margin-left: 10px;
 }
 
+#add-review-popup .review-actions-wrap .btn-review.disabled {
+    background-color: #1292FF;
+    border: 1px solid #1292FF;
+}
+
 #add-review-popup .image-input-btn {
     width: 100px;
     height: 100px;

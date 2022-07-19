@@ -17,7 +17,7 @@
 * @license LICENSE.txt
 */
 
-function initRaty(path) {
+function initRatyRoomTypeDetail(path) {
     $('.room_hotel_name_block .raty').html(''); // reset first to avoid star duplications
     $.extend($.raty, { path: path });
     $('.room_hotel_name_block .raty').raty({readOnly: true, hints: null, noRatedMsg: '0'});
@@ -25,6 +25,6 @@ function initRaty(path) {
 
 $(document).ready(function () {
     if (typeof qlo_hotel_review_rtd_js_vars === 'object' && qlo_hotel_review_rtd_js_vars.raty_img_path) {
-        initRaty(qlo_hotel_review_rtd_js_vars.raty_img_path);
+        initRatyRoomTypeDetail(qlo_hotel_review_rtd_js_vars.raty_img_path);
     }
 });

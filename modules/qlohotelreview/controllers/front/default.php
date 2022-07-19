@@ -43,7 +43,7 @@ class QloHotelReviewDefaultModuleFrontController extends ModuleFrontController
         $maxImages = (int) Configuration::get('QHR_MAX_IMAGES_PER_REVIEW');
         $approvalEnabled = (int) Configuration::get('QHR_ADMIN_APPROVAL_ENABLED');
 
-        $status = 'ko';
+        $status = false;
         $errors = array('by_key' => array(), 'general' => array());
         $objModule = new QloHotelReview();
         $objHotel = new HotelBranchInformation($idHotel);
@@ -104,14 +104,14 @@ class QloHotelReviewDefaultModuleFrontController extends ModuleFrontController
                     if ($maxImages) {
                         $objHotelReview->saveReviewImages();
                     }
-                    $status = 'ok';
+                    $status = true;
                 }
             } else {
-                $status = 'ko';
+                $status = false;
                 $errors['general'][] = $objModule->l('Something went wrong.', 'default');
             }
         } else {
-            $status = 'ko';
+            $status = false;
         }
 
         if (is_array($errors['general']) && count($errors['general'])) {
@@ -127,7 +127,7 @@ class QloHotelReviewDefaultModuleFrontController extends ModuleFrontController
 
     public function displayAjaxMarkReviewHelpful()
     {
-        $response = array('status' => 'ko');
+        $response = array('status' => false);
         $idHotelReview = (int) Tools::getValue('id_hotel_review');
         if (!$idHotelReview) {
             die(json_encode($response));
@@ -138,14 +138,14 @@ class QloHotelReviewDefaultModuleFrontController extends ModuleFrontController
         }
 
         if (QhrHotelReview::markHelpful($idHotelReview, $this->context->cookie->id_customer)) {
-            $response['status'] = 'ok';
+            $response['status'] = true;
             die(json_encode($response));
         }
     }
 
     public function displayAjaxReportAbuse()
     {
-        $response = array('status' => 'ko');
+        $response = array('status' => false);
         $idHotelReview = (int) Tools::getValue('id_hotel_review');
         if (!$idHotelReview) {
             die(json_encode($response));
@@ -156,14 +156,14 @@ class QloHotelReviewDefaultModuleFrontController extends ModuleFrontController
         }
 
         if (QhrHotelReview::reportAbuse($idHotelReview, $this->context->cookie->id_customer)) {
-            $response['status'] = 'ok';
+            $response['status'] = true;
             die(json_encode($response));
         }
     }
 
     public function displayAjaxGetReviews()
     {
-        $response = array('status' => 'ko');
+        $response = array('status' => false);
         $idHotel = (int) Tools::getValue('id_hotel');
         $sortBy = (int) Tools::getValue('sort_by');
         $page = (int)Tools::getValue('page');
@@ -181,7 +181,7 @@ class QloHotelReviewDefaultModuleFrontController extends ModuleFrontController
 
         if (is_array($reviews) && count($reviews)) {
             $response['html'] = $this->renderReviews($reviews);
-            $response['status'] = 'ok';
+            $response['status'] = true;
             $response['message'] = 'HTML_OK';
             $response['has_next_page'] = (bool) $hasNextPage;
         }
@@ -191,7 +191,7 @@ class QloHotelReviewDefaultModuleFrontController extends ModuleFrontController
 
     public function displayAjaxSortBy()
     {
-        $response = array('status' => 'ko');
+        $response = array('status' => false);
         $idHotel = (int) Tools::getValue('id_hotel');
         $sortBy = (int) Tools::getValue('sort_by');
         $reviewsPerPage = (int) Configuration::get('QHR_REVIEWS_PER_PAGE');
@@ -208,7 +208,7 @@ class QloHotelReviewDefaultModuleFrontController extends ModuleFrontController
 
         if (is_array($reviews) && count($reviews)) {
             $response['html'] = $this->renderReviews($reviews);
-            $response['status'] = 'ok';
+            $response['status'] = true;
             $response['message'] = 'HTML_OK';
             $response['has_next_page'] = (bool) $hasNextPage;
         }

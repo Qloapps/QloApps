@@ -33,7 +33,7 @@ var QhrReview = {
             dataType: 'JSON',
             headers: { 'cache-control': 'no-cache' },
             success: function(response) {
-                if (response.status == 'ok') {
+                if (response.status == true) {
                     $(btnHelpful).fadeOut('slow', function() {
                         $(btnHelpful).remove();
                     })
@@ -54,7 +54,7 @@ var QhrReview = {
             dataType: 'JSON',
             headers: { 'cache-control': 'no-cache' },
             success: function(response) {
-                if (response.status == 'ok') {
+                if (response.status == true) {
                     $(btnReportAbuse).fadeOut('slow', function() {
                         $(btnReportAbuse).remove();
                     })
@@ -76,7 +76,7 @@ var QhrReview = {
             type: 'POST',
             headers: { 'cache-control': 'no-cache' },
             success: function(response) {
-                if (response.status == 'ok' && response.message == 'HTML_OK') {
+                if (response.status == true && response.message == 'HTML_OK') {
                     $('.review-list').animate({opacity: 0}, 250, 'linear', function() {
                         $('.review-list').html(response.html);
                         initRaty(qlo_hotel_review_js_vars.raty_img_path, '.review-list .raty');
@@ -108,7 +108,7 @@ var QhrReview = {
             type: 'POST',
             headers: { 'cache-control': 'no-cache' },
             success: function(response) {
-                if (response.message == 'HTML_OK') {
+                if (response.status == true && response.message == 'HTML_OK') {
                     $('.review-list').append(response.html);
                     initRaty(qlo_hotel_review_js_vars.raty_img_path, '.review-list .raty');
 
