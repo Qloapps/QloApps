@@ -849,7 +849,7 @@ abstract class PaymentModuleCore extends Module
                     }
 
                     // delete cart feature prices after booking creation success
-                    HotelRoomTypeFeaturePricing::deleteByIdCart($cart->id);
+                    HotelRoomTypeFeaturePricing::deleteByIdCart($id_cart);
 
                     if (isset($_COOKIE['wk_id_cart'])) {
                         setcookie('wk_id_cart', ' ', time() - 86400, '/');
