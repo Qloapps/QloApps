@@ -81,6 +81,12 @@ class HotelImage extends ObjectModel
         return Db::getInstance()->executeS($sql);
     }
 
+    // for backward compatibility, use getImagesByHotelId() instead
+    public function getAllImagesByHotelId($id_hotel)
+    {
+        return $this->getImagesByHotelId($id_hotel);
+    }
+
     /**
      * [deleteByHotelId :: To delete hotel's images data of a hotel by its hotel Id]
      * @param  [int] $htl_id [Id of the hotel which images data you want to delete]

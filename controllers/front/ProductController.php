@@ -1018,7 +1018,7 @@ class ProductControllerCore extends FrontController
 
     public function displayAjaxGetHotelImages()
     {
-        $response = array('status' => 'ko');
+        $response = array('status' => false);
         $idProduct = (int) Tools::getValue('id_product');
         $page = (int) Tools::getValue('page');
         $imagesPerPage = (int) Configuration::get('PS_HOTEL_IMAGES_PER_PAGE');
@@ -1044,7 +1044,7 @@ class ProductControllerCore extends FrontController
             );
 
             $response['html'] = $html;
-            $response['status'] = 'ok';
+            $response['status'] = true;
             $response['has_next_page'] = $hasNextPage;
             $response['message'] = 'HTML_OK';
         }

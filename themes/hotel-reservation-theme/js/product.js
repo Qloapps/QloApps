@@ -1448,7 +1448,7 @@ function loadHotelImages() {
             page: 1,
         },
         success: function(response) {
-            if (response.message == 'HTML_OK') {
+            if (response.status == true && response.message == 'HTML_OK') {
                 $('#room_info_hotel_images').append(response.html);
                 $('.hotel-images-fancybox').fancybox();
             } else {
@@ -1481,7 +1481,7 @@ function loadMoreHotelImages() {
             page: page,
         },
         success: function(response) {
-            if (response.message == 'HTML_OK') {
+            if (response.status == true && response.message == 'HTML_OK') {
                 $('#room_info_hotel_images').append(response.html);
                 $('.hotel-images-fancybox').fancybox();
             }
