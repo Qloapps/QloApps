@@ -42,14 +42,14 @@
 <div class="row">
     <label class="control-label col-lg-3">{l s='Subject' mod='qlohotelreview'}</label>
     <div class="col-lg-9">
-        <p class="form-control-static">{$currentObject->subject}</p>
+        <p class="form-control-static rich-text">{$currentObject->subject}</p>
     </div>
 </div>
 
 <div class="row">
     <label class="control-label col-lg-3">{l s='Description' mod='qlohotelreview'}</label>
     <div class="col-lg-9">
-        <p class="form-control-static">{$currentObject->description}</p>
+        <p class="form-control-static rich-text">{$currentObject->description}</p>
     </div>
 </div>
 
