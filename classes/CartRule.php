@@ -1022,16 +1022,18 @@ class CartRuleCore extends ObjectModel
                 }
 
                 $reduction_amount = $this->reduction_amount;
-                if ($this->reduction_product && $restricted_product) {
-                    $prorata = 1; // do not split this cart rule
-                    if ($this->reduction_tax) {
-                        $max_reduction_amount = (int)$restricted_product['cart_quantity'] * (float)$restricted_product['price_wt'];
+                if ($this->reduction_product) {
+                    if ($restricted_product) {
+                        $prorata = 1; // do not split this cart rule
+                        if ($this->reduction_tax) {
+                            $max_reduction_amount = (int)$restricted_product['cart_quantity'] * (float)$restricted_product['price_wt'];
+                        } else {
+                            $max_reduction_amount = (int)$restricted_product['cart_quantity'] * (float)$restricted_product['price'];
+                        }
+                        $reduction_amount = min($reduction_amount, $max_reduction_amount);
                     } else {
-                        $max_reduction_amount = (int)$restricted_product['cart_quantity'] * (float)$restricted_product['price'];
+                        $reduction_amount = 0;
                     }
-                    $reduction_amount = min($reduction_amount, $max_reduction_amount);
-                } else {
-                    $reduction_amount = 0;
                 }
 
                 // If we need to convert the voucher value to the cart currency
