@@ -61,6 +61,7 @@
   <tab id="Tax_Rules" name="Btw-regels"/>
   <tab id="Translations" name="Vertalingen"/>
   <tab id="Modules_1" name="Modules en Services"/>
+  <tab id="Modules_Catalog" name="Modules Catalog"/>
   <tab id="Modules_Themes_Catalog" name="Module- &amp; themacatologus"/>
   <tab id="Positions" name="Posities"/>
   <tab id="Payment" name="Betaling"/>

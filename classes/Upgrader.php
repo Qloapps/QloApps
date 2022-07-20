@@ -27,6 +27,10 @@
 class UpgraderCore
 {
     const DEFAULT_CHECK_VERSION_DELAY_HOURS = 24;
+
+    // @todo find correct class to declare upgrade_info for header
+    const CACHE_FILE_UPGRADE_AVAILABE = '/config/xml/upgrade_available.xml';
+
     public $rss_version_link;
     public $rss_md5file_link_dir;
     /**

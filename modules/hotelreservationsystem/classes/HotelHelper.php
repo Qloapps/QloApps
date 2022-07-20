@@ -719,7 +719,7 @@ class HotelHelper
         $modules = array();
         if (is_object($qloNativeMods)) {
             foreach ($qloNativeMods as $qloNativeModsType) {
-                if (in_array($qloNativeModsType['type'], array('native'))) {
+                if (in_array($qloNativeModsType['type'], array('native', 'disk'))) {
                     foreach ($qloNativeModsType->module as $module) {
                         $modules[] = $module['name'];
                     }
