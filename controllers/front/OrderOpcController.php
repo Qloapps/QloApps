@@ -496,7 +496,7 @@ class OrderOpcControllerCore extends ParentOrderController
             $objCartBookingData = new HotelCartBookingData();
             if ($cart_data_dlt = $objCartBookingData->deleteRoomDataFromOrderLine(
                 $this->context->cart->id,
-                $this->context->cart->id_guest,
+                $this->context->cookie->id_guest,
                 $id_product,
                 $date_from,
                 $date_to

@@ -12,7 +12,7 @@ class BlockcartCheckRoomAvailabilityAjaxProcessModuleFrontController extends Mod
         $dateTo = Tools::getValue('date_to');
         $idProduct = Tools::getValue('id_product');
         $idCart = $this->context->cart->id;
-        $idGuest = $this->context->cart->id_guest;
+        $idGuest = $this->context->cookie->id_guest;
 
         if (Module::isInstalled('hotelreservationsystem')) {
             require_once (_PS_MODULE_DIR_.'hotelreservationsystem/define.php');

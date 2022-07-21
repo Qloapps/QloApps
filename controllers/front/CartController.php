@@ -268,7 +268,7 @@ class CartControllerCore extends FrontController
         $date_from = date("Y-m-d", strtotime($date_from));
         $date_to = date("Y-m-d", strtotime($date_to));
         $id_cart = $this->context->cart->id;
-        $id_guest = $this->context->cart->id_guest;
+        $id_guest = $this->context->cookie->id_guest;
 
 
 
@@ -427,7 +427,7 @@ class CartControllerCore extends FrontController
                                 $roomDemand = json_encode($roomDemand);
                                 $obj_htl_cart_booking_data = new HotelCartBookingData();
                                 $obj_htl_cart_booking_data->id_cart = $this->context->cart->id;
-                                $obj_htl_cart_booking_data->id_guest = $this->context->cart->id_guest;
+                                $obj_htl_cart_booking_data->id_guest = $this->context->cookie->id_guest;
                                 $obj_htl_cart_booking_data->id_customer = $id_customer;
                                 $obj_htl_cart_booking_data->id_currency = $id_currency;
                                 $obj_htl_cart_booking_data->id_product = $val_hotel_room_info['id_product'];

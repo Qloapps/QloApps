@@ -703,7 +703,7 @@ abstract class PaymentModuleCore extends Module
                     foreach ($order->product_list as $product) {
                         $objCartBookingData = new HotelCartBookingData();
                         $idProduct = $product['id_product'];
-                        $cartBookingData = $objCartBookingData->getOnlyCartBookingData($this->context->cart->id, $this->context->cart->id_guest, $idProduct);
+                        $cartBookingData = $objCartBookingData->getOnlyCartBookingData($this->context->cart->id, $this->context->cookie->id_guest, $idProduct);
                         if ($cartBookingData) {
                             foreach ($cartBookingData as $bookingInfo) {
                                 $objCartBookingData = new HotelCartBookingData($bookingInfo['id']);
@@ -752,11 +752,11 @@ abstract class PaymentModuleCore extends Module
                                     $objBookingDetail->check_in_time = $objHotelBranch->check_in;
                                     $objBookingDetail->check_out_time = $objHotelBranch->check_out;
                                     if ($hotelAddress = $objHotelBranch->getAddress($objCartBkData->id_hotel)) {
-                                        $objHtlBkDtl->city = $hotelAddress['city'];
-                                        $objHtlBkDtl->state = $hotelAddress['state'];
-                                        $objHtlBkDtl->country = $hotelAddress['country'];
-                                        $objHtlBkDtl->zipcode = $hotelAddress['postcode'];
-                                        $objHtlBkDtl->phone = $hotelAddress['phone'];
+                                        $objBookingDetail->city = $hotelAddress['city'];
+                                        $objBookingDetail->state = $hotelAddress['state'];
+                                        $objBookingDetail->country = $hotelAddress['country'];
+                                        $objBookingDetail->zipcode = $hotelAddress['postcode'];
+                                        $objBookingDetail->phone = $hotelAddress['phone'];
                                     }
                                 }
                                 if ($roomTypeInfo = $objRoomType->getRoomTypeInfoByIdProduct($idProduct)) {

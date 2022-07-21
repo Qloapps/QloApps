@@ -2176,7 +2176,7 @@ class AdminOrdersControllerCore extends AdminController
         $obj_cart_bk_data = new HotelCartBookingData();
         if ($cart_bk_data = $obj_cart_bk_data->getOnlyCartBookingData(
             $this->context->cart->id,
-            $this->context->cart->id_guest,
+            $this->context->cookie->id_guest,
             $idProduct
         )) {
             foreach ($cart_bk_data as $cb_k => $cb_v) {

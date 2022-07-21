@@ -945,7 +945,7 @@ class ProductControllerCore extends FrontController
                         0,
                         0,
                         $this->context->cart->id,
-                        $this->context->cart->id_guest
+                        $this->context->cookie->id_guest
                     )) {
                         $totalAvailRooms = $hotelRoomData['stats']['num_avail'];
                         if ($totalAvailRooms >= $quantity) {

@@ -700,6 +700,15 @@ class HotelCartBookingData extends ObjectModel
         return false;
     }
 
+    public static function updateIdGuestByIdCart($id_cart, $id_guest)
+    {
+        return Db::getInstance()->update(
+            'htl_cart_booking_data',
+            array('id_guest' => (int) $id_guest),
+            '`id_cart` = '.(int) $id_cart
+        );
+    }
+
     /**
      * [deleteRoomFromOrder : Deletes a row from the table with the supplied conditions].
      *
@@ -893,13 +902,13 @@ class HotelCartBookingData extends ObjectModel
                         if (isset($context->customer->id)) {
                             $cartBookingDetails = $objCartBooking->getOnlyCartBookingData(
                                 $context->cart->id,
-                                $context->cart->id_guest,
+                                $context->cookie->id_guest,
                                 $product['id_product']
                             );
                         } else {
                             $cartBookingDetails = $objCartBooking->getOnlyCartBookingData(
                                 $context->cart->id,
-                                $context->cart->id_guest,
+                                $context->cookie->id_guest,
                                 $product['id_product']
                             );
                         }

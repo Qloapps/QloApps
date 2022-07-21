@@ -90,7 +90,7 @@ class HotelOrderRestrictDate extends ObjectModel
 
                 if ($cart_bk_data = $objCartBookingData->getOnlyCartBookingData(
                     $context->cart->id,
-                    $context->cart->id_guest,
+                    $context->cookie->id_guest,
                     $product['id_product']
                 )) {
                     $cart_data = array();

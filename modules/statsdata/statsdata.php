@@ -54,9 +54,7 @@ class StatsData extends Module
             $hookFooter = 'footer';
         }
         return (parent::install()
-            && $this->registerHook($hookFooter)
-            && $this->registerHook('authentication')
-            && $this->registerHook('createAccount'));
+            && $this->registerHook($hookFooter));
     }
 
     public function getContent()
@@ -172,32 +170,6 @@ class StatsData extends Module
         }
 
         return '';
-    }
-
-    public function hookCreateAccount($params)
-    {
-        return $this->hookAuthentication($params);
-    }
-
-    public function hookAuthentication($params)
-    {
-        // Update or merge the guest with the customer id (login and account creation)
-        $guest = new Guest($params['cookie']->id_guest);
-        $result = Db::getInstance()->getRow('
-		SELECT `id_guest`
-		FROM `'._DB_PREFIX_.'guest`
-		WHERE `id_customer` = '.(int)$params['cookie']->id_customer);
-
-        if ((int)$result['id_guest']) {
-            // The new guest is merged with the old one when it's connecting to an account
-            $guest->mergeWithCustomer($result['id_guest'], $params['cookie']->id_customer);
-            $params['cookie']->id_guest = $guest->id;
-        } else {
-            // The guest is duplicated if it has multiple customer accounts
-            $method = ($guest->id_customer) ? 'add' : 'update';
-            $guest->id_customer = $params['cookie']->id_customer;
-            $guest->{$method}();
-        }
     }
 
     public function renderForm()

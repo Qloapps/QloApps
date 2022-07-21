@@ -77,7 +77,7 @@ class hotelreservationsystem extends Module
             $htlCart = new HotelCartBookingData();
             if ($cartBookingData = $htlCart->getCartBookingDetailsByIdCartIdGuest(
                 $this->context->cart->id,
-                $this->context->cart->id_guest,
+                $this->context->cookie->id_guest,
                 $this->context->language->id
             )) {
                 foreach ($cartBookingData as $cartRoom) {
@@ -514,9 +514,52 @@ class hotelreservationsystem extends Module
                 'actionObjectProfileAddAfter',
                 'actionObjectProfileDeleteBefore',
                 'actionObjectGroupDeleteBefore',
-                'actionOrderStatusPostUpdate'
+                'actionOrderStatusPostUpdate',
+                'actionAuthentication',
+                'actionCustomerAccountAdd',
+                'actionCartSave',
             )
         );
+    }
+
+    public function hookActionAuthentication($params)
+    {
+        $this->manageIdGuest($params);
+    }
+
+    public function hookActionCustomerAccountAdd($params)
+    {
+        $this->manageIdGuest($params);
+    }
+
+    public function hookActionCartSave()
+    {
+        HotelCartBookingData::updateIdGuestByIdCart($this->context->cart->id, $this->context->cookie->id_guest);
+    }
+
+    public function manageIdGuest($params)
+    {
+        // update or merge id_guest with id_customer during login and account creation
+        $objGuest = new Guest($params['cookie']->id_guest);
+        $result = Db::getInstance()->getRow(
+            'SELECT `id_guest`
+            FROM `'._DB_PREFIX_.'guest`
+            WHERE `id_customer` = '.(int) $params['cookie']->id_customer
+        );
+
+        if ((int) $result['id_guest']) {
+            // new id_guest is merged with the old one when its connecting to an account
+            $objGuest->mergeWithCustomer($result['id_guest'], $params['cookie']->id_customer);
+            $params['cookie']->id_guest = $objGuest->id;
+        } else {
+            // id_guest is duplicated if it has multiple customer accounts
+            $method = ($objGuest->id_customer) ? 'add' : 'update';
+            $objGuest->id_customer = $params['cookie']->id_customer;
+            $objGuest->$method();
+        }
+
+        $params['cart']->id_guest = $params['cookie']->id_guest;
+        $params['cart']->save();
     }
 
     public function uninstallTab()
