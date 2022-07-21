@@ -249,10 +249,7 @@ class FrontControllerCore extends Controller
         $this->context->smarty->assign(Meta::getMetaTags($this->context->language->id, $page_name));
         $this->context->smarty->assign('request_uri', Tools::safeOutput(urldecode($_SERVER['REQUEST_URI'])));
 
-        // Init cookie language
-        // @TODO This method must be moved into switchLanguage
         Tools::setCookieLanguage($this->context->cookie);
-
         $this->displayMaintenancePage();
         // If current URL use SSL, set it true (used a lot for module redirect)
         if (Tools::usingSecureMode()) {
@@ -276,6 +273,9 @@ class FrontControllerCore extends Controller
             unset($this->context->cookie->account_created);
         }
         ob_start();
+
+        // Init cookie language
+        // @TODO This method must be moved into switchLanguage
 
         $protocol_link = (Configuration::get('PS_SSL_ENABLED') || Tools::usingSecureMode()) ? 'https://' : 'http://';
         $useSSL = ((isset($this->ssl) && $this->ssl && Configuration::get('PS_SSL_ENABLED')) || Tools::usingSecureMode()) ? true : false;
@@ -750,7 +750,7 @@ class FrontControllerCore extends Controller
      */
     protected function displayMaintenancePage()
     {
-        if (isset(Context::getContext()->cookie->remote_addr) 
+        if (isset(Context::getContext()->cookie->remote_addr)
             && Context::getContext()->cookie->remote_addr != ip2long(Tools::getRemoteAddr())
         ) {
             $cookie = Context::getContext()->cookie;
@@ -761,7 +761,7 @@ class FrontControllerCore extends Controller
             }
         }
 
-        if (Tools::isSubmit('SubmitLogin') 
+        if (Tools::isSubmit('SubmitLogin')
             && Configuration::get('PS_ALLOW_EMP')
             && !Context::getContext()->cookie->enable_maintenance_view
         ) {
@@ -769,7 +769,7 @@ class FrontControllerCore extends Controller
             $passwd = trim(Tools::getValue('passwd'));
             $this->processLogin($email, $passwd);
         }
-        
+
         if (!Context::getContext()->cookie->enable_maintenance_view || !Configuration::get('PS_ALLOW_EMP')) {
             Context::getContext()->cookie->__unset('enable_maintenance_view');
             Context::getContext()->cookie->write();
@@ -777,7 +777,7 @@ class FrontControllerCore extends Controller
                 $this->maintenance = true;
                 if (!in_array(Tools::getRemoteAddr(), explode(',', Configuration::get('PS_MAINTENANCE_IP')))) {
                     header('HTTP/1.1 503 temporarily overloaded');
-    
+
                     $this->context->smarty->assign($this->initLogoAndFavicon());
                     $this->context->smarty->assign(array(
                         'HOOK_MAINTENANCE' => Hook::exec('displayMaintenance', array()),
@@ -796,6 +796,8 @@ class FrontControllerCore extends Controller
     protected function processLogin($email, $passwd)
     {
         $result = false;
+        $objLoginFail = new LoginFail;
+
         /* Check fields validity */
         if (empty($email)) {
             $this->errors[] = Tools::displayError('Email is empty.');
@@ -807,6 +809,10 @@ class FrontControllerCore extends Controller
             $this->errors[] = Tools::displayError('The password field is blank.');
         } elseif (!Validate::isPasswd($passwd)) {
             $this->errors[] = Tools::displayError('Invalid password.');
+        }
+
+        if ($objLoginFail->checkLimit($email)) {
+            $this->errors[] =Tools::displayError('You have exceeded the limit of login attempts, please try after some time');
         }
 
         if (!count($this->errors)) {
@@ -829,6 +835,10 @@ class FrontControllerCore extends Controller
             }
             if (count($this->errors)) {
                 $this->context->smarty->assign('errors', $this->errors);
+                $objLoginFail->email = $email;
+                $objLoginFail->ip_address = Tools::getRemoteAddr();
+                $objLoginFail->save();
+                $objLoginFail->cleanData();
             } else {
                 Tools::redirect('index.php');
             }
