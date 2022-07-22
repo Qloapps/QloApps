@@ -54,7 +54,7 @@
 		</a>
 	</td>
 	<td class="text-center">
-		<span class="booking_duration_show">{$data.date_from|date_format:"%d-%m-%Y"}&nbsp-&nbsp {$data.date_to|date_format:"%d-%m-%Y"}</span>
+		<span class="booking_duration_show">{dateFormat date=$data.date_from full=0} - {dateFormat date=$data.date_to full=0}</span>
 
 		{if $can_edit}
 			<div class="booking_duration_edit" style="display:none;">
