@@ -43,17 +43,18 @@ class AdminCartsControllerCore extends AdminController
         $this->_orderWay = 'DESC';
         $this->context = Context::getContext();
 
-        $this->_select = 'CONCAT(LEFT(c.`firstname`, 1), \'. \', c.`lastname`) `customer`, a.id_cart total,
-		IF (IFNULL(o.id_order, \''.$this->l('Non ordered').'\') = \''.$this->l('Non ordered').'\', IF(TIME_TO_SEC(TIMEDIFF(\''.pSQL(date('Y-m-d H:i:00', time())).'\', a.`date_add`)) > 86400, \''.$this->l('Abandoned cart').'\', \''.$this->l('Non ordered').'\'), o.id_order) AS status, IF(o.id_order, 1, 0) badge_success, IF(o.id_order, 0, 1) badge_danger, IF(co.id_guest, 1, 0) id_guest';
+        $this->_select = 'CONCAT(c.`firstname`, \' \', c.`lastname`) `customer`, a.id_cart total,
+        TIME_TO_SEC(TIMEDIFF(\''.pSQL(date('Y-m-d H:i:00', time())).'\', a.`date_add`)) AS `time_diff`,
+        IFNULL(GROUP_CONCAT(o.`id_order`), 0) AS `ids_order`,
+		IF(o.id_order, 1, 0) badge_success, IF(o.id_order, 0, 1) badge_danger, IF(co.id_guest, 1, 0) id_guest';
         $this->_join = 'LEFT JOIN '._DB_PREFIX_.'customer c ON (c.id_customer = a.id_customer)
 		LEFT JOIN '._DB_PREFIX_.'currency cu ON (cu.id_currency = a.id_currency)
 		LEFT JOIN '._DB_PREFIX_.'orders o ON (o.id_cart = a.id_cart)
 		LEFT JOIN `'._DB_PREFIX_.'connections` co ON (a.id_guest = co.id_guest AND TIME_TO_SEC(TIMEDIFF(\''.pSQL(date('Y-m-d H:i:00', time())).'\', co.`date_add`)) < 1800)';
+        $this->_group = ' GROUP BY a.`id_cart`';
 
-        if (Tools::getValue('action') && Tools::getValue('action') == 'filterOnlyAbandonedCarts') {
-            $this->_having = 'status = \''.$this->l('Abandoned cart').'\'';
-        } else {
-            $this->_use_found_rows = false;
+        if (Tools::getValue('action') == 'filterAbandonedCarts') {
+            $this->_filterHaving = ' AND `ids_order` = 0 AND `time_diff` > 86400';
         }
 
         $this->fields_list = array(
@@ -62,11 +63,12 @@ class AdminCartsControllerCore extends AdminController
                 'align' => 'text-center',
                 'class' => 'fixed-width-xs'
             ),
-            'status' => array(
+            'ids_order' => array(
                 'title' => $this->l('Order ID'),
                 'align' => 'text-center',
-                'badge_danger' => true,
-                'havingFilter' => true
+                'havingFilter' => true,
+                'filter_key' => 'ids_order',
+                'callback' => 'getOrderColumn',
             ),
             'customer' => array(
                 'title' => $this->l('Customer'),
@@ -114,6 +116,29 @@ class AdminCartsControllerCore extends AdminController
         }
 
         parent::__construct();
+
+        $this->list_no_link = true;
+    }
+
+    public function getOrderColumn($idsOrder, $tr)
+    {
+        $smartyVars = array();
+        if ($idsOrder) {
+            $idsOrder = explode(',', $idsOrder);
+            $smartyVars['type'] = 'orders';
+            $smartyVars['ids_order'] = $idsOrder;
+        } else {
+            if ($tr['time_diff'] > 86400) {
+                $smartyVars['type'] = 'abandoned';
+            } else {
+                $smartyVars['type'] = 'non_orderd';
+            }
+        }
+
+        $tpl = $this->createTemplate('_orders.tpl');
+        $tpl->assign($smartyVars);
+
+        return $tpl->fetch();
     }
 
     public function initPageHeaderToolbar()
@@ -160,7 +185,7 @@ class AdminCartsControllerCore extends AdminController
         $date_from = date(Context::getContext()->language->date_format_lite, strtotime('-2 day'));
         $date_to = date(Context::getContext()->language->date_format_lite, strtotime('-1 day'));
         $helper->subtitle = sprintf($this->l('From %s to %s', null, null, false), $date_from, $date_to);
-        $helper->href = $this->context->link->getAdminLink('AdminCarts').'&action=filterOnlyAbandonedCarts';
+        $helper->href = $this->context->link->getAdminLink('AdminCarts').'&action=filterAbandonedCarts';
         if (ConfigurationKPI::get('ABANDONED_CARTS') !== false) {
             $helper->value = ConfigurationKPI::get('ABANDONED_CARTS');
         }
@@ -225,10 +250,10 @@ class AdminCartsControllerCore extends AdminController
             if (Validate::isLoadedObject($objOrder)) {
                 $tax_calculation_method = $objOrder->getTaxCalculationMethod();
                 $id_shop = (int)$objOrder->id_shop;
-            } else {
-                $id_shop = (int)$cart->id_shop;
-                $tax_calculation_method = Group::getPriceDisplayMethod(Group::getCurrent()->id);
             }
+        } else {
+            $id_shop = (int)$cart->id_shop;
+            $tax_calculation_method = Group::getPriceDisplayMethod(Group::getCurrent()->id);
         }
 
         if ($tax_calculation_method == PS_TAX_EXC) {
@@ -959,7 +984,7 @@ class AdminCartsControllerCore extends AdminController
         $skip_list = array();
 
         foreach ($this->_list as $row) {
-            if (isset($row['id_order']) && is_numeric($row['id_order'])) {
+            if (isset($row['ids_order']) && $row['ids_order'] != '0') {
                 $skip_list[] = $row['id_cart'];
             }
         }

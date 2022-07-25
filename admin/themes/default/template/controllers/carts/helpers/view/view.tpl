@@ -59,13 +59,13 @@
 					</div>
 				</div>
 			{else}
-				<h2>{l s='Guest not registered'}</h2>
+				<h2>{l s='Guest not registered.'}</h2>
 			{/if}
 		</div>
 	</div>
 	<div class="col-lg-6">
 		<div class="panel">
-			<h3><i class="icon-shopping-cart"></i> {l s='Order information'}</h3>
+			<h3><i class="icon-shopping-cart"></i> {l s='Order(s) Information'}</h3>
 			{if is_array($cart_orders) && count($cart_orders)}
 				{foreach from=$cart_orders item=$cart_order}
 					<h2><a href="{$link->getAdminLink('AdminOrders')|escape:'html':'UTF-8'}&amp;id_order={$cart_order.id_order|intval}&amp;vieworder"> {l s='Order #%d' sprintf=$cart_order.id_order|string_format:"%06d"}</a></h2>
