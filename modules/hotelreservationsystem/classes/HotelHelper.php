@@ -705,33 +705,6 @@ class HotelHelper
         return $startUrl;
     }
 
-    public static function getQloNativeModules()
-    {
-        $qloModXml = _PS_ROOT_DIR_.'/config/xml/qlo_mod_list.xml';
-        if (!file_exists($qloModXml)) {
-            return false;
-        }
-        $qloNativeMods = @simplexml_load_file($qloModXml);
-
-        if ($qloNativeMods) {
-            $qloNativeMods = $qloNativeMods->modules;
-        }
-        $modules = array();
-        if (is_object($qloNativeMods)) {
-            foreach ($qloNativeMods as $qloNativeModsType) {
-                if (in_array($qloNativeModsType['type'], array('native'))) {
-                    foreach ($qloNativeModsType->module as $module) {
-                        $modules[] = $module['name'];
-                    }
-                }
-            }
-        }
-        if ($modules) {
-            return $modules;
-        }
-        return false;
-    }
-
     // update lang values of Configuration lang type keys when importing new language from localization
     public static function updateConfigurationLangKeys($idNewLang, $langKeys)
     {
