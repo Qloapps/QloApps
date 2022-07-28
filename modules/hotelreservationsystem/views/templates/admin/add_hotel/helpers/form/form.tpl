@@ -44,7 +44,7 @@
 						</li>
 					{/foreach}
 				</ul>
-				<p class="help-block">{l s='Change language for updating information in multiple language.' mod='hotelreservationsystem'}</p>
+				<p class="help-block">{l s='Change language here to update information in multiple languages.' mod='hotelreservationsystem'}</p>
 				<hr>
 			</div>
 		{/if}
@@ -343,7 +343,7 @@
 						</div>
 					{else}
 						<div class="alert alert-warning">
-							{l s='Please save the hotel information before saving the hotel images.' mod='hotelreservationsystem'}
+							{l s='Please save hotel information before saving hotel images.' mod='hotelreservationsystem'}
 						</div>
 					{/if}
 				</div>
@@ -429,7 +429,7 @@
 						</div>
 					{else}
 						<div class="alert alert-warning">
-							{l s='Please save the hotel information before saving the hotel images.' mod='hotelreservationsystem'}
+							{l s='Please save hotel information before saving refund policy options.' mod='hotelreservationsystem'}
 						</div>
 					{/if}
 				</div>
