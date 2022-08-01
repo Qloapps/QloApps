@@ -1,8 +1,8 @@
 <?xml version='1.0'?>
 <entity_order_state>
-  <order_state id='Awaiting_cheque_payment'>
-    <name>In afwachting van betaling per cheque</name>
-    <template>cheque</template>
+  <order_state id='Awaiting'>
+    <name>In afwachting van betaling</name>
+    <template>awating</template>
   </order_state>
   <order_state id='Payment_accepted'>
     <name>Betaling aanvaard</name>
@@ -24,22 +24,6 @@
     <name>Betalingsfout</name>
     <template>payment_error</template>
   </order_state>
-  <order_state id="On_backorder_paid">
-    <name>On backorder (paid)</name>
-    <template>outofstock</template>
-  </order_state>
-  <order_state id="On_backorder_unpaid">
-    <name>On backorder (not paid)</name>
-    <template>outofstock</template>
-  </order_state>
-  <order_state id='Awaiting_bank_wire_payment'>
-    <name>In afwachting van bankoverschrijving</name>
-    <template>bankwire</template>
-  </order_state>
-  <order_state id='Awaiting_PayPal_payment'>
-    <name>In afwachting van betaling via PayPal</name>
-    <template/>
-  </order_state>
   <order_state id='Payment_remotely_accepted'>
     <name>Betaling op afstand aanvaard</name>
     <template>payment</template>
@@ -48,12 +32,16 @@
     <name>Awaiting remote payment</name>
     <template/>
   </order_state>
-  <order_state id="Awaiting_partial_payment">
-    <name>Awaiting partial payment</name>
+  <order_state id="Overbooking">
+    <name>Over Booking</name>
+    <template/>
+  </order_state>
+  <order_state id="Overbooking_unpaid">
+    <name>Over Booking (not paid)</name>
     <template/>
   </order_state>
   <order_state id="Partial_payment_accepted">
     <name>Partial payment accepted</name>
-    <template/>
+    <template>payment</template>
   </order_state>
 </entity_order_state>

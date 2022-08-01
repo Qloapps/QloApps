@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <entity_order_state>
-  <order_state id="Awaiting_cheque_payment">
-    <name>等待支票付款</name>
-    <template>cheque</template>
+  <order_state id="Awaiting">
+    <name>等待付款</name>
+    <template>awating</template>
   </order_state>
   <order_state id="Payment_accepted">
     <name>付款完成</name>
@@ -24,22 +24,6 @@
     <name>付款錯誤</name>
     <template>payment_error</template>
   </order_state>
-  <order_state id="On_backorder_paid">
-    <name>預約訂購</name>
-    <template>outofstock</template>
-  </order_state>
-  <order_state id="On_backorder_unpaid">
-    <name>預約訂購</name>
-    <template>outofstock</template>
-  </order_state>
-  <order_state id="Awaiting_bank_wire_payment">
-    <name>等待銀行匯款</name>
-    <template>bankwire</template>
-  </order_state>
-  <order_state id="Awaiting_PayPal_payment">
-    <name>等待 PayPal 付款</name>
-    <template/>
-  </order_state>
   <order_state id="Payment_remotely_accepted">
     <name>遠端付款完成</name>
     <template>payment</template>
@@ -48,12 +32,17 @@
     <name>Awaiting remote payment</name>
     <template/>
   </order_state>
-  <order_state id="Awaiting_partial_payment">
-    <name>Awaiting partial payment</name>
+  <order_state id="Overbooking">
+    <name>Over Booking</name>
+    <template/>
+  </order_state>
+  <order_state id="Overbooking_unpaid">
+    <name>Over Booking (not paid)</name>
     <template/>
   </order_state>
   <order_state id="Partial_payment_accepted">
     <name>Partial payment accepted</name>
-    <template/>
+    <template>payment</template>
   </order_state>
+
 </entity_order_state>

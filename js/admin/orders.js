@@ -539,7 +539,7 @@ function init()
 					error : function(XMLHttpRequest, textStatus, errorThrown) {
 						jAlert("Impossible to add the room to the cart.\n\ntextStatus: '" + textStatus + "'\nerrorThrown: '" + errorThrown + "'\nresponseText:\n" + XMLHttpRequest.responseText);
 					},
-					complete: function() { 
+					complete: function() {
 						$('#submitAddProduct').removeAttr('disabled');
 					}
 				});
@@ -891,6 +891,17 @@ function init()
 		else
 			$(this).parent().parent().next('tr').show();
 		e.preventDefault();
+	});
+
+	$('#add_new_payment').on('click', function(e) {
+		$('#formAddPayment').show();
+		$(this).hide();
+	});
+
+	$('#cancle_add_payment').on('click', function(e) {
+		e.preventDefault();
+		$('#add_new_payment').show();
+		$('#formAddPayment').hide();
 	});
 
 	/*By webkul Code for the datepicker*/

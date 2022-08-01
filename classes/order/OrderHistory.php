@@ -312,7 +312,7 @@ class OrderHistoryCore extends ObjectModel
         }
 
         // set orders as paid
-        if ($new_os->paid == 1) {
+        if ($new_os->paid == 1 || (Configuration::get('PS_OS_PARTIAL_PAYMENT') == $new_os->id && $new_os->logable == 1)) {
             $invoices = $order->getInvoicesCollection();
             if ($order->total_paid != 0) {
                 $payment_method = Module::getInstanceByName($order->module);
@@ -322,10 +322,16 @@ class OrderHistoryCore extends ObjectModel
                 /** @var OrderInvoice $invoice */
                 $rest_paid = $invoice->getRestPaid();
                 if ($rest_paid > 0) {
+                    if (Configuration::get('PS_OS_PARTIAL_PAYMENT') == $new_os->id
+                        && $order->total_paid_real < $order->advance_paid_amount
+                    ) {
+                        $rest_paid =  $order->advance_paid_amount - $order->total_paid_real;
+                    }
                     $payment = new OrderPayment();
                     $payment->order_reference = Tools::substr($order->reference, 0, 9);
                     $payment->id_currency = $order->id_currency;
                     $payment->amount = $rest_paid;
+                    $payment->payment_type = $order->payment_type;
 
                     if ($order->total_paid != 0) {
                         $payment->payment_method = $payment_method->displayName;
@@ -410,7 +416,7 @@ class OrderHistoryCore extends ObjectModel
     public function sendEmail($order, $template_vars = false)
     {
         $result = Db::getInstance()->getRow('
-			SELECT osl.`template`, c.`lastname`, c.`firstname`, osl.`name` AS osname, c.`email`, os.`module_name`, os.`id_order_state`, os.`pdf_invoice`, os.`pdf_delivery`
+			SELECT osl.`template`, c.`lastname`, c.`firstname`, osl.`name` AS osname, c.`email`, o.`module` as `module_name`, os.`id_order_state`, os.`pdf_invoice`, os.`pdf_delivery`
 			FROM `'._DB_PREFIX_.'order_history` oh
 				LEFT JOIN `'._DB_PREFIX_.'orders` o ON oh.`id_order` = o.`id_order`
 				LEFT JOIN `'._DB_PREFIX_.'customer` c ON o.`id_customer` = c.`id_customer`
@@ -425,13 +431,17 @@ class OrderHistoryCore extends ObjectModel
                 '{lastname}' => $result['lastname'],
                 '{firstname}' => $result['firstname'],
                 '{id_order}' => (int)$this->id_order,
-                '{order_name}' => $order->getUniqReference()
+                '{order_name}' => $order->getUniqReference(),
+                '{payment_module_detail_html}' => '',
+                '{payment_module_detail_text}' => '',
+                '{payment_method}' => '',
             );
 
             if ($result['module_name']) {
                 $module = Module::getInstanceByName($result['module_name']);
-                if (Validate::isLoadedObject($module) && isset($module->extra_mail_vars) && is_array($module->extra_mail_vars)) {
-                    $data = array_merge($data, $module->extra_mail_vars);
+                if (Validate::isLoadedObject($module) && method_exists($module, 'getMailContent')) {
+                    $data = array_merge($data, $module->getMailContent($result['id_order_state'], $order->id_lang));
+                    $data['{payment_method}'] = $module->displayName;
                 }
             }
 

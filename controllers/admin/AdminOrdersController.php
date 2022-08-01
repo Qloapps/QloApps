@@ -159,7 +159,7 @@ class AdminOrdersControllerCore extends AdminController
                 'remove_onclick' => true
             )
         ));
-        
+
         $this->shopLinkType = 'shop';
         $this->shopShareDatas = Shop::SHARE_ORDER;
 
@@ -232,8 +232,7 @@ class AdminOrdersControllerCore extends AdminController
         $this->addJqueryPlugin(array('autocomplete', 'fancybox', 'typewatch'));
 
         $defaults_order_state = array(
-            'cheque' => (int)Configuration::get('PS_OS_CHEQUE'),
-            'bankwire' => (int)Configuration::get('PS_OS_BANKWIRE'),
+            'awating' => (int)Configuration::get('PS_OS_AWATING'),
             'other' => (int)Configuration::get('PS_OS_PAYMENT'));
         $payment_modules = array();
         foreach (PaymentModule::getInstalledPaymentModules() as $p_module) {
@@ -321,7 +320,7 @@ class AdminOrdersControllerCore extends AdminController
 
         $this->addJqueryUI('ui.datepicker');
         $this->addJS(_PS_JS_DIR_.'vendor/d3.v3.min.js');
-        
+
         if ($this->tabAccess['edit'] == 1 && $this->display == 'view') {
             $this->addJS(_PS_JS_DIR_.'admin/orders.js');
             $this->addJS(_PS_JS_DIR_.'tools.js');
@@ -780,6 +779,7 @@ class AdminOrdersControllerCore extends AdminController
             if ($this->tabAccess['edit'] === '1') {
                 $amount = str_replace(',', '.', Tools::getValue('payment_amount'));
                 $currency = new Currency(Tools::getValue('payment_currency'));
+                $payment_type = Tools::getValue('payment_type');
                 $order_has_invoice = $order->hasInvoice();
                 if ($order_has_invoice) {
                     $order_invoice = new OrderInvoice(Tools::getValue('payment_invoice'));
@@ -801,8 +801,18 @@ class AdminOrdersControllerCore extends AdminController
                     $this->errors[] = Tools::displayError('The invoice is invalid.');
                 } elseif (!Validate::isDate(Tools::getValue('payment_date'))) {
                     $this->errors[] = Tools::displayError('The date is invalid');
+                } elseif (!Validate::isUnsignedId($payment_type)) {
+                    $this->errors[] = Tools::displayError('Payment source is invalid');
                 } else {
-                    if (!$order->addOrderPayment($amount, Tools::getValue('payment_method'), Tools::getValue('payment_transaction_id'), $currency, Tools::getValue('payment_date'), $order_invoice)) {
+                    if (!$order->addOrderPayment(
+                        $amount,
+                        Tools::getValue('payment_method'),
+                        $payment_type,
+                        Tools::getValue('payment_transaction_id'),
+                        $currency,
+                        Tools::getValue('payment_date'),
+                        $order_invoice
+                    )) {
                         $this->errors[] = Tools::displayError('An error occurred during payment.');
                     } else {
                         Tools::redirectAdmin(self::$currentIndex.'&id_order='.$order->id.'&vieworder&conf=4&token='.$this->token);
@@ -1568,6 +1578,7 @@ class AdminOrdersControllerCore extends AdminController
             'invoices_collection' => $order->getInvoicesCollection(),
             'not_paid_invoices_collection' => $order->getNotPaidInvoicesCollection(),
             'payment_methods' => $payment_methods,
+            'payment_types' => $this->getPaymentsTypes(),
             'invoice_management_active' => Configuration::get('PS_INVOICE', null, null, $order->id_shop),
             'display_warehouse' => (int)Configuration::get('PS_ADVANCED_STOCK_MANAGEMENT'),
             'HOOK_CONTENT_ORDER' => Hook::exec(
@@ -2320,7 +2331,7 @@ class AdminOrdersControllerCore extends AdminController
         $product_quantity = (int) $obj_booking_detail->getNumberOfDays($new_date_from, $new_date_to);
         $old_product_quantity =  (int) $obj_booking_detail->getNumberOfDays($old_date_from, $old_date_to);
         $qty_diff = $product_quantity - $old_product_quantity;
-        
+
         /*By webkul to validate fields before deleting the cart and order data form the tables*/
         if ($id_hotel == '') {
             die(json_encode(array(
@@ -2989,6 +3000,27 @@ class AdminOrdersControllerCore extends AdminController
         ksort($products);
 
         return $products;
+    }
+
+    protected function getPaymentsTypes()
+    {
+        return array(
+            PaymentModule::PAYMENT_TYPE_ONLINE => array(
+                'key' => 'PAYMENT_TYPE_ONLINE',
+                'value' => PaymentModule::PAYMENT_TYPE_ONLINE,
+                'name' => $this->l('Online')
+            ),
+            PaymentModule::PAYMENT_TYPE_PAY_AT_HOTEL => array(
+                'key' => 'PAYMENT_TYPE_PAY_AT_HOTEL',
+                'value' => PaymentModule::PAYMENT_TYPE_PAY_AT_HOTEL,
+                'name' => $this->l('Pay at hotel')
+            ),
+            PaymentModule::PAYMENT_TYPE_REMOTE_PAYMENT => array(
+                'key' => 'PAYMENT_TYPE_REMOTE_PAYMENT',
+                'value' => PaymentModule::PAYMENT_TYPE_REMOTE_PAYMENT,
+                'name' => $this->l('Remote Payment')
+            ),
+        );
     }
 
     /**

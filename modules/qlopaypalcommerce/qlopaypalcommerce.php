@@ -91,6 +91,8 @@ class QloPaypalCommerce extends PaymentModule
         }
 
         parent::__construct();
+
+        $this->payment_type = PaymentModule::PAYMENT_TYPE_ONLINE;
     }
 
     public function getContent()
@@ -534,8 +536,6 @@ class QloPaypalCommerce extends PaymentModule
     {
         $objModuleDb = new WkPaypalCommerceDb();
         if (!parent::install()
-            || !$objModuleDb->createPartialPaymentOrderState()
-            || !$objModuleDb->createPaypalAwaitingOrderState()
             || !$objModuleDb->createTables()
             || !$this->callInstallTab()
             || !$this->registerModuleHooks()

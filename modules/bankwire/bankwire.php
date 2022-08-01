@@ -74,11 +74,26 @@ class bankwire extends PaymentModule
             $this->warning = $this->l('No currency has been set for this module.');
         }
 
-        $this->extra_mail_vars = array(
-                                        '{bankwire_owner}' => Configuration::get('BANK_WIRE_OWNER'),
-                                        '{bankwire_details}' => nl2br(Configuration::get('BANK_WIRE_DETAILS')),
-                                        '{bankwire_address}' => nl2br(Configuration::get('BANK_WIRE_ADDRESS'))
-                                        );
+        $this->payment_type = PaymentModule::PAYMENT_TYPE_REMOTE_PAYMENT;
+    }
+
+    public function getMailContent($id_order_state, $id_lang)
+    {
+        if (Configuration::get('PS_OS_AWATING') == $id_order_state) {
+            $this->context->smarty->assign(array(
+                'bankwire_owner' => Configuration::get('BANK_WIRE_OWNER'),
+                'bankwire_details' => nl2br(Configuration::get('BANK_WIRE_DETAILS')),
+                'bankwire_address' => nl2br(Configuration::get('BANK_WIRE_ADDRESS'))
+            ));
+            return array(
+                '{payment_module_detail_html}' => $this->context->smarty->fetch(
+                    $this->local_path.'mails/'.Language::getIsoById($id_lang).'/mail_template_html.tpl'
+                ),
+                '{payment_module_detail_text}' => $this->context->smarty->fetch(
+                    $this->local_path.'mails/'.Language::getIsoById($id_lang).'/mail_template_text.tpl'
+                )
+            );
+        }
     }
 
     public function install()
@@ -195,9 +210,7 @@ class bankwire extends PaymentModule
         if (in_array(
             $orderState,
             array(
-                Configuration::get('PS_OS_BANKWIRE'),
-                Configuration::get('PS_OS_OUTOFSTOCK'),
-                Configuration::get('PS_OS_OUTOFSTOCK_UNPAID')
+                Configuration::get('PS_OS_AWATING'),
             )
         )) {
             $objCart = new Cart($objOrder->id_cart);
