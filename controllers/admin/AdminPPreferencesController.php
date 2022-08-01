@@ -108,6 +108,14 @@ class AdminPPreferencesControllerCore extends AdminController
                         'cast' => 'intval',
                         'required' => false,
                         'type' => 'bool'
+                    ),
+                    'PS_LOS_RESTRICTION_BO' => array(
+                        'title' => $this->l('Apply Min and Max lenght of stay restrictions for back-office bookings'),
+                        'hint' => $this->l('While creating bookings from back-office, apply minimum and maximum lenght of stay restrictions'),
+                        'validation' => 'isBool',
+                        'cast' => 'intval',
+                        'required' => false,
+                        'type' => 'bool'
                     )
                 ),
                 'submit' => array('title' => $this->l('Save'))

@@ -40,6 +40,7 @@ require_once 'classes/HotelRoomTypeGlobalDemand.php';
 require_once 'classes/HotelRoomTypeGlobalDemandAdvanceOption.php';
 require_once 'classes/HotelRoomTypeDemandPrice.php';
 require_once 'classes/HotelRoomTypeDemand.php';
+require_once 'classes/HotelRoomTypeRestrictionDateRange.php';
 
 require_once 'classes/QloWebservice.php';
 require_once 'classes/QloRoomType.php';

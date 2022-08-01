@@ -225,6 +225,7 @@ class HotelBookingDetail extends ObjectModel
      */
     public function getBookingData($params)
     {
+        $this->context = Context::getContext();
         // extract all keys and values of the array [$params] into variables and values
         extract($this->getBookingDataParams($params));
         if ($date_from && $date_to && $hotel_id) {
@@ -248,10 +249,17 @@ class HotelBookingDetail extends ObjectModel
                 $num_cart = 0;
                 $new_part_arr = array();
                 $booking_data = array();
+                $applyLosRestriction = true;
 
                 if ($search_partial) {
                     $this->partAvaiDates = array();
                     $this->allReqDates = $this->createDateRangeArray($date_from, $date_to, 1);
+                }
+
+                if (isset(Context::getContext()->employee->id)) {
+                    if (!Configuration::get('PS_LOS_RESTRICTION_BO')) {
+                        $applyLosRestriction = false;
+                    }
                 }
 
                 foreach ($room_types as $key => $room_type) {
@@ -260,6 +268,10 @@ class HotelBookingDetail extends ObjectModel
                     }
 
                     $total_rooms += $obj_room_info->getHotelRoomInfo($room_type['id_product'], $hotel_id, 1);
+
+                    // Get min & max  LOS
+                    $objRoomTypeRestriction = new HotelRoomTypeRestrictionDateRange();
+                    $losRestriction = $objRoomTypeRestriction->getRoomTypeLengthOfStay($room_type['id_product'], $date_from);
 
                     $obj_product = new Product((int) $room_type['id_product']);
                     $product_name = $obj_product->name[Configuration::get('PS_LANG_DEFAULT')];
@@ -309,7 +321,15 @@ class HotelBookingDetail extends ObjectModel
                     if ($search_unavai) {
                         $sql1 = 'SELECT `id_product`, `id_hotel`, `room_num`, `comment` AS `room_comment`
                                 FROM `'._DB_PREFIX_.'htl_room_information`
-                                WHERE `id_hotel`='.(int)$hotel_id.' AND `id_product` ='.(int)$room_type['id_product'].' AND `id_status` = '. HotelRoomInformation::STATUS_INACTIVE;
+                                WHERE `id_hotel`='.(int)$hotel_id.' AND `id_product` ='.(int)$room_type['id_product'].' AND (`id_status` = '. HotelRoomInformation::STATUS_INACTIVE;
+                        if ($applyLosRestriction) {
+                            $sql1 .= ' OR ( DATEDIFF(\''.$date_to.'\', \''.$date_from.'\') < '.(int)$losRestriction['min_los'];
+                            if ((int)$losRestriction['max_los']) {
+                                $sql1 .= ' OR DATEDIFF(\''.$date_to.'\', \''.$date_from.'\') > '.(int)$losRestriction['max_los'];
+                            }
+                            $sql1 .= ')';
+                        }
+                        $sql1 .= ')';
 
                         $sql2 = 'SELECT hri.`id_product`, hri.`id_hotel`, hri.`room_num`, hri.`comment` AS `room_comment`
                                 FROM `'._DB_PREFIX_.'htl_room_information` AS hri
@@ -357,7 +377,18 @@ class HotelBookingDetail extends ObjectModel
 
                         $joinAvailRoomSearch = '';
 
-                        $whereAvailRoomSearch = 'WHERE ri.`id_hotel`='.(int)$hotel_id.' AND ri.`id_product`='.(int)$room_type['id_product'].' AND ri.`id_status` != '. HotelRoomInformation::STATUS_INACTIVE .' AND ri.`id` NOT IN ('.$exclude_ids.')';
+                        $whereAvailRoomSearch = 'WHERE ri.`id_hotel`='.(int)$hotel_id.' AND ri.`id_product`='.(int)$room_type['id_product'].' AND ri.`id_status` != '. HotelRoomInformation::STATUS_INACTIVE;
+
+                        // Check min & max LOS restrictions
+                        if ($applyLosRestriction) {
+                            $whereAvailRoomSearch .= ' AND DATEDIFF(\''.$date_to.'\', \''.$date_from.'\') >= '.(int)$losRestriction['min_los'];
+                            // check max LOS restriction is greater than zero
+                            if ((int)$losRestriction['max_los']) {
+                                $whereAvailRoomSearch .= ' AND DATEDIFF(\''.$date_to.'\', \''.$date_from.'\') <= '.(int)$losRestriction['max_los'];
+                            }
+                        }
+
+                        $whereAvailRoomSearch .= ' AND ri.`id` NOT IN ('.$exclude_ids.')';
 
                         $groupByAvailRoomSearch = '';
                         $orderByAvailRoomSearch = '';
