@@ -43,7 +43,7 @@ class AdminPPreferencesControllerCore extends AdminController
 
         $this->fields_options = array(
             'products' => array(
-                'title' =>    $this->l('Products (general)'),
+                'title' =>    $this->l('Room Types (General)'),
                 'fields' =>    array(
                     'PS_CATALOG_MODE' => array(
                         'title' => $this->l('Catalog mode'),
@@ -62,7 +62,8 @@ class AdminPPreferencesControllerCore extends AdminController
                     //     'type' => 'text'
                     // ),
                     'PS_NB_DAYS_NEW_PRODUCT' => array(
-                        'title' => $this->l('Number of days for which the product is considered \'new\''),
+                        'title' => $this->l('Number of days for which a room type is considered \'new\''),
+                        'hint' => $this->l('The counting of days starts from room type creation date.'),
                         'validation' => 'isUnsignedInt',
                         'cast' => 'intval',
                         'type' => 'text'
@@ -82,7 +83,7 @@ class AdminPPreferencesControllerCore extends AdminController
                     ),*/
                     'PS_PRODUCT_SHORT_DESC_LIMIT' => array(
                         'title' => $this->l('Max size of short description'),
-                        'hint' => $this->l('Set the maximum size of product short description (in characters).'),
+                        'hint' => $this->l('Set the maximum size of room type short description (in characters).'),
                         'validation' => 'isInt',
                         'cast' => 'intval',
                         'type' => 'text',
@@ -116,31 +117,31 @@ class AdminPPreferencesControllerCore extends AdminController
                 'title' =>    $this->l('Pagination'),
                 'fields' =>    array(
                     'PS_PRODUCTS_PER_PAGE' => array(
-                        'title' => $this->l('Products per page'),
-                        'hint' => $this->l('Number of products displayed per page. Default is 10.'),
+                        'title' => $this->l('Room types per page'),
+                        'hint' => $this->l('Number of room types displayed per page. Default is 10.'),
                         'validation' => 'isUnsignedInt',
                         'cast' => 'intval',
                         'type' => 'text'
                     ),
                     'PS_PRODUCTS_ORDER_BY' => array(
                         'title' => $this->l('Default order by'),
-                        'hint' => $this->l('The order in which products are displayed in the product list.'),
+                        'hint' => $this->l('The order in which room types are displayed in the room type list.'),
                         'type' => 'select',
                         'list' => array(
-                            array('id' => '0', 'name' => $this->l('Product name')),
-                            array('id' => '1', 'name' => $this->l('Product price')),
-                            array('id' => '2', 'name' => $this->l('Product add date')),
-                            array('id' => '3', 'name' => $this->l('Product modified date')),
-                            array('id' => '4', 'name' => $this->l('Position inside category')),
-                            array('id' => '5', 'name' => $this->l('Manufacturer')),
-                            array('id' => '6', 'name' => $this->l('Product quantity')),
-                            array('id' => '7', 'name' => $this->l('Product reference'))
+                            array('id' => '0', 'name' => $this->l('Room type name')),
+                            array('id' => '1', 'name' => $this->l('Room type price')),
+                            array('id' => '2', 'name' => $this->l('Room type add date')),
+                            array('id' => '3', 'name' => $this->l('Room type modified date')),
+                            // array('id' => '4', 'name' => $this->l('Position inside category')),
+                            // array('id' => '5', 'name' => $this->l('Manufacturer')),
+                            // array('id' => '6', 'name' => $this->l('Product quantity')),
+                            // array('id' => '7', 'name' => $this->l('Product reference'))
                         ),
                         'identifier' => 'id'
                     ),
                     'PS_PRODUCTS_ORDER_WAY' => array(
                         'title' => $this->l('Default order method'),
-                        'hint' => $this->l('Default order method for product list.'),
+                        'hint' => $this->l('Default order method for room type list.'),
                         'type' => 'select',
                         'list' => array(
                             array(
@@ -158,7 +159,7 @@ class AdminPPreferencesControllerCore extends AdminController
                 'submit' => array('title' => $this->l('Save'))
             ),
             'fo_product_page' => array(
-                'title' =>    $this->l('Product page'),
+                'title' =>    $this->l('Room type page'),
                 'fields' =>    array(
                    /* 'PS_DISPLAY_QTIES' => array(
                         'title' => $this->l('Display available quantities on the product page'),
@@ -176,7 +177,7 @@ class AdminPPreferencesControllerCore extends AdminController
                         'type' => 'text'
                     ),*/
                     'PS_DISPLAY_JQZOOM' => array(
-                        'title' => $this->l('Enable JqZoom instead of Fancybox on the product page'),
+                        'title' => $this->l('Enable JqZoom instead of Fancybox on room type page'),
                         'validation' => 'isBool',
                         'cast' => 'intval',
                         'required' => false,
