@@ -376,6 +376,10 @@ class HotelBranchInformation extends ObjectModel
         if (!$id_lang)
             $id_lang = Context::getContext()->language->id;
 
+        if (!$id_hotel) {
+            return false;
+        }
+
         $cache_id = 'hotelBranch::getAddress'.(int)$id_hotel.'-'.(int)$id_lang;
         if (!Cache::isStored($cache_id)) {
             $sql = 'SELECT a.*, cl.`name` AS country, s.`name` AS state, s.`iso_code` AS state_iso
