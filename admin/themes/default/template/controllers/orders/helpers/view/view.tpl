@@ -259,7 +259,7 @@
 				</div>
 				{if $returns}
 					<div class="alert alert-warning">
-						{l s='Booking cancellation requests has raised  from this order. To see booking cancelation requests'} <a target="_blank" href="{$link->getAdminLink('AdminOrderRefundRequests')}&amp;id_order={$order->id}&amp;vieworder_return">{l s='Click here'}</a>.
+						{l s='Booking cancelation requests have been raised from this order. To see booking cancelation requests'} <a target="_blank" href="{$link->getAdminLink('AdminOrderRefundRequests')}&amp;id_order={$order->id}&amp;vieworder_return">{l s='click here.'} <i class="icon icon-external-link"></i></a>
 					</div>
 				{/if}
 				<div class="row">

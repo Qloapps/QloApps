@@ -62,14 +62,17 @@ class OrderSlipCore extends ObjectModel
     /** @var int */
     public $partial;
 
+    /** @var int */
+    public $generated = 0;
+
+    /** @var int */
+    public $order_slip_type = 0;
+
     /** @var string Object creation date */
     public $date_add;
 
     /** @var string Object last modification date */
     public $date_upd;
-
-    /** @var int */
-    public $order_slip_type = 0;
 
     /**
      * @see ObjectModel::$definition
@@ -90,9 +93,10 @@ class OrderSlipCore extends ObjectModel
             'shipping_cost_amount' =>    array('type' => self::TYPE_FLOAT, 'validate' => 'isFloat'),
             'amount' =>                array('type' => self::TYPE_FLOAT, 'validate' => 'isFloat'),
             'partial' =>                array('type' => self::TYPE_INT),
+            'generated' =>        array('type' => self::TYPE_INT, 'validate' => 'isInt'),
+            'order_slip_type' =>        array('type' => self::TYPE_INT, 'validate' => 'isInt'),
             'date_add' =>                array('type' => self::TYPE_DATE, 'validate' => 'isDate'),
             'date_upd' =>                array('type' => self::TYPE_DATE, 'validate' => 'isDate'),
-            'order_slip_type' =>        array('type' => self::TYPE_INT, 'validate' => 'isInt'),
         ),
     );
 
@@ -541,6 +545,71 @@ class OrderSlipCore extends ObjectModel
         }
 
         return $ecotax_detail;
+    }
+
+    // generate voucher and return id of the created rule if successful, false otherwise
+    public function generateVoucher()
+    {
+        if (!Validate::isLoadedObject($this)) {
+            return false;
+        }
+
+        if ($this->generated) {
+            return false;
+        }
+
+        $objOrder = new Order($this->id_order);
+        if (!Validate::isLoadedObject($objOrder)) {
+            return false;
+        }
+
+        $objCustomer = new Customer($this->id_customer);
+        if (!Validate::isLoadedObject($objCustomer)) {
+            return false;
+        }
+
+        $context = Context::getContext();
+        $objCartRule = new CartRule();
+        $idsLanguage = Language::getIDs();
+
+        $creditSlipPrefix = Configuration::get('PS_CREDIT_SLIP_PREFIX', $context->language->id);
+        $creditSlipID = sprintf(('%1$s%2$06d'), $creditSlipPrefix, (int) $this->id);
+
+        // set temporary voucher code to get unique cart rule id
+        $voucherCodeTemp = 'V0C'.(int) ($objOrder->id_customer).'O'.(int) ($objOrder->id);
+
+        $dateFrom = $this->date_add;
+        $dateTo = date('Y-m-d H:i:s', strtotime($dateFrom) + (3600 * 24 * 365.25)); /* 1 year */
+
+        foreach ($idsLanguage as $idLang) {
+            $objCartRule->name[$idLang] = sprintf('Voucher for credit slip #%s', $creditSlipID);
+        }
+
+        $objCartRule->description = sprintf('Order: #%s', $objOrder->id);
+        $objCartRule->code = $voucherCodeTemp;
+        $objCartRule->quantity = 1;
+        $objCartRule->quantity_per_user = 1;
+        $objCartRule->id_customer = $objCustomer->id;
+        $objCartRule->date_from = $dateFrom;
+        $objCartRule->date_to = $dateTo;
+        $objCartRule->highlight = 1;
+        $objCartRule->active = 1;
+        $objCartRule->reduction_amount = $this->amount;
+        $objCartRule->reduction_tax = true;
+        $objCartRule->minimum_amount_currency = $objOrder->id_currency;
+        $objCartRule->reduction_currency = $objOrder->id_currency;
+
+        if (!$objCartRule->save()) {
+            return false;
+        }
+
+        // now set unique voucher code using cart rule id
+        $objCartRule->code = 'V'.(int) ($objCartRule->id).'C'.(int) ($objOrder->id_customer).'O'.(int) ($objOrder->id);
+        $objCartRule->save();
+
+        $this->generated = 1;
+
+        return $this->save() ? (int) $objCartRule->id : false;
     }
 
     public function getWsOrderSlipDetails()

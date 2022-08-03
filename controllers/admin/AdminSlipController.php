@@ -63,7 +63,14 @@ class AdminSlipControllerCore extends AdminController
                 'callback' => 'printPDFIcons',
                 'orderby' => false,
                 'search' => false,
-                'remove_onclick' => true)
+            ),
+            'generated' => array(
+                'title' => $this->l('Voucher'),
+                'align' => 'center',
+                'callback' => 'printVoucherIcons',
+                'orderby' => false,
+                'search' => false,
+            ),
         );
 
         $this->_select = 'a.id_order_slip AS id_pdf';
@@ -86,7 +93,12 @@ class AdminSlipControllerCore extends AdminController
 
         parent::__construct();
 
+        $this->list_no_link = true;
+
         $this->_where = Shop::addSqlRestriction(false, 'o');
+
+        $this->_conf[101] = $this->l('The voucher has been generated and email has been sent to the customer.');
+        $this->_conf[102] = $this->l('The voucher has been generated but email could not be sent to the customer.');
     }
 
     public function initPageHeaderToolbar()
@@ -162,6 +174,65 @@ class AdminSlipControllerCore extends AdminController
         }
     }
 
+    public function processGenerateVoucher()
+    {
+        $idOrderSlip = Tools::getValue('id_order_slip');
+        $objOrderSlip = new OrderSlip($idOrderSlip);
+
+        if (!Validate::isLoadedObject($objOrderSlip)) {
+            $this->errors[] = $this->l('The credit slip can not be loaded.');
+        } elseif ($objOrderSlip->generated) {
+            $this->errors[] = $this->l('The voucher code for this credit slip has already been generated.');
+        } else {
+            $objOrder = new Order($objOrderSlip->id_order);
+            $objCustomer = new Customer($objOrderSlip->id_customer);
+
+            if (!Validate::isLoadedObject($objOrder)) {
+                $this->errors[] = $this->l('The related order for this credit slip can not be loaded.');
+            }
+
+            if (!Validate::isLoadedObject($objCustomer)) {
+                $this->errors[] = $this->l('The related customer for this credit slip can not be loaded.');
+            }
+        }
+
+        if (!count($this->errors)) {
+            if ($idCartRule = $objOrderSlip->generateVoucher()) {
+                $objCartRule = new CartRule($idCartRule);
+                $objCustomer = new Customer($objCartRule->id_customer);
+
+                $creditSlipPrefix = Configuration::get('PS_CREDIT_SLIP_PREFIX', $this->context->language->id);
+                $creditSlipID = sprintf(('%1$s%2$06d'), $creditSlipPrefix, (int) $objOrderSlip->id);
+
+                $objCurrency = new Currency($objCartRule->reduction_currency, $this->context->language->id);
+                $mailVars['{firstname}'] = $objCustomer->firstname;
+                $mailVars['{lastname}'] = $objCustomer->lastname;
+                $mailVars['{credit_slip_id}'] = $creditSlipID;
+                $mailVars['{voucher_code}'] = $objCartRule->code;
+                $mailVars['{voucher_amount}'] = Tools::displayPrice($objCartRule->reduction_amount, $objCurrency, false);
+
+                $mailStatus = Mail::Send(
+                    $this->context->language->id,
+                    'credit_slip_voucher',
+                    sprintf(Mail::l('New voucher for your credit slip #%s', $this->context->language->id), $creditSlipID),
+                    $mailVars,
+                    $objCustomer->email,
+                    $objCustomer->firstname.' '.$objCustomer->lastname,
+                    null,
+                    null,
+                    null,
+                    null,
+                    _PS_MAIL_DIR_,
+                    true
+                );
+
+                Tools::redirectAdmin(self::$currentIndex.'&token='.$this->token.'&conf='.($mailStatus ? 101 : 102));
+            }
+
+            $this->errors[] = $this->l('Something went wrong while creating voucher.');
+        }
+    }
+
     public function initContent()
     {
         $this->initTabModuleList();
@@ -201,5 +272,20 @@ class AdminSlipControllerCore extends AdminController
         ));
 
         return $this->createTemplate('_print_pdf_icon.tpl')->fetch();
+    }
+
+    public function printVoucherIcons($generated, $tr)
+    {
+        $orderSlip = new OrderSlip($tr['id_order_slip']);
+        if (!Validate::isLoadedObject($orderSlip)) {
+            return '';
+        }
+
+        $this->context->smarty->assign(array(
+            'order_slip' => $orderSlip,
+            'tr' => $tr
+        ));
+
+        return $this->createTemplate('_print_voucher_icon.tpl')->fetch();
     }
 }

@@ -1,0 +1,16 @@
+
+[/{shop_url}]
+
+Hi {firstname} {lastname},
+
+VOUCHER GENERATED
+
+Your voucher has been generated successfully against your credit slip #{credit_slip_id}.
+
+VOUCHER CODE: {voucher_code} for an amount of {voucher_amount}.
+
+To use this voucher just copy and paste this code during payment process for your next
+order.
+
+{shop_name} [/{shop_url}] powered by Webkul(tm)
+[http://www.webkul.com/]

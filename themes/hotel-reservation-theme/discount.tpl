@@ -33,7 +33,7 @@
 		<thead>
 			<tr>
 				<th data-sort-ignore="true" class="discount_code first_item">{l s='Code'}</th>
-				<th data-sort-ignore="true" class="discount_description item">{l s='Description'}</th>
+				<th data-sort-ignore="true" class="discount_description item">{l s='Name'}</th>
 				<th class="discount_quantity item">{l s='Quantity'}</th>
 				<th data-sort-ignore="true" data-hide="phone,tablet" class="discount_value item">{l s='Value'}</th>
 				<th data-hide="phone,tablet" class="discount_minimum item">{l s='Minimum'}</th>

@@ -115,7 +115,7 @@
 
 {if isset($refundReqBookings) && $refundReqBookings}
 	<div class="alert alert-warning-light cancel_requests_link_wrapper">
-		<i class="icon-info-circle"></i> {l s='You have booking cancelation requests from this order. To see the cancelation request status'} <a target="_blank" href="{$link->getPageLink('order-follow')|escape:'html':'UTF-8'}?id_order={$order->id|escape:'html':'UTF-8'}">{l s='Click Here'}</a>
+		<i class="icon-info-circle"></i> {l s='You have booking cancelation requests from this order. To see the cancelation request status'} <a target="_blank" href="{$link->getPageLink('order-follow')|escape:'html':'UTF-8'}?id_order={$order->id|escape:'html':'UTF-8'}">{l s='click here.'}</a>
 	</div>
 {/if}
 

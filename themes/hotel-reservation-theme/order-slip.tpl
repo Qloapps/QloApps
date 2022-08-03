@@ -31,6 +31,15 @@
 <p class="info-title">
 	{l s='Credit slips you have received after canceled orders'}.
 </p>
+
+{include file="$tpl_dir./errors.tpl"}
+
+{if isset($smarty.get.confirmation) && $smarty.get.confirmation}
+    <p class="alert alert-success">
+        {l s='Your voucher has been generated successfully and sent via email.'} <a href="{$link->getPageLink('discount', true)|escape:'html':'UTF-8'}">{'Click here'}</a> {' to see your all vouchers.'}
+    </p>
+{/if}
+
 <div class="block-center" id="block-history">
 	{if $ordersSlip && count($ordersSlip)}
 		<table id="order-list" class="table table-bordered footab">
@@ -39,7 +48,8 @@
 					<th data-sort-ignore="true" class="first_item">{l s='Credit slip'}</th>
 					<th data-sort-ignore="true" class="item">{l s='Order'}</th>
 					<th class="item">{l s='Date issued'}</th>
-					<th data-sort-ignore="true" data-hide="phone" class="last_item">{l s='View credit slip'}</th>
+					<th data-sort-ignore="true" data-hide="phone">{l s='View credit slip'}</th>
+					<th data-sort-ignore="true" class="last_item">{l s='Actions'}</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -47,7 +57,7 @@
 					<tr class="{if $smarty.foreach.myLoop.first}first_item{elseif $smarty.foreach.myLoop.last}last_item{else}item{/if} {if $smarty.foreach.myLoop.index % 2}alternate_item{/if}">
 						<td class="bold">
 							<span class="color-myaccount">
-								{l s='#%s' sprintf=$slip.id_order_slip|string_format:"%06d"}
+								#{Configuration::get('PS_CREDIT_SLIP_PREFIX', $lang_id)}{l s='%s' sprintf=$slip.id_order_slip|string_format:"%06d"}
 							</span>
 						</td>
 						<td class="history_method">
@@ -59,9 +69,18 @@
 							{dateFormat date=$slip.date_add full=0}
 						</td>
 						<td class="history_invoice">
-							<a class="link-button" href="{$link->getPageLink('pdf-order-slip', true, NULL, "id_order_slip={$slip.id_order_slip|intval}")|escape:'html':'UTF-8'}" title="{l s='Credit slip'} {l s='#%s' sprintf=$slip.id_order_slip|string_format:"%06d"}">
+							<a class="link-button" href="{$link->getPageLink('pdf-order-slip', true, NULL, "id_order_slip={$slip.id_order_slip|intval}")|escape:'html':'UTF-8'}" title="{l s='Credit slip'} #{Configuration::get('PS_CREDIT_SLIP_PREFIX', $lang_id)}{l s='%s' sprintf=$slip.id_order_slip|string_format:"%06d"}">
 								<i class="icon-file-text large"></i>{l s='PDF'}
 							</a>
+						</td>
+						<td>
+							{if $slip.generated}
+								<span class="badge badge-warning">{l s='Voucher Generated'}</span>
+							{else}
+								<a href="{$link->getPageLink('order-slip', true, NULL, "generateVoucher=1&id_order_slip={$slip.id_order_slip|intval}")|escape:'html':'UTF-8'}" title="{l s='Generate voucher for credit slip '} #{Configuration::get('PS_CREDIT_SLIP_PREFIX', $lang_id)}{l s='%s' sprintf=$slip.id_order_slip|string_format:"%06d"}">
+									<u>{l s='Generate Voucher'}</u>
+								</a>
+							{/if}
 						</td>
 					</tr>
 				{/foreach}
