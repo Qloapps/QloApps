@@ -751,7 +751,7 @@ abstract class PaymentModuleCore extends Module
                                     $objBookingDetail->email = $objHotelBranch->email;
                                     $objBookingDetail->check_in_time = $objHotelBranch->check_in;
                                     $objBookingDetail->check_out_time = $objHotelBranch->check_out;
-                                    if ($hotelAddress = $objHotelBranch->getAddress($objCartBkData->id_hotel)) {
+                                    if ($hotelAddress = $objHotelBranch->getAddress($objCartBookingData->id_hotel)) {
                                         $objBookingDetail->city = $hotelAddress['city'];
                                         $objBookingDetail->state = $hotelAddress['state'];
                                         $objBookingDetail->country = $hotelAddress['country'];
