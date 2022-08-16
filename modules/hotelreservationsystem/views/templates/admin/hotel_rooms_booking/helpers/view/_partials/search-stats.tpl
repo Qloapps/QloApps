@@ -12,8 +12,8 @@
         <div class="col-sm-6">
             <div class="row">
                 <div class="col-sm-12 htl_room_cat_data">
-                    <p class="room_cat_header">{l s='Partially Available' mod='hotelreservationsystem'}</p>
-                    <p class="room_cat_data" id="num_part">{if isset($booking_data) && $booking_data}{$booking_data['stats']['num_part_avai']|escape:'htmlall':'UTF-8'}{else}00{/if}</p>
+                    <p class="room_cat_header">{l s='Available Rooms' mod='hotelreservationsystem'}</p>
+                    <p class="room_cat_data" id="num_avail">{if isset($booking_data) && $booking_data}{$booking_data['stats']['num_avail']|escape:'htmlall':'UTF-8'}{else}00{/if}</p>
                 </div>
             </div>
             <hr class="hr_style" />
@@ -23,8 +23,8 @@
         <div class="col-sm-6">
             <div class="row">
                 <div class="col-sm-12 htl_room_cat_data">
-                    <p class="room_cat_header">{l s='Available Rooms' mod='hotelreservationsystem'}</p>
-                    <p class="room_cat_data" id="num_avail">{if isset($booking_data) && $booking_data}{$booking_data['stats']['num_avail']|escape:'htmlall':'UTF-8'}{else}00{/if}</p>
+                    <p class="room_cat_header">{l s='Partially Available' mod='hotelreservationsystem'}</p>
+                    <p class="room_cat_data" id="num_part">{if isset($booking_data) && $booking_data}{$booking_data['stats']['num_part_avai']|escape:'htmlall':'UTF-8'}{else}00{/if}</p>
                 </div>
             </div>
             <hr class="hr_style" />

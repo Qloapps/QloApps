@@ -351,6 +351,70 @@ class HotelReservationSystemDb
                 PRIMARY KEY (`id_room_type_demand`)
             ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;",
 
+            "CREATE TABLE `"._DB_PREFIX_."htl_room_type_service_product` (
+                `id_room_type_service_product` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+                `id_product` int(11) UNSIGNED NOT NULL,
+                `position` smallint(2) unsigned NOT NULL DEFAULT '0',
+                `id_element` int(11) unsigned NOT NULL,
+                `element_type` tinyint(11) unsigned NOT NULL,
+                PRIMARY KEY (`id_room_type_service_product`),
+                KEY `id_product` (`id_product`)
+            ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;",
+
+            "CREATE TABLE `"._DB_PREFIX_."htl_room_type_service_product_price` (
+                `id_room_type_service_product_price` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+                `id_product` int(11) UNSIGNED NOT NULL,
+                `price` decimal(20,6) NOT NULL DEFAULT '0.000000',
+                `id_tax_rules_group` int(11) unsigned NOT NULL,
+                `id_element` int(11) unsigned NOT NULL,
+                `element_type` tinyint(11) unsigned NOT NULL,
+                PRIMARY KEY (`id_room_type_service_product_price`),
+                KEY `id_product` (`id_product`)
+            ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;",
+
+            "CREATE TABLE `"._DB_PREFIX_."htl_hotel_service_product_cart_detail` (
+                `id_hotel_service_product_cart_detail` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+                `id_cart` int(11) unsigned NOT NULL,
+                `id_product` int(11) UNSIGNED NOT NULL,
+                `id_hotel` int(11) UNSIGNED NOT NULL,
+                `quantity` int(11) UNSIGNED NOT NULL,
+                PRIMARY KEY (`id_hotel_service_product_cart_detail`),
+                KEY `id_product` (`id_product`)
+            ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;",
+
+            "CREATE TABLE `"._DB_PREFIX_."htl_room_type_service_product_cart_detail` (
+                `id_room_type_service_product_cart_detail` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+                `id_room_type` int(11) UNSIGNED NOT NULL,
+                `id_product` int(11) UNSIGNED NOT NULL,
+                `quantity` int(11) UNSIGNED NOT NULL,
+                `date_from` datetime NOT NULL,
+                `date_to` datetime NOT NULL,
+                `id_guest` int(11) unsigned NOT NULL,
+                `id_cart` int(11) unsigned NOT NULL,
+                `htl_cart_booking_id` int(11) unsigned NOT NULL,
+                PRIMARY KEY (`id_room_type_service_product_cart_detail`),
+                KEY `id_product` (`id_product`)
+            ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;",
+
+            "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_room_type_service_product_order_detail` (
+                `id_room_type_service_product_order_detail` int(11) NOT NULL AUTO_INCREMENT,
+                `id_product` int(11) NOT NULL,
+                `id_order` int(11) NOT NULL,
+                `id_order_detail` int(11) NOT NULL,
+                `id_cart` int(11) NOT NULL,
+                `id_htl_booking_detail` int(11) NOT NULL,
+                `unit_price_tax_excl` decimal(20,6) NOT NULL,
+                `unit_price_tax_incl` decimal(20,6) NOT NULL,
+                `total_price_tax_excl` decimal(20,6) NOT NULL,
+                `total_price_tax_incl` decimal(20,6) NOT NULL,
+                `name` varchar(255) DEFAULT NULL,
+                `quantity` INT(11) UNSIGNED NOT NULL,
+                `auto_added` tinyint(1) unsigned NOT NULL,
+                `date_add` datetime NOT NULL,
+                `date_upd` datetime NOT NULL,
+                PRIMARY KEY (`id_room_type_service_product_order_detail`)
+            ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;",
+
             "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_room_disable_dates` (
                 `id` int(11) NOT NULL AUTO_INCREMENT,
                 `id_room_type` int(11) NOT NULL,

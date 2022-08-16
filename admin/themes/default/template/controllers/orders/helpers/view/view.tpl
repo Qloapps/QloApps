@@ -1131,53 +1131,14 @@
 				<div class="panel" id="refundForm">
 					<div class="panel-heading">
 						<i class="icon-shopping-cart"></i>
-						{l s='Rooms In This Order'} <span class="badge">{$order_detail_data|@count}</span>
+						{l s='Order Detail'} <span class="badge">{$order_detail_data|@count}</span>
 						{* by webkul products changes as rooms *}
 					</div>
 					{* by webkul this code is added for showing rooms information on the order detail page *}
-					<div class="row">
-						<div class="col-lg-12">
-							<table class="table" id="customer_cart_details">
-								<thead>
-									<tr>
-										{if $refund_allowed}
-											<th class="standard_refund_fields" style="display:none"></th>
-										{/if}
-										<th class="text-center"><span class="title_box">{l s='Room No.'}</span></th>
-										<th class="text-center"><span class="title_box">{l s='Room Image'}</th>
-										<th class="text-center"><span class="title_box">{l s='Room Type'}</span></th>
-										<th class="text-center"><span class="title_box">{l s='Hotel Name'}</span></th>
-										<th class="text-center"><span class="title_box">{l s='Duration'}</span></th>
-										<th class="text-center fixed-width-lg"><span class="title_box">{l s='Occupancy'}</span></th>
-										<th class="text-center"><span class="title_box">{l s='Unit Price (Tax excl.)'}</span></th>
-										<th class="text-center"><span class="title_box">{l s='Total Price (Tax incl.)'}</span></th>
-										{if isset($refundReqBookings) && $refundReqBookings}
-											<th class="text-center"><span class="title_box">{l s='Refund State'}</span></th>
-											<th class="text-center"><span class="title_box">{l s='Refunded amount'}</span></th>
-										{/if}
-										<th class="text-center fixed-width-xxl"><span class="title_box">{l s='Reallocate Room'}</span></th>
-										{if ($can_edit && !$order->hasBeenDelivered())}
-										<th class="text-center"><span class="title_box">{l s='Edit Order'}</th>
-										{/if}
-									</tr>
-								</thead>
-								<tbody>
-								{if $order_detail_data}
-									{foreach from=$order_detail_data item=data}
-										{* Include product line partial *}
-										{include file='controllers/orders/_product_line.tpl'}
-									{/foreach}
-								{else}
-									<tr>
-										<td>{l s='No Data Found.'}</td>
-									</tr>
-								{/if}
-								{* Include product line partial *}
-								{include file='controllers/orders/_new_product.tpl'}
-								</tbody>
-							</table>
-						</div>
-					</div>
+					{include file='controllers/orders/_rooms_informaion_table.tpl'}
+					<br>
+					{include file='controllers/orders/_service_products_table.tpl'}
+
 
 					{capture "TaxMethod"}
 						{if ($order->getTaxCalculationMethod() == $smarty.const.PS_TAX_EXC)}
@@ -1192,12 +1153,16 @@
 						<input type="hidden" name="TaxMethod" value="1">
 					{/if}
 					{if $can_edit}
-						<div class="row-margin-bottom row-margin-top order_action standard_refund_fields"  style="display: none;">
+						<div class="row-margin-bottom row-margin-top standard_refund_fields"  style="display: none;">
 							<textarea class="cancellation_reason" name="cancellation_reason" placeholder="{l s='Enter reason to cancel bookings'}"></textarea>
 						</div>
 						<div class="row-margin-bottom row-margin-top order_action">
 							{if !$order->hasBeenDelivered()}
-								<button type="button" id="add_product" class="btn btn-default">
+								{* <button type="button" id="add_product" class="btn btn-default">
+									<i class="icon-plus-sign"></i>
+									{l s='Add Product In Order'}
+								</button> *}
+								<button type="button" id="add_room" class="btn btn-default">
 									<i class="icon-plus-sign"></i>
 									{l s='Add Rooms In Order'}
 								</button>
@@ -1294,38 +1259,59 @@
 											{assign var=order_wrapping_price value=$order->total_wrapping_tax_incl}
 											{assign var=order_shipping_price value=$order->total_shipping_tax_incl}
 										{/if}
-										<tr id="total_products">
-											<td class="text-right"><strong>{l s='Total Rooms Cost (tax excl.)'}</strong></td>
-											<td class="amount text-right nowrap">
-												<strong>{displayPrice price=$totalRoomsCostTE currency=$currency->id}</strong>
-											</td>
-											<td class="partial_refund_fields current-edit" style="display:none;"></td>
-										</tr>
-										{if isset($totalDemandsPriceTE) && $totalDemandsPriceTE > 0}
+
+										{assign var=room_price_tax_excl value=$order->getTotalProductsWithoutTaxes(false, true)}
+										{assign var=room_price_tax_incl value=$order->getTotalProductsWithTaxes(false, true)}
+										{assign var=service_products_price_tax_excl value=$order->getTotalProductsWithoutTaxes(false, false, Product::SERVICE_PRODUCT_WITHOUT_ROOMTYPE)}
+										{assign var=service_products_price_tax_incl value=$order->getTotalProductsWithTaxes(false, false, Product::SERVICE_PRODUCT_WITHOUT_ROOMTYPE)}
+										{assign var=additional_service_price_tax_excl value=($order->getTotalProductsWithoutTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE) + $totalDemandsPriceTE)}
+										{assign var=additional_service_price_tax_incl value=($order->getTotalProductsWithTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE) + $totalDemandsPriceTI)}
+										{if $room_price_tax_excl}
 											<tr id="total_products">
-												<td class="text-right"><strong>{l s='Additional Facilities Cost (tax excl.)'}</strong></td>
+												<td class="text-right"><strong>{l s='Total Rooms Cost (tax excl.)'}</strong></td>
 												<td class="amount text-right nowrap">
-													<strong>{displayPrice price=$totalDemandsPriceTE currency=$currency->id}</strong>
+													<strong>{displayPrice price=$room_price_tax_excl currency=$currency->id}</strong>
 												</td>
 												<td class="partial_refund_fields current-edit" style="display:none;"></td>
 											</tr>
 										{/if}
-										<tr id="total_tax_order">
-											<td class="text-right"><strong>{l s='Total Rooms Tax'}</strong></td>
-											<td class="text-right nowrap">
-												<strong>{displayPrice price=$total_room_tax currency=$currency->id}</strong>
-											</td>
-											<td class="partial_refund_fields current-edit" style="display:none;"></td>
-										</tr>
-										{if isset($totalDemandsPriceTE) && $totalDemandsPriceTE > 0}
+										{if isset($additional_service_price_tax_excl) && $additional_service_price_tax_excl > 0}
+											<tr id="total_products">
+												<td class="text-right"><strong>{l s='Total Extra services (tax excl.)'}</strong></td>
+												<td class="amount text-right nowrap">
+													<strong>{displayPrice price=($additional_service_price_tax_excl - $totalConvenienceFeeTE) currency=$currency->id}</strong>
+												</td>
+												<td class="partial_refund_fields current-edit" style="display:none;"></td>
+											</tr>
+										{/if}
+										{* {if $room_price_tax_excl}
 											<tr id="total_tax_order">
-												<td class="text-right"><strong>{l s='Additional Facilities Tax'}</strong></td>
+												<td class="text-right"><strong>{l s='Total Rooms Tax'}</strong></td>
 												<td class="text-right nowrap">
-													<strong>{displayPrice price=($totalDemandsPriceTI - $totalDemandsPriceTE) currency=$currency->id}</strong>
+													<strong>{displayPrice price=($room_price_tax_incl - $room_price_tax_excl) currency=$currency->id}</strong>
 												</td>
 												<td class="partial_refund_fields current-edit" style="display:none;"></td>
 											</tr>
 										{/if}
+										{if isset($additional_service_price_tax_excl) && $additional_service_price_tax_excl > 0}
+											<tr id="total_tax_order">
+												<td class="text-right"><strong>{l s='Extra services Tax'}</strong></td>
+												<td class="text-right nowrap">
+													<strong>{displayPrice price=($additional_service_price_tax_incl - $additional_service_price_tax_excl) currency=$currency->id}</strong>
+												</td>
+												<td class="partial_refund_fields current-edit" style="display:none;"></td>
+											</tr>
+										{/if} *}
+										{if $service_products_price_tax_excl}
+											<tr id="total_products">
+												<td class="text-right"><strong>{l s='Total service products cost (tax excl.)'}</strong></td>
+												<td class="amount text-right nowrap">
+													<strong>{displayPrice price=$service_products_price_tax_excl currency=$currency->id}</strong>
+												</td>
+												<td class="partial_refund_fields current-edit" style="display:none;"></td>
+											</tr>
+										{/if}
+
 										<tr id="total_discounts" {if $order->total_discounts_tax_incl == 0}style="display: none;"{/if}>
 											<td class="text-right">{l s='Discounts'}</td>
 											<td class="amount text-right nowrap">
@@ -1340,13 +1326,22 @@
 											</td>
 											<td class="partial_refund_fields current-edit" style="display:none;"></td>
 										</tr>
-										{if ($order->getTaxCalculationMethod() == $smarty.const.PS_TAX_EXC)}
+										{if isset($totalConvenienceFeeTI) && $totalConvenienceFeeTI > 0}
+											<tr id="total_products">
+												<td class="text-right"><strong>{l s='Convenience Fee'}</strong></td>
+												<td class="amount text-right nowrap">
+													<strong>{displayPrice price=$totalConvenienceFeeTE currency=$currency->id}</strong>
+												</td>
+												<td class="partial_refund_fields current-edit" style="display:none;"></td>
+											</tr>
+										{/if}
+										{* {if ($order->getTaxCalculationMethod() == $smarty.const.PS_TAX_EXC)} *}
 											<tr id="total_taxes">
 												<td class="text-right"><strong>{l s='Total Taxes'}</strong></td>
 												<td class="amount text-right nowrap" ><strong>{displayPrice price=($order->total_paid_tax_incl - $order->total_paid_tax_excl) currency=$currency->id}</strong></td>
 												<td class="partial_refund_fields current-edit" style="display:none;"></td>
 											</tr>
-			 							{/if}
+			 							{* {/if} *}
 										<tr id="total_order">
 											<td class="text-right"><strong>{l s='Final Booking Total'}</strong></td>
 											<td class="amount text-right nowrap">
@@ -1642,7 +1637,7 @@
 		});
 
 		{* open fancybox for extra demands *}
-		$('.open_room_extra_demands').on('click', function(e) {
+		$('.open_room_extra_services').on('click', function(e) {
 			e.preventDefault();
 			var idProduct = $(this).attr('id_product');
 			var idOrder = $(this).attr('id_order');
@@ -1651,7 +1646,7 @@
 			var dateTo = $(this).attr('date_to');
 			var idHtlBooking = $(this).attr('id_htl_booking');
 			var orderEdit = 0;
-			if(  $(this).closest('.product-line-row').find(".submitProductChange").is(":visible") == true ) {
+			if($(this).closest('.product-line-row').find(".submitRoomChange").is(":visible") == true ) {
 				orderEdit = 1;
 			}
 
@@ -1684,25 +1679,119 @@
 			});
 		});
 
+		$('#rooms_type_extra_demands').on('hidden.bs.modal', function (e) {
+			if ($('.product-line-row').find(".submitRoomChange").is(":visible") == true ) {
+				location.reload();
+				return;
+			}
+		});
+
 		{* when choose to add new facilities while additional facilities edit *}
-		$(document).on('click', '#room_extra_demand_content #btn_new_room_facility', function() {
+		$(document).on('click', '#room_extra_demand_content #btn_new_room_demand', function() {
 			$('#rooms_extra_demands .room_demands_container').show();
-			$('#room_extra_demand_content #save_room_facilities').show();
-			$('#room_extra_demand_content #back_to_facilities_btn').show();
+			$('#room_extra_demand_content #save_room_demands').show();
+			$('#room_extra_demand_content #back_to_demands_btn').show();
 			$('#rooms_extra_demands .room_ordered_demands').hide();
-			$('#room_extra_demand_content #btn_new_room_facility').hide();
+			$('#room_extra_demand_content #btn_new_room_demand').hide();
 		});
 		{* click on back button on created facilities while additional facilities edit *}
-		$(document).on('click', '#room_extra_demand_content #back_to_facilities_btn', function() {
+		$(document).on('click', '#room_extra_demand_content #back_to_demands_btn', function() {
 			$('#rooms_extra_demands .room_ordered_demands').show();
-			$('#room_extra_demand_content #btn_new_room_facility').show();
+			$('#room_extra_demand_content #btn_new_room_demand').show();
 			$('#rooms_extra_demands .room_demands_container').hide();
-			$('#room_extra_demand_content #save_room_facilities').hide();
-			$('#room_extra_demand_content #back_to_facilities_btn').hide();
+			$('#room_extra_demand_content #save_room_demands').hide();
+			$('#room_extra_demand_content #back_to_demands_btn').hide();
+		});
+
+		$(document).on('click', '#room_extra_demand_content #btn_new_room_service', function() {
+			$('#rooms_extra_demands .room_services_container').show();
+			$('#room_extra_demand_content #save_service_service').show();
+			$('#room_extra_demand_content #back_to_service_btn').show();
+			$('#rooms_extra_demands .room_ordered_services').hide();
+			$('#room_extra_demand_content #btn_new_room_service').hide();
+		});
+		{* click on back button on created facilities while additional facilities edit *}
+		$(document).on('click', '#room_extra_demand_content #back_to_service_btn', function() {
+			$('#rooms_extra_demands .room_ordered_services').show();
+			$('#room_extra_demand_content #btn_new_room_service').show();
+			$('#rooms_extra_demands .room_services_container').hide();
+			$('#room_extra_demand_content #save_service_service').hide();
+			$('#room_extra_demand_content #back_to_service_btn').hide();
+		});
+
+		$(document).on('focusout', '#rooms_type_extra_demands .qty', function(e) {
+			var qty_wntd = $(this).val();
+			if (qty_wntd == '' || !$.isNumeric(qty_wntd)) {
+				$(this).val(1);
+			}
+			updateServiceProducts($(this));
+		});
+
+		function updateServiceProducts(element)
+		{
+			var id_room_type_service_product_order_detail = $(element).data('id_room_type_service_product_order_detail');
+			var qty = $(element).val();
+			if ($.isNumeric(qty)) {
+				$.ajax({
+					type: 'POST',
+					headers: {
+						"cache-control": "no-cache"
+					},
+					url: "{$link->getAdminLink('AdminOrders')|addslashes}",
+					dataType: 'JSON',
+					cache: false,
+					data: {
+						id_room_type_service_product_order_detail: id_room_type_service_product_order_detail,
+						qty: qty,
+						action: 'updateRoomAdditionalServices',
+						ajax: true
+					},
+					success: function(jsonData) {
+						if (!jsonData.hasError) {
+							showSuccessMessage(txtExtraDemandSucc);
+						} else {
+							showErrorMessage(jsonData.errors);
+
+						}
+					}
+				});
+			}
+
+		}
+
+		$(document).on('submit', '#add_room_services_form', function(e) {
+			e.preventDefault();
+			var form_data = new FormData(this);
+			form_data.append('ajax', true);
+			form_data.append('action', 'addRoomAdditionalServices');
+
+			$.ajax({
+				type: 'POST',
+				headers: {
+					"cache-control": "no-cache"
+				},
+				url: "{$link->getAdminLink('AdminOrders')|addslashes}",
+				dataType: 'JSON',
+				cache: false,
+				data: form_data,
+				processData: false,
+				contentType: false,
+				success: function(jsonData) {
+					if (!jsonData.hasError) {
+						if (jsonData.service_panel) {
+							$('#room_type_service_product_desc').replaceWith(jsonData.service_panel);
+						}
+						showSuccessMessage(txtExtraDemandSucc);
+					} else {
+						showErrorMessage(jsonData.errors);
+
+					}
+				}
+			});
 		});
 
 		{* // save room extra demand to the order *}
-		$(document).on('click', '#save_room_facilities', function(e) {
+		$(document).on('click', '#save_room_demands', function(e) {
 			e.preventDefault();
 			var idHtlBooking = $(this).closest('#room_extra_demand_content').find('#id_htl_booking').val();
 			if (idHtlBooking) {
@@ -1730,10 +1819,12 @@
 							action: 'EditRoomExtraDemands',
 							ajax: true
 						},
-						success: function(result) {
-							if (result == 1) {
+						success: function(jsonData) {
+							if (jsonData.success) {
 								showSuccessMessage(txtExtraDemandSucc);
-								$('#rooms_type_extra_demands').modal('hide');
+								if (jsonData.facilities_panel) {
+									$('#room_type_demands_desc').replaceWith(jsonData.facilities_panel);
+								}
 							} else {
 								showErrorMessage(txtSomeErr);
 							}
@@ -1765,10 +1856,12 @@
 							action: 'DeleteRoomExtraDemand',
 							ajax: true
 						},
-						success: function(result) {
-							if (result == 1) {
-								$currentItem.closest('tr').remove();
+						success: function(jsonData) {
+							if (jsonData.success) {
 								showSuccessMessage(txtDeleteSucc);
+								if (jsonData.facilities_panel) {
+									$('#room_type_demands_desc').replaceWith(jsonData.facilities_panel);
+								}
 							} else {
 								showErrorMessage(txtSomeErr);
 							}
@@ -1778,6 +1871,42 @@
 					showErrorMessage(txtInvalidDemandVal);
 				}
 			}
+		});
+
+		$(document).on('click', '.del_room_additional_service', function(e){
+			e.preventDefault();
+			if (confirm(txt_confirm)) {
+				var idServiceProductOrderDetail = $(this).data('id_room_type_service_product_order_detail');
+				$currentItem = $(this);
+				if (idServiceProductOrderDetail) {
+					$.ajax({
+						type: 'POST',
+						headers: {
+							"cache-control": "no-cache"
+						},
+						url: "{$link->getAdminLink('AdminOrders')|addslashes}",
+						dataType: 'JSON',
+						cache: false,
+						data: {
+							id_room_type_service_product_order_detail: idServiceProductOrderDetail,
+							action: 'DeleteRoomAdditionalService',
+							ajax: true
+						},
+						success: function(jsonData) {
+							if (!jsonData.hasError) {
+							$('#room_type_service_product_desc').replaceWith(jsonData.service_panel);
+							showSuccessMessage(txtExtraDemandSucc);
+						} else {
+							showErrorMessage(jsonData.errors);
+
+						}
+						}
+					});
+				} else {
+					showErrorMessage(txtInvalidDemandVal);
+				}
+			}
+
 		});
 
 		// change advance option of extra demand

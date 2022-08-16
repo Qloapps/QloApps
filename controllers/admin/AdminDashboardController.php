@@ -254,7 +254,7 @@ class AdminDashboardControllerCore extends AdminController
         $hotelOptions = array(array('id_hotel' => false, 'hotel_name' => $this->l('All Hotels')));
         foreach ($idsHotel as $idHotel) {
             $objHotelBranchInfo = new HotelBranchInformation($idHotel, $this->context->language->id);
-            $hotelAddressInfo = $objHotelBranchInfo->getAddress($idHotel);
+            $hotelAddressInfo = HotelBranchInformation::getAddress($idHotel);
             $hotelOptions[] = array(
                 'id_hotel' => (int) $idHotel,
                 'hotel_name' => $objHotelBranchInfo->hotel_name.', '.$hotelAddressInfo['city'],

@@ -350,7 +350,6 @@ class AdminCartsControllerCore extends AdminController
                 $this->context->cart->recyclable = 0;
                 $this->context->cart->gift = 0;
             }
-
             /*if (!$this->context->cart->id_customer)
                 $this->context->cart->id_customer = $id_customer;*/
             if (Validate::isLoadedObject($this->context->cart) && $this->context->cart->OrderExists()) {
@@ -596,6 +595,7 @@ class AdminCartsControllerCore extends AdminController
             $cart_detail_data = $cart_detail_data_obj->getCartFormatedBookinInfoByIdCart((int) $id_cart);
             $this->context->smarty->assign(array(
                 'cart_detail_data' => $cart_detail_data,
+                'currency' => new Currency((int)$this->context->cart->id_currency),
             ));
 
             $tpl_path = 'default/template/controllers/orders/_current_cart_details_data.tpl';
@@ -939,7 +939,7 @@ class AdminCartsControllerCore extends AdminController
                 if ($bookingInfo['id'] == $id_booking_data) {
                     $amt_with_qty = $bookingInfo['amt_with_qty'];
                     $bookingInfo['amt_with_qty'] = Tools::displayPrice($amt_with_qty);
-                    $bookingInfo['total_price'] = Tools::displayPrice($amt_with_qty + $bookingInfo['demand_price']);
+                    $bookingInfo['total_price'] = Tools::displayPrice($amt_with_qty + $bookingInfo['demand_price'] + $bookingInfo['additional_service_price']);
                     $response = array(
                         'curr_booking_info' => $bookingInfo,
                         'cart_info' => $this->ajaxReturnVars(),
@@ -1065,14 +1065,50 @@ class AdminCartsControllerCore extends AdminController
                         }
                         $this->context->smarty->assign('roomTypeDemands', $roomTypeDemands);
                         $this->context->smarty->assign('selectedRoomDemands', $selectedRoomDemands);
-                        $response['status'] = true;
-                        $response['html_exta_demands'] = $this->context->smarty->fetch(
-                            _PS_ADMIN_DIR_.'/themes/default/template/controllers/orders/_cart_booking_demands.tpl'
-                        );
                     }
+                }
+                $htlCartBoookingata =  $objCartBookingData->getRoomRowByIdProductIdRoomInDateRange(
+                    $idCart,
+                    $idProduct,
+                    $dateFrom,
+                    $dateTo,
+                    $idRoom
+                );
+
+                $objRoomTypeServiceProductCartDetail = new RoomTypeServiceProductCartDetail();
+                if ($selectedRoomServiceProduct = $objRoomTypeServiceProductCartDetail->getServiceProductsInCart(
+                    $idCart,
+                    0,
+                    0,
+                    $idProduct,
+                    $dateFrom,
+                    $dateTo,
+                    $htlCartBoookingata['id'],
+                    0,
+                    null,
+                    null
+                )) {
+                    $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
+                    $roomTypeServiceProducts = $objRoomTypeServiceProduct->getServiceProductsData($idProduct, 1, 0, false, 2, null);
+                    foreach ($selectedRoomServiceProduct as $key => $selectedProducts) {
+                        $objRoom = new HotelRoomInformation($selectedProducts['id_room']);
+                        $selectedRoomServiceProduct[$key]['room_num'] = $objRoom->room_num;
+                        foreach ($selectedProducts['selected_products_info'] as $product) {
+                            $selectedRoomServiceProduct[$key]['selected_products'][] = $product['id_product'];
+                        }
+                    }
+
+                    $this->context->smarty->assign(array(
+                        'roomTypeServiceProducts' => $roomTypeServiceProducts,
+                        'selectedRoomServiceProduct' => $selectedRoomServiceProduct
+                    ));
                 }
             }
         }
+        $response['status'] = true;
+        $response['html_exta_demands'] = $this->context->smarty->fetch(
+            _PS_ADMIN_DIR_.'/themes/default/template/controllers/orders/_cart_booking_demands.tpl'
+        );
         $this->ajaxDie(json_encode($response));
     }
 

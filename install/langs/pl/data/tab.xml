@@ -66,7 +66,8 @@
   <tab id="Preferences" name="Preferencje"/>
   <tab id="Price_Rules" name="Reguły ustalania cen"/>
   <tab id="Products_1" name="Produkty"/>
-  <tab id="Products" name="Produkty"/>
+  <tab id="Products" name="Zarządzaj produktami usługowymi"/>
+  <tab id="Room_Types" name="Zarządzaj typami pokoi"/>
   <tab id="Profiles" name="Profile"/>
   <tab id="Quick_Access" name="Szybki dostęp"/>
   <tab id="Referrers" name="Sponsorujący"/>

@@ -218,6 +218,7 @@ class AdminOrdersControllerCore extends AdminController
                 $this->context->currency = new Currency((int)$cart->id_currency);
                 $cart_detail_data = array();
                 $cart_detail_data_obj = new HotelCartBookingData();
+                $objHotelServiceProductCartDetail = new HotelServiceProductCartDetail();
                 if ($cart_detail_data = $cart_detail_data_obj->getCartFormatedBookinInfoByIdCart((int) $id_cart)) {
                     $objRoomType = new HotelRoomType();
                     foreach ($cart_detail_data as $key => $cart_data) {
@@ -225,7 +226,12 @@ class AdminOrdersControllerCore extends AdminController
                         $cart_detail_data[$key]['room_type_info'] = $objRoomType->getRoomTypeInfoByIdProduct($cart_data['id_product']);
                     }
                     $this->context->smarty->assign('cart_detail_data', $cart_detail_data);
-                } else {
+                }
+                if ($normalCartProduct = $objHotelServiceProductCartDetail->getHotelProducts($this->context->cart->id)) {
+                    $this->context->smarty->assign('cart_normal_data', $normalCartProduct);
+                }
+
+                if (empty($cart_detail_data) && empty($normalCartProduct)) {
                     // if no rooms added in the cart and user visits add order page then redirect to BOOK NOW page
                     Tools::redirectAdmin($this->context->link->getAdminLink('AdminHotelRoomsBooking'));
                 }
@@ -264,6 +270,7 @@ class AdminOrdersControllerCore extends AdminController
             'toolbar_scroll' => $this->toolbar_scroll,
             'PS_CATALOG_MODE' => Configuration::get('PS_CATALOG_MODE'),
             'title' => array($this->l('Orders'), $this->l('Create order')),
+            'currency' => new Currency((int)$cart->id_currency),
             'max_child_in_room' => Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM'),
             'max_child_age' => Configuration::get('WK_GLOBAL_CHILD_MAX_AGE'),
             'occupancy_required_for_booking' => $occupancyRequiredForBooking,
@@ -336,6 +343,8 @@ class AdminOrdersControllerCore extends AdminController
 
         if ($this->tabAccess['edit'] == 1 && $this->display == 'view') {
             $this->addJS(_PS_JS_DIR_.'admin/orders.js');
+            // $this->addJS(_PS_JS_DIR_.'admin/orders-product-event.js');
+            // $this->addJS(_PS_JS_DIR_.'admin/orders-room-event.js');
             $this->addJS(_PS_JS_DIR_.'tools.js');
             $this->addJqueryPlugin('autocomplete');
         }
@@ -1402,6 +1411,7 @@ class AdminOrdersControllerCore extends AdminController
             $display_out_of_stock_warning = true;
         }
 
+        $orderServiceProducts = array();
         // products current stock (from stock_available)
         foreach ($products as &$product) {
             // Get total customized quantity for current product
@@ -1440,6 +1450,11 @@ class AdminOrdersControllerCore extends AdminController
                 $product['warehouse_name'] = '--';
                 $product['warehouse_location'] = false;
             }
+
+            // add service products in order detail
+            if ($product['product_service_type'] == Product::SERVICE_PRODUCT_WITHOUT_ROOMTYPE) {
+                $orderServiceProducts[] = $product;
+            }
         }
 
         $gender = new Gender((int)$customer->id_gender, $this->context->language->id);
@@ -1465,15 +1480,21 @@ class AdminOrdersControllerCore extends AdminController
         $order_detail_data = array();
         $cart_detail_data_obj = new HotelCartBookingData();
         $objBookingDetail = new HotelBookingDetail();
+        $objRoomTypeServiceProductOrderDetail = new RoomTypeServiceProductOrderDetail();
 
         $total_room_tax = 0;
         $totalRoomsCostTE = 0;
+        $totalConvenienceFeeTE = 0;
+        $totalConvenienceFeeTI = 0;
         $totalDemandsPriceTE = 0;
         $totalDemandsPriceTI = 0;
         if ($order_detail_data = $objBookingDetail->getOrderFormatedBookinInfoByIdOrder($order->id)) {
             $objBookingDemand = new HotelBookingDemands();
             $objHotelRoomType = new HotelRoomType();
             foreach ($order_detail_data as $key => $value) {
+                $order_detail_data[$key]['total_room_price_te'] = $value['total_price_tax_excl'];
+                $order_detail_data[$key]['total_room_price_ti'] = $value['total_price_tax_incl'];
+
                 $order_detail_data[$key]['extra_demands'] = $objBookingDemand->getRoomTypeBookingExtraDemands(
                     $order->id,
                     $value['id_product'],
@@ -1481,7 +1502,7 @@ class AdminOrdersControllerCore extends AdminController
                     $value['date_from'],
                     $value['date_to']
                 );
-                $order_detail_data[$key]['extra_demands_price_ti'] = $objBookingDemand->getRoomTypeBookingExtraDemands(
+                $order_detail_data[$key]['total_room_price_ti'] += $order_detail_data[$key]['extra_demands_price_ti'] = $objBookingDemand->getRoomTypeBookingExtraDemands(
                     $order->id,
                     $value['id_product'],
                     $value['id_room'],
@@ -1492,7 +1513,7 @@ class AdminOrdersControllerCore extends AdminController
                     1
                 );
                 $totalDemandsPriceTI += $order_detail_data[$key]['extra_demands_price_ti'];
-                $order_detail_data[$key]['extra_demands_price_te'] = $objBookingDemand->getRoomTypeBookingExtraDemands(
+                $order_detail_data[$key]['total_room_price_te'] += $order_detail_data[$key]['extra_demands_price_te'] = $objBookingDemand->getRoomTypeBookingExtraDemands(
                     $order->id,
                     $value['id_product'],
                     $value['id_room'],
@@ -1503,6 +1524,90 @@ class AdminOrdersControllerCore extends AdminController
                     0
                 );
                 $totalDemandsPriceTE += $order_detail_data[$key]['extra_demands_price_te'];
+
+                $order_detail_data[$key]['additional_services'] = $objRoomTypeServiceProductOrderDetail->getroomTypeServiceProducts(
+                    $order->id,
+                    0,
+                    0,
+                    $value['id_product'],
+                    $value['date_from'],
+                    $value['date_to'],
+                    $value['id_room']
+                );
+                $order_detail_data[$key]['total_room_price_ti'] += $order_detail_data[$key]['additional_services_price_ti'] = $objRoomTypeServiceProductOrderDetail->getroomTypeServiceProducts(
+                    $order->id,
+                    0,
+                    0,
+                    $value['id_product'],
+                    $value['date_from'],
+                    $value['date_to'],
+                    $value['id_room'],
+                    1,
+                    1
+                );
+                $order_detail_data[$key]['total_room_price_te'] += $order_detail_data[$key]['additional_services_price_te'] = $objRoomTypeServiceProductOrderDetail->getroomTypeServiceProducts(
+                    $order->id,
+                    0,
+                    0,
+                    $value['id_product'],
+                    $value['date_from'],
+                    $value['date_to'],
+                    $value['id_room'],
+                    1,
+                    0
+                );
+                $order_detail_data[$key]['total_room_price_ti'] += $totalConvenienceFeeTI += $order_detail_data[$key]['convenience_fee_ti'] = $objRoomTypeServiceProductOrderDetail->getroomTypeServiceProducts(
+                    $order->id,
+                    0,
+                    0,
+                    $value['id_product'],
+                    $value['date_from'],
+                    $value['date_to'],
+                    $value['id_room'],
+                    1,
+                    1,
+                    1,
+                    Product::PRICE_ADDITION_TYPE_INDEPENDENT
+                );
+                $order_detail_data[$key]['total_room_price_te'] += $totalConvenienceFeeTE += $order_detail_data[$key]['convenience_fee_te'] = $objRoomTypeServiceProductOrderDetail->getroomTypeServiceProducts(
+                    $order->id,
+                    0,
+                    0,
+                    $value['id_product'],
+                    $value['date_from'],
+                    $value['date_to'],
+                    $value['id_room'],
+                    1,
+                    0,
+                    1,
+                    Product::PRICE_ADDITION_TYPE_INDEPENDENT
+                );
+                $order_detail_data[$key]['total_room_price_ti'] += $order_detail_data[$key]['additional_services_price_auto_add_ti'] = $objRoomTypeServiceProductOrderDetail->getroomTypeServiceProducts(
+                    $order->id,
+                    0,
+                    0,
+                    $value['id_product'],
+                    $value['date_from'],
+                    $value['date_to'],
+                    $value['id_room'],
+                    1,
+                    1,
+                    1,
+                    Product::PRICE_ADDITION_TYPE_WITH_ROOM
+                );
+                $order_detail_data[$key]['total_room_price_te'] += $order_detail_data[$key]['additional_services_price_auto_add_te'] = $objRoomTypeServiceProductOrderDetail->getroomTypeServiceProducts(
+                    $order->id,
+                    0,
+                    0,
+                    $value['id_product'],
+                    $value['date_from'],
+                    $value['date_to'],
+                    $value['id_room'],
+                    1,
+                    0,
+                    1,
+                    Product::PRICE_ADDITION_TYPE_WITH_ROOM
+                );
                 $cust_obj = new Customer($value['id_customer']);
                 if ($cust_obj->firstname) {
                     $order_detail_data[$key]['alloted_cust_name'] = $cust_obj->firstname.' '.$cust_obj->lastname;
@@ -1527,7 +1632,7 @@ class AdminOrdersControllerCore extends AdminController
                 $order_detail_data[$key]['amt_with_qty_tax_excl'] = $value['total_price_tax_excl'];
                 $order_detail_data[$key]['amt_with_qty_tax_incl'] = $value['total_price_tax_incl'];
                 $order_detail_data[$key]['room_type_info'] = $objHotelRoomType->getRoomTypeInfoByIdProduct($value['id_product']);
-
+                $order_detail_data[$key]['total_room_tax'] = $order_detail_data[$key]['total_room_price_ti'] - $order_detail_data[$key]['total_room_price_te'];
             }
         }
 
@@ -1536,7 +1641,6 @@ class AdminOrdersControllerCore extends AdminController
         if ($refundReqBookings = $objOrderReturn->getOrderRefundRequestedBookings($order->id, 0, 1)) {
             $refundedAmount = $objOrderReturn->getRefundedAmount($order->id);
         }
-
 
         // get booking information by order
         $bookingOrderInfo = $objBookingDetail->getBookingDataByOrderId($order->id);
@@ -1550,9 +1654,10 @@ class AdminOrdersControllerCore extends AdminController
             'refundReqBookings' => $refundReqBookings,
             'hasCompletelyRefunded' => $order->hasCompletelyRefunded(),
             'refundedAmount' => $refundedAmount,
-
             'totalDemandsPriceTI' => $totalDemandsPriceTI,
             'totalDemandsPriceTE' => $totalDemandsPriceTE,
+            'totalConvenienceFeeTI' => $totalConvenienceFeeTI,
+            'totalConvenienceFeeTE' => $totalConvenienceFeeTE,
             'totalRoomsCostTE' => $totalRoomsCostTE,
             'total_room_tax' => $total_room_tax,
             'htl_booking_order_data' => $bookingOrderInfo,
@@ -1560,6 +1665,7 @@ class AdminOrdersControllerCore extends AdminController
             'order_detail_data' => $order_detail_data,
             'max_child_in_room' => Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM'),
             'max_child_age' => Configuration::get('WK_GLOBAL_CHILD_MAX_AGE'),
+            'order_service_products' => $orderServiceProducts,
             /*END*/
             'order' => $order,
             'cart' => new Cart($order->id_cart),
@@ -1684,6 +1790,7 @@ class AdminOrdersControllerCore extends AdminController
     {
         Context::getContext()->customer = new Customer((int)Tools::getValue('id_customer'));
         $currency = new Currency((int)Tools::getValue('id_currency'));
+        $bookingProduct = (bool)Tools::getValue('booking_product', true);
         $to_return = array('found' => false);
         if (Validate::isLoadedObject($order = new Order(Tools::getValue('id_order')))) {
             $objBookingDetail = new HotelBookingDetail();
@@ -1696,8 +1803,14 @@ class AdminOrdersControllerCore extends AdminController
 
             if ($products = Product::searchByName((int)$this->context->language->id, pSQL(Tools::getValue('product_search')), null, $idHotel)) {
                 $objRoomType = new HotelRoomType();
-                foreach ($products as &$product) {
-                        // get product room type informatin
+                foreach ($products as $key => &$product) {
+
+                    if (((bool)$product['booking_product']) != $bookingProduct) {
+                        unset($products[$key]);
+                        continue;
+                    }
+
+                    // get product room type informatin
                     if ($roomTypeDetail = $objRoomType->getRoomTypeInfoByIdProduct($product['id_product'])) {
                         $product['room_type_info'] = $roomTypeDetail;
                     }
@@ -1763,14 +1876,96 @@ class AdminOrdersControllerCore extends AdminController
                         $product['customization_fields'] = $product_instance->getCustomizationFields($this->context->language->id);
                     }
                 }
-                $to_return = array(
-                    'products' => $products,
-                    'found' => true
-                );
+
+                if (!empty($products)) {
+                    $to_return = array(
+                        'products' => $products,
+                        'found' => true
+                    );
+                }
             }
         }
         $this->content = json_encode($to_return);
     }
+
+    // public function ajaxProcessSearchProducts()
+    // {
+    //     Context::getContext()->customer = new Customer((int)Tools::getValue('id_customer'));
+    //     $currency = new Currency((int)Tools::getValue('id_currency'));
+    //     if ($products = Product::searchByName((int)$this->context->language->id, pSQL(Tools::getValue('product_search')))) {
+    //         foreach ($products as &$product) {
+    //             // Formatted price
+    //             $product['formatted_price'] = Tools::displayPrice(Tools::convertPrice($product['price_tax_incl'], $currency), $currency);
+    //             // Concret price
+    //             $product['price_tax_incl'] = Tools::ps_round(Tools::convertPrice($product['price_tax_incl'], $currency), 2);
+    //             $product['price_tax_excl'] = Tools::ps_round(Tools::convertPrice($product['price_tax_excl'], $currency), 2);
+    //             $productObj = new Product((int)$product['id_product'], false, (int)$this->context->language->id);
+    //             $combinations = array();
+    //             $attributes = $productObj->getAttributesGroups((int)$this->context->language->id);
+
+    //             // Tax rate for this customer
+    //             if (Tools::isSubmit('id_address')) {
+    //                 $product['tax_rate'] = $productObj->getTaxesRate(new Address(Tools::getValue('id_address')));
+    //             }
+
+    //             $product['warehouse_list'] = array();
+
+    //             foreach ($attributes as $attribute) {
+    //                 if (!isset($combinations[$attribute['id_product_attribute']]['attributes'])) {
+    //                     $combinations[$attribute['id_product_attribute']]['attributes'] = '';
+    //                 }
+    //                 $combinations[$attribute['id_product_attribute']]['attributes'] .= $attribute['attribute_name'].' - ';
+    //                 $combinations[$attribute['id_product_attribute']]['id_product_attribute'] = $attribute['id_product_attribute'];
+    //                 $combinations[$attribute['id_product_attribute']]['default_on'] = $attribute['default_on'];
+    //                 if (!isset($combinations[$attribute['id_product_attribute']]['price'])) {
+    //                     $price_tax_incl = Product::getPriceStatic((int)$product['id_product'], true, $attribute['id_product_attribute']);
+    //                     $price_tax_excl = Product::getPriceStatic((int)$product['id_product'], false, $attribute['id_product_attribute']);
+    //                     $combinations[$attribute['id_product_attribute']]['price_tax_incl'] = Tools::ps_round(Tools::convertPrice($price_tax_incl, $currency), 2);
+    //                     $combinations[$attribute['id_product_attribute']]['price_tax_excl'] = Tools::ps_round(Tools::convertPrice($price_tax_excl, $currency), 2);
+    //                     $combinations[$attribute['id_product_attribute']]['formatted_price'] = Tools::displayPrice(Tools::convertPrice($price_tax_excl, $currency), $currency);
+    //                 }
+    //                 if (!isset($combinations[$attribute['id_product_attribute']]['qty_in_stock'])) {
+    //                     $combinations[$attribute['id_product_attribute']]['qty_in_stock'] = StockAvailable::getQuantityAvailableByProduct((int)$product['id_product'], $attribute['id_product_attribute'], (int)$this->context->shop->id);
+    //                 }
+
+    //                 if (Configuration::get('PS_ADVANCED_STOCK_MANAGEMENT') && (int)$product['advanced_stock_management'] == 1) {
+    //                     $product['warehouse_list'][$attribute['id_product_attribute']] = Warehouse::getProductWarehouseList($product['id_product'], $attribute['id_product_attribute']);
+    //                 } else {
+    //                     $product['warehouse_list'][$attribute['id_product_attribute']] = array();
+    //                 }
+
+    //                 $product['stock'][$attribute['id_product_attribute']] = Product::getRealQuantity($product['id_product'], $attribute['id_product_attribute']);
+    //             }
+
+    //             if (Configuration::get('PS_ADVANCED_STOCK_MANAGEMENT') && (int)$product['advanced_stock_management'] == 1) {
+    //                 $product['warehouse_list'][0] = Warehouse::getProductWarehouseList($product['id_product']);
+    //             } else {
+    //                 $product['warehouse_list'][0] = array();
+    //             }
+
+    //             $product['stock'][0] = StockAvailable::getQuantityAvailableByProduct((int)$product['id_product'], 0, (int)$this->context->shop->id);
+
+    //             foreach ($combinations as &$combination) {
+    //                 $combination['attributes'] = rtrim($combination['attributes'], ' - ');
+    //             }
+    //             $product['combinations'] = $combinations;
+
+    //             if ($product['customizable']) {
+    //                 $product_instance = new Product((int)$product['id_product']);
+    //                 $product['customization_fields'] = $product_instance->getCustomizationFields($this->context->language->id);
+    //             }
+    //         }
+
+    //         $to_return = array(
+    //             'products' => $products,
+    //             'found' => true
+    //         );
+    //     } else {
+    //         $to_return = array('found' => false);
+    //     }
+
+    //     $this->content = json_encode($to_return);
+    // }
 
     public function ajaxProcessSendMailValidateOrder()
     {
@@ -1805,6 +2000,360 @@ class AdminOrdersControllerCore extends AdminController
             }
             $this->content = json_encode(array('errors' => true, 'result' => $this->l('Error in sending the email to your customer.')));
         }
+    }
+
+    public function ajaxProcessAddServiceProductOnOrder()
+    {
+        // Load object
+        $order = new Order((int)Tools::getValue('id_order'));
+        if (!Validate::isLoadedObject($order)) {
+            die(Tools::jsonEncode(array(
+                'result' => false,
+                'error' => Tools::displayError('The order object cannot be loaded.')
+            )));
+        }
+
+        $old_cart_rules = Context::getContext()->cart->getCartRules();
+
+        if ($order->hasBeenShipped()) {
+            die(Tools::jsonEncode(array(
+                'result' => false,
+                'error' => Tools::displayError('You cannot add products to delivered orders. ')
+            )));
+        }
+
+        $product_informations = $_POST['add_product'];
+        if (isset($_POST['add_invoice'])) {
+            $invoice_informations = $_POST['add_invoice'];
+        } else {
+            $invoice_informations = array();
+        }
+        $product = new Product($product_informations['product_id'], false, $order->id_lang);
+        if (!Validate::isLoadedObject($product)) {
+            die(Tools::jsonEncode(array(
+                'result' => false,
+                'error' => Tools::displayError('The product object cannot be loaded.')
+            )));
+        }
+
+        if (isset($product_informations['product_attribute_id']) && $product_informations['product_attribute_id']) {
+            $combination = new Combination($product_informations['product_attribute_id']);
+            if (!Validate::isLoadedObject($combination)) {
+                die(Tools::jsonEncode(array(
+                'result' => false,
+                'error' => Tools::displayError('The combination object cannot be loaded.')
+            )));
+            }
+        }
+
+        if ($product->booking_product || Product::SERVICE_PRODUCT_WITH_ROOMTYPE == $product->service_product_type) {
+            die(Tools::jsonEncode(array(
+                'result' => false,
+                'error' => Tools::displayError('The product cannot be added through this method.')
+            )));
+        }
+
+        // Total method
+        $total_method = Cart::BOTH_WITHOUT_SHIPPING;
+
+        // Create new cart
+        $cart = new Cart();
+        $cart->id_shop_group = $order->id_shop_group;
+        $cart->id_shop = $order->id_shop;
+        $cart->id_customer = $order->id_customer;
+        $cart->id_carrier = $order->id_carrier;
+        $cart->id_address_delivery = $order->id_address_delivery;
+        $cart->id_address_invoice = $order->id_address_invoice;
+        $cart->id_currency = $order->id_currency;
+        $cart->id_lang = $order->id_lang;
+        $cart->secure_key = $order->secure_key;
+
+        // Save new cart
+        $cart->add();
+
+        // Save context (in order to apply cart rule)
+        $this->context->cart = $cart;
+        $this->context->customer = new Customer($order->id_customer);
+
+        // always add taxes even if there are not displayed to the customer
+        $use_taxes = true;
+
+        $initial_product_price_tax_incl = Product::getPriceStatic(
+            $product->id,
+            $use_taxes,
+            isset($combination) ? $combination->id : null,
+            2,
+            null,
+            false,
+            true,
+            1,
+            false,
+            $order->id_customer,
+            $cart->id,
+            $order->id_address_tax
+        );
+
+        // Creating specific price if needed
+        if ($product_informations['product_price_tax_incl'] != $initial_product_price_tax_incl) {
+            $specific_price = new SpecificPrice();
+            $specific_price->id_shop = 0;
+            $specific_price->id_shop_group = 0;
+            $specific_price->id_currency = 0;
+            $specific_price->id_country = 0;
+            $specific_price->id_group = 0;
+            $specific_price->id_customer = $order->id_customer;
+            $specific_price->id_product = $product->id;
+            if (isset($combination)) {
+                $specific_price->id_product_attribute = $combination->id;
+            } else {
+                $specific_price->id_product_attribute = 0;
+            }
+            $specific_price->price = $product_informations['product_price_tax_excl'];
+            $specific_price->from_quantity = 1;
+            $specific_price->reduction = 0;
+            $specific_price->reduction_type = 'amount';
+            $specific_price->reduction_tax = 0;
+            $specific_price->from = '0000-00-00 00:00:00';
+            $specific_price->to = '0000-00-00 00:00:00';
+            $specific_price->add();
+        }
+
+        // Add product to cart
+        $update_quantity = $cart->updateQty($product_informations['product_quantity'], $product->id, isset($product_informations['product_attribute_id']) ? $product_informations['product_attribute_id'] : null,
+            isset($combination) ? $combination->id : null, 'up', 0, new Shop($cart->id_shop));
+
+        if ($update_quantity < 0) {
+            // If product has attribute, minimal quantity is set with minimal quantity of attribute
+            $minimal_quantity = ($product_informations['product_attribute_id']) ? Attribute::getAttributeMinimalQty($product_informations['product_attribute_id']) : $product->minimal_quantity;
+            die(Tools::jsonEncode(array('error' => sprintf(Tools::displayError('You must add %d minimum quantity', false), $minimal_quantity))));
+        } elseif (!$update_quantity) {
+            die(Tools::jsonEncode(array('error' => Tools::displayError('You already have the maximum quantity available for this product.', false))));
+        }
+
+        // If order is valid, we can create a new invoice or edit an existing invoice
+        if ($order->hasInvoice()) {
+            $order_invoice = new OrderInvoice($product_informations['invoice']);
+            // Create new invoice
+            if ($order_invoice->id == 0) {
+                // If we create a new invoice, we calculate shipping cost
+                $total_method = Cart::BOTH;
+                // Create Cart rule in order to make free shipping
+                if (isset($invoice_informations['free_shipping']) && $invoice_informations['free_shipping']) {
+                    $cart_rule = new CartRule();
+                    $cart_rule->id_customer = $order->id_customer;
+                    $cart_rule->name = array(
+                        Configuration::get('PS_LANG_DEFAULT') => $this->l('[Generated] CartRule for Free Shipping')
+                    );
+                    $cart_rule->date_from = date('Y-m-d H:i:s', time());
+                    $cart_rule->date_to = date('Y-m-d H:i:s', time() + 24 * 3600);
+                    $cart_rule->quantity = 1;
+                    $cart_rule->quantity_per_user = 1;
+                    $cart_rule->minimum_amount_currency = $order->id_currency;
+                    $cart_rule->reduction_currency = $order->id_currency;
+                    $cart_rule->free_shipping = true;
+                    $cart_rule->active = 1;
+                    $cart_rule->add();
+
+                    // Add cart rule to cart and in order
+                    $cart->addCartRule($cart_rule->id);
+                    $values = array(
+                        'tax_incl' => $cart_rule->getContextualValue(true),
+                        'tax_excl' => $cart_rule->getContextualValue(false)
+                    );
+                    $order->addCartRule($cart_rule->id, $cart_rule->name[Configuration::get('PS_LANG_DEFAULT')], $values);
+                }
+
+                $order_invoice->id_order = $order->id;
+                if ($order_invoice->number) {
+                    Configuration::updateValue('PS_INVOICE_START_NUMBER', false, false, null, $order->id_shop);
+                } else {
+                    $order_invoice->number = Order::getLastInvoiceNumber() + 1;
+                }
+
+                $invoice_address = new Address((int)$order->{Configuration::get('PS_TAX_ADDRESS_TYPE', null, null, $order->id_shop)});
+                $carrier = new Carrier((int)$order->id_carrier);
+                $tax_calculator = $carrier->getTaxCalculator($invoice_address);
+
+                $order_invoice->total_paid_tax_excl = Tools::ps_round((float)$cart->getOrderTotal(false, $total_method), 2);
+                $order_invoice->total_paid_tax_incl = Tools::ps_round((float)$cart->getOrderTotal($use_taxes, $total_method), 2);
+                $order_invoice->total_products = (float)$cart->getOrderTotal(false, Cart::ONLY_PRODUCTS);
+                $order_invoice->total_products_wt = (float)$cart->getOrderTotal($use_taxes, Cart::ONLY_PRODUCTS);
+                $order_invoice->total_shipping_tax_excl = (float)$cart->getTotalShippingCost(null, false);
+                $order_invoice->total_shipping_tax_incl = (float)$cart->getTotalShippingCost();
+
+                $order_invoice->total_wrapping_tax_excl = abs($cart->getOrderTotal(false, Cart::ONLY_WRAPPING));
+                $order_invoice->total_wrapping_tax_incl = abs($cart->getOrderTotal($use_taxes, Cart::ONLY_WRAPPING));
+                $order_invoice->shipping_tax_computation_method = (int)$tax_calculator->computation_method;
+
+                // Update current order field, only shipping because other field is updated later
+                $order->total_shipping += $order_invoice->total_shipping_tax_incl;
+                $order->total_shipping_tax_excl += $order_invoice->total_shipping_tax_excl;
+                $order->total_shipping_tax_incl += ($use_taxes) ? $order_invoice->total_shipping_tax_incl : $order_invoice->total_shipping_tax_excl;
+
+                $order->total_wrapping += abs($cart->getOrderTotal($use_taxes, Cart::ONLY_WRAPPING));
+                $order->total_wrapping_tax_excl += abs($cart->getOrderTotal(false, Cart::ONLY_WRAPPING));
+                $order->total_wrapping_tax_incl += abs($cart->getOrderTotal($use_taxes, Cart::ONLY_WRAPPING));
+                $order_invoice->add();
+
+                $order_invoice->saveCarrierTaxCalculator($tax_calculator->getTaxesAmount($order_invoice->total_shipping_tax_excl));
+
+                $order_carrier = new OrderCarrier();
+                $order_carrier->id_order = (int)$order->id;
+                $order_carrier->id_carrier = (int)$order->id_carrier;
+                $order_carrier->id_order_invoice = (int)$order_invoice->id;
+                $order_carrier->weight = (float)$cart->getTotalWeight();
+                $order_carrier->shipping_cost_tax_excl = (float)$order_invoice->total_shipping_tax_excl;
+                $order_carrier->shipping_cost_tax_incl = ($use_taxes) ? (float)$order_invoice->total_shipping_tax_incl : (float)$order_invoice->total_shipping_tax_excl;
+                $order_carrier->add();
+            }
+            // Update current invoice
+            else {
+                $order_invoice->total_paid_tax_excl += Tools::ps_round((float)($cart->getOrderTotal(false, $total_method)), 2);
+                $order_invoice->total_paid_tax_incl += Tools::ps_round((float)($cart->getOrderTotal($use_taxes, $total_method)), 2);
+                $order_invoice->total_products += (float)$cart->getOrderTotal(false, Cart::ONLY_PRODUCTS);
+                $order_invoice->total_products_wt += (float)$cart->getOrderTotal($use_taxes, Cart::ONLY_PRODUCTS);
+                $order_invoice->update();
+            }
+        }
+
+        // Create Order detail information
+        $order_detail = new OrderDetail();
+        $order_detail->createList($order, $cart, $order->getCurrentOrderState(), $cart->getProducts(), (isset($order_invoice) ? $order_invoice->id : 0), $use_taxes, (int)Tools::getValue('add_product_warehouse'));
+
+        // update totals amount of order
+        $order->total_products += (float)$cart->getOrderTotal(false, Cart::ONLY_PRODUCTS);
+        $order->total_products_wt += (float)$cart->getOrderTotal($use_taxes, Cart::ONLY_PRODUCTS);
+
+        $order->total_paid += Tools::ps_round((float)($cart->getOrderTotal(true, $total_method)), 2);
+        $order->total_paid_tax_excl += Tools::ps_round((float)($cart->getOrderTotal(false, $total_method)), 2);
+        $order->total_paid_tax_incl += Tools::ps_round((float)($cart->getOrderTotal($use_taxes, $total_method)), 2);
+
+        if (isset($order_invoice) && Validate::isLoadedObject($order_invoice)) {
+            $order->total_shipping = $order_invoice->total_shipping_tax_incl;
+            $order->total_shipping_tax_incl = $order_invoice->total_shipping_tax_incl;
+            $order->total_shipping_tax_excl = $order_invoice->total_shipping_tax_excl;
+        }
+
+        // discount
+        $order->total_discounts += (float)abs($cart->getOrderTotal(true, Cart::ONLY_DISCOUNTS));
+        $order->total_discounts_tax_excl += (float)abs($cart->getOrderTotal(false, Cart::ONLY_DISCOUNTS));
+        $order->total_discounts_tax_incl += (float)abs($cart->getOrderTotal(true, Cart::ONLY_DISCOUNTS));
+
+        // Save changes of order
+        $order->update();
+
+        // Update weight SUM
+        $order_carrier = new OrderCarrier((int)$order->getIdOrderCarrier());
+        if (Validate::isLoadedObject($order_carrier)) {
+            $order_carrier->weight = (float)$order->getTotalWeight();
+            if ($order_carrier->update()) {
+                $order->weight = sprintf("%.3f ".Configuration::get('PS_WEIGHT_UNIT'), $order_carrier->weight);
+            }
+        }
+
+        // Update Tax lines
+        $order_detail->updateTaxAmount($order);
+
+        // Delete specific price if exists
+        if (isset($specific_price)) {
+            $specific_price->delete();
+        }
+
+        $products = $this->getProducts($order);
+
+        // Get the last product
+        $product = end($products);
+        $product['current_stock'] = StockAvailable::getQuantityAvailableByProduct($product['product_id'], $product['product_attribute_id'], $product['id_shop']);
+        $resume = OrderSlip::getProductSlipResume((int)$product['id_order_detail']);
+        $product['quantity_refundable'] = $product['product_quantity'] - $resume['product_quantity'];
+        $product['amount_refundable'] = $product['total_price_tax_excl'] - $resume['amount_tax_excl'];
+        $product['amount_refund'] = Tools::displayPrice($resume['amount_tax_incl']);
+        $product['return_history'] = OrderReturn::getProductReturnDetail((int)$product['id_order_detail']);
+        $product['refund_history'] = OrderSlip::getProductSlipDetail((int)$product['id_order_detail']);
+        if ($product['id_warehouse'] != 0) {
+            $warehouse = new Warehouse((int)$product['id_warehouse']);
+            $product['warehouse_name'] = $warehouse->name;
+            $warehouse_location = WarehouseProductLocation::getProductLocation($product['product_id'], $product['product_attribute_id'], $product['id_warehouse']);
+            if (!empty($warehouse_location)) {
+                $product['warehouse_location'] = $warehouse_location;
+            } else {
+                $product['warehouse_location'] = false;
+            }
+        } else {
+            $product['warehouse_name'] = '--';
+            $product['warehouse_location'] = false;
+        }
+
+        // Get invoices collection
+        $invoice_collection = $order->getInvoicesCollection();
+
+        $invoice_array = array();
+        foreach ($invoice_collection as $invoice) {
+            /** @var OrderInvoice $invoice */
+            $invoice->name = $invoice->getInvoiceNumberFormatted(Context::getContext()->language->id, (int)$order->id_shop);
+            $invoice_array[] = $invoice;
+        }
+
+        // Assign to smarty informations in order to show the new product line
+        $this->context->smarty->assign(array(
+            'product' => $product,
+            'order' => $order,
+            'currency' => new Currency($order->id_currency),
+            'can_edit' => $this->tabAccess['edit'],
+            'invoices_collection' => $invoice_collection,
+            'current_id_lang' => Context::getContext()->language->id,
+            'link' => Context::getContext()->link,
+            'current_index' => self::$currentIndex,
+            'display_warehouse' => (int)Configuration::get('PS_ADVANCED_STOCK_MANAGEMENT')
+        ));
+
+        $this->sendChangedNotification($order);
+        $new_cart_rules = Context::getContext()->cart->getCartRules();
+        sort($old_cart_rules);
+        sort($new_cart_rules);
+        $result = array_diff($new_cart_rules, $old_cart_rules);
+        $refresh = false;
+
+        $res = true;
+        foreach ($result as $cart_rule) {
+            $refresh = true;
+            // Create OrderCartRule
+            $rule = new CartRule($cart_rule['id_cart_rule']);
+            $values = array(
+                    'tax_incl' => $rule->getContextualValue(true),
+                    'tax_excl' => $rule->getContextualValue(false)
+                    );
+            $order_cart_rule = new OrderCartRule();
+            $order_cart_rule->id_order = $order->id;
+            $order_cart_rule->id_cart_rule = $cart_rule['id_cart_rule'];
+            $order_cart_rule->id_order_invoice = $order_invoice->id;
+            $order_cart_rule->name = $cart_rule['name'];
+            $order_cart_rule->value = $values['tax_incl'];
+            $order_cart_rule->value_tax_excl = $values['tax_excl'];
+            $res &= $order_cart_rule->add();
+
+            $order->total_discounts += $order_cart_rule->value;
+            $order->total_discounts_tax_incl += $order_cart_rule->value;
+            $order->total_discounts_tax_excl += $order_cart_rule->value_tax_excl;
+            $order->total_paid -= $order_cart_rule->value;
+            $order->total_paid_tax_incl -= $order_cart_rule->value;
+            $order->total_paid_tax_excl -= $order_cart_rule->value_tax_excl;
+        }
+
+        // Update Order
+        $res &= $order->update();
+
+        die(Tools::jsonEncode(array(
+            'result' => true,
+            'view' => $this->createTemplate('_product_line.tpl')->fetch(),
+            'can_edit' => $this->tabAccess['add'],
+            'order' => $order,
+            'invoices' => $invoice_array,
+            'documents_html' => $this->createTemplate('_documents.tpl')->fetch(),
+            'shipping_html' => $this->createTemplate('_shipping.tpl')->fetch(),
+            'discount_form_html' => $this->createTemplate('_discount_form.tpl')->fetch(),
+            'refresh' => $refresh
+        )));
     }
 
     public function ajaxProcessAddProductOnOrder()
@@ -2028,7 +2577,7 @@ class AdminOrdersControllerCore extends AdminController
                     $objCartBookingData->id_product = $room_info['id_product'];
                     $objCartBookingData->id_room = $room_info['id_room'];
                     $objCartBookingData->id_hotel = $room_info['id_hotel'];
-                    $objCartBookingData->booking_type = HotelBookingDetail::ALLOTMENT_AUTO;
+                    $objCartBookingData->booking_type = 1;
                     $objCartBookingData->quantity = $num_days;
                     $objCartBookingData->date_from = $date_from;
                     $objCartBookingData->date_to = $date_to;
@@ -2433,15 +2982,14 @@ class AdminOrdersControllerCore extends AdminController
 
     public function ajaxProcessLoadProductInformation()
     {
-        // $order_detail = new OrderDetail(Tools::getValue('id_order_detail'));
-        // if (!Validate::isLoadedObject($order_detail))
-        // 	die(json_encode(array(
-        // 		'result' => false,
-        // 		'error' => Tools::displayError('The OrderDetail object cannot be loaded.')
-        // 	)));
+        $order_detail = new OrderDetail(Tools::getValue('id_order_detail'));
+        if (!Validate::isLoadedObject($order_detail))
+        	die(json_encode(array(
+        		'result' => false,
+        		'error' => Tools::displayError('The OrderDetail object cannot be loaded.')
+        	)));
 
-        $id_product = Tools::getValue('id_product');
-        $product = new Product($id_product);
+        $product = new Product($order_detail->product_id);
         if (!Validate::isLoadedObject($product)) {
             die(json_encode(array(
                 'result' => false,
@@ -2462,12 +3010,12 @@ class AdminOrdersControllerCore extends AdminController
             'product' => $product,
             'tax_rate' => $product->getTaxesRate($address),
             /*Original*/
-            /*'price_tax_incl' => Product::getPriceStatic($product->id, true, $order_detail->product_attribute_id, 2),
-            'price_tax_excl' => Product::getPriceStatic($product->id, false, $order_detail->product_attribute_id, 2),*/
+            'price_tax_incl' => Product::getPriceStatic($product->id, true, $order_detail->product_attribute_id, 2),
+            'price_tax_excl' => Product::getPriceStatic($product->id, false, $order_detail->product_attribute_id, 2),
             /*Changed by webkul because attribute_id will always be 0 (No combination)*/
-            'price_tax_incl' => Product::getPriceStatic($product->id, true, 0, 2),
-            'price_tax_excl' => Product::getPriceStatic($product->id, false, 0, 2),
-            //'reduction_percent' => $order_detail->reduction_percent
+            // 'price_tax_incl' => Product::getPriceStatic($product->id, true, 0, 2),
+            // 'price_tax_excl' => Product::getPriceStatic($product->id, false, 0, 2),
+            'reduction_percent' => $order_detail->reduction_percent
         )));
     }
 
@@ -2497,7 +3045,7 @@ class AdminOrdersControllerCore extends AdminController
         $hrt_feature_price->add();
     }
 
-    public function ajaxProcessEditProductOnOrder()
+    public function ajaxProcessEditRoomOnOrder()
     {
         // Return value
         $res = true;
@@ -2506,12 +3054,12 @@ class AdminOrdersControllerCore extends AdminController
         $cart = new Cart($order->id_cart);
         $customer = new Cart($order->id_customer);
         //$order_detail = new OrderDetail((int)Tools::getValue('product_id_order_detail'));
-        $order_detail = new OrderDetail((int) Tools::getValue('order_detail_id'));//by webkul id_order_detail from our table
-        $this->doEditProductValidation($order_detail, $order, isset($order_invoice) ? $order_invoice : null);
+        $order_detail = new OrderDetail((int) Tools::getValue('id_order_detail'));//by webkul id_order_detail from our table
+        $this->doEditRoomValidation($order_detail, $order, isset($order_invoice) ? $order_invoice : null);
+
         if (Tools::isSubmit('product_invoice')) {
             $order_invoice = new OrderInvoice((int) Tools::getValue('product_invoice'));
         }
-
         /*By webkul To edit Order and cart entries when edit rooms from the orderLine when editing the order*/
         $product_informations = $_POST['edit_product'];
         $new_date_from = trim(date('Y-m-d', strtotime($product_informations['date_from'])));
@@ -2634,7 +3182,7 @@ class AdminOrdersControllerCore extends AdminController
         $totalProductPriceAfterTI = 0;
         $totalRoomPriceAfterTE = 0;
         $totalRoomPriceAfterTI = 0;
-        $bookedRooms = $obj_booking_detail->getBookedRoomsByIdOrderDetail((int) Tools::getValue('order_detail_id'), $id_product);
+        $bookedRooms = $obj_booking_detail->getBookedRoomsByIdOrderDetail((int) Tools::getValue('id_order_detail'), $id_product);
         if ($bookedRooms) {
             $params = array(
                 'id_cart' => $cart->id,
@@ -2658,7 +3206,8 @@ class AdminOrdersControllerCore extends AdminController
                         Group::getCurrent()->id,
                         $cart->id,
                         $cart->id_guest,
-                        $roomInfo['id_room']
+                        $roomInfo['id_room'],
+                        0
                     );
 
                     $totalProductPriceAfterTE += (float) $roomTotalPrice['total_price_tax_excl'];
@@ -2894,19 +3443,6 @@ class AdminOrdersControllerCore extends AdminController
                         }
                     }
                 }
-
-                if (isset($order_invoice)) {
-                    // Apply changes on OrderInvoice
-                    $order_invoice->total_paid_tax_excl = $objOrder->total_paid_tax_excl;
-                    $order_invoice->total_paid_tax_incl = $objOrder->total_paid_tax_incl;
-                }
-
-
-                // Save order invoice
-                if (isset($order_invoice)) {
-                    $res &= $order_invoice->update();
-                }
-
                 // change order total save
                 $objOrder->save();
             }
@@ -2933,10 +3469,216 @@ class AdminOrdersControllerCore extends AdminController
         )));
     }
 
-    public function ajaxProcessDeleteProductLine()
+    public function ajaxProcessEditProductOnOrder()
+    {
+        // Return value
+        $res = true;
+
+        $order = new Order((int)Tools::getValue('id_order'));
+        $order_detail = new OrderDetail((int)Tools::getValue('product_id_order_detail'));
+        if (Tools::isSubmit('product_invoice')) {
+            $order_invoice = new OrderInvoice((int)Tools::getValue('product_invoice'));
+        }
+
+        // If multiple product_quantity, the order details concern a product customized
+        $product_quantity = 0;
+        if (is_array(Tools::getValue('product_quantity'))) {
+            foreach (Tools::getValue('product_quantity') as $id_customization => $qty) {
+                // Update quantity of each customization
+                Db::getInstance()->update('customization', array('quantity' => (int)$qty), 'id_customization = ' . (int)$id_customization);
+                // Calculate the real quantity of the product
+                $product_quantity += $qty;
+            }
+        } else {
+            $product_quantity = Tools::getValue('product_quantity');
+        }
+
+        $this->checkStockAvailable($order_detail, ($product_quantity - $order_detail->product_quantity));
+
+        // Check fields validity
+        $this->doEditProductValidation($order_detail, $order, isset($order_invoice) ? $order_invoice : null);
+
+        // If multiple product_quantity, the order details concern a product customized
+        $product_quantity = 0;
+        if (is_array(Tools::getValue('product_quantity'))) {
+            foreach (Tools::getValue('product_quantity') as $id_customization => $qty) {
+                // Update quantity of each customization
+                Db::getInstance()->update('customization', array('quantity' => (int)$qty), 'id_customization = '.(int)$id_customization);
+                // Calculate the real quantity of the product
+                $product_quantity += $qty;
+            }
+        } else {
+            $product_quantity = Tools::getValue('product_quantity');
+        }
+
+        $product_price_tax_incl = $order_detail->unit_price_tax_incl;
+        $product_price_tax_excl = $order_detail->unit_price_tax_excl;
+        $total_products_tax_incl = $product_price_tax_incl * $product_quantity;
+        $total_products_tax_excl = $product_price_tax_excl * $product_quantity;
+
+        // Calculate differences of price (Before / After)
+        $diff_price_tax_incl = $total_products_tax_incl - $order_detail->total_price_tax_incl;
+        $diff_price_tax_excl = $total_products_tax_excl - $order_detail->total_price_tax_excl;
+
+        // Apply change on OrderInvoice
+        if (isset($order_invoice)) {
+            // If OrderInvoice to use is different, we update the old invoice and new invoice
+            if ($order_detail->id_order_invoice != $order_invoice->id) {
+                $old_order_invoice = new OrderInvoice($order_detail->id_order_invoice);
+                // We remove cost of products
+                $old_order_invoice->total_products -= $order_detail->total_price_tax_excl;
+                $old_order_invoice->total_products_wt -= $order_detail->total_price_tax_incl;
+
+                $old_order_invoice->total_paid_tax_excl -= $order_detail->total_price_tax_excl;
+                $old_order_invoice->total_paid_tax_incl -= $order_detail->total_price_tax_incl;
+
+                $res &= $old_order_invoice->update();
+
+                $order_invoice->total_products += $order_detail->total_price_tax_excl;
+                $order_invoice->total_products_wt += $order_detail->total_price_tax_incl;
+
+                $order_invoice->total_paid_tax_excl += $order_detail->total_price_tax_excl;
+                $order_invoice->total_paid_tax_incl += $order_detail->total_price_tax_incl;
+
+                $order_detail->id_order_invoice = $order_invoice->id;
+            }
+        }
+
+        if ($diff_price_tax_incl != 0 && $diff_price_tax_excl != 0) {
+            $order_detail->unit_price_tax_excl = $product_price_tax_excl;
+            $order_detail->unit_price_tax_incl = $product_price_tax_incl;
+
+            $order_detail->total_price_tax_incl += $diff_price_tax_incl;
+            $order_detail->total_price_tax_excl += $diff_price_tax_excl;
+
+            if (isset($order_invoice)) {
+                // Apply changes on OrderInvoice
+                $order_invoice->total_products += $diff_price_tax_excl;
+                $order_invoice->total_products_wt += $diff_price_tax_incl;
+
+                $order_invoice->total_paid_tax_excl += $diff_price_tax_excl;
+                $order_invoice->total_paid_tax_incl += $diff_price_tax_incl;
+            }
+
+            // Apply changes on Order
+            $order = new Order($order_detail->id_order);
+            $order->total_products += $diff_price_tax_excl;
+            $order->total_products_wt += $diff_price_tax_incl;
+
+            $order->total_paid += $diff_price_tax_incl;
+            $order->total_paid_tax_excl += $diff_price_tax_excl;
+            $order->total_paid_tax_incl += $diff_price_tax_incl;
+
+            $res &= $order->update();
+        }
+
+        $old_quantity = $order_detail->product_quantity;
+
+        $order_detail->product_quantity = $product_quantity;
+        $order_detail->reduction_percent = 0;
+
+        // update taxes
+        $res &= $order_detail->updateTaxAmount($order);
+
+        // Save order detail
+        $res &= $order_detail->update();
+
+        // Update weight SUM
+        $order_carrier = new OrderCarrier((int)$order->getIdOrderCarrier());
+        if (Validate::isLoadedObject($order_carrier)) {
+            $order_carrier->weight = (float)$order->getTotalWeight();
+            $res &= $order_carrier->update();
+            if ($res) {
+                $order->weight = sprintf("%.3f ".Configuration::get('PS_WEIGHT_UNIT'), $order_carrier->weight);
+            }
+        }
+
+        // Save order invoice
+        if (isset($order_invoice)) {
+            $res &= $order_invoice->update();
+        }
+
+        // Update product available quantity
+        StockAvailable::updateQuantity($order_detail->product_id, $order_detail->product_attribute_id, ($old_quantity - $order_detail->product_quantity), $order->id_shop);
+
+        $products = $this->getProducts($order);
+        // Get the last product
+        $product = $products[$order_detail->id];
+        $product['current_stock'] = StockAvailable::getQuantityAvailableByProduct($product['product_id'], $product['product_attribute_id'], $product['id_shop']);
+        $resume = OrderSlip::getProductSlipResume($order_detail->id);
+        $product['quantity_refundable'] = $product['product_quantity'] - $resume['product_quantity'];
+        $product['amount_refundable'] = $product['total_price_tax_excl'] - $resume['amount_tax_excl'];
+        $product['amount_refund'] = Tools::displayPrice($resume['amount_tax_incl']);
+        $product['refund_history'] = OrderSlip::getProductSlipDetail($order_detail->id);
+        if ($product['id_warehouse'] != 0) {
+            $warehouse = new Warehouse((int)$product['id_warehouse']);
+            $product['warehouse_name'] = $warehouse->name;
+            $warehouse_location = WarehouseProductLocation::getProductLocation($product['product_id'], $product['product_attribute_id'], $product['id_warehouse']);
+            if (!empty($warehouse_location)) {
+                $product['warehouse_location'] = $warehouse_location;
+            } else {
+                $product['warehouse_location'] = false;
+            }
+        } else {
+            $product['warehouse_name'] = '--';
+            $product['warehouse_location'] = false;
+        }
+
+        // Get invoices collection
+        $invoice_collection = $order->getInvoicesCollection();
+
+        $invoice_array = array();
+        foreach ($invoice_collection as $invoice) {
+            /** @var OrderInvoice $invoice */
+            $invoice->name = $invoice->getInvoiceNumberFormatted(Context::getContext()->language->id, (int)$order->id_shop);
+            $invoice_array[] = $invoice;
+        }
+
+        // Assign to smarty informations in order to show the new product line
+        $this->context->smarty->assign(array(
+            'product' => $product,
+            'order' => $order,
+            'currency' => new Currency($order->id_currency),
+            'can_edit' => $this->tabAccess['edit'],
+            'invoices_collection' => $invoice_collection,
+            'current_id_lang' => Context::getContext()->language->id,
+            'link' => Context::getContext()->link,
+            'current_index' => self::$currentIndex,
+            'display_warehouse' => (int)Configuration::get('PS_ADVANCED_STOCK_MANAGEMENT')
+        ));
+
+        if (!$res) {
+            die(Tools::jsonEncode(array(
+                'result' => $res,
+                'error' => Tools::displayError('An error occurred while editing the product line.')
+            )));
+        }
+
+        if (is_array(Tools::getValue('product_quantity'))) {
+            $view = $this->createTemplate('_customized_data.tpl')->fetch();
+        } else {
+            $view = $this->createTemplate('_product_line.tpl')->fetch();
+        }
+
+        $this->sendChangedNotification($order);
+
+        die(Tools::jsonEncode(array(
+            'result' => $res,
+            'view' => $view,
+            'can_edit' => $this->tabAccess['add'],
+            'invoices_collection' => $invoice_collection,
+            'order' => $order,
+            'invoices' => $invoice_array,
+            'documents_html' => $this->createTemplate('_documents.tpl')->fetch(),
+            'shipping_html' => $this->createTemplate('_shipping.tpl')->fetch(),
+            'customized_product' => is_array(Tools::getValue('product_quantity'))
+        )));
+    }
+
+    public function ajaxProcessDeleteRoomLine()
     {
         $res = true;
-        $order_detail = new OrderDetail((int) Tools::getValue('order_detail_id'));
+        $order_detail = new OrderDetail((int) Tools::getValue('id_order_detail'));
         $id_order = (int) Tools::getValue('id_order');
         $order = new Order($id_order);
         /*By webkul To delete Order and cart entries when deleting rooms from the orderLine when editing the order*/
@@ -3012,6 +3754,36 @@ class AdminOrdersControllerCore extends AdminController
             0
         );
 
+        $objRoomTypeServiceProductOrderDetail = new RoomTypeServiceProductOrderDetail();
+        $additionlServicesTI = $objRoomTypeServiceProductOrderDetail->getSelectedServicesForRoom(
+            $id_order,
+            $id_product,
+            $date_from,
+            $date_to,
+            $id_room,
+            1,
+            1
+        );
+
+        $additionlServicesTE = $objRoomTypeServiceProductOrderDetail->getSelectedServicesForRoom(
+            $id_order,
+            $id_product,
+            $date_from,
+            $date_to,
+            $id_room,
+            1,
+            0
+        );
+
+        $selectedAdditonalServices = $objRoomTypeServiceProductOrderDetail->getSelectedServicesForRoom(
+            $id_order,
+            $id_product,
+            $date_from,
+            $date_to,
+            $id_room
+        );
+
+
         /*$totalProductPriceBeforeTE = $order_detail->total_price_tax_excl;
         $totalProductPriceBeforeTI = $order_detail->total_price_tax_incl;*/
         // by webkul to calculate rates of the product from hotelreservation syatem tables with feature prices....
@@ -3044,14 +3816,33 @@ class AdminOrdersControllerCore extends AdminController
             // Save order detail
             $res &= $order_detail->update();
         }
+        // update order detail for selected aditional services
+        foreach ($selectedAdditonalServices['additional_services'] as $service) {
+            $serviceOrderDetail = new OrderDetail($service['id_order_detail']);
+            if ($service['quantity'] >= $serviceOrderDetail->product_quantity) {
+                $serviceOrderDetail->delete();
+            } else {
+                $order_detail->total_price_tax_incl -= $service['total_price_tax_incl'];
+                $order_detail->total_price_tax_excl -= $service['total_price_tax_excl'];
+
+                $serviceOldQuantity = $serviceOrderDetail->product_quantity;
+                $serviceOrderDetail->product_quantity = $serviceOldQuantity - $service['quantity'];
+
+                // update taxes
+                $res &= $order_detail->updateTaxAmount($order);
+
+                // Save order detail
+                $res &= $order_detail->update();
+            }
+        }
         /*End*/
 
         // Update OrderInvoice of this OrderDetail
         if ($order_detail->id_order_invoice != 0) {
             // values changes as values are calculated accoding to the quantity of the product by webkul
             $order_invoice = new OrderInvoice($order_detail->id_order_invoice);
-            $order_invoice->total_paid_tax_excl -= ($diff_products_tax_excl + $roomExtraDemandTE);
-            $order_invoice->total_paid_tax_incl -= ($diff_products_tax_incl + $roomExtraDemandTI);
+            $order_invoice->total_paid_tax_excl -= ($diff_products_tax_excl + $roomExtraDemandTE + $additionlServicesTE);
+            $order_invoice->total_paid_tax_incl -= ($diff_products_tax_incl + $roomExtraDemandTI + $additionlServicesTI);
             $order_invoice->total_products -= $diff_products_tax_excl;
             $order_invoice->total_products_wt -= $diff_products_tax_incl;
             $res &= $order_invoice->update();
@@ -3060,10 +3851,10 @@ class AdminOrdersControllerCore extends AdminController
         // Update Order
         // values changes as values are calculated accoding to the quantity of the product by webkul
         $order->total_paid -= ($diff_products_tax_incl + $roomExtraDemandTI);
-        $order->total_paid_tax_incl -= ($diff_products_tax_incl + $roomExtraDemandTI);
-        $order->total_paid_tax_excl -= ($diff_products_tax_excl + $roomExtraDemandTE);
-        $order->total_products -= $diff_products_tax_excl;
-        $order->total_products_wt -= $diff_products_tax_incl;
+        $order->total_paid_tax_incl -= ($diff_products_tax_incl + $roomExtraDemandTI + $additionlServicesTI);
+        $order->total_paid_tax_excl -= ($diff_products_tax_excl + $roomExtraDemandTE + $additionlServicesTE);
+        $order->total_products -= ($diff_products_tax_excl + $additionlServicesTE);
+        $order->total_products_wt -= ($diff_products_tax_incl + $additionlServicesTI);
 
         $res &= $order->update();
 
@@ -3100,6 +3891,8 @@ class AdminOrdersControllerCore extends AdminController
         // delete the demands od this booking
         $objBookingDemand->deleteBookingDemands($idHotelBooking);
 
+        $objRoomTypeServiceProductOrderDetail->deleteRoomSevicesByIdHotelBookingDetail($idHotelBooking);
+
         /*By webkul to delete cart and order entries from cart and order tables of hotelreservationsystem when delete booking form the order line in order detaoil page*/
         $obj_htl_cart_booking = new HotelCartBookingData();
         $delete_room_order = $obj_htl_cart_booking->deleteOrderedRoomFromCart($id_order, $id_hotel, $id_room, $date_from, $date_to);
@@ -3128,7 +3921,183 @@ class AdminOrdersControllerCore extends AdminController
         )));
     }
 
+    public function ajaxProcessDeleteProductLine()
+    {
+        $res = true;
+
+        $order_detail = new OrderDetail((int)Tools::getValue('id_order_detail'));
+        $order = new Order((int)Tools::getValue('id_order'));
+
+        $this->doDeleteProductLineValidation($order_detail, $order);
+
+        // Update OrderInvoice of this OrderDetail
+        if ($order_detail->id_order_invoice != 0) {
+            $order_invoice = new OrderInvoice($order_detail->id_order_invoice);
+            $order_invoice->total_paid_tax_excl -= $order_detail->total_price_tax_excl;
+            $order_invoice->total_paid_tax_incl -= $order_detail->total_price_tax_incl;
+            $order_invoice->total_products -= $order_detail->total_price_tax_excl;
+            $order_invoice->total_products_wt -= $order_detail->total_price_tax_incl;
+            $res &= $order_invoice->update();
+        }
+
+        // Update Order
+        $order->total_paid -= $order_detail->total_price_tax_incl;
+        $order->total_paid_tax_incl -= $order_detail->total_price_tax_incl;
+        $order->total_paid_tax_excl -= $order_detail->total_price_tax_excl;
+        $order->total_products -= $order_detail->total_price_tax_excl;
+        $order->total_products_wt -= $order_detail->total_price_tax_incl;
+
+        $res &= $order->update();
+
+        // Reinject quantity in stock
+        $this->reinjectQuantity($order_detail, $order_detail->product_quantity, true);
+
+        // Update weight SUM
+        $order_carrier = new OrderCarrier((int)$order->getIdOrderCarrier());
+        if (Validate::isLoadedObject($order_carrier)) {
+            $order_carrier->weight = (float)$order->getTotalWeight();
+            $res &= $order_carrier->update();
+            if ($res) {
+                $order->weight = sprintf("%.3f ".Configuration::get('PS_WEIGHT_UNIT'), $order_carrier->weight);
+            }
+        }
+
+        if (!$res) {
+            die(Tools::jsonEncode(array(
+                'result' => $res,
+                'error' => Tools::displayError('An error occurred while attempting to delete the product line.')
+            )));
+        }
+
+        // Get invoices collection
+        $invoice_collection = $order->getInvoicesCollection();
+
+        $invoice_array = array();
+        foreach ($invoice_collection as $invoice) {
+            /** @var OrderInvoice $invoice */
+            $invoice->name = $invoice->getInvoiceNumberFormatted(Context::getContext()->language->id, (int)$order->id_shop);
+            $invoice_array[] = $invoice;
+        }
+
+        // Assign to smarty informations in order to show the new product line
+        $this->context->smarty->assign(array(
+            'order' => $order,
+            'currency' => new Currency($order->id_currency),
+            'invoices_collection' => $invoice_collection,
+            'current_id_lang' => Context::getContext()->language->id,
+            'link' => Context::getContext()->link,
+            'current_index' => self::$currentIndex
+        ));
+
+        $this->sendChangedNotification($order);
+
+        die(Tools::jsonEncode(array(
+            'result' => $res,
+            'order' => $order,
+            'invoices' => $invoice_array,
+            'documents_html' => $this->createTemplate('_documents.tpl')->fetch(),
+            'shipping_html' => $this->createTemplate('_shipping.tpl')->fetch()
+        )));
+    }
+
     protected function doEditProductValidation(OrderDetail $order_detail, Order $order, OrderInvoice $order_invoice = null)
+    {
+        $this->doEditValidation($order_detail, $order, $order_invoice);
+
+        if (!is_array(Tools::getValue('product_quantity')) && !Validate::isUnsignedInt(Tools::getValue('product_quantity'))) {
+            die(json_encode(array(
+                'result' => false,
+                'error' => Tools::displayError('Invalid quantity')
+            )));
+        } elseif (is_array(Tools::getValue('product_quantity'))) {
+            foreach (Tools::getValue('product_quantity') as $qty) {
+                if (!Validate::isUnsignedInt($qty)) {
+                    die(json_encode(array(
+                        'result' => false,
+                        'error' => Tools::displayError('Invalid quantity')
+                    )));
+                }
+            }
+        }
+    }
+
+    protected function doEditRoomValidation(OrderDetail $order_detail, Order $order, OrderInvoice $order_invoice = null)
+    {
+        $this->doEditValidation($order_detail, $order, $order_invoice);
+
+        $product_price_tax_incl = str_replace(',', '.', Tools::getValue('product_price_tax_incl'));
+        $product_price_tax_excl = str_replace(',', '.', Tools::getValue('product_price_tax_excl'));
+
+        if (!Validate::isPrice($product_price_tax_incl) || !Validate::isPrice($product_price_tax_excl)) {
+            die(json_encode(array(
+                'result' => false,
+                'error' => Tools::displayError('Invalid price')
+            )));
+        }
+
+        $product_informations = Tools::getValue('edit_product');
+        $new_date_from = trim(date('Y-m-d', strtotime($product_informations['date_from'])));
+        $new_date_to = trim(date('Y-m-d', strtotime($product_informations['date_to'])));
+        $obj_booking_detail = new HotelBookingDetail();
+        $product_quantity = (int) $obj_booking_detail->getNumberOfDays($new_date_from, $new_date_to);
+
+        if (trim(Tools::getValue('id_hotel')) == '') {
+            die(json_encode(array(
+                'result' => false,
+                'error' => Tools::displayError('Hotel Id is mising.'),
+            )));
+        } elseif (trim(Tools::getValue('id_room')) == '') {
+            die(json_encode(array(
+                'result' => false,
+                'error' => Tools::displayError('Room Id is missing.'),
+            )));
+        } elseif (trim(date('Y-m-d', strtotime($product_informations['date_from']))) == '') {
+            die(json_encode(array(
+                'result' => false,
+                'error' => Tools::displayError('Please Enter Check In Date.'),
+            )));
+        } elseif (!Validate::isDateFormat($new_date_from)) {
+            die(json_encode(array(
+                'result' => false,
+                'error' => Tools::displayError('Please Enter a Valid Check In Date.'),
+            )));
+        } elseif ($new_date_to == '') {
+            die(json_encode(array(
+                'result' => false,
+                'error' => Tools::displayError('Please Enter Check Out Date.'),
+            )));
+        } elseif (!Validate::isDateFormat($new_date_to)) {
+            die(json_encode(array(
+                'result' => false,
+                'error' => Tools::displayError('Please Enter a valid Check out Date.'),
+            )));
+        } elseif ($new_date_from < $curr_date) {
+            die(json_encode(array(
+                'result' => false,
+                'error' => Tools::displayError('Check In date should not be after current date.'),
+            )));
+        } elseif ($new_date_to <= $new_date_from) {
+            die(json_encode(array(
+                'result' => false,
+                'error' => Tools::displayError('Check out Date Should be after Check In date.'),
+            )));
+        } elseif (!Validate::isUnsignedInt($product_quantity)) {
+            die(json_encode(array(
+                'result' => false,
+                'error' => Tools::displayError('Invalid quantity.'),
+            )));
+        }
+
+        $rooms_booked = $obj_booking_detail->getRoomBookinInformationForDateRangeByOrder($id_room, $old_date_from, $old_date_to, $new_date_from, $new_date_to);
+        if ($rooms_booked) {
+            die(json_encode(array(
+                'result' => false,
+                'error' => Tools::displayError('This Room Unavailable For Selected Duration.'),
+            )));
+        }
+    }
+
+    protected function doEditValidation(OrderDetail $order_detail, Order $order, OrderInvoice $order_invoice = null)
     {
         if (!Validate::isLoadedObject($order_detail)) {
             die(json_encode(array(
@@ -3172,30 +4141,6 @@ class AdminOrdersControllerCore extends AdminController
                 'error' => Tools::displayError('You cannot use this invoice for the order')
             )));
         }
-
-        // Clean price
-        $product_price_tax_incl = str_replace(',', '.', Tools::getValue('product_price_tax_incl'));
-        $product_price_tax_excl = str_replace(',', '.', Tools::getValue('product_price_tax_excl'));
-
-        if (!Validate::isPrice($product_price_tax_incl) || !Validate::isPrice($product_price_tax_excl)) {
-            die(json_encode(array(
-                'result' => false,
-                'error' => Tools::displayError('Invalid price')
-            )));
-        }
-        //commented by webkul here quantity is gap between booking days which is calulated and validated in ajaxProcessEditProductOnOrder();
-        /*if (!is_array(Tools::getValue('product_quantity')) && !Validate::isUnsignedInt(Tools::getValue('product_quantity')))
-            die(json_encode(array(
-                'result' => false,
-                'error' => Tools::displayError('Invalid quantity')
-            )));
-        elseif (is_array(Tools::getValue('product_quantity')))
-            foreach (Tools::getValue('product_quantity') as $qty)
-                if (!Validate::isUnsignedInt($qty))
-                    die(json_encode(array(
-                        'result' => false,
-                        'error' => Tools::displayError('Invalid quantity')
-                    )));*/
     }
 
     protected function doDeleteProductLineValidation(OrderDetail $order_detail, Order $order)
@@ -3476,10 +4421,27 @@ class AdminOrdersControllerCore extends AdminController
         die(json_encode($result));
     }
 
+    public function ajaxProcessDeleteProductProcess()
+    {
+        $errors = array();
+        if ((!$id_product = (int)Tools::getValue('id_product')) || !Validate::isInt($id_product)) {
+            $errors[] = Tools::displayError('Invalid product');
+        }
+        $cart_id = Tools::getValue('id_cart');
+        if (!Validate::isLoadedObject($objCart = new Cart($cart_id))) {
+            $errors[] = Tools::displayError('Cart not found');
+        }
+        if (count($errors)) {
+            die(json_encode($errors));
+        }
+        if ($objCart->deleteProduct($id_product)) {
+            die(json_encode(array('status' => 'deleted')));
+        }
+    }
+
     // To show rooms extra demands in the modal box in order details view page
     public function ajaxProcessGetRoomTypeBookingDemands()
     {
-        $extraDemandsTpl = '';
         if (($idProduct = Tools::getValue('id_product'))
             && ($idOrder = Tools::getValue('id_order'))
             && ($idRoom = Tools::getValue('id_room'))
@@ -3490,7 +4452,19 @@ class AdminOrdersControllerCore extends AdminController
             $objOrder = new Order($idOrder);
             $smartyVars['orderCurrency'] = $objOrder->id_currency;
 
+            $objBookingDemand = new HotelBookingDetail();
+            $htlBookingDetail = $objBookingDemand->getRowByIdOrderIdProductInDateRange(
+                $idOrder,
+                $idProduct,
+                $dateFrom,
+                $dateTo,
+                $idRoom
+            );
+
+            $smartyVars['id_booking_detail'] = $htlBookingDetail['id'];
+
             $objBookingDemand = new HotelBookingDemands();
+
             if ($extraDemands = $objBookingDemand->getRoomTypeBookingExtraDemands(
                 $idOrder,
                 $idProduct,
@@ -3518,17 +4492,446 @@ class AdminOrdersControllerCore extends AdminController
                 }
             }
 
+            $objRoomTypeServiceProductOrderDetail = new RoomTypeServiceProductOrderDetail();
+            if ($additionalServices = $objRoomTypeServiceProductOrderDetail->getSelectedServicesForRoom(
+                $idOrder,
+                $idProduct,
+                $dateFrom,
+                $dateTo,
+                $idRoom
+            )) {
+                $smartyVars['additionalServices'] = $additionalServices;
+            }
+
+            if ($orderEdit = Tools::getValue('orderEdit')) {
+                $smartyVars['orderEdit'] = $orderEdit;
+
+                // get room type additional demands
+                $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
+                if ($roomTypeServiceProducts = $objRoomTypeServiceProduct->getServiceProductsData($idProduct)) {
+                    foreach ($roomTypeServiceProducts as $key => $product) {
+                        if (in_array($product['id_product'], array_column($additionalServices['additional_services'], 'id_product'))) {
+                            unset($roomTypeServiceProducts[$key]);
+                        }
+                    }
+                    $smartyVars['roomTypeServiceProducts'] = $roomTypeServiceProducts;
+                }
+            }
             $this->context->smarty->assign($smartyVars);
-            $extraDemandsTpl .= $this->context->smarty->fetch(
-                _PS_ADMIN_DIR_.'/themes/default/template/controllers/orders/_room_extra_demands.tpl'
-            );
+
         }
+
+        $extraDemandsTpl = $this->context->smarty->fetch(
+            _PS_ADMIN_DIR_.'/themes/default/template/controllers/orders/_room_extra_services_modal.tpl'
+        );
         die($extraDemandsTpl);
+    }
+
+    public function processRenderServicesPanel($idOrder, $idProduct, $dateFrom, $dateTo, $idRoom, $orderEdit)
+    {
+        $smartyVars = array();
+        $objBookingDemand = new HotelBookingDetail();
+        $htlBookingDetail = $objBookingDemand->getRowByIdOrderIdProductInDateRange(
+            $idOrder,
+            $idProduct,
+            $dateFrom,
+            $dateTo,
+            $idRoom
+        );
+
+        $smartyVars['id_booking_detail'] = $htlBookingDetail['id'];
+        $objRoomTypeServiceProductOrderDetail = new RoomTypeServiceProductOrderDetail();
+        if ($additionalServices = $objRoomTypeServiceProductOrderDetail->getSelectedServicesForRoom(
+            $idOrder,
+            $idProduct,
+            $dateFrom,
+            $dateTo,
+            $idRoom
+        )) {
+            $smartyVars['additionalServices'] = $additionalServices;
+        }
+
+        if ($orderEdit) {
+            $smartyVars['orderEdit'] = $orderEdit;
+
+            // get room type additional demands
+            $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
+            if ($roomTypeServiceProducts = $objRoomTypeServiceProduct->getServiceProductsData($idProduct)) {
+                foreach ($roomTypeServiceProducts as $key => $product) {
+                    if (in_array($product['id_product'], array_column($additionalServices['additional_services'], 'id_product'))) {
+                        unset($roomTypeServiceProducts[$key]);
+                    }
+                }
+                $smartyVars['roomTypeServiceProducts'] = $roomTypeServiceProducts;
+            }
+        }
+        $this->context->smarty->assign($smartyVars);
+
+        $servicesTpl = $this->context->smarty->fetch(
+            _PS_ADMIN_DIR_.'/themes/default/template/controllers/orders/_room_services_block.tpl'
+        );
+        return $servicesTpl;
+
+    }
+
+    public function processRenderFacilitiesBlock($idOrder, $idProduct, $dateFrom, $dateTo, $idRoom, $orderEdit)
+    {
+        $smartyVars = array();
+        $objOrder = new Order($idOrder);
+        $smartyVars['orderCurrency'] = $objOrder->id_currency;
+
+        $objBookingDemand = new HotelBookingDetail();
+        $htlBookingDetail = $objBookingDemand->getRowByIdOrderIdProductInDateRange(
+            $idOrder,
+            $idProduct,
+            $dateFrom,
+            $dateTo,
+            $idRoom
+        );
+
+        $smartyVars['id_booking_detail'] = $htlBookingDetail['id'];
+
+        $objBookingDemand = new HotelBookingDemands();
+
+        if ($extraDemands = $objBookingDemand->getRoomTypeBookingExtraDemands(
+            $idOrder,
+            $idProduct,
+            $idRoom,
+            $dateFrom,
+            $dateTo
+        )) {
+            $smartyVars['extraDemands'] = $extraDemands;
+        }
+
+        // if admin is editing order
+        if ($orderEdit) {
+            $smartyVars['orderEdit'] = $orderEdit;
+
+            // get room type additional demands
+            $objRoomDemands = new HotelRoomTypeDemand();
+            if ($roomTypeDemands = $objRoomDemands->getRoomTypeDemands($idProduct)) {
+                foreach ($roomTypeDemands as &$demand) {
+                    // if demand has advance options then set demand price as first advance option price.
+                    if (isset($demand['adv_option']) && $demand['adv_option']) {
+                        $demand['price'] = current($demand['adv_option'])['price'];
+                    }
+                }
+                $smartyVars['roomTypeDemands'] = $roomTypeDemands;
+            }
+        }
+        $this->context->smarty->assign($smartyVars);
+
+        $servicesTpl = $this->context->smarty->fetch(
+            _PS_ADMIN_DIR_.'/themes/default/template/controllers/orders/_room_facilities_block.tpl'
+        );
+        return $servicesTpl;
+    }
+
+    public function ajaxProcessUpdateRoomAdditionalServices()
+    {
+        $response = array('hasError' => false);
+        $id_room_type_service_product_order_detail = Tools::getValue('id_room_type_service_product_order_detail');
+        $quantity = Tools::getValue('qty');
+
+        if (Validate::isLoadedObject($objRoomTypeServiceProductOrderDetail = new RoomTypeServiceProductOrderDetail($id_room_type_service_product_order_detail))) {
+            $objOrderDetail = new OrderDetail($objRoomTypeServiceProductOrderDetail->id_order_detail);
+            if ($objOrderDetail->product_allow_multiple_quantity) {
+                if (!Validate::isUnsignedInt($quantity)) {
+                    $response['hasError'] = true;
+                    $response['errors'] = $this->l('Invalid quantity provided');
+                } else {
+                    $objRoomTypeServiceProductOrderDetail->quantity = $quantity;
+                    $oldPriceTaxExcl = $objRoomTypeServiceProductOrderDetail->total_price_tax_excl;
+                    $oldPriceTaxIncl = $objRoomTypeServiceProductOrderDetail->total_price_tax_incl;
+                    $objRoomTypeServiceProductOrderDetail->total_price_tax_excl = $objRoomTypeServiceProductOrderDetail->unit_price_tax_excl * $quantity;
+                    $objRoomTypeServiceProductOrderDetail->total_price_tax_incl = $objRoomTypeServiceProductOrderDetail->unit_price_tax_incl * $quantity;
+                    $res = true;
+                    if ($res &= $objRoomTypeServiceProductOrderDetail->save()) {
+                        $order = new Order($objRoomTypeServiceProductOrderDetail->id_order);
+                        $priceDiffTaxExcl = $objRoomTypeServiceProductOrderDetail->total_price_tax_excl - $oldPriceTaxExcl;
+                        $priceDiffTaxIncl = $objRoomTypeServiceProductOrderDetail->total_price_tax_incl - $oldPriceTaxIncl;
+
+                        $objOrderDetail->product_quantity = $quantity;
+                        $objOrderDetail->total_price_tax_excl += $priceDiffTaxExcl;
+                        $objOrderDetail->total_price_tax_incl += $priceDiffTaxIncl;
+
+                        $res &= $objOrderDetail->updateTaxAmount($order);
+
+                        $res &= $objOrderDetail->update();
+
+                        $order->total_paid_tax_excl += $priceDiffTaxExcl;
+                        $order->total_paid_tax_incl += $priceDiffTaxIncl;
+                        $order->total_paid += $priceDiffTaxIncl;
+
+                        $res &= $order->update();
+                    }
+                }
+                if (!$res) {
+                    $response['hasError'] = true;
+                    $response['errors'] = $this->l('Error while updating service, please try refresing the page');
+                }
+            } else {
+                $response['hasError'] = true;
+                $response['errors'] = $this->l('cannot order multiple quanitity for this service');
+            }
+        } else {
+            $response['hasError'] = true;
+            $response['errors'] = $this->l('Additional service not found');
+        }
+
+        die(json_encode($response));
+    }
+
+    public function ajaxProcessDeleteRoomAdditionalService()
+    {
+        $response = array('hasError' => false);
+        $id_room_type_service_product_order_detail = Tools::getValue('id_room_type_service_product_order_detail');
+
+        if (Validate::isLoadedObject($objRoomTypeServiceProductOrderDetail = new RoomTypeServiceProductOrderDetail($id_room_type_service_product_order_detail))) {
+            $objOrderDetail = new OrderDetail($objRoomTypeServiceProductOrderDetail->id_order_detail);
+            $priceTaxExcl = $objRoomTypeServiceProductOrderDetail->total_price_tax_excl;
+            $priceTaxIncl = $objRoomTypeServiceProductOrderDetail->total_price_tax_incl;
+            $quantity = $objRoomTypeServiceProductOrderDetail->quantity;
+            $res = true;
+            $objHotelBookingDetail = new HotelBookingDetail($objRoomTypeServiceProductOrderDetail->id_htl_booking_detail);
+
+            if ($res &= $objRoomTypeServiceProductOrderDetail->delete()) {
+                $order = new Order($objRoomTypeServiceProductOrderDetail->id_order);
+                if ($quantity >= $objOrderDetail->product_quantity) {
+                    $objOrderDetail->delete();
+                } else {
+                    $objOrderDetail->product_quantity -= $quantity;
+
+                    $objOrderDetail->total_price_tax_excl -= $priceTaxExcl;
+                    $objOrderDetail->total_price_tax_incl -= $priceTaxIncl;
+
+                    $res &= $objOrderDetail->updateTaxAmount($order);
+
+                    $res &= $objOrderDetail->update();
+                }
+
+                $order->total_paid_tax_excl -= $priceTaxExcl;
+                $order->total_paid_tax_incl -= $priceTaxIncl;
+                $order->total_paid += $priceTaxIncl;
+
+                $res &= $order->update();
+            }
+            if ($res) {
+                $response['service_panel']= $servicesBlock = $this->processRenderServicesPanel(
+                    $objOrderDetail->id_order,
+                    $objHotelBookingDetail->id_product,
+                    $objHotelBookingDetail->date_from,
+                    $objHotelBookingDetail->date_to,
+                    $objHotelBookingDetail->id_room,
+                    true
+                );
+            }
+        } else {
+            $response['hasError'] = true;
+            $response['errors'] = $this->l('Additional service not found');
+        }
+
+        die(json_encode($response));
+    }
+
+    public function ajaxProcessAddRoomAdditionalServices()
+    {
+        $idBookingDetail = Tools::getValue('id_booking_detail');
+        $response = array('hasError' => false);
+        if ($selectedServices = Tools::getValue('selected_service')) {
+            // valiadate services being added
+            if (Validate::isLoadedObject($objHotelBookingDetail = new HotelBookingDetail($idBookingDetail))) {
+                $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
+                $qty = Tools::getValue('service_qty');
+                foreach ($selectedServices as $key => $service) {
+                    if ($objRoomTypeServiceProduct->isRoomTypeLinkedWithProduct($objHotelBookingDetail->id_product, $service)) {
+                        $objProduct = new Product($service, false, $this->context->language->id);
+                        if ($objProduct->allow_multiple_quantity) {
+                            if (!Validate::isUnsignedInt($qty[$service])) {
+                                $response['hasError'] = true;
+                                $response['errors'][] = sprintf($this->l('The quantity you\'ve entered is invalid for %s.'), $objProduct->name);
+                            }
+                        } else {
+                            $qty[$service] = 1;
+                        }
+                        $selectedServices[$key] = array(
+                            'id' => $service,
+                            'qty' => $qty[$service],
+                            'name' => $objProduct->name,
+                        );
+                    } else {
+                        $response['hasError'] = true;
+                        $response['errors'][] = sprintf($this->l('The service %s is not avaialable for current room.'), $objProduct->name);
+                    }
+                }
+
+                $objHotelCartBookingData = new HotelCartBookingData();
+                $roomHtlCartInfo = $objHotelCartBookingData->getRoomRowByIdProductIdRoomInDateRange(
+                    $objHotelBookingDetail->id_cart,
+                    $objHotelBookingDetail->id_product,
+                    $objHotelBookingDetail->date_from,
+                    $objHotelBookingDetail->date_to,
+                    $objHotelBookingDetail->id_room
+                );
+
+                // add services in room
+                if (!$response['hasError']) {
+                    foreach ($selectedServices as $service) {
+                        $order = new Order($objHotelBookingDetail->id_order);
+
+                        // Create new cart
+                        $cart = new Cart();
+                        $cart->id_shop_group = $order->id_shop_group;
+                        $cart->id_shop = $order->id_shop;
+                        $cart->id_customer = $order->id_customer;
+                        $cart->id_carrier = $order->id_carrier;
+                        $cart->id_address_delivery = $order->id_address_delivery;
+                        $cart->id_address_invoice = $order->id_address_invoice;
+                        $cart->id_currency = $order->id_currency;
+                        $cart->id_lang = $order->id_lang;
+                        $cart->secure_key = $order->secure_key;
+
+                        // Save new cart
+                        $cart->add();
+
+                        $this->context->cart = $cart;
+                        $this->context->customer = new Customer($order->id_customer);
+
+                        $objRoomTypeServiceProductCartDetail = new RoomTypeServiceProductCartDetail();
+                        $objRoomTypeServiceProductCartDetail->addServiceProductInCart(
+                            $service['id'],
+                            $service['qty'],
+                            $cart->id,
+                            $roomHtlCartInfo['id']
+                        );
+                        $productList = $cart->getProducts();
+                        $objRoomTypeServiceProductPrice = new RoomTypeServiceProductPrice();
+                        $objHotelRoomType = new HotelRoomType();
+                        $roomInfo = $objHotelRoomType->getRoomTypeInfoByIdProduct($objHotelBookingDetail->id_product);
+                        $totalPriceChangeTaxExcl = 0;
+                        $totalPriceChangeTaxIncl = 0;
+                        foreach ($productList as &$product) {
+                            $totalPriceChangeTaxExcl += $totalPriceTaxExcl = $objRoomTypeServiceProductPrice->getProductPrice(
+                                (int)$product['id_product'],
+                                $roomInfo['id'],
+                                $product['cart_quantity'],
+                                false
+                            );
+                            $totalPriceChangeTaxIncl += $totalPriceTaxIncl = $objRoomTypeServiceProductPrice->getProductPrice(
+                                (int)$product['id_product'],
+                                $roomInfo['id'],
+                                $product['cart_quantity'],
+                                true
+                            );
+                            $unitPriceTaxExcl = $objRoomTypeServiceProductPrice->getProductPrice(
+                                (int)$product['id_product'],
+                                $roomInfo['id'],
+                                1,
+                                false
+                            );
+                            $unitPriceTaxIncl = $objRoomTypeServiceProductPrice->getProductPrice(
+                                (int)$product['id_product'],
+                                $roomInfo['id'],
+                                1,
+                                true
+                            );
+                            switch (Configuration::get('PS_ROUND_TYPE')) {
+                                case Order::ROUND_TOTAL:
+                                    $product['total'] = $totalPriceTaxExcl;
+                                    $product['total_wt'] = $totalPriceTaxIncl;
+                                    break;
+                                case Order::ROUND_LINE:
+                                    $product['total'] = Tools::ps_round($totalPriceTaxExcl, _PS_PRICE_COMPUTE_PRECISION_);
+                                    $product['total_wt'] = Tools::ps_round($totalPriceTaxIncl, _PS_PRICE_COMPUTE_PRECISION_);
+                                    break;
+
+                                case Order::ROUND_ITEM:
+                                default:
+                                    $product['total'] = Tools::ps_round($totalPriceTaxExcl, _PS_PRICE_COMPUTE_PRECISION_) * (int)$product['cart_quantity'];
+                                    $product['total_wt'] = Tools::ps_round($totalPriceTaxIncl, _PS_PRICE_COMPUTE_PRECISION_) * (int)$product['cart_quantity'];
+                                    break;
+                            }
+
+
+                        }
+
+                        $order_detail = new OrderDetail();
+                        $order_detail->createList($order, $cart, $order->getCurrentOrderState(), $productList, (isset($order_invoice) ? $order_invoice->id : 0), true);
+
+                        $objRoomTypeServiceProductOrderDetail = new RoomTypeServiceProductOrderDetail();
+                        $objRoomTypeServiceProductOrderDetail->id_product = $product['id_product'];
+                        $objRoomTypeServiceProductOrderDetail->id_order = $objHotelBookingDetail->id_order;
+                        $objRoomTypeServiceProductOrderDetail->id_order_detail = $order_detail->id;
+                        $objRoomTypeServiceProductOrderDetail->id_cart = $cart->id;
+                        $objRoomTypeServiceProductOrderDetail->id_htl_booking_detail = $objHotelBookingDetail->id;
+                        $objRoomTypeServiceProductOrderDetail->unit_price_tax_excl = $unitPriceTaxExcl;
+                        $objRoomTypeServiceProductOrderDetail->unit_price_tax_incl = $unitPriceTaxIncl;
+                        $objRoomTypeServiceProductOrderDetail->total_price_tax_excl = $totalPriceTaxExcl;
+                        $objRoomTypeServiceProductOrderDetail->total_price_tax_incl = $totalPriceTaxIncl;
+                        $objRoomTypeServiceProductOrderDetail->name = $product['name'];
+                        $objRoomTypeServiceProductOrderDetail->quantity = $product['cart_quantity'];
+                        $objRoomTypeServiceProductOrderDetail->save();
+
+                        // update totals amount of order
+                        $order->total_products += (float)$totalPriceChangeTaxExcl;
+                        $order->total_products_wt += (float)$totalPriceChangeTaxIncl;
+
+                        $order->total_paid += Tools::ps_round((float)$totalPriceChangeTaxIncl, 2);
+                        $order->total_paid_tax_excl += Tools::ps_round((float)($totalPriceChangeTaxExcl), 2);
+                        $order->total_paid_tax_incl += Tools::ps_round((float)($totalPriceChangeTaxIncl), 2);
+
+                        if (isset($order_invoice) && Validate::isLoadedObject($order_invoice)) {
+                            $order->total_shipping = $order_invoice->total_shipping_tax_incl;
+                            $order->total_shipping_tax_incl = $order_invoice->total_shipping_tax_incl;
+                            $order->total_shipping_tax_excl = $order_invoice->total_shipping_tax_excl;
+                        }
+
+                        // discount
+                        $order->total_discounts += (float)abs($cart->getOrderTotal(true, Cart::ONLY_DISCOUNTS));
+                        $order->total_discounts_tax_excl += (float)abs($cart->getOrderTotal(false, Cart::ONLY_DISCOUNTS));
+                        $order->total_discounts_tax_incl += (float)abs($cart->getOrderTotal(true, Cart::ONLY_DISCOUNTS));
+                        // Save changes of order
+                        $order->update();
+                    }
+                }
+                $response['service_panel'] = $servicesBlock = $this->processRenderServicesPanel(
+                    $order->id,
+                    $objHotelBookingDetail->id_product,
+                    $objHotelBookingDetail->date_from,
+                    $objHotelBookingDetail->date_to,
+                    $objHotelBookingDetail->id_room,
+                    true
+                );
+            } else {
+                $response['hasError'] = true;
+                $response['errors'][] = $this->l('Room not found');
+            }
+        }
+
+        die(json_encode($response));
+    }
+
+    // Process when admin changes extra demands of any room while order creation process form.tpl
+    public function ajaxProcessChangeRoomDemands()
+    {
+        if ($idCartBooking = Tools::getValue('id_cart_booking')) {
+            if (Validate::isLoadedObject($objCartbookingCata = new HotelCartBookingData($idCartBooking))) {
+                $roomDemands = Tools::getValue('room_demands');
+                $roomDemands = json_decode($roomDemands, true);
+                $roomDemands = json_encode($roomDemands);
+                $objCartbookingCata->extra_demands = $roomDemands;
+                if ($objCartbookingCata->save()) {
+                    die('1');
+                }
+            }
+        }
+        die('0');
     }
 
     // Process when admin edit rooms and edit rooms additional facilities
     public function ajaxProcessEditRoomExtraDemands()
     {
+        $response = array('success' => false);
         if ($idHtlBooking = Tools::getValue('id_htl_booking')) {
             if (Validate::isLoadedObject($objBookingDetail = new HotelBookingDetail($idHtlBooking))) {
                 $roomDemands = Tools::getValue('room_demands');
@@ -3607,18 +5010,28 @@ class AdminOrdersControllerCore extends AdminController
                             $objBookingDemand->setBookingDemandTaxDetails();
                         }
                     }
-                    $order->save();
-
-                    die('1');
+                    if ($order->save()) {
+                        $response['facilities_panel'] = $this->processRenderFacilitiesBlock(
+                            $order->id,
+                            $objBookingDetail->id_product,
+                            $objBookingDetail->date_from,
+                            $objBookingDetail->date_to,
+                            $objBookingDetail->id_room,
+                            true
+                        );
+                        $response['success'] = true;
+                    }
                 }
             }
         }
-        die('0');
+        die(json_encode($response));
     }
 
     // delete room extra demand while order edit
     public function ajaxProcessDeleteRoomExtraDemand()
     {
+        $response = array('success' => false);
+        $res = true;
         if ($idBookingDemand = Tools::getValue('id_booking_demand')) {
             if (Validate::isLoadedObject($objBookingDemand = new HotelBookingDemands($idBookingDemand))) {
                 // first delete the tax details of the booking demand
@@ -3641,13 +5054,78 @@ class AdminOrdersControllerCore extends AdminController
                                 $order_invoice->total_paid_tax_incl -= $objBookingDemand->total_price_tax_incl;
                                 $res &= $order_invoice->update();
                             }
+                            if ($res) {
+                                $response['facilities_panel'] = $this->processRenderFacilitiesBlock(
+                                    $order->id,
+                                    $objBookingDetail->id_product,
+                                    $objBookingDetail->date_from,
+                                    $objBookingDetail->date_to,
+                                    $objBookingDetail->id_room,
+                                    true
+                                );
+                                $response['success'] = true;
+                            }
                         }
-                        die('1');
                     }
                 }
             }
         }
-        die('0');
+        die(json_encode($response));
+    }
+
+    public function ajaxProcessUpdateServiceProduct()
+    {
+        $operator = Tools::getValue('operator', 'up');
+        $idServiceProduct = Tools::getValue('id_product');
+        $idCartBooking = Tools::getValue('id_cart_booking');
+        $qty = Tools::getValue('qty');
+
+        if (Validate::isLoadedObject($objHotelCartBookingData = new HotelCartBookingData($idCartBooking))) {
+            $objRoomTypeServiceProductCartDetail = new RoomTypeServiceProductCartDetail();
+
+            if ($operator == 'up') {
+                $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
+                if ($objRoomTypeServiceProduct->isRoomTypeLinkedWithProduct($objHotelCartBookingData->id_product, $idServiceProduct)) {
+                    // validate quanitity
+                    if (Validate::isLoadedObject($objProduct = new Product($idServiceProduct))) {
+                        if ($objProduct->allow_multiple_quantity) {
+                            if (!Validate::isUnsignedInt($qty)) {
+                                $this->errors[] = Tools::displayError('The quantity code you\'ve entered is invalid.');
+                            }
+                        } else {
+                            $qty = 1;
+                        }
+                    } else {
+                        $this->errors[] = Tools::displayError('This Service is not available.');
+                    }
+                } else {
+                    $this->errors[] = Tools::displayError('This Service is not available with selected room.');
+                }
+            }
+
+            if (empty($this->errors)) {
+                if ($objRoomTypeServiceProductCartDetail->updateCartServiceProduct(
+                    $idCartBooking,
+                    $idServiceProduct,
+                    $qty,
+                    $objHotelCartBookingData->id_cart,
+                    $operator
+                )) {
+                    $this->ajaxDie(json_encode(array(
+                        'hasError' => false
+                    )));
+                } else {
+                    $this->errors[] = Tools::displayError('Unable to update services. Please try reloading the page.');
+                }
+
+            }
+        } else {
+            $this->errors[] = Tools::displayError('Room not found. Please try reloading the page.');
+        }
+        $this->ajaxDie(json_encode(array(
+            'hasError' => true,
+            'errors' => $this->errors
+        )));
     }
 
     // To change the status of the room

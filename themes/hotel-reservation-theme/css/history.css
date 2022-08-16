@@ -103,7 +103,7 @@
   font-size:12px;}
 
 /* Fancy-box for extra demands Css */
-#rooms_extra_demands {
+/* #rooms_extra_demands {
   font-size: 16px;}
 .room_extra_demands .open_rooms_extra_demands {
   font-size:12px;
@@ -119,7 +119,7 @@
 #rooms_extra_demands .rooms_extra_demands_head {
   margin-bottom: 18px;}
 #rooms_extra_demands .card {
-  padding-bottom: 0px;}
+  padding-bottom: 0px;} */
 
 .cancel_requests_link_wrapper a {
   font-weight: bold;
@@ -169,17 +169,20 @@
   .refund_request_fields {
       display: none;}
 
-/* fancybox changes */
-/* fancybox changes */
-#history .fancybox-overlay {
-	background: rgba(255, 255, 255, 0.95)!important;}
-#history .fancybox-skin {
-  background: #FFF;
-  box-shadow: 0 4px 4px 0 rgba(0,0,0,0.25);
-  border-radius: 2px;}
-#history .fancybox-skin .fancybox-close:after {
-  content: "";}
-#history .fancybox-skin .fancybox-close {
-  top: -36px;
-  right: -36px;
-  background-image: url(../img/icon/icon-close.svg);}
+
+.ui-tooltip.price-tootip {
+  box-shadow: 0 2px 6px 0 rgb(0 0 0 / 20%);
+  background: #FFFFFF;
+  border: unset;
+  color: #333;
+  padding: 9px 15px;
+  max-height: 310px;
+  overflow-y: auto;
+}
+.price-info-tooltip-cont {
+  min-width: 180px;
+}
+.price-info-tooltip-cont .list-row {
+  display: flex;
+  justify-content: space-between;
+}

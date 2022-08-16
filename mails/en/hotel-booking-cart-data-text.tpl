@@ -7,7 +7,7 @@
 
 {$data_v['hotel_name']}
 
-{$data_v['adult']} {l s='Adults'}, {$data_v['children']} {l s='Children'}
+{$rm_v['adults']} {l s='Adults'}, {$rm_v['children']} {l s='Children'}
 
 {convertPrice price=$rm_v['avg_paid_unit_price_tax_incl']}
 

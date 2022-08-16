@@ -298,6 +298,15 @@ class AdminPPreferencesControllerCore extends AdminController
                         'required' => false,
                         'type' => 'bool'
                     ),
+
+                    'PS_SERVICE_PRODUCT_CATEGORY_FILTER' => array(
+                        'title' => $this->l('Show category filter for service products'),
+                        'validation' => 'isBool',
+                        'cast' => 'intval',
+                        'required' => false,
+                        'type' => 'bool'
+                    ),
+
                     'PS_HOTEL_IMAGES_PER_PAGE' => array(
                         'title' => $this->l('Number of hotel images per page'),
                         'hint' => $this->l('Number of hotel images displayed per page. Default is 9.'),
