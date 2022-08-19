@@ -309,7 +309,8 @@ class HotelBranchInformation extends ObjectModel
         if (!Cache::isStored($cache_id)) {
             $sql = 'SELECT hbi.*, hbl.`policies`, hbl.`hotel_name`, hbl.`description`, hbl.`short_description`';
             if ($detailedInfo) {
-                $sql .= ', hi.id as id_cover_img, a.`city`, s.`name` as `state_name`, cl.`name` as country_name';
+                $sql .= ', hi.id as id_cover_img, a.`address1` as address, a.`postcode`, a.`phone`,  a.`city`,
+                    s.`name` as `state_name`, cl.`name` as country_name';
             }
             $sql .= ' FROM `'._DB_PREFIX_.'htl_branch_info` hbi';
             $sql .= ' LEFT JOIN `'._DB_PREFIX_.'htl_branch_info_lang` hbl
