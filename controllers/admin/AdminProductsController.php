@@ -5503,11 +5503,12 @@ class AdminProductsControllerCore extends AdminController
         foreach ($idsHotel as $idHotel) {
             $objHotelBranchInfo = new HotelBranchInformation($idHotel, $this->context->language->id);
             if (Validate::isLoadedObject($objHotelBranchInfo)) {
+                $hotelAddressInfo = $objHotelBranchInfo->getAddress($idHotel);
                 $hotelInfo = array(
                     'id_hotel' => $objHotelBranchInfo->id,
                     'hotel_name' => $objHotelBranchInfo->hotel_name,
                     'rating' => $objHotelBranchInfo->rating,
-                    'city' => $objHotelBranchInfo->city,
+                    'city' => $hotelAddressInfo['city'],
                 );
                 $hotelsInfo[] = $hotelInfo;
             }
