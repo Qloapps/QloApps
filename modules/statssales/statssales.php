@@ -87,8 +87,8 @@ class StatsSales extends ModuleGraph
 			<div class="alert alert-warning">
 				<h4>'.$this->l('About order statuses').'</h4>
 				<p>
-					'.$this->l('In your Back Office, you can modify the following order statuses: Awaiting Check Payment, Payment Accepted, Preparation in Progress, Canceled, Refund, Payment Error, Out of Stock, and Awaiting Bank Wire Payment.').'<br />
-					'.$this->l('These order statuses cannot be removed from the Back Office; however you have the option to add more.').'
+					'.$this->l('In your back office, you can modify the following order statuses: Awaiting check payment, Payment accepted, Processing in progress, Canceled, Refunded, Payment error and Awaiting bank wire payment.').'<br />
+					'.$this->l('These order statuses cannot be removed from the back office; however you have the option to add more.').'
 				</p>
 			</div>
 			<div class="alert alert-info">
@@ -127,7 +127,7 @@ class StatsSales extends ModuleGraph
 						</ul>
 						<hr/>
 						<a class="btn btn-default export-csv" href="'.Tools::safeOutput($_SERVER['REQUEST_URI'].'&export=1').'">
-							<i class="icon-cloud-upload"></i> '.$this->l('CSV Export').'
+							<i class="icon-cloud-download"></i> '.$this->l('CSV Export').'
 						</a>
 					</div>
 				</div>
@@ -146,7 +146,7 @@ class StatsSales extends ModuleGraph
 						</ul>
 						<hr/>
 						<a class="btn btn-default export-csv" href="'.Tools::safeOutput($_SERVER['REQUEST_URI'].'&export=2').'">
-							<i class="icon-cloud-upload"></i> '.$this->l('CSV Export').'
+							<i class="icon-cloud-download"></i> '.$this->l('CSV Export').'
 						</a>
 					</div>
 				</div>
@@ -164,7 +164,7 @@ class StatsSales extends ModuleGraph
 					</div>
 					<div class="col-lg-4">
 						<a class="btn btn-default export-csv" href="'.Tools::safeOutput($_SERVER['REQUEST_URI'].'&export=3').'">
-							<i class="icon-cloud-upload"></i> '.$this->l('CSV Export').'
+							<i class="icon-cloud-download"></i> '.$this->l('CSV Export').'
 						</a>
 					</div>
 				</div>

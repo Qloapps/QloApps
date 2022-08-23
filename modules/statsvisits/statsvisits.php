@@ -31,7 +31,7 @@ if (!defined('_PS_VERSION_')) {
 class StatsVisits extends ModuleGraph
 {
     private $html = '';
-    private $query = '';
+    private $query = array();
 
     public function __construct()
     {
@@ -43,7 +43,7 @@ class StatsVisits extends ModuleGraph
 
         parent::__construct();
 
-        $this->displayName = $this->l('Visits and Visitors');
+        $this->displayName = $this->l('Visits and visitors');
         $this->description = $this->l('Adds statistics about your visits and visitors to the Stats dashboard.');
         $this->ps_versions_compliancy = array('min' => '1.6', 'max' => '1.7.0.99');
     }
@@ -102,7 +102,7 @@ class StatsVisits extends ModuleGraph
 				</p>
 				<ul>
 					<li>'.$this->l('If this is the case, congratulations, your website is well planned and pleasing. Glad to see that you\'ve been paying attention.').'</li>
-					<li>'.$this->l('Otherwise, the conclusion is not so simple. The problem can be aesthetic or ergonomic. It is also possible that many visitors have mistakenly visited your URL without possessing a particular interest in your website. This strange and ever-confusing phenomenon is most likely cause by search engines. If this is the case, you should consider revising your SEO structure.').'</li>
+					<li>'.$this->l('Otherwise, the conclusion is not so simple. The problem can be aesthetic or ergonomic. It is also possible that many visitors have mistakenly visited your URL without possessing a particular interest in your website. This strange and ever-confusing phenomenon is most likely caused by search engines. If this is the case, you should consider revising your SEO structure.').'</li>
 				</ul>
 				<p>
 					'.$this->l('This information is mostly qualitative. It is up to you to determine the interest of a disjointed visit.').'
@@ -110,7 +110,7 @@ class StatsVisits extends ModuleGraph
 			</div>
 			<div class="alert alert-info">
 				'.$this->l('A visit corresponds to an internet user coming to your website, and until the end of their session, only one visit is counted.').'
-				'.$this->l('A visitor is an unknown person who has not registered or logged into your store. A visitor can also be considered a person who has visited your website multiple times.').'
+				'.$this->l('A visitor is an unknown person who has not registered or logged into your website. A visitor can also be considered a person who has visited your website multiple times.').'
 			</div>
 			<div class="row row-margin-bottom">
 				<div class="col-lg-12">
@@ -124,7 +124,7 @@ class StatsVisits extends ModuleGraph
 						</ul>
 						<hr/>
 						<a class="btn btn-default export-csv" href="'.Tools::safeOutput($_SERVER['REQUEST_URI'].'&export=1').'">
-							<i class="icon-cloud-upload"></i> '.$this->l('CSV Export').'
+							<i class="icon-cloud-download"></i> '.$this->l('CSV Export').'
 						</a> ' : '').'
 					</div>
 				</div>

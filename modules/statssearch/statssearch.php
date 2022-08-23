@@ -130,7 +130,7 @@ class StatsSearch extends ModuleGraph
 		if (count($result))
 			$this->html .= '<div>'.$this->engine(array('type' => 'pie')).'</div>
 							<a class="btn btn-default" href="'.Tools::safeOutput($_SERVER['REQUEST_URI']).'&export=1">
-								<i class="icon-cloud-upload"></i> '.$this->l('CSV Export').'
+								<i class="icon-cloud-download"></i> '.$this->l('CSV Export').'
 							</a>'.$table;
 		else
 			$this->html .= '<p>'.$this->l('Cannot find any keywords that have been searched for more than once.').'</p>';

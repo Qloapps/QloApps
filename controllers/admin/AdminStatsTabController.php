@@ -150,8 +150,13 @@ abstract class AdminStatsTabControllerCore extends AdminPreferencesControllerCor
         $tpl = $this->createTemplate('menu.tpl');
 
         $modules = $this->getModules();
+        $key_statsforecast = null;
         $module_instance = array();
         foreach ($modules as $m => $module) {
+            if ($module['name'] == 'statsforecast') {
+                $key_statsforecast = $m;
+            }
+
             if ($module_instance[$module['name']] = Module::getInstanceByName($module['name'])) {
                 $modules[$m]['displayName'] = $module_instance[$module['name']]->displayName;
             } else {
@@ -161,6 +166,9 @@ abstract class AdminStatsTabControllerCore extends AdminPreferencesControllerCor
         }
 
         uasort($modules, array($this, 'checkModulesNames'));
+        if (!is_null($key_statsforecast)) {
+            $modules = array($key_statsforecast => $modules[$key_statsforecast]) + $modules;
+        }
 
         $tpl->assign(array(
             'current' => self::$currentIndex,

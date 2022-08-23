@@ -46,7 +46,7 @@ class StatsProduct extends ModuleGraph
         $this->need_instance = 0;
 
         parent::__construct();
-
+        $this->query = array();
         $this->displayName = $this->l('Room type details');
         $this->description = $this->l('Adds detailed statistics for each room type to the Stats dashboard.');
         $this->ps_versions_compliancy = array('min' => '1.6', 'max' => '1.7.0.99');
@@ -180,7 +180,7 @@ class StatsProduct extends ModuleGraph
 				<h4>'.$this->l('Number of purchases compared to number of views').'</h4>
 					'.$this->l('After choosing a hotel and selecting a room type, informational graphs will appear.').'
 					<ul>
-						<li class="bullet">'.$this->l('If you notice that a room type is often booked but viewed infrequently, you should display it more prominently in your Front Office.').'</li>
+						<li class="bullet">'.$this->l('If you notice that a room type is often booked but viewed infrequently, you should display it more prominently at front office.').'</li>
 						<li class="bullet">'.$this->l('On the other hand, if a room type has many views but is not often booked, we advise you to check or modify this room type\'s information, description and photography again, see if you can find something better.').'
 						</li>
 					</ul>
@@ -216,13 +216,13 @@ class StatsProduct extends ModuleGraph
 					</div>
 					<div class="col-lg-4">
 						<ul class="list-unstyled">
-							<li>'.$this->l('Total booked').' '.$total_bought.'</li>
-							<li>'.$this->l('Sales (tax excluded)').' '.Tools::displayprice($total_sales, $currency).'</li>
-							<li>'.$this->l('Total viewed').' '.$total_viewed.'</li>
-							<li>'.$this->l('Conversion rate').' '.number_format($total_viewed ? $total_bought / $total_viewed : 0, 2).'</li>
+							<li>'.$this->l('Total booked:').' '.$total_bought.'</li>
+							<li>'.$this->l('Sales (tax excluded):').' '.Tools::displayprice($total_sales, $currency).'</li>
+							<li>'.$this->l('Total viewed:').' '.$total_viewed.'</li>
+							<li>'.$this->l('Conversion rate:').' '.number_format($total_viewed ? $total_bought / $total_viewed : 0, 2).'</li>
 						</ul>
 						<a class="btn btn-default export-csv" href="'.Tools::safeOutput($_SERVER['REQUEST_URI']).'&export=1&exportType=1">
-							<i class="icon-cloud-upload"></i> '.$this->l('CSV Export').'
+							<i class="icon-cloud-download"></i> '.$this->l('CSV Export').'
 						</a>
 					</div>
 				</div>
@@ -252,7 +252,7 @@ class StatsProduct extends ModuleGraph
 								</th>
 								'.($has_attribute ? '<th><span class="title_box  active">'.$this->l('Attribute').'</span></th>' : '').'
 								<th>
-									<span class="title_box  active">'.$this->l('Rooms Booked').'</span>
+									<span class="title_box  active">'.$this->l('Rooms booked').'</span>
 								</th>
 								<th>
 									<span class="title_box  active">'.$this->l('Price').'</span>
@@ -266,8 +266,8 @@ class StatsProduct extends ModuleGraph
                     $this->html .= '
 						<tr>
 							<td>'.Tools::displayDate($sale['date_add'], null, false).'</td>
-							<td class="text-left"><a href="?tab=AdminOrders&id_order='.$sale['id_order'].'&vieworder&token='.$token_order.'">'.(int)$sale['id_order'].'</a></td>
-							<td class="text-left"><a href="?tab=AdminCustomers&id_customer='.$sale['id_customer'].'&viewcustomer&token='.$token_customer.'">'.(int)$sale['id_customer'].'</a></td>
+							<td class="text-left"><a href="?tab=AdminOrders&id_order='.$sale['id_order'].'&vieworder&token='.$token_order.'">#'.(int)$sale['id_order'].'</a></td>
+							<td class="text-left"><a href="?tab=AdminCustomers&id_customer='.$sale['id_customer'].'&viewcustomer&token='.$token_customer.'">#'.(int)$sale['id_customer'].'</a></td>
 							'.($has_attribute ? '<td>'.$sale['product_name'].'</td>' : '').'
 							<td>'.(int)$sale['total_booked'].'</td>
 							<td>'.Tools::displayprice($sale['total'], $currency).'</td>
@@ -287,10 +287,10 @@ class StatsProduct extends ModuleGraph
 							<thead>
 								<tr>
 									<th>
-										<span class="title_box active">'.$this->l('Room Type name').'</span>
+										<span class="title_box active">'.$this->l('Room type name').'</span>
 									</th>
 									<th>
-										<span class="title_box active">'.$this->l('Rooms Booked').'</span>
+										<span class="title_box active">'.$this->l('Rooms booked').'</span>
 									</th>
 									<th>
 										<span class="title_box active">'.$this->l('Average price').'</span>
@@ -321,7 +321,7 @@ class StatsProduct extends ModuleGraph
 			<form action="#" method="post" id="hotelsForm" class="form-horizontal">
 				<div class="row row-margin-bottom">
 					<label class="control-label col-lg-3">
-						<span title="" data-toggle="tooltip" class="label-tooltip" data-original-title="'.$this->l('Choose a hotel to access it\'s room types statistics!').'">
+						<span title="" data-toggle="tooltip" class="label-tooltip" data-original-title="'.$this->l('Choose a hotel to access it\'s room type statistics.').'">
 							'.$this->l('Choose a hotel').'
 						</span>
 					</label>
@@ -341,7 +341,7 @@ class StatsProduct extends ModuleGraph
 				<thead>
 					<tr>
 						<th>
-							<span class="title_box  active">'.$this->l('Room Type Name').'</span>
+							<span class="title_box  active">'.$this->l('Room type name').'</span>
 						</th>
 						<th>
 							<span class="title_box  active">'.$this->l('Available rooms').'</span>
@@ -382,7 +382,7 @@ class StatsProduct extends ModuleGraph
 				</tbody>
 			</table>
 			<a class="btn btn-default export-csv" href="'.Tools::safeOutput($_SERVER['REQUEST_URI'].'&export=1').'">
-				<i class="icon-cloud-upload"></i> '.$this->l('CSV Export').'
+				<i class="icon-cloud-download"></i> '.$this->l('CSV Export').'
 			</a>';
         }
 

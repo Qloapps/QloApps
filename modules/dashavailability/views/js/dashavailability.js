@@ -44,7 +44,7 @@ function line_chart_availability(widget_name, chart_details) {
 
         dashavailability_data = chart_details.data;
         dashavailability_chart = chart;
-        d3.select('#availableBarChart svg')
+        d3.select('#availability_line_chart1 svg')
             .datum(dashavailability_data)
             .call(chart);
         nv.utils.windowResize(chart.update);

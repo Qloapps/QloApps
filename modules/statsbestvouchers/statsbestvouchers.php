@@ -58,19 +58,19 @@ class StatsBestVouchers extends ModuleGrid
                 'id' => 'code',
                 'header' => $this->l('Code'),
                 'dataIndex' => 'code',
-                'align' => 'left'
+                'align' => 'center'
             ),
             array(
                 'id' => 'name',
                 'header' => $this->l('Name'),
                 'dataIndex' => 'name',
-                'align' => 'left'
+                'align' => 'center'
             ),
             array(
                 'id' => 'ca',
                 'header' => $this->l('Sales'),
                 'dataIndex' => 'ca',
-                'align' => 'right'
+                'align' => 'center'
             ),
             array(
                 'id' => 'total',
@@ -112,7 +112,7 @@ class StatsBestVouchers extends ModuleGrid
 			</div>
 			'.$this->engine($engine_params).'
 			<a class="btn btn-default export-csv" href="'.Tools::safeOutput($_SERVER['REQUEST_URI'].'&export=1').'">
-				<i class="icon-cloud-upload"></i> '.$this->l('CSV Export').'
+				<i class="icon-cloud-download"></i> '.$this->l('CSV Export').'
 			</a>';
 
         return $this->html;

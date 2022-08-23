@@ -58,19 +58,19 @@ class StatsBestProducts extends ModuleGrid
         $this->columns = array(
             array(
                 'id' => 'name',
-                'header' => $this->l('Room Type Name'),
+                'header' => $this->l('Room type name'),
                 'dataIndex' => 'name',
-                'align' => 'left'
+                'align' => 'center'
             ),
             array(
                 'id' => 'hotel_name',
-                'header' => $this->l('Hotel Name'),
+                'header' => $this->l('Hotel name'),
                 'dataIndex' => 'hotel_name',
-                'align' => 'left'
+                'align' => 'center'
             ),
             array(
                 'id' => 'totalRoomsSold',
-                'header' => $this->l('Rooms sold'),
+                'header' => $this->l('Rooms booked'),
                 'dataIndex' => 'totalRoomsSold',
                 'align' => 'center'
             ),
@@ -138,11 +138,17 @@ class StatsBestProducts extends ModuleGrid
             $this->csvExport($engine_params);
         }
 
-        return '<div class="panel-heading">'.$this->displayName.'</div>
-		'.$this->engine($engine_params).'
+        $html = '<div class="panel-heading">'.$this->displayName.'</div>';
+        if (!(Module::isEnabled('statsdata') && Configuration::get('PS_STATSDATA_PAGESVIEWS'))) {
+			$link = $this->context->link->getAdminLink('AdminModules').'&configure=statsdata';
+            $html .= '<div class="alert alert-info">'.$this->l('You must enable the "Save global page views" option from ').'<u><a href="'.$link.'" target="_blank">Data mining for statistics</a></u>'.$this->l(' module in order to display the most viewed room types, or use the QloApps Google Analytics module.').'</div>';
+        }
+        $html .= $this->engine($engine_params).'
 		<a class="btn btn-default export-csv" href="'.Tools::safeOutput($_SERVER['REQUEST_URI'].'&export=1').'">
-			<i class="icon-cloud-upload"></i> '.$this->l('CSV Export').'
+			<i class="icon-cloud-download"></i> '.$this->l('CSV Export').'
 		</a>';
+
+        return $html;
     }
 
     public function getData()
@@ -161,24 +167,43 @@ class StatsBestProducts extends ModuleGrid
 					WHERE pa.id_object = p.id_product AND pa.id_page_type = '.(int)Page::getPageTypeByName('product').'
 					AND dr.time_start BETWEEN '.$date_between.'
 					AND dr.time_end BETWEEN '.$date_between.'
-				) AS totalPageViewed,
-				(SELECT COUNT(hbd.`id_room`) FROM '._DB_PREFIX_.'htl_booking_detail hbd WHERE hbd.`id_product` = p.id_product) AS totalRoomsSold,
-				ROUND(IFNULL(IFNULL((SELECT COUNT(hbd.`id_room`) FROM '._DB_PREFIX_.'htl_booking_detail hbd WHERE hbd.`id_product` = p.id_product), 0) / (1 + LEAST(TO_DAYS('.$array_date_between[1].'), TO_DAYS(NOW())) - GREATEST(TO_DAYS('.$array_date_between[0].'), TO_DAYS(product_shop.date_add))), 0), 2) as averageQuantitySold,
-				product_shop.active
-				FROM '._DB_PREFIX_.'product p
-				'.Shop::addSqlAssociation('product', 'p').'
-				LEFT JOIN '._DB_PREFIX_.'product_lang pl ON (p.id_product = pl.id_product AND pl.id_lang = '.(int)$this->getLang().' '.Shop::addSqlRestrictionOnLang('pl').')
-				LEFT JOIN '._DB_PREFIX_.'htl_room_type hrt ON hrt.id_product = p.id_product
-				LEFT JOIN '._DB_PREFIX_.'htl_branch_info_lang hbil ON (hbil.id = hrt.id_hotel AND hbil.id_lang = '.(int)$this->getLang().')
-				LEFT JOIN '._DB_PREFIX_.'order_detail od ON od.product_id = p.id_product
-				LEFT JOIN '._DB_PREFIX_.'orders o ON od.id_order = o.id_order
-				'.Shop::addSqlRestriction(Shop::SHARE_ORDER, 'o').'
-				'.Product::sqlStock('p', 0).'
-				WHERE o.valid = 1
-				AND o.invoice_date BETWEEN '.$date_between.'
-				GROUP BY od.product_id';
+                    ) AS totalPageViewed,';
+                    if (explode(' ',trim($array_date_between[0]))[0] == explode(' ',trim($array_date_between[1]))[0]) {
+                        $this->query .=' (SELECT
+                            SUM(IFNULL(DATEDIFF(
+                                IF ('.$array_date_between[1].' > hbd.`date_to`, hbd.`date_to`, '.$array_date_between[1].'),
+                                IF ('.$array_date_between[0].' < hbd.`date_from`, hbd.`date_from`, '.$array_date_between[0].')
+                            ), 0))
+                            FROM '._DB_PREFIX_.'htl_booking_detail hbd WHERE hbd.`id_product` = p.id_product AND hbd.date_from <= '.$array_date_between[0].'
+                            AND hbd.date_to > '.$array_date_between[0].') AS totalRoomsSold,
+                            ROUND(IFNULL(IFNULL((SELECT COUNT(hbd.`id_room`) FROM '._DB_PREFIX_.'htl_booking_detail hbd WHERE hbd.`id_product` = p.id_product AND hbd.date_from <= '.$array_date_between[0].
+                            ' AND hbd.date_to > '.$array_date_between[0].'), 0) / (1 + LEAST(TO_DAYS('.$array_date_between[1].'), TO_DAYS(NOW())) - GREATEST(TO_DAYS('.$array_date_between[0].'), TO_DAYS(product_shop.date_add))), 0), 2) as averageQuantitySold,';
+                    } else {
+                        $this->query .= '(SELECT
+                            SUM(IFNULL(DATEDIFF(
+                                IF ('.$array_date_between[1].' > hbd.`date_to`, hbd.`date_to`, '.$array_date_between[1].'),
+                                IF ('.$array_date_between[0].' < hbd.`date_from`, hbd.`date_from`, '.$array_date_between[0].')
+                            ), 0))
+                            FROM '._DB_PREFIX_.'htl_booking_detail hbd WHERE hbd.`id_product` = p.id_product AND hbd.date_from BETWEEN '.$date_between.'
+                            AND hbd.date_to BETWEEN '.$date_between.') AS totalRoomsSold,
+                            ROUND(IFNULL(IFNULL((SELECT COUNT(hbd.`id_room`) FROM '._DB_PREFIX_.'htl_booking_detail hbd WHERE hbd.`id_product` = p.id_product AND hbd.date_from BETWEEN '.$date_between.
+                            ' AND hbd.date_to BETWEEN '.$date_between.'), 0) / (1 + LEAST(TO_DAYS('.$array_date_between[1].'), TO_DAYS(NOW())) - GREATEST(TO_DAYS('.$array_date_between[0].'), TO_DAYS(product_shop.date_add))), 0), 2) as averageQuantitySold,';
+                    }
 
+                $this->query .= 'product_shop.active
+                    FROM '._DB_PREFIX_.'product p
+                    '.Shop::addSqlAssociation('product', 'p').'
+                    LEFT JOIN '._DB_PREFIX_.'product_lang pl ON (p.id_product = pl.id_product AND pl.id_lang = '.(int)$this->getLang().' '.Shop::addSqlRestrictionOnLang('pl').')
+                    LEFT JOIN '._DB_PREFIX_.'htl_room_type hrt ON hrt.id_product = p.id_product
+                    LEFT JOIN '._DB_PREFIX_.'htl_branch_info_lang hbil ON (hbil.id = hrt.id_hotel AND hbil.id_lang = '.(int)$this->getLang().')
+                    LEFT JOIN '._DB_PREFIX_.'order_detail od ON od.product_id = p.id_product
+                    LEFT JOIN '._DB_PREFIX_.'orders o ON od.id_order = o.id_order
+                    '.Shop::addSqlRestriction(Shop::SHARE_ORDER, 'o').'
+                    '.Product::sqlStock('p', 0).'
+                    WHERE o.valid = 1
+                    GROUP BY od.product_id';
         if (Validate::IsName($this->_sort)) {
+
             $this->query .= ' ORDER BY `'.bqSQL($this->_sort).'`';
             if (isset($this->_direction) && Validate::isSortDirection($this->_direction)) {
                 $this->query .= ' '.$this->_direction;
@@ -190,6 +215,8 @@ class StatsBestProducts extends ModuleGrid
         }
 
         $values = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($this->query);
+        $this->_totalCount = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('SELECT FOUND_ROWS()');
+
         $dateFrom = date("Y-m-d", strtotime($this->_employee->stats_date_from));
         $dateTo = date("Y-m-d", strtotime($this->_employee->stats_date_to));
 
@@ -212,6 +239,5 @@ class StatsBestProducts extends ModuleGrid
         unset($value);
 
         $this->_values = $values;
-        $this->_totalCount = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('SELECT FOUND_ROWS()');
     }
 }

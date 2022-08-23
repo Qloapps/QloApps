@@ -57,19 +57,9 @@ class DashOccupancy extends Module
         }
     }
 
-    public function hookDashboardZoneOne($params)
+    public function hookDashboardZoneOne()
     {
-        $occupancyData = AdminStatsController::getOccupancyData(
-            $params['date_from'],
-            $params['date_to'],
-            $params['id_hotel']
-        );
-
         $this->context->smarty->assign(array(
-            'count_total' =>  sprintf('%02d', $occupancyData['count_total']),
-            'count_occupied' => sprintf('%02d', $occupancyData['count_occupied']),
-            'count_available' =>  sprintf('%02d', $occupancyData['count_available']),
-            'count_unavailable' =>  sprintf('%02d', $occupancyData['count_unavailable']),
             'date_occupancy_range' => $this->l('(from %s to %s)'),
             'date_occupancy_avail_format' => $this->context->language->date_format_lite,
         ));
@@ -79,7 +69,6 @@ class DashOccupancy extends Module
 
     public function hookDashboardData($params)
     {
-        $data = array();
         if (Configuration::get('PS_DASHBOARD_SIMULATION')) {
             $occupancyData = array();
             $occupancyData['count_total'] = sprintf('%02d', rand(0, 1000));
@@ -97,7 +86,14 @@ class DashOccupancy extends Module
             );
         }
 
-        $chartData = array(
+        $dataValue = array(
+            'do_count_total' => sprintf('%02d', $occupancyData['count_total']),
+            'do_count_occupied' => sprintf('%02d', $occupancyData['count_occupied']),
+            'do_count_available' => sprintf('%02d', $occupancyData['count_available']),
+            'do_count_unavailable' => sprintf('%02d', $occupancyData['count_unavailable']),
+        );
+
+        $dataPieChartBig = array(
             array(
                 'label' => $this->l('Occupied'),
                 'value' => $occupancyData['count_total']
@@ -118,12 +114,14 @@ class DashOccupancy extends Module
             ),
         );
 
-        $data['count_total'] = sprintf('%02d', $occupancyData['count_total']);
-        $data['count_occupied'] = sprintf('%02d', $occupancyData['count_occupied']);
-        $data['count_available'] = sprintf('%02d', $occupancyData['count_available']);
-        $data['count_unavailable'] = sprintf('%02d', $occupancyData['count_unavailable']);
-        $data['chart_data'] = $chartData;
-
-        return array('data_avail_pie_chart' => $data);
+        return array(
+            'data_value' => $dataValue,
+            'data_chart' => array(
+                'dash_occupancy_chart1' => array(
+                    'chart_type' => 'pie_chart_occupancy',
+                    'data' => $dataPieChartBig,
+                ),
+            ),
+        );
     }
 }

@@ -86,17 +86,9 @@ class Dashactivity extends Module
 
     public function hookDashboardZoneOne($params)
     {
-        $gapi_mode = 'configure';
-        if (!Module::isInstalled('gapi')) {
-            $gapi_mode = 'install';
-        } elseif (($gapi = Module::getInstanceByName('gapi')) && Validate::isLoadedObject($gapi) && $gapi->isConfigured()) {
-            $gapi_mode = false;
-        }
-
         $this->context->smarty->assign($this->getConfigFieldsValues());
         $this->context->smarty->assign(
             array(
-                'gapi_mode' => $gapi_mode,
                 'dashactivity_config_form' => $this->renderConfigForm(),
                 'date_subtitle' => $this->l('(from %s to %s)'),
                 'date_format' => $this->context->language->date_format_lite,
@@ -160,26 +152,23 @@ class Dashactivity extends Module
             );
         }
 
-        $gapi = Module::isInstalled('gapi') ? Module::getInstanceByName('gapi') : false;
-        if (Validate::isLoadedObject($gapi) && $gapi->isConfigured()) {
+        $objQGA = Module::isEnabled('qlogoogleanalytics') ? Module::getInstanceByName('qlogoogleanalytics') : false;
+        if (Validate::isLoadedObject($objQGA) && $objQGA->isConfigured()) {
             $visits = $unique_visitors = $online_visitor = 0;
-            if ($result = $gapi->requestReportData('', 'ga:visits,ga:visitors', Tools::substr($params['date_from'], 0, 10), Tools::substr($params['date_to'], 0, 10), null, null, 1, 1)) {
+            if ($result = $objQGA->requestReportData('', 'ga:visits,ga:visitors', Tools::substr($params['date_from'], 0, 10), Tools::substr($params['date_to'], 0, 10), null, null, 1, 1)) {
                 $visits = $result[0]['metrics']['visits'];
                 $unique_visitors = $result[0]['metrics']['visitors'];
             }
         } else {
-            $row = Db::getInstance(_PS_USE_SQL_SLAVE_)->getRow('
-						SELECT COUNT(*) as visits, COUNT(DISTINCT `id_guest`) as unique_visitors
-						FROM `'._DB_PREFIX_.'connections`
-						WHERE `date_add` BETWEEN "'.pSQL($params['date_from']).'" AND "'.pSQL($params['date_to']).'"
-						'.Shop::addSqlRestriction(false)
-                    );
+            $row = Db::getInstance(_PS_USE_SQL_SLAVE_)->getRow(
+                'SELECT COUNT(*) AS visits, COUNT(DISTINCT `id_guest`) AS unique_visitors
+                FROM `'._DB_PREFIX_.'connections`
+                WHERE `date_add` BETWEEN "'.pSQL($params['date_from']).'" AND "'.pSQL($params['date_to']).'"
+                '.Shop::addSqlRestriction(false)
+            );
             extract($row);
         }
 
-        // Online visitors is only available with Analytics Real Time still in private beta at this time (October 18th, 2013).
-        // if ($result = $gapi->requestReportData('', 'ga:activeVisitors', null, null, null, null, 1, 1))
-        // $online_visitor = $result[0]['metrics']['activeVisitors'];
         if ($maintenance_ips = Configuration::get('PS_MAINTENANCE_IP')) {
             $maintenance_ips = implode(',', array_map('ip2long', array_map('trim', explode(',', $maintenance_ips))));
         }
@@ -358,10 +347,10 @@ class Dashactivity extends Module
 
     protected function getReferer($date_from, $date_to, $limit = 3)
     {
-        $gapi = Module::isInstalled('gapi') ? Module::getInstanceByName('gapi') : false;
-        if (Validate::isLoadedObject($gapi) && $gapi->isConfigured()) {
+        $objQGA = Module::isEnabled('qlogoogleanalytics') ? Module::getInstanceByName('qlogoogleanalytics') : false;
+        if (Validate::isLoadedObject($objQGA) && $objQGA->isConfigured()) {
             $websites = array();
-            if ($result = $gapi->requestReportData(
+            if ($result = $objQGA->requestReportData(
                 'ga:source',
                 'ga:visitors',
                 Tools::substr($date_from, 0, 10),

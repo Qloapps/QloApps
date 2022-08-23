@@ -295,9 +295,6 @@ class AdminTranslationsControllerCore extends AdminController
             }
         }
 
-        $thm_name = str_replace('.', '', Tools::getValue('theme'));
-        $kpi_key = substr(strtoupper($thm_name.'_'.Tools::getValue('lang')), 0, 16);
-
         if ($fd = fopen($file_path, 'w')) {
             // Get value of button save and stay
             $save_and_stay = Tools::isSubmit('submitTranslations'.$type.'AndStay');
@@ -323,9 +320,22 @@ class AdminTranslationsControllerCore extends AdminController
                 }
             }
 
-            ConfigurationKPI::updateValue('FRONTOFFICE_TRANSLATIONS_EXPIRE', time());
-            ConfigurationKPI::updateValue('TRANSLATE_TOTAL_'.$kpi_key, count($_POST));
-            ConfigurationKPI::updateValue('TRANSLATE_DONE_'.$kpi_key, count($to_insert));
+            if (in_array($this->type_selected, array('front', 'back'))) {
+                if ($this->type_selected == 'front') {
+                    $thm_name = str_replace('.', '', Tools::getValue('theme'));
+                    $kpi_key = substr(strtoupper($thm_name.'_'.Tools::getValue('lang')), 0, 16);
+
+                    ConfigurationKPI::updateValue('FRONTOFFICE_TRANSLATIONS_EXPIRE', time());
+                    ConfigurationKPI::updateValue('FRONTOFFICE_TRANSLATE_TOTAL_'.$kpi_key, count($_POST));
+                    ConfigurationKPI::updateValue('FRONTOFFICE_TRANSLATE_DONE_'.$kpi_key, count($to_insert));
+                } else {
+                    $kpi_key = substr(strtoupper(Tools::getValue('lang')), 0, 16);
+
+                    ConfigurationKPI::updateValue('BACKOFFICE_TRANSLATIONS_EXPIRE', time());
+                    ConfigurationKPI::updateValue('BACKOFFICE_TRANSLATE_TOTAL_'.$kpi_key, count($_POST));
+                    ConfigurationKPI::updateValue('BACKOFFICE_TRANSLATE_DONE_'.$kpi_key, count($to_insert));
+                }
+            }
 
             // translations array is ordered by key (easy merge)
             ksort($to_insert);
@@ -1426,20 +1436,7 @@ class AdminTranslationsControllerCore extends AdminController
         $kpis[] = $helper->generate();
 
         $helper = new HelperKpi();
-        $helper->id = 'box-country';
-        $helper->icon = 'icon-home';
-        $helper->color = 'color2';
-        $helper->title = $this->l('Main Country', null, null, false);
-        $helper->subtitle = $this->l('30 Days', null, null, false);
-        if (ConfigurationKPI::get('MAIN_COUNTRY', $this->context->language->id) !== false) {
-            $helper->value = ConfigurationKPI::get('MAIN_COUNTRY', $this->context->language->id);
-        }
-        $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=main_country';
-        $helper->refresh = (bool)(ConfigurationKPI::get('MAIN_COUNTRY_EXPIRE', $this->context->language->id) < $time);
-        $kpis[] = $helper->generate();
-
-        $helper = new HelperKpi();
-        $helper->id = 'box-translations';
+        $helper->id = 'box-fo-translations';
         $helper->icon = 'icon-list';
         $helper->color = 'color3';
         $helper->title = $this->l('Front office Translations', null, null, false);
@@ -1448,6 +1445,18 @@ class AdminTranslationsControllerCore extends AdminController
         }
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=frontoffice_translations';
         $helper->refresh = (bool)(ConfigurationKPI::get('FRONTOFFICE_TRANSLATIONS_EXPIRE') < $time);
+        $kpis[] = $helper->generate();
+
+        $helper = new HelperKpi();
+        $helper->id = 'box-bo-translations';
+        $helper->icon = 'icon-list';
+        $helper->color = 'color4';
+        $helper->title = $this->l('Back office Translations', null, null, false);
+        if (ConfigurationKPI::get('BACKOFFICE_TRANSLATIONS') !== false) {
+            $helper->value = ConfigurationKPI::get('BACKOFFICE_TRANSLATIONS');
+        }
+        $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=backoffice_translations';
+        $helper->refresh = (bool)(ConfigurationKPI::get('BACKOFFICE_TRANSLATIONS_EXPIRE') < $time);
         $kpis[] = $helper->generate();
 
         $helper = new HelperKpiRow();

@@ -168,7 +168,7 @@ class StatsForecast extends Module
 						<th class="text-left"><span class="title_box active">'.$this->l('Visits').'</span></th>
 						<th class="text-left"><span class="title_box active">'.$this->l('Registrations').'</span></th>
 						<th class="text-left"><span class="title_box active">'.$this->l('Placed orders').'</span></th>
-						<th class="text-left"><span class="title_box active">'.$this->l('Booked Rooms').'</span></th>
+						<th class="text-left"><span class="title_box active">'.$this->l('Booked rooms').'</span></th>
 						<th class="text-left"><span class="title_box active">'.$this->l('Percentage of registrations').'</span></th>
 						<th class="text-left"><span class="title_box active">'.$this->l('Percentage of orders').'</span></th>
 						<th class="text-left"><span class="title_box active">'.$this->l('Revenue').'</span></th>
@@ -205,8 +205,8 @@ class StatsForecast extends Module
 				<td class="text-left">'.(int)$row['registrations'].'</td>
 				<td class="text-left">'.(int)$row['countOrders'].'</td>
 				<td class="text-left">'.(int)$row['roomBooked'].'</td>
-				<td class="text-left">'.($visits_today ? round(100 * (int)$row['registrations'] / $visits_today, 2).' %' : '-').'</td>
-				<td class="text-left">'.($visits_today ? round(100 * (int)$row['countOrders'] / $visits_today, 2).' %' : '-').'</td>
+				<td class="text-left">'.($visits_today ? sprintf('%0.2f', ($row['registrations'] / $visits_today) * 100).' %' : '--').'</td>
+				<td class="text-left">'.($visits_today ? sprintf('%0.2f', ($row['countOrders'] / $visits_today) * 100).' %' : '--').'</td>
 				<td class="text-left">'.Tools::displayPrice($row['totalSales'], $currency).'</td>
 			</tr>';
 
@@ -223,7 +223,7 @@ class StatsForecast extends Module
 					<th class="text-left"><span class="title_box active">'.$this->l('Visits').'</span></th>
 					<th class="text-left"><span class="title_box active">'.$this->l('Registrations').'</span></th>
 					<th class="text-left"><span class="title_box active">'.$this->l('Placed orders').'</span></th>
-					<th class="text-left"><span class="title_box active">'.$this->l('Booked Rooms').'</span></th>
+					<th class="text-left"><span class="title_box active">'.$this->l('Booked rooms').'</span></th>
 					<th class="text-left"><span class="title_box active">'.$this->l('Percentage of registrations').'</span></th>
 					<th class="text-left"><span class="title_box active">'.$this->l('Percentage of orders').'</span></th>
 					<th class="text-left"><span class="title_box active">'.$this->l('Revenue').'</span></th>
@@ -240,12 +240,12 @@ class StatsForecast extends Module
 				</tr>
 				<tr>
 					<td>'.$this->l('Average').'</td>
-					<td class="text-left">'.(int)($this->t1 / $interval_avg).'</td>
-					<td class="text-left">'.(int)($this->t2 / $interval_avg).'</td>
-					<td class="text-left">'.(int)($this->t3 / $interval_avg).'</td>
-					<td class="text-left">'.(int)($this->t4 / $interval_avg).'</td>
-					<td class="text-left">'.($this->t1 ? round(100 * $this->t2 / $this->t1, 2).' %' : '-').'</td>
-					<td class="text-left">'.($this->t1 ? round(100 * $this->t3 / $this->t1, 2).' %' : '-').'</td>
+					<td class="text-left">'.sprintf('%0.2f', $this->t1 / $interval_avg).'</td>
+					<td class="text-left">'.sprintf('%0.2f', $this->t2 / $interval_avg).'</td>
+					<td class="text-left">'.sprintf('%0.2f', $this->t3 / $interval_avg).'</td>
+					<td class="text-left">'.sprintf('%0.2f', $this->t4 / $interval_avg).'</td>
+					<td class="text-left">'.($this->t1 ? sprintf('%0.2f', ($this->t2 / $this->t1) * 100).' %' : '--').'</td>
+					<td class="text-left">'.($this->t1 ? sprintf('%0.2f', ($this->t3 / $this->t1) * 100).' %' : '--').'</td>
 					<td class="text-left">'.Tools::displayPrice($this->t8 / $interval_avg, $currency).'</td>
 				</tr>
 				<tr>
@@ -313,7 +313,7 @@ class StatsForecast extends Module
 						</td>
 						<td class="text-left">
 							<p><i class="icon-chevron-right"></i></p>
-							<p>'.round(100 * $customers / max(1, $visitors), 2).' %</p>
+							<p>'.sprintf('%0.2f', ($customers / max(1, $visitors)) * 100).' %</p>
 						</td>
 						<td class="text-left">
 							<p>'.$this->l('Accounts').'</p>
@@ -321,7 +321,7 @@ class StatsForecast extends Module
 						</td>
 						<td class="text-left">
 							<p><i class="icon-chevron-right"></i></p>
-							<p>'.round(100 * $fullcarts / max(1, $customers), 2).' %</p>
+							<p>'.sprintf('%0.2f', ($fullcarts / max(1, $customers)) * 100).' %</p>
 						</td>
 						<td rowspan="2" class="text-left">
 							<p>'.$this->l('Full carts').'</p>
@@ -329,7 +329,7 @@ class StatsForecast extends Module
 						</td>
 						<td rowspan="2" class="text-left">
 							<p><i class="icon-chevron-right"></i></p>
-							<p>'.round(100 * $orders / max(1, $fullcarts), 2).' %</p>
+							<p>'.sprintf('%0.2f', ($orders / max(1, $fullcarts)) * 100).' %</p>
 						</td>
 						<td rowspan="2" class="text-left">
 							<p>'.$this->l('Orders').'</p>
@@ -342,7 +342,7 @@ class StatsForecast extends Module
 							<i class="icon-chevron-right"></i>
 						</td>
 						<td rowspan="2" class="text-left">
-							<p>'.round(100 * $orders / max(1, $customers), 2).' %</p>
+							<p>'.sprintf('%0.2f', ($orders / max(1, $customers)) * 100).' %</p>
 						</td>
 						<td rowspan="2" class="text-left">
 							<i class="icon-chevron-right"></i>
@@ -357,7 +357,7 @@ class StatsForecast extends Module
 							<i class="icon-chevron-right"></i>
 						</td>
 						<td rowspan="2" class="text-left">
-							<p>'.round(100 * $orders / max(1, $visitors), 2).' %</p>
+							<p>'.sprintf('%0.2f', ($orders / max(1, $visitors)) * 100).' %</p>
 						</td>
 						<td rowspan="2" class="center">
 							<i class="icon-chevron-right"></i>
@@ -369,7 +369,7 @@ class StatsForecast extends Module
 					<tr>
 						<td class="text-left">
 							<p><i class="icon-chevron-right"></i></p>
-							<p>'.round(100 * $carts / max(1, $visitors)).' %</p>
+							<p>'.sprintf('%0.2f', ($carts / max(1, $visitors)) * 100).' %</p>
 						</td>
 						<td class="text-left">
 							<p>'.$this->l('Carts').'</p>
@@ -377,7 +377,7 @@ class StatsForecast extends Module
 						</td>
 						<td class="text-left">
 							<p><i class="icon-chevron-right"></i></p>
-							<p>'.round(100 * $fullcarts / max(1, $carts)).' %</p>
+							<p>'.sprintf('%0.2f', ($fullcarts / max(1, $carts)) * 100).' %</p>
 						</td>
 					</tr>
 				</tbody>
@@ -397,7 +397,7 @@ class StatsForecast extends Module
 			<div class="row row-margin-bottom">
 				<h4><i class="icon-money"></i> '.$this->l('Payment distribution').'</h4>
 				<div class="alert alert-info">'
-            .$this->l('The amounts include taxes, so you can get an estimation of the commission due to the payment method.').'
+            .$this->l('The amounts in this section include taxes, so you can get an estimation of the commission due to the payment method.').'
 				</div>
 				<form id="cat" action="'.Tools::safeOutput($ru).'#payment" method="post" class="form-horizontal">
 					<div class="row row-margin-bottom">
@@ -422,19 +422,30 @@ class StatsForecast extends Module
 							<th class="text-left"><span class="title_box active">'.$this->l('Module').'</span></th>
 							<th class="text-left"><span class="title_box active">'.$this->l('Orders').'</span></th>
 							<th class="text-left"><span class="title_box active">'.$this->l('Sales').'</span></th>
+							<th class="text-left"><span class="title_box active">'.$this->l('Percentage of orders').'</span></th>
+							<th class="text-left"><span class="title_box active">'.$this->l('Percentage of sales').'</span></th>
 							<th class="text-left"><span class="title_box active">'.$this->l('Average cart value').'</span></th>
 						</tr>
 					</thead>
 					<tbody>';
-        foreach ($ca['payment'] as $payment) {
-            $this->html .= '
+		if (is_array($ca['payment']) && count($ca['payment'])) {
+			foreach ($ca['payment'] as $payment) {
+				$this->html .= '
 						<tr>
 							<td class="text-left">'.$payment['payment_method'].'</td>
 							<td class="text-left">'.(int)$payment['nb'].'</td>
 							<td class="text-left">'.Tools::displayPrice($payment['total'], $currency).'</td>
+							<td class="text-left">'.sprintf('%0.2f', ($ca['ventil']['nb'] ? ($payment['nb'] / $ca['ventil']['nb']) * 100 : 0)).'%</td>
+							<td class="text-left">'.sprintf('%0.2f', ($ca['ventil']['nb'] ? ($payment['total'] / $ca['ventil']['total_incl']) * 100 : 0)).'%</td>
 							<td class="text-left">'.Tools::displayPrice($payment['total'] / (int)$payment['nb'], $currency).'</td>
 						</tr>';
-        }
+			}
+		} else {
+			$this->html .= '
+				<tr>
+					<td colspan="6" class="text-center">'.$this->l('No data available.').'</td>
+				</tr>';
+		}
         $this->html .= '
 					</tbody>
 				</table>
@@ -451,17 +462,24 @@ class StatsForecast extends Module
 						</tr>
 					</thead>
 					<tbody>';
-        foreach ($ca['lang'] as $ophone => $amount) {
-            $percent = (int)($ca['langprev'][$ophone]) ? number_format((100 * $amount / $ca['langprev'][$ophone]) - 100, 1, '.', ' ') : '&#x221e;';
-            $this->html .= '
-					<tr '.(($percent < 0) ? 'class="alt_row"' : '').'>
-						<td class="text-left">'.$ophone.'</td>
-						<td class="text-left">'.Tools::displayPrice($amount, $currency).'</td>
-						<td class="text-left">'.((int)$ca['ventil']['total'] ? number_format((100 * $amount / $ca['ventil']['total']), 1, '.', ' ').'%' : '-').'</td>
-						<td class="text-left">'.(($percent > 0 || $percent == '&#x221e;') ? '<img src="../img/admin/arrow_up.png" alt="" />' : '<img src="../img/admin/arrow_down.png" alt="" /> ').'</td>
-						<td class="text-left">'.(($percent > 0 || $percent == '&#x221e;') ? '+' : '').$percent.'%</td>
-					</tr>';
-        }
+		if (is_array($ca['lang']) && count($ca['lang'])) {
+			foreach ($ca['lang'] as $ophone => $amount) {
+				$percent = (int)($ca['langprev'][$ophone]) ? number_format((100 * $amount / $ca['langprev'][$ophone]) - 100, 1, '.', ' ') : '&#x221e;';
+				$this->html .= '
+						<tr '.(($percent < 0) ? 'class="alt_row"' : '').'>
+							<td class="text-left">'.$ophone.'</td>
+							<td class="text-left">'.Tools::displayPrice($amount, $currency).'</td>
+							<td class="text-left">'.sprintf('%0.2f', ($ca['ventil']['total'] ? ($amount / $ca['ventil']['total']) * 100 : 0)).'%</td>
+							<td class="text-left">'.(($percent > 0 || $percent == '&#x221e;') ? '<img src="../img/admin/arrow_up.png" alt="" />' : '<img src="../img/admin/arrow_down.png" alt="" /> ').'</td>
+							<td class="text-left">'.(($percent > 0 || $percent == '&#x221e;') ? '+' : '').$percent.'%</td>
+						</tr>';
+			}
+		} else {
+			$this->html .= '
+				<tr>
+					<td colspan="5" class="text-center">'.$this->l('No data available.').'</td>
+				</tr>';
+		}
         $this->html .= '
 					</tbody>
 				</table>
@@ -479,16 +497,23 @@ class StatsForecast extends Module
 						</tr>
 					</thead>
 					<tbody>';
-        foreach ($ca['zones'] as $zone) {
-            $this->html .= '
-					<tr>
-						<td class="text-left">'.(isset($zone['name']) ? $zone['name'] : $this->l('Undefined')).'</td>
-						<td class="text-left">'.(int)($zone['nb']).'</td>
-						<td class="text-left">'.Tools::displayPrice($zone['total'], $currency).'</td>
-						<td class="text-left">'.($ca['ventil']['nb'] ? number_format((100 * $zone['nb'] / $ca['ventil']['nb']), 1, '.', ' ') : '0').'%</td>
-						<td class="text-left">'.((int)$ca['ventil']['total'] ? number_format((100 * $zone['total'] / $ca['ventil']['total']), 1, '.', ' ') : '0').'%</td>
-					</tr>';
-        }
+		if (is_array($ca['zones']) && count($ca['zones'])) {
+			foreach ($ca['zones'] as $zone) {
+				$this->html .= '
+						<tr>
+							<td class="text-left">'.(isset($zone['name']) ? $zone['name'] : $this->l('Undefined')).'</td>
+							<td class="text-left">'.(int)($zone['nb']).'</td>
+							<td class="text-left">'.Tools::displayPrice($zone['total'], $currency).'</td>
+							<td class="text-left">'.sprintf('%0.2f', $ca['ventil']['nb'] ? ($zone['nb'] / $ca['ventil']['nb']) * 100 : 0).'%</td>
+							<td class="text-left">'.sprintf('%0.2f', $ca['ventil']['total'] ? ($zone['total'] / $ca['ventil']['total']) * 100 : 0).'%</td>
+						</tr>';
+			}
+		} else {
+			$this->html .= '
+				<tr>
+					<td colspan="5" class="text-center">'.$this->l('No data available.').'</td>
+				</tr>';
+		}
         $this->html .= '
 					</tbody>
 				</table>
@@ -523,16 +548,23 @@ class StatsForecast extends Module
 						</tr>
 					</thead>
 					<tbody>';
-        foreach ($ca['currencies'] as $currency_row) {
-            $this->html .= '
-						<tr>
-							<td class="text-left">'.$currency_row['name'].'</td>
-							<td class="text-left">'.(int)($currency_row['nb']).'</td>
-							<td class="text-left">'.Tools::displayPrice($currency_row['total'], $currency).'</td>
-							<td class="text-left">'.($ca['ventil']['nb'] ? number_format((100 * $currency_row['nb'] / $ca['ventil']['nb']), 1, '.', ' ') : '0').'%</td>
-							<td class="text-left">'.((int)$ca['ventil']['total'] ? number_format((100 * $currency_row['total'] / $ca['ventil']['total']), 1, '.', ' ') : '0').'%</td>
-						</tr>';
-        }
+		if (is_array($ca['currencies']) && count($ca['currencies'])) {
+			foreach ($ca['currencies'] as $currency_row) {
+				$this->html .= '
+							<tr>
+								<td class="text-left">'.$currency_row['name'].'</td>
+								<td class="text-left">'.(int)($currency_row['nb']).'</td>
+								<td class="text-left">'.Tools::displayPrice($currency_row['total'], $currency).'</td>
+								<td class="text-left">'.sprintf('%0.2f', $ca['ventil']['nb'] ? ($currency_row['nb'] / $ca['ventil']['nb']) * 100 : 0).'%</td>
+								<td class="text-left">'.sprintf('%0.2f', $ca['ventil']['total'] ? ($currency_row['total'] / $ca['ventil']['total']) * 100 : 0).'%</td>
+							</tr>';
+			}
+		} else {
+			$this->html .= '
+				<tr>
+					<td colspan="5" class="text-center">'.$this->l('No data available.').'</td>
+				</tr>';
+		}
         $this->html .= '
 					</tbody>
 				</table>
@@ -633,7 +665,8 @@ class StatsForecast extends Module
 				ORDER BY total DESC';
         $ca['currencies'] = Db::getInstance()->executeS($sql);
 
-        $sql = 'SELECT SUM(total_paid_tax_excl / o.conversion_rate) as total, COUNT(*) AS nb
+        $sql = 'SELECT SUM(total_paid_tax_excl / o.conversion_rate) as total,
+			SUM(total_paid_tax_incl / o.conversion_rate) as total_incl, COUNT(*) AS nb
 				FROM `'._DB_PREFIX_.'orders` o
 				WHERE o.valid = 1
 					AND o.`invoice_date` BETWEEN '.ModuleGraph::getDateBetween().'

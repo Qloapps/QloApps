@@ -24,6 +24,10 @@
     font-weight: 500;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
     margin-bottom: 25px;
+    transition: 0.25s;
+}
+.preformance-index-wrapper:hover {
+    transform: translate(0, -3px);
 }
 .preformance-index-wrapper .value-wrapper {
     font-size: 18px;

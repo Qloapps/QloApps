@@ -40,11 +40,11 @@ function pie_chart_trends(widget_name, chart_details)
 			.datum(chart_details.data)
 			.transition().duration(1200)
 			.call(chart);
-			
+
 		nv.utils.windowResize(chart.update);
 
 		return chart;
-	});	
+	});
 }
 
 //TODO unify this with other function in calenda.js and replace date.js functions
@@ -151,7 +151,7 @@ $(document).ready(function() {
 	$('#date-end').change(function() {
 		start = Date.parseDate($('#date-start').val(), 'Y-m-d');
 		end = Date.parseDate($('#date-end').val(), 'Y-m-d');
-		
+
 		$('#customers-newsletters-subtitle').html(sprintf(date_subtitle, start.format(date_format), end.format(date_format)));
 		$('#traffic-subtitle').html(sprintf(date_subtitle, start.format(date_format), end.format(date_format)));
 	});

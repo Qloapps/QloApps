@@ -64,7 +64,7 @@
 			<div class="col-md-4 col-xs-6">
 				<dl class="label-tooltip" onclick="selectDashtrendsChart(this, 'average_cart_value');"
 				data-toggle="tooltip" data-placement="top" data-original-title="{l s='Average Cart Value is a metric representing the value of an average order within the date range. It is calculated by dividing Sales by booking.' mod='dashtrends'}" data-placement="bottom" style='background-color: #FF4036;'>
-						<dt>{l s='Cart Value' mod='dashtrends'}</dt>
+						<dt>{l s='Average Cart Value' mod='dashtrends'}</dt>
 						<dd class="data_value size_l"><span id="cart_value_score"></span></dd>
 				</dl>
 			</div>
@@ -77,14 +77,14 @@
 			</div>
 			<div class="col-md-4 col-xs-6">
 				<dl class="label-tooltip" onclick="selectDashtrendsChart(this, 'conversion_rate');"
-				data-toggle="tooltip" data-placement="top" data-original-title="{l s='Hotel industry Conversion Rate is the percentage of visits that resulted in an validated booking.' mod='dashtrends'}" data-placement="bottom" style="background-color: #A569DF;">
+				data-toggle="tooltip" data-placement="top" data-original-title="{l s='Conversion Rate is the percentage of visits that resulted in a validated booking.' mod='dashtrends'}" data-placement="bottom" style="background-color: #A569DF;">
 					<dt>{l s='Conversion Rate' mod='dashtrends'}</dt>
 					<dd class="data_value size_l"><span id="conversion_rate_score"></span></dd>
 				</dl>
 			</div>
 			<div class="col-md-4 col-xs-6">
 				<dl class="label-tooltip" onclick="selectDashtrendsChart(this, 'net_profits');"
-				data-toggle="tooltip" data-placement="top" data-original-title="{l s='Net profit is a measure of the profitability of a venture after accounting for all the Hotel industry costs. You can provide these costs by clicking on the configuration icon right above here.' mod='dashtrends'}"
+				data-toggle="tooltip" data-placement="top" data-original-title="{l s='Net profit is a measure of the profitability of a venture after accounting for all operating costs. You can provide these costs by clicking on the configuration icon right above here.' mod='dashtrends'}"
 				data-placement="bottom" style="background-color: #AF8A42;">
 						<dt>{l s='Net Profit' mod='dashtrends'}</dt>
 						<dd class="data_value size_l"><span id="net_profits_score"></span></dd>

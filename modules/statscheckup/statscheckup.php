@@ -71,6 +71,10 @@ class StatsCheckUp extends Module
 
     public function hookAdminStatsModules()
     {
+        $this->html = '
+            <div class="panel-heading">'
+                .$this->displayName.'
+            </div>';
         if (Tools::isSubmit('submitCheckup')) {
             $confs = array(
                 'CHECKUP_DESCRIPTIONS_LT',
@@ -85,12 +89,12 @@ class StatsCheckUp extends Module
             foreach ($confs as $confname) {
                 Configuration::updateValue($confname, (int)Tools::getValue($confname));
             }
-            echo '<div class="conf confirm"> '.$this->l('Configuration updated').'</div>';
+            $this->html .= $this->displayConfirmation($this->l('Configuration updated.'));
         }
 
         if (Tools::isSubmit('submitCheckupOrder')) {
             $this->context->cookie->checkup_order = (int)Tools::getValue('submitCheckupOrder');
-            echo '<div class="conf confirm"> '.$this->l('Configuration updated').'</div>';
+            $this->html .= $this->displayConfirmation($this->l('Configuration updated.'));
         }
 
         if (!isset($this->context->cookie->checkup_order)) {
@@ -108,9 +112,9 @@ class StatsCheckUp extends Module
         $languages = $db->executeS($sql);
 
         $array_colors = array(
-            0 => '<img src="../modules/'.$this->name.'/img/red.png" alt="'.$this->l('Bad').'" />',
-            1 => '<img src="../modules/'.$this->name.'/img/orange.png" alt="'.$this->l('Average').'" />',
-            2 => '<img src="../modules/'.$this->name.'/img/green.png" alt="'.$this->l('Good').'" />'
+            0 => '<img src="../modules/'.$this->name.'/img/red.png" alt="'.$this->l('Bad').'" title="'.$this->l('Bad').'" />',
+            1 => '<img src="../modules/'.$this->name.'/img/orange.png" alt="'.$this->l('Average').'" title="'.$this->l('Average').'" />',
+            2 => '<img src="../modules/'.$this->name.'/img/green.png" alt="'.$this->l('Good').'" title="'.$this->l('Good').'" />'
         );
         $token_products = Tools::getAdminToken('AdminProducts'.(int)Tab::getIdFromClassName('AdminProducts').(int)Context::getContext()->employee->id);
         $divisor = 4;
@@ -167,10 +171,7 @@ class StatsCheckUp extends Module
             'STOCK' => array('name' => $this->l('Available rooms'), 'text' => $this->l('items'))
         );
 
-        $this->html = '
-		<div class="panel-heading">'
-            .$this->displayName.'
-		</div>
+        $this->html .= '
 		<form action="'.Tools::safeOutput(AdminController::$currentIndex.'&token='.Tools::getValue('token').'&module='.$this->name).'" method="post" class="checkup form-horizontal">
 			<table class="table checkup">
 				<thead>
