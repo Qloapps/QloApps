@@ -427,21 +427,21 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
                         } else {
                             Hook::exec('actionOrderSlipAdd', array('order' => $objOrder, 'bookingList' => $bookingList));
 
-                                @Mail::Send(
-                                    (int)$objOrder->id_lang,
-                                    'credit_slip',
-                                    Mail::l('New credit slip regarding your order', (int)$objOrder->id_lang),
-                                    $params,
-                                    $customer->email,
-                                    $customer->firstname.' '.$customer->lastname,
-                                    null,
-                                    null,
-                                    null,
-                                    null,
-                                    _PS_MAIL_DIR_,
-                                    true,
-                                    (int)$objOrder->id_shop
-                                );
+                            @Mail::Send(
+                                (int)$objOrder->id_lang,
+                                'credit_slip',
+                                Mail::l('New credit slip regarding your order', (int)$objOrder->id_lang),
+                                $params,
+                                $customer->email,
+                                $customer->firstname.' '.$customer->lastname,
+                                null,
+                                null,
+                                null,
+                                null,
+                                _PS_MAIL_DIR_,
+                                true,
+                                (int)$objOrder->id_shop
+                            );
                         }
                     }
 
@@ -484,9 +484,19 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
                             if (!$cartrule->update()) {
                                 $this->errors[] = $this->l('You cannot generate a voucher.');
                             } else {
+                                // if generating voucher with a credit slip do not allow voucher generation from front office
+                                if (Tools::isSubmit('generateCreditSlip') && isset($idCreditSlip) && $idCreditSlip) {
+                                    $objOrderSlip = new OrderSlip($idCreditSlip);
+                                    if (Validate::isLoadedObject($objOrderSlip)) {
+                                        $objOrderSlip->generated = 1;
+                                        $objOrderSlip->save();
+                                    }
+                                }
+
                                 $currency = $this->context->currency;
                                 $params['{voucher_amount}'] = Tools::displayPrice($cartrule->reduction_amount, $currency, false);
                                 $params['{voucher_num}'] = $cartrule->code;
+
                                 @Mail::Send(
                                     (int)$objOrder->id_lang,
                                     'voucher',
