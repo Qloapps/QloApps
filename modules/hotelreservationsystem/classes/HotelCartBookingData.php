@@ -800,7 +800,7 @@ class HotelCartBookingData extends ObjectModel
                         INNER JOIN `'._DB_PREFIX_.'htl_room_type_feature_pricing_group` fpg
                         ON (fp.`id_feature_price` = fpg.`id_feature_price` AND fpg.`id_group` = '.(int) $id_group.')
                         WHERE fp.`id_cart` = 0 AND fp.`id_product`='.(int) $id_product.' AND fp.`active`=1
-                        AND fp.`date_selection_type`=2 AND fp.`date_from` = \''.pSQL($date).'\''
+                        AND fp.`date_selection_type` = '.(int) HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_SPECIFIC.' AND fp.`date_from` = \''.pSQL($date).'\''
                     )) {
                         return $featurePrice;
                     }
@@ -825,7 +825,7 @@ class HotelCartBookingData extends ObjectModel
                         'SELECT * FROM `'._DB_PREFIX_.'htl_room_type_feature_pricing` fp
                         INNER JOIN `'._DB_PREFIX_.'htl_room_type_feature_pricing_group` fpg
                         ON (fp.`id_feature_price` = fpg.`id_feature_price` AND fpg.`id_group` = '.(int) $id_group.')
-                        WHERE fp.`id_cart` = 0 AND fp.`id_product`='.(int) $id_product.' AND fp.`date_selection_type`=1
+                        WHERE fp.`id_cart` = 0 AND fp.`id_product`='.(int) $id_product.' AND fp.`date_selection_type` = '.(int) HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_RANGE.'
                         AND `is_special_days_exists`=0 AND `active`=1
                         AND fp.`date_from` <= \''.pSQL($date).'\' AND fp.`date_to` >= \''.pSQL($date).'\''
                     )) {

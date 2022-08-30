@@ -911,13 +911,13 @@ class AdminCartsControllerCore extends AdminController
             $hrt_feature_price->id_guest = (int) $this->context->cookie->id_guest;
             $hrt_feature_price->id_room = $id_room;
             $hrt_feature_price->feature_price_name = $feature_price_name;
-            $hrt_feature_price->date_selection_type = 1; // date range
+            $hrt_feature_price->date_selection_type = HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_RANGE;
             $hrt_feature_price->date_from = $date_from;
             $hrt_feature_price->date_to = $date_to;
             $hrt_feature_price->is_special_days_exists = 0;
             $hrt_feature_price->special_days = json_encode(false);
-            $hrt_feature_price->impact_way = 3; // fix price
-            $hrt_feature_price->impact_type = 2; // fixed price
+            $hrt_feature_price->impact_way = HotelRoomTypeFeaturePricing::IMPACT_WAY_FIX_PRICE;
+            $hrt_feature_price->impact_type = HotelRoomTypeFeaturePricing::IMPACT_TYPE_FIXED_PRICE;
             $hrt_feature_price->impact_value = $price;
             $hrt_feature_price->active = 1;
             $hrt_feature_price->groupBox = array_column(Group::getGroups($this->context->language->id), 'id_group');

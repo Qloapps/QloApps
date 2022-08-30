@@ -905,11 +905,11 @@ $(document).ready(function() {
     /* ----  AdminHotelFeaturePricesSettingsController Admin ---- */
 
     $('#date_selection_type').on('change', function() {
-        if ($('#date_selection_type').val() == 2) {
+        if ($('#date_selection_type').val() == date_selection_types.specific) {
             $(".specific_date_type").show(200);
             $(".date_range_type").hide(200);
             $(".special_days_content").hide(200);
-        } else if ($('#date_selection_type').val() == 1) {
+        } else if ($('#date_selection_type').val() == date_selection_types.range) {
             $(".specific_date_type").hide(200);
             $(".date_range_type").show(200);
             $(".special_days_content").show(200);
@@ -930,9 +930,9 @@ $(document).ready(function() {
     });
 
     $('#price_impact_way').on('change', function() {
-        if ($('#price_impact_way').val() == 3) {
-            $('#price_impact_type option[value="2"]').attr('selected', 'selected');
-            $('#price_impact_type_input').removeAttr('disabled').val(2);
+        if ($('#price_impact_way').val() == impact_ways.fix) {
+            $('#price_impact_type option[value="' + impact_ways.increase + '"]').attr('selected', 'selected');
+            $('#price_impact_type_input').removeAttr('disabled').val(impact_ways.increase);
             $('#price_impact_type').trigger('change').attr('disabled', 'disabled');
         } else {
             $('#price_impact_type_input').attr('disabled', 'disabled');
@@ -941,9 +941,9 @@ $(document).ready(function() {
     });
 
     $('#price_impact_type').on('change', function() {
-        if ($('#price_impact_type').val() == 2) {
+        if ($('#price_impact_type').val() == impact_types.fixed) {
             $(".payment_type_icon").text(defaultcurrency_sign);
-        } else if ($('#price_impact_type').val() == 1) {
+        } else if ($('#price_impact_type').val() == impact_types.percentage) {
             $(".payment_type_icon").text('%');
         } else {
             $(".payment_type_icon").text(defaultcurrency_sign);

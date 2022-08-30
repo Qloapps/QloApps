@@ -78,17 +78,17 @@
             </label>
             <div class="col-lg-3">
 				<select class="form-control" name="date_selection_type" id="date_selection_type">
-					<option value="1" {if isset($objFeaturePrice->date_selection_type) && $objFeaturePrice->date_selection_type == 1}selected = "selected"{/if}>
+					<option value="{HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_RANGE}" {if isset($objFeaturePrice->date_selection_type) && $objFeaturePrice->date_selection_type == HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_RANGE}selected = "selected"{/if}>
 					  {l s='Date Range' mod='hotelreservationsystem'}
 					</option>
-					<option value="2" {if isset($objFeaturePrice->date_selection_type) && $objFeaturePrice->date_selection_type == 2}selected = "selected"{/if}>
+					<option value="{HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_SPECIFIC}" {if isset($objFeaturePrice->date_selection_type) && $objFeaturePrice->date_selection_type == HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_SPECIFIC}selected = "selected"{/if}>
 					  {l s='Specific Date' mod='hotelreservationsystem'}
 					</option>
 				</select>
 			</div>
 		</div>
 
-		<div class="form-group specific_date_type" {if isset($edit) && $edit}{if isset($objFeaturePrice->date_selection_type) && $objFeaturePrice->date_selection_type != 2}style="display:none;"{/if}{else}style="display:none;"{/if}>
+		<div class="form-group specific_date_type" {if isset($edit) && $edit}{if isset($objFeaturePrice->date_selection_type) && $objFeaturePrice->date_selection_type != HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_SPECIFIC}style="display:none;"{/if}{else}style="display:none;"{/if}>
 			<label class="col-sm-3 control-label required" for="specific_date" >
 				{l s='Specific Date' mod='hotelreservationsystem'}
 			</label>
@@ -97,7 +97,7 @@
 			</div>
 		</div>
 
-		<div class="form-group date_range_type" {if isset($objFeaturePrice->date_selection_type) && $objFeaturePrice->date_selection_type == 2}style="display:none;"{/if}>
+		<div class="form-group date_range_type" {if isset($objFeaturePrice->date_selection_type) && $objFeaturePrice->date_selection_type == HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_SPECIFIC}style="display:none;"{/if}>
 			<label class="col-sm-3 control-label required" for="date_form" >
 				{l s='Date From' mod='hotelreservationsystem'}
 			</label>
@@ -105,7 +105,7 @@
 				<input type="text" id="feature_plan_date_from" name="date_from" class="form-control datepicker-input" value="{if isset($objFeaturePrice->date_from)}{$objFeaturePrice->date_from|date_format:'%d-%m-%Y'}{else}{$date_from|date_format:'%d-%m-%Y'}{/if}" readonly/>
 			</div>
 		</div>
-		<div class="form-group date_range_type" {if isset($objFeaturePrice->date_selection_type) && $objFeaturePrice->date_selection_type == 2}style="display:none;"{/if}>
+		<div class="form-group date_range_type" {if isset($objFeaturePrice->date_selection_type) && $objFeaturePrice->date_selection_type == HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_SPECIFIC}style="display:none;"{/if}>
 			<label class="col-sm-3 control-label required" for="date_to" >
 				{l s='Date To' mod='hotelreservationsystem'}
 			</label>
@@ -113,7 +113,7 @@
 				<input type="text" id="feature_plan_date_to" name="date_to" class="form-control datepicker-input" value="{if isset($objFeaturePrice->date_to)}{$objFeaturePrice->date_to|date_format:'%d-%m-%Y'}{else}{$date_to|date_format:'%d-%m-%Y'}{/if}" readonly/>
 			</div>
 		</div>
-		<div class="form-group special_days_content" {if isset($objFeaturePrice->date_selection_type) && 	$objFeaturePrice->date_selection_type == 2}style="display:none;"{/if}>
+		<div class="form-group special_days_content" {if isset($objFeaturePrice->date_selection_type) && 	$objFeaturePrice->date_selection_type == HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_SPECIFIC}style="display:none;"{/if}>
 			<label class="control-label col-lg-3">
 				<span class="label-tooltip" data-toggle="tooltip" data-html="true" title="" data-original-title="{l s='If you want to create this Feature price rule only for some special days of the week of selected date range then you can select select days after checking this option. Otherwise rule will be created for whole selected date range.' mod='hotelreservationsystem'}">
 					{l s='For Special Days' mod='hotelreservationsystem'}
@@ -200,13 +200,13 @@
             </label>
             <div class="col-lg-3">
 				<select class="form-control" name="price_impact_way" id="price_impact_way">
-					<option value="1" {if isset($objFeaturePrice->impact_way) && $objFeaturePrice->impact_way == 1}selected = "selected"{/if}>
+					<option value="{HotelRoomTypeFeaturePricing::IMPACT_WAY_DECREASE}" {if isset($objFeaturePrice->impact_way) && $objFeaturePrice->impact_way == HotelRoomTypeFeaturePricing::IMPACT_WAY_DECREASE}selected = "selected"{/if}>
 					  {l s='Decrease Price' mod='hotelreservationsystem'}
 					</option>
-					<option value="2" {if isset($objFeaturePrice->impact_way) && $objFeaturePrice->impact_way == 2}selected = "selected"{/if}>
+					<option value="{HotelRoomTypeFeaturePricing::IMPACT_WAY_INCREASE}" {if isset($objFeaturePrice->impact_way) && $objFeaturePrice->impact_way == HotelRoomTypeFeaturePricing::IMPACT_WAY_INCREASE}selected = "selected"{/if}>
 					  {l s='Increase Price' mod='hotelreservationsystem'}
 					</option>
-					<option value="3" {if isset($objFeaturePrice->impact_way) && $objFeaturePrice->impact_way == 3}selected = "selected"{/if}>
+					<option value="{HotelRoomTypeFeaturePricing::IMPACT_WAY_FIX_PRICE}" {if isset($objFeaturePrice->impact_way) && $objFeaturePrice->impact_way == HotelRoomTypeFeaturePricing::IMPACT_WAY_FIX_PRICE}selected = "selected"{/if}>
 						{l s='Fix Price' mod='hotelreservationsystem'}
 					</option>
 				</select>
@@ -218,11 +218,11 @@
               {l s='Impact Type :' mod='hotelreservationsystem'}
             </label>
             <div class="col-lg-3">
-				<select class="form-control" name="price_impact_type" id="price_impact_type" {if isset($objFeaturePrice->impact_way) && $objFeaturePrice->impact_way == 3}disabled="disabled"{/if}>
-					<option value="1" {if isset($objFeaturePrice->impact_type) && $objFeaturePrice->impact_type == 1}selected = "selected"{/if}>
+				<select class="form-control" name="price_impact_type" id="price_impact_type" {if isset($objFeaturePrice->impact_way) && $objFeaturePrice->impact_way == HotelRoomTypeFeaturePricing::IMPACT_WAY_FIX_PRICE}disabled="disabled"{/if}>
+					<option value="{HotelRoomTypeFeaturePricing::IMPACT_TYPE_PERCENTAGE}" {if isset($objFeaturePrice->impact_type) && $objFeaturePrice->impact_type == HotelRoomTypeFeaturePricing::IMPACT_TYPE_PERCENTAGE}selected = "selected"{/if}>
 					  {l s='Percentage' mod='hotelreservationsystem'}
 					</option>
-					<option value="2" {if isset($objFeaturePrice->impact_type) && $objFeaturePrice->impact_type == 2}selected = "selected"{/if}>
+					<option value="{HotelRoomTypeFeaturePricing::IMPACT_TYPE_FIXED_PRICE}" {if isset($objFeaturePrice->impact_type) && $objFeaturePrice->impact_type == HotelRoomTypeFeaturePricing::IMPACT_TYPE_FIXED_PRICE}selected = "selected"{/if}>
 					  {l s='Fixed Price' mod='hotelreservationsystem'}
 					</option>
 				</select>
@@ -236,7 +236,7 @@
 			</label>
 			<div class="col-lg-3">
 				<div class="input-group">
-					<span class="input-group-addon payment_type_icon">{if isset($edit)} {if $objFeaturePrice->impact_type==2}{$defaultcurrency_sign}{else}%{/if}{else}%{/if}</span>
+					<span class="input-group-addon payment_type_icon">{if isset($edit)} {if $objFeaturePrice->impact_type == HotelRoomTypeFeaturePricing::IMPACT_TYPE_FIXED_PRICE}{$defaultcurrency_sign}{else}%{/if}{else}%{/if}</span>
 					<input type="text" id="impact_value" name="impact_value"
 					value="{if isset($smarty.post.impact_value) && $smarty.post.impact_value}{$smarty.post.impact_value}{elseif isset($objFeaturePrice->impact_value)}{$objFeaturePrice->impact_value}{/if}"/>
 				</div>

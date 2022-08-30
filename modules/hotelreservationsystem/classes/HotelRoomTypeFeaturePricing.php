@@ -39,6 +39,16 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
 
     public $groupBox;
 
+    const DATE_SELECTION_TYPE_RANGE = 1;
+    const DATE_SELECTION_TYPE_SPECIFIC = 2;
+
+    const IMPACT_WAY_DECREASE = 1;
+    const IMPACT_WAY_INCREASE = 2;
+    const IMPACT_WAY_FIX_PRICE = 3;
+
+    const IMPACT_TYPE_PERCENTAGE = 1;
+    const IMPACT_TYPE_FIXED_PRICE = 2;
+
     public static $definition = array(
         'table' => 'htl_room_type_feature_pricing',
         'primary' => 'id_feature_price',
@@ -180,7 +190,7 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
             return Db::getInstance()->getRow(
                 'SELECT * FROM `'._DB_PREFIX_.'htl_room_type_feature_pricing`
                 WHERE `id_product`='.(int) $id_product.'
-                AND `date_selection_type`=2
+                AND `date_selection_type` = '.(int) self::DATE_SELECTION_TYPE_SPECIFIC.'
                 AND `date_from` = \''.pSQL($date_from).'\'
                 AND `id_feature_price`!='.(int) $id_feature_price
             );
@@ -206,7 +216,7 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
             return Db::getInstance()->getRow(
                 'SELECT * FROM `'._DB_PREFIX_.'htl_room_type_feature_pricing`
                 WHERE `id_product`='.(int) $id_product.'
-                AND `date_selection_type`=1
+                AND `date_selection_type` = '.(int) self::DATE_SELECTION_TYPE_RANGE.'
                 AND `is_special_days_exists`=0
                 AND `date_from` <= \''.pSQL($date_to).'\'
                 AND `date_to` >= \''.pSQL($date_from).'\'
@@ -363,7 +373,7 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
                                     $params['enableFeaturePrice'] = 1;
                                     $nextDate = date('Y-m-d', strtotime('+1 day', strtotime($dateFrom)));
                                     if ($nextDate == $dateTo) {
-                                        $params['dateSelectionType'] = 2;
+                                        $params['dateSelectionType'] = self::DATE_SELECTION_TYPE_SPECIFIC;
                                         $featurePriceExists = $this->checkRoomTypeFeaturePriceExistance(
                                             $id_product,
                                             $dateFrom,
@@ -380,7 +390,7 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
                                             }
                                         }
                                     } else {
-                                        $params['dateSelectionType'] = 1;
+                                        $params['dateSelectionType'] = self::DATE_SELECTION_TYPE_RANGE;
                                         $featurePriceExists = $this->checkRoomTypeFeaturePriceExistance(
                                             $id_product,
                                             $dateFrom,
@@ -404,7 +414,7 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
                                                     $nextDayDate = date('Y-m-d', strtotime('+1 day', strtotime($currentDate)));
                                                     $params['dateFrom'] = $currentDate;
                                                     $params['dateTo'] = $nextDayDate;
-                                                    $params['dateSelectionType'] = 2;
+                                                    $params['dateSelectionType'] = self::DATE_SELECTION_TYPE_SPECIFIC;
                                                     $featurePriceExists = $this->checkRoomTypeFeaturePriceExistance(
                                                         $id_product,
                                                         $currentDate,
@@ -604,7 +614,7 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
             $roomTypeFeaturePricing->feature_price_name[$language['id_lang']] = $params['featurePriceName'];
         }
         $roomTypeFeaturePricing->date_selection_type = $params['dateSelectionType'];
-        if ($dateSelectionType == 1) {
+        if ($dateSelectionType == self::DATE_SELECTION_TYPE_RANGE) {
             $roomTypeFeaturePricing->date_from = $params['dateFrom'];
             $roomTypeFeaturePricing->date_to = $params['dateTo'];
         } else {
@@ -676,7 +686,7 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
                 $id_guest,
                 $id_room
             )) {
-                if ($featurePrice['impact_type'] == 1) {
+                if ($featurePrice['impact_type'] == self::IMPACT_TYPE_PERCENTAGE) {
                     //percentage
                     $featureImpactPriceTE = $productPriceTE * ($featurePrice['impact_value'] / 100);
                     $featureImpactPriceTI = $productPriceTI * ($featurePrice['impact_value'] / 100);
@@ -686,11 +696,11 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
                     $featureImpactPriceTE = Tools::convertPrice($featurePrice['impact_value'], $id_currency);
                     $featureImpactPriceTI = Tools::convertPrice($featurePrice['impact_value']+$taxPrice, $id_currency);
                 }
-                if ($featurePrice['impact_way'] == 1) {
+                if ($featurePrice['impact_way'] == self::IMPACT_WAY_DECREASE) {
                     // Decrease
                     $priceWithFeatureTE = ($productPriceTE - $featureImpactPriceTE);
                     $priceWithFeatureTI = ($productPriceTI - $featureImpactPriceTI);
-                } elseif ($featurePrice['impact_way'] == 2) {
+                } elseif ($featurePrice['impact_way'] == self::IMPACT_WAY_INCREASE) {
                     // Increase
                     $priceWithFeatureTE = ($productPriceTE + $featureImpactPriceTE);
                     $priceWithFeatureTI = ($productPriceTI + $featureImpactPriceTI);

@@ -1230,6 +1230,29 @@ class HotelBookingDetail extends ObjectModel
             $newTotalPriceTI = $unitRoomPriceTI * $newNumDays;
         }
 
+        // update `total_paid_amount` on database
+        $totalPaidAmount = 0;
+        $isAdvancePayment = Db::getInstance()->getValue(
+            'SELECT o.`is_advance_payment`
+            FROM `'._DB_PREFIX_.'orders` o
+            WHERE o.`id_order` = '.(int) $id_order
+        );
+
+        if ($isAdvancePayment) {
+            $objHotelAdvancedPayment = new HotelAdvancedPayment();
+            $productAdvancePayment = $objHotelAdvancedPayment->getIdAdvPaymentByIdProduct($rowByIdOrderIdRoom['id_product']);
+
+            if (!$productAdvancePayment || (isset($productAdvancePayment['payment_type']) && $productAdvancePayment['payment_type'])) {
+                $totalPaidAmount = $objHotelAdvancedPayment->getRoomMinAdvPaymentAmount(
+                    $rowByIdOrderIdRoom['id_product'],
+                    $new_date_from,
+                    $new_date_to
+                );
+            }
+        } else {
+            $totalPaidAmount = $newTotalPriceTI;
+        }
+
         $cart_booking = array(
             'table' => 'htl_cart_booking_data',
             'data' => array(
@@ -1246,6 +1269,7 @@ class HotelBookingDetail extends ObjectModel
                 'date_to' => $new_date_to,
                 'total_price_tax_excl' => $newTotalPriceTE,
                 'total_price_tax_incl' => $newTotalPriceTI,
+                'total_paid_amount' => $totalPaidAmount,
             ),
         );
 

@@ -42,13 +42,13 @@ class AdminHotelFeaturePricesSettingsController extends ModuleAdminController
         $this->_join .= ' LEFT JOIN `'._DB_PREFIX_.'htl_room_type` hrt ON (hrt.`id_product` = a.`id_product`)';
         $this->_join .= ' LEFT JOIN `'._DB_PREFIX_.'htl_branch_info_lang` hbl ON (hbl.`id` = hrt.`id_hotel` AND hbl.`id_lang`='.(int) $this->context->language->id.')';
 
-        $this->_select .= ' fpl.`feature_price_name` as ftr_price_name, CONCAT(pl.`name`, " (#", a.`id_product`, ")") as product_name, hbl.`hotel_name`, IF(a.impact_type=1 , CONCAT(round(a.impact_value, 2), " ", "%"), a.impact_value) AS impact_value';
-        $this->_select .= ' ,IF(a.impact_type=1 , \''.$this->l('Percentage').'\', \''.$this->l('Fixed Amount').'\')
+        $this->_select .= ' fpl.`feature_price_name` as ftr_price_name, CONCAT(pl.`name`, " (#", a.`id_product`, ")") as product_name, hbl.`hotel_name`, IF(a.impact_type='.(int) HotelRoomTypeFeaturePricing::IMPACT_TYPE_PERCENTAGE.', CONCAT(round(a.impact_value, 2), " ", "%"), a.impact_value) AS impact_value';
+        $this->_select .= ' ,IF(a.impact_type='.(int) HotelRoomTypeFeaturePricing::IMPACT_TYPE_PERCENTAGE.', \''.$this->l('Percentage').'\', \''.$this->l('Fixed Amount').'\')
         AS impact_type';
         $this->_select .= ', CASE
-            WHEN a.`impact_way` = 1 THEN \''.$this->l('Decrease').'\'
-            WHEN a.`impact_way` = 2 THEN \''.$this->l('Increase').'\'
-            WHEN a.`impact_way` = 3 THEN \''.$this->l('Fix').'\'
+            WHEN a.`impact_way` = '.(int) HotelRoomTypeFeaturePricing::IMPACT_WAY_DECREASE.' THEN \''.$this->l('Decrease').'\'
+            WHEN a.`impact_way` = '.(int) HotelRoomTypeFeaturePricing::IMPACT_WAY_INCREASE.' THEN \''.$this->l('Increase').'\'
+            WHEN a.`impact_way` = '.(int) HotelRoomTypeFeaturePricing::IMPACT_WAY_FIX_PRICE.' THEN \''.$this->l('Fix').'\'
         END AS `impact_way`';
 
         $this->_where = ' AND a.`id_cart` = 0 AND a.`id_guest` = 0 AND a.`id_room` = 0';
@@ -131,7 +131,7 @@ class AdminHotelFeaturePricesSettingsController extends ModuleAdminController
 
     public function getDateToValue($dateTo, $row)
     {
-        if ($row['date_selection_type'] == 1) {
+        if ($row['date_selection_type'] == HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_RANGE) {
             return date($this->context->language->date_format_lite, strtotime($dateTo));
         } else {
             return '<span class="badge badge-success">'.$this->l('Specific date').'</span>';
@@ -260,7 +260,7 @@ class AdminHotelFeaturePricesSettingsController extends ModuleAdminController
         $languages = Language::getLanguages(false);
         $objDefaultLang = new language($defaultLangId);
         $isPlanTypeExists = 0;
-        if ($dateSelectionType == 2) {
+        if ($dateSelectionType == HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_SPECIFIC) {
             $isPlanTypeExists = $objFeaturePricing->checkRoomTypeFeaturePriceExistance(
                 $roomTypeId,
                 $specificDate,
@@ -321,7 +321,7 @@ class AdminHotelFeaturePricesSettingsController extends ModuleAdminController
                 }
             }
 
-            if ($dateSelectionType == 1) {
+            if ($dateSelectionType == HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_RANGE) {
                 if ($dateFrom == '') {
                     $this->errors[] = $this->l('Please choose Date from for the feature price.');
                 }
@@ -384,7 +384,7 @@ class AdminHotelFeaturePricesSettingsController extends ModuleAdminController
                 }
                 $objFeaturePricing->date_selection_type = $dateSelectionType;
 
-                if ($dateSelectionType == 1) {
+                if ($dateSelectionType == HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_RANGE) {
                     $objFeaturePricing->date_from = $dateFrom;
                     $objFeaturePricing->date_to = $dateTo;
                 } else {
@@ -463,6 +463,23 @@ class AdminHotelFeaturePricesSettingsController extends ModuleAdminController
     public function setMedia()
     {
         parent::setMedia();
+
+        Media::addJsDef(array(
+            'date_selection_types' => array(
+                'range' => HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_RANGE,
+                'specific' => HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_SPECIFIC,
+            ),
+            'impact_ways' => array(
+                'decrease' => HotelRoomTypeFeaturePricing::IMPACT_WAY_DECREASE,
+                'increase' => HotelRoomTypeFeaturePricing::IMPACT_WAY_INCREASE,
+                'fix' => HotelRoomTypeFeaturePricing::IMPACT_WAY_FIX_PRICE,
+            ),
+            'impact_types' => array(
+                'percentage' => HotelRoomTypeFeaturePricing::IMPACT_TYPE_PERCENTAGE,
+                'fixed' => HotelRoomTypeFeaturePricing::IMPACT_TYPE_FIXED_PRICE,
+            ),
+        ));
+
         $this->addCSS(_MODULE_DIR_.'hotelreservationsystem/views/css/HotelReservationAdmin.css');
         $this->addJs(_MODULE_DIR_.'hotelreservationsystem/views/js/HotelReservationAdmin.js');
     }

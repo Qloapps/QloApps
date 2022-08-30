@@ -1884,7 +1884,7 @@ class AdminOrdersControllerCore extends AdminController
             $order->{Configuration::get('PS_TAX_ADDRESS_TYPE', null, null, $order->id_shop)}
         );
 
-        // creatie feature pricec if needed
+        // create feature price if needed
         $createFeaturePrice = $product_informations['product_price_tax_incl'] != $initial_product_price_tax_incl;
         $featurePriceParams = array();
         if ($createFeaturePrice) {
@@ -2310,13 +2310,13 @@ class AdminOrdersControllerCore extends AdminController
         $hrt_feature_price->id_guest = (int) $params['id_guest'];
         $hrt_feature_price->id_room = (int) $params['id_room'];
         $hrt_feature_price->feature_price_name = $feature_price_name;
-        $hrt_feature_price->date_selection_type = 1; // date range
+        $hrt_feature_price->date_selection_type = HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_RANGE;
         $hrt_feature_price->date_from = date('Y-m-d', strtotime($params['date_from']));
         $hrt_feature_price->date_to = date('Y-m-d', strtotime($params['date_to']));
         $hrt_feature_price->is_special_days_exists = 0;
         $hrt_feature_price->special_days = json_encode(false);
-        $hrt_feature_price->impact_way = 3; // fix price
-        $hrt_feature_price->impact_type = 2; // fixed price
+        $hrt_feature_price->impact_way = HotelRoomTypeFeaturePricing::IMPACT_WAY_FIX_PRICE;
+        $hrt_feature_price->impact_type = HotelRoomTypeFeaturePricing::IMPACT_TYPE_FIXED_PRICE;
         $hrt_feature_price->impact_value = $params['price'];
         $hrt_feature_price->active = 1;
         $hrt_feature_price->groupBox = array_column(Group::getGroups($this->context->language->id), 'id_group');
