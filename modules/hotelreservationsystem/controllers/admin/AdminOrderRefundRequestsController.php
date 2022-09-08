@@ -516,6 +516,17 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
                         }
                     }
 
+                    // if generating voucher with a refund transaction do not allow voucher generation from front office
+                    if (Tools::isSubmit('refundTransactionAmount') && !count($this->errors)) {
+                        if (Tools::isSubmit('generateCreditSlip') && isset($idCreditSlip) && $idCreditSlip) {
+                            $objOrderSlip = new OrderSlip($idCreditSlip);
+                            if (Validate::isLoadedObject($objOrderSlip)) {
+                                $objOrderSlip->generated = 1;
+                                $objOrderSlip->save();
+                            }
+                        }
+                    }
+
                     // redirect with success if process completed successfully
                     Tools::redirectAdmin(
                         self::$currentIndex.'&conf=4&id_order_return='.$idOrderReturn.
