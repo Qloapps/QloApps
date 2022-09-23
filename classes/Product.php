@@ -3750,7 +3750,7 @@ class ProductCore extends ObjectModel
     * @param string $query Search query
     * @return array Matching products
     */
-    public static function searchByName($id_lang, $query, Context $context = null)
+    public static function searchByName($id_lang, $query, Context $context = null, $id_hotel = false)
     {
         if (!$context) {
             $context = Context::getContext();
@@ -3765,6 +3765,14 @@ class ProductCore extends ObjectModel
 			AND pl.`id_lang` = '.(int)$id_lang.Shop::addSqlRestrictionOnLang('pl')
         );
         $sql->leftJoin('manufacturer', 'm', 'm.`id_manufacturer` = p.`id_manufacturer`');
+        if ($id_hotel) {
+            $sql->innerJoin(
+                'htl_room_type',
+                'hrt',
+                'p.`id_product` = hrt.`id_product` AND hrt.`id_hotel` = '.(int)$id_hotel
+            );
+
+        }
 
         $where = 'pl.`name` LIKE \'%'.pSQL($query).'%\'
 		OR p.`ean13` LIKE \'%'.pSQL($query).'%\'
