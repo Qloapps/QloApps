@@ -268,7 +268,6 @@ class ContactControllerCore extends FrontController
         $objHotelInfo = new HotelBranchInformation();
         if ($hotelsInfo = $objHotelInfo->hotelBranchesInfo(false, 1, 1)) {
             foreach ($hotelsInfo as &$hotel) {
-                $hotel['address_info'] = $objHotelInfo->getAddress($hotel['id']);
                 if (isset($hotel['id_cover_img'])
                     && $hotel['id_cover_img']
                     && Validate::isLoadedObject(

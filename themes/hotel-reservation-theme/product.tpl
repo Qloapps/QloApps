@@ -183,7 +183,7 @@
 						<ul class="nav nav-tabs product_description_tabs">
 							<li class="active"><a href="#room_info_tab" class="idTabHrefShort" data-toggle="tab">{l s='Room Information'}</a></li>
 							<li><a href="#refund_policies_tab" class="idTabHrefShort" data-toggle="tab">{l s='Refund Policies'}</a></li>
-							{if $display_google_maps && ($hotel->latitude|floatval != 0 && $hotel->longitude|floatval != 0)}
+							{if $display_google_maps && ($hotel_latitude|floatval != 0 && $hotel_longitude|floatval != 0)}
 								<li><a href="#room_type_map_tab" class="idTabHrefShort" data-toggle="tab">{l s='View on Map'}</a></li>
 							{/if}
 							{$HOOK_PRODUCT_TAB}
@@ -278,7 +278,7 @@
 									<span class="non_refundable_txt error_msg">{l s='Non Refundable'}</span>
 								{/if}
 							</div>
-							{if $display_google_maps && ($hotel->latitude|floatval != 0 && $hotel->longitude|floatval != 0)}
+							{if $display_google_maps && ($hotel_latitude|floatval != 0 && $hotel_longitude|floatval != 0)}
 								<div id="room_type_map_tab" class="tab-pane card">
 									<div class="map-wrap"></div>
 									<div id="room-info-map-ui-content" style="display: none;">
@@ -289,10 +289,10 @@
 												</div>
 											{/if}
 											<div>
-												<p class="name">{$hotel->hotel_name|escape:'html':'UTF-8'}</p>
-												<p class="address">{$hotel_address.address1|escape:'html':'UTF-8'}</p>
-												<p class="contact">{l s='Contact:'} {$hotel_address.phone|escape:'html':'UTF-8'}</p>
-												<a class="btn get-directions" href="https://www.google.com/maps/dir/?api=1&destination={$hotel->latitude},{$hotel->longitude}" target="_blank">
+												<p class="name">{$hotel_name|escape:'html':'UTF-8'}</p>
+												<p class="address">{$hotel_address1|escape:'html':'UTF-8'}</p>
+												<p class="contact">{l s='Contact:'} {$hotel_phone|escape:'html':'UTF-8'}</p>
+												<a class="btn get-directions" href="https://www.google.com/maps/dir/?api=1&destination={$hotel_latitude},{$hotel_longitude}" target="_blank">
 													<span>{l s='Get Directions'}</span>
 												</a>
 											</div>

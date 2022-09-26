@@ -309,7 +309,8 @@ class HotelBranchInformation extends ObjectModel
         if (!Cache::isStored($cache_id)) {
             $sql = 'SELECT hbi.*, hbl.`policies`, hbl.`hotel_name`, hbl.`description`, hbl.`short_description`';
             if ($detailedInfo) {
-                $sql .= ', hi.id as id_cover_img, a.`city`, s.`name` as `state_name`, cl.`name` as country_name';
+                $sql .= ', hi.id as id_cover_img, a.`address1` as address, a.`postcode`, a.`phone`,  a.`city`,
+                    s.`name` as `state_name`, cl.`name` as country_name';
             }
             $sql .= ' FROM `'._DB_PREFIX_.'htl_branch_info` hbi';
             $sql .= ' LEFT JOIN `'._DB_PREFIX_.'htl_branch_info_lang` hbl
@@ -532,12 +533,11 @@ class HotelBranchInformation extends ObjectModel
         }
 
         $sql = 'SELECT hbl.`hotel_name`, a.`phone`, hbi.`email`, a.`city`, cl.`name` AS country, a.`postcode`,
-            a.`address1`, hbi.`latitude`, hbi.`longitude`, hbi.`map_formated_address`, hbi.`map_input_text`
+            a.`address1` as `address`, hbi.`latitude`, hbi.`longitude`, hbi.`map_formated_address`, hbi.`map_input_text`
             FROM `'._DB_PREFIX_.'htl_branch_info` AS hbi
             INNER JOIN `'._DB_PREFIX_.'htl_branch_info_lang` hbl
             ON (hbl.`id` = hbi.`id` AND hbl.`id_lang` = '.(int)$idLang.')
-            INNER JOIN `'._DB_PREFIX_.'address` a
-            ON (a.`id_hotel` = hbi.`id`)
+            LEFT JOIN `'._DB_PREFIX_.'address` a ON (a.`id_hotel` = hbi.`id`)
             INNER JOIN `'._DB_PREFIX_.'country_lang` AS cl
             ON (cl.`id_country` = a.`id_country` AND cl.`id_lang` = '.(int)$idLang.")
             WHERE hbi.`latitude` != 0 AND hbi.`longitude` != 0";
@@ -550,7 +550,6 @@ class HotelBranchInformation extends ObjectModel
 
         return Db::getInstance()->executeS($sql);
     }
-
     public function getAllHotels()
     {
         return Db::getInstance()->executeS('SELECT * FROM `'._DB_PREFIX_.'htl_branch_info`');
