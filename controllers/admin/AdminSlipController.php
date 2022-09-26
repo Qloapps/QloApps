@@ -64,7 +64,7 @@ class AdminSlipControllerCore extends AdminController
                 'orderby' => false,
                 'search' => false,
             ),
-            'generated' => array(
+            'redeem_status' => array(
                 'title' => $this->l('Voucher'),
                 'align' => 'center',
                 'callback' => 'printVoucherIcons',
@@ -181,7 +181,7 @@ class AdminSlipControllerCore extends AdminController
 
         if (!Validate::isLoadedObject($objOrderSlip)) {
             $this->errors[] = $this->l('The credit slip can not be loaded.');
-        } elseif ($objOrderSlip->generated) {
+        } elseif ($objOrderSlip->redeem_status != OrderSlip::REDEEM_STATUS_NOT_REDEEMED) {
             $this->errors[] = $this->l('The voucher code for this credit slip has already been generated.');
         } else {
             $objOrder = new Order($objOrderSlip->id_order);
@@ -274,7 +274,7 @@ class AdminSlipControllerCore extends AdminController
         return $this->createTemplate('_print_pdf_icon.tpl')->fetch();
     }
 
-    public function printVoucherIcons($generated, $tr)
+    public function printVoucherIcons($redeem_status, $tr)
     {
         $orderSlip = new OrderSlip($tr['id_order_slip']);
         if (!Validate::isLoadedObject($orderSlip)) {

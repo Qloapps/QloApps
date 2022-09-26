@@ -63,7 +63,7 @@ class OrderSlipCore extends ObjectModel
     public $partial;
 
     /** @var int */
-    public $generated = 0;
+    public $redeem_status = self::REDEEM_STATUS_NOT_REDEEMED;
 
     /** @var int */
     public $order_slip_type = 0;
@@ -73,6 +73,10 @@ class OrderSlipCore extends ObjectModel
 
     /** @var string Object last modification date */
     public $date_upd;
+
+    const REDEEM_STATUS_NOT_REDEEMED = 1;
+    const REDEEM_STATUS_GENERATED = 2;
+    const REDEEM_STATUS_REFUNDED = 3;
 
     /**
      * @see ObjectModel::$definition
@@ -93,7 +97,7 @@ class OrderSlipCore extends ObjectModel
             'shipping_cost_amount' =>    array('type' => self::TYPE_FLOAT, 'validate' => 'isFloat'),
             'amount' =>                array('type' => self::TYPE_FLOAT, 'validate' => 'isFloat'),
             'partial' =>                array('type' => self::TYPE_INT),
-            'generated' =>        array('type' => self::TYPE_INT, 'validate' => 'isInt'),
+            'redeem_status' =>        array('type' => self::TYPE_INT, 'validate' => 'isInt'),
             'order_slip_type' =>        array('type' => self::TYPE_INT, 'validate' => 'isInt'),
             'date_add' =>                array('type' => self::TYPE_DATE, 'validate' => 'isDate'),
             'date_upd' =>                array('type' => self::TYPE_DATE, 'validate' => 'isDate'),
@@ -554,7 +558,7 @@ class OrderSlipCore extends ObjectModel
             return false;
         }
 
-        if ($this->generated) {
+        if ($this->redeem_status != self::REDEEM_STATUS_NOT_REDEEMED) {
             return false;
         }
 
@@ -607,7 +611,7 @@ class OrderSlipCore extends ObjectModel
         $objCartRule->code = 'V'.(int) ($objCartRule->id).'C'.(int) ($objOrder->id_customer).'O'.(int) ($objOrder->id);
         $objCartRule->save();
 
-        $this->generated = 1;
+        $this->redeem_status = self::REDEEM_STATUS_GENERATED;
 
         return $this->save() ? (int) $objCartRule->id : false;
     }

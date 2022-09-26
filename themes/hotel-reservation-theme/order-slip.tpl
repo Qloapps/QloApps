@@ -74,8 +74,10 @@
 							</a>
 						</td>
 						<td>
-							{if $slip.generated}
+							{if $slip.redeem_status == OrderSlip::REDEEM_STATUS_GENERATED}
 								<span class="badge badge-warning">{l s='Voucher Generated'}</span>
+							{elseif $slip.redeem_status == OrderSlip::REDEEM_STATUS_REFUNDED}
+								<span class="badge badge-danger">{l s='Refunded'}</span>
 							{else}
 								<a href="{$link->getPageLink('order-slip', true, NULL, "generateVoucher=1&id_order_slip={$slip.id_order_slip|intval}")|escape:'html':'UTF-8'}" title="{l s='Generate voucher for credit slip '} #{Configuration::get('PS_CREDIT_SLIP_PREFIX', $lang_id)}{l s='%s' sprintf=$slip.id_order_slip|string_format:"%06d"}">
 									<u>{l s='Generate Voucher'}</u>

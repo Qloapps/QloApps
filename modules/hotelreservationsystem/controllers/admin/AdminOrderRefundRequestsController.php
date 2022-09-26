@@ -488,7 +488,7 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
                                 if (Tools::isSubmit('generateCreditSlip') && isset($idCreditSlip) && $idCreditSlip) {
                                     $objOrderSlip = new OrderSlip($idCreditSlip);
                                     if (Validate::isLoadedObject($objOrderSlip)) {
-                                        $objOrderSlip->generated = 1;
+                                        $objOrderSlip->redeem_status = OrderSlip::REDEEM_STATUS_GENERATED;
                                         $objOrderSlip->save();
                                     }
                                 }
@@ -521,7 +521,7 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
                         if (Tools::isSubmit('generateCreditSlip') && isset($idCreditSlip) && $idCreditSlip) {
                             $objOrderSlip = new OrderSlip($idCreditSlip);
                             if (Validate::isLoadedObject($objOrderSlip)) {
-                                $objOrderSlip->generated = 1;
+                                $objOrderSlip->redeem_status = OrderSlip::REDEEM_STATUS_REFUNDED;
                                 $objOrderSlip->save();
                             }
                         }
