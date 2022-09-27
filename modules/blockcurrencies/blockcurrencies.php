@@ -82,6 +82,21 @@ class BlockCurrencies extends Module
         }
     }
 
+    public function hookDisplayTop()
+    {
+        return $this->hookDisplayNav();
+    }
+
+    public function hookDisplayTopSubPrimaryBlock()
+    {
+        return $this->hookDisplayNav();
+    }
+
+    public function hookDisplayFooterMostLeftBlock()
+    {
+        return $this->hookDisplayNav();
+    }
+
     public function hookDisplayExternalNavigationHook()
     {
         if (!$this->_prepareHook()) {
