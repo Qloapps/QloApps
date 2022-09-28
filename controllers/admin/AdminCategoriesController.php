@@ -381,13 +381,7 @@ class AdminCategoriesControllerCore extends AdminController
         $helper->icon = 'icon-off';
         $helper->color = 'color1';
         $helper->title = $this->l('Disabled Categories', null, null, false);
-        if (ConfigurationKPI::get('DISABLED_CATEGORIES') !== false) {
-            $helper->value = ConfigurationKPI::get('DISABLED_CATEGORIES');
-        } else {
-            $helper->value = $statsController->getLatestKpiValue('disabled_categories');
-        }
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=disabled_categories';
-        $helper->refresh = (bool)(ConfigurationKPI::get('DISABLED_CATEGORIES_EXPIRE') < $time);
         $kpis[] = $helper->generate();
 
         $helper = new HelperKpi();
@@ -396,13 +390,7 @@ class AdminCategoriesControllerCore extends AdminController
         $helper->color = 'color2';
         $helper->href = $this->context->link->getAdminLink('AdminTracking');
         $helper->title = $this->l('Empty Categories', null, null, false);
-        if (ConfigurationKPI::get('EMPTY_CATEGORIES') !== false) {
-            $helper->value = ConfigurationKPI::get('EMPTY_CATEGORIES');
-        } else {
-            $helper->value = $statsController->getLatestKpiValue('empty_categories');
-        }
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=empty_categories';
-        $helper->refresh = (bool)(ConfigurationKPI::get('EMPTY_CATEGORIES_EXPIRE') < $time);
         $kpis[] = $helper->generate();
 
         $helper = new HelperKpi();
@@ -411,13 +399,7 @@ class AdminCategoriesControllerCore extends AdminController
         $helper->color = 'color3';
         $helper->title = $this->l('Top Category', null, null, false);
         $helper->subtitle = $this->l('30 days', null, null, false);
-        if (ConfigurationKPI::get('TOP_CATEGORY', $this->context->employee->id_lang) !== false) {
-            $helper->value = ConfigurationKPI::get('TOP_CATEGORY', $this->context->employee->id_lang);
-        } else {
-            $helper->value = $statsController->getLatestKpiValue('top_category');
-        }
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=top_category';
-        $helper->refresh = (bool)(ConfigurationKPI::get('TOP_CATEGORY_EXPIRE', $this->context->employee->id_lang) < $time);
         $kpis[] = $helper->generate();
 
         $helper = new HelperKpi();
@@ -425,13 +407,7 @@ class AdminCategoriesControllerCore extends AdminController
         $helper->icon = 'icon-search';
         $helper->color = 'color4';
         $helper->title = $this->l('Average number of products per category', null, null, false);
-        if (ConfigurationKPI::get('PRODUCTS_PER_CATEGORY') !== false) {
-            $helper->value = ConfigurationKPI::get('PRODUCTS_PER_CATEGORY');
-        } else {
-            $helper->value = $statsController->getLatestKpiValue('products_per_category');
-        }
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=products_per_category';
-        $helper->refresh = (bool)(ConfigurationKPI::get('PRODUCTS_PER_CATEGORY_EXPIRE') < $time);
         $kpis[] = $helper->generate();
 
         $helper = new HelperKpiRow();
