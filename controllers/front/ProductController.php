@@ -371,6 +371,7 @@ class ProductControllerCore extends FrontController
                         'hotel_name' => $hotel_name,
                         'hotel_policies' => $hotel_policies,
                         'hotel_features' => $htl_features,
+                        'hotel_has_images' => (bool) HotelImage::getCover($hotel_id),
                         'ftr_img_src' => _PS_IMG_.'rf/',
                         'order_date_restrict' => $order_date_restrict
                     )

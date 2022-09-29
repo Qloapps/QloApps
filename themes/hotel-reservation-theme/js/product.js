@@ -205,7 +205,9 @@ $(document).ready(function() {
             getProductAttribute();
     }
 
-    loadHotelImages();
+    if ($('.room_info_hotel_images_wrap').length) {
+        loadHotelImagesByPage(1);
+    }
 });
 
 $(window).resize(function() {
@@ -1434,41 +1436,8 @@ function changeRoomDate(date_in, date_out){
     });
 }
 
-function loadHotelImages() {
-    const btnShowMore = $('.btn-show-more-images');
-
-    $.ajax({
-        url: product_controller_url,
-        type: 'POST',
-        dataType: 'JSON',
-        data: {
-            ajax: true,
-            action: 'getHotelImages',
-            id_product: id_product,
-            page: 1,
-        },
-        success: function(response) {
-            if (response.status == true && response.message == 'HTML_OK') {
-                $('#room_info_hotel_images').append(response.html);
-                $('.hotel-images-fancybox').fancybox();
-            } else {
-                $('.room_info_hotel_images_wrap').hide();
-            }
-
-            if (!response.has_next_page) {
-                $(btnShowMore).hide(200);
-            }
-        }
-    });
-}
-
-$(document).on('click', '.btn-show-more-images', function () {
-    loadMoreHotelImages();
-});
-
-function loadMoreHotelImages() {
-    const btnShowMore = $('.btn-show-more-images');
-    const page = parseInt($(btnShowMore).attr('data-next-page'));
+function loadHotelImagesByPage(page = 1) {
+    page = parseInt(page);
 
     $.ajax({
         url: product_controller_url,
@@ -1480,18 +1449,30 @@ function loadMoreHotelImages() {
             id_product: id_product,
             page: page,
         },
+        beforeSend: function() {
+            $('.room_info_hotel_images_wrap .skeleton-loading-wrap').show();
+        },
         success: function(response) {
             if (response.status == true && response.message == 'HTML_OK') {
-                $('#room_info_hotel_images').append(response.html);
-                $('.hotel-images-fancybox').fancybox();
+                $('.room_info_hotel_images_wrap .images-wrap').append(response.html);
+                $('.room_info_hotel_images_wrap .hotel-images-fancybox').fancybox();
+                $('.room_info_hotel_images_wrap .btn-show-more-images').removeClass('hide');
             }
 
             if (response.has_next_page) {
-                $(btnShowMore).show(200);
-                $(btnShowMore).attr('data-next-page', page + 1);
+                $('.room_info_hotel_images_wrap .btn-show-more-images').show(200);
+                $('.room_info_hotel_images_wrap .btn-show-more-images').attr('data-next-page', page + 1);
             } else {
-                $(btnShowMore).hide(200);
+                $('.room_info_hotel_images_wrap .btn-show-more-images').hide(200);
             }
+        },
+        complete: function() {
+            $('.room_info_hotel_images_wrap .skeleton-loading-wrap').hide();
         }
     });
 }
+
+$(document).on('click', '.room_info_hotel_images_wrap .btn-show-more-images', function () {
+    const page = parseInt($(this).attr('data-next-page'));
+    loadHotelImagesByPage(page);
+});

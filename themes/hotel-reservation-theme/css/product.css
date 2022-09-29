@@ -1502,3 +1502,10 @@ Quick View Styles
 
 .room_info_hotel_images_wrap .btn-show-more-images:hover {
   opacity: 0.8; }
+
+/* loading animation */
+#room_info_hotel_images .skeleton-loading-wrap .col-sm-4 {
+  border: 7.5px solid #fff; }
+
+#room_info_hotel_images .skeleton-loading-wrap .loading-container-box {
+  height: 200px; }

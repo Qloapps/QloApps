@@ -231,19 +231,34 @@
 											</div>
 										</div>
 									{/if}
-									<div class="room_info_hotel_images_wrap">
-										<div class="info_margin_div">
-											<div class="room_info_heading">
-												<span>{l s='Hotel Images'}</span>
+									{if isset($hotel_has_images) && $hotel_has_images}
+										<div class="room_info_hotel_images_wrap">
+											<div class="info_margin_div">
+												<div class="room_info_heading">
+													<span>{l s='Hotel Images'}</span>
+												</div>
+												<div class="room_info_content" id="room_info_hotel_images">
+													<div class="row images-wrap"></div>
+													<div class="row skeleton-loading-wrap">
+														<div class="skeleton-loading-wave clearfix">
+															<div class="col-sm-4">
+																<div class="loading-container-box"></div>
+															</div>
+															<div class="col-sm-4">
+																<div class="loading-container-box"></div>
+															</div>
+															<div class="col-sm-4">
+																<div class="loading-container-box"></div>
+															</div>
+														</div>
+													</div>
+												</div>
+												<a class="btn btn-primary btn-show-more-images hide" data-id-product="{$product->id}" data-next-page="1">
+													<span>{l s='SHOW MORE'}</span>
+												</a>
 											</div>
-
-											<div class="room_info_content row" id="room_info_hotel_images"></div>
-
-											<a class="btn btn-primary btn-show-more-images" data-id-product="{$product->id}" data-next-page="2">
-												<span>{l s='SHOW MORE'}</span>
-											</a>
 										</div>
-									</div>
+									{/if}
 									<!-- <div class="info_margin_div">
 										<div class="room_info_heading">
 											<span>{l s='Rooms'}</span>
