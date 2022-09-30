@@ -70,7 +70,7 @@ class AdminAboutHotelBlockSettingController extends ModuleAdminController
             ),
         );
 
-        $this->informations[] = $this->l('For better view, upload hotel interior image in multiple of 3.');
+        $this->informations[] = $this->l('Keep interior images in a multiple of 3 for the best view.');
         $this->addRowAction('edit');
         $this->addRowAction('delete');
 
