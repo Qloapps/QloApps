@@ -348,7 +348,7 @@ class DashProducts extends Module
 					}
 
 					$objHRT = new HotelRoomType($product_obj->id);
-					$objHBI = new HotelBranchInformation($objHRT->id_hotel, $this->context->language->id);
+					$objHotelBranch = new HotelBranchInformation($objHRT->id_hotel, $this->context->language->id);
 
 					$tr = array();
 					$tr[] = array(
@@ -367,8 +367,8 @@ class DashProducts extends Module
 					$tr[] = array(
 						'id' => 'hotel',
 						'value' => '<a href="'.$this->context->link->getAdminLink('AdminAddHotel', true).
-							'&id='.$objHBI->id.'&updatehtl_branch_info" target="_blank">'.
-							Tools::htmlentitiesUTF8($objHBI->hotel_name).'</a>',
+							'&id='.$objHotelBranch->id.'&updatehtl_branch_info" target="_blank">'.
+							Tools::htmlentitiesUTF8($objHotelBranch->hotel_name).'</a>',
 						'class' => 'text-center',
 					);
 					$tr[] = array(
@@ -443,7 +443,7 @@ class DashProducts extends Module
 			$body = array();
 			if (is_array($hotels) && count($hotels))
 				foreach ($hotels as $hotel) {
-					$objHBI = new HotelBranchInformation($hotel['id_hotel'], $this->context->language->id);
+					$objHotelBranch = new HotelBranchInformation($hotel['id_hotel'], $this->context->language->id);
 					$tr = array();
 					$tr[] = array(
 						'id' => 'reference',
@@ -454,12 +454,12 @@ class DashProducts extends Module
 					);
 					$tr[] = array(
 						'id' => 'image',
-						'value' => $this->getHotelImage($objHBI->id),
+						'value' => $this->getHotelImage($objHotelBranch->id),
 						'class' => 'text-center',
 					);
 					$tr[] = array(
 						'id' => 'location',
-						'value' => $objHBI->address,
+						'value' => $objHotelBranch->address,
 						'class' => 'text-center',
 					);
 					$tr[] = array(
@@ -479,15 +479,13 @@ class DashProducts extends Module
 
     public function getHotelImage($idHotel)
     {
-        $imageDir = _MODULE_DIR_.'hotelreservationsystem/views/img/hotel_img/';
-        $noPictureImagePath = _PS_IMG_.'p/en.jpg';
+		$noPictureImagePath = _PS_IMG_.'p/en.jpg';
         $hotelImage = HotelImage::getCover($idHotel);
-        $imgLink = '';
         if (is_array($hotelImage) && count($hotelImage)) {
-            $imagePath = $imageDir.$hotelImage['hotel_image_id'].'.jpg';
-            $imgLink = $imagePath;
+			$objHotelImage = new HotelImage();
+			$imgLink = $this->context->link->getMediaLink($objHotelImage->getImageLink($hotelImage['id'], ImageType::getFormatedName('small')));
         } else {
-            $imgLink = $noPictureImagePath;
+            $imgLink = $this->context->link->getMediaLink($noPictureImagePath);
         }
 
         return '<img src="'.$imgLink.'" class="img img-thumbnail hotel-thumbnail">';

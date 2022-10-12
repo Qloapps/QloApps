@@ -5,6 +5,7 @@
     <field name="width"/>
     <field name="height"/>
     <field name="products"/>
+    <field name="hotels"/>
     <field name="categories"/>
     <field name="manufacturers"/>
     <field name="suppliers"/>
@@ -12,14 +13,12 @@
     <field name="stores"/>
   </fields>
   <entities>
-    <image_type id="cart_default" name="cart_default" width="80" height="80" products="1" categories="0" manufacturers="0" suppliers="0" scenes="0" stores="0"/>
-    <image_type id="small_default" name="small_default" width="98" height="98" products="1" categories="0" manufacturers="1" suppliers="1" scenes="0" stores="0"/>
-    <image_type id="medium_default" name="medium_default" width="125" height="125" products="1" categories="1" manufacturers="1" suppliers="1" scenes="0" stores="1"/>
-    <image_type id="home_default" name="home_default" width="250" height="250" products="1" categories="0" manufacturers="0" suppliers="0" scenes="0" stores="0"/>
-    <image_type id="large_default" name="large_default" width="720" height="720" products="1" categories="0" manufacturers="1" suppliers="1" scenes="0" stores="0"/>
-    <image_type id="thickbox_default" name="thickbox_default" width="800" height="800" products="1" categories="0" manufacturers="0" suppliers="0" scenes="0" stores="0"/>
-    <image_type id="category_default" name="category_default" width="870" height="217" products="0" categories="1" manufacturers="0" suppliers="0" scenes="0" stores="0"/>
-    <image_type id="scene_default" name="scene_default" width="870" height="270" products="0" categories="0" manufacturers="0" suppliers="0" scenes="1" stores="0"/>
-    <image_type id="m_scene_default" name="m_scene_default" width="161" height="58" products="0" categories="0" manufacturers="0" suppliers="0" scenes="1" stores="0"/>
+    <image_type id="cart_default" name="cart_default" width="80" height="80" products="1" hotels="0" categories="0" manufacturers="0" suppliers="0" scenes="0" stores="0"/>
+    <image_type id="small_default" name="small_default" width="98" height="98" products="1" hotels="1" categories="0" manufacturers="1" suppliers="1" scenes="0" stores="0"/>
+    <image_type id="medium_default" name="medium_default" width="125" height="125" products="1" hotels="1" categories="1" manufacturers="1" suppliers="1" scenes="0" stores="1"/>
+    <image_type id="home_default" name="home_default" width="250" height="250" products="1" hotels="0" categories="0" manufacturers="0" suppliers="0" scenes="0" stores="0"/>
+    <image_type id="large_default" name="large_default" width="720" height="720" products="1" hotels="1" categories="0" manufacturers="1" suppliers="1" scenes="0" stores="0"/>
+    <image_type id="thickbox_default" name="thickbox_default" width="800" height="800" products="1" hotels="0" categories="0" manufacturers="0" suppliers="0" scenes="0" stores="0"/>
+    <image_type id="category_default" name="category_default" width="870" height="217" products="0" hotels="0" categories="1" manufacturers="0" suppliers="0" scenes="0" stores="0"/>
   </entities>
 </entity_image_type>
