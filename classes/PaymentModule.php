@@ -690,8 +690,6 @@ abstract class PaymentModuleCore extends Module
                     }
 
                     // update order in hlt tables
-                    $objCartBookingData = new HotelCartBookingData();
-                    $objBookingDetail = new HotelBookingDetail();
                     $objRoomType = new HotelRoomType();
 
                     $objAdvancedPayment = new HotelAdvancedPayment();
