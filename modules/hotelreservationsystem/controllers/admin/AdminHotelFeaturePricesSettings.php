@@ -60,7 +60,7 @@ class AdminHotelFeaturePricesSettingsController extends ModuleAdminController
                 'align' => 'center',
             ),
             'ftr_price_name' => array(
-                'title' => $this->l('Feature Name'),
+                'title' => $this->l('Rule Name'),
                 'align' => 'center',
                 'havingFilter' => true,
             ),
@@ -155,7 +155,7 @@ class AdminHotelFeaturePricesSettingsController extends ModuleAdminController
         parent::initToolbar();
         $this->page_header_toolbar_btn['new'] = array(
             'href' => self::$currentIndex.'&add'.$this->table.'&token='.$this->token,
-            'desc' => $this->l('Add Feature Price'),
+            'desc' => $this->l('Add new rule'),
             'imgclass' => 'new'
         );
     }
@@ -220,10 +220,10 @@ class AdminHotelFeaturePricesSettingsController extends ModuleAdminController
                 if (Configuration::updateValue('HTL_FEATURE_PRICING_PRIORITY', $priorityConfig)) {
                     Tools::redirectAdmin(self::$currentIndex.'&conf=4&token='.$this->token);
                 } else {
-                    $this->errors[] = $this->l('Some error occurred while updating feature price priorities.');
+                    $this->errors[] = $this->l('Some error occurred while updating advanced price rule priorities.');
                 }
             } else {
-                $this->errors[] = $this->l('Duplicate values selected for feature price priorities.');
+                $this->errors[] = $this->l('Duplicate values selected for advanced price rule priorities.');
             }
         } else {
             parent::postProcess();
@@ -289,7 +289,7 @@ class AdminHotelFeaturePricesSettingsController extends ModuleAdminController
         }
 
         if ($isPlanTypeExists) {
-            $this->errors[] = $this->l('A feature price rule already exists in which some dates are common with this
+            $this->errors[] = $this->l('An advanced price rule already exists in which some dates are common with this
             plan. Please select a different date range.');
         } else {
             if (!$roomTypeId) {
@@ -297,7 +297,7 @@ class AdminHotelFeaturePricesSettingsController extends ModuleAdminController
             }
             if (!Tools::getValue('feature_price_name_'.$defaultLangId)) {
                 $this->errors[] = sprintf(
-                    $this->l('Feature price rule name is required at least in %s'),
+                    $this->l('Advanced price rule name is required at least in %s'),
                     $objDefaultLang->name
                 );
             }
@@ -307,10 +307,10 @@ class AdminHotelFeaturePricesSettingsController extends ModuleAdminController
             );
             foreach ($languages as $language) {
                 if (!Validate::isCatalogName(Tools::getValue('feature_price_name_'.$language['id_lang']))) {
-                    $this->errors[] = $this->l('Feature price name is invalid in ').$language['name'];
+                    $this->errors[] = $this->l('Advanced price rule name is invalid in ').$language['name'];
                 } elseif (Tools::strlen(Tools::getValue('feature_price_name_'.$language['id_lang'])) > $validateRules['sizeLang']['feature_price_name']) {
                     sprintf(
-                        $this->l('Feature price Name field is too long (%2$d chars max).'),
+                        $this->l('Advanced price rule Name field is too long (%2$d chars max).'),
                         $validateRules['sizeLang']['feature_price_name']
                     );
                 }
@@ -318,10 +318,10 @@ class AdminHotelFeaturePricesSettingsController extends ModuleAdminController
 
             if ($dateSelectionType == 1) {
                 if ($dateFrom == '') {
-                    $this->errors[] = $this->l('Please choose Date from for the feature price.');
+                    $this->errors[] = $this->l('Please choose Date from for the advanced price rule.');
                 }
                 if ($dateTo == '') {
-                    $this->errors[] = $this->l('Please choose Date to for the feature price.');
+                    $this->errors[] = $this->l('Please choose Date to for the advanced price rule.');
                 }
                 $dateFrom = date('Y-m-d', strtotime($dateFrom));
                 $dateTo = date('Y-m-d', strtotime($dateTo));
@@ -345,7 +345,7 @@ class AdminHotelFeaturePricesSettingsController extends ModuleAdminController
                 }
             } else {
                 if ($specificDate == '') {
-                    $this->errors[] = $this->l('Please choose Date from for the feature price.');
+                    $this->errors[] = $this->l('Please choose Date from for the advanced price rule.');
                 }
                 $specificDate = date('Y-m-d', strtotime($specificDate));
                 if (!Validate::isDate($specificDate)) {
@@ -406,7 +406,7 @@ class AdminHotelFeaturePricesSettingsController extends ModuleAdminController
                         Tools::redirectAdmin(self::$currentIndex.'&conf=4&token='.$this->token);
                     }
                 } else {
-                    $this->errors[] = $this->l('Some error occured while saving feature price rule.');
+                    $this->errors[] = $this->l('Some error occured while saving advanced price rule.');
                 }
             }
         }

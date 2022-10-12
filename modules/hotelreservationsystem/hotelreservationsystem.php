@@ -426,10 +426,10 @@ class hotelreservationsystem extends Module
             'AdminHotelReservationSystemManagement'
         );
 
-        //Controllers which are to be used in this modules but we have not to create tab for those ontrollers...
+        // Controllers without tabs
         $this->installTab('AdminOrderRestrictSettings', 'Order Restrict Configuration', false, false);
         $this->installTab('AdminHotelGeneralSettings', 'Hotel General configuration', false, false);
-        $this->installTab('AdminHotelFeaturePricesSettings', 'Feature Pricing Configuration', false, false);
+        $this->installTab('AdminHotelFeaturePricesSettings', 'Advanced Price Rules', false, false);
         $this->installTab('AdminRoomTypeGlobalDemand', 'Additional Demand Configuration', false, false);
         $this->installTab('AdminAssignHotelFeatures', 'Assign Hotel Features', false, false);
 
