@@ -1692,8 +1692,8 @@ abstract class ObjectModelCore implements Core_Foundation_Database_EntityInterfa
             $types = ImageType::getImagesTypes();
             foreach ($types as $image_type) {
                 if ($this->image_name) { // by webkul
-                    if (file_exists($this->image_dir.$this->id.'-'.stripslashes($image_type['name']).'.'.$this->image_format)
-                        && !unlink($this->image_dir.$this->id.'-'.stripslashes($image_type['name']).'.'.$this->image_format)) {
+                    if (file_exists($this->image_dir.$this->image_name.'-'.stripslashes($image_type['name']).'.'.$this->image_format)
+                        && !unlink($this->image_dir.$this->image_name.'-'.stripslashes($image_type['name']).'.'.$this->image_format)) {
                         return false;
                     }
                 } else {

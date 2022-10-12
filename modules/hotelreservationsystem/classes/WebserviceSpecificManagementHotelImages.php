@@ -171,8 +171,8 @@ class WebserviceSpecificManagementHotelImages implements WebserviceSpecificManag
         // Get available image ids
         $available_image_ids = array();
 
-        $objHotelImg = new HotelImage();
-        $images = $objHotelImg->getImagesByHotelId($object_id);
+        $objHotelImage = new HotelImage();
+        $images = $objHotelImage->getImagesByHotelId($object_id);
 
         foreach ($images as $image) {
             $available_image_ids[] = $image['id'];
@@ -185,9 +185,9 @@ class WebserviceSpecificManagementHotelImages implements WebserviceSpecificManag
             } else {
                 // Check for new image system
                 $image_id = $this->wsObject->urlSegment[2];
-                if (Validate::isLoadedObject($objHotelImg = new HotelImage($image_id))) {
-                    if (file_exists($directory.$objHotelImg->hotel_image_id.'.jpg')) {
-                        $filename = $directory.'/'.$objHotelImg->hotel_image_id.'.jpg';
+                if (Validate::isLoadedObject($objHotelImage = new HotelImage($image_id))) {
+                    if (file_exists($objHotelImage->getImagePathDir().$objHotelImage->id.'.'.$objHotelImage->image_format)) {
+                        $filename = $objHotelImage->getImagePathDir().$objHotelImage->id.'.'.$objHotelImage->image_format;
                     }
                 }
             }
@@ -223,8 +223,8 @@ class WebserviceSpecificManagementHotelImages implements WebserviceSpecificManag
         }
         $this->output .= $this->objOutput->getObjectRender()->renderNodeHeader('images', array());
 
-        $objHotelImg = new HotelImage();
-        $images = $objHotelImg->getAllImages();
+        $objHotelImage = new HotelImage();
+        $images = $objHotelImage->getAllImages();
 
         $ids = array();
         foreach ($images as $image) {
@@ -372,7 +372,7 @@ class WebserviceSpecificManagementHotelImages implements WebserviceSpecificManag
 
                         @unlink($tmp_name);
 
-                        $this->imgToDisplay = _PS_MODULE_DIR_.'hotelreservationsystem/views/img/hotel_img/'.$objHotelImage->hotel_image_id.'.jpg';
+                        $this->imgToDisplay = $objHotelImage->getImagePathDir().$objHotelImage->id.'.'.$objHotelImage->image_format;
 
                         $this->objOutput->setFieldsToDisplay('full');
                         $this->output = $this->objOutput->renderEntity($objHotelImage, 1);
