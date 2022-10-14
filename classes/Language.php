@@ -915,7 +915,7 @@ class LanguageCore extends ObjectModel
             $errors[] = Tools::displayError('Archive cannot be downloaded from prestashop.com.');
         } elseif (!$lang_pack = json_decode($lang_pack_link)) {
             $errors[] = Tools::displayError('Error occurred when language was checked according to your Prestashop version.');
-        } elseif (empty($lang_pack->error) && ($content = Tools::file_get_contents(_QLO_API_URL_.'/download/lang_pack/'.$lang_pack->version.'/'.Tools::strtolower($lang_pack->iso_code.'.gzip')))) {
+        } elseif (empty($lang_pack->error) && ($content = Tools::file_get_contents($lang_pack->download_link))) {
             if (!@file_put_contents($file, $content)) {
                 if (is_writable(dirname($file))) {
                     @unlink($file);
