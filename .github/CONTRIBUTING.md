@@ -11,7 +11,7 @@ For individual issues please use the [Community Forum](https://forums.qloapps.co
 
 #### **Did you fix a bug?**
 
-1. To provide a code contribution for an issue you will need to set up your own fork of the [community-skeleton repository](https://github.com/webkul/hotelcommerce).
+1. To provide a code contribution for an issue you will need to set up your own fork of the [QloApps repository](https://github.com/webkul/hotelcommerce).
 Make your code changes, commit the changes and make a [Pull Request](https://help.github.com/articles/about-pull-requests/) to the respective repository.
 2. Separate each fix into a new branch in your repository and name it with the issue ID e.g. issue-1456.
 3. When committing to your individual branch, please try and use the following as your commit message  
