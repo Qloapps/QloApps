@@ -29,10 +29,10 @@ class AdminStatsControllerCore extends AdminStatsTabController
     public static function getVisits($unique = false, $date_from, $date_to, $granularity = false)
     {
         $visits = ($granularity == false) ? 0 : array();
-        $objQGA = Module::isEnabled('qlogoogleanalytics') ? Module::getInstanceByName('qlogoogleanalytics') : false;
-        if (Validate::isLoadedObject($objQGA) && $objQGA->isConfigured()) {
+        $objGoogleAnalytics = Module::isEnabled('qlogoogleanalytics') ? Module::getInstanceByName('qlogoogleanalytics') : false;
+        if (Validate::isLoadedObject($objGoogleAnalytics) && $objGoogleAnalytics->isConfigured()) {
             $metric = $unique ? 'visitors' : 'visits';
-            if ($result = $objQGA->requestReportData($granularity ? 'ga:date' : '', 'ga:'.$metric, $date_from, $date_to, null, null, 1, 5000)) {
+            if ($result = $objGoogleAnalytics->requestReportData($granularity ? 'ga:date' : '', 'ga:'.$metric, $date_from, $date_to, null, null, 1, 5000)) {
                 foreach ($result as $row) {
                     if ($granularity == 'day') {
                         $visits[strtotime(preg_replace('/^([0-9]{4})([0-9]{2})([0-9]{2})$/', '$1-$2-$3', $row['dimensions']['date']))] = $row['metrics'][$metric];
@@ -147,7 +147,6 @@ class AdminStatsControllerCore extends AdminStatsTabController
         return round($row['products'] ? 100 * $row['without_stock'] / $row['products'] : 0, 2).'%';
     }
 
-
     public static function getProductAverageGrossMargin()
     {
         $sql = 'SELECT AVG(1 - (IF(IFNULL(product_attribute_shop.wholesale_price, 0) = 0, product_shop.wholesale_price,product_attribute_shop.wholesale_price) / (IFNULL(product_attribute_shop.price, 0) + product_shop.price)))
@@ -261,6 +260,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
 		FROM `'._DB_PREFIX_.'orders` o
 		LEFT JOIN `'._DB_PREFIX_.'order_detail` od ON o.id_order = od.id_order
 		WHERE `invoice_date` BETWEEN "'.pSQL($date_from).' 00:00:00" AND "'.pSQL($date_to).' 23:59:59"
+        AND o.`valid` = 1
 		'.Shop::addSqlRestriction(false, 'o'));
         if (!$distinct_products) {
             return '0%';
@@ -524,21 +524,14 @@ class AdminStatsControllerCore extends AdminStatsTabController
                     : Configuration::get('CONF_'.strtoupper($order['module']).'_VAR_FOREIGN')
                 ) / 100;
 
-            // Add shipping fees for this order
-            $shipping_fees = $order['total_shipping_tax_excl'] * (
-                $order['id_country'] == Configuration::get('PS_COUNTRY_DEFAULT')
-                    ? Configuration::get('CONF_'.strtoupper($order['carrier_reference']).'_SHIP')
-                    : Configuration::get('CONF_'.strtoupper($order['carrier_reference']).'_SHIP_OVERSEAS')
-                ) / 100;
-
             // Tally up these fees
             if ($granularity == 'day') {
                 if (!isset($expenses[strtotime($order['date'])])) {
                     $expenses[strtotime($order['date'])] = 0;
                 }
-                $expenses[strtotime($order['date'])] += $flat_fees + $var_fees + $shipping_fees;
+                $expenses[strtotime($order['date'])] += $flat_fees + $var_fees;
             } else {
-                $expenses += $flat_fees + $var_fees + $shipping_fees;
+                $expenses += $flat_fees + $var_fees;
             }
         }
         return $expenses;
@@ -721,41 +714,11 @@ class AdminStatsControllerCore extends AdminStatsTabController
                 break;
 
             case 'frontoffice_translations':
-                $themes = Theme::getThemes();
-                $languages = Language::getLanguages();
-                $total = $translated = 0;
-                foreach ($themes as $theme) {
-                    /** @var Theme $theme */
-                    foreach ($languages as $language) {
-                        $kpi_key = substr(strtoupper($theme->name.'_'.$language['iso_code']), 0, 16);
-                        $total += ConfigurationKPI::get('FRONTOFFICE_TRANSLATE_TOTAL_'.$kpi_key);
-                        $translated += ConfigurationKPI::get('FRONTOFFICE_TRANSLATE_DONE_'.$kpi_key);
-                    }
-                }
-                $value = 0;
-                if ($translated) {
-                    $value = round(100 * $translated / $total, 1);
-                }
-                $value .= '%';
-                ConfigurationKPI::updateValue('FRONTOFFICE_TRANSLATIONS', $value);
-                ConfigurationKPI::updateValue('FRONTOFFICE_TRANSLATIONS_EXPIRE', strtotime('+2 min'));
+                $value = self::getFrontOfficeTranslations();
                 break;
 
             case 'backoffice_translations':
-                $languages = Language::getLanguages();
-                $total = $translated = 0;
-                foreach ($languages as $language) {
-                    $kpi_key = substr(strtoupper($language['iso_code']), 0, 16);
-                    $total += ConfigurationKPI::get('BACKOFFICE_TRANSLATE_TOTAL_'.$kpi_key);
-                    $translated += ConfigurationKPI::get('BACKOFFICE_TRANSLATE_DONE_'.$kpi_key);
-                }
-                $value = 0;
-                if ($translated) {
-                    $value = round(100 * $translated / $total, 1);
-                }
-                $value .= '%';
-                ConfigurationKPI::updateValue('BACKOFFICE_TRANSLATIONS', $value);
-                ConfigurationKPI::updateValue('BACKOFFICE_TRANSLATIONS_EXPIRE', strtotime('+2 min'));
+                $value = self::getBackOfficeTranslations();
                 break;
 
             case 'main_country':
@@ -855,6 +818,35 @@ class AdminStatsControllerCore extends AdminStatsTabController
             die(json_encode($array));
         }
         die(json_encode(array('has_errors' => true)));
+    }
+
+    public static function getFrontOfficeTranslations()
+    {
+        $themes = Theme::getThemes();
+        $languages = Language::getLanguages();
+        $total = $translated = 0;
+        foreach ($themes as $theme) {
+            foreach ($languages as $language) {
+                $result = Translate::getTranslationsCountFrontOffice($theme->name, $language['iso_code']);
+                $total += $result['total'];
+                $translated += $result['translated'];
+            }
+        }
+
+        return sprintf('%0.2f', $total ? ($translated / $total) * 100 : 0).'%';
+    }
+
+    public static function getBackOfficeTranslations()
+    {
+        $languages = Language::getLanguages();
+        $total = $translated = 0;
+        foreach ($languages as $language) {
+            $result = Translate::getTranslationsCountBackOffice($language['iso_code']);
+            $total += $result['total'];
+            $translated += $result['translated'];
+        }
+
+        return sprintf('%0.2f', $total ? ($translated / $total) * 100 : 0).'%';
     }
 
     public static function getArrivalsByDate($date, $idHotel = false)
@@ -1020,7 +1012,10 @@ class AdminStatsControllerCore extends AdminStatsTabController
         return $occupancyData;
     }
 
-    public static function getAvailabilityLineChartData($days, $dateFrom, $idHotel = null) // $dateFrom is inclusive
+    /**
+     * $dateFrom is inclusive
+     */
+    public static function getAvailabilityLineChartData($days, $dateFrom, $idHotel = null)
     {
         if ($days == 0) {
             return array();
@@ -1041,33 +1036,49 @@ class AdminStatsControllerCore extends AdminStatsTabController
         return $availabilityData;
     }
 
-    public static function getAverageDailyRate($dateFrom, $dateTo, $idHotel = null)
+    public static function getAverageDailyRateForDiscreteDates($dateFrom, $dateTo, $idHotel = null)
     {
         if ($dateFrom == $dateTo) {
             $dateTo = date('Y-m-d', strtotime('+1 day', strtotime($dateTo)));
         }
 
         $occupiedRooms = self::getOccupiedRoomsForDiscreteDates($dateFrom, $dateTo, $idHotel);
-        $roomsRevenues = self::getRoomsRevenuesForDiscreteDates($dateFrom, $dateTo, $idHotel);
+        $roomsRevenues = self::getRoomsRevenueForDiscreteDates($dateFrom, $dateTo, $idHotel);
 
         if (count($occupiedRooms) != count($roomsRevenues)) {
             return false;
         }
 
-        $divisor = 0;
-        $sumADRs = 0;
+        $averageDailyRates = array();
         foreach ($occupiedRooms as $key => $occupiedRoom) {
-            if ($occupiedRoom == 0) {
-                unset($occupiedRooms[$key]);
-                unset($roomsRevenues[$key]);
-                continue;
-            }
-
-            $sumADRs += ($occupiedRoom ? ($roomsRevenues[$key] / $occupiedRoom) : 0);
-            $divisor++;
+            $averageDailyRates[$key] = $occupiedRoom ? $roomsRevenues[$key] / $occupiedRoom : 0;
         }
 
-        return Tools::displayPrice($divisor ? ($sumADRs / $divisor) : 0);
+        return $averageDailyRates;
+    }
+
+    public static function getAverageDailyRate($dateFrom, $dateTo, $idHotel = null)
+    {
+        if ($dateFrom == $dateTo) {
+            $dateTo = date('Y-m-d', strtotime('+1 day', strtotime($dateTo)));
+        }
+
+        $averageDailyRates = self::getAverageDailyRateForDiscreteDates($dateFrom, $dateTo, $idHotel);
+
+        if (!is_array($averageDailyRates)) {
+            return 0;
+        }
+
+        $sumAverageDailyRates = 0;
+        $countAverageDailyRates = 0;
+        foreach ($averageDailyRates as $averageDailyRate) {
+            if ($averageDailyRate != 0) {
+                $sumAverageDailyRates += $averageDailyRate;
+                $countAverageDailyRates++;
+            }
+        }
+
+        return $countAverageDailyRates ? $sumAverageDailyRates / $countAverageDailyRates : 0;
     }
 
     public static function getCancellationRate($dateFrom, $dateTo, $idHotel = false)
@@ -1092,9 +1103,9 @@ class AdminStatsControllerCore extends AdminStatsTabController
         );
 
         if ($numAllOrders != 0) {
-            return Tools::ps_round(($numCancelledOrders / $numAllOrders) * 100, 2).'%';
+            return $numCancelledOrders / $numAllOrders * 100;
         } else {
-            return '0.00%';
+            return 0;
         }
     }
 
@@ -1112,18 +1123,19 @@ class AdminStatsControllerCore extends AdminStatsTabController
                 ) AS id_hotel
                 FROM `'._DB_PREFIX_.'orders` o
                 LEFT JOIN `' ._DB_PREFIX_.'order_return` orr ON orr.`id_order` = o.`id_order`
-                WHERE o.`invoice_date` BETWEEN "'.pSQL($dateFrom).' 00:00:00" AND "'.pSQL($dateTo).' 23:59:59"
+                WHERE o.`valid` = 1 AND o.`invoice_date` BETWEEN "'.pSQL($dateFrom).' 00:00:00" AND "'.pSQL($dateTo).' 23:59:59"
                 HAVING 1 '.HotelBranchInformation::addHotelRestriction($idHotel).'
             ) AS t'
         );
 
-        return Tools::displayPrice($result ? $result : 0);
+        return $result ? $result : 0;
     }
 
     public static function getNightsStayed($dateFrom, $dateTo, $idHotel = false)
     {
         $dateFrom = date('Y-m-d H:i:s', strtotime($dateFrom));
         $dateTo = date('Y-m-d H:i:s', strtotime($dateTo));
+
         return Db::getInstance()->getValue(
             'SELECT IFNULL(SUM(DATEDIFF(
                 IF (hbd.`id_status` = '.(int) HotelBookingDetail::STATUS_CHECKED_OUT.', IF ("'.$dateTo.'" > check_out, check_out, "'.$dateTo.'"), IF ("'.$dateTo.'" > date_to, date_to, "'.$dateTo.'")),
@@ -1134,8 +1146,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
             (IF (hbd.`id_status` = '.(int) HotelBookingDetail::STATUS_CHECKED_OUT.',
                 (hbd.`check_in` < \''.pSQL($dateTo).'\' AND hbd.`check_out` >= \''.pSQL($dateFrom).'\'),
                 (hbd.`date_from` < \''.pSQL($dateTo).'\' AND hbd.`date_to` >= \''.pSQL($dateFrom).'\')
-            ))'.
-            HotelBranchInformation::addHotelRestriction($idHotel, 'hbd')
+            ))'.HotelBranchInformation::addHotelRestriction($idHotel, 'hbd')
         );
     }
 
@@ -1164,20 +1175,20 @@ class AdminStatsControllerCore extends AdminStatsTabController
         $dateTo = !$dateTo ? date('Y-m-d', strtotime('+1 day', strtotime($dateFrom))) : $dateTo;
 
         $discreteDates = array();
-        $date = $dateFrom;
-        while ($date < $dateTo) {
-            $dateNext = date('Y-m-d', strtotime('+1 day', strtotime($date)));
+        $dateTemp = $dateFrom;
+        while ($dateTemp <= $dateTo) {
+            $dateNext = date('Y-m-d', strtotime('+1 day', strtotime($dateTemp)));
             $discreteDates[] = array(
-                'date_from' => $date,
+                'date_from' => $dateTemp,
                 'date_to' => $dateNext,
-                'timestamp_from' => strtotime($date),
+                'timestamp_from' => strtotime($dateTemp),
             );
-            $date = $dateNext;
+            $dateTemp = $dateNext;
         };
 
         $result = array();
         foreach ($discreteDates as $discreteDate) {
-            $cacheKey = 'AdminStats::getOccupiedRoomsForDiscreteDates_'.(int) $discreteDate['timestamp_from'].'_'.
+            $cacheKey = 'AdminStats::getOccupiedRoomsForDiscreteDates'.'_'.(int) $discreteDate['timestamp_from'].'_'.
             (!is_array($idHotel) ? (int) $idHotel : implode('_', $idHotel));
             if (!Cache::isStored($cacheKey) || !$useCache) {
                 $sql = 'SELECT COUNT(DISTINCT hbd.`id_room`)
@@ -1201,33 +1212,31 @@ class AdminStatsControllerCore extends AdminStatsTabController
         return $result;
     }
 
-    public static function getRoomsRevenuesForDiscreteDates($dateFrom, $dateTo = null, $idHotel = null, $useCache = true)
+    public static function getRoomsRevenueForDiscreteDates($dateFrom, $dateTo = null, $idHotel = null, $useCache = true)
     {
         $dateTo = !$dateTo ? date('Y-m-d', strtotime('+1 day', strtotime($dateFrom))) : $dateTo;
 
         $discreteDates = array();
-        $date = $dateFrom;
-        while ($date < $dateTo) {
-            $dateNext = date('Y-m-d', strtotime('+1 day', strtotime($date)));
+        $dateTemp = $dateFrom;
+        while ($dateTemp <= $dateTo) {
+            $dateNext = date('Y-m-d', strtotime('+1 day', strtotime($dateTemp)));
             $discreteDates[] = array(
-                'date_from' => $date,
+                'date_from' => $dateTemp,
                 'date_to' => $dateNext,
-                'timestamp_from' => strtotime($date),
+                'timestamp_from' => strtotime($dateTemp),
             );
-            $date = $dateNext;
+            $dateTemp = $dateNext;
         };
 
         $result = array();
         foreach ($discreteDates as $discreteDate) {
-            $cacheKey = 'AdminStats::getRoomsRevenuesForDiscreteDates'.(int) $discreteDate['timestamp_from'].'_'.
+            $cacheKey = 'AdminStats::getRoomsRevenueForDiscreteDates'.'_'.(int) $discreteDate['timestamp_from'].'_'.
             (!is_array($idHotel) ? (int) $idHotel : implode('_', $idHotel));
             if (!Cache::isStored($cacheKey) || !$useCache) {
                 $sql = 'SELECT IFNULL(SUM(hbd.`total_price_tax_excl` / DATEDIFF(hbd.`date_to`, hbd.`date_from`)), 0)
                 FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
-                LEFT JOIN `'._DB_PREFIX_.'htl_room_information` hri
-                ON (hri.`id` = hbd.`id_room`)
                 LEFT JOIN `'._DB_PREFIX_.'product` p
-                ON (p.`id_product` = hri.`id_product`)
+                ON (p.`id_product` = hbd.`id_product`)
                 WHERE p.`active` = 1
                 AND hbd.`is_refunded` = 0
                 AND hbd.`date_from` < "'.pSQL($discreteDate['date_to']).' 00:00:00" AND hbd.`date_to` > "'.pSQL($discreteDate['date_from']).' 00:00:00"'.
@@ -1243,24 +1252,166 @@ class AdminStatsControllerCore extends AdminStatsTabController
         return $result;
     }
 
-    public static function getAvailableRoomsForDiscreteDates($dateFrom, $dateTo = null, $idHotel = null, $useCache = true)
+    public static function getTotalRevenueForDiscreteDates($dateFrom, $dateTo = null, $idHotel = null, $useCache = true)
     {
         $dateTo = !$dateTo ? date('Y-m-d', strtotime('+1 day', strtotime($dateFrom))) : $dateTo;
+
         $discreteDates = array();
-        $date = $dateFrom;
-        while ($date < $dateTo) {
-            $dateNext = date('Y-m-d', strtotime('+1 day', strtotime($date)));
+        $dateTemp = $dateFrom;
+        while ($dateTemp <= $dateTo) {
+            $dateNext = date('Y-m-d', strtotime('+1 day', strtotime($dateTemp)));
             $discreteDates[] = array(
-                'date_from' => $date,
+                'date_from' => $dateTemp,
                 'date_to' => $dateNext,
-                'timestamp_from' => strtotime($date),
+                'timestamp_from' => strtotime($dateTemp),
             );
-            $date = $dateNext;
+            $dateTemp = $dateNext;
         };
 
         $result = array();
         foreach ($discreteDates as $discreteDate) {
-            $cacheKey = 'AdminStats::getAvailableRoomsForDiscreteDates'.(int) $discreteDate['timestamp_from'].'_'.
+            $cacheKey = 'AdminStats::getTotalRevenueForDiscreteDates'.'_'.(int) $discreteDate['timestamp_from'].'_'.
+            (!is_array($idHotel) ? (int) $idHotel : implode('_', $idHotel));
+            if (!Cache::isStored($cacheKey) || !$useCache) {
+                $sql = 'SELECT SUM((current_parts / total_parts) * total_paid_tax_excl) AS total_revenue
+                FROM (
+                    SELECT o.`id_order`,
+                    o.`total_paid_tax_excl` / o.`conversion_rate` AS total_paid_tax_excl,
+                    (
+                        SELECT SUM(DATEDIFF(hbd.`date_to`, hbd.`date_from`))
+                        FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+                        INNER JOIN `'._DB_PREFIX_.'product` p
+                        ON (p.`id_product` = hbd.`id_product`)
+                        WHERE hbd.`id_order` = o.`id_order`
+                        AND p.`active` = 1 AND hbd.`is_refunded` = 0'.
+                        (!is_null($idHotel) ? HotelBranchInformation::addHotelRestriction($idHotel, 'hbd') : '').'
+                    ) AS total_parts,
+                    (
+                        SELECT COUNT(*)
+                        FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+                        INNER JOIN `'._DB_PREFIX_.'product` p
+                        ON (p.`id_product` = hbd.`id_product`)
+                        WHERE hbd.`id_order` = o.`id_order`
+                        AND hbd.`date_from` <= "'.pSQL($discreteDate['date_from']).' 00:00:00" AND hbd.`date_to` >= "'.pSQL($discreteDate['date_to']).' 00:00:00"
+                        AND p.`active` = 1 AND hbd.`is_refunded` = 0'.
+                        (!is_null($idHotel) ? HotelBranchInformation::addHotelRestriction($idHotel, 'hbd') : '').'
+                    ) AS current_parts
+                    FROM `'._DB_PREFIX_.'orders` o
+                    HAVING total_parts IS NOT NULL AND current_parts > 0
+                    ORDER BY o.`id_order`
+                ) AS t';
+
+                $value = Db::getInstance()->getValue($sql);
+                $value = !$value ? 0: (float) $value;
+                Cache::store($cacheKey, $value);
+            }
+
+            $result[$discreteDate['timestamp_from']] = Cache::retrieve($cacheKey);
+        }
+
+        return $result;
+    }
+
+    /**
+     * total rooms (available for booking) for each date
+     */
+    public static function getTotalRoomsForDiscreteDates($dateFrom, $dateTo = null, $idHotel = null, $useCache = true)
+    {
+        $dateTo = !$dateTo ? date('Y-m-d', strtotime('+1 day', strtotime($dateFrom))) : $dateTo;
+
+        $discreteDates = array();
+        $dateTemp = $dateFrom;
+        while ($dateTemp <= $dateTo) {
+            $dateNext = date('Y-m-d', strtotime('+1 day', strtotime($dateTemp)));
+            $discreteDates[] = array(
+                'date_from' => $dateTemp,
+                'date_to' => $dateNext,
+                'timestamp_from' => strtotime($dateTemp),
+            );
+            $dateTemp = $dateNext;
+        };
+
+        $result = array();
+        foreach ($discreteDates as $discreteDate) {
+            $cacheKey = 'AdminStats::getTotalRoomsForDiscreteDates'.'_'.(int) $discreteDate['timestamp_from'].'_'.
+            (!is_array($idHotel) ? (int) $idHotel : implode('_', $idHotel));
+            if (!Cache::isStored($cacheKey) || !$useCache) {
+                $sql = 'SELECT (num_total_added - num_inactive - num_temporarily_inactive) AS num_total
+                FROM (
+                    SELECT (
+                        SELECT IFNULL(COUNT(hri.`id`), 0)
+                        FROM `'._DB_PREFIX_.'htl_room_information` hri
+                        LEFT JOIN `'._DB_PREFIX_.'product` p
+                        ON (p.`id_product` = hri.`id_product`)
+                        WHERE p.`active` = 1'.
+                        (!is_null($idHotel) ? HotelBranchInformation::addHotelRestriction($idHotel, 'hri') : '').'
+                    ) AS num_total_added,
+                    (
+                        SELECT COUNT(DISTINCT hbd.`id_room`)
+                        FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+                        LEFT JOIN `'._DB_PREFIX_.'htl_room_information` hri
+                        ON (hri.`id` = hbd.`id_room`)
+                        LEFT JOIN `'._DB_PREFIX_.'product` p
+                        ON (p.`id_product` = hri.`id_product`)
+                        WHERE p.`active` = 1
+                        AND hbd.`is_refunded` = 0
+                        AND hbd.`date_from` < "'.pSQL($discreteDate['date_to']).' 00:00:00" AND hbd.`date_to` > "'.pSQL($discreteDate['date_from']).' 00:00:00"'.
+                        (!is_null($idHotel) ? HotelBranchInformation::addHotelRestriction($idHotel, 'hbd') : '').'
+                    ) AS num_booked,
+                    (
+                        SELECT IFNULL(COUNT(hri.`id`), 0)
+                        FROM `'._DB_PREFIX_.'htl_room_information` hri
+                        LEFT JOIN `'._DB_PREFIX_.'product` p
+                        ON (p.`id_product` = hri.`id_product`)
+                        WHERE hri.`id_status` = '.(int) HotelRoomInformation::STATUS_INACTIVE.'
+                        AND p.`active` = 1'.
+                        (!is_null($idHotel) ? HotelBranchInformation::addHotelRestriction($idHotel, 'hri') : '').'
+                    ) AS num_inactive,
+                    (
+                        SELECT IFNULL(COUNT(hri.`id`), 0)
+                        FROM `'._DB_PREFIX_.'htl_room_information` hri
+                        LEFT JOIN `'._DB_PREFIX_.'htl_room_disable_dates` hrdd
+                        ON (hrdd.`id_room` = hri.`id`)
+                        LEFT JOIN `'._DB_PREFIX_.'product` p
+                        ON (p.`id_product` = hri.`id_product`)
+                        WHERE hri.`id_status` = '.(int) HotelRoomInformation::STATUS_TEMPORARY_INACTIVE.'
+                        AND ("'.pSQL($discreteDate['date_from']).'" >= hrdd.`date_from` AND "'.pSQL($discreteDate['date_from']).'" < hrdd.`date_to`)
+                        AND p.`active` = 1'.
+                        (!is_null($idHotel) ? HotelBranchInformation::addHotelRestriction($idHotel, 'hri') : '').'
+                    ) AS num_temporarily_inactive
+                ) AS t';
+
+                $value = Db::getInstance()->getValue($sql);
+                Cache::store($cacheKey, $value);
+            }
+
+            $result[$discreteDate['timestamp_from']] = Cache::retrieve($cacheKey);
+        }
+
+        return $result;
+    }
+
+    /**
+     * total available (unoccupied) for each date
+     */
+    public static function getAvailableRoomsForDiscreteDates($dateFrom, $dateTo = null, $idHotel = null, $useCache = true)
+    {
+        $dateTo = !$dateTo ? date('Y-m-d', strtotime('+1 day', strtotime($dateFrom))) : $dateTo;
+        $discreteDates = array();
+        $dateTemp = $dateFrom;
+        while ($dateTemp <= $dateTo) {
+            $dateNext = date('Y-m-d', strtotime('+1 day', strtotime($dateTemp)));
+            $discreteDates[] = array(
+                'date_from' => $dateTemp,
+                'date_to' => $dateNext,
+                'timestamp_from' => strtotime($dateTemp),
+            );
+            $dateTemp = $dateNext;
+        };
+
+        $result = array();
+        foreach ($discreteDates as $discreteDate) {
+            $cacheKey = 'AdminStats::getAvailableRoomsForDiscreteDates'.'_'.(int) $discreteDate['timestamp_from'].'_'.
             (!is_array($idHotel) ? (int) $idHotel : implode('_', $idHotel));
             if (!Cache::isStored($cacheKey) || !$useCache) {
                 $sql = 'SELECT (num_total - num_booked - num_inactive - num_temporarily_inactive) AS num_available
@@ -1316,5 +1467,243 @@ class AdminStatsControllerCore extends AdminStatsTabController
         }
 
         return $result;
+    }
+
+    public static function getOccupancyRateForDiscreteDates($dateFrom, $dateTo, $idHotel = null)
+    {
+        if ($dateFrom == $dateTo) {
+            $dateTo = date('Y-m-d', strtotime('+1 day', strtotime($dateTo)));
+        }
+
+        $occupiedRooms = self::getOccupiedRoomsForDiscreteDates($dateFrom, $dateTo, $idHotel);
+        $totalRooms = self::getTotalRoomsForDiscreteDates($dateFrom, $dateTo, $idHotel);
+
+        if (count($occupiedRooms) != count($totalRooms)) {
+            return false;
+        }
+
+        $occupancyRates = array();
+        foreach ($totalRooms as $key => $totalRoom) {
+            $occupancyRates[$key] = $totalRoom ? $occupiedRooms[$key] / $totalRoom : 0;
+        }
+
+        return $occupancyRates;
+    }
+
+    public static function getAverageOccupancyRate($dateFrom, $dateTo, $idHotel = null)
+    {
+        if ($dateFrom == $dateTo) {
+            $dateTo = date('Y-m-d', strtotime('+1 day', strtotime($dateTo)));
+        }
+
+        $occupancyRates = self::getOccupancyRateForDiscreteDates($dateFrom, $dateTo, $idHotel);
+
+        if (!is_array($occupancyRates)) {
+            return 0;
+        }
+
+        return array_sum($occupancyRates) / count($occupancyRates);
+    }
+
+    public static function getRevenuePerAvailableRoom($dateFrom, $dateTo, $idHotel = null)
+    {
+        if ($dateFrom == $dateTo) {
+            $dateTo = date('Y-m-d', strtotime('+1 day', strtotime($dateTo)));
+        }
+
+        $averageDailyRates = self::getAverageDailyRateForDiscreteDates($dateFrom, $dateTo, $idHotel);
+        $occupancyRates = self::getOccupancyRateForDiscreteDates($dateFrom, $dateTo, $idHotel);
+
+        if (count($averageDailyRates) != count($occupancyRates)) {
+            return false;
+        }
+
+        $sumRevPars = 0;
+        $countRevPars = 0;
+        foreach ($averageDailyRates as $key => $averageDailyRate) {
+            if ($averageDailyRate != 0) {
+                $sumRevPars += ($averageDailyRate * $occupancyRates[$key]);
+                $countRevPars++;
+            }
+        }
+
+        return $countRevPars ? $sumRevPars / $countRevPars : 0;
+    }
+
+    public static function getTotalRevenuePerAvailableRoom($dateFrom, $dateTo, $idHotel = null)
+    {
+        if ($dateFrom == $dateTo) {
+            $dateTo = date('Y-m-d', strtotime('+1 day', strtotime($dateTo)));
+        }
+
+        $totalRevenues = self::getTotalRevenueForDiscreteDates($dateFrom, $dateTo, $idHotel);
+        $totalRooms = self::getTotalRoomsForDiscreteDates($dateFrom, $dateTo, $idHotel);
+
+        if (count($totalRevenues) != count($totalRooms)) {
+            return false;
+        }
+
+        $sumTrevPars = 0;
+        $countTrevPars = 0;
+        foreach ($totalRevenues as $key => $totalRevenue) {
+            if ($totalRevenue != 0) {
+                $sumTrevPars += ($totalRevenue / $totalRooms[$key]);
+                $countTrevPars++;
+            }
+        }
+
+        return $countTrevPars ? $sumTrevPars / $countTrevPars : 0;
+    }
+
+    public static function getAverageLengthOfStay($dateFrom, $dateTo, $idHotel = null)
+    {
+        if ($dateFrom == $dateTo) {
+            $dateTo = date('Y-m-d', strtotime('+1 day', strtotime($dateTo)));
+        }
+
+        $sql = 'SELECT AVG(DATEDIFF(hbd.`date_to`, hbd.`date_from`))
+        FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+        LEFT JOIN `'._DB_PREFIX_.'product` p
+        ON (p.`id_product` = hbd.`id_product`)
+        WHERE p.`active` = 1
+        AND hbd.`is_refunded` = 0
+        AND hbd.`date_from` < "'.pSQL($dateTo).' 00:00:00" AND hbd.`date_to` > "'.pSQL($dateFrom).' 00:00:00"'.
+        (!is_null($idHotel) ? HotelBranchInformation::addHotelRestriction($idHotel, 'hbd') : '');
+        $result = Db::getInstance()->getValue($sql);
+
+        return $result ? $result : 0;
+    }
+
+    public static function getDirectRevenueRatio($dateFrom, $dateTo, $idHotel = null)
+    {
+        if ($dateFrom == $dateTo) {
+            $dateTo = date('Y-m-d', strtotime('+1 day', strtotime($dateTo)));
+        }
+
+        $sql = 'SELECT SUM(total_paid_tax_excl)
+        FROM (
+            SELECT o.`id_order`, o.`total_paid_tax_excl` / o.`conversion_rate` AS total_paid_tax_excl,
+            (SELECT hbd.`id_hotel`
+                FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+                WHERE hbd.`id_order` = o.`id_order` LIMIT 1
+            ) AS id_hotel
+            FROM `'._DB_PREFIX_.'orders` o
+            INNER JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd
+            ON (hbd.`id_order` = o.`id_order`)
+            INNER JOIN `'._DB_PREFIX_.'htl_branch_info` hbi
+            ON (hbi.`id` = hbd.`id_hotel`)
+            WHERE o.`valid` = 1 AND hbi.`active` = 1 AND hbd.`is_refunded` = 0
+            AND o.`invoice_date` BETWEEN "'.pSQL($dateFrom).' 00:00:00" AND "'.pSQL($dateTo).' 23:59:59"
+            AND o.`source` = "'.pSQL(Configuration::get('PS_SHOP_DOMAIN')).'"'.
+            (!is_null($idHotel) ? HotelBranchInformation::addHotelRestriction($idHotel, 'hbd') : '').
+            'GROUP BY o.`id_order`
+        ) AS t';
+        $directRevenue = (float) Db::getInstance()->getValue($sql);
+
+        $totalRevenue = (float) self::getRevenue($dateFrom, $dateTo, $idHotel);
+
+        return $totalRevenue ? ($directRevenue / $totalRevenue) * 100 : 0;
+    }
+
+    public static function getOperatingExpensesForDiscreteDates($dateFrom, $dateTo = null, $idHotel = null, $useCache = true)
+    {
+        $dateTo = !$dateTo ? date('Y-m-d', strtotime('+1 day', strtotime($dateFrom))) : $dateTo;
+
+        $discreteDates = array();
+        $dateTemp = $dateFrom;
+        while ($dateTemp <= $dateTo) {
+            $dateNext = date('Y-m-d', strtotime('+1 day', strtotime($dateTemp)));
+            $discreteDates[] = array(
+                'date_from' => $dateTemp,
+                'date_to' => $dateNext,
+                'timestamp_from' => strtotime($dateTemp),
+            );
+            $dateTemp = $dateNext;
+        };
+
+        $result = array();
+        foreach ($discreteDates as $discreteDate) {
+            $cacheKey = 'AdminStats::getOperatingExpensesForDiscreteDates'.'_'.(int) $discreteDate['timestamp_from'].'_'.
+            (!is_array($idHotel) ? (int) $idHotel : implode('_', $idHotel));
+            if (!Cache::isStored($cacheKey) || !$useCache) {
+                $sql = 'SELECT
+                IFNULL(SUM(
+                    CASE
+                        WHEN od.`original_wholesale_price` <> "0.000000"
+                        THEN od.`original_wholesale_price`
+                        WHEN p.`wholesale_price` <> "0.000000"
+                        THEN p.`wholesale_price`
+                    END
+                ), 0)
+                FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+                LEFT JOIN `'._DB_PREFIX_.'product` p
+                ON (p.`id_product` = hbd.`id_product`)
+                LEFT JOIN `'._DB_PREFIX_.'order_detail` od
+                ON (od.`id_order_detail` = hbd.`id_order_detail`)
+                WHERE p.`active` = 1
+                AND hbd.`is_refunded` = 0
+                AND hbd.`date_from` < "'.pSQL($discreteDate['date_to']).' 00:00:00" AND hbd.`date_to` > "'.pSQL($discreteDate['date_from']).' 00:00:00"'.
+                (!is_null($idHotel) ? HotelBranchInformation::addHotelRestriction($idHotel, 'hbd') : '');
+
+                $value = Db::getInstance()->getValue($sql);
+                Cache::store($cacheKey, $value);
+            }
+
+            $result[$discreteDate['timestamp_from']] = Cache::retrieve($cacheKey);
+        }
+
+        return $result;
+    }
+
+    public static function getGrossOperatingProfitPerAvailableRoomForDiscreteDates($dateFrom, $dateTo, $idHotel = null)
+    {
+        if ($dateFrom == $dateTo) {
+            $dateTo = date('Y-m-d', strtotime('+1 day', strtotime($dateTo)));
+        }
+
+        $roomsRevenues = self::getRoomsRevenueForDiscreteDates($dateFrom, $dateTo, $idHotel);
+        $operatingExpenses = self::getOperatingExpensesForDiscreteDates($dateFrom, $dateTo, $idHotel);
+        $totalRooms = self::getTotalRoomsForDiscreteDates($dateFrom, $dateTo, $idHotel);
+
+        if (!(count($roomsRevenues) == count($operatingExpenses)
+            && count($operatingExpenses) == count($totalRooms))
+        ) {
+            return false;
+        }
+
+        $operatingProfits = array();
+        foreach ($roomsRevenues as $key => $roomsRevenue) {
+            if ($roomsRevenue != 0 && $totalRooms[$key] != 0) {
+                $operatingProfits[$key] = (($roomsRevenue - $operatingExpenses[$key]) / $totalRooms[$key]);
+            } else {
+                $operatingProfits[$key] = 0;
+            }
+        }
+
+        return $operatingProfits;
+    }
+
+    public static function getGrossOperatingProfitPerAvailableRoom($dateFrom, $dateTo, $idHotel = null)
+    {
+        if ($dateFrom == $dateTo) {
+            $dateTo = date('Y-m-d', strtotime('+1 day', strtotime($dateTo)));
+        }
+
+        $grossOpProfitPars = self::getGrossOperatingProfitPerAvailableRoomForDiscreteDates($dateFrom, $dateTo, $idHotel);
+
+        if (!count($grossOpProfitPars)) {
+            return false;
+        }
+
+        $sumGrossOpProfitPars = 0;
+        $countGrossOpProfitPars = 0;
+        foreach ($grossOpProfitPars as $grossOpProfitPar) {
+            if ($grossOpProfitPar != 0) {
+                $sumGrossOpProfitPars += $grossOpProfitPar;
+                $countGrossOpProfitPars++;
+            }
+        }
+
+        return $countGrossOpProfitPars ? $sumGrossOpProfitPars / $countGrossOpProfitPars : 0;
     }
 }

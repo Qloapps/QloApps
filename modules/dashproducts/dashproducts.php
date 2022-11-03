@@ -543,11 +543,11 @@ class DashProducts extends Module
 
 	public function getTotalViewed($date_from, $date_to, $limit = 10)
 	{
-		$objQGA = Module::isEnabled('qlogoogleanalytics') ? Module::getInstanceByName('qlogoogleanalytics') : false;
-        if (Validate::isLoadedObject($objQGA) && $objQGA->isConfigured()) {
+		$objGoogleAnalytics = Module::isEnabled('qlogoogleanalytics') ? Module::getInstanceByName('qlogoogleanalytics') : false;
+        if (Validate::isLoadedObject($objGoogleAnalytics) && $objGoogleAnalytics->isConfigured()) {
 			$products = array();
 			// Only works with the default product URL pattern at this time
-			if ($result = $objQGA->requestReportData('ga:pagePath', 'ga:visits', $date_from, $date_to, '-ga:visits', 'ga:pagePath=~/([a-z]{2}/)?([a-z]+/)?[0-9][0-9]*\-.*\.html$', 1, $limit)) {
+			if ($result = $objGoogleAnalytics->requestReportData('ga:pagePath', 'ga:visits', $date_from, $date_to, '-ga:visits', 'ga:pagePath=~/([a-z]{2}/)?([a-z]+/)?[0-9][0-9]*\-.*\.html$', 1, $limit)) {
 				foreach ($result as $row) {
 					if (preg_match('@/([a-z]{2}/)?([a-z]+/)?([0-9]+)\-.*\.html@', $row['dimensions']['pagePath'], $matches)) {
 						$products[] = array('id_object' => (int)$matches[3], 'counter' => $row['metrics']['visits']);

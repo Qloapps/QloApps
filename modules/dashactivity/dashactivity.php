@@ -152,10 +152,10 @@ class Dashactivity extends Module
             );
         }
 
-        $objQGA = Module::isEnabled('qlogoogleanalytics') ? Module::getInstanceByName('qlogoogleanalytics') : false;
-        if (Validate::isLoadedObject($objQGA) && $objQGA->isConfigured()) {
+        $objGoogleAnalytics = Module::isEnabled('qlogoogleanalytics') ? Module::getInstanceByName('qlogoogleanalytics') : false;
+        if (Validate::isLoadedObject($objGoogleAnalytics) && $objGoogleAnalytics->isConfigured()) {
             $visits = $unique_visitors = $online_visitor = 0;
-            if ($result = $objQGA->requestReportData('', 'ga:visits,ga:visitors', Tools::substr($params['date_from'], 0, 10), Tools::substr($params['date_to'], 0, 10), null, null, 1, 1)) {
+            if ($result = $objGoogleAnalytics->requestReportData('', 'ga:visits,ga:visitors', Tools::substr($params['date_from'], 0, 10), Tools::substr($params['date_to'], 0, 10), null, null, 1, 1)) {
                 $visits = $result[0]['metrics']['visits'];
                 $unique_visitors = $result[0]['metrics']['visitors'];
             }
@@ -172,29 +172,28 @@ class Dashactivity extends Module
         if ($maintenance_ips = Configuration::get('PS_MAINTENANCE_IP')) {
             $maintenance_ips = implode(',', array_map('ip2long', array_map('trim', explode(',', $maintenance_ips))));
         }
+
         if (Configuration::get('PS_STATSDATA_CUSTOMER_PAGESVIEWS')) {
-            $sql = 'SELECT c.id_guest, c.ip_address, c.date_add, c.http_referer, pt.name as page
-					FROM `'._DB_PREFIX_.'connections` c
-					LEFT JOIN `'._DB_PREFIX_.'connections_page` cp ON c.id_connections = cp.id_connections
-					LEFT JOIN `'._DB_PREFIX_.'page` p ON p.id_page = cp.id_page
-					LEFT JOIN `'._DB_PREFIX_.'page_type` pt ON p.id_page_type = pt.id_page_type
-					INNER JOIN `'._DB_PREFIX_.'guest` g ON c.id_guest = g.id_guest
-					WHERE (g.id_customer IS NULL OR g.id_customer = 0)
-						'.Shop::addSqlRestriction(false, 'c').'
-						AND cp.`time_end` IS NULL
-					AND TIME_TO_SEC(TIMEDIFF(\''.pSQL(date('Y-m-d H:i:00', time())).'\', cp.`time_start`)) < 900
-					'.($maintenance_ips ? 'AND c.ip_address NOT IN ('.preg_replace('/[^,0-9]/', '', $maintenance_ips).')' : '').'
-					GROUP BY c.id_connections
-					ORDER BY c.date_add DESC';
+            $sql = 'SELECT c.id_guest, c.ip_address, c.date_add, c.http_referer
+                FROM `'._DB_PREFIX_.'connections` c
+                LEFT JOIN `'._DB_PREFIX_.'connections_page` cp ON c.id_connections = cp.id_connections
+                INNER JOIN `'._DB_PREFIX_.'guest` g ON c.id_guest = g.id_guest
+                WHERE (g.id_customer IS NULL OR g.id_customer = 0)
+                    '.Shop::addSqlRestriction(false, 'c').'
+                    AND cp.`time_end` IS NULL
+                AND TIME_TO_SEC(TIMEDIFF(\''.pSQL(date('Y-m-d H:i:00', time())).'\', cp.`time_start`)) < 900
+                '.($maintenance_ips ? 'AND c.ip_address NOT IN ('.preg_replace('/[^,0-9]/', '', $maintenance_ips).')' : '').'
+                GROUP BY c.id_connections
+                ORDER BY c.date_add DESC';
         } else {
             $sql = 'SELECT c.id_guest, c.ip_address, c.date_add, c.http_referer, "-" as page
-					FROM `'._DB_PREFIX_.'connections` c
-					INNER JOIN `'._DB_PREFIX_.'guest` g ON c.id_guest = g.id_guest
-					WHERE (g.id_customer IS NULL OR g.id_customer = 0)
-						'.Shop::addSqlRestriction(false, 'c').'
-						AND TIME_TO_SEC(TIMEDIFF(\''.pSQL(date('Y-m-d H:i:00', time())).'\', c.`date_add`)) < 900
-					'.($maintenance_ips ? 'AND c.ip_address NOT IN ('.preg_replace('/[^,0-9]/', '', $maintenance_ips).')' : '').'
-					ORDER BY c.date_add DESC';
+                FROM `'._DB_PREFIX_.'connections` c
+                INNER JOIN `'._DB_PREFIX_.'guest` g ON c.id_guest = g.id_guest
+                WHERE (g.id_customer IS NULL OR g.id_customer = 0)
+                    '.Shop::addSqlRestriction(false, 'c').'
+                    AND TIME_TO_SEC(TIMEDIFF(\''.pSQL(date('Y-m-d H:i:00', time())).'\', c.`date_add`)) < 900
+                '.($maintenance_ips ? 'AND c.ip_address NOT IN ('.preg_replace('/[^,0-9]/', '', $maintenance_ips).')' : '').'
+                ORDER BY c.date_add DESC';
         }
         Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
         $online_visitor = Db::getInstance()->NumRows();
@@ -347,10 +346,10 @@ class Dashactivity extends Module
 
     protected function getReferer($date_from, $date_to, $limit = 3)
     {
-        $objQGA = Module::isEnabled('qlogoogleanalytics') ? Module::getInstanceByName('qlogoogleanalytics') : false;
-        if (Validate::isLoadedObject($objQGA) && $objQGA->isConfigured()) {
+        $objGoogleAnalytics = Module::isEnabled('qlogoogleanalytics') ? Module::getInstanceByName('qlogoogleanalytics') : false;
+        if (Validate::isLoadedObject($objGoogleAnalytics) && $objGoogleAnalytics->isConfigured()) {
             $websites = array();
-            if ($result = $objQGA->requestReportData(
+            if ($result = $objGoogleAnalytics->requestReportData(
                 'ga:source',
                 'ga:visitors',
                 Tools::substr($date_from, 0, 10),

@@ -37,7 +37,7 @@ function line_chart_availability(widget_name, chart_details) {
         });
 
         chart.yAxis.tickFormat(function(d) {
-            return parseInt(d);
+            return Number.isInteger(d) ? d : '';
         });
 
         chart.legend.updateState(false);

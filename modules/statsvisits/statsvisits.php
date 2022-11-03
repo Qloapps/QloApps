@@ -137,8 +137,8 @@ class StatsVisits extends ModuleGraph
     {
         switch ($option) {
             case 3:
-                $this->_titles['main'][0] = $this->l('Number of visits and unique visitors');
-                $this->_titles['main'][1] = $this->l('Visits');
+                $this->_titles['main'][0] = $this->l('Visits');
+                $this->_titles['main'][1] = $this->l('Number of visits and unique visitors');
                 $this->_titles['main'][2] = $this->l('Visitors');
                 $this->query[0] = 'SELECT date_add, COUNT(`date_add`) as total
 					FROM `'._DB_PREFIX_.'connections`

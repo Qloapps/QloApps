@@ -81,17 +81,17 @@ class StatsBestCustomers extends ModuleGrid
                 'align' => 'center'
             ),
             array(
+                'id' => 'totalMoneySpent',
+                'header' => $this->l('Money spent').' ('.Tools::safeOutput($currency->iso_code).')',
+                'dataIndex' => 'totalMoneySpent',
+                'align' => 'center'
+            ),
+            array(
                 'id' => 'totalValidOrders',
                 'header' => $this->l('Valid orders'),
                 'dataIndex' => 'totalValidOrders',
                 'align' => 'center'
             ),
-            array(
-                'id' => 'totalMoneySpent',
-                'header' => $this->l('Money spent').' ('.Tools::safeOutput($currency->iso_code).')',
-                'dataIndex' => 'totalMoneySpent',
-                'align' => 'center'
-            )
         );
 
         $this->displayName = $this->l('Best customers');
@@ -187,11 +187,13 @@ class StatsBestCustomers extends ModuleGrid
         }
 
         $values = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($this->query);
+        $this->_totalCount = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('SELECT FOUND_ROWS()');
+
         foreach ($values as &$value) {
+            $value['email'] = '<a href="'.$this->context->link->getAdminLink('AdminCustomers').'&id_customer='.$value['id_customer'].'&updatecustomer" target="_blank">'.$value['email'].'</a>';
             $value['totalMoneySpent'] = Tools::displayPrice($value['totalMoneySpent'], $currency);
         }
 
         $this->_values = $values;
-        $this->_totalCount = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('SELECT FOUND_ROWS()');
     }
 }

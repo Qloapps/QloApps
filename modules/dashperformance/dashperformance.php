@@ -66,31 +66,55 @@ class DashPerformance extends Module
     {
         $data = array();
         if (Configuration::get('PS_DASHBOARD_SIMULATION')) {
-            $data['dp_average_daily_rate'] = Tools::displayPrice(round(rand(2000, 20000)));
-            $data['dp_cancellation_rate'] = (round(rand(1, 1000), 2) / 100).'%';
-            $data['dp_revenue'] = Tools::displayPrice(round(rand(20000, 70000)));
-            $data['dp_nights_stayed'] = rand(100, 1000);
+            $data['dp_average_daily_rate'] = Tools::displayPrice(sprintf('%0.2f', rand(100000, 1000000) / 100));
+            $data['dp_total_revenue_per_available_room'] = Tools::displayPrice(sprintf('%0.2f', rand(pow(10, 5), pow(10, 6)) / 100));
+            $data['dp_average_occupancy_rate'] = sprintf('%0.2f', rand(5000, 10000) / 100).'%';
+            $data['dp_revenue_per_available_room'] = Tools::displayPrice(sprintf('%0.2f', rand(pow(10, 5), pow(10, 6)) / 100));
+            $data['dp_gross_operating_profit_par'] = Tools::displayPrice(sprintf('%0.2f', rand(pow(10, 6), pow(10, 7)) / 100));
+            $data['dp_average_length_of_stay'] = sprintf('%0.2f', rand(1, 500) / 100);
+            $data['dp_direct_revenue_ratio'] = sprintf('%0.2f', rand(4000, 8000) / 100).'%';
+            $data['dp_cancellation_rate'] = sprintf('%0.2f', rand(1, 1000) / 100).'%';
         } else {
-            $data['dp_average_daily_rate'] = AdminStatsController::getAverageDailyRate(
+            $data['dp_average_daily_rate'] = Tools::displayPrice(AdminStatsController::getAverageDailyRate(
                 $params['date_from'],
                 $params['date_to'],
                 $params['id_hotel']
-            );
-            $data['dp_cancellation_rate'] = AdminStatsController::getCancellationRate(
+            ));
+            $data['dp_total_revenue_per_available_room'] = Tools::displayPrice(AdminStatsController::getTotalRevenuePerAvailableRoom(
                 $params['date_from'],
                 $params['date_to'],
                 $params['id_hotel']
-            );
-            $data['dp_revenue'] = AdminStatsController::getRevenue(
+            ));
+            $data['dp_average_occupancy_rate'] = sprintf('%0.2f', AdminStatsController::getAverageOccupancyRate(
                 $params['date_from'],
                 $params['date_to'],
                 $params['id_hotel']
-            );
-            $data['dp_nights_stayed'] = AdminStatsController::getNightsStayed(
+            )).'%';
+            $data['dp_revenue_per_available_room'] = Tools::displayPrice(AdminStatsController::getRevenuePerAvailableRoom(
                 $params['date_from'],
                 $params['date_to'],
                 $params['id_hotel']
-            );
+            ));
+            $data['dp_gross_operating_profit_par'] = Tools::displayPrice(AdminStatsController::getGrossOperatingProfitPerAvailableRoom(
+                $params['date_from'],
+                $params['date_to'],
+                $params['id_hotel']
+            ));
+            $data['dp_average_length_of_stay'] = sprintf('%0.2f', AdminStatsController::getAverageLengthOfStay(
+                $params['date_from'],
+                $params['date_to'],
+                $params['id_hotel']
+            ));
+            $data['dp_direct_revenue_ratio'] = sprintf('%0.2f', AdminStatsController::getDirectRevenueRatio(
+                $params['date_from'],
+                $params['date_to'],
+                $params['id_hotel']
+            )).'%';
+            $data['dp_cancellation_rate'] = sprintf('%0.2f', AdminStatsController::getCancellationRate(
+                $params['date_from'],
+                $params['date_to'],
+                $params['id_hotel']
+            )).'%';
         }
 
         return array('data_value' => $data);

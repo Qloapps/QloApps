@@ -50,66 +50,63 @@ class StatsBestProducts extends ModuleGrid
 
         parent::__construct();
 
-        $this->default_sort_column = 'totalPriceSold';
+        $this->default_sort_column = 'totalRevenue';
         $this->default_sort_direction = 'DESC';
         $this->empty_message = $this->l('An empty record-set was returned.');
         $this->paging_message = sprintf($this->l('Displaying %1$s of %2$s'), '{0} - {1}', '{2}');
 
         $this->columns = array(
             array(
-                'id' => 'name',
+                'id' => 'roomTypeName',
                 'header' => $this->l('Room type name'),
-                'dataIndex' => 'name',
-                'align' => 'center'
+                'dataIndex' => 'roomTypeName',
+                'align' => 'center',
             ),
             array(
-                'id' => 'hotel_name',
+                'id' => 'hotelName',
                 'header' => $this->l('Hotel name'),
-                'dataIndex' => 'hotel_name',
-                'align' => 'center'
+                'dataIndex' => 'hotelName',
+                'align' => 'center',
             ),
             array(
-                'id' => 'totalRoomsSold',
+                'id' => 'totalRoomsBooked',
                 'header' => $this->l('Rooms booked'),
-                'dataIndex' => 'totalRoomsSold',
-                'align' => 'center'
+                'dataIndex' => 'totalRoomsBooked',
+                'tooltip' => $this->l('The room nights booked for the room type.'),
+                'align' => 'center',
             ),
             array(
-                'id' => 'avgPriceSold',
+                'id' => 'sellingPrice',
                 'header' => $this->l('Price sold'),
-                'dataIndex' => 'avgPriceSold',
-                'align' => 'right'
+                'dataIndex' => 'sellingPrice',
+                'tooltip' => $this->l('The average price at which this room type has been booked.'),
+                'align' => 'center',
             ),
             array(
-                'id' => 'totalPriceSold',
-                'header' => $this->l('Sales'),
-                'dataIndex' => 'totalPriceSold',
-                'align' => 'right'
+                'id' => 'totalRevenue',
+                'header' => $this->l('Revenue'),
+                'dataIndex' => 'totalRevenue',
+                'align' => 'center',
             ),
             array(
-                'id' => 'averageQuantitySold',
-                'header' => $this->l('Rooms sold in a day'),
-                'dataIndex' => 'averageQuantitySold',
-                'align' => 'center'
+                'id' => 'bookingsPerDay',
+                'header' => $this->l('Bookings per day'),
+                'dataIndex' => 'bookingsPerDay',
+                'align' => 'center',
             ),
             array(
-                'id' => 'totalPageViewed',
-                'header' => $this->l('Page views'),
-                'dataIndex' => 'totalPageViewed',
-                'align' => 'center'
-            ),
-            array(
-                'id' => 'avail_rooms',
+                'id' => 'availableRooms',
                 'header' => $this->l('Available rooms'),
-                'dataIndex' => 'avail_rooms',
-                'align' => 'center'
+                'dataIndex' => 'availableRooms',
+                'tooltip' => $this->l('The room nights available for booking for the room type.'),
+                'align' => 'center',
             ),
             array(
                 'id' => 'active',
                 'header' => $this->l('Active'),
                 'dataIndex' => 'active',
-                'align' => 'center'
-            )
+                'align' => 'center',
+            ),
         );
 
         $this->displayName = $this->l('Best-selling room types');
@@ -155,55 +152,62 @@ class StatsBestProducts extends ModuleGrid
     {
         $currency = new Currency(Configuration::get('PS_CURRENCY_DEFAULT'));
         $date_between = $this->getDate();
+        $date_from = date('Y-m-d', strtotime($this->_employee->stats_date_from));
+        $date_to = date('Y-m-d', strtotime($this->_employee->stats_date_to));
         $array_date_between = explode(' AND ', $date_between);
-        $this->query = 'SELECT SQL_CALC_FOUND_ROWS hbil.`hotel_name`, hbil.`id` as id_hotel, p.`id_product`, pl.`name`,
-				ROUND(AVG(od.`product_price` / o.`conversion_rate`), 2) as avgPriceSold,
-				ROUND(IFNULL(SUM((od.`product_price` * od.`product_quantity`) / o.`conversion_rate`), 0), 2) AS totalPriceSold,
-				(
-					SELECT IFNULL(SUM(pv.counter), 0)
-					FROM '._DB_PREFIX_.'page pa
-					LEFT JOIN '._DB_PREFIX_.'page_viewed pv ON pa.id_page = pv.id_page
-					LEFT JOIN '._DB_PREFIX_.'date_range dr ON pv.id_date_range = dr.id_date_range
-					WHERE pa.id_object = p.id_product AND pa.id_page_type = '.(int)Page::getPageTypeByName('product').'
-					AND dr.time_start BETWEEN '.$date_between.'
-					AND dr.time_end BETWEEN '.$date_between.'
-                    ) AS totalPageViewed,';
-                    if (explode(' ',trim($array_date_between[0]))[0] == explode(' ',trim($array_date_between[1]))[0]) {
-                        $this->query .=' (SELECT
-                            SUM(IFNULL(DATEDIFF(
-                                IF ('.$array_date_between[1].' > hbd.`date_to`, hbd.`date_to`, '.$array_date_between[1].'),
-                                IF ('.$array_date_between[0].' < hbd.`date_from`, hbd.`date_from`, '.$array_date_between[0].')
-                            ), 0))
-                            FROM '._DB_PREFIX_.'htl_booking_detail hbd WHERE hbd.`id_product` = p.id_product AND hbd.date_from <= '.$array_date_between[0].'
-                            AND hbd.date_to > '.$array_date_between[0].') AS totalRoomsSold,
-                            ROUND(IFNULL(IFNULL((SELECT COUNT(hbd.`id_room`) FROM '._DB_PREFIX_.'htl_booking_detail hbd WHERE hbd.`id_product` = p.id_product AND hbd.date_from <= '.$array_date_between[0].
-                            ' AND hbd.date_to > '.$array_date_between[0].'), 0) / (1 + LEAST(TO_DAYS('.$array_date_between[1].'), TO_DAYS(NOW())) - GREATEST(TO_DAYS('.$array_date_between[0].'), TO_DAYS(product_shop.date_add))), 0), 2) as averageQuantitySold,';
-                    } else {
-                        $this->query .= '(SELECT
-                            SUM(IFNULL(DATEDIFF(
-                                IF ('.$array_date_between[1].' > hbd.`date_to`, hbd.`date_to`, '.$array_date_between[1].'),
-                                IF ('.$array_date_between[0].' < hbd.`date_from`, hbd.`date_from`, '.$array_date_between[0].')
-                            ), 0))
-                            FROM '._DB_PREFIX_.'htl_booking_detail hbd WHERE hbd.`id_product` = p.id_product AND hbd.date_from BETWEEN '.$date_between.'
-                            AND hbd.date_to BETWEEN '.$date_between.') AS totalRoomsSold,
-                            ROUND(IFNULL(IFNULL((SELECT COUNT(hbd.`id_room`) FROM '._DB_PREFIX_.'htl_booking_detail hbd WHERE hbd.`id_product` = p.id_product AND hbd.date_from BETWEEN '.$date_between.
-                            ' AND hbd.date_to BETWEEN '.$date_between.'), 0) / (1 + LEAST(TO_DAYS('.$array_date_between[1].'), TO_DAYS(NOW())) - GREATEST(TO_DAYS('.$array_date_between[0].'), TO_DAYS(product_shop.date_add))), 0), 2) as averageQuantitySold,';
-                    }
+        $id_lang = $this->getLang();
 
-                $this->query .= 'product_shop.active
-                    FROM '._DB_PREFIX_.'product p
-                    '.Shop::addSqlAssociation('product', 'p').'
-                    LEFT JOIN '._DB_PREFIX_.'product_lang pl ON (p.id_product = pl.id_product AND pl.id_lang = '.(int)$this->getLang().' '.Shop::addSqlRestrictionOnLang('pl').')
-                    LEFT JOIN '._DB_PREFIX_.'htl_room_type hrt ON hrt.id_product = p.id_product
-                    LEFT JOIN '._DB_PREFIX_.'htl_branch_info_lang hbil ON (hbil.id = hrt.id_hotel AND hbil.id_lang = '.(int)$this->getLang().')
-                    LEFT JOIN '._DB_PREFIX_.'order_detail od ON od.product_id = p.id_product
-                    LEFT JOIN '._DB_PREFIX_.'orders o ON od.id_order = o.id_order
-                    '.Shop::addSqlRestriction(Shop::SHARE_ORDER, 'o').'
-                    '.Product::sqlStock('p', 0).'
-                    WHERE o.valid = 1
-                    GROUP BY od.product_id';
+        $this->query = 'SELECT p.`id_product`, pl.`name` AS room_type_name,
+        p.`active`, hrt.`id_hotel`, hbil.`hotel_name`,
+        (
+            SELECT IFNULL(SUM(DATEDIFF(LEAST(hbd.`date_to`, "'.pSQL($date_to).'"), GREATEST(hbd.`date_from`, "'.pSQL($date_from).'"))), 0)
+            FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+            LEFT JOIN `'._DB_PREFIX_.'orders` o
+            ON (o.`id_order` = hbd.`id_order`)
+            WHERE hbd.`id_product` = p.`id_product` AND o.`valid` = 1
+            AND hbd.`date_to` > "'.pSQL($date_from).'" AND hbd.`date_from` < "'.pSQL($date_to).'"
+        ) AS totalRoomsBooked,
+        (
+            SELECT IFNULL(AVG(hbd.`total_price_tax_excl` / o.`conversion_rate`), 0)
+            FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+            LEFT JOIN `'._DB_PREFIX_.'orders` o
+            ON (o.`id_order` = hbd.`id_order`)
+            WHERE hbd.`id_product` = p.`id_product` AND o.`valid` = 1
+            AND hbd.`date_to` > "'.pSQL($date_from).'" AND hbd.`date_from` < "'.pSQL($date_to).'"
+        ) AS sellingPrice,
+        (
+            SELECT IFNULL(SUM(ROUND((DATEDIFF(LEAST(hbd.`date_to`, "'.pSQL($date_to).'"), GREATEST(hbd.`date_from`, "'.pSQL($date_from).'")) / DATEDIFF(hbd.`date_to`, hbd.`date_from`)) * hbd.`total_price_tax_excl`, 2)), 0)
+            FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+            LEFT JOIN `'._DB_PREFIX_.'orders` o
+            ON (o.`id_order` = hbd.`id_order`)
+            WHERE hbd.`id_product` = p.`id_product` AND o.`valid` = 1
+            AND hbd.`date_to` > "'.pSQL($date_from).'" AND hbd.`date_from` < "'.pSQL($date_to).'"
+        ) AS totalRevenue,
+        (
+            SELECT SUM(max_room_nights) - SUM(disabled_room_nights)
+            FROM (
+                SELECT hri.`id_product`, DATEDIFF("'.pSQL($date_to).'", "'.pSQL($date_from).'") AS max_room_nights,
+                CASE
+                    WHEN hri.`id_status` = '.(int) HotelRoomInformation::STATUS_INACTIVE.' THEN DATEDIFF("'.pSQL($date_to).'", "'.pSQL($date_from).'")
+                    WHEN hri.`id_status` = '.(int) HotelRoomInformation::STATUS_TEMPORARY_INACTIVE.' THEN IF(hrdd.`date_to` > "'.pSQL($date_from).'" AND hrdd.`date_from` < "'.pSQL($date_to).'", SUM(ABS(DATEDIFF(LEAST(hrdd.`date_to`, "'.pSQL($date_to).'"), GREATEST(hrdd.`date_from`, "'.pSQL($date_from).'")))), 0)
+                    ELSE 0
+                END AS disabled_room_nights
+                FROM `'._DB_PREFIX_.'htl_room_information` hri
+                LEFT JOIN `'._DB_PREFIX_.'htl_room_disable_dates` hrdd
+                ON (hrdd.`id_room` = hri.`id`)
+                GROUP BY hri.`id`
+            ) AS t
+            WHERE t.`id_product` = p.`id_product`
+        ) AS totalRooms
+        FROM `'._DB_PREFIX_.'product` p
+        LEFT JOIN `'._DB_PREFIX_.'product_lang` pl
+        ON (pl.`id_product` = p.`id_product` AND pl.`id_lang` = '.(int) $id_lang .')
+        LEFT JOIN `'._DB_PREFIX_.'htl_room_type` hrt
+        ON (hrt.`id_product` = p.`id_product`)
+        LEFT JOIN `'._DB_PREFIX_.'htl_branch_info_lang` hbil
+        ON (hbil.`id` = hrt.`id_hotel` AND hbil.`id_lang` = '.(int) $id_lang .')';
+
         if (Validate::IsName($this->_sort)) {
-
             $this->query .= ' ORDER BY `'.bqSQL($this->_sort).'`';
             if (isset($this->_direction) && Validate::isSortDirection($this->_direction)) {
                 $this->query .= ' '.$this->_direction;
@@ -217,26 +221,23 @@ class StatsBestProducts extends ModuleGrid
         $values = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($this->query);
         $this->_totalCount = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('SELECT FOUND_ROWS()');
 
-        $dateFrom = date("Y-m-d", strtotime($this->_employee->stats_date_from));
-        $dateTo = date("Y-m-d", strtotime($this->_employee->stats_date_to));
-
-        $objBookingDtl = new HotelBookingDetail();
-        $bookingParams = array();
-        $bookingParams['date_from'] = $dateFrom;
-        $bookingParams['date_to'] = $dateTo;
+        $objHotelBookingDetail = new HotelBookingDetail();
+        $numberOfDays = $objHotelBookingDetail->getNumberOfDays($date_from, $date_to);
         foreach ($values as &$value) {
-            $bookingParams['hotel_id'] = $value['id_hotel'];
-            $bookingParams['room_type'] = $value['id_product'];
-            $booking_data = $objBookingDtl->getBookingData($bookingParams);
-            if (isset($booking_data['stats']['num_avail'])) {
-                $value['avail_rooms'] = $booking_data['stats']['num_avail'];
+            $value['roomTypeName'] = '<a href="'.$this->context->link->getAdminLink('AdminProducts').'&id_product='.$value['id_product'].'&updateproduct" target="_blank">'.$value['room_type_name'].'</a>';
+            $value['hotelName'] = '<a href="'.$this->context->link->getAdminLink('AdminAddHotel').'&id='.$value['id_hotel'].'&updatehtl_branch_info" target="_blank">'.$value['hotel_name'].'</a>';
+            $value['totalRoomsBooked'] = (int) $value['totalRoomsBooked'];
+            $value['availableRooms'] = max($value['totalRooms'] - $value['totalRoomsBooked'], 0); // availableRooms can be negative if more rooms are disabled than available for booking
+            $value['bookingsPerDay'] = sprintf('%0.2f', ($numberOfDays ? $value['totalRoomsBooked'] / $numberOfDays : 0));
+            $value['sellingPrice'] = Tools::displayPrice($value['sellingPrice'], $currency);
+            $value['totalRevenue'] = Tools::displayPrice($value['totalRevenue'], $currency);
+
+            if ($value['active']) {
+                $value['active'] = '<span class="badge badge-success">'.$this->l('Yes').'</span>';
             } else {
-                $value['avail_rooms'] = 0;
+                $value['active'] = '<span class="badge badge-danger">'.$this->l('No').'</span>';
             }
-            $value['avgPriceSold'] = Tools::displayPrice($value['avgPriceSold'], $currency);
-            $value['totalPriceSold'] = Tools::displayPrice($value['totalPriceSold'], $currency);
         }
-        unset($value);
 
         $this->_values = $values;
     }

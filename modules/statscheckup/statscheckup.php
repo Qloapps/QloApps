@@ -33,6 +33,11 @@ require_once _PS_MODULE_DIR_.'hotelreservationsystem/define.php';
 class StatsCheckUp extends Module
 {
     private $html = '';
+    private $id_hotel = 0;
+
+    const ORDER_BY_ID = 1;
+    const ORDER_BY_NAME = 2;
+    const ORDER_BY_ORDERS = 3;
 
     public function __construct()
     {
@@ -52,20 +57,30 @@ class StatsCheckUp extends Module
     public function install()
     {
         $confs = array(
-            'CHECKUP_DESCRIPTIONS_LT' => 100,
-            'CHECKUP_DESCRIPTIONS_GT' => 400,
-            'CHECKUP_IMAGES_LT' => 1,
-            'CHECKUP_IMAGES_GT' => 2,
-            'CHECKUP_SALES_LT' => 1,
-            'CHECKUP_SALES_GT' => 2,
-            'CHECKUP_STOCK_LT' => 1,
-            'CHECKUP_STOCK_GT' => 3
+            'ROOM_TYPE_CHECKUP_DESCRIPTIONS_LT' => 100,
+            'ROOM_TYPE_CHECKUP_DESCRIPTIONS_GT' => 400,
+            'ROOM_TYPE_CHECKUP_IMAGES_LT' => 1,
+            'ROOM_TYPE_CHECKUP_IMAGES_GT' => 2,
+            'ROOM_TYPE_CHECKUP_ORDERS_LT' => 1,
+            'ROOM_TYPE_CHECKUP_ORDERS_GT' => 2,
+            'ROOM_TYPE_CHECKUP_TOTAL_ROOMS_LT' => 1,
+            'ROOM_TYPE_CHECKUP_TOTAL_ROOMS_GT' => 3,
+            'HOTEL_CHECKUP_DESCRIPTIONS_LT' => 100,
+            'HOTEL_CHECKUP_DESCRIPTIONS_GT' => 400,
+            'HOTEL_CHECKUP_IMAGES_LT' => 1,
+            'HOTEL_CHECKUP_IMAGES_GT' => 2,
+            'HOTEL_CHECKUP_ORDERS_LT' => 1,
+            'HOTEL_CHECKUP_ORDERS_GT' => 2,
+            'HOTEL_CHECKUP_TOTAL_ROOMS_LT' => 1,
+            'HOTEL_CHECKUP_TOTAL_ROOMS_GT' => 3,
         );
+
         foreach ($confs as $confname => $confdefault) {
             if (!Configuration::get($confname)) {
                 Configuration::updateValue($confname, (int)$confdefault);
             }
         }
+
         return (parent::install() && $this->registerHook('AdminStatsModules'));
     }
 
@@ -75,20 +90,42 @@ class StatsCheckUp extends Module
             <div class="panel-heading">'
                 .$this->displayName.'
             </div>';
-        if (Tools::isSubmit('submitCheckup')) {
+
+        if (Tools::isSubmit('submitCheckupRoomType')) {
             $confs = array(
-                'CHECKUP_DESCRIPTIONS_LT',
-                'CHECKUP_DESCRIPTIONS_GT',
-                'CHECKUP_IMAGES_LT',
-                'CHECKUP_IMAGES_GT',
-                'CHECKUP_SALES_LT',
-                'CHECKUP_SALES_GT',
-                'CHECKUP_STOCK_LT',
-                'CHECKUP_STOCK_GT'
+                'ROOM_TYPE_CHECKUP_DESCRIPTIONS_LT',
+                'ROOM_TYPE_CHECKUP_DESCRIPTIONS_GT',
+                'ROOM_TYPE_CHECKUP_IMAGES_LT',
+                'ROOM_TYPE_CHECKUP_IMAGES_GT',
+                'ROOM_TYPE_CHECKUP_ORDERS_LT',
+                'ROOM_TYPE_CHECKUP_ORDERS_GT',
+                'ROOM_TYPE_CHECKUP_TOTAL_ROOMS_LT',
+                'ROOM_TYPE_CHECKUP_TOTAL_ROOMS_GT',
             );
+
             foreach ($confs as $confname) {
                 Configuration::updateValue($confname, (int)Tools::getValue($confname));
             }
+
+            $this->html .= $this->displayConfirmation($this->l('Configuration updated.'));
+        }
+
+        if (Tools::isSubmit('submitCheckupHotel')) {
+            $confs = array(
+                'HOTEL_CHECKUP_DESCRIPTIONS_LT',
+                'HOTEL_CHECKUP_DESCRIPTIONS_GT',
+                'HOTEL_CHECKUP_IMAGES_LT',
+                'HOTEL_CHECKUP_IMAGES_GT',
+                'HOTEL_CHECKUP_ORDERS_LT',
+                'HOTEL_CHECKUP_ORDERS_GT',
+                'HOTEL_CHECKUP_TOTAL_ROOMS_LT',
+                'HOTEL_CHECKUP_TOTAL_ROOMS_GT',
+            );
+
+            foreach ($confs as $confname) {
+                Configuration::updateValue($confname, (int)Tools::getValue($confname));
+            }
+
             $this->html .= $this->displayConfirmation($this->l('Configuration updated.'));
         }
 
@@ -98,212 +135,186 @@ class StatsCheckUp extends Module
         }
 
         if (!isset($this->context->cookie->checkup_order)) {
-            $this->context->cookie->checkup_order = 1;
+            $this->context->cookie->checkup_order = self::ORDER_BY_ID;
         }
 
-        $db = Db::getInstance(_PS_USE_SQL_SLAVE_);
+        if (Tools::getValue('id_hotel')) {
+            $this->id_hotel = (int) Tools::getValue('id_hotel');
+        }
+
         $employee = Context::getContext()->employee;
         $prop30 = ((strtotime($employee->stats_date_to.' 23:59:59') - strtotime($employee->stats_date_from.' 00:00:00')) / 60 / 60 / 24) / 30;
 
         // Get languages
         $sql = 'SELECT l.*
-				FROM '._DB_PREFIX_.'lang l'
-                .Shop::addSqlAssociation('lang', 'l');
-        $languages = $db->executeS($sql);
+        FROM '._DB_PREFIX_.'lang l'
+        .Shop::addSqlAssociation('lang', 'l');
+        $languages = Db::getInstance()->executeS($sql);
 
         $array_colors = array(
             0 => '<img src="../modules/'.$this->name.'/img/red.png" alt="'.$this->l('Bad').'" title="'.$this->l('Bad').'" />',
             1 => '<img src="../modules/'.$this->name.'/img/orange.png" alt="'.$this->l('Average').'" title="'.$this->l('Average').'" />',
             2 => '<img src="../modules/'.$this->name.'/img/green.png" alt="'.$this->l('Good').'" title="'.$this->l('Good').'" />'
         );
-        $token_products = Tools::getAdminToken('AdminProducts'.(int)Tab::getIdFromClassName('AdminProducts').(int)Context::getContext()->employee->id);
+
         $divisor = 4;
-        $totals = array('products' => 0, 'active' => 0, 'images' => 0, 'sales' => 0, 'stock' => 0);
+        $totals = array('products' => 0, 'active' => 0, 'images' => 0, 'orders' => 0, 'total_rooms' => 0);
         foreach ($languages as $language) {
             $divisor++;
             $totals['description_'.$language['iso_code']] = 0;
         }
 
-        $order_by = 'p.id_product';
-        if ($this->context->cookie->checkup_order == 2) {
-            $order_by = 'pl.name';
-        } elseif ($this->context->cookie->checkup_order == 3) {
-            $order_by = 'nbSales DESC';
-        }
+        // set data from here
+        $result = null;
+        if ($this->id_hotel) {
+            $result = $this->getRoomTypeStats();
 
-        // Get products stats
-        $sql = 'SELECT p.id_product, product_shop.active, pl.name, (
-					SELECT COUNT(*)
-					FROM '._DB_PREFIX_.'image i
-					'.Shop::addSqlAssociation('image', 'i').'
-					WHERE i.id_product = p.id_product ';
-        if (version_compare(_PS_VERSION_, '1.7.0.0', '>=')) {
-            $sql .= 'AND p.state = ' . Product::STATE_SAVED . ' ';
-        }
-        $sql .= ') as nbImages, (
-				SELECT COUNT(hbd.id_room)
-				FROM '._DB_PREFIX_.'htl_booking_detail hbd
-				INNER JOIN '._DB_PREFIX_.'orders o ON o.id_order = hbd.id_order
-				WHERE hbd.id_product = p.id_product
-					AND o.invoice_date BETWEEN '.ModuleGraph::getDateBetween().'
-					'.Shop::addSqlRestriction(Shop::SHARE_ORDER, 'o').'
-				) as nbSales,
-				IFNULL(stock.quantity, 0) as stock
-				FROM '._DB_PREFIX_.'product p
-				'.Shop::addSqlAssociation('product', 'p').'
-				'.Product::sqlStock('p', 0).'
-				LEFT JOIN '._DB_PREFIX_.'product_lang pl
-				ON (p.id_product = pl.id_product AND pl.id_lang = '.(int)$this->context->language->id.Shop::addSqlRestrictionOnLang('pl').')';
-        if (version_compare(_PS_VERSION_, '1.7.0.0', '>=')) {
-            $sql .= 'WHERE p.state = '. Product::STATE_SAVED . ' ';
-        }
-        $sql .= 'ORDER BY '.$order_by;
-        $result = $db->executeS($sql);
+            if (!$result) {
+                return $this->l('No room type was found.');
+            }
+        } else {
+            $result = $this->getHotelStats();
 
-        if (!$result) {
-            return $this->l('No room type was found.');
+            if (!$result) {
+                return $this->l('No hotel was found.');
+            }
         }
 
         $array_conf = array(
             'DESCRIPTIONS' => array('name' => $this->l('Descriptions'), 'text' => $this->l('chars (without HTML)')),
             'IMAGES' => array('name' => $this->l('Images'), 'text' => $this->l('images')),
-            'SALES' => array('name' => $this->l('Sales'), 'text' => $this->l('orders / month')),
-            'STOCK' => array('name' => $this->l('Available rooms'), 'text' => $this->l('items'))
+            'ORDERS' => array('name' => $this->l('Orders'), 'text' => $this->l('orders / month')),
+            'TOTAL_ROOMS' => array('name' => $this->l('Total rooms'), 'text' => $this->l('rooms')),
         );
 
         $this->html .= '
-		<form action="'.Tools::safeOutput(AdminController::$currentIndex.'&token='.Tools::getValue('token').'&module='.$this->name).'" method="post" class="checkup form-horizontal">
-			<table class="table checkup">
-				<thead>
-					<tr>
-						<th></th>
-						<th><span class="title_box active">'.$array_colors[0].' '.$this->l('Not enough').'</span></th>
-						<th><span class="title_box active">'.$array_colors[2].' '.$this->l('Alright').'</span></th>
-					</tr>
-				</thead>';
+        <form action="'.Tools::safeOutput(AdminController::$currentIndex.'&token='.Tools::getValue('token').'&module='.$this->name.($this->id_hotel ? '&id_hotel='.$this->id_hotel : '')).'" method="post" class="checkup form-horizontal">
+            <table class="table checkup">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th><span class="title_box active">'.$array_colors[0].' '.$this->l('Not enough').'</span></th>
+                        <th><span class="title_box active">'.$array_colors[2].' '.$this->l('Alright').'</span></th>
+                    </tr>
+                </thead>';
         foreach ($array_conf as $conf => $translations) {
+            $confKeyLt = ($this->id_hotel ? 'ROOM_TYPE' : 'HOTEL').'_CHECKUP_'.$conf.'_LT';
+            $confKeyGt = ($this->id_hotel ? 'ROOM_TYPE' : 'HOTEL').'_CHECKUP_'.$conf.'_GT';
             $this->html .= '
-				<tbody>
-					<tr>
-						<td>
-							<label class="control-label col-lg-12">'.$translations['name'].'</label>
-						</td>
-						<td>
-							<div class="row">
-								<div class="col-lg-11 input-group">
-									<span class="input-group-addon">'.$this->l('Less than').'</span>
-									<input type="text" name="CHECKUP_'.$conf.'_LT" value="'.Tools::safeOutput(Tools::getValue('CHECKUP_'.$conf.'_LT', Configuration::get('CHECKUP_'.$conf.'_LT'))).'" />
-									<span class="input-group-addon">'.$translations['text'].'</span>
-								 </div>
-							 </div>
-						</td>
-						<td>
-							<div class="row">
-								<div class="col-lg-12 input-group">
-									<span class="input-group-addon">'.$this->l('Greater than').'</span>
-									<input type="text" name="CHECKUP_'.$conf.'_GT" value="'.Tools::safeOutput(Tools::getValue('CHECKUP_'.$conf.'_GT', Configuration::get('CHECKUP_'.$conf.'_GT'))).'" />
-									<span class="input-group-addon">'.$translations['text'].'</span>
-								 </div>
-							 </div>
-						</td>
-					</tr>
-				</tbody>';
+                <tbody>
+                    <tr>
+                        <td>
+                            <label class="control-label col-lg-12">'.$translations['name'].'</label>
+                        </td>
+                        <td>
+                            <div class="row">
+                                <div class="col-lg-11 input-group">
+                                    <span class="input-group-addon">'.$this->l('Less than').'</span>
+                                    <input type="text" name="'.$confKeyLt.'" value="'.Tools::safeOutput(Tools::getValue($confKeyLt, Configuration::get($confKeyLt))).'" />
+                                    <span class="input-group-addon">'.$translations['text'].'</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="row">
+                                <div class="col-lg-12 input-group">
+                                    <span class="input-group-addon">'.$this->l('Greater than').'</span>
+                                    <input type="text" name="'.$confKeyGt.'" value="'.Tools::safeOutput(Tools::getValue($confKeyGt, Configuration::get($confKeyGt))).'" />
+                                    <span class="input-group-addon">'.$translations['text'].'</span>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>';
         }
         $this->html .= '</table>
-			<button type="submit" name="submitCheckup" class="btn btn-default pull-right">
-				<i class="icon-save"></i> '.$this->l('Save').'
-			</button>
-		</form>
-		<form action="'.Tools::safeOutput(AdminController::$currentIndex.'&token='.Tools::getValue('token').'&module='.$this->name).'" method="post" class="form-horizontal alert">
-			<div class="row">
-				<div class="col-lg-12">
-					<label class="control-label pull-left">'.$this->l('Order by').'</label>
-					<div class="col-lg-3">
-						<select name="submitCheckupOrder" onchange="this.form.submit();">
-							<option value="1">'.$this->l('ID').'</option>
-							<option value="2" '.($this->context->cookie->checkup_order == 2 ? 'selected="selected"' : '').'>'.$this->l('Name').'</option>
-							<option value="3" '.($this->context->cookie->checkup_order == 3 ? 'selected="selected"' : '').'>'.$this->l('Sales').'</option>
-						</select>
-					</div>
-				</div>
-			</div>
-		</form>
-		<div style="overflow-x:auto">
-		<table class="table checkup2">
-			<thead>
-				<tr>
-					<th><span class="title_box active">'.$this->l('ID').'</span></th>
-					<th><span class="title_box active">'.$this->l('Item').'</span></th>
-					<th class="center"><span class="title_box active">'.$this->l('Active').'</span></th>';
+            <button type="submit" name="'.($this->id_hotel ? 'submitCheckupRoomType' : 'submitCheckupHotel').'" class="btn btn-default pull-right">
+                <i class="icon-save"></i> '.$this->l('Save').'
+            </button>
+        </form>
+        <form action="'.Tools::safeOutput(AdminController::$currentIndex.'&token='.Tools::getValue('token').'&module='.$this->name.($this->id_hotel ? '&id_hotel='.$this->id_hotel : '')).'" method="post" class="form-horizontal alert">
+            <div class="row">
+                <div class="col-lg-12">
+                    <label class="control-label pull-left">'.$this->l('Order by').'</label>
+                    <div class="col-lg-3">
+                        <select name="submitCheckupOrder" onchange="this.form.submit();">
+                            <option value="'.self::ORDER_BY_ID.'">'.$this->l('ID').'</option>
+                            <option value="'.self::ORDER_BY_NAME.'" '.($this->context->cookie->checkup_order == self::ORDER_BY_NAME ? 'selected="selected"' : '').'>'.$this->l('Name').'</option>
+                            <option value="'.self::ORDER_BY_ORDERS.'" '.($this->context->cookie->checkup_order == self::ORDER_BY_ORDERS ? 'selected="selected"' : '').'>'.$this->l('Orders').'</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <div style="overflow-x:auto">
+        <table class="table checkup2">
+            <thead>
+                <tr>
+                    <th><span class="title_box active">'.$this->l('ID').'</span></th>
+                    <th><span class="title_box active">'.$this->l('Room type').'</span></th>
+                    <th class="center"><span class="title_box active">'.$this->l('Active').'</span></th>';
         foreach ($languages as $language) {
             $this->html .= '<th><span class="title_box active">'.$this->l('Desc.').' ('.Tools::strtoupper($language['iso_code']).')</span></th>';
         }
         $this->html .= '
-					<th class="center"><span class="title_box active">'.$this->l('Images').'</span></th>
-					<th class="center"><span class="title_box active">'.$this->l('Sales').'</span></th>
-					<th class="center"><span class="title_box active">'.$this->l('Available rooms').'</span></th>
-					<th class="center"><span class="title_box active">'.$this->l('Global').'</span></th>
-				</tr>
-			</thead>
-			<tbody>';
-        // get room type info
-        $objBookingDtl = new HotelBookingDetail();
-        $objHotelRoomType = new HotelRoomType();
-        $dateFrom = date("Y-m-d", strtotime($this->context->employee->stats_date_from));
-        $dateTo = date("Y-m-d", strtotime($this->context->employee->stats_date_to));
-        if ($dateFrom == $dateTo) {
-            $dateTo = date('Y-m-d', strtotime('+1 day', strtotime($dateTo)));
-        }
-        $bookingParams = array();
-        $bookingParams['date_from'] = $dateFrom;
-        $bookingParams['date_to'] = $dateTo;
-        foreach ($result as $row) {
-            $row['stock'] = 0;
-            if ($roomTypeInfo = $objHotelRoomType->getRoomTypeInfoByIdProduct($row['id_product'])) {
-                $bookingParams['hotel_id'] = $roomTypeInfo['id_hotel'];
-                $bookingParams['room_type'] = $row['id_product'];
-                if ($booking_data = $objBookingDtl->getBookingData($bookingParams)) {
-                    if (isset($booking_data['stats']['num_avail'])) {
-                        $row['stock'] = $booking_data['stats']['num_avail'];
-                    }
-                }
-            }
+                    <th class="center"><span class="title_box active">'.$this->l('Images').'</span></th>
+                    <th class="center"><span class="title_box active">'.$this->l('Orders').'</span></th>
+                    <th class="center"><span class="title_box active">'.$this->l('Total rooms').'</span></th>
+                    <th class="center"><span class="title_box active">'.$this->l('Overall status').'</span></th>
+                    '.(!$this->id_hotel ? '<th class="center"><span class="title_box active">'.$this->l('Action').'</span></th>' : '').'
+                </tr>
+            </thead>
+            <tbody>';
 
+
+        $confPrefix = $this->id_hotel ? 'ROOM_TYPE_' : 'HOTEL_';
+        $confCheckup = array(
+            'IMAGES_LT' => Configuration::get($confPrefix.'CHECKUP_IMAGES_LT'),
+            'IMAGES_GT' => Configuration::get($confPrefix.'CHECKUP_IMAGES_GT'),
+            'ORDERS_LT' => Configuration::get($confPrefix.'CHECKUP_ORDERS_LT'),
+            'ORDERS_GT' => Configuration::get($confPrefix.'CHECKUP_ORDERS_GT'),
+            'TOTAL_ROOMS_LT' => Configuration::get($confPrefix.'CHECKUP_TOTAL_ROOMS_LT'),
+            'TOTAL_ROOMS_GT' => Configuration::get($confPrefix.'CHECKUP_TOTAL_ROOMS_GT'),
+            'DESCRIPTIONS_LT' => Configuration::get($confPrefix.'CHECKUP_DESCRIPTIONS_LT'),
+            'DESCRIPTIONS_GT' => Configuration::get($confPrefix.'CHECKUP_DESCRIPTIONS_GT'),
+        );
+
+        foreach ($result as $row) {
             $totals['products']++;
             $scores = array(
                 'active' => ($row['active'] ? 2 : 0),
-                'images' => ($row['nbImages'] < Configuration::get('CHECKUP_IMAGES_LT') ? 0 : ($row['nbImages'] > Configuration::get('CHECKUP_IMAGES_GT') ? 2 : 1)),
-                'sales' => (($row['nbSales'] * $prop30 < Configuration::get('CHECKUP_SALES_LT')) ? 0 : (($row['nbSales'] * $prop30 > Configuration::get('CHECKUP_SALES_GT')) ? 2 : 1)),
-                'stock' => (($row['stock'] < Configuration::get('CHECKUP_STOCK_LT')) ? 0 : (($row['stock'] > Configuration::get('CHECKUP_STOCK_GT')) ? 2 : 1)),
+                'images' => ($row['nbImages'] < $confCheckup['IMAGES_LT'] ? 0 : ($row['nbImages'] > $confCheckup['IMAGES_GT'] ? 2 : 1)),
+                'orders' => (($row['nbOrders'] * $prop30 < $confCheckup['ORDERS_LT']) ? 0 : (($row['nbOrders'] * $prop30 > $confCheckup['ORDERS_GT']) ? 2 : 1)),
+                'total_rooms' => (($row['totalRooms'] < $confCheckup['TOTAL_ROOMS_LT']) ? 0 : (($row['totalRooms'] > $confCheckup['TOTAL_ROOMS_GT']) ? 2 : 1)),
             );
             $totals['active'] += (int)$scores['active'];
             $totals['images'] += (int)$scores['images'];
-            $totals['sales'] += (int)$scores['sales'];
-            $totals['stock'] += (int)$scores['stock'];
-            $descriptions = $db->executeS('
-				SELECT l.iso_code, pl.description
-				FROM '._DB_PREFIX_.'product_lang pl
-				LEFT JOIN '._DB_PREFIX_.'lang l
-					ON pl.id_lang = l.id_lang
-				WHERE id_product = '.(int)$row['id_product'].Shop::addSqlRestrictionOnLang('pl'));
+            $totals['orders'] += (int)$scores['orders'];
+            $totals['total_rooms'] += (int)$scores['total_rooms'];
+            $descriptions = $this->getDescriptions($row['id_object']);
             foreach ($descriptions as $description) {
                 if (isset($description['iso_code']) && isset($description['description'])) {
                     $row['desclength_'.$description['iso_code']] = Tools::strlen(strip_tags($description['description']));
                 }
                 if (isset($description['iso_code'])) {
-                    $scores['description_'.$description['iso_code']] = ($row['desclength_'.$description['iso_code']] < Configuration::get('CHECKUP_DESCRIPTIONS_LT') ? 0 : ($row['desclength_'.$description['iso_code']] > Configuration::get('CHECKUP_DESCRIPTIONS_GT') ? 2 : 1));
+                    $scores['description_'.$description['iso_code']] = ($row['desclength_'.$description['iso_code']] < $confCheckup['DESCRIPTIONS_LT'] ? 0 : ($row['desclength_'.$description['iso_code']] > $confCheckup['DESCRIPTIONS_GT'] ? 2 : 1));
                     $totals['description_'.$description['iso_code']] += $scores['description_'.$description['iso_code']];
                 }
             }
             $scores['average'] = array_sum($scores) / $divisor;
             $scores['average'] = ($scores['average'] < 1 ? 0 : ($scores['average'] > 1.5 ? 2 : 1));
 
-            $urlParams = array('id_product' => $row['id_product'], 'updateproduct' => 1, 'token' => $token_products);
+            $objectLink = '';
+            if ($this->id_hotel) {
+                $objectLink = $this->context->link->getAdminLink('AdminProducts').'&updateproduct&id_product='.$row['id_object'];
+            } else {
+                $objectLink = $this->context->link->getAdminLink('AdminAddHotel').'&updatehtl_branch_info&id='.$row['id_object'];
+            }
             $this->html .= '
-				<tr>
-					<td>'.$row['id_product'].'</td>
-					<td><a href="'.Tools::safeOutput(preg_replace("/\\?.*$/", '?tab=AdminProducts&updateproduct&id_product='.$row['id_product'].'&token='.$token_products, $this->context->link->getAdminLink('AdminProducts', true, $urlParams))).'">'.Tools::substr($row['name'], 0, 42).'</a></td>
-					<td class="center">'.$array_colors[$scores['active']].'</td>';
+                <tr>
+                    <td>'.$row['id_object'].'</td>
+                    <td><a href="'.$objectLink.'" target="_blank">'.Tools::substr($row['object_name'], 0, 42).'</a></td>
+                    <td class="center">'.$array_colors[$scores['active']].'</td>';
             foreach ($languages as $language) {
                 if (isset($row['desclength_'.$language['iso_code']])) {
                     $this->html .= '<td class="center">'.(int)$row['desclength_'.$language['iso_code']].' '.$array_colors[$scores['description_'.$language['iso_code']]].'</td>';
@@ -311,12 +322,19 @@ class StatsCheckUp extends Module
                     $this->html .= '<td>0 '.$array_colors[0].'</td>';
                 }
             }
+
+            $objectViewLink = '';
+            if (!$this->id_hotel) {
+                $objectViewLink = $this->context->link->getAdminLink('AdminStats').'&module='.$this->name.'&id_hotel='.$row['id_object'];
+            }
+
             $this->html .= '
-					<td class="center">'.(int)$row['nbImages'].' '.$array_colors[$scores['images']].'</td>
-					<td class="center">'.(int)$row['nbSales'].' '.$array_colors[$scores['sales']].'</td>
-					<td class="center">'.(int)$row['stock'].' '.$array_colors[$scores['stock']].'</td>
-					<td class="center">'.$array_colors[$scores['average']].'</td>
-				</tr>';
+                    <td class="center">'.(int)$row['nbImages'].' '.$array_colors[$scores['images']].'</td>
+                    <td class="center">'.(int)$row['nbOrders'].' '.$array_colors[$scores['orders']].'</td>
+                    <td class="center">'.(int)$row['totalRooms'].' '.$array_colors[$scores['total_rooms']].'</td>
+                    <td class="center">'.$array_colors[$scores['average']].'</td>
+                    '.(!$this->id_hotel ? '<td class="center"><a class="btn btn-sm btn-default" href="'.$objectViewLink.'" title="'.$this->l('View').'"><i class="icon icon-eye"></i></a></td>' : '').'
+                </tr>';
         }
 
         $this->html .= '</tbody>';
@@ -325,10 +343,10 @@ class StatsCheckUp extends Module
         $totals['active'] = ($totals['active'] < 1 ? 0 : ($totals['active'] > 1.5 ? 2 : 1));
         $totals['images'] = $totals['images'] / $totals['products'];
         $totals['images'] = ($totals['images'] < 1 ? 0 : ($totals['images'] > 1.5 ? 2 : 1));
-        $totals['sales'] = $totals['sales'] / $totals['products'];
-        $totals['sales'] = ($totals['sales'] < 1 ? 0 : ($totals['sales'] > 1.5 ? 2 : 1));
-        $totals['stock'] = $totals['stock'] / $totals['products'];
-        $totals['stock'] = ($totals['stock'] < 1 ? 0 : ($totals['stock'] > 1.5 ? 2 : 1));
+        $totals['orders'] = $totals['orders'] / $totals['products'];
+        $totals['orders'] = ($totals['orders'] < 1 ? 0 : ($totals['orders'] > 1.5 ? 2 : 1));
+        $totals['total_rooms'] = $totals['total_rooms'] / $totals['products'];
+        $totals['total_rooms'] = ($totals['total_rooms'] < 1 ? 0 : ($totals['total_rooms'] > 1.5 ? 2 : 1));
         foreach ($languages as $language) {
             $totals['description_'.$language['iso_code']] = $totals['description_'.$language['iso_code']] / $totals['products'];
             $totals['description_'.$language['iso_code']] = ($totals['description_'.$language['iso_code']] < 1 ? 0 : ($totals['description_'.$language['iso_code']] > 1.5 ? 2 : 1));
@@ -337,34 +355,140 @@ class StatsCheckUp extends Module
         $totals['average'] = ($totals['average'] < 1 ? 0 : ($totals['average'] > 1.5 ? 2 : 1));
 
         $this->html .= '
-			<tfoot>
-				<tr>
-					<th colspan="2"></th>
-					<th class="center"><span class="title_box active">'.$this->l('Active').'</span></th>';
+            <tfoot>
+                <tr>
+                    <th colspan="2"></th>
+                    <th class="center"><span class="title_box active">'.$this->l('Active').'</span></th>';
         foreach ($languages as $language) {
             $this->html .= '<th class="center"><span class="title_box active">'.$this->l('Desc.').' ('.Tools::strtoupper($language['iso_code']).')</span></th>';
         }
         $this->html .= '
-					<th class="center"><span class="title_box active">'.$this->l('Images').'</span></th>
-					<th class="center"><span class="title_box active">'.$this->l('Sales').'</span></th>
-					<th class="center"><span class="title_box active">'.$this->l('Available rooms').'</span></th>
-					<th class="center"><span class="title_box active">'.$this->l('Global').'</span></th>
-				</tr>
-				<tr>
-					<td colspan="2"></td>
-					<td class="center">'.$array_colors[$totals['active']].'</td>';
+                    <th class="center"><span class="title_box active">'.$this->l('Images').'</span></th>
+                    <th class="center"><span class="title_box active">'.$this->l('Orders').'</span></th>
+                    <th class="center"><span class="title_box active">'.$this->l('Total rooms').'</span></th>
+                    <th class="center"><span class="title_box active">'.$this->l('Overall status').'</span></th>
+                    '.(!$this->id_hotel ? '<th></th>' : '').'
+                </tr>
+                <tr>
+                    <td colspan="2"></td>
+                    <td class="center">'.$array_colors[$totals['active']].'</td>';
         foreach ($languages as $language) {
             $this->html .= '<td class="center">'.$array_colors[$totals['description_'.$language['iso_code']]].'</td>';
         }
         $this->html .= '
-					<td class="center">'.$array_colors[$totals['images']].'</td>
-					<td class="center">'.$array_colors[$totals['sales']].'</td>
-					<td class="center">'.$array_colors[$totals['stock']].'</td>
-					<td class="center">'.$array_colors[$totals['average']].'</td>
-				</tr>
-			</tfoot>
-		</table></div>';
+                    <td class="center">'.$array_colors[$totals['images']].'</td>
+                    <td class="center">'.$array_colors[$totals['orders']].'</td>
+                    <td class="center">'.$array_colors[$totals['total_rooms']].'</td>
+                    <td class="center">'.$array_colors[$totals['average']].'</td>
+                    '.(!$this->id_hotel ? '<td></td>' : '').'
+                </tr>
+            </tfoot>
+        </table></div>';
 
         return $this->html;
+    }
+
+    public function getHotelStats()
+    {
+        $date_from = date('Y-m-d', strtotime($this->context->employee->stats_date_from));
+        $date_to = date('Y-m-d', strtotime($this->context->employee->stats_date_to));
+        $id_lang = $this->context->language->id;
+
+        $order_by = 'hbi.`id`';
+        if ($this->context->cookie->checkup_order == self::ORDER_BY_NAME) {
+            $order_by = 'object_name';
+        } elseif ($this->context->cookie->checkup_order == self::ORDER_BY_ORDERS) {
+            $order_by = 'nbOrders DESC';
+        }
+
+        $sql = 'SELECT hbi.`id` AS id_object, hbil.`hotel_name` AS object_name, hbi.`active`,
+        (
+            SELECT COUNT(*)
+            FROM '._DB_PREFIX_.'htl_image hi
+            WHERE hi.`id_hotel` = hbi.`id`
+        ) AS nbImages,
+        (
+            SELECT COUNT(DISTINCT hbd.`id_order`) FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+            LEFT JOIN `'._DB_PREFIX_.'orders` o
+            ON (o.`id_order` = hbd.`id_order`)
+            WHERE hbd.`id_hotel` = hbi.`id` AND o.`valid` = 1
+            AND hbd.`date_to` > "'.pSQL($date_from).'" AND hbd.`date_from` < "'.pSQL($date_to).'"
+        ) AS nbOrders,
+        (
+            SELECT COUNT(*)
+            FROM `'._DB_PREFIX_.'htl_room_information` hri
+            WHERE hri.`id_hotel` = hbi.`id`
+        ) AS totalRooms
+        FROM `'._DB_PREFIX_.'htl_branch_info` hbi
+        LEFT JOIN `'._DB_PREFIX_.'htl_branch_info_lang` hbil
+        ON (hbil.`id` = hbi.`id` AND hbil.`id_lang` = '.(int) $id_lang .')
+        ORDER BY '.$order_by;
+
+        return Db::getInstance()->executeS($sql);
+    }
+
+    public function getRoomTypeStats()
+    {
+        $date_from = date('Y-m-d', strtotime($this->context->employee->stats_date_from));
+        $date_to = date('Y-m-d', strtotime($this->context->employee->stats_date_to));
+        $id_lang = $this->context->language->id;
+
+        $order_by = 'p.`id_product`';
+        if ($this->context->cookie->checkup_order == self::ORDER_BY_NAME) {
+            $order_by = 'object_name';
+        } elseif ($this->context->cookie->checkup_order == self::ORDER_BY_ORDERS) {
+            $order_by = 'nbOrders DESC';
+        }
+
+        $sql = 'SELECT p.`id_product` AS id_object, p.`active`, pl.`name` AS object_name,
+        (
+            SELECT COUNT(*)
+            FROM '._DB_PREFIX_.'image i
+            WHERE i.`id_product` = p.`id_product`
+        ) AS nbImages,
+        (
+            SELECT COUNT(DISTINCT hbd.`id_order`) FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+            LEFT JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = hbd.`id_order`)
+            WHERE hbd.`id_product` = p.`id_product` AND o.`valid` = 1
+            AND hbd.`date_to` > "'.pSQL($date_from).'" AND hbd.`date_from` < "'.pSQL($date_to).'"
+        ) AS nbOrders,
+        (
+            SELECT COUNT(*)
+            FROM `'._DB_PREFIX_.'htl_room_information` hri
+            WHERE hri.`id_product` = p.`id_product`
+        ) AS totalRooms
+        FROM '._DB_PREFIX_.'product p
+        LEFT JOIN '._DB_PREFIX_.'product_lang pl
+        ON (p.`id_product` = pl.`id_product` AND pl.`id_lang` = '.(int) $id_lang.')
+        LEFT JOIN '._DB_PREFIX_.'htl_room_type hrt
+        ON (hrt.`id_product` = p.`id_product`)
+        WHERE hrt.`id_hotel` = '.(int) $this->id_hotel.'
+        ORDER BY '.$order_by;
+
+        return Db::getInstance()->executeS($sql);
+    }
+
+    public function getDescriptions($id_object)
+    {
+        if ($this->id_hotel) {
+            return Db::getInstance()->executeS(
+                'SELECT l.`iso_code`, pl.`description`
+                FROM '._DB_PREFIX_.'product_lang pl
+                LEFT JOIN '._DB_PREFIX_.'lang l
+                ON pl.`id_lang` = l.`id_lang`
+                LEFT JOIN '._DB_PREFIX_.'htl_room_type hrt
+                ON (hrt.`id_product` = pl.`id_product`)
+                WHERE hrt.`id_hotel` = '.(int) $this->id_hotel.'
+                AND pl.`id_product` = '.(int) $id_object
+            );
+        } else {
+            return Db::getInstance()->executeS(
+                'SELECT l.`iso_code`, hbil.`description`
+                FROM '._DB_PREFIX_.'htl_branch_info_lang hbil
+                LEFT JOIN '._DB_PREFIX_.'lang l
+                ON hbil.`id_lang` = l.`id_lang`
+                WHERE hbil.`id` = '.(int) $id_object
+            );
+        }
     }
 }

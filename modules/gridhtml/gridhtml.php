@@ -58,9 +58,10 @@ class GridHtml extends ModuleGridEngine
 
 	public static function hookGridEngine($params, $grider)
 	{
+		$objModule = Module::getInstanceByName('gridhtml');
 		self::$_columns = $params['columns'];
 		if (!isset($params['emptyMsg']))
-			$params['emptyMsg'] = 'Empty';
+			$params['emptyMsg'] = $objModule->l('No records found.');
 
         $customParams = '';
         if (isset($params['customParams'])) {
@@ -74,7 +75,7 @@ class GridHtml extends ModuleGridEngine
 			<thead>
 				<tr>';
 		foreach ($params['columns'] as $column)
-			$html .= '<th class="center"><span class="title_box active">'.$column['header'].'</span></th>';
+			$html .= '<th class="center" '.((isset($column['tooltip']) && $column['tooltip']) ? ('data-toggle="tooltip" title="'.$column['tooltip'].'"') : '').'><span class="title_box active">'.$column['header'].'</span></th>';
 		$html .= '</tr>
 			</thead>
 			<tbody></tbody>
