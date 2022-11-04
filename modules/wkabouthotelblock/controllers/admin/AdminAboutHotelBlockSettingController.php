@@ -70,6 +70,7 @@ class AdminAboutHotelBlockSettingController extends ModuleAdminController
             ),
         );
 
+        $this->informations[] = $this->l('Keep interior images in a multiple of 3 for the best view.');
         $this->addRowAction('edit');
         $this->addRowAction('delete');
 
@@ -136,7 +137,6 @@ class AdminAboutHotelBlockSettingController extends ModuleAdminController
         parent::initContent();
         // to customize the view as per our requirements
         if ($this->display != 'add' && $this->display != 'edit') {
-            $this->informations[] = $this->l('Keep interior images in a multiple of 3 for the best view.');
             $this->content = $this->renderOptions();
             $this->content .= $this->renderList();
             $this->context->smarty->assign('content', $this->content);
