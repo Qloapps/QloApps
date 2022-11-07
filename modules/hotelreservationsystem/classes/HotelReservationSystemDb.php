@@ -255,6 +255,8 @@ class HotelReservationSystemDb
                 `id` int(11) NOT NULL AUTO_INCREMENT,
                 `id_hotel` int(11) NOT NULL,
                 `max_order_date` datetime NOT NULL,
+                `enable_preperation_time` tinyint(1) NOT NULL,
+                `preperation_time` int(11) NOT NULL,
                 `date_add` datetime NOT NULL,
                 `date_upd` datetime NOT NULL,
                 PRIMARY KEY (`id`)

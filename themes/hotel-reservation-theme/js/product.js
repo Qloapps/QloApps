@@ -1100,11 +1100,10 @@ $(document).ready(function() {
             return [true, ""];
         }
     }
-
     $("#room_check_in").datepicker({
         showOtherMonths: true,
         dateFormat: dateFormat,
-        minDate: 0,
+        minDate: preperation_time,
         beforeShow: function (input, instance) {
             // So that on translating page date is translated to NaN-NaN-NaN
             $('.ui-datepicker').addClass('notranslate');
@@ -1147,6 +1146,7 @@ $(document).ready(function() {
     $("#room_check_out").datepicker({
         showOtherMonths: true,
         dateFormat: dateFormat,
+        minDate: preperation_time + 1,
         beforeShow: function (input, instance) {
             // So that on translating page date is translated to NaN-NaN-NaN
             $('.ui-datepicker').addClass('notranslate');

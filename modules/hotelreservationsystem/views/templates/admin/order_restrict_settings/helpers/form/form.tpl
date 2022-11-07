@@ -41,6 +41,33 @@
 				<input autocomplete="off" type="hidden" class="form-control" id="max_htl_book_date_hidden" name="max_htl_book_date_hidden" {if isset($ordr_restrict_hotel_data['max_date']) && $ordr_restrict_hotel_data['hidden_max_date']}value="{$ordr_restrict_hotel_data['hidden_max_date']}"{/if}/>
 			</div>
 		</div>
+		<div class="form-group">
+			<label for="enable_preperation_time" class="control-label col-sm-3">
+				<span title="" data-toggle="tooltip" class="label-tooltip" data-original-title='{l s='Enable, if you want to set prepration time for this hotel.' mod='hotelreservationsystem'}'>{l s='Enable preperation time for booking' mod='hotelreservationsystem'}</span>
+			</label>
+			<div class="col-sm-7">
+				<span class="switch prestashop-switch fixed-width-lg">
+					<input type="radio" value="1" id="enable_preperation_time_on" name="enable_preperation_time"
+					{if isset($smarty.post.enable_preperation_time)}{if $smarty.post.enable_preperation_time}checked="checked"{/if}{elseif isset($ordr_restrict_hotel_data) && $ordr_restrict_hotel_data.enable_preperation_time}checked="checked"{/if}>
+
+					<label for="enable_preperation_time_on">{l s='Yes' mod='hotelreservationsystem'}</label>
+
+					<input type="radio" value="0" id="enable_preperation_time_off" name="enable_preperation_time"
+					{if isset($smarty.post.enable_preperation_time)}{if !$smarty.post.enable_preperation_time}checked="checked"{/if}{elseif !isset($ordr_restrict_hotel_data)}checked="checked"{elseif isset($ordr_restrict_hotel_data) && !$ordr_restrict_hotel_data.enable_preperation_time}checked="checked"{/if}>
+
+					<label for="enable_preperation_time_off">{l s='No' mod='hotelreservationsystem'}</label>
+					<a class="slide-button btn"></a>
+				</span>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-sm-3 control-label required" for="preperation_time">
+				{l s='Number of days required for preperation :' mod='hotelreservationsystem'}
+			</label>
+			<div class="col-sm-2">
+				<input autocomplete="off" type="text" class="form-control" id="preperation_time" name="preperation_time" {if isset($ordr_restrict_hotel_data['preperation_time']) && $ordr_restrict_hotel_data['preperation_time']}value="{$ordr_restrict_hotel_data['preperation_time']}"{/if}/>
+			</div>
+		</div>
 		<div class="panel-footer">
 			<a href="{$link->getAdminLink('AdminOrderRestrictSettings')|escape:'html':'UTF-8'}" class="btn btn-default">
 				<i class="process-icon-cancel"></i>{l s='Cancel' mod='hotelreservationsystem'}

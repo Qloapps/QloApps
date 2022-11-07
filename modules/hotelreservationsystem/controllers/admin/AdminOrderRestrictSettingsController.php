@@ -26,6 +26,7 @@ class AdminOrderRestrictSettingsController extends ModuleAdminController
         $this->_join .= ' LEFT JOIN `'._DB_PREFIX_.'country_lang` cl
         ON (cl.`id_country` = ad.`id_country` AND cl.`id_lang` = '.(int)$this->context->language->id.')';
         $this->_select = 's.`name` as `state_name`, cl.`name` as country_name, hbl.`hotel_name`, ad.`city`, ';
+        $this->_select .= ' IF (a.`enable_preperation_time`, "'.$this->l('Yes').'", "'.$this->l('No').'") as enable_preperation_time_badge, IF(a.`enable_preperation_time`, 1, 0) badge_success, IF(a.`enable_preperation_time`, 0, 1) badge_danger';
         $this->fields_options = array(
             'orderrestrict' => array(
                 'title' => $this->l('Order Restriction Setting'),
@@ -36,36 +37,71 @@ class AdminOrderRestrictSettingsController extends ModuleAdminController
                         'id' => 'max_global_book_date',
                         'hint' => $this->l('Maximum date by which rooms of your hotels can be booked.'),
                     ),
+                    'GLOBAL_ENABLE_PREPERATION_TIME' => array(
+                        'title' => $this->l('Enable preperation time for booking'),
+                        'hint' => $this->l('Allow customer to book rooms only after certain number of days.'),
+                        'validation' => 'isBool',
+                        'cast' => 'intval',
+                        'type' => 'bool',
+                        'required' => true
+                    ),
+                    'GLOBAL_PREPERATION_TIME' => array(
+                        'title' => $this->l('Number of days required for preperation'),
+                        'id' => 'max_global_book_date',
+                        'type' => 'text',
+                        'hint' => $this->l('Maximum date by which rooms of your hotels can be booked.'),
+                    ),
                 ),
                 'submit' => array('title' => $this->l('Save')),
             ),
         );
+
+        $preperationList = array(
+            1 => $this->l('Yes'),
+            0 => $this->l('No')
+         );
+
         $this->fields_list = array(
             'id' => array(
                 'title' => $this->l('ID'),
-                'align' => 'center',
+                'align' => 'center'
             ),
             'hotel_name' => array(
                 'title' => $this->l('Hotel Name'),
-                'align' => 'center',
+                'align' => 'center'
             ),
             'city' => array(
                 'title' => $this->l('City'),
-                'align' => 'center',
+                'align' => 'center'
             ),
             'state_name' => array(
                 'title' => $this->l('State'),
                 'align' => 'center',
-                'filter_key' => 's!name',
+                'filter_key' => 's!name'
             ),
             'country_name' => array(
                 'title' => $this->l('Country'),
                 'align' => 'center',
-                'filter_key' => 'cl!name',
+                'filter_key' => 'cl!name'
             ),
             'max_order_date' => array(
                 'title' => $this->l('Maximum Booking Date'),
+                'type' => 'datetime',
+                'align' => 'center'
+            ),
+            'enable_preperation_time_badge' => array(
+                'title' => $this->l('Preperation time enabled'),
+                'badge_success' => true,
+                'badge_danger' => true,
+                'type' => 'select',
+                'list' => $preperationList,
+                'filter_key' => 'a!enable_preperation_time',
+                'align' => 'center'
+            ),
+            'preperation_time' => array(
+                'title' => $this->l('Preperation time'),
                 'align' => 'center',
+                'callback' => 'formatPreperationTime'
             ),
         );
         $this->bulk_actions = array(
@@ -75,6 +111,11 @@ class AdminOrderRestrictSettingsController extends ModuleAdminController
                 'confirm' => $this->l('Delete selected items?'),
             ),
         );
+    }
+
+    public function formatPreperationTime($days)
+    {
+        return $days . ' ' . $this->l('Days');
     }
 
     public function renderList()
@@ -115,6 +156,8 @@ class AdminOrderRestrictSettingsController extends ModuleAdminController
             );
             $ordr_restrict_data['hotel_name'] = $hotel_info_obj->hotel_name;
             $ordr_restrict_data['id_hotel'] = $obj_order_restrict->id_hotel;
+            $ordr_restrict_data['enable_preperation_time'] = $obj_order_restrict->enable_preperation_time;
+            $ordr_restrict_data['preperation_time'] = $obj_order_restrict->preperation_time;
             $ordr_restrict_data['max_date'] = date('d-m-Y', strtotime($obj_order_restrict->max_order_date));
             $ordr_restrict_data['hidden_max_date'] = date('Y-m-d', strtotime($obj_order_restrict->max_order_date));
 
@@ -139,6 +182,9 @@ class AdminOrderRestrictSettingsController extends ModuleAdminController
         $id = Tools::getValue('id');
         $hotel_id = Tools::getValue('hotel_id');
         $max_htl_book_date = Tools::getValue('max_htl_book_date');
+        $enable_preperation_time = Tools::getValue('enable_preperation_time');
+        $preperation_time = Tools::getValue('preperation_time');
+
         if (!$hotel_id) {
             $this->errors[] = $this->l('Please Select a Hotel.');
         }
@@ -151,6 +197,10 @@ class AdminOrderRestrictSettingsController extends ModuleAdminController
             }
         }
 
+        if (!Validate::isUnsignedInt($preperation_time)) {
+            $this->errors[] = $this->l('Invalid value for preperation time');
+        }
+
         if (!count($this->errors)) {
             $obj_order_restrict = new HotelOrderRestrictDate();
             $ordr_restrict_data = $obj_order_restrict->getDataByHotelId($hotel_id);
@@ -160,6 +210,8 @@ class AdminOrderRestrictSettingsController extends ModuleAdminController
 
             $obj_order_restrict->id_hotel = $hotel_id;
             $obj_order_restrict->max_order_date = $max_htl_book_date;
+            $obj_order_restrict->enable_preperation_time = $enable_preperation_time;
+            $obj_order_restrict->preperation_time = $preperation_time;
             $obj_order_restrict->save();
             $new_id = $obj_order_restrict->id;
             if (Tools::isSubmit('submitAdd'.$this->table.'AndStay')) {

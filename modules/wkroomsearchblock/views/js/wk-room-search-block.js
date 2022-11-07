@@ -73,9 +73,10 @@ $(document).ready(function() {
                 selectedDate.setDate(selectedDate.getDate()+1);
                 $("#check_out_time").datepicker("option", "minDate", selectedDate);
             } else {
+                $('#preperation_time').val()
                 var date_format = new Date();
                 var selectedDate = new Date($.datepicker.formatDate('yy-mm-dd', new Date()));
-                selectedDate.setDate(selectedDate.getDate()+1);
+                selectedDate.setDate(selectedDate.getDate()+1 + parseInt($('#preperation_time').val()));
                 $("#check_out_time").datepicker("option", "minDate", selectedDate);
             }
         }
@@ -277,6 +278,20 @@ $(document).ready(function() {
         $("#check_in_time").datepicker("option", "maxDate", max_date_from);
         $("#check_out_time").datepicker("option", "maxDate", max_date_to);
         $("#max_order_date").val(max_order_date);
+        let preperation_time = $(this).attr('data-preperation_time')
+        let preperation_time_date = new Date();
+        preperation_time_date.setDate(preperation_time_date.getDate() + parseInt(preperation_time));
+        preperation_time_date.setHours(0, 0, 0, 0);
+        if($("#check_in_time").datepicker("getDate") < preperation_time_date) {
+            $("#check_in_time").val('');
+        }
+        preperation_time_date.setDate(preperation_time_date.getDate() + 1);
+        if($("#check_out_time").datepicker("getDate") < preperation_time_date) {
+            $("#check_out_time").val('');
+        }
+        $("#check_in_time").datepicker("option", "minDate", parseInt(preperation_time));
+        $("#check_out_time").datepicker("option", "minDate", parseInt(preperation_time) + 1);
+        $('#preperation_time').val(preperation_time);
         $('#id_hotel').val($(this).attr('data-id-hotel'));
         $('#hotel_cat_id').val($(this).attr('data-hotel-cat-id'));
         $('#hotel_cat_name').html($(this).html());
@@ -296,6 +311,12 @@ $(document).ready(function() {
         }
         $("#check_in_time").datepicker("option", "maxDate", max_date_from);
         $("#check_out_time").datepicker("option", "maxDate", max_date_to);
+    }
+
+    var preperation_time = $('#preperation_time').val();
+    if (preperation_time != '') {
+        $("#check_in_time").datepicker("option", "minDate", parseInt(preperation_time));
+        $("#check_out_time").datepicker("option", "minDate", parseInt(preperation_time) + 1);
     }
 
     // validations on the submit of the search fields
