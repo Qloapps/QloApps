@@ -237,7 +237,9 @@ class StatsBestCategories extends ModuleGrid
         $this->_totalCount = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('SELECT FOUND_ROWS()');
 
         foreach ($values as &$value) {
-            $value['hotel_name'] = '<a href="'.$this->context->link->getAdminLink('AdminAddHotel').'&id='.$value['id'].'&updatehtl_branch_info" target="_blank">'.$value['hotel_name'].'</a>';
+            if (Tools::getValue('export') == false) {
+                $value['hotel_name'] = '<a href="'.$this->context->link->getAdminLink('AdminAddHotel').'&id='.$value['id'].'&updatehtl_branch_info" target="_blank">'.$value['hotel_name'].'</a>';
+            }
 
             $value['totalMargin'] = 0;
             if (((float) $value['totalRevenue']) > 0 && ((float) $value['totalOperatingCost']) > 0) {

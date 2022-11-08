@@ -380,9 +380,9 @@ class StatsProduct extends ModuleGraph
                 break;
 
             case 42:
-                $this->_titles['main'][1] = $this->l('Reference');
-                $this->_titles['main'][2] = $this->l('Name');
-                $this->_titles['main'][3] = $this->l('Stock');
+                $this->_titles['main'][0] = $this->l('ID');
+                $this->_titles['main'][1] = $this->l('Room type name');
+                $this->_titles['main'][2] = $this->l('Total Rooms');
                 break;
         }
     }
@@ -403,9 +403,8 @@ class StatsProduct extends ModuleGraph
         if ($this->option == 42) {
             $products = $this->getProducts();
             foreach ($products as $product) {
-                $this->_values[0][] = $product['reference'];
-                $this->_values[1][] = $product['name'];
-                $this->_values[2][] = $product['quantity'];
+                $this->_values[0][] = $product['name'];
+                $this->_values[1][] = $product['total_rooms'];
                 $this->_legend[] = $product['id_product'];
             }
         } elseif ($this->option != 3) {

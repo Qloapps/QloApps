@@ -51,8 +51,7 @@
 					let dateTo = $('form#calendar_form .datepicker#datepickerTo').val().trim();
 
 					if (dateFrom >= dateTo) {
-						let dateFromSplit = dateFrom.split('-');
-						let objDateFrom = new Date(dateFromSplit[0], dateFromSplit[1] - 1, dateFromSplit[2]);
+						let objDateFrom = $.datepicker.parseDate('yy-mm-dd', dateFrom);
 						let objDateToMin = objDateFrom;
 						objDateToMin.setDate(objDateToMin.getDate() + 1);
 
@@ -71,8 +70,7 @@
 					let dateFrom = $('form#calendar_form .datepicker#datepickerFrom').val().trim();
 
 					if (typeof dateFrom != 'undefined' && dateFrom != '') {
-						let dateFromSplit = dateFrom.split('-');
-						let objDateFrom = new Date(dateFromSplit[0], dateFromSplit[1] - 1, dateFromSplit[2]);
+						let objDateFrom = $.datepicker.parseDate('yy-mm-dd', dateFrom);
 						let objDateToMin = objDateFrom;
 						objDateToMin.setDate(objDateToMin.getDate() + 1);
 

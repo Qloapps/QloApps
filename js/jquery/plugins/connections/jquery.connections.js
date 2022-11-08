@@ -1,3 +1,5 @@
+/* jQuery Connections v1.0.1 https://github.com/musclesoft/jquery-connections */
+
 (function($) {
     $.fn.connections = function(options) {
       if (options === "update") {

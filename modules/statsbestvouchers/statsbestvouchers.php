@@ -144,8 +144,10 @@ class StatsBestVouchers extends ModuleGrid
         $values = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($this->query);
         $this->_totalCount = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('SELECT FOUND_ROWS()');
         foreach ($values as &$value) {
-            $value['code'] = '<a href="'.$this->context->link->getAdminLink('AdminCartRules').'&id_cart_rule='.$value['id_cart_rule'].'&updatecart_rule" target="_blank">'.$value['code'].'</a>';
-            $value['name'] = '<a href="'.$this->context->link->getAdminLink('AdminCartRules').'&id_cart_rule='.$value['id_cart_rule'].'&updatecart_rule" target="_blank">'.$value['name'].'</a>';
+            if (Tools::getValue('export') == false) {
+                $value['code'] = '<a href="'.$this->context->link->getAdminLink('AdminCartRules').'&id_cart_rule='.$value['id_cart_rule'].'&updatecart_rule" target="_blank">'.$value['code'].'</a>';
+                $value['name'] = '<a href="'.$this->context->link->getAdminLink('AdminCartRules').'&id_cart_rule='.$value['id_cart_rule'].'&updatecart_rule" target="_blank">'.$value['name'].'</a>';
+            }
             $value['ca'] = Tools::displayPrice($value['ca'], $currency);
         }
 

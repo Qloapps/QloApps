@@ -190,7 +190,9 @@ class StatsBestCustomers extends ModuleGrid
         $this->_totalCount = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('SELECT FOUND_ROWS()');
 
         foreach ($values as &$value) {
-            $value['email'] = '<a href="'.$this->context->link->getAdminLink('AdminCustomers').'&id_customer='.$value['id_customer'].'&updatecustomer" target="_blank">'.$value['email'].'</a>';
+            if (Tools::getValue('export') == false) {
+                $value['email'] = '<a href="'.$this->context->link->getAdminLink('AdminCustomers').'&id_customer='.$value['id_customer'].'&updatecustomer" target="_blank">'.$value['email'].'</a>';
+            }
             $value['totalMoneySpent'] = Tools::displayPrice($value['totalMoneySpent'], $currency);
         }
 

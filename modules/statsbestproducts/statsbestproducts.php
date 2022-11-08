@@ -157,8 +157,8 @@ class StatsBestProducts extends ModuleGrid
         $array_date_between = explode(' AND ', $date_between);
         $id_lang = $this->getLang();
 
-        $this->query = 'SELECT p.`id_product`, pl.`name` AS room_type_name,
-        p.`active`, hrt.`id_hotel`, hbil.`hotel_name`,
+        $this->query = 'SELECT p.`id_product`, pl.`name` AS roomTypeName,
+        p.`active`, hrt.`id_hotel`, hbil.`hotel_name` AS hotelName,
         (
             SELECT IFNULL(SUM(DATEDIFF(LEAST(hbd.`date_to`, "'.pSQL($date_to).'"), GREATEST(hbd.`date_from`, "'.pSQL($date_from).'"))), 0)
             FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
@@ -224,8 +224,10 @@ class StatsBestProducts extends ModuleGrid
         $objHotelBookingDetail = new HotelBookingDetail();
         $numberOfDays = $objHotelBookingDetail->getNumberOfDays($date_from, $date_to);
         foreach ($values as &$value) {
-            $value['roomTypeName'] = '<a href="'.$this->context->link->getAdminLink('AdminProducts').'&id_product='.$value['id_product'].'&updateproduct" target="_blank">'.$value['room_type_name'].'</a>';
-            $value['hotelName'] = '<a href="'.$this->context->link->getAdminLink('AdminAddHotel').'&id='.$value['id_hotel'].'&updatehtl_branch_info" target="_blank">'.$value['hotel_name'].'</a>';
+            if (Tools::getValue('export') == false) {
+                $value['roomTypeName'] = '<a href="'.$this->context->link->getAdminLink('AdminProducts').'&id_product='.$value['id_product'].'&updateproduct" target="_blank">'.$value['roomTypeName'].'</a>';
+                $value['hotelName'] = '<a href="'.$this->context->link->getAdminLink('AdminAddHotel').'&id='.$value['id_hotel'].'&updatehtl_branch_info" target="_blank">'.$value['hotelName'].'</a>';
+            }
             $value['totalRoomsBooked'] = (int) $value['totalRoomsBooked'];
             $value['availableRooms'] = max($value['totalRooms'] - $value['totalRoomsBooked'], 0); // availableRooms can be negative if more rooms are disabled than available for booking
             $value['bookingsPerDay'] = sprintf('%0.2f', ($numberOfDays ? $value['totalRoomsBooked'] / $numberOfDays : 0));
