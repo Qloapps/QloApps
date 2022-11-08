@@ -25,9 +25,9 @@
 
 <{if isset($href) && $href}a style="display:block" href="{$href|escape:'html':'UTF-8'}"{else}div{/if} id="{$id|escape:'html':'UTF-8'}" data-toggle="tooltip" class="box-stats label-tooltip {$color|escape}" data-original-title="{$tooltip|escape}">
 	<div class="kpi-content">
-	{if isset($icon) && $icon}
-		<i class="{$icon|escape}"></i>
-	{/if}
+		{if isset($icon) && $icon}
+			<i class="{$icon|escape}"></i>
+		{/if}
 		<span class="title">{$title|escape}</span>
 		<span cLass="subtitle">{$subtitle|escape}</span>
 		{if isset($chart) && $chart}
@@ -36,46 +36,47 @@
 				</div>
 			</div>
 		{/if}
-		<span class="value skeleton-loading-wave loading-container-bar loading"></span>
+		{if isset($source) && $source}
+			<span class="value skeleton-loading-wave loading-container-bar loading"></span>
+		{elseif isset($value) && $value != ''}
+			<span class="value">{$value|escape:'html':'UTF-8'}</span>
+		{/if}
 	</div>
-
 </{if isset($href) && $href}a{else}div{/if}>
 
-{if isset($source) && $source != '' && isset($refresh) && $refresh != ''}
-
-{/if}
-<script>
-    function refresh_{$id|replace:'-':'_'|addslashes}()
-    {
-		$.ajax({
-			url: '{$source|addslashes}' + '&rand=' + new Date().getTime(),
-			dataType: 'json',
-			type: 'GET',
-			cache: false,
-			headers: { 'cache-control': 'no-cache' },
-			beforeSend: function() {
-				$('#{$id|addslashes}').find('.value').html('');
-				$('#{$id|addslashes}').find('.value').addClass('skeleton-loading-wave loading-container-bar loading');
-			},
-			success: function(jsonData){
-				if (!jsonData.has_errors)
-				{
-					if (jsonData.value != undefined)
-						$('#{$id|addslashes} .value').html(jsonData.value);
-					if (jsonData.data != undefined)
+{if isset($source) && $source}
+	<script>
+		function refresh_{$id|replace:'-':'_'|addslashes}()
+		{
+			$.ajax({
+				url: '{$source|addslashes}' + '&rand=' + new Date().getTime(),
+				dataType: 'json',
+				type: 'GET',
+				cache: false,
+				headers: { 'cache-control': 'no-cache' },
+				beforeSend: function() {
+					$('#{$id|addslashes}').find('.value').html('');
+					$('#{$id|addslashes}').find('.value').addClass('skeleton-loading-wave loading-container-bar loading');
+				},
+				success: function(jsonData){
+					if (!jsonData.has_errors)
 					{
-						$("#{$id|addslashes} .boxchart svg").remove();
-						set_d3_{$id|replace:'-':'_'|addslashes}(jsonData.data);
+						if (jsonData.value != undefined)
+							$('#{$id|addslashes} .value').html(jsonData.value);
+						if (jsonData.data != undefined)
+						{
+							$("#{$id|addslashes} .boxchart svg").remove();
+							set_d3_{$id|replace:'-':'_'|addslashes}(jsonData.data);
+						}
 					}
-				}
-			},
-			complete: function () {
-				$('#{$id|addslashes}').find('.value').removeClass('skeleton-loading-wave loading-container-bar loading');
-			},
-		});
-    }
-</script>
-
+				},
+				complete: function () {
+					$('#{$id|addslashes}').find('.value').removeClass('skeleton-loading-wave loading-container-bar loading');
+				},
+			});
+		}
+	</script>
+{/if}
 
 {if $chart}
 <script>

@@ -2705,9 +2705,6 @@ class AdminProductsControllerCore extends AdminController
         $time = time();
         $kpis = array();
 
-        $statsController = new AdminStatsController();
-        $this->context->controller = $this;
-
         // if (Configuration::get('PS_STOCK_MANAGEMENT')) {
         //     $helper = new HelperKpi();
         //     $helper->id = 'box-products-stock';

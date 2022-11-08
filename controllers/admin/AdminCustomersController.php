@@ -642,9 +642,6 @@ class AdminCustomersControllerCore extends AdminController
         $time = time();
         $kpis = array();
 
-        $statsController = new AdminStatsController();
-        $this->context->controller = $this;
-
         $helper = new HelperKpi();
         $helper->id = 'box-gender';
         $helper->icon = 'icon-male';

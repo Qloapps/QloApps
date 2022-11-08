@@ -508,9 +508,6 @@ class AdminCustomerThreadsControllerCore extends AdminController
         $time = time();
         $kpis = array();
 
-        $statsController = new AdminStatsController();
-        $this->context->controller = $this;
-
         $helper = new HelperKpi();
         $helper->id = 'box-pending-messages';
         $helper->icon = 'icon-envelope';

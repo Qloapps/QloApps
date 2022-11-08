@@ -1409,9 +1409,6 @@ class AdminTranslationsControllerCore extends AdminController
         $time = time();
         $kpis = array();
 
-        $statsController = new AdminStatsController();
-        $this->context->controller = $this;
-
         $helper = new HelperKpi();
         $helper->id = 'box-languages';
         $helper->icon = 'icon-microphone';
