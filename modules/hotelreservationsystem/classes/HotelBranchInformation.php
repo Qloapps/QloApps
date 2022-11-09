@@ -22,18 +22,12 @@ class HotelBranchInformation extends ObjectModel
 {
     public $id_category;
     public $hotel_name;
-    public $phone;
     public $email;
     public $check_in;
     public $check_out;
     public $description;
     public $short_description;
     public $rating;
-    public $city;
-    public $state_id;
-    public $country_id;
-    public $zipcode;
-    public $address;
     public $policies;
     public $active;
     public $latitude;
@@ -50,16 +44,10 @@ class HotelBranchInformation extends ObjectModel
         'multilang' => true,
         'fields' => array(
             'id_category' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
-            'phone' => array('type' => self::TYPE_STRING,'validate' => 'isPhoneNumber', 'size' => 32),
             'email' => array('type' => self::TYPE_STRING,'validate' => 'isEmail', 'size' => 255),
             'rating' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
             'check_in' => array('type' => self::TYPE_STRING),
             'check_out' => array('type' => self::TYPE_STRING),
-            'address' => array('type' => self::TYPE_STRING),
-            'city' => array('type' => self::TYPE_STRING, 'validate' => 'isCityName', 'required' => true, 'size' => 64),
-            'state_id' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
-            'country_id' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
-            'zipcode' => array('type' => self::TYPE_STRING),
             'active' => array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
             'latitude' => array('type' => self::TYPE_FLOAT),
             'longitude' => array('type' => self::TYPE_FLOAT),
@@ -317,29 +305,36 @@ class HotelBranchInformation extends ObjectModel
         if (!$idLang) {
             $idLang = Context::getContext()->language->id;
         }
-        $sql = 'SELECT hbi.*, hbl.`policies`, hbl.`hotel_name`, hbl.`description`, hbl.`short_description`';
-        if ($detailedInfo) {
-            $sql .= ', hi.id as id_cover_img, s.`name` as `state_name`, cl.`name` as country_name';
+        $cache_id = 'hotelBranch::hotelBranchesInfo'.(int)$idLang.'-'.(int)$active.'-'.(int)$detailedInfo.'-'.(int)$idHotel;
+        if (!Cache::isStored($cache_id)) {
+            $sql = 'SELECT hbi.*, hbl.`policies`, hbl.`hotel_name`, hbl.`description`, hbl.`short_description`';
+            if ($detailedInfo) {
+                $sql .= ', hi.id as id_cover_img, a.`city`, s.`name` as `state_name`, cl.`name` as country_name';
+            }
+            $sql .= ' FROM `'._DB_PREFIX_.'htl_branch_info` hbi';
+            $sql .= ' LEFT JOIN `'._DB_PREFIX_.'htl_branch_info_lang` hbl
+            ON (hbl.`id` = hbi.`id` AND hbl.`id_lang` = '.(int)$idLang.')';
+            if ($detailedInfo) {
+                $sql .= ' LEFT JOIN `'._DB_PREFIX_.'htl_image` hi ON (hi.`id_hotel` = hbi.`id` AND hi.`cover` = 1)';
+                $sql .= ' LEFT JOIN `'._DB_PREFIX_.'address` a ON (a.`id_hotel` = hbi.`id`)';
+                $sql .= ' LEFT JOIN `'._DB_PREFIX_.'state` s ON (s.`id_state` = a.`id_state`)';
+                $sql .= ' LEFT JOIN `'._DB_PREFIX_.
+                'country_lang` cl ON (cl.`id_country` = a.`id_country` AND cl.`id_lang` = '.(int)$idLang.')';
+            }
+            $sql .= ' WHERE 1';
+            if ($active == 1 || $active == 0) {
+                $sql .= ' AND hbi.`active` = '.(int)$active;
+            }
+            if ($idHotel) {
+                $sql .= ' AND hbi.`id` = '.(int)$idHotel;
+                $result =  Db::getInstance()->getRow($sql);
+            } else {
+                $result =  Db::getInstance()->executeS($sql);
+            }
+            Cache::store($cache_id, $result);
+            return $result;
         }
-        $sql .= ' FROM `'._DB_PREFIX_.'htl_branch_info` hbi';
-        $sql .= ' LEFT JOIN `'._DB_PREFIX_.'htl_branch_info_lang` hbl
-        ON (hbl.`id` = hbi.`id` AND hbl.`id_lang` = '.(int)$idLang.')';
-        if ($detailedInfo) {
-            $sql .= ' LEFT JOIN `'._DB_PREFIX_.'htl_image` hi ON (hi.`id_hotel` = hbi.`id` AND hi.`cover` = 1)';
-            $sql .= ' LEFT JOIN `'._DB_PREFIX_.'state` s ON (s.`id_state` = hbi.`state_id`)';
-            $sql .= ' LEFT JOIN `'._DB_PREFIX_.
-            'country_lang` cl ON (cl.`id_country` = hbi.`country_id` AND cl.`id_lang` = '.(int)$idLang.')';
-        }
-        $sql .= ' WHERE 1';
-        if ($active == 1 || $active == 0) {
-            $sql .= ' AND hbi.`active` = '.(int)$active;
-        }
-        if ($idHotel) {
-            $sql .= ' AND hbi.`id` = '.(int)$idHotel;
-            return Db::getInstance()->getRow($sql);
-        } else {
-            return Db::getInstance()->executeS($sql);
-        }
+        return Cache::retrieve($cache_id);
     }
 
     /**
@@ -355,6 +350,51 @@ class HotelBranchInformation extends ObjectModel
             ON (hbl.`id` = hbi.`id` AND hbl.`id_lang` = '.(int)$idLang.')  WHERE hbi.`active` = 1';
 
         return Db::getInstance()->executeS($sql);
+    }
+
+    /**
+     * [getHotelIdAddress: get id_address for current hotel]
+     *
+     * @return int
+     */
+    public function getHotelIdAddress()
+    {
+        return Db::getInstance()->getValue(
+            'SELECT `id_address` from `'._DB_PREFIX_.'address` WHERE `id_hotel` = '.(int)$this->id.' AND `deleted` = 0
+        ');
+    }
+
+    /**
+     * [getAddress: get complete address for hotel by id_hotel]
+     *
+     * @param [int] $id_hotel
+     * @param int $id_lang
+     * @return array
+     */
+    public function getAddress($id_hotel, $id_lang = false)
+    {
+        if (!$id_lang)
+            $id_lang = Context::getContext()->language->id;
+
+        if (!$id_hotel) {
+            return false;
+        }
+
+        $cache_id = 'hotelBranch::getAddress'.(int)$id_hotel.'-'.(int)$id_lang;
+        if (!Cache::isStored($cache_id)) {
+            $sql = 'SELECT a.*, cl.`name` AS country, s.`name` AS state, s.`iso_code` AS state_iso
+					FROM `'._DB_PREFIX_.'address` a
+					LEFT JOIN `'._DB_PREFIX_.'country` c ON (a.`id_country` = c.`id_country`)
+					LEFT JOIN `'._DB_PREFIX_.'country_lang` cl ON (c.`id_country` = cl.`id_country`)
+					LEFT JOIN `'._DB_PREFIX_.'state` s
+                    ON (s.`id_state` = a.`id_state` AND`id_lang` = '.(int)$id_lang.')
+					WHERE `id_hotel` = '.(int)$id_hotel.' AND a.`deleted` = 0';
+
+            $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->getRow($sql);
+            Cache::store($cache_id, $result);
+            return $result;
+        }
+        return Cache::retrieve($cache_id);
     }
 
     /**
@@ -616,7 +656,7 @@ class HotelBranchInformation extends ObjectModel
                     'HotelBranchInformation'
                 );
             }
-            $hotelAllImages = $objHotelImage->getAllImagesByHotelId($idHotel);
+            $hotelAllImages = $objHotelImage->getImagesByHotelId($idHotel);
             if ($hotelAllImages) {
                 foreach ($hotelAllImages as $key_img => $value_img) {
                     if (Validate::isLoadedObject($objHotelImage = new HotelImage((int) $value_img['id']))) {
@@ -710,6 +750,28 @@ class HotelBranchInformation extends ObjectModel
     public function isRefundable()
     {
         return (Configuration::get('WK_ORDER_REFUND_ALLOWED') && $this->active_refund);
+    }
+
+    public static function addHotelRestriction($idsHotel, $alias = null, $identifier = 'id_hotel', $idProfile = null)
+    {
+        if (!$idProfile) {
+            $idProfile = Context::getContext()->employee->id_profile;
+        }
+
+        if (!$idsHotel) {
+            $idsHotel = self::getProfileAccessedHotels($idProfile, 1, 1);
+        } else {
+            $idsHotel = array($idsHotel);
+        }
+
+        if ($alias) {
+            $alias .= '.';
+        }
+
+        $identifier = "`$identifier`";
+        $restriction = ' AND '.$alias.$identifier.' IN ('.implode(', ', $idsHotel).') ';
+
+        return $restriction;
     }
 
     // Webservice getter : get virtual field id_default_image

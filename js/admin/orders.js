@@ -366,6 +366,7 @@ function init()
 				id_currency: id_currency,
 				id_address: id_address,
 				id_customer: id_customer,
+				id_order: id_order,
 				product_search: function() { return $('#add_product_product_name').val(); }
 			}
 		}
@@ -539,7 +540,7 @@ function init()
 					error : function(XMLHttpRequest, textStatus, errorThrown) {
 						jAlert("Impossible to add the room to the cart.\n\ntextStatus: '" + textStatus + "'\nerrorThrown: '" + errorThrown + "'\nresponseText:\n" + XMLHttpRequest.responseText);
 					},
-					complete: function() { 
+					complete: function() {
 						$('#submitAddProduct').removeAttr('disabled');
 					}
 				});

@@ -383,17 +383,17 @@ $(document).ready(function () {
 </div>
 
 <div class="panel">
-	<h3>{l s='Feature Price Plans'}</h3>
+	<h3>{l s='Advanced Price Rules'}</h3>
 	<div class="alert alert-info">
-		{l s='You can set feature price plans by visiting '}
-		<a target="_blank" href="{$link->getAdminLink('AdminHotelFeaturePricesSettings')}">{l s='create feature price plans'}</a>
+		{l s='You can set advanced price rules by visiting '}
+		<a target="_blank" href="{$link->getAdminLink('AdminHotelFeaturePricesSettings')}">{l s='create advanced price rules.'}</a>
 	</div>
 	<div class="table-responsive">
 		<table class="table table-bordered">
 			<thead>
 				<tr>
 					<th>#{l s='Id'}</th>
-					<th>{l s='Plan Name'}</th>
+					<th>{l s='Rule Name'}</th>
 					<th>{l s='Impact way'}</th>
 					<th>{l s='Impact Type'}</th>
 					<th>{l s='Impact Value'}</th>
@@ -455,7 +455,7 @@ $(document).ready(function () {
 				{else}
 					<tr>
 						<td class="text-center" colspan="6">
-							<i class="icon-warning-sign"></i> {l s='No feature price plans.'}
+							<i class="icon-warning-sign"></i> {l s='No advanced price rules.'}
 						</td>
 					</tr>
 				{/if}
@@ -577,15 +577,6 @@ $(document).ready(function () {
 								<span class="input-group-addon"><i class="icon-calendar-empty"></i></span>
 							</div>
 						</div>
-					</div>
-				</div>
-			</div>
-			<div class="form-group">
-				<label class="control-label col-lg-2" for="sp_from_quantity">{l s='Starting at'}</label>
-				<div class="col-lg-4">
-					<div class="input-group">
-						<span class="input-group-addon">{l s='unit'}</span>
-						<input type="text" name="sp_from_quantity" id="sp_from_quantity" value="1" />
 					</div>
 				</div>
 			</div>
@@ -732,7 +723,6 @@ $(document).ready(function () {
 				{/if}
 				<th>{l s='Impact'}</th>
 				<th>{l s='Period'}</th>
-				<th>{l s='From (quantity)'}</th>
 				<th>{l s='Action'}</th>
 			</tr>
 		</thead>

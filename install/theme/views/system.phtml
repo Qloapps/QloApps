@@ -1,11 +1,11 @@
 <?php $this->displayTemplate('header') ?>
 
-<h2><?php echo $this->l('We are currently checking Qloapps compatibility with your system environment') ?></h2>
+<h2><?php echo $this->l('We are currently checking QloApps compatibility with your system environment') ?></h2>
 
 <p><?php echo $this->l('If you have any questions, please visit our <a href="%1$s" target="_blank">documentation</a> and <a href="%2$s" target="_blank">community forum</a>.', $this->getDocumentationLink(), $this->getForumLink()); ?></p>
 
 <?php if ($this->tests['required']['success']): ?>
-	<h3 class="okBlock"><?php echo $this->l('Qloapps compatibility with your system environment has been verified!') ?></h3>
+	<h3 class="okBlock"><?php echo $this->l('QloApps compatibility with your system environment has been verified!') ?></h3>
 <?php else: ?>
 	<h3 class="errorBlock"><?php echo $this->l('Oops! Please correct the item(s) below, and then click "Refresh information" to test the compatibility of your new system.') ?></h3>
 <?php endif; ?>

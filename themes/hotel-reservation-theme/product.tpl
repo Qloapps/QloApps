@@ -46,7 +46,7 @@
 			{/if} --><!-- by webkul -->
 			{if isset($adminActionDisplay) && $adminActionDisplay}
 				<div id="admin-action" class="container">
-					<p class="alert alert-info">{l s='This product is not visible to your customers.'}
+					<p class="alert alert-info">{l s='This room type is not visible to your customers.'}
 						<input type="hidden" id="admin-action-product-id" value="{$product->id}" />
 						<a id="publish_button" class="btn btn-default button button-small" href="#">
 							<span>{l s='Publish'}</span>
@@ -203,6 +203,15 @@
 											</div>
 										</div>
 									{/if}
+									<div class="info_margin_div">
+										<div class="room_info_heading">
+											<span>{l s='Check-in and check-out time'}</span>
+										</div>
+										<div class="room_info_content">
+											<p>{l s='Check-in: '}{$hotel_check_in|escape:'html':'UTF-8'}</p>
+											<p>{l s='Check-out: '}{$hotel_check_out|escape:'html':'UTF-8'}</p>
+										</div>
+									</div>
 									{if isset($features) && $features}
 										<div class="info_margin_div">
 											<div class="room_info_heading">
@@ -228,6 +237,34 @@
 												{foreach from=$hotel_features key=ftr_k item=ftr_v}
 													<div class="col-sm-4 col-xs-12"><i class="circle-small">o</i> {$ftr_v|escape:'html':'UTF-8'}</div>
 												{/foreach}
+											</div>
+										</div>
+									{/if}
+									{if isset($hotel_has_images) && $hotel_has_images}
+										<div class="room_info_hotel_images_wrap">
+											<div class="info_margin_div">
+												<div class="room_info_heading">
+													<span>{l s='Hotel Images'}</span>
+												</div>
+												<div class="room_info_content" id="room_info_hotel_images">
+													<div class="row images-wrap"></div>
+													<div class="row skeleton-loading-wrap">
+														<div class="skeleton-loading-wave clearfix">
+															<div class="col-sm-4">
+																<div class="loading-container-box"></div>
+															</div>
+															<div class="col-sm-4">
+																<div class="loading-container-box"></div>
+															</div>
+															<div class="col-sm-4">
+																<div class="loading-container-box"></div>
+															</div>
+														</div>
+													</div>
+												</div>
+												<a class="btn btn-primary btn-show-more-images hide" data-id-product="{$product->id}" data-next-page="1">
+													<span>{l s='SHOW MORE'}</span>
+												</a>
 											</div>
 										</div>
 									{/if}

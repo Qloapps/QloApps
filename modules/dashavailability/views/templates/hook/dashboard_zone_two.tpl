@@ -17,13 +17,13 @@
 * @license LICENSE.txt
 *}
 
-<div class="col-md-7 col-lg-7">
+<div class="col-md-12 col-lg-12">
 	<section id="dashavailability" class="panel widget allow_push">
 		<header class="panel-heading">
-			<i class="icon-bar-chart"></i> 
+			<i class="icon-bar-chart"></i>
 			{l s="Availability" mod="dashavailability"}
 			<span class="panel-heading-action">
-			<a class="list-toolbar-btn" href="javascript:void(0);" title="Refresh" onclick="fetchAvailablityBarData(5)" title="{l s="Refresh" mod="dashavailability"}">
+			<a class="list-toolbar-btn" href="javascript:void(0);" title="Refresh" onclick="refreshAvailabilityBarData();" title="{l s="Refresh" mod="dashavailability"}">
 					<i class="process-icon-refresh"></i>
 				</a>
 			</span>
@@ -44,18 +44,18 @@
 					</div>
 				</div>
 				<div class="col-xs-2 col-md-2  col-lg-2 pull-left">
-					<button id='avail_bar_day_5' class="avail-bar-btn bar-btn-active" onclick="fetchAvailablityBarData(5)">
-						{l s="5Days" mod="dashavailability"}
+					<button id='avail_bar_day_5' class="avail-bar-btn bar-btn-active" data-days="5">
+						{l s="5 Days" mod="dashavailability"}
 					</button>
 				</div>
 				<div class="col-xs-2 col-md-2  col-lg-2 pull-left">
-					<button id='avail_bar_day_15' class="avail-bar-btn bar-btn-active" onclick="fetchAvailablityBarData(15)">
-						{l s="15Days" mod="dashavailability"}
+					<button id='avail_bar_day_15' class="avail-bar-btn" data-days="15)">
+						{l s="15 Days" mod="dashavailability"}
 					</button>
 				</div>
 				<div class="col-xs-2 col-md-2  col-lg-2 pull-left">
-					<button id='avail_bar_day_30' class="avail-bar-btn" onclick="fetchAvailablityBarData(30)">
-						{l s="30Days" mod="dashavailability"}
+					<button id='avail_bar_day_30' class="avail-bar-btn" data-days="30)">
+						{l s="30 Days" mod="dashavailability"}
 					</button>
 				</div>
 		</div>

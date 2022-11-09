@@ -37,7 +37,7 @@
 		{if isset($meta_keywords) AND $meta_keywords}
 			<meta name="keywords" content="{$meta_keywords|escape:'html':'UTF-8'}" />
 		{/if}
-		<meta name="generator" content="PrestaShop" />
+		<meta name="generator" content="QloApps" />
 		<meta name="robots" content="{if isset($nobots)}no{/if}index,{if isset($nofollow) && $nofollow}no{/if}follow" />
 		<meta name="viewport" content="width=device-width, minimum-scale=0.25, maximum-scale=1.6, initial-scale=1.0" />
 		<meta name="apple-mobile-web-app-capable" content="yes" />
@@ -99,15 +99,19 @@
 							</div>
 						</div>
 					</div>
-					<div>
+					<div class="header-top">
 						<div class="container">
 							<div class="row">
-								<div id="header_logo" class="col-xs-4">
-									<a href="{if isset($force_ssl) && $force_ssl}{$base_dir_ssl}{else}{$base_dir}{/if}" title="{$shop_name|escape:'html':'UTF-8'}">
-										<img class="logo img-responsive" src="{$logo_url}" alt="{$shop_name|escape:'html':'UTF-8'}"{if isset($logo_image_width) && $logo_image_width} width="{$logo_image_width}"{/if}{if isset($logo_image_height) && $logo_image_height} height="{$logo_image_height}"{/if}/>
-									</a>
+								<div class="col-xs-12">
+									<div id="header_logo">
+										<a href="{if isset($force_ssl) && $force_ssl}{$base_dir_ssl}{else}{$base_dir}{/if}" title="{$shop_name|escape:'html':'UTF-8'}">
+											<img class="logo img-responsive" src="{$logo_url}" alt="{$shop_name|escape:'html':'UTF-8'}"{if isset($logo_image_width) && $logo_image_width} width="{$logo_image_width}"{/if}{if isset($logo_image_height) && $logo_image_height} height="{$logo_image_height}"{/if}/>
+										</a>
+									</div>
+									<div class="header-top-menu">
+										{if isset($HOOK_TOP)}{$HOOK_TOP}{/if}
+									</div>
 								</div>
-								{if isset($HOOK_TOP)}{$HOOK_TOP}{/if}
 							</div>
 							{hook h='displaySearchHotelPanel'}
 						</div>

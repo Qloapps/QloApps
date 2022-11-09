@@ -207,10 +207,11 @@ class AdminProductsControllerCore extends AdminController
 				LEFT JOIN `'._DB_PREFIX_.'shop` shop ON (shop.id_shop = '.$id_shop.')
 				LEFT JOIN `'._DB_PREFIX_.'image_shop` image_shop ON (image_shop.`id_product` = a.`id_product` AND image_shop.`cover` = 1 AND image_shop.id_shop = '.$id_shop.')
 				LEFT JOIN `'._DB_PREFIX_.'image` i ON (i.`id_image` = image_shop.`id_image`)
-				LEFT JOIN `'._DB_PREFIX_.'product_download` pd ON (pd.`id_product` = a.`id_product` AND pd.`active` = 1)';
+                LEFT JOIN `'._DB_PREFIX_.'product_download` pd ON (pd.`id_product` = a.`id_product` AND pd.`active` = 1)
+				LEFT JOIN `'._DB_PREFIX_.'address` aa ON (aa.`id_hotel` = hb.`id`)';
 
         $this->_select .= ' (SELECT COUNT(hri.`id`) FROM `'._DB_PREFIX_.'htl_room_information` hri WHERE hri.`id_product` = a.`id_product`) as num_rooms, ';
-        $this->_select .= 'hrt.`adult`, hrt.`children`, hb.`id` as id_hotel, hb.`city`, hbl.`hotel_name`, ';
+        $this->_select .= 'hrt.`adult`, hrt.`children`, hb.`id` as id_hotel, aa.`city`, hbl.`hotel_name`, ';
         $this->_select .= 'shop.`name` AS `shopname`, a.`id_shop_default`, ';
         $this->_select .= $alias_image.'.`id_image` AS `id_image`, cl.`name` AS `name_category`, '.$alias.'.`price`, 0 AS `price_final`, a.`is_virtual`, pd.`nb_downloadable`, sav.`quantity` AS `sav_quantity`, '.$alias.'.`active`, IF(sav.`quantity`<=0, 1, 0) AS `badge_danger`';
 
@@ -1271,7 +1272,7 @@ class AdminProductsControllerCore extends AdminController
         $id_group = Tools::getValue('sp_id_group');
         $id_customer = Tools::getValue('sp_id_customer');
         $price = Tools::getValue('leave_bprice') ? '-1' : Tools::getValue('sp_price');
-        $from_quantity = Tools::getValue('sp_from_quantity');
+        $from_quantity = 1;
         $reduction = (float)(Tools::getValue('sp_reduction'));
         $reduction_tax = Tools::getValue('sp_reduction_tax');
         $reduction_type = !$reduction ? 'amount' : Tools::getValue('sp_reduction_type');
@@ -1589,7 +1590,9 @@ class AdminProductsControllerCore extends AdminController
             _PS_JS_DIR_.'admin/products.js',
         ));
 
-        if ($this->display == 'edit' || $this->display == 'add') {
+        if (in_array($this->display, array('add', 'edit'))
+            && $this->tabAccess[$this->display] == '1'
+        ) {
             $this->addJqueryUI(array(
                 'ui.core',
                 'ui.widget'
@@ -3899,6 +3902,9 @@ class AdminProductsControllerCore extends AdminController
                 'link' => new Link(),
                 'pack' => new Pack()
             ));
+
+            // get hotel address for this room type
+            $address_infos = Address::getCountryAndState(Cart::getIdAddressForTaxCalculation($obj->id));
         } else {
             $this->displayWarning($this->l('You must save this room type before adding specific pricing'));
             $product->id_tax_rules_group = (int)Product::getIdTaxRulesGroupMostUsed();
@@ -3906,7 +3912,14 @@ class AdminProductsControllerCore extends AdminController
         }
 
         $address = new Address();
-        $address->id_country = (int)$this->context->country->id;
+        // $address->id_country = (int)$this->context->country->id;
+        if (!$address_infos) {
+            $address->id_country = (int)$this->context->country->id;
+        } else {
+            $address->id_country = (int)$address_infos['id_country'];
+            $address->id_state = (int)$address_infos['id_state'];
+            $address->zipcode = $address_infos['postcode'];
+        }
         $tax_rules_groups = TaxRulesGroup::getTaxRulesGroups(true);
         $tax_rates = array(
             0 => array(
@@ -4281,7 +4294,6 @@ class AdminProductsControllerCore extends AdminController
 						<td>'.$fixed_price.'</td>
 						<td>'.$impact.'</td>
 						<td>'.$period.'</td>
-						<td>'.$specific_price['from_quantity'].'</th>
 						<td>'.((!$rule->id && $can_delete_specific_prices) ? '<a class="btn btn-default" name="delete_link" href="'.self::$currentIndex.'&id_product='.(int)Tools::getValue('id_product').'&action=deleteSpecificPrice&id_specific_price='.(int)($specific_price['id_specific_price']).'&token='.Tools::getValue('token').'"><i class="icon-trash"></i></a>': '').'</td>
 					</tr>';
                     $i++;
@@ -5470,7 +5482,7 @@ class AdminProductsControllerCore extends AdminController
         }
         $this->tpl_form_vars['custom_form'] = $data->fetch();
     }
-    
+
     public function getModalDuplicateOptions()
     {
         $tpl = $this->createTemplate('modal-duplicate-options.tpl');
@@ -5479,11 +5491,12 @@ class AdminProductsControllerCore extends AdminController
         foreach ($idsHotel as $idHotel) {
             $objHotelBranchInfo = new HotelBranchInformation($idHotel, $this->context->language->id);
             if (Validate::isLoadedObject($objHotelBranchInfo)) {
+                $hotelAddressInfo = $objHotelBranchInfo->getAddress($idHotel);
                 $hotelInfo = array(
                     'id_hotel' => $objHotelBranchInfo->id,
                     'hotel_name' => $objHotelBranchInfo->hotel_name,
                     'rating' => $objHotelBranchInfo->rating,
-                    'city' => $objHotelBranchInfo->city,
+                    'city' => $hotelAddressInfo['city'],
                 );
                 $hotelsInfo[] = $hotelInfo;
             }

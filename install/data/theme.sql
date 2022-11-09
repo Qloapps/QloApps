@@ -2,6 +2,7 @@ SET NAMES 'utf8';
 
 UPDATE `PREFIX_configuration` SET value = '1' WHERE name = 'PS_CONDITIONS';
 UPDATE `PREFIX_configuration` SET value = '12' WHERE name = 'PS_PRODUCTS_PER_PAGE';
+UPDATE `PREFIX_configuration` SET value = '9' WHERE name = 'PS_HOTEL_IMAGES_PER_PAGE';
 UPDATE `PREFIX_configuration` SET value = '0' WHERE name = 'PS_PRODUCTS_ORDER_WAY';
 UPDATE `PREFIX_configuration` SET value = '4' WHERE name = 'PS_PRODUCTS_ORDER_BY';
 UPDATE `PREFIX_configuration` SET value = '1' WHERE name = 'PS_DISPLAY_QTIES';
@@ -28,7 +29,7 @@ UPDATE `PREFIX_configuration` SET value = '0' WHERE name = 'PS_BLOCK_SPECIALS_DI
 UPDATE `PREFIX_configuration` SET value = '1' WHERE name = 'PS_STORES_DISPLAY_CMS';
 UPDATE `PREFIX_configuration` SET value = '1' WHERE name = 'PS_STORES_DISPLAY_FOOTER';
 UPDATE `PREFIX_configuration` SET value = '243' WHERE name = 'SHOP_LOGO_WIDTH';
-UPDATE `PREFIX_configuration` SET value = '61' WHERE name = 'SHOP_LOGO_HEIGHT';
+UPDATE `PREFIX_configuration` SET value = '120' WHERE name = 'SHOP_LOGO_HEIGHT';
 UPDATE `PREFIX_configuration` SET value = '1' WHERE name = 'PS_DISPLAY_SUPPLIERS';
 UPDATE `PREFIX_configuration` SET value = '1' WHERE name = 'PS_DISPLAY_BEST_SELLERS';
 UPDATE `PREFIX_configuration` SET value = '0' WHERE name = 'PS_LEGACY_IMAGES';
