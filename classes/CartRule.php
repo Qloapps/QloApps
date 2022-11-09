@@ -877,7 +877,7 @@ class CartRuleCore extends ObjectModel
      * @param bool $use_cache Allow using cache to avoid multiple free gift using multishipping
      * @return float|int|string
      */
-    public function getContextualValue($use_tax, Context $context = null, $filter = null, $package = null, $use_cache = true)
+    public function getContextualValue($use_tax, Context $context = null, $filter = null, $package = null, $use_cache = true, $forAdvancePayment = false)
     {
         if (!CartRule::isFeatureActive()) {
             return 0;
@@ -890,14 +890,29 @@ class CartRuleCore extends ObjectModel
         }
 
         $all_products = $context->cart->getProducts();
-        $package_products = (is_null($package) ? $all_products : $package['products']);
+        if (is_null($package)) {
+            $package = array(
+                'products' => $all_products,
+                'id_carrier' => null,
+                'id_address' => 0
+            );
+        }
 
         $reduction_value = 0;
-
-        $cache_id = 'getContextualValue_'.(int)$this->id.'_'.(int)$use_tax.'_'.(int)$context->cart->id.'_'.(int)$filter;
-        foreach ($package_products as $product) {
+        $objHotelAdvancePayment = new HotelAdvancedPayment();
+        $cache_id = 'getContextualValue_'.(int)$this->id.'_'.(int)$use_tax.'_'.(int)$context->cart->id.'_'.(int)$filter.'_'.(int)$forAdvancePayment;
+        foreach ($package['products'] as $key => $product) {
+            if ($forAdvancePayment) {
+                $paymentInfo = $objHotelAdvancePayment->getIdAdvPaymentByIdProduct($product['id_product']);
+                if (!$paymentInfo['active']) {
+                    unset($package['products'][$key]);
+                    continue;
+                }
+            }
             $cache_id .= '_'.(int)$product['id_product'].'_'.(int)$product['id_product_attribute'].(isset($product['in_stock']) ? '_'.(int)$product['in_stock'] : '');
         }
+
+        $package_products = $package['products'];
 
         if (Cache::isStored($cache_id)) {
             return Cache::retrieve($cache_id);
