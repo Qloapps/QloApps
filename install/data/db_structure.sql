@@ -2687,3 +2687,11 @@ CREATE TABLE IF NOT EXISTS `PREFIX_cms_role_lang` (
   PRIMARY KEY (`id_cms_role`,`id_lang`, id_shop)
 ) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8;
 
+
+CREATE TABLE IF NOT EXISTS `PREFIX_login_fail` (
+  `id_login_fail` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `ip_address` varchar(50) NOT NULL,
+  `email` varchar(128) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id_login_fail`)
+) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8;

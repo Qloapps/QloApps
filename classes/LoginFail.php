@@ -22,7 +22,7 @@
 class LoginFailCore extends ObjectModel
 {
 
-    public $id_failed_login;
+    public $id_login_fail;
     public $ip_address;
     public $email;
     public $created_at;
@@ -77,10 +77,10 @@ class LoginFailCore extends ObjectModel
         $hours_ago = time() - self::HOUR;
         $ip_address = Tools::getRemoteAddr();
 
-        $has_error = $this->getUserFailedCount($minutes_ago, $email, false, self::USERNAME_ATTEMPTS_PER_QUARTER_HOUR)? true : $has_error;
-        $has_error = $this->getUserFailedCount($minutes_ago, false, $ip_address, self::IP_ATTEMPTS_QUARTER_HOUR)? true : $has_error;
-        $has_error = $this->getUserFailedCount($hours_ago, $email, false, self::USERNAME_ATTEMPTS_PER_HOUR)? true : $has_error;
-        $has_error = $this->getUserFailedCount($hours_ago, false, $ip_address, self::IP_ATTEMPTS_PER_HOUR)? true : $has_error;
+        $has_error |= $this->getUserFailedCount($minutes_ago, $email, false, self::USERNAME_ATTEMPTS_PER_QUARTER_HOUR)? true : $has_error;
+        $has_error |= $this->getUserFailedCount($minutes_ago, false, $ip_address, self::IP_ATTEMPTS_QUARTER_HOUR)? true : $has_error;
+        $has_error |= $this->getUserFailedCount($hours_ago, $email, false, self::USERNAME_ATTEMPTS_PER_HOUR)? true : $has_error;
+        $has_error |= $this->getUserFailedCount($hours_ago, false, $ip_address, self::IP_ATTEMPTS_PER_HOUR)? true : $has_error;
 
         return $has_error;
     }

@@ -1,6 +1,10 @@
 /*********************************************************************
 					Maintenance Page Styles
 **********************************************************************/
+body {
+  font: 14px;
+  font-family: "Open Sans";
+}
 #body {
   background-color: #F7F7F7; }
 
@@ -84,11 +88,21 @@ button[type='button'].cancel-login {
 }
 
 .alert {
-  padding: 5px;
-  margin-bottom: 10px;
+  position: relative;
+  padding: 0.8rem 1.5rem;
+  margin-bottom: 1rem;
   border: 1px solid transparent;
-  border-radius: 0px;
-  font-weight: bold;
+  border-radius: 0.25rem;
+}
+
+.alert ol {
+  margin: 5px;
+}
+
+.alert li {
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
 }
 
 .alert.alert-danger p {
@@ -100,9 +114,9 @@ button[type='button'].cancel-login {
 }
 
 .alert-danger {
-  background-color: #FD6E6A;
-  border-color: #FD6E6A;
-  color: #fff;
+  color: #842029;
+  background-color: #f8d7da;
+  border-color: #f5c2c7;
 }
 
 .alert.alert-danger {
@@ -115,19 +129,18 @@ button[type='button'].cancel-login {
   color: #FFF;
 }
 
-  #maintenance .logo {
-    padding: 12px;
-    text-align: center; }
-  #maintenance h1 {
-    font: 24px "Open Sans", sans-serif;
-    color: #333;
-    padding: 0 0 14px 0;
-    margin: 0 0 19px 0; }
-  #maintenance #message {
-    font: 14px "Open Sans", sans-serif;
-    padding: 0 0 0 18px;
-    color: #555454;
-    text-align: center; }
+#maintenance .logo {
+  padding: 12px;
+  text-align: center; }
+#maintenance h2 {
+  font: 24px;
+  color: #333;
+  padding: 0 0 14px 0;
+  margin: 0 0 19px 0; }
+#maintenance #message {
+  padding: 0 0 0 18px;
+  color: #555454;
+  text-align: center; }
 
 .container {
   padding-right: 15px;

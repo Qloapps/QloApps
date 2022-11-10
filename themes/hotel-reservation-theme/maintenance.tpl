@@ -25,6 +25,7 @@
 
 <!DOCTYPE html>
 <html lang="{$language_code|escape:'html':'UTF-8'}">
+
 <head>
 	<meta charset="utf-8">
 	<title>{$meta_title|escape:'html':'UTF-8'}</title>
@@ -41,13 +42,24 @@
 	<script src="{$base_dir}js/maintenance.js"></script>
 	<link href='//fonts.googleapis.com/css?family=Open+Sans:600' rel='stylesheet'>
 </head>
+
 <body>
 	<div id="maintenance">
 		<div class="logo">
-			<img src="{$logo_url}" {if $logo_image_width}width="{$logo_image_width}" {/if} {if $logo_image_height}height="{$logo_image_height}" {/if} alt="logo" />
+			<img src="{$logo_url}" {if $logo_image_width}width="{$logo_image_width}" {/if}
+				{if $logo_image_height}height="{$logo_image_height}" {/if} alt="logo" />
 		</div>
 		<div class="margin-l-r">
-			{include file="$tpl_dir./errors.tpl"}
+			{if isset($errors) && $errors}
+				<div class="alert alert-danger">
+					<strong>{l s='Error!'}</strong>
+					<ol>
+						{foreach from=$errors key=k item=error}
+							<li>{$error}</li>
+						{/foreach}
+					</ol>
+				</div>
+			{/if}
 		</div>
 		<div class="containter">
 			<div class="left">
@@ -60,32 +72,33 @@
 				<p>{l s='We are currently updating our site and will be back really soon.'}</p>
 				<p>{l s='Thanks for your patience!'}</p>
 				{if isset($allowEmployee) && $allowEmployee}
-				<div>
-					<p class="clicker blue" tabindex="1">Are you member?</p>
-					<div class="hiddendiv">
+					<div>
+						<p class="clicker blue" tabindex="1">{l s='Are you member?'}</p>
+						<div class="hiddendiv">
 							<div class="allow-conatainer">
 								<form action="index.php" method="post">
 									<div class="form_content clearfix">
 										<div class="form-group form-ok">
-											<label class="" for="email">Email address</label>
+											<label class="" for="email">{l s='Email address'}</label>
 											<br>
 											<input class="form-control" placeholder="Email" type="email" id="email"
 												name="email" value="">
 										</div>
 										<div class="form-group form-ok">
-											<label class="" for="passwd">Password</label>
+											<label class="" for="passwd">{l s='Password'}</label>
 											<br>
 											<input class="form-control" type="password" placeholder="Password" id="passwd"
 												name="passwd" value="">
 										</div>
 										<button type="submit" id="SubmitLogin" name="SubmitLogin" class="btn btn-primary">
 											<span>
-												Log in
+												{l s='Log in'}
 											</span>
 										</button>
-										<button type="button" id="cancelLogin" name="cancelLogin" class="btn btn-primary cancel-login">
+										<button type="button" id="cancelLogin" name="cancelLogin"
+											class="btn btn-primary cancel-login">
 											<span>
-												Cancel
+												{l s='Cancel'}
 											</span>
 										</button>
 									</div>
@@ -98,4 +111,5 @@
 		</div>
 	</div>
 </body>
+
 </html>
