@@ -1528,14 +1528,14 @@ function parseDate(date){
 	return $.datepicker.parseDate("yy-mm-dd", date);
 }
 
-function refresh_kpis(callFunction)
+function refresh_kpis()
 {
 	$('.box-stats').each(function() {
 		if ($(this).attr('id')) {
 			var functionName = 'refresh_' + $(this).attr('id').replace(/-/g, '_');
 
 			if (typeof window[functionName] === 'function') {
-				window[functionName](callFunction);
+				window[functionName]();
 			}
 		}
 	});
