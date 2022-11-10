@@ -2697,8 +2697,6 @@ class AdminProductsControllerCore extends AdminController
             // used to build the new url when changing category
             $this->tpl_list_vars['base_url'] = preg_replace('#&id_category=[0-9]*#', '', self::$currentIndex).'&token='.$this->token;
         }
-        // @todo module free
-        $this->tpl_form_vars['vat_number'] = file_exists(_PS_MODULE_DIR_.'vatnumber/ajax.php');
 
         parent::initContent();
     }

@@ -29,7 +29,6 @@ class AdminModulesControllerCore extends AdminController
     private $_modules_ad = array(
         'blockcart' => array('cartabandonmentpro'),
         /* 'bloctopmenu' => array('advancedtopmenu'), */
-        'blocklayered' => array('pm_advancedsearch4')
     );
     /*
     ** @var array map with $_GET keywords and their callback

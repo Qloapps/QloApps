@@ -158,7 +158,7 @@ class ProductControllerCore extends FrontController
                     $id_category = (int)$this->product->id_category_default;
                 }
                 $this->category = new Category((int)$id_category, (int)$this->context->cookie->id_lang);
-                if (isset($this->context->cookie) && isset($this->category->id_category) && !(Module::isInstalled('blockcategories') && Module::isEnabled('blockcategories'))) {
+                if (isset($this->context->cookie) && isset($this->category->id_category)) {
                     $this->context->cookie->last_visited_category = (int)$this->category->id_category;
                 }
             }
