@@ -36,10 +36,9 @@ var default_iso = '<?php echo $this->session->shop_country ?>';
 	</div>
 	*/ ?>
 
-	<?php if (_PS_MODE_DEV_): ?>
 	<!-- Install type (with fixtures or not) -->
 	<div class="field clearfix">
-		<label class="aligned"><?php echo $this->l('Install demo products') ?></label>
+		<label class="aligned"><?php echo $this->l('Install demo data') ?></label>
 		<div class="contentinput">
 			<label>
 				<input value="full" type="radio" name="db_mode" style="vertical-align: middle;" <?php if ($this->install_type == 'full'): ?>checked="checked"<?php endif; ?> autocomplete="off" />
@@ -50,11 +49,8 @@ var default_iso = '<?php echo $this->session->shop_country ?>';
 				<?php echo $this->l('No'); ?>
 			</label>
 		</div>
-		<p class="userInfos aligned"><?php echo $this->l('Demo data are a good way to learn how to use QloApps. You should install them if you are not familiar with it.') ?></p>
+		<p class="userInfos aligned"><?php echo $this->l('Installing demo data is a good way to learn how to use QloApps if you have not used it before. This demo data can later be erased using module QloApps Data Cleaner which comes pre-installed with this installation.') ?></p>
 	</div>
-	<?php else: ?>
-		<input value="full" name="db_mode" type="hidden" />
-	<?php endif; ?>
 
 	<!-- Country list -->
 	<div class="field clearfix">
@@ -84,6 +80,21 @@ var default_iso = '<?php echo $this->session->shop_country ?>';
 			<sup class="required">*</sup>
 		</div>
 		<?php echo $this->displayError('shop_timezone') ?>
+	</div>
+
+	<!-- Enable SSL -->
+	<div class="field clearfix">
+		<label class="aligned"><?php echo $this->l('Enable SSL') ?></label>
+		<div class="contentinput">
+			<label>
+				<input value="1" type="radio" name="enable_ssl" style="vertical-align: middle;" <?php if ($this->session->enable_ssl == '1'): ?>checked="checked"<?php endif; ?> autocomplete="off" />
+				<?php echo $this->l('Yes') ?>
+			</label>
+			<label>
+				<input value="0" type="radio" name="enable_ssl" style="vertical-align: middle;" <?php if ($this->session->enable_ssl == '0'): ?>checked="checked"<?php endif; ?> autocomplete="off" />
+				<?php echo $this->l('No'); ?>
+			</label>
+		</div>
 	</div>
 
 	<!-- Shop logo

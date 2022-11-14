@@ -321,7 +321,7 @@ class AdminOrdersControllerCore extends AdminController
 
         $this->addJqueryUI('ui.datepicker');
         $this->addJS(_PS_JS_DIR_.'vendor/d3.v3.min.js');
-        
+
         if ($this->tabAccess['edit'] == 1 && $this->display == 'view') {
             $this->addJS(_PS_JS_DIR_.'admin/orders.js');
             $this->addJS(_PS_JS_DIR_.'tools.js');
@@ -872,7 +872,7 @@ class AdminOrdersControllerCore extends AdminController
                         unset($_COOKIE['wk_id_guest']);
                     */
                     if ($payment_module->currentOrder) {
-                        Tools::redirectAdmin(self::$currentIndex.'&id_order='.$payment_module->currentOrder.'&vieworder'.'&token='.$this->token);
+                        Tools::redirectAdmin(self::$currentIndex.'&id_order='.$payment_module->currentOrder.'&vieworder'.'&token='.$this->token.'&conf=3');
                     }
                 }
             } else {
@@ -1244,8 +1244,6 @@ class AdminOrdersControllerCore extends AdminController
         $time = time();
         $kpis = array();
 
-        /* The data generation is located in AdminStatsControllerCore */
-
         $helper = new HelperKpi();
         $helper->id = 'box-conversion-rate';
         $helper->icon = 'icon-sort-by-attributes-alt';
@@ -1253,14 +1251,10 @@ class AdminOrdersControllerCore extends AdminController
         $helper->color = 'color1';
         $helper->title = $this->l('Conversion Rate', null, null, false);
         $helper->subtitle = $this->l('30 days', null, null, false);
-        if (ConfigurationKPI::get('CONVERSION_RATE') !== false) {
-            $helper->value = ConfigurationKPI::get('CONVERSION_RATE');
-        }
         if (ConfigurationKPI::get('CONVERSION_RATE_CHART') !== false) {
             $helper->data = ConfigurationKPI::get('CONVERSION_RATE_CHART');
         }
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=conversion_rate';
-        $helper->refresh = (bool)(ConfigurationKPI::get('CONVERSION_RATE_EXPIRE') < $time);
         $kpis[] = $helper->generate();
 
         $helper = new HelperKpi();
@@ -1270,11 +1264,7 @@ class AdminOrdersControllerCore extends AdminController
         $helper->title = $this->l('Abandoned Carts', null, null, false);
         $helper->subtitle = $this->l('Today', null, null, false);
         $helper->href = $this->context->link->getAdminLink('AdminCarts').'&action=filterOnlyAbandonedCarts';
-        if (ConfigurationKPI::get('ABANDONED_CARTS') !== false) {
-            $helper->value = ConfigurationKPI::get('ABANDONED_CARTS');
-        }
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=abandoned_cart';
-        $helper->refresh = (bool)(ConfigurationKPI::get('ABANDONED_CARTS_EXPIRE') < $time);
         $kpis[] = $helper->generate();
 
         $helper = new HelperKpi();
@@ -1283,11 +1273,7 @@ class AdminOrdersControllerCore extends AdminController
         $helper->color = 'color3';
         $helper->title = $this->l('Average Order Value', null, null, false);
         $helper->subtitle = $this->l('30 days', null, null, false);
-        if (ConfigurationKPI::get('AVG_ORDER_VALUE') !== false) {
-            $helper->value = sprintf($this->l('%s tax excl.'), ConfigurationKPI::get('AVG_ORDER_VALUE'));
-        }
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=average_order_value';
-        $helper->refresh = (bool)(ConfigurationKPI::get('AVG_ORDER_VALUE_EXPIRE') < $time);
         $kpis[] = $helper->generate();
 
         $helper = new HelperKpi();
@@ -1296,11 +1282,7 @@ class AdminOrdersControllerCore extends AdminController
         $helper->color = 'color4';
         $helper->title = $this->l('Net Profit per Visit', null, null, false);
         $helper->subtitle = $this->l('30 days', null, null, false);
-        if (ConfigurationKPI::get('NETPROFIT_VISIT') !== false) {
-            $helper->value = ConfigurationKPI::get('NETPROFIT_VISIT');
-        }
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=netprofit_visit';
-        $helper->refresh = (bool)(ConfigurationKPI::get('NETPROFIT_VISIT_EXPIRE') < $time);
         $kpis[] = $helper->generate();
 
         $helper = new HelperKpiRow();
@@ -1607,78 +1589,85 @@ class AdminOrdersControllerCore extends AdminController
     {
         Context::getContext()->customer = new Customer((int)Tools::getValue('id_customer'));
         $currency = new Currency((int)Tools::getValue('id_currency'));
-        if ($products = Product::searchByName((int)$this->context->language->id, pSQL(Tools::getValue('product_search')))) {
-            foreach ($products as &$product) {
-                // Formatted price
-                $product['formatted_price'] = Tools::displayPrice(Tools::convertPrice($product['price_tax_incl'], $currency), $currency);
-                // Concret price
-                $product['price_tax_incl'] = Tools::ps_round(Tools::convertPrice($product['price_tax_incl'], $currency), 2);
-                $product['price_tax_excl'] = Tools::ps_round(Tools::convertPrice($product['price_tax_excl'], $currency), 2);
-                $productObj = new Product((int)$product['id_product'], false, (int)$this->context->language->id);
-                $combinations = array();
-                $attributes = $productObj->getAttributesGroups((int)$this->context->language->id);
+        $to_return = array('found' => false);
+        if (Validate::isLoadedObject($order = new Order(Tools::getValue('id_order')))) {
+            $objBookingDetail = new HotelBookingDetail();
+            $hotelBookingDetail = $objBookingDetail->getOrderCurrentDataByOrderId($order->id);
+            if (count($hotelBookingDetail)) {
+                $idHotel = reset($hotelBookingDetail)['id_hotel'];
+            } else {
+                $idHotel = false;
+            }
 
-                // Tax rate for this customer
-                if (Tools::isSubmit('id_address')) {
-                    $product['tax_rate'] = $productObj->getTaxesRate(new Address(Tools::getValue('id_address')));
-                }
+            if ($products = Product::searchByName((int)$this->context->language->id, pSQL(Tools::getValue('product_search')), null, $idHotel)) {
+                foreach ($products as &$product) {
+                    // Formatted price
+                    $product['formatted_price'] = Tools::displayPrice(Tools::convertPrice($product['price_tax_incl'], $currency), $currency);
+                    // Concret price
+                    $product['price_tax_incl'] = Tools::ps_round(Tools::convertPrice($product['price_tax_incl'], $currency), 2);
+                    $product['price_tax_excl'] = Tools::ps_round(Tools::convertPrice($product['price_tax_excl'], $currency), 2);
+                    $productObj = new Product((int)$product['id_product'], false, (int)$this->context->language->id);
+                    $combinations = array();
+                    $attributes = $productObj->getAttributesGroups((int)$this->context->language->id);
 
-                $product['warehouse_list'] = array();
-
-                foreach ($attributes as $attribute) {
-                    if (!isset($combinations[$attribute['id_product_attribute']]['attributes'])) {
-                        $combinations[$attribute['id_product_attribute']]['attributes'] = '';
+                    // Tax rate for this customer
+                    if (Tools::isSubmit('id_address')) {
+                        $product['tax_rate'] = $productObj->getTaxesRate(new Address(Tools::getValue('id_address')));
                     }
-                    $combinations[$attribute['id_product_attribute']]['attributes'] .= $attribute['attribute_name'].' - ';
-                    $combinations[$attribute['id_product_attribute']]['id_product_attribute'] = $attribute['id_product_attribute'];
-                    $combinations[$attribute['id_product_attribute']]['default_on'] = $attribute['default_on'];
-                    if (!isset($combinations[$attribute['id_product_attribute']]['price'])) {
-                        $price_tax_incl = Product::getPriceStatic((int)$product['id_product'], true, $attribute['id_product_attribute']);
-                        $price_tax_excl = Product::getPriceStatic((int)$product['id_product'], false, $attribute['id_product_attribute']);
-                        $combinations[$attribute['id_product_attribute']]['price_tax_incl'] = Tools::ps_round(Tools::convertPrice($price_tax_incl, $currency), 2);
-                        $combinations[$attribute['id_product_attribute']]['price_tax_excl'] = Tools::ps_round(Tools::convertPrice($price_tax_excl, $currency), 2);
-                        $combinations[$attribute['id_product_attribute']]['formatted_price'] = Tools::displayPrice(Tools::convertPrice($price_tax_excl, $currency), $currency);
-                    }
-                    if (!isset($combinations[$attribute['id_product_attribute']]['qty_in_stock'])) {
-                        $combinations[$attribute['id_product_attribute']]['qty_in_stock'] = StockAvailable::getQuantityAvailableByProduct((int)$product['id_product'], $attribute['id_product_attribute'], (int)$this->context->shop->id);
+
+                    $product['warehouse_list'] = array();
+
+                    foreach ($attributes as $attribute) {
+                        if (!isset($combinations[$attribute['id_product_attribute']]['attributes'])) {
+                            $combinations[$attribute['id_product_attribute']]['attributes'] = '';
+                        }
+                        $combinations[$attribute['id_product_attribute']]['attributes'] .= $attribute['attribute_name'].' - ';
+                        $combinations[$attribute['id_product_attribute']]['id_product_attribute'] = $attribute['id_product_attribute'];
+                        $combinations[$attribute['id_product_attribute']]['default_on'] = $attribute['default_on'];
+                        if (!isset($combinations[$attribute['id_product_attribute']]['price'])) {
+                            $price_tax_incl = Product::getPriceStatic((int)$product['id_product'], true, $attribute['id_product_attribute']);
+                            $price_tax_excl = Product::getPriceStatic((int)$product['id_product'], false, $attribute['id_product_attribute']);
+                            $combinations[$attribute['id_product_attribute']]['price_tax_incl'] = Tools::ps_round(Tools::convertPrice($price_tax_incl, $currency), 2);
+                            $combinations[$attribute['id_product_attribute']]['price_tax_excl'] = Tools::ps_round(Tools::convertPrice($price_tax_excl, $currency), 2);
+                            $combinations[$attribute['id_product_attribute']]['formatted_price'] = Tools::displayPrice(Tools::convertPrice($price_tax_excl, $currency), $currency);
+                        }
+                        if (!isset($combinations[$attribute['id_product_attribute']]['qty_in_stock'])) {
+                            $combinations[$attribute['id_product_attribute']]['qty_in_stock'] = StockAvailable::getQuantityAvailableByProduct((int)$product['id_product'], $attribute['id_product_attribute'], (int)$this->context->shop->id);
+                        }
+
+                        if (Configuration::get('PS_ADVANCED_STOCK_MANAGEMENT') && (int)$product['advanced_stock_management'] == 1) {
+                            $product['warehouse_list'][$attribute['id_product_attribute']] = Warehouse::getProductWarehouseList($product['id_product'], $attribute['id_product_attribute']);
+                        } else {
+                            $product['warehouse_list'][$attribute['id_product_attribute']] = array();
+                        }
+
+                        $product['stock'][$attribute['id_product_attribute']] = Product::getRealQuantity($product['id_product'], $attribute['id_product_attribute']);
                     }
 
                     if (Configuration::get('PS_ADVANCED_STOCK_MANAGEMENT') && (int)$product['advanced_stock_management'] == 1) {
-                        $product['warehouse_list'][$attribute['id_product_attribute']] = Warehouse::getProductWarehouseList($product['id_product'], $attribute['id_product_attribute']);
+                        $product['warehouse_list'][0] = Warehouse::getProductWarehouseList($product['id_product']);
                     } else {
-                        $product['warehouse_list'][$attribute['id_product_attribute']] = array();
+                        $product['warehouse_list'][0] = array();
                     }
 
-                    $product['stock'][$attribute['id_product_attribute']] = Product::getRealQuantity($product['id_product'], $attribute['id_product_attribute']);
-                }
+                    $product['stock'][0] = StockAvailable::getQuantityAvailableByProduct((int)$product['id_product'], 0, (int)$this->context->shop->id);
 
-                if (Configuration::get('PS_ADVANCED_STOCK_MANAGEMENT') && (int)$product['advanced_stock_management'] == 1) {
-                    $product['warehouse_list'][0] = Warehouse::getProductWarehouseList($product['id_product']);
-                } else {
-                    $product['warehouse_list'][0] = array();
-                }
+                    foreach ($combinations as &$combination) {
+                        $combination['attributes'] = rtrim($combination['attributes'], ' - ');
+                    }
+                    $product['combinations'] = $combinations;
 
-                $product['stock'][0] = StockAvailable::getQuantityAvailableByProduct((int)$product['id_product'], 0, (int)$this->context->shop->id);
-
-                foreach ($combinations as &$combination) {
-                    $combination['attributes'] = rtrim($combination['attributes'], ' - ');
+                    if ($product['customizable']) {
+                        $product_instance = new Product((int)$product['id_product']);
+                        $product['customization_fields'] = $product_instance->getCustomizationFields($this->context->language->id);
+                    }
                 }
-                $product['combinations'] = $combinations;
-
-                if ($product['customizable']) {
-                    $product_instance = new Product((int)$product['id_product']);
-                    $product['customization_fields'] = $product_instance->getCustomizationFields($this->context->language->id);
-                }
+                $to_return = array(
+                    'products' => $products,
+                    'found' => true
+                );
             }
-
-            $to_return = array(
-                'products' => $products,
-                'found' => true
-            );
-        } else {
-            $to_return = array('found' => false);
         }
-
         $this->content = json_encode($to_return);
     }
 

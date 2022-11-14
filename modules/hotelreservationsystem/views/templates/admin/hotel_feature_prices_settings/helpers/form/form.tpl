@@ -20,9 +20,9 @@
 <div class="panel">
 	<div class="panel-heading">
 		{if isset($edit)}
-			<i class='icon-pencil'></i>&nbsp{l s='Edit Feature Price Rule' mod='hotelreservationsystem'}
+			<i class='icon-pencil'></i>&nbsp{l s='Edit Advanced Price Rule' mod='hotelreservationsystem'}
 		{else}
-			<i class='icon-plus'></i>&nbsp{l s='Add New Feature Price Rule' mod='hotelreservationsystem'}
+			<i class='icon-plus'></i>&nbsp{l s='Add New Advanced Price Rule' mod='hotelreservationsystem'}
 		{/if}
 	</div>
 	<form id="{$table}_form" class="defaultForm form-horizontal" action="{$current}&{if !empty($submit_action)}{$submit_action}{/if}&token={$token}" method="post" enctype="multipart/form-data" {if isset($style)}style="{$style}"{/if}>
@@ -34,7 +34,7 @@
 				{l s='Room Type :' mod='hotelreservationsystem'}
 			</label>
 			<div class="col-sm-3">
-				<input autocomplete="off" type="text" id="room_type_name" name="room_type_name" class="form-control" placeholder= "{l s='Enter Room Type Name' mod='hotelreservationsystem'}" value="{if isset($productName)}{$productName}{/if}"/>
+				<input autocomplete="off" type="text" id="room_type_name" name="room_type_name" class="form-control" placeholder= "{l s='Enter room type name' mod='hotelreservationsystem'}" value="{if isset($productName)}{$productName}{/if}"/>
 				<input type="hidden" id="room_type_id" name="room_type_id" class="form-control" value="{if isset($objFeaturePrice->id_product)}{$objFeaturePrice->id_product}{else}0{/if}"/>
 				<div class="dropdown">
 	                <ul class="room_type_search_results_ul"></ul>
@@ -42,17 +42,17 @@
 				<p class="error-block" style="display:none; color: #CD5D5D;">{l s='No match found for this search. Please try with an existing name.' mod='hotelreservationsystem'}</p>
 			</div>
 			<div class="help-block">
-				**{l s='Enter room type name and select the room for which you are going to create this feature price plan.' mod='hotelreservationsystem'}
+				**{l s='Enter room type name and select the room for which you are going to create this advanced price rule.' mod='hotelreservationsystem'}
 			</div>
 		</div>
 		<div class="form-group">
 			<label class="col-sm-3 control-label required" for="feature_price_name" >
-				{l s='Feature Price Rule Name :' mod='hotelreservationsystem'}
+				{l s='Advanced Price Rule Name :' mod='hotelreservationsystem'}
 			</label>
 			<div class="col-lg-3">
 				{foreach from=$languages item=language}
 					{assign var="feature_price_name" value="feature_price_name_`$language.id_lang`"}
-					<input type="text" id="{$feature_price_name}" name="{$feature_price_name}" value="{if isset($objFeaturePrice->feature_price_name[$language.id_lang]) && $objFeaturePrice->feature_price_name[$language.id_lang]}{$objFeaturePrice->feature_price_name[$language.id_lang]}{else if isset($smarty.post.$feature_price_name)}{$smarty.post.$feature_price_name}{/if}" data-lang-name="{$language.name}" placeholder="{l s='Enter Feature Price Rule Name' mod='hotelreservationsystem'}" class="form-control feature_price_name_all" {if $currentLang.id_lang != $language.id_lang}style="display:none;"{/if}/>
+					<input type="text" id="{$feature_price_name}" name="{$feature_price_name}" value="{if isset($objFeaturePrice->feature_price_name[$language.id_lang]) && $objFeaturePrice->feature_price_name[$language.id_lang]}{$objFeaturePrice->feature_price_name[$language.id_lang]}{else if isset($smarty.post.$feature_price_name)}{$smarty.post.$feature_price_name}{/if}" data-lang-name="{$language.name}" placeholder="{l s='Enter advanced price rule name' mod='hotelreservationsystem'}" class="form-control feature_price_name_all" {if $currentLang.id_lang != $language.id_lang}style="display:none;"{/if}/>
 				{/foreach}
 			</div>
 			{if $languages|@count > 1}
@@ -115,7 +115,7 @@
 		</div>
 		<div class="form-group special_days_content" {if isset($objFeaturePrice->date_selection_type) && 	$objFeaturePrice->date_selection_type == HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_SPECIFIC}style="display:none;"{/if}>
 			<label class="control-label col-lg-3">
-				<span class="label-tooltip" data-toggle="tooltip" data-html="true" title="" data-original-title="{l s='If you want to create this Feature price rule only for some special days of the week of selected date range then you can select select days after checking this option. Otherwise rule will be created for whole selected date range.' mod='hotelreservationsystem'}">
+				<span class="label-tooltip" data-toggle="tooltip" data-html="true" title="" data-original-title="{l s='If you want to create this Advanced price rule only for some special days of the week of selected date range then you can select select days after checking this option. Otherwise rule will be created for whole selected date range.' mod='hotelreservationsystem'}">
 					{l s='For Special Days' mod='hotelreservationsystem'}
 				</span>
 			</label>
@@ -246,7 +246,7 @@
 		<div class="form-group">
 			<label class="control-label col-lg-3">
 				<span>
-					{l s='Enable Feature Price Rule' mod='hotelreservationsystem'}
+					{l s='Enable Advanced Price Rule' mod='hotelreservationsystem'}
 				</span>
 			</label>
 			<div class="col-lg-9 ">
@@ -263,7 +263,7 @@
 		{* select group accesses *}
 		<div class="form-group">
 			<label class="control-label col-lg-3">
-				<span class="label-tooltip" data-toggle="tooltip" data-html="true" data-original-title="{l s='Select all the groups that you would like to apply to this feature price.' mod='hotelreservationsystem'}">{l s='Group access' mod='hotelreservationsystem'}</span>
+				<span class="label-tooltip" data-toggle="tooltip" data-html="true" data-original-title="{l s='Select all the groups that you would like to apply to this advanced price rule.' mod='hotelreservationsystem'}">{l s='Group access' mod='hotelreservationsystem'}</span>
 			</label>
 			<div class="col-lg-6">
 				<div class="table-responsive">
