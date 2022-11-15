@@ -56,7 +56,6 @@
         {addJsDef displayPrice=$priceDisplay}
         {addJsDef taxEnabled=$use_taxes}
         {addJsDef conditionEnabled=$conditions|intval}
-        {addJsDef vat_management=$vat_management|intval}
         {addJsDef errorCarrier=$errorCarrier|@addcslashes:'\''}
         {addJsDef errorTOS=$errorTOS|@addcslashes:'\''}
         {addJsDef checkedCarrier=$checked|intval}

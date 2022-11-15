@@ -45,6 +45,9 @@
 		</div>
 		<div id="opc_account_form" class="unvisible">
 			{$HOOK_CREATE_ACCOUNT_TOP}
+			<div style="display: none;" id="opc_account_saved" class="alert alert-success">
+				{l s='Account information saved successfully.'}
+			</div>
 			<!-- Error return block -->
 			<div id="opc_account_errors" class="alert alert-danger" style="display:none;"></div>
 			<!-- END Error return block -->
@@ -189,13 +192,6 @@
 								<label for="company">{l s='Company'}{if in_array($field_name, $required_fields)} <sup>*</sup>{/if}</label>
 								<input type="text" class="text form-control validate" id="company" name="company" data-validate="isGenericName" value="{if isset($guestInformations) && isset($guestInformations.company) && $guestInformations.company}{$guestInformations.company}{/if}" />
 							</div>
-						{elseif $field_name eq "vat_number"}
-							<div id="vat_number_block" style="display:none;">
-								<div class="form-group col-sm-6">
-									<label for="vat_number">{l s='VAT number'}{if in_array($field_name, $required_fields)} <sup>*</sup>{/if}</label>
-									<input type="text" class="text form-control" name="vat_number" id="vat_number" value="{if isset($guestInformations) && isset($guestInformations.vat_number) && $guestInformations.vat_number}{$guestInformations.vat_number}{/if}" />
-								</div>
-							</div>
 						{elseif $field_name eq "dni"}
 							{assign var='dniExist' value=true}
 							<div class="required dni form-group col-sm-6">
@@ -285,13 +281,6 @@
 						<div class="form-group">
 							<label for="company_invoice">{l s='Company'}{if in_array($field_name, $required_fields)} <sup>*</sup>{/if}</label>
 							<input type="text" class="text form-control validate" id="company_invoice" name="company_invoice" data-validate="isName" value="{if isset($guestInformations) && isset($guestInformations.company_invoice) && $guestInformations.company_invoice}{$guestInformations.company_invoice}{/if}" />
-						</div>
-					{elseif $field_name eq "vat_number"}
-						<div id="vat_number_block_invoice" class="is_customer_param" style="display:none;">
-							<div class="form-group">
-								<label for="vat_number_invoice">{l s='VAT number'}{if in_array($field_name, $required_fields)} <sup>*</sup>{/if}</label>
-								<input type="text" class="form-control" id="vat_number_invoice" name="vat_number_invoice" value="{if isset($guestInformations) && isset($guestInformations.vat_number_invoice) && $guestInformations.vat_number_invoice}{$guestInformations.vat_number_invoice}{/if}" />
-							</div>
 						</div>
 					{elseif $field_name eq "dni"}
 						{assign var='dniExist' value=true}
@@ -394,9 +383,6 @@
 				<button type="submit" name="submitAccount" id="submitAccount" class="btn btn-default button button-medium pull-right"><span>{l s='Save'}<i class="icon-chevron-right right"></i></span></button>
 
 			</div>
-			<div style="display: none;" id="opc_account_saved" class="alert alert-success">
-				{l s='Account information saved successfully'}
-			</div>
 		<!-- END Account -->
 		</div>
 	</form>
@@ -424,8 +410,5 @@
 {/if}
 {if isset($countries)}
 	{addJsDef countries=$countries}
-{/if}
-{if isset($vatnumber_ajax_call) && $vatnumber_ajax_call}
-	{addJsDef vatnumber_ajax_call=$vatnumber_ajax_call}
 {/if}
 {/strip}

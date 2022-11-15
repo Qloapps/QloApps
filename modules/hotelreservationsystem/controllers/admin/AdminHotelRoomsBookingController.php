@@ -266,6 +266,8 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
         $date_from = date("d-m-Y", strtotime($date_from));
         $date_to = date("d-m-Y", strtotime($date_to));
         $currency = new Currency((int)Configuration::get('PS_CURRENCY_DEFAULT'));
+        // booking allotment types
+        $allotmentTypes = HotelBookingDetail::getAllAllotmentTypes();
         $this->tpl_view_vars = array(
             'check_calender_var' => $check_calender_var,
             'date_from' => $date_from,
@@ -281,6 +283,7 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
             'hotel_name' => $hotel_name,
             'all_room_type' => $all_room_type,
             'currency' => $currency,
+            'allotment_types' => $allotmentTypes,
             'rms_in_cart' => $rms_in_cart,
             'formAction' => $formAction,
         );

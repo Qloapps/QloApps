@@ -1,39 +1,38 @@
-/*******************************************************************
-					Cart Block Styles
-********************************************************************/
-#header .shopping_cart {
-  position: relative;
-  float: right;
-  /*margin-bottom: 20px;*/
-  /*padding-top: 5px;*/ }
-  #header .shopping_cart > a:first-child:after {
-    content: "\f0d7";
-    font-family: "FontAwesome";
-    display: inline-block;
-    float: right;
-    font-size: 11px;
-    color: #FFFFFF;
-    padding: 6px 0 0 0; }
-  #header .shopping_cart > a:first-child:hover:after {
-    content: "\f0d8";
-    padding: 4px 0px 0px 0px; }
+/**
+* 2010-2022 Webkul.
+*
+* NOTICE OF LICENSE
+*
+* All right is reserved,
+* Please go through LICENSE.txt file inside our module
+*
+* DISCLAIMER
+*
+* Do not edit or add to this file if you wish to upgrade this module to newer
+* versions in the future. If you wish to customize this module for your
+* needs please refer to CustomizationPolicy.txt file inside our module for more information.
+*
+* @author Webkul IN
+* @copyright 2010-2022 Webkul IN
+* @license LICENSE.txt
+*/
 
-.shopping_cart {
-  width: 34px; }
-  @media (max-width: 480px) {
-    /*.shopping_cart {
-      padding-top: 20px; }*/ }
-  @media (max-width: 1200px) {
-    .shopping_cart {
-      margin: 0 auto;
-      float: none;} }
+#header .shopping_cart > a:first-child:after {
+  content: "\f0d7";
+  font-family: "FontAwesome";
+  font-size: 12px;
+  padding: 0 2px;
+  position: relative;
+  top: -1px;
+  color: #fff; }
+#header .shopping_cart > a:first-child:hover::after {
+  content: "\f0d8";
+  top: -2px; }
   .shopping_cart > a:first-child {
-    /*padding: 7px 10px;*/
-    padding-top: 7px;
-    /*background-color: #BF9958;*/
     display: block;
     font-weight: bold;
-    color: #777777;
+    font-size: 20px;
+    color: #777;
     text-shadow: 1px 1px rgba(0, 0, 0, 0.2);
     overflow: hidden; }
     @media (min-width: 768px) and (max-width: 991px) {
@@ -49,15 +48,8 @@
     .shopping_cart > a:first-child:before {
       content: "\f07a";
       font-family: "FontAwesome";
-      display: inline-block;
-      font-size: 20px;
-      line-height: 23px;
       color: #fff;
-      top: 9px;
-      left: 0px;
-      z-index: 100;
-      position: absolute;
-      padding-right: 5px; }
+      z-index: 100; }
   .shopping_cart .ajax_cart_total {
     display: none !important; }
   .shopping_cart .block_cart_expand:after, .shopping_cart .block_cart_collapse:after {
@@ -487,11 +479,10 @@
   .remove_rooms_from_cart_link:hover {
     color: #515151; }
 
-.badge_style
-{
+.badge_style {
   left: 13px;
   position: absolute;
-  top: 2px;
+  top: -8px;
   z-index: 200;
 }
 

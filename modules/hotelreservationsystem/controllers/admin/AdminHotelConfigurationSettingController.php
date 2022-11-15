@@ -29,13 +29,6 @@ class AdminHotelConfigurationSettingController extends ModuleAdminController
             'order_restrict_setting_link' => $this->context->link->getAdminLink('AdminOrderRestrictSettings'),
             'additional_demand_setting_link' => $this->context->link->getAdminLink('AdminRoomTypeGlobalDemand'),
         );
-        // Reviews setting link if only productcomment module is enabled
-        if (Module::isEnabled('productcomments')) {
-            $review_module_instance = Module::getInstanceByName('productcomments');
-            $this->tpl_view_vars['htl_reviews_conf_link'] = $this->context->link->getAdminLink('AdminModules', true).
-            '&configure='.urlencode($review_module_instance->name).'&tab_module='.$review_module_instance->tab.
-            '&module_name='.urlencode($review_module_instance->name);
-        }
 
         return parent::renderView();
     }

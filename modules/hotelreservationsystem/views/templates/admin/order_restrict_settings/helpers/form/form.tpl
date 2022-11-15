@@ -8,7 +8,6 @@
 	</div>
 	<form id="{$table|escape:'htmlall':'UTF-8'}_form" class="defaultForm form-horizontal" action="{$current|escape:'htmlall':'UTF-8'}&{if !empty($submit_action)}{$submit_action|escape:'htmlall':'UTF-8'}{/if}&token={$token|escape:'htmlall':'UTF-8'}" method="post" enctype="multipart/form-data" {if isset($style)}style="{$style|escape:'htmlall':'UTF-8'}"{/if}>
 		{if isset($edit)}
-			<input type="hidden" value="{$id_hotel}" name="id_hotel" />
 			<div class="form-group">
 				<label class="control-label col-sm-3 required">{l s='Hotel Name :' mod='hotelreservationsystem'}</label>
 				<div class="col-sm-6">

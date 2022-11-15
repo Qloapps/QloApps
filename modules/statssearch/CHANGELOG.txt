@@ -1,3 +1,0 @@
-2014-03-27 17:21:33 +0100	/ MO statssearch : min ps_versions_compliancy modified (1.5.6.1 => 1.6)
-2014-03-24 15:22:56 +0100	/ MO statssearch : ps_versions_compliancy added
-2014-03-20 14:37:34 +0100	Initial commit

@@ -337,7 +337,7 @@ class AdminLocalizationControllerCore extends AdminController
                 array(
                     'type'     => 'radio',
                     'label'  => $this->l('Download pack data'),
-                    'desc'     => $this->l('If set to yes then the localization pack will be downloaded from prestashop.com. Otherwise the local xml file found in the localization folder of your Qloapps installation will be used.'),
+                    'desc'     => $this->l('If set to yes then the localization pack will be downloaded from prestashop.com. Otherwise the local xml file found in the localization folder of your QloApps installation will be used.'),
                     'name'     => 'download_updated_pack',
                     'is_bool'=> true,
                     'values' => array(

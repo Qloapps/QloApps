@@ -22,17 +22,31 @@
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
-$(document).ready(function(){
-	$(document).on('submit', '#create-account_form', function(e){
+
+$(document).ready(function() {
+	$(document).on('click', '#SubmitCreate', function(e) {
 		e.preventDefault();
-		submitFunction();
+		submitFunction('SubmitCreate');
+	});
+
+	$(document).on('click', '.btn-transform', function(e) {
+		e.preventDefault();
+		submitFunction('submitTransformAccount');
 	});
 	$('.is_customer_param').hide();
 });
 
-function submitFunction()
-{
+function submitFunction(submitAction) {
 	$('#create_account_error').html('').hide();
+	var data = {
+		controller: 'authentication',
+		ajax: true,
+		email_create: $('#email_create').val(),
+		back: $('input[name=back]').val(),
+		token: token
+	};
+	data[submitAction] = 1;
+
 	$.ajax({
 		type: 'POST',
 		url: baseUri + '?rand=' + new Date().getTime(),
@@ -40,62 +54,66 @@ function submitFunction()
 		cache: false,
 		dataType : "json",
 		headers: { "cache-control": "no-cache" },
-		data:
-		{
-			controller: 'authentication',
-			SubmitCreate: 1,
-			ajax: true,
-			email_create: $('#email_create').val(),
-			back: $('input[name=back]').val(),
-			token: token
-		},
-		success: function(jsonData)
-		{
-			if (jsonData.hasError)
-			{
-				var errors = '';
-				for(error in jsonData.errors)
-					//IE6 bug fix
-					if(error != 'indexOf')
-						errors += '<li>' + jsonData.errors[error] + '</li>';
-				$('#create_account_error').html('<ol>' + errors + '</ol>').show();
+		data: data,
+		success: function(jsonData) {
+			// display confirmations
+			if (jsonData.hasConfirmation) {
+				if (in_array('TRANSFORM_OK', jsonData.confirmations)) {
+					$('#guest_transform_success').show('slow');
+				}
+				return;
 			}
-			else
-			{
+			if (jsonData.hasInformation) {
+				var informations = '';
+				for(information in jsonData.informations) {
+					//IE6 bug fix
+					if(information != 'indexOf') {
+						informations += '<li>' + jsonData.informations[information] + '</li>';
+					}
+				}
+				$('#create_account_information').html('<ol>' + informations + '</ol>').show();
+				return;
+			}
+			if (jsonData.hasError) {
+				var errors = '';
+				for(error in jsonData.errors) {
+					//IE6 bug fix
+					if(error != 'indexOf') {
+						errors += '<li>' + jsonData.errors[error] + '</li>';
+					}
+				}
+				$('#create_account_error').html('<ol>' + errors + '</ol>').show();
+			} else {
 				// adding a div to display a transition
 				$('#center_column').html('<div id="noSlide">' + $('#center_column').html() + '</div>');
-				$('#noSlide').fadeOut('slow', function()
-				{
+				$('#noSlide').fadeOut('slow', function() {
 					$('#noSlide').html(jsonData.page);
-					$(this).fadeIn('slow', function()
-					{
-						if (typeof bindUniform !=='undefined')
+					$(this).fadeIn('slow', function() {
+						if (typeof bindUniform !=='undefined') {
 							bindUniform();
-						if (typeof bindStateInputAndUpdate !=='undefined')
+						}
+						if (typeof bindStateInputAndUpdate !=='undefined') {
 							bindStateInputAndUpdate();
+						}
 						document.location = '#account-creation';
 					});
 				});
 			}
 		},
-		error: function(XMLHttpRequest, textStatus, errorThrown)
-		{
+		error: function(XMLHttpRequest, textStatus, errorThrown) {
 			error = "TECHNICAL ERROR: unable to load form.\n\nDetails:\nError thrown: " + XMLHttpRequest + "\n" + 'Text status: ' + textStatus;
-			if (!!$.prototype.fancybox)
-			{
-				$.fancybox.open([
-				{
+			if (!!$.prototype.fancybox) {
+				$.fancybox.open([{
 					type: 'inline',
 					autoScale: true,
 					minHeight: 30,
 					content: "<p class='fancybox-error'>" + error + '</p>'
-				}],
-				{
+				}], {
 					padding: 0
 				});
-			}
-			else
+			} else {
 				alert(error);
+			}
 		}
 	});
 }

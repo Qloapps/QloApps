@@ -196,11 +196,8 @@
 					</span>
 				</li>
 				<li>
-					<span class="item-label">
-						<a href="{$link->getAdminLink("AdminModules")|escape}&configure=blocknewsletter&module_name=blocknewsletter"
-							target="_blank">
-							<span>{l s="Traffic Sources" mod="dashactivity"}</span>
-						</a>
+					<span class="item-label heading">
+						<span>{l s="Traffic Sources" mod="dashactivity"}</span>
 					</span>
 
 					<ul class="data_list_small" id="dash_traffic_source"></ul>
