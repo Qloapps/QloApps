@@ -20,10 +20,10 @@
 {if is_array($images) && count($images)}
     <div class="media-list-wrap">
         <h3 class="title">{l s='Media shared by guests' mod='qlohotelreview'}</h3>
-        <div class="row-no-gutters media-list clearfix">
+        <div class="media-list clearfix">
             {for $i = 0 to 5}
                 {if isset($images[$i])}
-                    <div class="col-xs-2">
+                    <div class="media-item-wrap">
                         <div class="media-item">
                             <img class="img img-responsive img-fancybox" src="{$images[$i]}" data-index="{$i}" />
                         </div>
