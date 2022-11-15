@@ -116,6 +116,7 @@ class AdminHotelReviewHotelReviewController extends ModuleAdminController
                 'hint' => $this->l('Date and time when this review was added.'),
                 'align' => 'center',
                 'type' => 'datetime',
+                'filter_key' => 'a!date_add',
             ),
         );
 
