@@ -19,7 +19,7 @@
 
 <div class="review-summary">
     <div class="row">
-        <div class="col-xs-3">
+        <div class="col-sm-3">
             <div class="score-wrap">
                 <h4 class="title-primary">{l s='Ratings Summary' mod='qlohotelreview'}</h4>
                 <div>
@@ -35,14 +35,14 @@
                 </div>
             </div>
         </div>
-        <div class="col-xs-9">
+        <div class="col-sm-9">
             {if is_array($summary.categories) && count($summary.categories)}
                 <div class="category-wrap">
                     <h4 class="title-primary">{l s='Categories' mod='qlohotelreview'}</h4>
                     <div class="clearfix">
                         <div class="row">
                             {foreach from=$summary.categories item=category}
-                                <div class="col-xs-2 class-list-item-wrap">
+                                <div class="col-xs-2 col-sm-3 col-md-2 class-list-item-wrap">
                                     <div class="score-circle-wrap">
                                         <div class="score-circle" data-value="{$category.average / 5|string_format:'%.1f'}" data-color="{$category.color}"></div>
                                     </div>
