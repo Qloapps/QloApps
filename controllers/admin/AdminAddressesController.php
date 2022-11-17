@@ -36,7 +36,7 @@ class AdminAddressesControllerCore extends AdminController
     {
         $this->bootstrap = true;
         $this->required_database = true;
-        $this->required_fields = array('company','address2', 'postcode', 'other', 'phone', 'phone_mobile', 'vat_number', 'dni');
+        $this->required_fields = array('company', 'address2', 'postcode', 'other', 'phone', 'phone_mobile', 'dni');
         $this->table = 'address';
         $this->className = 'Address';
         $this->lang = false;
@@ -216,13 +216,6 @@ class AdminAddressesControllerCore extends AdminController
                     'required' => in_array('company', $required_fields),
                     'col' => '4',
                     'hint' => $this->l('Invalid characters:').' &lt;&gt;;=#{}'
-                );
-                $temp_fields[] = array(
-                    'type' => 'text',
-                    'label' => $this->l('VAT number'),
-                    'col' => '2',
-                    'name' => 'vat_number',
-                    'required' => in_array('vat_number', $required_fields)
                 );
             } elseif ($addr_field_item == 'lastname') {
                 if (isset($customer) &&

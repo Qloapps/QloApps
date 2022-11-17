@@ -1,9 +1,0 @@
-<!--
-Description: parsed pubDate in Disney's proprietary format (invalid timezone, long month)
-Expect:      not bozo and feed['date_parsed'] == (2004, 1, 26, 22, 31, 0, 0, 26, 0)
--->
-<rss xmlns="http://backend.userland.com/rss093" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" version="0.93">
-<channel>
-<pubDate>Mon, 26 January 2004 16:31:00 CT</pubDate>
-</channel>
-</rss>

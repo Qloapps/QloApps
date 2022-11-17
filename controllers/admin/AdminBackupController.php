@@ -61,7 +61,7 @@ class AdminBackupControllerCore extends AdminController
                         'title' => $this->l('Ignore statistics tables'),
                         'desc' => $this->l('Drop existing tables during import.').'
 							<br />'._DB_PREFIX_.'connections, '._DB_PREFIX_.'connections_page, '._DB_PREFIX_
-                            .'connections_source, '._DB_PREFIX_.'guest, '._DB_PREFIX_.'statssearch',
+                            .'connections_source, '._DB_PREFIX_.'guest',
                         'cast' => 'intval',
                         'type' => 'bool'
                     ),

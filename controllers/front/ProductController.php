@@ -165,7 +165,7 @@ class ProductControllerCore extends FrontController
                     $id_category = (int)$this->product->id_category_default;
                 }
                 $this->category = new Category((int)$id_category, (int)$this->context->cookie->id_lang);
-                if (isset($this->context->cookie) && isset($this->category->id_category) && !(Module::isInstalled('blockcategories') && Module::isEnabled('blockcategories'))) {
+                if (isset($this->context->cookie) && isset($this->category->id_category)) {
                     $this->context->cookie->last_visited_category = (int)$this->category->id_category;
                 }
             }
@@ -401,6 +401,7 @@ class ProductControllerCore extends FrontController
                         'hotel_policies' => $hotel_policies,
                         'hotel_features' => $htl_features,
                         'hotel_image_link' => $hotelImageLink,
+                        'hotel_has_images' => (bool) HotelImage::getCover($hotel_id),
                         'ftr_img_src' => _PS_IMG_.'rf/',
                         'order_date_restrict' => $order_date_restrict
                     )
@@ -1045,5 +1046,41 @@ class ProductControllerCore extends FrontController
             $result['avail_rooms'] = 0;
         }
         die(json_encode($result));
+    }
+
+    public function displayAjaxGetHotelImages()
+    {
+        $response = array('status' => false);
+        $idProduct = (int) Tools::getValue('id_product');
+        $page = (int) Tools::getValue('page');
+        $imagesPerPage = (int) Configuration::get('PS_HOTEL_IMAGES_PER_PAGE');
+
+        $objHotelRoomType = new HotelRoomType();
+        $objHotelImage = new HotelImage();
+
+        $roomTypeInfo = $objHotelRoomType->getRoomTypeInfoByIdProduct($idProduct);
+        $idHotel = $roomTypeInfo['id_hotel'];
+        $hotelImages = $objHotelImage->getImagesByHotelId($idHotel, $page, $imagesPerPage);
+        $hasNextPage = ($objHotelImage->getImagesByHotelId($idHotel, $page + 1, $imagesPerPage)) ? true : false;
+        $hotelImagesBaseDir = _MODULE_DIR_.'hotelreservationsystem/views/img/hotel_img/';
+        foreach ($hotelImages as &$hotelImage) {
+            $hotelImage['link'] = $this->context->link->getMediaLink(
+                $hotelImagesBaseDir.$hotelImage['hotel_image_id'].'.jpg'
+            );
+        }
+
+        if (is_array($hotelImages) && count($hotelImages)) {
+            $this->context->smarty->assign(array('hotel_images' => $hotelImages));
+            $html = $this->context->smarty->fetch(
+                $this->getTemplatePath('_partials/hotel_images.tpl')
+            );
+
+            $response['html'] = $html;
+            $response['status'] = true;
+            $response['has_next_page'] = $hasNextPage;
+            $response['message'] = 'HTML_OK';
+        }
+
+        die(json_encode($response));
     }
 }
