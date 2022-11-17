@@ -690,8 +690,6 @@ abstract class PaymentModuleCore extends Module
                     }
 
                     // update order in hlt tables
-                    $objCartBookingData = new HotelCartBookingData();
-                    $objBookingDetail = new HotelBookingDetail();
                     $objRoomType = new HotelRoomType();
 
                     $objAdvancedPayment = new HotelAdvancedPayment();
@@ -751,12 +749,12 @@ abstract class PaymentModuleCore extends Module
                                     $objBookingDetail->email = $objHotelBranch->email;
                                     $objBookingDetail->check_in_time = $objHotelBranch->check_in;
                                     $objBookingDetail->check_out_time = $objHotelBranch->check_out;
-                                    if ($hotelAddress = $objHotelBranch->getAddress($objCartBkData->id_hotel)) {
-                                        $objHtlBkDtl->city = $hotelAddress['city'];
-                                        $objHtlBkDtl->state = $hotelAddress['state'];
-                                        $objHtlBkDtl->country = $hotelAddress['country'];
-                                        $objHtlBkDtl->zipcode = $hotelAddress['postcode'];
-                                        $objHtlBkDtl->phone = $hotelAddress['phone'];
+                                    if ($hotelAddress = $objHotelBranch->getAddress($objCartBookingData->id_hotel)) {
+                                        $objBookingDetail->city = $hotelAddress['city'];
+                                        $objBookingDetail->state = $hotelAddress['state'];
+                                        $objBookingDetail->country = $hotelAddress['country'];
+                                        $objBookingDetail->zipcode = $hotelAddress['postcode'];
+                                        $objBookingDetail->phone = $hotelAddress['phone'];
                                     }
                                 }
                                 if ($roomTypeInfo = $objRoomType->getRoomTypeInfoByIdProduct($idProduct)) {
@@ -945,7 +943,6 @@ abstract class PaymentModuleCore extends Module
                             '{delivery_phone}' => ($delivery->phone) ? $delivery->phone : $delivery->phone_mobile,
                             '{delivery_other}' => $delivery->other,
                             '{invoice_company}' => $invoice->company,
-                            '{invoice_vat_number}' => $invoice->vat_number,
                             '{invoice_firstname}' => $invoice->firstname,
                             '{invoice_lastname}' => $invoice->lastname,
                             '{invoice_address2}' => $invoice->address2,

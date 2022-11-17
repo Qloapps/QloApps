@@ -533,9 +533,6 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
         $debug = Tools::getValue('debug');
 
         $address = new Address((int)$this->order->id_address_tax);
-        $tax_exempt = Configuration::get('VATNUMBER_MANAGEMENT')
-                            && !empty($address->vat_number)
-                            && $address->id_country != Configuration::get('VATNUMBER_COUNTRY');
         $carrier = new Carrier($this->order->id_carrier);
 
         // code to send name of the taxes applied on the order to show names od taxes in the invoice for GST
@@ -560,7 +557,6 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
 
         $data = array(
             'showTaxName' => $showTaxName,
-            'tax_exempt' => $tax_exempt,
             'use_one_after_another_method' => $this->order_invoice->useOneAfterAnotherTaxComputationMethod(),
             'display_tax_bases_in_breakdowns' => $this->order_invoice->displayTaxBasesInProductTaxesBreakdown(),
             'product_tax_breakdown' => $this->order_invoice->getProductTaxesBreakdown($this->order),

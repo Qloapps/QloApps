@@ -373,7 +373,6 @@ class OrderOpcControllerCore extends ParentOrderController
         }
 
         $this->addJS(array(
-            _THEME_JS_DIR_.'tools/vatManagement.js',
             _THEME_JS_DIR_.'tools/statesManagement.js',
             _THEME_JS_DIR_.'order-carrier.js',
             _PS_JS_DIR_.'validate.js'
@@ -625,7 +624,6 @@ class OrderOpcControllerCore extends ParentOrderController
             'company' => Tools::htmlentitiesUTF8($address_delivery->company),
             'lastname' => Tools::htmlentitiesUTF8($address_delivery->lastname),
             'firstname' => Tools::htmlentitiesUTF8($address_delivery->firstname),
-            'vat_number' => Tools::htmlentitiesUTF8($address_delivery->vat_number),
             'dni' => Tools::htmlentitiesUTF8($address_delivery->dni),
             'address1' => Tools::htmlentitiesUTF8($address_delivery->address1),
             'postcode' => Tools::htmlentitiesUTF8($address_delivery->postcode),
@@ -641,7 +639,6 @@ class OrderOpcControllerCore extends ParentOrderController
             'company_invoice' => Tools::htmlentitiesUTF8($address_invoice->company),
             'lastname_invoice' => Tools::htmlentitiesUTF8($address_invoice->lastname),
             'firstname_invoice' => Tools::htmlentitiesUTF8($address_invoice->firstname),
-            'vat_number_invoice' => Tools::htmlentitiesUTF8($address_invoice->vat_number),
             'dni_invoice' => Tools::htmlentitiesUTF8($address_invoice->dni),
             'address1_invoice' => Tools::htmlentitiesUTF8($address_invoice->address1),
             'address2_invoice' => Tools::htmlentitiesUTF8($address_invoice->address2),
@@ -655,7 +652,6 @@ class OrderOpcControllerCore extends ParentOrderController
             'invoice_company' => Tools::htmlentitiesUTF8($address_invoice->company),
             'invoice_lastname' => Tools::htmlentitiesUTF8($address_invoice->lastname),
             'invoice_firstname' => Tools::htmlentitiesUTF8($address_invoice->firstname),
-            'invoice_vat_number' => Tools::htmlentitiesUTF8($address_invoice->vat_number),
             'invoice_dni' => Tools::htmlentitiesUTF8($address_invoice->dni),
             'invoice_address' => $this->context->cart->id_address_invoice !== $this->context->cart->id_address_delivery,
             'invoice_address1' => Tools::htmlentitiesUTF8($address_invoice->address1),

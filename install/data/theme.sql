@@ -2,6 +2,7 @@ SET NAMES 'utf8';
 
 UPDATE `PREFIX_configuration` SET value = '1' WHERE name = 'PS_CONDITIONS';
 UPDATE `PREFIX_configuration` SET value = '12' WHERE name = 'PS_PRODUCTS_PER_PAGE';
+UPDATE `PREFIX_configuration` SET value = '9' WHERE name = 'PS_HOTEL_IMAGES_PER_PAGE';
 UPDATE `PREFIX_configuration` SET value = '0' WHERE name = 'PS_PRODUCTS_ORDER_WAY';
 UPDATE `PREFIX_configuration` SET value = '4' WHERE name = 'PS_PRODUCTS_ORDER_BY';
 UPDATE `PREFIX_configuration` SET value = '1' WHERE name = 'PS_DISPLAY_QTIES';
@@ -28,7 +29,7 @@ UPDATE `PREFIX_configuration` SET value = '0' WHERE name = 'PS_BLOCK_SPECIALS_DI
 UPDATE `PREFIX_configuration` SET value = '1' WHERE name = 'PS_STORES_DISPLAY_CMS';
 UPDATE `PREFIX_configuration` SET value = '1' WHERE name = 'PS_STORES_DISPLAY_FOOTER';
 UPDATE `PREFIX_configuration` SET value = '243' WHERE name = 'SHOP_LOGO_WIDTH';
-UPDATE `PREFIX_configuration` SET value = '61' WHERE name = 'SHOP_LOGO_HEIGHT';
+UPDATE `PREFIX_configuration` SET value = '120' WHERE name = 'SHOP_LOGO_HEIGHT';
 UPDATE `PREFIX_configuration` SET value = '1' WHERE name = 'PS_DISPLAY_SUPPLIERS';
 UPDATE `PREFIX_configuration` SET value = '1' WHERE name = 'PS_DISPLAY_BEST_SELLERS';
 UPDATE `PREFIX_configuration` SET value = '0' WHERE name = 'PS_LEGACY_IMAGES';
@@ -42,12 +43,10 @@ UPDATE `PREFIX_configuration` SET value = '1' WHERE name = 'MANUFACTURER_DISPLAY
 UPDATE `PREFIX_configuration` SET value = '1' WHERE name = 'MANUFACTURER_DISPLAY_TEXT';
 UPDATE `PREFIX_configuration` SET value = '5' WHERE name = 'MANUFACTURER_DISPLAY_TEXT_NB';
 UPDATE `PREFIX_configuration` SET value = '8' WHERE name = 'NEW_PRODUCTS_NBR';
-UPDATE `PREFIX_configuration` SET value = '10' WHERE name = 'BLOCKTAGS_NBR';
 UPDATE `PREFIX_configuration` SET value = '0_3|0_4' WHERE name = 'FOOTER_CMS';
 UPDATE `PREFIX_configuration` SET value = '0_3|0_4' WHERE name = 'FOOTER_BLOCK_ACTIVATION';
 UPDATE `PREFIX_configuration` SET value = '1' WHERE name = 'FOOTER_POWEREDBY';
 UPDATE `PREFIX_configuration` SET value = 'https://qloapps.com/' WHERE name = 'BLOCKADVERT_LINK';
-UPDATE `PREFIX_configuration` SET value = 'store.jpg' WHERE name = 'BLOCKSTORE_IMG';
 UPDATE `PREFIX_configuration` SET value = 'jpg' WHERE name = 'BLOCKADVERT_IMG_EXT';
 UPDATE `PREFIX_configuration` SET value = 'CAT3,CAT8,CAT5,LNK1' WHERE name = 'MOD_BLOCKTOPMENU_ITEMS';
 UPDATE `PREFIX_configuration` SET value = '0' WHERE name = 'MOD_BLOCKTOPMENU_SEARCH';
@@ -106,9 +105,6 @@ AND id_hook = @id_hook;
 
 /* displayTop */
 SET @id_hook = (SELECT id_hook FROM `PREFIX_hook` WHERE name = 'displayTop');
-UPDATE `PREFIX_hook_module` SET position = 1
-WHERE id_module = (SELECT id_module FROM `PREFIX_module` WHERE name = 'blocksearch')
-AND id_hook = @id_hook;
 
 UPDATE `PREFIX_hook_module` SET position = 3
 WHERE id_module = (SELECT id_module FROM `PREFIX_module` WHERE name = 'blocktopmenu')
@@ -130,10 +126,6 @@ UPDATE `PREFIX_hook_module` SET position = 1
 WHERE id_module = (SELECT id_module FROM `PREFIX_module` WHERE name = 'blocknewproducts')
 AND id_hook IN (@id_hook, @id_hook2);
 
-UPDATE `PREFIX_hook_module` SET position = 2
-WHERE id_module = (SELECT id_module FROM `PREFIX_module` WHERE name = 'homefeatured')
-AND id_hook IN (@id_hook, @id_hook2);
-
 UPDATE `PREFIX_hook_module` SET position = 3
 WHERE id_module = (SELECT id_module FROM `PREFIX_module` WHERE name = 'blockbestsellers')
 AND id_hook IN (@id_hook, @id_hook2);
@@ -148,14 +140,6 @@ UPDATE `PREFIX_hook_module` SET position = 2
 WHERE id_module = (SELECT id_module FROM `PREFIX_module` WHERE name = 'blocksocial')
 AND id_hook = @id_hook;
 
-UPDATE `PREFIX_hook_module` SET position = 3
-WHERE id_module = (SELECT id_module FROM `PREFIX_module` WHERE name = 'blockcategories')
-AND id_hook = @id_hook;
-
-UPDATE `PREFIX_hook_module` SET position = 4
-WHERE id_module = (SELECT id_module FROM `PREFIX_module` WHERE name = 'blockcms')
-AND id_hook = @id_hook;
-
 UPDATE `PREFIX_hook_module` SET position = 5
 WHERE id_module = (SELECT id_module FROM `PREFIX_module` WHERE name = 'blockmyaccountfooter')
 AND id_hook = @id_hook;
@@ -168,9 +152,6 @@ AND id_hook = @id_hook;
 SET @id_hook = (SELECT id_hook FROM `PREFIX_hook` WHERE name = 'displayProductButtons');
 UPDATE `PREFIX_hook_module` SET position = 1
 WHERE id_module = (SELECT id_module FROM `PREFIX_module` WHERE name = 'blockwishlist')
-AND id_hook = @id_hook;
-UPDATE `PREFIX_hook_module` SET position = 2
-WHERE id_module = (SELECT id_module FROM `PREFIX_module` WHERE name = 'productpaymentlogos')
 AND id_hook = @id_hook;
 
 INSERT INTO `PREFIX_hook_module_exceptions` (`id_shop`, `id_module`, `id_hook`, `file_name`)

@@ -1,9 +1,0 @@
-<!--
-Description: parsed modified, ISO-8601 format, 2-digit year/month only variant
-Expect:      not bozo and feed['modified_parsed'] == (2003, 12, 1, 0, 0, 0, 0, 335, 0)
--->
-<feed version="0.3" xmlns="http://purl.org/atom/ns#">
-
-<modified>-0312</modified>
-
-</feed>
