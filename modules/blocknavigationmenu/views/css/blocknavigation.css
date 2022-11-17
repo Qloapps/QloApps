@@ -1,8 +1,28 @@
+/**
+* 2010-2022 Webkul.
+*
+* NOTICE OF LICENSE
+*
+* All right is reserved,
+* Please go through LICENSE.txt file inside our module
+*
+* DISCLAIMER
+*
+* Do not edit or add to this file if you wish to upgrade this module to newer
+* versions in the future. If you wish to customize this module for your
+* needs please refer to CustomizationPolicy.txt file inside our module for more information.
+*
+* @author Webkul IN
+* @copyright 2010-2022 Webkul IN
+* @license LICENSE.txt
+*/
+
 .nav_toggle {
   background-color: #379BF0;
   border: none;
   position: relative;
-  padding: 11px 10px
+  padding: 11px 10px;
+  margin: 4px 0;
 }
 
 .nav_toggle .icon-bar {
