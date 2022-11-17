@@ -741,7 +741,6 @@ class AdminMetaControllerCore extends AdminController
     {
         $this->addFieldRoute('product_rule', $this->l('Route to products'));
         $this->addFieldRoute('category_rule', $this->l('Route to category'));
-        $this->addFieldRoute('layered_rule', $this->l('Route to category which has the "selected_filter" attribute for the "Layered Navigation" (blocklayered) module'));
         $this->addFieldRoute('supplier_rule', $this->l('Route to supplier'));
         $this->addFieldRoute('manufacturer_rule', $this->l('Route to manufacturer'));
         $this->addFieldRoute('cms_rule', $this->l('Route to CMS page'));

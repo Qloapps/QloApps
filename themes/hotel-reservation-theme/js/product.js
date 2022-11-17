@@ -204,6 +204,10 @@ $(document).ready(function() {
         if (url.indexOf('#') != -1)
             getProductAttribute();
     }
+
+    if ($('.room_info_hotel_images_wrap').length) {
+        loadHotelImagesByPage(1);
+    }
 });
 
 $(window).resize(function() {
@@ -1060,6 +1064,7 @@ function checkUrl() {
 /*java script code by webkul on produt page.*/
 /*#####################################################################*/
 $(document).ready(function() {
+    let dateFormat = 'dd-mm-yy';
     if (total_avail_rms <= room_warning_num) {
         $('.num_quantity_alert').show();
     } else {
@@ -1273,3 +1278,44 @@ var BookingForm = {
         });
     },
 }
+
+function loadHotelImagesByPage(page = 1) {
+    page = parseInt(page);
+
+    $.ajax({
+        url: product_controller_url,
+        type: 'POST',
+        dataType: 'JSON',
+        data: {
+            ajax: true,
+            action: 'getHotelImages',
+            id_product: id_product,
+            page: page,
+        },
+        beforeSend: function() {
+            $('.room_info_hotel_images_wrap .skeleton-loading-wrap').show();
+        },
+        success: function(response) {
+            if (response.status == true && response.message == 'HTML_OK') {
+                $('.room_info_hotel_images_wrap .images-wrap').append(response.html);
+                $('.room_info_hotel_images_wrap .hotel-images-fancybox').fancybox();
+                $('.room_info_hotel_images_wrap .btn-show-more-images').removeClass('hide');
+            }
+
+            if (response.has_next_page) {
+                $('.room_info_hotel_images_wrap .btn-show-more-images').show(200);
+                $('.room_info_hotel_images_wrap .btn-show-more-images').attr('data-next-page', page + 1);
+            } else {
+                $('.room_info_hotel_images_wrap .btn-show-more-images').hide(200);
+            }
+        },
+        complete: function() {
+            $('.room_info_hotel_images_wrap .skeleton-loading-wrap').hide();
+        }
+    });
+}
+
+$(document).on('click', '.room_info_hotel_images_wrap .btn-show-more-images', function () {
+    const page = parseInt($(this).attr('data-next-page'));
+    loadHotelImagesByPage(page);
+});

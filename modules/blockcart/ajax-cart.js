@@ -122,6 +122,7 @@ $(document).ready(function() {
 
 //JS Object : update the cart by ajax actions
 var ajaxCart = {
+    dateFormat: 'dd-mm-yy',
     nb_total_products: 0,
     //override every button in the page in relation to the cart
     overrideButtonsInThePage: function() {
@@ -149,8 +150,8 @@ var ajaxCart = {
         if ($('.cart_block').length) {
             $(document).off('click', '#add_to_cart button').on('click', '#add_to_cart button', function(e) {
                 e.preventDefault();
-                var date_from = $('#room_check_in').val();
-                var date_to = $('#room_check_out').val();
+                var date_from = $.datepicker.formatDate('yy-mm-dd', $.datepicker.parseDate(ajaxCart.dateFormat, $('#room_check_in').val()));
+                var date_to = $.datepicker.formatDate('yy-mm-dd', $.datepicker.parseDate(ajaxCart.dateFormat, $('#room_check_out').val()));
                 ajaxCart.add($('#product_page_product_id').val(), $('#idCombination').val(), true, null, $('#quantity_wanted').val(), null, date_from, date_to);
 
             });
@@ -213,8 +214,8 @@ var ajaxCart = {
 
             /*by webkul*/
             if (pagename == 'product') {
-                dateFrom = $('#room_check_in').val();
-                dateTo = $('#room_check_out').val();
+                dateFrom = $.datepicker.formatDate('yy-mm-dd', $.datepicker.parseDate(ajaxCart.dateFormat, $('#room_check_in').val()));
+                dateTo = $.datepicker.formatDate('yy-mm-dd', $.datepicker.parseDate(ajaxCart.dateFormat, $('#room_check_out').val()));
             } else if (pagename == 'category') {
                 dateFrom = $('#check_in_time').val();
                 dateTo = $('#check_out_time').val();
@@ -504,8 +505,8 @@ var ajaxCart = {
                 /*by webkul checking and setting availability of rooms*/
                 /*for product page add to cart quantity management*/
                 if (pagename == 'product') {
-                    var date_checkIn = $('#room_check_in').val();
-                    var date_checkOut = $('#room_check_out').val();
+                    var date_checkIn = $.datepicker.formatDate('yy-mm-dd', $.datepicker.parseDate(ajaxCart.dateFormat, $('#room_check_in').val()));
+                    var date_checkOut = $.datepicker.formatDate('yy-mm-dd', $.datepicker.parseDate(ajaxCart.dateFormat, $('#room_check_out').val()));
                     var product_page_id_product = $('#product_page_product_id').val();
                     if (idProduct == product_page_id_product && dateFrom < date_checkOut && dateTo >= date_checkIn) {
                         if (jsonData.avail_rooms <= room_warning_num) {
@@ -889,7 +890,7 @@ var ajaxCart = {
                     if (cart_booking_data[key].date_diff !== 'undefined') {
                         $.each(cart_booking_data[key].date_diff, function(date_diff_k, date_diff_v) {
                             content += '<tr class="rooms_remove_container">';
-                            content += '<td>' + $.datepicker.formatDate('dd-mm-yy', new Date(date_diff_v.data_form)) + '&nbsp;-&nbsp;' + $.datepicker.formatDate('dd-mm-yy', new Date(date_diff_v.data_to)) + '</td>';
+                            content += '<td>' + $.datepicker.formatDate(ajaxCart.dateFormat, new Date(date_diff_v.data_form)) + '&nbsp;-&nbsp;' + $.datepicker.formatDate(ajaxCart.dateFormat, new Date(date_diff_v.data_to)) + '</td>';
                             content += '<td class="num_rooms_in_date">' + date_diff_v.num_rm + '</td>';
                             content += '<td>' + formatCurrency(parseFloat(date_diff_v.amount), currency_format, currency_sign, currency_blank) + '</td>';
                             content += '<td>';
@@ -926,7 +927,7 @@ var ajaxCart = {
                     if (cart_booking_data[key].date_diff !== 'undefined') {
                         $.each(cart_booking_data[key].date_diff, function(date_diff_k1, date_diff_v1) {
                             booking_dates_content += '<tr class="rooms_remove_container">';
-                            booking_dates_content += '<td>' + $.datepicker.formatDate('dd-mm-yy', new Date(date_diff_v1.data_form)) + '&nbsp;-&nbsp;' + $.datepicker.formatDate('dd-mm-yy', new Date(date_diff_v1.data_to)) + '</td>';
+                            booking_dates_content += '<td>' + $.datepicker.formatDate(ajaxCart.dateFormat, new Date(date_diff_v1.data_form)) + '&nbsp;-&nbsp;' + $.datepicker.formatDate(ajaxCart.dateFormat, new Date(date_diff_v1.data_to)) + '</td>';
                             booking_dates_content += '<td class="num_rooms_in_date">' + date_diff_v1.num_rm + '</td>';
                             booking_dates_content += '<td>' + formatCurrency(parseFloat(date_diff_v1.amount), currency_format, currency_sign, currency_blank) + '</td>';
                             booking_dates_content += '<td>';

@@ -24,7 +24,7 @@
 *}
 <!-- MODULE Block cart -->
 {if isset($blockcart_top) && $blockcart_top}
-<div class="clearfix{if $PS_CATALOG_MODE} header_user_catalog{/if} nav_menu_padding pull-right">
+<div class="header-top-item {if $PS_CATALOG_MODE}header_user_catalog{/if}">
 {/if}
 	<div class="shopping_cart">
 		<a href="{$link->getPageLink($order_process, true)|escape:'html':'UTF-8'}" title="{l s='View my booking cart' mod='blockcart'}" rel="nofollow">

@@ -1,9 +1,0 @@
-<!--
-Description: parsed pubDate with MSSQL-style date
-Expect:      not bozo and feed['date_parsed'] == (2004, 7, 8, 14, 56, 58, 3, 190, 0)
--->
-<rss version="2.0">
-<channel>
-<pubDate>2004-07-08 23:56:58.0</pubDate>
-</channel>
-</rss>
