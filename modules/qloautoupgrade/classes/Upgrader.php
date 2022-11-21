@@ -316,24 +316,6 @@ class Upgrader
         return $this->getXmlFIle($xml_local, $this->module_xml_link .str_replace('.', '', $version).'.xml', $refresh);
     }
 
-    /**
-     * use the addons api to get install modules list.
-     *
-     * @param mixed $xml_localfile
-     * @param mixed $postData
-     * @param mixed $refresh
-     */
-    public function getQloApiAddons($version, $refresh = false)
-    {
-        if (!is_dir(_PS_ROOT_DIR_ . '/config/xml')) {
-            if (is_file(_PS_ROOT_DIR_ . '/config/xml')) {
-                unlink(_PS_ROOT_DIR_ . '/config/xml');
-            }
-            mkdir(_PS_ROOT_DIR_ . '/config/xml', 0777);
-        }
-        return $this->getXmlFIle(_PS_ROOT_DIR_ . '/config/xml/qlo_mod_list.xml', 'http://'.$this->addons_api . 'xml/addons/' . $version . '.xml', $refresh);
-    }
-
     public function getXmlFile($xml_localfile, $xml_remotefile, $refresh = false)
     {
         // @TODO : this has to be moved in autoupgrade.php > install method

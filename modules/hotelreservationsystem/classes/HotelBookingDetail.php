@@ -1212,38 +1212,72 @@ class HotelBookingDetail extends ObjectModel
         $old_date_from,
         $old_date_to,
         $new_date_from,
-        $new_date_to
+        $new_date_to,
+        $new_total_price = null
     ) {
         $rowByIdOrderIdRoom = Db::getInstance()->getRow('SELECT * FROM `'._DB_PREFIX_.'htl_booking_detail` WHERE `id_room`='.(int)$id_room.' AND `id_order`='.(int)$id_order);
-        $numDays = $this->getNumberOfDays($old_date_from, $old_date_to);
-        $paidUnitRoomPriceTE = $rowByIdOrderIdRoom['total_price_tax_excl']/$numDays;
-        $paidUnitRoomPriceTI = $rowByIdOrderIdRoom['total_price_tax_incl']/$numDays;
-
+        $newTotalPriceTE = '';
+        $newTotalPriceTI = '';
         $newNumDays = $this->getNumberOfDays($new_date_from, $new_date_to);
-        $newTotalPriceTE = $paidUnitRoomPriceTE * $newNumDays;
-        $newTotalPriceTI = $paidUnitRoomPriceTI * $newNumDays;
-        //$total_price = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice($rowByIdOrderIdRoom['id_product'], $new_date_from, $new_date_to);
-        $table = 'htl_cart_booking_data';
-        $table1 = 'htl_booking_detail';
-        $num_days = $this->getNumberOfDays($new_date_from, $new_date_to);
-        $data_cart = array(
-            'date_from' => $new_date_from,
-            'date_to' => $new_date_to,
-            'quantity' => $num_days
+        if ($new_total_price) {
+            $newTotalPriceTE = $new_total_price['tax_excl'];
+            $newTotalPriceTI = $new_total_price['tax_incl'];
+        } else {
+            $oldNumDays = $this->getNumberOfDays($old_date_from, $old_date_to);
+            $unitRoomPriceTE = $rowByIdOrderIdRoom['total_price_tax_excl'] / $oldNumDays;
+            $unitRoomPriceTI = $rowByIdOrderIdRoom['total_price_tax_incl'] / $oldNumDays;
+            $newTotalPriceTE = $unitRoomPriceTE * $newNumDays;
+            $newTotalPriceTI = $unitRoomPriceTI * $newNumDays;
+        }
+
+        // update `total_paid_amount` on database
+        $totalPaidAmount = 0;
+        $isAdvancePayment = Db::getInstance()->getValue(
+            'SELECT o.`is_advance_payment`
+            FROM `'._DB_PREFIX_.'orders` o
+            WHERE o.`id_order` = '.(int) $id_order
         );
-        $data_order = array(
-            'date_from' => $new_date_from,
-            'date_to' => $new_date_to,
-            'total_price_tax_excl' => $newTotalPriceTE,
-            'total_price_tax_incl' => $newTotalPriceTI
+
+        if ($isAdvancePayment) {
+            $objHotelAdvancedPayment = new HotelAdvancedPayment();
+            $productAdvancePayment = $objHotelAdvancedPayment->getIdAdvPaymentByIdProduct($rowByIdOrderIdRoom['id_product']);
+
+            if (!$productAdvancePayment || (isset($productAdvancePayment['payment_type']) && $productAdvancePayment['payment_type'])) {
+                $totalPaidAmount = $objHotelAdvancedPayment->getRoomMinAdvPaymentAmount(
+                    $rowByIdOrderIdRoom['id_product'],
+                    $new_date_from,
+                    $new_date_to
+                );
+            }
+        } else {
+            $totalPaidAmount = $newTotalPriceTI;
+        }
+
+        $cart_booking = array(
+            'table' => 'htl_cart_booking_data',
+            'data' => array(
+                'date_from' => $new_date_from,
+                'date_to' => $new_date_to,
+                'quantity' => $newNumDays,
+            ),
+        );
+
+        $booking_detail = array(
+            'table' => 'htl_booking_detail',
+            'data' => array(
+                'date_from' => $new_date_from,
+                'date_to' => $new_date_to,
+                'total_price_tax_excl' => $newTotalPriceTE,
+                'total_price_tax_incl' => $newTotalPriceTI,
+                'total_paid_amount' => $totalPaidAmount,
+            ),
         );
 
         $where = 'id_order = '.(int)$id_order.' AND id_room = '.(int)$id_room.' AND date_from= \''.pSQL($old_date_from).
         '\' AND date_to = \''.pSQL($old_date_to).'\' AND `is_refunded`=0 AND `is_back_order`=0';
 
-        $result = Db::getInstance()->update($table, $data_cart, $where);
-
-        $result1 = Db::getInstance()->update($table1, $data_order, $where);
+        $result = Db::getInstance()->update($cart_booking['table'], $cart_booking['data'], $where);
+        $result &= Db::getInstance()->update($booking_detail['table'], $booking_detail['data'], $where);
 
         return $result;
     }
