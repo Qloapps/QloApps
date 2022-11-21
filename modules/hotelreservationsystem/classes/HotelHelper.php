@@ -40,36 +40,6 @@ class HotelHelper
         Media::addJsDef($jsVars);
     }
 
-    public function initCurl($params)
-    {
-        if (!$params) {
-            return false;
-        }
-        if ($params['contentType'] == 'JSON') {
-            $header = array('Content-Type: application/json');
-            if (isset($params['postData'])) {
-                $header[] = 'Content-Length: '.strlen($params['postData']);
-            }
-        }
-
-        $curlInit = curl_init();
-        curl_setopt($curlInit, CURLOPT_URL, $params['url']);
-        curl_setopt($curlInit, CURLOPT_HTTPAUTH, CURLAUTH_ANY);
-        curl_setopt($curlInit, CURLOPT_HTTPHEADER,  $header);
-        curl_setopt($curlInit, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($curlInit, CURLOPT_CUSTOMREQUEST, $params['method']);
-        curl_setopt($curlInit, CURLOPT_RETURNTRANSFER, 1);
-        if (isset($params['postData'])) {
-            curl_setopt($curlInit, CURLOPT_POSTFIELDS, $params['postData']);
-        }
-        $response = curl_exec($curlInit);
-
-        // Close handle
-        curl_close($curlInit);
-
-        return $response;
-    }
-
     public function insertHotelCommonFeatures()
     {
         $parent_features_arr = array(
@@ -281,18 +251,6 @@ class HotelHelper
         return true;
     }
 
-    public function insertHotelRoomAllotmentType()
-    {
-        $altment_type_arr = array('Random Allotment','Manual Allotment');
-        foreach ($altment_type_arr as $key => $value) {
-            $obj_allotmanet_type = new HotelRoomAllotmentType();
-            $obj_allotmanet_type->type = $value;
-            $obj_allotmanet_type->save();
-        }
-
-        return true;
-    }
-
     public function createHotelRoomDefaultFeatures()
     {
         $htl_room_ftrs = array(
@@ -352,10 +310,8 @@ class HotelHelper
 
     public function saveDummyHotelBranchInfo()
     {
-        $def_cont_id = Country::getDefaultCountryId();
         $obj_hotel_info = new HotelBranchInformation();
         $obj_hotel_info->active = 1;
-        $obj_hotel_info->phone = '0987654321';
         $obj_hotel_info->email = 'hotelprime@htl.com';
         $obj_hotel_info->check_in = '12:00';
         $obj_hotel_info->check_out = '11:00';
@@ -373,19 +329,31 @@ class HotelHelper
         }
 
         $obj_hotel_info->rating = 3;
-        $obj_hotel_info->city = 'DefCity';
+
+        $obj_hotel_info->save();
+        $htl_id = $obj_hotel_info->id;
+
+        // add hotel address info
+        $def_cont_id = Country::getDefaultCountryId();
+
         if ($states = State::getStatesByIdCountry($def_cont_id)) {
             $state_id = $states[0]['id_state'];
         } else {
             $state_id = 0;
         }
-        $obj_hotel_info->state_id = $state_id;
-        $obj_hotel_info->country_id = $def_cont_id;
-        $obj_hotel_info->zipcode = self::getRandomZipcodeByForCountry($def_cont_id);
-        $obj_hotel_info->address = 'Monticello Dr, Montgomery, AL 36117, USA';
-        $obj_hotel_info->save();
+        $objAddress = new Address();
+        $objAddress->id_hotel = $htl_id;
+        $objAddress->phone = '0987654321';
+        $objAddress->city = 'Demo City';
+        $objAddress->id_state = $state_id;
+        $objAddress->id_country = $def_cont_id;
+        $objAddress->postcode = self::getRandomZipcodeByForCountry($def_cont_id);
+        $objAddress->address1 = 'Monticello Dr, Montgomery, AL 36117, USA';
+        $objAddress->alias = 'The Hotel Prime';
+        $objAddress->lastname = 'The Hotel Prime';
+        $objAddress->firstname = 'The Hotel Prime';
 
-        $htl_id = $obj_hotel_info->id;
+        $objAddress->save();
 
         $grp_ids = array();
         $obj_grp = new Group();
@@ -407,10 +375,10 @@ class HotelHelper
         }
         if (count($states) > 0) {
             if ($cat_state) {
-                $cat_city = $this->addCategory('DefCity', $cat_state, $grp_ids);
+                $cat_city = $this->addCategory('Demo City', $cat_state, $grp_ids);
             }
         } else {
-            $cat_city = $this->addCategory('DefCity', $cat_country, $grp_ids);
+            $cat_city = $this->addCategory('Demo City', $cat_country, $grp_ids);
         }
         if ($cat_city) {
             $cat_hotel = $this->addCategory('The Hotel Prime', $cat_city, $grp_ids, 1, $htl_id);
@@ -437,7 +405,7 @@ class HotelHelper
 
     public function saveDummyProductsAndRelatedInfo($id_hotel)
     {
-        $prod_arr = array('General Rooms', 'Delux Rooms', 'Executive Rooms', 'luxury Rooms');
+        $prod_arr = array('General Rooms', 'Delux Rooms', 'Executive Rooms', 'Luxury Rooms');
         $prod_price_arr = array(1000, 1500, 2000, 2500);
         foreach ($prod_arr as $key => $value_prod) {
             // Add Product
@@ -536,7 +504,7 @@ class HotelHelper
                 $htl_room_info_obj->id_hotel = $id_hotel;
                 $htl_room_info_obj->room_num = 'A-10'.$k;
                 $htl_room_info_obj->id_status = 1;
-                $htl_room_info_obj->floor = 'first';
+                $htl_room_info_obj->floor = 'First';
                 $htl_room_info_obj->save();
             }
 
@@ -663,16 +631,6 @@ class HotelHelper
         }
     }
 
-    public function validImageExt($image_name)
-    {
-        if (!empty($image_name)) {
-            if (ImageManager::isCorrectImageFileExt($image_name)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     public static function generateRandomCode($length = 8)
     {
         $characters = '0123456789abcdefghijklmnopqrstuvwxyz';
@@ -693,33 +651,6 @@ class HotelHelper
 
         $startUrl = $forceSsl ? $baseDirSsl : $baseDir;
         return $startUrl;
-    }
-
-    public static function getQloNativeModules()
-    {
-        $qloModXml = _PS_ROOT_DIR_.'/config/xml/qlo_mod_list.xml';
-        if (!file_exists($qloModXml)) {
-            return false;
-        }
-        $qloNativeMods = @simplexml_load_file($qloModXml);
-
-        if ($qloNativeMods) {
-            $qloNativeMods = $qloNativeMods->modules;
-        }
-        $modules = array();
-        if (is_object($qloNativeMods)) {
-            foreach ($qloNativeMods as $qloNativeModsType) {
-                if (in_array($qloNativeModsType['type'], array('native'))) {
-                    foreach ($qloNativeModsType->module as $module) {
-                        $modules[] = $module['name'];
-                    }
-                }
-            }
-        }
-        if ($modules) {
-            return $modules;
-        }
-        return false;
     }
 
     // update lang values of Configuration lang type keys when importing new language from localization
@@ -789,23 +720,5 @@ class HotelHelper
             }
         }
         return $randZipCode;
-    }
-
-    /**
-     * Get Super Admin Of Prestashop
-     * @return int Super Admin Employee ID
-     */
-    public static function getSupperAdmin()
-    {
-        if ($data = Db::getInstance()->executeS('SELECT * FROM `'._DB_PREFIX_.'employee` ORDER BY `id_employee`')) {
-            foreach ($data as $emp) {
-                $employee = new Employee($emp['id_employee']);
-                if ($employee->isSuperAdmin()) {
-                    return $emp['id_employee'];
-                }
-            }
-        }
-
-        return false;
     }
 }

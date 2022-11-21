@@ -45,7 +45,6 @@ class AddressControllerCore extends FrontController
     {
         parent::setMedia();
         $this->addJS(array(
-            _THEME_JS_DIR_.'tools/vatManagement.js',
             _THEME_JS_DIR_.'tools/statesManagement.js',
             _PS_JS_DIR_.'validate.js'
         ));
@@ -257,7 +256,6 @@ class AddressControllerCore extends FrontController
         parent::initContent();
 
         $this->assignCountries();
-        $this->assignVatNumber();
         $this->assignAddressFormat();
 
         // Assign common vars
@@ -328,32 +326,6 @@ class AddressControllerCore extends FrontController
         $this->context->smarty->assign(array(
             'ordered_adr_fields' => $ordered_adr_fields,
             'required_fields' => $requireFormFieldsList
-        ));
-    }
-
-    /**
-     * Assign template vars related to vat number
-     * @todo move this in vatnumber module !
-     */
-    protected function assignVatNumber()
-    {
-        $vat_number_exists = file_exists(_PS_MODULE_DIR_.'vatnumber/vatnumber.php');
-        $vat_number_management = Configuration::get('VATNUMBER_MANAGEMENT');
-        if ($vat_number_management && $vat_number_exists) {
-            include_once(_PS_MODULE_DIR_.'vatnumber/vatnumber.php');
-        }
-
-        if ($vat_number_management && $vat_number_exists && VatNumber::isApplicable((int)Tools::getCountry())) {
-            $vat_display = 2;
-        } elseif ($vat_number_management) {
-            $vat_display = 1;
-        } else {
-            $vat_display = 0;
-        }
-
-        $this->context->smarty->assign(array(
-            'vatnumber_ajax_call' => file_exists(_PS_MODULE_DIR_.'vatnumber/ajax.php'),
-            'vat_display' => $vat_display,
         ));
     }
 

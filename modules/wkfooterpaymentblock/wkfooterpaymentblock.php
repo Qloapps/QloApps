@@ -43,6 +43,11 @@ class WkFooterPaymentBlock extends Module
         $this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
     }
 
+    public function getContent()
+    {
+        Tools::redirectAdmin($this->context->link->getAdminLink('AdminFooterPaymentBlockSetting'));
+    }
+
     public function hookFooter($params)
     {
         $objPaymentBlockInfo = new WkFooterPaymentBlockInfo();
@@ -57,15 +62,7 @@ class WkFooterPaymentBlock extends Module
     {
         return $this->hookFooter($params);
     }
-
-    public function hookDisplayAddModuleSettingLink()
-    {
-        $footerPaymentBlockLink = $this->context->link->getAdminLink('AdminFooterPaymentBlockSetting');
-        $this->context->smarty->assign('footerPaymentBlockLink', $footerPaymentBlockLink);
-
-        return $this->display(__FILE__, 'footerPaymentSettingLink.tpl');
-    }
-
+    
     public function callInstallTab()
     {
         //Controllers which are to be used in this modules but we have not to create tab for those controllers...
@@ -102,7 +99,6 @@ class WkFooterPaymentBlock extends Module
         if (!parent::install()
             || !$objFooterPaymentBlockDb->createTables()
             ||!$this->registerHook('displayFooterPaymentInfo')
-            ||!$this->registerHook('displayAddModuleSettingLink')
             || !$this->callInstallTab()
             || !$this->insertDefaultModuleData()
         ) {

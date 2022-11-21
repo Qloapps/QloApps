@@ -383,17 +383,17 @@ $(document).ready(function () {
 </div>
 
 <div class="panel">
-	<h3>{l s='Feature Price Plans'}</h3>
+	<h3>{l s='Advanced Price Rules'}</h3>
 	<div class="alert alert-info">
-		{l s='You can set feature price plans by visiting '}
-		<a target="_blank" href="{$link->getAdminLink('AdminHotelFeaturePricesSettings')}">{l s='create feature price plans'}</a>
+		{l s='You can set advanced price rules by visiting '}
+		<a target="_blank" href="{$link->getAdminLink('AdminHotelFeaturePricesSettings')}">{l s='create advanced price rules.'}</a>
 	</div>
 	<div class="table-responsive">
 		<table class="table table-bordered">
 			<thead>
 				<tr>
 					<th>#{l s='Id'}</th>
-					<th>{l s='Plan Name'}</th>
+					<th>{l s='Rule Name'}</th>
 					<th>{l s='Impact way'}</th>
 					<th>{l s='Impact Type'}</th>
 					<th>{l s='Impact Value'}</th>
@@ -413,21 +413,21 @@ $(document).ready(function () {
 								{$featurePlan['feature_price_name']}
 							</td>
 							<td>
-								{if $featurePlan['impact_type'] == 1}
+								{if $featurePlan['impact_type'] == HotelRoomTypeFeaturePricing::IMPACT_TYPE_PERCENTAGE}
 									{l s='Percentage'}
 								{else}
 									{l s='Fixed Amount'}
 								{/if}
 							</td>
 							<td>
-								{if $featurePlan['impact_way'] == 1}
+								{if $featurePlan['impact_way'] == HotelRoomTypeFeaturePricing::IMPACT_WAY_DECREASE}
 									{l s='Decrease'}
 								{else}
 									{l s='Increase'}
 								{/if}
 							</td>
 							<td>
-								{if $featurePlan['impact_type'] == 1}
+								{if $featurePlan['impact_type'] == HotelRoomTypeFeaturePricing::IMPACT_TYPE_PERCENTAGE}
 									{$featurePlan['impact_value']|round:2}%
 								{else}
 									{displayPrice price=$featurePlan['impact_value']}
@@ -437,7 +437,7 @@ $(document).ready(function () {
 								{dateFormat date=$featurePlan['date_from'] full=0}
 							</td>
 							<td>
-								{if $featurePlan['date_selection_type'] == 1}
+								{if $featurePlan['date_selection_type'] == HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_RANGE}
 									{dateFormat date=$featurePlan['date_to'] full=0}
 								{else}
 									<span class="badge badge-success">{l s='Specific date'}</span>
@@ -455,7 +455,7 @@ $(document).ready(function () {
 				{else}
 					<tr>
 						<td class="text-center" colspan="6">
-							<i class="icon-warning-sign"></i> {l s='No feature price plans.'}
+							<i class="icon-warning-sign"></i> {l s='No advanced price rules.'}
 						</td>
 					</tr>
 				{/if}
@@ -577,15 +577,6 @@ $(document).ready(function () {
 								<span class="input-group-addon"><i class="icon-calendar-empty"></i></span>
 							</div>
 						</div>
-					</div>
-				</div>
-			</div>
-			<div class="form-group">
-				<label class="control-label col-lg-2" for="sp_from_quantity">{l s='Starting at'}</label>
-				<div class="col-lg-4">
-					<div class="input-group">
-						<span class="input-group-addon">{l s='unit'}</span>
-						<input type="text" name="sp_from_quantity" id="sp_from_quantity" value="1" />
 					</div>
 				</div>
 			</div>
@@ -732,7 +723,6 @@ $(document).ready(function () {
 				{/if}
 				<th>{l s='Impact'}</th>
 				<th>{l s='Period'}</th>
-				<th>{l s='From (quantity)'}</th>
 				<th>{l s='Action'}</th>
 			</tr>
 		</thead>

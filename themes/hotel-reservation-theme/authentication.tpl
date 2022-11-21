@@ -50,11 +50,17 @@
 	</div>
 	{/if}-->
 	<div class="row">
+		<div class="col-xs-12">
+			<div class="alert alert-success" id="guest_transform_success" style="display:none">
+				{l s='Your guest account has been transformed into a customer account successfully and the login credentials have been sent to you. Please make sure to change the password for security.'}
+			</div>
+		</div>
 		<div class="col-xs-12 col-sm-6">
 			<form action="{$link->getPageLink('authentication', true)|escape:'html':'UTF-8'}" method="post" id="create-account_form" class="box">
 				<h3 class="page-subheading">{l s='Create an account'}</h3>
 				<div class="form_content clearfix">
 					<p class="content">{l s='Please enter your email address to create an account.'}</p>
+					<div class="alert alert-info" id="create_account_information" style="display:none"></div>
 					<div class="alert alert-danger" id="create_account_error" style="display:none"></div>
 					<div class="form-group">
 						<label for="email_create" class="">{l s='Email address'}</label>
@@ -68,7 +74,6 @@
 								{l s='Create an account'}
 							</span>
 						</button>
-						<input type="hidden" class="hidden" name="SubmitCreate" value="{l s='Create an account'}" />
 					</div>
 				</div>
 			</form>
@@ -192,14 +197,7 @@
 								<label for="company">{l s='Company'}{if in_array($field_name, $required_fields)} <sup>*</sup>{/if}</label>
 								<input type="text" class="form-control" id="company" name="company" value="{if isset($smarty.post.company)}{$smarty.post.company}{/if}" />
 							</div>
-						{elseif $field_name eq "vat_number"}
-							<div id="vat_number" style="display:none;">
-								<div class="form-group">
-									<label for="vat-number">{l s='VAT number'}{if in_array($field_name, $required_fields)} <sup>*</sup>{/if}</label>
-									<input id="vat-number" type="text" class="form-control" name="vat_number" value="{if isset($smarty.post.vat_number)}{$smarty.post.vat_number}{/if}" />
-								</div>
-							</div>
-							{elseif $field_name eq "dni"}
+						{elseif $field_name eq "dni"}
 							{assign var='dniExist' value=true}
 							<div class="required dni form-group">
 								<label for="dni">{l s='Identification number'} <sup>*</sup></label>
@@ -289,13 +287,6 @@
 						<div class="form-group">
 							<label for="company_invoice">{l s='Company'}{if in_array($field_name, $required_fields)} <sup>*</sup>{/if}</label>
 							<input type="text" class="text form-control" id="company_invoice" name="company_invoice" value="{if isset($smarty.post.company_invoice) && $smarty.post.company_invoice}{$smarty.post.company_invoice}{/if}" />
-						</div>
-						{elseif $field_name eq "vat_number"}
-						<div id="vat_number_block_invoice" style="display:none;">
-							<div class="form-group">
-								<label for="vat_number_invoice">{l s='VAT number'}{if in_array($field_name, $required_fields)} <sup>*</sup>{/if}</label>
-								<input type="text" class="form-control" id="vat_number_invoice" name="vat_number_invoice" value="{if isset($smarty.post.vat_number_invoice) && $smarty.post.vat_number_invoice}{$smarty.post.vat_number_invoice}{/if}" />
-							</div>
 						</div>
 						{elseif $field_name eq "dni"}
 						{assign var=dniExist value=true}
@@ -551,13 +542,6 @@
 								<input type="text" class="form-control" id="company" name="company" value="{if isset($smarty.post.company)}{$smarty.post.company}{/if}" />
 							</p>
 						{/if}
-					{elseif $field_name eq "vat_number"}
-						<div id="vat_number" style="display:none;">
-							<p class="form-group">
-								<label for="vat_number">{l s='VAT number'}{if in_array($field_name, $required_fields)} <sup>*</sup>{/if}</label>
-								<input type="text" class="form-control" id="vat_number" name="vat_number" value="{if isset($smarty.post.vat_number)}{$smarty.post.vat_number}{/if}" />
-							</p>
-						</div>
 					{elseif $field_name eq "firstname"}
 						<p class="required form-group">
 							<label for="firstname">{l s='First name'} <sup>*</sup></label>
@@ -694,9 +678,6 @@
 {/if}
 {if isset($countries)}
 	{addJsDef countries=$countries}
-{/if}
-{if isset($vatnumber_ajax_call) && $vatnumber_ajax_call}
-	{addJsDef vatnumber_ajax_call=$vatnumber_ajax_call}
 {/if}
 {if isset($email_create) && $email_create}
 	{addJsDef email_create=$email_create|boolval}

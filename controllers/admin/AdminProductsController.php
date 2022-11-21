@@ -207,10 +207,11 @@ class AdminProductsControllerCore extends AdminController
 				LEFT JOIN `'._DB_PREFIX_.'shop` shop ON (shop.id_shop = '.$id_shop.')
 				LEFT JOIN `'._DB_PREFIX_.'image_shop` image_shop ON (image_shop.`id_product` = a.`id_product` AND image_shop.`cover` = 1 AND image_shop.id_shop = '.$id_shop.')
 				LEFT JOIN `'._DB_PREFIX_.'image` i ON (i.`id_image` = image_shop.`id_image`)
-				LEFT JOIN `'._DB_PREFIX_.'product_download` pd ON (pd.`id_product` = a.`id_product` AND pd.`active` = 1)';
+                LEFT JOIN `'._DB_PREFIX_.'product_download` pd ON (pd.`id_product` = a.`id_product` AND pd.`active` = 1)
+				LEFT JOIN `'._DB_PREFIX_.'address` aa ON (aa.`id_hotel` = hb.`id`)';
 
         $this->_select .= ' (SELECT COUNT(hri.`id`) FROM `'._DB_PREFIX_.'htl_room_information` hri WHERE hri.`id_product` = a.`id_product`) as num_rooms, ';
-        $this->_select .= 'hrt.`adult`, hrt.`children`, hb.`id` as id_hotel, hb.`city`, hbl.`hotel_name`, ';
+        $this->_select .= 'hrt.`adult`, hrt.`children`, hb.`id` as id_hotel, aa.`city`, hbl.`hotel_name`, ';
         $this->_select .= 'shop.`name` AS `shopname`, a.`id_shop_default`, ';
         $this->_select .= $alias_image.'.`id_image` AS `id_image`, cl.`name` AS `name_category`, '.$alias.'.`price`, 0 AS `price_final`, a.`is_virtual`, pd.`nb_downloadable`, sav.`quantity` AS `sav_quantity`, '.$alias.'.`active`, IF(sav.`quantity`<=0, 1, 0) AS `badge_danger`';
 
@@ -724,7 +725,6 @@ class AdminProductsControllerCore extends AdminController
         }
     }
 
-
     /**
      * Attach an existing attachment to the product
      *
@@ -758,17 +758,63 @@ class AdminProductsControllerCore extends AdminController
             unset($product->id_product);
             $product->indexed = 0;
             $product->active = 0;
+
+            // suffix 'Duplicate' if same hotel
+            $id_hotel_new = Tools::getValue('id_hotel');
+            $obj_hotel_room_type = new HotelRoomType();
+            $room_type_info = $obj_hotel_room_type->getRoomTypeInfoByIdProduct($id_product_old);
+            if ($room_type_info && $room_type_info['id_hotel'] == $id_hotel_new) {
+                foreach (Language::getLanguages(true) as $language) {
+                    $product->name[$language['id_lang']] = $product->name[$language['id_lang']].
+                    ' - '.$this->l('Duplicate');
+                }
+            }
+
+            // update lang fields
+            foreach (Language::getLanguages(true) as $language) {
+                $product->link_rewrite[$language['id_lang']] = Tools::str2url($product->name[$language['id_lang']]);
+            }
             if ($product->add()
-            && Category::duplicateProductCategories($id_product_old, $product->id)
-            && Product::duplicateSuppliers($id_product_old, $product->id)
-            && ($combination_images = Product::duplicateAttributes($id_product_old, $product->id)) !== false
-            && GroupReduction::duplicateReduction($id_product_old, $product->id)
-            && Product::duplicateAccessories($id_product_old, $product->id)
-            && Product::duplicateFeatures($id_product_old, $product->id)
-            && Pack::duplicate($id_product_old, $product->id)
-            && Product::duplicateCustomizationFields($id_product_old, $product->id)
-            && Product::duplicateTags($id_product_old, $product->id)
-            && Product::duplicateDownload($id_product_old, $product->id)) {
+                // && Category::duplicateProductCategories($id_product_old, $product->id)
+                && Product::duplicateSuppliers($id_product_old, $product->id)
+                && ($combination_images = Product::duplicateAttributes($id_product_old, $product->id)) !== false
+                && GroupReduction::duplicateReduction($id_product_old, $product->id)
+                && Product::duplicateAccessories($id_product_old, $product->id)
+                && Product::duplicateFeatures($id_product_old, $product->id)
+                && Pack::duplicate($id_product_old, $product->id)
+                && Product::duplicateCustomizationFields($id_product_old, $product->id)
+                && Product::duplicateTags($id_product_old, $product->id)
+                && Product::duplicateDownload($id_product_old, $product->id)
+            ) {
+                $obj_hotel_room_type = new HotelRoomType();
+                $room_type_info = $obj_hotel_room_type->getRoomTypeInfoByIdProduct($id_product_old);
+                $id_room_type_old = $room_type_info['id'];
+                if (!$id_hotel_new) {
+                    $id_hotel_new = $room_type_info['id_hotel'];
+                }
+                $id_room_type_new = HotelRoomType::duplicateRoomType(
+                    $id_product_old,
+                    $product->id,
+                    $id_hotel_new,
+                    true
+                );
+                if ($id_room_type_new) {
+                    if (!HotelRoomType::duplicateRooms(
+                        $id_product_old,
+                        $id_room_type_new,
+                        $product->id,
+                        $id_hotel_new
+                    )) {
+                        $this->errors[] = Tools::displayError('An error occurred while duplicating rooms.');
+                    }
+                    if (!HotelRoomTypeDemand::duplicateRoomTypeDemands($id_product_old, $product->id)) {
+                        $this->errors[] = Tools::displayError(
+                            'An error occurred while duplicating additional facilities.'
+                        );
+                    }
+                } else {
+                    $this->errors[] = Tools::displayError('An error occurred while duplicating room type.');
+                }
                 if ($product->hasAttributes()) {
                     Product::updateDefaultAttribute($product->id);
                 } else {
@@ -1226,7 +1272,7 @@ class AdminProductsControllerCore extends AdminController
         $id_group = Tools::getValue('sp_id_group');
         $id_customer = Tools::getValue('sp_id_customer');
         $price = Tools::getValue('leave_bprice') ? '-1' : Tools::getValue('sp_price');
-        $from_quantity = Tools::getValue('sp_from_quantity');
+        $from_quantity = 1;
         $reduction = (float)(Tools::getValue('sp_reduction'));
         $reduction_tax = Tools::getValue('sp_reduction_tax');
         $reduction_type = !$reduction ? 'amount' : Tools::getValue('sp_reduction_type');
@@ -1540,7 +1586,13 @@ class AdminProductsControllerCore extends AdminController
             parent::postProcess();
         }
 
-        if ($this->display == 'edit' || $this->display == 'add') {
+        $this->addJS(array(
+            _PS_JS_DIR_.'admin/products.js',
+        ));
+
+        if (in_array($this->display, array('add', 'edit'))
+            && $this->tabAccess[$this->display] == '1'
+        ) {
             $this->addJqueryUI(array(
                 'ui.core',
                 'ui.widget'
@@ -1558,7 +1610,6 @@ class AdminProductsControllerCore extends AdminController
             ));
 
             $this->addJS(array(
-                _PS_JS_DIR_.'admin/products.js',
                 _PS_JS_DIR_.'admin/attributes.js',
                 _PS_JS_DIR_.'admin/price.js',
                 _PS_JS_DIR_.'tiny_mce/tiny_mce.js',
@@ -2646,8 +2697,6 @@ class AdminProductsControllerCore extends AdminController
             // used to build the new url when changing category
             $this->tpl_list_vars['base_url'] = preg_replace('#&id_category=[0-9]*#', '', self::$currentIndex).'&token='.$this->token;
         }
-        // @todo module free
-        $this->tpl_form_vars['vat_number'] = file_exists(_PS_MODULE_DIR_.'vatnumber/ajax.php');
 
         parent::initContent();
     }
@@ -2656,8 +2705,6 @@ class AdminProductsControllerCore extends AdminController
     {
         $time = time();
         $kpis = array();
-
-        /* The data generation is located in AdminStatsControllerCore */
 
         // if (Configuration::get('PS_STOCK_MANAGEMENT')) {
         //     $helper = new HelperKpi();
@@ -2680,12 +2727,8 @@ class AdminProductsControllerCore extends AdminController
         $helper->icon = 'icon-tags';
         $helper->color = 'color2';
         $helper->title = $this->l('Average Gross Margin %', null, null, false);
-        if (ConfigurationKPI::get('PRODUCT_AVG_GROSS_MARGIN') !== false) {
-            $helper->value = ConfigurationKPI::get('PRODUCT_AVG_GROSS_MARGIN');
-        }
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=product_avg_gross_margin';
         $helper->tooltip = $this->l('Gross margin expressed in percentage assesses how cost-effectively you sell your room types. Out of $100, you will retain $X to cover profit and expenses.', null, null, false);
-        $helper->refresh = (bool)(ConfigurationKPI::get('PRODUCT_AVG_GROSS_MARGIN_EXPIRE') < $time);
         $kpis[] = $helper->generate();
 
         $helper = new HelperKpi();
@@ -2694,12 +2737,8 @@ class AdminProductsControllerCore extends AdminController
         $helper->color = 'color3';
         $helper->title = $this->l('Purchased references', null, null, false);
         $helper->subtitle = $this->l('30 days', null, null, false);
-        if (ConfigurationKPI::get('8020_SALES_CATALOG') !== false) {
-            $helper->value = ConfigurationKPI::get('8020_SALES_CATALOG');
-        }
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=8020_sales_catalog';
-        $helper->tooltip = $this->l('X% of your references have been purchased for the past 30 days', null, null, false);
-        $helper->refresh = (bool)(ConfigurationKPI::get('8020_SALES_CATALOG_EXPIRE') < $time);
+        $helper->tooltip = $this->l('X% of your references have been purchased for the past 30 days.', null, null, false);
         if (Module::isInstalled('statsbestproducts')) {
             $helper->href = Context::getContext()->link->getAdminLink('AdminStats').'&module=statsbestproducts&datepickerFrom='.date('Y-m-d', strtotime('-30 days')).'&datepickerTo='.date('Y-m-d');
         }
@@ -2711,12 +2750,8 @@ class AdminProductsControllerCore extends AdminController
         $helper->color = 'color4';
         $helper->href = $this->context->link->getAdminLink('AdminProducts');
         $helper->title = $this->l('Disabled Room Types', null, null, false);
-        if (ConfigurationKPI::get('DISABLED_PRODUCTS') !== false) {
-            $helper->value = ConfigurationKPI::get('DISABLED_PRODUCTS');
-        }
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=disabled_products';
-        $helper->refresh = (bool)(ConfigurationKPI::get('DISABLED_PRODUCTS_EXPIRE') < $time);
-        $helper->tooltip = $this->l('X% of your room types are disabled and not visible to your customers', null, null, false);
+        $helper->tooltip = $this->l('X% of your room types are disabled and not visible to your customers.', null, null, false);
         $helper->href = Context::getContext()->link->getAdminLink('AdminProducts').'&productFilter_active=0&submitFilterproduct=1';
         $kpis[] = $helper->generate();
 
@@ -2732,6 +2767,12 @@ class AdminProductsControllerCore extends AdminController
         $this->addRowAction('duplicate');
         $this->addRowAction('delete');
         return parent::renderList();
+    }
+
+    public function displayDuplicateLink($token = null, $id, $name = null)
+    {
+        return '<a href="#" title="'.$this->l('Duplicate').'"
+        onclick="initDuplicateRoomType('.(int)$id.');return false;"><i class="icon-copy"></i>'.$this->l('Duplicate').'</a>';
     }
 
     public function ajaxProcessProductManufacturers()
@@ -2843,10 +2884,7 @@ class AdminProductsControllerCore extends AdminController
                     );
                 }
 
-                $js = (bool)Image::getImages($this->context->language->id, (int)$product->id) ?
-                    'confirm_link(\'\', \''.$this->l('This will copy the images too. If you wish to proceed, click "Yes". If not, click "No".', null, true, false).'\', \''.$this->l('Yes', null, true, false).'\', \''.$this->l('No', null, true, false).'\', \''.$this->context->link->getAdminLink('AdminProducts', true).'&id_product='.(int)$product->id.'&duplicateproduct'.'\', \''.$this->context->link->getAdminLink('AdminProducts', true).'&id_product='.(int)$product->id.'&duplicateproduct&noimage=1'.'\')'
-                    :
-                    'document.location = \''.$this->context->link->getAdminLink('AdminProducts', true).'&id_product='.(int)$product->id.'&duplicateproduct&noimage=1'.'\'';
+                $js = 'initDuplicateRoomType('.(int)$product->id.');return false;';
 
                 // adding button for duplicate this product
                 if ($this->tabAccess['add']) {
@@ -2880,6 +2918,12 @@ class AdminProductsControllerCore extends AdminController
             }
         }
         parent::initPageHeaderToolbar();
+    }
+
+    public function initModal()
+    {
+        parent::initModal();
+        $this->modals[] = $this->getModalDuplicateOptions();
     }
 
     public function initToolbar()
@@ -3856,6 +3900,9 @@ class AdminProductsControllerCore extends AdminController
                 'link' => new Link(),
                 'pack' => new Pack()
             ));
+
+            // get hotel address for this room type
+            $address_infos = Address::getCountryAndState(Cart::getIdAddressForTaxCalculation($obj->id));
         } else {
             $this->displayWarning($this->l('You must save this room type before adding specific pricing'));
             $product->id_tax_rules_group = (int)Product::getIdTaxRulesGroupMostUsed();
@@ -3863,7 +3910,14 @@ class AdminProductsControllerCore extends AdminController
         }
 
         $address = new Address();
-        $address->id_country = (int)$this->context->country->id;
+        // $address->id_country = (int)$this->context->country->id;
+        if (!$address_infos) {
+            $address->id_country = (int)$this->context->country->id;
+        } else {
+            $address->id_country = (int)$address_infos['id_country'];
+            $address->id_state = (int)$address_infos['id_state'];
+            $address->zipcode = $address_infos['postcode'];
+        }
         $tax_rules_groups = TaxRulesGroup::getTaxRulesGroups(true);
         $tax_rates = array(
             0 => array(
@@ -4238,7 +4292,6 @@ class AdminProductsControllerCore extends AdminController
 						<td>'.$fixed_price.'</td>
 						<td>'.$impact.'</td>
 						<td>'.$period.'</td>
-						<td>'.$specific_price['from_quantity'].'</th>
 						<td>'.((!$rule->id && $can_delete_specific_prices) ? '<a class="btn btn-default" name="delete_link" href="'.self::$currentIndex.'&id_product='.(int)Tools::getValue('id_product').'&action=deleteSpecificPrice&id_specific_price='.(int)($specific_price['id_specific_price']).'&token='.Tools::getValue('token').'"><i class="icon-trash"></i></a>': '').'</td>
 					</tr>';
                     $i++;
@@ -5428,6 +5481,51 @@ class AdminProductsControllerCore extends AdminController
         $this->tpl_form_vars['custom_form'] = $data->fetch();
     }
 
+    public function getModalDuplicateOptions()
+    {
+        $tpl = $this->createTemplate('modal-duplicate-options.tpl');
+        $idsHotel = HotelBranchInformation::getProfileAccessedHotels($this->context->employee->id_profile, 1, 1);
+        $hotelsInfo = array();
+        foreach ($idsHotel as $idHotel) {
+            $objHotelBranchInfo = new HotelBranchInformation($idHotel, $this->context->language->id);
+            if (Validate::isLoadedObject($objHotelBranchInfo)) {
+                $hotelAddressInfo = $objHotelBranchInfo->getAddress($idHotel);
+                $hotelInfo = array(
+                    'id_hotel' => $objHotelBranchInfo->id,
+                    'hotel_name' => $objHotelBranchInfo->hotel_name,
+                    'rating' => $objHotelBranchInfo->rating,
+                    'city' => $hotelAddressInfo['city'],
+                );
+                $hotelsInfo[] = $hotelInfo;
+            }
+        }
+        $formAction = $this->context->link->getAdminLink('AdminProducts', true).'&duplicateproduct';
+        $tpl->assign(array(
+            'action' => $formAction,
+            'hotels_info' => $hotelsInfo,
+            'duplicate_images' => 1,
+        ));
+
+        $modalActions = array(
+            array(
+                'type' => 'button',
+                'value' => 'submitDuplicate',
+                'class' => 'btn-primary submit-duplicate',
+                'label' => $this->l('Submit'),
+            ),
+        );
+
+        // set modal options
+        $modal = array(
+            'modal_id' => 'modal-duplicate-options',
+            'modal_class' => 'modal-md',
+            'modal_title' => $this->l('Duplication options'),
+            'modal_content' => $tpl->fetch(),
+            'modal_actions' => $modalActions,
+        );
+        return $modal;
+    }
+
     public function ajaxProcessProductQuantity()
     {
         if ($this->tabAccess['edit'] === '0') {
@@ -5744,6 +5842,19 @@ class AdminProductsControllerCore extends AdminController
                 }
             }
         }
+    }
+
+    public function ajaxProcessGetIdHotelByIdProduct()
+    {
+        $response = array('status' => 'failed');
+        $idProduct = Tools::getValue('id_product');
+        $objHotelRoomType = new HotelRoomType();
+        $roomTypeInfo = $objHotelRoomType->getRoomTypeInfoByIdProduct($idProduct);
+        if ($roomTypeInfo) {
+            $response['status'] = 'success';
+            $response['id_hotel'] = (int)$roomTypeInfo['id_hotel'];
+        }
+        die(json_encode($response));
     }
 
     public function processImageLegends()

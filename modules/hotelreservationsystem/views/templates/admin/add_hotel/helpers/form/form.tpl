@@ -1,3 +1,22 @@
+{**
+* 2010-2022 Webkul.
+*
+* NOTICE OF LICENSE
+*
+* All right is reserved,
+* Please go through LICENSE.txt file inside our module
+*
+* DISCLAIMER
+*
+* Do not edit or add to this file if you wish to upgrade this module to newer
+* versions in the future. If you wish to customize this module for your
+* needs please refer to CustomizationPolicy.txt file inside our module for more information.
+*
+* @author Webkul IN
+* @copyright 2010-2022 Webkul IN
+* @license LICENSE.txt
+*}
+
 <div class="panel">
 	<div class="panel-heading">
 		{if isset($edit)}
@@ -8,6 +27,11 @@
 	</div>
 
 	<form id="{$table|escape:'htmlall':'UTF-8'}_form" class="defaultForm {$name_controller|escape:'htmlall':'UTF-8'} form-horizontal" action="{$current|escape:'htmlall':'UTF-8'}&{if !empty($submit_action)}{$submit_action|escape:'htmlall':'UTF-8'}{/if}&token={$token|escape:'htmlall':'UTF-8'}" method="post" enctype="multipart/form-data" {if isset($style)}style="{$style|escape:'htmlall':'UTF-8'}"{/if}>
+		{if isset($edit)}
+			{assign var=hook_arg_id_hotel value=$hotel_info.id}
+		{else}
+			{assign var=hook_arg_id_hotel value=null}
+		{/if}
 		{if count($languages) > 1}
 			<div class="col-lg-12">
 				<label class="control-label">{l s='Choose Language' mod='hotelreservationsystem'}</label>
@@ -50,6 +74,7 @@
 						{l s='Refund Policies' mod='hotelreservationsystem'}
 					</a>
 				</li>
+				{hook h='displayAdminAddHotelFormTab' id_hotel=$hook_arg_id_hotel}
 			</ul>
 			<div class="tab-content panel collapse in">
 				<div class="tab-pane active" id="hotel-information">
@@ -129,7 +154,7 @@
 					<div class="form-group">
 						<label class="col-sm-3 control-label required">{l s='Phone :' mod='hotelreservationsystem'}</label>
 						<div class="col-sm-6">
-							<input type="text" name="phone" id="phone" {if isset($edit)}value="{$hotel_info.phone|escape:'htmlall':'UTF-8'}"{/if}/>
+							<input type="text" name="phone" id="phone" {if isset($edit)}value="{$address_info.phone|escape:'htmlall':'UTF-8'}"{/if}/>
 						</div>
 					</div>
 					<div class="form-group">
@@ -146,7 +171,7 @@
 					<div class="form-group">
 						<label class="col-sm-3 control-label required">{l s='Address :' mod='hotelreservationsystem'}</label>
 						<div class="col-sm-6">
-							<textarea name="address" rows="4" cols="35" >{if isset($edit)}{$hotel_info.address|escape:'htmlall':'UTF-8'}{/if}</textarea>
+							<textarea name="address" rows="4" cols="35" >{if isset($edit)}{$address_info.address1|escape:'htmlall':'UTF-8'}{/if}</textarea>
 						</div>
 					</div>
 					<div class="form-group">
@@ -188,7 +213,7 @@
 									<option value="0" selected="selected">{l s='Choose your Country' mod='hotelreservationsystem'} </option>
 									{if $country_var}
 										{foreach $country_var as $countr}
-											<option value="{$countr['id_country']}" {if isset($edit)} {if $hotel_info['country_id'] == "{$countr['id_country']}"}selected{/if}{/if}> {$countr['name']}</option>
+											<option value="{$countr['id_country']}" {if isset($edit)} {if $address_info['id_country'] == "{$countr['id_country']}"}selected{/if}{/if}> {$countr['name']}</option>
 										{/foreach}
 									{/if}
 								</select>
@@ -204,7 +229,7 @@
 								{if isset($edit)}
 									{if $state_var}
 										{foreach $state_var as $state}
-											<option value="{$state['id']}" {if isset($edit)} {if $hotel_info['state_id'] == "{$state['id']}"}selected{/if}{/if}> {$state['name']}</option>
+											<option value="{$state['id']}" {if isset($edit)} {if $address_info['id_state'] == "{$state['id']}"}selected{/if}{/if}> {$state['name']}</option>
 										{/foreach}
 									{/if}
 								{else}
@@ -217,13 +242,13 @@
 					<div class="form-group">
 						<label class="control-label col-sm-3 required" for="hotel_city">{l s='City :' mod='hotelreservationsystem'}</label>
 						<div class="col-sm-6">
-							<input class="form-control" type="" data-validate="" id="hotel_city" name="hotel_city" {if isset($edit)}value="{$hotel_info.city|escape:'htmlall':'UTF-8'}"{/if} />
+							<input class="form-control" type="" data-validate="" id="hotel_city" name="hotel_city" {if isset($edit)}value="{$address_info.city|escape:'htmlall':'UTF-8'}"{/if} />
 						</div>
 					</div>
 					<div class="form-group">
 						<label class="control-label col-sm-3 required" for="hotel_postal_code">{l s='Zip Code :' mod='hotelreservationsystem'}</label>
 						<div class="col-sm-6">
-							<input class="form-control" type="" data-validate="" id="hotel_postal_code" name="hotel_postal_code" {if isset($edit)}value="{$hotel_info.zipcode|escape:'htmlall':'UTF-8'}"{/if} />
+							<input class="form-control" type="" data-validate="" id="hotel_postal_code" name="hotel_postal_code" {if isset($edit)}value="{$address_info.postcode|escape:'htmlall':'UTF-8'}"{/if} />
 						</div>
 					</div>
 					<div class="form-group">
@@ -246,13 +271,13 @@
 					</div>
 					{if isset($enabledDisplayMap) && $enabledDisplayMap}
 						<div class="form-group">
-							<label class="col-sm-3 control-label">{l s='Map :' mod='hotelreservationsystem'}</label>
+							<label class="col-sm-3 control-label">{l s='Map:' mod='hotelreservationsystem'}</label>
 							<div class="col-sm-6" id="googleMapContainer">
 								<input type="hidden" id="loclatitude" name="loclatitude" value="{if isset($edit)}{$hotel_info.latitude|escape:'htmlall':'UTF-8'}{/if}" />
 								<input type="hidden" id="loclongitude" name="loclongitude" value="{if isset($edit)}{$hotel_info.longitude|escape:'htmlall':'UTF-8'}{/if}" />
 								<input type="hidden" id="locformatedAddr" name="locformatedAddr" value="{if isset($edit)}{$hotel_info.map_formated_address}{/if}" />
 								<input type="hidden" id="googleInputField" name="googleInputField" value="{if isset($edit)}{$hotel_info.map_input_text}{/if}" />
-								<input id="pac-input" class="controls" type="text" placeholder="Enter a location">
+								<input id="pac-input" class="controls" type="text" placeholder="{l s='Search' mod='hotelreservationsystem'}">
 								<div id="map"></div>
 							</div>
 						</div>
@@ -414,6 +439,7 @@
 						</div>
 					{/if}
 				</div>
+				{hook h='displayAdminAddHotelFormTabContent' id_hotel=$hook_arg_id_hotel}
 			</div>
 		</div>
 		<div class="panel-footer">

@@ -85,6 +85,11 @@
 	color: #555555;
 }
 
+#dashactivity .stats-list .item-label.heading span {
+	font-size: 14px;
+	font-weight: bold;
+}
+
 #dashactivity .stats-list .item-value {
 	position: absolute;
 	right: 0;
