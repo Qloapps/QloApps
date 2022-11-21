@@ -1580,6 +1580,14 @@ class AdminControllerCore extends Controller
 
         $this->context->smarty->assign('help_link', 'http://help.prestashop.com/'.Language::getIsoById($this->context->employee->id_lang).'/doc/'
             .Tools::getValue('controller').'?version='._PS_VERSION_.'&country='.Language::getIsoById($this->context->employee->id_lang));
+
+        $this->context->smarty->assign(array(
+            'show_page_header_toolbar' => $this->show_page_header_toolbar,
+            'page_header_toolbar_title' => $this->page_header_toolbar_title,
+            'title' => $this->page_header_toolbar_title,
+            'toolbar_btn' => $this->page_header_toolbar_btn,
+            'page_header_toolbar_btn' => $this->page_header_toolbar_btn,
+        ));
     }
 
     /**
@@ -2112,11 +2120,6 @@ class AdminControllerCore extends Controller
             'content' => $this->content,
             'lite_display' => $this->lite_display,
             'url_post' => self::$currentIndex.'&token='.$this->token,
-            'show_page_header_toolbar' => $this->show_page_header_toolbar,
-            'page_header_toolbar_title' => $this->page_header_toolbar_title,
-            'title' => $this->page_header_toolbar_title,
-            'toolbar_btn' => $this->page_header_toolbar_btn,
-            'page_header_toolbar_btn' => $this->page_header_toolbar_btn
         ));
     }
 

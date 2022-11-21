@@ -746,7 +746,16 @@ class CartCore extends ObjectModel
                 $totalPriceByProductTaxExcl = 0;
                 $priceDisplay = Group::getPriceDisplayMethod(Group::getCurrent()->id);
                 foreach ($roomTypesByIdProduct as $key => $cartRoomInfo) {
-                    $roomTotalPrice = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice($cartRoomInfo['id_product'], $cartRoomInfo['date_from'], $cartRoomInfo['date_to']);
+                    $roomTotalPrice = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
+                        $cartRoomInfo['id_product'],
+                        $cartRoomInfo['date_from'],
+                        $cartRoomInfo['date_to'],
+                        0,
+                        Group::getCurrent()->id,
+                        $cartRoomInfo['id_cart'],
+                        $cartRoomInfo['id_guest'],
+                        $cartRoomInfo['id_room']
+                    );
                     $totalPriceByProductTaxIncl += $roomTotalPrice['total_price_tax_incl'];
                     $totalPriceByProductTaxExcl += $roomTotalPrice['total_price_tax_excl'];
                 }
@@ -1637,7 +1646,12 @@ class CartCore extends ObjectModel
                 $roomTotalPrice = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
                     $cartRoomInfo['id_product'],
                     $cartRoomInfo['date_from'],
-                    $cartRoomInfo['date_to']
+                    $cartRoomInfo['date_to'],
+                    0,
+                    Group::getCurrent()->id,
+                    $cartRoomInfo['id_cart'],
+                    $cartRoomInfo['id_guest'],
+                    $cartRoomInfo['id_room']
                 );
                 if ($with_taxes) {
                     $totalPriceByProduct += $roomTotalPrice['total_price_tax_incl'];

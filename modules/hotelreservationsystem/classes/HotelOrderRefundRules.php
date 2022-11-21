@@ -128,20 +128,30 @@ class HotelOrderRefundRules extends ObjectModel
 
     public function calculateDeductionAmountFromRefundRules($idOrder, $idOrderReturn = 0, $idHtlBooking = 0)
     {
-        $cancelationCharges = 0;
+        $totalCancelationCharges = 0;
+
+        $objHtlRefundRules = new HotelBranchRefundRules();
+        $objHotelBookingDemands = new HotelBookingDemands();
+
         if ($bookingsToRefund = OrderReturn::getOrdersReturnDetail($idOrder, $idOrderReturn, $idHtlBooking)) {
             foreach ($bookingsToRefund as $booking) {
+                $bookingCancellationCharge = 0;
+
                 if (Validate::isLoadedObject($objHtlBooking = new HotelBookingDetail($booking['id_htl_booking']))) {
                     $objOrder = new Order($objHtlBooking->id_order);
                     $adPaidAmount = 0;
                     $refundValue = 0;
-                    $wayOfPayment = 'fullPayment';
 
-                    if ($objOrder->is_advance_payment) {
-                        $wayOfPayment = 'advancePayment';
-                    }
+                    $totalDemandsPrice = $objHotelBookingDemands->getRoomTypeBookingExtraDemands(
+                        $objHtlBooking->id_order,
+                        $objHtlBooking->id_product,
+                        $objHtlBooking->id_room,
+                        $objHtlBooking->date_from,
+                        $objHtlBooking->date_to,
+                        1,
+                        1
+                    );
 
-                    $objHtlRefundRules = new HotelBranchRefundRules();
                     if ($refundRules = $objHtlRefundRules->getHotelRefundRules($objHtlBooking->id_hotel, 0, 1)) {
                         $orderCurrency = $objOrder->id_currency;
                         $defaultCurrency = Configuration::get('PS_CURRENCY_DEFAULT');
@@ -156,9 +166,10 @@ class HotelOrderRefundRules extends ObjectModel
                         $daysDifference = date_diff($startDate, $dateRequest);
 
                         $daysBeforeCancel = (int) $daysDifference->format('%a');
+                        $ruleApplied = false;
                         foreach ($refundRules as $refRule) {
                             if ($daysBeforeCancel >= $refRule['days']) {
-                                $paidAmount = $objHtlBooking->total_paid_amount;
+                                $paidAmount = $objHtlBooking->total_paid_amount + $totalDemandsPrice;
                                 if ($objOrder->is_advance_payment) {
                                     $refundValue = $refRule['deduction_value_adv_pay'];
                                 } else {
@@ -166,41 +177,49 @@ class HotelOrderRefundRules extends ObjectModel
                                 }
 
                                 if ($refRule['payment_type'] == HotelOrderRefundRules::WK_REFUND_RULE_PAYMENT_TYPE_PERCENTAGE) {
-                                    $cancelationCharges = $paidAmount * ($refundValue / 100);
+                                    $bookingCancellationCharge = $paidAmount * ($refundValue / 100);
 
                                     if ($defaultCurrency != $orderCurrency) {
-                                        $cancelationCharges = Tools::convertPriceFull(
-                                            $cancelationCharges,
+                                        $bookingCancellationCharge = Tools::convertPriceFull(
+                                            $bookingCancellationCharge,
                                             $objDefaultCurrency,
                                             $objOrderCurrency
                                         );
                                     }
                                 } else {
                                     if ($defaultCurrency != $orderCurrency) {
-                                        $cancelationCharges = Tools::convertPriceFull(
+                                        $bookingCancellationCharge = Tools::convertPriceFull(
                                             $refundValue,
                                             $objDefaultCurrency,
                                             $objOrderCurrency
                                         );
                                     } else {
-                                        $cancelationCharges = $refundValue;
+                                        $bookingCancellationCharge = $refundValue;
                                     }
 
-                                    //if deduction amount is more than the order total cost
-                                    if ($cancelationCharges > $paidAmount) {
-                                        $cancelationCharges = $paidAmount;
+                                    // if deduction amount is more than the order total cost
+                                    if ($bookingCancellationCharge > $paidAmount) {
+                                        $bookingCancellationCharge = $paidAmount;
                                     }
                                 }
+
+                                $ruleApplied = true;
                                 break;
                             }
                         }
+
+                        if (!$ruleApplied) {
+                            $bookingCancellationCharge = ($objHtlBooking->total_price_tax_incl + $totalDemandsPrice);
+                        }
                     } else {
-                        $cancelationCharges += $objHtlBooking->total_price_tax_incl;
+                        $bookingCancellationCharge = ($objHtlBooking->total_price_tax_incl + $totalDemandsPrice);
                     }
                 }
+
+                $totalCancelationCharges += $bookingCancellationCharge;
             }
         }
 
-        return $cancelationCharges;
+        return $totalCancelationCharges;
     }
 }

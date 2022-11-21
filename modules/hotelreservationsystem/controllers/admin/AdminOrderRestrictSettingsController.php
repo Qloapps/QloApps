@@ -19,12 +19,13 @@ class AdminOrderRestrictSettingsController extends ModuleAdminController
 
         parent::__construct();
         $this->_join .= ' LEFT JOIN `'._DB_PREFIX_.'htl_branch_info` hb ON (a.`id_hotel` = hb.`id`)';
+        $this->_join .= 'LEFT JOIN `'._DB_PREFIX_.'address` ad ON (ad.`id_hotel` = hb.`id`)';
         $this->_join .= ' LEFT JOIN `'._DB_PREFIX_.'htl_branch_info_lang` hbl
         ON (hb.`id` = hbl.`id` AND hbl.`id_lang` = '.(int)$this->context->language->id.')';
-        $this->_join .= ' LEFT JOIN `'._DB_PREFIX_.'state` s ON (s.`id_state` = hb.`state_id`)';
+        $this->_join .= ' LEFT JOIN `'._DB_PREFIX_.'state` s ON (s.`id_state` = ad.`id_state`)';
         $this->_join .= ' LEFT JOIN `'._DB_PREFIX_.'country_lang` cl
-        ON (cl.`id_country` = hb.`country_id` AND cl.`id_lang` = '.(int)$this->context->language->id.')';
-        $this->_select = 's.`name` as `state_name`, cl.`name` as country_name, hbl.`hotel_name`, hb.`city`, ';
+        ON (cl.`id_country` = ad.`id_country` AND cl.`id_lang` = '.(int)$this->context->language->id.')';
+        $this->_select = 's.`name` as `state_name`, cl.`name` as country_name, hbl.`hotel_name`, ad.`city`, ';
         $this->fields_options = array(
             'orderrestrict' => array(
                 'title' => $this->l('Order Restriction Setting'),

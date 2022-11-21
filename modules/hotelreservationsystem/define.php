@@ -25,7 +25,6 @@ require_once 'classes/HotelBranchInformation.php';
 require_once 'classes/HotelImage.php';
 require_once 'classes/HotelFeatures.php';
 require_once 'classes/HotelBranchFeatures.php';
-require_once 'classes/HotelRoomAllotmentType.php';
 require_once 'classes/HotelBookingDetail.php';
 require_once 'classes/HotelCartBookingData.php';
 require_once 'classes/HotelAdvancedPayment.php';
