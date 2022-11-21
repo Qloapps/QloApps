@@ -402,12 +402,12 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
                             $cart_htl_data[$type_key]['date_diff'][$date_join]['num_rm'] += 1;
 
                             $num_days = $cart_htl_data[$type_key]['date_diff'][$date_join]['num_days'];
-                            $var_quant = (int)$cart_htl_data[$type_key]['date_diff'][$date_join]['num_rm'];
 
                             $cart_htl_data[$type_key]['date_diff'][$date_join]['paid_unit_price_tax_excl'] = $data_v['total_price_tax_excl']/$num_days;
                             $cart_htl_data[$type_key]['date_diff'][$date_join]['paid_unit_price_tax_incl'] = $data_v['total_price_tax_excl']/$num_days;
+                            $cart_htl_data[$type_key]['date_diff'][$date_join]['avg_paid_unit_price_tax_excl'] += $cart_htl_data[$type_key]['date_diff'][$date_join]['paid_unit_price_tax_excl'];
 
-                            $cart_htl_data[$type_key]['date_diff'][$date_join]['amount'] = $data_v['total_price_tax_excl']*$var_quant;
+                            $cart_htl_data[$type_key]['date_diff'][$date_join]['amount'] += $data_v['total_price_tax_excl'];
 
                             // For order refund
                             $cart_htl_data[$type_key]['date_diff'][$date_join]['stage_name'] = $stage_name;
@@ -450,6 +450,8 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
 
                             $cart_htl_data[$type_key]['date_diff'][$date_join]['paid_unit_price_tax_excl'] = $data_v['total_price_tax_excl']/$num_days;
                             $cart_htl_data[$type_key]['date_diff'][$date_join]['paid_unit_price_tax_incl'] = $data_v['total_price_tax_excl']/$num_days;
+                            $cart_htl_data[$type_key]['date_diff'][$date_join]['avg_paid_unit_price_tax_excl'] = $cart_htl_data[$type_key]['date_diff'][$date_join]['paid_unit_price_tax_excl'];
+
                             $cart_htl_data[$type_key]['date_diff'][$date_join]['amount'] = $data_v['total_price_tax_excl'];
 
                             // For order refund
@@ -470,6 +472,11 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
                         } else {
                             $cart_htl_data[$type_key]['order_detail_tax_label'] = HTMLTemplateInvoice::l('No tax');
                         }
+                    }
+
+                    // calculate averages now
+                    foreach ($cart_htl_data[$type_key]['date_diff'] as $key => &$value) {
+                        $value['avg_paid_unit_price_tax_excl'] = Tools::ps_round($value['avg_paid_unit_price_tax_excl'] / $value['num_rm'], 6);
                     }
                 }
                 unset($tax_temp);

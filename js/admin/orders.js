@@ -642,6 +642,8 @@ function init()
 						element_list.find('td .booking_duration_show').hide();
 						element_list.find('td .booking_duration_edit').show();
 					}
+					element_list.find('td .room_unit_price_show').hide();
+					element_list.find('td .room_unit_price_edit').show();
 					//element_list.find('td .product_price_show').hide();
 					//element_list.find('td .product_price_edit').show();
 					element_list.find('td.cancelCheck').hide();
@@ -680,6 +682,8 @@ function init()
 		element_list.find('td .booking_duration_show').show();
 		element_list.find('td .product_price_edit').hide();
 		element_list.find('td .booking_duration_edit').hide();
+		element_list.find('td .room_unit_price_show').show();
+		element_list.find('td .room_unit_price_edit').hide();
 		element_list.find('td.product_invoice').hide();
 		element_list.find('td.cancelCheck').show();
 		element_list.find('td.cancelQuantity').show();
