@@ -44,13 +44,6 @@ class WkTestimonialBlock extends Module
         $this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
     }
 
-    public function hookDisplayAddModuleSettingLink()
-    {
-        $hrefTestimonialsConf = $this->context->link->getAdminLink('AdminTestimonialsModuleSetting');
-        $this->context->smarty->assign('testimonials_setting_link', $hrefTestimonialsConf);
-        return $this->display(__FILE__, 'hotelTestimonialSettingLink.tpl');
-    }
-
     public function hookDisplayHome()
     {
         $this->context->controller->addCSS(_PS_JS_DIR_.'/owl-carousel/assets/owl.carousel.min.css');
@@ -132,10 +125,14 @@ class WkTestimonialBlock extends Module
             array (
                 'displayHome',
                 'displayFooterExploreSectionHook',
-                'displayAddModuleSettingLink',
                 'actionObjectLanguageAddAfter'
             )
         );
+    }
+
+    public function getContent()
+    {
+        Tools::redirectAdmin($this->context->link->getAdminLink('AdminTestimonialsModuleSetting'));
     }
 
     public function callInstallTab()
