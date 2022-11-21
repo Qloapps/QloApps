@@ -907,34 +907,45 @@ $(document).ready(function() {
     /* ----  AdminHotelFeaturePricesSettingsController Admin ---- */
 
     $('#date_selection_type').on('change', function() {
-        if ($('#date_selection_type').val() == 2) {
-            $(".specific_date_type").show();
-            $(".date_range_type").hide();
-            $(".special_days_content").hide();
-        } else if ($('#date_selection_type').val() == 1) {
-            $(".specific_date_type").hide();
-            $(".date_range_type").show();
-            $(".special_days_content").show();
+        if ($('#date_selection_type').val() == date_selection_types.specific) {
+            $(".specific_date_type").show(200);
+            $(".date_range_type").hide(200);
+            $(".special_days_content").hide(200);
+        } else if ($('#date_selection_type').val() == date_selection_types.range) {
+            $(".specific_date_type").hide(200);
+            $(".date_range_type").show(200);
+            $(".special_days_content").show(200);
         } else {
-            $(".specific_date_type").hide();
-            $(".date_range_type").show();
-            $(".special_days_content").show();
+            $(".specific_date_type").hide(200);
+            $(".date_range_type").show(200);
+            $(".special_days_content").show(200);
         }
     });
 
 
     $(".is_special_days_exists").on ('click', function() {
         if ($(this).is(':checked')) {
-            $('.week_days').show();
+            $('.week_days').show(200);
         } else {
-            $('.week_days').hide();
+            $('.week_days').hide(200);
+        }
+    });
+
+    $('#price_impact_way').on('change', function() {
+        if ($('#price_impact_way').val() == impact_ways.fix) {
+            $('#price_impact_type option[value="' + impact_ways.increase + '"]').attr('selected', 'selected');
+            $('#price_impact_type_input').removeAttr('disabled').val(impact_ways.increase);
+            $('#price_impact_type').trigger('change').attr('disabled', 'disabled');
+        } else {
+            $('#price_impact_type_input').attr('disabled', 'disabled');
+            $('#price_impact_type').removeAttr('disabled');
         }
     });
 
     $('#price_impact_type').on('change', function() {
-        if ($('#price_impact_type').val() == 2) {
+        if ($('#price_impact_type').val() == impact_types.fixed) {
             $(".payment_type_icon").text(defaultcurrency_sign);
-        } else if ($('#price_impact_type').val() == 1) {
+        } else if ($('#price_impact_type').val() == impact_types.percentage) {
             $(".payment_type_icon").text('%');
         } else {
             $(".payment_type_icon").text(defaultcurrency_sign);

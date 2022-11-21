@@ -80,12 +80,19 @@
 	</td>
 	</td>
 	<td class="text-center">
-		<span class="product_original_price {if $data.feature_price_diff > 0}room_type_old_price{/if}" {if $data.feature_price_diff < 0} style="display:none;"{/if}>
-        	{convertPriceWithCurrency price=$data.unit_price_without_reduction_tax_incl currency=$currency->id}
-		</span>&nbsp;
-        <span class="room_type_current_price" {if !$data.feature_price_diff}style="display:none;"{/if}>
-			{convertPriceWithCurrency price=$data.paid_unit_price_tax_incl currency=$currency->id}
-        </span>
+		<span class="room_unit_price_show">
+			{if $data.feature_price_diff != 0}
+				<span class="product_original_price room_type_old_price">
+					{convertPriceWithCurrency price=$data.unit_price_without_reduction_tax_excl currency=$currency->id}
+				</span> &nbsp;
+			{/if}
+			<span class="room_type_current_price">
+				{convertPriceWithCurrency price=$data.paid_unit_price_tax_excl currency=$currency->id}
+			</span>
+		</span>
+		<div class="room_unit_price_edit" style="display: none;">
+			<input type="text" class="room_unit_price" name="room_unit_price" value="{$data.paid_unit_price_tax_excl}">
+		</div>
 	</td>
 	<td class="text-center">
 		<span class="product_price_show">{convertPriceWithCurrency price=$data.amt_with_qty_tax_incl currency=$currency->id}</span>

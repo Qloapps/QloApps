@@ -172,7 +172,7 @@ class WebserviceSpecificManagementHotelImages implements WebserviceSpecificManag
         $available_image_ids = array();
 
         $objHotelImg = new HotelImage();
-        $images = $objHotelImg->getAllImagesByHotelId($object_id);
+        $images = $objHotelImg->getImagesByHotelId($object_id);
 
         foreach ($images as $image) {
             $available_image_ids[] = $image['id'];

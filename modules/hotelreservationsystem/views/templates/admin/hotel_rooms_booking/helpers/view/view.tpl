@@ -74,7 +74,7 @@
 			</div>
 			<div class="col-sm-8">
 				<div class="row margin-lr-0 box-border calender-main-div">
-					<div class="hotel_date col-sm-7">
+					<div class="hotel_date col-sm-12 col-md-7">
 						<div class="row margin-leftrgt-0">
 							<div class="col-sm-12 htl_date_header">
 								<div class="col-sm-3">
@@ -92,7 +92,7 @@
 						</div>
 					</div>
 
-					<div class="col-sm-5 htl_room_data_cont">
+					<div class="col-sm-12 col-md-5 htl_room_data_cont">
 						<div class="row">
 							<div class="col-sm-6">
 								<div class="row">

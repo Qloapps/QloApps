@@ -981,7 +981,7 @@
 										<th class="text-center"><span class="title_box">{l s='Room Type'}</span></th>
 										<th class="text-center"><span class="title_box">{l s='Hotel Name'}</span></th>
 										<th class="text-center"><span class="title_box">{l s='Duration'}</span></th>
-										<th class="text-center"><span class="title_box">{l s='Unit Price (Tax incl.)'}</span></th>
+										<th class="text-center"><span class="title_box">{l s='Unit Price (Tax excl.)'}</span></th>
 										<th class="text-center"><span class="title_box">{l s='Total Price (Tax incl.)'}</span></th>
 										{if isset($refundReqBookings) && $refundReqBookings}
 											<th class="text-center"><span class="title_box">{l s='Refund State'}</span></th>
