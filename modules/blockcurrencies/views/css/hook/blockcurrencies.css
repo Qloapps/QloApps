@@ -1,0 +1,53 @@
+/**
+* 2010-2022 Webkul.
+*
+* NOTICE OF LICENSE
+*
+* All right is reserved,
+* Please go through LICENSE.txt file inside our module
+*
+* DISCLAIMER
+*
+* Do not edit or add to this file if you wish to upgrade this module to newer
+* versions in the future. If you wish to customize this module for your
+* needs please refer to CustomizationPolicy.txt file inside our module for more information.
+*
+* @author Webkul IN
+* @copyright 2010-2022 Webkul IN
+* @license LICENSE.txt
+*/
+
+.currencies-block-wrap button.dropdown-toggle {
+    padding: 0;
+    background-color: transparent;
+    color: #fff;
+}
+
+.currencies-block-wrap .caret {
+    border-top-color: white;
+}
+
+.currencies-block-wrap .dropdown-menu {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+/* popup - start */
+.fancybox-blockcurrencies .fancybox-inner {
+    border-radius: 4px;
+}
+
+.fancybox-blockcurrencies .list-group {
+    margin-bottom: 0;
+}
+
+.fancybox-blockcurrencies .list-group-item {
+    border: none;
+    min-width: 160px;
+    font-size: 14px;
+}
+
+.fancybox-blockcurrencies .list-group-item.active {
+    background-color: #379BF0;
+}
+/* popup - end */

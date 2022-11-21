@@ -5483,7 +5483,6 @@ class AdminProductsControllerCore extends AdminController
 
     public function getModalDuplicateOptions()
     {
-        $tpl = $this->createTemplate('modal-duplicate-options.tpl');
         $idsHotel = HotelBranchInformation::getProfileAccessedHotels($this->context->employee->id_profile, 1, 1);
         $hotelsInfo = array();
         foreach ($idsHotel as $idHotel) {
@@ -5499,13 +5498,15 @@ class AdminProductsControllerCore extends AdminController
                 $hotelsInfo[] = $hotelInfo;
             }
         }
+
         $formAction = $this->context->link->getAdminLink('AdminProducts', true).'&duplicateproduct';
-        $tpl->assign(array(
+        $this->context->smarty->assign(array(
             'action' => $formAction,
             'hotels_info' => $hotelsInfo,
             'duplicate_images' => 1,
         ));
 
+        $modalContent = $this->context->smarty->fetch('controllers/products/modal-duplicate-options.tpl');
         $modalActions = array(
             array(
                 'type' => 'button',
@@ -5520,9 +5521,10 @@ class AdminProductsControllerCore extends AdminController
             'modal_id' => 'modal-duplicate-options',
             'modal_class' => 'modal-md',
             'modal_title' => $this->l('Duplication options'),
-            'modal_content' => $tpl->fetch(),
+            'modal_content' => $modalContent,
             'modal_actions' => $modalActions,
         );
+
         return $modal;
     }
 
