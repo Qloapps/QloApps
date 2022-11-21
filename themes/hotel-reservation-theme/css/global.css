@@ -5794,10 +5794,17 @@ header {
     max-height: 100%; }
     header .banner .row {
       margin: 0px; }
-  header .nav {
-    background-color: none; }
-    header .nav .row {
+    header #nav-main {
+      background-color: #333;
+      color: #fff; }
+    header #nav-main nav > div {
+      display: inline-block;
+      padding: 8px 0; }
+    header .nav .row,
+    header #nav-main .row {
       margin: 0px; }
+    #nav-main .nav-main-item-right:not(:last-of-type) {
+      margin-left: 24px; }
     header .nav nav {
       width: 100%; }
   header .row {
