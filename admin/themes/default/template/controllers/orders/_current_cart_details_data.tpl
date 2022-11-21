@@ -59,12 +59,12 @@
 							</td>
 							<td>{$data.date_from|escape:'html':'UTF-8'|date_format:"%d-%m-%Y"}&nbsp;-&nbsp; {$data.date_to|escape:'html':'UTF-8'|date_format:"%d-%m-%Y"}</td>
 							<td id="cart_detail_data_unit_price_{$data.id|escape:'html':'UTF-8'}">
-								<span class="product_original_price {if $data.feature_price_diff > 0}room_type_old_price{/if}" {if $data.feature_price_diff < 0} style="display:none;"{/if}>
-									{displayPrice price=$data.product_price_tax_excl|escape:'html':'UTF-8'}
-								</span>&nbsp;
-								<span class="room_type_current_price" {if !$data.feature_price_diff}style="display:none;"{/if}>
-									{displayPrice price=$data.feature_price_tax_excl|escape:'html':'UTF-8'}
-								</span>
+								{if $data.feature_price_diff != 0}
+									{assign var=shown_room_type_price value=$data.feature_price_tax_excl}
+								{else}
+									{assign var=shown_room_type_price value=$data.product_price_tax_excl}
+								{/if}
+								<input type="text" class="room_unit_price" data-id-booking-data="{$data.id}" data-id-product="{$data.id_product}" data-id-room="{$data.id_room}" data-date-from="{$data.date_from}" data-date-to="{$data.date_to}" value="{$shown_room_type_price|escape:'html':'UTF-8'}">
 							</td>
 							<td>
 								{if isset($data.extra_demands) && $data.extra_demands}
@@ -73,8 +73,8 @@
 									{displayPrice price=0}
 								{/if}
 							</td>
-							<td id="cart_detail_data_price_{$data.id|escape:'html':'UTF-8'}">{displayPrice price=$data.amt_with_qty}</td>
-							<td>
+							<td class="cart_line_total_rooms_price" id="cart_detail_data_price_{$data.id|escape:'html':'UTF-8'}">{displayPrice price=$data.amt_with_qty}</td>
+							<td class="cart_line_total_price">
 								{if isset($data.extra_demands) && $data.extra_demands}
 									{displayPrice price=$data.amt_with_qty|escape:'html':'UTF-8'+$data.demand_price|escape:'html':'UTF-8'}
 								{else}

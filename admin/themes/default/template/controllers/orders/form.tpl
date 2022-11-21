@@ -237,11 +237,19 @@
 			$(this).change();
 			return true;
 		});
-		$('.product_unit_price').live('change', function(e) {
+		$(document).on('change', '.room_unit_price', function(e) {
 			e.preventDefault();
-			var product = $(this).attr('rel').split('_');
-			updateProductPrice(product[0], product[1], $(this).val());
-		});
+			var cart_row = $(this).closest('tr');
+			var params = {
+				id_booking_data: parseInt($(this).attr('data-id-booking-data')),
+				id_product: parseInt($(this).attr('data-id-product')),
+				id_room: parseInt($(this).attr('data-id-room')),
+				date_from: $(this).attr('data-date-from'),
+				date_to: $(this).attr('data-date-to'),
+				price: $(this).val(),
+			};
+			updateProductPrice(params, cart_row);
+		})
 		$('#order_message').live('change', function(e) {
 			e.preventDefault();
 			$.ajax({
@@ -381,29 +389,43 @@
 		});
 	}
 
-	function updateProductPrice(id_product, id_product_attribute, new_price)
-	{
+	function updateProductPrice(params, cart_row) {
+		$.extend(params, {
+			id_cart: id_cart,
+			price: new Number(params.price.replace(",",".")).toFixed(4).toString(),
+		});
+
 		$.ajax({
 			type:"POST",
 			url: "{$link->getAdminLink('AdminCarts')|addslashes}",
 			async: true,
-			dataType: "json",
-			data : {
+			dataType: "JSON",
+			data: {
 				ajax: "1",
 				token: "{getAdminToken tab='AdminCarts'}",
 				tab: "AdminCarts",
 				action: "updateProductPrice",
-				id_cart: id_cart,
-				id_product: id_product,
-				id_product_attribute: id_product_attribute,
-				id_customer: id_customer,
-				price: new Number(new_price.replace(",",".")).toFixed(4).toString()
-				},
-			success : function(res)
-			{
-				displaySummary(res);
+				params: params,
+			},
+			success : function(response) {
+				updateCartLine(response.curr_booking_info, cart_row);
+				updateCartSummaryData(response.cart_info);
 			}
 		});
+	}
+
+	function updateCartLine(data, cart_row) {
+		$(cart_row).find('.cart_line_total_rooms_price').html(data.amt_with_qty);
+		$(cart_row).find('.cart_line_total_price').html(data.total_price);
+	}
+
+	function updateCartSummaryData(summaryData) {
+		$('#total_products').html(formatCurrency(parseFloat(summaryData.summary.total_products), currency_format, currency_sign, currency_blank));
+		$('#total_extra_demands').html(formatCurrency(parseFloat(summaryData.summary.total_extra_demands_tax_exc), currency_format, currency_sign, currency_blank));
+		$('#total_vouchers').html(formatCurrency(parseFloat(summaryData.summary.total_discounts_tax_exc), currency_format, currency_sign, currency_blank));
+		$('#total_without_taxes').html(formatCurrency(parseFloat(summaryData.summary.total_price_without_tax), currency_format, currency_sign, currency_blank));
+		$('#total_taxes').html(formatCurrency(parseFloat(summaryData.summary.total_tax), currency_format, currency_sign, currency_blank));
+		$('#total_with_taxes').html(formatCurrency(parseFloat(summaryData.summary.total_price), currency_format, currency_sign, currency_blank));
 	}
 
 	function displayQtyInStock(id)
@@ -558,7 +580,6 @@
 			}
 		});
 	}
-
 
 	function setupCustomer(idCustomer)
 	{
@@ -863,8 +884,7 @@
 		return price;
 	}
 
-	function displaySummary(jsonSummary)
-	{
+	function displaySummary(jsonSummary) {
 		currency_format = jsonSummary.currency.format;
 		currency_sign = jsonSummary.currency.sign;
 		currency_blank = jsonSummary.currency.blank;
@@ -874,37 +894,37 @@
 		updateCartVouchers(jsonSummary.summary.discounts);
 		updateAddressesList(jsonSummary.addresses, jsonSummary.cart.id_address_delivery, jsonSummary.cart.id_address_invoice);
 
-		if (!jsonSummary.summary.products.length || !jsonSummary.addresses.length || !jsonSummary.delivery_option_list)
+		if (!jsonSummary.summary.products.length || !jsonSummary.addresses.length || !jsonSummary.delivery_option_list) {
 			$('#carriers_part').hide();
-		else
+		} else {
 			$('#carriers_part').hide();
-
-		//original
-		/*if (!jsonSummary.summary.products.length || !jsonSummary.addresses.length || !jsonSummary.delivery_option_list)
-			$('#carriers_part,#summary_part').hide();
-		else
-			$('#carriers_part,#summary_part').hide();
-		*/
+		}
 
 		updateDeliveryOptionList(jsonSummary.delivery_option_list);
 		checkVirtualProduct(jsonSummary.summary.products,jsonSummary.delivery_option_list);
 
-		if (jsonSummary.cart.gift == 1)
+		if (jsonSummary.cart.gift == 1) {
 			$('#order_gift').attr('checked', true);
-		else
+		} else {
 			$('#carrier_gift').removeAttr('checked');
-		if (jsonSummary.cart.recyclable == 1)
+		}
+		if (jsonSummary.cart.recyclable == 1) {
 			$('#carrier_recycled_package').attr('checked', true);
-		else
+		} else {
 			$('#carrier_recycled_package').removeAttr('checked');
-		if (jsonSummary.free_shipping == 1)
+		}
+		if (jsonSummary.free_shipping == 1) {
 			$('#free_shipping').attr('checked', true);
-		else
+		} else {
 			$('#free_shipping_off').attr('checked', true);
+		}
 
 		$('#gift_message').html(jsonSummary.cart.gift_message);
-		if (!changed_shipping_price)
+
+		if (!changed_shipping_price) {
 			$('#shipping_price').html('<b>' + formatCurrency(parseFloat(jsonSummary.summary.total_shipping), currency_format, currency_sign, currency_blank) + '</b>');
+		}
+
 		shipping_price_selected_carrier = jsonSummary.summary.total_shipping;
 
 		$('#total_vouchers').html(formatCurrency(parseFloat(jsonSummary.summary.total_discounts_tax_exc), currency_format, currency_sign, currency_blank));

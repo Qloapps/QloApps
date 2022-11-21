@@ -159,7 +159,6 @@ class AdminCartsControllerCore extends AdminController
         $time = time();
         $kpis = array();
 
-        /* The data generation is located in AdminStatsControllerCore */
         $helper = new HelperKpi();
         $helper->id = 'box-conversion-rate';
         $helper->icon = 'icon-sort-by-attributes-alt';
@@ -167,14 +166,10 @@ class AdminCartsControllerCore extends AdminController
         $helper->color = 'color1';
         $helper->title = $this->l('Conversion Rate', null, null, false);
         $helper->subtitle = $this->l('30 days', null, null, false);
-        if (ConfigurationKPI::get('CONVERSION_RATE') !== false) {
-            $helper->value = ConfigurationKPI::get('CONVERSION_RATE');
-        }
         if (ConfigurationKPI::get('CONVERSION_RATE_CHART') !== false) {
             $helper->data = ConfigurationKPI::get('CONVERSION_RATE_CHART');
         }
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=conversion_rate';
-        $helper->refresh = (bool)(ConfigurationKPI::get('CONVERSION_RATE_EXPIRE') < $time);
         $kpis[] = $helper->generate();
 
         $helper = new HelperKpi();
@@ -185,12 +180,8 @@ class AdminCartsControllerCore extends AdminController
         $date_from = date(Context::getContext()->language->date_format_lite, strtotime('-2 day'));
         $date_to = date(Context::getContext()->language->date_format_lite, strtotime('-1 day'));
         $helper->subtitle = sprintf($this->l('From %s to %s', null, null, false), $date_from, $date_to);
-        $helper->href = $this->context->link->getAdminLink('AdminCarts').'&action=filterAbandonedCarts';
-        if (ConfigurationKPI::get('ABANDONED_CARTS') !== false) {
-            $helper->value = ConfigurationKPI::get('ABANDONED_CARTS');
-        }
+        $helper->href = $this->context->link->getAdminLink('AdminCarts').'&action=filterOnlyAbandonedCarts';
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=abandoned_cart';
-        $helper->refresh = (bool)(ConfigurationKPI::get('ABANDONED_CARTS_EXPIRE') < $time);
         $kpis[] = $helper->generate();
 
         $helper = new HelperKpi();
@@ -199,12 +190,7 @@ class AdminCartsControllerCore extends AdminController
         $helper->color = 'color3';
         $helper->title = $this->l('Average Order Value', null, null, false);
         $helper->subtitle = $this->l('30 days', null, null, false);
-        if (ConfigurationKPI::get('AVG_ORDER_VALUE') !== false) {
-            $helper->value = sprintf($this->l('%s tax excl.'), ConfigurationKPI::get('AVG_ORDER_VALUE'));
-        }
-        if (ConfigurationKPI::get('AVG_ORDER_VALUE_EXPIRE') < $time) {
-            $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=average_order_value';
-        }
+        $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=average_order_value';
         $kpis[] = $helper->generate();
 
         $helper = new HelperKpi();
@@ -213,11 +199,7 @@ class AdminCartsControllerCore extends AdminController
         $helper->color = 'color4';
         $helper->title = $this->l('Net Profit per Visitor', null, null, false);
         $helper->subtitle = $this->l('30 days', null, null, false);
-        if (ConfigurationKPI::get('NETPROFIT_VISITOR') !== false) {
-            $helper->value = ConfigurationKPI::get('NETPROFIT_VISITOR');
-        }
-        $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=netprofit_visitor';
-        $helper->refresh = (bool)(ConfigurationKPI::get('NETPROFIT_VISITOR_EXPIRE') < $time);
+        $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=netprofit_visit';
         $kpis[] = $helper->generate();
 
         $helper = new HelperKpiRow();
@@ -911,26 +893,60 @@ class AdminCartsControllerCore extends AdminController
 
     public function ajaxProcessUpdateProductPrice()
     {
+        $params = Tools::getValue('params');
+        $id_booking_data = (int) $params['id_booking_data'];
+        $id_cart = (int) $params['id_cart'];
+        $id_product = (int) $params['id_product'];
+        $id_room = (int) $params['id_room'];
+        $date_from = $params['date_from'];
+        $date_to = $params['date_to'];
+        $price = (float) $params['price'];
+
+        $this->context->cart = new Cart($id_cart);
+
+        $date_from = date('Y-m-d', strtotime($date_from));
+        $date_to = date('Y-m-d', strtotime($date_to));
+
         if ($this->tabAccess['edit'] === '1') {
-            SpecificPrice::deleteByIdCart((int)$this->context->cart->id, (int)Tools::getValue('id_product'), (int)Tools::getValue('id_product_attribute'));
-            $specific_price = new SpecificPrice();
-            $specific_price->id_cart = (int)$this->context->cart->id;
-            $specific_price->id_shop = 0;
-            $specific_price->id_shop_group = 0;
-            $specific_price->id_currency = 0;
-            $specific_price->id_country = 0;
-            $specific_price->id_group = 0;
-            $specific_price->id_customer = (int)$this->context->customer->id;
-            $specific_price->id_product = (int)Tools::getValue('id_product');
-            $specific_price->id_product_attribute = (int)Tools::getValue('id_product_attribute');
-            $specific_price->price = (float)Tools::getValue('price');
-            $specific_price->from_quantity = 1;
-            $specific_price->reduction = 0;
-            $specific_price->reduction_type = 'amount';
-            $specific_price->from = '0000-00-00 00:00:00';
-            $specific_price->to = '0000-00-00 00:00:00';
-            $specific_price->add();
-            echo json_encode($this->ajaxReturnVars());
+            HotelRoomTypeFeaturePricing::deleteByIdCart($id_cart, $id_product, $id_room, $date_from, $date_to);
+            $feature_price_name = array();
+            foreach (Language::getIDs(true) as $id_lang) {
+                $feature_price_name[$id_lang] = 'Auto-generated';
+            }
+
+            $hrt_feature_price = new HotelRoomTypeFeaturePricing();
+            $hrt_feature_price->id_product = $id_product;
+            $hrt_feature_price->id_cart = $id_cart;
+            $hrt_feature_price->id_guest = (int) $this->context->cookie->id_guest;
+            $hrt_feature_price->id_room = $id_room;
+            $hrt_feature_price->feature_price_name = $feature_price_name;
+            $hrt_feature_price->date_selection_type = HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_RANGE;
+            $hrt_feature_price->date_from = $date_from;
+            $hrt_feature_price->date_to = $date_to;
+            $hrt_feature_price->is_special_days_exists = 0;
+            $hrt_feature_price->special_days = json_encode(false);
+            $hrt_feature_price->impact_way = HotelRoomTypeFeaturePricing::IMPACT_WAY_FIX_PRICE;
+            $hrt_feature_price->impact_type = HotelRoomTypeFeaturePricing::IMPACT_TYPE_FIXED_PRICE;
+            $hrt_feature_price->impact_value = $price;
+            $hrt_feature_price->active = 1;
+            $hrt_feature_price->groupBox = array_column(Group::getGroups($this->context->language->id), 'id_group');
+            $hrt_feature_price->add();
+
+            $objHotelCartBookingData = new HotelCartBookingData();
+            $bookingsInfo = $objHotelCartBookingData->getCartFormatedBookinInfoByIdCart($id_cart);
+            foreach ($bookingsInfo as &$bookingInfo) {
+                if ($bookingInfo['id'] == $id_booking_data) {
+                    $amt_with_qty = $bookingInfo['amt_with_qty'];
+                    $bookingInfo['amt_with_qty'] = Tools::displayPrice($amt_with_qty);
+                    $bookingInfo['total_price'] = Tools::displayPrice($amt_with_qty + $bookingInfo['demand_price']);
+                    $response = array(
+                        'curr_booking_info' => $bookingInfo,
+                        'cart_info' => $this->ajaxReturnVars(),
+                    );
+
+                    die(json_encode($response));
+                }
+            }
         }
     }
 

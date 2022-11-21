@@ -26,10 +26,6 @@
 {extends file="helpers/form/form.tpl"}
 
 {block name="label"}
-	{if $input.name == 'vat_number'}
-		<div id="vat_area" style="display: visible">
-	{/if}
-
 	{if $input.type == 'text_customer' && !isset($customer)}
 		<label class="control-label col-lg-3 required" for="email">{l s='Customer email'}</label>
 	{else}
@@ -91,8 +87,5 @@
 		{/if}
 	{else}
 		{$smarty.block.parent}
-	{/if}
-	{if $input.name == 'vat_number'}
-		</div>
 	{/if}
 {/block}

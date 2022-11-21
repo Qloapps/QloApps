@@ -50,7 +50,6 @@
     <modules>
         <module action="enable" name="blocknewsletter"/>
         <module action="enable" name="blocksocial"/>
-        <module action="enable" name="socialsharing"/>
         <module action="enable" name="blockmyaccount"/>
         <module action="enable" name="blocklanguages"/>
         <module action="enable" name="blockcurrencies"/>
@@ -62,43 +61,6 @@
         <module action="enable" name="statsdata"/>
         <module action="enable" name="blockcart"/>
         <module action="enable" name="blockuserinfo"/>
-        <module action="disable" name="blockadvertising"/>
-        <module action="disable" name="blockbanner"/>
-        <module action="disable" name="blockbestsellers"/>
-        <module action="disable" name="blockcategories"/>
-        <module action="disable" name="blockcms"/>
-        <module action="disable" name="blockcmsinfo"/>
-        <module action="disable" name="blockcontact"/>
-        <module action="disable" name="blockcontactinfos"/>
-        <module action="disable" name="blockcustomerprivacy"/>
-        <module action="disable" name="blockfacebook"/>
-        <module action="disable" name="blocklayered"/>
-        <module action="disable" name="blocklink"/>
-        <module action="disable" name="blockmanufacturer"/>
-        <module action="disable" name="blockmyaccountfooter"/>
-        <module action="disable" name="blocknewproducts"/>
-        <module action="disable" name="blockpaymentlogo"/>
-        <module action="disable" name="blockpermanentlinks"/>
-        <module action="disable" name="blockrss"/>
-        <module action="disable" name="blocksearch"/>
-        <module action="disable" name="blocksharefb"/>
-        <module action="disable" name="blockspecials"/>
-        <module action="disable" name="blockstore"/>
-        <module action="disable" name="blocksupplier"/>
-        <module action="disable" name="blocktags"/>
-        <module action="disable" name="blocktopmenu"/>
-        <module action="disable" name="blockviewed"/>
-        <module action="disable" name="blockwishlist"/>
-        <module action="disable" name="crossselling"/>
-        <module action="disable" name="homefeatured"/>
-        <module action="disable" name="homeslider"/>
-        <module action="disable" name="productpaymentlogos"/>
-        <module action="disable" name="productscategory"/>
-        <module action="disable" name="producttooltip"/>
-        <module action="disable" name="pscleaner"/>
-        <module action="disable" name="sendtoafriend"/>
-        <module action="disable" name="trackingfront"/>
-        <module action="disable" name="vatnumber"/>
         <hooks>
             <hook module="hotelreservationsystem" hook="actionValidateOrder" position="1"/>
             <hook module="hotelreservationsystem" hook="Header" position="1"/>
@@ -166,12 +128,6 @@
             <hook module="blocknewsletter" hook="actionDeleteGDPRCustomer" position="1"/>
             <hook module="blocksocial" hook="Header" position="4"/>
             <hook module="blocksocial" hook="displayFooterNotificationHook" position="2"/>
-            <hook module="socialsharing" hook="Header" position="6"/>
-            <hook module="socialsharing" hook="displayRightColumnProduct" position="1"/>
-            <hook module="socialsharing" hook="actionObjectProductUpdateAfter" position="1"/>
-            <hook module="socialsharing" hook="actionObjectProductDeleteAfter" position="1"/>
-            <hook module="socialsharing" hook="displayCompareExtraInformation" position="1"/>
-            <hook module="socialsharing" hook="displaySocialSharing" position="1"/>
             <hook module="blockmyaccount" hook="displayLeftColumn" position="3" exceptions="category"/>
             <hook module="blockmyaccount" hook="Header" position="8"/>
             <hook module="blockmyaccount" hook="actionModuleRegisterHookAfter" position="1"/>

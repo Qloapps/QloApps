@@ -189,7 +189,7 @@ class PrestaShopBackupCore
     {
         if (!$this->psBackupAll) {
             $ignore_insert_table = array(_DB_PREFIX_.'connections', _DB_PREFIX_.'connections_page', _DB_PREFIX_
-                .'connections_source', _DB_PREFIX_.'guest', _DB_PREFIX_.'statssearch');
+                .'connections_source', _DB_PREFIX_.'guest');
         } else {
             $ignore_insert_table = array();
         }

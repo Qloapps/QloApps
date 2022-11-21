@@ -1,70 +1,44 @@
-#user_info_acc
-{
+/**
+* 2010-2022 Webkul.
+*
+* NOTICE OF LICENSE
+*
+* All right is reserved,
+* Please go through LICENSE.txt file inside our module
+*
+* DISCLAIMER
+*
+* Do not edit or add to this file if you wish to upgrade this module to newer
+* versions in the future. If you wish to customize this module for your
+* needs please refer to CustomizationPolicy.txt file inside our module for more information.
+*
+* @author Webkul IN
+* @copyright 2010-2022 Webkul IN
+* @license LICENSE.txt
+*/
+
+#user_info_acc {
   background-color: transparent;
   color: #fff;
   font-family: inherit;
   font-size: 17px;
   font-weight: 400;
-  text-transform: capitalize;
-}
+  text-transform: capitalize; }
 
-.visi_xs
-{
-  display: none;
-}
+.visi_xs {
+  display: none; }
 
-#user_info_acc:hover, #user_info_acc:focus, #user_info_acc:active
-{
-  box-shadow: none;
-}
+#user_info_acc:hover, #user_info_acc:focus, #user_info_acc:active {
+  box-shadow: none; }
 
-#user_info_acc span.account_user_name
-{
-  padding-right: 5px;
-}
+#user_info_acc span.account_user_name {
+  padding-right: 5px; }
 
-#user_info_acc span.caret
-{
-  border-top-color: #fff;
-}
+#user_info_acc span.caret {
+  border-top-color: #fff; }
 
-.header_user_info {
-  /*float: right;*/
-  /*padding-top: 30px;*/
-  /*border-left: 1px solid #515151;
-  border-right: 1px solid #515151; */}/*by webkul*/
-  .header_user_info a {
-    color: #fff;
-    background: none;
-    display: block;
-    padding: 8px 9px 11px 8px;
-    cursor: pointer;
-    line-height: 18px; }
-    @media screen and (min-width: 768px)and (max-width: 992px) {
-      /*.header_user_info
-      {
-        padding-top: 0px;
-      }*/
-    }
-
-    @media (max-width: 479px) {
-      .header_user_info a {
-        font-size: 17px; } }
-    .header_user_info a:hover, .header_user_info a.active {
-      border-bottom: 1px solid #FFFFFF;
-      /*background: #2b2b2b;*/ }
-
-      @media (max-width: 450px) {
-        .hide_xs
-        {
-          display: none;
-        }
-        .visi_xs
-        {
-          display: inline-block;
-        }
-      }
-
-/*# sourceMappingURL=blockuserinfo.css.map */
-
-
+@media (max-width: 450px) {
+  .hide_xs {
+    display: none; }
+  .visi_xs {
+    display: inline-block; } }
