@@ -194,123 +194,6 @@ class HotelReservationSystem extends Module
         }
     }
 
-    public function hookDisplayAdminProductsExtra($params)
-    {
-        if ($idProduct = Tools::getValue('id_product')) {
-            $objGlobalDemand = new HotelRoomTypeGlobalDemand();
-            $allDemands = $objGlobalDemand->getAllDemands();
-            $objCurrency = new Currency(Configuration::get('PS_CURRENCY_DEFAULT'));
-            // get room type additional services
-            $objRoomDemand = new HotelRoomTypeDemand();
-            $roomDemandPrices = $objRoomDemand->getRoomTypeDemands($idProduct, 0, 0);
-            $this->context->smarty->assign(
-                array(
-                    'idProduct' => $idProduct,
-                    'roomDemandPrices' => $roomDemandPrices,
-                    'allDemands' => $allDemands,
-                    'defaultcurrencySign' => $objCurrency->sign,
-                )
-            );
-        }
-        return $this->display(__FILE__, 'roomTypeDemands.tpl');
-    }
-
-    public function moduleProductsExtraTabName()
-    {
-        return $this->l('Additional Facilities');
-    }
-
-    public function hookActionProductUpdate($params)
-    {
-        if ($idProduct = $params['id_product']) {
-            $objRoomTypeDemand = new HotelRoomTypeDemand();
-            $objRoomTypeDemandPrice = new HotelRoomTypeDemandPrice();
-            // first delete all the previously saved prices and demands of this room type
-            $objRoomTypeDemand->deleteRoomTypeDemands($idProduct);
-            $objRoomTypeDemandPrice->deleteRoomTypeDemandPrices($idProduct);
-            if ($selectedDemands = Tools::getValue('selected_demand')) {
-                $objAdvOption = new HotelRoomTypeGlobalDemandAdvanceOption();
-                foreach ($selectedDemands as $idGlobalDemand) {
-                    if (Validate::isLoadedObject($objGlobalDemand = new HotelRoomTypeGlobalDemand($idGlobalDemand))) {
-                        // save selected demands for this room type
-                        $objRoomTypeDemand = new HotelRoomTypeDemand();
-                        $objRoomTypeDemand->id_product = $idProduct;
-                        $objRoomTypeDemand->id_global_demand = $idGlobalDemand;
-                        $objRoomTypeDemand->save();
-
-                        // save selected demands prices for this room type
-                        $demandPrice = Tools::getValue('demand_price_'.$idGlobalDemand);
-                        if (Validate::isPrice($demandPrice)) {
-                            if ($objGlobalDemand->price != $demandPrice) {
-                                $objRoomTypeDemandPrice = new HotelRoomTypeDemandPrice();
-                                $objRoomTypeDemandPrice->id_product = $idProduct;
-                                $objRoomTypeDemandPrice->id_global_demand = $idGlobalDemand;
-                                $objRoomTypeDemandPrice->id_option = 0;
-                                $objRoomTypeDemandPrice->price = $demandPrice;
-                                $objRoomTypeDemandPrice->save();
-                            }
-                        } else {
-                            $this->context->controller->errors[] = $this->l('Invalid demand price of facility').
-                            ' : '.$objGlobalDemand->name[$this->context->language->id];
-                        }
-                        if ($advOptions = $objAdvOption->getGlobalDemandAdvanceOptions($idGlobalDemand)) {
-                            foreach ($advOptions as $option) {
-                                if (Validate::isLoadedObject($objAdvOption = new HotelRoomTypeGlobalDemandAdvanceOption($option['id']))) {
-                                    $optionPrice = Tools::getValue('option_price_'.$option['id']);
-                                    if (Validate::isPrice($optionPrice)) {
-                                        if ($optionPrice != $objAdvOption->price) {
-                                            $objRoomTypeDemandPrice = new HotelRoomTypeDemandPrice();
-                                            $objRoomTypeDemandPrice->id_product = $idProduct;
-                                            $objRoomTypeDemandPrice->id_global_demand = $idGlobalDemand;
-                                            $objRoomTypeDemandPrice->id_option = $option['id'];
-                                            $objRoomTypeDemandPrice->price = $optionPrice;
-                                            $objRoomTypeDemandPrice->save();
-                                        }
-                                    } else {
-                                        $this->context->controller->errors[] = $this->l('Invalid price of advance option').
-                                        ' : '.$objAdvOption->name[$this->context->language->id];
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                if (count($this->context->controller->errors)) {
-                    $this->context->controller->warnings[] = $this->l('Invalid price values are not saved. Please correct them and save again');
-                }
-
-                $objCartBookingData = new HotelCartBookingData();
-                if ($cartExtraDemands = $objCartBookingData->getCartExtraDemands(0, $idProduct)) {
-                    // delete the demands from cart if not available in cart
-                    $objRoomDemand = new HotelRoomTypeDemand();
-                    $roomTypeDemandIds = array();
-                    if ($roomTypeDemands = $objRoomDemand->getRoomTypeDemands($idProduct)) {
-                        $roomTypeDemandIds = array_keys($roomTypeDemands);
-                    }
-                    foreach ($cartExtraDemands as &$demandInfo) {
-                        if (isset($demandInfo['extra_demands']) && $demandInfo['extra_demands']) {
-                            $cartChanged = 0;
-                            foreach ($demandInfo['extra_demands'] as $key => $demand) {
-                                if (!in_array($demand['id_global_demand'], $roomTypeDemandIds)) {
-                                    $cartChanged = 1;
-                                    unset($demandInfo['extra_demands'][$key]);
-                                }
-                            }
-                            if ($cartChanged) {
-                                if (Validate::isLoadedObject(
-                                    $objCartBooking = new HotelCartBookingData($demandInfo['id'])
-                                )) {
-                                    $objCartBooking->extra_demands = json_encode($demandInfo['extra_demands']);
-                                    $objCartBooking->save();
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
     public function hookActionProductSave($params)
     {
         $isToggling = Tools::getValue('statusproduct');
@@ -357,14 +240,6 @@ class HotelReservationSystem extends Module
             if (!$objHtlBkDtl->updateOrderRefundStatus($params['id_order'])) {
                 $this->context->controller->errors[] = $this->l('Error while making booked rooms available, attached with this order. Please try again !!');
             }
-        }
-    }
-
-    public function hookActionAdminControllerSetMedia()
-    {
-        if ('AdminProducts' == Tools::getValue('controller')) {
-            $this->context->controller->addJs($this->_path.'views/js/roomTypeDemand.js');
-            $this->context->controller->addCSS($this->_path.'views/css/roomTypeDemand.css');
         }
     }
 
@@ -509,9 +384,6 @@ class HotelReservationSystem extends Module
                 'actionProductSave',
                 'addWebserviceResources',
                 'actionObjectLanguageAddAfter',
-                'actionAdminControllerSetMedia',
-                'displayAdminProductsExtra',
-                'actionProductUpdate',
                 'actionObjectProfileAddAfter',
                 'actionObjectProfileDeleteBefore',
                 'actionObjectGroupDeleteBefore',
