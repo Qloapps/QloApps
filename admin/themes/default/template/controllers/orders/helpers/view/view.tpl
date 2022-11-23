@@ -291,10 +291,10 @@
 														</a>
 													</td>
 													<td>
-														{dateFormat date=$data['date_from'] full=0}
+														{dateFormat date=$data['date_from']}
 													</td>
 													<td>
-														{dateFormat date=$data['date_to'] full=0}
+														{dateFormat date=$data['date_to']}
 													</td>
 													<td>
 														<form action="" method="post" class="form-horizontal row room_status_info_form">
@@ -306,9 +306,9 @@
 																</select>
 
 																{if $data['id_status'] == $hotel_order_status['STATUS_CHECKED_IN']['id_status']}
-																	<p class="text-center"><span class="badge badge-success margin-bottom-5">{l s='Checked in on'} {dateFormat date=$data['check_in'] full=0}</span></p>
+																	<p class="text-center"><span class="badge badge-success margin-bottom-5">{l s='Checked in on'} {dateFormat date=$data['check_in']}</span></p>
 																{elseif $data['id_status'] == $hotel_order_status['STATUS_CHECKED_OUT']['id_status']}
-																	<p class="text-center"><span class="badge badge-success margin-bottom-5">{l s='Checked out on'} {dateFormat date=$data['check_out'] full=0}</span></p>
+																	<p class="text-center"><span class="badge badge-success margin-bottom-5">{l s='Checked out on'} {dateFormat date=$data['check_out']}</span></p>
 																{/if}
 
 																{* field for the current date *}

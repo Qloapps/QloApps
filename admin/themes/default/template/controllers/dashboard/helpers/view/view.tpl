@@ -72,9 +72,9 @@
                                         <i class="icon-calendar-empty"></i>
                                         <span class="hidden-xs">
                                             {l s='From'}
-                                            <strong class="text-info" id="datepicker-from-info">{dateFormat date=$date_from full=0}</strong>
+                                            <strong class="text-info" id="datepicker-from-info">{dateFormat date=$date_from}</strong>
                                             {l s='To'}
-                                            <strong class="text-info" id="datepicker-to-info">{dateFormat date=$date_to full=0}</strong>
+                                            <strong class="text-info" id="datepicker-to-info">{dateFormat date=$date_to}</strong>
                                             <strong class="text-info" id="datepicker-diff-info"></strong>
                                         </span>
                                         <i class="icon-caret-down"></i>

@@ -41,13 +41,6 @@ function generateAvailablityPieChart(chartData) {
 }
 
 $(document).ready(function() {
-    if (typeof date_subtitle === 'undefined') {
-        date_subtitle = '(from %s to %s)';
-    }
-
-    if (typeof date_format === 'undefined')
-        date_format = 'Y-mm-dd';
-
     $('#date-start').change(function() {
         start = Date.parseDate($('#date-start').val(), 'Y-m-d');
         end = Date.parseDate($('#date-end').val(), 'Y-m-d');

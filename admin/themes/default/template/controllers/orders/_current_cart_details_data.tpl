@@ -57,7 +57,7 @@
 									</ul>
 								{/if}
 							</td>
-							<td>{dateFormat date=$data.date_from full=0} - {dateFormat date=$data.date_to full=0}</td>
+							<td>{dateFormat date=$data.date_from} - {dateFormat date=$data.date_to}</td>
 							<td id="cart_detail_data_unit_price_{$data.id|escape:'html':'UTF-8'}">
 								{if $data.feature_price_diff != 0}
 									{assign var=shown_room_type_price value=$data.feature_price_tax_excl}
