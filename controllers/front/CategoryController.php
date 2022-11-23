@@ -218,7 +218,7 @@ class CategoryControllerCore extends FrontController
 
     public function displayAjaxFilterResults()
     {
-        $response = array('status' => 'ko');
+        $response = array('status' => false);
 
         $this->display_header = false;
         $this->display_footer = false;
@@ -291,10 +291,10 @@ class CategoryControllerCore extends FrontController
 
             $this->context->smarty->assign(array('booking_data' => $booking_data));
             $html = $this->context->smarty->fetch('_partials/room_type_list.tpl');
-            $response['status'] = 'ok';
+            $response['status'] = true;
             $response['html_room_type_list'] = $html;
         }
-        die(json_encode($response));
+        $this->ajaxDie(json_encode($response));
     }
 
     /**

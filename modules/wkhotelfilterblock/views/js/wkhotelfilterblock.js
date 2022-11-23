@@ -184,7 +184,7 @@ $(document).ready(function()
 			dataType: 'JSON',
 			data: data,
 			success: function (response) {
-				if (response.status == 'ok') {
+				if (response.status) {
 					$('#category_data_cont').html(response.html_room_type_list);
 				}
             }

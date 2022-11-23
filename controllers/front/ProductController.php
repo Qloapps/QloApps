@@ -1061,7 +1061,7 @@ class ProductControllerCore extends FrontController
             $response['html_booking_form'] = $html;
         }
 
-        die(json_encode($response));
+        $this->ajaxDie(json_encode($response));
     }
 
     public function displayAjaxCheckRoomAvailabilityAndRate()

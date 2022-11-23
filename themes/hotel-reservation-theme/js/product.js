@@ -1170,7 +1170,9 @@ $(document).ready(function() {
 });
 
 var BookingForm = {
+    currentRequest: null,
     init: function() {
+        this.currentRequest = null;
         BookingForm.initDatepicker();
     },
     initDatepicker: function() {
@@ -1259,7 +1261,7 @@ var BookingForm = {
         return data;
     },
     refresh: function() {
-        $.ajax({
+        BookingForm.currentRequest = $.ajax({
             url: product_controller_url,
             type: 'POST',
             headers: { 'cache-control': 'no-cache' },
@@ -1269,6 +1271,11 @@ var BookingForm = {
                 ajax: true,
                 action: 'refreshBookingForm',
             }, BookingForm.getFormData()),
+            beforeSend: function() {
+                if(BookingForm.currentRequest != null) {
+                    BookingForm.currentRequest.abort();
+                }
+            },
             success: function(response) {
                 if (response.status == true) {
                     $('.booking-form').replaceWith(response.html_booking_form);
