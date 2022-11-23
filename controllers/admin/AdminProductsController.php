@@ -3557,18 +3557,18 @@ class AdminProductsControllerCore extends AdminController
                         if ($objHotelRoomInfo->save()) {
                             $idRoom = $objHotelRoomInfo->id;
                             if ($roomInfo['id_status'] == HotelRoomInformation::STATUS_TEMPORARY_INACTIVE) {
-                                $hRDisableDates = new HotelRoomDisableDates();
-                                $hRDisableDates->deleteRoomDisableDates($idRoom);
+                                $objHotelRoomDisableDates = new HotelRoomDisableDates();
+                                $objHotelRoomDisableDates->deleteRoomDisableDates($idRoom);
 
                                 $disableDates = json_decode($roomInfo['disable_dates_json'], true);
                                 foreach ($disableDates as $disableDate) {
-                                    $hRDisableDates = new HotelRoomDisableDates();
-                                    $hRDisableDates->id_room_type = $id_product;
-                                    $hRDisableDates->id_room = $idRoom;
-                                    $hRDisableDates->date_from = $disableDate['date_from'];
-                                    $hRDisableDates->date_to = $disableDate['date_to'];
-                                    $hRDisableDates->reason = $disableDate['reason'];
-                                    $hRDisableDates->add();
+                                    $objHotelRoomDisableDates = new HotelRoomDisableDates();
+                                    $objHotelRoomDisableDates->id_room_type = $id_product;
+                                    $objHotelRoomDisableDates->id_room = $idRoom;
+                                    $objHotelRoomDisableDates->date_from = $disableDate['date_from'];
+                                    $objHotelRoomDisableDates->date_to = $disableDate['date_to'];
+                                    $objHotelRoomDisableDates->reason = $disableDate['reason'];
+                                    $objHotelRoomDisableDates->add();
                                 }
                             }
                         }
