@@ -122,7 +122,8 @@ class QloHotelReviewDefaultModuleFrontController extends ModuleFrontController
             $html .= '</ol>';
             $errors['general'] = $html;
         }
-        die(json_encode(array('status' => $status, 'errors' => $errors)));
+
+        $this->ajaxDie(json_encode(array('status' => $status, 'errors' => $errors)));
     }
 
     public function displayAjaxMarkReviewHelpful()
@@ -130,16 +131,16 @@ class QloHotelReviewDefaultModuleFrontController extends ModuleFrontController
         $response = array('status' => false);
         $idHotelReview = (int) Tools::getValue('id_hotel_review');
         if (!$idHotelReview) {
-            die(json_encode($response));
+            $this->ajaxDie(json_encode($response));
         }
 
         if (QhrHotelReview::isAlreadyMarkedHelpful($idHotelReview, $this->context->cookie->id_customer)) {
-            die(json_encode($response));
+            $this->ajaxDie(json_encode($response));
         }
 
         if (QhrHotelReview::markHelpful($idHotelReview, $this->context->cookie->id_customer)) {
             $response['status'] = true;
-            die(json_encode($response));
+            $this->ajaxDie(json_encode($response));
         }
     }
 
@@ -148,16 +149,16 @@ class QloHotelReviewDefaultModuleFrontController extends ModuleFrontController
         $response = array('status' => false);
         $idHotelReview = (int) Tools::getValue('id_hotel_review');
         if (!$idHotelReview) {
-            die(json_encode($response));
+            $this->ajaxDie(json_encode($response));
         }
 
         if (QhrHotelReview::isAlreadyReportedAbuse($idHotelReview, $this->context->cookie->id_customer)) {
-            die(json_encode($response));
+            $this->ajaxDie(json_encode($response));
         }
 
         if (QhrHotelReview::reportAbuse($idHotelReview, $this->context->cookie->id_customer)) {
             $response['status'] = true;
-            die(json_encode($response));
+            $this->ajaxDie(json_encode($response));
         }
     }
 
@@ -186,7 +187,7 @@ class QloHotelReviewDefaultModuleFrontController extends ModuleFrontController
             $response['has_next_page'] = (bool) $hasNextPage;
         }
 
-        die(json_encode($response));
+        $this->ajaxDie(json_encode($response));
     }
 
     public function displayAjaxSortBy()
@@ -213,7 +214,7 @@ class QloHotelReviewDefaultModuleFrontController extends ModuleFrontController
             $response['has_next_page'] = (bool) $hasNextPage;
         }
 
-        die(json_encode($response));
+        $this->ajaxDie(json_encode($response));
     }
 
     public function renderReviews($reviews)
@@ -230,8 +231,10 @@ class QloHotelReviewDefaultModuleFrontController extends ModuleFrontController
                     $this->module->getTemplatePath('_partials/review.tpl')
                 );
             }
+
             return $html;
         }
+
         return false;
     }
 }
