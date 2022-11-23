@@ -274,16 +274,14 @@ class AdminSlipControllerCore extends AdminController
         return $this->createTemplate('_print_pdf_icon.tpl')->fetch();
     }
 
-    public function printVoucherIcons($redeem_status, $tr)
+    public function printVoucherIcons($redeem_status, $row)
     {
-        $orderSlip = new OrderSlip($tr['id_order_slip']);
-        if (!Validate::isLoadedObject($orderSlip)) {
+        if (!$row['id_order_slip']) {
             return '';
         }
 
         $this->context->smarty->assign(array(
-            'order_slip' => $orderSlip,
-            'tr' => $tr
+            'order_slip_info' => $row,
         ));
 
         return $this->createTemplate('_print_voucher_icon.tpl')->fetch();

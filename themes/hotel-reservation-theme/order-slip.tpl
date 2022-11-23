@@ -57,19 +57,19 @@
 					<tr class="{if $smarty.foreach.myLoop.first}first_item{elseif $smarty.foreach.myLoop.last}last_item{else}item{/if} {if $smarty.foreach.myLoop.index % 2}alternate_item{/if}">
 						<td class="bold">
 							<span class="color-myaccount">
-								#{Configuration::get('PS_CREDIT_SLIP_PREFIX', $lang_id)}{l s='%s' sprintf=$slip.id_order_slip|string_format:"%06d"}
+								#{Configuration::get('PS_CREDIT_SLIP_PREFIX', $lang_id)}{$slip.id_order_slip|string_format:"%06d"}
 							</span>
 						</td>
 						<td class="history_method">
 							<a class="color-myaccount" href="javascript:showOrder(1, {$slip.id_order|intval}, '{$link->getPageLink('order-detail')|escape:'html':'UTF-8'}');">
-								{l s='#%s' sprintf=$slip.id_order|string_format:"%06d"}
+								#{$slip.id_order|string_format:"%06d"}
 							</a>
 						</td>
 						<td class="bold"  data-value="{$slip.date_add|regex_replace:"/[\-\:\ ]/":""}">
 							{dateFormat date=$slip.date_add full=0}
 						</td>
 						<td class="history_invoice">
-							<a class="link-button" href="{$link->getPageLink('pdf-order-slip', true, NULL, "id_order_slip={$slip.id_order_slip|intval}")|escape:'html':'UTF-8'}" title="{l s='Credit slip'} #{Configuration::get('PS_CREDIT_SLIP_PREFIX', $lang_id)}{l s='%s' sprintf=$slip.id_order_slip|string_format:"%06d"}">
+							<a class="link-button" href="{$link->getPageLink('pdf-order-slip', true, NULL, "id_order_slip={$slip.id_order_slip|intval}")|escape:'html':'UTF-8'}" title="{l s='Credit slip'} #{Configuration::get('PS_CREDIT_SLIP_PREFIX', $lang_id)}{$slip.id_order_slip|string_format:"%06d"}">
 								<i class="icon-file-text large"></i>{l s='PDF'}
 							</a>
 						</td>
@@ -79,7 +79,7 @@
 							{elseif $slip.redeem_status == OrderSlip::REDEEM_STATUS_REFUNDED}
 								<span class="badge badge-danger">{l s='Refunded'}</span>
 							{else}
-								<a href="{$link->getPageLink('order-slip', true, NULL, "generateVoucher=1&id_order_slip={$slip.id_order_slip|intval}")|escape:'html':'UTF-8'}" title="{l s='Generate voucher for credit slip '} #{Configuration::get('PS_CREDIT_SLIP_PREFIX', $lang_id)}{l s='%s' sprintf=$slip.id_order_slip|string_format:"%06d"}">
+								<a href="{$link->getPageLink('order-slip', true, NULL, "generateVoucher=1&id_order_slip={$slip.id_order_slip|intval}")|escape:'html':'UTF-8'}" title="{l s='Generate voucher for credit slip '} #{Configuration::get('PS_CREDIT_SLIP_PREFIX', $lang_id)}{$slip.id_order_slip|string_format:"%06d"}">
 									<u>{l s='Generate Voucher'}</u>
 								</a>
 							{/if}

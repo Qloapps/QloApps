@@ -17,12 +17,12 @@
  * @license LICENSE.txt
  *}
 
-{if isset($tr.redeem_status) && $tr.redeem_status == OrderSlip::REDEEM_STATUS_GENERATED}
+{if isset($order_slip_info.redeem_status) && $order_slip_info.redeem_status == OrderSlip::REDEEM_STATUS_GENERATED}
     <span class="label label-warning">{l s='Voucher generated'}</span>
-{elseif isset($tr.redeem_status) && $tr.redeem_status == OrderSlip::REDEEM_STATUS_REFUNDED}
+{elseif isset($order_slip_info.redeem_status) && $order_slip_info.redeem_status == OrderSlip::REDEEM_STATUS_REFUNDED}
     <span class="label label-danger">{l s='Refunded'}</span>
 {else}
-    <a class="btn btn-default" href="{$link->getAdminLink('AdminSlip')|escape:'html':'UTF-8'}&action=generateVoucher&id_order_slip={$order_slip->id|intval}">
+    <a class="btn btn-default" href="{$link->getAdminLink('AdminSlip')|escape:'html':'UTF-8'}&action=generateVoucher&id_order_slip={$order_slip_info.id_order_slip|intval}">
         <i class="icon-tag"></i>
         {l s='Generate voucher'}
     </a>
