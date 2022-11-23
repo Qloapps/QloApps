@@ -407,10 +407,10 @@
 	<configuration id="PS_OS_OUTOFSTOCK_UNPAID" name="PS_OS_OUTOFSTOCK_UNPAID">
 		<value>11</value>
 	</configuration>
-	<configuration id="PS_OS_AWATING_REMOTE_PAYMENT" name="PS_OS_REMOTE_PAYMENT">
+	<configuration id="PS_OS_AWATING_REMOTE_PAYMENT" name="PS_OS_AWATING_REMOTE_PAYMENT">
 		<value>9</value>
 	</configuration>
-		<configuration id="PS_OS_REMOTE_PAYMENT_ACCEPTED" name="PS_OS_REMOTE_PAYMENT">
+		<configuration id="PS_OS_REMOTE_PAYMENT_ACCEPTED" name="PS_OS_REMOTE_PAYMENT_ACCEPTED">
 		<value>10</value>
 	</configuration>
 	<!-- <configuration id="PS_OS_AWAITING_PARTIAL_PAYMENT" name="PS_OS_AWAITING_PARTIAL_PAYMENT">
