@@ -168,10 +168,10 @@ $(document).ready(function()
 			e.preventDefault();
 			$('#opc_new_account-overlay, #opc_delivery_methods-overlay, #opc_payment_methods-overlay').fadeIn('slow')
 
-			var callingFile = '';
+            var callingFile = '';
             var advApiParam = '';
             var params = '';
-			var isTransforming = false;
+            var isTransforming = false;
 
             if ($(this).attr('data-adv-api')) {
                 advApiParam = '&isAdvApi=1';
