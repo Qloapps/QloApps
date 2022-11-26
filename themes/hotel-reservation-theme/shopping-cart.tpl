@@ -92,6 +92,7 @@
 						<p class="room_remove_block">
 							<a href="{$rm_v['link']}"><i class="icon-trash"></i> &nbsp;{l s='Remove'}</a>
 						</p>
+						{hook h='displayCartRoomImageAfter' id_product=$data_v['id_product']}
 					</div>
 					<div class="col-sm-10">
 						<div class="room-info-container">
@@ -229,7 +230,6 @@
 	{* Will be deleted for 1.5 version and more *}
 	{if !isset($addresses_style)}
 		{$addresses_style.company = 'address_company'}
-		{$addresses_style.vat_number = 'address_company'}
 		{$addresses_style.firstname = 'address_name'}
 		{$addresses_style.lastname = 'address_name'}
 		{$addresses_style.address1 = 'address_address1'}

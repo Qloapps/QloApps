@@ -357,7 +357,7 @@ class OrderSlipCore extends ObjectModel
                 $order_detail->product_quantity_refunded += $numDays;
             }
 
-            $address = Address::initialize($order->id_address_invoice, false);
+            $address = Address::initialize($order->id_address_tax, false);
             $id_address = (int)$address->id;
             $id_tax_rules_group = Product::getIdTaxRulesGroupByIdProduct((int)$order_detail->product_id);
             $tax_calculator = TaxManagerFactory::getManager($address, $id_tax_rules_group)->getTaxCalculator();

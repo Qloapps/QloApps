@@ -158,7 +158,7 @@ class ProductControllerCore extends FrontController
                     $id_category = (int)$this->product->id_category_default;
                 }
                 $this->category = new Category((int)$id_category, (int)$this->context->cookie->id_lang);
-                if (isset($this->context->cookie) && isset($this->category->id_category) && !(Module::isInstalled('blockcategories') && Module::isEnabled('blockcategories'))) {
+                if (isset($this->context->cookie) && isset($this->category->id_category)) {
                     $this->context->cookie->last_visited_category = (int)$this->category->id_category;
                 }
             }
@@ -280,9 +280,9 @@ class ProductControllerCore extends FrontController
                 $hotel_policies = $hotel_info_by_id['policies'];
                 $hotel_name = $hotel_info_by_id['hotel_name'];
 
-                $country = Country::getNameById($this->context->language->id, $hotel_info_by_id['country_id']);
-                $state = State::getNameById($hotel_info_by_id['state_id']);
-                $hotel_location = $hotel_info_by_id['city'].', '.$state.', '.$country;
+                $addressInfo = $obj_hotel_branch->getAddress($room_info_by_product_id['id_hotel']);
+                $hotel_location = $addressInfo['city'].
+                    ($addressInfo['id_state']?', '.$addressInfo['state']:'').', '.$addressInfo['country'];
 
                 $obj_hotel_feaures_ids = $obj_hotel_branch->getFeaturesOfHotelByHotelId($hotel_id);
 
@@ -367,10 +367,13 @@ class ProductControllerCore extends FrontController
                         'num_days' => $num_days,
                         'date_from' => $date_from,
                         'date_to' => $date_to,
+                        'hotel_check_in' => date('h:i a', strtotime($hotel_branch_obj->check_in)),
+                        'hotel_check_out' => date('h:i a', strtotime($hotel_branch_obj->check_out)),
                         'hotel_location' => $hotel_location,
                         'hotel_name' => $hotel_name,
                         'hotel_policies' => $hotel_policies,
                         'hotel_features' => $htl_features,
+                        'hotel_has_images' => (bool) HotelImage::getCover($hotel_id),
                         'ftr_img_src' => _PS_IMG_.'rf/',
                         'order_date_restrict' => $order_date_restrict
                     )
@@ -470,7 +473,7 @@ class ProductControllerCore extends FrontController
         }
 
         // Tax
-        $tax = (float)$this->product->getTaxesRate(new Address((int)$this->context->cart->{Configuration::get('PS_TAX_ADDRESS_TYPE')}));
+        $tax = (float)$this->product->getTaxesRate();
         $this->context->smarty->assign('tax_rate', $tax);
 
         $product_price_with_tax = Product::getPriceStatic($this->product->id, true, null, 6);
@@ -479,7 +482,7 @@ class ProductControllerCore extends FrontController
         }
         $product_price_without_eco_tax = (float)$product_price_with_tax - $this->product->ecotax;
 
-        $ecotax_rate = (float)Tax::getProductEcotaxRate($this->context->cart->{Configuration::get('PS_TAX_ADDRESS_TYPE')});
+        $ecotax_rate = (float)Tax::getProductEcotaxRate(Cart::getIdAddressForTaxCalculation($this->product->id));
         if (Product::$_taxCalculationMethod == PS_TAX_INC && (int)Configuration::get('PS_TAX')) {
             $ecotax_tax_amount = Tools::ps_round($this->product->ecotax * (1 + $ecotax_rate / 100), 2);
         } else {
@@ -510,7 +513,7 @@ class ProductControllerCore extends FrontController
             }
         }
 
-        $address = new Address($this->context->cart->{Configuration::get('PS_TAX_ADDRESS_TYPE')});
+        $address = new Address(Cart::getIdAddressForTaxCalculation($this->product->id));
         $this->context->smarty->assign(
             array(
                 'quantity_discounts' => $this->formatQuantityDiscounts($quantity_discounts, null, (float)$tax, $ecotax_tax_amount),
@@ -1014,5 +1017,41 @@ class ProductControllerCore extends FrontController
             $result['avail_rooms'] = 0;
         }
         die(json_encode($result));
+    }
+
+    public function displayAjaxGetHotelImages()
+    {
+        $response = array('status' => false);
+        $idProduct = (int) Tools::getValue('id_product');
+        $page = (int) Tools::getValue('page');
+        $imagesPerPage = (int) Configuration::get('PS_HOTEL_IMAGES_PER_PAGE');
+
+        $objHotelRoomType = new HotelRoomType();
+        $objHotelImage = new HotelImage();
+
+        $roomTypeInfo = $objHotelRoomType->getRoomTypeInfoByIdProduct($idProduct);
+        $idHotel = $roomTypeInfo['id_hotel'];
+        $hotelImages = $objHotelImage->getImagesByHotelId($idHotel, $page, $imagesPerPage);
+        $hasNextPage = ($objHotelImage->getImagesByHotelId($idHotel, $page + 1, $imagesPerPage)) ? true : false;
+        $hotelImagesBaseDir = _MODULE_DIR_.'hotelreservationsystem/views/img/hotel_img/';
+        foreach ($hotelImages as &$hotelImage) {
+            $hotelImage['link'] = $this->context->link->getMediaLink(
+                $hotelImagesBaseDir.$hotelImage['hotel_image_id'].'.jpg'
+            );
+        }
+
+        if (is_array($hotelImages) && count($hotelImages)) {
+            $this->context->smarty->assign(array('hotel_images' => $hotelImages));
+            $html = $this->context->smarty->fetch(
+                $this->getTemplatePath('_partials/hotel_images.tpl')
+            );
+
+            $response['html'] = $html;
+            $response['status'] = true;
+            $response['has_next_page'] = $hasNextPage;
+            $response['message'] = 'HTML_OK';
+        }
+
+        die(json_encode($response));
     }
 }

@@ -1,9 +1,0 @@
-Most of these schemas are only available in RNC (RelaxNG, Compact) format.
-
-libxml (and therefor PHP) only supports RelaxNG - the XML version.
-
-To update these, you will need a conversion utility, like trang (http://www.thaiopensource.com/relaxng/trang.html).
-
-
-
-clockwerx@clockwerx-desktop:~/trang$ java -jar trang.jar -I rnc -O rng http://atompub.org/2005/08/17/atom.rnc atom.rng

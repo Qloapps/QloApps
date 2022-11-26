@@ -350,7 +350,6 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
 
         $this->context->cart->updateQty($num_day, $id_product, null, false, $direction);
 
-
         $id_cart = $this->context->cart->id;
         $id_guest = $this->context->cookie->id_guest;
 
@@ -392,27 +391,26 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
             $bookingParams['search_cart_rms'] = 1;
 
             $booking_stats = $obj_booking_dtl->getBookingData($bookingParams);
-            //$rm_amount = $unit_price * (int)$num_day;
-            //$rm_amount = Tools::ps_round($rm_amount, 2);
-            //
-            //// By webkul New way to calculate product prices with feature Prices
+
+            // By webkul New way to calculate product prices with feature Prices
             $roomTypeDateRangePrice = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
                 $id_product,
                 $date_from,
                 $date_to
             );
-            $rm_amount = $roomTypeDateRangePrice['total_price_tax_incl'];
 
+            $rm_amount = $roomTypeDateRangePrice['total_price_tax_excl'];
             $cart_data = array('room_num' => $obj_rm_info->room_num,
-                                'room_type' => Product::getProductName((int)$id_product),
-                                'date_from' => date('Y-M-d', strtotime($date_from)),
-                                'date_to' => date('Y-M-d', strtotime($date_to)),
-                                'amount' => $rm_amount,
-                                'qty' => $num_day,
-                                'rms_in_cart' => $rms_in_cart,
-                                'total_amount' => $total_amount,
-                                'booking_stats' => $booking_stats,
-                                'id_cart_book_data' => $obj_cart_book_data->id);
+                'room_type' => Product::getProductName((int)$id_product),
+                'date_from' => date('Y-M-d', strtotime($date_from)),
+                'date_to' => date('Y-M-d', strtotime($date_to)),
+                'amount' => $rm_amount,
+                'qty' => $num_day,
+                'rms_in_cart' => $rms_in_cart,
+                'total_amount' => $total_amount,
+                'booking_stats' => $booking_stats,
+                'id_cart_book_data' => $obj_cart_book_data->id
+            );
 
             if ($obj_cart_book_data->id) {
                 die(json_encode($cart_data));
@@ -483,9 +481,9 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
                     $this->context->smarty->assign(
                         array(
                             'date_from' => $search_date_from,
-                            'date_to'=>$search_date_to,
-                            'booking_data'=>$booking_data,
-                            'ajax_delete'=>$ajax_delete,
+                            'date_to' => $search_date_to,
+                            'booking_data' => $booking_data,
+                            'ajax_delete' => $ajax_delete,
                         )
                     );
                     $tpl_path = 'hotelreservationsystem/views/templates/admin/hotel_rooms_booking/helpers/view/view.tpl';

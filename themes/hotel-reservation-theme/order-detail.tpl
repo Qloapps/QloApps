@@ -359,20 +359,20 @@
 									<p class="text-center">
 										{if $group_use_tax}
 											<p class="text-center">
-												<span class="product_original_price {if $rm_v.feature_price_diff>0}room_type_old_price{/if}" {if $rm_v.feature_price_diff < 0} style="display:none;"{/if}>
+												<span class="product_original_price {if $rm_v.avg_price_diff_tax_incl>0}room_type_old_price{/if}" {if $rm_v.avg_price_diff_tax_incl < 0} style="display:none;"{/if}>
 													{displayWtPriceWithCurrency price=$rm_v['product_price_without_reduction_tax_incl'] currency=$currency}
 												</span>&nbsp;
-												<span class="room_type_current_price" {if !$rm_v.feature_price_diff}style="display:none;"{/if}>
-													{displayWtPriceWithCurrency price=$rm_v['paid_unit_price_tax_incl'] currency=$currency}
+												<span class="room_type_current_price" {if !$rm_v.avg_price_diff_tax_incl}style="display:none;"{/if}>
+													{displayWtPriceWithCurrency price=$rm_v['avg_paid_unit_price_tax_incl'] currency=$currency}
 												</span>
 											</p>
 										{else}
 											<p class="text-center">
-												<span class="product_original_price {if $rm_v.feature_price_diff>0}room_type_old_price{/if}" {if $rm_v.feature_price_diff < 0} style="display:none;"{/if}>
+												<span class="product_original_price {if $rm_v.avg_price_diff_tax_excl>0}room_type_old_price{/if}" {if $rm_v.avg_price_diff_tax_excl < 0} style="display:none;"{/if}>
 													{displayWtPriceWithCurrency price=$rm_v['product_price_without_reduction_tax_excl'] currency=$currency}
 												</span>&nbsp;
-												<span class="room_type_current_price" {if !$rm_v.feature_price_diff}style="display:none;"{/if}>
-													{displayWtPriceWithCurrency price=$rm_v['paid_unit_price_tax_excl'] currency=$currency}
+												<span class="room_type_current_price" {if !$rm_v.avg_price_diff_tax_excl}style="display:none;"{/if}>
+													{displayWtPriceWithCurrency price=$rm_v['avg_paid_unit_price_tax_excl'] currency=$currency}
 												</span>
 											</p>
 										{/if}

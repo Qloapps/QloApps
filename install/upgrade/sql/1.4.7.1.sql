@@ -1,2 +1,0 @@
-SET NAMES 'utf8';
-

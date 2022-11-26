@@ -1,9 +1,0 @@
-<!--
-Description: parsed modified, W3DTF format, year only
-Expect:      not bozo and feed['modified_parsed'] == (2003, 1, 1, 0, 0, 0, 2, 1, 0)
--->
-<feed version="0.3" xmlns="http://purl.org/atom/ns#">
-
-<modified>2003</modified>
-
-</feed>

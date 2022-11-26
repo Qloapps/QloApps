@@ -24,77 +24,84 @@
 *  International Registered Trademark & Property of PrestaShop SA
 */
 
-if (!defined('_PS_VERSION_'))
-	exit;
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
 
 class BlockCurrencies extends Module
 {
-	public function __construct()
-	{
-		$this->name = 'blockcurrencies';
-		$this->tab = 'front_office_features';
-		$this->version = '0.4.0';
-		$this->author = 'PrestaShop';
-		$this->need_instance = 0;
+    public function __construct()
+    {
+        $this->name = 'blockcurrencies';
+        $this->tab = 'front_office_features';
+        $this->version = '0.4.0';
+        $this->author = 'PrestaShop';
+        $this->need_instance = 0;
 
-		parent::__construct();
+        parent::__construct();
 
-		$this->displayName = $this->l('Currency block');
-		$this->description = $this->l('Adds a block allowing customers to choose their preferred shopping currency.');
-		$this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
-	}
+        $this->displayName = $this->l('Currency selector block');
+        $this->description = $this->l('Adds a block allowing customers to select their preferred currency.');
+        $this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
+    }
 
-	public function install()
-	{
-		return parent::install() 
-				&& $this->registerHook('displayFooterMostLeftBlock') 
-				&& $this->registerHook('displayHeader');
-	}
+    public function install()
+    {
+        if (!parent::install()
+            || !$this->registerHook('actionFrontControllerSetMedia')
+            || !$this->registerHook('displayNav')
+            || !$this->registerHook('displayExternalNavigationHook')
+        ) {
+            return false;
+        }
+        return true;
+    }
 
-	protected function _prepareHook($params)
-	{
-		if (Configuration::get('PS_CATALOG_MODE'))
-			return false;
+    public function hookActionFrontControllerSetMedia()
+    {
+        $this->context->controller->addCSS($this->getPathUri().'views/css/hook/blockcurrencies.css');
+        $this->context->controller->addJS($this->getPathUri().'views/js/hook/blockcurrencies.js');
+    }
 
-		if (!Currency::isMultiCurrencyActivated())
-			return false;
+    protected function _prepareHook()
+    {
+        if (Configuration::get('PS_CATALOG_MODE')) {
+            return false;
+        }
 
-		$this->smarty->assign('blockcurrencies_sign', $this->context->currency->sign);
-	
-		return true;
-	}
+        if (!Currency::isMultiCurrencyActivated()) {
+            return false;
+        }
+        return true;
+    }
 
-	/**
-	* Returns module content for header
-	*
-	* @param array $params Parameters
-	* @return string Content
-	*/
-	public function hookDisplayTop($params)
-	{
-		if ($this->_prepareHook($params))
-			return $this->display(__FILE__, 'blockcurrencies.tpl');
-	}
+    public function hookDisplayNav()
+    {
+        if ($this->_prepareHook()) {
+            return $this->display(__FILE__, 'blockcurrencies.tpl');
+        }
+    }
 
-	public function hookDisplayNav($params)
-	{
-		return $this->hookDisplayTop($params);
-	}
+    public function hookDisplayTop()
+    {
+        return $this->hookDisplayNav();
+    }
 
-	public function hookDisplayTopSubPrimaryBlock($params)
-	{
-		return $this->hookDisplayTop($params);
-	}
+    public function hookDisplayTopSubPrimaryBlock()
+    {
+        return $this->hookDisplayNav();
+    }
 
-	public function hookDisplayFooterMostLeftBlock($params)
-	{
-		return $this->hookDisplayTop($params);
-	}
+    public function hookDisplayFooterMostLeftBlock()
+    {
+        return $this->hookDisplayNav();
+    }
 
-	public function hookDisplayHeader($params)
-	{
-		if (Configuration::get('PS_CATALOG_MODE'))
-			return;
-		$this->context->controller->addCSS(($this->_path).'blockcurrencies.css', 'all');
-	}
+    public function hookDisplayExternalNavigationHook()
+    {
+        if (!$this->_prepareHook()) {
+            return;
+        }
+        return $this->display(__FILE__, 'external-navigation-hook.tpl');
+    }
 }

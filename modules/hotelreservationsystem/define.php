@@ -25,7 +25,6 @@ require_once 'classes/HotelBranchInformation.php';
 require_once 'classes/HotelImage.php';
 require_once 'classes/HotelFeatures.php';
 require_once 'classes/HotelBranchFeatures.php';
-require_once 'classes/HotelRoomAllotmentType.php';
 require_once 'classes/HotelBookingDetail.php';
 require_once 'classes/HotelCartBookingData.php';
 require_once 'classes/HotelAdvancedPayment.php';
@@ -40,6 +39,7 @@ require_once 'classes/HotelRoomTypeGlobalDemand.php';
 require_once 'classes/HotelRoomTypeGlobalDemandAdvanceOption.php';
 require_once 'classes/HotelRoomTypeDemandPrice.php';
 require_once 'classes/HotelRoomTypeDemand.php';
+require_once 'classes/HotelRoomTypeRestrictionDateRange.php';
 
 require_once 'classes/QloWebservice.php';
 require_once 'classes/QloRoomType.php';

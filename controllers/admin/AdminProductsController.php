@@ -112,6 +112,7 @@ class AdminProductsControllerCore extends AdminController
             'Warehouses' => $this->l('Warehouses'),
             'Configuration' => $this->l('Configuration'),
             'Occupancy' => $this->l('Occupancy'),
+            'LengthOfStay' => $this->l('Length of Stay'),
         );
 
         $this->available_tabs = array('Warehouses' => 14);
@@ -132,6 +133,7 @@ class AdminProductsControllerCore extends AdminController
                 //'Suppliers' => 13,
                 'Configuration' => 14,
                 'Occupancy' => 15,
+                'LengthOfStay' => 16,
             ));
         }
 
@@ -205,10 +207,11 @@ class AdminProductsControllerCore extends AdminController
 				LEFT JOIN `'._DB_PREFIX_.'shop` shop ON (shop.id_shop = '.$id_shop.')
 				LEFT JOIN `'._DB_PREFIX_.'image_shop` image_shop ON (image_shop.`id_product` = a.`id_product` AND image_shop.`cover` = 1 AND image_shop.id_shop = '.$id_shop.')
 				LEFT JOIN `'._DB_PREFIX_.'image` i ON (i.`id_image` = image_shop.`id_image`)
-				LEFT JOIN `'._DB_PREFIX_.'product_download` pd ON (pd.`id_product` = a.`id_product` AND pd.`active` = 1)';
+                LEFT JOIN `'._DB_PREFIX_.'product_download` pd ON (pd.`id_product` = a.`id_product` AND pd.`active` = 1)
+				LEFT JOIN `'._DB_PREFIX_.'address` aa ON (aa.`id_hotel` = hb.`id`)';
 
         $this->_select .= ' (SELECT COUNT(hri.`id`) FROM `'._DB_PREFIX_.'htl_room_information` hri WHERE hri.`id_product` = a.`id_product`) as num_rooms, ';
-        $this->_select .= 'hrt.`adult`, hrt.`children`, hb.`id` as id_hotel, hb.`city`, hbl.`hotel_name`, ';
+        $this->_select .= 'hrt.`adult`, hrt.`children`, hb.`id` as id_hotel, aa.`city`, hbl.`hotel_name`, ';
         $this->_select .= 'shop.`name` AS `shopname`, a.`id_shop_default`, ';
         $this->_select .= $alias_image.'.`id_image` AS `id_image`, cl.`name` AS `name_category`, '.$alias.'.`price`, 0 AS `price_final`, a.`is_virtual`, pd.`nb_downloadable`, sav.`quantity` AS `sav_quantity`, '.$alias.'.`active`, IF(sav.`quantity`<=0, 1, 0) AS `badge_danger`';
 
@@ -1269,7 +1272,7 @@ class AdminProductsControllerCore extends AdminController
         $id_group = Tools::getValue('sp_id_group');
         $id_customer = Tools::getValue('sp_id_customer');
         $price = Tools::getValue('leave_bprice') ? '-1' : Tools::getValue('sp_price');
-        $from_quantity = Tools::getValue('sp_from_quantity');
+        $from_quantity = 1;
         $reduction = (float)(Tools::getValue('sp_reduction'));
         $reduction_tax = Tools::getValue('sp_reduction_tax');
         $reduction_type = !$reduction ? 'amount' : Tools::getValue('sp_reduction_type');
@@ -1587,7 +1590,9 @@ class AdminProductsControllerCore extends AdminController
             _PS_JS_DIR_.'admin/products.js',
         ));
 
-        if ($this->display == 'edit' || $this->display == 'add') {
+        if (in_array($this->display, array('add', 'edit'))
+            && $this->tabAccess[$this->display] == '1'
+        ) {
             $this->addJqueryUI(array(
                 'ui.core',
                 'ui.widget'
@@ -2217,6 +2222,9 @@ class AdminProductsControllerCore extends AdminController
                         if ($this->isTabSubmitted('Occupancy')) {
                             $this->processOccupancy();
                         }
+                        if ($this->isTabSubmitted('LengthOfStay')) {
+                            $this->processLengthOfStay();
+                        }
                         if ($this->isTabSubmitted('Configuration')) {
                             $this->processConfiguration();
                         }
@@ -2686,8 +2694,6 @@ class AdminProductsControllerCore extends AdminController
             // used to build the new url when changing category
             $this->tpl_list_vars['base_url'] = preg_replace('#&id_category=[0-9]*#', '', self::$currentIndex).'&token='.$this->token;
         }
-        // @todo module free
-        $this->tpl_form_vars['vat_number'] = file_exists(_PS_MODULE_DIR_.'vatnumber/ajax.php');
 
         parent::initContent();
     }
@@ -2696,8 +2702,6 @@ class AdminProductsControllerCore extends AdminController
     {
         $time = time();
         $kpis = array();
-
-        /* The data generation is located in AdminStatsControllerCore */
 
         // if (Configuration::get('PS_STOCK_MANAGEMENT')) {
         //     $helper = new HelperKpi();
@@ -2720,12 +2724,8 @@ class AdminProductsControllerCore extends AdminController
         $helper->icon = 'icon-tags';
         $helper->color = 'color2';
         $helper->title = $this->l('Average Gross Margin %', null, null, false);
-        if (ConfigurationKPI::get('PRODUCT_AVG_GROSS_MARGIN') !== false) {
-            $helper->value = ConfigurationKPI::get('PRODUCT_AVG_GROSS_MARGIN');
-        }
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=product_avg_gross_margin';
         $helper->tooltip = $this->l('Gross margin expressed in percentage assesses how cost-effectively you sell your room types. Out of $100, you will retain $X to cover profit and expenses.', null, null, false);
-        $helper->refresh = (bool)(ConfigurationKPI::get('PRODUCT_AVG_GROSS_MARGIN_EXPIRE') < $time);
         $kpis[] = $helper->generate();
 
         $helper = new HelperKpi();
@@ -2734,12 +2734,8 @@ class AdminProductsControllerCore extends AdminController
         $helper->color = 'color3';
         $helper->title = $this->l('Purchased references', null, null, false);
         $helper->subtitle = $this->l('30 days', null, null, false);
-        if (ConfigurationKPI::get('8020_SALES_CATALOG') !== false) {
-            $helper->value = ConfigurationKPI::get('8020_SALES_CATALOG');
-        }
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=8020_sales_catalog';
-        $helper->tooltip = $this->l('X% of your references have been purchased for the past 30 days', null, null, false);
-        $helper->refresh = (bool)(ConfigurationKPI::get('8020_SALES_CATALOG_EXPIRE') < $time);
+        $helper->tooltip = $this->l('X% of your references have been purchased for the past 30 days.', null, null, false);
         if (Module::isInstalled('statsbestproducts')) {
             $helper->href = Context::getContext()->link->getAdminLink('AdminStats').'&module=statsbestproducts&datepickerFrom='.date('Y-m-d', strtotime('-30 days')).'&datepickerTo='.date('Y-m-d');
         }
@@ -2751,12 +2747,8 @@ class AdminProductsControllerCore extends AdminController
         $helper->color = 'color4';
         $helper->href = $this->context->link->getAdminLink('AdminProducts');
         $helper->title = $this->l('Disabled Room Types', null, null, false);
-        if (ConfigurationKPI::get('DISABLED_PRODUCTS') !== false) {
-            $helper->value = ConfigurationKPI::get('DISABLED_PRODUCTS');
-        }
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=disabled_products';
-        $helper->refresh = (bool)(ConfigurationKPI::get('DISABLED_PRODUCTS_EXPIRE') < $time);
-        $helper->tooltip = $this->l('X% of your room types are disabled and not visible to your customers', null, null, false);
+        $helper->tooltip = $this->l('X% of your room types are disabled and not visible to your customers.', null, null, false);
         $helper->href = Context::getContext()->link->getAdminLink('AdminProducts').'&productFilter_active=0&submitFilterproduct=1';
         $kpis[] = $helper->generate();
 
@@ -3478,6 +3470,141 @@ class AdminProductsControllerCore extends AdminController
         }
     }
 
+    // send information for the length of stay tab
+    public function initFormLengthOfStay($product)
+    {
+        $data = $this->createTemplate($this->tpl_form);
+        if ($product->id) {
+            if ($this->product_exists_in_shop) {
+                // Check if any hotel is created or not
+                $objRoomType = new HotelRoomType();
+                if ($roomTypeInfo = $objRoomType->getRoomTypeInfoByIdProduct($product->id)) {
+                    if ($roomTypeInfo['id_hotel']) {
+                        // send length of stay date ranges for this room type
+                        $objRoomTypeRestrictionDates = new HotelRoomTypeRestrictionDateRange();
+                        $roomTypeInfo['restrictionDataRange'] = $objRoomTypeRestrictionDates->getRoomTypeLengthOfStayRestriction($product->id);
+                        $smartyVars['roomTypeInfo'] = $roomTypeInfo;
+                    } else {
+                        $this->displayWarning($this->l('No hotel is attached to this room type.'));
+                    }
+                } else {
+                    $this->displayWarning($this->l('Room type information is missing.'));
+                }
+            } else {
+                $this->displayWarning($this->l('You must save room type before managing length of stay.'));
+            }
+        } else {
+            $this->displayWarning($this->l('You must save room type before managing length of stay.'));
+        }
+
+        $smartyVars['product'] = $product;
+        $data->assign($smartyVars);
+        $this->tpl_form_vars['custom_form'] = $data->fetch();
+    }
+
+    public function processLengthOfStay()
+    {
+        if ($this->tabAccess['edit'] == 1) {
+
+            $idProduct = Tools::getValue('id_product');
+            if (Validate::isLoadedObject($product = new Product((int)$idProduct))) {
+                $objRoomType = new HotelRoomType();
+                if ($roomTypeInfo = $objRoomType->getRoomTypeInfoByIdProduct($idProduct)) {
+                    $roomTypeMinLos = Tools::getValue('min_los');
+                    $roomTypeMaxLos = Tools::getValue('max_los');
+
+                    // validate length of stay global values for room type
+                    if (!$roomTypeMinLos || $roomTypeMinLos == null) {
+                        $this->errors[] = Tools::displayError('Global minimum length of stay is a required field.');
+                    } elseif (!Validate::isUnsignedInt($roomTypeMinLos)) {
+                        $this->errors[] = Tools::displayError('Global minimum length of stay value is invalid. Please enter integer value. Set 1 day incase  of setting no limit on global minimum length of stay.');
+                    }
+
+                    if ($roomTypeMaxLos == null) {
+                        $this->errors[] = Tools::displayError('Global maximum length of stay is a required field.');
+                    } elseif (!Validate::isUnsignedInt($roomTypeMaxLos)) {
+                        $this->errors[] = Tools::displayError('Invalid value entered for global maximum length of stay field. Please enter integer value. Set 0 day incase of setting no limit on maximum length of stay.');
+                    } elseif ($roomTypeMinLos && $roomTypeMaxLos > 0 && ($roomTypeMinLos > $roomTypeMaxLos)) {
+                        $this->errors[] = Tools::displayError('Value of global maximum length of stay must be greater than global minimum length of stay.');
+                    }
+
+                    if (Tools::getValue('active_restriction_dates')) {
+                        if (Tools::getValue('restriction_date_from') && Tools::getValue('restriction_date_to')) {
+                            $objRoomTypeRestrictDateRange = new HotelRoomTypeRestrictionDateRange();
+                            $dateFromRestriction = Tools::getValue('restriction_date_from');
+                            $dateToRestriction = Tools::getValue('restriction_date_to');
+                            $minLosDays = Tools::getValue('restriction_min_los');
+                            $maxLosDays = Tools::getValue('restriction_max_los');
+
+                            $this->errors = array_merge($this->errors, $objRoomTypeRestrictDateRange->validateRoomTypeLengthOfStayRestriction($dateFromRestriction, $dateToRestriction, $minLosDays, $maxLosDays));
+                        } else {
+                            $this->errors[] = Tools::displayError('Please add at least one Minimum & maximum length of stay restriction for date range if \'Length of stay for date ranges\' option is enable.');
+                        }
+                    }
+
+                    if (!$this->errors) {
+                        $objRoomType = new HotelRoomType($roomTypeInfo['id']);
+                        $objRoomType->min_los = $roomTypeMinLos;
+                        $objRoomType->max_los = $roomTypeMaxLos;
+                        if ($objRoomType->save()) {
+                            if (Tools::getValue('active_restriction_dates') && Tools::getValue('restriction_date_from')) {
+                                // @ToDo: we should validate this room type restriction ids belongs to this room type
+                                $idRoomTypeRestriction = Tools::getValue('id_rt_restriction');
+
+                                foreach ($dateFromRestriction as $restrictionKey => $dateFrom) {
+                                    // change into database compatible format
+                                    $dateFrom = date('Y-m-d', strtotime($dateFrom));
+                                    $dateTo = date('Y-m-d', strtotime($dateToRestriction[$restrictionKey]));
+
+                                    if ($idRoomTypeRestriction[$restrictionKey]) {
+                                        $objRoomTypeRestrictDateRange = new HotelRoomTypeRestrictionDateRange($idRoomTypeRestriction[$restrictionKey]);
+                                    } else {
+                                        $objRoomTypeRestrictDateRange = new HotelRoomTypeRestrictionDateRange();
+                                    }
+
+                                    $objRoomTypeRestrictDateRange->id_product = $idProduct;
+                                    $objRoomTypeRestrictDateRange->date_from = $dateFrom;
+                                    $objRoomTypeRestrictDateRange->date_to = $dateTo;
+                                    $objRoomTypeRestrictDateRange->min_los = $minLosDays[$restrictionKey];
+                                    $objRoomTypeRestrictDateRange->max_los = $maxLosDays[$restrictionKey];
+                                    $objRoomTypeRestrictDateRange->save();
+                                }
+                            } else {
+                                // if disabled length of stay for date ranges then delete all previously saved
+                                $objRoomTypeRestrictDateRange = new HotelRoomTypeRestrictionDateRange();
+                                if ($losRestrictions = $objRoomTypeRestrictDateRange->getRoomTypeLengthOfStayRestriction($idProduct)) {
+                                    foreach ($losRestrictions as $losDate) {
+                                        $objRoomTypeRestrictDateRange = new HotelRoomTypeRestrictionDateRange($losDate['id_rt_restriction']);
+                                        $objRoomTypeRestrictDateRange->delete();
+                                    }
+                                }
+                            }
+                        } else {
+                            $this->errors[] = Tools::displayError('Something went wrong while saving global minimum & maximum length of stay values. Please try again !!');
+                        }
+                    }
+                }
+            }
+        } else {
+            $this->errors[] = Tools::displayError('You do not have the right permission.');
+        }
+    }
+
+    // delete the rows of length of stay on date range
+    public function ajaxProcessDeleteRoomTypeLengthOfStayRestriction()
+    {
+        if ($this->tabAccess['edit'] == 1) {
+            $objRoomTypeRestrictionDates = new HotelRoomTypeRestrictionDateRange(Tools::getValue('id_rt_restriction'));
+            if ($objRoomTypeRestrictionDates->delete()) {
+                die(json_encode(array('success' => $this->l('Successfully deleted'))));
+            } else {
+                die(json_encode(array('error' => $this->l('Something went wrong. Please reload the page and try again !!'))));
+            }
+        } else {
+            die(json_encode(array('error' => $this->l('You do not have the right permission'))));
+        }
+    }
+
     public function validateDisableDateRanges($disableDates)
     {
         if (count($disableDates)) {
@@ -3749,6 +3876,9 @@ class AdminProductsControllerCore extends AdminController
                 'link' => new Link(),
                 'pack' => new Pack()
             ));
+
+            // get hotel address for this room type
+            $address_infos = Address::getCountryAndState(Cart::getIdAddressForTaxCalculation($obj->id));
         } else {
             $this->displayWarning($this->l('You must save this room type before adding specific pricing'));
             $product->id_tax_rules_group = (int)Product::getIdTaxRulesGroupMostUsed();
@@ -3756,7 +3886,14 @@ class AdminProductsControllerCore extends AdminController
         }
 
         $address = new Address();
-        $address->id_country = (int)$this->context->country->id;
+        // $address->id_country = (int)$this->context->country->id;
+        if (!$address_infos) {
+            $address->id_country = (int)$this->context->country->id;
+        } else {
+            $address->id_country = (int)$address_infos['id_country'];
+            $address->id_state = (int)$address_infos['id_state'];
+            $address->zipcode = $address_infos['postcode'];
+        }
         $tax_rules_groups = TaxRulesGroup::getTaxRulesGroups(true);
         $tax_rates = array(
             0 => array(
@@ -4131,7 +4268,6 @@ class AdminProductsControllerCore extends AdminController
 						<td>'.$fixed_price.'</td>
 						<td>'.$impact.'</td>
 						<td>'.$period.'</td>
-						<td>'.$specific_price['from_quantity'].'</th>
 						<td>'.((!$rule->id && $can_delete_specific_prices) ? '<a class="btn btn-default" name="delete_link" href="'.self::$currentIndex.'&id_product='.(int)Tools::getValue('id_product').'&action=deleteSpecificPrice&id_specific_price='.(int)($specific_price['id_specific_price']).'&token='.Tools::getValue('token').'"><i class="icon-trash"></i></a>': '').'</td>
 					</tr>';
                     $i++;
@@ -5320,31 +5456,33 @@ class AdminProductsControllerCore extends AdminController
         }
         $this->tpl_form_vars['custom_form'] = $data->fetch();
     }
-    
+
     public function getModalDuplicateOptions()
     {
-        $tpl = $this->createTemplate('modal-duplicate-options.tpl');
         $idsHotel = HotelBranchInformation::getProfileAccessedHotels($this->context->employee->id_profile, 1, 1);
         $hotelsInfo = array();
         foreach ($idsHotel as $idHotel) {
             $objHotelBranchInfo = new HotelBranchInformation($idHotel, $this->context->language->id);
             if (Validate::isLoadedObject($objHotelBranchInfo)) {
+                $hotelAddressInfo = $objHotelBranchInfo->getAddress($idHotel);
                 $hotelInfo = array(
                     'id_hotel' => $objHotelBranchInfo->id,
                     'hotel_name' => $objHotelBranchInfo->hotel_name,
                     'rating' => $objHotelBranchInfo->rating,
-                    'city' => $objHotelBranchInfo->city,
+                    'city' => $hotelAddressInfo['city'],
                 );
                 $hotelsInfo[] = $hotelInfo;
             }
         }
+
         $formAction = $this->context->link->getAdminLink('AdminProducts', true).'&duplicateproduct';
-        $tpl->assign(array(
+        $this->context->smarty->assign(array(
             'action' => $formAction,
             'hotels_info' => $hotelsInfo,
             'duplicate_images' => 1,
         ));
 
+        $modalContent = $this->context->smarty->fetch('controllers/products/modal-duplicate-options.tpl');
         $modalActions = array(
             array(
                 'type' => 'button',
@@ -5359,9 +5497,10 @@ class AdminProductsControllerCore extends AdminController
             'modal_id' => 'modal-duplicate-options',
             'modal_class' => 'modal-md',
             'modal_title' => $this->l('Duplication options'),
-            'modal_content' => $tpl->fetch(),
+            'modal_content' => $modalContent,
             'modal_actions' => $modalActions,
         );
+
         return $modal;
     }
 

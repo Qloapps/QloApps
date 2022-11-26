@@ -1,4 +1,0 @@
-2014-04-22 18:57:34 +0200	// Changelog updated
-2014-03-24 11:43:28 +0100	/ MO blockpermanentlinks : ps_versions_compliancy modified (1.5.6.1 => 1.6)
-2014-03-24 11:03:21 +0100	/ MO blockpermanentlinks : ps_versions_compliancy added
-2014-03-20 14:23:25 +0100	Initial commit

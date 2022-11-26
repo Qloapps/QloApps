@@ -14,42 +14,340 @@
 // ui-datepicker-buttonpane: The buttonpane that is used when the showButtonPanel option is set.
 // ui-datepicker-current: The button used to select today's date.
 
+$color-bright: white
+
+$color-calendar: #00A4E7
+$color-calendar-compare: #FF8000
+
+$color-calendar-day: $color-bright
+
+$color-calendar-outrange: #ccc
+
+$color-calendar-day-selected: $color-calendar
+$color-calendar-day-selected-compare: $color-calendar-compare
+
+$color-calendar-range: lighten($color-calendar,10%)
+$color-calendar-range-compare: lighten($color-calendar-compare,10%)
+
+.datepicker2
+	background: #fff
+	position: absolute
+	z-index: 599
+	right: -10rem
+	.daterangepicker
+		border-radius: 5px 5px 0 0 !important
+.bootstrap
+	#datepicker
+		.daterangepicker
+			position: relative
+			width: 100%
+			font-family: Verdana, Arial, sans-serif
+			font-size: 13px
+			box-shadow: 0 4px 10px 0 rgba(0, 0, 0, 0.26)
+			margin-bottom: 8px
+			padding: 12px
+			border-bottom-left-radius: 0
+			border-bottom-right-radius: 0
+			table
+				width: 100%
+				margin: 0
+				border-spacing: 1px
+			thead
+				tr th
+					text-transform: uppercase
+					text-align: center
+					font-weight: bold
+					border: 0
+					background-color: #fff !important
+					color: #777 !important
+					font-size: 14px
+				tr:first-child th
+					padding-bottom: 10px
+					text-transform: capitalize
+					.icon-angle-left
+						font-weight: bold
+						padding-left: 6px
+						&:after
+							content: ''
+							position: absolute
+							top: -5px
+							left: -2px
+							width: 24px
+							height: 24px
+							background-color: #f0f0f0
+							z-index: -1
+							border-radius: 50%
+					.icon-angle-right
+						font-weight: bold
+						padding-right: 6px
+						&:after
+							content: ''
+							position: absolute
+							top: -5px
+							right: -2px
+							width: 24px
+							height: 24px
+							background-color: #f0f0f0
+							z-index: -1
+							border-radius: 50%
+			td, th
+				text-align: center
+				padding: 0
+				position: relative
+			tr
+				border-bottom: solid 1px white
+			td
+				color: #555
+				font-size: 14px
+				line-height: 25px
+				padding: 5px 10px
+				&.day:after
+					content: ""
+					position: absolute
+					display: block
+					top: 0
+					width: 100%
+					z-index: 0
+					background-color: transparent
+					@include left(0)
+				&.day:hover
+					cursor: pointer
+					color: #212121
+				&.day.disabled
+					color: $color-calendar-outrange
+				&.old, &.new
+					color: $color-calendar-outrange
+				&.start-selected:not(.old):not(.new):not(.end-selected)
+					color: $color-bright
+					background-color: #1292ff
+					//@extend .chevron-left
+					&.range-compare
+						background-color: mix($color-calendar-day-selected,$color-calendar-range-compare,70%)
+						@include border-left-radius(0)
+					&.end-selected-compare, &.start-selected-compare
+						background-color: mix($color-calendar-day-selected,$color-calendar-day-selected-compare,70%)
+					&.end-selected-compare
+						@include border-radius(0)
+				&.end-selected:not(.old):not(.new):not(.start-selected)
+					color: $color-bright
+					background-color: #1292ff
+					//@extend .chevron-right
+					&.range-compare
+						background-color: mix($color-calendar-day-selected,$color-calendar-range-compare,70%)
+						@include border-right-radius(0)
+					&.end-selected-compare, &.start-selected-compare
+						background-color: mix($color-calendar-day-selected,$color-calendar-day-selected-compare,70%)
+					&.start-selected-compare
+						@include border-radius(0)
+				&.start-selected-compare:not(.old):not(.new):not(.end-selected-compare)
+					color: $color-bright
+					font-weight: 700
+					background-color: $color-calendar-day-selected-compare
+					@include border-left-radius(15px)
+					&.range
+						background-color: #f2f2f2
+						@include border-left-radius(0)
+				&.end-selected-compare:not(.old):not(.new):not(.start-selected-compare)
+					color: $color-bright
+					font-weight: 700
+					background-color: $color-calendar-day-selected-compare
+					@include border-right-radius(15px)
+					&.range
+						background-color: #f2f2f2
+						@include border-right-radius(0)
+				&.end-selected.start-selected
+					color: $color-bright
+					font-weight: 700
+					background-color: $color-calendar-day-selected
+					&.range-compare
+						background-color: mix($color-calendar-day-selected,$color-calendar-range-compare,70%)
+						@include border-radius(0)
+				&.end-selected-compare.start-selected-compare
+					color: $color-bright
+					@include border-radius(15px)
+					font-weight: 700
+					background-color: $color-calendar-day-selected-compare
+					&.range
+						background-color: mix($color-calendar-day-selected-compare,$color-calendar-range,70%)
+						@include border-radius(0)
+				&.range
+					color: #333
+					background-color: #f2f2f2
+					&.range-compare
+						background-color: mix($color-calendar-range,$color-calendar-range-compare,50%)
+				&.range-compare
+					color: lighten($color-calendar-range-compare,35%)
+					background-color: $color-calendar-range-compare
+					&.range
+						background-color: mix($color-calendar-range,$color-calendar-range-compare,50%)
+				&.today
+					background-color: $color-bright
+				span
+					padding: 0
+					display: block
+					width: 33.333%
+					height: 3em
+					line-height: 3em
+					font-weight: 400
+					float: left
+					text-transform: uppercase
+					cursor: pointer
+					&:hover
+						color: white
+						background-color: $color-calendar-day-selected
+					&.active
+						background-color: $color-calendar-day-selected
+						color: #fff
+					&.old
+						color: $color-calendar-outrange
+			th
+				&.next
+					@include text-align(right)
+				&.prev
+					@include text-align(left)
+				&.next, &.prev, &.month-switch
+					font-size: 16px !important
+					font-weight: normal
+					color: #333 !important
+					&:hover
+						opacity: 0.8
+			thead tr:first-child th
+				cursor: pointer
 .ui-datepicker
+	margin: 5px auto 0
+	width: auto !important
+	z-index: 111111 !important
 	top: 0
 	left: 0
-	padding: 4px
+	padding: 12px !important
 	margin-top: 1px
 	@include border-radius(4px)
-	&:before
-		content: ''
-		display: inline-block!important
-		border-left: 7px solid transparent
-		border-right: 7px solid transparent
-		border-bottom: 7px solid #ccc
-		border-bottom-color: rgba(black,.2)
-		position: absolute
-		top: -7px
-		left: 6px
-	&:after
-		content: ''
-		display: inline-block!important
-		border-left: 6px solid transparent
-		border-right: 6px solid transparent
-		border-bottom: 6px solid white
-		position: absolute
-		top: -6px
-		left: 7px
 	.ui-datepicker-header
-		background: transparent !important
+		background: none
+		border: none
 		color: gray
 		font-weight: normal
-	.ui-state-default
-		background: transparent !important
+	.ui-datepicker-title
+		color: #333
+		font-size: 16px
+		font-style: normal
+	th
+		font-size: 12px
+		font-weight: 600
+		color: #777
+		text-transform: uppercase
+	tbody
+		td
+			&:last-child
+				border-right: 0px
+		tr
+			border-bottom: 1px solid #bbb
+			border: none
+			&:last-child
+				border-bottom: 0px
+	a
+		text-decoration: none
 	.ui-state-highlight
 		border: solid 1px darken(#FEFBE2 ,50%) !important
 		background: #FEFBE2 !important
+	.ui-datepicker-today
+		background: #e7f4ff !important
+		.ui-state-highlight
+			color: #1292ff !important
+	.ui-datepicker-current-day, .ui-datepicker-today.ui-datepicker-current-day
+		background-color: #1292ff !important
+	.ui-datepicker-current-day, .ui-datepicker-today.ui-datepicker-current-day .ui-state-highlight
+		color: #fff !important
 	.ui-state-active
 		color: white !important
 		background: $primary-color !important
 		border: solid 1px darken($primary-color,10%) !important
-
+	.ui-datepicker-prev-hover
+		left: 2px !important
+.form-date-actions .btn:hover, .form-date-actions .btn:focus, .form-date-actions .btn:active
+	outline: unset !important
+	text-decoration: none
+.form-date-actions
+	bottom: -27px
+	position: absolute
+	width: 100%
+	z-index: 599
+	background-color: #fff
+	box-shadow: 0 7px 10px 0 rgba(0,0,0,0.26)
+	padding: 2px
+	border-bottom-left-radius: 4px
+	border-bottom-right-radius: 4px
+.ui-datepicker-prev
+	float: left
+	cursor: pointer
+	&::before
+		background-position: center -30px
+		font-weight: bold
+		font-size: 16px
+		color: #333
+		content: "\f104"
+		font-family: FontAwesome
+		position: absolute
+		left: 8px
+.ui-datepicker-next
+	float: right
+	cursor: pointer
+	&::before
+		background-position: center -30px
+		font-weight: bold
+		font-size: 16px
+		color: #333
+		content: "\f105"
+		font-family: FontAwesome
+		position: absolute
+		right: 8px
+	&:hover
+		top: 5px !important
+		right: 2px !important
+.ui-state-hover,
+.ui-widget-content .ui-state-hover,
+.ui-widget-header .ui-state-hover,
+.ui-state-focus,
+.ui-widget-content .ui-state-focus,
+.ui-widget-header .ui-state-focus
+	border: unset
+	background: none
+	font-weight: none
+	color: none
+.ui-widget-content.ui-datepicker
+	border: none
+	box-shadow: 0 4px 10px 0 rgba(0, 0, 0, 0.26)
+.ui-datepicker td span,
+.ui-datepicker td a
+	display: inline-block
+	text-align: center
+	line-height: 25px
+	color: #ffffff
+.ui-datepicker .ui-datepicker-prev,
+.ui-datepicker .ui-datepicker-next
+	top: 5px !important
+	background-color: #f0f0f0
+	border: none
+	border-radius: 50%
+.ui-state-default,
+.ui-widget-content .ui-state-default,
+.ui-widget-header .ui-state-default
+	border: none !important
+	background: transparent !important
+	font-size: 14px
+	color: #333
+.ui-widget-content
+	.ui-icon
+		background-image: none !important
+.ui-datepicker td span, .ui-datepicker td a
+	text-align: center !important
+	padding: 4px 9px !important
+.ui-widget-header .ui-state-hover, .ui-state-focus, .ui-widget-content .ui-state-focus, .ui-widget-header .ui-state-focus
+	background: unset !important
+	border: unset !important
+.ui-widget-content .ui-slider-handle, .ui-datepicker-current .ui-slider-handle
+	border: 1px solid #d3d3d3 !important
+	color: #555555 !important
+	background: #e6e6e6 url(images/ui-bg_glass_75_e6e6e6_1x400.png) !important
+.ui-datepicker-prev-hover
+	top: unset !important

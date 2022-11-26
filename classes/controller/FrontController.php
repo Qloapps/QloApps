@@ -307,7 +307,7 @@ class FrontControllerCore extends Controller
             }
 
             if (Validate::isLoadedObject($cart) && $cart->OrderExists()) {
-                PrestaShopLogger::addLog('Frontcontroller::init - Cart cannot be loaded or a booking has already been placed using this cart', 1, null, 'Cart', (int)$this->context->cookie->id_cart, true);
+                PrestaShopLogger::addLog('Frontcontroller::init - Cart cannot be loaded or a booking has already been created using this cart', 1, null, 'Cart', (int)$this->context->cookie->id_cart, true);
                 unset($this->context->cookie->id_cart, $cart, $this->context->cookie->checkedTOS);
                 $this->context->cookie->check_cgv = false;
             }
@@ -465,7 +465,6 @@ class FrontControllerCore extends Controller
             'use_taxes'           => (int)Configuration::get('PS_TAX'),
             'show_taxes'          => (int)(Configuration::get('PS_TAX_DISPLAY') == 1 && (int)Configuration::get('PS_TAX')),
             'display_tax_label'   => (bool)$display_tax_label,
-            'vat_management'      => (int)Configuration::get('VATNUMBER_MANAGEMENT'),
             'opc'                 => (bool)Configuration::get('PS_ORDER_PROCESS_TYPE'),
             'PS_CATALOG_MODE'     => (bool)Configuration::get('PS_CATALOG_MODE') || (Group::isFeatureActive() && !(bool)Group::getCurrent()->show_prices),
             'b2b_enable'          => (bool)Configuration::get('PS_B2B_ENABLE'),
@@ -1582,17 +1581,10 @@ class FrontControllerCore extends Controller
      */
     public function setMobileTemplate($template)
     {
-        // Needed for site map
-        $blockmanufacturer = Module::getInstanceByName('blockmanufacturer');
-        $blocksupplier     = Module::getInstanceByName('blocksupplier');
-
         $this->context->smarty->assign(array(
             'categoriesTree'            => Category::getRootCategory()->recurseLiteCategTree(0),
             'categoriescmsTree'         => CMSCategory::getRecurseCategory($this->context->language->id, 1, 1, 1),
             'voucherAllowed'            => (int)CartRule::isFeatureActive(),
-            'display_manufacturer_link' => (bool)$blockmanufacturer->active,
-            'display_supplier_link'     => (bool)$blocksupplier->active,
-            'PS_DISPLAY_SUPPLIERS'      => Configuration::get('PS_DISPLAY_SUPPLIERS'),
             'PS_DISPLAY_BEST_SELLERS'   => Configuration::get('PS_DISPLAY_BEST_SELLERS'),
             'display_store'             => Configuration::get('PS_STORES_DISPLAY_SITEMAP'),
             'conditions'                => Configuration::get('PS_CONDITIONS'),

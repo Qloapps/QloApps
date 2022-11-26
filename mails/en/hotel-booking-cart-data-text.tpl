@@ -9,7 +9,7 @@
 
 {$data_v['adult']} {l s='Adults'}, {$data_v['children']} {l s='Children'}
 
-{convertPrice price=$data_v['unit_price']}
+{convertPrice price=$rm_v['avg_paid_unit_price_tax_incl']}
 
 {$rm_v['num_rm']}
 
@@ -17,7 +17,7 @@
 
 {$rm_v['data_to']|date_format:"%d-%b-%G"}
 
-{$rm_v['amount']}
+{$rm_v['amount_tax_incl']}
 
 
 {/foreach}
