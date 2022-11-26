@@ -669,15 +669,27 @@
 										<input class="btn btn-default" type="submit" name="submitGuestToCustomer" value="{l s='Transform a guest into a customer'}" />
 										<p class="help-block">{l s='This feature will generate a random password and send an email to the customer.'}</p>
 									</form>
+									<dl class="panel list-detail">
+										<dt>{l s='Email'}</dt>
+											<dd><a href="mailto:{$customer->email}"><i class="icon-envelope-o"></i> {$customer->email}</a></dd>
+										{if $addresses.invoice->phone_mobile || $addresses.invoice->phone}
+											<dt>{l s='Phone'}</dt>
+												<dd><a href="tel:{if $addresses.invoice->phone_mobile}{$addresses.invoice->phone_mobile}{else}{$addresses.invoice->phone}{/if}"><i class="icon-envelope-o"></i> {if $addresses.invoice->phone_mobile}{$addresses.invoice->phone_mobile}{else}{$addresses.invoice->phone}{/if}</a></dd><br>
+										{/if}
+									</dl>
 								{else}
 									<div class="alert alert-warning">
 										{l s='A registered customer account has already claimed this email address'}
 									</div>
 								{/if}
 							{else}
-								<dl class="well list-detail">
+								<dl class="panel list-detail">
 									<dt>{l s='Email'}</dt>
 										<dd><a href="mailto:{$customer->email}"><i class="icon-envelope-o"></i> {$customer->email}</a></dd><br>
+									{if $addresses.invoice->phone_mobile || $addresses.invoice->phone}
+										<dt>{l s='Phone'}</dt>
+											<dd><a href="tel:{if $addresses.invoice->phone_mobile}{$addresses.invoice->phone_mobile}{else}{$addresses.invoice->phone}{/if}"><i class="icon-envelope-o"></i> {if $addresses.invoice->phone_mobile}{$addresses.invoice->phone_mobile}{else}{$addresses.invoice->phone}{/if}</a></dd><br>
+									{/if}
 									<dt>{l s='Account registered'}</dt>
 										<dd class="text-muted"><i class="icon-calendar-o"></i> {dateFormat date=$customer->date_add full=true}</dd>
 									<!-- <dt>{l s='Valid orders placed'}</dt>
@@ -691,6 +703,19 @@
 											<dd>{$customer->ape}</dd>
 									{/if} -->
 								</dl>
+								{if $order->id_booking_staying_guest}
+									<dl class="panel">
+										<div class="panel-heading">
+											{l s='Staying guest'}
+										</div>
+										<dt>{l s='Name'}</dt>
+											<dd>{$bookingStayingGuest->firstname} {$bookingStayingGuest->lastname}</dd><br>
+										<dt>{l s='Email'}</dt>
+											<dd><a href="mailto:{$bookingStayingGuest->email}"><i class="icon-envelope-o"></i> {$bookingStayingGuest->email}</a></dd><br>
+										<dt>{l s='Phone'}</dt>
+											<dd><a href="tel:{$bookingStayingGuest->phone}"><i class="icon-envelope-o"></i> {$bookingStayingGuest->phone}</a></dd>
+									</dl>
+								{/if}
 							{/if}
 						</div>
 

@@ -50,6 +50,44 @@ $(document).ready(function()
 			$("#partial_data").slideDown();
 	});
 
+	// staying guest booking
+	function initGuestbookingcontainer() {
+		if ($("#booking_staying_guest:checked").val() == 1) {
+			$('#customer_info_container').hide('slow');
+			$('#booking_staying_guest_container').show('slow');
+		} else {
+			$('#booking_staying_guest_container').hide('slow');
+			$('#customer_info_container').show('slow');
+		}
+	}
+	function validateBookingStayingGuestForm() {
+		$('#booking_staying_guest_form input.validate').each(function (index, element) {
+			if (!validate_field(element)) {
+				if ($('#cgv').prop('checked') == 1) {
+					$('#cgv').trigger('click');
+				}
+			}
+		});
+	}
+	initGuestbookingcontainer();
+	$("#booking_staying_guest").on('change',function() {
+		initGuestbookingcontainer();
+	});
+	if ($("#booking_staying_guest:checked").val() == 1) {
+		validateBookingStayingGuestForm();
+	}
+
+	$('#booking_staying_guest_form').on('change', function(e) {
+		$.ajax({
+			type: 'POST',
+			url: orderOpcUrl,
+			async: false,
+			cache: false,
+			dataType : "json",
+			data: $(this).serialize()+'&method=submitBookingStayingGuest&ajax=true&token=' + static_token
+		});
+	});
+
 	// GUEST CHECKOUT / NEW ACCOUNT MANAGEMENT
 	if ((typeof isLogged == 'undefined' || !isLogged) || (typeof isGuest !== 'undefined' && isGuest))
 	{

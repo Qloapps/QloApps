@@ -78,33 +78,74 @@
 													<div id="collapse-guest-info" class="opc-collapse {if !$step->step_is_current}collapse{/if}" aria-labelledby="guest-info-head" data-parent="#oprder-opc-accordion">
 														<div class="card-body">
 															{if $is_logged || $isGuest}
-																<div class="row margin-btm-10">
-																	<div class="col-sm-3 col-xs-5 info-head">{l s='Name'}</div>
-																	<div class="col-sm-9 col-xs-7 info-value">{$guestInformations['firstname']} {$guestInformations['lastname']}</div>
-																</div>
-																<div class="row margin-btm-10">
-																	<div class="col-sm-3 col-xs-5 info-head">{l s='Email'}</div>
-																	<div class="col-sm-9 col-xs-7 info-value">{$guestInformations['email']}</div>
-																</div>
-																{if (isset($delivery->phone_mobile) && $delivery->phone_mobile) || (isset($delivery->phone) && $delivery->phone)}
-																	<div class="row margin-btm-10">
-																		<div class="col-sm-3 col-xs-5 info-head">
-																			{if isset($delivery->phone_mobile) && $delivery->phone_mobile}
-																				{l s='Mobile Number'}
-																			{else}
-																				{l s='Phone Number'}
-																			{/if}
+																<form id="booking_staying_guest_form">
+																	{if $is_logged}
+																		<p class="checkbox">
+																			<input type="checkbox" name="booking_staying_guest" id="booking_staying_guest" value="1" {if $id_booking_staying_guest}checked="checked"{/if}/>
+																			<label for="booking_staying_guest" id="booking_staying_guest_txt">{l s='Booking for someone else?'}</label>
+																		</p>
+																	{/if}
+																	<div id="booking_staying_guest_container" {if !$id_booking_staying_guest}style="display: none;"{/if}>
+																		<div class="row">
+																			<div class="required clearfix gender-line col-sm-2">
+																				<label>{l s='Social title'}</label>
+																				<select name="booking_staying_guest_gender" id="booking_staying_guest_gender">
+																					{foreach from=$genders key=k item=gender}
+																						<option value="{$gender->id_gender}"{if isset($smarty.post.booking_staying_guest_gender) && $smarty.post.booking_staying_guest_gender == $gender->id_gender || (isset($booking_staying_guest) && $booking_staying_guest.id_gender == $gender->id_gender)} selected="selected"{/if}>{$gender->name}</option>
+																					{/foreach}
+																				</select>
+																			</div>
+																			<div class="required form-group col-sm-5">
+																				<label for="firstname">{l s='First name'} <sup>*</sup></label>
+																				<input type="text" class="text form-control validate is_required" id="booking_staying_guest_firstname" name="booking_staying_guest_firstname" data-validate="isName"{if isset($smarty.post.booking_staying_guest_firstname) && $smarty.post.booking_staying_guest_firstname}  value="{$smarty.post.booking_staying_guest_firstname}"{elseif isset($booking_staying_guest) && $booking_staying_guest.firstname} value="{$booking_staying_guest.firstname}"{/if}/>
+																			</div>
+																			<div class="required form-group col-sm-5">
+																				<label for="lastname">{l s='Last name'} <sup>*</sup></label>
+																				<input type="text" class="form-control validate is_required" id="booking_staying_guest_lastname" name="booking_staying_guest_lastname" data-validate="isName"{if isset($smarty.post.booking_staying_guest_lastname) && $smarty.post.booking_staying_guest_lastname}  value="{$smarty.post.booking_staying_guest_lastname}"{elseif isset($booking_staying_guest) && $booking_staying_guest.lastname} value="{$booking_staying_guest.lastname}"{/if}/>
+																			</div>
 																		</div>
-																		<div class="col-sm-9 col-xs-7 info-value">
-																			{if isset($delivery->phone_mobile) && $delivery->phone_mobile}
-																				{$delivery->phone_mobile|escape:'html':'UTF-8'}
-																			{else}
-																				{$delivery->phone|escape:'html':'UTF-8'}
-																			{/if}
+																		<div class="row">
+																			<div class="required text form-group col-sm-6">
+																				<label for="email">{l s='Email'} <sup>*</sup></label>
+																				<input type="email" class="text form-control validate is_required" id="booking_staying_guest_email" name="booking_staying_guest_email" data-validate="isEmail"{if isset($smarty.post.booking_staying_guest_email) && $smarty.post.booking_staying_guest_email}  value="{$smarty.post.booking_staying_guest_email}"{elseif isset($booking_staying_guest) && $booking_staying_guest.email} value="{$booking_staying_guest.email}"{/if}/>
+																			</div>
+																		</div>
+																		<div class="row">
+																			<div class="{if isset($one_phone_at_least) && $one_phone_at_least}required {/if}form-group col-sm-6">
+																				<label for="phone_mobile">{l s='Mobile phone'}{if isset($one_phone_at_least) && $one_phone_at_least} <sup>**</sup>{/if}</label>
+																				<input type="text" class="text form-control validate is_required" name="booking_staying_guest_phone" id="booking_staying_guest_phone" data-validate="isPhoneNumber"{if isset($smarty.post.booking_staying_guest_phone) && $smarty.post.booking_staying_guest_phone}  value="{$smarty.post.booking_staying_guest_phone}"{elseif isset($booking_staying_guest) && $booking_staying_guest.phone} value="{$booking_staying_guest.phone}"{/if}/>
+																			</div>
 																		</div>
 																	</div>
-																{/if}
-
+																	<div id="customer_info_container" {if $id_booking_staying_guest}style="display: none;"{/if}>
+																		<div class="row margin-btm-10">
+																			<div class="col-sm-3 col-xs-5 info-head">{l s='Name'}</div>
+																			<div class="col-sm-9 col-xs-7 info-value">{$guestInformations['firstname']} {$guestInformations['lastname']}</div>
+																		</div>
+																		<div class="row margin-btm-10">
+																			<div class="col-sm-3 col-xs-5 info-head">{l s='Email'}</div>
+																			<div class="col-sm-9 col-xs-7 info-value">{$guestInformations['email']}</div>
+																		</div>
+																		{if (isset($delivery->phone_mobile) && $delivery->phone_mobile) || (isset($delivery->phone) && $delivery->phone)}
+																			<div class="row margin-btm-10">
+																				<div class="col-sm-3 col-xs-5 info-head">
+																					{if isset($delivery->phone_mobile) && $delivery->phone_mobile}
+																						{l s='Mobile Number'}
+																					{else}
+																						{l s='Phone Number'}
+																					{/if}
+																				</div>
+																				<div class="col-sm-9 col-xs-7 info-value">
+																					{if isset($delivery->phone_mobile) && $delivery->phone_mobile}
+																						{$delivery->phone_mobile|escape:'html':'UTF-8'}
+																					{else}
+																						{$delivery->phone|escape:'html':'UTF-8'}
+																					{/if}
+																				</div>
+																			</div>
+																		{/if}
+																	</div>
+																</form>
 																{* proceed only if no order restrict errors are there *}
 																{if !$orderRestrictErr}
 																	<hr>

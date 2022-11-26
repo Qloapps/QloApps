@@ -42,9 +42,17 @@ class CheckoutCustomerDetailsStep extends AbstractCheckoutStep
                 }
             }
         } elseif (Tools::getValue('proceed_to_payment')) {
+            $guestInfoComplete = true;
+            if ($this->context->cart->id_booking_staying_guest) {
+                $guestInfoComplete = false;
+                $objBookingStayingGuest = new BookingStayingGuest($this->context->cart->id_booking_staying_guest);
+                if ($objBookingStayingGuest->validateGuestInfo()) {
+                    $guestInfoComplete = true;
+                }
+            }
             $this->step_is_reachable = 1;
             $this->step_is_current = 1;
-            if ($idAddressDelivery) {
+            if ($idAddressDelivery && $guestInfoComplete) {
                 if (Validate::isLoadedObject($objAddress)) {
                     $this->step_is_current = 0;
                     $this->step_is_complete = 1;

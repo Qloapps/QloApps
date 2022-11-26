@@ -317,6 +317,10 @@ class OrderOpcControllerCore extends ParentOrderController
                             $this->ajaxDie($this->changeRoomDemands());
                             exit;
                             break;
+                        case 'submitBookingStayingGuest':
+                            $this->ajaxDie($this->submitBookingStayingGuest());
+                            exit;
+                            break;
                         default:
                             throw new PrestaShopException('Unknown method "'.Tools::getValue('method').'"');
                     }
@@ -477,6 +481,13 @@ class OrderOpcControllerCore extends ParentOrderController
         $this->_assignCarrier();
         // PAYMENT
         $this->_assignPayment();
+        // GUEST BOOKING
+        if ($this->isLogged) {
+            if ($this->context->cart->id_booking_staying_guest) {
+                $this->context->smarty->assign('booking_staying_guest', BookingStayingGuest::getBookingStayingGuestInfo($this->context->cart->id_booking_staying_guest));
+            }
+            $this->context->smarty->assign('id_booking_staying_guest', $this->context->cart->id_booking_staying_guest);
+        }
         Tools::safePostVars();
 
         $newsletter = Configuration::get('PS_CUSTOMER_NWSL') || (Module::isInstalled('blocknewsletter') && Module::getInstanceByName('blocknewsletter')->active);
@@ -963,5 +974,36 @@ class OrderOpcControllerCore extends ParentOrderController
             }
         }
         die('0');
+    }
+
+    public function submitBookingStayingGuest()
+    {
+        $booking_staying_guest = Tools::getValue('booking_staying_guest');
+        $this->context->cookie->__set('customer_details_proceeded', 0);
+        $this->context->cookie->checkedTOS = false;
+        if ($booking_staying_guest) {
+            if ($this->context->cart->id_booking_staying_guest) {
+                $objBookingStayingGuest = new BookingStayingGuest($this->context->cart->id_booking_staying_guest);
+            } else {
+                $objBookingStayingGuest = new BookingStayingGuest();
+            }
+            $booking_staying_guest_gender = Tools::getValue('booking_staying_guest_gender');
+            $booking_staying_guest_firstname = Tools::getValue('booking_staying_guest_firstname');
+            $booking_staying_guest_lastname = Tools::getValue('booking_staying_guest_lastname');
+            $booking_staying_guest_email = Tools::getValue('booking_staying_guest_email');
+            $booking_staying_guest_phone = Tools::getValue('booking_staying_guest_phone');
+            $objBookingStayingGuest->id_gender = $booking_staying_guest_gender;
+            $objBookingStayingGuest->firstname = $booking_staying_guest_firstname;
+            $objBookingStayingGuest->lastname = $booking_staying_guest_lastname;
+            $objBookingStayingGuest->email = $booking_staying_guest_email;
+            $objBookingStayingGuest->phone = $booking_staying_guest_phone;
+            $objBookingStayingGuest->save();
+            $this->context->cart->id_booking_staying_guest = $objBookingStayingGuest->id;
+        } else {
+            $objBookingStayingGuest = new BookingStayingGuest($this->context->cart->id_booking_staying_guest);
+            $objBookingStayingGuest->delete();
+            $this->context->cart->id_booking_staying_guest = false;
+        }
+        $this->context->cart->save();
     }
 }

@@ -362,6 +362,11 @@ abstract class PaymentModuleCore extends Module
                         $order->advance_paid_amount = (float)Tools::ps_round((float)$this->context->cart->getOrderTotal(true, Cart::BOTH, $order->product_list, $id_carrier), _PS_PRICE_COMPUTE_PRECISION_);
                     }
 
+                    // save staying guest information
+                    if ($this->context->cart->id_booking_staying_guest) {
+                        $order->id_booking_staying_guest = (int)$this->context->cart->id_booking_staying_guest;
+                    }
+
                     // Creating order
                     $result = $order->add();
 
@@ -1016,6 +1021,30 @@ abstract class PaymentModuleCore extends Module
                                     $file_attachement,
                                     null, _PS_MAIL_DIR_, false, (int)$order->id_shop
                                 );
+                            }
+                            // send mail to staying guest if customer booked for someone other.
+                            if ($order->id_booking_staying_guest) {
+                                if ($stayingGuestInfo = BookingStayingGuest::getBookingStayingGuestInfo(
+                                    $order->id_booking_staying_guest
+                                )) {
+                                    if (Validate::isEmail($stayingGuestInfo['email'])) {
+                                        $data['{firstname}'] = $stayingGuestInfo['firstname'];
+                                        $data['{lastname}'] = $stayingGuestInfo['lastname'];
+                                        $data['{email}'] = $stayingGuestInfo['email'];
+                                        Mail::Send(
+                                            (int)$order->id_lang,
+                                            'order_conf',
+                                            Mail::l('Order confirmation', (int)$order->id_lang),
+                                            $data,
+                                            $stayingGuestInfo['email'],
+                                            $stayingGuestInfo['firstname'].' '.$stayingGuestInfo['lastname'],
+                                            null,
+                                            null,
+                                            $file_attachement,
+                                            null, _PS_MAIL_DIR_, false, (int)$order->id_shop
+                                        );
+                                    }
+                                }
                             }
                         }
                         if (Configuration::get('PS_ORDER_CONF_MAIL_TO_SUPERADMIN')){
