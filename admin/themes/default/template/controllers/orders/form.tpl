@@ -1691,3 +1691,118 @@
 <div id="loader_container">
 	<div id="loader"></div>
 </div>
+
+{* JS for handling extra demands changes *}
+<script type="text/javascript">
+	$(document).ready(function() {
+		// modalbox for extra demands
+		$('body').on('click', '.open_rooms_extra_demands', function() {
+			var idProduct = $(this).attr('id_product');
+			var idCart = $(this).attr('id_cart');
+			var idRoom = $(this).attr('id_room');
+			var dateFrom = $(this).attr('date_from');
+			var dateTo = $(this).attr('date_to');
+			$.ajax({
+				type: 'POST',
+				headers: {
+					"cache-control": "no-cache"
+				},
+				url: "{$link->getAdminLink('AdminOrders')|addslashes}",
+				cache: false,
+				data: {
+					date_from: dateFrom,
+					date_to: dateTo,
+					id_room: idRoom,
+					id_cart: idCart,
+					id_product: idProduct,
+					action: 'getRoomTypeCartDemands',
+					ajax: true
+				},
+				success: function(result) {
+					$('#rooms_type_extra_demands').find('#room_type_demands_desc').html('');
+					$('#rooms_type_extra_demands').find('#room_type_demands_desc').append(result);
+					$('#rooms_type_extra_demands').modal('show');
+				},
+			});
+		});
+		$(document).on('hidden.bs.modal', '#rooms_type_extra_demands', function (e) {
+			// reload to make changes reflect everywhere
+			location.reload();
+		});
+
+		// select/unselect extra demand
+		$(document).on('click', '.id_room_type_demand', function() {
+			var roomDemands = [];
+			// get the selected extra demands by customer
+			$(this).closest('.room_demand_detail').find('input:checkbox.id_room_type_demand:checked').each(function () {
+				roomDemands.push({
+					'id_global_demand':$(this).val(),
+					'id_option': $(this).closest('.room_demand_block').find('.id_option').val()
+				});
+			});
+			var idBookingCart = $(this).attr('id_cart_booking');
+			$.ajax({
+				type: 'POST',
+				headers: {
+					"cache-control": "no-cache"
+				},
+				url: "{$link->getAdminLink('AdminOrders')|addslashes}",
+				dataType: 'JSON',
+				cache: false,
+				data: {
+					id_cart_booking: idBookingCart,
+					room_demands: JSON.stringify(roomDemands),
+					action: 'changeRoomDemands',
+					ajax: true
+				},
+				success: function(result) {
+					if (result == 1) {
+						showSuccessMessage(txtExtraDemandSucc);
+					} else {
+						showErrorMessage(txtExtraDemandErr);
+					}
+				}
+			});
+		});
+
+		// change advanced option of extra demand
+		$(document).on('change', '.demand_adv_option_block .id_option', function(e) {
+			var option_selected = $(this).find('option:selected');
+			var extra_demand_price = option_selected.attr("optionPrice")
+			extra_demand_price = parseFloat(extra_demand_price);
+			extra_demand_price = formatCurrency(extra_demand_price, currency_format, currency_sign, currency_blank);
+			$(this).closest('.room_demand_block').find('.extra_demand_option_price').text(extra_demand_price);
+			var roomDemands = [];
+			// get the selected extra demands by customer
+			$(this).closest('.room_demand_detail').find('input:checkbox.id_room_type_demand:checked').each(function () {
+				roomDemands.push({
+					'id_global_demand':$(this).val(),
+					'id_option': $(this).closest('.room_demand_block').find('.id_option').val()
+				});
+			});
+			var idBookingCart = $(this).closest('.room_demand_block').find('.id_room_type_demand').attr('id_cart_booking');
+			$.ajax({
+				type: 'POST',
+				headers: {
+					"cache-control": "no-cache"
+				},
+				url: "{$link->getAdminLink('AdminOrders')|addslashes}",
+				dataType: 'JSON',
+				cache: false,
+				data: {
+					id_cart_booking: idBookingCart,
+					room_demands: JSON.stringify(roomDemands),
+					action: 'changeRoomDemands',
+					ajax: true
+				},
+				success: function(result) {
+					if (result == 1) {
+						showSuccessMessage(txtExtraDemandSucc);
+					} else {
+						showErrorMessage(txtExtraDemandErr);
+					}
+				}
+			});
+		});
+	});
+</script>

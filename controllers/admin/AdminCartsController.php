@@ -570,12 +570,12 @@ class AdminCartsControllerCore extends AdminController
                 'cart_detail_data' => $cart_detail_data,
             ));
 
-            $tpl_path = 'default/template/controllers/orders/current_cart_details_data.tpl';
+            $tpl_path = 'default/template/controllers/orders/_current_cart_details_data.tpl';
             $cart_dtl_tpl = $this->context->smarty->fetch(_PS_BO_ALL_THEMES_DIR_.$tpl_path);
 
             $result = $this->ajaxReturnVars();
             $result['cart_detail_html'] = $cart_dtl_tpl;//tpl is added to the returned array
-            echo json_encode($result);
+            $this->ajaxDie(json_encode($result));
         }
     }
     public function ajaxProcessUpdateLang()

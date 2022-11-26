@@ -215,6 +215,7 @@ class AdminOrdersControllerCore extends AdminController
             $cart_order_exists = $cart->orderExists();
             if (!$cart_order_exists) {
                 $this->context->cart = $cart;
+                $this->context->currency = new Currency((int)$cart->id_currency);
                 $cart_detail_data = array();
                 $cart_detail_data_obj = new HotelCartBookingData();
                 if ($cart_detail_data = $cart_detail_data_obj->getCartFormatedBookinInfoByIdCart((int) $id_cart)) {
@@ -3291,6 +3292,9 @@ class AdminOrdersControllerCore extends AdminController
                 && ($idRoom = Tools::getValue('id_room'))
                 && ($idCart = Tools::getValue('id_cart'))
             ) {
+                $objCart = new Cart($idCart);
+                $this->context->currency = new Currency($objCart->id_currency);
+
                 $objCartBookingData = new HotelCartBookingData();
                 if ($selectedRoomDemands = $objCartBookingData->getCartExtraDemands(
                     $idCart,
