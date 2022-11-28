@@ -150,14 +150,15 @@
             <hook module="dashtrends" hook="actionOrderStatusPostUpdate" position="3"/>
             <hook module="dashtrends" hook="actionAdminControllerSetMedia" position="3"/>
             <hook module="dashtrends" hook="dashboardData" position="2"/>
-            <hook module="dashtrends" hook="dashboardZoneTwo" position="1"/>
+            <hook module="dashguestcycle" hook="dashboardZoneTwo" position="1"/>
+            <hook module="dashtrends" hook="dashboardZoneTwo" position="2"/>
             <hook module="dashgoals" hook="actionAdminControllerSetMedia" position="4"/>
             <hook module="dashgoals" hook="dashboardData" position="3"/>
-            <hook module="dashgoals" hook="dashboardZoneTwo" position="2"/>
+            <hook module="dashgoals" hook="dashboardZoneTwo" position="3"/>
             <hook module="dashproducts" hook="actionSearch" position="1"/>
             <hook module="dashproducts" hook="dashboardData" position="4"/>
             <hook module="dashproducts" hook="actionObjectOrderAddAfter" position="2"/>
-            <hook module="dashproducts" hook="dashboardZoneTwo" position="3"/>
+            <hook module="dashproducts" hook="dashboardZoneTwo" position="4"/>
             <hook module="statsdata" hook="actionAuthentication" position="1"/>
             <hook module="statsdata" hook="displayFooter" position="7"/>
             <hook module="statsdata" hook="actionCustomerAccountAdd" position="2"/>
