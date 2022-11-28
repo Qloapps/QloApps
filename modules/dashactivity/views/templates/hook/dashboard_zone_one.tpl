@@ -128,7 +128,7 @@
 			<div class="sub-title">
 				<small class="text-muted" id="customers-newsletters-subtitle"></small>
 			</div>
-			
+
 			<ul class="stats-list">
 				<li>
 					<span class="item-label">
@@ -209,7 +209,3 @@
 		</section>
 	</div>
 </section>
-<script type="text/javascript">
-	date_subtitle = "{$date_subtitle|escape:"html":"UTF-8"}";
-	date_format = "{$date_format|escape:"html":"UTF-8"}";
-</script>
