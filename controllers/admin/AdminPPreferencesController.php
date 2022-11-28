@@ -305,6 +305,29 @@ class AdminPPreferencesControllerCore extends AdminController
             //     'bottom' => '<script type="text/javascript">stockManagementActivationAuthorization();advancedStockManagementActivationAuthorization();</script>',
             //     'submit' => array('title' => $this->l('Save'))
             // ),
+            'fo_search_filters' => array(
+                'title' => $this->l('Search Filters'),
+                'icon' => 'icon-search',
+                'fields' => array(
+                    'SHOW_AMENITIES_FILTER' => array(
+                        'title' => $this->l('Show Amenities filter'),
+                        'hint' => $this->l('Enable to display Amenities filter for search.'),
+                        'validation' => 'isBool',
+                        'cast' => 'intval',
+                        'required' => false,
+                        'type' => 'bool',
+                    ),
+                    'SHOW_PRICE_FILTER' => array(
+                        'title' => $this->l('Show Price filter'),
+                        'hint' => $this->l('Enable to display Price filter for search.'),
+                        'validation' => 'isBool',
+                        'cast' => 'intval',
+                        'required' => false,
+                        'type' => 'bool',
+                    ),
+                ),
+                'submit' => array('title' => $this->l('Save'))
+            ),
         );
     }
 
