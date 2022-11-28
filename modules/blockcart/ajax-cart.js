@@ -524,6 +524,7 @@ var ajaxCart = {
                             $('.unvail_rooms_cond_display').hide();
                         }
                     }
+                    BookingForm.refresh();
                 }
 
                 if (pagename == 'category') {
