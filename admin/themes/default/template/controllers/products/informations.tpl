@@ -261,7 +261,7 @@
 	<div class="form-group redirect_product_options redirect_product_options_product_choise" style="display:none">
 		<div class="col-lg-1"><span class="pull-right">{include file="controllers/products/multishop/checkbox.tpl" field="id_product_redirected" type="radio" onclick=""}</span></div>
 		<label class="control-label col-lg-2" for="related_product_autocomplete_input">
-			{l s='Related product:'}
+			{l s='Related room type'}
 		</label>
 		<div class="col-lg-7">
 			<input type="hidden" value="" name="id_product_redirected" />
@@ -272,7 +272,7 @@
 			</div>
 
 			<div class="form-control-static">
-				<span id="related_product_name"><i class="icon-warning-sign"></i>&nbsp;{l s='No related product.'}</span>
+				<span id="related_product_name"><i class="icon-warning-sign"></i>&nbsp;{l s='No related room type set.'}</span>
 				<span id="related_product_remove" style="display:none">
 					<a class="btn btn-default" href="#" onclick="removeRelatedProduct(); return false" id="related_product_remove_link">
 						<i class="icon-remove text-danger"></i>
@@ -282,7 +282,7 @@
 
 		</div>
 		<script>
-			var no_related_product = '{l s='No related product'}';
+			var no_related_product = '{l s='No related room type set.'}';
 			var id_product_redirected = {$product->id_product_redirected|intval};
 			var product_name_redirected = '{$product_name_redirected|escape:'html':'UTF-8'}';
 		</script>
