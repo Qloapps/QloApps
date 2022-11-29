@@ -491,10 +491,7 @@ class EmployeeCore extends ObjectModel
 
     public function getImage()
     {
-        if (!Validate::isLoadedObject($this)) {
-            return Tools::getAdminImageUrl('prestashop-avatar.png');
-        }
-        return Tools::getShopProtocol().'profile.prestashop.com/'.urlencode($this->email).'.jpg';
+        return Context::getContext()->link->getMediaLink(_PS_IMG_.Configuration::get('PS_LOGO'));
     }
 
     public function getLastElementsForNotify($element)
