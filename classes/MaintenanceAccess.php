@@ -19,13 +19,13 @@
 *  @license   https://store.webkul.com/license.html
 */
 
-class LoginFailCore extends ObjectModel
+class MaintenanceAccessCore  extends ObjectModel
 {
 
-    public $id_login_fail;
+    public $id_maintenance_access;
     public $ip_address;
     public $email;
-    public $created_at;
+    public $date_add;
     const USERNAME_ATTEMPTS_PER_QUARTER_HOUR = 3;
     const IP_ATTEMPTS_QUARTER_HOUR = 12;
     const USERNAME_ATTEMPTS_PER_HOUR = 6;
@@ -37,11 +37,12 @@ class LoginFailCore extends ObjectModel
      * @see ObjectModel::$definition
      */
     public static $definition = array(
-        'table' => 'login_fail',
-        'primary' => 'id_login_fail',
+        'table' => 'maintenance_access',
+        'primary' => 'id_maintenance_access',
         'fields' => array(
             'ip_address' => array('type' => self::TYPE_STRING,  'size' => 50),
             'email' => array('type' => self::TYPE_STRING, 'validate' => 'isEmail', 'required' => true, 'size' => 128),
+            'date_add' => array('type' => self::TYPE_DATE, 'validate' => 'isDate'),
         ),
     );
 
@@ -49,15 +50,14 @@ class LoginFailCore extends ObjectModel
     {
         $time = (time() - (self::HOUR*2));
         Db::getInstance()->execute(
-            '
-			DELETE FROM `' . _DB_PREFIX_ . 'login_fail`
-			WHERE `created_at`  < "' . pSQL(date("Y-m-d H:i:s", $time)) . '"'
+            'DELETE FROM `' . _DB_PREFIX_ .'maintenance_access`
+			WHERE `date_add`  < "' . pSQL(date("Y-m-d H:i:s", $time)) . '"'
         );
     }
 
     public function getUserFailedCount($time, $email=false, $ip_address=false, $attempts)
     {
-        $sql = "SELECT COUNT(id_login_fail) FROM `". _DB_PREFIX_ ."login_fail` WHERE `created_at`  > '"
+        $sql = "SELECT COUNT(`id_maintenance_access`) FROM `". _DB_PREFIX_ ."maintenance_access` WHERE `date_add`  > '"
         . pSQL(date('Y-m-d H:i:s', $time)) ."'";
 
         if ($email) {
@@ -67,6 +67,7 @@ class LoginFailCore extends ObjectModel
         if ($ip_address) {
             $sql .= " AND  `ip_address` = '".pSQL($ip_address)."'";
         }
+
         return Db::getInstance()->getValue($sql) >= $attempts;
     }
 
@@ -77,10 +78,18 @@ class LoginFailCore extends ObjectModel
         $hours_ago = time() - self::HOUR;
         $ip_address = Tools::getRemoteAddr();
 
-        $has_error |= $this->getUserFailedCount($minutes_ago, $email, false, self::USERNAME_ATTEMPTS_PER_QUARTER_HOUR)? true : $has_error;
-        $has_error |= $this->getUserFailedCount($minutes_ago, false, $ip_address, self::IP_ATTEMPTS_QUARTER_HOUR)? true : $has_error;
-        $has_error |= $this->getUserFailedCount($hours_ago, $email, false, self::USERNAME_ATTEMPTS_PER_HOUR)? true : $has_error;
-        $has_error |= $this->getUserFailedCount($hours_ago, false, $ip_address, self::IP_ATTEMPTS_PER_HOUR)? true : $has_error;
+        $has_error |= $this->getUserFailedCount(
+                $minutes_ago, $email, false, self::USERNAME_ATTEMPTS_PER_QUARTER_HOUR
+            )? true : $has_error;
+        $has_error |= $this->getUserFailedCount(
+                $minutes_ago, false, $ip_address, self::IP_ATTEMPTS_QUARTER_HOUR
+            )? true : $has_error;
+        $has_error |= $this->getUserFailedCount(
+                $hours_ago, $email, false, self::USERNAME_ATTEMPTS_PER_HOUR
+            )? true : $has_error;
+        $has_error |= $this->getUserFailedCount(
+                $hours_ago, false, $ip_address, self::IP_ATTEMPTS_PER_HOUR
+            )? true : $has_error;
 
         return $has_error;
     }

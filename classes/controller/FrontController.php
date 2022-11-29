@@ -796,7 +796,7 @@ class FrontControllerCore extends Controller
     protected function processLogin($email, $passwd)
     {
         $result = false;
-        $objLoginFail = new LoginFail;
+        $objMaintenanceAccess = new MaintenanceAccess();
 
         /* Check fields validity */
         if (empty($email)) {
@@ -811,7 +811,7 @@ class FrontControllerCore extends Controller
             $this->errors[] = Tools::displayError('Invalid password.');
         }
 
-        if ($objLoginFail->checkLimit($email)) {
+        if ($objMaintenanceAccess->checkLimit($email)) {
             $this->errors[] =Tools::displayError('You have exceeded the limit of login attempts, please try after some time');
         }
 
@@ -835,10 +835,9 @@ class FrontControllerCore extends Controller
             }
             if (count($this->errors)) {
                 $this->context->smarty->assign('errors', $this->errors);
-                $objLoginFail->email = $email;
-                $objLoginFail->ip_address = Tools::getRemoteAddr();
-                $objLoginFail->save();
-                $objLoginFail->cleanData();
+                $objMaintenanceAccess->email = $email;
+                $objMaintenanceAccess->ip_address = Tools::getRemoteAddr();
+                $objMaintenanceAccess->save();
             } else {
                 Tools::redirect('index.php');
             }
