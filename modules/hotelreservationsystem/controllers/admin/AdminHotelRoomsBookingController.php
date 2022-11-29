@@ -409,7 +409,7 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
                 'rms_in_cart' => $rms_in_cart,
                 'total_amount' => Tools::displayPrice($total_amount),
                 'booking_stats' => $booking_stats,
-                'id_cart_book_data' => $obj_cart_book_data->id);
+                'id_cart_book_data' => $obj_cart_book_data->id
             );
 
             if ($obj_cart_book_data->id) {
