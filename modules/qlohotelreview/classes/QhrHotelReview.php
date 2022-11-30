@@ -218,12 +218,17 @@ class QhrHotelReview extends ObjectModel
             '{review_subject}' => $this->subject,
             '{review_description}' => $this->description,
             '{management_reply}' => $this->getManagementReply()['message'],
-            '{review_view_url}' => $this->getReviewViewLink(),
         );
+
+        $template = 'review_reply_without_link';
+        if ($this->status == self::QHR_STATUS_APPROVED) {
+            $template = 'review_reply_with_link';
+            $mailVars['{review_view_url}'] = $this->getReviewViewLink();
+        }
 
         return Mail::Send(
             $context->language->id,
-            'review_reply',
+            $template,
             Mail::l('Your review has a reply!', $context->language->id),
             $mailVars,
             $objCustomer->email,
