@@ -50,7 +50,6 @@ class BlockSocial extends Module
 		if (!parent::install()
 			|| !Configuration::updateValue('BLOCKSOCIAL_FACEBOOK', '')
 			|| !Configuration::updateValue('BLOCKSOCIAL_TWITTER', '')
-			|| !Configuration::updateValue('BLOCKSOCIAL_MEDIUM', '')
 			|| !Configuration::updateValue('BLOCKSOCIAL_RSS', '')
 			|| !Configuration::updateValue('BLOCKSOCIAL_YOUTUBE', '')
 			|| !Configuration::updateValue('BLOCKSOCIAL_PINTEREST', '')
@@ -70,7 +69,6 @@ class BlockSocial extends Module
 		if (!parent::uninstall()
 			|| !Configuration::deleteByName('BLOCKSOCIAL_FACEBOOK')
 			|| !Configuration::deleteByName('BLOCKSOCIAL_TWITTER')
-			|| !Configuration::deleteByName('BLOCKSOCIAL_MEDIUM')
 			|| !Configuration::deleteByName('BLOCKSOCIAL_RSS')
 			|| !Configuration::deleteByName('BLOCKSOCIAL_YOUTUBE')
 			|| !Configuration::deleteByName('BLOCKSOCIAL_PINTEREST')
@@ -90,7 +88,6 @@ class BlockSocial extends Module
 		if (Tools::isSubmit('submitModule')) {
 			Configuration::updateValue('BLOCKSOCIAL_FACEBOOK', Tools::getValue('blocksocial_facebook', ''));
 			Configuration::updateValue('BLOCKSOCIAL_TWITTER', Tools::getValue('blocksocial_twitter', ''));
-			Configuration::updateValue('BLOCKSOCIAL_MEDIUM', Tools::getValue('blocksocial_medium', ''));
 			Configuration::updateValue('BLOCKSOCIAL_RSS', Tools::getValue('blocksocial_rss', ''));
 			Configuration::updateValue('BLOCKSOCIAL_YOUTUBE', Tools::getValue('blocksocial_youtube', ''));
 			Configuration::updateValue('BLOCKSOCIAL_PINTEREST', Tools::getValue('blocksocial_pinterest', ''));
@@ -108,7 +105,6 @@ class BlockSocial extends Module
 		$this->smarty->assign(array(
 			'facebook_url' => Configuration::get('BLOCKSOCIAL_FACEBOOK'),
 			'twitter_url' => Configuration::get('BLOCKSOCIAL_TWITTER'),
-			'medium_url' => Configuration::get('BLOCKSOCIAL_MEDIUM'),
 			'rss_url' => Configuration::get('BLOCKSOCIAL_RSS'),
 			'youtube_url' => Configuration::get('BLOCKSOCIAL_YOUTUBE'),
 			'pinterest_url' => Configuration::get('BLOCKSOCIAL_PINTEREST'),
@@ -139,12 +135,6 @@ class BlockSocial extends Module
 						'label' => $this->l('Twitter URL'),
 						'name' => 'blocksocial_twitter',
 						'desc' => $this->l('Your official Twitter account.'),
-					),
-					array(
-						'type' => 'text',
-						'label' => $this->l('Medium URL'),
-						'name' => 'blocksocial_medium',
-						'desc' => $this->l('Your official Medium account.'),
 					),
 					array(
 						'type' => 'text',
@@ -207,7 +197,6 @@ class BlockSocial extends Module
 		return array(
 			'blocksocial_facebook' => Tools::getValue('blocksocial_facebook', Configuration::get('BLOCKSOCIAL_FACEBOOK')),
 			'blocksocial_twitter' => Tools::getValue('blocksocial_twitter', Configuration::get('BLOCKSOCIAL_TWITTER')),
-			'blocksocial_medium' => Tools::getValue('blocksocial_medium', Configuration::get('BLOCKSOCIAL_MEDIUM')),
 			'blocksocial_rss' => Tools::getValue('blocksocial_rss', Configuration::get('BLOCKSOCIAL_RSS')),
 			'blocksocial_youtube' => Tools::getValue('blocksocial_youtube', Configuration::get('BLOCKSOCIAL_YOUTUBE')),
 			'blocksocial_pinterest' => Tools::getValue('blocksocial_pinterest', Configuration::get('BLOCKSOCIAL_PINTEREST')),

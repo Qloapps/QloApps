@@ -46,13 +46,6 @@
                         </a>
                     </li>
                 {/if}
-                {if isset($medium_url) && $medium_url != ''}
-                    <li class="medium">
-                        <a class="_blank" href="{$medium_url|escape:html:'UTF-8'}">
-                            <span>{l s='Medium' mod='blocksocial'}</span>
-                        </a>
-                    </li>
-                {/if}
                 {if isset($rss_url) && $rss_url != ''}
                     <li class="rss">
                         <a class="_blank" href="{$rss_url|escape:html:'UTF-8'}">
