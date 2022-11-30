@@ -662,7 +662,7 @@
 					<div class="row">
 						<div class="col-xs-6">
 							{if ($customer->isGuest())}
-								<p>{l s='This order has been placed by a guest.'}</p>
+								<p>{l s='This booking has been created by a guest.'}</p>
 								{if (!Customer::customerExists($customer->email))}
 									<form method="post" action="index.php?tab=AdminCustomers&amp;id_customer={$customer->id}&amp;id_order={$order->id|intval}&amp;token={getAdminToken tab='AdminCustomers'}">
 										<input type="hidden" name="id_lang" value="{$order->id_lang}" />

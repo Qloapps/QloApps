@@ -120,8 +120,8 @@ class AdminOrderPreferencesControllerCore extends AdminController
                         )
                     ),
                     'PS_CONDITIONS_CMS_ID' => array(
-                        'title' => $this->l('CMS page for the Conditions of use'),
-                        'hint' => $this->l('Choose the CMS page which contains your website\'s conditions of use.'),
+                        'title' => $this->l('CMS page for Terms and Conditions'),
+                        'hint' => $this->l('Choose the CMS page which contains your website\'s Terms and Conditions.'),
                         'validation' => 'isInt',
                         'type' => 'select',
                         'list' => $cms_tab,
@@ -143,8 +143,8 @@ class AdminOrderPreferencesControllerCore extends AdminController
                         'type' => 'bool'
                     ),
                     'PS_ORDER_CONF_MAIL_TO_SUPERADMIN' => array(
-                        'title' => $this->l('Order confirmation mail to Super Admin'),
-                        'hint' => $this->l('Enable, if you want to send order confirmation email to the Super Admin.'),
+                        'title' => $this->l('Order confirmation mail to super admin'),
+                        'hint' => $this->l('Enable, if you want to send order confirmation email to the super admin.'),
                         'validation' => 'isBool',
                         'cast' => 'intval',
                         'type' => 'bool'
@@ -185,7 +185,7 @@ class AdminOrderPreferencesControllerCore extends AdminController
         $sql = 'SELECT `id_cms` FROM `'._DB_PREFIX_.'cms`
 				WHERE id_cms = '.(int)Tools::getValue('PS_CONDITIONS_CMS_ID');
         if (Tools::getValue('PS_CONDITIONS') && (Tools::getValue('PS_CONDITIONS_CMS_ID') == 0 || !Db::getInstance()->getValue($sql))) {
-            $this->errors[] = Tools::displayError('Please assign a valid CMS page for Conditions of use.');
+            $this->errors[] = Tools::displayError('Please assign a valid CMS page for Terms and Conditions.');
         }
     }
 }
