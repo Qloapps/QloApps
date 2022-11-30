@@ -81,22 +81,32 @@ class ProductControllerCore extends FrontController
      */
     public function init()
     {
-        // validate dates if available
-        $dateFrom = Tools::getValue('date_from');
-        $dateTo = Tools::getValue('date_to');
-
-        if ($dateFrom != '' && !Validate::isDate($dateFrom)) {
-            Tools::redirect($this->context->link->getPageLink('pagenotfound'));
-        }
-
-        if ($dateTo != '' && !Validate::isDate($dateTo)) {
-            Tools::redirect($this->context->link->getPageLink('pagenotfound'));
-        }
-
         parent::init();
 
         if ($id_product = (int) Tools::getValue('id_product')) {
             $this->product = new Product($id_product, true, $this->context->language->id, $this->context->shop->id);
+        }
+
+        // validate dates if available and redirect if invalid
+        $hasInvalidDates = false;
+        $dateFrom = Tools::getValue('date_from');
+        $dateTo = Tools::getValue('date_to');
+
+        if ($dateFrom != '' && !Validate::isDate($dateFrom)) {
+            $dateFrom = date('Y-m-d');
+            $dateTo = date('Y-m-d', strtotime($dateFrom) + 86400);
+            $hasInvalidDates = true;
+        } elseif ($dateTo != '' && !Validate::isDate($dateTo)) {
+            $dateTo = date('Y-m-d', strtotime($dateFrom) + 86400);
+            $hasInvalidDates = true;
+        }
+
+        if ($hasInvalidDates) {
+            $urlParams = array('date_from' => $dateFrom, 'date_to' => $dateTo);
+            $redirectLink = $this->context->link->getProductLink($this->product, null, $this->context->language->id).
+            (Configuration::get('PS_REWRITING_SETTINGS') ? '?' : '&').http_build_query($urlParams);
+
+            Tools::redirect($redirectLink);
         }
 
         if (!Validate::isLoadedObject($this->product)) {
