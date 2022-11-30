@@ -58,24 +58,6 @@
                         </a>
                     </li>
     			{/if}
-    			{if $display_manufacturer_link OR $PS_DISPLAY_SUPPLIERS}
-                    <li>
-                        <a 
-                        href="{$link->getPageLink('manufacturer')|escape:'html':'UTF-8'}" 
-                        title="{l s='View a list of manufacturers'}">
-                            {l s='Manufacturers'}
-                        </a>
-                    </li>
-                {/if}
-    			{if $display_supplier_link OR $PS_DISPLAY_SUPPLIERS}
-                    <li>
-                        <a 
-                        href="{$link->getPageLink('supplier')|escape:'html':'UTF-8'}" 
-                        title="{l s='View a list of suppliers'}">
-                            {l s='Suppliers'}
-                        </a>
-                    </li>
-                {/if}
     		</ul>
 	   </div>
     </div>

@@ -459,7 +459,7 @@ class AdminCustomerThreadsControllerCore extends AdminController
 
     public function initContent()
     {
-        if (isset($_GET['filename']) && (bool)Tools::file_get_contents($context->link->getMediaLink(_THEME_PROD_PIC_DIR_.$_GET['filename'])) && Validate::isFileName($_GET['filename'])) { // by webkul
+        if (isset($_GET['filename']) && (bool)Tools::file_get_contents($this->context->link->getMediaLink(_THEME_PROD_PIC_DIR_.$_GET['filename'])) && Validate::isFileName($_GET['filename'])) { // by webkul
             AdminCustomerThreadsController::openUploadedFile();
         }
 
@@ -509,18 +509,12 @@ class AdminCustomerThreadsControllerCore extends AdminController
         $time = time();
         $kpis = array();
 
-        /* The data generation is located in AdminStatsControllerCore */
-
         $helper = new HelperKpi();
         $helper->id = 'box-pending-messages';
         $helper->icon = 'icon-envelope';
         $helper->color = 'color1';
         $helper->title = $this->l('Pending Discussion Threads', null, null, false);
-        if (ConfigurationKPI::get('PENDING_MESSAGES') !== false) {
-            $helper->value = ConfigurationKPI::get('PENDING_MESSAGES');
-        }
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=pending_messages';
-        $helper->refresh = (bool)(ConfigurationKPI::get('PENDING_MESSAGES_EXPIRE') < $time);
         $kpis[] = $helper->generate();
 
         $helper = new HelperKpi();
@@ -529,11 +523,7 @@ class AdminCustomerThreadsControllerCore extends AdminController
         $helper->color = 'color2';
         $helper->title = $this->l('Average Response Time', null, null, false);
         $helper->subtitle = $this->l('30 days', null, null, false);
-        if (ConfigurationKPI::get('AVG_MSG_RESPONSE_TIME') !== false) {
-            $helper->value = ConfigurationKPI::get('AVG_MSG_RESPONSE_TIME');
-        }
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=avg_msg_response_time';
-        $helper->refresh = (bool)(ConfigurationKPI::get('AVG_MSG_RESPONSE_TIME_EXPIRE') < $time);
         $kpis[] = $helper->generate();
 
         $helper = new HelperKpi();
@@ -542,11 +532,7 @@ class AdminCustomerThreadsControllerCore extends AdminController
         $helper->color = 'color3';
         $helper->title = $this->l('Messages per Thread', null, null, false);
         $helper->subtitle = $this->l('30 day', null, null, false);
-        if (ConfigurationKPI::get('MESSAGES_PER_THREAD') !== false) {
-            $helper->value = ConfigurationKPI::get('MESSAGES_PER_THREAD');
-        }
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=messages_per_thread';
-        $helper->refresh = (bool)(ConfigurationKPI::get('MESSAGES_PER_THREAD_EXPIRE') < $time);
         $kpis[] = $helper->generate();
 
         $helper = new HelperKpiRow();
@@ -560,7 +546,6 @@ class AdminCustomerThreadsControllerCore extends AdminController
             return;
         }
 
-        $this->context = Context::getContext();
         if (!($thread = $this->loadObject())) {
             return;
         }
@@ -800,7 +785,7 @@ class AdminCustomerThreadsControllerCore extends AdminController
             'thread_url' => Tools::getAdminUrl(basename(_PS_ADMIN_DIR_).'/'.
                 $this->context->link->getAdminLink('AdminCustomerThreads').'&amp;id_customer_thread='
                 .(int)$message['id_customer_thread'].'&amp;viewcustomer_thread=1'),
-            'link' => Context::getContext()->link,
+            'link' => $this->context->link,
             'current' => self::$currentIndex,
             'token' => $this->token,
             'message' => $message,
@@ -808,7 +793,7 @@ class AdminCustomerThreadsControllerCore extends AdminController
             'email' => $email,
             'id_employee' => $id_employee,
             'PS_SHOP_NAME' => Configuration::get('PS_SHOP_NAME'),
-            'file_name' => (bool)Tools::file_get_contents($context->link->getMediaLink(_THEME_PROD_PIC_DIR_.$message['file_name'])), // by webkul
+            'file_name' => (bool)Tools::file_get_contents($this->context->link->getMediaLink(_THEME_PROD_PIC_DIR_.$message['file_name'])), // by webkul
             'contacts' => $contacts,
             'is_valid_order_id' => $is_valid_order_id
         ));

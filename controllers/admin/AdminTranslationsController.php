@@ -1318,19 +1318,13 @@ class AdminTranslationsControllerCore extends AdminController
         $time = time();
         $kpis = array();
 
-        /* The data generation is located in AdminStatsControllerCore */
-
         $helper = new HelperKpi();
         $helper->id = 'box-languages';
         $helper->icon = 'icon-microphone';
         $helper->color = 'color1';
         $helper->href = $this->context->link->getAdminLink('AdminLanguages');
         $helper->title = $this->l('Enabled Languages', null, null, false);
-        if (ConfigurationKPI::get('ENABLED_LANGUAGES') !== false) {
-            $helper->value = ConfigurationKPI::get('ENABLED_LANGUAGES');
-        }
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=enabled_languages';
-        $helper->refresh = (bool)(ConfigurationKPI::get('ENABLED_LANGUAGES_EXPIRE') < $time);
         $kpis[] = $helper->generate();
 
         $helper = new HelperKpi();
@@ -1338,11 +1332,7 @@ class AdminTranslationsControllerCore extends AdminController
         $helper->icon = 'icon-list';
         $helper->color = 'color3';
         $helper->title = $this->l('Front office Translations', null, null, false);
-        if (ConfigurationKPI::get('FRONTOFFICE_TRANSLATIONS') !== false) {
-            $helper->value = ConfigurationKPI::get('FRONTOFFICE_TRANSLATIONS');
-        }
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=frontoffice_translations';
-        $helper->refresh = (bool)(ConfigurationKPI::get('FRONTOFFICE_TRANSLATIONS_EXPIRE') < $time);
         $kpis[] = $helper->generate();
 
         $helper = new HelperKpi();

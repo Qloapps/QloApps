@@ -29,7 +29,6 @@ class AdminModulesControllerCore extends AdminController
     private $_modules_ad = array(
         'blockcart' => array('cartabandonmentpro'),
         /* 'bloctopmenu' => array('advancedtopmenu'), */
-        'blocklayered' => array('pm_advancedsearch4')
     );
     /*
     ** @var array map with $_GET keywords and their callback
@@ -1301,18 +1300,12 @@ class AdminModulesControllerCore extends AdminController
         $time = time();
         $kpis = array();
 
-        /* The data generation is located in AdminStatsControllerCore */
-
         $helper = new HelperKpi();
         $helper->id = 'box-installed-modules';
         $helper->icon = 'icon-puzzle-piece';
         $helper->color = 'color1';
         $helper->title = $this->l('Installed Modules', null, null, false);
-        if (ConfigurationKPI::get('INSTALLED_MODULES') !== false && ConfigurationKPI::get('INSTALLED_MODULES') != '') {
-            $helper->value = ConfigurationKPI::get('INSTALLED_MODULES');
-        }
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=installed_modules';
-        $helper->refresh = (bool)(ConfigurationKPI::get('INSTALLED_MODULES_EXPIRE') < $time);
         $kpis[] = $helper->generate();
 
         $helper = new HelperKpi();
@@ -1320,11 +1313,7 @@ class AdminModulesControllerCore extends AdminController
         $helper->icon = 'icon-off';
         $helper->color = 'color2';
         $helper->title = $this->l('Disabled Modules', null, null, false);
-        if (ConfigurationKPI::get('DISABLED_MODULES') !== false && ConfigurationKPI::get('DISABLED_MODULES') != '') {
-            $helper->value = ConfigurationKPI::get('DISABLED_MODULES');
-        }
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=disabled_modules';
-        $helper->refresh = (bool)(ConfigurationKPI::get('DISABLED_MODULES_EXPIRE') < $time);
         $kpis[] = $helper->generate();
 
         $helper = new HelperKpi();
@@ -1332,11 +1321,7 @@ class AdminModulesControllerCore extends AdminController
         $helper->icon = 'icon-refresh';
         $helper->color = 'color3';
         $helper->title = $this->l('Modules to Update', null, null, false);
-        if (ConfigurationKPI::get('UPDATE_MODULES') !== false && ConfigurationKPI::get('UPDATE_MODULES') != '') {
-            $helper->value = ConfigurationKPI::get('UPDATE_MODULES');
-        }
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=update_modules';
-        $helper->refresh = (bool)(ConfigurationKPI::get('UPDATE_MODULES_EXPIRE') < $time);
         $kpis[] = $helper->generate();
 
         $helper = new HelperKpiRow();
@@ -1584,8 +1569,6 @@ class AdminModulesControllerCore extends AdminController
             $html = $this->generateHtmlMessage($module_success);
             $this->confirmations[] = sprintf($this->l('The following module(s) were upgraded successfully: %s.'), $html);
         }
-
-        ConfigurationKPI::updateValue('UPDATE_MODULES', count($upgrade_available));
 
         if (count($upgrade_available) == 0 && (int)Tools::getValue('check') == 1) {
             $this->confirmations[] = $this->l('Everything is up-to-date');

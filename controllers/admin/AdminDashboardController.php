@@ -235,6 +235,11 @@ class AdminDashboardControllerCore extends AdminController
         $calendar_helper->setCompareDateTo($stats_compare_to);
         $calendar_helper->setCompareOption(Tools::getValue('compare_date_option', $this->context->employee->stats_compare_option));
 
+        Media::addJsDef(array(
+            'date_subtitle' => $this->l('(from %s to %s)'),
+            'date_format' => $this->context->language->date_format_lite,
+        ));
+
         $params = array(
             'date_from' => $this->context->employee->stats_date_from,
             'date_to' => $this->context->employee->stats_date_to,
@@ -270,7 +275,7 @@ class AdminDashboardControllerCore extends AdminController
             'PS_DASHBOARD_SIMULATION' => Configuration::get('PS_DASHBOARD_SIMULATION'),
             'datepickerFrom' => Tools::getValue('datepickerFrom', $this->context->employee->stats_date_from),
             'datepickerTo' => Tools::getValue('datepickerTo', $this->context->employee->stats_date_to),
-            'preselect_date_range' => Tools::getValue('preselectDateRange', $this->context->employee->preselect_date_range)
+            'preselect_date_range' => Tools::getValue('preselectDateRange', $this->context->employee->preselect_date_range),
         );
         return parent::renderView();
     }

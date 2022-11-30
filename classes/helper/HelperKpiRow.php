@@ -30,12 +30,15 @@ class HelperKpiRowCore extends Helper
     public $base_tpl = 'row.tpl';
 
     public $kpis = array();
+    public $refresh = true;
 
     public function generate()
     {
         $this->tpl = $this->createTemplate($this->base_tpl);
 
         $this->tpl->assign('kpis', $this->kpis);
+        $this->tpl->assign('refresh', $this->refresh);
+
         return $this->tpl->fetch();
     }
 }

@@ -60,8 +60,10 @@ class DashOccupancy extends Module
     public function hookDashboardZoneOne()
     {
         $this->context->smarty->assign(array(
-            'date_occupancy_range' => $this->l('(from %s to %s)'),
-            'date_occupancy_avail_format' => $this->context->language->date_format_lite,
+            'count_total' =>  sprintf('%02d', $occupancyData['count_total']),
+            'count_occupied' => sprintf('%02d', $occupancyData['count_occupied']),
+            'count_available' =>  sprintf('%02d', $occupancyData['count_available']),
+            'count_unavailable' =>  sprintf('%02d', $occupancyData['count_unavailable']),
         ));
 
         return $this->display(__FILE__, 'dashboard_zone_one.tpl');

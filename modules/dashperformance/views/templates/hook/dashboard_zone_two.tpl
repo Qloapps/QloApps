@@ -22,9 +22,7 @@
 		<header class="panel-heading">
 			<i class="icon-bar-chart"></i> {l s='Performance' mod='dashperformance'} <small class="text-muted">{l s='(Amounts are tax exclusive)' mod='dashperformance'}</small>
 			<span class="panel-heading-action">
-				<a class="list-toolbar-btn" href="#"
-					onclick="refreshDashboard('dashperformance'); return false;"
-					title="{l s='Refresh' mod='dashperformance'}">
+				<a class="list-toolbar-btn" href="#" onclick="refreshDashboard('dashperformance'); return false;" title="{l s='Refresh' mod='dashperformance'}">
 					<i class="process-icon-refresh"></i>
 				</a>
 			</span>
@@ -115,3 +113,4 @@
 		</section>
 	</section>
 </div>
+<div class="clearfix"></div>

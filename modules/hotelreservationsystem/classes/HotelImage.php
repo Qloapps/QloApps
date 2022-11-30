@@ -59,13 +59,32 @@ class HotelImage extends ObjectModel
     }
 
     /**
-     * [getAllImagesByHotelId :: To get all images data of a hotel by hotel id]
-     * @param  [int] $htl_id [Id of the hotel which images data you want]
+     * [getImagesByHotelId :: To get paginated hotel images data]
+     * @param  [int] $id_hotel [id_hotel to get images of]
+     * @param  [int] $p [page number of the paginated images data]
+     * @param  [int] $n [number of images per page for paginated images data]
      * @return [array|boolean] [if data found returns array containing information of the images of the hotel which id is passed]
      */
-    public function getAllImagesByHotelId($htl_id)
+    public function getImagesByHotelId($id_hotel, $p = 1, $n = null)
     {
-        return Db::getInstance()->executeS('SELECT * FROM `'._DB_PREFIX_.'htl_image` WHERE `id_hotel` = '.(int)$htl_id);
+        $p = (int) $p;
+        $n = $n !== null ? (int) $n : $n; // n = null for no pagination
+        if ($p <= 1) {
+            $p = 1;
+        }
+
+        $sql = 'SELECT *
+        FROM `'._DB_PREFIX_.'htl_image`
+        WHERE `id_hotel` = '.(int) $id_hotel.
+        ($n ? ' LIMIT '.(int) (($p - 1) * $n).', '.(int) ($n) : '');
+
+        return Db::getInstance()->executeS($sql);
+    }
+
+    // for backward compatibility, use getImagesByHotelId() instead
+    public function getAllImagesByHotelId($id_hotel)
+    {
+        return $this->getImagesByHotelId($id_hotel);
     }
 
     /**
@@ -84,24 +103,6 @@ class HotelImage extends ObjectModel
         return Db::getInstance()->getRow(
             'SELECT * FROM `'._DB_PREFIX_.'htl_image` WHERE `id_hotel` = '.(int)$idHotel.' AND `cover`=1'
         );
-    }
-
-    /**
-     * [validAddHotelMainImage :: To validate the image of the hotel before saving it]
-     * @param  [array] $image [variable having image information of the hotel]
-     * @return [boolean]        [returns true if image is valid]
-     */
-    public static function validateImage($image)
-    {
-        if ($image['size'] > 0) {
-            if ($image['tmp_name'] != "") {
-                if (!ImageManager::isCorrectImageFileExt($image['name'])) {
-                    return true;
-                }
-            }
-        } else {
-            return true;
-        }
     }
 
     public function uploadHotelImages($images, $idHotel, $destPath)
