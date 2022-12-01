@@ -24,7 +24,6 @@
 *}
 {if !isset($addresses_style)}
     {$addresses_style.company = 'address_company'}
-    {$addresses_style.vat_number = 'address_company'}
     {$addresses_style.firstname = 'address_name'}
     {$addresses_style.lastname = 'address_name'}
     {$addresses_style.address1 = 'address_address1'}

@@ -728,6 +728,7 @@ class CustomerCore extends ObjectModel
         if (!$cart) {
             $cart = Context::getContext()->cart;
         }
+
         if (!$cart || !$cart->{Configuration::get('PS_TAX_ADDRESS_TYPE')}) {
             $id_address = (int)Db::getInstance()->getValue('
 				SELECT `id_address`
@@ -738,8 +739,13 @@ class CustomerCore extends ObjectModel
         } else {
             $id_address = $cart->{Configuration::get('PS_TAX_ADDRESS_TYPE')};
         }
+
         $ids = Address::getCountryAndState($id_address);
-        return (int)$ids['id_country'] ? $ids['id_country'] : Configuration::get('PS_COUNTRY_DEFAULT');
+        if (isset($ids['id_country']) && (int) $ids['id_country']) {
+            return (int) $ids['id_country'];
+        }
+
+        return (int) Configuration::get('PS_COUNTRY_DEFAULT');
     }
 
     public function toggleStatus()

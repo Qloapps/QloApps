@@ -839,8 +839,6 @@ function saveAddress(type)
 	var params = 'firstname=' + encodeURIComponent($('#firstname' + (type == 'invoice' ? '_invoice' : '')).val()) + '&lastname=' + encodeURIComponent($('#lastname' + (type == 'invoice' ? '_invoice' : '')).val()) + '&';
 	if ($('#company' + (type == 'invoice' ? '_invoice' : '')).length)
 		params += 'company=' + encodeURIComponent($('#company' + (type == 'invoice' ? '_invoice' : '')).val()) + '&';
-	if ($('#vat_number' + (type == 'invoice' ? '_invoice' : '')).length)
-		params += 'vat_number='+encodeURIComponent($('#vat_number' + (type == 'invoice' ? '_invoice' : '')).val()) + '&';
 	if ($('#dni' + (type == 'invoice' ? '_invoice' : '')).length)
 		params += 'dni=' + encodeURIComponent($('#dni' + (type == 'invoice' ? '_invoice' : '')).val())+'&';
 	if ($('#address1' + (type == 'invoice' ? '_invoice' : '')).length)

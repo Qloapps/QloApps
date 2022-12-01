@@ -1,9 +1,0 @@
-<!--
-Description: parsed pubDate, W3DTF format, UTC, invalid (25 hour)
-Expect:      not bozo and feed['date_parsed'] == (2004, 1, 1, 1, 14, 55, 3, 1, 0)
--->
-<rss version="2.0">
-<channel>
-<pubDate>2003-12-31T25:14:55Z</pubDate>
-</channel>
-</rss>
