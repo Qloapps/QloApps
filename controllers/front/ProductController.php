@@ -374,6 +374,7 @@ class ProductControllerCore extends FrontController
                         'hotel_location' => $hotel_location,
                         'hotel_latitude' => $hotel_branch_obj->latitude,
                         'hotel_longitude' => $hotel_branch_obj->longitude,
+                        'hotel_map_input_text' => $hotel_branch_obj->map_input_text,
                         'hotel_address1' => $addressInfo['address1'],
                         'hotel_phone' => $addressInfo['phone'],
                         'hotel_name' => $hotel_name,

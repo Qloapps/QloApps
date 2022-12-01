@@ -37,9 +37,14 @@ function initMap() {
     });
 
     marker.addListener('click', function() {
-        const directionsLink = 'https://www.google.com/maps/dir/?api=1&destination='+
-        hotelLocation.lat+','+hotelLocation.lng;
-        window.open(directionsLink, '_blank');
+        let query = '';
+        if (hotel_location.map_input_text != '') {
+            query = hotel_location.map_input_text;
+        } else {
+            query = hotel_location.latitude + ',' + hotel_location.longitude;
+        }
+
+        window.open('https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(query), '_blank');
     });
 }
 
