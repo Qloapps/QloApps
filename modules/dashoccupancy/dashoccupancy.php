@@ -70,8 +70,6 @@ class DashOccupancy extends Module
             'count_occupied' => sprintf('%02d', $occupancyData['count_occupied']),
             'count_available' =>  sprintf('%02d', $occupancyData['count_available']),
             'count_unavailable' =>  sprintf('%02d', $occupancyData['count_unavailable']),
-            'date_occupancy_range' => $this->l('(from %s to %s)'),
-            'date_occupancy_avail_format' => $this->context->language->date_format_lite,
         ));
 
         return $this->display(__FILE__, 'dashboard_zone_one.tpl');

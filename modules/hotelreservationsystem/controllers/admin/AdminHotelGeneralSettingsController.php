@@ -27,7 +27,7 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
         $this->bootstrap = true;
         parent::__construct();
 
-        $psImgUrl = $this->context->link->getMediaLink(_PS_IMG_.'hotel_header_image.jpg');
+        $psImgUrl = $this->context->link->getMediaLink(_PS_IMG_.Configuration::get('WK_HOTEL_HEADER_IMAGE'));
         if ($imgExist = (bool)Tools::file_get_contents($psImgUrl)) {
             $image = '<img class="img-thumbnail img-responsive" style="max-width:200px" src="'.$psImgUrl.'">';
         }
@@ -300,10 +300,11 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
                 }
 
                 if (!count($this->errors)) {
-                    $img_path = _PS_IMG_DIR_.'hotel_header_image.jpg';
+                    $file_name = 'hotel_header_image_'.time().'.jpg';
+                    $img_path = _PS_IMG_DIR_.$file_name;
 
                     if (ImageManager::resize($_FILES['htl_header_image']['tmp_name'], $img_path)) {
-                        Configuration::updateValue('WK_HOTEL_HEADER_IMAGE', 'hotel_header_image.jpg');
+                        Configuration::updateValue('WK_HOTEL_HEADER_IMAGE', $file_name);
                     } else {
                         $this->errors[] = $this->l('Some error occured while uoploading image.Please try again.');
                     }

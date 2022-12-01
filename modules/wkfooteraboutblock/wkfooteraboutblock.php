@@ -40,7 +40,7 @@ class WkFooterAboutBlock extends Module
         $this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
     }
 
-    public function hookFooter($params)
+    public function hookDisplayFooterMostLeftBlock($params)
     {
         $this->context->smarty->assign(
             array('WK_HTL_SHORT_DESC' => Configuration::get('WK_HTL_SHORT_DESC', $this->context->language->id))
@@ -50,29 +50,10 @@ class WkFooterAboutBlock extends Module
         return $this->display(__FILE__, 'wkFooterAboutBlock.tpl');
     }
 
-    public function hookDisplayFooterMostLeftBlock($params)
-    {
-        $languages = Language::getLanguages(true, $this->context->shop->id);
-        $currencies = Currency::getCurrencies(false, true);
-        if ((count($languages) <= 1) && (count($currencies) <= 1)) {
-            return $this->hookFooter($params);
-        }
-    }
-
-    public function hookdisplayFooterPaymentInfo($params)
-    {
-        $languages = Language::getLanguages(true, $this->context->shop->id);
-        $currencies = Currency::getCurrencies(false, true);
-        if ((count($languages) > 1) || (count($currencies) > 1)) {
-            return $this->hookFooter($params);
-        }
-    }
-
     public function install()
     {
         if (!parent::install()
-            ||!$this->registerHook('displayFooterMostLeftBlock')
-            ||!$this->registerHook('displayFooterPaymentInfo')
+            || !$this->registerHook('displayFooterMostLeftBlock')
         ) {
             return false;
         }

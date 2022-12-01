@@ -326,16 +326,17 @@ function init()
 
 		$('.edit_product_fields, .standard_refund_fields, .partial_refund_fields, .order_action').hide();
 		$('tr#new_product').slideDown('fast', function () {
-			$('tr#new_product td').fadeIn('fast', function() {
+			$('tr#new_product td').fadeIn('fast').promise().done(function () {
 				$('#add_product_product_name').focus();
-				scroll_if_anchor('#new_product');
+				scroll_if_anchor('#new_product', 360);
 			});
 		});
+
 		e.preventDefault();
 	});
 
 	$('#cancelAddProduct').unbind('click').click(function() {
-		$('.order_action').show();
+		$('.order_action').not('.standard_refund_fields').show();
 		$('tr#new_product td').fadeOut('fast');
 	});
 
@@ -366,6 +367,7 @@ function init()
 				id_currency: id_currency,
 				id_address: id_address,
 				id_customer: id_customer,
+				id_order: id_order,
 				product_search: function() { return $('#add_product_product_name').val(); }
 			}
 		}
@@ -539,7 +541,7 @@ function init()
 					error : function(XMLHttpRequest, textStatus, errorThrown) {
 						jAlert("Impossible to add the room to the cart.\n\ntextStatus: '" + textStatus + "'\nerrorThrown: '" + errorThrown + "'\nresponseText:\n" + XMLHttpRequest.responseText);
 					},
-					complete: function() { 
+					complete: function() {
 						$('#submitAddProduct').removeAttr('disabled');
 					}
 				});
@@ -641,6 +643,8 @@ function init()
 						element_list.find('td .booking_duration_show').hide();
 						element_list.find('td .booking_duration_edit').show();
 					}
+					element_list.find('td .room_unit_price_show').hide();
+					element_list.find('td .room_unit_price_edit').show();
 					//element_list.find('td .product_price_show').hide();
 					//element_list.find('td .product_price_edit').show();
 					element_list.find('td.cancelCheck').hide();
@@ -679,6 +683,8 @@ function init()
 		element_list.find('td .booking_duration_show').show();
 		element_list.find('td .product_price_edit').hide();
 		element_list.find('td .booking_duration_edit').hide();
+		element_list.find('td .room_unit_price_show').show();
+		element_list.find('td .room_unit_price_edit').hide();
 		element_list.find('td.product_invoice').hide();
 		element_list.find('td.cancelCheck').show();
 		element_list.find('td.cancelQuantity').show();

@@ -165,7 +165,7 @@ class AdminAboutHotelBlockSettingController extends ModuleAdminController
 
     public function renderForm()
     {
-        $imageUrl = $imageSize = false;
+        $imgUrl = $imageSize = $imgExist = $image = false;
 
         if ($this->display == 'edit') {
             $idHtlInterior = Tools::getValue('id_interior_image');
@@ -190,6 +190,7 @@ class AdminAboutHotelBlockSettingController extends ModuleAdminController
             }
 
         }
+
         $this->fields_form = array(
             'legend' => array(
                 'title' => $this->l('Add New Hotel Interior Image'),

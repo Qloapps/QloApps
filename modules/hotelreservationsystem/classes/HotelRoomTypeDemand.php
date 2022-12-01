@@ -228,13 +228,6 @@ class HotelRoomTypeDemand extends ObjectModel
             $useTax = false;
         }
 
-        if ($useTax != false
-            && !empty($addressInfos['vat_number'])
-            && $addressInfos['id_country'] != Configuration::get('VATNUMBER_COUNTRY')
-            && Configuration::get('VATNUMBER_MANAGEMENT')) {
-            $useTax = false;
-        }
-
         if (is_null($idCustomer) && Validate::isLoadedObject($context->customer)) {
             $idCustomer = $context->customer->id;
         }

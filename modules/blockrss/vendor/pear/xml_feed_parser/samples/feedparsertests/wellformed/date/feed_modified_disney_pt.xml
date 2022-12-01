@@ -1,7 +1,0 @@
-<!--
-Description: parsed modified in Disney's proprietary format (invalid timezone, long month)
-Expect:      not bozo and feed['date_parsed'] == (2004, 1, 27, 0, 31, 0, 1, 27, 0)
--->
-<feed version="0.3" xmlns="http://purl.org/atom/ns#">
-<modified>Mon, 26 January 2004 16:31:00 PT</modified>
-</feed>
