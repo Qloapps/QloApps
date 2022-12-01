@@ -29,6 +29,8 @@ class HotelReservationSystemDb
                 `id_hotel` int(11) NOT NULL,
                 `adult` smallint(6) NOT NULL,
                 `children` smallint(6) NOT NULL,
+                `min_los` smallint(6) NOT NULL DEFAULT '1',
+                `max_los` smallint(6) NOT NULL DEFAULT '0',
                 `date_add` datetime NOT NULL,
                 `date_upd` datetime NOT NULL,
                 PRIMARY KEY (`id`)
@@ -257,6 +259,9 @@ class HotelReservationSystemDb
             "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_room_type_feature_pricing` (
                 `id_feature_price` int(11) NOT NULL AUTO_INCREMENT,
                 `id_product` int(11) NOT NULL,
+                `id_cart` int(11) NOT NULL DEFAULT '0',
+                `id_guest` int(11) NOT NULL DEFAULT '0',
+                `id_room` int(11) NOT NULL DEFAULT '0',
                 `date_from` date NOT NULL,
                 `date_to` date NOT NULL,
                 `is_special_days_exists` tinyint(1) NOT NULL,
@@ -349,6 +354,18 @@ class HotelReservationSystemDb
                 PRIMARY KEY (`id`)
             ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;",
 
+            "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_room_type_restriction_date_range` (
+            `id_rt_restriction` int(11) NOT NULL AUTO_INCREMENT,
+            `id_product` int(11) NOT NULL,
+            `min_los` smallint(6) unsigned NOT NULL DEFAULT '1',
+            `max_los` smallint(6) unsigned NOT NULL DEFAULT '0',
+            `date_from` date NOT NULL,
+            `date_to` date NOT NULL,
+            `date_add` datetime NOT NULL,
+            `date_upd` datetime NOT NULL,
+            PRIMARY KEY (`id_rt_restriction`)
+            ) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;",
+
             "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_access` (
                 `id_profile` int(10) unsigned NOT NULL,
                 `id_hotel` int(10) unsigned NOT NULL,
@@ -405,6 +422,7 @@ class HotelReservationSystemDb
             `'._DB_PREFIX_.'htl_room_type_demand_price`,
             `'._DB_PREFIX_.'htl_room_type_demand`,
             `'._DB_PREFIX_.'htl_room_disable_dates`,
+            `'._DB_PREFIX_.'htl_room_type_restriction_date_range`,
             `'._DB_PREFIX_.'htl_access`'
         );
     }

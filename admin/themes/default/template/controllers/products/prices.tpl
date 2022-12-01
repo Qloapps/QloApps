@@ -413,21 +413,21 @@ $(document).ready(function () {
 								{$featurePlan['feature_price_name']}
 							</td>
 							<td>
-								{if $featurePlan['impact_type'] == 1}
+								{if $featurePlan['impact_type'] == HotelRoomTypeFeaturePricing::IMPACT_TYPE_PERCENTAGE}
 									{l s='Percentage'}
 								{else}
 									{l s='Fixed Amount'}
 								{/if}
 							</td>
 							<td>
-								{if $featurePlan['impact_way'] == 1}
+								{if $featurePlan['impact_way'] == HotelRoomTypeFeaturePricing::IMPACT_WAY_DECREASE}
 									{l s='Decrease'}
 								{else}
 									{l s='Increase'}
 								{/if}
 							</td>
 							<td>
-								{if $featurePlan['impact_type'] == 1}
+								{if $featurePlan['impact_type'] == HotelRoomTypeFeaturePricing::IMPACT_TYPE_PERCENTAGE}
 									{$featurePlan['impact_value']|round:2}%
 								{else}
 									{displayPrice price=$featurePlan['impact_value']}
@@ -437,7 +437,7 @@ $(document).ready(function () {
 								{dateFormat date=$featurePlan['date_from'] full=0}
 							</td>
 							<td>
-								{if $featurePlan['date_selection_type'] == 1}
+								{if $featurePlan['date_selection_type'] == HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_RANGE}
 									{dateFormat date=$featurePlan['date_to'] full=0}
 								{else}
 									<span class="badge badge-success">{l s='Specific date'}</span>

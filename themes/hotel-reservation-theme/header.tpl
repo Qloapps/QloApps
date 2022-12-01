@@ -92,7 +92,7 @@
 							</div>
 						</div>
 					</div>
-					<div class="nav">
+					<div id="nav-main">
 						<div class="container">
 							<div class="row">
 								<nav>{hook h="displayNav"}</nav>
