@@ -23,6 +23,12 @@
 *  International Registered Trademark & Property of PrestaShop SA
 *}
 
-{$employee_name|escape:'html':'UTF-8'}
-<br />
-({$employee_email|escape:'html':'UTF-8'})
+{if $type == 'orders' && isset($ids_order)}
+    {foreach from=$ids_order item=id_order name=orders}
+        <a href="{$link->getAdminLink('AdminOrders')}&vieworder&id_order={$id_order}" style="margin: 1px 0;" target="_blank">#{$id_order}</a>{if !$smarty.foreach.orders.last},{/if}
+    {/foreach}
+{elseif $type == 'abandoned'}
+    <span class="badge badge-danger">{l s='Abandoned cart'}</span>
+{elseif $type == 'non_orderd'}
+    <span class="badge badge-danger">{l s='Non-orderd cart'}</span>
+{/if}

@@ -112,6 +112,7 @@ class AdminProductsControllerCore extends AdminController
             'Warehouses' => $this->l('Warehouses'),
             'Configuration' => $this->l('Configuration'),
             'Occupancy' => $this->l('Occupancy'),
+            'LengthOfStay' => $this->l('Length of Stay'),
             'Booking' => $this->l('Booking Information'),
             'AdditionalFacilities' => $this->l('Additional Facilities'),
         );
@@ -135,7 +136,8 @@ class AdminProductsControllerCore extends AdminController
                 'Configuration' => 14,
                 'Occupancy' => 15,
                 'Booking' => 16,
-                'AdditionalFacilities' => 17,
+                'LengthOfStay' => 17,
+                'AdditionalFacilities' => 18,
             ));
         }
 
@@ -2227,6 +2229,9 @@ class AdminProductsControllerCore extends AdminController
                         if ($this->isTabSubmitted('Occupancy')) {
                             $this->processOccupancy();
                         }
+                        if ($this->isTabSubmitted('LengthOfStay')) {
+                            $this->processLengthOfStay();
+                        }
                         if ($this->isTabSubmitted('Configuration')) {
                             $this->processConfiguration();
                         }
@@ -3475,6 +3480,141 @@ class AdminProductsControllerCore extends AdminController
             } else {
                 $this->errors[] = Tools::displayError('Please save hotel of the room type from configuration tab.');
             }
+        }
+    }
+
+    // send information for the length of stay tab
+    public function initFormLengthOfStay($product)
+    {
+        $data = $this->createTemplate($this->tpl_form);
+        if ($product->id) {
+            if ($this->product_exists_in_shop) {
+                // Check if any hotel is created or not
+                $objRoomType = new HotelRoomType();
+                if ($roomTypeInfo = $objRoomType->getRoomTypeInfoByIdProduct($product->id)) {
+                    if ($roomTypeInfo['id_hotel']) {
+                        // send length of stay date ranges for this room type
+                        $objRoomTypeRestrictionDates = new HotelRoomTypeRestrictionDateRange();
+                        $roomTypeInfo['restrictionDataRange'] = $objRoomTypeRestrictionDates->getRoomTypeLengthOfStayRestriction($product->id);
+                        $smartyVars['roomTypeInfo'] = $roomTypeInfo;
+                    } else {
+                        $this->displayWarning($this->l('No hotel is attached to this room type.'));
+                    }
+                } else {
+                    $this->displayWarning($this->l('Room type information is missing.'));
+                }
+            } else {
+                $this->displayWarning($this->l('You must save room type before managing length of stay.'));
+            }
+        } else {
+            $this->displayWarning($this->l('You must save room type before managing length of stay.'));
+        }
+
+        $smartyVars['product'] = $product;
+        $data->assign($smartyVars);
+        $this->tpl_form_vars['custom_form'] = $data->fetch();
+    }
+
+    public function processLengthOfStay()
+    {
+        if ($this->tabAccess['edit'] == 1) {
+
+            $idProduct = Tools::getValue('id_product');
+            if (Validate::isLoadedObject($product = new Product((int)$idProduct))) {
+                $objRoomType = new HotelRoomType();
+                if ($roomTypeInfo = $objRoomType->getRoomTypeInfoByIdProduct($idProduct)) {
+                    $roomTypeMinLos = Tools::getValue('min_los');
+                    $roomTypeMaxLos = Tools::getValue('max_los');
+
+                    // validate length of stay global values for room type
+                    if (!$roomTypeMinLos || $roomTypeMinLos == null) {
+                        $this->errors[] = Tools::displayError('Global minimum length of stay is a required field.');
+                    } elseif (!Validate::isUnsignedInt($roomTypeMinLos)) {
+                        $this->errors[] = Tools::displayError('Global minimum length of stay value is invalid. Please enter integer value. Set 1 day incase  of setting no limit on global minimum length of stay.');
+                    }
+
+                    if ($roomTypeMaxLos == null) {
+                        $this->errors[] = Tools::displayError('Global maximum length of stay is a required field.');
+                    } elseif (!Validate::isUnsignedInt($roomTypeMaxLos)) {
+                        $this->errors[] = Tools::displayError('Invalid value entered for global maximum length of stay field. Please enter integer value. Set 0 day incase of setting no limit on maximum length of stay.');
+                    } elseif ($roomTypeMinLos && $roomTypeMaxLos > 0 && ($roomTypeMinLos > $roomTypeMaxLos)) {
+                        $this->errors[] = Tools::displayError('Value of global maximum length of stay must be greater than global minimum length of stay.');
+                    }
+
+                    if (Tools::getValue('active_restriction_dates')) {
+                        if (Tools::getValue('restriction_date_from') && Tools::getValue('restriction_date_to')) {
+                            $objRoomTypeRestrictDateRange = new HotelRoomTypeRestrictionDateRange();
+                            $dateFromRestriction = Tools::getValue('restriction_date_from');
+                            $dateToRestriction = Tools::getValue('restriction_date_to');
+                            $minLosDays = Tools::getValue('restriction_min_los');
+                            $maxLosDays = Tools::getValue('restriction_max_los');
+
+                            $this->errors = array_merge($this->errors, $objRoomTypeRestrictDateRange->validateRoomTypeLengthOfStayRestriction($dateFromRestriction, $dateToRestriction, $minLosDays, $maxLosDays));
+                        } else {
+                            $this->errors[] = Tools::displayError('Please add at least one Minimum & maximum length of stay restriction for date range if \'Length of stay for date ranges\' option is enable.');
+                        }
+                    }
+
+                    if (!$this->errors) {
+                        $objRoomType = new HotelRoomType($roomTypeInfo['id']);
+                        $objRoomType->min_los = $roomTypeMinLos;
+                        $objRoomType->max_los = $roomTypeMaxLos;
+                        if ($objRoomType->save()) {
+                            if (Tools::getValue('active_restriction_dates') && Tools::getValue('restriction_date_from')) {
+                                // @ToDo: we should validate this room type restriction ids belongs to this room type
+                                $idRoomTypeRestriction = Tools::getValue('id_rt_restriction');
+
+                                foreach ($dateFromRestriction as $restrictionKey => $dateFrom) {
+                                    // change into database compatible format
+                                    $dateFrom = date('Y-m-d', strtotime($dateFrom));
+                                    $dateTo = date('Y-m-d', strtotime($dateToRestriction[$restrictionKey]));
+
+                                    if ($idRoomTypeRestriction[$restrictionKey]) {
+                                        $objRoomTypeRestrictDateRange = new HotelRoomTypeRestrictionDateRange($idRoomTypeRestriction[$restrictionKey]);
+                                    } else {
+                                        $objRoomTypeRestrictDateRange = new HotelRoomTypeRestrictionDateRange();
+                                    }
+
+                                    $objRoomTypeRestrictDateRange->id_product = $idProduct;
+                                    $objRoomTypeRestrictDateRange->date_from = $dateFrom;
+                                    $objRoomTypeRestrictDateRange->date_to = $dateTo;
+                                    $objRoomTypeRestrictDateRange->min_los = $minLosDays[$restrictionKey];
+                                    $objRoomTypeRestrictDateRange->max_los = $maxLosDays[$restrictionKey];
+                                    $objRoomTypeRestrictDateRange->save();
+                                }
+                            } else {
+                                // if disabled length of stay for date ranges then delete all previously saved
+                                $objRoomTypeRestrictDateRange = new HotelRoomTypeRestrictionDateRange();
+                                if ($losRestrictions = $objRoomTypeRestrictDateRange->getRoomTypeLengthOfStayRestriction($idProduct)) {
+                                    foreach ($losRestrictions as $losDate) {
+                                        $objRoomTypeRestrictDateRange = new HotelRoomTypeRestrictionDateRange($losDate['id_rt_restriction']);
+                                        $objRoomTypeRestrictDateRange->delete();
+                                    }
+                                }
+                            }
+                        } else {
+                            $this->errors[] = Tools::displayError('Something went wrong while saving global minimum & maximum length of stay values. Please try again !!');
+                        }
+                    }
+                }
+            }
+        } else {
+            $this->errors[] = Tools::displayError('You do not have the right permission.');
+        }
+    }
+
+    // delete the rows of length of stay on date range
+    public function ajaxProcessDeleteRoomTypeLengthOfStayRestriction()
+    {
+        if ($this->tabAccess['edit'] == 1) {
+            $objRoomTypeRestrictionDates = new HotelRoomTypeRestrictionDateRange(Tools::getValue('id_rt_restriction'));
+            if ($objRoomTypeRestrictionDates->delete()) {
+                die(json_encode(array('success' => $this->l('Successfully deleted'))));
+            } else {
+                die(json_encode(array('error' => $this->l('Something went wrong. Please reload the page and try again !!'))));
+            }
+        } else {
+            die(json_encode(array('error' => $this->l('You do not have the right permission'))));
         }
     }
 

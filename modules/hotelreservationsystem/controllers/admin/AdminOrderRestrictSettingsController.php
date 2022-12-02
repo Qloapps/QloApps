@@ -66,6 +66,7 @@ class AdminOrderRestrictSettingsController extends ModuleAdminController
             'max_order_date' => array(
                 'title' => $this->l('Maximum Booking Date'),
                 'align' => 'center',
+                'type' => 'date',
             ),
         );
         $this->bulk_actions = array(
