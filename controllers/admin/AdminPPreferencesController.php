@@ -306,12 +306,12 @@ class AdminPPreferencesControllerCore extends AdminController
             //     'submit' => array('title' => $this->l('Save'))
             // ),
             'fo_search_filters' => array(
-                'title' => $this->l('Search Filters'),
+                'title' => $this->l('Search Results Page Filters'),
                 'icon' => 'icon-search',
                 'fields' => array(
                     'SHOW_AMENITIES_FILTER' => array(
                         'title' => $this->l('Show Amenities filter'),
-                        'hint' => $this->l('Enable to display Amenities filter for search.'),
+                        'hint' => $this->l('Enable to display Amenities filter.'),
                         'validation' => 'isBool',
                         'cast' => 'intval',
                         'required' => false,
@@ -319,7 +319,7 @@ class AdminPPreferencesControllerCore extends AdminController
                     ),
                     'SHOW_PRICE_FILTER' => array(
                         'title' => $this->l('Show Price filter'),
-                        'hint' => $this->l('Enable to display Price filter for search.'),
+                        'hint' => $this->l('Enable to display Price filter.'),
                         'validation' => 'isBool',
                         'cast' => 'intval',
                         'required' => false,

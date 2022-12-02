@@ -129,4 +129,13 @@ class wkhotelfilterblock extends Module
             return $this->display(__FILE__, 'htlfilterblock.tpl');
         }
     }
+
+    public function getConfigFieldsValues()
+    {
+        return array(
+            'SHOW_RATTING_FILTER' => Configuration::get('SHOW_RATTING_FILTER'),
+            'SHOW_AMENITIES_FILTER' => Configuration::get('SHOW_AMENITIES_FILTER'),
+            'SHOW_PRICE_FILTER' => Configuration::get('SHOW_PRICE_FILTER'),
+        );
+    }
 }
