@@ -51,8 +51,7 @@
 					let dateTo = $('form#calendar_form .datepicker#datepickerTo').val().trim();
 
 					if (dateFrom >= dateTo) {
-						let objDateFrom = $.datepicker.parseDate('yy-mm-dd', dateFrom);
-						let objDateToMin = objDateFrom;
+						let objDateToMin = $.datepicker.parseDate('yy-mm-dd', dateFrom);
 						objDateToMin.setDate(objDateToMin.getDate() + 1);
 
 						$('form#calendar_form .datepicker#datepickerTo').datepicker('option', 'minDate', objDateToMin);
@@ -70,8 +69,7 @@
 					let dateFrom = $('form#calendar_form .datepicker#datepickerFrom').val().trim();
 
 					if (typeof dateFrom != 'undefined' && dateFrom != '') {
-						let objDateFrom = $.datepicker.parseDate('yy-mm-dd', dateFrom);
-						let objDateToMin = objDateFrom;
+						let objDateToMin = $.datepicker.parseDate('yy-mm-dd', dateFrom);
 						objDateToMin.setDate(objDateToMin.getDate() + 1);
 
 						$('form#calendar_form .datepicker#datepickerTo').datepicker('option', 'minDate', objDateToMin);
