@@ -272,7 +272,7 @@
 			</div>
 
 			<div class="form-control-static">
-				<span id="related_product_name"><i class="icon-warning-sign"></i>&nbsp;{l s='No related room type set.'}</span>
+				<span id="related_product_name"><i class="icon-warning-sign"></i>&nbsp;{l s='No related room type.'}</span>
 				<span id="related_product_remove" style="display:none">
 					<a class="btn btn-default" href="#" onclick="removeRelatedProduct(); return false" id="related_product_remove_link">
 						<i class="icon-remove text-danger"></i>
@@ -282,7 +282,7 @@
 
 		</div>
 		<script>
-			var no_related_product = '{l s='No related room type set.'}';
+			var no_related_product = '{l s='No related room type.'}';
 			var id_product_redirected = {$product->id_product_redirected|intval};
 			var product_name_redirected = '{$product_name_redirected|escape:'html':'UTF-8'}';
 		</script>
