@@ -3747,7 +3747,6 @@ class AdminProductsControllerCore extends AdminController
 
             $data->assign(array(
                 'product' => $obj,
-                'idProduct' => $obj->id,
                 'roomDemandPrices' => $roomDemandPrices,
                 'allDemands' => $allDemands,
                 'defaultcurrencySign' => $objCurrency->sign,
