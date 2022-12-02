@@ -42,10 +42,10 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
                 Guest::setNewGuest($this->context->cookie);
             }
 
-            setcookie('wk_id_guest', $this->context->cookie->id_guest, time() + 86400, "/");
+            setcookie('wk_id_guest', $this->context->cookie->id_guest, time() + 86400, $this->context->shop->physical_uri);
         } else {
             $this->context->cookie->id_guest = $_COOKIE['wk_id_guest'];
-            setcookie('wk_id_guest', $this->context->cookie->id_guest, time() + 86400, "/");
+            setcookie('wk_id_guest', $this->context->cookie->id_guest, time() + 86400, $this->context->shop->physical_uri);
         }
         $guest = new Guest($this->context->cookie->id_guest);
 
@@ -67,13 +67,13 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
             $this->context->cart = $cart;
             $this->context->cookie->id_cart = $cart->id;
 
-            setcookie('wk_id_cart', $cart->id, time() + 86400, "/");
+            setcookie('wk_id_cart', $cart->id, time() + 86400, $this->context->shop->physical_uri);
         } else {
             $cart = new Cart((int)$_COOKIE['wk_id_cart']);
 
             $this->context->cart = $cart;
             $this->context->cookie->id_cart = $cart->id;
-            setcookie('wk_id_cart', $cart->id, time() + 86400, "/");
+            setcookie('wk_id_cart', $cart->id, time() + 86400, $this->context->shop->physical_uri);
         }
 
         $customer = new Customer();
@@ -409,7 +409,7 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
                 'rms_in_cart' => $rms_in_cart,
                 'total_amount' => Tools::displayPrice($total_amount),
                 'booking_stats' => $booking_stats,
-                'id_cart_book_data' => $obj_cart_book_data->id);
+                'id_cart_book_data' => $obj_cart_book_data->id
             );
 
             if ($obj_cart_book_data->id) {

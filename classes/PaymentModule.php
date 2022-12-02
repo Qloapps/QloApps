@@ -850,8 +850,8 @@ abstract class PaymentModuleCore extends Module
                     HotelRoomTypeFeaturePricing::deleteByIdCart($id_cart);
 
                     if (isset($_COOKIE['wk_id_cart'])) {
-                        setcookie('wk_id_cart', ' ', time() - 86400, '/');
-                        setcookie('wk_id_guest', ' ', time() - 86400, '/');
+                        setcookie('wk_id_cart', ' ', time() - 86400, $this->context->shop->physical_uri);
+                        setcookie('wk_id_guest', ' ', time() - 86400, $this->context->shop->physical_uri);
 
                         unset($_COOKIE['wk_id_cart']);
                         unset($_COOKIE['wk_id_guest']);
