@@ -22,9 +22,9 @@
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
-{capture name=path}{l s='Your addresses'}{/capture}
+{capture name=path}{l s='Your address'}{/capture}
 <div class="box">
-	<h1 class="page-subheading">{l s='Your addresses'}</h1>
+	<h1 class="page-subheading">{l s='Your address'}</h1>
 	<p class="info-title">
 		{if isset($id_address) && (isset($smarty.post.alias) || isset($address->alias))}
 			{l s='Modify address'}
@@ -199,8 +199,8 @@
 </div>
 <ul class="footer_links clearfix">
 	<li>
-		<a class="btn btn-defaul button button-small" href="{$link->getPageLink('addresses', true)|escape:'html':'UTF-8'}">
-			<span><i class="icon-chevron-left"></i> {l s='Back to your addresses'}</span>
+		<a class="btn btn-defaul button button-small" href="{$link->getPageLink('my-account', true)|escape:'html':'UTF-8'}">
+			<span><i class="icon-chevron-left"></i> {l s='Back to your account'}</span>
 		</a>
 	</li>
 </ul>
