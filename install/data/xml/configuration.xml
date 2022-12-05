@@ -56,6 +56,9 @@
 	<configuration id="PS_PRODUCTS_PER_PAGE" name="PS_PRODUCTS_PER_PAGE">
 		<value>12</value>
 	</configuration>
+	<configuration id="PS_HOTEL_IMAGES_PER_PAGE" name="PS_HOTEL_IMAGES_PER_PAGE">
+		<value>9</value>
+	</configuration>
 	<configuration id="PS_PURCHASE_MINIMUM" name="PS_PURCHASE_MINIMUM">
 		<value>0</value>
 	</configuration>
@@ -392,39 +395,39 @@
 	<configuration id="PS_OS_OUTOFSTOCK" name="PS_OS_OUTOFSTOCK">
 		<value>7</value>
 	</configuration>
+	<configuration id="PS_OS_OUTOFSTOCK_PAID" name="PS_OS_OUTOFSTOCK_PAID">
+		<value>7</value>
+	</configuration>
+	<configuration id="PS_OS_OVERBOOKING" name="PS_OS_OVERBOOKING">
+		<value>7</value>
+	</configuration>
+	<configuration id="PS_OS_PARTIAL_PAYMENT" name="PS_OS_PARTIAL_PAYMENT">
+		<value>8</value>
+	</configuration>
 	<!-- <configuration id="PS_OS_BANKWIRE" name="PS_OS_BANKWIRE">
 		<value>8</value>
 	</configuration> -->
 	<!-- <configuration id="PS_OS_PAYPAL" name="PS_OS_PAYPAL">
 		<value>9</value>
 	</configuration> -->
+	<configuration id="PS_OS_AWATING_REMOTE_PAYMENT" name="PS_OS_AWATING_REMOTE_PAYMENT">
+		<value>9</value>
+	</configuration>
 	<configuration id="PS_OS_WS_PAYMENT" name="PS_OS_WS_PAYMENT">
 		<value>10</value>
 	</configuration>
-	<configuration id="PS_OS_OUTOFSTOCK_PAID" name="PS_OS_OUTOFSTOCK_PAID">
-		<value>7</value>
+	<configuration id="PS_OS_REMOTE_PAYMENT_ACCEPTED" name="PS_OS_REMOTE_PAYMENT_ACCEPTED">
+		<value>10</value>
 	</configuration>
 	<configuration id="PS_OS_OUTOFSTOCK_UNPAID" name="PS_OS_OUTOFSTOCK_UNPAID">
 		<value>11</value>
 	</configuration>
-	<configuration id="PS_OS_AWATING_REMOTE_PAYMENT" name="PS_OS_AWATING_REMOTE_PAYMENT">
-		<value>9</value>
-	</configuration>
-		<configuration id="PS_OS_REMOTE_PAYMENT_ACCEPTED" name="PS_OS_REMOTE_PAYMENT_ACCEPTED">
-		<value>10</value>
+	<configuration id="PS_OS_OVERBOOKING_UNPAID" name="PS_OS_OVERBOOKING_UNPAID">
+		<value>11</value>
 	</configuration>
 	<!-- <configuration id="PS_OS_AWAITING_PARTIAL_PAYMENT" name="PS_OS_AWAITING_PARTIAL_PAYMENT">
 		<value>13</value>
 	</configuration> -->
-	<configuration id="PS_OS_OVERBOOKING" name="PS_OS_OVERBOOKING">
-		<value>7</value>
-	</configuration>
-	<configuration id="PS_OS_OVERBOOKING_UNPAID" name="PS_OS_OVERBOOKING_UNPAID">
-		<value>11</value>
-	</configuration>
-	<configuration id="PS_OS_PARTIAL_PAYMENT" name="PS_OS_PARTIAL_PAYMENT">
-		<value>8</value>
-	</configuration>
 	<configuration id="PS_LEGACY_IMAGES" name="PS_LEGACY_IMAGES">
 		<value>0</value>
 	</configuration>
@@ -611,9 +614,6 @@
 	<configuration id="PS_STATS_GRID_RENDER" name="PS_STATS_GRID_RENDER">
 		<value>gridhtml</value>
 	</configuration>
-	<configuration id="BLOCKTAGS_NBR" name="BLOCKTAGS_NBR">
-		<value>10</value>
-	</configuration>
 	<configuration id="CHECKUP_DESCRIPTIONS_LT" name="CHECKUP_DESCRIPTIONS_LT">
 		<value>100</value>
 	</configuration>
@@ -650,9 +650,6 @@
 	<configuration id="BLOCKADVERT_LINK" name="BLOCKADVERT_LINK">
 		<value>http://www.qloapps.com</value>
 	</configuration>
-	<configuration id="BLOCKSTORE_IMG" name="BLOCKSTORE_IMG">
-		<value>store.jpg</value>
-	</configuration>
 	<configuration id="BLOCKADVERT_IMG_EXT" name="BLOCKADVERT_IMG_EXT">
 		<value>jpg</value>
 	</configuration>
@@ -667,26 +664,6 @@
 	</configuration>
 	<configuration id="blocksocial_twitter" name="BLOCKSOCIAL_TWITTER">
 		<value>http://www.twitter.com/qloapps</value>
-	</configuration>
-	<configuration id="blockcontactinfos_company" name="BLOCKCONTACTINFOS_COMPANY">
-		<value>Your company</value>
-	</configuration>
-	<configuration id="blockcontactinfos_address" name="BLOCKCONTACTINFOS_ADDRESS">
-		<value>Address line 1
-City
-Country</value>
-	</configuration>
-	<configuration id="blockcontactinfos_phone" name="BLOCKCONTACTINFOS_PHONE">
-		<value>0123-456-789</value>
-	</configuration>
-	<configuration id="blockcontactinfos_email" name="BLOCKCONTACTINFOS_EMAIL">
-		<value>pub@qloapps.com</value>
-	</configuration>
-	<configuration id="blockcontact_telnumber" name="BLOCKCONTACT_TELNUMBER">
-		<value>0123-456-789</value>
-	</configuration>
-	<configuration id="blockcontact_email" name="BLOCKCONTACT_EMAIL">
-		<value>pub@qloapps.com</value>
 	</configuration>
 	<configuration id="SUPPLIER_DISPLAY_TEXT" name="SUPPLIER_DISPLAY_TEXT">
 		<value>1</value>
@@ -708,18 +685,6 @@ Country</value>
 	</configuration>
 	<configuration id="BLOCKREINSURANCE_NBBLOCKS" name="BLOCKREINSURANCE_NBBLOCKS">
 		<value>5</value>
-	</configuration>
-	<configuration id="HOMESLIDER_WIDTH" name="HOMESLIDER_WIDTH">
-		<value>535</value>
-	</configuration>
-	<configuration id="HOMESLIDER_SPEED" name="HOMESLIDER_SPEED">
-		<value>1300</value>
-	</configuration>
-	<configuration id="HOMESLIDER_PAUSE" name="HOMESLIDER_PAUSE">
-		<value>7700</value>
-	</configuration>
-	<configuration id="HOMESLIDER_LOOP" name="HOMESLIDER_LOOP">
-		<value>1</value>
 	</configuration>
 	<configuration id="PS_BASE_DISTANCE_UNIT" name="PS_BASE_DISTANCE_UNIT">
 		<value>m</value>
