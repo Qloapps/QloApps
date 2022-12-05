@@ -427,6 +427,11 @@ class ToolsCore
         return isset($_POST[$key]) ? true : (isset($_GET[$key]) ? true : false);
     }
 
+    public static function getQueryString()
+    {
+        return isset($_SERVER['QUERY_STRING']) ? $_SERVER['QUERY_STRING'] : '';
+    }
+
     /**
     * Change language in cookie while clicking on a flag
     *

@@ -105,15 +105,17 @@ class CategoryControllerCore extends FrontController
 
         if ($dateFrom != '' && !Validate::isDate($dateFrom)) {
             $dateFrom = date('Y-m-d');
-            $dateTo = date('Y-m-d', strtotime($dateFrom) + 86400);
+            $dateTo = date('Y-m-d', strtotime('+1 day', strtotime($dateFrom)));
             $hasInvalidDates = true;
         } elseif ($dateTo != '' && !Validate::isDate($dateTo)) {
-            $dateTo = date('Y-m-d', strtotime($dateFrom) + 86400);
+            $dateTo = date('Y-m-d', strtotime('+1 day', strtotime($dateFrom)));
             $hasInvalidDates = true;
         }
 
         if ($hasInvalidDates) {
-            $urlParams = array('date_from' => $dateFrom, 'date_to' => $dateTo);
+            $queryString = Tools::getQueryString();
+            parse_str($queryString, $queryParams);
+            $urlParams = array_merge($queryParams, array('date_from' => $dateFrom, 'date_to' => $dateTo));
             $redirectLink = $this->context->link->getCategoryLink($this->category, null, $this->context->language->id).
             (Configuration::get('PS_REWRITING_SETTINGS') ? '?' : '&').http_build_query($urlParams);
 
