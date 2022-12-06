@@ -849,14 +849,6 @@ abstract class PaymentModuleCore extends Module
                     // delete cart feature prices after booking creation success
                     HotelRoomTypeFeaturePricing::deleteByIdCart($id_cart);
 
-                    if (isset($_COOKIE['wk_id_cart'])) {
-                        setcookie('wk_id_cart', ' ', time() - 86400, $this->context->shop->physical_uri);
-                        setcookie('wk_id_guest', ' ', time() - 86400, $this->context->shop->physical_uri);
-
-                        unset($_COOKIE['wk_id_cart']);
-                        unset($_COOKIE['wk_id_guest']);
-                    }
-
                     if (self::DEBUG_MODE) {
                         PrestaShopLogger::addLog('PaymentModule::validateOrder - Hook validateOrder is about to be called', 1, null, 'Cart', (int)$id_cart, true);
                     }

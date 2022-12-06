@@ -30,26 +30,22 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
 
         parent::__construct();
 
-        //unset($_COOKIE['wk_id_guest']);
-        //unset($_COOKIE['wk_id_cart']);
         $this->setPhpCookieData();
     }
 
     public function setPhpCookieData()
     {
-        if (!isset($_COOKIE['wk_id_guest']) || !$_COOKIE['wk_id_guest']) {
+        if (!isset($this->context->cookie->wk_id_guest) || !$this->context->cookie->wk_id_guest) {
             if (!isset($this->context->cookie->id_guest)) {
                 Guest::setNewGuest($this->context->cookie);
             }
 
-            setcookie('wk_id_guest', $this->context->cookie->id_guest, time() + 86400, $this->context->shop->physical_uri);
+            $this->context->cookie->wk_id_guest = $this->context->cookie->id_guest;
         } else {
-            $this->context->cookie->id_guest = $_COOKIE['wk_id_guest'];
-            setcookie('wk_id_guest', $this->context->cookie->id_guest, time() + 86400, $this->context->shop->physical_uri);
+            $this->context->cookie->id_guest = $this->context->cookie->wk_id_guest;
         }
-        $guest = new Guest($this->context->cookie->id_guest);
 
-        if (!isset($_COOKIE['wk_id_cart']) && !isset($this->context->cart->id)) {
+        if (!isset($this->context->cookie->wk_id_cart) && !isset($this->context->cart->id)) {
             $cart = new Cart();
 
             $cart->recyclable = 0;
@@ -67,13 +63,13 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
             $this->context->cart = $cart;
             $this->context->cookie->id_cart = $cart->id;
 
-            setcookie('wk_id_cart', $cart->id, time() + 86400, $this->context->shop->physical_uri);
+            $this->context->cookie->wk_id_cart = $cart->id;
         } else {
-            $cart = new Cart((int)$_COOKIE['wk_id_cart']);
+            $cart = new Cart((int) $this->context->cookie->wk_id_cart);
 
             $this->context->cart = $cart;
             $this->context->cookie->id_cart = $cart->id;
-            setcookie('wk_id_cart', $cart->id, time() + 86400, $this->context->shop->physical_uri);
+            $this->context->cookie->wk_id_cart = $cart->id;
         }
 
         $customer = new Customer();
