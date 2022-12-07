@@ -356,11 +356,23 @@ abstract class PaymentModuleCore extends Module
                     // advance payment information
                     $order->is_advance_payment = $this->context->cart->is_advance_payment;
                     if ($order->is_advance_payment) {
-                        $order->advance_paid_amount = (float)Tools::ps_round((float)$this->context->cart->getOrderTotal(true, Cart::ADVANCE_PAYMENT, $order->product_list, $id_carrier), _PS_PRICE_COMPUTE_PRECISION_);
-                        $order->real_paid_amount = ($order->advance_paid_amount * $amount_paid) / (float)Tools::ps_round((float)$this->context->cart->getOrderTotal(true, Cart::ADVANCE_PAYMENT, null, $id_carrier));
+                        $order->advance_paid_amount = (float)Tools::ps_round(
+                            (float)$this->context->cart->getOrderTotal(true, Cart::ADVANCE_PAYMENT, $order->product_list, $id_carrier),
+                            _PS_PRICE_COMPUTE_PRECISION_
+                        );
+                        $order->amount_paid = (float)Tools::ps_round(
+                            (($order->advance_paid_amount * $amount_paid) / $this->context->cart->getOrderTotal(true, Cart::ADVANCE_PAYMENT, null, $id_carrier)),
+                            _PS_PRICE_COMPUTE_PRECISION_
+                        );
                     } else {
-                        $order->advance_paid_amount = (float)Tools::ps_round((float)$this->context->cart->getOrderTotal(true, Cart::BOTH, $order->product_list, $id_carrier), _PS_PRICE_COMPUTE_PRECISION_);
-                        $order->real_paid_amount = ($order->advance_paid_amount * $amount_paid) / (float)Tools::ps_round((float)$this->context->cart->getOrderTotal(true, Cart::BOTH, null, $id_carrier));
+                        $order->advance_paid_amount = (float)Tools::ps_round(
+                            (float)$this->context->cart->getOrderTotal(true, Cart::BOTH, $order->product_list, $id_carrier),
+                            _PS_PRICE_COMPUTE_PRECISION_
+                        );
+                        $order->amount_paid = (float)Tools::ps_round(
+                            (($order->advance_paid_amount * $amount_paid) / $this->context->cart->getOrderTotal(true, Cart::BOTH, null, $id_carrier)),
+                            _PS_PRICE_COMPUTE_PRECISION_
+                        );
                     }
 
                     // Creating order
@@ -439,7 +451,7 @@ abstract class PaymentModuleCore extends Module
                 }
 
                 foreach($order_list as $order) {
-                    $order->addOrderPaymentDetail($order->real_paid_amount);
+                    $order->addOrderPaymentDetail($order->amount_paid);
                 }
             }
 
