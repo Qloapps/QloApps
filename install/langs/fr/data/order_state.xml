@@ -2,7 +2,7 @@
 <entity_order_state>
   <order_state id='Awaiting'>
     <name>En attente paiement</name>
-    <template>awating</template>
+    <template>awaiting</template>
   </order_state>
   <order_state id='Payment_accepted'>
     <name>Paiement accepté</name>

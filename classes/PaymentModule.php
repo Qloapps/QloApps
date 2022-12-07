@@ -26,22 +26,17 @@
 
 abstract class PaymentModuleCore extends Module
 {
-    /** @var int Current order's id */
-    public $currentOrder;
-    public $currencies = true;
-    public $currencies_mode = 'checkbox';
-
     const DEBUG_MODE = false;
 
     const PAYMENT_TYPE_ONLINE = 1;
     const PAYMENT_TYPE_PAY_AT_HOTEL = 2;
     const PAYMENT_TYPE_REMOTE_PAYMENT = 3;
 
-    public function __construct()
-    {
-        parent::__construct();
-        $this->payment_type = PaymentModule::PAYMENT_TYPE_REMOTE_PAYMENT;
-    }
+    /** @var int Current order's id */
+    public $currentOrder;
+    public $currencies = true;
+    public $currencies_mode = 'checkbox';
+    public $payment_type = PaymentModule::PAYMENT_TYPE_REMOTE_PAYMENT;
 
     public function install()
     {
@@ -443,7 +438,7 @@ abstract class PaymentModuleCore extends Module
                     $transaction_id = null;
                 }
 
-                if (!isset($order) || !Validate::isLoadedObject($order) || !$order->addOrderPayment($amount_paid, null, PaymentModule::PAYMENT_TYPE_ONLINE , $transaction_id)) {
+                if (!isset($order) || !Validate::isLoadedObject($order) || !$order->addOrderPayment($amount_paid, null, $this->payment_type, $transaction_id)) {
                     PrestaShopLogger::addLog('PaymentModule::validateOrder - Cannot save Order Payment', 3, null, 'Cart', (int)$id_cart, true);
                     throw new PrestaShopException('Can\'t save Order Payment');
                 }

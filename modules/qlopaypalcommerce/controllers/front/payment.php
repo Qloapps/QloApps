@@ -138,7 +138,7 @@ class QloPaypalCommercePaymentModuleFrontController extends ModuleFrontControlle
                                         $orderStatus = Configuration::get('PS_OS_PAYMENT');
                                     }
                                 } else {
-                                    $orderStatus = Configuration::get('PS_OS_AWATING');
+                                    $orderStatus = Configuration::get('PS_OS_AWAITING');
                                 }
 
                                 // create order for the payment

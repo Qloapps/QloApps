@@ -2,7 +2,7 @@
 <entity_order_state>
   <order_state id="Awaiting">
     <name>等待付款</name>
-    <template>awating</template>
+    <template>awaiting</template>
   </order_state>
   <order_state id="Payment_accepted">
     <name>付款完成</name>

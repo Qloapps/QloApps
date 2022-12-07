@@ -232,7 +232,7 @@ class AdminOrdersControllerCore extends AdminController
         $this->addJqueryPlugin(array('autocomplete', 'fancybox', 'typewatch'));
 
         $defaults_order_state = array(
-            'awating' => (int)Configuration::get('PS_OS_AWATING'),
+            'awaiting' => (int)Configuration::get('PS_OS_AWAITING'),
             'other' => (int)Configuration::get('PS_OS_PAYMENT'));
         $payment_modules = array();
         foreach (PaymentModule::getInstalledPaymentModules() as $p_module) {

@@ -2,7 +2,7 @@
 <entity_order_state>
   <order_state id='Awaiting'>
     <name>অপেক্ষমান পেমেন্ট</name>
-    <template>awating</template>
+    <template>awaiting</template>
   </order_state>
   <order_state id='Payment_accepted'>
     <name>পেমেন্ট গৃহীত </name>

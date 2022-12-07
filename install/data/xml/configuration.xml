@@ -374,7 +374,7 @@
 	<configuration id="PS_BACKUP_DROP_TABLE" name="PS_BACKUP_DROP_TABLE">
 		<value>1</value>
 	</configuration>
-	<configuration id="PS_OS_AWATING" name="PS_OS_AWATING">
+	<configuration id="PS_OS_AWAITING" name="PS_OS_AWAITING">
 		<value>1</value>
 	</configuration>
 	<configuration id="PS_OS_PAYMENT" name="PS_OS_PAYMENT">
@@ -410,7 +410,7 @@
 	<!-- <configuration id="PS_OS_PAYPAL" name="PS_OS_PAYPAL">
 		<value>9</value>
 	</configuration> -->
-	<configuration id="PS_OS_AWATING_REMOTE_PAYMENT" name="PS_OS_AWATING_REMOTE_PAYMENT">
+	<configuration id="PS_OS_AWAITING_REMOTE_PAYMENT" name="PS_OS_AWAITING_REMOTE_PAYMENT">
 		<value>9</value>
 	</configuration>
 	<configuration id="PS_OS_WS_PAYMENT" name="PS_OS_WS_PAYMENT">

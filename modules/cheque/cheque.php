@@ -74,7 +74,7 @@ class Cheque extends PaymentModule
 
 	public function getMailContent($id_order_state, $id_lang)
 	{
-        if (Configuration::get('PS_OS_AWATING') == $id_order_state) {
+        if (Configuration::get('PS_OS_AWAITING') == $id_order_state) {
 			$this->context->smarty->assign(array(
 				'cheque_name' => Configuration::get('CHEQUE_NAME'),
 				'cheque_address' => Configuration::get('CHEQUE_ADDRESS'),
@@ -193,7 +193,7 @@ class Cheque extends PaymentModule
         if (in_array(
 			$orderState,
 			array(
-				Configuration::get('PS_OS_AWATING')
+				Configuration::get('PS_OS_AWAITING')
 			)
 		)) {
 			$objCart = new Cart($objOrder->id_cart);

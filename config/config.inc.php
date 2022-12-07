@@ -238,7 +238,7 @@ $context->link = new Link($https_link, $https_link);
  * USE : Configuration::get() method in order to getting the id of order status
  */
 
-define('_PS_OS_AWATING_', Configuration::get('PS_OS_AWATING'));
+define('_PS_OS_AWAITING_', Configuration::get('PS_OS_AWAITING'));
 define('_PS_OS_PAYMENT_', Configuration::get('PS_OS_PAYMENT'));
 define('_PS_OS_PROCESSING_', Configuration::get('PS_OS_PROCESSING'));
 define('_PS_OS_CANCELED_', Configuration::get('PS_OS_CANCELED'));

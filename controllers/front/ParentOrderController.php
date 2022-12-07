@@ -182,7 +182,7 @@ class ParentOrderControllerCore extends FrontController
 
             // order status payment accepted if no amount is pending for the booking
             if ($dueAmount > 0) {
-                $orderStatus = Configuration::get('PS_OS_AWATING');
+                $orderStatus = Configuration::get('PS_OS_AWAITING');
             } else {
                 $orderStatus = Configuration::get('PS_OS_PAYMENT');
             }

@@ -2,7 +2,7 @@
 <entity_order_state>
   <order_state id="Awaiting">
     <name>Đang chờ thanh toán</name>
-    <template>awating</template>
+    <template>awaiting</template>
   </order_state>
   <order_state id="Payment_accepted">
     <name>Thanh toán được chấp nhận</name>
