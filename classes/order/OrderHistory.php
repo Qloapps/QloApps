@@ -326,6 +326,8 @@ class OrderHistoryCore extends ObjectModel
                         && $order->total_paid_real < $order->advance_paid_amount
                     ) {
                         $rest_paid =  $order->advance_paid_amount - $order->total_paid_real;
+                    } else {
+                        break;
                     }
                     $payment = new OrderPayment();
                     $payment->order_reference = Tools::substr($order->reference, 0, 9);
