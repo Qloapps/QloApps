@@ -25,9 +25,7 @@
 
 <!--  TAX DETAILS -->
 
-{if $tax_exempt}
-	{l s='Exempt of VAT according to section 259B of the General Tax Code.' pdf='true'}
-{elseif (isset($tax_breakdowns) && $tax_breakdowns)}
+{if (isset($tax_breakdowns) && $tax_breakdowns)}
 	{assign var=th_rows value=3}
 	{if isset($showTaxName) && $showTaxName}
 		{assign var=th_rows value=$th_rows+1}

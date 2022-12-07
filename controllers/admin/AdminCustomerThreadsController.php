@@ -509,19 +509,13 @@ class AdminCustomerThreadsControllerCore extends AdminController
         $time = time();
         $kpis = array();
 
-        /* The data generation is located in AdminStatsControllerCore */
-
         $helper = new HelperKpi();
         $helper->id = 'box-pending-messages';
         $helper->icon = 'icon-envelope';
         $helper->color = 'color1';
         $helper->href = $this->context->link->getAdminLink('AdminCustomerThreads');
         $helper->title = $this->l('Pending Discussion Threads', null, null, false);
-        if (ConfigurationKPI::get('PENDING_MESSAGES') !== false) {
-            $helper->value = ConfigurationKPI::get('PENDING_MESSAGES');
-        }
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=pending_messages';
-        $helper->refresh = (bool)(ConfigurationKPI::get('PENDING_MESSAGES_EXPIRE') < $time);
         $kpis[] = $helper->generate();
 
         $helper = new HelperKpi();
@@ -530,11 +524,7 @@ class AdminCustomerThreadsControllerCore extends AdminController
         $helper->color = 'color2';
         $helper->title = $this->l('Average Response Time', null, null, false);
         $helper->subtitle = $this->l('30 days', null, null, false);
-        if (ConfigurationKPI::get('AVG_MSG_RESPONSE_TIME') !== false) {
-            $helper->value = ConfigurationKPI::get('AVG_MSG_RESPONSE_TIME');
-        }
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=avg_msg_response_time';
-        $helper->refresh = (bool)(ConfigurationKPI::get('AVG_MSG_RESPONSE_TIME_EXPIRE') < $time);
         $kpis[] = $helper->generate();
 
         $helper = new HelperKpi();
@@ -543,11 +533,7 @@ class AdminCustomerThreadsControllerCore extends AdminController
         $helper->color = 'color3';
         $helper->title = $this->l('Messages per Thread', null, null, false);
         $helper->subtitle = $this->l('30 day', null, null, false);
-        if (ConfigurationKPI::get('MESSAGES_PER_THREAD') !== false) {
-            $helper->value = ConfigurationKPI::get('MESSAGES_PER_THREAD');
-        }
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=messages_per_thread';
-        $helper->refresh = (bool)(ConfigurationKPI::get('MESSAGES_PER_THREAD_EXPIRE') < $time);
         $kpis[] = $helper->generate();
 
         $helper = new HelperKpiRow();

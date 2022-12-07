@@ -52,7 +52,6 @@ class DashPerformance extends Module
     public function hookActionAdminControllerSetMedia()
     {
         if (get_class($this->context->controller) == 'AdminDashboardController') {
-            $this->context->controller->addJs($this->_path.'views/js/'.$this->name.'.js');
             $this->context->controller->addCSS($this->_path.'views/css/'.$this->name.'.css');
         }
     }

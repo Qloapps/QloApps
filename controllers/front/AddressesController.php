@@ -85,7 +85,6 @@ class AddressesControllerCore extends FrontController
 
         $addresses_style = array(
             'company' => 'address_company',
-            'vat_number' => 'address_company',
             'firstname' => 'address_name',
             'lastname' => 'address_name',
             'address1' => 'address_address1',

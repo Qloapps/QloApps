@@ -21,13 +21,15 @@
 if (!defined('_PS_VERSION_')) {
     exit;
 }
+
 include_once 'define.php';
 
-class hotelreservationsystem extends Module
+class HotelReservationSystem extends Module
 {
     public function __construct()
     {
         $this->name = 'hotelreservationsystem';
+        $this->tab = 'administration';
         $this->version = '1.4.3';
         $this->author = 'Webkul';
         $this->need_instance = 0;
@@ -475,7 +477,6 @@ class hotelreservationsystem extends Module
             || !$this->registerModuleHooks()
             || !$this->callInstallTab()
             || !$objHtlHelper->insertDefaultHotelEntries()
-            || !$objHtlHelper->insertHotelRoomAllotmentType()
         ) {
             return false;
         }

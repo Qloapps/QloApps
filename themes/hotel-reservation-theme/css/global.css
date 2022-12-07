@@ -5794,10 +5794,17 @@ header {
     max-height: 100%; }
     header .banner .row {
       margin: 0px; }
-  header .nav {
-    background-color: none; }
-    header .nav .row {
+    header #nav-main {
+      background-color: #333;
+      color: #fff; }
+    header #nav-main nav > div {
+      display: inline-block;
+      padding: 8px 0; }
+    header .nav .row,
+    header #nav-main .row {
       margin: 0px; }
+    #nav-main .nav-main-item-right:not(:last-of-type) {
+      margin-left: 24px; }
     header .nav nav {
       width: 100%; }
   header .row {
@@ -7385,8 +7392,6 @@ div.star a:hover {
             padding-right: 12px;
             float: left;
             color: #908f8f; }
-    .footer-container #footer .blockcategories_footer {
-      clear: left; }
     .footer-container #footer #social_block {
       /* By Webkul */
       /*display: table;
@@ -8428,9 +8433,6 @@ div.star.star_hover:after {
   width: 191px;
   margin-bottom: 1em;
   text-align: center; }
-
-.blockcategories_footer ul ul {
-  display: none !important; }
 
 .form-group.form-error input, .form-group.form-error textarea {
   border: 1px solid #f13340;

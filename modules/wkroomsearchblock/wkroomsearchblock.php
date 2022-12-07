@@ -74,14 +74,14 @@ class WkRoomSearchBlock extends Module
 
         // apply assets as per pages
         if ('category' == $controller) {
-            $this->context->controller->addCSS(_PS_MODULE_DIR_.$this->name.'/views/css/wk-category-search.css');
+            $this->context->controller->addCSS($this->_path.'views/css/wk-category-search.css');
         }
         if ('index' == $controller) {
-            $this->context->controller->addCSS(_PS_MODULE_DIR_.$this->name.'/views/css/wk-landing-page-search.css');
+            $this->context->controller->addCSS($this->_path.'views/css/wk-landing-page-search.css');
         }
         if ('product' == $controller) {
-            $this->context->controller->addCSS(_PS_MODULE_DIR_.$this->name.'/views/css/wk-roomtype-search.css');
-            $this->context->controller->addJS(_PS_MODULE_DIR_.$this->name.'/views/js/wk-roomtype-search.js');
+            $this->context->controller->addCSS($this->_path.'views/css/wk-roomtype-search.css');
+            $this->context->controller->addJS($this->_path.'views/js/wk-roomtype-search.js');
         }
     }
 

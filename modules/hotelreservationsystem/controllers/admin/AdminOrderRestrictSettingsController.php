@@ -87,7 +87,8 @@ class AdminOrderRestrictSettingsController extends ModuleAdminController
             'max_order_date' => array(
                 'title' => $this->l('Maximum Booking Date'),
                 'type' => 'datetime',
-                'align' => 'center'
+                'align' => 'center',
+                'type' => 'date',
             ),
             'enable_preperation_time_badge' => array(
                 'title' => $this->l('Preperation time enabled'),

@@ -218,6 +218,8 @@ class CategoryControllerCore extends FrontController
 
     public function displayAjaxFilterResults()
     {
+        $response = array('status' => false);
+
         $this->display_header = false;
         $this->display_footer = false;
 
@@ -286,9 +288,13 @@ class CategoryControllerCore extends FrontController
 
                 array_multisort($indi_arr, $direction, $booking_data['rm_data']);
             }
+
             $this->context->smarty->assign(array('booking_data' => $booking_data));
+            $html = $this->context->smarty->fetch('_partials/room_type_list.tpl');
+            $response['status'] = true;
+            $response['html_room_type_list'] = $html;
         }
-        die($this->context->smarty->fetch(_PS_THEME_DIR_.'_partials/room_type_list.tpl'));
+        $this->ajaxDie(json_encode($response));
     }
 
     /**
