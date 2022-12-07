@@ -357,8 +357,10 @@ abstract class PaymentModuleCore extends Module
                     $order->is_advance_payment = $this->context->cart->is_advance_payment;
                     if ($order->is_advance_payment) {
                         $order->advance_paid_amount = (float)Tools::ps_round((float)$this->context->cart->getOrderTotal(true, Cart::ADVANCE_PAYMENT, $order->product_list, $id_carrier), _PS_PRICE_COMPUTE_PRECISION_);
+                        $order->real_paid_amount = ($order->advance_paid_amount * $amount_paid) / (float)Tools::ps_round((float)$this->context->cart->getOrderTotal(true, Cart::ADVANCE_PAYMENT, null, $id_carrier));
                     } else {
                         $order->advance_paid_amount = (float)Tools::ps_round((float)$this->context->cart->getOrderTotal(true, Cart::BOTH, $order->product_list, $id_carrier), _PS_PRICE_COMPUTE_PRECISION_);
+                        $order->real_paid_amount = ($order->advance_paid_amount * $amount_paid) / (float)Tools::ps_round((float)$this->context->cart->getOrderTotal(true, Cart::BOTH, null, $id_carrier));
                     }
 
                     // Creating order
@@ -373,7 +375,7 @@ abstract class PaymentModuleCore extends Module
                     // We don't use the following condition to avoid the float precision issues : http://www.php.net/manual/en/language.types.float.php
                     // if ($order->total_paid != $order->total_paid_real)
                     // We use number_format in order to compare two string
-                    if ($order_status->logable && number_format($cart_total_paid, _PS_PRICE_COMPUTE_PRECISION_) != number_format($amount_paid, _PS_PRICE_COMPUTE_PRECISION_)) {
+                    if ($order_status->logable && number_format($cart_total_paid, _PS_PRICE_COMPUTE_PRECISION_) != number_format($amount_paid, _PS_PRICE_COMPUTE_PRECISION_) && $this->name != 'cheque') {
                         // if customer is paying full payment amount
                         $id_order_state = Configuration::get('PS_OS_ERROR');
                     }
@@ -437,7 +439,7 @@ abstract class PaymentModuleCore extends Module
                 }
 
                 foreach($order_list as $order) {
-                    $order->addOrderPaymentDetail($order->advance_paid_amount);
+                    $order->addOrderPaymentDetail($order->real_paid_amount);
                 }
             }
 
