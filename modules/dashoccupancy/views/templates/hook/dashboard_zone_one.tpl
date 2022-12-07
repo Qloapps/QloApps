@@ -84,8 +84,3 @@
 		<svg></svg>
 	</div>
 </section>
-
-<script type='text/javascript'>
-	date_occupancy_range = '{$date_occupancy_range|escape:'html':'UTF-8'}';
-	date_occupancy_avail_format = '{$date_occupancy_avail_format|escape:'html':'UTF-8'}';
-</script>

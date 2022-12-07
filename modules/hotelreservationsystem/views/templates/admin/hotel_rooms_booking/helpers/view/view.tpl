@@ -215,7 +215,7 @@
 												{foreach from=$book_v['data']['available'] key=avai_k item=avai_v}
 													<tr>
 														<td>{$avai_v['room_num']|escape:'htmlall':'UTF-8'}</td>
-														<td>{$date_from|escape:'htmlall':'UTF-8'|date_format:'%d-%m-%Y'} - {$date_to|escape:'htmlall':'UTF-8'|date_format:'%d-%m-%Y'}</td>
+														<td>{dateFormat date=date('Y-m-d', strtotime($date_from))} - {dateFormat date=date('Y-m-d', strtotime($date_to))}</td>
 														<td>{$avai_v['room_comment']|escape:'htmlall':'UTF-8'}</td>
 														<td>
 															{foreach $allotment_types as $allotment_type}
@@ -255,7 +255,7 @@
 																{foreach from=$part_v['avai_dates'] key=sub_part_k item=sub_part_v}
 																	<tr>
 																		<td class="text-center">
-																			<p>{$sub_part_v['date_from']|escape:'htmlall':'UTF-8'|date_format:'%d-%m-%Y'} - {$sub_part_v['date_to']|escape:'htmlall':'UTF-8'|date_format:'%d-%m-%Y'}</p>
+																		<p>{dateFormat date=date('Y-m-d', strtotime($sub_part_v['date_from']))} - {dateFormat date=date('Y-m-d', strtotime($sub_part_v['date_to']))}</p>
 																		</td>
 																		<td class="text-left">
 																			{foreach $allotment_types as $allotment_type}
@@ -299,7 +299,7 @@
 															<table class="table">
 																{foreach from=$booked_v['detail'] key=rm_dtl_k item=rm_dtl_v}
 																	<tr>
-																		<td class="col-xs-3">{$rm_dtl_v['date_from']|escape:'htmlall':'UTF-8'|date_format:'%d-%m-%Y'} - {$rm_dtl_v['date_to']|escape:'htmlall':'UTF-8'|date_format:'%d-%m-%Y'}</td>
+																	<td class="col-xs-3">{dateFormat date=date('Y-m-d', strtotime($rm_dtl_v['date_from']))} - {dateFormat date=date('Y-m-d', strtotime($rm_dtl_v['date_to']))}</td>
 																		<td class="col-xs-3">{$rm_dtl_v['comment']|escape:'htmlall':'UTF-8'}</td>
 																		<td class="col-xs-3">
 																			{if $rm_dtl_v['booking_type'] == HotelBookingDetail::ALLOTMENT_AUTO}{l s='Auto Allotment' mod='hotelreservationsystem'}{elseif $rm_dtl_v['booking_type'] == HotelBookingDetail::ALLOTMENT_MANUAL}{l s='Manual Allotment' mod='hotelreservationsystem'}{/if}
@@ -368,10 +368,10 @@
 						<table class="table table-responsive addtocart-table">
 							<thead class="cart-table-thead">
 								<tr>
-									<th>{l s='Room No.' mod='hotelreservationsystem'}</th>
-									<th>{l s='Room Type' mod='hotelreservationsystem'}</th>
-									<th>{l s='Duration' mod='hotelreservationsystem'}</th>
-									<th>{l s='Amount (Tax excl.)' mod='hotelreservationsystem'}</th>
+									<th class="text-center">{l s='Room No.' mod='hotelreservationsystem'}</th>
+									<th class="text-center">{l s='Room Type' mod='hotelreservationsystem'}</th>
+									<th class="text-center">{l s='Duration' mod='hotelreservationsystem'}</th>
+									<th class="text-center">{l s='Amount (Tax excl.)' mod='hotelreservationsystem'}</th>
 									<th></th>
 								</tr>
 							</thead>
@@ -379,13 +379,11 @@
 							{if isset($cart_bdata)}
 								{foreach $cart_bdata as $cart_data}
 									<tr>
-										<td>{$cart_data['room_num']|escape:'htmlall':'UTF-8'}</td>
-										<td>{$cart_data['room_type']|escape:'htmlall':'UTF-8'}</td>
-										<td>
-											{$cart_data['date_from']|escape:'htmlall':'UTF-8'|date_format:'%d-%m-%Y'} - {$cart_data['date_to']|escape:'htmlall':'UTF-8'|date_format:'%d-%m-%Y'}
-										</td>
-										<td>{convertPrice price=$cart_data['amt_with_qty']}</td>
-										<td><button class="btn btn-default ajax_cart_delete_data" data-id-product="{$cart_data['id_product']|escape:'htmlall':'UTF-8'}" data-id-hotel="{$cart_data['id_hotel']|escape:'htmlall':'UTF-8'}" data-id-cart="{$cart_data['id_cart']|escape:'htmlall':'UTF-8'}" data-id-cart-book-data="{$cart_data['id_cart_book_data']|escape:'htmlall':'UTF-8'}" data-date-from="{$cart_data['date_from']|escape:'htmlall':'UTF-8'}" data-date-to="{$cart_data['date_to']|escape:'htmlall':'UTF-8'}"><i class='icon-trash'></i></button></td>
+										<td class="text-center">{$cart_data['room_num']|escape:'htmlall':'UTF-8'}</td>
+										<td class="text-center">{$cart_data['room_type']|escape:'htmlall':'UTF-8'}</td>
+										<td class="text-center">{dateFormat date=$cart_data['date_from']} - {dateFormat date=$cart_data['date_to']}</td>
+										<td class="text-center">{convertPrice price=$cart_data['amt_with_qty']}</td>
+										<td class="text-center"><button class="btn btn-default ajax_cart_delete_data" data-id-product="{$cart_data['id_product']|escape:'htmlall':'UTF-8'}" data-id-hotel="{$cart_data['id_hotel']|escape:'htmlall':'UTF-8'}" data-id-cart="{$cart_data['id_cart']|escape:'htmlall':'UTF-8'}" data-id-cart-book-data="{$cart_data['id_cart_book_data']|escape:'htmlall':'UTF-8'}" data-date-from="{$cart_data['date_from']|escape:'htmlall':'UTF-8'}" data-date-to="{$cart_data['date_to']|escape:'htmlall':'UTF-8'}"><i class='icon-trash'></i></button></td>
 									</tr>
 								{/foreach}
 							{/if}
@@ -395,7 +393,7 @@
 					<div class="row cart_amt_div">
 						<table class="table table-responsive">
 							<tr>
-								<th colspan="2">{l s='Total Amount' mod='hotelreservationsystem'}</th>
+								<th colspan="2">{l s='Total Amount (Tax incl.):' mod='hotelreservationsystem'}</th>
 								<th colspan="2" class="text-right" id="cart_total_amt">
 									{if isset($cart_tamount)}{convertPrice price=$cart_tamount}{else}0{/if}
 								</th>
@@ -520,9 +518,6 @@
 	{addJsDefL name=add_to_cart}{l s='Add To Cart' js=1 mod='hotelreservationsystem'}{/addJsDefL}
 	{addJsDefL name=remove}{l s='Remove' js=1 mod='hotelreservationsystem'}{/addJsDefL}
 	{addJsDefL name=noRoomTypeAvlTxt}{l s='No room type available.' js=1 mod='hotelreservationsystem'}{/addJsDefL}
-
-	{addJsDef currency_prefix = $currency->prefix}
-	{addJsDef currency_suffix = $currency->suffix}
 
 	{addJsDef currency_sign = $currency->sign}
 	{addJsDef currency_format = $currency->format}

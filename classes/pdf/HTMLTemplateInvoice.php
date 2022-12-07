@@ -410,7 +410,6 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
                             $cart_htl_data[$type_key]['date_diff'][$date_join]['amount'] += $data_v['total_price_tax_excl'];
 
                             // For order refund
-                            $cart_htl_data[$type_key]['date_diff'][$date_join]['stage_name'] = $stage_name;
                             $cart_htl_data[$type_key]['date_diff'][$date_join]['id_room'] = $data_v['id_room'];
                         } else {
                             $cart_htl_data[$type_key]['date_diff'][$date_join]['extra_demands'] = $objBookingDemand->getRoomTypeBookingExtraDemands(
@@ -455,7 +454,6 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
                             $cart_htl_data[$type_key]['date_diff'][$date_join]['amount'] = $data_v['total_price_tax_excl'];
 
                             // For order refund
-                            $cart_htl_data[$type_key]['date_diff'][$date_join]['stage_name'] = $stage_name;
                             $cart_htl_data[$type_key]['date_diff'][$date_join]['id_room'] = $data_v['id_room'];
                             $totalDemandsPriceTE += $cart_htl_data[$type_key]['date_diff'][$date_join]['extra_demands_price_te'];
                             $totalDemandsPriceTI += $cart_htl_data[$type_key]['date_diff'][$date_join]['extra_demands_price_ti'];
