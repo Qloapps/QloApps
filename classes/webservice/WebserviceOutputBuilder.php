@@ -627,11 +627,11 @@ class WebserviceOutputBuilderCore
                 $output_details = '';
                 foreach ($objects_assoc as $object_assoc) {
                     if ($depth == 0 || $class_name === null) {
-                        $value = null;
-                        if (!empty($object_assoc)) {
-                            $value = $object_assoc;
+                        if (empty($object_assoc)) {
+                            continue;
                         }
-                        if (empty($fields_assoc)) {
+                        $value = $object_assoc;
+                        if (empty($fields_assoc) && !empty($value['id'])) {
                             $fields_assoc = array(array('id' => $value['id']));
                         }
                         $output_details .= $this->renderFlatAssociation($object, $depth, $assoc_name, $association['resource'], $fields_assoc, $value, $parent_details);
@@ -676,13 +676,14 @@ class WebserviceOutputBuilderCore
 
         foreach ($fields_assoc as $field_name => $field) {
             if (!is_array($this->fieldsToDisplay) || in_array($field_name, $this->fieldsToDisplay[$assoc_name])) {
-                if ($field_name == 'id' && !isset($field['sqlId'])) {
+                if (isset($field['id']) && !isset($field['sqlId'])) {
                     $field['sqlId'] = 'id';
-                    $field['value'] = $object_assoc['id'];
+                    $field['value'] = isset($object_assoc['id']) ? $object_assoc['id'] : null;
                 } elseif (!isset($field['sqlId'])) {
                     $field['sqlId'] = $field_name;
-                    $field['value'] = $object_assoc[$field_name];
+                    $field['value'] = isset($object_assoc[$field_name]) ? $object_assoc[$field_name] : null;
                 }
+
                 $field['entities_name'] = $assoc_name;
                 $field['entity_name'] = $resource_name;
 

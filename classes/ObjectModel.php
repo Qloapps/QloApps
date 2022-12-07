@@ -1007,7 +1007,19 @@ abstract class ObjectModelCore implements Core_Foundation_Database_EntityInterfa
         // Check if field is required
         $required_fields = (isset(self::$fieldsRequiredDatabase[get_class($this)])) ? self::$fieldsRequiredDatabase[get_class($this)] : array();
         if (!$id_lang || $id_lang == $ps_lang_default) {
-            if (!in_array('required', $skip) && (!empty($data['required']) || in_array($field, $required_fields))) {
+            // if validation is being done for webservice request then check if that field is required in webservice parameters or not
+            $isWebserviceFieldRequired  = true;
+            if (isset($this->webservice_validation) && $this->webservice_validation) {
+                $webserviceParams = $this->getWebserviceParameters();
+                if (isset($webserviceParams['fields'][$field]['required']) && !$webserviceParams['fields'][$field]['required']) {
+                    $isWebserviceFieldRequired = false;
+                }
+            }
+
+            if (!in_array('required', $skip)
+                && (!empty($data['required']) || in_array($field, $required_fields))
+                && $isWebserviceFieldRequired
+            ) {
                 if (Tools::isEmpty($value)) {
                     if ($human_errors) {
                         return sprintf(Tools::displayError('The %s field is required.'), $this->displayFieldName($field, get_class($this)));
@@ -1251,7 +1263,10 @@ abstract class ObjectModelCore implements Core_Foundation_Database_EntityInterfa
             } else {
                 $current_field['i18n'] = false;
             }
-            if ((isset($details['required']) && $details['required'] === true) || in_array($field_name, $required_fields)) {
+            // For webservice request then check if that field is required in webservice parameters or not to set this 'required'
+            if (((isset($details['required']) && $details['required'] === true) || in_array($field_name, $required_fields))
+                && (!isset($resource_parameters['fields'][$field_name]['required']) || $resource_parameters['fields'][$field_name]['required'])
+            ) {
                 $current_field['required'] = true;
             } else {
                 $current_field['required'] = false;

@@ -256,6 +256,7 @@ class OrderCore extends ObjectModel
         'fields' => array(
             'id_address_delivery' => array('xlink_resource'=> 'addresses'),
             'id_address_invoice' => array('xlink_resource'=> 'addresses'),
+            'id_address_tax' => array('xlink_resource'=> 'addresses', 'required' => false),
             'id_cart' => array('xlink_resource'=> 'carts'),
             'id_currency' => array('xlink_resource'=> 'currencies'),
             'id_lang' => array('xlink_resource'=> 'languages'),
@@ -264,12 +265,16 @@ class OrderCore extends ObjectModel
                 'xlink_resource'=> 'order_states',
                 'setter' => 'setWsCurrentState'
             ),
-            'module' => array('required' => true),
+            'module' => array('required' => false),
             'invoice_number' => array(),
             'invoice_date' => array(),
             'valid' => array(),
             'date_add' => array(),
             'date_upd' => array(),
+            'transaction_id' => array(
+                'getter' => false,
+                'setter' => 'setWsTransactionId'
+            ),
         ),
         'hidden_fields' => array (
             'total_shipping',
@@ -1605,11 +1610,33 @@ class OrderCore extends ObjectModel
     public function addWs($autodate = true, $null_values = false)
     {
         /** @var PaymentModule $payment_module */
-        $payment_module = Module::getInstanceByName($this->module);
-        $payment_module->orderSource = $this->source;
+        $paymentModule = new WebserviceOrder();
+        $paymentModule->orderSource = $this->source;
         $customer = new Customer($this->id_customer);
-        $payment_module->validateOrder($this->id_cart, Configuration::get('PS_OS_WS_PAYMENT'), $this->total_paid, $this->payment, null, array(), null, false, $customer->secure_key);
-        $this->id = $payment_module->currentOrder;
+
+        $extraVars = array();
+        $extraVars['transaction_id'] = $this->transaction_id;
+
+        if ($this->total_paid_real > 0) {
+            $orderStatus = Configuration::get('PS_OS_WS_PAYMENT');
+        } else {
+            $orderStatus = Configuration::get('PS_OS_AWAITING_REMOTE_PAYMENT');
+        }
+
+        $paymentModule->validateOrder(
+            $this->id_cart,
+            $orderStatus,
+            $this->total_paid,
+            $paymentModule->displayName,
+            'Order created by API request',
+            $extraVars,
+            null,
+            false,
+            $customer->secure_key
+        );
+
+        $this->id = $paymentModule->currentOrder;
+
         return true;
     }
 
@@ -2525,5 +2552,10 @@ class OrderCore extends ObjectModel
         return Db::getInstance()->executeS(
             'SELECT `id` FROM `'._DB_PREFIX_.'htl_booking_detail` WHERE `id_order` = '.(int)$this->id.' ORDER BY `id` ASC'
         );
+    }
+
+    public function setWsTransactionId($transactionId)
+    {
+        $this->transaction_id = $transactionId;
     }
 }
