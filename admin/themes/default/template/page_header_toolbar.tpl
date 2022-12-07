@@ -105,7 +105,6 @@
 					</li>
 					{/if} *}
 				</ul>
-				{if (isset($tab_modules_open) && $tab_modules_open) || isset($tab_modules_list)}
 				<script type="text/javascript">
 				//<![CDATA[
 					var modules_list_loaded = false;
@@ -116,15 +115,12 @@
 
 						});
 					{/if}
-					{if isset($tab_modules_list)}
-						$('.process-icon-modules-list').parent('a').unbind().bind('click', function (){
-							$('#modules_list_container').modal('show');
-							openModulesList();
-						});
-					{/if}
+					$('.process-icon-modules-list').parent('a').unbind().bind('click', function (){
+						$('#modules_list_container').modal('show');
+						openModulesList();
+					});
 				//]]>
 				</script>
-				{/if}
 			</div>
 		</div>
 		{/block}

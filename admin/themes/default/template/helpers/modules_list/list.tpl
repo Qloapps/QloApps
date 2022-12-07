@@ -37,7 +37,7 @@
 						{counter}
 					{/foreach}
 				</table>
-				{if $controller_name == 'AdminPayment' && isset($view_all)}
+				{* {if $controller_name == 'AdminPayment' && isset($view_all)}
 					<div class="panel-footer">
 						<div class="col-lg-4 col-lg-offset-4">
 							<a class="btn btn-default btn-block" href="index.php?tab=AdminModules&amp;token={getAdminToken tab='AdminModules'}&amp;filterCategory=payments_gateways">
@@ -46,7 +46,7 @@
 							</a>
 						</div>
 					</div>
-				{/if}
+				{/if} *}
 			{else}
 				<table class="table">
 					<tr>
