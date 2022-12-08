@@ -1180,7 +1180,7 @@ var BookingForm = {
         $("#room_check_in").datepicker({
             showOtherMonths: true,
             dateFormat: 'dd-mm-yy',
-            minDate: 0,
+            minDate: preparation_time,
             beforeShow: function (input, instance) {
                 // So that on translating page date is translated to NaN-NaN-NaN
                 $('.ui-datepicker').addClass('notranslate');
@@ -1215,6 +1215,7 @@ var BookingForm = {
         $("#room_check_out").datepicker({
             showOtherMonths: true,
             dateFormat: 'dd-mm-yy',
+            minDate: preparation_time + 1,
             beforeShow: function (input, instance) {
                 // So that on translating page date is translated to NaN-NaN-NaN
                 $('.ui-datepicker').addClass('notranslate');

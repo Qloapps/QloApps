@@ -269,6 +269,49 @@
 							{/foreach}
 						</div>
 					</div>
+					<div class="form-group">
+						<label class="control-label col-lg-3">
+							<span>{l s='Use Global Maximum Order date :' mod='hotelreservationsystem'}</span>
+						</label>
+						<div class="col-lg-6">
+							<span class="switch prestashop-switch fixed-width-lg">
+								<input type="radio" {if isset($edit)}{if isset($order_restrict_date_info.use_global_max_order_date) && $order_restrict_date_info.use_global_max_order_date} checked="checked" {/if}{else} checked="checked"  {/if} value="1" id="ENABLE_USE_GLOBAL_MAX_ORDER_DATE_on" name="ENABLE_USE_GLOBAL_MAX_ORDER_DATE">
+								<label for="ENABLE_USE_GLOBAL_MAX_ORDER_DATE_on">{l s='Yes'}</label>
+								<input {if isset($edit) && isset($order_restrict_date_info.use_global_max_order_date) && !$order_restrict_date_info.use_global_max_order_date} checked="checked" {/if} type="radio" value="0" id="ENABLE_USE_GLOBAL_MAX_ORDER_DATE_off" name="ENABLE_USE_GLOBAL_MAX_ORDER_DATE">
+								<label for="ENABLE_USE_GLOBAL_MAX_ORDER_DATE_off">{l s='No'}</label>
+								<a class="slide-button btn"></a>
+							</span>
+						</div>
+					</div>
+					<div class="form-group" {if isset($smarty.post.ENABLE_USE_GLOBAL_MAX_ORDER_DATE)}{if !$smarty.post.ENABLE_USE_GLOBAL_MAX_ORDER_DATE}style="display:block;"{else}style="display:none;"{/if}{elseif isset($order_restrict_date_info.use_global_max_order_date) && !$order_restrict_date_info.use_global_max_order_date}style="display:block;" {else} style="display:none;" {/if}>
+						<label class="control-label col-sm-3 required" for="maximum_booking_date">{l s='Maximum Date to book a room :' mod='hotelreservationsystem'}</label>
+						<div class="col-sm-2">
+							<input type="text" class="form-control" id="maximum_booking_date" name="maximum_booking_date" value="{if isset($smarty.post.maximum_booking_date)}{$smarty.post.maximum_booking_date|escape:'html':'UTF-8'}{elseif isset($edit) && isset($order_restrict_date_info.max_order_date)}{$order_restrict_date_info.max_order_date|escape:'htmlall':'UTF-8'}{/if}" />
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="control-label col-lg-3">
+							<span>{l s='Use Global preparation time :' mod='hotelreservationsystem'}</span>
+						</label>
+						<div class="col-lg-6">
+							<span class="switch prestashop-switch fixed-width-lg">
+								<input type="radio" {if isset($edit) && isset($order_restrict_date_info.use_global_preparation_time) && $order_restrict_date_info.use_global_preparation_time} checked="checked" {else} checked="checked" {/if} value="1" id="ENABLE_USE_GLOBAL_PREPARATION_TIME_on" name="ENABLE_USE_GLOBAL_PREPARATION_TIME">
+								<label for="ENABLE_USE_GLOBAL_PREPARATION_TIME_on">{l s='Yes'}</label>
+								<input {if isset($edit) && isset($order_restrict_date_info.use_global_preparation_time) && !$order_restrict_date_info.use_global_preparation_time} checked="checked" {/if} type="radio" value="0" id="ENABLE_USE_GLOBAL_PREPARATION_TIME_off" name="ENABLE_USE_GLOBAL_PREPARATION_TIME">
+								<label for="ENABLE_USE_GLOBAL_PREPARATION_TIME_off">{l s='No'}</label>
+								<a class="slide-button btn"></a>
+							</span>
+						</div>
+					</div>
+					<div class="form-group" {if isset($smarty.post.ENABLE_USE_GLOBAL_PREPARATION_TIME)}{if !$smarty.post.ENABLE_USE_GLOBAL_PREPARATION_TIME}style="display:block;"{else}style="display:none;"{/if}{elseif isset($order_restrict_date_info.use_global_preparation_time) && !$order_restrict_date_info.use_global_preparation_time}style="display:block;" {else} style="display:none;" {/if}>
+						<label class="control-label col-sm-3 required" for="preparation_time">{l s='Preparation time :' mod='hotelreservationsystem'}</label>
+						<div class="col-sm-2">
+							<input type="text" class="form-control" id="preparation_time" name="preparation_time" value="{if isset($smarty.post.preparation_time)}{$smarty.post.preparation_time|escape:'html':'UTF-8'}{elseif isset($edit) && isset($order_restrict_date_info.preparation_time)}{$order_restrict_date_info.preparation_time|escape:'htmlall':'UTF-8'}{/if}" />
+						</div>
+						<div class="col-lg-9 col-lg-offset-3">
+							<div class="help-block">{l s='Set to 0 to disable this feature.' mod='hotelreservationsystem'}</div>
+						</div>
+					</div>
 					{if isset($enabledDisplayMap) && $enabledDisplayMap}
 						<div class="form-group">
 							<label class="col-sm-3 control-label">{l s='Map:' mod='hotelreservationsystem'}</label>

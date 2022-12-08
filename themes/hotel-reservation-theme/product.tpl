@@ -621,6 +621,7 @@
 			{* By webkul variable needed in product.js *}
 			{addJsDef total_avail_rms = $total_available_rooms}
 			{addJsDef max_order_date = $max_order_date}
+			{addJsDef preparation_time = $preparation_time}
 			{addJsDef booking_date_to = $date_to}
 			{addJsDef booking_date_from = $date_from}
 

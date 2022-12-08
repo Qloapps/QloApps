@@ -323,6 +323,8 @@ class ProductControllerCore extends FrontController
                     }
                 }
                 /*End*/
+                // booking preparation time
+                $preparationTime = HotelOrderRestrictDate::getPreparationTime($hotel_id);
 
                 if (Tools::getValue('error')) {
                     $this->context->smarty->assign('error', Tools::getValue('error'));
@@ -340,6 +342,7 @@ class ProductControllerCore extends FrontController
                     array(
                         'isHotelRefundable' => $hotel_branch_obj->isRefundable(),
                         'max_order_date' => $max_order_date,
+                        'preparation_time' => $preparationTime,
                         'warning_num' => Configuration::get('WK_ROOM_LEFT_WARNING_NUMBER'),
                         'ratting_img_path' => _MODULE_DIR_.'hotelreservationsystem/views/img/Slices/icons-sprite.png',
                         'total_available_rooms' => $total_available_rooms,
