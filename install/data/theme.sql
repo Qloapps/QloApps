@@ -130,6 +130,24 @@ UPDATE `PREFIX_hook_module` SET position = 3
 WHERE id_module = (SELECT id_module FROM `PREFIX_module` WHERE name = 'blockbestsellers')
 AND id_hook IN (@id_hook, @id_hook2);
 
+/* displayLeftColumn */
+SET @id_hook = (SELECT id_hook FROM `PREFIX_hook` WHERE name = 'displayLeftColumn');
+UPDATE `PREFIX_hook_module` SET position = 1
+WHERE id_module = (SELECT id_module FROM `PREFIX_module` WHERE name = 'wkroomsearchblock')
+AND id_hook = @id_hook;
+
+UPDATE `PREFIX_hook_module` SET position = 2
+WHERE id_module = (SELECT id_module FROM `PREFIX_module` WHERE name = 'wkhotelfilterblock')
+AND id_hook = @id_hook;
+
+UPDATE `PREFIX_hook_module` SET position = 3
+WHERE id_module = (SELECT id_module FROM `PREFIX_module` WHERE name = 'blockmyaccount')
+AND id_hook = @id_hook;
+
+UPDATE `PREFIX_hook_module` SET position = 4
+WHERE id_module = (SELECT id_module FROM `PREFIX_module` WHERE name = 'hotelreservationsystem')
+AND id_hook = @id_hook;
+
 /* displayFooter */
 SET @id_hook = (SELECT id_hook FROM `PREFIX_hook` WHERE name = 'displayFooter');
 UPDATE `PREFIX_hook_module` SET position = 1

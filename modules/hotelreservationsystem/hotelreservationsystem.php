@@ -100,6 +100,40 @@ class HotelReservationSystem extends Module
         $this->context->controller->addJS($this->_path.'/views/js/HotelReservationFront.js');
     }
 
+    public function hookDisplayLeftColumn()
+    {
+        if (Tools::getValue('controller') == 'category') {
+            if ($apiKey = Configuration::get('PS_API_KEY')) {
+                $idCategory = Tools::getValue('id_category');
+                $idHotel = HotelBranchInformation::getHotelIdByIdCategory($idCategory);
+                $objHotel = new HotelBranchInformation($idHotel, $this->context->language->id);
+
+                if (floatval($objHotel->latitude) != 0
+                    && floatval($objHotel->longitude) != 0
+                ) {
+                    Media::addJsDef(array(
+                        'hotel_location' => array(
+                            'latitude' => $objHotel->latitude,
+                            'longitude' => $objHotel->longitude,
+                            'map_input_text' => $objHotel->map_input_text,
+                        ),
+                        'hotel_name' => $objHotel->hotel_name,
+                    ));
+
+                    $this->context->controller->addJS(
+                        'https://maps.googleapis.com/maps/api/js?key='.$apiKey.'&libraries=places&language='.
+                        $this->context->language->iso_code.'&region='.$this->context->country->iso_code
+                    );
+                    $this->context->controller->addJS($this->getPathUri().'views/js/searchResultsMap.js');
+                    $this->context->controller->addCSS($this->getPathUri().'views/css/searchResultsMap.css');
+
+                    $this->context->smarty->assign('hotel', $objHotel);
+                    return $this->display(__FILE__, 'searchResultsMap.tpl');
+                }
+            }
+        }
+    }
+
     public function hookDisplayAfterHookTop()
     {
         if (Tools::getValue('controller') == 'index') {
@@ -515,7 +549,8 @@ class HotelReservationSystem extends Module
                 'actionObjectProfileAddAfter',
                 'actionObjectProfileDeleteBefore',
                 'actionObjectGroupDeleteBefore',
-                'actionOrderStatusPostUpdate'
+                'actionOrderStatusPostUpdate',
+                'displayLeftColumn',
             )
         );
     }
