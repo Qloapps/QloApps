@@ -52,7 +52,6 @@ UPDATE `PREFIX_configuration` SET value = 'CAT3,CAT8,CAT5,LNK1' WHERE name = 'MO
 UPDATE `PREFIX_configuration` SET value = '0' WHERE name = 'MOD_BLOCKTOPMENU_SEARCH';
 UPDATE `PREFIX_configuration` SET value = 'https://www.facebook.com/qloapps' WHERE name = 'BLOCKSOCIAL_FACEBOOK';
 UPDATE `PREFIX_configuration` SET value = 'https://twitter.com/qloapps' WHERE name = 'BLOCKSOCIAL_TWITTER';
-UPDATE `PREFIX_configuration` SET value = 'https://plus.google.com/110221570427070809661' WHERE name = 'BLOCKSOCIAL_GOOGLE_PLUS';
 UPDATE `PREFIX_configuration` SET value = 'My Company' WHERE name = 'BLOCKCONTACTINFOS_COMPANY';
 UPDATE `PREFIX_configuration` SET value = '42 Puffin street\n12345 Puffinville\nFrance' WHERE name = 'BLOCKCONTACTINFOS_ADDRESS';
 UPDATE `PREFIX_configuration` SET value = '0123-456-789' WHERE name = 'BLOCKCONTACTINFOS_PHONE';
