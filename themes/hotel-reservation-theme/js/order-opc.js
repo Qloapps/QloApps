@@ -269,32 +269,13 @@ $(document).ready(function()
 						static_token = jsonData.token;
 
 						// It's not a new customer
-						if (PS_CUSTOMER_ADDRESS_CREATION && $('#opc_id_customer').val() !== '0')
-							if (!saveAddress('delivery'))
-								return false;
-
-						// update id_customer
-						$('#opc_id_customer').val(jsonData.id_customer);
-
-						// if ($('#invoice_address:checked').length !== 0)
-						// {
-						// 	if (!saveAddress('invoice'))
-						// 		return false;
-						// }
-
-						// update id_customer
-						$('#opc_id_customer').val(jsonData.id_customer);
-
-						// force to refresh carrier list
-						if (isGuest)
-						{
-							isLogged = 1;
-							$('#opc_account_saved').fadeIn('slow');
-							$('#submitAccount').hide();
-							updateAddressSelection(advApiParam);
+						if (PS_CUSTOMER_ADDRESS_CREATION && $('#opc_id_customer').val() !== '0') {
+							saveAddress('delivery', function() {
+								location.reload();
+							});
 						}
-						else
-							updateNewAccountToAddressBlock(advApiParam);
+
+						location.reload();
 					}
 					//$('#guest-info-block, #opc_new_account-overlay, #opc_delivery_methods-overlay, #opc_payment_methods-overlay').fadeIn('slow');
 				},
@@ -844,7 +825,7 @@ function confirmFreeOrder()
 	});
 }
 
-function saveAddress(type)
+function saveAddress(type, callback)
 {
 	if (type !== 'delivery' && type !== 'invoice')
 		return false;
@@ -881,8 +862,6 @@ function saveAddress(type)
 	// Clean the last &
 	params = params.substr(0, params.length-1);
 
-	var result = false;
-
 	$.ajax({
 		type: 'POST',
 		headers: { "cache-control": "no-cache" },
@@ -912,14 +891,16 @@ function saveAddress(type)
 					});
 				});
 				$('#guest-info-block, #opc_account-overlay, #opc_delivery_methods-overlay, #opc_payment_methods-overlay').fadeOut('slow');
-				result = false;
 			}
 			else
 			{
 				// update addresses id
 				$('input#opc_id_address_delivery').val(jsonData.id_address_delivery);
 				$('input#opc_id_address_invoice').val(jsonData.id_address_invoice);
-				result = true;
+
+				if (typeof callback === 'function') {
+					callback();
+				}
 			}
 		},
 		error: function(XMLHttpRequest, textStatus, errorThrown) {
@@ -943,8 +924,6 @@ function saveAddress(type)
 			$('#guest-info-block, #opc_account-overlay, #opc_delivery_methods-overlay, #opc_payment_methods-overlay').fadeOut('slow');
 		}
 		});
-
-	return result;
 }
 
 function updateNewAccountToAddressBlock(is_adv_api)
