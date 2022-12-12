@@ -449,14 +449,14 @@ class AdminStoresControllerCore extends AdminController
 
         $formFields = array(
             'PS_SHOP_NAME' => array(
-                'title' => $this->l('Shop name'),
+                'title' => $this->l('Website name'),
                 'hint' => $this->l('Displayed in emails and page titles.'),
                 'validation' => 'isGenericName',
                 'required' => true,
                 'type' => 'text',
                 'no_escape' => true,
             ),
-            'PS_SHOP_EMAIL' => array('title' => $this->l('Shop email'),
+            'PS_SHOP_EMAIL' => array('title' => $this->l('Website email'),
                 'hint' => $this->l('Displayed in emails sent to customers.'),
                 'validation' => 'isEmail',
                 'required' => true,
@@ -464,19 +464,19 @@ class AdminStoresControllerCore extends AdminController
             ),
             'PS_SHOP_DETAILS' => array(
                 'title' => $this->l('Registration number'),
-                'hint' => $this->l('Shop registration information (e.g. SIRET or RCS).'),
+                'hint' => $this->l('Website registration information (e.g. SIRET or RCS).'),
                 'validation' => 'isGenericName',
                 'type' => 'textarea',
                 'cols' => 30,
                 'rows' => 5
             ),
             'PS_SHOP_ADDR1' => array(
-                'title' => $this->l('Shop address line 1'),
+                'title' => $this->l('Address line 1'),
                 'validation' => 'isAddress',
                 'type' => 'text'
             ),
             'PS_SHOP_ADDR2' => array(
-                'title' => $this->l('Shop address line 2'),
+                'title' => $this->l('Address line 2'),
                 'validation' => 'isAddress',
                 'type' => 'text'
             ),

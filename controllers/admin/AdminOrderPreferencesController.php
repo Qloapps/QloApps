@@ -75,7 +75,7 @@ class AdminOrderPreferencesControllerCore extends AdminController
                     ),*/
                     'PS_GUEST_CHECKOUT_ENABLED' => array(
                         'title' => $this->l('Enable guest checkout'),
-                        'hint' => $this->l('Allow guest visitors to place an order without registering.'),
+                        'hint' => $this->l('Allow guest visitors to place an order without registration.'),
                         'validation' => 'isBool',
                         'cast' => 'intval',
                         'type' => 'bool'
@@ -120,8 +120,8 @@ class AdminOrderPreferencesControllerCore extends AdminController
                         )
                     ),
                     'PS_CONDITIONS_CMS_ID' => array(
-                        'title' => $this->l('CMS page for the Conditions of use'),
-                        'hint' => $this->l('Choose the CMS page which contains your store\'s conditions of use.'),
+                        'title' => $this->l('CMS page for Terms and Conditions'),
+                        'hint' => $this->l('Choose the CMS page which contains your website\'s Terms and Conditions.'),
                         'validation' => 'isInt',
                         'type' => 'select',
                         'list' => $cms_tab,
@@ -157,8 +157,8 @@ class AdminOrderPreferencesControllerCore extends AdminController
                         'type' => 'bool'
                     ),
                     'PS_ORDER_CONF_MAIL_TO_EMPLOYEE' => array(
-                        'title' => $this->l('Order confirmation mail to employee'),
-                        'hint' => $this->l('Enable, if you want to send order confirmation email to the employees with profiles which have permission to manage the hotel.'),
+                        'title' => $this->l('Order confirmation mail to employees'),
+                        'hint' => $this->l('Enable, if you want to send order confirmation email to employees having permission to manage the hotel.'),
                         'validation' => 'isBool',
                         'cast' => 'intval',
                         'type' => 'bool'
@@ -185,7 +185,7 @@ class AdminOrderPreferencesControllerCore extends AdminController
         $sql = 'SELECT `id_cms` FROM `'._DB_PREFIX_.'cms`
 				WHERE id_cms = '.(int)Tools::getValue('PS_CONDITIONS_CMS_ID');
         if (Tools::getValue('PS_CONDITIONS') && (Tools::getValue('PS_CONDITIONS_CMS_ID') == 0 || !Db::getInstance()->getValue($sql))) {
-            $this->errors[] = Tools::displayError('Assign a valid CMS page if you want it to be read.');
+            $this->errors[] = Tools::displayError('Please assign a valid CMS page for Terms and Conditions.');
         }
     }
 }
