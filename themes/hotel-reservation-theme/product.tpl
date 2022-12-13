@@ -173,7 +173,10 @@
 					<section class="page-product-box">
 						<ul class="nav nav-tabs product_description_tabs">
 							<li class="active"><a href="#room_info_tab" class="idTabHrefShort" data-toggle="tab">{l s='Room Information'}</a></li>
-							<li><a href="#refund_policies_tab" class="idTabHrefShort" data-toggle="tab">{l s='Refund policies'}</a></li>
+							<li><a href="#refund_policies_tab" class="idTabHrefShort" data-toggle="tab">{l s='Refund Policies'}</a></li>
+							{if $display_google_maps && ($hotel_latitude|floatval != 0 && $hotel_longitude|floatval != 0)}
+								<li><a href="#room_type_map_tab" class="idTabHrefShort" data-toggle="tab">{l s='View on Map'}</a></li>
+							{/if}
 							{$HOOK_PRODUCT_TAB}
 						</ul>
 						<div class="tab-content product_description_tabs_contents">
@@ -294,6 +297,28 @@
 									<span class="non_refundable_txt error_msg">{l s='Non Refundable'}</span>
 								{/if}
 							</div>
+							{if $display_google_maps && ($hotel_latitude|floatval != 0 && $hotel_longitude|floatval != 0)}
+								<div id="room_type_map_tab" class="tab-pane card">
+									<div class="map-wrap"></div>
+									<div id="room-info-map-ui-content" style="display: none;">
+										<div class="hotel-info-wrap">
+											{if isset($hotel_image_link) && $hotel_image_link}
+												<div class="hotel-image-wrap">
+													<img class="img img-responsive" src="{$hotel_image_link}">
+												</div>
+											{/if}
+											<div>
+												<p class="name">{$hotel_name|escape:'html':'UTF-8'}</p>
+												<p class="address">{$hotel_address1|escape:'html':'UTF-8'}</p>
+												<p class="contact">{l s='Contact:'} {$hotel_phone|escape:'html':'UTF-8'}</p>
+												<a class="btn view-on-map" href="https://www.google.com/maps/search/?api=1&query={if $hotel_map_input_text != ''}{$hotel_map_input_text|urlencode}{else}{($hotel_latitude|cat:','|cat:$hotel_longitude)|urlencode}{/if}" target="_blank">
+													<span>{l s='View on Map'}</span>
+												</a>
+											</div>
+										</div>
+									</div>
+								</div>
+							{/if}
 							{if isset($HOOK_PRODUCT_TAB_CONTENT) && $HOOK_PRODUCT_TAB_CONTENT}{$HOOK_PRODUCT_TAB_CONTENT}{/if}
 						</div>
 					</section>

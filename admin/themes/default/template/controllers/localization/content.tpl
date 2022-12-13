@@ -28,7 +28,7 @@
 <script type="text/javascript">
 	$(document).ready(function() {
 		$('#PS_CURRENCY_DEFAULT').change(function(e) {
-			alert('Before changing the default currency, we strongly recommend that you enable maintenance mode because any change on default currency requires manual adjustment of the price of each product');
+			alert('Before changing default currency, we strongly recommend that you enable maintenance mode from Preferences > Maintenance page because any change in default currency requires manual adjustment of price of each room type.');
 		});
 	});
 </script>

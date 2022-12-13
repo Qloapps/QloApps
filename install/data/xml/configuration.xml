@@ -11,6 +11,9 @@
 	<configuration id="PS_ONE_PHONE_AT_LEAST" name="PS_ONE_PHONE_AT_LEAST">
 		<value>1</value>
 	</configuration>
+	<configuration id="PS_CART_FOLLOWING" name="PS_CART_FOLLOWING">
+		<value>1</value>
+	</configuration>
 	<configuration id="PS_CARRIER_DEFAULT" name="PS_CARRIER_DEFAULT">
 		<value>1</value>
 	</configuration>

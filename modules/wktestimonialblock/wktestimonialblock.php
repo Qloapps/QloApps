@@ -33,7 +33,7 @@ class WkTestimonialBlock extends Module
         $this->name = 'wktestimonialblock';
         $this->tab = 'front_office_features';
         $this->version = '1.1.5';
-        $this->author = 'webkul';
+        $this->author = 'Webkul';
         $this->need_instance = 0;
 
         $this->bootstrap = true;

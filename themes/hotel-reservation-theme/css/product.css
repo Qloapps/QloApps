@@ -1455,6 +1455,54 @@ Quick View Styles
 	border-top: 1px solid #eee;
 	padding-top: 15px;} */
 
+#room_type_map_tab .map-wrap {
+  min-height: 500px;
+}
+
+#room_type_map_tab .hotel-info-wrap {
+  max-width: 300px;
+  background-color: #fff;
+  padding: 12px;
+  margin: 0 0 20px 10px;
+  border-radius: 2px;
+  box-shadow: 0 2px 6px rgba(0,0,0,.3);
+  display: flex;
+}
+
+#room_type_map_tab .hotel-info-wrap .hotel-image-wrap {
+  padding-right: 8px;
+}
+
+#room_type_map_tab .hotel-info-wrap .hotel-image-wrap img {
+  max-width: 70px;
+  max-height: 70px;
+}
+
+#room_type_map_tab .hotel-info-wrap .name {
+  font-size: 14px;
+  font-weight: bold;
+  color: #1a73e8;
+  margin-bottom: 6px;
+}
+
+#room_type_map_tab .hotel-info-wrap .address,
+#room_type_map_tab .hotel-info-wrap .contact {
+  font-size: 13px;
+  font-weight: normal;
+  color: #555;
+}
+
+#room_type_map_tab .hotel-info-wrap .address {
+  margin-bottom: 6px;
+}
+
+#room_type_map_tab .hotel-info-wrap .view-on-map {
+  background-color: #186bd7;
+  border-radius: 2px;
+  color: #fff;
+  padding: 5px 10px;
+}
+
 .room_info_hotel_images_wrap .row {
   margin-left: -7.5px;
   margin-right: -7.5px; }

@@ -63,6 +63,7 @@
   <tab id="Tax_Rules" name="稅務規則"/>
   <tab id="Translations" name="翻譯"/>
   <tab id="Modules_1" name="模組"/>
+  <tab id="Modules_Catalog" name="Modules Catalog"/>
   <tab id="Modules_Themes_Catalog" name="目錄模組與佈景"/>
   <tab id="Positions" name="位置"/>
   <tab id="Payment" name="付款"/>

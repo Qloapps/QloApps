@@ -86,7 +86,7 @@ class AdminLogsControllerCore extends AdminController
                 'fields' =>    array(
                     'PS_LOGS_BY_EMAIL' => array(
                         'title' => $this->l('Minimum severity level'),
-                        'hint' => $this->l('Enter "5" if you do not want to receive any emails.').'<br />'.$this->l('Emails will be sent to the shop owner.'),
+                        'hint' => $this->l('Enter "5" if you do not want to receive any emails.').'<br />'.$this->l('Emails will be sent to the website owner.'),
                         'cast' => 'intval',
                         'type' => 'text'
                     )

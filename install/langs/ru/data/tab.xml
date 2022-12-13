@@ -51,6 +51,7 @@
   <!-- <tab id="Merchandise_Returns" name="Возвраты товаров"/> -->
   <tab id="Modules_1" name="Модули и Сервисы"/>
   <tab id="Modules" name="Модули"/>
+  <tab id="Modules_Catalog" name="Modules Catalog"/>
   <tab id="Modules_Themes_Catalog" name="Модули &amp; Шаблоны"/>
   <tab id="Monitoring" name="Мониторинг"/>
   <tab id="Multistore" name="Мульти-магазин"/>

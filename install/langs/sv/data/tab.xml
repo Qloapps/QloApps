@@ -59,6 +59,7 @@
   <tab id="Tax_Rules" name="Momsregler"/>
   <tab id="Translations" name="Översättningar"/>
   <tab id="Modules_1" name="Moduler och Tjänster"/>
+  <tab id="Modules_Catalog" name="Modules Catalog"/>
   <tab id="Modules_Themes_Catalog" name="Katalog med moduler &amp; teman"/>
   <tab id="Positions" name="Positioner"/>
   <tab id="Payment" name="Betalning"/>

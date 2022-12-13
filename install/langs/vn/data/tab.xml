@@ -49,6 +49,7 @@
   <!-- <tab id="Merchandise_Returns" name="H&#xE0;ng h&#xF3;a tr&#x1EA3; l&#x1EA1;i"/> -->
   <tab id="Modules" name="Modules v&#xE0; d&#x1ECB;ch v&#x1EE5;"/>
   <tab id="Modules_1" name="Modules v&#xE0; d&#x1ECB;ch v&#x1EE5;"/>
+  <tab id="Modules_Catalog" name="Modules Catalog"/>
   <tab id="Modules_Themes_Catalog" name="Danh m&#x1EE5;c Module &amp; Giao di&#x1EC7;n"/>
   <tab id="Monitoring" name="Gi&#xE1;m s&#xE1;t"/>
   <tab id="Multistore" name="Multistore"/>
