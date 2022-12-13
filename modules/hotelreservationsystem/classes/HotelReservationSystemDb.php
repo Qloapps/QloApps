@@ -358,6 +358,27 @@ class HotelReservationSystemDb
                 `access` int(11) NOT NULL,
                 PRIMARY KEY (`id_profile`, `id_hotel`)
             ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8;",
+
+            "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_settings_link` (
+                `id_settings_link` int(11) NOT NULL AUTO_INCREMENT,
+                `icon` varchar(32) character set utf8 NOT NULL,
+                `link` text NOT NULL,
+                `new_window` tinyint(1) NOT NULL DEFAULT '0',
+                `position` int(11) unsigned NOT NULL DEFAULT '0',
+                `unremovable` tinyint(1) NOT NULL DEFAULT '0',
+                `active` tinyint(1) NOT NULL,
+                `date_add` datetime NOT NULL,
+                `date_upd` datetime NOT NULL,
+                PRIMARY KEY (`id_settings_link`)
+            ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;",
+
+            "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_settings_link_lang` (
+                `id_settings_link` int(10) unsigned NOT NULL,
+                `id_lang` int(10) unsigned NOT NULL,
+                `name` varchar(255) character set utf8 NOT NULL,
+                `hint` varchar(255) character set utf8 NOT NULL,
+                PRIMARY KEY (`id_settings_link`, `id_lang`)
+            ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8;",
         );
     }
 
@@ -408,7 +429,9 @@ class HotelReservationSystemDb
             `'._DB_PREFIX_.'htl_room_type_demand_price`,
             `'._DB_PREFIX_.'htl_room_type_demand`,
             `'._DB_PREFIX_.'htl_room_disable_dates`,
-            `'._DB_PREFIX_.'htl_access`'
+            `'._DB_PREFIX_.'htl_access`,
+            `'._DB_PREFIX_.'htl_settings_link`,
+            `'._DB_PREFIX_.'htl_settings_link_lang`'
         );
     }
 }
