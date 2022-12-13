@@ -28,7 +28,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-class blockcart extends Module
+class Blockcart extends Module
 {
     public function __construct()
     {
@@ -42,7 +42,7 @@ class blockcart extends Module
         parent::__construct();
 
         $this->displayName = $this->l('Cart block');
-        $this->description = $this->l('Adds a block containing the customer\'s shopping cart.');
+        $this->description = $this->l('Adds a block containing the customer\'s booking cart.');
         $this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
     }
 

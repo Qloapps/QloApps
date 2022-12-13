@@ -414,7 +414,7 @@
 
 	{if $refund_allowed && $non_requested_rooms}
 		<div class="alert alert-info-light standard_refund_fields">
-			<i class="icon-info-circle"></i> {l s='Select rooms which bookings you want to cancel. Attached additional facilities with the room will be cancelled with room cancellation.'}
+			<i class="icon-info-circle"></i> {l s='Select rooms for which you want to cancel bookings. Additional facilities for cancelled rooms will be cancelled automatically.'}
 		</div>
 		{if !$hasCompletelyRefunded}
 			<div class="row standard_refund_fields">

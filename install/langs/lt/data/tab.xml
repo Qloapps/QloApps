@@ -59,6 +59,7 @@
   <tab id="Tax_Rules" name="Mokesčių taisyklės"/>
   <tab id="Translations" name="Vertimai"/>
   <tab id="Modules_1" name="Moduliai ir paslaugos"/>
+  <tab id="Modules_Catalog" name="Modules Catalog"/>
   <tab id="Modules_Themes_Catalog" name="Modulių ir temų katalogas"/>
   <tab id="Positions" name="Pozicijos"/>
   <tab id="Payment" name="Mokėjimas"/>
