@@ -1575,10 +1575,19 @@ class AdminControllerCore extends Controller
             $this->page_header_toolbar_title = $this->toolbar_title[count($this->toolbar_title) - 1];
         }
 
+        $this->initTabModuleList();
         $this->addPageHeaderToolBarModulesListButton();
 
         $this->context->smarty->assign('help_link', 'http://help.prestashop.com/'.Language::getIsoById($this->context->employee->id_lang).'/doc/'
             .Tools::getValue('controller').'?version='._PS_VERSION_.'&country='.Language::getIsoById($this->context->employee->id_lang));
+
+        $this->context->smarty->assign(array(
+            'show_page_header_toolbar' => $this->show_page_header_toolbar,
+            'page_header_toolbar_title' => $this->page_header_toolbar_title,
+            'title' => $this->page_header_toolbar_title,
+            'toolbar_btn' => $this->page_header_toolbar_btn,
+            'page_header_toolbar_btn' => $this->page_header_toolbar_btn,
+        ));
     }
 
     /**
@@ -1644,7 +1653,6 @@ class AdminControllerCore extends Controller
                     );
                 }
         }
-        $this->addToolBarModulesListButton();
     }
 
     /**
@@ -2078,7 +2086,7 @@ class AdminControllerCore extends Controller
 
         $this->getLanguages();
         $this->initToolbar();
-        $this->initTabModuleList();
+        // $this->initTabModuleList();
         $this->initPageHeaderToolbar();
 
         if ($this->display == 'edit' || $this->display == 'add') {
@@ -2112,11 +2120,6 @@ class AdminControllerCore extends Controller
             'content' => $this->content,
             'lite_display' => $this->lite_display,
             'url_post' => self::$currentIndex.'&token='.$this->token,
-            'show_page_header_toolbar' => $this->show_page_header_toolbar,
-            'page_header_toolbar_title' => $this->page_header_toolbar_title,
-            'title' => $this->page_header_toolbar_title,
-            'toolbar_btn' => $this->page_header_toolbar_btn,
-            'page_header_toolbar_btn' => $this->page_header_toolbar_btn
         ));
     }
 
@@ -2125,22 +2128,10 @@ class AdminControllerCore extends Controller
      */
     protected function initTabModuleList()
     {
-        if (!$this->isFresh(Module::CACHE_FILE_MUST_HAVE_MODULES_LIST, 86400)) {
-            @file_put_contents(_PS_ROOT_DIR_.Module::CACHE_FILE_MUST_HAVE_MODULES_LIST, Tools::addonsRequest('must-have'));
-        }
-        if (!$this->isFresh(Module::CACHE_FILE_TAB_MODULES_LIST, 604800)) {
-            $this->refresh(Module::CACHE_FILE_TAB_MODULES_LIST, _QLO_TAB_MODULE_LIST_URL_);
-        }
-
-        $this->tab_modules_list = Tab::getTabModulesList($this->id);
-
         if (is_array($this->tab_modules_list['default_list']) && count($this->tab_modules_list['default_list'])) {
             $this->filter_modules_list = $this->tab_modules_list['default_list'];
         } elseif (is_array($this->tab_modules_list['slider_list']) && count($this->tab_modules_list['slider_list'])) {
-            $this->addToolBarModulesListButton();
-            $this->addPageHeaderToolBarModulesListButton();
             $this->context->smarty->assign(array(
-                'tab_modules_list' => implode(',', $this->tab_modules_list['slider_list']),
                 'admin_module_ajax_url' => $this->context->link->getAdminLink('AdminModules'),
                 'back_tab_modules_list' => $this->context->link->getAdminLink(Tools::getValue('controller')),
                 'tab_modules_open' => (int)Tools::getValue('tab_modules_open')
@@ -2148,11 +2139,17 @@ class AdminControllerCore extends Controller
         }
     }
 
+
+
     protected function addPageHeaderToolBarModulesListButton()
     {
-        $this->filterTabModuleList();
+        $tab_modules_list = Tab::getTabModulesList($this->id);
 
-        if (is_array($this->tab_modules_list['slider_list']) && count($this->tab_modules_list['slider_list'])) {
+        $tab_modules_list = $this->filterTabModuleList($tab_modules_list);
+
+        if ((is_array($tab_modules_list['slider_list']) && count($tab_modules_list['slider_list']))
+            || !Tab::isTabModuleListAvailable()
+        ) {
             $this->page_header_toolbar_btn['modules-list'] = array(
                 'href' => '#',
                 'desc' => $this->l('Recommended Modules and Services')
@@ -2160,19 +2157,8 @@ class AdminControllerCore extends Controller
         }
     }
 
-    protected function addToolBarModulesListButton()
-    {
-        $this->filterTabModuleList();
 
-        if (is_array($this->tab_modules_list['slider_list']) && count($this->tab_modules_list['slider_list'])) {
-            $this->toolbar_btn['modules-list'] = array(
-                'href' => '#',
-                'desc' => $this->l('Recommended Modules and Services')
-            );
-        }
-    }
-
-    protected function filterTabModuleList()
+    protected function filterTabModuleList($tab_modules_list)
     {
         static $list_is_filtered = null;
 
@@ -2180,59 +2166,83 @@ class AdminControllerCore extends Controller
             return;
         }
 
-        if (!$this->isFresh(Module::CACHE_FILE_DEFAULT_COUNTRY_MODULES_LIST, 86400)) {
-            file_put_contents(_PS_ROOT_DIR_.Module::CACHE_FILE_DEFAULT_COUNTRY_MODULES_LIST, Tools::addonsRequest('native'));
-        }
-
-        if (!$this->isFresh(Module::CACHE_FILE_ALL_COUNTRY_MODULES_LIST, 86400)) {
-            file_put_contents(_PS_ROOT_DIR_.Module::CACHE_FILE_ALL_COUNTRY_MODULES_LIST, Tools::addonsRequest('native_all'));
-        }
-
-        if (!$this->isFresh(Module::CACHE_FILE_MUST_HAVE_MODULES_LIST, 86400)) {
-            @file_put_contents(_PS_ROOT_DIR_.Module::CACHE_FILE_MUST_HAVE_MODULES_LIST, Tools::addonsRequest('must-have'));
-        }
-
-        libxml_use_internal_errors(true);
-
-        $country_module_list = file_get_contents(_PS_ROOT_DIR_.Module::CACHE_FILE_DEFAULT_COUNTRY_MODULES_LIST);
-        $must_have_module_list = file_get_contents(_PS_ROOT_DIR_.Module::CACHE_FILE_MUST_HAVE_MODULES_LIST);
         $all_module_list = array();
 
-        if (!empty($country_module_list) && $country_module_list_xml = @simplexml_load_string($country_module_list)) {
-            $country_module_list_array = array();
-            if (is_object($country_module_list_xml->module)) {
-                foreach ($country_module_list_xml->module as $k => $m) {
-                    $all_module_list[] = (string)$m->name;
+        libxml_use_internal_errors(true);
+        if (file_exists(_PS_ROOT_DIR_.Module::CACHE_FILE_DEFAULT_COUNTRY_MODULES_LIST)) {
+            $country_module_list = file_get_contents(_PS_ROOT_DIR_.Module::CACHE_FILE_DEFAULT_COUNTRY_MODULES_LIST);
+            if (!empty($country_module_list) && $country_module_list_xml = @simplexml_load_string($country_module_list)) {
+                $country_module_list_array = array();
+                if (is_object($country_module_list_xml->module)) {
+                    foreach ($country_module_list_xml->module as $k => $m) {
+                        $all_module_list[] = (string)$m->name;
+                    }
                 }
-            }
-        } else {
-            foreach (libxml_get_errors() as $error) {
-                $this->errors[] = Tools::displayError(sprintf('Error found : %1$s in country_module_list.xml file.', $error->message));
+            } else {
+                foreach (libxml_get_errors() as $error) {
+                    $this->errors[] = Tools::displayError(sprintf('Error found : %1$s in country_module_list.xml file.', $error->message));
+                }
             }
         }
 
         libxml_clear_errors();
 
-
-
-        if (!empty($must_have_module_list) && $must_have_module_list_xml = @simplexml_load_string($must_have_module_list)) {
-            $must_have_module_list_array = array();
-            if (is_object($country_module_list_xml->module)) {
-                foreach ($must_have_module_list_xml->module as $l => $mo) {
-                    $all_module_list[] = (string)$mo->name;
+        if (file_exists(_PS_ROOT_DIR_.Module::CACHE_FILE_MUST_HAVE_MODULES_LIST)) {
+            $must_have_module_list = file_get_contents(_PS_ROOT_DIR_.Module::CACHE_FILE_MUST_HAVE_MODULES_LIST);
+            if (!empty($must_have_module_list) && $must_have_module_list_xml = @simplexml_load_string($must_have_module_list)) {
+                $must_have_module_list_array = array();
+                if (is_object($country_module_list_xml->module)) {
+                    foreach ($must_have_module_list_xml->module as $l => $mo) {
+                        $all_module_list[] = (string)$mo->name;
+                    }
                 }
-            }
-        } else {
-            foreach (libxml_get_errors() as $error) {
-                $this->errors[] = Tools::displayError(sprintf('Error found : %1$s in must_have_module_list.xml file.', $error->message));
+            } else {
+                foreach (libxml_get_errors() as $error) {
+                    $this->errors[] = Tools::displayError(sprintf('Error found : %1$s in must_have_module_list.xml file.', $error->message));
+                }
             }
         }
 
         libxml_clear_errors();
 
-        $this->tab_modules_list['slider_list'] = array_intersect($this->tab_modules_list['slider_list'], $all_module_list);
+        $tab_modules_list['slider_list'] = array_intersect($tab_modules_list['slider_list'], $all_module_list);
 
         $list_is_filtered = true;
+
+        return $tab_modules_list;
+    }
+
+    public function ajaxProcessRefreshModuleList($force_reload_cache = false)
+    {
+        if (!$this->isFresh(Module::CACHE_FILE_DEFAULT_COUNTRY_MODULES_LIST, _TIME_1_DAY_) || $force_reload_cache) {
+            if (file_put_contents(_PS_ROOT_DIR_.Module::CACHE_FILE_DEFAULT_COUNTRY_MODULES_LIST, Tools::addonsRequest('native'))) {
+                $this->status = 'refresh';
+            } else {
+                $this->status = 'error';
+            }
+        } else {
+            $this->status = 'cache';
+        }
+
+        if (!$this->isFresh(Module::CACHE_FILE_MUST_HAVE_MODULES_LIST, _TIME_1_DAY_) || $force_reload_cache) {
+            if (file_put_contents(_PS_ROOT_DIR_.Module::CACHE_FILE_MUST_HAVE_MODULES_LIST, Tools::addonsRequest('must-have'))) {
+                $this->status = 'refresh';
+            } else {
+                $this->status = 'error';
+            }
+        } else {
+            $this->status = 'cache';
+        }
+
+        if (!$this->isFresh(Module::CACHE_FILE_TAB_MODULES_LIST, _TIME_1_WEEK_)) {
+            if ($this->refresh(Module::CACHE_FILE_TAB_MODULES_LIST, _QLO_TAB_MODULE_LIST_URL_)) {
+                $this->status = 'refresh';
+            } else {
+                $this->status = 'error';
+            }
+        } else {
+            $this->status = 'cache';
+        }
     }
 
     /**
@@ -2366,7 +2376,9 @@ class AdminControllerCore extends Controller
                 foreach ($xml_module->children() as $module) {
                     /** @var SimpleXMLElement $module */
                     foreach ($module->attributes() as $key => $value) {
-                        if ($xml_module->attributes() == 'native' && $key == 'name') {
+                        if (($xml_module->attributes() == 'native' || $xml_module->attributes() == 'disk')
+                            && $key == 'name'
+                        ) {
                             $this->list_natives_modules[] = (string)$value;
                         }
                         if ($xml_module->attributes() == 'partner' && $key == 'name') {
@@ -2438,6 +2450,8 @@ class AdminControllerCore extends Controller
 
         $helper = new HelperList();
 
+        unset($this->toolbar_btn);
+        $this->initToolbar();
         // Empty list is ok
         if (!is_array($this->_list)) {
             $this->displayWarning($this->l('Bad SQL query', 'Helper').'<br />'.htmlspecialchars($this->_list_error));
@@ -2820,6 +2834,19 @@ class AdminControllerCore extends Controller
             'displayBackOfficeTop' => Hook::exec('displayBackOfficeTop', array()),
             'submit_form_ajax' => (int)Tools::getValue('submitFormAjax')
         ));
+
+        // get upgrade available info
+        if (!$this->isFresh(Upgrader::CACHE_FILE_UPGRADE_AVAILABE, _TIME_1_DAY_)) {
+            file_put_contents(_PS_ROOT_DIR_.Upgrader::CACHE_FILE_UPGRADE_AVAILABE, Tools::addonsRequest('check-version'));
+        }
+        if (file_exists(_PS_ROOT_DIR_.Upgrader::CACHE_FILE_UPGRADE_AVAILABE)) {
+            $content = Tools::file_get_contents( _PS_ROOT_DIR_.Upgrader::CACHE_FILE_UPGRADE_AVAILABE);
+            $upgradeInfo = simplexml_load_string($content);
+
+            $this->context->smarty->assign(array(
+                'upgrade_info' => $upgradeInfo
+            ));
+        }
 
         Employee::setLastConnectionDate($this->context->employee->id);
 
@@ -4050,7 +4077,7 @@ class AdminControllerCore extends Controller
      * @param int $timeout
      * @return bool
      */
-    public function isFresh($file, $timeout = 604800)
+    public function isFresh($file, $timeout = _TIME_1_WEEK_)
     {
         if (($time = @filemtime(_PS_ROOT_DIR_.$file)) && filesize(_PS_ROOT_DIR_.$file) > 0) {
             return ((time() - $time) < $timeout);
@@ -4100,8 +4127,17 @@ class AdminControllerCore extends Controller
         $link_admin_modules = $this->context->link->getAdminLink('AdminModules', true);
 
         $module->options['install_url'] = $link_admin_modules.'&install='.urlencode($module->name).'&tab_module='.$module->tab.'&module_name='.$module->name.'&anchor='.ucfirst($module->name);
-        $module->options['update_url'] = $link_admin_modules.'&update='.urlencode($module->name).'&tab_module='.$module->tab.'&module_name='.$module->name.'&anchor='.ucfirst($module->name);
+        if ($module->is_native) {
+            $module->options['update_url'] = $link_admin_modules.'&update='.urlencode($module->name).'&tab_module='.$module->tab.'&module_name='.$module->name.'&anchor='.ucfirst($module->name);
+        } else {
+            if ($module->url) {
+                $module->options['update_url'] = $module->url;
+            } else {
+                $module->options['update_url'] = '';
+            }
+        }
         $module->options['uninstall_url'] = $link_admin_modules.'&uninstall='.urlencode($module->name).'&tab_module='.$module->tab.'&module_name='.$module->name.'&anchor='.ucfirst($module->name);
+        $module->options['delete_url'] = $link_admin_modules.'&delete='.urlencode($module->name).'&tab_module='.$module->tab.'&module_name='.$module->name.'&anchor='.ucfirst($module->name);
 
         $module->optionsHtml = $this->displayModuleOptions($module, $output_type, $back);
 

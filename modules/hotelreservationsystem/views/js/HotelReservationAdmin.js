@@ -630,16 +630,16 @@ $(document).ready(function() {
                     btn.attr('data-id-cart', result.id_cart);
                     btn.attr('data-id-cart-book-data', result.id_cart_book_data);
                     html = "<tr>";
-                    html += "<td>" + result.room_num + "</td>";
-                    html += "<td>" + result.room_type + "</td>";
-                    html += "<td>" + result.date_from + " To " + result.date_to + "</td>";
-                    html += "<td>" + currency_prefix + result.amount + currency_suffix + "</td>";
-                    html += "<td><button class='btn btn-default ajax_cart_delete_data' data-id-product='" + id_prod + "' data-id-hotel='" + id_hotel + "' data-id-cart='" + result.id_cart + "' data-id-cart-book-data='" + result.id_cart_book_data + "' data-date-from='" + date_from + "' data-date-to='" + date_to + "'><i class='icon-trash'></i></button></td>";
+                    html += "<td class='text-center'>" + result.room_num + "</td>";
+                    html += "<td class='text-center'>" + result.room_type + "</td>";
+                    html += "<td class='text-center'>" + result.date_from + " - " + result.date_to + "</td>";
+                    html += "<td class='text-center'>" + result.amount + "</td>";
+                    html += "<td class='text-center'><button class='btn btn-default ajax_cart_delete_data' data-id-product='" + id_prod + "' data-id-hotel='" + id_hotel + "' data-id-cart='" + result.id_cart + "' data-id-cart-book-data='" + result.id_cart_book_data + "' data-date-from='" + date_from + "' data-date-to='" + date_to + "'><i class='icon-trash'></i></button></td>";
                     html += "</tr>";
 
                     $('.cart_tbody').append(html);
 
-                    $('#cart_total_amt').html(currency_prefix + result.total_amount + currency_suffix);
+                    $('#cart_total_amt').html(result.total_amount);
                     // $('#cart_record').html(result.rms_in_cart);
 
                     // For Stats
@@ -701,16 +701,16 @@ $(document).ready(function() {
                     btn.attr('data-id-cart-book-data', result.id_cart_book_data);
 
                     html = "<tr>";
-                    html += "<td>" + result.room_num + "</td>";
-                    html += "<td>" + result.room_type + "</td>";
-                    html += "<td>" + result.date_from + " To " + result.date_to + "</td>";
-                    html += "<td>" + currency_prefix + result.amount + currency_suffix + "</td>";
-                    html += "<td><button class='btn btn-default ajax_cart_delete_data' data-id-product='" + id_prod + "' data-id-hotel='" + id_hotel + "' data-id-cart='" + result.id_cart + "' data-id-cart-book-data='" + result.id_cart_book_data + "' data-date-from='" + date_from + "' data-date-to='" + date_to + "'><i class='icon-trash'></i></button></td>";
+                    html += "<td class='text-center'>" + result.room_num + "</td>";
+                    html += "<td class='text-center'>" + result.room_type + "</td>";
+                    html += "<td class='text-center'>" + result.date_from + " - " + result.date_to + "</td>";
+                    html += "<td class='text-center'>" + result.amount + "</td>";
+                    html += "<td class='text-center'><button class='btn btn-default ajax_cart_delete_data' data-id-product='" + id_prod + "' data-id-hotel='" + id_hotel + "' data-id-cart='" + result.id_cart + "' data-id-cart-book-data='" + result.id_cart_book_data + "' data-date-from='" + date_from + "' data-date-to='" + date_to + "'><i class='icon-trash'></i></button></td>";
                     html += "</tr>";
 
                     $('.cart_tbody').append(html);
 
-                    $('#cart_total_amt').html(currency_prefix + result.total_amount + currency_suffix);
+                    $('#cart_total_amt').html(result.total_amount);
                     // $('#cart_record').html(result.rms_in_cart);
 
                     // For Stats
@@ -763,8 +763,10 @@ $(document).ready(function() {
                         $(".cart_booking_btn").attr('disabled', 'true');
                     }
 
-                    btn.parent().parent().remove();
-                    $('#cart_total_amt').html(currency_prefix + result.total_amount + currency_suffix);
+                    btn.hide(400, function () {
+                        btn.closest('tr').remove();
+                    });
+                    $('#cart_total_amt').html(result.total_amount);
                     // $('#cart_record').html(result.rms_in_cart);
 
                     // For Stats
@@ -905,34 +907,45 @@ $(document).ready(function() {
     /* ----  AdminHotelFeaturePricesSettingsController Admin ---- */
 
     $('#date_selection_type').on('change', function() {
-        if ($('#date_selection_type').val() == 2) {
-            $(".specific_date_type").show();
-            $(".date_range_type").hide();
-            $(".special_days_content").hide();
-        } else if ($('#date_selection_type').val() == 1) {
-            $(".specific_date_type").hide();
-            $(".date_range_type").show();
-            $(".special_days_content").show();
+        if ($('#date_selection_type').val() == date_selection_types.specific) {
+            $(".specific_date_type").show(200);
+            $(".date_range_type").hide(200);
+            $(".special_days_content").hide(200);
+        } else if ($('#date_selection_type').val() == date_selection_types.range) {
+            $(".specific_date_type").hide(200);
+            $(".date_range_type").show(200);
+            $(".special_days_content").show(200);
         } else {
-            $(".specific_date_type").hide();
-            $(".date_range_type").show();
-            $(".special_days_content").show();
+            $(".specific_date_type").hide(200);
+            $(".date_range_type").show(200);
+            $(".special_days_content").show(200);
         }
     });
 
 
     $(".is_special_days_exists").on ('click', function() {
         if ($(this).is(':checked')) {
-            $('.week_days').show();
+            $('.week_days').show(200);
         } else {
-            $('.week_days').hide();
+            $('.week_days').hide(200);
+        }
+    });
+
+    $('#price_impact_way').on('change', function() {
+        if ($('#price_impact_way').val() == impact_ways.fix) {
+            $('#price_impact_type option[value="' + impact_ways.increase + '"]').attr('selected', 'selected');
+            $('#price_impact_type_input').removeAttr('disabled').val(impact_ways.increase);
+            $('#price_impact_type').trigger('change').attr('disabled', 'disabled');
+        } else {
+            $('#price_impact_type_input').attr('disabled', 'disabled');
+            $('#price_impact_type').removeAttr('disabled');
         }
     });
 
     $('#price_impact_type').on('change', function() {
-        if ($('#price_impact_type').val() == 2) {
+        if ($('#price_impact_type').val() == impact_types.fixed) {
             $(".payment_type_icon").text(defaultcurrency_sign);
-        } else if ($('#price_impact_type').val() == 1) {
+        } else if ($('#price_impact_type').val() == impact_types.percentage) {
             $(".payment_type_icon").text('%');
         } else {
             $(".payment_type_icon").text(defaultcurrency_sign);

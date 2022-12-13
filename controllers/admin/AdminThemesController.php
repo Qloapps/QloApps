@@ -506,7 +506,7 @@ class AdminThemesControllerCore extends AdminController
         ) {
             return false;
         }
-        if (!$this->isFresh(Theme::CACHE_FILE_CUSTOMER_THEMES_LIST, 86400)) {
+        if (!$this->isFresh(Theme::CACHE_FILE_CUSTOMER_THEMES_LIST, _TIME_1_DAY_)) {
             file_put_contents(_PS_ROOT_DIR_.Theme::CACHE_FILE_CUSTOMER_THEMES_LIST, Tools::addonsRequest('customer_themes'));
         }
 
@@ -2075,6 +2075,15 @@ class AdminThemesControllerCore extends AdminController
                         }
                     }
                     break;
+                case 3:
+                    foreach ($xml->modules as $row) {
+                        if ($row['type'] == 'disk') {
+                            foreach ($row->module as $row2) {
+                                $natives[] = (string)$row2['name'];
+                            }
+                        }
+                    }
+                    break;
             }
 
             if (count($natives) > 0) {
@@ -2085,45 +2094,17 @@ class AdminThemesControllerCore extends AdminController
         return array(
             'addsharethis',
             'bankwire',
-            'blockadvertising',
-            'blockbanner',
-            'blockbestsellers',
             'blockcart',
-            'blockcategories',
-            'blockcms',
-            'blockcmsinfo',
-            'blockcontact',
-            'blockcontactinfos',
             'blockcurrencies',
-            'blockcustomerprivacy',
-            'blockfacebook',
             'blocklanguages',
-            'blocklayered',
-            'blocklink',
-            'blockmanufacturer',
+            'qloblockcontact',
             'blockmyaccount',
-            'blockmyaccountfooter',
-            'blocknewproducts',
             'blocknewsletter',
-            'blockpaymentlogo',
-            'blockpermanentlinks',
-            'blockreinsurance',
-            'blockrss',
-            'blocksearch',
-            'blocksharefb',
             'blocksocial',
-            'blockspecials',
-            'blockstore',
-            'blocksupplier',
-            'blocktags',
-            'blocktopmenu',
             'blockuserinfo',
-            'blockviewed',
-            'blockwishlist',
             'carriercompare',
             'cashondelivery',
             'cheque',
-            'crossselling',
             'dashactivity',
             'dashgoals',
             'dashproducts',
@@ -2135,22 +2116,13 @@ class AdminThemesControllerCore extends AdminController
             'followup',
             'gapi',
             'graphnvd3',
-            'gridhtml',
-            'homefeatured',
-            'homeslider',
             'loyalty',
             'mailalerts',
             'newsletter',
             'pagesnotfound',
             'productcomments',
-            'productpaymentlogos',
-            'productscategory',
-            'producttooltip',
-            'pscleaner',
             'referralprogram',
             'sekeywords',
-            'sendtoafriend',
-            'socialsharing',
             'statsbestcategories',
             'statsbestcustomers',
             'statsbestmanufacturers',
@@ -2170,12 +2142,8 @@ class AdminThemesControllerCore extends AdminController
             'statsproduct',
             'statsregistrations',
             'statssales',
-            'statssearch',
-            'statsstock',
             'statsvisits',
             'themeconfigurator',
-            'trackingfront',
-            'vatnumber',
             'watermark'
         );
     }

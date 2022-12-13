@@ -183,7 +183,7 @@ class WebserviceRequestCore
     public static $ws_current_classname;
 
 
-    public static $shopIDs;
+    public static $shopIDs = array();
 
 
     public function getOutputEnabled()

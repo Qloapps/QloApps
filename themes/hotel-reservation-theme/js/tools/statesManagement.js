@@ -68,8 +68,6 @@ function bindCheckbox()
 	if ($('#invoice_address:checked').length > 0)
 	{
 		$('#opc_invoice_address').slideDown('slow');
-		if ($('#company_invoice').val() == '')
-			$('#vat_number_block_invoice').hide();
 		if (typeof bindUniform !=='undefined')
 			bindUniform();
 	}

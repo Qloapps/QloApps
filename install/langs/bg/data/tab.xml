@@ -59,6 +59,7 @@
   <tab id="Tax_Rules" name="Данъчни правила"/>
   <tab id="Translations" name="Преводи"/>
   <tab id="Modules_1" name="Модули и услуги"/>
+  <tab id="Modules_Catalog" name="Modules Catalog"/>
   <tab id="Modules_Themes_Catalog" name="Каталог с модули и теми"/>
   <tab id="Positions" name="Разположение"/>
   <tab id="Payment" name="Плащане"/>

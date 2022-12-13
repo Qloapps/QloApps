@@ -1,0 +1,43 @@
+/**
+* 2010-2022 Webkul.
+*
+* NOTICE OF LICENSE
+*
+* All right is reserved,
+* Please go through LICENSE.txt file inside our module
+*
+* DISCLAIMER
+*
+* Do not edit or add to this file if you wish to upgrade this module to newer
+* versions in the future. If you wish to customize this module for your
+* needs please refer to CustomizationPolicy.txt file inside our module for more information.
+*
+* @author Webkul IN
+* @copyright 2010-2022 Webkul IN
+* @license LICENSE.txt
+*/
+
+#nav-main .contact-item a {
+    color: #fff;
+}
+
+#nav-main .contact-item {
+    margin-right: 24px;
+}
+
+#nav-main .contact-item i {
+    font-size: 14px;
+    padding-right: 2px;
+    position: relative;
+    top: 1px;
+}
+
+@media (max-width: 767px) {
+    #nav-main .contact-item {
+        display: none;
+    }
+}
+
+#nav-main i.icon-phone {
+    font-size: 15px;
+}

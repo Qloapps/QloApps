@@ -29,7 +29,7 @@ class wkhotelfilterblock extends Module
     public function __construct()
     {
         $this->name = 'wkhotelfilterblock';
-        $this->author = 'webkul';
+        $this->author = 'Webkul';
         $this->tab = 'front_office_features';
         $this->version = '1.0.4';
         $this->context = Context::getContext();

@@ -1,3 +1,22 @@
+{**
+* 2010-2022 Webkul.
+*
+* NOTICE OF LICENSE
+*
+* All right is reserved,
+* Please go through LICENSE.txt file inside our module
+*
+* DISCLAIMER
+*
+* Do not edit or add to this file if you wish to upgrade this module to newer
+* versions in the future. If you wish to customize this module for your
+* needs please refer to CustomizationPolicy.txt file inside our module for more information.
+*
+* @author Webkul IN
+* @copyright 2010-2022 Webkul IN
+* @license LICENSE.txt
+*}
+
 {if isset($product->id)}
 	<div id="product-configuration" class="panel product-tab">
 		<input type="hidden" name="submitted_tabs[]" value="Configuration" />
@@ -10,85 +29,128 @@
 				<thead>
 					<tr class="nodrag nodrop">
 						<th class="col-sm-2 center">
-							<label class="control-label">
-								<span class="label-tooltip" data-toggle="tooltip" title="" data-original-title="Enter the name of the Room for ex. A-101. Invalid characters <>;=#{}">{l s='Room No.'}</span>
+							<label class="control-label required">
+								<span class="label-tooltip" data-toggle="tooltip" data-original-title="{l s='Enter room number. For eg. A-101, A-102 etc. Invalid characters <>;=#{}'}">
+									{l s='Room No.'}
+								</span>
 							</label>
 						</th>
 						<th class="col-sm-2 center">
-							<span>{l s='Floor'}</span>
+							<label class="control-label">
+								<span class="label-tooltip" data-toggle="tooltip" data-original-title="{l s='Enter floor of the room. For eg. First, Second etc. Invalid characters <>;=#{}'}">
+									{l s='Floor'}
+								</span>
+							</label>
 						</th>
-						<th class="col-sm-2">
-							<span>{l s='Status'}</span>
+						<th class="col-sm-2 center">
+							<label class="control-label">
+								<span class="label-tooltip" data-toggle="tooltip" data-original-title="{l s='Select status of the room.'}">
+									{l s='Status'}
+								</span>
+							</label>
 						</th>
-						<th class="col-sm-6 center">
-							<span>{l s='Extra Information'}</span>
+						<th class="col-sm-3 center">
+							<label class="control-label">
+								<span class="label-tooltip" data-toggle="tooltip" data-original-title="{l s='Enter extra information about this room. Leave empty if not required.'}">
+									{l s='Extra Information'}
+								</span>
+							</label>
 						</th>
+						<th class="col-sm-2 center">
+							<label class="control-label">
+								<span class="label-tooltip" data-toggle="tooltip" data-original-title="{l s='Set date ranges when room is set to Temporarily Inactive.'}">
+									{l s='Disable Dates'}
+								</span>
+							</label>
+						</th>
+                        <th class="col-sm-1 center">
+                            {l s='--'}
+                        </th>
 					</tr>
-					{if isset($htl_room_info) && $htl_room_info}
-						{foreach from=$htl_room_info key=key item=info}
-							<tr class="room_data_values" id="row_index{$key}" data-rowKey="{$key}">
+				</thead>
+				<tbody>
+					{if isset($smarty.post.rooms_info) && is_array($smarty.post.rooms_info) && count($smarty.post.rooms_info)}
+						{assign var="rooms_info" value=$smarty.post.rooms_info}
+					{elseif isset($htl_room_info) && is_array($htl_room_info) && count($htl_room_info)}
+						{assign var="rooms_info" value=$htl_room_info}
+					{/if}
+					{if isset($rooms_info) && is_array($rooms_info) && count($rooms_info)}
+						{foreach from=$rooms_info key=key item=room_info}
+							{assign var="var_name_room_info" value="rooms_info[`$key`]"}
+							<tr class="room_data_values" data-row-index="{$key}">
 								<td class="col-sm-1 center">
-									<input class="form-control" type="text" value="{$info['room_num']}" name="room_num[]">
+									<input class="form-control" type="text" value="{$room_info['room_num']}" name="{$var_name_room_info|cat:'[room_num]'}">
 								</td>
 								<td class="col-sm-2 center">
-									<input class="form-control" type="text" value="{$info['floor']}" name="room_floor[]">
+									<input class="form-control" type="text" value="{$room_info['floor']}" name="{$var_name_room_info|cat:'[floor]'}">
 								</td>
 								<td class="col-sm-2 center">
-									<select class="form-control room_status" name="room_status[]">
+									<select class="form-control room_status" name="{$var_name_room_info|cat:'[id_status]'}">
 										{foreach from=$rm_status item=room_stauts}
-											<option value="{$room_stauts['id']}" {if $info['id_status'] == {$room_stauts['id']}}selected="selected"{/if}>{$room_stauts['status']}</option>
+											<option value="{$room_stauts['id']}" {if $room_info['id_status'] == {$room_stauts['id']}}selected="selected"{/if}>{$room_stauts['status']}</option>
 										{/foreach}
 									</select>
 								</td>
-								<td class="center col-sm-6">
-									<a class="btn btn-default deactiveDatesModal" data-toggle="modal" data-target="#deactiveDatesModal" {if $info['id_status'] != $rm_status['STATUS_TEMPORARY_INACTIVE']['id'] }style="display: none;"{/if}>{if $info['id_status'] != $rm_status['STATUS_TEMPORARY_INACTIVE']['id'] }{l s='Add Dates'}{else}{l s='View Dates'}{/if}
-									</a>
-									<input type="text" class="form-control room_comment" value="{$info['comment']}" name="room_comment[]" {if $info['id_status'] == $rm_status['STATUS_TEMPORARY_INACTIVE']['id'] }style="display: none;"{/if}>
-									<input type="hidden" class="form-control disableDatesJSON" name="disableDatesJSON[]" {if $info['id_status'] == $rm_status['STATUS_TEMPORARY_INACTIVE']['id']}value="{$info['disabled_dates_json']|escape:'html':'UTF-8'}"{/if}>
+								<td class="col-sm-3 center">
+									<input type="text" class="form-control room_comment" value="{$room_info['comment']}" name="{$var_name_room_info|cat:'[comment]'}">
 								</td>
-								<td class="center col-sm-1">
-									<a href="#" class="rm_htl_room btn btn-default" data-id-htl-info="{$info['id']}"><i class="icon-trash"></i></a>
-									<input type="hidden" name="id_room_info[]" value="{$info['id']}">
+								<td class="col-sm-2 center">
+									<a class="btn btn-default deactiveDatesModal {if $room_info['id_status'] != $rm_status['STATUS_TEMPORARY_INACTIVE']['id'] }disabled{/if}" data-toggle="modal" data-target="#deactiveDatesModal">{if $room_info['id_status'] != $rm_status['STATUS_TEMPORARY_INACTIVE']['id'] }{l s='Add Dates'}{else}{l s='View Dates'}{/if}
+									</a>
+									<input type="hidden" class="form-control disable_dates_json" name="{$var_name_room_info|cat:'[disable_dates_json]'}" {if $room_info['id_status'] == $rm_status['STATUS_TEMPORARY_INACTIVE']['id']}value="{$room_info['disable_dates_json']|escape:'html':'UTF-8'}"{/if}>
+								</td>
+								<td class="col-sm-1 center">
+									{if isset($room_info['id'])}
+										<a href="#" class="rm_htl_room btn btn-default" data-id-htl-info="{$room_info['id']}"><i class="icon-trash"></i></a>
+										<input type="hidden" name="{$var_name_room_info|cat:'[id]'}" value="{$room_info['id']}">
+									{else}
+										<a href="#" class="remove-rooms-button btn btn-default"><i class="icon-trash"></i></a>
+									{/if}
 								</td>
 							</tr>
 						{/foreach}
 					{else}
 						{for $k=0 to 1}
-							<tr class="room_data_values" id="row_index{$k}" data-rowKey="{$k}">
-								<td class="col-sm-2 center">
-									<input class="form-control" type="text" name="room_num[]">
+							{assign var="var_name_room_info" value="rooms_info[`$k`]"}
+							<tr class="room_data_values" data-row-index="{$k}">
+								<td class="col-sm-1 center">
+									<input class="form-control" type="text" name="{$var_name_room_info|cat:'[room_num]'}">
 								</td>
 								<td class="col-sm-2 center">
-									<input class="form-control" type="text" name="room_floor[]">
+									<input class="form-control" type="text" name="{$var_name_room_info|cat:'[floor]'}">
 								</td>
 								<td class="col-sm-2 center">
-									<select class="form-control room_status" name="room_status[]">
+									<select class="form-control room_status" name="{$var_name_room_info|cat:'[id_status]'}">
 										{foreach from=$rm_status item=room_stauts}
 											<option value="{$room_stauts['id']}">{$room_stauts['status']}</option>
 										{/foreach}
 									</select>
 								</td>
-								<td class="center col-sm-6">
-									<a class="deactiveDatesModal" data-toggle="modal" data-target="#deactiveDatesModal" style="display: none;">
-										{l s='add Dates'}
+                                <td class="center col-sm-3">
+									<input type="text" class="form-control room_comment" name="{$var_name_room_info|cat:'[comment]'}">
+                                </td>
+								<td class="center col-sm-2">
+									<a class="btn btn-default deactiveDatesModal disabled" data-toggle="modal" data-target="#deactiveDatesModal">
+										{l s='Add Dates'}
 									</a>
-									<input type="hidden" class="form-control disableDatesJSON" name="disableDatesJSON" value="0">
-									<input type="text" class="form-control room_comment" name="room_comment[]">
+									<input type="hidden" class="form-control disable_dates_json" name="{$var_name_room_info|cat:'[disable_dates_json]'}" value="">
 								</td>
-								{if $k == 1}
-									<td class="center col-sm-1">
+								<td class="center col-sm-1">
+								    {if $k == 1}
 										<a href="#" class="remove-rooms-button btn btn-default"><i class="icon-trash"></i></a>
-									</td>
-								{/if}
+                                    {else}
+                                        <a href="#" class="remove-rooms-button btn btn-default disabled"><i class="icon-trash"></i></a>
+								    {/if}
+                                </td>
 							</tr>
 						{/for}
 					{/if}
-				</thead>
+				</tbody>
 			</table>
 			<div class="form-group">
 				<div class="col-sm-12">
 					<button id="add-more-rooms-button" class="btn btn-default" type="button" data-size="s" data-style="expand-right">
-						<i class="icon-folder-open"></i>
+						<i class="icon icon-plus"></i>
 						{l s='Add More Rooms'}
 					</button>
 				</div>
@@ -119,9 +181,12 @@
 				<button type="button" class="close margin-right-10" data-dismiss="modal" aria-label="Close">
 					<span aria-hidden="true">&times;</span>
 				</button>
-				<h4 class="modal-title"><i class="icon-calendar"></i>&nbsp; {l s='Disable dates'}</h4>
+				<h4 class="modal-title"><i class="icon-calendar"></i>&nbsp; {l s='Disable Dates'}</h4>
 			</div>
 			<div class="modal-body">
+				<div class="alert alert-info">
+					<p>{l s='Please note that the date chosen for field \'Date To\' is not considered as a blocking date.'}</p>
+				</div>
 				<div class="from-group table-responsive-row clearfix">
 					<table class="table room-disable-dates">
 						<thead>
@@ -135,14 +200,17 @@
 								<th class="col-sm-2 center">
 									<span>{l s='Reason'}</span>
 								</th>
+                                <th class="col-sm-1 center"></th>
 							</tr>
 						</thead>
-						<tbody>
-						</tbody>
+						<tbody></tbody>
 					</table>
 					<div class="form-group">
 						<div class="col-sm-12">
-							<a href="#" class="add_more_room_disable_dates btn btn-default"><i class="icon icon-plus"></i>{l s="Add More"}</a>
+							<a href="#" class="add_more_room_disable_dates btn btn-default">
+                                <i class="icon icon-plus"></i>
+                                <span>{l s="Add More"}</span>
+                            </a>
 						</div>
 					</div>
 				</div>
@@ -168,223 +236,257 @@
 
 
 <script>
-	var prod_link = "{$link->getAdminLink('AdminProducts')}";
-	var rm_status = {$rm_status|@json_encode};
-	var currentRoomRow = 0;
-	var datesMissing = "{$datesMissing}";
-	var datesOverlapping = "{$datesOverlapping}";
+    var prod_link = "{$link->getAdminLink('AdminProducts')}";
+    var rm_status = {$rm_status|@json_encode};
+    var currentRoomRow = 0;
+    var datesMissing = "{$datesMissing}";
+    var datesOverlapping = "{$datesOverlapping}";
 
-	$(document).ready(function() {
-		// Disable dates data filling when model open
-		$('#deactiveDatesModal').on('show.bs.modal', function (e) {
-			$('.disabledDatesTr').remove();
+    $(document).ready(function() {
+        const DisableDatesModal = {
+            init: function() {
+                this.addNewRow();
+            },
+            addNewRow: function() {
+                $('#deactiveDatesModal tbody').append(this.disableDatesRowHtml);
+            },
+            populateWithDatesInfo: function(datesInfo) {
+                const $this = this;
+                $(datesInfo).each(function(i, dateRange) {
+                    $('#deactiveDatesModal tbody').append($this.disableDatesRowHtml);
+                    const dateRangeRow = $('#deactiveDatesModal tbody tr').last();
+                    $(dateRangeRow).find('.disabled_date_from').val(dateRange.date_from);
+                    $(dateRangeRow).find('.disabled_date_to').val(dateRange.date_to);
+                    $(dateRangeRow).find('.room_disable_reason').val(dateRange.reason);
+                });
+            },
+            getValidationErrors: function() {
+                let $return = false;
+                const disableDates = Array();
+                $('#deactiveDatesModal .room-disable-dates tbody tr').each(function(i, tr) {
+                    const dateFrom = $(tr).find('.disabled_date_from').val().trim();
+                    const dateTo = $(tr).find('.disabled_date_to').val().trim();
 
-			var modelTriggerElement = $(e.relatedTarget);
-			var html = '';
-
-			var rowKey = modelTriggerElement.closest(".room_data_values").attr('data-rowKey');
-			currentRoomRow = rowKey;
-			var disableDatesJSON = modelTriggerElement.siblings('input.disableDatesJSON').val();
-
-			if (disableDatesJSON) {
-				var disableDatesObj = JSON.parse(disableDatesJSON);
-				$.each(disableDatesObj, function(disKey, disabledRange) {
-					html += '<tr class="disabledDatesTr">';
-						html += '<td class="col-sm-2 center">';
-							html += '<input class="disabled_date_from form-control" type="text" value="'+disabledRange.date_from+'" name="disabled_date_from'+rowKey+'[]">';
-						html += '</td>';
-						html += '<td class="col-sm-2 center">';
-							html += '<input class="disabled_date_to form-control" type="text" value="'+disabledRange.date_to+'" name="disabled_date_to'+rowKey+'[]">';
-						html += '<td class="center col-sm-6">';
-							html += '<input type="text" class="form-control room_disable_reason" value="'+disabledRange.reason+'" name="room_disable_reason'+rowKey+'[]">';
-						html += '</td>';
-						html += '<td class="center col-sm-1">';
-							html += '<a href="#" class="remove-disable-dates-button btn btn-default"><i class="icon-trash"></i></a>';
-						html += '</td>';
-					html += '</tr>';
-				});
-			} else {
-				html += '<tr class="disabledDatesTr">';
-					html += '<td class="col-sm-2 center">';
-						html += '<input class="disabled_date_from form-control" type="text" value="" name="disabled_date_from'+rowKey+'[]">';
-					html += '</td>';
-					html += '<td class="col-sm-2 center">';
-						html += '<input class="disabled_date_to form-control" type="text" value="" name="disabled_date_to'+rowKey+'[]">';
-					html += '<td class="center col-sm-6">';
-						html += '<input type="text" class="form-control room_disable_reason" value="" name="room_disable_reason'+rowKey+'[]">';
-					html += '</td>';
-					html += '<td class="center col-sm-1">';
-						html += '<a href="#" class="remove-disable-dates-button btn btn-default"><i class="icon-trash"></i></a>';
-					html += '</td>';
-				html += '</tr>';
-			}
-
-			$('.room-disable-dates').append(html);
-		});
-
-		// Disable dates data save when model open
-		$(document).on('click', '.deactiveDatesModalSubmit', function() {
-			var disableDates = new Array();
-			var error = false;
-			$.each($('.disabled_date_from'), function(key, val){
-				var date_from =  $(this).val();
-				var date_to = $('.disabled_date_to:eq('+key+')').val();
-				if (date_from.trim() && date_to.trim()) {
-					var obj = {
-						'date_from': $(this).val(),
-						'date_to': $('.disabled_date_to:eq('+key+')').val(),
-						'reason': $('.room_disable_reason:eq('+key+')').val(),
-					};
-					disableDates.push(obj);
-				} else {
-					if (!(!date_from.trim() && !date_to.trim())) {
-						error = datesMissing;
-					}
-				}
-
-				$.each(disableDates, function(disKey, disabledRange) {
-					if (key != disKey) {
-                        if (((date_from < disabledRange.date_from) && (date_to <= disabledRange.date_from)) || ((date_from > disabledRange.date_from) && (date_from >= disabledRange.date_to))) {
-                        } else {
-                        	error = datesOverlapping;
-                        }
+                    if (!dateFrom.length || !dateTo.length) {
+                        $return = datesMissing;
                     }
-				});
-			});
 
-			if (error) {
-				alert(error);
-				return false;
-			} else {
-				$('#deactiveDatesModal').modal('hide');
-				$("#row_index"+currentRoomRow).find('.disableDatesJSON').val(JSON.stringify(disableDates));
-				return true;
-			}
-		});
+                    disableDates.push({ dateFrom, dateTo });
+                });
 
-		// Add new room detail
-		$('#add-more-rooms-button').on('click',function() {
-			var lengthRooms = $('.room_data_values').length;
-			html = '<tr class="room_data_values" id="row_index'+lengthRooms+'" data-rowKey="'+lengthRooms+'">';
-				html += '<td class="col-sm-1 center">';
-					html += '<input class="form-control" type="text" name="room_num[]">';
-				html += '</td>';
-				html += '<td class="col-sm-2 center">';
-					html += '<input class="form-control" type="text" name="room_floor[]">';
-				html += '</td>';
-				html += '<td class="col-sm-2 center">';
-					html += '<select class="form-control room_status" name="room_status[]">';
-						$.each(rm_status, function(key, value)
-						{
-							html += '<option value="'+value.id+'">'+value.status+'</option>';
-						});
-					html += '</select>';
-				html += '</td>';
-				html += '<td class="center col-sm-6">';
-					html += '<a class="btn btn-default deactiveDatesModal" data-toggle="modal" data-target="#deactiveDatesModal" style="display: none;">';
-						html += "{l s='Add Dates'}";
-					html += '</a>';
-					html += '<input type="hidden" class="form-control disableDatesJSON" name="disableDatesJSON[]" value="0">';
-					html += '<input type="text" class="form-control room_comment" name="room_comment[]">';
-				html += '</td>';
-				html += '<td class="center col-sm-1">';
-					html += '<a href="#" class="remove-rooms-button btn btn-default"><i class="icon-trash"></i></a>';
-				html += '</td>';
-			html += '</tr>';
+                $.each(disableDates, function(keyOuter, dateRangeOuter) {
+                    $.each(disableDates, function(keyInner, dateRangeInner) {
+                        if (keyInner != keyOuter) {
+                            if ((dateRangeOuter.dateFrom <= dateRangeInner.dateTo)
+                                && (dateRangeInner.dateFrom <= dateRangeOuter.dateTo)
+                            ) {
+                                $return = datesOverlapping;
+                            }
+                        }
+                    });
+                });
 
-			$('.hotel-room').append(html);
-		});
+                return $return;
+            },
+            getDisableDatesInfo: function() {
+                const disableDates = Array();
+                $('#deactiveDatesModal .room-disable-dates tbody tr').each(function(i, tr) {
+                    disableDates.push({
+                        date_from: $(tr).find('.disabled_date_from').val().trim(),
+                        date_to: $(tr).find('.disabled_date_to').val().trim(),
+                        reason: $(tr).find('.room_disable_reason').val().trim(),
+                    });
+                });
 
-		// delete room
-		$('.rm_htl_room').on('click',function(e) {
-			e.preventDefault();
-			var $current = $(this);
-			var id_htl_info = $(this).attr('data-id-htl-info');
-			$.ajax({
-	            url: prod_link,
-	            type: 'POST',
-	            dataType: 'text',
-	            data: {
-	            	ajax:true,
-	            	action:'deleteHotelRoom',
-	            	id: id_htl_info,
-	            },
-	            success: function (result) {
-	            	if (parseInt(result) == 1) {
-		               	showSuccessMessage("{l s='Removed successfully'}");
-						$current.closest(".room_data_values").remove();
-	            	} else {
-						showErrorMessage("{l s='Some error occurred'}");
-					}
-	            },
-				error: function(XMLHttpRequest, textStatus, errorThrown) {
-					showErrorMessage("{l s='Some error occurred'}");
-				}
-	        });
-		});
+                return disableDates;
+            },
+            disableDatesRowHtml: `
+                <tr class="disabledDatesTr">
+                    <td class="col-sm-2 center">
+                        <input type="text" class="form-control disabled_date_from" value="" readonly>
+                    </td>
+                    <td class="col-sm-2 center">
+                        <input type="text" class="form-control disabled_date_to" value="" readonly>
+                    </td>
+                    <td class="center col-sm-6">
+                        <input type="text" class="form-control room_disable_reason" value="">
+                    </td>
+                    <td class="center col-sm-1">
+                        <a href="#" class="remove-disable-dates-button btn btn-default"><i class="icon-trash"></i></a>
+                    </td>
+                </tr>
+            `,
+        }
 
-		$(".checkConfigurationClick").on("click", function() {
-			$("#checkConfSubmit").val(1);
-			return true;
-		});
+        // Disable dates data filling when model open
+        $('#deactiveDatesModal').on('show.bs.modal', function(e) {
+            const triggerRoomRow = $(e.relatedTarget);
+            const roomRowIndex = parseInt($(triggerRoomRow).closest('tr').attr('data-row-index'));
+            $('#deactiveDatesModal table.room-disable-dates tbody').html('');
+            $('#deactiveDatesModal table.room-disable-dates').attr('data-room-row-index', roomRowIndex);
+            let disableDates = $(triggerRoomRow).closest('tr').find('.disable_dates_json').val();
+            if (!disableDates) {
+                DisableDatesModal.init();
+                return;
+            }
 
-		// New Room Row Remove
-		$(document).on('click','.remove-rooms-button',function(e) {
-			e.preventDefault();
-			$(this).closest(".room_data_values").remove();
-		});
+            disableDates = JSON.parse(disableDates);
+            DisableDatesModal.populateWithDatesInfo(disableDates);
+        });
 
-		// on changing the room status as disabled for some date range.....
-		$(document).on("change", ".room_status", function(){
-			var status_val = $(this).val();
-			if (status_val == rm_status.STATUS_TEMPORARY_INACTIVE.id) {
-				$(this).closest('.room_data_values').find('.room_comment, .deactiveDatesModal').toggle();
-			} else {
-				$(this).closest('.room_data_values').find('.room_comment').show();
-				$(this).closest('.room_data_values').find('.deactiveDatesModal').hide();
-			}
-		});
+        // copy json formatted dates to room
+        $(document).on('click', '.deactiveDatesModalSubmit', function() {
+            const error = DisableDatesModal.getValidationErrors();
+            if (error) {
+                alert(error);
+                return;
+            }
 
-		$(document).on("focus", ".disabled_date_from, .disabled_date_to", function () {
-			$(".disabled_date_from").datepicker({
-		        showOtherMonths: true,
-		        dateFormat: 'yy-mm-dd',
-		        minDate: 0,
-		        //for calender Css
-		        onSelect: function(selectedDate) {
-		            $(this).closest('tr').find(".disabled_date_to").datepicker("option", "minDate", selectedDate).val('');
-		        },
-		    });
-		    $(".disabled_date_to").datepicker({
-		        showOtherMonths: true,
-		        dateFormat: 'yy-mm-dd',
-		        minDate: 0,
-		    });
-		});
+            const disableDates = DisableDatesModal.getDisableDatesInfo();
+            const roomRowIndex = parseInt($('#deactiveDatesModal table.room-disable-dates').attr('data-room-row-index'));
+            const roomRow = $('#product-configuration .hotel-room tr.room_data_values[data-row-index='+roomRowIndex+']');
+            $(roomRow).find('.disable_dates_json').val(JSON.stringify(disableDates));
+            $('#deactiveDatesModal').modal('hide');
+        });
 
-		$('.add_more_room_disable_dates').on('click',function() {
-	    	var rowKey = $(this).closest(".room_data_values").attr('data-rowKey');
-			html = '<tr class="disabledDatesTr">';
-				html += '<td class="col-sm-2 center">';
-					html += '<input class="disabled_date_from form-control" type="text" value="" name="disabled_date_from'+rowKey+'[]">';
-				html += '</td>';
-				html += '<td class="col-sm-2 center">';
-					html += '<input class="disabled_date_to form-control" type="text" value="" name="disabled_date_to'+rowKey+'[]">';
-				html += '<td class="center col-sm-6">';
-					html += '<input type="text" class="form-control room_disable_reason" value="" name="room_disable_reason'+rowKey+'[]">';
-				html += '</td>';
-				html += '<td class="center col-sm-1">';
-					html += '<a href="#" class="remove-disable-dates-button btn btn-default"><i class="icon-trash"></i></a>';
-				html += '</td>';
-			html += '</tr>';
+        // Add new room detail
+        $('#add-more-rooms-button').on('click',function() {
+            var lengthRooms = parseInt($('.room_data_values').length);
 
-			$('.room-disable-dates').append(html);
-		});
+            var prefix = 'rooms_info['+lengthRooms+']';
+            html = '<tr class="room_data_values" data-row-index="'+lengthRooms+'">';
+                html += '<td class="col-sm-1 center">';
+                    html += '<input class="form-control" type="text" name="'+prefix+'[room_num]">';
+                html += '</td>';
+                html += '<td class="col-sm-2 center">';
+                    html += '<input class="form-control" type="text" name="'+prefix+'[floor]">';
+                html += '</td>';
+                html += '<td class="col-sm-2 center">';
+                    html += '<select class="form-control room_status" name="'+prefix+'[id_status]">';
+                        $.each(rm_status, function(key, value) {
+                            html += '<option value="'+value.id+'">'+value.status+'</option>';
+                        });
+                    html += '</select>';
+                html += '</td>';
+                html += '<td class="col-sm-3 center">';
+                    html += '<input class="form-control" type="text" name="'+prefix+'[floor]">';
+                html += '</td>';
+                html += '<td class="center col-sm-2">';
+                    html += '<a class="btn btn-default deactiveDatesModal disabled" data-toggle="modal" data-target="#deactiveDatesModal">';
+                        html += "{l s='Add Dates'}";
+                    html += '</a>';
+                    html += '<input type="hidden" class="form-control disable_dates_json" name="'+prefix+'[disable_dates_json]">';
+                html += '</td>';
+                html += '<td class="center col-sm-1">';
+                    html += '<a href="#" class="remove-rooms-button btn btn-default"><i class="icon-trash"></i></a>';
+                html += '</td>';
+            html += '</tr>';
 
-		$(document).on('click','.remove-disable-dates-button',function(e) {
-			e.preventDefault();
-			$(this).closest('tr').remove();
-		});
-	});
+            $('table.hotel-room tbody').append(html);
+        });
 
+        // delete room
+        $('.rm_htl_room').on('click',function(e) {
+            e.preventDefault();
+            var $current = $(this);
+            var id_htl_info = $(this).attr('data-id-htl-info');
+            $.ajax({
+                url: prod_link,
+                type: 'POST',
+                dataType: 'text',
+                data: {
+                    ajax:true,
+                    action:'deleteHotelRoom',
+                    id: id_htl_info,
+                },
+                success: function (result) {
+                    if (parseInt(result) == 1) {
+                        showSuccessMessage("{l s='Removed successfully'}");
+                        $current.closest(".room_data_values").remove();
+                    } else {
+                        showErrorMessage("{l s='Some error occurred'}");
+                    }
+                },
+                error: function(XMLHttpRequest, textStatus, errorThrown) {
+                    showErrorMessage("{l s='Some error occurred'}");
+                }
+            });
+        });
+
+        $(".checkConfigurationClick").on("click", function() {
+            $("#checkConfSubmit").val(1);
+            return true;
+        });
+
+        // remove room row
+        $(document).on('click','.remove-rooms-button',function(e) {
+            e.preventDefault();
+            $(this).closest('.room_data_values').remove();
+            $('#product-configuration table.hotel-room tr.room_data_values').each(function(iOuter, tr) {
+                $(tr).attr('data-row-index', iOuter);
+                $(tr).find('input, select').each(function (iInner, inputField) {
+                    let fieldName = $(inputField).attr('name');
+                    fieldName = fieldName.replace(/[0-9]+/, iOuter)
+                    $(inputField).attr('name', fieldName);
+                });
+            });
+        });
+
+        // on changing the room status as disabled for some date range
+        $(document).on('change', '.room_status', function(){
+            var status_val = $(this).val();
+            if (status_val == rm_status.STATUS_TEMPORARY_INACTIVE.id) {
+                $(this).closest('.room_data_values').find('.deactiveDatesModal').removeClass('disabled');
+            } else {
+                $(this).closest('.room_data_values').find('.deactiveDatesModal').addClass('disabled');
+            }
+        });
+
+        $(document).on('focus', '.disabled_date_from, .disabled_date_to', function () {
+            $('.disabled_date_from').datepicker({
+                showOtherMonths: true,
+                dateFormat: 'yy-mm-dd',
+                minDate: 0,
+                onSelect: function(selectedDate) {
+                    var date_format = selectedDate.split('-');
+                    selectedDate = new Date($.datepicker.formatDate('yy-mm-dd', new Date(date_format[0], date_format[1] - 1, date_format[2])));
+                    selectedDate.setDate(selectedDate.getDate() + 1);
+                    $(this).closest('tr').find('.disabled_date_to').datepicker('option', 'minDate', selectedDate);
+                },
+                onClose: function(selectedDate) {
+                    var dateTo = $(this).closest('tr').find('.disabled_date_to').val();
+                    if (!dateTo || (dateTo && selectedDate >= dateTo)) {
+                        $('.disabled_date_to').datepicker('show');
+                    }
+                },
+            });
+
+            $('.disabled_date_to').datepicker({
+                showOtherMonths: true,
+                dateFormat: 'yy-mm-dd',
+                minDate: 0,
+                beforeShow: function (input, instance) {
+                    var date_to = $(this).closest('tr').find('.disabled_date_from').val();
+                    if (typeof date_to != 'undefined' && date_to != '') {
+                        var date_format = date_to.split('-');
+                        var selectedDate = new Date($.datepicker.formatDate('yy-mm-dd', new Date(date_format[0], date_format[1] - 1, date_format[2])));
+                    } else {
+                        var date_format = new Date();
+                        var selectedDate = new Date($.datepicker.formatDate('yy-mm-dd', new Date()));
+                    }
+                    selectedDate.setDate(selectedDate.getDate()+1);
+                    $(this).datepicker('option', 'minDate', selectedDate);
+                },
+            });
+        });
+
+        $('.add_more_room_disable_dates').on('click', function() {
+            DisableDatesModal.addNewRow();
+        });
+
+        $(document).on('click','.remove-disable-dates-button',function(e) {
+            e.preventDefault();
+            $(this).closest('tr').remove();
+        });
+    });
 </script>

@@ -86,9 +86,8 @@ function error_modal(heading, msg) {
 }
 
 //move to hash after clicking on anchored links
-function scroll_if_anchor(href) {
+function scroll_if_anchor(href, fromTop = 120) {
 	href = typeof(href) === "string" ? href : $(this).attr("href");
-	var fromTop = 120;
 	if(href.indexOf("#") === 0) {
 		var $target = $(href);
 		if($target.length) {
@@ -460,7 +459,7 @@ $(document).ready(function() {
 
 	// reset form
 	/* global header_confirm_reset, body_confirm_reset, left_button_confirm_reset, right_button_confirm_reset */
-	$(".reset_ready").click(function () {
+	$(document).on('click', '.reset_ready', function () {
 		var href = $(this).attr('href');
 		confirm_modal( header_confirm_reset, body_confirm_reset, left_button_confirm_reset, right_button_confirm_reset,
 			function () {

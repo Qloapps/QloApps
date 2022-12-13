@@ -27,6 +27,11 @@
 	</div>
 
 	<form id="{$table|escape:'htmlall':'UTF-8'}_form" class="defaultForm {$name_controller|escape:'htmlall':'UTF-8'} form-horizontal" action="{$current|escape:'htmlall':'UTF-8'}&{if !empty($submit_action)}{$submit_action|escape:'htmlall':'UTF-8'}{/if}&token={$token|escape:'htmlall':'UTF-8'}" method="post" enctype="multipart/form-data" {if isset($style)}style="{$style|escape:'htmlall':'UTF-8'}"{/if}>
+		{if isset($edit)}
+			{assign var=hook_arg_id_hotel value=$hotel_info.id}
+		{else}
+			{assign var=hook_arg_id_hotel value=null}
+		{/if}
 		{if count($languages) > 1}
 			<div class="col-lg-12">
 				<label class="control-label">{l s='Choose Language' mod='hotelreservationsystem'}</label>
@@ -44,7 +49,7 @@
 						</li>
 					{/foreach}
 				</ul>
-				<p class="help-block">{l s='Change language for updating information in multiple language.' mod='hotelreservationsystem'}</p>
+				<p class="help-block">{l s='Change language here to update information in multiple languages.' mod='hotelreservationsystem'}</p>
 				<hr>
 			</div>
 		{/if}
@@ -69,6 +74,7 @@
 						{l s='Refund Policies' mod='hotelreservationsystem'}
 					</a>
 				</li>
+				{hook h='displayAdminAddHotelFormTab' id_hotel=$hook_arg_id_hotel}
 			</ul>
 			<div class="tab-content panel collapse in">
 				<div class="tab-pane active" id="hotel-information">
@@ -343,7 +349,7 @@
 						</div>
 					{else}
 						<div class="alert alert-warning">
-							{l s='Please save the hotel information before saving the hotel images.' mod='hotelreservationsystem'}
+							{l s='Please save hotel information before saving hotel images.' mod='hotelreservationsystem'}
 						</div>
 					{/if}
 				</div>
@@ -429,10 +435,11 @@
 						</div>
 					{else}
 						<div class="alert alert-warning">
-							{l s='Please save the hotel information before saving the hotel images.' mod='hotelreservationsystem'}
+							{l s='Please save hotel information before saving refund policy options.' mod='hotelreservationsystem'}
 						</div>
 					{/if}
 				</div>
+				{hook h='displayAdminAddHotelFormTabContent' id_hotel=$hook_arg_id_hotel}
 			</div>
 		</div>
 		<div class="panel-footer">
