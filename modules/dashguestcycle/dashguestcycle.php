@@ -103,19 +103,19 @@ class DashGuestCycle extends Module
 
         // set tables data
         $tableCurrentArrivals = $this->getTableArrivalsByDate($dateToday, $params['id_hotel']);
-        $dataValue['dgc_count_upcoming_arrivals'] = sprintf('%02d', count($tableCurrentArrivals['body']));
+        $dataValue['dgc_count_upcoming_arrivals'] = count($tableCurrentArrivals['body']);
 
         $tableCurrentDepartures = $this->getTableDeparturesByDate($dateToday, $params['id_hotel']);
-        $dataValue['dgc_count_upcoming_departures'] = sprintf('%02d', count($tableCurrentDepartures['body']));
+        $dataValue['dgc_count_upcoming_departures'] = count($tableCurrentDepartures['body']);
 
         $tableCurrentInHouse = $this->getTableInHouseByDate($dateToday, $params['id_hotel']);
-        $dataValue['dgc_count_current_in_house'] = sprintf('%02d', count($tableCurrentInHouse['body']));
+        $dataValue['dgc_count_current_in_house'] = count($tableCurrentInHouse['body']);
 
         $tableNewBookings = $this->getTableNewBookingsByDate($dateToday, $params['id_hotel']);
-        $dataValue['dgc_count_new_bookings'] = sprintf('%02d', count($tableNewBookings['body']));
+        $dataValue['dgc_count_new_bookings'] = count($tableNewBookings['body']);
 
         $tableCancellations = $this->getTableCancellationsByDate($dateToday, $params['id_hotel']);
-        $dataValue['dgc_count_cancellations'] = sprintf('%02d', count($tableCancellations['body']));
+        $dataValue['dgc_count_cancellations'] = count($tableCancellations['body']);
 
         $dataTable = array(
             'dgc_table_current_arrivals' => $tableCurrentArrivals,

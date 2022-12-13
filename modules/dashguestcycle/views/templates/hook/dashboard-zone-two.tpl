@@ -34,31 +34,31 @@
                 <li class="active">
                     <a href="#dgc_current_arrivals" data-toggle="tab">
                         <span>{l s='Arrivals' mod='dashguestcycle'}</span>
-                        <span class="label label-info" id="dgc_count_upcoming_arrivals">--</span>
+                        <span class="label label-info" id="dgc_count_upcoming_arrivals">0</span>
                     </a>
                 </li>
                 <li>
                     <a href="#dgc_current_departures" data-toggle="tab">
                         <span>{l s='Departures' mod='dashguestcycle'}</span>
-                        <span class="label label-info" id="dgc_count_upcoming_departures">--</span>
+                        <span class="label label-info" id="dgc_count_upcoming_departures">0</span>
                     </a>
                 </li>
                 <li>
                     <a href="#dgc_current_in_house" data-toggle="tab">
                         <span>{l s='In-house' mod='dashguestcycle'}</span>
-                        <span class="label label-info" id="dgc_count_current_in_house">--</span>
+                        <span class="label label-info" id="dgc_count_current_in_house">0</span>
                     </a>
                 </li>
                 <li>
                     <a href="#dgc_current_new_bookings" data-toggle="tab">
                         <span>{l s='Bookings' mod='dashguestcycle'}</span>
-                        <span class="label label-info" id="dgc_count_new_bookings">--</span>
+                        <span class="label label-info" id="dgc_count_new_bookings">0</span>
                     </a>
                 </li>
                 <li>
                     <a href="#dgc_current_cancellations" data-toggle="tab">
                         <span>{l s='Cancellations' mod='dashguestcycle'}</span>
-                        <span class="label label-info" id="dgc_count_cancellations">--</span>
+                        <span class="label label-info" id="dgc_count_cancellations">0</span>
                     </a>
                 </li>
             </ul>
