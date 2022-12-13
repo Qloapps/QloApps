@@ -71,7 +71,7 @@ class AdminHotelReviewHotelReviewController extends ModuleAdminController
             'hotel_name' => array(
                 'title' => $this->l('Hotel'),
                 'hint' => $this->l('Name of the hotel for which this review has been added.'),
-                'align' => 'center',
+                'align' => 'left',
                 'callback' => 'getHotelLink',
             ),
             'rating' => array(
@@ -84,13 +84,13 @@ class AdminHotelReviewHotelReviewController extends ModuleAdminController
             'subject' => array(
                 'title' => $this->l('Subject'),
                 'hint' => $this->l('Subject of the review.'),
-                'align' => 'center',
+                'align' => 'left',
                 'callback' => 'getSubject',
             ),
             'customer_name' => array(
                 'title' => $this->l('Customer'),
                 'hint' => $this->l('Name of the customer who added this review.'),
-                'align' => 'center',
+                'align' => 'left',
                 'callback' => 'getCustomerLink',
                 'havingFilter' => true,
             ),

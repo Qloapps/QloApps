@@ -85,6 +85,11 @@ class QloHotelReview extends Module
                 return false;
             }
         }
+
+        if (!QhrHotelReviewDb::saveDefaultCategories()) {
+            return false;
+        }
+
         return true;
     }
 
@@ -280,7 +285,7 @@ class QloHotelReview extends Module
         $tabs = array(
             array('AdminParentHotelReview', 'Hotel Reviews', false, true),
             array('AdminHotelReviewCategory', 'Configuration', 'AdminParentHotelReview', true),
-            array('AdminHotelReviewHotelReview', 'Manage Reviews', 'AdminHotelReservationSystemManagement', false),
+            array('AdminHotelReviewHotelReview', 'Reviews', 'AdminParentHotelReview', false),
         );
 
         foreach ($tabs as $tab) {

@@ -17,4 +17,9 @@
 * @license LICENSE.txt
 *}
 
-<span class="badge badge-danger">{$total_reports|escape:'html':'UTF-8'}</span>
+{if $total_reports == 0}
+    --
+{else}
+    <span class="badge badge-danger">{$total_reports|escape:'html':'UTF-8'}</span>
+{/if}
+

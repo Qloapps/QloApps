@@ -49,7 +49,7 @@
 <div class="row">
     <label class="control-label col-lg-3">{l s='Description' mod='qlohotelreview'}</label>
     <div class="col-lg-9">
-        <p class="form-control-static rich-text">{$currentObject->description}</p>
+        <p class="form-control-static rich-text">{if !$currentObject->description|strlen}--{else}{$currentObject->description}{/if}</p>
     </div>
 </div>
 
@@ -60,18 +60,18 @@
             {if $currentObject->rating|floatval < 2}
                 <span class="badge badge-danger">{$currentObject->rating|string_format:'%.1f'}</span>
             {elseif $currentObject->rating|floatval < 3.5}
-                <span class="badge badge-danger">{$currentObject->rating|string_format:'%.1f'}</span>
+                <span class="badge badge-warning">{$currentObject->rating|string_format:'%.1f'}</span>
             {else}
-                <span class="badge badge-danger">{$currentObject->rating|string_format:'%.1f'}</span>
+                <span class="badge badge-success">{$currentObject->rating|string_format:'%.1f'}</span>
             {/if}
         </p>
     </div>
 </div>
 
-<div class="row">
-    <label class="control-label col-lg-3">{l s='Category Ratings' mod='qlohotelreview'}</label>
-    <div class="col-lg-9">
-        {if count($currentObject->category_ratings)}
+{if count($currentObject->category_ratings)}
+    <div class="row">
+        <label class="control-label col-lg-3">{l s='Category Ratings' mod='qlohotelreview'}</label>
+        <div class="col-lg-9">
             {foreach from=$currentObject->category_ratings item=category}
                 <div class="row">
                     <p class="form-control-static">
@@ -86,11 +86,9 @@
                     </p>
                 </div>
             {/foreach}
-        {else}
-            <p class="form-control-static">{l s='No categories available.'}</p>
-        {/if}
+        </div>
     </div>
-</div>
+{/if}
 
 <div class="row">
     <label class="control-label col-lg-3">{l s='Images' mod='qlohotelreview'}</label>

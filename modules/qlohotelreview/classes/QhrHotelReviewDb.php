@@ -96,6 +96,30 @@ class QhrHotelReviewDb
         );
     }
 
+    public static function saveDefaultCategories()
+    {
+        $categories = array('Food', 'Room Service');
+
+        $languages = Language::getLanguages();
+        foreach ($categories as $category) {
+            $objCategory = new QhrCategory();
+
+            $name = array();
+            foreach ($languages as $language) {
+                $name[$language['id_lang']] = $category;
+            }
+
+            $objCategory->name = $name;
+            $objCategory->active = 1;
+
+            if (!$objCategory->save()) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     public static function deleteTables()
     {
         return DB::getInstance()->execute(
@@ -115,7 +139,7 @@ class QhrHotelReviewDb
         return array(
             'QHR_ADMIN_APPROVAL_ENABLED' => 1,
             'QHR_MAX_IMAGES_PER_REVIEW' => 5,
-            'QHR_REVIEWS_PER_PAGE' => 3,
+            'QHR_REVIEWS_PER_PAGE' => 5,
             'QHR_REVIEW_APPROVAL_EMAIL_ENABLED' => 0,
             'QHR_REVIEW_MGMT_REPLY_EMAIL_ENABLED' => 0,
         );

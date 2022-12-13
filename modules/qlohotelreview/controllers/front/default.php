@@ -66,9 +66,8 @@ class QloHotelReviewDefaultModuleFrontController extends ModuleFrontController
             $errors['by_key']['subject'] = $objModule->l('This field is too long.', 'default');
         }
 
-        if (!$description) {
-            $errors['by_key']['description'] = $objModule->l('Review description can not be empty.', 'default');
-        } elseif(!Validate::isMessage($description)) {
+
+        if(!Validate::isMessage($description)) {
             $errors['by_key']['description'] = $objModule->l('Review description is invalid.', 'default');
         } elseif(Tools::strlen($description) > 65535) {
             $errors['by_key']['description'] = $objModule->l('This field is too long.', 'default');

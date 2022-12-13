@@ -53,7 +53,7 @@ class QhrHotelReview extends ObjectModel
             'id_order' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedInt', 'required' => true),
             'rating' => array('type' => self::TYPE_FLOAT, 'validate' => 'isFloat'),
             'subject' => array('type' => self::TYPE_STRING, 'validate' => 'isMessage', 'size' => 255, 'required' => true),
-            'description' => array('type' => self::TYPE_STRING, 'validate' => 'isMessage', 'size' => 65535, 'required' => true),
+            'description' => array('type' => self::TYPE_STRING, 'validate' => 'isMessage', 'size' => 65535),
             'status_abusive' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedInt'),
             'status' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedInt'),
             'date_add' => array('type' => self::TYPE_DATE, 'validate' => 'isDate', 'copy_post' => false),
