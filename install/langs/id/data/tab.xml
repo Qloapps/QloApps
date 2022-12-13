@@ -59,6 +59,7 @@
   <tab id="Tax_Rules" name="Aturan pajak"/>
   <tab id="Translations" name="Terjemahan"/>
   <tab id="Modules_1" name="Modul dan layanan"/>
+  <tab id="Modules_Catalog" name="Modules Catalog"/>
   <tab id="Modules_Themes_Catalog" name="Katalog modul dan theme"/>
   <tab id="Positions" name="Posisi"/>
   <tab id="Payment" name="Pembayaran"/>

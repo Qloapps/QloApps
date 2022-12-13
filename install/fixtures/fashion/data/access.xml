@@ -69,6 +69,7 @@
     <access id="access_3_59" id_profile="Logistician" id_tab="Taxes" view="0" add="0" edit="0" delete="0"/>
     <access id="access_3_60" id_profile="Logistician" id_tab="Translations" view="0" add="0" edit="0" delete="0"/>
     <access id="access_3_61" id_profile="Logistician" id_tab="Modules_1" view="1" add="0" edit="1" delete="0"/>
+    <access id="access_3_62" id_profile="Logistician" id_tab="Modules_Catalog" view="0" add="0" edit="0" delete="0"/>
     <access id="access_3_62" id_profile="Logistician" id_tab="Modules_Themes_Catalog" view="0" add="0" edit="0" delete="0"/>
     <access id="access_3_63" id_profile="Logistician" id_tab="Positions" view="0" add="0" edit="0" delete="0"/>
     <access id="access_3_64" id_profile="Logistician" id_tab="Payment" view="0" add="0" edit="0" delete="0"/>
@@ -169,6 +170,7 @@
     <access id="access_4_59" id_profile="Translator" id_tab="Taxes" view="0" add="0" edit="0" delete="0"/>
     <access id="access_4_60" id_profile="Translator" id_tab="Translations" view="1" add="1" edit="1" delete="1"/>
     <access id="access_4_61" id_profile="Translator" id_tab="Modules_1" view="0" add="0" edit="0" delete="0"/>
+    <access id="access_4_62" id_profile="Translator" id_tab="Modules_Catalog" view="0" add="0" edit="0" delete="0"/>
     <access id="access_4_62" id_profile="Translator" id_tab="Modules_Themes_Catalog" view="0" add="0" edit="0" delete="0"/>
     <access id="access_4_63" id_profile="Translator" id_tab="Positions" view="0" add="0" edit="0" delete="0"/>
     <access id="access_4_64" id_profile="Translator" id_tab="Payment" view="0" add="0" edit="0" delete="0"/>
@@ -269,6 +271,7 @@
     <access id="access_5_59" id_profile="Salesman" id_tab="Taxes" view="0" add="0" edit="0" delete="0"/>
     <access id="access_5_60" id_profile="Salesman" id_tab="Translations" view="0" add="0" edit="0" delete="0"/>
     <access id="access_5_61" id_profile="Salesman" id_tab="Modules_1" view="1" add="0" edit="1" delete="0"/>
+    <access id="access_5_62" id_profile="Salesman" id_tab="Modules_Catalog" view="0" add="0" edit="0" delete="0"/>
     <access id="access_5_62" id_profile="Salesman" id_tab="Modules_Themes_Catalog" view="0" add="0" edit="0" delete="0"/>
     <access id="access_5_63" id_profile="Salesman" id_tab="Positions" view="0" add="0" edit="0" delete="0"/>
     <access id="access_5_64" id_profile="Salesman" id_tab="Payment" view="0" add="0" edit="0" delete="0"/>

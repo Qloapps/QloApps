@@ -803,7 +803,11 @@ class AdminOrdersControllerCore extends AdminController
                     $this->errors[] = Tools::displayError('The date is invalid');
                 } else {
                     if (!$order->addOrderPayment($amount, Tools::getValue('payment_method'), Tools::getValue('payment_transaction_id'), $currency, Tools::getValue('payment_date'), $order_invoice)) {
-                        $this->errors[] = Tools::displayError('An error occurred during payment.');
+                        if (!validate::isPrice($order->total_paid_real)) {
+                            $this->errors[] = Tools::displayError('Order total payments cannot be less than 0.');
+                        } else {
+                            $this->errors[] = Tools::displayError('An error occurred during payment.');
+                        }
                     } else {
                         Tools::redirectAdmin(self::$currentIndex.'&id_order='.$order->id.'&vieworder&conf=4&token='.$this->token);
                     }

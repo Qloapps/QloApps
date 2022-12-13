@@ -90,7 +90,7 @@
 		<div class="col-lg-3">
 			<div class="panel">
 				<div class="alert alert-info">
-					{l s="The module '%s' must be activated and configurated in order to have all the statistics" sprintf=$statsdata_name}
+					{l s="The module '%s' must be activated and configured in order to have all the statistics." sprintf=$statsdata_name}
 				</div>
 			</div>
 		</div>

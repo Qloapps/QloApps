@@ -51,8 +51,8 @@ class HotelBranchInformation extends ObjectModel
             'active' => array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
             'latitude' => array('type' => self::TYPE_FLOAT),
             'longitude' => array('type' => self::TYPE_FLOAT),
-            'map_formated_address' => array('type' => self::TYPE_HTML, 'size' => 128),
-            'map_input_text' => array('type' => self::TYPE_STRING, 'size' => 128),
+            'map_formated_address' => array('type' => self::TYPE_HTML, 'validate' => 'isCleanHtml'),
+            'map_input_text' => array('type' => self::TYPE_STRING, 'validate' => 'isString'),
             'active_refund' => array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
             'date_add' => array('type' => self::TYPE_DATE, 'validate' => 'isDate', 'copy_post' => false),
             'date_upd' => array('type' => self::TYPE_DATE, 'validate' => 'isDate', 'copy_post' => false),
@@ -554,7 +554,6 @@ class HotelBranchInformation extends ObjectModel
 
         return Db::getInstance()->executeS($sql);
     }
-
     public function getAllHotels()
     {
         return Db::getInstance()->executeS('SELECT * FROM `'._DB_PREFIX_.'htl_branch_info`');

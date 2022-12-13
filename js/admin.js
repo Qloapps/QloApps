@@ -728,6 +728,27 @@ $(document).ready(function()
 		$('#theme_fieldset_'+formToMove+' .form-wrapper').appendTo('#'+formDestination);
 	}
 
+	try
+		{
+			resAjax = $.ajax({
+				type:"POST",
+				url: 'index.php',
+				headers: {"cache-control": "no-cache"},
+				async: true,
+				cache: false,
+				data: {
+					ajax : "1",
+					token : token,
+					action : "refreshModuleList"
+				},
+				success: function(data){
+				}
+			});
+		}
+	catch(e) { }
+
+
+
 	$('select.chosen').each(function(k, item){
 		$(item).chosen({disable_search_threshold: 10, search_contains: true});
 	});
@@ -863,7 +884,6 @@ $(document).ready(function()
 		var moduleLink = $(this).data('link');
 		var authorUri = $(this).data('author-uri');
 		var isValidUri = /(https?):\/\/([a-z0-9\.]*)?(prestashop.com).*/gi;
-		var addonsSearchLink = 'http://addons.prestashop.com/en/search?search_query='+encodeURIComponent(moduleDisplayName)+'&utm_source=back-office&utm_medium=addons-certified&utm_campaign=back-office-'+iso_user.toUpperCase();
 
 		$('.modal #untrusted-module-logo').attr('src', moduleImage);
 		$('.modal .module-display-name-placeholder').text(moduleDisplayName);
@@ -873,7 +893,6 @@ $(document).ready(function()
 			$('.modal .author-name-placeholder').wrap('<a href="'+authorUri+'" onclick="window.open(this.href);return false;"></a>');
 
 		$('.modal #proceed-install-anyway').attr('href', moduleLink);
-		$('.modal .catalog-link').attr('href', addonsSearchLink);
 		$('.modal .catalog-link').attr('onclick', 'window.open(this.href);return false;');
 	});
 
@@ -1206,14 +1225,14 @@ function openModulesList()
 				ajax : "1",
 				controller : "AdminModules",
 				action : "getTabModulesList",
-				tab_modules_list : tab_modules_list,
+				controller_class: help_class_name,
 				back_tab_modules_list : window.location.href
 			},
 			success : function(data)
 			{
 				$('#modules_list_container_tab_modal').html(data).slideDown();
 				$('#modules_list_loader').hide();
-				modules_list_loaded = true;
+				// modules_list_loaded = true;
 				$('.help-tooltip').tooltip();
 			}
 		});
@@ -1574,5 +1593,30 @@ function countDown($source, $target) {
 
 	$source.keyup(function(){
 		$target.html(max-$source.val().length);
+	});
+}
+
+function loadRecommendation()
+{
+	$.ajax({
+		type: 'POST',
+		url: 'index.php',
+		async: true,
+		dataType: 'JSON',
+		data: {
+			action: 'getRecommendationContent',
+			tab: help_class_name,
+			ajax: 1,
+			token: token
+		},
+		success: function(res) {
+			$('#recommendation-wrapper-skeleton').fadeOut('slow').hide();
+			if (res.success) {
+				$('#recommendation-wrapper').html(res.content).fadeIn('slow');
+			}
+		},
+		error: function(res) {
+			$('#recommendation-wrapper-skeleton').fadeOut('slow').hide();
+		}
 	});
 }

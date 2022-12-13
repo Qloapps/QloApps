@@ -113,7 +113,6 @@ if (typeof combinations !== 'undefined' && combinations)
 	}
 	combinations = combinationsJS;
 }
-/* */
 
 $(document).ready(function() {
     var url_found = checkUrl();
@@ -861,7 +860,6 @@ function serialScrollResizeThumbContainer() {
     }
 }
 
-
 // Change the current product images regarding the combination selected
 function refreshProductImages(id_product_attribute) {
     id_product_attribute = parseInt(id_product_attribute);
@@ -968,7 +966,6 @@ function colorPickerClick(elt) {
     });
     $(elt).parent().parent().parent().children('.color_pick_hidden').val(id_attribute);
 }
-
 
 function getProductAttribute() {
     // get every attributes values
@@ -1167,7 +1164,33 @@ $(document).ready(function() {
         }
         e.preventDefault();
 	});
+
+    if (typeof google === 'object') {
+        initMap();
+    }
 });
+
+function initMap() {
+    const map = new google.maps.Map($('#room_type_map_tab .map-wrap').get(0), {
+        zoom: 10,
+        streetViewControl: false,
+    });
+
+    const hotelLatLng = {
+        lat: Number(hotel_loc.latitude),
+        lng: Number(hotel_loc.longitude),
+    };
+
+    map.setCenter(hotelLatLng);
+
+    const marker = new google.maps.Marker({
+        position: hotelLatLng,
+        map: map,
+    });
+
+    const uiContent = $('#room-info-map-ui-content .hotel-info-wrap').get(0);
+    map.controls[google.maps.ControlPosition.LEFT_TOP].push(uiContent);
+}
 
 var BookingForm = {
     currentRequest: null,

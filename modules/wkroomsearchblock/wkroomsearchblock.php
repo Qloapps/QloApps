@@ -32,7 +32,7 @@ class WkRoomSearchBlock extends Module
         $this->name = 'wkroomsearchblock';
         $this->tab = 'front_office_features';
         $this->version = '1.1.2';
-        $this->author = 'webkul';
+        $this->author = 'Webkul';
         $this->need_instance = 0;
 
         $this->bootstrap = true;

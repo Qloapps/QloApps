@@ -63,6 +63,13 @@ class ProductControllerCore extends FrontController
         if (Configuration::get('PS_DISPLAY_JQZOOM') == 1) {
             $this->addJqueryPlugin('jqzoom');
         }
+
+        if (($PS_API_KEY = Configuration::get('PS_API_KEY')) && Configuration::get('WK_GOOGLE_ACTIVE_MAP')) {
+            $this->addJS(
+                'https://maps.googleapis.com/maps/api/js?key='.$PS_API_KEY.'&libraries=places&language='.
+                $this->context->language->iso_code.'&region='.$this->context->country->iso_code
+            );
+        }
     }
 
     public function canonicalRedirection($canonical_url = '')
@@ -324,9 +331,25 @@ class ProductControllerCore extends FrontController
                 }
                 /*End*/
 
+                $hotelImageLink = null;
+                if ($coverImage = HotelImage::getCover($hotel_id)) {
+                    $hotelImagesBaseDir = _MODULE_DIR_.'hotelreservationsystem/views/img/hotel_img/';
+                    $hotelImageLink = $this->context->link->getMediaLink(
+                        $hotelImagesBaseDir.$coverImage['hotel_image_id'].'.jpg'
+                    );
+                }
+
+                Media::addJsDef(array(
+                    'hotel_loc' => array(
+                        'latitude' => $hotel_branch_obj->latitude,
+                        'longitude' => $hotel_branch_obj->longitude,
+                    )
+                ));
+
                 if (Tools::getValue('error')) {
                     $this->context->smarty->assign('error', Tools::getValue('error'));
                 }
+
                 if (Module::isInstalled('productcomments')) {
                     $this->context->smarty->assign(
                         array(
@@ -349,9 +372,15 @@ class ProductControllerCore extends FrontController
                         'hotel_check_in' => date('h:i a', strtotime($hotel_branch_obj->check_in)),
                         'hotel_check_out' => date('h:i a', strtotime($hotel_branch_obj->check_out)),
                         'hotel_location' => $hotel_location,
+                        'hotel_latitude' => $hotel_branch_obj->latitude,
+                        'hotel_longitude' => $hotel_branch_obj->longitude,
+                        'hotel_map_input_text' => $hotel_branch_obj->map_input_text,
+                        'hotel_address1' => $addressInfo['address1'],
+                        'hotel_phone' => $addressInfo['phone'],
                         'hotel_name' => $hotel_name,
                         'hotel_policies' => $hotel_policies,
                         'hotel_features' => $htl_features,
+                        'hotel_image_link' => $hotelImageLink,
                         'hotel_has_images' => (bool) HotelImage::getCover($hotel_id),
                         'ftr_img_src' => _PS_IMG_.'rf/',
                         'order_date_restrict' => $order_date_restrict
@@ -434,6 +463,7 @@ class ProductControllerCore extends FrontController
                         'category-'.(isset($this->category) ? $this->category->getFieldByLang('link_rewrite') : ''),
                     ),
                     'display_discount_price' => Configuration::get('PS_DISPLAY_DISCOUNT_PRICE'),
+                    'display_google_maps' => Configuration::get('WK_GOOGLE_ACTIVE_MAP'),
                 )
             );
         }
