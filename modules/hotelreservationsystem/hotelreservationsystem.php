@@ -374,40 +374,14 @@ class HotelReservationSystem extends Module
         }
     }
 
-    public function hookActionOrderStatusUpdate($params)
+    public function hookActionOrderStatusPostUpdate($params)
     {
-        $objHotelBookingDetail = new HotelBookingDetail();
-        $statusesAvailable = $objHotelBookingDetail->getOrderStatusToFreeBookedRoom();
+        $objHtlBkDtl = new HotelBookingDetail();
 
-        if (in_array($params['newOrderStatus']->id, $statusesAvailable)) {
-            // make rooms available for booking if order status is changing to cancelled, refunded or error
-            if (!$objHotelBookingDetail->updateOrderRefundStatus(
-                $params['id_order'],
-                false,
-                false,
-                array(),
-                1
-            )) {
-                $this->context->controller->errors[] = $this->l('Error while making rooms available attached with this order. Please try again.');
-            }
-        } else {
-            $objOrder = new Order($params['id_order']);
-            if (!Validate::isLoadedObject($objOrder)) {
-                return;
-            }
-
-            $objOrderStatusCurrent = $objOrder->getCurrentOrderState();
-            if (in_array($objOrderStatusCurrent->id, $statusesAvailable)) {
-                // make rooms unavailable for booking if previous order status was any of cancelled, refunded or error
-                if (!$objHotelBookingDetail->updateOrderRefundStatus(
-                    $params['id_order'],
-                    false,
-                    false,
-                    array(),
-                    0
-                )) {
-                    $this->context->controller->errors[] = $this->l('Error while making rooms unavailable attached with this order. Please try again.');
-                }
+        // Make rooms available for booking if order status is cancelled, refunded or error
+        if (in_array($params['newOrderStatus']->id, $objHtlBkDtl->getOrderStatusToFreeBookedRoom())) {
+            if (!$objHtlBkDtl->updateOrderRefundStatus($params['id_order'])) {
+                $this->context->controller->errors[] = $this->l('Error while making booked rooms available, attached with this order. Please try again !!');
             }
         }
     }
@@ -567,7 +541,7 @@ class HotelReservationSystem extends Module
                 'actionObjectProfileAddAfter',
                 'actionObjectProfileDeleteBefore',
                 'actionObjectGroupDeleteBefore',
-                'actionOrderStatusUpdate',
+                'actionOrderStatusPostUpdate',
             )
         );
     }
