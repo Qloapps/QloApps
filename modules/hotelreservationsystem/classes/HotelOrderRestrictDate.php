@@ -43,7 +43,7 @@ class HotelOrderRestrictDate extends ObjectModel
         ),
     );
 
-    public function getDataByHotelId($idHotel)
+    public static function getDataByHotelId($idHotel)
     {
         return Db::getInstance()->getRow(
             'SELECT * FROM `'._DB_PREFIX_.'htl_order_restrict_date` ord WHERE ord.`id_hotel` = '.(int) $idHotel
@@ -53,12 +53,7 @@ class HotelOrderRestrictDate extends ObjectModel
     /*Max date of ordering for order restrict*/
     public static function getMaxOrderDate($idHotel)
     {
-        $result = Db::getInstance()->getRow(
-            'SELECT *
-            FROM `'._DB_PREFIX_.'htl_order_restrict_date` ord
-            WHERE ord.`id_hotel` = '.(int) $idHotel
-        );
-
+        $result = self::getDataByHotelId($idHotel);
         if (is_array($result) && count($result) && !$result['use_global_max_order_date']) {
             return $result['max_order_date'];
         }
@@ -76,12 +71,7 @@ class HotelOrderRestrictDate extends ObjectModel
      */
     public static function getPreparationTime($idHotel)
     {
-        $result = Db::getInstance()->getRow(
-            'SELECT *
-            FROM `'._DB_PREFIX_.'htl_order_restrict_date` ord
-            WHERE ord.`id_hotel` = '.(int) $idHotel
-        );
-
+        $result = self::getDataByHotelId($idHotel);
         if (is_array($result) && count($result) && !$result['use_global_preparation_time']) {
             return (int) $result['preparation_time'];
         }
