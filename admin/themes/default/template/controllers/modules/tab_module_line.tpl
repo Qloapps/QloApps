@@ -35,8 +35,6 @@
 				<small class="text-muted">v{$module->version} - by {$module->author}</small>
 				{if isset($module->type) && $module->type == 'addonsBought'}
 					- <span class="module-badge-bought help-tooltip text-warning" data-title="{l s="You bought this module on QloApps Addons. Thank You."}"><i class="icon-pushpin"></i> <small>{l s="Bought"}</small></span>
-				{elseif isset($module->type) && $module->type == 'addonsMustHave'}
-					- <span class="module-badge-popular help-tooltip text-primary" data-title="{l s="This module is available on QloApps Addons"}"><i class="icon-group"></i> <small>{l s="Popular"}</small></span>
 				{elseif isset($module->type) && $module->type == 'addonsPartner'}
 					- <span class="module-badge-partner help-tooltip text-warning" data-title="{l s="This module is available for free thanks to our partner."}"><i class="icon-pushpin"></i> <small>{l s="Official"}</small></span>
 				{elseif isset($module->id) && $module->id gt 0}

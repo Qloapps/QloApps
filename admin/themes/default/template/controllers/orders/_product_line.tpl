@@ -54,7 +54,7 @@
 		</a>
 	</td>
 	<td class="text-center">
-		<span class="booking_duration_show">{$data.date_from|date_format:"%d-%m-%Y"}&nbsp-&nbsp {$data.date_to|date_format:"%d-%m-%Y"}</span>
+		<span class="booking_duration_show">{dateFormat date=$data.date_from} - {dateFormat date=$data.date_to}</span>
 
 		{if $can_edit}
 			<div class="booking_duration_edit" style="display:none;">
@@ -159,7 +159,7 @@
 		</td>
 		<td class="product_action text-right">
 			{* edit/delete controls *}
-			<div class="btn-group">
+			<div class="btn-group pull-right">
 				<button type="button" class="btn btn-default edit_product_change_link">
 					<i class="icon-pencil"></i>
 					{l s='Edit'}

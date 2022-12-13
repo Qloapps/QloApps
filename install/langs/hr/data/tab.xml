@@ -59,6 +59,7 @@
   <tab id="Tax_Rules" name="Pravila poreza"/>
   <tab id="Translations" name="Prijevodi"/>
   <tab id="Modules_1" name="Moduli i servisi"/>
+  <tab id="Modules_Catalog" name="Modules Catalog"/>
   <tab id="Modules_Themes_Catalog" name="Katalog Modula i Tema"/>
   <tab id="Positions" name="Pozicije"/>
   <tab id="Payment" name="Plaćanje"/>

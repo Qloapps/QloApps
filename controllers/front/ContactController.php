@@ -287,7 +287,8 @@ class ContactControllerCore extends FrontController
                 }
             }
         }
-	$contactKey = md5(uniqid(microtime(), true));
+
+	    $contactKey = md5(uniqid(microtime(), true));
         $this->context->cookie->__set('contactFormKey', $contactKey);
         $this->context->smarty->assign(
             array(
@@ -297,7 +298,7 @@ class ContactControllerCore extends FrontController
                 'gblHtlAddress' => $gblHtlAddress,
                 'contacts' => Contact::getContacts($this->context->language->id),
                 'message' => html_entity_decode(Tools::getValue('message')),
-	        'contactKey' => $contactKey,
+	            'contactKey' => $contactKey,
             )
         );
 

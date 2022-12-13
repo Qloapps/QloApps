@@ -68,162 +68,19 @@ $color-calendar-range-compare: lighten($color-calendar-compare,10%)
 				width: 35%
 			button
 				@include margin(5px, 0, 0, 0)
-
-	.daterangepicker
-		position: relative
-		width: 100%
-		font-size: 13px
-		border: solid 1px #ccc
-		@include margin(0, 0, 8px, 0)
-		table
-			width: 100%
-			margin: 0
-			border-spacing: 1px
-		thead
-			tr th
-				background-color: darken($color-calendar,5%)
-				color: white
-				font-size: 0.7em
-				height: 1.5em
-				text-transform: uppercase
-			tr:first-child th
-				background-color: $color-bright
-				border-bottom: 1px solid darken($color-calendar,5%)
-				font-weight: 200
-				font-size: 1.4em
-				color: $color-calendar-day-selected
-		td, th
-			text-align: center
-			padding: 0
-			position: relative
-		tr
-			border-bottom: solid 1px white
-		td
-			color: $color-calendar-day-selected
-			height: 2.4em
-			padding: 0 8px
-			@include transition-property(all)
-			@include transition-duration(0.2s)
-			@include transition-timing-function(ease-out)
-			&.day:after
-				content: ""
-				position: absolute
-				display: block
-				top: 0
-				width: 100%
-				z-index: 0
-				background-color: transparent
-				@include left(0)
-			&.day:hover
-				cursor: pointer
-			&.day.disabled
-				color: $color-calendar-outrange
-			&.old, &.new
-				color: $color-calendar-outrange
-			&.start-selected:not(.old):not(.new):not(.end-selected)
-				color: $color-bright
-				font-weight: 700
-				background-color: $color-calendar-day-selected
-				@include border-left-radius(15px)
-				//@extend .chevron-left
-				&.range-compare
-					background-color: mix($color-calendar-day-selected,$color-calendar-range-compare,70%)
-					@include border-left-radius(0)
-				&.end-selected-compare, &.start-selected-compare
-					background-color: mix($color-calendar-day-selected,$color-calendar-day-selected-compare,70%)
-				&.end-selected-compare
-					@include border-radius(0)
-			&.end-selected:not(.old):not(.new):not(.start-selected)
-				color: $color-bright
-				font-weight: 700
-				background-color: $color-calendar-day-selected
-				//@extend .chevron-right
-				@include border-right-radius(15px)
-				&.range-compare
-					background-color: mix($color-calendar-day-selected,$color-calendar-range-compare,70%)
-					@include border-right-radius(0)
-				&.end-selected-compare, &.start-selected-compare
-					background-color: mix($color-calendar-day-selected,$color-calendar-day-selected-compare,70%)
-				&.start-selected-compare
-					@include border-radius(0)
-			&.start-selected-compare:not(.old):not(.new):not(.end-selected-compare)
-				color: $color-bright
-				font-weight: 700
-				background-color: $color-calendar-day-selected-compare
-				@include border-left-radius(15px)
-				&.range
-					background-color: mix($color-calendar-day-selected-compare,$color-calendar-range,70%)
-					@include border-left-radius(0)
-			&.end-selected-compare:not(.old):not(.new):not(.start-selected-compare)
-				color: $color-bright
-				font-weight: 700
-				background-color: $color-calendar-day-selected-compare
-				@include border-right-radius(15px)
-				&.range
-					background-color: mix($color-calendar-day-selected-compare,$color-calendar-range,70%)
-					@include border-right-radius(0)
-			&.end-selected.start-selected
-				color: $color-bright
-				@include border-radius(15px)
-				font-weight: 700
-				background-color: $color-calendar-day-selected
-				&.range-compare
-					background-color: mix($color-calendar-day-selected,$color-calendar-range-compare,70%)
-					@include border-radius(0)
-			&.end-selected-compare.start-selected-compare
-				color: $color-bright
-				@include border-radius(15px)
-				font-weight: 700
-				background-color: $color-calendar-day-selected-compare
-				&.range
-					background-color: mix($color-calendar-day-selected-compare,$color-calendar-range,70%)
-					@include border-radius(0)
-			&.range
-				color: lighten($color-calendar-range,35%)
-				background-color: $color-calendar-range
-				&.range-compare
-					background-color: mix($color-calendar-range,$color-calendar-range-compare,50%)
-			&.range-compare
-				color: lighten($color-calendar-range-compare,35%)
-				background-color: $color-calendar-range-compare
-				&.range
-					background-color: mix($color-calendar-range,$color-calendar-range-compare,50%)
-			&.today
-				background-color: $color-bright
-			span
-				padding: 0
-				display: block
-				width: 33.333%
-				height: 3em
-				line-height: 3em
-				font-weight: 400
-				float: left
-				text-transform: uppercase
-				cursor: pointer
-				&:hover
-					color: white
-					background-color: $color-calendar-day-selected
-				&.active
-					background-color: $color-calendar-day-selected
-					color: #fff
-				&.old
-					color: $color-calendar-outrange
-		th
-			&.next
-				@include text-align(right)
-				@include padding(0, 10px, 0, 0)
-			&.prev
-				@include text-align(left)
-				@include padding(0, 0, 0, 10px)
-			&.next, &.prev, &.month-switch
-				font-size: 1.3em
-				line-height: 2em
-				height: 2em
-				&:hover
-					background-color: darken($color-calendar,5%)
-					color: white
-		thead tr:first-child th
-			cursor: pointer
+.form-date-actions .btn:hover, .form-date-actions .btn:focus, .form-date-actions .btn:active
+	outline: unset !important
+	text-decoration: none
+.form-date-actions
+	bottom: -27px
+	position: absolute
+	width: 100%
+	z-index: 599
+	background-color: #fff
+	box-shadow: 0 7px 10px 0 rgba(0,0,0,0.26)
+	padding: 2px
+	border-bottom-left-radius: 4px
+	border-bottom-right-radius: 4px
 
 //chevrons are disabled time to figure out the firefox incompatibility..
 .chevron-left, .chevron-right
@@ -253,7 +110,7 @@ $color-calendar-range-compare: lighten($color-calendar-compare,10%)
 	-ms-animation: one 0.2s ease-in-out
 	-o-animation: one 0.2s ease-in-out
 	animation: one 0.2s ease-in-out
-		
+
 @-webkit-keyframes one
 	0%
 		background-color: $color-calendar
