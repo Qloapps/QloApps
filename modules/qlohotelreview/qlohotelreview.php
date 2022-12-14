@@ -247,11 +247,11 @@ class QloHotelReview extends Module
         $objHotelRoomType = new HotelRoomType();
         $roomTypeInfo = $objHotelRoomType->getRoomTypeInfoByIdProduct($idProduct);
         $idHotel = $roomTypeInfo['id_hotel'];
-        $reviewsPerPage = (int) Configuration::get('QHR_REVIEWS_PER_PAGE');
+        $reviewsAtOnce = (int) Configuration::get('QHR_REVIEWS_AT_ONCE');
         $reviews = QhrHotelReview::getByHotel(
             $idHotel,
             1,
-            $reviewsPerPage,
+            $reviewsAtOnce,
             QhrHotelReview::QHR_SORT_BY_TIME_NEW,
             $this->context->cookie->id_customer
         );
@@ -267,7 +267,7 @@ class QloHotelReview extends Module
             $summary = QhrHotelReviewHelper::prepareCategoriesData($summary);
         }
 
-        $hasNextPage = QhrHotelReview::hasNextPage($idHotel, 1, $reviewsPerPage);
+        $hasNextPage = QhrHotelReview::hasNextPage($idHotel, 1, $reviewsAtOnce);
 
         $this->smarty->assign(array(
             'id_hotel' => $idHotel,

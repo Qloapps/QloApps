@@ -167,17 +167,17 @@ class QloHotelReviewDefaultModuleFrontController extends ModuleFrontController
         $idHotel = (int) Tools::getValue('id_hotel');
         $sortBy = (int) Tools::getValue('sort_by');
         $page = (int)Tools::getValue('page');
-        $reviewsPerPage = (int) Configuration::get('QHR_REVIEWS_PER_PAGE');
+        $reviewsAtOnce = (int) Configuration::get('QHR_REVIEWS_AT_ONCE');
 
         $reviews = QhrHotelReview::getByHotel(
             $idHotel,
             $page,
-            $reviewsPerPage,
+            $reviewsAtOnce,
             $sortBy,
             $this->context->cookie->id_customer
         );
 
-        $hasNextPage = QhrHotelReview::hasNextPage($idHotel, $page, $reviewsPerPage);
+        $hasNextPage = QhrHotelReview::hasNextPage($idHotel, $page, $reviewsAtOnce);
 
         if (is_array($reviews) && count($reviews)) {
             $response['html'] = $this->renderReviews($reviews);
@@ -194,17 +194,17 @@ class QloHotelReviewDefaultModuleFrontController extends ModuleFrontController
         $response = array('status' => false);
         $idHotel = (int) Tools::getValue('id_hotel');
         $sortBy = (int) Tools::getValue('sort_by');
-        $reviewsPerPage = (int) Configuration::get('QHR_REVIEWS_PER_PAGE');
+        $reviewsAtOnce = (int) Configuration::get('QHR_REVIEWS_AT_ONCE');
 
         $reviews = QhrHotelReview::getByHotel(
             $idHotel,
             1,
-            $reviewsPerPage,
+            $reviewsAtOnce,
             $sortBy,
             $this->context->cookie->id_customer
         );
 
-        $hasNextPage = QhrHotelReview::hasNextPage($idHotel, 1, $reviewsPerPage);
+        $hasNextPage = QhrHotelReview::hasNextPage($idHotel, 1, $reviewsAtOnce);
 
         if (is_array($reviews) && count($reviews)) {
             $response['html'] = $this->renderReviews($reviews);

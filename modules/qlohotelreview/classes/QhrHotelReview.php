@@ -429,7 +429,7 @@ class QhrHotelReview extends ObjectModel
             $p = 1;
         }
         if ($n !== null && $n <= 0) {
-            $n = (int) Configuration::get('QHR_REVIEWS_PER_PAGE');
+            $n = (int) Configuration::get('QHR_REVIEWS_AT_ONCE');
         }
 
         $cache_id = 'QhrHotelReview::getByHotel_'.(int) $id_hotel.'-'.(int) $p.'-'.(int) $n.'-'.(int) $sort_by.

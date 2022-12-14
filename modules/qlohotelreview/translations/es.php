@@ -28,8 +28,8 @@ $_MODULE['<{qlohotelreview}prestashop>adminhotelreviewcategory_1bf96c4dc6396149c
 $_MODULE['<{qlohotelreview}prestashop>adminhotelreviewcategory_cab400745e95b72353010bccc5408994'] = 'Habilite si desea que cada revisión sea aprobada por un empleado.';
 $_MODULE['<{qlohotelreview}prestashop>adminhotelreviewcategory_fbb6a0405374ac045d8d799356333117'] = 'Máximo de imágenes por reseña';
 $_MODULE['<{qlohotelreview}prestashop>adminhotelreviewcategory_b4e22e7b773b2cfc532e12ea67fb3a2e'] = 'El número máximo de imágenes que se pueden cargar con una reseña.';
-$_MODULE['<{qlohotelreview}prestashop>adminhotelreviewcategory_60370f309bf176f5697f87ff305ee95d'] = 'Reseñas por página';
-$_MODULE['<{qlohotelreview}prestashop>adminhotelreviewcategory_8df916dfcf72ad43fd0afbeb7ae99e67'] = 'El número de reseñas que se muestran por página.';
+$_MODULE['<{qlohotelreview}prestashop>adminhotelreviewcategory_69b962a333770d032cf343072afa3e5b'] = 'Número de reseñas mostradas a la vez';
+$_MODULE['<{qlohotelreview}prestashop>adminhotelreviewcategory_f26a894b5343a4c0319e6d34b784fa0d'] = 'El número de reseñas que se muestran a la vez al enumerarlas.';
 $_MODULE['<{qlohotelreview}prestashop>adminhotelreviewcategory_e86731aaa229c9dbbc2a98e3952e3973'] = 'Revisar el correo electrónico de aprobación';
 $_MODULE['<{qlohotelreview}prestashop>adminhotelreviewcategory_74fdd0caf61978645b6850941cb61154'] = 'Habilite si desea enviar un correo electrónico al cliente cuando se apruebe su revisión.';
 $_MODULE['<{qlohotelreview}prestashop>adminhotelreviewcategory_aaa8d2e2f80851d3bc39720ad57e04b2'] = 'Correo electrónico de respuesta de la gerencia';
@@ -55,7 +55,7 @@ $_MODULE['<{qlohotelreview}prestashop>adminhotelreviewhotelreview_adfa8ba04f1b71
 $_MODULE['<{qlohotelreview}prestashop>adminhotelreviewhotelreview_642826207c217f20e99b154c15ae472c'] = 'Estado de aprobación';
 $_MODULE['<{qlohotelreview}prestashop>adminhotelreviewhotelreview_a0f19e563e79d5e8030c2ceb52926e53'] = 'Estado de aprobación de la revisión.';
 $_MODULE['<{qlohotelreview}prestashop>adminhotelreviewhotelreview_44749712dbec183e983dcd78a7736c41'] = 'Fecha';
-$_MODULE['<{qlohotelreview}prestashop>adminhotelreviewhotelreview_2bd2adb2f861a277935470d0285903c2'] = 'Fecha y hora en que se agregó esta reseña.';
+$_MODULE['<{qlohotelreview}prestashop>adminhotelreviewhotelreview_2bd2adb2f861a277935470d0285903c2'] = 'Fecha y hora en que se añadió esta reseña.';
 $_MODULE['<{qlohotelreview}prestashop>adminhotelreviewhotelreview_d3b206d196cd6be3a2764c1fb90b200f'] = 'Eliminar seleccionado';
 $_MODULE['<{qlohotelreview}prestashop>adminhotelreviewhotelreview_e25f0ecd41211b01c83e5fec41df4fe7'] = '¿Eliminar elementos seleccionados?';
 $_MODULE['<{qlohotelreview}prestashop>adminhotelreviewhotelreview_75adb28860b686e5793f408f6a77bc0b'] = 'La respuesta se ha agregado con éxito.';
@@ -71,7 +71,6 @@ $_MODULE['<{qlohotelreview}prestashop>default_deaca574f1a37b7cb33ef8277cfecade']
 $_MODULE['<{qlohotelreview}prestashop>default_703e6241b109f4eabe0b1d6ae41dca42'] = 'Este campo no puede estar vacío.';
 $_MODULE['<{qlohotelreview}prestashop>default_5d332d96e4a2c480629c66ec0e0b9715'] = 'Este campo no es válido.';
 $_MODULE['<{qlohotelreview}prestashop>default_3577700536f3f42f4f0882dbbe1d1d28'] = 'Este campo es demasiado largo.';
-$_MODULE['<{qlohotelreview}prestashop>default_666df5b26905f1737fe6a6d5d1fce032'] = 'La descripción de la reseña no puede estar vacía.';
 $_MODULE['<{qlohotelreview}prestashop>default_397dcf8a6f1b795d335192a95307fce0'] = 'La descripción de la reseña no es válida.';
 $_MODULE['<{qlohotelreview}prestashop>default_2a7705ef2541560aa28d38af80caa692'] = 'Cargue un máximo de %d imágenes.';
 $_MODULE['<{qlohotelreview}prestashop>default_7c7efec2d1dfd66eb653cf98d4cc865c'] = 'Algo salió mal.';

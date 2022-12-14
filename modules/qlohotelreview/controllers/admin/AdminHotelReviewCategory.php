@@ -141,10 +141,10 @@ class AdminHotelReviewCategoryController extends ModuleAdminController
                         'required' => true,
                         'cast' => 'intval',
                     ),
-                    'QHR_REVIEWS_PER_PAGE' => array(
+                    'QHR_REVIEWS_AT_ONCE' => array(
                         'type' => 'text',
-                        'title' => $this->l('Reviews per page'),
-                        'hint' => $this->l('The number of reviews that are displayed per page.'),
+                        'title' => $this->l('Number of reviews displayed at once'),
+                        'hint' => $this->l('The number of reviews that are displayed at once when listing them.'),
                         'class' => 'fixed-width-md',
                         'validation' => 'isUnsignedInt',
                         'required' => true,
@@ -219,7 +219,7 @@ class AdminHotelReviewCategoryController extends ModuleAdminController
     {
         if (Tools::isSubmit('submitHotelReviewOptions')) {
             $imagesPerReview = Tools::getValue('QHR_MAX_IMAGES_PER_REVIEW');
-            $reviewsPerPage = Tools::getValue('QHR_REVIEWS_PER_PAGE');
+            $reviewsAtOnce = Tools::getValue('QHR_REVIEWS_AT_ONCE');
 
             if ($imagesPerReview == '') {
                 $this->errors[] = $this->l('Please enter maximum images per review.');
@@ -228,16 +228,16 @@ class AdminHotelReviewCategoryController extends ModuleAdminController
                 $this->errors[] = $this->l('Please enter valid maximum images per review.');
             }
 
-            if ($reviewsPerPage == '') {
+            if ($reviewsAtOnce == '') {
                 $this->errors[] = $this->l('Please enter reviews per page.');
             }
-            if (($reviewsPerPage == '0') || ($reviewsPerPage && !Validate::isUnsignedInt($reviewsPerPage))) {
+            if (($reviewsAtOnce == '0') || ($reviewsAtOnce && !Validate::isUnsignedInt($reviewsAtOnce))) {
                 $this->errors[] = $this->l('Please enter valid reviews per page.');
             }
             if (!count($this->errors)) {
                 Configuration::updateValue('QHR_ADMIN_APPROVAL_ENABLED', Tools::getValue('QHR_ADMIN_APPROVAL_ENABLED'));
                 Configuration::updateValue('QHR_MAX_IMAGES_PER_REVIEW', $imagesPerReview);
-                Configuration::updateValue('QHR_REVIEWS_PER_PAGE', $reviewsPerPage);
+                Configuration::updateValue('QHR_REVIEWS_AT_ONCE', $reviewsAtOnce);
                 Configuration::updateValue('QHR_REVIEW_APPROVAL_EMAIL_ENABLED', Tools::getValue('QHR_REVIEW_APPROVAL_EMAIL_ENABLED'));
                 Configuration::updateValue('QHR_REVIEW_MGMT_REPLY_EMAIL_ENABLED', Tools::getValue('QHR_REVIEW_MGMT_REPLY_EMAIL_ENABLED'));
                 Tools::redirectAdmin(self::$currentIndex.'&conf=6&token='.$this->token);

@@ -28,8 +28,8 @@ $_MODULE['<{qlohotelreview}prestashop>adminhotelreviewcategory_1bf96c4dc6396149c
 $_MODULE['<{qlohotelreview}prestashop>adminhotelreviewcategory_cab400745e95b72353010bccc5408994'] = 'Activez si vous souhaitez que chaque avis soit approuvé par un employé.';
 $_MODULE['<{qlohotelreview}prestashop>adminhotelreviewcategory_fbb6a0405374ac045d8d799356333117'] = 'Images maximales par avis';
 $_MODULE['<{qlohotelreview}prestashop>adminhotelreviewcategory_b4e22e7b773b2cfc532e12ea67fb3a2e'] = 'Le nombre maximum d\'images pouvant être téléchargées avec une critique.';
-$_MODULE['<{qlohotelreview}prestashop>adminhotelreviewcategory_60370f309bf176f5697f87ff305ee95d'] = 'Avis par page';
-$_MODULE['<{qlohotelreview}prestashop>adminhotelreviewcategory_8df916dfcf72ad43fd0afbeb7ae99e67'] = 'Le nombre d\'avis affichés par page.';
+$_MODULE['<{qlohotelreview}prestashop>adminhotelreviewcategory_69b962a333770d032cf343072afa3e5b'] = 'Nombre d\'avis affichés à la fois';
+$_MODULE['<{qlohotelreview}prestashop>adminhotelreviewcategory_f26a894b5343a4c0319e6d34b784fa0d'] = 'Le nombre d\'avis qui sont affichés en même temps lors de leur inscription.';
 $_MODULE['<{qlohotelreview}prestashop>adminhotelreviewcategory_e86731aaa229c9dbbc2a98e3952e3973'] = 'Examiner l\'e-mail d\'approbation';
 $_MODULE['<{qlohotelreview}prestashop>adminhotelreviewcategory_74fdd0caf61978645b6850941cb61154'] = 'Activez si vous souhaitez envoyer un e-mail au client lorsque son avis est approuvé.';
 $_MODULE['<{qlohotelreview}prestashop>adminhotelreviewcategory_aaa8d2e2f80851d3bc39720ad57e04b2'] = 'E-mail de réponse de la direction';
@@ -71,7 +71,6 @@ $_MODULE['<{qlohotelreview}prestashop>default_deaca574f1a37b7cb33ef8277cfecade']
 $_MODULE['<{qlohotelreview}prestashop>default_703e6241b109f4eabe0b1d6ae41dca42'] = 'Ce champ ne peut pas être vide.';
 $_MODULE['<{qlohotelreview}prestashop>default_5d332d96e4a2c480629c66ec0e0b9715'] = 'Ce champ est invalide.';
 $_MODULE['<{qlohotelreview}prestashop>default_3577700536f3f42f4f0882dbbe1d1d28'] = 'Ce champ est trop long.';
-$_MODULE['<{qlohotelreview}prestashop>default_666df5b26905f1737fe6a6d5d1fce032'] = 'La description de l\'avis ne peut pas être vide.';
 $_MODULE['<{qlohotelreview}prestashop>default_397dcf8a6f1b795d335192a95307fce0'] = 'La description de l\'avis n\'est pas valide.';
 $_MODULE['<{qlohotelreview}prestashop>default_2a7705ef2541560aa28d38af80caa692'] = 'Veuillez télécharger un maximum de %d images.';
 $_MODULE['<{qlohotelreview}prestashop>default_7c7efec2d1dfd66eb653cf98d4cc865c'] = 'Quelque chose s\'est mal passé.';
@@ -112,7 +111,7 @@ $_MODULE['<{qlohotelreview}prestashop>review_59d1880d8f037561eea191c1a8c782e0'] 
 $_MODULE['<{qlohotelreview}prestashop>add-review-popup_c33dd1013c05a6055b81dfde8d9248a4'] = 'Nom de l\'Hotel';
 $_MODULE['<{qlohotelreview}prestashop>add-review-popup_fff0d600f8a0b5e19e88bfb821dd1157'] = 'Images';
 $_MODULE['<{qlohotelreview}prestashop>add-review-popup_6acfb5f6d1e0cbbb23eeaa553946db54'] = 'Parlez-nous de votre expérience globale';
-$_MODULE['<{qlohotelreview}prestashop>add-review-popup_5fca9835b4981fabdedaa831e45f7dfa'] = 'Dites-nous en plus ce qui s\'est bien passé ?';
+$_MODULE['<{qlohotelreview}prestashop>add-review-popup_5fca9835b4981fabdedaa831e45f7dfa'] = 'Dites-nous en plus qu\'est-ce qui s\'est bien passé ?';
 $_MODULE['<{qlohotelreview}prestashop>add-review-popup_e8e1e13ec7923474eb2effe9ae2167f9'] = 'Résumez votre avis';
 $_MODULE['<{qlohotelreview}prestashop>add-review-popup_c46a69adeb34e733599885d42e5cb9ee'] = 'Écrivez en détail';
 $_MODULE['<{qlohotelreview}prestashop>add-review-popup_758c668e973a3d689b89ec238413066a'] = 'Faire une révision';
