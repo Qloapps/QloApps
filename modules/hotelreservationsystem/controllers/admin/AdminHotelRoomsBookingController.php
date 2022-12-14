@@ -62,9 +62,9 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
             $cart->id_currency = Configuration::get('PS_CURRENCY_DEFAULT');
             $cart->id_guest = (int)$this->context->cookie->id_guest;
             $cart->setNoMultishipping();
-            $cart->save();
 
             $this->context->cart = $cart;
+            $this->context->cart->save();
             $this->context->cookie->id_cart = $cart->id;
 
             setcookie('wk_id_cart', $cart->id, time() + 86400, "/");

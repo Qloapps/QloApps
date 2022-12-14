@@ -1788,7 +1788,7 @@ class AdminOrdersControllerCore extends AdminController
 
             if ($id_hotel) {
                 $obj_booking_dtl = new HotelBookingDetail();
-                $hotel_room_data = $obj_booking_dtl->DataForFrontSearch($date_from, $date_to, $id_hotel, $product_informations['product_id'], 1, 0, 0, -1, 0, 0, $id_cart, $id_guest);
+                $hotel_room_data = $obj_booking_dtl->DataForFrontSearch($date_from, $date_to, $id_hotel, $product_informations['product_id'], 1);
 
                 $total_available_rooms = $hotel_room_data['stats']['num_avail'];
 
@@ -1883,7 +1883,7 @@ class AdminOrdersControllerCore extends AdminController
         if ($createFeaturePrice) {
             $featurePriceParams = array(
                 'id_cart' => $this->context->cart->id,
-                'id_guest' => $this->context->cookie->id_guest,
+                'id_guest' => Guest::getFromCustomer((int) $order->id_customer),
                 'price' => $product_informations['product_price_tax_excl'],
                 'id_product' => $product->id,
             );
@@ -1897,7 +1897,7 @@ class AdminOrdersControllerCore extends AdminController
                 if ($chkQty < $req_rm) {
                     $obj_htl_cart_booking_data = new HotelCartBookingData();
                     $obj_htl_cart_booking_data->id_cart = $this->context->cart->id;
-                    $obj_htl_cart_booking_data->id_guest = $this->context->cookie->id_guest;
+                    $obj_htl_cart_booking_data->id_guest = Guest::getFromCustomer((int) $order->id_customer);
                     $obj_htl_cart_booking_data->id_customer = $this->context->customer->id;
                     $obj_htl_cart_booking_data->id_currency = $order->id_currency;
                     $obj_htl_cart_booking_data->id_product = $room_info['id_product'];
@@ -2158,7 +2158,7 @@ class AdminOrdersControllerCore extends AdminController
         $obj_cart_bk_data = new HotelCartBookingData();
         if ($cart_bk_data = $obj_cart_bk_data->getOnlyCartBookingData(
             $this->context->cart->id,
-            $this->context->cookie->id_guest,
+            Guest::getFromCustomer((int) $order->id_customer),
             $idProduct
         )) {
             foreach ($cart_bk_data as $cb_k => $cb_v) {
@@ -2189,7 +2189,7 @@ class AdminOrdersControllerCore extends AdminController
                     0,
                     Group::getCurrent()->id,
                     $this->context->cart->id,
-                    $this->context->cookie->id_guest,
+                    Guest::getFromCustomer((int) $order->id_customer),
                     $obj_cart_bk_data->id_room
                 );
 
@@ -2323,7 +2323,6 @@ class AdminOrdersControllerCore extends AdminController
         $id_order = (int) Tools::getValue('id_order');
         $order = new Order($id_order);
         $cart = new Cart($order->id_cart);
-        $customer = new Cart($order->id_customer);
         //$order_detail = new OrderDetail((int)Tools::getValue('product_id_order_detail'));
         $order_detail = new OrderDetail((int) Tools::getValue('order_detail_id'));//by webkul id_order_detail from our table
         $this->doEditProductValidation($order_detail, $order, isset($order_invoice) ? $order_invoice : null);
@@ -2426,7 +2425,7 @@ class AdminOrdersControllerCore extends AdminController
         if ($bookedRooms) {
             $params = array(
                 'id_cart' => $cart->id,
-                'id_guest' => $cart->id_guest,
+                'id_guest' => Guest::getFromCustomer((int) $order->id_customer),
                 'price' => $room_unit_price,
             );
 
@@ -2445,7 +2444,7 @@ class AdminOrdersControllerCore extends AdminController
                         0,
                         Group::getCurrent()->id,
                         $cart->id,
-                        $cart->id_guest,
+                        Guest::getFromCustomer((int) $order->id_customer),
                         $roomInfo['id_room']
                     );
 
