@@ -271,7 +271,6 @@ class ProductControllerCore extends FrontController
             /*By webkul To send All needed Hotel Information on product.tpl*/
             #####################################################################
 
-            $total_available_rooms = 0;
             $htl_features = array();
             $obj_hotel_room_type = new HotelRoomType();
             $room_info_by_product_id = $obj_hotel_room_type->getRoomTypeInfoByIdProduct($this->product->id);
@@ -311,12 +310,6 @@ class ProductControllerCore extends FrontController
                     $date_to = date('Y-m-d', strtotime('+1 day', strtotime($date_from)));
                 }
 
-                $obj_booking_dtl = new HotelBookingDetail();
-                $hotel_room_data = $obj_booking_dtl->DataForFrontSearch($date_from, $date_to, $hotel_id, $this->product->id, 1);
-
-                if ($hotel_room_data) {
-                    $total_available_rooms = $hotel_room_data['stats']['num_avail'];
-                }
                 $hotel_branch_obj = new HotelBranchInformation($hotel_id);
                 /*Max date of ordering for order restrict*/
                 $order_date_restrict = false;
@@ -365,7 +358,6 @@ class ProductControllerCore extends FrontController
                         'max_order_date' => $max_order_date,
                         'warning_num' => Configuration::get('WK_ROOM_LEFT_WARNING_NUMBER'),
                         'ratting_img_path' => _MODULE_DIR_.'hotelreservationsystem/views/img/Slices/icons-sprite.png',
-                        'total_available_rooms' => $total_available_rooms,
                         'product_controller_url' => $this->context->link->getPageLink('product'),
                         'date_from' => $date_from,
                         'date_to' => $date_to,

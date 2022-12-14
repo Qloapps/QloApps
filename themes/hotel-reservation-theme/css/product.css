@@ -1229,25 +1229,6 @@ Quick View Styles
     font-size: 16px;
     font-weight: 400;
     padding-top: 10px;}
-.room_unavailability_qty_error_div
-{
-  display: none;
-  background-color: #cd5d5d;
-    color: #ffffff;
-    font-size: 13px;
-    margin-bottom: 10px;
-    padding: 2px;
-    text-align: center;}
-
-.room_unavailability_date_error_div
-{
-  display: none;
-  background-color: #cd5d5d;
-    color: #ffffff;
-    font-size: 13px;
-    margin-bottom: 10px;
-    padding: 2px;
-    text-align: center;}
 
 .room_ratting_yes
 {
@@ -1270,10 +1251,11 @@ Quick View Styles
   display: block;
   font-size: 16px;
   font-weight: 700;}
-.num_quantity_alert {
-  font-size: 14px;
-  color: #FF4B4B;
-  font-weight: 700;}
+  .num_quantity_alert {
+    font-size: 14px;
+    color: #FF4B4B;
+    font-weight: 700;
+    text-align: right;}
 
 /*for search block background*/
 .idTabHrefShort:hover {
