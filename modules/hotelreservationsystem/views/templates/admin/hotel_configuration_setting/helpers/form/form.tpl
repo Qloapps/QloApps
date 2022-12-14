@@ -121,6 +121,15 @@
 				<div class="col-lg-5">
 					<input name="icon" class="form-control" placeholder="{l s='Eg. icon-user' mod='hotelreservationsystem'}" value="{$currentTab->getFieldValue($currentObject, 'icon')|escape}">
 				</div>
+				<div class="col-lg-9 col-lg-offset-3">
+					<div class="help-block">
+						{l s='Refer to the following link for available icons.' mod='hotelreservationsystem'}
+						<a href="https://fontawesome.com/v4/cheatsheet" target="_blank">
+							https://fontawesome.com/v4/cheatsheet <i class="icon icon-external-link"></i>
+						</a>
+						{l s=' Note: Replace fa- with icon- in icon name.' mod='hotelreservationsystem'}
+					</div>
+				</div>
 			</div>
 
 			<div class="form-group">
