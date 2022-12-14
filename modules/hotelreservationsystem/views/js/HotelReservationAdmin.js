@@ -1166,7 +1166,7 @@ $(document).ready(function() {
         minDate: 0,
     });
 
-    $('input[name="ENABLE_USE_GLOBAL_MAX_ORDER_DATE"]').on('change', function () {
+    $('input[name="enable_use_global_max_order_date"]').on('change', function () {
         if (parseInt($(this).val())) {
             $('input[name="maximum_booking_date"]').closest('.form-group').hide(200);
         } else {
@@ -1174,7 +1174,7 @@ $(document).ready(function() {
         }
     });
 
-    $('input[name="ENABLE_USE_GLOBAL_PREPARATION_TIME"]').on('change', function () {
+    $('input[name="enable_use_global_preparation_time"]').on('change', function () {
         if (parseInt($(this).val())) {
             $('input[name="preparation_time"]').closest('.form-group').hide(200);
         } else {

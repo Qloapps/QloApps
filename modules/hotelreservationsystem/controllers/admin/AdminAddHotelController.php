@@ -203,9 +203,9 @@ class AdminAddHotelController extends ModuleAdminController
         $address = Tools::getValue('address');
         $active = Tools::getValue('ENABLE_HOTEL');
         $activeRefund = Tools::getValue('active_refund');
-        $enableUseGlobalMaxOrderDate = Tools::getValue('ENABLE_USE_GLOBAL_MAX_ORDER_DATE');
+        $enableUseGlobalMaxOrderDate = Tools::getValue('enable_use_global_max_order_date');
         $maximumBookingDate = Tools::getValue('maximum_booking_date');
-        $enableUseGlobalPreparationTime = Tools::getValue('ENABLE_USE_GLOBAL_PREPARATION_TIME');
+        $enableUseGlobalPreparationTime = Tools::getValue('enable_use_global_preparation_time');
         $preparationTime = Tools::getValue('preparation_time');
         $latitude = Tools::getValue('loclatitude');
         $longitude = Tools::getValue('loclongitude');
