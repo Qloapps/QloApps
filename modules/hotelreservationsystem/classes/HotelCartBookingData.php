@@ -224,9 +224,12 @@ class HotelCartBookingData extends ObjectModel
      */
     public function deleteRowById($id)
     {
-        $delete = Db::getInstance()->delete('htl_cart_booking_data', '`id`='.(int) $id);
+        $objHotelCartBookingData = new self($id);
+        if (!Validate::isLoadedObject($objHotelCartBookingData)) {
+            return false;
+        }
 
-        return $delete;
+        return $objHotelCartBookingData->delete();
     }
 
     /**
@@ -289,28 +292,34 @@ class HotelCartBookingData extends ObjectModel
      *
      * @return [boolean] [If cart updated with quantity successfully returns true else returns false]
      */
-    public function changeProductDataByRoomId($roomid, $id_product, $days_diff, $cart_id)
+    public function changeProductDataByRoomId($idRoom, $idProduct, $daysDiff, $idCart)
     {
-        $deleted = Db::getInstance()->delete('htl_cart_booking_data', '`id_room` = '.(int) $roomid.' AND `id_cart` = '.(int) $cart_id);
+        $result = Db::getInstance()->executeS(
+            'SELECT `id`
+            FROM `'._DB_PREFIX_.'htl_cart_booking_data`
+            WHERE `id_room` = '.(int) $idRoom.' AND `id_cart` = '.(int) $idCart
+        );
 
-        $cart_product_quantity = Db::getInstance()->getValue('SELECT `quantity` FROM `'._DB_PREFIX_.'cart_product` WHERE `id_cart`='.$cart_id.' AND `id_product`='.$id_product);
+        if (is_array($result) && count($result)) {
+            foreach ($result as $row) {
+                $objHotelCartBookingData = new self($row['id']);
+                if (!Validate::isLoadedObject($objHotelCartBookingData)) {
+                    return false;
+                }
 
-        $new_quantity = $cart_product_quantity - $days_diff;
-
-        if ($new_quantity > 0) {
-            $update_quantity = Db::getInstance()->update('cart_product', array('quantity' => $new_quantity), '`id_cart`='.$cart_id.' AND `id_product`='.$id_product);
-            if ($update_quantity) {
-                return true;
+                if (!$objHotelCartBookingData->delete()) {
+                    return false;
+                }
             }
+        }
 
-            return false;
+        $cartProductQuantity = Db::getInstance()->getValue('SELECT `quantity` FROM `'._DB_PREFIX_.'cart_product` WHERE `id_cart`='.$idCart.' AND `id_product`='.$idProduct);
+        $newQuantity = $cartProductQuantity - $daysDiff;
+
+        if ($newQuantity > 0) {
+            return Db::getInstance()->update('cart_product', array('quantity' => $newQuantity), '`id_cart`='.$idCart.' AND `id_product`='.$idProduct);
         } else {
-            $delete_product = Db::getInstance()->delete('cart_product', '`id_cart`='.$cart_id.' AND `id_product`='.$id_product);
-            if ($delete_product) {
-                return true;
-            }
-
-            return false;
+            return Db::getInstance()->delete('cart_product', '`id_cart`='.$idCart.' AND `id_product`='.$idProduct);
         }
     }
 
@@ -402,13 +411,22 @@ class HotelCartBookingData extends ObjectModel
                     }
                 }
             }
+
             // delete rows from table
-            if (!Db::getInstance()->delete('htl_cart_booking_data', $where)) {
-                return false;
+            foreach ($cartBookingInfo as $row) {
+                $objHotelCartBookingData = new HotelCartBookingData($row['id']);
+                if (!Validate::isLoadedObject($objHotelCartBookingData)) {
+                    return false;
+                }
+
+                if (!$objHotelCartBookingData->delete()) {
+                    return false;
+                }
             }
         }
+
         // return number of rooms deleted
-        return true;
+        return $numRooms;
     }
 
     /**
@@ -443,14 +461,23 @@ class HotelCartBookingData extends ObjectModel
      *
      * @return [boolean] [Returns true if deleted successfully else returns false]
      */
-    public function deleteCartDataByIdProductIdCart($id_cart, $id_product, $date_from, $date_to)
+    public function deleteCartDataByIdProductIdCart($idCart, $idProduct, $dateFrom, $dateTo)
     {
-        $result = Db::getInstance()->delete('htl_cart_booking_data', '`id_cart`='.$id_cart.' AND `id_product`='.$id_product." AND `date_from` = '$date_from' AND `date_to` = '$date_to'");
-        if ($result) {
-            return true;
+        $result = $this->getHotelCartRoomsInfoByRoomType($idCart, $idProduct, $dateFrom, $dateTo);
+        if (is_array($result) && count($result)) {
+            foreach ($result as $row) {
+                $objHotelCartBookingData = new self($row['id']);
+                if (!Validate::isLoadedObject($objHotelCartBookingData)) {
+                    return false;
+                }
+
+                if (!$objHotelCartBookingData->delete()) {
+                    return false;
+                }
+            }
         }
 
-        return false;
+        return true;
     }
 
     /**
@@ -478,15 +505,23 @@ class HotelCartBookingData extends ObjectModel
             $this->context = Context::getContext();
             $update_quantity = $this->context->cart->updateQty($qty, $id_product, null, false, 'down');
 
-            $delete_rooms = Db::getInstance()->delete('htl_cart_booking_data', '`id_cart`='.$id_cart.' AND `id_guest`='.$id_guest.' AND `id_product`='.$id_product." AND `date_from`= '$date_from' AND `date_to`= '$date_to'");
-            if ($delete_rooms) {
-                return true;
+            if (is_array($result) && count($result)) {
+                foreach ($result as $row) {
+                    $objHotelCartBookingData = new self($row['id']);
+                    if (!Validate::isLoadedObject($objHotelCartBookingData)) {
+                        return false;
+                    }
+
+                    if (!$objHotelCartBookingData->delete()) {
+                        return false;
+                    }
+                }
             }
 
-            return false;
-        } else {
-            return false;
+            return true;
         }
+
+        return false;
     }
 
     /**
@@ -498,37 +533,26 @@ class HotelCartBookingData extends ObjectModel
      */
     public function deleteBookingCartDataNotOrderedByProductId($id_product)
     {
-        return Db::getInstance()->delete(
-            'htl_cart_booking_data',
-            '`id_product`='.(int) $id_product.' AND `id_order`= 0'
+        $result = Db::getInstance()->executeS(
+            'SELECT `id`
+            FROM `'._DB_PREFIX_.'htl_cart_booking_data`
+            WHERE `id_product`='.(int) $id_product.' AND `id_order`= 0'
         );
-    }
 
-    /**
-     * [updateOrderRefundStatus :: To update the refund status of a room booked in the Cart(htl_cart_booking_data) if amount 									refunded by the admin].
-     *
-     * @param [int]  $id_cart   [Id of the Cart]
-     * @param [date] $date_from [start date of the bookin of the room]
-     * @param [date] $date_to   [end date of the bookin of the room]
-     * @param [int]  $id_room   [id of the room for which refund is done]
-     *
-     * @return [boolean] [true if updated otherwise false]
-     */
-    public function updateOrderRefundStatus($id_cart, $date_from, $date_to, $id_rooms)
-    {
-        $table = 'htl_cart_booking_data';
-        $data = array('is_refunded' => 1);
+        if (is_array($result) && count($result)) {
+            foreach ($result as $row) {
+                $objHotelCartBookingData = new self($row['id']);
+                if (!Validate::isLoadedObject($objHotelCartBookingData)) {
+                    return false;
+                }
 
-        foreach ($id_rooms as $key_rm => $val_rm) {
-            $where = '`id_cart` = '.$id_cart.' AND `id_room` = '.$val_rm['id_room']." AND `date_from` = '$date_from' AND `date_to` = '$date_to'";
-            $result = Db::getInstance()->update($table, $data, $where);
+                if (!$objHotelCartBookingData->delete()) {
+                    return false;
+                }
+            }
         }
 
-        if ($result) {
-            return $result;
-        }
-
-        return false;
+        return true;
     }
 
     /**
@@ -564,7 +588,7 @@ class HotelCartBookingData extends ObjectModel
             return false;
         }
 
-        $dltdata = false;
+        $dltdata = '';
 
         $stringArr = array('date_from', 'date_to');
 
@@ -579,9 +603,27 @@ class HotelCartBookingData extends ObjectModel
                 $dltdata .= $c_key.' = '.$c_val;
             }
         }
-        $delete = Db::getInstance()->delete('htl_cart_booking_data', $dltdata);
 
-        return $delete;
+        $result = Db::getInstance()->executeS(
+            'SELECT `id`
+            FROM `'._DB_PREFIX_.'htl_cart_booking_data`
+            WHERE '.$dltdata
+        );
+
+        if (is_array($result) && count($result)) {
+            foreach ($result as $row) {
+                $objHotelCartBookingData = new self($row['id']);
+                if (!Validate::isLoadedObject($objHotelCartBookingData)) {
+                    return false;
+                }
+
+                if (!$objHotelCartBookingData->delete()) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -598,7 +640,7 @@ class HotelCartBookingData extends ObjectModel
             return false;
         }
 
-        $where = false;
+        $where = '';
         $stringArr = array('date_from', 'date_to');
         foreach ($updBy as $u_key => $u_val) {
             if ($where) {
@@ -611,9 +653,31 @@ class HotelCartBookingData extends ObjectModel
                 $where .= $u_key.' = '.$u_val;
             }
         }
-        $update = Db::getInstance()->update('htl_cart_booking_data', $updData, $where);
+        // $update = Db::getInstance()->update('htl_cart_booking_data', $updData, $where);
+        $result = Db::getInstance()->executeS(
+            'SELECT `id`
+            FROM `'._DB_PREFIX_.'htl_cart_booking_data`
+            WHERE '.$where
+        );
 
-        return $update;
+        if (is_array($result) && count($result)) {
+            foreach ($result as $row) {
+                $objHotelCartBookingData = new self($row['id']);
+                if (!Validate::isLoadedObject($objHotelCartBookingData)) {
+                    return false;
+                }
+
+                foreach ($updData as $key => $value) {
+                    $objHotelCartBookingData->$key = $value;
+                }
+
+                if (!$objHotelCartBookingData->save()) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -725,12 +789,25 @@ class HotelCartBookingData extends ObjectModel
      */
     public function updateIdCurrencyByIdCart($id_cart, $id_currency)
     {
-        $update_currency = Db::getInstance()->update('htl_cart_booking_data', array('id_currency' => $id_currency), '`id_cart`='.$id_cart);
-        if ($update_currency) {
-            return true;
-        }
+        $result = Db::getInstance()->executeS(
+            'SELECT `id`
+            FROM `'._DB_PREFIX_.'htl_cart_booking_data`
+            WHERE `id_cart` = '.(int) $idCart
+        );
 
-        return false;
+        if (is_array($result) && count($result)) {
+            foreach ($result as $row) {
+                $objHotelCartBookingData = new HotelCartBookingData($row['id']);
+                if (!Validate::isLoadedObject($objHotelCartBookingData)) {
+                    return false;
+                }
+
+                $objHotelCartBookingData->id_currency = $id_currency;
+                if (!$objHotelCartBookingData->save()) {
+                    return false;
+                }
+            }
+        }
     }
 
     /**
@@ -745,9 +822,26 @@ class HotelCartBookingData extends ObjectModel
      */
     public function deleteOrderedRoomFromCart($id_order, $id_hotel, $id_room, $date_from, $date_to)
     {
-        $delete = Db::getInstance()->delete('htl_cart_booking_data', '`id_order`='.(int) $id_order.' AND `id_hotel`='.(int) $id_hotel.' AND `id_room`='.(int) $id_room." AND `date_from`='$date_from' AND `date_to`='$date_to'");
+        $result = Db::getInstance()->executeS(
+            'SELECT `id`
+            FROM `'._DB_PREFIX_.'htl_cart_booking_data`
+            WHERE '.'`id_order`='.(int) $id_order.' AND `id_hotel`='.(int) $id_hotel.' AND `id_room`='.(int) $id_room." AND `date_from`='$date_from' AND `date_to`='$date_to'"
+        );
 
-        return $delete;
+        if (is_array($result) && count($result)) {
+            foreach ($result as $row) {
+                $objHotelCartBookingData = new HotelCartBookingData($row['id']);
+                if (!Validate::isLoadedObject($objHotelCartBookingData)) {
+                    return false;
+                }
+
+                if (!$objHotelCartBookingData->delete()) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 
     /**

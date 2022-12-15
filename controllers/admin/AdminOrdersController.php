@@ -459,7 +459,7 @@ class AdminOrdersControllerCore extends AdminController
                     if (!$room_swapped) {
                         $this->errors[] = Tools::displayError('Some error occured. Please try again.');
                     } else {
-                        Tools::redirectAdmin(self::$currentIndex.'&id_order='.(int) $order_id.'&vieworder&token='.$this->token);
+                        Tools::redirectAdmin(self::$currentIndex.'&id_order='.(int) $order_id.'&vieworder&token='.$this->token.'&conf=4');
                     }
                 }
             } else {
@@ -494,7 +494,7 @@ class AdminOrdersControllerCore extends AdminController
                     if (!$room_swapped) {
                         $this->errors[] = Tools::displayError('Some error occured. Please try again.');
                     } else {
-                        Tools::redirectAdmin(self::$currentIndex.'&id_order='.(int) $order_id.'&vieworder&token='.$this->token);
+                        Tools::redirectAdmin(self::$currentIndex.'&id_order='.(int) $order_id.'&vieworder&token='.$this->token.'&conf=4');
                     }
                 }
             } else {
