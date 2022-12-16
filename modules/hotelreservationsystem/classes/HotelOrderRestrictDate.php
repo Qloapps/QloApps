@@ -112,7 +112,11 @@ class HotelOrderRestrictDate extends ObjectModel
                                         $objCartBookingData->id_hotel,
                                         $context->language->id
                                     );
-                                    $controller->errors[] = $moduleInstance->l('You can not Book room after date', 'HotelOrderRestrictDate').' \''.date('d-m-Y', strtotime($maxOrderDate)).'\' '.$moduleInstance->l('For hotel', 'HotelOrderRestrictDate').' \''.$objBranchInfo->hotel_name.'\'. '.$moduleInstance->l('Please remove rooms from cart from', 'HotelOrderRestrictDate').' \''.$objBranchInfo->hotel_name.'\' '.$moduleInstance->l('after date', 'HotelOrderRestrictDate').' \''.date('d-m-Y', strtotime($maxOrderDate)).'\' '.$moduleInstance->l('to proceed.', 'HotelOrderRestrictDate');
+                                    $controller->errors[] = sprintf(
+                                        'You can not book rooms for hotel \'%s\' after date %s. Please remove such rooms to proceed.',
+                                        $objBranchInfo->hotel_name,
+                                        Tools::displayDate($maxOrderDate)
+                                    );
                                     $error = true;
                                 }
                             }
@@ -126,7 +130,11 @@ class HotelOrderRestrictDate extends ObjectModel
                                         $objCartBookingData->id_hotel,
                                         $context->language->id
                                     );
-                                    $controller->errors[] = $moduleInstance->l('You can not Book room before date', 'HotelOrderRestrictDate').' \''.date('d-m-Y', strtotime($minOrderDate)).'\' '.$moduleInstance->l('For hotel', 'HotelOrderRestrictDate').' \''.$objBranchInfo->hotel_name.'\'. '.$moduleInstance->l('Please remove rooms from cart from', 'HotelOrderRestrictDate').' \''.$objBranchInfo->hotel_name.'\' '.$moduleInstance->l('after date', 'HotelOrderRestrictDate').' \''.date('d-m-Y', strtotime($maxOrderDate)).'\' '.$moduleInstance->l('to proceed.', 'HotelOrderRestrictDate');
+                                    $controller->errors[] = sprintf(
+                                        'You can not book rooms for hotel \'%s\' before date %s. Please remove such rooms to proceed.',
+                                        $objBranchInfo->hotel_name,
+                                        Tools::displayDate($minOrderDate)
+                                    );
                                     $error = true;
                                 }
                             }

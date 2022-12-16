@@ -324,7 +324,7 @@ class ProductControllerCore extends FrontController
                 }
                 /*End*/
                 // booking preparation time
-                $preparationTime = HotelOrderRestrictDate::getPreparationTime($hotel_id);
+                $preparationTime = (int) HotelOrderRestrictDate::getPreparationTime($hotel_id);
 
                 if (Tools::getValue('error')) {
                     $this->context->smarty->assign('error', Tools::getValue('error'));

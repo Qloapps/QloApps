@@ -165,7 +165,11 @@ class AdminAddHotelController extends ModuleAdminController
 
             $restrictDateInfo = HotelOrderRestrictDate::getDataByHotelId($idHotel);
             if ($restrictDateInfo) {
-                $restrictDateInfo['max_order_date'] = date('d-m-Y', strtotime($restrictDateInfo['max_order_date']));
+                if ($restrictDateInfo['max_order_date'] == '0000-00-00') {
+                    $restrictDateInfo['max_order_date'] = date('d-m-Y');
+                } else {
+                    $restrictDateInfo['max_order_date'] = date('d-m-Y', strtotime($restrictDateInfo['max_order_date']));
+                }
             }
             $smartyVars['order_restrict_date_info'] = $restrictDateInfo;
         }

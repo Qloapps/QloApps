@@ -275,7 +275,7 @@
 						</label>
 						<div class="col-lg-6">
 							<span class="switch prestashop-switch fixed-width-lg">
-								<input type="radio" {if isset($edit)}{if isset($order_restrict_date_info.use_global_max_order_date) && $order_restrict_date_info.use_global_max_order_date} checked="checked" {/if}{else} checked="checked"  {/if} value="1" id="enable_use_global_max_order_date_on" name="enable_use_global_max_order_date">
+								<input type="radio" {if isset($edit) && isset($order_restrict_date_info.use_global_max_order_date) && $order_restrict_date_info.use_global_max_order_date} checked="checked" {else} checked="checked" {/if} value="1" id="enable_use_global_max_order_date_on" name="enable_use_global_max_order_date">
 								<label for="enable_use_global_max_order_date_on">{l s='Yes'}</label>
 								<input {if isset($edit) && isset($order_restrict_date_info.use_global_max_order_date) && !$order_restrict_date_info.use_global_max_order_date} checked="checked" {/if} type="radio" value="0" id="enable_use_global_max_order_date_off" name="enable_use_global_max_order_date">
 								<label for="enable_use_global_max_order_date_off">{l s='No'}</label>
