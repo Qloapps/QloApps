@@ -1299,7 +1299,7 @@ class HotelBookingDetail extends ObjectModel
             'SELECT `id`
             FROM `'._DB_PREFIX_.'htl_cart_booking_data`
             WHERE date_from = "'.pSQL($oldDateFrom).'" AND date_to = "'.pSQL($oldDateTo).'"
-            AND id_room = '.(int) $idRoom
+            AND id_room = '.(int) $idRoom.' AND `id_order` = '.(int) $idOrder
         );
 
         $objHotelCartBookingData = new HotelCartBookingData($idHotelCartBookingData);
