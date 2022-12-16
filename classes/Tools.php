@@ -3323,13 +3323,14 @@ exit;
             'version' => isset($params['version']) ? $params['version'] : _QLOAPPS_VERSION_,
             'iso_lang' => Tools::strtolower(isset($params['iso_lang']) ? $params['iso_lang'] : Context::getContext()->language->iso_code),
             'iso_code' => Tools::strtolower(isset($params['iso_country']) ? $params['iso_country'] : Country::getIsoById(Configuration::get('PS_COUNTRY_DEFAULT'))),
-            'shop_url_ssl' => isset($params['shop_url']) ? $params['shop_url'] : Tools::getShopDomainSsl(),
+            'shop_url' => isset($params['shop_url']) ? $params['shop_url'] : Tools::getShopDomain(),
+            'shop_url_ssl' => isset($params['shop_url_ssl']) ? $params['shop_url_ssl'] : Tools::getShopDomainSsl(),
             'physical_uri' => Context::getContext()->shop->physical_uri,
             'mail' => isset($params['email']) ? $params['email'] : Configuration::get('PS_SHOP_EMAIL')
         ));
 
         $protocols = array('https');
-        $end_point = 'api.qloapps.com';
+        $end_point = _QLO_API_DOMAIN_;
 
         switch ($request) {
             case 'native':
