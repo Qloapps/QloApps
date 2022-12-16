@@ -1877,13 +1877,14 @@ class AdminOrdersControllerCore extends AdminController
             $order->{Configuration::get('PS_TAX_ADDRESS_TYPE', null, null, $order->id_shop)}
         );
 
+        $idGuest = Guest::getFromCustomer((int) $order->id_customer);
         // create feature price if needed
         $createFeaturePrice = $product_informations['product_price_tax_incl'] != $initial_product_price_tax_incl;
         $featurePriceParams = array();
         if ($createFeaturePrice) {
             $featurePriceParams = array(
                 'id_cart' => $this->context->cart->id,
-                'id_guest' => Guest::getFromCustomer((int) $order->id_customer),
+                'id_guest' => $idGuest,
                 'price' => $product_informations['product_price_tax_excl'],
                 'id_product' => $product->id,
             );
@@ -1897,7 +1898,7 @@ class AdminOrdersControllerCore extends AdminController
                 if ($chkQty < $req_rm) {
                     $obj_htl_cart_booking_data = new HotelCartBookingData();
                     $obj_htl_cart_booking_data->id_cart = $this->context->cart->id;
-                    $obj_htl_cart_booking_data->id_guest = Guest::getFromCustomer((int) $order->id_customer);
+                    $obj_htl_cart_booking_data->id_guest = $idGuest;
                     $obj_htl_cart_booking_data->id_customer = $this->context->customer->id;
                     $obj_htl_cart_booking_data->id_currency = $order->id_currency;
                     $obj_htl_cart_booking_data->id_product = $room_info['id_product'];
@@ -2158,7 +2159,7 @@ class AdminOrdersControllerCore extends AdminController
         $obj_cart_bk_data = new HotelCartBookingData();
         if ($cart_bk_data = $obj_cart_bk_data->getOnlyCartBookingData(
             $this->context->cart->id,
-            Guest::getFromCustomer((int) $order->id_customer),
+            $idGuest,
             $idProduct
         )) {
             foreach ($cart_bk_data as $cb_k => $cb_v) {
@@ -2189,7 +2190,7 @@ class AdminOrdersControllerCore extends AdminController
                     0,
                     Group::getCurrent()->id,
                     $this->context->cart->id,
-                    Guest::getFromCustomer((int) $order->id_customer),
+                    $idGuest,
                     $obj_cart_bk_data->id_room
                 );
 
@@ -2411,9 +2412,9 @@ class AdminOrdersControllerCore extends AdminController
             )));
         }
 
+        $idGuest = Guest::getFromCustomer((int) $order->id_customer);
         // By webkul to calculate rates of the product from hotelreservationsystem tables with feature prices....
         // add feature price for updated price
-
         $hotelCartBookingData = new HotelCartBookingData();
         $totalProductPriceBeforeTE = (float) $order_detail->total_price_tax_excl;
         $totalProductPriceBeforeTI = (float) $order_detail->total_price_tax_incl;
@@ -2425,7 +2426,7 @@ class AdminOrdersControllerCore extends AdminController
         if ($bookedRooms) {
             $params = array(
                 'id_cart' => $cart->id,
-                'id_guest' => Guest::getFromCustomer((int) $order->id_customer),
+                'id_guest' => $idGuest,
                 'price' => $room_unit_price,
             );
 
@@ -2444,7 +2445,7 @@ class AdminOrdersControllerCore extends AdminController
                         0,
                         Group::getCurrent()->id,
                         $cart->id,
-                        Guest::getFromCustomer((int) $order->id_customer),
+                        $idGuest,
                         $roomInfo['id_room']
                     );
 

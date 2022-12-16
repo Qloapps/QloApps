@@ -1626,7 +1626,7 @@ class HotelBookingDetail extends ObjectModel
         $this->context = Context::getContext();
         $this->errors = array();
         $id_cart = $params['id_cart'];
-        $id_guest = Guest::getFromCustomer((int) $this->context->customer->id);
+        $id_guest = Guest::getFromCustomer((int) $params['id_customer']);
         $date_from = date("Y-m-d", strtotime($params['date_from']));
         $date_to = date("Y-m-d", strtotime($params['date_to']));
         $id_product = $params['id_room_type'];
