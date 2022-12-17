@@ -1554,7 +1554,6 @@ class AdminOrdersControllerCore extends AdminController
             'customerStats' => $customer->getStats(),
             'products' => $products,
             'discounts' => $order->getCartRules(),
-            'orders_total_paid_tax_incl' => $order->total_paid_tax_incl, // Get the sum of total_paid_tax_incl of the order with similar reference
             'total_paid' => $order->getTotalPaid(),
             'customer_thread_message' => CustomerThread::getCustomerMessages($order->id_customer, null, $order->id),
             'orderMessages' => OrderMessage::getOrderMessages($order->id_lang),

@@ -1725,6 +1725,7 @@ class OrderCore extends ObjectModel
      * @param Currency $currency
      * @param string $date
      * @param OrderInvoice $order_invoice
+     * @param bool $update_payment_detail :: if false, be sure to add payment detail in payment detail table
      * @return bool
      */
     public function addOrderPayment($amount_paid, $payment_method = null, $payment_transaction_id = null, $currency = null, $date = null, $order_invoice = null, $update_payment_detail = true)
@@ -1746,26 +1747,24 @@ class OrderCore extends ObjectModel
         }
 
         // We put autodate parameter of add method to true if date_add field is null
-        $res = $order_payment->add(is_null($order_payment->date_add));
-
-        if (!$res) {
-            return false;
-        }
-
-        if ($update_payment_detail) {
-            $this->addOrderPaymentDetail($amount_paid, $order_invoice);
+        if ($res = $order_payment->add(is_null($order_payment->date_add))) {
+            if ($update_payment_detail) {
+                $res &= $this->addOrderPaymentDetail($order_payment, $amount_paid, $order_invoice);
+            }
         }
 
         return $res;
     }
 
-    public function addOrderPaymentDetail($amount, $order_invoice = null)
+    public function addOrderPaymentDetail(OrderPayment $payment, $amount = false, $order_invoice = null)
     {
-        if ($orderPayments = OrderPayment::getByOrderReference($this->reference)) {
-            $lastOrderPayment = array_pop($orderPayments);
+        if (Validate::isLoadedObject($payment)) {
+            if (!$amount) {
+                $amount = $payment->amount;
+            }
             $order_payment_detail = new OrderPaymentDetail();
             $order_payment_detail->id_order = $this->id;
-            $order_payment_detail->id_order_payment = (int)$lastOrderPayment->id;
+            $order_payment_detail->id_order_payment = (int)$payment->id;
             $order_payment_detail->amount = $amount;
 
             if ($lastOrderPayment->id_currency == $this->id_currency) {
@@ -1777,7 +1776,7 @@ class OrderCore extends ObjectModel
                 if (!is_null($order_invoice)) {
                     $res = Db::getInstance()->execute('
                     INSERT INTO `'._DB_PREFIX_.'order_invoice_payment` (`id_order_invoice`, `id_order_payment`, `id_order_payment_detail`, `id_order`)
-                    VALUES('.(int)$order_invoice->id.', '.(int)(int)$lastOrderPayment->id.', '.(int)$order_payment_detail->id.', '.(int)$this->id.')');
+                    VALUES('.(int)$order_invoice->id.', '.(int)(int)$payment->id.', '.(int)$order_payment_detail->id.', '.(int)$this->id.')');
 
                     // Clear cache
                     Cache::clean('order_invoice_paid_*');

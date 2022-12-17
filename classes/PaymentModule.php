@@ -450,8 +450,13 @@ abstract class PaymentModuleCore extends Module
                     throw new PrestaShopException('Can\'t save Order Payment');
                 }
 
-                foreach($order_list as $order) {
-                    $order->addOrderPaymentDetail($order->amount_paid);
+                // now add payment detail for order
+                if ($payment = OrderPayment::getByOrderReference($order->reference)) {
+                    if ($payment = array_shift($payment)) {
+                        foreach($order_list as $order) {
+                            $order->addOrderPaymentDetail($payment, $order->amount_paid);
+                        }
+                    }
                 }
             }
 

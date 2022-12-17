@@ -336,7 +336,7 @@ class OrderHistoryCore extends ObjectModel
                     $payment->conversion_rate = ($order ? $order->conversion_rate : 1);
                     $payment->save();
 
-                    $id_order_payment_detail = $order->addOrderPaymentDetail($rest_paid);
+                    $id_order_payment_detail = $order->addOrderPaymentDetail($payment);
 
                     Db::getInstance()->execute('
 					INSERT INTO `'._DB_PREFIX_.'order_invoice_payment` (`id_order_invoice`, `id_order_payment`, `id_order_payment_detail`, `id_order`)

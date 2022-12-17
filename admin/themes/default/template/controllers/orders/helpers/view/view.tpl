@@ -472,12 +472,12 @@
 					{l s="Payment"} <span class="badge">{$order->getOrderPayments()|@count}</span>
 				</div>
 				{if count($order->getOrderPayments()) > 0}
-					<p class="alert alert-danger"{if round($orders_total_paid_tax_incl, 2) == round($total_paid, 2) || (isset($currentState) && $currentState->id == 6)} style="display: none;"{/if}>
+					<p class="alert alert-danger"{if round($order->total_paid_tax_incl, 2) == round($total_paid, 2) || (isset($currentState) && $currentState->id == 6)} style="display: none;"{/if}>
 						{l s='Warning'}
 						<strong>{displayPrice price=$total_paid currency=$currency->id}</strong>
 						{l s='paid instead of'}
-						<strong class="total_paid">{displayPrice price=$orders_total_paid_tax_incl currency=$currency->id}</strong>
-						{foreach $order->getBrother() as $brother_order}
+						<strong class="total_paid">{displayPrice price=$order->total_paid_tax_incl currency=$currency->id}</strong>
+						{* {foreach $order->getBrother() as $brother_order}
 							{if $brother_order@first}
 								{if count($order->getBrother()) == 1}
 									<br />{l s='This warning also concerns order '}
@@ -488,7 +488,7 @@
 							<a href="{$current_index}&amp;vieworder&amp;id_order={$brother_order->id}&amp;token={$smarty.get.token|escape:'html':'UTF-8'}">
 								#{'%06d'|sprintf:$brother_order->id}
 							</a>
-						{/foreach}
+						{/foreach} *}
 					</p>
 				{/if}
 				<form id="formAddPayment"  method="post" action="{$current_index}&amp;vieworder&amp;id_order={$order->id}&amp;token={$smarty.get.token|escape:'html':'UTF-8'}">
