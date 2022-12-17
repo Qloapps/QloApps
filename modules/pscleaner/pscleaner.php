@@ -839,6 +839,7 @@ class PSCleaner extends Module
             'order_message',
             'order_message_lang',
             'order_payment',
+            'order_payment_detail',
             'order_return',
             'order_return_detail',
             'order_slip',
