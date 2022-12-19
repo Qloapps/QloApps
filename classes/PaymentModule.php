@@ -355,7 +355,7 @@ abstract class PaymentModuleCore extends Module
                     }
 
                     // if (Configuration::get('PS_FRONT_SEARCH_TYPE') == HotelBookingDetail::SEARCH_TYPE_OWS) {
-                    //     $order->is_occupnacy_provided = 1;
+                    //     $order->occupnacy_wise_booking = 1;
                     // }
 
                     // advance payment information

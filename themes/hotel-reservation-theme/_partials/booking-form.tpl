@@ -86,11 +86,11 @@
                                         <span>
                                             {if isset($content_only) && $content_only && (isset($product->customization_required) && $product->customization_required)}{l s='Customize'}{else}{l s='Book Now'}{/if}
                                         </span>
+                                        <span id="booking_action_loader"></span>
                                     </button>
                                 </p>
                             {/if}
                         </div>
-                        <div id="booking_action_loader"><i class="icon-refresh icon-spin"></i></div>
                     </div>
                 {else}
                     <div class="sold_out_alert">

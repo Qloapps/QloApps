@@ -1358,22 +1358,27 @@ Quick View Styles
 #booking_action_block {
   position: relative;
 }
-#booking_action_loader {
-  display: none;
-  position: absolute;
-  top: -15px;
-  left: -15px;
-  right: -15px;
-  bottom: -15px;
-  border-radius: 0px 0px 4px 4px;
-  z-index: 1000;
-  background-color: rgba(0, 0, 0, 0.1);
+@keyframes blink {
+  33%{background-size:calc(100%/3) 0%  ,calc(100%/3) 100%,calc(100%/3) 100%}
+  50%{background-size:calc(100%/3) 100%,calc(100%/3) 0%  ,calc(100%/3) 100%}
+  66%{background-size:calc(100%/3) 100%,calc(100%/3) 100%,calc(100%/3) 0%  }
 }
+#booking_action_loader {
+  margin: auto;
+  height: 16px;
+  width: 50px;
+  --_circle: no-repeat radial-gradient(circle closest-side,rgb(255, 255, 255) 80%,#0000);
+  background:
+    var(--_circle)  0%   50%,
+    var(--_circle)  50%  50%,
+    var(--_circle)  100% 50%;
+  background-size: calc(100%/3) 100%;
+  animation: blink 1.5s infinite linear;
+  display: none;
+}
+
 #booking_action_loader.active {
-  font-size: 40px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  display: block;
 }
 /* room type extra demands container */
 .room_demands_container_overlay {

@@ -1792,7 +1792,7 @@ class AdminOrdersControllerCore extends AdminController
                 'error' => Tools::displayError('Check out Date Should be after Check In date.'),
             )));
         }
-        if ($order->is_occupnacy_provided) {
+        if ($order->occupnacy_wise_booking) {
             if ($occupancy) {
                 foreach($occupancy as $key =>$roomOccupancy) {
                     if (!Validate::isUnsignedInt($roomOccupancy['adult'])) {
@@ -1952,7 +1952,7 @@ class AdminOrdersControllerCore extends AdminController
                     $objCartBookingData->date_from = $date_from;
                     $objCartBookingData->date_to = $date_to;
 
-                    if ($order->is_occupnacy_provided) {
+                    if ($order->occupnacy_wise_booking) {
                         $room_occupancy = array_shift($occupancy);
                         $objCartBookingData->adult = $room_occupancy['adult'];
                         $objCartBookingData->children = $room_occupancy['children'];

@@ -1230,7 +1230,7 @@ var BookingForm = {
                 if(BookingForm.currentRequest != null) {
                     BookingForm.currentRequest.abort();
                 }
-                $('.book_now_submit').prop('disabled', true);
+                $('.book_now_submit').prop('disabled', true).find('span:not(#booking_action_loader)').hide();
                 $('#booking_action_block').find('#booking_action_loader').addClass('active');
             },
             success: function(response) {
@@ -1240,7 +1240,7 @@ var BookingForm = {
                 }
             },
             complete: function() {
-                $('.book_now_submit').prop('disabled', false);
+                $('.book_now_submit').prop('disabled', false).find('span:not(#booking_action_loader)').show();
                 $('#booking_action_block').find('#booking_action_loader').removeClass('active');
             }
         });

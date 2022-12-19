@@ -79,7 +79,7 @@
 		{/if}
 	</td>
 	<td class="text-center">
-		{if $order->is_occupnacy_provided && $data['children']}
+		{if $order->occupnacy_wise_booking && $data['children']}
 			<div class="dropdown booking_occupancy_show">
 				<button class="btn btn-default btn-left btn-block" data-toggle="dropdown" type="button">
 					<span>{if $data['adult']}{$data['adult']}{/if} {if $data['adult'] > 1}{l s='Adults'}{else}{l s='Adult'}{/if}{if {$data['children']}}, {$data['children']} {if $data['children'] > 1}{l s='Children'}{else}{l s='Child'}{/if}{/if}</span>
@@ -98,7 +98,7 @@
 		{else}
 			<span class="booking_occupancy_show">{if $data['adult']}{$data['adult']}{/if} {if $data['adult'] > 1}{l s='Adults'}{else}{l s='Adult'}{/if}{if {$data['children']}}, {$data['children']} {if $data['children'] > 1}{l s='Children'}{else}{l s='Child'}{/if}{/if}</span>
 		{/if}
-		{if $order->is_occupnacy_provided}
+		{if $order->occupnacy_wise_booking}
 			<div class="booking_occupancy_edit" style="display:none;">
 				<div class="dropdown">
 					<button class="booking_guest_occupancy btn btn-default btn-left btn-block input-occupancy" type="button">
