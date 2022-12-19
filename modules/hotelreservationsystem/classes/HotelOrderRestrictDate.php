@@ -35,7 +35,7 @@ class HotelOrderRestrictDate extends ObjectModel
         'fields' => array(
             'id_hotel' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
             'use_global_max_order_date' => array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
-            'max_order_date' => array('type' => self::TYPE_DATE, 'validate' => 'isDate'),
+            'max_order_date' => array('type' => self::TYPE_DATE, 'validate' => 'isDateFormat'),
             'use_global_preparation_time' => array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
             'preparation_time' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
             'date_add' => array('type' => self::TYPE_DATE, 'validate' => 'isDate'),

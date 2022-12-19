@@ -166,7 +166,7 @@ class AdminAddHotelController extends ModuleAdminController
             $restrictDateInfo = HotelOrderRestrictDate::getDataByHotelId($idHotel);
             if ($restrictDateInfo) {
                 if ($restrictDateInfo['max_order_date'] == '0000-00-00') {
-                    $restrictDateInfo['max_order_date'] = date('d-m-Y');
+                    $restrictDateInfo['max_order_date'] = date('d-m-Y', strtotime('1 year'));
                 } else {
                     $restrictDateInfo['max_order_date'] = date('d-m-Y', strtotime($restrictDateInfo['max_order_date']));
                 }
@@ -510,14 +510,14 @@ class AdminAddHotelController extends ModuleAdminController
 
             // save maximum booking date and preparation time
             $objHotelOrderRestrictDate = new HotelOrderRestrictDate();
-            $restrictDateInfo = HotelOrderRestrictDate::getDataByHotelId($idHotel);
+            $restrictDateInfo = HotelOrderRestrictDate::getDataByHotelId($newIdHotel);
             if ($restrictDateInfo) {
                 $objHotelOrderRestrictDate = new HotelOrderRestrictDate($restrictDateInfo['id']);
             } else {
                 $objHotelOrderRestrictDate = new HotelOrderRestrictDate();
             }
 
-            $objHotelOrderRestrictDate->id_hotel = $idHotel;
+            $objHotelOrderRestrictDate->id_hotel = $newIdHotel;
             $objHotelOrderRestrictDate->use_global_max_order_date = $enableUseGlobalMaxOrderDate;
             if (!$enableUseGlobalMaxOrderDate) {
                 $objHotelOrderRestrictDate->max_order_date = $maximumBookingDateFormatted;
