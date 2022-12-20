@@ -354,9 +354,13 @@ abstract class PaymentModuleCore extends Module
                         PrestaShopLogger::addLog('PaymentModule::validateOrder - Order is about to be added', 1, null, 'Cart', (int)$id_cart, true);
                     }
 
-                    // if (Configuration::get('PS_FRONT_SEARCH_TYPE') == HotelBookingDetail::SEARCH_TYPE_OWS) {
-                    //     $order->occupnacy_wise_booking = 1;
-                    // }
+                    if (isset($this->context->employee->id)) {
+                        if (Configuration::get('PS_BACKOFFICE_OCCUPANCY_WISE_BOOKING'))
+                            $order->occupnacy_wise_booking = 1;
+                    } else {
+                        if (Configuration::get('PS_FRONT_OCCUPANCY_WISE_BOOKING'))
+                            $order->occupnacy_wise_booking = 1;
+                    }
 
                     // advance payment information
                     $order->is_advance_payment = $this->context->cart->is_advance_payment;
