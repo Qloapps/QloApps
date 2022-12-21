@@ -56,7 +56,7 @@
 							<div class="col-sm-12 col-md-8 col-lg-9">
 								<div class="booking_room_fields">
 									{if !isset($restricted_country_mode) && !$PS_CATALOG_MODE && !$order_date_restrict}
-										{if isset($occupancy_wise_booking) && $occupancy_wise_booking}
+										{if isset($occupancy_required_for_booking) && $occupancy_required_for_booking}
 											<div class="booking_guest_occupancy_conatiner">
 												{include file="./occupancy_field.tpl" room_type_info=$room_v total_available_rooms=$room_v['room_left']}
 											</div>

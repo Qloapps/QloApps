@@ -295,7 +295,7 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
             'max_child_age' => Configuration::get('WK_GLOBAL_CHILD_MAX_AGE'),
             'max_child_in_room' => Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM'),
         );
-        $this->tpl_view_vars['occupancy_wise_booking'] = Configuration::get('PS_BACKOFFICE_OCCUPANCY_WISE_BOOKING');
+        $this->tpl_view_vars['occupancy_required_for_booking'] = Configuration::get('PS_BACKOFFICE_OCCUPANCY_REQUIRED_FOR_BOOKING');
 
         if (Configuration::get('PS_BACKOFFICE_SEARCH_TYPE') == HotelBookingDetail::SEARCH_TYPE_OWS ) {
             $this->tpl_view_vars['occupancy_adults'] = array_sum(array_column($occupancy, 'adult'));
@@ -375,7 +375,7 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
         $obj_cart_book_data = new HotelCartBookingData();
         $total_amount = $this->context->cart->getOrderTotal();
         if ($opt) {
-            if (!Configuration::get('PS_BACKOFFICE_OCCUPANCY_WISE_BOOKING')) {
+            if (!Configuration::get('PS_BACKOFFICE_OCCUPANCY_REQUIRED_FOR_BOOKING')) {
                 $objRoomType = new HotelRoomType();
                 $roomTypeInfo = $objRoomType->getRoomTypeInfoByIdProduct($id_product);
             }
@@ -390,7 +390,7 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
             $obj_cart_book_data->comment = $comment;
             $obj_cart_book_data->date_from = $date_from;
             $obj_cart_book_data->date_to = $date_to;
-            if (Configuration::get('PS_BACKOFFICE_OCCUPANCY_WISE_BOOKING')) {
+            if (Configuration::get('PS_BACKOFFICE_OCCUPANCY_REQUIRED_FOR_BOOKING')) {
                 $room_occupancy = array_shift($occupancy);
                 $obj_cart_book_data->adult = $room_occupancy['adult'];
                 $obj_cart_book_data->children = $room_occupancy['children'];

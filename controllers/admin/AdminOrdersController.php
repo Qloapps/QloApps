@@ -265,7 +265,7 @@ class AdminOrdersControllerCore extends AdminController
             'title' => array($this->l('Orders'), $this->l('Create order')),
             'max_child_in_room' => Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM'),
             'max_child_age' => Configuration::get('WK_GLOBAL_CHILD_MAX_AGE'),
-            'occupancy_wise_booking' => Configuration::get('PS_BACKOFFICE_OCCUPANCY_WISE_BOOKING'),
+            'occupancy_required_for_booking' => Configuration::get('PS_BACKOFFICE_OCCUPANCY_REQUIRED_FOR_BOOKING'),
             'occupancy_wise_search' => $occupancyWiseSearch
         ));
         $this->content .= $this->createTemplate('form.tpl')->fetch();
@@ -1792,7 +1792,7 @@ class AdminOrdersControllerCore extends AdminController
                 'error' => Tools::displayError('Check out Date Should be after Check In date.'),
             )));
         }
-        if ($order->occupnacy_wise_booking) {
+        if ($order->is_occupnacy_provided) {
             if ($occupancy) {
                 foreach($occupancy as $key =>$roomOccupancy) {
                     if (!Validate::isUnsignedInt($roomOccupancy['adult'])) {
@@ -1952,7 +1952,7 @@ class AdminOrdersControllerCore extends AdminController
                     $objCartBookingData->date_from = $date_from;
                     $objCartBookingData->date_to = $date_to;
 
-                    if ($order->occupnacy_wise_booking) {
+                    if ($order->is_occupnacy_provided) {
                         $room_occupancy = array_shift($occupancy);
                         $objCartBookingData->adult = $room_occupancy['adult'];
                         $objCartBookingData->children = $room_occupancy['children'];

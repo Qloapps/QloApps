@@ -85,7 +85,7 @@
 	</td>
 
 	<td style="display:none;" class="productQuantity text-center" colspan="2">
-		{if $order->occupnacy_wise_booking}
+		{if $order->is_occupnacy_provided}
 			<div class="booking_occupancy">
 				<div class="dropdown">
 					<button class="booking_guest_occupancy btn btn-default btn-left btn-block input-occupancy disabled" type="button">

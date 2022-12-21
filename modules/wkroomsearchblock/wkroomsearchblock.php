@@ -163,7 +163,7 @@ class WkRoomSearchBlock extends Module
         $maxOrderDate = Tools::getValue('max_order_date');
         $maxOrderDate = date('Y-m-d', strtotime($maxOrderDate));
 
-        if (Configuration::get('PS_FRONT_OCCUPANCY_WISE_BOOKING')) {
+        if (Configuration::get('PS_FRONT_OCCUPANCY_REQUIRED_FOR_BOOKING')) {
             if ($occupancy = Tools::getValue('occupancy')) {
                 $urlData['occupancy'] = $occupancy;
             }

@@ -312,7 +312,7 @@
 													<th><span class="title_box">{l s='Duration' mod='hotelreservationsystem'}</span></th>
 													<th><span class="title_box">{l s='Message' mod='hotelreservationsystem'}</span></th>
 													<th><span class="title_box">{l s='Allotment Type' mod='hotelreservationsystem'}</span></th>
-													{if $occupancy_wise_booking}
+													{if $occupancy_required_for_booking}
 														<th class="fixed-width-xxl"><span class="title_box">{l s='Guests' mod='hotelreservationsystem'}</span></th>
 													{/if}
 													<th class="text-right"><span class="title_box">{l s='Action' mod='hotelreservationsystem'}</span></th>
@@ -333,7 +333,7 @@
 															{/foreach}
 															<input type="text" id="comment_{$avai_v['id_room']|escape:'htmlall':'UTF-8'}" class="form-control avai_comment" placeholder="{l s='Allotment message' mod='hotelreservationsystem'}">
 														</td>
-														{if $occupancy_wise_booking}
+														{if $occupancy_required_for_booking}
 															<td class="booking_occupancy">
 																<div class="dropdown">
 																	<button class="btn btn-default btn-left btn-block booking_guest_occupancy input-occupancy" type="button">
@@ -395,7 +395,7 @@
 													<th class="text-center"><span class="title_box">{l s='Duration' mod='hotelreservationsystem'}</span></th>
 													<th><span class="title_box">{l s='Room No.' mod='hotelreservationsystem'}</span></th>
 													<th class="text-left"><span class="title_box">{l s='Allotment Type' mod='hotelreservationsystem'}</span></th>
-													{if $occupancy_wise_booking}
+													{if $occupancy_required_for_booking}
 														<th class="fixed-width-xxl"><span class="title_box">{l s='Guests' mod='hotelreservationsystem'}</span></th>
 													{/if}
 													<th class="text-center"><span class="title_box">{l s='Action' mod='hotelreservationsystem'}</span></th>
@@ -423,7 +423,7 @@
 																			{/foreach}
 																			<input type="text" id="comment_{$sub_part_v['id_room']|escape:'htmlall':'UTF-8'}_{$sub_part_k|escape:'htmlall':'UTF-8'}" class="form-control par_comment" placeholder="{l s='Allotment message' mod='hotelreservationsystem'}">
 																		</td>
-																		{if $occupancy_wise_booking}
+																		{if $occupancy_required_for_booking}
 																			<td class="booking_occupancy">
 																				<div class="dropdown">
 																					<button class="btn btn-default btn-left btn-block booking_guest_occupancy input-occupancy" type="button">
@@ -733,7 +733,7 @@
 	{addJsDef max_child_age=$max_child_age}
 	{addJsDef max_child_in_room=$max_child_in_room}
 	{addJsDef occupancy_wise_search=$occupancy_wise_search|boolval}
-	{addJsDef occupancy_wise_booking=$occupancy_wise_booking|boolval}
+	{addJsDef occupancy_required_for_booking=$occupancy_required_for_booking|boolval}
 
 	{addJsDefL name='select_age_txt'}{l s='Select age' js=1  mod='hotelreservationsystem'}{/addJsDefL}
 	{addJsDefL name='under_1_age'}{l s='Under 1' js=1  mod='hotelreservationsystem'}{/addJsDefL}

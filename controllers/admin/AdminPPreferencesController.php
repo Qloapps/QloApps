@@ -139,7 +139,7 @@ class AdminPPreferencesControllerCore extends AdminController
                         ),
                         'identifier' => 'id'
                     ),
-                    'PS_FRONT_OCCUPANCY_WISE_BOOKING' => array(
+                    'PS_FRONT_OCCUPANCY_REQUIRED_FOR_BOOKING' => array(
                         'title' => $this->l('Front end occupancy required for booking'),
                         'hint' => $this->l('Select occupancy is required for booking a room for frontend. When enabled occupancy field will be shown in the booking form.'),
                         'cast' => 'intval',
@@ -169,7 +169,7 @@ class AdminPPreferencesControllerCore extends AdminController
                         'identifier' => 'id',
                         'desc' => $this->l('This option is only for fully available rooms. For partially available rooms, always all possible rooms will be displayed.'),
                     ),
-                    'PS_BACKOFFICE_OCCUPANCY_WISE_BOOKING' => array(
+                    'PS_BACKOFFICE_OCCUPANCY_REQUIRED_FOR_BOOKING' => array(
                         'title' => $this->l('Back-office occupancy required for booking'),
                         'hint' => $this->l('Select occupancy is required for booking a room for frontend. When enabled occupancy field will be shown in the booking form.'),
                         'cast' => 'intval',

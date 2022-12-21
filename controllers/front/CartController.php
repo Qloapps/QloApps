@@ -270,7 +270,7 @@ class CartControllerCore extends FrontController
         $date_to = date("Y-m-d", strtotime($date_to));
 
         if ($occupancy = json_decode(Tools::getValue('occupancy'), true)) {
-            if (Configuration::get('PS_FRONT_OCCUPANCY_WISE_BOOKING')) {
+            if (Configuration::get('PS_FRONT_OCCUPANCY_REQUIRED_FOR_BOOKING')) {
                 $this->qty = count($occupancy);
             } else {
                 $this->qty = $occupancy;
@@ -293,7 +293,7 @@ class CartControllerCore extends FrontController
         }
 
         // valdiate occupancy if providede
-        if (Configuration::get('PS_FRONT_OCCUPANCY_WISE_BOOKING')) {
+        if (Configuration::get('PS_FRONT_OCCUPANCY_REQUIRED_FOR_BOOKING')) {
             foreach($occupancy as $key =>$roomOccupancy) {
                 if (!isset($roomOccupancy['adult']) || !$roomOccupancy['adult'] || !Validate::isUnsignedInt($roomOccupancy['adult'])) {
                     $this->errors[] = sprintf(Tools::displayError('Invalid number of adults for Room %s.'), ($key + 1));
@@ -337,7 +337,7 @@ class CartControllerCore extends FrontController
                             $this->errors[] = Tools::displayError('You can\'t book room after date '.$maxOrdDate);
                         }
                     }
-                    if (Configuration::get('PS_FRONT_OCCUPANCY_WISE_BOOKING')) {
+                    if (Configuration::get('PS_FRONT_OCCUPANCY_REQUIRED_FOR_BOOKING')) {
                         foreach($occupancy as $key =>$roomOccupancy) {
                             if ($roomOccupancy['adult'] > $roomTypeInfo['max_adults']) {
                                 $this->errors[] = sprintf(Tools::displayError('Room %s cannot have adults more than %s'), $key + 1, $roomTypeInfo['max_adults']);

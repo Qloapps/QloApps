@@ -487,7 +487,7 @@ class FrontControllerCore extends Controller
             'currencyFormat'      => $currency->format, // backward compat
             'currencyBlank'       => $currency->blank, // backward compat
             'occupancy_wise_search'    => $occupancyWiseSearch,
-            'occupancy_wise_booking' => Configuration::get('PS_FRONT_OCCUPANCY_WISE_BOOKING'),
+            'occupancy_required_for_booking' => Configuration::get('PS_FRONT_OCCUPANCY_REQUIRED_FOR_BOOKING'),
             'max_child_age' => Configuration::get('WK_GLOBAL_CHILD_MAX_AGE'),
             'max_child_in_room' => Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM'),
         ));

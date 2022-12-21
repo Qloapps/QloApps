@@ -536,7 +536,7 @@ class ProductControllerCore extends FrontController
             'id_cart' => $idCart,
             'id_guest' => $idGuest,
         );
-        if (Configuration::get('PS_FRONT_OCCUPANCY_WISE_BOOKING')) {
+        if (Configuration::get('PS_FRONT_OCCUPANCY_REQUIRED_FOR_BOOKING')) {
             $quantity = count($occupancy);
         } else {
             $quantity = $occupancy;

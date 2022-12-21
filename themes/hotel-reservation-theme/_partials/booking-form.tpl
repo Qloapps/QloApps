@@ -35,7 +35,7 @@
                 {if $total_available_rooms > 0}
                     <div class="row">
                         <div class="form-group col-sm-12"{if !$product->available_for_order || $PS_CATALOG_MODE} style="display: none;"{/if}>
-                            {if isset($occupancy_wise_booking) && $occupancy_wise_booking}
+                            {if isset($occupancy_required_for_booking) && $occupancy_required_for_booking}
                                 <label class="control-label">{l s='Guests'}</label>
                                 {include file="./occupancy_field.tpl"}
                             {else}

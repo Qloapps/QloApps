@@ -664,7 +664,7 @@ $(document).ready(function() {
     function getBookingOccupancyDetails(bookingform)
     {
         let occupancy;
-        if (occupancy_wise_booking) {
+        if (occupancy_required_for_booking) {
             let selected_occupancy = $(bookingform).find(".occupancy_info_block.selected")
             if (selected_occupancy.length) {
                 occupancy = [];

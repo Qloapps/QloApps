@@ -31,7 +31,7 @@
 						<th><span class="title_box">{l s='Room Image'}</th>
 						<th><span class="title_box">{l s='Room Type'}</span></th>
 						<th><span class="title_box">{l s='Duration'}</span></th>
-						{if $occupancy_wise_booking}
+						{if $occupancy_required_for_booking}
 							<th><span class="fixed-width-lg title_box">{l s='Occupancy'}</span></th>
 						{/if}
 						<th><span class="title_box">{l s='Unit Price (tax excl)'}</span></th>
@@ -61,7 +61,7 @@
 								{/if}
 							</td>
 							<td>{dateFormat date=$data.date_from} - {dateFormat date=$data.date_to}</td>
-							{if $occupancy_wise_booking}
+							{if $occupancy_required_for_booking}
 								<td>
 									<div class="dropdown">
 										<button class="booking_guest_occupancy btn btn-default btn-left btn-block input-occupancy" type="button">
