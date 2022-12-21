@@ -36,15 +36,14 @@ class DashOccupancy extends Module
         $this->displayName = $this->l('Dashboard Occupancy');
         $this->description = $this->l('Adds a block with a graphical representation of occupancy of your hotel`s room.');
         $this->confirmUnsinstall = $this->l('Are you sure you want to uninstall?');
-        
+
         $this->allow_push = true;
-        
     }
 
     public function install()
     {
         return (parent::install()
-            && $this->registerHook('dashboardZoneTwo')
+            && $this->registerHook('dashboardZoneOne')
             && $this->registerHook('dashboardData')
             && $this->registerHook('actionAdminControllerSetMedia')
         );
@@ -54,92 +53,74 @@ class DashOccupancy extends Module
     {
         if (get_class($this->context->controller) == 'AdminDashboardController') {
             $this->context->controller->addJs($this->_path.'views/js/'.$this->name.'.js');
+            $this->context->controller->addCSS($this->_path.'views/css/'.$this->name.'.css');
         }
-        $this->context->controller->addCSS($this->_path.'views/css/'.$this->name.'.css');
     }
-    
-    public function hookDashboardZoneTwo($params)
+
+    public function hookDashboardZoneOne($params)
     {
-        Media::addJsDef(array(
-            'ajaxUrl' => $this->context->link->getModuleLink($this->name, 'chartdata'),
-            'date_from' => $params['date_from'],
-            'date_to' => $params['date_to'],
-        ));
-        $availPieChartLabelData = AdminStatsController::getAvailPieChartData($params['date_from'], $params['date_to']);
-        $totalRooms = sprintf("%02d", AdminStatsController::getTotalRooms());
+        $occupancyData = AdminStatsController::getOccupancyData(
+            $params['date_from'],
+            $params['date_to'],
+            $params['id_hotel']
+        );
+
         $this->context->smarty->assign(array(
-            'totalRooms' => $totalRooms,
-            'inactiveRooms' =>  $availPieChartLabelData['inactive'],
-            'availableRooms' =>  $availPieChartLabelData['available'],
-            'occupiedRooms' =>  $availPieChartLabelData['occupied'],
-            'date_occupancy_range' => $this->l('(from %s to %s)'),
-            'date_occupancy_avail_format' => $this->context->language->date_format_lite,
-		));
-        return $this->display(__FILE__, 'dashboard_zone_two.tpl');
+            'count_total' =>  sprintf('%02d', $occupancyData['count_total']),
+            'count_occupied' => sprintf('%02d', $occupancyData['count_occupied']),
+            'count_available' =>  sprintf('%02d', $occupancyData['count_available']),
+            'count_unavailable' =>  sprintf('%02d', $occupancyData['count_unavailable']),
+        ));
+
+        return $this->display(__FILE__, 'dashboard_zone_one.tpl');
     }
 
     public function hookDashboardData($params)
     {
-        $totalRooms = sprintf("%02d", AdminStatsController::getTotalRooms());
         $data = array();
-		$data['total_rooms'] = $totalRooms;
+        if (Configuration::get('PS_DASHBOARD_SIMULATION')) {
+            $occupancyData = array();
+            $occupancyData['count_total'] = sprintf('%02d', rand(0, 1000));
+            $tmp = $occupancyData['count_total'];
+            $occupancyData['count_occupied'] = sprintf('%02d', round(rand(0, $occupancyData['count_total'])));
+            $tmp = $tmp - $occupancyData['count_occupied'];
+            $occupancyData['count_available'] = sprintf('%02d', round(rand(0, $tmp)));
+            $tmp = $tmp - $occupancyData['count_available'];
+            $occupancyData['count_unavailable'] = sprintf('%02d', $tmp);
+        } else {
+            $occupancyData = AdminStatsController::getOccupancyData(
+                $params['date_from'],
+                $params['date_to'],
+                $params['id_hotel']
+            );
+        }
 
-		if (Configuration::get('PS_DASHBOARD_SIMULATION'))
-		{
-            		$totalRoomsTemp = $totalRooms;
-			$data['occupied'] = round(rand(0, $totalRoomsTemp));
-            		$totalRoomsTemp = $totalRoomsTemp - $data['occupied'];
-			$data['available'] = round(rand(0, $totalRoomsTemp));
-            		$totalRoomsTemp = $totalRoomsTemp - $data['available'];
-			$data['inactive'] = $totalRoomsTemp;
-			$availPieChartData = array();
-			$objChartData = array();
-			$objChartData['label'] = $this->l('Occupied');;
-			$objChartData['value'] = $data['occupied']*100/$totalRooms;
-			$availPieChartData[] = $objChartData;
+        $chartData = array(
+            array(
+                'label' => $this->l('Occupied'),
+                'value' => $occupancyData['count_total']
+                    ? ($occupancyData['count_occupied'] / $occupancyData['count_total']) * 100
+                    : 0,
+            ),
+            array(
+                'label' => $this->l('Available'),
+                'value' => $occupancyData['count_total']
+                    ? ($occupancyData['count_available'] / $occupancyData['count_total']) * 100
+                    : 0,
+            ),
+            array(
+                'label' => $this->l('Unavailable'),
+                'value' => $occupancyData['count_total']
+                    ? ($occupancyData['count_unavailable'] / $occupancyData['count_total']) * 100
+                    : 0,
+            ),
+        );
 
-			$objChartData = array();
-			$objChartData['label'] = $this->l('Available');
-			$objChartData['value'] = $data['available']*100/$totalRooms;
-			$availPieChartData[] = $objChartData;
-
-			$objChartData = array();
-			$objChartData['label'] = $this->l('Inactive/ maintainance');
-			$objChartData['value'] = $data['inactive']*100/$totalRooms;
-			$availPieChartData[] = $objChartData;
-
-			$data['chart_data'] = $availPieChartData;
-
-		} else {
-            $dateFrom = $params['date_from'];
-            $dateTo = $params['date_to'];
-			$availPieChartLabelData = AdminStatsController::getAvailPieChartData(
-				$dateFrom,
-				 $dateTo
-			);
-
-			$availPieChartData = array();
-			$objChartData = array();
-			$objChartData['label'] = $this->l('Occupied');;
-			$objChartData['value'] = $availPieChartLabelData['occupied']*100/$totalRooms;
-			$availPieChartData[] = $objChartData;
-
-			$objChartData = array();
-			$objChartData['label'] = $this->l('Available');
-			$objChartData['value'] = $availPieChartLabelData['available']*100/$totalRooms;
-			$availPieChartData[] = $objChartData;
-
-			$objChartData = array();
-			$objChartData['label'] = $this->l('Inactive/ maintainance');
-			$objChartData['value'] = $availPieChartLabelData['inactive']*100/$totalRooms;
-			$availPieChartData[] = $objChartData;
-
-			$data['occupied'] = $availPieChartLabelData['occupied'];
-			$data['available'] = $availPieChartLabelData['available'];
-			$data['inactive'] = $availPieChartLabelData['inactive'];
-			$data['chart_data'] = $availPieChartData;
-
-		}
+        $data['count_total'] = sprintf('%02d', $occupancyData['count_total']);
+        $data['count_occupied'] = sprintf('%02d', $occupancyData['count_occupied']);
+        $data['count_available'] = sprintf('%02d', $occupancyData['count_available']);
+        $data['count_unavailable'] = sprintf('%02d', $occupancyData['count_unavailable']);
+        $data['chart_data'] = $chartData;
 
         return array('data_avail_pie_chart' => $data);
     }

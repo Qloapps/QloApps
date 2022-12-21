@@ -40,6 +40,9 @@ class OrderCore extends ObjectModel
     /** @var int Invoice address id */
     public $id_address_invoice;
 
+    /** @var int Hotel address id */
+    public $id_address_tax;
+
     public $id_shop_group;
 
     public $id_shop;
@@ -196,6 +199,7 @@ class OrderCore extends ObjectModel
         'fields' => array(
             'id_address_delivery' =>        array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => true),
             'id_address_invoice' =>        array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => true),
+            'id_address_tax' =>        array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => true),
             'id_cart' =>                    array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => true),
             'id_currency' =>                array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => true),
             'id_shop_group' =>                array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
@@ -747,6 +751,7 @@ class OrderCore extends ObjectModel
 
     public function getTaxesAverageUsed()
     {
+        // @todo should use order table to get tax average
         return Cart::getTaxesAverageUsed((int)$this->id_cart);
     }
 
@@ -1349,7 +1354,7 @@ class OrderCore extends ObjectModel
             return;
         }
 
-        $address = new Address((int)$this->{Configuration::get('PS_TAX_ADDRESS_TYPE')});
+        $address = new Address((int)$this->id_address_tax);
         $carrier = new Carrier((int)$this->id_carrier);
         $tax_calculator = $carrier->getTaxCalculator($address);
         $order_invoice->total_discount_tax_excl = $this->total_discounts_tax_excl;
@@ -1772,6 +1777,11 @@ class OrderCore extends ObjectModel
             } else {
                 $this->total_paid_real += Tools::ps_round(Tools::convertPrice($order_payment_detail->amount, $lastOrderPayment->id_currency, false), 2);
             }
+
+            if (!validate::isPrice($this->total_paid_real)) {
+                return false;
+            }
+
             if ($order_payment_detail->add() && $this->update()) {
                 if (!is_null($order_invoice)) {
                     $res = Db::getInstance()->execute('
@@ -2515,7 +2525,7 @@ class OrderCore extends ObjectModel
                     if ($refundFlag) {
                         foreach ($refundBookings as $refundRow) {
                             if (Validate::isLoadedObject(
-                                $objReturnState = new OrderReturnState($refundRow['current_state']
+                                $objReturnState = new OrderReturnState($refundRow['state']
                             ))) {
                                 if ($refundFlag == OrderReturnState::ORDER_RETURN_STATE_FLAG_REFUNDED
                                     && !$objReturnState->refunded

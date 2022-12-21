@@ -25,6 +25,7 @@ CREATE TABLE `PREFIX_address` (
   `id_manufacturer` int(10) unsigned NOT NULL DEFAULT '0',
   `id_supplier` int(10) unsigned NOT NULL DEFAULT '0',
   `id_warehouse` int(10) unsigned NOT NULL DEFAULT '0',
+  `id_hotel` int(10) unsigned NOT NULL DEFAULT '0',
   `alias` varchar(32) NOT NULL,
   `company` varchar(255) DEFAULT NULL,
   `lastname` varchar(32) NOT NULL,
@@ -1101,6 +1102,7 @@ CREATE TABLE `PREFIX_orders` (
   `id_currency` int(10) unsigned NOT NULL,
   `id_address_delivery` int(10) unsigned NOT NULL,
   `id_address_invoice` int(10) unsigned NOT NULL,
+  `id_address_tax` int(10) unsigned NOT NULL,
   `current_state` int(10) unsigned NOT NULL,
   `secure_key` varchar(32) NOT NULL DEFAULT '-1',
   `payment` varchar(255) NOT NULL,
@@ -2697,3 +2699,11 @@ CREATE TABLE IF NOT EXISTS `PREFIX_cms_role_lang` (
   PRIMARY KEY (`id_cms_role`,`id_lang`, id_shop)
 ) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8;
 
+
+CREATE TABLE IF NOT EXISTS `PREFIX_maintenance_access` (
+  `id_maintenance_access` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `ip_address` varchar(50) NOT NULL,
+  `email` varchar(128) NOT NULL,
+  `date_add` datetime NOT NULL,
+  PRIMARY KEY (`id_maintenance_access`)
+) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8;

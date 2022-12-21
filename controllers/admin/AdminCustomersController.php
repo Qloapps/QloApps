@@ -598,12 +598,13 @@ class AdminCustomersControllerCore extends AdminController
         );
 
         $birthday = explode('-', $this->getFieldValue($obj, 'birthday'));
-
+        
         $this->fields_value = array(
-            'years' => $this->getFieldValue($obj, 'birthday') ? $birthday[0] : 0,
-            'months' => $this->getFieldValue($obj, 'birthday') ? $birthday[1] : 0,
-            'days' => $this->getFieldValue($obj, 'birthday') ? $birthday[2] : 0,
+            'years' => Tools::getValue('years', $this->getFieldValue($obj, 'birthday') ? $birthday[0] : 0),
+            'months' => Tools::getValue('months', $this->getFieldValue($obj, 'birthday') ? $birthday[1] : 0),
+            'days' => Tools::getValue('days', $this->getFieldValue($obj, 'birthday') ? $birthday[2] : 0),
         );
+
 
         // Added values of object Group
         if (!Validate::isUnsignedId($obj->id)) {
@@ -642,19 +643,13 @@ class AdminCustomersControllerCore extends AdminController
         $time = time();
         $kpis = array();
 
-        /* The data generation is located in AdminStatsControllerCore */
-
         $helper = new HelperKpi();
         $helper->id = 'box-gender';
         $helper->icon = 'icon-male';
         $helper->color = 'color1';
         $helper->title = $this->l('Customers', null, null, false);
         $helper->subtitle = $this->l('All Time', null, null, false);
-        if (ConfigurationKPI::get('CUSTOMER_MAIN_GENDER', $this->context->language->id) !== false) {
-            $helper->value = ConfigurationKPI::get('CUSTOMER_MAIN_GENDER', $this->context->language->id);
-        }
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=customer_main_gender';
-        $helper->refresh = (bool)(ConfigurationKPI::get('CUSTOMER_MAIN_GENDER_EXPIRE', $this->context->language->id) < $time);
         $kpis[] = $helper->generate();
 
         $helper = new HelperKpi();
@@ -663,11 +658,7 @@ class AdminCustomersControllerCore extends AdminController
         $helper->color = 'color2';
         $helper->title = $this->l('Average Age', 'AdminTab', null, false);
         $helper->subtitle = $this->l('All Time', null, null, false);
-        if (ConfigurationKPI::get('AVG_CUSTOMER_AGE', $this->context->language->id) !== false) {
-            $helper->value = ConfigurationKPI::get('AVG_CUSTOMER_AGE', $this->context->language->id);
-        }
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=avg_customer_age';
-        $helper->refresh = (bool)(ConfigurationKPI::get('AVG_CUSTOMER_AGE_EXPIRE', $this->context->language->id) < $time);
         $kpis[] = $helper->generate();
 
         $helper = new HelperKpi();
@@ -676,11 +667,7 @@ class AdminCustomersControllerCore extends AdminController
         $helper->color = 'color3';
         $helper->title = $this->l('Orders per Customer', null, null, false);
         $helper->subtitle = $this->l('All Time', null, null, false);
-        if (ConfigurationKPI::get('ORDERS_PER_CUSTOMER') !== false) {
-            $helper->value = ConfigurationKPI::get('ORDERS_PER_CUSTOMER');
-        }
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=orders_per_customer';
-        $helper->refresh = (bool)(ConfigurationKPI::get('ORDERS_PER_CUSTOMER_EXPIRE') < $time);
         $kpis[] = $helper->generate();
 
         $helper = new HelperKpi();
@@ -689,11 +676,7 @@ class AdminCustomersControllerCore extends AdminController
         $helper->color = 'color4';
         $helper->title = $this->l('Newsletter Registrations', null, null, false);
         $helper->subtitle = $this->l('All Time', null, null, false);
-        if (ConfigurationKPI::get('NEWSLETTER_REGISTRATIONS') !== false) {
-            $helper->value = ConfigurationKPI::get('NEWSLETTER_REGISTRATIONS');
-        }
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=newsletter_registrations';
-        $helper->refresh = (bool)(ConfigurationKPI::get('NEWSLETTER_REGISTRATIONS_EXPIRE') < $time);
         $kpis[] = $helper->generate();
 
         $helper = new HelperKpiRow();
@@ -878,7 +861,6 @@ class AdminCustomersControllerCore extends AdminController
             'referrers' => $referrers,
             'show_toolbar' => true
         );
-
         return parent::renderView();
     }
 
@@ -962,10 +944,25 @@ class AdminCustomersControllerCore extends AdminController
             $this->errors[] = Tools::displayError('A default customer group must be selected in group box.');
         }
 
-        // Check the requires fields which are settings in the BO
+        $days = Tools::getValue('days');
+        $months = Tools::getValue('months');
+        $years = Tools::getValue('years');
+        
+        if ($days || $months || $years) {
+            if (!$days) {
+                $this->errors[] = Tools::displayError("Please select a valid date of birthday");
+            }
+            if (!$months) {
+                $this->errors[] = Tools::displayError("Please select a valid year of birthday");
+            }
+            if (!$years) {
+                $this->errors[] = Tools::displayError("Please select a valid month of birthday");
+            }
+        }
+        
         $customer = new Customer();
         $this->errors = array_merge($this->errors, $customer->validateFieldsRequiredDatabase());
-
+        
         return parent::processSave();
     }
 

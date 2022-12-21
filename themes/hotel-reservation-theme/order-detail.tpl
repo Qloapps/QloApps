@@ -359,20 +359,20 @@
 									<p class="text-center">
 										{if $group_use_tax}
 											<p class="text-center">
-												<span class="product_original_price {if $rm_v.feature_price_diff>0}room_type_old_price{/if}" {if $rm_v.feature_price_diff < 0} style="display:none;"{/if}>
+												<span class="product_original_price {if $rm_v.avg_price_diff_tax_incl>0}room_type_old_price{/if}" {if $rm_v.avg_price_diff_tax_incl < 0} style="display:none;"{/if}>
 													{displayWtPriceWithCurrency price=$rm_v['product_price_without_reduction_tax_incl'] currency=$currency}
 												</span>&nbsp;
-												<span class="room_type_current_price" {if !$rm_v.feature_price_diff}style="display:none;"{/if}>
-													{displayWtPriceWithCurrency price=$rm_v['paid_unit_price_tax_incl'] currency=$currency}
+												<span class="room_type_current_price" {if !$rm_v.avg_price_diff_tax_incl}style="display:none;"{/if}>
+													{displayWtPriceWithCurrency price=$rm_v['avg_paid_unit_price_tax_incl'] currency=$currency}
 												</span>
 											</p>
 										{else}
 											<p class="text-center">
-												<span class="product_original_price {if $rm_v.feature_price_diff>0}room_type_old_price{/if}" {if $rm_v.feature_price_diff < 0} style="display:none;"{/if}>
+												<span class="product_original_price {if $rm_v.avg_price_diff_tax_excl>0}room_type_old_price{/if}" {if $rm_v.avg_price_diff_tax_excl < 0} style="display:none;"{/if}>
 													{displayWtPriceWithCurrency price=$rm_v['product_price_without_reduction_tax_excl'] currency=$currency}
 												</span>&nbsp;
-												<span class="room_type_current_price" {if !$rm_v.feature_price_diff}style="display:none;"{/if}>
-													{displayWtPriceWithCurrency price=$rm_v['paid_unit_price_tax_excl'] currency=$currency}
+												<span class="room_type_current_price" {if !$rm_v.avg_price_diff_tax_excl}style="display:none;"{/if}>
+													{displayWtPriceWithCurrency price=$rm_v['avg_paid_unit_price_tax_excl'] currency=$currency}
 												</span>
 											</p>
 										{/if}
@@ -414,7 +414,7 @@
 
 	{if $refund_allowed && $non_requested_rooms}
 		<div class="alert alert-info-light standard_refund_fields">
-			<i class="icon-info-circle"></i> {l s='Select rooms which bookings you want to cancel. Attached additional facilities with the room will be cancelled with room cancellation.'}
+			<i class="icon-info-circle"></i> {l s='Select rooms for which you want to cancel bookings. Additional facilities for cancelled rooms will be cancelled automatically.'}
 		</div>
 		{if !$hasCompletelyRefunded}
 			<div class="row standard_refund_fields">

@@ -1,5 +1,0 @@
-2014-04-22 18:57:04 +0200	// Changelog updated
-2014-03-24 12:18:44 +0100	[*] MO : Remove "toll free" from blockcontact strings.
-2014-03-24 11:43:28 +0100	/ MO blockcontact : ps_versions_compliancy modified (1.5.6.1 => 1.6)
-2014-03-24 11:01:44 +0100	/ MO blockcontact : ps_versions_compliancy added
-2014-03-20 14:21:10 +0100	Initial commit

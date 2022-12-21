@@ -39,7 +39,7 @@ class DashProducts extends Module
 
 		$this->push_filename = _PS_CACHE_DIR_.'push/activity';
 		$this->allow_push = true;
-		
+
 		parent::__construct();
 		$this->displayName = $this->l('Dashboard Products');
 		$this->description = $this->l('Adds a block with a table of your latest orders and a ranking of your products');
@@ -89,10 +89,10 @@ class DashProducts extends Module
 
 	public function hookDashboardData($params)
 	{
-		$table_recent_orders = $this->getTableRecentOrders();
-		$table_best_sellers = $this->getTableBestSellers($params['date_from'], $params['date_to']);
-		$table_most_viewed = $this->getTableMostViewed($params['date_from'], $params['date_to']);
-		$table_top_10_most_search = $this->getTableTop10MostSearch($params['date_from'], $params['date_to']);
+		$table_recent_orders = $this->getTableRecentOrders($params['id_hotel']);
+		$table_best_sellers = $this->getTableBestSellers($params['date_from'], $params['date_to'], $params['id_hotel']);
+		$table_most_viewed = $this->getTableMostViewed($params['date_from'], $params['date_to'], $params['id_hotel']);
+		$table_top_10_most_search = $this->getTableTop10MostSearch($params['date_from'], $params['date_to'], $params['id_hotel']);
 
 		//$table_top_5_search = $this->getTableTop5Search();
 		return array(
@@ -106,7 +106,7 @@ class DashProducts extends Module
 		);
 	}
 
-	public function getTableRecentOrders()
+	public function getTableRecentOrders($idHotel)
 	{
 		$header = array(
 			array('title' => $this->l('Customer Name'), 'class' => 'text-left'),
@@ -120,7 +120,7 @@ class DashProducts extends Module
 		);
 
 		$limit = (int)Configuration::get('DASHPRODUCT_NBR_SHOW_LAST_ORDER') ? (int)Configuration::get('DASHPRODUCT_NBR_SHOW_LAST_ORDER') : 10;
-		$orders = Order::getOrdersWithInformations($limit);
+		$orders = AdminStatsController::getRecentOrdersByHotel($idHotel, $limit);
 
 		$body = array();
 		foreach ($orders as $order) {
@@ -186,7 +186,7 @@ class DashProducts extends Module
 		return array('header' => $header, 'body' => $body);
 	}
 
-	public function getTableBestSellers($date_from, $date_to)
+	public function getTableBestSellers($date_from, $date_to, $id_hotel)
 	{
 		$header = array(
 			array(
@@ -226,10 +226,11 @@ class DashProducts extends Module
 			FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
 			LEFT JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = hbd.`id_order`)
 			WHERE o.`invoice_date` BETWEEN "'.pSQL($date_from).' 00:00:00" AND "'.pSQL($date_to).' 23:59:59"
-			AND o.`valid` = 1 AND hbd.`is_refunded` = 0
+			AND o.`valid` = 1 AND hbd.`is_refunded` = 0.'.
+			(!is_null($id_hotel) ? HotelBranchInformation::addHotelRestriction($id_hotel, 'hbd') : '').'
 			GROUP BY hbd.`id_product`
 			ORDER BY `sales` DESC
-			LIMIT '.(int)Configuration::get('DASHPRODUCT_NBR_SHOW_BEST_SELLER', 10)
+			LIMIT '.(int) Configuration::get('DASHPRODUCT_NBR_SHOW_BEST_SELLER', 10)
 		);
 
 		$body = array();
@@ -249,7 +250,7 @@ class DashProducts extends Module
 				$path_to_image = _PS_PROD_IMG_DIR_.$image->getExistingImgPath().'.'.$this->context->controller->imageType;
 				$img = ImageManager::thumbnail($path_to_image, 'product_mini_'.$product_obj->id.'.'.$this->context->controller->imageType, 45, $this->context->controller->imageType);
 			}
-			
+
 			$productPrice = $product['price'];
 
 			$body[] = array(
@@ -289,7 +290,7 @@ class DashProducts extends Module
 		return array('header' => $header, 'body' => $body);
 	}
 
-	public function getTableMostViewed($date_from, $date_to)
+	public function getTableMostViewed($date_from, $date_to, $id_hotel)
 	{
 		$header = array(
 			array(
@@ -395,9 +396,10 @@ class DashProducts extends Module
 					$body[] = $tr;
 				}
 			}
+		} else {
+			$link = $this->context->link->getAdminLink('AdminModules').'&configure=statsdata';
+			$body = '<div class="alert alert-info">'.$this->l('You must enable the "Save global page views" option from ').'<u><a href="'.$link.'" target="_blank">Data mining for statistics</a></u>'.$this->l(' module in order to display the most viewed room types, or use the Google Analytics module.').'</div>';
 		}
-		else
-			$body = '<div class="alert alert-info">'.$this->l('You must enable the "Save global page views" option from the "Data mining for statistics" module in order to display the most viewed room types, or use the Google Analytics module.').'</div>';
 		return array('header' => $header, 'body' => $body);
 	}
 
@@ -468,9 +470,8 @@ class DashProducts extends Module
 					$body[] = $tr;
 				}
 		} else {
-			$body = '<div class="alert alert-info">'.
-			$this->l('You must enable the "Save global page views" option from the "Data mining for statistics" module in order to display the most viewed room types, or use the Google Analytics module.').
-			'</div>';
+			$link = $this->context->link->getAdminLink('AdminModules').'&configure=statsdata';
+			$body = '<div class="alert alert-info">'.$this->l('You must enable the "Save global page views" option from ').'<u><a href="'.$link.'" target="_blank">Data mining for statistics</a></u>'.$this->l(' module in order to display the most viewed room types, or use the Google Analytics module.').'</div>';
 		}
 
 		return array('header' => $header, 'body' => $body);
@@ -553,18 +554,19 @@ class DashProducts extends Module
 				}
 
 			return $products;
-		}
-		else {
+		} else {
 			return Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS('
 			SELECT p.id_object, SUM(pv.counter) AS `counter`
 			FROM `'._DB_PREFIX_.'page_viewed` pv
 			LEFT JOIN `'._DB_PREFIX_.'date_range` dr ON pv.`id_date_range` = dr.`id_date_range`
 			LEFT JOIN `'._DB_PREFIX_.'page` p ON pv.`id_page` = p.`id_page`
 			LEFT JOIN `'._DB_PREFIX_.'page_type` pt ON pt.`id_page_type` = p.`id_page_type`
+			LEFT JOIN `'._DB_PREFIX_.'htl_room_type` hrt ON hrt.`id_product` = p.`id_object`
 			WHERE pt.`name` = \'product\'
 			'.Shop::addSqlRestriction(false, 'pv').'
 			AND dr.`time_start` BETWEEN "'.pSQL($date_from).' 00:00:00" AND "'.pSQL($date_to).' 23:59:59"
-			AND dr.`time_end` BETWEEN "'.pSQL($date_from).' 00:00:00" AND "'.pSQL($date_to).' 23:59:59"
+			AND dr.`time_end` BETWEEN "'.pSQL($date_from).' 00:00:00" AND "'.pSQL($date_to).' 23:59:59"'.
+			(!is_null($id_hotel) ? HotelBranchInformation::addHotelRestriction($id_hotel, 'hrt') : '').'
 			GROUP BY p.id_object
 			ORDER BY `counter` DESC
 			LIMIT '.(int)$limit);
@@ -679,7 +681,7 @@ class DashProducts extends Module
 	{
 		Tools::changeFileMTime($this->push_filename);
 	}
-	
+
 	public function hookActionSearch($params)
 	{
 		Tools::changeFileMTime($this->push_filename);

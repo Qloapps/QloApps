@@ -48,9 +48,17 @@ class AdminMaintenanceControllerCore extends AdminController
                         'cast' => 'intval',
                         'type' => 'bool'
                     ),
+                    'PS_ALLOW_EMP' => array(
+                        'title' => $this->l('Allow Employees'),
+                        'desc' => $this->l('Allow the employees to access the site using email and password.'),
+                        'validation' => 'isBool',
+                        'cast' => 'intval',
+                        'type' => 'bool',
+                        'class' => "hello"
+                    ),
                     'PS_MAINTENANCE_IP' => array(
                         'title' => $this->l('Maintenance IP'),
-                        'hint' => $this->l('IP addresses allowed to access the front office even if the shop is disabled. Please use a comma to separate them (e.g. 42.24.4.2,127.0.0.1,99.98.97.96)'),
+                        'hint' => $this->l('IP addresses allowed to access the front office even if the site is disabled. Please use a comma to separate them (e.g. 42.24.4.2,127.0.0.1,99.98.97.96)'),
                         'validation' => 'isGenericName',
                         'type' => 'maintenance_ip',
                         'default' => ''
@@ -59,5 +67,11 @@ class AdminMaintenanceControllerCore extends AdminController
                 'submit' => array('title' => $this->l('Save'))
             ),
         );
+    }
+
+    public function setMedia()
+    {
+        parent::setMedia();
+        $this->addJS(_PS_JS_DIR_.'maintenance.js');
     }
 }

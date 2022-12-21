@@ -29,7 +29,7 @@ class wkhotelfilterblock extends Module
     public function __construct()
     {
         $this->name = 'wkhotelfilterblock';
-        $this->author = 'webkul';
+        $this->author = 'Webkul';
         $this->tab = 'front_office_features';
         $this->version = '1.0.4';
         $this->context = Context::getContext();
@@ -37,13 +37,14 @@ class wkhotelfilterblock extends Module
         $this->bootstrap = true;
         parent::__construct();
 
-        $this->displayName = $this->l('layered filters and sorting block');
+        $this->displayName = $this->l('Layered filters and sorting block');
         $this->description = $this->l('Hotel filter and sorting block');
         $this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
     }
 
     public function getContent()
     {
+        $this->html = '';
         if (Tools::isSubmit('btnConfigSubmit')) {
             $this->postProcess();
         } else {

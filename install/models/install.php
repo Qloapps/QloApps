@@ -443,6 +443,7 @@ class InstallModelInstall extends InstallAbstractModel
             'shop_activity' => '',
             'shop_country' => 'us',
             'shop_timezone' => 'US/Eastern',
+            'enable_ssl' => false,
             'use_smtp' => false,
             'smtp_encryption' => 'off',
             'smtp_port' => 25,
@@ -476,6 +477,10 @@ class InstallModelInstall extends InstallAbstractModel
         Configuration::updateGlobalValue('PS_LOCALE_COUNTRY',            $data['shop_country']);
         Configuration::updateGlobalValue('PS_TIMEZONE',                $data['shop_timezone']);
         Configuration::updateGlobalValue('PS_CONFIGURATION_AGREMENT',        (int)$data['configuration_agrement']);
+
+        // Set SSL configuration
+        Configuration::updateGlobalValue('PS_SSL_ENABLED', (int) $data['enable_ssl']);
+        Configuration::updateGlobalValue('PS_SSL_ENABLED_EVERYWHERE', (int) $data['enable_ssl']);
 
         // Set mails configuration
         Configuration::updateGlobalValue('PS_MAIL_METHOD',            ($data['use_smtp']) ? 2 : 1);
@@ -654,8 +659,9 @@ class InstallModelInstall extends InstallAbstractModel
                 'bankwire',
                 'cheque',
                 'blockmyaccount',
-                'blocklanguages',
+                'qloblockcontact',
                 'blockcurrencies',
+                'blocklanguages',
                 'productcomments',
                 'wkfooterlangcurrencyblock',
                 'wkfooterpaymentinfoblockcontainer',
@@ -666,11 +672,11 @@ class InstallModelInstall extends InstallAbstractModel
                 'dashguestcycle',
                 'dashoccupancy',
                 'dashavailability',
-                'dashactivity',
-                'dashtrends',
-                'dashgoals',
-                'dashperformance',
                 'dashproducts',
+                'dashtrends',
+                'dashperformance',
+                'dashgoals',
+                'dashactivity',
                 'graphnvd3',
                 'statsdata',
                 'statsvisits',

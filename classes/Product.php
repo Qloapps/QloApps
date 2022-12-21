@@ -488,11 +488,8 @@ class ProductCore extends ObjectModel
             $this->manufacturer_name = Manufacturer::getNameById((int)$this->id_manufacturer);
             $this->supplier_name = Supplier::getNameById((int)$this->id_supplier);
             $address = null;
-            if (is_object($context->cart) && $context->cart->{Configuration::get('PS_TAX_ADDRESS_TYPE')} != null) {
-                $address = $context->cart->{Configuration::get('PS_TAX_ADDRESS_TYPE')};
-            }
-
-            $this->tax_rate = $this->getTaxesRate(new Address($address));
+            $id_address = Cart::getIdAddressForTaxCalculation($this->id);
+            $this->tax_rate = $this->getTaxesRate(new Address($id_address));
 
             $this->new = $this->isNew();
 
@@ -591,13 +588,6 @@ class ProductCore extends ObjectModel
                 $id_address = (int)$cur_cart->{Configuration::get('PS_TAX_ADDRESS_TYPE')};
             }
             $address_infos = Address::getCountryAndState($id_address);
-
-            if (self::$_taxCalculationMethod != PS_TAX_EXC
-                && !empty($address_infos['vat_number'])
-                && $address_infos['id_country'] != Configuration::get('VATNUMBER_COUNTRY')
-                && Configuration::get('VATNUMBER_MANAGEMENT')) {
-                self::$_taxCalculationMethod = PS_TAX_EXC;
-            }
         } else {
             self::$_taxCalculationMethod = Group::getPriceDisplayMethod(Group::getCurrent()->id);
         }
@@ -2844,31 +2834,19 @@ class ProductCore extends ObjectModel
         $id_state = 0;
         $zipcode = 0;
 
-        if (!$id_address && Validate::isLoadedObject($cur_cart)) {
-            $id_address = $cur_cart->{Configuration::get('PS_TAX_ADDRESS_TYPE')};
-        }
-
         if ($id_address) {
             $address_infos = Address::getCountryAndState($id_address);
-            if ($address_infos['id_country']) {
-                $id_country = (int)$address_infos['id_country'];
-                $id_state = (int)$address_infos['id_state'];
-                $zipcode = $address_infos['postcode'];
-            }
-        } elseif (isset($context->customer->geoloc_id_country)) {
-            $id_country = (int)$context->customer->geoloc_id_country;
-            $id_state = (int)$context->customer->id_state;
-            $zipcode = $context->customer->postcode;
+        } else {
+            $address_infos = Address::getCountryAndState(Cart::getIdAddressForTaxCalculation($id_product));
+        }
+
+        if ($address_infos['id_country']) {
+            $id_country = (int)$address_infos['id_country'];
+            $id_state = (int)$address_infos['id_state'];
+            $zipcode = $address_infos['postcode'];
         }
 
         if (Tax::excludeTaxeOption()) {
-            $usetax = false;
-        }
-
-        if ($usetax != false
-            && !empty($address_infos['vat_number'])
-            && $address_infos['id_country'] != Configuration::get('VATNUMBER_COUNTRY')
-            && Configuration::get('VATNUMBER_MANAGEMENT')) {
             $usetax = false;
         }
 
@@ -2965,7 +2943,7 @@ class ProductCore extends ObjectModel
             (int)$id_product,
             $id_shop,
             $id_currency,
-            $id_country,
+            (int)$context->country->id,
             $id_group,
             $quantity,
             $id_product_attribute,
@@ -3160,7 +3138,7 @@ class ProductCore extends ObjectModel
         $quantity = $cart_quantity ? $cart_quantity : $quantity;
 
         $id_currency = (int)$context->currency->id;
-        $ids = Address::getCountryAndState((int)$context->cart->{Configuration::get('PS_TAX_ADDRESS_TYPE')});
+        $ids = Address::getCountryAndState(cart::getIdAddressForTaxCalculation($id_product));
         $id_country = $ids['id_country'] ? (int)$ids['id_country'] : (int)Configuration::get('PS_COUNTRY_DEFAULT');
         return (bool)SpecificPrice::getSpecificPrice((int)$id_product, $context->shop->id, $id_currency, $id_country, $id_group, $quantity, null, 0, 0, $quantity);
     }
@@ -3758,7 +3736,7 @@ class ProductCore extends ObjectModel
     * @param string $query Search query
     * @return array Matching products
     */
-    public static function searchByName($id_lang, $query, Context $context = null)
+    public static function searchByName($id_lang, $query, Context $context = null, $id_hotel = false)
     {
         if (!$context) {
             $context = Context::getContext();
@@ -3773,6 +3751,14 @@ class ProductCore extends ObjectModel
 			AND pl.`id_lang` = '.(int)$id_lang.Shop::addSqlRestrictionOnLang('pl')
         );
         $sql->leftJoin('manufacturer', 'm', 'm.`id_manufacturer` = p.`id_manufacturer`');
+        if ($id_hotel) {
+            $sql->innerJoin(
+                'htl_room_type',
+                'hrt',
+                'p.`id_product` = hrt.`id_product` AND hrt.`id_hotel` = '.(int)$id_hotel
+            );
+
+        }
 
         $where = 'pl.`name` LIKE \'%'.pSQL($query).'%\'
 		OR p.`ean13` LIKE \'%'.pSQL($query).'%\'
@@ -5048,7 +5034,7 @@ class ProductCore extends ObjectModel
     public function getTaxesRate(Address $address = null)
     {
         if (!$address || !$address->id_country) {
-            $address = Address::initialize();
+            $address = Address::initialize(Cart::getIdAddressForTaxCalculation($this->id));
         }
 
         $tax_manager = TaxManagerFactory::getManager($address, $this->id_tax_rules_group);
@@ -5514,66 +5500,6 @@ class ProductCore extends ObjectModel
         $id_shop = (int)Context::getContext()->shop->id;
         $cache_id = 'Product::getAttributesParams_'.(int)$id_product.'-'.(int)$id_product_attribute.'-'.(int)$id_lang.'-'.(int)$id_shop;
 
-        // if blocklayered module is installed we check if user has set custom attribute name
-        if (Module::isInstalled('blocklayered') && Module::isEnabled('blocklayered')) {
-            $nb_custom_values = Db::getInstance()->executeS('
-			SELECT DISTINCT la.`id_attribute`, la.`url_name` as `name`
-			FROM `'._DB_PREFIX_.'attribute` a
-			LEFT JOIN `'._DB_PREFIX_.'product_attribute_combination` pac
-				ON (a.`id_attribute` = pac.`id_attribute`)
-			LEFT JOIN `'._DB_PREFIX_.'product_attribute` pa
-				ON (pac.`id_product_attribute` = pa.`id_product_attribute`)
-			'.Shop::addSqlAssociation('product_attribute', 'pa').'
-			LEFT JOIN `'._DB_PREFIX_.'layered_indexable_attribute_lang_value` la
-				ON (la.`id_attribute` = a.`id_attribute` AND la.`id_lang` = '.(int)$id_lang.')
-			WHERE la.`url_name` IS NOT NULL AND la.`url_name` != \'\'
-			AND pa.`id_product` = '.(int)$id_product.'
-			AND pac.`id_product_attribute` = '.(int)$id_product_attribute);
-
-            if (!empty($nb_custom_values)) {
-                $tab_id_attribute = array();
-                foreach ($nb_custom_values as $attribute) {
-                    $tab_id_attribute[] = $attribute['id_attribute'];
-
-                    $group = Db::getInstance()->executeS('
-					SELECT a.`id_attribute`, g.`id_attribute_group`, g.`url_name` as `group`
-					FROM `'._DB_PREFIX_.'layered_indexable_attribute_group_lang_value` g
-					LEFT JOIN `'._DB_PREFIX_.'attribute` a
-						ON (a.`id_attribute_group` = g.`id_attribute_group`)
-					WHERE a.`id_attribute` = '.(int)$attribute['id_attribute'].'
-					AND g.`id_lang` = '.(int)$id_lang.'
-					AND g.`url_name` IS NOT NULL AND g.`url_name` != \'\'');
-                    if (empty($group)) {
-                        $group = Db::getInstance()->executeS('
-						SELECT g.`id_attribute_group`, g.`name` as `group`
-						FROM `'._DB_PREFIX_.'attribute_group_lang` g
-						LEFT JOIN `'._DB_PREFIX_.'attribute` a
-							ON (a.`id_attribute_group` = g.`id_attribute_group`)
-						WHERE a.`id_attribute` = '.(int)$attribute['id_attribute'].'
-						AND g.`id_lang` = '.(int)$id_lang.'
-						AND g.`name` IS NOT NULL');
-                    }
-                    $result[] = array_merge($attribute, $group[0]);
-                }
-                $values_not_custom = Db::getInstance()->executeS('
-				SELECT DISTINCT a.`id_attribute`, a.`id_attribute_group`, al.`name`, agl.`name` as `group`
-				FROM `'._DB_PREFIX_.'attribute` a
-				LEFT JOIN `'._DB_PREFIX_.'attribute_lang` al
-					ON (a.`id_attribute` = al.`id_attribute` AND al.`id_lang` = '.(int)$id_lang.')
-				LEFT JOIN `'._DB_PREFIX_.'attribute_group_lang` agl
-					ON (a.`id_attribute_group` = agl.`id_attribute_group` AND agl.`id_lang` = '.(int)$id_lang.')
-				LEFT JOIN `'._DB_PREFIX_.'product_attribute_combination` pac
-					ON (a.`id_attribute` = pac.`id_attribute`)
-				LEFT JOIN `'._DB_PREFIX_.'product_attribute` pa
-					ON (pac.`id_product_attribute` = pa.`id_product_attribute`)
-				'.Shop::addSqlAssociation('product_attribute', 'pa').'
-				WHERE pa.`id_product` = '.(int)$id_product.'
-				AND pac.id_product_attribute = '.(int)$id_product_attribute.'
-				AND a.`id_attribute` NOT IN('.implode(', ', $tab_id_attribute).')');
-                return array_merge($values_not_custom, $result);
-            }
-        }
-
         if (!Cache::isStored($cache_id)) {
             $result = Db::getInstance()->executeS('
 			SELECT a.`id_attribute`, a.`id_attribute_group`, al.`name`, agl.`name` as `group`
@@ -5603,94 +5529,20 @@ class ProductCore extends ObjectModel
      */
     public static function getAttributesInformationsByProduct($id_product)
     {
-        // if blocklayered module is installed we check if user has set custom attribute name
-        if (Module::isInstalled('blocklayered') && Module::isEnabled('blocklayered')) {
-            $nb_custom_values = Db::getInstance()->executeS('
-			SELECT DISTINCT la.`id_attribute`, la.`url_name` as `attribute`
-			FROM `'._DB_PREFIX_.'attribute` a
-			LEFT JOIN `'._DB_PREFIX_.'product_attribute_combination` pac
-				ON (a.`id_attribute` = pac.`id_attribute`)
-			LEFT JOIN `'._DB_PREFIX_.'product_attribute` pa
-				ON (pac.`id_product_attribute` = pa.`id_product_attribute`)
-			'.Shop::addSqlAssociation('product_attribute', 'pa').'
-			LEFT JOIN `'._DB_PREFIX_.'layered_indexable_attribute_lang_value` la
-				ON (la.`id_attribute` = a.`id_attribute` AND la.`id_lang` = '.(int)Context::getContext()->language->id.')
-			WHERE la.`url_name` IS NOT NULL AND la.`url_name` != \'\'
-			AND pa.`id_product` = '.(int)$id_product);
-
-            if (!empty($nb_custom_values)) {
-                $tab_id_attribute = array();
-                foreach ($nb_custom_values as $attribute) {
-                    $tab_id_attribute[] = $attribute['id_attribute'];
-
-                    $group = Db::getInstance()->executeS('
-					SELECT g.`id_attribute_group`, g.`url_name` as `group`
-					FROM `'._DB_PREFIX_.'layered_indexable_attribute_group_lang_value` g
-					LEFT JOIN `'._DB_PREFIX_.'attribute` a
-						ON (a.`id_attribute_group` = g.`id_attribute_group`)
-					WHERE a.`id_attribute` = '.(int)$attribute['id_attribute'].'
-					AND g.`id_lang` = '.(int)Context::getContext()->language->id.'
-					AND g.`url_name` IS NOT NULL AND g.`url_name` != \'\'');
-                    if (empty($group)) {
-                        $group = Db::getInstance()->executeS('
-						SELECT g.`id_attribute_group`, g.`name` as `group`
-						FROM `'._DB_PREFIX_.'attribute_group_lang` g
-						LEFT JOIN `'._DB_PREFIX_.'attribute` a
-							ON (a.`id_attribute_group` = g.`id_attribute_group`)
-						WHERE a.`id_attribute` = '.(int)$attribute['id_attribute'].'
-						AND g.`id_lang` = '.(int)Context::getContext()->language->id.'
-						AND g.`name` IS NOT NULL');
-                    }
-                    $result[] = array_merge($attribute, $group[0]);
-                }
-                $values_not_custom = Db::getInstance()->executeS('
-				SELECT DISTINCT a.`id_attribute`, a.`id_attribute_group`, al.`name` as `attribute`, agl.`name` as `group`
-				FROM `'._DB_PREFIX_.'attribute` a
-				LEFT JOIN `'._DB_PREFIX_.'attribute_lang` al
-					ON (a.`id_attribute` = al.`id_attribute` AND al.`id_lang` = '.(int)Context::getContext()->language->id.')
-				LEFT JOIN `'._DB_PREFIX_.'attribute_group_lang` agl
-					ON (a.`id_attribute_group` = agl.`id_attribute_group` AND agl.`id_lang` = '.(int)Context::getContext()->language->id.')
-				LEFT JOIN `'._DB_PREFIX_.'product_attribute_combination` pac
-					ON (a.`id_attribute` = pac.`id_attribute`)
-				LEFT JOIN `'._DB_PREFIX_.'product_attribute` pa
-					ON (pac.`id_product_attribute` = pa.`id_product_attribute`)
-				'.Shop::addSqlAssociation('product_attribute', 'pa').'
-				'.Shop::addSqlAssociation('attribute', 'pac').'
-				WHERE pa.`id_product` = '.(int)$id_product.'
-				AND a.`id_attribute` NOT IN('.implode(', ', $tab_id_attribute).')');
-                $result = array_merge($values_not_custom, $result);
-            } else {
-                $result = Db::getInstance()->executeS('
-				SELECT DISTINCT a.`id_attribute`, a.`id_attribute_group`, al.`name` as `attribute`, agl.`name` as `group`
-				FROM `'._DB_PREFIX_.'attribute` a
-				LEFT JOIN `'._DB_PREFIX_.'attribute_lang` al
-					ON (a.`id_attribute` = al.`id_attribute` AND al.`id_lang` = '.(int)Context::getContext()->language->id.')
-				LEFT JOIN `'._DB_PREFIX_.'attribute_group_lang` agl
-					ON (a.`id_attribute_group` = agl.`id_attribute_group` AND agl.`id_lang` = '.(int)Context::getContext()->language->id.')
-				LEFT JOIN `'._DB_PREFIX_.'product_attribute_combination` pac
-					ON (a.`id_attribute` = pac.`id_attribute`)
-				LEFT JOIN `'._DB_PREFIX_.'product_attribute` pa
-					ON (pac.`id_product_attribute` = pa.`id_product_attribute`)
-				'.Shop::addSqlAssociation('product_attribute', 'pa').'
-				'.Shop::addSqlAssociation('attribute', 'pac').'
-				WHERE pa.`id_product` = '.(int)$id_product);
-            }
-        } else {
-            $result = Db::getInstance()->executeS('
-			SELECT DISTINCT a.`id_attribute`, a.`id_attribute_group`, al.`name` as `attribute`, agl.`name` as `group`
-			FROM `'._DB_PREFIX_.'attribute` a
-			LEFT JOIN `'._DB_PREFIX_.'attribute_lang` al
-				ON (a.`id_attribute` = al.`id_attribute` AND al.`id_lang` = '.(int)Context::getContext()->language->id.')
-			LEFT JOIN `'._DB_PREFIX_.'attribute_group_lang` agl
-				ON (a.`id_attribute_group` = agl.`id_attribute_group` AND agl.`id_lang` = '.(int)Context::getContext()->language->id.')
-			LEFT JOIN `'._DB_PREFIX_.'product_attribute_combination` pac
-				ON (a.`id_attribute` = pac.`id_attribute`)
-			LEFT JOIN `'._DB_PREFIX_.'product_attribute` pa
-				ON (pac.`id_product_attribute` = pa.`id_product_attribute`)
-			'.Shop::addSqlAssociation('product_attribute', 'pa').'
-			'.Shop::addSqlAssociation('attribute', 'pac').'
-			WHERE pa.`id_product` = '.(int)$id_product);
-        }
+        $result = Db::getInstance()->executeS('
+        SELECT DISTINCT a.`id_attribute`, a.`id_attribute_group`, al.`name` as `attribute`, agl.`name` as `group`
+        FROM `'._DB_PREFIX_.'attribute` a
+        LEFT JOIN `'._DB_PREFIX_.'attribute_lang` al
+            ON (a.`id_attribute` = al.`id_attribute` AND al.`id_lang` = '.(int)Context::getContext()->language->id.')
+        LEFT JOIN `'._DB_PREFIX_.'attribute_group_lang` agl
+            ON (a.`id_attribute_group` = agl.`id_attribute_group` AND agl.`id_lang` = '.(int)Context::getContext()->language->id.')
+        LEFT JOIN `'._DB_PREFIX_.'product_attribute_combination` pac
+            ON (a.`id_attribute` = pac.`id_attribute`)
+        LEFT JOIN `'._DB_PREFIX_.'product_attribute` pa
+            ON (pac.`id_product_attribute` = pa.`id_product_attribute`)
+        '.Shop::addSqlAssociation('product_attribute', 'pa').'
+        '.Shop::addSqlAssociation('attribute', 'pac').'
+        WHERE pa.`id_product` = '.(int)$id_product);
         return $result;
     }
 

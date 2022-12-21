@@ -111,9 +111,9 @@ function data_value(widget_name, data) {
 
 function data_avail_pie_chart(widget_name, data) {
     if (data) {
-        $("#pie_occupied_text").text(data.occupied + '/' + data.total_rooms);
-        $("#pie_avail_text").text(data.available);
-        $("#pie_inactive_text").text(data.inactive);
+        $("#pie_occupied_text").text(data.count_occupied + '/' + data.count_total);
+        $("#pie_avail_text").text(data.count_available);
+        $("#pie_inactive_text").text(data.count_unavailable);
         generateAvailablityPieChart(data.chart_data);
     }
 }
@@ -297,7 +297,6 @@ $(document).ready(function() {
     });
 
     refreshDashboard(false, false);
-    getBlogRss();
     bindSubmitDashConfig();
     bindCancelDashConfig();
 
@@ -318,5 +317,10 @@ $(document).ready(function() {
                 refreshDashboard(false, false);
             }
         });
+    });
+
+    $(document).on('change', '.stats-filter-hotel', function() {
+        $('#submit-stats-hotel').removeAttr('disabled');
+        $(this).closest('form').submit();
     });
 });

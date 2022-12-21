@@ -87,9 +87,9 @@
     <!-- <tab id="Suppliers" id_parent="Catalog" active="1" hide_host_mode="0">
       <class_name>AdminSuppliers</class_name>
     </tab> -->
-    <tab id="Tags" id_parent="Catalog" active="1" hide_host_mode="0">
+    <!-- <tab id="Tags" id_parent="Catalog" active="1" hide_host_mode="0">
       <class_name>AdminTags</class_name>
-    </tab>
+    </tab> -->
     <!-- <tab id="Attachments" id_parent="Catalog" active="1" hide_host_mode="0">
       <class_name>AdminAttachments</class_name>
     </tab> -->
@@ -185,6 +185,9 @@
     </tab>
     <tab id="Modules_1" id_parent="Modules" active="1" hide_host_mode="0">
       <class_name>AdminModules</class_name>
+    </tab>
+    <tab id="Modules_Catalog" id_parent="Modules" active="1" hide_host_mode="0">
+      <class_name>AdminModulesCatalog</class_name>
     </tab>
     <!-- <tab id="Modules_Themes_Catalog" id_parent="Modules" active="1" hide_host_mode="0">
       <class_name>AdminAddonsCatalog</class_name>

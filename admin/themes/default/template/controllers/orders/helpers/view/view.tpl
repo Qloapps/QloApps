@@ -291,10 +291,10 @@
 														</a>
 													</td>
 													<td>
-														{$data['date_from']|date_format:"%d-%m-%Y"}
+														{dateFormat date=$data['date_from']}
 													</td>
 													<td>
-														{$data['date_to']|date_format:"%d-%m-%Y"}
+														{dateFormat date=$data['date_to']}
 													</td>
 													<td>
 														<form action="" method="post" class="form-horizontal row room_status_info_form">
@@ -305,7 +305,11 @@
 																	{/foreach}
 																</select>
 
-																{if $data['id_status'] == $hotel_order_status['STATUS_CHECKED_IN']['id_status']}<span class="badge badge-success margin-bottom-5">{l s='checked in on'} {$data['check_in']|date_format:"%d-%m-%Y"}</span>{elseif $data['id_status'] == $hotel_order_status['STATUS_CHECKED_OUT']['id_status']}<span class="badge badge-success margin-bottom-5">{l s='checked out on'} {$data['check_out']|date_format:"%d-%m-%Y"}</span>{/if}
+																{if $data['id_status'] == $hotel_order_status['STATUS_CHECKED_IN']['id_status']}
+																	<p class="text-center"><span class="badge badge-success margin-bottom-5">{l s='Checked in on'} {dateFormat date=$data['check_in']}</span></p>
+																{elseif $data['id_status'] == $hotel_order_status['STATUS_CHECKED_OUT']['id_status']}
+																	<p class="text-center"><span class="badge badge-success margin-bottom-5">{l s='Checked out on'} {dateFormat date=$data['check_out']}</span></p>
+																{/if}
 
 																{* field for the current date *}
 																<input class="room_status_date wk-input-date" type="text" name="status_date" value="{$data['date_from']|date_format:"%d-%m-%Y"}" readonly/>
@@ -662,11 +666,11 @@
 					<div class="row">
 						<div class="col-xs-6">
 							{if ($customer->isGuest())}
-								{l s='This order has been placed by a guest.'}
+								<p>{l s='This booking has been created by a guest.'}</p>
 								{if (!Customer::customerExists($customer->email))}
 									<form method="post" action="index.php?tab=AdminCustomers&amp;id_customer={$customer->id}&amp;id_order={$order->id|intval}&amp;token={getAdminToken tab='AdminCustomers'}">
 										<input type="hidden" name="id_lang" value="{$order->id_lang}" />
-										<input class="btn btn-default" type="submit" name="submitGuestToCustomer" value="{l s='Transform a guest into a customer'}" />
+										<input class="btn btn-default" type="submit" name="submitGuestToCustomer" value="{l s='Transform this guest into a customer'}" />
 										<p class="help-block">{l s='This feature will generate a random password and send an email to the customer.'}</p>
 									</form>
 								{else}
@@ -977,7 +981,7 @@
 										<th class="text-center"><span class="title_box">{l s='Room Type'}</span></th>
 										<th class="text-center"><span class="title_box">{l s='Hotel Name'}</span></th>
 										<th class="text-center"><span class="title_box">{l s='Duration'}</span></th>
-										<th class="text-center"><span class="title_box">{l s='Unit Price (Tax incl.)'}</span></th>
+										<th class="text-center"><span class="title_box">{l s='Unit Price (Tax excl.)'}</span></th>
 										<th class="text-center"><span class="title_box">{l s='Total Price (Tax incl.)'}</span></th>
 										{if isset($refundReqBookings) && $refundReqBookings}
 											<th class="text-center"><span class="title_box">{l s='Refund State'}</span></th>

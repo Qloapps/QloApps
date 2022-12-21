@@ -74,7 +74,7 @@
 							</span>
 						</button>
 					</div>
-					<div class="form-group">
+					<div class="form-group login-actions">
 						<div id="remind-me" class="checkbox pull-left">
 							<label for="stay_logged_in">
 								<input name="stay_logged_in" type="checkbox" id="stay_logged_in" value="1"	tabindex="3"/>
@@ -100,7 +100,7 @@
 						</label>
 						<input type="text" name="email_forgot" id="email_forgot" class="form-control" autofocus="autofocus" tabindex="5" placeholder="&#xf0e0 test@example.com" />
 					</div>
-					<div class="panel-footer">
+					<div class="panel-footer login-actions">
 						<button type="button" href="#" class="btn btn-default show-login-form" tabindex="7">
 							<i class="icon-caret-left"></i>
 							{l s='Back to login'}

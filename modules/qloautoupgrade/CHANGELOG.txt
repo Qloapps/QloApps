@@ -1,0 +1,12 @@
+-----------------------------
+# V1.0.0 to V1.0.1
+-----------------------------
+
+## Fixed Bug:
+
+- [CO] : Resloved : channel not available issue.
+- [CO] : Resloved : Room features not images not availabe after upgrade.
+
+
+## New Feature:
+- [CO] : Support QloApps upgrade to QloApps:1.5.2.0

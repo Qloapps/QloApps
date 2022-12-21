@@ -38,11 +38,12 @@ class AdminAddHotelController extends ModuleAdminController
 
         $this->_join .= 'LEFT JOIN `'._DB_PREFIX_.'htl_branch_info_lang` hbl
         ON (a.id = hbl.id AND hbl.`id_lang` = '.(int) $this->context->language->id.')';
-        $this->_join .= 'LEFT JOIN `'._DB_PREFIX_.'state` s ON (s.`id_state` = a.`state_id`)';
+        $this->_join .= 'LEFT JOIN `'._DB_PREFIX_.'address` aa ON (aa.`id_hotel` = a.`id`)';
+        $this->_join .= 'LEFT JOIN `'._DB_PREFIX_.'state` s ON (s.`id_state` = aa.`id_state`)';
         $this->_join .= 'LEFT JOIN `'._DB_PREFIX_.'country_lang` cl
-        ON (cl.`id_country` = a.`country_id` AND cl.`id_lang` = '.(int) $this->context->language->id.')';
+        ON (cl.`id_country` = aa.`id_country` AND cl.`id_lang` = '.(int) $this->context->language->id.')';
 
-        $this->_select = ' hbl.`hotel_name`, s.`name` as `state_name`, cl.`name` as country_name';
+        $this->_select = ' hbl.`hotel_name`, aa.`city`, s.`name` as `state_name`, cl.`name` as country_name';
 
         $this->fields_list = array(
             'id' => array(
@@ -125,9 +126,10 @@ class AdminAddHotelController extends ModuleAdminController
 
         if ($this->display == 'edit') {
             $idHotel = Tools::getValue('id');
-            $hotelBranchInfo = (array) (new HotelBranchInformation($idHotel));
+            $hotelBranchInfo = new HotelBranchInformation($idHotel);
 
-            $statesbycountry = State::getStatesByIdCountry($hotelBranchInfo['country_id']);
+            $addressInfo = $hotelBranchInfo->getAddress($idHotel);
+            $statesbycountry = State::getStatesByIdCountry($addressInfo['id_country']);
 
             $states = array();
             if ($statesbycountry) {
@@ -137,11 +139,12 @@ class AdminAddHotelController extends ModuleAdminController
                 }
             }
             $smartyVars['edit'] =  1;
-            $smartyVars['state_var'] =  $states;
-            $smartyVars['hotel_info'] =  $hotelBranchInfo;
+            $smartyVars['state_var'] = $states;
+            $smartyVars['address_info'] = $addressInfo;
+            $smartyVars['hotel_info'] = (array) $hotelBranchInfo;
             //Hotel Images
             $objHotelImage = new HotelImage();
-            if ($hotelAllImages = $objHotelImage->getAllImagesByHotelId($idHotel)) {
+            if ($hotelAllImages = $objHotelImage->getImagesByHotelId($idHotel)) {
                 foreach ($hotelAllImages as &$image) {
                     $image['image_link'] = $this->context->link->getMediaLink(_MODULE_DIR_.$this->module->name.'/views/img/hotel_img/'.$image['hotel_image_id'].'.jpg');
                 }
@@ -367,16 +370,10 @@ class AdminAddHotelController extends ModuleAdminController
                     );
                 }
             }
-            $objHotelBranch->phone = $phone;
             $objHotelBranch->email = $email;
             $objHotelBranch->check_in = $check_in;
             $objHotelBranch->check_out = $check_out;
             $objHotelBranch->rating = $rating;
-            $objHotelBranch->city = $city;
-            $objHotelBranch->state_id = $state;
-            $objHotelBranch->country_id = $country;
-            $objHotelBranch->zipcode = $zipcode;
-            $objHotelBranch->address = $address;
             $objHotelBranch->latitude = $latitude;
             $objHotelBranch->longitude = $longitude;
             $objHotelBranch->map_formated_address = $map_formated_address;
@@ -387,6 +384,26 @@ class AdminAddHotelController extends ModuleAdminController
             $categsBeforeUpd = $objHotelBranch->getAllHotelCategories();
 
             if ($newIdHotel = $objHotelBranch->id) {
+
+                // getHotel address
+                if ($idHotelAddress = $objHotelBranch->getHotelIdAddress()) {
+                $objAddress = new Address($idHotelAddress);
+                } else {
+                    $objAddress = new Address();
+                }
+                $objAddress->id_hotel = $newIdHotel;
+                $objAddress->id_country = $country;
+                $objAddress->id_state = $state;
+                $objAddress->city = $city;
+                $objAddress->postcode = $zipcode;
+                $objAddress->alias = Tools::getValue('hotel_name_'.$defaultLangId);
+                $objAddress->lastname = Tools::getValue('hotel_name_'.$defaultLangId);
+                $objAddress->firstname = Tools::getValue('hotel_name_'.$defaultLangId);
+                $objAddress->address1 = $address;
+                $objAddress->phone = $phone;
+
+                $objAddress->save();
+
                 // Save refund rules of the hotels
                 if ($hotelRefundRules = Tools::getValue('htl_refund_rules')) {
                     foreach ($hotelRefundRules as $key => $idRefundRule) {
@@ -562,7 +579,7 @@ class AdminAddHotelController extends ModuleAdminController
                 if (Validate::isLoadedObject($objHtlImage = new HotelImage((int) $idImage))) {
                     if ($objHtlImage->delete()) {
                         if (!HotelImage::getCover($idHotel)) {
-                            $images = $objHtlImage->getAllImagesByHotelId($idHotel);
+                            $images = $objHtlImage->getImagesByHotelId($idHotel);
                             if ($images) {
                                 $objHtlImage = new HotelImage($images[0]['id']);
                                 $objHtlImage->cover = 1;

@@ -28,7 +28,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-class bankwire extends PaymentModule
+class Bankwire extends PaymentModule
 {
     protected $_html = '';
     protected $_postErrors = array();
@@ -64,7 +64,7 @@ class bankwire extends PaymentModule
         parent::__construct();
 
         $this->displayName = $this->l('Bank wire');
-        $this->description = $this->l('Accept payments for your products via bank wire transfer.');
+        $this->description = $this->l('This module allows you to accept payments for bookings via bank wire transfer.');
         $this->confirmUninstall = $this->l('Are you sure about removing these details?');
         if (!isset($this->owner) || !isset($this->details) || !isset($this->address)) {
             $this->warning = $this->l('Account owner and account details must be configured before using this module.');

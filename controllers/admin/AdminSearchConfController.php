@@ -74,7 +74,7 @@ class AdminSearchConfControllerCore extends AdminController
                 'title' => $this->l('Indexing'),
                 'icon' => 'icon-cogs',
                 'info' => '<p>
-						'.$this->l('The "indexed" products have been analyzed by Qloapps and will appear in the results of a front office search.').'<br />
+						'.$this->l('The "indexed" products have been analyzed by QloApps and will appear in the results of a front office search.').'<br />
 						'.$this->l('Indexed products').' <strong>'.(int)$indexed.' / '.(int)$total.'</strong>.
 					</p>
 					<p>

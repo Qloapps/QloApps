@@ -128,7 +128,7 @@
 			<div class="sub-title">
 				<small class="text-muted" id="customers-newsletters-subtitle"></small>
 			</div>
-			
+
 			<ul class="stats-list">
 				<li>
 					<span class="item-label">
@@ -196,11 +196,8 @@
 					</span>
 				</li>
 				<li>
-					<span class="item-label">
-						<a href="{$link->getAdminLink("AdminModules")|escape}&configure=blocknewsletter&module_name=blocknewsletter"
-							target="_blank">
-							<span>{l s="Traffic Sources" mod="dashactivity"}</span>
-						</a>
+					<span class="item-label heading">
+						<span>{l s="Traffic Sources" mod="dashactivity"}</span>
 					</span>
 
 					<ul class="data_list_small" id="dash_traffic_source"></ul>
@@ -212,7 +209,3 @@
 		</section>
 	</div>
 </section>
-<script type="text/javascript">
-	date_subtitle = "{$date_subtitle|escape:"html":"UTF-8"}";
-	date_format = "{$date_format|escape:"html":"UTF-8"}";
-</script>
