@@ -662,7 +662,7 @@ class InstallModelInstall extends InstallAbstractModel
                 'qloblockcontact',
                 'blockcurrencies',
                 'blocklanguages',
-                'productcomments',
+                'qlohotelreview',
                 'wkfooterlangcurrencyblock',
                 'wkfooterpaymentinfoblockcontainer',
                 'wkfooteraboutblock',

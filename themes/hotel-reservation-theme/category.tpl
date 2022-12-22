@@ -31,18 +31,6 @@
             </div>
             <div class="col-sm-3">
                 <div class="filter_dw_cont">
-                    <button class="btn btn-default dropdown-toggle" type="button" id="gst_rating" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <span class="pull-left sort_btn_span" data-sort-by="0" data-sort-value="0" data-sort-for="{l s='Rating'}">{l s='Rating'}</span>
-                        <span class="caret pull-right margin-top-7"></span>
-                    </button>
-                    <ul class="dropdown-menu" aria-labelledby="gst_rating">
-                        <li><a href="#" class="sort_result" data-sort-by="1" data-value="1">{l s='Rating Ascending'}</a></li>
-                        <li><a href="#" class="sort_result" data-sort-by="1" data-value="2">{l s='Rating Descending'}</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="col-sm-3">
-                <div class="filter_dw_cont">
                     <button class="btn btn-default dropdown-toggle" type="button" id="price_ftr" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         <span class="pull-left sort_btn_span" data-sort-by="0" data-sort-value="0" data-sort-for="{l s='Price'}">{l s='Price'}</span>
                         <span class="caret pull-right margin-top-7"></span>
