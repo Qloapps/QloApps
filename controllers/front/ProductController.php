@@ -323,6 +323,8 @@ class ProductControllerCore extends FrontController
                     }
                 }
                 /*End*/
+                // booking preparation time
+                $preparationTime = (int) HotelOrderRestrictDate::getPreparationTime($hotel_id);
 
                 $hotelImageLink = null;
                 if ($coverImage = HotelImage::getCover($hotel_id)) {
@@ -347,6 +349,7 @@ class ProductControllerCore extends FrontController
                     array(
                         'isHotelRefundable' => $hotel_branch_obj->isRefundable(),
                         'max_order_date' => $max_order_date,
+                        'preparation_time' => $preparationTime,
                         'warning_num' => Configuration::get('WK_ROOM_LEFT_WARNING_NUMBER'),
                         'product_controller_url' => $this->context->link->getPageLink('product'),
                         'date_from' => $date_from,
