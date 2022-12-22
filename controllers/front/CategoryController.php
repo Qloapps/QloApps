@@ -95,32 +95,20 @@ class CategoryControllerCore extends FrontController
             $this->errors[] = Tools::displayError('Missing category ID');
         }
 
-        // Instantiate category
-        $this->category = new Category($id_category, $this->context->language->id);
-
-        // validate dates if available and redirect if invalid
-        $hasInvalidDates = false;
+        // validate dates if available
         $dateFrom = Tools::getValue('date_from');
         $dateTo = Tools::getValue('date_to');
 
         if ($dateFrom != '' && !Validate::isDate($dateFrom)) {
-            $dateFrom = date('Y-m-d');
-            $dateTo = date('Y-m-d', strtotime('+1 day', strtotime($dateFrom)));
-            $hasInvalidDates = true;
-        } elseif ($dateTo != '' && !Validate::isDate($dateTo)) {
-            $dateTo = date('Y-m-d', strtotime('+1 day', strtotime($dateFrom)));
-            $hasInvalidDates = true;
+            Tools::redirect($this->context->link->getPageLink('pagenotfound'));
         }
 
-        if ($hasInvalidDates) {
-            $queryString = Tools::getQueryString();
-            parse_str($queryString, $queryParams);
-            $urlParams = array_merge($queryParams, array('date_from' => $dateFrom, 'date_to' => $dateTo));
-            $redirectLink = $this->context->link->getCategoryLink($this->category, null, $this->context->language->id).
-            (Configuration::get('PS_REWRITING_SETTINGS') ? '?' : '&').http_build_query($urlParams);
-
-            Tools::redirect($redirectLink);
+        if ($dateTo != '' && !Validate::isDate($dateTo)) {
+            Tools::redirect($this->context->link->getPageLink('pagenotfound'));
         }
+
+        // Instantiate category
+        $this->category = new Category($id_category, $this->context->language->id);
 
         parent::init();
 
