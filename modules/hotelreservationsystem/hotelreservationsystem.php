@@ -21,21 +21,23 @@
 if (!defined('_PS_VERSION_')) {
     exit;
 }
+
 include_once 'define.php';
 
-class hotelreservationsystem extends Module
+class HotelReservationSystem extends Module
 {
     public function __construct()
     {
         $this->name = 'hotelreservationsystem';
+        $this->tab = 'administration';
         $this->version = '1.4.3';
         $this->author = 'Webkul';
         $this->need_instance = 0;
         $this->bootstrap = true;
         parent::__construct();
         $this->displayName = $this->l('Hotel Booking and Reservation System');
-        $this->description = $this->l('Now you can be able to build your website for your hotels for their bookings and reservations by using this module.');
-        $this->confirmUninstall = $this->l('Are you sure? All module data will be lost after uninstalling the module');
+        $this->description = $this->l('This module is the backbone of QloApps and handles all booking processes on your website.');
+        $this->confirmUninstall = $this->l('This module should not be uninstalled under any circumstances. Doing so may cause undesired results.');
     }
 
     public function hookAddWebserviceResources()
@@ -96,6 +98,40 @@ class hotelreservationsystem extends Module
         //End
         $this->context->controller->addCSS($this->_path.'/views/css/HotelReservationFront.css');
         $this->context->controller->addJS($this->_path.'/views/js/HotelReservationFront.js');
+    }
+
+    public function hookDisplayLeftColumn()
+    {
+        if (Tools::getValue('controller') == 'category') {
+            if ($apiKey = Configuration::get('PS_API_KEY')) {
+                $idCategory = Tools::getValue('id_category');
+                $idHotel = HotelBranchInformation::getHotelIdByIdCategory($idCategory);
+                $objHotel = new HotelBranchInformation($idHotel, $this->context->language->id);
+
+                if (floatval($objHotel->latitude) != 0
+                    && floatval($objHotel->longitude) != 0
+                ) {
+                    Media::addJsDef(array(
+                        'hotel_location' => array(
+                            'latitude' => $objHotel->latitude,
+                            'longitude' => $objHotel->longitude,
+                            'map_input_text' => $objHotel->map_input_text,
+                        ),
+                        'hotel_name' => $objHotel->hotel_name,
+                    ));
+
+                    $this->context->controller->addJS(
+                        'https://maps.googleapis.com/maps/api/js?key='.$apiKey.'&libraries=places&language='.
+                        $this->context->language->iso_code.'&region='.$this->context->country->iso_code
+                    );
+                    $this->context->controller->addJS($this->getPathUri().'views/js/searchResultsMap.js');
+                    $this->context->controller->addCSS($this->getPathUri().'views/css/searchResultsMap.css');
+
+                    $this->context->smarty->assign('hotel', $objHotel);
+                    return $this->display(__FILE__, 'searchResultsMap.tpl');
+                }
+            }
+        }
     }
 
     public function hookDisplayAfterHookTop()
@@ -426,10 +462,10 @@ class hotelreservationsystem extends Module
             'AdminHotelReservationSystemManagement'
         );
 
-        //Controllers which are to be used in this modules but we have not to create tab for those ontrollers...
+        // Controllers without tabs
         $this->installTab('AdminOrderRestrictSettings', 'Order Restrict Configuration', false, false);
         $this->installTab('AdminHotelGeneralSettings', 'Hotel General configuration', false, false);
-        $this->installTab('AdminHotelFeaturePricesSettings', 'Feature Pricing Configuration', false, false);
+        $this->installTab('AdminHotelFeaturePricesSettings', 'Advanced Price Rules', false, false);
         $this->installTab('AdminRoomTypeGlobalDemand', 'Additional Demand Configuration', false, false);
         $this->installTab('AdminAssignHotelFeatures', 'Assign Hotel Features', false, false);
 
@@ -475,7 +511,6 @@ class hotelreservationsystem extends Module
             || !$this->registerModuleHooks()
             || !$this->callInstallTab()
             || !$objHtlHelper->insertDefaultHotelEntries()
-            || !$objHtlHelper->insertHotelRoomAllotmentType()
         ) {
             return false;
         }
@@ -514,7 +549,8 @@ class hotelreservationsystem extends Module
                 'actionObjectProfileAddAfter',
                 'actionObjectProfileDeleteBefore',
                 'actionObjectGroupDeleteBefore',
-                'actionOrderStatusPostUpdate'
+                'actionOrderStatusPostUpdate',
+                'displayLeftColumn',
             )
         );
     }

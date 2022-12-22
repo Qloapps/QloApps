@@ -25,6 +25,8 @@ class HotelRoomType extends ObjectModel
     public $id_hotel;
     public $adult;
     public $children;
+    public $min_los;
+    public $max_los;
     public $date_add;
     public $date_upd;
 
@@ -36,6 +38,8 @@ class HotelRoomType extends ObjectModel
             'id_hotel' => array('type' => self::TYPE_INT, 'validate' => 'isInt'),
             'adult' => array('type' => self::TYPE_INT, 'validate' => 'isInt'),
             'children' => array('type' => self::TYPE_INT, 'validate' => 'isInt'),
+            'min_los' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedInt', 'default' => 1),
+            'max_los' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedInt', 'default' => 0),
             'date_add' => array('type' => self::TYPE_DATE, 'validate' => 'isDate'),
             'date_upd' => array('type' => self::TYPE_DATE, 'validate' => 'isDate'),
         ),
@@ -211,14 +215,17 @@ class HotelRoomType extends ObjectModel
      *
      * @return [array|false] [If data found returns array containing information of the room type else returns false]
      */
-    public function getRoomTypeInfoByIdProduct($id_product)
+    public function getRoomTypeInfoByIdProduct($id_product, $idLang = false)
     {
-        $idLang = Context::getContext()->language->id;
-        $sql = 'SELECT hrt.`id`,hrt.`id_hotel`, hrt.`adult`, hrt.`children`, hbl.`hotel_name`
+        if (!$idLang) {
+            $idLang = Context::getContext()->language->id;
+        }
+
+        $sql = 'SELECT hrt.`id`,hrt.`id_hotel`, hrt.`adult`, hrt.`children`, hbl.`hotel_name`, hrt.`min_los`, hrt.`max_los`
                 FROM `'._DB_PREFIX_.'htl_room_type` AS hrt
                 INNER JOIN `'._DB_PREFIX_.'htl_branch_info_lang` AS hbl
                 ON (hbl.`id` = hrt.`id_hotel` AND hbl.`id_lang` = '.(int)$idLang.')
-                WHERE `id_product` = '.(int)$id_product;
+                WHERE hrt.`id_product` = '.(int)$id_product;
 
         return Db::getInstance()->getRow($sql);
     }

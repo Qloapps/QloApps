@@ -27,7 +27,7 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
         $this->bootstrap = true;
         parent::__construct();
 
-        $psImgUrl = $this->context->link->getMediaLink(_PS_IMG_.'hotel_header_image.jpg');
+        $psImgUrl = $this->context->link->getMediaLink(_PS_IMG_.Configuration::get('WK_HOTEL_HEADER_IMAGE'));
         if ($imgExist = (bool)Tools::file_get_contents($psImgUrl)) {
             $image = '<img class="img-thumbnail img-responsive" style="max-width:200px" src="'.$psImgUrl.'">';
         }
@@ -123,7 +123,7 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
                         'lang' => true,
                         'required' => true,
                         'validation' => 'isGenericName',
-                        'hint' => $this->l('Enter Hotel name in case of single hotel or enter your hotels chain name in case of multiple hotels'),
+                        'hint' => $this->l('Enter Hotel name in case of single hotel or enter your hotels chain name in case of multiple hotels.'),
                     ),
                     'WK_HTL_TAG_LINE' => array(
                         'title' => $this->l('Hotel Tag Line'),
@@ -134,7 +134,7 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
                         'hint' => $this->l('This will display hotel tag line in hotel page.'),
                     ),
                     'WK_HTL_SHORT_DESC' => array(
-                        'title' => $this->l('Hotel Sort Description'),
+                        'title' => $this->l('Hotel Short Description'),
                         'type' => 'textareaLang',
                         'lang' => true,
                         'required' => true,
@@ -202,15 +202,15 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
                 'submit' => array('title' => $this->l('Save')),
             ),
             'googleMap' => array(
-                'title' => $this->l('Google Map Setting'),
+                'title' => $this->l('Google Maps Settings'),
                 'fields' => array(
                     'PS_API_KEY' => array(
-                        'title' => $this->l('Google API Key'),
-                        'hint' => $this->l('Unique API key for Google map.'),
+                        'title' => $this->l('Google Maps API Key'),
+                        'hint' => $this->l('Unique API key for Google Maps.'),
                         'type' => 'text',
                     ),
                     'WK_GOOGLE_ACTIVE_MAP' => array(
-                        'title' => $this->l('Display Google Map For Hotel Location'),
+                        'title' => $this->l('Display Google Maps For Hotel Location'),
                         'cast' => 'intval',
                         'type' => 'bool',
                         'default' => '1',
@@ -224,10 +224,10 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
                                 'value' => 0,
                             ),
                         ),
-                        'hint' => $this->l('If set to No, Google Map will not be displayed for hotel location. You need to set hotels location from edit hotel page to display location on the map at contact-us page.'),
+                        'hint' => $this->l('If set to No, Google Maps will not be displayed for hotel location. You need to set hotels location from edit hotel page to display location on the map at contact-us page.'),
                     ),
                     'WK_MAP_HOTEL_ACTIVE_ONLY' => array(
-                        'title' => $this->l('Display Only Active Hotels'),
+                        'title' => $this->l('Display Active Hotels Only'),
                         'cast' => 'intval',
                         'type' => 'bool',
                         'default' => '1',
@@ -241,7 +241,7 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
                                 'value' => 0,
                             ),
                         ),
-                        'hint' => $this->l('If yes, only active hotels will be display on map'),
+                        'hint' => $this->l('If yes, only active hotels will be displayed on map.'),
                     ),
 
                 ),
@@ -300,10 +300,11 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
                 }
 
                 if (!count($this->errors)) {
-                    $img_path = _PS_IMG_DIR_.'hotel_header_image.jpg';
+                    $file_name = 'hotel_header_image_'.time().'.jpg';
+                    $img_path = _PS_IMG_DIR_.$file_name;
 
                     if (ImageManager::resize($_FILES['htl_header_image']['tmp_name'], $img_path)) {
-                        Configuration::updateValue('WK_HOTEL_HEADER_IMAGE', 'hotel_header_image.jpg');
+                        Configuration::updateValue('WK_HOTEL_HEADER_IMAGE', $file_name);
                     } else {
                         $this->errors[] = $this->l('Some error occured while uoploading image.Please try again.');
                     }

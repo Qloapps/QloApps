@@ -198,6 +198,7 @@ class InstallControllerHttpProcess extends InstallControllerHttp
             'shop_activity' => $this->session->shop_activity,
             'shop_country' => $this->session->shop_country,
             'shop_timezone' => $this->session->shop_timezone,
+            'enable_ssl' => $this->session->enable_ssl,
             'admin_firstname' => $this->session->admin_firstname,
             'admin_lastname' => $this->session->admin_lastname,
             'admin_password' => $this->session->admin_password,

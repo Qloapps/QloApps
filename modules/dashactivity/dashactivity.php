@@ -98,8 +98,6 @@ class Dashactivity extends Module
             array(
                 'gapi_mode' => $gapi_mode,
                 'dashactivity_config_form' => $this->renderConfigForm(),
-                'date_subtitle' => $this->l('(from %s to %s)'),
-                'date_format' => $this->context->language->date_format_lite,
                 'link' => $this->context->link
             )
         );

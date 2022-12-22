@@ -1,9 +1,0 @@
-<!--
-Description: pubDate without seconds
-Expect:      not bozo and feed['date_parsed'] == (2004, 1, 1, 0, 0, 0, 3, 1, 0)
--->
-<rss version="2.0">
-<channel>
-<pubDate>Thu, 01 Jan 2004 00:00 GMT</pubDate>
-</channel>
-</rss>

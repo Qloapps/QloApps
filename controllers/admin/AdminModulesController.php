@@ -29,7 +29,6 @@ class AdminModulesControllerCore extends AdminController
     private $_modules_ad = array(
         'blockcart' => array('cartabandonmentpro'),
         /* 'bloctopmenu' => array('advancedtopmenu'), */
-        'blocklayered' => array('pm_advancedsearch4')
     );
     /*
     ** @var array map with $_GET keywords and their callback
@@ -131,7 +130,9 @@ class AdminModulesControllerCore extends AdminController
                 foreach ($xml_module->children() as $module) {
                     /** @var SimpleXMLElement $module */
                     foreach ($module->attributes() as $key => $value) {
-                        if ($xml_module->attributes() == 'native' && $key == 'name') {
+                        if (($xml_module->attributes() == 'native' || $xml_module->attributes() == 'disk')
+                            && $key == 'name'
+                        ) {
                             $this->list_natives_modules[] = (string)$value;
                         }
                         if ($xml_module->attributes() == 'partner' && $key == 'name') {
@@ -157,17 +158,22 @@ class AdminModulesControllerCore extends AdminController
         parent::setMedia();
         $this->addJqueryPlugin(array('autocomplete', 'fancybox', 'tablefilter'));
 
-        if ($this->context->mode == Context::MODE_HOST && Tools::isSubmit('addnewmodule')) {
+        Media::addjsDef(array(
+            'remove_uploaded_module_txt' => $this->l('Do you want to remove the uploaded/installed module?'),
+            'module_install_error_txt' => $this->l('There was an error while installing module.'),
+        ));
+        $this->addJS(_PS_JS_DIR_.'admin/modules.js');
+
+         if ($this->context->mode == Context::MODE_HOST && Tools::isSubmit('addnewmodule')) {
             $this->addJS(_PS_JS_DIR_.'admin/addons.js');
         }
     }
 
     public function ajaxProcessRefreshModuleList($force_reload_cache = false)
     {
-        $xml_modules_list = _QLO_API_DOMAIN_.'/xml/'.str_replace('.', '', _QLOAPPS_VERSION_).'.xml';
-
         // Refresh modules_list.xml every week
-        if (!$this->isFresh(Module::CACHE_FILE_MODULES_LIST, 86400) || $force_reload_cache) {
+        if (!$this->isFresh(Module::CACHE_FILE_MODULES_LIST, _TIME_1_DAY_) || $force_reload_cache) {
+            $xml_modules_list = _QLO_API_DOMAIN_.'/xml/'.str_replace('.', '', _QLOAPPS_VERSION_).'.xml';
             if ($this->refresh(Module::CACHE_FILE_MODULES_LIST, 'https://'.$xml_modules_list)) {
                 $this->status = 'refresh';
             } elseif ($this->refresh(Module::CACHE_FILE_MODULES_LIST, 'http://'.$xml_modules_list)) {
@@ -181,7 +187,7 @@ class AdminModulesControllerCore extends AdminController
 
         // If logged to Addons Webservices, refresh default country native modules list every day
         if ($this->status != 'error') {
-            if (!$this->isFresh(Module::CACHE_FILE_DEFAULT_COUNTRY_MODULES_LIST, 86400) || $force_reload_cache) {
+            if (!$this->isFresh(Module::CACHE_FILE_DEFAULT_COUNTRY_MODULES_LIST, _TIME_1_DAY_) || $force_reload_cache) {
                 if (file_put_contents(_PS_ROOT_DIR_.Module::CACHE_FILE_DEFAULT_COUNTRY_MODULES_LIST, Tools::addonsRequest('native'))) {
                     $this->status = 'refresh';
                 } else {
@@ -191,7 +197,17 @@ class AdminModulesControllerCore extends AdminController
                 $this->status = 'cache';
             }
 
-            if (!$this->isFresh(Module::CACHE_FILE_MUST_HAVE_MODULES_LIST, 86400) || $force_reload_cache) {
+            if (!$this->isFresh(Module::CACHE_FILE_ADDONS_MODULES_LIST, _TIME_1_DAY_) || $force_reload_cache) {
+                if (file_put_contents(_PS_ROOT_DIR_.Module::CACHE_FILE_ADDONS_MODULES_LIST, Tools::addonsRequest('addons-modules'))) {
+                    $this->status = 'refresh';
+                } else {
+                    $this->status = 'error';
+                }
+            } else {
+                $this->status = 'cache';
+            }
+
+            if (!$this->isFresh(Module::CACHE_FILE_MUST_HAVE_MODULES_LIST, _TIME_1_DAY_) || $force_reload_cache) {
                 if (file_put_contents(_PS_ROOT_DIR_.Module::CACHE_FILE_MUST_HAVE_MODULES_LIST, Tools::addonsRequest('must-have'))) {
                     $this->status = 'refresh';
                 } else {
@@ -214,6 +230,7 @@ class AdminModulesControllerCore extends AdminController
                 $this->status = 'cache';
             }
         }
+        Module::generateTrustedXml();
     }
 
     public function displayAjaxRefreshModuleList()
@@ -269,19 +286,29 @@ class AdminModulesControllerCore extends AdminController
 
     public function ajaxProcessGetTabModulesList()
     {
-        $tab_modules_list = Tools::getValue('tab_modules_list');
+        // $tab_modules_list = Tools::getValue('tab_modules_list');
+        $conrollerClass = Tools::getValue('controller_class');
+        $controllerId = Tab::getIdFromClassName($conrollerClass);
+
+        if (!Tab::isTabModuleListAvailable()) {
+            $this->ajaxProcessRefreshModuleList();
+        }
+
+        if ($tab_modules_list = Tab::getTabModulesList($controllerId)) {
+            $tab_modules_list = $this->filterTabModuleList($tab_modules_list);
+        }
+
         $back = Tools::getValue('back_tab_modules_list');
         if ($back) {
             $back .= '&tab_modules_open=1';
         }
         $modules_list = array('installed' =>array(), 'not_installed' => array());
-        if ($tab_modules_list) {
-            $tab_modules_list = explode(',', $tab_modules_list);
-            $modules_list_unsort = $this->getModulesByInstallation($tab_modules_list);
+        if (count($tab_modules_list['slider_list'])) {
+            $modules_list_unsort = $this->getModulesByInstallation($tab_modules_list['slider_list']);
         }
 
         $installed = $uninstalled = array();
-        foreach ($tab_modules_list as $key => $value) {
+        foreach ($tab_modules_list['slider_list'] as $key => $value) {
             $continue = 0;
             foreach ($modules_list_unsort['installed'] as $mod_in) {
                 if ($mod_in->name == $value) {
@@ -552,7 +579,7 @@ class AdminModulesControllerCore extends AdminController
         }
     }
 
-    public function postProcessDownload()
+    public function postProcessDownload($redirect = true)
     {
         /* PrestaShop demo mode */
         if (_PS_MODE_DEMO_ || ($this->context->mode == Context::MODE_HOST)) {
@@ -594,7 +621,7 @@ class AdminModulesControllerCore extends AdminController
             } elseif (!move_uploaded_file($_FILES['file']['tmp_name'], _PS_MODULE_DIR_.$_FILES['file']['name'])) {
                 $this->errors[] = Tools::displayError('An error occurred while copying the archive to the module directory.');
             } else {
-                $this->extractArchive(_PS_MODULE_DIR_.$_FILES['file']['name']);
+                $this->extractArchive(_PS_MODULE_DIR_.$_FILES['file']['name'], $redirect);
             }
         } else {
             $this->errors[] = Tools::displayError('You do not have permission to add this.');
@@ -710,12 +737,9 @@ class AdminModulesControllerCore extends AdminController
                 return;
             }
 
-            if ($key == 'check') {
-                $this->ajaxProcessRefreshModuleList(true);
-            } elseif ($key == 'checkAndUpdate') {
+            if ($key == 'checkAndUpdate') {
                 $modules = array();
-                $this->ajaxProcessRefreshModuleList(true);
-                $modules_on_disk = Module::getModulesOnDisk(true, $this->logged_on_addons, $this->id_employee);
+                $modules_on_disk = Module::getModulesOnDisk(true, $this->logged_on_addons, $this->id_employee, true);
 
                 // Browse modules list
                 foreach ($modules_on_disk as $km => $module_on_disk) {
@@ -770,6 +794,7 @@ class AdminModulesControllerCore extends AdminController
                             array('type' => 'addonsNative', 'file' => Module::CACHE_FILE_DEFAULT_COUNTRY_MODULES_LIST, 'loggedOnAddons' => 0),
                             // array('type' => 'addonsBought', 'file' => Module::CACHE_FILE_CUSTOMER_MODULES_LIST, 'loggedOnAddons' => 1),
                             // array('type' => 'addonsMustHave', 'file' => Module::CACHE_FILE_MUST_HAVE_MODULES_LIST, 'loggedOnAddons' => 1),
+                            array('type' => 'addonsMustHave', 'file' => Module::CACHE_FILE_ADDONS_MODULES_LIST, 'loggedOnAddons' => 1),
                         );
 
                         foreach ($files_list as $f) {
@@ -783,6 +808,9 @@ class AdminModulesControllerCore extends AdminController
                                             $module_to_update[$name]['name'] = $modaddons->name;
                                             $module_to_update[$name]['displayName'] = $modaddons->displayName;
                                             $module_to_update[$name]['need_loggedOnAddons'] = $f['loggedOnAddons'];
+                                            if ($modaddons->url) {
+                                                $module_to_update[$name]['url'] = $modaddons->url;
+                                            }
                                         }
                                     }
                                 }
@@ -791,7 +819,8 @@ class AdminModulesControllerCore extends AdminController
 
                         foreach ($module_to_update as $name => $attr) {
                             if ((is_null($attr) && $this->logged_on_addons == 0) || ($attr['need_loggedOnAddons'] == 1 && $this->logged_on_addons == 0)) {
-                                $this->errors[] = sprintf(Tools::displayError('You need to be logged in to your PrestaShop Addons account in order to update the %s module. %s'), '<strong>'.$name.'</strong>', '<a href="#" class="addons_connect" data-toggle="modal" data-target="#modal_addons_connect" title="Addons">'.$this->l('Click here to log in.').'</a>');
+                                $this->errors[] = sprintf(Tools::displayError('You need to be download this module from store in order to update the %s module. %s'), '<strong>'.$name.'</strong>', '<a href="'.$attr['url'].'" title="Store">'.$this->l('Click here to download.').'</a>');
+                                // $this->errors[] = sprintf(Tools::displayError('You need to be logged in to your PrestaShop Addons account in order to update the %s module. %s'), '<strong>'.$name.'</strong>', '<a href="#" class="addons_connect" data-toggle="modal" data-target="#modal_addons_connect" title="Addons">'.$this->l('Click here to log in.').'</a>');
                             } elseif (!is_null($attr['name'])) {
                                 $download_ok = false;
                                 if ($attr['need_loggedOnAddons'] == 0 && file_put_contents(_PS_MODULE_DIR_.$name.'.zip', Tools::addonsRequest('module', array('module_name' => pSQL($attr['name']))))) {
@@ -1042,7 +1071,8 @@ class AdminModulesControllerCore extends AdminController
 
     protected function getModulesByInstallation($tab_modules_list = null)
     {
-        $all_modules = Module::getModulesOnDisk(true, $this->logged_on_addons, $this->id_employee);
+        // $all_modules = Module::getModulesOnDisk(true, $this->logged_on_addons, $this->id_employee);
+        $all_modules = Module::getSuggestedModules();
         $all_unik_modules = array();
         $modules_list = array('installed' =>array(), 'not_installed' => array());
 
@@ -1301,18 +1331,12 @@ class AdminModulesControllerCore extends AdminController
         $time = time();
         $kpis = array();
 
-        /* The data generation is located in AdminStatsControllerCore */
-
         $helper = new HelperKpi();
         $helper->id = 'box-installed-modules';
         $helper->icon = 'icon-puzzle-piece';
         $helper->color = 'color1';
         $helper->title = $this->l('Installed Modules', null, null, false);
-        if (ConfigurationKPI::get('INSTALLED_MODULES') !== false && ConfigurationKPI::get('INSTALLED_MODULES') != '') {
-            $helper->value = ConfigurationKPI::get('INSTALLED_MODULES');
-        }
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=installed_modules';
-        $helper->refresh = (bool)(ConfigurationKPI::get('INSTALLED_MODULES_EXPIRE') < $time);
         $kpis[] = $helper->generate();
 
         $helper = new HelperKpi();
@@ -1320,11 +1344,7 @@ class AdminModulesControllerCore extends AdminController
         $helper->icon = 'icon-off';
         $helper->color = 'color2';
         $helper->title = $this->l('Disabled Modules', null, null, false);
-        if (ConfigurationKPI::get('DISABLED_MODULES') !== false && ConfigurationKPI::get('DISABLED_MODULES') != '') {
-            $helper->value = ConfigurationKPI::get('DISABLED_MODULES');
-        }
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=disabled_modules';
-        $helper->refresh = (bool)(ConfigurationKPI::get('DISABLED_MODULES_EXPIRE') < $time);
         $kpis[] = $helper->generate();
 
         $helper = new HelperKpi();
@@ -1332,11 +1352,7 @@ class AdminModulesControllerCore extends AdminController
         $helper->icon = 'icon-refresh';
         $helper->color = 'color3';
         $helper->title = $this->l('Modules to update', null, null, false);
-        if (ConfigurationKPI::get('UPDATE_MODULES') !== false && ConfigurationKPI::get('UPDATE_MODULES') != '') {
-            $helper->value = ConfigurationKPI::get('UPDATE_MODULES');
-        }
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=update_modules';
-        $helper->refresh = (bool)(ConfigurationKPI::get('UPDATE_MODULES_EXPIRE') < $time);
         $kpis[] = $helper->generate();
 
         $helper = new HelperKpiRow();
@@ -1441,12 +1457,13 @@ class AdminModulesControllerCore extends AdminController
         }
 
         // Retrieve Modules List
-        $modules = Module::getModulesOnDisk(true, $this->logged_on_addons, $this->id_employee);
+        $modules = Module::getInstalledModulesOnDisk(true, $this->logged_on_addons, $this->id_employee);
         $this->initModulesList($modules);
         $this->nb_modules_total = count($modules);
         $module_errors = array();
         $module_success = array();
         $upgrade_available = array();
+        $module_alerts = array();
         $dont_filter = false;
 
         //Add succes message for one module update
@@ -1529,7 +1546,7 @@ class AdminModulesControllerCore extends AdminController
                 $href = Context::getContext()->link->getAdminLink('AdminModules', true).'&module_name='.$module->name.'&tab_module='.$module->tab.'&configure='.$module->name;
                 $this->context->smarty->assign('text', sprintf($this->l('%1$s: %2$s'), $module->displayName, $module->warning));
                 $this->context->smarty->assign('module_link', $href);
-                $this->displayWarning($this->context->smarty->fetch('controllers/modules/warning_module.tpl'));
+                $module_alerts[] = $this->context->smarty->fetch('controllers/modules/warning_module.tpl');
             }
 
             // AutoComplete array
@@ -1555,7 +1572,7 @@ class AdminModulesControllerCore extends AdminController
             }
             unset($object);
             if ($module->installed && isset($module->version_addons) && $module->version_addons) {
-                $upgrade_available[] = array('anchor' => ucfirst($module->name), 'name' => $module->name, 'displayName' => $module->displayName);
+                $upgrade_available[] = array('anchor' => ucfirst($module->name), 'name' => $module->name, 'displayName' => $module->displayName, 'is_native' => $module->is_native);
             }
 
             if (in_array($module->name, $this->list_partners_modules)) {
@@ -1585,8 +1602,6 @@ class AdminModulesControllerCore extends AdminController
             $this->confirmations[] = sprintf($this->l('The following module(s) were upgraded successfully: %s.'), $html);
         }
 
-        ConfigurationKPI::updateValue('UPDATE_MODULES', count($upgrade_available));
-
         if (count($upgrade_available) == 0 && (int)Tools::getValue('check') == 1) {
             $this->confirmations[] = $this->l('Everything is up-to-date');
         }
@@ -1595,6 +1610,7 @@ class AdminModulesControllerCore extends AdminController
         $tpl_vars = array(
             'token' => $this->token,
             'upgrade_available' => $upgrade_available,
+            'module_alerts' => $module_alerts,
             'currentIndex' => self::$currentIndex,
             'dirNameCurrentIndex' => dirname(self::$currentIndex),
             'ajaxCurrentIndex' => str_replace('index', 'ajax-tab', self::$currentIndex),
@@ -1664,5 +1680,193 @@ class AdminModulesControllerCore extends AdminController
             'price' => $module->price
         ));
         $this->smartyOutputContent('controllers/modules/quickview.tpl');
+    }
+
+    public function ajaxProcessUploadModule()
+    {
+        $response = array('success' => false);
+        $this->postProcessDownload(false);
+        if (!count($this->errors)) {
+            $filename = $_FILES['file']['name'];
+            $filename = explode('.', $filename);
+            if ($module = Module::getInstanceByName($filename[0])) {
+                $response['success'] = true;
+                if (Module::isInstalled($module->name)) {
+                    $response['msg'] = $this->l('module already installed, update if available');
+                } else {
+                    $response['msg'] = $this->l('module uploaded successfully');
+                }
+                if (@filemtime(_PS_ROOT_DIR_.DIRECTORY_SEPARATOR.basename(_PS_MODULE_DIR_).DIRECTORY_SEPARATOR.$module->name
+                .DIRECTORY_SEPARATOR.'logo.png')) {
+                    $module->image = _MODULE_DIR_.DIRECTORY_SEPARATOR.$module->name
+                    .DIRECTORY_SEPARATOR.'logo.png';
+                }
+                $response['data']['module'] = array(
+                    'module_name' => $module->name,
+                    'displayName' => $module->displayName,
+                    'installed' => Module::isInstalled($module->name),
+                    'author' => $module->author,
+                    'image' => $module->image ? $module->image : ''
+                );
+            }
+        } else {
+            $response['errors'] = $this->errors;
+        }
+        $this->logAndResponseAjax($response);
+    }
+
+    public function ajaxProcessCheckModuleTrusted()
+    {
+        $response = array(
+            'success' => false,
+            'data' => array('trusted' => false)
+        );
+        if ($moduleName = Tools::getValue('module_name')) {
+            if ($module = Module::getInstanceByName($moduleName)) {
+                if ($response['data']['trusted'] = Module::isModuleTrusted($moduleName)) {
+                    $response['msg'] = $this->l('Module trusted');
+                } else {
+                    $response['msg'] = $this->l('Module not trusted');
+                }
+                $response['success'] = true;
+            } else {
+                $this->errors[] = $this->l('Module not found.');
+            }
+        } else {
+            $this->errors[] = $this->l('Invalid module provided');
+        }
+        $response['errors'] = $this->errors;
+        $this->logAndResponseAjax($response);
+    }
+
+    public function ajaxProcessInstallModule()
+    {
+        $response = array(
+            'success' => false,
+        );
+        if ($moduleName = Tools::getValue('module_name')) {
+            if ($module = Module::getInstanceByName($moduleName)) {
+                if (!Module::isInstalled($module->name)) {
+                    if ($response['success'] = $module->install()) {
+                        $response['msg'] = $this->l('Module installed successfully');
+                        $response['data']['redirect'] = $this->context->link->getAdminLink('AdminModules').'&conf=12&anchor='.$module->name;
+                    } else {
+                        $this->errors[] = $this->l('Cannot install this module.');
+                    }
+                } else {
+                    $response['success'] = true;
+                    $response['msg'] = $this->l('Module already installed');
+                }
+            } else {
+                $this->errors[] = $this->l('Module not found.');
+            }
+        }
+
+        if (count($this->errors)) {
+            $response['data']['callback']['process'] = 'delete';
+            $response['data']['callback']['msg'] = $this->l('There was some error while installing the module, do you want to delete the uploded module');
+            $response['errors'] = $this->errors;
+        }
+        $this->logAndResponseAjax($response);
+    }
+
+    public function ajaxProcessRollbackModuleUpload()
+    {
+        $response = array(
+            'success' => false
+        );
+        $process = Tools::getValue('process');
+        if ($moduleName = Tools::getValue('module_name')) {
+            if($process == 'disable') {
+                if ($module = Module::getInstanceByName($moduleName)) {
+                    if (Module::isInstalled($module->name)) {
+                        $module->disable();
+                        $response['success'] = true;
+                        $response['msg'] = $this->l('Module disable successfully');
+                        $response['data']['redirect'] = $this->context->link->getAdminLink('AdminModules').'&conf=5';
+                    }
+                }
+            } else if($process == 'delete' || $process == 'uninstall') {
+                if ($module = Module::getInstanceByName($moduleName)) {
+                    if (Module::isInstalled($module->name)) {
+                        if ($module->uninstall()) {
+                            if ($process == 'uninstall') {
+                                $response['success'] = true;
+                                $response['msg'] = $this->l('Module uninstall process completed');
+                                $response['data']['redirect'] = $this->context->link->getAdminLink('AdminModules').'&conf=22';
+                            }
+                        }
+                    }
+                }
+                if($process == 'delete') {
+                    if (is_dir(_PS_MODULE_DIR_.$moduleName)) {
+                        $this->recursiveDeleteOnDisk(_PS_MODULE_DIR_.$moduleName);
+                        $response['success'] = true;
+                        $response['msg'] = $this->l('Module rollback process completed');
+                        $response['data']['redirect'] = $this->context->link->getAdminLink('AdminModules').'&conf=22';
+                    }
+                }
+            }
+        }
+
+        $response['errors'] = $this->errors;
+
+        $this->logAndResponseAjax($response);
+    }
+
+    public function ajaxProcessUpdateModule()
+    {
+        $response = array(
+            'success' => false
+        );
+        if ($moduleName = Tools::getValue('module_name')) {
+            if ($module = Module::getInstanceByName($moduleName)) {
+                if ($installed = Module::getModuleInstallVersion($module->name)) {
+                    $module->installed = (bool)$installed;
+                    $module->database_version = $installed['version'];
+                    if (Module::initUpgradeModule($module)) {
+                        if (!class_exists($module->name)) {
+                            require_once(_PS_MODULE_DIR_.$module->name.'/'.$module->name.'.php');
+                        }
+                        if ($object = Adapter_ServiceLocator::get($module->name)) {
+                            $object->runUpgradeModule();
+                            if ((count($errors_module_list = $object->getErrors()))) {
+                                $this->errors = array_merge($this->errors, array('name' => $module->displayName, 'message' => $errors_module_list));
+                            } elseif ((count($conf_module_list = $object->getConfirmations()))) {
+                                $response['data']['upgrade'][] = array('name' => $module->displayName, 'message' => $conf_module_list);
+                                $response['success'] = true;
+                                $html = $this->generateHtmlMessage($response['data']['upgrade']);
+                                $response['msg'] = sprintf($this->l('The following module was upgraded successfully: %s.'), $html);
+                                $response['data']['redirect'] = $this->context->link->getAdminLink('AdminModules').'&conf=29&anchor='.$module->name;
+                            }
+                            unset($object);
+                        } else {
+                            $this->errors[] = $this->l('Module not found!');
+                        }
+                    } else {
+                        $this->errors[] = $this->l('There was some error while updating the module');
+                    }
+                } else {
+                    $this->errors[] = $this->l('Module not installed, install module before updating.');
+                }
+            } else {
+                $this->errors[] = $this->l('Module not found!');
+            }
+        }
+        if (count($this->errors)) {
+            $response['data']['callback']['process'] = 'disable';
+            $response['data']['callback']['msg'] = $this->l('There was some error while updating the module, do you want to disable the module');
+            $response['errors'] = $this->errors;
+        }
+
+        $this->logAndResponseAjax($response);
+    }
+
+    public function logAndResponseAjax($response)
+    {
+        if (isset($response['errors']) && count($response['errors'])) {
+            PrestaShopLogger::addLog('Module install/upload error : Resquest => '.json_encode(Tools::getAllValues()).' || Response =>'.(json_encode($response)), 1, null, 'Module', null, true, (int)$this->context->employee->id);
+        }
+        $this->ajaxDie(json_encode($response));
     }
 }

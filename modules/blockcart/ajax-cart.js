@@ -122,6 +122,7 @@ $(document).ready(function() {
 
 //JS Object : update the cart by ajax actions
 var ajaxCart = {
+    dateFormat: 'dd-mm-yy',
     nb_total_products: 0,
     //override every button in the page in relation to the cart
     overrideButtonsInThePage: function() {
@@ -149,8 +150,8 @@ var ajaxCart = {
         if ($('.cart_block').length) {
             $(document).off('click', '#add_to_cart button').on('click', '#add_to_cart button', function(e) {
                 e.preventDefault();
-                var date_from = $('#room_check_in').val();
-                var date_to = $('#room_check_out').val();
+                var date_from = $.datepicker.formatDate('yy-mm-dd', $.datepicker.parseDate(ajaxCart.dateFormat, $('#room_check_in').val()));
+                var date_to = $.datepicker.formatDate('yy-mm-dd', $.datepicker.parseDate(ajaxCart.dateFormat, $('#room_check_out').val()));
                 ajaxCart.add($('#product_page_product_id').val(), $('#idCombination').val(), true, null, $('#quantity_wanted').val(), null, date_from, date_to);
 
             });
@@ -213,8 +214,8 @@ var ajaxCart = {
 
             /*by webkul*/
             if (pagename == 'product') {
-                dateFrom = $('#room_check_in').val();
-                dateTo = $('#room_check_out').val();
+                dateFrom = $.datepicker.formatDate('yy-mm-dd', $.datepicker.parseDate(ajaxCart.dateFormat, $('#room_check_in').val()));
+                dateTo = $.datepicker.formatDate('yy-mm-dd', $.datepicker.parseDate(ajaxCart.dateFormat, $('#room_check_out').val()));
             } else if (pagename == 'category') {
                 dateFrom = $('#check_in_time').val();
                 dateTo = $('#check_out_time').val();
@@ -369,20 +370,10 @@ var ajaxCart = {
                 /*by webkul checking and setting availability of rooms*/
                 /*for product page add to cart quantity management*/
                 if (pagename == 'product') {
-                    if (jsonData.avail_rooms <= room_warning_num) {
-                        $('.num_quantity_alert').show();
-                    } else {
-                        $('.num_quantity_alert').hide();
-                    }
-                    $("#max_avail_type_qty").val(jsonData.avail_rooms);
-                    $(".num_searched_avail_rooms").text(jsonData.avail_rooms);
-
                     if (jsonData.avail_rooms == 0) {
-                        $('.num_quantity_alert').hide();
-                        $('.sold_out_alert').show();
                         disableRoomTypeDemands(1);
-                        $('.unvail_rooms_cond_display').hide();
                     }
+                    BookingForm.refresh();
                 }
 
                 if (pagename == 'category') {
@@ -504,25 +495,17 @@ var ajaxCart = {
                 /*by webkul checking and setting availability of rooms*/
                 /*for product page add to cart quantity management*/
                 if (pagename == 'product') {
-                    var date_checkIn = $('#room_check_in').val();
-                    var date_checkOut = $('#room_check_out').val();
+                    var date_checkIn = $.datepicker.formatDate('yy-mm-dd', $.datepicker.parseDate(ajaxCart.dateFormat, $('#room_check_in').val()));
+                    var date_checkOut = $.datepicker.formatDate('yy-mm-dd', $.datepicker.parseDate(ajaxCart.dateFormat, $('#room_check_out').val()));
                     var product_page_id_product = $('#product_page_product_id').val();
                     if (idProduct == product_page_id_product && dateFrom < date_checkOut && dateTo >= date_checkIn) {
-                        if (jsonData.avail_rooms <= room_warning_num) {
-                            $('.num_quantity_alert').show();
-                        } else {
-                            $('.num_quantity_alert').hide();
-                        }
                         $("#max_avail_type_qty").val(jsonData.avail_rooms);
-                        $(".num_searched_avail_rooms").text(jsonData.avail_rooms);
 
                         if (jsonData.avail_rooms == 0) {
-                            $('.num_quantity_alert').hide();
-                            $('.sold_out_alert').show();
                             disableRoomTypeDemands(1);
-                            $('.unvail_rooms_cond_display').hide();
                         }
                     }
+                    BookingForm.refresh();
                 }
 
                 if (pagename == 'category') {
@@ -538,9 +521,56 @@ var ajaxCart = {
                     if (jsonData.avail_rooms == 0) {
                         $(".cat_remain_rm_qty_" + idProduct).closest('.room_cont').hide();
                     }
+                    //$('#cat_quantity_wanted_'+idProduct).val(1);
                 }
 
                 ajaxCart.updateCart(jsonData);
+
+
+            //     // add appliance to whishlist module
+            //     if (whishlist && !jsonData.errors)
+            //         WishlistAddProductCart(whishlist[0], idProduct, idCombination, whishlist[1]);
+
+            //     if (!jsonData.hasError) {
+            //         if (contentOnly)
+            //             window.parent.ajaxCart.updateCartInformation(jsonData, addedFromProductPage);
+            //         else
+            //             ajaxCart.updateCartInformation(jsonData, addedFromProductPage);
+
+            //         if (jsonData.crossSelling)
+            //             $('.crossseling').html(jsonData.crossSelling);
+
+            //         if (idCombination)
+            //             $(jsonData.products).each(function() {
+            //                 if (this.id != undefined && this.id == parseInt(idProduct) && this.idCombination == parseInt(idCombination))
+            //                     if (contentOnly)
+            //                         window.parent.ajaxCart.updateLayer(this);
+            //                     else
+            //                         ajaxCart.updateLayer(this);
+            //             });
+            //         else
+            //             $(jsonData.products).each(function() {
+            //                 if (this.id != undefined && this.id == parseInt(idProduct))
+            //                     if (contentOnly)
+            //                         window.parent.ajaxCart.updateLayer(this);
+            //                     else
+            //                         ajaxCart.updateLayer(this);
+            //             });
+            //         if (contentOnly)
+            //             parent.$.fancybox.close();
+            //     } else {
+            //         if (contentOnly)
+            //             window.parent.ajaxCart.updateCart(jsonData);
+            //         else
+            //             ajaxCart.updateCart(jsonData);
+            //         if (addedFromProductPage)
+            //             $('#add_to_cart button').removeProp('disabled').removeClass('disabled');
+            //         else
+            //             $(callerElement).removeProp('disabled');
+            //     }
+
+            //     emptyCustomizations();
+
             },
             error: function(XMLHttpRequest, textStatus, errorThrown) {
                 var error = "Impossible to add the room to the cart.<br/>textStatus: '" + textStatus + "'<br/>errorThrown: '" + errorThrown + "'<br/>responseText:<br/>" + XMLHttpRequest.responseText;
@@ -579,18 +609,10 @@ var ajaxCart = {
             data: 'controller=cart&delete=1&dateFrom=' + dateFrom + '&dateTo=' + dateTo + '&id_product=' + idProduct + '&ipa=' + ((idCombination != null && parseInt(idCombination)) ? idCombination : '') + ((customizationId && customizationId != null) ? '&id_customization=' + customizationId : '') + '&id_address_delivery=' + idAddressDelivery + '&token=' + static_token + '&ajax=true',
             success: function(jsonData) {
                 if (pagename == 'product') {
-                    if (jsonData.avail_rooms <= room_warning_num) {
-                        $('.num_quantity_alert').show();
-                    } else {
-                        $('.num_quantity_alert').hide();
-                    }
-
-                    $("#max_avail_type_qty").val(jsonData.avail_rooms);
-                    $(".num_searched_avail_rooms").text(jsonData.avail_rooms);
-                    $('.sold_out_alert').hide();
                     disableRoomTypeDemands(0);
-                    $('.unvail_rooms_cond_display').show();
+                    BookingForm.refresh();
                 }
+
                 if (pagename == 'category') {
                     // for category page....
                     $(".cat_remain_rm_qty_" + idProduct).text(jsonData.avail_rooms);
@@ -841,7 +863,7 @@ var ajaxCart = {
                     if (cart_booking_data[key].date_diff !== 'undefined') {
                         $.each(cart_booking_data[key].date_diff, function(date_diff_k, date_diff_v) {
                             content += '<tr class="rooms_remove_container">';
-                            content += '<td>' + $.datepicker.formatDate('dd-mm-yy', new Date(date_diff_v.data_form)) + '&nbsp;-&nbsp;' + $.datepicker.formatDate('dd-mm-yy', new Date(date_diff_v.data_to)) + '</td>';
+                            content += '<td>' + $.datepicker.formatDate(ajaxCart.dateFormat, new Date(date_diff_v.data_form)) + '&nbsp;-&nbsp;' + $.datepicker.formatDate(ajaxCart.dateFormat, new Date(date_diff_v.data_to)) + '</td>';
                             content += '<td class="num_rooms_in_date">' + date_diff_v.num_rm + '</td>';
                             content += '<td>' + formatCurrency(parseFloat(date_diff_v.amount), currency_format, currency_sign, currency_blank) + '</td>';
                             content += '<td>';
@@ -878,7 +900,7 @@ var ajaxCart = {
                     if (cart_booking_data[key].date_diff !== 'undefined') {
                         $.each(cart_booking_data[key].date_diff, function(date_diff_k1, date_diff_v1) {
                             booking_dates_content += '<tr class="rooms_remove_container">';
-                            booking_dates_content += '<td>' + $.datepicker.formatDate('dd-mm-yy', new Date(date_diff_v1.data_form)) + '&nbsp;-&nbsp;' + $.datepicker.formatDate('dd-mm-yy', new Date(date_diff_v1.data_to)) + '</td>';
+                            booking_dates_content += '<td>' + $.datepicker.formatDate(ajaxCart.dateFormat, new Date(date_diff_v1.data_form)) + '&nbsp;-&nbsp;' + $.datepicker.formatDate(ajaxCart.dateFormat, new Date(date_diff_v1.data_to)) + '</td>';
                             booking_dates_content += '<td class="num_rooms_in_date">' + date_diff_v1.num_rm + '</td>';
                             booking_dates_content += '<td>' + formatCurrency(parseFloat(date_diff_v1.amount), currency_format, currency_sign, currency_blank) + '</td>';
                             booking_dates_content += '<td>';
