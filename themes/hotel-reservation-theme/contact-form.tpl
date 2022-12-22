@@ -217,6 +217,7 @@
 {strip}
 	{addJsDefL name='contact_fileDefaultHtml'}{l s='No file selected' js=1}{/addJsDefL}
 	{addJsDefL name='contact_fileButtonHtml'}{l s='Choose File' js=1}{/addJsDefL}
+	{addJsDefL name='contact_map_get_dirs'}{l s='Get Directions' js=1}{/addJsDefL}
 {/strip}
 {if isset($hotelLocationArray)}
 	{strip}

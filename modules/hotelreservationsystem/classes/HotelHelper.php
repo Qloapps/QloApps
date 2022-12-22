@@ -222,6 +222,8 @@ class HotelHelper
             date('d-m-Y', strtotime(date('Y-m-d', time()).' + 1 year'))
         );
 
+        Configuration::updateValue('GLOBAL_PREPARATION_TIME', 0);
+
         Configuration::updateValue('HTL_FEATURE_PRICING_PRIORITY', 'specific_date;special_day;date_range');
         Configuration::updateValue('WK_GOOGLE_ACTIVE_MAP', 0);
         Configuration::updateValue('WK_MAP_HOTEL_ACTIVE_ONLY', 1);

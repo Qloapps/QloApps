@@ -102,6 +102,9 @@
             </div>
         </div>
     </div>
+	{include file='recomended-banner.tpl'}
+	<div class="row" id="recommendation-wrapper" style="display:none">
+	</div>
     <div class="row">
         <div class="col-md-8 col-md-push-4 col-lg-7 col-lg-push-3" id="hookDashboardZoneTwo">
             <div class='row'>
@@ -114,9 +117,16 @@
         <div class="col-md-4 col-md-pull-8 col-lg-2 col-lg-pull-0" id="hookDashboardZoneThree">
             <div class="row">
                 {$hookDashboardZoneThree}
+				{if isset($upgrade_info) && $upgrade_info}
+					<div class="col-sm-12">
+						<section class="widget panel">
+							{$upgrade_info->dash_upgrade_panel}
+						</section>
+					</div>
+				{/if}
                 <div class="col-sm-12">
                     <section class="dash_links widget panel">
-                        <h3><i class="icon-link"></i> {l s="Useful links"}</h3>
+                        <h3><i class="icon-link"></i> {l s="Help Center"}</h3>
                             <dl>
                                 <dt><a href="https://qloapps.com/qlo-reservation-system/" class="_blank">{l s="Official Documentation"}</a></dt>
                                 <dd>{l s="Qloapps User Guide"}</dd>

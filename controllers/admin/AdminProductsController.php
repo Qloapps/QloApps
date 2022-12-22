@@ -113,7 +113,6 @@ class AdminProductsControllerCore extends AdminController
             'Configuration' => $this->l('Configuration'),
             'Occupancy' => $this->l('Occupancy'),
             'LengthOfStay' => $this->l('Length of Stay'),
-            'Booking' => $this->l('Booking Information'),
         );
 
         $this->available_tabs = array('Warehouses' => 14);
@@ -135,7 +134,6 @@ class AdminProductsControllerCore extends AdminController
                 'Configuration' => 14,
                 'Occupancy' => 15,
                 'LengthOfStay' => 16,
-                'Booking' => 17,
             ));
         }
 
@@ -1625,10 +1623,7 @@ class AdminProductsControllerCore extends AdminController
             $this->addJS(_PS_JS_DIR_.'jquery/plugins/select2/select2_locale_'.$this->context->language->iso_code.'.js');
             $this->addJS(_PS_JS_DIR_.'jquery/plugins/validate/localization/messages_'.$this->context->language->iso_code.'.js');
 
-            $this->addCSS(array(
-                _PS_JS_DIR_.'jquery/plugins/timepicker/jquery-ui-timepicker-addon.css',
-                _PS_CSS_DIR_.'ps-hotel-reservation.css',
-            ));
+            $this->addCSS(_PS_JS_DIR_.'jquery/plugins/timepicker/jquery-ui-timepicker-addon.css');
         }
     }
 
@@ -2233,9 +2228,6 @@ class AdminProductsControllerCore extends AdminController
                         if ($this->isTabSubmitted('Configuration')) {
                             $this->processConfiguration();
                         }
-                        if ($this->isTabSubmitted('Booking')) {
-                            $this->processBooking();
-                        }
 
                         $this->updatePackItems($object);
                         // Disallow avanced stock management if the product become a pack
@@ -2740,7 +2732,7 @@ class AdminProductsControllerCore extends AdminController
         $helper->id = 'box-8020-sales-catalog';
         $helper->icon = 'icon-beaker';
         $helper->color = 'color3';
-        $helper->title = $this->l('Purchased references', null, null, false);
+        $helper->title = $this->l('Purchased References', null, null, false);
         $helper->subtitle = $this->l('30 days', null, null, false);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=8020_sales_catalog';
         $helper->tooltip = $this->l('X% of your references have been purchased for the past 30 days.', null, null, false);
@@ -3389,7 +3381,7 @@ class AdminProductsControllerCore extends AdminController
                             foreach ($hotelRoomInfo as &$room) {
                                 if ($room['id_status'] == HotelRoomInformation::STATUS_TEMPORARY_INACTIVE) {
                                     $disabledDates = $objRoomDisableDates->getRoomDisableDates($room['id']);
-                                    $room['disabled_dates_json'] = json_encode($disabledDates);
+                                    $room['disable_dates_json'] = json_encode($disabledDates);
                                 }
                             }
                             $data->assign('htl_room_info', $hotelRoomInfo);
@@ -3401,8 +3393,8 @@ class AdminProductsControllerCore extends AdminController
                             'product' => $obj,
                             'htl_info' => $hotelInfo,
                             'rm_status' => $roomStatus,
-                            'datesMissing' => $this->l('Please fill all Date From and Date To'),
-                            'datesOverlapping' => $this->l('Some date are conflicting with each other. Please check and reselect the date ranges.'),
+                            'datesMissing' => $this->l('Some dates are missing. Please select all the date ranges.'),
+                            'datesOverlapping' => $this->l('Some dates are conflicting with each other. Please check and reselect the date ranges.'),
                         )
                     );
                 } else {
@@ -3477,7 +3469,7 @@ class AdminProductsControllerCore extends AdminController
             }
         }
     }
-
+  
     // send information for the length of stay tab
     public function initFormLengthOfStay($product)
     {
@@ -3613,127 +3605,137 @@ class AdminProductsControllerCore extends AdminController
         }
     }
 
-    public function validateDisableDateRanges($disableDates)
+    public function validateDisableDateRanges($disableDates, $index)
     {
         if (count($disableDates)) {
             foreach ($disableDates as $disable_key => $disableDate) {
                 if (!$disableDate['date_to'] && !$disableDate['date_from']) {
                     unset($disableDates[$disable_key]);
                 } elseif (!Validate::isDate($disableDate['date_from']) || !Validate::isDate($disableDate['date_to'])) {
-                    $this->errors[] = Tools::displayError('Please fill valid date in disable date fields.');
+                    $this->errors[] = sprintf(
+                        Tools::displayError('Please add valid disable dates for %s room.'),
+                        $index
+                    );
                 } elseif (($disableDate['date_from'] && !$disableDate['date_to']) || (!$disableDate['date_from'] && $disableDate['date_to'])) {
-                    $this->errors[] = Tools::displayError('Please fill all date from and date to for disable dates fields.');
+                    $this->errors[] = sprintf(
+                        Tools::displayError('Please fill date from and date to for disable dates for %s room.'),
+                        $index
+                    );
                 } else {
                     foreach ($disableDates as $key => $disDate) {
                         if ($key != $disable_key) {
                             if ((($disableDate['date_from'] < $disDate['date_from']) && ($disableDate['date_to'] <= $disDate['date_from'])) || (($disableDate['date_from'] > $disDate['date_from']) && ($disableDate['date_from'] >= $disDate['date_to']))) {
                                 // continue
                             } else {
-                                $this->errors[] = Tools::displayError('Some date are conflicting with each other. Please check and reselect the date ranges.');
+                                $this->errors[] = sprintf(
+                                    Tools::displayError('Disable dates are conflicting for %s room. Please add non-conflicting dates.'),
+                                    $index
+                                );
                             }
                         }
                     }
                 }
             }
         } else {
-            $this->errors[] = Tools::displayError('Please add dates for status temporary inactive.');
+            $this->errors[] = sprintf(Tools::displayError('Please add disable dates for %s room.'), $index);
         }
     }
 
     public function processConfiguration()
     {
-        /*Check if save of configuration tab is submitted*/
+        // Check if save of configuration tab is submitted
         if (Tools::getValue('checkConfSubmit')) {
-            // htl_room_type id field use only in edit case
-            $wk_id_room_type = Tools::getValue('wk_id_room_type');
-
-            $id_product = Tools::getValue('id_product');    //room type
+            $id_product = Tools::getValue('id_product');
             $id_hotel = Tools::getValue('id_hotel');
 
             if (!$id_product || !Validate::isUnsignedInt($id_product)) {
-                $this->errors[] = Tools::displayError('There is some problem while setting room information');
+                $this->errors[] = Tools::displayError('There is some problem while setting room information.');
             }
             if (!$id_hotel || !Validate::isUnsignedInt($id_hotel)) {
-                $this->errors[] = Tools::displayError('Please select a hotel');
+                $this->errors[] = Tools::displayError('Please select a hotel.');
             }
+
+            $this->validateConfigurationPostData();
             if (!count($this->errors)) {
-                $room_numbers = Tools::getValue('room_num');
-                if ($room_numbers) {
-                    $room_floor = Tools::getValue('room_floor');
-                    $room_comment = Tools::getValue('room_comment');
-                    $disable_dates = Tools::getValue('disableDatesJSON');
-                    $room_status = Tools::getValue('room_status');
+                $roomsInfo = Tools::getValue('rooms_info');
+                if (is_array($roomsInfo) && count($roomsInfo)) {
+                    foreach ($roomsInfo as $roomInfo) {
+                        $objHotelRoomInfo = null;
+                        if (isset($roomInfo['id']) && $roomInfo['id']) {
+                            $objHotelRoomInfo = new HotelRoomInformation($roomInfo['id']);
+                        } else {
+                            $objHotelRoomInfo = new HotelRoomInformation();
+                        }
+                        $objHotelRoomInfo->id_product = $id_product;
+                        $objHotelRoomInfo->id_hotel = $id_hotel;
+                        $objHotelRoomInfo->room_num = $roomInfo['room_num'];
+                        $objHotelRoomInfo->id_status = $roomInfo['id_status'];
+                        $objHotelRoomInfo->floor = $roomInfo['floor'];
+                        $objHotelRoomInfo->comment = $roomInfo['comment'];
+                        if ($objHotelRoomInfo->save()) {
+                            $idRoom = $objHotelRoomInfo->id;
+                            if ($roomInfo['id_status'] == HotelRoomInformation::STATUS_TEMPORARY_INACTIVE) {
+                                $objHotelRoomDisableDates = new HotelRoomDisableDates();
+                                $objHotelRoomDisableDates->deleteRoomDisableDates($idRoom);
 
-                    if (count($room_numbers) != count($room_status)) {
-                        $this->errors[] = Tools::displayError('There is some problem while setting room information');
-                    } else {
-                        //validate room number
-                        foreach ($room_numbers as $roomNum) {
-                            if (!$roomNum || !Validate::isGenericName($roomNum)) {
-                                $this->errors[] = Tools::displayError('Invalid room number entered. please enter a valid room number.');
-                            }
-                        }
-                        //validate room status
-                        $disableDtsArr = array();
-                        foreach ($room_status as $key => $status) {
-                            if ($status == HotelRoomInformation::STATUS_TEMPORARY_INACTIVE) {
-                                $disableDtsArr[$key] = json_decode($disable_dates[$key], true);
-                                $this->validateDisableDateRanges($disableDtsArr[$key]);
-                            }
-                        }
-                    }
-                    if (!count($this->errors)) {
-                        if ($wk_id_room_type) {
-                            $objRoomType = new HotelRoomType($wk_id_room_type);
-                            $id_hotel = $objRoomType->id_hotel;
-                        }
-
-                        // Associate categories to Room Type
-                        $id_room_info = Tools::getValue('id_room_info');
-                        $objCartBookingData = new HotelCartBookingData();
-                        foreach ($room_numbers as $key => $value) {
-                            if ($value) {
-                                if ($id_room_info) {
-                                    if ($key <= (count($id_room_info) - 1)) {
-                                        $objRoomInfo = new HotelRoomInformation($id_room_info[$key]);
-                                    } else {
-                                        //if any new room is added at the time of edit
-                                        $objRoomInfo = new HotelRoomInformation();
-                                        $objRoomInfo->id_product = $id_product;
-                                        $objRoomInfo->id_hotel = $id_hotel;
-                                    }
-                                } else {
-                                    $objRoomInfo = new HotelRoomInformation();
-                                    $objRoomInfo->id_product = $id_product;
-                                    $objRoomInfo->id_hotel = $id_hotel;
-                                }
-                                $objRoomInfo->room_num = $value;
-                                $objRoomInfo->id_status = $room_status[$key];
-                                $objRoomInfo->floor = $room_floor[$key];
-                                $objRoomInfo->comment = $room_comment[$key];
-                                if ($objRoomInfo->save()) {
-                                    if ($room_status[$key] == HotelRoomInformation::STATUS_TEMPORARY_INACTIVE) {
-                                        $objDisDts = new HotelRoomDisableDates();
-                                        $objDisDts->deleteRoomDisableDates($objRoomInfo->id);
-                                        if (isset($disableDtsArr[$key]) && $disableDtsArr[$key]) {
-                                            // delete privious save dats
-                                            foreach ($disableDtsArr[$key] as $disDtRange) {
-                                                $objDisDts = new HotelRoomDisableDates();
-                                                $objDisDts->id_room_type = $id_product;
-                                                $objDisDts->id_room = $objRoomInfo->id;
-                                                $objDisDts->date_from = $disDtRange['date_from'];
-                                                $objDisDts->date_to = $disDtRange['date_to'];
-                                                $objDisDts->reason = $disDtRange['reason'];
-                                                $objDisDts->add();
-                                            }
-                                        }
-                                    }
+                                $disableDates = json_decode($roomInfo['disable_dates_json'], true);
+                                foreach ($disableDates as $disableDate) {
+                                    $objHotelRoomDisableDates = new HotelRoomDisableDates();
+                                    $objHotelRoomDisableDates->id_room_type = $id_product;
+                                    $objHotelRoomDisableDates->id_room = $idRoom;
+                                    $objHotelRoomDisableDates->date_from = $disableDate['date_from'];
+                                    $objHotelRoomDisableDates->date_to = $disableDate['date_to'];
+                                    $objHotelRoomDisableDates->reason = $disableDate['reason'];
+                                    $objHotelRoomDisableDates->add();
                                 }
                             }
                         }
                     }
                 }
             }
+        }
+    }
+
+    public function validateConfigurationPostData()
+    {
+        $roomsInfo = Tools::getValue('rooms_info');
+        if (is_array($roomsInfo) && count($roomsInfo)) {
+            foreach ($roomsInfo as $key => $roomInfo) {
+                if (!$roomInfo['room_num']) {
+                    unset($_POST['rooms_info'][$key]);
+                }
+            }
+        }
+
+        $roomsInfo = Tools::getValue('rooms_info'); // since $_POST['rooms_info'] has changed
+        if (is_array($roomsInfo) && count($roomsInfo)) {
+            $formatter = new NumberFormatter($this->context->language->language_code, NumberFormatter::ORDINAL);
+            foreach ($roomsInfo as $key => $roomInfo) {
+                $index = $formatter->format($key + 1);
+
+                if ($roomInfo['id_status'] == HotelRoomInformation::STATUS_TEMPORARY_INACTIVE) {
+                    if ($roomInfo['disable_dates_json'] === 0) {
+                        $this->errors[] = sprintf(Tools::displayError('Please add disable dates for %s room.'), $index);
+                    }
+                }
+
+                if ($roomInfo['room_num'] && !Validate::isGenericName($roomInfo['room_num'])) {
+                    $this->errors[] = sprintf(Tools::displayError('Invalid room number for %s room.'), $index);
+                }
+
+                if ($roomInfo['floor'] && !Validate::isGenericName($roomInfo['floor'])) {
+                    $this->errors[] = sprintf(Tools::displayError('Invalid floor for %s room.'), $index);
+                }
+
+                if ($roomInfo['id_status'] == HotelRoomInformation::STATUS_TEMPORARY_INACTIVE) {
+                    $disableDates = json_decode($roomInfo['disable_dates_json'], true);
+                    if ($roomInfo['disable_dates_json'] !== 0) {
+                        $this->validateDisableDateRanges($disableDates, $index);
+                    }
+                }
+            }
+        } else {
+            $this->errors[] = Tools::displayError('Please add at least one room.');
         }
     }
 
@@ -3747,162 +3749,6 @@ class AdminProductsControllerCore extends AdminController
             }
         }
         die('0');
-    }
-
-    /**
-     * @param Product $obj
-     *
-     * @throws Exception
-     * @throws PrestaShopException
-     * @throws SmartyException
-     */
-    public function initFormBooking($obj)
-    {
-        $data = $this->createTemplate($this->tpl_form);
-        if ($obj->id) {
-            if ($this->product_exists_in_shop) {
-                $data->assign(array('product' => $obj));
-
-                $date_from = Tools::getValue('date_from');
-                $date_to = Tools::getValue('date_to');
-
-                $obj_rm_type = new HotelRoomType();
-                $obj_booking_dtl = new HotelBookingDetail();
-
-                $rm_info = $obj_rm_type->getRoomTypeInfoByIdProduct($obj->id);
-                if ($rm_info) {
-                    if ($date_from && $date_to) {
-                        $search_flag = 1;
-                        $start_date = $date_from;
-                        $last_date = $date_to;
-                    } else {
-                        $date_from = date('Y-m-d');
-                        $date_to = date('Y-m-t');
-                        $start_date = date('Y-m-01'); // hard-coded '01' for first day
-                        $last_date = date('Y-m-t');
-                    }
-                    $bookingParams = array();
-                    $bookingParams['date_from'] = $date_from;
-                    $bookingParams['date_to'] = $date_to;
-                    $bookingParams['hotel_id'] = $rm_info['id_hotel'];
-                    $bookingParams['room_type'] = $obj->id;
-                    $bookingParams['adult'] = $rm_info['adult'];
-                    $bookingParams['children'] = $rm_info['children'];
-                    $bookingParams['num_rooms'] = 0;
-
-                    $bookingParams['only_active_roomtype'] = 0;
-
-                    $booking_data = $obj_booking_dtl->getBookingData($bookingParams);
-
-                    $bookingParams['for_calendar'] = 1;
-                    while ($start_date <= $last_date) {
-                        $cal_date_from = $start_date;
-                        $cal_date_to = date('Y-m-d', strtotime('+1 day', strtotime($cal_date_from)));
-                        $booking_calendar_data[$cal_date_from] = $obj_booking_dtl->getBookingData($bookingParams);
-
-                        // if product is inactive then booking_details will be false
-                        if (!$booking_calendar_data[$cal_date_from]) {
-                            $booking_calendar_data[$cal_date_from]['stats']['num_avail'] = 0;
-                            $booking_calendar_data[$cal_date_from]['stats']['num_part_avai'] = 0;
-                            $booking_calendar_data[$cal_date_from]['stats']['num_unavail'] = 0;
-                            $booking_calendar_data[$cal_date_from]['stats']['num_booked'] = 0;
-                        }
-                        $start_date = date('Y-m-d', strtotime('+1 day', strtotime($start_date)));
-                    }
-                    if (isset($search_flag) && $search_flag) {
-                        if ($booking_data['stats']['num_avail'] > 0) {
-                            $check_css_condition_var = 'available';
-                        } elseif ($booking_data['stats']['num_part_avai'] > 0) {
-                            $check_css_condition_var = 'part_available';
-                        } else {
-                            $check_css_condition_var = 'unavailable';
-                        }
-                    } else {
-                        if ($booking_data['stats']['num_avail'] > 0) {
-                            $check_css_condition_var = 'default_available';
-                        } elseif ($booking_data['stats']['num_part_avai'] > 0) {
-                            $check_css_condition_var = 'default_part_available';
-                        } else {
-                            $check_css_condition_var = 'default_unavailable';
-                        }
-                    }
-
-                    $data->assign(
-                        array(
-                            'rooms_info' => $rm_info,
-                            'check_calendar_var' => 1,
-                            'date_from' => $date_from,
-                            'date_to' => $date_to,
-                            'booking_data' => $booking_data,
-                            'booking_calendar_data' => $booking_calendar_data,
-                            'htl_config' => 1,
-                            'check_css_condition_var' => $check_css_condition_var,
-                        )
-                    );
-                } else {
-                    $this->displayWarning($this->l('First you have to fill Room configuration.'));
-                }
-            } else {
-                $this->displayWarning($this->l('You must save the room type in this shop before managing hotel configuration.'));
-            }
-        } else {
-            $this->displayWarning($this->l('You must save this room type to see the booking information.'));
-        }
-        $this->tpl_form_vars['custom_form'] = $data->fetch();
-    }
-
-    public function processBooking()
-    {
-        if (Tools::isSubmit('submitAddproductAndStay')) {
-            $checkTabClick = Tools::getValue('checkTabClick');
-            $date_from = Tools::getValue('from_date');
-            $date_to = Tools::getValue('to_date');
-            $num_rooms = Tools::getValue('num_rooms');
-            $id_product = Tools::getValue('id_product');
-
-            $link = new Link();
-            if ($checkTabClick) {
-                Tools::redirectAdmin($link->getAdminLink('AdminProducts').'&id_product='.$id_product.'&updateproduct&key_tab=Booking&date_from='.$date_from.'&date_to='.$date_to);
-            }
-        }
-    }
-
-    public function ajaxProcessProductRoomsBookingDetailsOnMonthChange()
-    {
-        $month = Tools::getValue('month');
-        $year = Tools::getValue('year');
-        $query_date = $year.'-'.$month.'-04';
-        $start_date = date('Y-m-01', strtotime($query_date)); // hard-coded '01' for first day
-        $last_day_this_month = date('Y-m-t', strtotime($query_date));
-        $hotel_id = Tools::getValue('id_hotel');
-        $room_type = Tools::getValue('id_product');
-        $adult = Tools::getValue('num_adults');
-        $children = Tools::getValue('num_children');
-        $num_rooms = 1;
-
-        $obj_booking_dtl = new HotelBookingDetail();
-        $bookingParams = array();
-        $bookingParams['hotel_id'] = $hotel_id;
-        $bookingParams['room_type'] = $room_type;
-        $bookingParams['adult'] = $adult;
-        $bookingParams['children'] = $children;
-        $bookingParams['num_rooms'] = $num_rooms;
-        $bookingParams['for_calendar'] = 1;
-        while ($start_date <= $last_day_this_month) {
-            $cal_date_from = $start_date;
-            $cal_date_to = date('Y-m-d', strtotime($cal_date_from) + 86400);
-
-            $bookingParams['date_from'] = $cal_date_from;
-            $bookingParams['date_to'] = $cal_date_to;
-            $booking_calendar_data[$cal_date_from] = $obj_booking_dtl->getBookingData($bookingParams);
-            $start_date = date('Y-m-d', strtotime($start_date) + 86400);
-        }
-
-        if ($booking_calendar_data) {
-            die(json_encode($booking_calendar_data));
-        } else {
-            die(0);
-        }
     }
 
     /**

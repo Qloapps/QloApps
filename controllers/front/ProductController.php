@@ -63,6 +63,13 @@ class ProductControllerCore extends FrontController
         if (Configuration::get('PS_DISPLAY_JQZOOM') == 1) {
             $this->addJqueryPlugin('jqzoom');
         }
+
+        if (($PS_API_KEY = Configuration::get('PS_API_KEY')) && Configuration::get('WK_GOOGLE_ACTIVE_MAP')) {
+            $this->addJS(
+                'https://maps.googleapis.com/maps/api/js?key='.$PS_API_KEY.'&libraries=places&language='.
+                $this->context->language->iso_code.'&region='.$this->context->country->iso_code
+            );
+        }
     }
 
     public function canonicalRedirection($canonical_url = '')
@@ -264,7 +271,6 @@ class ProductControllerCore extends FrontController
             /*By webkul To send All needed Hotel Information on product.tpl*/
             #####################################################################
 
-            $total_available_rooms = 0;
             $htl_features = array();
             $obj_hotel_room_type = new HotelRoomType();
             $room_info_by_product_id = $obj_hotel_room_type->getRoomTypeInfoByIdProduct($this->product->id);
@@ -304,12 +310,6 @@ class ProductControllerCore extends FrontController
                     $date_to = date('Y-m-d', strtotime('+1 day', strtotime($date_from)));
                 }
 
-                $obj_booking_dtl = new HotelBookingDetail();
-                $hotel_room_data = $obj_booking_dtl->DataForFrontSearch($date_from, $date_to, $hotel_id, $this->product->id, 1);
-
-                if ($hotel_room_data) {
-                    $total_available_rooms = $hotel_room_data['stats']['num_avail'];
-                }
                 $hotel_branch_obj = new HotelBranchInformation($hotel_id);
                 /*Max date of ordering for order restrict*/
                 $order_date_restrict = false;
@@ -323,35 +323,49 @@ class ProductControllerCore extends FrontController
                     }
                 }
                 /*End*/
+                // booking preparation time
+                $preparationTime = (int) HotelOrderRestrictDate::getPreparationTime($hotel_id);
+
+                $hotelImageLink = null;
+                if ($coverImage = HotelImage::getCover($hotel_id)) {
+                    $hotelImagesBaseDir = _MODULE_DIR_.'hotelreservationsystem/views/img/hotel_img/';
+                    $hotelImageLink = $this->context->link->getMediaLink(
+                        $hotelImagesBaseDir.$coverImage['hotel_image_id'].'.jpg'
+                    );
+                }
+
+                Media::addJsDef(array(
+                    'hotel_loc' => array(
+                        'latitude' => $hotel_branch_obj->latitude,
+                        'longitude' => $hotel_branch_obj->longitude,
+                    )
+                ));
 
                 if (Tools::getValue('error')) {
                     $this->context->smarty->assign('error', Tools::getValue('error'));
-                }
-                if (Module::isInstalled('productcomments')) {
-                    $this->context->smarty->assign(
-                        array(
-                            'num_reviews' => ProductComment::getCommentNumber($this->product->id),
-                            'ratting' => ProductComment::getAverageGrade($this->product->id)['grade'],
-                        )
-                    );
                 }
 
                 $this->context->smarty->assign(
                     array(
                         'isHotelRefundable' => $hotel_branch_obj->isRefundable(),
                         'max_order_date' => $max_order_date,
+                        'preparation_time' => $preparationTime,
                         'warning_num' => Configuration::get('WK_ROOM_LEFT_WARNING_NUMBER'),
-                        'ratting_img_path' => _MODULE_DIR_.'hotelreservationsystem/views/img/Slices/icons-sprite.png',
-                        'total_available_rooms' => $total_available_rooms,
                         'product_controller_url' => $this->context->link->getPageLink('product'),
                         'date_from' => $date_from,
                         'date_to' => $date_to,
                         'hotel_check_in' => date('h:i a', strtotime($hotel_branch_obj->check_in)),
                         'hotel_check_out' => date('h:i a', strtotime($hotel_branch_obj->check_out)),
                         'hotel_location' => $hotel_location,
+                        'hotel_latitude' => $hotel_branch_obj->latitude,
+                        'hotel_longitude' => $hotel_branch_obj->longitude,
+                        'hotel_map_input_text' => $hotel_branch_obj->map_input_text,
+                        'hotel_address1' => $addressInfo['address1'],
+                        'hotel_phone' => $addressInfo['phone'],
                         'hotel_name' => $hotel_name,
                         'hotel_policies' => $hotel_policies,
                         'hotel_features' => $htl_features,
+                        'hotel_image_link' => $hotelImageLink,
                         'hotel_has_images' => (bool) HotelImage::getCover($hotel_id),
                         'ftr_img_src' => _PS_IMG_.'rf/',
                         'order_date_restrict' => $order_date_restrict
@@ -434,6 +448,7 @@ class ProductControllerCore extends FrontController
                         'category-'.(isset($this->category) ? $this->category->getFieldByLang('link_rewrite') : ''),
                     ),
                     'display_discount_price' => Configuration::get('PS_DISPLAY_DISCOUNT_PRICE'),
+                    'display_google_maps' => Configuration::get('WK_GOOGLE_ACTIVE_MAP'),
                 )
             );
         }

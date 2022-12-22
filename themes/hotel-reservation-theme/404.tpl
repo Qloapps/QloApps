@@ -29,13 +29,13 @@
 		{l s='We\'re sorry, but the Web address you\'ve entered is no longer available.'}
 	</p>
 
-	<h3>{l s='To find a product, please type its name in the field below.'}</h3>
+	<h3>{l s='To find a room type, please type its name in the field below.'}</h3>
 	<form action="{$link->getPageLink('search')|escape:'html':'UTF-8'}" method="post" class="std">
 		<fieldset>
 			<div>
-				<label for="search_query">{l s='Search our product catalog:'}</label>
+				<label for="search_query">{l s='Search our catalog:'}</label>
 				<input id="search_query" name="search_query" type="text" class="form-control grey" />
-                <button type="submit" name="Submit" value="OK" class="btn btn-default button button-small"><span>{l s='Ok'}</span></button>
+                <button type="submit" name="Submit" value="OK" class="btn btn-default button button-small"><span>{l s='Search'}</span></button>
 			</div>
 		</fieldset>
 	</form>

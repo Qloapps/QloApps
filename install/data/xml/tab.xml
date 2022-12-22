@@ -186,6 +186,9 @@
     <tab id="Modules_1" id_parent="Modules" active="1" hide_host_mode="0">
       <class_name>AdminModules</class_name>
     </tab>
+    <tab id="Modules_Catalog" id_parent="Modules" active="1" hide_host_mode="0">
+      <class_name>AdminModulesCatalog</class_name>
+    </tab>
     <!-- <tab id="Modules_Themes_Catalog" id_parent="Modules" active="1" hide_host_mode="0">
       <class_name>AdminAddonsCatalog</class_name>
     </tab> -->
