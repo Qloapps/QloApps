@@ -113,7 +113,7 @@ class HotelOrderRestrictDate extends ObjectModel
                                         $context->language->id
                                     );
                                     $controller->errors[] = sprintf(
-                                        'You can not book rooms for hotel \'%s\' after date %s. Please remove such rooms to proceed.',
+                                        'You can not book rooms for hotel \'%s\' after date %s. Please remove these rooms to proceed.',
                                         $objBranchInfo->hotel_name,
                                         Tools::displayDate($maxOrderDate)
                                     );
@@ -131,7 +131,7 @@ class HotelOrderRestrictDate extends ObjectModel
                                         $context->language->id
                                     );
                                     $controller->errors[] = sprintf(
-                                        'You can not book rooms for hotel \'%s\' before date %s. Please remove such rooms to proceed.',
+                                        'You can not book rooms for hotel \'%s\' before date %s. Please remove these rooms to proceed.',
                                         $objBranchInfo->hotel_name,
                                         Tools::displayDate($minOrderDate)
                                     );

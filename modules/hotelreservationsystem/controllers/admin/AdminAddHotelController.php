@@ -305,23 +305,24 @@ class AdminAddHotelController extends ModuleAdminController
             $this->errors[] = $this->l('Enter a Valid City Name.');
         }
 
-
-        if (!$enableUseGlobalMaxOrderDate) {
-            $maximumBookingDateFormatted = date('Y-m-d', strtotime($maximumBookingDate));
-            if ($maximumBookingDate == '') {
-                $this->errors[] = Tools::displayError('Maximum Global Date to book a room is a required field.');
-            } elseif (!Validate::isDate($maximumBookingDateFormatted)) {
-                $this->errors[] = Tools::displayError('Maximum Global Date to book a room is invalid.');
-            } elseif (strtotime($maximumBookingDateFormatted) < strtotime(date('Y-m-d'))) {
-                $this->errors[] = Tools::displayError('Maximum Global Date to book a room can not be a past date. Please use a future date.');
+        if ($idHotel) {
+            if (!$enableUseGlobalMaxOrderDate) {
+                $maximumBookingDateFormatted = date('Y-m-d', strtotime($maximumBookingDate));
+                if ($maximumBookingDate == '') {
+                    $this->errors[] = Tools::displayError('Maximum Global Date to book a room is a required field.');
+                } elseif (!Validate::isDate($maximumBookingDateFormatted)) {
+                    $this->errors[] = Tools::displayError('Maximum Global Date to book a room is invalid.');
+                } elseif (strtotime($maximumBookingDateFormatted) < strtotime(date('Y-m-d'))) {
+                    $this->errors[] = Tools::displayError('Maximum Global Date to book a room can not be a past date. Please use a future date.');
+                }
             }
-        }
 
-        if (!$enableUseGlobalPreparationTime) {
-            if ($preparationTime === '') {
-                $this->errors[] = Tools::displayError('Preparation time is a required field.');
-            } elseif ($preparationTime !== '0' && !Validate::isUnsignedInt($preparationTime)) {
-                $this->errors[] = Tools::displayError('Preparation time is invalid.');
+            if (!$enableUseGlobalPreparationTime) {
+                if ($preparationTime === '') {
+                    $this->errors[] = Tools::displayError('Preparation time is a required field.');
+                } elseif ($preparationTime !== '0' && !Validate::isUnsignedInt($preparationTime)) {
+                    $this->errors[] = Tools::displayError('Preparation time is invalid.');
+                }
             }
         }
 
@@ -508,25 +509,27 @@ class AdminAddHotelController extends ModuleAdminController
                 }
             }
 
-            // save maximum booking date and preparation time
-            $objHotelOrderRestrictDate = new HotelOrderRestrictDate();
-            $restrictDateInfo = HotelOrderRestrictDate::getDataByHotelId($newIdHotel);
-            if ($restrictDateInfo) {
-                $objHotelOrderRestrictDate = new HotelOrderRestrictDate($restrictDateInfo['id']);
-            } else {
+            if ($idHotel) {
+                // save maximum booking date and preparation time
                 $objHotelOrderRestrictDate = new HotelOrderRestrictDate();
-            }
+                $restrictDateInfo = HotelOrderRestrictDate::getDataByHotelId($newIdHotel);
+                if ($restrictDateInfo) {
+                    $objHotelOrderRestrictDate = new HotelOrderRestrictDate($restrictDateInfo['id']);
+                } else {
+                    $objHotelOrderRestrictDate = new HotelOrderRestrictDate();
+                }
 
-            $objHotelOrderRestrictDate->id_hotel = $newIdHotel;
-            $objHotelOrderRestrictDate->use_global_max_order_date = $enableUseGlobalMaxOrderDate;
-            if (!$enableUseGlobalMaxOrderDate) {
-                $objHotelOrderRestrictDate->max_order_date = $maximumBookingDateFormatted;
+                $objHotelOrderRestrictDate->id_hotel = $newIdHotel;
+                $objHotelOrderRestrictDate->use_global_max_order_date = $enableUseGlobalMaxOrderDate;
+                if (!$enableUseGlobalMaxOrderDate) {
+                    $objHotelOrderRestrictDate->max_order_date = $maximumBookingDateFormatted;
+                }
+                $objHotelOrderRestrictDate->use_global_preparation_time = $enableUseGlobalPreparationTime;
+                if (!$enableUseGlobalPreparationTime) {
+                    $objHotelOrderRestrictDate->preparation_time = $preparationTime;
+                }
+                $objHotelOrderRestrictDate->save();
             }
-            $objHotelOrderRestrictDate->use_global_preparation_time = $enableUseGlobalPreparationTime;
-            if (!$enableUseGlobalPreparationTime) {
-                $objHotelOrderRestrictDate->preparation_time = $preparationTime;
-            }
-            $objHotelOrderRestrictDate->save();
 
             if (Tools::isSubmit('submitAdd'.$this->table.'AndStay')) {
                 if ($idHotel) {
