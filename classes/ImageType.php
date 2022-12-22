@@ -120,9 +120,11 @@ class ImageTypeCore extends ObjectModel
      * @param string $type_name Name
      * @return array Image type definition
      */
-    public static function getTypeByName($name)
+    public static function getByName($name)
     {
-        return Db::getInstance()->getRow('SELECT * FROM `'._DB_PREFIX_.'image_type` WHERE `name` like "'.pSQL($name).'"');
+        return Db::getInstance()->getRow(
+            'SELECT `id_image_type`, `width`, `height` FROM `'._DB_PREFIX_.'image_type` WHERE `name` like "'.pSQL($name).'"'
+        );
     }
 
     /**

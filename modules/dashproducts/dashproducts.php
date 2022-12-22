@@ -347,8 +347,8 @@ class DashProducts extends Module
 						$img = ImageManager::thumbnail($path_to_image, 'product_mini_'.$product_obj->id.'.'.$this->context->controller->imageType, 45, $this->context->controller->imageType);
 					}
 
-					$objHRT = new HotelRoomType($product_obj->id);
-					$objHotelBranch = new HotelBranchInformation($objHRT->id_hotel, $this->context->language->id);
+					$objHotelRoomType = new HotelRoomType($product_obj->id);
+					$objHotelBranch = new HotelBranchInformation($objHotelRoomType->id_hotel, $this->context->language->id);
 
 					$tr = array();
 					$tr[] = array(

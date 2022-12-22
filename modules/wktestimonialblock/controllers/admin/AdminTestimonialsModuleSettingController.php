@@ -295,7 +295,7 @@ class AdminTestimonialsModuleSettingController extends ModuleAdminController
                 if ($_FILES['testimonial_image']['size']) {
                     $testimonial_img_path = _PS_MODULE_DIR_.$this->module->name.'/views/img/hotels_testimonials_img/'.
                     $objTestimonialData->id.'.jpg';
-                    $imageSize = ImageType::getTypeByName(ImageType::getFormatedName('small'));
+                    $imageSize = ImageType::getByName(ImageType::getFormatedName('small'));
                     ImageManager::resize(
                         $_FILES['testimonial_image']['tmp_name'],
                         $testimonial_img_path,

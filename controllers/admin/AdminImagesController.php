@@ -70,7 +70,7 @@ class AdminImagesControllerCore extends AdminController
                 'suffix' => ' px'
             ),
             'products' => array(
-                'title' => $this->l('Products'),
+                'title' => $this->l('Room Types/Products'),
                 'align' => 'center',
                 'type' => 'bool',
                 'active' => 'products',
@@ -91,7 +91,6 @@ class AdminImagesControllerCore extends AdminController
                 'type' => 'bool',
                 'active' => 'hotels',
                 'ajax' => true,
-                'callback' => 'printEntityActiveIcon',
                 'orderby' => false
             ),
         );
@@ -261,7 +260,7 @@ class AdminImagesControllerCore extends AdminController
                 ),
                 array(
                     'type' => 'switch',
-                    'label' => $this->l('Products'),
+                    'label' => $this->l('Room Types/Products'),
                     'name' => 'products',
                     'required' => false,
                     'is_bool' => true,
@@ -341,9 +340,9 @@ class AdminImagesControllerCore extends AdminController
                     $objImageType->$action = !$objImageType->$action;
                     if ($objImageType->save()) {
                         $response['success'] = true;
-                        $response['text'] = $this->l('The status has been updated successfully.');
+                        $response['text'] = $this->l('Updated successfully.');
                     } else {
-                        $response['text'] = $this->l('An error occurred while updating this status.');
+                        $response['text'] = $this->l('An error occurred while updating image type for .'.$action);
                     }
                 }
             }
@@ -413,7 +412,7 @@ class AdminImagesControllerCore extends AdminController
     {
         $types = array(
             'categories' => $this->l('Categories'),
-            'products' => $this->l('Room Types'),
+            'products' => $this->l('Room Types/Products'),
             'hotels' => $this->l('Hotels'),
         );
 

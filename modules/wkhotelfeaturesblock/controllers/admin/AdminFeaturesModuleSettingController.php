@@ -317,7 +317,7 @@ class AdminFeaturesModuleSettingController extends ModuleAdminController
                 if (file_exists($imgPath)) {
                     unlink($imgPath);
                 }
-                $imageSize = ImageType::getTypeByName(ImageType::getFormatedName('large'));
+                $imageSize = ImageType::getByName(ImageType::getFormatedName('large'));
                 ImageManager::resize(
                     $file['tmp_name'],
                     $imgPath,

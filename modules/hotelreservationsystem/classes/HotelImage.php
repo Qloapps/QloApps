@@ -26,7 +26,7 @@ class HotelImage extends ObjectModel
 
     public $image_format = 'jpg';
 
-    protected static $access_rights = 0775;
+    protected static $access_rights = 0755;
 
     public static $definition = array(
         'table' => 'htl_image',
