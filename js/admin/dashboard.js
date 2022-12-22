@@ -109,15 +109,6 @@ function data_value(widget_name, data) {
     }
 }
 
-function data_avail_pie_chart(widget_name, data) {
-    if (data) {
-        $("#pie_occupied_text").text(data.count_occupied + '/' + data.count_total);
-        $("#pie_avail_text").text(data.count_available);
-        $("#pie_inactive_text").text(data.count_unavailable);
-        generateAvailablityPieChart(data.chart_data);
-    }
-}
-
 function data_trends(widget_name, data) {
     for (var data_id in data) {
         this.el = $('#' + data_id);

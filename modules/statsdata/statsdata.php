@@ -48,13 +48,8 @@ class StatsData extends Module
 
     public function install()
     {
-        if (_PS_VERSION_ >= 1.7) {
-            $hookFooter = 'displayBeforeBodyClosingTag';
-        } else {
-            $hookFooter = 'footer';
-        }
         return (parent::install()
-            && $this->registerHook($hookFooter)
+            && $this->registerHook('displayFooter')
             && $this->registerHook('authentication')
             && $this->registerHook('createAccount'));
     }
@@ -74,66 +69,9 @@ class StatsData extends Module
         return $html;
     }
 
-    public function hookFooter($params)
+    public function hookDisplayFooter($params)
     {
-        if (_PS_VERSION_ < 1.7) {
-            $script_content_plugins = $this->getScriptPlugins($params);
-            $script_content_pages_views = $this->getScriptCustomerPagesViews($params);
-
-            return $script_content_plugins . $script_content_pages_views;
-        }
-
-        return false;
-    }
-
-    public function hookDisplayBeforeBodyClosingTag($params)
-    {
-        if (_PS_VERSION_ >= 1.7) {
-            $script_content_plugins = $this->getScriptPlugins($params);
-            $script_content_pages_views = $this->getScriptCustomerPagesViews($params);
-
-            return $script_content_plugins . $script_content_pages_views;
-        }
-
-        return false;
-    }
-
-    private function getScriptPlugins($params)
-    {
-        if (!isset($params['cookie']->id_guest)) {
-            Guest::setNewGuest($params['cookie']);
-
-            if (Configuration::get('PS_STATSDATA_PLUGINS')) {
-                if (_PS_VERSION_ >= 1.7) {
-                    $this->context->controller->registerJavascript('modules-plugindetect', 'modules/'.$this->name.'/js/plugindetect.js', array('position' => 'bottom', 'priority' => 150));
-                } else {
-                    $this->context->controller->addJS($this->_path.'js/plugindetect.js');
-                }
-
-                $token = sha1($params['cookie']->id_guest._COOKIE_KEY_);
-                return '<script type="text/javascript">
-					$(document).ready(function() {
-						plugins = new Object;
-						plugins.adobe_director = (PluginDetect.getVersion("Shockwave") != null) ? 1 : 0;
-						plugins.adobe_flash = (PluginDetect.getVersion("Flash") != null) ? 1 : 0;
-						plugins.apple_quicktime = (PluginDetect.getVersion("QuickTime") != null) ? 1 : 0;
-						plugins.windows_media = (PluginDetect.getVersion("WindowsMediaPlayer") != null) ? 1 : 0;
-						plugins.sun_java = (PluginDetect.getVersion("java") != null) ? 1 : 0;
-						plugins.real_player = (PluginDetect.getVersion("RealPlayer") != null) ? 1 : 0;
-
-						navinfo = { screen_resolution_x: screen.width, screen_resolution_y: screen.height, screen_color:screen.colorDepth};
-						for (var i in plugins)
-							navinfo[i] = plugins[i];
-						navinfo.type = "navinfo";
-						navinfo.id_guest = "'.(int)$params['cookie']->id_guest.'";
-						navinfo.token = "'.$token.'";
-						$.post("'.Context::getContext()->link->getPageLink('statistics', (bool)(Tools::getShopProtocol() == 'https://')).'", navinfo);
-					});
-				</script>';
-            }
-        }
-
-        return '';
+        return $this->getScriptCustomerPagesViews($params);
     }
 
     private function getScriptCustomerPagesViews($params)
