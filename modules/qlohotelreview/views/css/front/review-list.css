@@ -1,0 +1,287 @@
+/**
+* 2010-2022 Webkul.
+*
+* NOTICE OF LICENSE
+*
+* All right is reserved,
+* Please go through LICENSE.txt file inside our module
+*
+* DISCLAIMER
+*
+* Do not edit or add to this file if you wish to upgrade this module to newer
+* versions in the future. If you wish to customize this module for your
+* needs please refer to CustomizationPolicy.txt file inside our module for more information.
+*
+* @author Webkul IN
+* @copyright 2010-2022 Webkul IN
+* @license LICENSE.txt
+*/
+
+#hotel-reviews {
+    padding: 20px;
+}
+
+/* commons - start */
+#hotel-reviews .btn-primary-review {
+    background: #379BF0;
+    padding: 10px 25px;
+    border: none;
+    color: #fff;
+    font-weight: bold;
+}
+
+#hotel-reviews .btn-primary-review:hover {
+    opacity: 0.8;
+}
+/* commons - end */
+
+#hotel-reviews .review-summary .score-wrap,
+#hotel-reviews .review-summary .category-wrap {
+    margin-bottom: 20px;
+}
+
+#hotel-reviews .review {
+    padding: 15px 0;
+    border-bottom: 1px solid #ccc;
+}
+
+#hotel-reviews .images-wrap {
+    padding: 4px 0;
+}
+
+#hotel-reviews .image-wrap {
+    display: inline-block;
+    width: 100px;
+    height: 100px;
+    margin-right: 4px;
+}
+
+#hotel-reviews .image-wrap img {
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+    border-radius: 4px;
+}
+
+#hotel-reviews .title-primary {
+    font-size: 14px;
+    line-height: 18px;
+    font-weight: 700;
+}
+
+#hotel-reviews .score-wrap .score {
+    font-size: 30px;
+    line-height: 38px;
+    color: #000;
+}
+
+#hotel-reviews .score-wrap .max {
+    font-size: 18px;
+    line-height: 23px;
+    font-weight: 600;
+    color: #000;
+}
+
+#hotel-reviews .score-wrap .tool-text {
+    font-size: 12px;
+    line-height: 15px;
+    font-weight: 400;
+    color: #333;
+    margin: 0;
+    padding-top: 4px;
+}
+
+#hotel-reviews .category-wrap .score-circle-wrap {
+    position: relative;
+    width: 100%;
+    padding-bottom: 100%;
+}
+
+#hotel-reviews .category-wrap .score-circle {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+#hotel-reviews .category-wrap .score-circle canvas {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 120% !important;
+    height: 120% !important;
+    padding: 8px;
+}
+
+#hotel-reviews .category-wrap .class-list-item-wrap {
+    position: relative;
+    margin-bottom: 45px;
+    min-width: 100px;
+}
+
+#hotel-reviews .category-wrap .class-list-item-wrap .name {
+    font-size: 14px;
+    font-weight: bold;
+    color: #555555;
+    text-align: center;
+
+    position: absolute;
+    left: 0;
+    top: 105%;
+    width: 100%;
+}
+
+#hotel-reviews .category-wrap .class-list-item-wrap .title {
+    font-size: 16px;
+    line-height: 100%;
+    font-weight: bold;
+    color: #000000;
+    text-align: center;
+
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100%;
+    transform: translate(-50%, -50%);
+}
+
+#hotel-reviews .heading-primary {
+    font-size: 20px;
+    font-weight: bold;
+    line-height: 25px;
+    color: #333;
+    margin: 0;
+}
+
+#hotel-reviews .heading-secondary {
+    font-size: 14px;
+    font-weight: bold;
+    line-height: 18px;
+    margin: 3px 0;
+}
+
+#hotel-reviews .date-add {
+    font-size: 14px;
+    line-height: 18px;
+    color: #333;
+    padding-top: 6px;
+}
+
+#hotel-reviews .description {
+    font-size: 14px;
+    line-height: 24px;
+    color: #333;
+    white-space: break-spaces;
+}
+
+#hotel-reviews .btn-helpful span {
+    font-size: 14px;
+    line-height: 18px;
+    color: #333;
+}
+
+#hotel-reviews .btn-helpful i {
+    margin-left: 4px;
+}
+
+#hotel-reviews .helpful-count {
+    font-style: normal;
+    font-size: 14px;
+    line-height: 18px;
+    color: #999;
+}
+
+#hotel-reviews .btn-report-abuse {
+    font-weight: bold;
+    font-size: 14px;
+    line-height: 18px;
+    text-decoration-line: underline;
+    color: #E85757;
+}
+
+#hotel-reviews .reply-wrap {
+    margin-top: 10px;
+}
+
+#hotel-reviews .reply-box {
+    padding: 20px;
+    border: 1px solid #ccc;
+}
+
+#hotel-reviews .reply-box .heading-secondary {
+    font-weight: normal;
+    color: #333;
+}
+
+#hotel-reviews .reply-message {
+    margin-top: 5px;
+}
+
+#hotel-reviews .reply-message p {
+    font-size: 14px;
+    line-height: 20px;
+    color: #333;
+    margin: 0;
+    white-space: break-spaces;
+}
+
+#hotel-reviews .media-list-wrap .title {
+    font-size: 14px;
+    line-height: 18px;
+    font-weight: bold;
+    color: #999;
+}
+
+#hotel-reviews .media-list {
+    padding-bottom: 10px;
+}
+
+#hotel-reviews .media-item-wrap {
+    display: inline-block;
+    width: 100px;
+    height: 100px;
+    margin-right: 4px;
+}
+
+#hotel-reviews .media-item {
+    display: inline-block;
+    height: 100px;
+    width: 100%;
+}
+
+#hotel-reviews .media-item img {
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#hotel-reviews #btn-load-more-reviews {
+    margin-top: 15px;
+}
+
+#hotel-reviews .review-list-actions {
+    margin: 30px 0 20px;
+}
+
+#hotel-reviews .sort-by {
+    display: inline-block;
+    font-weight: bold;
+    margin-right: 5px;
+}
+
+#hotel-reviews .review-sort-by button {
+    text-align: left;
+    min-width: 170px;
+}
+
+#hotel-reviews .dropdown-menu {
+    width: 170px;
+}
+
+#hotel-reviews .review-sort-by .caret {
+    position: absolute;
+    top: 15px;
+    right: 12px;
+}

@@ -3324,11 +3324,13 @@ exit;
             'iso_lang' => Tools::strtolower(isset($params['iso_lang']) ? $params['iso_lang'] : Context::getContext()->language->iso_code),
             'iso_code' => Tools::strtolower(isset($params['iso_country']) ? $params['iso_country'] : Country::getIsoById(Configuration::get('PS_COUNTRY_DEFAULT'))),
             'shop_url' => isset($params['shop_url']) ? $params['shop_url'] : Tools::getShopDomain(),
+            'shop_url_ssl' => isset($params['shop_url_ssl']) ? $params['shop_url_ssl'] : Tools::getShopDomainSsl(),
+            'physical_uri' => Context::getContext()->shop->physical_uri,
             'mail' => isset($params['email']) ? $params['email'] : Configuration::get('PS_SHOP_EMAIL')
         ));
 
         $protocols = array('https');
-        $end_point = 'api.qloapps.com';
+        $end_point = _QLO_API_DOMAIN_;
 
         switch ($request) {
             case 'native':
@@ -3347,6 +3349,10 @@ exit;
                 $protocols[] = 'http';
                 $post_data .= '&method=listing&action=must-have-themes';
                 break;
+            case 'addons-modules':
+                $protocols[] = 'http';
+                $post_data .= '&method=listing&action=addons-modules';
+                break;
             case 'customer':
                 $post_data .= '&method=listing&action=customer&username='.urlencode(trim(Context::getContext()->cookie->username_addons))
                     .'&password='.urlencode(trim(Context::getContext()->cookie->password_addons));
@@ -3359,10 +3365,10 @@ exit;
                 $post_data .= '&method=check_customer&username='.urlencode($params['username_addons']).'&password='.urlencode($params['password_addons']);
                 break;
             case 'check_module':
-                $post_data .= '&method=check&module_name='.urlencode($params['module_name']).'&module_key='.urlencode($params['module_key']);
-                break;
+               $post_data .= '&method=check&module='.urlencode($params['module_name']);
+               break;
             case 'module':
-                $post_data .= '&method=module&module_name='.urlencode($params['module_name']);
+                $post_data .= '&method=module&module='.urlencode($params['module_name']);
                 if (isset($params['username_addons']) && isset($params['password_addons'])) {
                     $post_data .= '&username='.urlencode($params['username_addons']).'&password='.urlencode($params['password_addons']);
                 } else {
@@ -3374,12 +3380,23 @@ exit;
                     .'&password='.urlencode($params['password_addons'])
                     .'&shop_url='.urlencode(isset($params['shop_url']) ? $params['shop_url'] : Tools::getShopDomain())
                     .'&mail='.urlencode(isset($params['email']) ? $params['email'] : Configuration::get('PS_SHOP_EMAIL'));
-                $protocols[] = 'https';
                 break;
             case 'install-modules':
-                $protocols[] = 'http';
                 $post_data .= '&method=listing&action=install-modules';
                 $post_data .= defined('_PS_HOST_MODE_') ? '-od' : '';
+                break;
+            case 'catalog-recommendation':
+                $protocols[] = 'http';
+                $post_data .= '&method=content&action=catalogRecommendation';
+                $post_data .= defined('_PS_HOST_MODE_') ? '-od' : '';
+                break;
+            case 'dashboard-recommendation':
+                $protocols[] = 'http';
+                $post_data .= '&method=content&action=dashboardRecommendation';
+                $post_data .= defined('_PS_HOST_MODE_') ? '-od' : '';
+                break;
+            case 'check-version':
+                $post_data .= '&method=check-version&autoupgrade='.(int)(Module::isInstalled('qloautoupgrade') && Module::isEnabled('qloautoupgrade'));
                 break;
             default:
                 return false;

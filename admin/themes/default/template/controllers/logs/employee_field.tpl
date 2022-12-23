@@ -22,7 +22,7 @@
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
-<span class="employee_avatar_small">
-	<img class="imgm img-thumbnail" alt="" src="{$employee_image}" width="32" height="32" />
-</span>
-{$employee_name}
+
+{$employee_name|escape:'html':'UTF-8'}
+<br />
+({$employee_email|escape:'html':'UTF-8'})

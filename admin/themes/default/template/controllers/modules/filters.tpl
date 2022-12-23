@@ -29,11 +29,6 @@
 	<div class="col-lg-8">
 		<div class="form-group">
 			<label>{l s='Filter by'}</label>
-			<select name="module_install" id="module_install_filter" class="form-control {if isset($showInstalledModules) && $showInstalledModules && $showInstalledModules != 'installedUninstalled' }active{/if}">
-				<option value="installedUninstalled" {if $showInstalledModules eq 'installedUninstalled'}selected="selected"{/if}>{l s='Installed & Not Installed'}</option>
-				<option value="installed" {if $showInstalledModules eq 'installed'}selected="selected"{/if}>{l s='Installed Modules'}</option>
-				<option value="uninstalled" {if $showInstalledModules eq 'uninstalled'}selected="selected"{/if}>{l s='Modules Not Installed '}</option>
-			</select>
 		</div>
 
 		<div class="form-group">
@@ -71,10 +66,10 @@
 	<!-- <span class="pull-right">
 		<button class="btn btn-default " type="submit" name="resetFilterModules">
 			<i class="icon-eraser"></i>
-			{l s='Reset'} 
+			{l s='Reset'}
 		</button>
 		<button class="btn btn-default " name="filterModules" id="filterModulesButton" type="submit">
-			<i class="icon-filter"></i> 
+			<i class="icon-filter"></i>
 			{l s='Filter'}
 		</button>
 	</span> -->

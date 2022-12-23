@@ -59,6 +59,7 @@
   <tab id="Tax_Rules" name="Daňová pravidla"/>
   <tab id="Translations" name="Překlady"/>
   <tab id="Modules_1" name="Moduly a Služby"/>
+  <tab id="Modules_Catalog" name="Modules Catalog"/>
   <tab id="Modules_Themes_Catalog" name="Katalog modulů a šablon"/>
   <tab id="Positions" name="Pozice modulů"/>
   <tab id="Payment" name="Platba"/>

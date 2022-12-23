@@ -36,8 +36,8 @@ class HotelReservationSystem extends Module
         $this->bootstrap = true;
         parent::__construct();
         $this->displayName = $this->l('Hotel Booking and Reservation System');
-        $this->description = $this->l('Now you can be able to build your website for your hotels for their bookings and reservations by using this module.');
-        $this->confirmUninstall = $this->l('Are you sure? All module data will be lost after uninstalling the module');
+        $this->description = $this->l('This module is the backbone of QloApps and handles all booking processes on your website.');
+        $this->confirmUninstall = $this->l('This module should not be uninstalled under any circumstances. Doing so may cause undesired results.');
     }
 
     public function hookAddWebserviceResources()
@@ -100,6 +100,40 @@ class HotelReservationSystem extends Module
         $this->context->controller->addJS($this->_path.'/views/js/HotelReservationFront.js');
     }
 
+    public function hookDisplayLeftColumn()
+    {
+        if (Tools::getValue('controller') == 'category') {
+            if ($apiKey = Configuration::get('PS_API_KEY')) {
+                $idCategory = Tools::getValue('id_category');
+                $idHotel = HotelBranchInformation::getHotelIdByIdCategory($idCategory);
+                $objHotel = new HotelBranchInformation($idHotel, $this->context->language->id);
+
+                if (floatval($objHotel->latitude) != 0
+                    && floatval($objHotel->longitude) != 0
+                ) {
+                    Media::addJsDef(array(
+                        'hotel_location' => array(
+                            'latitude' => $objHotel->latitude,
+                            'longitude' => $objHotel->longitude,
+                            'map_input_text' => $objHotel->map_input_text,
+                        ),
+                        'hotel_name' => $objHotel->hotel_name,
+                    ));
+
+                    $this->context->controller->addJS(
+                        'https://maps.googleapis.com/maps/api/js?key='.$apiKey.'&libraries=places&language='.
+                        $this->context->language->iso_code.'&region='.$this->context->country->iso_code
+                    );
+                    $this->context->controller->addJS($this->getPathUri().'views/js/searchResultsMap.js');
+                    $this->context->controller->addCSS($this->getPathUri().'views/css/searchResultsMap.css');
+
+                    $this->context->smarty->assign('hotel', $objHotel);
+                    return $this->display(__FILE__, 'searchResultsMap.tpl');
+                }
+            }
+        }
+    }
+
     public function hookDisplayAfterHookTop()
     {
         if (Tools::getValue('controller') == 'index') {
@@ -113,15 +147,41 @@ class HotelReservationSystem extends Module
         }
     }
 
-    public function hookFooter($params)
+    public function hookDisplayFooter($params)
     {
         /*NOTE : NEVER REMOVE THIS CODE BEFORE DISCUSSION*/
         /*id_guest is set to the context->cookie object because data mining for prestashop module is disabled
         in which id_guest was set before this*/
         if (!isset($this->context->cookie->id_guest)) {
             Guest::setNewGuest($this->context->cookie);
+
+            if (Configuration::get('PS_STATSDATA_PLUGINS')) {
+                $this->context->controller->addJS($this->_path.'views/js/plugindetect.js');
+
+                $token = sha1($params['cookie']->id_guest._COOKIE_KEY_);
+
+                return '<script type="text/javascript">
+                    $(document).ready(function() {
+                        plugins = new Object;
+                        plugins.adobe_director = (PluginDetect.getVersion("Shockwave") != null) ? 1 : 0;
+                        plugins.adobe_flash = (PluginDetect.getVersion("Flash") != null) ? 1 : 0;
+                        plugins.apple_quicktime = (PluginDetect.getVersion("QuickTime") != null) ? 1 : 0;
+                        plugins.windows_media = (PluginDetect.getVersion("WindowsMediaPlayer") != null) ? 1 : 0;
+                        plugins.sun_java = (PluginDetect.getVersion("java") != null) ? 1 : 0;
+                        plugins.real_player = (PluginDetect.getVersion("RealPlayer") != null) ? 1 : 0;
+
+                        navinfo = { screen_resolution_x: screen.width, screen_resolution_y: screen.height, screen_color:screen.colorDepth};
+                        for (var i in plugins)
+                            navinfo[i] = plugins[i];
+                        navinfo.type = "navinfo";
+                        navinfo.id_guest = "'.(int)$params['cookie']->id_guest.'";
+                        navinfo.token = "'.$token.'";
+                        $.post("'.Context::getContext()->link->getPageLink('statistics', (bool)(Tools::getShopProtocol() == 'https://')).'", navinfo);
+                    });
+                </script>';
+            }
         }
-        // return $this->display(__FILE__, 'hotelGlobalVariables.tpl');
+
     }
     public function hookDisplayAfterDefautlFooterHook($params)
     {
@@ -429,7 +489,6 @@ class HotelReservationSystem extends Module
         );
 
         // Controllers without tabs
-        $this->installTab('AdminOrderRestrictSettings', 'Order Restrict Configuration', false, false);
         $this->installTab('AdminHotelGeneralSettings', 'Hotel General configuration', false, false);
         $this->installTab('AdminHotelFeaturePricesSettings', 'Advanced Price Rules', false, false);
         $this->installTab('AdminRoomTypeGlobalDemand', 'Additional Demand Configuration', false, false);
@@ -504,7 +563,7 @@ class HotelReservationSystem extends Module
                 'actionOrderHistoryAddAfter',
                 'displayBackOfficeHeader',
                 'actionObjectProductDeleteBefore',
-                'footer',
+                'displayFooter',
                 'displayAfterDefautlFooterHook',
                 'actionProductSave',
                 'addWebserviceResources',
@@ -515,7 +574,8 @@ class HotelReservationSystem extends Module
                 'actionObjectProfileAddAfter',
                 'actionObjectProfileDeleteBefore',
                 'actionObjectGroupDeleteBefore',
-                'actionOrderStatusPostUpdate'
+                'actionOrderStatusPostUpdate',
+                'displayLeftColumn',
             )
         );
     }

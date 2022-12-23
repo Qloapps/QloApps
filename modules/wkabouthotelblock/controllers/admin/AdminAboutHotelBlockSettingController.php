@@ -70,7 +70,7 @@ class AdminAboutHotelBlockSettingController extends ModuleAdminController
             ),
         );
 
-        $this->informations[] = $this->l('For better view, upload hotel interior image in multiple of 3.');
+        $this->informations[] = $this->l('Keep interior images in a multiple of 3 for the best view.');
         $this->addRowAction('edit');
         $this->addRowAction('delete');
 
@@ -165,7 +165,7 @@ class AdminAboutHotelBlockSettingController extends ModuleAdminController
 
     public function renderForm()
     {
-        $imageUrl = $imageSize = false;
+        $imgUrl = $imageSize = $imgExist = $image = false;
 
         if ($this->display == 'edit') {
             $idHtlInterior = Tools::getValue('id_interior_image');
@@ -190,6 +190,7 @@ class AdminAboutHotelBlockSettingController extends ModuleAdminController
             }
 
         }
+
         $this->fields_form = array(
             'legend' => array(
                 'title' => $this->l('Add New Hotel Interior Image'),
