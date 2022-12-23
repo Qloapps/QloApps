@@ -513,7 +513,6 @@ class AdminCustomerThreadsControllerCore extends AdminController
         $helper->id = 'box-pending-messages';
         $helper->icon = 'icon-envelope';
         $helper->color = 'color1';
-        $helper->href = $this->context->link->getAdminLink('AdminCustomerThreads');
         $helper->title = $this->l('Pending Discussion Threads', null, null, false);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=pending_messages';
         $kpis[] = $helper->generate();

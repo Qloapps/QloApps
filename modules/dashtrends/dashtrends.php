@@ -80,6 +80,7 @@ class Dashtrends extends Module
         return $this->display(__FILE__, 'dashboard_zone_two.tpl');
     }
 
+    // get available data from database for each day within date range
     protected function getData($date_from, $date_to, $id_hotel)
     {
         // We need the following figures to calculate our stats
@@ -114,6 +115,7 @@ class Dashtrends extends Module
         return $tmp_data;
     }
 
+    // interpolate data for missing days within date range
     protected function refineData($date_from, $date_to, $gross_data)
     {
         $refined_data = array(
@@ -128,31 +130,30 @@ class Dashtrends extends Module
         $from = strtotime($date_from.' 00:00:00');
         $to = min(time(), strtotime($date_to.' 23:59:59'));
         for ($date = $from; $date <= $to; $date = strtotime('+1 day', $date)) {
+            // initialize values for current date first
             $refined_data['sales'][$date] = 0;
-            if (isset($gross_data['total_paid_tax_excl'][$date])) {
-                $refined_data['sales'][$date] += $gross_data['total_paid_tax_excl'][$date];
-            }
+            $refined_data['orders'][$date] = 0;
+            $refined_data['average_cart_value'][$date] = 0;
+            $refined_data['visits'][$date] = 0;
+            $refined_data['conversion_rate'][$date] = 0;
+            $refined_data['net_profits'][$date] = 0;
 
+            // calculate actual values now for current date from available $gross_data to be used to display in line chart
+            $refined_data['sales'][$date] = isset($gross_data['total_paid_tax_excl'][$date]) ? $gross_data['total_paid_tax_excl'][$date] : 0;
             $refined_data['orders'][$date] = isset($gross_data['orders'][$date]) ? $gross_data['orders'][$date] : 0;
             $refined_data['average_cart_value'][$date] = $refined_data['orders'][$date] ? $refined_data['sales'][$date] / $refined_data['orders'][$date] : 0;
             $refined_data['visits'][$date] = isset($gross_data['visits'][$date]) ? $gross_data['visits'][$date] : 0;
             $refined_data['conversion_rate'][$date] = $refined_data['visits'][$date] ? $refined_data['orders'][$date] / $refined_data['visits'][$date] : 0;
-            $refined_data['net_profits'][$date] = 0;
 
-            if (isset($gross_data['total_paid_tax_excl'][$date])) {
-                $refined_data['net_profits'][$date] += $gross_data['total_paid_tax_excl'][$date];
-            }
-            if (isset($gross_data['total_purchases'][$date])) {
-                $refined_data['net_profits'][$date] -= $gross_data['total_purchases'][$date];
-            }
-            if (isset($gross_data['total_expenses'][$date])) {
-                $refined_data['net_profits'][$date] -= $gross_data['total_expenses'][$date];
-            }
+            $refined_data['net_profits'][$date] += (isset($gross_data['total_paid_tax_excl'][$date]) ? $gross_data['total_paid_tax_excl'][$date] : 0);
+            $refined_data['net_profits'][$date] -= (isset($gross_data['total_purchases'][$date]) ? $gross_data['total_purchases'][$date] : 0);
+            $refined_data['net_profits'][$date] -= (isset($gross_data['total_expenses'][$date]) ? $gross_data['total_expenses'][$date] : 0);
         }
 
         return $refined_data;
     }
 
+    // calculate sum of individual values
     protected function addupData($data)
     {
         $summing = array(
@@ -233,7 +234,7 @@ class Dashtrends extends Module
                 'orders_score' => Tools::displayNumber($this->dashboard_data_sum['orders'], $this->currency),
                 'cart_value_score' => $cart_value_score,
                 'visits_score' => Tools::displayNumber($this->dashboard_data_sum['visits'], $this->currency),
-                'conversion_rate_score' => round(100 * $this->dashboard_data_sum['conversion_rate'], 2).'%',
+                'conversion_rate_score' => sprintf('%0.2f', 100 * $this->dashboard_data_sum['conversion_rate']).'%',
                 'net_profits_score' => $net_profit_score,
             ),
             'data_trends' => $this->data_trends,
@@ -310,15 +311,15 @@ class Dashtrends extends Module
 
         $charts = array(
             'sales' => $this->l('Sales'),
-            'orders' => $this->l('Orders'),
-            'average_cart_value' => $this->l('Average Cart Value'),
+            'orders' => $this->l('Bookings'),
+            'average_cart_value' => $this->l('Average Order Value'),
             'visits' => $this->l('Visits'),
             'conversion_rate' => $this->l('Conversion Rate'),
             'net_profits' => $this->l('Net Profit')
         );
 
         $gfx_color = array('#72C3F0','#56CE56','#FF4036','#FF7F0E','#A569DF','#AF8A42');
-        $gfx_color_border = array('#11f0fc','#118c11','#9e1010','#af5c13','#681daf','#845c0d');
+        $gfx_color_border = $gfx_color;
         $gfx_color_compare = array('#1777B6','#19900d','#b9140c','#bf6307','#6B399C','#B3591F');
 
         $i = 0;

@@ -58,37 +58,6 @@
 	margin-bottom: 5px;
 }
 
-.ratting_img_style
-{
-    height: 14px;
-    width: 92px;
-    transform: translate(0px, 6px);
-}
-.ratting_5
-{
-    background-position: 0 0;
-}
-.ratting_4
-{
-	background-position: 0 -28px;
-}
-.ratting_3
-{
-	background-position: 0 -54px;
-}
-.ratting_2
-{
-	background-position: 0 -81px;
-}
-.ratting_1
-{
-	background-position: 0 -108px;
-}
-.ratting_0
-{
-	background-position: 0 -135px;
-}
-
 .filters_name, .price_filter_subcont span
 {
 	font-size: 16px;
@@ -97,11 +66,6 @@
 }
 
 .layered_filt div.checker
-{
-	display: inline-block;
-}
-
-.layered_filt span.filters_name, .layered_filt span.ratting_img_style
 {
 	display: inline-block;
 }

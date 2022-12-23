@@ -250,7 +250,10 @@ class HotelReservationSystemDb
             "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_order_restrict_date` (
                 `id` int(11) NOT NULL AUTO_INCREMENT,
                 `id_hotel` int(11) NOT NULL,
-                `max_order_date` datetime NOT NULL,
+                `use_global_max_order_date` tinyint(1) NOT NULL,
+                `max_order_date` date NOT NULL,
+                `use_global_preparation_time` tinyint(1) NOT NULL,
+                `preparation_time` int(11) NOT NULL,
                 `date_add` datetime NOT NULL,
                 `date_upd` datetime NOT NULL,
                 PRIMARY KEY (`id`)

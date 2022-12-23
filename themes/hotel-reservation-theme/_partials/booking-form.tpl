@@ -35,7 +35,6 @@
                         <input type="text" class="form-control input-date" name="room_check_out" id="room_check_out" value="{if isset($date_to)}{$date_to|escape:'html':'UTF-8'|date_format:"%d-%m-%Y"}{/if}" autocomplete="off" readonly />
                     </div>
                 </div>
-                <div class="room_unavailability_date_error_div"></div>
                 {if $total_available_rooms > 0}
                     <div class="unvail_rooms_cond_display row">
                         <div class="form-group col-sm-6" id="quantity_wanted_p"{if (!$allow_oosp && $product->quantity <= 0) || !$product->available_for_order || $PS_CATALOG_MODE} style="display: none;"{/if}>
@@ -82,7 +81,6 @@
                         </div>
                         <hr class="separator-hr-mg-10 form-group unvail_rooms_cond_display">
                     {/if}
-                    <div class="room_unavailability_qty_error_div"></div>
                     <div class="row unvail_rooms_cond_display">
                         <div class="total_price_block col-xs-7 form-group">
                             <label class="control-label">{l s='Subtotal'}</label>
@@ -90,9 +88,7 @@
                         </div>
                         {if $total_available_rooms <= $warning_count}
                             <div class="col-xs-5 form-group pull-right num_quantity_alert">
-                                <span class="num_searched_avail_rooms">
-                                    {$total_available_rooms|escape:'html':'UTF-8'}
-                                </span>
+                                <span>{$total_available_rooms|escape:'html':'UTF-8'}</span>
                                 {if $total_available_rooms > 1} {l s='rooms left!'} {else} {l s='room left!'} {/if}
                             </div>
                         {/if}
