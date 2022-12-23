@@ -57,15 +57,15 @@ class StatsBestCustomers extends ModuleGrid
 
         $this->columns = array(
             array(
-                'id' => 'lastname',
-                'header' => $this->l('Last Name'),
-                'dataIndex' => 'lastname',
+                'id' => 'firstname',
+                'header' => $this->l('First name'),
+                'dataIndex' => 'firstname',
                 'align' => 'center'
             ),
             array(
-                'id' => 'firstname',
-                'header' => $this->l('First Name'),
-                'dataIndex' => 'firstname',
+                'id' => 'lastname',
+                'header' => $this->l('Last name'),
+                'dataIndex' => 'lastname',
                 'align' => 'center'
             ),
             array(
@@ -81,17 +81,17 @@ class StatsBestCustomers extends ModuleGrid
                 'align' => 'center'
             ),
             array(
+                'id' => 'totalMoneySpent',
+                'header' => $this->l('Money spent').' ('.Tools::safeOutput($currency->iso_code).')',
+                'dataIndex' => 'totalMoneySpent',
+                'align' => 'center'
+            ),
+            array(
                 'id' => 'totalValidOrders',
                 'header' => $this->l('Valid orders'),
                 'dataIndex' => 'totalValidOrders',
                 'align' => 'center'
             ),
-            array(
-                'id' => 'totalMoneySpent',
-                'header' => $this->l('Money spent').' ('.Tools::safeOutput($currency->iso_code).')',
-                'dataIndex' => 'totalMoneySpent',
-                'align' => 'center'
-            )
         );
 
         $this->displayName = $this->l('Best customers');
@@ -140,7 +140,7 @@ class StatsBestCustomers extends ModuleGrid
 			</div>
 		'.$this->engine($engine_params).'
 		<a class="btn btn-default export-csv" href="'.Tools::safeOutput($_SERVER['REQUEST_URI'].'&export=').'1">
-			<i class="icon-cloud-upload"></i> '.$this->l('CSV Export').'
+			<i class="icon-cloud-download"></i> '.$this->l('CSV Export').'
 		</a>';
 
         return $this->html;
@@ -148,8 +148,9 @@ class StatsBestCustomers extends ModuleGrid
 
     public function getData()
     {
-        $this->query = '
-		SELECT SQL_CALC_FOUND_ROWS c.`id_customer`, c.`lastname`, c.`firstname`, c.`email`,
+        $currency = new Currency(Configuration::get('PS_CURRENCY_DEFAULT'));
+
+        $this->query = 'SELECT SQL_CALC_FOUND_ROWS c.`id_customer`, c.`lastname`, c.`firstname`, c.`email`,
 			COUNT(co.`id_connections`) as totalVisits,
 			IFNULL((
 				SELECT ROUND(SUM(IFNULL(op.`amount`, 0) / cu.conversion_rate), 2)
@@ -185,7 +186,16 @@ class StatsBestCustomers extends ModuleGrid
             $this->query .= ' LIMIT '.(int)$this->_start.', '.(int)$this->_limit;
         }
 
-        $this->_values = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($this->query);
+        $values = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($this->query);
         $this->_totalCount = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('SELECT FOUND_ROWS()');
+
+        foreach ($values as &$value) {
+            if (Tools::getValue('export') == false) {
+                $value['email'] = '<a href="'.$this->context->link->getAdminLink('AdminCustomers').'&id_customer='.$value['id_customer'].'&updatecustomer" target="_blank">'.$value['email'].'</a>';
+            }
+            $value['totalMoneySpent'] = Tools::displayPrice($value['totalMoneySpent'], $currency);
+        }
+
+        $this->_values = $values;
     }
 }

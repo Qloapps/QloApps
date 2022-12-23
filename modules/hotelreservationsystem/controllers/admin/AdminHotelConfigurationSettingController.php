@@ -26,7 +26,6 @@ class AdminHotelConfigurationSettingController extends ModuleAdminController
         $this->tpl_view_vars = array(
             'feature_price_setting_link' => $this->context->link->getAdminLink('AdminHotelFeaturePricesSettings'),
             'general_setting_link' => $this->context->link->getAdminLink('AdminHotelGeneralSettings'),
-            'order_restrict_setting_link' => $this->context->link->getAdminLink('AdminOrderRestrictSettings'),
             'additional_demand_setting_link' => $this->context->link->getAdminLink('AdminRoomTypeGlobalDemand'),
         );
 

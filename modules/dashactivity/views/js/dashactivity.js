@@ -40,7 +40,6 @@ function pie_chart_trends(widget_name, chart_details)
 			.datum(chart_details.data)
 			.transition().duration(1200)
 			.call(chart);
-
 		nv.utils.windowResize(chart.update);
 
 		return chart;

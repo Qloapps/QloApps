@@ -92,7 +92,7 @@ class DashAvailability extends Module
                 $availability_data['values'][] = array($date, round(rand(0, 20)));
             }
         } else {
-            $availability_data = AdminStatsController::getAvailBarChartData($days, $dateFrom, $params['id_hotel']);
+            $availability_data = AdminStatsController::getAvailabilityLineChartData($days, $dateFrom, $params['id_hotel']);
         }
 
         $availability_data = array_merge(
@@ -111,8 +111,9 @@ class DashAvailability extends Module
             'date_format' => $this->context->language->date_format_lite,
             'data' => $data
         );
+
         return array(
-            'data_chart' => array('availableBarChart' => $data),
+            'data_chart' => array('availability_line_chart1' => $data),
         );
     }
 }
