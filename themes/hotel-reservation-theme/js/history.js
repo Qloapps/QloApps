@@ -156,6 +156,11 @@ function sendOrderMessage()
 }
 
 $(document).ready(function(){
+	var page = $('html, body');
+	page.on('mousewheel', function () {
+		page.stop();
+	});
+
 	// If customer clicks for refund request then toggle refund request fields
 	$('body').on('click', '#order_refund_request', function(e) {
 		e.preventDefault();

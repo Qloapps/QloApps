@@ -31,7 +31,7 @@
 					<th class="fixed-width-md">{$goals_year}</th>
 					<th class="fixed-width-md">{l s='Traffic' mod='dashgoals'}</th>
 					<th class="fixed-width-md">{l s='Conversion Rate' mod='dashgoals'}</th>
-					<th class="fixed-width-lg">{l s='Average Cart Value' mod='dashgoals'}</th>
+					<th class="fixed-width-lg">{l s='Average Order Value' mod='dashgoals'}</th>
 					<th>{l s='Sales' mod='dashgoals'}</th>
 				</tr>
 			</thead>

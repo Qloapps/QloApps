@@ -506,7 +506,7 @@ class AdminThemesControllerCore extends AdminController
         ) {
             return false;
         }
-        if (!$this->isFresh(Theme::CACHE_FILE_CUSTOMER_THEMES_LIST, 86400)) {
+        if (!$this->isFresh(Theme::CACHE_FILE_CUSTOMER_THEMES_LIST, _TIME_1_DAY_)) {
             file_put_contents(_PS_ROOT_DIR_.Theme::CACHE_FILE_CUSTOMER_THEMES_LIST, Tools::addonsRequest('customer_themes'));
         }
 
@@ -2075,6 +2075,15 @@ class AdminThemesControllerCore extends AdminController
                         }
                     }
                     break;
+                case 3:
+                    foreach ($xml->modules as $row) {
+                        if ($row['type'] == 'disk') {
+                            foreach ($row->module as $row2) {
+                                $natives[] = (string)$row2['name'];
+                            }
+                        }
+                    }
+                    break;
             }
 
             if (count($natives) > 0) {
@@ -2111,7 +2120,7 @@ class AdminThemesControllerCore extends AdminController
             'mailalerts',
             'newsletter',
             'pagesnotfound',
-            'productcomments',
+            'qlohotelreview',
             'referralprogram',
             'sekeywords',
             'statsbestcategories',

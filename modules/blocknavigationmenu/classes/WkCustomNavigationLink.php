@@ -181,7 +181,7 @@ class WkCustomNavigationLink extends ObjectModel
                 $modsElems['Testimonials'] = 'hotelTestimonialBlock';
             }
         } else {
-            // if qloapps is installing the enter modules links directly
+            // if QloApps is installing then enter modules links directly
             $modsElems['Interior'] = 'hotelInteriorBlock';
             $modsElems['Amenities'] = 'hotelAmenitiesBlock';
             $modsElems['Rooms'] = 'hotelRoomsBlock';
@@ -222,7 +222,7 @@ class WkCustomNavigationLink extends ObjectModel
         //insert contact link to the list
         $objCustomNavigationLink = new WkCustomNavigationLink();
         foreach ($languages as $language) {
-            $objCustomNavigationLink->name[$language['id_lang']] = 'Contact';
+            $objCustomNavigationLink->name[$language['id_lang']] = 'Contact Us';
         }
         $objCustomNavigationLink->position = $this->getHigherPosition();
         $objCustomNavigationLink->id_cms = 0;

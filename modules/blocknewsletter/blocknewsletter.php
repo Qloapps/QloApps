@@ -908,9 +908,7 @@ class Blocknewsletter extends Module
                     'title' => $this->l('Export Newsletter Subscribers'),
                     'icon' => 'icon-envelope'
                 ),
-                'desc' => array(
-                    array('text' => $this->l('Generate a .CSV file based on BlockNewsletter subscribers data. Only subscribers without an account on the shop will be exported.'))
-                ),
+                'description' => $this->l('Generate a .CSV file based on Newsletter subscribers data. Only subscribers without an account on your website will be exported.'),
                 'submit' => array(
                     'title' => $this->l('Export .CSV file'),
                     'class' => 'btn btn-default pull-right',
