@@ -137,6 +137,7 @@ class WkRoomSearchHelper
         foreach ($hotelsInfo as &$hotel) {
             $maxOrderDate = HotelOrderRestrictDate::getMaxOrderDate($hotel['id']);
             $hotel['max_order_date'] = date('Y-m-d', strtotime($maxOrderDate));
+            $hotel['preparation_time'] = (int) HotelOrderRestrictDate::getPreparationTime($hotel['id']);
         }
         $smartyVars['location_enabled'] = $locationEnabled;
         $smartyVars['total_active_hotels'] = $totalActiveHotels;
@@ -145,6 +146,7 @@ class WkRoomSearchHelper
 
         $maxOrderDate = HotelOrderRestrictDate::getMaxOrderDate($idHotel);
         $smartyVars['max_order_date'] = date('Y-m-d', strtotime($maxOrderDate));
+        $smartyVars['preparation_time'] = (int) HotelOrderRestrictDate::getPreparationTime($idHotel);
 
         Context::getContext()->smarty->assign($smartyVars);
     }

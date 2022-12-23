@@ -1351,7 +1351,7 @@ class AdminModulesControllerCore extends AdminController
         $helper->id = 'box-update-modules';
         $helper->icon = 'icon-refresh';
         $helper->color = 'color3';
-        $helper->title = $this->l('Modules to update', null, null, false);
+        $helper->title = $this->l('Modules to Update', null, null, false);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=update_modules';
         $kpis[] = $helper->generate();
 

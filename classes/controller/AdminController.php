@@ -2243,6 +2243,7 @@ class AdminControllerCore extends Controller
         } else {
             $this->status = 'cache';
         }
+        Module::generateTrustedXml();
     }
 
     /**

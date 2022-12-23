@@ -73,13 +73,11 @@ class AdminDashboardControllerCore extends AdminController
     {
         $forms = array();
         $currency = new Currency(Configuration::get('PS_CURRENCY_DEFAULT'));
-        $carriers = Carrier::getCarriers($this->context->language->id, true, false, false, null, 'ALL_CARRIERS');
         $modules = Module::getModulesOnDisk(true);
 
         $forms = array(
+            'net_profit' => array('title' => $this->l('Net Profit settings'), 'id' => 'net_profit'),
             'payment' => array('title' => $this->l('Average bank fees per payment method'), 'id' => 'payment'),
-            'carriers' => array('title' => $this->l('Average shipping fees per shipping method'), 'id' => 'carriers'),
-            'other' => array('title' => $this->l('Other settings'), 'id' => 'other')
         );
         foreach ($forms as &$form) {
             $form['icon'] = 'tab-preferences';
@@ -136,32 +134,9 @@ class AdminDashboardControllerCore extends AdminController
             }
         }
 
-        foreach ($carriers as $carrier) {
-            $forms['carriers']['fields']['CONF_'.strtoupper($carrier['id_reference']).'_SHIP'] = array(
-                'title' => $carrier['name'],
-                'desc' => sprintf($this->l('For the carrier named %s, indicate the domestic delivery costs  in percentage of the price charged to customers.'), $carrier['name']),
-                'validation' => 'isPercentage',
-                'cast' => 'floatval',
-                'type' => 'text',
-                'defaultValue' => '0',
-                'suffix' => '%'
-            );
-            $forms['carriers']['fields']['CONF_'.strtoupper($carrier['id_reference']).'_SHIP_OVERSEAS'] = array(
-                'title' => $carrier['name'],
-                'desc' => sprintf($this->l('For the carrier named %s, indicate the overseas delivery costs in percentage of the price charged to customers.'), $carrier['name']),
-                'validation' => 'isPercentage',
-                'cast' => 'floatval',
-                'type' => 'text',
-                'defaultValue' => '0',
-                'suffix' => '%'
-            );
-        }
-
-        $forms['carriers']['description'] = $this->l('Method: Indicate the percentage of your carrier margin. For example, if you charge $10 of shipping fees to your customer for each shipment, but you really pay $4 to this carrier, then you should indicate "40" in the percentage field.');
-
-        $forms['other']['fields']['CONF_AVERAGE_PRODUCT_MARGIN'] = array(
+        $forms['net_profit']['fields']['CONF_AVERAGE_PRODUCT_MARGIN'] = array(
             'title' => $this->l('Average gross margin percentage'),
-            'desc' => $this->l('You should calculate this percentage as follows: ((total sales revenue) - (cost of goods sold)) / (total sales revenue) * 100. This value is only used to calculate the Dashboard approximate gross margin, if you do not specify the wholesale price for each product.'),
+            'desc' => $this->l('You should calculate this percentage as follows: ((total sales revenue) - (total operating cost)) / (total sales revenue) * 100. This value is only used to calculate Dashboard approximate gross margin, if you do not specify operating cost for each room type.'),
             'validation' => 'isPercentage',
             'cast' => 'intval',
             'type' => 'text',
@@ -169,7 +144,7 @@ class AdminDashboardControllerCore extends AdminController
             'suffix' => '%'
         );
 
-        $forms['other']['fields']['CONF_ORDER_FIXED'] = array(
+        $forms['net_profit']['fields']['CONF_ORDER_FIXED'] = array(
             'title' => $this->l('Other fees per order'),
             'desc' => $this->l('You should calculate this value by making the sum of all of your additional costs per order.'),
             'validation' => 'isPrice',
