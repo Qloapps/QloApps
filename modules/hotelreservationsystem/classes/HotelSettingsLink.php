@@ -50,13 +50,13 @@ class HotelSettingsLink extends ObjectModel
         ),
     );
 
-    public function getAll($active = true)
+    public function getAllSettingsLinks($active = true)
     {
         return Db::getInstance()->executeS(
             'SELECT * FROM `'._DB_PREFIX_.'htl_settings_link` hsl
             LEFT JOIN `'._DB_PREFIX_.'htl_settings_link_lang` hsll
-            ON hsll.`id_settings_link` = hsl.`id_settings_link` AND hsll.`id_lang` = '.(int) Context::getContext()->language->id.
-            ($active ? ' WHERE hsl.`active` = 1' : '').'
+            ON (hsll.`id_settings_link` = hsl.`id_settings_link` AND hsll.`id_lang` = '.(int) Context::getContext()->language->id.')
+            WHERE hsl.`active` = '.(int) $active.'
             ORDER BY hsl.`position`'
         );
     }

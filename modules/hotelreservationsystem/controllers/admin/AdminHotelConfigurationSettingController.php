@@ -19,6 +19,25 @@ class AdminHotelConfigurationSettingController extends ModuleAdminController
         $this->addRowAction('edit');
         $this->addRowAction('delete');
 
+        $this->bulk_actions = array(
+            'enableSelection' => array(
+                'text' => $this->l('Enable selection'),
+                'icon' => 'icon-power-off text-success'
+            ),
+            'disableSelection' => array(
+                'text' => $this->l('Disable selection'),
+                'icon' => 'icon-power-off text-danger'
+            ),
+            'divider' => array(
+                'text' => 'divider'
+            ),
+            'delete' => array(
+                'text' => $this->l('Delete selected'),
+                'confirm' => $this->l('Delete selected items?'),
+                'icon' => 'icon-trash'
+            )
+        );
+
         $this->fields_list = array(
             'id_settings_link' => array(
                 'title' => $this->l('ID'),
@@ -70,25 +89,6 @@ class AdminHotelConfigurationSettingController extends ModuleAdminController
                 'class' => 'fixed-width-lg',
                 'filter_key' => 'a!active',
             ),
-        );
-
-        $this->bulk_actions = array(
-            'enableSelection' => array(
-                'text' => $this->l('Enable selection'),
-                'icon' => 'icon-power-off text-success'
-            ),
-            'disableSelection' => array(
-                'text' => $this->l('Disable selection'),
-                'icon' => 'icon-power-off text-danger'
-            ),
-            'divider' => array(
-                'text' => 'divider'
-            ),
-            'delete' => array(
-                'text' => $this->l('Delete selected'),
-                'confirm' => $this->l('Delete selected items?'),
-                'icon' => 'icon-trash'
-            )
         );
     }
 
@@ -205,7 +205,7 @@ class AdminHotelConfigurationSettingController extends ModuleAdminController
 
     public function renderView()
     {
-        $settingsLinks = $this->object->getAll();
+        $settingsLinks = $this->object->getAllSettingsLinks();
         foreach ($settingsLinks as $index => &$settingsLink) {
             $settingsLink['generated_link'] = $this->object->generateLink($settingsLink['link']);
         }
