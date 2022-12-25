@@ -1145,6 +1145,7 @@
 		{
 			$('#addresses_err').show().html('{l s='You must add at least one address to process the order.'}');
 			$('#address_delivery, #address_invoice').hide();
+			$("#new_address").show();
 
 			//by webkul (if there is no address then order can not be created)
 			$("button[name=\"submitAddOrder\"]").attr("disabled", "disabled");
