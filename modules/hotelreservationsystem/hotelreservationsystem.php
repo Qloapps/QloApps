@@ -45,7 +45,6 @@ class HotelReservationSystem extends Module
         $resources = array(
             'hotels' => array('description' => 'Hotel Branch Information','class' => 'HotelBranchInformation'),
             'hotel_room_types' => array('description' => 'Hotel room types','class' => 'HotelRoomType'),
-            'hotel_images' => array('description' => 'Hotel images', 'specific_management' => true),
             'hotel_features' => array('description' => 'The hotel features','class' => 'HotelFeatures'),
             'hotel_refund_rules' => array('description' => 'The hotel refund rules','class' => 'HotelOrderRefundRules'),
             'hotel_rooms' => array('description' => 'The hotel rooms','class' => 'HotelRoomInformation'),
