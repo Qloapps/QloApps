@@ -1145,6 +1145,7 @@
 		{
 			$('#addresses_err').show().html('{l s='You must add at least one address to process the order.'}');
 			$('#address_delivery, #address_invoice').hide();
+			$("#new_address").show();
 
 			//by webkul (if there is no address then order can not be created)
 			$("button[name=\"submitAddOrder\"]").attr("disabled", "disabled");
@@ -1152,6 +1153,7 @@
 		else
 		{
 			$('#addresses_err').hide();
+			$("#new_address").hide();
 			$('#address_delivery, #address_invoice').show();
 
 			//by webkul
@@ -1159,8 +1161,8 @@
 		}
 
 		/*Changed by webkul to make delivery and invoice addresses same*/
-		$('#id_address_delivery').html(addresses_delivery_options);
-		$('#id_address_invoice').html(addresses_delivery_options);
+		$('#id_address_delivery').html(addresses_delivery_options).hide();
+		$('#id_address_invoice').html(addresses_delivery_options).hide();
 		$('#address_delivery_detail').html(address_delivery_detail);
 		$('#address_invoice_detail').html(address_delivery_detail);
 		$('#edit_delivery_address').attr('href', delivery_address_edit_link);
