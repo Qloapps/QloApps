@@ -59,8 +59,8 @@ class OrderCore extends ObjectModel
     /** @var int Customer id */
     public $id_customer;
 
-    /** @var int Staying guest id */
-    public $id_booking_staying_guest;
+    /** @var int Customer guest id */
+    public $id_customer_guest_detail;
 
     /** @var int Carrier id */
     public $id_carrier;
@@ -209,7 +209,7 @@ class OrderCore extends ObjectModel
             'id_shop' =>                    array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
             'id_lang' =>                    array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => true),
             'id_customer' =>                array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => true),
-            'id_booking_staying_guest' =>                array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
+            'id_customer_guest_detail' =>                array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
             'id_carrier' =>                array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
             'current_state' =>                array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
             'secure_key' =>                array('type' => self::TYPE_STRING, 'validate' => 'isMd5'),

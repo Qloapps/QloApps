@@ -50,18 +50,18 @@ $(document).ready(function()
 			$("#partial_data").slideDown();
 	});
 
-	// staying guest booking
+	// customer guest booking
 	function initGuestbookingcontainer() {
-		if ($("#booking_staying_guest:checked").val() == 1) {
+		if ($("#customer_guest_detail:checked").val() == 1) {
 			$('#customer_info_container').hide('slow');
-			$('#booking_staying_guest_container').show('slow');
+			$('#customer_guest_detail_container').show('slow');
 		} else {
-			$('#booking_staying_guest_container').hide('slow');
+			$('#customer_guest_detail_container').hide('slow');
 			$('#customer_info_container').show('slow');
 		}
 	}
-	function validateBookingStayingGuestForm() {
-		$('#booking_staying_guest_form input.validate').each(function (index, element) {
+	function validateCustomerGuestDetailForm() {
+		$('#customer_guest_detail_form input.validate').each(function (index, element) {
 			if (!validate_field(element)) {
 				if ($('#cgv').prop('checked') == 1) {
 					$('#cgv').trigger('click');
@@ -70,21 +70,21 @@ $(document).ready(function()
 		});
 	}
 	initGuestbookingcontainer();
-	$("#booking_staying_guest").on('change',function() {
+	$("#customer_guest_detail").on('change',function() {
 		initGuestbookingcontainer();
 	});
-	if ($("#booking_staying_guest:checked").val() == 1) {
-		validateBookingStayingGuestForm();
+	if ($("#customer_guest_detail:checked").val() == 1) {
+		validateCustomerGuestDetailForm();
 	}
 
-	$('#booking_staying_guest_form').on('change', function(e) {
+	$('#customer_guest_detail_form').on('change', function(e) {
 		$.ajax({
 			type: 'POST',
 			url: orderOpcUrl,
 			async: false,
 			cache: false,
 			dataType : "json",
-			data: $(this).serialize()+'&method=submitBookingStayingGuest&ajax=true&token=' + static_token
+			data: $(this).serialize()+'&method=submitCustomerGuestDetail&ajax=true&token=' + static_token
 		});
 	});
 

@@ -88,7 +88,7 @@ class CartCore extends ObjectModel
     */
     public $is_advance_payment;
 
-    public $id_booking_staying_guest;
+    public $id_customer_guest_detail;
 
     protected static $_nbProducts = array();
     protected static $_isVirtualCart = array();
@@ -118,7 +118,7 @@ class CartCore extends ObjectModel
             'id_currency' =>            array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => true),
             'id_customer' =>            array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
             'id_guest' =>                array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
-            'id_booking_staying_guest' =>          array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
+            'id_customer_guest_detail' =>          array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
             'id_lang' =>                array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => true),
             'recyclable' =>            array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
             'gift' =>                    array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),

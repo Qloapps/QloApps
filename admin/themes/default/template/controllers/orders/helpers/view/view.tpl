@@ -703,17 +703,17 @@
 											<dd>{$customer->ape}</dd>
 									{/if} -->
 								</dl>
-								{if $order->id_booking_staying_guest}
+								{if $order->id_customer_guest_detail}
 									<dl class="panel">
 										<div class="panel-heading">
-											{l s='Staying guest'}
+											{l s='Guest'}
 										</div>
 										<dt>{l s='Name'}</dt>
-											<dd>{$bookingStayingGuest->firstname} {$bookingStayingGuest->lastname}</dd><br>
+											<dd>{$customerGuestDetail->firstname} {$customerGuestDetail->lastname}</dd><br>
 										<dt>{l s='Email'}</dt>
-											<dd><a href="mailto:{$bookingStayingGuest->email}"><i class="icon-envelope-o"></i> {$bookingStayingGuest->email}</a></dd><br>
+											<dd><a href="mailto:{$customerGuestDetail->email}"><i class="icon-envelope-o"></i> {$customerGuestDetail->email}</a></dd><br>
 										<dt>{l s='Phone'}</dt>
-											<dd><a href="tel:{$bookingStayingGuest->phone}"><i class="icon-envelope-o"></i> {$bookingStayingGuest->phone}</a></dd>
+											<dd><a href="tel:{$customerGuestDetail->phone}"><i class="icon-envelope-o"></i> {$customerGuestDetail->phone}</a></dd>
 									</dl>
 								{/if}
 							{/if}

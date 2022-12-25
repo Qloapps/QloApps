@@ -43,10 +43,10 @@ class CheckoutCustomerDetailsStep extends AbstractCheckoutStep
             }
         } elseif (Tools::getValue('proceed_to_payment')) {
             $guestInfoComplete = true;
-            if ($this->context->cart->id_booking_staying_guest) {
+            if ($this->context->cart->id_customer_guest_detail) {
                 $guestInfoComplete = false;
-                $objBookingStayingGuest = new BookingStayingGuest($this->context->cart->id_booking_staying_guest);
-                if ($objBookingStayingGuest->validateGuestInfo()) {
+                $objCustomerGuestDetail = new CustomerGuestDetail($this->context->cart->id_customer_guest_detail);
+                if ($objCustomerGuestDetail->validateGuestInfo()) {
                     $guestInfoComplete = true;
                 }
             }

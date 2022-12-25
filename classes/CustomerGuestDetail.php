@@ -18,9 +18,9 @@
 *  @license   https://store.webkul.com/license.html
 */
 
-class BookingStayingGuestCore extends ObjectModel
+class CustomerGuestDetailCore extends ObjectModel
 {
-    public $id_booking_staying_guest;
+    public $id_customer_guest_detail;
     public $id_gender;
     public $firstname;
     public $lastname;
@@ -30,9 +30,10 @@ class BookingStayingGuestCore extends ObjectModel
     public $date_upd;
 
     public static $definition = array(
-        'table' => 'booking_staying_guest',
-        'primary' => 'id_booking_staying_guest',
+        'table' => 'customer_guest_detail',
+        'primary' => 'id_customer_guest_detail',
         'fields' => array(
+            'id_customer' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
             'id_gender' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
             'firstname' => array('type' => self::TYPE_STRING, 'validate' => 'isName', 'size' => 32),
             'lastname' => array('type' => self::TYPE_STRING, 'validate' => 'isName', 'size' => 32),
@@ -43,11 +44,21 @@ class BookingStayingGuestCore extends ObjectModel
         ),
     );
 
-    public static function getBookingStayingGuestInfo($id_booking_staying_guest)
+    public static function getCustomerGuests($id_customer)
     {
         return Db::getInstance()->getRow('
-            SELECT * FROM `'._DB_PREFIX_.'booking_staying_guest`
-            WHERE `id_booking_staying_guest` = '.(int)$id_booking_staying_guest
+            SELECT `id_customer_guest_detail`, `id_gender`, `firstname`, `lastname`, `email`, `phone`
+            FROM `'._DB_PREFIX_.'customer_guest_detail`
+            WHERE `id_customer` = '.(int)$id_customer
+        );
+    }
+
+    public static function getCustomerGuestDetail($id_customer_guest_detail)
+    {
+        return Db::getInstance()->getRow('
+            SELECT `id_gender`, `firstname`, `lastname`, `email`, `phone`
+            FROM `'._DB_PREFIX_.'customer_guest_detail`
+            WHERE `id_customer_guest_detail` = '.(int)$id_customer_guest_detail
         );
     }
 

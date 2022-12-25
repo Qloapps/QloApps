@@ -1335,9 +1335,9 @@ class AdminOrdersControllerCore extends AdminController
         }
 
         // get details if booking is done for some other guest
-        $bookingStayingGuest = false;
-        if ($order->id_booking_staying_guest) {
-            $bookingStayingGuest = new BookingStayingGuest($order->id_booking_staying_guest);
+        $customerGuestDetail = false;
+        if ($order->id_customer_guest_detail) {
+            $customerGuestDetail = new CustomerGuestDetail($order->id_customer_guest_detail);
         }
 
         // gets warehouses to ship products, if and only if advanced stock management is activated
@@ -1522,7 +1522,7 @@ class AdminOrdersControllerCore extends AdminController
             'cart' => new Cart($order->id_cart),
             'customer' => $customer,
             'gender' => $gender,
-            'bookingStayingGuest' => $bookingStayingGuest,
+            'customerGuestDetail' => $customerGuestDetail,
             'customer_addresses' => $customer->getAddresses($this->context->language->id),
             'addresses' => array(
                 'delivery' => $addressDelivery,

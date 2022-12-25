@@ -362,9 +362,9 @@ abstract class PaymentModuleCore extends Module
                         $order->advance_paid_amount = (float)Tools::ps_round((float)$this->context->cart->getOrderTotal(true, Cart::BOTH, $order->product_list, $id_carrier), _PS_PRICE_COMPUTE_PRECISION_);
                     }
 
-                    // save staying guest information
-                    if ($this->context->cart->id_booking_staying_guest) {
-                        $order->id_booking_staying_guest = (int)$this->context->cart->id_booking_staying_guest;
+                    // save customer guest information
+                    if ($this->context->cart->id_customer_guest_detail) {
+                        $order->id_customer_guest_detail = (int)$this->context->cart->id_customer_guest_detail;
                     }
 
                     // Creating order
@@ -1022,22 +1022,22 @@ abstract class PaymentModuleCore extends Module
                                     null, _PS_MAIL_DIR_, false, (int)$order->id_shop
                                 );
                             }
-                            // send mail to staying guest if customer booked for someone other.
-                            if ($order->id_booking_staying_guest) {
-                                if ($stayingGuestInfo = BookingStayingGuest::getBookingStayingGuestInfo(
-                                    $order->id_booking_staying_guest
+                            // send mail to customer guest if customer booked for someone other.
+                            if ($order->id_customer_guest_detail) {
+                                if ($customerGuestDetail = CustomerGuestDetail::getCustomerGuestDetail(
+                                    $order->id_customer_guest_detail
                                 )) {
-                                    if (Validate::isEmail($stayingGuestInfo['email'])) {
-                                        $data['{firstname}'] = $stayingGuestInfo['firstname'];
-                                        $data['{lastname}'] = $stayingGuestInfo['lastname'];
-                                        $data['{email}'] = $stayingGuestInfo['email'];
+                                    if (Validate::isEmail($customerGuestDetail['email'])) {
+                                        $data['{firstname}'] = $customerGuestDetail['firstname'];
+                                        $data['{lastname}'] = $customerGuestDetail['lastname'];
+                                        $data['{email}'] = $customerGuestDetail['email'];
                                         Mail::Send(
                                             (int)$order->id_lang,
                                             'order_conf',
                                             Mail::l('Order confirmation', (int)$order->id_lang),
                                             $data,
-                                            $stayingGuestInfo['email'],
-                                            $stayingGuestInfo['firstname'].' '.$stayingGuestInfo['lastname'],
+                                            $customerGuestDetail['email'],
+                                            $customerGuestDetail['firstname'].' '.$customerGuestDetail['lastname'],
                                             null,
                                             null,
                                             $file_attachement,

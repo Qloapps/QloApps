@@ -317,8 +317,8 @@ class OrderOpcControllerCore extends ParentOrderController
                             $this->ajaxDie($this->changeRoomDemands());
                             exit;
                             break;
-                        case 'submitBookingStayingGuest':
-                            $this->ajaxDie($this->submitBookingStayingGuest());
+                        case 'submitCustomerGuestDetail':
+                            $this->ajaxDie($this->submitCustomerGuestDetail());
                             exit;
                             break;
                         default:
@@ -483,10 +483,10 @@ class OrderOpcControllerCore extends ParentOrderController
         $this->_assignPayment();
         // GUEST BOOKING
         if ($this->isLogged) {
-            if ($this->context->cart->id_booking_staying_guest) {
-                $this->context->smarty->assign('booking_staying_guest', BookingStayingGuest::getBookingStayingGuestInfo($this->context->cart->id_booking_staying_guest));
+            if ($this->context->cart->id_customer_guest_detail) {
+                $this->context->smarty->assign('customer_guest_detail', CustomerGuestDetail::getCustomerGuestDetail($this->context->cart->id_customer_guest_detail));
             }
-            $this->context->smarty->assign('id_booking_staying_guest', $this->context->cart->id_booking_staying_guest);
+            $this->context->smarty->assign('id_customer_guest_detail', $this->context->cart->id_customer_guest_detail);
         }
         Tools::safePostVars();
 
@@ -976,33 +976,33 @@ class OrderOpcControllerCore extends ParentOrderController
         die('0');
     }
 
-    public function submitBookingStayingGuest()
+    public function submitCustomerGuestDetail()
     {
-        $booking_staying_guest = Tools::getValue('booking_staying_guest');
+        $customer_guest_detail = Tools::getValue('customer_guest_detail');
         $this->context->cookie->__set('customer_details_proceeded', 0);
         $this->context->cookie->checkedTOS = false;
-        if ($booking_staying_guest) {
-            if ($this->context->cart->id_booking_staying_guest) {
-                $objBookingStayingGuest = new BookingStayingGuest($this->context->cart->id_booking_staying_guest);
+        if ($customer_guest_detail) {
+            if ($this->context->cart->id_customer_guest_detail) {
+                $objCustomerGuestDetail = new CustomerGuestDetail($this->context->cart->id_customer_guest_detail);
             } else {
-                $objBookingStayingGuest = new BookingStayingGuest();
+                $objCustomerGuestDetail = new CustomerGuestDetail();
             }
-            $booking_staying_guest_gender = Tools::getValue('booking_staying_guest_gender');
-            $booking_staying_guest_firstname = Tools::getValue('booking_staying_guest_firstname');
-            $booking_staying_guest_lastname = Tools::getValue('booking_staying_guest_lastname');
-            $booking_staying_guest_email = Tools::getValue('booking_staying_guest_email');
-            $booking_staying_guest_phone = Tools::getValue('booking_staying_guest_phone');
-            $objBookingStayingGuest->id_gender = $booking_staying_guest_gender;
-            $objBookingStayingGuest->firstname = $booking_staying_guest_firstname;
-            $objBookingStayingGuest->lastname = $booking_staying_guest_lastname;
-            $objBookingStayingGuest->email = $booking_staying_guest_email;
-            $objBookingStayingGuest->phone = $booking_staying_guest_phone;
-            $objBookingStayingGuest->save();
-            $this->context->cart->id_booking_staying_guest = $objBookingStayingGuest->id;
+            $customer_guest_detail_gender = Tools::getValue('customer_guest_detail_gender');
+            $customer_guest_detail_firstname = Tools::getValue('customer_guest_detail_firstname');
+            $customer_guest_detail_lastname = Tools::getValue('customer_guest_detail_lastname');
+            $customer_guest_detail_email = Tools::getValue('customer_guest_detail_email');
+            $customer_guest_detail_phone = Tools::getValue('customer_guest_detail_phone');
+            $objCustomerGuestDetail->id_gender = $customer_guest_detail_gender;
+            $objCustomerGuestDetail->firstname = $customer_guest_detail_firstname;
+            $objCustomerGuestDetail->lastname = $customer_guest_detail_lastname;
+            $objCustomerGuestDetail->email = $customer_guest_detail_email;
+            $objCustomerGuestDetail->phone = $customer_guest_detail_phone;
+            $objCustomerGuestDetail->save();
+            $this->context->cart->id_customer_guest_detail = $objCustomerGuestDetail->id;
         } else {
-            $objBookingStayingGuest = new BookingStayingGuest($this->context->cart->id_booking_staying_guest);
-            $objBookingStayingGuest->delete();
-            $this->context->cart->id_booking_staying_guest = false;
+            $objCustomerGuestDetail = new CustomerGuestDetail($this->context->cart->id_customer_guest_detail);
+            $objCustomerGuestDetail->delete();
+            $this->context->cart->id_customer_guest_detail = false;
         }
         $this->context->cart->save();
     }

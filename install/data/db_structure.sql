@@ -182,7 +182,6 @@ CREATE TABLE `PREFIX_cart` (
   `id_currency` int(10) unsigned NOT NULL,
   `id_customer` int(10) unsigned NOT NULL,
   `id_guest` int(10) unsigned NOT NULL,
-  `id_booking_staying_guest` int(10) unsigned NOT NULL,
   `secure_key` varchar(32) NOT NULL DEFAULT '-1',
   `recyclable` tinyint(1) unsigned NOT NULL DEFAULT '1',
   `gift` tinyint(1) unsigned NOT NULL DEFAULT '0',
@@ -674,9 +673,21 @@ CREATE TABLE `PREFIX_customer_thread` (
 	KEY `id_product` (`id_product`)
 ) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8 COLLATION;
 
-CREATE TABLE `PREFIX_booking_staying_guest` (
-  `id_booking_staying_guest` int(10) unsigned NOT NULL auto_increment,
+CREATE TABLE `PREFIX_order_customer_guest_detail` (
+  `id_customer_guest_detail` int(10) unsigned NOT NULL auto_increment,
   `id_cart` int(10) unsigned NOT NULL,
+  `id_gender` int(10) unsigned NOT NULL,
+  `firstname` varchar(32) NOT NULL,
+  `lastname` varchar(32) NOT NULL,
+  `email` varchar(128) NOT NULL,
+  `phone` varchar(32) DEFAULT NULL,
+  `date_add` datetime NOT NULL,
+  `date_upd` datetime NOT NULL,
+	PRIMARY KEY (`id_customer_guest_detail`)
+) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8 COLLATION;
+
+CREATE TABLE `PREFIX_cart_customer_guest_detail` (
+  `id_customer_guest_detail` int(10) unsigned NOT NULL auto_increment,
   `id_order` int(10) unsigned NOT NULL,
   `id_gender` int(10) unsigned NOT NULL,
   `firstname` varchar(32) NOT NULL,
@@ -685,7 +696,7 @@ CREATE TABLE `PREFIX_booking_staying_guest` (
   `phone` varchar(32) DEFAULT NULL,
   `date_add` datetime NOT NULL,
   `date_upd` datetime NOT NULL,
-	PRIMARY KEY (`id_booking_staying_guest`)
+	PRIMARY KEY (`id_customer_guest_detail`)
 ) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8 COLLATION;
 
 CREATE TABLE `PREFIX_customization` (
@@ -1112,7 +1123,6 @@ CREATE TABLE `PREFIX_orders` (
   `id_carrier` int(10) unsigned NOT NULL,
   `id_lang` int(10) unsigned NOT NULL,
   `id_customer` int(10) unsigned NOT NULL,
-  `id_booking_staying_guest` int(10) unsigned NOT NULL,
   `id_cart` int(10) unsigned NOT NULL,
   `id_currency` int(10) unsigned NOT NULL,
   `id_address_delivery` int(10) unsigned NOT NULL,
