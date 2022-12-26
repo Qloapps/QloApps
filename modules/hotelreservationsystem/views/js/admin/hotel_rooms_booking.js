@@ -106,6 +106,7 @@ $(document).ready(function() {
                         });
                     }
                 });
+                info.event.remove();
             } else {
                 $(info.el).tooltip({
                     content: function()
@@ -170,8 +171,12 @@ $(document).ready(function() {
 
             let svg = $('#svg-icon').html();
             $(arg.el).find('.fc-daygrid-day-top').append('<a class="day-info">'+svg+'</a>');
+        },
+        datesSet: function(arg) {
+            if($('.fc-event').tooltip()) {
+                $('.fc-event').tooltip('destroy');
+            }
         }
-
     });
     calendar.render();
 
