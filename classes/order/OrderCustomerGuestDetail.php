@@ -18,9 +18,10 @@
 *  @license   https://store.webkul.com/license.html
 */
 
-class CustomerGuestDetailCore extends ObjectModel
+class OrderCustomerGuestDetailCore extends ObjectModel
 {
-    public $id_customer_guest_detail;
+    public $id_order_customer_guest_detail;
+    public $id_order;
     public $id_gender;
     public $firstname;
     public $lastname;
@@ -30,10 +31,10 @@ class CustomerGuestDetailCore extends ObjectModel
     public $date_upd;
 
     public static $definition = array(
-        'table' => 'customer_guest_detail',
-        'primary' => 'id_customer_guest_detail',
+        'table' => 'order_customer_guest_detail',
+        'primary' => 'id_order_customer_guest_detail',
         'fields' => array(
-            'id_customer' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
+            'id_order' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
             'id_gender' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
             'firstname' => array('type' => self::TYPE_STRING, 'validate' => 'isName', 'size' => 32),
             'lastname' => array('type' => self::TYPE_STRING, 'validate' => 'isName', 'size' => 32),
@@ -44,21 +45,12 @@ class CustomerGuestDetailCore extends ObjectModel
         ),
     );
 
-    public static function getCustomerGuests($id_customer)
+    public static function isCustomerGuestBooking($id_order)
     {
-        return Db::getInstance()->getRow('
-            SELECT `id_customer_guest_detail`, `id_gender`, `firstname`, `lastname`, `email`, `phone`
-            FROM `'._DB_PREFIX_.'customer_guest_detail`
-            WHERE `id_customer` = '.(int)$id_customer
-        );
-    }
-
-    public static function getCustomerGuestDetail($id_customer_guest_detail)
-    {
-        return Db::getInstance()->getRow('
-            SELECT `id_gender`, `firstname`, `lastname`, `email`, `phone`
-            FROM `'._DB_PREFIX_.'customer_guest_detail`
-            WHERE `id_customer_guest_detail` = '.(int)$id_customer_guest_detail
+        return Db::getInstance()->getValue('
+            SELECT `id_order_customer_guest_detail`
+            FROM `'._DB_PREFIX_.'order_customer_guest_detail`
+            WHERE `id_order` = '.(int)$id_order
         );
     }
 

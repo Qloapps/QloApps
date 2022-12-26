@@ -1336,8 +1336,9 @@ class AdminOrdersControllerCore extends AdminController
 
         // get details if booking is done for some other guest
         $customerGuestDetail = false;
-        if ($order->id_customer_guest_detail) {
-            $customerGuestDetail = new CustomerGuestDetail($order->id_customer_guest_detail);
+        if ($id_customer_guest_detail = OrderCustomerGuestDetail::isCustomerGuestBooking($order->id)) {
+            $customerGuestDetail = new OrderCustomerGuestDetail($id_customer_guest_detail);
+            $customerGuestDetail->gender = new Gender($customerGuestDetail->id_gender, $this->context->language->id);
         }
 
         // gets warehouses to ship products, if and only if advanced stock management is activated
@@ -1523,6 +1524,7 @@ class AdminOrdersControllerCore extends AdminController
             'customer' => $customer,
             'gender' => $gender,
             'customerGuestDetail' => $customerGuestDetail,
+            'genders' => Gender::getGenders(),
             'customer_addresses' => $customer->getAddresses($this->context->language->id),
             'addresses' => array(
                 'delivery' => $addressDelivery,
@@ -1590,6 +1592,49 @@ class AdminOrdersControllerCore extends AdminController
         );
 
         return parent::renderView();
+    }
+
+    public function ajaxProcessUpdateGuestDetails()
+    {
+        $response = array(
+            'success' => false
+        );
+        if (Validate::isLoadedObject($order = new Order(Tools::getValue('id_order')))) {
+            if ($id_customer_guest_detail = OrderCustomerGuestDetail::isCustomerGuestBooking($order->id)) {
+                if (Validate::isLoadedObject($objCustomerGuestDetail = new OrderCustomerGuestDetail($id_customer_guest_detail))) {
+                    $id_gender = Tools::getValue('id_gender');
+                    $firstname = Tools::getValue('firstname');
+                    $lastname = Tools::getValue('lastname');
+                    $email = Tools::getValue('email');
+                    $phone = Tools::getValue('phone');
+                    $objCustomerGuestDetail->id_gender = $id_gender;
+                    $objCustomerGuestDetail->firstname = $firstname;
+                    $objCustomerGuestDetail->lastname = $lastname;
+                    $objCustomerGuestDetail->email = $email;
+                    $objCustomerGuestDetail->phone = $phone;
+                    if ($objCustomerGuestDetail->validateGuestInfo()) {
+                        if ($objCustomerGuestDetail->save()) {
+                            $response['success'] = true;
+                            $gender = new Gender($objCustomerGuestDetail->id_gender, $this->context->language->id);
+                            $response['data']['guest_name'] = $gender->name.' '.$objCustomerGuestDetail->firstname.' '.$objCustomerGuestDetail->lastname ;
+                            $response['data']['guest_email'] = $objCustomerGuestDetail->email;
+                            $response['data']['guest_phone'] = $objCustomerGuestDetail->phone;
+                            $response['msg'] = $this->l('Guest details are updated.');
+                        } else {
+                            $response['errors'][] = $this->l('Unable to save guest details.');
+                        }
+                    } else {
+                        $response['errors'][] = $this->l('Invalid guest details, please check and try again.');
+                    }
+                } else {
+                    $response['errors'][] = $this->l('Guest details not found.');
+                }
+            } else {
+                $response['errors'][] = $this->l('Guest details not found.');
+            }
+        }
+
+        $this->ajaxDie(json_encode($response));
     }
 
     public function ajaxProcessSearchProducts()

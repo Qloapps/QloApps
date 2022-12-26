@@ -362,17 +362,28 @@ abstract class PaymentModuleCore extends Module
                         $order->advance_paid_amount = (float)Tools::ps_round((float)$this->context->cart->getOrderTotal(true, Cart::BOTH, $order->product_list, $id_carrier), _PS_PRICE_COMPUTE_PRECISION_);
                     }
 
-                    // save customer guest information
-                    if ($this->context->cart->id_customer_guest_detail) {
-                        $order->id_customer_guest_detail = (int)$this->context->cart->id_customer_guest_detail;
-                    }
-
                     // Creating order
                     $result = $order->add();
 
                     if (!$result) {
                         PrestaShopLogger::addLog('PaymentModule::validateOrder - Order cannot be created', 3, null, 'Cart', (int)$id_cart, true);
                         throw new PrestaShopException('Can\'t save Order');
+                    }
+
+                    // save customer guest information
+                    if ($id_customer_guest_detail = CartCustomerGuestDetail::getCartCustomerGuest($this->context->cart->id)) {
+                        if (Validate::isLoadedObject($objCartCustomerGuestDetail = new CartCustomerGuestDetail(
+                            $id_customer_guest_detail
+                        ))) {
+                            $objOrderCustomerGuestDetail = new OrderCustomerGuestDetail();
+                            $objOrderCustomerGuestDetail->id_gender = $objCartCustomerGuestDetail->id_gender;
+                            $objOrderCustomerGuestDetail->firstname = $objCartCustomerGuestDetail->firstname;
+                            $objOrderCustomerGuestDetail->lastname = $objCartCustomerGuestDetail->lastname;
+                            $objOrderCustomerGuestDetail->email = $objCartCustomerGuestDetail->email;
+                            $objOrderCustomerGuestDetail->phone = $objCartCustomerGuestDetail->phone;
+                            $objOrderCustomerGuestDetail->id_order = (int)$order->id;
+                            $objOrderCustomerGuestDetail->save();
+                        }
                     }
 
                     // Amount paid by customer is not the right one -> Status = payment error
@@ -1023,21 +1034,21 @@ abstract class PaymentModuleCore extends Module
                                 );
                             }
                             // send mail to customer guest if customer booked for someone other.
-                            if ($order->id_customer_guest_detail) {
-                                if ($customerGuestDetail = CustomerGuestDetail::getCustomerGuestDetail(
-                                    $order->id_customer_guest_detail
+                            if ($id_customer_guest_detail = OrderCustomerGuestDetail::isCustomerGuestBooking($order->id)) {
+                                if ($objOrderCustomerGuestDetail = new OrderCustomerGuestDetail(
+                                    $id_customer_guest_detail
                                 )) {
-                                    if (Validate::isEmail($customerGuestDetail['email'])) {
-                                        $data['{firstname}'] = $customerGuestDetail['firstname'];
-                                        $data['{lastname}'] = $customerGuestDetail['lastname'];
-                                        $data['{email}'] = $customerGuestDetail['email'];
+                                    if (Validate::isEmail($objOrderCustomerGuestDetail->email)) {
+                                        $data['{firstname}'] = $objOrderCustomerGuestDetail->firstname;
+                                        $data['{lastname}'] = $objOrderCustomerGuestDetail->lastname;
+                                        $data['{email}'] = $objOrderCustomerGuestDetail->email;
                                         Mail::Send(
                                             (int)$order->id_lang,
                                             'order_conf',
                                             Mail::l('Order confirmation', (int)$order->id_lang),
                                             $data,
-                                            $customerGuestDetail['email'],
-                                            $customerGuestDetail['firstname'].' '.$customerGuestDetail['lastname'],
+                                            $objOrderCustomerGuestDetail->email,
+                                            $objOrderCustomerGuestDetail->firstname.' '.$objOrderCustomerGuestDetail->lastname,
                                             null,
                                             null,
                                             $file_attachement,

@@ -483,10 +483,12 @@ class OrderOpcControllerCore extends ParentOrderController
         $this->_assignPayment();
         // GUEST BOOKING
         if ($this->isLogged) {
-            if ($this->context->cart->id_customer_guest_detail) {
-                $this->context->smarty->assign('customer_guest_detail', CustomerGuestDetail::getCustomerGuestDetail($this->context->cart->id_customer_guest_detail));
+            if ($id_customer_guest_detail = CartCustomerGuestDetail::getCartCustomerGuest($this->context->cart->id)) {
+                $this->context->smarty->assign(
+                    'customer_guest_detail', CartCustomerGuestDetail::getCustomerGuestDetail($id_customer_guest_detail)
+                );
             }
-            $this->context->smarty->assign('id_customer_guest_detail', $this->context->cart->id_customer_guest_detail);
+            $this->context->smarty->assign('id_customer_guest_detail', $id_customer_guest_detail);
         }
         Tools::safePostVars();
 
@@ -978,31 +980,44 @@ class OrderOpcControllerCore extends ParentOrderController
 
     public function submitCustomerGuestDetail()
     {
-        $customer_guest_detail = Tools::getValue('customer_guest_detail');
+        $customerGuestDetail = Tools::getValue('customer_guest_detail');
         $this->context->cookie->__set('customer_details_proceeded', 0);
         $this->context->cookie->checkedTOS = false;
-        if ($customer_guest_detail) {
-            if ($this->context->cart->id_customer_guest_detail) {
-                $objCustomerGuestDetail = new CustomerGuestDetail($this->context->cart->id_customer_guest_detail);
+        if ($customerGuestDetail) {
+            if ($id_customer_guest_detail = CartCustomerGuestDetail::getCartCustomerGuest($this->context->cart->id)) {
+                $objCustomerGuestDetail = new CartCustomerGuestDetail($id_customer_guest_detail);
             } else {
-                $objCustomerGuestDetail = new CustomerGuestDetail();
+                $objCustomerGuestDetail = new CartCustomerGuestDetail();
             }
-            $customer_guest_detail_gender = Tools::getValue('customer_guest_detail_gender');
-            $customer_guest_detail_firstname = Tools::getValue('customer_guest_detail_firstname');
-            $customer_guest_detail_lastname = Tools::getValue('customer_guest_detail_lastname');
-            $customer_guest_detail_email = Tools::getValue('customer_guest_detail_email');
-            $customer_guest_detail_phone = Tools::getValue('customer_guest_detail_phone');
-            $objCustomerGuestDetail->id_gender = $customer_guest_detail_gender;
-            $objCustomerGuestDetail->firstname = $customer_guest_detail_firstname;
-            $objCustomerGuestDetail->lastname = $customer_guest_detail_lastname;
-            $objCustomerGuestDetail->email = $customer_guest_detail_email;
-            $objCustomerGuestDetail->phone = $customer_guest_detail_phone;
+
+            $customerGuestDetailGender = Tools::getValue('customer_guest_detail_gender');
+            $customerGuestDetailFirstname = Tools::getValue('customer_guest_detail_firstname');
+            $customerGuestDetailLastname = Tools::getValue('customer_guest_detail_lastname');
+            $customerGuestDetailEmail = Tools::getValue('customer_guest_detail_email');
+            $customerGuestDetailPhone = Tools::getValue('customer_guest_detail_phone');
+            if (trim($customerGuestDetailGender) && Validate::isUnsignedInt($customerGuestDetailGender)) {
+                $objCustomerGuestDetail->id_gender = $customerGuestDetailGender;
+            }
+            if (trim($customerGuestDetailFirstname) && Validate::isName($customerGuestDetailFirstname)) {
+                $objCustomerGuestDetail->firstname = $customerGuestDetailFirstname;
+            }
+            if (trim($customerGuestDetailLastname) && Validate::isName($customerGuestDetailLastname)) {
+                $objCustomerGuestDetail->lastname = $customerGuestDetailLastname;
+            }
+            if (trim($customerGuestDetailEmail) && Validate::isEmail($customerGuestDetailEmail)) {
+                $objCustomerGuestDetail->email = $customerGuestDetailEmail;
+            }
+            if (trim($customerGuestDetailPhone) && Validate::isPhoneNumber($customerGuestDetailPhone)) {
+                $objCustomerGuestDetail->phone = $customerGuestDetailPhone;
+            }
+            $objCustomerGuestDetail->id_cart = $this->context->cart->id;
             $objCustomerGuestDetail->save();
-            $this->context->cart->id_customer_guest_detail = $objCustomerGuestDetail->id;
         } else {
-            $objCustomerGuestDetail = new CustomerGuestDetail($this->context->cart->id_customer_guest_detail);
-            $objCustomerGuestDetail->delete();
-            $this->context->cart->id_customer_guest_detail = false;
+            if ($id_customer_guest_detail = CartCustomerGuestDetail::getCartCustomerGuest($this->context->cart->id)) {
+                if (Validate::isLoadedObject($objCustomerGuestDetail = new CartCustomerGuestDetail($id_customer_guest_detail))) {
+                    $objCustomerGuestDetail->delete();
+                }
+            }
         }
         $this->context->cart->save();
     }
