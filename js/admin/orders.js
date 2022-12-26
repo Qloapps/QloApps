@@ -900,14 +900,14 @@ function init()
 	});
 
 	$('#add_new_payment').on('click', function(e) {
-		$('#formAddPayment').show();
+		$('#form_add_payment').show();
 		$(this).hide();
 	});
 
 	$('#cancle_add_payment').on('click', function(e) {
 		e.preventDefault();
 		$('#add_new_payment').show();
-		$('#formAddPayment').hide();
+		$('#form_add_payment').hide();
 	});
 
 	/*By webkul Code for the datepicker*/

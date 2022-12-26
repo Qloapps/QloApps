@@ -470,7 +470,7 @@
 				</script>
 			</div>
 			<!-- Payments block -->
-			<div id="formAddPaymentPanel" class="panel">
+			<div id="form_add_payment_panel" class="panel">
 				<div class="panel-heading">
 					<i class="icon-money"></i>
 					{l s="Payment"} <span class="badge">{$order->getOrderPayments()|@count}</span>
@@ -586,7 +586,7 @@
 						{l s='Add new payment'}
 					</button>
 				</div>
-				<form id="formAddPayment" class="well" method="post" action="{$current_index}&amp;vieworder&amp;id_order={$order->id}&amp;token={$smarty.get.token|escape:'html':'UTF-8'}" style="display:none">
+				<form id="form_add_payment" class="well" method="post" action="{$current_index}&amp;vieworder&amp;id_order={$order->id}&amp;token={$smarty.get.token|escape:'html':'UTF-8'}" style="display:none">
 					<div class="form-horizontal">
 						<div class="form-group">
 							<label class="control-label col-sm-2">{l s='Date'}</label>

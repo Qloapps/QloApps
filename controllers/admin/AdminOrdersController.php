@@ -807,11 +807,11 @@ class AdminOrdersControllerCore extends AdminController
                     if (!$order->addOrderPayment(
                         $amount,
                         Tools::getValue('payment_method'),
-                        $payment_type,
                         Tools::getValue('payment_transaction_id'),
                         $currency,
                         Tools::getValue('payment_date'),
-                        $order_invoice
+                        $order_invoice,
+                        $payment_type
                     )) {
                         if (!validate::isPrice($order->total_paid_real)) {
                             $this->errors[] = Tools::displayError('Order total payments cannot be less than 0.');

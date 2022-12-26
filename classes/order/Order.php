@@ -1726,7 +1726,7 @@ class OrderCore extends ObjectModel
      * @param OrderInvoice $order_invoice
      * @return bool
      */
-    public function addOrderPayment($amount_paid, $payment_method = null, $payment_type = null,  $payment_transaction_id = null, $currency = null, $date = null, $order_invoice = null)
+    public function addOrderPayment($amount_paid, $payment_method = null, $payment_transaction_id = null, $currency = null, $date = null, $order_invoice = null, $payment_type = null)
     {
         $order_payment = new OrderPayment();
         $order_payment->order_reference = $this->reference;
