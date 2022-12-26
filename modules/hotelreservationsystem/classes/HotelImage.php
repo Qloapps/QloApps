@@ -44,7 +44,7 @@ class HotelImage extends ObjectModel
 
         $this->source_index = _PS_HOTEL_IMG_DIR_.'index.php';
 
-        $this->image_dir = $this->getImagePathDir();
+        $this->image_dir = _PS_HOTEL_IMG_.$this->getImgFolder();
     }
 
     /**
@@ -115,20 +115,12 @@ class HotelImage extends ObjectModel
 
     public function getImagePath()
     {
-        if ($hotelDir = $this->getImgFolder()) {
-            return _PS_HOTEL_IMG_.$hotelDir;
+        if (!$this->id) {
+            return false;
         }
 
-        return false;
-    }
-
-    public function getImagePathDir()
-    {
-        if ($hotelDir = $this->getImgFolder()) {
-            return _PS_HOTEL_IMG_DIR_.$hotelDir;
-        }
-
-        return false;
+        $path = $this->getImgFolder().$this->id;
+        return $path;
     }
 
     public function getImgFolder()

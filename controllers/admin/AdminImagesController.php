@@ -319,6 +319,87 @@ class AdminImagesControllerCore extends AdminController
                         ),
                     )
                 ),
+                // array(
+                //     'type' => 'switch',
+                //     'label' => $this->l('Manufacturers'),
+                //     'name' => 'manufacturers',
+                //     'required' => false,
+                //     'is_bool' => true,
+                //     'hint' => $this->l('This type will be used for Manufacturer images.'),
+                //     'values' => array(
+                //         array(
+                //             'id' => 'manufacturers_on',
+                //             'value' => 1,
+                //             'label' => $this->l('Enabled')
+                //         ),
+                //         array(
+                //             'id' => 'manufacturers_off',
+                //             'value' => 0,
+                //             'label' => $this->l('Disabled')
+                //         ),
+                //     )
+                // ),
+                // array(
+                //     'type' => 'switch',
+                //     'label' => $this->l('Suppliers'),
+                //     'name' => 'suppliers',
+                //     'required' => false,
+                //     'is_bool' => true,
+                //     'hint' => $this->l('This type will be used for Supplier images.'),
+                //     'values' => array(
+                //         array(
+                //             'id' => 'suppliers_on',
+                //             'value' => 1,
+                //             'label' => $this->l('Enabled')
+                //         ),
+                //         array(
+                //             'id' => 'suppliers_off',
+                //             'value' => 0,
+                //             'label' => $this->l('Disabled')
+                //         ),
+                //     )
+                // ),
+                // array(
+                //     'type' => 'switch',
+                //     'label' => $this->l('Scenes'),
+                //     'name' => 'scenes',
+                //     'required' => false,
+                //     'class' => 't',
+                //     'is_bool' => true,
+                //     'hint' => $this->l('This type will be used for Scene images.'),
+                //     'values' => array(
+                //         array(
+                //             'id' => 'scenes_on',
+                //             'value' => 1,
+                //             'label' => $this->l('Enabled')
+                //         ),
+                //         array(
+                //             'id' => 'scenes_off',
+                //             'value' => 0,
+                //             'label' => $this->l('Disabled')
+                //         ),
+                //     )
+                // ),
+                // array(
+                //     'type' => 'switch',
+                //     'label' => $this->l('Stores'),
+                //     'name' => 'stores',
+                //     'required' => false,
+                //     'is_bool' => true,
+                //     'hint' => $this->l('This type will be used for Store images.'),
+                //     'values' => array(
+                //         array(
+                //             'id' => 'stores_on',
+                //             'value' => 1,
+                //             'label' => $this->l('Enabled')
+                //         ),
+                //         array(
+                //             'id' => 'stores_off',
+                //             'value' => 0,
+                //             'label' => $this->l('Disabled')
+                //         ),
+                //     )
+                // ),
             ),
             'submit' => array(
                 'title' => $this->l('Save')
@@ -414,6 +495,10 @@ class AdminImagesControllerCore extends AdminController
             'categories' => $this->l('Categories'),
             'products' => $this->l('Room Types/Products'),
             'hotels' => $this->l('Hotels'),
+            // 'manufacturers' => $this->l('Manufacturers'),
+            // 'suppliers' => $this->l('Suppliers'),
+            // 'scenes' => $this->l('Scenes'),
+            // 'stores' => $this->l('Stores')
         );
 
         $formats = array();
@@ -498,50 +583,7 @@ class AdminImagesControllerCore extends AdminController
         }
 
         $generate_hight_dpi_images = (bool)Configuration::get('PS_HIGHT_DPI');
-
-        if ($imageElement != 'products') {
-            $formated_thumb_scene = ImageType::getFormatedName('thumb_scene');
-            $formated_medium = ImageType::getFormatedName('medium');
-            $this->regenerateImageInDir($dir, $type);
-            // foreach (scandir($dir) as $image) {
-            //     if (preg_match('/^[0-9]*\.jpg$/', $image)) {
-            //         foreach ($type as $k => $imageType) {
-            //             // Customizable writing dir
-            //             $newDir = $dir;
-            //             if ($imageType['name'] == $formated_thumb_scene) {
-            //                 $newDir .= 'thumbs/';
-            //             }
-            //             if (!file_exists($newDir)) {
-            //                 continue;
-            //             }
-
-            //             if (($dir == _PS_CAT_IMG_DIR_) && ($imageType['name'] == $formated_medium) && is_file(_PS_CAT_IMG_DIR_.str_replace('.', '_thumb.', $image))) {
-            //                 $image = str_replace('.', '_thumb.', $image);
-            //             }
-
-            //             if (!file_exists($newDir.substr($image, 0, -4).'-'.stripslashes($imageType['name']).'.jpg')) {
-            //                 if (!file_exists($dir.$image) || !filesize($dir.$image)) {
-            //                     $this->errors[] = sprintf(Tools::displayError('Source file does not exist or is empty (%s)'), $dir.$image);
-            //                 } elseif (!ImageManager::resize($dir.$image, $newDir.substr(str_replace('_thumb.', '.', $image), 0, -4).'-'.stripslashes($imageType['name']).'.jpg', (int)$imageType['width'], (int)$imageType['height'])) {
-            //                         $this->errors[] = sprintf(Tools::displayError('Failed to resize image file (%s)'), $dir.$image);
-            //                 }
-
-            //                 if ($generate_hight_dpi_images) {
-            //                     if (!ImageManager::resize($dir.$image, $newDir.substr($image, 0, -4).'-'.stripslashes($imageType['name']).'2x.jpg', (int)$imageType['width']*2, (int)$imageType['height']*2)) {
-            //                         $this->errors[] = sprintf(Tools::displayError('Failed to resize image file to high resolution (%s)'), $dir.$image);
-            //                     }
-            //                 }
-            //             }
-            //              // stop 4 seconds before the timeout, just enough time to process the end of the page on a slow server
-            //             if (time() - $this->start_time > $this->max_execution_time - 4) {
-            //                 return 'timeout';
-            //             }
-            //         }
-            //     }
-            // }
-
-
-        } else {
+        if ($imageElement == 'products') {
             foreach (Image::getAllImages() as $image) {
                 $imageObj = new Image($image['id_image']);
                 $existing_img = $dir.$imageObj->getExistingImgPath().'.jpg';
@@ -566,56 +608,76 @@ class AdminImagesControllerCore extends AdminController
                     return 'timeout';
                 }
             }
-        }
+        } elseif ($imageElement == 'hotels') {
+            $objHotelImage = new HotelImage();
+            foreach($objHotelImage->getAllImages() as $image) {
+                $objHotelImage = new HotelImage($image['id']);
+                $existing_img = $dir.$objHotelImage->getImagePath().'.jpg';
 
-        return (bool)count($this->errors);
-    }
+                if (file_exists($existing_img) && filesize($existing_img)) {
+                    foreach ($type as $imageType) {
+                        if (!file_exists($dir.$objHotelImage->getImagePath().'-'.stripslashes($imageType['name']).'.jpg')) {
+                            if (!ImageManager::resize($existing_img, $dir.$objHotelImage->getImagePath().'-'.stripslashes($imageType['name']).'.jpg', (int)$imageType['width'], (int)$imageType['height'])) {
+                                $this->errors[] = sprintf(Tools::displayError('Original image is corrupt (%s) for hotel ID %2$d or bad permission on folder'), $existing_img, (int)$objHotelImage->id_hotel);
+                            }
 
-    public function regenerateImageInDir($dir, $type)
-    {
-        foreach (scandir($dir) as $image) {
-            if ($image === '.' || $image === '..') {
-                continue;
-            }
-            if (is_dir($dir.$image)) {
-                $this->regenerateImageInDir($dir.$image.'/', $type);
-            }
-            if (preg_match('/^[0-9]*\.jpg$/', $image)) {
-                foreach ($type as $k => $imageType) {
-                    // Customizable writing dir
-                    $newDir = $dir;
-                    if ($imageType['name'] == $formated_thumb_scene) {
-                        $newDir .= 'thumbs/';
-                    }
-
-                    if (!file_exists($newDir)) {
-                        continue;
-                    }
-
-                    if (($dir == _PS_CAT_IMG_DIR_) && ($imageType['name'] == $formated_medium) && is_file(_PS_CAT_IMG_DIR_.str_replace('.', '_thumb.', $image))) {
-                        $image = str_replace('.', '_thumb.', $image);
-                    }
-                    if (!file_exists($newDir.substr($image, 0, -4).'-'.stripslashes($imageType['name']).'.jpg')) {
-                        if (!file_exists($dir.$image) || !filesize($dir.$image)) {
-                            $this->errors[] = sprintf(Tools::displayError('Source file does not exist or is empty (%s)'), $dir.$image);
-                        } elseif (!ImageManager::resize($dir.$image, $newDir.substr(str_replace('_thumb.', '.', $image), 0, -4).'-'.stripslashes($imageType['name']).'.jpg', (int)$imageType['width'], (int)$imageType['height'])) {
-                                $this->errors[] = sprintf(Tools::displayError('Failed to resize image file (%s)'), $dir.$image);
-                        }
-
-                        if ($generate_hight_dpi_images) {
-                            if (!ImageManager::resize($dir.$image, $newDir.substr($image, 0, -4).'-'.stripslashes($imageType['name']).'2x.jpg', (int)$imageType['width']*2, (int)$imageType['height']*2)) {
-                                $this->errors[] = sprintf(Tools::displayError('Failed to resize image file to high resolution (%s)'), $dir.$image);
+                            if ($generate_hight_dpi_images) {
+                                if (!ImageManager::resize($existing_img, $dir.$objHotelImage->getImagePath().'-'.stripslashes($imageType['name']).'2x.jpg', (int)$imageType['width']*2, (int)$imageType['height']*2)) {
+                                    $this->errors[] = sprintf(Tools::displayError('Original image is corrupt (%s) for hotel ID %2$d or bad permission on folder'), $existing_img, (int)$objHotelImage->id_hotel);
+                                }
                             }
                         }
                     }
+                } else {
+                    $this->errors[] = sprintf(Tools::displayError('Original image is missing or empty (%1$s) for hotel ID %2$d'), $existing_img, (int)$objHotelImage->id_hotel);
+                }
+                if (time() - $this->start_time > $this->max_execution_time - 4) { // stop 4 seconds before the tiemout, just enough time to process the end of the page on a slow server
+                    return 'timeout';
+                }
 
-                    // stop 4 seconds before the timeout, just enough time to process the end of the page on a slow server
-                    if (time() - $this->start_time > $this->max_execution_time - 4) {
-                        return 'timeout';
+            }
+        } else {
+            $formated_thumb_scene = ImageType::getFormatedName('thumb_scene');
+            $formated_medium = ImageType::getFormatedName('medium');
+            foreach (scandir($dir) as $image) {
+                if (preg_match('/^[0-9]*\.jpg$/', $image)) {
+                    foreach ($type as $k => $imageType) {
+                        // Customizable writing dir
+                        $newDir = $dir;
+                        if ($imageType['name'] == $formated_thumb_scene) {
+                            $newDir .= 'thumbs/';
+                        }
+                        if (!file_exists($newDir)) {
+                            continue;
+                        }
+
+                        if (($dir == _PS_CAT_IMG_DIR_) && ($imageType['name'] == $formated_medium) && is_file(_PS_CAT_IMG_DIR_.str_replace('.', '_thumb.', $image))) {
+                            $image = str_replace('.', '_thumb.', $image);
+                        }
+
+                        if (!file_exists($newDir.substr($image, 0, -4).'-'.stripslashes($imageType['name']).'.jpg')) {
+                            if (!file_exists($dir.$image) || !filesize($dir.$image)) {
+                                $this->errors[] = sprintf(Tools::displayError('Source file does not exist or is empty (%s)'), $dir.$image);
+                            } elseif (!ImageManager::resize($dir.$image, $newDir.substr(str_replace('_thumb.', '.', $image), 0, -4).'-'.stripslashes($imageType['name']).'.jpg', (int)$imageType['width'], (int)$imageType['height'])) {
+                                    $this->errors[] = sprintf(Tools::displayError('Failed to resize image file (%s)'), $dir.$image);
+                            }
+
+                            if ($generate_hight_dpi_images) {
+                                if (!ImageManager::resize($dir.$image, $newDir.substr($image, 0, -4).'-'.stripslashes($imageType['name']).'2x.jpg', (int)$imageType['width']*2, (int)$imageType['height']*2)) {
+                                    $this->errors[] = sprintf(Tools::displayError('Failed to resize image file to high resolution (%s)'), $dir.$image);
+                                }
+                            }
+                        }
+                         // stop 4 seconds before the timeout, just enough time to process the end of the page on a slow server
+                        if (time() - $this->start_time > $this->max_execution_time - 4) {
+                            return 'timeout';
+                        }
                     }
                 }
             }
         }
+
+        return (bool)count($this->errors);
     }
 
     /**

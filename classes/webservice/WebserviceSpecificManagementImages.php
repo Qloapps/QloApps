@@ -48,13 +48,13 @@ class WebserviceSpecificManagementImagesCore implements WebserviceSpecificManage
             'invoice' => array(),
             'store_icon' => array(),
         ),
-        'products' => array(),
+        'room_types' => array(),
         'hotels' => array(),
         'categories' => array(),
-        'manufacturers' => array(),
-        'suppliers' => array(),
-        'stores' => array(),
-        'customizations' => array(),
+        // 'manufacturers' => array(),
+        // 'suppliers' => array(),
+        // 'stores' => array(),
+        // 'customizations' => array(),
     );
 
     /**
@@ -301,6 +301,8 @@ class WebserviceSpecificManagementImagesCore implements WebserviceSpecificManage
             case 'suppliers':
             case 'stores':
             case 'features':
+            case 'hotels':
+            case 'room_types':
                 switch ($this->wsObject->urlSegment[1]) {
                     case 'categories':
                         $directory = _PS_CAT_IMG_DIR_;
@@ -317,17 +319,16 @@ class WebserviceSpecificManagementImagesCore implements WebserviceSpecificManage
                     case 'features':
                         $directory = _PS_IMG_DIR_.'rf/';
                         break;
+                    case 'room_types':
+                        $directory = _PS_PROD_IMG_DIR_;
+                        break;
+                    case 'hotels':
+                        $directory = _PS_HOTEL_IMG_DIR_;
+                        break;
                 }
                 return $this->manageDeclinatedImages($directory);
                 break;
 
-            // product image management : many image for one entity (product)
-            case 'room_types':
-                return $this->manageProductImages();
-                break;
-            case 'hotels':
-                return $this->manageHotelImages();
-                break;
             case 'customizations':
                 return $this->manageCustomizationImages();
                 break;
@@ -718,16 +719,6 @@ class WebserviceSpecificManagementImagesCore implements WebserviceSpecificManage
                 return $this->manageEntityDeclinatedImages($directory, $normal_image_sizes);
                 break;
         }
-    }
-
-    protected function manageProductImages()
-    {
-        $this->manageDeclinatedImages(_PS_PROD_IMG_DIR_);
-    }
-
-    protected function manageHotelImages()
-    {
-        $this->manageDeclinatedImages(_PS_HOTEL_IMG_DIR_);
     }
 
     protected function getCustomizations()
