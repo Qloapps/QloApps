@@ -880,7 +880,7 @@ class OrderInvoiceCore extends ObjectModel
         return OrderPayment::getByInvoiceId($this->id);
     }
 
-    public function getOrderPaymentDetailCollection()
+    public function getOrderPaymentDetail()
     {
         return OrderPaymentDetail::getByInvoiceId($this->id);
     }

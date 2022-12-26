@@ -1419,7 +1419,7 @@ class AdminOrdersControllerCore extends AdminController
             $order_state['text-color'] = Tools::getBrightness($order_state['color']) < 128 ? 'white' : 'black';
         }
 
-        $order_payment_detail = $order->getOrderPaymentDetailCollection();
+        $order_payment_detail = $order->getOrderPaymentDetail();
         foreach ($order_payment_detail as &$payment_detail) {
             $payment = new OrderPayment($payment_detail['id_order_payment']);
             if ($invoice = $payment->getOrderInvoice($order->id)) {

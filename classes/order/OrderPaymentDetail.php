@@ -1,6 +1,6 @@
 <?php
 /**
-* 2010-2021 Webkul.
+* 2010-2022 Webkul.
 *
 * NOTICE OF LICENSE
 *
@@ -30,50 +30,42 @@ class OrderPaymentDetailCore extends ObjectModel
         'primary' => 'id_order_payment_detail',
         'fields' => array(
             'id_order_payment' =>    array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
-            'id_order' =>    array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
-            'amount' =>            array('type' => self::TYPE_FLOAT, 'validate' => 'isNegativePrice', 'required' => true),
+            'id_order' =>            array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
+            'amount' =>              array('type' => self::TYPE_FLOAT, 'validate' => 'isNegativePrice', 'required' => true),
             'date_add' =>            array('type' => self::TYPE_DATE, 'validate' => 'isDate'),
-        ),
-        'associations' => array(
-            'order_payment' => array('type' => self::HAS_ONE, 'table' => 'order_payment')
         )
     );
 
+    /**
+     * Get Order Payments By Order ID
+     *
+     * @param int $id_invoice Order ID
+     * @return array OrderPayment detail
+     */
     public static function getByOrderId($id_order)
     {
         return Db::getInstance()->executeS('
-        SELECT opd.*, op.`id_currency`, op.`payment_method`, op.`conversion_rate`, op.`transaction_id`, op.`card_number`, op.`card_brand`, op.`card_expiration`, op.`card_holder`
-        FROM `'._DB_PREFIX_.'order_payment_detail` opd
-        INNER JOIN `'._DB_PREFIX_.'order_payment`op ON (op.`id_order_payment` = opd.`id_order_payment`)
-        WHERE `id_order` = '.(int)$id_order);
+            SELECT opd.*, op.`id_currency`, op.`payment_method`, op.`conversion_rate`, op.`transaction_id`, op.`card_number`, op.`card_brand`, op.`card_expiration`, op.`card_holder`
+            FROM `'._DB_PREFIX_.'order_payment_detail` opd
+            INNER JOIN `'._DB_PREFIX_.'order_payment`op ON (op.`id_order_payment` = opd.`id_order_payment`)
+            WHERE `id_order` = '.(int)$id_order
+        );
     }
 
     /**
      * Get Order Payments By Invoice ID
      *
      * @param int $id_invoice Invoice ID
-     * @return PrestaShopCollection Collection of OrderPayment
+     * @return array OrderPayment detail
      */
     public static function getByInvoiceId($id_invoice)
     {
-        $payments = Db::getInstance()->executeS('SELECT id_order_payment_detail FROM `'._DB_PREFIX_.'order_invoice_payment` WHERE id_order_invoice = '.(int)$id_invoice);
-        if (!$payments) {
-            return array();
-        }
-
-        $payment_list = array();
-        foreach ($payments as $payment) {
-            $payment_list[] = $payment['id_order_payment_detail'];
-        }
-        $order_payments = new DbQuery();
-        $order_payments->select('opd.*, op.*, opd.`amount` as `amount`');
-        $order_payments->from('order_payment_detail', 'opd');
-        $order_payments->innerJoin('order_payment', 'op', 'opd.`id_order_payment` = op.`id_order_payment`');
-        $order_payments->where('id_order_payment_detail IN ('.pSQL(implode(', ', $payment_list)).')');
-        return Db::getInstance()->executeS($order_payments);
-        // $payments = new PrestaShopCollection('OrderPaymentDetail');
-        // $payments->join('order_payment', 'id_order_payment');
-        // $payments->where('id_order_payment_detail', 'IN', $payment_list);
-        // ddd($payments->getAll());
+        return Db::getInstance()->executeS('
+            SELECT opd.`id_order_payment_detail`, opd.`id_order_payment`, opd.`id_order`, opd.`date_add`, op.*, opd.`amount` as `amount`
+            FROM `'._DB_PREFIX_.'order_payment_detail` opd
+            INNER JOIN `'._DB_PREFIX_.'order_payment` op ON (opd.`id_order_payment` = op.`id_order_payment`)
+            INNER JOIN `'._DB_PREFIX_.'order_invoice_payment` oip ON (oip.`id_order_payment_detail` = opd.`id_order_payment_detail`)
+            WHERE oip.`id_order_invoice` = '.(int)$id_invoice
+        );
     }
 }

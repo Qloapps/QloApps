@@ -1691,11 +1691,12 @@ class OrderCore extends ObjectModel
     {
         // if one of the order details use the tax computation method the display will be different
         return Db::getInstance()->getValue('
-		SELECT od.`tax_computation_method`
-		FROM `'._DB_PREFIX_.'order_detail_tax` odt
-		LEFT JOIN `'._DB_PREFIX_.'order_detail` od ON (od.`id_order_detail` = odt.`id_order_detail`)
-		WHERE od.`id_order` = '.(int)$this->id.'
-		AND od.`tax_computation_method` = '.(int)TaxCalculator::ONE_AFTER_ANOTHER_METHOD);
+            SELECT od.`tax_computation_method`
+            FROM `'._DB_PREFIX_.'order_detail_tax` odt
+            LEFT JOIN `'._DB_PREFIX_.'order_detail` od ON (od.`id_order_detail` = odt.`id_order_detail`)
+            WHERE od.`id_order` = '.(int)$this->id.'
+            AND od.`tax_computation_method` = '.(int)TaxCalculator::ONE_AFTER_ANOTHER_METHOD
+        );
     }
 
     /**
@@ -1710,14 +1711,19 @@ class OrderCore extends ObjectModel
         return $order_payments;
     }
 
-    public function getOrderPaymentDetailCollection()
+    /**
+     * This method allows to get all Order Payment detail for the current order
+     * @since 1.5.0.1
+     * @return array of OrderPaymentDetails
+     */
+    public function getOrderPaymentDetail()
     {
-        $order_payments = new DbQuery();
-        $order_payments->select('opd.`amount` as `real_paid_amount`, opd.*, op.*');
-        $order_payments->from('order_payment_detail', 'opd');
-        $order_payments->innerJoin('order_payment', 'op', 'opd.`id_order_payment` = op.`id_order_payment`');
-        $order_payments->where('id_order = '.$this->id);
-        return Db::getInstance()->executeS($order_payments);
+        return Db::getInstance()->executeS('
+            SELECT opd.`amount` as `real_paid_amount`, opd.*, op.*
+            FROM `'._DB_PREFIX_.'order_payment_detail` opd
+            INNER JOIN `'._DB_PREFIX_.'order_payment` op ON (opd.`id_order_payment` = op.`id_order_payment`)
+            WHERE `id_order` = '.$this->id
+        );
     }
 
     /**
@@ -1761,10 +1767,10 @@ class OrderCore extends ObjectModel
         return $res;
     }
 
-    public function addOrderPaymentDetail(OrderPayment $payment, $amount = false, $order_invoice = null)
+    public function addOrderPaymentDetail(OrderPayment $payment, $amount = null, $order_invoice = null)
     {
         if (Validate::isLoadedObject($payment)) {
-            if (!$amount) {
+            if (!is_null($amount)) {
                 $amount = $payment->amount;
             }
             $order_payment_detail = new OrderPaymentDetail();
@@ -1772,10 +1778,10 @@ class OrderCore extends ObjectModel
             $order_payment_detail->id_order_payment = (int)$payment->id;
             $order_payment_detail->amount = $amount;
 
-            if ($lastOrderPayment->id_currency == $this->id_currency) {
+            if ($payment->id_currency == $this->id_currency) {
                 $this->total_paid_real += $order_payment_detail->amount;
             } else {
-                $this->total_paid_real += Tools::ps_round(Tools::convertPrice($order_payment_detail->amount, $lastOrderPayment->id_currency, false), 2);
+                $this->total_paid_real += Tools::ps_round(Tools::convertPrice($order_payment_detail->amount, $payment->id_currency, false), 2);
             }
 
             if (!validate::isPrice($this->total_paid_real)) {
@@ -1932,7 +1938,7 @@ class OrderCore extends ObjectModel
         $total = 0;
 
         // Retrieve all payments
-        $payments = $this->getOrderPaymentDetailCollection();
+        $payments = $this->getOrderPaymentDetail();
         foreach ($payments as $payment) {
             /** @var OrderPayment $payment */
             if ($payment['id_currency'] == $currency->id) {
