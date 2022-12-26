@@ -980,8 +980,8 @@ class HotelBookingDetail extends ObjectModel
     public function getAvailableRoomsForReallocation($date_from, $date_to, $room_type, $hotel_id)
     {
         $context = Context::getContext();
-        if (isset($context->cookie->wk_id_cart)) {
-            $current_admin_cart_id = $context->cookie->wk_id_cart;
+        if (isset($context->cookie->id_cart)) {
+            $current_admin_cart_id = $context->cookie->id_cart;
         }
         $exclude_ids = 'SELECT `id_room` FROM `'._DB_PREFIX_.'htl_booking_detail`
             WHERE `date_from` < \''.pSQL($date_to).'\' AND `date_to` > \''.pSQL($date_from).'\'
