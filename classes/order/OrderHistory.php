@@ -312,7 +312,7 @@ class OrderHistoryCore extends ObjectModel
         }
 
         // set orders as paid
-        if ($new_os->paid == 1 || (Configuration::get('PS_OS_PARTIAL_PAYMENT') == $new_os->id && $new_os->logable == 1)) {
+        if ($new_os->paid == 1) {
             $invoices = $order->getInvoicesCollection();
             if ($order->total_paid != 0) {
                 $payment_method = Module::getInstanceByName($order->module);
@@ -322,13 +322,6 @@ class OrderHistoryCore extends ObjectModel
                 /** @var OrderInvoice $invoice */
                 $rest_paid = $invoice->getRestPaid();
                 if ($rest_paid > 0) {
-                    if (Configuration::get('PS_OS_PARTIAL_PAYMENT') == $new_os->id) {
-                        if ($order->total_paid_real < $order->advance_paid_amount) {
-                            $rest_paid =  $order->advance_paid_amount - $order->total_paid_real;
-                        } else {
-                            break;
-                        }
-                    }
                     $payment = new OrderPayment();
                     $payment->order_reference = Tools::substr($order->reference, 0, 9);
                     $payment->id_currency = $order->id_currency;
