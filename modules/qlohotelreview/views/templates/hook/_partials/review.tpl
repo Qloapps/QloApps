@@ -51,7 +51,7 @@
                     <i class="icon icon-thumbs-o-up text-primary"></i>
                 </a>
             {/if}
-            <p class="helpful-count">{l s='%1$d people found it helpful.' sprintf=[$review.total_useful] mod='qlohotelreview'}</p>
+            <p class="helpful-count"><span>{$review.total_useful|escape:'html':'UTF-8'}</span>{l s=' people found it helpful.' mod='qlohotelreview'}</p>
         </div>
         {if $logged && !$review.response_report}
             <div class="col-sm-6 text-right">

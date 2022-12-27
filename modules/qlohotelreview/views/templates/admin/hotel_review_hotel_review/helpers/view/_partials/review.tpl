@@ -124,7 +124,11 @@
     <label class="control-label col-lg-3">{l s='Total Reports' mod='qlohotelreview'}</label>
     <div class="col-lg-9">
         <p class="form-control-static">
-            <span class="badge badge-danger">{$total_reports|escape:'html':'UTF-8'}</span>
+            {if $total_reports|intval > 0}
+                <span class="badge badge-danger">{$total_reports|escape:'html':'UTF-8'}</span>
+            {else}
+                --
+            {/if}
         </p>
         {if $total_reports|intval > 0}
             <p>
