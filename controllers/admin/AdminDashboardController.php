@@ -26,6 +26,9 @@
 
 class AdminDashboardControllerCore extends AdminController
 {
+
+    const DASHBOARD_RECOMMENDATION_CONTENT = '/cache/dashboard_recommendation.html';
+
     public function __construct()
     {
         $this->bootstrap = true;
@@ -70,13 +73,11 @@ class AdminDashboardControllerCore extends AdminController
     {
         $forms = array();
         $currency = new Currency(Configuration::get('PS_CURRENCY_DEFAULT'));
-        $carriers = Carrier::getCarriers($this->context->language->id, true, false, false, null, 'ALL_CARRIERS');
         $modules = Module::getModulesOnDisk(true);
 
         $forms = array(
+            'net_profit' => array('title' => $this->l('Net Profit settings'), 'id' => 'net_profit'),
             'payment' => array('title' => $this->l('Average bank fees per payment method'), 'id' => 'payment'),
-            'carriers' => array('title' => $this->l('Average shipping fees per shipping method'), 'id' => 'carriers'),
-            'other' => array('title' => $this->l('Other settings'), 'id' => 'other')
         );
         foreach ($forms as &$form) {
             $form['icon'] = 'tab-preferences';
@@ -133,32 +134,9 @@ class AdminDashboardControllerCore extends AdminController
             }
         }
 
-        foreach ($carriers as $carrier) {
-            $forms['carriers']['fields']['CONF_'.strtoupper($carrier['id_reference']).'_SHIP'] = array(
-                'title' => $carrier['name'],
-                'desc' => sprintf($this->l('For the carrier named %s, indicate the domestic delivery costs  in percentage of the price charged to customers.'), $carrier['name']),
-                'validation' => 'isPercentage',
-                'cast' => 'floatval',
-                'type' => 'text',
-                'defaultValue' => '0',
-                'suffix' => '%'
-            );
-            $forms['carriers']['fields']['CONF_'.strtoupper($carrier['id_reference']).'_SHIP_OVERSEAS'] = array(
-                'title' => $carrier['name'],
-                'desc' => sprintf($this->l('For the carrier named %s, indicate the overseas delivery costs in percentage of the price charged to customers.'), $carrier['name']),
-                'validation' => 'isPercentage',
-                'cast' => 'floatval',
-                'type' => 'text',
-                'defaultValue' => '0',
-                'suffix' => '%'
-            );
-        }
-
-        $forms['carriers']['description'] = $this->l('Method: Indicate the percentage of your carrier margin. For example, if you charge $10 of shipping fees to your customer for each shipment, but you really pay $4 to this carrier, then you should indicate "40" in the percentage field.');
-
-        $forms['other']['fields']['CONF_AVERAGE_PRODUCT_MARGIN'] = array(
+        $forms['net_profit']['fields']['CONF_AVERAGE_PRODUCT_MARGIN'] = array(
             'title' => $this->l('Average gross margin percentage'),
-            'desc' => $this->l('You should calculate this percentage as follows: ((total sales revenue) - (cost of goods sold)) / (total sales revenue) * 100. This value is only used to calculate the Dashboard approximate gross margin, if you do not specify the wholesale price for each product.'),
+            'desc' => $this->l('You should calculate this percentage as follows: ((total sales revenue) - (total operating cost)) / (total sales revenue) * 100. This value is only used to calculate Dashboard approximate gross margin, if you do not specify operating cost for each room type.'),
             'validation' => 'isPercentage',
             'cast' => 'intval',
             'type' => 'text',
@@ -166,7 +144,7 @@ class AdminDashboardControllerCore extends AdminController
             'suffix' => '%'
         );
 
-        $forms['other']['fields']['CONF_ORDER_FIXED'] = array(
+        $forms['net_profit']['fields']['CONF_ORDER_FIXED'] = array(
             'title' => $this->l('Other fees per order'),
             'desc' => $this->l('You should calculate this value by making the sum of all of your additional costs per order.'),
             'validation' => 'isPrice',
@@ -282,6 +260,15 @@ class AdminDashboardControllerCore extends AdminController
                 'hotel_name' => $objHotelBranchInfo->hotel_name.', '.$hotelAddressInfo['city'],
             );
         }
+
+        if (file_exists(_PS_ROOT_DIR_.Upgrader::CACHE_FILE_UPGRADE_AVAILABE)) {
+            $content = Tools::file_get_contents( _PS_ROOT_DIR_.Upgrader::CACHE_FILE_UPGRADE_AVAILABE);
+            $upgradeInfo = simplexml_load_string($content);
+            $this->context->smarty->assign(array(
+                'upgrade_info' => $upgradeInfo
+            ));
+        }
+
         $this->tpl_view_vars = array(
             'date_from' => $this->context->employee->stats_date_from,
             'date_to' => $this->context->employee->stats_date_to,
@@ -294,7 +281,7 @@ class AdminDashboardControllerCore extends AdminController
             //'translations' => $translations,
             'action' => self::$currentIndex.'&token='.$this->token,
             'warning' => $this->getWarningDomainName(),
-            'new_version_url' => Tools::getCurrentUrlProtocolPrefix()._PS_API_DOMAIN_.'/version/check_version.php?v='._PS_VERSION_.'&lang='.$this->context->language->iso_code.'&autoupgrade='.(int)(Module::isInstalled('autoupgrade') && Module::isEnabled('autoupgrade')).'&hosted_mode='.(int)defined('_PS_HOST_MODE_'),
+            'new_version_url' => Tools::getCurrentUrlProtocolPrefix()._QLO_API_DOMAIN_.'/index.php?version='._QLOAPPS_VERSION_.'&lang='.$this->context->language->iso_code.'&method=check-version&autoupgrade='.(int)(Module::isInstalled('qloautoupgrade') && Module::isEnabled('qloautoupgrade')).'&hosted_mode='.(int)defined('_PS_HOST_MODE_'),
             'dashboard_use_push' => Configuration::get('PS_DASHBOARD_USE_PUSH'),
             'calendar' => $calendar_helper->generate(),
             'PS_DASHBOARD_SIMULATION' => Configuration::get('PS_DASHBOARD_SIMULATION'),
@@ -411,7 +398,7 @@ class AdminDashboardControllerCore extends AdminController
     public function ajaxProcessGetBlogRss()
     {
         $return = array('has_errors' => false, 'rss' => array());
-        if (!$this->isFresh('/config/xml/blog-'.$this->context->language->iso_code.'.xml', 86400)) {
+        if (!$this->isFresh('/config/xml/blog-'.$this->context->language->iso_code.'.xml', _TIME_1_DAY_)) {
             if (!$this->refresh('/config/xml/blog-'.$this->context->language->iso_code.'.xml', _PS_API_URL_.'/rss/blog/blog-'.$this->context->language->iso_code.'.xml')) {
                 $return['has_errors'] = true;
             }
@@ -505,5 +492,26 @@ class AdminDashboardControllerCore extends AdminController
         }
 
         die(json_encode($return));
+    }
+
+    public function ajaxProcessGetRecommendationContent()
+    {
+        $response = array('success' => false);
+        if ($content = $this->getRecommendationContent()) {
+            $response['success'] = true;
+            $response['content'] = $content;
+        }
+        $this->ajaxDie(json_encode($response));
+    }
+
+    public function getRecommendationContent()
+    {
+        if (!$this->isFresh(self::DASHBOARD_RECOMMENDATION_CONTENT, _TIME_1_DAY_)) {
+            @file_put_contents(_PS_ROOT_DIR_.self::DASHBOARD_RECOMMENDATION_CONTENT, Tools::addonsRequest('dashboard-recommendation'));
+        }
+        if (file_exists(_PS_ROOT_DIR_.self::DASHBOARD_RECOMMENDATION_CONTENT)) {
+            return Tools::file_get_contents(_PS_ROOT_DIR_.self::DASHBOARD_RECOMMENDATION_CONTENT);
+        }
+        return false;
     }
 }

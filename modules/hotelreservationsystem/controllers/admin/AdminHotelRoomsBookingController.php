@@ -77,73 +77,24 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
         $this->context->customer = $objCustomer;
     }
 
-    public function initContent()
+    public function postProcess()
     {
-        $this->show_toolbar = false;
-        $this->display = 'view';
-        parent::initContent();
-    }
-
-    public function renderView()
-    {
-        $obj_rm_type = new HotelRoomType();
-        $obj_booking_dtl = new HotelBookingDetail();
-        $obj_htl_info = new HotelBranchInformation();
-        $obj_cart_book_data = new HotelCartBookingData();
-
-        $check_calender_var = 0;
-        $hotel_name = '';
-        $all_room_type = array();
-        $rms_in_cart = 0;
-        $hotel_id = 0;
-        $room_type = 0;
-        $booking_data = false;
-        $id_cart = $this->context->cart->id;
-        $id_guest = $this->context->cookie->id_guest;
-
-        $this->context->smarty->assign(
-            array(
-                'id_cart' => $id_cart,
-                'id_guest' => $id_guest
-            )
-        );
-
-        $cart_bdata = $obj_cart_book_data->getCartBookingDetailsByIdCartIdGuest(
-            $id_cart,
-            $id_guest,
-            Configuration::get('PS_LANG_DEFAULT')
-        );
-        if ($cart_bdata) {
-            $cart_tamount = $this->context->cart->getOrderTotal();
-            $this->context->smarty->assign(
-                array(
-                    'cart_bdata' => $cart_bdata,
-                    'cart_tamount' => $cart_tamount
-                )
-            );
-        }
-
-        // No use of adult, child, num_rooms
-        $adult = 0;
-        $children = 0;
-        $num_rooms = 1;
-        $check_css_condition_var = '';
-
-        if (Tools::getValue('dt_f')) {
-            $date_from = Tools::getValue('dt_f');
+        if (Tools::getValue('date_from')) {
+            $date_from = Tools::getValue('date_from');
         } else {
             $date_from = date('Y-m-d');
         }
-        if (Tools::getValue('dt_t')) {
-            $date_to = Tools::getValue('dt_t');
+        if (Tools::getValue('date_to')) {
+            $date_to = Tools::getValue('date_to');
         } else {
-            $date_to = date('Y-m-t');
-            if (strtotime($date_from) == strtotime($date_to)) {
+            $date_to = date('Y-m-d');
+            if (strtotime($date_from) >= strtotime($date_to)) {
                 $date_to = date('Y-m-d', strtotime('+1 day', strtotime($date_to)));
             }
         }
-        if (Tools::getValue('id_htl')) {
-            $hotel_id = Tools::getValue('id_htl');
+
+        if (Tools::getValue('id_hotel')) {
+            $id_hotel = Tools::getValue('id_hotel');
         } else {
             $obj_htl_info = new HotelBranchInformation();
             if ($htl_info = $obj_htl_info->hotelBranchesInfo(false, 1)) {
@@ -153,380 +104,26 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
                     $this->context->employee->id_profile,
                     1
                 );
-                $hotel_id = reset($htl_info)['id'];
+                $id_hotel = reset($htl_info)['id'];
             }
         }
-        if (Tools::getValue('id_rt')) {
-            $room_type = Tools::getValue('id_rt');
+
+        if (Tools::getValue('id_room_type')) {
+            $id_room_type = Tools::getValue('id_room_type');
+        } else {
+            $id_room_type = 0;
         }
-        $formAction = '';
+
         if (Tools::isSubmit('search_hotel_list')) {
-            $date_from = Tools::getValue('from_date');
-            $date_to = Tools::getValue('to_date');
-            $hotel_id = Tools::getValue('hotel_id');
-            $room_type = Tools::getValue('room_type');
-
-            $formAction = $this->context->link->getAdminLink('AdminHotelRoomsBooking').
-            '&dt_f='.$date_from.'&dt_t='.$date_to.'&id_htl='.$hotel_id.'&id_rt='.$room_type;
-            Tools::redirectAdmin($formAction);
-
-        }
-        if ($date_from == '') {
-            $this->errors[] = $this->l('Date from is required field.');
-        }
-        if ($date_to == '') {
-            $this->errors[] = $this->l('Date to is required field.');
-        }
-        if (strtotime($date_to) <= strtotime($date_from)) {
-            $this->errors[] = $this->l('Date to should be greater than Date from.');
-        }
-
-        $date_from = date("Y-m-d", strtotime($date_from));
-        $date_to = date("Y-m-d", strtotime($date_to));
-
-        $booking_calendar_data = array();
-        if (!count($this->errors)) {
-            $booking_data = $this->getAllBookingDataInfo(
-                $date_from,
-                $date_to,
-                $hotel_id,
-                $room_type,
-                $adult,
-                $children,
-                $num_rooms,
-                $id_cart,
-                $id_guest
+            $urlData = array (
+                'date_from' => $date_from,
+                'date_to' => $date_to,
+                'id_hotel' => $id_hotel,
+                'id_room_type' => $id_room_type
             );
-
-            //To show info of every date
-            $start_date = $date_from; // hard-coded '01' for first day
-            $last_day_this_month  = $date_to;
-
-            $bookingParams = array();
-            $bookingParams['hotel_id'] = $hotel_id;
-            $bookingParams['room_type'] = $room_type;
-            $bookingParams['adult'] = $adult;
-            $bookingParams['children'] = $children;
-            $bookingParams['num_rooms'] = $num_rooms;
-            $bookingParams['for_calendar'] = 1;
-            $bookingParams['search_available'] = 1;
-            $bookingParams['search_partial'] = 1;
-            $bookingParams['search_booked'] = 1;
-            $bookingParams['search_unavai'] = 1;
-            $bookingParams['id_cart'] = $id_cart;
-            $bookingParams['id_guest'] = $id_guest;
-            $bookingParams['search_cart_rms'] = 1;
-
-            while ($start_date <= $last_day_this_month) {
-                $cal_date_from = $start_date;
-                $cal_date_to = date('Y-m-d', strtotime('+1 day', strtotime($cal_date_from)));
-                $bookingParams['date_from'] = $cal_date_from;
-                $bookingParams['date_to'] = $cal_date_to;
-
-                $booking_calendar_data[$cal_date_from] = $obj_booking_dtl->getBookingData($bookingParams);
-                $start_date = date('Y-m-d', strtotime('+1 day', strtotime($start_date)));
-            }
-
-            if (isset($booking_data)) {
-                if ($num_rooms <= $booking_data['stats']['num_avail']) {
-                    $check_css_condition_var = 'default_available';
-                } elseif ($num_rooms <= $booking_data['stats']['num_part_avai']) {
-                    $check_css_condition_var = 'default_part_available';
-                } else {
-                    $check_css_condition_var = 'default_unavailable';
-                }
-            }
-        }
-        $hotel_name = $obj_htl_info->hotelBranchesInfo(false, 1);
-        // filter hotels as per accessed hotels
-        $hotel_name = HotelBranchInformation::filterDataByHotelAccess(
-            $hotel_name,
-            $this->context->employee->id_profile,
-            1
-        );
-        $all_room_type = $obj_rm_type->getRoomTypeByHotelId($hotel_id, Configuration::get('PS_LANG_DEFAULT'), 1);
-
-        $rms_in_cart = $obj_cart_book_data->getCountRoomsInCart($id_cart, $id_guest);
-        $date_from = date("d-m-Y", strtotime($date_from));
-        $date_to = date("d-m-Y", strtotime($date_to));
-        $currency = new Currency((int)Configuration::get('PS_CURRENCY_DEFAULT'));
-        // booking allotment types
-        $allotmentTypes = HotelBookingDetail::getAllAllotmentTypes();
-        $this->tpl_view_vars = array(
-            'check_calender_var' => $check_calender_var,
-            'date_from' => $date_from,
-            'date_to' => $date_to,
-            'hotel_id' => $hotel_id,
-            'room_type' => $room_type,
-            'adult' => $adult,
-            'children' => $children,
-            'num_rooms' => $num_rooms,
-            'booking_data' => $booking_data,
-            'booking_calendar_data' => $booking_calendar_data,
-            'check_css_condition_var' => $check_css_condition_var,
-            'hotel_name' => $hotel_name,
-            'all_room_type' => $all_room_type,
-            'currency' => $currency,
-            'allotment_types' => $allotmentTypes,
-            'rms_in_cart' => $rms_in_cart,
-            'formAction' => $formAction,
-        );
-        return parent::renderView();
-    }
-
-    public function ajaxProcessGetRoomType()
-    {
-        $hotel_id  = Tools::getValue('hotel_id');
-        $obj_room_type = new HotelRoomType();
-        $room_type_info = $obj_room_type->getRoomTypeByHotelId($hotel_id, Configuration::get('PS_LANG_DEFAULT'), 1);
-        die(json_encode($room_type_info));
-    }
-
-    public function ajaxProcessAddDataToCart()
-    {
-        // for Add Quantity
-        $id_room = Tools::getValue('id_room');
-        $booking_type = Tools::getValue('booking_type');
-        $comment = Tools::getValue('comment');
-
-        // for both (add , delete)
-        $id_hotel = Tools::getValue('id_hotel');
-        $id_product = Tools::getValue('id_prod');
-        $date_from = Tools::getValue('date_from');
-        $date_to = Tools::getValue('date_to');
-
-        $date_from = date("Y-m-d", strtotime($date_from));
-        $date_to = date("Y-m-d", strtotime($date_to));
-
-        $search_id_prod = Tools::getValue('search_id_prod');
-        $search_date_from = Tools::getValue('search_date_from');
-        $search_date_to = Tools::getValue('search_date_to');
-
-        // for delete quantity
-        $id_cart = Tools::getValue('id_cart');
-        $id_cart_book_data = Tools::getValue('id_cart_book_data');
-        $ajax_delete = Tools::getValue('ajax_delete'); // If delete from cart(not for room list delete(pagebottom tabs))
-
-        $opt = Tools::getValue('opt'); // if 1 then add quantity or if 0 means delete quantity
-
-        $obj_booking_dtl = new HotelBookingDetail();
-        $num_day = $obj_booking_dtl->getNumberOfDays($date_from, $date_to); //quantity of product
-        $product = new Product($id_product, false, Configuration::get('PS_LANG_DEFAULT'));
-
-        if ($opt) {
-            $unit_price = Product::getPriceStatic(
-                $id_product,
-                HotelBookingDetail::useTax(),
-                null,
-                6,
-                null,
-                false,
-                true,
-                $num_day
-            );
+            Tools::redirectAdmin($this->context->link->getAdminLink('AdminHotelRoomsBooking').'&'.http_build_query($urlData));
         }
 
-        if ($opt) {
-            $direction = 'up';
-        } else {
-            $direction = 'down';
-        }
-
-        $this->context->cart->updateQty($num_day, $id_product, null, false, $direction);
-
-        $id_cart = $this->context->cart->id;
-        $id_guest = $this->context->cookie->id_guest;
-
-        $obj_cart_book_data = new HotelCartBookingData();
-        $total_amount = $this->context->cart->getOrderTotal();
-        if ($opt) {
-            $obj_cart_book_data->id_cart = $id_cart;
-            $obj_cart_book_data->id_guest = $id_guest;
-            $obj_cart_book_data->id_product = $id_product;
-            $obj_cart_book_data->id_room = $id_room;
-            $obj_cart_book_data->id_hotel = $id_hotel;
-            $obj_cart_book_data->quantity = $num_day;
-            $obj_cart_book_data->id_currency = Configuration::get('PS_CURRENCY_DEFAULT');
-            $obj_cart_book_data->booking_type = $booking_type;
-            $obj_cart_book_data->comment = $comment;
-            $obj_cart_book_data->date_from = $date_from;
-            $obj_cart_book_data->date_to = $date_to;
-            $obj_cart_book_data->save();
-
-            $obj_rm_info = new HotelRoomInformation($id_room);
-            $total_amount = $this->context->cart->getOrderTotal();
-            $rms_in_cart = $obj_cart_book_data->getCountRoomsInCart($id_cart, $id_guest);
-
-            $bookingParams = array();
-            $bookingParams['date_from'] = $search_date_from;
-            $bookingParams['date_to'] = $search_date_to;
-            $bookingParams['hotel_id'] = $id_hotel;
-            $bookingParams['room_type'] = $search_id_prod;
-            $bookingParams['adult'] = 0;
-            $bookingParams['children'] = 0;
-            $bookingParams['num_rooms'] = 1;
-            $bookingParams['for_calendar'] = 1;
-            $bookingParams['search_available'] = 1;
-            $bookingParams['search_partial'] = 1;
-            $bookingParams['search_booked'] = 0;
-            $bookingParams['search_unavai'] = 0;
-            $bookingParams['id_cart'] = $id_cart;
-            $bookingParams['id_guest'] = $id_guest;
-            $bookingParams['search_cart_rms'] = 1;
-
-            $booking_stats = $obj_booking_dtl->getBookingData($bookingParams);
-
-            // By webkul New way to calculate product prices with feature Prices
-            $roomTypeDateRangePrice = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
-                $id_product,
-                $date_from,
-                $date_to
-            );
-
-            $rm_amount = $roomTypeDateRangePrice['total_price_tax_excl'];
-            $cart_data = array('room_num' => $obj_rm_info->room_num,
-                'room_type' => Product::getProductName((int)$id_product),
-                'date_from' => Tools::displayDate($date_from),
-                'date_to' => Tools::displayDate($date_to),
-                'amount' => Tools::displayPrice($rm_amount),
-                'qty' => $num_day,
-                'rms_in_cart' => $rms_in_cart,
-                'total_amount' => Tools::displayPrice($total_amount),
-                'booking_stats' => $booking_stats,
-                'id_cart_book_data' => $obj_cart_book_data->id
-            );
-
-            if ($obj_cart_book_data->id) {
-                die(json_encode($cart_data));
-            } else {
-                die(0);
-            }
-        } else {
-            $total_amount = $this->context->cart->getOrderTotal();
-            $data_dlt = $obj_cart_book_data->deleteRowById($id_cart_book_data);
-            if ($data_dlt) {
-                $rms_in_cart = $obj_cart_book_data->getCountRoomsInCart($id_cart, $id_guest);
-
-                if (!$ajax_delete) {
-                    $bookingParams = array();
-                    $bookingParams['date_from'] = $search_date_from;
-                    $bookingParams['date_to'] = $search_date_to;
-                    $bookingParams['hotel_id'] = $id_hotel;
-                    $bookingParams['room_type'] = $search_id_prod;
-                    $bookingParams['adult'] = 0;
-                    $bookingParams['children'] = 0;
-                    $bookingParams['num_rooms'] = 1;
-                    $bookingParams['for_calendar'] = 1;
-                    $bookingParams['search_available'] = 1;
-                    $bookingParams['search_partial'] = 1;
-                    $bookingParams['search_booked'] = 0;
-                    $bookingParams['search_unavai'] = 0;
-                    $bookingParams['id_cart'] = $id_cart;
-                    $bookingParams['id_guest'] = $id_guest;
-                    $bookingParams['search_cart_rms'] = 1;
-
-                    $booking_stats = $obj_booking_dtl->getBookingData($bookingParams);
-                    $cart_data = array(
-                        'total_amount' => Tools::displayPrice($total_amount),
-                        'rms_in_cart' => $rms_in_cart,
-                        'booking_stats' => $booking_stats
-                    );
-                }
-
-                if ($ajax_delete) {
-                    $obj_htl_info = new HotelBranchInformation();
-                    $obj_rm_type = new HotelRoomType();
-
-                    $this->context->smarty->assign(
-                        array(
-                            'id_cart' => $id_cart,
-                            'id_guest' => $id_guest
-                        )
-                    );
-
-                    // No use of adult, child, num_rooms
-                    $adult = 0;
-                    $children = 0;
-                    $num_rooms = 1;
-
-                    $booking_data = array();
-
-                    $booking_data = $this->getAllBookingDataInfo(
-                        $search_date_from,
-                        $search_date_to,
-                        $id_hotel,
-                        $search_id_prod,
-                        $adult,
-                        $children,
-                        $num_rooms,
-                        $id_cart,
-                        $id_guest
-                    );
-                    $this->context->smarty->assign(
-                        array(
-                            'date_from' => $search_date_from,
-                            'date_to' => $search_date_to,
-                            'booking_data' => $booking_data,
-                            'ajax_delete' => $ajax_delete,
-                        )
-                    );
-                    $tpl_path = 'hotelreservationsystem/views/templates/admin/hotel_rooms_booking/helpers/view/view.tpl';
-                    $room_tpl = $this->context->smarty->fetch(_PS_MODULE_DIR_.$tpl_path);
-
-                    $cart_data = array(
-                        'total_amount' => Tools::displayPrice($total_amount),
-                        'room_tpl' => $room_tpl,
-                        'rms_in_cart' => $rms_in_cart,
-                        'booking_data' => $booking_data,
-                    );
-                }
-                die(json_encode($cart_data));
-            } else {
-                die(0);
-            }
-        }
-    }
-
-    public function ajaxProcessGetDataOnMonthChange()
-    {
-        $month = Tools::getValue('month');
-        $year = Tools::getValue('year');
-        $query_date = $year.'-'.$month.'-04';
-        $start_date = date('Y-m-01', strtotime($query_date)); // hard-coded '01' for first day
-        $last_day_this_month  = date('Y-m-t', strtotime($query_date));
-        $hotel_id = 1;
-        $room_type = 0;
-        $adult = 1;
-        $children = 0;
-        $num_rooms = 1;
-
-        $obj_booking_dtl = new HotelBookingDetail();
-
-        $bookingParams = array();
-        $bookingParams['hotel_id'] = $hotel_id;
-        $bookingParams['room_type'] = $room_type;
-        $bookingParams['adult'] = $adult;
-        $bookingParams['children'] = $children;
-        $bookingParams['num_rooms'] = $num_rooms;
-        while ($start_date <= $last_day_this_month) {
-            $cal_date_from = $start_date;
-            $cal_date_to = date('Y-m-d', strtotime('+1 day', strtotime($cal_date_from)));
-
-            $bookingParams['date_from'] = $cal_date_from;
-            $bookingParams['date_to'] = $cal_date_to;
-
-            $booking_calendar_data[$cal_date_from] = $obj_booking_dtl->getBookingData($bookingParams);
-            $start_date = date('Y-m-d', strtotime('+1 day', strtotime($start_date)));
-        }
-        if ($booking_calendar_data) {
-            die(json_encode($booking_calendar_data));
-        } else {
-            die(0);
-        }
-    }
-
-    public function postProcess()
-    {
         if (Tools::isSubmit('realloc_allocated_rooms')) {
             $current_room_id = Tools::getValue('modal_id_room');
             $current_room = Tools::getValue('modal_curr_room_num');
@@ -593,7 +190,379 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
                 }
             }
         }
-        parent::postProcess();
+
+        $this->id_cart = $this->context->cart->id;
+        $this->id_guest = $this->context->cookie->id_guest;
+        $this->id_hotel = $id_hotel;
+        $this->id_room_type = $id_room_type;
+        $this->date_from = $date_from;
+        $this->date_to = $date_to;
+
+        parent::postprocess();
+    }
+
+    public function initContent()
+    {
+        // $this->show_toolbar = false;
+        $this->toolbar_title = $this->l('Book Now');
+        $this->display = 'view';
+
+        parent::initContent();
+        // $this->content = $this->renderView();
+        // $this->context->smarty->assign('content', $this->content);
+    }
+
+    public function initSearchFormData()
+    {
+        $obj_htl_info = new HotelBranchInformation();
+        $obj_rm_type = new HotelRoomType();
+        $objHotelCartBookingData = new HotelCartBookingData();
+
+
+        $hotel_list = $obj_htl_info->hotelBranchesInfo(false, 1);
+        // filter hotels as per accessed hotels
+        $hotel_list = HotelBranchInformation::filterDataByHotelAccess(
+            $hotel_list,
+            $this->context->employee->id_profile,
+            1
+        );
+        $all_room_type = $obj_rm_type->getRoomTypeByHotelId($this->id_hotel, Configuration::get('PS_LANG_DEFAULT'), 1);
+
+        $this->tpl_view_vars = array_merge($this->tpl_view_vars, array(
+            'hotel_list' => $hotel_list,
+            'all_room_type' => $all_room_type,
+            'date_from' => $this->date_from,
+            'date_to' => $this->date_to,
+            'id_hotel' => $this->id_hotel,
+            'id_room_type' => $this->id_room_type,
+        ));
+    }
+
+    public function renderView()
+    {
+        $this->tpl_view_vars = array(
+            'id_cart' => $this->context->cart->id,
+            'id_guest' => $this->context->cookie->id_guest,
+        );
+        $this->initSearchFormData();
+        $this->assignRoomBookingForm();
+        $this->initCartData();
+
+        return parent::renderView();
+    }
+
+    public function assignRoomBookingForm()
+    {
+        $objHotelBookingDetail = new HotelBookingDetail();
+
+        $adult = 0;
+        $children = 0;
+        $num_rooms = 1;
+        $booking_data = $this->getAllBookingDataInfo(
+            $this->date_from,
+            $this->date_to,
+            $this->id_hotel,
+            $this->id_room_type,
+            $adult,
+            $children,
+            $num_rooms,
+            $this->context->cart->id,
+            $this->context->cookie->id_guest
+        );
+
+        $allotmentTypes = HotelBookingDetail::getAllAllotmentTypes();
+
+        $this->context->smarty->assign(array(
+            'adult' => $adult,
+            'children' => $children,
+            'num_rooms' => $num_rooms,
+            'booking_data' => $booking_data,
+            'allotment_types' => $allotmentTypes,
+            'date_from' => $this->date_from,
+            'date_to' => $this->date_to,
+        ));
+    }
+
+    public function initCartData()
+    {
+        $objHotelCartBookingData = new HotelCartBookingData();
+
+        $cart_bdata = $objHotelCartBookingData->getCartBookingDetailsByIdCartIdGuest(
+            $this->context->cart->id,
+            $this->context->cookie->id_guest,
+            $this->context->employee->id_lang
+        );
+        $this->context->smarty->assign(array(
+            'id_cart' => $this->context->cart->id,
+            'id_guest' => $this->context->cookie->id_guest,
+            'rms_in_cart' => $objHotelCartBookingData->getCountRoomsInCart($this->id_cart, $this->id_guest)
+        ));
+        if ($cart_bdata) {
+            $cart_tamount = $this->context->cart->getOrderTotal();
+            $this->context->smarty->assign(
+                array(
+                    'cart_bdata' => $cart_bdata,
+                    'cart_tamount' => $cart_tamount
+                )
+            );
+        }
+    }
+
+
+    public function ajaxProcessUpdateCartData()
+    {
+        $response = array(
+            'rms_in_cart' => 0
+        );
+
+        $tplVars = $this->initCartData();
+        $tplVars['link'] = $this->context->link;
+        $this->context->smarty->assign($tplVars);
+        if ($room_tpl = $this->context->smarty->fetch(
+            _PS_MODULE_DIR_.$this->module->name.'/views/templates/admin/hotel_rooms_booking/helpers/view/_partials/booking-cart.tpl'
+        )) {
+            $response['cart_content'] = $room_tpl;
+        }
+        $objHotelCartBookingData = new HotelCartBookingData();
+        $response['rms_in_cart'] = $objHotelCartBookingData->getCountRoomsInCart($this->id_cart, $this->id_guest);
+
+        $this->ajaxDie(json_encode($response));
+    }
+
+    public function ajaxProcessGetBookingStats()
+    {
+        $response = array(
+            'success' => false,
+            'data' => array()
+        );
+
+        $searchIdHotel = Tools::getValue('search_id_hotel');
+        $searchIdRoomType = Tools::getValue('search_id_room_type');
+        $searchDateFrom = Tools::getValue('search_date_from');
+        $searchDateTo = Tools::getValue('search_date_to');
+
+        // No use of adult, child, num_rooms
+        $adult = 0;
+        $children = 0;
+        $num_rooms = 1;
+
+        $bookingParams = array();
+        $bookingParams['date_from'] = $searchDateFrom;
+        $bookingParams['date_to'] = $searchDateTo;
+        $bookingParams['hotel_id'] = $searchIdHotel;
+        $bookingParams['room_type'] = $searchIdRoomType;
+        $bookingParams['adult'] = $adult;
+        $bookingParams['children'] = $children;
+        $bookingParams['num_rooms'] = $num_rooms;
+        $bookingParams['for_calendar'] = 1;
+        $bookingParams['search_available'] = 1;
+        $bookingParams['search_partial'] = 1;
+        $bookingParams['search_booked'] = 1;
+        $bookingParams['search_unavai'] = 1;
+        $bookingParams['id_cart'] = $this->id_cart;
+        $bookingParams['id_guest'] = $this->id_guest;
+        $bookingParams['search_cart_rms'] = 1;
+
+        $objBookingDetail = new HotelBookingDetail();
+        if ($bookingData = $objBookingDetail->getBookingData($bookingParams)) {
+            $this->context->smarty->assign(array('booking_data' => $bookingData));
+            $tpl_path = 'hotelreservationsystem/views/templates/admin/hotel_rooms_booking/helpers/view/_partials/search-stats.tpl';
+            $searchStats = $this->context->smarty->fetch(_PS_MODULE_DIR_.$tpl_path);
+            $response['success'] = true;
+            $response['data']['stats_panel'] = $searchStats;
+        }
+
+        $this->ajaxDie(json_encode($response));
+    }
+
+    public function ajaxProcessGetCalenderData()
+    {
+        $events = array();
+        // No use of adult, child, num_rooms
+        $adult = 0;
+        $children = 0;
+        $num_rooms = 1;
+
+        $start_date = date('Y-m-d', strtotime(Tools::getValue('start')));
+        $last_day_this_month  = date('Y-m-d', strtotime(Tools::getValue('end')));
+        $searchIdHotel = Tools::getValue('search_id_hotel');
+        $searchIdRoomType = Tools::getValue('search_id_room_type');
+        $searchDateFrom = Tools::getValue('search_date_from');
+        $searchDateTo = Tools::getValue('search_date_to');
+
+        $bookingParams = array();
+        $bookingParams['hotel_id'] = $searchIdHotel;
+        $bookingParams['room_type'] = $searchIdRoomType;
+        $bookingParams['adult'] = $adult;
+        $bookingParams['children'] = $children;
+        $bookingParams['num_rooms'] = $num_rooms;
+        $bookingParams['for_calendar'] = 1;
+        $bookingParams['search_available'] = 1;
+        $bookingParams['search_partial'] = 1;
+        $bookingParams['search_booked'] = 1;
+        $bookingParams['search_unavai'] = 1;
+        $bookingParams['id_cart'] = $this->id_cart;
+        $bookingParams['id_guest'] = $this->id_guest;
+        $bookingParams['search_cart_rms'] = 1;
+
+        $objBookingDetail = new HotelBookingDetail();
+
+        while ($start_date <= $last_day_this_month) {
+            $cal_date_from = $start_date;
+            $cal_date_to = date('Y-m-d', strtotime('+1 day', strtotime($cal_date_from)));
+            $bookingParams['date_from'] = $cal_date_from;
+            $bookingParams['date_to'] = $cal_date_to;
+            $eventData = $objBookingDetail->getBookingData($bookingParams);
+            $eventData['date_format'] = Tools::displayDate($cal_date_from);
+            $events[strtotime($bookingParams['date_from'])] = array(
+                'is_notification' => 1,
+                'title' => $this->l('icon'),
+                'start' => date('Y-m-d H:i:s', strtotime($bookingParams['date_from'])),
+                'data' => $eventData
+            );
+
+            $start_date = date('Y-m-d', strtotime('+1 day', strtotime($start_date)));
+        }
+        $bookingParams['date_from'] = $searchDateFrom;
+        $bookingParams['date_to'] = $searchDateTo;
+        if ($bookingData = $objBookingDetail->getBookingData($bookingParams)) {
+            if ($bookingData['stats']['num_avail']) {
+                $eventColor = '#7EC77B';
+                $title = sprintf($this->l('Available Rooms : %s'), $bookingData['stats']['num_avail']);
+            } elseif ($bookingData['stats']['num_part_avai']) {
+                $eventColor = '#FFC224';
+                $title = sprintf($this->l('Partially Available Rooms : %s'), $bookingData['stats']['num_part_avai']);
+            } else {
+                $eventColor = '#FF3838';
+                $title = sprintf($this->l('Available Rooms : %s'), $bookingData['stats']['num_avail']);
+            }
+            $bookingData['date_from_format'] = Tools::displayDate($searchDateFrom);
+            $bookingData['date_to_format'] = Tools::displayDate($searchDateTo);
+            $events[] = array(
+                'title' => $title,
+                'start' => date('Y-m-d', strtotime($searchDateFrom)),
+                'end' => date('Y-m-d', strtotime($searchDateTo)),
+                'backgroundColor' => $eventColor,
+                'color' => $eventColor,
+                'textColor' => '#FFF',
+                'data' => $bookingData
+            );
+        }
+
+
+        $events = array_values($events);
+        $this->ajaxDie(Tools::jsonEncode($events));
+    }
+
+    public function ajaxProcessGetRoomType()
+    {
+        $hotel_id  = Tools::getValue('hotel_id');
+        $obj_room_type = new HotelRoomType();
+        $room_type_info = $obj_room_type->getRoomTypeByHotelId($hotel_id, Configuration::get('PS_LANG_DEFAULT'), 1);
+        die(json_encode($room_type_info));
+    }
+
+    public function ajaxProcessAddDataToCart()
+    {
+        // for Add Quantity
+        $id_room = Tools::getValue('id_room');
+        $booking_type = Tools::getValue('booking_type');
+        $comment = Tools::getValue('comment');
+
+        // for both (add , delete)
+        $id_hotel = Tools::getValue('id_hotel');
+        $id_product = Tools::getValue('id_prod');
+        $date_from = Tools::getValue('date_from');
+        $date_to = Tools::getValue('date_to');
+
+        $date_from = date("Y-m-d", strtotime($date_from));
+        $date_to = date("Y-m-d", strtotime($date_to));
+
+        $search_id_room_type = Tools::getValue('search_id_room_type');
+        $search_id_hotel = Tools::getValue('search_id_hotel');
+        $search_date_from = Tools::getValue('search_date_from');
+        $search_date_to = Tools::getValue('search_date_to');
+
+        // for delete quantity
+        $id_cart = Tools::getValue('id_cart');
+        $id_cart_book_data = Tools::getValue('id_cart_book_data');
+        $ajax_delete = Tools::getValue('ajax_delete'); // If delete from cart(not for room list delete(pagebottom tabs))
+
+        $opt = Tools::getValue('opt'); // if 1 then add quantity or if 0 means delete quantity
+
+        $obj_booking_dtl = new HotelBookingDetail();
+        $num_day = $obj_booking_dtl->getNumberOfDays($date_from, $date_to); //quantity of product
+
+        if ($opt) {
+            $unit_price = Product::getPriceStatic(
+                $id_product,
+                HotelBookingDetail::useTax(),
+                null,
+                6,
+                null,
+                false,
+                true,
+                $num_day
+            );
+        }
+
+        if ($opt) {
+            $direction = 'up';
+        } else {
+            $direction = 'down';
+        }
+
+        $this->context->cart->updateQty($num_day, $id_product, null, false, $direction);
+
+        $id_cart = $this->context->cart->id;
+        $id_guest = $this->context->cookie->id_guest;
+
+        $response = array(
+            'success' => false,
+            'data' => array()
+        );
+        if ($opt) {
+            // add room in cart
+            $obj_cart_book_data = new HotelCartBookingData();
+            $obj_cart_book_data->id_cart = $id_cart;
+            $obj_cart_book_data->id_guest = $id_guest;
+            $obj_cart_book_data->id_product = $id_product;
+            $obj_cart_book_data->id_room = $id_room;
+            $obj_cart_book_data->id_hotel = $id_hotel;
+            $obj_cart_book_data->quantity = $num_day;
+            $obj_cart_book_data->id_currency = Configuration::get('PS_CURRENCY_DEFAULT');
+            $obj_cart_book_data->booking_type = $booking_type;
+            $obj_cart_book_data->comment = $comment;
+            $obj_cart_book_data->date_from = $date_from;
+            $obj_cart_book_data->date_to = $date_to;
+            if ($obj_cart_book_data->save()) {
+                $response['success'] = true;
+                $response['data']['id_cart_book_data'] = $obj_cart_book_data->id;
+            }
+        } else {
+            // remove room from cart
+            $obj_cart_book_data = new HotelCartBookingData();
+            $data_dlt = $obj_cart_book_data->deleteRowById($id_cart_book_data);
+            if ($data_dlt) {
+                $response['success'] = true;
+                if ($ajax_delete) {
+                    // deleting from cart modal
+                    $this->date_from = $search_date_from;
+                    $this->date_to = $search_date_to;
+                    $this->id_hotel = $search_id_hotel;
+                    $this->id_room_type = $search_id_room_type;
+
+                    $this->assignRoomBookingForm();
+                    $tpl_path = 'hotelreservationsystem/views/templates/admin/hotel_rooms_booking/helpers/view/_partials/booking-rooms.tpl';
+                    $room_tpl = $this->context->smarty->fetch(_PS_MODULE_DIR_.$tpl_path);
+
+                    $response['data'] = array(
+                        'room_tpl' => $room_tpl,
+                    );
+                }
+            }
+        }
+        $this->ajaxDie(json_encode($response));
     }
 
     public function getAllBookingDataInfo(
@@ -659,8 +628,43 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
     public function setMedia()
     {
         parent::setMedia();
+        $currency = new Currency((int)Configuration::get('PS_CURRENCY_DEFAULT'));
+        $jsVars = array(
+            'currency_prefix' => $currency->prefix,
+            'currency_suffix' => $currency->suffix,
+            'currency_sign' => $currency->sign,
+            'currency_format' => $currency->format,
+            'currency_blank' => $currency->blank,
+            'ALLOTMENT_AUTO' => HotelBookingDetail::ALLOTMENT_AUTO,
+            'ALLOTMENT_MANUAL' => HotelBookingDetail::ALLOTMENT_MANUAL,
+            'rooms_booking_url' => $this->context->link->getAdminLink('AdminHotelRoomsBooking'),
+            'opt_select_all' => $this->l('All Types'),
+            'slt_another_htl' => $this->l('Select Another Hotel'),
+            'product_type_cond' => $this->l('Product type is required'),
+            'from_date_cond' => $this->l('From date is required'),
+            'to_date_cond' => $this->l('To date is required'),
+            'hotel_name_cond' => $this->l('Hotel Name is required'),
+            'num_rooms_cond' => $this->l('Number of Rooms is required'),
+            'add_to_cart' => $this->l('Add To Cart'),
+            'remove' => $this->l('Remove'),
+            'noRoomTypeAvlTxt' => $this->l('No room type available.'),
+            'no_rm_avail_txt' => $this->l('No rooms available.'),
+            'slct_rm_err' => $this->l('Please select a room first.'),
+            'product_added_cart_txt' => $this->l('Product added in cart'),
+            'info_icon_path' => _MODULE_DIR_.$this->module->name.'/views/img/Slices/info-icon.svg'
+            // 'check_calender_var' => $check_calender_var,
+        );
+        MediaCore::addJsDef($jsVars);
+
+        // add fullcalender plugin
+        $this->addJqueryUI('ui.tooltip', 'base', true);
+        $this->removeJS(Media::getJqueryUIPath('effects.core', 'base', false), false);
+
+        $this->addCSS(_PS_JS_DIR_.'fullcalendar/main.css');
+        $this->addJs(_PS_JS_DIR_.'fullcalendar/main.js');
 
         $this->addCSS(array(_MODULE_DIR_.'hotelreservationsystem/views/css/HotelReservationAdmin.css'));
         $this->addJs(_MODULE_DIR_.$this->module->name.'/views/js/HotelReservationAdmin.js');
+        $this->addJs(_MODULE_DIR_.$this->module->name.'/views/js/admin/hotel_rooms_booking.js');
     }
 }

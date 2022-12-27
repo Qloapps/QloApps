@@ -222,6 +222,8 @@ class HotelHelper
             date('d-m-Y', strtotime(date('Y-m-d', time()).' + 1 year'))
         );
 
+        Configuration::updateValue('GLOBAL_PREPARATION_TIME', 0);
+
         Configuration::updateValue('HTL_FEATURE_PRICING_PRIORITY', 'specific_date;special_day;date_range');
         Configuration::updateValue('WK_GOOGLE_ACTIVE_MAP', 0);
         Configuration::updateValue('WK_MAP_HOTEL_ACTIVE_ONLY', 1);
@@ -543,25 +545,19 @@ class HotelHelper
     public function saveDummyHotelImages($idHotel)
     {
         if ($idHotel) {
-            $hotelImgPath = _PS_MODULE_DIR_.'hotelreservationsystem/views/img/hotel_img/';
-            if (is_dir($hotelImgPath)) {
-                if ($dir = opendir($hotelImgPath)) {
-                    while (($file = readdir($dir)) !== false) {
-                        $explodeFile = explode('.', $file);
-                        if ($explodeFile[1] == 'jpg') {
-                            $coverImgExist = HotelImage::getCover($idHotel);
-                            $objHtlImage = new HotelImage();
-                            $objHtlImage->id_hotel = $idHotel;
-                            $objHtlImage->hotel_image_id = $explodeFile[0];
-                            if (!$coverImgExist) {
-                                $objHtlImage->cover = 1;
-                            } else {
-                                $objHtlImage->cover = 0;
-                            }
-                            $objHtlImage->add();
-                        }
+            $objHotelImage = new HotelImage();
+            if (is_dir(_PS_HOTEL_IMG_DIR_)) {
+                foreach(scandir(_PS_HOTEL_IMG_DIR_) as $file) {
+                    if ($file === '.' || $file === '..') {
+                        continue;
                     }
-                    closedir($dir);
+                    if (preg_match('/[^\\s]+\.jpg$/', $file)) {
+                        $imageDetail = $objHotelImage->uploadHotelImages(
+                            array('tmp_name' => _PS_HOTEL_IMG_DIR_.$file),
+                            $idHotel
+                        );
+                        unlink(_PS_HOTEL_IMG_DIR_.$file);
+                    }
                 }
             }
         }

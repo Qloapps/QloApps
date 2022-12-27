@@ -48,7 +48,7 @@ class StatsBestCategories extends ModuleGrid
 
         parent::__construct();
 
-        $this->default_sort_column = 'totalPriceSold';
+        $this->default_sort_column = 'totalRevenue';
         $this->default_sort_direction = 'DESC';
         $this->empty_message = $this->l('Empty recordset returned');
         $this->paging_message = sprintf($this->l('Displaying %1$s of %2$s'), '{0} - {1}', '{2}');
@@ -56,34 +56,48 @@ class StatsBestCategories extends ModuleGrid
         $this->columns = array(
             array(
                 'id' => 'name',
-                'header' => $this->l('Name'),
-                'dataIndex' => 'name',
-                'align' => 'left'
+                'header' => $this->l('Hotel name'),
+                'dataIndex' => 'hotel_name',
+                'align' => 'center'
             ),
             array(
                 'id' => 'totalRoomsBooked',
-                'header' => $this->l('Total Rooms Booked'),
+                'header' => $this->l('Rooms booked'),
                 'dataIndex' => 'totalRoomsBooked',
-                'align' => 'center'
+                'align' => 'center',
+                'tooltip' => $this->l('The room nights booked for the hotel.'),
             ),
             array(
-                'id' => 'totalPriceSold',
-                'header' => $this->l('Total Price'),
-                'dataIndex' => 'totalPriceSold',
-                'align' => 'center'
+                'id' => 'availableRooms',
+                'header' => $this->l('Available rooms'),
+                'dataIndex' => 'availableRooms',
+                'align' => 'center',
+                'tooltip' => $this->l('The total room nights available for booking for the hotel.'),
             ),
             array(
-                'id' => 'totalWholeSalePriceSold',
-                'header' => $this->l('Total Margin'),
-                'dataIndex' => 'totalWholeSalePriceSold',
-                'align' => 'center'
+                'id' => 'totalOrders',
+                'header' => $this->l('Orders'),
+                'dataIndex' => 'totalOrders',
+                'align' => 'center',
             ),
             array(
-                'id' => 'totalPageViewed',
-                'header' => $this->l('Total Viewed'),
-                'dataIndex' => 'totalPageViewed',
-                'align' => 'center'
-            )
+                'id' => 'totalRevenue',
+                'header' => $this->l('Revenue'),
+                'dataIndex' => 'totalRevenue',
+                'align' => 'center',
+            ),
+            array(
+                'id' => 'totalMargin',
+                'header' => $this->l('Margin'),
+                'dataIndex' => 'totalMargin',
+                'align' => 'center',
+            ),
+            array(
+                'id' => 'averageRevenue',
+                'header' => $this->l('Avg. revenue'),
+                'dataIndex' => 'averageRevenue',
+                'align' => 'center',
+            ),
         );
 
         $this->displayName = $this->l('Best hotels');
@@ -98,8 +112,6 @@ class StatsBestCategories extends ModuleGrid
 
     public function hookAdminStatsModules($params)
     {
-        $onlyChildren = (int)Tools::getValue('onlyChildren');
-
         $engine_params = array(
             'id' => 'id_category',
             'title' => $this->displayName,
@@ -108,9 +120,6 @@ class StatsBestCategories extends ModuleGrid
             'defaultSortDirection' => $this->default_sort_direction,
             'emptyMessage' => $this->empty_message,
             'pagingMessage' => $this->paging_message,
-            'customParams' => array(
-                'onlyChildren' => $onlyChildren,
-            )
         );
 
         if (Tools::getValue('export')) {
@@ -120,16 +129,20 @@ class StatsBestCategories extends ModuleGrid
         $this->html = '
 			<div class="panel-heading">
 				<i class="icon-sitemap"></i> '.$this->displayName.'
-			</div>
-			'.$this->engine($engine_params).'
+			</div>';
+        if (!(Module::isEnabled('statsdata') && Configuration::get('PS_STATSDATA_PAGESVIEWS'))) {
+			$link = $this->context->link->getAdminLink('AdminModules').'&configure=statsdata';
+            $this->html .= '<div class="alert alert-info">'.$this->l('You must enable the "Save global page views" option from ').'<u><a href="'.$link.'" target="_blank">Data mining for statistics</a></u>'.$this->l(' module in order to display the most viewed hotels, or use the QloApps Google Analytics module.').'</div>';
+        }
+
+        $this->html .= $this->engine($engine_params).'
             <div class="row form-horizontal">
                 <div class="col-md-3">
                     <a class="btn btn-default export-csv" href="'.Tools::safeOutput($_SERVER['REQUEST_URI'].'&export=1').'">
-                        <i class="icon-cloud-upload"></i> '.$this->l('CSV Export').'
+                        <i class="icon-cloud-download"></i> '.$this->l('CSV Export').'
                     </a>
                 </div>
             </div>';
-
         return $this->html;
     }
 
@@ -137,6 +150,8 @@ class StatsBestCategories extends ModuleGrid
     {
         $currency = new Currency(Configuration::get('PS_CURRENCY_DEFAULT'));
         $date_between = $this->getDate();
+        $date_from = date('Y-m-d', strtotime($this->_employee->stats_date_from));
+        $date_to = date('Y-m-d', strtotime($this->_employee->stats_date_to));
         $id_lang = $this->getLang();
 
         //If column 'order_detail.original_wholesale_price' does not exist, create it
@@ -145,145 +160,67 @@ class StatsBestCategories extends ModuleGrid
             Db::getInstance()->execute('ALTER TABLE `'._DB_PREFIX_.'order_detail` ADD `original_wholesale_price` DECIMAL( 20, 6 ) NOT NULL DEFAULT  "0.000000"');
         }
 
-        // If a shop is selected, get all children categories for the shop
-        $categories = array();
-        if (Shop::getContext() != Shop::CONTEXT_ALL) {
-            $sql = 'SELECT c.nleft, c.nright
-					FROM '._DB_PREFIX_.'category c
-					WHERE c.id_category IN (
-						SELECT hbi.id_category
-						FROM '._DB_PREFIX_.'htl_branch_info hbi)';
-            if ($result = Db::getInstance()->executeS($sql)) {
-                $ntree_restriction = array();
-                foreach ($result as $row) {
-                    $ntree_restriction[] = '(nleft >= '.$row['nleft'].' AND nright <= '.$row['nright'].')';
-                }
-
-                if ($ntree_restriction) {
-                    $sql = 'SELECT id_category
-							FROM '._DB_PREFIX_.'category
-							WHERE '.implode(' OR ', $ntree_restriction);
-                    if ($result = Db::getInstance()->executeS($sql)) {
-                        foreach ($result as $row) {
-                            $categories[] = $row['id_category'];
-                        }
-                    }
-                }
-            }
-        }
-
-        $onlyChildren = '';
-        if ((int)Tools::getValue('onlyChildren') == 1) {
-            $onlyChildren = 'AND NOT EXISTS (SELECT NULL FROM '._DB_PREFIX_.'category WHERE id_parent = ca.id_category)';
-        }
-
-        // Get best categories
-        if (version_compare(_PS_VERSION_, '1.6.1.1', '>=')) {
-            $this->query = '
-				SELECT SQL_CALC_FOUND_ROWS ca.`id_category`, CONCAT(parent.name, \' > \', calang.`name`) as name,
-				IFNULL(SUM(t.`totalQuantitySold`), 0) AS totalQuantitySold,
-				ROUND(IFNULL(SUM(t.`totalPriceSold`), 0), 2) AS totalPriceSold,
-				ROUND(IFNULL(SUM(t.`totalWholeSalePriceSold`), 0), 2) AS totalWholeSalePriceSold,
-				(
-					SELECT IFNULL(SUM(pv.`counter`), 0)
-					FROM `'._DB_PREFIX_.'page` p
-					LEFT JOIN `'._DB_PREFIX_.'page_viewed` pv ON p.`id_page` = pv.`id_page`
-					LEFT JOIN `'._DB_PREFIX_.'date_range` dr ON pv.`id_date_range` = dr.`id_date_range`
-					LEFT JOIN `'._DB_PREFIX_.'product` pr ON CAST(p.`id_object` AS UNSIGNED INTEGER) = pr.`id_product`
-					LEFT JOIN `'._DB_PREFIX_.'category_product` capr2 ON capr2.`id_product` = pr.`id_product`
-					WHERE capr.`id_category` = capr2.`id_category`
-					AND p.`id_page_type` = 1
-					AND dr.`time_start` BETWEEN '.$date_between.'
-					AND dr.`time_end` BETWEEN '.$date_between.'
-				) AS totalPageViewed,
-				(
-                    SELECT COUNT(id_category) FROM '._DB_PREFIX_.'category WHERE `id_parent` = ca.`id_category`
-                ) AS hasChildren,
-                (
-                    SELECT COUNT(`id_room`) FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
-                    LEFT JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = hbd.`id_order`)
-                    WHERE `id_hotel` IN (SELECT `id` FROM `'._DB_PREFIX_.'htl_branch_info` hbi WHERE hbi.`id_category` = ca.`id_category`) AND o.`valid` = 1 AND o.`invoice_date` BETWEEN '.$date_between.'
-			    ) AS totalRoomsBooked
-			FROM `'._DB_PREFIX_.'category` ca
-			LEFT JOIN `'._DB_PREFIX_.'category_lang` calang ON (ca.`id_category` = calang.`id_category` AND calang.`id_lang` = '.(int)$id_lang.Shop::addSqlRestrictionOnLang('calang').')
-			LEFT JOIN `'._DB_PREFIX_.'category_lang` parent ON (ca.`id_parent` = parent.`id_category` AND parent.`id_lang` = '.(int)$id_lang.Shop::addSqlRestrictionOnLang('parent').')
-			LEFT JOIN `'._DB_PREFIX_.'category_product` capr ON ca.`id_category` = capr.`id_category`
-			LEFT JOIN (
-				SELECT pr.`id_product`, t.`totalQuantitySold`, t.`totalPriceSold`, t.`totalWholeSalePriceSold`
-				FROM `'._DB_PREFIX_.'product` pr
-				LEFT JOIN (
-                    SELECT pr.`id_product`, pa.`wholesale_price`,
-						IFNULL(SUM(cp.`product_quantity`), 0) AS totalQuantitySold,
-						IFNULL(SUM(cp.`product_price` * cp.`product_quantity`), 0) / o.conversion_rate AS totalPriceSold,
-						IFNULL(SUM(
-							CASE
-								WHEN cp.`original_wholesale_price` <> "0.000000"
-								THEN cp.`original_wholesale_price` * cp.`product_quantity`
-								WHEN pa.`wholesale_price` <> "0.000000"
-								THEN pa.`wholesale_price` * cp.`product_quantity`
-								WHEN pr.`wholesale_price` <> "0.000000"
-								THEN pr.`wholesale_price` * cp.`product_quantity`
-							END
-						), 0) / o.conversion_rate AS totalWholeSalePriceSold
-					FROM `'._DB_PREFIX_.'product` pr
-					LEFT OUTER JOIN `'._DB_PREFIX_.'order_detail` cp ON pr.`id_product` = cp.`product_id`
-					LEFT JOIN `'._DB_PREFIX_.'orders` o ON o.`id_order` = cp.`id_order`
-					LEFT JOIN `'._DB_PREFIX_.'product_attribute` pa ON pa.`id_product_attribute` = cp.`product_attribute_id`
-					'.Shop::addSqlRestriction(Shop::SHARE_ORDER, 'o').'
-					WHERE o.valid = 1
-					AND o.invoice_date BETWEEN '.$date_between.'
-					GROUP BY pr.`id_product`
-				) t ON t.`id_product` = pr.`id_product`
-			) t	ON t.`id_product` = capr.`id_product`
-			'.(($categories) ? 'WHERE ca.id_category IN ('.implode(', ', $categories).')' : '').'
-			'.$onlyChildren.'
-			GROUP BY ca.`id_category`
-			HAVING ca.`id_category` != 1';
-        } else {
-            $this->query = '
-			SELECT SQL_CALC_FOUND_ROWS ca.`id_category`, CONCAT(parent.name, \' > \', calang.`name`) as name,
-				IFNULL(SUM(t.`totalQuantitySold`), 0) AS totalQuantitySold,
-				ROUND(IFNULL(SUM(t.`totalPriceSold`), 0), 2) AS totalPriceSold,
-				(
-					SELECT IFNULL(SUM(pv.`counter`), 0)
-					FROM `' . _DB_PREFIX_ . 'page` p
-					LEFT JOIN `' . _DB_PREFIX_ . 'page_viewed` pv ON p.`id_page` = pv.`id_page`
-					LEFT JOIN `' . _DB_PREFIX_ . 'date_range` dr ON pv.`id_date_range` = dr.`id_date_range`
-					LEFT JOIN `' . _DB_PREFIX_ . 'product` pr ON CAST(p.`id_object` AS UNSIGNED INTEGER) = pr.`id_product`
-					LEFT JOIN `' . _DB_PREFIX_ . 'category_product` capr2 ON capr2.`id_product` = pr.`id_product`
-					WHERE capr.`id_category` = capr2.`id_category`
-					AND p.`id_page_type` = 1
-					AND dr.`time_start` BETWEEN ' . $date_between . '
-					AND dr.`time_end` BETWEEN ' . $date_between . '
-				) AS totalPageViewed,
-				(
-                    SELECT COUNT(id_category) FROM '._DB_PREFIX_.'category WHERE `id_parent` = ca.`id_category`
-			    ) AS hasChildren
-			FROM `' . _DB_PREFIX_ . 'category` ca
-			LEFT JOIN `' . _DB_PREFIX_ . 'category_lang` calang ON (ca.`id_category` = calang.`id_category` AND calang.`id_lang` = ' . (int)$id_lang . Shop::addSqlRestrictionOnLang('calang') . ')
-			LEFT JOIN `' . _DB_PREFIX_ . 'category_lang` parent ON (ca.`id_parent` = parent.`id_category` AND parent.`id_lang` = ' . (int)$id_lang . Shop::addSqlRestrictionOnLang('parent') . ')
-			LEFT JOIN `' . _DB_PREFIX_ . 'category_product` capr ON ca.`id_category` = capr.`id_category`
-			LEFT JOIN (
-				SELECT pr.`id_product`, t.`totalQuantitySold`, t.`totalPriceSold`
-				FROM `' . _DB_PREFIX_ . 'product` pr
-				LEFT JOIN (
-					SELECT pr.`id_product`,
-					IFNULL(SUM(cp.`product_quantity`), 0) AS totalQuantitySold,
-					IFNULL(SUM(cp.`product_price` * cp.`product_quantity`), 0) / o.conversion_rate AS totalPriceSold
-					FROM `' . _DB_PREFIX_ . 'product` pr
-					LEFT OUTER JOIN `' . _DB_PREFIX_ . 'order_detail` cp ON pr.`id_product` = cp.`product_id`
-					LEFT JOIN `' . _DB_PREFIX_ . 'orders` o ON o.`id_order` = cp.`id_order`
-					' . Shop::addSqlRestriction(Shop::SHARE_ORDER, 'o') . '
-					WHERE o.valid = 1
-					AND o.invoice_date BETWEEN ' . $date_between . '
-					GROUP BY pr.`id_product`
-				) t ON t.`id_product` = pr.`id_product`
-			) t	ON t.`id_product` = capr.`id_product`
-			' . (($categories) ? 'WHERE ca.id_category IN (' . implode(', ', $categories) . ')' : '') . '
-			'.$onlyChildren.'
-			GROUP BY ca.`id_category`
-			HAVING ca.`id_category` != 1';
-        }
+        // Get best hotels
+        $this->query = 'SELECT hbi.`id`, hbil.`hotel_name` AS hotel_name,
+        (
+            SELECT IFNULL(SUM(DATEDIFF(LEAST(hbd.`date_to`, "'.pSQL($date_to).'"), GREATEST(hbd.`date_from`, "'.pSQL($date_from).'"))), 0)
+            FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+            LEFT JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = hbd.`id_order`)
+            WHERE hbd.`id_hotel` = hbi.`id` AND o.`valid` = 1
+            AND hbd.`date_to` > "'.pSQL($date_from).'" AND hbd.`date_from` < "'.pSQL($date_to).'"
+        ) AS totalRoomsBooked,
+        (
+            SELECT SUM(max_room_nights) - SUM(disabled_room_nights)
+            FROM (
+                SELECT hri.`id_hotel`, DATEDIFF("'.pSQL($date_to).'", "'.pSQL($date_from).'") AS max_room_nights,
+                CASE
+                    WHEN hri.`id_status` = '.(int) HotelRoomInformation::STATUS_INACTIVE.' THEN DATEDIFF("'.pSQL($date_to).'", "'.pSQL($date_from).'")
+                    WHEN hri.`id_status` = '.(int) HotelRoomInformation::STATUS_TEMPORARY_INACTIVE.' THEN IF(hrdd.`date_to` > "'.pSQL($date_from).'" AND hrdd.`date_from` < "'.pSQL($date_to).'", SUM(ABS(DATEDIFF(LEAST(hrdd.`date_to`, "'.pSQL($date_to).'"), GREATEST(hrdd.`date_from`, "'.pSQL($date_from).'")))), 0)
+                    ELSE 0
+                END AS disabled_room_nights
+                FROM `'._DB_PREFIX_.'htl_room_information` hri
+                LEFT JOIN `'._DB_PREFIX_.'htl_room_disable_dates` hrdd
+                ON (hrdd.`id_room` = hri.`id`)
+                GROUP BY hri.`id`
+            ) AS t
+            WHERE t.`id_hotel` = hbi.`id`
+        ) AS totalRooms,
+        (
+            SELECT COUNT(DISTINCT hbd.`id_order`) FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+            LEFT JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = hbd.`id_order`)
+            WHERE hbd.`id_hotel` = hbi.`id` AND o.`valid` = 1
+            AND hbd.`date_to` > "'.pSQL($date_from).'" AND hbd.`date_from` < "'.pSQL($date_to).'"
+        ) AS totalOrders,
+        (
+            SELECT IFNULL(SUM(ROUND((DATEDIFF(LEAST(hbd.`date_to`, "'.pSQL($date_to).'"), GREATEST(hbd.`date_from`, "'.pSQL($date_from).'")) / DATEDIFF(hbd.`date_to`, hbd.`date_from`)) * hbd.`total_price_tax_excl`, 2)), 0)
+            FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+            LEFT JOIN `'._DB_PREFIX_.'orders` o
+            ON (o.`id_order` = hbd.`id_order`)
+            WHERE hbd.`id_hotel` = hbi.`id` AND o.`valid` = 1
+            AND hbd.`date_to` > "'.pSQL($date_from).'" AND hbd.`date_from` < "'.pSQL($date_to).'"
+        ) AS totalRevenue,
+        (
+            SELECT IFNULL(SUM(ROUND((DATEDIFF(LEAST(hbd.`date_to`, "'.pSQL($date_to).'"), GREATEST(hbd.`date_from`, "'.pSQL($date_from).'")) / DATEDIFF(hbd.`date_to`, hbd.`date_from`)) * (
+                CASE
+                    WHEN od.`original_wholesale_price` <> "0.000000" THEN od.`original_wholesale_price`
+                    WHEN p.`wholesale_price` <> "0.000000" THEN p.`wholesale_price`
+                    ELSE 0
+                END
+            ), 2)), 0)
+            FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+            LEFT JOIN `'._DB_PREFIX_.'orders` o
+            ON (o.`id_order` = hbd.`id_order`)
+            LEFT JOIN `'._DB_PREFIX_.'product` p
+            ON (p.`id_product` = hbd.`id_product`)
+            LEFT JOIN `'._DB_PREFIX_.'order_detail` od
+            ON (od.`id_order_detail` = hbd.`id_order_detail`)
+            WHERE hbd.`id_hotel` = hbi.`id` AND o.`valid` = 1
+            AND hbd.`date_to` > "'.pSQL($date_from).'" AND hbd.`date_from` < "'.pSQL($date_to).'"
+        ) AS totalOperatingCost
+        FROM `'._DB_PREFIX_.'htl_branch_info` hbi
+        LEFT JOIN `'._DB_PREFIX_.'htl_branch_info_lang` hbil
+        ON (hbil.`id` = hbi.`id` AND hbil.`id_lang` = '.(int)$id_lang .')
+        GROUP BY (hbi.`id`)';
 
         if (Validate::IsName($this->_sort)) {
             $this->query .= ' ORDER BY `'.bqSQL($this->_sort).'`';
@@ -297,19 +234,27 @@ class StatsBestCategories extends ModuleGrid
         }
 
         $values = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($this->query);
+        $this->_totalCount = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('SELECT FOUND_ROWS()');
+
         foreach ($values as &$value) {
-            if ((int)Tools::getIsset('export') == false) {
-                $parts = explode('>', $value['name']);
-                $value['name'] = trim($parts[1]);
+            if (Tools::getValue('export') == false) {
+                $value['hotel_name'] = '<a href="'.$this->context->link->getAdminLink('AdminAddHotel').'&id='.$value['id'].'&updatehtl_branch_info" target="_blank">'.$value['hotel_name'].'</a>';
             }
 
-            if (isset($value['totalWholeSalePriceSold'])) {
-                $value['totalWholeSalePriceSold'] = Tools::displayPrice($value['totalPriceSold'] - $value['totalWholeSalePriceSold'], $currency);
+            $value['totalMargin'] = 0;
+            if (((float) $value['totalRevenue']) > 0 && ((float) $value['totalOperatingCost']) > 0) {
+                $value['totalMargin'] = max($value['totalRevenue'] - $value['totalOperatingCost'], 0);
             }
-            $value['totalPriceSold'] = Tools::displayPrice($value['totalPriceSold'], $currency);
+            $value['totalMargin'] = Tools::displayPrice($value['totalMargin'], $currency);
+
+            $value['availableRooms'] = max($value['totalRooms'] - $value['totalRoomsBooked'], 0); // availableRooms can be negative if more rooms are disabled than available for booking
+
+            $value['averageRevenue'] = $value['totalRoomsBooked'] ? ((float) $value['totalRevenue'] / (int) $value['totalRoomsBooked']) : 0;
+            $value['averageRevenue'] = Tools::displayPrice((float) $value['averageRevenue'], $currency);
+
+            $value['totalRevenue'] = Tools::displayPrice((float) $value['totalRevenue'], $currency);
         }
 
         $this->_values = $values;
-        $this->_totalCount = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('SELECT FOUND_ROWS()');
     }
 }

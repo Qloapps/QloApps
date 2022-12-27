@@ -71,6 +71,7 @@
 								$('input[name=firstname]').val(infos[0]);
 								$('input[name=lastname]').val(infos[1]);
 								$('input[name=company]').val(infos[2]);
+								$('input[name=id_customer]').val(infos[3]);
 							}
 						},
 						error: function(msg)
@@ -82,6 +83,7 @@
 			</script>
 
 			<div class="col-lg-4">
+				<input type="hidden" name="id_customer" value="{$fields_value[$input.id_customer]}" />
 				<input type="email" id="email" name="email" value="{$fields_value[$input.name]|escape:'html':'UTF-8'}"/>
 			</div>
 		{/if}

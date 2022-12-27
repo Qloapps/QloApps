@@ -54,7 +54,7 @@
         <module action="enable" name="qloblockcontact"/>
         <module action="enable" name="blocklanguages"/>
         <module action="enable" name="blockcurrencies"/>
-        <module action="enable" name="productcomments"/>
+        <module action="enable" name="qlohotelreview"/>
         <module action="enable" name="dashactivity"/>
         <module action="enable" name="dashtrends"/>
         <module action="enable" name="dashgoals"/>
@@ -82,6 +82,7 @@
             <hook module="hotelreservationsystem" hook="actionObjectProfileAddAfter" position="1"/>
             <hook module="hotelreservationsystem" hook="actionObjectProfileDeleteBefore" position="1"/>
             <hook module="hotelreservationsystem" hook="actionObjectGroupDeleteBefore" position="1"/>
+            <hook module="hotelreservationsystem" hook="displayLeftColumn" position="4"/>
             <hook module="wkroomsearchblock" hook="displayLeftColumn" position="1"/>
             <hook module="wkroomsearchblock" hook="Header" position="2"/>
             <hook module="wkroomsearchblock" hook="displayAfterHookTop" position="2"/>
@@ -133,12 +134,15 @@
             <hook module="blockmyaccount" hook="Header" position="8"/>
             <hook module="blockmyaccount" hook="actionModuleRegisterHookAfter" position="1"/>
             <hook module="blockmyaccount" hook="actionModuleUnRegisterHookAfter" position="1"/>
-            <hook module="productcomments" hook="Header" position="11"/>
-            <hook module="productcomments" hook="displayRightColumnProduct" position="2"/>
-            <hook module="productcomments" hook="displayProductTab" position="1"/>
-            <hook module="productcomments" hook="displayProductTabContent" position="1"/>
-            <hook module="productcomments" hook="displayProductComparison" position="1"/>
-            <hook module="productcomments" hook="displayProductListReviews" position="1"/>
+            <hook module="qlohotelreview" hook="actionFrontControllerSetMedia" position="2"/>
+            <hook module="qlohotelreview" hook="displayProductTab" position="1"/>
+            <hook module="qlohotelreview" hook="displayProductTabContent" position="1"/>
+            <hook module="qlohotelreview" hook="displayFooterBefore" position="1"/>
+            <hook module="qlohotelreview" hook="displayRoomTypeDetailRoomTypeNameAfter" position="1"/>
+            <hook module="qlohotelreview" hook="actionRoomBookingStatusUpdateAfter" position="1"/>
+            <hook module="qlohotelreview" hook="displayBookingAction" position="1"/>
+            <hook module="qlohotelreview" hook="displayBackOfficeHeader" position="2"/>
+            <hook module="qlohotelreview" hook="displayAdminAfterHeader" position="1"/>
             <hook module="dashactivity" hook="actionAdminControllerSetMedia" position="2"/>
             <hook module="dashactivity" hook="dashboardZoneOne" position="1"/>
             <hook module="dashactivity" hook="dashboardData" position="1"/>

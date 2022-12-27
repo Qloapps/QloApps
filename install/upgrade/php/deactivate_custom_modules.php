@@ -54,7 +54,7 @@ function deactivate_custom_modules()
     $arrNativeModules = array();
     if (is_array($nativeModules)) {
         foreach ($nativeModules as $nativeModulesType) {
-            if (in_array($nativeModulesType['type'], array('native', 'partner'))) {
+            if (in_array($nativeModulesType['type'], array('native', 'disk', 'partner'))) {
                 $arrNativeModules[] = '""';
                 foreach ($nativeModulesType->module as $module) {
                     $arrNativeModules[] = '"'.pSQL($module['name']).'"';

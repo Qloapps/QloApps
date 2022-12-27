@@ -459,7 +459,7 @@ $(document).ready(function() {
 
 	// reset form
 	/* global header_confirm_reset, body_confirm_reset, left_button_confirm_reset, right_button_confirm_reset */
-	$(".reset_ready").click(function () {
+	$(document).on('click', '.reset_ready', function () {
 		var href = $(this).attr('href');
 		confirm_modal( header_confirm_reset, body_confirm_reset, left_button_confirm_reset, right_button_confirm_reset,
 			function () {

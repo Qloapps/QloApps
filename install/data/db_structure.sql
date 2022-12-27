@@ -959,6 +959,7 @@ CREATE TABLE `PREFIX_image_type` (
   `height` int(10) unsigned NOT NULL,
   `products` tinyint(1) NOT NULL DEFAULT '1',
   `categories` tinyint(1) NOT NULL DEFAULT '1',
+  `hotels` tinyint(1) NOT NULL DEFAULT '1',
   `manufacturers` tinyint(1) NOT NULL DEFAULT '1',
   `suppliers` tinyint(1) NOT NULL DEFAULT '1',
   `scenes` tinyint(1) NOT NULL DEFAULT '1',
@@ -2689,3 +2690,11 @@ CREATE TABLE IF NOT EXISTS `PREFIX_cms_role_lang` (
   PRIMARY KEY (`id_cms_role`,`id_lang`, id_shop)
 ) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8;
 
+
+CREATE TABLE IF NOT EXISTS `PREFIX_maintenance_access` (
+  `id_maintenance_access` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `ip_address` varchar(50) NOT NULL,
+  `email` varchar(128) NOT NULL,
+  `date_add` datetime NOT NULL,
+  PRIMARY KEY (`id_maintenance_access`)
+) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8;

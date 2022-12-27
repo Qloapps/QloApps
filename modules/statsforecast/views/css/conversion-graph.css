@@ -1,0 +1,64 @@
+/**
+ * 2010-2022 Webkul.
+ *
+ * NOTICE OF LICENSE
+ *
+ * All right is reserved,
+ * Please go through LICENSE.txt file inside our module
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade this module to newer
+ * versions in the future. If you wish to customize this module for your
+ * needs please refer to CustomizationPolicy.txt file inside our module for more information.
+ *
+ * @author Webkul IN
+ * @copyright 2010-2022 Webkul IN
+ * @license LICENSE.txt
+ */
+
+ .adminstats .graph-level {
+    display: flex;
+    justify-content: space-around;
+}
+
+.adminstats .stat-box {
+    min-width: 150px;
+    margin-bottom: 25px;
+    padding: 10px 15px;
+    border: 1.5px solid #555;
+    background-color: #CFE2F3;
+    color: #111;
+}
+
+.adminstats .stat-box p {
+    margin: 0;
+    padding: 0;
+}
+
+connection {
+    border: 1px solid #000;
+}
+
+connection span {
+    position: absolute;
+    font-size: 13px;
+    color: #111;
+    background: #F8F8FF;
+}
+
+connection.connection-border-top span {
+    bottom: 20px;
+}
+
+connection.connection-border-bottom span {
+    top: 20px;
+}
+
+connection.connection-border-left span {
+    right: 60px;
+}
+
+connection.connection-border-right span {
+    left: 60px;
+}

@@ -4,28 +4,32 @@
 		<fieldset>
 			<div class="already_registered_block">
 				<p>
-					{l s='Already have an account? '} <a href="{$link->getPageLink('authentication', true)|escape:'html':'UTF-8'}" id="openLoginFormBlock"> {l s='Login Now'}</a> {l s='to make check process faster and time saving.'}
+					{l s='Already have an account?'} <a href="{$link->getPageLink('authentication', true)|escape:'html':'UTF-8'}" id="openLoginFormBlock"> {l s='Login now'}</a> {l s='to make checkout process faster and time saving.'}
 				</p>
 				<p>{l s='Or'}</p>
 			</div>
-			<p><a href="{$link->getPageLink('authentication', true)|escape:'html':'UTF-8'}" id="openLoginFormBlock"></a></p>
 			<div id="login_form_content" style="display:none;">
+				<p class="text-secondary"><a href="#" id="idAccountChoice"> {l s='Return'}</a> {l s='to other checkout options.'}</p>
 				<!-- Error return block -->
 				<div id="opc_login_errors" class="alert alert-danger" style="display:none;"></div>
 				<!-- END Error return block -->
-				<p class="form-group">
-					<label for="login_email">{l s='Email address'}</label>
-					<input type="email" class="form-control validate" id="login_email" name="email" data-validate="isEmail" />
-				</p>
-				<p class="form-group">
-					<label for="login_passwd">{l s='Password'}</label>
-					<input class="form-control validate" type="password" id="login_passwd" name="login_passwd" data-validate="isPasswd" />
-				</p>
+				<div class="row">
+					<div class="form-group col-sm-6">
+						<label for="login_email">{l s='Email address'}</label>
+						<input type="email" class="form-control validate" id="login_email" name="email" data-validate="isEmail" />
+					</div>
+				</div>
+				<div class="row">
+					<div class="form-group col-sm-6">
+						<label for="login_passwd">{l s='Password'}</label>
+						<input class="form-control validate" type="password" id="login_passwd" name="login_passwd" data-validate="isPasswd" />
+					</div>
+				</div>
 				<a href="{$link->getPageLink('password', true)|escape:'html':'UTF-8'}" class="lost_password pull-right">{l s='Forgot your password?'}</a>
 				<div style="clear:both"></div>
 				<p class="submit">
 					{if isset($back)}<input type="hidden" class="hidden" name="back" value="{$back|escape:'html':'UTF-8'}" />{/if}
-					<button type="submit" id="SubmitLogin" name="SubmitLogin" class="button btn btn-default button-medium pull-right"><span><i class="icon-lock left"></i>{l s='Sign in'}</span></button>
+					<button type="submit" id="SubmitLogin" name="SubmitLogin" class="button btn btn-default button-medium pull-right"><span>{l s='Sign in'}</span></button>
 				</p>
 			</div>
 		</fieldset>
@@ -51,6 +55,9 @@
 			<!-- Error return block -->
 			<div id="opc_account_errors" class="alert alert-danger" style="display:none;"></div>
 			<!-- END Error return block -->
+			<div style="display: none; margin-top: 15px;" id="opc_account_saved" class="alert alert-success">
+				{l s='Account information saved successfully.'}
+			</div>
 			<!-- Account -->
 			<input type="hidden" id="is_new_customer" name="is_new_customer" value="0" />
 			<input type="hidden" id="opc_id_customer" name="opc_id_customer" value="{if isset($guestInformations) && isset($guestInformations.id_customer) && $guestInformations.id_customer}{$guestInformations.id_customer}{else}0{/if}" />
@@ -381,34 +388,8 @@
 			{$HOOK_CREATE_ACCOUNT_FORM}
 			<div class="submit opc-add-save clearfix">
 				<button type="submit" name="submitAccount" id="submitAccount" class="btn btn-default button button-medium pull-right"><span>{l s='Save'}<i class="icon-chevron-right right"></i></span></button>
-
 			</div>
 		<!-- END Account -->
 		</div>
 	</form>
 </div>
-{strip}
-{if isset($guestInformations) && isset($guestInformations.id_state) && $guestInformations.id_state}
-	{addJsDef idSelectedState=$guestInformations.id_state|intval}
-{else}
-	{addJsDef idSelectedState=false}
-{/if}
-{if isset($guestInformations) && isset($guestInformations.id_state_invoice) && $guestInformations.id_state_invoice}
-	{addJsDef idSelectedStateInvoice=$guestInformations.id_state_invoice|intval}
-{else}
-	{addJsDef idSelectedStateInvoice=false}
-{/if}
-{if isset($guestInformations) && isset($guestInformations.id_country) && $guestInformations.id_country}
-	{addJsDef idSelectedCountry=$guestInformations.id_country|intval}
-{else}
-	{addJsDef idSelectedCountry=false}
-{/if}
-{if isset($guestInformations) && isset($guestInformations.id_country_invoice) && $guestInformations.id_country_invoice}
-	{addJsDef idSelectedCountryInvoice=$guestInformations.id_country_invoice|intval}
-{else}
-	{addJsDef idSelectedCountryInvoice=false}
-{/if}
-{if isset($countries)}
-	{addJsDef countries=$countries}
-{/if}
-{/strip}

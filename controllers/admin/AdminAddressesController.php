@@ -344,11 +344,23 @@ class AdminAddressesControllerCore extends AdminController
         return parent::renderForm();
     }
 
+    // public function postProcess()
+    // {
+
+    //     $address = new Address();
+    //     $this->errors = $address->validateController();
+
+    //     return parent::postProcess();
+    // }
+
     public function processSave()
     {
         if (Tools::getValue('submitFormAjax')) {
             $this->redirect_after = false;
         }
+
+        $address = new Address();
+        $this->errors = $address->validateController();
 
         // Transform e-mail in id_customer for parent processing
         if (Validate::isEmail(Tools::getValue('email'))) {
@@ -488,7 +500,7 @@ class AdminAddressesControllerCore extends AdminController
             $customer = Customer::searchByName($email);
             if (!empty($customer)) {
                 $customer = $customer['0'];
-                echo json_encode(array('infos' => pSQL($customer['firstname']).'_'.pSQL($customer['lastname']).'_'.pSQL($customer['company'])));
+                echo json_encode(array('infos' => pSQL($customer['firstname']).'_'.pSQL($customer['lastname']).'_'.pSQL($customer['company']).'_'.pSQL($customer['id_customer'])));
             }
         }
         die;
