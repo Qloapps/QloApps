@@ -59,19 +59,6 @@ class DashOccupancy extends Module
 
     public function hookDashboardZoneOne($params)
     {
-        $occupancyData = AdminStatsController::getOccupancyData(
-            $params['date_from'],
-            $params['date_to'],
-            $params['id_hotel']
-        );
-
-        $this->context->smarty->assign(array(
-            'count_total' =>  sprintf('%02d', $occupancyData['count_total']),
-            'count_occupied' => sprintf('%02d', $occupancyData['count_occupied']),
-            'count_available' =>  sprintf('%02d', $occupancyData['count_available']),
-            'count_unavailable' =>  sprintf('%02d', $occupancyData['count_unavailable']),
-        ));
-
         return $this->display(__FILE__, 'dashboard_zone_one.tpl');
     }
 
