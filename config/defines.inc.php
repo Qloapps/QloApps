@@ -128,6 +128,7 @@ define('_PS_LANG_IMG_DIR_',          _PS_IMG_DIR_.'l/');
 define('_PS_MANU_IMG_DIR_',          _PS_IMG_DIR_.'m/');
 define('_PS_ORDER_STATE_IMG_DIR_',   _PS_IMG_DIR_.'os/');
 define('_PS_PROD_IMG_DIR_',          _PS_IMG_DIR_.'p/');
+define('_PS_HOTEL_IMG_DIR_',          _PS_MODULE_DIR_.'hotelreservationsystem/views/img/hotel_img/');
 define('_PS_SCENE_IMG_DIR_',         _PS_IMG_DIR_.'scenes/');
 define('_PS_SCENE_THUMB_IMG_DIR_',   _PS_IMG_DIR_.'scenes/thumbs/');
 define('_PS_SHIP_IMG_DIR_',          _PS_IMG_DIR_.'s/');

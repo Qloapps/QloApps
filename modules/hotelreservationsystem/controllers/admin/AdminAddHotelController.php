@@ -146,7 +146,8 @@ class AdminAddHotelController extends ModuleAdminController
             $objHotelImage = new HotelImage();
             if ($hotelAllImages = $objHotelImage->getImagesByHotelId($idHotel)) {
                 foreach ($hotelAllImages as &$image) {
-                    $image['image_link'] = $this->context->link->getMediaLink(_MODULE_DIR_.$this->module->name.'/views/img/hotel_img/'.$image['hotel_image_id'].'.jpg');
+                    $image['image_link'] = $this->context->link->getMediaLink($objHotelImage->getImageLink($image['id'],ImageType::getFormatedName('large')));
+                    $image['image_link_small'] = $this->context->link->getMediaLink($objHotelImage->getImageLink($image['id'], ImageType::getFormatedName('small')));
                 }
                 $smartyVars['hotelImages'] =  $hotelAllImages;
             }
@@ -587,8 +588,7 @@ class AdminAddHotelController extends ModuleAdminController
                     'hotel_image' => $_FILES['hotel_image'],
                 ];
                 $objHotelImage = new HotelImage();
-                $hotelImgPath = _PS_MODULE_DIR_.'hotelreservationsystem/views/img/hotel_img/';
-                $imageDetail = $objHotelImage->uploadHotelImages($_FILES['hotel_image'], $idHotel, $hotelImgPath);
+                $imageDetail = $objHotelImage->uploadHotelImages($_FILES['hotel_image'], $idHotel);
                 if ($imageDetail) {
                     die(json_encode($imageDetail));
                 } else {
