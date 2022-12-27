@@ -5824,6 +5824,7 @@ header {
       display: flex;
       flex-direction: row-reverse;
       align-items: center;
+      padding: 10px 0;
       justify-content: end; }
     header .header-top > div > div > div .header-top-item {
       position: relative;

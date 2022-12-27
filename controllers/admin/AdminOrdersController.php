@@ -215,6 +215,7 @@ class AdminOrdersControllerCore extends AdminController
             $cart_order_exists = $cart->orderExists();
             if (!$cart_order_exists) {
                 $this->context->cart = $cart;
+                $this->context->currency = new Currency((int)$cart->id_currency);
                 $cart_detail_data = array();
                 $cart_detail_data_obj = new HotelCartBookingData();
                 if ($cart_detail_data = $cart_detail_data_obj->getCartFormatedBookinInfoByIdCart((int) $id_cart)) {
@@ -803,7 +804,11 @@ class AdminOrdersControllerCore extends AdminController
                     $this->errors[] = Tools::displayError('The date is invalid');
                 } else {
                     if (!$order->addOrderPayment($amount, Tools::getValue('payment_method'), Tools::getValue('payment_transaction_id'), $currency, Tools::getValue('payment_date'), $order_invoice)) {
-                        $this->errors[] = Tools::displayError('An error occurred during payment.');
+                        if (!validate::isPrice($order->total_paid_real)) {
+                            $this->errors[] = Tools::displayError('Order total payments cannot be less than 0.');
+                        } else {
+                            $this->errors[] = Tools::displayError('An error occurred during payment.');
+                        }
                     } else {
                         Tools::redirectAdmin(self::$currentIndex.'&id_order='.$order->id.'&vieworder&conf=4&token='.$this->token);
                     }
@@ -3331,74 +3336,6 @@ class AdminOrdersControllerCore extends AdminController
             );
         }
         die($extraDemandsTpl);
-    }
-
-    // Process to get extra demands of any room while order creation process form.tpl
-    public function ajaxProcessGetRoomTypeCartDemands()
-    {
-        $extraDemandsTpl = '';
-        if ($idProduct = Tools::getValue('id_product')) {
-            if (($dateFrom = Tools::getValue('date_from'))
-                && ($dateTo = Tools::getValue('date_to'))
-                && ($idRoom = Tools::getValue('id_room'))
-                && ($idCart = Tools::getValue('id_cart'))
-            ) {
-                $objCartBookingData = new HotelCartBookingData();
-                if ($selectedRoomDemands = $objCartBookingData->getCartExtraDemands(
-                    $idCart,
-                    $idProduct,
-                    $idRoom,
-                    $dateFrom,
-                    $dateTo
-                )) {
-                    // get room type additional demands
-                    $objRoomDemands = new HotelRoomTypeDemand();
-                    if ($roomTypeDemands = $objRoomDemands->getRoomTypeDemands($idProduct)) {
-                        foreach ($roomTypeDemands as &$demand) {
-                            // if demand has advance options then set demand price as first advance option price.
-                            if (isset($demand['adv_option']) && $demand['adv_option']) {
-                                $demand['price'] = current($demand['adv_option'])['price'];
-                            }
-                        }
-                        foreach ($selectedRoomDemands as &$selectedDemand) {
-                            $objRoom = new HotelRoomInformation($selectedDemand['id_room']);
-                            $selectedDemand['room_num'] = $objRoom->room_num;
-                            if (isset($selectedDemand['extra_demands']) && $selectedDemand['extra_demands']) {
-                                $extraDmd = array();
-                                foreach ($selectedDemand['extra_demands'] as $sDemand) {
-                                    $selectedDemand['selected_global_demands'][] = $sDemand['id_global_demand'];
-                                    $extraDmd[$sDemand['id_global_demand'].'-'.$sDemand['id_option']] = $sDemand;
-                                }
-                                $selectedDemand['extra_demands'] = $extraDmd;
-                            }
-                        }
-                        $this->context->smarty->assign('roomTypeDemands', $roomTypeDemands);
-                        $this->context->smarty->assign('selectedRoomDemands', $selectedRoomDemands);
-                        $extraDemandsTpl .= $this->context->smarty->fetch(
-                            _PS_ADMIN_DIR_.'/themes/default/template/controllers/orders/_cart_booking_demands.tpl'
-                        );
-                    }
-                }
-            }
-        }
-        die($extraDemandsTpl);
-    }
-
-    // Process when admin changes extra demands of any room while order creation process form.tpl
-    public function ajaxProcessChangeRoomDemands()
-    {
-        if ($idCartBooking = Tools::getValue('id_cart_booking')) {
-            if (Validate::isLoadedObject($objCartbookingCata = new HotelCartBookingData($idCartBooking))) {
-                $roomDemands = Tools::getValue('room_demands');
-                $roomDemands = json_decode($roomDemands, true);
-                $roomDemands = json_encode($roomDemands);
-                $objCartbookingCata->extra_demands = $roomDemands;
-                if ($objCartbookingCata->save()) {
-                    die('1');
-                }
-            }
-        }
-        die('0');
     }
 
     // Process when admin edit rooms and edit rooms additional facilities

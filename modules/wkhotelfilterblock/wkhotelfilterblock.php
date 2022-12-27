@@ -29,7 +29,7 @@ class wkhotelfilterblock extends Module
     public function __construct()
     {
         $this->name = 'wkhotelfilterblock';
-        $this->author = 'webkul';
+        $this->author = 'Webkul';
         $this->tab = 'front_office_features';
         $this->version = '1.0.4';
         $this->context = Context::getContext();
@@ -65,23 +65,6 @@ class wkhotelfilterblock extends Module
                 'title' => $this->l('Search Results Filter Configuration'),
             ),
             'input' => array(
-                array(
-                    'type' => 'switch',
-                    'label' => $this->l('Show Guest Rating Filter'),
-                    'name' => 'SHOW_RATTING_FILTER',
-                    'is_bool' => true,
-                    'values' => array(
-                        array(
-                            'id' => 'active_on',
-                            'value' => 1,
-                        ),
-                        array(
-                            'id' => 'active_off',
-                            'value' => 0,
-                        ),
-                    ),
-                    'hint' => $this->l('If yes, it will display Guest Rating Filter.'),
-                ),
                 array(
                     'type' => 'switch',
                     'label' => $this->l('Show Amenities Filter'),
@@ -148,10 +131,6 @@ class wkhotelfilterblock extends Module
     {
         if (Tools::isSubmit('btnConfigSubmit')) {
             Configuration::updateValue(
-                'SHOW_RATTING_FILTER',
-                Tools::getValue('SHOW_RATTING_FILTER')
-            );
-            Configuration::updateValue(
                 'SHOW_AMENITIES_FILTER',
                 Tools::getValue('SHOW_AMENITIES_FILTER')
             );
@@ -175,7 +154,6 @@ class wkhotelfilterblock extends Module
         }
 
         //set default config variable`
-        Configuration::updateValue('SHOW_RATTING_FILTER', 1);
         Configuration::updateValue('SHOW_AMENITIES_FILTER', 1);
         Configuration::updateValue('SHOW_PRICE_FILTER', 1);
 
@@ -244,16 +222,12 @@ class wkhotelfilterblock extends Module
             $num_days = $obj_booking_detail->getNumberOfDays($date_from, $date_to);
 
             $warning_num = Configuration::get('WK_ROOM_LEFT_WARNING_NUMBER');
-            $product_comment_installed = Module::isInstalled('productcomments');
-            $ratting_img = _MODULE_DIR_.$this->name.'/views/img/stars-sprite-image.png';
             $this->context->smarty->assign(array(
-                'product_comment_installed' => $product_comment_installed,
                 'warning_num' => $warning_num,
                 'all_feat' => $all_feat,
                 'max_adult' => $max_adult,
                 'max_child' => $max_child,
                 'cat_link' => $cat_link,
-                'ratting_img' => $ratting_img,
                 'currency' => $currency,
                 'date_from' => $date_from,
                 'date_to' => $date_to,
@@ -270,7 +244,6 @@ class wkhotelfilterblock extends Module
     public function getConfigFieldsValues()
     {
         $config_vars = array(
-            'SHOW_RATTING_FILTER' => Tools::getValue('SHOW_RATTING_FILTER', Configuration::get('SHOW_RATTING_FILTER')),
             'SHOW_AMENITIES_FILTER' => Tools::getValue('SHOW_AMENITIES_FILTER', Configuration::get('SHOW_AMENITIES_FILTER')),
             'SHOW_PRICE_FILTER' => Tools::getValue('SHOW_PRICE_FILTER', Configuration::get('SHOW_PRICE_FILTER')),
         );
@@ -280,9 +253,7 @@ class wkhotelfilterblock extends Module
 
     public function deleteConfigKeys()
     {
-        $var = array('SHOW_RATTING_FILTER',
-                    'SHOW_AMENITIES_FILTER',
-                    'SHOW_PRICE_FILTER', );
+        $var = array('SHOW_AMENITIES_FILTER', 'SHOW_PRICE_FILTER');
 
         foreach ($var as $key) {
             if (!Configuration::deleteByName($key)) {

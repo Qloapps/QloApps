@@ -49,6 +49,7 @@
   <!-- <tab id="Merchandise_Returns" name="Warenrücksendungen"/> -->
   <tab id="Modules_1" name="Module"/>
   <tab id="Modules" name="Module"/>
+  <tab id="Modules_Catalog" name="Modules Catalog"/>
   <tab id="Modules_Themes_Catalog" name="Module &amp; Templates"/>
   <tab id="Monitoring" name="Kontrollübersicht"/>
   <tab id="Multistore" name="Multishop"/>

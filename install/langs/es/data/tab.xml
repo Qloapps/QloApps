@@ -58,6 +58,7 @@
   <tab id="Tax_Rules" name="Reglas de tasas"/>
   <tab id="Translations" name="Traducciones"/>
   <tab id="Modules_1" name="Módulos y Servicios"/>
+  <tab id="Modules_Catalog" name="Modules Catalog"/>
   <tab id="Modules_Themes_Catalog" name="Catálogo de Módulos y Temas"/>
   <tab id="Positions" name="Posiciones de los módulos"/>
   <tab id="Payment" name="Pago"/>

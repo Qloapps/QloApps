@@ -49,6 +49,7 @@
   <!-- <tab id="Merchandise_Returns" name="Restituzione prodotto"/> -->
   <tab id="Modules_1" name="Moduli e Servizi"/>
   <tab id="Modules" name="Moduli"/>
+  <tab id="Modules_Catalog" name="Modules Catalog"/>
   <tab id="Modules_Themes_Catalog" name="Catalogo Moduli e temi"/>
   <tab id="Monitoring" name="Monitoraggio"/>
   <tab id="Multistore" name="Multi-negozio"/>

@@ -59,6 +59,7 @@
   <tab id="Tax_Rules" name="כללי מס"/>
   <tab id="Translations" name="תרגומים"/>
   <tab id="Modules_1" name="מודולים"/>
+  <tab id="Modules_Catalog" name="Modules Catalog"/>
   <tab id="Modules_Themes_Catalog" name="קטלוג מודולים וערכות עיצוב"/>
   <tab id="Positions" name="מיקומים"/>
   <tab id="Payment" name="תשלום"/>

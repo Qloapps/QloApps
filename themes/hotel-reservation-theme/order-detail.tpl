@@ -132,17 +132,18 @@
 	</div>
 {/if}
 
-{if $refund_allowed}
-	<div class="row totalOrdercancellation_div">
-		<div class="col-xs-12 col-sm-12">
+<div class="row booking-actions-wrap">
+	<div class="col-xs-12 col-sm-12">
+		{if $refund_allowed}
 			{if !$hasCompletelyRefunded}
-				<a refund_fields_on="0" id="order_refund_request" class="btn btn-default pull-right" href="#" title={l s='Proceed to refund'}><span>{l s='Cancel Bookings'}</span></a>
+				<a refund_fields_on="0" id="order_refund_request" class="btn btn-default pull-right" href="#" title="{l s='Proceed to refund'}"><span>{l s='Cancel Bookings'}</span></a>
 			{/if}
-
+		
 			{if isset($id_cms_refund_policy) && $id_cms_refund_policy}<a target="_blank" class="btn btn-default pull-right refund_policy_link" href="{$link->getCMSLink($id_cms_refund_policy)|escape:'html':'UTF-8'}">{l s='Refund Policies'}</a>{/if}
-		</div>
+		{/if}
+		{hook h='displayBookingAction' id_order=$order->id}
 	</div>
-{/if}
+</div>
 
 {* Form Refund fields and submit refund *}
 <form id="order-detail-content">
@@ -427,7 +428,7 @@
 
 	{if $refund_allowed && $non_requested_rooms}
 		<div class="alert alert-info-light standard_refund_fields">
-			<i class="icon-info-circle"></i> {l s='Select rooms which bookings you want to cancel. Attached additional facilities with the room will be cancelled with room cancellation.'}
+			<i class="icon-info-circle"></i> {l s='Select rooms for which you want to cancel bookings. Additional facilities for cancelled rooms will be cancelled automatically.'}
 		</div>
 		{if !$hasCompletelyRefunded}
 			<div class="row standard_refund_fields">

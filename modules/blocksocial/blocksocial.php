@@ -24,10 +24,11 @@
 *  International Registered Trademark & Property of PrestaShop SA
 */
 
-if (!defined('_CAN_LOAD_FILES_'))
+if (!defined('_PS_VERSION_')) {
 	exit;
-	
-class blocksocial extends Module
+}
+
+class BlockSocial extends Module
 {
 	public function __construct()
 	{
@@ -37,102 +38,83 @@ class blocksocial extends Module
 		$this->author = 'PrestaShop';
 
 		$this->bootstrap = true;
-		parent::__construct();	
+		parent::__construct();
 
 		$this->displayName = $this->l('Social networking block');
 		$this->description = $this->l('Allows you to add information about your brand\'s social networking accounts.');
 		$this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
 	}
-	
+
 	public function install()
 	{
-		return (parent::install() AND Configuration::updateValue('BLOCKSOCIAL_FACEBOOK', '') && 
-			Configuration::updateValue('BLOCKSOCIAL_TWITTER', '') && 
-			Configuration::updateValue('BLOCKSOCIAL_RSS', '') && 
-			Configuration::updateValue('BLOCKSOCIAL_YOUTUBE', '') && 
-			Configuration::updateValue('BLOCKSOCIAL_GOOGLE_PLUS', '') && 
-			Configuration::updateValue('BLOCKSOCIAL_PINTEREST', '') && 
-			Configuration::updateValue('BLOCKSOCIAL_VIMEO', '') &&
-			Configuration::updateValue('BLOCKSOCIAL_INSTAGRAM', '') &&
-			$this->registerHook('displayHeader') && 
-			$this->registerHook('displayFooterNotificationHook')
-			);
+		if (!parent::install()
+			|| !Configuration::updateValue('BLOCKSOCIAL_FACEBOOK', '')
+			|| !Configuration::updateValue('BLOCKSOCIAL_TWITTER', '')
+			|| !Configuration::updateValue('BLOCKSOCIAL_RSS', '')
+			|| !Configuration::updateValue('BLOCKSOCIAL_YOUTUBE', '')
+			|| !Configuration::updateValue('BLOCKSOCIAL_PINTEREST', '')
+			|| !Configuration::updateValue('BLOCKSOCIAL_VIMEO', '')
+			|| !Configuration::updateValue('BLOCKSOCIAL_INSTAGRAM', '')
+			|| !$this->registerHook('displayFooterNotificationHook')
+		) {
+			return false;
+		}
+
+		return true;
 	}
-	
+
 	public function uninstall()
 	{
-		//Delete configuration
-		return (Configuration::deleteByName('BLOCKSOCIAL_FACEBOOK') AND 
-			Configuration::deleteByName('BLOCKSOCIAL_TWITTER') AND 
-			Configuration::deleteByName('BLOCKSOCIAL_RSS') AND 
-			Configuration::deleteByName('BLOCKSOCIAL_YOUTUBE') AND 
-			Configuration::deleteByName('BLOCKSOCIAL_GOOGLE_PLUS') AND 
-			Configuration::deleteByName('BLOCKSOCIAL_PINTEREST') AND
-			Configuration::deleteByName('BLOCKSOCIAL_VIMEO') AND
-			Configuration::deleteByName('BLOCKSOCIAL_INSTAGRAM') AND
-			parent::uninstall());
+		// Delete configuration
+		if (!parent::uninstall()
+			|| !Configuration::deleteByName('BLOCKSOCIAL_FACEBOOK')
+			|| !Configuration::deleteByName('BLOCKSOCIAL_TWITTER')
+			|| !Configuration::deleteByName('BLOCKSOCIAL_RSS')
+			|| !Configuration::deleteByName('BLOCKSOCIAL_YOUTUBE')
+			|| !Configuration::deleteByName('BLOCKSOCIAL_PINTEREST')
+			|| !Configuration::deleteByName('BLOCKSOCIAL_VIMEO')
+			|| !Configuration::deleteByName('BLOCKSOCIAL_INSTAGRAM')
+		) {
+			return false;
+		}
+
+		return true;
 	}
-	
+
 	public function getContent()
 	{
 		// If we try to update the settings
 		$output = '';
-		if (Tools::isSubmit('submitModule'))
-		{	
+		if (Tools::isSubmit('submitModule')) {
 			Configuration::updateValue('BLOCKSOCIAL_FACEBOOK', Tools::getValue('blocksocial_facebook', ''));
 			Configuration::updateValue('BLOCKSOCIAL_TWITTER', Tools::getValue('blocksocial_twitter', ''));
 			Configuration::updateValue('BLOCKSOCIAL_RSS', Tools::getValue('blocksocial_rss', ''));
 			Configuration::updateValue('BLOCKSOCIAL_YOUTUBE', Tools::getValue('blocksocial_youtube', ''));
-			Configuration::updateValue('BLOCKSOCIAL_GOOGLE_PLUS', Tools::getValue('blocksocial_google_plus', ''));
 			Configuration::updateValue('BLOCKSOCIAL_PINTEREST', Tools::getValue('blocksocial_pinterest', ''));
 			Configuration::updateValue('BLOCKSOCIAL_VIMEO', Tools::getValue('blocksocial_vimeo', ''));
 			Configuration::updateValue('BLOCKSOCIAL_INSTAGRAM', Tools::getValue('blocksocial_instagram', ''));
-			$this->_clearCache('blocksocial.tpl');
-			Tools::redirectAdmin($this->context->link->getAdminLink('AdminModules').'&configure='.$this->name.'&tab_module='.$this->tab.'&conf=4&module_name='.$this->name);
+
+			Tools::redirectAdmin($this->context->link->getAdminLink('AdminModules').'&configure='.$this->name.'&conf=4');
 		}
-		
+
 		return $output.$this->renderForm();
-	}
-	
-	public function hookDisplayHeader()
-	{
-		$this->context->controller->addCSS(($this->_path).'blocksocial.css', 'all');
 	}
 
 	public function hookDisplayFooterNotificationHook()
 	{
-		if (!$this->isCached('blocksocial.tpl', $this->getCacheId()))
-			$this->smarty->assign(array(
-				'facebook_url' => Configuration::get('BLOCKSOCIAL_FACEBOOK'),
-				'twitter_url' => Configuration::get('BLOCKSOCIAL_TWITTER'),
-				'rss_url' => Configuration::get('BLOCKSOCIAL_RSS'),
-				'youtube_url' => Configuration::get('BLOCKSOCIAL_YOUTUBE'),
-				'google_plus_url' => Configuration::get('BLOCKSOCIAL_GOOGLE_PLUS'),
-				'pinterest_url' => Configuration::get('BLOCKSOCIAL_PINTEREST'),
-				'vimeo_url' => Configuration::get('BLOCKSOCIAL_VIMEO'),
-				'instagram_url' => Configuration::get('BLOCKSOCIAL_INSTAGRAM'),
-			));
+		$this->smarty->assign(array(
+			'facebook_url' => Configuration::get('BLOCKSOCIAL_FACEBOOK'),
+			'twitter_url' => Configuration::get('BLOCKSOCIAL_TWITTER'),
+			'rss_url' => Configuration::get('BLOCKSOCIAL_RSS'),
+			'youtube_url' => Configuration::get('BLOCKSOCIAL_YOUTUBE'),
+			'pinterest_url' => Configuration::get('BLOCKSOCIAL_PINTEREST'),
+			'vimeo_url' => Configuration::get('BLOCKSOCIAL_VIMEO'),
+			'instagram_url' => Configuration::get('BLOCKSOCIAL_INSTAGRAM'),
+		));
 
-		return $this->display(__FILE__, 'blocksocial.tpl', $this->getCacheId());
+		return $this->display(__FILE__, 'blocksocial.tpl');
 	}
 
-	/*public function hookDisplayFooter()
-	{
-		if (!$this->isCached('blocksocial.tpl', $this->getCacheId()))
-			$this->smarty->assign(array(
-				'facebook_url' => Configuration::get('BLOCKSOCIAL_FACEBOOK'),
-				'twitter_url' => Configuration::get('BLOCKSOCIAL_TWITTER'),
-				'rss_url' => Configuration::get('BLOCKSOCIAL_RSS'),
-				'youtube_url' => Configuration::get('BLOCKSOCIAL_YOUTUBE'),
-				'google_plus_url' => Configuration::get('BLOCKSOCIAL_GOOGLE_PLUS'),
-				'pinterest_url' => Configuration::get('BLOCKSOCIAL_PINTEREST'),
-				'vimeo_url' => Configuration::get('BLOCKSOCIAL_VIMEO'),
-				'instagram_url' => Configuration::get('BLOCKSOCIAL_INSTAGRAM'),
-			));
-
-		return $this->display(__FILE__, 'blocksocial.tpl', $this->getCacheId());
-	}*/
-	
 	public function renderForm()
 	{
 		$fields_form = array(
@@ -168,27 +150,21 @@ class blocksocial extends Module
 					),
 					array(
 						'type' => 'text',
-						'label' => $this->l('Google+ URL:'),
-						'name' => 'blocksocial_google_plus',
-						'desc' => $this->l('Your official Google+ page.'),
-					),
-					array(
-						'type' => 'text',
 						'label' => $this->l('Pinterest URL:'),
 						'name' => 'blocksocial_pinterest',
 						'desc' => $this->l('Your official Pinterest account.'),
 					),
-					array(						
-						'type' => 'text',						
-						'label' => $this->l('Vimeo URL:'),						
-						'name' => 'blocksocial_vimeo',						
-						'desc' => $this->l('Your official Vimeo account.'),					
+					array(
+						'type' => 'text',
+						'label' => $this->l('Vimeo URL:'),
+						'name' => 'blocksocial_vimeo',
+						'desc' => $this->l('Your official Vimeo account.'),
 					),
-					array(						
-						'type' => 'text',						
-						'label' => $this->l('Instagram URL:'),						
-						'name' => 'blocksocial_instagram',						
-						'desc' => $this->l('Your official Instagram account.'),					
+					array(
+						'type' => 'text',
+						'label' => $this->l('Instagram URL:'),
+						'name' => 'blocksocial_instagram',
+						'desc' => $this->l('Your official Instagram account.'),
 					),
 				),
 				'submit' => array(
@@ -196,7 +172,7 @@ class blocksocial extends Module
 				)
 			),
 		);
-		
+
 		$helper = new HelperForm();
 		$helper->show_toolbar = false;
 		$helper->table =  $this->table;
@@ -215,7 +191,7 @@ class blocksocial extends Module
 
 		return $helper->generateForm(array($fields_form));
 	}
-	
+
 	public function getConfigFieldsValues()
 	{
 		return array(
@@ -223,11 +199,9 @@ class blocksocial extends Module
 			'blocksocial_twitter' => Tools::getValue('blocksocial_twitter', Configuration::get('BLOCKSOCIAL_TWITTER')),
 			'blocksocial_rss' => Tools::getValue('blocksocial_rss', Configuration::get('BLOCKSOCIAL_RSS')),
 			'blocksocial_youtube' => Tools::getValue('blocksocial_youtube', Configuration::get('BLOCKSOCIAL_YOUTUBE')),
-			'blocksocial_google_plus' => Tools::getValue('blocksocial_google_plus', Configuration::get('BLOCKSOCIAL_GOOGLE_PLUS')),
 			'blocksocial_pinterest' => Tools::getValue('blocksocial_pinterest', Configuration::get('BLOCKSOCIAL_PINTEREST')),
 			'blocksocial_vimeo' => Tools::getValue('blocksocial_vimeo', Configuration::get('BLOCKSOCIAL_VIMEO')),
 			'blocksocial_instagram' => Tools::getValue('blocksocial_instagram', Configuration::get('BLOCKSOCIAL_INSTAGRAM')),
 		);
 	}
-
 }

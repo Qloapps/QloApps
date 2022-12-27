@@ -41,7 +41,6 @@ abstract class AdminStatsTabControllerCore extends AdminPreferencesControllerCor
         }
 
         $this->initTabModuleList();
-        $this->addToolBarModulesListButton();
         $this->toolbar_title = $this->l('Stats', 'AdminStatsTab');
         $this->initPageHeaderToolbar();
         if ($this->display == 'view') {
@@ -104,6 +103,7 @@ abstract class AdminStatsTabControllerCore extends AdminPreferencesControllerCor
         $module = Tools::getValue('module');
         $action .= ($module ? '&module='.Tools::safeOutput($module) : '');
         $action .= (($id_product = Tools::getValue('id_product')) ? '&id_product='.Tools::safeOutput($id_product) : '');
+        $action .= (($id_hotel = Tools::getValue('id_hotel')) ? '&id_hotel='.Tools::safeOutput($id_hotel) : '');
         $tpl->assign(array(
             'current' => self::$currentIndex,
             'token' => $token,

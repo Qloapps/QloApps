@@ -59,6 +59,30 @@ class AdminOrderPreferencesControllerCore extends AdminController
         );
 
         $this->fields_options = array(
+            'order_restrict' => array(
+                'title' => $this->l('Order Restrict'),
+                'icon' => 'icon-cogs',
+                'fields' => array(
+                    'MAX_GLOBAL_BOOKING_DATE' => array(
+                        'title' => $this->l('Maximum Global Date to book a room'),
+                        'hint' => $this->l('Maximum date by which rooms of your hotels can be booked.'),
+                        'type' => 'text',
+                        'id' => 'max_global_book_date',
+                        'class' => 'fixed-width-xxl readonly',
+                    ),
+                    'GLOBAL_PREPARATION_TIME' => array(
+                        'title' => $this->l('Preparation time'),
+                        'hint' => $this->l('Number of days required to prepare a room for stay.'),
+                        'desc' => $this->l('Set to 0 to disable this feature.'),
+                        'type' => 'text',
+                        'class' => 'fixed-width-xl',
+                        'suffix' => $this->l('day(s)'),
+                    ),
+                ),
+                'submit' => array(
+                    'title' => $this->l('Save'),
+                ),
+            ),
             'general' => array(
                 'title' =>    $this->l('General'),
                 'icon' =>    'icon-cogs',
@@ -75,7 +99,7 @@ class AdminOrderPreferencesControllerCore extends AdminController
                     ),*/
                     'PS_GUEST_CHECKOUT_ENABLED' => array(
                         'title' => $this->l('Enable guest checkout'),
-                        'hint' => $this->l('Allow guest visitors to place an order without registering.'),
+                        'hint' => $this->l('Allow guest visitors to place an order without registration.'),
                         'validation' => 'isBool',
                         'cast' => 'intval',
                         'type' => 'bool'
@@ -120,8 +144,8 @@ class AdminOrderPreferencesControllerCore extends AdminController
                         )
                     ),
                     'PS_CONDITIONS_CMS_ID' => array(
-                        'title' => $this->l('CMS page for the Conditions of use'),
-                        'hint' => $this->l('Choose the CMS page which contains your store\'s conditions of use.'),
+                        'title' => $this->l('CMS page for Terms and Conditions'),
+                        'hint' => $this->l('Choose the CMS page which contains your website\'s Terms and Conditions.'),
                         'validation' => 'isInt',
                         'type' => 'select',
                         'list' => $cms_tab,
@@ -157,8 +181,8 @@ class AdminOrderPreferencesControllerCore extends AdminController
                         'type' => 'bool'
                     ),
                     'PS_ORDER_CONF_MAIL_TO_EMPLOYEE' => array(
-                        'title' => $this->l('Order confirmation mail to employee'),
-                        'hint' => $this->l('Enable, if you want to send order confirmation email to the employees with profiles which have permission to manage the hotel.'),
+                        'title' => $this->l('Order confirmation mail to employees'),
+                        'hint' => $this->l('Enable, if you want to send order confirmation email to employees having permission to manage the hotel.'),
                         'validation' => 'isBool',
                         'cast' => 'intval',
                         'type' => 'bool'
@@ -183,9 +207,34 @@ class AdminOrderPreferencesControllerCore extends AdminController
     public function beforeUpdateOptions()
     {
         $sql = 'SELECT `id_cms` FROM `'._DB_PREFIX_.'cms`
-				WHERE id_cms = '.(int)Tools::getValue('PS_CONDITIONS_CMS_ID');
+        WHERE id_cms = '.(int)Tools::getValue('PS_CONDITIONS_CMS_ID');
         if (Tools::getValue('PS_CONDITIONS') && (Tools::getValue('PS_CONDITIONS_CMS_ID') == 0 || !Db::getInstance()->getValue($sql))) {
-            $this->errors[] = Tools::displayError('Assign a valid CMS page if you want it to be read.');
+            $this->errors[] = Tools::displayError('Please assign a valid CMS page for Terms and Conditions.');
         }
+
+        $maxGlobalBookingDate = Tools::getValue('MAX_GLOBAL_BOOKING_DATE');
+        $globalPreparationTime = Tools::getValue('GLOBAL_PREPARATION_TIME');
+        $maxGlobalBookingDateFormatted = date('Y-m-d', strtotime($maxGlobalBookingDate));
+
+        if ($maxGlobalBookingDate == '') {
+            $this->errors[] = Tools::displayError('Field \'Maximum Global Date to book a room\' can not be empty.');
+        } elseif (!Validate::isDate($maxGlobalBookingDateFormatted)) {
+            $this->errors[] = Tools::displayError('Field \'Maximum Global Date to book a room\' is invalid.');
+        } elseif (strtotime($maxGlobalBookingDateFormatted) < strtotime(date('Y-m-d'))) {
+            $this->errors[] = Tools::displayError('Field \'Maximum Global Date to book a room\' can not be a past date. Please use a future date.');
+        }
+
+        if ($globalPreparationTime === '') {
+            $this->errors[] = Tools::displayError('Field \'Preparation time\' can not be empty.');
+        } elseif ($globalPreparationTime !== '0' && !Validate::isUnsignedInt($globalPreparationTime)) {
+            $this->errors[] = Tools::displayError('Field \'Preparation time\' is invalid.');
+        }
+    }
+
+    public function setMedia()
+    {
+        parent::setMedia();
+        $this->addCSS(_MODULE_DIR_.'hotelreservationsystem/views/css/HotelReservationAdmin.css');
+        $this->addJS(_MODULE_DIR_.'hotelreservationsystem/views/js/HotelReservationAdmin.js');
     }
 }

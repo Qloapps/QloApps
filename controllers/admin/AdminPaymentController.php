@@ -92,12 +92,6 @@ class AdminPaymentControllerCore extends AdminController
         $this->toolbar_title = array_unique($this->breadcrumbs);
     }
 
-    public function initPageHeaderToolbar()
-    {
-        parent::initPageHeaderToolbar();
-        $this->page_header_toolbar_btn = array();
-    }
-
     public function postProcess()
     {
         if (Tools::getValue('action') == 'GetModuleQuickView' && Tools::getValue('ajax') == '1') {
@@ -273,41 +267,5 @@ class AdminPaymentControllerCore extends AdminController
         );
 
         return parent::renderView();
-    }
-
-    public function renderModulesList()
-    {
-        if ($this->getModulesList($this->filter_modules_list)) {
-            $active_list = array();
-            foreach ($this->modules_list as $key => $module) {
-                if (in_array($module->name, $this->list_partners_modules)) {
-                    $this->modules_list[$key]->type = 'addonsPartner';
-                }
-                if (isset($module->description_full) && trim($module->description_full) != '') {
-                    $module->show_quick_view = true;
-                }
-
-                if ($module->active) {
-                    $active_list[] = $module;
-                } else {
-                    $unactive_list[] = $module;
-                }
-            }
-
-            $helper = new Helper();
-            $fetch = '';
-
-            if (isset($active_list)) {
-                $this->context->smarty->assign('panel_title', $this->l('Active payment'));
-                $fetch = $helper->renderModulesList($active_list);
-            }
-
-            $this->context->smarty->assign(array(
-                'panel_title' => $this->l('Recommended payment gateways'),
-                'view_all' => true
-            ));
-            $fetch .= $helper->renderModulesList($unactive_list);
-            return $fetch;
-        }
     }
 }

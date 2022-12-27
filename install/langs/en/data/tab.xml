@@ -58,7 +58,8 @@
   <tab id="Taxes" name="Taxes"/>
   <tab id="Tax_Rules" name="Tax Rules"/>
   <tab id="Translations" name="Translations"/>
-  <tab id="Modules_1" name="Modules and Services"/>
+  <tab id="Modules_1" name="Manage Modules"/>
+  <tab id="Modules_Catalog" name="Modules Catalog"/>
   <tab id="Modules_Themes_Catalog" name="Modules &amp; Themes Catalog"/>
   <tab id="Positions" name="Positions"/>
   <tab id="Payment" name="Payment"/>

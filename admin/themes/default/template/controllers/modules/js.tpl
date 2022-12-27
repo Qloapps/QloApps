@@ -72,7 +72,7 @@
 
 		if (module_name != '')
 			$.uiTableFilter($('#moduleContainer').find('table'), module_name);
-		
+
 		$('#moduleQuicksearch').on('keyup', function(){
 			val = this.value;
 			if ($('#filter_all').hasClass('active'))
@@ -86,15 +86,15 @@
 					clearInterval(interval);
 					interval = null;
 				}
-			
+
 		}, 100);
-	
-			
+
+
 		}).on('keydown', function(e){
 			if (e.keyCode == 13)
 				return false;
 		});
-		
+
 		$('input[name="filtername"]').result(function(event, data, formatted) {
 			$('#filternameForm').submit();
 		});
@@ -114,7 +114,7 @@
 				$(this).attr("rel", "false");
 				$("input[name=modules]").removeAttr("checked");
 			}
-		});		
+		});
 
 		// Method to reload filter in ajax
 		$('.categoryModuleFilterLink').click(function()
@@ -212,12 +212,12 @@
 			return false;
 		}
 
-		$(document).on('change', '#module_type_filter, #module_install_filter, #module_status_filter, #country_module_value_filter', function() { 
-			setFilter(); 
+		$(document).on('change', '#module_type_filter, #module_install_filter, #module_status_filter, #country_module_value_filter', function() {
+			setFilter();
 		});
 
 		$('.moduleTabPreferencesChoise').change(function()
-		{			
+		{
 			var value_pref = $(this).val();
 			var module_pref = $(this).attr('name');
 			module_pref = module_pref.substring(2, module_pref.length);
@@ -240,7 +240,7 @@
 				}
 			});
 		});
-		
+
 		// Method to save favorites preferences
 		$('.moduleFavorite').change(function()
 		{
@@ -309,7 +309,7 @@
 					else
 						$('#favorite-count').html(total_favorites-1);
 	              }
-	                
+
 	            },
 	            error: function(res,textStatus,jqXHR)
 	            {

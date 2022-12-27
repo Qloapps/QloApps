@@ -271,11 +271,11 @@ class ContactControllerCore extends FrontController
                 if (isset($hotel['id_cover_img'])
                     && $hotel['id_cover_img']
                     && Validate::isLoadedObject(
-                        $objHtlImg = new HotelImage($hotel['id_cover_img'])
+                        $objHotelImage = new HotelImage($hotel['id_cover_img'])
                     )
                 ) {
                     // by webkul to get media link.
-                    $htlImgLink = $this->context->link->getMediaLink(_MODULE_DIR_.'hotelreservationsystem/views/img/hotel_img/'.$objHtlImg->hotel_image_id.'.jpg');
+                    $htlImgLink = $this->context->link->getMediaLink($objHotelImage->getImageLink($hotel['id_cover_img'], ImageType::getFormatedName('medium')));
 
                     if ((bool)Tools::file_get_contents($htlImgLink)) {
                         $hotel['image_url'] = $htlImgLink;
@@ -287,7 +287,8 @@ class ContactControllerCore extends FrontController
                 }
             }
         }
-	$contactKey = md5(uniqid(microtime(), true));
+
+	    $contactKey = md5(uniqid(microtime(), true));
         $this->context->cookie->__set('contactFormKey', $contactKey);
         $this->context->smarty->assign(
             array(
@@ -297,7 +298,7 @@ class ContactControllerCore extends FrontController
                 'gblHtlAddress' => $gblHtlAddress,
                 'contacts' => Contact::getContacts($this->context->language->id),
                 'message' => html_entity_decode(Tools::getValue('message')),
-	        'contactKey' => $contactKey,
+	            'contactKey' => $contactKey,
             )
         );
 
