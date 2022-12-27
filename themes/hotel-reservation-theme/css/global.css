@@ -5818,8 +5818,7 @@ header {
     header .row #header_logo {
       padding: 10px 0; }
     header .row #header_logo img {
-      max-width: 120px;
-      max-height: 120px; }
+      max-height: 60px; }
     header .header-top > div > div > div .header-top-menu {
       display: flex;
       flex-direction: row-reverse;
