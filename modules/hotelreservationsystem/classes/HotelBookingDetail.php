@@ -1758,12 +1758,8 @@ class HotelBookingDetail extends ObjectModel
         if (is_array($bookingsCartData) && count($bookingsCartData)) {
             foreach ($bookingsData as $bookingCartData) {
                 $objHotelCartBookingData = new HotelCartBookingData($bookingCartData['id']);
-                if (!Validate::isLoadedObject($objHotelCartBookingData)) {
-                    return false;
-                }
-
-                if (!$objHotelCartBookingData->delete()) {
-                    return false;
+                if (Validate::isLoadedObject($objHotelCartBookingData)) {
+                    $objHotelCartBookingData->delete();
                 }
             }
         }
@@ -1772,12 +1768,8 @@ class HotelBookingDetail extends ObjectModel
         if (is_array($bookingsData) && count($bookingsData)) {
             foreach ($bookingsData as $bookingData) {
                 $objHotelBookingDetail = new self($bookingData['id']);
-                if (!Validate::isLoadedObject($objHotelBookingDetail)) {
-                    return false;
-                }
-
-                if (!$objHotelBookingDetail->delete()) {
-                    return false;
+                if (Validate::isLoadedObject($objHotelBookingDetail)) {
+                    $objHotelBookingDetail->delete();
                 }
             }
         }
@@ -1797,12 +1789,8 @@ class HotelBookingDetail extends ObjectModel
         if (is_array($result) && count($result)) {
             foreach ($result as $row) {
                 $objHotelCartBookingData = new HotelCartBookingData($row['id']);
-                if (!Validate::isLoadedObject($objHotelCartBookingData)) {
-                    return false;
-                }
-
-                if (!$objHotelCartBookingData->delete()) {
-                    return false;
+                if (Validate::isLoadedObject($objHotelCartBookingData)) {
+                    $objHotelCartBookingData->delete();
                 }
             }
         }
@@ -1817,12 +1805,8 @@ class HotelBookingDetail extends ObjectModel
         if (is_array($result) && count($result)) {
             foreach ($result as $row) {
                 $objHotelBookingDetail = new self($row['id']);
-                if (!Validate::isLoadedObject($objHotelBookingDetail)) {
-                    return false;
-                }
-
-                if (!$objHotelBookingDetail->delete()) {
-                    return false;
+                if (Validate::isLoadedObject($objHotelBookingDetail)) {
+                    $objHotelBookingDetail->delete();
                 }
             }
         }
@@ -1841,12 +1825,8 @@ class HotelBookingDetail extends ObjectModel
         if (is_array($result) && count($result)) {
             foreach ($result as $row) {
                 $objHotelCartBookingData = new HotelCartBookingData($row['id']);
-                if (!Validate::isLoadedObject($objHotelCartBookingData)) {
-                    return false;
-                }
-
-                if (!$objHotelCartBookingData->delete()) {
-                    return false;
+                if (Validate::isLoadedObject($objHotelCartBookingData)) {
+                    $objHotelCartBookingData->delete();
                 }
             }
         }
@@ -1860,12 +1840,8 @@ class HotelBookingDetail extends ObjectModel
         if (is_array($result) && count($result)) {
             foreach ($result as $row) {
                 $objHotelBookingDetail = new self($row['id']);
-                if (!Validate::isLoadedObject($objHotelBookingDetail)) {
-                    return false;
-                }
-
-                if (!$objHotelBookingDetail->delete()) {
-                    return false;
+                if (Validate::isLoadedObject($objHotelBookingDetail)) {
+                    $objHotelBookingDetail->delete();
                 }
             }
         }
@@ -1970,19 +1946,16 @@ class HotelBookingDetail extends ObjectModel
             if ($orderDetail->save()) {
                 $bookingsData = self::getOrderInfoIdOrderIdProduct($id_order, $id_product);
                 if (is_array($bookingsData) && count($bookingsData)) {
+                    $result = true;
                     foreach ($bookingsData as $bookingData) {
                         $objHotelBookingDetail = new self($bookingData['id']);
-                        if (!Validate::isLoadedObject($objHotelBookingDetail)) {
-                            return false;
-                        }
-
-                        $objHotelBookingDetail->id_order_detail = $orderDetail->id_order_detail;
-                        if (!$objHotelBookingDetail->save()) {
-                            return false;
+                        if (Validate::isLoadedObject($objHotelBookingDetail)) {
+                            $objHotelBookingDetail->id_order_detail = $orderDetail->id_order_detail;
+                            $result &= $objHotelBookingDetail->save();
                         }
                     }
 
-                    return true;
+                    return $result;
                 }
             }
         }
