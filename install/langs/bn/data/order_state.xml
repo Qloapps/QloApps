@@ -1,12 +1,12 @@
 <?xml version='1.0'?>
 <entity_order_state>
-  <order_state id='Awaiting'>
+  <order_state id='Awaiting_payment'>
     <name>অপেক্ষমান পেমেন্ট</name>
-    <template>awaiting</template>
+    <template>awaiting_payment</template>
   </order_state>
   <order_state id='Payment_accepted'>
     <name>পেমেন্ট গৃহীত </name>
-    <template>payment</template>
+    <template>payment_accepted</template>
   </order_state>
   <order_state id='Preparation_in_progress'>
     <name>প্রস্তুতি আগাচ্ছে </name>
@@ -26,7 +26,7 @@
   </order_state>
   <order_state id='Payment_remotely_accepted'>
     <name>পেমেন্ট স্থানিয় ভাবে গৃহীত</name>
-    <template>payment</template>
+    <template>payment_accepted</template>
   </order_state>
   <order_state id="Awaiting_remote_payment">
     <name>Awaiting remote payment</name>
@@ -42,6 +42,6 @@
   </order_state>
   <order_state id="Partial_payment_accepted">
     <name>Partial payment accepted</name>
-    <template>payment</template>
+    <template>payment_accepted</template>
   </order_state>
 </entity_order_state>

@@ -77,7 +77,7 @@ class BankwireValidationModuleFrontController extends ModuleFrontController
 			'{bankwire_address}' => nl2br(Configuration::get('BANK_WIRE_ADDRESS'))
 		);
 
-		$this->module->validateOrder($cart->id, Configuration::get('PS_OS_AWAITING'), $total, $this->module->displayName, NULL, $mailVars, (int)$currency->id, false, $customer->secure_key);
+		$this->module->validateOrder($cart->id, Configuration::get('PS_OS_AWAITING_PAYMENT'), $total, $this->module->displayName, NULL, $mailVars, (int)$currency->id, false, $customer->secure_key);
 		Tools::redirect('index.php?controller=order-confirmation&id_cart='.$cart->id.'&id_module='.$this->module->id.'&id_order='.$this->module->currentOrder.'&key='.$customer->secure_key);
 	}
 }

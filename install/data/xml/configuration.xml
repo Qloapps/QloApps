@@ -377,10 +377,10 @@
 	<configuration id="PS_BACKUP_DROP_TABLE" name="PS_BACKUP_DROP_TABLE">
 		<value>1</value>
 	</configuration>
-	<configuration id="PS_OS_AWAITING" name="PS_OS_AWAITING">
+	<configuration id="PS_OS_AWAITING_PAYMENT" name="PS_OS_AWAITING_PAYMENT">
 		<value>1</value>
 	</configuration>
-	<configuration id="PS_OS_PAYMENT" name="PS_OS_PAYMENT">
+	<configuration id="PS_OS_PAYMENT_ACCEPTED" name="PS_OS_PAYMENT_ACCEPTED">
 		<value>2</value>
 	</configuration>
 	<configuration id="PS_OS_PROCESSING" name="PS_OS_PROCESSING">
@@ -404,7 +404,7 @@
 	<configuration id="PS_OS_OVERBOOKING" name="PS_OS_OVERBOOKING">
 		<value>7</value>
 	</configuration>
-	<configuration id="PS_OS_PARTIAL_PAYMENT" name="PS_OS_PARTIAL_PAYMENT">
+	<configuration id="PS_OS_PARTIAL_PAYMENT_ACCEPTED" name="PS_OS_PARTIAL_PAYMENT_ACCEPTED">
 		<value>8</value>
 	</configuration>
 	<!-- <configuration id="PS_OS_BANKWIRE" name="PS_OS_BANKWIRE">

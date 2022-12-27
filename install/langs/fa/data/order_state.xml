@@ -1,12 +1,12 @@
 <?xml version="1.0"?>
 <entity_order_state>
-    <order_state id="Awaiting">
+    <order_state id="Awaiting_payment">
         <name>منتظر پرداخت</name>
-        <template>awaiting</template>
+        <template>awaiting_payment</template>
     </order_state>
     <order_state id="Payment_accepted">
         <name>پرداخت تایید شده</name>
-        <template>payment</template>
+        <template>payment_accepted</template>
     </order_state>
     <order_state id="Preparation_in_progress">
         <name>در حال آماده سازی</name>
@@ -26,7 +26,7 @@
     </order_state>
     <order_state id="Payment_remotely_accepted">
         <name>پرداخت از راه دور تایید شده</name>
-        <template>payment</template>
+        <template>payment_accepted</template>
     </order_state>
     <order_state id="Awaiting_remote_payment">
         <name>Awaiting remote payment</name>
@@ -42,6 +42,6 @@
     </order_state>
     <order_state id="Partial_payment_accepted">
         <name>Partial payment accepted</name>
-        <template>payment</template>
+        <template>payment_accepted</template>
     </order_state>
 </entity_order_state>

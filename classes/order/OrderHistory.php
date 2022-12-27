@@ -97,7 +97,7 @@ class OrderHistoryCore extends ObjectModel
         $old_os = $order->getCurrentOrderState();
 
         // executes hook
-        if (in_array($new_os->id, array(Configuration::get('PS_OS_PAYMENT'), Configuration::get('PS_OS_WS_PAYMENT')))) {
+        if (in_array($new_os->id, array(Configuration::get('PS_OS_PAYMENT_ACCEPTED'), Configuration::get('PS_OS_WS_PAYMENT')))) {
             Hook::exec('actionPaymentConfirmation', array('id_order' => (int)$order->id), null, false, true, false, $order->id_shop);
         }
 

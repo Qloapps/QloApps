@@ -240,14 +240,14 @@ $context->link = new Link($https_link, $https_link);
  * USE : Configuration::get() method in order to getting the id of order status
  */
 
-define('_PS_OS_AWAITING_', Configuration::get('PS_OS_AWAITING'));
-define('_PS_OS_PAYMENT_', Configuration::get('PS_OS_PAYMENT'));
+define('_PS_OS_AWAITING_PAYMENT_', Configuration::get('PS_OS_AWAITING_PAYMENT'));
+define('_PS_OS_PAYMENT_ACCEPTED_', Configuration::get('PS_OS_PAYMENT_ACCEPTED'));
 define('_PS_OS_PROCESSING_', Configuration::get('PS_OS_PROCESSING'));
 define('_PS_OS_CANCELED_', Configuration::get('PS_OS_CANCELED'));
 define('_PS_OS_REFUND_', Configuration::get('PS_OS_REFUND'));
 define('_PS_OS_ERROR_', Configuration::get('PS_OS_ERROR'));
 define('_PS_OS_OVERBOOKING_', Configuration::get('PS_OS_OVERBOOKING'));
-define('_PS_OS_PARTIAL_PAYMENT_', Configuration::get('PS_OS_PARTIAL_PAYMENT'));
+define('_PS_OS_PARTIAL_PAYMENT_ACCEPTED_', Configuration::get('PS_OS_PARTIAL_PAYMENT_ACCEPTED'));
 
 if (!defined('_MEDIA_SERVER_1_')) {
     define('_MEDIA_SERVER_1_', Configuration::get('PS_MEDIA_SERVER_1'));

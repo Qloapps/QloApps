@@ -232,8 +232,8 @@ class AdminOrdersControllerCore extends AdminController
         $this->addJqueryPlugin(array('autocomplete', 'fancybox', 'typewatch'));
 
         $defaults_order_state = array(
-            'awaiting' => (int)Configuration::get('PS_OS_AWAITING'),
-            'other' => (int)Configuration::get('PS_OS_PAYMENT'));
+            'awaiting_payment' => (int)Configuration::get('PS_OS_AWAITING_PAYMENT'),
+            'other' => (int)Configuration::get('PS_OS_PAYMENT_ACCEPTED'));
         $payment_modules = array();
         foreach (PaymentModule::getInstalledPaymentModules() as $p_module) {
             $payment_modules[] = Module::getInstanceById((int)$p_module['id_module']);
