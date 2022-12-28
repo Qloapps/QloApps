@@ -254,8 +254,8 @@
 				</table>
 			</div>
 			<p>{l s='An email has been sent with this information.'}
-				<br /><strong>{l s='Your order will be sent as soon as we receive payment.'}</strong>
-				<br />{l s='If you have questions, comments or concerns, please contact our'} <a class="cust_serv_lnk" href="{$link->getPageLink('contact', true)|escape:'html'}">{l s='expert customer support team'}</a>
+				<br /><strong>{l s='Your booking has been received successfully and we are looking forward to welcoming you.'}</strong>
+				<br />{l s='If you have questions, comments or concerns, please contact our'} <a class="cust_serv_lnk" href="{$link->getPageLink('contact', true)|escape:'html'}">{l s='expert customer support team.'}</a>
 			</p>
 		</div>
 		<p class="cart_navigation exclusive">

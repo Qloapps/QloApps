@@ -146,7 +146,8 @@ class AdminAddHotelController extends ModuleAdminController
             $objHotelImage = new HotelImage();
             if ($hotelAllImages = $objHotelImage->getImagesByHotelId($idHotel)) {
                 foreach ($hotelAllImages as &$image) {
-                    $image['image_link'] = $this->context->link->getMediaLink(_MODULE_DIR_.$this->module->name.'/views/img/hotel_img/'.$image['hotel_image_id'].'.jpg');
+                    $image['image_link'] = $this->context->link->getMediaLink($objHotelImage->getImageLink($image['id'],ImageType::getFormatedName('large')));
+                    $image['image_link_small'] = $this->context->link->getMediaLink($objHotelImage->getImageLink($image['id'], ImageType::getFormatedName('small')));
                 }
                 $smartyVars['hotelImages'] =  $hotelAllImages;
             }
@@ -162,6 +163,16 @@ class AdminAddHotelController extends ModuleAdminController
                     $smartyVars['hotelRefundRules'] =  array_column($hotelRefundRules, 'id_refund_rule');
                 }
             }
+
+            $restrictDateInfo = HotelOrderRestrictDate::getDataByHotelId($idHotel);
+            if ($restrictDateInfo) {
+                if ($restrictDateInfo['max_order_date'] == '0000-00-00') {
+                    $restrictDateInfo['max_order_date'] = date('d-m-Y', strtotime('1 year'));
+                } else {
+                    $restrictDateInfo['max_order_date'] = date('d-m-Y', strtotime($restrictDateInfo['max_order_date']));
+                }
+            }
+            $smartyVars['order_restrict_date_info'] = $restrictDateInfo;
         }
 
         $smartyVars['enabledDisplayMap'] =  Configuration::get('WK_GOOGLE_ACTIVE_MAP');
@@ -197,6 +208,10 @@ class AdminAddHotelController extends ModuleAdminController
         $address = Tools::getValue('address');
         $active = Tools::getValue('ENABLE_HOTEL');
         $activeRefund = Tools::getValue('active_refund');
+        $enableUseGlobalMaxOrderDate = Tools::getValue('enable_use_global_max_order_date');
+        $maximumBookingDate = Tools::getValue('maximum_booking_date');
+        $enableUseGlobalPreparationTime = Tools::getValue('enable_use_global_preparation_time');
+        $preparationTime = Tools::getValue('preparation_time');
         $latitude = Tools::getValue('loclatitude');
         $longitude = Tools::getValue('loclongitude');
         $map_formated_address = Tools::getValue('locformatedAddr');
@@ -290,6 +305,27 @@ class AdminAddHotelController extends ModuleAdminController
             $this->errors[] = $this->l('City is required field.');
         } elseif (!Validate::isCityName($city)) {
             $this->errors[] = $this->l('Enter a Valid City Name.');
+        }
+
+        if ($idHotel) {
+            if (!$enableUseGlobalMaxOrderDate) {
+                $maximumBookingDateFormatted = date('Y-m-d', strtotime($maximumBookingDate));
+                if ($maximumBookingDate == '') {
+                    $this->errors[] = Tools::displayError('Maximum Global Date to book a room is a required field.');
+                } elseif (!Validate::isDate($maximumBookingDateFormatted)) {
+                    $this->errors[] = Tools::displayError('Maximum Global Date to book a room is invalid.');
+                } elseif (strtotime($maximumBookingDateFormatted) < strtotime(date('Y-m-d'))) {
+                    $this->errors[] = Tools::displayError('Maximum Global Date to book a room can not be a past date. Please use a future date.');
+                }
+            }
+
+            if (!$enableUseGlobalPreparationTime) {
+                if ($preparationTime === '') {
+                    $this->errors[] = Tools::displayError('Preparation time is a required field.');
+                } elseif ($preparationTime !== '0' && !Validate::isUnsignedInt($preparationTime)) {
+                    $this->errors[] = Tools::displayError('Preparation time is invalid.');
+                }
+            }
         }
 
         if (!count($this->errors)) {
@@ -475,6 +511,28 @@ class AdminAddHotelController extends ModuleAdminController
                 }
             }
 
+            if ($idHotel) {
+                // save maximum booking date and preparation time
+                $objHotelOrderRestrictDate = new HotelOrderRestrictDate();
+                $restrictDateInfo = HotelOrderRestrictDate::getDataByHotelId($newIdHotel);
+                if ($restrictDateInfo) {
+                    $objHotelOrderRestrictDate = new HotelOrderRestrictDate($restrictDateInfo['id']);
+                } else {
+                    $objHotelOrderRestrictDate = new HotelOrderRestrictDate();
+                }
+
+                $objHotelOrderRestrictDate->id_hotel = $newIdHotel;
+                $objHotelOrderRestrictDate->use_global_max_order_date = $enableUseGlobalMaxOrderDate;
+                if (!$enableUseGlobalMaxOrderDate) {
+                    $objHotelOrderRestrictDate->max_order_date = $maximumBookingDateFormatted;
+                }
+                $objHotelOrderRestrictDate->use_global_preparation_time = $enableUseGlobalPreparationTime;
+                if (!$enableUseGlobalPreparationTime) {
+                    $objHotelOrderRestrictDate->preparation_time = $preparationTime;
+                }
+                $objHotelOrderRestrictDate->save();
+            }
+
             if (Tools::isSubmit('submitAdd'.$this->table.'AndStay')) {
                 if ($idHotel) {
                     Tools::redirectAdmin(
@@ -531,8 +589,7 @@ class AdminAddHotelController extends ModuleAdminController
                     'hotel_image' => $_FILES['hotel_image'],
                 ];
                 $objHotelImage = new HotelImage();
-                $hotelImgPath = _PS_MODULE_DIR_.'hotelreservationsystem/views/img/hotel_img/';
-                $imageDetail = $objHotelImage->uploadHotelImages($_FILES['hotel_image'], $idHotel, $hotelImgPath);
+                $imageDetail = $objHotelImage->uploadHotelImages($_FILES['hotel_image'], $idHotel);
                 if ($imageDetail) {
                     die(json_encode($imageDetail));
                 } else {

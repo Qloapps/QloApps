@@ -17,8 +17,7 @@
  * @license LICENSE.txt
  */
 
-// PIE CHART CODE
-function generateAvailablityPieChart(chartData) {
+function pie_chart_occupancy(widget_name, chart_details) {
     nv.addGraph(function() {
         var chart = nv.models.pieChart()
             .x(function(d) { return d.label })
@@ -26,16 +25,17 @@ function generateAvailablityPieChart(chartData) {
             .showLabels(true)
             .showLegend(false)
             .labelThreshold(.01)
-            .labelType("percent")
+            .labelType('percent')
             .donut(true)
             .donutRatio(0.35)
-            .color(["#A569DF", "#56CE56", "#FF655C"]);
+            .color(['#A569DF', '#56CE56', '#FF655C']);
 
-        d3.select("#availablePieChart svg")
-            .datum(chartData)
+        d3.select('#availablePieChart svg')
+            .datum(chart_details.data)
             .transition().duration(350)
             .call(chart);
         nv.utils.windowResize(chart.update);
+
         return chart;
     });
 }

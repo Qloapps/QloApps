@@ -91,6 +91,20 @@
 
 /* By Webkul */
 
+.strikethrough {
+    width: 100%;
+    text-align: center;
+    border-bottom: 1px solid #777;
+    line-height: 0.1em;
+    margin: 10px 0 25px;
+}
+
+.strikethrough span {
+    background: #fff;
+    color: #333;
+    padding:0 10px;
+}
+
 #title {
 	font-size: 13px;
 	color: #3C3C3C;
@@ -264,6 +278,9 @@
 .order-detail-content .room_remove_block i {
 	font-size: 18px;
 }
+#order-opc #guest-info-block {
+	position: relative;
+}
 #order-opc #guest-info-block div.info-head {
 	font-size: 14px;
 	color: #555555;
@@ -308,6 +325,16 @@
 	color: #333333;
 }
 #order-opc .already_registered_block #openLoginFormBlock {
+	color: #003AEF;
+	font-weight: 600;
+}
+
+#order-opc #login_form_content .text-secondary {
+	color: #333;
+	font-size: 14px;
+}
+
+#order-opc #login_form_content #idAccountChoice {
 	color: #003AEF;
 	font-weight: 600;
 }
@@ -552,6 +579,10 @@
 	padding-top: 0px;
 }
 
+#order-opc #opc_account_errors {
+    margin-top: 10px
+}
+
 /* buttons css */
 #order-opc .opc-button-small {
 	border: none;
@@ -570,7 +601,7 @@
 	color: #1292FF;
 }
 #order-opc .opc-button {
-	padding: 11px 0 0 0;
+	padding: 2px 0 0 0;
 }
 #order-opc .button-medium {
 	background-color: #1292FF;
@@ -641,3 +672,29 @@
 	content: "";}
 	#order-opc .fancybox-skin .fancybox-close {
 	background-image: url(../img/icon/icon-close.svg);}
+
+.btn-edit-guest-info {
+	padding: 0px 50px;
+	font-size: 17px;
+	line-height: 23px;
+	border-radius: 2px;
+	background-color: #D9D9D9;
+	border: 1px solid #D9D9D9;
+	margin-right: 10px; }
+
+.btn-edit-guest-info span {
+	display: block;
+	font-size: 14px;
+	padding: 11px;
+	font-weight: 600;
+	text-transform: uppercase;
+	text-align: center; }
+
+.transform-to-customer-block {
+    margin-top: 25px; }
+
+.transform-to-customer-block .text-secondary {
+    font-size: 14px;
+    line-height: 19px;
+    color: #333;
+    margin-bottom: 15px; }

@@ -54,8 +54,14 @@ $(document).ready(function() {
     var ajax_check_var = '';
     $('.location_search_results_ul').hide();
 
-    function createDateRangePicker(max_order_date, dateFrom, dateTo)
+    function createDateRangePicker(max_order_date, preparation_time, dateFrom, dateTo)
     {
+        let start_date = new Date();
+        if (preparation_time) {
+            start_date.setDate(start_date.getDate() + parseInt(preparation_time));
+            start_date.setHours(0, 0, 0, 0);
+        }
+
         if (max_order_date) {
             max_order_date = $.datepicker.parseDate('yy-mm-dd', max_order_date );
         } else {
@@ -110,6 +116,7 @@ $(document).ready(function() {
         } else {
             $('#daterange_value').dateRangePicker({
                 startDate: $.datepicker.formatDate('dd-mm-yy', new Date()),
+                startDate: start_date,
                 endDate: max_order_date,
             }).on('datepicker-change', function(event,obj){
                 $('#check_in_time').val($.datepicker.formatDate('yy-mm-dd', obj.date1));
@@ -124,12 +131,6 @@ $(document).ready(function() {
             );
         }
 
-    }
-
-    createDateRangePicker(false, $('#check_in_time').val(), $('#check_out_time').val());
-
-    if (typeof max_order_date != 'undefined' && typeof booking_date_to != 'undefined') {
-        createDateRangePicker(max_order_date, $('#check_in_time').val(), $('#check_out_time').val());
     }
 
     function abortRunningAjax() {
@@ -257,9 +258,11 @@ $(document).ready(function() {
     });
 
     $(document).on('click', '.hotel_dropdown_ul li', function() {
-        var max_order_date = $(this).attr('data-max_order_date');
-        createDateRangePicker(max_order_date, $('#check_in_time').val(), $('#check_out_time').val());
+        let max_order_date = $(this).attr('data-max_order_date');
+        let preparation_time = $(this).attr('data-preparation_time')
+        createDateRangePicker(max_order_date, preparation_time, $('#check_in_time').val(), $('#check_out_time').val());
         $("#max_order_date").val(max_order_date);
+        $('#preparation_time').val(preparation_time);
         $('#id_hotel').val($(this).attr('data-id-hotel'));
         $('#hotel_cat_id').val($(this).attr('data-hotel-cat-id'));
         $('#hotel_cat_name').html($(this).html());
@@ -267,9 +270,8 @@ $(document).ready(function() {
 
     // If only one hotel then set max order date on date pickers
     var max_order_date = $('#max_order_date').val();
-    if (max_order_date != '') {
-        createDateRangePicker(max_order_date, $('#check_in_time').val(), $('#check_out_time').val());
-    }
+    var preparation_time = $('#preparation_time').val();
+    createDateRangePicker(max_order_date, preparation_time, $('#check_in_time').val(), $('#check_out_time').val());
 
     // validations on the submit of the search fields
     $('#search_room_submit').on('click', function(e) {

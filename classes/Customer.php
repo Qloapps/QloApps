@@ -465,6 +465,21 @@ class CustomerCore extends ObjectModel
         return Cache::retrieve($cache_id);
     }
 
+    public static function getCustomerIdAddress($id_customer)
+    {
+        $cache_id = 'Customer::getCustomerIdAddress'.(int)$id_customer;
+        if (!Cache::isStored($cache_id)) {
+            $sql = 'SELECT id_address
+					FROM `'._DB_PREFIX_.'address` a
+					WHERE `id_customer` = '.(int)$id_customer.' AND a.`deleted` = 0';
+
+            $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue($sql);
+            Cache::store($cache_id, $result);
+            return $result;
+        }
+        return Cache::retrieve($cache_id);
+    }
+
     /**
      * Count the number of addresses for a customer
      *

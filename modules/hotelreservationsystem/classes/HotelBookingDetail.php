@@ -1466,9 +1466,9 @@ class HotelBookingDetail extends ObjectModel
      */
     public function dataForFrontSearch($bookingParams)
     {
-        if (Module::isInstalled('productcomments')) {
-            require_once _PS_MODULE_DIR_.'productcomments/ProductComment.php';
-        }
+        // if (Module::isInstalled('productcomments')) {
+        //     require_once _PS_MODULE_DIR_.'productcomments/ProductComment.php';
+        // }
 
         $this->context = Context::getContext();
 
@@ -1489,93 +1489,95 @@ class HotelBookingDetail extends ObjectModel
                     if (empty($value['data']['available'])) {
                         unset($bookingData['rm_data'][$key]);
                     } else {
-                        if (Module::isInstalled('productcomments')) {
-                            $prod_ratting = ProductComment::getAverageGrade($value['id_product'])['grade'];
-                        }
-                        if (empty($prod_ratting)) {
-                            $prod_ratting = 0;
-                        }
+                        $prod_ratting = 0;
+                        // if (Module::isInstalled('productcomments')) {
+                        //     $prod_ratting = ProductComment::getAverageGrade($value['id_product'])['grade'];
+                        // }
+                        // if (empty($prod_ratting)) {
+                        //     $prod_ratting = 0;
+                        // }
 
-                        if ($prod_ratting < $ratting && $ratting != -1) {
-                            unset($bookingData['rm_data'][$key]);
-                        } else {
-                            $product = new Product($value['id_product'], false, $this->context->language->id);
+                        // if ($prod_ratting < $ratting && $ratting != -1) {
+                        //     unset($bookingData['rm_data'][$key]);
+                        // } else
+                        // {
+                        $product = new Product($value['id_product'], false, $this->context->language->id);
 
-                            $product_feature = $product->getFrontFeaturesStatic($this->context->language->id, $value['id_product']);
+                        $product_feature = $product->getFrontFeaturesStatic($this->context->language->id, $value['id_product']);
 
-                            $prod_amen = array();
-                            if (!empty($amenities) && $amenities) {
-                                $prod_amen = $amenities;
-                                foreach ($product_feature as $a_key => $a_val) {
-                                    if (($pa_key = array_search($a_val['id_feature'], $prod_amen)) !== false) {
-                                        unset($prod_amen[$pa_key]);
-                                        if (empty($prod_amen)) {
-                                            break;
-                                        }
+                        $prod_amen = array();
+                        if (!empty($amenities) && $amenities) {
+                            $prod_amen = $amenities;
+                            foreach ($product_feature as $a_key => $a_val) {
+                                if (($pa_key = array_search($a_val['id_feature'], $prod_amen)) !== false) {
+                                    unset($prod_amen[$pa_key]);
+                                    if (empty($prod_amen)) {
+                                        break;
                                     }
-                                }
-                                if (!empty($prod_amen)) {
-                                    unset($bookingData['rm_data'][$key]);
                                 }
                             }
+                            if (!empty($prod_amen)) {
+                                unset($bookingData['rm_data'][$key]);
+                            }
+                        }
 
-                            if (empty($prod_amen)) {
-                                $prod_price = Product::getPriceStatic($value['id_product'], self::useTax());
-                                $productPriceWithoutReduction = $product->getPriceWithoutReduct(!self::useTax());
-                                $productFeaturePrice = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay($value['id_product'], $date_from, $date_to, self::useTax());
+                        if (empty($prod_amen)) {
+                            $prod_price = Product::getPriceStatic($value['id_product'], self::useTax());
+                            $productPriceWithoutReduction = $product->getPriceWithoutReduct(!self::useTax());
+                            $productFeaturePrice = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay($value['id_product'], $date_from, $date_to, self::useTax());
 
-                                if (empty($price) || ($price['from'] <= $prod_price && $price['to'] >= $prod_price)) {
-                                    $cover_image_arr = $product->getCover($value['id_product']);
+                            if (empty($price) || ($price['from'] <= $prod_price && $price['to'] >= $prod_price)) {
+                                $cover_image_arr = $product->getCover($value['id_product']);
 
-                                    if (!empty($cover_image_arr)) {
-                                        $cover_img = $this->context->link->getImageLink($product->link_rewrite, $product->id.'-'.$cover_image_arr['id_image'], 'home_default');
-                                    } else {
-                                        $cover_img = $this->context->link->getImageLink($product->link_rewrite, $this->context->language->iso_code.'-default', 'home_default');
-                                    }
-
-                                    $room_left = count($bookingData['rm_data'][$key]['data']['available']);
-
-                                    $rm_dtl = $objRoomType->getRoomTypeInfoByIdProduct($value['id_product']);
-
-                                    $bookingData['rm_data'][$key]['name'] = $product->name;
-                                    $bookingData['rm_data'][$key]['image'] = $cover_img;
-                                    $bookingData['rm_data'][$key]['description'] = $product->description_short;
-                                    $bookingData['rm_data'][$key]['feature'] = $product_feature;
-                                    $bookingData['rm_data'][$key]['price'] = $prod_price;
-                                    $bookingData['rm_data'][$key]['price_without_reduction'] = $productPriceWithoutReduction;
-                                    $bookingData['rm_data'][$key]['feature_price'] = $productFeaturePrice;
-                                    $bookingData['rm_data'][$key]['feature_price_diff'] = $productPriceWithoutReduction - $productFeaturePrice;
-
-                                    // if ($room_left <= (int)Configuration::get('WK_ROOM_LEFT_WARNING_NUMBER'))
-                                    $bookingData['rm_data'][$key]['room_left'] = $room_left;
-
-                                    $bookingData['rm_data'][$key]['adult'] = $rm_dtl['adult'];
-                                    $bookingData['rm_data'][$key]['children'] = $rm_dtl['children'];
-
-                                    $bookingData['rm_data'][$key]['ratting'] = $prod_ratting;
-                                    if (Module::isInstalled('productcomments')) {
-                                        $bookingData['rm_data'][$key]['num_review'] = ProductComment::getCommentNumber($value['id_product']);
-                                    }
-
-                                    // create URL with the parameters from URL
-                                    $urlData = array ('date_from' => $date_from, 'date_to' => $date_to);
-                                    if (!isset($occupancy)) {
-                                        $occupancy = Tools::getValue('occupancy');
-                                    }
-                                    if ($occupancy) {
-                                        $urlData['occupancy'] = $occupancy;
-                                    }
-
-                                    if (Configuration::get('PS_REWRITING_SETTINGS')) {
-                                        $bookingData['rm_data'][$key]['product_link'] = $this->context->link->getProductLink($product).'?'.http_build_query($urlData);
-                                    } else {
-                                        $bookingData['rm_data'][$key]['product_link'] = $this->context->link->getProductLink($product).'&'.http_build_query($urlData);
-                                    }
+                                if (!empty($cover_image_arr)) {
+                                    $cover_img = $this->context->link->getImageLink($product->link_rewrite, $product->id.'-'.$cover_image_arr['id_image'], 'home_default');
                                 } else {
-                                    unset($bookingData['rm_data'][$key]);
+                                    $cover_img = $this->context->link->getImageLink($product->link_rewrite, $this->context->language->iso_code.'-default', 'home_default');
                                 }
+
+                                $room_left = count($bookingData['rm_data'][$key]['data']['available']);
+
+                                $rm_dtl = $objRoomType->getRoomTypeInfoByIdProduct($value['id_product']);
+
+                                $bookingData['rm_data'][$key]['name'] = $product->name;
+                                $bookingData['rm_data'][$key]['image'] = $cover_img;
+                                $bookingData['rm_data'][$key]['description'] = $product->description_short;
+                                $bookingData['rm_data'][$key]['feature'] = $product_feature;
+                                $bookingData['rm_data'][$key]['price'] = $prod_price;
+                                $bookingData['rm_data'][$key]['price_without_reduction'] = $productPriceWithoutReduction;
+                                $bookingData['rm_data'][$key]['feature_price'] = $productFeaturePrice;
+                                $bookingData['rm_data'][$key]['feature_price_diff'] = $productPriceWithoutReduction - $productFeaturePrice;
+
+                                // if ($room_left <= (int)Configuration::get('WK_ROOM_LEFT_WARNING_NUMBER'))
+                                $bookingData['rm_data'][$key]['room_left'] = $room_left;
+
+                                $bookingData['rm_data'][$key]['adult'] = $rm_dtl['adult'];
+                                $bookingData['rm_data'][$key]['children'] = $rm_dtl['children'];
+
+                                $bookingData['rm_data'][$key]['ratting'] = $prod_ratting;
+                                // if (Module::isInstalled('productcomments')) {
+                                //     $bookingData['rm_data'][$key]['num_review'] = ProductComment::getCommentNumber($value['id_product']);
+                                //  }
+
+                                // create URL with the parameters from URL
+                                $urlData = array ('date_from' => $date_from, 'date_to' => $date_to);
+                                if (!isset($occupancy)) {
+                                    $occupancy = Tools::getValue('occupancy');
+                                }
+                                if ($occupancy) {
+                                    $urlData['occupancy'] = $occupancy;
+                                }
+
+                                if (Configuration::get('PS_REWRITING_SETTINGS')) {
+                                    $bookingData['rm_data'][$key]['product_link'] = $this->context->link->getProductLink($product).'?'.http_build_query($urlData);
+                                } else {
+                                    $bookingData['rm_data'][$key]['product_link'] = $this->context->link->getProductLink($product).'&'.http_build_query($urlData);
+                                }
+                            } else {
+                                unset($bookingData['rm_data'][$key]);
                             }
                         }
+                        // }
                     }
                 }
             }
@@ -1772,10 +1774,10 @@ class HotelBookingDetail extends ObjectModel
      *
      * @return [boolean] [true if updated otherwise false]
      */
-    public function updateOrderRefundStatus($id_order, $date_from = false, $date_to = false, $id_rooms = array())
+    public function updateOrderRefundStatus($id_order, $date_from = false, $date_to = false, $id_rooms = array(), $is_refunded = 1)
     {
         $table = 'htl_booking_detail';
-        $data = array('is_refunded' => 1);
+        $data = array('is_refunded' => (int) $is_refunded);
         if ($id_rooms) {
             foreach ($id_rooms as $key_rm => $val_rm) {
                 $where = 'id_order='.(int)$id_order.' AND id_room = '.(int)$val_rm['id_room'].' AND `date_from`= \''.

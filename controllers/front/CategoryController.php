@@ -250,7 +250,6 @@ class CategoryControllerCore extends FrontController
 
         $adult = 0;
         $child = 0;
-        $ratting = -1;
         $amenities = 0;
         $price = 0;
 
@@ -260,8 +259,6 @@ class CategoryControllerCore extends FrontController
                     $adult = min($value);
                 } elseif ($key == 'children') {
                     $child = min($value);
-                } elseif ($key == 'ratting') {
-                    $ratting = min($value);
                 } elseif ($key == 'amenities') {
                     $amenities = array();
                     foreach ($value as $a_k => $a_v) {
@@ -288,7 +285,6 @@ class CategoryControllerCore extends FrontController
                 'hotel_id' => $id_hotel,
                 'adult' => $adult,
                 'children' => $child,
-                'ratting' => $ratting,
                 'amenities' => $amenities,
                 'price' => $price,
                 'get_total_rooms' => 0,
@@ -308,11 +304,7 @@ class CategoryControllerCore extends FrontController
                     $direction = SORT_DESC;
                 }
                 foreach ($booking_data['rm_data'] as $s_k => $s_v) {
-                    if ($sort_by == 1) {
-                        $indi_arr[$s_k] = $s_v['ratting'];
-                    } elseif ($sort_by == 2) {
-                        $indi_arr[$s_k] = $s_v['price'];
-                    }
+                    $indi_arr[$s_k] = $s_v['price'];
                 }
 
                 array_multisort($indi_arr, $direction, $booking_data['rm_data']);

@@ -2732,7 +2732,7 @@ class AdminProductsControllerCore extends AdminController
         $helper->id = 'box-8020-sales-catalog';
         $helper->icon = 'icon-beaker';
         $helper->color = 'color3';
-        $helper->title = $this->l('Purchased references', null, null, false);
+        $helper->title = $this->l('Purchased References', null, null, false);
         $helper->subtitle = $this->l('30 days', null, null, false);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=8020_sales_catalog';
         $helper->tooltip = $this->l('X% of your references have been purchased for the past 30 days.', null, null, false);

@@ -1028,47 +1028,10 @@ function checkUrl() {
 /*java script code by webkul on produt page.*/
 /*#####################################################################*/
 $(document).ready(function() {
-    let dateFormat = 'dd-mm-yy';
-    if (total_avail_rms <= room_warning_num) {
-        $('.num_quantity_alert').show();
-    } else {
-        $('.num_quantity_alert').hide();
-    }
-    /*set $max avail quantity when reloading page*/
-    $('.max_avail_type_qty').val(total_avail_rms);
-    if ($('.max_avail_type_qty').val() < 1) {
-        $('.num_quantity_alert').hide();
-        $('.unvail_rooms_cond_display').hide();
-        $('.sold_out_alert').show();
+    if (!$('.max_avail_type_qty').length || $('.max_avail_type_qty').val() < 1) {
         disableRoomTypeDemands(1);
     } else {
-        $('.unvail_rooms_cond_display').show();
-        $('.sold_out_alert').hide();
         disableRoomTypeDemands(0);
-    }
-
-    function highlightDateBorder(elementVal, date)
-    {
-        if (elementVal) {
-            var currentDate = date.getDate();
-            var currentMonth = date.getMonth()+1;
-            if (currentMonth < 10) {
-                currentMonth = '0' + currentMonth;
-            }
-            if (currentDate < 10) {
-                currentDate = '0' + currentDate;
-            }
-            dmy = date.getFullYear() + "-" + currentMonth + "-" + currentDate;
-            var date_format = elementVal.split("-");
-            var check_in_time = (date_format[2]) + '-' + (date_format[1]) + '-' + (date_format[0]);
-            if (dmy == check_in_time) {
-                return [true, "selectedCheckedDate", "Check-In date"];
-            } else {
-                return [true, ""];
-            }
-        } else {
-            return [true, ""];
-        }
     }
 
     BookingForm.init();
@@ -1156,9 +1119,15 @@ var BookingForm = {
     currentRequest: null,
     init: function() {
         this.currentRequest = null;
-        BookingForm.initDatepicker(max_order_date, $('#room_check_in').val(), $('#room_check_out').val());
+        BookingForm.initDatepicker(max_order_date, preparation_time, $('#room_check_in').val(), $('#room_check_out').val());
     },
-    initDatepicker: function(max_order_date, dateFrom, dateTo) {
+    initDatepicker: function(max_order_date, preparation_time, dateFrom, dateTo) {
+        let start_date = new Date();
+        if (preparation_time) {
+            start_date.setDate(start_date.getDate() + parseInt(preparation_time));
+            start_date.setHours(0, 0, 0, 0);
+        }
+
         if (max_order_date) {
             max_order_date = $.datepicker.parseDate('yy-mm-dd', max_order_date );
         } else {
@@ -1182,6 +1151,7 @@ var BookingForm = {
         $('#room_date_range').dateRangePicker({
             startDate: $.datepicker.formatDate('dd-mm-yy', new Date()),
             endDate: max_order_date,
+            startDate: start_date,
         }).on('datepicker-change', function(event,obj){
             $('#room_check_in').val($.datepicker.formatDate('yy-mm-dd', obj.date1));
             $('#room_check_out').val($.datepicker.formatDate('yy-mm-dd', obj.date2));
@@ -1201,11 +1171,14 @@ var BookingForm = {
         }
     },
     getFormData: function () {
+        // var quantity = parseInt($('#quantity_wanted').val());
+        // quantity = (isNaN(quantity) || quantity < 1) ? 1 : quantity;
+
         var data = {
             id_product: parseInt($('#product_page_product_id').val()),
             date_from: $('#room_check_in').val(),
             date_to: $('#room_check_out').val(),
-            // quantity: parseInt($('#quantity_wanted').val()),
+            // quantity: quantity,
             room_type_demands: JSON.stringify(getRoomsExtraDemands()),
         };
         if (occupancy = getBookingOccupancy()) {
@@ -1215,7 +1188,6 @@ var BookingForm = {
         return data;
     },
     refresh: function() {
-        console.log(typeof(BookingForm.getFormData().occupancy));
         BookingForm.currentRequest = $.ajax({
             url: product_controller_url,
             type: 'POST',

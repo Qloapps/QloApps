@@ -271,7 +271,6 @@ class ProductControllerCore extends FrontController
             /*By webkul To send All needed Hotel Information on product.tpl*/
             #####################################################################
 
-            $total_available_rooms = 0;
             $htl_features = array();
             $obj_hotel_room_type = new HotelRoomType();
             $room_info_by_product_id = $obj_hotel_room_type->getRoomTypeInfoByIdProduct($this->product->id);
@@ -316,20 +315,6 @@ class ProductControllerCore extends FrontController
                     }
                 }
 
-                $objBookingDetail = new HotelBookingDetail();
-                $bookingParams = array(
-                    'date_from' => $date_from,
-                    'date_to' => $date_to,
-                    'hotel_id' => $hotel_id,
-                    'occupancy' => $occupancy,
-                    'id_room_type' => $this->product->id,
-                    'only_search_data' => 1
-                );
-
-                $hotel_room_data = $objBookingDetail->dataForFrontSearch($bookingParams);
-                if ($hotel_room_data) {
-                    $total_available_rooms = $hotel_room_data['stats']['num_avail'];
-                }
                 $hotel_branch_obj = new HotelBranchInformation($hotel_id);
                 /*Max date of ordering for order restrict*/
                 $order_date_restrict = false;
@@ -343,6 +328,8 @@ class ProductControllerCore extends FrontController
                     }
                 }
                 /*End*/
+                // booking preparation time
+                $preparationTime = (int) HotelOrderRestrictDate::getPreparationTime($hotel_id);
 
                 $hotelImageLink = null;
                 if ($coverImage = HotelImage::getCover($hotel_id)) {
@@ -363,24 +350,13 @@ class ProductControllerCore extends FrontController
                     $this->context->smarty->assign('error', Tools::getValue('error'));
                 }
 
-                if (Module::isInstalled('productcomments')) {
-                    $this->context->smarty->assign(
-                        array(
-                            'num_reviews' => ProductComment::getCommentNumber($this->product->id),
-                            'ratting' => ProductComment::getAverageGrade($this->product->id)['grade'],
-                        )
-                    );
-                }
-
-
                 $this->context->smarty->assign(
                     array(
                         'room_type_info' => $room_info_by_product_id,
                         'isHotelRefundable' => $hotel_branch_obj->isRefundable(),
                         'max_order_date' => $max_order_date,
+                        'preparation_time' => $preparationTime,
                         'warning_num' => Configuration::get('WK_ROOM_LEFT_WARNING_NUMBER'),
-                        'ratting_img_path' => _MODULE_DIR_.'hotelreservationsystem/views/img/Slices/icons-sprite.png',
-                        'total_available_rooms' => $total_available_rooms,
                         'product_controller_url' => $this->context->link->getPageLink('product'),
                         'date_from' => $date_from,
                         'date_to' => $date_to,
@@ -533,6 +509,7 @@ class ProductControllerCore extends FrontController
             'date_to' => $dateTo,
             'hotel_id' => $idHotel,
             'id_room_type' => $idProduct,
+            'occupancy' => $occupancy,
             'id_cart' => $idCart,
             'id_guest' => $idGuest,
         );
