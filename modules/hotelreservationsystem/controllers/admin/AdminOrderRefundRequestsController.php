@@ -25,9 +25,11 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
         $this->bootstrap = true;
         $this->table = 'order_return';
         $this->className = 'OrderReturn';
+        $this->list_no_link = true;
         $this->context = Context::getContext();
 
-        $this->_select = ' COUNT(a.`id_order_return`) as total_refund_requests, ord.`id_currency`, ord.`total_paid_tax_incl` AS total_order, CONCAT(firstname, " ", lastname) AS cust_name, osl.`name` as order_status_name, os.`color`, os.`id_order_state`';
+        $this->_select = ' COUNT(CASE WHEN a.`state` = '.(int) OrderReturnState::ORDER_RETRUN_FIRST_STATUS.' THEN 1 else NULL END) as total_pending_requests,
+        ord.`id_currency`, ord.`total_paid_tax_incl` AS total_order, CONCAT(firstname, " ", lastname) AS cust_name, os.`color`, os.`id_order_state`';
         $this->_join .= ' LEFT JOIN `'._DB_PREFIX_.'orders` ord ON (a.`id_order` = ord.`id_order`)';
         $this->_join .= 'LEFT JOIN '._DB_PREFIX_.'order_state os ON (os.`id_order_state` = ord.`current_state`)';
         $this->_join .= 'LEFT JOIN '._DB_PREFIX_.'order_state_lang osl ON (osl.`id_order_state` = os.`id_order_state` AND osl.`id_lang` = '.(int)$this->context->language->id.')';
@@ -62,16 +64,8 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
                 'callback' => 'setOrderCurrency',
                 'havingFilter' => true,
             ),
-            'order_status_name' => array(
-                'title' => $this->l('Order Status'),
-                'type' => 'select',
-                'color' => 'color',
-                'list' => $ordStatuses,
-                'filter_key' => 'os!id_order_state',
-                'havingFilter' => true,
-            ),
-            'total_refund_requests' => array(
-                'title' => $this->l('Total Requests'),
+            'total_pending_requests' => array(
+                'title' => $this->l('Total Pending'),
                 'align' => 'center',
                 'havingFilter' => true,
             ),
@@ -288,7 +282,7 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
                             if (Tools::isSubmit('refundTransactionAmount')) {
                                 $paymentMode = Tools::getValue('payment_method');
                                 if (!$paymentMode) {
-                                    $paymentMode = Tools::getValue('payment_mode');
+                                    $paymentMode = Tools::getValue('other_payment_mode');
                                     if (!$paymentMode) {
                                         $this->errors[] = $this->l('Please enter the payment mode of the refund transaction.');
                                     } elseif (!Validate::isGenericName($paymentMode)) {
@@ -427,21 +421,21 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
                         } else {
                             Hook::exec('actionOrderSlipAdd', array('order' => $objOrder, 'bookingList' => $bookingList));
 
-                                @Mail::Send(
-                                    (int)$objOrder->id_lang,
-                                    'credit_slip',
-                                    Mail::l('New credit slip regarding your order', (int)$objOrder->id_lang),
-                                    $params,
-                                    $customer->email,
-                                    $customer->firstname.' '.$customer->lastname,
-                                    null,
-                                    null,
-                                    null,
-                                    null,
-                                    _PS_MAIL_DIR_,
-                                    true,
-                                    (int)$objOrder->id_shop
-                                );
+                            @Mail::Send(
+                                (int)$objOrder->id_lang,
+                                'credit_slip',
+                                Mail::l('New credit slip regarding your order', (int)$objOrder->id_lang),
+                                $params,
+                                $customer->email,
+                                $customer->firstname.' '.$customer->lastname,
+                                null,
+                                null,
+                                null,
+                                null,
+                                _PS_MAIL_DIR_,
+                                true,
+                                (int)$objOrder->id_shop
+                            );
                         }
                     }
 
@@ -487,6 +481,7 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
                                 $currency = $this->context->currency;
                                 $params['{voucher_amount}'] = Tools::displayPrice($cartrule->reduction_amount, $currency, false);
                                 $params['{voucher_num}'] = $cartrule->code;
+
                                 @Mail::Send(
                                     (int)$objOrder->id_lang,
                                     'voucher',
