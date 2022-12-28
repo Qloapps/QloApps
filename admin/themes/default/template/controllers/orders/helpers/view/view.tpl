@@ -710,7 +710,7 @@
 								{if $customerGuestDetail}
 									<div class="panel">
 										<div class="panel-heading">
-											{l s='Guest'}
+											{l s='Traveller detail'}
 										</div>
 										<dl id="customer-guest-details">
 											<dt>{l s='Name'}</dt>
