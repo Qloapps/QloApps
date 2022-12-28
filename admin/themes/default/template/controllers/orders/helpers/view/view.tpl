@@ -476,12 +476,12 @@
 					{l s="Payment"} <span class="badge">{$order->getOrderPayments()|@count}</span>
 				</div>
 				{if count($order->getOrderPayments()) > 0}
-					<p class="alert alert-danger"{if round($orders_total_paid_tax_incl, 2) == round($total_paid, 2) || (isset($currentState) && $currentState->id == 6)} style="display: none;"{/if}>
+					<p class="alert alert-danger"{if round($order->total_paid_tax_incl, 2) == round($total_paid, 2) || (isset($currentState) && $currentState->id == 6)} style="display: none;"{/if}>
 						{l s='Warning'}
 						<strong>{displayPrice price=$total_paid currency=$currency->id}</strong>
 						{l s='paid instead of'}
-						<strong class="total_paid">{displayPrice price=$orders_total_paid_tax_incl currency=$currency->id}</strong>
-						{foreach $order->getBrother() as $brother_order}
+						<strong class="total_paid">{displayPrice price=$order->total_paid_tax_incl currency=$currency->id}</strong>
+						{* {foreach $order->getBrother() as $brother_order}
 							{if $brother_order@first}
 								{if count($order->getBrother()) == 1}
 									<br />{l s='This warning also concerns order '}
@@ -492,7 +492,7 @@
 							<a href="{$current_index}&amp;vieworder&amp;id_order={$brother_order->id}&amp;token={$smarty.get.token|escape:'html':'UTF-8'}">
 								#{'%06d'|sprintf:$brother_order->id}
 							</a>
-						{/foreach}
+						{/foreach} *}
 					</p>
 				{/if}
 				<form id="formAddPayment"  method="post" action="{$current_index}&amp;vieworder&amp;id_order={$order->id}&amp;token={$smarty.get.token|escape:'html':'UTF-8'}">
@@ -509,15 +509,15 @@
 								</tr>
 							</thead>
 							<tbody>
-								{foreach from=$order->getOrderPaymentCollection() item=payment}
+								{foreach from=$order_payment_detail item=payment}
 								<tr>
-									<td>{dateFormat date=$payment->date_add full=true}</td>
-									<td>{$payment->payment_method|escape:'html':'UTF-8'}</td>
-									<td>{$payment->transaction_id|escape:'html':'UTF-8'}</td>
-									<td>{displayPrice price=$payment->amount currency=$payment->id_currency}</td>
+									<td>{dateFormat date=$payment['date_add'] full=true}</td>
+									<td>{$payment['payment_method']|escape:'html':'UTF-8'}</td>
+									<td>{$payment['transaction_id']|escape:'html':'UTF-8'}</td>
+									<td>{displayPrice price=$payment['real_paid_amount'] currency=$payment['id_currency']}</td>
 									<td>
-									{if $invoice = $payment->getOrderInvoice($order->id)}
-										{$invoice->getInvoiceNumberFormatted($current_id_lang, $order->id_shop)}
+									{if $payment['invoice_number']}
+										{$payment['invoice_number']}
 									{else}
 									{/if}
 									</td>
@@ -532,32 +532,32 @@
 									<td colspan="5">
 										<p>
 											<b>{l s='Card Number'}</b>&nbsp;
-											{if $payment->card_number}
-												{$payment->card_number}
+											{if $payment['card_number']}
+												{$payment['card_number']}
 											{else}
 												<i>{l s='Not defined'}</i>
 											{/if}
 										</p>
 										<p>
 											<b>{l s='Card Brand'}</b>&nbsp;
-											{if $payment->card_brand}
-												{$payment->card_brand}
+											{if $payment['card_brand']}
+												{$payment['card_brand']}
 											{else}
 												<i>{l s='Not defined'}</i>
 											{/if}
 										</p>
 										<p>
 											<b>{l s='Card Expiration'}</b>&nbsp;
-											{if $payment->card_expiration}
-												{$payment->card_expiration}
+											{if $payment['card_expiration']}
+												{$payment['card_expiration']}
 											{else}
 												<i>{l s='Not defined'}</i>
 											{/if}
 										</p>
 										<p>
 											<b>{l s='Card Holder'}</b>&nbsp;
-											{if $payment->card_holder}
-												{$payment->card_holder}
+											{if $payment['card_holder']}
+												{$payment['card_holder']}
 											{else}
 												<i>{l s='Not defined'}</i>
 											{/if}
