@@ -139,6 +139,8 @@ class QloHotelReviewDefaultModuleFrontController extends ModuleFrontController
 
         if (QhrHotelReview::markHelpful($idHotelReview, $this->context->cookie->id_customer)) {
             $response['status'] = true;
+            $objHotelReview = new QhrHotelReview($idHotelReview);
+            $response['count_useful'] = $objHotelReview->getTotalUseful();
             $this->ajaxDie(json_encode($response));
         }
     }

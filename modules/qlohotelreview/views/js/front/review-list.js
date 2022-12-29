@@ -36,9 +36,10 @@ var QhrReview = {
             headers: { 'cache-control': 'no-cache' },
             success: function(response) {
                 if (response.status == true) {
+                    $(btnHelpful).closest('.review').find('.helpful-count span').html(response.count_useful);
                     $(btnHelpful).fadeOut('slow', function() {
                         $(btnHelpful).remove();
-                    })
+                    });
                 }
             }
         });
