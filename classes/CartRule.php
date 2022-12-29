@@ -877,7 +877,7 @@ class CartRuleCore extends ObjectModel
      * @param bool $use_cache Allow using cache to avoid multiple free gift using multishipping
      * @return float|int|string
      */
-    public function getContextualValue($use_tax, Context $context = null, $filter = null, $package = null, $use_cache = true, $forAdvancePayment = false)
+    public function getContextualValue($use_tax, Context $context = null, $filter = null, $package = null, $use_cache = true, $only_advance_payment_products = false)
     {
         if (!CartRule::isFeatureActive()) {
             return 0;
@@ -900,11 +900,15 @@ class CartRuleCore extends ObjectModel
 
         $reduction_value = 0;
         $objHotelAdvancePayment = new HotelAdvancedPayment();
-        $cache_id = 'getContextualValue_'.(int)$this->id.'_'.(int)$use_tax.'_'.(int)$context->cart->id.'_'.(int)$filter.'_'.(int)$forAdvancePayment;
+        $cache_id = 'getContextualValue_'.(int)$this->id.'_'.(int)$use_tax.'_'.(int)$context->cart->id.'_'.(int)$filter.'_'.(int)$only_advance_payment_products;
         foreach ($package['products'] as $key => $product) {
-            if ($forAdvancePayment) {
-                $paymentInfo = $objHotelAdvancePayment->getIdAdvPaymentByIdProduct($product['id_product']);
-                if (!$paymentInfo['active']) {
+            if ($only_advance_payment_products) {
+                if ($paymentInfo = $objHotelAdvancePayment->getIdAdvPaymentByIdProduct($product['id_product'])) {
+                    if (!$paymentInfo['active']) {
+                        unset($package['products'][$key]);
+                        continue;
+                    }
+                } else {
                     unset($package['products'][$key]);
                     continue;
                 }
