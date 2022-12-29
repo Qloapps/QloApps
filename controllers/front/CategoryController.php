@@ -95,6 +95,18 @@ class CategoryControllerCore extends FrontController
             $this->errors[] = Tools::displayError('Missing category ID');
         }
 
+        // validate dates if available
+        $dateFrom = Tools::getValue('date_from');
+        $dateTo = Tools::getValue('date_to');
+
+        if ($dateFrom != '' && !Validate::isDate($dateFrom)) {
+            Tools::redirect($this->context->link->getPageLink('pagenotfound'));
+        }
+
+        if ($dateTo != '' && !Validate::isDate($dateTo)) {
+            Tools::redirect($this->context->link->getPageLink('pagenotfound'));
+        }
+
         // Instantiate category
         $this->category = new Category($id_category, $this->context->language->id);
 
