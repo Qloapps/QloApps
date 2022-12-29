@@ -78,50 +78,68 @@
 													<div id="collapse-guest-info" class="opc-collapse {if !$step->step_is_current}collapse{/if}" aria-labelledby="guest-info-head" data-parent="#oprder-opc-accordion">
 														<div class="card-body">
 															{if $is_logged || $isGuest}
-																<div class="row margin-btm-10">
-																	<div class="col-sm-3 col-xs-5 info-head">{l s='Name'}</div>
-																	<div class="col-sm-9 col-xs-7 info-value">{$guestInformations['firstname']} {$guestInformations['lastname']}</div>
-																</div>
-																<div class="row margin-btm-10">
-																	<div class="col-sm-3 col-xs-5 info-head">{l s='Email'}</div>
-																	<div class="col-sm-9 col-xs-7 info-value">{$guestInformations['email']}</div>
-																</div>
-																{if (isset($delivery->phone_mobile) && $delivery->phone_mobile) || (isset($delivery->phone) && $delivery->phone)}
+																<div class="checkout-guest-info-block">
 																	<div class="row margin-btm-10">
-																		<div class="col-sm-3 col-xs-5 info-head">
-																			{if isset($delivery->phone_mobile) && $delivery->phone_mobile}
-																				{l s='Mobile Number'}
-																			{else}
-																				{l s='Phone Number'}
-																			{/if}
-																		</div>
+																		<div class="col-sm-3 col-xs-5 info-head">{l s='Name'}</div>
 																		<div class="col-sm-9 col-xs-7 info-value">
-																			{if isset($delivery->phone_mobile) && $delivery->phone_mobile}
-																				{$delivery->phone_mobile|escape:'html':'UTF-8'}
+																			{if $isGuest}
+																				{$guestInformations['customer_firstname']} {$guestInformations['customer_lastname']}
 																			{else}
-																				{$delivery->phone|escape:'html':'UTF-8'}
+																				{$guestInformations['firstname']} {$guestInformations['lastname']}
 																			{/if}
 																		</div>
 																	</div>
-																{/if}
-
-																{* proceed only if no order restrict errors are there *}
-																{if !$orderRestrictErr}
-																	<hr>
-																	<div class="row">
-																		<div class="col-sm-12 proceed_btn_block">
-																			<a class="btn btn-default button button-medium pull-right" href="{$link->getPageLink('order-opc', null, null, ['proceed_to_payment' => 1])}" title="Proceed to Payment" rel="nofollow">
-																				<span>
-																					{l s='Proceed'}
-																				</span>
-																			</a>
-																		</div>
+																	<div class="row margin-btm-10">
+																		<div class="col-sm-3 col-xs-5 info-head">{l s='Email'}</div>
+																		<div class="col-sm-9 col-xs-7 info-value">{$guestInformations['email']}</div>
 																	</div>
-																{/if}
+																	{if (isset($delivery->phone_mobile) && $delivery->phone_mobile) || (isset($delivery->phone) && $delivery->phone)}
+																		<div class="row margin-btm-10">
+																			<div class="col-sm-3 col-xs-5 info-head">
+																				{if isset($delivery->phone_mobile) && $delivery->phone_mobile}
+																					{l s='Mobile Number'}
+																				{else}
+																					{l s='Phone Number'}
+																				{/if}
+																			</div>
+																			<div class="col-sm-9 col-xs-7 info-value">
+																				{if isset($delivery->phone_mobile) && $delivery->phone_mobile}
+																					{$delivery->phone_mobile|escape:'html':'UTF-8'}
+																				{else}
+																					{$delivery->phone|escape:'html':'UTF-8'}
+																				{/if}
+																			</div>
+																		</div>
+																	{/if}
+
+																	{* proceed only if no order restrict errors are there *}
+																	{if !$orderRestrictErr}
+																		<hr>
+																		<div class="row">
+																			<div class="col-sm-12 proceed_btn_block">
+																				<a class="btn btn-default button button-medium pull-right" href="{$link->getPageLink('order-opc', null, null, ['proceed_to_payment' => 1])}" title="Proceed to Payment" rel="nofollow">
+																					<span>
+																						{l s='Proceed'}
+																					</span>
+																				</a>
+																				{if $isGuest}
+																					<a class="btn btn-default btn-edit-guest-info pull-right" href="#" rel="nofollow">
+																						<span>
+																							{l s='Edit'}
+																						</span>
+																					</a>
+																				{/if}
+																			</div>
+																		</div>
+																	{/if}
+																</div>
 															{else}
 																<!-- Create account / Guest account / Login block -->
 																{include file="$tpl_dir./order-opc-new-account.tpl"}
 															{/if}
+														</div>
+														<div class="card-body hidden" id="order-opc-edit-guest-info">
+															{include file="./order-opc-edit-guest-info.tpl"}
 														</div>
 													</div>
 												{/if}

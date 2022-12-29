@@ -45,7 +45,6 @@ class HotelReservationSystem extends Module
         $resources = array(
             'hotels' => array('description' => 'Hotel Branch Information','class' => 'HotelBranchInformation'),
             'hotel_room_types' => array('description' => 'Hotel room types','class' => 'HotelRoomType'),
-            'hotel_images' => array('description' => 'Hotel images', 'specific_management' => true),
             'hotel_features' => array('description' => 'The hotel features','class' => 'HotelFeatures'),
             'hotel_refund_rules' => array('description' => 'The hotel refund rules','class' => 'HotelOrderRefundRules'),
             'hotel_rooms' => array('description' => 'The hotel rooms','class' => 'HotelRoomInformation'),
@@ -147,15 +146,41 @@ class HotelReservationSystem extends Module
         }
     }
 
-    public function hookFooter($params)
+    public function hookDisplayFooter($params)
     {
         /*NOTE : NEVER REMOVE THIS CODE BEFORE DISCUSSION*/
         /*id_guest is set to the context->cookie object because data mining for prestashop module is disabled
         in which id_guest was set before this*/
         if (!isset($this->context->cookie->id_guest)) {
             Guest::setNewGuest($this->context->cookie);
+
+            if (Configuration::get('PS_STATSDATA_PLUGINS')) {
+                $this->context->controller->addJS($this->_path.'views/js/plugindetect.js');
+
+                $token = sha1($params['cookie']->id_guest._COOKIE_KEY_);
+
+                return '<script type="text/javascript">
+                    $(document).ready(function() {
+                        plugins = new Object;
+                        plugins.adobe_director = (PluginDetect.getVersion("Shockwave") != null) ? 1 : 0;
+                        plugins.adobe_flash = (PluginDetect.getVersion("Flash") != null) ? 1 : 0;
+                        plugins.apple_quicktime = (PluginDetect.getVersion("QuickTime") != null) ? 1 : 0;
+                        plugins.windows_media = (PluginDetect.getVersion("WindowsMediaPlayer") != null) ? 1 : 0;
+                        plugins.sun_java = (PluginDetect.getVersion("java") != null) ? 1 : 0;
+                        plugins.real_player = (PluginDetect.getVersion("RealPlayer") != null) ? 1 : 0;
+
+                        navinfo = { screen_resolution_x: screen.width, screen_resolution_y: screen.height, screen_color:screen.colorDepth};
+                        for (var i in plugins)
+                            navinfo[i] = plugins[i];
+                        navinfo.type = "navinfo";
+                        navinfo.id_guest = "'.(int)$params['cookie']->id_guest.'";
+                        navinfo.token = "'.$token.'";
+                        $.post("'.Context::getContext()->link->getPageLink('statistics', (bool)(Tools::getShopProtocol() == 'https://')).'", navinfo);
+                    });
+                </script>';
+            }
         }
-        // return $this->display(__FILE__, 'hotelGlobalVariables.tpl');
+
     }
     public function hookDisplayAfterDefautlFooterHook($params)
     {
@@ -463,7 +488,6 @@ class HotelReservationSystem extends Module
         );
 
         // Controllers without tabs
-        $this->installTab('AdminOrderRestrictSettings', 'Order Restrict Configuration', false, false);
         $this->installTab('AdminHotelGeneralSettings', 'Hotel General configuration', false, false);
         $this->installTab('AdminHotelFeaturePricesSettings', 'Advanced Price Rules', false, false);
         $this->installTab('AdminRoomTypeGlobalDemand', 'Additional Demand Configuration', false, false);
@@ -538,7 +562,7 @@ class HotelReservationSystem extends Module
                 'actionOrderHistoryAddAfter',
                 'displayBackOfficeHeader',
                 'actionObjectProductDeleteBefore',
-                'footer',
+                'displayFooter',
                 'displayAfterDefautlFooterHook',
                 'actionProductSave',
                 'addWebserviceResources',

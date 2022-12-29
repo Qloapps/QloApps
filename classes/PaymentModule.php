@@ -357,9 +357,23 @@ abstract class PaymentModuleCore extends Module
                     // advance payment information
                     $order->is_advance_payment = $this->context->cart->is_advance_payment;
                     if ($order->is_advance_payment) {
-                        $order->advance_paid_amount = (float)Tools::ps_round((float)$this->context->cart->getOrderTotal(true, Cart::ADVANCE_PAYMENT, $order->product_list, $id_carrier), _PS_PRICE_COMPUTE_PRECISION_);
+                        $order->advance_paid_amount = (float)Tools::ps_round(
+                            (float)$this->context->cart->getOrderTotal(true, Cart::ADVANCE_PAYMENT, $order->product_list, $id_carrier),
+                            _PS_PRICE_COMPUTE_PRECISION_
+                        );
+                        $order->amount_paid = (float)Tools::ps_round(
+                            (($order->advance_paid_amount * $amount_paid) / $this->context->cart->getOrderTotal(true, Cart::ADVANCE_PAYMENT, null, $id_carrier)),
+                            _PS_PRICE_COMPUTE_PRECISION_
+                        );
                     } else {
-                        $order->advance_paid_amount = (float)Tools::ps_round((float)$this->context->cart->getOrderTotal(true, Cart::BOTH, $order->product_list, $id_carrier), _PS_PRICE_COMPUTE_PRECISION_);
+                        $order->advance_paid_amount = (float)Tools::ps_round(
+                            (float)$this->context->cart->getOrderTotal(true, Cart::BOTH, $order->product_list, $id_carrier),
+                            _PS_PRICE_COMPUTE_PRECISION_
+                        );
+                        $order->amount_paid = (float)Tools::ps_round(
+                            (($order->advance_paid_amount * $amount_paid) / $this->context->cart->getOrderTotal(true, Cart::BOTH, null, $id_carrier)),
+                            _PS_PRICE_COMPUTE_PRECISION_
+                        );
                     }
 
                     // Creating order
@@ -374,7 +388,7 @@ abstract class PaymentModuleCore extends Module
                     // We don't use the following condition to avoid the float precision issues : http://www.php.net/manual/en/language.types.float.php
                     // if ($order->total_paid != $order->total_paid_real)
                     // We use number_format in order to compare two string
-                    if ($order_status->logable && number_format($cart_total_paid, _PS_PRICE_COMPUTE_PRECISION_) != number_format($amount_paid, _PS_PRICE_COMPUTE_PRECISION_)) {
+                    if ($order_status->logable && number_format($cart_total_paid, _PS_PRICE_COMPUTE_PRECISION_) != number_format($amount_paid, _PS_PRICE_COMPUTE_PRECISION_) && $this->name != 'wsorder') {
                         // if customer is paying full payment amount
                         $id_order_state = Configuration::get('PS_OS_ERROR');
                     }
@@ -432,9 +446,18 @@ abstract class PaymentModuleCore extends Module
                     $transaction_id = null;
                 }
 
-                if (!isset($order) || !Validate::isLoadedObject($order) || !$order->addOrderPayment($amount_paid, null, $transaction_id)) {
+                if (!isset($order) || !Validate::isLoadedObject($order) || !$order->addOrderPayment($amount_paid, null, $transaction_id, null, null, null, false)) {
                     PrestaShopLogger::addLog('PaymentModule::validateOrder - Cannot save Order Payment', 3, null, 'Cart', (int)$id_cart, true);
                     throw new PrestaShopException('Can\'t save Order Payment');
+                }
+
+                // now add payment detail for order
+                if ($payment = OrderPayment::getByOrderReference($order->reference)) {
+                    if ($payment = array_shift($payment)) {
+                        foreach($order_list as $order) {
+                            $order->addOrderPaymentDetail($payment, $order->amount_paid);
+                        }
+                    }
                 }
             }
 
@@ -883,7 +906,11 @@ abstract class PaymentModuleCore extends Module
                     // Set the order status
                     $new_history = new OrderHistory();
                     $new_history->id_order = (int)$order->id;
-                    $new_history->changeIdOrderState((int)$id_order_state, $order, true);
+                    if ($order_status->logable && $order->is_advance_payment && $order->advance_paid_amount < $order->total_paid_tax_incl) {
+                        $new_history->changeIdOrderState((int)Configuration::get('PS_OS_PARTIAL_PAYMENT'), $order, true);
+                    } else {
+                        $new_history->changeIdOrderState((int)$id_order_state, $order, true);
+                    }
                     $new_history->addWithemail(true, $extra_vars);
 
                     // Switch to back order if needed
