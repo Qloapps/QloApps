@@ -345,6 +345,10 @@ class OrderOpcControllerCore extends ParentOrderController
                             $this->ajaxDie($this->changeRoomDemands());
                             exit;
                             break;
+                        case 'submitCustomerGuestDetail':
+                            $this->ajaxDie($this->submitCustomerGuestDetail());
+                            exit;
+                            break;
                         default:
                             throw new PrestaShopException('Unknown method "'.Tools::getValue('method').'"');
                     }
@@ -505,6 +509,15 @@ class OrderOpcControllerCore extends ParentOrderController
         $this->_assignCarrier();
         // PAYMENT
         $this->_assignPayment();
+        // GUEST BOOKING
+        if ($this->isLogged) {
+            if ($id_customer_guest_detail = CartCustomerGuestDetail::getCartCustomerGuest($this->context->cart->id)) {
+                $this->context->smarty->assign(
+                    'customer_guest_detail', CartCustomerGuestDetail::getCustomerGuestDetail($id_customer_guest_detail)
+                );
+            }
+            $this->context->smarty->assign('id_customer_guest_detail', $id_customer_guest_detail);
+        }
         Tools::safePostVars();
 
         $newsletter = Configuration::get('PS_CUSTOMER_NWSL') || (Module::isInstalled('blocknewsletter') && Module::getInstanceByName('blocknewsletter')->active);
@@ -991,6 +1004,50 @@ class OrderOpcControllerCore extends ParentOrderController
             }
         }
         die('0');
+    }
+
+    public function submitCustomerGuestDetail()
+    {
+        $customerGuestDetail = Tools::getValue('customer_guest_detail');
+        $this->context->cookie->__set('customer_details_proceeded', 0);
+        $this->context->cookie->checkedTOS = false;
+        if ($customerGuestDetail) {
+            if ($id_customer_guest_detail = CartCustomerGuestDetail::getCartCustomerGuest($this->context->cart->id)) {
+                $objCustomerGuestDetail = new CartCustomerGuestDetail($id_customer_guest_detail);
+            } else {
+                $objCustomerGuestDetail = new CartCustomerGuestDetail();
+            }
+
+            $customerGuestDetailGender = Tools::getValue('customer_guest_detail_gender');
+            $customerGuestDetailFirstname = Tools::getValue('customer_guest_detail_firstname');
+            $customerGuestDetailLastname = Tools::getValue('customer_guest_detail_lastname');
+            $customerGuestDetailEmail = Tools::getValue('customer_guest_detail_email');
+            $customerGuestDetailPhone = Tools::getValue('customer_guest_detail_phone');
+            if (trim($customerGuestDetailGender) && Validate::isUnsignedInt($customerGuestDetailGender)) {
+                $objCustomerGuestDetail->id_gender = $customerGuestDetailGender;
+            }
+            if (trim($customerGuestDetailFirstname) && Validate::isName($customerGuestDetailFirstname)) {
+                $objCustomerGuestDetail->firstname = $customerGuestDetailFirstname;
+            }
+            if (trim($customerGuestDetailLastname) && Validate::isName($customerGuestDetailLastname)) {
+                $objCustomerGuestDetail->lastname = $customerGuestDetailLastname;
+            }
+            if (trim($customerGuestDetailEmail) && Validate::isEmail($customerGuestDetailEmail)) {
+                $objCustomerGuestDetail->email = $customerGuestDetailEmail;
+            }
+            if (trim($customerGuestDetailPhone) && Validate::isPhoneNumber($customerGuestDetailPhone)) {
+                $objCustomerGuestDetail->phone = $customerGuestDetailPhone;
+            }
+            $objCustomerGuestDetail->id_cart = $this->context->cart->id;
+            $objCustomerGuestDetail->save();
+        } else {
+            if ($id_customer_guest_detail = CartCustomerGuestDetail::getCartCustomerGuest($this->context->cart->id)) {
+                if (Validate::isLoadedObject($objCustomerGuestDetail = new CartCustomerGuestDetail($id_customer_guest_detail))) {
+                    $objCustomerGuestDetail->delete();
+                }
+            }
+        }
+        $this->context->cart->save();
     }
 
     public function updateContext(Customer $customer)

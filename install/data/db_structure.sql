@@ -673,6 +673,31 @@ CREATE TABLE `PREFIX_customer_thread` (
 	KEY `id_product` (`id_product`)
 ) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8 COLLATION;
 
+CREATE TABLE `PREFIX_order_customer_guest_detail` (
+  `id_order_customer_guest_detail` int(10) unsigned NOT NULL auto_increment,
+  `id_order` int(10) unsigned NOT NULL,
+  `id_gender` int(10) unsigned NOT NULL,
+  `firstname` varchar(32) NOT NULL,
+  `lastname` varchar(32) NOT NULL,
+  `email` varchar(128) NOT NULL,
+  `phone` varchar(32) DEFAULT NULL,
+  `date_add` datetime NOT NULL,
+  `date_upd` datetime NOT NULL,
+	PRIMARY KEY (`id_order_customer_guest_detail`)
+) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8 COLLATION;
+
+CREATE TABLE `PREFIX_cart_customer_guest_detail` (
+  `id_customer_guest_detail` int(10) unsigned NOT NULL auto_increment,
+  `id_cart` int(10) unsigned NOT NULL,
+  `id_gender` int(10) unsigned NOT NULL,
+  `firstname` varchar(32) NOT NULL,
+  `lastname` varchar(32) NOT NULL,
+  `email` varchar(128) NOT NULL,
+  `phone` varchar(32) DEFAULT NULL,
+  `date_add` datetime NOT NULL,
+  `date_upd` datetime NOT NULL,
+	PRIMARY KEY (`id_customer_guest_detail`)
+) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8 COLLATION;
 
 CREATE TABLE `PREFIX_customization` (
   `id_customization` int(10) unsigned NOT NULL auto_increment,

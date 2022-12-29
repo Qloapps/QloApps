@@ -50,6 +50,44 @@ $(document).ready(function()
 			$("#partial_data").slideDown();
 	});
 
+	// customer guest booking
+	function initGuestbookingcontainer() {
+		if ($("#customer_guest_detail:checked").val() == 1) {
+			$('#checkout-guest-info-block').hide('slow');
+			$('#customer-guest-detail-container').show('slow');
+		} else {
+			$('#customer-guest-detail-container').hide('slow');
+			$('#checkout-guest-info-block').show('slow');
+		}
+	}
+	function validateCustomerGuestDetailForm() {
+		$('#customer_guest_detail_form input.validate').each(function (index, element) {
+			if (!validate_field(element)) {
+				if ($('#cgv').prop('checked') == 1) {
+					$('#cgv').trigger('click');
+				}
+			}
+		});
+	}
+	initGuestbookingcontainer();
+	$("#customer_guest_detail").on('change',function() {
+		initGuestbookingcontainer();
+	});
+	if ($("#customer_guest_detail:checked").val() == 1) {
+		validateCustomerGuestDetailForm();
+	}
+
+	$('#customer_guest_detail_form').on('change', function(e) {
+		$.ajax({
+			type: 'POST',
+			url: orderOpcUrl,
+			async: false,
+			cache: false,
+			dataType : "json",
+			data: $(this).serialize()+'&method=submitCustomerGuestDetail&ajax=true&token=' + static_token
+		});
+	});
+
 	// GUEST CHECKOUT / NEW ACCOUNT MANAGEMENT
 	if ((typeof isLogged == 'undefined' || !isLogged) || (typeof isGuest !== 'undefined' && isGuest))
 	{

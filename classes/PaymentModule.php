@@ -384,6 +384,22 @@ abstract class PaymentModuleCore extends Module
                         throw new PrestaShopException('Can\'t save Order');
                     }
 
+                    // save customer guest information
+                    if ($id_customer_guest_detail = CartCustomerGuestDetail::getCartCustomerGuest($this->context->cart->id)) {
+                        if (Validate::isLoadedObject($objCartCustomerGuestDetail = new CartCustomerGuestDetail(
+                            $id_customer_guest_detail
+                        ))) {
+                            $objOrderCustomerGuestDetail = new OrderCustomerGuestDetail();
+                            $objOrderCustomerGuestDetail->id_gender = $objCartCustomerGuestDetail->id_gender;
+                            $objOrderCustomerGuestDetail->firstname = $objCartCustomerGuestDetail->firstname;
+                            $objOrderCustomerGuestDetail->lastname = $objCartCustomerGuestDetail->lastname;
+                            $objOrderCustomerGuestDetail->email = $objCartCustomerGuestDetail->email;
+                            $objOrderCustomerGuestDetail->phone = $objCartCustomerGuestDetail->phone;
+                            $objOrderCustomerGuestDetail->id_order = (int)$order->id;
+                            $objOrderCustomerGuestDetail->save();
+                        }
+                    }
+
                     // Amount paid by customer is not the right one -> Status = payment error
                     // We don't use the following condition to avoid the float precision issues : http://www.php.net/manual/en/language.types.float.php
                     // if ($order->total_paid != $order->total_paid_real)
@@ -1043,6 +1059,30 @@ abstract class PaymentModuleCore extends Module
                                     $file_attachement,
                                     null, _PS_MAIL_DIR_, false, (int)$order->id_shop
                                 );
+                            }
+                            // send mail to customer guest if customer booked for someone other.
+                            if ($id_customer_guest_detail = OrderCustomerGuestDetail::isCustomerGuestBooking($order->id)) {
+                                if ($objOrderCustomerGuestDetail = new OrderCustomerGuestDetail(
+                                    $id_customer_guest_detail
+                                )) {
+                                    if (Validate::isEmail($objOrderCustomerGuestDetail->email)) {
+                                        $data['{firstname}'] = $objOrderCustomerGuestDetail->firstname;
+                                        $data['{lastname}'] = $objOrderCustomerGuestDetail->lastname;
+                                        $data['{email}'] = $objOrderCustomerGuestDetail->email;
+                                        Mail::Send(
+                                            (int)$order->id_lang,
+                                            'order_conf',
+                                            Mail::l('Order confirmation', (int)$order->id_lang),
+                                            $data,
+                                            $objOrderCustomerGuestDetail->email,
+                                            $objOrderCustomerGuestDetail->firstname.' '.$objOrderCustomerGuestDetail->lastname,
+                                            null,
+                                            null,
+                                            $file_attachement,
+                                            null, _PS_MAIL_DIR_, false, (int)$order->id_shop
+                                        );
+                                    }
+                                }
                             }
                         }
                         if (Configuration::get('PS_ORDER_CONF_MAIL_TO_SUPERADMIN')){
