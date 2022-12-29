@@ -312,7 +312,7 @@
 																{/if}
 
 																{* field for the current date *}
-																<input class="room_status_date wk-input-date" type="text" name="status_date" value="{$data['date_from']|date_format:"%d-%m-%Y"}" readonly/>
+																<input class="room_status_date wk-input-date" type="text" name="status_date" value="{if $data['id_status'] == $hotel_order_status['STATUS_CHECKED_IN']['id_status']}{$data['date_to']|date_format:"%d-%m-%Y"}{else}{$data['date_from']|date_format:"%d-%m-%Y"}{/if}" readonly/>
 
 																<input type="hidden" name="date_from" value="{$data['date_from']|date_format:"%Y-%m-%d"}" />
 																<input type="hidden" name="date_to" value="{$data['date_to']|date_format:"%Y-%m-%d"}" />
