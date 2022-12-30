@@ -8,9 +8,9 @@
     <name>Payment accepted</name>
     <template>payment_accepted</template>
   </order_state>
-  <order_state id="Preparation_in_progress">
+  <order_state id="Processing_in_progress">
     <name>Processing in progress</name>
-    <template>preparation</template>
+    <template>processing</template>
   </order_state>
   <order_state id="Canceled">
     <name>Canceled</name>

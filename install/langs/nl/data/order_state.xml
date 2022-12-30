@@ -8,9 +8,9 @@
     <name>Betaling aanvaard</name>
     <template>payment_accepted</template>
   </order_state>
-  <order_state id='Preparation_in_progress'>
+  <order_state id='Processing_in_progress'>
     <name>Wordt momenteel voorbereid</name>
-    <template>preparation</template>
+    <template>processing</template>
   </order_state>
   <order_state id='Canceled'>
     <name>Geannuleerd</name>

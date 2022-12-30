@@ -8,9 +8,9 @@
     <name>付款完成</name>
     <template>payment_accepted</template>
   </order_state>
-  <order_state id="Preparation_in_progress">
+  <order_state id="Processing_in_progress">
     <name>備貨中</name>
-    <template>preparation</template>
+    <template>processing</template>
   </order_state>
   <order_state id="Canceled">
     <name>已取消</name>
