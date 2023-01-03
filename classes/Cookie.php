@@ -30,20 +30,20 @@ class CookieCore
     const SAMESITE_LAX = 'Lax';
     const SAMESITE_STRICT = 'Strict';
 
-    const SAMESITE_AVAILABLE_VALUES = [
-        [
+    const SAMESITE_AVAILABLE_VALUES = array(
+        array(
             "type" => self::SAMESITE_NONE,
             "name" => self::SAMESITE_NONE
-        ],
-        [
+        ),
+        array(
             "type" => self::SAMESITE_LAX,
             "name" => self::SAMESITE_LAX
-        ],
-        [
+        ),
+        array(
             "type" => self::SAMESITE_STRICT,
             "name" => self::SAMESITE_STRICT
-        ],
-    ];
+        ),
+    );
 
     /** @var array Contain cookie content in a key => value format */
     protected $_content;
