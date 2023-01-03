@@ -443,15 +443,18 @@ class HotelCartBookingData extends ObjectModel
     {
         $result = $this->getHotelCartRoomsInfoByRoomType($idCart, $idProduct, $dateFrom, $dateTo);
         if (is_array($result) && count($result)) {
+            $return = true;
             foreach ($result as $row) {
                 $objHotelCartBookingData = new self($row['id']);
                 if (Validate::isLoadedObject($objHotelCartBookingData)) {
-                    $objHotelCartBookingData->delete();
+                    $return &= $objHotelCartBookingData->delete();
                 }
             }
+
+            return $return;
         }
 
-        return true;
+        return false;
     }
 
     /**
@@ -480,15 +483,16 @@ class HotelCartBookingData extends ObjectModel
             $update_quantity = $this->context->cart->updateQty($qty, $id_product, null, false, 'down');
 
             if (is_array($result) && count($result)) {
+                $return = true;
                 foreach ($result as $row) {
                     $objHotelCartBookingData = new self($row['id']);
                     if (Validate::isLoadedObject($objHotelCartBookingData)) {
-                        $objHotelCartBookingData->delete();
+                        $return &= $objHotelCartBookingData->delete();
                     }
                 }
             }
 
-            return true;
+            return $return;
         }
 
         return false;
@@ -510,19 +514,18 @@ class HotelCartBookingData extends ObjectModel
         );
 
         if (is_array($result) && count($result)) {
+            $return = true;
             foreach ($result as $row) {
                 $objHotelCartBookingData = new self($row['id']);
-                if (!Validate::isLoadedObject($objHotelCartBookingData)) {
-                    return false;
-                }
-
-                if (!$objHotelCartBookingData->delete()) {
-                    return false;
+                if (Validate::isLoadedObject($objHotelCartBookingData)) {
+                    $return &= $objHotelCartBookingData->delete();
                 }
             }
+
+            return $return;
         }
 
-        return true;
+        return false;
     }
 
     /**
@@ -581,15 +584,18 @@ class HotelCartBookingData extends ObjectModel
         );
 
         if (is_array($result) && count($result)) {
+            $return = true;
             foreach ($result as $row) {
                 $objHotelCartBookingData = new self($row['id']);
                 if (Validate::isLoadedObject($objHotelCartBookingData)) {
-                    $objHotelCartBookingData->delete();
+                    $return &= $objHotelCartBookingData->delete();
                 }
             }
+
+            return $return;
         }
 
-        return true;
+        return false;
     }
 
     /**
@@ -795,12 +801,15 @@ class HotelCartBookingData extends ObjectModel
         );
 
         if (is_array($result) && count($result)) {
+            $return = true;
             foreach ($result as $row) {
                 $objHotelCartBookingData = new HotelCartBookingData($row['id']);
                 if (Validate::isLoadedObject($objHotelCartBookingData)) {
-                    $objHotelCartBookingData->delete();
+                    $return &= $objHotelCartBookingData->delete();
                 }
             }
+
+            return $return;
         }
 
         return true;

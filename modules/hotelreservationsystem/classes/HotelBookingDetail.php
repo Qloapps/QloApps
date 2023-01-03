@@ -797,29 +797,29 @@ class HotelBookingDetail extends ObjectModel
         $roomBookingData = $this->getRoomBookingData($idRoom, $idOrder, $dateFrom, $dateTo);
         $objHotelBookingDetail = new self($roomBookingData['id']);
 
-        if (!Validate::isLoadedObject($objHotelBookingDetail)) {
-            return false;
+        if (Validate::isLoadedObject($objHotelBookingDetail)) {
+            if ($statusDate) {
+                $statusDate = date('Y-m-d H:i:s', strtotime($statusDate));
+            } else {
+                $statusDate = date('Y-m-d H:i:s');
+            }
+
+            if ($newStatus == self::STATUS_CHECKED_IN) {
+                $objHotelBookingDetail->id_status = $newStatus;
+                $objHotelBookingDetail->check_in = ($statusDate > $dateTo ? $dateTo : $statusDate);
+            } elseif ($newStatus == self::STATUS_CHECKED_OUT) {
+                $objHotelBookingDetail->id_status = $newStatus;
+                $objHotelBookingDetail->check_out = ($statusDate > $dateTo ? $dateTo : $statusDate);
+            } else {
+                $objHotelBookingDetail->id_status = $newStatus;
+                $objHotelBookingDetail->check_in = '';
+                $objHotelBookingDetail->check_out = '';
+            }
+
+            return $objHotelBookingDetail->save();
         }
 
-        if ($statusDate) {
-            $statusDate = date('Y-m-d H:i:s', strtotime($statusDate));
-        } else {
-            $statusDate = date('Y-m-d H:i:s');
-        }
-
-        if ($newStatus == self::STATUS_CHECKED_IN) {
-            $objHotelBookingDetail->id_status = $newStatus;
-            $objHotelBookingDetail->check_in = ($statusDate > $dateTo ? $dateTo : $statusDate);
-        } elseif ($newStatus == self::STATUS_CHECKED_OUT) {
-            $objHotelBookingDetail->id_status = $newStatus;
-            $objHotelBookingDetail->check_out = ($statusDate > $dateTo ? $dateTo : $statusDate);
-        } else {
-            $objHotelBookingDetail->id_status = $newStatus;
-            $objHotelBookingDetail->check_in = '';
-            $objHotelBookingDetail->check_out = '';
-        }
-
-        return $objHotelBookingDetail->save();
+        return false;
     }
 
     /**
@@ -1059,34 +1059,30 @@ class HotelBookingDetail extends ObjectModel
 
         if ($idHotelCartBookingData) {
             $objHotelCartBookingData = new HotelCartBookingData($idHotelCartBookingData);
-            if (!Validate::isLoadedObject($objHotelCartBookingData)) {
-                return false;
-            }
+            if (Validate::isLoadedObject($objHotelCartBookingData)) {
+                $objHotelCartBookingData->id_room = $swappedRoomId;
+                if ($objHotelCartBookingData->save()) {
+                    $objHotelRoomInformation = new HotelRoomInformation($swappedRoomId);
 
-            $objHotelCartBookingData->id_room = $swappedRoomId;
-            if ($objHotelCartBookingData->save()) {
-                $objHotelRoomInformation = new HotelRoomInformation($swappedRoomId);
+                    $roomBookingData = $this->getRoomBookingData($currentRoomId, $objHotelCartBookingData->id_order, $dateFrom, $dateTo);
+                    $objHotelBookingDetail = new self($roomBookingData['id']);
+                    if (Validate::isLoadedObject($objHotelBookingDetail)) {
+                        $objHotelBookingDetail->id_room = $swappedRoomId;
+                        $objHotelBookingDetail->room_num = $objHotelRoomInformation->room_num;
+                        if ($objHotelBookingDetail->save()) {
+                            Hook::exec(
+                                'actionRoomReAllocateAfter',
+                                array(
+                                    'room_id' => $currentRoomId,
+                                    'realloc_room_id' => $swappedRoomId,
+                                    'date_from' => $dateFrom,
+                                    'date_to' => $dateTo,
+                                )
+                            );
 
-                $roomBookingData = $this->getRoomBookingData($currentRoomId, $objHotelCartBookingData->id_order, $dateFrom, $dateTo);
-                $objHotelBookingDetail = new self($roomBookingData['id']);
-                if (!Validate::isLoadedObject($objHotelBookingDetail)) {
-                    return false;
-                }
-
-                $objHotelBookingDetail->id_room = $swappedRoomId;
-                $objHotelBookingDetail->room_num = $objHotelRoomInformation->room_num;
-                if ($objHotelBookingDetail->save()) {
-                    Hook::exec(
-                        'actionRoomReAllocateAfter',
-                        array(
-                            'room_id' => $currentRoomId,
-                            'realloc_room_id' => $swappedRoomId,
-                            'date_from' => $dateFrom,
-                            'date_to' => $dateTo,
-                        )
-                    );
-
-                    return true;
+                            return true;
+                        }
+                    }
                 }
             }
         }
@@ -1239,11 +1235,11 @@ class HotelBookingDetail extends ObjectModel
         $roomBookingData = $this->getRoomBookingData($idRoom, $idOrder, $dateFrom, $dateTo);
         $objHotelBookingDetail = new self($roomBookingData['id']);
 
-        if (!Validate::isLoadedObject($objHotelBookingDetail)) {
-            return false;
+        if (Validate::isLoadedObject($objHotelBookingDetail)) {
+            return $objHotelBookingDetail->delete();
         }
 
-        return $objHotelBookingDetail->delete();
+        return false;
     }
 
     public function getRoomBookinInformationForDateRangeByOrder(
@@ -1273,75 +1269,71 @@ class HotelBookingDetail extends ObjectModel
         // retrieve HotelBookingDetail row
         $roomBookingData = $this->getRoomBookingData($idRoom, $idOrder, $oldDateFrom, $oldDateTo);
         $objHotelBookingDetail = new self($roomBookingData['id']);
-        if (!Validate::isLoadedObject($objHotelBookingDetail)) {
-            return false;
-        }
+        if (Validate::isLoadedObject($objHotelBookingDetail)) {
+            // retrieve HotelCartBookingData row
+            $idHotelCartBookingData = Db::getInstance()->getValue(
+                'SELECT `id`
+                FROM `'._DB_PREFIX_.'htl_cart_booking_data`
+                WHERE date_from = "'.pSQL($oldDateFrom).'" AND date_to = "'.pSQL($oldDateTo).'"
+                AND id_room = '.(int) $idRoom.' AND `id_order` = '.(int) $idOrder
+            );
 
-        // retrieve HotelCartBookingData row
-        $idHotelCartBookingData = Db::getInstance()->getValue(
-            'SELECT `id`
-            FROM `'._DB_PREFIX_.'htl_cart_booking_data`
-            WHERE date_from = "'.pSQL($oldDateFrom).'" AND date_to = "'.pSQL($oldDateTo).'"
-            AND id_room = '.(int) $idRoom.' AND `id_order` = '.(int) $idOrder
-        );
+            $objHotelCartBookingData = new HotelCartBookingData($idHotelCartBookingData);
+            if (Validate::isLoadedObject($objHotelCartBookingData)) {
+                // calculate new prices
+                $newTotalPriceTE = '';
+                $newTotalPriceTI = '';
+                $newNumDays = $this->getNumberOfDays($newDateFrom, $newDateTo);
+                if ($newTotalPrice) {
+                    $newTotalPriceTE = $newTotalPrice['tax_excl'];
+                    $newTotalPriceTI = $newTotalPrice['tax_incl'];
+                } else {
+                    $oldNumDays = $this->getNumberOfDays($oldDateFrom, $oldDateTo);
+                    $unitRoomPriceTE = $objHotelBookingDetail->total_price_tax_excl / $oldNumDays;
+                    $unitRoomPriceTI = $objHotelBookingDetail->total_price_tax_incl / $oldNumDays;
+                    $newTotalPriceTE = $unitRoomPriceTE * $newNumDays;
+                    $newTotalPriceTI = $unitRoomPriceTI * $newNumDays;
+                }
 
-        $objHotelCartBookingData = new HotelCartBookingData($idHotelCartBookingData);
-        if (!Validate::isLoadedObject($objHotelCartBookingData)) {
-            return false;
-        }
-
-        // calculate new prices
-        $newTotalPriceTE = '';
-        $newTotalPriceTI = '';
-        $newNumDays = $this->getNumberOfDays($newDateFrom, $newDateTo);
-        if ($newTotalPrice) {
-            $newTotalPriceTE = $newTotalPrice['tax_excl'];
-            $newTotalPriceTI = $newTotalPrice['tax_incl'];
-        } else {
-            $oldNumDays = $this->getNumberOfDays($oldDateFrom, $oldDateTo);
-            $unitRoomPriceTE = $objHotelBookingDetail->total_price_tax_excl / $oldNumDays;
-            $unitRoomPriceTI = $objHotelBookingDetail->total_price_tax_incl / $oldNumDays;
-            $newTotalPriceTE = $unitRoomPriceTE * $newNumDays;
-            $newTotalPriceTI = $unitRoomPriceTI * $newNumDays;
-        }
-
-        // calculate `total_paid_amount`
-        $totalPaidAmount = 0;
-        $isAdvancePayment = Db::getInstance()->getValue(
-            'SELECT o.`is_advance_payment`
-            FROM `'._DB_PREFIX_.'orders` o
-            WHERE o.`id_order` = '.(int) $idOrder
-        );
-
-        if ($isAdvancePayment) {
-            $objHotelAdvancedPayment = new HotelAdvancedPayment();
-            $productAdvancePayment = $objHotelAdvancedPayment->getIdAdvPaymentByIdProduct($objHotelBookingDetail->id_product);
-
-            if (!$productAdvancePayment || (isset($productAdvancePayment['payment_type']) && $productAdvancePayment['payment_type'])) {
-                $totalPaidAmount = $objHotelAdvancedPayment->getRoomMinAdvPaymentAmount(
-                    $objHotelBookingDetail->id_product,
-                    $newDateFrom,
-                    $newDateTo
+                // calculate `total_paid_amount`
+                $totalPaidAmount = 0;
+                $isAdvancePayment = Db::getInstance()->getValue(
+                    'SELECT o.`is_advance_payment`
+                    FROM `'._DB_PREFIX_.'orders` o
+                    WHERE o.`id_order` = '.(int) $idOrder
                 );
+
+                if ($isAdvancePayment) {
+                    $objHotelAdvancedPayment = new HotelAdvancedPayment();
+                    $productAdvancePayment = $objHotelAdvancedPayment->getIdAdvPaymentByIdProduct($objHotelBookingDetail->id_product);
+
+                    if (!$productAdvancePayment || (isset($productAdvancePayment['payment_type']) && $productAdvancePayment['payment_type'])) {
+                        $totalPaidAmount = $objHotelAdvancedPayment->getRoomMinAdvPaymentAmount(
+                            $objHotelBookingDetail->id_product,
+                            $newDateFrom,
+                            $newDateTo
+                        );
+                    }
+                } else {
+                    $totalPaidAmount = $newTotalPriceTI;
+                }
+
+                // update $objHotelCartBookingData
+                $objHotelCartBookingData->date_from = $newDateFrom;
+                $objHotelCartBookingData->date_to = $newDateTo;
+                $objHotelCartBookingData->quantity = $newNumDays;
+
+                // update $objHotelBookingDetail
+                $objHotelBookingDetail->date_from = $newDateFrom;
+                $objHotelBookingDetail->date_to = $newDateTo;
+                $objHotelBookingDetail->total_price_tax_excl = Tools::ps_round($newTotalPriceTE, 6);
+                $objHotelBookingDetail->total_price_tax_incl = Tools::ps_round($newTotalPriceTI, 6);
+                $objHotelBookingDetail->total_paid_amount = Tools::ps_round($totalPaidAmount, 6);
+
+                if ($objHotelCartBookingData->save() && $objHotelBookingDetail->save()) {
+                    return true;
+                }
             }
-        } else {
-            $totalPaidAmount = $newTotalPriceTI;
-        }
-
-        // update $objHotelCartBookingData
-        $objHotelCartBookingData->date_from = $newDateFrom;
-        $objHotelCartBookingData->date_to = $newDateTo;
-        $objHotelCartBookingData->quantity = $newNumDays;
-
-        // update $objHotelBookingDetail
-        $objHotelBookingDetail->date_from = $newDateFrom;
-        $objHotelBookingDetail->date_to = $newDateTo;
-        $objHotelBookingDetail->total_price_tax_excl = Tools::ps_round($newTotalPriceTE, 6);
-        $objHotelBookingDetail->total_price_tax_incl = Tools::ps_round($newTotalPriceTI, 6);
-        $objHotelBookingDetail->total_paid_amount = Tools::ps_round($totalPaidAmount, 6);
-
-        if ($objHotelCartBookingData->save() && $objHotelBookingDetail->save()) {
-            return true;
         }
 
         return false;
@@ -1753,13 +1745,14 @@ class HotelBookingDetail extends ObjectModel
 
     public function deleteHotelOrderInfo($idOrder)
     {
+        $result = true;
         $objHotelCartBookingData = new HotelCartBookingData();
         $bookingsCartData = $objHotelCartBookingData->getCartCurrentDataByOrderId($idOrder);
         if (is_array($bookingsCartData) && count($bookingsCartData)) {
             foreach ($bookingsData as $bookingCartData) {
                 $objHotelCartBookingData = new HotelCartBookingData($bookingCartData['id']);
                 if (Validate::isLoadedObject($objHotelCartBookingData)) {
-                    $objHotelCartBookingData->delete();
+                    $result &= $objHotelCartBookingData->delete();
                 }
             }
         }
@@ -1769,12 +1762,12 @@ class HotelBookingDetail extends ObjectModel
             foreach ($bookingsData as $bookingData) {
                 $objHotelBookingDetail = new self($bookingData['id']);
                 if (Validate::isLoadedObject($objHotelBookingDetail)) {
-                    $objHotelBookingDetail->delete();
+                    $result &= $objHotelBookingDetail->delete();
                 }
             }
         }
 
-        return true;
+        return $result;
     }
 
     public function deleteHotelOrderRoomInfo($idOrder, $idProduct, $idRoom)
@@ -1786,11 +1779,12 @@ class HotelBookingDetail extends ObjectModel
             AND `id_room` = '.(int) $idRoom
         );
 
+        $return = true;
         if (is_array($result) && count($result)) {
             foreach ($result as $row) {
                 $objHotelCartBookingData = new HotelCartBookingData($row['id']);
                 if (Validate::isLoadedObject($objHotelCartBookingData)) {
-                    $objHotelCartBookingData->delete();
+                    $return &= $objHotelCartBookingData->delete();
                 }
             }
         }
@@ -1806,12 +1800,12 @@ class HotelBookingDetail extends ObjectModel
             foreach ($result as $row) {
                 $objHotelBookingDetail = new self($row['id']);
                 if (Validate::isLoadedObject($objHotelBookingDetail)) {
-                    $objHotelBookingDetail->delete();
+                    $return &= $objHotelBookingDetail->delete();
                 }
             }
         }
 
-        return true;
+        return $return;
     }
 
     public function deleteHotelOrderRoomTypeInfo($idOrder, $idProduct)
@@ -1822,11 +1816,12 @@ class HotelBookingDetail extends ObjectModel
             WHERE `id_order` = '.(int) $idOrder.' AND `id_product` = '.(int) $idProduct
         );
 
+        $return = true;
         if (is_array($result) && count($result)) {
             foreach ($result as $row) {
                 $objHotelCartBookingData = new HotelCartBookingData($row['id']);
                 if (Validate::isLoadedObject($objHotelCartBookingData)) {
-                    $objHotelCartBookingData->delete();
+                    $return &= $objHotelCartBookingData->delete();
                 }
             }
         }
@@ -1841,12 +1836,12 @@ class HotelBookingDetail extends ObjectModel
             foreach ($result as $row) {
                 $objHotelBookingDetail = new self($row['id']);
                 if (Validate::isLoadedObject($objHotelBookingDetail)) {
-                    $objHotelBookingDetail->delete();
+                    $return &= $objHotelBookingDetail->delete();
                 }
             }
         }
 
-        return true;
+        return $return;
     }
 
     public function enterHotelOrderBookingFormCartBookingData($id_cart)
