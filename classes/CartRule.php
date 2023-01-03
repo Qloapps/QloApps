@@ -875,6 +875,7 @@ class CartRuleCore extends ObjectModel
      * @param bool $use_tax
      * @param Context $context
      * @param bool $use_cache Allow using cache to avoid multiple free gift using multishipping
+     * @param bool $only_advance_payment_products to calculate discount applied only on products that have advance payment
      * @return float|int|string
      */
     public function getContextualValue($use_tax, Context $context = null, $filter = null, $package = null, $use_cache = true, $only_advance_payment_products = false)
@@ -903,8 +904,8 @@ class CartRuleCore extends ObjectModel
         $cache_id = 'getContextualValue_'.(int)$this->id.'_'.(int)$use_tax.'_'.(int)$context->cart->id.'_'.(int)$filter.'_'.(int)$only_advance_payment_products;
         foreach ($package['products'] as $key => $product) {
             if ($only_advance_payment_products) {
-                if ($paymentInfo = $objHotelAdvancePayment->getIdAdvPaymentByIdProduct($product['id_product'])) {
-                    if (!$paymentInfo['active']) {
+                if ($advancePaymentInfo = $objHotelAdvancePayment->getIdAdvPaymentByIdProduct($product['id_product'])) {
+                    if (!$advancePaymentInfo['active']) {
                         unset($package['products'][$key]);
                         continue;
                     }
