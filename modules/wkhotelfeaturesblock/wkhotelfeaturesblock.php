@@ -63,13 +63,6 @@ class WkHotelFeaturesBlock extends Module
         return $this->display(__FILE__, 'hotelfeaturescontent.tpl');
     }
 
-    public function hookDisplayAddModuleSettingLink()
-    {
-        $hrefFeaturesConf = $this->context->link->getAdminLink('AdminFeaturesModuleSetting');
-        $this->context->smarty->assign('features_setting_link', $hrefFeaturesConf);
-        return $this->display(__FILE__, 'hotelFeatureSettingLink.tpl');
-    }
-
     /**
      * If admin add any language then an entry will add in defined $lang_tables array's lang table same as prestashop
      * @param array $params
@@ -140,10 +133,14 @@ class WkHotelFeaturesBlock extends Module
             array (
                 'displayHome',
                 'displayFooterExploreSectionHook',
-                'displayAddModuleSettingLink',
                 'actionObjectLanguageAddAfter'
             )
         );
+    }
+
+    public function getContent()
+    {
+        Tools::redirectAdmin($this->context->link->getAdminLink('AdminFeaturesModuleSetting'));
     }
 
     public function uninstall()
