@@ -59,7 +59,7 @@
 					</button>
 				</div>
 		</div>
-		<div class="avil-chart-svg" id="availableBarChart">
+		<div class="avil-chart-svg" id="availability_line_chart1">
 			<svg></svg>
 		</div>
 	</section>

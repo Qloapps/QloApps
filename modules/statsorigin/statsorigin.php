@@ -90,15 +90,15 @@ class StatsOrigin extends ModuleGraph
         if (count($websites)) {
             $this->_html .= '
 			<div class="alert alert-info">
-				'.$this->l('In the tab, we break down the 10 most popular referral websites that bring customers to your online store.').'
+				'.$this->l('This page lists the 10 most popular referral websites that bring customers to your website.').'
 			</div>
 			<h4>'.$this->l('Guide').'</h4>
 			<div class="alert alert-warning">
 				<h4>'.$this->l('What is a referral website?').'</h4>
 				<p>
-					'.$this->l('The referrer is the URL of the previous webpage from which a link was followed by the visitor.').'<br />
-					'.$this->l('A referrer also enables you to know which keywords visitors use in search engines when browsing for your online store.').'<br /><br />
-					'.$this->l('A referrer can be:').'
+					'.$this->l('A referer is the URL of the previous webpage from which a link was followed by a visitor.').'<br />
+					'.$this->l('A referer also enables you to know which keywords visitors use in search engines when searching for your website.').'<br /><br />
+					'.$this->l('A referer can be:').'
 				</p>
 				<ul>
 					<li>'.$this->l('Someone who posts a link to your website.').'</li>
@@ -112,7 +112,7 @@ class StatsOrigin extends ModuleGraph
 					</div>
 					<div class="col-lg-4">
 						<a href="'.Tools::safeOutput($_SERVER['REQUEST_URI'].'&export=1&exportType=top').'" class="btn btn-default">
-							<i class="icon-cloud-upload"></i> '.$this->l('CSV Export').'
+							<i class="icon-cloud-download"></i> '.$this->l('CSV Export').'
 						</a>
 					</div>
 				</div>

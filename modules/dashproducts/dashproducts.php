@@ -347,8 +347,8 @@ class DashProducts extends Module
 						$img = ImageManager::thumbnail($path_to_image, 'product_mini_'.$product_obj->id.'.'.$this->context->controller->imageType, 45, $this->context->controller->imageType);
 					}
 
-					$objHRT = new HotelRoomType($product_obj->id);
-					$objHBI = new HotelBranchInformation($objHRT->id_hotel, $this->context->language->id);
+					$objHotelRoomType = new HotelRoomType($product_obj->id);
+					$objHotelBranch = new HotelBranchInformation($objHotelRoomType->id_hotel, $this->context->language->id);
 
 					$tr = array();
 					$tr[] = array(
@@ -367,8 +367,8 @@ class DashProducts extends Module
 					$tr[] = array(
 						'id' => 'hotel',
 						'value' => '<a href="'.$this->context->link->getAdminLink('AdminAddHotel', true).
-							'&id='.$objHBI->id.'&updatehtl_branch_info" target="_blank">'.
-							Tools::htmlentitiesUTF8($objHBI->hotel_name).'</a>',
+							'&id='.$objHotelBranch->id.'&updatehtl_branch_info" target="_blank">'.
+							Tools::htmlentitiesUTF8($objHotelBranch->hotel_name).'</a>',
 						'class' => 'text-center',
 					);
 					$tr[] = array(
@@ -398,7 +398,7 @@ class DashProducts extends Module
 			}
 		} else {
 			$link = $this->context->link->getAdminLink('AdminModules').'&configure=statsdata';
-			$body = '<div class="alert alert-info">'.$this->l('You must enable the "Save global page views" option from ').'<u><a href="'.$link.'" target="_blank">Data mining for statistics</a></u>'.$this->l(' module in order to display the most viewed room types, or use the Google Analytics module.').'</div>';
+			$body = '<div class="alert alert-info text-left">'.$this->l('You must enable the "Save global page views" option from ').'<u><a href="'.$link.'" target="_blank">Data mining for statistics</a></u>'.$this->l(' module in order to display the most viewed room types, or use the QloApps Google Analytics module.').'</div>';
 		}
 		return array('header' => $header, 'body' => $body);
 	}
@@ -443,7 +443,8 @@ class DashProducts extends Module
 			$body = array();
 			if (is_array($hotels) && count($hotels))
 				foreach ($hotels as $hotel) {
-					$objHBI = new HotelBranchInformation($hotel['id_hotel'], $this->context->language->id);
+					$objHotelBranch = new HotelBranchInformation($hotel['id_hotel'], $this->context->language->id);
+					$addressInfo = $objHotelBranch->getAddress($hotel['id_hotel']);
 					$tr = array();
 					$tr[] = array(
 						'id' => 'reference',
@@ -454,12 +455,12 @@ class DashProducts extends Module
 					);
 					$tr[] = array(
 						'id' => 'image',
-						'value' => $this->getHotelImage($objHBI->id),
+						'value' => $this->getHotelImage($objHotelBranch->id),
 						'class' => 'text-center',
 					);
 					$tr[] = array(
 						'id' => 'location',
-						'value' => $objHBI->address,
+						'value' => $addressInfo['address1'],
 						'class' => 'text-center',
 					);
 					$tr[] = array(
@@ -471,7 +472,7 @@ class DashProducts extends Module
 				}
 		} else {
 			$link = $this->context->link->getAdminLink('AdminModules').'&configure=statsdata';
-			$body = '<div class="alert alert-info">'.$this->l('You must enable the "Save global page views" option from ').'<u><a href="'.$link.'" target="_blank">Data mining for statistics</a></u>'.$this->l(' module in order to display the most viewed room types, or use the Google Analytics module.').'</div>';
+			$body = '<div class="alert alert-info text-left">'.$this->l('You must enable the "Save global page views" option from ').'<u><a href="'.$link.'" target="_blank">Data mining for statistics</a></u>'.$this->l(' module in order to display the most viewed room types, or use the QloApps Google Analytics module.').'</div>';
 		}
 
 		return array('header' => $header, 'body' => $body);
@@ -479,15 +480,13 @@ class DashProducts extends Module
 
     public function getHotelImage($idHotel)
     {
-        $imageDir = _MODULE_DIR_.'hotelreservationsystem/views/img/hotel_img/';
-        $noPictureImagePath = _PS_IMG_.'p/en.jpg';
+		$noPictureImagePath = _PS_IMG_.'p/en.jpg';
         $hotelImage = HotelImage::getCover($idHotel);
-        $imgLink = '';
         if (is_array($hotelImage) && count($hotelImage)) {
-            $imagePath = $imageDir.$hotelImage['hotel_image_id'].'.jpg';
-            $imgLink = $imagePath;
+			$objHotelImage = new HotelImage();
+			$imgLink = $this->context->link->getMediaLink($objHotelImage->getImageLink($hotelImage['id'], ImageType::getFormatedName('small')));
         } else {
-            $imgLink = $noPictureImagePath;
+            $imgLink = $this->context->link->getMediaLink($noPictureImagePath);
         }
 
         return '<img src="'.$imgLink.'" class="img img-thumbnail hotel-thumbnail">';
@@ -542,16 +541,17 @@ class DashProducts extends Module
 
 	public function getTotalViewed($date_from, $date_to, $limit = 10)
 	{
-		$gapi = Module::isInstalled('gapi') ? Module::getInstanceByName('gapi') : false;
-		if (Validate::isLoadedObject($gapi) && $gapi->isConfigured()) {
+		$objGoogleAnalytics = Module::isEnabled('qlogoogleanalytics') ? Module::getInstanceByName('qlogoogleanalytics') : false;
+        if (Validate::isLoadedObject($objGoogleAnalytics) && $objGoogleAnalytics->isConfigured()) {
 			$products = array();
 			// Only works with the default product URL pattern at this time
-			if ($result = $gapi->requestReportData('ga:pagePath', 'ga:visits', $date_from, $date_to, '-ga:visits', 'ga:pagePath=~/([a-z]{2}/)?([a-z]+/)?[0-9][0-9]*\-.*\.html$', 1, 10))
-				foreach ($result as $row)
-				{
-					if (preg_match('@/([a-z]{2}/)?([a-z]+/)?([0-9]+)\-.*\.html$@', $row['dimensions']['pagePath'], $matches))
+			if ($result = $objGoogleAnalytics->requestReportData('ga:pagePath', 'ga:visits', $date_from, $date_to, '-ga:visits', 'ga:pagePath=~/([a-z]{2}/)?([a-z]+/)?[0-9][0-9]*\-.*\.html$', 1, $limit)) {
+				foreach ($result as $row) {
+					if (preg_match('@/([a-z]{2}/)?([a-z]+/)?([0-9]+)\-.*\.html@', $row['dimensions']['pagePath'], $matches)) {
 						$products[] = array('id_object' => (int)$matches[3], 'counter' => $row['metrics']['visits']);
+					}
 				}
+			}
 
 			return $products;
 		} else {
@@ -579,14 +579,13 @@ class DashProducts extends Module
 			return array();
 		}
 
-		$pageType = Page::getPageTypeByName('category');
 		return Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS(
 			'SELECT hbi.`id` AS `id_hotel`, cl.`name` AS `hotel_name`, pv.`counter` AS `views`
 			FROM `'._DB_PREFIX_.'page_viewed` pv
 			LEFT JOIN `'._DB_PREFIX_.'page` p ON (p.`id_page` = pv.`id_page`)
 			LEFT JOIN `'._DB_PREFIX_.'page_type` pt ON (pt.`id_page_type` = p.`id_page_type`)
 			LEFT JOIN `'._DB_PREFIX_.'category_lang` cl ON (cl.`id_category` = p.`id_object`)
-			LEFT JOIN `'._DB_PREFIX_.'htl_branch_info` hbi ON (hbi.`id_category` = hbi.`id_category`)
+			LEFT JOIN `'._DB_PREFIX_.'htl_branch_info` hbi ON (hbi.`id_category` = cl.`id_category`)
 			LEFT JOIN `'._DB_PREFIX_.'date_range` dr ON (pv.`id_date_range` = dr.`id_date_range`)
 			WHERE pt.`name` = "'.pSQL('category').'"
 			AND dr.`time_start` BETWEEN "'.pSQL($date_from).' 00:00:00" AND "'.pSQL($date_to).' 23:59:59"

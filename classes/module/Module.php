@@ -1377,6 +1377,7 @@ abstract class ModuleCore
                     $item->active = 0;
                     $item->onclick_option = false;
                     $item->url = false;
+                    $item->trusted = Module::isModuleTrusted($item->name, false);
                     $item->is_native = false;
 
                     if (defined('_PS_HOST_MODE_') && in_array($item->name, self::$hosted_modules_blacklist)) {
@@ -1443,6 +1444,7 @@ abstract class ModuleCore
                     $item->is_configurable = $tmp_module->is_configurable = method_exists($tmp_module, 'getContent') ? 1 : 0;
                     $item->need_instance = isset($tmp_module->need_instance) ? $tmp_module->need_instance : 0;
                     $item->active = $tmp_module->active;
+                    $item->trusted = Module::isModuleTrusted($tmp_module->name, false);
                     $item->currencies = isset($tmp_module->currencies) ? $tmp_module->currencies : null;
                     $item->currencies_mode = isset($tmp_module->currencies_mode) ? $tmp_module->currencies_mode : null;
                     $item->confirmUninstall = isset($tmp_module->confirmUninstall) ? html_entity_decode($tmp_module->confirmUninstall) : null;
@@ -1629,6 +1631,7 @@ abstract class ModuleCore
                     $item->need_instance = 0;
                     $item->not_on_disk = 1;
                     $item->available_on_addons = 1;
+                    $item->trusted = Module::isModuleTrusted($item->name, false);
                     $item->active = 0;
                     $item->description_full = stripslashes($modaddons->description_full);
                     $item->additional_description = isset($modaddons->additional_description) ? stripslashes($modaddons->additional_description) : null;

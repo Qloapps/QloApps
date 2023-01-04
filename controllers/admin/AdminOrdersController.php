@@ -215,6 +215,7 @@ class AdminOrdersControllerCore extends AdminController
             $cart_order_exists = $cart->orderExists();
             if (!$cart_order_exists) {
                 $this->context->cart = $cart;
+                $this->context->currency = new Currency((int)$cart->id_currency);
                 $cart_detail_data = array();
                 $cart_detail_data_obj = new HotelCartBookingData();
                 if ($cart_detail_data = $cart_detail_data_obj->getCartFormatedBookinInfoByIdCart((int) $id_cart)) {
@@ -1348,6 +1349,13 @@ class AdminOrdersControllerCore extends AdminController
             $this->toolbar_title .= ' - '.sprintf($this->l('Shop: %s'), $shop->name);
         }
 
+        // get details if booking is done for some other guest
+        $customerGuestDetail = false;
+        if ($id_customer_guest_detail = OrderCustomerGuestDetail::isCustomerGuestBooking($order->id)) {
+            $customerGuestDetail = new OrderCustomerGuestDetail($id_customer_guest_detail);
+            $customerGuestDetail->gender = new Gender($customerGuestDetail->id_gender, $this->context->language->id);
+        }
+
         // gets warehouses to ship products, if and only if advanced stock management is activated
         $warehouse_list = null;
 
@@ -1428,6 +1436,16 @@ class AdminOrdersControllerCore extends AdminController
         foreach ($history as &$order_state) {
             $order_state['text-color'] = Tools::getBrightness($order_state['color']) < 128 ? 'white' : 'black';
         }
+
+        $order_payment_detail = $order->getOrderPaymentDetail();
+        foreach ($order_payment_detail as &$payment_detail) {
+            $payment = new OrderPayment($payment_detail['id_order_payment']);
+            if ($invoice = $payment->getOrderInvoice($order->id)) {
+                $payment_detail['invoice_number'] = $invoice->getInvoiceNumberFormatted($this->context->language->id, $order->id_shop);
+            }
+        }
+
+
         //by webkul to get data to show hotel rooms order data on order detail page
 
         $cart_id = Cart::getCartIdByOrderId(Tools::getValue('id_order'));
@@ -1530,6 +1548,8 @@ class AdminOrdersControllerCore extends AdminController
             'cart' => new Cart($order->id_cart),
             'customer' => $customer,
             'gender' => $gender,
+            'customerGuestDetail' => $customerGuestDetail,
+            'genders' => Gender::getGenders(),
             'customer_addresses' => $customer->getAddresses($this->context->language->id),
             'addresses' => array(
                 'delivery' => $addressDelivery,
@@ -1540,13 +1560,13 @@ class AdminOrdersControllerCore extends AdminController
             'customerStats' => $customer->getStats(),
             'products' => $products,
             'discounts' => $order->getCartRules(),
-            'orders_total_paid_tax_incl' => $order->getOrdersTotalPaid(), // Get the sum of total_paid_tax_incl of the order with similar reference
             'total_paid' => $order->getTotalPaid(),
             'customer_thread_message' => CustomerThread::getCustomerMessages($order->id_customer, null, $order->id),
             'orderMessages' => OrderMessage::getOrderMessages($order->id_lang),
             'messages' => Message::getMessagesByOrderId($order->id, true),
             'carrier' => new Carrier($order->id_carrier),
             'history' => $history,
+            'order_payment_detail' => $order_payment_detail,
             'states' => OrderState::getOrderStates($this->context->language->id),
             'warehouse_list' => $warehouse_list,
             'sources' => ConnectionsSource::getOrderSources($order->id),
@@ -1598,6 +1618,49 @@ class AdminOrdersControllerCore extends AdminController
         );
 
         return parent::renderView();
+    }
+
+    public function ajaxProcessUpdateGuestDetails()
+    {
+        $response = array(
+            'success' => false
+        );
+        if (Validate::isLoadedObject($order = new Order(Tools::getValue('id_order')))) {
+            if ($id_customer_guest_detail = OrderCustomerGuestDetail::isCustomerGuestBooking($order->id)) {
+                if (Validate::isLoadedObject($objCustomerGuestDetail = new OrderCustomerGuestDetail($id_customer_guest_detail))) {
+                    $id_gender = Tools::getValue('id_gender');
+                    $firstname = Tools::getValue('firstname');
+                    $lastname = Tools::getValue('lastname');
+                    $email = Tools::getValue('email');
+                    $phone = Tools::getValue('phone');
+                    $objCustomerGuestDetail->id_gender = $id_gender;
+                    $objCustomerGuestDetail->firstname = $firstname;
+                    $objCustomerGuestDetail->lastname = $lastname;
+                    $objCustomerGuestDetail->email = $email;
+                    $objCustomerGuestDetail->phone = $phone;
+                    if ($objCustomerGuestDetail->validateGuestInfo()) {
+                        if ($objCustomerGuestDetail->save()) {
+                            $response['success'] = true;
+                            $gender = new Gender($objCustomerGuestDetail->id_gender, $this->context->language->id);
+                            $response['data']['guest_name'] = $gender->name.' '.$objCustomerGuestDetail->firstname.' '.$objCustomerGuestDetail->lastname ;
+                            $response['data']['guest_email'] = $objCustomerGuestDetail->email;
+                            $response['data']['guest_phone'] = $objCustomerGuestDetail->phone;
+                            $response['msg'] = $this->l('Guest details are updated.');
+                        } else {
+                            $response['errors'][] = $this->l('Unable to save guest details.');
+                        }
+                    } else {
+                        $response['errors'][] = $this->l('Invalid guest details, please check and try again.');
+                    }
+                } else {
+                    $response['errors'][] = $this->l('Guest details not found.');
+                }
+            } else {
+                $response['errors'][] = $this->l('Guest details not found.');
+            }
+        }
+
+        $this->ajaxDie(json_encode($response));
     }
 
     public function ajaxProcessSearchProducts()
@@ -3315,74 +3378,6 @@ class AdminOrdersControllerCore extends AdminController
             );
         }
         die($extraDemandsTpl);
-    }
-
-    // Process to get extra demands of any room while order creation process form.tpl
-    public function ajaxProcessGetRoomTypeCartDemands()
-    {
-        $extraDemandsTpl = '';
-        if ($idProduct = Tools::getValue('id_product')) {
-            if (($dateFrom = Tools::getValue('date_from'))
-                && ($dateTo = Tools::getValue('date_to'))
-                && ($idRoom = Tools::getValue('id_room'))
-                && ($idCart = Tools::getValue('id_cart'))
-            ) {
-                $objCartBookingData = new HotelCartBookingData();
-                if ($selectedRoomDemands = $objCartBookingData->getCartExtraDemands(
-                    $idCart,
-                    $idProduct,
-                    $idRoom,
-                    $dateFrom,
-                    $dateTo
-                )) {
-                    // get room type additional demands
-                    $objRoomDemands = new HotelRoomTypeDemand();
-                    if ($roomTypeDemands = $objRoomDemands->getRoomTypeDemands($idProduct)) {
-                        foreach ($roomTypeDemands as &$demand) {
-                            // if demand has advance options then set demand price as first advance option price.
-                            if (isset($demand['adv_option']) && $demand['adv_option']) {
-                                $demand['price'] = current($demand['adv_option'])['price'];
-                            }
-                        }
-                        foreach ($selectedRoomDemands as &$selectedDemand) {
-                            $objRoom = new HotelRoomInformation($selectedDemand['id_room']);
-                            $selectedDemand['room_num'] = $objRoom->room_num;
-                            if (isset($selectedDemand['extra_demands']) && $selectedDemand['extra_demands']) {
-                                $extraDmd = array();
-                                foreach ($selectedDemand['extra_demands'] as $sDemand) {
-                                    $selectedDemand['selected_global_demands'][] = $sDemand['id_global_demand'];
-                                    $extraDmd[$sDemand['id_global_demand'].'-'.$sDemand['id_option']] = $sDemand;
-                                }
-                                $selectedDemand['extra_demands'] = $extraDmd;
-                            }
-                        }
-                        $this->context->smarty->assign('roomTypeDemands', $roomTypeDemands);
-                        $this->context->smarty->assign('selectedRoomDemands', $selectedRoomDemands);
-                        $extraDemandsTpl .= $this->context->smarty->fetch(
-                            _PS_ADMIN_DIR_.'/themes/default/template/controllers/orders/_cart_booking_demands.tpl'
-                        );
-                    }
-                }
-            }
-        }
-        die($extraDemandsTpl);
-    }
-
-    // Process when admin changes extra demands of any room while order creation process form.tpl
-    public function ajaxProcessChangeRoomDemands()
-    {
-        if ($idCartBooking = Tools::getValue('id_cart_booking')) {
-            if (Validate::isLoadedObject($objCartbookingCata = new HotelCartBookingData($idCartBooking))) {
-                $roomDemands = Tools::getValue('room_demands');
-                $roomDemands = json_decode($roomDemands, true);
-                $roomDemands = json_encode($roomDemands);
-                $objCartbookingCata->extra_demands = $roomDemands;
-                if ($objCartbookingCata->save()) {
-                    die('1');
-                }
-            }
-        }
-        die('0');
     }
 
     // Process when admin edit rooms and edit rooms additional facilities

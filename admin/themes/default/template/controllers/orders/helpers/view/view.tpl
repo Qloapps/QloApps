@@ -312,7 +312,7 @@
 																{/if}
 
 																{* field for the current date *}
-																<input class="room_status_date wk-input-date" type="text" name="status_date" value="{$data['date_from']|date_format:"%d-%m-%Y"}" readonly/>
+																<input class="room_status_date wk-input-date" type="text" name="status_date" value="{if $data['id_status'] == $hotel_order_status['STATUS_CHECKED_IN']['id_status']}{$data['date_to']|date_format:"%d-%m-%Y"}{else}{$data['date_from']|date_format:"%d-%m-%Y"}{/if}" readonly/>
 
 																<input type="hidden" name="date_from" value="{$data['date_from']|date_format:"%Y-%m-%d"}" />
 																<input type="hidden" name="date_to" value="{$data['date_to']|date_format:"%Y-%m-%d"}" />
@@ -476,12 +476,12 @@
 					{l s="Payment"} <span class="badge">{$order->getOrderPayments()|@count}</span>
 				</div>
 				{if count($order->getOrderPayments()) > 0}
-					<p class="alert alert-danger"{if round($orders_total_paid_tax_incl, 2) == round($total_paid, 2) || (isset($currentState) && $currentState->id == 6)} style="display: none;"{/if}>
+					<p class="alert alert-danger"{if round($order->total_paid_tax_incl, 2) == round($total_paid, 2) || (isset($currentState) && $currentState->id == 6)} style="display: none;"{/if}>
 						{l s='Warning'}
 						<strong>{displayPrice price=$total_paid currency=$currency->id}</strong>
 						{l s='paid instead of'}
-						<strong class="total_paid">{displayPrice price=$orders_total_paid_tax_incl currency=$currency->id}</strong>
-						{foreach $order->getBrother() as $brother_order}
+						<strong class="total_paid">{displayPrice price=$order->total_paid_tax_incl currency=$currency->id}</strong>
+						{* {foreach $order->getBrother() as $brother_order}
 							{if $brother_order@first}
 								{if count($order->getBrother()) == 1}
 									<br />{l s='This warning also concerns order '}
@@ -492,7 +492,7 @@
 							<a href="{$current_index}&amp;vieworder&amp;id_order={$brother_order->id}&amp;token={$smarty.get.token|escape:'html':'UTF-8'}">
 								#{'%06d'|sprintf:$brother_order->id}
 							</a>
-						{/foreach}
+						{/foreach} *}
 					</p>
 				{/if}
 				<div class="form-group">
@@ -510,16 +510,16 @@
 								</tr>
 							</thead>
 							<tbody>
-								{foreach from=$order->getOrderPaymentCollection() item=payment}
+								{foreach from=$order_payment_detail item=payment}
 								<tr>
-									<td>{dateFormat date=$payment->date_add full=true}</td>
-									<td>{$payment->payment_method|escape:'html':'UTF-8'}</td>
-									<td>{$payment_types[$payment->payment_type]['name']|escape:'html':'UTF-8'}</td>
-									<td>{$payment->transaction_id|escape:'html':'UTF-8'}</td>
-									<td>{displayPrice price=$payment->amount currency=$payment->id_currency}</td>
+									<td>{dateFormat date=$payment['date_add'] full=true}</td>
+									<td>{$payment['payment_method']|escape:'html':'UTF-8'}</td>
+									<td>{$payment_types[$payment['payment_type']]['name']|escape:'html':'UTF-8'}</td>
+									<td>{$payment['transaction_id']|escape:'html':'UTF-8'}</td>
+									<td>{displayPrice price=$payment['real_paid_amount'] currency=$payment['id_currency']}</td>
 									<td>
-									{if $invoice = $payment->getOrderInvoice($order->id)}
-										{$invoice->getInvoiceNumberFormatted($current_id_lang, $order->id_shop)}
+									{if $payment['invoice_number']}
+										{$payment['invoice_number']}
 									{else}
 									{/if}
 									</td>
@@ -534,32 +534,32 @@
 									<td colspan="5">
 										<p>
 											<b>{l s='Card Number'}</b>&nbsp;
-											{if $payment->card_number}
-												{$payment->card_number}
+											{if $payment['card_number']}
+												{$payment['card_number']}
 											{else}
 												<i>{l s='Not defined'}</i>
 											{/if}
 										</p>
 										<p>
 											<b>{l s='Card Brand'}</b>&nbsp;
-											{if $payment->card_brand}
-												{$payment->card_brand}
+											{if $payment['card_brand']}
+												{$payment['card_brand']}
 											{else}
 												<i>{l s='Not defined'}</i>
 											{/if}
 										</p>
 										<p>
 											<b>{l s='Card Expiration'}</b>&nbsp;
-											{if $payment->card_expiration}
-												{$payment->card_expiration}
+											{if $payment['card_expiration']}
+												{$payment['card_expiration']}
 											{else}
 												<i>{l s='Not defined'}</i>
 											{/if}
 										</p>
 										<p>
 											<b>{l s='Card Holder'}</b>&nbsp;
-											{if $payment->card_holder}
-												{$payment->card_holder}
+											{if $payment['card_holder']}
+												{$payment['card_holder']}
 											{else}
 												<i>{l s='Not defined'}</i>
 											{/if}
@@ -709,15 +709,27 @@
 										<input class="btn btn-default" type="submit" name="submitGuestToCustomer" value="{l s='Transform this guest into a customer'}" />
 										<p class="help-block">{l s='This feature will generate a random password and send an email to the customer.'}</p>
 									</form>
+									<dl class="panel list-detail">
+										<dt>{l s='Email'}</dt>
+											<dd><a href="mailto:{$customer->email}"><i class="icon-envelope-o"></i> {$customer->email}</a></dd>
+										{if $addresses.invoice->phone_mobile || $addresses.invoice->phone}
+											<dt>{l s='Phone'}</dt>
+												<dd><a href="tel:{if $addresses.invoice->phone_mobile}{$addresses.invoice->phone_mobile}{else}{$addresses.invoice->phone}{/if}"><i class="icon-envelope-o"></i> {if $addresses.invoice->phone_mobile}{$addresses.invoice->phone_mobile}{else}{$addresses.invoice->phone}{/if}</a></dd><br>
+										{/if}
+									</dl>
 								{else}
 									<div class="alert alert-warning">
 										{l s='A registered customer account has already claimed this email address'}
 									</div>
 								{/if}
 							{else}
-								<dl class="well list-detail">
+								<dl class="panel list-detail">
 									<dt>{l s='Email'}</dt>
 										<dd><a href="mailto:{$customer->email}"><i class="icon-envelope-o"></i> {$customer->email}</a></dd><br>
+									{if $addresses.invoice->phone_mobile || $addresses.invoice->phone}
+										<dt>{l s='Phone'}</dt>
+											<dd><a href="tel:{if $addresses.invoice->phone_mobile}{$addresses.invoice->phone_mobile}{else}{$addresses.invoice->phone}{/if}"><i class="icon-envelope-o"></i> {if $addresses.invoice->phone_mobile}{$addresses.invoice->phone_mobile}{else}{$addresses.invoice->phone}{/if}</a></dd><br>
+									{/if}
 									<dt>{l s='Account registered'}</dt>
 										<dd class="text-muted"><i class="icon-calendar-o"></i> {dateFormat date=$customer->date_add full=true}</dd>
 									<!-- <dt>{l s='Valid orders placed'}</dt>
@@ -731,6 +743,67 @@
 											<dd>{$customer->ape}</dd>
 									{/if} -->
 								</dl>
+								{if $customerGuestDetail}
+									<div class="panel">
+										<div class="panel-heading">
+											{l s='Traveller detail'}
+										</div>
+										<dl id="customer-guest-details">
+											<dt>{l s='Name'}</dt>
+												<dd class="guest_name">{$customerGuestDetail->gender->name} {$customerGuestDetail->firstname} {$customerGuestDetail->lastname}</dd>
+												<br>
+											<dt>{l s='Email'}</dt>
+												<dd class="guest_email"><a href="mailto:{$customerGuestDetail->email}"><i class="icon-envelope-o"></i> {$customerGuestDetail->email}</a></dd><br>
+											<dt>{l s='Phone'}</dt>
+												<dd class="guest_phone"><a href="tel:{$customerGuestDetail->phone}"><i class="icon-envelope-o"></i> {$customerGuestDetail->phone}</a></dd>
+											<div class="text-right">
+												<button id="edit_guest_details" class="btn btn-default">
+													<i class="icon-pencil"></i>
+													{l s='Edit'}
+												</button>
+											</div>
+										</dl>
+										<form id="customer-guest-details-form" style="display:none">
+											<dl>
+												<dt>{l s='Social title'}</dt>
+													<dd>
+														<select name="id_gender">
+															{foreach from=$genders key=k item=gender}
+																<option value="{$gender->id_gender}"{if $customerGuestDetail->id_gender == $gender->id_gender} selected="selected"{/if}>{$gender->name}</option>
+															{/foreach}
+														</select>
+													</dd><br>
+												<dt>{l s='First name'}</dt>
+													<dd>
+														<input type="text" value="{$customerGuestDetail->firstname}" name="firstname">
+													</dd><br>
+												<dt>{l s='Last name'}</dt>
+													<dd>
+														<input type="text" value="{$customerGuestDetail->lastname}" name="lastname">
+													</dd><br>
+												<dt>{l s='Email'}</dt>
+													<dd>
+														<input type="text" value="{$customerGuestDetail->email}" name="email">
+													</dd><br>
+												<dt>{l s='Phone'}</dt>
+													<dd>
+														<input type="text" value="{$customerGuestDetail->phone}" name="phone">
+													</dd>
+											</dl>
+											<div class="text-right">
+
+												<button id="cancle_edit_guest_details" class="btn btn-default">
+													<i class="icon-remove"></i>
+													{l s='cancel'}
+												</button>
+												<button id="submit_guest_details" class="btn btn-default">
+													<i class="icon-save"></i>
+													{l s='Save'}
+												</button>
+											</div>
+										</form>
+									</div>
+								{/if}
 							{/if}
 						</div>
 
@@ -1709,6 +1782,53 @@
 		});
 
 		/*END*/
+
+		// for updating customer guest details
+		$('#edit_guest_details').on('click', function(e) {
+			e.preventDefault();
+			$('#customer-guest-details-form').show();
+			$('#customer-guest-details').hide();
+		});
+
+		$('#cancle_edit_guest_details').on('click', function(e) {
+			e.preventDefault();
+			$('#customer-guest-details-form').hide();
+			$('#customer-guest-details').show();
+		});
+
+		$('#submit_guest_details').on('click', function(e) {
+			e.preventDefault();
+			$.ajax({
+				type: 'POST',
+				headers: {
+					"cache-control": "no-cache"
+				},
+				url: "{$link->getAdminLink('AdminOrders')|addslashes}",
+				dataType: 'JSON',
+				cache: false,
+				data: $('#customer-guest-details-form').serialize()+'&ajax=true&id_order='+id_order+'&action=updateGuestDetails',
+				success: function(result) {
+					if (result.success) {
+						if (result.msg) {
+							showSuccessMessage(result.msg);
+						}
+						if (result.data.guest_name) {
+							$('#customer-guest-details .guest_name').text(result.data.guest_name);
+						}
+						if (result.data.guest_email) {
+							$('#customer-guest-details .guest_email a').attr('href', 'mailto:'+result.data.guest_email).text(result.data.guest_email);
+						}
+						if (result.data.guest_phone) {
+							$('#customer-guest-details .guest_phone a').attr('href', 'tel'+result.data.guest_phone).text(result.data.guest_phone);
+						}
+						$('#customer-guest-details-form').hide();
+						$('#customer-guest-details').show();
+					} else if (result.errors) {
+						showErrorMessage(result.errors);
+					}
+				}
+			});
+		});
 
 		$(".textarea-autosize").autosize();
 

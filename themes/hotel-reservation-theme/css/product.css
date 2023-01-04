@@ -1209,7 +1209,7 @@ Quick View Styles
 .hotel_name_block {
   font-size: 22px;
   color: #000000;
-  margin-bottom: 5px;}
+  margin-bottom: 8px;}
 .room_hotel_name_block
 {
   padding-bottom: 12px;}
@@ -1230,22 +1230,6 @@ Quick View Styles
     font-weight: 400;
     padding-top: 10px;}
 
-.room_ratting_yes
-{
-  background-position: 48px 22px;
-  display: inline-block;
-    height: 22px;
-    width: 22px;}
-.room_ratting_no
-{
-  background-position: 74px 22px;
-  display: inline-block;
-    height: 22px;
-    width: 22px;}
-.num_reviews {
-  font-size: 14px;
-  color: #0000FF;
-  margin-left: 10px;}
 .sold_out_alert, .order_restrict_alert {
   color: #FF4B4B;
   display: block;

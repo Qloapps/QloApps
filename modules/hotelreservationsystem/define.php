@@ -48,4 +48,3 @@ require_once 'classes/HotelBranchRefundRules.php';
 
 // Web services classes
 require_once 'classes/WebserviceSpecificManagementQlo.php';
-require_once 'classes/WebserviceSpecificManagementHotelImages.php';
