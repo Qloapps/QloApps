@@ -592,7 +592,7 @@ class AdminCartsControllerCore extends AdminController
             $id_cart = Tools::getValue('id_cart');//get cart id from url
             $cart_detail_data = array();
             $cart_detail_data_obj = new HotelCartBookingData();
-            $update_htl_cart_currency = $cart_detail_data_obj->updateIdCurrencyByIdCart($id_cart, $currency->id);
+            $cart_detail_data_obj->updateIdCurrencyByIdCart($id_cart, $currency->id);
             $cart_detail_data = $cart_detail_data_obj->getCartFormatedBookinInfoByIdCart((int) $id_cart);
             $this->context->smarty->assign(array(
                 'cart_detail_data' => $cart_detail_data,
