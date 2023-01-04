@@ -1,0 +1,111 @@
+/**
+* 2010-2023 Webkul.
+*
+* NOTICE OF LICENSE
+*
+* All right is reserved,
+* Please go through this link for complete license : https://store.webkul.com/license.html
+*
+* DISCLAIMER
+*
+* Do not edit or add to this file if you wish to upgrade this module to newer
+* versions in the future. If you wish to customize this module for your
+* needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
+*
+*  @author    Webkul IN <support@webkul.com>
+*  @copyright 2010-2023 Webkul IN
+*  @license   https://store.webkul.com/license.html
+*/
+
+.booking_occupancy_wrapper {
+    border: none;
+    max-height: 380px;
+    overflow: auto;
+    box-shadow: 0 8px 25px -4px rgba(0,0,0,0.39);
+    left: 0px;
+    padding: 20px;
+    min-width: 280px}
+    .booking_occupancy_wrapper .occupancy-info-separator {
+      margin-bottom: 15px;
+      margin-top: 15px;
+      margin-right: -20px;
+        margin-left: -20px;}
+    .booking_occupancy_wrapper .children_age_info_block {
+      display: none;}
+    .booking_occupancy_wrapper .children_age_info_block label {
+      font-size: 12px;
+      color: #777777;}
+    .booking_occupancy_wrapper .label-desc-txt {
+      font-size: 12px;
+      color: #777777;}
+    .booking_occupancy_wrapper label {
+      font-size: 14px;
+      color: #333333;
+      font-weight: 400;}
+      .booking_occupancy_wrapper .add_new_occupancy_btn {
+        font-weight: bold;
+        text-decoration: none;
+        font-size: 14px;
+        color: #0000FF;
+        line-height: 24px;}
+        .booking_occupancy_wrapper .add_new_occupancy_btn:active, .booking_occupancy_wrapper .add_new_occupancy_btn:focus, .booking_occupancy_wrapper .add_new_occupancy_btn:hover {
+          text-decoration: none;
+          color: #0000FF;}
+      .booking_occupancy_wrapper .occupancy_info_head {
+        font-size: 14px;
+        color: #333333;
+        font-weight: bold;
+        margin-bottom: 10px;}
+        .booking_occupancy_wrapper .occupancy_info_head .remove-room-link {
+          font-size: 12px;
+          color: #FF4343;
+          text-align: right;}
+        .booking_occupancy_wrapper .occupancy_info_block .occupancy_count, .qty_count {
+          padding: 14px;
+          border: 1px solid #E1E3E7;
+          font-size: 14px;
+          font-weight: 600;
+          color: #333333;
+          text-align: center;
+          border-radius: 4px;}
+          .rm_qty_cont .qty_count, .rm_qty_cont .qty_direction a {
+            border: 1px solid #999999;
+            box-shadow: 0 1px 0 0 rgb(0 0 0 / 13%);}
+        .booking_occupancy_wrapper .occupancy_info_block .occupancy_count > span, .qty_count > span {
+          min-width: 21px;
+          text-align: center;
+          display: block;}
+        .qty_direction {
+          margin-left: 3px;
+          width: 22px;}
+          .qty_direction a {
+            padding: 1px 5px;
+            border: 0px;
+            border: 1px solid #E1E3E7;
+            color: #333;
+            border-radius: 4px;
+            font-weight: 400;}
+            .qty_direction .occupancy_quantity_down, .qty_direction .rm_quantity_down {
+              margin-top: 3px;}
+
+    .booking_occupancy_wrapper .children_ages .col-xs-4 {
+      padding-left: 5px;
+      margin-bottom: 5px;
+      padding-right: 5px;}
+    .booking_occupancy_wrapper .children_ages select {
+      background-color: #fff;
+      height: 37px;
+      border-radius: 4px;
+      padding: 3px 5px;
+      font-size: 12px;
+      color: #333;
+      border: 1px solid #E1E3E7;
+      width: 100%;}
+
+
+  @media (max-width: 450) {
+    .booking_occupancy_wrapper .occupancy_info_block .occupancy_count_block {
+      width: 100%;}
+    .booking_occupancy_wrapper .occupancy_info_block .occupancy_count {
+        width: 80%;}
+  }

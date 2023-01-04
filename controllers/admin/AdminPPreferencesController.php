@@ -130,11 +130,11 @@ class AdminPPreferencesControllerCore extends AdminController
                     ),
                     'PS_FRONT_OWS_SEARCH_ALGO_TYPE' => array(
                         'title' => $this->l('Front end occupancy wise search algorithm '),
-                        'hint' => $this->l('In occupancy wise search at front end, you want to display only room types which are fully satisfing searched occupancy or you want to display all the available room types for the dates searched'),
+                        'hint' => $this->l('In occupancy wise search at front end, you want to display only room types which are fully satisfying searched occupancy or you want to display all the available room types for the dates searched'),
                         'cast' => 'intval',
                         'type' => 'select',
                         'list' => array(
-                            array('id' => HotelBookingDetail::SEARCH_EXACT_ROOM_TYPE_ALGO, 'name' => $this->l('Show room types satisfing required occupancy')),
+                            array('id' => HotelBookingDetail::SEARCH_EXACT_ROOM_TYPE_ALGO, 'name' => $this->l('Show room types satisfying required occupancy')),
                             array('id' => HotelBookingDetail::SEARCH_ALL_ROOM_TYPE_ALGO, 'name' => $this->l('Show all available room types'))
                         ),
                         'identifier' => 'id'
@@ -159,11 +159,11 @@ class AdminPPreferencesControllerCore extends AdminController
                     ),
                     'PS_BACKOFFICE_OWS_SEARCH_ALGO_TYPE' => array(
                         'title' => $this->l('Back-office occupancy wise search algorithm'),
-                        'hint' => $this->l('In occupancy wise search at back-office, you want to display only room types which are fully satisfing searched occupancy or you want to display all the available room types for the dates searched.'),
+                        'hint' => $this->l('In occupancy wise search at back-office, you want to display only room types which are fully satisfying searched occupancy or you want to display all the available room types for the dates searched.'),
                         'cast' => 'intval',
                         'type' => 'select',
                         'list' => array(
-                            array('id' => HotelBookingDetail::SEARCH_EXACT_ROOM_TYPE_ALGO, 'name' => $this->l('Show room types satisfing required occupancy')),
+                            array('id' => HotelBookingDetail::SEARCH_EXACT_ROOM_TYPE_ALGO, 'name' => $this->l('Show room types satisfying required occupancy')),
                             array('id' => HotelBookingDetail::SEARCH_ALL_ROOM_TYPE_ALGO, 'name' => $this->l('Show all available room types'))
                         ),
                         'identifier' => 'id',

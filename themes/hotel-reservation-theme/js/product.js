@@ -1285,7 +1285,7 @@ function getBookingOccupancy()
                         }
                     }
                     occupancy.push({
-                        'adult': $(element).find('.num_adults').val(),
+                        'adults': $(element).find('.num_adults').val(),
                         'children': $(element).find('.num_children').val(),
                         'child_ages': child_ages
                     });

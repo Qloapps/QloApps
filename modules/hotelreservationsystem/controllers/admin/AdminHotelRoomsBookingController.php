@@ -278,7 +278,7 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
     {
         $objHotelBookingDetail = new HotelBookingDetail();
 
-        $adult = 0;
+        $adults = 0;
         $children = 0;
         $num_rooms = 1;
         $booking_data = $this->getAllBookingDataInfo(
@@ -295,7 +295,7 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
         $allotmentTypes = HotelBookingDetail::getAllAllotmentTypes();
 
         $this->context->smarty->assign(array(
-            'adult' => $adult,
+            'adults' => $adults,
             'children' => $children,
             'num_rooms' => $num_rooms,
             'booking_data' => $booking_data,
@@ -311,9 +311,9 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
 
         if (Configuration::get('PS_BACKOFFICE_SEARCH_TYPE') == HotelBookingDetail::SEARCH_TYPE_OWS ) {
             $this->context->smarty->assign(array(
-                'occupancy_adults' => array_sum(array_column($occupancy, 'adult')),
-                'occupancy_children' => array_sum(array_column($occupancy, 'children')),
-                'occupancy_child_ages' => array_sum(array_column($occupancy, 'child_ages')),
+                'occupancy_adults' => array_sum(array_column($this->occupancy, 'adults')),
+                'occupancy_children' => array_sum(array_column($this->occupancy, 'children')),
+                'occupancy_child_ages' => array_sum(array_column($this->occupancy, 'child_ages')),
                 'occupancy_wise_search' => true,
             ));
         } else {
@@ -379,8 +379,8 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
         $searchDateFrom = Tools::getValue('search_date_from');
         $searchDateTo = Tools::getValue('search_date_to');
 
-        // No use of adult, child, num_rooms
-        $adult = 0;
+        // No use of adults, child, num_rooms
+        $adults = 0;
         $children = 0;
         $num_rooms = 1;
 
@@ -389,7 +389,7 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
         $bookingParams['date_to'] = $searchDateTo;
         $bookingParams['hotel_id'] = $searchIdHotel;
         $bookingParams['room_type'] = $searchIdRoomType;
-        $bookingParams['adult'] = $adult;
+        $bookingParams['adults'] = $adults;
         $bookingParams['children'] = $children;
         $bookingParams['num_rooms'] = $num_rooms;
         $bookingParams['for_calendar'] = 1;
@@ -416,8 +416,8 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
     public function ajaxProcessGetCalenderData()
     {
         $events = array();
-        // No use of adult, child, num_rooms
-        $adult = 0;
+        // No use of adults, child, num_rooms
+        $adults = 0;
         $children = 0;
         $num_rooms = 1;
 
@@ -431,7 +431,7 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
         $bookingParams = array();
         $bookingParams['hotel_id'] = $searchIdHotel;
         $bookingParams['room_type'] = $searchIdRoomType;
-        $bookingParams['adult'] = $adult;
+        $bookingParams['adults'] = $adults;
         $bookingParams['children'] = $children;
         $bookingParams['num_rooms'] = $num_rooms;
         $bookingParams['for_calendar'] = 1;
@@ -577,11 +577,11 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
             $obj_cart_book_data->date_to = $date_to;
             if (Configuration::get('PS_BACKOFFICE_OCCUPANCY_REQUIRED_FOR_BOOKING')) {
                 $room_occupancy = array_shift($occupancy);
-                $obj_cart_book_data->adult = $room_occupancy['adult'];
+                $obj_cart_book_data->adults = $room_occupancy['adults'];
                 $obj_cart_book_data->children = $room_occupancy['children'];
                 $obj_cart_book_data->child_ages = $room_occupancy['children'] ? json_encode($room_occupancy['child_ages']) : json_encode(array());
             } else {
-                $obj_cart_book_data->adult = $roomTypeInfo['adult'];
+                $obj_cart_book_data->adults = $roomTypeInfo['adults'];
                 $obj_cart_book_data->children = $roomTypeInfo['children'];
                 $obj_cart_book_data->child_ages = json_encode(array());
             }
@@ -687,10 +687,9 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
             'currency_blank' => $currency->blank,
             'ALLOTMENT_AUTO' => HotelBookingDetail::ALLOTMENT_AUTO,
             'ALLOTMENT_MANUAL' => HotelBookingDetail::ALLOTMENT_MANUAL,
-            'max_child_age' => $max_child_age,
-            'max_child_in_room' => $max_child_in_room,
-            'occupancy_wise_search' => $occupancy_wise_search,
-            'occupancy_required_for_booking' => $occupancy_required_for_booking,
+            'max_child_age' => Configuration::get('WK_GLOBAL_CHILD_MAX_AGE'),
+            'max_child_in_room' => Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM'),
+            'occupancy_required_for_booking' => Configuration::get('PS_BACKOFFICE_OCCUPANCY_REQUIRED_FOR_BOOKING'),
             'rooms_booking_url' => $this->context->link->getAdminLink('AdminHotelRoomsBooking'),
             'opt_select_all' => $this->l('All Types'),
             'slt_another_htl' => $this->l('Select Another Hotel'),
@@ -711,16 +710,21 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
             'room_txt' => 'Room',
             'rooms_txt' => 'Rooms',
             'remove_txt' => 'Remove',
-            'adult_txt' => 'Adult',
+            'adult_txt' => 'Adults',
             'adults_txt' => 'Adults',
             'child_txt' => 'Child',
             'children_txt' => 'Children',
             'below_txt' => 'Below',
             'years_txt' => 'years',
-            'all_children_txt' => 'years',
+            'all_children_txt' => 'All Children',
             'invalid_occupancy_txt' => 'Invalid occupancy(adults/children) found.',
             // 'check_calender_var' => $check_calender_var,
         );
+        if (Configuration::get('PS_BACKOFFICE_SEARCH_TYPE') == HotelBookingDetail::SEARCH_TYPE_OWS ) {
+            $jsVars['occupancy_wise_search'] = true;
+        } else {
+            $jsVars['occupancy_wise_search'] = false;
+        }
         MediaCore::addJsDef($jsVars);
 
         // add fullcalender plugin

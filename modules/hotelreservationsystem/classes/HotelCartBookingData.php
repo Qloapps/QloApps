@@ -36,7 +36,7 @@ class HotelCartBookingData extends ObjectModel
     public $is_back_order;
     public $date_from;
     public $date_to;
-    public $adult;
+    public $adults;
     public $children;
     public $child_ages;
     public $extra_demands;
@@ -62,7 +62,7 @@ class HotelCartBookingData extends ObjectModel
             'is_back_order' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
             'date_from' => array('type' => self::TYPE_DATE, 'validate' => 'isDate'),
             'date_to' => array('type' => self::TYPE_DATE, 'validate' => 'isDate'),
-            'adult' => array('type' => self::TYPE_INT, 'validate' => 'isInt'),
+            'adults' => array('type' => self::TYPE_INT, 'validate' => 'isInt'),
             'children' => array('type' => self::TYPE_INT, 'validate' => 'isInt'),
             'child_ages' => array('type' => self::TYPE_STRING),
             'extra_demands' => array('type' => self::TYPE_STRING),
@@ -474,11 +474,11 @@ class HotelCartBookingData extends ObjectModel
                     $obj_htl_cart_booking_data->date_to = $date_to;
                     if (Configuration::get('PS_FRONT_OCCUPANCY_REQUIRED_FOR_BOOKING')) {
                         $room_occupancy = array_shift($occupancy);
-                        $obj_htl_cart_booking_data->adult = $room_occupancy['adult'];
+                        $obj_htl_cart_booking_data->adults = $room_occupancy['adults'];
                         $obj_htl_cart_booking_data->children = $room_occupancy['children'];
                         $obj_htl_cart_booking_data->child_ages = $room_occupancy['children'] ? json_encode($room_occupancy['child_ages']) : json_encode(array());
                     } else {
-                        $obj_htl_cart_booking_data->adult = $roomTypeInfo['adult'];
+                        $obj_htl_cart_booking_data->adults = $roomTypeInfo['adults'];
                         $obj_htl_cart_booking_data->children = $roomTypeInfo['children'];
                         $obj_htl_cart_booking_data->child_ages = json_encode(array());
                     }
@@ -1048,7 +1048,7 @@ class HotelCartBookingData extends ObjectModel
                         );
 
                         $unitPriceWithoutReduction = $objProduct->getPriceWithoutReduct(!$price_tax);
-                        $cartHotelData[$prodKey]['adult'] = $roomDetail['adult'];
+                        $cartHotelData[$prodKey]['adults'] = $roomDetail['adults'];
                         $cartHotelData[$prodKey]['children'] = $roomDetail['children'];
                         $cartHotelData[$prodKey]['total_num_rooms'] = 0;
                         $cartHotelData[$prodKey]['id_product'] = $product['id_product'];
@@ -1141,7 +1141,7 @@ class HotelCartBookingData extends ObjectModel
                                     $cartHotelData[$prodKey]['date_diff'][$dateJoin]['demand_price'] += $demandPrice;
                                     $cartHotelData[$prodKey]['date_diff'][$dateJoin]['num_rm'] += 1;
                                     $cartHotelData[$prodKey]['date_diff'][$dateJoin]['num_days'] = $numDays;
-                                    $cartHotelData[$prodKey]['date_diff'][$dateJoin]['adult'] += $data_v['adult'];
+                                    $cartHotelData[$prodKey]['date_diff'][$dateJoin]['adults'] += $data_v['adults'];
                                     $cartHotelData[$prodKey]['date_diff'][$dateJoin]['children'] += $data_v['children'];
                                     if (is_array($data_v['child_ages'])) {
                                         $cartHotelData[$prodKey]['date_diff'][$dateJoin]['child_ages'] = array_merge($cartHotelData[$prodKey]['date_diff'][$dateJoin]['child_ages'], json_decode($data_v['child_ages']));
@@ -1171,7 +1171,7 @@ class HotelCartBookingData extends ObjectModel
                                         strtotime($data_v['date_to'])
                                     );
                                     $cartHotelData[$prodKey]['date_diff'][$dateJoin]['num_days'] = $numDays;
-                                    $cartHotelData[$prodKey]['date_diff'][$dateJoin]['adult'] = $data_v['adult'];
+                                    $cartHotelData[$prodKey]['date_diff'][$dateJoin]['adults'] = $data_v['adults'];
                                     $cartHotelData[$prodKey]['date_diff'][$dateJoin]['children'] = $data_v['children'];
                                     $cartHotelData[$prodKey]['date_diff'][$dateJoin]['child_ages'] = json_decode($data_v['child_ages']);
 

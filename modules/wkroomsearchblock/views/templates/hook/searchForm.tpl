@@ -77,9 +77,9 @@
                                         <div class="form-group occupancy_count_block">
                                             <label>{l s='Adults' mod='wkroomsearchblock'}</label>
                                             <div>
-                                                <input type="hidden" class="num_occupancy num_adults room_occupancies" name="occupancy[{$key|escape:'htmlall':'UTF-8'}][adult]" value="{$occupancy['adult']|escape:'htmlall':'UTF-8'}">
+                                                <input type="hidden" class="num_occupancy num_adults room_occupancies" name="occupancy[{$key|escape:'htmlall':'UTF-8'}][adults]" value="{$occupancy['adults']|escape:'htmlall':'UTF-8'}">
                                                 <div class="occupancy_count pull-left">
-                                                    <span>{$occupancy['adult']|escape:'htmlall':'UTF-8'}</span>
+                                                    <span>{$occupancy['adults']|escape:'htmlall':'UTF-8'}</span>
                                                 </div>
                                                 <div class="qty_direction pull-left">
                                                     <a href="#" data-field-qty="qty" class="btn btn-default occupancy_quantity_up">
@@ -138,7 +138,7 @@
                                     <div class="form-group occupancy_count_block">
                                         <label>{l s='Adults' mod='wkroomsearchblock'}</label>
                                         <div>
-                                            <input type="hidden" class="num_occupancy num_adults room_occupancies" name="occupancy[0][adult]" value="1">
+                                            <input type="hidden" class="num_occupancy num_adults room_occupancies" name="occupancy[0][adults]" value="1">
                                             <div class="occupancy_count pull-left">
                                                 <span>1</span>
                                             </div>

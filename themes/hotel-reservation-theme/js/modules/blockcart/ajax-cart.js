@@ -148,10 +148,10 @@ var ajaxCart = {
         });
         //for product page 'add' button...
         if ($('.cart_block').length) {
-            $(document).off('click', '#add_to_cartadd_to_cart button').on('click', '#add_to_cart button', function(e) {
+            $(document).off('click', '#add_to_cart  button').on('click', '#add_to_cart button', function(e) {
                 e.preventDefault();
-                var date_from = $.datepicker.formatDate('yy-mm-dd', $.datepicker.parseDate('yy-mm-dd', $('#room_check_in').val()));
-                var date_to = $.datepicker.formatDate('yy-mm-dd', $.datepicker.parseDate('yy-mm-dd', $('#room_check_out').val()));
+                var date_from = $('#room_check_in').val();
+                var date_to = $('#room_check_out').val();
                 var occupancy = getBookingOccupancyDetails($(this).closest('.booking_room_fields'));
                 if (occupancy) {
                     ajaxCart.add($('#product_page_product_id').val(), $('#idCombination').val(), true, null, occupancy, null, date_from, date_to);
@@ -216,8 +216,8 @@ var ajaxCart = {
 
             /*by webkul*/
             if (pagename == 'product') {
-                dateFrom = $.datepicker.formatDate('yy-mm-dd', $.datepicker.parseDate('yy-mm-dd', $('#room_check_in').val()));
-                dateTo = $.datepicker.formatDate('yy-mm-dd', $.datepicker.parseDate('yy-mm-dd', $('#room_check_out').val()));
+                dateFrom = $('#room_check_in').val();
+                dateTo = $('#room_check_out').val();
             } else if (pagename == 'category') {
                 dateFrom = $('#check_in_time').val();
                 dateTo = $('#check_out_time').val();
@@ -504,8 +504,8 @@ var ajaxCart = {
                 /*by webkul checking and setting availability of rooms*/
                 /*for product page add to cart quantity management*/
                 if (pagename == 'product') {
-                    var date_checkIn = $.datepicker.formatDate('yy-mm-dd', $.datepicker.parseDate('yy-mm-dd', $('#room_check_in').val()));
-                    var date_checkOut = $.datepicker.formatDate('yy-mm-dd', $.datepicker.parseDate('yy-mm-dd', $('#room_check_out').val()));
+                    var date_checkIn = $('#room_check_in').val();
+                    var date_checkOut = $('#room_check_out').val();
                     var product_page_id_product = $('#product_page_product_id').val();
                     if (idProduct == product_page_id_product && dateFrom < date_checkOut && dateTo >= date_checkIn) {
                         $(".max_avail_type_qty").val(jsonData.avail_rooms);
@@ -824,7 +824,7 @@ var ajaxCart = {
 
                     content += '<div class="room-capacity cart-info-sec">';
                     content += '<span class="product_info_label">' + capacity_txt + ':</span>';
-                    content += '<span class="product_info_data">&nbsp;' + cart_booking_data[key].adult + '&nbsp;' + adults_txt + '&nbsp;&&nbsp;' + cart_booking_data[key].children + '&nbsp;' + children_txt + '</span>'
+                    content += '<span class="product_info_data">&nbsp;' + cart_booking_data[key].adults + '&nbsp;' + adults_txt + '&nbsp;&&nbsp;' + cart_booking_data[key].children + '&nbsp;' + children_txt + '</span>'
                     content += '</div>';
 
                     if (this.hasAttributes)
@@ -1022,15 +1022,15 @@ var ajaxCart = {
         );
 
         let rooms = 0;
-        let adult = 0;
+        let adults = 0;
         let children = 0;
         $.each(product.occupancy, function(index, val) {
             rooms++;
-            adult += parseInt(val.adult);
+            adults += parseInt(val.adults);
             children += parseInt(val.children);
 
         });
-        $('#layer_cart_product_quantity').text(getRoomTypeGuestOccupancyFormated(adult, children, rooms));
+        $('#layer_cart_product_quantity').text(getRoomTypeGuestOccupancyFormated(adults, children, rooms));
 
         $('.layer_cart_img').html('<img class="layer_cart_img img-responsive" src="' + product.image + '" alt="' + product.name + '" title="' + product.name + '" />');
 
@@ -1224,7 +1224,7 @@ function getBookingOccupancyDetails(bookingform)
                         }
                     }
                     occupancy.push({
-                        'adult': $(element).find('.num_adults').val(),
+                        'adults': $(element).find('.num_adults').val(),
                         'children': $(element).find('.num_children').val(),
                         'child_ages': child_ages
                     });

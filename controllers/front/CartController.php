@@ -184,8 +184,8 @@ class CartControllerCore extends FrontController
                         'id_room_type' => $id_product,
                         'only_search_data' => 1,
                     );
-                    if ($hotel_room_data = $objBookingDetail->dataForFrontSearch($bookingParams)) {
-                        $total_available_rooms = $hotel_room_data['stats']['num_avail'];
+                    if ($hotelRoomData = $objBookingDetail->dataForFrontSearch($bookingParams)) {
+                        $total_available_rooms = $hotelRoomData['stats']['num_avail'];
                     }
                 }
             }
@@ -269,14 +269,16 @@ class CartControllerCore extends FrontController
         $date_from = date("Y-m-d", strtotime($date_from));
         $date_to = date("Y-m-d", strtotime($date_to));
 
-        if ($occupancy = json_decode(Tools::getValue('occupancy'), true)) {
-            if (Configuration::get('PS_FRONT_OCCUPANCY_REQUIRED_FOR_BOOKING')) {
+        if (Configuration::get('PS_FRONT_OCCUPANCY_REQUIRED_FOR_BOOKING')) {
+            if ($occupancy = json_decode(Tools::getValue('occupancy'), true)) {
                 $this->qty = count($occupancy);
             } else {
-                $this->qty = $occupancy;
-
+                $this->errors[] = Tools::displayError('Invalid occupnacy.');
             }
+        } else {
+            $this->qty = Tools::getValue('occupancy');
         }
+
         $id_cart = $this->context->cart->id;
         $id_guest = $this->context->cart->id_guest;
 
@@ -294,8 +296,8 @@ class CartControllerCore extends FrontController
 
         // valdiate occupancy if providede
         if (Configuration::get('PS_FRONT_OCCUPANCY_REQUIRED_FOR_BOOKING')) {
-            foreach($occupancy as $key =>$roomOccupancy) {
-                if (!isset($roomOccupancy['adult']) || !$roomOccupancy['adult'] || !Validate::isUnsignedInt($roomOccupancy['adult'])) {
+            foreach($occupancy as $key => $roomOccupancy) {
+                if (!isset($roomOccupancy['adults']) || !$roomOccupancy['adults'] || !Validate::isUnsignedInt($roomOccupancy['adults'])) {
                     $this->errors[] = sprintf(Tools::displayError('Invalid number of adults for Room %s.'), ($key + 1));
                 }
                 if (isset($roomOccupancy['children'])) {
@@ -338,14 +340,14 @@ class CartControllerCore extends FrontController
                         }
                     }
                     if (Configuration::get('PS_FRONT_OCCUPANCY_REQUIRED_FOR_BOOKING')) {
-                        foreach($occupancy as $key =>$roomOccupancy) {
-                            if ($roomOccupancy['adult'] > $roomTypeInfo['max_adults']) {
+                        foreach($occupancy as $key => $roomOccupancy) {
+                            if ($roomOccupancy['adults'] > $roomTypeInfo['max_adults']) {
                                 $this->errors[] = sprintf(Tools::displayError('Room %s cannot have adults more than %s'), $key + 1, $roomTypeInfo['max_adults']);
                             }
                             if ($roomOccupancy['children'] > $roomTypeInfo['max_children']) {
                                 $this->errors[] = sprintf(Tools::displayError('Room %s cannot have children more than %s'), $key + 1, $roomTypeInfo['max_children']);
                             }
-                            if ($roomOccupancy['adult'] + $roomOccupancy['children'] > $roomTypeInfo['max_guests']) {
+                            if ($roomOccupancy['adults'] + $roomOccupancy['children'] > $roomTypeInfo['max_guests']) {
                                 $this->errors[] = sprintf(Tools::displayError('Room %s cannot have total guests more than %s'), $key + 1, $roomTypeInfo['max_guests']);
                             }
                         }
@@ -365,9 +367,9 @@ class CartControllerCore extends FrontController
                             'id_cart' => $id_cart,
                             'id_guest' => $id_guest,
                         );
-                        if ($hotel_room_data = $objBookingDetail->dataForFrontSearch($bookingParams)) {
-                            if (isset($hotel_room_data['stats']['num_avail'])) {
-                                $total_available_rooms = $hotel_room_data['stats']['num_avail'];
+                        if ($hotelRoomData = $objBookingDetail->dataForFrontSearch($bookingParams)) {
+                            if (isset($hotelRoomData['stats']['num_avail'])) {
+                                $total_available_rooms = $hotelRoomData['stats']['num_avail'];
                                 if (Tools::getValue('op', 'up') == 'up') {
                                     if ($total_available_rooms < $req_rm) {
                                         die(json_encode(array('status' => 'unavailable_quantity', 'avail_rooms' => $total_available_rooms)));

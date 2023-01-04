@@ -288,7 +288,7 @@ $(document).ready(function() {
                             }
                         }
                         occupancy.push({
-                            'adult': $(element).find('.num_adults').val(),
+                            'adults': $(element).find('.num_adults').val(),
                             'children': $(element).find('.num_children').val(),
                             'child_ages': child_ages
                         });
@@ -639,19 +639,19 @@ $(document).ready(function() {
             if (!($(e.target).closest(".booking_occupancy_wrapper").length || $(e.target).closest(".booking_guest_occupancy").length || $(e.target).closest(".avai_add_cart").length || $(e.target).closest(".par_add_cart").length)) {
                 let hasErrors = 0;
 
-                let adult = $(occupancy_wrapper).find(".num_adults").map(function(){return $(this).val();}).get();
+                let adults = $(occupancy_wrapper).find(".num_adults").map(function(){return $(this).val();}).get();
                 let children = $(occupancy_wrapper).find(".num_children").map(function(){return $(this).val();}).get();
                 let child_ages = $(occupancy_wrapper).find(".guest_child_age").map(function(){return $(this).val();}).get();
 
                 // start validating above values
-                if (!adult.length || (adult.length != children.length)) {
+                if (!adults.length || (adults.length != children.length)) {
                     hasErrors = 1;
                     showErrorMessage(invalid_occupancy_txt);
                 } else {
                     $(occupancy_wrapper).find('.occupancy_count').removeClass('error_border');
 
-                    // validate values of adult and children
-                    adult.forEach(function (item, index) {
+                    // validate values of adults and children
+                    adults.forEach(function (item, index) {
                         if (isNaN(item) || parseInt(item) < 1) {
                             hasErrors = 1;
                             $(occupancy_wrapper).find(".num_adults").eq(index).closest('.occupancy_count_block').find('.occupancy_count').addClass('error_border');
@@ -701,7 +701,7 @@ $(document).ready(function() {
                 occupancy_block += '<div class="row">';
                     occupancy_block += '<div class="form-group col-xs-6 occupancy_count_block">';
                         occupancy_block += '<label>' + adults_txt + '</label>';
-                        occupancy_block += '<input type="number" class="form-control num_occupancy num_adults" name="occupancy['+roomBlockIndex+'][adult]" value="1" min="1">';
+                        occupancy_block += '<input type="number" class="form-control num_occupancy num_adults" name="occupancy['+roomBlockIndex+'][adults]" value="1" min="1">';
                     occupancy_block += '</div>';
                     occupancy_block += '<div class="form-group col-xs-6 occupancy_count_block">';
                         occupancy_block += '<label>' + child_txt + '<span class="label-desc-txt"></span></label>';

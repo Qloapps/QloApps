@@ -136,7 +136,7 @@
 							<div class="col-sm-6 col-xs-6">
 								<p class="room_duration_block_head">{l s='OCCUPANCY'}</p>
 								<p class="room_duration_block_value">
-									{if {$rm_v['adult']} <= 9}0{$rm_v['adult']}{else}{$rm_v['adult']}{/if} {if $rm_v['adult'] > 1}{l s='Adults'}{else}{l s='Adult'}{/if}{if $rm_v['children']}, {if $rm_v['children'] <= 9}0{$rm_v['children']}{else}{$rm_v['children']}{/if} {if $rm_v['children'] > 1}{l s='Children'}{else}{l s='Child'}{/if}{/if}, {if {$rm_v['num_rm']} <= 9}0{/if}{$rm_v['num_rm']}{if $rm_v['num_rm'] > 1} {l s='Rooms'}{else} {l s='Room'}{/if}
+									{if {$rm_v['adults']} <= 9}0{$rm_v['adults']}{else}{$rm_v['adults']}{/if} {if $rm_v['adults'] > 1}{l s='Adults'}{else}{l s='Adult'}{/if}{if $rm_v['children']}, {if $rm_v['children'] <= 9}0{$rm_v['children']}{else}{$rm_v['children']}{/if} {if $rm_v['children'] > 1}{l s='Children'}{else}{l s='Child'}{/if}{/if}, {if {$rm_v['num_rm']} <= 9}0{/if}{$rm_v['num_rm']}{if $rm_v['num_rm'] > 1} {l s='Rooms'}{else} {l s='Room'}{/if}
 								</p>
 							</div>
 						</div>

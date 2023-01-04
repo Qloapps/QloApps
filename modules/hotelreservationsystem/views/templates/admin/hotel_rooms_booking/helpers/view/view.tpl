@@ -52,36 +52,36 @@
 								<div class="col-sm-8">
 									<div class="dropdown">
 										<button class="booking_guest_occupancy btn btn-default btn-left btn-block input-occupancy" type="button">
-											<span class="">{if (isset($occupancy_adults) && $occupancy_adults)}{$occupancy_adults} {if $occupancy_adults > 1}{l s='Adults'}{else}{l s='Adult'}{/if}, {if isset($occupancy_children) && $occupancy_children}{$occupancy_children} {if $occupancy_children > 1} {l s='Children'}{else}{l s='Child'}{/if}, {/if}{$occupancies|count} {if $occupancies|count > 1}{l s='Rooms'}{else}{l s='Room'}{/if}{else}{l s='1 Adult, 1 Room'}{/if}</span>
+											<span class="">{if (isset($occupancy_adults) && $occupancy_adults)}{$occupancy_adults} {if $occupancy_adults > 1}{l s='Adults'}{else}{l s='Adult'}{/if}, {if isset($occupancy_children) && $occupancy_children}{$occupancy_children} {if $occupancy_children > 1} {l s='Children'}{else}{l s='Child'}{/if}, {/if}{$occupancy|count} {if $occupancy|count > 1}{l s='Rooms'}{else}{l s='Room'}{/if}{else}{l s='1 Adult, 1 Room'}{/if}</span>
 										</button>
 										<input type="hidden" class="max_avail_type_qty" value="{if isset($total_available_rooms)}	{$total_available_rooms|escape:'html':'UTF-8'}{/if}">
 										<div class="dropdown-menu booking_occupancy_wrapper well well-sm">
 											<div class="booking_occupancy_inner row">
-												{if isset($occupancies) && $occupancies}
+												{if isset($occupancy) && $occupancy}
 													{assign var=countRoom value=1}
 													<hr class="occupancy-info-separator col-sm-12">
-													{foreach from=$occupancies key=key item=$occupancy name=occupancyInfo}
+													{foreach from=$occupancy key=key item=$room_occupancy name=occupancyInfo}
 														<div class="occupancy_info_block" occ_block_index="{$key|escape:'htmlall':'UTF-8'}">
 															<div class="occupancy_info_head col-sm-12"><label class="room_num_wrapper">{l s='Room'} - {$countRoom|escape:'htmlall':'UTF-8'} </label>{if !$smarty.foreach.occupancyInfo.first}<a class="remove-room-link pull-right" href="#">{l s='Remove'}</a>{/if}</div>
 															<div class="col-sm-12">
 																<div class="row">
 																	<div class="form-group col-xs-6 occupancy_count_block">
 																		<label>{l s='Adults'}</label>
-																		<input type="number" class="form-control num_occupancy num_adults" name="occupancy[{$key|escape:'htmlall':'UTF-8'}][adult]" value="{$occupancy['adult']|escape:'htmlall':'UTF-8'}" min="1">
+																		<input type="number" class="form-control num_occupancy num_adults" name="occupancy[{$key|escape:'htmlall':'UTF-8'}][adults]" value="{$room_occupancy['adults']|escape:'htmlall':'UTF-8'}" min="1">
 																	</div>
 																	<div class="form-group col-xs-6 occupancy_count_block">
 																		<label>{l s='Child'} <span class="label-desc-txt"></span></label>
-																		<input type="number" class="form-control num_occupancy num_children" name="occupancy[{$key|escape:'htmlall':'UTF-8'}][children]" value="{$occupancy['children']|escape:'htmlall':'UTF-8'}" min="0" {if $max_child_in_room}max="{$max_child_in_room}"{/if}>
+																		<input type="number" class="form-control num_occupancy num_children" name="occupancy[{$key|escape:'htmlall':'UTF-8'}][children]" value="{$room_occupancy['children']|escape:'htmlall':'UTF-8'}" min="0" {if $max_child_in_room}max="{$max_child_in_room}"{/if}>
 																		({l s='Below'}  {$max_child_age|escape:'htmlall':'UTF-8'} {l s='years'})
 																	</div>
 																</div>
-																<div class="row children_age_info_block" {if !$occupancy['children']}style="display:none"{/if}>
+																<div class="row children_age_info_block" {if !$room_occupancy['children']}style="display:none"{/if}>
 																	<div class="form-group col-sm-12">
 																		<label class="">{l s='All Children'}</label>
 																		<div class="">
 																			<div class="row children_ages">
-																				{if isset($occupancy['child_ages']) && $occupancy['child_ages']}
-																					{foreach $occupancy['child_ages'] as $childAge}
+																				{if isset($room_occupancy['child_ages']) && $room_occupancy['child_ages']}
+																					{foreach $room_occupancy['child_ages'] as $childAge}
 																						<div class="form-group col-xs-12 col-sm-12 col-md-6 col-lg-6">
 																							<select class="guest_child_age room_occupancies" name="occupancy[{$key|escape:'htmlall':'UTF-8'}][child_ages][]">
 																								<option value="-1" {if $childAge == -1}selected{/if}>{l s='Select age'}</option>
@@ -109,7 +109,7 @@
 															<div class="row">
 																<div class="form-group col-xs-6 occupancy_count_block">
 																	<label>{l s='Adults'}</label>
-																	<input type="number" class="form-control num_occupancy num_adults" name="occupancy[0][adult]" value="1" min="1">
+																	<input type="number" class="form-control num_occupancy num_adults" name="occupancy[0][adults]" value="1" min="1">
 																</div>
 																<div class="form-group col-xs-6 occupancy_count_block">
 																	<label>{l s='Child'} <span class="label-desc-txt"></span></label>

@@ -398,7 +398,7 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
                             );
 
                             $cart_htl_data[$type_key]['date_diff'][$date_join]['num_rm'] += 1;
-                            $cart_htl_data[$type_key]['date_diff'][$date_join]['adult'] += $data_v['adult'];
+                            $cart_htl_data[$type_key]['date_diff'][$date_join]['adults'] += $data_v['adults'];
                             $cart_htl_data[$type_key]['date_diff'][$date_join]['children'] += $data_v['children'];
 
                             $num_days = $cart_htl_data[$type_key]['date_diff'][$date_join]['num_days'];
@@ -446,7 +446,7 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
                             $cart_htl_data[$type_key]['date_diff'][$date_join]['data_form'] = Tools::displayDate($data_v['date_from']);
                             $cart_htl_data[$type_key]['date_diff'][$date_join]['data_to'] = Tools::displayDate($data_v['date_to']);
                             $cart_htl_data[$type_key]['date_diff'][$date_join]['num_days'] = $num_days;
-                            $cart_htl_data[$type_key]['date_diff'][$date_join]['adult'] = $data_v['adult'];
+                            $cart_htl_data[$type_key]['date_diff'][$date_join]['adults'] = $data_v['adults'];
                             $cart_htl_data[$type_key]['date_diff'][$date_join]['children'] = $data_v['children'];
 
 

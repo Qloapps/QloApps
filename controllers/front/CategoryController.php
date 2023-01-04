@@ -57,6 +57,9 @@ class CategoryControllerCore extends FrontController
             ));
         }
 
+        $this->addCSS(_THEME_CSS_DIR_.'occupancy.css');
+        $this->addJS(_THEME_JS_DIR_.'occupancy.js');
+
         $scenes = Scene::getScenes($this->category->id, $this->context->language->id, true, false);
         if ($scenes && count($scenes)) {
             $this->addJS(_THEME_JS_DIR_.'scenes.js');
@@ -241,24 +244,23 @@ class CategoryControllerCore extends FrontController
         $htl_id_category = Tools::getValue('id_category');
 
         // occupancy of the search
-        // @todo send occupancy in the search function
         $occupancy = Tools::getValue('occupancy');
 
         $sort_by = Tools::getValue('sort_by');
         $sort_value = Tools::getValue('sort_value');
         $filter_data = Tools::getValue('filter_data');
 
-        $adult = 0;
-        $child = 0;
+        $adults = 0;
+        $children = 0;
         $amenities = 0;
         $price = 0;
 
         if (!empty($filter_data)) {
             foreach ($filter_data as $key => $value) {
-                if ($key == 'adult') {
-                    $adult = min($value);
+                if ($key == 'adults') {
+                    $adults = min($value);
                 } elseif ($key == 'children') {
-                    $child = min($value);
+                    $children = min($value);
                 } elseif ($key == 'amenities') {
                     $amenities = array();
                     foreach ($value as $a_k => $a_v) {
@@ -283,8 +285,7 @@ class CategoryControllerCore extends FrontController
                 'date_from' => $date_from,
                 'date_to' => $date_to,
                 'hotel_id' => $id_hotel,
-                'adult' => $adult,
-                'children' => $child,
+                'occupancy' => $occupancy,
                 'amenities' => $amenities,
                 'price' => $price,
                 'get_total_rooms' => 0,

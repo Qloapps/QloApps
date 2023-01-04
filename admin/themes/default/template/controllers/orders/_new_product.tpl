@@ -89,7 +89,7 @@
 			<div class="booking_occupancy">
 				<div class="dropdown">
 					<button class="booking_guest_occupancy btn btn-default btn-left btn-block input-occupancy disabled" type="button">
-						<span class="pull-left">{l s='Select occupancy'}</span>
+						<span>{l s='Select occupancy'}</span>
 					</button>
 					<input type="hidden" class="max_avail_type_qty" value="">
 					<div class="dropdown-menu booking_occupancy_wrapper fixed-width-xxl well well-sm">
@@ -100,7 +100,7 @@
 									<div class="row">
 										<div class="form-group col-xs-6 occupancy_count_block">
 											<label>{l s='Adults'}</label>
-											<input type="number" class="form-control num_occupancy num_adults" name="occupancy[0][adult]" value="1" min="1">
+											<input type="number" class="form-control num_occupancy num_adults" name="occupancy[0][adults]" value="1" min="1">
 										</div>
 										<div class="form-group col-xs-6 occupancy_count_block">
 											<label>{l s='Child'} <span class="label-desc-txt"></span></label>
@@ -134,38 +134,6 @@
 		{/if}
 
 	</td>
-	{* <td style="display:none;" id="add_product_occupancy" class="text-center">
-		<div class="row">
-			<div class="form-group">
-				<div class="fixed-width-xl adult_occupancy_div">
-					<div class="input-group">
-						<div class="input-group-addon">{l s='Adults'}</div>
-						<input type="number" class="form-control add_product_adults" name="add_product[adult]" value="1" min="1"/>
-					</div>
-				</div>
-				<br/>
-				<div class="fixed-width-xl children_occupancy_div">
-					<div class="input-group">
-						<div class="input-group-addon">{l s='Children'}</div>
-						<input type="number" class="form-control add_product_children" name="add_product[children]" value="1" min="0"/>
-					</div>
-				</div>
-				<br/>
-				<div class="fixed-width-xl children_age_div">
-					<label>{l s='Child age'}</label>
-					<div class="child_age">
-						<select class="guest_child_age room_occupancies" name="add_product[child_ages][]">
-							<option value="-1" selected>{l s='Select age' mod='wkroomsearchblock'}</option>
-							<option value="0" >{l s='Under 1' mod='wkroomsearchblock'}</option>
-							{for $age=1 to ($max_child_age-1)}
-								<option value="{$age|escape:'htmlall':'UTF-8'}">{$age|escape:'htmlall':'UTF-8'}</option>
-							{/for}
-						</select>
-					</div>
-				</div>
-			</div>
-		</div>
-	</td> *}
 	{*{if ($order->hasBeenPaid())}<td style="display:none;" class="productQuantity"></td>{/if}
 	{if $display_warehouse}<td></td>{/if}
 	{if ($order->hasBeenDelivered())}<td style="display:none;" class="productQuantity"></td>{/if}

@@ -754,7 +754,7 @@ abstract class PaymentModuleCore extends Module
                                 $objBookingDetail->date_to = $objCartBookingData->date_to;
                                 $objBookingDetail->total_price_tax_excl = Tools::ps_round($total_price['total_price_tax_excl'], 6);
                                 $objBookingDetail->total_price_tax_incl = Tools::ps_round($total_price['total_price_tax_incl'], 6);
-                                $objBookingDetail->adult = $objCartBookingData->adult;
+                                $objBookingDetail->adults = $objCartBookingData->adults;
                                 $objBookingDetail->children = $objCartBookingData->children;
                                 $objBookingDetail->child_ages = $objCartBookingData->child_ages;
 
@@ -1384,7 +1384,7 @@ abstract class PaymentModuleCore extends Module
 
                             $num_days = $cart_htl_data[$type_key]['date_diff'][$date_join]['num_days'];
 
-                            $cart_htl_data[$type_key]['date_diff'][$date_join]['adult'] += $data_v['adult'];
+                            $cart_htl_data[$type_key]['date_diff'][$date_join]['adults'] += $data_v['adults'];
                             $cart_htl_data[$type_key]['date_diff'][$date_join]['children'] += $data_v['children'];
 
                             $cart_htl_data[$type_key]['date_diff'][$date_join]['paid_unit_price_tax_incl'] = $data_v['total_price_tax_incl']/$num_days;
@@ -1426,7 +1426,7 @@ abstract class PaymentModuleCore extends Module
                             $cart_htl_data[$type_key]['date_diff'][$date_join]['data_form'] = $data_v['date_from'];
                             $cart_htl_data[$type_key]['date_diff'][$date_join]['data_to'] = $data_v['date_to'];
                             $cart_htl_data[$type_key]['date_diff'][$date_join]['num_days'] = $num_days;
-                            $cart_htl_data[$type_key]['date_diff'][$date_join]['adult'] = $data_v['adult'];
+                            $cart_htl_data[$type_key]['date_diff'][$date_join]['adults'] = $data_v['adults'];
                             $cart_htl_data[$type_key]['date_diff'][$date_join]['children'] = $data_v['children'];
 
                             $cart_htl_data[$type_key]['date_diff'][$date_join]['paid_unit_price_tax_incl'] = $data_v['total_price_tax_incl']/$num_days;

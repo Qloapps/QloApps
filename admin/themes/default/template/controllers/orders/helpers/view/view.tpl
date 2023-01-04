@@ -1424,7 +1424,7 @@
 	{addJsDefL name='children_txt'}{l s='Children' js=1}{/addJsDefL}
 	{addJsDefL name='below_txt'}{l s='Below' js=1}{/addJsDefL}
 	{addJsDefL name='years_txt'}{l s='years' js=1}{/addJsDefL}
-	{addJsDefL name='all_children_txt'}{l s='years' js=1}{/addJsDefL}
+	{addJsDefL name='all_children_txt'}{l s='All Children' js=1}{/addJsDefL}
 	{addJsDefL name='invalid_occupancy_txt'}{l s='Invalid occupancy(adults/children) found.' js=1}{/addJsDefL}
 	{addJsDef max_child_age=$max_child_age|escape:'quotes':'UTF-8'}
 	{addJsDef max_child_in_room=$max_child_in_room|escape:'quotes':'UTF-8'}

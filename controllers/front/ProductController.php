@@ -60,6 +60,9 @@ class ProductControllerCore extends FrontController
             ));
         }
 
+        $this->addCSS(_THEME_CSS_DIR_.'occupancy.css');
+        $this->addJS(_THEME_JS_DIR_.'occupancy.js');
+
         if (Configuration::get('PS_DISPLAY_JQZOOM') == 1) {
             $this->addJqueryPlugin('jqzoom');
         }
@@ -275,7 +278,7 @@ class ProductControllerCore extends FrontController
             $obj_hotel_room_type = new HotelRoomType();
             $room_info_by_product_id = $obj_hotel_room_type->getRoomTypeInfoByIdProduct($this->product->id);
             $productCapacity = array();
-            $productCapacity['adult'] = $room_info_by_product_id['adult'];
+            $productCapacity['adults'] = $room_info_by_product_id['adults'];
             $productCapacity['children'] = $room_info_by_product_id['children'];
             $this->product->capacity = $productCapacity;
             $hotel_id = $room_info_by_product_id['id_hotel'];
@@ -308,11 +311,6 @@ class ProductControllerCore extends FrontController
                 }
                 if (!($date_to = Tools::getValue('date_to'))) {
                     $date_to = date('Y-m-d', strtotime('+1 day', strtotime($date_from)));
-                }
-                if (!$occupancy = Tools::getValue('occupancy')) {
-                    if (Configuration::get('PS_FRONT_SEARCH_TYPE') == HotelBookingDetail::SEARCH_TYPE_NORMAL) {
-                        $occupancy = 1;
-                    }
                 }
 
                 $hotel_branch_obj = new HotelBranchInformation($hotel_id);
@@ -378,7 +376,7 @@ class ProductControllerCore extends FrontController
                     )
                 );
 
-                $this->assignBookingFormVars($this->product->id, $date_from, $date_to, $occupancy);
+                $this->assignBookingFormVars($this->product->id, $date_from, $date_to);
 
                 // product price after imposing feature prices...
                 if ($useTax) {
@@ -416,7 +414,6 @@ class ProductControllerCore extends FrontController
 
             $this->context->smarty->assign(
                 array(
-                    // occupancy fields
                     'room_type_demands' => $roomTypeDemands,
                     'WK_PRICE_CALC_METHOD_EACH_DAY' => HotelRoomTypeGlobalDemand::WK_PRICE_CALC_METHOD_EACH_DAY,
                     'product_id_hotel' => $hotel_id,
@@ -466,7 +463,7 @@ class ProductControllerCore extends FrontController
         $idProduct,
         $dateFrom,
         $dateTo,
-        $occupancy,
+        $occupancy = array(),
         $jsonDemands = ''
     ) {
         $objProduct = new Product($idProduct, true, $this->context->language->id, $this->context->shop->id);
@@ -509,11 +506,11 @@ class ProductControllerCore extends FrontController
             'date_to' => $dateTo,
             'hotel_id' => $idHotel,
             'id_room_type' => $idProduct,
-            'occupancy' => $occupancy,
             'id_cart' => $idCart,
             'id_guest' => $idGuest,
         );
         if (Configuration::get('PS_FRONT_OCCUPANCY_REQUIRED_FOR_BOOKING')) {
+            $bookingParams['occupancy'] = $occupancy;
             $quantity = count($occupancy);
         } else {
             $quantity = $occupancy;
@@ -577,7 +574,7 @@ class ProductControllerCore extends FrontController
         // send occupancy information searched by the user
         if ($this->ajax && $occupancy && is_array($occupancy)) {
             $smartyVars['occupancies'] = $occupancy;
-            $smartyVars['occupancy_adults'] = array_sum(array_column($occupancy, 'adult'));
+            $smartyVars['occupancy_adults'] = array_sum(array_column($occupancy, 'adults'));
             $smartyVars['occupancy_children'] = array_sum(array_column($occupancy, 'children'));
             $smartyVars['occupancy_child_ages'] = array_sum(array_column($occupancy, 'child_ages'));
         }
@@ -1090,105 +1087,6 @@ class ProductControllerCore extends FrontController
         }
 
         $this->ajaxDie(json_encode($response));
-    }
-
-    public function displayAjaxCheckRoomAvailabilityAndRate()
-    {
-        $result = array();
-        if ($idProduct = Tools::getValue('id_product')) {
-            $objHotelRoomType = new HotelRoomType();
-            if ($roomTypeInfo = $objHotelRoomType->getRoomTypeInfoByIdProduct($idProduct)) {
-                $dateFrom = Tools::getValue('date_from');
-                $dateTo = Tools::getValue('date_to');
-                // occupancy is created for sending to the search function
-                $occupancy = Tools::getValue('occupancy');
-                $occupancy = json_decode($occupancy, true);
-                // @todo for now we are sending the num of rooms for current algo,
-                // @todo Send occupancy in the dataForFrontSearch function
-                $quantity = count($occupancy);
-                if ($idHotel = $roomTypeInfo['id_hotel']) {
-                    $objBookingDetail = new HotelBookingDetail();
-                    $bookingParams = array(
-                        'date_from' => $dateFrom,
-                        'date_to' => $dateTo,
-                        'hotel_id' => $idHotel,
-                        'id_room_type' => $idProduct,
-                        'occupancy' => $occupancy,
-                        'only_search_data' => 1,
-                        'id_cart' => $this->context->cart->id,
-                        'id_guest' => $this->context->cart->id_guest
-                    );
-                    if ($hotelRoomData = $objBookingDetail->dataForFrontSearch($bookingParams)) {
-                        $totalAvailRooms = $hotelRoomData['stats']['num_avail'];
-                        if ($totalAvailRooms >= $quantity) {
-                            $totalPrice = 0;
-                            $useTax = HotelBookingDetail::useTax();
-                            $product = new Product($idProduct);
-                            $productPriceWithoutReduction = $product->getPriceWithoutReduct(!$useTax);
-                            $numDays = $objBookingDetail->getNumberOfDays($dateFrom, $dateTo);
-                            $roomTypeDateRangePrice = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
-                                $idProduct,
-                                $dateFrom,
-                                $dateTo
-                            );
-                            if ($useTax) {
-                                $priceProduct = Product::getPriceStatic($idProduct, true);
-                                $featurePrice = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay($idProduct, $dateFrom, $dateTo, true);
-                                $roomTypeDateRangePrice = $roomTypeDateRangePrice['total_price_tax_incl'];
-                            } else {
-                                $priceProduct = Product::getPriceStatic($idProduct, false);
-                                $featurePrice = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay($idProduct, $dateFrom, $dateTo, false);
-                                $roomTypeDateRangePrice = $roomTypeDateRangePrice['total_price_tax_excl'];
-                            }
-                            $featurePriceDiff = (float)($productPriceWithoutReduction - $featurePrice);
-
-                            //$price_tax_incl = Product::getPriceStatic($idProduct, $price_tax);
-                            // $totalRoomPrice = $roomTypeDateRangePrice * $quantity;
-                            $totalRoomPrice = $roomTypeDateRangePrice;
-                            $totalPrice += $totalRoomPrice;
-                            $demandsPrice = 0;
-                            if ($roomDemand = Tools::getValue('room_demands')) {
-                                if ($roomDemand = json_decode($roomDemand, true)) {
-                                    $objRoomDemandPrice = new HotelRoomTypeDemandPrice();
-                                    $demandsPrice = $objRoomDemandPrice->getRoomTypeDemandsTotalPrice(
-                                        $idProduct,
-                                        $roomDemand,
-                                        $useTax,
-                                        $dateFrom,
-                                        $dateTo
-                                    );
-                                    $demandsPrice *= $quantity;
-                                    $totalPrice += $demandsPrice;
-                                }
-                            }
-                            $result['msg'] = 'success';
-                            $result['quantity'] = (int)$quantity;
-                            $result['total_price'] = $totalPrice;
-                            $result['total_room_price'] = $totalRoomPrice;
-                            $result['extra_demand_price'] = $demandsPrice;
-                            $result['num_days'] = $numDays;
-                            $result['avail_rooms'] = $totalAvailRooms;
-                            $result['original_product_price'] = $priceProduct;
-                            $result['feature_price'] = $featurePrice;
-                            $result['feature_price_diff'] = $featurePriceDiff;
-                        } else {
-                            $result['msg'] = 'unavailable_quantity';
-                            $result['avail_rooms'] = $totalAvailRooms;
-                        }
-                    } else {
-                        $result['msg'] = 'failed1';
-                        $result['avail_rooms'] = $totalAvailRooms;
-                    }
-                } else {
-                    $result['msg'] = 'failed2';
-                    $result['avail_rooms'] = $totalAvailRooms;
-                }
-            }
-        } else {
-            $result['msg'] = 'failed3';
-            $result['avail_rooms'] = 0;
-        }
-        die(json_encode($result));
     }
 
     public function displayAjaxGetHotelImages()

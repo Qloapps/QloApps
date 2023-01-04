@@ -951,20 +951,20 @@ class AdminCartsControllerCore extends AdminController
         }
     }
 
-    public function ajaxProcessUpdateProductOccupancy()
+    public function ajaxProcessupdateRoomOccupancy()
     {
         $params = Tools::getValue('params');
-        $id_booking_data = (int) $params['id_booking_data'];
-        $id_cart = (int) $params['id_cart'];
+        $idBookingData = (int) $params['id_booking_data'];
+        $idCart = (int) $params['id_cart'];
         $occupancy =  $params['occupancy'];
 
-        $this->context->cart = new Cart($id_cart);
+        $this->context->cart = new Cart($idCart);
 
         if ($this->tabAccess['edit'] === '1') {
             // validate occupancy is correct
             $hasError = false;
             if (is_array($occupancy)) {
-                if (!$occupancy['adult'] || !Validate::isUnsignedInt($occupancy['adult'])) {
+                if (!$occupancy['adults'] || !Validate::isUnsignedInt($occupancy['adults'])) {
                     $hasError = true;
                 }
                 if (!Validate::isUnsignedInt($occupancy['children'])) {
@@ -975,41 +975,44 @@ class AdminCartsControllerCore extends AdminController
                         $hasError = true;
                     } else {
                         foreach($occupancy['child_ages'] as $age) {
-                            if (!Validate::isUnsignedInt($occupancy['adult'])) {
+                            if (!Validate::isUnsignedInt($occupancy['adults'])) {
                                 $hasError = true;
                             }
                         }
                     }
                 }
+            } else {
+                $hasError = true;
             }
 
             if (!$hasError) {
-                $objHotelCartBookingData = new HotelCartBookingData($id_booking_data);
+                $objHotelCartBookingData = new HotelCartBookingData($idBookingData);
                 $objRoomType = new HotelRoomType();
                 if ($roomTypeInfo = $objRoomType->getRoomTypeInfoByIdProduct($objHotelCartBookingData->id_product)) {
-                    if ($occupancy['adult'] > $roomTypeInfo['max_adults']) {
+                    if ($occupancy['adults'] > $roomTypeInfo['max_adults']) {
                         $hasError = true;
                     }
                     if ($occupancy['children'] > $roomTypeInfo['max_children']) {
                         $hasError = true;
                     }
-                    if ($occupancy['adult'] + $occupancy['children'] > $roomTypeInfo['max_guests']) {
+                    if ($occupancy['adults'] + $occupancy['children'] > $roomTypeInfo['max_guests']) {
                         $hasError = true;
                     }
                     if (!$hasError) {
-                        $objHotelCartBookingData->adult = $occupancy['adult'];
+                        $objHotelCartBookingData->adults = $occupancy['adults'];
                         $objHotelCartBookingData->children = $occupancy['children'];
                         $objHotelCartBookingData->child_ages = json_encode($occupancy['child_ages']);
                         $objHotelCartBookingData->save();
                     }
                 }
             }
-            $bookingsInfo = $objHotelCartBookingData->getCartFormatedBookinInfoByIdCart($id_cart);
+            $objHotelCartBookingData = new HotelCartBookingData();
+            $bookingsInfo = $objHotelCartBookingData->getCartFormatedBookinInfoByIdCart($idCart);
             foreach ($bookingsInfo as &$bookingInfo) {
-                if ($bookingInfo['id'] == $id_booking_data) {
-                    $amt_with_qty = $bookingInfo['amt_with_qty'];
-                    $bookingInfo['amt_with_qty'] = Tools::displayPrice($amt_with_qty);
-                    $bookingInfo['total_price'] = Tools::displayPrice($amt_with_qty + $bookingInfo['demand_price']);
+                if ($bookingInfo['id'] == $idBookingData) {
+                    $amtWithQty = $bookingInfo['amt_with_qty'];
+                    $bookingInfo['amt_with_qty'] = Tools::displayPrice($amtWithQty);
+                    $bookingInfo['total_price'] = Tools::displayPrice($amtWithQty + $bookingInfo['demand_price']);
                     $response = array(
                         'curr_booking_info' => $bookingInfo,
                         'cart_info' => $this->ajaxReturnVars(),

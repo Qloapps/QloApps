@@ -66,7 +66,7 @@
 									<div class="dropdown">
 										<button class="booking_guest_occupancy btn btn-default btn-left btn-block input-occupancy" type="button">
 											<span>
-												{if $data['adult']}{$data['adult']}{/if} {if $data['adult'] > 1}{l s='Adults'}{else}{l s='Adult'}{/if}{if {$data['children']}}, {$data['children']} {if $data['children'] > 1}{l s='Children'}{else}{l s='Child'}{/if}{/if}
+												{if $data['adults']}{$data['adults']}{/if} {if $data['adults'] > 1}{l s='Adults'}{else}{l s='Adult'}{/if}{if {$data['children']}}, {$data['children']} {if $data['children'] > 1}{l s='Children'}{else}{l s='Child'}{/if}{/if}
 											</span>
 										</button>
 										<div class="dropdown-menu booking_occupancy_wrapper fixed-width-xxl">
@@ -80,7 +80,7 @@
 														<div class="col-xs-6 occupancy_count_block">
 															<div class="col-sm-12">
 																<label>{l s='Adults'}</label>
-																<input type="number" class="form-control num_occupancy num_adults" name="occupancy[0][adult]" value="{$data['adult']}" min="1" max="{$data['room_type_info']['max_adults']|escape:'html':'UTF-8'}">
+																<input type="number" class="form-control num_occupancy num_adults" name="occupancy[0][adults]" value="{$data['adults']}" min="1" max="{$data['room_type_info']['max_adults']|escape:'html':'UTF-8'}">
 															</div>
 														</div>
 														<div class="col-xs-6 occupancy_count_block">

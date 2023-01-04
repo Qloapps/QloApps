@@ -14,7 +14,7 @@
         <input type="hidden" class="max_adults" value="{$room_type_info['max_adults']|escape:'html':'UTF-8'}">
         <input type="hidden" class="max_children" value="{$room_type_info['max_children']|escape:'html':'UTF-8'}">
         <input type="hidden" class="max_guests" value="{$room_type_info['max_guests']|escape:'html':'UTF-8'}">
-        <input type="hidden" class="base_adult" value="{$room_type_info['adult']|escape:'html':'UTF-8'}">
+        <input type="hidden" class="base_adult" value="{$room_type_info['adults']|escape:'html':'UTF-8'}">
         <input type="hidden" class="base_children" value="{$room_type_info['children']|escape:'html':'UTF-8'}">
         <div class="booking_occupancy_inner">
             {if isset($occupancies) && $occupancies}
@@ -27,9 +27,9 @@
                                 <div class="row">
                                     <label class="col-sm-12">{l s='Adults'}</label>
                                     <div class="col-sm-12">
-                                        <input type="hidden" class="num_occupancy num_adults room_occupancies" name="occupancy[{$key|escape:'htmlall':'UTF-8'}][adult]" value="{$occupancy['adult']|escape:'htmlall':'UTF-8'}">
+                                        <input type="hidden" class="num_occupancy num_adults room_occupancies" name="occupancy[{$key|escape:'htmlall':'UTF-8'}][adults]" value="{$occupancy['adults']|escape:'htmlall':'UTF-8'}">
                                         <div class="occupancy_count pull-left">
-                                            <span>{$occupancy['adult']|escape:'htmlall':'UTF-8'}</span>
+                                            <span>{$occupancy['adults']|escape:'htmlall':'UTF-8'}</span>
                                         </div>
                                         <div class="qty_direction pull-left">
                                             <a href="#" data-field-qty="qty" class="btn btn-default occupancy_quantity_up">
@@ -94,9 +94,9 @@
                             <div class="row">
                                 <label class="col-sm-12">{l s='Adults'}</label>
                                 <div class="col-sm-12">
-                                    <input type="hidden" class="num_occupancy num_adults" name="num_adults[]" value="{$room_type_info['adult']}">
+                                    <input type="hidden" class="num_occupancy num_adults" name="num_adults[]" value="{$room_type_info['adults']}">
                                     <div class="occupancy_count pull-left">
-                                        <span>{$room_type_info['adult']}</span>
+                                        <span>{$room_type_info['adults']}</span>
                                     </div>
                                     <div class="qty_direction pull-left">
                                         <a href="#" data-field-qty="qty" class="btn btn-default occupancy_quantity_up">

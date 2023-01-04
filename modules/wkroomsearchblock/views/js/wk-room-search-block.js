@@ -350,7 +350,7 @@ $(document).ready(function() {
                 occupancy_block += '<div class="form-group occupancy_count_block">';
                     occupancy_block += '<label>' + adults_txt + '</label>';
                     occupancy_block += '<div>';
-                        occupancy_block += '<input type="hidden" class="num_occupancy num_adults room_occupancies" name="occupancy['+roomBlockIndex+'][adult]" value="1">';
+                        occupancy_block += '<input type="hidden" class="num_occupancy num_adults room_occupancies" name="occupancy['+roomBlockIndex+'][adults]" value="1">';
                         occupancy_block += '<div class="occupancy_count pull-left">';
                             occupancy_block += '<span>1</span>';
                         occupancy_block += '</div>';
@@ -409,7 +409,7 @@ $(document).ready(function() {
         setGuestOccupancy();
     });
 
-    // increase the quantity of adult and child
+    // increase the quantity of adults and child
     $(document).on('click', '#search_occupancy_wrapper .occupancy_quantity_up', function(e) {
         e.preventDefault();
         // set input field value
@@ -495,19 +495,19 @@ $(document).ready(function() {
                     // Before closing the occupancy block validate the vaules inside
                     let hasErrors = 0;
 
-                    let adult = $("#search_occupancy_wrapper").find(".num_adults").map(function(){return $(this).val();}).get();
+                    let adults = $("#search_occupancy_wrapper").find(".num_adults").map(function(){return $(this).val();}).get();
                     let children = $("#search_occupancy_wrapper").find(".num_children").map(function(){return $(this).val();}).get();
                     let child_ages = $("#search_occupancy_wrapper").find(".guest_child_age").map(function(){return $(this).val();}).get();
 
                     // start validating above values
-                    if (!adult.length || (adult.length != children.length)) {
+                    if (!adults.length || (adults.length != children.length)) {
                         hasErrors = 1;
                         showErrorMessage(invalid_occupancy_txt);
                     } else {
                         $("#search_occupancy_wrapper").find('.occupancy_count').removeClass('error_border');
 
-                        // validate values of adult and children
-                        adult.forEach(function (item, index) {
+                        // validate values of adults and children
+                        adults.forEach(function (item, index) {
                             if (isNaN(item) || parseInt(item) < 1) {
                                 hasErrors = 1;
                                 $("#search_occupancy_wrapper .num_adults").eq(index).closest('.occupancy_count_block').find('.occupancy_count').addClass('error_border');
@@ -544,17 +544,17 @@ $(document).ready(function() {
 // function to set occupancy infor in guest occupancy field(search form)
 function setGuestOccupancy()
 {
-    var adult = 0;
+    var adults = 0;
     var children = 0;
     var rooms = $('#search_occupancy_wrapper .occupancy_info_block').length;
     $( "#search_occupancy_wrapper .num_adults" ).each(function(key, val) {
-        adult += parseInt($(this).val());
+        adults += parseInt($(this).val());
     });
     $( "#search_occupancy_wrapper .num_children" ).each(function(key, val) {
         children += parseInt($(this).val());
     });
-    var guestButtonVal = parseInt(adult) + ' ';
-    if (parseInt(adult) > 1) {
+    var guestButtonVal = parseInt(adults) + ' ';
+    if (parseInt(adults) > 1) {
         guestButtonVal += adults_txt;
     } else {
         guestButtonVal += adult_txt;

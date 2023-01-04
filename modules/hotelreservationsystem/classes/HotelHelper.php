@@ -524,7 +524,7 @@ class HotelHelper
             $htl_rm_type = new HotelRoomType();
             $htl_rm_type->id_product = $product_id;
             $htl_rm_type->id_hotel = $id_hotel;
-            $htl_rm_type->adult = 2;
+            $htl_rm_type->adults = 2;
             $htl_rm_type->children = 2;
             $htl_rm_type->max_adults = 2;
             $htl_rm_type->max_children = 2;

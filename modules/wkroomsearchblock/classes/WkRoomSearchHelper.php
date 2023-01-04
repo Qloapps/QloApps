@@ -64,7 +64,7 @@ class WkRoomSearchHelper
             $childTypeErr = 0;
             $childAgeErr = 0;
             foreach ($guestOccupancy as $occupancy) {
-                if (!isset($occupancy['adult']) || !Validate::isUnsignedInt($occupancy['adult'])) {
+                if (!isset($occupancy['adults']) || !Validate::isUnsignedInt($occupancy['adults'])) {
                     $adultTypeErr = 1;
                 }
                 if (!isset($occupancy['children']) || !Validate::isUnsignedInt($occupancy['children'])) {
@@ -169,7 +169,7 @@ class WkRoomSearchHelper
                     // send occupancy information searched by the user
                     if ($searchedData['occupancies'] = Tools::getvalue('occupancy')) {
                         $searchedData['occupancy_adults'] = array_sum(
-                            array_column($searchedData['occupancies'], 'adult')
+                            array_column($searchedData['occupancies'], 'adults')
                         );
                         $searchedData['occupancy_children'] = array_sum(
                             array_column($searchedData['occupancies'], 'children')

@@ -155,7 +155,7 @@ class OrderConfirmationControllerCore extends FrontController
 
                             $cart_htl_data[$type_key]['id_product'] = $type_value['product_id'];
                             $cart_htl_data[$type_key]['cover_img'] = $cover_img;
-                            $cart_htl_data[$type_key]['adult'] = $rm_dtl['adult'];
+                            $cart_htl_data[$type_key]['adults'] = $rm_dtl['adults'];
                             $cart_htl_data[$type_key]['children'] = $rm_dtl['children'];
 
                             foreach ($order_bk_data as $data_k => $data_v) {
@@ -177,7 +177,7 @@ class OrderConfirmationControllerCore extends FrontController
                                     $num_days = $cart_htl_data[$type_key]['date_diff'][$date_join]['num_days'];
                                     $var_quant = (int) $cart_htl_data[$type_key]['date_diff'][$date_join]['num_rm'];
 
-                                    $cart_htl_data[$type_key]['date_diff'][$date_join]['adult'] += $data_v['adult'];
+                                    $cart_htl_data[$type_key]['date_diff'][$date_join]['adults'] += $data_v['adults'];
                                     $cart_htl_data[$type_key]['date_diff'][$date_join]['children'] += $data_v['children'];
 
                                     //// By webkul New way to calculate product prices with feature Prices
@@ -199,7 +199,7 @@ class OrderConfirmationControllerCore extends FrontController
                                     $cart_htl_data[$type_key]['date_diff'][$date_join]['data_to'] = $data_v['date_to'];
                                     $cart_htl_data[$type_key]['date_diff'][$date_join]['num_days'] = $num_days;
 
-                                    $cart_htl_data[$type_key]['date_diff'][$date_join]['adult'] = $data_v['adult'];
+                                    $cart_htl_data[$type_key]['date_diff'][$date_join]['adults'] = $data_v['adults'];
                                     $cart_htl_data[$type_key]['date_diff'][$date_join]['children'] = $data_v['children'];
 
 

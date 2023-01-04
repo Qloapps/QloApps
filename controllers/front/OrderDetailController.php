@@ -331,7 +331,7 @@ class OrderDetailControllerCore extends FrontController
 
                                     $num_days = $cartHotelData[$type_key]['date_diff'][$date_join]['num_days'];
 
-                                    $cartHotelData[$type_key]['date_diff'][$date_join]['adult'] += $data_v['adult'];
+                                    $cartHotelData[$type_key]['date_diff'][$date_join]['adults'] += $data_v['adults'];
                                     $cartHotelData[$type_key]['date_diff'][$date_join]['children'] += $data_v['children'];
 
                                     $cartHotelData[$type_key]['date_diff'][$date_join]['paid_unit_price_tax_excl'] = $data_v['total_price_tax_excl']/$num_days;
@@ -350,7 +350,7 @@ class OrderDetailControllerCore extends FrontController
                                     $cartHotelData[$type_key]['date_diff'][$date_join]['data_form'] = $data_v['date_from'];
                                     $cartHotelData[$type_key]['date_diff'][$date_join]['data_to'] = $data_v['date_to'];
                                     $cartHotelData[$type_key]['date_diff'][$date_join]['num_days'] = $num_days;
-                                    $cartHotelData[$type_key]['date_diff'][$date_join]['adult'] = $data_v['adult'];
+                                    $cartHotelData[$type_key]['date_diff'][$date_join]['adults'] = $data_v['adults'];
                                     $cartHotelData[$type_key]['date_diff'][$date_join]['children'] = $data_v['children'];
 
                                     $cartHotelData[$type_key]['date_diff'][$date_join]['paid_unit_price_tax_excl'] = $data_v['total_price_tax_excl']/$num_days;

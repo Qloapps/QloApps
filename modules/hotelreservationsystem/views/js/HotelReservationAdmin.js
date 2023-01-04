@@ -785,19 +785,19 @@ $(document).ready(function() {
 
 function setRoomTypeGuestOccupancy(booking_occupancy_wrapper)
 {
-    var adult = 0;
+    var adults = 0;
     var children = 0;
 	var rooms = $(booking_occupancy_wrapper).find('.occupancy_info_block').length;
 
 	$(booking_occupancy_wrapper).find(".num_adults" ).each(function(key, val) {
-        adult += parseInt($(this).val());
+        adults += parseInt($(this).val());
     });
     $(booking_occupancy_wrapper).find(".num_children" ).each(function(key, val) {
         children += parseInt($(this).val());
     });
 
-    var guestButtonVal = parseInt(adult) + ' ';
-    if (parseInt(adult) > 1) {
+    var guestButtonVal = parseInt(adults) + ' ';
+    if (parseInt(adults) > 1) {
         guestButtonVal += adults_txt;
     } else {
         guestButtonVal += adult_txt;

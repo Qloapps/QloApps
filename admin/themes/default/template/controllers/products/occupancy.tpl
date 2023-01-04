@@ -35,7 +35,7 @@
                 </span>
 			</label>
 			<div class="col-sm-3">
-				<input id="base_adults" type="text" name="base_adults" class="form-control" {if isset($roomTypeInfo)}value="{$roomTypeInfo['adult']|escape:'htmlall':'UTF-8'}"{/if}>
+				<input id="base_adults" type="text" name="base_adults" class="form-control" {if isset($roomTypeInfo)}value="{$roomTypeInfo['adults']|escape:'htmlall':'UTF-8'}"{/if}>
 			</div>
 		</div>
 		<div class="form-group">
@@ -54,14 +54,14 @@
         <hr>
 
         <div class="alert alert-info">
-            {l s='Below, enter the maximum of adult or children which can be accommodated in a room of this room type. Also, enter maximum number of guests for this room type.'}
+            {l s='Below, enter the maximum of adults or children which can be accommodated in a room of this room type. Also, enter maximum number of guests for this room type.'}
         </div>
 
         <div class="form-group">
 			<label class="control-label col-sm-2" for="max_adults">
                 <span class="label-tooltip" data-toggle="tooltip"
-				title="{l s='Enter maximum number of adult can be accommodated in a room of this room type.'}">
-                    {l s='Maximum adult'}
+				title="{l s='Enter maximum number of adults can be accommodated in a room of this room type.'}">
+                    {l s='Maximum adults'}
                 </span>
 			</label>
 			<div class="col-sm-3">

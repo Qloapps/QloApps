@@ -266,11 +266,11 @@
 						<span id="layer_cart_product_time_duration"></span>
 					</div>
 					<div>
-						<strong class="dark">{if isset($occupancy_required_for_booking) && $occupancy_required_for_booking}{l s='Room occupancy' mod='blockcart'}{else}{l s='Rooms Quantity Added' mod='blockcart'}{/if} &nbsp;-&nbsp;</strong>
+						<strong class="dark">{if isset($occupancy_required_for_booking) && $occupancy_required_for_booking}{l s='Room occupancy' mod='blockcart'}{else}{l s='Rooms quantity added' mod='blockcart'}{/if} &nbsp;-&nbsp;</strong>
 						<span id="layer_cart_product_quantity"></span>
 					</div>
 					<div>
-						<strong class="dark">{l s='Room Type Cost' mod='blockcart'} &nbsp;-&nbsp;</strong>
+						<strong class="dark">{l s='Room type cost' mod='blockcart'} &nbsp;-&nbsp;</strong>
 						<span id="layer_cart_product_price"></span>
 					</div>
 				</div>

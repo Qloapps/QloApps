@@ -58,7 +58,7 @@ class HotelBookingDetail extends ObjectModel
     public $check_in_time;
     public $check_out_time;
     public $room_num;
-    public $adult;
+    public $adults;
     public $children;
     public $child_ages;
 
@@ -118,7 +118,7 @@ class HotelBookingDetail extends ObjectModel
             'email' => array('type' => self::TYPE_STRING, 'validate' => 'isEmail', 'size' => 255, 'required' => true),
             'check_in_time' => array('type' => self::TYPE_STRING, 'required' => true),
             'check_out_time' => array('type' => self::TYPE_STRING, 'required' => true),
-            'adult' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => true),
+            'adults' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => true),
             'children' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
             'child_ages' => array('type' => self::TYPE_STRING),
 
@@ -380,7 +380,7 @@ class HotelBookingDetail extends ObjectModel
                         $roomTypeSearchData = array(
                             'name' => (new Product((int) $idProduct, false, $this->context->cookie->id_lang))->name,
                             'id_product' => $idProduct,
-                            'adult' => $roomTypeDetail['adult'],
+                            'adults' => $roomTypeDetail['adults'],
                             'children' => $roomTypeDetail['children'],
                             'max_adults' => $roomTypeDetail['max_adults'],
                             'max_children' => $roomTypeDetail['max_children'],
@@ -726,7 +726,7 @@ class HotelBookingDetail extends ObjectModel
             // TODO: Try to merge with the next loop
             $totalReqOccupancy = 0;
             foreach ($searchOccupancy as $reqRoomOccupancy) {
-                $totalReqOccupancy += (int)$reqRoomOccupancy['adult'] + (int)$reqRoomOccupancy['children'];
+                $totalReqOccupancy += (int)$reqRoomOccupancy['adults'] + (int)$reqRoomOccupancy['children'];
             }
 
             // Check total required occupancy must be <= hotel total available occupancy
@@ -762,9 +762,9 @@ class HotelBookingDetail extends ObjectModel
 
                     foreach ($availableRoomTypes['roomTypes'] as $idProduct => $roomsDetail) {
                         // below is STEP 1
-                        if (($reqRoomOccupancy['adult'] <= $roomsDetail['maxAdult']) &&
+                        if (($reqRoomOccupancy['adults'] <= $roomsDetail['maxAdult']) &&
                         ($reqRoomOccupancy['children'] <= $roomsDetail['maxChildren']) &&
-                        ((int)$reqRoomOccupancy['adult'] + (int)$reqRoomOccupancy['children'] <= $roomsDetail['maxOccupancy'])) {
+                        ((int)$reqRoomOccupancy['adults'] + (int)$reqRoomOccupancy['children'] <= $roomsDetail['maxOccupancy'])) {
 
                             // below is STEP 3
                             $reqRoomOccupancy['roomTypes'][$idProduct] = ($roomsDetail['maxOccupancy']*100 - $roomsDetail['roomCount']);
@@ -788,12 +788,12 @@ class HotelBookingDetail extends ObjectModel
                         // below is STEP 2
                         $reqRoomOccupancyWt = $this->generateRoomOccupancyWeight(
                             count($reqRoomOccupancy['roomTypes']),
-                            (int)$reqRoomOccupancy['adult'] + (int)$reqRoomOccupancy['children'],
-                            $reqRoomOccupancy['adult'],
+                            (int)$reqRoomOccupancy['adults'] + (int)$reqRoomOccupancy['children'],
+                            $reqRoomOccupancy['adults'],
                             $reqRoomOccupancy['children']
                         );
 
-                        // In case avail rooms, required adult and required childers are same
+                        // In case avail rooms, required adults and required childers are same
                         // then to overcome the loose of required occupancy array
                         while (isset($reqOccupancies[$reqRoomOccupancyWt])) {
                             $reqRoomOccupancyWt += 1;
@@ -1453,7 +1453,7 @@ class HotelBookingDetail extends ObjectModel
      * @param [int]  $id_hotel      [Id of the Hotel]
      * @param [int]  $id_product    [ID of the product]
      * @param [int]  $only_search_data [used for product page and category page for block cart]
-     * @param [int]  $adult         []
+     * @param [int]  $adults         []
      * @param [int]  $children      []
      * @param []     $ratting       [description]
      * @param []     $amenities     [description]
@@ -1551,7 +1551,7 @@ class HotelBookingDetail extends ObjectModel
                                 // if ($room_left <= (int)Configuration::get('WK_ROOM_LEFT_WARNING_NUMBER'))
                                 $bookingData['rm_data'][$key]['room_left'] = $room_left;
 
-                                $bookingData['rm_data'][$key]['adult'] = $rm_dtl['adult'];
+                                $bookingData['rm_data'][$key]['adults'] = $rm_dtl['adults'];
                                 $bookingData['rm_data'][$key]['children'] = $rm_dtl['children'];
 
                                 $bookingData['rm_data'][$key]['ratting'] = $prod_ratting;
@@ -1910,7 +1910,7 @@ class HotelBookingDetail extends ObjectModel
                 'date_from' => $new_date_from,
                 'date_to' => $new_date_to,
                 'quantity' => $newNumDays,
-                'adult' => $occupancy['adult'],
+                'adults' => $occupancy['adults'],
                 'children' => $occupancy['children'],
                 'child_ages' => json_encode($occupancy['child_ages']),
             ),
@@ -1924,7 +1924,7 @@ class HotelBookingDetail extends ObjectModel
                 'total_price_tax_excl' => $newTotalPriceTE,
                 'total_price_tax_incl' => $newTotalPriceTI,
                 'total_paid_amount' => $totalPaidAmount,
-                'adult' => $occupancy['adult'],
+                'adults' => $occupancy['adults'],
                 'children' => $occupancy['children'],
                 'child_ages' => json_encode($occupancy['child_ages']),
             ),

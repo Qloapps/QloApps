@@ -246,10 +246,6 @@ class AdminOrdersControllerCore extends AdminController
             $payment_modules[] = Module::getInstanceById((int)$p_module['id_module']);
         }
 
-        $occupancyWiseSearch = false;
-        if (Configuration::get('PS_BACKOFFICE_SEARCH_TYPE') == HotelBookingDetail::SEARCH_TYPE_OWS) {
-            $occupancyWiseSearch = true;
-        }
         $this->context->smarty->assign(array(
             'recyclable_pack' => (int)Configuration::get('PS_RECYCLABLE_PACK'),
             'gift_wrapping' => (int)Configuration::get('PS_GIFT_WRAPPING'),
@@ -267,7 +263,6 @@ class AdminOrdersControllerCore extends AdminController
             'max_child_in_room' => Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM'),
             'max_child_age' => Configuration::get('WK_GLOBAL_CHILD_MAX_AGE'),
             'occupancy_required_for_booking' => Configuration::get('PS_BACKOFFICE_OCCUPANCY_REQUIRED_FOR_BOOKING'),
-            'occupancy_wise_search' => $occupancyWiseSearch
         ));
         $this->content .= $this->createTemplate('form.tpl')->fetch();
     }
@@ -1796,7 +1791,7 @@ class AdminOrdersControllerCore extends AdminController
         if ($order->is_occupnacy_provided) {
             if ($occupancy) {
                 foreach($occupancy as $key =>$roomOccupancy) {
-                    if (!Validate::isUnsignedInt($roomOccupancy['adult'])) {
+                    if (!$roomOccupancy['adults'] || !Validate::isUnsignedInt($roomOccupancy['adults'])) {
                         die(json_encode(array(
                             'result' => false,
                             'error' => sprintf(Tools::displayError('Invalid number of adults for Room %s.'), ($key + 1)),
@@ -1831,17 +1826,19 @@ class AdminOrdersControllerCore extends AdminController
                     'error' => Tools::displayError('Invalid occupancy.'),
                 )));
             }
-            $req_rm = count($occupancy);
-            $objRoomType = new HotelRoomType();
-            $roomTypeInfo = $objRoomType->getRoomTypeInfoByIdProduct($id_product);
         } elseif (!Validate::isUnsignedInt($product_informations['product_quantity'])) {
             die(json_encode(array(
                 'result' => false,
                 'error' => Tools::displayError('Please Enter a valid Quantity.'),
             )));
-            $req_rm = $product_informations['product_quantity'];
         }
 
+
+        if ($order->is_occupnacy_provided) {
+            $req_rm = count($occupancy);
+        } else {
+            $req_rm = $product_informations['product_quantity'];
+        }
         $obj_booking_detail = new HotelBookingDetail();
         $num_days = $obj_booking_detail->getNumberOfDays($date_from, $date_to);
         $product_informations['product_quantity'] = $product_informations['product_quantity'] * (int) $num_days;
@@ -1934,6 +1931,10 @@ class AdminOrdersControllerCore extends AdminController
         $this->context->cart = $cart;
         $this->context->customer = new Customer($order->id_customer);
 
+        if ($order->is_occupnacy_provided) {
+            $objRoomType = new HotelRoomType();
+            $roomTypeInfo = $objRoomType->getRoomTypeInfoByIdProduct($id_product);
+        }
         /*By Webkul to make entries in HotelCartBookingData */
         $hotel_room_info_arr = $hotel_room_data['rm_data'][$idProduct]['data']['available'];
         $chkQty = 0;
@@ -1955,11 +1956,11 @@ class AdminOrdersControllerCore extends AdminController
 
                     if ($order->is_occupnacy_provided) {
                         $room_occupancy = array_shift($occupancy);
-                        $objCartBookingData->adult = $room_occupancy['adult'];
+                        $objCartBookingData->adults = $room_occupancy['adults'];
                         $objCartBookingData->children = $room_occupancy['children'];
                         $objCartBookingData->child_ages = $room_occupancy['children'] ? json_encode($room_occupancy['child_ages']) : json_encode(array());
                     } else {
-                        $objCartBookingData->adult = $roomTypeInfo['adult'];
+                        $objCartBookingData->adults = $roomTypeInfo['adults'];
                         $objCartBookingData->children = $roomTypeInfo['children'];
                         $objCartBookingData->child_ages = json_encode(array());
                     }
@@ -2279,7 +2280,7 @@ class AdminOrdersControllerCore extends AdminController
 
                 $objBookingDetail->date_from = $objCartBookingData->date_from;
                 $objBookingDetail->date_to = $objCartBookingData->date_to;
-                $objBookingDetail->adult = $objCartBookingData->adult;
+                $objBookingDetail->adults = $objCartBookingData->adults;
                 $objBookingDetail->children = $objCartBookingData->children;
                 $objBookingDetail->child_ages = $objCartBookingData->child_ages;
 
@@ -2317,7 +2318,7 @@ class AdminOrdersControllerCore extends AdminController
                     $objBookingDetail->check_out_time = $objHotelBranch->check_out;
                 }
                 if ($roomTypeInfo = $objRoomType->getRoomTypeInfoByIdProduct($idProduct)) {
-                    $objBookingDetail->adult = $objCartBookingData->adult;
+                    $objBookingDetail->adults = $objCartBookingData->adults;
                     $objBookingDetail->children = $objCartBookingData->children;
                     $objBookingDetail->child_ages = $objCartBookingData->child_ages;
                 }
@@ -2447,7 +2448,7 @@ class AdminOrdersControllerCore extends AdminController
         $old_product_quantity =  (int) $obj_booking_detail->getNumberOfDays($old_date_from, $old_date_to);
         $qty_diff = $product_quantity - $old_product_quantity;
         $occupancy = array_shift(Tools::getValue('occupancy'));
-        $adult = $occupancy['adult'];
+        $adults = $occupancy['adults'];
         $children = $occupancy['children'];
         $child_ages = $occupancy['child_ages'];
 
@@ -2507,7 +2508,7 @@ class AdminOrdersControllerCore extends AdminController
                 'result' => false,
                 'error' => Tools::displayError('Invalid quantity.'),
             )));
-        } elseif (!Validate::isUnsignedInt($adult)) {
+        } elseif (!Validate::isUnsignedInt($adults)) {
             die(json_encode(array(
                 'result' => false,
                 'error' => Tools::displayError('Invalid number of adults.'),
@@ -2764,7 +2765,7 @@ class AdminOrdersControllerCore extends AdminController
 
         // set occupancy details
         $occupancy = array(
-            'adult' => $adult,
+            'adults' => $adults,
             'children' => $children,
             'child_ages' => $child_ages
         );

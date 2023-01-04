@@ -82,7 +82,7 @@
 		{if $order->is_occupnacy_provided && $data['children']}
 			<div class="dropdown booking_occupancy_show">
 				<button class="btn btn-default btn-left btn-block" data-toggle="dropdown" type="button">
-					<span>{if $data['adult']}{$data['adult']}{/if} {if $data['adult'] > 1}{l s='Adults'}{else}{l s='Adult'}{/if}{if {$data['children']}}, {$data['children']} {if $data['children'] > 1}{l s='Children'}{else}{l s='Child'}{/if}{/if}</span>
+					<span>{if $data['adults']}{$data['adults']}{/if} {if $data['adults'] > 1}{l s='Adults'}{else}{l s='Adult'}{/if}{if {$data['children']}}, {$data['children']} {if $data['children'] > 1}{l s='Children'}{else}{l s='Child'}{/if}{/if}</span>
 				</button>
 				<div class="dropdown-menu well well-sm">
 					<label>{l s='Children Ages'}</label>
@@ -96,14 +96,14 @@
 				</div>
 			</div>
 		{else}
-			<span class="booking_occupancy_show">{if $data['adult']}{$data['adult']}{/if} {if $data['adult'] > 1}{l s='Adults'}{else}{l s='Adult'}{/if}{if {$data['children']}}, {$data['children']} {if $data['children'] > 1}{l s='Children'}{else}{l s='Child'}{/if}{/if}</span>
+			<span class="booking_occupancy_show">{if $data['adults']}{$data['adults']}{/if} {if $data['adults'] > 1}{l s='Adults'}{else}{l s='Adult'}{/if}{if {$data['children']}}, {$data['children']} {if $data['children'] > 1}{l s='Children'}{else}{l s='Child'}{/if}{/if}</span>
 		{/if}
 		{if $order->is_occupnacy_provided}
 			<div class="booking_occupancy_edit" style="display:none;">
 				<div class="dropdown">
 					<button class="booking_guest_occupancy btn btn-default btn-left btn-block input-occupancy" type="button">
-						<span class="pull-left">
-							{if $data['adult']}{$data['adult']}{/if} {if $data['adult'] > 1}{l s='Adults'}{else}{l s='Adult'}{/if}{if {$data['children']}}, {$data['children']} {if $data['children'] > 1}{l s='Children'}{else}{l s='Child'}{/if}{/if}
+						<span>
+							{if $data['adults']}{$data['adults']}{/if} {if $data['adults'] > 1}{l s='Adults'}{else}{l s='Adult'}{/if}{if {$data['children']}}, {$data['children']} {if $data['children'] > 1}{l s='Children'}{else}{l s='Child'}{/if}{/if}
 						</span>
 					</button>
 					<div class="dropdown-menu booking_occupancy_wrapper fixed-width-xxl well well-sm">
@@ -117,7 +117,7 @@
 									<div class="col-xs-6 occupancy_count_block">
 										<div class="col-sm-12">
 											<label>{l s='Adults'}</label>
-											<input type="number" class="form-control num_occupancy num_adults" name="occupancy[0][adult]" value="{$data['adult']}" min="1"  max="{$data['room_type_info']['max_adults']|escape:'html':'UTF-8'}">
+											<input type="number" class="form-control num_occupancy num_adults" name="occupancy[0][adults]" value="{$data['adults']}" min="1"  max="{$data['room_type_info']['max_adults']|escape:'html':'UTF-8'}">
 										</div>
 									</div>
 									<div class="col-xs-6 occupancy_count_block">
@@ -157,7 +157,7 @@
 				</div>
 			</div>
 		{else}
-			<span class="booking_occupancy_edit" style="display:none;">{if $data['adult']}{$data['adult']}{/if} {if $data['adult'] > 1}{l s='Adults'}{else}{l s='Adult'}{/if}{if {$data['children']}}, {$data['children']} {if $data['children'] > 1}{l s='Children'}{else}{l s='Child'}{/if}{/if}</span>
+			<span class="booking_occupancy_edit" style="display:none;">{if $data['adults']}{$data['adults']}{/if} {if $data['adults'] > 1}{l s='Adults'}{else}{l s='Adult'}{/if}{if {$data['children']}}, {$data['children']} {if $data['children'] > 1}{l s='Children'}{else}{l s='Child'}{/if}{/if}</span>
 		{/if}
 	</td>
 	<td class="text-center">
