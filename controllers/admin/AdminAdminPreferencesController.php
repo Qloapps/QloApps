@@ -85,6 +85,16 @@ class AdminAdminPreferencesControllerCore extends AdminController
                         'default' => '480',
                         'visibility' => Shop::CONTEXT_ALL
                     ),
+                    'PS_COOKIE_SAMESITE' => array(
+                        'title' => $this->l('Same site cookie'),
+                        'hint' => $this->l('Allows you to declare if your cookie should be restricted to a first-party or same-site context.'),
+                        'validation' => 'isGenericName',
+                        'type' => 'select',
+                        'cast' => 'strval',
+                        'identifier' => 'type',
+                        'list' => CookieCore::SAMESITE_AVAILABLE_VALUES,
+                        'visibility' => Shop::CONTEXT_ALL
+                    ),
                 ),
                 'submit' => array('title' => $this->l('Save'))
             ),
@@ -159,6 +169,12 @@ class AdminAdminPreferencesControllerCore extends AdminController
         $upload_max_size = (int)str_replace('M', '', ini_get('upload_max_filesize'));
         $post_max_size = (int)str_replace('M', '', ini_get('post_max_size'));
         $max_size = $upload_max_size < $post_max_size ? $upload_max_size : $post_max_size;
+        $forceSsl = Configuration::get('PS_SSL_ENABLED') && Configuration::get('PS_SSL_ENABLED_EVERYWHERE');
+
+        if (!$forceSsl && Tools::getValue('PS_COOKIE_SAMESITE') === Cookie::SAMESITE_NONE) {
+            $this->errors[] = Tools::displayError('The SameSite=None is only available in secure mode.');
+            return;
+        }
 
         if (Tools::getValue('PS_LIMIT_UPLOAD_FILE_VALUE') > $max_size || Tools::getValue('PS_LIMIT_UPLOAD_IMAGE_VALUE') > $max_size) {
             $this->errors[] = Tools::displayError('The limit chosen is larger than the server\'s maximum upload limit. Please increase the limits of your server.');
