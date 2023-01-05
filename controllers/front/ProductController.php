@@ -88,6 +88,18 @@ class ProductControllerCore extends FrontController
      */
     public function init()
     {
+        // validate dates if available
+        $dateFrom = Tools::getValue('date_from');
+        $dateTo = Tools::getValue('date_to');
+
+        if ($dateFrom != '' && !Validate::isDate($dateFrom)) {
+            Tools::redirect($this->context->link->getPageLink('pagenotfound'));
+        }
+
+        if ($dateTo != '' && !Validate::isDate($dateTo)) {
+            Tools::redirect($this->context->link->getPageLink('pagenotfound'));
+        }
+
         parent::init();
 
         if ($id_product = (int) Tools::getValue('id_product')) {
@@ -323,6 +335,8 @@ class ProductControllerCore extends FrontController
                     }
                 }
                 /*End*/
+                // booking preparation time
+                $preparationTime = (int) HotelOrderRestrictDate::getPreparationTime($hotel_id);
 
                 $hotelImageLink = null;
                 if ($coverImage = HotelImage::getCover($hotel_id)) {
@@ -343,21 +357,12 @@ class ProductControllerCore extends FrontController
                     $this->context->smarty->assign('error', Tools::getValue('error'));
                 }
 
-                if (Module::isInstalled('productcomments')) {
-                    $this->context->smarty->assign(
-                        array(
-                            'num_reviews' => ProductComment::getCommentNumber($this->product->id),
-                            'ratting' => ProductComment::getAverageGrade($this->product->id)['grade'],
-                        )
-                    );
-                }
-
                 $this->context->smarty->assign(
                     array(
                         'isHotelRefundable' => $hotel_branch_obj->isRefundable(),
                         'max_order_date' => $max_order_date,
+                        'preparation_time' => $preparationTime,
                         'warning_num' => Configuration::get('WK_ROOM_LEFT_WARNING_NUMBER'),
-                        'ratting_img_path' => _MODULE_DIR_.'hotelreservationsystem/views/img/Slices/icons-sprite.png',
                         'product_controller_url' => $this->context->link->getPageLink('product'),
                         'date_from' => $date_from,
                         'date_to' => $date_to,

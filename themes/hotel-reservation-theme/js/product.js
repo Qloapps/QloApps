@@ -1081,22 +1081,6 @@ $(document).ready(function() {
         BookingForm.refresh();
     });
 
-    /*Set maxDate for Order resrict date*/
-    if (max_order_date) {
-        var max_date_from = new Date(max_order_date);
-        max_date_from.setDate(max_date_from.getDate() - 1);
-        var max_date_to = new Date(max_order_date);
-        if($("#room_check_in").datepicker("getDate") > max_date_from) {
-            $("#room_check_in").val('');
-        }
-        if($("#room_check_out").datepicker("getDate") > max_date_to) {
-            $("#room_check_out").val('');
-        }
-        $("#room_check_in").datepicker("option", "maxDate", max_date_from);
-        $("#room_check_out").datepicker("option", "maxDate", max_date_to);
-    }
-
-
     // Accordian for extra demand
     function close_accordion_section() {
         $('.accordion .accordion-section-title').removeClass('active');
@@ -1161,7 +1145,7 @@ var BookingForm = {
         $("#room_check_in").datepicker({
             showOtherMonths: true,
             dateFormat: 'dd-mm-yy',
-            minDate: 0,
+            minDate: preparation_time,
             beforeShow: function (input, instance) {
                 // So that on translating page date is translated to NaN-NaN-NaN
                 $('.ui-datepicker').addClass('notranslate');
@@ -1196,6 +1180,7 @@ var BookingForm = {
         $("#room_check_out").datepicker({
             showOtherMonths: true,
             dateFormat: 'dd-mm-yy',
+            minDate: preparation_time + 1,
             beforeShow: function (input, instance) {
                 // So that on translating page date is translated to NaN-NaN-NaN
                 $('.ui-datepicker').addClass('notranslate');
@@ -1230,6 +1215,21 @@ var BookingForm = {
                 }
             }
         });
+
+        // set max order date
+        if (max_order_date) {
+            var maxDateFrom = new Date(max_order_date);
+            maxDateFrom.setDate(maxDateFrom.getDate() - 1);
+            var maxDateTo = new Date(max_order_date);
+            if($('#room_check_in').datepicker('getDate') > maxDateFrom) {
+                $('#room_check_in').val('');
+            }
+            if($('#room_check_out').datepicker('getDate') > maxDateTo) {
+                $('#room_check_out').val('');
+            }
+            $('#room_check_in').datepicker('option', 'maxDate', maxDateFrom);
+            $('#room_check_out').datepicker('option', 'maxDate', maxDateTo);
+        }
     },
     getFormData: function () {
         var quantity = parseInt($('#quantity_wanted').val());

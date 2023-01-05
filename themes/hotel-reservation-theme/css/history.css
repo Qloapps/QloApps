@@ -67,8 +67,15 @@
 #reasonForRefund {
   font-size: 14px;
   color: #777777;}
-.totalOrdercancellation_div {
+.booking-actions-wrap {
   margin-bottom: 10px;}
+.booking-actions-wrap .btn {
+  font-size: 14px;
+  padding: 12px 30px;
+  font-weight: 600;
+  text-transform: uppercase;
+  text-align: center;
+  margin-left: 10px;}
 .terms_btn {
   background-color: #404040;
   color: #ffffff;
@@ -129,24 +136,12 @@
     font-weight: bold;
     padding-left: 6px;}
   #history .refund_policy_link {
-    background-color: #D9D9D9;;
-    border: 1px solid #D9D9D9;;
-    font-size: 14px;
-    padding: 12px 30px;
-    font-weight: 600;
-    color: #232323;
-    text-transform: uppercase;
-    text-align: center;}
+    background-color: #D9D9D9;
+    border: 1px solid #D9D9D9;}
   #history #order_refund_request {
     background-color: #1292FF;
     border: 1px solid #1292FF;
-    font-size: 14px;
-    padding: 12px 30px;
-    font-weight: 600;
-    color: #FFF;
-    text-transform: uppercase;
-    margin-left: 10px;
-    text-align: center;}
+    color: #FFF;}
     @media screen and (max-width: 405px) {
       #history #order_refund_request {
       margin-bottom: 5px;}}

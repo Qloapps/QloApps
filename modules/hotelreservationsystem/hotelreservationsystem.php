@@ -45,7 +45,6 @@ class HotelReservationSystem extends Module
         $resources = array(
             'hotels' => array('description' => 'Hotel Branch Information','class' => 'HotelBranchInformation'),
             'hotel_room_types' => array('description' => 'Hotel room types','class' => 'HotelRoomType'),
-            'hotel_images' => array('description' => 'Hotel images', 'specific_management' => true),
             'hotel_features' => array('description' => 'The hotel features','class' => 'HotelFeatures'),
             'hotel_refund_rules' => array('description' => 'The hotel refund rules','class' => 'HotelOrderRefundRules'),
             'hotel_rooms' => array('description' => 'The hotel rooms','class' => 'HotelRoomInformation'),
@@ -147,15 +146,41 @@ class HotelReservationSystem extends Module
         }
     }
 
-    public function hookFooter($params)
+    public function hookDisplayFooter($params)
     {
         /*NOTE : NEVER REMOVE THIS CODE BEFORE DISCUSSION*/
         /*id_guest is set to the context->cookie object because data mining for prestashop module is disabled
         in which id_guest was set before this*/
         if (!isset($this->context->cookie->id_guest)) {
             Guest::setNewGuest($this->context->cookie);
+
+            if (Configuration::get('PS_STATSDATA_PLUGINS')) {
+                $this->context->controller->addJS($this->_path.'views/js/plugindetect.js');
+
+                $token = sha1($params['cookie']->id_guest._COOKIE_KEY_);
+
+                return '<script type="text/javascript">
+                    $(document).ready(function() {
+                        plugins = new Object;
+                        plugins.adobe_director = (PluginDetect.getVersion("Shockwave") != null) ? 1 : 0;
+                        plugins.adobe_flash = (PluginDetect.getVersion("Flash") != null) ? 1 : 0;
+                        plugins.apple_quicktime = (PluginDetect.getVersion("QuickTime") != null) ? 1 : 0;
+                        plugins.windows_media = (PluginDetect.getVersion("WindowsMediaPlayer") != null) ? 1 : 0;
+                        plugins.sun_java = (PluginDetect.getVersion("java") != null) ? 1 : 0;
+                        plugins.real_player = (PluginDetect.getVersion("RealPlayer") != null) ? 1 : 0;
+
+                        navinfo = { screen_resolution_x: screen.width, screen_resolution_y: screen.height, screen_color:screen.colorDepth};
+                        for (var i in plugins)
+                            navinfo[i] = plugins[i];
+                        navinfo.type = "navinfo";
+                        navinfo.id_guest = "'.(int)$params['cookie']->id_guest.'";
+                        navinfo.token = "'.$token.'";
+                        $.post("'.Context::getContext()->link->getPageLink('statistics', (bool)(Tools::getShopProtocol() == 'https://')).'", navinfo);
+                    });
+                </script>';
+            }
         }
-        // return $this->display(__FILE__, 'hotelGlobalVariables.tpl');
+
     }
     public function hookDisplayAfterDefautlFooterHook($params)
     {
@@ -228,123 +253,6 @@ class HotelReservationSystem extends Module
         }
     }
 
-    public function hookDisplayAdminProductsExtra($params)
-    {
-        if ($idProduct = Tools::getValue('id_product')) {
-            $objGlobalDemand = new HotelRoomTypeGlobalDemand();
-            $allDemands = $objGlobalDemand->getAllDemands();
-            $objCurrency = new Currency(Configuration::get('PS_CURRENCY_DEFAULT'));
-            // get room type additional services
-            $objRoomDemand = new HotelRoomTypeDemand();
-            $roomDemandPrices = $objRoomDemand->getRoomTypeDemands($idProduct, 0, 0);
-            $this->context->smarty->assign(
-                array(
-                    'idProduct' => $idProduct,
-                    'roomDemandPrices' => $roomDemandPrices,
-                    'allDemands' => $allDemands,
-                    'defaultcurrencySign' => $objCurrency->sign,
-                )
-            );
-        }
-        return $this->display(__FILE__, 'roomTypeDemands.tpl');
-    }
-
-    public function moduleProductsExtraTabName()
-    {
-        return $this->l('Additional Facilities');
-    }
-
-    public function hookActionProductUpdate($params)
-    {
-        if ($idProduct = $params['id_product']) {
-            $objRoomTypeDemand = new HotelRoomTypeDemand();
-            $objRoomTypeDemandPrice = new HotelRoomTypeDemandPrice();
-            // first delete all the previously saved prices and demands of this room type
-            $objRoomTypeDemand->deleteRoomTypeDemands($idProduct);
-            $objRoomTypeDemandPrice->deleteRoomTypeDemandPrices($idProduct);
-            if ($selectedDemands = Tools::getValue('selected_demand')) {
-                $objAdvOption = new HotelRoomTypeGlobalDemandAdvanceOption();
-                foreach ($selectedDemands as $idGlobalDemand) {
-                    if (Validate::isLoadedObject($objGlobalDemand = new HotelRoomTypeGlobalDemand($idGlobalDemand))) {
-                        // save selected demands for this room type
-                        $objRoomTypeDemand = new HotelRoomTypeDemand();
-                        $objRoomTypeDemand->id_product = $idProduct;
-                        $objRoomTypeDemand->id_global_demand = $idGlobalDemand;
-                        $objRoomTypeDemand->save();
-
-                        // save selected demands prices for this room type
-                        $demandPrice = Tools::getValue('demand_price_'.$idGlobalDemand);
-                        if (Validate::isPrice($demandPrice)) {
-                            if ($objGlobalDemand->price != $demandPrice) {
-                                $objRoomTypeDemandPrice = new HotelRoomTypeDemandPrice();
-                                $objRoomTypeDemandPrice->id_product = $idProduct;
-                                $objRoomTypeDemandPrice->id_global_demand = $idGlobalDemand;
-                                $objRoomTypeDemandPrice->id_option = 0;
-                                $objRoomTypeDemandPrice->price = $demandPrice;
-                                $objRoomTypeDemandPrice->save();
-                            }
-                        } else {
-                            $this->context->controller->errors[] = $this->l('Invalid demand price of facility').
-                            ' : '.$objGlobalDemand->name[$this->context->language->id];
-                        }
-                        if ($advOptions = $objAdvOption->getGlobalDemandAdvanceOptions($idGlobalDemand)) {
-                            foreach ($advOptions as $option) {
-                                if (Validate::isLoadedObject($objAdvOption = new HotelRoomTypeGlobalDemandAdvanceOption($option['id']))) {
-                                    $optionPrice = Tools::getValue('option_price_'.$option['id']);
-                                    if (Validate::isPrice($optionPrice)) {
-                                        if ($optionPrice != $objAdvOption->price) {
-                                            $objRoomTypeDemandPrice = new HotelRoomTypeDemandPrice();
-                                            $objRoomTypeDemandPrice->id_product = $idProduct;
-                                            $objRoomTypeDemandPrice->id_global_demand = $idGlobalDemand;
-                                            $objRoomTypeDemandPrice->id_option = $option['id'];
-                                            $objRoomTypeDemandPrice->price = $optionPrice;
-                                            $objRoomTypeDemandPrice->save();
-                                        }
-                                    } else {
-                                        $this->context->controller->errors[] = $this->l('Invalid price of advance option').
-                                        ' : '.$objAdvOption->name[$this->context->language->id];
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                if (count($this->context->controller->errors)) {
-                    $this->context->controller->warnings[] = $this->l('Invalid price values are not saved. Please correct them and save again');
-                }
-
-                $objCartBookingData = new HotelCartBookingData();
-                if ($cartExtraDemands = $objCartBookingData->getCartExtraDemands(0, $idProduct)) {
-                    // delete the demands from cart if not available in cart
-                    $objRoomDemand = new HotelRoomTypeDemand();
-                    $roomTypeDemandIds = array();
-                    if ($roomTypeDemands = $objRoomDemand->getRoomTypeDemands($idProduct)) {
-                        $roomTypeDemandIds = array_keys($roomTypeDemands);
-                    }
-                    foreach ($cartExtraDemands as &$demandInfo) {
-                        if (isset($demandInfo['extra_demands']) && $demandInfo['extra_demands']) {
-                            $cartChanged = 0;
-                            foreach ($demandInfo['extra_demands'] as $key => $demand) {
-                                if (!in_array($demand['id_global_demand'], $roomTypeDemandIds)) {
-                                    $cartChanged = 1;
-                                    unset($demandInfo['extra_demands'][$key]);
-                                }
-                            }
-                            if ($cartChanged) {
-                                if (Validate::isLoadedObject(
-                                    $objCartBooking = new HotelCartBookingData($demandInfo['id'])
-                                )) {
-                                    $objCartBooking->extra_demands = json_encode($demandInfo['extra_demands']);
-                                    $objCartBooking->save();
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
     public function hookActionProductSave($params)
     {
         $isToggling = Tools::getValue('statusproduct');
@@ -391,14 +299,6 @@ class HotelReservationSystem extends Module
             if (!$objHtlBkDtl->updateOrderRefundStatus($params['id_order'])) {
                 $this->context->controller->errors[] = $this->l('Error while making booked rooms available, attached with this order. Please try again !!');
             }
-        }
-    }
-
-    public function hookActionAdminControllerSetMedia()
-    {
-        if ('AdminProducts' == Tools::getValue('controller')) {
-            $this->context->controller->addJs($this->_path.'views/js/roomTypeDemand.js');
-            $this->context->controller->addCSS($this->_path.'views/css/roomTypeDemand.css');
         }
     }
 
@@ -463,7 +363,6 @@ class HotelReservationSystem extends Module
         );
 
         // Controllers without tabs
-        $this->installTab('AdminOrderRestrictSettings', 'Order Restrict Configuration', false, false);
         $this->installTab('AdminHotelGeneralSettings', 'Hotel General configuration', false, false);
         $this->installTab('AdminHotelFeaturePricesSettings', 'Advanced Price Rules', false, false);
         $this->installTab('AdminRoomTypeGlobalDemand', 'Additional Demand Configuration', false, false);
@@ -538,14 +437,11 @@ class HotelReservationSystem extends Module
                 'actionOrderHistoryAddAfter',
                 'displayBackOfficeHeader',
                 'actionObjectProductDeleteBefore',
-                'footer',
+                'displayFooter',
                 'displayAfterDefautlFooterHook',
                 'actionProductSave',
                 'addWebserviceResources',
                 'actionObjectLanguageAddAfter',
-                'actionAdminControllerSetMedia',
-                'displayAdminProductsExtra',
-                'actionProductUpdate',
                 'actionObjectProfileAddAfter',
                 'actionObjectProfileDeleteBefore',
                 'actionObjectGroupDeleteBefore',

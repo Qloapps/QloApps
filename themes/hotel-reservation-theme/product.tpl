@@ -70,16 +70,7 @@
 						<div class="hotel_name_block">
 							<span>{$product->name}&nbsp;-&nbsp;{$hotel_name}</span>
 						</div>
-						{if isset($num_reviews)}
-							{for $foo=1 to 5}
-								{if $foo <= $ratting}
-									<div class="room_ratting_yes" style="background-image:url({$ratting_img_path});"></div>
-								{else}
-									<div class="room_ratting_no" style="background-image:url({$ratting_img_path});"></div>
-								{/if}
-							{/for}
-							<span class="num_reviews">{$num_reviews} &nbsp;{l s='Review(s)'}</span>
-						{/if}
+						{hook h='displayRoomTypeDetailRoomTypeNameAfter' id_product=$product->id}
 					</div>
 					<!-- product img-->
 					<div class="row">
@@ -645,6 +636,7 @@
 		{strip}
 			{* By webkul variable needed in product.js *}
 			{addJsDef max_order_date = $max_order_date}
+			{addJsDef preparation_time = $preparation_time}
 			{addJsDef booking_date_to = $date_to}
 			{addJsDef booking_date_from = $date_from}
 
