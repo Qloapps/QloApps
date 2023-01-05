@@ -39,8 +39,8 @@
 							{l s='Occupied' mod='dashoccupancy'}
 						</p>
 						<div class="avail-pie-value-container">
-							<p class="avail-pie-value" id="pie_occupied_text">
-								{$count_occupied|escape:'htmlall':'UTF-8'}/{$count_total|escape:'htmlall':'UTF-8'}
+							<p class="avail-pie-value">
+								<span id="do_count_occupied"></span>/<span id="do_count_total"></span>
 							</p>
 						</div>
 					</div>
@@ -56,7 +56,7 @@
 						</p>
 						<div class="avail-pie-value-container">
 							<p class="avail-pie-value" id="pie_avail_text">
-								{$count_available|escape:'htmlall':'UTF-8'}
+								<span id="do_count_available"></span>
 							</p>
 						</div>
 					</div>
@@ -72,7 +72,7 @@
 						</p>
 						<div class="avail-pie-value-container">
 							<p class="avail-pie-value" id="pie_inactive_text">
-								{$count_unavailable|escape:'htmlall':'UTF-8'}
+								<span id="do_count_unavailable"></span>
 							</p>
 						</div>
 					</div>

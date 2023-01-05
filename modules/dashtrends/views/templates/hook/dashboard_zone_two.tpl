@@ -47,47 +47,39 @@
 		</header>
 		<section id="dashtrends_toolbar">
 			<div class="col-md-4 col-xs-6">
-				<dl class="label-tooltip" onclick="selectDashtrendsChart(this, 'sales');"
-				data-toggle="tooltip" data-placement="top"
-				data-original-title="{l s='Sum of revenue (excl. tax) generated within the date range by orders considered validated.' mod='dashtrends'}" data-placement="bottom" style='background-color: #72C3F0;'>
-						<dt>{l s='Sales' mod='dashtrends'}</dt>
-						<dd class="data_value size_l"><span id="sales_score"></span></dd>
+				<dl class="label-tooltip" onclick="selectDashtrendsChart(this, 'sales');" data-toggle="tooltip" data-placement="top" data-original-title="{l s='Sum of revenue (excluding tax) generated within the date range by orders considered validated.' mod='dashtrends'}" data-placement="bottom" style='background-color: #72C3F0;'>
+					<dt>{l s='Sales' mod='dashtrends'}</dt>
+					<dd class="data_value size_l"><span id="sales_score"></span></dd>
 				</dl>
 			</div>
 			<div class="col-md-4 col-xs-6">
-				<dl class="label-tooltip" onclick="selectDashtrendsChart(this, 'orders');"
-				data-toggle="tooltip" data-placement="top" data-original-title="{l s='Total number of booking received within the date range that are considered validated.' mod='dashtrends'}" data-placement="bottom" style='background-color: #56CE56;'>
-						<dt>{l s='Bookings' mod='dashtrends'}</dt>
-						<dd class="data_value size_l"><span id="orders_score"></span></dd>
+				<dl class="label-tooltip" onclick="selectDashtrendsChart(this, 'orders');" data-toggle="tooltip" data-placement="top" data-original-title="{l s='Total number of bookings received within the date range that are considered validated.' mod='dashtrends'}" data-placement="bottom" style='background-color: #56CE56;'>
+					<dt>{l s='Bookings' mod='dashtrends'}</dt>
+					<dd class="data_value size_l"><span id="orders_score"></span></dd>
 				</dl>
 			</div>
 			<div class="col-md-4 col-xs-6">
-				<dl class="label-tooltip" onclick="selectDashtrendsChart(this, 'average_cart_value');"
-				data-toggle="tooltip" data-placement="top" data-original-title="{l s='Average Cart Value is a metric representing the value of an average order within the date range. It is calculated by dividing Sales by booking.' mod='dashtrends'}" data-placement="bottom" style='background-color: #FF4036;'>
-						<dt>{l s='Cart Value' mod='dashtrends'}</dt>
-						<dd class="data_value size_l"><span id="cart_value_score"></span></dd>
+				<dl class="label-tooltip" onclick="selectDashtrendsChart(this, 'average_cart_value');" data-toggle="tooltip" data-placement="top" data-original-title="{l s='Average Order Value is a metric representing the value of an average order within the date range. It is calculated by dividing sales by bookings. This data is provided by the module "Data mining for statistics", so please make sure it is installed and configured.' mod='dashtrends'}" data-placement="bottom" style='background-color: #FF655C;'>
+					<dt>{l s='Average Order Value' mod='dashtrends'}</dt>
+					<dd class="data_value size_l"><span id="cart_value_score"></span></dd>
 				</dl>
 			</div>
 			<div class="col-md-4 col-xs-6">
-				<dl class="label-tooltip" onclick="selectDashtrendsChart(this, 'visits');"
-				data-toggle="tooltip" data-placement="top" data-original-title="{l s='Total number of visits within the date range. A visit is the period of time a user is actively engaged with your website.' mod='dashtrends'}" data-placement="bottom" style='background-color: #FF7F0E;'>
-						<dt>{l s='Visits' mod='dashtrends'}</dt>
-						<dd class="data_value size_l"><span id="visits_score"></span></dd>
+				<dl class="label-tooltip" onclick="selectDashtrendsChart(this, 'visits');" data-toggle="tooltip" data-placement="top" data-original-title="{l s='Total number of visits within the date range. A visit is the period of time a user is actively engaged with your website. This data is provided by the module "Data mining for statistics", so please make sure it is installed and configured.' mod='dashtrends'}" data-placement="bottom" style='background-color: #FF7F0E;'>
+					<dt>{l s='Visits' mod='dashtrends'}</dt>
+					<dd class="data_value size_l"><span id="visits_score"></span></dd>
 				</dl>
 			</div>
 			<div class="col-md-4 col-xs-6">
-				<dl class="label-tooltip" onclick="selectDashtrendsChart(this, 'conversion_rate');"
-				data-toggle="tooltip" data-placement="top" data-original-title="{l s='Hotel industry Conversion Rate is the percentage of visits that resulted in an validated booking.' mod='dashtrends'}" data-placement="bottom" style="background-color: #A569DF;">
+				<dl class="label-tooltip" onclick="selectDashtrendsChart(this, 'conversion_rate');" data-toggle="tooltip" data-placement="top" data-original-title="{l s='Conversion Rate is the percentage of visits that resulted in a validated booking.' mod='dashtrends'}" data-placement="bottom" style="background-color: #A569DF;">
 					<dt>{l s='Conversion Rate' mod='dashtrends'}</dt>
 					<dd class="data_value size_l"><span id="conversion_rate_score"></span></dd>
 				</dl>
 			</div>
 			<div class="col-md-4 col-xs-6">
-				<dl class="label-tooltip" onclick="selectDashtrendsChart(this, 'net_profits');"
-				data-toggle="tooltip" data-placement="top" data-original-title="{l s='Net profit is a measure of the profitability of a venture after accounting for all the Hotel industry costs. You can provide these costs by clicking on the configuration icon right above here.' mod='dashtrends'}"
-				data-placement="bottom" style="background-color: #AF8A42;">
-						<dt>{l s='Net Profit' mod='dashtrends'}</dt>
-						<dd class="data_value size_l"><span id="net_profits_score"></span></dd>
+				<dl class="label-tooltip" onclick="selectDashtrendsChart(this, 'net_profits');" data-toggle="tooltip" data-placement="top" data-original-title="{l s='Net Profit is the amount of money earned after deducting all operating costs and expenses over a period of time. You can provide these costs by clicking on the configuration icon right above here.' mod='dashtrends'}" data-placement="bottom" style="background-color: #AF8A42;">
+					<dt>{l s='Net Profit' mod='dashtrends'}</dt>
+					<dd class="data_value size_l"><span id="net_profits_score"></span></dd>
 				</dl>
 			</div>
 		</section>

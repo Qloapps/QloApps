@@ -151,7 +151,7 @@ class AdminPerformanceControllerCore extends AdminController
             'input' => array(
                 array(
                     'type' => 'switch',
-                    'label' => $this->l('Disable non PrestaShop modules'),
+                    'label' => $this->l('Disable non QloApps modules'),
                     'name' => 'native_module',
                     'class' => 't',
                     'is_bool' => true,
@@ -167,7 +167,7 @@ class AdminPerformanceControllerCore extends AdminController
                             'label' => $this->l('Disabled')
                         )
                     ),
-                    'hint' => $this->l('Enable or disable non PrestaShop Modules.')
+                    'hint' => $this->l('Enable or disable non QloApps Modules.')
                 ),
                 array(
                     'type' => 'switch',

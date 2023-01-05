@@ -93,7 +93,7 @@ class StatsNewsletter extends ModuleGraph
 						</ul>
 						<hr/>
 						<a class="btn btn-default export-csv" href="'.Tools::safeOutput($_SERVER['REQUEST_URI'].'&export=1').'">
-							<i class="icon-cloud-upload"></i> '.$this->l('CSV Export').'
+							<i class="icon-cloud-download"></i> '.$this->l('CSV Export').'
 						</a>
 					</div>
 				</div>
@@ -125,7 +125,7 @@ class StatsNewsletter extends ModuleGraph
 
     protected function getData($layers)
     {
-        $this->_titles['main'][0] = $this->l('customers');
+        $this->_titles['main'][0] = $this->l('Customers');
         $this->_titles['main'][1] = $this->l('Visitors');
         $this->_titles['main'][2] = $this->l('Newsletter statistics');
         $this->_titles['main'][3] = $this->l('Both');

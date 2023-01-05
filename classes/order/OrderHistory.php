@@ -327,30 +327,19 @@ class OrderHistoryCore extends ObjectModel
                 /** @var OrderInvoice $invoice */
                 $rest_paid = $invoice->getRestPaid();
                 if ($rest_paid > 0) {
-                    $payment = new OrderPayment();
-                    $payment->order_reference = Tools::substr($order->reference, 0, 9);
-                    $payment->id_currency = $order->id_currency;
-                    $payment->amount = $rest_paid;
-
                     if ($order->total_paid != 0) {
-                        $payment->payment_method = $payment_method->displayName;
+                        $payment_method = $payment_method->displayName;
                     } else {
-                        $payment->payment_method = null;
+                        $payment_method = null;
                     }
-
-                    // Update total_paid_real value for backward compatibility reasons
-                    if ($payment->id_currency == $order->id_currency) {
-                        $order->total_paid_real += $payment->amount;
-                    } else {
-                        $order->total_paid_real += Tools::ps_round(Tools::convertPrice($payment->amount, $payment->id_currency, false), 2);
-                    }
-                    $order->save();
-
-                    $payment->conversion_rate = ($order ? $order->conversion_rate : 1);
-                    $payment->save();
-                    Db::getInstance()->execute('
-					INSERT INTO `'._DB_PREFIX_.'order_invoice_payment` (`id_order_invoice`, `id_order_payment`, `id_order`)
-					VALUES('.(int)$invoice->id.', '.(int)$payment->id.', '.(int)$order->id.')');
+                    $order->addOrderPayment(
+                        $rest_paid,
+                        $payment_method,
+                        null,
+                        null,
+                        null,
+                        $invoice
+                    );
                 }
             }
         }

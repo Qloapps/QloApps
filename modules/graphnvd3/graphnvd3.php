@@ -82,14 +82,15 @@ class GraphNvD3 extends ModuleGraphEngine
         }
 
         $nvd3_func = array(
-            'line' => '
-				nv.models.lineChart()',
+            'line' => (isset($params['has_label_y']) && $params['has_label_y']) ?
+                'nv.models.lineChart().margin({ left: 80 })' :
+                'nv.models.lineChart()',
             'pie' => '
-				nv.models.pieChart()
-					.x(function(d) { return d.label; })
-					.y(function(d) { return d.value; })
-					.showLabels(true)
-					.showLegend(false)'
+                nv.models.pieChart()
+                    .x(function(d) { return d.label; })
+                    .y(function(d) { return d.value; })
+                    .showLabels(true)
+                    .showLegend(false)'
         );
 
         return '

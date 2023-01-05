@@ -33,7 +33,7 @@ class WkTestimonialBlock extends Module
         $this->name = 'wktestimonialblock';
         $this->tab = 'front_office_features';
         $this->version = '1.1.5';
-        $this->author = 'webkul';
+        $this->author = 'Webkul';
         $this->need_instance = 0;
 
         $this->bootstrap = true;
@@ -42,13 +42,6 @@ class WkTestimonialBlock extends Module
         $this->displayName = $this->l('Hotel Testimonial');
         $this->description = $this->l('Show Hotel testimonials on home page using this module.');
         $this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
-    }
-
-    public function hookDisplayAddModuleSettingLink()
-    {
-        $hrefTestimonialsConf = $this->context->link->getAdminLink('AdminTestimonialsModuleSetting');
-        $this->context->smarty->assign('testimonials_setting_link', $hrefTestimonialsConf);
-        return $this->display(__FILE__, 'hotelTestimonialSettingLink.tpl');
     }
 
     public function hookDisplayHome()
@@ -132,10 +125,14 @@ class WkTestimonialBlock extends Module
             array (
                 'displayHome',
                 'displayFooterExploreSectionHook',
-                'displayAddModuleSettingLink',
                 'actionObjectLanguageAddAfter'
             )
         );
+    }
+
+    public function getContent()
+    {
+        Tools::redirectAdmin($this->context->link->getAdminLink('AdminTestimonialsModuleSetting'));
     }
 
     public function callInstallTab()

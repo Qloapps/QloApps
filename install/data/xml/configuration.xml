@@ -11,6 +11,9 @@
 	<configuration id="PS_ONE_PHONE_AT_LEAST" name="PS_ONE_PHONE_AT_LEAST">
 		<value>1</value>
 	</configuration>
+	<configuration id="PS_CART_FOLLOWING" name="PS_CART_FOLLOWING">
+		<value>1</value>
+	</configuration>
 	<configuration id="PS_CARRIER_DEFAULT" name="PS_CARRIER_DEFAULT">
 		<value>1</value>
 	</configuration>
@@ -58,6 +61,12 @@
 	</configuration>
 	<configuration id="PS_HOTEL_IMAGES_PER_PAGE" name="PS_HOTEL_IMAGES_PER_PAGE">
 		<value>9</value>
+	</configuration>
+	<configuration id="SHOW_AMENITIES_FILTER" name="SHOW_AMENITIES_FILTER">
+		<value>1</value>
+	</configuration>
+	<configuration id="SHOW_PRICE_FILTER" name="SHOW_PRICE_FILTER">
+		<value>1</value>
 	</configuration>
 	<configuration id="PS_PURCHASE_MINIMUM" name="PS_PURCHASE_MINIMUM">
 		<value>0</value>
@@ -437,6 +446,9 @@
 	<configuration id="PS_COOKIE_LIFETIME_BO" name="PS_COOKIE_LIFETIME_BO">
 		<value>480</value>
 	</configuration>
+	<configuration id="PS_COOKIE_SAMESITE" name="PS_COOKIE_SAMESITE">
+		<value>Lax</value>
+	</configuration>
 	<configuration id="PS_RESTRICT_DELIVERED_COUNTRIES" name="PS_RESTRICT_DELIVERED_COUNTRIES">
 		<value>0</value>
 	</configuration>
@@ -605,28 +617,55 @@
 	<configuration id="PS_STATS_GRID_RENDER" name="PS_STATS_GRID_RENDER">
 		<value>gridhtml</value>
 	</configuration>
-	<configuration id="CHECKUP_DESCRIPTIONS_LT" name="CHECKUP_DESCRIPTIONS_LT">
+	<configuration id="BLOCKTAGS_NBR" name="BLOCKTAGS_NBR">
+		<value>10</value>
+	</configuration>
+	<configuration id="HOTEL_CHECKUP_DESCRIPTIONS_LT" name="HOTEL_CHECKUP_DESCRIPTIONS_LT">
 		<value>100</value>
 	</configuration>
-	<configuration id="CHECKUP_DESCRIPTIONS_GT" name="CHECKUP_DESCRIPTIONS_GT">
+	<configuration id="HOTEL_CHECKUP_DESCRIPTIONS_GT" name="HOTEL_CHECKUP_DESCRIPTIONS_GT">
 		<value>400</value>
 	</configuration>
-	<configuration id="CHECKUP_IMAGES_LT" name="CHECKUP_IMAGES_LT">
+	<configuration id="HOTEL_CHECKUP_IMAGES_LT" name="HOTEL_CHECKUP_IMAGES_LT">
 		<value>1</value>
 	</configuration>
-	<configuration id="CHECKUP_IMAGES_GT" name="CHECKUP_IMAGES_GT">
+	<configuration id="HOTEL_CHECKUP_IMAGES_GT" name="HOTEL_CHECKUP_IMAGES_GT">
 		<value>2</value>
 	</configuration>
-	<configuration id="CHECKUP_SALES_LT" name="CHECKUP_SALES_LT">
+	<configuration id="HOTEL_CHECKUP_ORDERS_LT" name="HOTEL_CHECKUP_ORDERS_LT">
 		<value>1</value>
 	</configuration>
-	<configuration id="CHECKUP_SALES_GT" name="CHECKUP_SALES_GT">
+	<configuration id="HOTEL_CHECKUP_ORDERS_GT" name="HOTEL_CHECKUP_ORDERS_GT">
 		<value>2</value>
 	</configuration>
-	<configuration id="CHECKUP_STOCK_LT" name="CHECKUP_STOCK_LT">
+	<configuration id="HOTEL_CHECKUP_TOTAL_ROOMS_LT" name="HOTEL_CHECKUP_TOTAL_ROOMS_LT">
 		<value>1</value>
 	</configuration>
-	<configuration id="CHECKUP_STOCK_GT" name="CHECKUP_STOCK_GT">
+	<configuration id="HOTEL_CHECKUP_TOTAL_ROOMS_GT" name="HOTEL_CHECKUP_TOTAL_ROOMS_GT">
+		<value>3</value>
+	</configuration>
+	<configuration id="ROOM_TYPE_CHECKUP_DESCRIPTIONS_LT" name="ROOM_TYPE_CHECKUP_DESCRIPTIONS_LT">
+		<value>100</value>
+	</configuration>
+	<configuration id="ROOM_TYPE_CHECKUP_DESCRIPTIONS_GT" name="ROOM_TYPE_CHECKUP_DESCRIPTIONS_GT">
+		<value>400</value>
+	</configuration>
+	<configuration id="ROOM_TYPE_CHECKUP_IMAGES_LT" name="ROOM_TYPE_CHECKUP_IMAGES_LT">
+		<value>1</value>
+	</configuration>
+	<configuration id="ROOM_TYPE_CHECKUP_IMAGES_GT" name="ROOM_TYPE_CHECKUP_IMAGES_GT">
+		<value>2</value>
+	</configuration>
+	<configuration id="ROOM_TYPE_CHECKUP_ORDERS_LT" name="ROOM_TYPE_CHECKUP_ORDERS_LT">
+		<value>1</value>
+	</configuration>
+	<configuration id="ROOM_TYPE_CHECKUP_ORDERS_GT" name="ROOM_TYPE_CHECKUP_ORDERS_GT">
+		<value>2</value>
+	</configuration>
+	<configuration id="ROOM_TYPE_CHECKUP_TOTAL_ROOMS_LT" name="ROOM_TYPE_CHECKUP_TOTAL_ROOMS_LT">
+		<value>1</value>
+	</configuration>
+	<configuration id="ROOM_TYPE_CHECKUP_TOTAL_ROOMS_GT" name="ROOM_TYPE_CHECKUP_TOTAL_ROOMS_GT">
 		<value>3</value>
 	</configuration>
 	<configuration id="FOOTER_CMS" name="FOOTER_CMS">

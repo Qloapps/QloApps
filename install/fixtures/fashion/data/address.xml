@@ -30,12 +30,5 @@
       <city>Paris </city>
       <other/>
     </address>
-    <address id="My_address" id_country="US" id_state="FL" id_customer="John" id_manufacturer="" id_supplier="" id_warehouse="0" alias="My address" lastname="DOE" firstname="John" postcode="33133" phone="0102030405" phone_mobile="" vat_number="" dni="" active="1">
-      <company>My Company</company>
-      <address1>16, Main street</address1>
-      <address2>2nd floor</address2>
-      <city>Miami</city>
-      <other/>
-    </address>
   </entities>
 </entity_address>

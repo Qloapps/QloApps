@@ -1,0 +1,24 @@
+------------------------------
+# V1.3.1 to V1.3.2
+------------------------------
+
+## Improved/Changed Features:
+
+* [CO] : [#244] Changed Tools::jsonEncode to json_encode
+
+
+------------------------------
+# V1.2.2 to V1.3.1
+------------------------------
+
+## Improved/Changed Features:
+
+* [CO] : Updated with latest PS version - 1.6.1.23.
+
+
+2014-04-22 18:58:41 +0200	// Changelog updated
+2014-04-17 11:33:15 +0200	[-] MO : gridhtml - Fix 1.5 ps_version_compliancy issue
+2014-04-16 13:26:45 +0200	// Missing closing parenthesis.
+2014-04-16 12:30:41 +0200	// gridhtml: mode description translatable.
+2014-03-24 15:21:48 +0100	/ MO gridhtml : ps_versions_compliancy added
+2014-03-20 14:35:17 +0100	Initial commit

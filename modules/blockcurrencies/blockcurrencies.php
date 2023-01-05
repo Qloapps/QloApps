@@ -41,10 +41,10 @@ class BlockCurrencies extends Module
         parent::__construct();
 
         $this->displayName = $this->l('Currency selector block');
-        $this->description = $this->l('Adds a block allowing customers to select their preferred currency.');
+        $this->description = $this->l('Adds a block allowing customers to select their preferred booking currency.');
         $this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
     }
-
+ 
     public function install()
     {
         if (!parent::install()

@@ -673,6 +673,31 @@ CREATE TABLE `PREFIX_customer_thread` (
 	KEY `id_product` (`id_product`)
 ) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8 COLLATION;
 
+CREATE TABLE `PREFIX_order_customer_guest_detail` (
+  `id_order_customer_guest_detail` int(10) unsigned NOT NULL auto_increment,
+  `id_order` int(10) unsigned NOT NULL,
+  `id_gender` int(10) unsigned NOT NULL,
+  `firstname` varchar(32) NOT NULL,
+  `lastname` varchar(32) NOT NULL,
+  `email` varchar(128) NOT NULL,
+  `phone` varchar(32) DEFAULT NULL,
+  `date_add` datetime NOT NULL,
+  `date_upd` datetime NOT NULL,
+	PRIMARY KEY (`id_order_customer_guest_detail`)
+) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8 COLLATION;
+
+CREATE TABLE `PREFIX_cart_customer_guest_detail` (
+  `id_customer_guest_detail` int(10) unsigned NOT NULL auto_increment,
+  `id_cart` int(10) unsigned NOT NULL,
+  `id_gender` int(10) unsigned NOT NULL,
+  `firstname` varchar(32) NOT NULL,
+  `lastname` varchar(32) NOT NULL,
+  `email` varchar(128) NOT NULL,
+  `phone` varchar(32) DEFAULT NULL,
+  `date_add` datetime NOT NULL,
+  `date_upd` datetime NOT NULL,
+	PRIMARY KEY (`id_customer_guest_detail`)
+) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8 COLLATION;
 
 CREATE TABLE `PREFIX_customization` (
   `id_customization` int(10) unsigned NOT NULL auto_increment,
@@ -959,6 +984,7 @@ CREATE TABLE `PREFIX_image_type` (
   `height` int(10) unsigned NOT NULL,
   `products` tinyint(1) NOT NULL DEFAULT '1',
   `categories` tinyint(1) NOT NULL DEFAULT '1',
+  `hotels` tinyint(1) NOT NULL DEFAULT '1',
   `manufacturers` tinyint(1) NOT NULL DEFAULT '1',
   `suppliers` tinyint(1) NOT NULL DEFAULT '1',
   `scenes` tinyint(1) NOT NULL DEFAULT '1',
@@ -1455,6 +1481,15 @@ CREATE TABLE `PREFIX_order_payment` (
 	`date_add` DATETIME NOT NULL,
 	PRIMARY KEY (`id_order_payment`),
 	KEY `order_reference`(`order_reference`)
+) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8 COLLATION;
+
+CREATE TABLE `PREFIX_order_payment_detail` (
+	`id_order_payment_detail` INT(10) unsigned NOT NULL auto_increment,
+	`id_order_payment` INT(10) unsigned NOT NULL,
+	`id_order` INT(10) unsigned NOT NULL,
+	`amount` DECIMAL(10,2) NOT NULL,
+	`date_add` DATETIME NOT NULL,
+	PRIMARY KEY (`id_order_payment_detail`)
 ) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8 COLLATION;
 
 CREATE TABLE `PREFIX_product` (
@@ -2597,7 +2632,7 @@ CREATE TABLE `PREFIX_tab_module_preference` (
   UNIQUE KEY `employee_module` (`id_employee`, `id_tab`, `module`)
 ) ENGINE=ENGINE_TYPE  DEFAULT CHARSET=utf8 COLLATION;
 
- CREATE TABLE `PREFIX_carrier_tax_rules_group_shop` (
+CREATE TABLE `PREFIX_carrier_tax_rules_group_shop` (
 	`id_carrier` int( 11 ) unsigned NOT NULL,
 	`id_tax_rules_group` int(11) unsigned NOT NULL,
 	`id_shop` int(11) unsigned NOT NULL,
@@ -2607,6 +2642,7 @@ CREATE TABLE `PREFIX_tab_module_preference` (
 CREATE TABLE `PREFIX_order_invoice_payment` (
 	`id_order_invoice` int(11) unsigned NOT NULL,
 	`id_order_payment` int(11) unsigned NOT NULL,
+	`id_order_payment_detail` int(11) unsigned NOT NULL,
 	`id_order` int(11) unsigned NOT NULL,
 	PRIMARY KEY (`id_order_invoice`,`id_order_payment`),
 	KEY `order_payment` (`id_order_payment`),
@@ -2689,3 +2725,11 @@ CREATE TABLE IF NOT EXISTS `PREFIX_cms_role_lang` (
   PRIMARY KEY (`id_cms_role`,`id_lang`, id_shop)
 ) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8;
 
+
+CREATE TABLE IF NOT EXISTS `PREFIX_maintenance_access` (
+  `id_maintenance_access` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `ip_address` varchar(50) NOT NULL,
+  `email` varchar(128) NOT NULL,
+  `date_add` datetime NOT NULL,
+  PRIMARY KEY (`id_maintenance_access`)
+) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8;

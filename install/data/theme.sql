@@ -3,6 +3,8 @@ SET NAMES 'utf8';
 UPDATE `PREFIX_configuration` SET value = '1' WHERE name = 'PS_CONDITIONS';
 UPDATE `PREFIX_configuration` SET value = '12' WHERE name = 'PS_PRODUCTS_PER_PAGE';
 UPDATE `PREFIX_configuration` SET value = '9' WHERE name = 'PS_HOTEL_IMAGES_PER_PAGE';
+UPDATE `PREFIX_configuration` SET value = '1' WHERE name = 'SHOW_AMENITIES_FILTER';
+UPDATE `PREFIX_configuration` SET value = '1' WHERE name = 'SHOW_PRICE_FILTER';
 UPDATE `PREFIX_configuration` SET value = '0' WHERE name = 'PS_PRODUCTS_ORDER_WAY';
 UPDATE `PREFIX_configuration` SET value = '4' WHERE name = 'PS_PRODUCTS_ORDER_BY';
 UPDATE `PREFIX_configuration` SET value = '1' WHERE name = 'PS_DISPLAY_QTIES';
@@ -52,7 +54,6 @@ UPDATE `PREFIX_configuration` SET value = 'CAT3,CAT8,CAT5,LNK1' WHERE name = 'MO
 UPDATE `PREFIX_configuration` SET value = '0' WHERE name = 'MOD_BLOCKTOPMENU_SEARCH';
 UPDATE `PREFIX_configuration` SET value = 'https://www.facebook.com/qloapps' WHERE name = 'BLOCKSOCIAL_FACEBOOK';
 UPDATE `PREFIX_configuration` SET value = 'https://twitter.com/qloapps' WHERE name = 'BLOCKSOCIAL_TWITTER';
-UPDATE `PREFIX_configuration` SET value = 'https://plus.google.com/110221570427070809661' WHERE name = 'BLOCKSOCIAL_GOOGLE_PLUS';
 UPDATE `PREFIX_configuration` SET value = 'My Company' WHERE name = 'BLOCKCONTACTINFOS_COMPANY';
 UPDATE `PREFIX_configuration` SET value = '42 Puffin street\n12345 Puffinville\nFrance' WHERE name = 'BLOCKCONTACTINFOS_ADDRESS';
 UPDATE `PREFIX_configuration` SET value = '0123-456-789' WHERE name = 'BLOCKCONTACTINFOS_PHONE';
@@ -129,6 +130,24 @@ AND id_hook IN (@id_hook, @id_hook2);
 UPDATE `PREFIX_hook_module` SET position = 3
 WHERE id_module = (SELECT id_module FROM `PREFIX_module` WHERE name = 'blockbestsellers')
 AND id_hook IN (@id_hook, @id_hook2);
+
+/* displayLeftColumn */
+SET @id_hook = (SELECT id_hook FROM `PREFIX_hook` WHERE name = 'displayLeftColumn');
+UPDATE `PREFIX_hook_module` SET position = 1
+WHERE id_module = (SELECT id_module FROM `PREFIX_module` WHERE name = 'wkroomsearchblock')
+AND id_hook = @id_hook;
+
+UPDATE `PREFIX_hook_module` SET position = 2
+WHERE id_module = (SELECT id_module FROM `PREFIX_module` WHERE name = 'wkhotelfilterblock')
+AND id_hook = @id_hook;
+
+UPDATE `PREFIX_hook_module` SET position = 3
+WHERE id_module = (SELECT id_module FROM `PREFIX_module` WHERE name = 'blockmyaccount')
+AND id_hook = @id_hook;
+
+UPDATE `PREFIX_hook_module` SET position = 4
+WHERE id_module = (SELECT id_module FROM `PREFIX_module` WHERE name = 'hotelreservationsystem')
+AND id_hook = @id_hook;
 
 /* displayFooter */
 SET @id_hook = (SELECT id_hook FROM `PREFIX_hook` WHERE name = 'displayFooter');
