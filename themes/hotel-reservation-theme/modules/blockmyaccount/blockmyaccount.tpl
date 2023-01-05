@@ -49,11 +49,6 @@
 				</a>
 			</li>
 			<li>
-				<a href="{$link->getPageLink('addresses', true)|escape:'html':'UTF-8'}" title="{l s='My addresses' mod='blockmyaccount'}">
-					{l s='My addresses' mod='blockmyaccount'}
-				</a>
-			</li>
-			<li>
 				<a href="{$link->getPageLink('identity', true)|escape:'html':'UTF-8'}" title="{l s='My personal info' mod='blockmyaccount'}">
 					{l s='My personal info' mod='blockmyaccount'}
 				</a>

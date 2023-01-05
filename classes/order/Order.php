@@ -1272,8 +1272,6 @@ class OrderCore extends ObjectModel
                 $this->setLastInvoiceNumber($order_invoice->id, $this->id_shop);
             }
 
-
-
             // Update order_carrier
             $id_order_carrier = Db::getInstance()->getValue('
 				SELECT `id_order_carrier`
@@ -1297,11 +1295,13 @@ class OrderCore extends ObjectModel
             // Update order payment
             if ($use_existing_payment) {
                 $id_order_payments = Db::getInstance()->executeS('
-					SELECT DISTINCT op.id_order_payment
+					SELECT DISTINCT op.id_order_payment, opd.id_order_payment_detail
 					FROM `'._DB_PREFIX_.'order_payment` op
 					INNER JOIN `'._DB_PREFIX_.'orders` o ON (o.reference = op.order_reference)
+					LEFT JOIN `'._DB_PREFIX_.'order_payment_detail` opd ON (op.id_order_payment = opd.id_order_payment)
 					LEFT JOIN `'._DB_PREFIX_.'order_invoice_payment` oip ON (oip.id_order_payment = op.id_order_payment)
-					WHERE (oip.id_order != '.(int)$order_invoice->id_order.' OR oip.id_order IS NULL) AND o.id_order = '.(int)$order_invoice->id_order);
+					WHERE (oip.id_order != '.(int)$order_invoice->id_order.' OR oip.id_order IS NULL) AND o.id_order = '.(int)$order_invoice->id_order.'
+                    AND opd.`id_order` = '.$order_invoice->id_order);
 
                 if (count($id_order_payments)) {
                     foreach ($id_order_payments as $order_payment) {
@@ -1309,6 +1309,7 @@ class OrderCore extends ObjectModel
 							INSERT INTO `'._DB_PREFIX_.'order_invoice_payment`
 							SET
 								`id_order_invoice` = '.(int)$order_invoice->id.',
+								`id_order_payment_detail` = '.(int)$order_payment['id_order_payment_detail'].',
 								`id_order_payment` = '.(int)$order_payment['id_order_payment'].',
 								`id_order` = '.(int)$order_invoice->id_order);
                     }
@@ -1316,7 +1317,6 @@ class OrderCore extends ObjectModel
                     Cache::clean('order_invoice_paid_*');
                 }
             }
-
             // Update order cart rule
             Db::getInstance()->execute('
 				UPDATE `'._DB_PREFIX_.'order_cart_rule`
@@ -1691,11 +1691,12 @@ class OrderCore extends ObjectModel
     {
         // if one of the order details use the tax computation method the display will be different
         return Db::getInstance()->getValue('
-		SELECT od.`tax_computation_method`
-		FROM `'._DB_PREFIX_.'order_detail_tax` odt
-		LEFT JOIN `'._DB_PREFIX_.'order_detail` od ON (od.`id_order_detail` = odt.`id_order_detail`)
-		WHERE od.`id_order` = '.(int)$this->id.'
-		AND od.`tax_computation_method` = '.(int)TaxCalculator::ONE_AFTER_ANOTHER_METHOD);
+            SELECT od.`tax_computation_method`
+            FROM `'._DB_PREFIX_.'order_detail_tax` odt
+            LEFT JOIN `'._DB_PREFIX_.'order_detail` od ON (od.`id_order_detail` = odt.`id_order_detail`)
+            WHERE od.`id_order` = '.(int)$this->id.'
+            AND od.`tax_computation_method` = '.(int)TaxCalculator::ONE_AFTER_ANOTHER_METHOD
+        );
     }
 
     /**
@@ -1711,6 +1712,21 @@ class OrderCore extends ObjectModel
     }
 
     /**
+     * This method allows to get all Order Payment detail for the current order
+     * @since 1.5.0.1
+     * @return array of OrderPaymentDetails
+     */
+    public function getOrderPaymentDetail()
+    {
+        return Db::getInstance()->executeS('
+            SELECT opd.`amount` as `real_paid_amount`, opd.*, op.*
+            FROM `'._DB_PREFIX_.'order_payment_detail` opd
+            INNER JOIN `'._DB_PREFIX_.'order_payment` op ON (opd.`id_order_payment` = op.`id_order_payment`)
+            WHERE `id_order` = '.$this->id
+        );
+    }
+
+    /**
      *
      * This method allows to add a payment to the current order
      * @since 1.5.0.1
@@ -1720,9 +1736,10 @@ class OrderCore extends ObjectModel
      * @param Currency $currency
      * @param string $date
      * @param OrderInvoice $order_invoice
+     * @param bool $update_payment_detail :: if false, be sure to add payment detail in payment detail table
      * @return bool
      */
-    public function addOrderPayment($amount_paid, $payment_method = null, $payment_transaction_id = null, $currency = null, $date = null, $order_invoice = null)
+    public function addOrderPayment($amount_paid, $payment_method = null, $payment_transaction_id = null, $currency = null, $date = null, $order_invoice = null, $update_payment_detail = true)
     {
         $order_payment = new OrderPayment();
         $order_payment->order_reference = $this->reference;
@@ -1740,30 +1757,51 @@ class OrderCore extends ObjectModel
             $order_payment->date_add .= ' '.date('H:i:s');
         }
 
-        // Update total_paid_real value for backward compatibility reasons
-        if ($order_payment->id_currency == $this->id_currency) {
-            $this->total_paid_real += $order_payment->amount;
-        } else {
-            $this->total_paid_real += Tools::ps_round(Tools::convertPrice($order_payment->amount, $order_payment->id_currency, false), 2);
-        }
-
         // We put autodate parameter of add method to true if date_add field is null
-        $res = $order_payment->add(is_null($order_payment->date_add)) && $this->update();
-
-        if (!$res) {
-            return false;
-        }
-
-        if (!is_null($order_invoice)) {
-            $res = Db::getInstance()->execute('
-			INSERT INTO `'._DB_PREFIX_.'order_invoice_payment` (`id_order_invoice`, `id_order_payment`, `id_order`)
-			VALUES('.(int)$order_invoice->id.', '.(int)$order_payment->id.', '.(int)$this->id.')');
-
-            // Clear cache
-            Cache::clean('order_invoice_paid_*');
+        if ($res = $order_payment->add(is_null($order_payment->date_add))) {
+            if ($update_payment_detail) {
+                $res &= $this->addOrderPaymentDetail($order_payment, $amount_paid, $order_invoice);
+            }
         }
 
         return $res;
+    }
+
+    public function addOrderPaymentDetail(OrderPayment $payment, $amount = null, $order_invoice = null)
+    {
+        if (Validate::isLoadedObject($payment)) {
+            if (!is_null($amount)) {
+                $amount = $payment->amount;
+            }
+            $order_payment_detail = new OrderPaymentDetail();
+            $order_payment_detail->id_order = $this->id;
+            $order_payment_detail->id_order_payment = (int)$payment->id;
+            $order_payment_detail->amount = $amount;
+
+            if ($payment->id_currency == $this->id_currency) {
+                $this->total_paid_real += $order_payment_detail->amount;
+            } else {
+                $this->total_paid_real += Tools::ps_round(Tools::convertPrice($order_payment_detail->amount, $payment->id_currency, false), 2);
+            }
+
+            if (!validate::isPrice($this->total_paid_real)) {
+                return false;
+            }
+
+            if ($order_payment_detail->add() && $this->update()) {
+                if (!is_null($order_invoice)) {
+                    $res = Db::getInstance()->execute('
+                    INSERT INTO `'._DB_PREFIX_.'order_invoice_payment` (`id_order_invoice`, `id_order_payment`, `id_order_payment_detail`, `id_order`)
+                    VALUES('.(int)$order_invoice->id.', '.(int)(int)$payment->id.', '.(int)$order_payment_detail->id.', '.(int)$this->id.')');
+
+                    // Clear cache
+                    Cache::clean('order_invoice_paid_*');
+                }
+
+                return $order_payment_detail->id;
+            }
+        }
+        return false;
     }
 
     /**
@@ -1898,14 +1936,15 @@ class OrderCore extends ObjectModel
         }
 
         $total = 0;
+
         // Retrieve all payments
-        $payments = $this->getOrderPaymentCollection();
+        $payments = $this->getOrderPaymentDetail();
         foreach ($payments as $payment) {
             /** @var OrderPayment $payment */
-            if ($payment->id_currency == $currency->id) {
-                $total += $payment->amount;
+            if ($payment['id_currency'] == $currency->id) {
+                $total += $payment['real_paid_amount'];
             } else {
-                $amount = Tools::convertPrice($payment->amount, $payment->id_currency, false);
+                $amount = Tools::convertPrice($payment['real_paid_amount'], $payment['id_currency'], false);
                 if ($currency->id == Configuration::get('PS_CURRENCY_DEFAULT', null, null, $this->id_shop)) {
                     $total += $amount;
                 } else {
@@ -2169,6 +2208,11 @@ class OrderCore extends ObjectModel
     public function getOrderPayments()
     {
         return OrderPayment::getByOrderReference($this->reference);
+    }
+
+    public function getOrderPaymentsDetail()
+    {
+        return OrderPaymentDetail::getByOrderId($this->id);
     }
 
     /**

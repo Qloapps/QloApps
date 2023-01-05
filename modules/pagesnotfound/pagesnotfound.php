@@ -164,7 +164,7 @@ class PagesNotFound extends Module
 				</tbody>
 			</table>';
         } else {
-            $this->html .= '<div class="alert alert-warning"> '.$this->l('No "page not found" issue registered for now.').'</div>';
+            $this->html .= '<div class="alert alert-warning"> '.$this->l('No "Page not found" issue registered or database has been cleared for this time period.').'</div>';
         }
 
         if (count($pages)) {

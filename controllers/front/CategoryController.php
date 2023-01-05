@@ -95,6 +95,18 @@ class CategoryControllerCore extends FrontController
             $this->errors[] = Tools::displayError('Missing category ID');
         }
 
+        // validate dates if available
+        $dateFrom = Tools::getValue('date_from');
+        $dateTo = Tools::getValue('date_to');
+
+        if ($dateFrom != '' && !Validate::isDate($dateFrom)) {
+            Tools::redirect($this->context->link->getPageLink('pagenotfound'));
+        }
+
+        if ($dateTo != '' && !Validate::isDate($dateTo)) {
+            Tools::redirect($this->context->link->getPageLink('pagenotfound'));
+        }
+
         // Instantiate category
         $this->category = new Category($id_category, $this->context->language->id);
 
@@ -218,6 +230,8 @@ class CategoryControllerCore extends FrontController
 
     public function displayAjaxFilterResults()
     {
+        $response = array('status' => false);
+
         $this->display_header = false;
         $this->display_footer = false;
 
@@ -231,7 +245,6 @@ class CategoryControllerCore extends FrontController
 
         $adult = 0;
         $child = 0;
-        $ratting = -1;
         $amenities = 0;
         $price = 0;
 
@@ -241,8 +254,6 @@ class CategoryControllerCore extends FrontController
                     $adult = min($value);
                 } elseif ($key == 'children') {
                     $child = min($value);
-                } elseif ($key == 'ratting') {
-                    $ratting = min($value);
                 } elseif ($key == 'amenities') {
                     $amenities = array();
                     foreach ($value as $a_k => $a_v) {
@@ -265,7 +276,7 @@ class CategoryControllerCore extends FrontController
             $id_guest = $this->context->cookie->id_guest;
 
             $obj_booking_dtl = new HotelBookingDetail();
-            $booking_data = $obj_booking_dtl->DataForFrontSearch($date_from, $date_to, $id_hotel, 0, 0, $adult, $child, $ratting, $amenities, $price, $id_cart, $id_guest);
+            $booking_data = $obj_booking_dtl->DataForFrontSearch($date_from, $date_to, $id_hotel, 0, 0, $adult, $child, -1, $amenities, $price, $id_cart, $id_guest);
             // reset array keys from 0
             $booking_data['rm_data'] = array_values($booking_data['rm_data']);
             if ($sort_by && $sort_value) {
@@ -277,18 +288,18 @@ class CategoryControllerCore extends FrontController
                     $direction = SORT_DESC;
                 }
                 foreach ($booking_data['rm_data'] as $s_k => $s_v) {
-                    if ($sort_by == 1) {
-                        $indi_arr[$s_k] = $s_v['ratting'];
-                    } elseif ($sort_by == 2) {
-                        $indi_arr[$s_k] = $s_v['price'];
-                    }
+                    $indi_arr[$s_k] = $s_v['price'];
                 }
 
                 array_multisort($indi_arr, $direction, $booking_data['rm_data']);
             }
+
             $this->context->smarty->assign(array('booking_data' => $booking_data));
+            $html = $this->context->smarty->fetch('_partials/room_type_list.tpl');
+            $response['status'] = true;
+            $response['html_room_type_list'] = $html;
         }
-        die($this->context->smarty->fetch(_PS_THEME_DIR_.'_partials/room_type_list.tpl'));
+        $this->ajaxDie(json_encode($response));
     }
 
     /**

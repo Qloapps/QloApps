@@ -16,10 +16,10 @@
     <link_rewrite>legal-notice</link_rewrite>
   </cms>
   <cms id="Terms_and_conditions_of_use">
-    <meta_title>Terms and conditions of use</meta_title>
-    <meta_description>Our terms and conditions of use</meta_description>
+    <meta_title>Terms and Conditions</meta_title>
+    <meta_description>Our Terms and Conditions</meta_description>
     <meta_keywords>conditions, terms, use, sell</meta_keywords>
-    <content>&lt;h1 class=&quot;page-heading&quot;&gt;Terms and conditions of use&lt;/h1&gt;
+    <content>&lt;h1 class=&quot;page-heading&quot;&gt;Terms and Conditions&lt;/h1&gt;
 &lt;h3 class=&quot;page-subheading&quot;&gt;Rule 1&lt;/h3&gt;
 &lt;p class=&quot;bottom-indent&quot;&gt;Lorem ipsum dolor sit amet conse ctetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.&lt;/p&gt;
 &lt;h3 class=&quot;page-subheading&quot;&gt;Rule 2&lt;/h3&gt;
@@ -29,10 +29,10 @@
     <link_rewrite>terms-and-conditions-of-use</link_rewrite>
   </cms>
   <cms id="About_us">
-    <meta_title>About us</meta_title>
+    <meta_title>About Us</meta_title>
     <meta_description>Learn more about us</meta_description>
     <meta_keywords>about us, informations</meta_keywords>
-    <content>&lt;h1 class=&quot;page-heading bottom-indent&quot;&gt;About us&lt;/h1&gt;
+    <content>&lt;h1 class=&quot;page-heading bottom-indent&quot;&gt;About Us&lt;/h1&gt;
 &lt;div class=&quot;row&quot;&gt;
 &lt;div class=&quot;col-xs-12 col-sm-4&quot;&gt;
 &lt;div class=&quot;cms-block&quot;&gt;

@@ -55,6 +55,9 @@
 		</header>
 		{include file='./config.tpl'}
 		<section class="loading text-center">
+			<div class="alert alert-info text-left">
+				<p>{l s='Please use the configuration button right above here to set targets.' mod='dashgoals'}</p>
+			</div>
 			<div class="dashgoals row">
 				<div class="col-xs-6 col-sm-3">
 					<label class="btn btn-default label-tooltip" style="background-color:{$colors[0]};"
@@ -72,9 +75,9 @@
 				</div>
 				<div class="col-xs-6 col-sm-3">
 					<label class="btn btn-default label-tooltip" style="background-color:{$colors[2]};"
-						data-toggle="tooltip" data-original-title="{l s="Average Cart Value is the average amount spent on each booking over a given time period." mod="dashgoals"}">
+						data-toggle="tooltip" data-original-title="{l s="Average Order Value is the average amount spent on each booking over a given time period." mod="dashgoals"}">
 						<input type="radio" name="options" onchange="selectDashgoalsChart('avg_cart_value');"/>
-						{l s="Avg. Cart Value" mod="dashgoals"}
+						{l s="Avg. Order Value" mod="dashgoals"}
 					</label>
 				</div>
 				<div class="col-xs-6 col-sm-3">

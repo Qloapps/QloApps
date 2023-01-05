@@ -17,8 +17,7 @@
  * @license LICENSE.txt
  */
 
-// PIE CHART CODE
-function generateAvailablityPieChart(chartData) {
+function pie_chart_occupancy(widget_name, chart_details) {
     nv.addGraph(function() {
         var chart = nv.models.pieChart()
             .x(function(d) { return d.label })
@@ -26,37 +25,33 @@ function generateAvailablityPieChart(chartData) {
             .showLabels(true)
             .showLegend(false)
             .labelThreshold(.01)
-            .labelType("percent")
+            .labelType('percent')
             .donut(true)
             .donutRatio(0.35)
-            .color(["#A569DF", "#56CE56", "#FF655C"]);
+            .color(['#A569DF', '#56CE56', '#FF655C']);
 
-        d3.select("#availablePieChart svg")
-            .datum(chartData)
+        d3.select('#availablePieChart svg')
+            .datum(chart_details.data)
             .transition().duration(350)
             .call(chart);
         nv.utils.windowResize(chart.update);
+
         return chart;
     });
 }
 
 $(document).ready(function() {
-    if (typeof date_occupancy_range === "undefined")
-        var date_occupancy_range = '(from %s to %s)';
-
-    if (typeof date_occupancy_avail_format === "undefined")
-        var date_occupancy_avail_format = 'Y-mm-dd';
-
     $('#date-start').change(function() {
         start = Date.parseDate($('#date-start').val(), 'Y-m-d');
         end = Date.parseDate($('#date-end').val(), 'Y-m-d');
-        $('#dashoccupancy_date_range').html(sprintf(date_occupancy_range, start.format(date_occupancy_avail_format), end.format(date_occupancy_avail_format)));
+
+        $('#dashoccupancy_date_range').html(sprintf(date_subtitle, start.format(date_format), end.format(date_format)));
     });
 
     $('#date-end').change(function() {
         start = Date.parseDate($('#date-start').val(), 'Y-m-d');
         end = Date.parseDate($('#date-end').val(), 'Y-m-d');
 
-        $('#dashoccupancy_date_range').html(sprintf(date_occupancy_range, start.format(date_occupancy_avail_format), end.format(date_occupancy_avail_format)));
+        $('#dashoccupancy_date_range').html(sprintf(date_subtitle, start.format(date_format), end.format(date_format)));
     });
 });

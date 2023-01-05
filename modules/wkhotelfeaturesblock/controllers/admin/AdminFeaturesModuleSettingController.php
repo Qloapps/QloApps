@@ -317,7 +317,13 @@ class AdminFeaturesModuleSettingController extends ModuleAdminController
                 if (file_exists($imgPath)) {
                     unlink($imgPath);
                 }
-                ImageManager::resize($file['tmp_name'], $imgPath);
+                $imageSize = ImageType::getByName(ImageType::getFormatedName('large'));
+                ImageManager::resize(
+                    $file['tmp_name'],
+                    $imgPath,
+                    $imageSize['width'],
+                    $imageSize['height']
+                );
             }
 
             if ($hotelAmenityId) {

@@ -77,6 +77,8 @@ if (_PS_DEBUG_PROFILING_) {
     include_once(_PS_TOOL_DIR_.'profiling/Tools.php');
 }
 
+require_once (_PS_ROOT_DIR_.'/modules/hotelreservationsystem/define.php');
+
 if (Tools::convertBytes(ini_get('upload_max_filesize')) < Tools::convertBytes('100M')) {
     ini_set('upload_max_filesize', '100M');
 }
@@ -159,10 +161,10 @@ if ($cookie_lifetime > 0) {
     $cookie_lifetime = time() + (max($cookie_lifetime, 1) * 3600);
 }
 
+$force_ssl = Configuration::get('PS_SSL_ENABLED') && Configuration::get('PS_SSL_ENABLED_EVERYWHERE');
 if (defined('_PS_ADMIN_DIR_')) {
-    $cookie = new Cookie('psAdmin', '', $cookie_lifetime);
+    $cookie = new Cookie('psAdmin', '', $cookie_lifetime, null, false, $force_ssl);
 } else {
-    $force_ssl = Configuration::get('PS_SSL_ENABLED') && Configuration::get('PS_SSL_ENABLED_EVERYWHERE');
     if ($context->shop->getGroup()->share_order) {
         $cookie = new Cookie('ps-sg'.$context->shop->getGroup()->id, '', $cookie_lifetime, $context->shop->getUrlsSharedCart(), false, $force_ssl);
     } else {
@@ -264,4 +266,5 @@ if (!defined('_MEDIA_SERVER_3_')) {
     define('_MEDIA_SERVER_3_', Configuration::get('PS_MEDIA_SERVER_3'));
 }
 
-require_once (_PS_ROOT_DIR_.'/modules/hotelreservationsystem/define.php');
+define('_TIME_1_DAY_', 86400);
+define('_TIME_1_WEEK_', 604800);

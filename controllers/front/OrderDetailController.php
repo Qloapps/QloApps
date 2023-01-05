@@ -275,6 +275,12 @@ class OrderDetailControllerCore extends FrontController
 
                 $customer = new Customer($order->id_customer);
 
+                $customerGuestDetail = false;
+                if ($id_customer_guest_detail = OrderCustomerGuestDetail::isCustomerGuestBooking($order->id)) {
+                    $customerGuestDetail = new OrderCustomerGuestDetail($id_customer_guest_detail);
+                }
+
+
                 //by webkul to show order details properly on order history page
 
                 if (Module::isInstalled('hotelreservationsystem')) {
@@ -457,6 +463,7 @@ class OrderDetailControllerCore extends FrontController
                         'shop_name' => strval(Configuration::get('PS_SHOP_NAME')),
                         'order' => $order,
                         'guestInformations' => (array)new Customer($order->id_customer),
+                        'customerGuestDetail' => $customerGuestDetail,
                         'currency' => new Currency($order->id_currency),
                         'order_state' => (int) $id_order_state,
                         'invoiceAllowed' => (int) Configuration::get('PS_INVOICE'),

@@ -126,9 +126,9 @@ class SEKeywords extends ModuleGraph
 			<p>&nbsp;</p>
 			<h4>'.$this->l('How does it work?').'</h4>
 			<p>'
-            .$this->l('When a visitor comes to your website, the web server notes the URL of the site he/she comes from. This module then parses the URL, and if it finds a reference to a known search engine, it finds the keywords in it.').'<br>'.
-            $this->l('This module can recognize all the search engines listed in QloApps\'s Stats/Search Engine page -- and you can add more!').'<br>'.
-            $this->l('IMPORTANT NOTE: in September 2013, Google chose to encrypt its searches queries using SSL. This means all the referer-based tools in the World (including this one) cannot identify Google keywords anymore.').'
+            .$this->l('When a visitor comes to your website, the web server notes the URL of the site he/she came from. This module then parses the URL, and if it finds a reference to a known search engine, it finds the keywords in it.').'<br>'.
+            $this->l('This module can recognize all the search engines listed on Stats > Search Engines page -- and you can add more!').'<br>'.
+            $this->l('IMPORTANT: In September 2013, Google chose to encrypt its searche queries using SSL. This means all HTTP referer-based tools in the world (including this one) cannot identify Google keywords anymore.').'
 			</p>
 		</div>
 		<p>'.($total == 1 ? sprintf($this->l('%d keyword matches your query.'), $total) : sprintf($this->l('%d keywords match your query.'), $total)).'</p>';
@@ -173,7 +173,7 @@ class SEKeywords extends ModuleGraph
             }
             $table .= '</tbody></table>';
             $this->html .= '<div>'.$this->engine(array('type' => 'pie')).'</div>
-			<a class="btn btn-default" href="'.Tools::safeOutput($_SERVER['REQUEST_URI']).'&export=1&exportType=language"><<i class="icon-cloud-upload"></i> '.$this->l('CSV Export').'</a>
+			<a class="btn btn-default" href="'.Tools::safeOutput($_SERVER['REQUEST_URI']).'&export=1&exportType=language"><<i class="icon-cloud-download"></i> '.$this->l('CSV Export').'</a>
 			'.$form.'<br/>'.$table;
         } else {
             $this->html .= $form.'<p><strong>'.$this->l('No keywords').'</strong></p>';

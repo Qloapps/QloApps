@@ -71,6 +71,7 @@ define('_THEME_COL_DIR_',                _PS_IMG_.'co/');
 define('_THEME_GENDERS_DIR_',            _PS_IMG_.'genders/');
 define('_SUPP_DIR_',                    _PS_IMG_.'su/');
 define('_PS_PROD_IMG_',                    _PS_IMG_.'p/');
+define('_PS_HOTEL_IMG_',                    __PS_BASE_URI__.'modules/hotelreservationsystem/views/img/hotel_img/');
 
 /* Other URLs */
 define('_PS_JS_DIR_',                    __PS_BASE_URI__.'js/');
@@ -84,5 +85,5 @@ Tools::safeDefine('_PS_API_DOMAIN_',                'api.prestashop.com');
 Tools::safeDefine('_PS_API_URL_',                    'http://'._PS_API_DOMAIN_);
 Tools::safeDefine('_PS_CURRENCY_FEED_URL_',            _PS_API_URL_.'/xml/currencies.xml');
 Tools::safeDefine('_QLO_API_DOMAIN_',                'api.qloapps.com');
-Tools::safeDefine('_QLO_API_URL_',                    'http://'._QLO_API_DOMAIN_);
+Tools::safeDefine('_QLO_API_URL_',                    'https://'._QLO_API_DOMAIN_);
 Tools::safeDefine('_QLO_TAB_MODULE_LIST_URL_',        _QLO_API_URL_.'/xml/tab_modules_list.xml');

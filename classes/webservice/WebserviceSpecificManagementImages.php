@@ -48,12 +48,13 @@ class WebserviceSpecificManagementImagesCore implements WebserviceSpecificManage
             'invoice' => array(),
             'store_icon' => array(),
         ),
-        'products' => array(),
+        'room_types' => array(),
+        'hotels' => array(),
         'categories' => array(),
-        'manufacturers' => array(),
-        'suppliers' => array(),
-        'stores' => array(),
-        'customizations' => array(),
+        // 'manufacturers' => array(),
+        // 'suppliers' => array(),
+        // 'stores' => array(),
+        // 'customizations' => array(),
     );
 
     /**
@@ -300,6 +301,8 @@ class WebserviceSpecificManagementImagesCore implements WebserviceSpecificManage
             case 'suppliers':
             case 'stores':
             case 'features':
+            case 'hotels':
+            case 'room_types':
                 switch ($this->wsObject->urlSegment[1]) {
                     case 'categories':
                         $directory = _PS_CAT_IMG_DIR_;
@@ -316,14 +319,16 @@ class WebserviceSpecificManagementImagesCore implements WebserviceSpecificManage
                     case 'features':
                         $directory = _PS_IMG_DIR_.'rf/';
                         break;
+                    case 'room_types':
+                        $directory = _PS_PROD_IMG_DIR_;
+                        break;
+                    case 'hotels':
+                        $directory = _PS_HOTEL_IMG_DIR_;
+                        break;
                 }
                 return $this->manageDeclinatedImages($directory);
                 break;
 
-            // product image management : many image for one entity (product)
-            case 'room_types':
-                return $this->manageProductImages();
-                break;
             case 'customizations':
                 return $this->manageCustomizationImages();
                 break;
@@ -508,6 +513,17 @@ class WebserviceSpecificManagementImagesCore implements WebserviceSpecificManage
             foreach ($ids as $id) {
                 $this->output .= $this->objOutput->getObjectRender()->renderNodeHeader('image', array(), array('id' => $id, 'xlink_resource'=>$this->wsObject->wsUrl.'images/'.'room_types'.'/'.$id), false);
             }
+        } else if ($this->imageType == 'hotels') {
+            $ids = array();
+            $objHotelImage = new HotelImage();
+            $images = $objHotelImage->getAllImages();
+            foreach ($images as $image) {
+                $ids[] = $image['id_hotel'];
+            }
+            $ids = array_unique($ids, SORT_NUMERIC);
+            foreach ($ids as $id) {
+                $this->output .= $this->objOutput->getObjectRender()->renderNodeHeader('image', array(), array('id' => $id, 'xlink_resource'=>$this->wsObject->wsUrl.'images/'.'hotels'.'/'.$id), false);
+            }
         } else {
             $nodes = scandir($directory);
             foreach ($nodes as $node) {
@@ -591,6 +607,47 @@ class WebserviceSpecificManagementImagesCore implements WebserviceSpecificManage
                     $this->wsObject->setOutputEnabled(false);
                 }
             }
+        } elseif ($this->imageType == 'hotels') {
+            // Get available image ids
+            $available_image_ids = array();
+            $objHotelImage = new HotelImage();
+
+            foreach (Language::getIDs() as $id_lang) {
+                foreach ($objHotelImage->getImagesByHotelId($object_id) as $image) {
+                    $available_image_ids[] = $image['id'];
+                }
+            }
+            $available_image_ids = array_unique($available_image_ids, SORT_NUMERIC);
+
+            if ($this->wsObject->urlSegment[3] != '') {
+                if ($this->wsObject->urlSegment[3] == 'bin') {
+                    $hotelCoverImage = HotelImage::getCover($object_id);
+                    $this->wsObject->urlSegment[3] = $hotelCoverImage['id'];
+                }
+                if (!Validate::isUnsignedId($object_id) || !in_array($this->wsObject->urlSegment[3], $available_image_ids)) {
+                    throw new WebserviceException('This image id does not exist', array(57, 400));
+                } else {
+                    $image_id = $this->wsObject->urlSegment[3];
+                    $path = $object_id;
+                    $image_size = $this->wsObject->urlSegment[4];
+                    if (file_exists($directory.$path.'/'.$image_id.(strlen($this->wsObject->urlSegment[4]) > 0 ? '-'.$this->wsObject->urlSegment[4] : '').'.jpg')) {
+                        $filename = $directory.$path.'/'.$image_id.(strlen($this->wsObject->urlSegment[4]) > 0 ? '-'.$this->wsObject->urlSegment[4] : '').'.jpg';
+
+                        $orig_filename = $directory.$path.'/'.$image_id.'.jpg';
+                    }
+                }
+            } elseif ($this->wsObject->method == 'GET' || $this->wsObject->method == 'HEAD') {
+                if ($available_image_ids) {
+                    $this->output .= $this->objOutput->getObjectRender()->renderNodeHeader('image', array(), array('id'=>$object_id));
+                    foreach ($available_image_ids as $available_image_id) {
+                        $this->output .= $this->objOutput->getObjectRender()->renderNodeHeader('declination', array(), array('id'=>$available_image_id, 'xlink_resource'=>$this->wsObject->wsUrl.'images/'.'hotels'.'/'.$object_id.'/'.$available_image_id), false);
+                    }
+                    $this->output .= $this->objOutput->getObjectRender()->renderNodeFooter('image', array());
+                } else {
+                    $this->objOutput->setStatus(404);
+                    $this->wsObject->setOutputEnabled(false);
+                }
+            }
         }
 
         // for all other cases
@@ -662,11 +719,6 @@ class WebserviceSpecificManagementImagesCore implements WebserviceSpecificManage
                 return $this->manageEntityDeclinatedImages($directory, $normal_image_sizes);
                 break;
         }
-    }
-
-    protected function manageProductImages()
-    {
-        $this->manageDeclinatedImages(_PS_PROD_IMG_DIR_);
     }
 
     protected function getCustomizations()

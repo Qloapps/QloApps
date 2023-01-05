@@ -144,7 +144,7 @@ class AdminThemesControllerCore extends AdminController
                 'fields' => array(
                     'PS_LOGO' => array(
                         'title' => $this->l('Header logo'),
-                        'hint' => $this->l('Will appear on main page. Recommended height: 52px. Maximum height on default theme: 65px.'),
+                        'hint' => $this->l('Will appear on header of website. Maximum height on default theme: 60px.'),
                         'type' => 'file',
                         'name' => 'PS_LOGO',
                         'tab' => 'logo',
@@ -153,7 +153,7 @@ class AdminThemesControllerCore extends AdminController
                     'PS_LOGO_MOBILE' => array(
                         'title' => $this->l('Header logo for mobile'),
                         'desc' => ((Configuration::get('PS_LOGO_MOBILE') === false) ? '<span class="light-warning">'.$this->l('Warning: No mobile logo has been defined. The header logo will be used instead.').'</span><br />' : ''),
-                        'hint' => $this->l('Will appear on the main page of your mobile template. If left undefined, the header logo will be used.'),
+                        'hint' => $this->l('Will appear on the header of your mobile template. If left undefined, the header logo will be used.'),
                         'type' => 'file',
                         'name' => 'PS_LOGO_MOBILE',
                         'tab' => 'mobile',
@@ -506,7 +506,7 @@ class AdminThemesControllerCore extends AdminController
         ) {
             return false;
         }
-        if (!$this->isFresh(Theme::CACHE_FILE_CUSTOMER_THEMES_LIST, 86400)) {
+        if (!$this->isFresh(Theme::CACHE_FILE_CUSTOMER_THEMES_LIST, _TIME_1_DAY_)) {
             file_put_contents(_PS_ROOT_DIR_.Theme::CACHE_FILE_CUSTOMER_THEMES_LIST, Tools::addonsRequest('customer_themes'));
         }
 
@@ -2075,6 +2075,15 @@ class AdminThemesControllerCore extends AdminController
                         }
                     }
                     break;
+                case 3:
+                    foreach ($xml->modules as $row) {
+                        if ($row['type'] == 'disk') {
+                            foreach ($row->module as $row2) {
+                                $natives[] = (string)$row2['name'];
+                            }
+                        }
+                    }
+                    break;
             }
 
             if (count($natives) > 0) {
@@ -2111,7 +2120,7 @@ class AdminThemesControllerCore extends AdminController
             'mailalerts',
             'newsletter',
             'pagesnotfound',
-            'productcomments',
+            'qlohotelreview',
             'referralprogram',
             'sekeywords',
             'statsbestcategories',
