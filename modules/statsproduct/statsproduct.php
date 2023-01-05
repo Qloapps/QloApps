@@ -46,7 +46,7 @@ class StatsProduct extends ModuleGraph
         $this->need_instance = 0;
 
         parent::__construct();
-
+        $this->query = array();
         $this->displayName = $this->l('Room type details');
         $this->description = $this->l('Adds detailed statistics for each room type to the Stats dashboard.');
         $this->ps_versions_compliancy = array('min' => '1.6', 'max' => '1.7.0.99');
@@ -57,101 +57,83 @@ class StatsProduct extends ModuleGraph
         return (parent::install() && $this->registerHook('AdminStatsModules'));
     }
 
-    public function getTotalBought($id_product)
+    public function getTotalOrders($id_product)
     {
         $date_between = ModuleGraph::getDateBetween();
-        $sql = 'SELECT COUNT(hbd.`id_room`) AS total_booked
-				FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
-				LEFT JOIN `'._DB_PREFIX_.'orders` o ON o.`id_order` = hbd.`id_order`
-				WHERE hbd.`id_product` = '.(int)$id_product.'
-					'.Shop::addSqlRestriction(Shop::SHARE_ORDER, 'o').'
-					AND o.valid = 1
-					AND o.`date_add` BETWEEN '.$date_between;
+        $sql = 'SELECT COUNT(DISTINCT o.`id_order`)
+        FROM `'._DB_PREFIX_.'orders` o
+        INNER JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd
+        ON (hbd.`id_order` = o.`id_order` AND hbd.`id_product` = '.(int) $id_product.')
+        AND o.`valid` = 1 AND o.`date_add` BETWEEN '.$date_between;
 
-        return (int)Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue($sql);
+        return Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue($sql);
     }
 
-    public function getTotalSales($id_product)
+    public function getTotalRoomNights($id_product)
     {
         $date_between = ModuleGraph::getDateBetween();
-        $sql = 'SELECT SUM(od.`total_price_tax_excl`) AS total
-				FROM `'._DB_PREFIX_.'order_detail` od
-				LEFT JOIN `'._DB_PREFIX_.'orders` o ON o.`id_order` = od.`id_order`
-				WHERE od.`product_id` = '.(int)$id_product.'
-					'.Shop::addSqlRestriction(Shop::SHARE_ORDER, 'o').'
-					AND o.valid = 1
-					AND o.`date_add` BETWEEN '.$date_between;
+        $sql = 'SELECT SUM(DATEDIFF(hbd.`date_to`, hbd.`date_from`))
+        FROM `'._DB_PREFIX_.'orders` o
+        INNER JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd
+        ON (hbd.`id_order` = o.`id_order` AND hbd.`id_product` = '.(int) $id_product.')
+        AND o.`valid` = 1 AND o.`date_add` BETWEEN '.$date_between;
 
-        return (float)Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue($sql);
+        return Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue($sql);
     }
 
-    public function getTotalViewed($id_product)
+    public function getTotalRevenue($id_product)
+    {
+        $date_between = ModuleGraph::getDateBetween();
+        $sql = 'SELECT SUM(hbd.`total_price_tax_excl` / o.`conversion_rate`)
+        FROM `'._DB_PREFIX_.'orders` o
+        INNER JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd
+        ON (hbd.`id_order` = o.`id_order` AND hbd.`id_product` = '.(int) $id_product.')
+        AND o.`valid` = 1 AND o.`date_add` BETWEEN '.$date_between;
+
+        return Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue($sql);
+    }
+
+    public function getTotalViews($id_product)
     {
         $date_between = ModuleGraph::getDateBetween();
         $sql = 'SELECT SUM(pv.`counter`) AS total
-				FROM `'._DB_PREFIX_.'page_viewed` pv
-				LEFT JOIN `'._DB_PREFIX_.'date_range` dr ON pv.`id_date_range` = dr.`id_date_range`
-				LEFT JOIN `'._DB_PREFIX_.'page` p ON pv.`id_page` = p.`id_page`
-				LEFT JOIN `'._DB_PREFIX_.'page_type` pt ON pt.`id_page_type` = p.`id_page_type`
-				WHERE pt.`name` = \'product\'
-					'.Shop::addSqlRestriction(false, 'pv').'
-					AND p.`id_object` = '.(int)$id_product.'
-					AND dr.`time_start` BETWEEN '.$date_between.'
-					AND dr.`time_end` BETWEEN '.$date_between;
+        FROM `'._DB_PREFIX_.'page_viewed` pv
+        LEFT JOIN `'._DB_PREFIX_.'date_range` dr ON pv.`id_date_range` = dr.`id_date_range`
+        LEFT JOIN `'._DB_PREFIX_.'page` p ON pv.`id_page` = p.`id_page`
+        LEFT JOIN `'._DB_PREFIX_.'page_type` pt ON pt.`id_page_type` = p.`id_page_type`
+        WHERE pt.`name` = "product"
+        AND p.`id_object` = '.(int) $id_product.'
+        AND dr.`time_start` BETWEEN '.$date_between.'
+        AND dr.`time_end` BETWEEN '.$date_between;
         $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->getRow($sql);
 
         return isset($result['total']) ? $result['total'] : 0;
     }
 
-    private function getProducts($id_lang)
+    private function getProducts()
     {
-        $sql = 'SELECT p.`id_product`, p.reference, pl.`name`, IFNULL(stock.quantity, 0) as quantity
-				FROM `'._DB_PREFIX_.'product` p
-                '.Product::sqlStock('p', 0);
+        $sql = 'SELECT p.`id_product`, p.reference, pl.`name`,
+        (SELECT COUNT(hri.`id`) FROM `'._DB_PREFIX_.'htl_room_information` hri WHERE hri.`id_product` = p.`id_product`) AS total_rooms
+        FROM `'._DB_PREFIX_.'product` p';
         if (Tools::getValue('id_hotel')) {
             $sql .= ' INNER JOIN `'._DB_PREFIX_.'htl_room_type` hrt ON (hrt.`id_product` = p.`id_product` AND hrt.`id_hotel` = '.(int)Tools::getValue('id_hotel').')';
         }
-        $sql .= ' LEFT JOIN `'._DB_PREFIX_.'product_lang` pl ON (p.`id_product` = pl.`id_product` AND pl.`id_lang`='.
-        (int)$this->context->language->id.')';
-        $sql .= ' ORDER BY pl.`name`';
+        $sql .= ' LEFT JOIN `'._DB_PREFIX_.'product_lang` pl ON (p.`id_product` = pl.`id_product` AND pl.`id_lang`='.(int)$this->context->language->id.')
+        ORDER BY pl.`name`';
+
         return Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
     }
 
     private function getSales($id_product)
     {
-        $sql = 'SELECT o.`date_add`, o.`id_order`, o.`id_customer`, od.`product_quantity`, (od.`product_price` * od.`product_quantity`) as total, od.`tax_name`, od.`product_name`, COUNT(hbd.`id_room`) AS total_booked
-				FROM `'._DB_PREFIX_.'orders` o
-				LEFT JOIN `'._DB_PREFIX_.'order_detail` od ON o.`id_order` = od.`id_order`
-                LEFT JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd ON (od.`id_order` = hbd.`id_order` AND od.`product_id` = hbd.`id_product`)
-				WHERE o.`date_add` BETWEEN '.$this->getDate().'
-					'.Shop::addSqlRestriction(Shop::SHARE_ORDER, 'o').'
-                    AND o.valid = 1
-					AND od.product_id = '.(int)$id_product.' GROUP BY od.`id_order`';
-
-        return Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
-    }
-
-    private function getCrossSales($id_product, $id_lang)
-    {
-        $sql = 'SELECT pl.`name` as pname, pl.`id_product`, SUM(od.`product_quantity`) as pqty, AVG(od.`product_price`) as          pprice, COUNT(hbd.`id_room`) AS total_booked
-				FROM `'._DB_PREFIX_.'orders` o
-				LEFT JOIN `'._DB_PREFIX_.'order_detail` od ON o.id_order = od.id_order
-                INNER JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd ON (o.`id_order` = hbd.`id_order` AND od.`product_id` = hbd.`id_product`)
-				LEFT JOIN `'._DB_PREFIX_.'product_lang` pl ON (pl.id_product = od.product_id AND pl.id_lang = '.(int)$id_lang.Shop::addSqlRestrictionOnLang('pl').')
-				WHERE o.id_customer IN (
-						SELECT o.id_customer
-						FROM `'._DB_PREFIX_.'orders` o
-						LEFT JOIN `'._DB_PREFIX_.'order_detail` od ON o.id_order = od.id_order
-						WHERE o.date_add BETWEEN '.$this->getDate().'
-						AND o.valid = 1
-						AND od.product_id = '.(int)$id_product.'
-					)
-					'.Shop::addSqlRestriction(Shop::SHARE_ORDER, 'o').'
-					AND o.date_add BETWEEN '.$this->getDate().'
-					AND o.valid = 1
-					AND od.product_id != '.(int)$id_product.'
-				GROUP BY od.product_id
-				ORDER BY pqty DESC';
+        $sql = 'SELECT o.`date_add`, o.`id_order`, o.`id_customer`, c.`firstname`, c.`lastname`, od.`product_quantity`, (od.`product_price` * od.`product_quantity`) AS total, od.`tax_name`, od.`product_name`, SUM(DATEDIFF(hbd.`date_to`, hbd.`date_from`)) AS total_booked
+        FROM `'._DB_PREFIX_.'orders` o
+        LEFT JOIN `'._DB_PREFIX_.'order_detail` od ON o.`id_order` = od.`id_order`
+        LEFT JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd ON (od.`id_order` = hbd.`id_order` AND od.`product_id` = hbd.`id_product`)
+        LEFT JOIN `'._DB_PREFIX_.'customer` c ON c.`id_customer` = o.`id_customer`
+        WHERE o.`date_add` BETWEEN '.$this->getDate().'
+        AND o.valid = 1
+        AND od.product_id = '.(int)$id_product.' GROUP BY od.`id_order`';
 
         return Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
     }
@@ -177,10 +159,10 @@ class StatsProduct extends ModuleGraph
 			</div>
 			<h4>'.$this->l('Guide').'</h4>
 			<div class="alert alert-warning">
-				<h4>'.$this->l('Number of purchases compared to number of views').'</h4>
+				<h4>'.$this->l('Number of orders compared to number of views').'</h4>
 					'.$this->l('After choosing a hotel and selecting a room type, informational graphs will appear.').'
 					<ul>
-						<li class="bullet">'.$this->l('If you notice that a room type is often booked but viewed infrequently, you should display it more prominently in your Front Office.').'</li>
+						<li class="bullet">'.$this->l('If you notice that a room type is often booked but viewed infrequently, you should display it more prominently at front office.').'</li>
 						<li class="bullet">'.$this->l('On the other hand, if a room type has many views but is not often booked, we advise you to check or modify this room type\'s information, description and photography again, see if you can find something better.').'
 						</li>
 					</ul>
@@ -201,39 +183,42 @@ class StatsProduct extends ModuleGraph
                 }
             }
             $product = new Product($id_product, false, $this->context->language->id);
-            $total_bought = $this->getTotalBought($product->id);
-            $total_sales = $this->getTotalSales($product->id);
-            $total_viewed = $this->getTotalViewed($product->id);
+            $total_orders = $this->getTotalOrders($product->id);
+            $total_room_nights = $this->getTotalRoomNights($product->id);
+            $total_revenue = $this->getTotalRevenue($product->id);
+            $total_views = $this->getTotalViews($product->id);
             $this->html .= '<h4>'.$product->name.' - '.$this->l('Details').'</h4>
 			<div class="row row-margin-bottom">
 				<div class="col-lg-12">
 					<div class="col-lg-8">
 						'.$this->engine(array(
-                    'layers' => 2,
-                    'type' => 'line',
-                    'option' => '1-'.$id_product
-                )).'
+                            'layers' => 2,
+                            'type' => 'line',
+                            'option' => '1-'.$id_product,
+                            'has_label_y' => true,
+                        )).'
 					</div>
 					<div class="col-lg-4">
 						<ul class="list-unstyled">
-							<li>'.$this->l('Total booked').' '.$total_bought.'</li>
-							<li>'.$this->l('Sales (tax excluded)').' '.Tools::displayprice($total_sales, $currency).'</li>
-							<li>'.$this->l('Total viewed').' '.$total_viewed.'</li>
-							<li>'.$this->l('Conversion rate').' '.number_format($total_viewed ? $total_bought / $total_viewed : 0, 2).'</li>
+							<li>'.$this->l('Total orders:').' '.$total_orders.'</li>
+							<li>'.$this->l('Total room nights:').' '.$total_room_nights.'</li>
+							<li>'.$this->l('Revenue:').' '.Tools::displayprice($total_revenue, $currency).'</li>
+							<li>'.$this->l('Total views:').' '.$total_views.'</li>
+							<li>'.$this->l('Conversion rate:').' '.sprintf('%0.2f', ($total_views ? $total_orders / $total_views : 0) * 100).'%</li>
 						</ul>
 						<a class="btn btn-default export-csv" href="'.Tools::safeOutput($_SERVER['REQUEST_URI']).'&export=1&exportType=1">
-							<i class="icon-cloud-upload"></i> '.$this->l('CSV Export').'
+							<i class="icon-cloud-download"></i> '.$this->l('CSV Export').'
 						</a>
 					</div>
 				</div>
 			</div>';
-            if ($has_attribute = $product->hasAttributes() && $total_bought) {
+            if ($has_attribute = $product->hasAttributes() && $total_orders) {
                 $this->html .= '
 				<h3 class="space">'.$this->l('Attribute sales distribution').'</h3>
 				<center>'.$this->engine(array('type' => 'pie', 'option' => '3-'.$id_product)).'</center><br />
 				<a href="'.Tools::safeOutput($_SERVER['REQUEST_URI']).'&export=1&exportType=2"><img src="../img/admin/asterisk.gif" alt=""/>'.$this->l('CSV Export').'</a>';
             }
-            if ($total_bought) {
+            if ($total_orders) {
                 $sales = $this->getSales($id_product);
                 $this->html .= '
 				<h4>'.$this->l('Sales').'</h4>
@@ -252,10 +237,10 @@ class StatsProduct extends ModuleGraph
 								</th>
 								'.($has_attribute ? '<th><span class="title_box  active">'.$this->l('Attribute').'</span></th>' : '').'
 								<th>
-									<span class="title_box  active">'.$this->l('Rooms Booked').'</span>
+									<span class="title_box  active">'.$this->l('Room nights booked').'</span>
 								</th>
 								<th>
-									<span class="title_box  active">'.$this->l('Price').'</span>
+									<span class="title_box  active">'.$this->l('Revenue').'</span>
 								</th>
 							</tr>
 						</thead>
@@ -266,8 +251,8 @@ class StatsProduct extends ModuleGraph
                     $this->html .= '
 						<tr>
 							<td>'.Tools::displayDate($sale['date_add'], null, false).'</td>
-							<td class="text-left"><a href="?tab=AdminOrders&id_order='.$sale['id_order'].'&vieworder&token='.$token_order.'">'.(int)$sale['id_order'].'</a></td>
-							<td class="text-left"><a href="?tab=AdminCustomers&id_customer='.$sale['id_customer'].'&viewcustomer&token='.$token_customer.'">'.(int)$sale['id_customer'].'</a></td>
+							<td class="text-left"><a href="?tab=AdminOrders&id_order='.$sale['id_order'].'&vieworder&token='.$token_order.'" target="_blank">#'.(int)$sale['id_order'].'</a></td>
+							<td class="text-left"><a href="?tab=AdminCustomers&id_customer='.$sale['id_customer'].'&viewcustomer&token='.$token_customer.'" target="_blank">'.$sale['firstname'].' '.$sale['lastname'].' (#'.(int) $sale['id_customer'].')'.'</a></td>
 							'.($has_attribute ? '<td>'.$sale['product_name'].'</td>' : '').'
 							<td>'.(int)$sale['total_booked'].'</td>
 							<td>'.Tools::displayprice($sale['total'], $currency).'</td>
@@ -277,42 +262,6 @@ class StatsProduct extends ModuleGraph
 						</tbody>
 					</table>
 				</div>';
-
-                $cross_selling = $this->getCrossSales($id_product, $this->context->language->id);
-                if (count($cross_selling)) {
-                    $this->html .= '
-					<h4>'.$this->l('Cross selling').'</h4>
-					<div style="overflow-y:scroll;height:200px">
-						<table class="table">
-							<thead>
-								<tr>
-									<th>
-										<span class="title_box active">'.$this->l('Room Type name').'</span>
-									</th>
-									<th>
-										<span class="title_box active">'.$this->l('Rooms Booked').'</span>
-									</th>
-									<th>
-										<span class="title_box active">'.$this->l('Average price').'</span>
-									</th>
-								</tr>
-							</thead>
-						<tbody>';
-                    $token_products = Tools::getAdminToken('AdminProducts'.(int)Tab::getIdFromClassName('AdminProducts').(int)$this->context->employee->id);
-                    foreach ($cross_selling as $selling) {
-                        $urlParams = array('id_product' => (int)$selling['id_product'], 'updateproduct' => 1, 'token' => $token_products);
-                        $this->html .= '
-							<tr>
-								<td><a href="' . preg_replace("/\\?.*$/", '?tab=AdminProducts&id_product=' . (int)$selling['id_product'] . '&updateproduct&token=' . $token_products, $this->context->link->getAdminLink('AdminProducts', true, $urlParams)) . '">' . $selling['pname'] . '</a></td>
-								<td class="text-left">'.(int)$selling['total_booked'].'</td>
-								<td class="text-left">'.Tools::displayprice($selling['pprice'], $currency).'</td>
-							</tr>';
-                    }
-                    $this->html .= '
-							</tbody>
-						</table>
-					</div>';
-                }
             }
         } else {
             $objBranchInfo = new HotelBranchInformation();
@@ -321,7 +270,7 @@ class StatsProduct extends ModuleGraph
 			<form action="#" method="post" id="hotelsForm" class="form-horizontal">
 				<div class="row row-margin-bottom">
 					<label class="control-label col-lg-3">
-						<span title="" data-toggle="tooltip" class="label-tooltip" data-original-title="'.$this->l('Choose a hotel to access it\'s room types statistics!').'">
+						<span title="" data-toggle="tooltip" class="label-tooltip" data-original-title="'.$this->l('Choose a hotel to access it\'s room type statistics.').'">
 							'.$this->l('Choose a hotel').'
 						</span>
 					</label>
@@ -341,40 +290,29 @@ class StatsProduct extends ModuleGraph
 				<thead>
 					<tr>
 						<th>
-							<span class="title_box  active">'.$this->l('Room Type Name').'</span>
+							<span class="title_box active">'.$this->l('Room type name').'</span>
 						</th>
 						<th>
-							<span class="title_box  active">'.$this->l('Available rooms').'</span>
+							<span class="title_box text-center active">'.$this->l('Total rooms').'</span>
+						</th>
+						<th>
+							<span class="title_box text-center active">'.$this->l('Action').'</span>
 						</th>
 					</tr>
 				</thead>
                 <tbody>';
-            // get room type info
-            $objBookingDtl = new HotelBookingDetail();
-            $objHotelRoomType = new HotelRoomType();
-            $dateFrom = date("Y-m-d", strtotime($this->context->employee->stats_date_from));
-            $dateTo = date("Y-m-d", strtotime($this->context->employee->stats_date_to));
 
-            $bookingParams = array();
-            $bookingParams['date_from'] = $dateFrom;
-            $bookingParams['date_to'] = $dateTo;
-            foreach ($this->getProducts($this->context->language->id) as $product) {
-                $availRooms = 0;
-                if ($roomTypeInfo = $objHotelRoomType->getRoomTypeInfoByIdProduct($product['id_product'])) {
-                    $bookingParams['hotel_id'] = $roomTypeInfo['id_hotel'];
-                    $bookingParams['room_type'] = $product['id_product'];
-                    if ($booking_data = $objBookingDtl->getBookingData($bookingParams)) {
-                        if (isset($booking_data['stats']['num_avail'])) {
-                            $availRooms = $booking_data['stats']['num_avail'];
-                        }
-                    }
-                }
+            // get room types info
+            foreach ($this->getProducts() as $product) {
                 $this->html .= '
 				<tr>
 					<td>
-						<a href="'.Tools::safeOutput(AdminController::$currentIndex.'&token='.Tools::getValue('token').'&module='.$this->name.'&id_product='.$product['id_product']).'">'.$product['name'].'</a>
+						<a href="'.$this->context->link->getAdminLink('AdminProducts').'&updateproduct&id_product='.$product['id_product'].'" target="_blank">'.$product['name'].'</a>
 					</td>
-					<td>'.$availRooms.'</td>
+					<td class="center">'.$product['total_rooms'].'</td>
+					<td class="center">
+                        <a class="btn btn-sm btn-default" href="'.$this->context->link->getAdminLink('AdminStats').'&module='.$this->name.'&id_product='.$product['id_product'].'" title="'.$this->l('View').'"><i class="icon icon-eye"></i></a>
+                    </td>
 				</tr>';
             }
 
@@ -382,7 +320,7 @@ class StatsProduct extends ModuleGraph
 				</tbody>
 			</table>
 			<a class="btn btn-default export-csv" href="'.Tools::safeOutput($_SERVER['REQUEST_URI'].'&export=1').'">
-				<i class="icon-cloud-upload"></i> '.$this->l('CSV Export').'
+				<i class="icon-cloud-download"></i> '.$this->l('CSV Export').'
 			</a>';
         }
 
@@ -400,49 +338,51 @@ class StatsProduct extends ModuleGraph
         $date_between = $this->getDate();
         switch ($this->option) {
             case 1:
-                $this->_titles['main'][0] = $this->l('Popularity');
-                $this->_titles['main'][1] = $this->l('Sales');
-                $this->_titles['main'][2] = $this->l('Visits (x100)');
-                $this->query[0] = 'SELECT o.`date_add`, COUNT(hbd.`id_room`) AS total
-						FROM `'._DB_PREFIX_.'order_detail` od
-						LEFT JOIN `'._DB_PREFIX_.'orders` o ON o.`id_order` = od.`id_order`
-                        INNER JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd ON (o.`id_order` = hbd.`id_order` AND od.`product_id` = hbd.`id_product`)
-						WHERE od.`product_id` = '.(int)$this->id_product.'
-							'.Shop::addSqlRestriction(Shop::SHARE_ORDER, 'o').'
-							AND o.valid = 1
-							AND o.`date_add` BETWEEN '.$date_between.'
-						GROUP BY o.`date_add`';
+                $this->_titles['main'][0] = $this->l('Room nights');
+                $this->_titles['main'][1] = $this->l('Views (x100)');
+                $this->_titles['x'] = $this->l('Date');
+                $this->_titles['y'] = $this->l('Room nights, Views (x100)');
+
+                $this->query[0] = 'SELECT o.`date_add`, SUM(DATEDIFF(hbd.`date_to`, hbd.`date_from`)) AS total
+                FROM `'._DB_PREFIX_.'order_detail` od
+                LEFT JOIN `'._DB_PREFIX_.'orders` o ON o.`id_order` = od.`id_order`
+                INNER JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd ON (o.`id_order` = hbd.`id_order` AND od.`product_id` = hbd.`id_product`)
+                WHERE od.`product_id` = '.(int)$this->id_product.'
+                '.Shop::addSqlRestriction(Shop::SHARE_ORDER, 'o').'
+                AND o.valid = 1
+                AND o.`date_add` BETWEEN '.$date_between.'
+                GROUP BY o.`date_add`';
 
                 $this->query[1] = 'SELECT dr.`time_start` AS date_add, (SUM(pv.`counter`) / 100) AS total
-						FROM `'._DB_PREFIX_.'page_viewed` pv
-						LEFT JOIN `'._DB_PREFIX_.'date_range` dr ON pv.`id_date_range` = dr.`id_date_range`
-						LEFT JOIN `'._DB_PREFIX_.'page` p ON pv.`id_page` = p.`id_page`
-						LEFT JOIN `'._DB_PREFIX_.'page_type` pt ON pt.`id_page_type` = p.`id_page_type`
-						WHERE pt.`name` = \'product\'
-							'.Shop::addSqlRestriction(false, 'pv').'
-							AND p.`id_object` = '.(int)$this->id_product.'
-							AND dr.`time_start` BETWEEN '.$date_between.'
-							AND dr.`time_end` BETWEEN '.$date_between.'
-						GROUP BY dr.`time_start`';
+                FROM `'._DB_PREFIX_.'page_viewed` pv
+                LEFT JOIN `'._DB_PREFIX_.'date_range` dr ON pv.`id_date_range` = dr.`id_date_range`
+                LEFT JOIN `'._DB_PREFIX_.'page` p ON pv.`id_page` = p.`id_page`
+                LEFT JOIN `'._DB_PREFIX_.'page_type` pt ON pt.`id_page_type` = p.`id_page_type`
+                WHERE pt.`name` = \'product\'
+                '.Shop::addSqlRestriction(false, 'pv').'
+                AND p.`id_object` = '.(int)$this->id_product.'
+                AND dr.`time_start` BETWEEN '.$date_between.'
+                AND dr.`time_end` BETWEEN '.$date_between.'
+                GROUP BY dr.`time_start`';
                 break;
 
             case 3:
                 $this->query = 'SELECT product_attribute_id, COUNT(hbd.`id_room`) AS total
-						FROM `'._DB_PREFIX_.'orders` o
-						LEFT JOIN `'._DB_PREFIX_.'order_detail` od ON o.`id_order` = od.`id_order`
-                        INNER JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd ON (o.`id_order` = hbd.`id_order` AND od.`product_id` = hbd.`id_product`)
-						WHERE od.`product_id` = '.(int)$this->id_product.'
-							'.Shop::addSqlRestriction(Shop::SHARE_ORDER, 'o').'
-							AND o.valid = 1
-							AND o.`date_add` BETWEEN '.$date_between.'
-						GROUP BY od.`product_attribute_id`';
+                FROM `'._DB_PREFIX_.'orders` o
+                LEFT JOIN `'._DB_PREFIX_.'order_detail` od ON o.`id_order` = od.`id_order`
+                INNER JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd ON (o.`id_order` = hbd.`id_order` AND od.`product_id` = hbd.`id_product`)
+                WHERE od.`product_id` = '.(int)$this->id_product.'
+                '.Shop::addSqlRestriction(Shop::SHARE_ORDER, 'o').'
+                AND o.valid = 1
+                AND o.`date_add` BETWEEN '.$date_between.'
+                GROUP BY od.`product_attribute_id`';
                 $this->_titles['main'] = $this->l('Attributes');
                 break;
 
             case 42:
-                $this->_titles['main'][1] = $this->l('Reference');
-                $this->_titles['main'][2] = $this->l('Name');
-                $this->_titles['main'][3] = $this->l('Stock');
+                $this->_titles['main'][0] = $this->l('ID');
+                $this->_titles['main'][1] = $this->l('Room type name');
+                $this->_titles['main'][2] = $this->l('Total Rooms');
                 break;
         }
     }
@@ -461,11 +401,10 @@ class StatsProduct extends ModuleGraph
     protected function getData($layers)
     {
         if ($this->option == 42) {
-            $products = $this->getProducts($this->context->language->id);
+            $products = $this->getProducts();
             foreach ($products as $product) {
-                $this->_values[0][] = $product['reference'];
-                $this->_values[1][] = $product['name'];
-                $this->_values[2][] = $product['quantity'];
+                $this->_values[0][] = $product['name'];
+                $this->_values[1][] = $product['total_rooms'];
                 $this->_legend[] = $product['id_product'];
             }
         } elseif ($this->option != 3) {

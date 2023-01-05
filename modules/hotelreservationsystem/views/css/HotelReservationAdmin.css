@@ -134,21 +134,6 @@ a.deleteHtlImage {
 {
     margin-top: 20px !important;
 }
-.hotel_date .margin-leftrgt-0
-{
-    margin-left: 0px !important;
-    margin-right: 0px !important;
-}
-
-.hotel_date .no_border
-{
-    border: none !important;
-}
-.hr_style
-{
-    border-color: #c7d6db !important;
-    margin: 10px 0 !important;
-}
 
 .padding-top-btm-30
 {
@@ -163,82 +148,22 @@ a.deleteHtlImage {
 
 .bg-yellow
 {
-    background-color: #DCC635;
+    background-color: #FFC224;
 }
 
 .bg-red
 {
-    background-color: #CD5D5D;
+    background-color: #FF3838;
+}
+
+.bg-blue
+{
+    background-color: #00AFF0;
 }
 
 .bg-gray
 {
     background-color: #C2C2C2;
-}
-
-.htl_date_header
-{
-    background-color: #2EACCE;
-    color: #FFFFFF;
-    border-top-left-radius: 4px;
-    border-top-right-radius: 4px;
-    padding-bottom: 15px;
-    padding-top: 15px;
-    margin-bottom: -2px;
-}
-
-.htl_date_disp
-{
-    font-size: 75px;
-    color: #FFFFFF;
-    font-weight: 300;
-    font-family: inherit;
-    margin-bottom: 0px !important;
-    line-height: 60px;
-}
-
-.htl_month_disp
-{
-    font-size: 18px;
-    color: #FFFFFF;
-    font-weight: 400;
-    font-family: inherit;
-    margin-left: 7px !important;
-}
-
-.hotel_date .ui-datepicker
-{
-    border: 1px solid #c7d6db;
-    border-top-left-radius: 0;
-    border-top-right-radius: 0;
-    width: 100%;
-}
-
-/*.hotel_date .ui-state-active
-{
-    border-radius: 50%;
-}*/
-
-.hotel_date .ui-datepicker td
-{
-    padding: 14px!important;
-}
-
-.hotel_date .ui-state-default
-{
-    border: none!important;
-    text-align: center!important;
-    padding: 10px!important;
-}
-
-.hotel_date .ui-datepicker-header
-{
-    border: medium none;
-}
-
-.hotel_date .ui-datepicker-next:hover, .hotel_date .ui-datepicker-next:focus, .hotel_date .ui-datepicker-next:active, .hotel_date .ui-datepicker-prev:hover, .hotel_date .ui-datepicker-prev:focus, .hotel_date .ui-datepicker-prev:active
-{
-    outline: none;
 }
 
 .ui-datepicker-prev span
@@ -251,68 +176,64 @@ a.deleteHtlImage {
     background-position: -33px 0;
 }
 
-.htl_room_data_cont
+.hr_style
 {
-    border: 1px solid #C7D6DB;
-    border-radius: 4px;
-    padding: 15px !important;
+    border-color: #c7d6db !important;
+}
+
+#cart_btn
+{
+    float: right;
+    margin: 2px 20px;
+}
+
+.htl_room_data_cont > div.row > div + div > div.row{
+    border-left: 1px solid #C7D6DB;
 }
 
 .htl_room_cat_data
 {
-    border-right: 1px solid #C7D6DB;
     text-align: center;
-    padding-bottom: 30px;
-    padding-top: 30px;
 }
 
 .room_cat_header
 {
-    font-size: 15px;
-    color: #252525;
+    font-size: 16px;
+    color: #333;
     font-weight: 400;
     text-transform: capitalize;
 }
 
-.room_cat_data
+p.room_cat_data
 {
-    line-height: 75px;
-    font-size: 75px;
-    color: #252525;
-    font-weight: 300;
+    line-height: 46px;
+    font-size: 36px;
+    color: #333;
+    font-weight: 700;
+    margin-bottom: 0px;
 }
 
 .color_indicate
 {
-    width: 40px;
-    height: 40px;
+    width: 10px;
+    height: 10px;
     border-radius: 50%;
-    float: left;
+    display: inline-block;
 }
 
 .indi_label
 {
     color: #252525;
-    display: block !important;
     font-size: 14px;
     font-weight: 400;
     margin-left: 3px;
     text-transform: capitalize;
-    transform: translate(4px, 6px) !important;
 }
 
 .indi_cont
 {
-    margin: 20px 0px;
+    margin: 10px 0px;
 }
-
-/*.addtocart-div
-{
-    position: fixed !important;
-    right: 5px;
-    width: 32% !important;
-    font-size: 13px!important;
-}*/
 
 .cart-table-thead
 {
@@ -397,12 +318,9 @@ a.deleteHtlImage {
 
 .cart_table_container
 {
-    /*border-bottom: 1px solid #cccccc;*/
-    /*margin-bottom: 15px;*/
     max-height: 393px;
     min-height: 150px;
     overflow-y: auto;
-    /*padding-bottom: 10px;*/
 }
 
 .default_available .ui-state-default
@@ -591,3 +509,59 @@ a.deleteHtlImage {
     text-align: right;}
     .dataTables_filter .input-sm {
         margin-left: 5px;}
+
+
+/* book now full calender */
+.fc .fc-daygrid-day.fc-day-today {
+    background-color: unset;
+}
+.fc-daygrid-day-top {
+    justify-content: space-between;}
+    .fc a.fc-daygrid-day-number {
+        color: #333;
+        text-decoration: none;}
+    .fc .fc-daygrid-day.fc-day-today a.fc-daygrid-day-number {
+        color: #00aff0;
+    }
+    .fc-daygrid-day-top .day-info {
+
+        font-size: 15px;
+        padding: 4px;}
+        .fc-daygrid-day-top .day-info img {
+            width: 15px;
+            height: 15px;
+            color: #3da73d;
+        }
+        .fc-today-button:disabled {
+            display: none;
+        }
+/* book now page tooltip */
+.tooltip_cont {
+    min-width: 280px;
+    width: 100%;
+    font-size: 14px;
+    font-weight: 600;
+    /* display: grid; */
+}
+.tooltip_cont .tip_header {
+    margin-bottom: 10px;
+}
+.tooltip_cont .tip-body > div {
+    margin-bottom: 6px;
+}
+.tip_element_head {
+    font-size: 12px;
+}
+.tip_element_value {
+    font-size: 16px;
+    opacity: 0.6;
+}
+.tip-body {
+    display: grid;
+    grid-template-columns: auto auto;
+}
+body.adminhotelroomsbooking .ui-tooltip {
+    border: unset;
+    padding: 10px;
+    box-shadow: 0px 0px 15px 0px #00000026;
+}

@@ -17,27 +17,35 @@
 * @license LICENSE.txt
 */
 
-.preformance-index-wrapper {
+#dashperformance .stats-wrap {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+#dashperformance .stats-wrap > div {
+    margin-bottom: 20px;
+}
+
+#dashperformance .stat-box {
+    height: 100%;
     padding: 20px;
     border-radius: 10px;
     font-size: 14px;
     font-weight: 500;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
-    margin-bottom: 25px;
+    transition: 0.25s;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
-.preformance-index-wrapper .value-wrapper {
+
+#dashperformance .stat-box:hover {
+    cursor: pointer;
+    transform: translate(0, -3px);
+}
+
+#dashperformance .stat-box .value-wrapper {
     font-size: 18px;
     font-weight: 700;
-}
-#dashperformance .preformance-index-wrapper.avg-daily-rate {
-    background-color: #B7F0FF;
-}
-#dashperformance .preformance-index-wrapper.cancellation-rate {
-    background-color: #FFBBB8;
-}
-#dashperformance .preformance-index-wrapper.revenue {
-    background-color: #B6FFB6;
-}
-#dashperformance .preformance-index-wrapper.nights-stayed {
-    background-color: #FFE5B4;
 }

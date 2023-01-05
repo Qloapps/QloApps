@@ -76,7 +76,6 @@ function bar_chart_goals(widget_name, chart_details)
 
 			});
 
-		chart.yAxis.tickFormat(d3.format('.1f'));
 		dashgoals_chart = chart;
 
 		d3.select('#dash_goals_chart1 svg')
@@ -103,6 +102,21 @@ function selectDashgoalsChart(type)
 				value.disabled = true;
 		});
 	}
+
+	dashgoals_chart.yAxis.tickFormat(d3.format('.1f'));
+
+	if (type == 'avg_cart_value' || type == 'sales') {
+		dashgoals_chart.yAxis.tickFormat(function(d) {
+			return formatCurrency(parseFloat(d), currency_format, currency_sign, currency_blank);
+		});
+	}
+
+	if (type == 'conversion') {
+		dashgoals_chart.yAxis.tickFormat(function(d) {
+			return d + ' %';
+		});
+	}
+
 	dashgoals_toggleDashConfig();
 }
 

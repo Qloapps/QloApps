@@ -93,23 +93,36 @@
 	<div class="row">
 		<div class="col-xs-12 col-sm-12">
 			<ul class="address item {if $order->isVirtual()}full_width{/if} box">
-				<li><h3 class="page-subheading">{l s='Customer Details'}</h3></li>
-				{if isset($address_invoice->firstname) && $address_invoice->firstname}
-					<li class="row"><div class="col-sm-3 col-md-2 col-xs-6">{l s='Name'}</div><div class="col-sm-9 col-xs-6">{$address_invoice->firstname|escape:'html':'UTF-8'} {$address_invoice->lastname|escape:'html':'UTF-8'}</div></li>
-				{/if}
-				{if isset($guestInformations['email']) && $guestInformations['email']}
-					<li class="row"><div class="col-sm-3 col-md-2 col-xs-6">{l s='Email'}</div><div class="col-sm-9 col-xs-6">{$guestInformations['email']|escape:'html':'UTF-8'}</div></li>
-				{/if}
-				{if isset($address_invoice->phone_mobile) && $address_invoice->phone_mobile}
-					<li class="row"><div class="col-sm-3 col-md-2 col-xs-6">{l s='Mobile Number'}</div><div class="col-sm-9 col-xs-6">{$address_invoice->phone_mobile|escape:'html':'UTF-8'}</div></li>
-				{/if}
-				{if isset($address_invoice->phone) && $address_invoice->phone}
-					<li class="row"><div class="col-sm-3 col-md-2 col-xs-6">{l s='Phone Number'}</div><div class="col-sm-9 col-xs-6">{$address_invoice->phone|escape:'html':'UTF-8'}</div></li>
+				<li><h3 class="page-subheading">{l s='Guest Details'}</h3></li>
+				{if $customerGuestDetail}
+					{if isset($customerGuestDetail->firstname) && $customerGuestDetail->firstname}
+						<li class="row"><div class="col-sm-3 col-md-2 col-xs-6">{l s='Name'}</div><div class="col-sm-9 col-xs-6">{$customerGuestDetail->firstname|escape:'html':'UTF-8'} {$customerGuestDetail->lastname|escape:'html':'UTF-8'}</div></li>
+					{/if}
+					{if isset($customerGuestDetail->email) && $customerGuestDetail->email}
+						<li class="row"><div class="col-sm-3 col-md-2 col-xs-6">{l s='Email'}</div><div class="col-sm-9 col-xs-6">{$customerGuestDetail->email|escape:'html':'UTF-8'}</div></li>
+					{/if}
+					{if isset($customerGuestDetail->phone) && $customerGuestDetail->phone}
+						<li class="row"><div class="col-sm-3 col-md-2 col-xs-6">{l s='Mobile Number'}</div><div class="col-sm-9 col-xs-6">{$customerGuestDetail->phone|escape:'html':'UTF-8'}</div></li>
+					{/if}
+				{else}
+					{if isset($address_invoice->firstname) && $address_invoice->firstname}
+						<li class="row"><div class="col-sm-3 col-md-2 col-xs-6">{l s='Name'}</div><div class="col-sm-9 col-xs-6">{$address_invoice->firstname|escape:'html':'UTF-8'} {$address_invoice->lastname|escape:'html':'UTF-8'}</div></li>
+					{/if}
+					{if isset($guestInformations['email']) && $guestInformations['email']}
+						<li class="row"><div class="col-sm-3 col-md-2 col-xs-6">{l s='Email'}</div><div class="col-sm-9 col-xs-6">{$guestInformations['email']|escape:'html':'UTF-8'}</div></li>
+					{/if}
+					{if isset($address_invoice->phone_mobile) && $address_invoice->phone_mobile}
+						<li class="row"><div class="col-sm-3 col-md-2 col-xs-6">{l s='Mobile Number'}</div><div class="col-sm-9 col-xs-6">{$address_invoice->phone_mobile|escape:'html':'UTF-8'}</div></li>
+					{/if}
+					{if isset($address_invoice->phone) && $address_invoice->phone}
+						<li class="row"><div class="col-sm-3 col-md-2 col-xs-6">{l s='Phone Number'}</div><div class="col-sm-9 col-xs-6">{$address_invoice->phone|escape:'html':'UTF-8'}</div></li>
+					{/if}
 				{/if}
 			</ul>
 		</div>
 	</div>
 </div>
+
 {$HOOK_ORDERDETAILDISPLAYED}
 {if !$is_guest}<form action="{$link->getPageLink('order-follow', true)|escape:'html':'UTF-8'}" method="post">{/if}
 
@@ -119,17 +132,18 @@
 	</div>
 {/if}
 
-{if $refund_allowed}
-	<div class="row totalOrdercancellation_div">
-		<div class="col-xs-12 col-sm-12">
+<div class="row booking-actions-wrap">
+	<div class="col-xs-12 col-sm-12">
+		{if $refund_allowed}
 			{if !$hasCompletelyRefunded}
-				<a refund_fields_on="0" id="order_refund_request" class="btn btn-default pull-right" href="#" title={l s='Proceed to refund'}><span>{l s='Cancel Bookings'}</span></a>
+				<a refund_fields_on="0" id="order_refund_request" class="btn btn-default pull-right" href="#" title="{l s='Proceed to refund'}"><span>{l s='Cancel Bookings'}</span></a>
 			{/if}
-
+		
 			{if isset($id_cms_refund_policy) && $id_cms_refund_policy}<a target="_blank" class="btn btn-default pull-right refund_policy_link" href="{$link->getCMSLink($id_cms_refund_policy)|escape:'html':'UTF-8'}">{l s='Refund Policies'}</a>{/if}
-		</div>
+		{/if}
+		{hook h='displayBookingAction' id_order=$order->id}
 	</div>
-{/if}
+</div>
 
 {* Form Refund fields and submit refund *}
 <form id="order-detail-content">
