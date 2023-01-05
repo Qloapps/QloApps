@@ -18,8 +18,6 @@
 *  @license   https://store.webkul.com/license.html
 */
 
-
-
 class WebserviceSpecificManagementAri extends ObjectModel implements WebserviceSpecificManagementInterface
 {
     // fields for the object
@@ -145,7 +143,7 @@ class WebserviceSpecificManagementAri extends ObjectModel implements WebserviceS
 
                 $this->output = $this->objOutput->getObjectRender()->overrideContent($this->output);
             } else {
-                $this->wsObject->setError(405, 'Method '.$this->method.' is not valid', 23);
+                $this->wsObject->setError(405, 'Method '.$this->wsObject->method.' is not valid', 23);
             }
         } else {
             if ($this->wsObject->method == 'POST') {
@@ -222,7 +220,7 @@ class WebserviceSpecificManagementAri extends ObjectModel implements WebserviceS
                     return false;
                 }
             } else {
-                $this->wsObject->setError(405, 'Method '.$this->method.' is not valid', 23);
+                $this->wsObject->setError(405, 'Method '.$this->wsObject->method.' is not valid', 23);
             }
         }
     }
@@ -302,39 +300,29 @@ class WebserviceSpecificManagementAri extends ObjectModel implements WebserviceS
             $this->wsObject->setError(400, 'Validation error: "Date to" must be after "date from"', 85);
             return false;
         }
+
         // validate all the information of sent rooms occupancies
-        if (isset($ariParams['associations']['occupancies']) && $ariParams['associations']['occupancies']) {
-            foreach ($ariParams['associations']['occupancies'] as $occupancy) {
-                $roomsAdults = array_column($occupancy, 'adults');
-                $roomsChildren = array_column($occupancy, 'children');
-                // atleast 1 adult info for one room must be there in the request
-                if (!$roomsAdults) {
-                    $this->wsObject->setError(400, 'Validation error: Invalid information for adults in occupancies.', 85);
-                    return false;
-                } else {
-                    // check values of adults count in rooms are valid
-                    foreach ($roomsAdults as $adultInRoom) {
-                        if (!$adultInRoom || !Validate::isUnsignedInt($adultInRoom)) {
-                            $this->wsObject->setError(400, 'Validation error: Invalid value for number of adults(value must be greater than 0).', 85);
-                            return false;
-                        }
-                    }
-                }
-                // atleast 1 adult info for one room must be there in the request
-                if (!$roomsChildren) {
-                    $this->wsObject->setError(400, 'Validation error: Invalid information for children in occupancies.', 85);
-                } else {
-                    if (count($roomsAdults) != count($roomsChildren)) {
-                        $this->wsObject->setError(400, 'Validation error: Insufficient information for children in occupancies.', 85);
+        if (isset($ariParams['associations']['occupancies']['occupancy']) && $ariParams['associations']['occupancies']['occupancy']) {
+            $occupancies = $ariParams['associations']['occupancies']['occupancy'];
+            foreach ($occupancies as $key => $occupancy) {
+                if (isset($occupancy['adults'])) {
+                    if (!$occupancy['adults'] || !Validate::isUnsignedInt($occupancy['adults'])) {
+                        $this->wsObject->setError(400, 'Validation error: Invalid value for number of adults for Room-'.($key+1).' occupancy(value must be greater than 0).', 85);
                         return false;
-                    } else {
-                        // check values of children count in rooms are valid
-                        foreach ($roomsChildren as $childrenInRoom) {
-                            if (!Validate::isUnsignedInt($childrenInRoom)) {
-                                $this->wsObject->setError(400, 'Validation error: Invalid values for number of children.', 85);
-                            }
-                        }
                     }
+                } else {
+                    $this->wsObject->setError(400, 'Validation error: Missing information for adults for Room-'.($key+1).' occupancy.', 85);
+                    return false;
+                }
+
+                if (isset($occupancy['children'])) {
+                    if (!Validate::isUnsignedInt($occupancy['children'])) {
+                        $this->wsObject->setError(400, 'Validation error: Invalid value for number of children for Room-'.($key+1).' occupancy.', 85);
+                        return false;
+                    }
+                } else {
+                    $this->wsObject->setError(400, 'Validation error: Missing information for children for Room-'.($key+1).' occupancy.', 85);
+                    return false;
                 }
             }
         }
