@@ -49,4 +49,4 @@ require_once 'classes/HotelBranchRefundRules.php';
 // Web services classes
 require_once 'classes/WebserviceSpecificManagementQlo.php';
 require_once 'classes/WebserviceSpecificManagementHotelImages.php';
-require_once 'classes/WebserviceSpecificManagementAri.php';
+require_once 'classes/WebserviceSpecificManagementHotelAri.php';

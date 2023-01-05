@@ -56,7 +56,7 @@ class HotelReservationSystem extends Module
             'booking_extra_demands' => array('description' => 'Booking extra demands', 'class' => 'HotelBookingDemands'),
             'extra_demands' => array('description' => 'Extra demands', 'class' => 'HotelRoomTypeGlobalDemand'),
             'demand_advance_options' => array('description' => 'Extra demand advance options', 'class' => 'HotelRoomTypeGlobalDemandAdvanceOption'),
-            'ari' => array('description' => 'Search availability, rates and inventory', 'specific_management' => true),
+            'hotel_ari' => array('description' => 'Search availability, rates and inventory', 'specific_management' => true),
             'qlo' => array('description' => 'qlo API', 'specific_management' => true),
         );
 

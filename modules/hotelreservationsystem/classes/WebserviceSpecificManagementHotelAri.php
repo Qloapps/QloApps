@@ -18,7 +18,7 @@
 *  @license   https://store.webkul.com/license.html
 */
 
-class WebserviceSpecificManagementAri extends ObjectModel implements WebserviceSpecificManagementInterface
+class WebserviceSpecificManagementHotelAri extends ObjectModel implements WebserviceSpecificManagementInterface
 {
     // fields for the object
     public $id_room_type;
