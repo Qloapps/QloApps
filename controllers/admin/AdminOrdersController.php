@@ -1339,6 +1339,13 @@ class AdminOrdersControllerCore extends AdminController
             $this->toolbar_title .= ' - '.sprintf($this->l('Shop: %s'), $shop->name);
         }
 
+        // get details if booking is done for some other guest
+        $customerGuestDetail = false;
+        if ($id_customer_guest_detail = OrderCustomerGuestDetail::isCustomerGuestBooking($order->id)) {
+            $customerGuestDetail = new OrderCustomerGuestDetail($id_customer_guest_detail);
+            $customerGuestDetail->gender = new Gender($customerGuestDetail->id_gender, $this->context->language->id);
+        }
+
         // gets warehouses to ship products, if and only if advanced stock management is activated
         $warehouse_list = null;
 
@@ -1419,6 +1426,16 @@ class AdminOrdersControllerCore extends AdminController
         foreach ($history as &$order_state) {
             $order_state['text-color'] = Tools::getBrightness($order_state['color']) < 128 ? 'white' : 'black';
         }
+
+        $order_payment_detail = $order->getOrderPaymentDetail();
+        foreach ($order_payment_detail as &$payment_detail) {
+            $payment = new OrderPayment($payment_detail['id_order_payment']);
+            if ($invoice = $payment->getOrderInvoice($order->id)) {
+                $payment_detail['invoice_number'] = $invoice->getInvoiceNumberFormatted($this->context->language->id, $order->id_shop);
+            }
+        }
+
+
         //by webkul to get data to show hotel rooms order data on order detail page
 
         $cart_id = Cart::getCartIdByOrderId(Tools::getValue('id_order'));
@@ -1521,6 +1538,8 @@ class AdminOrdersControllerCore extends AdminController
             'cart' => new Cart($order->id_cart),
             'customer' => $customer,
             'gender' => $gender,
+            'customerGuestDetail' => $customerGuestDetail,
+            'genders' => Gender::getGenders(),
             'customer_addresses' => $customer->getAddresses($this->context->language->id),
             'addresses' => array(
                 'delivery' => $addressDelivery,
@@ -1531,13 +1550,13 @@ class AdminOrdersControllerCore extends AdminController
             'customerStats' => $customer->getStats(),
             'products' => $products,
             'discounts' => $order->getCartRules(),
-            'orders_total_paid_tax_incl' => $order->getOrdersTotalPaid(), // Get the sum of total_paid_tax_incl of the order with similar reference
             'total_paid' => $order->getTotalPaid(),
             'customer_thread_message' => CustomerThread::getCustomerMessages($order->id_customer, null, $order->id),
             'orderMessages' => OrderMessage::getOrderMessages($order->id_lang),
             'messages' => Message::getMessagesByOrderId($order->id, true),
             'carrier' => new Carrier($order->id_carrier),
             'history' => $history,
+            'order_payment_detail' => $order_payment_detail,
             'states' => OrderState::getOrderStates($this->context->language->id),
             'warehouse_list' => $warehouse_list,
             'sources' => ConnectionsSource::getOrderSources($order->id),
@@ -1588,6 +1607,49 @@ class AdminOrdersControllerCore extends AdminController
         );
 
         return parent::renderView();
+    }
+
+    public function ajaxProcessUpdateGuestDetails()
+    {
+        $response = array(
+            'success' => false
+        );
+        if (Validate::isLoadedObject($order = new Order(Tools::getValue('id_order')))) {
+            if ($id_customer_guest_detail = OrderCustomerGuestDetail::isCustomerGuestBooking($order->id)) {
+                if (Validate::isLoadedObject($objCustomerGuestDetail = new OrderCustomerGuestDetail($id_customer_guest_detail))) {
+                    $id_gender = Tools::getValue('id_gender');
+                    $firstname = Tools::getValue('firstname');
+                    $lastname = Tools::getValue('lastname');
+                    $email = Tools::getValue('email');
+                    $phone = Tools::getValue('phone');
+                    $objCustomerGuestDetail->id_gender = $id_gender;
+                    $objCustomerGuestDetail->firstname = $firstname;
+                    $objCustomerGuestDetail->lastname = $lastname;
+                    $objCustomerGuestDetail->email = $email;
+                    $objCustomerGuestDetail->phone = $phone;
+                    if ($objCustomerGuestDetail->validateGuestInfo()) {
+                        if ($objCustomerGuestDetail->save()) {
+                            $response['success'] = true;
+                            $gender = new Gender($objCustomerGuestDetail->id_gender, $this->context->language->id);
+                            $response['data']['guest_name'] = $gender->name.' '.$objCustomerGuestDetail->firstname.' '.$objCustomerGuestDetail->lastname ;
+                            $response['data']['guest_email'] = $objCustomerGuestDetail->email;
+                            $response['data']['guest_phone'] = $objCustomerGuestDetail->phone;
+                            $response['msg'] = $this->l('Guest details are updated.');
+                        } else {
+                            $response['errors'][] = $this->l('Unable to save guest details.');
+                        }
+                    } else {
+                        $response['errors'][] = $this->l('Invalid guest details, please check and try again.');
+                    }
+                } else {
+                    $response['errors'][] = $this->l('Guest details not found.');
+                }
+            } else {
+                $response['errors'][] = $this->l('Guest details not found.');
+            }
+        }
+
+        $this->ajaxDie(json_encode($response));
     }
 
     public function ajaxProcessSearchProducts()

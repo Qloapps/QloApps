@@ -68,7 +68,7 @@ class AddressControllerCore extends FrontController
                 $id_address = (int)$this->context->cart->id_address_invoice;
             }
         } else {
-            $id_address = (int)Tools::getValue('id_address', 0);
+            $id_address = Customer::getCustomerIdAddress($this->context->customer->id);
         }
 
         // Initialize address
@@ -91,7 +91,7 @@ class AddressControllerCore extends FrontController
             } elseif ($this->ajax) {
                 exit;
             } else {
-                Tools::redirect('index.php?controller=addresses');
+                // Tools::redirect('index.php?controller=addresses');
             }
         }
     }
@@ -241,7 +241,7 @@ class AddressControllerCore extends FrontController
                 $mod = Tools::getValue('mod');
                 Tools::redirect('index.php?controller='.$back.($mod ? '&back='.$mod : ''));
             } else {
-                Tools::redirect('index.php?controller=addresses');
+                Tools::redirect('index.php?controller=address');
             }
         }
         $this->errors[] = Tools::displayError('An error occurred while updating your address.');

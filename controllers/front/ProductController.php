@@ -88,6 +88,18 @@ class ProductControllerCore extends FrontController
      */
     public function init()
     {
+        // validate dates if available
+        $dateFrom = Tools::getValue('date_from');
+        $dateTo = Tools::getValue('date_to');
+
+        if ($dateFrom != '' && !Validate::isDate($dateFrom)) {
+            Tools::redirect($this->context->link->getPageLink('pagenotfound'));
+        }
+
+        if ($dateTo != '' && !Validate::isDate($dateTo)) {
+            Tools::redirect($this->context->link->getPageLink('pagenotfound'));
+        }
+
         parent::init();
 
         if ($id_product = (int) Tools::getValue('id_product')) {

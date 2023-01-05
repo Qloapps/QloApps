@@ -244,6 +244,15 @@ class QhrHotelReview extends ObjectModel
         );
     }
 
+    public function getTotalUseful()
+    {
+        return (int) Db::getInstance()->getValue(
+            'SELECT COUNT(*)
+            FROM `'._DB_PREFIX_.'qhr_review_usefulness` ru
+            WHERE ru.`id_hotel_review` = '.(int) $this->id_hotel_review
+        );
+    }
+
     public function getTotalReports()
     {
         $sql = new DbQuery();

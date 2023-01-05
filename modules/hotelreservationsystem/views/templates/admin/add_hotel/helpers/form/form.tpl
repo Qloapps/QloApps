@@ -321,7 +321,7 @@
 														<td class="text-center">{$image.id|escape:'html':'UTF-8'}</td>
 														<td class="text-center">
 															<a class="htl-img-preview" href="{$image.image_link|escape:'html':'UTF-8'}">
-																<img class="img-thumbnail" width="100" src="{$image.image_link|escape:'html':'UTF-8'}"/>
+																<img class="img-thumbnail" width="100" src="{$image.image_link_small|escape:'html':'UTF-8'}"/>
 															</a>
 														</td>
 														<td class="text-center {if $image.cover == 1}cover-image-td{/if}">

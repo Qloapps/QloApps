@@ -67,11 +67,6 @@ class WkAboutHotelBlock extends Module
         return $this->display(__FILE__, 'hotelInteriorBlock.tpl');
     }
 
-    public function hookDisplayAddModuleSettingLink()
-    {
-        return $this->display(__FILE__, 'aboutHotelBlockModuleSetting.tpl');
-    }
-
     /**
      * If admin add any language then an entry will add in defined $lang_tables array's lang table same as prestashop
      * @param array $params
@@ -102,13 +97,17 @@ class WkAboutHotelBlock extends Module
         return true;
     }
 
+    public function getContent()
+    {
+        Tools::redirectAdmin($this->context->link->getAdminLink('AdminAboutHotelBlockSetting'));
+    }
+
     public function registerModuleHooks()
     {
         return $this->registerHook(
             array(
                 'displayHome',
                 'displayFooterExploreSectionHook',
-                'displayAddModuleSettingLink',
                 'actionObjectLanguageAddAfter'
             )
         );
