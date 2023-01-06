@@ -118,6 +118,7 @@ class AdminOutstandingControllerCore  extends AdminController
      */
     public function initToolbar()
     {
+        parent::initToolbar();
         return true;
     }
 
