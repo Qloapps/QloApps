@@ -544,8 +544,6 @@ abstract class PaymentModuleCore extends Module
                     }
 
                     $cart_rules_list = array();
-                    $total_reduction_value_ti = 0;
-                    $total_reduction_value_tex = 0;
                     foreach ($cart_rules as $cart_rule) {
                         if ($cart_rule['obj']->reduction_product > 0 && !$order->orderContainProduct($cart_rule['obj']->reduction_product)) {
                             continue;
@@ -563,7 +561,6 @@ abstract class PaymentModuleCore extends Module
                         }
 
                         // IF
-                        //	This is not multi-shipping
                         //	The value of the voucher is greater than the total of the order
                         //	Partial use is allowed
                         //	This is an "amount" reduction, not a reduction in % or a gift
@@ -582,7 +579,7 @@ abstract class PaymentModuleCore extends Module
                         } else {
                             $remaining_amount = $reduction_amount_converted - $values['tax_excl'];
                         }
-                        if (count($order_list) == 1 && $remaining_amount > 0 && $cart_rule['obj']->partial_use == 1 && $reduction_amount_converted > 0) {
+                        if ($remaining_amount > 0 && $cart_rule['obj']->partial_use == 1 && $reduction_amount_converted > 0) {
                             // Create a new voucher from the original
                             $voucher = new CartRule((int)$cart_rule['obj']->id); // We need to instantiate the CartRule without lang parameter to allow saving it
                             unset($voucher->id);
@@ -642,12 +639,7 @@ abstract class PaymentModuleCore extends Module
                                     null, null, null, null, _PS_MAIL_DIR_, false, (int)$order->id_shop
                                 );
                             }
-
-                            $values['tax_incl'] = $order->total_products_wt - $total_reduction_value_ti;
-                            $values['tax_excl'] = $order->total_products - $total_reduction_value_tex;
                         }
-                        $total_reduction_value_ti += $values['tax_incl'];
-                        $total_reduction_value_tex += $values['tax_excl'];
 
                         $order->addCartRule($cart_rule['obj']->id, $cart_rule['obj']->name, $values, 0, $cart_rule['obj']->free_shipping);
 
