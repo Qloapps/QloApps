@@ -30,10 +30,10 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
 
         parent::__construct();
 
-        $this->setPhpCookieData();
+        $this->initCart();
     }
 
-    public function setPhpCookieData()
+    public function initCart()
     {
         if (!isset($this->context->cookie->id_guest)) {
             Guest::setNewGuest($this->context->cookie);
