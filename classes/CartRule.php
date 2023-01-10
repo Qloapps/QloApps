@@ -1032,16 +1032,6 @@ class CartRuleCore extends ObjectModel
                 }
 
                 $restricted_product = null;
-                // If the cart rule is restricted to one room type it can't exceed this room type price
-                if ($this->reduction_product > 0) {
-                    foreach ($package_products as $product) {
-                        if ($product['id_product'] == $this->reduction_product) {
-                            $restricted_product = $product;
-                        }
-                    }
-                }
-
-                $restricted_product = null;
                 $reduction_amount = $this->reduction_amount;
                 // If the cart rule is restricted to one room type it can't exceed this room type price
                 if ($this->reduction_product > 0) {
