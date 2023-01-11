@@ -2734,7 +2734,7 @@ CREATE TABLE IF NOT EXISTS `PREFIX_maintenance_access` (
   PRIMARY KEY (`id_maintenance_access`)
 ) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8;
 
-CREATE TABLE IF NOT EXISTS `PREFIX_cities` (
+CREATE TABLE IF NOT EXISTS `PREFIX_city` (
   `id_city` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(30) NOT NULL,
   `state_id` int(11) NOT NULL,
