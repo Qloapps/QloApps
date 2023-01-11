@@ -131,7 +131,7 @@ class DashGuestCycle extends Module
     public function getTableArrivalsByDate($date, $idHotel)
     {
         $header = array(
-            'name' => array('title' => $this->l('Name'), 'class' => 'text-left'),
+            'name' => array('title' => $this->l('Customer Name'), 'class' => 'text-left'),
             'room_num' => array('title' => $this->l('Room No.'), 'class' => 'text-center'),
             'room_type' => array('title' => $this->l('Room Type'), 'class' => 'text-left'),
             'hotel' => array('title' => $this->l('Hotel'), 'class' => 'text-left'),
@@ -191,7 +191,7 @@ class DashGuestCycle extends Module
     public function getTableDeparturesByDate($date, $idHotel)
     {
         $header = array(
-            'name' => array('title' => $this->l('Name'), 'class' => 'text-left'),
+            'name' => array('title' => $this->l('Customer Name'), 'class' => 'text-left'),
             'room_num' => array('title' => $this->l('Room No.'), 'class' => 'text-center'),
             'room_type' => array('title' => $this->l('Room Type'), 'class' => 'text-left'),
             'hotel' => array('title' => $this->l('Hotel'), 'class' => 'text-left'),
@@ -251,7 +251,7 @@ class DashGuestCycle extends Module
     public function getTableInHouseByDate($date, $idHotel)
     {
         $header = array(
-            'name' => array('title' => $this->l('Name'), 'class' => 'text-left'),
+            'name' => array('title' => $this->l('Customer Name'), 'class' => 'text-left'),
             'room_num' => array('title' => $this->l('Room No.'), 'class' => 'text-center'),
             'room_type' => array('title' => $this->l('Room Type'), 'class' => 'text-left'),
             'hotel' => array('title' => $this->l('Hotel'), 'class' => 'text-left'),
@@ -316,11 +316,11 @@ class DashGuestCycle extends Module
     public function getTableNewBookingsByDate($date, $idHotel)
     {
         $header = array(
-            'name' => array('title' => $this->l('Name'), 'class' => 'text-left'),
+            'order_id' => array('title' => $this->l('Order ID'), 'class' => 'text-center'),
+            'name' => array('title' => $this->l('Customer Name'), 'class' => 'text-left'),
+            'hotel' => array('title' => $this->l('Hotel'), 'class' => 'text-left'),
             'total' => array('title' => $this->l('Total Rooms'), 'class' => 'text-center'),
             'guests' => array('title' => $this->l('Guests'), 'class' => 'text-center'),
-            'hotel' => array('title' => $this->l('Hotel'), 'class' => 'text-left'),
-            'order_id' => array('title' => $this->l('Order ID'), 'class' => 'text-center'),
             'order_total' => array('title' => $this->l('Order Total'), 'class' => 'text-right'),
             'order_status' => array('title' => $this->l('Order Status'), 'class' => 'text-left'),
         );
@@ -337,16 +337,12 @@ class DashGuestCycle extends Module
 
             $tr = array();
             $tr[] = array(
+                'value' => '<a href="'.$this->context->link->getAdminLink('AdminOrders', true).'&id_order='.$newBookingInfo['id_order'].'&vieworder" target="_blank">#'.Tools::htmlentitiesUTF8($newBookingInfo['id_order']).'</a>',
+                'class' => 'text-center',
+            );
+            $tr[] = array(
                 'value' => '<a href="'.$this->context->link->getAdminLink('AdminCustomers', true).'&id_customer='.$newBookingInfo['id_customer'].'&viewcustomer" target="_blank">'.Tools::htmlentitiesUTF8($newBookingInfo['customer_name']).'</a>',
                 'class' => 'text-left',
-            );
-            $tr[] = array(
-                'value' => $newBookingInfo['total_rooms'],
-                'class' => 'text-center',
-            );
-            $tr[] = array(
-                'value' => $newBookingInfo['total_guests'],
-                'class' => 'text-center',
             );
 
             if ($idHotel == 0) {
@@ -357,7 +353,11 @@ class DashGuestCycle extends Module
             }
 
             $tr[] = array(
-                'value' => '<a href="'.$this->context->link->getAdminLink('AdminOrders', true).'&id_order='.$newBookingInfo['id_order'].'&vieworder" target="_blank">#'.Tools::htmlentitiesUTF8($newBookingInfo['id_order']).'</a>',
+                'value' => $newBookingInfo['total_rooms'],
+                'class' => 'text-center',
+            );
+            $tr[] = array(
+                'value' => $newBookingInfo['total_guests'],
                 'class' => 'text-center',
             );
             $tr[] = array(
@@ -378,7 +378,8 @@ class DashGuestCycle extends Module
     public function getTableCancellationsByDate($date, $idHotel)
     {
         $header = array(
-            'name' => array('title' => $this->l('Name'), 'class' => 'text-left'),
+            'request_id' => array('title' => $this->l('Request ID'), 'class' => 'text-center'),
+            'name' => array('title' => $this->l('Customer Name'), 'class' => 'text-left'),
             'room_num' => array('title' => $this->l('Room No.'), 'class' => 'text-center'),
             'room_type' => array('title' => $this->l('Room Type'), 'class' => 'text-left'),
             'hotel' => array('title' => $this->l('Hotel'), 'class' => 'text-left'),
@@ -386,7 +387,6 @@ class DashGuestCycle extends Module
             'check_in' => array('title' => $this->l('Check-in'), 'class' => 'text-left'),
             'check_out' => array('title' => $this->l('Check-out'), 'class' => 'text-left'),
             'order_id' => array('title' => $this->l('Order ID'), 'class' => 'text-center'),
-            'order_status' => array('title' => $this->l('Cancel Status'), 'class' => 'text-left'),
         );
 
         if ($idHotel != 0) {
@@ -400,6 +400,10 @@ class DashGuestCycle extends Module
             $objCurrency = Currency::getCurrency($cancellationInfo['id_currency']);
 
             $tr = array();
+            $tr[] = array(
+                'value' => '<a href="'.$this->context->link->getAdminLink('AdminOrderRefundRequests', true).'&id_order_return='.$cancellationInfo['id_order_return'].'&vieworder_return" target="_blank">#'.Tools::htmlentitiesUTF8($cancellationInfo['id_order_return']).'</a>',
+                'class' => 'text-center',
+            );
             $tr[] = array(
                 'value' => '<a href="'.$this->context->link->getAdminLink('AdminCustomers', true).'&id_customer='.$cancellationInfo['id_customer'].'&viewcustomer" target="_blank">'.Tools::htmlentitiesUTF8($cancellationInfo['customer_name']).'</a>',
                 'class' => 'text-left',
@@ -435,10 +439,6 @@ class DashGuestCycle extends Module
             $tr[] = array(
                 'value' => '<a href="'.$this->context->link->getAdminLink('AdminOrders', true).'&id_order='.$cancellationInfo['id_order'].'&vieworder" target="_blank">#'.Tools::htmlentitiesUTF8($cancellationInfo['id_order']).'</a>',
                 'class' => 'text-center',
-            );
-            $tr[] = array(
-                'value' => $cancellationInfo['state_name'],
-                'class' => 'text-left',
             );
 
             $body[] = $tr;
