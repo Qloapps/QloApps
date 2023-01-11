@@ -29,7 +29,7 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
         $this->context = Context::getContext();
 
         $this->_select = ' COUNT(IF(a.`state` = '.(int) OrderReturnState::ORDER_RETRUN_FIRST_STATUS.', 1, NULL)) AS total_pending_requests,
-        ord.`id_currency`, ord.`total_paid_tax_incl` AS total_order, CONCAT(firstname, " ", lastname) AS cust_name, os.`color`, os.`id_order_state`';
+        ord.`id_currency`, ord.`total_paid_tax_incl` AS total_order, SUM(a.`refunded_amount`) AS refunded_amount, CONCAT(firstname, " ", lastname) AS cust_name, os.`color`, os.`id_order_state`';
         $this->_join .= ' LEFT JOIN `'._DB_PREFIX_.'orders` ord ON (a.`id_order` = ord.`id_order`)';
         $this->_join .= 'LEFT JOIN '._DB_PREFIX_.'order_state os ON (os.`id_order_state` = ord.`current_state`)';
         $this->_join .= 'LEFT JOIN '._DB_PREFIX_.'order_state_lang osl ON (osl.`id_order_state` = os.`id_order_state` AND osl.`id_lang` = '.(int)$this->context->language->id.')';
@@ -64,8 +64,14 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
                 'callback' => 'setOrderCurrency',
                 'havingFilter' => true,
             ),
+            'refunded_amount' => array(
+                'title' => $this->l('Refunded Amount'),
+                'align' => 'center',
+                'callback' => 'setOrderCurrency',
+                'havingFilter' => true,
+            ),
             'total_pending_requests' => array(
-                'title' => $this->l('Total Pending'),
+                'title' => $this->l('Pending Requests'),
                 'align' => 'center',
                 'havingFilter' => true,
             ),
@@ -86,6 +92,9 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
         if (Tools::isSubmit('submitResetorder_return') && Tools::getValue('id_order')) {
             Tools::redirectAdmin($this->context->link->getAdminLink('AdminOrderRefundRequests').'&id_order='.Tools::getValue('id_order').'&view'.$this->table);
         }
+
+        $this->_conf[101] = $this->l('Refund request has been denied successfully.');
+        $this->_conf[102] = $this->l('Refund request has been completed successfully.');
     }
 
     public function setOrderCurrency($echo, $row)
@@ -140,7 +149,7 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
             $this->identifier = 'id_order_return';
 
             /*for showing status of booking with badge_danger or success*/
-            $this->_select = ' CONCAT(cust.`firstname`, " ", cust.`lastname`) AS `cust_name`, ors.`color`, orsl.`name` as `status_name`';
+            $this->_select = ' CONCAT(cust.`firstname`, " ", cust.`lastname`) AS `cust_name`, ors.`color`, orsl.`name` as `status_name`, ord.`id_currency`';
             $this->_join = ' LEFT JOIN `'._DB_PREFIX_.'customer` cust ON (cust.`id_customer` = a.`id_customer`)';
             $this->_join .= ' LEFT JOIN `'._DB_PREFIX_.'orders` ord ON (ord.`id_order` = a.`id_order`)';
             $this->_join .= 'LEFT JOIN '._DB_PREFIX_.'order_return_state ors ON (ors.`id_order_return_state` = a.`state`)';
@@ -181,6 +190,12 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
                     'list' => $retStatuses,
                     'filter_key' => 'ors!id_order_return_state',
                     'filter_type' => 'int',
+                ),
+                'refunded_amount' => array(
+                    'title' => $this->l('Refunded Amount'),
+                    'align' => 'center',
+                    'callback' => 'setOrderCurrency',
+                    'havingFilter' => true,
                 ),
                 'date_add' => array(
                     'title' => $this->l('Requested Date'),
@@ -269,11 +284,11 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
                                 if ($refundedAmounts) {
                                     foreach ($idsReturnDetail as $idRetDetail) {
                                         if (!isset($refundedAmounts[$idRetDetail]) || !Validate::isPrice($refundedAmounts[$idRetDetail])) {
-                                            $this->errors[] = $this->l('Invalid refund amounts entered.');
+                                            $this->errors[] = $this->l('Invalid refund amount(s) entered.');
                                         }
                                     }
                                 } else {
-                                    $this->errors[] = $this->l('Invalid refund amounts entered.');
+                                    $this->errors[] = $this->l('Invalid refund amount(s) entered.');
                                 }
                             } else {
                                 $this->errors[] = $this->l('Select at least one booking for refund.');
@@ -502,8 +517,14 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
                     }
 
                     // redirect with success if process completed successfully
+                    $confirmation = '4';
+                    if ($idRefundState == 2) {
+                        $confirmation = '101';
+                    } elseif ($idRefundState == 3) {
+                        $confirmation = '102';
+                    }
                     Tools::redirectAdmin(
-                        self::$currentIndex.'&conf=4&id_order_return='.$idOrderReturn.
+                        self::$currentIndex.'&conf='.$confirmation.'&id_order_return='.$idOrderReturn.
                         '&vieworder_return&token='.$this->token
                     );
                 }

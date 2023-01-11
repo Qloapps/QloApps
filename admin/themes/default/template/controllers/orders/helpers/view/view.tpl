@@ -961,7 +961,7 @@
 					<input type="hidden" value="{$order->getWarehouseList()|implode}" id="warehouse_list" />
 				</div>
 
-				<div class="panel">
+				<div class="panel" id="refundForm">
 					<div class="panel-heading">
 						<i class="icon-shopping-cart"></i>
 						{l s='Rooms In This Order'} <span class="badge">{$order_detail_data|@count}</span>
@@ -1040,9 +1040,14 @@
 							</button>
 
 							{if $refund_allowed && !$hasCompletelyRefunded}
-								<button style="display: none;" type="submit" name="initiateRefund" class="btn btn-success standard_refund_fields pull-right" id="initiateRefund">
-									{if $order->hasBeenPaid()}<i class="icon-undo"></i> {l s='Initiate Refund'}{else}{l s='Cancel bookings'}{/if}
-								</button>
+								<div class="pull-right">
+									<button style="display: none;" type="button" class="btn btn-default standard_refund_fields" id="cancelRefund">
+										{l s='Cancel'}
+									</button>
+									<button style="display: none;" type="submit" name="initiateRefund" class="btn btn-success standard_refund_fields" id="initiateRefund">
+										{if $order->hasBeenPaid()}<i class="icon-undo"></i> {l s='Initiate Refund'}{else}{l s='Submit'}{/if}
+									</button>
+								</div>
 							{/if}
 						</div>
 					{/if}

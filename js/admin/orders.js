@@ -605,6 +605,7 @@ function init()
 		$('.row-editing-warning').hide();
 		$('.cancel_product_change_link:visible').trigger('click');
 		closeAddProduct();
+		refundFormStatus = 'closed';
 
 		/*By webkul*/
 		var tr_product = $(this).closest('.product-line-row');
@@ -930,22 +931,26 @@ function init()
 /* Refund system script */
 var flagRefund = '';
 
+var refundFormStatus = 'closed';
 $(document).ready(function() {
 	$('#desc-order-standard_refund').click(function() {
 		$('.cancel_product_change_link:visible').trigger('click');
-		closeAddProduct();
-		if (flagRefund == 'standard') {
-			flagRefund = '';
-			$('.partial_refund_fields').hide();
-			$('.standard_refund_fields').hide();
-		}
-		else {
-			flagRefund = 'standard';
-			$('.partial_refund_fields').hide();
+
+		if (refundFormStatus == 'closed') {
 			$('.standard_refund_fields').fadeIn();
+			refundFormStatus = 'open';
 		}
+
+		closeAddProduct();
 		if (order_discount_price)
 			actualizeTotalRefundVoucher();
+
+		scroll_if_anchor('#refundForm', 170);
+	});
+
+	$('#cancelRefund').click(function() {
+		$('.standard_refund_fields').hide();
+		refundFormStatus = 'closed';
 	});
 
 	$('#desc-order-partial_refund').click(function() {
