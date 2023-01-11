@@ -2733,3 +2733,10 @@ CREATE TABLE IF NOT EXISTS `PREFIX_maintenance_access` (
   `date_add` datetime NOT NULL,
   PRIMARY KEY (`id_maintenance_access`)
 ) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `PREFIX_cities` (
+  `id_city` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(30) NOT NULL,
+  `state_id` int(11) NOT NULL,
+  PRIMARY KEY (`id_city`)
+) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8;
