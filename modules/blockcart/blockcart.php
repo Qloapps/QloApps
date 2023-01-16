@@ -129,7 +129,7 @@ class Blockcart extends Module
         $wrappingCost = (float) ($params['cart']->getOrderTotal($useTax, Cart::ONLY_WRAPPING));
         $totalToPay = $params['cart']->getOrderTotal($useTax);
         $tax_cost = 0;
-        if ($showTax) {
+        if ($useTax && $showTax) {
             $totalToPayWithoutTaxes = $params['cart']->getOrderTotal(false);
             $tax_cost = Tools::displayPrice($totalToPay - $totalToPayWithoutTaxes, $currency);
         }
@@ -206,6 +206,7 @@ class Blockcart extends Module
             'shipping_cost_float' => $shipping_cost_float,
             'show_wrapping' => $wrappingCost > 0 ? true : false,
             'show_tax' => $showTax,
+            'use_tax' => $useTax,
             'tax_cost' => $tax_cost,
             'wrapping_cost' => Tools::displayPrice($wrappingCost, $currency),
             'product_total' => Tools::displayPrice($params['cart']->getOrderTotal($useTax, Cart::ONLY_PRODUCTS), $currency),
