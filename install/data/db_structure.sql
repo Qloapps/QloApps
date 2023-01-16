@@ -2739,7 +2739,7 @@ CREATE TABLE IF NOT EXISTS `PREFIX_city` (
   `id_country` int(11) NOT NULL,
   `id_state` int(11) NOT NULL,
   `name` varchar(30) NOT NULL,
-  `iso_code` varchar(7) NOT NULL,
+  `iso_code` varchar(7) DEFAULT NULL,
   `active` tinyint(1) unsigned NOT NULL DEFAULT '1',
   PRIMARY KEY (`id_city`)
 ) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8;
