@@ -159,12 +159,12 @@ class WebserviceOutputJSON implements WebserviceOutputInterface
 
     public function overrideContent($content)
     {
-        $content = '';
-        $content .= json_encode($this->content);
-        $content = preg_replace_callback("/\\\\u([a-f0-9]{4})/", function ($matches) {
-            return iconv('UCS-4LE','UTF-8', pack('V', hexdec('U' . $matches[1])));
-        }, $content);
-        return $content;
+        array_walk($this->content, function (&$item) {
+            $item = array_filter($item);
+        });
+        $content = json_encode($this->content, JSON_UNESCAPED_UNICODE);
+
+        return (false !== $content) ? $content : '';
     }
 
     public function setLanguages($languages)
