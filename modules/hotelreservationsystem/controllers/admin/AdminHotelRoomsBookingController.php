@@ -30,65 +30,51 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
 
         parent::__construct();
 
-        $this->setPhpCookieData();
+        $this->initCart();
     }
 
-    public function setPhpCookieData()
+    public function initCart()
     {
-        if (!isset($_COOKIE['wk_id_guest']) || !$_COOKIE['wk_id_guest']) {
-            if (!isset($this->context->cookie->id_guest)) {
-                Guest::setNewGuest($this->context->cookie);
-            }
-
-            setcookie('wk_id_guest', $this->context->cookie->id_guest, time() + 86400, "/");
-        } else {
-            $this->context->cookie->id_guest = $_COOKIE['wk_id_guest'];
-            setcookie('wk_id_guest', $this->context->cookie->id_guest, time() + 86400, "/");
-        }
-        $guest = new Guest($this->context->cookie->id_guest);
-
-        if (!isset($_COOKIE['wk_id_cart']) && !isset($this->context->cart->id)) {
-            $cart = new Cart();
-
-            $cart->recyclable = 0;
-            $cart->gift = 0;
-            $cart->id_shop = (int)$this->context->shop->id;
-            $cart->id_lang = (($id_lang = (int)Tools::getValue('id_lang')) ? $id_lang : Configuration::get('PS_LANG_DEFAULT'));
-            $cart->id_currency = (($id_currency = (int)Tools::getValue('id_currency')) ? $id_currency : Configuration::get('PS_CURRENCY_DEFAULT'));
-            $cart->id_address_delivery = 0;
-            $cart->id_address_invoice = 0;
-            $cart->id_currency = Configuration::get('PS_CURRENCY_DEFAULT');
-            $cart->id_guest = (int)$this->context->cookie->id_guest;
-            $cart->setNoMultishipping();
-            $cart->save();
-
-            $this->context->cart = $cart;
-            $this->context->cookie->id_cart = $cart->id;
-
-            setcookie('wk_id_cart', $cart->id, time() + 86400, "/");
-        } else {
-            $cart = new Cart((int)$_COOKIE['wk_id_cart']);
-
-            $this->context->cart = $cart;
-            $this->context->cookie->id_cart = $cart->id;
-            setcookie('wk_id_cart', $cart->id, time() + 86400, "/");
+        if (!isset($this->context->cookie->id_guest)) {
+            Guest::setNewGuest($this->context->cookie);
         }
 
-        $customer = new Customer();
-        $customer->id_gender = 0;
-        $customer->id_default_group = 1;
-        $customer->outstanding_allow_amount = 0;
-        $customer->show_public_prices = 0;
-        $customer->max_payment_days = 0;
-        $customer->active = 1;
-        $customer->is_guest = 0;
-        $customer->deleted = 0;
-        $customer->logged = 0;
-        $customer->id_guest = $this->context->cookie->id_guest;
+        if (!isset($this->context->cookie->id_cart)) {
+            // create a new cart
+            $objCart = new Cart();
+            $objCart->recyclable = 0;
+            $objCart->gift = 0;
+            $objCart->id_shop = (int) $this->context->shop->id;
+            $objCart->id_lang = (($id_lang = (int) Tools::getValue('id_lang')) ? $id_lang : (int) Configuration::get('PS_LANG_DEFAULT'));
+            $objCart->id_currency = (($id_currency = (int) Tools::getValue('id_currency')) ? $id_currency : (int) Configuration::get('PS_CURRENCY_DEFAULT'));
+            $objCart->id_address_delivery = 0;
+            $objCart->id_address_invoice = 0;
+            $objCart->id_currency = (int) Configuration::get('PS_CURRENCY_DEFAULT');
+            $objCart->id_guest = (int) $this->context->cookie->id_guest;
+            $objCart->setNoMultishipping();
 
-        $this->context->customer = $customer;
+            $this->context->cart = $objCart;
+            $this->context->cart->save();
 
-        return true;
+            $this->context->cookie->id_cart = (int) $objCart->id;
+        } else {
+            // use previous cart
+            $this->context->cart = new Cart($this->context->cookie->id_cart);
+        }
+
+        $objCustomer = new Customer();
+        $objCustomer->id_gender = 0;
+        $objCustomer->id_default_group = 1;
+        $objCustomer->outstanding_allow_amount = 0;
+        $objCustomer->show_public_prices = 0;
+        $objCustomer->max_payment_days = 0;
+        $objCustomer->active = 1;
+        $objCustomer->is_guest = 0;
+        $objCustomer->deleted = 0;
+        $objCustomer->logged = 0;
+        $objCustomer->id_guest = (int) $this->context->cookie->id_guest;
+
+        $this->context->customer = $objCustomer;
     }
 
     public function postProcess()

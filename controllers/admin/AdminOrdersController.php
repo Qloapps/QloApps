@@ -869,13 +869,14 @@ class AdminOrdersControllerCore extends AdminController
                         false,
                         $cart->secure_key
                     );
-                    /*
-                        setcookie('wk_id_cart', ' ', time() - 86400, '/');
-                        setcookie('wk_id_guest', ' ', time() - 86400, '/');
 
-                        unset($_COOKIE['wk_id_cart']);
-                        unset($_COOKIE['wk_id_guest']);
-                    */
+                    if (isset($this->context->cookie->id_cart)) {
+                        unset($this->context->cookie->id_cart);
+                    }
+                    if (isset($this->context->cookie->id_guest)) {
+                        unset($this->context->cookie->id_guest);
+                    }
+
                     if ($payment_module->currentOrder) {
                         Tools::redirectAdmin(self::$currentIndex.'&id_order='.$payment_module->currentOrder.'&vieworder'.'&token='.$this->token.'&conf=3');
                     }
