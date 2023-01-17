@@ -1783,7 +1783,7 @@ class CartCore extends ObjectModel
             $order_total_discount = min(Tools::ps_round($order_total_discount, 2), (float)$order_total_products) + (float)$order_shipping_discount;
             if ($type == Cart::ADVANCE_PAYMENT) {
                 // get order total without discount
-                $total_without_discount = self::getOrderTotal() + $order_total_discount;
+                $total_without_discount = $this->getOrderTotal() + $order_total_discount;
                 // to find due amount substract advance payment without discuount from order total without discount
                 // Due Amount = order total - advance payment (without discount)
                 $due_amount = $total_without_discount - $order_total;
