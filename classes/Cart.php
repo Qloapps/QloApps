@@ -1731,6 +1731,7 @@ class CartCore extends ObjectModel
 
         $order_total_discount = 0;
         $order_shipping_discount = 0;
+        $advance_payment_products_discount = 0;
         if (!in_array($type, array(Cart::ONLY_SHIPPING, Cart::ONLY_PRODUCTS, Cart::ADVANCE_PAYMENT_ONLY_PRODUCTS)) && CartRule::isFeatureActive()) {
             // First, retrieve the cart rules associated to this "getOrderTotal"
             if ($with_shipping || $type == Cart::ONLY_DISCOUNTS) {
@@ -1787,10 +1788,28 @@ class CartCore extends ObjectModel
                 // If the cart rule offers a reduction, the amount is prorated (with the products in the package)
                 if ($cart_rule['obj']->reduction_percent > 0 || $cart_rule['obj']->reduction_amount > 0) {
                     $order_total_discount += Tools::ps_round($cart_rule['obj']->getContextualValue($with_taxes, $virtual_context, CartRule::FILTER_ACTION_REDUCTION, $package, $use_cache), $compute_precision);
+
+                    if ($type == Cart::ADVANCE_PAYMENT) {
+                        $advance_payment_products_discount += Tools::ps_round($cart_rule['obj']->getContextualValue($with_taxes, $virtual_context, CartRule::FILTER_ACTION_REDUCTION, $package, $use_cache, true), $compute_precision);
+                    }
                 }
             }
             $order_total_discount = min(Tools::ps_round($order_total_discount, 2), (float)$order_total_products) + (float)$order_shipping_discount;
-            $order_total -= $order_total_discount;
+            if ($type == Cart::ADVANCE_PAYMENT) {
+                // get order total without discount
+                $total_without_discount = $this->getOrderTotal() + $order_total_discount;
+                // to find due amount substract advance payment without discuount from order total without discount
+                // Due Amount = order total - advance payment (without discount)
+                $due_amount = $total_without_discount - $order_total;
+                // if discount for advance payment products is greater than due amount then only decrease the price of advance payment amount
+                // otherwise discount will be applied on due amount not advance payment amount
+                if ($advance_payment_products_discount > $due_amount) {
+                    $order_total -= ($advance_payment_products_discount - $due_amount);
+                }
+                $order_total -= $order_total_discount - $advance_payment_products_discount;
+            } else {
+                $order_total -= $order_total_discount;
+            }
         }
 
         if ($type == Cart::BOTH || $type == Cart::ADVANCE_PAYMENT) {

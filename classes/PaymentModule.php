@@ -583,9 +583,11 @@ abstract class PaymentModuleCore extends Module
                     }
 
                     $cart_rules_list = array();
-                    $total_reduction_value_ti = 0;
-                    $total_reduction_value_tex = 0;
                     foreach ($cart_rules as $cart_rule) {
+                        if ($cart_rule['obj']->reduction_product > 0 && !$order->orderContainProduct($cart_rule['obj']->reduction_product)) {
+                            continue;
+                        }
+
                         $package = array('id_carrier' => $order->id_carrier, 'id_address' => $order->id_address_delivery, 'products' => $order->product_list);
                         $values = array(
                             'tax_incl' => $cart_rule['obj']->getContextualValue(true, $this->context, CartRule::FILTER_ACTION_ALL_NOCAP, $package),
@@ -598,13 +600,25 @@ abstract class PaymentModuleCore extends Module
                         }
 
                         // IF
-                        //	This is not multi-shipping
                         //	The value of the voucher is greater than the total of the order
                         //	Partial use is allowed
                         //	This is an "amount" reduction, not a reduction in % or a gift
                         // THEN
                         //	The voucher is cloned with a new value corresponding to the remainder
-                        if (count($order_list) == 1 && $values['tax_incl'] > ($order->total_products_wt - $total_reduction_value_ti) && $cart_rule['obj']->partial_use == 1 && $cart_rule['obj']->reduction_amount > 0) {
+                        $reduction_amount_converted = $cart_rule['obj']->reduction_amount;
+                        if ((int) $cart_rule['obj']->reduction_currency !== (int) $cart->id_currency) {
+                            $reduction_amount_converted = Tools::convertPriceFull(
+                                $cart_rule['obj']->reduction_amount,
+                                new Currency($cart_rule['obj']->reduction_currency),
+                                new Currency($cart->id_currency)
+                            );
+                        }
+                        if ($cart_rule['obj']->reduction_tax) {
+                            $remaining_amount = $reduction_amount_converted - $values['tax_incl'];
+                        } else {
+                            $remaining_amount = $reduction_amount_converted - $values['tax_excl'];
+                        }
+                        if ($remaining_amount > 0 && $cart_rule['obj']->partial_use == 1 && $reduction_amount_converted > 0) {
                             // Create a new voucher from the original
                             $voucher = new CartRule((int)$cart_rule['obj']->id); // We need to instantiate the CartRule without lang parameter to allow saving it
                             unset($voucher->id);
@@ -616,16 +630,13 @@ abstract class PaymentModuleCore extends Module
                             }
 
                             // Set the new voucher value
+                            $voucher->reduction_amount = $remaining_amount;
                             if ($voucher->reduction_tax) {
-                                $voucher->reduction_amount = ($total_reduction_value_ti + $values['tax_incl']) - $order->total_products_wt;
-
                                 // Add total shipping amout only if reduction amount > total shipping
                                 if ($voucher->free_shipping == 1 && $voucher->reduction_amount >= $order->total_shipping_tax_incl) {
                                     $voucher->reduction_amount -= $order->total_shipping_tax_incl;
                                 }
                             } else {
-                                $voucher->reduction_amount = ($total_reduction_value_tex + $values['tax_excl']) - $order->total_products;
-
                                 // Add total shipping amout only if reduction amount > total shipping
                                 if ($voucher->free_shipping == 1 && $voucher->reduction_amount >= $order->total_shipping_tax_excl) {
                                     $voucher->reduction_amount -= $order->total_shipping_tax_excl;
@@ -667,12 +678,7 @@ abstract class PaymentModuleCore extends Module
                                     null, null, null, null, _PS_MAIL_DIR_, false, (int)$order->id_shop
                                 );
                             }
-
-                            $values['tax_incl'] = $order->total_products_wt - $total_reduction_value_ti;
-                            $values['tax_excl'] = $order->total_products - $total_reduction_value_tex;
                         }
-                        $total_reduction_value_ti += $values['tax_incl'];
-                        $total_reduction_value_tex += $values['tax_excl'];
 
                         $order->addCartRule($cart_rule['obj']->id, $cart_rule['obj']->name, $values, 0, $cart_rule['obj']->free_shipping);
 
