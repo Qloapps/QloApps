@@ -93,9 +93,12 @@
 					</button>
 					<input type="hidden" class="max_avail_type_qty" value="">
 					<div class="dropdown-menu booking_occupancy_wrapper fixed-width-xxl well well-sm">
-						<div class="booking_occupancy_inner row">
-						<div class="occupancy_info_block col-sm-12" occ_block_index="0">
-							<div class="occupancy_info_head col-sm-12"><label class="room_num_wrapper">{l s='Room - 1'}</label></div>
+						<div class="booking_occupancy_inner">
+							<input type="hidden" class="max_adults" value="">
+							<input type="hidden" class="max_children" value="">
+							<input type="hidden" class="max_guests" value="">
+							<div class="occupancy_info_block col-sm-12" occ_block_index="0">
+								<div class="occupancy_info_head col-sm-12"><label class="room_num_wrapper">{l s='Room - 1'}</label></div>
 								<div class="col-sm-12">
 									<div class="row">
 										<div class="form-group col-xs-6 occupancy_count_block">

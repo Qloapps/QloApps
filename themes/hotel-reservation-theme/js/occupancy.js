@@ -116,6 +116,7 @@ $(document).ready(function(){
     });
 
 	$(document).on('click', '.booking_guest_occupancy', function(e) {
+        $('.booking_guest_occupancy_conatiner .dropdown').removeClass('open');
 		$(this).parent().toggleClass('open');
     });
 
@@ -294,7 +295,6 @@ function setRoomTypeGuestOccupancy(booking_occupancy_wrapper)
         children += parseInt($(this).val());
     });
 	guestButtonVal = getRoomTypeGuestOccupancyFormated(adults, children, rooms);
-	// console.log($(booking_occupancy_wrapper).siblings('.booking_guest_occupancy > span'));
 	$(booking_occupancy_wrapper).siblings('.booking_guest_occupancy').find('span').text(guestButtonVal);
 }
 

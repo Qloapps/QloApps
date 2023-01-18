@@ -385,6 +385,9 @@ function init()
 			$('tr#new_product input, tr#new_product select, tr#new_product button').removeAttr('disabled');
 			$('tr#new_product .booking_guest_occupancy').removeClass('disabled');
 			if (data.room_type_info) {
+				$('tr#new_product .max_adults').val(data.room_type_info.max_adults);
+				$('tr#new_product .max_children').val(data.room_type_info.max_children);
+				$('tr#new_product .max_guests').val(data.room_type_info.max_guests);
 				$('tr#new_product .num_adults').attr('max', data.room_type_info.max_adults);
 				$('tr#new_product .num_children').attr('max', data.room_type_info.max_children);
 			}
@@ -524,12 +527,21 @@ function init()
 		if ($(this).val() > $(this).attr('max')) {
 			$(this).val($(this).attr('max'));
 		}
+		if ($(this).val() < $(this).attr('min')) {
+			$(this).val($(this).attr('min'));
+		}
 		if ($(this).val() > max_allowed_for_current) {
 			$(this).val(max_allowed_for_current);
 		}
 		if ($(this).hasClass('num_children')) {
 			var totalChilds = $(this).closest('.occupancy_info_block').find('.guest_child_age').length;
 			if (totalChilds < $(this).val()) {
+				let max_child_in_room;
+				if ($(this).closest(".booking_occupancy_wrapper").find('.max_children').val()) {
+					max_child_in_room = $(this).closest(".booking_occupancy_wrapper").find('.max_children').val();
+				} else {
+					max_child_in_room = window.max_child_in_room;
+				}
 				if (totalChilds < max_child_in_room) {
 					$(this).closest('.occupancy_info_block').find('.children_age_info_block').show();
 					while ($(this).closest('.occupancy_info_block').find('.guest_child_age').length < $(this).val()) {
@@ -613,11 +625,7 @@ function init()
 				}
 				if (hasErrors == 0) {
 					$(occupancy_wrapper).parent().removeClass('open');
-					// $(occupancy_wrapper).siblings(".booking_guest_occupancy").parent().removeClass('has-error');
-
 					$(document).trigger( "QloApps:updateRoomOccupancy", [occupancy_wrapper]);
-				} else {
-					// $(occupancy_wrapper).siblings(".booking_guest_occupancy").parent().addClass('has-error');
 				}
 			}
 		}
@@ -630,8 +638,12 @@ function init()
 		var occupancy_block = '';
 		var roomBlockIndex = parseInt($(booking_occupancy_wrapper).find(".occupancy_info_block").last().attr('occ_block_index'));
 		roomBlockIndex += 1;
-
-
+		let max_child_in_room;
+		if ($(this).closest(".booking_occupancy_wrapper").find('.max_children').val()) {
+			max_child_in_room = $(this).closest(".booking_occupancy_wrapper").find('.max_children').val();
+		} else {
+			max_child_in_room = window.max_child_in_room;
+		}
 		var countRooms = parseInt($(booking_occupancy_wrapper).find('.occupancy_info_block').length);
 		countRooms += 1
 		occupancy_block += '<div class="occupancy_info_block col-sm-12" occ_block_index="'+roomBlockIndex+'">';

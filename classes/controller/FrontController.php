@@ -439,6 +439,11 @@ class FrontControllerCore extends Controller
         if (Configuration::get('PS_FRONT_SEARCH_TYPE') == HotelBookingDetail::SEARCH_TYPE_OWS) {
             $occupancyWiseSearch = true;
         }
+
+        $bookingTypeOccupancy = false;
+        if (Configuration::get('PS_FRONT_ROOM_BOOKING_TYPE') == HotelBookingDetail::ROOM_BOOKING_OCCUPANCY_WISE) {
+            $bookingTypeOccupancy = true;
+        }
         $this->context->smarty->assign(array(
             // Useful for layout.tpl
             'mobile_device'       => $this->context->getMobileDevice(),
@@ -487,7 +492,7 @@ class FrontControllerCore extends Controller
             'currencyFormat'      => $currency->format, // backward compat
             'currencyBlank'       => $currency->blank, // backward compat
             'occupancy_wise_search'    => $occupancyWiseSearch,
-            'occupancy_required_for_booking' => Configuration::get('PS_FRONT_OCCUPANCY_REQUIRED_FOR_BOOKING'),
+            'occupancy_required_for_booking' => $bookingTypeOccupancy,
             'max_child_age' => Configuration::get('WK_GLOBAL_CHILD_MAX_AGE'),
             'max_child_in_room' => Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM'),
         ));

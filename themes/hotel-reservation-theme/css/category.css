@@ -266,6 +266,7 @@ p.capa_txt {
     .booking_room_fields {
         display: flex;
         flex-wrap: wrap;
+        align-items: end;
         justify-content: end;
         gap: 15px 10px;
     }

@@ -246,6 +246,11 @@ class AdminOrdersControllerCore extends AdminController
             $payment_modules[] = Module::getInstanceById((int)$p_module['id_module']);
         }
 
+        $bookingTypeOccupancy = false;
+        if (Configuration::get('PS_BACKOFFICE_ROOM_BOOKING_TYPE') == HotelBookingDetail::ROOM_BOOKING_OCCUPANCY_WISE) {
+            $bookingTypeOccupancy = true;
+        }
+
         $this->context->smarty->assign(array(
             'recyclable_pack' => (int)Configuration::get('PS_RECYCLABLE_PACK'),
             'gift_wrapping' => (int)Configuration::get('PS_GIFT_WRAPPING'),
@@ -262,7 +267,7 @@ class AdminOrdersControllerCore extends AdminController
             'title' => array($this->l('Orders'), $this->l('Create order')),
             'max_child_in_room' => Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM'),
             'max_child_age' => Configuration::get('WK_GLOBAL_CHILD_MAX_AGE'),
-            'occupancy_required_for_booking' => Configuration::get('PS_BACKOFFICE_OCCUPANCY_REQUIRED_FOR_BOOKING'),
+            'occupancy_required_for_booking' => $bookingTypeOccupancy,
         ));
         $this->content .= $this->createTemplate('form.tpl')->fetch();
     }
@@ -2508,7 +2513,7 @@ class AdminOrdersControllerCore extends AdminController
                 'result' => false,
                 'error' => Tools::displayError('Invalid quantity.'),
             )));
-        } elseif (!Validate::isUnsignedInt($adults)) {
+        } elseif (!isset($adults) || !$adults || !Validate::isUnsignedInt($adults)) {
             die(json_encode(array(
                 'result' => false,
                 'error' => Tools::displayError('Invalid number of adults.'),

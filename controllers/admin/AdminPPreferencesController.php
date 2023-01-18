@@ -129,7 +129,7 @@ class AdminPPreferencesControllerCore extends AdminController
                         'desc' => $this->l('Choose "Occupancy wise search" or "Search without occupancy". Occupancy search restriction will depend on this option selection at front end.'),
                     ),
                     'PS_FRONT_OWS_SEARCH_ALGO_TYPE' => array(
-                        'title' => $this->l('Front end occupancy wise search algorithm '),
+                        'title' => $this->l('Front end occupancy wise search algorithm'),
                         'hint' => $this->l('In occupancy wise search at front end, you want to display only room types which are fully satisfying searched occupancy or you want to display all the available room types for the dates searched'),
                         'cast' => 'intval',
                         'type' => 'select',
@@ -137,13 +137,19 @@ class AdminPPreferencesControllerCore extends AdminController
                             array('id' => HotelBookingDetail::SEARCH_EXACT_ROOM_TYPE_ALGO, 'name' => $this->l('Show room types satisfying required occupancy')),
                             array('id' => HotelBookingDetail::SEARCH_ALL_ROOM_TYPE_ALGO, 'name' => $this->l('Show all available room types'))
                         ),
-                        'identifier' => 'id'
+                        'identifier' => 'id',
+                        'desc' => $this->l('This option is only for fully available rooms. For partially available rooms, always all possible rooms will be displayed.'),
                     ),
-                    'PS_FRONT_OCCUPANCY_REQUIRED_FOR_BOOKING' => array(
-                        'title' => $this->l('Front end occupancy required for booking'),
-                        'hint' => $this->l('Select occupancy is required for booking a room for frontend. When enabled occupancy field will be shown in the booking form.'),
+                    'PS_FRONT_ROOM_BOOKING_TYPE' => array(
+                        'title' => $this->l('In front-end, add rooms to cart with'),
+                        'hint' => $this->l('In Room occupancy, while adding rooms in cart customer has to select per room occupancy and in room quantity customer only has to select number of rooms.'),
                         'cast' => 'intval',
-                        'type' => 'bool',
+                        'type' => 'select',
+                        'list' => array(
+                            array('id' => HotelBookingDetail::ROOM_BOOKING_OCCUPANCY_WISE, 'name' => $this->l('Room Occupancy')),
+                            array('id' => HotelBookingDetail::ROOM_BOOKING_QUANTITY_WISE, 'name' => $this->l('Rooms Quantity (No. of rooms)'))
+                        ),
+                        'identifier' => 'id',
                     ),
                     'PS_BACKOFFICE_SEARCH_TYPE' => array(
                         'title' => $this->l('Back-office search type'),
@@ -169,11 +175,16 @@ class AdminPPreferencesControllerCore extends AdminController
                         'identifier' => 'id',
                         'desc' => $this->l('This option is only for fully available rooms. For partially available rooms, always all possible rooms will be displayed.'),
                     ),
-                    'PS_BACKOFFICE_OCCUPANCY_REQUIRED_FOR_BOOKING' => array(
-                        'title' => $this->l('Back-office occupancy required for booking'),
-                        'hint' => $this->l('Select occupancy is required for booking a room for frontend. When enabled occupancy field will be shown in the booking form.'),
+                    'PS_BACKOFFICE_ROOM_BOOKING_TYPE' => array(
+                        'title' => $this->l('In back-office, add rooms to cart with'),
+                        'hint' => $this->l('In Room occupancy, while adding rooms in cart customer has to select per room occupancy and in room quantity customer only has to select number of rooms.'),
                         'cast' => 'intval',
-                        'type' => 'bool',
+                        'type' => 'select',
+                        'list' => array(
+                            array('id' => HotelBookingDetail::ROOM_BOOKING_OCCUPANCY_WISE, 'name' => $this->l('Room Occupancy')),
+                            array('id' => HotelBookingDetail::ROOM_BOOKING_QUANTITY_WISE, 'name' => $this->l('Rooms Quantity (No. of rooms)'))
+                        ),
+                        'identifier' => 'id',
                     ),
                     'PS_LOS_RESTRICTION_BO' => array(
                         'title' => $this->l('Apply Min and Max lenght of stay restrictions for back-office search'),
@@ -398,9 +409,28 @@ class AdminPPreferencesControllerCore extends AdminController
             Db::getInstance()->execute($sql);
         }
 
+        if (Tools::getValue('PS_FRONT_SEARCH_TYPE') == HotelBookingDetail::SEARCH_TYPE_OWS) {
+            $_POST['PS_FRONT_ROOM_BOOKING_TYPE'] = HotelBookingDetail::ROOM_BOOKING_OCCUPANCY_WISE;
+        }
+
+        if (Tools::getValue('PS_BACKOFFICE_SEARCH_TYPE') == HotelBookingDetail::SEARCH_TYPE_OWS) {
+            $_POST['PS_BACKOFFICE_ROOM_BOOKING_TYPE'] = HotelBookingDetail::ROOM_BOOKING_OCCUPANCY_WISE;
+        }
+
         if (Tools::getIsset('PS_CATALOG_MODE')) {
             Tools::clearSmartyCache();
             Media::clearCache();
         }
+    }
+
+    public function setMedia()
+    {
+        parent::setMedia();
+
+        Media::addJsDef(array(
+            'SEARCH_TYPE_OWS' => HotelBookingDetail::SEARCH_TYPE_OWS
+        ));
+
+        $this->addJS(_PS_JS_DIR_.'admin/ppreferences.js');
     }
 }

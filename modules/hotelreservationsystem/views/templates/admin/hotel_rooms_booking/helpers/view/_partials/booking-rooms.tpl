@@ -10,12 +10,10 @@
                 <div id="room_type_{$book_k}" class="tab-pane {if $book_v@first}active{/if}">
                     {* room type occupancy Details *}
                     <div>
-                        <h4>{l s='Room Occupancy'}</h4>
-                        <ul>
-                            <li>{l s='Max adults'} : {$book_v['room_type_info']['max_adults']}</li>
-                            <li>{l s='Max children'} : {$book_v['room_type_info']['max_children']}</li>
-                            <li>{l s='Max guests'} : {$book_v['room_type_info']['max_guests']}</li>
-                        </ul>
+                        <div class="form-group">
+                            <b>{l s='Room Occupancy'}:</b>&nbsp;&nbsp;&nbsp;
+                            <span>{l s='Maximum adults'} : {$book_v['room_type_info']['max_adults']}</span>&nbsp;&nbsp;&nbsp;<span>{l s='Maximum children'} : {$book_v['room_type_info']['max_children']}</span>&nbsp;&nbsp;&nbsp;<span>{l s='Maximum guests'} : {$book_v['room_type_info']['max_guests']}</span>
+                        </div>
                     </div>
                     <ul class="nav nav-tabs">
                         <li class="active"><a href="#avail_room_data_{$book_k|escape:'htmlall':'UTF-8'}" data-toggle="tab">{l s='Available Rooms' mod='hotelreservationsystem'}</a></li>

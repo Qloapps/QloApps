@@ -307,7 +307,12 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
             'max_child_in_room' => Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM'),
         ));
 
-        $this->context->smarty->assign('occupancy_required_for_booking', Configuration::get('PS_BACKOFFICE_OCCUPANCY_REQUIRED_FOR_BOOKING'));
+        $bookingTypeOccupancy = false;
+        if (Configuration::get('PS_BACKOFFICE_ROOM_BOOKING_TYPE') == HotelBookingDetail::ROOM_BOOKING_OCCUPANCY_WISE) {
+            $bookingTypeOccupancy = true;
+        }
+
+        $this->context->smarty->assign('occupancy_required_for_booking', $bookingTypeOccupancy);
 
         if (Configuration::get('PS_BACKOFFICE_SEARCH_TYPE') == HotelBookingDetail::SEARCH_TYPE_OWS ) {
             $this->context->smarty->assign(array(
@@ -562,6 +567,8 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
         );
         if ($opt) {
             // add room in cart
+            $objRoomType = new HotelRoomType();
+            $roomTypeInfo = $objRoomType->getRoomTypeInfoByIdProduct($id_product);
 
             $obj_cart_book_data = new HotelCartBookingData();
             $obj_cart_book_data->id_cart = $id_cart;
@@ -575,7 +582,7 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
             $obj_cart_book_data->comment = $comment;
             $obj_cart_book_data->date_from = $date_from;
             $obj_cart_book_data->date_to = $date_to;
-            if (Configuration::get('PS_BACKOFFICE_OCCUPANCY_REQUIRED_FOR_BOOKING')) {
+            if (Configuration::get('PS_BACKOFFICE_ROOM_BOOKING_TYPE') == HotelBookingDetail::ROOM_BOOKING_OCCUPANCY_WISE) {
                 $room_occupancy = array_shift($occupancy);
                 $obj_cart_book_data->adults = $room_occupancy['adults'];
                 $obj_cart_book_data->children = $room_occupancy['children'];
@@ -679,6 +686,10 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
     {
         parent::setMedia();
         $currency = new Currency((int)Configuration::get('PS_CURRENCY_DEFAULT'));
+        $bookingTypeOccupancy = false;
+        if (Configuration::get('PS_BACKOFFICE_ROOM_BOOKING_TYPE') == HotelBookingDetail::ROOM_BOOKING_OCCUPANCY_WISE) {
+            $bookingTypeOccupancy = true;
+        }
         $jsVars = array(
             'currency_prefix' => $currency->prefix,
             'currency_suffix' => $currency->suffix,
@@ -689,7 +700,7 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
             'ALLOTMENT_MANUAL' => HotelBookingDetail::ALLOTMENT_MANUAL,
             'max_child_age' => Configuration::get('WK_GLOBAL_CHILD_MAX_AGE'),
             'max_child_in_room' => Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM'),
-            'occupancy_required_for_booking' => Configuration::get('PS_BACKOFFICE_OCCUPANCY_REQUIRED_FOR_BOOKING'),
+            'occupancy_required_for_booking' => $bookingTypeOccupancy,
             'rooms_booking_url' => $this->context->link->getAdminLink('AdminHotelRoomsBooking'),
             'opt_select_all' => $this->l('All Types'),
             'slt_another_htl' => $this->l('Select Another Hotel'),

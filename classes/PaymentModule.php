@@ -358,11 +358,11 @@ abstract class PaymentModuleCore extends Module
                         $order->is_occupnacy_provided = 0;
                     } else {
                         if (defined('_PS_ADMIN_DIR_')) {
-                            if (Configuration::get('PS_BACKOFFICE_OCCUPANCY_REQUIRED_FOR_BOOKING')) {
+                            if (Configuration::get('PS_BACKOFFICE_ROOM_BOOKING_TYPE') == HotelBookingDetail::ROOM_BOOKING_OCCUPANCY_WISE) {
                                 $order->is_occupnacy_provided = 1;
                             }
                         } else {
-                            if (Configuration::get('PS_FRONT_OCCUPANCY_REQUIRED_FOR_BOOKING')) {
+                            if (Configuration::get('PS_FRONT_ROOM_BOOKING_TYPE') == HotelBookingDetail::ROOM_BOOKING_OCCUPANCY_WISE) {
                                 $order->is_occupnacy_provided = 1;
                             }
                         }

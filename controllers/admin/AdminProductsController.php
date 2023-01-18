@@ -3482,6 +3482,8 @@ class AdminProductsControllerCore extends AdminController
                         $this->errors[] = Tools::displayError('Invalid maximum number of guests');
                     } elseif ($maxGuests < ($baseAdults + $baseChildren)) {
                         $this->errors[] = Tools::displayError('Maximum number of guests cannot be less than base occupancy of adults and children');
+                    } elseif ($maxGuests > ($maxChildren + $maxAdults)) {
+                        $this->errors[] = Tools::displayError('Maximum number of guests cannot be more than max occupancy of adults and children');
                     }
 
                     if (!count($this->errors)) {

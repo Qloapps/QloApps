@@ -358,6 +358,7 @@ var ajaxCart = {
 
         // get the selected extra demands by customer
         var roomDemands = getRoomsExtraDemands();
+
         //send the ajax request to the server
         $.ajax({
             type: 'POST',
@@ -368,7 +369,7 @@ var ajaxCart = {
             async: true,
             cache: false,
             dataType: "json",
-            data: 'controller=cart&add=1&dateFrom=' + dateFrom + '&dateTo=' + dateTo + '&ajax=true&occupancy=' + JSON.stringify(occupancy) + '&id_product=' + idProduct + '&roomDemands=' + JSON.stringify(roomDemands) + '&token=' + static_token + ((parseInt(idCombination) && idCombination != null) ? '&ipa=' + parseInt(idCombination) : '' + '&id_customization=' + ((typeof customizationId !== 'undefined') ? customizationId : 0)),
+            data: 'controller=cart&add=1&dateFrom=' + dateFrom + '&dateTo=' + dateTo + '&ajax=true'+(occupancy_required_for_booking ? '&occupancy=' + JSON.stringify(occupancy) : '&qty=' + occupancy) + '&id_product=' + idProduct + '&roomDemands=' + JSON.stringify(roomDemands) + '&token=' + static_token + ((parseInt(idCombination) && idCombination != null) ? '&ipa=' + parseInt(idCombination) : '' + '&id_customization=' + ((typeof customizationId !== 'undefined') ? customizationId : 0)),
             success: function(jsonData, textStatus, jqXHR) {
                 /*by webkul checking and setting availability of rooms*/
                 /*for product page add to cart quantity management*/
@@ -388,6 +389,8 @@ var ajaxCart = {
 
                     /*for category page add to cart quantity management*/
                     $(callerElement).closest(".room_cont").find(".remain_rm_qty").text(jsonData.avail_rooms);
+                    $(callerElement).closest(".room_cont").find('.max_avail_type_qty').val(jsonData.avail_rooms);
+
                     if (jsonData.avail_rooms == 0) {
                         $(callerElement).closest(".room_cont").hide();
                     }
@@ -526,6 +529,7 @@ var ajaxCart = {
                     /*for category page add to cart quantity management*/
 
                     $(".room_cont").find('[data-id-product="'+idProduct+'"] .remain_rm_qty').text(jsonData.avail_rooms);
+                    $(".room_cont").find('[data-id-product="'+idProduct+'"] .max_avail_type_qty').val(jsonData.avail_rooms);
                     if (jsonData.avail_rooms == 0) {
                         $(".room_cont").find('[data-id-product="'+idProduct+'"]').hide();
                     }
@@ -624,6 +628,7 @@ var ajaxCart = {
                 if (pagename == 'category') {
                     // for category page....
                     $('.room_cont[data-id-product="'+idProduct+'"]').find(".remain_rm_qty").text(jsonData.avail_rooms);
+                    $('.room_cont[data-id-product="'+idProduct+'"]').find('.max_avail_type_qty').val(jsonData.avail_rooms);
 
                     $('.room_cont[data-id-product="'+idProduct+'"]').show(0, function() {
                         if (jsonData.avail_rooms <= room_warning_num) {
@@ -1024,13 +1029,18 @@ var ajaxCart = {
         let rooms = 0;
         let adults = 0;
         let children = 0;
-        $.each(product.occupancy, function(index, val) {
-            rooms++;
-            adults += parseInt(val.adults);
-            children += parseInt(val.children);
-
-        });
-        $('#layer_cart_product_quantity').text(getRoomTypeGuestOccupancyFormated(adults, children, rooms));
+        let room_quantity_text = '';
+        if (occupancy_required_for_booking) {
+            $.each(product.occupancy, function(index, val) {
+                rooms++;
+                adults += parseInt(val.adults);
+                children += parseInt(val.children);
+            });
+            room_quantity_text = getRoomTypeGuestOccupancyFormated(adults, children, rooms);
+        } else {
+            room_quantity_text = product.occupancy;
+        }
+        $('#layer_cart_product_quantity').text(room_quantity_text);
 
         $('.layer_cart_img').html('<img class="layer_cart_img img-responsive" src="' + product.image + '" alt="' + product.name + '" title="' + product.name + '" />');
 

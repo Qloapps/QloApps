@@ -77,9 +77,13 @@ class HotelBookingDetail extends ObjectModel
     const SEARCH_EXACT_ROOM_TYPE_ALGO = 1;
     const SEARCH_ALL_ROOM_TYPE_ALGO = 2;
 
-    // Search TYpe: Occupancy wise search, Normal search
+    // Search Type: Occupancy wise search, Normal search
     const SEARCH_TYPE_OWS = 1;
     const SEARCH_TYPE_NORMAL = 2;
+
+    //
+    const ROOM_BOOKING_OCCUPANCY_WISE = 1;
+    const ROOM_BOOKING_QUANTITY_WISE = 2;
 
     public static $definition = array(
         'table' => 'htl_booking_detail',
