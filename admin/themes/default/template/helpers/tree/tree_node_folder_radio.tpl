@@ -31,6 +31,6 @@
 		<label class="tree-toggler">{$node['name']|escape:'html':'UTF-8'}</label>
 	</span>
 	<ul class="tree">
-		{$children|escape:'UTF-8'}
+		{$children}
 	</ul>
 </li>
