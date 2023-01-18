@@ -1237,8 +1237,8 @@ var BookingForm = {
 
         var data = {
             id_product: parseInt($('#product_page_product_id').val()),
-            date_from: $.datepicker.formatDate('yy-mm-dd', $.datepicker.parseDate('dd-mm-yy', $('#room_check_in').val())),
-            date_to: $.datepicker.formatDate('yy-mm-dd', $.datepicker.parseDate('dd-mm-yy', $('#room_check_out').val())),
+            date_from: $('#room_check_in').val(),
+            date_to: $('#room_check_out').val(),
             quantity: quantity,
             room_type_demands: JSON.stringify(getRoomsExtraDemands()),
         };
