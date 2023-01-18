@@ -371,9 +371,23 @@ abstract class PaymentModuleCore extends Module
                     // advance payment information
                     $order->is_advance_payment = $this->context->cart->is_advance_payment;
                     if ($order->is_advance_payment) {
-                        $order->advance_paid_amount = (float)Tools::ps_round((float)$this->context->cart->getOrderTotal(true, Cart::ADVANCE_PAYMENT, $order->product_list, $id_carrier), _PS_PRICE_COMPUTE_PRECISION_);
+                        $order->advance_paid_amount = (float)Tools::ps_round(
+                            (float)$this->context->cart->getOrderTotal(true, Cart::ADVANCE_PAYMENT, $order->product_list, $id_carrier),
+                            _PS_PRICE_COMPUTE_PRECISION_
+                        );
+                        $order->amount_paid = (float)Tools::ps_round(
+                            (($order->advance_paid_amount * $amount_paid) / $this->context->cart->getOrderTotal(true, Cart::ADVANCE_PAYMENT, null, $id_carrier)),
+                            _PS_PRICE_COMPUTE_PRECISION_
+                        );
                     } else {
-                        $order->advance_paid_amount = (float)Tools::ps_round((float)$this->context->cart->getOrderTotal(true, Cart::BOTH, $order->product_list, $id_carrier), _PS_PRICE_COMPUTE_PRECISION_);
+                        $order->advance_paid_amount = (float)Tools::ps_round(
+                            (float)$this->context->cart->getOrderTotal(true, Cart::BOTH, $order->product_list, $id_carrier),
+                            _PS_PRICE_COMPUTE_PRECISION_
+                        );
+                        $order->amount_paid = (float)Tools::ps_round(
+                            (($order->advance_paid_amount * $amount_paid) / $this->context->cart->getOrderTotal(true, Cart::BOTH, null, $id_carrier)),
+                            _PS_PRICE_COMPUTE_PRECISION_
+                        );
                     }
 
                     // Creating order
@@ -384,11 +398,27 @@ abstract class PaymentModuleCore extends Module
                         throw new PrestaShopException('Can\'t save Order');
                     }
 
+                    // save customer guest information
+                    if ($id_customer_guest_detail = CartCustomerGuestDetail::getCartCustomerGuest($this->context->cart->id)) {
+                        if (Validate::isLoadedObject($objCartCustomerGuestDetail = new CartCustomerGuestDetail(
+                            $id_customer_guest_detail
+                        ))) {
+                            $objOrderCustomerGuestDetail = new OrderCustomerGuestDetail();
+                            $objOrderCustomerGuestDetail->id_gender = $objCartCustomerGuestDetail->id_gender;
+                            $objOrderCustomerGuestDetail->firstname = $objCartCustomerGuestDetail->firstname;
+                            $objOrderCustomerGuestDetail->lastname = $objCartCustomerGuestDetail->lastname;
+                            $objOrderCustomerGuestDetail->email = $objCartCustomerGuestDetail->email;
+                            $objOrderCustomerGuestDetail->phone = $objCartCustomerGuestDetail->phone;
+                            $objOrderCustomerGuestDetail->id_order = (int)$order->id;
+                            $objOrderCustomerGuestDetail->save();
+                        }
+                    }
+
                     // Amount paid by customer is not the right one -> Status = payment error
                     // We don't use the following condition to avoid the float precision issues : http://www.php.net/manual/en/language.types.float.php
                     // if ($order->total_paid != $order->total_paid_real)
                     // We use number_format in order to compare two string
-                    if ($order_status->logable && number_format($cart_total_paid, _PS_PRICE_COMPUTE_PRECISION_) != number_format($amount_paid, _PS_PRICE_COMPUTE_PRECISION_)) {
+                    if ($order_status->logable && number_format($cart_total_paid, _PS_PRICE_COMPUTE_PRECISION_) != number_format($amount_paid, _PS_PRICE_COMPUTE_PRECISION_) && $this->name != 'wsorder') {
                         // if customer is paying full payment amount
                         $id_order_state = Configuration::get('PS_OS_ERROR');
                     }
@@ -446,9 +476,18 @@ abstract class PaymentModuleCore extends Module
                     $transaction_id = null;
                 }
 
-                if (!isset($order) || !Validate::isLoadedObject($order) || !$order->addOrderPayment($amount_paid, null, $transaction_id)) {
+                if (!isset($order) || !Validate::isLoadedObject($order) || !$order->addOrderPayment($amount_paid, null, $transaction_id, null, null, null, false)) {
                     PrestaShopLogger::addLog('PaymentModule::validateOrder - Cannot save Order Payment', 3, null, 'Cart', (int)$id_cart, true);
                     throw new PrestaShopException('Can\'t save Order Payment');
+                }
+
+                // now add payment detail for order
+                if ($payment = OrderPayment::getByOrderReference($order->reference)) {
+                    if ($payment = array_shift($payment)) {
+                        foreach($order_list as $order) {
+                            $order->addOrderPaymentDetail($payment, $order->amount_paid);
+                        }
+                    }
                 }
             }
 
@@ -862,14 +901,6 @@ abstract class PaymentModuleCore extends Module
                     // delete cart feature prices after booking creation success
                     HotelRoomTypeFeaturePricing::deleteByIdCart($id_cart);
 
-                    if (isset($_COOKIE['wk_id_cart'])) {
-                        setcookie('wk_id_cart', ' ', time() - 86400, '/');
-                        setcookie('wk_id_guest', ' ', time() - 86400, '/');
-
-                        unset($_COOKIE['wk_id_cart']);
-                        unset($_COOKIE['wk_id_guest']);
-                    }
-
                     if (self::DEBUG_MODE) {
                         PrestaShopLogger::addLog('PaymentModule::validateOrder - Hook validateOrder is about to be called', 1, null, 'Cart', (int)$id_cart, true);
                     }
@@ -896,7 +927,11 @@ abstract class PaymentModuleCore extends Module
                     // Set the order status
                     $new_history = new OrderHistory();
                     $new_history->id_order = (int)$order->id;
-                    $new_history->changeIdOrderState((int)$id_order_state, $order, true);
+                    if ($order_status->logable && $order->is_advance_payment && $order->advance_paid_amount < $order->total_paid_tax_incl) {
+                        $new_history->changeIdOrderState((int)Configuration::get('PS_OS_PARTIAL_PAYMENT'), $order, true);
+                    } else {
+                        $new_history->changeIdOrderState((int)$id_order_state, $order, true);
+                    }
                     $new_history->addWithemail(true, $extra_vars);
 
                     // Switch to back order if needed
@@ -1029,6 +1064,30 @@ abstract class PaymentModuleCore extends Module
                                     $file_attachement,
                                     null, _PS_MAIL_DIR_, false, (int)$order->id_shop
                                 );
+                            }
+                            // send mail to customer guest if customer booked for someone other.
+                            if ($id_customer_guest_detail = OrderCustomerGuestDetail::isCustomerGuestBooking($order->id)) {
+                                if ($objOrderCustomerGuestDetail = new OrderCustomerGuestDetail(
+                                    $id_customer_guest_detail
+                                )) {
+                                    if (Validate::isEmail($objOrderCustomerGuestDetail->email)) {
+                                        $data['{firstname}'] = $objOrderCustomerGuestDetail->firstname;
+                                        $data['{lastname}'] = $objOrderCustomerGuestDetail->lastname;
+                                        $data['{email}'] = $objOrderCustomerGuestDetail->email;
+                                        Mail::Send(
+                                            (int)$order->id_lang,
+                                            'order_conf',
+                                            Mail::l('Order confirmation', (int)$order->id_lang),
+                                            $data,
+                                            $objOrderCustomerGuestDetail->email,
+                                            $objOrderCustomerGuestDetail->firstname.' '.$objOrderCustomerGuestDetail->lastname,
+                                            null,
+                                            null,
+                                            $file_attachement,
+                                            null, _PS_MAIL_DIR_, false, (int)$order->id_shop
+                                        );
+                                    }
+                                }
                             }
                         }
                         if (Configuration::get('PS_ORDER_CONF_MAIL_TO_SUPERADMIN')){

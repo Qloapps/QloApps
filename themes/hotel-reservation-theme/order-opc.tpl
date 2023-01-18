@@ -78,7 +78,47 @@
 													<div id="collapse-guest-info" class="opc-collapse {if !$step->step_is_current}collapse{/if}" aria-labelledby="guest-info-head" data-parent="#oprder-opc-accordion">
 														<div class="card-body">
 															{if $is_logged || $isGuest}
-																<div class="checkout-guest-info-block">
+																{if $is_logged}
+																	<form id="customer_guest_detail_form">
+																		<p class="checkbox">
+																			<input type="checkbox" name="customer_guest_detail" id="customer_guest_detail" value="1" {if $id_customer_guest_detail}checked="checked"{/if}/>
+																			<label for="customer_guest_detail" id="customer_guest_detail_txt">{l s='Booking for someone else?'}</label>
+																		</p>
+																		<div id="customer-guest-detail-container" {if !$id_customer_guest_detail}style="display: none;"{/if}>
+																			<div class="row">
+																				<div class="required clearfix gender-line col-sm-2">
+																					<label>{l s='Social title'}</label>
+																					<select name="customer_guest_detail_gender" id="customer_guest_detail_gender">
+																						{foreach from=$genders key=k item=gender}
+																							<option value="{$gender->id_gender}"{if isset($smarty.post.customer_guest_detail_gender) && $smarty.post.customer_guest_detail_gender == $gender->id_gender || (isset($customer_guest_detail) && $customer_guest_detail.id_gender == $gender->id_gender)} selected="selected"{/if}>{$gender->name}</option>
+																						{/foreach}
+																					</select>
+																				</div>
+																				<div class="required form-group col-sm-5">
+																					<label for="firstname">{l s='First name'} <sup>*</sup></label>
+																					<input type="text" class="text form-control validate is_required" id="customer_guest_detail_firstname" name="customer_guest_detail_firstname" data-validate="isName"{if isset($smarty.post.customer_guest_detail_firstname) && $smarty.post.customer_guest_detail_firstname}  value="{$smarty.post.customer_guest_detail_firstname}"{elseif isset($customer_guest_detail) && $customer_guest_detail.firstname} value="{$customer_guest_detail.firstname}"{/if}/>
+																				</div>
+																				<div class="required form-group col-sm-5">
+																					<label for="lastname">{l s='Last name'} <sup>*</sup></label>
+																					<input type="text" class="form-control validate is_required" id="customer_guest_detail_lastname" name="customer_guest_detail_lastname" data-validate="isName"{if isset($smarty.post.customer_guest_detail_lastname) && $smarty.post.customer_guest_detail_lastname}  value="{$smarty.post.customer_guest_detail_lastname}"{elseif isset($customer_guest_detail) && $customer_guest_detail.lastname} value="{$customer_guest_detail.lastname}"{/if}/>
+																				</div>
+																			</div>
+																			<div class="row">
+																				<div class="required text form-group col-sm-6">
+																					<label for="email">{l s='Email'} <sup>*</sup></label>
+																					<input type="email" class="text form-control validate is_required" id="customer_guest_detail_email" name="customer_guest_detail_email" data-validate="isEmail"{if isset($smarty.post.customer_guest_detail_email) && $smarty.post.customer_guest_detail_email}  value="{$smarty.post.customer_guest_detail_email}"{elseif isset($customer_guest_detail) && $customer_guest_detail.email} value="{$customer_guest_detail.email}"{/if}/>
+																				</div>
+																			</div>
+																			<div class="row">
+																				<div class="{if isset($one_phone_at_least) && $one_phone_at_least}required {/if}form-group col-sm-6">
+																					<label for="phone_mobile">{l s='Mobile phone'}{if isset($one_phone_at_least) && $one_phone_at_least} <sup>**</sup>{/if}</label>
+																					<input type="text" class="text form-control validate is_required" name="customer_guest_detail_phone" id="customer_guest_detail_phone" data-validate="isPhoneNumber"{if isset($smarty.post.customer_guest_detail_phone) && $smarty.post.customer_guest_detail_phone}  value="{$smarty.post.customer_guest_detail_phone}"{elseif isset($customer_guest_detail) && $customer_guest_detail.phone} value="{$customer_guest_detail.phone}"{/if}/>
+																				</div>
+																			</div>
+																		</div>
+																	</form>
+																{/if}
+																<div id="checkout-guest-info-block"  {if $id_customer_guest_detail}style="display: none;"{/if}>
 																	<div class="row margin-btm-10">
 																		<div class="col-sm-3 col-xs-5 info-head">{l s='Name'}</div>
 																		<div class="col-sm-9 col-xs-7 info-value">
@@ -111,28 +151,28 @@
 																			</div>
 																		</div>
 																	{/if}
+																</div>
 
-																	{* proceed only if no order restrict errors are there *}
-																	{if !$orderRestrictErr}
-																		<hr>
-																		<div class="row">
-																			<div class="col-sm-12 proceed_btn_block">
-																				<a class="btn btn-default button button-medium pull-right" href="{$link->getPageLink('order-opc', null, null, ['proceed_to_payment' => 1])}" title="Proceed to Payment" rel="nofollow">
+																{* proceed only if no order restrict errors are there *}
+																{if !$orderRestrictErr}
+																	<hr>
+																	<div class="row">
+																		<div class="col-sm-12 proceed_btn_block">
+																			<a class="btn btn-default button button-medium pull-right" href="{$link->getPageLink('order-opc', null, null, ['proceed_to_payment' => 1])}" title="Proceed to Payment" rel="nofollow">
+																				<span>
+																					{l s='Proceed'}
+																				</span>
+																			</a>
+																			{if $isGuest}
+																				<a class="btn btn-default btn-edit-guest-info pull-right" href="#" rel="nofollow">
 																					<span>
-																						{l s='Proceed'}
+																						{l s='Edit'}
 																					</span>
 																				</a>
-																				{if $isGuest}
-																					<a class="btn btn-default btn-edit-guest-info pull-right" href="#" rel="nofollow">
-																						<span>
-																							{l s='Edit'}
-																						</span>
-																					</a>
-																				{/if}
-																			</div>
+																			{/if}
 																		</div>
-																	{/if}
-																</div>
+																	</div>
+																{/if}
 															{else}
 																<!-- Create account / Guest account / Login block -->
 																{include file="$tpl_dir./order-opc-new-account.tpl"}

@@ -190,12 +190,16 @@ function validate_field(that)
 		}
 		else if($(that).attr('data-validate'))
 			var result = window['validate_' + $(that).attr('data-validate')]($(that).val());
-
-		if (result)
+		if (result) {
 			$(that).parent().removeClass('form-error').addClass('form-ok');
-		else
+			return true;
+		} else {
 			$(that).parent().addClass('form-error').removeClass('form-ok');
+			return false;
+		}
+
 	}
+	return true;
 }
 
 $(document).on('focusout', 'input.validate, textarea.validate', function() {

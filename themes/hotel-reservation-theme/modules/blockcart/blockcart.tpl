@@ -206,7 +206,7 @@
 									</span>
 							   </div>
 							{/if} --><!-- commented by webkul unnecessary data -->
-							{if $show_tax && isset($tax_cost)}
+							{if $show_tax && $use_tax}
 								<div class="cart-prices-line">
 									<span class="price cart_block_tax_cost ajax_cart_tax_cost">{$tax_cost}</span>
 									<span>{l s='Tax' mod='blockcart'}</span>

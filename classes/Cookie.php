@@ -26,6 +26,25 @@
 
 class CookieCore
 {
+    const SAMESITE_NONE = 'None';
+    const SAMESITE_LAX = 'Lax';
+    const SAMESITE_STRICT = 'Strict';
+
+    const SAMESITE_AVAILABLE_VALUES = array(
+        array(
+            "type" => self::SAMESITE_NONE,
+            "name" => self::SAMESITE_NONE
+        ),
+        array(
+            "type" => self::SAMESITE_LAX,
+            "name" => self::SAMESITE_LAX
+        ),
+        array(
+            "type" => self::SAMESITE_STRICT,
+            "name" => self::SAMESITE_STRICT
+        ),
+    );
+
     /** @var array Contain cookie content in a key => value format */
     protected $_content;
 
@@ -73,6 +92,7 @@ class CookieCore
         $this->_path = str_replace('%2F', '/', $this->_path);
         $this->_path = str_replace('%7E', '~', $this->_path);
         $this->_domain = $this->getDomain($shared_urls);
+        $this->_sameSite = Configuration::get('PS_COOKIE_SAMESITE');
         $this->_name = 'PrestaShop-'.md5(($this->_standalone ? '' : _PS_VERSION_).$name.$this->_domain);
         $this->_allow_writing = true;
         $this->_salt = $this->_standalone ? str_pad('', 8, md5('ps'.__FILE__)) : _COOKIE_IV_;
@@ -342,11 +362,35 @@ class CookieCore
             $content = 0;
             $time = 1;
         }
-        if (PHP_VERSION_ID <= 50200) { /* PHP version > 5.2.0 */
-            return setcookie($this->_name, $content, $time, $this->_path, $this->_domain, $this->_secure);
-        } else {
-            return setcookie($this->_name, $content, $time, $this->_path, $this->_domain, $this->_secure, true);
+
+        /*
+         * The alternative signature supporting an options array is only available since
+         * PHP 7.3.0, before there is no support for SameSite attribute.
+         */
+        if (PHP_VERSION_ID < 70300) {
+            return setcookie(
+                $this->_name,
+                $content,
+                $time,
+                $this->_path,
+                $this->_domain . '; SameSite=' . $this->_sameSite,
+                $this->_secure,
+                true
+            );
         }
+
+        return setcookie(
+            $this->_name,
+            $content,
+            [
+                'expires' => $time,
+                'path' => $this->_path,
+                'domain' => $this->_domain,
+                'secure' => $this->_secure,
+                'httponly' => true,
+                'samesite' => $this->_sameSite,
+            ]
+        );
     }
 
     public function __destruct()
