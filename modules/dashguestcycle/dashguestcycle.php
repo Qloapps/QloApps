@@ -102,19 +102,19 @@ class DashGuestCycle extends Module
         }
 
         // set tables data
-        $tableCurrentArrivals = $this->getTableArrivalsByDate($dateToday, $params['id_hotel']);
+        $tableCurrentArrivals = $this->getArrivalsTableContentsByDate($dateToday, $params['id_hotel']);
         $dataValue['dgc_count_upcoming_arrivals'] = count($tableCurrentArrivals['body']);
 
-        $tableCurrentDepartures = $this->getTableDeparturesByDate($dateToday, $params['id_hotel']);
+        $tableCurrentDepartures = $this->getDeparturesTableContentsByDate($dateToday, $params['id_hotel']);
         $dataValue['dgc_count_upcoming_departures'] = count($tableCurrentDepartures['body']);
 
-        $tableCurrentInHouse = $this->getTableInHouses($params['id_hotel']);
+        $tableCurrentInHouse = $this->getInHousesTableContents($params['id_hotel']);
         $dataValue['dgc_count_current_in_house'] = count($tableCurrentInHouse['body']);
 
-        $tableNewBookings = $this->getTableNewBookingsByDate($dateToday, $params['id_hotel']);
+        $tableNewBookings = $this->getNewBookingsTableContentsByDate($dateToday, $params['id_hotel']);
         $dataValue['dgc_count_new_bookings'] = count($tableNewBookings['body']);
 
-        $tableCancellations = $this->getTableCancellationsByDate($dateToday, $params['id_hotel']);
+        $tableCancellations = $this->getCancellationsTableContentsByDate($dateToday, $params['id_hotel']);
         $dataValue['dgc_count_cancellations'] = count($tableCancellations['body']);
 
         $dataTable = array(
@@ -128,7 +128,7 @@ class DashGuestCycle extends Module
         return array('data_value' => $dataValue, 'data_table' => $dataTable);
     }
 
-    public function getTableArrivalsByDate($date, $idHotel)
+    public function getArrivalsTableContentsByDate($date, $idHotel)
     {
         $header = array(
             'name' => array('title' => $this->l('Customer Name'), 'class' => 'text-left'),
@@ -188,7 +188,7 @@ class DashGuestCycle extends Module
         return array('header' => array_values($header), 'body' => $body);
     }
 
-    public function getTableDeparturesByDate($date, $idHotel)
+    public function getDeparturesTableContentsByDate($date, $idHotel)
     {
         $header = array(
             'name' => array('title' => $this->l('Customer Name'), 'class' => 'text-left'),
@@ -248,7 +248,7 @@ class DashGuestCycle extends Module
         return array('header' => array_values($header), 'body' => $body);
     }
 
-    public function getTableInHouses($idHotel)
+    public function getInHousesTableContents($idHotel)
     {
         $header = array(
             'name' => array('title' => $this->l('Customer Name'), 'class' => 'text-left'),
@@ -313,7 +313,7 @@ class DashGuestCycle extends Module
         return array('header' => array_values($header), 'body' => $body);
     }
 
-    public function getTableNewBookingsByDate($date, $idHotel)
+    public function getNewBookingsTableContentsByDate($date, $idHotel)
     {
         $header = array(
             'order_id' => array('title' => $this->l('Order ID'), 'class' => 'text-center'),
@@ -375,7 +375,7 @@ class DashGuestCycle extends Module
         return array('header' => array_values($header), 'body' => $body);
     }
 
-    public function getTableCancellationsByDate($date, $idHotel)
+    public function getCancellationsTableContentsByDate($date, $idHotel)
     {
         $header = array(
             'request_id' => array('title' => $this->l('Request ID'), 'class' => 'text-center'),
