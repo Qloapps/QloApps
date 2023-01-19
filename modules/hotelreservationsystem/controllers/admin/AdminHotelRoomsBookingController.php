@@ -293,22 +293,22 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
             'max_child_in_room' => Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM'),
         ));
 
-        $bookingTypeOccupancy = false;
-        if (Configuration::get('PS_BACKOFFICE_ROOM_BOOKING_TYPE') == HotelBookingDetail::ROOM_BOOKING_OCCUPANCY_WISE) {
-            $bookingTypeOccupancy = true;
+        $occupancyRequiredForBooking = false;
+        if (Configuration::get('PS_BACKOFFICE_ROOM_BOOKING_TYPE') == HotelBookingDetail::PS_FRONT_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY) {
+            $occupancyRequiredForBooking = true;
         }
 
-        $this->context->smarty->assign('occupancy_required_for_booking', $bookingTypeOccupancy);
+        $this->context->smarty->assign('occupancy_required_for_booking', $occupancyRequiredForBooking);
 
         if (Configuration::get('PS_BACKOFFICE_SEARCH_TYPE') == HotelBookingDetail::SEARCH_TYPE_OWS ) {
             $this->context->smarty->assign(array(
                 'occupancy_adults' => array_sum(array_column($this->occupancy, 'adults')),
                 'occupancy_children' => array_sum(array_column($this->occupancy, 'children')),
                 'occupancy_child_ages' => array_sum(array_column($this->occupancy, 'child_ages')),
-                'occupancy_wise_search' => true,
+                'is_occupancy_wise_search' => true,
             ));
         } else {
-            $this->context->smarty->assign('occupancy_wise_search', false);
+            $this->context->smarty->assign('is_occupancy_wise_search', false);
         }
     }
 
@@ -568,7 +568,7 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
             $obj_cart_book_data->comment = $comment;
             $obj_cart_book_data->date_from = $date_from;
             $obj_cart_book_data->date_to = $date_to;
-            if (Configuration::get('PS_BACKOFFICE_ROOM_BOOKING_TYPE') == HotelBookingDetail::ROOM_BOOKING_OCCUPANCY_WISE) {
+            if (Configuration::get('PS_BACKOFFICE_ROOM_BOOKING_TYPE') == HotelBookingDetail::PS_FRONT_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY) {
                 $room_occupancy = array_shift($occupancy);
                 $obj_cart_book_data->adults = $room_occupancy['adults'];
                 $obj_cart_book_data->children = $room_occupancy['children'];
@@ -672,9 +672,9 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
     {
         parent::setMedia();
         $currency = new Currency((int)Configuration::get('PS_CURRENCY_DEFAULT'));
-        $bookingTypeOccupancy = false;
-        if (Configuration::get('PS_BACKOFFICE_ROOM_BOOKING_TYPE') == HotelBookingDetail::ROOM_BOOKING_OCCUPANCY_WISE) {
-            $bookingTypeOccupancy = true;
+        $occupancyRequiredForBooking = false;
+        if (Configuration::get('PS_BACKOFFICE_ROOM_BOOKING_TYPE') == HotelBookingDetail::PS_FRONT_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY) {
+            $occupancyRequiredForBooking = true;
         }
         $jsVars = array(
             'currency_prefix' => $currency->prefix,
@@ -686,7 +686,7 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
             'ALLOTMENT_MANUAL' => HotelBookingDetail::ALLOTMENT_MANUAL,
             'max_child_age' => Configuration::get('WK_GLOBAL_CHILD_MAX_AGE'),
             'max_child_in_room' => Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM'),
-            'occupancy_required_for_booking' => $bookingTypeOccupancy,
+            'occupancy_required_for_booking' => $occupancyRequiredForBooking,
             'rooms_booking_url' => $this->context->link->getAdminLink('AdminHotelRoomsBooking'),
             'opt_select_all' => $this->l('All Types'),
             'slt_another_htl' => $this->l('Select Another Hotel'),
@@ -718,9 +718,9 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
             // 'check_calender_var' => $check_calender_var,
         );
         if (Configuration::get('PS_BACKOFFICE_SEARCH_TYPE') == HotelBookingDetail::SEARCH_TYPE_OWS ) {
-            $jsVars['occupancy_wise_search'] = true;
+            $jsVars['is_occupancy_wise_search'] = true;
         } else {
-            $jsVars['occupancy_wise_search'] = false;
+            $jsVars['is_occupancy_wise_search'] = false;
         }
         MediaCore::addJsDef($jsVars);
 

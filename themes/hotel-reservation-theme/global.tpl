@@ -56,7 +56,7 @@
 {addJsDef displayList=Configuration::get('PS_GRID_PRODUCT')|boolval}
 {addJsDef highDPI=Configuration::get('PS_HIGHT_DPI')|boolval}
 {* occupancy text *}
-{addJsDef occupancy_wise_search=$occupancy_wise_search|boolval}
+{addJsDef is_occupancy_wise_search=$is_occupancy_wise_search|boolval}
 {addJsDef occupancy_required_for_booking=$occupancy_required_for_booking|boolval}
 {addJsDef max_child_age=$max_child_age}
 {addJsDef max_child_in_room=$max_child_in_room}

@@ -1165,7 +1165,7 @@ CREATE TABLE `PREFIX_orders` (
   `valid` int(1) unsigned NOT NULL DEFAULT '0',
   `is_advance_payment` tinyint(1) NOT NULL DEFAULT '0',
   `advance_paid_amount` decimal(20,6) NOT NULL DEFAULT '0.00',
-  `is_occupnacy_provided` tinyint(1) NOT NULL DEFAULT '0',
+  `with_occupancy` tinyint(1) NOT NULL DEFAULT '0',
   `date_add` datetime NOT NULL,
   `date_upd` datetime NOT NULL,
   PRIMARY KEY (`id_order`),

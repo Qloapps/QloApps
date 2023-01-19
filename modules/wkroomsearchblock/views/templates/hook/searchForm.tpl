@@ -59,7 +59,7 @@
         </div>
     {/if}
 
-    {if isset($occupancy_wise_search) && $occupancy_wise_search}
+    {if isset($is_occupancy_wise_search) && $is_occupancy_wise_search}
         <div class="form-group area-{$column_widths['occupancy']}">
             <div class="dropdown">
                 <button class="form-control input-occupancy header-rmsearch-input {if isset($error) && $error == 1}error_border{/if}" type="button" data-toggle="dropdown" id="guest_occupancy">

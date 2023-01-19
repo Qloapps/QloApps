@@ -140,14 +140,14 @@ class AdminPPreferencesControllerCore extends AdminController
                         'identifier' => 'id',
                         'desc' => $this->l('This option is only for fully available rooms. For partially available rooms, always all possible rooms will be displayed.'),
                     ),
-                    'PS_FRONT_ROOM_BOOKING_TYPE' => array(
+                    'PS_FRONT_ROOM_UNIT_SELECTION_TYPE' => array(
                         'title' => $this->l('In front-end, add rooms to cart with'),
                         'hint' => $this->l('In Room occupancy, while adding rooms in cart customer has to select per room occupancy and in room quantity customer only has to select number of rooms.'),
                         'cast' => 'intval',
                         'type' => 'select',
                         'list' => array(
-                            array('id' => HotelBookingDetail::ROOM_BOOKING_OCCUPANCY_WISE, 'name' => $this->l('Room Occupancy')),
-                            array('id' => HotelBookingDetail::ROOM_BOOKING_QUANTITY_WISE, 'name' => $this->l('Rooms Quantity (No. of rooms)'))
+                            array('id' => HotelBookingDetail::PS_FRONT_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY, 'name' => $this->l('Room Occupancy')),
+                            array('id' => HotelBookingDetail::PS_FRONT_ROOM_UNIT_SELECTION_TYPE_QUANTITY, 'name' => $this->l('Rooms Quantity (No. of rooms)'))
                         ),
                         'identifier' => 'id',
                     ),
@@ -181,8 +181,8 @@ class AdminPPreferencesControllerCore extends AdminController
                         'cast' => 'intval',
                         'type' => 'select',
                         'list' => array(
-                            array('id' => HotelBookingDetail::ROOM_BOOKING_OCCUPANCY_WISE, 'name' => $this->l('Room Occupancy')),
-                            array('id' => HotelBookingDetail::ROOM_BOOKING_QUANTITY_WISE, 'name' => $this->l('Rooms Quantity (No. of rooms)'))
+                            array('id' => HotelBookingDetail::PS_FRONT_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY, 'name' => $this->l('Room Occupancy')),
+                            array('id' => HotelBookingDetail::PS_FRONT_ROOM_UNIT_SELECTION_TYPE_QUANTITY, 'name' => $this->l('Rooms Quantity (No. of rooms)'))
                         ),
                         'identifier' => 'id',
                     ),
@@ -433,11 +433,11 @@ class AdminPPreferencesControllerCore extends AdminController
         }
 
         if (Tools::getValue('PS_FRONT_SEARCH_TYPE') == HotelBookingDetail::SEARCH_TYPE_OWS) {
-            $_POST['PS_FRONT_ROOM_BOOKING_TYPE'] = HotelBookingDetail::ROOM_BOOKING_OCCUPANCY_WISE;
+            $_POST['PS_FRONT_ROOM_UNIT_SELECTION_TYPE'] = HotelBookingDetail::PS_FRONT_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY;
         }
 
         if (Tools::getValue('PS_BACKOFFICE_SEARCH_TYPE') == HotelBookingDetail::SEARCH_TYPE_OWS) {
-            $_POST['PS_BACKOFFICE_ROOM_BOOKING_TYPE'] = HotelBookingDetail::ROOM_BOOKING_OCCUPANCY_WISE;
+            $_POST['PS_BACKOFFICE_ROOM_BOOKING_TYPE'] = HotelBookingDetail::PS_FRONT_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY;
         }
 
         if (Tools::getIsset('PS_CATALOG_MODE')) {

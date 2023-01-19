@@ -256,10 +256,10 @@ class HotelHelper
         // Search Fields
         Configuration::updateValue('PS_FRONT_SEARCH_TYPE', HotelBookingDetail::SEARCH_TYPE_OWS);
         Configuration::updateValue('PS_FRONT_OWS_SEARCH_ALGO_TYPE', HotelBookingDetail::SEARCH_EXACT_ROOM_TYPE_ALGO);
-        Configuration::updateValue('PS_FRONT_ROOM_BOOKING_TYPE', HotelBookingDetail::ROOM_BOOKING_OCCUPANCY_WISE);
+        Configuration::updateValue('PS_FRONT_ROOM_UNIT_SELECTION_TYPE', HotelBookingDetail::PS_FRONT_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY);
         Configuration::updateValue('PS_BACKOFFICE_SEARCH_TYPE', HotelBookingDetail::SEARCH_TYPE_OWS);
         Configuration::updateValue('PS_BACKOFFICE_OWS_SEARCH_ALGO_TYPE', HotelBookingDetail::SEARCH_ALL_ROOM_TYPE_ALGO);
-        Configuration::updateValue('PS_BACKOFFICE_ROOM_BOOKING_TYPE', HotelBookingDetail::ROOM_BOOKING_OCCUPANCY_WISE);
+        Configuration::updateValue('PS_BACKOFFICE_ROOM_BOOKING_TYPE', HotelBookingDetail::PS_FRONT_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY);
 
         return true;
     }

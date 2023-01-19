@@ -435,14 +435,14 @@ class FrontControllerCore extends Controller
             $compared_products = CompareProduct::getCompareProducts($this->context->cookie->id_compare);
         }
 
-        $occupancyWiseSearch = false;
+        $isOccupancyWiseSearch = false;
         if (Configuration::get('PS_FRONT_SEARCH_TYPE') == HotelBookingDetail::SEARCH_TYPE_OWS) {
-            $occupancyWiseSearch = true;
+            $isOccupancyWiseSearch = true;
         }
 
-        $bookingTypeOccupancy = false;
-        if (Configuration::get('PS_FRONT_ROOM_BOOKING_TYPE') == HotelBookingDetail::ROOM_BOOKING_OCCUPANCY_WISE) {
-            $bookingTypeOccupancy = true;
+        $occupancyRequiredForBooking = false;
+        if (Configuration::get('PS_FRONT_ROOM_UNIT_SELECTION_TYPE') == HotelBookingDetail::PS_FRONT_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY) {
+            $occupancyRequiredForBooking = true;
         }
         $this->context->smarty->assign(array(
             // Useful for layout.tpl
@@ -491,8 +491,8 @@ class FrontControllerCore extends Controller
             'currencySign'        => $currency->sign, // backward compat, see global.tpl
             'currencyFormat'      => $currency->format, // backward compat
             'currencyBlank'       => $currency->blank, // backward compat
-            'occupancy_wise_search'    => $occupancyWiseSearch,
-            'occupancy_required_for_booking' => $bookingTypeOccupancy,
+            'is_occupancy_wise_search'    => $isOccupancyWiseSearch,
+            'occupancy_required_for_booking' => $occupancyRequiredForBooking,
             'max_child_age' => Configuration::get('WK_GLOBAL_CHILD_MAX_AGE'),
             'max_child_in_room' => Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM'),
         ));

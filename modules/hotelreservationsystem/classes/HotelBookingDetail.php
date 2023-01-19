@@ -82,8 +82,8 @@ class HotelBookingDetail extends ObjectModel
     const SEARCH_TYPE_NORMAL = 2;
 
     //
-    const ROOM_BOOKING_OCCUPANCY_WISE = 1;
-    const ROOM_BOOKING_QUANTITY_WISE = 2;
+    const PS_FRONT_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY = 1;
+    const PS_FRONT_ROOM_UNIT_SELECTION_TYPE_QUANTITY = 2;
 
     public static $definition = array(
         'table' => 'htl_booking_detail',

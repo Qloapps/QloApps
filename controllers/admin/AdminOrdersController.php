@@ -246,9 +246,9 @@ class AdminOrdersControllerCore extends AdminController
             $payment_modules[] = Module::getInstanceById((int)$p_module['id_module']);
         }
 
-        $bookingTypeOccupancy = false;
-        if (Configuration::get('PS_BACKOFFICE_ROOM_BOOKING_TYPE') == HotelBookingDetail::ROOM_BOOKING_OCCUPANCY_WISE) {
-            $bookingTypeOccupancy = true;
+        $occupancyRequiredForBooking = false;
+        if (Configuration::get('PS_BACKOFFICE_ROOM_BOOKING_TYPE') == HotelBookingDetail::PS_FRONT_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY) {
+            $occupancyRequiredForBooking = true;
         }
 
         $this->context->smarty->assign(array(
@@ -267,7 +267,7 @@ class AdminOrdersControllerCore extends AdminController
             'title' => array($this->l('Orders'), $this->l('Create order')),
             'max_child_in_room' => Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM'),
             'max_child_age' => Configuration::get('WK_GLOBAL_CHILD_MAX_AGE'),
-            'occupancy_required_for_booking' => $bookingTypeOccupancy,
+            'occupancy_required_for_booking' => $occupancyRequiredForBooking,
         ));
         $this->content .= $this->createTemplate('form.tpl')->fetch();
     }
@@ -1856,7 +1856,7 @@ class AdminOrdersControllerCore extends AdminController
                 'error' => Tools::displayError('Check out Date Should be after Check In date.'),
             )));
         }
-        if ($order->is_occupnacy_provided) {
+        if ($order->with_occupancy) {
             if ($occupancy) {
                 foreach($occupancy as $key =>$roomOccupancy) {
                     if (!$roomOccupancy['adults'] || !Validate::isUnsignedInt($roomOccupancy['adults'])) {
@@ -1902,7 +1902,7 @@ class AdminOrdersControllerCore extends AdminController
         }
 
 
-        if ($order->is_occupnacy_provided) {
+        if ($order->with_occupancy) {
             $req_rm = count($occupancy);
         } else {
             $req_rm = $product_informations['product_quantity'];
@@ -1999,7 +1999,7 @@ class AdminOrdersControllerCore extends AdminController
         $this->context->cart = $cart;
         $this->context->customer = new Customer($order->id_customer);
 
-        if ($order->is_occupnacy_provided) {
+        if ($order->with_occupancy) {
             $objRoomType = new HotelRoomType();
             $roomTypeInfo = $objRoomType->getRoomTypeInfoByIdProduct($id_product);
         }
@@ -2022,7 +2022,7 @@ class AdminOrdersControllerCore extends AdminController
                     $objCartBookingData->date_from = $date_from;
                     $objCartBookingData->date_to = $date_to;
 
-                    if ($order->is_occupnacy_provided) {
+                    if ($order->with_occupancy) {
                         $room_occupancy = array_shift($occupancy);
                         $objCartBookingData->adults = $room_occupancy['adults'];
                         $objCartBookingData->children = $room_occupancy['children'];

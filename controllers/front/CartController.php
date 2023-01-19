@@ -270,12 +270,12 @@ class CartControllerCore extends FrontController
         $date_to = date("Y-m-d", strtotime($date_to));
         $operator = Tools::getValue('op', 'up');
 
-        $bookingTypeOccupancy = false;
-        if (Configuration::get('PS_FRONT_ROOM_BOOKING_TYPE') == HotelBookingDetail::ROOM_BOOKING_OCCUPANCY_WISE) {
-            $bookingTypeOccupancy = true;
+        $occupancyRequiredForBooking = false;
+        if (Configuration::get('PS_FRONT_ROOM_UNIT_SELECTION_TYPE') == HotelBookingDetail::PS_FRONT_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY) {
+            $occupancyRequiredForBooking = true;
         }
 
-        if ($bookingTypeOccupancy) {
+        if ($occupancyRequiredForBooking) {
             if ($occupancy = json_decode(Tools::getValue('occupancy'), true)) {
                 $this->qty = count($occupancy);
             } else {
@@ -303,7 +303,7 @@ class CartControllerCore extends FrontController
 
         // valdiate occupancy if providede
         if ($operator == 'up') {
-            if ($bookingTypeOccupancy) {
+            if ($occupancyRequiredForBooking) {
                 foreach($occupancy as $key => $roomOccupancy) {
                     if (!isset($roomOccupancy['adults']) || !$roomOccupancy['adults'] || !Validate::isUnsignedInt($roomOccupancy['adults'])) {
                         $this->errors[] = sprintf(Tools::displayError('Invalid number of adults for Room %s.'), ($key + 1));
@@ -348,7 +348,7 @@ class CartControllerCore extends FrontController
                             $this->errors[] = Tools::displayError('You can\'t book room after date '.$maxOrdDate);
                         }
                     }
-                    if ($bookingTypeOccupancy) {
+                    if ($occupancyRequiredForBooking) {
                         foreach($occupancy as $key => $roomOccupancy) {
                             if ($roomOccupancy['adults'] > $roomTypeInfo['max_adults']) {
                                 $this->errors[] = sprintf(Tools::displayError('Room %s cannot have adults more than %s'), $key + 1, $roomTypeInfo['max_adults']);

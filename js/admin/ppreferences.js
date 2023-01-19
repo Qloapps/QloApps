@@ -27,10 +27,10 @@ $(document).ready(function() {
     {
         if ($('#PS_FRONT_SEARCH_TYPE').val() == SEARCH_TYPE_OWS) {
             $('#PS_FRONT_OWS_SEARCH_ALGO_TYPE').closest('.form-group').show('fast');
-            $('#PS_FRONT_ROOM_BOOKING_TYPE').closest('.form-group').hide('fast');
+            $('#PS_FRONT_ROOM_UNIT_SELECTION_TYPE').closest('.form-group').hide('fast');
         } else {
             $('#PS_FRONT_OWS_SEARCH_ALGO_TYPE').closest('.form-group').hide('fast');
-            $('#PS_FRONT_ROOM_BOOKING_TYPE').closest('.form-group').show('fast');
+            $('#PS_FRONT_ROOM_UNIT_SELECTION_TYPE').closest('.form-group').show('fast');
         }
     }
 

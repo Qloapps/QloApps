@@ -44,7 +44,7 @@
 								<input type="hidden" name="search_id_hotel" id="search_id_hotel" {if isset($id_hotel)}value="{$id_hotel|escape:'htmlall':'UTF-8'}"{/if}>
 							</div>
 						</div>
-						{if $occupancy_wise_search}
+						{if $is_occupancy_wise_search}
 							<div class="form-group col-sm-12">
 								<label for="occupancy" class="control-label col-sm-4 required">
 									<span title="" data-toggle="tooltip" class="label-tooltip">{l s='Occupancy' mod='hotelreservationsystem'}</span>

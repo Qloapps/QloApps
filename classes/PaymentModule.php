@@ -355,15 +355,15 @@ abstract class PaymentModuleCore extends Module
                     }
 
                     if ($this->name == 'wsorder') {
-                        $order->is_occupnacy_provided = 0;
+                        $order->with_occupancy = 0;
                     } else {
                         if (defined('_PS_ADMIN_DIR_')) {
-                            if (Configuration::get('PS_BACKOFFICE_ROOM_BOOKING_TYPE') == HotelBookingDetail::ROOM_BOOKING_OCCUPANCY_WISE) {
-                                $order->is_occupnacy_provided = 1;
+                            if (Configuration::get('PS_BACKOFFICE_ROOM_BOOKING_TYPE') == HotelBookingDetail::PS_FRONT_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY) {
+                                $order->with_occupancy = 1;
                             }
                         } else {
-                            if (Configuration::get('PS_FRONT_ROOM_BOOKING_TYPE') == HotelBookingDetail::ROOM_BOOKING_OCCUPANCY_WISE) {
-                                $order->is_occupnacy_provided = 1;
+                            if (Configuration::get('PS_FRONT_ROOM_UNIT_SELECTION_TYPE') == HotelBookingDetail::PS_FRONT_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY) {
+                                $order->with_occupancy = 1;
                             }
                         }
                     }
