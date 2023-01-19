@@ -159,28 +159,57 @@
 							{if $currentStateInfo['refunded']}
 								<div class="form-group row">
 									<div class="col-sm-3">
-										<strong>{l s='Payment mode' mod='hotelreservationsystem'} :</strong>
-									</div>
-									<div class="col-sm-9">
-										{$orderReturnInfo['payment_mode']|escape:'html':'UTF-8'}
-									</div>
-								</div>
-								<div class="form-group row">
-									<div class="col-sm-3">
-										<strong>{l s='Transaction ID' mod='hotelreservationsystem'} :</strong>
-									</div>
-									<div class="col-sm-9">
-										{$orderReturnInfo['id_transaction']|escape:'html':'UTF-8'}
-									</div>
-								</div>
-								<div class="form-group row">
-									<div class="col-sm-3">
-										<strong>{l s='Refunded amount' mod='hotelreservationsystem'} :</strong>
+										<strong>{l s='Refunded amount:' mod='hotelreservationsystem'}</strong>
 									</div>
 									<div class="col-sm-9">
 										{displayPrice price=$orderReturnInfo['refunded_amount'] currency=$orderInfo['id_currency']}
 									</div>
 								</div>
+
+								{if $orderReturnInfo['payment_mode'] != '' && $orderReturnInfo['id_transaction'] != ''}
+									<div class="form-group row">
+										<div class="col-sm-3">
+											<strong>{l s='Payment mode:' mod='hotelreservationsystem'}</strong>
+										</div>
+										<div class="col-sm-9">
+											{$orderReturnInfo['payment_mode']|escape:'html':'UTF-8'}
+										</div>
+									</div>
+									<div class="form-group row">
+										<div class="col-sm-3">
+											<strong>{l s='Transaction ID:' mod='hotelreservationsystem'}</strong>
+										</div>
+										<div class="col-sm-9">
+											{$orderReturnInfo['id_transaction']|escape:'html':'UTF-8'}
+										</div>
+									</div>
+								{/if}
+
+								{if isset($orderReturnInfo['return_type'])}
+									{if $orderReturnInfo['return_type'] == OrderReturn::RETURN_TYPE_CART_RULE}
+										<div class="form-group row">
+											<div class="col-sm-3">
+												<strong>{l s='Voucher ID:' mod='hotelreservationsystem'}</strong>
+											</div>
+											<div class="col-sm-9">
+												<a href="{$link->getAdminLink('AdminCartRules')}&updatecart_rule&id_cart_rule={$orderReturnInfo['id_return_type']}" target="_blank">#{$orderReturnInfo['id_return_type']}</a>
+											</div>
+										</div>
+									{elseif $orderReturnInfo['return_type'] == OrderReturn::RETURN_TYPE_ORDER_SLIP}
+										<div class="form-group row">
+											<div class="col-sm-3">
+												<strong>{l s='Credit Slip ID:' mod='hotelreservationsystem'}</strong>
+											</div>
+											<div class="col-sm-9">
+												#{$orderReturnInfo['id_return_type']}
+												<a class="btn btn-default" href="{$link->getAdminLink('AdminPdf')}&submitAction=generateOrderSlipPDF&id_order_slip={$orderReturnInfo['id_return_type']}" title="#{Configuration::get('PS_CREDIT_SLIP_PREFIX', $current_id_lang)}{$orderReturnInfo['id_return_type']|string_format:'%06d'}">
+													<i class="icon-file-text"></i>
+													{l s='Download' mod='hotelreservationsystem'}
+												</a>
+											</div>
+										</div>
+									{/if}
+								{/if}
 							{/if}
 						{else}
 							<div class="form-group">
@@ -207,7 +236,7 @@
 										<div class="col-sm-3">
 											<div class="checkbox">
 												<label>
-													<input value="1" type="checkbox" name="generateCreditSlip" id="generateCreditSlip"/> &nbsp;{l s='Create Refund Slip' mod='hotelreservationsystem'}
+													<input value="1" type="checkbox" name="generateCreditSlip" id="generateCreditSlip"/> &nbsp;{l s='Create Credit Slip' mod='hotelreservationsystem'}
 												</label>
 											</div>
 										</div>

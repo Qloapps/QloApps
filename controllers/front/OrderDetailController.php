@@ -246,7 +246,7 @@ class OrderDetailControllerCore extends FrontController
                         }
                     }
                     // Emails to customer, admin on refund request state change
-                    $objOrderReturn->changeIdOrderReturnState(OrderReturnState::ORDER_RETRUN_FIRST_STATUS, $objOrderReturn->id);
+                    $objOrderReturn->changeIdOrderReturnState(Configuration::get('PS_ORS_PENDING'));
 
                     die(json_encode(array('status' => 1)));
                 }

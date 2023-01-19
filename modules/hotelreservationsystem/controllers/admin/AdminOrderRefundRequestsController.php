@@ -46,7 +46,7 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
         /*for showing status of booking with badge_danger or success*/
         $this->fields_list = array(
             'id_order' => array(
-                'title' => $this->l('Id Order'),
+                'title' => $this->l('Order ID'),
                 'align' => 'center',
                 'class' => 'fixed-width-xs',
                 'callback' => 'setOrderLink',
@@ -164,12 +164,12 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
             }
             $this->fields_list = array(
                 'id_order_return' => array(
-                    'title' => $this->l('Id'),
+                    'title' => $this->l('ID'),
                     'align' => 'center',
                     'class' => 'fixed-width-xs',
                 ),
                 'id_order' => array(
-                    'title' => $this->l('Id Order'),
+                    'title' => $this->l('Order ID'),
                     'align' => 'center',
                     'class' => 'fixed-width-xs',
                     'callback' => 'setOrderLink',
@@ -249,6 +249,7 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
                     $this->context->language->id),
                     'currentStateInfo' => (array) new OrderReturnState($objOrderReturn->state,
                     $this->context->language->id),
+                    'current_id_lang' => $this->context->language->id,
                     'refundStatuses' => $refundStatuses,
                     'isRefundCompleted' => $objOrderReturn->hasBeenCompleted(),
                     'paymentMethods' => $paymentMethods,
@@ -402,7 +403,7 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
                 $objOrderReturn->refunded_amount = $totalRefundedAmount;
                 if ($objOrderReturn->save()) {
                     // change state of the order refund
-                    $objOrderReturn->changeIdOrderReturnState($idRefundState, $idOrderReturn);
+                    $objOrderReturn->changeIdOrderReturnState($idRefundState);
 
                     if ($objRefundState->refunded || $objRefundState->denied) {
                         // check if order is paid the set status of the order to refunded
@@ -434,6 +435,10 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
                         if (!$idCreditSlip = OrderSlip::create($objOrder, $bookingList, 0, 0, 0, 0)) {
                             $this->errors[] = $this->l('A credit slip cannot be generated. ');
                         } else {
+                            $objOrderReturn->id_return_type = $idCreditSlip;
+                            $objOrderReturn->return_type = OrderReturn::RETURN_TYPE_ORDER_SLIP;
+                            $objOrderReturn->save();
+
                             Hook::exec('actionOrderSlipAdd', array('order' => $objOrder, 'bookingList' => $bookingList));
 
                             @Mail::Send(
@@ -452,13 +457,11 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
                                 (int)$objOrder->id_shop
                             );
                         }
-                    }
-
-                    // Generate voucher
-                    if (Tools::isSubmit('generateDiscount') && !count($this->errors)) {
+                    } elseif (Tools::isSubmit('generateDiscount') && !count($this->errors)) {
+                        // Generate voucher
                         $cartrule = new CartRule();
                         $language_ids = Language::getIDs();
-                        $cartrule->description = sprintf($this->l('Credit card slip for order #%d'), $objOrder->id);
+                        $cartrule->description = sprintf($this->l('Voucher for order #%d'), $objOrder->id);
                         foreach ($language_ids as $id_lang) {
                             // Define a temporary name
                             $cartrule->name[$id_lang] = 'V0C'.(int)($objOrder->id_customer).'O'.(int)($objOrder->id);
@@ -483,7 +486,8 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
                         if (!$cartrule->add()) {
                             $this->errors[] = $this->errors('You cannot generate a voucher.');
                         } else {
-                            $objOrderReturn->id_transaction = $cartrule->id;
+                            $objOrderReturn->id_return_type = $cartrule->id;
+                            $objOrderReturn->return_type = OrderReturn::RETURN_TYPE_CART_RULE;
                             $objOrderReturn->save();
                             // Update the voucher code and name
                             foreach ($language_ids as $id_lang) {

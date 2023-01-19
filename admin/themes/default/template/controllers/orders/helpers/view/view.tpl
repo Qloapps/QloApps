@@ -949,6 +949,64 @@
 					</form>
 				</div>
 			</div>
+			{if is_array($returns) && count($returns)}
+				<div class="panel">
+					<div class="panel-heading">
+						<i class="icon-undo"></i> {l s='Refunds'}
+					</div>
+					<table class="table table-striped">
+						<thead>
+							<tr>
+								<th class="text-left">{l s='Refund ID'}</th>
+								<th class="text-left">{l s='Status'}</th>
+							</tr>
+						</thead>
+						<tbody>
+							{foreach from=$returns item=return_info}
+							<tr>
+								<td class="text-left">
+									<a href="{$link->getAdminLink('AdminOrderRefundRequests')}&vieworder_return&id_order_return={$return_info.id_order_return}" target="_blank">#{$return_info.id_order_return}</a>
+								</td>
+								<td class="text-left">
+									{capture name=refund_status}
+										{if isset($return_info.payment_mode) && $return_info.payment_mode != ''}{l s='Payment Mode: '}{$return_info.payment_mode}<br/>{/if}
+										{if isset($return_info.id_transaction) && $return_info.id_transaction != ''}{l s='Transaction ID: '}{$return_info.id_transaction}<br/>{/if}
+										{if isset($return_info.id_return_type) && isset($return_info.return_type) && $return_info.id_return_type && $return_info.return_type}
+											{if $return_info.return_type == OrderReturn::RETURN_TYPE_CART_RULE}
+												{l s='Voucher ID: '}
+												<a href="{$link->getAdminLink('AdminCartRules')}&updatecart_rule&id_cart_rule={$return_info.id_return_type}" target="_blank">
+													#{$return_info.id_return_type}
+												</a>
+											{elseif $return_info.return_type == OrderReturn::RETURN_TYPE_ORDER_SLIP}
+												{l s='Credit Slip ID: '}
+												#{$return_info.id_return_type}
+												<a href="{$link->getAdminLink('AdminPdf')}&submitAction=generateOrderSlipPDF&id_order_slip={$return_info.id_return_type}" title="#{Configuration::get('PS_CREDIT_SLIP_PREFIX', $current_id_lang)}{$return_info.id_return_type|string_format:'%06d'}">
+													{l s='Download' mod='hotelreservationsystem'}
+												</a>
+											{/if}
+											<br/>
+										{/if}
+										{if isset($return_info.id_cart_rule) && $return_info.id_cart_rule}
+											{l s='Voucher ID: '}
+											<a href="{$link->getAdminLink('AdminCartRules')}&updatecart_rule&id_cart_rule={$return_info.id_cart_rule}" target="_blank">
+												#{$return_info.id_cart_rule}
+											</a>
+											<br/>
+										{/if}
+									{/capture}
+
+									{if $smarty.capture.refund_status|trim != ''}
+										{$smarty.capture.refund_status}
+									{else}
+										{$return_info.state_name}
+									{/if}
+								</td>
+							</tr>
+							{/foreach}
+						</tbody>
+					</table>
+				</div>
+			{/if}
 			{hook h="displayAdminOrderRight" id_order=$order->id}
 		</div>
 	</div>

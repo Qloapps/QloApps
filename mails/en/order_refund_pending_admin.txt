@@ -1,7 +1,7 @@
 Message from {shop_name}
 
 Hi {firstname} {lastname},
-A request has been generated for the booking cancellation.
+A request has been generated for booking cancellations.
 
 Order details
 
@@ -9,7 +9,7 @@ Order: {order_reference} Placed on {order_date}
 Refund Status: {status_name}
 Cancelation Reason: {cancelation_reason}
 
-Booking details
+Requested Booking Cancellations
 
 Room Num
 Room Type

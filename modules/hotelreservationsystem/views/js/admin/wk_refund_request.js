@@ -42,11 +42,11 @@ $(document).ready(function() {
         }
     });
 
-    $('#refundTransactionAmount, #generateDiscount').click(function() {
+    $('#generateCreditSlip, #generateDiscount').click(function() {
         if ($(this).is(':checked')) {
-            $('#refundTransactionAmount, #generateDiscount').prop('checked', false);
+            $('#generateCreditSlip, #generateDiscount').prop('checked', false);
 			$(this).prop('checked', true);
 		}
-        $('#refundTransactionAmount').change();
+        $('#generateCreditSlip').change();
 	});
 });
