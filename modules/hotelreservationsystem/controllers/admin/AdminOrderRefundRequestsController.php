@@ -28,7 +28,7 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
         $this->list_no_link = true;
         $this->context = Context::getContext();
 
-        $this->_select = ' COUNT(IF(a.`state` = '.(int) OrderReturnState::ORDER_RETRUN_FIRST_STATUS.', 1, NULL)) AS total_pending_requests,
+        $this->_select = ' COUNT(IF(a.`state` = '.(int) Configuration::get('PS_ORS_PENDING').', 1, NULL)) AS total_pending_requests,
         ord.`id_currency`, ord.`total_paid_tax_incl` AS total_order, SUM(a.`refunded_amount`) AS refunded_amount, CONCAT(firstname, " ", lastname) AS cust_name, os.`color`, os.`id_order_state`';
         $this->_join .= ' LEFT JOIN `'._DB_PREFIX_.'orders` ord ON (a.`id_order` = ord.`id_order`)';
         $this->_join .= 'LEFT JOIN '._DB_PREFIX_.'order_state os ON (os.`id_order_state` = ord.`current_state`)';
@@ -517,11 +517,11 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
                     }
 
                     // redirect with success if process completed successfully
-                    $confirmation = '4';
-                    if ($idRefundState == 2) {
-                        $confirmation = '101';
-                    } elseif ($idRefundState == 3) {
-                        $confirmation = '102';
+                    $confirmation = 4;
+                    if ($objRefundState->denied) {
+                        $confirmation = 101;
+                    } elseif ($objRefundState->refunded) {
+                        $confirmation = 102;
                     }
                     Tools::redirectAdmin(
                         self::$currentIndex.'&conf='.$confirmation.'&id_order_return='.$idOrderReturn.

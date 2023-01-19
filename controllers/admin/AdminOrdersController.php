@@ -747,7 +747,7 @@ class AdminOrdersControllerCore extends AdminController
                     $objOrderReturn = new OrderReturn();
                     $objOrderReturn->id_customer = $order->id_customer;
                     $objOrderReturn->id_order = $order->id;
-                    $objOrderReturn->state = OrderReturnState::ORDER_RETRUN_FIRST_STATUS;
+                    $objOrderReturn->state = Configuration::get('PS_ORS_PENDING');
                     $objOrderReturn->by_admin = 1;
                     $objOrderReturn->question = $refundReason;
                     $objOrderReturn->save();
