@@ -1161,22 +1161,20 @@ class AdminStatsControllerCore extends AdminStatsTabController
         FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
         LEFT JOIN `'._DB_PREFIX_.'customer` c ON (c.`id_customer` = hbd.`id_customer`)
         WHERE hbd.`is_refunded` = 0 AND hbd.`date_to` = "'.pSQL($date).' 00:00:00"
-        AND hbd.`id_status` = '.(int) HotelBookingDetail::STATUS_CHECKED_IN.'
-        AND hbd.`id_status` != '.(int) HotelBookingDetail::STATUS_CHECKED_OUT.
+        AND hbd.`id_status` = '.(int) HotelBookingDetail::STATUS_CHECKED_IN.
         (!is_null($idHotel) ? HotelBranchInformation::addHotelRestriction($idHotel, 'hbd') : '');
         $result = Db::getInstance()->executeS($sql);
 
         return $result;
     }
 
-    public static function getInHouseInfoByDate($date, $idHotel = null)
+    public static function getInHousesInfo($idHotel = null)
     {
         $sql = 'SELECT hbd.*, CONCAT(c.`firstname`, " ", c.`lastname`) AS customer_name,
         DATEDIFF(hbd.`date_to`, hbd.`date_from`) AS los
         FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
         LEFT JOIN `'._DB_PREFIX_.'customer` c ON (c.`id_customer` = hbd.`id_customer`)
-        WHERE hbd.`is_refunded` = 0 AND hbd.`id_status` = '.(int) HotelBookingDetail::STATUS_CHECKED_IN.'
-        AND hbd.`id_status` != '.(int) HotelBookingDetail::STATUS_CHECKED_OUT.
+        WHERE hbd.`is_refunded` = 0 AND hbd.`id_status` = '.(int) HotelBookingDetail::STATUS_CHECKED_IN.
         (!is_null($idHotel) ? HotelBranchInformation::addHotelRestriction($idHotel, 'hbd') : '');
         $result = Db::getInstance()->executeS($sql);
 

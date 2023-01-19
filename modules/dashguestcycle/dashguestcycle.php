@@ -62,7 +62,7 @@ class DashGuestCycle extends Module
         return $this->display(__FILE__, 'dashboard-top.tpl');
     }
 
-    public function hookDashboardZoneTwo($params)
+    public function hookDashboardZoneTwo()
     {
         return $this->display(__FILE__, 'dashboard-zone-two.tpl');
     }
@@ -108,7 +108,7 @@ class DashGuestCycle extends Module
         $tableCurrentDepartures = $this->getTableDeparturesByDate($dateToday, $params['id_hotel']);
         $dataValue['dgc_count_upcoming_departures'] = count($tableCurrentDepartures['body']);
 
-        $tableCurrentInHouse = $this->getTableInHouseByDate($dateToday, $params['id_hotel']);
+        $tableCurrentInHouse = $this->getTableInHouses($params['id_hotel']);
         $dataValue['dgc_count_current_in_house'] = count($tableCurrentInHouse['body']);
 
         $tableNewBookings = $this->getTableNewBookingsByDate($dateToday, $params['id_hotel']);
@@ -248,7 +248,7 @@ class DashGuestCycle extends Module
         return array('header' => array_values($header), 'body' => $body);
     }
 
-    public function getTableInHouseByDate($date, $idHotel)
+    public function getTableInHouses($idHotel)
     {
         $header = array(
             'name' => array('title' => $this->l('Customer Name'), 'class' => 'text-left'),
@@ -265,10 +265,10 @@ class DashGuestCycle extends Module
             unset($header['hotel']);
         }
 
-        $inHouseInfos = AdminStatsController::getInHouseInfoByDate($date, $idHotel);
+        $inHousesInfo = AdminStatsController::getInHousesInfo($idHotel);
 
         $body = array();
-        foreach ($inHouseInfos as $inHouseInfo) {
+        foreach ($inHousesInfo as $inHouseInfo) {
             $tr = array();
             $tr[] = array(
                 'value' => '<a href="'.$this->context->link->getAdminLink('AdminCustomers', true).'&id_customer='.$inHouseInfo['id_customer'].'&viewcustomer" target="_blank">'.Tools::htmlentitiesUTF8($inHouseInfo['customer_name']).'</a>',
