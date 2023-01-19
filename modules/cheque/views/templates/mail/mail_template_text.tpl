@@ -1,5 +1,4 @@
-<?php
-/**
+{*
 * 2010-2022 Webkul.
 *
 * NOTICE OF LICENSE
@@ -16,14 +15,9 @@
 *  @author    Webkul IN <support@webkul.com>
 *  @copyright 2010-2022 Webkul IN
 *  @license   https://store.webkul.com/license.html
-*/
+*}
+{l s='Here are the bank details for your check:' mod='cheque' lang=$lang}
 
-header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
-header('Last-Modified: '.gmdate('D, d M Y H:i:s').' GMT');
-
-header('Cache-Control: no-store, no-cache, must-revalidate');
-header('Cache-Control: post-check=0, pre-check=0', false);
-header('Pragma: no-cache');
-
-header('Location: ../../../');
-exit;
+{l s='Amount:' mod='cheque' lang=$lang}  {literal}{total_paid}{/literal}
+{l s='Payable to the order of:' mod='cheque' lang=$lang} {$cheque_name}
+{l s='Please mail your check to:' mod='cheque' lang=$lang} {$cheque_address}

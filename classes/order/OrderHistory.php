@@ -429,7 +429,7 @@ class OrderHistoryCore extends ObjectModel
                     if (method_exists($module, 'getExtraMailContent')) {
                         if (is_array($extra_mail_content = $module->getExtraMailContent(
                             $result['id_order_state'],
-                            $order->id_lang
+                            $order
                         ))) {
                             $data = array_merge($data, $extra_mail_content);
                         }

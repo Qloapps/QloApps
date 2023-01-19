@@ -72,20 +72,22 @@ class Cheque extends PaymentModule
 		$this->payment_type = OrderPayment::PAYMENT_TYPE_REMOTE_PAYMENT;
 	}
 
-	public function getExtraMailContent($id_order_state, $id_lang)
+	public function getExtraMailContent($id_order_state, $order)
 	{
         if (Configuration::get('PS_OS_AWAITING_PAYMENT') == $id_order_state) {
 			$this->context->smarty->assign(array(
 				'cheque_name' => Configuration::get('CHEQUE_NAME'),
 				'cheque_address' => Configuration::get('CHEQUE_ADDRESS'),
-				'cheque_address_html' => str_replace("\n", '<br />', Configuration::get('CHEQUE_ADDRESS'))
+				'cheque_address_html' => str_replace("\n", '<br />', Configuration::get('CHEQUE_ADDRESS')),
+                'lang' => new Language($order->id_lang)
 			));
+
 			return array(
                 '{extra_mail_content_html}' => $this->context->smarty->fetch(
-					$this->local_path.'mails/'.Language::getIsoById($id_lang).'/mail_template_html.tpl'
+                    $this->local_path.'views/templates/mail/mail_template_html.tpl'
 				),
                 '{extra_mail_content_txt}' => $this->context->smarty->fetch(
-					$this->local_path.'mails/'.Language::getIsoById($id_lang).'/mail_template_text.tpl'
+                    $this->local_path.'views/templates/mail/mail_template_text.tpl'
 				)
             );
 		}
