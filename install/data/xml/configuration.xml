@@ -401,7 +401,7 @@
 	<configuration id="PS_OS_OUTOFSTOCK_PAID" name="PS_OS_OUTOFSTOCK_PAID">
 		<value>7</value>
 	</configuration>
-	<configuration id="PS_OS_OVERBOOKING" name="PS_OS_OVERBOOKING">
+	<configuration id="PS_OS_OVERBOOKING_PAID" name="PS_OS_OVERBOOKING_PAID">
 		<value>7</value>
 	</configuration>
 	<configuration id="PS_OS_PARTIAL_PAYMENT_ACCEPTED" name="PS_OS_PARTIAL_PAYMENT_ACCEPTED">

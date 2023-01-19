@@ -32,12 +32,12 @@
     <name>Awaiting remote payment</name>
     <template/>
   </order_state>
-  <order_state id="Overbooking">
-    <name>Over Booking</name>
+  <order_state id="Overbooking_paid">
+    <name>Overbooking (paid)</name>
     <template/>
   </order_state>
   <order_state id="Overbooking_unpaid">
-    <name>Over Booking (not paid)</name>
+    <name>Overbooking (not paid)</name>
     <template/>
   </order_state>
   <order_state id="Partial_payment_accepted">

@@ -26,6 +26,10 @@
 
 class OrderPaymentCore extends ObjectModel
 {
+    const PAYMENT_TYPE_ONLINE = 1;
+    const PAYMENT_TYPE_PAY_AT_HOTEL = 2;
+    const PAYMENT_TYPE_REMOTE_PAYMENT = 3;
+
     public $order_reference;
     public $id_currency;
     public $amount;

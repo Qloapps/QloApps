@@ -9,7 +9,7 @@ Order {order_name} - Awaiting payment
 Order reference: {order_name}
 Payment method: {payment_method}
 
-{payment_module_detail_text}
+{extra_mail_content_txt}
 
 You can review your order and download your invoice from the
 "Order history" [/{history_url}] section of your customer account by

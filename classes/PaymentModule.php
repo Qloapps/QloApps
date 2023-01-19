@@ -28,15 +28,11 @@ abstract class PaymentModuleCore extends Module
 {
     const DEBUG_MODE = false;
 
-    const PAYMENT_TYPE_ONLINE = 1;
-    const PAYMENT_TYPE_PAY_AT_HOTEL = 2;
-    const PAYMENT_TYPE_REMOTE_PAYMENT = 3;
-
     /** @var int Current order's id */
     public $currentOrder;
     public $currencies = true;
     public $currencies_mode = 'checkbox';
-    public $payment_type = PaymentModule::PAYMENT_TYPE_REMOTE_PAYMENT;
+    public $payment_type = OrderPayment::PAYMENT_TYPE_REMOTE_PAYMENT;
 
     public function install()
     {

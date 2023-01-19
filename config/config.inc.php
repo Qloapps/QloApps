@@ -246,7 +246,7 @@ define('_PS_OS_PROCESSING_', Configuration::get('PS_OS_PROCESSING'));
 define('_PS_OS_CANCELED_', Configuration::get('PS_OS_CANCELED'));
 define('_PS_OS_REFUND_', Configuration::get('PS_OS_REFUND'));
 define('_PS_OS_ERROR_', Configuration::get('PS_OS_ERROR'));
-define('_PS_OS_OVERBOOKING_', Configuration::get('PS_OS_OVERBOOKING'));
+define('_PS_OS_OVERBOOKING_', Configuration::get('PS_OS_OVERBOOKING_PAID'));
 define('_PS_OS_PARTIAL_PAYMENT_ACCEPTED_', Configuration::get('PS_OS_PARTIAL_PAYMENT_ACCEPTED'));
 
 if (!defined('_MEDIA_SERVER_1_')) {

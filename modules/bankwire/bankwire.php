@@ -74,10 +74,10 @@ class Bankwire extends PaymentModule
             $this->warning = $this->l('No currency has been set for this module.');
         }
 
-        $this->payment_type = PaymentModule::PAYMENT_TYPE_REMOTE_PAYMENT;
+        $this->payment_type = OrderPayment::PAYMENT_TYPE_REMOTE_PAYMENT;
     }
 
-    public function getMailContent($id_order_state, $id_lang)
+    public function getExtraMailContent($id_order_state, $id_lang)
     {
         if (Configuration::get('PS_OS_AWAITING_PAYMENT') == $id_order_state) {
             $this->context->smarty->assign(array(
@@ -86,14 +86,15 @@ class Bankwire extends PaymentModule
                 'bankwire_address' => nl2br(Configuration::get('BANK_WIRE_ADDRESS'))
             ));
             return array(
-                '{payment_module_detail_html}' => $this->context->smarty->fetch(
+                '{extra_mail_content_html}' => $this->context->smarty->fetch(
                     $this->local_path.'mails/'.Language::getIsoById($id_lang).'/mail_template_html.tpl'
                 ),
-                '{payment_module_detail_text}' => $this->context->smarty->fetch(
+                '{extra_mail_content_txt}' => $this->context->smarty->fetch(
                     $this->local_path.'mails/'.Language::getIsoById($id_lang).'/mail_template_text.tpl'
                 )
             );
         }
+        return array();
     }
 
     public function install()

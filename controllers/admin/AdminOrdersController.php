@@ -802,7 +802,7 @@ class AdminOrdersControllerCore extends AdminController
                     $this->errors[] = Tools::displayError('The invoice is invalid.');
                 } elseif (!Validate::isDate(Tools::getValue('payment_date'))) {
                     $this->errors[] = Tools::displayError('The date is invalid');
-                } elseif (!Validate::isUnsignedId($payment_type)) {
+                } elseif (!Validate::isUnsignedInt($payment_type)) {
                     $this->errors[] = Tools::displayError('Payment source is invalid');
                 } else {
                     if (!$order->addOrderPayment(
@@ -3138,20 +3138,20 @@ class AdminOrdersControllerCore extends AdminController
     protected function getPaymentsTypes()
     {
         return array(
-            PaymentModule::PAYMENT_TYPE_ONLINE => array(
+            OrderPayment::PAYMENT_TYPE_ONLINE => array(
                 'key' => 'PAYMENT_TYPE_ONLINE',
-                'value' => PaymentModule::PAYMENT_TYPE_ONLINE,
+                'value' => OrderPayment::PAYMENT_TYPE_ONLINE,
                 'name' => $this->l('Online')
             ),
-            PaymentModule::PAYMENT_TYPE_PAY_AT_HOTEL => array(
+            OrderPayment::PAYMENT_TYPE_PAY_AT_HOTEL => array(
                 'key' => 'PAYMENT_TYPE_PAY_AT_HOTEL',
-                'value' => PaymentModule::PAYMENT_TYPE_PAY_AT_HOTEL,
+                'value' => OrderPayment::PAYMENT_TYPE_PAY_AT_HOTEL,
                 'name' => $this->l('Pay at hotel')
             ),
-            PaymentModule::PAYMENT_TYPE_REMOTE_PAYMENT => array(
+            OrderPayment::PAYMENT_TYPE_REMOTE_PAYMENT => array(
                 'key' => 'PAYMENT_TYPE_REMOTE_PAYMENT',
-                'value' => PaymentModule::PAYMENT_TYPE_REMOTE_PAYMENT,
-                'name' => $this->l('Remote Payment')
+                'value' => OrderPayment::PAYMENT_TYPE_REMOTE_PAYMENT,
+                'name' => $this->l('Remote payment')
             ),
         );
     }

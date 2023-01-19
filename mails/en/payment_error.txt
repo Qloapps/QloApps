@@ -9,7 +9,7 @@ convenience.
 
 WE CANNOT SHIP YOUR ORDER UNTIL WE RECEIVE YOUR PAYMENT.
 
-{payment_module_detail_text}
+{extra_mail_content_txt}
 
 You can review your order and download your invoice from the
 "Order history" [/{history_url}] section of your customer account by

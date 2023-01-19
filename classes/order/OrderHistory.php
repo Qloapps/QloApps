@@ -415,16 +415,25 @@ class OrderHistoryCore extends ObjectModel
                 '{firstname}' => $result['firstname'],
                 '{id_order}' => (int)$this->id_order,
                 '{order_name}' => $order->getUniqReference(),
-                '{payment_module_detail_html}' => '',
-                '{payment_module_detail_text}' => '',
+                '{extra_mail_content_html}' => '',
+                '{extra_mail_content_txt}' => '',
                 '{payment_method}' => '',
             );
 
             if ($result['module_name']) {
-                $module = Module::getInstanceByName($result['module_name']);
-                if (Validate::isLoadedObject($module) && method_exists($module, 'getMailContent')) {
-                    $data = array_merge($data, $module->getMailContent($result['id_order_state'], $order->id_lang));
+                if (Validate::isLoadedObject($module = Module::getInstanceByName($result['module_name']))) {
                     $data['{payment_method}'] = $module->displayName;
+                    // if any modle need to send extra content in mail, that module need to implement this function
+                    // this function should return an array with content for both html and txt mail template
+                    // return  array('{extra_mail_content_html}' => '', '{extra_mail_content_txt}' => '')
+                    if (method_exists($module, 'getExtraMailContent')) {
+                        if (is_array($extra_mail_content = $module->getExtraMailContent(
+                            $result['id_order_state'],
+                            $order->id_lang
+                        ))) {
+                            $data = array_merge($data, $extra_mail_content);
+                        }
+                    }
                 }
             }
 

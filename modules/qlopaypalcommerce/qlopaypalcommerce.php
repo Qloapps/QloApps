@@ -92,7 +92,7 @@ class QloPaypalCommerce extends PaymentModule
 
         parent::__construct();
 
-        $this->payment_type = PaymentModule::PAYMENT_TYPE_ONLINE;
+        $this->payment_type = OrderPayment::PAYMENT_TYPE_ONLINE;
     }
 
     public function getContent()
