@@ -99,11 +99,15 @@ class CategoryControllerCore extends FrontController
         $dateFrom = Tools::getValue('date_from');
         $dateTo = Tools::getValue('date_to');
 
-        if ($dateFrom != '' && !Validate::isDate($dateFrom)) {
+        $currentTimestamp = strtotime(date('Y-m-d'));
+        $dateFromTimestamp = strtotime($dateFrom);
+        $dateToTimestamp = strtotime($dateTo);
+
+        if ($dateFrom != '' && ($dateFromTimestamp === false || ($dateFromTimestamp < $currentTimestamp))) {
             Tools::redirect($this->context->link->getPageLink('pagenotfound'));
         }
 
-        if ($dateTo != '' && !Validate::isDate($dateTo)) {
+        if ($dateTo != '' && ($dateToTimestamp === false || ($dateToTimestamp < $currentTimestamp))) {
             Tools::redirect($this->context->link->getPageLink('pagenotfound'));
         }
 
