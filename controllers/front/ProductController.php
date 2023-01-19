@@ -96,11 +96,11 @@ class ProductControllerCore extends FrontController
         $dateFromTimestamp = strtotime($dateFrom);
         $dateToTimestamp = strtotime($dateTo);
 
-        if ($dateFrom != '' && (!$dateFromTimestamp || ($dateFromTimestamp < $currentTimestamp))) {
+        if ($dateFrom != '' && ($dateFromTimestamp === false || ($dateFromTimestamp < $currentTimestamp))) {
             Tools::redirect($this->context->link->getPageLink('pagenotfound'));
         }
 
-        if ($dateTo != '' && (!$dateToTimestamp || ($dateToTimestamp < $currentTimestamp))) {
+        if ($dateTo != '' && ($dateToTimestamp === false || ($dateToTimestamp < $currentTimestamp))) {
             Tools::redirect($this->context->link->getPageLink('pagenotfound'));
         }
 
