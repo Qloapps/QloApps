@@ -11,6 +11,7 @@
 					width:218px !important;
 					margin:auto !important;
 				}
+				thead, tbody{width: 100%}
 				.table {width:195px !important;margin:auto !important;}
 				.logo, .titleblock, .linkbelow, .box, .footer, .space_footer{width:auto !important;display: block !important;}
 				span.title{font-size:20px !important;line-height: 23px !important}
@@ -25,24 +26,25 @@
 				.space_address{display: none !important;}
 			}
 	@media only screen and (min-width: 301px) and (max-width: 500px) {
-				body {width:308px!important;margin:auto!important;}
-				.table {width:285px!important;margin:auto!important;}
+				body {width:425px!important;margin:auto!important;}
+				thead, tbody{width: 100%}
+				.table {margin:auto!important;}
 				.logo, .titleblock, .linkbelow, .box, .footer, .space_footer{width:auto!important;display: block!important;}
-				.table-recap table, .table-recap thead, .table-recap tbody, .table-recap th, .table-recap td, .table-recap tr {
-					display: block !important;
-				}
 				.table-recap{width: 295px !important;}
 				.table-recap tr td, .conf_body td{text-align:center !important;}
+				.table-recap tr th{font-size: 10px !important}
 
 			}
 	@media only screen and (min-width: 501px) and (max-width: 768px) {
 				body {width:478px!important;margin:auto!important;}
-				.table {width:450px!important;margin:auto!important;}
+				thead, tbody{width: 100%}
+				.table {margin:auto!important;}
 				.logo, .titleblock, .linkbelow, .box, .footer, .space_footer{width:auto!important;display: block!important;}
 			}
 	@media only screen and (max-device-width: 480px) {
-				body {width:308px!important;margin:auto!important;}
-				.table {width:285px;margin:auto!important;}
+				body {width:340px!important;margin:auto!important;}
+				thead, tbody{width: 100%}
+				.table {margin:auto!important;}
 				.logo, .titleblock, .linkbelow, .box, .footer, .space_footer{width:auto!important;display: block!important;}
 
 				.table-recap{width: 295px!important;}
@@ -70,7 +72,7 @@
 <tr>
 	<td align="center" class="titleblock" style="padding:7px 0">
 		<font size="2" face="Open-sans, sans-serif" color="#555454">
-			<span class="title" style="font-weight:500;font-size:28px;text-transform:uppercase;line-height:33px">Hi {firstname} {lastname},</span>
+			<span class="title" style="font-weight:500;font-size:28px;text-transform:capitalize;line-height:33px">Hi {firstname} {lastname},</span><br/>
 		</font>
 	</td>
 </tr>
@@ -106,7 +108,7 @@
 						</tr>
 						<tr>
 							<td class="footer" style="border-top:4px solid #333333;padding:7px 0">
-								<span><a href="{shop_url}" style="color:#337ff1">{shop_name}</a> powered by <a href="http://www.webkul.com/" style="color:#337ff1">Webkul&trade;</a></span>
+								<span><a href="{shop_url}" style="color:#337ff1">{shop_name}</a> powered by <a href="https://webkul.com" style="color:#337ff1">Webkul&trade;</a></span>
 							</td>
 						</tr>
 					</table>

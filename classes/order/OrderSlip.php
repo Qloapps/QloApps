@@ -580,7 +580,7 @@ class OrderSlipCore extends ObjectModel
 
         $context = Context::getContext();
         $objCartRule = new CartRule();
-        $idsLanguage = Language::getIDs();
+        $languages = Language::getLanguages();
 
         $creditSlipPrefix = Configuration::get('PS_CREDIT_SLIP_PREFIX', $context->language->id);
         $creditSlipID = sprintf(('%1$s%2$06d'), $creditSlipPrefix, (int) $this->id_order_slip);
@@ -588,8 +588,8 @@ class OrderSlipCore extends ObjectModel
         $dateFrom = $this->date_add;
         $dateTo = date('Y-m-d H:i:s', strtotime($dateFrom) + (3600 * 24 * 365.25)); /* 1 year */
 
-        foreach ($idsLanguage as $idLang) {
-            $objCartRule->name[$idLang] = sprintf('Voucher for credit slip #%s', $creditSlipID);
+        foreach ($languages as $language) {
+            $objCartRule->name[$language['id_lang']] = sprintf('Voucher for credit slip #%s', $creditSlipID);
         }
 
         $objCartRule->description = sprintf('Order: #%s', $objOrder->id);

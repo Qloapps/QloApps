@@ -13,4 +13,4 @@ To use this voucher just copy and paste this code during payment process for you
 order.
 
 {shop_name} [/{shop_url}] powered by Webkul(tm)
-[http://www.webkul.com/]
+[https://www.webkul.com/]
