@@ -73,7 +73,7 @@
 	<td align="center" class="titleblock" style="padding:7px 0">
 		<font size="2" face="Open-sans, sans-serif" color="#555454">
 			<span class="title" style="font-weight:500;font-size:28px;text-transform:capitalize;line-height:33px">Hi {firstname} {lastname},</span><br/>
-			<span class="subtitle" style="font-weight:500;font-size:16px;line-height:25px">A request has been recieved for the booking cancellation.</span>
+			<span class="subtitle" style="font-weight:500;font-size:16px;line-height:25px">A request has been generated for booking cancellations.</span>
 		</font>
 	</td>
 </tr>
@@ -92,6 +92,7 @@
 						<span style="color:#777">
 							<span style="color:#333"><strong>Order:</strong></span> {order_reference} Placed on {order_date}<br /><br />
 							<span style="color:#333"><strong>Refund Status:</strong></span> <span style="border-radius: 2px;color:#FFFFFF;font-weight:600;padding:5px 10px;background-color:{status_color}">{status_name}</span><br /><br />
+							<span style="color:#333"><strong>Cancelation Reason:</strong></span> {cancelation_reason}<br /><br />
 						</span>
 					</font>
 				</td>
@@ -103,7 +104,7 @@
 <tr>
 	<td style="padding:7px 0">
 		<font size="2" face="Open-sans, sans-serif" color="#555454">
-			<p data-html-only="1" style="margin:10px 0 7px;text-transform:uppercase;font-weight:500;font-size:16px;padding-bottom:0px">Booking details</p>
+			<p data-html-only="1" style="margin:10px 0 7px;text-transform:uppercase;font-weight:500;font-size:16px;padding-bottom:0px">Requested Booking Cancellations</p>
 			<table class="table table-recap" bgcolor="#ffffff" style="width:100%;border-collapse:collapse"><!-- Title -->
 				<tr>
 					<tr>
