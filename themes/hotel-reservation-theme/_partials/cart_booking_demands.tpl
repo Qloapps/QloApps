@@ -5,7 +5,8 @@
 			<div class="row accordion-section">
 				<div class="col-sm-12 demand_header">
 					<a class="accordion-section-title {if $roomCount == 1}active{/if}" href="#accordion_{$key|escape:'html':'UTF-8'}">
-						{l s='Room'} {$roomCount|escape:'html':'UTF-8'}
+						{l s='Room'} {$roomCount|escape:'html':'UTF-8'}&nbsp;
+						<span>({if {$roomDemand['adults']} <= 9}0{$roomDemand['adults']}{else}{$roomDemand['adults']}{/if} {if $roomDemand['adults'] > 1}{l s='Adults'}{else}{l s='Adult'}{/if}, {if {$roomDemand['children']} <= 9}0{$roomDemand['children']}{else}{$roomDemand['children']}{/if} {if $roomDemand['children'] > 1}{l s='Children'}{else}{l s='Child'}{/if})</span>
 					</a>
 				</div>
 				<div id="accordion_{$key|escape:'html':'UTF-8'}" class="accordion-section-content {if $roomCount == 1}open{/if}" {if $roomCount == 1}style="display: block;"{/if}>

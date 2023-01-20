@@ -187,13 +187,13 @@
 											{$product->description}
 										</div>
 									</div>
-									{if isset($product->capacity['adult']) && isset($product->capacity['children']) }
+									{if isset($product->capacity['adults']) && isset($product->capacity['children']) }
 										<div class="info_margin_div">
 											<div class="room_info_heading">
 												<span>{l s='Max Capacity'}</span>
 											</div>
 											<div class="room_info_content">
-												<p> {$product->capacity['adult']} {l s='Adults'}, {$product->capacity['children']} {l s='child'}</p>
+												<p> {$product->capacity['adults']} {l s='Adults'}, {$product->capacity['children']} {l s='child'}</p>
 											</div>
 										</div>
 									{/if}

@@ -321,8 +321,6 @@ class OrderDetailControllerCore extends FrontController
                             $rm_dtl = $objRoomType->getRoomTypeInfoByIdProduct($type_value['product_id']);
                             $cartHotelData[$type_key]['id_product'] = $type_value['product_id'];
                             $cartHotelData[$type_key]['cover_img'] = $cover_img;
-                            $cartHotelData[$type_key]['adult'] = $rm_dtl['adult'];
-                            $cartHotelData[$type_key]['children'] = $rm_dtl['children'];
 
                             $objBookingDemand = new HotelBookingDemands();
                             foreach ($order_bk_data as $data_k => $data_v) {
@@ -338,6 +336,9 @@ class OrderDetailControllerCore extends FrontController
                                     $cartHotelData[$type_key]['date_diff'][$date_join]['num_rm'] += 1;
 
                                     $num_days = $cartHotelData[$type_key]['date_diff'][$date_join]['num_days'];
+
+                                    $cartHotelData[$type_key]['date_diff'][$date_join]['adults'] += $data_v['adults'];
+                                    $cartHotelData[$type_key]['date_diff'][$date_join]['children'] += $data_v['children'];
 
                                     $cartHotelData[$type_key]['date_diff'][$date_join]['paid_unit_price_tax_excl'] = $data_v['total_price_tax_excl']/$num_days;
                                     $cartHotelData[$type_key]['date_diff'][$date_join]['paid_unit_price_tax_incl'] = $data_v['total_price_tax_incl']/$num_days;
@@ -355,6 +356,8 @@ class OrderDetailControllerCore extends FrontController
                                     $cartHotelData[$type_key]['date_diff'][$date_join]['data_form'] = $data_v['date_from'];
                                     $cartHotelData[$type_key]['date_diff'][$date_join]['data_to'] = $data_v['date_to'];
                                     $cartHotelData[$type_key]['date_diff'][$date_join]['num_days'] = $num_days;
+                                    $cartHotelData[$type_key]['date_diff'][$date_join]['adults'] = $data_v['adults'];
+                                    $cartHotelData[$type_key]['date_diff'][$date_join]['children'] = $data_v['children'];
 
                                     $cartHotelData[$type_key]['date_diff'][$date_join]['paid_unit_price_tax_excl'] = $data_v['total_price_tax_excl']/$num_days;
                                     $cartHotelData[$type_key]['date_diff'][$date_join]['paid_unit_price_tax_incl'] = $data_v['total_price_tax_incl']/$num_days;
@@ -428,7 +431,6 @@ class OrderDetailControllerCore extends FrontController
 
                         $redirectTermsLink = $this->context->link->getCMSLink(new CMS(3, $this->context->language->id), null, $this->context->language->id);
                     }
-
                     $this->context->smarty->assign(
                         array(
                             'id_cms_refund_policy' => Configuration::get('WK_GLOBAL_REFUND_POLICY_CMS'),

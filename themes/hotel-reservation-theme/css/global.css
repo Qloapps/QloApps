@@ -6518,6 +6518,30 @@ table.table_block td {
       margin-bottom: 0;
       width: auto; }
 
+/* input backgrounds */
+.input-occupancy, .form-control .input-occupancy {
+  background: url("../img/icon/icon-users.svg") no-repeat 8px 50%, url("../img/icon/icon-dropdown-arrow.svg") no-repeat calc(100% - 8px) 50%;
+  padding-left: 35px;
+  padding-right: 20px;
+  background-color: #FFF;
+}
+.input-date, .form-control .input-date {
+  background: url("../img/icon/icon-calendar.svg") no-repeat 10px 50%, url("../img/icon/icon-dropdown-arrow.svg") no-repeat calc(100% - 8px) 50%;
+  padding-left: 35px;
+  padding-right: 20px;
+  background-color: #FFF;}
+  .input-date span i, .form-control .input-date span i {
+    transform: scale(0.8, 0.6);}
+
+.input-hotel, .form-control .input-hotel, .input-location, .form-control .input-location {
+  background: url("../img/icon/icon-hotel.svg") no-repeat 10px 50%;
+  padding-left: 35px;
+  background-color: #FFF;
+}
+.input-occupancy, .form-control .input-occupancy {
+  text-align: left;
+}
+
 .page-product-box {
   padding-bottom: 10px; }
 
@@ -7222,6 +7246,9 @@ div.star a:hover {
   display: block;
   padding: 5px 0;
   color: #333; }
+
+#page {
+  position: relative; }
 
 .header-container {
   background: #fff; }

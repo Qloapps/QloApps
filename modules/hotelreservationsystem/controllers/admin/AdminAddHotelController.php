@@ -216,6 +216,7 @@ class AdminAddHotelController extends ModuleAdminController
         $longitude = Tools::getValue('loclongitude');
         $map_formated_address = Tools::getValue('locformatedAddr');
         $map_input_text = Tools::getValue('googleInputField');
+
         // check if field is atleast in default language. Not available in default prestashop
         $defaultLangId = Configuration::get('PS_LANG_DEFAULT');
         $objDefaultLanguage = Language::getLanguage((int) $defaultLangId);

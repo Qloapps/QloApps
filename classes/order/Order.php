@@ -191,6 +191,11 @@ class OrderCore extends ObjectModel
     public $advance_paid_amount;
 
     /**
+    * @var int is occupancy provided in this order
+    */
+    public $with_occupancy;
+
+    /**
      * @see ObjectModel::$definition
      */
     public static $definition = array(
@@ -242,8 +247,9 @@ class OrderCore extends ObjectModel
             'source' =>                        array('type' => self::TYPE_STRING),
             'valid' =>                        array('type' => self::TYPE_BOOL),
             'reference' =>                    array('type' => self::TYPE_STRING),
-            'is_advance_payment' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'default' => 0),
-            'advance_paid_amount' => array('type' => self::TYPE_FLOAT, 'validate' => 'isPrice'),
+            'is_advance_payment' =>         array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'default' => 0),
+            'advance_paid_amount' =>        array('type' => self::TYPE_FLOAT, 'validate' => 'isPrice'),
+            'with_occupancy' =>      array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'default' => 0),
             'date_add' =>                    array('type' => self::TYPE_DATE, 'validate' => 'isDate'),
             'date_upd' =>                    array('type' => self::TYPE_DATE, 'validate' => 'isDate'),
         ),

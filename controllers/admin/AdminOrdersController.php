@@ -219,6 +219,11 @@ class AdminOrdersControllerCore extends AdminController
                 $cart_detail_data = array();
                 $cart_detail_data_obj = new HotelCartBookingData();
                 if ($cart_detail_data = $cart_detail_data_obj->getCartFormatedBookinInfoByIdCart((int) $id_cart)) {
+                    $objRoomType = new HotelRoomType();
+                    foreach ($cart_detail_data as $key => $cart_data) {
+
+                        $cart_detail_data[$key]['room_type_info'] = $objRoomType->getRoomTypeInfoByIdProduct($cart_data['id_product']);
+                    }
                     $this->context->smarty->assign('cart_detail_data', $cart_detail_data);
                 } else {
                     // if no rooms added in the cart and user visits add order page then redirect to BOOK NOW page
@@ -241,6 +246,11 @@ class AdminOrdersControllerCore extends AdminController
             $payment_modules[] = Module::getInstanceById((int)$p_module['id_module']);
         }
 
+        $occupancyRequiredForBooking = false;
+        if (Configuration::get('PS_BACKOFFICE_ROOM_BOOKING_TYPE') == HotelBookingDetail::PS_FRONT_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY) {
+            $occupancyRequiredForBooking = true;
+        }
+
         $this->context->smarty->assign(array(
             'recyclable_pack' => (int)Configuration::get('PS_RECYCLABLE_PACK'),
             'gift_wrapping' => (int)Configuration::get('PS_GIFT_WRAPPING'),
@@ -254,8 +264,10 @@ class AdminOrdersControllerCore extends AdminController
             'toolbar_btn' => $this->toolbar_btn,
             'toolbar_scroll' => $this->toolbar_scroll,
             'PS_CATALOG_MODE' => Configuration::get('PS_CATALOG_MODE'),
-            'title' => array($this->l('Orders'), $this->l('Create order'))
-
+            'title' => array($this->l('Orders'), $this->l('Create order')),
+            'max_child_in_room' => Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM'),
+            'max_child_age' => Configuration::get('WK_GLOBAL_CHILD_MAX_AGE'),
+            'occupancy_required_for_booking' => $occupancyRequiredForBooking,
         ));
         $this->content .= $this->createTemplate('form.tpl')->fetch();
     }
@@ -455,8 +467,8 @@ class AdminOrdersControllerCore extends AdminController
                 }
 
                 if (!count($this->errors)) {
-                    $obj_booking_dtl = new HotelBookingDetail();
-                    $room_swapped = $obj_booking_dtl->reallocateRoomWithAvailableSameRoomType($current_room_id, $date_from, $date_to, $realloc_room_id);
+                    $objBookingDetail = new HotelBookingDetail();
+                    $room_swapped = $objBookingDetail->reallocateRoomWithAvailableSameRoomType($current_room_id, $date_from, $date_to, $realloc_room_id);
                     if (!$room_swapped) {
                         $this->errors[] = Tools::displayError('Some error occured. Please try again.');
                     } else {
@@ -490,8 +502,8 @@ class AdminOrdersControllerCore extends AdminController
                 }
 
                 if (!count($this->errors)) {
-                    $obj_booking_dtl = new HotelBookingDetail();
-                    $room_swapped = $obj_booking_dtl->swapRoomWithAvailableSameRoomType($current_room_id, $date_from, $date_to, $swapped_room_id);
+                    $objBookingDetail = new HotelBookingDetail();
+                    $room_swapped = $objBookingDetail->swapRoomWithAvailableSameRoomType($current_room_id, $date_from, $date_to, $swapped_room_id);
                     if (!$room_swapped) {
                         $this->errors[] = Tools::displayError('Some error occured. Please try again.');
                     } else {
@@ -1450,6 +1462,7 @@ class AdminOrdersControllerCore extends AdminController
         $totalDemandsPriceTI = 0;
         if ($order_detail_data = $objBookingDetail->getOrderFormatedBookinInfoByIdOrder($order->id)) {
             $objBookingDemand = new HotelBookingDemands();
+            $objHotelRoomType = new HotelRoomType();
             foreach ($order_detail_data as $key => $value) {
                 $order_detail_data[$key]['extra_demands'] = $objBookingDemand->getRoomTypeBookingExtraDemands(
                     $order->id,
@@ -1503,6 +1516,8 @@ class AdminOrdersControllerCore extends AdminController
                 $order_detail_data[$key]['unit_amt_tax_incl'] = $value['total_price_tax_incl']/$num_days;
                 $order_detail_data[$key]['amt_with_qty_tax_excl'] = $value['total_price_tax_excl'];
                 $order_detail_data[$key]['amt_with_qty_tax_incl'] = $value['total_price_tax_incl'];
+                $order_detail_data[$key]['room_type_info'] = $objHotelRoomType->getRoomTypeInfoByIdProduct($value['id_product']);
+
             }
         }
 
@@ -1518,7 +1533,6 @@ class AdminOrdersControllerCore extends AdminController
 
         // hotel booking statuses
         $htlOrderStatus = HotelBookingDetail::getAllHotelOrderStatus();
-
         $this->tpl_view_vars = array(
             // refund info
             'refund_allowed' => (int) $order->isReturnable(),
@@ -1534,6 +1548,8 @@ class AdminOrdersControllerCore extends AdminController
             'htl_booking_order_data' => $bookingOrderInfo,
             'hotel_order_status' => $htlOrderStatus,
             'order_detail_data' => $order_detail_data,
+            'max_child_in_room' => Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM'),
+            'max_child_age' => Configuration::get('WK_GLOBAL_CHILD_MAX_AGE'),
             /*END*/
             'order' => $order,
             'cart' => new Cart($order->id_cart),
@@ -1668,7 +1684,13 @@ class AdminOrdersControllerCore extends AdminController
             }
 
             if ($products = Product::searchByName((int)$this->context->language->id, pSQL(Tools::getValue('product_search')), null, $idHotel)) {
+                $objRoomType = new HotelRoomType();
                 foreach ($products as &$product) {
+                        // get product room type informatin
+                    if ($roomTypeDetail = $objRoomType->getRoomTypeInfoByIdProduct($product['id_product'])) {
+                        $product['room_type_info'] = $roomTypeDetail;
+                    }
+
                     // Formatted price
                     $product['formatted_price'] = Tools::displayPrice(Tools::convertPrice($product['price_tax_incl'], $currency), $currency);
                     // Concret price
@@ -1801,6 +1823,7 @@ class AdminOrdersControllerCore extends AdminController
         $date_from = date('Y-m-d', strtotime($product_informations['date_from']));
         $date_to = date('Y-m-d', strtotime($product_informations['date_to']));
         $curr_date = date('Y-m-d');
+        $occupancy = Tools::getValue('occupancy');
         /*Validations*/
         if ($date_from == '') {
             die(json_encode(array(
@@ -1832,6 +1855,45 @@ class AdminOrdersControllerCore extends AdminController
                 'result' => false,
                 'error' => Tools::displayError('Check out Date Should be after Check In date.'),
             )));
+        }
+        if ($order->with_occupancy) {
+            if ($occupancy) {
+                foreach($occupancy as $key =>$roomOccupancy) {
+                    if (!$roomOccupancy['adults'] || !Validate::isUnsignedInt($roomOccupancy['adults'])) {
+                        die(json_encode(array(
+                            'result' => false,
+                            'error' => sprintf(Tools::displayError('Invalid number of adults for Room %s.'), ($key + 1)),
+                        )));
+                    } elseif (!Validate::isUnsignedInt($roomOccupancy['children'])) {
+                        die(json_encode(array(
+                            'result' => false,
+                            'error' => sprintf(Tools::displayError('Invalid number of children for Room %s.'), ($key + 1)),
+                        )));
+                    }
+                    if ($roomOccupancy['children'] > 0) {
+                        if (!isset($roomOccupancy['child_ages']) || ($roomOccupancy['children'] != count($roomOccupancy['child_ages']))) {
+                            die(json_encode(array(
+                                'result' => false,
+                            'error' => sprintf(Tools::displayError('Please provide all children age for Room %s.'), ($key + 1)),
+                            )));
+                        } else {
+                            foreach($roomOccupancy['child_ages'] as $childAge) {
+                                if (!Validate::isUnsignedInt($childAge)) {
+                                    die(json_encode(array(
+                                        'result' => false,
+                                        'error' => sprintf(Tools::displayError('Invalid children age for Room %s.'), ($key + 1)),
+                                    )));
+                                }
+                            }
+                        }
+                    }
+                }
+            } else {
+                die(json_encode(array(
+                    'result' => false,
+                    'error' => Tools::displayError('Invalid occupancy.'),
+                )));
+            }
         } elseif (!Validate::isUnsignedInt($product_informations['product_quantity'])) {
             die(json_encode(array(
                 'result' => false,
@@ -1839,8 +1901,13 @@ class AdminOrdersControllerCore extends AdminController
             )));
         }
 
+
+        if ($order->with_occupancy) {
+            $req_rm = count($occupancy);
+        } else {
+            $req_rm = $product_informations['product_quantity'];
+        }
         $obj_booking_detail = new HotelBookingDetail();
-        $req_rm = $product_informations['product_quantity'];
         $num_days = $obj_booking_detail->getNumberOfDays($date_from, $date_to);
         $product_informations['product_quantity'] = $product_informations['product_quantity'] * (int) $num_days;
 
@@ -1851,9 +1918,17 @@ class AdminOrdersControllerCore extends AdminController
             $id_hotel = $room_info_by_id_product['id_hotel'];
 
             if ($id_hotel) {
-                $obj_booking_dtl = new HotelBookingDetail();
-                $hotel_room_data = $obj_booking_dtl->DataForFrontSearch($date_from, $date_to, $id_hotel, $product_informations['product_id'], 1, 0, 0, -1, 0, 0, $id_cart, $id_guest);
-
+                $objBookingDetail = new HotelBookingDetail();
+                $bookingParams = array(
+                    'date_from' => $date_from,
+                    'date_to' => $date_to,
+                    'hotel_id' => $id_hotel,
+                    'id_room_type' => $product_informations['product_id'],
+                    'only_search_data' => 1,
+                    'id_cart' => $id_cart,
+                    'id_guest' => $id_guest,
+                );
+                $hotel_room_data = $objBookingDetail->dataForFrontSearch($bookingParams);
                 $total_available_rooms = $hotel_room_data['stats']['num_avail'];
 
                 if ($total_available_rooms < $req_rm) {
@@ -1924,54 +1999,40 @@ class AdminOrdersControllerCore extends AdminController
         $this->context->cart = $cart;
         $this->context->customer = new Customer($order->id_customer);
 
-        // always add taxes even if there are not displayed to the customer
-        $use_taxes = true;
-        $initial_product_price_tax_incl = Product::getPriceStatic(
-            $product->id,
-            $use_taxes,
-            isset($combination) ? $combination->id : null,
-            2,
-            null,
-            false,
-            true,
-            1,
-            false,
-            $order->id_customer,
-            $cart->id,
-            $order->{Configuration::get('PS_TAX_ADDRESS_TYPE', null, null, $order->id_shop)}
-        );
-
-        // create feature price if needed
-        $createFeaturePrice = $product_informations['product_price_tax_incl'] != $initial_product_price_tax_incl;
-        $featurePriceParams = array();
-        if ($createFeaturePrice) {
-            $featurePriceParams = array(
-                'id_cart' => $this->context->cart->id,
-                'id_guest' => $this->context->cookie->id_guest,
-                'price' => $product_informations['product_price_tax_excl'],
-                'id_product' => $product->id,
-            );
+        if ($order->with_occupancy) {
+            $objRoomType = new HotelRoomType();
+            $roomTypeInfo = $objRoomType->getRoomTypeInfoByIdProduct($id_product);
         }
-
         /*By Webkul to make entries in HotelCartBookingData */
-        $hotel_room_info_arr = $hotel_room_data['rm_data'][0]['data']['available'];
+        $hotel_room_info_arr = $hotel_room_data['rm_data'][$idProduct]['data']['available'];
         $chkQty = 0;
         if ($hotel_room_info_arr) {
-            foreach ($hotel_room_info_arr as $room_info) {
+            foreach ($hotel_room_info_arr as $key => $room_info) {
                 if ($chkQty < $req_rm) {
-                    $obj_htl_cart_booking_data = new HotelCartBookingData();
-                    $obj_htl_cart_booking_data->id_cart = $this->context->cart->id;
-                    $obj_htl_cart_booking_data->id_guest = $this->context->cookie->id_guest;
-                    $obj_htl_cart_booking_data->id_customer = $this->context->customer->id;
-                    $obj_htl_cart_booking_data->id_currency = $order->id_currency;
-                    $obj_htl_cart_booking_data->id_product = $room_info['id_product'];
-                    $obj_htl_cart_booking_data->id_room = $room_info['id_room'];
-                    $obj_htl_cart_booking_data->id_hotel = $room_info['id_hotel'];
-                    $obj_htl_cart_booking_data->booking_type = HotelBookingDetail::ALLOTMENT_AUTO;
-                    $obj_htl_cart_booking_data->quantity = $num_days;
-                    $obj_htl_cart_booking_data->date_from = $date_from;
-                    $obj_htl_cart_booking_data->date_to = $date_to;
-                    $obj_htl_cart_booking_data->save();
+                    $objCartBookingData = new HotelCartBookingData();
+                    $objCartBookingData->id_cart = $this->context->cart->id;
+                    $objCartBookingData->id_guest = $this->context->cookie->id_guest;
+                    $objCartBookingData->id_customer = $this->context->customer->id;
+                    $objCartBookingData->id_currency = $order->id_currency;
+                    $objCartBookingData->id_product = $room_info['id_product'];
+                    $objCartBookingData->id_room = $room_info['id_room'];
+                    $objCartBookingData->id_hotel = $room_info['id_hotel'];
+                    $objCartBookingData->booking_type = HotelBookingDetail::ALLOTMENT_AUTO;
+                    $objCartBookingData->quantity = $num_days;
+                    $objCartBookingData->date_from = $date_from;
+                    $objCartBookingData->date_to = $date_to;
+
+                    if ($order->with_occupancy) {
+                        $room_occupancy = array_shift($occupancy);
+                        $objCartBookingData->adults = $room_occupancy['adults'];
+                        $objCartBookingData->children = $room_occupancy['children'];
+                        $objCartBookingData->child_ages = $room_occupancy['children'] ? json_encode($room_occupancy['child_ages']) : json_encode(array());
+                    } else {
+                        $objCartBookingData->adults = $roomTypeInfo['adults'];
+                        $objCartBookingData->children = $roomTypeInfo['children'];
+                        $objCartBookingData->child_ages = json_encode(array());
+                    }
+                    $objCartBookingData->save();
                     ++$chkQty;
 
                     // create feature price if needed
@@ -1986,10 +2047,52 @@ class AdminOrdersControllerCore extends AdminController
             }
         }
         /*END*/
+        // always add taxes even if there are not displayed to the customer
+        $use_taxes = true;
+
+        $initial_product_price_tax_incl = Product::getPriceStatic(
+            $product->id,
+            $use_taxes,
+            isset($combination) ? $combination->id : null,
+            2,
+            null,
+            false,
+            true,
+            1,
+            false,
+            $order->id_customer,
+            $cart->id,
+            $order->id_address_tax
+        );
+
+        // Creating specific price if needed
+        if ($product_informations['product_price_tax_incl'] != $initial_product_price_tax_incl) {
+            $specific_price = new SpecificPrice();
+            $specific_price->id_shop = 0;
+            $specific_price->id_shop_group = 0;
+            $specific_price->id_currency = 0;
+            $specific_price->id_country = 0;
+            $specific_price->id_group = 0;
+            $specific_price->id_customer = $order->id_customer;
+            $specific_price->id_product = $product->id;
+            if (isset($combination)) {
+                $specific_price->id_product_attribute = $combination->id;
+            } else {
+                $specific_price->id_product_attribute = 0;
+            }
+            $specific_price->price = $product_informations['product_price_tax_excl'];
+            $specific_price->from_quantity = 1;
+            $specific_price->reduction = 0;
+            $specific_price->reduction_type = 'amount';
+            $specific_price->reduction_tax = 0;
+            $specific_price->from = '0000-00-00 00:00:00';
+            $specific_price->to = '0000-00-00 00:00:00';
+            $specific_price->add();
+        }
 
         // Add product to cart
         $update_quantity = $cart->updateQty(
-            $product_informations['product_quantity'],
+            ($req_rm * $num_days),
             $product->id,
             isset($product_informations['product_attribute_id']) ? $product_informations['product_attribute_id'] : null,
             isset($combination) ? $combination->id : null,
@@ -2216,76 +2319,79 @@ class AdminOrdersControllerCore extends AdminController
 
         /*By Webkul Entry into table HotelbookingDetail*/
         $objRoomType = new HotelRoomType();
-        $objHtlBkDtl = new HotelBookingDetail();
-        $inserted_id_order_detail = $objHtlBkDtl->getLastInsertedIdOrderDetail($order->id);
+        $objBookingDetail = new HotelBookingDetail();
+        $inserted_id_order_detail = $objBookingDetail->getLastInsertedIdOrderDetail($order->id);
         $idLang = (int)$this->context->cart->id_lang;
-        $obj_cart_bk_data = new HotelCartBookingData();
-        if ($cart_bk_data = $obj_cart_bk_data->getOnlyCartBookingData(
+        $objCartBookingData = new HotelCartBookingData();
+        if ($cartBookingData = $objCartBookingData->getOnlyCartBookingData(
             $this->context->cart->id,
             $this->context->cart->id_guest,
             $idProduct
         )) {
-            foreach ($cart_bk_data as $cb_k => $cb_v) {
-                $obj_cart_bk_data = new HotelCartBookingData($cb_v['id']);
-                $obj_cart_bk_data->id_order = $order->id;
-                $obj_cart_bk_data->save();
+            foreach ($cartBookingData as $cb_k => $cb_v) {
+                $objCartBookingData = new HotelCartBookingData($cb_v['id']);
+                $objCartBookingData->id_order = $order->id;
+                $objCartBookingData->save();
 
-                $objHtlBkDtl = new HotelBookingDetail();
-                $objHtlBkDtl->id_product = $idProduct;
-                $objHtlBkDtl->id_order = $order->id;
-                $objHtlBkDtl->id_order_detail = $inserted_id_order_detail;
-                $objHtlBkDtl->id_cart = $this->context->cart->id;
-                $objHtlBkDtl->id_room = $obj_cart_bk_data->id_room;
-                $objHtlBkDtl->id_hotel = $obj_cart_bk_data->id_hotel;
-                $objHtlBkDtl->id_customer = $this->context->customer->id;
-                $objHtlBkDtl->booking_type = $obj_cart_bk_data->booking_type;
-                $objHtlBkDtl->id_status = 1;
-                $objHtlBkDtl->comment = $obj_cart_bk_data->comment;
-                $objHtlBkDtl->room_type_name = Product::getProductName($idProduct, null, $order->id_lang);
+                $objBookingDetail = new HotelBookingDetail();
+                $objBookingDetail->id_product = $idProduct;
+                $objBookingDetail->id_order = $order->id;
+                $objBookingDetail->id_order_detail = $inserted_id_order_detail;
+                $objBookingDetail->id_cart = $this->context->cart->id;
+                $objBookingDetail->id_room = $objCartBookingData->id_room;
+                $objBookingDetail->id_hotel = $objCartBookingData->id_hotel;
+                $objBookingDetail->id_customer = $this->context->customer->id;
+                $objBookingDetail->booking_type = $objCartBookingData->booking_type;
+                $objBookingDetail->id_status = 1;
+                $objBookingDetail->comment = $objCartBookingData->comment;
+                $objBookingDetail->room_type_name = Product::getProductName($idProduct, null, $order->id_lang);
 
-                $objHtlBkDtl->date_from = $obj_cart_bk_data->date_from;
-                $objHtlBkDtl->date_to = $obj_cart_bk_data->date_to;
+                $objBookingDetail->date_from = $objCartBookingData->date_from;
+                $objBookingDetail->date_to = $objCartBookingData->date_to;
+                $objBookingDetail->adults = $objCartBookingData->adults;
+                $objBookingDetail->children = $objCartBookingData->children;
+                $objBookingDetail->child_ages = $objCartBookingData->child_ages;
 
                 $total_price = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
                     $idProduct,
-                    $obj_cart_bk_data->date_from,
-                    $obj_cart_bk_data->date_to,
+                    $objCartBookingData->date_from,
+                    $objCartBookingData->date_to,
                     0,
                     Group::getCurrent()->id,
                     $this->context->cart->id,
                     $this->context->cookie->id_guest,
-                    $obj_cart_bk_data->id_room
+                    $objCartBookingData->id_room
                 );
-
-                $objHtlBkDtl->total_price_tax_excl = $total_price['total_price_tax_excl'];
-                $objHtlBkDtl->total_price_tax_incl = $total_price['total_price_tax_incl'];
-                $objHtlBkDtl->total_paid_amount = Tools::ps_round($total_price['total_price_tax_incl'], 5);
+                $objBookingDetail->total_price_tax_excl = $total_price['total_price_tax_excl'];
+                $objBookingDetail->total_price_tax_incl = $total_price['total_price_tax_incl'];
+                $objBookingDetail->total_paid_amount = Tools::ps_round($total_price['total_price_tax_incl'], 5);
 
                 // Save hotel information/location/contact
-                if (Validate::isLoadedObject($objRoom = new HotelRoomInformation($obj_cart_bk_data->id_room))) {
-                    $objHtlBkDtl->room_num = $objRoom->room_num;
+                if (Validate::isLoadedObject($objRoom = new HotelRoomInformation($objCartBookingData->id_room))) {
+                    $objBookingDetail->room_num = $objRoom->room_num;
                 }
                 if (Validate::isLoadedObject($objHotelBranch = new HotelBranchInformation(
-                    $obj_cart_bk_data->id_hotel,
+                    $objCartBookingData->id_hotel,
                     $idLang
                 ))) {
-                    $addressInfo = $objHotelBranch->getAddress($obj_cart_bk_data->id_hotel);
-                    $objHtlBkDtl->hotel_name = $objHotelBranch->hotel_name;
-                    $objHtlBkDtl->city = $addressInfo['city'];
-                    $objHtlBkDtl->state = State::getNameById($addressInfo['id_state']);
-                    $objHtlBkDtl->country = Country::getNameById($idLang, $addressInfo['id_country']);
-                    $objHtlBkDtl->zipcode = $addressInfo['postcode'];;
-                    $objHtlBkDtl->phone = $addressInfo['phone'];
-                    $objHtlBkDtl->email = $objHotelBranch->email;
-                    $objHtlBkDtl->check_in_time = $objHotelBranch->check_in;
-                    $objHtlBkDtl->check_out_time = $objHotelBranch->check_out;
+                    $addressInfo = $objHotelBranch->getAddress($objCartBookingData->id_hotel);
+                    $objBookingDetail->hotel_name = $objHotelBranch->hotel_name;
+                    $objBookingDetail->city = $addressInfo['city'];
+                    $objBookingDetail->state = State::getNameById($addressInfo['id_state']);
+                    $objBookingDetail->country = Country::getNameById($idLang, $addressInfo['id_country']);
+                    $objBookingDetail->zipcode = $addressInfo['postcode'];;
+                    $objBookingDetail->phone = $addressInfo['phone'];
+                    $objBookingDetail->email = $objHotelBranch->email;
+                    $objBookingDetail->check_in_time = $objHotelBranch->check_in;
+                    $objBookingDetail->check_out_time = $objHotelBranch->check_out;
                 }
                 if ($roomTypeInfo = $objRoomType->getRoomTypeInfoByIdProduct($idProduct)) {
-                    $objHtlBkDtl->adult = $roomTypeInfo['adult'];
-                    $objHtlBkDtl->children = $roomTypeInfo['children'];
+                    $objBookingDetail->adults = $objCartBookingData->adults;
+                    $objBookingDetail->children = $objCartBookingData->children;
+                    $objBookingDetail->child_ages = $objCartBookingData->child_ages;
                 }
 
-                $objHtlBkDtl->save();
+                $objBookingDetail->save();
             }
         }
 
@@ -2396,7 +2502,7 @@ class AdminOrdersControllerCore extends AdminController
         }
 
         /*By webkul To edit Order and cart entries when edit rooms from the orderLine when editing the order*/
-        $product_informations = $_POST['add_product'];
+        $product_informations = $_POST['edit_product'];
         $new_date_from = trim(date('Y-m-d', strtotime($product_informations['date_from'])));
         $new_date_to = trim(date('Y-m-d', strtotime($product_informations['date_to'])));
         $old_date_from = trim(Tools::getValue('date_from'));
@@ -2409,6 +2515,10 @@ class AdminOrdersControllerCore extends AdminController
         $product_quantity = (int) $obj_booking_detail->getNumberOfDays($new_date_from, $new_date_to);
         $old_product_quantity =  (int) $obj_booking_detail->getNumberOfDays($old_date_from, $old_date_to);
         $qty_diff = $product_quantity - $old_product_quantity;
+        $occupancy = array_shift(Tools::getValue('occupancy'));
+        $adults = $occupancy['adults'];
+        $children = $occupancy['children'];
+        $child_ages = $occupancy['child_ages'];
 
         /*By webkul to validate fields before deleting the cart and order data form the tables*/
         if ($id_hotel == '') {
@@ -2466,6 +2576,33 @@ class AdminOrdersControllerCore extends AdminController
                 'result' => false,
                 'error' => Tools::displayError('Invalid quantity.'),
             )));
+        } elseif (!isset($adults) || !$adults || !Validate::isUnsignedInt($adults)) {
+            die(json_encode(array(
+                'result' => false,
+                'error' => Tools::displayError('Invalid number of adults.'),
+            )));
+        } elseif (!Validate::isUnsignedInt($children)) {
+            die(json_encode(array(
+                'result' => false,
+                'error' => Tools::displayError('Invalid number of children.'),
+            )));
+        }
+        if ($children > 0) {
+            if (!isset($child_ages) || ($children != count($child_ages))) {
+                die(json_encode(array(
+                    'result' => false,
+                    'error' => Tools::displayError('Please provide all children age.'),
+                )));
+            } else {
+                foreach($child_ages as $childAge) {
+                    if (!Validate::isUnsignedInt($childAge)) {
+                        die(json_encode(array(
+                            'result' => false,
+                            'error' => Tools::displayError('Invalid children age.'),
+                        )));
+                    }
+                }
+            }
         }
 
         $rooms_booked = $obj_booking_detail->getRoomBookinInformationForDateRangeByOrder($id_room, $old_date_from, $old_date_to, $new_date_from, $new_date_to);
@@ -2694,6 +2831,13 @@ class AdminOrdersControllerCore extends AdminController
             $old_date_to
         );
 
+        // set occupancy details
+        $occupancy = array(
+            'adults' => $adults,
+            'children' => $children,
+            'child_ages' => $child_ages
+        );
+
         /*By webkul to edit the Hotel Cart and Hotel Order tables when editing the room for the order detail page*/
         $new_total_price = array(
             'tax_excl' => $totalRoomPriceAfterTE,
@@ -2706,6 +2850,7 @@ class AdminOrdersControllerCore extends AdminController
             $old_date_to,
             $new_date_from,
             $new_date_to,
+            $occupancy,
             $new_total_price
         )) {
             // update extra demands total prices if dates are changes (price calc method for each day)
