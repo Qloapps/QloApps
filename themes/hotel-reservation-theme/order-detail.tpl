@@ -138,7 +138,7 @@
 			{if !$hasCompletelyRefunded}
 				<a refund_fields_on="0" id="order_refund_request" class="btn btn-default pull-right" href="#" title="{l s='Proceed to refund'}"><span>{l s='Cancel Bookings'}</span></a>
 			{/if}
-		
+
 			{if isset($id_cms_refund_policy) && $id_cms_refund_policy}<a target="_blank" class="btn btn-default pull-right refund_policy_link" href="{$link->getCMSLink($id_cms_refund_policy)|escape:'html':'UTF-8'}">{l s='Refund Policies'}</a>{/if}
 		{/if}
 		{hook h='displayBookingAction' id_order=$order->id}
@@ -158,7 +158,6 @@
 					<th class="cart_product">{l s='Room Image'}</th>
 					<th class="cart_description">{l s='Room Description'}</th>
 					<th>{l s='Hotel Name'}</th>
-					<th>{l s='Room Capacity'}</th>
 					<th class="cart_unit">{l s='Unit Price'}</th>
 					<th>{l s='Rooms'}</th>
 					<th>{l s='Check-in Date'}</th>
@@ -364,11 +363,6 @@
 									{/if}
 								</td>
 								<td>{$data_v['hotel_name']|escape:'html':'UTF-8'}</td>
-								<td>
-									<p class="text-left">
-										{$data_v['adult']|escape:'html':'UTF-8'} {l s='Adults'}, {$data_v['children']|escape:'html':'UTF-8'} {l s='Children'}
-									</p>
-								</td>
 								<td class="cart_unit">
 									<p class="text-center">
 										{if $group_use_tax}
@@ -392,7 +386,11 @@
 										{/if}
 									</p>
 								</td>
-								<td class="text-center">{$rm_v['num_rm']|escape:'html':'UTF-8'}</td>
+								<td class="text-center">
+									<p>
+										{if $rm_v['adults'] <= 9}0{$rm_v['adults']}{else}{$rm_v['adults']}{/if} {if $rm_v['adults'] > 1}{l s='Adults'}{else}{l s='Adult'}{/if}{if $rm_v['children']}, {if $rm_v['children'] <= 9}0{$rm_v['children']}{else} {$rm_v['children']}{/if} {if $rm_v['children'] > 1}{l s='Children'}{else}{l s='Child'}{/if}{/if}<br>{if $rm_v['num_rm'] <= 9}0{/if}{$rm_v['num_rm']} {if $rm_v['num_rm'] > 1}{l s='Rooms'}{else}{l s='Room'}{/if}
+									</p>
+								</td>
 								<td class="text-center">{$rm_v['data_form']|date_format:"%d-%m-%Y"}</td>
 								<td class="text-center">{$rm_v['data_to']|date_format:"%d-%m-%Y"}</td>
 								<td class="cart_total text-left">

@@ -24,7 +24,7 @@
 *}
 <!-- MODULE Block cart -->
 {if isset($blockcart_top) && $blockcart_top}
-<div class="clearfix{if $PS_CATALOG_MODE} header_user_catalog{/if} nav_menu_padding pull-right">
+<div class="header-top-item {if $PS_CATALOG_MODE}header_user_catalog{/if}">
 {/if}
 	<div class="shopping_cart">
 		<a href="{$link->getPageLink($order_process, true)|escape:'html':'UTF-8'}" title="{l s='View my booking cart' mod='blockcart'}" rel="nofollow">
@@ -66,11 +66,6 @@
 											<!-- quantity changed for number of rooms -->
 												<!-- <span class="quantity-formated"><span class="quantity">{$cart_booking_data[$data_k]['total_num_rooms']}</span>&nbsp;x&nbsp;</span> -->
 												<a class="cart_block_product_name" href="{$link->getProductLink($product, $product.link_rewrite, $product.category, null, null, $product.id_shop, $product.id_product_attribute)|escape:'html':'UTF-8'}" title="{$product.name|escape:'html':'UTF-8'}">{$product.name|truncate:30:'...':true|escape:'html':'UTF-8'}</a>
-											</div>
-											<!-- extra fields added by webkul to show on the cart  -->
-											<div class="room-capacity cart-info-sec">
-												<span class="product_info_label">{l s='Capacity' mod='blockcart'}:</span>
-												<span class="product_info_data">&nbsp;{$cart_booking_data[$data_k]['adult']}&nbsp;{l s='Adults' mod='blockcart'}&nbsp;&&nbsp;{$cart_booking_data[$data_k]['children']}&nbsp;{l s='Children' mod='blockcart'}</span>
 											</div>
 
 											{if isset($product.attributes_small)}
@@ -118,7 +113,7 @@
 														{foreach from=$cart_booking_data[$data_k]['date_diff'] key=data_k1 item=data_v}
 															<tr class="rooms_remove_container">
 																<td>
-																	{$data_v['data_form']|date_format:"%d %b %Y"}&nbsp;-&nbsp;{$data_v['data_to']|date_format:"%d %b %Y"}
+																	{$data_v['data_form']|date_format:"%d-%m-%Y"}&nbsp;-&nbsp;{$data_v['data_to']|date_format:"%d-%m-%Y"}
 																</td>
 																<td class="num_rooms_in_date">{$data_v['num_rm']}</td>
 																<td>{convertPrice price=$data_v['amount']}</td>
@@ -211,7 +206,7 @@
 									</span>
 							   </div>
 							{/if} --><!-- commented by webkul unnecessary data -->
-							{if $show_tax && isset($tax_cost)}
+							{if $show_tax && $use_tax}
 								<div class="cart-prices-line">
 									<span class="price cart_block_tax_cost ajax_cart_tax_cost">{$tax_cost}</span>
 									<span>{l s='Tax' mod='blockcart'}</span>
@@ -271,11 +266,11 @@
 						<span id="layer_cart_product_time_duration"></span>
 					</div>
 					<div>
-						<strong class="dark">{l s='Rooms Quantity Added' mod='blockcart'} &nbsp;-&nbsp;</strong>
+						<strong class="dark">{if isset($occupancy_required_for_booking) && $occupancy_required_for_booking}{l s='Room occupancy' mod='blockcart'}{else}{l s='Rooms quantity added' mod='blockcart'}{/if} &nbsp;-&nbsp;</strong>
 						<span id="layer_cart_product_quantity"></span>
 					</div>
 					<div>
-						<strong class="dark">{l s='Total Cart Cost of This Room Type' mod='blockcart'} &nbsp;-&nbsp;</strong>
+						<strong class="dark">{l s='Room type cost' mod='blockcart'} &nbsp;-&nbsp;</strong>
 						<span id="layer_cart_product_price"></span>
 					</div>
 				</div>

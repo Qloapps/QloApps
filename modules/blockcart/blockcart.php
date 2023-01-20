@@ -129,7 +129,7 @@ class Blockcart extends Module
         $wrappingCost = (float) ($params['cart']->getOrderTotal($useTax, Cart::ONLY_WRAPPING));
         $totalToPay = $params['cart']->getOrderTotal($useTax);
         $tax_cost = 0;
-        if ($showTax) {
+        if ($useTax && $showTax) {
             $totalToPayWithoutTaxes = $params['cart']->getOrderTotal(false);
             $tax_cost = Tools::displayPrice($totalToPay - $totalToPayWithoutTaxes, $currency);
         }
@@ -195,6 +195,52 @@ class Blockcart extends Module
             1
         );
 
+        $addedProduct = false;
+        // get currently added product if exists
+        if (!empty($params['cookie']->currentAddedProduct)) {
+            $addedProduct = json_decode($params['cookie']->currentAddedProduct, true);
+            $objProduct = new Product($addedProduct['id_product'], false, $this->context->language->id);
+
+            $addedProduct['name'] = $objProduct->name;
+            $addedProduct['link'] = $this->context->link->getProductLink(
+                $objProduct->id,
+                $objProduct->link_rewrite,
+                $objProduct->category,
+                null,
+                null,
+                $this->context->cart->id_shop
+            );
+            $image = Product::getCover($objProduct->id);
+            $image['id_product'] = $objProduct->id;
+            // Product::defineProductImage(array(Product::getCover($objProduct->id)['id_image']/), $this->id_lang)
+            $addedProduct['image'] = $this->context->link->getImageLink(
+                $objProduct->link_rewrite,
+                Product::defineProductImage($image, $this->context->language->id),
+                'home_default'
+            );
+            $addedProduct['image_cart'] = $this->context->link->getImageLink(
+                $objProduct->link_rewrite,
+                Product::defineProductImage($image, $this->context->language->id),
+                'cart_default'
+            );
+            $price = $addedProduct['price'] = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
+                $objProduct->id,
+                $addedProduct['date_from'],
+                $addedProduct['date_to'],
+                $addedProduct['req_rm']
+            );
+
+            if ($priceDisplayMethod == PS_TAX_EXC) {
+                $addedProduct['price'] = Tools::displayPrice($price['total_price_tax_incl']);
+            } else {
+                $addedProduct['price'] = Tools::displayPrice($price['total_price_tax_excl']);
+            }
+            $addedProduct['date_from'] = Tools::displayDate($addedProduct['date_from']);
+            $addedProduct['date_to'] = Tools::displayDate($addedProduct['date_to']);
+
+            unset($this->context->cookie->currentAddedProduct);
+        }
+
         $response = array(
             'products' => $products,
             'customizedDatas' => Product::getAllCustomizedDatas((int) ($params['cart']->id)),
@@ -206,6 +252,7 @@ class Blockcart extends Module
             'shipping_cost_float' => $shipping_cost_float,
             'show_wrapping' => $wrappingCost > 0 ? true : false,
             'show_tax' => $showTax,
+            'use_tax' => $useTax,
             'tax_cost' => $tax_cost,
             'wrapping_cost' => Tools::displayPrice($wrappingCost, $currency),
             'product_total' => Tools::displayPrice($params['cart']->getOrderTotal($useTax, Cart::ONLY_PRODUCTS), $currency),
@@ -218,7 +265,7 @@ class Blockcart extends Module
             'static_token' => Tools::getToken(false),
             'free_shipping' => Tools::displayPrice($total_free_shipping),
             'free_shipping_float' => $total_free_shipping,
-
+            'last_added_product' => $addedProduct,
             'cart_booking_data' => $htlCartData,
             'total_rooms_in_cart' => $totalRooms,
         );

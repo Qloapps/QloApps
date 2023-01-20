@@ -176,15 +176,16 @@ class CartControllerCore extends FrontController
             $result = $objCartBooking->deleteCartBookingData($id_cart, $id_product, 0, 0, 0, 0);
             if ($roomTypeInfo = $objRoomType->getRoomTypeInfoByIdProduct($id_product)) {
                 if ($id_hotel = $roomTypeInfo['id_hotel']) {
-                    $obj_booking_dtl = new HotelBookingDetail();
-                    if ($hotel_room_data = $obj_booking_dtl->DataForFrontSearch(
-                        $date_from,
-                        $date_to,
-                        $id_hotel,
-                        $id_product,
-                        1
-                    )) {
-                        $total_available_rooms = $hotel_room_data['stats']['num_avail'];
+                    $objBookingDetail = new HotelBookingDetail();
+                    $bookingParams = array(
+                        'date_from' => $date_from,
+                        'date_to' => $date_to,
+                        'hotel_id' => $id_hotel,
+                        'id_room_type' => $id_product,
+                        'only_search_data' => 1,
+                    );
+                    if ($hotelRoomData = $objBookingDetail->dataForFrontSearch($bookingParams)) {
+                        $total_available_rooms = $hotelRoomData['stats']['num_avail'];
                     }
                 }
             }
@@ -267,10 +268,26 @@ class CartControllerCore extends FrontController
         $date_to = Tools::getValue('dateTo');
         $date_from = date("Y-m-d", strtotime($date_from));
         $date_to = date("Y-m-d", strtotime($date_to));
+        $operator = Tools::getValue('op', 'up');
+
+        $occupancyRequiredForBooking = false;
+        if (Configuration::get('PS_FRONT_ROOM_UNIT_SELECTION_TYPE') == HotelBookingDetail::PS_FRONT_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY) {
+            $occupancyRequiredForBooking = true;
+        }
+
+        if ($occupancyRequiredForBooking) {
+            if ($occupancy = json_decode(Tools::getValue('occupancy'), true)) {
+                $this->qty = count($occupancy);
+            } else {
+                $this->errors[] = Tools::displayError('Invalid occupnacy.');
+            }
+        } else {
+            $occupancy = Tools::getValue('qty');
+            $this->qty = $occupancy;
+        }
+
         $id_cart = $this->context->cart->id;
         $id_guest = $this->context->cart->id_guest;
-
-
 
         if ($this->qty == 0) {
             $this->errors[] = Tools::displayError('Null quantity.', !Tools::getValue('ajax'));
@@ -284,71 +301,106 @@ class CartControllerCore extends FrontController
             return;
         }
 
-        $qty_to_check = $this->qty;
-        $cart_products = $this->context->cart->getProducts();
-
-        // By Webkul : This code is to check available quantity of Room before adding it to cart.
-        // only check availability if qty is increasing
-        if (Module::isInstalled('hotelreservationsystem') && Module::isEnabled('hotelreservationsystem')) {
-                require_once _PS_MODULE_DIR_.'hotelreservationsystem/define.php';
-                $objRoomType = new HotelRoomType();
-                if ($roomTypeInfo = $objRoomType->getRoomTypeInfoByIdProduct($this->id_product)) {
-                    if ($id_hotel = $roomTypeInfo['id_hotel']) {
-                        if (strtotime($date_from) < strtotime(date('Y-m-d'))) {
-                            $this->errors[] = Tools::displayError('You can\'t book room before current date');
-                        } elseif (strtotime($date_from) >= strtotime($date_to)) {
-                            $this->errors[] = Tools::displayError('Check-out date must be after check-in date');
-                        } elseif ($maxOrdDate = HotelOrderRestrictDate::getMaxOrderDate($id_hotel)) {
-                            // Check Order restrict condition before adding in to cart
-                            if (strtotime('-1 day', strtotime($maxOrdDate)) < strtotime($date_from)
-                                || strtotime($maxOrdDate) < strtotime($date_to)
-                            ) {
-                                $maxOrdDate = date('d-m-Y', strtotime($maxOrdDate));
-                                $this->errors[] = Tools::displayError('You can\'t book room after date '.$maxOrdDate);
-                            }
+        // valdiate occupancy if providede
+        if ($operator == 'up') {
+            if ($occupancyRequiredForBooking) {
+                foreach($occupancy as $key => $roomOccupancy) {
+                    if (!isset($roomOccupancy['adults']) || !$roomOccupancy['adults'] || !Validate::isUnsignedInt($roomOccupancy['adults'])) {
+                        $this->errors[] = sprintf(Tools::displayError('Invalid number of adults for Room %s.'), ($key + 1));
+                    }
+                    if (isset($roomOccupancy['children'])) {
+                        if (!Validate::isUnsignedInt($roomOccupancy['children'])) {
+                            $this->errors[] = sprintf(Tools::displayError('Invalid number of children for Room %s.'), ($key + 1));
                         }
-                        if (!$this->errors) {
-                            $objBookingDtl = new HotelBookingDetail();
-                            $num_days = $objBookingDtl->getNumberOfDays($date_from, $date_to);
-                            $req_rm = $this->qty;
-                            $this->qty = $this->qty * (int) $num_days;
-                            $obj_booking_dtl = new HotelBookingDetail();
-                            if ($hotel_room_data = $obj_booking_dtl->DataForFrontSearch(
-                                $date_from,
-                                $date_to,
-                                $id_hotel,
-                                $this->id_product,
-                                1,
-                                0,
-                                0,
-                                -1,
-                                0,
-                                0,
-                                $id_cart,
-                                $id_guest
-                            )) {
-                                if (isset($hotel_room_data['stats']['num_avail'])) {
-                                    $total_available_rooms = $hotel_room_data['stats']['num_avail'];
-                                    if (Tools::getValue('op', 'up') == 'up') {
-                                        if ($total_available_rooms < $req_rm) {
-                                            die(json_encode(array('status' => 'unavailable_quantity', 'avail_rooms' => $total_available_rooms)));
+                        if ($roomOccupancy['children'] > 0) {
+                            if (!isset($roomOccupancy['child_ages']) || ($roomOccupancy['children'] != count($roomOccupancy['child_ages'])) || !is_array($roomOccupancy['child_ages'])) {
+                                $this->errors[] = sprintf(Tools::displayError('Please provide all children age for Room %s.'), ($key + 1));
+                            } else {
+                                if (is_array($roomOccupancy['child_ages'])) {
+                                    foreach($roomOccupancy['child_ages'] as $childAge) {
+                                        if (!Validate::isUnsignedInt($childAge)) {
+                                            $this->errors[] = sprintf(Tools::displayError('Invalid children age for Room %s.'), ($key + 1));
                                         }
                                     }
-                                } else {
-                                    $this->errors[] = Tools::displayError('Rooms are unavailable. Please try with different dates');
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        // By Webkul : This code is to check available quantity of Room before adding it to cart.
+        // only check availability if qty is increasing
+        if (!$this->errors) {
+            $objRoomType = new HotelRoomType();
+            if ($roomTypeInfo = $objRoomType->getRoomTypeInfoByIdProduct($this->id_product)) {
+                if ($id_hotel = $roomTypeInfo['id_hotel']) {
+                    if (strtotime($date_from) < strtotime(date('Y-m-d'))) {
+                        $this->errors[] = Tools::displayError('You can\'t book room before current date');
+                    } elseif (strtotime($date_from) >= strtotime($date_to)) {
+                        $this->errors[] = Tools::displayError('Check-out date must be after check-in date');
+                    } elseif ($maxOrdDate = HotelOrderRestrictDate::getMaxOrderDate($id_hotel)) {
+                        // Check Order restrict condition before adding in to cart
+                        if (strtotime('-1 day', strtotime($maxOrdDate)) < strtotime($date_from)
+                            || strtotime($maxOrdDate) < strtotime($date_to)
+                        ) {
+                            $maxOrdDate = date('d-m-Y', strtotime($maxOrdDate));
+                            $this->errors[] = Tools::displayError('You can\'t book room after date '.$maxOrdDate);
+                        }
+                    }
+                    if ($occupancyRequiredForBooking) {
+                        foreach($occupancy as $key => $roomOccupancy) {
+                            if ($roomOccupancy['adults'] > $roomTypeInfo['max_adults']) {
+                                $this->errors[] = sprintf(Tools::displayError('Room %s cannot have adults more than %s'), $key + 1, $roomTypeInfo['max_adults']);
+                            }
+                            if ($roomOccupancy['children'] > $roomTypeInfo['max_children']) {
+                                $this->errors[] = sprintf(Tools::displayError('Room %s cannot have children more than %s'), $key + 1, $roomTypeInfo['max_children']);
+                            }
+                            if ($roomOccupancy['adults'] + $roomOccupancy['children'] > $roomTypeInfo['max_guests']) {
+                                $this->errors[] = sprintf(Tools::displayError('Room %s cannot have total guests more than %s'), $key + 1, $roomTypeInfo['max_guests']);
+                            }
+                        }
+                    }
+                    if (!$this->errors) {
+                        $objBookingDetail = new HotelBookingDetail();
+                        $num_days = $objBookingDetail->getNumberOfDays($date_from, $date_to);
+                        $req_rm = $this->qty;
+                        $this->qty = $this->qty * (int) $num_days;
+                        $objBookingDetail = new HotelBookingDetail();
+                        $bookingParams = array(
+                            'date_from' => $date_from,
+                            'date_to' => $date_to,
+                            'hotel_id' => $id_hotel,
+                            'id_room_type' => $this->id_product,
+                            'only_search_data' => 1,
+                            'id_cart' => $id_cart,
+                            'id_guest' => $id_guest,
+                        );
+                        if ($hotelRoomData = $objBookingDetail->dataForFrontSearch($bookingParams)) {
+                            if (isset($hotelRoomData['stats']['num_avail'])) {
+                                $total_available_rooms = $hotelRoomData['stats']['num_avail'];
+                                if (Tools::getValue('op', 'up') == 'up') {
+                                    if ($total_available_rooms < $req_rm) {
+                                        die(json_encode(array('status' => 'unavailable_quantity', 'avail_rooms' => $total_available_rooms)));
+                                    }
                                 }
                             } else {
                                 $this->errors[] = Tools::displayError('Rooms are unavailable. Please try with different dates');
                             }
+                        } else {
+                            $this->errors[] = Tools::displayError('Rooms are unavailable. Please try with different dates');
                         }
-                    } else {
-                        die(json_encode(array('status' => 'failed3')));
                     }
                 } else {
-                    die(json_encode(array('status' => 'failed4')));
+                    die(json_encode(array('status' => 'failed3')));
                 }
+            } else {
+                die(json_encode(array('status' => 'failed4')));
+            }
         }
 
+        $cart_products = $this->context->cart->getProducts();
+        $qty_to_check = $this->qty;
         if (is_array($cart_products)) {
             foreach ($cart_products as $cart_product) {
                 if ((!isset($this->id_product_attribute) || $cart_product['id_product_attribute'] == $this->id_product_attribute) &&
@@ -411,54 +463,37 @@ class CartControllerCore extends FrontController
                 /*
                 * To add Rooms in hotel cart
                 */
-                if (Module::isInstalled('hotelreservationsystem') && Module::isEnabled('hotelreservationsystem')) {
-                    if (Tools::getValue('op', 'up') == 'up') {
-                        $update_quantity = $this->context->cart->updateQty($this->qty, $this->id_product, $this->id_product_attribute, $this->customization_id, Tools::getValue('op', 'up'), $this->id_address_delivery);
-                        $this->availQty = false;
-                        $id_customer = $this->context->cart->id_customer;
-                        $id_currency = $this->context->cart->id_currency;
 
-                        $hotel_room_info_arr = $hotel_room_data['rm_data'][0]['data']['available'];
-                        $chkQty = 0;
-                        foreach ($hotel_room_info_arr as $key_hotel_room_info => $val_hotel_room_info) {
-                            if ($chkQty < $req_rm) {
-                                $roomDemand = Tools::getValue('roomDemands');
-                                $roomDemand = json_decode($roomDemand, true);
-                                $roomDemand = json_encode($roomDemand);
-                                $obj_htl_cart_booking_data = new HotelCartBookingData();
-                                $obj_htl_cart_booking_data->id_cart = $this->context->cart->id;
-                                $obj_htl_cart_booking_data->id_guest = $this->context->cart->id_guest;
-                                $obj_htl_cart_booking_data->id_customer = $id_customer;
-                                $obj_htl_cart_booking_data->id_currency = $id_currency;
-                                $obj_htl_cart_booking_data->id_product = $val_hotel_room_info['id_product'];
-                                $obj_htl_cart_booking_data->id_room = $val_hotel_room_info['id_room'];
-                                $obj_htl_cart_booking_data->id_hotel = $val_hotel_room_info['id_hotel'];
-                                $obj_htl_cart_booking_data->booking_type = HotelBookingDetail::ALLOTMENT_AUTO;
-                                $obj_htl_cart_booking_data->quantity = $num_days;
-                                $obj_htl_cart_booking_data->extra_demands = $roomDemand;
-                                $obj_htl_cart_booking_data->date_from = $date_from;
-                                $obj_htl_cart_booking_data->date_to = $date_to;
-                                $obj_htl_cart_booking_data->save();
-                                ++$chkQty;
-                            } else {
-                                break;
-                            }
-                        }
-                        $this->availQty = $total_available_rooms - $req_rm;
-                    } else {
-                        $objCartBooking = new HotelCartBookingData();
-                        $update_quantity = $objCartBooking->deleteCartBookingData(
-                            $id_cart,
-                            $this->id_product,
-                            0,
-                            $date_from,
-                            $date_to
-                        );
-                        $this->availQty = $total_available_rooms + $req_rm;
-
-                    }
-                    $this->context->cookie->avail_rooms = $this->availQty;
+                $objHotelCartBookingData = new HotelCartBookingData();
+                $roomDemand = json_decode(Tools::getValue('roomDemands'), true);
+                $roomDemand = json_encode($roomDemand);
+                $this->availQty = $total_available_rooms;
+                $update_quantity = $objHotelCartBookingData->updateRoomCartBookingData(
+                    $this->id_product,
+                    $occupancy,
+                    $operator,
+                    $id_hotel,
+                    $date_from,
+                    $date_to,
+                    $roomDemand,
+                    $id_cart,
+                    $id_guest
+                );
+                if ($operator == 'up') {
+                    $this->availQty = $total_available_rooms - $req_rm;
+                    $this->context->cookie->currentAddedProduct = json_encode(array(
+                        'date_from' => $date_from,
+                        'date_to' => $date_to,
+                        'id_product' => $this->id_product,
+                        'occupancy' => $occupancy,
+                        'room_demand' => $roomDemand,
+                        'req_rm' => $req_rm
+                    ));
+                } else {
+                    $this->availQty = $total_available_rooms + $req_rm;
                 }
+                $this->context->cookie->avail_rooms = $this->availQty;
+
                 /*------  BY Webkul ------*/
 
                 if ($update_quantity < 0) {

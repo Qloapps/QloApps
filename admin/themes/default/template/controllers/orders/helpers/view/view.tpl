@@ -1058,6 +1058,64 @@
 					</form>
 				</div>
 			</div>
+			{if is_array($returns) && count($returns)}
+				<div class="panel">
+					<div class="panel-heading">
+						<i class="icon-undo"></i> {l s='Refunds'}
+					</div>
+					<table class="table table-striped">
+						<thead>
+							<tr>
+								<th class="text-left">{l s='Refund ID'}</th>
+								<th class="text-left">{l s='Status'}</th>
+							</tr>
+						</thead>
+						<tbody>
+							{foreach from=$returns item=return_info}
+							<tr>
+								<td class="text-left">
+									<a href="{$link->getAdminLink('AdminOrderRefundRequests')}&vieworder_return&id_order_return={$return_info.id_order_return}" target="_blank">#{$return_info.id_order_return}</a>
+								</td>
+								<td class="text-left">
+									{capture name=refund_status}
+										{if isset($return_info.payment_mode) && $return_info.payment_mode != ''}{l s='Payment Mode: '}{$return_info.payment_mode}<br/>{/if}
+										{if isset($return_info.id_transaction) && $return_info.id_transaction != ''}{l s='Transaction ID: '}{$return_info.id_transaction}<br/>{/if}
+										{if isset($return_info.id_return_type) && isset($return_info.return_type) && $return_info.id_return_type && $return_info.return_type}
+											{if $return_info.return_type == OrderReturn::RETURN_TYPE_CART_RULE}
+												{l s='Voucher ID: '}
+												<a href="{$link->getAdminLink('AdminCartRules')}&updatecart_rule&id_cart_rule={$return_info.id_return_type}" target="_blank">
+													#{$return_info.id_return_type}
+												</a>
+											{elseif $return_info.return_type == OrderReturn::RETURN_TYPE_ORDER_SLIP}
+												{l s='Credit Slip ID: '}
+												#{$return_info.id_return_type}
+												<a href="{$link->getAdminLink('AdminPdf')}&submitAction=generateOrderSlipPDF&id_order_slip={$return_info.id_return_type}" title="#{Configuration::get('PS_CREDIT_SLIP_PREFIX', $current_id_lang)}{$return_info.id_return_type|string_format:'%06d'}">
+													{l s='Download' mod='hotelreservationsystem'}
+												</a>
+											{/if}
+											<br/>
+										{/if}
+										{if isset($return_info.id_cart_rule) && $return_info.id_cart_rule}
+											{l s='Voucher ID: '}
+											<a href="{$link->getAdminLink('AdminCartRules')}&updatecart_rule&id_cart_rule={$return_info.id_cart_rule}" target="_blank">
+												#{$return_info.id_cart_rule}
+											</a>
+											<br/>
+										{/if}
+									{/capture}
+
+									{if $smarty.capture.refund_status|trim != ''}
+										{$smarty.capture.refund_status}
+									{else}
+										{$return_info.state_name}
+									{/if}
+								</td>
+							</tr>
+							{/foreach}
+						</tbody>
+					</table>
+				</div>
+			{/if}
 			{hook h="displayAdminOrderRight" id_order=$order->id}
 		</div>
 	</div>
@@ -1070,7 +1128,7 @@
 					<input type="hidden" value="{$order->getWarehouseList()|implode}" id="warehouse_list" />
 				</div>
 
-				<div class="panel">
+				<div class="panel" id="refundForm">
 					<div class="panel-heading">
 						<i class="icon-shopping-cart"></i>
 						{l s='Rooms In This Order'} <span class="badge">{$order_detail_data|@count}</span>
@@ -1090,6 +1148,7 @@
 										<th class="text-center"><span class="title_box">{l s='Room Type'}</span></th>
 										<th class="text-center"><span class="title_box">{l s='Hotel Name'}</span></th>
 										<th class="text-center"><span class="title_box">{l s='Duration'}</span></th>
+										<th class="text-center fixed-width-lg"><span class="title_box">{l s='Occupancy'}</span></th>
 										<th class="text-center"><span class="title_box">{l s='Unit Price (Tax excl.)'}</span></th>
 										<th class="text-center"><span class="title_box">{l s='Total Price (Tax incl.)'}</span></th>
 										{if isset($refundReqBookings) && $refundReqBookings}
@@ -1149,9 +1208,14 @@
 							</button>
 
 							{if $refund_allowed && !$hasCompletelyRefunded}
-								<button style="display: none;" type="submit" name="initiateRefund" class="btn btn-success standard_refund_fields pull-right" id="initiateRefund">
-									{if $order->hasBeenPaid()}<i class="icon-undo"></i> {l s='Initiate Refund'}{else}{l s='Cancel bookings'}{/if}
-								</button>
+								<div class="pull-right">
+									<button style="display: none;" type="button" class="btn btn-default standard_refund_fields" id="cancelRefund">
+										{l s='Cancel'}
+									</button>
+									<button style="display: none;" type="submit" name="initiateRefund" class="btn btn-success standard_refund_fields" id="initiateRefund">
+										{if $order->hasBeenPaid()}<i class="icon-undo"></i> {l s='Initiate Refund'}{else}{l s='Submit'}{/if}
+									</button>
+								</div>
 							{/if}
 						</div>
 					{/if}
@@ -1521,6 +1585,21 @@
 	{addJsDefL name=txtSomeErr}{l s='Some error occurred. Please try again.' js=1}{/addJsDefL}
 	{addJsDefL name=txtDeleteSucc}{l s='Deleted successfully' js=1}{/addJsDefL}
 	{addJsDefL name=txtInvalidDemandVal}{l s='Invalid demand value found' js=1}{/addJsDefL}
+	{addJsDefL name='select_age_txt'}{l s='Select age' js=1}{/addJsDefL}
+	{addJsDefL name='under_1_age'}{l s='Under 1' js=1}{/addJsDefL}
+	{addJsDefL name='room_txt'}{l s='Room' js=1}{/addJsDefL}
+	{addJsDefL name='rooms_txt'}{l s='Rooms' js=1}{/addJsDefL}
+	{addJsDefL name='remove_txt'}{l s='Remove' js=1}{/addJsDefL}
+	{addJsDefL name='adult_txt'}{l s='Adult' js=1}{/addJsDefL}
+	{addJsDefL name='adults_txt'}{l s='Adults' js=1}{/addJsDefL}
+	{addJsDefL name='child_txt'}{l s='Child' js=1}{/addJsDefL}
+	{addJsDefL name='children_txt'}{l s='Children' js=1}{/addJsDefL}
+	{addJsDefL name='below_txt'}{l s='Below' js=1}{/addJsDefL}
+	{addJsDefL name='years_txt'}{l s='years' js=1}{/addJsDefL}
+	{addJsDefL name='all_children_txt'}{l s='All Children' js=1}{/addJsDefL}
+	{addJsDefL name='invalid_occupancy_txt'}{l s='Invalid occupancy(adults/children) found.' js=1}{/addJsDefL}
+	{addJsDef max_child_age=$max_child_age|escape:'quotes':'UTF-8'}
+	{addJsDef max_child_in_room=$max_child_in_room|escape:'quotes':'UTF-8'}
 {/strip}
 
 {* Apply javascript for the page *}

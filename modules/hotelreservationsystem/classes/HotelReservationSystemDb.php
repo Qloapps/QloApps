@@ -27,8 +27,11 @@ class HotelReservationSystemDb
                 `id` int(11) NOT NULL AUTO_INCREMENT,
                 `id_product` int(11) NOT NULL,
                 `id_hotel` int(11) NOT NULL,
-                `adult` smallint(6) NOT NULL,
-                `children` smallint(6) NOT NULL,
+                `adults` smallint(6) NOT NULL DEFAULT '2',
+                `children` smallint(6) NOT NULL DEFAULT '0',
+                `max_adults` smallint(6) NOT NULL DEFAULT '2',
+                `max_children` smallint(6) NOT NULL DEFAULT '0',
+                `max_guests` smallint(6) NOT NULL DEFAULT '2',
                 `min_los` smallint(6) NOT NULL DEFAULT '1',
                 `max_los` smallint(6) NOT NULL DEFAULT '0',
                 `date_add` datetime NOT NULL,
@@ -127,6 +130,9 @@ class HotelReservationSystemDb
                 `extra_demands` text NOT NULL,
                 `date_from` datetime NOT NULL,
                 `date_to` datetime NOT NULL,
+                `adults` smallint(6) NOT NULL,
+                `children` smallint(6) NOT NULL,
+                `child_ages` text NOT NULL,
                 `is_refunded` tinyint(1) NOT NULL DEFAULT '0',
                 `date_add` datetime NOT NULL,
                 `date_upd` datetime NOT NULL,
@@ -164,8 +170,9 @@ class HotelReservationSystemDb
                 `check_in_time` varchar(32) DEFAULT NULL,
                 `check_out_time` varchar(32) DEFAULT NULL,
                 `room_num` varchar(225) DEFAULT NULL,
-                `adult` smallint(6) NOT NULL DEFAULT '0',
+                `adults` smallint(6) NOT NULL DEFAULT '0',
                 `children` smallint(6) NOT NULL DEFAULT '0',
+                `child_ages` text NOT NULL,
                 `is_refunded` tinyint(1) NOT NULL DEFAULT '0',
                 -- `available_for_order` tinyint(1) NOT NULL DEFAULT '0',
                 `date_add` datetime NOT NULL,
@@ -374,6 +381,65 @@ class HotelReservationSystemDb
                 `access` int(11) NOT NULL,
                 PRIMARY KEY (`id_profile`, `id_hotel`)
             ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8;",
+
+            "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_settings_link` (
+                `id_settings_link` int(11) NOT NULL AUTO_INCREMENT,
+                `icon` varchar(32) character set utf8 NOT NULL,
+                `link` text NOT NULL,
+                `new_window` tinyint(1) NOT NULL DEFAULT '0',
+                `position` int(11) unsigned NOT NULL DEFAULT '0',
+                `unremovable` tinyint(1) NOT NULL DEFAULT '0',
+                `active` tinyint(1) NOT NULL,
+                `date_add` datetime NOT NULL,
+                `date_upd` datetime NOT NULL,
+                PRIMARY KEY (`id_settings_link`)
+            ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;",
+
+            "INSERT INTO `"._DB_PREFIX_."htl_settings_link` (`id_settings_link`, `icon`, `link`, `new_window`, `position`, `unremovable`, `active`, `date_add`, `date_upd`) VALUES
+            (1, 'icon-cogs', 'index.php?controller=AdminHotelGeneralSettings', 0, 0, 1, 1, NOW(), NOW()),
+            (2, 'icon-list-alt', 'index.php?controller=AdminOrderRestrictSettings', 0, 1, 1, 1, NOW(), NOW()),
+            (3, 'icon-dollar', 'index.php?controller=AdminHotelFeaturePricesSettings', 0, 2, 1, 1, NOW(), NOW()),
+            (4, 'icon-plus-square', 'index.php?controller=AdminRoomTypeGlobalDemand', 0, 3, 1, 1, NOW(), NOW()),
+            (5, 'icon-file-text', 'index.php?controller=AdminAboutHotelBlockSetting', 0, 4, 0, 1, NOW(), NOW()),
+            (6, 'icon-th-list', 'index.php?controller=AdminFeaturesModuleSetting', 0, 5, 0, 1, NOW(), NOW());",
+
+            "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_settings_link_lang` (
+                `id_settings_link` int(10) unsigned NOT NULL,
+                `id_lang` int(10) unsigned NOT NULL,
+                `name` varchar(255) character set utf8 NOT NULL,
+                `hint` varchar(255) character set utf8 NOT NULL,
+                PRIMARY KEY (`id_settings_link`, `id_lang`)
+            ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8;",
+
+            "INSERT INTO `"._DB_PREFIX_."htl_settings_link_lang` (`id_settings_link`, `id_lang`, `name`, `hint`)
+            SELECT 1, `id_lang`, 'General Settings', 'Configure Your hotel general gettings using this option.'
+            FROM `"._DB_PREFIX_."lang`
+            ORDER BY `id_lang`;",
+
+            "INSERT INTO `"._DB_PREFIX_."htl_settings_link_lang` (`id_settings_link`, `id_lang`, `name`, `hint`)
+            SELECT 2, `id_lang`, 'Order Restrict', 'Configure if you want to restrict orders till a specific date for your hotels.'
+            FROM `"._DB_PREFIX_."lang`
+            ORDER BY `id_lang`;",
+
+            "INSERT INTO `"._DB_PREFIX_."htl_settings_link_lang` (`id_settings_link`, `id_lang`, `name`, `hint`)
+            SELECT 3, `id_lang`, 'Advanced Price Rules', 'Here set Advanced price rules for specific dates.'
+            FROM `"._DB_PREFIX_."lang`
+            ORDER BY `id_lang`;",
+
+            "INSERT INTO `"._DB_PREFIX_."htl_settings_link_lang` (`id_settings_link`, `id_lang`, `name`, `hint`)
+            SELECT 4, `id_lang`, 'Additional Facilities', 'Here create Additional facilities and their prices for room types.'
+            FROM `"._DB_PREFIX_."lang`
+            ORDER BY `id_lang`;",
+
+            "INSERT INTO `"._DB_PREFIX_."htl_settings_link_lang` (`id_settings_link`, `id_lang`, `name`, `hint`)
+            SELECT 5, `id_lang`, 'Hotel Interior Block', 'Configure Hotel Interior block. You can display hotel interior images using this block. This block will be displayed on home page.'
+            FROM `"._DB_PREFIX_."lang`
+            ORDER BY `id_lang`;",
+
+            "INSERT INTO `"._DB_PREFIX_."htl_settings_link_lang` (`id_settings_link`, `id_lang`, `name`, `hint`)
+            SELECT 6, `id_lang`, 'Hotel Amenities Block', 'Configure Hotels Amenities settings. You can display hotel amenities images using this block. This block will be displayed on home page.'
+            FROM `"._DB_PREFIX_."lang`
+            ORDER BY `id_lang`;",
         );
     }
 
@@ -424,6 +490,8 @@ class HotelReservationSystemDb
             `'._DB_PREFIX_.'htl_room_type_demand_price`,
             `'._DB_PREFIX_.'htl_room_type_demand`,
             `'._DB_PREFIX_.'htl_room_disable_dates`,
+            `'._DB_PREFIX_.'htl_settings_link`,
+            `'._DB_PREFIX_.'htl_settings_link_lang`,
             `'._DB_PREFIX_.'htl_room_type_restriction_date_range`,
             `'._DB_PREFIX_.'htl_access`'
         );

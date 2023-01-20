@@ -55,7 +55,7 @@
 </style>
 
 	</head>
-	<body style="-webkit-text-size-adjust:none;background-color:#fff;width:650px;font-family:Open-sans, sans-serif;color:#555454;font-size:13px;line-height:18px;margin:auto">
+	<body style="-webkit-text-size-adjust:none;background-color:#fff;width:650px;font-family:Open-sans, sans-serif;color:#555454;font-size:13px;line-height:18px;margin:auto" >
 		<table class="table table-mail" style="width:100%;margin-top:10px;-moz-box-shadow:0 0 5px #afafaf;-webkit-box-shadow:0 0 5px #afafaf;-o-box-shadow:0 0 5px #afafaf;box-shadow:0 0 5px #afafaf;filter:progid:DXImageTransform.Microsoft.Shadow(color=#afafaf,Direction=134,Strength=5)">
 			<tr>
 				<td class="space" style="width:20px;padding:7px 0">&nbsp;</td>
@@ -73,7 +73,6 @@
 	<td align="center" class="titleblock" style="padding:7px 0">
 		<font size="2" face="Open-sans, sans-serif" color="#555454">
 			<span class="title" style="font-weight:500;font-size:28px;text-transform:capitalize;line-height:33px">Hi {firstname} {lastname},</span><br/>
-			<span class="subtitle" style="font-weight:500;font-size:16px;line-height:25px">Your request for booking cancellation has been recieved.</span>
 		</font>
 	</td>
 </tr>
@@ -87,45 +86,20 @@
 				<td width="10" style="padding:7px 0">&nbsp;</td>
 				<td style="padding:7px 0">
 					<font size="2" face="Open-sans, sans-serif" color="#555454">
-						<p data-html-only="1" style="border-bottom:1px solid #D6D4D4;margin:3px 0 7px;text-transform:uppercase;font-weight:500;font-size:16px;padding-bottom:10px">Order details</p>
+						<p data-html-only="1" style="border-bottom:1px solid #D6D4D4;margin:3px 0 7px;text-transform:uppercase;font-weight:500;font-size:18px;padding-bottom:10px">
+							VOUCHER GENERATED
+						</p>
 						<span style="color:#777">
-							<span style="color:#333"><strong>Order:</strong></span> {order_reference} Placed on {order_date}<br /><br />
-							<span style="color:#333"><strong>Refund Status:</strong></span> <span style="border-radius: 2px;color:#FFFFFF;font-weight:600;padding:5px 10px;background-color:{status_color}">{status_name}</span><br /><br />
+							Your voucher has been generated successfully against your credit slip #{credit_slip_id}.
+							<br/><br/>
+							<span style="color:#333"><strong>Voucher Code: <span>{voucher_code}</span></strong></span> for an amount of <span style="color:#333"><strong>{voucher_amount}.</strong></span><br /><br />
+							To use this voucher just copy and paste this code during payment process for your next order.
 						</span>
 					</font>
 				</td>
 				<td width="10" style="padding:7px 0">&nbsp;</td>
 			</tr>
 		</table>
-	</td>
-</tr>
-<tr>
-	<td style="padding:7px 0">
-		<font size="2" face="Open-sans, sans-serif" color="#555454">
-			<p data-html-only="1" style="margin:10px 0 7px;text-transform:uppercase;font-weight:500;font-size:16px;padding-bottom:0px">Booking details</p>
-			<table class="table table-recap" bgcolor="#ffffff" style="width:100%;border-collapse:collapse"><!-- Title -->
-				<tr>
-					<tr>
-						<th bgcolor="#f8f8f8" style="border:1px solid #D6D4D4;background-color: #fbfbfb;color: #333;font-family: Arial;font-size: 13px;padding: 10px;">Room Type</th>
-						<th bgcolor="#f8f8f8" style="border:1px solid #D6D4D4;background-color: #fbfbfb;color: #333;font-family: Arial;font-size: 13px;padding: 10px;" width="17%">Hotel</th>
-						<th bgcolor="#f8f8f8" style="border:1px solid #D6D4D4;background-color: #fbfbfb;color: #333;font-family: Arial;font-size: 13px;padding: 10px;">Num. Rooms</th>
-						<th bgcolor="#f8f8f8" style="border:1px solid #D6D4D4;background-color: #fbfbfb;color: #333;font-family: Arial;font-size: 13px;padding: 10px;">Duration</th>
-					</tr>
-					{refundBookingHtml}
-				</tbody>
-			</table>
-		</font>
-	</td>
-</tr>
-<tr>
-	<td class="space_footer" style="padding:0!important">&nbsp;</td>
-</tr>
-<tr>
-	<td class="linkbelow" style="padding:7px 0">
-		<font size="2" face="Open-sans, sans-serif" color="#555454">
-			<span>
-				You can review your booking cancelation requests from the <a href="{refund_reqests_url}" style="color:#337ff1">"Booking Refund Requests"</a> section of your customer account by clicking <a href="{my_account_url}" style="color:#337ff1">"My account"</a>.</span>
-		</font>
 	</td>
 </tr>
 

@@ -113,6 +113,7 @@ class AdminProductsControllerCore extends AdminController
             'Configuration' => $this->l('Configuration'),
             'Occupancy' => $this->l('Occupancy'),
             'LengthOfStay' => $this->l('Length of Stay'),
+            'AdditionalFacilities' => $this->l('Additional Facilities'),
         );
 
         $this->available_tabs = array('Warehouses' => 14);
@@ -134,6 +135,7 @@ class AdminProductsControllerCore extends AdminController
                 'Configuration' => 14,
                 'Occupancy' => 15,
                 'LengthOfStay' => 16,
+                'AdditionalFacilities' => 17,
             ));
         }
 
@@ -211,7 +213,7 @@ class AdminProductsControllerCore extends AdminController
 				LEFT JOIN `'._DB_PREFIX_.'address` aa ON (aa.`id_hotel` = hb.`id`)';
 
         $this->_select .= ' (SELECT COUNT(hri.`id`) FROM `'._DB_PREFIX_.'htl_room_information` hri WHERE hri.`id_product` = a.`id_product`) as num_rooms, ';
-        $this->_select .= 'hrt.`adult`, hrt.`children`, hb.`id` as id_hotel, aa.`city`, hbl.`hotel_name`, ';
+        $this->_select .= 'hrt.`adults`, hrt.`children`, hb.`id` as id_hotel, aa.`city`, hbl.`hotel_name`, ';
         $this->_select .= 'shop.`name` AS `shopname`, a.`id_shop_default`, ';
         $this->_select .= $alias_image.'.`id_image` AS `id_image`, cl.`name` AS `name_category`, '.$alias.'.`price`, 0 AS `price_final`, a.`is_virtual`, pd.`nb_downloadable`, sav.`quantity` AS `sav_quantity`, '.$alias.'.`active`, IF(sav.`quantity`<=0, 1, 0) AS `badge_danger`';
 
@@ -253,9 +255,9 @@ class AdminProductsControllerCore extends AdminController
                 'callback' => 'getHotelName',
             );
         }
-        $this->fields_list['adult'] = array(
+        $this->fields_list['adults'] = array(
             'title' => $this->l('Adults'),
-            'filter_key' => 'hrt!adult',
+            'filter_key' => 'hrt!adults',
             'align' => 'center',
         );
         $this->fields_list['child'] = array(
@@ -2228,6 +2230,9 @@ class AdminProductsControllerCore extends AdminController
                         if ($this->isTabSubmitted('Configuration')) {
                             $this->processConfiguration();
                         }
+                        if ($this->isTabSubmitted('AdditionalFacilities')) {
+                            $this->processAdditionalFacilities();
+                        }
 
                         $this->updatePackItems($object);
                         // Disallow avanced stock management if the product become a pack
@@ -3433,6 +3438,7 @@ class AdminProductsControllerCore extends AdminController
         } else {
             $this->displayWarning($this->l('You must save this room type before managing occupancy.'));
         }
+        $smartyVars['currency'] = $this->context->currency;
         $data->assign($smartyVars);
         $this->tpl_form_vars['custom_form'] = $data->fetch();
     }
@@ -3449,16 +3455,48 @@ class AdminProductsControllerCore extends AdminController
                 if (Validate::isLoadedObject($objRoomType = new HotelRoomType($idHtlRoomType))) {
                     $baseAdults = Tools::getValue('base_adults');
                     $baseChildren = Tools::getValue('base_children');
+                    $maxAdults = Tools::getValue('max_adults');
+                    $maxChildren = Tools::getValue('max_children');
+                    $maxGuests = Tools::getValue('max_guests');
 
                     if (!$baseAdults || !Validate::isUnsignedInt($baseAdults)) {
                         $this->errors[] = Tools::displayError('Invalid base adults');
                     }
-                    if (!Validate::isUnsignedInt($baseChildren)) {
+                    if ($baseChildren == '' || !Validate::isUnsignedInt($baseChildren)) {
                         $this->errors[] = Tools::displayError('Invalid base children');
+                    } else if (Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM')) {
+                        if ($baseChildren > Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM')) {
+                            $this->errors[] = sprintf(Tools::displayError('Base children cannot be greater than max childern allowed on your website (Max: %s)'), Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM'));
+                        }
                     }
+                    if (!$maxAdults || !Validate::isUnsignedInt($maxAdults)) {
+                        $this->errors[] = Tools::displayError('Invalid maximum number of adults');
+                    } elseif ($maxAdults < $baseAdults) {
+                        $this->errors[] = Tools::displayError('Maximum number of adults cannot be less than base adults');
+                    }
+                    if ($maxChildren == '' || !Validate::isUnsignedInt($maxChildren)) {
+                        $this->errors[] = Tools::displayError('Invalid maximum number of children');
+                    } else if (Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM')) {
+                        if ($maxChildren > Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM')) {
+                            $this->errors[] = sprintf(Tools::displayError('Maximum number of children cannot be greater than max childern allowed on your website (Max: %s)'), Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM'));
+                        }
+                    } elseif ($maxChildren < $baseChildren) {
+                        $this->errors[] = Tools::displayError('Maximum number of children cannot be less than base children');
+                    }
+                    if (!$maxGuests || !Validate::isUnsignedInt($maxGuests)) {
+                        $this->errors[] = Tools::displayError('Invalid maximum number of guests');
+                    } elseif ($maxGuests < ($baseAdults + $baseChildren)) {
+                        $this->errors[] = Tools::displayError('Maximum number of guests cannot be less than base occupancy of adults and children');
+                    } elseif ($maxGuests > ($maxChildren + $maxAdults)) {
+                        $this->errors[] = Tools::displayError('Maximum number of guests cannot be more than max occupancy of adults and children');
+                    }
+
                     if (!count($this->errors)) {
-                        $objRoomType->adult = $baseAdults;
+                        $objRoomType->adults = $baseAdults;
                         $objRoomType->children = $baseChildren;
+                        $objRoomType->max_adults = $maxAdults;
+                        $objRoomType->max_children = $maxChildren;
+                        $objRoomType->max_guests = $maxGuests;
                         $objRoomType->save();
                     }
                 } else {
@@ -3469,7 +3507,7 @@ class AdminProductsControllerCore extends AdminController
             }
         }
     }
-  
+
     // send information for the length of stay tab
     public function initFormLengthOfStay($product)
     {
@@ -3749,6 +3787,122 @@ class AdminProductsControllerCore extends AdminController
             }
         }
         die('0');
+    }
+
+    public function initFormAdditionalFacilities($obj)
+    {
+        $data = $this->createTemplate($this->tpl_form);
+
+        if ($obj->id) {
+            $objGlobalDemand = new HotelRoomTypeGlobalDemand();
+            $allDemands = $objGlobalDemand->getAllDemands();
+            $objCurrency = new Currency(Configuration::get('PS_CURRENCY_DEFAULT'));
+
+            // get room type additional facilities
+            $objRoomDemand = new HotelRoomTypeDemand();
+            $roomDemandPrices = $objRoomDemand->getRoomTypeDemands($obj->id, 0, 0);
+
+            $data->assign(array(
+                'product' => $obj,
+                'roomDemandPrices' => $roomDemandPrices,
+                'allDemands' => $allDemands,
+                'defaultcurrencySign' => $objCurrency->sign,
+            ));
+        } else {
+            $this->displayWarning($this->l('You must save this room type before managing additional facilities.'));
+        }
+
+        $this->tpl_form_vars['custom_form'] = $data->fetch();
+    }
+
+    public function processAdditionalFacilities()
+    {
+        if ($idProduct = Tools::getValue('id_product')) {
+            $objRoomTypeDemand = new HotelRoomTypeDemand();
+            $objRoomTypeDemandPrice = new HotelRoomTypeDemandPrice();
+            // first delete all the previously saved prices and demands of this room type
+            $objRoomTypeDemand->deleteRoomTypeDemands($idProduct);
+            $objRoomTypeDemandPrice->deleteRoomTypeDemandPrices($idProduct);
+            if ($selectedDemands = Tools::getValue('selected_demand')) {
+                $objAdvOption = new HotelRoomTypeGlobalDemandAdvanceOption();
+                foreach ($selectedDemands as $idGlobalDemand) {
+                    if (Validate::isLoadedObject($objGlobalDemand = new HotelRoomTypeGlobalDemand($idGlobalDemand))) {
+                        // save selected demands for this room type
+                        $objRoomTypeDemand = new HotelRoomTypeDemand();
+                        $objRoomTypeDemand->id_product = $idProduct;
+                        $objRoomTypeDemand->id_global_demand = $idGlobalDemand;
+                        $objRoomTypeDemand->save();
+
+                        // save selected demands prices for this room type
+                        $demandPrice = Tools::getValue('demand_price_'.$idGlobalDemand);
+                        if (Validate::isPrice($demandPrice)) {
+                            if ($objGlobalDemand->price != $demandPrice) {
+                                $objRoomTypeDemandPrice = new HotelRoomTypeDemandPrice();
+                                $objRoomTypeDemandPrice->id_product = $idProduct;
+                                $objRoomTypeDemandPrice->id_global_demand = $idGlobalDemand;
+                                $objRoomTypeDemandPrice->id_option = 0;
+                                $objRoomTypeDemandPrice->price = $demandPrice;
+                                $objRoomTypeDemandPrice->save();
+                            }
+                        } else {
+                            $this->errors[] = Tools::displayError('Invalid demand price of facility.').
+                            ' : '.$objGlobalDemand->name[$this->context->language->id];
+                        }
+                        if ($advOptions = $objAdvOption->getGlobalDemandAdvanceOptions($idGlobalDemand)) {
+                            foreach ($advOptions as $option) {
+                                if (Validate::isLoadedObject($objAdvOption = new HotelRoomTypeGlobalDemandAdvanceOption($option['id']))) {
+                                    $optionPrice = Tools::getValue('option_price_'.$option['id']);
+                                    if (Validate::isPrice($optionPrice)) {
+                                        if ($optionPrice != $objAdvOption->price) {
+                                            $objRoomTypeDemandPrice = new HotelRoomTypeDemandPrice();
+                                            $objRoomTypeDemandPrice->id_product = $idProduct;
+                                            $objRoomTypeDemandPrice->id_global_demand = $idGlobalDemand;
+                                            $objRoomTypeDemandPrice->id_option = $option['id'];
+                                            $objRoomTypeDemandPrice->price = $optionPrice;
+                                            $objRoomTypeDemandPrice->save();
+                                        }
+                                    } else {
+                                        $this->errors[] = Tools::displayError('Invalid price of advanced option: ').$objAdvOption->name[$this->context->language->id];
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                if (count($this->errors)) {
+                    $this->warnings[] = Tools::displayError('Invalid price values are not saved. Please correct them and save again.');
+                }
+
+                $objCartBookingData = new HotelCartBookingData();
+                if ($cartExtraDemands = $objCartBookingData->getCartExtraDemands(0, $idProduct)) {
+                    // delete the demands from cart if not available in cart
+                    $objRoomDemand = new HotelRoomTypeDemand();
+                    $roomTypeDemandIds = array();
+                    if ($roomTypeDemands = $objRoomDemand->getRoomTypeDemands($idProduct)) {
+                        $roomTypeDemandIds = array_keys($roomTypeDemands);
+                    }
+                    foreach ($cartExtraDemands as &$demandInfo) {
+                        if (isset($demandInfo['extra_demands']) && $demandInfo['extra_demands']) {
+                            $cartChanged = 0;
+                            foreach ($demandInfo['extra_demands'] as $key => $demand) {
+                                if (!in_array($demand['id_global_demand'], $roomTypeDemandIds)) {
+                                    $cartChanged = 1;
+                                    unset($demandInfo['extra_demands'][$key]);
+                                }
+                            }
+                            if ($cartChanged) {
+                                if (Validate::isLoadedObject(
+                                    $objCartBooking = new HotelCartBookingData($demandInfo['id'])
+                                )) {
+                                    $objCartBooking->extra_demands = json_encode($demandInfo['extra_demands']);
+                                    $objCartBooking->save();
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     /**

@@ -65,7 +65,6 @@
         <hooks>
             <hook module="hotelreservationsystem" hook="actionValidateOrder" position="1"/>
             <hook module="hotelreservationsystem" hook="Header" position="1"/>
-            <hook module="hotelreservationsystem" hook="actionProductUpdate" position="1"/>
             <hook module="hotelreservationsystem" hook="displayTop" position="1"/>
             <hook module="hotelreservationsystem" hook="displayFooter" position="1"/>
             <hook module="hotelreservationsystem" hook="actionOrderStatusPostUpdate" position="1"/>
@@ -77,8 +76,6 @@
             <hook module="hotelreservationsystem" hook="displayAfterDefautlFooterHook" position="1"/>
             <hook module="hotelreservationsystem" hook="addWebserviceResources" position="1"/>
             <hook module="hotelreservationsystem" hook="actionObjectLanguageAddAfter" position="1"/>
-            <hook module="hotelreservationsystem" hook="actionAdminControllerSetMedia" position="1"/>
-            <hook module="hotelreservationsystem" hook="displayAdminProductsExtra" position="1"/>
             <hook module="hotelreservationsystem" hook="actionObjectProfileAddAfter" position="1"/>
             <hook module="hotelreservationsystem" hook="actionObjectProfileDeleteBefore" position="1"/>
             <hook module="hotelreservationsystem" hook="actionObjectGroupDeleteBefore" position="1"/>
@@ -154,14 +151,15 @@
             <hook module="dashtrends" hook="actionOrderStatusPostUpdate" position="3"/>
             <hook module="dashtrends" hook="actionAdminControllerSetMedia" position="3"/>
             <hook module="dashtrends" hook="dashboardData" position="2"/>
-            <hook module="dashtrends" hook="dashboardZoneTwo" position="1"/>
+            <hook module="dashguestcycle" hook="dashboardZoneTwo" position="1"/>
+            <hook module="dashtrends" hook="dashboardZoneTwo" position="2"/>
             <hook module="dashgoals" hook="actionAdminControllerSetMedia" position="4"/>
             <hook module="dashgoals" hook="dashboardData" position="3"/>
-            <hook module="dashgoals" hook="dashboardZoneTwo" position="2"/>
+            <hook module="dashgoals" hook="dashboardZoneTwo" position="3"/>
             <hook module="dashproducts" hook="actionSearch" position="1"/>
             <hook module="dashproducts" hook="dashboardData" position="4"/>
             <hook module="dashproducts" hook="actionObjectOrderAddAfter" position="2"/>
-            <hook module="dashproducts" hook="dashboardZoneTwo" position="3"/>
+            <hook module="dashproducts" hook="dashboardZoneTwo" position="4"/>
             <hook module="statsdata" hook="actionAuthentication" position="1"/>
             <hook module="statsdata" hook="displayFooter" position="7"/>
             <hook module="statsdata" hook="actionCustomerAccountAdd" position="2"/>

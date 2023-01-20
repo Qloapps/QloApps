@@ -126,14 +126,6 @@ class WkHotelRoom extends Module
         }
     }
 
-    public function hookDisplayAddModuleSettingLink()
-    {
-        $htlRoomBlockConfigLink = $this->context->link->getAdminLink('AdminHotelRoomModuleSetting');
-        $this->context->smarty->assign('htlRoomBlockConfigLink', $htlRoomBlockConfigLink);
-
-        return $this->display(__FILE__, 'hotelRoomSettingLink.tpl');
-    }
-
     /**
      * If admin add any language then an entry will add in defined $lang_tables array's lang table same as prestashop
      * @param array $params
@@ -204,12 +196,16 @@ class WkHotelRoom extends Module
             array (
                 'displayHome',
                 'actionProductDelete',
-                'displayAddModuleSettingLink',
                 'displayFooterExploreSectionHook',
                 'actionProductSave',
                 'actionObjectLanguageAddAfter'
             )
         );
+    }
+
+    public function getContent()
+    {
+        Tools::redirectAdmin($this->context->link->getAdminLink('AdminHotelRoomModuleSetting'));
     }
 
     public function uninstall()

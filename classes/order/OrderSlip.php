@@ -27,7 +27,7 @@
 class OrderSlipCore extends ObjectModel
 {
     /** @var int */
-    public $id;
+    public $id_order_slip;
 
     /** @var int */
     public $id_customer;
@@ -62,6 +62,12 @@ class OrderSlipCore extends ObjectModel
     /** @var int */
     public $partial;
 
+    /** @var int */
+    public $redeem_status = self::REDEEM_STATUS_ACTIVE;
+
+    /** @var int */
+    public $id_cart_rule;
+
     /** @var string Object creation date */
     public $date_add;
 
@@ -70,6 +76,9 @@ class OrderSlipCore extends ObjectModel
 
     /** @var int */
     public $order_slip_type = 0;
+
+    const REDEEM_STATUS_ACTIVE = 1;
+    const REDEEM_STATUS_REDEEMED = 2;
 
     /**
      * @see ObjectModel::$definition
@@ -90,6 +99,8 @@ class OrderSlipCore extends ObjectModel
             'shipping_cost_amount' =>    array('type' => self::TYPE_FLOAT, 'validate' => 'isFloat'),
             'amount' =>                array('type' => self::TYPE_FLOAT, 'validate' => 'isFloat'),
             'partial' =>                array('type' => self::TYPE_INT),
+            'redeem_status' =>          array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
+            'id_cart_rule' =>            array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
             'date_add' =>                array('type' => self::TYPE_DATE, 'validate' => 'isDate'),
             'date_upd' =>                array('type' => self::TYPE_DATE, 'validate' => 'isDate'),
             'order_slip_type' =>        array('type' => self::TYPE_INT, 'validate' => 'isInt'),
@@ -336,6 +347,7 @@ class OrderSlipCore extends ObjectModel
         $order_slip->{'total_products_tax_'.$inc_or_ex_1} = 0;
         $order_slip->{'total_products_tax_'.$inc_or_ex_2} = 0;
 
+        $total_products = array();
         foreach ($booking_list as &$booking) {
             $objHtlBooking = new HotelBookingDetail($booking['id_htl_booking']);
             $order_detail = new OrderDetail((int)$objHtlBooking->id_order_detail);
@@ -541,6 +553,95 @@ class OrderSlipCore extends ObjectModel
         }
 
         return $ecotax_detail;
+    }
+
+    /**
+     * generate voucher and return id of the created rule if successful, false otherwise
+     */
+    public function generateVoucher($sendMail = true)
+    {
+        if (!Validate::isLoadedObject($this)) {
+            return false;
+        }
+
+        if ($this->redeem_status != self::REDEEM_STATUS_ACTIVE) {
+            return false;
+        }
+
+        $objOrder = new Order($this->id_order);
+        if (!Validate::isLoadedObject($objOrder)) {
+            return false;
+        }
+
+        $objCustomer = new Customer($this->id_customer);
+        if (!Validate::isLoadedObject($objCustomer)) {
+            return false;
+        }
+
+        $context = Context::getContext();
+        $objCartRule = new CartRule();
+        $languages = Language::getLanguages();
+
+        $creditSlipPrefix = Configuration::get('PS_CREDIT_SLIP_PREFIX', $context->language->id);
+        $creditSlipID = sprintf(('%1$s%2$06d'), $creditSlipPrefix, (int) $this->id_order_slip);
+
+        $dateFrom = $this->date_add;
+        $dateTo = date('Y-m-d H:i:s', strtotime($dateFrom) + (3600 * 24 * 365.25)); /* 1 year */
+
+        foreach ($languages as $language) {
+            $objCartRule->name[$language['id_lang']] = sprintf('Voucher for credit slip #%s', $creditSlipID);
+        }
+
+        $objCartRule->description = sprintf('Order: #%s', $objOrder->id);
+        $objCartRule->code = 'CS'.(int) ($this->id_order_slip).'C'.(int) ($objCustomer->id).'O'.(int) ($objOrder->id);
+        $objCartRule->quantity = 1;
+        $objCartRule->quantity_per_user = 1;
+        $objCartRule->id_customer = $objCustomer->id;
+        $objCartRule->date_from = $dateFrom;
+        $objCartRule->date_to = $dateTo;
+        $objCartRule->highlight = 1;
+        $objCartRule->active = 1;
+        $objCartRule->reduction_amount = $this->amount;
+        $objCartRule->reduction_tax = true;
+        $objCartRule->minimum_amount_currency = $objOrder->id_currency;
+        $objCartRule->reduction_currency = $objOrder->id_currency;
+
+        if (!$objCartRule->save()) {
+            return false;
+        }
+
+        $this->redeem_status = self::REDEEM_STATUS_REDEEMED;
+        $this->id_cart_rule = (int) $objCartRule->id;
+        $this->save();
+
+        if ($sendMail) {
+            $objCartRule = new CartRule($this->id_cart_rule);
+            $objCustomer = new Customer($objCartRule->id_customer);
+
+            $objCurrency = new Currency($objCartRule->reduction_currency, $context->language->id);
+            $mailVars['{firstname}'] = $objCustomer->firstname;
+            $mailVars['{lastname}'] = $objCustomer->lastname;
+            $mailVars['{credit_slip_id}'] = $creditSlipID;
+            $mailVars['{voucher_code}'] = $objCartRule->code;
+            $mailVars['{voucher_amount}'] = Tools::displayPrice($objCartRule->reduction_amount, $objCurrency, false);
+
+            Mail::Send(
+                $context->language->id,
+                'credit_slip_voucher',
+                sprintf(Mail::l('New voucher for your credit slip #%s', $context->language->id), $creditSlipID),
+                $mailVars,
+                $objCustomer->email,
+                $objCustomer->firstname.' '.$objCustomer->lastname,
+                null,
+                null,
+                null,
+                null,
+                _PS_MAIL_DIR_,
+                true
+            );
+        }
+
+        return $this->id_cart_rule;
     }
 
     public function getWsOrderSlipDetails()

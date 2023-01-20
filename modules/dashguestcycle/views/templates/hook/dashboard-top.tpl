@@ -19,7 +19,7 @@
 
 <div class="row">
 	<div class="col-xs-12">
-		<section id="dashguestcycle" class="widget allow_push">
+		<section id="dashguestcycle" class="dashboard-top widget allow_push">
 			<div class="badges-wrapper">
 				{hook h="displayDashboardBadgeListBefore"}
 				<div class="badge-wrapper">
