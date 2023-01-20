@@ -2147,7 +2147,7 @@ class AdminControllerCore extends Controller
 
         $tab_modules_list = $this->filterTabModuleList($tab_modules_list);
 
-        if ((is_array($tab_modules_list['slider_list']) && count($tab_modules_list['slider_list']))
+        if (!empty($tab_modules_list) && (is_array($tab_modules_list['slider_list']) && count($tab_modules_list['slider_list']))
             || !Tab::isTabModuleListAvailable()
         ) {
             $this->page_header_toolbar_btn['modules-list'] = array(
