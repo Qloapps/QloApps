@@ -26,12 +26,13 @@
 
 abstract class PaymentModuleCore extends Module
 {
+    const DEBUG_MODE = false;
+
     /** @var int Current order's id */
     public $currentOrder;
     public $currencies = true;
     public $currencies_mode = 'checkbox';
-
-    const DEBUG_MODE = false;
+    public $payment_type = OrderPayment::PAYMENT_TYPE_REMOTE_PAYMENT;
 
     public function install()
     {
@@ -305,6 +306,7 @@ abstract class PaymentModuleCore extends Module
 
                     $order->secure_key = ($secure_key ? pSQL($secure_key) : pSQL($this->context->customer->secure_key));
                     $order->payment = $payment_method;
+                    $order->payment_type = $this->payment_type;
                     if (isset($this->name)) {
                         $order->module = $this->name;
                     }
@@ -476,7 +478,7 @@ abstract class PaymentModuleCore extends Module
                     $transaction_id = null;
                 }
 
-                if (!isset($order) || !Validate::isLoadedObject($order) || !$order->addOrderPayment($amount_paid, null, $transaction_id, null, null, null, false)) {
+                if (!isset($order) || !Validate::isLoadedObject($order) || !$order->addOrderPayment($amount_paid, null, $transaction_id, null, null, null, $this->payment_type, false)) {
                     PrestaShopLogger::addLog('PaymentModule::validateOrder - Cannot save Order Payment', 3, null, 'Cart', (int)$id_cart, true);
                     throw new PrestaShopException('Can\'t save Order Payment');
                 }

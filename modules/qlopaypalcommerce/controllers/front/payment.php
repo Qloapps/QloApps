@@ -133,12 +133,12 @@ class QloPaypalCommercePaymentModuleFrontController extends ModuleFrontControlle
                                 // set order status
                                 if ($returnData['data']['status'] == 'COMPLETED') {
                                     if ($cart->is_advance_payment) {
-                                        $orderStatus = Configuration::get('PS_OS_PARTIAL_PAYMENT');
+                                        $orderStatus = Configuration::get('PS_OS_PARTIAL_PAYMENT_ACCEPTED');
                                     } else {
-                                        $orderStatus = Configuration::get('PS_OS_PAYMENT');
+                                        $orderStatus = Configuration::get('PS_OS_PAYMENT_ACCEPTED');
                                     }
                                 } else {
-                                    $orderStatus = Configuration::get('PS_OS_PAYPAL_COMMERCE_AWAITING');
+                                    $orderStatus = Configuration::get('PS_OS_AWAITING_PAYMENT');
                                 }
 
                                 // create order for the payment

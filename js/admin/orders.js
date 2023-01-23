@@ -1119,6 +1119,17 @@ function init()
 		e.preventDefault();
 	});
 
+	$('#add_new_payment').on('click', function(e) {
+		$('#form_add_payment').show('fast');
+		$(this).hide();
+	});
+
+	$('#cancle_add_payment').on('click', function(e) {
+		e.preventDefault();
+		$('#form_add_payment').hide('fast');
+		$('#add_new_payment').show('fast');
+	});
+
 	/*By webkul Code for the datepicker*/
 	$(".add_product_date_from").datepicker(
     {

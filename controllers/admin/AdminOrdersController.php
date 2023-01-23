@@ -238,9 +238,8 @@ class AdminOrdersControllerCore extends AdminController
         $this->addJqueryPlugin(array('autocomplete', 'fancybox', 'typewatch'));
 
         $defaults_order_state = array(
-            'cheque' => (int)Configuration::get('PS_OS_CHEQUE'),
-            'bankwire' => (int)Configuration::get('PS_OS_BANKWIRE'),
-            'other' => (int)Configuration::get('PS_OS_PAYMENT'));
+            'awaiting_payment' => (int)Configuration::get('PS_OS_AWAITING_PAYMENT'),
+            'other' => (int)Configuration::get('PS_OS_PAYMENT_ACCEPTED'));
         $payment_modules = array();
         foreach (PaymentModule::getInstalledPaymentModules() as $p_module) {
             $payment_modules[] = Module::getInstanceById((int)$p_module['id_module']);
@@ -793,6 +792,7 @@ class AdminOrdersControllerCore extends AdminController
             if ($this->tabAccess['edit'] === '1') {
                 $amount = str_replace(',', '.', Tools::getValue('payment_amount'));
                 $currency = new Currency(Tools::getValue('payment_currency'));
+                $payment_type = Tools::getValue('payment_type');
                 $order_has_invoice = $order->hasInvoice();
                 if ($order_has_invoice) {
                     $order_invoice = new OrderInvoice(Tools::getValue('payment_invoice'));
@@ -814,8 +814,18 @@ class AdminOrdersControllerCore extends AdminController
                     $this->errors[] = Tools::displayError('The invoice is invalid.');
                 } elseif (!Validate::isDate(Tools::getValue('payment_date'))) {
                     $this->errors[] = Tools::displayError('The date is invalid');
+                } elseif (!Validate::isUnsignedInt($payment_type)) {
+                    $this->errors[] = Tools::displayError('Payment source is invalid');
                 } else {
-                    if (!$order->addOrderPayment($amount, Tools::getValue('payment_method'), Tools::getValue('payment_transaction_id'), $currency, Tools::getValue('payment_date'), $order_invoice)) {
+                    if (!$order->addOrderPayment(
+                        $amount,
+                        Tools::getValue('payment_method'),
+                        Tools::getValue('payment_transaction_id'),
+                        $currency,
+                        Tools::getValue('payment_date'),
+                        $order_invoice,
+                        $payment_type
+                    )) {
                         if (!validate::isPrice($order->total_paid_real)) {
                             $this->errors[] = Tools::displayError('Order total payments cannot be less than 0.');
                         } else {
@@ -1591,6 +1601,7 @@ class AdminOrdersControllerCore extends AdminController
             'invoices_collection' => $order->getInvoicesCollection(),
             'not_paid_invoices_collection' => $order->getNotPaidInvoicesCollection(),
             'payment_methods' => $payment_methods,
+            'payment_types' => $this->getPaymentsTypes(),
             'invoice_management_active' => Configuration::get('PS_INVOICE', null, null, $order->id_shop),
             'display_warehouse' => (int)Configuration::get('PS_ADVANCED_STOCK_MANAGEMENT'),
             'HOOK_CONTENT_ORDER' => Hook::exec(
@@ -3268,6 +3279,27 @@ class AdminOrdersControllerCore extends AdminController
         ksort($products);
 
         return $products;
+    }
+
+    protected function getPaymentsTypes()
+    {
+        return array(
+            OrderPayment::PAYMENT_TYPE_ONLINE => array(
+                'key' => 'PAYMENT_TYPE_ONLINE',
+                'value' => OrderPayment::PAYMENT_TYPE_ONLINE,
+                'name' => $this->l('Online')
+            ),
+            OrderPayment::PAYMENT_TYPE_PAY_AT_HOTEL => array(
+                'key' => 'PAYMENT_TYPE_PAY_AT_HOTEL',
+                'value' => OrderPayment::PAYMENT_TYPE_PAY_AT_HOTEL,
+                'name' => $this->l('Pay at hotel')
+            ),
+            OrderPayment::PAYMENT_TYPE_REMOTE_PAYMENT => array(
+                'key' => 'PAYMENT_TYPE_REMOTE_PAYMENT',
+                'value' => OrderPayment::PAYMENT_TYPE_REMOTE_PAYMENT,
+                'name' => $this->l('Remote payment')
+            ),
+        );
     }
 
     /**

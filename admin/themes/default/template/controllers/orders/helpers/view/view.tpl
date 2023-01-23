@@ -470,7 +470,7 @@
 				</script>
 			</div>
 			<!-- Payments block -->
-			<div id="formAddPaymentPanel" class="panel">
+			<div id="form_add_payment_panel" class="panel">
 				<div class="panel-heading">
 					<i class="icon-money"></i>
 					{l s="Payment"} <span class="badge">{$order->getOrderPayments()|@count}</span>
@@ -495,13 +495,14 @@
 						{/foreach} *}
 					</p>
 				{/if}
-				<form id="formAddPayment"  method="post" action="{$current_index}&amp;vieworder&amp;id_order={$order->id}&amp;token={$smarty.get.token|escape:'html':'UTF-8'}">
+				<div class="form-group">
 					<div class="table-responsive">
 						<table class="table">
 							<thead>
 								<tr>
 									<th><span class="title_box ">{l s='Date'}</span></th>
 									<th><span class="title_box ">{l s='Payment method'}</span></th>
+									<th><span class="title_box ">{l s='Payment source'}</span></th>
 									<th><span class="title_box ">{l s='Transaction ID'}</span></th>
 									<th><span class="title_box ">{l s='Amount'}</span></th>
 									<th><span class="title_box ">{l s='Invoice'}</span></th>
@@ -513,6 +514,7 @@
 								<tr>
 									<td>{dateFormat date=$payment['date_add'] full=true}</td>
 									<td>{$payment['payment_method']|escape:'html':'UTF-8'}</td>
+									<td>{$payment_types[$payment['payment_type']]['name']|escape:'html':'UTF-8'}</td>
 									<td>{$payment['transaction_id']|escape:'html':'UTF-8'}</td>
 									<td>{displayPrice price=$payment['real_paid_amount'] currency=$payment['id_currency']}</td>
 									<td>
@@ -569,56 +571,90 @@
 									<td class="list-empty hidden-print" colspan="6">
 										<div class="list-empty-msg">
 											<i class="icon-warning-sign list-empty-icon"></i>
-											{l s='No payment methods are available'}
+											{l s='No payment records'}
 										</div>
 									</td>
 								</tr>
 								{/foreach}
-								<tr class="current-edit hidden-print">
-									<td>
-										<div class="input-group fixed-width-xl">
-											<input type="text" name="payment_date" class="datepicker" value="{date('Y-m-d')}" />
-											<div class="input-group-addon">
-												<i class="icon-calendar-o"></i>
-											</div>
-										</div>
-									</td>
-									<td>
-										<input name="payment_method" list="payment_method" class="payment_method">
-										<datalist id="payment_method">
-										{foreach from=$payment_methods item=payment_method}
-											<option value="{$payment_method}">
-										{/foreach}
-										</datalist>
-									</td>
-									<td>
-										<input type="text" name="payment_transaction_id" value="" class="form-control fixed-width-sm"/>
-									</td>
-									<td>
-										<input type="text" name="payment_amount" value="" class="form-control fixed-width-sm pull-left" />
-										<select name="payment_currency" class="payment_currency form-control fixed-width-xs pull-left">
-											{foreach from=$currencies item=current_currency}
-												<option value="{$current_currency['id_currency']}"{if $current_currency['id_currency'] == $currency->id} selected="selected"{/if}>{$current_currency['sign']}</option>
-											{/foreach}
-										</select>
-									</td>
-									<td>
-										{if count($invoices_collection) > 0}
-											<select name="payment_invoice" id="payment_invoice">
-											{foreach from=$invoices_collection item=invoice}
-												<option value="{$invoice->id}" selected="selected">{$invoice->getInvoiceNumberFormatted($current_id_lang, $order->id_shop)}</option>
-											{/foreach}
-											</select>
-										{/if}
-									</td>
-									<td class="actions">
-										<button class="btn btn-primary" type="submit" name="submitAddPayment">
-											{l s='Add'}
-										</button>
-									</td>
-								</tr>
+
 							</tbody>
 						</table>
+					</div>
+				</div>
+				<div class="form-group">
+					<button class="btn btn-primary add_new_payment" id="add_new_payment">
+						{l s='Add new payment'}
+					</button>
+				</div>
+				<form id="form_add_payment" class="well" method="post" action="{$current_index}&amp;vieworder&amp;id_order={$order->id}&amp;token={$smarty.get.token|escape:'html':'UTF-8'}" style="display:none">
+					<div class="form-horizontal">
+						<div class="form-group">
+							<label class="control-label col-sm-2">{l s='Date'}</label>
+							<div class="col-sm-10">
+								<div class="input-group fixed-width-xl">
+									<input type="text" name="payment_date" class="datepicker" value="{date('Y-m-d')}" />
+									<div class="input-group-addon">
+										<i class="icon-calendar-o"></i>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="control-label col-sm-2">{l s='Payment method'}</label>
+							<div class="col-sm-10">
+								<input name="payment_method" list="payment_method" class="form-control payment_method fixed-width-xl">
+								<datalist id="payment_method">
+								{foreach from=$payment_methods item=payment_method}
+									<option value="{$payment_method}">
+								{/foreach}
+								</datalist>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="control-label col-sm-2">{l s='Payment source'}</label>
+							<div class="col-sm-10">
+								<select name="payment_type" class="payment_type form-control fixed-width-xl">
+									{foreach from=$payment_types item=payment_type}
+										<option value="{$payment_type['value']}">{$payment_type['name']}</option>
+									{/foreach}
+								</select>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="control-label col-sm-2">{l s='Transaction ID'}</label>
+							<div class="col-sm-10">
+								<input type="text" name="payment_transaction_id" value="" class="form-control fixed-width-xl"/>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="control-label col-sm-2">{l s='Amount'}</label>
+							<div class="col-sm-10">
+								<input type="text" name="payment_amount" value="" class="form-control fixed-width-xl pull-left" />
+								<select name="payment_currency" class="payment_currency form-control fixed-width-xs pull-left">
+									{foreach from=$currencies item=current_currency}
+										<option value="{$current_currency['id_currency']}"{if $current_currency['id_currency'] == $currency->id} selected="selected"{/if}>{$current_currency['sign']}</option>
+									{/foreach}
+								</select>
+							</div>
+						</div>
+						<div class="form-group">
+							{if count($invoices_collection) > 0}
+								<label class="control-label col-sm-2">{l s='Invoice'}</label>
+								<div class="col-sm-10">
+									<select name="payment_invoice" id="payment_invoice">
+									{foreach from=$invoices_collection item=invoice}
+										<option value="{$invoice->id}" selected="selected">{$invoice->getInvoiceNumberFormatted($current_id_lang, $order->id_shop)}</option>
+									{/foreach}
+									</select>
+								</div>
+							{/if}
+						</div>
+						<button class="btn btn-primary pull-right" type="submit" name="submitAddPayment">
+							{l s='Add payment'}
+						</button>
+						<button class="btn btn-default" id="cancle_add_payment">
+							{l s='Cancel'}
+						</button>
 					</div>
 				</form>
 				{if (!$order->valid && sizeof($currencies) > 1)}

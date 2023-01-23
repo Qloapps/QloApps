@@ -112,7 +112,7 @@
 							{if !isset($document->is_delivery)}
 
 								{if $document->getRestPaid()}
-									<a href="#formAddPaymentPanel" class="js-set-payment btn btn-default anchor" data-amount="{$document->getRestPaid()}" data-id-invoice="{$document->id}" title="{l s='Set payment form'}">
+									<a href="#form_add_payment_panel" class="js-set-payment btn btn-default anchor" data-amount="{$document->getRestPaid()}" data-id-invoice="{$document->id}" title="{l s='Set payment form'}">
 										<i class="icon-money"></i>
 										{l s='Enter payment'}
 									</a>

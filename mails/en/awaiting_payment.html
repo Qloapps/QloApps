@@ -4,51 +4,51 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
 		<title>Message from {shop_name}</title>
-		
-		
-		<style>	@media only screen and (max-width: 300px){ 
+
+
+		<style>	@media only screen and (max-width: 300px){
 				body {
 					width:218px !important;
 					margin:auto !important;
 				}
 				.table {width:195px !important;margin:auto !important;}
-				.logo, .titleblock, .linkbelow, .box, .footer, .space_footer{width:auto !important;display: block !important;}		
+				.logo, .titleblock, .linkbelow, .box, .footer, .space_footer{width:auto !important;display: block !important;}
 				span.title{font-size:20px !important;line-height: 23px !important}
-				span.subtitle{font-size: 14px !important;line-height: 18px !important;padding-top:10px !important;display:block !important;}		
+				span.subtitle{font-size: 14px !important;line-height: 18px !important;padding-top:10px !important;display:block !important;}
 				td.box p{font-size: 12px !important;font-weight: bold !important;}
-				.table-recap table, .table-recap thead, .table-recap tbody, .table-recap th, .table-recap td, .table-recap tr { 
-					display: block !important; 
+				.table-recap table, .table-recap thead, .table-recap tbody, .table-recap th, .table-recap td, .table-recap tr {
+					display: block !important;
 				}
 				.table-recap{width: 200px!important;}
-				.table-recap tr td, .conf_body td{text-align:center !important;}	
+				.table-recap tr td, .conf_body td{text-align:center !important;}
 				.address{display: block !important;margin-bottom: 10px !important;}
-				.space_address{display: none !important;}	
+				.space_address{display: none !important;}
 			}
-	@media only screen and (min-width: 301px) and (max-width: 500px) { 
+	@media only screen and (min-width: 301px) and (max-width: 500px) {
 				body {width:308px!important;margin:auto!important;}
-				.table {width:285px!important;margin:auto!important;}	
-				.logo, .titleblock, .linkbelow, .box, .footer, .space_footer{width:auto!important;display: block!important;}	
-				.table-recap table, .table-recap thead, .table-recap tbody, .table-recap th, .table-recap td, .table-recap tr { 
-					display: block !important; 
+				.table {width:285px!important;margin:auto!important;}
+				.logo, .titleblock, .linkbelow, .box, .footer, .space_footer{width:auto!important;display: block!important;}
+				.table-recap table, .table-recap thead, .table-recap tbody, .table-recap th, .table-recap td, .table-recap tr {
+					display: block !important;
 				}
 				.table-recap{width: 295px !important;}
 				.table-recap tr td, .conf_body td{text-align:center !important;}
-				
+
 			}
 	@media only screen and (min-width: 501px) and (max-width: 768px) {
 				body {width:478px!important;margin:auto!important;}
-				.table {width:450px!important;margin:auto!important;}	
-				.logo, .titleblock, .linkbelow, .box, .footer, .space_footer{width:auto!important;display: block!important;}			
-			}
-	@media only screen and (max-device-width: 480px) { 
-				body {width:308px!important;margin:auto!important;}
-				.table {width:285px;margin:auto!important;}	
+				.table {width:450px!important;margin:auto!important;}
 				.logo, .titleblock, .linkbelow, .box, .footer, .space_footer{width:auto!important;display: block!important;}
-				
+			}
+	@media only screen and (max-device-width: 480px) {
+				body {width:308px!important;margin:auto!important;}
+				.table {width:285px;margin:auto!important;}
+				.logo, .titleblock, .linkbelow, .box, .footer, .space_footer{width:auto!important;display: block!important;}
+
 				.table-recap{width: 295px!important;}
-				.table-recap tr td, .conf_body td{text-align:center!important;}	
+				.table-recap tr td, .conf_body td{text-align:center!important;}
 				.address{display: block !important;margin-bottom: 10px !important;}
-				.space_address{display: none !important;}	
+				.space_address{display: none !important;}
 			}
 </style>
 
@@ -71,7 +71,7 @@
 	<td align="center" class="titleblock" style="padding:7px 0">
 		<font size="2" face="Open-sans, sans-serif" color="#555454">
 			<span class="title" style="font-weight:500;font-size:28px;text-transform:uppercase;line-height:33px">Hi {firstname} {lastname},</span><br/>
-			<span class="subtitle" style="font-weight:500;font-size:16px;text-transform:uppercase;line-height:25px">Thanks for your order with the reference {order_name} from {shop_name}.</span>
+			<span class="subtitle" style="font-weight:500;font-size:16px;text-transform:uppercase;line-height:25px">Thank you for shopping with {shop_name}!</span>
 		</font>
 	</td>
 </tr>
@@ -86,9 +86,10 @@
 				<td style="padding:7px 0">
 					<font size="2" face="Open-sans, sans-serif" color="#555454">
 						<p data-html-only="1" style="border-bottom:1px solid #D6D4D4;margin:3px 0 7px;text-transform:uppercase;font-weight:500;font-size:18px;padding-bottom:10px">
-							Order {order_name}&nbsp;-&nbsp;Item(s) out of stock						</p>
-						<span style="color:#777">
-							Unfortunately, one or more items are currently out of stock. This may cause a slight delay in your delivery. Please accept our apologies and rest assured that we are working hard to rectify this.						</span>
+							Order {order_name}&nbsp;-&nbsp;Awaiting payment
+						</p>
+						<span style="color:#333"><strong>Order reference:</strong></span> {order_name}<br />
+						<span style="color:#333"><strong>Payment method:</strong></span> {payment_method}<br />
 					</font>
 				</td>
 				<td width="10" style="padding:7px 0">&nbsp;</td>
@@ -99,6 +100,7 @@
 <tr>
 	<td class="space_footer" style="padding:0!important">&nbsp;</td>
 </tr>
+{extra_mail_content_html}
 <tr>
 	<td class="linkbelow" style="padding:7px 0">
 		<font size="2" face="Open-sans, sans-serif" color="#555454">
@@ -111,10 +113,11 @@
 	<td class="linkbelow" style="padding:7px 0">
 		<font size="2" face="Open-sans, sans-serif" color="#555454">
 			<span>
-				If you have a guest account, you can follow your order via the <a href="{guest_tracking_url}?id_order={order_name}" style="color:#337ff1">"Guest Tracking"</a> section on our shop.			</span>
+				If you have a guest account, you can follow your order via the <a href="{guest_tracking_url}" style="color:#337ff1">"Guest Tracking"</a> section on our shop.			</span>
 		</font>
 	</td>
 </tr>
+
 
 						<tr>
 							<td class="space_footer" style="padding:0!important">&nbsp;</td>
