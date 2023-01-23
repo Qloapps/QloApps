@@ -2451,8 +2451,6 @@ class AdminControllerCore extends Controller
 
         $helper = new HelperList();
 
-        unset($this->toolbar_btn);
-        $this->initToolbar();
         // Empty list is ok
         if (!is_array($this->_list)) {
             $this->displayWarning($this->l('Bad SQL query', 'Helper').'<br />'.htmlspecialchars($this->_list_error));
