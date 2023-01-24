@@ -629,11 +629,11 @@ class WebserviceOutputBuilderCore
                 $output_details = '';
                 foreach ($objects_assoc as $object_assoc) {
                     if ($depth == 0 || $class_name === null) {
-                        if (empty($object_assoc)) {
-                            continue;
+                        $value = null;
+                        if (!empty($object_assoc)) {
+                            $value = $object_assoc;
                         }
-                        $value = $object_assoc;
-                        if (empty($fields_assoc) && !empty($value['id'])) {
+                        if (empty($fields_assoc)) {
                             $fields_assoc = array(array('id' => $value['id']));
                         }
                         $output_details .= $this->renderFlatAssociation($object, $depth, $assoc_name, $association['resource'], $fields_assoc, $value, $parent_details);
