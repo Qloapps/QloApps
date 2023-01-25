@@ -568,7 +568,7 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
             $obj_cart_book_data->comment = $comment;
             $obj_cart_book_data->date_from = $date_from;
             $obj_cart_book_data->date_to = $date_to;
-            if (Configuration::get('PS_BACKOFFICE_ROOM_BOOKING_TYPE') == HotelBookingDetail::PS_FRONT_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY) {
+            if (Configuration::get('PS_BACKOFFICE_ROOM_BOOKING_TYPE') == HotelBookingDetail::PS_FRONT_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY && is_array($occupancy)) {
                 $room_occupancy = array_shift($occupancy);
                 $obj_cart_book_data->adults = $room_occupancy['adults'];
                 $obj_cart_book_data->children = $room_occupancy['children'];
