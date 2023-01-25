@@ -2428,7 +2428,38 @@ class AdminOrdersControllerCore extends AdminController
             $order = new Order(Tools::getValue('id_order'));
         }
 
+        $this->updateOrderStatusOnOrderChange($order);
+
+        // load updated object
+        $order = new Order(Tools::getValue('id_order'));
+
         Hook::exec('actionOrderEdited', array('order' => $order));
+    }
+
+    public function updateOrderStatusOnOrderChange($objOrder)
+    {
+        // check if new order amount is greater that old order amount and order payment is accepted
+        // then update order status to partial payment accepted
+        $currentOrderState = $objOrder->getCurrentOrderState();
+        $psOsPartialPaymentAccepted = Configuration::get('PS_OS_PARTIAL_PAYMENT_ACCEPTED');
+        if ($currentOrderState->paid == 1 && $currentOrderState->id != $psOsPartialPaymentAccepted) {
+            // calculate due amount
+            $dueAmount = $objOrder->total_paid_tax_incl - $objOrder->total_paid_real;
+            if ($dueAmount > 0) {
+                // now change order status to partial payment
+                $objOrderHistory = new OrderHistory();
+                $objOrderHistory->id_order = $objOrder->id;
+                $objOrderHistory->id_employee = (int) $this->context->employee->id;
+
+                $useExistingPayment = false;
+                if (!$objOrder->hasInvoice()) {
+                    $useExistingPayment = true;
+                }
+
+                $objOrderHistory->changeIdOrderState($psOsPartialPaymentAccepted, $objOrder, $useExistingPayment);
+                $objOrderHistory->add();
+            }
+        }
     }
 
     public function ajaxProcessLoadProductInformation()

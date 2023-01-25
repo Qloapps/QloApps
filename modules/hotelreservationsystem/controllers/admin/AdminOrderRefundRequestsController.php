@@ -238,7 +238,7 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
 
             $this->context->smarty->assign(
                 array (
-                    'hasOrderPaid' => $objOrder->hasBeenPaid(),
+                    'orderTotalPaid' => $objOrder->getTotalPaid(),
                     'customer_name' => $objCustomer->firstname.' '.$objCustomer->lastname,
                     'customer_email' => $objCustomer->email,
                     'orderReturnInfo' => (array)$objOrderReturn,
@@ -274,13 +274,13 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
             $idsReturnDetail = Tools::getValue('id_order_return_detail');
             if (Validate::isLoadedObject($objOrderReturn = new OrderReturn($idOrderReturn))) {
                 $objOrder = new Order($objOrderReturn->id_order);
-                $hasOrderPaid = $objOrder->hasBeenPaid();
+                $orderTotalPaid = $objOrder->getTotalPaid();
                 $idRefundState = Tools::getValue('id_refund_state');
                 if (Validate::isLoadedObject($objRefundState = new OrderReturnState($idRefundState))) {
                     if ($objRefundState->refunded) {
                         $refundedAmounts = Tools::getValue('refund_amounts');
 
-                        if ($hasOrderPaid) {
+                        if ((float) $orderTotalPaid) {
                             if ($idsReturnDetail && count($idsReturnDetail)) {
                                 if ($refundedAmounts) {
                                     foreach ($idsReturnDetail as $idRetDetail) {
@@ -393,7 +393,7 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
                             $objOrderReturn->id_transaction = $idTransaction;
                         } elseif (Tools::isSubmit('generateDiscount')) {
                             $objOrderReturn->payment_mode = 'Voucher';
-                        } elseif (!$hasOrderPaid) {
+                        } elseif (!((float) $orderTotalPaid)) {
                             $objOrderReturn->payment_mode = 'Unpaid by customer';
                             $objOrderReturn->id_transaction = '-';
                         }
@@ -405,18 +405,25 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
                     // change state of the order refund
                     $objOrderReturn->changeIdOrderReturnState($idRefundState);
 
-                    if ($objRefundState->refunded || $objRefundState->denied) {
+                    if ($objRefundState->refunded) {
                         // check if order is paid the set status of the order to refunded
                         $objOrderHistory = new OrderHistory();
                         $objOrderHistory->id_order = (int)$objOrder->id;
 
-                        if ($hasOrderPaid
-                            && $objOrder->hasCompletelyRefunded(OrderReturnState::ORDER_RETURN_STATE_FLAG_REFUNDED)
-                        ) {
-                            $objOrderHistory->changeIdOrderState(Configuration::get('PS_OS_REFUND'), $objOrder);
-                            $objOrderHistory->addWithemail();
-                        } elseif ($objOrder->hasCompletelyRefunded(OrderReturnState::ORDER_RETURN_STATE_FLAG_DENIED)) {
-                            $objOrderHistory->changeIdOrderState(Configuration::get('PS_OS_CANCELED'), $objOrder);
+                        if ($objOrder->hasCompletelyRefunded(OrderReturnState::ORDER_RETURN_STATE_FLAG_REFUNDED)) {
+                            $idOrderState = null;
+                            if ((float) $orderTotalPaid) {
+                                $idOrderState = Configuration::get('PS_OS_REFUND');
+                            } else {
+                                $idOrderState = Configuration::get('PS_OS_CANCELED');
+                            }
+
+                            $useExistingPayment = false;
+                            if (!$objOrder->hasInvoice()) {
+                                $useExistingPayment = true;
+                            }
+
+                            $objOrderHistory->changeIdOrderState($idOrderState, $objOrder, $useExistingPayment);
                             $objOrderHistory->addWithemail();
                         }
                     }

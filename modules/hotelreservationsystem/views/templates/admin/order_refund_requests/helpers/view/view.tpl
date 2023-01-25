@@ -67,6 +67,14 @@
 						</div>
 						<div class="form-group row">
 							<div class="col-sm-3">
+								<strong>{l s='Total paid amount' mod='hotelreservationsystem'} :</strong>
+							</div>
+							<div class="col-sm-9">
+								{displayPrice price=$orderTotalPaid currency=$orderInfo['id_currency']}
+							</div>
+						</div>
+						<div class="form-group row">
+							<div class="col-sm-3">
 								<strong>{l s='Way of payment' mod='hotelreservationsystem'} :</strong>
 							</div>
 							<div class="col-sm-9">
@@ -115,7 +123,7 @@
 											{if !$isRefundCompleted}
 												<th>{l s='Rooms cancelation charges' mod='hotelreservationsystem'}</th>
 											{/if}
-											{if $hasOrderPaid}
+											{if $orderTotalPaid|floatval}
 												<th>{l s='Refund amount' mod='hotelreservationsystem'}</th>
 											{/if}
 										</tr>
@@ -133,7 +141,7 @@
 												{if !$isRefundCompleted}
 													<td>{displayPrice price=$booking['cancelation_charge'] currency=$orderCurrency['id']}</td>
 												{/if}
-												{if $hasOrderPaid}
+												{if $orderTotalPaid|floatval}
 													<td>
 														<div class="input-group">
 															{if $isRefundCompleted}
@@ -228,7 +236,7 @@
 							</div>
 
 							{* Fields to submit refund information *}
-							{if $hasOrderPaid}
+							{if $orderTotalPaid|floatval}
 								<div class="refunded_state_fields" style="display:none;">
 									<div class="form-group">
 										<div class="col-sm-3">
@@ -291,19 +299,17 @@
 											</div>
 										</div>
 									</div>
-									{if $orderReturnInfo['by_admin']}
-										<div class="form-group">
-											<div class="col-sm-3">
-											</div>
-											<div class="col-sm-3">
-												<div class="checkbox">
-													<label>
-														<input value="1" type="checkbox" name="generateDiscount" id="generateDiscount"/> &nbsp;{l s='Create Voucher' mod='hotelreservationsystem'}
-													</label>
-												</div>
+									<div class="form-group">
+										<div class="col-sm-3">
+										</div>
+										<div class="col-sm-3">
+											<div class="checkbox">
+												<label>
+													<input value="1" type="checkbox" name="generateDiscount" id="generateDiscount"/> &nbsp;{l s='Create Voucher' mod='hotelreservationsystem'}
+												</label>
 											</div>
 										</div>
-									{/if}
+									</div>
 								</div>
 							{/if}
 						{/if}
