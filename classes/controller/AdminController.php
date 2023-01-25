@@ -2214,36 +2214,7 @@ class AdminControllerCore extends Controller
 
     public function ajaxProcessRefreshModuleList($force_reload_cache = false)
     {
-        if (!$this->isFresh(Module::CACHE_FILE_DEFAULT_COUNTRY_MODULES_LIST, _TIME_1_DAY_) || $force_reload_cache) {
-            if (file_put_contents(_PS_ROOT_DIR_.Module::CACHE_FILE_DEFAULT_COUNTRY_MODULES_LIST, Tools::addonsRequest('native'))) {
-                $this->status = 'refresh';
-            } else {
-                $this->status = 'error';
-            }
-        } else {
-            $this->status = 'cache';
-        }
-
-        if (!$this->isFresh(Module::CACHE_FILE_MUST_HAVE_MODULES_LIST, _TIME_1_DAY_) || $force_reload_cache) {
-            if (file_put_contents(_PS_ROOT_DIR_.Module::CACHE_FILE_MUST_HAVE_MODULES_LIST, Tools::addonsRequest('must-have'))) {
-                $this->status = 'refresh';
-            } else {
-                $this->status = 'error';
-            }
-        } else {
-            $this->status = 'cache';
-        }
-
-        if (!$this->isFresh(Module::CACHE_FILE_TAB_MODULES_LIST, _TIME_1_WEEK_)) {
-            if ($this->refresh(Module::CACHE_FILE_TAB_MODULES_LIST, _QLO_TAB_MODULE_LIST_URL_)) {
-                $this->status = 'refresh';
-            } else {
-                $this->status = 'error';
-            }
-        } else {
-            $this->status = 'cache';
-        }
-        Module::generateTrustedXml();
+        $this->status = Module::refreshModuleList($force_reload_cache);
     }
 
     /**
@@ -2835,7 +2806,7 @@ class AdminControllerCore extends Controller
         ));
 
         // get upgrade available info
-        if (!$this->isFresh(Upgrader::CACHE_FILE_UPGRADE_AVAILABE, _TIME_1_DAY_)) {
+        if (!Tools::isFresh(Upgrader::CACHE_FILE_UPGRADE_AVAILABE, _TIME_1_DAY_)) {
             file_put_contents(_PS_ROOT_DIR_.Upgrader::CACHE_FILE_UPGRADE_AVAILABE, Tools::addonsRequest('check-version'));
         }
         if (file_exists(_PS_ROOT_DIR_.Upgrader::CACHE_FILE_UPGRADE_AVAILABE)) {
@@ -4075,28 +4046,24 @@ class AdminControllerCore extends Controller
      * @param string $file
      * @param int $timeout
      * @return bool
+     * @deprecated Deprecated 1.6.0.0 Use Tools::isFresh instead
      */
     public function isFresh($file, $timeout = _TIME_1_WEEK_)
     {
-        if (($time = @filemtime(_PS_ROOT_DIR_.$file)) && filesize(_PS_ROOT_DIR_.$file) > 0) {
-            return ((time() - $time) < $timeout);
-        }
-
-        return false;
+        Tools::displayAsDeprecated();
+        return Tools::isFresh($file, $timeout);
     }
 
     /**
      * @param string $file_to_refresh
      * @param string $external_file
      * @return bool
+     * @deprecated Deprecated 1.6.0.0 Use Tools::refresh instead
      */
     public function refresh($file_to_refresh, $external_file)
     {
-        if (self::$is_qloapps_up && $content = Tools::file_get_contents($external_file)) {
-            return (bool)file_put_contents(_PS_ROOT_DIR_.$file_to_refresh, $content);
-        }
-        self::$is_qloapps_up = false;
-        return false;
+        Tools::displayAsDeprecated();
+        return Tools::refresh($file_to_refresh, $external_file);
     }
 
     /**
