@@ -529,7 +529,12 @@ class ProductControllerCore extends FrontController
             $bookingParams['occupancy'] = $occupancy;
             $quantity = count($occupancy);
         } else {
+            // when room selection is done using qty, occupancy parameter will contain the number of rooms.
             $quantity = $occupancy;
+        }
+
+        if ($quantity <= 0) {
+            $quantity = 1;
         }
 
         if ($hotelRoomData = $objBookingDetail->DataForFrontSearch($bookingParams)) {
