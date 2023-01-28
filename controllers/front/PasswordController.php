@@ -84,6 +84,9 @@ class PasswordControllerCore extends FrontController
                             '{passwd}' => $password
                         );
                         if (Mail::Send($this->context->language->id, 'password', Mail::l('Your new password'), $mail_params, $customer->email, $customer->firstname.' '.$customer->lastname)) {
+
+                            $this->context->updateCustomer($customer);
+
                             $this->context->smarty->assign(array('confirmation' => 1, 'customer_email' => $customer->email));
                         } else {
                             $this->errors[] = Tools::displayError('An error occurred while sending the email.');
