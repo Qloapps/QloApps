@@ -699,6 +699,7 @@ class InstallModelInstall extends InstallAbstractModel
                 'statsequipment',
                 'blockcart',
                 'blockuserinfo',
+                'qlochannelmanagerconnector',
             );
         }
         return $modules;

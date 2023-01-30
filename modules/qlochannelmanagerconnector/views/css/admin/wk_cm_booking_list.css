@@ -1,0 +1,49 @@
+/**
+* 2010-2023 Webkul.
+*
+* NOTICE OF LICENSE
+*
+* All right is reserved,
+* Please go through this link for complete license : https://store.webkul.com/license.html
+*
+* DISCLAIMER
+*
+* Do not edit or add to this file if you wish to upgrade this module to newer
+* versions in the future. If you wish to customize this module for your
+* needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
+*
+*  @author    Webkul IN <support@webkul.com>
+*  @copyright 2010-2023 Webkul IN
+*  @license   https://store.webkul.com/license.html
+*/
+
+#content.bootstrap .panel .panel-heading {
+    text-transform: none;
+    height: auto;
+    margin: -20px -16px 25px -16px;
+    padding: 15px;
+    color: #555;
+    font-size: 16px;
+    border-bottom: 1px solid #d4d9dd;
+}
+#form-qcmc_channel_manager_booking .table {
+    border: 1px solid #ddd;
+}
+#form-qcmc_channel_manager_booking .table thead>tr>th {
+    font-weight: bold;
+    font-size: 13px;
+    vertical-align: middle;
+    padding: 15px;
+    background-color: #ecf6fb;
+    border-bottom: 1px solid #ddd;
+}
+#form-qcmc_channel_manager_booking .table tbody>tr>td {
+    font-size: 13px;
+    color: #555;
+    vertical-align: middle;
+    padding: 15px;
+    border-bottom: 1px solid #ddd;
+}
+#form-qcmc_channel_manager_booking .pagination {
+    font-size: 14px;
+}
