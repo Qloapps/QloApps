@@ -365,6 +365,8 @@ class AdminHotelFeaturePricesSettingsController extends ModuleAdminController
                     $this->errors[] = $this->l('Invalid value of impact value.');
                 }
             }
+
+
             if (!count($this->errors)) {
                 if ($idFeaturePrice) {
                     $objFeaturePricing = new HotelRoomTypeFeaturePricing($idFeaturePrice);

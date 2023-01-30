@@ -302,8 +302,20 @@ class StatsProduct extends ModuleGraph
 				</thead>
                 <tbody>';
 
-            // get room types info
-            foreach ($this->getProducts() as $product) {
+            $bookingParams = array();
+            $bookingParams['date_from'] = $dateFrom;
+            $bookingParams['date_to'] = $dateTo;
+            foreach ($this->getProducts($this->context->language->id) as $product) {
+                $availRooms = 0;
+                if ($roomTypeInfo = $objHotelRoomType->getRoomTypeInfoByIdProduct($product['id_product'])) {
+                    $bookingParams['hotel_id'] = $roomTypeInfo['id_hotel'];
+                    $bookingParams['id_room_type'] = $product['id_product'];
+                    if ($booking_data = $objBookingDtl->getBookingData($bookingParams)) {
+                        if (isset($booking_data['stats']['num_avail'])) {
+                            $availRooms = $booking_data['stats']['num_avail'];
+                        }
+                    }
+                }
                 $this->html .= '
 				<tr>
 					<td>

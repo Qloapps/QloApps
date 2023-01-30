@@ -250,7 +250,7 @@ class GuestTrackingControllerCore extends FrontController
 
                         $cartHotelData[$type_key]['id_product'] = $type_value['product_id'];
                         $cartHotelData[$type_key]['cover_img'] = $cover_img;
-                        $cartHotelData[$type_key]['adult'] = $rm_dtl['adult'];
+                        $cartHotelData[$type_key]['adults'] = $rm_dtl['adults'];
                         $cartHotelData[$type_key]['children'] = $rm_dtl['children'];
 
                         $objBookingDemand = new HotelBookingDemands();

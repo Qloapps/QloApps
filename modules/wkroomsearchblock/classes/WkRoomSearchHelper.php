@@ -54,6 +54,44 @@ class WkRoomSearchHelper
             }
         }
 
+        // Lets validate guest occupancy fields
+        // Get guest occupancy variable
+        $guestOccupancy = Tools::getValue('occupancy');
+        if (!count($guestOccupancy)) {
+            $errors[] = $objModule->l('Invalid occupancy', 'WkRoomSearchHelper');
+        } else {
+            $adultTypeErr = 0;
+            $childTypeErr = 0;
+            $childAgeErr = 0;
+            foreach ($guestOccupancy as $occupancy) {
+                if (!isset($occupancy['adults']) || !Validate::isUnsignedInt($occupancy['adults'])) {
+                    $adultTypeErr = 1;
+                }
+                if (!isset($occupancy['children']) || !Validate::isUnsignedInt($occupancy['children'])) {
+                    $childTypeErr = 1;
+                } elseif ($occupancy['children']) {
+                    if (!isset($occupancy['child_ages']) || ($occupancy['children'] != count($occupancy['child_ages']))) {
+                        $childAgeErr = 1;
+                    } else {
+                        foreach ($occupancy['child_ages'] as $childAge) {
+                            if (!Validate::isUnsignedInt($childAge)) {
+                                $childAgeErr = 1;
+                            }
+                        }
+                    }
+                }
+            }
+            if ($adultTypeErr) {
+                $errors[] = $objModule->l('Invalid adults', 'WkRoomSearchHelper');
+            }
+            if ($childTypeErr) {
+                $errors[] = $objModule->l('Invalid children', 'WkRoomSearchHelper');
+            }
+            if ($childAgeErr) {
+                $errors[] = $objModule->l('Invalid children ages', 'WkRoomSearchHelper');
+            }
+        }
+
         return $errors;
     }
 
@@ -71,6 +109,10 @@ class WkRoomSearchHelper
         $hotelsInfo = $objHotelInfo->hotelBranchesInfo(0, 1);
 
         $locationEnabled = Configuration::get('WK_HOTEL_LOCATION_ENABLE');
+        $occupancyEnabled = false;
+        if (Configuration::get('PS_FRONT_SEARCH_TYPE') == HotelBookingDetail::SEARCH_TYPE_OWS) {
+            $occupancyEnabled = true;
+        }
         // if room type page
         if ($idProduct = Tools::getValue('id_product')) {
             $objHtlRoomType = new HotelRoomType();
@@ -102,8 +144,8 @@ class WkRoomSearchHelper
                 $searchedData['num_days'] = $objBookingDetail->getNumberOfDays($dateFrom, $dateTo);
 
                 $searchedData['parent_data'] = $htlCategoryInfo;
-                $searchedData['date_from'] = date('d-m-Y', strtotime($dateFrom));
-                $searchedData['date_to'] = date('d-m-Y', strtotime($dateTo));
+                $searchedData['date_from'] = $dateFrom;
+                $searchedData['date_to'] = $dateTo;
                 $searchedData['htl_dtl'] = $objHotelInfo->hotelBranchesInfo(0, 1, 1, $idHotel);
 
                 $searchedData['location'] = $searchedData['htl_dtl']['city'];
@@ -123,6 +165,20 @@ class WkRoomSearchHelper
                     }
                 }
 
+                if ($occupancyEnabled) {
+                    // send occupancy information searched by the user
+                    if ($searchedData['occupancies'] = Tools::getvalue('occupancy')) {
+                        $searchedData['occupancy_adults'] = array_sum(
+                            array_column($searchedData['occupancies'], 'adults')
+                        );
+                        $searchedData['occupancy_children'] = array_sum(
+                            array_column($searchedData['occupancies'], 'children')
+                        );
+                        $searchedData['occupancy_child_ages'] = array_sum(
+                            array_column($searchedData['occupancies'], 'child_ages')
+                        );
+                    }
+                }
                 $smartyVars['search_data'] = $searchedData;
             }
 
@@ -143,10 +199,78 @@ class WkRoomSearchHelper
         $smartyVars['total_active_hotels'] = $totalActiveHotels;
         $smartyVars['hotels_info'] = $hotelsInfo;
         $smartyVars['show_hotel_name'] = Configuration::get('WK_HOTEL_NAME_ENABLE');
+        $smartyVars['max_child_age'] = Configuration::get('WK_GLOBAL_CHILD_MAX_AGE');
 
         $maxOrderDate = HotelOrderRestrictDate::getMaxOrderDate($idHotel);
         $smartyVars['max_order_date'] = date('Y-m-d', strtotime($maxOrderDate));
         $smartyVars['preparation_time'] = (int) HotelOrderRestrictDate::getPreparationTime($idHotel);
+
+
+        // set base width for each elements
+        $search_column_widths = array(
+            'location' => 4,
+            'hotel' => 5,
+            'date' => 5,
+            'occupancy' => 5,
+            'search' => 3
+        );
+
+        if (!$locationEnabled) {
+            unset($search_column_widths['location']);
+
+            $search_column_widths['date'] += 1;
+            $search_column_widths['search'] += 1;
+            if ($occupancyEnabled) {
+                $search_column_widths['search'] += 1;
+                $search_column_widths['occupancy'] += 1;
+            } elseif ($smartyVars['show_hotel_name'] || count($hotelsInfo) > 1) {
+                $search_column_widths['hotel'] += 1;
+            } else {
+                $search_column_widths['search'] += 1;
+                $search_column_widths['date'] += 1;
+            }
+        }
+        if (!$smartyVars['show_hotel_name'] && count($hotelsInfo) <= 1) {
+            unset($search_column_widths['hotel']);
+
+            $search_column_widths['date'] += 1;
+            $search_column_widths['search'] += 1;
+            if ($occupancyEnabled) {
+                $search_column_widths['date'] += 1;
+                $search_column_widths['occupancy'] += 2;
+            } else {
+                $search_column_widths['date'] += 1;
+                $search_column_widths['date'] += 2;
+            }
+        }
+        if (!$occupancyEnabled) {
+            unset($search_column_widths['occupancy']);
+
+            if ($smartyVars['show_hotel_name'] || count($hotelsInfo) > 1) {
+                if ($locationEnabled) {
+                    $search_column_widths['hotel'] += 1;
+                    $search_column_widths['location'] += 1;
+                    $search_column_widths['search'] += 2;
+                    $search_column_widths['date'] += 1;
+                } else {
+                    $search_column_widths['hotel'] += 2;
+                    $search_column_widths['search'] += 2;
+                    $search_column_widths['date'] += 2;
+
+                }
+            } else {
+                $search_column_widths['date'] += 1;
+                $search_column_widths['date'] += 4;
+            }
+        }
+        $smartyVars['column_widths'] = $search_column_widths;
+        if (count($search_column_widths) == 2) {
+            $smartyVars['multiple_dates_input'] = true;
+            Media::addJSDef(array(
+                'multiple_dates_input' => true
+            ));
+        }
+
 
         Context::getContext()->smarty->assign($smartyVars);
     }

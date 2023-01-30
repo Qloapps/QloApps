@@ -71,6 +71,9 @@ class OrderCore extends ObjectModel
     /** @var string Payment method */
     public $payment;
 
+    /** @var string Payment type */
+    public $payment_type;
+
     /** @var string Payment module */
     public $module;
 
@@ -191,6 +194,11 @@ class OrderCore extends ObjectModel
     public $advance_paid_amount;
 
     /**
+    * @var int is occupancy provided in this order
+    */
+    public $with_occupancy;
+
+    /**
      * @see ObjectModel::$definition
      */
     public static $definition = array(
@@ -210,6 +218,7 @@ class OrderCore extends ObjectModel
             'current_state' =>                array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
             'secure_key' =>                array('type' => self::TYPE_STRING, 'validate' => 'isMd5'),
             'payment' =>                    array('type' => self::TYPE_STRING, 'validate' => 'isGenericName', 'required' => true),
+            'payment_type' =>                array('type' => self::TYPE_INT, 'validate' => 'isUnsignedInt'),
             'module' =>                    array('type' => self::TYPE_STRING, 'validate' => 'isModuleName', 'required' => true),
             'recyclable' =>                array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
             'gift' =>                        array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
@@ -242,8 +251,9 @@ class OrderCore extends ObjectModel
             'source' =>                        array('type' => self::TYPE_STRING),
             'valid' =>                        array('type' => self::TYPE_BOOL),
             'reference' =>                    array('type' => self::TYPE_STRING),
-            'is_advance_payment' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'default' => 0),
-            'advance_paid_amount' => array('type' => self::TYPE_FLOAT, 'validate' => 'isPrice'),
+            'is_advance_payment' =>         array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'default' => 0),
+            'advance_paid_amount' =>        array('type' => self::TYPE_FLOAT, 'validate' => 'isPrice'),
+            'with_occupancy' =>      array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'default' => 0),
             'date_add' =>                    array('type' => self::TYPE_DATE, 'validate' => 'isDate'),
             'date_upd' =>                    array('type' => self::TYPE_DATE, 'validate' => 'isDate'),
         ),
@@ -885,7 +895,7 @@ class OrderCore extends ObjectModel
 
     public function isInPreparation()
     {
-        return count($this->getHistory((int)$this->id_lang, Configuration::get('PS_OS_PREPARATION')));
+        return count($this->getHistory((int)$this->id_lang, Configuration::get('PS_OS_PROCESSING')));
     }
 
     /**
@@ -1608,7 +1618,7 @@ class OrderCore extends ObjectModel
         $payment_module = Module::getInstanceByName($this->module);
         $payment_module->orderSource = $this->source;
         $customer = new Customer($this->id_customer);
-        $payment_module->validateOrder($this->id_cart, Configuration::get('PS_OS_WS_PAYMENT'), $this->total_paid, $this->payment, null, array(), null, false, $customer->secure_key);
+        $payment_module->validateOrder($this->id_cart, Configuration::get('PS_OS_AWAITING_REMOTE_PAYMENT'), $this->total_paid, $this->payment, null, array(), null, false, $customer->secure_key);
         $this->id = $payment_module->currentOrder;
         return true;
     }
@@ -1739,7 +1749,7 @@ class OrderCore extends ObjectModel
      * @param bool $update_payment_detail :: if false, be sure to add payment detail in payment detail table
      * @return bool
      */
-    public function addOrderPayment($amount_paid, $payment_method = null, $payment_transaction_id = null, $currency = null, $date = null, $order_invoice = null, $update_payment_detail = true)
+    public function addOrderPayment($amount_paid, $payment_method = null, $payment_transaction_id = null, $currency = null, $date = null, $order_invoice = null, $payment_type = null, $update_payment_detail = true)
     {
         $order_payment = new OrderPayment();
         $order_payment->order_reference = $this->reference;
@@ -1748,6 +1758,7 @@ class OrderCore extends ObjectModel
         $order_payment->conversion_rate = ($currency ? $currency->conversion_rate : 1);
         // if payment_method is define, we used this
         $order_payment->payment_method = ($payment_method ? $payment_method : $this->payment);
+        $order_payment->payment_type = ($payment_type ? $payment_type : $this->payment_type);
         $order_payment->transaction_id = $payment_transaction_id;
         $order_payment->amount = $amount_paid;
         $order_payment->date_add = ($date ? $date : null);

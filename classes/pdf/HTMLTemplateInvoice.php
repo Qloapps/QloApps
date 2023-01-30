@@ -352,8 +352,6 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
 
                     $cart_htl_data[$type_key]['id_product'] = $type_value['product_id'];
                     $cart_htl_data[$type_key]['cover_img']    = $cover_img;
-                    $cart_htl_data[$type_key]['adult']        = $rm_dtl['adult'];
-                    $cart_htl_data[$type_key]['children']    = $rm_dtl['children'];
                     $cart_htl_data[$type_key]['hotel_name']    = $rm_dtl['hotel_name'];
                     $objBookingDemand = new HotelBookingDemands();
                     foreach ($order_bk_data as $data_k => $data_v) {
@@ -400,6 +398,8 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
                             );
 
                             $cart_htl_data[$type_key]['date_diff'][$date_join]['num_rm'] += 1;
+                            $cart_htl_data[$type_key]['date_diff'][$date_join]['adults'] += $data_v['adults'];
+                            $cart_htl_data[$type_key]['date_diff'][$date_join]['children'] += $data_v['children'];
 
                             $num_days = $cart_htl_data[$type_key]['date_diff'][$date_join]['num_days'];
 
@@ -446,6 +446,9 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
                             $cart_htl_data[$type_key]['date_diff'][$date_join]['data_form'] = Tools::displayDate($data_v['date_from']);
                             $cart_htl_data[$type_key]['date_diff'][$date_join]['data_to'] = Tools::displayDate($data_v['date_to']);
                             $cart_htl_data[$type_key]['date_diff'][$date_join]['num_days'] = $num_days;
+                            $cart_htl_data[$type_key]['date_diff'][$date_join]['adults'] = $data_v['adults'];
+                            $cart_htl_data[$type_key]['date_diff'][$date_join]['children'] = $data_v['children'];
+
 
                             $cart_htl_data[$type_key]['date_diff'][$date_join]['paid_unit_price_tax_excl'] = $data_v['total_price_tax_excl']/$num_days;
                             $cart_htl_data[$type_key]['date_diff'][$date_join]['paid_unit_price_tax_incl'] = $data_v['total_price_tax_excl']/$num_days;

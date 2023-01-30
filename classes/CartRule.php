@@ -875,9 +875,10 @@ class CartRuleCore extends ObjectModel
      * @param bool $use_tax
      * @param Context $context
      * @param bool $use_cache Allow using cache to avoid multiple free gift using multishipping
+     * @param bool $only_advance_payment_products to calculate discount applied only on products that have advance payment
      * @return float|int|string
      */
-    public function getContextualValue($use_tax, Context $context = null, $filter = null, $package = null, $use_cache = true)
+    public function getContextualValue($use_tax, Context $context = null, $filter = null, $package = null, $use_cache = true, $only_advance_payment_products = false)
     {
         if (!CartRule::isFeatureActive()) {
             return 0;
@@ -890,14 +891,33 @@ class CartRuleCore extends ObjectModel
         }
 
         $all_products = $context->cart->getProducts();
-        $package_products = (is_null($package) ? $all_products : $package['products']);
+        if (is_null($package)) {
+            $package = array(
+                'products' => $all_products,
+                'id_carrier' => null,
+                'id_address' => 0
+            );
+        }
 
         $reduction_value = 0;
-
-        $cache_id = 'getContextualValue_'.(int)$this->id.'_'.(int)$use_tax.'_'.(int)$context->cart->id.'_'.(int)$filter;
-        foreach ($package_products as $product) {
+        $objHotelAdvancePayment = new HotelAdvancedPayment();
+        $cache_id = 'getContextualValue_'.(int)$this->id.'_'.(int)$use_tax.'_'.(int)$context->cart->id.'_'.(int)$filter.'_'.(int)$only_advance_payment_products;
+        foreach ($package['products'] as $key => $product) {
+            if ($only_advance_payment_products) {
+                if ($advancePaymentInfo = $objHotelAdvancePayment->getIdAdvPaymentByIdProduct($product['id_product'])) {
+                    if (!$advancePaymentInfo['active']) {
+                        unset($package['products'][$key]);
+                        continue;
+                    }
+                } else {
+                    unset($package['products'][$key]);
+                    continue;
+                }
+            }
             $cache_id .= '_'.(int)$product['id_product'].'_'.(int)$product['id_product_attribute'].(isset($product['in_stock']) ? '_'.(int)$product['in_stock'] : '');
         }
+
+        $package_products = $package['products'];
 
         if (Cache::isStored($cache_id)) {
             return Cache::retrieve($cache_id);
@@ -1001,7 +1021,7 @@ class CartRuleCore extends ObjectModel
                 $reduction_value += $selected_products_reduction * $this->reduction_percent / 100;
             }
 
-            // Discount (¤)
+            // Discount (by amount)
             if ((float)$this->reduction_amount > 0) {
                 $prorata = 1;
                 if (!is_null($package) && count($all_products)) {
@@ -1011,7 +1031,31 @@ class CartRuleCore extends ObjectModel
                     }
                 }
 
+                $restricted_product = null;
                 $reduction_amount = $this->reduction_amount;
+                // If the cart rule is restricted to one room type it can't exceed this room type price
+                if ($this->reduction_product > 0) {
+                    foreach ($package_products as $product) {
+                        if ($product['id_product'] == $this->reduction_product) {
+                            $restricted_product = $product;
+
+                            $prorata = 1; // do not split this cart rule
+                            if ($this->reduction_tax) {
+                                $max_reduction_amount = (int) $restricted_product['cart_quantity'] * (float) $restricted_product['price_wt'];
+                            } else {
+                                $max_reduction_amount = (int) $restricted_product['cart_quantity'] * (float) $restricted_product['price'];
+                            }
+                            $reduction_amount = min($reduction_amount, $max_reduction_amount);
+
+                            break;
+                        }
+                    }
+                }
+
+                if (($this->reduction_product > 0) && !$restricted_product) {
+                    $reduction_amount = 0;
+                }
+
                 // If we need to convert the voucher value to the cart currency
                 if (isset($context->currency) && $this->reduction_currency != $context->currency->id) {
                     $voucherCurrency = new Currency($this->reduction_currency);
@@ -1058,7 +1102,7 @@ class CartRuleCore extends ObjectModel
                             }
                         }
                     }
-                    // Discount (¤) on the whole order
+                    // Discount (by amount) on the whole order
                     elseif ($this->reduction_product == 0) {
                         $cart_amount_te = null;
                         $cart_amount_ti = null;

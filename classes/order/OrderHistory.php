@@ -97,7 +97,7 @@ class OrderHistoryCore extends ObjectModel
         $old_os = $order->getCurrentOrderState();
 
         // executes hook
-        if (in_array($new_os->id, array(Configuration::get('PS_OS_PAYMENT'), Configuration::get('PS_OS_WS_PAYMENT')))) {
+        if (in_array($new_os->id, array(Configuration::get('PS_OS_PAYMENT_ACCEPTED'), Configuration::get('PS_OS_WS_PAYMENT')))) {
             Hook::exec('actionPaymentConfirmation', array('id_order' => (int)$order->id), null, false, true, false, $order->id_shop);
         }
 
@@ -399,7 +399,7 @@ class OrderHistoryCore extends ObjectModel
     public function sendEmail($order, $template_vars = false)
     {
         $result = Db::getInstance()->getRow('
-			SELECT osl.`template`, c.`lastname`, c.`firstname`, osl.`name` AS osname, c.`email`, os.`module_name`, os.`id_order_state`, os.`pdf_invoice`, os.`pdf_delivery`
+			SELECT osl.`template`, c.`lastname`, c.`firstname`, osl.`name` AS osname, c.`email`, o.`module` as `module_name`, os.`id_order_state`, os.`pdf_invoice`, os.`pdf_delivery`
 			FROM `'._DB_PREFIX_.'order_history` oh
 				LEFT JOIN `'._DB_PREFIX_.'orders` o ON oh.`id_order` = o.`id_order`
 				LEFT JOIN `'._DB_PREFIX_.'customer` c ON o.`id_customer` = c.`id_customer`
@@ -414,13 +414,26 @@ class OrderHistoryCore extends ObjectModel
                 '{lastname}' => $result['lastname'],
                 '{firstname}' => $result['firstname'],
                 '{id_order}' => (int)$this->id_order,
-                '{order_name}' => $order->getUniqReference()
+                '{order_name}' => $order->getUniqReference(),
+                '{extra_mail_content_html}' => '',
+                '{extra_mail_content_txt}' => '',
+                '{payment_method}' => '',
             );
 
             if ($result['module_name']) {
-                $module = Module::getInstanceByName($result['module_name']);
-                if (Validate::isLoadedObject($module) && isset($module->extra_mail_vars) && is_array($module->extra_mail_vars)) {
-                    $data = array_merge($data, $module->extra_mail_vars);
+                if (Validate::isLoadedObject($module = Module::getInstanceByName($result['module_name']))) {
+                    $data['{payment_method}'] = $module->displayName;
+                    // if any modle need to send extra content in mail, that module need to implement this function
+                    // this function should return an array with content for both html and txt mail template
+                    // return  array('{extra_mail_content_html}' => '', '{extra_mail_content_txt}' => '')
+                    if (method_exists($module, 'getExtraMailContent')) {
+                        if (is_array($extra_mail_content = $module->getExtraMailContent(
+                            $result['id_order_state'],
+                            $order
+                        ))) {
+                            $data = array_merge($data, $extra_mail_content);
+                        }
+                    }
                 }
             }
 

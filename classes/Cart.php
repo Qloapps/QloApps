@@ -1731,6 +1731,7 @@ class CartCore extends ObjectModel
 
         $order_total_discount = 0;
         $order_shipping_discount = 0;
+        $advance_payment_products_discount = 0;
         if (!in_array($type, array(Cart::ONLY_SHIPPING, Cart::ONLY_PRODUCTS, Cart::ADVANCE_PAYMENT_ONLY_PRODUCTS)) && CartRule::isFeatureActive()) {
             // First, retrieve the cart rules associated to this "getOrderTotal"
             if ($with_shipping || $type == Cart::ONLY_DISCOUNTS) {
@@ -1787,10 +1788,28 @@ class CartCore extends ObjectModel
                 // If the cart rule offers a reduction, the amount is prorated (with the products in the package)
                 if ($cart_rule['obj']->reduction_percent > 0 || $cart_rule['obj']->reduction_amount > 0) {
                     $order_total_discount += Tools::ps_round($cart_rule['obj']->getContextualValue($with_taxes, $virtual_context, CartRule::FILTER_ACTION_REDUCTION, $package, $use_cache), $compute_precision);
+
+                    if ($type == Cart::ADVANCE_PAYMENT) {
+                        $advance_payment_products_discount += Tools::ps_round($cart_rule['obj']->getContextualValue($with_taxes, $virtual_context, CartRule::FILTER_ACTION_REDUCTION, $package, $use_cache, true), $compute_precision);
+                    }
                 }
             }
             $order_total_discount = min(Tools::ps_round($order_total_discount, 2), (float)$order_total_products) + (float)$order_shipping_discount;
-            $order_total -= $order_total_discount;
+            if ($type == Cart::ADVANCE_PAYMENT) {
+                // get order total without discount
+                $total_without_discount = $this->getOrderTotal() + $order_total_discount;
+                // to find due amount substract advance payment without discuount from order total without discount
+                // Due Amount = order total - advance payment (without discount)
+                $due_amount = $total_without_discount - $order_total;
+                // if discount for advance payment products is greater than due amount then only decrease the price of advance payment amount
+                // otherwise discount will be applied on due amount not advance payment amount
+                if ($advance_payment_products_discount > $due_amount) {
+                    $order_total -= ($advance_payment_products_discount - $due_amount);
+                }
+                $order_total -= $order_total_discount - $advance_payment_products_discount;
+            } else {
+                $order_total -= $order_total_discount;
+            }
         }
 
         if ($type == Cart::BOTH || $type == Cart::ADVANCE_PAYMENT) {
@@ -4370,7 +4389,7 @@ class CartCore extends ObjectModel
         // lets validate the cart booking data first
         if (isset($bookingRows) && count($bookingRows)) {
             $objRoomType = new HotelRoomType();
-            $objBookingDtl = new HotelBookingDetail();
+            $objBookingDetail = new HotelBookingDetail();
             $errors = array();
             $idCustomer = $objCart->id_customer;
             $idCurrency = $objCart->id_currency;
@@ -4412,24 +4431,20 @@ class CartCore extends ObjectModel
                         }
 
                         if (!count($errors)) {
-                            $numDays = $objBookingDtl->getNumberOfDays($dateFrom, $dateTo);
+                            $numDays = $objBookingDetail->getNumberOfDays($dateFrom, $dateTo);
                             $prodQty = $prodQty * (int) $numDays;
                             $reqRooms = 1;
 
-                            if ($hotelRoomData = $objBookingDtl->DataForFrontSearch(
-                                $dateFrom,
-                                $dateTo,
-                                $idHotel,
-                                $idProduct,
-                                1,
-                                0,
-                                0,
-                                -1,
-                                0,
-                                0,
-                                $idCart,
-                                $idGuest
-                            )) {
+                            $bookingParams = array(
+                                'date_from' => $dateFrom,
+                                'date_to' => $dateTo,
+                                'hotel_id' => $idHotel,
+                                'id_room_type' => $idProduct,
+                                'only_search_data' => 1,
+                                'id_cart' => $idCart,
+                                'id_guest' => $idGuest,
+                            );
+                            if ($hotelRoomData = $objBookingDetail->dataForFrontSearch($bookingParams)) {
                                 if (isset($hotelRoomData['stats']['num_avail'])) {
                                     $totalAvailRooms = $hotelRoomData['stats']['num_avail'];
                                     if ($totalAvailRooms < $reqRooms) {
@@ -4470,7 +4485,7 @@ class CartCore extends ObjectModel
                 if (!$hasErrors) {
                     $update_quantity = $objCart->updateQty($prodQty, $idProduct, 0, 0, Tools::getValue('op', 'up'), $this->id_address_delivery);
                     $chkQty = 0;
-                    if ($hotelAvailRomms = $hotelRoomData['rm_data'][0]['data']['available']) {
+                    if ($hotelAvailRomms = $hotelRoomData['rm_data'][$idProduct]['data']['available']) {
                         foreach ($hotelAvailRomms as $key_hotel_room_info => $val_hotel_room_info) {
                             if ($chkQty < $reqRooms) {
                                 $objCartBooking = new HotelCartBookingData();

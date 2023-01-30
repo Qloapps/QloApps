@@ -470,7 +470,7 @@
 				</script>
 			</div>
 			<!-- Payments block -->
-			<div id="formAddPaymentPanel" class="panel">
+			<div id="form_add_payment_panel" class="panel">
 				<div class="panel-heading">
 					<i class="icon-money"></i>
 					{l s="Payment"} <span class="badge">{$order->getOrderPayments()|@count}</span>
@@ -495,13 +495,14 @@
 						{/foreach} *}
 					</p>
 				{/if}
-				<form id="formAddPayment"  method="post" action="{$current_index}&amp;vieworder&amp;id_order={$order->id}&amp;token={$smarty.get.token|escape:'html':'UTF-8'}">
+				<div class="form-group">
 					<div class="table-responsive">
 						<table class="table">
 							<thead>
 								<tr>
 									<th><span class="title_box ">{l s='Date'}</span></th>
 									<th><span class="title_box ">{l s='Payment method'}</span></th>
+									<th><span class="title_box ">{l s='Payment source'}</span></th>
 									<th><span class="title_box ">{l s='Transaction ID'}</span></th>
 									<th><span class="title_box ">{l s='Amount'}</span></th>
 									<th><span class="title_box ">{l s='Invoice'}</span></th>
@@ -513,6 +514,7 @@
 								<tr>
 									<td>{dateFormat date=$payment['date_add'] full=true}</td>
 									<td>{$payment['payment_method']|escape:'html':'UTF-8'}</td>
+									<td>{$payment_types[$payment['payment_type']]['name']|escape:'html':'UTF-8'}</td>
 									<td>{$payment['transaction_id']|escape:'html':'UTF-8'}</td>
 									<td>{displayPrice price=$payment['real_paid_amount'] currency=$payment['id_currency']}</td>
 									<td>
@@ -569,56 +571,90 @@
 									<td class="list-empty hidden-print" colspan="6">
 										<div class="list-empty-msg">
 											<i class="icon-warning-sign list-empty-icon"></i>
-											{l s='No payment methods are available'}
+											{l s='No payment records'}
 										</div>
 									</td>
 								</tr>
 								{/foreach}
-								<tr class="current-edit hidden-print">
-									<td>
-										<div class="input-group fixed-width-xl">
-											<input type="text" name="payment_date" class="datepicker" value="{date('Y-m-d')}" />
-											<div class="input-group-addon">
-												<i class="icon-calendar-o"></i>
-											</div>
-										</div>
-									</td>
-									<td>
-										<input name="payment_method" list="payment_method" class="payment_method">
-										<datalist id="payment_method">
-										{foreach from=$payment_methods item=payment_method}
-											<option value="{$payment_method}">
-										{/foreach}
-										</datalist>
-									</td>
-									<td>
-										<input type="text" name="payment_transaction_id" value="" class="form-control fixed-width-sm"/>
-									</td>
-									<td>
-										<input type="text" name="payment_amount" value="" class="form-control fixed-width-sm pull-left" />
-										<select name="payment_currency" class="payment_currency form-control fixed-width-xs pull-left">
-											{foreach from=$currencies item=current_currency}
-												<option value="{$current_currency['id_currency']}"{if $current_currency['id_currency'] == $currency->id} selected="selected"{/if}>{$current_currency['sign']}</option>
-											{/foreach}
-										</select>
-									</td>
-									<td>
-										{if count($invoices_collection) > 0}
-											<select name="payment_invoice" id="payment_invoice">
-											{foreach from=$invoices_collection item=invoice}
-												<option value="{$invoice->id}" selected="selected">{$invoice->getInvoiceNumberFormatted($current_id_lang, $order->id_shop)}</option>
-											{/foreach}
-											</select>
-										{/if}
-									</td>
-									<td class="actions">
-										<button class="btn btn-primary" type="submit" name="submitAddPayment">
-											{l s='Add'}
-										</button>
-									</td>
-								</tr>
+
 							</tbody>
 						</table>
+					</div>
+				</div>
+				<div class="form-group">
+					<button class="btn btn-primary add_new_payment" id="add_new_payment">
+						{l s='Add new payment'}
+					</button>
+				</div>
+				<form id="form_add_payment" class="well" method="post" action="{$current_index}&amp;vieworder&amp;id_order={$order->id}&amp;token={$smarty.get.token|escape:'html':'UTF-8'}" style="display:none">
+					<div class="form-horizontal">
+						<div class="form-group">
+							<label class="control-label col-sm-2">{l s='Date'}</label>
+							<div class="col-sm-10">
+								<div class="input-group fixed-width-xl">
+									<input type="text" name="payment_date" class="datepicker" value="{date('Y-m-d')}" />
+									<div class="input-group-addon">
+										<i class="icon-calendar-o"></i>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="control-label col-sm-2">{l s='Payment method'}</label>
+							<div class="col-sm-10">
+								<input name="payment_method" list="payment_method" class="form-control payment_method fixed-width-xl">
+								<datalist id="payment_method">
+								{foreach from=$payment_methods item=payment_method}
+									<option value="{$payment_method}">
+								{/foreach}
+								</datalist>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="control-label col-sm-2">{l s='Payment source'}</label>
+							<div class="col-sm-10">
+								<select name="payment_type" class="payment_type form-control fixed-width-xl">
+									{foreach from=$payment_types item=payment_type}
+										<option value="{$payment_type['value']}">{$payment_type['name']}</option>
+									{/foreach}
+								</select>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="control-label col-sm-2">{l s='Transaction ID'}</label>
+							<div class="col-sm-10">
+								<input type="text" name="payment_transaction_id" value="" class="form-control fixed-width-xl"/>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="control-label col-sm-2">{l s='Amount'}</label>
+							<div class="col-sm-10">
+								<input type="text" name="payment_amount" value="" class="form-control fixed-width-xl pull-left" />
+								<select name="payment_currency" class="payment_currency form-control fixed-width-xs pull-left">
+									{foreach from=$currencies item=current_currency}
+										<option value="{$current_currency['id_currency']}"{if $current_currency['id_currency'] == $currency->id} selected="selected"{/if}>{$current_currency['sign']}</option>
+									{/foreach}
+								</select>
+							</div>
+						</div>
+						<div class="form-group">
+							{if count($invoices_collection) > 0}
+								<label class="control-label col-sm-2">{l s='Invoice'}</label>
+								<div class="col-sm-10">
+									<select name="payment_invoice" id="payment_invoice">
+									{foreach from=$invoices_collection item=invoice}
+										<option value="{$invoice->id}" selected="selected">{$invoice->getInvoiceNumberFormatted($current_id_lang, $order->id_shop)}</option>
+									{/foreach}
+									</select>
+								</div>
+							{/if}
+						</div>
+						<button class="btn btn-primary pull-right" type="submit" name="submitAddPayment">
+							{l s='Add payment'}
+						</button>
+						<button class="btn btn-default" id="cancle_add_payment">
+							{l s='Cancel'}
+						</button>
 					</div>
 				</form>
 				{if (!$order->valid && sizeof($currencies) > 1)}
@@ -1022,6 +1058,64 @@
 					</form>
 				</div>
 			</div>
+			{if is_array($returns) && count($returns)}
+				<div class="panel">
+					<div class="panel-heading">
+						<i class="icon-undo"></i> {l s='Refunds'}
+					</div>
+					<table class="table table-striped">
+						<thead>
+							<tr>
+								<th class="text-left">{l s='Refund ID'}</th>
+								<th class="text-left">{l s='Status'}</th>
+							</tr>
+						</thead>
+						<tbody>
+							{foreach from=$returns item=return_info}
+							<tr>
+								<td class="text-left">
+									<a href="{$link->getAdminLink('AdminOrderRefundRequests')}&vieworder_return&id_order_return={$return_info.id_order_return}" target="_blank">#{$return_info.id_order_return}</a>
+								</td>
+								<td class="text-left">
+									{capture name=refund_status}
+										{if isset($return_info.payment_mode) && $return_info.payment_mode != ''}{l s='Payment Mode: '}{$return_info.payment_mode}<br/>{/if}
+										{if isset($return_info.id_transaction) && $return_info.id_transaction != ''}{l s='Transaction ID: '}{$return_info.id_transaction}<br/>{/if}
+										{if isset($return_info.id_return_type) && isset($return_info.return_type) && $return_info.id_return_type && $return_info.return_type}
+											{if $return_info.return_type == OrderReturn::RETURN_TYPE_CART_RULE}
+												{l s='Voucher ID: '}
+												<a href="{$link->getAdminLink('AdminCartRules')}&updatecart_rule&id_cart_rule={$return_info.id_return_type}" target="_blank">
+													#{$return_info.id_return_type}
+												</a>
+											{elseif $return_info.return_type == OrderReturn::RETURN_TYPE_ORDER_SLIP}
+												{l s='Credit Slip ID: '}
+												#{$return_info.id_return_type}
+												<a href="{$link->getAdminLink('AdminPdf')}&submitAction=generateOrderSlipPDF&id_order_slip={$return_info.id_return_type}" title="#{Configuration::get('PS_CREDIT_SLIP_PREFIX', $current_id_lang)}{$return_info.id_return_type|string_format:'%06d'}">
+													{l s='Download' mod='hotelreservationsystem'}
+												</a>
+											{/if}
+											<br/>
+										{/if}
+										{if isset($return_info.id_cart_rule) && $return_info.id_cart_rule}
+											{l s='Voucher ID: '}
+											<a href="{$link->getAdminLink('AdminCartRules')}&updatecart_rule&id_cart_rule={$return_info.id_cart_rule}" target="_blank">
+												#{$return_info.id_cart_rule}
+											</a>
+											<br/>
+										{/if}
+									{/capture}
+
+									{if $smarty.capture.refund_status|trim != ''}
+										{$smarty.capture.refund_status}
+									{else}
+										{$return_info.state_name}
+									{/if}
+								</td>
+							</tr>
+							{/foreach}
+						</tbody>
+					</table>
+				</div>
+			{/if}
 			{hook h="displayAdminOrderRight" id_order=$order->id}
 		</div>
 	</div>
@@ -1034,7 +1128,7 @@
 					<input type="hidden" value="{$order->getWarehouseList()|implode}" id="warehouse_list" />
 				</div>
 
-				<div class="panel">
+				<div class="panel" id="refundForm">
 					<div class="panel-heading">
 						<i class="icon-shopping-cart"></i>
 						{l s='Rooms In This Order'} <span class="badge">{$order_detail_data|@count}</span>
@@ -1054,6 +1148,7 @@
 										<th class="text-center"><span class="title_box">{l s='Room Type'}</span></th>
 										<th class="text-center"><span class="title_box">{l s='Hotel Name'}</span></th>
 										<th class="text-center"><span class="title_box">{l s='Duration'}</span></th>
+										<th class="text-center fixed-width-lg"><span class="title_box">{l s='Occupancy'}</span></th>
 										<th class="text-center"><span class="title_box">{l s='Unit Price (Tax excl.)'}</span></th>
 										<th class="text-center"><span class="title_box">{l s='Total Price (Tax incl.)'}</span></th>
 										{if isset($refundReqBookings) && $refundReqBookings}
@@ -1113,9 +1208,14 @@
 							</button>
 
 							{if $refund_allowed && !$hasCompletelyRefunded}
-								<button style="display: none;" type="submit" name="initiateRefund" class="btn btn-success standard_refund_fields pull-right" id="initiateRefund">
-									{if $order->hasBeenPaid()}<i class="icon-undo"></i> {l s='Initiate Refund'}{else}{l s='Cancel bookings'}{/if}
-								</button>
+								<div class="pull-right">
+									<button style="display: none;" type="button" class="btn btn-default standard_refund_fields" id="cancelRefund">
+										{l s='Cancel'}
+									</button>
+									<button style="display: none;" type="submit" name="initiateRefund" class="btn btn-success standard_refund_fields" id="initiateRefund">
+										{if $order->hasBeenPaid()}<i class="icon-undo"></i> {l s='Initiate Refund'}{else}{l s='Submit'}{/if}
+									</button>
+								</div>
 							{/if}
 						</div>
 					{/if}
@@ -1485,6 +1585,21 @@
 	{addJsDefL name=txtSomeErr}{l s='Some error occurred. Please try again.' js=1}{/addJsDefL}
 	{addJsDefL name=txtDeleteSucc}{l s='Deleted successfully' js=1}{/addJsDefL}
 	{addJsDefL name=txtInvalidDemandVal}{l s='Invalid demand value found' js=1}{/addJsDefL}
+	{addJsDefL name='select_age_txt'}{l s='Select age' js=1}{/addJsDefL}
+	{addJsDefL name='under_1_age'}{l s='Under 1' js=1}{/addJsDefL}
+	{addJsDefL name='room_txt'}{l s='Room' js=1}{/addJsDefL}
+	{addJsDefL name='rooms_txt'}{l s='Rooms' js=1}{/addJsDefL}
+	{addJsDefL name='remove_txt'}{l s='Remove' js=1}{/addJsDefL}
+	{addJsDefL name='adult_txt'}{l s='Adult' js=1}{/addJsDefL}
+	{addJsDefL name='adults_txt'}{l s='Adults' js=1}{/addJsDefL}
+	{addJsDefL name='child_txt'}{l s='Child' js=1}{/addJsDefL}
+	{addJsDefL name='children_txt'}{l s='Children' js=1}{/addJsDefL}
+	{addJsDefL name='below_txt'}{l s='Below' js=1}{/addJsDefL}
+	{addJsDefL name='years_txt'}{l s='years' js=1}{/addJsDefL}
+	{addJsDefL name='all_children_txt'}{l s='All Children' js=1}{/addJsDefL}
+	{addJsDefL name='invalid_occupancy_txt'}{l s='Invalid occupancy(adults/children) found.' js=1}{/addJsDefL}
+	{addJsDef max_child_age=$max_child_age|escape:'quotes':'UTF-8'}
+	{addJsDef max_child_in_room=$max_child_in_room|escape:'quotes':'UTF-8'}
 {/strip}
 
 {* Apply javascript for the page *}

@@ -1606,6 +1606,7 @@ abstract class ModuleCore
             array('type' => 'addonsMustHave', 'file' => _PS_ROOT_DIR_.Module::CACHE_FILE_MUST_HAVE_MODULES_LIST, 'loggedOnAddons' => 0),
             array('type' => 'addonsNative', 'file' => _PS_ROOT_DIR_.Module::CACHE_FILE_DEFAULT_COUNTRY_MODULES_LIST, 'loggedOnAddons' => 0),
         );
+        $modulesOnDisk = Module::getModulesDirOnDisk();
         $module_list = array();
         foreach ($files_list as $f) {
             $file = $f['file'];
@@ -1642,17 +1643,20 @@ abstract class ModuleCore
                     $item->url = isset($modaddons->url) ? $modaddons->url : null;
                     $item->is_native = false;
 
-                    if (isset($modaddons->img)) {
-                        if (!file_exists(_PS_TMP_IMG_DIR_.md5((int)$modaddons->id.'-'.$modaddons->name).'.jpg')) {
-                            if (!file_put_contents(_PS_TMP_IMG_DIR_.md5((int)$modaddons->id.'-'.$modaddons->name).'.jpg', Tools::file_get_contents($modaddons->img))) {
-                                copy(_PS_IMG_DIR_.'404.gif', _PS_TMP_IMG_DIR_.md5((int)$modaddons->id.'-'.$modaddons->name).'.jpg');
+                    if (!in_array($modaddons->name, $modulesOnDisk)) {
+                        if (isset($modaddons->img)) {
+                            if (!file_exists(_PS_TMP_IMG_DIR_.md5((int)$modaddons->id.'-'.$modaddons->name).'.jpg')) {
+                                if (!file_put_contents(_PS_TMP_IMG_DIR_.md5((int)$modaddons->id.'-'.$modaddons->name).'.jpg', Tools::file_get_contents($modaddons->img))) {
+                                    copy(_PS_IMG_DIR_.'404.gif', _PS_TMP_IMG_DIR_.md5((int)$modaddons->id.'-'.$modaddons->name).'.jpg');
+                                }
+                            }
+
+                            if (file_exists(_PS_TMP_IMG_DIR_.md5((int)$modaddons->id.'-'.$modaddons->name).'.jpg')) {
+                                $item->image = '../img/tmp/'.md5((int)$modaddons->id.'-'.$modaddons->name).'.jpg';
                             }
                         }
-
-                        if (file_exists(_PS_TMP_IMG_DIR_.md5((int)$modaddons->id.'-'.$modaddons->name).'.jpg')) {
-                            $item->image = '../img/tmp/'.md5((int)$modaddons->id.'-'.$modaddons->name).'.jpg';
-                        }
                     }
+
 
                     if ($item->type == 'addonsMustHave') {
                         $item->addons_buy_url = strip_tags((string)$modaddons->url);
@@ -1759,6 +1763,42 @@ abstract class ModuleCore
         return Db::getInstance()->executeS($sql);
     }
 
+    public static function refreshModuleList($force_reload_cache = false)
+    {
+        $status = false;
+        if (!Tools::isFresh(Module::CACHE_FILE_DEFAULT_COUNTRY_MODULES_LIST, _TIME_1_DAY_) || $force_reload_cache) {
+            if (file_put_contents(_PS_ROOT_DIR_.Module::CACHE_FILE_DEFAULT_COUNTRY_MODULES_LIST, Tools::addonsRequest('native'))) {
+                $status = 'refresh';
+            } else {
+                $status = 'error';
+            }
+        } else {
+            $status = 'cache';
+        }
+
+        if (!Tools::isFresh(Module::CACHE_FILE_MUST_HAVE_MODULES_LIST, _TIME_1_DAY_) || $force_reload_cache) {
+            if (file_put_contents(_PS_ROOT_DIR_.Module::CACHE_FILE_MUST_HAVE_MODULES_LIST, Tools::addonsRequest('must-have'))) {
+                $status = 'refresh';
+            } else {
+                $status = 'error';
+            }
+        } else {
+            $status = 'cache';
+        }
+
+        if (!Tools::isFresh(Module::CACHE_FILE_TAB_MODULES_LIST, _TIME_1_WEEK_)) {
+            if (Tools::refresh(Module::CACHE_FILE_TAB_MODULES_LIST, _QLO_TAB_MODULE_LIST_URL_)) {
+                $status = 'refresh';
+            } else {
+                $status = 'error';
+            }
+        } else {
+            $status = 'cache';
+        }
+
+        return $status;
+    }
+
     /**
      * Return if the module is provided by addons.prestashop.com or not
      *
@@ -1840,6 +1880,9 @@ abstract class ModuleCore
         $modules_on_disk = Module::getModulesDirOnDisk();
         $trusted   = array();
         $untrusted = array();
+
+        // before generating list first check if file exists and are updated
+        Module::refreshModuleList();
 
         $trusted_modules_xml = array(
             // _PS_ROOT_DIR_.self::CACHE_FILE_ALL_COUNTRY_MODULES_LIST,

@@ -842,7 +842,9 @@ class AdminStatsControllerCore extends AdminStatsTabController
         $totalDepartures = Db::getInstance()->getValue(
             'SELECT COUNT(hbd.`id_room`)
             FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
-            WHERE hbd.`is_refunded` = 0 AND hbd.`is_back_order` = 0
+            WHERE hbd.`is_refunded` = 0
+            AND ((hbd.`id_status` = '.(int) HotelBookingDetail::STATUS_CHECKED_IN.') OR
+            (hbd.`check_in` != "0000:00:00 00:00:00" AND hbd.`check_out` != "0000:00:00 00:00:00"))
             AND hbd.`date_to` BETWEEN "'.pSQL($date).' 00:00:00" AND "'.pSQL($date).' 23:59:59"'.
             HotelBranchInformation::addHotelRestriction($idHotel, 'hbd')
         );
@@ -850,9 +852,10 @@ class AdminStatsControllerCore extends AdminStatsTabController
         $departed = Db::getInstance()->getValue(
             'SELECT COUNT(hbd.`id_room`)
             FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
-            WHERE hbd.`is_refunded` = 0 AND hbd.`is_back_order` = 0
+            WHERE hbd.`is_refunded` = 0
             AND hbd.`date_to` BETWEEN "'.pSQL($date).' 00:00:00" AND "'.pSQL($date).' 23:59:59"
-            AND hbd.`id_status` = '.(int) HotelBookingDetail::STATUS_CHECKED_OUT.
+            AND hbd.`id_status` = '.(int) HotelBookingDetail::STATUS_CHECKED_OUT.'
+            AND hbd.`check_in` != "0000:00:00 00:00:00"'.
             HotelBranchInformation::addHotelRestriction($idHotel, 'hbd')
         );
 
@@ -900,7 +903,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
     public static function getGuestsByDate($date, $idHotel = false)
     {
         return Db::getInstance()->getRow(
-            'SELECT SUM(hbd.`adult`) AS `adults`, SUM(hbd.`children`) AS `children`
+            'SELECT SUM(hbd.`adults`) AS `adults`, SUM(hbd.`children`) AS `children`
             FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
             WHERE hbd.`is_refunded` = 0 AND hbd.`is_back_order` = 0
             AND hbd.`date_from` BETWEEN "'.pSQL($date).' 00:00:00" AND "'.pSQL($date).' 23:59:59"'.
@@ -1134,6 +1137,87 @@ class AdminStatsControllerCore extends AdminStatsTabController
             ORDER BY o.`date_add` DESC'.
             ((int) $limit ? ' LIMIT 0, '.(int) $limit : '')
         );
+    }
+
+    public static function getArrivalsInfoByDate($date, $idHotel = null)
+    {
+        $sql = 'SELECT hbd.*, CONCAT(c.`firstname`, " ", c.`lastname`) AS customer_name,
+        DATEDIFF(hbd.`date_to`, hbd.`date_from`) AS los
+        FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+        LEFT JOIN `'._DB_PREFIX_.'customer` c ON (c.`id_customer` = hbd.`id_customer`)
+        WHERE hbd.`is_refunded` = 0 AND hbd.`date_from` = "'.pSQL($date).' 00:00:00"
+        AND hbd.`id_status` != '.(int) HotelBookingDetail::STATUS_CHECKED_IN.'
+        AND hbd.`id_status` != '.(int) HotelBookingDetail::STATUS_CHECKED_OUT.
+        (!is_null($idHotel) ? HotelBranchInformation::addHotelRestriction($idHotel, 'hbd') : '');
+        $result = Db::getInstance()->executeS($sql);
+
+        return $result;
+    }
+
+    public static function getDeparturesInfoByDate($date, $idHotel = null)
+    {
+        $sql = 'SELECT hbd.*, CONCAT(c.`firstname`, " ", c.`lastname`) AS customer_name,
+        DATEDIFF(hbd.`date_to`, hbd.`date_from`) AS los
+        FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+        LEFT JOIN `'._DB_PREFIX_.'customer` c ON (c.`id_customer` = hbd.`id_customer`)
+        WHERE hbd.`is_refunded` = 0 AND hbd.`date_to` = "'.pSQL($date).' 00:00:00"
+        AND hbd.`id_status` = '.(int) HotelBookingDetail::STATUS_CHECKED_IN.
+        (!is_null($idHotel) ? HotelBranchInformation::addHotelRestriction($idHotel, 'hbd') : '');
+        $result = Db::getInstance()->executeS($sql);
+
+        return $result;
+    }
+
+    public static function getInHousesInfo($idHotel = null)
+    {
+        $sql = 'SELECT hbd.*, CONCAT(c.`firstname`, " ", c.`lastname`) AS customer_name,
+        DATEDIFF(hbd.`date_to`, hbd.`date_from`) AS los
+        FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+        LEFT JOIN `'._DB_PREFIX_.'customer` c ON (c.`id_customer` = hbd.`id_customer`)
+        WHERE hbd.`is_refunded` = 0 AND hbd.`id_status` = '.(int) HotelBookingDetail::STATUS_CHECKED_IN.
+        (!is_null($idHotel) ? HotelBranchInformation::addHotelRestriction($idHotel, 'hbd') : '');
+        $result = Db::getInstance()->executeS($sql);
+
+        return $result;
+    }
+
+    public static function getNewBookingsInfoByDate($date, $idHotel = null)
+    {
+        $sql = 'SELECT hbd.`id_customer`, CONCAT(c.`firstname`, " ", c.`lastname`) AS customer_name,
+        COUNT(hbd.`id`) AS total_rooms, SUM(hbd.`adult` + hbd.`children`) AS total_guests,
+        hbd.`id_hotel`, hbd.`hotel_name`, hbd.`id_order`, o.`total_paid_tax_excl`, o.`id_currency`, osl.`name` AS `state_name`
+        FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+        LEFT JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = hbd.`id_order`)
+        LEFT JOIN `'._DB_PREFIX_.'order_state_lang` osl
+        ON (osl.`id_order_state` = o.`current_state` AND osl.`id_lang` = '.(int) Context::getContext()->language->id.')
+        LEFT JOIN `'._DB_PREFIX_.'customer` c ON (c.`id_customer` = hbd.`id_customer`)
+        WHERE hbd.`date_add` BETWEEN "'.pSQL($date).' 00:00:00" AND "'.pSQL($date).' 23:59:59"'.
+        (!is_null($idHotel) ? HotelBranchInformation::addHotelRestriction($idHotel, 'hbd') : '').'
+        GROUP BY hbd.`id_order`';
+        $result = Db::getInstance()->executeS($sql);
+
+        return $result;
+    }
+
+    public static function getCancellationsInfoByDate($date, $idHotel = null)
+    {
+        $sql = 'SELECT orr.`id_order_return`, orr.`id_customer`, hbd.`room_num`, hbd.`id_product`, hbd.`room_type_name`,
+        CONCAT(c.`firstname`, " ", c.`lastname`) AS customer_name,
+        hbd.`id_hotel`, hbd.`hotel_name`, SUM(hbd.`adult` + hbd.`children`) AS total_guests,
+        hbd.`date_from`, hbd.`date_to`, orr.`id_order`
+        FROM `'._DB_PREFIX_.'order_return` orr
+        LEFT JOIN `'._DB_PREFIX_.'order_return_detail` ord ON (ord.`id_order_return` = orr.`id_order_return`)
+        LEFT JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = orr.`id_order`)
+        LEFT JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd ON (hbd.`id` = ord.`id_htl_booking`)
+        LEFT JOIN `'._DB_PREFIX_.'customer` c ON (c.`id_customer` = orr.`id_customer`)
+        WHERE orr.`date_add` BETWEEN "'.pSQL($date).' 00:00:00" AND "'.pSQL($date).' 23:59:59"
+        AND orr.`state` = '.(int) OrderReturnState::ORDER_RETRUN_FIRST_STATUS.
+        (!is_null($idHotel) ? HotelBranchInformation::addHotelRestriction($idHotel, 'hbd') : '').'
+        GROUP BY ord.`id_htl_booking`
+        ORDER BY orr.`date_add` DESC';
+        $result = Db::getInstance()->executeS($sql);
+
+        return $result;
     }
 
     public static function getOccupiedRoomsForDiscreteDates($dateFrom, $dateTo = null, $idHotel = null, $useCache = true)

@@ -50,6 +50,14 @@
   }
 }
 
+// buttons text align
+.btn-left {
+  text-align: left;
+}
+.btn-right {
+  text-align: right;
+}
+
 
 // Alternate buttons
 // --------------------------------------------------
@@ -140,8 +148,6 @@
 .btn-block {
   display: block;
   width: 100%;
-  padding-left: 0;
-  padding-right: 0;
 }
 
 // Vertically space out multiple block buttons

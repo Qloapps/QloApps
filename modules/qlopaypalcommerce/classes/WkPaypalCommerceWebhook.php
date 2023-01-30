@@ -95,9 +95,9 @@ class WkPaypalCommerceWebhook
                         $cartID = $transactionData['id_cart'];
                         $objCart = new Cart($cartID);
                         if ($objCart->is_advance_payment) {
-                            $orderStatus = Configuration::get('PS_OS_PARTIAL_PAYMENT');
+                            $orderStatus = Configuration::get('PS_OS_PARTIAL_PAYMENT_ACCEPTED');
                         } else {
-                            $orderStatus = Configuration::get('PS_OS_PAYMENT');
+                            $orderStatus = Configuration::get('PS_OS_PAYMENT_ACCEPTED');
                         }
                         if ($orders = WkPaypalCommerceHelper::getOrdersByCartId($cartID)) {
                             foreach ($orders as $order) {
@@ -125,9 +125,9 @@ class WkPaypalCommerceWebhook
             $cartID = $transactionData['id_cart'];
             $objCart = new Cart($cartID);
             if ($objCart->is_advance_payment) {
-                $orderStatus = Configuration::get('PS_OS_PARTIAL_PAYMENT');
+                $orderStatus = Configuration::get('PS_OS_PARTIAL_PAYMENT_ACCEPTED');
             } else {
-                $orderStatus = Configuration::get('PS_OS_PAYMENT');
+                $orderStatus = Configuration::get('PS_OS_PAYMENT_ACCEPTED');
             }
             if ($orders = WkPaypalCommerceHelper::getOrdersByCartId($cartID)) {
                 foreach ($orders as $order) {

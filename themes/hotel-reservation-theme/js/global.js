@@ -111,6 +111,7 @@ $(document).ready(function(){
 	});
 });
 
+
 function highdpiInit()
 {
 	if (typeof highDPI === 'undefined')

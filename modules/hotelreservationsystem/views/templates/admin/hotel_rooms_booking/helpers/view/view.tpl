@@ -44,6 +44,101 @@
 								<input type="hidden" name="search_id_hotel" id="search_id_hotel" {if isset($id_hotel)}value="{$id_hotel|escape:'htmlall':'UTF-8'}"{/if}>
 							</div>
 						</div>
+						{if $is_occupancy_wise_search}
+							<div class="form-group col-sm-12">
+								<label for="occupancy" class="control-label col-sm-4 required">
+									<span title="" data-toggle="tooltip" class="label-tooltip">{l s='Occupancy' mod='hotelreservationsystem'}</span>
+								</label>
+								<div class="col-sm-8">
+									<div class="dropdown">
+										<button class="booking_guest_occupancy btn btn-default btn-left btn-block input-occupancy" type="button">
+											<span class="">{if (isset($occupancy_adults) && $occupancy_adults)}{$occupancy_adults} {if $occupancy_adults > 1}{l s='Adults'}{else}{l s='Adult'}{/if}, {if isset($occupancy_children) && $occupancy_children}{$occupancy_children} {if $occupancy_children > 1} {l s='Children'}{else}{l s='Child'}{/if}, {/if}{$occupancy|count} {if $occupancy|count > 1}{l s='Rooms'}{else}{l s='Room'}{/if}{else}{l s='1 Adult, 1 Room'}{/if}</span>
+										</button>
+										<input type="hidden" class="max_avail_type_qty" value="{if isset($total_available_rooms)}	{$total_available_rooms|escape:'html':'UTF-8'}{/if}">
+										<div class="dropdown-menu booking_occupancy_wrapper well well-sm">
+											<div class="booking_occupancy_inner row">
+												{if isset($occupancy) && $occupancy}
+													{assign var=countRoom value=1}
+													<hr class="occupancy-info-separator col-sm-12">
+													{foreach from=$occupancy key=key item=$room_occupancy name=occupancyInfo}
+														<div class="occupancy_info_block" occ_block_index="{$key|escape:'htmlall':'UTF-8'}">
+															<div class="occupancy_info_head col-sm-12"><label class="room_num_wrapper">{l s='Room'} - {$countRoom|escape:'htmlall':'UTF-8'} </label>{if !$smarty.foreach.occupancyInfo.first}<a class="remove-room-link pull-right" href="#">{l s='Remove'}</a>{/if}</div>
+															<div class="col-sm-12">
+																<div class="row">
+																	<div class="form-group col-xs-6 occupancy_count_block">
+																		<label>{l s='Adults'}</label>
+																		<input type="number" class="form-control num_occupancy num_adults" name="occupancy[{$key|escape:'htmlall':'UTF-8'}][adults]" value="{$room_occupancy['adults']|escape:'htmlall':'UTF-8'}" min="1">
+																	</div>
+																	<div class="form-group col-xs-6 occupancy_count_block">
+																		<label>{l s='Child'} <span class="label-desc-txt"></span></label>
+																		<input type="number" class="form-control num_occupancy num_children" name="occupancy[{$key|escape:'htmlall':'UTF-8'}][children]" value="{$room_occupancy['children']|escape:'htmlall':'UTF-8'}" min="0" {if $max_child_in_room}max="{$max_child_in_room}"{/if}>
+																		({l s='Below'}  {$max_child_age|escape:'htmlall':'UTF-8'} {l s='years'})
+																	</div>
+																</div>
+																<div class="row children_age_info_block" {if !$room_occupancy['children']}style="display:none"{/if}>
+																	<div class="form-group col-sm-12">
+																		<label class="">{l s='All Children'}</label>
+																		<div class="">
+																			<div class="row children_ages">
+																				{if isset($room_occupancy['child_ages']) && $room_occupancy['child_ages']}
+																					{foreach $room_occupancy['child_ages'] as $childAge}
+																						<div class="form-group col-xs-12 col-sm-12 col-md-6 col-lg-6">
+																							<select class="guest_child_age room_occupancies" name="occupancy[{$key|escape:'htmlall':'UTF-8'}][child_ages][]">
+																								<option value="-1" {if $childAge == -1}selected{/if}>{l s='Select age'}</option>
+																								<option value="0" {if $childAge == 0}selected{/if}>{l s='Under 1'}</option>
+																								{for $age=1 to ($max_child_age-1)}
+																									<option value="{$age|escape:'htmlall':'UTF-8'}" {if $childAge == $age}selected{/if}>{$age|escape:'htmlall':'UTF-8'}</option>
+																								{/for}
+																							</select>
+																						</div>
+																					{/foreach}
+																				{/if}
+																			</div>
+																		</div>
+																	</div>
+																</div>
+															</div>
+														</div>
+														<hr class="occupancy-info-separator col-sm-12">
+														{assign var=countRoom value=$countRoom+1}
+													{/foreach}
+												{else}
+													<div class="occupancy_info_block col-sm-12" occ_block_index="0">
+														<div class="occupancy_info_head col-sm-12"><label class="room_num_wrapper">{l s='Room - 1'}</label></div>
+														<div class="col-sm-12">
+															<div class="row">
+																<div class="form-group col-xs-6 occupancy_count_block">
+																	<label>{l s='Adults'}</label>
+																	<input type="number" class="form-control num_occupancy num_adults" name="occupancy[0][adults]" value="1" min="1">
+																</div>
+																<div class="form-group col-xs-6 occupancy_count_block">
+																	<label>{l s='Child'} <span class="label-desc-txt"></span></label>
+																	<input type="number" class="form-control num_occupancy num_children" name="occupancy[0][children]" value="0" min="0" {if $max_child_in_room}max="{$max_child_in_room}"{/if}>
+																	({l s='Below'}  {$max_child_age|escape:'htmlall':'UTF-8'} {l s='years'})
+																</div>
+															</div>
+															<div class="row children_age_info_block" style="display:none">
+																<div class="form-group col-sm-12">
+																	<label class="">{l s='All Children'}</label>
+																	<div class="">
+																		<div class="row children_ages">
+																		</div>
+																	</div>
+																</div>
+															</div>
+														</div>
+													</div>
+													<hr class="occupancy-info-separator col-sm-12">
+												{/if}
+											</div>
+											<div class="add_occupancy_block col-sm-12">
+												<a class="add_new_occupancy_btn" href="#"><i class="icon-plus"></i> <span>{l s='Add Room'}</span></a>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						{/if}
 						<div class="form-group col-sm-12">
 							<label for="id_room_type" class="control-label col-sm-4">
 								<span title="" data-toggle="tooltip" class="label-tooltip">{l s='Room Type' mod='hotelreservationsystem'}</span>
@@ -91,6 +186,97 @@
 
 <div class="modal fade" id="cartModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
 	{include file="./_partials/booking-cart.tpl"}
+</div>
+<!-- Modal for reallocation of rooms -->
+<div class="modal fade" id="mySwappigModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+    	<ul class="nav nav-tabs" role="tablist">
+		    <li role="presentation" class="active"><a href="#reallocate_room_tab" aria-controls="reallocate" role="tab" data-toggle="tab">{l s='Room Reallocation' mod='hotelreservationsystem'}</a></li>
+		    <li role="presentation"><a href="#swap_room_tab" aria-controls="swap" role="tab" data-toggle="tab">{l s='Swap Room' mod='hotelreservationsystem'}</a></li>
+		 </ul>
+		<div class="tab-content panel active">
+			<div role="tabpanel" class="tab-pane active" id="reallocate_room_tab">
+				<form method="post" action="{$formAction|escape:'htmlall':'UTF-8'}">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+						<h4 class="modal-title" id="realloc_myModalLabel">{l s='Reallocate Rooms'}</h4>
+					</div>
+					<div class="modal-body">
+						<div class="form-group">
+							<label for="curr_room_num" class="control-label">{l s='Current Room Number:' mod='hotelreservationsystem'}</label>
+							<input type="text" class="form-control modal_curr_room_num" name="modal_curr_room_num" readonly="true">
+							<input type="hidden" class="form-control modal_date_from" name="modal_date_from">
+							<input type="hidden" class="form-control modal_date_to" name="modal_date_to">
+							<input type="hidden" class="form-control modal_id_room" name="modal_id_room">
+						</div>
+						<div class="form-group">
+							<label for="realloc_avail_rooms" class="control-label">{l s='Available Rooms To Reallocate:' mod='hotelreservationsystem'}</label>
+							<div style="width: 195px;">
+								<select class="form-control" name="realloc_avail_rooms" id="realloc_avail_rooms">
+									<option value="0" selected="selected">{l s='Select Rooms' mod='hotelreservationsystem'}</option>
+								</select>
+								<p class="error_text" id="realloc_sel_rm_err_p"></p>
+							</div>
+						</div>
+						<div class="form-group">
+							<label style="text-decoration:underline;margin-top:5px;" for="message-text" class="col-sm-12 control-label"><i class="icon-info-circle"></i>&nbsp;{l s='Currently Alloted Customer Information:' mod='hotelreservationsystem'}</label>
+							<dl class="well list-detail">
+								<dt>{l s='Name' mod='hotelreservationsystem'}</dt>
+								<dd class="cust_name"></dd><br>
+								<dt>{l s='Email' mod='hotelreservationsystem'}</dt>
+								<dd class="cust_email"></dd><br>
+							</dl>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">{l s="Close" mod="hotelreservationsyatem"}</button>
+						<input type="submit" id="realloc_allocated_rooms" name="realloc_allocated_rooms" class="btn btn-primary" value="Reallocate">
+					</div>
+				</form>
+			</div>
+			<div role="tabpanel" class="tab-pane" id="swap_room_tab">
+				<form method="post" action="">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+						<h4 class="modal-title" id="swap_myModalLabel">{l s='Swap Rooms' mod='hotelreservationsystem'}</h4>
+					</div>
+					<div class="modal-body">
+						<div class="form-group">
+							<label for="swap_curr_room_num" class="control-label">{l s='Current Room Number:' mod='hotelreservationsystem'}</label>
+							<input type="text" class="form-control modal_curr_room_num" name="modal_curr_room_num" readonly="true">
+							<input type="hidden" class="form-control modal_date_from" name="modal_date_from">
+							<input type="hidden" class="form-control modal_date_to" name="modal_date_to">
+							<input type="hidden" class="form-control modal_id_room" name="modal_id_room">
+						</div>
+						<div class="form-group">
+							<label for="swap_avail_rooms" class="control-label">{l s='Available Rooms To Swap:' mod='hotelreservationsystem'}</label>
+							<div style="width: 195px;">
+								<select class="form-control" name="swap_avail_rooms" id="swap_avail_rooms">
+									<option value="0" selected="selected">{l s='Select Rooms' mod='hotelreservationsystem'}</option>
+								</select>
+								<p class="error_text" id="swap_sel_rm_err_p"></p>
+							</div>
+						</div>
+						<div class="form-group">
+							<label style="text-decoration:underline;margin-top:5px;" for="message-text" class="col-sm-12 control-label"><i class="icon-info-circle"></i>&nbsp;{l s='Currently Alloted Customer Information:' mod='hotelreservationsystem'}</label>
+							<dl class="well list-detail">
+								<dt>{l s='Name' mod='hotelreservationsystem'}</dt>
+								<dd class="cust_name"></dd><br>
+								<dt>{l s='Email' mod='hotelreservationsystem'}</dt>
+								<dd class="cust_email"></dd><br>
+							</dl>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">{l s="Close" mod="hotelreservationsyatem"}</button>
+						<input type="submit" id="swap_allocated_rooms" name="swap_allocated_rooms" class="btn btn-primary" value="Swap">
+					</div>
+				</form>
+			</div>
+		</div>
+    </div>
+  </div>
 </div>
 <div id="date-stats-tooltop" style="display:none">
 	<div class="tooltip_cont">

@@ -4,7 +4,8 @@
 		<div class="card">
 			<div class="row">
 				<div class="col-sm-12 demand_header">
-					{l s='Room'} {$roomCount|escape:'html':'UTF-8'}
+					{l s='Room'} {$roomCount|escape:'html':'UTF-8'}&nbsp;
+					<span>({if {$roomDemand['adults']} <= 9}0{$roomDemand['adults']}{else}{$roomDemand['adults']}{/if} {if $roomDemand['adults'] > 1}{l s='Adults'}{else}{l s='Adult'}{/if}, {if {$roomDemand['children']} <= 9}0{$roomDemand['children']}{else}{$roomDemand['children']}{/if} {if $roomDemand['children'] > 1}{l s='Children'}{else}{l s='Child'}{/if})</span>
 				</div>
 				<div>
 					<div class="col-sm-12 demand_detail">

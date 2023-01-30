@@ -951,6 +951,79 @@ class AdminCartsControllerCore extends AdminController
         }
     }
 
+    public function ajaxProcessupdateRoomOccupancy()
+    {
+        $params = Tools::getValue('params');
+        $idBookingData = (int) $params['id_booking_data'];
+        $idCart = (int) $params['id_cart'];
+        $occupancy =  $params['occupancy'];
+
+        $this->context->cart = new Cart($idCart);
+
+        if ($this->tabAccess['edit'] === '1') {
+            // validate occupancy is correct
+            $hasError = false;
+            if (is_array($occupancy)) {
+                if (!$occupancy['adults'] || !Validate::isUnsignedInt($occupancy['adults'])) {
+                    $hasError = true;
+                }
+                if (!Validate::isUnsignedInt($occupancy['children'])) {
+                    $hasError = true;
+                }
+                if ($occupancy['children']) {
+                    if (!isset($occupancy['child_ages']) || $occupancy['children'] != count($occupancy['child_ages'])) {
+                        $hasError = true;
+                    } else {
+                        foreach($occupancy['child_ages'] as $age) {
+                            if (!Validate::isUnsignedInt($occupancy['adults'])) {
+                                $hasError = true;
+                            }
+                        }
+                    }
+                }
+            } else {
+                $hasError = true;
+            }
+
+            if (!$hasError) {
+                $objHotelCartBookingData = new HotelCartBookingData($idBookingData);
+                $objRoomType = new HotelRoomType();
+                if ($roomTypeInfo = $objRoomType->getRoomTypeInfoByIdProduct($objHotelCartBookingData->id_product)) {
+                    if ($occupancy['adults'] > $roomTypeInfo['max_adults']) {
+                        $hasError = true;
+                    }
+                    if ($occupancy['children'] > $roomTypeInfo['max_children']) {
+                        $hasError = true;
+                    }
+                    if ($occupancy['adults'] + $occupancy['children'] > $roomTypeInfo['max_guests']) {
+                        $hasError = true;
+                    }
+                    if (!$hasError) {
+                        $objHotelCartBookingData->adults = $occupancy['adults'];
+                        $objHotelCartBookingData->children = $occupancy['children'];
+                        $objHotelCartBookingData->child_ages = json_encode($occupancy['child_ages']);
+                        $objHotelCartBookingData->save();
+                    }
+                }
+            }
+            $objHotelCartBookingData = new HotelCartBookingData();
+            $bookingsInfo = $objHotelCartBookingData->getCartFormatedBookinInfoByIdCart($idCart);
+            foreach ($bookingsInfo as &$bookingInfo) {
+                if ($bookingInfo['id'] == $idBookingData) {
+                    $amtWithQty = $bookingInfo['amt_with_qty'];
+                    $bookingInfo['amt_with_qty'] = Tools::displayPrice($amtWithQty);
+                    $bookingInfo['total_price'] = Tools::displayPrice($amtWithQty + $bookingInfo['demand_price']);
+                    $response = array(
+                        'curr_booking_info' => $bookingInfo,
+                        'cart_info' => $this->ajaxReturnVars(),
+                    );
+
+                    die(json_encode($response));
+                }
+            }
+        }
+    }
+
     // Process to get extra demands of any room while order creation process form.tpl
     public function ajaxProcessGetRoomTypeCartDemands()
     {
