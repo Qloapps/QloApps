@@ -3312,6 +3312,20 @@ exit;
         return preg_replace('/\\\[px]\{[a-z]{1,2}\}|(\/[a-z]*)u([a-z]*)$/i', '$1$2', $pattern);
     }
 
+    /**
+     * @param string $file
+     * @param int $timeout
+     * @return bool
+     */
+    public static function isFresh($file, $timeout = _TIME_1_WEEK_)
+    {
+        if (($time = @filemtime(_PS_ROOT_DIR_.$file)) && filesize(_PS_ROOT_DIR_.$file) > 0) {
+            return ((time() - $time) < $timeout);
+        }
+
+        return false;
+    }
+
     protected static $is_addons_up = true;
     public static function addonsRequest($request, $params = array())
     {
@@ -3417,6 +3431,20 @@ exit;
             }
         }
 
+        self::$is_addons_up = false;
+        return false;
+    }
+
+    /**
+     * @param string $file_to_refresh
+     * @param string $external_file
+     * @return bool
+     */
+    public static function refresh($file_to_refresh, $external_file)
+    {
+        if (self::$is_addons_up && $content = Tools::file_get_contents($external_file)) {
+            return (bool)file_put_contents(_PS_ROOT_DIR_.$file_to_refresh, $content);
+        }
         self::$is_addons_up = false;
         return false;
     }
