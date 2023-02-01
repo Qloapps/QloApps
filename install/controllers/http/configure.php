@@ -312,6 +312,17 @@ class InstallControllerHttpConfigure extends InstallControllerHttp
             $this->session->enable_ssl = Tools::usingSecureMode() ? '1' : '0';
         }
 
+        $this->ssl_url = 'https://'.$_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'];
+
+        if (!isset($this->session->allow_ssl) || $this->session->allow_ssl === false) {
+            if (Tools::usingSecureMode()) {
+                $this->session->enable_ssl = '1';
+                $this->session->allow_ssl = true;
+            } else {
+                $this->session->allow_ssl = false;
+            }
+        }
+
         $this->displayTemplate('configure');
     }
 
