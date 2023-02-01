@@ -184,14 +184,14 @@ $(document).ready(function() {
     // set data on clicking the searched location on dropdown
     $(document).on('click', '.location_search_results_ul li', function(e) {
         $('#hotel_location').attr('value', $(this).html());
-        $('#hotel_location').attr('city_cat_id', $(this).val());
+        $('#location_category_id').val($(this).val());
 
         $('.location_search_results_ul').empty().hide();
 
         $.ajax({
             url: autocomplete_search_url,
             data: {
-                hotel_city_cat_id: $('#hotel_location').attr('city_cat_id'),
+                location_category_id: $('#location_category_id').val(),
             },
             method: 'POST',
             dataType: 'json',
@@ -280,12 +280,12 @@ $(document).ready(function() {
         var max_order_date = $("#max_order_date").val();
         var error = false;
 
-        var locationCatId = $('#hotel_location').attr('city_cat_id');
+        var location_category_id = $('#location_category_id').val();
         var hotelCatId = $('#hotel_cat_id').val();
         $('.header-rmsearch-input').removeClass("error_border");
 
         if (hotelCatId == '') {
-            if (typeof(locationCatId) == 'undefined' || locationCatId == '') {
+            if (typeof(location_category_id) == 'undefined' || location_category_id == '') {
                 $("#hotel_location").addClass("error_border");
                 error = true;
             }

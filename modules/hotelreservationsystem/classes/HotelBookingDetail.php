@@ -1565,6 +1565,9 @@ class HotelBookingDetail extends ObjectModel
                                 if ($occupancy) {
                                     $urlData['occupancy'] = $occupancy;
                                 }
+                                if ($location = Tools::getValue('location')) {
+                                    $urlData['location'] = $location;
+                                }
 
                                 if (Configuration::get('PS_REWRITING_SETTINGS')) {
                                     $bookingData['rm_data'][$key]['product_link'] = $this->context->link->getProductLink($product).'?'.http_build_query($urlData);

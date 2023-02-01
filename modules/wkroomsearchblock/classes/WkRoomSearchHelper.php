@@ -98,6 +98,7 @@ class WkRoomSearchHelper
     public function assignSearchPanelVariables()
     {
         $smartyVars = array();
+        $context = Context::getContext();
         // send if page is landing or not
         $smartyVars['is_index_page'] = 0;
         if (Tools::getValue('controller') == 'index') {
@@ -136,6 +137,8 @@ class WkRoomSearchHelper
             $smartyVars['date_from'] = $dateFrom;
             $smartyVars['date_to'] = $dateTo;
 
+            $locationCategoryId = Tools::getValue('location');
+
             if (Validate::isLoadedObject($objCategory = new Category((int) $idHotelCategory))) {
                 $idHotel = HotelBranchInformation::getHotelIdByIdCategory($idHotelCategory);
                 $htlCategoryInfo = $objHotelInfo->getCategoryDataByIdCategory((int) $objCategory->id_parent);
@@ -148,11 +151,18 @@ class WkRoomSearchHelper
                 $searchedData['date_to'] = $dateTo;
                 $searchedData['htl_dtl'] = $objHotelInfo->hotelBranchesInfo(0, 1, 1, $idHotel);
 
-                $searchedData['location'] = $searchedData['htl_dtl']['city'];
-                if (isset($searchedData['htl_dtl']['state_name'])) {
-                    $searchedData['location'] .= ', '.$searchedData['htl_dtl']['state_name'];
+                if ($locationCategoryId) {
+                    $objLocationCategory = new Category($locationCategoryId, $context->language->id);
+                    $searchedData['location'] = $objLocationCategory->name;
+                } else {
+                    $locationCategoryId = $objCategory->id_parent;
+                    $searchedData['location'] = $searchedData['htl_dtl']['city'];
+                    if (isset($searchedData['htl_dtl']['state_name'])) {
+                        $searchedData['location'] .= ', '.$searchedData['htl_dtl']['state_name'];
+                    }
+                    $searchedData['location'] .= ', '.$searchedData['htl_dtl']['country_name'];
                 }
-                $searchedData['location'] .= ', '.$searchedData['htl_dtl']['country_name'];
+                $searchedData['location_category_id'] = $locationCategoryId;
 
                 $searchedData['order_date_restrict'] = false;
                 $max_order_date = HotelOrderRestrictDate::getMaxOrderDate($idHotel);
@@ -184,16 +194,22 @@ class WkRoomSearchHelper
 
             // if location is enabled the send hotels of the selected location only
             if ($locationEnabled) {
-                $hotelsInfo = $objHotelInfo->hotelBranchInfoByCategoryId($idHotelCategory);
+                $hotelsInfo = Category::getAllCategoriesName($locationCategoryId);
             }
         }
 
         $totalActiveHotels = count($hotelsInfo);
         // set hotels order restrict date on all hotels
-        foreach ($hotelsInfo as &$hotel) {
-            $maxOrderDate = HotelOrderRestrictDate::getMaxOrderDate($hotel['id']);
-            $hotel['max_order_date'] = date('Y-m-d', strtotime($maxOrderDate));
-            $hotel['preparation_time'] = (int) HotelOrderRestrictDate::getPreparationTime($hotel['id']);
+        foreach ($hotelsInfo as $key => $hotel) {
+            if ($hotel_info = $objHotelInfo->hotelBranchInfoByCategoryId($hotel['id_category'])) {
+                $maxOrderDate = HotelOrderRestrictDate::getMaxOrderDate($hotel_info['id']);
+                $hotelsInfo[$key]['id'] = $hotel_info['id'];
+                $hotelsInfo[$key]['hotel_name'] = $hotel_info['hotel_name'];
+                $hotelsInfo[$key]['max_order_date'] = date('Y-m-d', strtotime($maxOrderDate));
+                $hotelsInfo[$key]['preparation_time'] = (int) HotelOrderRestrictDate::getPreparationTime($hotel_info['id']);
+            } else {
+                unset($hotelsInfo[$key]);
+            }
         }
         $smartyVars['location_enabled'] = $locationEnabled;
         $smartyVars['total_active_hotels'] = $totalActiveHotels;

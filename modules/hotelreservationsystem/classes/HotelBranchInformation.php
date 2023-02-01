@@ -504,7 +504,7 @@ class HotelBranchInformation extends ObjectModel
             ON (hbl.`id` = hbi.`id` AND hbl.`id_lang` = '.(int)$idLang.')
             WHERE hbi.`id_category` = '.(int)$cat_id.' AND `active` = 1';
 
-        return Db::getInstance()->executeS($sql);
+        return Db::getInstance()->getRow($sql);
     }
 
     /**

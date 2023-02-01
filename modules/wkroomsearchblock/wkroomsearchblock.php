@@ -169,6 +169,10 @@ class WkRoomSearchBlock extends Module
             }
         }
 
+        if ($locationCategoryId = Tools::getValue('location_category_id')) {
+            $urlData['location'] = $locationCategoryId;
+        }
+
         $objSearchHelper = new WkRoomSearchHelper();
         $this->context->controller->errors = array_merge(
             $this->context->controller->errors,
