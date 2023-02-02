@@ -506,7 +506,7 @@ class AdminThemesControllerCore extends AdminController
         ) {
             return false;
         }
-        if (!$this->isFresh(Theme::CACHE_FILE_CUSTOMER_THEMES_LIST, _TIME_1_DAY_)) {
+        if (!Tools::isFresh(Theme::CACHE_FILE_CUSTOMER_THEMES_LIST, _TIME_1_DAY_)) {
             file_put_contents(_PS_ROOT_DIR_.Theme::CACHE_FILE_CUSTOMER_THEMES_LIST, Tools::addonsRequest('customer_themes'));
         }
 

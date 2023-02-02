@@ -1,0 +1,125 @@
+Webkul Software Customization Policy
+=====================================
+
+1.Definitions :
+------------------
+
+=> "Webkul" means Webkul Software Pvt. Ltd.
+
+=> "Customization" means those services by which functionality / features are added to a product that are not included in the base installation of a product, which are aimed to suit the specific needs of the customer.
+
+=> "Module" means the custom add-on module to be developed and provided by Webkul to you in accordance with this policy and the Order Form.
+
+=> "Order Form" means the order form (electronic or hard copy), accepted by Webkul, through which you ordered the Module to be developed and provided by Webkul and which sets out the details, specifications and parameters of the customized Module to be provided.
+
+=> "Software" means the software licensed by Webkul to you pursuant to the terms and conditions of a Webkul Software License Agreement.
+
+2. Module Development :
+-----------------------
+
+=> All customization Services and use of the Module are subject to the terms and conditions of Webkul’s Software Licence Agreement, found on Webkul’s website, and are also subject to the terms and conditions set forth in the Order Form, as well as the customization parameters. No other customization services will be provided unless expressly agreed upon by you and Webkul in writing, signed by authorized representatives of you and Webkul.
+
+3. Customization Services :
+---------------------------
+
+=> Customization Services will be provided in accordance with the terms of the Order Form and subject to the conditions set forth on the Order Form including full payment of all fees and adherence to all time limits and scheduling restrictions.
+
+=> If expressly stated on the Order Form, the Customization Services and Module shall be subject to acceptance by you in accordance with the acceptance criteria set forth in the Order Form. Where there is no acceptance criteria set forth on the Order Form, acceptance shall be deemed to occur upon the earliest of:
+
+    -> completion of the acceptance criteria,
+
+    -> Webkul's completion of the Customization Services and written notification to you of such completion,
+
+    -> your use of the Module in other than a test environment.
+
+=> Notwithstanding the foregoing, if acceptance testing, delivery or completion is delayed by thirty (30) days or more for reasons not related to Webkul’s performance, you must pay the value of any milestone that is contingent on acceptance. Such acceptance does not negate any warranty rights that you may have respecting the Module, as set forth herein. You are solely responsible for preparing your facilities and equipment for installation of the Module, where applicable.
+
+=> Webkul will make reasonable efforts to accommodate your time and deadline requirements with respect to the performance of Customization Services; however, meeting such requirements is subject to availability of resources, both human and equipment at the time of your request and is dependent on your availability to provide input and to perform necessary actions. Webkul shall not be liable in any way for any delay or damage arising from Webkul’s failure to meet such of your requirements or any deadlines.
+
+=> Any changes to the Customization Services or Module requirements after execution of the Order Form will be subject to a cost and delivery re-assessment, and a written change order or re-quote that has been mutually agreed upon by you and Webkul in writing. Webkul reserves the right to make changes in the design of its Software without the obligation to make equivalent changes to the Module.
+
+=> If, pursuant to your request, Webkul reviews drawings and documents prepared by others in connection with the Customization Services, including your personnel and other consultants, contractors, and suppliers, Webkul’s review of such drawings and documents shall be only to confirm general compliance with the intent of the design and information given, and shall not constitute acceptance by Webkul of any responsibility for correctness of specifications or details of such drawings and documentation. Webkul shall be entitled to rely on all information provided, and decisions and approvals made, by you in connection with Webkul’s work hereunder. You agree that Webkul and its personnel shall not be subject to any liability or costs relating to the Customization Services to the extent such liability and costs are attributable to any information provided by you that is not complete, accurate or current in all material respects.
+
+=> The Module, and all parts thereof, shall at all times be treated as Software licensed to you under the terms and conditions of the Licence Agreement.
+
+4. Term and Termination
+------------------------
+
+=> The term of the Development Services, if any, shall be as set out on the Order Form.
+
+=> Customization Services may be terminated by Webkul immediately upon notice for cause if:
+
+    -> you materially breach any agreement entered into between you and Webkul, including Webkul’s Licence Agreement and/or any User / software license agreement relating to Webkul’s products (or you consistently fail to properly perform and observe your obligations under such agreements or any applicable Webkul Software policy), and you fail to rectify the situation within ten (10) calendar days of notice from Webkul; or
+
+    -> you become insolvent, or a receiver or receiver-manager is appointed for any part of your property, or you make an assignment, proposal or arrangement for the benefit of your creditors or you file an assignment in bankruptcy, or any proceedings under any bankruptcy or insolvency laws are commenced against you.
+
+=> Webkul shall have the right to terminate Customization Services immediately upon notice to you, without penalty or refund, if any agreement relating to the Software is terminated for any reason.
+
+=> Each party shall have the right to terminate the Development Services for convenience upon ninety (90) days’ notice to the other party.
+
+=> Termination of the Customization Services or any agreement shall not affect your payment obligation for any Customization Services performed by Webkul prior to the date of termination, regardless of whether you have had, as at the date of termination, any use of the Module or part thereof. In the event that the Customization Services are terminated prior to the delivery of the Module to you, Webkul shall not be obligated to deliver any work-in-progress or any portion of the Module to you, unless otherwise expressly agreed by the parties in writing.
+
+5. Fees
+--------
+
+=> You shall pay fees for the Customization Services and Module license in accordance with the fee schedule set forth in the Order Form. Webkul shall submit invoices to you for all fees and payments due, including applicable expenses, on a monthly basis in arrears. You shall pay to Webkul the full amount of each invoice received from Webkul within seven (7) days of receipt of the invoice. All invoices shall detail the nature of the Customization Services performed, the fees payable, and the basis on which the calculation of the fees has been made.
+
+=> You are responsible for, and shall pay all taxes relating to the Customization Services and the Module. Unless otherwise indicated, all amounts payable by you under an Order Form are exclusive of any tax, duty, levy, or similar government charge that may be assessed by any jurisdiction, whether based on gross revenue, the delivery, possession or use of the Module, other Software or Customization Services, or otherwise.
+
+=> If you fail to pay any amount due within thirty (30) days of such payment becoming due and payable, in addition to any other rights and remedies available to Webkul, Webkul shall be entitled to charge interest on all outstanding amounts at the lesser of 18% per annum or the maximum rate permitted by law, such interest commencing as of the due date for such payment. You shall also be responsible for paying for all reasonable fees and costs incurred by Webkul, including legal fees, in collecting any overdue amounts or enforcing any provision of any agreement entered into between you and Webkul.
+
+=> Pricing is subject to Webkul’s understanding of the project requirements, the terms of this policy and the Order Form. Webkul reserves the right to invoice you for additional Customization Services requested by you, or that are required based on incomplete details or specifications provided by you, that are not specified in the Order Form but are provided by Webkul to you, provided that Webkul provides you with notice that such additional Customization Services are not included in the Order Form and are subject to Webkul’s then current time and materials fee schedule for such Customization Services. Invoices for such additional Customization Services shall be subject to payment in accordance with this Section.
+
+6. Intellectual Property Rights
+--------------------------------
+
+=> Webkul shall own all intellectual property rights (whether or not patentable or registrable under copyright, trade-mark or similar legislation or subject to analogous protection) in and to the Module, and all work conceived, created, invented, produced, designed or reduced to practice by Webkul and its personnel as a result of or with respect to any and all Customization Services provided to you. Your rights and obligations relating to the use of the Module shall be governed by the terms of the applicable Webkul Software License Agreement regardless of whether you may have contributed to any Module in any way. The foregoing shall not be deemed to transfer ownership to Webkul of any pre-existing intellectual property rights that you may have in the materials that you provide to Webkul in order to permit Webkul to perform the Customization Services; however, to the extent that you have provided such materials to Webkul, you hereby grant Webkul a non-exclusive, non-transferable, royalty-free license to use all such materials for the purposes of performing the Customization Services and providing you with the Module.
+
+7. Limited Warranty and Limitation of Liability
+-----------------------------------------------
+
+=> Limited Warranty: Webkul warrants that all services provided by Webkul shall be provided in a competent, professional manner by persons who are fully trained and qualified to perform the Customization Services. Webkul does not represent or warrant that the Customization Services or Module provided hereunder will be capable of achieving a particular result for your business, or that the operation of the Module will be error free or uninterrupted, or that all errors in the Module can be found or corrected, although Webkul shall use commercially reasonable efforts to do so. Without limiting the foregoing, this warranty is valid only for the six (6) months following the acceptance date as set forth in Section 3(b). The above warranty shall not apply to defects or non-conformities resulting from:
+
+    -> improper or inadequate maintenance or installation of the Module
+
+    -> use of the Module in combination with software, interfaces, or other materials that are not supplied or specifically authorized by Webkul,
+
+    -> unauthorized or improper use or modification of the Module, including use that is not contemplated in the Order Form or instructions provided by Webkul,
+
+    -> abuse, negligence, accident, or other damage from external sources, or
+
+    ->improper preparation of your facilities or equipment for installation and use or the Module.
+
+=> Limitation of Liability:
+
+    -> save as otherwise provided in a written agreement between you and Webkul, and to the maximum extent permitted by applicable law, Webkul makes no warranty or condition, express or implied, statutory or otherwise, with respect to the module or the Customization services, including, without limitation, the implied warranties or conditions of merchantability and fitness for a particular purpose.
+
+    -> in no event shall Webkul be liable to you or any other person for any indirect, special, punitive, exemplary, consequential or incidental damages (including without limitation, damages for loss of revenues or profits, business interruption, loss of business information, and the like) arising out of the use, inability to use or the performance or non-performance of, the module or the provision of the Customization services, even if Webkul has been advised of the possibility of such damage or claim, or it is foreseeable.
+
+    -> in no event shall Webkul’s maximum aggregate liability to you for direct damages exceed the total amount paid by you for the Customization services performed by Webkul within the six (6) months preceding the date on which the claim arose.
+
+8. General Terms and Conditions
+-------------------------------
+=> As Webkul is primarily a plugin and app development company and its main focus is on constant plugin development fulfilling various latest requirements and keeping up with the latest trends, Webkul has all the right to release the same customized plugin as a new plugin in future to be available to all its customers. The same may include few or every feature of the customisation. Webkul reserve all the rights to do the same as the customisation done for the client is Intellectual property of Webkul.
+
+=> The customization undertaken by Webkul would be identical to the discussed requirements, and would not include any sort of additional changes or alterations. Any additional changes or alterations would be considered as a separate project and would be charged separately.
+
+=> Webkul would be providing customization support for only one month from the delivery of the project. For any further support extended to you, the same shall be charged separately which includes specifically any further help or bug /error fix.
+
+=> The cost of customization doesn’t include the cost of extension installation or exchange of the extension, if it has not been specifically quoted within the project cost.
+
+=> During the project customization, you ought not to edit or change any of the files and it is also advisable to have a backup every-time a change is made. If you, on your own, are making certain changes, it is advisable to back up the files, folder and database. Before doing anything on your own, you need to inform Webkul if Webkul is working on the project or your support period is subsisting.
+
+=> The customization charge will include a single template. Any time during or after the customization if you change the template, you shall be wholly and solely liable for any loss or damage emanating from the same. Webkul will not be responsible for any loss or damage done due to the same.
+
+=> All the communication will take place through Webkul’s help desk system only. If the need arises, the issues can be discussed via Skype once in week or month. Webkul does not allow screen sharing and remote desktop.
+
+=> Customization cost will not include any free consulting beyond the scope of the project.
+
+=> If while making any changes by yourself or by your team, something gets damaged, then Webkul will not be responsible for it. This includes any issues faced by you for your own fault even during the support period of the module or project.
+
+=> Webkul will not be responsible for any damages during the customization. It is advised that you must have a proper backup management system deployed.
+
+=> The terms and conditions of this Policy shall be governed by Indian Laws, and the courts in Delhi alone shall only have exclusive jurisdiction to resolve/ adjudicate upon any disputes.
+
+=> If any dispute arises between webkul and you/Licensee at any time, in connection with the validity, interpretation, implementation or alleged breach of any provision of this Agreement,  the same shall be referred to a sole Arbitrator who shall be an independent and neutral third party appointed exclusively by Webkul. You shall not object to the appointment of the Arbitrator so appointed by Webkul. The place of arbitration shall be Delhi, India. The Arbitration & Conciliation Act, 1996 as amended by The Arbitration & Conciliation  (Amendment) Act, 2015, shall govern the arbitration proceedings. The arbitration proceedings shall be held in the English language.
