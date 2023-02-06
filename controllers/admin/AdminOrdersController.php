@@ -327,6 +327,12 @@ class AdminOrdersControllerCore extends AdminController
         return $res;
     }
 
+    public function initModal()
+    {
+        parent::initModal();
+        $this->modals[] = $this->getModalBookingDocuments();
+    }
+
     public function setMedia()
     {
         parent::setMedia();
@@ -1637,6 +1643,99 @@ class AdminOrdersControllerCore extends AdminController
         return parent::renderView();
     }
 
+    public function getModalBookingDocuments()
+    {
+        $modalContent = $this->context->smarty->fetch('controllers/orders/modal_booking_documents.tpl');
+
+        // set modal details
+        $modal = array(
+            'modal_id' => 'modal-booking-documents',
+            'modal_class' => 'modal-md',
+            'modal_title' => $this->l('Documents'),
+            'modal_content' => $modalContent,
+            'modal_actions' => array(), // required to show Close button
+        );
+
+        return $modal;
+    }
+
+    public function ajaxProcessGetBookingDocuments()
+    {
+        $response = array('status' => false);
+
+        $idHtlBooking = (int) Tools::getValue('id_htl_booking');
+        $objHotelBookingDetail = new HotelBookingDetail($idHtlBooking);
+        if (Validate::isLoadedObject($objHotelBookingDetail)) {
+            $response['html'] = $this->getRenderedBookingDocuments($idHtlBooking);
+            $response['status'] = true;
+        }
+
+        $this->ajaxDie(json_encode($response));
+    }
+
+    public function ajaxProcessUploadBookingDocument()
+    {
+        $response = array('status' => false);
+
+        $idHtlBooking = (int) Tools::getValue('id_htl_booking');
+
+        // validations
+        $objHotelBookingDetail = new HotelBookingDetail($idHtlBooking);
+        if (!Validate::isLoadedObject($objHotelBookingDetail)) {
+            $this->errors[] = $this->l('Booking detail not found.');
+        }
+
+        $objHotelBookingDocument = new HotelBookingDocument();
+        $objHotelBookingDocument->setFileInfoForUploadedDocument('booking_document');
+        if (!count($objHotelBookingDocument->fileInfo)) {
+            $this->errors[] = $this->l('Please upload a document.');
+        } elseif ($objHotelBookingDocument->fileInfo['size'] > Tools::getMaxUploadSize()) {
+            $this->errors[] = $this->l('Uploaded file size is too large.');
+        }
+
+        if (!count($this->errors)) {
+            $objHotelBookingDocument = new HotelBookingDocument();
+            $objHotelBookingDocument->setFileInfoForUploadedDocument('booking_document');
+            $objHotelBookingDocument->id_htl_booking = $idHtlBooking;
+            $objHotelBookingDocument->setFileType();
+            if ($objHotelBookingDocument->save()) {
+                $objHotelBookingDocument->saveDocumentFile();
+
+                $response['html'] = $this->getRenderedBookingDocuments($idHtlBooking);
+                $response['status'] = true;
+            } else {
+                $this->errors[] = $this->l('Document upload failed.');
+            }
+        } else {
+            $this->context->smarty->assign(array(
+                'errors' => $this->errors,
+            ));
+
+            $response['errors'] = $this->context->smarty->fetch('controllers/orders/_errors.tpl');
+            $response['status'] = false;
+        }
+
+        $this->ajaxDie(json_encode($response));
+    }
+
+    public function ajaxProcessDeleteBookingDocument()
+    {
+        $response = array('status' => false);
+
+        $idHtlBookingDocument = (int) Tools::getValue('id_htl_booking_document');
+
+        $objHotelBookingDocument = new HotelBookingDocument($idHtlBookingDocument);
+        if (Validate::isLoadedObject($objHotelBookingDocument)) {
+            $idHtlBooking = $objHotelBookingDocument->id_htl_booking;
+            if ($objHotelBookingDocument->delete()) {
+                $response['html'] = $this->getRenderedBookingDocuments($idHtlBooking);
+                $response['status'] = true;
+            }
+        }
+
+        $this->ajaxDie(json_encode($response));
+    }
+
     public function ajaxProcessUpdateGuestDetails()
     {
         $response = array(
@@ -1678,6 +1777,25 @@ class AdminOrdersControllerCore extends AdminController
         }
 
         $this->ajaxDie(json_encode($response));
+    }
+
+    private function getRenderedBookingDocuments($idHtlBooking)
+    {
+        $bookingDocuments = HotelBookingDocument::getDocumentsByIdHtlBooking($idHtlBooking);
+
+        foreach($bookingDocuments as &$bookingDocument) {
+            if ($bookingDocument['file_type'] == HotelBookingDocument::FILE_TYPE_IMAGE) {
+                $bookingDocument['file_link'] = $this->context->link->getAdminLink('AdminBookingDocument').
+                '&action=getDocument&id_document='.(int) $bookingDocument['id_htl_booking_document'];
+            }
+        }
+
+        $this->context->smarty->assign(array(
+            'link' => $this->context->link,
+            'booking_documents' => $bookingDocuments,
+        ));
+
+        return $this->context->smarty->fetch('controllers/orders/_booking_documents.tpl');
     }
 
     public function ajaxProcessSearchProducts()
