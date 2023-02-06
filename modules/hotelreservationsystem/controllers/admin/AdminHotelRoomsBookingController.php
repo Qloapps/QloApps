@@ -421,7 +421,7 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
 
         $bookingParams = array();
         $bookingParams['hotel_id'] = $searchIdHotel;
-        $bookingParams['room_type'] = $searchIdRoomType;
+        $bookingParams['id_room_type'] = $searchIdRoomType;
         $bookingParams['adults'] = $adults;
         $bookingParams['children'] = $children;
         $bookingParams['num_rooms'] = $num_rooms;
