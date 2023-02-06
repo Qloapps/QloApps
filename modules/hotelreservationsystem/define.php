@@ -47,6 +47,7 @@ require_once 'classes/HotelRoomDisableDates.php';
 require_once 'classes/HotelBranchRefundRules.php';
 
 require_once 'classes/HotelSettingsLink.php';
+require_once 'classes/HotelBookingDocument.php';
 
 // Web services classes
 require_once 'classes/WebserviceSpecificManagementQlo.php';

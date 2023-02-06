@@ -275,8 +275,8 @@
 										<tr>
 											<th>{l s='Room No.'}</th>
 											<th>{l s='Hotel Name'}</th>
-											<th>{l s='Date From'}</th>
-											<th>{l s='Date To'}</th>
+											<th>{l s='Duration'}</th>
+											<th>{l s='Documents'}</th>
 											<th>{l s='Order Status'}</th>
 										</tr>
 										{if isset($htl_booking_order_data) && $htl_booking_order_data}
@@ -291,10 +291,12 @@
 														</a>
 													</td>
 													<td>
-														{dateFormat date=$data['date_from']}
+														{dateFormat date=$data['date_from']} - {dateFormat date=$data['date_to']}
 													</td>
 													<td>
-														{dateFormat date=$data['date_to']}
+														<a class="btn btn-default" onclick="BookingDocumentsModal.init({$data.id|intval}); return false;">
+															{l s='Documents'}
+														</a>
 													</td>
 													<td>
 														<form action="" method="post" class="form-horizontal row room_status_info_form">
