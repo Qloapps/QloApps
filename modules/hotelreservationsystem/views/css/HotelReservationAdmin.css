@@ -519,9 +519,14 @@ p.room_cat_data
     justify-content: space-between;}
     .fc a.fc-daygrid-day-number {
         color: #333;
+        font-size: 14px;
         text-decoration: none;}
     .fc .fc-daygrid-day.fc-day-today a.fc-daygrid-day-number {
-        color: #00aff0;
+        background-color: #FC3D39;
+        color: #FFFFFF;
+        line-height: 1;
+        border-radius: 50%;
+        padding: 5px 8px;
     }
     .fc-daygrid-day-top .day-info {
 
