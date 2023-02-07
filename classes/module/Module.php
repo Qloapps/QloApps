@@ -1766,8 +1766,12 @@ abstract class ModuleCore
     public static function refreshModuleList($force_reload_cache = false)
     {
         $status = false;
-        if (!Tools::isFresh(Module::CACHE_FILE_DEFAULT_COUNTRY_MODULES_LIST, _TIME_1_DAY_) || $force_reload_cache) {
-            if (file_put_contents(_PS_ROOT_DIR_.Module::CACHE_FILE_DEFAULT_COUNTRY_MODULES_LIST, Tools::addonsRequest('native'))) {
+
+        if (!Tools::isFresh(Module::CACHE_FILE_MODULES_LIST, _TIME_1_DAY_) || $force_reload_cache) {
+            $xml_modules_list = _QLO_API_DOMAIN_.'/xml/'.str_replace('.', '', _QLOAPPS_VERSION_).'.xml';
+            if (Tools::refresh(Module::CACHE_FILE_MODULES_LIST, 'https://'.$xml_modules_list)) {
+                $status = 'refresh';
+            } elseif (Tools::refresh(Module::CACHE_FILE_MODULES_LIST, 'http://'.$xml_modules_list)) {
                 $status = 'refresh';
             } else {
                 $status = 'error';
@@ -1776,24 +1780,52 @@ abstract class ModuleCore
             $status = 'cache';
         }
 
-        if (!Tools::isFresh(Module::CACHE_FILE_MUST_HAVE_MODULES_LIST, _TIME_1_DAY_) || $force_reload_cache) {
-            if (file_put_contents(_PS_ROOT_DIR_.Module::CACHE_FILE_MUST_HAVE_MODULES_LIST, Tools::addonsRequest('must-have'))) {
-                $status = 'refresh';
+        if ($status != 'error') {
+            if (!Tools::isFresh(Module::CACHE_FILE_DEFAULT_COUNTRY_MODULES_LIST, _TIME_1_DAY_) || $force_reload_cache) {
+                if (file_put_contents(_PS_ROOT_DIR_.Module::CACHE_FILE_DEFAULT_COUNTRY_MODULES_LIST, Tools::addonsRequest('native'))) {
+                    $status = 'refresh';
+                } else {
+                    $status = 'error';
+                }
             } else {
-                $status = 'error';
+                $status = 'cache';
             }
-        } else {
-            $status = 'cache';
         }
 
-        if (!Tools::isFresh(Module::CACHE_FILE_TAB_MODULES_LIST, _TIME_1_WEEK_)) {
-            if (Tools::refresh(Module::CACHE_FILE_TAB_MODULES_LIST, _QLO_TAB_MODULE_LIST_URL_)) {
-                $status = 'refresh';
+        if ($status != 'error') {
+            if (!Tools::isFresh(Module::CACHE_FILE_MUST_HAVE_MODULES_LIST, _TIME_1_DAY_) || $force_reload_cache) {
+                if (file_put_contents(_PS_ROOT_DIR_.Module::CACHE_FILE_MUST_HAVE_MODULES_LIST, Tools::addonsRequest('must-have'))) {
+                    $status = 'refresh';
+                } else {
+                    $status = 'error';
+                }
             } else {
-                $status = 'error';
+                $status = 'cache';
             }
-        } else {
-            $status = 'cache';
+        }
+
+        if ($status != 'error') {
+            if (!Tools::isFresh(Module::CACHE_FILE_ADDONS_MODULES_LIST, _TIME_1_DAY_) || $force_reload_cache) {
+                if (file_put_contents(_PS_ROOT_DIR_.Module::CACHE_FILE_ADDONS_MODULES_LIST, Tools::addonsRequest('addons-modules'))) {
+                    $status = 'refresh';
+                } else {
+                    $status = 'error';
+                }
+            } else {
+                $status = 'cache';
+            }
+        }
+
+        if ($status != 'error') {
+            if (!Tools::isFresh(Module::CACHE_FILE_TAB_MODULES_LIST, _TIME_1_WEEK_)) {
+                if (Tools::refresh(Module::CACHE_FILE_TAB_MODULES_LIST, _QLO_TAB_MODULE_LIST_URL_)) {
+                    $status = 'refresh';
+                } else {
+                    $status = 'error';
+                }
+            } else {
+                $status = 'cache';
+            }
         }
 
         return $status;
