@@ -2422,6 +2422,9 @@ class AdminOrdersControllerCore extends AdminController
         )));
     }
 
+    /**
+     * This function is called when order is changed (Add/Edit/Delete room on order)
+     */
     public function sendChangedNotification(Order $order = null)
     {
         if (is_null($order)) {
@@ -2436,6 +2439,9 @@ class AdminOrdersControllerCore extends AdminController
         Hook::exec('actionOrderEdited', array('order' => $order));
     }
 
+    /**
+     * This function is called to manage order status when order is changed
+     */
     public function updateOrderStatusOnOrderChange($objOrder)
     {
         // check if new order amount is greater that old order amount and order payment is accepted
