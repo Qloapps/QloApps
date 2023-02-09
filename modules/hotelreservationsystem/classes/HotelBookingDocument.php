@@ -22,10 +22,10 @@ class HotelBookingDocument extends ObjectModel
 {
     public $id_htl_booking_document;
     public $id_htl_booking;
+    public $title;
     public $file_type;
     public $file_name;
     public $date_add;
-    public $date_upd;
 
     const FILE_TYPE_IMAGE = 1;
     const FILE_TYPE_PDF = 2;
@@ -39,10 +39,10 @@ class HotelBookingDocument extends ObjectModel
         'primary' => 'id_htl_booking_document',
         'fields' => array(
             'id_htl_booking' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => true),
+            'title' => array('type' => self::TYPE_STRING, 'validate' => 'isString'),
             'file_type' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => true),
             'file_name' => array('type' => self::TYPE_STRING, 'validate' => 'isString'),
             'date_add' => array('type' => self::TYPE_DATE, 'validate' => 'isDate'),
-            'date_upd' => array('type' => self::TYPE_DATE, 'validate' => 'isDate'),
         ),
     );
 
@@ -74,6 +74,15 @@ class HotelBookingDocument extends ObjectModel
     {
         return Db::getInstance()->executeS(
             'SELECT *
+            FROM `'._DB_PREFIX_.'htl_booking_document`
+            WHERE `id_htl_booking` = '.(int) $idHtlBooking
+        );
+    }
+
+    public static function getCountByIdHtlBooking($idHtlBooking)
+    {
+        return (int) Db::getInstance()->getValue(
+            'SELECT COUNT(*)
             FROM `'._DB_PREFIX_.'htl_booking_document`
             WHERE `id_htl_booking` = '.(int) $idHtlBooking
         );

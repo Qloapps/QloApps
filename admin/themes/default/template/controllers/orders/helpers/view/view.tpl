@@ -294,8 +294,9 @@
 														{dateFormat date=$data['date_from']} - {dateFormat date=$data['date_to']}
 													</td>
 													<td>
-														<a class="btn btn-default" onclick="BookingDocumentsModal.init({$data.id|intval}); return false;">
-															{l s='Documents'}
+														<a class="btn btn-default" onclick="BookingDocumentsModal.init({$data.id|intval}, this); return false;">
+															<i class="icon icon-file-text"></i>
+															{l s='Documents'} <span class="badge badge-info count-documents">{$data.num_checkin_documents}</span>
 														</a>
 													</td>
 													<td>

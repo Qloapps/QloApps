@@ -31,6 +31,7 @@ class AdminBookingDocumentController extends ModuleAdminController
             $contentLength = $objHotelBookingDocument->getContentLength();
             $filePath = $objHotelBookingDocument->getPhysicalPath();
             $downloadFileName = $objHotelBookingDocument->getDownloadFileName();
+            $contentDisposition = Tools::getValue('is_preview') ? 'inline' : 'attachment';
 
             if (Tools::file_exists_cache($filePath)) {
                 if (ob_get_level() && ob_get_length() > 0) {
@@ -40,7 +41,7 @@ class AdminBookingDocumentController extends ModuleAdminController
                 header('Content-Transfer-Encoding: binary');
                 header('Content-Type: '.$contentType);
                 header('Content-Length: '.$contentLength);
-                header('Content-Disposition: attachment; filename="'.$downloadFileName.'"');
+                header('Content-Disposition: '.$contentDisposition.'; filename="'.$downloadFileName.'"');
                 @set_time_limit(0);
                 readfile($filePath);
             }
