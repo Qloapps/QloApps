@@ -43,6 +43,6 @@
     {/foreach}
 {else}
     <tr>
-        <td colspan="4" class="text-center">{l s='No documents.'}</td>
+        <td colspan="4" class="text-center">{l s='No documents uploaded yet.'}</td>
     </tr>
 {/if}
