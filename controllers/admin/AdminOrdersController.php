@@ -1703,10 +1703,10 @@ class AdminOrdersControllerCore extends AdminController
             $this->errors[] = $this->l('Please upload a document.');
         } elseif ($objHotelBookingDocument->fileInfo['size'] > Tools::getMaxUploadSize()) {
             $this->errors[] = $this->l('Uploaded file size is too large.');
-        } elseif(!ImageManager::isRealImage($objHotelBookingDocument->fileInfo['tmp_name'])
-            || $objHotelBookingDocument->fileInfo['mime'] != 'application/pdf'
+        } elseif(!(ImageManager::isRealImage($objHotelBookingDocument->fileInfo['tmp_name'])
+            || $objHotelBookingDocument->fileInfo['mime'] == 'application/pdf')
         ) {
-            $this->errors[] = $this->l('Please upload an image or a PDF file only.');
+            $this->errors[] = $this->l('Please upload an image or a PDF file only. Allowed image formats: .gif, .jpg, .jpeg and .png');
         }
 
         if (!count($this->errors)) {
