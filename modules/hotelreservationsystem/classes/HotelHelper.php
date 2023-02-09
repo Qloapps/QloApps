@@ -347,7 +347,7 @@ class HotelHelper
         $htl_id = $obj_hotel_info->id;
 
         // add hotel address info
-        $def_cont_id = Country::getDefaultCountryId();
+        $def_cont_id = Configuration::get('PS_COUNTRY_DEFAULT');
 
         if ($states = State::getStatesByIdCountry($def_cont_id)) {
             $state_id = $states[0]['id_state'];
