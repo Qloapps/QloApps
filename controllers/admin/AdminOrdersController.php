@@ -1546,6 +1546,9 @@ class AdminOrdersControllerCore extends AdminController
 
         // get booking information by order
         $bookingOrderInfo = $objBookingDetail->getBookingDataByOrderId($order->id);
+        foreach ($bookingOrderInfo as &$bookingOrderRoomInfo) {
+            $bookingOrderRoomInfo['num_checkin_documents'] = HotelBookingDocument::getCountByIdHtlBooking($bookingOrderRoomInfo['id']);
+        }
 
         // hotel booking statuses
         $htlOrderStatus = HotelBookingDetail::getAllHotelOrderStatus();
@@ -1678,11 +1681,20 @@ class AdminOrdersControllerCore extends AdminController
         $response = array('status' => false);
 
         $idHtlBooking = (int) Tools::getValue('id_htl_booking');
+        $title = Tools::getValue('title');
 
         // validations
         $objHotelBookingDetail = new HotelBookingDetail($idHtlBooking);
         if (!Validate::isLoadedObject($objHotelBookingDetail)) {
             $this->errors[] = $this->l('Booking detail not found.');
+        }
+
+        if (!$title) {
+            $title = '--';
+        } else {
+            if (!Validate::isString($title)) {
+                $this->errors[] = $this->l('Please enter a valid Title.');
+            }
         }
 
         $objHotelBookingDocument = new HotelBookingDocument();
@@ -1697,11 +1709,13 @@ class AdminOrdersControllerCore extends AdminController
             $objHotelBookingDocument = new HotelBookingDocument();
             $objHotelBookingDocument->setFileInfoForUploadedDocument('booking_document');
             $objHotelBookingDocument->id_htl_booking = $idHtlBooking;
+            $objHotelBookingDocument->title = $title;
             $objHotelBookingDocument->setFileType();
             if ($objHotelBookingDocument->save()) {
                 $objHotelBookingDocument->saveDocumentFile();
 
                 $response['html'] = $this->getRenderedBookingDocuments($idHtlBooking);
+                $response['num_checkin_documents'] = HotelBookingDocument::getCountByIdHtlBooking($idHtlBooking);
                 $response['status'] = true;
             } else {
                 $this->errors[] = $this->l('Document upload failed.');
@@ -1729,6 +1743,7 @@ class AdminOrdersControllerCore extends AdminController
             $idHtlBooking = $objHotelBookingDocument->id_htl_booking;
             if ($objHotelBookingDocument->delete()) {
                 $response['html'] = $this->getRenderedBookingDocuments($idHtlBooking);
+                $response['num_checkin_documents'] = HotelBookingDocument::getCountByIdHtlBooking($idHtlBooking);
                 $response['status'] = true;
             }
         }
@@ -1783,16 +1798,10 @@ class AdminOrdersControllerCore extends AdminController
     {
         $bookingDocuments = HotelBookingDocument::getDocumentsByIdHtlBooking($idHtlBooking);
 
-        foreach($bookingDocuments as &$bookingDocument) {
-            if ($bookingDocument['file_type'] == HotelBookingDocument::FILE_TYPE_IMAGE) {
-                $bookingDocument['file_link'] = $this->context->link->getAdminLink('AdminBookingDocument').
-                '&action=getDocument&id_document='.(int) $bookingDocument['id_htl_booking_document'];
-            }
-        }
-
         $this->context->smarty->assign(array(
             'link' => $this->context->link,
             'booking_documents' => $bookingDocuments,
+            'pdf_icon_link' => $this->context->link->getBaseLink().'modules/hotelreservationsystem/views/img/pdf-icon.jpg',
         ));
 
         return $this->context->smarty->fetch('controllers/orders/_booking_documents.tpl');

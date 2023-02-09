@@ -20,20 +20,22 @@
 {if is_array($booking_documents) && count($booking_documents)}
     {foreach from=$booking_documents item=booking_document}
         <tr>
-            <td class="text-left">{$booking_document.id_htl_booking_document}</td>
+            <td class="text-left">{$booking_document.title}</td>
             <td class="text-center">
-                {if $booking_document.file_type == HotelBookingDocument::FILE_TYPE_IMAGE}
-                    <a href="{$booking_document.file_link}" target="_blank">
-                        <img class="img img-responsive img-thumbnail" src="{$booking_document.file_link}">
-                    </a>
-                {elseif $booking_document.file_type == HotelBookingDocument::FILE_TYPE_PDF}
-                    <a class="btn btn-default" href="{$link->getAdminLink('AdminBookingDocument')}&action=getDocument&id_document={$booking_document.id_htl_booking_document}">
-                        {l s='Download PDF'}
-                    </a>
-                {/if}
+                <a href="{$link->getAdminLink('AdminBookingDocument')}&action=getDocument&id_document={$booking_document.id_htl_booking_document}&is_preview=1" target="_blank">
+                    {if $booking_document.file_type == HotelBookingDocument::FILE_TYPE_IMAGE}
+                        <img class="img img-responsive img-thumbnail" src="{$link->getAdminLink('AdminBookingDocument')}&action=getDocument&id_document={$booking_document.id_htl_booking_document}&is_preview=1">
+                    {elseif $booking_document.file_type == HotelBookingDocument::FILE_TYPE_PDF}
+                        <img class="img img-responsive img-thumbnail" src="{$pdf_icon_link}">
+                    {/if}
+                </a>
             </td>
+            <td class="text-center">{dateFormat date=$booking_document.date_add full=1}</td>
             <td class="text-center">
-                <a class="btn btn-default btn-delete-document" data-id-htl-booking-document="{$booking_document.id_htl_booking_document}">
+                <a class="btn btn-info" href="{$link->getAdminLink('AdminBookingDocument')}&action=getDocument&id_document={$booking_document.id_htl_booking_document}">
+                    <i class="icon icon-cloud-download"></i>
+                </a>
+                <a class="btn btn-danger btn-delete-document" data-id-htl-booking-document="{$booking_document.id_htl_booking_document}">
                     <i class="icon icon-trash"></i>
                 </a>
             </td>
@@ -41,6 +43,6 @@
     {/foreach}
 {else}
     <tr>
-        <td colspan="3" class="text-center">{l s='No documents.'}</td>
+        <td colspan="4" class="text-center">{l s='No documents.'}</td>
     </tr>
 {/if}

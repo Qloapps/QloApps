@@ -183,10 +183,10 @@ class HotelReservationSystemDb
             "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_booking_document` (
                 `id_htl_booking_document` int(11) NOT NULL AUTO_INCREMENT,
                 `id_htl_booking` int(11) NOT NULL,
+                `title` varchar(32) NOT NULL DEFAULT '',
                 `file_type` tinyint(1) NOT NULL DEFAULT '0',
                 `file_name` varchar(8) NOT NULL DEFAULT '',
                 `date_add` datetime NOT NULL,
-                `date_upd` datetime NOT NULL,
                 PRIMARY KEY (`id_htl_booking_document`)
             ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;",
 

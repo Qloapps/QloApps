@@ -1309,41 +1309,61 @@ function checkTotalRefundProductQuantity(it)
 		actualizeTotalRefundVoucher();
 }
 
-$(document).on('click', '#modal-booking-documents .booking-documents .btn-add-new-document', function() {
+$(document).on('click', '#modal-booking-documents .btn-add-new-document', function() {
 	BookingDocumentsModal.addNew();
-	BookingDocumentsFile.addNew();
+	BookingDocumentsForm.addNew();
 });
 
 $(document).on('change', '.input-booking-document', function(e) {
 	e.preventDefault();
+
 	if (!this.files.length) {
 		$(this).remove();
 		return;
 	}
 
-	BookingDocumentsFile.updatePreview();
+	BookingDocumentsForm.updatePreview();
+});
+
+$(document).on('click', '#form-add-new-document .btn-add-file', function(e) {
+	e.preventDefault();
+
+	BookingDocumentsForm.openFileChooser();
+});
+
+$(document).on('click', '#form-add-new-document .btn-group-add-new .cancel', function(e) {
+	e.preventDefault();
+
+	BookingDocumentsForm.close();
+	BookingDocumentsModal.enableAddNewButton();
+});
+
+$(document).on('click', '#form-add-new-document .btn-group-add-new .upload', function(e) {
+	e.preventDefault();
+
 	BookingDocumentsModal.uploadDocument();
 });
 
-$(document).on('click', '#modal-booking-documents .booking-documents .btn-delete-document', function(e) {
+$(document).on('click', '#modal-booking-documents .documents-list .btn-delete-document', function(e) {
+	e.preventDefault();
+
 	BookingDocumentsModal.deleteDocument(this);
 });
 
 const BookingDocumentsModal = {
-	init: function(idHtlBooking) {
-		BookingDocumentsFile.noDocumentHtml = '<tr><td colspan="3">'+'a'+'</td></tr>';
-
-		$('#modal-booking-documents .booking-documents').find('[name="id_hotel_booking"]').val(idHtlBooking);
-		BookingDocumentsFile.init();
+	init: function(idHtlBooking, $this) {
+		BookingDocumentsModal.currentTr = $this;
+		$('#modal-booking-documents .documents-list').find('[name="id_hotel_booking"]').val(idHtlBooking);
+		BookingDocumentsForm.init();
 		BookingDocumentsModal.reset();
 		BookingDocumentsModal.show(idHtlBooking);
 	},
 	reset: function() {
-		$('#modal-booking-documents .booking-documents table tbody').html('');
+		$('#modal-booking-documents .documents-list table tbody').html('');
 	},
 	show: function(idHtlBooking) {
 		$('#modal-booking-documents').modal('show');
-		$('#modal-booking-documents #booking-document-id-htl-booking').attr('value', idHtlBooking);
+		$('#form-add-new-document').find('[name="id_htl_booking"]').attr('value', idHtlBooking);
 		let data = {
 			ajax: true,
 			action: 'getBookingDocuments',
@@ -1363,22 +1383,21 @@ const BookingDocumentsModal = {
 		});
 	},
 	setBodyHtml: function(html) {
-		$('#modal-booking-documents .booking-documents table tbody').html(html);
+		$('#modal-booking-documents .documents-list table tbody').html(html);
 	},
 	close: function() {
 		$('#modal-booking-documents').modal('hide');
 	},
 	addNew: function() {
 		BookingDocumentsModal.hideErrors();
-		BookingDocumentsModal.disableAddNewButton();
+		BookingDocumentsModal.hideAddNewButton();
 	},
 	beforeSubmit: function() {
 		BookingDocumentsModal.hideErrors();
-		BookingDocumentsModal.disableAddNewButton();
 	},
 	uploadDocument: function() {
 		BookingDocumentsModal.beforeSubmit();
-		let formData = new FormData($('#modal-booking-documents form.booking-documents').get(0));
+		let formData = new FormData($('form#form-add-new-document').get(0));
 		formData.append('ajax', true);
 		formData.append('action', 'uploadBookingDocument');
 		$.ajax({
@@ -1392,14 +1411,13 @@ const BookingDocumentsModal = {
 				if (jsonResponse.status) {
 					showSuccessMessage(txt_booking_document_upload_success);
 					BookingDocumentsModal.reset();
-					BookingDocumentsFile.resetPreview();
+					BookingDocumentsForm.reset();
+					BookingDocumentsForm.resetPreview();
 					BookingDocumentsModal.setBodyHtml(jsonResponse.html);
+					BookingDocumentsModal.setDocumentsCount(jsonResponse.num_checkin_documents);
 				} else {
 					BookingDocumentsModal.showErrors(jsonResponse.errors);
 				}
-			},
-			complete: function() {
-				BookingDocumentsModal.enableAddNewButton();
 			},
 		});
 	},
@@ -1419,13 +1437,14 @@ const BookingDocumentsModal = {
 			success: function(response) {
 				if (response.status) {
 					BookingDocumentsModal.setBodyHtml(response.html);
+					BookingDocumentsModal.setDocumentsCount(response.num_checkin_documents);
 					showSuccessMessage(txt_booking_document_delete_success);
 				}
 			},
 		});
 	},
 	showErrors: function(errors) {
-		$('#modal-booking-documents .errors-wrap').html(errors);
+		$('#modal-booking-documents .errors-wrap').stop().html(errors);
 		$('#modal-booking-documents .errors-wrap').show('slow');
 	},
 	hideErrors: function() {
@@ -1434,28 +1453,41 @@ const BookingDocumentsModal = {
 		});
 	},
 	enableAddNewButton: function() {
-		$('#modal-booking-documents .booking-documents .btn-add-new-document').removeClass('disabled');
+		$('#modal-booking-documents .btn-add-new-document').show(200);
 	},
-	disableAddNewButton: function() {
-		$('#modal-booking-documents .booking-documents .btn-add-new-document').addClass('disabled');
+	hideAddNewButton: function() {
+		$('#modal-booking-documents .btn-add-new-document').hide(200);
+	},
+	setDocumentsCount: function(count) {
+		$(BookingDocumentsModal.currentTr).find('.count-documents').html(count);
 	},
 }
 
-const BookingDocumentsFile = {
+const BookingDocumentsForm = {
 	init: function() {
-		BookingDocumentsFile.inputHtml = '<input type="file" accept="image/*, .pdf" class="input-booking-document hidden" name="booking_document">';
+		BookingDocumentsForm.inputHtml = '<input type="file" accept="image/*, .pdf" class="input-booking-document hidden" name="booking_document">';
+	},
+	reset: function() {
+		$('#form-add-new-document').get(0).reset();
 	},
 	resetPreview: function() {
-		$('#modal-booking-documents .booking-documents .add-new-wrap span').html('');
+		$('#form-add-new-document .file-name').val('');
 	},
 	updatePreview: function() {
-		BookingDocumentsFile.resetPreview();
-		let input = $('#modal-booking-documents .booking-documents').find('.input-file-wrap input');
+		BookingDocumentsForm.resetPreview();
+		let input = $('#form-add-new-document').find('.input-file-wrap input');
 		let file = $(input).get(0).files[0];
-		$('#modal-booking-documents .booking-documents .add-new-wrap span').html(file.name);
+		$('#form-add-new-document .file-name').val(file.name);
 	},
 	addNew: function() {
-		$('#modal-booking-documents .booking-documents').find('.input-file-wrap').html(BookingDocumentsFile.inputHtml);
-		$('#modal-booking-documents .booking-documents').find('.input-file-wrap input').click();
+		$('#modal-booking-documents #form-add-new-document').show(200);
+		$('#form-add-new-document').find('.input-file-wrap').html(BookingDocumentsForm.inputHtml);
+	},
+	openFileChooser: function() {
+		$('#form-add-new-document').find('.input-file-wrap').html(BookingDocumentsForm.inputHtml);
+		$('#form-add-new-document').find('.input-file-wrap input').click();
+	},
+	close: function() {
+		$('#modal-booking-documents #form-add-new-document').hide(200);
 	},
 }
