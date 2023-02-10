@@ -1,4 +1,4 @@
-QloApps Core is licensed under OSL-3.0 and Modules authored by Webkul have their applicable license, LICENSE.txt, kept inside their root directories, while other modules are licensed under AFL-3.0.
+QloApps Core is licensed under OSL-3.0 and Modules authored by Webkul have their applicable license, LICENSE.md, kept inside their root directories, while other modules are licensed under AFL-3.0.
 
 The online copy of OSL-3.0 can be found at https://opensource.org/licenses/OSL-3.0.
 
