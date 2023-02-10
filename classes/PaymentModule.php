@@ -26,12 +26,13 @@
 
 abstract class PaymentModuleCore extends Module
 {
+    const DEBUG_MODE = false;
+
     /** @var int Current order's id */
     public $currentOrder;
     public $currencies = true;
     public $currencies_mode = 'checkbox';
-
-    const DEBUG_MODE = false;
+    public $payment_type = OrderPayment::PAYMENT_TYPE_REMOTE_PAYMENT;
 
     public function install()
     {
@@ -305,6 +306,7 @@ abstract class PaymentModuleCore extends Module
 
                     $order->secure_key = ($secure_key ? pSQL($secure_key) : pSQL($this->context->customer->secure_key));
                     $order->payment = $payment_method;
+                    $order->payment_type = $this->payment_type;
                     if (isset($this->name)) {
                         $order->module = $this->name;
                     }
@@ -352,6 +354,20 @@ abstract class PaymentModuleCore extends Module
 
                     if (self::DEBUG_MODE) {
                         PrestaShopLogger::addLog('PaymentModule::validateOrder - Order is about to be added', 1, null, 'Cart', (int)$id_cart, true);
+                    }
+
+                    if ($this->name == 'wsorder') {
+                        $order->with_occupancy = 0;
+                    } else {
+                        if (defined('_PS_ADMIN_DIR_')) {
+                            if (Configuration::get('PS_BACKOFFICE_ROOM_BOOKING_TYPE') == HotelBookingDetail::PS_FRONT_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY) {
+                                $order->with_occupancy = 1;
+                            }
+                        } else {
+                            if (Configuration::get('PS_FRONT_ROOM_UNIT_SELECTION_TYPE') == HotelBookingDetail::PS_FRONT_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY) {
+                                $order->with_occupancy = 1;
+                            }
+                        }
                     }
 
                     // advance payment information
@@ -466,7 +482,7 @@ abstract class PaymentModuleCore extends Module
                     $transaction_id = null;
                 }
 
-                if (!isset($order) || !Validate::isLoadedObject($order) || !$order->addOrderPayment($amount_paid, null, $transaction_id, null, null, null, false)) {
+                if (!isset($order) || !Validate::isLoadedObject($order) || !$order->addOrderPayment($amount_paid, null, $transaction_id, null, null, null, $this->payment_type, false)) {
                     PrestaShopLogger::addLog('PaymentModule::validateOrder - Cannot save Order Payment', 3, null, 'Cart', (int)$id_cart, true);
                     throw new PrestaShopException('Can\'t save Order Payment');
                 }
@@ -587,9 +603,11 @@ abstract class PaymentModuleCore extends Module
                     }
 
                     $cart_rules_list = array();
-                    $total_reduction_value_ti = 0;
-                    $total_reduction_value_tex = 0;
                     foreach ($cart_rules as $cart_rule) {
+                        if ($cart_rule['obj']->reduction_product > 0 && !$order->orderContainProduct($cart_rule['obj']->reduction_product)) {
+                            continue;
+                        }
+
                         $package = array('id_carrier' => $order->id_carrier, 'id_address' => $order->id_address_delivery, 'products' => $order->product_list);
                         $values = array(
                             'tax_incl' => $cart_rule['obj']->getContextualValue(true, $this->context, CartRule::FILTER_ACTION_ALL_NOCAP, $package),
@@ -602,13 +620,25 @@ abstract class PaymentModuleCore extends Module
                         }
 
                         // IF
-                        //	This is not multi-shipping
                         //	The value of the voucher is greater than the total of the order
                         //	Partial use is allowed
                         //	This is an "amount" reduction, not a reduction in % or a gift
                         // THEN
                         //	The voucher is cloned with a new value corresponding to the remainder
-                        if (count($order_list) == 1 && $values['tax_incl'] > ($order->total_products_wt - $total_reduction_value_ti) && $cart_rule['obj']->partial_use == 1 && $cart_rule['obj']->reduction_amount > 0) {
+                        $reduction_amount_converted = $cart_rule['obj']->reduction_amount;
+                        if ((int) $cart_rule['obj']->reduction_currency !== (int) $cart->id_currency) {
+                            $reduction_amount_converted = Tools::convertPriceFull(
+                                $cart_rule['obj']->reduction_amount,
+                                new Currency($cart_rule['obj']->reduction_currency),
+                                new Currency($cart->id_currency)
+                            );
+                        }
+                        if ($cart_rule['obj']->reduction_tax) {
+                            $remaining_amount = $reduction_amount_converted - $values['tax_incl'];
+                        } else {
+                            $remaining_amount = $reduction_amount_converted - $values['tax_excl'];
+                        }
+                        if ($remaining_amount > 0 && $cart_rule['obj']->partial_use == 1 && $reduction_amount_converted > 0) {
                             // Create a new voucher from the original
                             $voucher = new CartRule((int)$cart_rule['obj']->id); // We need to instantiate the CartRule without lang parameter to allow saving it
                             unset($voucher->id);
@@ -620,16 +650,13 @@ abstract class PaymentModuleCore extends Module
                             }
 
                             // Set the new voucher value
+                            $voucher->reduction_amount = $remaining_amount;
                             if ($voucher->reduction_tax) {
-                                $voucher->reduction_amount = ($total_reduction_value_ti + $values['tax_incl']) - $order->total_products_wt;
-
                                 // Add total shipping amout only if reduction amount > total shipping
                                 if ($voucher->free_shipping == 1 && $voucher->reduction_amount >= $order->total_shipping_tax_incl) {
                                     $voucher->reduction_amount -= $order->total_shipping_tax_incl;
                                 }
                             } else {
-                                $voucher->reduction_amount = ($total_reduction_value_tex + $values['tax_excl']) - $order->total_products;
-
                                 // Add total shipping amout only if reduction amount > total shipping
                                 if ($voucher->free_shipping == 1 && $voucher->reduction_amount >= $order->total_shipping_tax_excl) {
                                     $voucher->reduction_amount -= $order->total_shipping_tax_excl;
@@ -671,12 +698,7 @@ abstract class PaymentModuleCore extends Module
                                     null, null, null, null, _PS_MAIL_DIR_, false, (int)$order->id_shop
                                 );
                             }
-
-                            $values['tax_incl'] = $order->total_products_wt - $total_reduction_value_ti;
-                            $values['tax_excl'] = $order->total_products - $total_reduction_value_tex;
                         }
-                        $total_reduction_value_ti += $values['tax_incl'];
-                        $total_reduction_value_tex += $values['tax_excl'];
 
                         $order->addCartRule($cart_rule['obj']->id, $cart_rule['obj']->name, $values, 0, $cart_rule['obj']->free_shipping);
 
@@ -783,6 +805,9 @@ abstract class PaymentModuleCore extends Module
                                 $objBookingDetail->date_to = $objCartBookingData->date_to;
                                 $objBookingDetail->total_price_tax_excl = Tools::ps_round($total_price['total_price_tax_excl'], 6);
                                 $objBookingDetail->total_price_tax_incl = Tools::ps_round($total_price['total_price_tax_incl'], 6);
+                                $objBookingDetail->adults = $objCartBookingData->adults;
+                                $objBookingDetail->children = $objCartBookingData->children;
+                                $objBookingDetail->child_ages = $objCartBookingData->child_ages;
 
                                 // Save hotel information/location/contact
                                 if (Validate::isLoadedObject($objRoom = new HotelRoomInformation($objCartBookingData->id_room))) {
@@ -804,10 +829,6 @@ abstract class PaymentModuleCore extends Module
                                         $objBookingDetail->zipcode = $hotelAddress['postcode'];
                                         $objBookingDetail->phone = $hotelAddress['phone'];
                                     }
-                                }
-                                if ($roomTypeInfo = $objRoomType->getRoomTypeInfoByIdProduct($idProduct)) {
-                                    $objBookingDetail->adult = $roomTypeInfo['adult'];
-                                    $objBookingDetail->children = $roomTypeInfo['children'];
                                 }
 
                                 /*for saving details of the advance payment product wise*/
@@ -891,14 +912,6 @@ abstract class PaymentModuleCore extends Module
 
                     // delete cart feature prices after booking creation success
                     HotelRoomTypeFeaturePricing::deleteByIdCart($id_cart);
-
-                    if (isset($_COOKIE['wk_id_cart'])) {
-                        setcookie('wk_id_cart', ' ', time() - 86400, '/');
-                        setcookie('wk_id_guest', ' ', time() - 86400, '/');
-
-                        unset($_COOKIE['wk_id_cart']);
-                        unset($_COOKIE['wk_id_guest']);
-                    }
 
                     if (self::DEBUG_MODE) {
                         PrestaShopLogger::addLog('PaymentModule::validateOrder - Hook validateOrder is about to be called', 1, null, 'Cart', (int)$id_cart, true);
@@ -1433,8 +1446,6 @@ abstract class PaymentModuleCore extends Module
                     $cart_htl_data[$type_key]['cover_img']    = $cover_img;
                     $cart_htl_data[$type_key]['name']        = $product->name;
                     $cart_htl_data[$type_key]['hotel_name'] = $rm_dtl['hotel_name'];
-                    $cart_htl_data[$type_key]['adult']        = $rm_dtl['adult'];
-                    $cart_htl_data[$type_key]['children']    = $rm_dtl['children'];
 
                     foreach ($cart_bk_data as $data_k => $data_v) {
                         $date_join = strtotime($data_v['date_from']).strtotime($data_v['date_to']);
@@ -1443,6 +1454,9 @@ abstract class PaymentModuleCore extends Module
                             $cart_htl_data[$type_key]['date_diff'][$date_join]['num_rm'] += 1;
 
                             $num_days = $cart_htl_data[$type_key]['date_diff'][$date_join]['num_days'];
+
+                            $cart_htl_data[$type_key]['date_diff'][$date_join]['adults'] += $data_v['adults'];
+                            $cart_htl_data[$type_key]['date_diff'][$date_join]['children'] += $data_v['children'];
 
                             $cart_htl_data[$type_key]['date_diff'][$date_join]['paid_unit_price_tax_incl'] = $data_v['total_price_tax_incl']/$num_days;
                             $cart_htl_data[$type_key]['date_diff'][$date_join]['avg_paid_unit_price_tax_incl'] += $cart_htl_data[$type_key]['date_diff'][$date_join]['paid_unit_price_tax_incl'];
@@ -1483,6 +1497,8 @@ abstract class PaymentModuleCore extends Module
                             $cart_htl_data[$type_key]['date_diff'][$date_join]['data_form'] = $data_v['date_from'];
                             $cart_htl_data[$type_key]['date_diff'][$date_join]['data_to'] = $data_v['date_to'];
                             $cart_htl_data[$type_key]['date_diff'][$date_join]['num_days'] = $num_days;
+                            $cart_htl_data[$type_key]['date_diff'][$date_join]['adults'] = $data_v['adults'];
+                            $cart_htl_data[$type_key]['date_diff'][$date_join]['children'] = $data_v['children'];
 
                             $cart_htl_data[$type_key]['date_diff'][$date_join]['paid_unit_price_tax_incl'] = $data_v['total_price_tax_incl']/$num_days;
                             $cart_htl_data[$type_key]['date_diff'][$date_join]['avg_paid_unit_price_tax_incl'] = $cart_htl_data[$type_key]['date_diff'][$date_join]['paid_unit_price_tax_incl'];

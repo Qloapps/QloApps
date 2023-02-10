@@ -74,11 +74,29 @@ class Bankwire extends PaymentModule
             $this->warning = $this->l('No currency has been set for this module.');
         }
 
-        $this->extra_mail_vars = array(
-                                        '{bankwire_owner}' => Configuration::get('BANK_WIRE_OWNER'),
-                                        '{bankwire_details}' => nl2br(Configuration::get('BANK_WIRE_DETAILS')),
-                                        '{bankwire_address}' => nl2br(Configuration::get('BANK_WIRE_ADDRESS'))
-                                        );
+        $this->payment_type = OrderPayment::PAYMENT_TYPE_REMOTE_PAYMENT;
+    }
+
+    public function getExtraMailContent($id_order_state, $order)
+    {
+        if (Configuration::get('PS_OS_AWAITING_PAYMENT') == $id_order_state) {
+            $this->context->smarty->assign(array(
+                'bankwire_owner' => Configuration::get('BANK_WIRE_OWNER'),
+                'bankwire_details' => nl2br(Configuration::get('BANK_WIRE_DETAILS')),
+                'bankwire_address' => nl2br(Configuration::get('BANK_WIRE_ADDRESS')),
+                'lang' => new Language($order->id_lang)
+            ));
+
+            return array(
+                '{extra_mail_content_html}' => $this->context->smarty->fetch(
+                    $this->local_path.'views/templates/mail/mail_template_html.tpl'
+                ),
+                '{extra_mail_content_txt}' => $this->context->smarty->fetch(
+                    $this->local_path.'views/templates/mail/mail_template_text.tpl'
+                )
+            );
+        }
+        return array();
     }
 
     public function install()
@@ -195,9 +213,7 @@ class Bankwire extends PaymentModule
         if (in_array(
             $orderState,
             array(
-                Configuration::get('PS_OS_BANKWIRE'),
-                Configuration::get('PS_OS_OUTOFSTOCK'),
-                Configuration::get('PS_OS_OUTOFSTOCK_UNPAID')
+                Configuration::get('PS_OS_AWAITING_PAYMENT'),
             )
         )) {
             $objCart = new Cart($objOrder->id_cart);

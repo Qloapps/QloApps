@@ -53,4 +53,34 @@ class OrderSlipControllerCore extends FrontController
         $this->context->smarty->assign('ordersSlip', OrderSlip::getOrdersSlip((int)$this->context->cookie->id_customer));
         $this->setTemplate(_PS_THEME_DIR_.'order-slip.tpl');
     }
+
+    public function postProcess()
+    {
+        if (Tools::isSubmit('generateVoucher')) {
+            $idOrderSlip = Tools::getValue('id_order_slip');
+            $objOrderSlip = new OrderSlip($idOrderSlip);
+            if (!Validate::isLoadedObject($objOrderSlip)) {
+                $this->errors[] = Tools::displayError('The credit slip is invalid.');
+            } elseif ($objOrderSlip->redeem_status == OrderSlip::REDEEM_STATUS_REDEEMED) {
+                $this->errors[] = Tools::displayError('The credit slip has already been redeemed.');
+            } elseif ($objOrderSlip->id_customer != $this->context->customer->id) {
+                $this->errors[] = Tools::displayError('Invalid request.');
+            }
+
+            if (!count($this->errors)) {
+                if ($objOrderSlip->generateVoucher()) {
+                    Tools::redirect($this->context->link->getPageLink(
+                        $this->php_self,
+                        $this->ssl,
+                        $this->context->language->id,
+                        'confirmation=1'
+                    ));
+                }
+
+                $this->errors[] = Tools::displayError('The voucher code for this credit slip could not be generated.');
+            }
+        }
+
+        parent::postProcess();
+    }
 }

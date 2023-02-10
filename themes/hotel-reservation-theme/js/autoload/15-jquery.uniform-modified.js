@@ -817,7 +817,7 @@ Enjoy!
                                 $span.width(origElemWidth -spanPad);
                             });
                         });
-						
+
                     } else {
                         // Force the select to fill the size of the div
                         $div.addClass('fixedWidth');

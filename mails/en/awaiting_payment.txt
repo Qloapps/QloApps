@@ -1,0 +1,23 @@
+
+[/{shop_url}]
+
+Hi {firstname} {lastname},
+
+Thank you for shopping with {shop_name}!
+
+Order {order_name} - Awaiting payment
+Order reference: {order_name}
+Payment method: {payment_method}
+
+{extra_mail_content_txt}
+
+You can review your order and download your invoice from the
+"Order history" [/{history_url}] section of your customer account by
+clicking "My account" [/{my_account_url}] on our shop.
+
+If you have a guest account, you can follow your order via the
+"Guest Tracking" [/{guest_tracking_url}] section on our shop.
+
+{shop_name} [/{shop_url}] powered by Webkul(tm)
+[https://webkul.com]
+

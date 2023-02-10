@@ -109,15 +109,91 @@ class AdminPPreferencesControllerCore extends AdminController
                         'cast' => 'intval',
                         'required' => false,
                         'type' => 'bool'
+                    )
+                ),
+                'submit' => array('title' => $this->l('Save'))
+            ),
+            'search' => array(
+                'title' =>    $this->l('Search'),
+                'fields' =>    array(
+                    'PS_FRONT_SEARCH_TYPE' => array(
+                        'title' => $this->l('Front end search type'),
+                        'hint' => $this->l('Select search type for frontend. In "Occupancy wise search", occupancy field will be shown in the search panel and search will be based on required occupancy by the guest. In "Search without occupancy", All available room types will be shown for the search dates without any occupancy filter.'),
+                        'cast' => 'intval',
+                        'type' => 'select',
+                        'list' => array(
+                            array('id' => HotelBookingDetail::SEARCH_TYPE_OWS, 'name' => $this->l('Occupancy wise search')),
+                            array('id' => HotelBookingDetail::SEARCH_TYPE_NORMAL, 'name' => $this->l('Search without occupancy'))
+                        ),
+                        'identifier' => 'id',
+                        'desc' => $this->l('Choose "Occupancy wise search" or "Search without occupancy". Occupancy search restriction will depend on this option selection at front end.'),
+                    ),
+                    'PS_FRONT_OWS_SEARCH_ALGO_TYPE' => array(
+                        'title' => $this->l('Front end occupancy wise search algorithm'),
+                        'hint' => $this->l('In occupancy wise search at front end, you want to display only room types which are fully satisfying searched occupancy or you want to display all the available room types for the dates searched'),
+                        'cast' => 'intval',
+                        'type' => 'select',
+                        'list' => array(
+                            array('id' => HotelBookingDetail::SEARCH_EXACT_ROOM_TYPE_ALGO, 'name' => $this->l('Show room types satisfying required occupancy')),
+                            array('id' => HotelBookingDetail::SEARCH_ALL_ROOM_TYPE_ALGO, 'name' => $this->l('Show all available room types'))
+                        ),
+                        'identifier' => 'id',
+                        'desc' => $this->l('This option is only for fully available rooms. For partially available rooms, always all possible rooms will be displayed.'),
+                    ),
+                    'PS_FRONT_ROOM_UNIT_SELECTION_TYPE' => array(
+                        'title' => $this->l('In front-end, add rooms to cart with'),
+                        'hint' => $this->l('In Room occupancy, while adding rooms in cart customer has to select per room occupancy and in room quantity customer only has to select number of rooms.'),
+                        'cast' => 'intval',
+                        'type' => 'select',
+                        'list' => array(
+                            array('id' => HotelBookingDetail::PS_FRONT_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY, 'name' => $this->l('Room Occupancy')),
+                            array('id' => HotelBookingDetail::PS_FRONT_ROOM_UNIT_SELECTION_TYPE_QUANTITY, 'name' => $this->l('Rooms Quantity (No. of rooms)'))
+                        ),
+                        'identifier' => 'id',
+                    ),
+                    'PS_BACKOFFICE_SEARCH_TYPE' => array(
+                        'title' => $this->l('Back-office search type'),
+                        'hint' => $this->l('Select search type for Back-office. In "Occupancy wise search", occupancy field will be shown in the search panel and search will be based on required occupancy by the employee. In "Search without occupancy", All available room types will be shown for the search dates without any occupancy filter.'),
+                        'cast' => 'intval',
+                        'type' => 'select',
+                        'list' => array(
+                            array('id' => HotelBookingDetail::SEARCH_TYPE_OWS, 'name' => $this->l('Occupancy wise search')),
+                            array('id' => HotelBookingDetail::SEARCH_TYPE_NORMAL, 'name' => $this->l('Search without occupancy'))
+                        ),
+                        'identifier' => 'id',
+                        'desc' => $this->l('Choose "Occupancy wise search" or "Search without occupancy". Occupancy search restriction will depend on this option selection at back-office.'),
+                    ),
+                    'PS_BACKOFFICE_OWS_SEARCH_ALGO_TYPE' => array(
+                        'title' => $this->l('Back-office occupancy wise search algorithm'),
+                        'hint' => $this->l('In occupancy wise search at back-office, you want to display only room types which are fully satisfying searched occupancy or you want to display all the available room types for the dates searched.'),
+                        'cast' => 'intval',
+                        'type' => 'select',
+                        'list' => array(
+                            array('id' => HotelBookingDetail::SEARCH_EXACT_ROOM_TYPE_ALGO, 'name' => $this->l('Show room types satisfying required occupancy')),
+                            array('id' => HotelBookingDetail::SEARCH_ALL_ROOM_TYPE_ALGO, 'name' => $this->l('Show all available room types'))
+                        ),
+                        'identifier' => 'id',
+                        'desc' => $this->l('This option is only for fully available rooms. For partially available rooms, always all possible rooms will be displayed.'),
+                    ),
+                    'PS_BACKOFFICE_ROOM_BOOKING_TYPE' => array(
+                        'title' => $this->l('In back-office, add rooms to cart with'),
+                        'hint' => $this->l('In Room occupancy, while adding rooms in cart customer has to select per room occupancy and in room quantity customer only has to select number of rooms.'),
+                        'cast' => 'intval',
+                        'type' => 'select',
+                        'list' => array(
+                            array('id' => HotelBookingDetail::PS_FRONT_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY, 'name' => $this->l('Room Occupancy')),
+                            array('id' => HotelBookingDetail::PS_FRONT_ROOM_UNIT_SELECTION_TYPE_QUANTITY, 'name' => $this->l('Rooms Quantity (No. of rooms)'))
+                        ),
+                        'identifier' => 'id',
                     ),
                     'PS_LOS_RESTRICTION_BO' => array(
-                        'title' => $this->l('Apply Min and Max lenght of stay restrictions for back-office bookings'),
-                        'hint' => $this->l('While creating bookings from back-office, apply minimum and maximum lenght of stay restrictions'),
+                        'title' => $this->l('Apply Min and Max lenght of stay restrictions for back-office search'),
+                        'hint' => $this->l('While searching for available rooms from back-office, apply minimum and maximum lenght of stay restrictions'),
                         'validation' => 'isBool',
                         'cast' => 'intval',
                         'required' => false,
                         'type' => 'bool'
-                    )
+                    ),
                 ),
                 'submit' => array('title' => $this->l('Save'))
             ),
@@ -356,9 +432,28 @@ class AdminPPreferencesControllerCore extends AdminController
             Db::getInstance()->execute($sql);
         }
 
+        if (Tools::getValue('PS_FRONT_SEARCH_TYPE') == HotelBookingDetail::SEARCH_TYPE_OWS) {
+            $_POST['PS_FRONT_ROOM_UNIT_SELECTION_TYPE'] = HotelBookingDetail::PS_FRONT_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY;
+        }
+
+        if (Tools::getValue('PS_BACKOFFICE_SEARCH_TYPE') == HotelBookingDetail::SEARCH_TYPE_OWS) {
+            $_POST['PS_BACKOFFICE_ROOM_BOOKING_TYPE'] = HotelBookingDetail::PS_FRONT_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY;
+        }
+
         if (Tools::getIsset('PS_CATALOG_MODE')) {
             Tools::clearSmartyCache();
             Media::clearCache();
         }
+    }
+
+    public function setMedia()
+    {
+        parent::setMedia();
+
+        Media::addJsDef(array(
+            'SEARCH_TYPE_OWS' => HotelBookingDetail::SEARCH_TYPE_OWS
+        ));
+
+        $this->addJS(_PS_JS_DIR_.'admin/ppreferences.js');
     }
 }

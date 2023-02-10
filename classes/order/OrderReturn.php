@@ -27,6 +27,9 @@
 class OrderReturnCore extends ObjectModel
 {
     /** @var int */
+    public $id_order_return;
+
+    /** @var int */
     public $id_customer;
 
     /** @var int */
@@ -48,11 +51,21 @@ class OrderReturnCore extends ObjectModel
     /** @var int if request raised by the admin */
     public $by_admin;
 
+    /** @var int id_cart_rule or id_order_slip */
+    public $id_return_type;
+
+    /** @var int whether $id_return_type is cart_rule or order_slip */
+    public $return_type;
+
     /** @var string Object creation date */
     public $date_add;
 
     /** @var string Object last modification date */
     public $date_upd;
+
+    /** possible values for $return_type */
+    const RETURN_TYPE_CART_RULE = 1;
+    const RETURN_TYPE_ORDER_SLIP = 2;
 
     /**
      * @see ObjectModel::$definition
@@ -69,6 +82,8 @@ class OrderReturnCore extends ObjectModel
             'refunded_amount' => array('type' => self::TYPE_FLOAT),
             'state' => array('type' => self::TYPE_INT),
             'by_admin' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => true),
+            'id_return_type' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
+            'return_type' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
             'date_add' => array('type' => self::TYPE_DATE, 'validate' => 'isDate'),
             'date_upd' => array('type' => self::TYPE_DATE, 'validate' => 'isDate'),
         ),
@@ -232,14 +247,16 @@ class OrderReturnCore extends ObjectModel
         if (!$context) {
             $context = Context::getContext();
         }
-        $data = Db::getInstance()->executeS('
-		SELECT *
-		FROM `'._DB_PREFIX_.'order_return`
-        WHERE `id_customer` = '.(int)$customer_id.
-        ($only_customer ? ' AND `by_admin` = 0' : '').
-        ($order_id ? ' AND `id_order` = '.(int)$order_id : '').
-        ($no_denied ? ' AND `state` != 4' : '').'
-		ORDER BY `date_add` DESC');
+        $sql = 'SELECT *
+        FROM `'._DB_PREFIX_.'order_return` orr
+        LEFT JOIN `'._DB_PREFIX_.'order_slip` ors
+        ON (ors.`id_order_slip` = orr.`id_return_type` AND orr.`return_type` = '.(int) self::RETURN_TYPE_ORDER_SLIP.')
+        WHERE orr.`id_customer` = '.(int)$customer_id.
+        ($only_customer ? ' AND orr.`by_admin` = 0' : '').
+        ($order_id ? ' AND orr.`id_order` = '.(int)$order_id : '').
+        ($no_denied ? ' AND orr.`state` != 4' : '').'
+        ORDER BY orr.`date_add` DESC';
+        $data = Db::getInstance()->executeS($sql);
         foreach ($data as $k => $or) {
             $state = new OrderReturnState($or['state']);
             $data[$k]['state_name'] = $state->name[$context->language->id];
@@ -373,144 +390,112 @@ class OrderReturnCore extends ObjectModel
     /**
      * Sets the new order return state
      * @param int $newOrderReturnState
-     * @param int/object $idOrderReturn
      */
-    public function changeIdOrderReturnState($newOrderReturnState, $idOrderReturn, $idLang = 0)
+    public function changeIdOrderReturnState($newOrderReturnState, $idLang = 0)
     {
-        if (Validate::isLoadedObject($objOrderReturn = new OrderReturn((int)$idOrderReturn))) {
-            $objOrder = new Order($objOrderReturn->id_order);
+        $objOrder = new Order($this->id_order);
+        if (!$idLang) {
+            $idLang = $objOrder->id_lang;
+        }
+        if (Validate::isLoadedObject(
+            $objOrderReturnState = new OrderReturnState((int)$newOrderReturnState, $idLang)
+        )) {
+            if ($this->state != $newOrderReturnState) {
+                $this->state = $newOrderReturnState;
+                $this->save();
 
-            if (!$idLang) {
-                $idLang = $objOrder->id_lang;
-            }
-            if (Validate::isLoadedObject(
-                $objOrderReturnState = new OrderReturnState((int)$newOrderReturnState, $idLang)
-            )) {
-                if ($objOrderReturn->state != $newOrderReturnState) {
-                    $objOrderReturn->state = $newOrderReturnState;
-                    $objOrderReturn->save();
+                if ($objOrderReturnState->send_email_to_customer
+                    || $objOrderReturnState->send_email_to_superadmin
+                    || $objOrderReturnState->send_email_to_employee
+                    || $objOrderReturnState->send_email_to_hotelier
+                ) {
+                    // Lets create data for the email templates
+                    $objMail = new Mail();
+                    $idHotel = 0;
 
-                    if ($objOrderReturnState->send_email_to_customer
-                        || $objOrderReturnState->send_email_to_superadmin
-                        || $objOrderReturnState->send_email_to_employee
-                        || $objOrderReturnState->send_email_to_hotelier
-                    ) {
-                        // Lets create data for the email templates
-                        $objMail = new Mail();
-                        $idHotel = 0;
+                    $data = array (
+                        '{status_name}' => $objOrderReturnState->name,
+                        '{status_color}' => $objOrderReturnState->color,
+                        '{order_reference}' => $objOrder->reference,
+                        '{order_date}' => date('Y-m-d h:i:s', strtotime($objOrder->date_add)),
+                        '{refunded_amount}' => Tools::displayPrice($this->refunded_amount, new Currency($objOrder->id_currency)),
+                        '{payment_mode}' => $this->payment_mode,
+                        '{id_transaction}' => $this->id_transaction,
+                    );
 
-                        $data = array (
-                            '{status_name}' => $objOrderReturnState->name,
-                            '{status_color}' => $objOrderReturnState->color,
-                            '{order_reference}' => $objOrder->reference,
-                            '{order_date}' => date('Y-m-d h:i:s', strtotime($objOrder->date_add)),
-                            '{refunded_amount}' => Tools::displayPrice($objOrderReturn->refunded_amount, new Currency($objOrder->id_currency)),
-                            '{payment_mode}' => $objOrderReturn->payment_mode,
-                            '{id_transaction}' => $objOrderReturn->id_transaction,
-                        );
-
-                        // if mail is true for the customer then send mail to customer with selected template
-                        $objCustomer = new Customer($objOrderReturn->id_customer);
-                        if ($objOrderReturnState->send_email_to_customer && $objOrderReturnState->customer_template) {
-                            if ($refundReqBookings = $objOrderReturn->getOrderRefundRequestedBookings(
-                                $objOrderReturn->id_order,
-                                $objOrderReturn->id,
-                                0,
-                                1
-                            )) {
-                                $idHotel = reset($refundReqBookings)['id_hotel'];
-                            }
-
-                            $refBookHtml = $objMail->getEmailTemplateContent('refund_request_detail_customer', Mail::TYPE_HTML, $refundReqBookings);
-                            $refBookTxt = $objMail->getEmailTemplateContent('refund_request_detail_customer', Mail::TYPE_TEXT, $refundReqBookings);
-
-                            $data['{refundBookingHtml}'] = $refBookHtml;
-                            $data['{refundBookingTxt}'] = $refBookTxt;
-
-                            // send customer information
-                            $link = new Link();
-                            $data['{refund_reqests_url}'] = $link->getPageLink('order-follow');
-                            $data['{firstname}'] = $objCustomer->firstname;
-                            $data['{lastname}'] = $objCustomer->lastname;
-
-                            Mail::Send(
-                                (int)$idLang,
-                                $objOrderReturnState->customer_template,
-                                $objOrderReturnState->name,
-                                $data,
-                                $objCustomer->email,
-                                $objCustomer->firstname.' '.$objCustomer->lastname,
-                                null,
-                                null,
-                                null,
-                                null,
-                                _PS_MAIL_DIR_,
-                                false,
-                                (int)$objOrder->id_shop
-                            );
+                    // if mail is true for the customer then send mail to customer with selected template
+                    $objCustomer = new Customer($this->id_customer);
+                    if ($objOrderReturnState->send_email_to_customer && $objOrderReturnState->customer_template) {
+                        if ($refundReqBookings = $this->getOrderRefundRequestedBookings(
+                            $this->id_order,
+                            $this->id,
+                            0,
+                            1
+                        )) {
+                            $idHotel = reset($refundReqBookings)['id_hotel'];
                         }
 
-                        if ($objOrderReturnState->admin_template) {
-                            if ($refundReqBookings = $objOrderReturn->getOrderRefundRequestedBookings(
-                                $objOrderReturn->id_order,
-                                $objOrderReturn->id
-                            )) {
-                                $idHotel = $refundReqBookings[0]['id_hotel'];
-                            }
+                        $refBookHtml = $objMail->getEmailTemplateContent('refund_request_detail_customer', Mail::TYPE_HTML, $refundReqBookings);
+                        $refBookTxt = $objMail->getEmailTemplateContent('refund_request_detail_customer', Mail::TYPE_TEXT, $refundReqBookings);
 
-                            $refBookHtml = $objMail->getEmailTemplateContent('refund_request_detail_admin', Mail::TYPE_HTML, $refundReqBookings);
-                            $refBookTxt = $objMail->getEmailTemplateContent('refund_request_detail_admin', Mail::TYPE_TEXT, $refundReqBookings);
+                        $data['{refundBookingHtml}'] = $refBookHtml;
+                        $data['{refundBookingTxt}'] = $refBookTxt;
 
-                            $data['{cancelation_reason}'] = $objOrderReturn->question;
-                            $data['{refundBookingHtml}'] = $refBookHtml;
-                            $data['{refundBookingTxt}'] = $refBookTxt;
+                        // send customer information
+                        $link = new Link();
+                        $data['{refund_reqests_url}'] = $link->getPageLink('order-follow');
+                        $data['{firstname}'] = $objCustomer->firstname;
+                        $data['{lastname}'] = $objCustomer->lastname;
 
-                            // send mail to the super admin
-                            if ($objOrderReturnState->send_email_to_superadmin) {
-                                // send superadmin information
-                                if (Validate::isLoadedObject($superAdmin = new Employee(_PS_ADMIN_PROFILE_))) {
-                                    if (Validate::isEmail($superAdmin->email)) {
-                                        $data['{customer_name}'] = $objCustomer->firstname.' '.$objCustomer->lastname;
-                                        $data['{customer_email}'] = $objCustomer->email;
-                                        $data['{firstname}'] = $superAdmin->firstname;
-                                        $data['{lastname}'] = $superAdmin->lastname;
+                        Mail::Send(
+                            (int)$idLang,
+                            $objOrderReturnState->customer_template,
+                            $objOrderReturnState->name,
+                            $data,
+                            $objCustomer->email,
+                            $objCustomer->firstname.' '.$objCustomer->lastname,
+                            null,
+                            null,
+                            null,
+                            null,
+                            _PS_MAIL_DIR_,
+                            false,
+                            (int)$objOrder->id_shop
+                        );
+                    }
 
-                                        Mail::Send(
-                                            (int)$idLang,
-                                            $objOrderReturnState->admin_template,
-                                            $objOrderReturnState->name,
-                                            $data,
-                                            $superAdmin->email,
-                                            $superAdmin->firstname.' '.$superAdmin->lastname,
-                                            null,
-                                            null,
-                                            null,
-                                            null,
-                                            _PS_MAIL_DIR_,
-                                            false,
-                                            (int)$objOrder->id_shop
-                                        );
-                                    }
-                                }
-                            }
-                            if ($idHotel
-                                && Validate::isLoadedObject($objHotel = new HotelBranchInformation($idHotel))
-                            ) {
-                                // send mail to the hotelier
-                                if ($objOrderReturnState->send_email_to_hotelier) {
+                    if ($objOrderReturnState->admin_template) {
+                        if ($refundReqBookings = $this->getOrderRefundRequestedBookings(
+                            $this->id_order,
+                            $this->id
+                        )) {
+                            $idHotel = $refundReqBookings[0]['id_hotel'];
+                        }
+
+                        $refBookHtml = $objMail->getEmailTemplateContent('refund_request_detail_admin', Mail::TYPE_HTML, $refundReqBookings);
+                        $refBookTxt = $objMail->getEmailTemplateContent('refund_request_detail_admin', Mail::TYPE_TEXT, $refundReqBookings);
+
+                        $data['{cancelation_reason}'] = $this->question;
+                        $data['{refundBookingHtml}'] = $refBookHtml;
+                        $data['{refundBookingTxt}'] = $refBookTxt;
+
+                        // send mail to the super admin
+                        if ($objOrderReturnState->send_email_to_superadmin) {
+                            // send superadmin information
+                            if (Validate::isLoadedObject($superAdmin = new Employee(_PS_ADMIN_PROFILE_))) {
+                                if (Validate::isEmail($superAdmin->email)) {
                                     $data['{customer_name}'] = $objCustomer->firstname.' '.$objCustomer->lastname;
                                     $data['{customer_email}'] = $objCustomer->email;
-                                    $data['{firstname}'] = '';
-                                    $data['{lastname}'] = '';
-                                    $data['{email}'] = $objHotel->email;
+                                    $data['{firstname}'] = $superAdmin->firstname;
+                                    $data['{lastname}'] = $superAdmin->lastname;
 
                                     Mail::Send(
                                         (int)$idLang,
                                         $objOrderReturnState->admin_template,
                                         $objOrderReturnState->name,
                                         $data,
-                                        $objHotel->email,
-                                        null,
+                                        $superAdmin->email,
+                                        $superAdmin->firstname.' '.$superAdmin->lastname,
                                         null,
                                         null,
                                         null,
@@ -520,38 +505,66 @@ class OrderReturnCore extends ObjectModel
                                         (int)$objOrder->id_shop
                                     );
                                 }
+                            }
+                        }
+                        if ($idHotel
+                            && Validate::isLoadedObject($objHotel = new HotelBranchInformation($idHotel))
+                        ) {
+                            // send mail to the hotelier
+                            if ($objOrderReturnState->send_email_to_hotelier) {
+                                $data['{customer_name}'] = $objCustomer->firstname.' '.$objCustomer->lastname;
+                                $data['{customer_email}'] = $objCustomer->email;
+                                $data['{firstname}'] = '';
+                                $data['{lastname}'] = '';
+                                $data['{email}'] = $objHotel->email;
 
-                                // send mail to the employee
-                                if ($objOrderReturnState->send_email_to_employee) {
-                                    if ($htlAccesses = $objHotel->getHotelAccess($idHotel)) {
-                                        $data['{customer_name}'] = $objCustomer->firstname.' '.$objCustomer->lastname;
-                                        $data['{customer_email}'] = $objCustomer->email;
-                                        foreach ($htlAccesses as $access) {
-                                            if ($access['id_profile'] != _PS_ADMIN_PROFILE_) {
-                                                if ($htlEmployees = Employee::getEmployeesByProfile($access['id_profile'])) {
-                                                    foreach ($htlEmployees as $empl) {
-                                                        if (Validate::isEmail($empl['email'])) {
-                                                            // send hotel manager (employee) have permission for this hotel
-                                                            $data['{firstname}'] = $empl['firstname'];
-                                                            $data['{lastname}'] = $empl['lastname'];
-                                                            $data['{email}'] = $empl['email'];
+                                Mail::Send(
+                                    (int)$idLang,
+                                    $objOrderReturnState->admin_template,
+                                    $objOrderReturnState->name,
+                                    $data,
+                                    $objHotel->email,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    _PS_MAIL_DIR_,
+                                    false,
+                                    (int)$objOrder->id_shop
+                                );
+                            }
 
-                                                            Mail::Send(
-                                                                (int)$idLang,
-                                                                $objOrderReturnState->admin_template,
-                                                                $objOrderReturnState->name,
-                                                                $data,
-                                                                $empl['email'],
-                                                                $empl['firstname'].' '.$empl['lastname'],
-                                                                null,
-                                                                null,
-                                                                null,
-                                                                null,
-                                                                _PS_MAIL_DIR_,
-                                                                false,
-                                                                (int)$objOrder->id_shop
-                                                            );
-                                                        }
+                            // send mail to the employee
+                            if ($objOrderReturnState->send_email_to_employee) {
+                                if ($htlAccesses = $objHotel->getHotelAccess($idHotel)) {
+                                    $data['{customer_name}'] = $objCustomer->firstname.' '.$objCustomer->lastname;
+                                    $data['{customer_email}'] = $objCustomer->email;
+                                    foreach ($htlAccesses as $access) {
+                                        if ($access['id_profile'] != _PS_ADMIN_PROFILE_) {
+                                            if ($htlEmployees = Employee::getEmployeesByProfile($access['id_profile'])) {
+                                                foreach ($htlEmployees as $empl) {
+                                                    if (Validate::isEmail($empl['email'])) {
+                                                        // send hotel manager (employee) have permission for this hotel
+                                                        $data['{firstname}'] = $empl['firstname'];
+                                                        $data['{lastname}'] = $empl['lastname'];
+                                                        $data['{email}'] = $empl['email'];
+
+                                                        Mail::Send(
+                                                            (int)$idLang,
+                                                            $objOrderReturnState->admin_template,
+                                                            $objOrderReturnState->name,
+                                                            $data,
+                                                            $empl['email'],
+                                                            $empl['firstname'].' '.$empl['lastname'],
+                                                            null,
+                                                            null,
+                                                            null,
+                                                            null,
+                                                            _PS_MAIL_DIR_,
+                                                            false,
+                                                            (int)$objOrder->id_shop
+                                                        );
                                                     }
                                                 }
                                             }
@@ -561,18 +574,21 @@ class OrderReturnCore extends ObjectModel
                             }
                         }
                     }
-
-                    // executes hook
-                    Hook::exec(
-                        'actionOrderReFundStatusPostUpdate',
-                        array(
-                            'new_order_return_status' => $newOrderReturnState,
-                            'id_order_return' => (int)$idOrderReturn
-                        )
-                    );
                 }
+
+                // executes hook
+                Hook::exec(
+                    'actionOrderReFundStatusPostUpdate',
+                    array(
+                        'new_order_return_status' => $newOrderReturnState,
+                        'id_order_return' => (int) $this->id_order_return,
+                    )
+                );
+
+                return true;
             }
         }
+
         return false;
     }
 

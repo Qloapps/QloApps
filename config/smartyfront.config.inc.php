@@ -24,6 +24,8 @@
 *  International Registered Trademark & Property of PrestaShop SA
 */
 
+use JetBrains\PhpStorm\Language;
+
 global $smarty;
 $smarty->setTemplateDir(_PS_THEME_DIR_);
 
@@ -53,6 +55,17 @@ function smartyTranslate($params, $smarty)
 
     if (!isset($params['d'])) {
         $params['d'] = null;
+    }
+
+    if (!isset($params['lang'])) {
+        $params['lang'] = null;
+    } else {
+        if (!is_object($params['lang'])) {
+            $params['lang'] = new Language((int)$params['lang']);
+        }
+        if (!Validate::isLoadedObject($params['lang'])) {
+            $params['lang'] = null;
+        }
     }
 
     if (!is_null($params['d'])) {
@@ -102,9 +115,9 @@ function smartyTranslate($params, $smarty)
     }
 
     if ($params['mod']) {
-        return Translate::smartyPostProcessTranslation(Translate::getModuleTranslation($params['mod'], $params['s'], $basename, $params['sprintf'], $params['js']), $params);
+        return Translate::smartyPostProcessTranslation(Translate::getModuleTranslation($params['mod'], $params['s'], $basename, $params['sprintf'], $params['js'], $params['lang']), $params);
     } elseif ($params['pdf']) {
-        return Translate::smartyPostProcessTranslation(Translate::getPdfTranslation($params['s'], $params['sprintf']), $params);
+        return Translate::smartyPostProcessTranslation(Translate::getPdfTranslation($params['s'], $params['sprintf'], $params['lang']), $params);
     }
 
     if ($_LANG != null && isset($_LANG[$key])) {

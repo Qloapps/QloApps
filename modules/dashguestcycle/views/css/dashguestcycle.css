@@ -18,18 +18,18 @@
 */
 
 /* scrollbar design - start */
-#dashguestcycle ::-webkit-scrollbar {
+#dashguestcycle.dashboard-top ::-webkit-scrollbar {
 	height: 12px;
 	margin-bottom: 5px;
 }
- 
-#dashguestcycle ::-webkit-scrollbar-track {
+
+#dashguestcycle.dashboard-top ::-webkit-scrollbar-track {
 	background-color: #DDD;
 	margin: 0 6px;
 	border-radius: 10px;
 }
- 
-#dashguestcycle ::-webkit-scrollbar-thumb {
+
+#dashguestcycle.dashboard-top ::-webkit-scrollbar-thumb {
 	background-color: #BBB;
 	border-radius: 10px;
 	margin-bottom: 5px;
@@ -105,4 +105,9 @@
 	font-weight: bold;
 	font-size: 24px;
 	line-height: 30px;
+}
+
+#dashguestcycle .tab-content {
+	max-height: 300px;
+	overflow-y: auto;
 }

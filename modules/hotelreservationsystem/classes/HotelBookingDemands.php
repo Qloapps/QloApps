@@ -86,7 +86,7 @@ class HotelBookingDemands extends ObjectModel
             $idCurrency = (int)Configuration::get('PS_CURRENCY_DEFAULT');
         }
         $totalDemandsPrice = 0;
-        $sql = 'SELECT hb.`id_room`, hd.* FROM `'._DB_PREFIX_.'htl_booking_demands` hd
+        $sql = 'SELECT hb.`id_room`, hb.`adults`, hb.`children`, hd.* FROM `'._DB_PREFIX_.'htl_booking_demands` hd
         LEFT JOIN `'._DB_PREFIX_.'htl_booking_detail` hb ON (hd.`id_htl_booking` = hb.`id`)
         WHERE hd.`id_htl_booking` IN
         (SELECT `id` FROM `'._DB_PREFIX_.'htl_booking_detail`
@@ -132,6 +132,8 @@ class HotelBookingDemands extends ObjectModel
                             $demand['extra_demands_tax_label'] = $moduleObj->l('No tax', 'HotelBookingDemands');
                         }
                         $roomDemands[$demand['id_room']]['id_room'] = $demand['id_room'];
+                        $roomDemands[$demand['id_room']]['adults'] = $demand['adults'];
+                        $roomDemands[$demand['id_room']]['children'] = $demand['children'];
                         $roomDemands[$demand['id_room']]['extra_demands'][] = $demand;
                     }
                     unset($taxTemp);

@@ -17,39 +17,102 @@
 *  @license   https://store.webkul.com/license.html
 */
 
+#search_hotel_block_form.grid {
+  display: grid;
+  grid-template-columns: repeat(22, 1fr);
+  column-gap: 5px;
+}
+#search_hotel_block_form.grid > div {
+  display: grid;
+}
+#search_hotel_block_form .area-3 {
+  grid-column-end: span 3;
+}
+#search_hotel_block_form .area-4 {
+  grid-column-end: span 4;
+}
+#search_hotel_block_form .area-5 {
+  grid-column-end: span 5;
+}
+#search_hotel_block_form .area-6 {
+  grid-column-end: span 6;
+}
+#search_hotel_block_form .area-7 {
+  grid-column-end: span 7;
+}
+#search_hotel_block_form .area-8 {
+  grid-column-end: span 8;
+}
+#search_hotel_block_form .area-9 {
+  grid-column-end: span 9;
+}
+#search_hotel_block_form .area-10 {
+  grid-column-end: span 10;
+}
+#search_hotel_block_form .area-11 {
+  grid-column-end: span 11;
+}
+#search_hotel_block_form .area-14 {
+  grid-column-end: span 14;
+}
+#search_hotel_block_form .area-16 {
+  grid-column-end: span 16;
+}
+#daterange_value.grid {
+  display: grid;
+  column-gap: 5px;
+  grid-template-columns: repeat(2, 1fr);
+}
+/* #search_hotel_block_form {
+  display: grid;
+  grid-template-columns: 0.8fr repeat(3, 1fr) 0.6fr;
+  column-gap: 5px;
+}
+@media (min-width: 768px) and (max-width: 991px) {
+  #search_hotel_block_form {
+    grid-template-columns: repeat(12, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+  }
+  #search_hotel_block_form > div {
+    grid-column-end: span 4;
+  }
+  #search_hotel_block_form > div:nth-child(1) {
+    grid-column: 1 / span 5;
+  }
+  #search_hotel_block_form > div:nth-child(2) {
+    grid-column: 6 / span 5;
+  }
+}
+@media (max-width: 767px) {
+  #search_hotel_block_form {
+    grid-template-columns: 1fr;
+  }
+} */
 #search_hotel_block_form .header-rmsearch-input {
   border-radius: 4px;
   border: none;
   color: #333;
   font-size: 14px;
   font-weight: 400;
-  padding: 7px 5px 7px 12px;
   border: 1px solid #555555;
-  background-color: #FFF;}
+  background-color: #FFF;
+  min-height: 55px;}
   #search_hotel_block_form .header-rmsearch-input:active, #search_hotel_block_form .header-rmsearch-input:focus {
     border: 2px solid #1292FF;}
-  #search_hotel_block_form #hotel_location, #search_hotel_block_form #id_hotel_button, #search_hotel_block_form #guest_occupancy {
-    padding-left: 45px;
-    padding-right: 35px;
-    background-repeat: no-repeat;
-    background-position: 4% 50%;}
-  #search_hotel_block_form #hotel_location {
-    background-image: url("../../views/img/icon-hotel.svg");}
   #search_hotel_block_form #id_hotel_button {
-    background: url("../../views/img/icon-hotel.svg") no-repeat 4% 50%, url("../../views/img/icon-dropdown-arrow.svg") no-repeat 96% 50%;
+    background: url("../../views/img/icon-hotel.svg") no-repeat 10px 50%, url("../../views/img/icon-dropdown-arrow.svg") no-repeat calc(100% - 10px) 50%;
     background-color: #FFF;}
   #search_hotel_block_form #guest_occupancy {
-    background: url("../../views/img/icon-users.svg") no-repeat 4% 50%, url("../../views/img/icon-dropdown-arrow.svg") no-repeat 96% 50%;
-    background-color: #FFF;}
-
+    height: unset;
+    text-align: unset;
+  }
   #search_hotel_block_form .input-date {
-    cursor: text;
-    background-image: url("../../views/img/icon-calendar.svg");
-    background-repeat: no-repeat;
-    padding-right: 40px;
-    background-position: 96% 50%;}
-  #search_hotel_block_form #hotel_location {
-    padding-right: 15px;}
+    display: grid;
+    cursor: text;}
+  #search_hotel_block_form .input-date span {
+    align-self: center;}
+    #search_hotel_block_form .input-date span i {
+      transform: scale(0.8, 0.6);}
   .header-rmsearch-input::-webkit-input-placeholder {
     color: #333;}
   .header-rmsearch-input:-moz-placeholder {
@@ -135,8 +198,6 @@
       color: #333333;
       line-height: 22px;
       text-align: center;}
-      #search_hotel_block_form .form-group {
-        margin-bottom: 20px;}
       #search_hotel_block_form #search_room_submit {
         background-color: #1292FF;
         width: 100%;
@@ -144,3 +205,103 @@
         text-transform: uppercase;
         border: none;
         border-radius: 4px;}
+
+
+/* occupancy  */
+#search_occupancy_wrapper {
+  border: none;
+  max-height: 400px;
+  min-width: 250px;
+  overflow: auto;
+  box-shadow: 0 8px 25px -4px rgba(0,0,0,0.39);
+  left: 0px;
+  padding: 20px;}
+  #search_occupancy_wrapper .occupancy-info-separator {
+    margin-bottom: 15px;
+    margin-top: 15px;
+    margin-right: -20px;
+      margin-left: -20px;}
+  #search_occupancy_wrapper .children_age_info_block {
+    display: none;}
+  #search_occupancy_wrapper .children_age_info_block label {
+    font-size: 12px;
+    color: #777777;}
+  #search_occupancy_wrapper label {
+    font-size: 14px;
+    color: #333333;
+    font-weight: 400;}
+    #search_occupancy_wrapper .add_new_occupancy_btn {
+      font-weight: bold;
+      text-decoration: none;
+      font-size: 14px;
+      color: #0000FF;
+      line-height: 24px;}
+      #search_occupancy_wrapper .add_new_occupancy_btn:active, #search_occupancy_wrapper .add_new_occupancy_btn:focus, #search_occupancy_wrapper .add_new_occupancy_btn:hover {
+        text-decoration: none;
+        color: #0000FF;}
+    #search_occupancy_wrapper .occupancy_info_head {
+      font-size: 14px;
+      color: #333333;
+      font-weight: bold;
+      margin-bottom: 10px;}
+      #search_occupancy_wrapper .occupancy_info_head .remove-room-link {
+        font-size: 12px;
+        color: #FF4343;
+        text-align: right;}
+      #search_occupancy_wrapper .occupancy_info_block {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr); }
+        #search_occupancy_wrapper .occupancy_info_block .occupancy_count_block{
+          display: grid;}
+          #search_occupancy_wrapper .occupancy_info_block .occupancy_count_block > div{
+            align-self: end;}
+        #search_occupancy_wrapper .occupancy_info_block .children_age_info_block {
+          grid-column: 1 / 3}
+      #search_occupancy_wrapper .occupancy_info_block .occupancy_count {
+        padding: 14px;
+        border: 1px solid #E1E3E7;
+        font-size: 14px;
+        font-weight: 600;
+        color: #333333;
+        text-align: center;
+        border-radius: 4px;}
+      #search_occupancy_wrapper .occupancy_info_block .occupancy_count > span {
+        min-width: 21px;
+        text-align: center;
+        display: block;}
+      #search_occupancy_wrapper .occupancy_info_block .qty_direction {
+        margin-left: 3px;
+        width: 22px;}
+        #search_occupancy_wrapper .occupancy_info_block .qty_direction a {
+          padding: 1px 5px;
+          border: 0px;
+          border: 1px solid #E1E3E7;
+          color: #333;
+          border-radius: 4px;
+          font-weight: 400;}
+          #search_occupancy_wrapper .occupancy_info_block .qty_direction .occupancy_quantity_down {
+            margin-top: 3px;}
+
+  #search_occupancy_wrapper .children_ages {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 5px;
+    justify-content: space-between;
+  }
+  #search_occupancy_wrapper .children_ages select {
+    background-color: #fff;
+    height: 37px;
+    border-radius: 4px;
+    padding: 3px 5px;
+    font-size: 12px;
+    color: #333;
+    border: 1px solid #E1E3E7;
+    width: 100%;}
+
+
+@media (max-width: 411px) {
+  #search_occupancy_wrapper .occupancy_info_block .occupancy_count_block {
+    width: 100%;}
+  #search_occupancy_wrapper .occupancy_info_block .occupancy_count {
+      width: 80%;}
+}

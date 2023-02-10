@@ -64,7 +64,7 @@
 			</div>
 		</center>
 	</td>
-	<td style="display:none;" class="text-center" colspan="2">
+	<td style="display:none;" class="text-center">
 		<center>
 			<div class="row">
 				<div class="input-group fixed-width-xl">
@@ -83,17 +83,66 @@
 			</div>
 		</center>
 	</td>
-	<td style="display:none;" class="productQuantity text-center">
-		<center>
-			<input type="number" class="form-control fixed-width-sm" name="add_product[product_quantity]" id="add_product_product_quantity" value="1" disabled="disabled" min="1"/>
-		</center>
+
+	<td style="display:none;" class="productQuantity text-center" colspan="2">
+		{if $order->with_occupancy}
+			<div class="booking_occupancy">
+				<div class="dropdown">
+					<button class="booking_guest_occupancy btn btn-default btn-left btn-block input-occupancy disabled" type="button">
+						<span>{l s='Select occupancy'}</span>
+					</button>
+					<input type="hidden" class="max_avail_type_qty" value="">
+					<div class="dropdown-menu booking_occupancy_wrapper fixed-width-xxl well well-sm">
+						<div class="booking_occupancy_inner">
+							<input type="hidden" class="max_adults" value="">
+							<input type="hidden" class="max_children" value="">
+							<input type="hidden" class="max_guests" value="">
+							<div class="occupancy_info_block col-sm-12" occ_block_index="0">
+								<div class="occupancy_info_head col-sm-12"><label class="room_num_wrapper">{l s='Room - 1'}</label></div>
+								<div class="col-sm-12">
+									<div class="row">
+										<div class="form-group col-xs-6 occupancy_count_block">
+											<label>{l s='Adults'}</label>
+											<input type="number" class="form-control num_occupancy num_adults" name="occupancy[0][adults]" value="1" min="1">
+										</div>
+										<div class="form-group col-xs-6 occupancy_count_block">
+											<label>{l s='Child'} <span class="label-desc-txt"></span></label>
+											<input type="number" class="form-control num_occupancy num_children" name="occupancy[0][children]" value="0" min="0" {if $max_child_in_room}max="{$max_child_in_room}"{/if}>
+											({l s='Below'}  {$max_child_age|escape:'htmlall':'UTF-8'} {l s='years'})
+										</div>
+									</div>
+									<div class="row children_age_info_block" style="display:none">
+										<div class="form-group col-sm-12">
+											<label class="">{l s='All Children'}</label>
+											<div class="">
+												<div class="row children_ages">
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<hr class="occupancy-info-separator col-sm-12">
+						</div>
+						<div class="add_occupancy_block">
+							<a class="add_new_occupancy_btn" href="#"><i class="icon-plus"></i> <span>{l s='Add Room'}</span></a>
+						</div>
+					</div>
+				</div>
+			</div>
+		{else}
+			<center>
+				<input type="number" class="form-control fixed-width-sm" name="add_product[product_quantity]" id="add_product_product_quantity" value="1" disabled="disabled" min="1"/>
+			</center>
+		{/if}
+
 	</td>
 	{*{if ($order->hasBeenPaid())}<td style="display:none;" class="productQuantity"></td>{/if}
 	{if $display_warehouse}<td></td>{/if}
 	{if ($order->hasBeenDelivered())}<td style="display:none;" class="productQuantity"></td>{/if}
 	<td style="display:none;" class="productQuantity" id="add_product_product_stock">0</td>*}
 	<td style="display:none;" id="add_product_product_total"  class="text-center">{displayPrice price=0 currency=$currency->id}</td>
-	<td style="display:none;" colspan="2"  class="text-center">
+	<td style="display:none;" class="text-center">
 		{if sizeof($invoices_collection)}
 		<select class="form-control" name="add_product[invoice]" id="add_product_product_invoice" disabled="disabled">
 			<optgroup class="existing" label="{l s='Existing'}">

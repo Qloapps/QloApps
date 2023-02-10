@@ -5623,7 +5623,7 @@ class ProductCore extends ObjectModel
                 WHERE `id_product` = '.(int)$this->id
             );
 
-            // save room type info adult, child, hotel info
+            // save room type info adults, child, hotel info
             $postData = trim(file_get_contents('php://input'));
             libxml_use_internal_errors(true);
             $xml = simplexml_load_string(utf8_decode($postData));
@@ -5631,7 +5631,7 @@ class ProductCore extends ObjectModel
             $roomtypeData = json_decode(json_encode($xml), true);
 
             // set room  map info for the hotel from request
-            return Db::getInstance()->execute('INSERT INTO `'._DB_PREFIX_.'htl_room_type` (`id_product`, `id_hotel`, `adult`, `children`, `date_add`, `date_upd`) VALUES ('.(int)$this->id.', '.(int) $roomtypeData['room_type']['id_hotel'].', '.(int) $roomtypeData['room_type']['adults'].', '.(int) $roomtypeData['room_type']['children'].', \''.date('Y-m-d h:i:s').'\', \''.date('Y-m-d h:i:s').'\')');
+            return Db::getInstance()->execute('INSERT INTO `'._DB_PREFIX_.'htl_room_type` (`id_product`, `id_hotel`, `adults`, `children`, `date_add`, `date_upd`) VALUES ('.(int)$this->id.', '.(int) $roomtypeData['room_type']['id_hotel'].', '.(int) $roomtypeData['room_type']['adults'].', '.(int) $roomtypeData['room_type']['children'].', \''.date('Y-m-d h:i:s').'\', \''.date('Y-m-d h:i:s').'\')');
         }
 
         return true;
@@ -6060,7 +6060,7 @@ class ProductCore extends ObjectModel
     public function getWsAdults()
     {
         return Db::getInstance()->getValue(
-            'SELECT `adult` FROM `'._DB_PREFIX_.'htl_room_type` WHERE `id_product` = '.(int)$this->id.' ORDER BY `id` ASC'
+            'SELECT `adults` FROM `'._DB_PREFIX_.'htl_room_type` WHERE `id_product` = '.(int)$this->id.' ORDER BY `id` ASC'
         );
     }
 

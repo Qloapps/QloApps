@@ -26,10 +26,15 @@
 
 class OrderPaymentCore extends ObjectModel
 {
+    const PAYMENT_TYPE_ONLINE = 1;
+    const PAYMENT_TYPE_PAY_AT_HOTEL = 2;
+    const PAYMENT_TYPE_REMOTE_PAYMENT = 3;
+
     public $order_reference;
     public $id_currency;
     public $amount;
     public $payment_method;
+    public $payment_type;
     public $conversion_rate;
     public $transaction_id;
     public $card_number;
@@ -49,6 +54,7 @@ class OrderPaymentCore extends ObjectModel
             'id_currency' =>        array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => true),
             'amount' =>            array('type' => self::TYPE_FLOAT, 'validate' => 'isNegativePrice', 'required' => true),
             'payment_method' =>    array('type' => self::TYPE_STRING, 'validate' => 'isGenericName'),
+            'payment_type' =>        array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => true),
             'conversion_rate' =>    array('type' => self::TYPE_FLOAT, 'validate' => 'isFloat'),
             'transaction_id' =>    array('type' => self::TYPE_STRING, 'validate' => 'isAnything', 'size' => 254),
             'card_number' =>        array('type' => self::TYPE_STRING, 'validate' => 'isAnything', 'size' => 254),
