@@ -587,7 +587,7 @@ function init()
 		if ($('.booking_occupancy_wrapper:visible').length) {
 			var occupancy_wrapper = $('.booking_occupancy_wrapper:visible');
 			$(occupancy_wrapper).find(".occupancy_info_block").addClass('selected');
-			if (!($(e.target).closest(".booking_occupancy_wrapper").length || $(e.target).closest(".booking_guest_occupancy").length || $(e.target).closest(".ajax_add_to_cart_button").length || $(e.target).closest(".exclusive.book_now_submit").length)) {
+			if (!($(e.target).closest(".booking_occupancy_wrapper").length || $(e.target).closest(".booking_guest_occupancy").length || $(e.target).closest(".ajax_add_to_cart_button").length || $(e.target).closest(".exclusive.book_now_submit").length || $(e.target).closest(".remove-room-link").length)) {
 				let hasErrors = 0;
 
 				let adults = $(occupancy_wrapper).find(".num_adults").map(function(){return $(this).val();}).get();
@@ -669,8 +669,8 @@ function init()
 					occupancy_block += '</div>';
 				occupancy_block += '</div>';
 			occupancy_block += '</div>';
+			occupancy_block += '<hr class="occupancy-info-separator col-sm-12">';
 		occupancy_block += '</div>';
-		occupancy_block += '<hr class="occupancy-info-separator col-sm-12">';
 		$(booking_occupancy_wrapper).find('.booking_occupancy_inner').append(occupancy_block);
 
 		setRoomTypeGuestOccupancy(booking_occupancy_wrapper);

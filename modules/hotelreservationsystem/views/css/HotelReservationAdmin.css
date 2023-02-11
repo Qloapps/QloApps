@@ -141,6 +141,10 @@ a.deleteHtlImage {
     padding-top: 30px;
 }
 
+.booking_occupancy_wrapper {
+    max-height: 250px;
+    overflow-x: auto;
+}
 .bg-green
 {
     background-color: #7EC77B;

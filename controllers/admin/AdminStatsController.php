@@ -1184,7 +1184,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
     public static function getNewBookingsInfoByDate($date, $idHotel = null)
     {
         $sql = 'SELECT hbd.`id_customer`, CONCAT(c.`firstname`, " ", c.`lastname`) AS customer_name,
-        COUNT(hbd.`id`) AS total_rooms, SUM(hbd.`adult` + hbd.`children`) AS total_guests,
+        COUNT(hbd.`id`) AS total_rooms, SUM(hbd.`adults` + hbd.`children`) AS total_guests,
         hbd.`id_hotel`, hbd.`hotel_name`, hbd.`id_order`, o.`total_paid_tax_excl`, o.`id_currency`, osl.`name` AS `state_name`
         FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
         LEFT JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = hbd.`id_order`)
@@ -1203,7 +1203,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
     {
         $sql = 'SELECT orr.`id_order_return`, orr.`id_customer`, hbd.`room_num`, hbd.`id_product`, hbd.`room_type_name`,
         CONCAT(c.`firstname`, " ", c.`lastname`) AS customer_name,
-        hbd.`id_hotel`, hbd.`hotel_name`, SUM(hbd.`adult` + hbd.`children`) AS total_guests,
+        hbd.`id_hotel`, hbd.`hotel_name`, SUM(hbd.`adults` + hbd.`children`) AS total_guests,
         hbd.`date_from`, hbd.`date_to`, orr.`id_order`
         FROM `'._DB_PREFIX_.'order_return` orr
         LEFT JOIN `'._DB_PREFIX_.'order_return_detail` ord ON (ord.`id_order_return` = orr.`id_order_return`)
