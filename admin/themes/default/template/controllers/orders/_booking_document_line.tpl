@@ -20,7 +20,6 @@
 {if is_array($booking_documents) && count($booking_documents)}
     {foreach from=$booking_documents item=booking_document}
         <tr>
-            <td class="text-left">{$booking_document.title}</td>
             <td class="text-center">
                 <a href="{$link->getAdminLink('AdminBookingDocument')}&action=getDocument&id_document={$booking_document.id_htl_booking_document}&is_preview=1" target="_blank">
                     {if $booking_document.file_type == HotelBookingDocument::FILE_TYPE_IMAGE}
@@ -30,6 +29,7 @@
                     {/if}
                 </a>
             </td>
+            <td class="text-left">{$booking_document.title}</td>
             <td class="text-center">{dateFormat date=$booking_document.date_add full=1}</td>
             <td class="text-center">
                 <a class="btn btn-info" href="{$link->getAdminLink('AdminBookingDocument')}&action=getDocument&id_document={$booking_document.id_htl_booking_document}">
@@ -43,6 +43,11 @@
     {/foreach}
 {else}
     <tr>
-        <td colspan="4" class="text-center">{l s='No documents uploaded yet.'}</td>
+        <td class="list-empty" colspan="4">
+            <div class="list-empty-msg">
+                <i class="icon-warning-sign list-empty-icon"></i>
+                {l s='No documents uploaded yet.'}
+            </div>
+        </td>
     </tr>
 {/if}

@@ -1309,9 +1309,13 @@ function checkTotalRefundProductQuantity(it)
 		actualizeTotalRefundVoucher();
 }
 
-$(document).on('click', '#modal-booking-documents .btn-add-new-document', function() {
+$(document).on('click', '#booking-documents-modal .btn-add-new-document', function() {
 	BookingDocumentsModal.addNew();
 	BookingDocumentsForm.addNew();
+});
+
+$(document).on('click', '#booking-documents-modal [data-dismiss="alert"]', function() {
+	BookingDocumentsModal.hideErrors();
 });
 
 $(document).on('change', '.input-booking-document', function(e) {
@@ -1344,25 +1348,27 @@ $(document).on('click', '#form-add-new-document .btn-group-add-new .upload', fun
 	BookingDocumentsModal.uploadDocument();
 });
 
-$(document).on('click', '#modal-booking-documents .documents-list .btn-delete-document', function(e) {
+$(document).on('click', '#booking-documents-modal .documents-list .btn-delete-document', function(e) {
 	e.preventDefault();
 
-	BookingDocumentsModal.deleteDocument(this);
+	if (confirm(txt_booking_document_delete_confirm)) {
+		BookingDocumentsModal.deleteDocument(this);
+	}
 });
 
 const BookingDocumentsModal = {
 	init: function(idHtlBooking, $this) {
 		BookingDocumentsModal.currentTr = $this;
-		$('#modal-booking-documents .documents-list').find('[name="id_hotel_booking"]').val(idHtlBooking);
+		$('#booking-documents-modal .documents-list').find('[name="id_hotel_booking"]').val(idHtlBooking);
 		BookingDocumentsForm.init();
 		BookingDocumentsModal.reset();
 		BookingDocumentsModal.show(idHtlBooking);
 	},
 	reset: function() {
-		$('#modal-booking-documents .documents-list table tbody').html('');
+		$('#booking-documents-modal .documents-list table tbody').html('');
 	},
 	show: function(idHtlBooking) {
-		$('#modal-booking-documents').modal('show');
+		$('#booking-documents-modal').modal('show');
 		$('#form-add-new-document').find('[name="id_htl_booking"]').attr('value', idHtlBooking);
 		let data = {
 			ajax: true,
@@ -1383,45 +1389,47 @@ const BookingDocumentsModal = {
 		});
 	},
 	setBodyHtml: function(html) {
-		$('#modal-booking-documents .documents-list table tbody').html(html);
+		$('#booking-documents-modal .documents-list table tbody').html(html);
 	},
 	close: function() {
-		$('#modal-booking-documents').modal('hide');
+		$('#booking-documents-modal').modal('hide');
 	},
 	addNew: function() {
 		BookingDocumentsModal.hideErrors();
 		BookingDocumentsModal.hideAddNewButton();
 	},
-	beforeSubmit: function() {
-		BookingDocumentsModal.hideErrors();
+	beforeSubmit: function(cb) {
+		BookingDocumentsModal.hideErrors(cb);
 	},
 	uploadDocument: function() {
-		BookingDocumentsModal.beforeSubmit();
-		let formData = new FormData($('form#form-add-new-document').get(0));
-		formData.append('ajax', true);
-		formData.append('action', 'uploadBookingDocument');
-		$.ajax({
-			url: admin_order_tab_link,
-			data: formData,
-			processData: false,
-			contentType: false,
-			type: 'POST',
-			success: function(response) {
-				let jsonResponse = JSON.parse(response);
-				if (jsonResponse.status) {
-					showSuccessMessage(txt_booking_document_upload_success);
-					BookingDocumentsModal.reset();
-					BookingDocumentsForm.reset();
-					BookingDocumentsForm.resetPreview();
-					BookingDocumentsModal.setBodyHtml(jsonResponse.html);
-					BookingDocumentsModal.setDocumentsCount(jsonResponse.num_checkin_documents);
-				} else {
-					BookingDocumentsModal.showErrors(jsonResponse.errors);
-				}
-			},
+		BookingDocumentsModal.beforeSubmit(function() {
+			let formData = new FormData($('form#form-add-new-document').get(0));
+			formData.append('ajax', true);
+			formData.append('action', 'uploadBookingDocument');
+			$.ajax({
+				url: admin_order_tab_link,
+				data: formData,
+				processData: false,
+				contentType: false,
+				type: 'POST',
+				success: function(response) {
+					let jsonResponse = JSON.parse(response);
+					if (jsonResponse.status) {
+						showSuccessMessage(txt_booking_document_upload_success);
+						BookingDocumentsModal.reset();
+						BookingDocumentsForm.reset();
+						BookingDocumentsForm.resetPreview();
+						BookingDocumentsModal.setBodyHtml(jsonResponse.html);
+						BookingDocumentsModal.setDocumentsCount(jsonResponse.num_checkin_documents);
+					} else {
+						BookingDocumentsModal.showErrors(jsonResponse.errors);
+					}
+				},
+			});
 		});
 	},
 	deleteDocument: function($this) {
+		BookingDocumentsModal.hideErrors();
 		let idHtlBookingDocument = parseInt($($this).attr('data-id-htl-booking-document'));
 		let data = {
 			ajax: true,
@@ -1444,19 +1452,22 @@ const BookingDocumentsModal = {
 		});
 	},
 	showErrors: function(errors) {
-		$('#modal-booking-documents .errors-wrap').stop().html(errors);
-		$('#modal-booking-documents .errors-wrap').show('slow');
+		$('#booking-documents-modal .errors-wrap').stop().html(errors);
+		$('#booking-documents-modal .errors-wrap').show(200);
 	},
-	hideErrors: function() {
-		$('#modal-booking-documents .errors-wrap').hide('slow', function() {
-			$('#modal-booking-documents .errors-wrap').html('');
+	hideErrors: function(cb) {
+		$('#booking-documents-modal .errors-wrap').hide(200, function() {
+			$('#booking-documents-modal .errors-wrap').html('');
+			if (typeof cb === 'function') {
+				cb();
+			}
 		});
 	},
 	enableAddNewButton: function() {
-		$('#modal-booking-documents .btn-add-new-document').show(200);
+		$('#booking-documents-modal .btn-add-new-document').show(200);
 	},
 	hideAddNewButton: function() {
-		$('#modal-booking-documents .btn-add-new-document').hide(200);
+		$('#booking-documents-modal .btn-add-new-document').hide();
 	},
 	setDocumentsCount: function(count) {
 		$(BookingDocumentsModal.currentTr).find('.count-documents').html(count);
@@ -1480,7 +1491,7 @@ const BookingDocumentsForm = {
 		$('#form-add-new-document .file-name').val(file.name);
 	},
 	addNew: function() {
-		$('#modal-booking-documents #form-add-new-document').show(200);
+		$('#booking-documents-modal #form-add-new-document').show(200);
 		$('#form-add-new-document').find('.input-file-wrap').html(BookingDocumentsForm.inputHtml);
 	},
 	openFileChooser: function() {
@@ -1488,6 +1499,6 @@ const BookingDocumentsForm = {
 		$('#form-add-new-document').find('.input-file-wrap input').click();
 	},
 	close: function() {
-		$('#modal-booking-documents #form-add-new-document').hide(200);
+		$('#booking-documents-modal #form-add-new-document').hide(200);
 	},
 }

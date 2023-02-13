@@ -20,13 +20,13 @@
 <div class="modal-body text-center">
     <div class="row">
         <div class="col-lg-12">
-            <div class="alert alert-danger text-left errors-wrap" style="display: none;"></div>
+            <div class="text-left errors-wrap"></div>
             <div class="documents-list">
-                <table class="table table-striped">
+                <table class="table table-bordered">
                     <thead>
                         <tr>
-                            <th class="text-left">{l s='Title'}</th>
                             <th class="text-center">{l s='Preview'}</th>
+                            <th class="text-left">{l s='Title'}</th>
                             <th class="text-center">{l s='Upload Date'}</th>
                             <th class="text-center">{l s='Actions'}</th>
                         </tr>
@@ -34,10 +34,9 @@
                     <tbody></tbody>
                 </table>
             </div>
-            <div class="add-new-document-form">
+            <div class="add-new-document-form" style="margin-top: 10px;">
                 <div class="text-left add-new-wrap">
-                    <a class="btn btn-default btn-add-new-document">
-                        <i class="icon icon-cloud-upload"></i>
+                    <a class="btn btn-primary btn-add-new-document">
                         {l s='Upload new document'}
                     </a>
                     <span></span>
@@ -48,18 +47,26 @@
 
                     <div class="form-horizontal">
                         <div class="form-group">
-                            <label class="control-label col-sm-2">{l s='Title'}</label>
+                            <label class="control-label col-sm-2">
+                                <span class="label-tooltip" data-toggle="tooltip" title="" data-original-title="{l s='Write the title for the document. Invalid characters <>;=#{}'}">
+                                    {l s='Title'}
+                                </span>
+                            </label>
                             <div class="col-sm-10">
                                 <div class="input-group fixed-width-xxl">
-                                    <input type="text" name="title" value="" placeholder="{l s='Eg. Passport, Driver\'s license'}" />
+                                    <input type="text" name="title" value="" placeholder="{l s='Eg. Passport, Driving license'}" />
                                 </div>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="control-label required col-sm-2">{l s='File'}</label>
+                            <label class="control-label required col-sm-2">
+                                <span class="label-tooltip" data-toggle="tooltip" title="" data-original-title="{l s='Choose the document file to be uploaded.'}">
+                                    {l s='File'}
+                                </span>
+                            </label>
                             <div class="col-sm-10">
                                 <div class="input-file-wrap"></div>
-                                <div class="dummyfile input-group fixed-width-xxl">
+                                <div class="input-group fixed-width-xxl">
                                     <span class="input-group-addon"><i class="icon-file"></i></span>
                                     <input type="text" class="file-name" readonly="">
                                     <span class="input-group-btn">
@@ -69,6 +76,9 @@
                                         </button>
                                     </span>
                                 </div>
+                                <p class="text-left" style="margin-top: 4px; font-style: italic;">
+                                    {l s='Upload a PDF or an image file. Allowed image formats: .gif, .jpg, .jpeg and .png'}
+                                </p>
                             </div>
                         </div>
                         <div class="clearfix btn-group-add-new">
@@ -87,4 +97,5 @@
 </div>
 
 {addJsDefL name=txt_booking_document_upload_success}{l s='Document uploaded successfully.' js=1}{/addJsDefL}
+{addJsDefL name=txt_booking_document_delete_confirm}{l s='Are you sure?' js=1}{/addJsDefL}
 {addJsDefL name=txt_booking_document_delete_success}{l s='Document deleted successfully.' js=1}{/addJsDefL}
