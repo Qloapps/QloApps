@@ -39,7 +39,7 @@ class HotelBookingDocument extends ObjectModel
         'primary' => 'id_htl_booking_document',
         'fields' => array(
             'id_htl_booking' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => true),
-            'title' => array('type' => self::TYPE_STRING, 'validate' => 'isString'),
+            'title' => array('type' => self::TYPE_STRING, 'validate' => 'isCatalogName'),
             'file_type' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => true),
             'file_name' => array('type' => self::TYPE_STRING, 'validate' => 'isString'),
             'date_add' => array('type' => self::TYPE_DATE, 'validate' => 'isDate'),
@@ -58,9 +58,6 @@ class HotelBookingDocument extends ObjectModel
     public function save($null_values = false, $auto_date = true)
     {
         parent::save($null_values, $auto_date);
-
-        $this->documentsBaseDir = _PS_MODULE_DIR_.'hotelreservationsystem/documents/booking_guests/';
-        $this->sourceIndexFile = $this->documentsBaseDir.'index.php';
 
         if ($this->id) {
             $this->setFileName();
@@ -85,17 +82,6 @@ class HotelBookingDocument extends ObjectModel
             'SELECT COUNT(*)
             FROM `'._DB_PREFIX_.'htl_booking_document`
             WHERE `id_htl_booking` = '.(int) $idHtlBooking
-        );
-    }
-
-    public static function getDocumentsByIdOrder($idOrder)
-    {
-        return Db::getInstance()->executeS(
-            'SELECT hbdo.*
-            FROM `'._DB_PREFIX_.'htl_booking_document` hbdo
-            INNER JOIN `'._DB_PREFIX_.'htl_booking_detail` hbde
-            ON (hbde.`id` = hbdo.`id_htl_booking`)
-            WHERE hbde.`id_order` = '.(int) $idOrder
         );
     }
 

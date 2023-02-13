@@ -330,7 +330,7 @@ class AdminOrdersControllerCore extends AdminController
     public function initModal()
     {
         parent::initModal();
-        $this->modals[] = $this->getModalBookingDocuments();
+        $this->modals[] = $this->getBookingDocumentsModal();
     }
 
     public function setMedia()
@@ -1646,13 +1646,13 @@ class AdminOrdersControllerCore extends AdminController
         return parent::renderView();
     }
 
-    public function getModalBookingDocuments()
+    public function getBookingDocumentsModal()
     {
-        $modalContent = $this->context->smarty->fetch('controllers/orders/modal_booking_documents.tpl');
+        $modalContent = $this->context->smarty->fetch('controllers/orders/_booking_documents_modal.tpl');
 
         // set modal details
         $modal = array(
-            'modal_id' => 'modal-booking-documents',
+            'modal_id' => 'booking-documents-modal',
             'modal_class' => 'modal-md',
             'modal_title' => $this->l('Documents'),
             'modal_content' => $modalContent,
@@ -1692,7 +1692,7 @@ class AdminOrdersControllerCore extends AdminController
         if (!$title) {
             $title = '--';
         } else {
-            if (!Validate::isString($title)) {
+            if (!Validate::isCatalogName($title)) {
                 $this->errors[] = $this->l('Please enter a valid Title.');
             }
         }
@@ -1700,7 +1700,7 @@ class AdminOrdersControllerCore extends AdminController
         $objHotelBookingDocument = new HotelBookingDocument();
         $objHotelBookingDocument->setFileInfoForUploadedDocument('booking_document');
         if (!count($objHotelBookingDocument->fileInfo)) {
-            $this->errors[] = $this->l('Please upload a document.');
+            $this->errors[] = $this->l('Please select a file to upload.');
         } elseif ($objHotelBookingDocument->fileInfo['size'] > Tools::getMaxUploadSize()) {
             $this->errors[] = $this->l('Uploaded file size is too large.');
         } elseif(!(ImageManager::isRealImage($objHotelBookingDocument->fileInfo['tmp_name'])
@@ -1729,7 +1729,7 @@ class AdminOrdersControllerCore extends AdminController
                 'errors' => $this->errors,
             ));
 
-            $response['errors'] = $this->context->smarty->fetch('controllers/orders/_errors.tpl');
+            $response['errors'] = $this->context->smarty->fetch('alerts.tpl');
             $response['status'] = false;
         }
 
@@ -1808,7 +1808,7 @@ class AdminOrdersControllerCore extends AdminController
             'pdf_icon_link' => $this->context->link->getBaseLink().'modules/hotelreservationsystem/views/img/pdf-icon.jpg',
         ));
 
-        return $this->context->smarty->fetch('controllers/orders/_booking_documents.tpl');
+        return $this->context->smarty->fetch('controllers/orders/_booking_document_line.tpl');
     }
 
     public function ajaxProcessSearchProducts()
