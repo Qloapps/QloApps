@@ -14,7 +14,7 @@ THEREFORE, with the intent to be legally bound, the parties hereby agree as foll
 Agreement
 ================
 
-1.Definitions : 
+1.Definitions :
 ------------------
 As used in this Agreement, the following capitalized terms shall have the definitions set forth below:
 
@@ -31,10 +31,10 @@ As used in this Agreement, the following capitalized terms shall have the defini
 "Source Code" is the computer programming source code form of the Software in the form maintained by the Licensor, and includes all non-third-party executables, libraries, components, and Documentation created or used in the creation, development, maintenance, and support of the Software as well as all updates, error corrections and revisions thereto provided by Licensor, in whole or in part.
 
 
-2. Software License.  
+2. Software License.
 -------------------------
 
-(a)Grant of License.  For the consideration set forth below, Licensor hereby grants to Licensee, and Licensee hereby accepts the worldwide, non-exclusive, perpetual, royalty-free rights and licenses set forth below:  
+(a)Grant of License.  For the consideration set forth below, Licensor hereby grants to Licensee, and Licensee hereby accepts the worldwide, non-exclusive, perpetual, royalty-free rights and licenses set forth below:
 
 
 (i)The right and license to use and incorporate the software, in whole or in part, to develop its website/ mobile app (including the integration of all or part of the Licensor’s software into Licensee's own software) on one domain (  Except Joomla modules , listed on store are entitled to be used on unlimited domain as per the standard guidelines ) only, solely for the own personal or business use of the Licensee. However, the License does not authorize the Licensee to compile, copy or distribute the said Software or its Derivative Works.
@@ -51,7 +51,7 @@ As used in this Agreement, the following capitalized terms shall have the defini
 (i)Licensor shall enable the Licensee to download one complete copy of the Software.
 
 
-(ii)The Software is intended for the sole use of the Licensee in development of its own website/ mobile app.  
+(ii)The Software is intended for the sole use of the Licensee in development of its own website/ mobile app.
 
 
 (iii)Licensee does not have the right to hand over, sell, distribute, sub-license, rent, lease or lend any portion of the Software or Documentation, whether modified or unmodified, to anyone. Licensee should not place the Software on a server so that it becomes accessible via a public network such as the Internet for distribution purposes. In case the Licensee is using any source code management system like github, it can use the code there only when it has paid subscription from such management system.
@@ -59,7 +59,7 @@ As used in this Agreement, the following capitalized terms shall have the defini
 
 (iv)Licensee is not authorized to appoint, or work with, third parties to perform any development services using the Source Code, the source code to Derivative Works and/or the Documentation on behalf of, or working with, the Licensee.  Release of Source Code, Derivative Work source code and/or Documentation to any third party shall be considered as violation of the Agreement, inter-alia entailing forthwith termination and legal action.
 
- 
+
 
 (c)Ownership.
 
@@ -67,10 +67,10 @@ As used in this Agreement, the following capitalized terms shall have the defini
 (i)Software and Source Code.  All right, title, copyright, and interest in the Software, Source Code, Software Modifications and Error corrections will be and remain the property of Licensor.
 
 
-(ii)Derivative Works. As creation of Derivative Works by the Licensee is prohibited, thus, all right, title, copyright, and interest in any and/or all Derivative Works and Improvements created by, or on behalf of, Licensee will also be deemed to the property of Licensor. Licensor shall be entitled to protect copyright / intellectual property in all such Derivative Works and Improvements also in any country as it may deem fit including without limitation seeking copyright and/or patent protection.   
+(ii)Derivative Works. As creation of Derivative Works by the Licensee is prohibited, thus, all right, title, copyright, and interest in any and/or all Derivative Works and Improvements created by, or on behalf of, Licensee will also be deemed to the property of Licensor. Licensor shall be entitled to protect copyright / intellectual property in all such Derivative Works and Improvements also in any country as it may deem fit including without limitation seeking copyright and/or patent protection.
 
 
-3.Consideration.  
+3.Consideration.
 --------------------
 
 (a)Licensee shall pay to Licensor the amount as mentioned on the website from where the order is placed, as one-time, upfront fees in consideration for the licenses and rights granted hereunder (hereinafter referred to as the "License Fee").  The License Fee to be paid by Licensee shall be paid upfront at the time of placing the order, and no credit will be allowed under any circumstances.
@@ -83,13 +83,13 @@ As used in this Agreement, the following capitalized terms shall have the defini
 4.Representations and Warranties.
 -------------------------------------
 
-(a)Mutual.  Each of the parties represents and warrants to the other as follows.  
+(a)Mutual.  Each of the parties represents and warrants to the other as follows.
 
 
 (i)such party is a legal entity duly organized, validly existing and in good standing;
 
 
-(ii)such party has the power and authority to conduct its business as presently conducted and to enter into, execute, deliver and perform this Agreement.  
+(ii)such party has the power and authority to conduct its business as presently conducted and to enter into, execute, deliver and perform this Agreement.
 
 
 (iii)This Agreement has been duly and validly accepted by such party and constitutes the legal, valid and binding obligations of such party respectively, enforceable against such party in accordance with their respective terms;
@@ -112,13 +112,13 @@ Software add-ons, if purchased by the Licensee from the Licensor, will not mater
 
 
 
-5.Term.  
+5.Term.
 -------------
 
-(a)Subject to Licensee's payment obligations, this Agreement shall commence as on the date of making payment of the Software by the Licensee to the Licensor, and shall continue until terminated by either party.  
+(a)Subject to Licensee's payment obligations, this Agreement shall commence as on the date of making payment of the Software by the Licensee to the Licensor, and shall continue until terminated by either party.
 
 
-(b)The Licensor retains the right to terminate the license at any time, if the Licensee is not abiding by any of the terms of the Agreement. The Licensee may terminate the Agreement at any time at its own discretion by uninstalling the Software and /or by destroying the said Software (or any copies thereof). However, the Licensee shall not be entitled to seek any refund of the amount paid by it to the Licensor, under any circumstances.   
+(b)The Licensor retains the right to terminate the license at any time, if the Licensee is not abiding by any of the terms of the Agreement. The Licensee may terminate the Agreement at any time at its own discretion by uninstalling the Software and /or by destroying the said Software (or any copies thereof). However, the Licensee shall not be entitled to seek any refund of the amount paid by it to the Licensor, under any circumstances.
 
 
 (c)Survival.  In the event this Agreement is terminated for any reason, the provisions set forth in Sections 2(a), 2(b), and 2(c) shall survive.
@@ -160,7 +160,7 @@ The Licensor may amend any of the terms and conditions contained in this Agreeme
 11.Miscellaneous.
 -----------------------
 
-(a)General Provisions.  This Agreement:  (i) may be amended only by a writing signed by each of the parties; (ii) may be executed in several counterparts, each of which shall be deemed an original but all of which shall constitute one and the same instrument; (iii) contains the entire agreement of the parties with respect to the transactions contemplated hereby and supersedes all prior written and oral agreements, and all contemporaneous oral agreements, relating to such transactions; (iv) shall be governed by, and construed and enforced in accordance with, the laws of India; and (v) shall be binding upon, and inure to the benefit of, the parties and their respective successors and permitted assigns.  Each of the parties hereby irrevocably submits to the jurisdiction of the Courts at Delhi, India, for the purposes of any action or proceeding arising out of or relating to this Agreement or the subject matter hereof and brought by any other party.  
+(a)General Provisions.  This Agreement:  (i) may be amended only by a writing signed by each of the parties; (ii) may be executed in several counterparts, each of which shall be deemed an original but all of which shall constitute one and the same instrument; (iii) contains the entire agreement of the parties with respect to the transactions contemplated hereby and supersedes all prior written and oral agreements, and all contemporaneous oral agreements, relating to such transactions; (iv) shall be governed by, and construed and enforced in accordance with, the laws of India; and (v) shall be binding upon, and inure to the benefit of, the parties and their respective successors and permitted assigns.  Each of the parties hereby irrevocably submits to the jurisdiction of the Courts at Delhi, India, for the purposes of any action or proceeding arising out of or relating to this Agreement or the subject matter hereof and brought by any other party.
 
 
 (b)Assignment.  Licensee cannot assign, pledge or otherwise transfer, whether by operation of law or otherwise, this Agreement, or any of its obligations hereunder, without the prior written consent of Licensor, which consent shall not be unreasonably withheld.
@@ -183,11 +183,11 @@ All such communications shall be sent to the following addresses or numbers, or 
 
 If to Webkul Software Pvt. Ltd.:
 
- 
+
 
 Webkul Software Pvt. Ltd.
 
-A-67, Sector 63, NOIDA – 201301,
+H-28, ARV Park, Sector 63, NOIDA – 201301,
 
 Uttar Pradesh, India
 
