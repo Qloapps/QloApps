@@ -494,16 +494,6 @@ class AdminDashboardControllerCore extends AdminController
         die(json_encode($return));
     }
 
-    public function ajaxProcessGetRecommendationContent()
-    {
-        $response = array('success' => false);
-        if ($content = $this->getRecommendationContent()) {
-            $response['success'] = true;
-            $response['content'] = $content;
-        }
-        $this->ajaxDie(json_encode($response));
-    }
-
     public function getRecommendationContent()
     {
         if (!Tools::isFresh(self::DASHBOARD_RECOMMENDATION_CONTENT, _TIME_1_DAY_)) {
