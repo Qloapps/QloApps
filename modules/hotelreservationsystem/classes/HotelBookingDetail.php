@@ -1400,6 +1400,13 @@ class HotelBookingDetail extends ObjectModel
         );
     }
 
+    public static function getIdHotelByIdOrder($idOrder)
+    {
+        return Db::getInstance()->getValue(
+            'SELECT `id_hotel` FROM `'._DB_PREFIX_.'htl_booking_detail` WHERE `id_order` = '.(int) $idOrder
+        );
+    }
+
     /**
      * [updateBookingOrderStatusBYOrderId :: To update the order status of a room in the booking].
      * @param [int] $order_id   [Id of the order]
