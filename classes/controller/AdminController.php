@@ -3900,6 +3900,29 @@ class AdminControllerCore extends Controller
         die($popup_content);
     }
 
+    public function ajaxProcessGetRecommendationContent()
+    {
+        $response = array('success' => false);
+        if (isset($this->context->cookie->{$this->controller_name.'_closed'}) && $this->context->cookie->{$this->controller_name.'_closed'}) {
+            $response['success'] = true;
+        } else {
+            if (method_exists($this, 'getRecommendationContent')) {
+                if ($content = $this->getRecommendationContent()) {
+                    $response['success'] = true;
+                    $response['content'] = $content;
+                }
+            }
+        }
+        $this->ajaxDie(json_encode($response));
+    }
+
+    public function ajaxProcessRecommendationClosed()
+    {
+        $this->context->cookie->{Tools::getValue('tab').'_closed'} = true;
+        $response = array('success' => true);
+        $this->ajaxDie(json_encode($response));
+    }
+
     /**
      * Enable multiple items
      *
