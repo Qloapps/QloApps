@@ -83,19 +83,21 @@ var default_iso = '<?php echo $this->session->shop_country ?>';
 	</div>
 
 	<!-- Enable SSL -->
-	<div class="field clearfix">
-		<label class="aligned"><?php echo $this->l('Enable SSL') ?></label>
-		<div class="contentinput">
-			<label>
-				<input value="1" type="radio" name="enable_ssl" style="vertical-align: middle;" <?php if ($this->session->enable_ssl == '1'): ?>checked="checked"<?php endif; ?> autocomplete="off" />
-				<?php echo $this->l('Yes') ?>
-			</label>
-			<label>
-				<input value="0" type="radio" name="enable_ssl" style="vertical-align: middle;" <?php if ($this->session->enable_ssl == '0'): ?>checked="checked"<?php endif; ?> autocomplete="off" />
-				<?php echo $this->l('No'); ?>
-			</label>
+	<?php if ($this->session->allow_ssl) { ?>
+		<div class="field clearfix">
+			<label class="aligned"><?php echo $this->l('Enable SSL') ?></label>
+			<div class="contentinput">
+				<label>
+					<input value="1" type="radio" name="enable_ssl" style="vertical-align: middle;" <?php if ($this->session->enable_ssl == '1'): ?>checked="checked"<?php endif; ?> autocomplete="off" />
+					<?php echo $this->l('Yes') ?>
+				</label>
+				<label>
+					<input value="0" type="radio" name="enable_ssl" style="vertical-align: middle;" <?php if ($this->session->enable_ssl == '0'): ?>checked="checked"<?php endif; ?> autocomplete="off" />
+					<?php echo $this->l('No'); ?>
+				</label>
+			</div>
 		</div>
-	</div>
+	<?php } ?>
 
 	<!-- Shop logo
 	<div class="field clearfix">
