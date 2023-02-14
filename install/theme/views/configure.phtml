@@ -83,9 +83,9 @@ var default_iso = '<?php echo $this->session->shop_country ?>';
 	</div>
 
 	<!-- Enable SSL -->
-	<div class="field clearfix">
-		<label class="aligned"><?php echo $this->l('Enable SSL') ?></label>
-		<?php if ($this->session->allow_ssl) { ?>
+	<?php if ($this->session->allow_ssl) { ?>
+		<div class="field clearfix">
+			<label class="aligned"><?php echo $this->l('Enable SSL') ?></label>
 			<div class="contentinput">
 				<label>
 					<input value="1" type="radio" name="enable_ssl" style="vertical-align: middle;" <?php if ($this->session->enable_ssl == '1'): ?>checked="checked"<?php endif; ?> autocomplete="off" />
@@ -96,12 +96,8 @@ var default_iso = '<?php echo $this->session->shop_country ?>';
 					<?php echo $this->l('No'); ?>
 				</label>
 			</div>
-		<?php } else { ?>
-			<div class="contentinput">
-				<a href="<?php echo $this->ssl_url ?>"><?php echo $this->l('Please click here to check if your server supports HTTPS.') ?></a>
-			</div>
-		<?php } ?>
-	</div>
+		</div>
+	<?php } ?>
 
 	<!-- Shop logo
 	<div class="field clearfix">

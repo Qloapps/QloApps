@@ -307,18 +307,12 @@ class InstallControllerHttpConfigure extends InstallControllerHttp
         // Install type
         $this->install_type = ($this->session->install_type) ? $this->session->install_type : 'full';
 
-        // Detect SSL mode
-        if (!isset($this->session->enable_ssl)) {
-            $this->session->enable_ssl = Tools::usingSecureMode() ? '1' : '0';
-        }
-
-        $this->ssl_url = 'https://'.$_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'];
-
         if (!isset($this->session->allow_ssl) || $this->session->allow_ssl === false) {
             if (Tools::usingSecureMode()) {
                 $this->session->enable_ssl = '1';
                 $this->session->allow_ssl = true;
             } else {
+                $this->session->enable_ssl = '0';
                 $this->session->allow_ssl = false;
             }
         }
