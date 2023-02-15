@@ -1308,3 +1308,197 @@ function checkTotalRefundProductQuantity(it)
 	if (order_discount_price)
 		actualizeTotalRefundVoucher();
 }
+
+$(document).on('click', '#booking-documents-modal .btn-add-new-document', function() {
+	BookingDocumentsModal.addNew();
+	BookingDocumentsForm.addNew();
+});
+
+$(document).on('click', '#booking-documents-modal [data-dismiss="alert"]', function() {
+	BookingDocumentsModal.hideErrors();
+});
+
+$(document).on('change', '.input-booking-document', function(e) {
+	e.preventDefault();
+
+	if (!this.files.length) {
+		$(this).remove();
+		return;
+	}
+
+	BookingDocumentsForm.updatePreview();
+});
+
+$(document).on('click', '#form-add-new-document .btn-add-file', function(e) {
+	e.preventDefault();
+
+	BookingDocumentsForm.openFileChooser();
+});
+
+$(document).on('click', '#form-add-new-document .btn-group-add-new .cancel', function(e) {
+	e.preventDefault();
+
+	BookingDocumentsForm.close();
+	BookingDocumentsModal.enableAddNewButton();
+});
+
+$(document).on('click', '#form-add-new-document .btn-group-add-new .upload', function(e) {
+	e.preventDefault();
+
+	BookingDocumentsModal.uploadDocument();
+});
+
+$(document).on('click', '#booking-documents-modal .documents-list .btn-delete-document', function(e) {
+	e.preventDefault();
+
+	if (confirm(txt_booking_document_delete_confirm)) {
+		BookingDocumentsModal.deleteDocument(this);
+	}
+});
+
+const BookingDocumentsModal = {
+	init: function(idHtlBooking, $this) {
+		BookingDocumentsModal.currentTr = $this;
+		$('#booking-documents-modal .documents-list').find('[name="id_hotel_booking"]').val(idHtlBooking);
+		BookingDocumentsForm.init();
+		BookingDocumentsModal.reset();
+		BookingDocumentsModal.show(idHtlBooking);
+	},
+	reset: function() {
+		$('#booking-documents-modal .documents-list table tbody').html('');
+	},
+	show: function(idHtlBooking) {
+		$('#booking-documents-modal').modal('show');
+		$('#form-add-new-document').find('[name="id_htl_booking"]').attr('value', idHtlBooking);
+		let data = {
+			ajax: true,
+			action: 'getBookingDocuments',
+			id_htl_booking: parseInt(idHtlBooking),
+		};
+
+		$.ajax({
+			url: admin_order_tab_link,
+			data: data,
+			type: 'POST',
+			dataType: 'JSON',
+			success: function(response) {
+				if (response.status) {
+					BookingDocumentsModal.setBodyHtml(response.html);
+				}
+			},
+		});
+	},
+	setBodyHtml: function(html) {
+		$('#booking-documents-modal .documents-list table tbody').html(html);
+	},
+	close: function() {
+		$('#booking-documents-modal').modal('hide');
+	},
+	addNew: function() {
+		BookingDocumentsModal.hideErrors();
+		BookingDocumentsModal.hideAddNewButton();
+	},
+	beforeSubmit: function(cb) {
+		BookingDocumentsModal.hideErrors(cb);
+	},
+	uploadDocument: function() {
+		BookingDocumentsModal.beforeSubmit(function() {
+			let formData = new FormData($('form#form-add-new-document').get(0));
+			formData.append('ajax', true);
+			formData.append('action', 'uploadBookingDocument');
+			$.ajax({
+				url: admin_order_tab_link,
+				data: formData,
+				processData: false,
+				contentType: false,
+				type: 'POST',
+				success: function(response) {
+					let jsonResponse = JSON.parse(response);
+					if (jsonResponse.status) {
+						showSuccessMessage(txt_booking_document_upload_success);
+						BookingDocumentsModal.reset();
+						BookingDocumentsForm.reset();
+						BookingDocumentsForm.resetPreview();
+						BookingDocumentsModal.setBodyHtml(jsonResponse.html);
+						BookingDocumentsModal.setDocumentsCount(jsonResponse.num_checkin_documents);
+					} else {
+						BookingDocumentsModal.showErrors(jsonResponse.errors);
+					}
+				},
+			});
+		});
+	},
+	deleteDocument: function($this) {
+		BookingDocumentsModal.hideErrors();
+		let idHtlBookingDocument = parseInt($($this).attr('data-id-htl-booking-document'));
+		let data = {
+			ajax: true,
+			action: 'deleteBookingDocument',
+			id_htl_booking_document: idHtlBookingDocument,
+		};
+
+		$.ajax({
+			url: admin_order_tab_link,
+			data: data,
+			type: 'POST',
+			dataType: 'JSON',
+			success: function(response) {
+				if (response.status) {
+					BookingDocumentsModal.setBodyHtml(response.html);
+					BookingDocumentsModal.setDocumentsCount(response.num_checkin_documents);
+					showSuccessMessage(txt_booking_document_delete_success);
+				}
+			},
+		});
+	},
+	showErrors: function(errors) {
+		$('#booking-documents-modal .errors-wrap').stop().html(errors);
+		$('#booking-documents-modal .errors-wrap').show(200);
+	},
+	hideErrors: function(cb) {
+		$('#booking-documents-modal .errors-wrap').hide(200, function() {
+			$('#booking-documents-modal .errors-wrap').html('');
+			if (typeof cb === 'function') {
+				cb();
+			}
+		});
+	},
+	enableAddNewButton: function() {
+		$('#booking-documents-modal .btn-add-new-document').show(200);
+	},
+	hideAddNewButton: function() {
+		$('#booking-documents-modal .btn-add-new-document').hide();
+	},
+	setDocumentsCount: function(count) {
+		$(BookingDocumentsModal.currentTr).find('.count-documents').html(count);
+	},
+}
+
+const BookingDocumentsForm = {
+	init: function() {
+		BookingDocumentsForm.inputHtml = '<input type="file" accept="image/*, .pdf" class="input-booking-document hidden" name="booking_document">';
+	},
+	reset: function() {
+		$('#form-add-new-document').get(0).reset();
+	},
+	resetPreview: function() {
+		$('#form-add-new-document .file-name').val('');
+	},
+	updatePreview: function() {
+		BookingDocumentsForm.resetPreview();
+		let input = $('#form-add-new-document').find('.input-file-wrap input');
+		let file = $(input).get(0).files[0];
+		$('#form-add-new-document .file-name').val(file.name);
+	},
+	addNew: function() {
+		$('#booking-documents-modal #form-add-new-document').show(200);
+		$('#form-add-new-document').find('.input-file-wrap').html(BookingDocumentsForm.inputHtml);
+	},
+	openFileChooser: function() {
+		$('#form-add-new-document').find('.input-file-wrap').html(BookingDocumentsForm.inputHtml);
+		$('#form-add-new-document').find('.input-file-wrap input').click();
+	},
+	close: function() {
+		$('#booking-documents-modal #form-add-new-document').hide(200);
+	},
+}

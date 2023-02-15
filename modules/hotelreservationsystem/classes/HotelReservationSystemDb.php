@@ -180,6 +180,16 @@ class HotelReservationSystemDb
                 PRIMARY KEY (`id`)
             ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;",
 
+            "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_booking_document` (
+                `id_htl_booking_document` int(11) NOT NULL AUTO_INCREMENT,
+                `id_htl_booking` int(11) NOT NULL,
+                `title` varchar(32) NOT NULL DEFAULT '',
+                `file_type` tinyint(1) NOT NULL DEFAULT '0',
+                `file_name` varchar(8) NOT NULL DEFAULT '',
+                `date_add` datetime NOT NULL,
+                PRIMARY KEY (`id_htl_booking_document`)
+            ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;",
+
             "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_booking_demands` (
                 `id_booking_demand` int(11) NOT NULL AUTO_INCREMENT,
                 `id_htl_booking` int(11) NOT NULL,
@@ -471,6 +481,7 @@ class HotelReservationSystemDb
             `'._DB_PREFIX_.'htl_features_lang`,
             `'._DB_PREFIX_.'htl_cart_booking_data`,
             `'._DB_PREFIX_.'htl_booking_detail`,
+            `'._DB_PREFIX_.'htl_booking_document`,
             `'._DB_PREFIX_.'htl_booking_demands`,
             `'._DB_PREFIX_.'htl_booking_demands_tax`,
             `'._DB_PREFIX_.'htl_room_status`,
