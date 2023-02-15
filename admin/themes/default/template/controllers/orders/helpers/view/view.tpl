@@ -160,7 +160,7 @@
 					{if $refund_allowed && !$hasCompletelyRefunded}
 						<a id="desc-order-standard_refund" class="btn btn-default" href="#refundForm">
 							<i class="icon-exchange"></i>
-							{if $order->hasBeenPaid()}
+							{if $order->getTotalPaid()|floatval}
 								{l s='Initiate refund'}
 							{else}
 								{l s='Cancel bookings'}
@@ -520,12 +520,7 @@
 									<td>{$payment_types[$payment['payment_type']]['name']|escape:'html':'UTF-8'}</td>
 									<td>{$payment['transaction_id']|escape:'html':'UTF-8'}</td>
 									<td>{displayPrice price=$payment['real_paid_amount'] currency=$payment['id_currency']}</td>
-									<td>
-									{if $payment['invoice_number']}
-										{$payment['invoice_number']}
-									{else}
-									{/if}
-									</td>
+									<td>{if isset($payment['invoice_number'])}{$payment['invoice_number']}{else}--{/if}</td>
 									<td class="actions">
 										<button class="btn btn-default open_payment_information">
 											<i class="icon-search"></i>
