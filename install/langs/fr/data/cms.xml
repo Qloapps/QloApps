@@ -12,7 +12,7 @@
     <meta_title>Mentions légales</meta_title>
     <meta_description>Mentions légales</meta_description>
     <meta_keywords>mentions, légales, crédits</meta_keywords>
-    <content>&lt;h2&gt;Mentions légales&lt;/h2&gt;&lt;h3&gt;Crédits&lt;/h3&gt;&lt;p&gt;Conception et production :&lt;/p&gt;&lt;p&gt;cette boutique en ligne a été créée à l&apos;aide du &lt;a href=&quot;http://www.prestashop.com&quot;&gt;logiciel PrestaShop. &lt;/a&gt;Rendez-vous sur le &lt;a href=&quot;http://www.prestashop.com/blog/en/&quot;&gt;blog e-commerce de PrestaShop&lt;/a&gt; pour vous tenir au courant des dernières actualités et obtenir des conseils sur la vente en ligne et la gestion d&apos;un site d&apos;e-commerce.&lt;/p&gt;</content>
+    <content>&lt;h2&gt;Legal&lt;/h2&gt;&lt;h3&gt;Credits&lt;/h3&gt;&lt;p&gt;Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry&#x27;s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.&lt;/p&gt;</content>
     <link_rewrite>mentions-legales</link_rewrite>
   </cms>
   <cms id='Terms_and_conditions_of_use'>
