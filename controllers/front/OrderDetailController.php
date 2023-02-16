@@ -163,93 +163,97 @@ class OrderDetailControllerCore extends FrontController
             $this->errors[] = Tools::displayError('Order ID required');
         } else {
             $order = new Order($id_order);
-            // Here handle request from the ajax on order details page i.e refund, additional qty etc
-            $method = Tools::getValue('method');
-            // extra demands popup ajax
-            if ($method == 'getRoomTypeBookingDemands') {
-                $extraDemandsTpl = '';
-                if (($idProduct = Tools::getValue('id_product'))
-                    && ($idOrder = Tools::getValue('id_order'))
-                    && ($dateFrom = Tools::getValue('date_from'))
-                    && ($dateTo = Tools::getValue('date_to'))
-                ) {
-                    $objBookingDemand = new HotelBookingDemands();
-                    $useTax = 0;
-                    $customer = Context::getContext()->customer;
-                    if (Group::getPriceDisplayMethod($customer->id_default_group) == PS_TAX_INC) {
-                        $useTax = 1;
+            if (Validate::isLoadedObject($order) && $order->id_customer == $this->context->customer->id) {
+                // Here handle request from the ajax on order details page i.e refund, additional qty etc
+                $method = Tools::getValue('method');
+                // extra demands popup ajax
+                if ($method == 'getRoomTypeBookingDemands') {
+                    $extraDemandsTpl = '';
+                    if (($idProduct = Tools::getValue('id_product'))
+                        && ($idOrder = Tools::getValue('id_order'))
+                        && ($dateFrom = Tools::getValue('date_from'))
+                        && ($dateTo = Tools::getValue('date_to'))
+                    ) {
+                        $objBookingDemand = new HotelBookingDemands();
+                        $useTax = 0;
+                        $customer = Context::getContext()->customer;
+                        if (Group::getPriceDisplayMethod($customer->id_default_group) == PS_TAX_INC) {
+                            $useTax = 1;
+                        }
+                        if ($extraDemands = $objBookingDemand->getRoomTypeBookingExtraDemands(
+                            $idOrder,
+                            $idProduct,
+                            0,
+                            $dateFrom,
+                            $dateTo,
+                            1,
+                            0,
+                            $useTax
+                        )) {
+                            $this->context->smarty->assign(
+                                array(
+                                    'useTax' => $useTax,
+                                    'extraDemands' => $extraDemands,
+                                )
+                            );
+                            $extraDemandsTpl .= $this->context->smarty->fetch(_PS_THEME_DIR_.'_partials/order_booking_demands.tpl');
+                        }
                     }
-                    if ($extraDemands = $objBookingDemand->getRoomTypeBookingExtraDemands(
-                        $idOrder,
-                        $idProduct,
-                        0,
-                        $dateFrom,
-                        $dateTo,
-                        1,
-                        0,
-                        $useTax
-                    )) {
-                        $this->context->smarty->assign(
-                            array(
-                                'useTax' => $useTax,
-                                'extraDemands' => $extraDemands,
-                            )
-                        );
-                        $extraDemandsTpl .= $this->context->smarty->fetch(_PS_THEME_DIR_.'_partials/order_booking_demands.tpl');
-                    }
-                }
 
-                die($extraDemandsTpl);
-            } elseif ($method == 'submitRefundRequest') { // room cancellation ajax
-                $hasError = 0;
-                if (!$refundReason = Tools::getValue('cancellation_reason')) {
-                    $hasError = 1;
-                } elseif (!Validate::isCleanHtml($refundReason)) {
-                    $hasError = 1;
-                }
-                if ($bookingRefunds = Tools::getValue('bookings_to_refund')) {
-                    if (!count($bookingRefunds = json_decode($bookingRefunds, true))) {
+                    die($extraDemandsTpl);
+                } elseif ($method == 'submitRefundRequest') { // room cancellation ajax
+                    $hasError = 0;
+                    if (!$refundReason = Tools::getValue('cancellation_reason')) {
                         $hasError = 1;
-                    } else {
-                        foreach ($bookingRefunds as $idHtlBooking) {
-                            if (OrderReturn::getOrdersReturnDetail($order->id, 0, $idHtlBooking)) {
-                                $hasError = 1;
-                                break;
+                    } elseif (!Validate::isCleanHtml($refundReason)) {
+                        $hasError = 1;
+                    }
+                    if ($bookingRefunds = Tools::getValue('bookings_to_refund')) {
+                        if (!count($bookingRefunds = json_decode($bookingRefunds, true))) {
+                            $hasError = 1;
+                        } else {
+                            foreach ($bookingRefunds as $idHtlBooking) {
+                                if (OrderReturn::getOrdersReturnDetail($order->id, 0, $idHtlBooking)) {
+                                    $hasError = 1;
+                                    break;
+                                }
                             }
                         }
+                    } else {
+                        $hasError = 1;
                     }
-                } else {
-                    $hasError = 1;
-                }
-                if (!$hasError) {
-                    $objOrderReturn = new OrderReturn();
-                    $objOrderReturn->id_customer = $order->id_customer;
-                    $objOrderReturn->id_order = $order->id;
-                    $objOrderReturn->state = 0;
-                    $objOrderReturn->by_admin = 0;
-                    $objOrderReturn->question = $refundReason;
-                    $objOrderReturn->save();
-                    if ($objOrderReturn->id) {
-                        foreach ($bookingRefunds as $idHtlBooking) {
-                            $objHtlBooking = new HotelBookingDetail($idHtlBooking);
-                            $numDays = $objHtlBooking->getNumberOfDays(
-                                $objHtlBooking->date_from,
-                                $objHtlBooking->date_to
-                            );
+                    if (!$hasError) {
+                        $objOrderReturn = new OrderReturn();
+                        $objOrderReturn->id_customer = $order->id_customer;
+                        $objOrderReturn->id_order = $order->id;
+                        $objOrderReturn->state = 0;
+                        $objOrderReturn->by_admin = 0;
+                        $objOrderReturn->question = $refundReason;
+                        $objOrderReturn->save();
+                        if ($objOrderReturn->id) {
+                            foreach ($bookingRefunds as $idHtlBooking) {
+                                $objHtlBooking = new HotelBookingDetail($idHtlBooking);
+                                $numDays = $objHtlBooking->getNumberOfDays(
+                                    $objHtlBooking->date_from,
+                                    $objHtlBooking->date_to
+                                );
 
-                            $objOrderReturnDetail = new OrderReturnDetail();
-                            $objOrderReturnDetail->id_order_return = $objOrderReturn->id;
-                            $objOrderReturnDetail->id_order_detail = $objHtlBooking->id_order_detail;
-                            $objOrderReturnDetail->product_quantity = $numDays;
-                            $objOrderReturnDetail->id_htl_booking = $idHtlBooking;
-                            $objOrderReturnDetail->save();
+                                $objOrderReturnDetail = new OrderReturnDetail();
+                                $objOrderReturnDetail->id_order_return = $objOrderReturn->id;
+                                $objOrderReturnDetail->id_order_detail = $objHtlBooking->id_order_detail;
+                                $objOrderReturnDetail->product_quantity = $numDays;
+                                $objOrderReturnDetail->id_htl_booking = $idHtlBooking;
+                                $objOrderReturnDetail->save();
+                            }
                         }
-                    }
-                    // Emails to customer, admin on refund request state change
-                    $objOrderReturn->changeIdOrderReturnState(Configuration::get('PS_ORS_PENDING'));
+                        // Emails to customer, admin on refund request state change
+                        $objOrderReturn->changeIdOrderReturnState(Configuration::get('PS_ORS_PENDING'));
 
-                    die(json_encode(array('status' => 1)));
+                        die(json_encode(array('status' => 1)));
+                    }
+                    die(json_encode(array('status' => 0)));
                 }
+            } else {
                 die(json_encode(array('status' => 0)));
             }
             // END ajax request handle
