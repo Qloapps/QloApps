@@ -191,6 +191,9 @@ class WebserviceSpecificManagementHotelAri extends ObjectModel implements Webser
                             $bookingParams['search_unavai'] = 0;
                         }
                         if (isset($ariParams['associations']['occupancies']['occupancy'])) {
+                            if (isset($ariParams['associations']['occupancies']['occupancy']['adults'])) {
+                                $ariParams['associations']['occupancies']['occupancy'] = array($ariParams['associations']['occupancies']['occupancy']);
+                            }
                             $bookingParams['occupancy'] = $ariParams['associations']['occupancies']['occupancy'];
                         }
 
