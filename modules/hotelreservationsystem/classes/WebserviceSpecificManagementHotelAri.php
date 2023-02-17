@@ -116,13 +116,13 @@ class WebserviceSpecificManagementHotelAri extends ObjectModel implements Webser
         // create object of the class to create schema of the api
         if (isset($this->wsObject->urlFragments['schema'])) {
             if ($this->wsObject->method == 'GET') {
-                $objAriWebserviceManage = new WebserviceSpecificManagementAri();
+                $objAriWebserviceManage = new WebserviceSpecificManagementHotelAri();
 
                 $this->wsObject->objects = [];
                 $this->wsObject->objects[] = $objAriWebserviceManage;
                 $this->wsObject->objects['empty'] = $objAriWebserviceManage;
 
-                // If a schema is asked the view must be an details type
+                // If a schema is asked the view must be in details type
                 $typeOfView = WebserviceOutputBuilder::VIEW_DETAILS;
 
                 if ($this->wsObject->urlFragments['schema'] == 'blank' || $this->wsObject->urlFragments['schema'] == 'synopsis') {
@@ -167,7 +167,7 @@ class WebserviceSpecificManagementHotelAri extends ObjectModel implements Webser
                         $simpleXMLObj = new SimpleXMLElement($inputXml);
                         $xmlEntities = $simpleXMLObj->children();
                         $ariParams = json_decode(json_encode($xmlEntities), true);
-                        $ariParams = $ariParams['ari'];
+                        $ariParams = $ariParams['hotel_ari'];
 
                         // Set request array for sending to the function which returns ari info as per the request
                         $bookingParams = array();
@@ -242,89 +242,112 @@ class WebserviceSpecificManagementHotelAri extends ObjectModel implements Webser
     // This function fully validated the request data(xml)
     private function validateRequestXml($inputXml)
     {
-        // lets check if valid xml or not. if xml is not valid then it will be in catch block of calling code and error will be thrown
-        $simpleXMLObj = new SimpleXMLElement($inputXml);
+        // check if xml is present in the request
+        if ($inputXml) {
+            $isValidXml = simplexml_load_string($inputXml);
+            // check if xml is valid in the request
+            if ($isValidXml) {
+                // lets check if valid xml or not. if xml is not valid then it will be in catch block of calling code and error will be thrown
+                $simpleXMLObj = new SimpleXMLElement($inputXml);
 
-        /** @var SimpleXMLElement|Countable $xmlEntities */
-        $xmlEntities = $simpleXMLObj->children();
-        $resourceConfiguration = $this->getWebserviceParameters();
-        /** @var ObjectModel $object */
-        $retrieveData = $resourceConfiguration['retrieveData'];
-        $object = new $retrieveData['className']();
+                /** @var SimpleXMLElement|Countable $xmlEntities */
+                $xmlEntities = $simpleXMLObj->children();
+                $resourceConfiguration = $this->getWebserviceParameters();
+                /** @var ObjectModel $object */
+                $retrieveData = $resourceConfiguration['retrieveData'];
+                $object = new $retrieveData['className']();
 
-        // Through below validations checks, we are checking if required fields in request xml are present or not
-        foreach ($xmlEntities as $xmlEntity) {
-            /** @var SimpleXMLElement $xmlEntity */
-            $attributes = $xmlEntity->children();
+                // Through below validations checks, we are checking if required fields in request xml are present or not
+                foreach ($xmlEntities as $xmlEntity) {
+                    /** @var SimpleXMLElement $xmlEntity */
+                    $attributes = $xmlEntity->children();
 
-            foreach ($resourceConfiguration['fields'] as $fieldName => $fieldProperties) {
-                $sqlId = $fieldProperties['sqlId'];
-                if (isset($attributes->$fieldName) && isset($fieldProperties['sqlId']) && (!isset($fieldProperties['i18n']) || !$fieldProperties['i18n'])) {
-                    if (isset($fieldProperties['setter'])) {
-                        // if we have to use a specific setter
-                        if (!$fieldProperties['setter']) {
-                            // if it's forbidden to set this field
-                            $this->wsObject->setError(400, 'parameter "'.$fieldName.'" not writable. Please remove this attribute of this XML', 93);
+                    foreach ($resourceConfiguration['fields'] as $fieldName => $fieldProperties) {
+                        $sqlId = $fieldProperties['sqlId'];
+                        if (isset($attributes->$fieldName) && isset($fieldProperties['sqlId']) && (!isset($fieldProperties['i18n']) || !$fieldProperties['i18n'])) {
+                            if (isset($fieldProperties['setter'])) {
+                                // if we have to use a specific setter
+                                if (!$fieldProperties['setter']) {
+                                    // if it's forbidden to set this field
+                                    $this->wsObject->setError(400, 'parameter "'.$fieldName.'" not writable. Please remove this attribute of this XML', 93);
+                                    return false;
+                                } else {
+                                    $setter = $fieldProperties['setter'];
+                                    $object->$setter((string)$attributes->$fieldName);
+                                }
+                            } elseif (property_exists($object, $sqlId)) {
+                                $object->$sqlId = (string)$attributes->$fieldName;
+                            } else {
+                                $this->wsObject->setError(400, 'Parameter "'.$fieldName.'" can\'t be set to the object "'.$this->resourceConfiguration['retrieveData']['className'].'"', 123);
+                                return false;
+                            }
+                        } elseif (isset($fieldProperties['required']) && $fieldProperties['required'] && !$fieldProperties['i18n']) {
+                            $this->wsObject->setError(400, 'parameter "'.$fieldName.'" required', 41);
                             return false;
-                        } else {
-                            $setter = $fieldProperties['setter'];
-                            $object->$setter((string)$attributes->$fieldName);
                         }
-                    } elseif (property_exists($object, $sqlId)) {
-                        $object->$sqlId = (string)$attributes->$fieldName;
-                    } else {
-                        $this->wsObject->setError(400, 'Parameter "'.$fieldName.'" can\'t be set to the object "'.$this->resourceConfiguration['retrieveData']['className'].'"', 123);
-                        return false;
                     }
-                } elseif (isset($fieldProperties['required']) && $fieldProperties['required'] && !$fieldProperties['i18n']) {
-                    $this->wsObject->setError(400, 'parameter "'.$fieldName.'" required', 41);
+                }
+
+                // Through below validations checks, we are checking if fields are satifying the fields definition of the class
+                if (($retValidateFields = $object->validateFields(false, true)) !== true) {
+                    $this->wsObject->setError(400, 'Validation error: "'.$retValidateFields.'"', 85);
                     return false;
                 }
-            }
-        }
 
-        // Through below validations checks, we are checking if fields are satifying the fields definition of the class
-        if (($retValidateFields = $object->validateFields(false, true)) !== true) {
-            $this->wsObject->setError(400, 'Validation error: "'.$retValidateFields.'"', 85);
-            return false;
-        }
+                // Get array form the xml request data
+                $ariParams = json_decode(json_encode($xmlEntities), true);
+                if (isset($ariParams['hotel_ari']) && $ariParams['hotel_ari']) {
+                    $ariParams = $ariParams['hotel_ari'];
 
-        // Get array form the xml request data
-        $ariParams = json_decode(json_encode($xmlEntities), true);
-        $ariParams = $ariParams['ari'];
+                    // Below are custom validations we need other then required and data-types validations. e.g. (date from must be before date to)
 
-        // Below are custom validations we need other then required and data-types validations. e.g. (date from must be before date to)
-
-        // date to must be after date from
-        if (strtotime($ariParams['date_to']) <= strtotime($ariParams['date_from'])) {
-            $this->wsObject->setError(400, 'Validation error: "Date to" must be after "date from"', 85);
-            return false;
-        }
-
-        // validate all the information of sent rooms occupancies
-        if (isset($ariParams['associations']['occupancies']['occupancy']) && $ariParams['associations']['occupancies']['occupancy']) {
-            $occupancies = $ariParams['associations']['occupancies']['occupancy'];
-            foreach ($occupancies as $key => $occupancy) {
-                if (isset($occupancy['adults'])) {
-                    if (!$occupancy['adults'] || !Validate::isUnsignedInt($occupancy['adults'])) {
-                        $this->wsObject->setError(400, 'Validation error: Invalid value for number of adults for Room-'.($key+1).' occupancy(value must be greater than 0).', 85);
+                    // date to must be after date from
+                    if (strtotime($ariParams['date_to']) <= strtotime($ariParams['date_from'])) {
+                        $this->wsObject->setError(400, 'Validation error: "Date to" must be after "date from"', 85);
                         return false;
+                    }
+
+
+                    // validate all the information of sent rooms occupancies
+                    if (isset($ariParams['associations']['occupancies']['occupancy']) && $ariParams['associations']['occupancies']['occupancy']) {
+                        if (isset($ariParams['associations']['occupancies']['occupancy']['adults'])) {
+                            $ariParams['associations']['occupancies']['occupancy'] = array($ariParams['associations']['occupancies']['occupancy']);
+                        }
+
+                        $occupancies = $ariParams['associations']['occupancies']['occupancy'];
+                        foreach ($occupancies as $key => $occupancy) {
+                            if (isset($occupancy['adults'])) {
+                                if (!$occupancy['adults'] || !Validate::isUnsignedInt($occupancy['adults'])) {
+                                    $this->wsObject->setError(400, 'Validation error: Invalid value for number of adults for Room-'.($key+1).' occupancy(value must be greater than 0).', 85);
+                                    return false;
+                                }
+                            } else {
+                                $this->wsObject->setError(400, 'Validation error: Missing information for adults for Room-'.($key+1).' occupancy.', 85);
+                                return false;
+                            }
+
+                            if (isset($occupancy['children'])) {
+                                if (!Validate::isUnsignedInt($occupancy['children'])) {
+                                    $this->wsObject->setError(400, 'Validation error: Invalid value for number of children for Room-'.($key+1).' occupancy.', 85);
+                                    return false;
+                                }
+                            } else {
+                                $this->wsObject->setError(400, 'Validation error: Missing information for children for Room-'.($key+1).' occupancy.', 85);
+                                return false;
+                            }
+                        }
                     }
                 } else {
-                    $this->wsObject->setError(400, 'Validation error: Missing information for adults for Room-'.($key+1).' occupancy.', 85);
+                    $this->wsObject->setError(400, 'Validation error: Invalid request XML', 85);
                     return false;
                 }
-
-                if (isset($occupancy['children'])) {
-                    if (!Validate::isUnsignedInt($occupancy['children'])) {
-                        $this->wsObject->setError(400, 'Validation error: Invalid value for number of children for Room-'.($key+1).' occupancy.', 85);
-                        return false;
-                    }
-                } else {
-                    $this->wsObject->setError(400, 'Validation error: Missing information for children for Room-'.($key+1).' occupancy.', 85);
-                    return false;
-                }
+            } else {
+                $this->wsObject->setError(400, 'Validation error: Invalid ARI search parameters found.', 85);
+                return false;
             }
+        } else {
+            $this->wsObject->setError(400, 'Validation error: ARI search parameters are missing.', 85);
+            return false;
         }
 
         return true;
@@ -340,7 +363,7 @@ class WebserviceSpecificManagementHotelAri extends ObjectModel implements Webser
     // create xml for the response of the ari request
     private function getResponseXml($ariInfo)
     {
-        $this->output .= $this->objOutput->getObjectRender()->renderNodeHeader('ari', array());
+        $this->output .= $this->objOutput->getObjectRender()->renderNodeHeader('hotel_ari', array());
 
         $field = array('sqlId' => 'id_hotel', 'value' => $ariInfo['id_hotel'], 'xlink_resource' => 'hotels');
         $this->output .= $this->objOutput->getObjectRender()->renderField($field);
@@ -444,7 +467,7 @@ class WebserviceSpecificManagementHotelAri extends ObjectModel implements Webser
             $this->output .= $this->objOutput->getObjectRender()->renderNodeFooter('room_types', array());
         }
 
-        $this->output .= $this->objOutput->getObjectRender()->renderNodeFooter('ari', array());
+        $this->output .= $this->objOutput->getObjectRender()->renderNodeFooter('hotel_ari', array());
 
         // wrap with the common parent header of QloApps xml api responses
         $this->output = $this->objOutput->getObjectRender()->overrideContent($this->output);
@@ -456,34 +479,34 @@ class WebserviceSpecificManagementHotelAri extends ObjectModel implements Webser
     private function getResponseJson($ariInfo)
     {
         $ariFormatted = array();
-        $ariFormatted['ari'] = array();
-        $ariFormatted['ari']['id_hotel'] = $ariInfo['id_hotel'];
-        $ariFormatted['ari']['date_from'] = $ariInfo['date_from'];
-        $ariFormatted['ari']['date_to'] = $ariInfo['date_to'];
+        $ariFormatted['hotel_ari'] = array();
+        $ariFormatted['hotel_ari']['id_hotel'] = $ariInfo['id_hotel'];
+        $ariFormatted['hotel_ari']['date_from'] = $ariInfo['date_from'];
+        $ariFormatted['hotel_ari']['date_to'] = $ariInfo['date_to'];
 
         $objCurrency = new Currency(Configuration::get('PS_CURRENCY_DEFAULT'));
-        $ariFormatted['ari']['currency'] = $objCurrency->iso_code;
+        $ariFormatted['hotel_ari']['currency'] = $objCurrency->iso_code;
 
         // check if availability stats are available then only process further
         if (isset($ariInfo['stats']) && $ariInfo['stats']) {
-            $ariFormatted['ari']['total_rooms'] = $ariInfo['stats']['total_rooms'];
+            $ariFormatted['hotel_ari']['total_rooms'] = $ariInfo['stats']['total_rooms'];
             if (isset($ariInfo['stats']['num_avail'])) {
-                $ariFormatted['ari']['total_available_rooms'] = $ariInfo['stats']['num_avail'];
+                $ariFormatted['hotel_ari']['total_available_rooms'] = $ariInfo['stats']['num_avail'];
             }
             if (isset($ariInfo['stats']['num_unavail'])) {
-                $ariFormatted['ari']['total_unavailable_rooms'] = $ariInfo['stats']['num_unavail'];
+                $ariFormatted['hotel_ari']['total_unavailable_rooms'] = $ariInfo['stats']['num_unavail'];
             }
             if (isset($ariInfo['stats']['num_part_avai'])) {
-                $ariFormatted['ari']['total_partial_available_rooms'] = $ariInfo['stats']['num_part_avai'];
+                $ariFormatted['hotel_ari']['total_partial_available_rooms'] = $ariInfo['stats']['num_part_avai'];
             }
             if (isset($ariInfo['stats']['num_booked'])) {
-                $ariFormatted['ari']['total_booked_rooms'] = $ariInfo['stats']['num_booked'];
+                $ariFormatted['hotel_ari']['total_booked_rooms'] = $ariInfo['stats']['num_booked'];
             }
         }
 
         // check if room type data is available then only process further
         if (isset($ariInfo['rm_data']) && $ariInfo['rm_data']) {
-            $ariFormatted['ari']['room_types'] = array();
+            $ariFormatted['hotel_ari']['room_types'] = array();
 
             foreach ($ariInfo['rm_data'] as $roomTypeIndex => $roomTypeInfo) {
                 // get feature price of room type
@@ -494,7 +517,7 @@ class WebserviceSpecificManagementHotelAri extends ObjectModel implements Webser
                     1
                 );
 
-                $ariFormatted['ari']['room_types'][$roomTypeIndex] = array(
+                $ariFormatted['hotel_ari']['room_types'][$roomTypeIndex] = array(
                     'id_room_type' => $roomTypeInfo['id_product'],
                     'name' => $roomTypeInfo['name'],
                     'price' => $roomTypePrice,
@@ -502,7 +525,7 @@ class WebserviceSpecificManagementHotelAri extends ObjectModel implements Webser
 
                 // rooms info of the room type
                 if (isset($roomTypeInfo['data']) && $roomTypeInfo['data']) {
-                    $ariFormatted['ari']['room_types'][$roomTypeIndex]['rooms'] = array();
+                    $ariFormatted['hotel_ari']['room_types'][$roomTypeIndex]['rooms'] = array();
 
                     foreach ($roomTypeInfo['data'] as $key => $roomsInfo) {
                         $roomsAriInfo = array();
@@ -521,7 +544,7 @@ class WebserviceSpecificManagementHotelAri extends ObjectModel implements Webser
                                 $roomsAriInfo[$roomIndex]['room_number'] = $roomInfo['room_num'];
                             }
                         }
-                        $ariFormatted['ari']['room_types'][$roomTypeIndex]['rooms'][$keyRoomAvailability] = $roomsAriInfo;
+                        $ariFormatted['hotel_ari']['room_types'][$roomTypeIndex]['rooms'][$keyRoomAvailability] = $roomsAriInfo;
                     }
                 }
             }
