@@ -65,7 +65,8 @@
   <tab id="Preferences" name="T&#xF9;y ch&#x1ECD;n"/>
   <tab id="Preferences_1" name="T&#xF9;y ch&#x1ECD;n"/>
   <tab id="Price_Rules" name="Khuy&#x1EBF;n m&#x1EA1;i"/>
-  <tab id="Products" name="S&#x1EA3;n ph&#x1EA9;m"/>
+  <tab id="Products" name="Quản lý sản phẩm dịch vụ"/>
+  <tab id="Room_Types" name="Quản lý loại phòng"/>
   <tab id="Products_1" name="S&#x1EA3;n ph&#x1EA9;m"/>
   <tab id="Profiles" name="H&#x1ED3; s&#x1A1; c&#xE1; nh&#xE2;n"/>
   <tab id="Quick_Access" name="Truy c&#x1EAD;p nhanh"/>

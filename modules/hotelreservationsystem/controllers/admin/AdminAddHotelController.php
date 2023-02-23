@@ -128,7 +128,7 @@ class AdminAddHotelController extends ModuleAdminController
             $idHotel = Tools::getValue('id');
             $hotelBranchInfo = new HotelBranchInformation($idHotel);
 
-            $addressInfo = $hotelBranchInfo->getAddress($idHotel);
+            $addressInfo = HotelBranchInformation::getAddress($idHotel);
             $statesbycountry = State::getStatesByIdCountry($addressInfo['id_country']);
 
             $states = array();

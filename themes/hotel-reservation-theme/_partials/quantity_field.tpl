@@ -24,10 +24,10 @@
         <span>{if isset($quantity) && $quantity}{$quantity|escape:'html':'UTF-8'}{else}1{/if}</span>
     </div>
     <div class="qty_direction pull-left">
-        <a href="#" data-field-qty="qty" class="btn btn-default rm_quantity_up">
+        <a href="#" data-field-qty="qty" class="btn btn-default quantity_up rm_quantity_up">
             <span><i class="icon-plus"></i></span>
         </a>
-        <a href="#" data-field-qty="qty" class="btn btn-default rm_quantity_down">
+        <a href="#" data-field-qty="qty" class="btn btn-default quantity_down rm_quantity_down">
             <span><i class="icon-minus"></i></span>
         </a>
     </div>

@@ -20,7 +20,8 @@
   <tab id="Administration" name="Administrasi"/>
   <tab id="Stats" name="Statistik"/>
   <tab id="Stock" name="Stok"/>
-  <tab id="Products" name="Produk"/>
+  <tab id="Products" name="Kelola Produk Layanan"/>
+  <tab id="Room_Types" name="Kelola Jenis Kamar"/>
   <tab id="Categories" name="Kategori"/>
   <tab id="Monitoring" name="Monitoring"/>
   <tab id="Attributes_and_Values" name="Atribut produk"/>

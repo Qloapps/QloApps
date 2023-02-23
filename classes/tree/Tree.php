@@ -279,8 +279,8 @@ class TreeCore
 
     public function getTemplateFile($template)
     {
-        if (preg_match_all('/((?:^|[A-Z])[a-z]+)/', get_class($this->getContext()->controller), $matches) !== false) {
-            $controller_name = strtolower($matches[0][1]);
+        if (preg_match_all('/[^Admin].*(?=Controller)/', get_class($this->getContext()->controller), $matches) !== false) {
+            $controller_name = strtolower(Tools::toUnderscoreCase($matches[0][0]));
         }
 
         if ($this->getContext()->controller instanceof ModuleAdminController && isset($controller_name) && file_exists($this->_normalizeDirectory(

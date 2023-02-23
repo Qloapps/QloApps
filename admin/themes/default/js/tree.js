@@ -168,58 +168,15 @@ Tree.prototype =
 
 	expandAll : function($speed)
 	{
-		var idTree = this.$element.parent().find('.cattree.tree').first().attr('id');
-		if (typeof(idTree) != 'undefined' && !$('#'+idTree).hasClass('full_loaded'))
-		{
-			var selected = [];
-			that = this;
-			$('#'+idTree).find('.tree-selected input').each(
-				function()
-				{
-					selected.push($(this).val());
-				}
-			);
-			var name = $('#'+idTree).find('ul.tree input').first().attr('name');
-			var inputType = $('#'+idTree).find('ul.tree input').first().attr('type');
-			var useCheckBox = 0;
-			if (inputType == 'checkbox')
+		this.$element.find("label.tree-toggler").each(
+			function()
 			{
-				useCheckBox = 1;
+				$(this).parent().children(".icon-folder-close")
+					.removeClass("icon-folder-close")
+					.addClass("icon-folder-open");
+				$(this).parent().parent().children("ul.tree").show($speed);
 			}
-
-			$.get(
-				'ajax-tab.php',
-				{controller:'AdminProducts',token:currentToken,action:'getCategoryTree',type:idTree,fullTree:1,selected:selected, inputName:name,useCheckBox:useCheckBox},
-				function(content)
-				{
-					$('#' + idTree).html(content);
-					organizeTree();
-					$('#' + idTree).tree('init');
-					that.$element.find("label.tree-toggler").each(
-						function()
-						{
-							$(this).parent().children(".icon-folder-close")
-								.removeClass("icon-folder-close")
-								.addClass("icon-folder-open");
-							$(this).parent().parent().children("ul.tree").show($speed);
-							$('#'+idTree).addClass('full_loaded');
-						}
-					);
-				}
-			);
-		}
-		else
-		{
-			this.$element.find("label.tree-toggler").each(
-				function()
-				{
-					$(this).parent().children(".icon-folder-close")
-						.removeClass("icon-folder-close")
-						.addClass("icon-folder-open");
-					$(this).parent().parent().children("ul.tree").show($speed);
-				}
-			);
-		}
+		);
 
 		return $(this);
 	}

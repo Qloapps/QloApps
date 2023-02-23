@@ -62,82 +62,89 @@ class wkhotelfilterblock extends Module
     public function hookDisplayLeftColumn()
     {
         if ($this->context->controller->php_self == 'category') {
-            Media::addJsDef(array('noRoomAvailTxt' => $this->l('No room available')));
-
-            $this->context->controller->addJS($this->_path.'/views/js/wkhotelfilterblock.js');
-            $this->context->controller->addCSS($this->_path.'/views/css/wkhotelfilterblock.css');
-            $id_lang = $this->context->language->id;
-            $all_feat = FeatureCore::getFeatures($id_lang);
 
             $htl_id_category = Tools::getValue('id_category');
-            $id_hotel = HotelBranchInformation::getHotelIdByIdCategory($htl_id_category);
+            if (Validate::isLoadedObject($objCategory = new Category((int) $htl_id_category))) {
+                if ($objCategory->hasParent(Configuration::get('PS_LOCATIONS_CATEGORY'))) {
+                    Media::addJsDef(array('noRoomAvailTxt' => $this->l('No room available')));
 
-            $max_adult = HotelRoomType::getMaxAdults($id_hotel);
-            $max_child = HotelRoomType::getMaxChild($id_hotel);
+                    $this->context->controller->addJS($this->_path.'/views/js/wkhotelfilterblock.js');
+                    $this->context->controller->addCSS($this->_path.'/views/css/wkhotelfilterblock.css');
+                    $id_lang = $this->context->language->id;
+                    $all_feat = FeatureCore::getFeatures($id_lang);
 
-            if (!($date_from = Tools::getValue('date_from'))) {
-                $date_from = date('Y-m-d');
-                $date_to = date('Y-m-d', strtotime($date_from) + 86400);
-            }
-            if (!($date_to = Tools::getValue('date_to'))) {
-                $date_to = date('Y-m-d', strtotime($date_from) + 86400);
-            }
+                    $id_hotel = HotelBranchInformation::getHotelIdByIdCategory($htl_id_category);
 
-            $obj_rm_type = new HotelRoomType();
-            $room_types = $obj_rm_type->getIdProductByHotelId($id_hotel, 0, 1, 1);
+                    $max_adult = HotelRoomType::getMaxAdults($id_hotel);
+                    $max_child = HotelRoomType::getMaxChild($id_hotel);
 
-            $prod_price = array();
-            if ($room_types) {
-                foreach ($room_types as $key => $value) {
-                    $prod_price[] = Product::getPriceStatic($value['id_product'], HotelBookingDetail::useTax());
+                    $category = new Category($htl_id_category);
+
+                    if (!($date_from = Tools::getValue('date_from'))) {
+                        $date_from = date('Y-m-d');
+                        $date_to = date('Y-m-d', strtotime($date_from) + 86400);
+                    }
+                    if (!($date_to = Tools::getValue('date_to'))) {
+                        $date_to = date('Y-m-d', strtotime($date_from) + 86400);
+                    }
+
+                    $obj_rm_type = new HotelRoomType();
+                    $room_types = $obj_rm_type->getIdProductByHotelId($id_hotel, 0, 1, 1);
+
+                    $prod_price = array();
+                    if ($room_types) {
+                        foreach ($room_types as $key => $value) {
+                            $prod_price[] = Product::getPriceStatic($value['id_product'], HotelBookingDetail::useTax());
+                        }
+                    }
+
+                    // Create URL of category
+                    $occupancy = Tools::getValue('occupancy');
+                    $urlData = array (
+                        'date_from' => $date_from,
+                        'date_to' => $date_to,
+                        'occupancy' => $occupancy,
+                    );
+
+                    if (Configuration::get('PS_REWRITING_SETTINGS')) {
+                        $categoryUrl = $this->context->link->getCategoryLink(
+                            new Category($htl_id_category, $this->context->language->id),
+                            null,
+                            $this->context->language->id
+                        ).'?'.http_build_query($urlData);
+                    } else {
+                        $categoryUrl = $this->context->link->getCategoryLink(
+                            new Category($htl_id_category, $this->context->language->id),
+                            null,
+                            $this->context->language->id
+                        ).'&'.http_build_query($urlData);
+                    }
+                    $currency = $this->context->currency;
+
+                    $config = $this->getConfigFieldsValues();
+
+                    $obj_booking_detail = new HotelBookingDetail();
+                    $num_days = $obj_booking_detail->getNumberOfDays($date_from, $date_to);
+
+                    $warning_num = Configuration::get('WK_ROOM_LEFT_WARNING_NUMBER');
+                    $this->context->smarty->assign(array(
+                        'warning_num' => $warning_num,
+                        'all_feat' => $all_feat,
+                        'max_adult' => $max_adult,
+                        'max_child' => $max_child,
+                        'cat_link' => $categoryUrl,
+                        'currency' => $currency,
+                        'date_from' => $date_from,
+                        'date_to' => $date_to,
+                        'num_days' => $num_days,
+                        'config' => $config,
+                        'min_price' => $prod_price ? min($prod_price) : 0,
+                        'max_price' => $prod_price ? max($prod_price) : 0,
+                    ));
+
+                    return $this->display(__FILE__, 'htlfilterblock.tpl');
                 }
             }
-
-            // Create URL of category
-            $occupancy = Tools::getValue('occupancy');
-            $urlData = array (
-                'date_from' => $date_from,
-                'date_to' => $date_to,
-                'occupancy' => $occupancy,
-            );
-
-            if (Configuration::get('PS_REWRITING_SETTINGS')) {
-                $categoryUrl = $this->context->link->getCategoryLink(
-                    new Category($htl_id_category, $this->context->language->id),
-                    null,
-                    $this->context->language->id
-                ).'?'.http_build_query($urlData);
-            } else {
-                $categoryUrl = $this->context->link->getCategoryLink(
-                    new Category($htl_id_category, $this->context->language->id),
-                    null,
-                    $this->context->language->id
-                ).'&'.http_build_query($urlData);
-            }
-            $currency = $this->context->currency;
-
-            $config = $this->getConfigFieldsValues();
-
-            $obj_booking_detail = new HotelBookingDetail();
-            $num_days = $obj_booking_detail->getNumberOfDays($date_from, $date_to);
-
-            $warning_num = Configuration::get('WK_ROOM_LEFT_WARNING_NUMBER');
-            $this->context->smarty->assign(array(
-                'warning_num' => $warning_num,
-                'all_feat' => $all_feat,
-                'max_adult' => $max_adult,
-                'max_child' => $max_child,
-                'cat_link' => $categoryUrl,
-                'currency' => $currency,
-                'date_from' => $date_from,
-                'date_to' => $date_to,
-                'num_days' => $num_days,
-                'config' => $config,
-                'min_price' => $prod_price ? min($prod_price) : 0,
-                'max_price' => $prod_price ? max($prod_price) : 0,
-            ));
-
-            return $this->display(__FILE__, 'htlfilterblock.tpl');
         }
     }
 

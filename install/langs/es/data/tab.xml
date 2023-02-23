@@ -19,7 +19,8 @@
   <tab id="Administration" name="Administración"/>
   <tab id="Stats" name="Estadísticas"/>
   <tab id="Stock" name="Existencias"/>
-  <tab id="Products" name="Productos"/>
+  <tab id="Products" name="Administrar productos de servicio"/>
+  <tab id="Room_Types" name="Administrar tipos de habitaciones"/>
   <tab id="Categories" name="Categorías"/>
   <tab id="Monitoring" name="Monitoring"/>
   <tab id="Attributes_and_Values" name="Atributos de productos"/>

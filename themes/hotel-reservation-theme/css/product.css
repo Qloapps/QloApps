@@ -1386,7 +1386,7 @@ Quick View Styles
 .price_desc_block {
   font-size: 18px;
 }
-.price_desc_block .total_rooms_price_block {
+.price_desc_block .total_price_block {
   color: #333;
 }
 .price_desc_block .extra_demands_price_block {
@@ -1396,6 +1396,52 @@ Quick View Styles
   font-size: 24px;
   color: #505050;
 }
+
+/* service popup design */
+.price_desc_block .services-info {
+  cursor: pointer;
+}
+.ui-tooltip.services-tootip {
+  box-shadow: 0 2px 6px 0 rgb(0 0 0 / 20%);
+  background: #FFFFFF;
+  border: unset;
+  color: #333;
+  /* min-width: 300px; */
+  padding: 9px 15px;
+  max-height: 310px;
+  overflow-y: auto;
+}
+.services-info-tooltip-cont {
+  min-width: 240px;
+}
+.extra-service-panel + .extra-service-panel {
+  margin-top: 15px;
+}
+.extra-service-panel .panel_title {
+  font-size: 15px;
+  margin-bottom: 18px;
+  font-weight: 600;}
+  .extra-service-panel .panel_title span {
+    font-weight: 400;}
+.extra-service-panel .table td {
+  font-size: 13px;
+  border-top: unset;
+  padding: 9px 15px;
+}
+.extra-service-panel .services-list > div + div {
+  margin-top: 15px;
+}
+.extra-service-panel .services-list .services-list-row, .extra-service-panel .summary-row {
+  font-size: 13px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+.extra-service-panel .summary-row .service_price {
+  font-weight: 700;
+}
+/* end */
+
 
 /* extra demands Css */
 #rooms_extra_demands {
@@ -1443,6 +1489,141 @@ Quick View Styles
 	display:none;
 	border-top: 1px solid #eee;
 	padding-top: 15px;} */
+
+/* style for normal product listing on product page */
+
+ul.service-product-nav {
+  margin-top: 20px;
+}
+ul.service-product-nav > li {
+  margin-bottom: 15px;
+}
+ul.service-product-nav > li a {
+  text-align: center;
+}
+ul.service-product-nav > li.active a {
+  background: #379AEF;
+  border-radius: 4px;
+  font-weight: bold;
+  color: #FFFFFF;
+  /* padding: 8px 12px 8px 12px; */
+  /* width: max-content; */
+}
+ul.service-product-nav > li:hover {
+  border-bottom: 2px solid #fff;
+}
+@media (max-width: 991px){
+  ul.nav-stacked.service-product-nav > li {
+    float:left;
+    margin-bottom: 25px;
+  }
+}
+.service-product-element {
+  color: #333333;
+  position: relative;
+}
+.service-product-block {
+    margin-bottom: 10px;
+}
+.service_product_action_block {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    flex-wrap: wrap;
+}
+.service-product-element .service-product-img {
+  border-radius: 4px;
+}
+.service-product-element .service-product-name {
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 22px;
+}
+.service-product-element .service-product-short-desc {
+  font-size: 14px;
+  line-height: 22px;
+}
+.service-product-element .service-product-price {
+  font-weight: 600;
+  font-size: 22px;
+  line-height: 27.24px;
+}
+
+.service-product-element .service-product-actions {
+  display: flex;
+  justify-content: space-between;
+}
+.service-product-element .service-product-actions > div {
+  flex-grow: 1;
+}
+
+.service-product-element .qty_container > * {
+  float: left;
+}
+.service-product-element .qty_container {
+    margin-right: 10px;
+}
+.service-product-element .service_product_qty {
+  border-radius: 4px 0px 0px 4px;
+  max-width: 70px;
+}
+.service-product-element .qty_controls a {
+  display: block;
+  color: #333;
+  border: 1px solid #999999;
+  border-left: none;
+  padding: 5px;
+  line-height: 11px;
+  font-size: 12px;
+}
+
+.service-product-element .qty_controls a:first-of-type {
+  border-radius: 0 4px 0 0;
+}
+.service-product-element .qty_controls a:last-of-type {
+  border-radius: 0 0 4px 0;
+  box-shadow: 0 1px 0 0 rgb(0 0 0 / 13%);
+}
+.service-product-element .btn-service-product {
+  border-radius: 4px;
+  font-size: 14px;
+  color: #ffffff;
+  font-weight: bold;
+  text-transform: uppercase;
+  padding: 12px 30px;
+  outline: none;
+}
+.service-product-element .btn-service-product.btn-success:hover, .service-product-element .btn-service-product.btn-success:focus, .service-product-element .btn-service-product.btn-success:active, .service-product-element .btn-service-product.btn-success.active {
+  color: #fff;
+  background-color: #1cb62e;
+  border-color: #1cb62e;
+}
+.service-product-element .btn-service-product.btn-success {
+  background-color: #36BA46;
+  border: 1px solid #36BA46;
+}
+#service_products_cont .bx-wrapper .bx-controls-direction a {
+  height: unset;
+  width: unset;
+}
+#service_products_cont .bx-wrapper .bx-prev {
+  left: 0px;
+}
+#service_products_cont .bx-wrapper .bx-prev:before {
+  content: "\f053";
+}
+#service_products_cont .bx-wrapper .bx-next {
+  right: 0px;
+}
+#service_products_cont .bx-wrapper .bx-next:before {
+  content: "\f054";
+}
+#service_products_cont .show_more_btn_container {
+  text-align: center;
+}
+#service_products_cont .get-service-products {
+  border-radius: 4px;
+}
 
 #room_type_map_tab .map-wrap {
   min-height: 500px;

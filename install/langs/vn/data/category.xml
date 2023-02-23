@@ -16,4 +16,20 @@
     <meta_keywords/>
     <meta_description/>
   </category>
+  <category id="Locations" id_shop="1">
+    <name>Locations</name>
+    <description/>
+    <link_rewrite>locations</link_rewrite>
+    <meta_title/>
+    <meta_keywords/>
+    <meta_description/>
+  </category>
+  <category id="Services" id_shop="1">
+    <name>Services</name>
+    <description/>
+    <link_rewrite>services</link_rewrite>
+    <meta_title/>
+    <meta_keywords/>
+    <meta_description/>
+  </category>
 </entity_category>

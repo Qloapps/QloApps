@@ -23,7 +23,7 @@
 *  International Registered Trademark & Property of PrestaShop SA
 *}
 
-<tr class="product-line-row" data-id_room="{$data.id_room}" data-id_product="{$data.id_product}" data-id_hotel="{$data.id_hotel}" data-date_from="{$data.date_from}" data-date_to="{$data.date_to}" data-product_price="{$data.unit_amt_tax_incl}" data-order_detail_id="{$data.id_order_detail}">
+<tr class="product-line-row" data-id_room="{$data.id_room}" data-id_product="{$data.id_product}" data-id_hotel="{$data.id_hotel}" data-date_from="{$data.date_from}" data-date_to="{$data.date_to}" data-product_price="{$data.unit_amt_tax_incl}" data-id_order_detail="{$data.id_order_detail}">
 	{if $refund_allowed}
 		<td class="standard_refund_fields" style="display:none">
 			<input type="checkbox" name="id_htl_booking[]" value="{$data.id|escape:'html':'UTF-8'}" {if isset($refundReqBookings) && ($data.id|in_array:$refundReqBookings)}disabled{/if}/>
@@ -37,16 +37,16 @@
 	</td>
 	<td class="text-center">
 		<p>{$data.room_type}</p>
-		<p class="room_extra_demands {if !isset($data['extra_demands']) || !$data['extra_demands']}edit_product_fields{/if}" {if !isset($data['extra_demands']) || !$data['extra_demands']}style="display: none;"{/if}>
-			<a href="#" data-toggle="modal" data-target="#rooms_type_extra_demands" date_from="{$data['date_from']}" date_to="{$data['date_to']}" id_product="{$data['id_product']}" id_room="{$data['id_room']}" id_order="{$order->id}" class="open_room_extra_demands" id_htl_booking="{$data['id']}" edit_orde_line="0">
-				{l s='Additional Features'}
+		{* <p class="room_extra_demands {if !isset($data['extra_demands']) || !$data['extra_demands']}edit_product_fields{/if}" {if (!isset($data['extra_demands']) || !$data['extra_demands']) && (!isset($data['additional_services']) || !$data['additional_services'])}style="display: none;"{/if}>
+			<a href="#" data-toggle="modal" data-target="#rooms_type_extra_demands" date_from="{$data['date_from']}" date_to="{$data['date_to']}" id_product="{$data['id_product']}" id_room="{$data['id_room']}" id_order="{$order->id}" class="open_room_extra_services" id_htl_booking="{$data['id']}" edit_orde_line="0">
+				{l s='Extra Services'}
 			</a>
-		</p>
-		{if isset($data['extra_demands']) && $data['extra_demands']}
+		</p> *}
+		{* {if (isset($data['extra_demands']) && $data['extra_demands']) || (isset($data['additional_services']) && $data['additional_services'])}
 			<p>
-				{convertPriceWithCurrency price=$data['extra_demands_price_ti'] currency=$currency->id}
+				{convertPriceWithCurrency price=($data['extra_demands_price_ti'] + $data['additional_services_price_ti']) currency=$currency->id}
 			</p>
-		{/if}
+		{/if} *}
 	</td>
 	<td class="text-center">
 		<a href="{$link->getAdminLink('AdminAddHotel')}&amp;id={$data['id_hotel']}&amp;updatehtl_branch_info" target="_blank">
@@ -162,21 +162,41 @@
 	</td>
 	<td class="text-center">
 		<span class="room_unit_price_show">
-			{if $data.feature_price_diff != 0}
+			{* {if $data['feature_price_diff'] != 0}
 				<span class="product_original_price room_type_old_price">
-					{convertPriceWithCurrency price=$data.unit_price_without_reduction_tax_excl currency=$currency->id}
+					{convertPriceWithCurrency price=$data['unit_price_without_reduction_tax_excl'] currency=$currency->id}
 				</span> &nbsp;
-			{/if}
-			<span class="room_type_current_price">
-				{convertPriceWithCurrency price=$data.paid_unit_price_tax_excl currency=$currency->id}
-			</span>
+			{/if} *}
+			<p>
+				<span class="room_type_current_price">
+					{convertPriceWithCurrency price=$data['total_price_tax_excl'] currency=$currency->id}
+				</span>
+			</p>
+			<p class="help-block">{l s='Per day price:'} {convertPriceWithCurrency price=$data['paid_unit_price_tax_excl'] currency=$currency->id}</p>
 		</span>
 		<div class="room_unit_price_edit" style="display: none;">
-			<input type="text" class="room_unit_price" name="room_unit_price" value="{$data.paid_unit_price_tax_excl}">
+			<input type="text" class="room_unit_price" name="room_unit_price" value="{$data['paid_unit_price_tax_excl']}">
+			<p class="help-block">{l s='Set per day price'}</p>
 		</div>
 	</td>
 	<td class="text-center">
-		<span class="product_price_show">{convertPriceWithCurrency price=$data.amt_with_qty_tax_incl currency=$currency->id}</span>
+		<span class="extra_service_show">
+			{convertPriceWithCurrency price=($data['extra_demands_price_te'] + $data['additional_services_price_te'] + $data['convenience_fee_te'] + $data['additional_services_price_auto_add_te']) currency=$currency->id}
+			<a href="#" data-toggle="modal" data-target="#rooms_type_extra_demands" date_from="{$data['date_from']}" date_to="{$data['date_to']}" id_product="{$data['id_product']}" id_room="{$data['id_room']}" id_order="{$order->id}" class="open_room_extra_services" id_htl_booking="{$data['id']}" edit_orde_line="0">
+				<i class="icon icon-lg icon-info-circle"></i>
+			</a>
+		</span>
+		<span class="extra_service_edit" style="display: none;">
+			<a href="#" data-toggle="modal" data-target="#rooms_type_extra_demands" date_from="{$data['date_from']}" date_to="{$data['date_to']}" id_product="{$data['id_product']}" id_room="{$data['id_room']}" id_order="{$order->id}" class="open_room_extra_services" id_htl_booking="{$data['id']}" edit_orde_line="0">
+				{convertPriceWithCurrency price=($data['extra_demands_price_te'] + $data['additional_services_price_te'] + $data['convenience_fee_te'] + $data['additional_services_price_auto_add_te']) currency=$currency->id}
+			</a>
+		</span>
+	</td>
+	<td class="text-center">
+		<span class="product_price_show">{convertPriceWithCurrency price=($data['total_room_tax']) currency=$currency->id}</span>
+	</td>
+	<td class="text-center">
+		<span class="product_price_show">{convertPriceWithCurrency price=($data['total_room_price_ti']) currency=$currency->id}</span>
 		{if $can_edit}
 		<div class="product_price_edit" style="display:none;">
 			<div class="form-group">
@@ -211,19 +231,6 @@
 			{/if}
 		</td>
 	{/if}
-
-	<td class="text-center">
-		{if $data.booking_type == HotelBookingDetail::ALLOTMENT_MANUAL && $data.comment|count_characters > 0}
-			<p><strong>{l s='Message: '}</strong> <span>{$data.comment|escape:'htmlall':'UTF-8'}</span></p>
-		{/if}
-		{if isset($data.refund_info) && ($data.refund_info.refunded || $data.refund_info.denied)}
-			<p class="text-center">--</p>
-		{else}
-			<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#mySwappigModal" data-id_order="{$order->id}" data-room_num='{$data.room_num}' data-date_from='{$data.date_from}' data-date_to='{$data.date_to}' data-id_room='{$data.id_room}' data-cust_name='{$data.alloted_cust_name}' data-cust_email='{$data.alloted_cust_email}' data-avail_rm_swap='{$data.avail_rooms_to_swap|@json_encode}' data-avail_rm_realloc='{$data.avail_rooms_to_realloc|@json_encode}'>
-				{l s='Reallocate Room' mod='hotelreservationsystem'}
-			</button>
-		{/if}
-	</td>
 	{if ($can_edit && !$order->hasBeenDelivered())}
 		<td class="product_invoice" style="display: none;">
 		{if sizeof($invoices_collection)}
@@ -241,7 +248,7 @@
 		<td class="product_action text-right">
 			{* edit/delete controls *}
 			<div class="btn-group pull-right">
-				<button type="button" class="btn btn-default edit_product_change_link">
+				<button type="button" class="btn btn-default edit_room_change_link">
 					<i class="icon-pencil"></i>
 					{l s='Edit'}
 				</button>
@@ -250,7 +257,13 @@
 				</button>
 				<ul class="dropdown-menu" role="menu">
 					<li>
-						<a href="#" class="delete_product_line">
+						<a href="#" data-toggle="modal" data-target="#mySwappigModal" data-id_order="{$order->id}" data-room_num='{$data.room_num}' data-date_from='{$data.date_from}' data-date_to='{$data.date_to}' data-id_room='{$data.id_room}' data-cust_name='{$data.alloted_cust_name}' data-cust_email='{$data.alloted_cust_email}' data-avail_rm_swap='{$data.avail_rooms_to_swap|@json_encode}' data-avail_rm_realloc='{$data.avail_rooms_to_realloc|@json_encode}'>
+							<i class="icon-refresh"></i>
+							{l s='Reallocate Room'}
+						</a>
+					</li>
+					<li>
+						<a href="#" class="delete_room_line">
 							<i class="icon-trash"></i>
 							{l s='Delete'}
 						</a>
@@ -258,11 +271,11 @@
 				</ul>
 			</div>
 			{* Update controls *}
-			<button type="button" class="btn btn-default submitProductChange" style="display: none;">
+			<button type="button" class="btn btn-default submitRoomChange" style="display: none;">
 				<i class="icon-ok"></i>
 				{l s='Update'}
 			</button>
-			<button type="button" class="btn btn-default cancel_product_change_link" style="display: none;">
+			<button type="button" class="btn btn-default cancel_room_change_link" style="display: none;">
 				<i class="icon-remove"></i>
 				{l s='Cancel'}
 			</button>

@@ -1371,8 +1371,19 @@ class HotelBookingDetail extends ObjectModel
      * @param [date] $dateTo   [End date of the booking]
      *
      * @return [int] [Returns number of days between two dates]
+     * @deprecated use hotelBookingDetail::getDays() instead
      */
     public function getNumberOfDays($dateFrom, $dateTo)
+    {
+        return self::getDays($dateFrom, $dateTo);
+        // $startDate = new DateTime($dateFrom);
+        // $endDate = new DateTime($dateTo);
+        // $daysDifference = $startDate->diff($endDate)->days;
+
+        // return $daysDifference;
+    }
+
+    public static function getDays($dateFrom, $dateTo)
     {
         $startDate = new DateTime($dateFrom);
         $endDate = new DateTime($dateTo);

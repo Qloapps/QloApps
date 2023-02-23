@@ -53,7 +53,7 @@ class CategoryControllerCore extends FrontController
             $this->addCSS(array(
                 // _THEME_CSS_DIR_.'scenes.css'       => 'all',
                 _THEME_CSS_DIR_.'category.css' => 'all',
-                // _THEME_CSS_DIR_.'product_list.css' => 'all',
+                _THEME_CSS_DIR_.'product_list.css' => 'all',
             ));
         }
 
@@ -147,7 +147,7 @@ class CategoryControllerCore extends FrontController
             return;
         }
 
-        $htl_id_category = Tools::getValue('id_category');
+        $id_category = Tools::getValue('id_category');
 
         if (!($date_from = Tools::getValue('date_from'))) {
             $date_from = date('Y-m-d');
@@ -162,11 +162,7 @@ class CategoryControllerCore extends FrontController
 
         $currency = new Currency($this->context->currency->id);
 
-        if (Module::isInstalled('hotelreservationsystem')) {
-            require_once _PS_MODULE_DIR_.'hotelreservationsystem/define.php';
-
-            $id_hotel = HotelBranchInformation::getHotelIdByIdCategory($htl_id_category);
-
+        if ($id_hotel = HotelBranchInformation::getHotelIdByIdCategory($id_category)) {
             $id_cart = $this->context->cart->id;
             $id_guest = $this->context->cookie->id_guest;
 
@@ -183,8 +179,7 @@ class CategoryControllerCore extends FrontController
 
             $booking_data = $objBookingDetail->dataForFrontSearch($bookingParams);
 
-            $feat_img_dir = _PS_IMG_.'rf/';
-            $ratting_img = _MODULE_DIR_.'hotelreservationsystem/views/img/Slices/icons-sprite.png';
+
 
             $obj_booking_detail = new HotelBookingDetail();
             $num_days = $obj_booking_detail->getNumberOfDays($date_from, $date_to);
@@ -210,13 +205,24 @@ class CategoryControllerCore extends FrontController
                 'booking_date_from' => $date_from,
                 'booking_date_to' => $date_to,
                 'booking_data' => $booking_data,
-                'feat_img_dir' => $feat_img_dir,
-                'ratting_img' => $ratting_img,
-                'currency' => $currency,
                 'max_order_date' => $max_order_date,
                 'order_date_restrict' => $order_date_restrict
             ));
+        } else {
+            Tools::redirect($this->context->link->getPageLink('index'));
         }
+
+        $feat_img_dir = _PS_IMG_.'rf/';
+        $ratting_img = _MODULE_DIR_.'hotelreservationsystem/views/img/Slices/icons-sprite.png';
+
+        $this->context->smarty->assign(array(
+            'id_hotel' => $id_hotel,
+            'currency' => $currency,
+            'feat_img_dir' => $feat_img_dir,
+            'ratting_img' => $ratting_img,
+        ));
+
+
 
         /*if (isset($this->context->cookie->id_compare))
             $this->context->smarty->assign('compareProducts', CompareProduct::getCompareProducts((int)$this->context->cookie->id_compare));

@@ -20,7 +20,8 @@
   <tab id="Administration" name="Adminisztráció"/>
   <tab id="Stats" name="Statisztika"/>
   <tab id="Stock" name="Készlet"/>
-  <tab id="Products" name="Termék"/>
+  <tab id="Products" name="Szolgáltatási termékek kezelése"/>
+  <tab id="Room_Types" name="Szobatípusok kezelése"/>
   <tab id="Categories" name="Kategóriák"/>
   <tab id="Monitoring" name="Monitoring"/>
   <tab id="Attributes_and_Values" name="Product Attributes"/>
