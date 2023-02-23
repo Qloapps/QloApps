@@ -98,6 +98,15 @@ class OrderDetailCore extends ObjectModel
     /** @var float */
     public $product_quantity_discount;
 
+    /** @var bool */
+    public $is_booking_product;
+
+    /** @var int */
+    public $product_service_type;
+
+    /** @var bool */
+    public $product_allow_multiple_quantity;
+
     /** @var string */
     public $product_ean13;
 
@@ -184,6 +193,11 @@ class OrderDetailCore extends ObjectModel
             'reduction_amount_tax_excl' =>  array('type' => self::TYPE_FLOAT, 'validate' => 'isPrice'),
             'group_reduction' =>            array('type' => self::TYPE_FLOAT, 'validate' => 'isFloat'),
             'product_quantity_discount' =>    array('type' => self::TYPE_FLOAT, 'validate' => 'isFloat'),
+            'is_booking_product' =>                array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
+            'product_service_type' =>        array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
+            'product_auto_add' =>            array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
+            'product_price_addition_type' =>    array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
+            'product_allow_multiple_quantity' => array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
             'product_ean13' =>                array('type' => self::TYPE_STRING, 'validate' => 'isEan13'),
             'product_upc' =>                array('type' => self::TYPE_STRING, 'validate' => 'isUpc'),
             'product_reference' =>            array('type' => self::TYPE_STRING, 'validate' => 'isReference'),
@@ -638,6 +652,12 @@ class OrderDetailCore extends ObjectModel
         $this->product_quantity_in_stock = ($product_quantity - (int)$product['cart_quantity'] < 0) ?
             $product_quantity : (int)$product['cart_quantity'];
 
+        $this->is_booking_product = $product['booking_product'];
+        $this->product_service_type = $product['service_product_type'];
+        $this->product_auto_add = $product['auto_add_to_cart'];
+        $this->product_price_addition_type = $product['price_addition_type'];
+        $this->product_allow_multiple_quantity = $product['allow_multiple_quantity'];
+
         $this->setVirtualProductInformation($product);
         $this->checkProductStock($product, $id_order_state);
 
@@ -694,6 +714,17 @@ class OrderDetailCore extends ObjectModel
     public function getStockState()
     {
         return $this->outOfStock;
+    }
+
+    public function getBookingProducts($id_order)
+    {
+        $orders = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS(
+            'SELECT *
+            FROM '._DB_PREFIX_.'order_detail od
+            WHERE od.`is_booking_product` = true and `id_order` = '.(int) $id_order
+        );
+
+        return $orders;
     }
 
     /**

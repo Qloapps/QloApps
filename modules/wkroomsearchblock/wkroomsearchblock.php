@@ -123,9 +123,14 @@ class WkRoomSearchBlock extends Module
     public function hookDisplayLeftColumn()
     {
         if ('category' == Tools::getValue('controller')) {
-            $objSearchHelper = new WkRoomSearchHelper();
-            $objSearchHelper->assignSearchPanelVariables();
-            return $this->display(__FILE__, 'categoryPageSearch.tpl');
+            $idCategory = Tools::getValue('id_category');
+            if (Validate::isLoadedObject($objCategory = new Category((int) $idCategory))) {
+                if ($objCategory->hasParent(Configuration::get('PS_LOCATIONS_CATEGORY'))) {
+                    $objSearchHelper = new WkRoomSearchHelper();
+                    $objSearchHelper->assignSearchPanelVariables();
+                    return $this->display(__FILE__, 'categoryPageSearch.tpl');
+                }
+            }
         }
     }
 

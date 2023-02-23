@@ -459,21 +459,19 @@ class AuthControllerCore extends FrontController
                 $objHtlCart = new HotelCartBookingData();
                 if ($htlCartInfo = $objHtlCart->getCartCurrentDataByCartId($this->context->cart->id)) {
                     if (isset($htlCartInfo[0]['id_hotel']) && ($idHotel = $htlCartInfo[0]['id_hotel'])) {
-                        if ($objHotel = new HotelBranchInformation()) {
-                            if ($address_info = $objHotel->getAddress($idHotel)) {
-                                $_POST['lastname'] = Tools::getValue('customer_lastname');
-                                $_POST['firstname'] = Tools::getValue('customer_firstname');
-                                $_POST['address1'] = $address_info['address1'];
-                                $_POST['city'] = $address_info['city'];
-                                $_POST['postcode'] = $address_info['postcode'];
-                                $_POST['alias'] = 'My address';
-                                $_POST['id_country'] = $address_info['id_country'];
-                                $_POST['id_state'] = $address_info['id_state'];
-                                $_POST['auto_generated'] = true;
-                                // if form is shorter then address name will be customer name
-                                $lastnameAddress = $_POST['lastname'];
-                                $firstnameAddress = $_POST['firstname'];
-                            }
+                        if ($address_info = HotelBranchInformation::getAddress($idHotel)) {
+                            $_POST['lastname'] = Tools::getValue('customer_lastname');
+                            $_POST['firstname'] = Tools::getValue('customer_firstname');
+                            $_POST['address1'] = $address_info['address1'];
+                            $_POST['city'] = $address_info['city'];
+                            $_POST['postcode'] = $address_info['postcode'];
+                            $_POST['alias'] = 'My address';
+                            $_POST['id_country'] = $address_info['id_country'];
+                            $_POST['id_state'] = $address_info['id_state'];
+                            $_POST['auto_generated'] = true;
+                            // if form is shorter then address name will be customer name
+                            $lastnameAddress = $_POST['lastname'];
+                            $firstnameAddress = $_POST['firstname'];
                         }
                     }
                 }

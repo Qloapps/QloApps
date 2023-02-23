@@ -783,39 +783,7 @@ $(document).ready(function() {
     initGoogleMaps();
 });
 
-function setRoomTypeGuestOccupancy(booking_occupancy_wrapper)
-{
-    var adults = 0;
-    var children = 0;
-	var rooms = $(booking_occupancy_wrapper).find('.occupancy_info_block').length;
 
-	$(booking_occupancy_wrapper).find(".num_adults" ).each(function(key, val) {
-        adults += parseInt($(this).val());
-    });
-    $(booking_occupancy_wrapper).find(".num_children" ).each(function(key, val) {
-        children += parseInt($(this).val());
-    });
-
-    var guestButtonVal = parseInt(adults) + ' ';
-    if (parseInt(adults) > 1) {
-        guestButtonVal += adults_txt;
-    } else {
-        guestButtonVal += adult_txt;
-    }
-    if (parseInt(children) > 0) {
-        if (parseInt(children) > 1) {
-            guestButtonVal += ', ' + parseInt(children) + ' ' + children_txt;
-        } else {
-            guestButtonVal += ', ' + parseInt(children) + ' ' + child_txt;
-        }
-    }
-    if (parseInt(rooms) > 1) {
-        guestButtonVal += ', ' + parseInt(rooms) + ' ' + rooms_txt;
-    } else {
-        guestButtonVal += ', ' + parseInt(rooms) + ' ' + room_txt;
-    }
-	$(booking_occupancy_wrapper).siblings('.booking_guest_occupancy').find('span').text(guestButtonVal);
-}
 
 
 function showFeaturePriceRuleLangField(lang_iso_code, id_lang)

@@ -1,0 +1,40 @@
+{if isset($list)}
+    {l s='Extra Demands Details'}
+    {l s='Room Type'}
+    {l s='Extra demand name'}
+    {l s='Total'} {l s='(Tax excl.)'}
+
+    {if isset($list)}
+        {foreach from=$list key=data_k item=data_v}
+            {foreach from=$data_v['date_diff'] key=rm_k item=rm_v}
+                {if isset($rm_v['extra_demands']) && $rm_v['extra_demands']}
+                    {assign var=roomCount value=1}
+                    {foreach $rm_v['extra_demands'] as $roomDemand}
+                        {foreach name=demandRow from=$roomDemand['extra_demands'] item=demand}
+                                {if $smarty.foreach.demandRow.first}
+                                    <td class="text-center" rowspan="{$roomDemand['extra_demands']|count}">
+                                        <font size="2" face="Open-sans, sans-serif" color="#555454">
+                                            {$data_v['name']}<br>
+                                            {$rm_v['data_form']|date_format:"%d-%m-%Y"} {l s='to'} {$rm_v['data_to']|date_format:"%d-%m-%Y"}<br>
+                                            <strong>{l s='Room'} - {$roomCount}</strong>
+                                        </font>
+                                    </td>
+                                {/if}
+                                <td class="text-center">
+                                    <font size="2" face="Open-sans, sans-serif" color="#555454">
+                                        {$demand['name']}
+                                    </font>
+                                </td>
+                                <td class="text-center">
+                                    <font size="2" face="Open-sans, sans-serif" color="#555454">
+                                        {convertPrice price=$demand['total_price_tax_excl']}
+                                    </font>
+                                </td>
+                            </tr>
+                        {/foreach}
+                        {assign var=roomCount value=$roomCount+1}
+                    {/foreach}
+                {/if}
+            {/foreach}
+        {/foreach}
+    {/if}

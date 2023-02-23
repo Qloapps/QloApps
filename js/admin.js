@@ -604,6 +604,12 @@ function submitAddProductAndPreview()
 	$('#product_form').submit();
 }
 
+function submitAddProduct()
+{
+	$('#fakeSubmitAddProduct').attr('name','submitAddProduct');
+	$('#product_form').submit();
+}
+
 function submitAddcmsAndPreview()
 {
 	$('#previewSubmitAddcmsAndPreview').attr('name','submitAddcmsAndPreview');

@@ -9,7 +9,7 @@
     <template>payment_accepted</template>
   </order_state>
   <order_state id="Processing_in_progress">
-    <name>Preparation in progress</name>
+    <name>Processing in progress</name>
     <template>processing</template>
   </order_state>
   <order_state id="Canceled">
@@ -17,7 +17,7 @@
     <template>order_canceled</template>
   </order_state>
   <order_state id="Refund">
-    <name>Refund</name>
+    <name>Refunded</name>
     <template>refund</template>
   </order_state>
   <order_state id="Payment_error">
@@ -28,9 +28,9 @@
     <name>Remote payment accepted</name>
     <template>payment_accepted</template>
   </order_state>
-  <order_state id="Awaiting_cod_validation">
-    <name>Remote payment accepted</name>
-    <template>cashondelivery</template>
+  <order_state id="Awaiting_remote_payment">
+    <name>Awaiting remote payment</name>
+    <template/>
   </order_state>
   <order_state id="Overbooking_paid">
     <name>Overbooking (paid)</name>

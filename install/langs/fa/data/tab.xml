@@ -20,7 +20,8 @@
   <tab id="Administration" name="مدیریت"/>
   <tab id="Stats" name="آمارها"/>
   <tab id="Stock" name="موجودی"/>
-  <tab id="Products" name="محصولات"/>
+  <tab id="Products" name="مدیریت محصولات خدماتی"/>
+  <tab id="Room_Types" name="مدیریت انواع اتاق"/>
   <tab id="Categories" name="شاخه‌ها"/>
   <tab id="Monitoring" name="بازرسی"/>
   <tab id="Attributes_and_Values" name="مشخصه‌های محصول"/>

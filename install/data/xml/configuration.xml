@@ -770,6 +770,12 @@
 	<configuration id="PS_HOME_CATEGORY" name="PS_HOME_CATEGORY">
 		<value>2</value>
 	</configuration>
+	<configuration id="PS_LOCATIONS_CATEGORY" name="PS_LOCATIONS_CATEGORY">
+		<value>3</value>
+	</configuration>
+	<configuration id="PS_SERVICE_CATEGORY" name="PS_SERVICE_CATEGORY">
+		<value>4</value>
+	</configuration>
 	<configuration id="PS_CONFIGURATION_AGREMENT" name="PS_CONFIGURATION_AGREMENT">
 		<value>0</value>
 	</configuration>
@@ -877,6 +883,9 @@
     </configuration>
     <configuration id="PS_ADVANCED_PAYMENT_API" name="PS_ADVANCED_PAYMENT_API">
       <value>0</value>
+    </configuration>
+	<configuration id="PS_SERVICE_PRODUCT_CATEGORY_FILTER" name="PS_SERVICE_PRODUCT_CATEGORY_FILTER">
+      <value>1</value>
     </configuration>
   </entities>
 </entity_configuration>

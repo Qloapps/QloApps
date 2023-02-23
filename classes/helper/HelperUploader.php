@@ -183,9 +183,7 @@ class HelperUploaderCore extends Uploader
 
     public function getTemplateFile($template)
     {
-        if (preg_match_all('/((?:^|[A-Z])[a-z]+)/', get_class($this->getContext()->controller), $matches) !== false) {
-            $controller_name = strtolower($matches[0][1]);
-        }
+        $controller_name = Tools::toUnderscoreCase(substr($this->getContext()->controller->controller_name, 5));
 
         if ($this->getContext()->controller instanceof ModuleAdminController && file_exists($this->_normalizeDirectory(
                 $this->getContext()->controller->getTemplatePath()).$this->getTemplateDirectory().$template)) {

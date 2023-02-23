@@ -1,6 +1,6 @@
 <?xml version='1.0'?>
 <entity_order_state>
-  <order_state id='Awaiting'>
+  <order_state id='Awaiting_payment'>
     <name>Menunggu pembayaran</name>
     <template>awaiting_payment</template>
   </order_state>
@@ -17,7 +17,7 @@
     <template>order_canceled</template>
   </order_state>
   <order_state id='Refund'>
-    <name>Refund</name>
+    <name>Refunded</name>
     <template>refund</template>
   </order_state>
   <order_state id='Payment_error'>

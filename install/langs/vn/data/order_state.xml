@@ -28,9 +28,9 @@
     <name>Remote payment accepted</name>
     <template>payment_accepted</template>
   </order_state>
-  <order_state id="Awaiting_cod_validation">
-    <name>Awaiting Cash On Delivery validation</name>
-    <template>cashondelivery</template>
+  <order_state id="Awaiting_remote_payment">
+    <name>Awaiting remote payment</name>
+    <template/>
   </order_state>
   <order_state id="Overbooking_paid">
     <name>Overbooking (paid)</name>
@@ -44,5 +44,4 @@
     <name>Partial payment accepted</name>
     <template>payment_accepted</template>
   </order_state>
-
 </entity_order_state>
