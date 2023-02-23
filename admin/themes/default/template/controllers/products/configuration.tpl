@@ -95,7 +95,7 @@
 									<input type="text" class="form-control room_comment" value="{$room_info['comment']}" name="{$var_name_room_info|cat:'[comment]'}">
 								</td>
 								<td class="col-sm-2 center">
-									<a class="btn btn-default deactiveDatesModal {if $room_info['id_status'] != $rm_status['STATUS_TEMPORARY_INACTIVE']['id'] }disabled{/if}" data-toggle="modal" data-target="#deactiveDatesModal">{if $room_info['id_status'] != $rm_status['STATUS_TEMPORARY_INACTIVE']['id'] }{l s='Add Dates'}{else}{l s='View Dates'}{/if}
+									<a class="btn btn-default deactiveDatesModal {if $room_info['id_status'] != $rm_status['STATUS_TEMPORARY_INACTIVE']['id'] }disabled{/if}" data-toggle="modal" data-target="#deactiveDatesModal" data-id-room="{$room_info['id']}">{if $room_info['id_status'] != $rm_status['STATUS_TEMPORARY_INACTIVE']['id'] }{l s='Add Dates'}{else}{l s='View Dates'}{/if}
 									</a>
 									<input type="hidden" class="form-control disable_dates_json" name="{$var_name_room_info|cat:'[disable_dates_json]'}" {if $room_info['id_status'] == $rm_status['STATUS_TEMPORARY_INACTIVE']['id']}value="{$room_info['disable_dates_json']|escape:'html':'UTF-8'}"{/if}>
 								</td>
@@ -184,6 +184,7 @@
 				<h4 class="modal-title"><i class="icon-calendar"></i>&nbsp; {l s='Disable Dates'}</h4>
 			</div>
 			<div class="modal-body">
+				<div class="text-left errors-wrap" style="display: none;"></div>
 				<div class="alert alert-info">
 					<p>{l s='Please note that the date chosen for field \'Date To\' is not considered as a blocking date.'}</p>
 				</div>
@@ -245,7 +246,9 @@
     $(document).ready(function() {
         const DisableDatesModal = {
             init: function() {
-                this.addNewRow();
+                DisableDatesModal.addNewRow();
+                DisableDatesModal.hideErrors();
+                DisableDatesModal.removeAllInvalidRowDataMarkers();
             },
             addNewRow: function() {
                 $('#deactiveDatesModal tbody').append(this.disableDatesRowHtml);
@@ -260,33 +263,59 @@
                     $(dateRangeRow).find('.room_disable_reason').val(dateRange.reason);
                 });
             },
-            getValidationErrors: function() {
-                let $return = false;
+            validateDisableDates: function(cb) {
+                DisableDatesModal.hideErrors();
+                DisableDatesModal.removeAllInvalidRowDataMarkers();
+                DisableDatesModal.disableRowDeleteActionButtons();
+
+                let idRoom = parseInt($('#deactiveDatesModal .room-disable-dates').attr('data-id-room'));
+                idRoom = idRoom == isNaN(idRoom) ? 0 : idRoom;
                 const disableDates = Array();
                 $('#deactiveDatesModal .room-disable-dates tbody tr').each(function(i, tr) {
-                    const dateFrom = $(tr).find('.disabled_date_from').val().trim();
-                    const dateTo = $(tr).find('.disabled_date_to').val().trim();
-
-                    if (!dateFrom.length || !dateTo.length) {
-                        $return = datesMissing;
-                    }
-
-                    disableDates.push({ dateFrom, dateTo });
+                    const date_from = $(tr).find('.disabled_date_from').val().trim();
+                    const date_to = $(tr).find('.disabled_date_to').val().trim();
+                    disableDates.push({ date_from, date_to });
                 });
 
-                $.each(disableDates, function(keyOuter, dateRangeOuter) {
-                    $.each(disableDates, function(keyInner, dateRangeInner) {
-                        if (keyInner != keyOuter) {
-                            if ((dateRangeOuter.dateFrom <= dateRangeInner.dateTo)
-                                && (dateRangeInner.dateFrom <= dateRangeOuter.dateTo)
-                            ) {
-                                $return = datesOverlapping;
+                $.ajax({
+                    url: prod_link,
+                    type: 'POST',
+                    data: {
+                        ajax: true,
+                        action: 'validateDisableDates',
+                        id_room: idRoom,
+                        disable_dates: disableDates,
+                    },
+                    dataType: 'JSON',
+                    success: function(response) {
+                        if (response.status) {
+                            if (typeof cb === 'function') {
+                                cb();
                             }
+                        } else {
+                            DisableDatesModal.showErrors(response.errors);
+                            DisableDatesModal.addInvalidRowDataMarkers(response.rows_to_highlight);
                         }
-                    });
+                    },
+                    complete: function () {
+                        DisableDatesModal.enableRowDeleteActionButtons();
+                    }
                 });
-
-                return $return;
+            },
+            showErrors: function(errors) {
+                $('#deactiveDatesModal .errors-wrap').stop().html(errors);
+                $('#deactiveDatesModal .errors-wrap').show(200);
+            },
+            hideErrors: function() {
+                $('#deactiveDatesModal .errors-wrap').hide(200, function() {
+                    $('#deactiveDatesModal .errors-wrap').html('');
+                });
+            },
+            addInvalidRowDataMarkers: function(rowsToHighlight) {
+                rowsToHighlight.map(function (rowIndex) {
+                    const tr = $('#deactiveDatesModal .room-disable-dates tbody tr').eq(rowIndex);
+                    DisableDatesModal.markRowDataInvalid(tr);
+                });
             },
             getDisableDatesInfo: function() {
                 const disableDates = Array();
@@ -299,6 +328,24 @@
                 });
 
                 return disableDates;
+            },
+            disableRowDeleteActionButtons: function() {
+                const disableDates = Array();
+                $('#deactiveDatesModal .room-disable-dates .remove-disable-dates-button').addClass('disabled');
+            },
+            enableRowDeleteActionButtons: function() {
+                const disableDates = Array();
+                $('#deactiveDatesModal .room-disable-dates .remove-disable-dates-button').removeClass('disabled');
+            },
+            markRowDataInvalid: function(tr) {
+                $(tr).css({ 'outline': '1px solid #D27C82', 'border-radius': '2px' });
+            },
+            removeAllInvalidRowDataMarkers: function(tr) {
+                $('#deactiveDatesModal .room-disable-dates tr').css('outline', '');
+                $(tr).css('outline', '');
+            },
+            removeRowDataMark: function(tr) {
+                $(tr).css('outline', '');
             },
             disableDatesRowHtml: `
                 <tr class="disabledDatesTr">
@@ -322,8 +369,10 @@
         $('#deactiveDatesModal').on('show.bs.modal', function(e) {
             const triggerRoomRow = $(e.relatedTarget);
             const roomRowIndex = parseInt($(triggerRoomRow).closest('tr').attr('data-row-index'));
+            const idRoom = parseInt($(triggerRoomRow).attr('data-id-room'));
             $('#deactiveDatesModal table.room-disable-dates tbody').html('');
             $('#deactiveDatesModal table.room-disable-dates').attr('data-room-row-index', roomRowIndex);
+            $('#deactiveDatesModal table.room-disable-dates').attr('data-id-room', idRoom);
             let disableDates = $(triggerRoomRow).closest('tr').find('.disable_dates_json').val();
             if (!disableDates) {
                 DisableDatesModal.init();
@@ -336,17 +385,13 @@
 
         // copy json formatted dates to room
         $(document).on('click', '.deactiveDatesModalSubmit', function() {
-            const error = DisableDatesModal.getValidationErrors();
-            if (error) {
-                alert(error);
-                return;
-            }
-
-            const disableDates = DisableDatesModal.getDisableDatesInfo();
-            const roomRowIndex = parseInt($('#deactiveDatesModal table.room-disable-dates').attr('data-room-row-index'));
-            const roomRow = $('#product-configuration .hotel-room tr.room_data_values[data-row-index='+roomRowIndex+']');
-            $(roomRow).find('.disable_dates_json').val(JSON.stringify(disableDates));
-            $('#deactiveDatesModal').modal('hide');
+            DisableDatesModal.validateDisableDates(function () {
+                const disableDates = DisableDatesModal.getDisableDatesInfo();
+                const roomRowIndex = parseInt($('#deactiveDatesModal table.room-disable-dates').attr('data-room-row-index'));
+                const roomRow = $('#product-configuration .hotel-room tr.room_data_values[data-row-index='+roomRowIndex+']');
+                $(roomRow).find('.disable_dates_json').val(JSON.stringify(disableDates));
+                $('#deactiveDatesModal').modal('hide');
+            });
         });
 
         // Add new room detail
@@ -456,7 +501,7 @@
                 onClose: function(selectedDate) {
                     var dateTo = $(this).closest('tr').find('.disabled_date_to').val();
                     if (!dateTo || (dateTo && selectedDate >= dateTo)) {
-                        $('.disabled_date_to').datepicker('show');
+                        $(this).closest('tr').find('.disabled_date_to').datepicker('show');
                     }
                 },
             });

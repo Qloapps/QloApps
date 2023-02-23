@@ -4632,6 +4632,69 @@ class AdminProductsControllerCore extends AdminController
         die(json_encode($response));
     }
 
+    public function ajaxProcessValidateDisableDates()
+    {
+        $response = array('status' => false);
+
+        $idRoom = (int) Tools::getValue('id_room');
+        $disableDates = Tools::getValue('disable_dates');
+
+        $rowsToHighlight = array();
+        if (is_array($disableDates) && count($disableDates)) {
+            foreach ($disableDates as $key => $dateRange) {
+                if (!Validate::isDate($dateRange['date_from']) || !Validate::isDate($dateRange['date_to'])) {
+                    $this->errors[] = $this->l('Some dates are missing. Please select all the date ranges.');
+                    $rowsToHighlight[] = $key;
+                }
+            }
+
+            if (!count($this->errors)) {
+                foreach ($disableDates as $keyOuter => $dateRangeOuter) {
+                    foreach ($disableDates as $keyInner => $dateRangeInner) {
+                        if ($keyInner != $keyOuter) {
+                            if ((strtotime($dateRangeOuter['date_from']) <= strtotime($dateRangeInner['date_to']))
+                                && (strtotime($dateRangeInner['date_from']) <= strtotime($dateRangeOuter['date_to']))
+                            ) {
+                                $this->errors[] = $this->l('Some dates are conflicting with each other. Please check and reselect the date ranges.');
+                                $rowsToHighlight[] = $keyOuter;
+                                $rowsToHighlight[] = $keyInner;
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (!count($this->errors)) {
+                if ($idRoom) {
+                    $objHotelBookingDetail = new HotelBookingDetail();
+                    foreach ($disableDates as $key => $dateRange) {
+                        if ($objHotelBookingDetail->chechRoomBooked($idRoom, $dateRange['date_from'], $dateRange['date_to'])) {
+                            $this->errors[] = $this->l('This room has been booked for highlighted date range(s). Please reselect the date ranges.');
+                            $rowsToHighlight[] = $key;
+                        }
+                    }
+                }
+            }
+        }
+
+        $this->errors = array_unique($this->errors);
+        $rowsToHighlight = array_unique($rowsToHighlight);
+
+        if (!count($this->errors)) {
+            $response['status'] = true;
+        } else {
+            $this->context->smarty->assign(array(
+                'errors' => $this->errors,
+            ));
+
+            $response['errors'] = $this->context->smarty->fetch('alerts.tpl');
+            $response['rows_to_highlight'] = $rowsToHighlight;
+            $response['status'] = false;
+        }
+
+        $this->ajaxDie(json_encode($response));
+    }
+
     public function processImageLegends()
     {
         if (Tools::getValue('key_tab') == 'Images' && Tools::getValue('submitAddproductAndStay') == 'update_legends' && Validate::isLoadedObject($product = new Product((int)Tools::getValue('id_product')))) {
