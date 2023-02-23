@@ -44,5 +44,4 @@
     <name>Partial payment accepted</name>
     <template>payment_accepted</template>
   </order_state>
-
 </entity_order_state>
