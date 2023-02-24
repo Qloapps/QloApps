@@ -361,7 +361,7 @@ class ProductControllerCore extends FrontController
                     if ($coverImage = HotelImage::getCover($hotel_id)) {
                         $hotelImagesBaseDir = _MODULE_DIR_.'hotelreservationsystem/views/img/hotel_img/';
                         $hotelImageLink = $this->context->link->getMediaLink(
-                            $hotelImagesBaseDir.$coverImage['hotel_image_id'].'.jpg'
+                            $hotelImagesBaseDir.$coverImage['id'].'.jpg'
                         );
                     }
 
