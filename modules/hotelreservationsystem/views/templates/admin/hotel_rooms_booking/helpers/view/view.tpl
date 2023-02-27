@@ -218,7 +218,7 @@
 		 </ul>
 		<div class="tab-content panel active">
 			<div role="tabpanel" class="tab-pane active" id="reallocate_room_tab">
-				<form method="post" action="{$formAction|escape:'htmlall':'UTF-8'}">
+				<form method="post" action="">
 					<div class="modal-header">
 						<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
 						<h4 class="modal-title" id="realloc_myModalLabel">{l s='Reallocate Rooms'}</h4>
