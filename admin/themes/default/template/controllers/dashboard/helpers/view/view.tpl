@@ -129,15 +129,15 @@
                         <h3><i class="icon-link"></i> {l s="Help Center"}</h3>
                             <dl>
                                 <dt><a href="https://qloapps.com/qlo-reservation-system/" class="_blank">{l s="Official Documentation"}</a></dt>
-                                <dd>{l s="Qloapps User Guide"}</dd>
+                                <dd>{l s="QloApps User Guide"}</dd>
                             </dl>
                             <dl>
-                                <dt><a href="https://forums.qloapps.com/" class="_blank">{l s="Qloapps Forum"}</a></dt>
-                                <dd>{l s="Connect with the Qloapps community"}</dd>
+                                <dt><a href="https://forums.qloapps.com/" class="_blank">{l s="QloApps Forum"}</a></dt>
+                                <dd>{l s="Connect with the QloApps community"}</dd>
                             </dl>
                             <dl>
-                                <dt><a href="https://qloapps.com/addons/" class="_blank">{l s="Qloapps Addons"}</a></dt>
-                                <dd>{l s="Enhance your store Qloapps modules"}</dd>
+                                <dt><a href="https://qloapps.com/addons/" class="_blank">{l s="QloApps Addons"}</a></dt>
+                                <dd>{l s="Enhance your store QloApps modules"}</dd>
                             </dl>
                             <dl>
                                 <dt><a href="https://qloapps.com/contact/" class="_blank">{l s="Contact Us!"}</a></dt>
