@@ -257,6 +257,10 @@ class AdminHotelFeaturePricesSettingsController extends ModuleAdminController
 
         $objFeaturePricing = new HotelRoomTypeFeaturePricing();
 
+        if ($priceImpactWay == HotelRoomTypeFeaturePricing::IMPACT_WAY_FIX_PRICE) {
+            $priceImpactType = HotelRoomTypeFeaturePricing::IMPACT_TYPE_FIXED_PRICE;
+        }
+
         $languages = Language::getLanguages(false);
         $objDefaultLang = new language($defaultLangId);
         $isPlanTypeExists = 0;

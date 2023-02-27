@@ -207,7 +207,7 @@
 					  {l s='Increase Price' mod='hotelreservationsystem'}
 					</option>
 					<option value="{HotelRoomTypeFeaturePricing::IMPACT_WAY_FIX_PRICE}" {if isset($objFeaturePrice->impact_way) && $objFeaturePrice->impact_way == HotelRoomTypeFeaturePricing::IMPACT_WAY_FIX_PRICE}selected = "selected"{/if}>
-						{l s='Fix Price' mod='hotelreservationsystem'}
+						{l s='Fixed Price' mod='hotelreservationsystem'}
 					</option>
 				</select>
 			</div>
@@ -223,10 +223,9 @@
 					  {l s='Percentage' mod='hotelreservationsystem'}
 					</option>
 					<option value="{HotelRoomTypeFeaturePricing::IMPACT_TYPE_FIXED_PRICE}" {if isset($objFeaturePrice->impact_type) && $objFeaturePrice->impact_type == HotelRoomTypeFeaturePricing::IMPACT_TYPE_FIXED_PRICE}selected = "selected"{/if}>
-					  {l s='Fixed Price' mod='hotelreservationsystem'}
+					  {l s='Amount' mod='hotelreservationsystem'}
 					</option>
 				</select>
-				<input type="hidden" id="price_impact_type_input" name="price_impact_type" value="{if isset($objFeaturePrice->impact_type)}{$objFeaturePrice->impact_type}{/if}">
 			</div>
 		</div>
 
