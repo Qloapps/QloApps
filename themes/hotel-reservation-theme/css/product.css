@@ -1689,7 +1689,8 @@ ul.service-product-nav > li:hover {
   height: 200px;
   border-radius: 4px;
   object-fit: cover;
-  transition: all 0.2s; }
+  transition: all 0.2s;
+  box-shadow: #00000029 0px 0px 2px 1px; }
 
 #room_info_hotel_images .image-item img:hover {
   transform: scale(1.05); }

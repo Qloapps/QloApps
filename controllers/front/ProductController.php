@@ -357,11 +357,12 @@ class ProductControllerCore extends FrontController
                     // booking preparation time
                     $preparationTime = (int) HotelOrderRestrictDate::getPreparationTime($hotel_id);
 
+                    $objHotelImage = new HotelImage();
                     $hotelImageLink = null;
                     if ($coverImage = HotelImage::getCover($hotel_id)) {
                         $hotelImagesBaseDir = _MODULE_DIR_.'hotelreservationsystem/views/img/hotel_img/';
                         $hotelImageLink = $this->context->link->getMediaLink(
-                            $hotelImagesBaseDir.$coverImage['hotel_image_id'].'.jpg'
+                            $objHotelImage->getImageLink($coverImage['id'], ImageType::getFormatedName('large'))
                         );
                     }
 
@@ -603,6 +604,7 @@ class ProductControllerCore extends FrontController
             $quantity = 1;
         }
 
+        $totalAvailableRooms = 0;
         if ($hotelRoomData = $objBookingDetail->DataForFrontSearch($bookingParams)) {
             $totalAvailableRooms = $hotelRoomData['stats']['num_avail'];
             $quantity = ($quantity > $totalAvailableRooms) ? $totalAvailableRooms : $quantity;
@@ -1244,7 +1246,8 @@ class ProductControllerCore extends FrontController
         $hotelImagesBaseDir = _MODULE_DIR_.'hotelreservationsystem/views/img/hotel_img/';
         foreach ($hotelImages as &$hotelImage) {
             $hotelImage['link'] = $this->context->link->getMediaLink(
-                $hotelImagesBaseDir.$hotelImage['hotel_image_id'].'.jpg'
+                $objHotelImage->getImageLink($hotelImage['id'],
+                ImageType::getFormatedName('large'))
             );
         }
 
