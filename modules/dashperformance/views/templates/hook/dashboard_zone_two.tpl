@@ -50,7 +50,7 @@
 					</div>
 				</div>
 				<div class="col-xs-6 col-lg-3">
-					<div class="stat-box label-tooltip" data-toggle="tooltip" data-original-title="{l s='Total Revenue Per Available Room (TrevPAR) measures the total revenue being generated per available room including additional facilities.' mod='dashperformance'}" data-placement="top" style="background-color: #B6FFB6;">
+					<div class="stat-box label-tooltip" data-toggle="tooltip" data-original-title="{l s='Total Revenue Per Available Room (TrevPAR) measures the total revenue being generated per available room including additional facilities and service products.' mod='dashperformance'}" data-placement="top" style="background-color: #B6FFB6;">
 						<div class="title-wrapper">
 							<p>{l s='Total Revenue Per Available Room' mod='dashperformance'}</p>
 						</div>
