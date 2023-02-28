@@ -85,7 +85,7 @@
 															</div>
 															<div class="col-xs-6 occupancy_count_block">
 																<div class="col-sm-12">
-																	<label>{l s='Child'} <span class="label-desc-txt"></span></label>
+																	<label>{l s='Children'} <span class="label-desc-txt"></span></label>
 																	<input type="number" class="form-control num_occupancy num_children" name="occupancy[0][children]" value="{$data['children']}" min="0" max="{$data['room_type_info']['max_children']|escape:'html':'UTF-8'}">
 																	({l s='Below'}  {$max_child_age|escape:'htmlall':'UTF-8'} {l s='years'})
 																</div>
