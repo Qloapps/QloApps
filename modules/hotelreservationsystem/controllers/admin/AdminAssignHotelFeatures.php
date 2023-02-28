@@ -40,11 +40,12 @@ class AdminAssignHotelFeaturesController extends ModuleAdminController
         $this->_join .= 'LEFT JOIN `'._DB_PREFIX_.'htl_branch_info` hi ON (hi.`id` = a.`id_hotel`)';
         $this->_join .= 'LEFT JOIN `'._DB_PREFIX_.'htl_branch_info_lang` hil
         ON (hi.`id` = hil.`id` AND hil.id_lang = '.(int)$this->context->language->id.')';
-        $this->_join .= 'LEFT JOIN `'._DB_PREFIX_.'state` s ON (s.`id_state` = hi.`state_id`)';
-        $this->_join .= 'LEFT JOIN `'._DB_PREFIX_.'country_lang` cl ON (cl.`id_country` = hi.`country_id`
+        $this->_join .= 'LEFT JOIN `'._DB_PREFIX_.'address` addr ON (addr.`id_hotel` = hi.`id`)';
+        $this->_join .= 'LEFT JOIN `'._DB_PREFIX_.'state` s ON (s.`id_state` = addr.`id_state`)';
+        $this->_join .= 'LEFT JOIN `'._DB_PREFIX_.'country_lang` cl ON (cl.`id_country` = addr.`id_country`
         AND cl.`id_lang` = '.(int)$this->context->language->id.')';
 
-        $this->_select .= 'hi.`city` as htl_city, hi.`id` as htl_id, hil.`hotel_name` as htl_name,
+        $this->_select .= 'addr.`city` as htl_city, hi.`id` as htl_id, hil.`hotel_name` as htl_name,
         s.`name` as `state_name`, cl.`name`';
         $this->_group = 'GROUP BY a.`id_hotel`';
 
