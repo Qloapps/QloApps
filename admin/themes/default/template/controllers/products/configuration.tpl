@@ -240,8 +240,6 @@
     var prod_link = "{$link->getAdminLink('AdminProducts')}";
     var rm_status = {$rm_status|@json_encode};
     var currentRoomRow = 0;
-    var datesMissing = "{$datesMissing}";
-    var datesOverlapping = "{$datesOverlapping}";
 
     $(document).ready(function() {
         const DisableDatesModal = {
@@ -303,13 +301,12 @@
                 });
             },
             showErrors: function(errors) {
-                $('#deactiveDatesModal .errors-wrap').stop().html(errors);
-                $('#deactiveDatesModal .errors-wrap').show(200);
+                $('#deactiveDatesModal .errors-wrap').html(errors);
+                $('#deactiveDatesModal .errors-wrap').show();
             },
             hideErrors: function() {
-                $('#deactiveDatesModal .errors-wrap').hide(200, function() {
-                    $('#deactiveDatesModal .errors-wrap').html('');
-                });
+                $('#deactiveDatesModal .errors-wrap').hide();
+                $('#deactiveDatesModal .errors-wrap').html('');
             },
             addInvalidRowDataMarkers: function(rowsToHighlight) {
                 rowsToHighlight.map(function (rowIndex) {
@@ -380,7 +377,17 @@
             }
 
             disableDates = JSON.parse(disableDates);
+            DisableDatesModal.hideErrors();
             DisableDatesModal.populateWithDatesInfo(disableDates);
+        });
+
+        // Disable dates data filling when model open
+        $('#deactiveDatesModal').on('hide.bs.modal', function(e) {
+            const disableDates = DisableDatesModal.getDisableDatesInfo();
+            console.log(disableDates);
+            const roomRowIndex = parseInt($('#deactiveDatesModal table.room-disable-dates').attr('data-room-row-index'));
+            const roomRow = $('#product-configuration .hotel-room tr.room_data_values[data-row-index='+roomRowIndex+']');
+            $(roomRow).find('.disable_dates_json').val(JSON.stringify(disableDates));
         });
 
         // copy json formatted dates to room

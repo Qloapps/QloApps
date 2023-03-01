@@ -2779,8 +2779,6 @@ class AdminProductsControllerCore extends AdminController
                             'product' => $obj,
                             'htl_info' => $hotelInfo,
                             'rm_status' => $roomStatus,
-                            'datesMissing' => $this->l('Some dates are missing. Please select all the date ranges.'),
-                            'datesOverlapping' => $this->l('Some dates are conflicting with each other. Please check and reselect the date ranges.'),
                         )
                     );
                 } else {
@@ -4640,6 +4638,7 @@ class AdminProductsControllerCore extends AdminController
         $disableDates = Tools::getValue('disable_dates');
 
         $rowsToHighlight = array();
+        $bookedRows = array();
         if (is_array($disableDates) && count($disableDates)) {
             foreach ($disableDates as $key => $dateRange) {
                 if (!Validate::isDate($dateRange['date_from']) || !Validate::isDate($dateRange['date_to'])) {
@@ -4652,8 +4651,8 @@ class AdminProductsControllerCore extends AdminController
                 foreach ($disableDates as $keyOuter => $dateRangeOuter) {
                     foreach ($disableDates as $keyInner => $dateRangeInner) {
                         if ($keyInner != $keyOuter) {
-                            if ((strtotime($dateRangeOuter['date_from']) <= strtotime($dateRangeInner['date_to']))
-                                && (strtotime($dateRangeInner['date_from']) <= strtotime($dateRangeOuter['date_to']))
+                            if ((($dateRangeOuter['date_from'] >= $dateRangeInner['date_from']) && ($dateRangeOuter['date_from'] < $dateRangeInner['date_to']))
+                                || (($dateRangeInner['date_from'] >= $dateRangeOuter['date_from']) && ($dateRangeInner['date_from'] < $dateRangeOuter['date_to']))
                             ) {
                                 $this->errors[] = $this->l('Some dates are conflicting with each other. Please check and reselect the date ranges.');
                                 $rowsToHighlight[] = $keyOuter;
@@ -4668,8 +4667,8 @@ class AdminProductsControllerCore extends AdminController
                 if ($idRoom) {
                     $objHotelBookingDetail = new HotelBookingDetail();
                     foreach ($disableDates as $key => $dateRange) {
-                        if ($objHotelBookingDetail->chechRoomBooked($idRoom, $dateRange['date_from'], $dateRange['date_to'])) {
-                            $this->errors[] = $this->l('This room has been booked for highlighted date range(s). Please reselect the date ranges.');
+                        if ($bookingRow = $objHotelBookingDetail->chechRoomBooked($idRoom, $dateRange['date_from'], $dateRange['date_to'])) {
+                            $bookedRows[] = new HotelBookingDetail($bookingRow['id']);
                             $rowsToHighlight[] = $key;
                         }
                     }
@@ -4677,8 +4676,17 @@ class AdminProductsControllerCore extends AdminController
             }
         }
 
+        if (count($bookedRows)) {
+            $this->context->smarty->assign(array(
+                'link' => $this->context->link,
+                'booked_rows_list' => $bookedRows,
+            ));
+
+            $this->errors[] = $this->context->smarty->fetch('controllers/products/booked_room_date_ranges_list.tpl');
+        }
+
         $this->errors = array_unique($this->errors);
-        $rowsToHighlight = array_unique($rowsToHighlight);
+        $rowsToHighlight = array_values(array_unique($rowsToHighlight));
 
         if (!count($this->errors)) {
             $response['status'] = true;
