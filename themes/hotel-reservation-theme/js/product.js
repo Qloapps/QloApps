@@ -1029,7 +1029,9 @@ function checkUrl() {
 /*#####################################################################*/
 
 $(document).ready(function() {
-    BookingForm.init();
+    if (!PS_CATALOG_MODE) {
+        BookingForm.init();
+    }
 
     $(document).on('QloApps:updateRoomOccupancy', function(e) {
         BookingForm.refresh();
