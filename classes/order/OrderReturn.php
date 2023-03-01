@@ -219,13 +219,13 @@ class OrderReturnCore extends ObjectModel
                     0
                 );
                 $bookingRow['additional_services_tax_excl'] = $objRoomTypeServiceProductOrderDetail->getroomTypeServiceProducts(
-                    $id_order,
+                    $bookingRow['id_order'],
                     0,
                     0,
-                    $type_value['product_id'],
-                    $data_v['date_from'],
-                    $data_v['date_to'],
-                    $data_v['id_room'],
+                    $bookingRow['id_product'],
+                    $bookingRow['date_from'],
+                    $bookingRow['date_to'],
+                    $bookingRow['id_room'],
                     1,
                     0
                 );
