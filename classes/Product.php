@@ -240,7 +240,6 @@ class ProductCore extends ObjectModel
     public $cache_has_attachments;
     public $is_virtual;
     public $booking_product;
-    public $is_invisible;
     public $id_pack_product_attribute;
     public $cache_default_attribute;
 
@@ -297,7 +296,6 @@ class ProductCore extends ObjectModel
             'cache_has_attachments' =>        array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
             'is_virtual' =>                array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
             'booking_product' =>                array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
-            'is_invisible' =>                array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
             'service_product_type' =>        array('type' => self::TYPE_INT, 'validate' => 'isUnsignedInt'),
 
             /* Shop fields */
@@ -992,7 +990,7 @@ class ProductCore extends ObjectModel
     public function deleteServiceInfo()
     {
         if (!RoomTypeServiceProduct::deleteRoomProductLink($this->id)
-            ||RoomTypeServiceProductPrice::deleteRoomProductPrices($this->id)
+            || !RoomTypeServiceProductPrice::deleteRoomProductPrices($this->id)
         ) {
             return false;
         }
@@ -1339,7 +1337,6 @@ class ProductCore extends ObjectModel
                 .($sub_category? ' AND product_shop.`id_category_default` = '.(int)$sub_category : '')
                 .($front ? ' AND product_shop.`show_at_front` = 1':'')
                 .(!is_null($auto_add_to_cart) ? ' AND product_shop.`auto_add_to_cart` = '.$auto_add_to_cart:'')
-                .($front ? ' AND p.`is_invisible` = 0':'')
                 .($available_for_order != 2 ? ' AND p.`available_for_order` = '.(int)$available_for_order:'')
                 .($active ? ' AND product_shop.`active` = 1' : '');
             return (int)Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue($sql);
@@ -1384,7 +1381,6 @@ class ProductCore extends ObjectModel
                     .($sub_category? ' AND product_shop.`id_category_default` = '.(int)$sub_category : '')
                     .($front ? ' AND product_shop.`show_at_front` = 1':'')
                     .(!is_null($auto_add_to_cart) ? ' AND product_shop.`auto_add_to_cart` = '.$auto_add_to_cart:'')
-                    .($front ? ' AND p.`is_invisible` = 0':'')
                     .($available_for_order != 2 ? ' AND p.`available_for_order` = '.(int)$available_for_order:'')
                     .($active ? ' AND product_shop.`active` = 1' : '');
 
@@ -1429,7 +1425,6 @@ class ProductCore extends ObjectModel
                     AND p.`service_product_type` = '.(int)self::SERVICE_PRODUCT_WITH_ROOMTYPE. '
                     AND product_shop.`id_shop` = '.(int)$context->shop->id
                     .($front ? ' AND product_shop.`auto_add_to_cart` = 0 AND product_shop.`show_at_front` = 1':'')
-                    .($front ? ' AND p.`is_invisible` = 0':'')
                     .($active ? ' AND product_shop.`active` = 1' : '');
 
 

@@ -568,10 +568,6 @@ class CartCore extends ObjectModel
             $sql->where('cp.`id_product` = '.(int)$id_product);
         }
         $sql->where('p.`id_product` IS NOT NULL');
-        // hide invisible products
-        // if ($front) {
-        //     $sql->where('p.`is_invisible` = 0');
-        // }
 
         // Build ORDER BY
         $sql->orderBy('cp.`date_add`, cp.`id_product`, cp.`id_product_attribute` ASC');

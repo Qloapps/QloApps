@@ -1318,12 +1318,13 @@ class ProductControllerCore extends FrontController
     public function displayAjaxCheckServiceProductWithRoomType()
     {
         $response = array(
-            'status' => false
+            'success' => false
         );
 
         if ($this->isTokenValid()) {
             $idProduct = Tools::getValue('id_product');
             $idServiceProduct = Tools::getValue('service_product');
+            $addedServiceProduct = Tools::getValue('added_service_product');
             if (Validate::isLoadedObject($objProduct = new Product($idProduct))) {
                 if (!Product::isBookingProduct($idProduct)) {
                     $response['error'] = Tools::displayError('Room Type info not Found');
@@ -1334,7 +1335,22 @@ class ProductControllerCore extends FrontController
                 if (!$objRoomTypeServiceProduct->isRoomTypeLinkedWithProduct($idProduct, $idServiceProduct)) {
                     $response['error'] = Tools::displayError('Selected product is not available with current room type');
                 } else {
-                    $response['status'] = true;
+                    if (Validate::isLoadedObject($objServiceProduct = new Product($idServiceProduct))) {
+                        $response['success'] = true;
+                        if (!$objServiceProduct->allow_multiple_quantity && !empty($addedServiceProduct)) {
+                            if (!in_array($idServiceProduct, array_column($addedServiceProduct, 'id_product'))) {
+                                $response['add'] = true;
+                                $response['msg'] = 'Service is added to cart.';
+                            } else {
+                                $response['msg'] = 'Service already added.';
+                            }
+                        } else {
+                            $response['add'] = true;
+                            $response['msg'] = 'Service is added to cart.';
+                        }
+                    } else {
+                        $response['error'] = Tools::displayError('Service not Found');
+                    }
                 }
             } else {
                 $response['error'] = Tools::displayError('Room Type not Found');

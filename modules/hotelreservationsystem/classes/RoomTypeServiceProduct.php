@@ -182,6 +182,8 @@ class RoomTypeServiceProduct extends ObjectModel
                     1,
                     $useTax
                 );
+
+                $serviceProduct['images'] = Image::getImages((int)Context::getContext()->language->id, $serviceProduct['id_product']);
             }
         }
 
