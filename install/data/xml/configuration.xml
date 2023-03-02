@@ -686,6 +686,24 @@
 	<configuration id="ROOM_TYPE_CHECKUP_TOTAL_ROOMS_GT" name="ROOM_TYPE_CHECKUP_TOTAL_ROOMS_GT">
 		<value>3</value>
 	</configuration>
+	<configuration id="SERVICE_CHECKUP_DESCRIPTIONS_SHORT_LT" name="SERVICE_CHECKUP_DESCRIPTIONS_SHORT_LT">
+		<value>50</value>
+	</configuration>
+	<configuration id="SERVICE_CHECKUP_DESCRIPTIONS_SHORT_GT" name="SERVICE_CHECKUP_DESCRIPTIONS_GT">
+		<value>150</value>
+	</configuration>
+	<configuration id="SERVICE_CHECKUP_IMAGES_LT" name="SERVICE_CHECKUP_IMAGES_LT">
+		<value>1</value>
+	</configuration>
+	<configuration id="SERVICE_CHECKUP_IMAGES_GT" name="SERVICE_CHECKUP_IMAGES_GT">
+		<value>2</value>
+	</configuration>
+	<configuration id="SERVICE_CHECKUP_ORDERS_LT" name="SERVICE_CHECKUP_ORDERS_LT">
+		<value>1</value>
+	</configuration>
+	<configuration id="SERVICE_CHECKUP_ORDERS_GT" name="SERVICE_CHECKUP_ORDERS_GT">
+		<value>2</value>
+	</configuration>
 	<configuration id="FOOTER_CMS" name="FOOTER_CMS">
 		<value>0_3|0_4</value>
 	</configuration>
