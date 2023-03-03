@@ -59,6 +59,15 @@
 										{/foreach}
 										</ul>
 									{/if}
+									{if isset($data['selected_additional_service'][$data['id']]['selected_products_info']) && $data['selected_additional_service'][$data['id']]['selected_products_info']}
+										<ul class="extra-demand-list">
+										{foreach $data['selected_additional_service'][$data['id']]['selected_products_info'] as $selectedService}
+											<li>
+												{$selectedService.name|escape:'html':'UTF-8'}
+											</li>
+										{/foreach}
+										</ul>
+									{/if}
 								</td>
 								<td>{dateFormat date=$data.date_from} - {dateFormat date=$data.date_to}</td>
 								{if $occupancy_required_for_booking}
