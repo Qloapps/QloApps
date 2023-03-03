@@ -3523,7 +3523,7 @@ class CartCore extends ObjectModel
             $module = Module::getInstanceByName($module_name);
 
             if (Validate::isLoadedObject($module)) {
-                if (array_key_exists('id_carrier', $module)) {
+                if (property_exists($module, 'id_carrier')) {
                     $module->id_carrier = $carrier->id;
                 }
                 if ($carrier->need_range) {
