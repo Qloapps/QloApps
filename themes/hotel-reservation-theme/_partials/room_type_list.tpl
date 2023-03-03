@@ -49,7 +49,7 @@
 								{/if}
 							</div>
 							<div class="col-sm-12 hidden-md hidden-lg">
-								<p class="capa_txt"><span>{l s='Max Capacity:'}</span><span class="capa_data"> {$room_v['max_adults']|escape:'htmlall':'UTF-8'} {l s='Adults'}, {$room_v['max_children']|escape:'htmlall':'UTF-8'} {l s='child'}</span></p>
+								<p class="capa_txt"><span>{$room_v['max_guests']|escape:'htmlall':'UTF-8'} {l s='Max guests:'}</span><span class="capa_data"> {$room_v['max_adults']|escape:'htmlall':'UTF-8'} {l s='Adults'}, {$room_v['max_children']|escape:'htmlall':'UTF-8'} {if $room_v['children'] > 1}{l s='Children'}{else}{l s='Child'}{/if}</span></p>
 							</div>
 							<div class="col-sm-12 col-md-7 col-lg-6">
 								{if !isset($restricted_country_mode) && !$PS_CATALOG_MODE && !$order_date_restrict}
@@ -70,7 +70,7 @@
 								{/if}
 							</div>
 							<div class="col-md-4 col-lg-3 visible-md visible-lg">
-								<div class="capa_txt"><span>{l s='Max Capacity:'}</span><br><span class="capa_data"> {$room_v['max_adults']|escape:'htmlall':'UTF-8'} {l s='Adults'}, {$room_v['max_children']|escape:'htmlall':'UTF-8'} {l s='child'}</span></div>
+								<div class="capa_txt"><span>{$room_v['max_guests']|escape:'htmlall':'UTF-8'} {l s='Max guests:'}</span><br><span class="capa_data"> {$room_v['max_adults']|escape:'htmlall':'UTF-8'} {l s='Adults'}, {$room_v['max_children']|escape:'htmlall':'UTF-8'} {if $room_v['children'] > 1}{l s='Children'}{else}{l s='Child'}{/if}</span></div>
 							</div>
 							<div class="col-sm-12 col-md-8 col-lg-9">
 								<div class="booking_room_fields">
