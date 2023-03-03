@@ -40,27 +40,15 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
         }
 
         if (!isset($this->context->cookie->id_cart)) {
-            // create a new cart
-            $objCart = new Cart();
-            $objCart->recyclable = 0;
-            $objCart->gift = 0;
-            $objCart->id_shop = (int) $this->context->shop->id;
-            $objCart->id_lang = (($id_lang = (int) Tools::getValue('id_lang')) ? $id_lang : (int) Configuration::get('PS_LANG_DEFAULT'));
-            $objCart->id_currency = (($id_currency = (int) Tools::getValue('id_currency')) ? $id_currency : (int) Configuration::get('PS_CURRENCY_DEFAULT'));
-            $objCart->id_address_delivery = 0;
-            $objCart->id_address_invoice = 0;
-            $objCart->id_currency = (int) Configuration::get('PS_CURRENCY_DEFAULT');
-            $objCart->id_guest = (int) $this->context->cookie->id_guest;
-            $objCart->setNoMultishipping();
-
-            $this->context->cart = $objCart;
-            $this->context->cart->save();
-
+            $objCart = $this->createNewCart();
             $this->context->cookie->id_cart = (int) $objCart->id;
         } else {
             // use previous cart
-            $this->context->cart = new Cart($this->context->cookie->id_cart);
+            if (!validate::isLoadedObject($objCart = new Cart($this->context->cookie->id_cart))) {
+                $objCart = $this->createNewCart();
+            }
         }
+        $this->context->cart = $objCart;
 
         $objCustomer = new Customer();
         $objCustomer->id_gender = 0;
@@ -76,6 +64,26 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
 
         $this->context->customer = $objCustomer;
     }
+
+    protected function createNewCart()
+    {
+        // create a new cart
+        $objCart = new Cart();
+        $objCart->recyclable = 0;
+        $objCart->gift = 0;
+        $objCart->id_shop = (int) $this->context->shop->id;
+        $objCart->id_lang = (($id_lang = (int) Tools::getValue('id_lang')) ? $id_lang : (int) Configuration::get('PS_LANG_DEFAULT'));
+        $objCart->id_currency = (($id_currency = (int) Tools::getValue('id_currency')) ? $id_currency : (int) Configuration::get('PS_CURRENCY_DEFAULT'));
+        $objCart->id_address_delivery = 0;
+        $objCart->id_address_invoice = 0;
+        $objCart->id_currency = (int) Configuration::get('PS_CURRENCY_DEFAULT');
+        $objCart->id_guest = (int) $this->context->cookie->id_guest;
+        $objCart->setNoMultishipping();
+
+        $objCart->save();
+        return $objCart;
+    }
+
 
     public function postProcess()
     {
