@@ -2020,15 +2020,13 @@ class AdminNormalProductsControllerCore extends AdminController
         // we have removed seo tab as it is currently not required, but in product object requires link_rewrite
         // so adding link_rewrite in $_POST
         if (Configuration::get('PS_FORCE_FRIENDLY_PRODUCT') || !Validate::isLoadedObject($this->object)) {
-            $link_rewrite = $_POST['name_'.$default_language->id];
-            if (!Configuration::get('PS_ALLOW_ACCENTED_CHARS_URL')) {
-                $link_rewrite = Tools::replaceAccentedChars($link_rewrite);
+            foreach ($languages as $lang) {
+                $_POST['link_rewrite_'.$lang['id_lang']] = Tools::link_rewrite(Tools::getValue('name_'.$lang['id_lang']));
             }
-            $link_rewrite = str_replace(' ', '-', $link_rewrite);
-            $link_rewrite = preg_replace('/[\/\\"\'|,;%]*/', '', $link_rewrite);
-            $_POST['link_rewrite_'.$default_language->id] = $link_rewrite;
         } else {
-            $_POST['link_rewrite_'.$default_language->id] = $this->object->link_rewrite[$default_language->id];
+            foreach ($languages as $lang) {
+                $_POST['link_rewrite_'.$lang['id_lang']] = $this->object->link_rewrite[$lang['id_lang']];
+            }
         }
         // end
 
