@@ -1114,6 +1114,30 @@
 					</table>
 				</div>
 			{/if}
+			<div class="panel">
+				<div class="panel-heading">
+					<i class="icon-list"></i> {l s='Cancellation Policies'}
+				</div>
+				{if is_array($applicable_refund_policies) && count($applicable_refund_policies)}
+					<ul>
+						{foreach from=$applicable_refund_policies item=$applicable_refund_policy}
+							<li>
+								<p>
+									<a href="{$link->getAdminLink('AdminOrderRefundRules')|escape:'html':'UTF-8'}&id_refund_rule={$applicable_refund_policy.id_refund_rule}&updatehtl_order_refund_rules" target="_blank">
+										{$applicable_refund_policy.name|escape:'html':'UTF-8'}
+										<i class="icon-external-link"></i>
+									</a>
+								</p>
+							</li>
+						{/foreach}
+					</ul>
+				{else}
+					<p>
+						<i class="icon-warning-sign list-empty-icon"></i>
+						{l s='No cancellation policies applicable.'}
+					</p>
+				{/if}
+			</div>
 			{hook h="displayAdminOrderRight" id_order=$order->id}
 		</div>
 	</div>

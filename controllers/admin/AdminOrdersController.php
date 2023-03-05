@@ -1661,9 +1661,13 @@ class AdminOrdersControllerCore extends AdminController
 
         // hotel booking statuses
         $htlOrderStatus = HotelBookingDetail::getAllHotelOrderStatus();
+
+        // applicable refund policies
+        $applicableRefundPolicies = HotelOrderRefundRules::getApplicableRefundRules($order->id);
         $this->tpl_view_vars = array(
             // refund info
             'refund_allowed' => (int) $order->isReturnable(),
+            'applicable_refund_policies' => $applicableRefundPolicies,
             'returns' => OrderReturn::getOrdersReturn($order->id_customer, $order->id),
             'refundReqBookings' => $refundReqBookings,
             'hasCompletelyRefunded' => $order->hasCompletelyRefunded(),

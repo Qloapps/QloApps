@@ -222,4 +222,38 @@ class HotelOrderRefundRules extends ObjectModel
 
         return $totalCancelationCharges;
     }
+
+    public static function getApplicableRefundRules($idOrder)
+    {
+        $idLang = Context::getContext()->language->id;
+
+        $minDate = Db::getInstance()->getValue(
+            'SELECT MIN(DATE(hbd.`date_from`))
+            FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+            WHERE hbd.`id_order` = '.(int) $idOrder
+        );
+
+        if (!$minDate) {
+            return array();
+        }
+
+        $dateToday = date('Y-m-d');
+
+        if (strtotime($minDate) < strtotime($dateToday)) { // same day cancellation rules are allowed
+            $minDate = $dateToday;
+        }
+
+        $days = HotelBookingDetail::getDays($dateToday, $minDate);
+
+        $sql = 'SELECT *
+        FROM `'._DB_PREFIX_.'htl_branch_refund_rules` hrr
+        LEFT JOIN `'._DB_PREFIX_.'htl_order_refund_rules` orr
+        ON (orr.`id_refund_rule` = hrr.`id_refund_rule`)
+        LEFT JOIN `'._DB_PREFIX_.'htl_order_refund_rules_lang` orrl
+        ON (orrl.`id_refund_rule` = orr.`id_refund_rule` AND orrl.`id_lang` = '.(int) $idLang.')
+        WHERE orr.`days` <= '.(int) $days.'
+        ORDER BY orr.`days` DESC';
+
+        return Db::getInstance()->executeS($sql);
+    }
 }
