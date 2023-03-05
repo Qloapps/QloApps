@@ -90,7 +90,7 @@ class AdminNormalProductsControllerCore extends AdminController
         parent::__construct();
 
         $this->imageType = 'jpg';
-        $this->_defaultOrderBy = 'position';
+        $this->_defaultOrderBy = 'id_product';
         $this->max_file_size = (int)(Configuration::get('PS_LIMIT_UPLOAD_FILE_VALUE') * 1000000);
         $this->max_image_size = (int)Configuration::get('PS_PRODUCT_PICTURE_MAX_SIZE');
         $this->allow_export = true;
