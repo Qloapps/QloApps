@@ -1991,7 +1991,9 @@ class CartCore extends ObjectModel
                     }
                 }
             }
-            $order_total_discount = min(Tools::ps_round($order_total_discount, 2), (float)$order_total_products) + (float)$order_shipping_discount;
+            if ($type != Cart::ADVANCE_PAYMENT) {
+                $order_total_discount = min(Tools::ps_round($order_total_discount, 2), (float)$order_total_products) + (float)$order_shipping_discount;
+            }
             if ($type == Cart::ADVANCE_PAYMENT) {
                 // get order total without discount
                 $total_without_discount = $this->getOrderTotal() + $order_total_discount;
