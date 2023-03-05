@@ -1065,7 +1065,9 @@
 						<thead>
 							<tr>
 								<th class="text-left">{l s='Refund ID'}</th>
+								<th class="text-center">{l s='Total Rooms'}</th>
 								<th class="text-left">{l s='Status'}</th>
+								<th class="text-center">{l s='Requested Date'}</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -1073,6 +1075,9 @@
 							<tr>
 								<td class="text-left">
 									<a href="{$link->getAdminLink('AdminOrderRefundRequests')}&vieworder_return&id_order_return={$return_info.id_order_return}" target="_blank">#{$return_info.id_order_return}</a>
+								</td>
+								<td class="text-center">
+									{$return_info.total_rooms|escape:'html':'UTF-8'}
 								</td>
 								<td class="text-left">
 									{capture name=refund_status}
@@ -1107,6 +1112,9 @@
 									{else}
 										{$return_info.state_name}
 									{/if}
+								</td>
+								<td class="text-center">
+									{$return_info.date_add}
 								</td>
 							</tr>
 							{/foreach}
