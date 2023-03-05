@@ -77,6 +77,9 @@ class ProductCore extends ObjectModel
     /** @var bool allow order for multiple quantities */
     public $allow_multiple_quantity;
 
+    /** @var bool max allowed quantities */
+    public $max_quantity;
+
     /** @var string available_now */
     public $available_now;
 
@@ -308,6 +311,7 @@ class ProductCore extends ObjectModel
             'ecotax' =>                    array('type' => self::TYPE_FLOAT, 'shop' => true, 'validate' => 'isPrice'),
             'minimal_quantity' =>            array('type' => self::TYPE_INT, 'shop' => true, 'validate' => 'isUnsignedInt'),
             'allow_multiple_quantity' =>     array('type' => self::TYPE_BOOL, 'shop' => true, 'validate' => 'isBool'),
+            'max_quantity' =>                array('type' => self::TYPE_INT, 'shop' => true, 'validate' => 'isUnsignedInt'),
             'price' =>                        array('type' => self::TYPE_FLOAT, 'shop' => true, 'validate' => 'isPrice', 'required' => true),
             'wholesale_price' =>            array('type' => self::TYPE_FLOAT, 'shop' => true, 'validate' => 'isPrice'),
             'unity' =>                        array('type' => self::TYPE_STRING, 'shop' => true, 'validate' => 'isString'),
