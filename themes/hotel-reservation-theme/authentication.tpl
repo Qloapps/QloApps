@@ -50,11 +50,13 @@
 	</div>
 	{/if}-->
 	<div class="row">
-		<div class="col-xs-12">
-			<div class="alert alert-success" id="guest_transform_success" style="display:none">
-				{l s='Your guest account has been transformed into a customer account successfully and the login credentials have been sent to you. Please make sure to change the password for security.'}
+		{if isset($smarty.get.guest_transform_success) && $smarty.get.guest_transform_success}
+			<div class="col-xs-12">
+				<div class="alert alert-success">
+					{l s='Your guest account has been transformed into a customer account successfully and the login credentials have been sent to you. Please make sure to change the password for security.'}
+				</div>
 			</div>
-		</div>
+		{/if}
 		<div class="col-xs-12 col-sm-6">
 			<form action="{$link->getPageLink('authentication', true)|escape:'html':'UTF-8'}" method="post" id="create-account_form" class="box">
 				<h3 class="page-subheading">{l s='Create an account'}</h3>
