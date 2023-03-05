@@ -44,21 +44,21 @@
 			<table class="table table-bordered">
 				<thead>
 					<tr>
-						<th>{l s='Refund Id'}</th>
 						<th>{l s='Order'}</th>
+						<th>{l s='Total rooms'}</th>
 						<th>{l s='Refund status'}</th>
 						<th>{l s='Date requested'}</th>
-						<th></th>
+						<th>{l s='Actions'}</th>
 					</tr>
 				</thead>
 				<tbody>
 					{foreach from=$ordersReturns item=return}
 						<tr>
 							<td>
-								<a href="{$link->getPageLink('order-return', true)|escape:'html':'UTF-8'}&amp;id_order_return={$return.id_order_return|escape:'html':'UTF-8'}">{l s='#'}{$return.id_order_return|escape:'html':'UTF-8'}</a>
+								#{$return.reference|escape:'html':'UTF-8'}
 							</td>
 							<td>
-								#{$return.reference|escape:'html':'UTF-8'}
+								{$return.total_rooms|escape:'html':'UTF-8'}
 							</td>
 							<td>
 								<span class="badge wk-badge" style="background-color:{$return.state_color|escape:'html':'UTF-8'}">{$return.state_name|escape:'html':'UTF-8'}</span>

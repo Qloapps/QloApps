@@ -260,14 +260,17 @@ class OrderReturnCore extends ObjectModel
         if (!$context) {
             $context = Context::getContext();
         }
-        $sql = 'SELECT *
+        $sql = 'SELECT *, orr.*, COUNT(ord.`id_order_return_detail`) AS total_rooms
         FROM `'._DB_PREFIX_.'order_return` orr
+        LEFT JOIN `'._DB_PREFIX_.'order_return_detail` ord
+        ON (ord.`id_order_return` = orr.`id_order_return`)
         LEFT JOIN `'._DB_PREFIX_.'order_slip` ors
         ON (ors.`id_order_slip` = orr.`id_return_type` AND orr.`return_type` = '.(int) self::RETURN_TYPE_ORDER_SLIP.')
         WHERE orr.`id_customer` = '.(int)$customer_id.
         ($only_customer ? ' AND orr.`by_admin` = 0' : '').
         ($order_id ? ' AND orr.`id_order` = '.(int)$order_id : '').
         ($no_denied ? ' AND orr.`state` != 4' : '').'
+        GROUP BY orr.`id_order_return`
         ORDER BY orr.`date_add` DESC';
         $data = Db::getInstance()->executeS($sql);
         foreach ($data as $k => $or) {
