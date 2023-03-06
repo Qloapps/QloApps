@@ -718,7 +718,7 @@ class FrontControllerCore extends Controller
             'css_files'      => $this->css_files,
             'js_files'       => ($this->getLayout() && (bool)Configuration::get('PS_JS_DEFER')) ? array() : $this->js_files,
             'js_defer'       => (bool)Configuration::get('PS_JS_DEFER'),
-            'errors'         => $this->errors,
+            'errors'         => array_unique($this->errors),
             'display_header' => $this->display_header,
             'display_footer' => $this->display_footer,
         ));
