@@ -114,6 +114,10 @@ class ProductControllerCore extends FrontController
             $this->product = new Product($id_product, true, $this->context->language->id, $this->context->shop->id);
         }
 
+        if (!$this->product->booking_product) {
+            Tools::redirect($this->context->link->getPageLink('pagenotfound'));
+        }
+
         if (!Validate::isLoadedObject($this->product)) {
             header('HTTP/1.1 404 Not Found');
             header('Status: 404 Not Found');
@@ -191,12 +195,6 @@ class ProductControllerCore extends FrontController
                 if (isset($this->context->cookie) && isset($this->category->id_category)) {
                     $this->context->cookie->last_visited_category = (int)$this->category->id_category;
                 }
-            }
-
-            if (!$this->product->booking_product) {
-                header('HTTP/1.1 403 Forbidden');
-                header('Status: 403 Forbidden');
-                $this->errors[] = Tools::displayError('You do not have access to this Product.');
             }
         }
     }
