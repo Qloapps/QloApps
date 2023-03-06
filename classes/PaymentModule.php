@@ -379,19 +379,23 @@ abstract class PaymentModuleCore extends Module
                             (float)$this->context->cart->getOrderTotal(true, Cart::ADVANCE_PAYMENT, $order->product_list, $id_carrier),
                             _PS_PRICE_COMPUTE_PRECISION_
                         );
-                        $order->amount_paid = (float)Tools::ps_round(
-                            (($order->advance_paid_amount * $amount_paid) / $this->context->cart->getOrderTotal(true, Cart::ADVANCE_PAYMENT, null, $id_carrier)),
-                            _PS_PRICE_COMPUTE_PRECISION_
-                        );
+                        if ($totalOrder = $this->context->cart->getOrderTotal(true, Cart::ADVANCE_PAYMENT, null, $id_carrier)) {
+                            $order->amount_paid = (float)Tools::ps_round(
+                                (($order->advance_paid_amount * $amount_paid) / $totalOrder),
+                                _PS_PRICE_COMPUTE_PRECISION_
+                            );
+                        }
                     } else {
                         $order->advance_paid_amount = (float)Tools::ps_round(
                             (float)$this->context->cart->getOrderTotal(true, Cart::BOTH, $order->product_list, $id_carrier),
                             _PS_PRICE_COMPUTE_PRECISION_
                         );
-                        $order->amount_paid = (float)Tools::ps_round(
-                            (($order->advance_paid_amount * $amount_paid) / $this->context->cart->getOrderTotal(true, Cart::BOTH, null, $id_carrier)),
-                            _PS_PRICE_COMPUTE_PRECISION_
-                        );
+                        if ($orderTotal = $this->context->cart->getOrderTotal(true, Cart::BOTH, null, $id_carrier)) {
+                            $order->amount_paid = (float)Tools::ps_round(
+                                (($order->advance_paid_amount * $amount_paid) / $orderTotal),
+                                _PS_PRICE_COMPUTE_PRECISION_
+                            );
+                        }
                     }
 
                     // Creating order
