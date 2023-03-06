@@ -24,7 +24,7 @@
             <i class="icon-user"></i> {l s='Room Type Additional Facilities'}
         </div>
         <div class="alert alert-info">
-            {l s='To create new Additiona facilities '} <a target="_blank" href="{$link->getAdminLink('AdminRoomTypeGlobalDemand')}">{l s='click here.'}</a>
+            {l s='To create new Additional facilities'} <a target="_blank" href="{$link->getAdminLink('AdminRoomTypeGlobalDemand')}">{l s='click here.'}</a>
         </div>
         {if isset($allDemands) && $allDemands}
             <div class="panel-group">
