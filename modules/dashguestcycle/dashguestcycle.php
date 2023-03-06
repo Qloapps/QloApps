@@ -170,7 +170,7 @@ class DashGuestCycle extends Module
             }
 
             $tr[] = array(
-                'value' => $arrivalInfo['adult'] + $arrivalInfo['children'],
+                'value' => $arrivalInfo['adults'] + $arrivalInfo['children'],
                 'class' => 'text-center',
             );
             $tr[] = array(
@@ -230,7 +230,7 @@ class DashGuestCycle extends Module
             }
 
             $tr[] = array(
-                'value' => $departureInfo['adult'] + $departureInfo['children'],
+                'value' => $departureInfo['adults'] + $departureInfo['children'],
                 'class' => 'text-center',
             );
             $tr[] = array(
@@ -291,7 +291,7 @@ class DashGuestCycle extends Module
             }
 
             $tr[] = array(
-                'value' => $inHouseInfo['adult'] + $inHouseInfo['children'],
+                'value' => $inHouseInfo['adults'] + $inHouseInfo['children'],
                 'class' => 'text-center',
             );
             $tr[] = array(
