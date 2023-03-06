@@ -603,6 +603,7 @@ class ProductControllerCore extends FrontController
             $quantity = 1;
         }
 
+        $totalAvailableRooms = 0;
         if ($hotelRoomData = $objBookingDetail->DataForFrontSearch($bookingParams)) {
             $totalAvailableRooms = $hotelRoomData['stats']['num_avail'];
             $quantity = ($quantity > $totalAvailableRooms) ? $totalAvailableRooms : $quantity;
