@@ -28,20 +28,20 @@ $(document).ready(function () {
 
     $("#hotel_images").on("change", function(event) {
         files = event.target.files;
+        var formData = new FormData();
         for (var i = 0; i < files.length; i++) {
-            var formData = new FormData();
             var file = files[i];
 
             if (typeof file != 'undefined') {
                 if (file.size > maxSizeAllowed) {
                     showErrorMessage(filesizeError + '[' + file.name +  ']');
                 } else {
-                    formData.append('hotel_image', file);
-                    uploadHotelImages(formData);
+                    formData.append('hotel_images[]', file);
                 }
             }
         }
-        $('#hotel_images').val(null);
+
+        uploadHotelImages(formData);
     });
 
     function uploadHotelImages(formData) {
@@ -52,68 +52,21 @@ $(document).ready(function () {
 
         $.ajax({
             type:'POST',
+            dataType:'JSON',
             url: adminHotelCtrlUrl,
             data: formData,
             cache:false,
             contentType: false,
             processData: false,
-            success:function(image){
-                image = JSON.parse(image);
-                if (!image.hasError) {
-                    $('.list-empty-tr').remove();
-                    var html = '';
-                    html += '<tr class="';
-                        if(image.cover) {
-                            html += 'cover-image-tr';
-                        }
-                    html += '">';
-                        html += '<td class="text-center">'+image.id_image+'</td>';
-                        html += '<td class="text-center">';
-                            html += '<a class="htl-img-preview" href="'+image.image_url+'">';
-                                html += '<img class="img-thumbnail" width="100" src="'+image.image_url+'"/>';
-                            html += '</a>';
-                        html += '</td>';
-                        html += '<td class="text-center ';
-                            if(image.cover) {
-                                html += 'cover-image-td';
-                            }
-                        html += '">';
-                            html += '<a href="#" class="';
-                                if(image.cover) {
-                                    html += 'text-success';
-                                } else {
-                                    html += 'text-danger';
-                                }
-                            html += ' changer-cover-image" data-id-hotel="'+idHotel+'" data-is-cover="';
-                                if(image.cover) {
-                                    html += '1';
-                                } else {
-                                    html += '0';
-                                }
-                            html += '" data-id-image="'+image.id_image+'">';
-                                if(image.cover) {
-                                    html += '<i class="icon-check"></i>';
-                                } else {
-                                    html += '<i class="icon-times"></i>';
-                                }
-                            html += '</a>';
-                        html += '</td>';
-                        html += '<td class="text-center">';
-                            html += '<button type="button" class="btn btn-default delete-hotel-image" data-id-hotel="'+idHotel+'" data-is-cover="';
-                                if(image.cover) {
-                                    html += '1';
-                                } else {
-                                    html += '0';
-                                }
-                            html += '" data-id-image="'+image.id_image+'"><i class="icon-trash"></i></button>';
-                        html += '</td>';
-                    html += '</tr>';
-                    $("#hotel-image-table tbody").append(html);
-
+            success:function(response) {
+                if (response.status) {
                     showSuccessMessage(imgUploadSuccessMsg);
+                    setTimeout(function() {
+                        location.reload();
+                    }, 1000);
                 } else {
-                    if (typeof image.message != 'undefined') {
-                        showErrorMessage(image.message);
+                    if (typeof response.errorMessage != 'undefined') {
+                        showErrorMessage(response.errorMessage);
                     } else {
                         showErrorMessage(imgUploadErrorMsg);
                     }

@@ -576,35 +576,16 @@ class AdminAddHotelController extends ModuleAdminController
 
     public function ajaxProcessUploadHotelImages()
     {
+        $response = array('status' => false);
         $idHotel = Tools::getValue('id_hotel');
         if ($idHotel) {
-            $invalidImg = ImageManager::validateUpload(
-                $_FILES['hotel_image'],
-                Tools::getMaxUploadSize()
-            );
-            if (!$invalidImg) {
-                // Add Hotel images
-                $kwargs = [
-                    'id_hotel' => $idHotel,
-                    'hotel_image' => $_FILES['hotel_image'],
-                ];
-                $objHotelImage = new HotelImage();
-                $imageDetail = $objHotelImage->uploadHotelImages($_FILES['hotel_image'], $idHotel);
-                if ($imageDetail) {
-                    die(json_encode($imageDetail));
-                } else {
-                    die(json_encode(array('hasError' => true)));
-                }
-            } else {
-                die(
-                    json_encode(
-                        array('hasError' => true, 'message' => $_FILES['hotel_image']['name'].': '.$invalidImg)
-                    )
-                );
+            $objHotelImage = new HotelImage();
+            if ($objHotelImage->uploadHotelImages($_FILES['hotel_images'], $idHotel)) {
+                $response['status'] = true;
             }
-        } else {
-            die(json_encode(array('hasError' => true)));
         }
+
+        $this->ajaxDie(json_encode($response));
     }
 
     public function ajaxProcessChangeCoverImage()
