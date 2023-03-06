@@ -369,49 +369,49 @@ class AdminCategoriesControllerCore extends AdminController
         }
     }
 
-    public function renderKpis()
-    {
-        $time = time();
-        $kpis = array();
+    // public function renderKpis()
+    // {
+    //     $time = time();
+    //     $kpis = array();
 
-        $helper = new HelperKpi();
-        $helper->id = 'box-disabled-categories';
-        $helper->icon = 'icon-off';
-        $helper->color = 'color1';
-        $helper->title = $this->l('Disabled Categories', null, null, false);
-        $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=disabled_categories';
-        $kpis[] = $helper->generate();
+    //     $helper = new HelperKpi();
+    //     $helper->id = 'box-disabled-categories';
+    //     $helper->icon = 'icon-off';
+    //     $helper->color = 'color1';
+    //     $helper->title = $this->l('Disabled Categories', null, null, false);
+    //     $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=disabled_categories';
+    //     $kpis[] = $helper->generate();
 
-        // $helper = new HelperKpi();
-        // $helper->id = 'box-empty-categories';
-        // $helper->icon = 'icon-bookmark-empty';
-        // $helper->color = 'color2';
-        // $helper->href = $this->context->link->getAdminLink('AdminTracking');
-        // $helper->title = $this->l('Empty Categories', null, null, false);
-        // $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=empty_categories';
-        // $kpis[] = $helper->generate();
+    //     // $helper = new HelperKpi();
+    //     // $helper->id = 'box-empty-categories';
+    //     // $helper->icon = 'icon-bookmark-empty';
+    //     // $helper->color = 'color2';
+    //     // $helper->href = $this->context->link->getAdminLink('AdminTracking');
+    //     // $helper->title = $this->l('Empty Categories', null, null, false);
+    //     // $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=empty_categories';
+    //     // $kpis[] = $helper->generate();
 
-        $helper = new HelperKpi();
-        $helper->id = 'box-top-category';
-        $helper->icon = 'icon-money';
-        $helper->color = 'color3';
-        $helper->title = $this->l('Top Category', null, null, false);
-        $helper->subtitle = $this->l('30 days', null, null, false);
-        $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=top_category';
-        $kpis[] = $helper->generate();
+    //     $helper = new HelperKpi();
+    //     $helper->id = 'box-top-category';
+    //     $helper->icon = 'icon-money';
+    //     $helper->color = 'color3';
+    //     $helper->title = $this->l('Top Category', null, null, false);
+    //     $helper->subtitle = $this->l('30 days', null, null, false);
+    //     $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=top_category';
+    //     $kpis[] = $helper->generate();
 
-        $helper = new HelperKpi();
-        $helper->id = 'box-products-per-category';
-        $helper->icon = 'icon-search';
-        $helper->color = 'color4';
-        $helper->title = $this->l('Average number of products per category', null, null, false);
-        $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=products_per_category';
-        $kpis[] = $helper->generate();
+    //     $helper = new HelperKpi();
+    //     $helper->id = 'box-products-per-category';
+    //     $helper->icon = 'icon-search';
+    //     $helper->color = 'color4';
+    //     $helper->title = $this->l('Average number of products per category', null, null, false);
+    //     $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=products_per_category';
+    //     $kpis[] = $helper->generate();
 
-        $helper = new HelperKpiRow();
-        $helper->kpis = $kpis;
-        return $helper->generate();
-    }
+    //     $helper = new HelperKpiRow();
+    //     $helper->kpis = $kpis;
+    //     return $helper->generate();
+    // }
 
     public function renderForm()
     {
