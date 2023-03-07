@@ -466,6 +466,19 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
             $bookingParams['date_from'] = $cal_date_from;
             $bookingParams['date_to'] = $cal_date_to;
             $eventData = $objBookingDetail->getBookingData($bookingParams);
+            if (!$eventData) {
+                $eventData['stats'] = array(
+                    'total_room_type' => 0,
+                    'total_rooms' => 0,
+                    'max_avail_occupancy' => 0,
+                    'num_unavail' => 0,
+                    'num_cart' => 0,
+                    'num_booked' => 0,
+                    'num_avail' => 0,
+                    'num_part_avai' => 0,
+                );
+            }
+
             $eventData['date_format'] = Tools::displayDate($cal_date_from);
             $events[strtotime($bookingParams['date_from'])] = array(
                 'is_notification' => 1,

@@ -9501,7 +9501,6 @@ var FullCalendar = (function (exports) {
             });
             return (createElement(ContentHook, { hookProps: hookProps, content: options.dayCellContent, defaultContent: props.defaultContent }, props.children));
         };
-        console.log(DayCellContent);
         return DayCellContent;
     }(BaseComponent));
     function refineDayCellHookProps(raw) {
