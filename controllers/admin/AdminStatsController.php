@@ -1665,9 +1665,10 @@ class AdminStatsControllerCore extends AdminStatsTabController
             $dateTo = date('Y-m-d', strtotime('+1 day', strtotime($dateTo)));
         }
 
-        $sql = 'SELECT SUM(total_paid_tax_excl)
+        $sql = 'SELECT SUM(total_paid_tax_excl - refunded_amount)
         FROM (
             SELECT o.`id_order`, o.`total_paid_tax_excl` / o.`conversion_rate` AS total_paid_tax_excl,
+            IFNULL(orr.`refunded_amount`, 0) AS refunded_amount,
             (SELECT hbd.`id_hotel`
                 FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
                 WHERE hbd.`id_order` = o.`id_order` LIMIT 1
@@ -1677,6 +1678,8 @@ class AdminStatsControllerCore extends AdminStatsTabController
             ON (hbd.`id_order` = o.`id_order`)
             INNER JOIN `'._DB_PREFIX_.'htl_branch_info` hbi
             ON (hbi.`id` = hbd.`id_hotel`)
+            LEFT JOIN `' ._DB_PREFIX_.'order_return` orr
+            ON (orr.`id_order` = o.`id_order`)
             WHERE o.`valid` = 1 AND hbi.`active` = 1 AND hbd.`is_refunded` = 0
             AND o.`invoice_date` BETWEEN "'.pSQL($dateFrom).' 00:00:00" AND "'.pSQL($dateTo).' 23:59:59"
             AND o.`source` = "'.pSQL(Configuration::get('PS_SHOP_DOMAIN')).'"'.
