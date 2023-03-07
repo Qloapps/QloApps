@@ -1797,4 +1797,206 @@ class AdminStatsControllerCore extends AdminStatsTabController
 
         return $countGrossOpProfitPars ? $sumGrossOpProfitPars / $countGrossOpProfitPars : 0;
     }
+
+    public static function getRoomNightsData($dateFrom, $dateTo = null, $idHotel = null, $useCache = true)
+    {
+        $dateTo = !$dateTo ? date('Y-m-d', strtotime('+1 day', strtotime($dateFrom))) : $dateTo;
+
+        $idsHotel = array();
+        if (!$idHotel) {
+            $idsHotel = HotelBranchInformation::getProfileAccessedHotels(
+                Context::getContext()->employee->id_profile,
+                1,
+                1
+            );
+        } else {
+            $idsHotel[] = $idHotel;
+        }
+
+        $result = array();
+        foreach ($idsHotel as $idHotel) {
+            $result[$idHotel] = self::getOccupiedRoomsForDiscreteDates(
+                $dateFrom,
+                $dateTo,
+                $idHotel,
+                $useCache
+            );
+        }
+
+        return $result;
+    }
+
+    /**
+     * $dow: day of week, 1 = SUN
+     */
+    public static function getOccupiedRoomsForDayOfTheWeek($dow, $dateFrom, $dateTo = null, $idHotel = null, $useCache = true)
+    {
+        $dateTo = !$dateTo ? date('Y-m-d', strtotime('+1 day', strtotime($dateFrom))) : $dateTo;
+
+        $result = 0;
+        $cacheKey = 'AdminStats::getOccupiedRoomsForDayOfTheWeek'.'_'.(int) $dow.(int) strtotime($dateFrom).
+        (int) strtotime($dateTo).(!is_array($idHotel) ? (int) $idHotel : implode('_', $idHotel));
+        if (!Cache::isStored($cacheKey) || !$useCache) {
+            // (los/7) + {if(los%7 has $dow) + 1 else + 0)}
+            // dow(start_of(remaining_days)) = dow_date_from && dow(end_of(remaining_days)) = dow_date_to
+            $sql = 'SELECT SUM((full_weeks + IF(('.(int) $dow.' >= dow_date_from AND '.(int) $dow.' < dow_date_to), 1, 0)))
+            AS total_occupied
+            FROM (
+                SELECT hbd.`id`, hbd.`date_from`, hbd.`date_to`, DAYOFWEEK(hbd.`date_from`) AS dow_date_from,
+                DAYOFWEEK(hbd.`date_to`) AS dow_date_to,
+                DATEDIFF(hbd.`date_to`, hbd.`date_from`) AS los,
+                ROUND(DATEDIFF(hbd.`date_to`, hbd.`date_from`) / 7) AS full_weeks,
+                DATEDIFF(hbd.`date_to`, hbd.`date_from`) % 7 AS remaining_days
+                FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+                WHERE hbd.`is_refunded` = 0
+                AND hbd.`date_from` < "'.pSQL($dateTo).' 00:00:00" AND hbd.`date_to` > "'.pSQL($dateFrom).' 00:00:00"'.
+                (!is_null($idHotel) ? HotelBranchInformation::addHotelRestriction($idHotel, 'hbd') : '').'
+            ) AS t';
+
+            $value = (int) Db::getInstance()->getValue($sql);
+            Cache::store($cacheKey, $value);
+
+            $result = Cache::retrieve($cacheKey);
+        }
+
+        return $result;
+    }
+
+    public static function getOccupiedRoomsForDaysOfTheWeek($dateFrom, $dateTo = null, $idHotel = null, $useCache = true)
+    {
+        $dateTo = !$dateTo ? date('Y-m-d', strtotime('+1 day', strtotime($dateFrom))) : $dateTo;
+
+        $idsHotel = array();
+        if (!$idHotel) {
+            $idsHotel = HotelBranchInformation::getProfileAccessedHotels(
+                Context::getContext()->employee->id_profile,
+                1,
+                1
+            );
+        } else {
+            $idsHotel[] = $idHotel;
+        }
+
+        $result = array();
+        foreach ($idsHotel as $idHotel) {
+            $result[$idHotel] = array();
+            // 1 = SUN
+            for ($i = 1; $i <= 7; $i++) {
+                $result[$idHotel][$i] = self::getOccupiedRoomsForDayOfTheWeek(
+                    $i,
+                    $dateFrom,
+                    $dateTo,
+                    $idHotel,
+                    $useCache
+                );
+            }
+        }
+
+        return $result;
+    }
+
+    public static function getDaysOfTheWeekData($dateFrom, $dateTo = null, $idHotel = null, $useCache = true)
+    {
+        $dateTo = !$dateTo ? date('Y-m-d', strtotime('+1 day', strtotime($dateFrom))) : $dateTo;
+
+        $idsHotel = array();
+        if (!$idHotel) {
+            $idsHotel = HotelBranchInformation::getProfileAccessedHotels(
+                Context::getContext()->employee->id_profile,
+                1,
+                1
+            );
+        } else {
+            $idsHotel[] = $idHotel;
+        }
+
+        $result = array();
+        foreach ($idsHotel as $idHotel) {
+            $result[$idHotel] = self::getOccupiedRoomsForDiscreteDates(
+                $dateFrom,
+                $dateTo,
+                $idHotel,
+                $useCache
+            );
+        }
+
+        return $result;
+    }
+
+    public static function getLengthOfStayPercentage($losMinimum, $dateFrom, $dateTo, $idHotel = null, $useCache = true, $losMaximum = 0)
+    {
+        $result = 0;
+        $cacheKey = 'AdminStats::getLengthOfStayPercentage'.'_'.(int) $losMinimum.(int) $losMaximum.
+        (int) strtotime($dateFrom).(int) strtotime($dateTo).(!is_array($idHotel) ? (int) $idHotel : implode('_', $idHotel));
+        if (!Cache::isStored($cacheKey) || !$useCache) {
+            if ($dateFrom == $dateTo) {
+                $dateTo = date('Y-m-d', strtotime('+1 day', strtotime($dateTo)));
+            }
+
+            $sql = 'SELECT COUNT(hbd.`id`) AS total
+            FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+            LEFT JOIN `'._DB_PREFIX_.'product` p
+            ON (p.`id_product` = hbd.`id_product`)
+            WHERE p.`active` = 1
+            AND hbd.`is_refunded` = 0
+            AND hbd.`date_from` < "'.pSQL($dateTo).' 00:00:00" AND hbd.`date_to` > "'.pSQL($dateFrom).' 00:00:00"'.
+            (!is_null($idHotel) ? HotelBranchInformation::addHotelRestriction($idHotel, 'hbd') : '');
+
+            $total = Db::getInstance()->getValue($sql);
+
+            $sql = 'SELECT COUNT(*)
+            FROM (
+                SELECT DATEDIFF(hbd.`date_to`, hbd.`date_from`) AS los
+                FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+                LEFT JOIN `'._DB_PREFIX_.'product` p
+                ON (p.`id_product` = hbd.`id_product`)
+                WHERE p.`active` = 1
+                AND hbd.`is_refunded` = 0
+                AND hbd.`date_from` < "'.pSQL($dateTo).' 00:00:00" AND hbd.`date_to` > "'.pSQL($dateFrom).' 00:00:00"'.
+                (!is_null($idHotel) ? HotelBranchInformation::addHotelRestriction($idHotel, 'hbd') : '').'
+            ) AS t
+            WHERE los >= '.(int) $losMinimum.' AND los <= '.(int) ($losMaximum ? $losMaximum : $losMinimum);
+
+            $fraction = Db::getInstance()->getValue($sql);
+
+            $value = (float) $total ? ($fraction / $total) : 0;
+            Cache::store($cacheKey, $value);
+
+            $result = Cache::retrieve($cacheKey);
+        }
+
+        return $result;
+    }
+
+    public static function getLengthOfStayPercentages($days, $dateFrom, $dateTo, $idHotel = null, $useCache = true)
+    {
+        $idsHotel = array();
+        if (!$idHotel) {
+            $idsHotel = HotelBranchInformation::getProfileAccessedHotels(
+                Context::getContext()->employee->id_profile,
+                1,
+                1
+            );
+        } else {
+            $idsHotel[] = $idHotel;
+        }
+
+        $result = array();
+        foreach ($idsHotel as $idHotel) {
+            $result[$idHotel] = array();
+            foreach ($days as $key => $day) {
+                $result[$idHotel][$key] = self::getLengthOfStayPercentage(
+                    $day[0],
+                    $dateFrom,
+                    $dateTo,
+                    $idHotel,
+                    $useCache,
+                    $day[1]
+                );
+            }
+
+        }
+
+        return $result;
+    }
 }
