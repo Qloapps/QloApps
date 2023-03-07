@@ -284,7 +284,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
         if (!$distinct_products) {
             return '0%';
         }
-        return round(100 * $distinct_products / AdminStatsController::getTotalProducts()).'%';
+        return round(100 * $distinct_products / AdminStatsController::getTotalRoomTypes()).'%';
     }
 
     public static function getOrders($date_from, $date_to, $granularity = false, $id_hotel = false)
