@@ -341,20 +341,4 @@ class RoomTypeServiceProductCartDetail extends ObjectModel
         }
         return false;
     }
-
-    public static function validateServiceProductsInCart()
-    {
-        $context = Context::getContext();
-        if ($cartProducts = $context->cart->getProducts()) {
-            $objRoomTypeServiceProductCartDetail = new RoomTypeServiceProductCartDetail();
-            foreach ($cartProducts as $product) {
-                if (!$product['active'] && !$product['booking_product']) {
-                    $serviceProducts = $objRoomTypeServiceProductCartDetail->getServiceProductsInCart($context->cart->id, $product['id_product']);
-                    foreach ($serviceProducts as $serviceProduct) {
-                        $objRoomTypeServiceProductCartDetail->removeServiceProductByIdHtlCartBooking($serviceProduct['htl_cart_booking_id']);
-                    }
-                }
-            }
-        }
-    }
 }

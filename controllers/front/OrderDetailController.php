@@ -479,40 +479,40 @@ class OrderDetailControllerCore extends FrontController
                                         1,
                                         0
                                     );
-                                    // get auto added price to be displayed with room price
-                                    if (empty($cartHotelData[$type_key]['date_diff'][$date_join]['additional_services_price_auto_add_ti'])) {
-                                        $cartHotelData[$type_key]['date_diff'][$date_join]['additional_services_price_auto_add_ti'] = 0;
-                                    }
-                                    $cartHotelData[$type_key]['date_diff'][$date_join]['additional_services_price_auto_add_ti'] += $objRoomTypeServiceProductOrderDetail->getroomTypeServiceProducts(
-                                        $id_order,
-                                        0,
-                                        0,
-                                        $type_value['product_id'],
-                                        $data_v['date_from'],
-                                        $data_v['date_to'],
-                                        $data_v['id_room'],
-                                        1,
-                                        1,
-                                        1,
-                                        Product::PRICE_ADDITION_TYPE_WITH_ROOM
-                                    );
-                                    if (empty($cartHotelData[$type_key]['date_diff'][$date_join]['additional_services_price_auto_add_te'])) {
-                                        $cartHotelData[$type_key]['date_diff'][$date_join]['additional_services_price_auto_add_te'] = 0;
-                                    }
-                                    $cartHotelData[$type_key]['date_diff'][$date_join]['additional_services_price_auto_add_te'] += $objRoomTypeServiceProductOrderDetail->getroomTypeServiceProducts(
-                                        $id_order,
-                                        0,
-                                        0,
-                                        $type_value['product_id'],
-                                        $data_v['date_from'],
-                                        $data_v['date_to'],
-                                        $data_v['id_room'],
-                                        1,
-                                        0,
-                                        1,
-                                        Product::PRICE_ADDITION_TYPE_WITH_ROOM
-                                    );
                                 }
+                                // get auto added price to be displayed with room price
+                                if (empty($cartHotelData[$type_key]['date_diff'][$date_join]['additional_services_price_auto_add_ti'])) {
+                                    $cartHotelData[$type_key]['date_diff'][$date_join]['additional_services_price_auto_add_ti'] = 0;
+                                }
+                                $cartHotelData[$type_key]['date_diff'][$date_join]['additional_services_price_auto_add_ti'] += $objRoomTypeServiceProductOrderDetail->getroomTypeServiceProducts(
+                                    $id_order,
+                                    0,
+                                    0,
+                                    $type_value['product_id'],
+                                    $data_v['date_from'],
+                                    $data_v['date_to'],
+                                    $data_v['id_room'],
+                                    1,
+                                    1,
+                                    1,
+                                    Product::PRICE_ADDITION_TYPE_WITH_ROOM
+                                );
+                                if (empty($cartHotelData[$type_key]['date_diff'][$date_join]['additional_services_price_auto_add_te'])) {
+                                    $cartHotelData[$type_key]['date_diff'][$date_join]['additional_services_price_auto_add_te'] = 0;
+                                }
+                                $cartHotelData[$type_key]['date_diff'][$date_join]['additional_services_price_auto_add_te'] += $objRoomTypeServiceProductOrderDetail->getroomTypeServiceProducts(
+                                    $id_order,
+                                    0,
+                                    0,
+                                    $type_value['product_id'],
+                                    $data_v['date_from'],
+                                    $data_v['date_to'],
+                                    $data_v['id_room'],
+                                    1,
+                                    0,
+                                    1,
+                                    Product::PRICE_ADDITION_TYPE_WITH_ROOM
+                                );
                                 // calculate averages now
                                 foreach ($cartHotelData[$type_key]['date_diff'] as $key => &$value) {
                                     $value['avg_paid_unit_price_tax_excl'] = Tools::ps_round($value['avg_paid_unit_price_tax_excl'] / $value['num_rm'], 6);

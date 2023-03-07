@@ -389,9 +389,6 @@ class OrderOpcControllerCore extends ParentOrderController
      */
     public function initContent()
     {
-        // check all service products are available
-        RoomTypeServiceProductCartDetail::validateServiceProductsInCart();
-
         parent::initContent();
 
         // check ORDER RESTRICT condition before payment by the customer

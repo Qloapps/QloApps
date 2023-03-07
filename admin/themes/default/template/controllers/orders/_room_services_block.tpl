@@ -17,7 +17,8 @@
 *  @license   https://store.webkul.com/license.html
 *}
 
-<div id="room_type_service_product_desc" class="tab-pane {if isset($show_active) && $show_active}active{/if}">
+{if (isset($additionalServices) && $additionalServices) || (isset($roomTypeServiceProducts) && $roomTypeServiceProducts)}
+<div id="room_type_service_product_desc" class="tab-pane{if !(isset($extraDemands) && $extraDemands) && !(isset($roomTypeDemands) && $roomTypeDemands)} active{/if}">
 	{if isset($orderEdit) && $orderEdit}
 
 		<p class="col-sm-12 facility_nav_btn">
@@ -36,7 +37,7 @@
 									<div>{$service['name']|escape:'html':'UTF-8'}</div>
 										{if $service['allow_multiple_quantity']}
 											<div class="qty_container">
-												<input type="number" class="form-control qty" min="1" data-id_room_type_service_product_order_detail="{$service['id_room_type_service_product_order_detail']}" data-id_product="{$service['id_product']|escape:'html':'UTF-8'}" value="{$service['quantity']|escape:'html':'UTF-8'}">
+												<input type="number" class="form-control qty" data-id_room_type_service_product_order_detail="{$service['id_room_type_service_product_order_detail']}" data-id_product="{$service['id_product']|escape:'html':'UTF-8'}" value="{$service['quantity']|escape:'html':'UTF-8'}">
 											</div>
 										{/if}
 								</td>
@@ -76,7 +77,7 @@
 										<p>{$product['name']|escape:'html':'UTF-8'}</p>
 										{if $product.allow_multiple_quantity}
 											<div class="qty_container">
-												<input type="number" class="form-control qty" min="1" id="qty_{$product['id_product']|escape:'html':'UTF-8'}" name="service_qty[{$product['id_product']|escape:'html':'UTF-8'}]" data-id-product="{$product.id_product|escape:'html':'UTF-8'}" value="1">
+												<input type="number" class="form-control qty" id="qty_{$product['id_product']|escape:'html':'UTF-8'}" name="service_qty[{$product['id_product']|escape:'html':'UTF-8'}]" data-id-product="{$product.id_product|escape:'html':'UTF-8'}" value="1">
 											</div>
 										{/if}
 									</div>
@@ -124,7 +125,6 @@
 				</div>
 			{/foreach}
 		</div>
-	{else}
-		{l s='No services available!'}
 	{/if}
 </div>
+{/if}

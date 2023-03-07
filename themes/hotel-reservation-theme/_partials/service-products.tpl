@@ -45,7 +45,7 @@
                     {/foreach}
                 {else}
                     <ul class="product-list">
-                        {include file="{$tpl_dir}_partials/service-products-list.tpl" service_products=$service_products init=true}
+                        {include file="{$tpl_dir}_partials/service-products-list.tpl" service_products=$service_products group='all' init=true}
                     </ul>
                     {if RoomTypeServiceProduct::WK_NUM_RESULTS < $num_total_service_products}
                         <div class="show_more_btn_container">
