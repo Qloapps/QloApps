@@ -46,7 +46,7 @@ class StatsCatalog extends Module
 
         parent::__construct();
 
-        $this->displayName = $this->l('Catalog statistics');
+        $this->displayName = $this->l('Hotel statistics');
         $this->description = $this->l('Adds a tab containing general statistics about your catalog to the Stats dashboard.');
         $this->ps_versions_compliancy = array('min' => '1.6', 'max' => '1.7.0.99');
     }
@@ -119,7 +119,7 @@ class StatsCatalog extends Module
 		LEFT JOIN `'._DB_PREFIX_.'page` pa ON pv.`id_page` = pa.`id_page`
 		LEFT JOIN `'._DB_PREFIX_.'page_type` pt ON pt.`id_page_type` = pa.`id_page_type`
 		LEFT JOIN `'._DB_PREFIX_.'product` p ON p.`id_product` = pa.`id_object`
-		LEFT JOIN `'._DB_PREFIX_.'htl_room_type` hrt ON (p.`id_product` = hrt.`id_product`)
+		INNER JOIN `'._DB_PREFIX_.'htl_room_type` hrt ON (p.`id_product` = hrt.`id_product`)
 		'.Shop::addSqlAssociation('product', 'p').'
 		'.$this->join.'
 		WHERE pt.`name` IN ("product.php", "product")
@@ -149,7 +149,7 @@ class StatsCatalog extends Module
                     FROM `'._DB_PREFIX_.'image` i
                     LEFT JOIN `'._DB_PREFIX_.'product` p
                     ON (p.`id_product` = i.`id_product`)
-                    LEFT JOIN `'._DB_PREFIX_.'htl_room_type` hrt
+                    INNER JOIN `'._DB_PREFIX_.'htl_room_type` hrt
                     ON (hrt.`id_product` = i.`id_product`)
                     WHERE hrt.`id_hotel` = hbi.`id`
                 ) AS room_type_images
@@ -174,7 +174,7 @@ class StatsCatalog extends Module
 				FROM `'._DB_PREFIX_.'orders` o
 				LEFT JOIN `'._DB_PREFIX_.'order_detail` od ON o.`id_order` = od.`id_order`
 				LEFT JOIN `'._DB_PREFIX_.'product` p ON p.`id_product` = od.`product_id`
-				LEFT JOIN `'._DB_PREFIX_.'htl_room_type` hrt ON (p.`id_product` = hrt.`id_product`)
+				INNER JOIN `'._DB_PREFIX_.'htl_room_type` hrt ON (p.`id_product` = hrt.`id_product`)
 				'.Shop::addSqlAssociation('product', 'p').'
 				'.$this->join.'
 				WHERE o.valid = 1
@@ -194,7 +194,7 @@ class StatsCatalog extends Module
         $sql = 'SELECT p.id_product, pl.name, pl.link_rewrite
 				FROM `'._DB_PREFIX_.'product` p
 				'.Shop::addSqlAssociation('product', 'p').'
-				LEFT JOIN `'._DB_PREFIX_.'htl_room_type` hrt ON (p.`id_product` = hrt.`id_product`)
+				INNER JOIN `'._DB_PREFIX_.'htl_room_type` hrt ON (p.`id_product` = hrt.`id_product`)
 				LEFT JOIN `'._DB_PREFIX_.'product_lang` pl
 					ON (pl.`id_product` = p.`id_product` AND pl.id_lang = '.(int)$id_lang.Shop::addSqlRestrictionOnLang('pl').')
 				'.$this->join.'
@@ -293,7 +293,7 @@ class StatsCatalog extends Module
 
         if (count($products_nb) && count($products_nb) < 50) {
             $html .= '
-				<div class="panel-heading">'.$this->l('Room types never booked').'</div>
+				<div class="col-sm-12"><div class="panel-heading">'.$this->l('Room types never booked').'</div></div>
 				<table class="table">
 					<thead>
 						<tr>
