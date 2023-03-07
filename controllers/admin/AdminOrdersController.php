@@ -4742,6 +4742,7 @@ class AdminOrdersControllerCore extends AdminController
                 $smartyVars['roomTypeServiceProducts'] = $roomTypeServiceProducts;
             }
         }
+        $smartyVars['show_active'] = true;
         $this->context->smarty->assign($smartyVars);
 
         $servicesTpl = $this->context->smarty->fetch(
