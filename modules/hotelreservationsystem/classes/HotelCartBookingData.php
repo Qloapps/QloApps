@@ -1009,7 +1009,8 @@ class HotelCartBookingData extends ObjectModel
                     0,
                     $id_cart,
                     $value['id_guest'],
-                    $value['id_room']
+                    $value['id_room'],
+                    0
                 );
 
                 $cart_detail_data[$key]['amt_with_qty'] = $roomTypeDateRangePrice['total_price_tax_excl'];

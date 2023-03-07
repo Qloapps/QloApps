@@ -270,7 +270,9 @@ class AdminCartsControllerCore extends AdminController
 
             $product['qty_in_stock'] = StockAvailable::getQuantityAvailableByProduct($product['id_product'], isset($product['id_product_attribute']) ? $product['id_product_attribute'] : null, (int)$id_shop);
 
-            $image_product = new Image($image['id_image']);
+            if (isset($image['id_image'])) {
+                $image_product = new Image($image['id_image']);
+            }
             $product['image'] = (isset($image['id_image']) ? ImageManager::thumbnail(_PS_IMG_DIR_.'p/'.$image_product->getExistingImgPath().'.jpg', 'product_mini_'.(int)$product['id_product'].(isset($product['id_product_attribute']) ? '_'.(int)$product['id_product_attribute'] : '').'.jpg', 45, 'jpg') : '--');
         }
 
@@ -283,34 +285,19 @@ class AdminCartsControllerCore extends AdminController
         $helper->value = Tools::displayPrice($total_price, $currency);
         $kpi = $helper->generate();
         // by webkul to show rooms available in the cart
-        $cart_id = $cart->id;
-        $cart_detail_data = array();
-        $cart_detail_data_obj = new HotelCartBookingData();
-        $cart_detail_data = $cart_detail_data_obj->getCartCurrentDataByCartId((int) $cart_id);
-        if ($cart_detail_data) {
-            foreach ($cart_detail_data as $key => $value) {
-                $product_image_id = Product::getCover($value['id_product']);
-                $obj_product = new Product((int) $value['id_product'], Configuration::get('PS_LANG_DEFAULT'));
-                $link_rewrite = $obj_product->link_rewrite[Configuration::get('PS_LANG_DEFAULT')];
-
-                if ($product_image_id) {
-                    $cart_detail_data[$key]['image_link'] = $this->context->link->getImageLink($link_rewrite, $product_image_id['id_image'], 'small_default');
-                } else {
-                    $cart_detail_data[$key]['image_link'] = $this->context->link->getImageLink($link_rewrite, $this->context->language->iso_code."-default", 'small_default');
-                }
-
-                $cart_detail_data[$key]['room_type'] = $obj_product->name;
-                $obj_room_info = new HotelRoomInformation((int) $value['id_room']);
-                $cart_detail_data[$key]['room_num'] = $obj_room_info->room_num;
-                $obj_date_time_from = new DateTime($value['date_from']);
-                $cart_detail_data[$key]['date_from'] = $obj_date_time_from->format('d-M Y');
-                $obj_date_time_to = new DateTime($value['date_to']);
-                $cart_detail_data[$key]['date_to'] = $obj_date_time_to->format('d-M Y');
+        $cartHtlData = array();
+        $objHotelCartBookingData = new HotelCartBookingData();
+        $objHotelRoomType = new HotelRoomType();
+        $cartHtlData = $objHotelCartBookingData->getCartFormatedBookinInfoByIdCart((int) $cart->id);
+        if ($cartHtlData) {
+            foreach ($cartHtlData as $key => $value) {
+                $cartHtlData[$key]['room_type_info'] = $objHotelRoomType->getRoomTypeInfoByIdProduct($value['id_product']);
             }
         }
         //end
+        ddd($cartHtlData);
         $this->tpl_view_vars = array(
-            'cart_detail_data' => $cart_detail_data,//by webkul hotel rooms in order data
+            'cart_htl_data' => $cartHtlData,//by webkul hotel rooms in order data
             'kpi' => $kpi,
             'products' => $products,
             'discounts' => $cart->getCartRules(),
