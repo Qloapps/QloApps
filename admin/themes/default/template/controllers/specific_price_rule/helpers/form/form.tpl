@@ -52,7 +52,7 @@
 			</div>
 		</div>
 	</div>
-	<div class="form-group">
+	{* <div class="form-group">
 		<label for="id_manufacturer" class="control-label col-lg-3">{l s='Manufacturer'}</label>
 		<div class="col-lg-9">
 			<div class="col-lg-8">
@@ -68,8 +68,8 @@
 				</a>
 			</div>
 		</div>
-	</div>
-	<div class="form-group">
+	</div> *}
+	{* <div class="form-group">
 		<label for="id_supplier" class="control-label col-lg-3">{l s='Supplier'}</label>
 		<div class="col-lg-9">
 			<div class="col-lg-8">
@@ -85,8 +85,8 @@
 				</a>
 			</div>
 		</div>
-	</div>
-	<div class="form-group">
+	</div> *}
+	{* <div class="form-group">
 		<label for="id_attribute_group" class="control-label col-lg-3">{l s='Attributes'}</label>
 		<div class="col-lg-9">
 			<div class="col-lg-4">
@@ -111,7 +111,7 @@
 				</a>
 			</div>
 		</div>
-	</div>
+	</div> *}
 	<div class="form-group">
 		<label for="id_feature" class="control-label col-lg-3">{l s='Features'}</label>
 		<div class="col-lg-9">
