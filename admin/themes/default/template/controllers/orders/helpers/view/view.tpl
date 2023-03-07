@@ -1717,12 +1717,19 @@
 			$('#room_extra_demand_content #back_to_service_btn').hide();
 		});
 
-		$(document).on('focusout', '#rooms_type_extra_demands .qty', function(e) {
+		$(document).on('focusout', '#rooms_type_extra_demands .room_ordered_services .qty', function(e) {
 			var qty_wntd = $(this).val();
-			if (qty_wntd == '' || !$.isNumeric(qty_wntd)) {
+			if (qty_wntd == '' || !$.isNumeric(qty_wntd) || qty_wntd < 1) {
 				$(this).val(1);
 			}
 			updateServiceProducts($(this));
+		});
+
+		$(document).on('focusout', '#rooms_type_extra_demands #add_room_services_form .qty', function(e) {
+			var qty_wntd = $(this).val();
+			if (qty_wntd == '' || !$.isNumeric(qty_wntd) || qty_wntd < 1) {
+				$(this).val(1);
+			}
 		});
 
 		function updateServiceProducts(element)
