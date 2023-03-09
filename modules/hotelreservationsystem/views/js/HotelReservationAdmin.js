@@ -227,6 +227,30 @@ function initGoogleMaps() {
 
 $(document).ready(function() {
     //For Add Hotels
+
+    // hotel status change
+    $("#form-htl_branch_info a.list-action-enable.action-enabled").on('click', function(e) {
+        let id_hotel = $(this).closest('tr').find('.row-selector input').val();
+        if (id_hotel == primaryHotelId) {
+            if (!confirm(disableHotelMsg)) {
+                e.preventDefault();
+                e.stopImmediatePropagation();
+                return false;
+            }
+        }
+    });
+    $("form#htl_branch_info_form").on('submit', function(e) {
+        let id_hotel = $(this).find('#id-hotel').val();
+        let enable = $(this).find('[name="ENABLE_HOTEL"]:checked').val();
+        if (id_hotel == primaryHotelId && !parseInt(enable)) {
+            if (!confirm(disableHotelMsg)) {
+                e.preventDefault();
+                e.stopImmediatePropagation();
+                return false;
+            }
+        }
+    });
+
     // delete hotel image
 	$('.deleteHtlImage').on('click', function(){
 		var imgId = $(this).attr('id_htl_img');

@@ -422,6 +422,18 @@ class AdminAddHotelController extends ModuleAdminController
 
             if ($newIdHotel = $objHotelBranch->id) {
 
+                if ($primaryHotelId = Configuration::get('WK_PRIMARY_HOTEL')) {
+                    if ($primaryHotelId == $objHotelBranch->id && !$objHotelBranch->active) {
+                        $hotels = $objHotelBranch->hotelBranchesInfo(false, 1);
+                        if (!empty($hotel = array_shift($hotels))) {
+                            Configuration::updateValue('WK_PRIMARY_HOTEL', $objHotelBranch['id']);
+                        } else {
+                            $newPrimaryHotelId = Configuration::updateValue('WK_PRIMARY_HOTEL', 0);
+                        }
+                    }
+                } else if ($objHotelBranch->active) {
+                    Configuration::updateValue('WK_PRIMARY_HOTEL', $objHotelBranch->id);
+                }
                 // getHotel address
                 if ($idHotelAddress = $objHotelBranch->getHotelIdAddress()) {
                 $objAddress = new Address($idHotelAddress);
@@ -559,6 +571,29 @@ class AdminAddHotelController extends ModuleAdminController
             $this->display = 'add';
         }
     }
+    public function processStatus()
+    {
+        parent::processStatus();
+        if (empty($this->errors)) {
+            if (Validate::isLoadedObject($objHotelBranch = new HotelBranchInformation(Tools::getValue('id')))) {
+                if ($primaryHotelId = Configuration::get('WK_PRIMARY_HOTEL')) {
+                    if ($primaryHotelId == $objHotelBranch->id && !$objHotelBranch->active) {
+                        $hotels = $objHotelBranch->hotelBranchesInfo(false, 1);
+                        if (!empty($hotel = array_shift($hotels))) {
+                            Configuration::updateValue('WK_PRIMARY_HOTEL', $hotel['id']);
+                        } else {
+                            $newPrimaryHotelId = Configuration::updateValue('WK_PRIMARY_HOTEL', 0);
+                        }
+                    }
+                } else {
+                    $hotels = $objHotelBranch->hotelBranchesInfo(false, 1);
+                    if (!empty($hotel = array_shift($hotels))) {
+                        Configuration::updateValue('WK_PRIMARY_HOTEL', $hotel['id']);
+                    }
+                }
+            }
+        }
+    }
 
     public function ajaxProcessStateByCountryId()
     {
@@ -686,6 +721,8 @@ class AdminAddHotelController extends ModuleAdminController
                 'filesizeError' => $this->l('File exceeds maximum size.'),
                 'maxSizeAllowed' => Tools::getMaxUploadSize(),
                 'sortRowsUrl' => $this->context->link->getAdminLink('AdminAddHotel'),
+                'primaryHotelId' => Configuration::get('WK_PRIMARY_HOTEL'),
+                'disableHotelMsg' => $this->l('Primary hotel for website will be updated to first available active hotel.'),
             )
         );
         // GOOGLE MAP

@@ -401,6 +401,8 @@ class HotelHelper
             $obj_hotel_info->id_category = $cat_hotel;
             $obj_hotel_info->save();
         }
+        // save dummy hotel as primary hotel
+        Configuration::updateValue('WK_PRIMARY_HOTEL', $htl_id);
 
         return $htl_id;
     }

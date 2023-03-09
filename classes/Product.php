@@ -3041,17 +3041,30 @@ class ProductCore extends ObjectModel
         $id_state = 0;
         $zipcode = 0;
 
-        if ($id_address) {
-            $address_infos = Address::getCountryAndState($id_address);
-        } else {
-            // if ($id_roomtype) {
-            //     $address_infos = Address::getCountryAndState(Cart::getIdAddressForTaxCalculation($id_roomtype));
-            // } else {
-                $address_infos = Address::getCountryAndState(Cart::getIdAddressForTaxCalculation($id_product));
-            // }
+        if (!$id_address) {
+            if (!Product::isBookingProduct($id_product)) {
+                if ($id_roomtype) {
+                    // if room type is provided with product then we know that the service product price should be calculated accroding to roomt type
+                    $id_address = Cart::getIdAddressForTaxCalculation($id_roomtype);
+                }
+            } else {
+                $id_address = Cart::getIdAddressForTaxCalculation($id_product);
+            }
         }
 
-        if ($address_infos['id_country']) {
+        if (!$id_address) {
+            if ($primaryHotel = ConfigurationCore::get('WK_PRIMARY_HOTEL')) {
+                if ($address = HotelBranchInformation::getAddress($primaryHotel)) {
+                    $address_infos['id_country'] = $address['id_country'];
+                    $address_infos['id_state'] = $address['id_state'];
+                    $address_infos['postcode'] = $address['postcode'];
+                }
+            }
+        } elseif ($id_address) {
+            $address_infos = Address::getCountryAndState($id_address);
+        }
+
+        if (isset($address_infos['id_country'])) {
             $id_country = (int)$address_infos['id_country'];
             $id_state = (int)$address_infos['id_state'];
             $zipcode = $address_infos['postcode'];
