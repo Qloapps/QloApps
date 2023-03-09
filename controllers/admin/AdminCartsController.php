@@ -295,7 +295,6 @@ class AdminCartsControllerCore extends AdminController
             }
         }
         //end
-        ddd($cartHtlData);
         $this->tpl_view_vars = array(
             'cart_htl_data' => $cartHtlData,//by webkul hotel rooms in order data
             'kpi' => $kpi,
@@ -1054,6 +1053,27 @@ class AdminCartsControllerCore extends AdminController
                         $this->context->smarty->assign('selectedRoomDemands', $selectedRoomDemands);
                     }
                 }
+                $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
+                $objRoomTypeServiceProductCartDetail = new RoomTypeServiceProductCartDetail();
+                $roomTypeServiceProducts = $objRoomTypeServiceProduct->getServiceProductsData($idProduct, 1, 0, false, 2, null);
+                if ($selectedRoomServiceProduct =  $objCartBookingData->getRoomRowByIdProductIdRoomInDateRange(
+                    $idCart,
+                    $idProduct,
+                    $dateFrom,
+                    $dateTo,
+                    $idRoom
+                )) {
+                    $selectedRoomServiceProduct['selected_service'] = $objRoomTypeServiceProductCartDetail->getRoomServiceProducts(
+                        $selectedRoomServiceProduct['id'],
+                        0,
+                        null,
+                        null
+                    );
+                }
+                $this->context->smarty->assign(array(
+                    'roomTypeServiceProducts' => $roomTypeServiceProducts,
+                    'selectedRoomServiceProduct' => $selectedRoomServiceProduct
+                ));
                 $htlCartBoookingata =  $objCartBookingData->getRoomRowByIdProductIdRoomInDateRange(
                     $idCart,
                     $idProduct,
@@ -1061,35 +1081,6 @@ class AdminCartsControllerCore extends AdminController
                     $dateTo,
                     $idRoom
                 );
-
-                $objRoomTypeServiceProductCartDetail = new RoomTypeServiceProductCartDetail();
-                if ($selectedRoomServiceProduct = $objRoomTypeServiceProductCartDetail->getServiceProductsInCart(
-                    $idCart,
-                    0,
-                    0,
-                    $idProduct,
-                    $dateFrom,
-                    $dateTo,
-                    $htlCartBoookingata['id'],
-                    0,
-                    null,
-                    null
-                )) {
-                    $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
-                    $roomTypeServiceProducts = $objRoomTypeServiceProduct->getServiceProductsData($idProduct, 1, 0, false, 2, null);
-                    foreach ($selectedRoomServiceProduct as $key => $selectedProducts) {
-                        $objRoom = new HotelRoomInformation($selectedProducts['id_room']);
-                        $selectedRoomServiceProduct[$key]['room_num'] = $objRoom->room_num;
-                        foreach ($selectedProducts['selected_products_info'] as $product) {
-                            $selectedRoomServiceProduct[$key]['selected_products'][] = $product['id_product'];
-                        }
-                    }
-
-                    $this->context->smarty->assign(array(
-                        'roomTypeServiceProducts' => $roomTypeServiceProducts,
-                        'selectedRoomServiceProduct' => $selectedRoomServiceProduct
-                    ));
-                }
             }
         }
         $response['status'] = true;

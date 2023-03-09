@@ -792,8 +792,9 @@ class CartCore extends ObjectModel
                 }
             } else if  (Product::SERVICE_PRODUCT_WITH_ROOMTYPE == $row['service_product_type']) {
                 $objRoomTypeServiceProductCartDetail = new RoomTypeServiceProductCartDetail();
-                $totalPriceByProductTaxIncl = $objRoomTypeServiceProductCartDetail->getServiceProductsInCart($this->id, (int)$row['id_product'], 0, 0, 0, 0, 0, 1, true, null);
-                $totalPriceByProductTaxExcl = $objRoomTypeServiceProductCartDetail->getServiceProductsInCart($this->id, (int)$row['id_product'], 0, 0, 0, 0, 0, 1, false, null);
+                $totalPriceByProductTaxIncl = $objRoomTypeServiceProductCartDetail->getServiceProductsTotalInCart($this->id, (int)$row['id_product'], 0, 0, 0, 0, 0, true, null);
+                $totalPriceByProductTaxExcl = $objRoomTypeServiceProductCartDetail->getServiceProductsTotalInCart($this->id, (int)$row['id_product'], 0, 0, 0, 0, 0, false, null);
+
 
                 switch (Configuration::get('PS_ROUND_TYPE')) {
                     case Order::ROUND_TOTAL:
@@ -1795,7 +1796,7 @@ class CartCore extends ObjectModel
             } else if (!$product['booking_product'] && Product::SERVICE_PRODUCT_WITH_ROOMTYPE == $product['service_product_type']) {
 
                 $objRoomTypeServiceProductCartDetail = new RoomTypeServiceProductCartDetail();
-                $totalPriceByProduct = $objRoomTypeServiceProductCartDetail->getServiceProductsInCart(
+                $totalPriceByProduct = $objRoomTypeServiceProductCartDetail->getServiceProductsTotalInCart(
                     $this->id,
                     (int)$product['id_product'],
                     isset($product['id_hotel']) ? $product['id_hotel'] : 0,
@@ -1803,7 +1804,6 @@ class CartCore extends ObjectModel
                     0,
                     0,
                     0,
-                    1,
                     $with_taxes,
                     null
                 );

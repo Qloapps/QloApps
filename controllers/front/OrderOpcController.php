@@ -985,31 +985,21 @@ class OrderOpcControllerCore extends ParentOrderController
                     }
                 }
                 $objRoomTypeServiceProductCartDetail = new RoomTypeServiceProductCartDetail();
-                if ($selectedRoomServiceProduct = $objRoomTypeServiceProductCartDetail->getServiceProductsInCart(
-                    $this->context->cart->id,
-                    0,
-                    0,
-                    $idProduct,
-                    $dateFrom,
-                    $dateTo,
-                    0,
-                    0,
-                    null,
-                    null
-                )) {
-                    $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
-                    $roomTypeServiceProducts = $objRoomTypeServiceProduct->getServiceProductsData($idProduct, 1, 0, true, 1);
-                    foreach ($selectedRoomServiceProduct as $key => $selectedProducts) {
-                        foreach ($selectedProducts['selected_products_info'] as $product) {
-                            $selectedRoomServiceProduct[$key]['selected_products'][] = $product['id_product'];
-                        }
-                    }
-                    $this->context->smarty->assign(array(
-                        'roomTypeServiceProducts' => $roomTypeServiceProducts,
-                        'selectedRoomServiceProduct' => $selectedRoomServiceProduct
-                    ));
+                $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
+                $roomTypeServiceProducts = $objRoomTypeServiceProduct->getServiceProductsData($idProduct, 1, 0, true, 1);
+                $cartRooms = $objCartBookingData->getHotelCartRoomsInfoByRoomType($this->context->cart->id, $idProduct,$dateFrom, $dateTo);
+                foreach($cartRooms as &$room) {
+                    $room['selected_service'] = $objRoomTypeServiceProductCartDetail->getRoomServiceProducts(
+                        $room['id'],
+                        0,
+                        null,
+                        null
+                    );
                 }
-
+                $this->context->smarty->assign(array(
+                    'roomTypeServiceProducts' => $roomTypeServiceProducts,
+                    'cartRooms' => $cartRooms
+                ));
             }
         }
         $response['extra_demands'] = $this->context->smarty->fetch(

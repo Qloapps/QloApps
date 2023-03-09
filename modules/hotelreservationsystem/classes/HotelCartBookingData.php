@@ -968,16 +968,13 @@ class HotelCartBookingData extends ObjectModel
                 );
 
                 $cart_detail_data[$key]['additional_service'] = $objRoomTypeServiceProduct->getServiceProductsData($value['id_product']);
-                $cart_detail_data[$key]['selected_additional_service'] = $objRoomTypeServiceProductCartDetail->getServiceProductsInCart(
-                    $id_cart,
+                $cart_detail_data[$key]['selected_services'] = $objRoomTypeServiceProductCartDetail->getRoomServiceProducts(
+                    $value['id'],
                     0,
-                    0,
-                    $value['id_product'],
-                    $value['date_from'],
-                    $value['date_to'],
-                    $value['id']
+                    null,
+                    null
                 );
-                $cart_detail_data[$key]['additional_service_price'] = $objRoomTypeServiceProductCartDetail->getServiceProductsInCart(
+                $cart_detail_data[$key]['additional_service_price'] = $objRoomTypeServiceProductCartDetail->getServiceProductsTotalInCart(
                     $id_cart,
                     0,
                     0,
@@ -985,10 +982,9 @@ class HotelCartBookingData extends ObjectModel
                     $value['date_from'],
                     $value['date_to'],
                     $value['id'],
-                    true,
                     false
                 );
-                $cart_detail_data[$key]['additional_services_auto_add_price'] = $objRoomTypeServiceProductCartDetail->getServiceProductsInCart(
+                $cart_detail_data[$key]['additional_services_auto_add_price'] = $objRoomTypeServiceProductCartDetail->getServiceProductsTotalInCart(
                     $id_cart,
                     0,
                     0,
@@ -996,7 +992,6 @@ class HotelCartBookingData extends ObjectModel
                     $value['date_from'],
                     $value['date_to'],
                     $value['id'],
-                    true,
                     false,
                     1
                 );
@@ -1304,15 +1299,14 @@ class HotelCartBookingData extends ObjectModel
                                     $data_v['date_to'],
                                     1
                                 );
-                                $serviceProductPrice = $objRoomTypeServiceProductCartDetail->getServiceProductsInCart(
+                                $serviceProductPrice = $objRoomTypeServiceProductCartDetail->getServiceProductsTotalInCart(
                                     $context->cart->id,
                                     0,
                                     $data_v['id_hotel'],
                                     $data_v['id_product'],
                                     $data_v['date_from'],
                                     $data_v['date_to'],
-                                    $data_v['id'],
-                                    true
+                                    $data_v['id']
                                 );
                                 $totalAdditionalServicePrice = $demandPrice + $serviceProductPrice;
 
