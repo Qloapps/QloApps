@@ -195,8 +195,7 @@ class HotelHelper
     {
         //from setting tab
         $home_banner_default_title = 'Four Lessons Hotel Greshon Palace';
-        $home_banner_default_content = 'Tofu helvetica leggings tattooed. Skateboard blue bottle green juice,
-        brooklyn cardigan kitsch fap narwhal organic flexitarian.';
+        $home_banner_default_content = 'Tofu helvetica leggings tattooed. Skateboard blue bottle green juice, brooklyn cardigan kitsch fap narwhal organic flexitarian.';
 
         Configuration::updateValue('WK_HOTEL_LOCATION_ENABLE', 1);
         Configuration::updateValue('WK_HOTEL_NAME_ENABLE', 1);
@@ -244,10 +243,8 @@ class HotelHelper
         $WK_HTL_SHORT_DESC = array();
         foreach ($languages as $lang) {
             $WK_HTL_CHAIN_NAME[$lang['id_lang']] = 'Hotel Dominic Parks';
-            $WK_HTL_TAG_LINE[$lang['id_lang']] = 'Tofu helvetica leggings tattooed. Skateboard blue
-            bottle green juice, brooklyn cardigan kitsch fap narwhal organic flexitarian.';
-            $WK_HTL_SHORT_DESC[$lang['id_lang']] = 'Tofu helvetica leggings tattooed. Skateboard blue bottle green
-            juice, brooklyn cardigan kitsch fap narwhal organic flexitarian.';
+            $WK_HTL_TAG_LINE[$lang['id_lang']] = 'Tofu helvetica leggings tattooed. Skateboard blue bottle green juice, brooklyn cardigan kitsch fap narwhal organic flexitarian.';
+            $WK_HTL_SHORT_DESC[$lang['id_lang']] = 'Tofu helvetica leggings tattooed. Skateboard blue bottle green juice, brooklyn cardigan kitsch fap narwhal organic flexitarian.';
         }
         Configuration::updateValue('WK_HTL_CHAIN_NAME', $WK_HTL_CHAIN_NAME);
         Configuration::updateValue('WK_HTL_TAG_LINE', $WK_HTL_TAG_LINE);
