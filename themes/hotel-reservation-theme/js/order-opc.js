@@ -469,7 +469,7 @@ $(document).ready(function()
         e.preventDefault();
         qtyfield = $(this).closest('.qty_container').find('input.qty');
         var newQuantity = parseInt(qtyfield.val()) + 1;
-		if (qtyfield.data('max_quantity') < newQuantity) {
+		if (qtyfield.data('max_quantity') && qtyfield.data('max_quantity') < newQuantity) {
             newQuantity = qtyfield.data('max_quantity');
         }
         qtyfield.val(newQuantity).trigger('focusout');
@@ -491,7 +491,7 @@ $(document).ready(function()
         if (qty_wntd == '' || !$.isNumeric(qty_wntd)) {
             $(this).val(1);
         }
-		if ($(this).data('max_quantity') < qty_wntd) {
+		if ($(this).data('max_quantity') && $(this).data('max_quantity') < qty_wntd) {
             $(this).val(qtyfield.data('max_quantity'));
         }
 		if ($(this).closest('.room_demand_block').find('.change_room_type_service_product').is(':checked')) {

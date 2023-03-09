@@ -1109,7 +1109,7 @@ $(document).ready(function() {
         e.preventDefault();
         qtyfield = $(this).closest('.qty_container').find('input.service_product_qty');
         var newQuantity = parseInt(qtyfield.val()) + 1;
-        if (qtyfield.data('max_quantity') < newQuantity) {
+        if (qtyfield.data('max_quantity') && qtyfield.data('max_quantity') < newQuantity) {
             newQuantity = qtyfield.data('max_quantity');
         }
         $(this).closest('.qty_container').find('.qty_count span').text(newQuantity);

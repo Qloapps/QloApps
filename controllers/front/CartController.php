@@ -395,16 +395,26 @@ class CartControllerCore extends FrontController
                                     if (Tools::getValue('op', 'up') == 'up') {
                                         if ($total_available_rooms < $req_rm) {
                                             die(json_encode(array('status' => 'unavailable_quantity', 'avail_rooms' => $total_available_rooms)));
-                                            } else {
-                                                // validate normal products if available
-                                                if ($serviceProducts) {
-                                                    $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
-                                                    foreach ($serviceProducts as $key => $standartProduct) {
-                                                        if (!$objRoomTypeServiceProduct->isRoomTypeLinkedWithProduct($this->id_product, $standartProduct['id_product'])) {
-                                                            unset($serviceProducts[$key]);
+                                        } else {
+                                            // validate service products if available
+                                            if ($serviceProducts) {
+                                                $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
+                                                foreach ($serviceProducts as $key => $serviceProduct) {
+                                                    if (!$objRoomTypeServiceProduct->isRoomTypeLinkedWithProduct($this->id_product, $serviceProduct['id_product'])) {
+                                                        unset($serviceProducts[$key]);
+                                                    } else {
+                                                        if (Validate::isLoadedObject($objServiceProduct = new Product($serviceProduct['id_product']))) {
+                                                            if (!$objServiceProduct->allow_multiple_quantity && $serviceProduct['quantity'] > 1) {
+                                                                $serviceProducts[$key]['quantity'] = 1;
+                                                            } else if ($objServiceProduct->max_quantity && $objServiceProduct->max_quantity < $serviceProduct['quantity'] ) {
+                                                                $serviceProducts[$key]['quantity'] = $objServiceProduct->max_quantity;
+                                                            }
+                                                        } else {
+                                                            $response['error'] = Tools::displayError('Service not Found');
                                                         }
                                                     }
                                                 }
+                                            }
                                         }
                                     }
                                 } else {
