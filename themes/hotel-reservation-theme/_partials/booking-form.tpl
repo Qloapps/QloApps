@@ -32,6 +32,7 @@
                     {if  !$order_date_restrict}
                         <div class="row">
                             <div class="form-group col-sm-12">
+                                <label class="control-label">{l s='Check In - Check Out'}</label>
                                 <div class="form-control input-date" id="room_date_range"  autocomplete="off" placeholder="{l s='Check-in - Check-out'}"><span>{l s='Check-in'} &nbsp;<i class="icon icon-minus"></i>&nbsp; {l s='Check-out'}</span></div>
                                 <input type="hidden" class="input-date" name="room_check_in" id="room_check_in" value="{if isset($date_from)}{$date_from}{/if}" />
                                 <input type="hidden" class="input-date" name="room_check_out" id="room_check_out" value="{if isset($date_to)}{$date_to}{/if}" />

@@ -114,6 +114,10 @@ class ProductControllerCore extends FrontController
             $this->product = new Product($id_product, true, $this->context->language->id, $this->context->shop->id);
         }
 
+        if (!$this->product->booking_product) {
+            Tools::redirect($this->context->link->getPageLink('pagenotfound'));
+        }
+
         if (!Validate::isLoadedObject($this->product)) {
             header('HTTP/1.1 404 Not Found');
             header('Status: 404 Not Found');
@@ -191,12 +195,6 @@ class ProductControllerCore extends FrontController
                 if (isset($this->context->cookie) && isset($this->category->id_category)) {
                     $this->context->cookie->last_visited_category = (int)$this->category->id_category;
                 }
-            }
-
-            if (!$this->product->booking_product) {
-                header('HTTP/1.1 403 Forbidden');
-                header('Status: 403 Forbidden');
-                $this->errors[] = Tools::displayError('You do not have access to this Product.');
             }
         }
     }
@@ -357,11 +355,12 @@ class ProductControllerCore extends FrontController
                     // booking preparation time
                     $preparationTime = (int) HotelOrderRestrictDate::getPreparationTime($hotel_id);
 
+                    $objHotelImage = new HotelImage();
                     $hotelImageLink = null;
                     if ($coverImage = HotelImage::getCover($hotel_id)) {
                         $hotelImagesBaseDir = _MODULE_DIR_.'hotelreservationsystem/views/img/hotel_img/';
                         $hotelImageLink = $this->context->link->getMediaLink(
-                            $hotelImagesBaseDir.$coverImage['hotel_image_id'].'.jpg'
+                            $objHotelImage->getImageLink($coverImage['id'], ImageType::getFormatedName('large'))
                         );
                     }
 
@@ -603,6 +602,7 @@ class ProductControllerCore extends FrontController
             $quantity = 1;
         }
 
+        $totalAvailableRooms = 0;
         if ($hotelRoomData = $objBookingDetail->DataForFrontSearch($bookingParams)) {
             $totalAvailableRooms = $hotelRoomData['stats']['num_avail'];
             $quantity = ($quantity > $totalAvailableRooms) ? $totalAvailableRooms : $quantity;
@@ -1244,7 +1244,8 @@ class ProductControllerCore extends FrontController
         $hotelImagesBaseDir = _MODULE_DIR_.'hotelreservationsystem/views/img/hotel_img/';
         foreach ($hotelImages as &$hotelImage) {
             $hotelImage['link'] = $this->context->link->getMediaLink(
-                $hotelImagesBaseDir.$hotelImage['hotel_image_id'].'.jpg'
+                $objHotelImage->getImageLink($hotelImage['id'],
+                ImageType::getFormatedName('large'))
             );
         }
 
@@ -1318,12 +1319,13 @@ class ProductControllerCore extends FrontController
     public function displayAjaxCheckServiceProductWithRoomType()
     {
         $response = array(
-            'status' => false
+            'success' => false
         );
 
         if ($this->isTokenValid()) {
             $idProduct = Tools::getValue('id_product');
             $idServiceProduct = Tools::getValue('service_product');
+            $addedServiceProduct = Tools::getValue('added_service_product');
             if (Validate::isLoadedObject($objProduct = new Product($idProduct))) {
                 if (!Product::isBookingProduct($idProduct)) {
                     $response['error'] = Tools::displayError('Room Type info not Found');
@@ -1334,7 +1336,22 @@ class ProductControllerCore extends FrontController
                 if (!$objRoomTypeServiceProduct->isRoomTypeLinkedWithProduct($idProduct, $idServiceProduct)) {
                     $response['error'] = Tools::displayError('Selected product is not available with current room type');
                 } else {
-                    $response['status'] = true;
+                    if (Validate::isLoadedObject($objServiceProduct = new Product($idServiceProduct))) {
+                        $response['success'] = true;
+                        if (!$objServiceProduct->allow_multiple_quantity && !empty($addedServiceProduct)) {
+                            if (!in_array($idServiceProduct, array_column($addedServiceProduct, 'id_product'))) {
+                                $response['add'] = true;
+                                $response['msg'] = 'Service is added to cart.';
+                            } else {
+                                $response['msg'] = 'Service already added.';
+                            }
+                        } else {
+                            $response['add'] = true;
+                            $response['msg'] = 'Service is added to cart.';
+                        }
+                    } else {
+                        $response['error'] = Tools::displayError('Service not Found');
+                    }
                 }
             } else {
                 $response['error'] = Tools::displayError('Room Type not Found');

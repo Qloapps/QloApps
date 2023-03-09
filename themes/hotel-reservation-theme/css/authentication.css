@@ -12,9 +12,9 @@
     margin-bottom: 8px; }
   #create-account_form .form-group {
     margin: 0 0 20px 0; }
-    #create-account_form .btn-transform {
+    #authentication .btn-transform {
       padding: 0;
-      font-size: 16px;
+      font-size: 1em;
       cursor: pointer;
       vertical-align: initial;
       text-decoration: underline; }
