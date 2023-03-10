@@ -359,7 +359,7 @@ class SpecificPriceCore extends ObjectModel
 				AND IF(`from_quantity` > 1, `from_quantity`, 0) <= ';
 
             $query .= (Configuration::get('PS_QTY_DISCOUNT_ON_COMBINATION') || !$id_cart || !$real_quantity) ? (int)$quantity : max(1, (int)$real_quantity);
-            $query .= ' ORDER BY `id_product_attribute` DESC, `from_quantity` DESC, `id_specific_price_rule` ASC, `score` DESC, `to` DESC, `from` DESC';
+            $query .= ' ORDER BY `id_product_attribute` DESC, `from_quantity` DESC, `score` DESC, `to` DESC, `from` DESC';
 
             SpecificPrice::$_specificPriceCache[$key] = Db::getInstance(_PS_USE_SQL_SLAVE_)->getRow($query);
         }
