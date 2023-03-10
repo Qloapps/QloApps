@@ -231,7 +231,7 @@ class OrderDetailControllerCore extends FrontController
                         } else {
                             foreach ($bookingRefunds as $idHtlBooking) {
                                 $objHotelBookingDetail = new HotelBookingDetail($idHtlBooking);
-                                if ($objHotelBookingDetail->id_customer == $order->id_customer
+                                if ($objHotelBookingDetail->id_customer != $order->id_customer
                                     || OrderReturn::getOrdersReturnDetail($order->id, 0, $idHtlBooking)
                                 ) {
                                     $hasError = 1;
