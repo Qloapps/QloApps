@@ -689,10 +689,22 @@ class ProductControllerCore extends FrontController
             $serviceProductsPrice = 0;
             if ($roomServiceProducts = json_decode($roomServiceProducts, true)) {
                 $objRoomTypeServiceProductPrice = new RoomTypeServiceProductPrice();
+                $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
                 foreach ($roomServiceProducts as &$product) {
-                    $objProduct = new ProductCore($product['id_product'], false, $this->context->language->id);
-                    $product['name'] = $objProduct->name;
-                    $product['allow_multiple_quantity'] = $objProduct->allow_multiple_quantity;
+                    if (!$objRoomTypeServiceProduct->isRoomTypeLinkedWithProduct($idProduct, $product['id_product'])) {
+                        unset($product);
+                        continue;
+                    } else {
+                        $objServiceProduct = new ProductCore($product['id_product'], false, $this->context->language->id);
+                        if (!$objServiceProduct->allow_multiple_quantity && $product['quantity'] > 1) {
+                            $product['quantity'] = 1;
+                        } else if ($objServiceProduct->max_quantity && $objServiceProduct->max_quantity < $product['quantity'] ) {
+                            $product['quantity'] = $objServiceProduct->max_quantity;
+                        }
+
+                    }
+                    $product['name'] = $objServiceProduct->name;
+                    $product['allow_multiple_quantity'] = $objServiceProduct->allow_multiple_quantity;
                     $productPrice = $objRoomTypeServiceProductPrice->getProductPrice($product['id_product'], $idProduct, $product['quantity'], $useTax);
                     $product['price'] = $productPrice;
                     $serviceProductsPrice += $productPrice;
@@ -1326,6 +1338,7 @@ class ProductControllerCore extends FrontController
             $idProduct = Tools::getValue('id_product');
             $idServiceProduct = Tools::getValue('service_product');
             $addedServiceProduct = Tools::getValue('added_service_product');
+            $qty = Tools::getValue('qty');
             if (Validate::isLoadedObject($objProduct = new Product($idProduct))) {
                 if (!Product::isBookingProduct($idProduct)) {
                     $response['error'] = Tools::displayError('Room Type info not Found');
@@ -1338,16 +1351,31 @@ class ProductControllerCore extends FrontController
                 } else {
                     if (Validate::isLoadedObject($objServiceProduct = new Product($idServiceProduct))) {
                         $response['success'] = true;
-                        if (!$objServiceProduct->allow_multiple_quantity && !empty($addedServiceProduct)) {
-                            if (!in_array($idServiceProduct, array_column($addedServiceProduct, 'id_product'))) {
+                        if (!$objServiceProduct->allow_multiple_quantity) {
+                            if (!empty($addedServiceProduct)) {
+                                if (!in_array($idServiceProduct, array_column($addedServiceProduct, 'id_product'))) {
+                                    $response['add'] = true;
+                                    $response['msg'] = 'Service is added to cart.';
+                                } else {
+                                    $response['msg'] = 'Service already added.';
+                                }
+                            } else {
                                 $response['add'] = true;
                                 $response['msg'] = 'Service is added to cart.';
-                            } else {
-                                $response['msg'] = 'Service already added.';
                             }
                         } else {
-                            $response['add'] = true;
-                            $response['msg'] = 'Service is added to cart.';
+                            $totalQty = $qty;
+                            if (!empty($addedServiceProduct)) {
+                                if (($key = array_search($idServiceProduct, array_column($addedServiceProduct, 'id_product')))!== false) {
+                                    $totalQty += $addedServiceProduct[$key]['quantity'];
+                                }
+                            }
+                            if ($objServiceProduct->max_quantity && $objServiceProduct->max_quantity < $totalQty ) {
+                                $response['msg'] = Tools::displayError(sprintf('Cannot add more than %d quantity.', $objServiceProduct->max_quantity));
+                            } else {
+                                $response['add'] = true;
+                                $response['msg'] = Tools::displayError('Service is added to cart.');
+                            }
                         }
                     } else {
                         $response['error'] = Tools::displayError('Service not Found');

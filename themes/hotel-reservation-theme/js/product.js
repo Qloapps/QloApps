@@ -1108,9 +1108,12 @@ $(document).ready(function() {
     $(document).on('click', '.service_product_qty_up', function(e) {
         e.preventDefault();
         qtyfield = $(this).closest('.qty_container').find('input.service_product_qty');
-        var currentVal = parseInt(qtyfield.val());
-        $(this).closest('.qty_container').find('.qty_count span').text(currentVal + 1);
-        qtyfield.val(currentVal + 1);
+        var newQuantity = parseInt(qtyfield.val()) + 1;
+        if (qtyfield.data('max_quantity') && qtyfield.data('max_quantity') < newQuantity) {
+            newQuantity = qtyfield.data('max_quantity');
+        }
+        $(this).closest('.qty_container').find('.qty_count span').text(newQuantity);
+        qtyfield.val(newQuantity);
     });
 
     // The button to decrement the product value

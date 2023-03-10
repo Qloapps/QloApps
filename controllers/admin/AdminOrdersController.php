@@ -5268,6 +5268,8 @@ class AdminOrdersControllerCore extends AdminController
                         if ($objProduct->allow_multiple_quantity) {
                             if (!Validate::isUnsignedInt($qty)) {
                                 $this->errors[] = Tools::displayError('The quantity code you\'ve entered is invalid.');
+                            // } elseif ($objProduct->max_quantity && $qty > $objProduct->max_quantity) {
+                            //     $this->errors[] = Tools::displayError(sprintf('cannot add more than %d quantity.', $objProduct->max_quantity));
                             }
                         } else {
                             $qty = 1;
