@@ -50,6 +50,9 @@ class BankwirePaymentModuleFrontController extends ModuleFrontController
             $total = $cart->getOrderTotal(true, Cart::BOTH);
 		}
 
+        // check all service products are available
+        RoomTypeServiceProductCartDetail::validateServiceProductsInCart();
+
         $restrict_order = false;
         /*Check Order restrict condition before Payment by the customer*/
         if (Module::isInstalled('hotelreservationsystem') && Module::isEnabled('hotelreservationsystem')) {
