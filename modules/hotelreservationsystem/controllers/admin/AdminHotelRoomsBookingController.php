@@ -260,6 +260,10 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
             'booking_product' => $this->booking_product,
             'is_occupancy_wise_search' => $isOccupancyWiseSearch,
         ));
+        MediaCore::addJsDef(array(
+            'initialDate' => $this->date_from
+        ));
+
     }
 
     public function renderView()
