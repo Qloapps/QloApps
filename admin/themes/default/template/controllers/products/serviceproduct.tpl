@@ -14,7 +14,7 @@
 							<span>{l s='Name'}</span>
 						</th>
                         <th>
-                            <span>{l s='Auto Added'}</span>
+                            <span>{l s='Auto add to cart'}</span>
                         </th>
                         <th>
                             <span>{l s='Position'}</span>
