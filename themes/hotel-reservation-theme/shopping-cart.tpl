@@ -148,8 +148,14 @@
 											<div class="price_block">
 												<p class="total_price">
 													<span>
-														{displayPrice price=($rm_v['amount'])}
+														{displayPrice price=($rm_v['amount_without_auto_add'])}
 													</span>
+													<br>
+													{if ($rm_v['amount'] - $rm_v['amount_without_auto_add']) > 0}
+														<span class="total_price_detial">
+															+ {displayPrice price=($rm_v['amount'] - $rm_v['amount_without_auto_add'])}
+														</span>
+													{/if}
 													{if (isset($data_v['extra_demands']) && $data_v['extra_demands']) || (isset($data_v['service_products']) && $data_v['service_products'])}
 														<span class="plus-sign pull-right">
 															+

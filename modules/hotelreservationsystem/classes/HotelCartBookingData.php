@@ -1331,12 +1331,26 @@ class HotelCartBookingData extends ObjectModel
                                         $data_v['date_from'],
                                         $data_v['date_to']
                                     );
+                                    $roomTypeDateRangePriceWithoutAutoAdd = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
+                                        $product['id_product'],
+                                        $data_v['date_from'],
+                                        $data_v['date_to'],
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        0
+                                    );
                                     if (!$price_tax) {
                                         $amount = $roomTypeDateRangePrice['total_price_tax_excl'];
+                                        $amountWithoutAutoAdd = $roomTypeDateRangePriceWithoutAutoAdd['total_price_tax_excl'];
                                     } else {
                                         $amount = $roomTypeDateRangePrice['total_price_tax_incl'];
+                                        $amountWithoutAutoAdd = $roomTypeDateRangePriceWithoutAutoAdd['total_price_tax_incl'];
                                     }
                                     $cartHotelData[$prodKey]['date_diff'][$dateJoin]['amount'] = $amount * $varQty;
+                                    $cartHotelData[$prodKey]['date_diff'][$dateJoin]['amount_without_auto_add'] = $amountWithoutAutoAdd * $varQty;
                                 } else {
                                     $cartHotelData[$prodKey]['date_diff'][$dateJoin]['demand_price'] = $totalAdditionalServicePrice;
                                     $numDays = $objBookingDetail->getNumberOfDays($data_v['date_from'], $data_v['date_to']);
@@ -1359,12 +1373,26 @@ class HotelCartBookingData extends ObjectModel
                                         $data_v['date_from'],
                                         $data_v['date_to']
                                     );
+                                    $roomTypeDateRangePriceWithoutAutoAdd = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
+                                        $product['id_product'],
+                                        $data_v['date_from'],
+                                        $data_v['date_to'],
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        0
+                                    );
                                     if (!$price_tax) {
                                         $amount = $roomTypeDateRangePrice['total_price_tax_excl'];
+                                        $amountWithoutAutoAdd = $roomTypeDateRangePriceWithoutAutoAdd['total_price_tax_excl'];
                                     } else {
                                         $amount = $roomTypeDateRangePrice['total_price_tax_incl'];
+                                        $amountWithoutAutoAdd = $roomTypeDateRangePriceWithoutAutoAdd['total_price_tax_incl'];
                                     }
                                     $cartHotelData[$prodKey]['date_diff'][$dateJoin]['amount'] = $amount;
+                                    $cartHotelData[$prodKey]['date_diff'][$dateJoin]['amount_without_auto_add'] = $amountWithoutAutoAdd;
                                     $cartHotelData[$prodKey]['date_diff'][$dateJoin]['link'] = $context->link->getPageLink(
                                         'order-opc',
                                         null,
