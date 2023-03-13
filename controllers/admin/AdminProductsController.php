@@ -2846,6 +2846,7 @@ class AdminProductsControllerCore extends AdminController
                     );
                     $serviceProduct['id_product'] = $product->id;
                     $serviceProduct['name'] = $product->name;
+                    $serviceProduct['auto_add_to_cart'] = $product->auto_add_to_cart;
                     $serviceProduct['category'] = $product->category;
                     $serviceProduct['default_price'] = $product->price;
                     $serviceProduct['id_tax_rules_group'] = $product->id_tax_rules_group;
@@ -2874,7 +2875,6 @@ class AdminProductsControllerCore extends AdminController
                         $serviceProduct['default_tax_rules_group_name'] = $objTaxRuleGroup->name;
                     }
                 }
-
                 $data->assign(array(
                     'product' => $obj,
                     'currency' => $this->context->currency,
