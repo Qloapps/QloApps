@@ -669,6 +669,7 @@ class OrderOpcControllerCore extends ParentOrderController
             'invoice_company' => Tools::htmlentitiesUTF8($address_invoice->company),
             'invoice_lastname' => Tools::htmlentitiesUTF8($address_invoice->lastname),
             'invoice_firstname' => Tools::htmlentitiesUTF8($address_invoice->firstname),
+            'invoice_vat_number' => Tools::htmlentitiesUTF8($address_invoice->vat_number),
             'invoice_dni' => Tools::htmlentitiesUTF8($address_invoice->dni),
             'invoice_address' => $this->context->cart->id_address_invoice !== $this->context->cart->id_address_delivery,
             'invoice_address1' => Tools::htmlentitiesUTF8($address_invoice->address1),
