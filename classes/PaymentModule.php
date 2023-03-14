@@ -1039,18 +1039,19 @@ abstract class PaymentModuleCore extends Module
                         $normal_products_data_html = $this->getEmailTemplateContent('hotel-service-product-data.tpl', Mail::TYPE_TEXT, $orderServiceProducts);
                         $normal_products_data_txt = $this->getEmailTemplateContent('hotel-service-product-data-text.tpl', Mail::TYPE_TEXT, $orderServiceProducts);
 
-
+                        // total room price
                         $room_price_tax_excl = $order->getTotalProductsWithoutTaxes(false, true);
                         $room_price_tax_incl = $order->getTotalProductsWithTaxes(false, true);
                         $room_tax = ($order->getTotalProductsWithTaxes(false, true) - $order->getTotalProductsWithoutTaxes(false, true));
-                        $room_price_tax_excl += $service_products_price_tax_excl = $order->getTotalProductsWithoutTaxes(false, false, Product::SERVICE_PRODUCT_WITHOUT_ROOMTYPE);
-                        $room_price_tax_incl += $service_products_price_tax_incl = $order->getTotalProductsWithTaxes(false, false, Product::SERVICE_PRODUCT_WITHOUT_ROOMTYPE);
-                        $service_products_tax = ($order->getTotalProductsWithTaxes(false, false, Product::SERVICE_PRODUCT_WITHOUT_ROOMTYPE) - $order->getTotalProductsWithoutTaxes(false, false, Product::SERVICE_PRODUCT_WITHOUT_ROOMTYPE));
+
+                        // extra services
                         $additional_service_price_tax_excl = ($order->getTotalProductsWithoutTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE) + $cart_booking_data['total_extra_demands_te']);
                         $additional_service_price_tax_incl = ($order->getTotalProductsWithTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE) + $cart_booking_data['total_extra_demands_ti']);
                         $additional_service_tax = (($order->getTotalProductsWithTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE) + $cart_booking_data['total_extra_demands_ti']) - ($order->getTotalProductsWithoutTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE) + $cart_booking_data['total_extra_demands_te']));
+
+                        // convenience fee price
                         $objRoomTypeServiceProductOrderDetail = new RoomTypeServiceProductOrderDetail();
-                        $room_price_tax_incl -= $total_convenience_fee_ti = $objRoomTypeServiceProductOrderDetail->getroomTypeServiceProducts(
+                        $total_convenience_fee_ti = $objRoomTypeServiceProductOrderDetail->getroomTypeServiceProducts(
                             $order->id,
                             0,
                             0,
@@ -1060,9 +1061,10 @@ abstract class PaymentModuleCore extends Module
                             0,
                             1,
                             1,
-                            1
+                            1,
+                            Product::PRICE_ADDITION_TYPE_INDEPENDENT
                         );
-                        $room_price_tax_excl -= $total_convenience_fee_te = $objRoomTypeServiceProductOrderDetail->getroomTypeServiceProducts(
+                        $total_convenience_fee_te = $objRoomTypeServiceProductOrderDetail->getroomTypeServiceProducts(
                             $order->id,
                             0,
                             0,
@@ -1072,8 +1074,18 @@ abstract class PaymentModuleCore extends Module
                             0,
                             1,
                             0,
-                            1
+                            1,
+                            Product::PRICE_ADDITION_TYPE_INDEPENDENT
                         );
+                        $additional_service_price_tax_excl = $additional_service_price_tax_excl - $total_convenience_fee_te;
+                        $additional_service_price_tax_incl = $additional_service_price_tax_incl - $total_convenience_fee_ti;
+                        $room_price_tax_excl = $room_price_tax_excl + $additional_service_price_tax_excl;
+                        $room_price_tax_incl = $room_price_tax_incl + $additional_service_price_tax_incl;
+
+                        // service products
+                        // $service_products_price_tax_excl = $order->getTotalProductsWithoutTaxes(false, false, Product::SERVICE_PRODUCT_WITHOUT_ROOMTYPE);
+                        // $service_products_price_tax_incl = $order->getTotalProductsWithTaxes(false, false, Product::SERVICE_PRODUCT_WITHOUT_ROOMTYPE);
+                        // $service_products_tax = ($order->getTotalProductsWithTaxes(false, false, Product::SERVICE_PRODUCT_WITHOUT_ROOMTYPE) - $order->getTotalProductsWithoutTaxes(false, false, Product::SERVICE_PRODUCT_WITHOUT_ROOMTYPE));
 
                         $data = array(
                             '{cart_booking_data_html}' => $cart_booking_data_html,
@@ -1143,9 +1155,9 @@ abstract class PaymentModuleCore extends Module
                             '{room_price_tax_excl}' => Tools::displayPrice($room_price_tax_excl, $this->context->currency, false),
                             '{room_price_tax_incl}' => Tools::displayPrice($room_price_tax_incl, $this->context->currency, false),
                             '{room_tax}' => Tools::displayPrice($room_tax, $this->context->currency, false),
-                            '{service_products_price_tax_excl}' => Tools::displayPrice($service_products_price_tax_excl, $this->context->currency, false),
-                            '{service_products_price_tax_incl}' => Tools::displayPrice($service_products_price_tax_incl, $this->context->currency, false),
-                            '{service_products_tax}' => Tools::displayPrice($service_products_tax, $this->context->currency, false),
+                            // '{service_products_price_tax_excl}' => Tools::displayPrice($service_products_price_tax_excl, $this->context->currency, false),
+                            // '{service_products_price_tax_incl}' => Tools::displayPrice($service_products_price_tax_incl, $this->context->currency, false),
+                            // '{service_products_tax}' => Tools::displayPrice($service_products_tax, $this->context->currency, false),
                             '{additional_service_price_tax_excl}' => Tools::displayPrice($additional_service_price_tax_excl, $this->context->currency, false),
                             '{additional_service_price_tax_incl}' => Tools::displayPrice($additional_service_price_tax_incl, $this->context->currency, false),
                             '{additional_service_tax}' => Tools::displayPrice($additional_service_tax, $this->context->currency, false),
