@@ -17,9 +17,21 @@
 * @license LICENSE.txt
 *}
 
-{l s='This room already has bookings for highlighted date range(s). Please reselect the date ranges:'}
+{l s='This room already has bookings for highlighted date range(s):'}
 
-{foreach from=$booked_rows_list item=booked_row}
-    <br>
-    {dateFormat date=$booked_row->date_from} {l s='to'} {dateFormat date=$booked_row->date_to} - <a href="{$link->getAdminLink('AdminOrders')}&id_order={$booked_row->id_order}&vieworder" target="_blank"><strong>#{$booked_row->id_order|intval}</strong></a>
-{/foreach}
+<table width="70%">
+    <tr>
+        <th class="text-center">{l s='Order ID'}</th>
+        <th class="text-center">{l s='Date From'}</th>
+        <th class="text-center">{l s='Date To'}</th>
+    </tr>
+    {foreach from=$booked_rows_list item=booked_row}
+        <tr>
+            <td class="text-center">
+                <a href="{$link->getAdminLink('AdminOrders')}&id_order={$booked_row->id_order}&vieworder" target="_blank"><strong>#{$booked_row->id_order|intval}</strong></a>
+            </td>
+            <td class="text-center">{dateFormat date=$booked_row->date_from}</td>
+            <td class="text-center">{dateFormat date=$booked_row->date_to}</td>
+        </tr>
+    {/foreach}
+</table>

@@ -3116,7 +3116,7 @@ class AdminProductsControllerCore extends AdminController
         }
     }
 
-    public function validateDisableDateRanges($disableDates, $index)
+    public function validateDisableDateRanges($disableDates, $index, $idRoom)
     {
         if (count($disableDates)) {
             foreach ($disableDates as $disable_key => $disableDate) {
@@ -3133,6 +3133,7 @@ class AdminProductsControllerCore extends AdminController
                         $index
                     );
                 } else {
+                    $objHotelBookingDetail = new HotelBookingDetail();
                     foreach ($disableDates as $key => $disDate) {
                         if ($key != $disable_key) {
                             if ((($disableDate['date_from'] < $disDate['date_from']) && ($disableDate['date_to'] <= $disDate['date_from'])) || (($disableDate['date_from'] > $disDate['date_from']) && ($disableDate['date_from'] >= $disDate['date_to']))) {
@@ -3140,6 +3141,14 @@ class AdminProductsControllerCore extends AdminController
                             } else {
                                 $this->errors[] = sprintf(
                                     Tools::displayError('Disable dates are conflicting for %s room. Please add non-conflicting dates.'),
+                                    $index
+                                );
+                            }
+
+                            // check if room has booking for current date range
+                            if ($objHotelBookingDetail->chechRoomBooked($idRoom, $disDate['date_from'], $disDate['date_to'])) {
+                                $this->errors[] = sprintf(
+                                    Tools::displayError('The %s room already has bookings for selected disable dates. Please reselect disable dates.'),
                                     $index
                                 );
                             }
@@ -3241,7 +3250,7 @@ class AdminProductsControllerCore extends AdminController
                 if ($roomInfo['id_status'] == HotelRoomInformation::STATUS_TEMPORARY_INACTIVE) {
                     $disableDates = json_decode($roomInfo['disable_dates_json'], true);
                     if ($roomInfo['disable_dates_json'] !== 0) {
-                        $this->validateDisableDateRanges($disableDates, $index);
+                        $this->validateDisableDateRanges($disableDates, $index, $roomInfo['id']);
                     }
                 }
             }

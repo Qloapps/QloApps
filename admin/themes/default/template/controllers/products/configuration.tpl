@@ -384,7 +384,6 @@
         // Disable dates data filling when model open
         $('#deactiveDatesModal').on('hide.bs.modal', function(e) {
             const disableDates = DisableDatesModal.getDisableDatesInfo();
-            console.log(disableDates);
             const roomRowIndex = parseInt($('#deactiveDatesModal table.room-disable-dates').attr('data-room-row-index'));
             const roomRow = $('#product-configuration .hotel-room tr.room_data_values[data-row-index='+roomRowIndex+']');
             $(roomRow).find('.disable_dates_json').val(JSON.stringify(disableDates));
