@@ -2704,7 +2704,7 @@ class AdminOrdersControllerCore extends AdminController
                     $objCartBookingData = new HotelCartBookingData();
                     $objCartBookingData->id_cart = $this->context->cart->id;
                     $objCartBookingData->id_guest = $this->context->cookie->id_guest;
-                    $objCartBookingData->id_customer = $this->context->customer->id;
+                    $objCartBookingData->id_customer = $order->id_customer;
                     $objCartBookingData->id_currency = $order->id_currency;
                     $objCartBookingData->id_product = $room_info['id_product'];
                     $objCartBookingData->id_room = $room_info['id_room'];
@@ -3032,7 +3032,7 @@ class AdminOrdersControllerCore extends AdminController
                 $objBookingDetail->id_cart = $this->context->cart->id;
                 $objBookingDetail->id_room = $objCartBookingData->id_room;
                 $objBookingDetail->id_hotel = $objCartBookingData->id_hotel;
-                $objBookingDetail->id_customer = $this->context->customer->id;
+                $objBookingDetail->id_customer = $order->id_customer;
                 $objBookingDetail->booking_type = $objCartBookingData->booking_type;
                 $objBookingDetail->id_status = 1;
                 $objBookingDetail->comment = $objCartBookingData->comment;
