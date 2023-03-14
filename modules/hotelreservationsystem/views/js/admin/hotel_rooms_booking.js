@@ -313,7 +313,7 @@ $(document).ready(function() {
                 occupancy = false;
             }
         } else {
-            return true;
+            return 1;
         }
 
         return occupancy;
