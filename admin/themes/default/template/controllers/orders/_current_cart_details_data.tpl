@@ -50,15 +50,6 @@
 								<td><img src="{$data.image_link|escape:'html':'UTF-8'}" title="Room image" /></td>
 								<td>
 									<p>{$data.room_type|escape:'html':'UTF-8'}</p>
-									{if isset($data.selected_demands) && $data.selected_demands}
-										<ul class="extra-demand-list">
-										{foreach $data.selected_demands as $selDemand}
-											<li>
-												{$selDemand.name|escape:'html':'UTF-8'}
-											</li>
-										{/foreach}
-										</ul>
-									{/if}
 								</td>
 								<td>{dateFormat date=$data.date_from} - {dateFormat date=$data.date_to}</td>
 								{if $occupancy_required_for_booking}
@@ -153,7 +144,7 @@
 									{if (isset($data.extra_demands) && $data.extra_demands) || isset($data.additional_service) && $data.additional_service}
 										<br />
 										<a href="#" id_room={$data.id_room|escape:'html':'UTF-8'} date_from="{$data.date_from|escape:'html':'UTF-8'}" date_to="{$data.date_to|escape:'html':'UTF-8'}" id_product="{$data.id_product|escape:'html':'UTF-8'}" id_cart="{$data.id_cart|escape:'html':'UTF-8'}" class="open_rooms_extra_demands btn btn-success" title="{l s='Click here to add or remove the extra services of this room type.'}">
-											<i class="icon-plus"></i>&nbsp;{l s='Services'}
+											<i class="icon-pencil"></i>&nbsp;{l s='Services'}
 										</a>
 									{/if}
 								</td>

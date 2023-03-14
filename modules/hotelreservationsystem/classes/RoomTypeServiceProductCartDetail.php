@@ -107,16 +107,24 @@ class RoomTypeServiceProductCartDetail extends ObjectModel
         if ($useTax === null)
             $useTax = Product::$_taxCalculationMethod == PS_TAX_EXC ? false : true;
 
+        $idLang = Context::getContext()->language->id;
+
         $sql = 'SELECT rscd.`id_product`, rscd.`quantity`, cbd.`id_cart`, cbd.`id` as `htl_cart_booking_id` ,
             cbd.`id_product` as `room_type_id_product`, cbd.`adults`, cbd.`children`';
         if (!$getTotalPrice) {
-            $sql .= ', cbd.`id_guest`, cbd.`id_customer`, p.`auto_add_to_cart`, p.`price_addition_type`,
+            $sql .= ', pl.`name`, cbd.`id_guest`, cbd.`id_customer`, p.`auto_add_to_cart`, p.`price_addition_type`,
                 cbd.`id_hotel`, cbd.`id_room`, cbd.`date_from`, cbd.`date_to`, cbd.`is_refunded`';
         }
         $sql .= ' FROM `'._DB_PREFIX_.'htl_cart_booking_data` cbd
-            LEFT JOIN `'._DB_PREFIX_.'htl_room_type_service_product_cart_detail` rscd ON(rscd.`htl_cart_booking_id` = cbd.`id`)
-            LEFT JOIN `'._DB_PREFIX_.'product` p ON (p.`id_product` = rscd.`id_product`)
-            WHERE 1';
+            LEFT JOIN `'._DB_PREFIX_.'htl_room_type_service_product_cart_detail` rscd
+            ON(rscd.`htl_cart_booking_id` = cbd.`id`)
+            LEFT JOIN `'._DB_PREFIX_.'product` p
+            ON (p.`id_product` = rscd.`id_product`)';
+        if (!$getTotalPrice) {
+            $sql .=  ' LEFT JOIN `'._DB_PREFIX_.'product_lang` pl
+                ON (pl.`id_product` = p.`id_product` AND pl.`id_lang` = '.(int)$idLang.')';
+        }
+        $sql .= ' WHERE 1';
 
         if (!is_null($autoAddToCart)) {
             $sql .= ' AND p.`auto_add_to_cart` = '. (int)$autoAddToCart;
@@ -165,7 +173,6 @@ class RoomTypeServiceProductCartDetail extends ObjectModel
                     );
 
                 } else {
-                    $roomTypeInfo = $objHotelRoomType->getRoomTypeInfoByIdProduct($product['room_type_id_product']);
                     $qty = $product['quantity'] ? (int)$product['quantity'] : 1;
                     if (isset($selectedServiceProducts[$product['htl_cart_booking_id']])) {
                         if ($product['id_product']) {
@@ -175,6 +182,7 @@ class RoomTypeServiceProductCartDetail extends ObjectModel
                             } else {
                                 $selectedServiceProducts[$product['htl_cart_booking_id']]['selected_products_info'][$product['id_product']] = array(
                                     'id_product' => $product['id_product'],
+                                    'name' => $product['name'],
                                     'auto_add_to_cart' => $product['auto_add_to_cart'],
                                     'price_addition_type' => $product['price_addition_type'],
                                     'quantity' => $product['quantity'],
@@ -220,6 +228,7 @@ class RoomTypeServiceProductCartDetail extends ObjectModel
                         $selectedServiceProducts[$product['htl_cart_booking_id']]['children'] = $product['children'];
                         if ($idProduct) {
                             $selectedServiceProducts[$product['htl_cart_booking_id']]['id_product'] = $product['id_product'];
+                            $selectedServiceProducts[$product['htl_cart_booking_id']]['name'] = $product['name'];
                             $selectedServiceProducts[$product['htl_cart_booking_id']]['quantity'] = $product['quantity'];
                             $selectedServiceProducts[$product['htl_cart_booking_id']]['auto_add_to_cart'] = $product['auto_add_to_cart'];
                             $selectedServiceProducts[$product['htl_cart_booking_id']]['price_addition_type'] = $product['price_addition_type'];
@@ -243,6 +252,7 @@ class RoomTypeServiceProductCartDetail extends ObjectModel
                             $selectedServiceProducts[$product['htl_cart_booking_id']]['selected_products_info'] = ($product['id_product']) ? array(
                                 $product['id_product'] => array(
                                     'id_product' => $product['id_product'],
+                                    'name' => $product['name'],
                                     'quantity' => $product['quantity'],
                                     'auto_add_to_cart' => $product['auto_add_to_cart'],
                                     'price_addition_type' => $product['price_addition_type'],
