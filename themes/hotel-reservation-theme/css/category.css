@@ -108,6 +108,9 @@
 p.capa_txt {
     margin-bottom: 15px;
 }
+.visible-md .capa_txt {
+    padding-left: 15px;
+}
 
 .rm_review_cont
 {
@@ -254,7 +257,8 @@ p.capa_txt {
     .room_features_cont > div {
         display: flex;
         flex-wrap: wrap;
-        align-items: flex-end;
+        align-items: center;
+        justify-content: space-between;
         gap: 10px 0;
     }
     .booking_room_fields {
