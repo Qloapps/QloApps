@@ -1555,7 +1555,6 @@ CREATE TABLE `PREFIX_product` (
   `cache_has_attachments` tinyint(1) NOT NULL DEFAULT '0',
   `is_virtual` tinyint(1) NOT NULL DEFAULT '0',
   `booking_product` tinyint(1) NOT NULL DEFAULT '1',
-  `is_invisible` tinyint(1) NOT NULL DEFAULT '0',
   `cache_default_attribute` int(10) unsigned DEFAULT NULL,
   `date_add` datetime NOT NULL,
   `date_upd` datetime NOT NULL,
