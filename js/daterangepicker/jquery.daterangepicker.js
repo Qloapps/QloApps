@@ -2579,11 +2579,9 @@
          */
         function translate(translationKey) {
             var translationKeyLowerCase = translationKey.toLowerCase();
-            console.log(languages);
             var result = (translationKey in languages) ? languages[translationKey] : (translationKeyLowerCase in languages) ? languages[translationKeyLowerCase] : null;
             var defaultLanguage = $.dateRangePickerLanguages['default'];
             if (result == null) result = (translationKey in defaultLanguage) ? defaultLanguage[translationKey] : (translationKeyLowerCase in defaultLanguage) ? defaultLanguage[translationKeyLowerCase] : '';
-            console.log(result);
 
             return result;
         }
