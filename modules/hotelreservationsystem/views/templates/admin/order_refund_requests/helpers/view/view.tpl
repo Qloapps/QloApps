@@ -137,7 +137,7 @@
 												<td>{$booking['hotel_name']|escape:'htmlall':'UTF-8'}</td>
 												<td>{$booking['date_from']|date_format:"%d-%m-%Y"} {l s='To' mod='hotelreservationsystem'} {$booking['date_to']|date_format:"%d-%m-%Y"}</td>
 												<td>{displayPrice price=$booking['total_paid_amount'] currency=$orderCurrency['id']}</td>
-												<td>{displayPrice price=($booking['extra_demands_price_tax_incl'] + $booking['additional_services_tax_incl']) currency=$orderCurrency['id']}</td>
+												<td>{displayPrice price=$booking['extra_demand_service_total_paid_amount'] currency=$orderCurrency['id']}</td>
 												{if !$isRefundCompleted}
 													<td>{displayPrice price=$booking['cancelation_charge'] currency=$orderCurrency['id']}</td>
 												{/if}

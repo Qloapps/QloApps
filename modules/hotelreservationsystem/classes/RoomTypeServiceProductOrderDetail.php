@@ -30,6 +30,7 @@ class RoomTypeServiceProductOrderDetail extends ObjectModel
     public $unit_price_tax_incl;
     public $total_price_tax_excl;
     public $total_price_tax_incl;
+    public $total_paid_amount;
     public $name;
     public $quantity;
     public $auto_added;
@@ -49,6 +50,7 @@ class RoomTypeServiceProductOrderDetail extends ObjectModel
             'unit_price_tax_incl' => array('type' => self::TYPE_FLOAT, 'validate' => 'isPrice', 'required' => true),
             'total_price_tax_excl' => array('type' => self::TYPE_FLOAT, 'validate' => 'isPrice', 'required' => true),
             'total_price_tax_incl' => array('type' => self::TYPE_FLOAT, 'validate' => 'isPrice', 'required' => true),
+            'total_paid_amount' => array('type' => self::TYPE_FLOAT, 'validate' => 'isPrice'),
             'name' => array('type' => self::TYPE_STRING, 'required' => true),
             'quantity' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedInt', 'required' => true),
             'auto_added' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedInt'),
@@ -185,11 +187,7 @@ class RoomTypeServiceProductOrderDetail extends ObjectModel
     }
 
     public function getSelectedServicesForRoom(
-        $idOrder,
-        $roomTypeIdProduct,
-        $dateFrom,
-        $dateTo,
-        $idRoom,
+        $idHotelBookingDetail,
         $getTotalPrice = 0,
         $useTax = null
     ) {
@@ -204,8 +202,8 @@ class RoomTypeServiceProductOrderDetail extends ObjectModel
         }
         $sql .= ' FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
             LEFT JOIN `'._DB_PREFIX_.'htl_room_type_service_product_order_detail` rsod ON(rsod.`id_htl_booking_detail` = hbd.`id`)';
-        $sql .= ' LEFT JOIN `'._DB_PREFIX_.'order_detail` od ON(od.`product_id` = rsod.`id_product` AND od.`id_order` = '.(int)$idOrder.')';
-        $sql .= ' WHERE rsod.`id_order` = '.(int)$idOrder.' AND hbd.`id_product`='.(int) $roomTypeIdProduct .' AND hbd.`date_from` = \''.pSQL($dateFrom).'\' AND hbd.`date_to` = \''.pSQL($dateTo).'\' AND hbd.`id_room`='.(int) $idRoom;
+        $sql .= ' LEFT JOIN `'._DB_PREFIX_.'order_detail` od ON(od.`product_id` = rsod.`id_product`)';
+        $sql .= ' WHERE hbd.`id` = '.(int)$idHotelBookingDetail;
 
         if ($getTotalPrice) {
             $totalPrice = 0;
@@ -234,6 +232,7 @@ class RoomTypeServiceProductOrderDetail extends ObjectModel
                             'product_price_addition_type' => $product['product_price_addition_type'],
                             'total_price_tax_excl' => $product['total_price_tax_excl'],
                             'total_price_tax_incl' => $product['total_price_tax_incl'],
+                            'total_paid_amount' => $product['total_paid_amount'],
                         );
                     } else {
                         $selectedAdditionalServices['id_order'] = $product['id_order'];
@@ -255,6 +254,7 @@ class RoomTypeServiceProductOrderDetail extends ObjectModel
                                 'product_price_addition_type' => $product['product_price_addition_type'],
                                 'total_price_tax_excl' => $product['total_price_tax_excl'],
                                 'total_price_tax_incl' => $product['total_price_tax_incl'],
+                                'total_paid_amount' => $product['total_paid_amount'],
                             ),
                         );
                     }
@@ -267,7 +267,7 @@ class RoomTypeServiceProductOrderDetail extends ObjectModel
         return $selectedAdditionalServices;
     }
 
-    public function deleteRoomSevicesByIdHotelBookingDetail($idHotelBookingDetail)
+    public function deleteRoomSevices($idHotelBookingDetail)
     {
         $services = Db::getInstance()->executeS(
             'SELECT `id_room_type_service_product_order_detail` FROM `'._DB_PREFIX_.'htl_room_type_service_product_order_detail` pod

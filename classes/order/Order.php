@@ -2599,4 +2599,58 @@ class OrderCore extends ObjectModel
             'SELECT `id` FROM `'._DB_PREFIX_.'htl_booking_detail` WHERE `id_order` = '.(int)$this->id.' ORDER BY `id` ASC'
         );
     }
+
+    // Recalculate order split amount for booking room, service product and additional features
+    public function recalculateOrderSplitAmount()
+    {
+        if ($this->id && $this->total_paid_real) {
+            $objHotelBookingDetail = new HotelBookingDetail();
+            $objHotelBookingDemands = new HotelBookingDemands();
+            $objRoomTypeServiceProductOrderDetail = new RoomTypeServiceProductOrderDetail();
+
+            // recalculate booking room split amount
+            $bookingInfo = $objHotelBookingDetail->getBookingDataByOrderId($this->id);
+            foreach ($bookingInfo as $info) {
+                $roomSplitAmountPercent = ($info['total_price_tax_incl']*100)/$this->total_paid_tax_incl;
+                $roomSplitAmount = ($this->total_paid_real*$roomSplitAmountPercent)/100;
+                $objHotelBookingDetail = new HotelBookingDetail($info['id']);
+                $objHotelBookingDetail->total_paid_amount = Tools::math_round($roomSplitAmount, 6);
+                $objHotelBookingDetail->save();
+
+                // recalculate booking demand split amount
+                $roomSelectedDemands = $objHotelBookingDemands->getSelectedRoomDemandPaidAmount(
+                    $objHotelBookingDetail->id
+                );
+                if (count($roomSelectedDemands)) {
+                    foreach ($roomSelectedDemands as $demand) {
+                        $roomDemandSplitAmountPercent = ($demand['total_price_tax_incl']*100)/$this->total_paid_tax_incl;
+                        $roomDemandSplitAmount = ($this->total_paid_real*$roomDemandSplitAmountPercent)/100;
+                        $objHotelBookingDemands = new HotelBookingDemands($demand['id_booking_demand']);
+                        $objHotelBookingDemands->total_paid_amount = Tools::math_round($roomDemandSplitAmount, 6);
+                        $objHotelBookingDemands->save();
+                    }
+                }
+
+                // recalculate booking service product split amount
+                $roomSelectedServices = $objRoomTypeServiceProductOrderDetail->getSelectedServicesForRoom(
+                    $objHotelBookingDetail->id
+                );
+                foreach ($roomSelectedServices['additional_services'] as $serviceProduct) {
+                    if (isset($serviceProduct['id_room_type_service_product_order_detail'])
+                        && isset($serviceProduct['id_room_type_service_product_order_detail'])
+                    ) {
+                        $roomServiceProductPercent = ($serviceProduct['total_price_tax_incl']*100)/$this->total_paid_tax_incl;
+                        $roomServiceProductAmount = ($this->total_paid_real*$roomServiceProductPercent)/100;
+                        $objRoomTypeServiceProductOrderDetail = new RoomTypeServiceProductOrderDetail(
+                            $serviceProduct['id_room_type_service_product_order_detail']
+                        );
+                        $objRoomTypeServiceProductOrderDetail->total_paid_amount = Tools::math_round(
+                            $roomServiceProductAmount, 6
+                        );
+                        $objRoomTypeServiceProductOrderDetail->save();
+                    }
+                }
+            }
+        }
+    }
 }

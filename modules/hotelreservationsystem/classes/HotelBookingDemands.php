@@ -26,6 +26,7 @@ class HotelBookingDemands extends ObjectModel
     public $unit_price_tax_incl;
     public $total_price_tax_excl;
     public $total_price_tax_incl;
+    public $total_paid_amount;
     public $id_tax_rules_group;
     public $tax_computation_method;
     public $price_calc_method;
@@ -44,6 +45,7 @@ class HotelBookingDemands extends ObjectModel
             'unit_price_tax_incl' => array('type' => self::TYPE_FLOAT),
             'total_price_tax_excl' => array('type' => self::TYPE_FLOAT),
             'total_price_tax_incl' => array('type' => self::TYPE_FLOAT),
+            'total_paid_amount' => array('type' => self::TYPE_FLOAT),
             'name' => array(
                 'type' => self::TYPE_STRING, 'validate' => 'isCatalogName', 'required' => true, 'size' => 128
             ),
@@ -300,5 +302,13 @@ class HotelBookingDemands extends ObjectModel
     public function deleteBookingDemandTaxDetails($idBookingDemand)
     {
         return Db::getInstance()->delete('htl_booking_demands_tax', 'id_booking_demand = '.(int)$idBookingDemand);
+    }
+
+    public function getSelectedRoomDemandPaidAmount($idHotelBooking)
+    {
+        return Db::getInstance()->executeS(
+            'SELECT hbd.`id_booking_demand`, hbd.`total_paid_amount`, hbd.`total_price_tax_incl` FROM `'._DB_PREFIX_.'htl_booking_demands` hbd
+            WHERE `id_htl_booking` = '.(int)$idHotelBooking
+        );
     }
 }

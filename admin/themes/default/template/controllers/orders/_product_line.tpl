@@ -245,7 +245,7 @@
 		&nbsp;
 		{/if}
 		</td>
-		<td class="product_action text-right">
+		<td class="product_action text-right fixed-width-md">
 			{* edit/delete controls *}
 			<div class="btn-group pull-right">
 				<button type="button" class="btn btn-default edit_room_change_link">

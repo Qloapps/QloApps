@@ -599,11 +599,16 @@ class OrderDetailControllerCore extends FrontController
                 if ($refundReqBookings = $objOrderReturn->getOrderRefundRequestedBookings($order->id, 0, 1)) {
                     $refundedAmount = $objOrderReturn->getRefundedAmount($order->id);
                 }
+                $isRefundAllowed = (int)$order->isReturnable();
+                if ($isRefundAllowed) {
+                    $allowedOrderStatus = explode(',' ,Configuration::get('WK_ALLOW_ORDER_STATUS_TO_REFUND'));
+                    $isRefundAllowed = $isRefundAllowed && in_array($order->current_state, $allowedOrderStatus);
+                }
                 $this->context->smarty->assign(
                     array(
                         'hasOrderPaid' => $order->hasBeenPaid(),
                         // refund info
-                        'refund_allowed' => (int) $order->isReturnable(),
+                        'refund_allowed' => $isRefundAllowed,
                         'returns' => OrderReturn::getOrdersReturn($order->id_customer, $order->id),
                         'refundReqBookings' => $refundReqBookings,
                         'hasCompletelyRefunded' => $order->hasCompletelyRefunded(),

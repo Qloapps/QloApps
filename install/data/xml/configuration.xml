@@ -905,5 +905,8 @@
 	<configuration id="PS_SERVICE_PRODUCT_CATEGORY_FILTER" name="PS_SERVICE_PRODUCT_CATEGORY_FILTER">
       <value>1</value>
     </configuration>
+	<configuration id="WK_ALLOW_ORDER_STATUS_TO_REFUND" name="WK_ALLOW_ORDER_STATUS_TO_REFUND">
+      <value>8,2</value>
+    </configuration>
   </entities>
 </entity_configuration>
