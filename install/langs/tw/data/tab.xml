@@ -22,7 +22,8 @@
   <tab id="Administration" name="管理"/>
   <tab id="Stats" name="狀態"/>
   <tab id="Stock" name="庫存"/>
-  <tab id="Products" name="產品"/>
+  <tab id="Products" name="管理服務產品"/>
+  <tab id="Room_Types" name="管理房間類型"/>
   <tab id="Categories" name="分類"/>
   <tab id="Monitoring" name="追蹤"/>
   <tab id="Attributes_and_Values" name="屬性與數值"/>

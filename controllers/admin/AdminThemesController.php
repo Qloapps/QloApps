@@ -716,8 +716,6 @@ class AdminThemesControllerCore extends AdminController
 
     public function initPageHeaderToolbar()
     {
-        parent::initPageHeaderToolbar();
-
         if (empty($this->display)) {
             $this->page_header_toolbar_btn['import_theme'] = array(
                 'href' => self::$currentIndex.'&action=importtheme&token='.$this->token,
@@ -746,6 +744,8 @@ class AdminThemesControllerCore extends AdminController
 
         $title = implode(' '.Configuration::get('PS_NAVIGATION_PIPE').' ', $this->toolbar_title);
         $this->page_header_toolbar_title = $title;
+
+        parent::initPageHeaderToolbar();
     }
 
     private function checkParentClass($name)

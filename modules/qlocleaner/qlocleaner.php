@@ -641,7 +641,6 @@ class QloCleaner extends Module
                 array('warehouse_carrier', 'id_carrier', 'carrier', 'id_carrier'),
                 array('warehouse_product_location', 'id_product', 'product', 'id_product'),
                 array('warehouse_product_location', 'id_warehouse', 'warehouse', 'id_warehouse'),
-                array('product_comment', 'id_product', 'product', 'id_product'),
                 array('specific_price', 'id_product', 'customer', 'id_customer'),
                 array('specific_price', 'id_group', 'group', 'id_group'),
                 array('htl_features_block_data_lang', 'id_features_block', 'htl_features_block_data', 'id_features_block'),
@@ -835,6 +834,10 @@ class QloCleaner extends Module
             'htl_booking_detail',
             'htl_booking_demands',
             'htl_booking_demands_tax',
+
+            'htl_room_type_service_product_order_detail',
+            'htl_room_type_service_product_cart_detail',
+            'htl_hotel_service_product_cart_detail',
         );
     }
 }

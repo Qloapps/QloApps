@@ -260,7 +260,7 @@ class HotelRoomType extends ObjectModel
      */
     public function getRoomTypeByHotelId($hotel_id, $id_lang, $active = 2)
     {
-        $sql = 'SELECT pl.`name` AS room_type, pl.`id_product` AS id_product, p.`active`
+        $sql = 'SELECT rt.`id` as id_room_type, pl.`name` AS room_type, pl.`id_product` AS id_product, p.`active`
 			FROM `'._DB_PREFIX_.'htl_room_type` AS rt';
         if ($active != 2) {
             $sql .= ' INNER JOIN `'._DB_PREFIX_.'product` AS pp ON (rt.id_product = pp.id_product AND pp.active = 1)';

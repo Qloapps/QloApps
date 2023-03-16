@@ -3611,7 +3611,7 @@ class AdminControllerCore extends Controller
     {
         /* Classical fields */
         foreach ($_POST as $key => $value) {
-            if (array_key_exists($key, $object) && $key != 'id_'.$table) {
+            if (property_exists($object, $key) && $key != 'id_'.$table) {
                 /* Do not take care of password field if empty */
                 if ($key == 'passwd' && Tools::getValue('id_'.$table) && empty($value)) {
                     continue;
@@ -3898,6 +3898,29 @@ class AdminControllerCore extends Controller
 			<body><div id='help-container' class='help-popup'></div></body>
 		</html>";
         die($popup_content);
+    }
+
+    public function ajaxProcessGetRecommendationContent()
+    {
+        $response = array('success' => false);
+        if (isset($this->context->cookie->{$this->controller_name.'_closed'}) && $this->context->cookie->{$this->controller_name.'_closed'}) {
+            $response['success'] = true;
+        } else {
+            if (method_exists($this, 'getRecommendationContent')) {
+                if ($content = $this->getRecommendationContent()) {
+                    $response['success'] = true;
+                    $response['content'] = $content;
+                }
+            }
+        }
+        $this->ajaxDie(json_encode($response));
+    }
+
+    public function ajaxProcessRecommendationClosed()
+    {
+        $this->context->cookie->{Tools::getValue('tab').'_closed'} = true;
+        $response = array('success' => true);
+        $this->ajaxDie(json_encode($response));
     }
 
     /**

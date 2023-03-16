@@ -20,7 +20,8 @@
   <tab id="Administration" name="ניהול"/>
   <tab id="Stats" name="סטטיסטיקות"/>
   <tab id="Stock" name="מלאי"/>
-  <tab id="Products" name="מוצרים"/>
+  <tab id="Products" name="ניהול מוצרי שירות"/>
+  <tab id="Room_Types" name="נהל סוגי חדרים"/>
   <tab id="Categories" name="קטגוריות"/>
   <tab id="Monitoring" name="בקרה"/>
   <tab id="Attributes_and_Values" name="מאפייני מוצר"/>

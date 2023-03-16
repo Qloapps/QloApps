@@ -1,6 +1,6 @@
 <?xml version='1.0'?>
 <entity_order_state>
-  <order_state id='Awaiting'>
+  <order_state id='Awaiting_payment'>
     <name>In attesa del pagamento</name>
     <template>awaiting_payment</template>
   </order_state>
@@ -44,5 +44,4 @@
     <name>Partial payment accepted</name>
     <template>payment_accepted</template>
   </order_state>
-
 </entity_order_state>

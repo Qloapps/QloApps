@@ -20,7 +20,8 @@
   <tab id="Administration" name="Administration"/>
   <tab id="Stats" name="Statistik"/>
   <tab id="Stock" name="Lager"/>
-  <tab id="Products" name="Produkter"/>
+  <tab id="Products" name="Hantera serviceprodukter"/>
+  <tab id="Room_Types" name="Hantera rumstyper"/>
   <tab id="Categories" name="Kategorier"/>
   <tab id="Monitoring" name="Övervakning"/>
   <tab id="Attributes_and_Values" name="Attribut &amp; grupper"/>

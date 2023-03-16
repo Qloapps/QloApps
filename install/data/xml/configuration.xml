@@ -686,6 +686,24 @@
 	<configuration id="ROOM_TYPE_CHECKUP_TOTAL_ROOMS_GT" name="ROOM_TYPE_CHECKUP_TOTAL_ROOMS_GT">
 		<value>3</value>
 	</configuration>
+	<configuration id="SERVICE_CHECKUP_DESCRIPTIONS_SHORT_LT" name="SERVICE_CHECKUP_DESCRIPTIONS_SHORT_LT">
+		<value>50</value>
+	</configuration>
+	<configuration id="SERVICE_CHECKUP_DESCRIPTIONS_SHORT_GT" name="SERVICE_CHECKUP_DESCRIPTIONS_GT">
+		<value>150</value>
+	</configuration>
+	<configuration id="SERVICE_CHECKUP_IMAGES_LT" name="SERVICE_CHECKUP_IMAGES_LT">
+		<value>1</value>
+	</configuration>
+	<configuration id="SERVICE_CHECKUP_IMAGES_GT" name="SERVICE_CHECKUP_IMAGES_GT">
+		<value>2</value>
+	</configuration>
+	<configuration id="SERVICE_CHECKUP_ORDERS_LT" name="SERVICE_CHECKUP_ORDERS_LT">
+		<value>1</value>
+	</configuration>
+	<configuration id="SERVICE_CHECKUP_ORDERS_GT" name="SERVICE_CHECKUP_ORDERS_GT">
+		<value>2</value>
+	</configuration>
 	<configuration id="FOOTER_CMS" name="FOOTER_CMS">
 		<value>0_3|0_4</value>
 	</configuration>
@@ -769,6 +787,12 @@
 	</configuration>
 	<configuration id="PS_HOME_CATEGORY" name="PS_HOME_CATEGORY">
 		<value>2</value>
+	</configuration>
+	<configuration id="PS_LOCATIONS_CATEGORY" name="PS_LOCATIONS_CATEGORY">
+		<value>3</value>
+	</configuration>
+	<configuration id="PS_SERVICE_CATEGORY" name="PS_SERVICE_CATEGORY">
+		<value>4</value>
 	</configuration>
 	<configuration id="PS_CONFIGURATION_AGREMENT" name="PS_CONFIGURATION_AGREMENT">
 		<value>0</value>
@@ -877,6 +901,9 @@
     </configuration>
     <configuration id="PS_ADVANCED_PAYMENT_API" name="PS_ADVANCED_PAYMENT_API">
       <value>0</value>
+    </configuration>
+	<configuration id="PS_SERVICE_PRODUCT_CATEGORY_FILTER" name="PS_SERVICE_PRODUCT_CATEGORY_FILTER">
+      <value>1</value>
     </configuration>
   </entities>
 </entity_configuration>

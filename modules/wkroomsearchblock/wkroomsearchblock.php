@@ -123,9 +123,14 @@ class WkRoomSearchBlock extends Module
     public function hookDisplayLeftColumn()
     {
         if ('category' == Tools::getValue('controller')) {
-            $objSearchHelper = new WkRoomSearchHelper();
-            $objSearchHelper->assignSearchPanelVariables();
-            return $this->display(__FILE__, 'categoryPageSearch.tpl');
+            $idCategory = Tools::getValue('id_category');
+            if (Validate::isLoadedObject($objCategory = new Category((int) $idCategory))) {
+                if ($objCategory->hasParent(Configuration::get('PS_LOCATIONS_CATEGORY'))) {
+                    $objSearchHelper = new WkRoomSearchHelper();
+                    $objSearchHelper->assignSearchPanelVariables();
+                    return $this->display(__FILE__, 'categoryPageSearch.tpl');
+                }
+            }
         }
     }
 
@@ -163,7 +168,7 @@ class WkRoomSearchBlock extends Module
         $maxOrderDate = Tools::getValue('max_order_date');
         $maxOrderDate = date('Y-m-d', strtotime($maxOrderDate));
 
-        if (Configuration::get('PS_FRONT_ROOM_UNIT_SELECTION_TYPE') == HotelBookingDetail::PS_FRONT_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY) {
+        if (Configuration::get('PS_FRONT_ROOM_UNIT_SELECTION_TYPE') == HotelBookingDetail::PS_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY) {
             if ($occupancy = Tools::getValue('occupancy')) {
                 $urlData['occupancy'] = $occupancy;
             }

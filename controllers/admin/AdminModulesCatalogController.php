@@ -290,16 +290,6 @@ class AdminModulesCatalogControllerCore extends AdminController
     }
 
 
-    public function ajaxProcessGetRecommendationContent()
-    {
-        $response = array('success' => false);
-        if ($content = $this->getRecommendationContent()) {
-            $response['success'] = true;
-            $response['content'] = $content;
-        }
-        $this->ajaxDie(json_encode($response));
-    }
-
     public function ajaxProcessSetSorting()
     {
         $this->setSorting(Tools::getValue('module_sorting'), Tools::getValue('theme_sorting'));

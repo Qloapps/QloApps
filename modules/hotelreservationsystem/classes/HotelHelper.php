@@ -256,10 +256,10 @@ class HotelHelper
         // Search Fields
         Configuration::updateValue('PS_FRONT_SEARCH_TYPE', HotelBookingDetail::SEARCH_TYPE_OWS);
         Configuration::updateValue('PS_FRONT_OWS_SEARCH_ALGO_TYPE', HotelBookingDetail::SEARCH_EXACT_ROOM_TYPE_ALGO);
-        Configuration::updateValue('PS_FRONT_ROOM_UNIT_SELECTION_TYPE', HotelBookingDetail::PS_FRONT_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY);
+        Configuration::updateValue('PS_FRONT_ROOM_UNIT_SELECTION_TYPE', HotelBookingDetail::PS_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY);
         Configuration::updateValue('PS_BACKOFFICE_SEARCH_TYPE', HotelBookingDetail::SEARCH_TYPE_OWS);
         Configuration::updateValue('PS_BACKOFFICE_OWS_SEARCH_ALGO_TYPE', HotelBookingDetail::SEARCH_ALL_ROOM_TYPE_ALGO);
-        Configuration::updateValue('PS_BACKOFFICE_ROOM_BOOKING_TYPE', HotelBookingDetail::PS_FRONT_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY);
+        Configuration::updateValue('PS_BACKOFFICE_ROOM_BOOKING_TYPE', HotelBookingDetail::PS_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY);
 
         return true;
     }
@@ -347,7 +347,7 @@ class HotelHelper
         $htl_id = $obj_hotel_info->id;
 
         // add hotel address info
-        $def_cont_id = Country::getDefaultCountryId();
+        $def_cont_id = Configuration::get('PS_COUNTRY_DEFAULT');
 
         if ($states = State::getStatesByIdCountry($def_cont_id)) {
             $state_id = $states[0]['id_state'];
@@ -442,6 +442,7 @@ class HotelHelper
             $product->price = $prod_price_arr[$key];
             $product->active = 1;
             $product->quantity = 999999999;
+            $product->booking_product = true;
             $product->is_virtual = 1;
             $product->indexed = 1;
             $product->save();
@@ -591,7 +592,7 @@ class HotelHelper
     public function addCategory($name, $parent_cat = false, $group_ids, $ishotel = false, $hotel_id = false)
     {
         if (!$parent_cat) {
-            $parent_cat = Category::getRootCategory()->id;
+            $parent_cat = Configuration::get('PS_LOCATIONS_CATEGORY');
         }
 
         if ($ishotel && $hotel_id) {

@@ -195,13 +195,11 @@ p.capa_txt {
     {
         text-align: right;
     }
+    .rm_qty_cont {
+        margin-bottom: 0;
+    }
 }
 
-.rm_qty_cont
-{
-    width: 120px;
-    margin-right: 15px;
-}
 .qty_txt
 {
     color: #333333;
@@ -255,6 +253,9 @@ p.capa_txt {
 }
 .booking_guest_occupancy_conatiner {
     display: flex;
+}
+.booking_guest_occupancy_conatiner .booking_occupancy_wrapper {
+    left: unset;
 }
 @media (min-width: 992px) {
     .room_features_cont > div {

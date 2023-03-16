@@ -44,7 +44,7 @@ class Datas
             'default' => '0',
             'validate' => 'isInt',
             'alias' => 'l',
-            'help' => 'install all available languages',
+            'help' => 'Install all available languages',
         ),
         'timezone' => array(
             'default' => 'Europe/Paris',
@@ -80,7 +80,7 @@ class Datas
         'database_name' => array(
             'name' => 'db_name',
             'alias' => 'd',
-            'default' => 'prestashop',
+            'default' => 'qloapps',
             'validate' => 'isGenericName',
         ),
         'database_clear' => array(
@@ -97,7 +97,7 @@ class Datas
         ),
         'database_prefix' => array(
             'name' => 'prefix',
-            'default' => 'ps_',
+            'default' => 'qlo_',
             'validate' => 'isGenericName',
         ),
         'database_engine' => array(
@@ -109,7 +109,7 @@ class Datas
         'shop_name' => array(
             'name' => 'name',
             'validate' => 'isGenericName',
-            'default' => 'PrestaShop',
+            'default' => 'QloApps',
         ),
         'shop_activity'    => array(
             'name' => 'activity',
@@ -144,17 +144,17 @@ class Datas
         'show_license' => array(
             'name' => 'license',
             'default' => 0,
-            'help' => 'show PrestaShop license'
+            'help' => 'Show QloApps license'
         ),
         'newsletter' => array(
             'name' => 'newsletter',
             'default' => 1,
-            'help' => 'get news from PrestaShop',
+            'help' => 'Get news from QloApps',
         ),
         'send_email' => array(
             'name' => 'send_email',
             'default' => 1,
-            'help' => 'send an email to the administrator after installation',
+            'help' => 'Send an email to the administrator after installation',
         ),
     );
 

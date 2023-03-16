@@ -401,6 +401,257 @@ class OrderInvoiceCore extends ObjectModel
         return $breakdown;
     }
 
+    public function getRoomsTaxesBreakdown($order = null)
+    {
+        if (!$order) {
+            $order = $this->getOrder();
+        }
+
+        $sum_composite_taxes = !$this->useOneAfterAnotherTaxComputationMethod();
+
+        // $breakdown will be an array with tax rates as keys and at least the columns:
+        // 	- 'total_price_tax_excl'
+        // 	- 'total_amount'
+        $breakdown = array();
+        $order_detail = $order->getOrderDetailList();
+        $order_detail = array_filter($order_detail, function($v) {
+            return ($v['is_booking_product']
+                || ($v['product_auto_add']
+                    && $v['product_service_type'] == Product::SERVICE_PRODUCT_WITH_ROOMTYPE
+                    && $v['product_price_addition_type'] == ProductCore::PRICE_ADDITION_TYPE_WITH_ROOM)
+            );
+        });
+
+        $details = $order->getProductTaxesDetails($order_detail, true);
+
+        if ($sum_composite_taxes) {
+            $grouped_details = array();
+            foreach ($details as $row) {
+                if (!isset($grouped_details[$row['id_order_detail']])) {
+                    $grouped_details[$row['id_order_detail']] = array(
+                        'tax_rate' => 0,
+                        'total_tax_base' => 0,
+                        'total_amount' => 0,
+                        'id_tax' => $row['id_tax'],
+                    );
+                }
+
+                $grouped_details[$row['id_order_detail']]['tax_rate'] += $row['tax_rate'];
+                $grouped_details[$row['id_order_detail']]['total_tax_base'] += $row['total_tax_base'];
+                $grouped_details[$row['id_order_detail']]['total_amount'] += $row['total_amount'];
+            }
+            $details = $grouped_details;
+        }
+        foreach ($details as $row) {
+            $rate = sprintf('%.3f', $row['tax_rate']);
+            if (!isset($breakdown[$rate])) {
+                $breakdown[$rate] = array(
+                    'total_price_tax_excl' => 0,
+                    'total_amount' => 0,
+                    'id_tax' => $row['id_tax'],
+                    'rate' => $rate,
+                );
+            }
+
+            $breakdown[$rate]['total_price_tax_excl'] += $row['total_tax_base'];
+            $breakdown[$rate]['total_amount'] += $row['total_amount'];
+        }
+
+        foreach ($breakdown as $rate => $data) {
+            $breakdown[$rate]['total_price_tax_excl'] = Tools::ps_round($data['total_price_tax_excl'], _PS_PRICE_COMPUTE_PRECISION_, $order->round_mode);
+            $breakdown[$rate]['total_amount'] = Tools::ps_round($data['total_amount'], _PS_PRICE_COMPUTE_PRECISION_, $order->round_mode);
+        }
+
+        ksort($breakdown);
+        return $breakdown;
+    }
+
+    public function getAdditionalServicesTaxesBreakdown($order = null)
+    {
+        if (!$order) {
+            $order = $this->getOrder();
+        }
+
+        $sum_composite_taxes = !$this->useOneAfterAnotherTaxComputationMethod();
+
+        // $breakdown will be an array with tax rates as keys and at least the columns:
+        // 	- 'total_price_tax_excl'
+        // 	- 'total_amount'
+        $breakdown = array();
+        $order_detail = $order->getOrderDetailList();
+        $order_detail = array_filter($order_detail, function($v) {
+            return (!$v['is_booking_product'] && !$v['product_auto_add'] && $v['product_service_type'] == Product::SERVICE_PRODUCT_WITH_ROOMTYPE);
+        });
+        $details = $order->getProductTaxesDetails($order_detail, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE);
+
+        if ($sum_composite_taxes) {
+            $grouped_details = array();
+            foreach ($details as $row) {
+                if (!isset($grouped_details[$row['id_order_detail']])) {
+                    $grouped_details[$row['id_order_detail']] = array(
+                        'tax_rate' => 0,
+                        'total_tax_base' => 0,
+                        'total_amount' => 0,
+                        'id_tax' => $row['id_tax'],
+                    );
+                }
+
+                $grouped_details[$row['id_order_detail']]['tax_rate'] += $row['tax_rate'];
+                $grouped_details[$row['id_order_detail']]['total_tax_base'] += $row['total_tax_base'];
+                $grouped_details[$row['id_order_detail']]['total_amount'] += $row['total_amount'];
+            }
+            $details = $grouped_details;
+        }
+        foreach ($details as $row) {
+            $rate = sprintf('%.3f', $row['tax_rate']);
+            if (!isset($breakdown[$rate])) {
+                $breakdown[$rate] = array(
+                    'total_price_tax_excl' => 0,
+                    'total_amount' => 0,
+                    'id_tax' => $row['id_tax'],
+                    'rate' => $rate,
+                );
+            }
+
+            $breakdown[$rate]['total_price_tax_excl'] += $row['total_tax_base'];
+            $breakdown[$rate]['total_amount'] += $row['total_amount'];
+        }
+
+        foreach ($breakdown as $rate => $data) {
+            $breakdown[$rate]['total_price_tax_excl'] = Tools::ps_round($data['total_price_tax_excl'], _PS_PRICE_COMPUTE_PRECISION_, $order->round_mode);
+            $breakdown[$rate]['total_amount'] = Tools::ps_round($data['total_amount'], _PS_PRICE_COMPUTE_PRECISION_, $order->round_mode);
+        }
+
+        ksort($breakdown);
+        return $breakdown;
+    }
+
+    public function getConvenienceFeeTaxesBreakdown($order = null)
+    {
+        if (!$order) {
+            $order = $this->getOrder();
+        }
+
+        $sum_composite_taxes = !$this->useOneAfterAnotherTaxComputationMethod();
+
+        // $breakdown will be an array with tax rates as keys and at least the columns:
+        // 	- 'total_price_tax_excl'
+        // 	- 'total_amount'
+        $breakdown = array();
+        $order_detail = $order->getOrderDetailList();
+        $order_detail = array_filter($order_detail, function($v) {
+            return (!$v['is_booking_product']
+                && $v['product_auto_add']
+                && $v['product_service_type'] == Product::SERVICE_PRODUCT_WITH_ROOMTYPE
+                && $v['product_price_addition_type'] == Product::PRICE_ADDITION_TYPE_INDEPENDENT
+            );
+        });
+
+        $details = $order->getProductTaxesDetails($order_detail, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE);
+
+        if ($sum_composite_taxes) {
+            $grouped_details = array();
+            foreach ($details as $row) {
+                if (!isset($grouped_details[$row['id_order_detail']])) {
+                    $grouped_details[$row['id_order_detail']] = array(
+                        'tax_rate' => 0,
+                        'total_tax_base' => 0,
+                        'total_amount' => 0,
+                        'id_tax' => $row['id_tax'],
+                    );
+                }
+
+                $grouped_details[$row['id_order_detail']]['tax_rate'] += $row['tax_rate'];
+                $grouped_details[$row['id_order_detail']]['total_tax_base'] += $row['total_tax_base'];
+                $grouped_details[$row['id_order_detail']]['total_amount'] += $row['total_amount'];
+            }
+            $details = $grouped_details;
+        }
+
+        foreach ($details as $row) {
+            $rate = sprintf('%.3f', $row['tax_rate']);
+            if (!isset($breakdown[$rate])) {
+                $breakdown[$rate] = array(
+                    'total_price_tax_excl' => 0,
+                    'total_amount' => 0,
+                    'id_tax' => $row['id_tax'],
+                    'rate' => $rate,
+                );
+            }
+
+            $breakdown[$rate]['total_price_tax_excl'] += $row['total_tax_base'];
+            $breakdown[$rate]['total_amount'] += $row['total_amount'];
+        }
+
+        foreach ($breakdown as $rate => $data) {
+            $breakdown[$rate]['total_price_tax_excl'] = Tools::ps_round($data['total_price_tax_excl'], _PS_PRICE_COMPUTE_PRECISION_, $order->round_mode);
+            $breakdown[$rate]['total_amount'] = Tools::ps_round($data['total_amount'], _PS_PRICE_COMPUTE_PRECISION_, $order->round_mode);
+        }
+
+        ksort($breakdown);
+        return $breakdown;
+    }
+
+    public function getServiceProductsTaxesBreakdown($order = null)
+    {
+        if (!$order) {
+            $order = $this->getOrder();
+        }
+
+        $sum_composite_taxes = !$this->useOneAfterAnotherTaxComputationMethod();
+
+        // $breakdown will be an array with tax rates as keys and at least the columns:
+        // 	- 'total_price_tax_excl'
+        // 	- 'total_amount'
+        $breakdown = array();
+        $order_detail = $order->getOrderDetailList();
+        $order_detail = array_filter($order_detail, function($v) {
+            return (!$v['is_booking_product'] && $v['product_service_type'] == Product::SERVICE_PRODUCT_WITHOUT_ROOMTYPE);
+        });
+        $details = $order->getProductTaxesDetails($order_detail, false, Product::SERVICE_PRODUCT_WITHOUT_ROOMTYPE);
+
+        if ($sum_composite_taxes) {
+            $grouped_details = array();
+            foreach ($details as $row) {
+                if (!isset($grouped_details[$row['id_order_detail']])) {
+                    $grouped_details[$row['id_order_detail']] = array(
+                        'tax_rate' => 0,
+                        'total_tax_base' => 0,
+                        'total_amount' => 0,
+                        'id_tax' => $row['id_tax'],
+                    );
+                }
+
+                $grouped_details[$row['id_order_detail']]['tax_rate'] += $row['tax_rate'];
+                $grouped_details[$row['id_order_detail']]['total_tax_base'] += $row['total_tax_base'];
+                $grouped_details[$row['id_order_detail']]['total_amount'] += $row['total_amount'];
+            }
+            $details = $grouped_details;
+        }
+        foreach ($details as $row) {
+            $rate = sprintf('%.3f', $row['tax_rate']);
+            if (!isset($breakdown[$rate])) {
+                $breakdown[$rate] = array(
+                    'total_price_tax_excl' => 0,
+                    'total_amount' => 0,
+                    'id_tax' => $row['id_tax'],
+                    'rate' => $rate,
+                );
+            }
+
+            $breakdown[$rate]['total_price_tax_excl'] += $row['total_tax_base'];
+            $breakdown[$rate]['total_amount'] += $row['total_amount'];
+        }
+
+        foreach ($breakdown as $rate => $data) {
+            $breakdown[$rate]['total_price_tax_excl'] = Tools::ps_round($data['total_price_tax_excl'], _PS_PRICE_COMPUTE_PRECISION_, $order->round_mode);
+            $breakdown[$rate]['total_amount'] = Tools::ps_round($data['total_amount'], _PS_PRICE_COMPUTE_PRECISION_, $order->round_mode);
+        }
+
+        ksort($breakdown);
+        return $breakdown;
+    }
+
     public function getExtraDemandTaxesBreakdown($order = null)
     {
         if (!$order) {

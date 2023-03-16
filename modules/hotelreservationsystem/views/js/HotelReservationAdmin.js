@@ -411,65 +411,6 @@ $(document).ready(function() {
         $(this).parents('.child_feature_row').remove();
     });
 
-    /*For swaping rooms in the modal*/
-    $("#realloc_allocated_rooms").on('click', function(e) {
-        $(".error_text").text('');
-        if ($('#realloc_avail_rooms').val() == 0) {
-            $("#realloc_sel_rm_err_p").text(slct_rm_err);
-            return false;
-        }
-    });
-    $("#swap_allocated_rooms").on('click', function(e) {
-        $(".error_text").text('');
-        if ($('#swap_avail_rooms').val() == 0) {
-            $("#swap_sel_rm_err_p").text(slct_rm_err);
-            return false;
-        }
-    });
-
-    $('#mySwappigModal').on('hidden.bs.modal', function(e) {
-        $(".modal_date_from").val('');
-        $(".modal_date_to").val('');
-        $(".modal_id_room").val('');
-        $(".modal_curr_room_num").val('');
-        $(".cust_name").text('');
-        $(".cust_email").text('');
-        $(".swp_rm_opts").remove();
-        $(".realloc_rm_opts").remove();
-    });
-
-    $('#mySwappigModal').on('shown.bs.modal', function(e) {
-        $(".modal_date_from").val(e.relatedTarget.dataset.date_from);
-        $(".modal_date_to").val(e.relatedTarget.dataset.date_to);
-        $(".modal_id_room").val(e.relatedTarget.dataset.id_room);
-        $(".modal_curr_room_num").val(e.relatedTarget.dataset.room_num);
-        $(".cust_name").text(e.relatedTarget.dataset.cust_name);
-        $(".cust_email").text(e.relatedTarget.dataset.cust_email);
-        html = '';
-        if (e.relatedTarget.dataset.avail_rm_realloc) {
-            var json_arr_rm_swp = JSON.parse(e.relatedTarget.dataset.avail_rm_swap);
-            $.each(json_arr_rm_swp, function(key, val) {
-                html += '<option class="swp_rm_opts" value="' + val.id_room + '" >' + val.room_num + '</option>';
-            });
-        }
-        if (html != '') {
-            $("#swap_avail_rooms").append(html);
-        }
-
-        html = '';
-        if (e.relatedTarget.dataset.avail_rm_realloc) {
-            var json_arr_rm_realloc = JSON.parse(e.relatedTarget.dataset.avail_rm_realloc);
-            $.each(json_arr_rm_realloc, function(key, val) {
-                html += '<option class="realloc_rm_opts" value="' + val.id_room + '" >' + val.room_num + '</option>';
-            });
-        }
-        if (html != '') {
-            $("#realloc_avail_rooms").append(html);
-        }
-    });
-
-    /* ---- Book Now page Admin ---- */
-
     /* ----  HotelConfigurationSettingController Admin ---- */
 
     if ($('#WK_SHOW_MSG_ON_BO_on').prop('checked') === true) {
@@ -783,39 +724,7 @@ $(document).ready(function() {
     initGoogleMaps();
 });
 
-function setRoomTypeGuestOccupancy(booking_occupancy_wrapper)
-{
-    var adults = 0;
-    var children = 0;
-	var rooms = $(booking_occupancy_wrapper).find('.occupancy_info_block').length;
 
-	$(booking_occupancy_wrapper).find(".num_adults" ).each(function(key, val) {
-        adults += parseInt($(this).val());
-    });
-    $(booking_occupancy_wrapper).find(".num_children" ).each(function(key, val) {
-        children += parseInt($(this).val());
-    });
-
-    var guestButtonVal = parseInt(adults) + ' ';
-    if (parseInt(adults) > 1) {
-        guestButtonVal += adults_txt;
-    } else {
-        guestButtonVal += adult_txt;
-    }
-    if (parseInt(children) > 0) {
-        if (parseInt(children) > 1) {
-            guestButtonVal += ', ' + parseInt(children) + ' ' + children_txt;
-        } else {
-            guestButtonVal += ', ' + parseInt(children) + ' ' + child_txt;
-        }
-    }
-    if (parseInt(rooms) > 1) {
-        guestButtonVal += ', ' + parseInt(rooms) + ' ' + rooms_txt;
-    } else {
-        guestButtonVal += ', ' + parseInt(rooms) + ' ' + room_txt;
-    }
-	$(booking_occupancy_wrapper).siblings('.booking_guest_occupancy').find('span').text(guestButtonVal);
-}
 
 
 function showFeaturePriceRuleLangField(lang_iso_code, id_lang)

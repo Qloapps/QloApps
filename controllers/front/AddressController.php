@@ -58,41 +58,8 @@ class AddressControllerCore extends FrontController
     {
         parent::init();
 
-        // Get address ID
-        $id_address = 0;
-        if ($this->ajax && Tools::isSubmit('type')) {
-            if (Tools::getValue('type') == 'delivery' && isset($this->context->cart->id_address_delivery)) {
-                $id_address = (int)$this->context->cart->id_address_delivery;
-            } elseif (Tools::getValue('type') == 'invoice' && isset($this->context->cart->id_address_invoice)
-                        && $this->context->cart->id_address_invoice != $this->context->cart->id_address_delivery) {
-                $id_address = (int)$this->context->cart->id_address_invoice;
-            }
-        } else {
-            $id_address = Customer::getCustomerIdAddress($this->context->customer->id);
-        }
-
-        // Initialize address
-        if ($id_address) {
-            $this->_address = new Address($id_address);
-            if (Validate::isLoadedObject($this->_address) && Customer::customerHasAddress($this->context->customer->id, $id_address)) {
-                if (Tools::isSubmit('delete')) {
-                    if ($this->_address->delete()) {
-                        if ($this->context->cart->id_address_invoice == $this->_address->id) {
-                            unset($this->context->cart->id_address_invoice);
-                        }
-                        if ($this->context->cart->id_address_delivery == $this->_address->id) {
-                            unset($this->context->cart->id_address_delivery);
-                            $this->context->cart->updateAddressId($this->_address->id, (int)Address::getFirstCustomerAddressId(Context::getContext()->customer->id));
-                        }
-                        Tools::redirect('index.php?controller=addresses');
-                    }
-                    $this->errors[] = Tools::displayError('This address cannot be deleted.');
-                }
-            } elseif ($this->ajax) {
-                exit;
-            } else {
-                // Tools::redirect('index.php?controller=addresses');
-            }
+        if ($this->context->customer->id) {
+            $this->_address = new Address(Customer::getCustomerIdAddress($this->context->customer->id));
         }
     }
 

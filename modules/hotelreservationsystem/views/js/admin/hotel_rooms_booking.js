@@ -20,76 +20,78 @@
 $(document).ready(function() {
 
     // calender
-    var calendar = new FullCalendar.Calendar($('#fullcalendar').get(0), {
-        initialView: 'dayGridMonth',
-        events: {
-            url: rooms_booking_url,
-            method: 'POST',
-            extraParams: function() {
-                return $.extend(
-                    {
-                        ajax: true,
-                        action: 'getCalenderData',
-                    },
-                    getSearchData()
-                )
+    if ($('#fullcalendar').length) {
+        var calendar = new FullCalendar.Calendar($('#fullcalendar').get(0), {
+            initialView: 'dayGridMonth',
+            initialDate: initialDate,
+            events: {
+                url: rooms_booking_url,
+                method: 'POST',
+                extraParams: function() {
+                    return $.extend(
+                        {
+                            ajax: true,
+                            action: 'getCalenderData',
+                        },
+                        getSearchData()
+                    )
+                },
+
+
             },
-
-
-        },
-        eventContent: function(info) {
-            if (info.event.extendedProps.is_notification) {
-                return false;
-            }
-        },
-        eventDidMount: function(info) {
-            if (info.event.extendedProps.is_notification) {
-                if (info.event.extendedProps.data.stats.num_avail > 0) {
-                    $(info.el).closest('td').find('.day-info svg circle').attr('fill', '#7EC77B');
-                } else if (info.event.extendedProps.data.stats.num_part_avai > 0) {
-                    $(info.el).closest('td').find('.day-info svg circle').attr('fill', '#FFC224');
-                } else if (info.event.extendedProps.data.stats.num_booked == info.event.extendedProps.data.stats.total_rooms) {
-                    $(info.el).closest('td').find('.day-info svg circle').attr('fill', '#00AFF0');
-                } else {
-                    $(info.el).closest('td').find('.day-info svg circle').attr('fill', '#FF3838');
+            eventContent: function(info) {
+                if (info.event.extendedProps.is_notification) {
+                    return false;
                 }
-                $(info.el).closest('td').find('.day-info').tooltip({
-                    content: function()
-                    {
-                        $('#date-stats-tooltop .tip_date').text(info.event.extendedProps.data.date_format);
-                        $.each(info.event.extendedProps.data.stats, function(elem, val) {
-                            if (elem == 'num_part_avai') {
-                                $('#date-stats-tooltop').find('.'+elem).hide().find('.tip_element_value').text('');
-                            } else {
-                                $('#date-stats-tooltop').find('.'+elem).show().find('.tip_element_value').text(val);
+            },
+            eventDidMount: function(info) {
+                if (info.event.extendedProps.is_notification) {
+                    if (info.event.extendedProps.data.stats.num_avail > 0) {
+                        $(info.el).closest('td').find('.day-info svg circle').attr('fill', '#7EC77B');
+                    } else if (info.event.extendedProps.data.stats.num_part_avai > 0) {
+                        $(info.el).closest('td').find('.day-info svg circle').attr('fill', '#FFC224');
+                    } else if ((info.event.extendedProps.data.stats.num_booked == info.event.extendedProps.data.stats.total_rooms) && info.event.extendedProps.data.stats.total_rooms != 0) {
+                        $(info.el).closest('td').find('.day-info svg circle').attr('fill', '#00AFF0');
+                    } else {
+                        $(info.el).closest('td').find('.day-info svg circle').attr('fill', '#FF3838');
+                    }
+                    $(info.el).closest('td').find('.day-info').tooltip({
+                        content: function()
+                        {
+                            $('#date-stats-tooltop .tip_date').text(info.event.extendedProps.data.date_format);
+                            $.each(info.event.extendedProps.data.stats, function(elem, val) {
+                                if (elem == 'num_part_avai') {
+                                    $('#date-stats-tooltop').find('.'+elem).hide().find('.tip_element_value').text('');
+                                } else {
+                                    $('#date-stats-tooltop').find('.'+elem).show().find('.tip_element_value').text(val);
+                                }
+                            });
+                            return $('#date-stats-tooltop').html();
+                        },
+                        items: "div",
+                        trigger : 'hover',
+                        show: {
+                            delay: 100,
+                        },
+                        hide: {
+                            delay: 300,
+                        },
+                        open: function(event, ui)
+                        {
+                            if(event.buttons == 1 || event.buttons == 3){
+                                ui.tooltip.remove();
                             }
-                        });
-                        return $('#date-stats-tooltop').html();
-                    },
-                    items: "div",
-                    trigger : 'hover',
-                    show: {
-                        delay: 100,
-                    },
-                    hide: {
-                        delay: 300,
-                    },
-                    open: function(event, ui)
-                    {
-                        if(event.buttons == 1 || event.buttons == 3){
-                            ui.tooltip.remove();
-                        }
 
-                        if (typeof(event.originalEvent) === 'undefined') {
-                            return false;
-                        }
+                            if (typeof(event.originalEvent) === 'undefined') {
+                                return false;
+                            }
 
-                        var $id = $(ui.tooltip).attr('id');
+                            var $id = $(ui.tooltip).attr('id');
 
-                        // close any lingering tooltips
-                        if ($('div.ui-tooltip').not('#' + $id).length) {
-                            return false;
-                        }
+                            // close any lingering tooltips
+                            if ($('div.ui-tooltip').not('#' + $id).length) {
+                                return false;
+                            }
 
                         // ajax function to pull in data and add it to the tooltip goes here
                     },
@@ -139,46 +141,47 @@ $(document).ready(function() {
                             ui.tooltip.remove();
                         }
 
-                        if (typeof(event.originalEvent) === 'undefined') {
-                            return false;
-                        }
+                            if (typeof(event.originalEvent) === 'undefined') {
+                                return false;
+                            }
 
-                        var $id = $(ui.tooltip).attr('id');
+                            var $id = $(ui.tooltip).attr('id');
 
-                        // close any lingering tooltips
-                        if ($('div.ui-tooltip').not('#' + $id).length) {
-                            return false;
-                        }
+                            // close any lingering tooltips
+                            if ($('div.ui-tooltip').not('#' + $id).length) {
+                                return false;
+                            }
 
-                        // ajax function to pull in data and add it to the tooltip goes here
-                    },
-                    close: function(event, ui)
-                    {
-                        ui.tooltip.hover(function() {
-                            $(this).stop(true).fadeTo(300, 1);
+                            // ajax function to pull in data and add it to the tooltip goes here
                         },
-                        function() {
-                            $(this).fadeOut('300', function()
-                            {
-                                $(this).remove();
+                        close: function(event, ui)
+                        {
+                            ui.tooltip.hover(function() {
+                                $(this).stop(true).fadeTo(300, 1);
+                            },
+                            function() {
+                                $(this).fadeOut('300', function()
+                                {
+                                    $(this).remove();
+                                });
                             });
-                        });
-                    }
-                });
-            }
-        },
-        dayCellDidMount: (arg)  => {
+                        }
+                    });
+                }
+            },
+            dayCellDidMount: (arg)  => {
 
-            let svg = $('#svg-icon').html();
-            $(arg.el).find('.fc-daygrid-day-top').append('<a class="day-info">'+svg+'</a>');
-        },
-        datesSet: function(arg) {
-            if($('.fc-event').tooltip()) {
-                $('.fc-event').tooltip('destroy');
+                let svg = $('#svg-icon').html();
+                $(arg.el).find('.fc-daygrid-day-top').append('<a class="day-info">'+svg+'</a>');
+            },
+            datesSet: function(arg) {
+                if($('.fc-event').tooltip()) {
+                    $('.fc-event').tooltip('destroy');
+                }
             }
-        }
-    });
-    calendar.render();
+        });
+        calendar.render();
+    }
 
     function getSearchData()
     {
@@ -189,6 +192,11 @@ $(document).ready(function() {
             search_date_to: $("#search_date_to").val(),
         }
     }
+
+    // toggleSearchFields();
+    // $('#booking_product').on('change', function() {
+    //     toggleSearchFields();
+    // });
 
     // search form changes
     $('#search_hotel_list').on('click', function(e) {
@@ -256,7 +264,9 @@ $(document).ready(function() {
                             });
                             $('#id_room_type').append(html);
                         } else {
-                            showErrorMessage(noRoomTypeAvlTxt);
+                            if ($('#booking_product').val() == 1) {
+                                showErrorMessage(noRoomTypeAvlTxt);
+                            }
                             $('#id_room_type').append(html);
                         }
                     }
@@ -303,7 +313,7 @@ $(document).ready(function() {
                 occupancy = false;
             }
         } else {
-            return true;
+            return 1;
         }
 
         return occupancy;
@@ -726,6 +736,123 @@ $(document).ready(function() {
         setRoomTypeGuestOccupancy(booking_occupancy_wrapper);
     });
 
+    function setRoomTypeGuestOccupancy(booking_occupancy_wrapper)
+    {
+        var adults = 0;
+        var children = 0;
+        var rooms = $(booking_occupancy_wrapper).find('.occupancy_info_block').length;
+
+        $(booking_occupancy_wrapper).find(".num_adults" ).each(function(key, val) {
+            adults += parseInt($(this).val());
+        });
+        $(booking_occupancy_wrapper).find(".num_children" ).each(function(key, val) {
+            children += parseInt($(this).val());
+        });
+
+        var guestButtonVal = parseInt(adults) + ' ';
+        if (parseInt(adults) > 1) {
+            guestButtonVal += adults_txt;
+        } else {
+            guestButtonVal += adult_txt;
+        }
+        if (parseInt(children) > 0) {
+            if (parseInt(children) > 1) {
+                guestButtonVal += ', ' + parseInt(children) + ' ' + children_txt;
+            } else {
+                guestButtonVal += ', ' + parseInt(children) + ' ' + child_txt;
+            }
+        }
+        if (parseInt(rooms) > 1) {
+            guestButtonVal += ', ' + parseInt(rooms) + ' ' + rooms_txt;
+        } else {
+            guestButtonVal += ', ' + parseInt(rooms) + ' ' + room_txt;
+        }
+        $(booking_occupancy_wrapper).siblings('.booking_guest_occupancy').find('span').text(guestButtonVal);
+    }
+
+    // normal products
+    $('body').on('click', '.service_product_add_to_cart', function() {
+        var current_btn = $(this);
+        current_btn.attr('disabled', 'disabled');
+        var search_id_prod = $("#search_id_prod").val();
+        var id_product = $(this).data('id-product');
+        var id_hotel = $(this).data('id-hotel');
+        var qty = current_btn.closest('.product-container').find('.product_quantity').val();
+        if (typeof(qty) == 'undefined') {
+            qty = 1;
+        }
+
+        $.ajax({
+            url: rooms_booking_url,
+            type: 'POST',
+            dataType: 'json',
+            data: {
+                ajax: true,
+                action: 'updateProductInCart',
+                id_product: id_product,
+                id_hotel: id_hotel,
+                qty: qty,
+                search_id_prod: search_id_prod,
+                opt: 'up',
+            },
+            success: function(result) {
+                if (result.status) {
+                    $(current_btn).closest('.product-info-container').find('.product_quantity').val('1');
+                    refreshCartData();
+                    showSuccessMessage(product_added_cart_txt)
+                } else if (result.errors) {
+                    showErrorMessage(result.errors);
+                }
+            },
+            complete: function() {
+                current_btn.attr('disabled', false);
+            }
+        });
+    });
+
+    $('body').on('click', '.service_product_delete', function() {
+        var current_btn = $(this);
+        current_btn.attr('disabled', 'disabled');
+        var id_product = $(this).attr('data-id-product');
+        var id_cart = $(this).attr('data-id-cart');
+        var id_hotel = $(this).attr('data-id-hotel');
+
+
+        $.ajax({
+            url: rooms_booking_url,
+            type: 'POST',
+            dataType: 'json',
+            data: {
+                ajax: true,
+                action: 'updateProductInCart',
+                id_product: id_product,
+                id_hotel: id_hotel,
+                id_cart: id_cart,
+                opt: 0,
+            },
+            success: function(result) {
+                if (result) {
+                    refreshCartData();
+                }
+            }
+        });
+    });
+
+    function toggleSearchFields()
+    {
+        if ($('#booking_product').val() == 1) {
+            $('#from_date').closest('.form-group').show('fast');
+            $('#to_date').closest('.form-group').show('fast');
+            $('#id_room_type').closest('.form-group').show('fast');
+            $('#search_occupancy').closest('.form-group').show('fast');
+        } else {
+            $('#from_date').closest('.form-group').hide('fast');
+            $('#to_date').closest('.form-group').hide('fast');
+            $('#id_room_type').closest('.form-group').hide('fast');
+            $('#search_occupancy').closest('.form-group').hide('fast');
+        }
+    }
+
     function refreshCartData()
     {
         $.ajax({
@@ -741,7 +868,7 @@ $(document).ready(function() {
                     if (result.cart_content) {
                         $("#cartModal").html(result.cart_content);
                     }
-                    $("#cart_record").html(result.rms_in_cart);
+                    $("#cart_record").html(result.total_products_in_cart);
                 }
             }
         });
@@ -828,4 +955,61 @@ $(document).ready(function() {
             return [true, ""];
         }
     }
+
+    /*For swaping rooms in the modal*/
+    $("#realloc_allocated_rooms").on('click', function(e) {
+        $(".error_text").text('');
+        if ($('#realloc_avail_rooms').val() == 0) {
+            $("#realloc_sel_rm_err_p").text(slct_rm_err);
+            return false;
+        }
+    });
+    $("#swap_allocated_rooms").on('click', function(e) {
+        $(".error_text").text('');
+        if ($('#swap_avail_rooms').val() == 0) {
+            $("#swap_sel_rm_err_p").text(slct_rm_err);
+            return false;
+        }
+    });
+
+    $('#mySwappigModal').on('hidden.bs.modal', function(e) {
+        $(".modal_date_from").val('');
+        $(".modal_date_to").val('');
+        $(".modal_id_room").val('');
+        $(".modal_curr_room_num").val('');
+        $(".cust_name").text('');
+        $(".cust_email").text('');
+        $(".swp_rm_opts").remove();
+        $(".realloc_rm_opts").remove();
+    });
+
+    $('#mySwappigModal').on('shown.bs.modal', function(e) {
+        $(".modal_date_from").val(e.relatedTarget.dataset.date_from);
+        $(".modal_date_to").val(e.relatedTarget.dataset.date_to);
+        $(".modal_id_room").val(e.relatedTarget.dataset.id_room);
+        $(".modal_curr_room_num").val(e.relatedTarget.dataset.room_num);
+        $(".cust_name").text(e.relatedTarget.dataset.cust_name);
+        $(".cust_email").text(e.relatedTarget.dataset.cust_email);
+        html = '';
+        if (e.relatedTarget.dataset.avail_rm_realloc) {
+            var json_arr_rm_swp = JSON.parse(e.relatedTarget.dataset.avail_rm_swap);
+            $.each(json_arr_rm_swp, function(key, val) {
+                html += '<option class="swp_rm_opts" value="' + val.id_room + '" >' + val.room_num + '</option>';
+            });
+        }
+        if (html != '') {
+            $("#swap_avail_rooms").append(html);
+        }
+
+        html = '';
+        if (e.relatedTarget.dataset.avail_rm_realloc) {
+            var json_arr_rm_realloc = JSON.parse(e.relatedTarget.dataset.avail_rm_realloc);
+            $.each(json_arr_rm_realloc, function(key, val) {
+                html += '<option class="realloc_rm_opts" value="' + val.id_room + '" >' + val.room_num + '</option>';
+            });
+        }
+        if (html != '') {
+            $("#realloc_avail_rooms").append(html);
+        }
+    });
 });

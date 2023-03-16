@@ -196,7 +196,7 @@
         </div>
     {/if}
     <div class="form-group search_room_submit_block area-{$column_widths['search']}">
-        <button type="submit" class="btn btn btn-lg btn-primary pull-right" name="search_room_submit" id="search_room_submit">
+        <button type="submit" class="btn btn btn-primary pull-right" name="search_room_submit" id="search_room_submit">
             <span>{l s='Search Rooms' mod='wkroomsearchblock'}</span>
         </button>
     </div>

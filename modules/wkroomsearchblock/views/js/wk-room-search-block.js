@@ -42,7 +42,9 @@ $(document).ready(function() {
             padding: 0,
             autoScale: false,
             maxWidth: '100%',
-            'hideOnContentClick': false,
+            helpers: {
+                overlay: { closeClick: false } //Disable click outside event
+            },
             'afterClose': function() {
                 $('.header-rmsearch-container').show();
                 $('#xs_room_search_form').show();

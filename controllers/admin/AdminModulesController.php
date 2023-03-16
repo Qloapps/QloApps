@@ -206,16 +206,6 @@ class AdminModulesControllerCore extends AdminController
             } else {
                 $this->status = 'cache';
             }
-
-            if (!Tools::isFresh(Module::CACHE_FILE_MUST_HAVE_MODULES_LIST, _TIME_1_DAY_) || $force_reload_cache) {
-                if (file_put_contents(_PS_ROOT_DIR_.Module::CACHE_FILE_MUST_HAVE_MODULES_LIST, Tools::addonsRequest('must-have'))) {
-                    $this->status = 'refresh';
-                } else {
-                    $this->status = 'error';
-                }
-            } else {
-                $this->status = 'cache';
-            }
         }
 
         // If logged to Addons Webservices, refresh customer modules list every 5 minutes
@@ -736,7 +726,10 @@ class AdminModulesControllerCore extends AdminController
                 return;
             }
 
-            if ($key == 'checkAndUpdate') {
+            if ($key == 'check') {
+                $this->ajaxProcessRefreshModuleList(true);
+            } elseif ($key == 'checkAndUpdate') {
+                $this->ajaxProcessRefreshModuleList(true);
                 $modules = array();
                 $modules_on_disk = Module::getModulesOnDisk(true, $this->logged_on_addons, $this->id_employee, true);
 

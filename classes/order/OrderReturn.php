@@ -197,6 +197,7 @@ class OrderReturnCore extends ObjectModel
             }
 
             $objBookingDemands = new HotelBookingDemands();
+            $objRoomTypeServiceProductOrderDetail = new RoomTypeServiceProductOrderDetail();
             foreach ($returnDetails as &$bookingRow) {
                 $bookingRow['extra_demands_price_tax_incl'] = $objBookingDemands->getRoomTypeBookingExtraDemands(
                     $bookingRow['id_order'],
@@ -217,6 +218,31 @@ class OrderReturnCore extends ObjectModel
                     1,
                     0
                 );
+                $bookingRow['additional_services_tax_excl'] = $objRoomTypeServiceProductOrderDetail->getroomTypeServiceProducts(
+                    $bookingRow['id_order'],
+                    0,
+                    0,
+                    $bookingRow['id_product'],
+                    $bookingRow['date_from'],
+                    $bookingRow['date_to'],
+                    $bookingRow['id_room'],
+                    1,
+                    0,
+                    null
+                );
+                $bookingRow['additional_services_tax_incl'] = $objRoomTypeServiceProductOrderDetail->getroomTypeServiceProducts(
+                    $bookingRow['id_order'],
+                    0,
+                    0,
+                    $bookingRow['id_product'],
+                    $bookingRow['date_from'],
+                    $bookingRow['date_to'],
+                    $bookingRow['id_room'],
+                    1,
+                    1,
+                    null
+                );
+
                 if ($customerView) {
                     $dateJoin = $bookingRow['id_product'].'_'.strtotime($bookingRow['date_from']).strtotime($bookingRow['date_to']);
                     if (isset($returnsCustView[$dateJoin]['num_rooms'])) {
@@ -225,7 +251,9 @@ class OrderReturnCore extends ObjectModel
                         $returnsCustView[$dateJoin]['total_price_tax_incl'] += $bookingRow['total_price_tax_incl'];
                         $returnsCustView[$dateJoin]['total_paid_amount'] += $bookingRow['total_paid_amount'];
                         $returnsCustView[$dateJoin]['extra_demands_price_tax_incl'] += $bookingRow['extra_demands_price_tax_incl'];
+                        $returnsCustView[$dateJoin]['extra_demands_price_tax_incl'] += $bookingRow['additional_services_tax_incl'];
                         $returnsCustView[$dateJoin]['extra_demands_price_tax_excl'] += $bookingRow['extra_demands_price_tax_excl'];
+                        $returnsCustView[$dateJoin]['extra_demands_price_tax_excl'] += $bookingRow['additional_services_tax_excl'];
                     } else {
                         unset($bookingRow['id_room']);
                         unset($bookingRow['room_num']);

@@ -17,7 +17,7 @@
 *  @license   https://store.webkul.com/license.html
 *}
 
-<div id="recommendation-wrapper-skeleton">
+<div id="recommendation-wrapper-skeleton" style="display:none">
     <script>
         loadRecommendation();
     </script>

@@ -8,5 +8,11 @@
     <category_group id="category_group_1_1" id_category="Home" id_group="Visitor"/>
     <category_group id="category_group_1_2" id_category="Home" id_group="Guest"/>
     <category_group id="category_group_1_3" id_category="Home" id_group="Customer"/>
+    <category_group id="category_group_2_1" id_category="Locations" id_group="Visitor"/>
+    <category_group id="category_group_2_2" id_category="Locations" id_group="Guest"/>
+    <category_group id="category_group_2_3" id_category="Locations" id_group="Customer"/>
+    <category_group id="category_group_3_1" id_category="Products" id_group="Visitor"/>
+    <category_group id="category_group_3_2" id_category="Products" id_group="Guest"/>
+    <category_group id="category_group_3_3" id_category="Products" id_group="Customer"/>
   </entities>
 </entity_category_group>

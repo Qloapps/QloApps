@@ -82,8 +82,8 @@ class HotelBookingDetail extends ObjectModel
     const SEARCH_TYPE_NORMAL = 2;
 
     //
-    const PS_FRONT_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY = 1;
-    const PS_FRONT_ROOM_UNIT_SELECTION_TYPE_QUANTITY = 2;
+    const PS_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY = 1;
+    const PS_ROOM_UNIT_SELECTION_TYPE_QUANTITY = 2;
 
     public static $definition = array(
         'table' => 'htl_booking_detail',
@@ -1371,8 +1371,19 @@ class HotelBookingDetail extends ObjectModel
      * @param [date] $dateTo   [End date of the booking]
      *
      * @return [int] [Returns number of days between two dates]
+     * @deprecated use hotelBookingDetail::getDays() instead
      */
     public function getNumberOfDays($dateFrom, $dateTo)
+    {
+        return self::getDays($dateFrom, $dateTo);
+        // $startDate = new DateTime($dateFrom);
+        // $endDate = new DateTime($dateTo);
+        // $daysDifference = $startDate->diff($endDate)->days;
+
+        // return $daysDifference;
+    }
+
+    public static function getDays($dateFrom, $dateTo)
     {
         $startDate = new DateTime($dateFrom);
         $endDate = new DateTime($dateTo);
@@ -1397,6 +1408,13 @@ class HotelBookingDetail extends ObjectModel
     {
         return Db::getInstance()->executeS(
             'SELECT * FROM `'._DB_PREFIX_.'htl_booking_detail` WHERE `id_order`='.(int)$order_id
+        );
+    }
+
+    public static function getIdHotelByIdOrder($idOrder)
+    {
+        return Db::getInstance()->getValue(
+            'SELECT `id_hotel` FROM `'._DB_PREFIX_.'htl_booking_detail` WHERE `id_order` = '.(int) $idOrder
         );
     }
 

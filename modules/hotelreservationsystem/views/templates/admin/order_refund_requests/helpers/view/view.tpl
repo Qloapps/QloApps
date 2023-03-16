@@ -67,6 +67,14 @@
 						</div>
 						<div class="form-group row">
 							<div class="col-sm-3">
+								<strong>{l s='Total paid amount' mod='hotelreservationsystem'} :</strong>
+							</div>
+							<div class="col-sm-9">
+								{displayPrice price=$orderTotalPaid currency=$orderInfo['id_currency']}
+							</div>
+						</div>
+						<div class="form-group row">
+							<div class="col-sm-3">
 								<strong>{l s='Way of payment' mod='hotelreservationsystem'} :</strong>
 							</div>
 							<div class="col-sm-9">
@@ -111,11 +119,11 @@
 											<th>{l s='Hotel' mod='hotelreservationsystem'}</th>
 											<th>{l s='Duration' mod='hotelreservationsystem'}</th>
 											<th>{l s='Total rooms paid (tax incl.)'}</th>
-											<th>{l s='Additional facilities price (tax incl.)'}</th>
+											<th>{l s='Additional services price (tax incl.)'}</th>
 											{if !$isRefundCompleted}
 												<th>{l s='Rooms cancelation charges' mod='hotelreservationsystem'}</th>
 											{/if}
-											{if $hasOrderPaid}
+											{if $orderTotalPaid|floatval}
 												<th>{l s='Refund amount' mod='hotelreservationsystem'}</th>
 											{/if}
 										</tr>
@@ -129,11 +137,11 @@
 												<td>{$booking['hotel_name']|escape:'htmlall':'UTF-8'}</td>
 												<td>{$booking['date_from']|date_format:"%d-%m-%Y"} {l s='To' mod='hotelreservationsystem'} {$booking['date_to']|date_format:"%d-%m-%Y"}</td>
 												<td>{displayPrice price=$booking['total_paid_amount'] currency=$orderCurrency['id']}</td>
-												<td>{displayPrice price=$booking['extra_demands_price_tax_incl'] currency=$orderCurrency['id']}</td>
+												<td>{displayPrice price=($booking['extra_demands_price_tax_incl'] + $booking['additional_services_tax_incl']) currency=$orderCurrency['id']}</td>
 												{if !$isRefundCompleted}
 													<td>{displayPrice price=$booking['cancelation_charge'] currency=$orderCurrency['id']}</td>
 												{/if}
-												{if $hasOrderPaid}
+												{if $orderTotalPaid|floatval}
 													<td>
 														<div class="input-group">
 															{if $isRefundCompleted}
@@ -228,7 +236,7 @@
 							</div>
 
 							{* Fields to submit refund information *}
-							{if $hasOrderPaid}
+							{if $orderTotalPaid|floatval}
 								<div class="refunded_state_fields" style="display:none;">
 									<div class="form-group">
 										<div class="col-sm-3">
@@ -291,19 +299,17 @@
 											</div>
 										</div>
 									</div>
-									{if $orderReturnInfo['by_admin']}
-										<div class="form-group">
-											<div class="col-sm-3">
-											</div>
-											<div class="col-sm-3">
-												<div class="checkbox">
-													<label>
-														<input value="1" type="checkbox" name="generateDiscount" id="generateDiscount"/> &nbsp;{l s='Create Voucher' mod='hotelreservationsystem'}
-													</label>
-												</div>
+									<div class="form-group">
+										<div class="col-sm-3">
+										</div>
+										<div class="col-sm-3">
+											<div class="checkbox">
+												<label>
+													<input value="1" type="checkbox" name="generateDiscount" id="generateDiscount"/> &nbsp;{l s='Create Voucher' mod='hotelreservationsystem'}
+												</label>
 											</div>
 										</div>
-									{/if}
+									</div>
 								</div>
 							{/if}
 						{/if}
