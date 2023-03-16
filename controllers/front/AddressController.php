@@ -51,6 +51,19 @@ class AddressControllerCore extends FrontController
     }
 
     /**
+     * Initialize address controller
+     * @see FrontController::init()
+     */
+    public function init()
+    {
+        parent::init();
+
+        if ($this->context->customer->id) {
+            $this->_address = new Address(Customer::getCustomerIdAddress($this->context->customer->id));
+        }
+    }
+
+    /**
      * Start forms process
      * @see FrontController::postProcess()
      */

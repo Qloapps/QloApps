@@ -284,7 +284,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
         if (!$distinct_products) {
             return '0%';
         }
-        return round(100 * $distinct_products / AdminStatsController::getTotalProducts()).'%';
+        return round(100 * $distinct_products / AdminStatsController::getTotalRoomTypes()).'%';
     }
 
     public static function getOrders($date_from, $date_to, $granularity = false, $id_hotel = false)
@@ -354,7 +354,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
     public static function getCustomerMainGender()
     {
         $row = Db::getInstance(_PS_USE_SQL_SLAVE_)->getRow('
-		SELECT SUM(IF(g.id_gender IS NOT NULL, 1, 0)) as total, SUM(IF(type = 0, 1, 0)) as male, SUM(IF(type = 1, 1, 0)) as female, SUM(IF(type = 2, 1, 0)) as neutral
+		SELECT SUM(IF(c.id_gender IS NOT NULL, 1, 0)) as total, SUM(IF(type = 0, 1, 0)) as male, SUM(IF(type = 1, 1, 0)) as female, SUM(IF(type = 2, 1, 0)) as neutral
 		FROM `'._DB_PREFIX_.'customer` c
 		LEFT JOIN `'._DB_PREFIX_.'gender` g ON c.id_gender = g.id_gender
 		WHERE c.active = 1 '.Shop::addSqlRestriction());
@@ -1176,9 +1176,10 @@ class AdminStatsControllerCore extends AdminStatsTabController
 
     public static function getArrivalsInfoByDate($date, $idHotel = null)
     {
-        $sql = 'SELECT hbd.*, CONCAT(c.`firstname`, " ", c.`lastname`) AS customer_name,
+        $sql = 'SELECT hbd.*, o.`with_occupancy`, CONCAT(c.`firstname`, " ", c.`lastname`) AS customer_name,
         DATEDIFF(hbd.`date_to`, hbd.`date_from`) AS los
         FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+        LEFT JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = hbd.`id_order`)
         LEFT JOIN `'._DB_PREFIX_.'customer` c ON (c.`id_customer` = hbd.`id_customer`)
         WHERE hbd.`is_refunded` = 0 AND hbd.`date_from` = "'.pSQL($date).' 00:00:00"
         AND hbd.`id_status` != '.(int) HotelBookingDetail::STATUS_CHECKED_IN.'
@@ -1191,9 +1192,10 @@ class AdminStatsControllerCore extends AdminStatsTabController
 
     public static function getDeparturesInfoByDate($date, $idHotel = null)
     {
-        $sql = 'SELECT hbd.*, CONCAT(c.`firstname`, " ", c.`lastname`) AS customer_name,
+        $sql = 'SELECT hbd.*, o.`with_occupancy`, CONCAT(c.`firstname`, " ", c.`lastname`) AS customer_name,
         DATEDIFF(hbd.`date_to`, hbd.`date_from`) AS los
         FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+        LEFT JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = hbd.`id_order`)
         LEFT JOIN `'._DB_PREFIX_.'customer` c ON (c.`id_customer` = hbd.`id_customer`)
         WHERE hbd.`is_refunded` = 0 AND hbd.`date_to` = "'.pSQL($date).' 00:00:00"
         AND hbd.`id_status` = '.(int) HotelBookingDetail::STATUS_CHECKED_IN.
@@ -1205,9 +1207,10 @@ class AdminStatsControllerCore extends AdminStatsTabController
 
     public static function getInHousesInfo($idHotel = null)
     {
-        $sql = 'SELECT hbd.*, CONCAT(c.`firstname`, " ", c.`lastname`) AS customer_name,
+        $sql = 'SELECT hbd.*, o.`with_occupancy`, CONCAT(c.`firstname`, " ", c.`lastname`) AS customer_name,
         DATEDIFF(hbd.`date_to`, hbd.`date_from`) AS los
         FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+        LEFT JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = hbd.`id_order`)
         LEFT JOIN `'._DB_PREFIX_.'customer` c ON (c.`id_customer` = hbd.`id_customer`)
         WHERE hbd.`is_refunded` = 0 AND hbd.`id_status` = '.(int) HotelBookingDetail::STATUS_CHECKED_IN.
         (!is_null($idHotel) ? HotelBranchInformation::addHotelRestriction($idHotel, 'hbd') : '');
@@ -1220,7 +1223,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
     {
         $sql = 'SELECT hbd.`id_customer`, CONCAT(c.`firstname`, " ", c.`lastname`) AS customer_name,
         COUNT(hbd.`id`) AS total_rooms, SUM(hbd.`adults` + hbd.`children`) AS total_guests,
-        hbd.`id_hotel`, hbd.`hotel_name`, hbd.`id_order`, o.`total_paid_tax_excl`, o.`id_currency`, osl.`name` AS `state_name`
+        hbd.`id_hotel`, hbd.`hotel_name`, hbd.`id_order`, o.`with_occupancy`, o.`total_paid_tax_excl`, o.`id_currency`, osl.`name` AS `state_name`
         FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
         LEFT JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = hbd.`id_order`)
         LEFT JOIN `'._DB_PREFIX_.'order_state_lang` osl
@@ -1237,8 +1240,8 @@ class AdminStatsControllerCore extends AdminStatsTabController
     public static function getCancellationsInfoByDate($date, $idHotel = null)
     {
         $sql = 'SELECT orr.`id_order_return`, orr.`id_customer`, hbd.`room_num`, hbd.`id_product`, hbd.`room_type_name`,
-        CONCAT(c.`firstname`, " ", c.`lastname`) AS customer_name,
-        hbd.`id_hotel`, hbd.`hotel_name`, SUM(hbd.`adults` + hbd.`children`) AS total_guests,
+        o.`with_occupancy`, CONCAT(c.`firstname`, " ", c.`lastname`) AS customer_name, hbd.`id_hotel`,
+        hbd.`hotel_name`, SUM(hbd.`adults` + hbd.`children`) AS total_guests,
         hbd.`date_from`, hbd.`date_to`, orr.`id_order`
         FROM `'._DB_PREFIX_.'order_return` orr
         LEFT JOIN `'._DB_PREFIX_.'order_return_detail` ord ON (ord.`id_order_return` = orr.`id_order_return`)
@@ -1665,9 +1668,10 @@ class AdminStatsControllerCore extends AdminStatsTabController
             $dateTo = date('Y-m-d', strtotime('+1 day', strtotime($dateTo)));
         }
 
-        $sql = 'SELECT SUM(total_paid_tax_excl)
+        $sql = 'SELECT SUM(total_paid_tax_excl - refunded_amount)
         FROM (
             SELECT o.`id_order`, o.`total_paid_tax_excl` / o.`conversion_rate` AS total_paid_tax_excl,
+            IFNULL(orr.`refunded_amount`, 0) AS refunded_amount,
             (SELECT hbd.`id_hotel`
                 FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
                 WHERE hbd.`id_order` = o.`id_order` LIMIT 1
@@ -1677,6 +1681,8 @@ class AdminStatsControllerCore extends AdminStatsTabController
             ON (hbd.`id_order` = o.`id_order`)
             INNER JOIN `'._DB_PREFIX_.'htl_branch_info` hbi
             ON (hbi.`id` = hbd.`id_hotel`)
+            LEFT JOIN `' ._DB_PREFIX_.'order_return` orr
+            ON (orr.`id_order` = o.`id_order`)
             WHERE o.`valid` = 1 AND hbi.`active` = 1 AND hbd.`is_refunded` = 0
             AND o.`invoice_date` BETWEEN "'.pSQL($dateFrom).' 00:00:00" AND "'.pSQL($dateTo).' 23:59:59"
             AND o.`source` = "'.pSQL(Configuration::get('PS_SHOP_DOMAIN')).'"'.

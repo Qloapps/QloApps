@@ -41,7 +41,8 @@ function submitFunction(submitAction) {
 	var data = {
 		controller: 'authentication',
 		ajax: true,
-		email_create: $('#email_create').val(),
+		email_create: $('#email_create').val(), // for login page
+		email: $('#email').val(), // for personal info page
 		back: $('input[name=back]').val(),
 		token: token
 	};
@@ -59,7 +60,7 @@ function submitFunction(submitAction) {
 			// display confirmations
 			if (jsonData.hasConfirmation) {
 				if (in_array('TRANSFORM_OK', jsonData.confirmations)) {
-					$('#guest_transform_success').show('slow');
+					window.location = jsonData.ajaxExtraData.redirect_link
 				}
 				return;
 			}

@@ -17,7 +17,7 @@
 * @license LICENSE.txt
 *}
 
-<div class="rm_qty_cont clearfix">
+<div class="rm_qty_cont form-group clearfix">
     <input type="hidden" class="text-center form-control quantity_wanted" min="1" name="qty" value="{if isset($quantity) && $quantity}{$quantity|escape:'html':'UTF-8'}{else}1{/if}">
     <input type="hidden" class="max_avail_type_qty" value="{if isset($total_available_rooms)}	{$total_available_rooms|escape:'html':'UTF-8'}{/if}">
     <div class="qty_count pull-left">

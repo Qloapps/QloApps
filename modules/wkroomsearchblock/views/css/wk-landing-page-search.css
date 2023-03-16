@@ -24,6 +24,7 @@
   left: 0;
   right: 0;
   z-index: 10;}
+
 .header-rmsearch-hide-xs {
   background-image: url("../img/black-opacity-5.png");}
 .header-rmsearch-show-xs {
@@ -50,7 +51,16 @@
 #make_booking_btn_div {
   margin-top: 20px;
   text-align: center;}
-
+@media (max-width: 767px) {
+  .header-rmsearch-wrapper #search_hotel_block_form.grid {
+    grid-template-columns: 1fr;
+    column-gap: 0px;
+  }
+  .header-rmsearch-wrapper {
+    height: calc(100vw - 60px);
+    width: calc(100vw - 60px);
+  }
+}
 .fancy_search_header_xs {
   margin-top: 25px;
   padding-left: 15px;
@@ -62,6 +72,10 @@
     float: left;
     margin-top: 5px;
     width: 125px;}
+  #search_hotel_block_form #search_room_submit {
+    height: unset;
+    min-height: 45px;
+  }
 /* .fancybox-inner #search_hotel_block_form {
   grid-template-columns: 1fr;
 } */
