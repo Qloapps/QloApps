@@ -1303,7 +1303,6 @@ function getBookingOccupancyDetails(bookingform)
                         if (child_ages.length != $(element).find('.num_children').val()) {
                             $(bookingform).find('.booking_occupancy_wrapper').parent().addClass('open')
                             occupancy = false;
-                            return false;
                         }
                     }
                     occupancy.push({
@@ -1311,10 +1310,12 @@ function getBookingOccupancyDetails(bookingform)
                         'children': $(element).find('.num_children').val(),
                         'child_ages': child_ages
                     });
+                    if ($(bookingform).find('.booking_occupancy_wrapper').parent().hasClass('open')) {
+                        $('.booking_guest_occupancy_conatiner .dropdown').removeClass('open');
+                    }
                 } else {
                     $(bookingform).find('.booking_occupancy_wrapper').parent().addClass('open')
                     occupancy = false;
-                    return false;
                 }
             });
         } else {
