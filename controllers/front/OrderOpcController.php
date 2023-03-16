@@ -455,7 +455,6 @@ class OrderOpcControllerCore extends ParentOrderController
 
         $this->context->smarty->assign('checkout_process_steps', $this->checkoutProcess->getSteps());
 
-        // @todo shreesh get this checked with sumit sir
         // set room type demands
         // $objGlobalDemand = new HotelRoomTypeGlobalDemand();
         // $allDemands = $objGlobalDemand->getAllDemands();

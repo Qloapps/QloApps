@@ -2081,7 +2081,6 @@ class AdminProductsControllerCore extends AdminController
             }
         }
 
-        // shreesh check if product is virtual, then set categories according to hotel
         // if (Tools::getValue('is_virtual')) {
             $id_hotel = Tools::getValue('id_hotel');
             if (!$id_hotel || !Validate::isUnsignedInt($id_hotel)) {
