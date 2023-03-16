@@ -52,7 +52,7 @@ $(document).ready(function()
 		const navigationMenu = $('#menu_cont');
 		if (navigationMenu.length) {
 			if (!($(e.target).closest('#menu_cont').length
-				|| $(e.target).closest('.nav_toggle').length
+				|| $(e.target).closest('.header-top .header-top-menu .nav_toggle').length
 			)) {
 				if (navigationMenu.hasClass('menu_cont_left')) {
 					navigationMenu.removeClass('menu_cont_left').addClass('menu_cont_right');
