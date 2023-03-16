@@ -227,32 +227,35 @@ class HotelOrderRefundRules extends ObjectModel
     {
         $idLang = Context::getContext()->language->id;
 
-        $minDate = Db::getInstance()->getValue(
-            'SELECT MIN(DATE(hbd.`date_from`))
+        $maxDate = Db::getInstance()->getValue(
+            'SELECT MAX(DATE(hbd.`date_from`))
             FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
             WHERE hbd.`id_order` = '.(int) $idOrder
         );
 
-        if (!$minDate) {
+        if (!$maxDate) {
             return array();
         }
 
         $dateToday = date('Y-m-d');
 
-        if (strtotime($minDate) < strtotime($dateToday)) { // same day cancellation rules are allowed
-            $minDate = $dateToday;
+        if (strtotime($maxDate) < strtotime($dateToday)) { // same day cancellation rules are allowed
+            $maxDate = $dateToday;
         }
 
-        $days = HotelBookingDetail::getDays($dateToday, $minDate);
+        $days = HotelBookingDetail::getDays($dateToday, $maxDate);
+        $idHotel = HotelBookingDetail::getIdHotelByIdOrder($idOrder);
 
-        $sql = 'SELECT *
+        $sql = 'SELECT hrr.`id_hotel_refund_rule`, hrr.`id_refund_rule`, hrr.`id_hotel`, hrr.`position`,
+        orrl.`name`, orrl.`description`, orr.`payment_type`, orr.`deduction_value_full_pay`, orr.`deduction_value_adv_pay`,
+        orr.`days`
         FROM `'._DB_PREFIX_.'htl_branch_refund_rules` hrr
         LEFT JOIN `'._DB_PREFIX_.'htl_order_refund_rules` orr
         ON (orr.`id_refund_rule` = hrr.`id_refund_rule`)
         LEFT JOIN `'._DB_PREFIX_.'htl_order_refund_rules_lang` orrl
         ON (orrl.`id_refund_rule` = orr.`id_refund_rule` AND orrl.`id_lang` = '.(int) $idLang.')
-        WHERE orr.`days` <= '.(int) $days.'
-        ORDER BY orr.`days` DESC';
+        WHERE orr.`days` <= '.(int) $days.' AND hrr.`id_hotel` = '.(int) $idHotel.'
+        ORDER BY hrr.`position`';
 
         return Db::getInstance()->executeS($sql);
     }
