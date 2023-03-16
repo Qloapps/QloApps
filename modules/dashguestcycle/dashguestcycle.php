@@ -170,7 +170,7 @@ class DashGuestCycle extends Module
             }
 
             $tr[] = array(
-                'value' => $arrivalInfo['adult'] + $arrivalInfo['children'],
+                'value' => $arrivalInfo['with_occupancy'] ? ($arrivalInfo['adults'] + $arrivalInfo['children']) : '--',
                 'class' => 'text-center',
             );
             $tr[] = array(
@@ -230,7 +230,7 @@ class DashGuestCycle extends Module
             }
 
             $tr[] = array(
-                'value' => $departureInfo['adult'] + $departureInfo['children'],
+                'value' => $departureInfo['with_occupancy'] ? ($departureInfo['adults'] + $departureInfo['children']) : '--',
                 'class' => 'text-center',
             );
             $tr[] = array(
@@ -291,7 +291,7 @@ class DashGuestCycle extends Module
             }
 
             $tr[] = array(
-                'value' => $inHouseInfo['adult'] + $inHouseInfo['children'],
+                'value' => $inHouseInfo['with_occupancy'] ? ($inHouseInfo['adults'] + $inHouseInfo['children']) : '--',
                 'class' => 'text-center',
             );
             $tr[] = array(
@@ -357,7 +357,7 @@ class DashGuestCycle extends Module
                 'class' => 'text-center',
             );
             $tr[] = array(
-                'value' => $newBookingInfo['total_guests'],
+                'value' => $newBookingInfo['with_occupancy'] ? $newBookingInfo['total_guests'] : '--',
                 'class' => 'text-center',
             );
             $tr[] = array(
@@ -425,7 +425,7 @@ class DashGuestCycle extends Module
             }
 
             $tr[] = array(
-                'value' => $cancellationInfo['total_guests'],
+                'value' => $cancellationInfo['with_occupancy'] ? $cancellationInfo['total_guests'] : '--',
                 'class' => 'text-center',
             );
             $tr[] = array(

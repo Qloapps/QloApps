@@ -54,7 +54,9 @@
         <hr>
 
         <div class="alert alert-info">
-            {l s='Below, enter the maximum of adults or children which can be accommodated in a room of this room type. Also, enter maximum number of guests for this room type.'}
+            {l s='Below, enter the maximum number of adults and children which can be accommodated in a room of this room type.'}
+			<br>
+            {l s='For maximum room occupancy, the total number of guests which can be accommodated in a room of this room type.'}
         </div>
 
         <div class="form-group">

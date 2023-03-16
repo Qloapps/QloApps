@@ -412,6 +412,17 @@
 				</span>
 			</div>
 		</div>
+		<div id="max_quantity_container" class="form-group" {if (!$product->available_for_order && $product->isAssociatedToShop()) || $product->auto_add_to_cart || !$product->allow_multiple_quantity}style="display:none;"{/if}>
+			<label class="control-label col-lg-3" for="max_quantity">
+				<span class="label-tooltip" data-toggle="tooltip"
+					title="{l s='Enter max allowed quantity per room, enter 0 for unlimited.'}">
+					{l s='Max quantity allow'}
+				</span>
+			</label>
+			<div class="col-lg-3">
+				<input type="text" id="max_quantity" name="max_quantity" value="{$product->max_quantity|escape:'html':'UTF-8'}" />
+			</div>
+		</div>
 		<div class="form-group">
 			<div class="col-lg-6 col-lg-offset-3">
 				<div class="alert alert-info">

@@ -219,15 +219,28 @@ class OrderReturnCore extends ObjectModel
                     0
                 );
                 $bookingRow['additional_services_tax_excl'] = $objRoomTypeServiceProductOrderDetail->getroomTypeServiceProducts(
-                    $id_order,
+                    $bookingRow['id_order'],
                     0,
                     0,
-                    $type_value['product_id'],
-                    $data_v['date_from'],
-                    $data_v['date_to'],
-                    $data_v['id_room'],
+                    $bookingRow['id_product'],
+                    $bookingRow['date_from'],
+                    $bookingRow['date_to'],
+                    $bookingRow['id_room'],
                     1,
-                    0
+                    0,
+                    null
+                );
+                $bookingRow['additional_services_tax_incl'] = $objRoomTypeServiceProductOrderDetail->getroomTypeServiceProducts(
+                    $bookingRow['id_order'],
+                    0,
+                    0,
+                    $bookingRow['id_product'],
+                    $bookingRow['date_from'],
+                    $bookingRow['date_to'],
+                    $bookingRow['id_room'],
+                    1,
+                    1,
+                    null
                 );
 
                 if ($customerView) {
@@ -238,7 +251,9 @@ class OrderReturnCore extends ObjectModel
                         $returnsCustView[$dateJoin]['total_price_tax_incl'] += $bookingRow['total_price_tax_incl'];
                         $returnsCustView[$dateJoin]['total_paid_amount'] += $bookingRow['total_paid_amount'];
                         $returnsCustView[$dateJoin]['extra_demands_price_tax_incl'] += $bookingRow['extra_demands_price_tax_incl'];
+                        $returnsCustView[$dateJoin]['extra_demands_price_tax_incl'] += $bookingRow['additional_services_tax_incl'];
                         $returnsCustView[$dateJoin]['extra_demands_price_tax_excl'] += $bookingRow['extra_demands_price_tax_excl'];
+                        $returnsCustView[$dateJoin]['extra_demands_price_tax_excl'] += $bookingRow['additional_services_tax_excl'];
                     } else {
                         unset($bookingRow['id_room']);
                         unset($bookingRow['room_num']);

@@ -468,8 +468,11 @@ $(document).ready(function()
 	$(document).on('click', '#rooms_extra_services .qty_up', function(e) {
         e.preventDefault();
         qtyfield = $(this).closest('.qty_container').find('input.qty');
-        var currentVal = parseInt(qtyfield.val());
-        qtyfield.val(currentVal + 1).trigger('focusout');
+        var newQuantity = parseInt(qtyfield.val()) + 1;
+		if (qtyfield.data('max_quantity') && qtyfield.data('max_quantity') < newQuantity) {
+            newQuantity = qtyfield.data('max_quantity');
+        }
+        qtyfield.val(newQuantity).trigger('focusout');
     });
 
     $(document).on('click', '#rooms_extra_services .qty_down', function(e) {
@@ -487,6 +490,9 @@ $(document).ready(function()
         var qty_wntd = $(this).val();
         if (qty_wntd == '' || !$.isNumeric(qty_wntd)) {
             $(this).val(1);
+        }
+		if ($(this).data('max_quantity') && $(this).data('max_quantity') < qty_wntd) {
+            $(this).val(qtyfield.data('max_quantity'));
         }
 		if ($(this).closest('.room_demand_block').find('.change_room_type_service_product').is(':checked')) {
 			updateServiceProducts($(this).closest('.room_demand_block').find('.change_room_type_service_product'));

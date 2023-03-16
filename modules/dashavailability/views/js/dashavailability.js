@@ -26,6 +26,7 @@ function line_chart_availability(widget_name, chart_details) {
             .useInteractiveGuideline(true)
             .x(function(d) { return (d !== undefined ? d[0] : 0); })
             .y(function(d) { return (d !== undefined ? parseInt(d[1]) : 0); })
+            .forceY(0)
             .margin({
                 left: 30,
                 right: 30,

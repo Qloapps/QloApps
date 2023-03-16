@@ -132,6 +132,7 @@ class HotelOrderRefundRules extends ObjectModel
 
         $objHtlRefundRules = new HotelBranchRefundRules();
         $objHotelBookingDemands = new HotelBookingDemands();
+        $objRoomTypeServiceProductOrderDetail = new RoomTypeServiceProductOrderDetail();
 
         if ($bookingsToRefund = OrderReturn::getOrdersReturnDetail($idOrder, $idOrderReturn, $idHtlBooking)) {
             foreach ($bookingsToRefund as $booking) {
@@ -152,6 +153,19 @@ class HotelOrderRefundRules extends ObjectModel
                         1
                     );
 
+                    $totalServicesPrice = $objRoomTypeServiceProductOrderDetail->getroomTypeServiceProducts(
+                        $objHtlBooking->id_order,
+                        0,
+                        0,
+                        $objHtlBooking->id_product,
+                        $objHtlBooking->date_from,
+                        $objHtlBooking->date_to,
+                        $objHtlBooking->id_room,
+                        1,
+                        1,
+                        null
+                    );
+
                     if ($refundRules = $objHtlRefundRules->getHotelRefundRules($objHtlBooking->id_hotel, 0, 1)) {
                         $orderCurrency = $objOrder->id_currency;
                         $defaultCurrency = Configuration::get('PS_CURRENCY_DEFAULT');
@@ -169,7 +183,7 @@ class HotelOrderRefundRules extends ObjectModel
                         $ruleApplied = false;
                         foreach ($refundRules as $refRule) {
                             if ($daysBeforeCancel >= $refRule['days']) {
-                                $paidAmount = $objHtlBooking->total_paid_amount + $totalDemandsPrice;
+                                $paidAmount = $objHtlBooking->total_paid_amount + $totalDemandsPrice + $totalServicesPrice;
                                 if ($objOrder->is_advance_payment) {
                                     $refundValue = $refRule['deduction_value_adv_pay'];
                                 } else {
