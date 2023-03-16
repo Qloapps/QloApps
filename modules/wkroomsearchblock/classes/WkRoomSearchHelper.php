@@ -218,56 +218,48 @@ class WkRoomSearchHelper
             'location' => 4,
             'hotel' => 5,
             'date' => 5,
-            'occupancy' => 5,
-            'search' => 3
+            'occupancy' => 4,
+            'search' => 4
         );
 
         if (!$locationEnabled) {
             unset($search_column_widths['location']);
 
-            $search_column_widths['date'] += 1;
+            $search_column_widths['date'] += 2;
             $search_column_widths['search'] += 1;
             if ($occupancyEnabled) {
-                $search_column_widths['search'] += 1;
                 $search_column_widths['occupancy'] += 1;
             } elseif ($smartyVars['show_hotel_name'] || count($hotelsInfo) > 1) {
                 $search_column_widths['hotel'] += 1;
             } else {
-                $search_column_widths['search'] += 1;
                 $search_column_widths['date'] += 1;
             }
         }
         if (!$smartyVars['show_hotel_name'] && count($hotelsInfo) <= 1) {
             unset($search_column_widths['hotel']);
 
-            $search_column_widths['date'] += 1;
+            $search_column_widths['date'] += 2;
             $search_column_widths['search'] += 1;
             if ($occupancyEnabled) {
-                $search_column_widths['date'] += 1;
                 $search_column_widths['occupancy'] += 2;
             } else {
-                $search_column_widths['date'] += 1;
                 $search_column_widths['date'] += 2;
             }
         }
         if (!$occupancyEnabled) {
             unset($search_column_widths['occupancy']);
 
+            $search_column_widths['date'] += 1;
             if ($smartyVars['show_hotel_name'] || count($hotelsInfo) > 1) {
+                $search_column_widths['hotel'] += 1;
+                $search_column_widths['date'] += 1;
                 if ($locationEnabled) {
-                    $search_column_widths['hotel'] += 1;
                     $search_column_widths['location'] += 1;
-                    $search_column_widths['search'] += 2;
-                    $search_column_widths['date'] += 1;
                 } else {
-                    $search_column_widths['hotel'] += 2;
-                    $search_column_widths['search'] += 2;
-                    $search_column_widths['date'] += 2;
-
+                    $search_column_widths['date'] += 1;
                 }
             } else {
-                $search_column_widths['date'] += 1;
-                $search_column_widths['date'] += 4;
+                $search_column_widths['date'] += 3;
             }
         }
         $smartyVars['column_widths'] = $search_column_widths;

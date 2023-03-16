@@ -44,7 +44,7 @@ class HotelImage extends ObjectModel
 
         $this->source_index = _PS_HOTEL_IMG_DIR_.'index.php';
 
-        $this->image_dir = _PS_HOTEL_IMG_.$this->getImgFolder();
+        $this->image_dir = _PS_HOTEL_IMG_DIR_.$this->getImgFolder();
     }
 
     /**
@@ -58,6 +58,33 @@ class HotelImage extends ObjectModel
         ) {
             return false;
         }
+        return true;
+    }
+
+    /**
+     * Delete the hotel image from disk and remove the containing folder if empty
+     * Handles both legacy and new image filesystems
+     */
+    public function deleteImage($force_delete = false)
+    {
+        parent::deleteImage();
+        // Can we delete the image folder?
+        if (is_dir($this->image_dir)) {
+            $delete_folder = true;
+            foreach (scandir($this->image_dir) as $file) {
+                if (($file != '.' && $file != '..' && $file != 'index.php')) {
+                    $delete_folder = false;
+                    break;
+                }
+            }
+        }
+
+        if (isset($delete_folder) && $delete_folder) {
+            // delete index image before deleting folder
+            unlink($this->image_dir.'index.php');
+            @rmdir($this->image_dir);
+        }
+
         return true;
     }
 
@@ -232,9 +259,9 @@ class HotelImage extends ObjectModel
                                 }
                             }
                             $addedImage = array(
-                                'id_image' => $objHtlImage->id,
+                                'id' => $objHtlImage->id,
                                 'cover' => $objHtlImage->cover,
-                                'image_url' => Context::getContext()->link->getMediaLink($objHtlImage->getImageLink($objHtlImage->id)),
+                                'image_link' => Context::getContext()->link->getMediaLink($objHtlImage->getImageLink($objHtlImage->id)),
                             );
                             return $addedImage;
                         }

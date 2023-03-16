@@ -561,7 +561,7 @@ class DashProducts extends Module
 			LEFT JOIN `'._DB_PREFIX_.'date_range` dr ON pv.`id_date_range` = dr.`id_date_range`
 			LEFT JOIN `'._DB_PREFIX_.'page` p ON pv.`id_page` = p.`id_page`
 			LEFT JOIN `'._DB_PREFIX_.'page_type` pt ON pt.`id_page_type` = p.`id_page_type`
-			LEFT JOIN `'._DB_PREFIX_.'htl_room_type` hrt ON hrt.`id_product` = p.`id_object`
+			INNER JOIN `'._DB_PREFIX_.'htl_room_type` hrt ON hrt.`id_product` = p.`id_object`
 			WHERE pt.`name` = \'product\'
 			'.Shop::addSqlRestriction(false, 'pv').'
 			AND dr.`time_start` BETWEEN "'.pSQL($date_from).' 00:00:00" AND "'.pSQL($date_to).' 23:59:59"

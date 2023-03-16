@@ -96,7 +96,7 @@
 	</div>
 	<div class="form-group row">
 		<div class="col-md-2 col-sm-3">
-			<strong>{l s='Total Order Amount'} </strong>
+			<strong>{l s='Total order amount'} </strong>
 		</div>
 		<div class="col-sm-9 col-md-10">
 			{displayPrice price=$orderInfo['total_paid_tax_incl'] currency=$orderInfo['id_currency']}
@@ -104,7 +104,7 @@
 	</div>
 	<div class="form-group row">
 		<div class="col-md-2 col-sm-3">
-			<strong>{l s='Refund initiated on'} </strong>
+			<strong>{l s='Request date'} </strong>
 		</div>
 		<div class="col-sm-9 col-md-10">
 			{$orderReturnInfo['date_add']|date_format:"%d-%m-%Y %I:%M %p"}
@@ -114,7 +114,7 @@
 	{if $currentStateInfo['refunded']}
 		<div class="form-group row">
 			<div class="col-md-2 col-sm-3">
-				<strong>{l s='Refunded Amount' mod='hotelreservationsystem'}</strong>
+				<strong>{l s='Refunded amount' mod='hotelreservationsystem'}</strong>
 			</div>
 			<div class="col-sm-9 col-md-10">
 				{displayPrice price=$orderReturnInfo['refunded_amount'] currency=$orderInfo['id_currency']}
@@ -122,7 +122,7 @@
 		</div>
 		<div class="form-group row">
 			<div class="col-md-2 col-sm-3">
-				<strong>{l s='Payment Mode' mod='hotelreservationsystem'}</strong>
+				<strong>{l s='Payment mode' mod='hotelreservationsystem'}</strong>
 			</div>
 			<div class="col-sm-9 col-md-10">
 				{$orderReturnInfo['payment_mode']|escape:'html':'UTF-8'}
@@ -130,7 +130,7 @@
 		</div>
 		<div class="form-group row">
 			<div class="col-md-2 col-sm-3">
-				<strong>{l s='Transaction Id' mod='hotelreservationsystem'}</strong>
+				<strong>{l s='Transaction ID' mod='hotelreservationsystem'}</strong>
 			</div>
 			<div class="col-sm-9 col-md-10">
 				{$orderReturnInfo['id_transaction']|escape:'html':'UTF-8'}

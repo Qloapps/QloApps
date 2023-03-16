@@ -72,7 +72,7 @@
                                                                                     <input type="number" class="form-control num_occupancy num_adults" name="occupancy[0][adults]" value="1" min="1"  max="{if isset($book_v)}{$book_v['max_adults']|escape:'html':'UTF-8'}{/if}">
                                                                                 </div>
                                                                                 <div class="form-group col-xs-6 occupancy_count_block">
-                                                                                    <label>{l s='Child'} <span class="label-desc-txt"></span></label>
+                                                                                    <label>{l s='Children'} <span class="label-desc-txt"></span></label>
                                                                                     <input type="number" class="form-control num_occupancy num_children" name="occupancy[0][children]" value="0" min="0" max="{if isset($book_v)}{$book_v['max_children']|escape:'html':'UTF-8'}{else}{$max_child_in_room}{/if}">
                                                                                     ({l s='Below'}  {$max_child_age|escape:'htmlall':'UTF-8'} {l s='years'})
                                                                                 </div>
@@ -159,7 +159,7 @@
                                                                                         <input type="number" class="form-control num_occupancy num_adults" name="occupancy[0][adults]" value="1" min="1"  max="{if isset($book_v)}{$book_v['max_adults']|escape:'html':'UTF-8'}{/if}">
                                                                                     </div>
                                                                                     <div class="form-group col-xs-6 occupancy_count_block">
-                                                                                        <label>{l s='Child'} <span class="label-desc-txt"></span></label>
+                                                                                        <label>{l s='Children'} <span class="label-desc-txt"></span></label>
                                                                                         <input type="number" class="form-control num_occupancy num_children" name="occupancy[0][children]" value="0" min="0" max="{if isset($book_v)}{$book_v['max_children']|escape:'html':'UTF-8'}{else}{$max_child_in_room}{/if}">
                                                                                         ({l s='Below'}  {$max_child_age|escape:'htmlall':'UTF-8'} {l s='years'})
                                                                                     </div>

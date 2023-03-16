@@ -82,12 +82,16 @@ class AdminSearchControllerCore extends AdminController
                         Tools::redirectAdmin('index.php?tab=AdminOrders&id_order='.(int)$order->id.'&vieworder'.'&token='.Tools::getAdminTokenLite('AdminOrders'));
                     } else {
                         $row = get_object_vars($order);
-                        $row['id_order'] = $row['id'];
-                        $customer = $order->getCustomer();
-                        $row['customer'] = $customer->firstname.' '.$customer->lastname;
-                        $order_state = $order->getCurrentOrderState();
-                        $row['osname'] = $order_state->name[$this->context->language->id];
-                        $this->_list['orders'] = array($row);
+                        $idHotel = HotelBookingDetail::getIdHotelByIdOrder($row['id']);
+                        if (in_array($idHotel, HotelBranchInformation::getProfileAccessedHotels($this->context->employee->id_profile, 1, 1))) {
+                            $row['id_order'] = $row['id'];
+                            $customer = $order->getCustomer();
+                            $row['customer'] = $customer->firstname.' '.$customer->lastname;
+                            $order_state = $order->getCurrentOrderState();
+                            $row['osname'] = $order_state->name[$this->context->language->id];
+                            $this->_list['orders'] = array($row);
+                        }
+
                     }
                 } else {
                     $orders = Order::getByReference($this->query);
@@ -99,12 +103,15 @@ class AdminSearchControllerCore extends AdminController
                         foreach ($orders as $order) {
                             /** @var Order $order */
                             $row = get_object_vars($order);
-                            $row['id_order'] = $row['id'];
-                            $customer = $order->getCustomer();
-                            $row['customer'] = $customer->firstname.' '.$customer->lastname;
-                            $order_state = $order->getCurrentOrderState();
-                            $row['osname'] = $order_state->name[$this->context->language->id];
-                            $this->_list['orders'][] = $row;
+                            $idHotel = HotelBookingDetail::getIdHotelByIdOrder($row['id']);
+                            if (in_array($idHotel, HotelBranchInformation::getProfileAccessedHotels($this->context->employee->id_profile, 1, 1))) {
+                                $row['id_order'] = $row['id'];
+                                $customer = $order->getCustomer();
+                                $row['customer'] = $customer->firstname.' '.$customer->lastname;
+                                $order_state = $order->getCurrentOrderState();
+                                $row['osname'] = $order_state->name[$this->context->language->id];
+                                $this->_list['orders'][] = $row;
+                            }
                         }
                     } elseif ($searchType == 3) {
                         $this->errors[] = Tools::displayError('No order was found with this ID:').' '.Tools::htmlentitiesUTF8($this->query);
@@ -162,7 +169,15 @@ class AdminSearchControllerCore extends AdminController
     public function searchCatalog()
     {
         $this->context = Context::getContext();
-        $this->_list['products'] = Product::searchByName($this->context->language->id, $this->query);
+        if ($this->_list['products'] = Product::searchByName($this->context->language->id, $this->query)) {
+            $objRoomType = new HotelRoomType();
+            foreach ($this->_list['products'] as $key => $product) {
+                $roomInfo = $objRoomType->getRoomTypeInfoByIdProduct($product['id_product']);
+                if (!in_array($roomInfo['id_hotel'], HotelBranchInformation::getProfileAccessedHotels($this->context->employee->id_profile, 1, 1))) {
+                    unset($this->_list['products'][$key]);
+                }
+            }
+        }
         $this->_list['categories'] = Category::searchByName($this->context->language->id, $this->query);
     }
 
@@ -299,9 +314,8 @@ class AdminSearchControllerCore extends AdminController
         $this->show_toolbar = false;
         $this->fields_list['products'] = array(
             'id_product' => array('title' => $this->l('ID'), 'width' => 25),
-            'manufacturer_name' => array('title' => $this->l('Manufacturer'), 'align' => 'center', 'width' => 200),
-            'reference' => array('title' => $this->l('Reference'), 'align' => 'center', 'width' => 150),
             'name' => array('title' => $this->l('Name'), 'width' => 'auto'),
+            'reference' => array('title' => $this->l('Reference'), 'align' => 'center', 'width' => 150),
             'price_tax_excl' => array('title' => $this->l('Price (tax excl.)'), 'align' => 'right', 'type' => 'price', 'width' => 60),
             'price_tax_incl' => array('title' => $this->l('Price (tax incl.)'), 'align' => 'right', 'type' => 'price', 'width' => 60),
             'active' => array('title' => $this->l('Active'), 'width' => 70, 'active' => 'status', 'align' => 'center', 'type' => 'bool')
@@ -350,7 +364,7 @@ class AdminSearchControllerCore extends AdminController
                 }
                 $this->tpl_view_vars['categories'] = $categories;
             }
-            if (isset($this->_list['products']) && count($this->_list['products'])) {
+            if (isset($this->_list['products']) && $this->_list['products']&& count($this->_list['products'])) {
                 $view = '';
                 $this->initProductList();
 
@@ -376,6 +390,7 @@ class AdminSearchControllerCore extends AdminController
                     $view = $helper->generateList($this->_list['products'], $this->fields_list['products']);
                 }
 
+                $this->tpl_view_vars['num_products'] = count($this->_list['products']);
                 $this->tpl_view_vars['products'] = $view;
             }
             if (isset($this->_list['customers']) && count($this->_list['customers'])) {
@@ -398,6 +413,7 @@ class AdminSearchControllerCore extends AdminController
                     }
                     $view = $helper->generateList($this->_list['customers'], $this->fields_list['customers']);
                 }
+                $this->tpl_view_vars['num_customers'] = count($this->_list['customers']);
                 $this->tpl_view_vars['customers'] = $view;
             }
             if (isset($this->_list['orders']) && count($this->_list['orders'])) {
@@ -417,6 +433,7 @@ class AdminSearchControllerCore extends AdminController
                 if ($this->_list['orders']) {
                     $view = $helper->generateList($this->_list['orders'], $this->fields_list['orders']);
                 }
+                $this->tpl_view_vars['num_orders'] = count($this->_list['orders']);
                 $this->tpl_view_vars['orders'] = $view;
             }
 

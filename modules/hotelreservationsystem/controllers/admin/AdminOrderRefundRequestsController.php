@@ -164,7 +164,7 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
             }
             $this->fields_list = array(
                 'id_order_return' => array(
-                    'title' => $this->l('ID'),
+                    'title' => $this->l('Refund ID'),
                     'align' => 'center',
                     'class' => 'fixed-width-xs',
                 ),
@@ -447,6 +447,8 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
                             $objOrderReturn->save();
 
                             Hook::exec('actionOrderSlipAdd', array('order' => $objOrder, 'bookingList' => $bookingList));
+
+                            $params['{credit_slip_url}'] = $this->context->link->getPageLink('order-slip', true);
 
                             @Mail::Send(
                                 (int)$objOrder->id_lang,

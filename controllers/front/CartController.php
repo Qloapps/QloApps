@@ -285,11 +285,11 @@ class CartControllerCore extends FrontController
 
         if ($product->booking_product) {
             $occupancyRequiredForBooking = false;
-            if (Configuration::get('PS_FRONT_ROOM_UNIT_SELECTION_TYPE') == HotelBookingDetail::PS_FRONT_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY) {
+            if (Configuration::get('PS_FRONT_ROOM_UNIT_SELECTION_TYPE') == HotelBookingDetail::PS_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY) {
                 $occupancyRequiredForBooking = true;
             }
 
-            if ($occupancyRequiredForBooking) {
+            if ($occupancyRequiredForBooking && $operator == 'up') {
                 if ($occupancy = json_decode(Tools::getValue('occupancy'), true)) {
                     $this->qty = count($occupancy);
                 } else {
@@ -395,16 +395,26 @@ class CartControllerCore extends FrontController
                                     if (Tools::getValue('op', 'up') == 'up') {
                                         if ($total_available_rooms < $req_rm) {
                                             die(json_encode(array('status' => 'unavailable_quantity', 'avail_rooms' => $total_available_rooms)));
-                                            } else {
-                                                // validate normal products if available
-                                                if ($serviceProducts) {
-                                                    $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
-                                                    foreach ($serviceProducts as $key => $standartProduct) {
-                                                        if (!$objRoomTypeServiceProduct->isRoomTypeLinkedWithProduct($this->id_product, $standartProduct['id_product'])) {
-                                                            unset($serviceProducts[$key]);
+                                        } else {
+                                            // validate service products if available
+                                            if ($serviceProducts) {
+                                                $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
+                                                foreach ($serviceProducts as $key => $serviceProduct) {
+                                                    if (!$objRoomTypeServiceProduct->isRoomTypeLinkedWithProduct($this->id_product, $serviceProduct['id_product'])) {
+                                                        unset($serviceProducts[$key]);
+                                                    } else {
+                                                        if (Validate::isLoadedObject($objServiceProduct = new Product($serviceProduct['id_product']))) {
+                                                            if (!$objServiceProduct->allow_multiple_quantity && $serviceProduct['quantity'] > 1) {
+                                                                $serviceProducts[$key]['quantity'] = 1;
+                                                            } else if ($objServiceProduct->max_quantity && $objServiceProduct->max_quantity < $serviceProduct['quantity'] ) {
+                                                                $serviceProducts[$key]['quantity'] = $objServiceProduct->max_quantity;
+                                                            }
+                                                        } else {
+                                                            $response['error'] = Tools::displayError('Service not Found');
                                                         }
                                                     }
                                                 }
+                                            }
                                         }
                                     }
                                 } else {
@@ -621,6 +631,8 @@ class CartControllerCore extends FrontController
                             if ($objProduct->allow_multiple_quantity) {
                                 if (!Validate::isUnsignedInt($qty)) {
                                     $this->errors[] = Tools::displayError('The quantity you\'ve entered is invalid.');
+                                } elseif ($objProduct->max_quantity && $qty > $objProduct->max_quantity) {
+                                    $this->errors[] = Tools::displayError(sprintf('cannot add more than %d quantity.', $objProduct->max_quantity));
                                 }
                             } else {
                                 $qty = 1;
