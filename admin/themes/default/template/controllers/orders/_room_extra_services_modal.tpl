@@ -36,10 +36,6 @@
 		{include file='controllers/orders/_room_services_block.tpl'}
 	</div>
 </div>
-<div class="modal-footer">
-	{* <button type="button" class="btn btn-secondary pull-left" data-dismiss="modal">{l s='Close'}</button> *}
-</div>
-
 
 
 {* Css for handling extra demands changes *}
@@ -49,10 +45,6 @@
 		padding-bottom: 0px;}
 	#rooms_type_extra_demands .modal-title {
 		margin: 0px;}
-	#rooms_type_extra_demands .demand_edit_badge {
-		font-size: 14px;}
-	#rooms_extra_demands .room_ordered_demands td, #rooms_extra_demands .room_demand_detail {
-		font-size: 14px;}
 	#rooms_extra_demands .demand_header {
 		padding: 10px;
 		color: #333;

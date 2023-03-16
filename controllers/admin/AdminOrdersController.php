@@ -4628,6 +4628,7 @@ class AdminOrdersControllerCore extends AdminController
             $smartyVars = array();
             $objOrder = new Order($idOrder);
             $smartyVars['orderCurrency'] = $objOrder->id_currency;
+            $smartyVars['link'] = $this->context->link;
 
             $objBookingDemand = new HotelBookingDetail();
             $htlBookingDetail = $objBookingDemand->getRowByIdOrderIdProductInDateRange(
