@@ -48,7 +48,7 @@
                             <button class="btn btn-service-product{if isset($product.selected) && $product.selected} btn-danger remove_roomtype_product{else} btn-success add_roomtype_product{/if} pull-right" data-id-product="{$product.id_product}">{if isset($product.selected) && $product.selected}{l s='Remove'}{else}{l s='Select'}{/if}</button>
                             {if $product.allow_multiple_quantity && $product.available_for_order}
                                 <div class="qty_container pull-right">
-                                    <input type="hidden" class="service_product_qty" id="service_product_qty_{$product.id_product}" name="service_product_qty_{$product.id_product}" data-id-product="{$product.id_product}" value="{if isset($product.quantity_added) && $product.quantity_added}{$product.quantity_added|escape:'html':'UTF-8'}{else}1{/if}">
+                                    <input type="hidden" class="service_product_qty" id="service_product_qty_{$product.id_product}" name="service_product_qty_{$product.id_product}" data-id-product="{$product.id_product}" data-max_quantity="{$product.max_quantity}" value="{if isset($product.quantity_added) && $product.quantity_added}{$product.quantity_added|escape:'html':'UTF-8'}{else}1{/if}">
                                     <div class="qty_count pull-left">
                                         <span>{if isset($product.quantity_added) && $product.quantity_added}{$product.quantity_added|escape:'html':'UTF-8'}{else}1{/if}</span>
                                     </div>

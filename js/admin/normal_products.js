@@ -449,6 +449,14 @@ product_tabs['Informations'] = new function(){
 			}
 		});
 
+		$('input[name=allow_multiple_quantity]').on('change', function(e) {
+			if ($(this).val() == 1) {
+				$('#max_quantity_container').show('fast');
+			} else {
+				$('#max_quantity_container').hide('fast');
+			}
+		});
+
 		$('#related_product_autocomplete_input')
 			.autocomplete('ajax_products_list.php?exclude_packs=0&excludeVirtuals=0&excludeIds='+id_product, {
 				minChars: 1,

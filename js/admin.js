@@ -1616,7 +1616,7 @@ function loadRecommendation()
 			token: token
 		},
 		success: function(res) {
-			if (res.success && res.content.trim()) {
+			if (res.success && res.content && res.content.trim()) {
 				$('#recommendation-wrapper-skeleton').fadeIn('slow');
 				$('#recommendation-wrapper').html(res.content);
 				let images = $('#recommendation-wrapper img');

@@ -1029,7 +1029,9 @@ function checkUrl() {
 /*#####################################################################*/
 
 $(document).ready(function() {
-    BookingForm.init();
+    if (!PS_CATALOG_MODE) {
+        BookingForm.init();
+    }
 
     $(document).on('QloApps:updateRoomOccupancy', function(e) {
         BookingForm.refresh();
@@ -1106,9 +1108,12 @@ $(document).ready(function() {
     $(document).on('click', '.service_product_qty_up', function(e) {
         e.preventDefault();
         qtyfield = $(this).closest('.qty_container').find('input.service_product_qty');
-        var currentVal = parseInt(qtyfield.val());
-        $(this).closest('.qty_container').find('.qty_count span').text(currentVal + 1);
-        qtyfield.val(currentVal + 1);
+        var newQuantity = parseInt(qtyfield.val()) + 1;
+        if (qtyfield.data('max_quantity') && qtyfield.data('max_quantity') < newQuantity) {
+            newQuantity = qtyfield.data('max_quantity');
+        }
+        $(this).closest('.qty_container').find('.qty_count span').text(newQuantity);
+        qtyfield.val(newQuantity);
     });
 
     // The button to decrement the product value
@@ -1201,6 +1206,13 @@ $(document).ready(function() {
         if (typeof(qty) == 'undefined') {
             qty = 1;
         }
+        var added_service_product = [];
+        $('#additional_products input.service_product').each(function () {
+            added_service_product.push({
+                'id_product': $(this).data('id_product'),
+                'quantity':$(this).val(),
+            });
+        });
         $.ajax({
             type: 'POST',
             headers: {
@@ -1215,31 +1227,36 @@ $(document).ready(function() {
                 qty: qty,
                 id_product: $('#product_page_product_id').val(),
                 service_product: id_product,
+                added_service_product: added_service_product,
                 action: 'checkServiceProductWithRoomType',
                 ajax: true,
                 token: static_token
             },
             success: function(result) {
-                if (result.status) {
-                    if ($('input#service_product_'+ id_product).length) {
-                        var prevQty = $('input#service_product_'+ id_product).val();
-                        if (parseInt(prevQty) > 0) {
-                            qty = parseInt(qty) + parseInt(prevQty);
+                if (result.success) {
+                    if (result.add) {
+                        if ($('input#service_product_'+ id_product).length) {
+                            var prevQty = $('input#service_product_'+ id_product).val();
+                            if (parseInt(prevQty) > 0) {
+                                qty = parseInt(qty) + parseInt(prevQty);
+                            }
+                            $('input#service_product_'+ id_product).val(qty);
+                        } else {
+                            $('<input type="hidden">').attr({
+                                id: 'service_product_'+ id_product,
+                                name: 'service_product['+ id_product +'][]',
+                                class: 'service_product',
+                                'data-id_product': id_product,
+                                value: qty
+                            }).appendTo('#additional_products');
                         }
-                        $('input#service_product_'+ id_product).val(qty);
-                    } else {
-                        $('<input type="hidden">').attr({
-                            id: 'service_product_'+ id_product,
-                            name: 'service_product['+ id_product +'][]',
-                            class: 'service_product',
-                            'data-id_product': id_product,
-                            value: qty
-                        }).appendTo('#additional_products');
                     }
                     // reset input
                     $(that).closest('.service_product_action_block').find('input.service_product_qty').val(1);
                     $(that).closest('.service_product_action_block').find('.qty_count span').text(1);
-                    showSuccessMessage(cart_extra_service_add);
+                    if (result.msg) {
+                        showSuccessMessage(result.msg);
+                    }
                     BookingForm.refresh();
                 } else {
                     if (result.error) {
