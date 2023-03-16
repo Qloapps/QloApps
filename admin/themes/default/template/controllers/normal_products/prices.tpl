@@ -470,15 +470,6 @@ $(document).ready(function () {
 				</div>
 			</div>
 			<div class="form-group">
-				<label class="control-label col-lg-2" for="sp_from_quantity">{l s='Starting at'}</label>
-				<div class="col-lg-4">
-					<div class="input-group">
-						<span class="input-group-addon">{l s='unit'}</span>
-						<input type="text" name="sp_from_quantity" id="sp_from_quantity" value="1" />
-					</div>
-				</div>
-			</div>
-			<div class="form-group">
 				<label class="control-label col-lg-2" for="sp_price">{l s='product price'}
 					{if $country_display_tax_label}
 						{l s='(tax excl.)'}

@@ -23,6 +23,7 @@ $(document).ready(function() {
     if ($('#fullcalendar').length) {
         var calendar = new FullCalendar.Calendar($('#fullcalendar').get(0), {
             initialView: 'dayGridMonth',
+            initialDate: initialDate,
             events: {
                 url: rooms_booking_url,
                 method: 'POST',
@@ -49,7 +50,7 @@ $(document).ready(function() {
                         $(info.el).closest('td').find('.day-info svg circle').attr('fill', '#7EC77B');
                     } else if (info.event.extendedProps.data.stats.num_part_avai > 0) {
                         $(info.el).closest('td').find('.day-info svg circle').attr('fill', '#FFC224');
-                    } else if (info.event.extendedProps.data.stats.num_booked == info.event.extendedProps.data.stats.total_rooms) {
+                    } else if ((info.event.extendedProps.data.stats.num_booked == info.event.extendedProps.data.stats.total_rooms) && info.event.extendedProps.data.stats.total_rooms != 0) {
                         $(info.el).closest('td').find('.day-info svg circle').attr('fill', '#00AFF0');
                     } else {
                         $(info.el).closest('td').find('.day-info svg circle').attr('fill', '#FF3838');
@@ -312,7 +313,7 @@ $(document).ready(function() {
                 occupancy = false;
             }
         } else {
-            return true;
+            return 1;
         }
 
         return occupancy;

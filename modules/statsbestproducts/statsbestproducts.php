@@ -202,7 +202,7 @@ class StatsBestProducts extends ModuleGrid
         FROM `'._DB_PREFIX_.'product` p
         LEFT JOIN `'._DB_PREFIX_.'product_lang` pl
         ON (pl.`id_product` = p.`id_product` AND pl.`id_lang` = '.(int) $id_lang .')
-        LEFT JOIN `'._DB_PREFIX_.'htl_room_type` hrt
+        INNER JOIN `'._DB_PREFIX_.'htl_room_type` hrt
         ON (hrt.`id_product` = p.`id_product`)
         LEFT JOIN `'._DB_PREFIX_.'htl_branch_info_lang` hbil
         ON (hbil.`id` = hrt.`id_hotel` AND hbil.`id_lang` = '.(int) $id_lang .')

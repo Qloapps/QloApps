@@ -64,6 +64,19 @@
       background-color: #FAFAFA;}
       .faded-txt {
         color: #777777;}
+      #search_hotel_block_form #search_room_submit {
+        height: unset;
+        min-height: 45px;
+      }
+@media (max-width: 767px) {
+  .header-rmsearch-wrapper #search_hotel_block_form.grid {
+    grid-template-columns: 1fr;
+    column-gap: 0px;
+  }
+  .header-rmsearch-details-wrapper .modify_roomtype_search_btn {
+    padding: 6px 12px;
+  }
+}
 @media (max-width: 991px) {
   .header-rmsearch-wrapper .close_room_serach_wrapper {
     top: -8px;

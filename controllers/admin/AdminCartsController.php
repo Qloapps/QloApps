@@ -135,6 +135,7 @@ class AdminCartsControllerCore extends AdminController
                 $smartyVars['type'] = 'non_orderd';
             }
         }
+        $smartyVars['link'] = $this->context->link;
 
         $tpl = $this->createTemplate('_orders.tpl');
         $tpl->assign($smartyVars);

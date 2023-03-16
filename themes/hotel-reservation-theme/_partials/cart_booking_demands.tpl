@@ -118,7 +118,7 @@
 															<p>{$product['name']|escape:'html':'UTF-8'}</p>
 															{if $product.allow_multiple_quantity}
 																<div class="qty_container">
-																	<input type="text" class="form-control qty" id="qty_{$product.id_product}" name="service_product_qty_{$product.id_product}" data-id-product="{$product.id_product}" value="{if  isset($cartRoom['selected_service']) && $cartRoom['selected_service'] && ($product['id_product']|array_key_exists:$cartRoom['selected_service'])}{$cartRoom['selected_service'][$product['id_product']]['quantity']}{else}1{/if}">
+																	<input type="text" class="form-control qty" id="qty_{$product.id_product}" name="service_product_qty_{$product.id_product}" data-id-product="{$product.id_product}" data-max_quantity="{$product.max_quantity}" value="{if  isset($cartRoom['selected_service']) && $cartRoom['selected_service'] && ($product['id_product']|array_key_exists:$cartRoom['selected_service'])}{$cartRoom['selected_service'][$product['id_product']]['quantity']}{else}1{/if}">
 																	<div class="qty_controls">
 																		<a href="#" class="qty_up"><span><i class="icon-plus"></i></span></a>
 																		<a href="#" class="qty_down"><span><i class="icon-minus"></i></span></a>
