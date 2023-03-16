@@ -147,8 +147,8 @@ class WkRoomSearchHelper
                     $htlCategoryInfo = $objHotelInfo->getCategoryDataByIdCategory((int) $objCategory->id_parent);
 
                     $objBookingDetail = new HotelBookingDetail();
-                    $searchedData['num_days'] = $objBookingDetail->getNumberOfDays($dateFrom, $dateTo);\
-                    
+                    $searchedData['num_days'] = $objBookingDetail->getNumberOfDays($dateFrom, $dateTo);
+
                     $searchedData['parent_data'] = $htlCategoryInfo;
                     $searchedData['date_from'] = $dateFrom;
                     $searchedData['date_to'] = $dateTo;
