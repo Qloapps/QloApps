@@ -23,6 +23,7 @@ $(document).ready(function() {
     if ($('#fullcalendar').length) {
         var calendar = new FullCalendar.Calendar($('#fullcalendar').get(0), {
             initialView: 'dayGridMonth',
+            initialDate: initialDate,
             events: {
                 url: rooms_booking_url,
                 method: 'POST',
@@ -312,7 +313,7 @@ $(document).ready(function() {
                 occupancy = false;
             }
         } else {
-            return true;
+            return 1;
         }
 
         return occupancy;

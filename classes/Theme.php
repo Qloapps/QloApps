@@ -345,7 +345,7 @@ class ThemeCore extends ObjectModel
     public function toggleResponsive()
     {
         // Object must have a variable called 'responsive'
-        if (!array_key_exists('responsive', $this)) {
+        if (!property_exists($this, 'responsive')) {
             throw new PrestaShopException('property "responsive" is missing in object '.get_class($this));
         }
 
@@ -361,7 +361,7 @@ class ThemeCore extends ObjectModel
 
     public function toggleDefaultLeftColumn()
     {
-        if (!array_key_exists('default_left_column', $this)) {
+        if (!property_exists($this, 'default_left_column')) {
             throw new PrestaShopException('property "default_left_column" is missing in object '.get_class($this));
         }
 
@@ -374,7 +374,7 @@ class ThemeCore extends ObjectModel
 
     public function toggleDefaultRightColumn()
     {
-        if (!array_key_exists('default_right_column', $this)) {
+        if (!property_exists($this,'default_right_column')) {
             throw new PrestaShopException('property "default_right_column" is missing in object '.get_class($this));
         }
 

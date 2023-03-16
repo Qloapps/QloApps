@@ -126,7 +126,7 @@ class StatsData extends Module
 		FROM `'._DB_PREFIX_.'guest`
 		WHERE `id_customer` = '.(int)$params['cookie']->id_customer);
 
-        if ((int)$result['id_guest']) {
+        if (isset($result['id_guest']) && ( int)$result['id_guest']) {
             // The new guest is merged with the old one when it's connecting to an account
             $guest->mergeWithCustomer($result['id_guest'], $params['cookie']->id_customer);
             $params['cookie']->id_guest = $guest->id;

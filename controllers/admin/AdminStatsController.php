@@ -354,7 +354,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
     public static function getCustomerMainGender()
     {
         $row = Db::getInstance(_PS_USE_SQL_SLAVE_)->getRow('
-		SELECT SUM(IF(g.id_gender IS NOT NULL, 1, 0)) as total, SUM(IF(type = 0, 1, 0)) as male, SUM(IF(type = 1, 1, 0)) as female, SUM(IF(type = 2, 1, 0)) as neutral
+		SELECT SUM(IF(c.id_gender IS NOT NULL, 1, 0)) as total, SUM(IF(type = 0, 1, 0)) as male, SUM(IF(type = 1, 1, 0)) as female, SUM(IF(type = 2, 1, 0)) as neutral
 		FROM `'._DB_PREFIX_.'customer` c
 		LEFT JOIN `'._DB_PREFIX_.'gender` g ON c.id_gender = g.id_gender
 		WHERE c.active = 1 '.Shop::addSqlRestriction());
@@ -1176,9 +1176,10 @@ class AdminStatsControllerCore extends AdminStatsTabController
 
     public static function getArrivalsInfoByDate($date, $idHotel = null)
     {
-        $sql = 'SELECT hbd.*, CONCAT(c.`firstname`, " ", c.`lastname`) AS customer_name,
+        $sql = 'SELECT hbd.*, o.`with_occupancy`, CONCAT(c.`firstname`, " ", c.`lastname`) AS customer_name,
         DATEDIFF(hbd.`date_to`, hbd.`date_from`) AS los
         FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+        LEFT JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = hbd.`id_order`)
         LEFT JOIN `'._DB_PREFIX_.'customer` c ON (c.`id_customer` = hbd.`id_customer`)
         WHERE hbd.`is_refunded` = 0 AND hbd.`date_from` = "'.pSQL($date).' 00:00:00"
         AND hbd.`id_status` != '.(int) HotelBookingDetail::STATUS_CHECKED_IN.'
@@ -1191,9 +1192,10 @@ class AdminStatsControllerCore extends AdminStatsTabController
 
     public static function getDeparturesInfoByDate($date, $idHotel = null)
     {
-        $sql = 'SELECT hbd.*, CONCAT(c.`firstname`, " ", c.`lastname`) AS customer_name,
+        $sql = 'SELECT hbd.*, o.`with_occupancy`, CONCAT(c.`firstname`, " ", c.`lastname`) AS customer_name,
         DATEDIFF(hbd.`date_to`, hbd.`date_from`) AS los
         FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+        LEFT JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = hbd.`id_order`)
         LEFT JOIN `'._DB_PREFIX_.'customer` c ON (c.`id_customer` = hbd.`id_customer`)
         WHERE hbd.`is_refunded` = 0 AND hbd.`date_to` = "'.pSQL($date).' 00:00:00"
         AND hbd.`id_status` = '.(int) HotelBookingDetail::STATUS_CHECKED_IN.
@@ -1205,9 +1207,10 @@ class AdminStatsControllerCore extends AdminStatsTabController
 
     public static function getInHousesInfo($idHotel = null)
     {
-        $sql = 'SELECT hbd.*, CONCAT(c.`firstname`, " ", c.`lastname`) AS customer_name,
+        $sql = 'SELECT hbd.*, o.`with_occupancy`, CONCAT(c.`firstname`, " ", c.`lastname`) AS customer_name,
         DATEDIFF(hbd.`date_to`, hbd.`date_from`) AS los
         FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+        LEFT JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = hbd.`id_order`)
         LEFT JOIN `'._DB_PREFIX_.'customer` c ON (c.`id_customer` = hbd.`id_customer`)
         WHERE hbd.`is_refunded` = 0 AND hbd.`id_status` = '.(int) HotelBookingDetail::STATUS_CHECKED_IN.
         (!is_null($idHotel) ? HotelBranchInformation::addHotelRestriction($idHotel, 'hbd') : '');
@@ -1220,7 +1223,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
     {
         $sql = 'SELECT hbd.`id_customer`, CONCAT(c.`firstname`, " ", c.`lastname`) AS customer_name,
         COUNT(hbd.`id`) AS total_rooms, SUM(hbd.`adults` + hbd.`children`) AS total_guests,
-        hbd.`id_hotel`, hbd.`hotel_name`, hbd.`id_order`, o.`total_paid_tax_excl`, o.`id_currency`, osl.`name` AS `state_name`
+        hbd.`id_hotel`, hbd.`hotel_name`, hbd.`id_order`, o.`with_occupancy`, o.`total_paid_tax_excl`, o.`id_currency`, osl.`name` AS `state_name`
         FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
         LEFT JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = hbd.`id_order`)
         LEFT JOIN `'._DB_PREFIX_.'order_state_lang` osl
@@ -1237,8 +1240,8 @@ class AdminStatsControllerCore extends AdminStatsTabController
     public static function getCancellationsInfoByDate($date, $idHotel = null)
     {
         $sql = 'SELECT orr.`id_order_return`, orr.`id_customer`, hbd.`room_num`, hbd.`id_product`, hbd.`room_type_name`,
-        CONCAT(c.`firstname`, " ", c.`lastname`) AS customer_name,
-        hbd.`id_hotel`, hbd.`hotel_name`, SUM(hbd.`adults` + hbd.`children`) AS total_guests,
+        o.`with_occupancy`, CONCAT(c.`firstname`, " ", c.`lastname`) AS customer_name, hbd.`id_hotel`,
+        hbd.`hotel_name`, SUM(hbd.`adults` + hbd.`children`) AS total_guests,
         hbd.`date_from`, hbd.`date_to`, orr.`id_order`
         FROM `'._DB_PREFIX_.'order_return` orr
         LEFT JOIN `'._DB_PREFIX_.'order_return_detail` ord ON (ord.`id_order_return` = orr.`id_order_return`)
