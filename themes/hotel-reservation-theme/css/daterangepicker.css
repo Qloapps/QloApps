@@ -75,10 +75,10 @@
     background: #dadada;
 }
 .date-picker-wrapper .month-wrapper table .day.checked {
-    background-color: #f2f2f2;
+    background-color: #E6E6E6;
 }
 .date-picker-wrapper .month-wrapper table .day.toMonth.hovering {
-    background-color: #f2f2f2;
+    background-color: #E6E6E6;
 }
 .date-picker-wrapper .first-date-selected, .date-picker-wrapper .last-date-selected {
     background-color: #1292ff !important;
