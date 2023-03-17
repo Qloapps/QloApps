@@ -274,35 +274,33 @@
 										{displayPrice price=$total_discounts_negative}
 									</span>
 								</p>
-								{if $use_taxes && $show_taxes && $total_tax != 0 }
-									{* {if $priceDisplay != 0} *}
-										<p class="cart_total_price {if $total_discounts == 0}unvisible{/if}" >
-											<span>
-												{l s='Total'}
-												{if $display_tax_label}
-													{if $use_taxes && $priceDisplay == 0}
-														{l s='(tax incl)'}
-													{else}
-														{l s='(tax excl)'}
-													{/if}
-												{/if}
-											</span>
-											<span class="cart_total_values">
-											{if $use_taxes && $priceDisplay == 0}
-													{displayPrice price=$total_price - $convenience_fee_wt}
+								{* {if $priceDisplay != 0} *}
+									<p class="cart_total_price {if $total_discounts == 0}unvisible{/if}" >
+										<span>
+											{l s='Total'}
+											{if $display_tax_label}
+												{if $use_taxes && $priceDisplay == 0}
+													{l s='(tax incl)'}
 												{else}
-													{displayPrice price=$total_price_without_tax - $convenience_fee}
+													{l s='(tax excl)'}
 												{/if}
-											</span>
-										</p>
-									{* {/if} *}
-									{* {if $total_rooms_wt != 0}
-										<p class="cart_total_tax">
-											<span>{l s='Tax on rooms'}</span>
-											<span class="cart_total_values">{displayPrice price=($total_rooms_wt - $total_rooms)}</span>
-										</p>
-									{/if} *}
-								{/if}
+											{/if}
+										</span>
+										<span class="cart_total_values">
+										{if $use_taxes && $priceDisplay == 0}
+												{displayPrice price=$total_price - $convenience_fee_wt}
+											{else}
+												{displayPrice price=$total_price_without_tax - $convenience_fee}
+											{/if}
+										</span>
+									</p>
+								{* {/if} *}
+								{* {if $total_rooms_wt != 0}
+									<p class="cart_total_tax">
+										<span>{l s='Tax on rooms'}</span>
+										<span class="cart_total_values">{displayPrice price=($total_rooms_wt - $total_rooms)}</span>
+									</p>
+								{/if} *}
 								{if $convenience_fee_wt}
 									<p>
 										<span>{l s='Convenience Fees'}</span>
