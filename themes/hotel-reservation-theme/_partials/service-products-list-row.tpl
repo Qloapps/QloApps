@@ -20,9 +20,15 @@
 {if isset($product) && $product}
     <li class="row service-product-element">
         <div class="col-xs-4 col-sm-3 col-md-2">
-            <a href="{$link->getImageLink($product.link_rewrite, $product.id_image, 'large_default')|escape:'html':'UTF-8'}" data-fancybox-group="service-products-{$group}" class="fancybox" title="{if !empty($product.legend)}{$product.legend|escape:'html':'UTF-8'}{else}{$product.name|escape:'html':'UTF-8'}{/if}">
+            <a href="{$link->getImageLink($product.link_rewrite, $product.id_image, 'large_default')|escape:'html':'UTF-8'}" rel="htl-images{$product['id_product']}" class="fancybox" title="{if !empty($product.legend)}{$product.legend|escape:'html':'UTF-8'}{else}{$product.name|escape:'html':'UTF-8'}{/if}">
                 <img class="img-responsive service-product-img" src="{$link->getImageLink($product.link_rewrite, $product.id_image, 'home_default')|escape:'html':'UTF-8'}" alt="{if !empty($product.legend)}{$product.legend|escape:'html':'UTF-8'}{else}{$product.name|escape:'html':'UTF-8'}{/if}" title="{if !empty($product.legend)}{$product.legend|escape:'html':'UTF-8'}{else}{$product.name|escape:'html':'UTF-8'}{/if}">
             </a>
+            {foreach $product.images as $image}
+                {if $image['cover'] == 0}
+                    <a href="{$link->getImageLink($product.link_rewrite, $image.id_image, 'large_default')|escape:'html':'UTF-8'}" rel="htl-images{$product['id_product']}" class="fancybox hidden">
+                    </a>
+                {/if}
+            {/foreach}
         </div>
         <div class="col-xs-8 col-sm-9 col-md-10">
             <div class="row">
