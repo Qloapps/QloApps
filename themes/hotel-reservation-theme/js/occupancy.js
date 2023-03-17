@@ -123,8 +123,12 @@ $(document).ready(function(){
     });
 
 	$(document).on('click', '.booking_guest_occupancy', function(e) {
-        $('.booking_guest_occupancy_conatiner .dropdown').removeClass('open');
-		$(this).parent().toggleClass('open');
+        if ($(this).parent().hasClass('open')) {
+            $('.booking_guest_occupancy_conatiner .dropdown').removeClass('open');
+        } else {
+            $('.booking_guest_occupancy_conatiner .dropdown').removeClass('open');
+            $(this).parent().toggleClass('open');
+        }
     });
 
 	$(document).on('click', function(e) {
@@ -132,7 +136,10 @@ $(document).ready(function(){
 			var occupancy_wrapper = $('.booking_occupancy_wrapper:visible');
 			$(occupancy_wrapper).find(".occupancy_info_block").addClass('selected');
 			setRoomTypeGuestOccupancy(occupancy_wrapper);
-            if (!($(e.target).closest(".booking_occupancy_wrapper").length || $(e.target).closest(".booking_guest_occupancy").length || $(e.target).closest(".ajax_add_to_cart_button").length || $(e.target).closest(".exclusive.book_now_submit").length || $(e.target).closest(".remove-room-link").length)) {
+            if (!($(e.target).closest(".booking_occupancy_wrapper").length
+                || $(e.target).closest(".booking_guest_occupancy").length
+                || $(e.target).closest(".remove-room-link").length
+            )) {
 				let hasErrors = 0;
 
                 let adults = $(occupancy_wrapper).find(".num_adults").map(function(){return $(this).val();}).get();
@@ -169,9 +176,12 @@ $(document).ready(function(){
                     });
                 }
                 if (hasErrors == 0) {
-					$(occupancy_wrapper).parent().removeClass('open');
-					$(occupancy_wrapper).siblings(".booking_guest_occupancy").removeClass('error_border');
-
+                    if (!($(e.target).closest(".ajax_add_to_cart_button").length
+                        || $(e.target).closest(".exclusive.book_now_submit").length
+                    )) {
+                        $(occupancy_wrapper).parent().removeClass('open');
+                        $(occupancy_wrapper).siblings(".booking_guest_occupancy").removeClass('error_border');
+                    }
                     $(document).trigger( "QloApps:updateRoomOccupancy", [occupancy_wrapper]);
                 } else {
                     $(occupancy_wrapper).siblings(".booking_guest_occupancy").addClass('error_border');
