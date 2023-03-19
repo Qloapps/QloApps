@@ -537,7 +537,7 @@ class HotelBranchInformation extends ObjectModel
             FROM `'._DB_PREFIX_.'category_lang` AS cl
             INNER JOIN `'._DB_PREFIX_.'category` AS c ON (cl.`id_category` = c.`id_category`)
             WHERE cl.`name` LIKE \'%'.pSQL($searchData).'%\'
-            AND c.`level_depth` NOT IN (0, 1, 5) and cl.`id_lang`='.(int)$context->language->id.'
+            AND c.`level_depth` NOT IN (0, 1, 6) and cl.`id_lang`='.(int)$context->language->id.'
             AND c.`nleft` > '.(int)$locationCategory->nleft.' AND c.`nright` < '.(int)$locationCategory->nright.'
             GROUP BY cl.`name`'
         );
