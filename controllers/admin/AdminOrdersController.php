@@ -4213,6 +4213,8 @@ class AdminOrdersControllerCore extends AdminController
         }
 
         $product_informations = Tools::getValue('edit_product');
+        $old_date_from = date('Y-m-d', strtotime(trim(Tools::getValue('date_from'))));
+        $old_date_to = date('Y-m-d', strtotime(trim(Tools::getValue('date_to'))));
         $new_date_from = trim(date('Y-m-d', strtotime($product_informations['date_from'])));
         $new_date_to = trim(date('Y-m-d', strtotime($product_informations['date_to'])));
         $obj_booking_detail = new HotelBookingDetail();
