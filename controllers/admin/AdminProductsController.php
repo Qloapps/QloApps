@@ -3143,15 +3143,14 @@ class AdminProductsControllerCore extends AdminController
                                     $index
                                 );
                             }
-
-                            // check if room has booking for current date range
-                            if ($objHotelBookingDetail->chechRoomBooked($idRoom, $disDate['date_from'], $disDate['date_to'])) {
-                                $this->errors[] = sprintf(
-                                    Tools::displayError('The %s room already has bookings for selected disable dates. Please reselect disable dates.'),
-                                    $index
-                                );
-                            }
                         }
+						// check if room has booking for current date range
+						if ($objHotelBookingDetail->chechRoomBooked($idRoom, $disDate['date_from'], $disDate['date_to'])) {
+							$this->errors[] = sprintf(
+								Tools::displayError('The %s room already has bookings for selected disable dates. Please reselect disable dates.'),
+								$index
+							);
+						}
                     }
                 }
             }
