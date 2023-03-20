@@ -563,38 +563,7 @@ function initProductEvents()
 		addProductRefreshTotal();
 	});
 
-	function setRoomTypeGuestOccupancy(booking_occupancy_wrapper)
-	{
-		var adults = 0;
-		var children = 0;
-		var rooms = $(booking_occupancy_wrapper).find('.occupancy_info_block').length;
 
-		$(booking_occupancy_wrapper).find(".num_adults" ).each(function(key, val) {
-			adults += parseInt($(this).val());
-		});
-		$(booking_occupancy_wrapper).find(".num_children" ).each(function(key, val) {
-			children += parseInt($(this).val());
-		});
-
-		var guestButtonVal = parseInt(adults) + ' ';
-		if (parseInt(adults) > 1) {
-			guestButtonVal += adults_txt;
-		} else {
-			guestButtonVal += adult_txt;
-		}
-		if (parseInt(children) > 0) {
-			if (parseInt(children) > 1) {
-				guestButtonVal += ', ' + parseInt(children) + ' ' + children_txt;
-			} else {
-				guestButtonVal += ', ' + parseInt(children) + ' ' + child_txt;
-			}
-		}
-		if (parseInt(rooms) > 1) {
-			guestButtonVal += ', ' + parseInt(rooms) + ' ' + rooms_txt;
-		}
-
-		$(booking_occupancy_wrapper).siblings('.booking_guest_occupancy').find('span').text(guestButtonVal);
-	}
 
 	$(document).on('change', '.num_occupancy', function(e) {
 		let current_room_occupancy = 0;
@@ -1122,6 +1091,39 @@ function initRoomEvents()
 		}
 	});
 
+	function setRoomTypeGuestOccupancy(booking_occupancy_wrapper)
+	{
+		var adults = 0;
+		var children = 0;
+		var rooms = $(booking_occupancy_wrapper).find('.occupancy_info_block').length;
+
+		$(booking_occupancy_wrapper).find(".num_adults" ).each(function(key, val) {
+			adults += parseInt($(this).val());
+		});
+		$(booking_occupancy_wrapper).find(".num_children" ).each(function(key, val) {
+			children += parseInt($(this).val());
+		});
+
+		var guestButtonVal = parseInt(adults) + ' ';
+		if (parseInt(adults) > 1) {
+			guestButtonVal += adults_txt;
+		} else {
+			guestButtonVal += adult_txt;
+		}
+		if (parseInt(children) > 0) {
+			if (parseInt(children) > 1) {
+				guestButtonVal += ', ' + parseInt(children) + ' ' + children_txt;
+			} else {
+				guestButtonVal += ', ' + parseInt(children) + ' ' + child_txt;
+			}
+		}
+		if (parseInt(rooms) > 1) {
+			guestButtonVal += ', ' + parseInt(rooms) + ' ' + rooms_txt;
+		}
+
+		$(booking_occupancy_wrapper).siblings('.booking_guest_occupancy').find('span').text(guestButtonVal);
+	}
+
     $("#add_product_product_name").autocomplete(admin_order_tab_link,
 		{
 			minChars: 3,
@@ -1166,7 +1168,10 @@ function initRoomEvents()
 		else
 		{
 			$('tr#new_product input, tr#new_product select, tr#new_product button').removeAttr('disabled');
-			$('tr#new_product .booking_guest_occupancy').removeClass('disabled');
+			if ($('tr#new_product .booking_occupancy').length) {
+				$('tr#new_product .booking_guest_occupancy').removeClass('disabled');
+				setRoomTypeGuestOccupancy($('tr#new_product .booking_occupancy_wrapper'));
+			}
 			if (data.room_type_info) {
 				$('tr#new_product .max_adults').val(data.room_type_info.max_adults);
 				$('tr#new_product .max_children').val(data.room_type_info.max_children);
