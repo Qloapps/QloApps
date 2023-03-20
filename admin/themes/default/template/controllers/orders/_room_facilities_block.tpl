@@ -28,6 +28,13 @@
 		{* Already selected room demands *}
 		<div class="col-sm-12 room_ordered_demands table-responsive">
 			<table class="table">
+					<thead>
+						<tr>
+							<th>{l s='Name'}</th>
+							<th>{l s='Price'}</th>
+							<th class="text-right">{l s='Action'}</th>
+						</tr>
+					</thead>
 				<tbody>
 					{if isset($extraDemands) && $extraDemands}
 						{foreach $extraDemands as $roomDemand}
@@ -54,15 +61,25 @@
 		<div class="col-sm-12 room_demands_container">
 			<div class="room_demand_detail">
 				{if isset($roomTypeDemands) && $roomTypeDemands}
-					{foreach $roomTypeDemands as $idGlobalDemand => $demand}
-						<div class="row room_demand_block">
-							<div class="col-xs-6">
-								<div class="row">
-									<div class="col-xs-2">
+					<table class="table">
+						<thead>
+							<tr>
+								<th></th>
+								<th>{l s='Name'}</th>
+								<th>{l s='Option'}</th>
+								<th class="text-right">{l s='Price'}</th>
+							</tr>
+						</thead>
+						<tbody>
+							{foreach $roomTypeDemands as $idGlobalDemand => $demand}
+								<tr class="room_demand_block">
+									<td>
 										<input id_cart_booking="{$roomDemand['id']}" value="{$idGlobalDemand|escape:'html':'UTF-8'}" type="checkbox" class="id_room_type_demand" {if  isset($roomDemand['selected_global_demands']) && $roomDemand['selected_global_demands'] && ($idGlobalDemand|in_array:$roomDemand['selected_global_demands'])}checked{/if} />
-									</div>
-									<div class="col-xs-10 demand_adv_option_block">
-										<p>{$demand['name']|escape:'html':'UTF-8'}</p>
+									</td>
+									<td>
+										{$demand['name']|escape:'html':'UTF-8'}
+									</td>
+									<td class="demand_adv_option_block">
 										{if isset($demand['adv_option']) && $demand['adv_option']}
 											<select class="id_option">
 												{foreach $demand['adv_option'] as $idOption => $option}
@@ -74,16 +91,19 @@
 												{/foreach}
 											</select>
 										{else}
+											{l s='--'}
 											<input type="hidden" class="id_option" value="0" />
 										{/if}
-									</div>
-								</div>
-							</div>
-							<div class="col-xs-6">
-								<p><span class="pull-right extra_demand_option_price">{if isset($selected_adv_option) && isset($demand['adv_option'][$selected_adv_option]['price'])}{convertPrice price = $demand['adv_option'][$selected_adv_option]['price']|escape:'html':'UTF-8'}{else}{convertPrice price = $demand['price']|escape:'html':'UTF-8'}{/if}</span></p>
-							</div>
-						</div>
-					{/foreach}
+									</td>
+									<td class="text-right">
+										<span class="extra_demand_option_price">{if isset($selected_adv_option) && isset($demand['adv_option'][$selected_adv_option]['price'])}{convertPrice price = $demand['adv_option'][$selected_adv_option]['price']|escape:'html':'UTF-8'}{else}{convertPrice price = $demand['price']|escape:'html':'UTF-8'}{/if}</span>
+									</td>
+								</tr>
+							{/foreach}
+						</tbody>
+					</table>
+				{else}
+					<i class="icon-warning"></i> {l s='No facilities available for this room.'}
 				{/if}
 			</div>
 			<button type="button" id="save_room_demands" class="btn btn-success pull-right"><i class="icon-save"></i> {l s='Save'}</button>
@@ -91,17 +111,25 @@
 	{elseif isset($extraDemands) && $extraDemands}
 		{foreach $extraDemands as $roomDemand}
 			<div class="row room_demand_detail">
-				{foreach $roomDemand['extra_demands'] as $demand}
-					<div class="col-sm-12 room_demand_block">
-						<p>
-							<span>{$demand['name']}</span>
-							<span class="pull-right">{displayPrice price=$demand['total_price_tax_excl'] currency=$orderCurrency}</span>
-						</p>
-					</div>
-				{/foreach}
+				<table class="table">
+					<thead>
+						<tr>
+							<th>{l s='Name'}</th>
+							<th>{l s='Price'}</th>
+						</tr>
+					</thead>
+					<tbody>
+						{foreach $roomDemand['extra_demands'] as $demand}
+							<tr class="room_demand_block">
+								<td>{$demand['name']}</td>
+								<td>{displayPrice price=$demand['total_price_tax_excl'] currency=$orderCurrency}</td>
+							</tr>
+						{/foreach}
+					</tbody>
+				</table>
 			</div>
 		{/foreach}
 	{else}
-		{l s='No facilities available!'}
+		{l s='No facilities selected!'}
 	{/if}
 </div>
