@@ -247,30 +247,33 @@ class HotelOrderRefundRules extends ObjectModel
             WHERE hbd.`id_order` = '.(int) $idOrder
         );
 
-        if (!$maxDate) {
-            return array();
+        if ($maxDate) {
+            $dateToday = date('Y-m-d');
+
+            if (strtotime($maxDate) >= strtotime($dateToday)) {
+                $days = HotelBookingDetail::getDays($dateToday, $maxDate); // always returns positive
+
+                $sql = 'SELECT hbrr.`id_hotel_refund_rule`, hbrr.`id_refund_rule`, hbrr.`id_hotel`, hbrr.`position`,
+                horrl.`name`, horrl.`description`, horr.`payment_type`, horr.`deduction_value_full_pay`,
+                horr.`deduction_value_adv_pay`, horr.`days`
+                FROM `'._DB_PREFIX_.'htl_branch_refund_rules` hbrr
+                LEFT JOIN `'._DB_PREFIX_.'htl_order_refund_rules` horr
+                ON (horr.`id_refund_rule` = hbrr.`id_refund_rule`)
+                LEFT JOIN `'._DB_PREFIX_.'htl_order_refund_rules_lang` horrl
+                ON (horrl.`id_refund_rule` = horr.`id_refund_rule` AND horrl.`id_lang` = '.(int) $idLang.')
+                LEFT JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd
+                ON (hbd.`id_hotel` = hbrr.`id_hotel` AND hbd.`id_order` = '.(int) $idOrder.')
+                WHERE horr.`days` <= '.(int) $days.'
+                GROUP BY hbrr.`id_refund_rule`
+                ORDER BY hbrr.`position`';
+
+                if ($result = Db::getInstance()->executeS($sql)) {
+                    return $result;
+                }
+            }
         }
 
-        $dateToday = date('Y-m-d');
+        return array();
 
-        if (strtotime($maxDate) < strtotime($dateToday)) { // same day cancellation rules are allowed
-            $maxDate = $dateToday;
-        }
-
-        $days = HotelBookingDetail::getDays($dateToday, $maxDate);
-        $idHotel = HotelBookingDetail::getIdHotelByIdOrder($idOrder);
-
-        $sql = 'SELECT hrr.`id_hotel_refund_rule`, hrr.`id_refund_rule`, hrr.`id_hotel`, hrr.`position`,
-        orrl.`name`, orrl.`description`, orr.`payment_type`, orr.`deduction_value_full_pay`, orr.`deduction_value_adv_pay`,
-        orr.`days`
-        FROM `'._DB_PREFIX_.'htl_branch_refund_rules` hrr
-        LEFT JOIN `'._DB_PREFIX_.'htl_order_refund_rules` orr
-        ON (orr.`id_refund_rule` = hrr.`id_refund_rule`)
-        LEFT JOIN `'._DB_PREFIX_.'htl_order_refund_rules_lang` orrl
-        ON (orrl.`id_refund_rule` = orr.`id_refund_rule` AND orrl.`id_lang` = '.(int) $idLang.')
-        WHERE orr.`days` <= '.(int) $days.' AND hrr.`id_hotel` = '.(int) $idHotel.'
-        ORDER BY hrr.`position`';
-
-        return Db::getInstance()->executeS($sql);
     }
 }
