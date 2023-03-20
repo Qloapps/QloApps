@@ -1254,7 +1254,7 @@ class HotelBookingDetail extends ObjectModel
     // This function algo is same as available rooms algo and it not similar to booked rooms algo.
     public function chechRoomBooked($id_room, $date_from, $date_to)
     {
-        $sql = 'SELECT `id_product`, `id_order`, `id_cart`, `id_room`, `id_hotel`, `id_customer`
+        $sql = 'SELECT `id`, `id_product`, `id_order`, `id_cart`, `id_room`, `id_hotel`, `id_customer`
         FROM `'._DB_PREFIX_.'htl_booking_detail` WHERE `id_room` = '.(int)$id_room.
         ' AND `is_back_order` = 0 AND `is_refunded` = 0 AND ((date_from <= \''.pSQL($date_from).'\' AND date_to > \''.
         pSQL($date_from).'\' AND date_to <= \''.pSQL($date_to).'\') OR (date_from > \''.pSQL($date_from).
