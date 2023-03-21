@@ -8,21 +8,21 @@
 				<thead>
                     <tr class="nodrag nodrop">
                         <th class="col-sm-1">
-                            <span>{l s='Id Product'}</span>
+                            <span>{l s='Id Service'}</span>
                         </th>
                         <th class="col-sm-3">
-							<span>{l s='name'}</span>
+							<span>{l s='Name'}</span>
 						</th>
-                        <th class="">
-                            <span>{l s='Category'}</span>
+                        <th>
+                            <span>{l s='Auto add to cart'}</span>
                         </th>
                         <th>
                             <span>{l s='Position'}</span>
                         </th>
-						<th class="">
+						<th>
 							<span>{l s='Price'}</span>
                         </th>
-                        <th class="">
+                        <th>
                             <span>{l s='Tax'}</span>
                         </th>
                         <th class="text-right">
@@ -35,8 +35,8 @@
 						{foreach from=$service_products key=key item=service_product}
                             <tr id='room_type_service_product_{$service_product.id_room_type_service_product|escape:'html':'UTF-8'}' position='{$service_product.position|escape:'html':'UTF-8'}' id_product='{$service_product.id_product|escape:'html':'UTF-8'}' id_element="{$product->id}" data-roomtype_url="{$link->getAdminLink('AdminProducts', true)|addslashes}">
                                 <td class="col-sm-1">{$service_product.id_product|escape:'html':'UTF-8'} <a target="blank" href="{$link->getAdminLink('AdminNormalProducts')|escape:'html':'UTF-8'}&amp;id_product={$service_product.id_product|escape:'html':'UTF-8'}&amp;updateproduct"><i class="icon-external-link-sign"></i></a></td>
-                                <td class="">{$service_product.name}</td>
-                                <td class="">{$service_product.category}</td>
+                                <td>{$service_product.name}</td>
+                                <td><span {if $service_product.auto_add_to_cart}class="badge badge-success"{/if}>{if $service_product.auto_add_to_cart}{l s='Yes'}{else}{l s='No'}{/if}</span></td>
                                 <td class="pointer dragHandle center positionImage">
                                     <div class="dragGroup">
                                         <div class="positions">
@@ -44,7 +44,7 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td class="">
+                                <td>
                                     <span class="field-view service-product-price-text">{if isset($service_product.custom_price) && $service_product.custom_price}{displayPrice price=$service_product.custom_price currency=$id_currency}{else}{displayPrice price=$service_product.default_price currency=$id_currency}{/if}</span>
                                     <div class="field-edit" style="display:none">
                                         <div class="input-group">
