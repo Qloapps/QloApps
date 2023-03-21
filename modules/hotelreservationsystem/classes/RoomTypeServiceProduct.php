@@ -120,7 +120,7 @@ class RoomTypeServiceProduct extends ObjectModel
         if (Product::isBookingProduct($idProduct)) {
             $sql = 'SELECT p.`id_product` FROM  `'._DB_PREFIX_.'htl_room_type_service_product` rsp
             INNER JOIN `'._DB_PREFIX_.'product` p ON (rsp.`id_product` = p.`id_product` AND p.`auto_add_to_cart` = 1)
-            WHERE `id_element` = '.(int)$idProduct.' AND `element_type` = '.self::WK_ELEMENT_TYPE_ROOM_TYPE;
+            WHERE p.`active` = 1 AND `id_element` = '.(int)$idProduct.' AND `element_type` = '.self::WK_ELEMENT_TYPE_ROOM_TYPE;
             if (!is_null($priceAdditionType)) {
                 $sql .= ' AND p.`price_addition_type` = '.$priceAdditionType;
             }
@@ -183,6 +183,7 @@ class RoomTypeServiceProduct extends ObjectModel
                     $useTax
                 );
             }
+            $serviceProduct['images'] = Image::getImages((int)Context::getContext()->language->id, $serviceProduct['id_product']);
         }
 
         return $serviceProducts;

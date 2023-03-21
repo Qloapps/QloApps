@@ -21,9 +21,13 @@
     <label class="control-label col-lg-3">{l s='Customer' mod='qlohotelreview'}</label>
     <div class="col-lg-9">
         <p class="form-control-static">
-            <a href="{$link->getAdminLink('AdminCustomers')}&viewcustomer&id_customer={$obj_customer->id}" target="_blank">
-                {$obj_customer->firstname} {$obj_customer->lastname} (#{$obj_customer->id})
-            </a>
+            {if isset($obj_customer) && $obj_customer}
+                <a href="{$link->getAdminLink('AdminCustomers')}&viewcustomer&id_customer={$obj_customer->id}" target="_blank">
+                    {$obj_customer->firstname} {$obj_customer->lastname} (#{$obj_customer->id})
+                </a>
+            {else}
+                --
+            {/if}
         </p>
     </div>
 </div>

@@ -227,7 +227,20 @@ class OrderReturnCore extends ObjectModel
                     $bookingRow['date_to'],
                     $bookingRow['id_room'],
                     1,
-                    0
+                    0,
+                    null
+                );
+                $bookingRow['additional_services_tax_incl'] = $objRoomTypeServiceProductOrderDetail->getroomTypeServiceProducts(
+                    $bookingRow['id_order'],
+                    0,
+                    0,
+                    $bookingRow['id_product'],
+                    $bookingRow['date_from'],
+                    $bookingRow['date_to'],
+                    $bookingRow['id_room'],
+                    1,
+                    1,
+                    null
                 );
 
                 if ($customerView) {
@@ -238,7 +251,9 @@ class OrderReturnCore extends ObjectModel
                         $returnsCustView[$dateJoin]['total_price_tax_incl'] += $bookingRow['total_price_tax_incl'];
                         $returnsCustView[$dateJoin]['total_paid_amount'] += $bookingRow['total_paid_amount'];
                         $returnsCustView[$dateJoin]['extra_demands_price_tax_incl'] += $bookingRow['extra_demands_price_tax_incl'];
+                        $returnsCustView[$dateJoin]['extra_demands_price_tax_incl'] += $bookingRow['additional_services_tax_incl'];
                         $returnsCustView[$dateJoin]['extra_demands_price_tax_excl'] += $bookingRow['extra_demands_price_tax_excl'];
+                        $returnsCustView[$dateJoin]['extra_demands_price_tax_excl'] += $bookingRow['additional_services_tax_excl'];
                     } else {
                         unset($bookingRow['id_room']);
                         unset($bookingRow['room_num']);
@@ -260,15 +275,20 @@ class OrderReturnCore extends ObjectModel
         if (!$context) {
             $context = Context::getContext();
         }
-        $sql = 'SELECT *
-        FROM `'._DB_PREFIX_.'order_return` orr
-        LEFT JOIN `'._DB_PREFIX_.'order_slip` ors
-        ON (ors.`id_order_slip` = orr.`id_return_type` AND orr.`return_type` = '.(int) self::RETURN_TYPE_ORDER_SLIP.')
-        WHERE orr.`id_customer` = '.(int)$customer_id.
-        ($only_customer ? ' AND orr.`by_admin` = 0' : '').
-        ($order_id ? ' AND orr.`id_order` = '.(int)$order_id : '').
-        ($no_denied ? ' AND orr.`state` != 4' : '').'
-        ORDER BY orr.`date_add` DESC';
+        $sql = 'SELECT orr.`id_order`, orr.`state`, orr.`id_order_return`, orr.`payment_mode`, orr.`id_transaction`,
+            orr.`id_return_type`, orr.`return_type`, ors.`id_cart_rule`, orr.`date_add`, orr.`date_upd`,
+            COUNT(ord.`id_order_return_detail`) AS total_rooms
+            FROM `'._DB_PREFIX_.'order_return` orr
+            LEFT JOIN `'._DB_PREFIX_.'order_return_detail` ord
+            ON (ord.`id_order_return` = orr.`id_order_return`)
+            LEFT JOIN `'._DB_PREFIX_.'order_slip` ors
+            ON (ors.`id_order_slip` = orr.`id_return_type` AND orr.`return_type` = '.(int) self::RETURN_TYPE_ORDER_SLIP.')
+            WHERE orr.`id_customer` = '.(int)$customer_id.
+            ($only_customer ? ' AND orr.`by_admin` = 0' : '').
+            ($order_id ? ' AND orr.`id_order` = '.(int)$order_id : '').
+            ($no_denied ? ' AND orr.`state` != 4' : '').'
+            GROUP BY orr.`id_order_return`
+            ORDER BY orr.`date_add` DESC';
         $data = Db::getInstance()->executeS($sql);
         foreach ($data as $k => $or) {
             $state = new OrderReturnState($or['state']);

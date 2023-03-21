@@ -568,10 +568,6 @@ class CartCore extends ObjectModel
             $sql->where('cp.`id_product` = '.(int)$id_product);
         }
         $sql->where('p.`id_product` IS NOT NULL');
-        // hide invisible products
-        // if ($front) {
-        //     $sql->where('p.`is_invisible` = 0');
-        // }
 
         // Build ORDER BY
         $sql->orderBy('cp.`date_add`, cp.`id_product`, cp.`id_product_attribute` ASC');
@@ -1991,7 +1987,9 @@ class CartCore extends ObjectModel
                     }
                 }
             }
-            $order_total_discount = min(Tools::ps_round($order_total_discount, 2), (float)$order_total_products) + (float)$order_shipping_discount;
+            if ($type != Cart::ADVANCE_PAYMENT) {
+                $order_total_discount = min(Tools::ps_round($order_total_discount, 2), (float)$order_total_products) + (float)$order_shipping_discount;
+            }
             if ($type == Cart::ADVANCE_PAYMENT) {
                 // get order total without discount
                 $total_without_discount = $this->getOrderTotal() + $order_total_discount;
@@ -3523,7 +3521,7 @@ class CartCore extends ObjectModel
             $module = Module::getInstanceByName($module_name);
 
             if (Validate::isLoadedObject($module)) {
-                if (array_key_exists('id_carrier', $module)) {
+                if (property_exists($module, 'id_carrier')) {
                     $module->id_carrier = $carrier->id;
                 }
                 if ($carrier->need_range) {

@@ -252,7 +252,7 @@ class AdminOrdersControllerCore extends AdminController
         }
 
         $occupancyRequiredForBooking = false;
-        if (Configuration::get('PS_BACKOFFICE_ROOM_BOOKING_TYPE') == HotelBookingDetail::PS_FRONT_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY) {
+        if (Configuration::get('PS_BACKOFFICE_ROOM_BOOKING_TYPE') == HotelBookingDetail::PS_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY) {
             $occupancyRequiredForBooking = true;
         }
 
@@ -1661,9 +1661,13 @@ class AdminOrdersControllerCore extends AdminController
 
         // hotel booking statuses
         $htlOrderStatus = HotelBookingDetail::getAllHotelOrderStatus();
+
+        // applicable refund policies
+        $applicableRefundPolicies = HotelOrderRefundRules::getApplicableRefundRules($order->id);
         $this->tpl_view_vars = array(
             // refund info
             'refund_allowed' => (int) $order->isReturnable(),
+            'applicable_refund_policies' => $applicableRefundPolicies,
             'returns' => OrderReturn::getOrdersReturn($order->id_customer, $order->id),
             'refundReqBookings' => $refundReqBookings,
             'hasCompletelyRefunded' => $order->hasCompletelyRefunded(),
@@ -2704,7 +2708,7 @@ class AdminOrdersControllerCore extends AdminController
                     $objCartBookingData = new HotelCartBookingData();
                     $objCartBookingData->id_cart = $this->context->cart->id;
                     $objCartBookingData->id_guest = $this->context->cookie->id_guest;
-                    $objCartBookingData->id_customer = $this->context->customer->id;
+                    $objCartBookingData->id_customer = $order->id_customer;
                     $objCartBookingData->id_currency = $order->id_currency;
                     $objCartBookingData->id_product = $room_info['id_product'];
                     $objCartBookingData->id_room = $room_info['id_room'];
@@ -3032,7 +3036,7 @@ class AdminOrdersControllerCore extends AdminController
                 $objBookingDetail->id_cart = $this->context->cart->id;
                 $objBookingDetail->id_room = $objCartBookingData->id_room;
                 $objBookingDetail->id_hotel = $objCartBookingData->id_hotel;
-                $objBookingDetail->id_customer = $this->context->customer->id;
+                $objBookingDetail->id_customer = $order->id_customer;
                 $objBookingDetail->booking_type = $objCartBookingData->booking_type;
                 $objBookingDetail->id_status = 1;
                 $objBookingDetail->comment = $objCartBookingData->comment;
@@ -4213,6 +4217,8 @@ class AdminOrdersControllerCore extends AdminController
         }
 
         $product_informations = Tools::getValue('edit_product');
+        $old_date_from = date('Y-m-d', strtotime(trim(Tools::getValue('date_from'))));
+        $old_date_to = date('Y-m-d', strtotime(trim(Tools::getValue('date_to'))));
         $new_date_from = trim(date('Y-m-d', strtotime($product_informations['date_from'])));
         $new_date_to = trim(date('Y-m-d', strtotime($product_informations['date_to'])));
         $obj_booking_detail = new HotelBookingDetail();
@@ -5268,6 +5274,8 @@ class AdminOrdersControllerCore extends AdminController
                         if ($objProduct->allow_multiple_quantity) {
                             if (!Validate::isUnsignedInt($qty)) {
                                 $this->errors[] = Tools::displayError('The quantity code you\'ve entered is invalid.');
+                            // } elseif ($objProduct->max_quantity && $qty > $objProduct->max_quantity) {
+                            //     $this->errors[] = Tools::displayError(sprintf('cannot add more than %d quantity.', $objProduct->max_quantity));
                             }
                         } else {
                             $qty = 1;
