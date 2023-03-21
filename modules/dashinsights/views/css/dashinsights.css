@@ -21,6 +21,10 @@
     height: 350px;
 }
 
+#dashinsights .row .col-md-12.col-lg-6:not(:first-of-type) {
+    border-left: 1px solid #ccc;
+}
+
 #content #dashinsights .insight-chart-wrap .nvtooltip h3 {
     margin: 0;
     padding: 4px 14px;
@@ -41,4 +45,10 @@
     font-weight: bold;
     font-size: 14px;
     color: #555;
+}
+
+@media (max-width: 992px) {
+    #dashinsights .row .col-md-12.col-lg-6:not(:first-of-type) {
+        border-left: none;
+    }
 }

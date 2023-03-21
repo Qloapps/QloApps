@@ -1798,29 +1798,48 @@ class AdminStatsControllerCore extends AdminStatsTabController
         return $countGrossOpProfitPars ? $sumGrossOpProfitPars / $countGrossOpProfitPars : 0;
     }
 
-    public static function getRoomNightsData($dateFrom, $dateTo = null, $idHotel = null, $useCache = true)
+    public static function getRoomNightsData($dateFrom, $dateTo = null, $idHotel = null, $useCache = true, $average = false)
     {
         $dateTo = !$dateTo ? date('Y-m-d', strtotime('+1 day', strtotime($dateFrom))) : $dateTo;
 
         $idsHotel = array();
-        if (!$idHotel) {
-            $idsHotel = HotelBranchInformation::getProfileAccessedHotels(
-                Context::getContext()->employee->id_profile,
-                1,
-                1
-            );
-        } else {
+        if (is_int($idHotel)) {
             $idsHotel[] = $idHotel;
+        } else {
+            $idsHotel = $idHotel;
         }
 
-        $result = array();
+        // collect data
+        $hotelsData = array();
         foreach ($idsHotel as $idHotel) {
-            $result[$idHotel] = self::getOccupiedRoomsForDiscreteDates(
+            $hotelsData[$idHotel] = self::getOccupiedRoomsForDiscreteDates(
                 $dateFrom,
                 $dateTo,
                 $idHotel,
                 $useCache
             );
+        }
+
+        // calculate sums
+        $result = array();
+        foreach ($hotelsData as $hotelData) {
+            foreach ($hotelData as $timestamp => $value) {
+                if (!array_key_exists($timestamp, $result)) {
+                    $result[$timestamp] = $value;
+                } else {
+                    $result[$timestamp] += $value;
+                }
+            }
+        }
+
+        // calculate averages
+        if ($average) {
+            $totalHotels = count($idsHotel);
+            if ($totalHotels > 1) {
+                foreach ($result as $timestamp => &$value) {
+                    $value = $value / $totalHotels;
+                }
+            }
         }
 
         return $result;
@@ -1862,27 +1881,24 @@ class AdminStatsControllerCore extends AdminStatsTabController
         return $result;
     }
 
-    public static function getOccupiedRoomsForDaysOfTheWeek($dateFrom, $dateTo = null, $idHotel = null, $useCache = true)
+    public static function getOccupiedRoomsForDaysOfTheWeek($dateFrom, $dateTo = null, $idHotel = null, $useCache = true, $average = false)
     {
         $dateTo = !$dateTo ? date('Y-m-d', strtotime('+1 day', strtotime($dateFrom))) : $dateTo;
 
         $idsHotel = array();
-        if (!$idHotel) {
-            $idsHotel = HotelBranchInformation::getProfileAccessedHotels(
-                Context::getContext()->employee->id_profile,
-                1,
-                1
-            );
-        } else {
+        if (is_int($idHotel)) {
             $idsHotel[] = $idHotel;
+        } else {
+            $idsHotel = $idHotel;
         }
 
-        $result = array();
+        // collect data
+        $hotelsData = array();
         foreach ($idsHotel as $idHotel) {
-            $result[$idHotel] = array();
+            $hotelsData[$idHotel] = array();
             // 1 = SUN
             for ($i = 1; $i <= 7; $i++) {
-                $result[$idHotel][$i] = self::getOccupiedRoomsForDayOfTheWeek(
+                $hotelsData[$idHotel][$i] = self::getOccupiedRoomsForDayOfTheWeek(
                     $i,
                     $dateFrom,
                     $dateTo,
@@ -1892,41 +1908,35 @@ class AdminStatsControllerCore extends AdminStatsTabController
             }
         }
 
-        return $result;
-    }
-
-    public static function getDaysOfTheWeekData($dateFrom, $dateTo = null, $idHotel = null, $useCache = true)
-    {
-        $dateTo = !$dateTo ? date('Y-m-d', strtotime('+1 day', strtotime($dateFrom))) : $dateTo;
-
-        $idsHotel = array();
-        if (!$idHotel) {
-            $idsHotel = HotelBranchInformation::getProfileAccessedHotels(
-                Context::getContext()->employee->id_profile,
-                1,
-                1
-            );
-        } else {
-            $idsHotel[] = $idHotel;
-        }
-
+        // calculate sums
         $result = array();
-        foreach ($idsHotel as $idHotel) {
-            $result[$idHotel] = self::getOccupiedRoomsForDiscreteDates(
-                $dateFrom,
-                $dateTo,
-                $idHotel,
-                $useCache
-            );
+        foreach ($hotelsData as $hotelData) {
+            foreach ($hotelData as $dayOfWeek => $value) {
+                if (!array_key_exists($dayOfWeek, $result)) {
+                    $result[$dayOfWeek] = $value;
+                } else {
+                    $result[$dayOfWeek] += $value;
+                }
+            }
+        }
+
+        // calculate averages
+        if ($average) {
+            $totalHotels = count($idsHotel);
+            if ($totalHotels > 1) {
+                foreach ($result as $timestamp => &$value) {
+                    $value = $value / $totalHotels;
+                }
+            }
         }
 
         return $result;
     }
 
-    public static function getLengthOfStayPercentage($losMinimum, $dateFrom, $dateTo, $idHotel = null, $useCache = true, $losMaximum = 0)
+    public static function getLengthOfStayRatio($losMinimum, $dateFrom, $dateTo, $idHotel = null, $useCache = true, $losMaximum = false)
     {
         $result = 0;
-        $cacheKey = 'AdminStats::getLengthOfStayPercentage'.'_'.(int) $losMinimum.(int) $losMaximum.
+        $cacheKey = 'AdminStats::getLengthOfStayRatio'.'_'.(int) $losMinimum.(int) $losMaximum.
         (int) strtotime($dateFrom).(int) strtotime($dateTo).(!is_array($idHotel) ? (int) $idHotel : implode('_', $idHotel));
         if (!Cache::isStored($cacheKey) || !$useCache) {
             if ($dateFrom == $dateTo) {
@@ -1944,7 +1954,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
 
             $total = Db::getInstance()->getValue($sql);
 
-            $sql = 'SELECT COUNT(*)
+            $sql = 'SELECT COUNT(los)
             FROM (
                 SELECT DATEDIFF(hbd.`date_to`, hbd.`date_from`) AS los
                 FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
@@ -1959,8 +1969,8 @@ class AdminStatsControllerCore extends AdminStatsTabController
 
             $fraction = Db::getInstance()->getValue($sql);
 
-            $value = (float) $total ? ($fraction / $total) : 0;
-            Cache::store($cacheKey, $value);
+            $ratio = array('fraction' => $fraction, 'total' => $total);
+            Cache::store($cacheKey, $ratio);
 
             $result = Cache::retrieve($cacheKey);
         }
@@ -1968,24 +1978,21 @@ class AdminStatsControllerCore extends AdminStatsTabController
         return $result;
     }
 
-    public static function getLengthOfStayPercentages($days, $dateFrom, $dateTo, $idHotel = null, $useCache = true)
+    public static function getLengthOfStayPercentages($days, $dateFrom, $dateTo, $idHotel = null, $useCache = true, $average = false)
     {
         $idsHotel = array();
-        if (!$idHotel) {
-            $idsHotel = HotelBranchInformation::getProfileAccessedHotels(
-                Context::getContext()->employee->id_profile,
-                1,
-                1
-            );
-        } else {
+        if (is_int($idHotel)) {
             $idsHotel[] = $idHotel;
+        } else {
+            $idsHotel = $idHotel;
         }
 
-        $result = array();
+        // collect data
+        $hotelsData = array();
         foreach ($idsHotel as $idHotel) {
-            $result[$idHotel] = array();
+            $hotelsData[$idHotel] = array();
             foreach ($days as $key => $day) {
-                $result[$idHotel][$key] = self::getLengthOfStayPercentage(
+                $hotelsData[$idHotel][$key] = self::getLengthOfStayRatio(
                     $day[0],
                     $dateFrom,
                     $dateTo,
@@ -1994,7 +2001,34 @@ class AdminStatsControllerCore extends AdminStatsTabController
                     $day[1]
                 );
             }
+        }
 
+        // calculate sums
+        $result = array();
+        foreach ($hotelsData as $hotelData) {
+            foreach ($days as $key => $day) {
+                if (!array_key_exists($key, $result)) {
+                    $result[$key]['fraction'] = $hotelData[$key]['fraction'];
+                    $result[$key]['total'] = $hotelData[$key]['total'];
+                } else {
+                    $result[$key]['fraction'] += $hotelData[$key]['fraction'];
+                    $result[$key]['total'] += $hotelData[$key]['total'];
+                }
+            }
+        }
+
+        // calculate averages
+        if ($average) {
+            $totalHotels = count($idsHotel);
+            if ($totalHotels > 1) {
+                foreach ($result as $key => $ratio) {
+                    $result[$key] = $ratio['total'] ? ($ratio['fraction'] / $ratio['total']) : 0;
+                }
+            }
+        } else {
+            foreach ($result as $key => $ratio) {
+                $result[$key] = $ratio['total'] ? ($ratio['fraction'] / $ratio['total']) : 0;
+            }
         }
 
         return $result;

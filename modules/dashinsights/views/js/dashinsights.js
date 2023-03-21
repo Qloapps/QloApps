@@ -17,19 +17,16 @@
  * @license LICENSE.txt
  */
 
-var dashinsights_data;
-var dashinsights_chart;
-
 function line_chart_dashinsights(widget_name, chart_details) {
     nv.addGraph(function () {
         var chart = nv.models.lineChart()
             .interpolate('basis')
             .useInteractiveGuideline(true)
             .x(function (d) { return (d !== undefined ? d[0] : 0); })
-            .y(function (d) { return (d !== undefined ? parseInt(d[1]) : 0); })
+            .y(function (d) { return (d !== undefined ? d[1] : 0); })
             .forceY(0)
             .margin({
-                left: 30,
+                left: 40,
                 right: 30,
             });
 
@@ -38,46 +35,10 @@ function line_chart_dashinsights(widget_name, chart_details) {
             return date.format(chart_details['date_format']);
         });
 
-        chart.yAxis.tickFormat(function (d) {
-            return parseInt(d);
-        });
+        chart.yAxis.tickFormat(d3.format('.f'));
 
-        dashinsights_data = chart_details.data;
-        dashinsights_chart = chart;
         d3.select('#dashinsights_room_nights svg')
-            .datum(dashinsights_data)
-            .call(chart);
-        nv.utils.windowResize(chart.update);
-
-        return chart;
-    });
-}
-function line_chart_dashinsights(widget_name, chart_details) {
-    nv.addGraph(function () {
-        var chart = nv.models.lineChart()
-            .interpolate('basis')
-            .useInteractiveGuideline(true)
-            .x(function (d) { return (d !== undefined ? d[0] : 0); })
-            .y(function (d) { return (d !== undefined ? parseInt(d[1]) : 0); })
-            .forceY(0)
-            .margin({
-                left: 30,
-                right: 30,
-            });
-
-        chart.xAxis.tickFormat(function (d) {
-            date = new Date(d * 1000);
-            return date.format(chart_details['date_format']);
-        });
-
-        chart.yAxis.tickFormat(function (d) {
-            return parseInt(d);
-        });
-
-        dashinsights_data = chart_details.data;
-        dashinsights_chart = chart;
-        d3.select('#dashinsights_room_nights svg')
-            .datum(dashinsights_data)
+            .datum(chart_details.data)
             .call(chart);
         nv.utils.windowResize(chart.update);
 
@@ -87,12 +48,10 @@ function line_chart_dashinsights(widget_name, chart_details) {
 
 function multibar_chart_dotw_dashinsights(widget_name, chart_details) {
     nv.addGraph(function() {
-        var chart = nv.models.multiBarChart()
+        var chart = nv.models.multiBarHorizontalChart()
             .showControls(false)
-            .reduceXTicks(false)
-            .groupSpacing(0.3)
             .margin({
-                left: 30,
+                left: 40,
                 right: 30,
             });
 
@@ -100,9 +59,7 @@ function multibar_chart_dotw_dashinsights(widget_name, chart_details) {
             return d;
         });
 
-        chart.yAxis.tickFormat(function (d) {
-            return parseInt(d);
-        });
+        chart.yAxis.tickFormat(d3.format('.f'));
 
         d3.select('#dashinsights_days_of_the_week svg')
             .datum(chart_details.data)
@@ -116,12 +73,10 @@ function multibar_chart_dotw_dashinsights(widget_name, chart_details) {
 
 function multibar_chart_los_dashinsights(widget_name, chart_details) {
     nv.addGraph(function() {
-        var chart = nv.models.multiBarChart()
+        var chart = nv.models.multiBarHorizontalChart()
             .showControls(false)
-            .reduceXTicks(false)
-            .groupSpacing(0.3)
             .margin({
-                left: 30,
+                left: 40,
                 right: 30,
             });
 
@@ -131,9 +86,7 @@ function multibar_chart_los_dashinsights(widget_name, chart_details) {
                 return d;
             });
 
-        chart.yAxis.tickFormat(function (d) {
-            return parseInt(d);
-        });
+        chart.yAxis.tickFormat(d3.format(chart_details['y_format']));
 
         d3.select('#dashinsights_length_of_stay svg')
             .datum(chart_details.data)

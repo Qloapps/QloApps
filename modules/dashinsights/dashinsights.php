@@ -47,6 +47,7 @@ class DashInsights extends Module
             && $this->registerHook('dashboardZoneTwo')
             && $this->registerHook('dashboardData')
             && $this->registerHook('actionAdminControllerSetMedia')
+            && $this->updateHookPositions()
         );
     }
 
@@ -56,6 +57,17 @@ class DashInsights extends Module
             $this->context->controller->addCSS($this->_path.'views/css/'.$this->name.'.css');
             $this->context->controller->addJS($this->_path.'views/js/'.$this->name.'.js');
         }
+    }
+
+    public function updateHookPositions()
+    {
+        $idHook = Hook::getIdByName('dashboardZoneOne');
+        $result = $this->updatePosition($idHook, 0, 2);
+
+        $idHook = Hook::getIdByName('dashboardZoneTwo');
+        $result &= $this->updatePosition($idHook, 0, 6);
+
+        return $result;
     }
 
     public function hookDashboardZoneOne()
@@ -74,86 +86,267 @@ class DashInsights extends Module
         $dateTo = $params['date_to'];
         $idHotel = $params['id_hotel'];
 
-        $idsHotel = array();
-        if (!$idHotel) {
-            $idsHotel = HotelBranchInformation::getProfileAccessedHotels($this->context->employee->id_profile, 1, 1);
+        // set common variables
+        $this->accessibleIdsHotel = HotelBranchInformation::getProfileAccessedHotels($this->context->employee->id_profile, 1, 1);
+
+        // set dates info
+        $this->discreteDates = array();
+        $dateTemp = $dateFrom;
+        while ($dateTemp <= $dateTo) {
+            $dateNext = date('Y-m-d', strtotime('+1 day', strtotime($dateTemp)));
+            $this->discreteDates[] = array(
+                'timestamp_from' => strtotime($dateTemp),
+            );
+            $dateTemp = $dateNext;
+        };
+
+        // set colors to be used for charts
+        $this->chartColors = array('#545fd5', '#fc7c63');
+
+        // get data now
+        $roomNightsData = $this->getRoomNightsData($dateFrom, $dateTo, $idHotel);
+        $daysOfTheWeekData = $this->getDaysOfTheWeekData($dateFrom, $dateTo, $idHotel);
+        $lengthOfStayData = $this->getLengthOfStayData($dateFrom, $dateTo, $idHotel);
+
+        // set labels
+        $panelsLabel = '';
+        if ($idHotel) {
+            $objHotelBranchInformation = new HotelBranchInformation($idHotel, $this->context->language->id);
+            $addressInfo = HotelBranchInformation::getAddress($idHotel, $this->context->language->id);
+            $panelsLabel = sprintf('(%s, %s)', $objHotelBranchInformation->hotel_name, $addressInfo['city']);
         } else {
-            $idsHotel[] = $idHotel;
+            $panelsLabel = $this->l('(All Hotels)');
         }
 
-        $hotelWiseRoomNights = array();
-        $hotelWiseDaysOfTheWeek = array();
-        $hotelWiseLengthOfStay = array();
+        $return = array(
+            'data_value' => array(
+                'dashinsights_heading_zone_one' => $panelsLabel,
+                'dashinsights_heading_zone_two' => $panelsLabel,
+            ),
+            'data_chart' => array(
+                'dashinsights_line_chart1' => array(
+                    'chart_type' => 'line_chart_dashinsights',
+                    'data' => $roomNightsData,
+                    'date_format' => $this->context->language->date_format_lite,
+                ),
+                'dashinsights_multibar_chart1' => array(
+                    'chart_type' => 'multibar_chart_dotw_dashinsights',
+                    'data' => $daysOfTheWeekData,
+                    'date_format' => $this->context->language->date_format_lite,
+                ),
+                'dashinsights_multibar_chart2' => array(
+                    'chart_type' => 'multibar_chart_los_dashinsights',
+                    'data' => $lengthOfStayData,
+                    'date_format' => $this->context->language->date_format_lite,
+                    'axis_labels' => array('x' => $this->l('Days')),
+                    'y_format' => '%',
+                ),
+            ),
+        );
+
+        return $return;
+    }
+
+    public function getRoomNightsData($dateFrom, $dateTo, $idHotel)
+    {
+        $seriesWiseRoomNights = array();
         if (Configuration::get('PS_DASHBOARD_SIMULATION')) {
-            if ($dateFrom == $dateTo) {
-                $dateTo = date('Y-m-d', strtotime('+1 day', strtotime($dateTo)));
-            }
-
-            // prepare dates
-            $discreteDates = array();
-            $dateTemp = $dateFrom;
-            while ($dateTemp <= $dateTo) {
-                $dateNext = date('Y-m-d', strtotime('+1 day', strtotime($dateTemp)));
-                $discreteDates[] = array(
-                    'timestamp_from' => strtotime($dateTemp),
-                );
-                $dateTemp = $dateNext;
-            };
-
             // set room nights demo data
-            foreach ($idsHotel as $idHotel) {
-                foreach ($discreteDates as $discreteDate) {
-                    $hotelWiseRoomNights[$idHotel][$discreteDate['timestamp_from']] = round(rand(0, 100));
-                }
-            }
+            if ($idHotel == 0) { // if 'All Hotels' is selected
+                $allHotelSeriesInfo = array(
+                    'data' => array(),
+                    'label' => $this->l('All Hotels'),
+                );
 
-            // set days of the week demo data
-            foreach ($idsHotel as $idHotel) {
-                for ($i = 1; $i <= 7; $i++) {
-                    $hotelWiseDaysOfTheWeek[$idHotel][$i] = round(rand(0, 100));
+                foreach ($this->discreteDates as $discreteDate) {
+                    $allHotelSeriesInfo['data'][$discreteDate['timestamp_from']] = rand(1, 100);
                 }
-            }
+                $seriesWiseRoomNights[] = $allHotelSeriesInfo;
+            } else { // if one of the hotels is selected
+                $hotelRoomNights = array();
+                $otherHotelsRoomNights = array();
 
-            // set length of stay demo data
-            foreach ($idsHotel as $idHotel) {
-                for ($i = 1; $i <= 7; $i++) {
-                    $hotelWiseLengthOfStay[$idHotel][$i] = round(rand(0, 15));
+                // current hotel series info
+                $objHotelBranchInformation = new HotelBranchInformation($idHotel, $this->context->language->id);
+                $currentHotelRoomNightsData = array();
+                foreach ($this->discreteDates as $discreteDate) {
+                    $currentHotelRoomNightsData[$discreteDate['timestamp_from']] = rand(1, 100);
                 }
+
+                $currentHotelSeriesInfo = array(
+                    'data' => $currentHotelRoomNightsData,
+                    'label' => $objHotelBranchInformation->hotel_name,
+                );
+
+                // average series info
+                $averageRoomNightsData = array();
+                foreach ($this->discreteDates as $discreteDate) {
+                    $averageRoomNightsData[$discreteDate['timestamp_from']] = sprintf('%0.2f', rand(1, 10000) / 100);
+                }
+
+                $averageSeriesInfo = array(
+                    'data' => $averageRoomNightsData,
+                    'label' => $this->l('Others Average'),
+                );
+
+                $seriesWiseRoomNights = array(
+                    $currentHotelSeriesInfo,
+                    $averageSeriesInfo,
+                );
             }
         } else {
-            $hotelWiseRoomNights = AdminStatsController::getRoomNightsData($dateFrom, $dateTo, $idHotel);
-            $hotelWiseDaysOfTheWeek = AdminStatsController::getOccupiedRoomsForDaysOfTheWeek($dateFrom, $dateTo, $idHotel);
+            if ($idHotel == 0) { // if 'All Hotels' is selected
+                $idsHotel = $this->accessibleIdsHotel;
+                $allHotelSeriesInfo = array(
+                    'data' => AdminStatsController::getRoomNightsData($dateFrom, $dateTo, $idsHotel),
+                    'label' => $this->l('All Hotels'),
+                );
 
-            $days = array(
-                1 => array(1, 1),
-                2 => array(2, 2),
-                3 => array(3, 3),
-                4 => array(4, 4),
-                5 => array(5, 5),
-                6 => array(6, 6),
-                7 => array(7, 100),
-            );
+                $seriesWiseRoomNights[] = $allHotelSeriesInfo;
+            } else { // if one of the hotels is selected
+                $hotelRoomNights = array();
+                $otherHotelsRoomNights = array();
 
-            $hotelWiseLengthOfStay = AdminStatsController::getLengthOfStayPercentages($days, $dateFrom, $dateTo, $idHotel);
+                $objHotelBranchInformation = new HotelBranchInformation($idHotel, $this->context->language->id);
+                $currentHotelRoomNightsData = AdminStatsController::getRoomNightsData($dateFrom, $dateTo, $idHotel);
+
+                $currentHotelSeriesInfo = array(
+                    'data' => $currentHotelRoomNightsData,
+                    'label' => $objHotelBranchInformation->hotel_name,
+                );
+
+                $seriesWiseRoomNights[] = $currentHotelSeriesInfo;
+
+                // calculate average of other hotels
+                $idsHotel = $this->accessibleIdsHotel;
+                if (($key = array_search($idHotel, $idsHotel)) !== false) {
+                    unset($idsHotel[$key]);
+                }
+
+                if (count($idsHotel) > 2) { // display average series only if other hotels are available
+                    $averageRoomNightsData = AdminStatsController::getRoomNightsData($dateFrom, $dateTo, $idsHotel, true, true);
+                    $averageSeriesInfo = array(
+                        'data' => $averageRoomNightsData,
+                        'label' => $this->l('Others Average'),
+                    );
+
+                    $seriesWiseRoomNights[] = $averageSeriesInfo;
+                }
+            }
         }
 
         // format room nights data
         $roomNightsFormattedData = array();
-        foreach ($hotelWiseRoomNights as $idHotel => &$hotelRoomNights) {
+        $colorIndex = 0;
+        foreach ($seriesWiseRoomNights as $key => &$hotelRoomNights) {
             $hotelData = array();
-            foreach ($hotelRoomNights as $timestamp => $hotelRoomNight) {
+            foreach ($hotelRoomNights['data'] as $timestamp => $hotelRoomNight) {
                 $hotelData[] = array($timestamp, $hotelRoomNight);
             }
 
-            $objHotelBranchInformation = new HotelBranchInformation($idHotel, $this->context->language->id);
             $roomNightsFormattedData[] = array(
-                'key' => $objHotelBranchInformation->hotel_name,
+                'key' => $hotelRoomNights['label'],
                 'values' => $hotelData,
+                'color' => $this->chartColors[$colorIndex++],
             );
+        }
+
+        return $roomNightsFormattedData;
+    }
+
+    public function getDaysOfTheWeekData($dateFrom, $dateTo, $idHotel)
+    {
+        $seriesWiseDaysOfTheWeek = array();
+        if (Configuration::get('PS_DASHBOARD_SIMULATION')) {
+            // set room nights demo data
+            if ($idHotel == 0) { // if 'All Hotels' is selected
+                $allHotelSeriesInfo = array(
+                    'data' => array(),
+                    'label' => $this->l('All Hotels'),
+                );
+
+                // 1 = SUN
+                for ($i = 1; $i <= 7; $i++) {
+                    $allHotelSeriesInfo['data'][$i] = round(rand(0, 100));
+                }
+
+                $seriesWiseDaysOfTheWeek[] = $allHotelSeriesInfo;
+            } else { // if one of the hotels is selected
+                $hotelDaysOfTheWeek = array();
+                $otherHotelsDaysOfTheWeek = array();
+
+                // current hotel series info
+                $objHotelBranchInformation = new HotelBranchInformation($idHotel, $this->context->language->id);
+                $currentHotelDaysOfTheWeekData = array();
+                for ($i = 1; $i <= 7; $i++) {
+                    $currentHotelDaysOfTheWeekData[$i] = round(rand(0, 100));
+                }
+
+                $currentHotelSeriesInfo = array(
+                    'data' => $currentHotelDaysOfTheWeekData,
+                    'label' => $objHotelBranchInformation->hotel_name,
+                );
+
+                // average series info
+                $averageDaysOfTheWeekData = array();
+                for ($i = 1; $i <= 7; $i++) {
+                    $averageDaysOfTheWeekData[$i] = sprintf('%0.2f', rand(1, 10000) / 100);
+                }
+
+                $averageSeriesInfo = array(
+                    'data' => $averageDaysOfTheWeekData,
+                    'label' => $this->l('Others Average'),
+                );
+
+                $seriesWiseDaysOfTheWeek = array(
+                    $currentHotelSeriesInfo,
+                    $averageSeriesInfo,
+                );
+            }
+        } else {
+            if ($idHotel == 0) { // if 'All Hotels' is selected
+                $idsHotel = $this->accessibleIdsHotel;
+                $allHotelSeriesInfo = array(
+                    'data' => AdminStatsController::getOccupiedRoomsForDaysOfTheWeek($dateFrom, $dateTo, $idsHotel),
+                    'label' => $this->l('All Hotels'),
+                );
+
+                $seriesWiseDaysOfTheWeek[] = $allHotelSeriesInfo;
+            } else { // if one of the hotels is selected
+                $hotelDaysOfTheWeek = array();
+                $otherHotelsDaysOfTheWeek = array();
+
+                $objHotelBranchInformation = new HotelBranchInformation($idHotel, $this->context->language->id);
+                $currentHotelDaysOfTheWeekData = AdminStatsController::getOccupiedRoomsForDaysOfTheWeek($dateFrom, $dateTo, $idHotel);
+
+                $currentHotelSeriesInfo = array(
+                    'data' => $currentHotelDaysOfTheWeekData,
+                    'label' => $objHotelBranchInformation->hotel_name,
+                );
+
+                $seriesWiseDaysOfTheWeek[] = $currentHotelSeriesInfo;
+
+                // calculate average of other hotels
+                $idsHotel = $this->accessibleIdsHotel;
+                if (($key = array_search($idHotel, $idsHotel)) !== false) {
+                    unset($idsHotel[$key]);
+                }
+
+                if (count($idsHotel) > 1) { // display average series only if other hotels are available
+                    $averageDaysOfTheWeekData = AdminStatsController::getOccupiedRoomsForDaysOfTheWeek($dateFrom, $dateTo, $idsHotel, true, true);
+                    $averageSeriesInfo = array(
+                        'data' => $averageDaysOfTheWeekData,
+                        'label' => $this->l('Others Average'),
+                    );
+
+                    $seriesWiseDaysOfTheWeek[] = $averageSeriesInfo;
+                }
+            }
         }
 
         // format days of the week data
         $daysOfTheWeekFormattedData = array();
+        $colorIndex = 0;
         $weekDays = array(
             $this->l('SUN'),
             $this->l('MON'),
@@ -163,24 +356,130 @@ class DashInsights extends Module
             $this->l('FRI'),
             $this->l('SAT'),
         );
-        foreach ($hotelWiseDaysOfTheWeek as $idHotel => &$hotelDaysOfTheWeek) {
+
+        foreach ($seriesWiseDaysOfTheWeek as $key => &$hotelDaysOfTheWeek) {
             $hotelData = array();
-            foreach ($hotelDaysOfTheWeek as $dayOfWeek => $hotelDayOfTheWeek) {
+            foreach ($hotelDaysOfTheWeek['data'] as $dayOfWeek => $hotelDayOfTheWeek) {
                 $hotelData[] = array(
                     'x' => $weekDays[$dayOfWeek - 1],
                     'y' => $hotelDayOfTheWeek,
                 );
             }
 
-            $objHotelBranchInformation = new HotelBranchInformation($idHotel, $this->context->language->id);
             $daysOfTheWeekFormattedData[] = array(
-                'key' => $objHotelBranchInformation->hotel_name,
+                'key' => $hotelDaysOfTheWeek['label'],
                 'values' => $hotelData,
+                'color' => $this->chartColors[$colorIndex++],
             );
+        }
+
+        return $daysOfTheWeekFormattedData;
+    }
+
+    public function getLengthOfStayData($dateFrom, $dateTo, $idHotel)
+    {
+        $seriesWiseLengthOfStay = array();
+
+        // day ranges to get length of stay data
+        $day = array(
+            1 => array(1, 1),
+            2 => array(2, 2),
+            3 => array(3, 3),
+            4 => array(4, 4),
+            5 => array(5, 5),
+            6 => array(6, 6),
+            7 => array(7, 100),
+        );
+
+        if (Configuration::get('PS_DASHBOARD_SIMULATION')) {
+            // set room nights demo data
+            if ($idHotel == 0) { // if 'All Hotels' is selected
+                $allHotelSeriesInfo = array(
+                    'data' => array(),
+                    'label' => $this->l('All Hotels'),
+                );
+
+                for ($i = 1; $i <= 7; $i++) {
+                    $allHotelSeriesInfo['data'][$i] = sprintf('%0.2f', rand(1, 100) / 100);
+                }
+
+                $seriesWiseLengthOfStay[] = $allHotelSeriesInfo;
+            } else { // if one of the hotels is selected
+                $hotelLengthOfStay = array();
+                $otherHotelsLengthOfStay = array();
+
+                // current hotel series info
+                $objHotelBranchInformation = new HotelBranchInformation($idHotel, $this->context->language->id);
+                $currentHotelLengthOfStayData = array();
+                for ($i = 1; $i <= 7; $i++) {
+                    $currentHotelLengthOfStayData[$i] = sprintf('%0.2f', rand(1, 100) / 100);
+                }
+
+                $currentHotelSeriesInfo = array(
+                    'data' => $currentHotelLengthOfStayData,
+                    'label' => $objHotelBranchInformation->hotel_name,
+                );
+
+                // average series info
+                $averageLengthOfStayData = array();
+                for ($i = 1; $i <= 7; $i++) {
+                    $averageLengthOfStayData[$i] = sprintf('%0.2f', rand(1, 100) / 100);
+                }
+
+                $averageSeriesInfo = array(
+                    'data' => $averageLengthOfStayData,
+                    'label' => $this->l('Others Average'),
+                );
+
+                $seriesWiseLengthOfStay = array(
+                    $currentHotelSeriesInfo,
+                    $averageSeriesInfo,
+                );
+            }
+        } else {
+            if ($idHotel == 0) { // if 'All Hotels' is selected
+                $idsHotel = $this->accessibleIdsHotel;
+                $allHotelSeriesInfo = array(
+                    'data' => AdminStatsController::getLengthOfStayPercentages($day, $dateFrom, $dateTo, $idsHotel),
+                    'label' => $this->l('All Hotels'),
+                );
+
+                $seriesWiseLengthOfStay[] = $allHotelSeriesInfo;
+            } else { // if one of the hotels is selected
+                $hotelLengthOfStay = array();
+                $otherHotelsLengthOfStay = array();
+
+                $objHotelBranchInformation = new HotelBranchInformation($idHotel, $this->context->language->id);
+                $currentHotelLengthOfStayData = AdminStatsController::getLengthOfStayPercentages($day, $dateFrom, $dateTo, $idHotel);
+
+                $currentHotelSeriesInfo = array(
+                    'data' => $currentHotelLengthOfStayData,
+                    'label' => $objHotelBranchInformation->hotel_name,
+                );
+
+                $seriesWiseLengthOfStay[] = $currentHotelSeriesInfo;
+
+                // calculate average of other hotels
+                $idsHotel = $this->accessibleIdsHotel;
+                if (($key = array_search($idHotel, $idsHotel)) !== false) {
+                    unset($idsHotel[$key]);
+                }
+
+                if (count($idsHotel) > 1) { // display average series only if other hotels are available
+                    $averageLengthOfStayData = AdminStatsController::getLengthOfStayPercentages($day, $dateFrom, $dateTo, $idsHotel, true, true);
+                    $averageSeriesInfo = array(
+                        'data' => $averageLengthOfStayData,
+                        'label' => $this->l('Others Average'),
+                    );
+
+                    $seriesWiseLengthOfStay[] = $averageSeriesInfo;
+                }
+            }
         }
 
         // format length of stay data
         $lengthOfStayFormattedData = array();
+        $colorIndex = 0;
         $losInfos = array(
             array('days' => 1, 'label' => $this->l('1')),
             array('days' => 2, 'label' => $this->l('2')),
@@ -190,43 +489,23 @@ class DashInsights extends Module
             array('days' => 6, 'label' => $this->l('6')),
             array('days' => 7, 'label' => $this->l('7+')),
         );
-        foreach ($hotelWiseLengthOfStay as $idHotel => &$hotelLengthOfStay) {
+
+        foreach ($seriesWiseLengthOfStay as $idHotel => &$hotelLengthOfStay) {
             $hotelData = array();
-            foreach ($hotelLengthOfStay as $numDays => $hotelLengthOfStay) {
+            foreach ($hotelLengthOfStay['data'] as $numDays => $lengthOfStay) {
                 $hotelData[] = array(
                     'x' => $losInfos[$numDays - 1]['label'],
-                    'y' => $hotelLengthOfStay,
+                    'y' => $lengthOfStay,
                 );
             }
 
-            $objHotelBranchInformation = new HotelBranchInformation($idHotel, $this->context->language->id);
             $lengthOfStayFormattedData[] = array(
-                'key' => $objHotelBranchInformation->hotel_name,
+                'key' => $hotelLengthOfStay['label'],
                 'values' => $hotelData,
+                'color' => $this->chartColors[$colorIndex++],
             );
         }
 
-        $return = array(
-            'data_chart' => array(
-                'dashinsights_line_chart1' => array(
-                    'chart_type' => 'line_chart_dashinsights',
-                    'data' => $roomNightsFormattedData,
-                    'date_format' => $this->context->language->date_format_lite,
-                ),
-                'dashinsights_multibar_chart1' => array(
-                    'chart_type' => 'multibar_chart_dotw_dashinsights',
-                    'data' => $daysOfTheWeekFormattedData,
-                    'date_format' => $this->context->language->date_format_lite,
-                ),
-                'dashinsights_multibar_chart2' => array(
-                    'chart_type' => 'multibar_chart_los_dashinsights',
-                    'data' => $lengthOfStayFormattedData,
-                    'date_format' => $this->context->language->date_format_lite,
-                    'axis_labels' => array('x' => $this->l('Days')),
-                ),
-            ),
-        );
-
-        return $return;
+        return $lengthOfStayFormattedData;
     }
 }

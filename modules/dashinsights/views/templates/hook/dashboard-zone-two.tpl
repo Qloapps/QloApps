@@ -21,6 +21,7 @@
     <section id="dashinsights" class="panel widget allow_push">
         <header class="panel-heading">
             <i class="icon-area-chart"></i> {l s='Insights' mod='dashinsights'}
+            <span><small class="text-muted" id="dashinsights_heading_zone_two"></small></span>
             <span class="panel-heading-action">
                 <a class="list-toolbar-btn" href="#" onclick="refreshDashboard('dashinsights'); return false;" title="{l s='Refresh' mod='dashinsights'}">
                     <i class="process-icon-refresh"></i>
