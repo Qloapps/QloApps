@@ -1114,6 +1114,7 @@ abstract class PaymentModuleCore extends Module
                             '{delivery_phone}' => ($delivery->phone) ? $delivery->phone : $delivery->phone_mobile,
                             '{delivery_other}' => $delivery->other,
                             '{invoice_company}' => $invoice->company,
+                            '{invoice_vat_number}' => $invoice->vat_number,
                             '{invoice_firstname}' => $invoice->firstname,
                             '{invoice_lastname}' => $invoice->lastname,
                             '{invoice_address2}' => $invoice->address2,
