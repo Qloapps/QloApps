@@ -3036,9 +3036,6 @@ class CartCore extends ObjectModel
         } else if ($id_hotel) {
             $addressInfo = HotelBranchInformation::getAddress($id_hotel);
             return $addressInfo['id_address'];
-        } else {
-            // provide an address for service product.
-            // for now we do not have an address associated with the service product
         }
         return false;
     }
