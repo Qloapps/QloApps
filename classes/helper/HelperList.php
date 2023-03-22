@@ -81,6 +81,8 @@ class HelperListCore extends Helper
      */
     protected $fields_list;
 
+    protected $fields_optional = array();
+
     /** @var bool Content line is clickable if true */
     public $no_link = false;
 
@@ -333,6 +335,12 @@ class HelperListCore extends Helper
             }
         }
 
+        foreach ($this->fields_list as $key => $params) {
+            if (isset($field['optional']) && $field['optional']) {
+                $this->fields_optional[$key] = $field;
+            }
+        }
+
         $this->content_tpl->assign(array_merge($this->tpl_vars, array(
             'shop_link_type' => $this->shopLinkType,
             'name' => isset($name) ? $name : null,
@@ -348,6 +356,7 @@ class HelperListCore extends Helper
             'order_way' => $this->orderWay,
             'is_cms' => $this->is_cms,
             'fields_display' => $this->fields_list,
+            'fields_optional' => $this->fields_optional,
             'list' => $this->_list,
             'actions' => $this->actions,
             'no_link' => $this->no_link,
@@ -635,6 +644,12 @@ class HelperListCore extends Helper
                     $this->context->controller->addJqueryUI('ui.datepicker');
                     break;
 
+                case 'range':
+                    if (is_string($value)) {
+                        $value = json_decode($value, true);
+                    }
+                    break;
+
                 case 'select':
                     foreach ($params['list'] as $option_value => $option_display) {
                         if (isset(Context::getContext()->cookie->{$prefix.$this->list_id.'Filter_'.$params['filter_key']})
@@ -667,8 +682,21 @@ class HelperListCore extends Helper
                 $has_value = true;
                 break;
             }
+        }
+
+        // get selected fields to display
+        $list_visibility = json_decode($this->context->cookie->{'list_visibility_'.$this->context->controller->className});
+        foreach ($this->fields_list as $key => $field) {
             if (!(isset($field['search']) && $field['search'] === false)) {
                 $has_search_field = true;
+            }
+            if (isset($field['optional']) && $field['optional']) {
+                $this->fields_optional[$key] = $field;
+                if ((empty($list_visibility) && isset($field['visible_default']) && $field['visible_default'])
+                    || $list_visibility && in_array($key , $list_visibility)
+                ) {
+                    $this->fields_optional[$key]['selected'] = true;
+                }
             }
         }
 
@@ -699,6 +727,7 @@ class HelperListCore extends Helper
             'order_way' => $this->orderWay,
             'order_by' => $this->orderBy,
             'fields_display' => $this->fields_list,
+            'fields_optional' => $this->fields_optional,
             'delete' => in_array('delete', $this->actions),
             'identifier' => $this->identifier,
             'id_cat' => $id_cat,

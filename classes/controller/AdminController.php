@@ -709,6 +709,18 @@ class AdminControllerCore extends Controller
                                     $filter_value .= ' - '.$date[1];
                                 }
                             }
+                        } elseif (isset($t['type']) && $t['type'] == 'range') {
+                            $range = json_decode($val, true);
+                            if (isset($range[0]) && !empty($range[0])) {
+                                $filter_value = $range[0];
+                                if (isset($range[1]) && !empty($range[1])) {
+                                    $filter_value .= ' - '.$range[1];
+                                }
+                            } else {
+                                if (isset($range[1]) && !empty($range[1])) {
+                                    $filter_value = $range[1];
+                                }
+                            }
                         } elseif (is_string($val)) {
                             $filter_value = htmlspecialchars($val, ENT_QUOTES, 'UTF-8');
                         }
@@ -856,7 +868,7 @@ class AdminControllerCore extends Controller
 
                 if ($field = $this->filterToField($key, $filter)) {
                     $type = (array_key_exists('filter_type', $field) ? $field['filter_type'] : (array_key_exists('type', $field) ? $field['type'] : false));
-                    if (($type == 'date' || $type == 'datetime') && is_string($value)) {
+                    if (($type == 'date' || $type == 'datetime' || $type == 'range') && is_string($value)) {
                         $value = json_decode($value, true);
                     }
                     $key = isset($tmp_tab[1]) ? $tmp_tab[0].'.`'.$tmp_tab[1].'`' : '`'.$tmp_tab[0].'`';
@@ -874,22 +886,34 @@ class AdminControllerCore extends Controller
                     } else {
                         $sql_filter = & $this->_filter;
                     }
-
                     /* Only for date filtering (from, to) */
                     if (is_array($value)) {
-                        if (isset($value[0]) && !empty($value[0])) {
-                            if (!Validate::isDate($value[0])) {
-                                $this->errors[] = Tools::displayError('The \'From\' date format is invalid (YYYY-MM-DD)');
-                            } else {
-                                $sql_filter .= ' AND '.pSQL($key).' >= \''.pSQL(Tools::dateFrom($value[0])).'\'';
+                        if ($type == 'range') {
+                            if (isset($value[0]) && !empty($value[0])) {
+                                if (!Validate::isUnsignedInt($value[0])) {
+                                    $this->errors[] = Tools::displayError('The \'From\' value is invalid');
+                                } else {
+                                    $sql_filter .= ' AND '.pSQL($key).' >= '.pSQL($value[0]);
+                                }
                             }
-                        }
+                            if (isset($value[1]) && !empty($value[1])) {
+                                $sql_filter .= ' AND '.pSQL($key).' <= '.pSQL($value[1]);
+                            }
+                        } else {
+                            if (isset($value[0]) && !empty($value[0])) {
+                                if (!Validate::isDate($value[0])) {
+                                    $this->errors[] = Tools::displayError('The \'From\' date format is invalid (YYYY-MM-DD)');
+                                } else {
+                                    $sql_filter .= ' AND '.pSQL($key).' >= \''.pSQL(Tools::dateFrom($value[0])).'\'';
+                                }
+                            }
 
-                        if (isset($value[1]) && !empty($value[1])) {
-                            if (!Validate::isDate($value[1])) {
-                                $this->errors[] = Tools::displayError('The \'To\' date format is invalid (YYYY-MM-DD)');
-                            } else {
-                                $sql_filter .= ' AND '.pSQL($key).' <= \''.pSQL(Tools::dateTo($value[1])).'\'';
+                            if (isset($value[1]) && !empty($value[1])) {
+                                if (!Validate::isDate($value[1])) {
+                                    $this->errors[] = Tools::displayError('The \'To\' date format is invalid (YYYY-MM-DD)');
+                                } else {
+                                    $sql_filter .= ' AND '.pSQL($key).' <= \''.pSQL(Tools::dateTo($value[1])).'\'';
+                                }
                             }
                         }
                     } else {
@@ -913,6 +937,15 @@ class AdminControllerCore extends Controller
                 }
             }
         }
+    }
+
+    public function processListVisibility()
+    {
+        $listFieldsVisibility = Tools::getValue('list_fields_visibility');
+        $controller = 'list_visibility_'.$this->context->controller->className;
+        $this->context->cookie->$controller = json_encode($listFieldsVisibility);
+
+        return true;
     }
 
     /**
@@ -3920,6 +3953,22 @@ class AdminControllerCore extends Controller
     {
         $this->context->cookie->{Tools::getValue('tab').'_closed'} = true;
         $response = array('success' => true);
+        $this->ajaxDie(json_encode($response));
+    }
+
+    /**
+     * Save list visible columns
+     *
+     * @return json as response
+     */
+    public function ajaxProcessUpdateListVisivility()
+    {
+        $response = array(
+            'success' => false
+        );
+
+        $response['success'] = $this->processListVisibility();
+
         $this->ajaxDie(json_encode($response));
     }
 
