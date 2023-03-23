@@ -72,7 +72,7 @@ class QloChannelManagerConnector extends Module
     public function hookActionValidateOrder($data)
     {
         // If the order request is coming from channel manager ip then only enter in database
-        if (Tools::getRemoteAddr() != '54.216.64.42') {
+        if (Tools::getRemoteAddr() == '54.216.64.42') {
             $order = $data['order'];
             if (!QcmcChannelManagerBooking::getChannelManagerBookings($order->id)) {
                 $objChannelManagerBooking = new QcmcChannelManagerBooking();
