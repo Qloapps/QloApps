@@ -324,7 +324,7 @@ class StatsPersonalInfos extends ModuleGraph
                 // Total unknown
                 $sql = 'SELECT COUNT(`id_customer`) as total
 						FROM `'._DB_PREFIX_.'customer`
-						WHERE `birthday` IS NULL
+						WHERE `birthday` = "0000-00-00"
 							'.Shop::addSqlRestriction(Shop::SHARE_CUSTOMER);
                 $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->getRow($sql);
                 if (isset($result['total']) && $result['total']) {

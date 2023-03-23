@@ -1,7 +1,8 @@
 <form method="POST" id="search_hotel_block_form" class="grid">
     {if isset($location_enabled) && $location_enabled}
         <div class="form-group area-{$column_widths['location']}">
-            <input type="text" class="form-control header-rmsearch-input input-location" id="hotel_location" name="hotel_location" autocomplete="off" placeholder="{l s='Hotel location' mod='wkroomsearchblock'}" {if isset($search_data)}value="{$search_data['location']|escape:'htmlall':'UTF-8'}" city_cat_id="{$search_data['parent_data']['id_category']}"{/if}>
+            <input type="text" class="form-control header-rmsearch-input input-location" id="hotel_location" name="hotel_location" autocomplete="off" placeholder="{l s='Hotel location' mod='wkroomsearchblock'}" {if isset($search_data)}value="{$search_data['location']|escape:'htmlall':'UTF-8'}"{/if}>
+            <input hidden="hidden" name="location_category_id" id="location_category_id" {if isset($search_data)}value="{$search_data['location_category_id']|escape:'htmlall':'UTF-8'}"{/if}>
             <div class="dropdown">
                 <ul class="location_search_results_ul dropdown-menu"></ul>
             </div>
@@ -195,7 +196,7 @@
         </div>
     {/if}
     <div class="form-group search_room_submit_block area-{$column_widths['search']}">
-        <button type="submit" class="btn btn btn-lg btn-primary pull-right" name="search_room_submit" id="search_room_submit">
+        <button type="submit" class="btn btn btn-primary pull-right" name="search_room_submit" id="search_room_submit">
             <span>{l s='Search Rooms' mod='wkroomsearchblock'}</span>
         </button>
     </div>

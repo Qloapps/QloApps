@@ -108,39 +108,39 @@ $(function() {
 	</div>
 	{/if}
 
-	{if isset($products) && $products}
+	{if isset($num_products) && $num_products}
 	<div class="panel">
 		<h3>
-			{if $products|@count == 1}
+			{if $num_products == 1}
 				{l s='1 product'}
 			{else}
-				{l s='%d products' sprintf=$products|@count}
+				{l s='%d products' sprintf=$num_products}
 			{/if}
 		</h3>
 		{$products}
 	</div>
 	{/if}
 
-	{if isset($customers) && $customers}
+	{if isset($num_customers) && $num_customers}
 	<div class="panel">
 		<h3>
-			{if $customers|@count == 1}
+			{if $num_customers == 1}
 				{l s='1 customer'}
 			{else}
-				{l s='%d customers' sprintf=$customers|@count}
+				{l s='%d customers' sprintf=$num_customers}
 			{/if}
 		</h3>
 		{$customers}
 	</div>
 	{/if}
 
-	{if isset($orders) && $orders}
+	{if isset($num_orders) && $num_orders}
 	<div class="panel">
 		<h3>
-			{if $orders|@count == 1}
+			{if $num_orders == 1}
 				{l s='1 order'}
 			{else}
-				{l s='%d orders' sprintf=$orders|@count}
+				{l s='%d orders' sprintf=$num_orders}
 			{/if}
 		</h3>
 		{$orders}

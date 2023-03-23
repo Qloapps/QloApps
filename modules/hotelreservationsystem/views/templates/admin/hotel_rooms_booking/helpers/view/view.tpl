@@ -81,7 +81,7 @@
 																		<input type="number" class="form-control num_occupancy num_adults" name="occupancy[{$key|escape:'htmlall':'UTF-8'}][adults]" value="{$room_occupancy['adults']|escape:'htmlall':'UTF-8'}" min="1">
 																	</div>
 																	<div class="form-group col-xs-6 occupancy_count_block">
-																		<label>{l s='Child'} <span class="label-desc-txt"></span></label>
+																		<label>{l s='Children'} <span class="label-desc-txt"></span></label>
 																		<input type="number" class="form-control num_occupancy num_children" name="occupancy[{$key|escape:'htmlall':'UTF-8'}][children]" value="{$room_occupancy['children']|escape:'htmlall':'UTF-8'}" min="0" {if $max_child_in_room}max="{$max_child_in_room}"{/if}>
 																		({l s='Below'}  {$max_child_age|escape:'htmlall':'UTF-8'} {l s='years'})
 																	</div>
@@ -123,7 +123,7 @@
 																	<input type="number" class="form-control num_occupancy num_adults" name="occupancy[0][adults]" value="1" min="1">
 																</div>
 																<div class="form-group col-xs-6 occupancy_count_block">
-																	<label>{l s='Child'} <span class="label-desc-txt"></span></label>
+																	<label>{l s='Children'} <span class="label-desc-txt"></span></label>
 																	<input type="number" class="form-control num_occupancy num_children" name="occupancy[0][children]" value="0" min="0" {if $max_child_in_room}max="{$max_child_in_room}"{/if}>
 																	({l s='Below'}  {$max_child_age|escape:'htmlall':'UTF-8'} {l s='years'})
 																</div>
@@ -218,7 +218,7 @@
 		 </ul>
 		<div class="tab-content panel active">
 			<div role="tabpanel" class="tab-pane active" id="reallocate_room_tab">
-				<form method="post" action="{$formAction|escape:'htmlall':'UTF-8'}">
+				<form method="post" action="">
 					<div class="modal-header">
 						<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
 						<h4 class="modal-title" id="realloc_myModalLabel">{l s='Reallocate Rooms'}</h4>

@@ -45,9 +45,23 @@ class AddressControllerCore extends FrontController
     {
         parent::setMedia();
         $this->addJS(array(
+            _THEME_JS_DIR_.'tools/vatManagement.js',
             _THEME_JS_DIR_.'tools/statesManagement.js',
             _PS_JS_DIR_.'validate.js'
         ));
+    }
+
+    /**
+     * Initialize address controller
+     * @see FrontController::init()
+     */
+    public function init()
+    {
+        parent::init();
+
+        if ($this->context->customer->id) {
+            $this->_address = new Address(Customer::getCustomerIdAddress($this->context->customer->id));
+        }
     }
 
     /**

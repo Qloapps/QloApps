@@ -63,7 +63,7 @@
                             </div>
                             <div class="form-group col-sm-7 col-xs-6 occupancy_count_block">
                                 <div class="row">
-                                    <label class="col-sm-12">{l s='Child'}<span class="label-desc-txt"> ({l s='Below'} {$max_child_age|escape:'htmlall':'UTF-8'} {l s='years'})</span></label>
+                                    <label class="col-sm-12">{l s='Children'}<span class="label-desc-txt"> ({l s='Below'} {$max_child_age|escape:'htmlall':'UTF-8'} {l s='years'})</span></label>
                                     <div class="col-sm-12">
                                         <input type="hidden" class="num_occupancy num_children room_occupancies" name="occupancy[{$key|escape:'htmlall':'UTF-8'}][children]" max="{}" value="{$occupancy['children']|escape:'htmlall':'UTF-8'}">
                                         <div class="occupancy_count pull-left">
@@ -134,7 +134,7 @@
                         </div>
                         <div class="form-group col-sm-7 col-xs-6 occupancy_count_block">
                             <div class="row">
-                                <label class="col-sm-12">{l s='Child'} <span class="label-desc-txt">({l s='Below'}  {$max_child_age|escape:'htmlall':'UTF-8'} {l s='years'})</span></label>
+                                <label class="col-sm-12">{l s='Children'} <span class="label-desc-txt">({l s='Below'}  {$max_child_age|escape:'htmlall':'UTF-8'} {l s='years'})</span></label>
                                 <div class="col-sm-12">
                                     <input type="hidden" class="num_occupancy num_children" name="num_children[]" value="0">
                                     <div class="occupancy_count pull-left">

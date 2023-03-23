@@ -284,7 +284,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
         if (!$distinct_products) {
             return '0%';
         }
-        return round(100 * $distinct_products / AdminStatsController::getTotalProducts()).'%';
+        return round(100 * $distinct_products / AdminStatsController::getTotalRoomTypes()).'%';
     }
 
     public static function getOrders($date_from, $date_to, $granularity = false, $id_hotel = false)
@@ -354,7 +354,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
     public static function getCustomerMainGender()
     {
         $row = Db::getInstance(_PS_USE_SQL_SLAVE_)->getRow('
-		SELECT SUM(IF(g.id_gender IS NOT NULL, 1, 0)) as total, SUM(IF(type = 0, 1, 0)) as male, SUM(IF(type = 1, 1, 0)) as female, SUM(IF(type = 2, 1, 0)) as neutral
+		SELECT SUM(IF(c.id_gender IS NOT NULL, 1, 0)) as total, SUM(IF(type = 0, 1, 0)) as male, SUM(IF(type = 1, 1, 0)) as female, SUM(IF(type = 2, 1, 0)) as neutral
 		FROM `'._DB_PREFIX_.'customer` c
 		LEFT JOIN `'._DB_PREFIX_.'gender` g ON c.id_gender = g.id_gender
 		WHERE c.active = 1 '.Shop::addSqlRestriction());
@@ -1176,9 +1176,10 @@ class AdminStatsControllerCore extends AdminStatsTabController
 
     public static function getArrivalsInfoByDate($date, $idHotel = null)
     {
-        $sql = 'SELECT hbd.*, CONCAT(c.`firstname`, " ", c.`lastname`) AS customer_name,
+        $sql = 'SELECT hbd.*, o.`with_occupancy`, CONCAT(c.`firstname`, " ", c.`lastname`) AS customer_name,
         DATEDIFF(hbd.`date_to`, hbd.`date_from`) AS los
         FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+        LEFT JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = hbd.`id_order`)
         LEFT JOIN `'._DB_PREFIX_.'customer` c ON (c.`id_customer` = hbd.`id_customer`)
         WHERE hbd.`is_refunded` = 0 AND hbd.`date_from` = "'.pSQL($date).' 00:00:00"
         AND hbd.`id_status` != '.(int) HotelBookingDetail::STATUS_CHECKED_IN.'
@@ -1191,9 +1192,10 @@ class AdminStatsControllerCore extends AdminStatsTabController
 
     public static function getDeparturesInfoByDate($date, $idHotel = null)
     {
-        $sql = 'SELECT hbd.*, CONCAT(c.`firstname`, " ", c.`lastname`) AS customer_name,
+        $sql = 'SELECT hbd.*, o.`with_occupancy`, CONCAT(c.`firstname`, " ", c.`lastname`) AS customer_name,
         DATEDIFF(hbd.`date_to`, hbd.`date_from`) AS los
         FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+        LEFT JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = hbd.`id_order`)
         LEFT JOIN `'._DB_PREFIX_.'customer` c ON (c.`id_customer` = hbd.`id_customer`)
         WHERE hbd.`is_refunded` = 0 AND hbd.`date_to` = "'.pSQL($date).' 00:00:00"
         AND hbd.`id_status` = '.(int) HotelBookingDetail::STATUS_CHECKED_IN.
@@ -1205,9 +1207,10 @@ class AdminStatsControllerCore extends AdminStatsTabController
 
     public static function getInHousesInfo($idHotel = null)
     {
-        $sql = 'SELECT hbd.*, CONCAT(c.`firstname`, " ", c.`lastname`) AS customer_name,
+        $sql = 'SELECT hbd.*, o.`with_occupancy`, CONCAT(c.`firstname`, " ", c.`lastname`) AS customer_name,
         DATEDIFF(hbd.`date_to`, hbd.`date_from`) AS los
         FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+        LEFT JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = hbd.`id_order`)
         LEFT JOIN `'._DB_PREFIX_.'customer` c ON (c.`id_customer` = hbd.`id_customer`)
         WHERE hbd.`is_refunded` = 0 AND hbd.`id_status` = '.(int) HotelBookingDetail::STATUS_CHECKED_IN.
         (!is_null($idHotel) ? HotelBranchInformation::addHotelRestriction($idHotel, 'hbd') : '');
@@ -1220,7 +1223,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
     {
         $sql = 'SELECT hbd.`id_customer`, CONCAT(c.`firstname`, " ", c.`lastname`) AS customer_name,
         COUNT(hbd.`id`) AS total_rooms, SUM(hbd.`adults` + hbd.`children`) AS total_guests,
-        hbd.`id_hotel`, hbd.`hotel_name`, hbd.`id_order`, o.`total_paid_tax_excl`, o.`id_currency`, osl.`name` AS `state_name`
+        hbd.`id_hotel`, hbd.`hotel_name`, hbd.`id_order`, o.`with_occupancy`, o.`total_paid_tax_excl`, o.`id_currency`, osl.`name` AS `state_name`
         FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
         LEFT JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = hbd.`id_order`)
         LEFT JOIN `'._DB_PREFIX_.'order_state_lang` osl
@@ -1237,8 +1240,8 @@ class AdminStatsControllerCore extends AdminStatsTabController
     public static function getCancellationsInfoByDate($date, $idHotel = null)
     {
         $sql = 'SELECT orr.`id_order_return`, orr.`id_customer`, hbd.`room_num`, hbd.`id_product`, hbd.`room_type_name`,
-        CONCAT(c.`firstname`, " ", c.`lastname`) AS customer_name,
-        hbd.`id_hotel`, hbd.`hotel_name`, SUM(hbd.`adults` + hbd.`children`) AS total_guests,
+        o.`with_occupancy`, CONCAT(c.`firstname`, " ", c.`lastname`) AS customer_name, hbd.`id_hotel`,
+        hbd.`hotel_name`, SUM(hbd.`adults` + hbd.`children`) AS total_guests,
         hbd.`date_from`, hbd.`date_to`, orr.`id_order`
         FROM `'._DB_PREFIX_.'order_return` orr
         LEFT JOIN `'._DB_PREFIX_.'order_return_detail` ord ON (ord.`id_order_return` = orr.`id_order_return`)
@@ -1665,9 +1668,10 @@ class AdminStatsControllerCore extends AdminStatsTabController
             $dateTo = date('Y-m-d', strtotime('+1 day', strtotime($dateTo)));
         }
 
-        $sql = 'SELECT SUM(total_paid_tax_excl)
+        $sql = 'SELECT SUM(total_paid_tax_excl - refunded_amount)
         FROM (
             SELECT o.`id_order`, o.`total_paid_tax_excl` / o.`conversion_rate` AS total_paid_tax_excl,
+            IFNULL(orr.`refunded_amount`, 0) AS refunded_amount,
             (SELECT hbd.`id_hotel`
                 FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
                 WHERE hbd.`id_order` = o.`id_order` LIMIT 1
@@ -1677,6 +1681,8 @@ class AdminStatsControllerCore extends AdminStatsTabController
             ON (hbd.`id_order` = o.`id_order`)
             INNER JOIN `'._DB_PREFIX_.'htl_branch_info` hbi
             ON (hbi.`id` = hbd.`id_hotel`)
+            LEFT JOIN `' ._DB_PREFIX_.'order_return` orr
+            ON (orr.`id_order` = o.`id_order`)
             WHERE o.`valid` = 1 AND hbi.`active` = 1 AND hbd.`is_refunded` = 0
             AND o.`invoice_date` BETWEEN "'.pSQL($dateFrom).' 00:00:00" AND "'.pSQL($dateTo).' 23:59:59"
             AND o.`source` = "'.pSQL(Configuration::get('PS_SHOP_DOMAIN')).'"'.
@@ -1790,5 +1796,241 @@ class AdminStatsControllerCore extends AdminStatsTabController
         }
 
         return $countGrossOpProfitPars ? $sumGrossOpProfitPars / $countGrossOpProfitPars : 0;
+    }
+
+    public static function getRoomNightsData($dateFrom, $dateTo = null, $idHotel = null, $useCache = true, $average = false)
+    {
+        $dateTo = !$dateTo ? date('Y-m-d', strtotime('+1 day', strtotime($dateFrom))) : $dateTo;
+
+        $idsHotel = array();
+        if (is_int($idHotel)) {
+            $idsHotel[] = $idHotel;
+        } else {
+            $idsHotel = $idHotel;
+        }
+
+        // collect data
+        $hotelsData = array();
+        foreach ($idsHotel as $idHotel) {
+            $hotelsData[$idHotel] = self::getOccupiedRoomsForDiscreteDates(
+                $dateFrom,
+                $dateTo,
+                $idHotel,
+                $useCache
+            );
+        }
+
+        // calculate sums
+        $result = array();
+        foreach ($hotelsData as $hotelData) {
+            foreach ($hotelData as $timestamp => $value) {
+                if (!array_key_exists($timestamp, $result)) {
+                    $result[$timestamp] = $value;
+                } else {
+                    $result[$timestamp] += $value;
+                }
+            }
+        }
+
+        // calculate averages
+        if ($average) {
+            $totalHotels = count($idsHotel);
+            if ($totalHotels > 1) {
+                foreach ($result as $timestamp => &$value) {
+                    $value = $value / $totalHotels;
+                }
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * $dow: day of week, 1 = SUN
+     */
+    public static function getOccupiedRoomsForDayOfTheWeek($dow, $dateFrom, $dateTo = null, $idHotel = null, $useCache = true)
+    {
+        $dateTo = !$dateTo ? date('Y-m-d', strtotime('+1 day', strtotime($dateFrom))) : $dateTo;
+
+        $result = 0;
+        $cacheKey = 'AdminStats::getOccupiedRoomsForDayOfTheWeek'.'_'.(int) $dow.(int) strtotime($dateFrom).
+        (int) strtotime($dateTo).(!is_array($idHotel) ? (int) $idHotel : implode('_', $idHotel));
+        if (!Cache::isStored($cacheKey) || !$useCache) {
+            // (los/7) + {if(los%7 has $dow) + 1 else + 0)}
+            // dow(start_of(remaining_days)) = dow_date_from && dow(end_of(remaining_days)) = dow_date_to
+            $sql = 'SELECT SUM((full_weeks + IF(('.(int) $dow.' >= dow_date_from AND '.(int) $dow.' < dow_date_to), 1, 0)))
+            AS total_occupied
+            FROM (
+                SELECT hbd.`id`, hbd.`date_from`, hbd.`date_to`, DAYOFWEEK(hbd.`date_from`) AS dow_date_from,
+                DAYOFWEEK(hbd.`date_to`) AS dow_date_to,
+                DATEDIFF(hbd.`date_to`, hbd.`date_from`) AS los,
+                ROUND(DATEDIFF(hbd.`date_to`, hbd.`date_from`) / 7) AS full_weeks,
+                DATEDIFF(hbd.`date_to`, hbd.`date_from`) % 7 AS remaining_days
+                FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+                WHERE hbd.`is_refunded` = 0
+                AND hbd.`date_from` < "'.pSQL($dateTo).' 00:00:00" AND hbd.`date_to` > "'.pSQL($dateFrom).' 00:00:00"'.
+                (!is_null($idHotel) ? HotelBranchInformation::addHotelRestriction($idHotel, 'hbd') : '').'
+            ) AS t';
+
+            $value = (int) Db::getInstance()->getValue($sql);
+            Cache::store($cacheKey, $value);
+
+            $result = Cache::retrieve($cacheKey);
+        }
+
+        return $result;
+    }
+
+    public static function getOccupiedRoomsForDaysOfTheWeek($dateFrom, $dateTo = null, $idHotel = null, $useCache = true, $average = false)
+    {
+        $dateTo = !$dateTo ? date('Y-m-d', strtotime('+1 day', strtotime($dateFrom))) : $dateTo;
+
+        $idsHotel = array();
+        if (is_int($idHotel)) {
+            $idsHotel[] = $idHotel;
+        } else {
+            $idsHotel = $idHotel;
+        }
+
+        // collect data
+        $hotelsData = array();
+        foreach ($idsHotel as $idHotel) {
+            $hotelsData[$idHotel] = array();
+            // 1 = SUN
+            for ($i = 1; $i <= 7; $i++) {
+                $hotelsData[$idHotel][$i] = self::getOccupiedRoomsForDayOfTheWeek(
+                    $i,
+                    $dateFrom,
+                    $dateTo,
+                    $idHotel,
+                    $useCache
+                );
+            }
+        }
+
+        // calculate sums
+        $result = array();
+        foreach ($hotelsData as $hotelData) {
+            foreach ($hotelData as $dayOfWeek => $value) {
+                if (!array_key_exists($dayOfWeek, $result)) {
+                    $result[$dayOfWeek] = $value;
+                } else {
+                    $result[$dayOfWeek] += $value;
+                }
+            }
+        }
+
+        // calculate averages
+        if ($average) {
+            $totalHotels = count($idsHotel);
+            if ($totalHotels > 1) {
+                foreach ($result as $timestamp => &$value) {
+                    $value = $value / $totalHotels;
+                }
+            }
+        }
+
+        return $result;
+    }
+
+    public static function getLengthOfStayRatio($losMinimum, $dateFrom, $dateTo, $idHotel = null, $useCache = true, $losMaximum = false)
+    {
+        $result = 0;
+        $cacheKey = 'AdminStats::getLengthOfStayRatio'.'_'.(int) $losMinimum.(int) $losMaximum.
+        (int) strtotime($dateFrom).(int) strtotime($dateTo).(!is_array($idHotel) ? (int) $idHotel : implode('_', $idHotel));
+        if (!Cache::isStored($cacheKey) || !$useCache) {
+            if ($dateFrom == $dateTo) {
+                $dateTo = date('Y-m-d', strtotime('+1 day', strtotime($dateTo)));
+            }
+
+            $sql = 'SELECT COUNT(hbd.`id`) AS total
+            FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+            LEFT JOIN `'._DB_PREFIX_.'product` p
+            ON (p.`id_product` = hbd.`id_product`)
+            WHERE p.`active` = 1
+            AND hbd.`is_refunded` = 0
+            AND hbd.`date_from` < "'.pSQL($dateTo).' 00:00:00" AND hbd.`date_to` > "'.pSQL($dateFrom).' 00:00:00"'.
+            (!is_null($idHotel) ? HotelBranchInformation::addHotelRestriction($idHotel, 'hbd') : '');
+
+            $total = Db::getInstance()->getValue($sql);
+
+            $sql = 'SELECT COUNT(los)
+            FROM (
+                SELECT DATEDIFF(hbd.`date_to`, hbd.`date_from`) AS los
+                FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+                LEFT JOIN `'._DB_PREFIX_.'product` p
+                ON (p.`id_product` = hbd.`id_product`)
+                WHERE p.`active` = 1
+                AND hbd.`is_refunded` = 0
+                AND hbd.`date_from` < "'.pSQL($dateTo).' 00:00:00" AND hbd.`date_to` > "'.pSQL($dateFrom).' 00:00:00"'.
+                (!is_null($idHotel) ? HotelBranchInformation::addHotelRestriction($idHotel, 'hbd') : '').'
+            ) AS t
+            WHERE los >= '.(int) $losMinimum.' AND los <= '.(int) ($losMaximum ? $losMaximum : $losMinimum);
+
+            $fraction = Db::getInstance()->getValue($sql);
+
+            $ratio = array('fraction' => $fraction, 'total' => $total);
+            Cache::store($cacheKey, $ratio);
+
+            $result = Cache::retrieve($cacheKey);
+        }
+
+        return $result;
+    }
+
+    public static function getLengthOfStayPercentages($days, $dateFrom, $dateTo, $idHotel = null, $useCache = true, $average = false)
+    {
+        $idsHotel = array();
+        if (is_int($idHotel)) {
+            $idsHotel[] = $idHotel;
+        } else {
+            $idsHotel = $idHotel;
+        }
+
+        // collect data
+        $hotelsData = array();
+        foreach ($idsHotel as $idHotel) {
+            $hotelsData[$idHotel] = array();
+            foreach ($days as $key => $day) {
+                $hotelsData[$idHotel][$key] = self::getLengthOfStayRatio(
+                    $day[0],
+                    $dateFrom,
+                    $dateTo,
+                    $idHotel,
+                    $useCache,
+                    $day[1]
+                );
+            }
+        }
+
+        // calculate sums
+        $result = array();
+        foreach ($hotelsData as $hotelData) {
+            foreach ($days as $key => $day) {
+                if (!array_key_exists($key, $result)) {
+                    $result[$key]['fraction'] = $hotelData[$key]['fraction'];
+                    $result[$key]['total'] = $hotelData[$key]['total'];
+                } else {
+                    $result[$key]['fraction'] += $hotelData[$key]['fraction'];
+                    $result[$key]['total'] += $hotelData[$key]['total'];
+                }
+            }
+        }
+
+        // calculate averages
+        if ($average) {
+            $totalHotels = count($idsHotel);
+            if ($totalHotels > 1) {
+                foreach ($result as $key => $ratio) {
+                    $result[$key] = $ratio['total'] ? ($ratio['fraction'] / $ratio['total']) : 0;
+                }
+            }
+        } else {
+            foreach ($result as $key => $ratio) {
+                $result[$key] = $ratio['total'] ? ($ratio['fraction'] / $ratio['total']) : 0;
+            }
+        }
+
+        return $result;
     }
 }

@@ -432,7 +432,7 @@ class HotelCartBookingData extends ObjectModel
         }
 
         // return number of rooms deleted
-        return $numRooms;
+        return true;
     }
 
     public function addCartBookingData(
@@ -450,7 +450,12 @@ class HotelCartBookingData extends ObjectModel
         $chkQty = 0;
         $num_days = HotelHelper::getNumberOfDays($date_from, $date_to);
         $objRoomTypeServiceProductCartDetail = new RoomTypeServiceProductCartDetail();
-        if (Configuration::get('PS_FRONT_ROOM_UNIT_SELECTION_TYPE') == HotelBookingDetail::PS_FRONT_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY) {
+        if (defined('_PS_ADMIN_DIR_')) {
+            $PS_ROOM_UNIT_SELECTION_TYPE = Configuration::get('PS_BACKOFFICE_ROOM_BOOKING_TYPE');
+        } else {
+            $PS_ROOM_UNIT_SELECTION_TYPE = Configuration::get('PS_FRONT_ROOM_UNIT_SELECTION_TYPE');
+        }
+        if ($PS_ROOM_UNIT_SELECTION_TYPE == HotelBookingDetail::PS_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY) {
             $roomsRequired = count($occupancy);
         } else {
             $objRoomType = new HotelRoomType();
@@ -475,7 +480,7 @@ class HotelCartBookingData extends ObjectModel
                     $obj_htl_cart_booking_data->extra_demands = $roomDemand;
                     $obj_htl_cart_booking_data->date_from = $date_from;
                     $obj_htl_cart_booking_data->date_to = $date_to;
-                    if (Configuration::get('PS_FRONT_ROOM_UNIT_SELECTION_TYPE') == HotelBookingDetail::PS_FRONT_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY) {
+                    if ($PS_ROOM_UNIT_SELECTION_TYPE == HotelBookingDetail::PS_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY) {
                         $room_occupancy = array_shift($occupancy);
                         $obj_htl_cart_booking_data->adults = $room_occupancy['adults'];
                         $obj_htl_cart_booking_data->children = $room_occupancy['children'];
@@ -573,8 +578,12 @@ class HotelCartBookingData extends ObjectModel
                 'id_cart' => $id_cart,
                 'id_guest' => $id_guest,
             );
-
-            if (Configuration::get('PS_FRONT_ROOM_UNIT_SELECTION_TYPE') == HotelBookingDetail::PS_FRONT_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY) {
+            if (defined('_PS_ADMIN_DIR_')) {
+                $PS_ROOM_UNIT_SELECTION_TYPE = Configuration::get('PS_BACKOFFICE_ROOM_BOOKING_TYPE');
+            } else {
+                $PS_ROOM_UNIT_SELECTION_TYPE = Configuration::get('PS_FRONT_ROOM_UNIT_SELECTION_TYPE');
+            }
+            if ($PS_ROOM_UNIT_SELECTION_TYPE == HotelBookingDetail::PS_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY) {
                 $roomsRequired = count($occupancy);
             } else {
                 $roomsRequired = $occupancy;
@@ -968,16 +977,13 @@ class HotelCartBookingData extends ObjectModel
                 );
 
                 $cart_detail_data[$key]['additional_service'] = $objRoomTypeServiceProduct->getServiceProductsData($value['id_product']);
-                $cart_detail_data[$key]['selected_additional_service'] = $objRoomTypeServiceProductCartDetail->getServiceProductsInCart(
-                    $id_cart,
+                $cart_detail_data[$key]['selected_services'] = $objRoomTypeServiceProductCartDetail->getRoomServiceProducts(
+                    $value['id'],
                     0,
-                    0,
-                    $value['id_product'],
-                    $value['date_from'],
-                    $value['date_to'],
-                    $value['id']
+                    null,
+                    null
                 );
-                $cart_detail_data[$key]['additional_service_price'] = $objRoomTypeServiceProductCartDetail->getServiceProductsInCart(
+                $cart_detail_data[$key]['additional_service_price'] = $objRoomTypeServiceProductCartDetail->getServiceProductsTotalInCart(
                     $id_cart,
                     0,
                     0,
@@ -985,10 +991,9 @@ class HotelCartBookingData extends ObjectModel
                     $value['date_from'],
                     $value['date_to'],
                     $value['id'],
-                    true,
                     false
                 );
-                $cart_detail_data[$key]['additional_services_auto_add_price'] = $objRoomTypeServiceProductCartDetail->getServiceProductsInCart(
+                $cart_detail_data[$key]['additional_services_auto_add_price'] = $objRoomTypeServiceProductCartDetail->getServiceProductsTotalInCart(
                     $id_cart,
                     0,
                     0,
@@ -996,7 +1001,6 @@ class HotelCartBookingData extends ObjectModel
                     $value['date_from'],
                     $value['date_to'],
                     $value['id'],
-                    true,
                     false,
                     1
                 );
@@ -1009,7 +1013,8 @@ class HotelCartBookingData extends ObjectModel
                     0,
                     $id_cart,
                     $value['id_guest'],
-                    $value['id_room']
+                    $value['id_room'],
+                    0
                 );
 
                 $cart_detail_data[$key]['amt_with_qty'] = $roomTypeDateRangePrice['total_price_tax_excl'];
@@ -1303,15 +1308,14 @@ class HotelCartBookingData extends ObjectModel
                                     $data_v['date_to'],
                                     1
                                 );
-                                $serviceProductPrice = $objRoomTypeServiceProductCartDetail->getServiceProductsInCart(
+                                $serviceProductPrice = $objRoomTypeServiceProductCartDetail->getServiceProductsTotalInCart(
                                     $context->cart->id,
                                     0,
                                     $data_v['id_hotel'],
                                     $data_v['id_product'],
                                     $data_v['date_from'],
                                     $data_v['date_to'],
-                                    $data_v['id'],
-                                    true
+                                    $data_v['id']
                                 );
                                 $totalAdditionalServicePrice = $demandPrice + $serviceProductPrice;
 

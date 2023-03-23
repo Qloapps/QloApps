@@ -103,57 +103,54 @@
 							</div>
 							<div id="room_type_services_desc">
 								{assign var=roomCount value=1}
-								{foreach $selectedRoomServiceProduct as $cartRoom}
-									<div class="row room_demands_container">
-										<div class="col-sm-12 demand_header">
-											<span>
-												<i class="icon-bed"></i>
-												{if isset($cartRoom['room_num']) && $cartRoom['room_num']}
-													{l s='Room'} {$cartRoom['room_num']|escape:'html':'UTF-8'}
-												{else}
-													{l s='Room'} {$roomCount|escape:'html':'UTF-8'}
-												{/if}
-											</span>
-										</div>
-										<div class="col-sm-12 room_demand_detail">
-											{if isset($roomTypeServiceProducts) && $roomTypeServiceProducts}
-												{foreach $roomTypeServiceProducts as $product}
-													<div class="row room_demand_block">
-															<div class="col-xs-5">
-																<div class="row">
-																	<div class="col-xs-2">
-																		<input data-id_cart_booking="{$cartRoom['htl_cart_booking_id']}" value="{$product['id_product']|escape:'html':'UTF-8'}" type="checkbox" class="change_room_type_service_product" {if  isset($cartRoom['selected_products']) && $cartRoom['selected_products'] && ($product['id_product']|in_array:$cartRoom['selected_products'])}checked{/if}/>
-																	</div>
-																	<div class="col-xs-10">
-																		<p>{$product['name']|escape:'html':'UTF-8'}</p>
-																		{if $product.allow_multiple_quantity}
-																			<div class="qty_container">
-																				<input type="number" class="form-control room_type_service_product_qty qty" id="qty_{$product.id_product}" name="service_product_qty_{$product.id_product}" data-id-product="{$product.id_product}" min="1" value="{if  isset($cartRoom['selected_products']) && $cartRoom['selected_products'] && ($product['id_product']|in_array:$cartRoom['selected_products'])}{$cartRoom['selected_products_info'][$product['id_product']]['quantity']}{else}1{/if}">
-																			</div>
-																		{/if}
-																	</div>
+								<div class="row room_demands_container">
+									<div class="col-sm-12 demand_header">
+										<span>
+											<i class="icon-bed"></i>
+											{if isset($selectedRoomServiceProduct['room_num']) && $selectedRoomServiceProduct['room_num']}
+												{l s='Room'} {$selectedRoomServiceProduct['room_num']|escape:'html':'UTF-8'}
+											{else}
+												{l s='Room'} {$roomCount|escape:'html':'UTF-8'}
+											{/if}
+										</span>
+									</div>
+									<div class="col-sm-12 room_demand_detail">
+										{if isset($roomTypeServiceProducts) && $roomTypeServiceProducts}
+											{foreach $roomTypeServiceProducts as $product}
+												<div class="row room_demand_block">
+														<div class="col-xs-5">
+															<div class="row">
+																<div class="col-xs-2">
+																	<input data-id_cart_booking="{$selectedRoomServiceProduct['htl_cart_booking_id']}" value="{$product['id_product']|escape:'html':'UTF-8'}" type="checkbox" class="change_room_type_service_product" {if  isset($selectedRoomServiceProduct['selected_service']) && $selectedRoomServiceProduct['selected_service'] && ($product['id_product']|array_key_exists:$selectedRoomServiceProduct['selected_service'])}checked{/if}/>
+																</div>
+																<div class="col-xs-10">
+																	<p>{$product['name']|escape:'html':'UTF-8'}</p>
+																	{if $product.allow_multiple_quantity}
+																		<div class="qty_container">
+																			<input type="number" class="form-control room_type_service_product_qty qty" id="qty_{$product.id_product}" name="service_product_qty_{$product.id_product}" data-id-product="{$product.id_product}" min="1" value="{if  isset($selectedRoomServiceProduct['selected_service']) && $selectedRoomServiceProduct['selected_service'] && ($product['id_product']|array_key_exists:$selectedRoomServiceProduct['selected_service'])}{$selectedRoomServiceProduct['selected_service'][$product['id_product']]['quantity']}{else}1{/if}">
+																		</div>
+																	{/if}
 																</div>
 															</div>
-															<div class="col-xs-3">
-																{if $product['auto_add_to_cart'] && $product['price_addition_type'] == Product::PRICE_ADDITION_TYPE_INDEPENDENT}
-																	<span class="badge badge-info label">{l s='Convenience fee'}</span>
-																{/if}
-																{if $product['auto_add_to_cart'] && $product['price_addition_type'] == Product::PRICE_ADDITION_TYPE_WITH_ROOM}
-																	<span class="badge badge-info label">{l s='Auto added'}</span>
-																{/if}
-															</div>
-															<div class="col-xs-4">
-																{if ($product.show_price && !isset($restricted_country_mode)) || isset($groups)}
-																	<span class="pull-right">{convertPrice price=$product.price_tax_exc}</span>
-																{/if}
-															</div>
 														</div>
-												{/foreach}
-											{/if}
-										</div>
+														<div class="col-xs-3">
+															{if $product['auto_add_to_cart'] && $product['price_addition_type'] == Product::PRICE_ADDITION_TYPE_INDEPENDENT}
+																<span class="badge badge-info label">{l s='Convenience fee'}</span>
+															{/if}
+															{if $product['auto_add_to_cart'] && $product['price_addition_type'] == Product::PRICE_ADDITION_TYPE_WITH_ROOM}
+																<span class="badge badge-info label">{l s='Auto added'}</span>
+															{/if}
+														</div>
+														<div class="col-xs-4">
+															{if ($product.show_price && !isset($restricted_country_mode)) || isset($groups)}
+																<span class="pull-right">{convertPrice price=$product.price_tax_exc}</span>
+															{/if}
+														</div>
+													</div>
+											{/foreach}
+										{/if}
 									</div>
-									{assign var=roomCount value=1}
-								{/foreach}
+								</div>
 							</div>
 						</div>
 					{/if}

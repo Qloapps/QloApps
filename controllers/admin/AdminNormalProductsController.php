@@ -90,7 +90,7 @@ class AdminNormalProductsControllerCore extends AdminController
         parent::__construct();
 
         $this->imageType = 'jpg';
-        $this->_defaultOrderBy = 'position';
+        $this->_defaultOrderBy = 'id_product';
         $this->max_file_size = (int)(Configuration::get('PS_LIMIT_UPLOAD_FILE_VALUE') * 1000000);
         $this->max_image_size = (int)Configuration::get('PS_PRODUCT_PICTURE_MAX_SIZE');
         $this->allow_export = true;
@@ -99,7 +99,7 @@ class AdminNormalProductsControllerCore extends AdminController
         $this->available_tabs_lang = array(
             'Informations' => $this->l('Information'),
             'Prices' => $this->l('Prices'),
-            'Seo' => $this->l('SEO'),
+            // 'Seo' => $this->l('SEO'),
             'Images' => $this->l('Images'),
             'Associations' => $this->l('Associations'),
         );
@@ -108,7 +108,7 @@ class AdminNormalProductsControllerCore extends AdminController
             $this->available_tabs = array_merge($this->available_tabs, array(
                 'Informations' => 0,
                 'Prices' => 1,
-                'Seo' => 2,
+                // 'Seo' => 2,
                 'Associations' => 3,
                 'Images' => 4,
             ));
@@ -948,7 +948,7 @@ class AdminNormalProductsControllerCore extends AdminController
         $id_groups = Tools::getValue('spm_id_group');
         $id_customers = Tools::getValue('spm_id_customer');
         $prices = Tools::getValue('spm_price');
-        $from_quantities = Tools::getValue('spm_from_quantity');
+        $from_quantities = 1;
         $reductions = Tools::getValue('spm_reduction');
         $reduction_types = Tools::getValue('spm_reduction_type');
         $froms = Tools::getValue('spm_from');
@@ -1939,7 +1939,7 @@ class AdminNormalProductsControllerCore extends AdminController
                         if ($this->isTabSubmitted('Prices')) {
                             // $this->processAdvancedPayment();
                             $this->processPriceAddition();
-                            // $this->processSpecificPricePriorities();
+                            $this->processSpecificPricePriorities();
                         }
                         if ($this->isTabSubmitted('Images')) {
                             $this->processImageLegends();
@@ -2015,6 +2015,20 @@ class AdminNormalProductsControllerCore extends AdminController
         $rules = call_user_func(array($this->className, 'getValidationRules'), $this->className);
         $default_language = new Language((int)Configuration::get('PS_LANG_DEFAULT'));
         $languages = Language::getLanguages(false);
+
+
+        // we have removed seo tab as it is currently not required, but in product object requires link_rewrite
+        // so adding link_rewrite in $_POST
+        if (Configuration::get('PS_FORCE_FRIENDLY_PRODUCT') || !Validate::isLoadedObject($this->object)) {
+            foreach ($languages as $lang) {
+                $_POST['link_rewrite_'.$lang['id_lang']] = Tools::link_rewrite(Tools::getValue('name_'.$lang['id_lang']));
+            }
+        } else {
+            foreach ($languages as $lang) {
+                $_POST['link_rewrite_'.$lang['id_lang']] = $this->object->link_rewrite[$lang['id_lang']];
+            }
+        }
+        // end
 
         // Check required fields
         foreach ($rules['required'] as $field) {
@@ -2855,13 +2869,12 @@ class AdminNormalProductsControllerCore extends AdminController
             $tree = new HelperTreeCategories('associated-categories-tree', 'Associated categories');
             $tree->setTemplate('tree_associated_categories.tpl')
                 ->setHeaderTemplate('tree_associated_header.tpl')
-                ->setRootCategory((int)Configuration::get('PS_PRODUCTS_CATEGORY'))
+                ->setRootCategory((int)Configuration::get('PS_SERVICE_CATEGORY'))
                 ->setUseCheckBox(true)
                 ->setUseSearch(false)
                 ->setFullTree(0)
                 ->setSelectedCategories($categories)
                 ->setUseBulkActions(false);
-                // ->setDisablAllCategories(true);
 
             $data->assign(array('default_category' => $default_category,
                         'selected_cat_ids' => implode(',', array_keys($selected_cat)),

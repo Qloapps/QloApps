@@ -35,7 +35,7 @@
 								{foreach $roomDemand['extra_demands'] as $demand}
 									<tr>
 										<td>{$demand['name']}</td>
-										<td>{displayPrice price=$demand['total_price_tax_incl'] currency=$orderCurrency}</td>
+										<td>{displayPrice price=$demand['total_price_tax_excl'] currency=$orderCurrency}</td>
 										<td><a class="btn btn-danger pull-right del-order-room-demand" href="#" id_booking_demand="{$demand['id_booking_demand']}"><i class="icon-trash"></i></a></td>
 									</tr>
 								{/foreach}
@@ -96,7 +96,7 @@
 						<div class="col-sm-12 room_demand_block">
 							<p>
 								<span>{$demand['name']}</span>
-								<span class="pull-right">{displayPrice price=$demand['total_price_tax_incl'] currency=$orderCurrency}</span>
+								<span class="pull-right">{displayPrice price=$demand['total_price_tax_excl'] currency=$orderCurrency}</span>
 							</p>
 						</div>
 					{/foreach}
