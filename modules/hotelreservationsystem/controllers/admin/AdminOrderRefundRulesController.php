@@ -87,7 +87,7 @@ class AdminOrderRefundRulesController extends ModuleAdminController
                 'callback' => 'setOrderCurrency',
             ),
             'days' => array(
-                'title' => $this->l('Days'),
+                'title' => $this->l('Days Before Check-in'),
                 'align' => 'center',
             )
         );
