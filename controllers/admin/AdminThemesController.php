@@ -2109,6 +2109,7 @@ class AdminThemesControllerCore extends AdminController
             'dashgoals',
             'dashproducts',
             'dashtrends',
+            'dashinsights',
             'dateofdelivery',
             'editorial',
             'favoriteproducts',

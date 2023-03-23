@@ -677,6 +677,7 @@ class InstallModelInstall extends InstallAbstractModel
                 'dashperformance',
                 'dashproducts',
                 'dashgoals',
+                'dashinsights',
                 'graphnvd3',
                 'statsdata',
                 'statsvisits',
