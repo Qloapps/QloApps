@@ -261,8 +261,8 @@
 
 		{* select group accesses *}
 		<div class="form-group">
-			<label class="control-label col-lg-3">
-				<span class="label-tooltip" data-toggle="tooltip" data-html="true" data-original-title="{l s='Select all the groups that you would like to apply to this advanced price rule.' mod='hotelreservationsystem'}">{l s='Group access' mod='hotelreservationsystem'}</span>
+			<label class="control-label required col-lg-3">
+				<span class="label-tooltip required" data-toggle="tooltip" data-html="true" data-original-title="{l s='Select all the groups that you would like to apply to this advanced price rule.' mod='hotelreservationsystem'}">{l s='Group access' mod='hotelreservationsystem'}</span>
 			</label>
 			<div class="col-lg-6">
 				<div class="table-responsive">
@@ -278,7 +278,13 @@
 								{foreach $groups as $group}
 									<tr>
 										<td class="text-center">
-											<input type="checkbox" name="groupBox[]" value="{$group['id_group']|escape:'html':'UTF-8'}" {if isset($feature_price_groups) && $feature_price_groups && $group['id_group']|in_array:$feature_price_groups}checked{/if}/>
+											<input type="checkbox" name="groupBox[]" value="{$group['id_group']|escape:'html':'UTF-8'}"
+												{if isset($feature_price_groups) && $feature_price_groups && $group['id_group']|in_array:$feature_price_groups}
+													checked
+												{elseif empty($objFeaturePrice->id)}
+													checked
+												{/if}
+											/>
 										</td>
 										<td class="text-center">{$group['name']|escape:'html':'UTF-8'}</td>
 									</tr>

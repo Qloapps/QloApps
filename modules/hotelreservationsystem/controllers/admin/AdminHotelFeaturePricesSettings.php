@@ -41,15 +41,19 @@ class AdminHotelFeaturePricesSettingsController extends ModuleAdminController
         $this->_join .= ' LEFT JOIN `'._DB_PREFIX_.'htl_room_type_feature_pricing_lang` fpl ON (a.id_feature_price = fpl.id_feature_price AND fpl.`id_lang` = '.(int) $this->context->language->id.')';
         $this->_join .= ' LEFT JOIN `'._DB_PREFIX_.'htl_room_type` hrt ON (hrt.`id_product` = a.`id_product`)';
         $this->_join .= ' LEFT JOIN `'._DB_PREFIX_.'htl_branch_info_lang` hbl ON (hbl.`id` = hrt.`id_hotel` AND hbl.`id_lang`='.(int) $this->context->language->id.')';
+        $this->_join .= ' LEFT JOIN `'._DB_PREFIX_.'htl_room_type_feature_pricing_group` hrtfpg ON (hrtfpg.`id_feature_price` = a.`id_feature_price`)';
+        $this->_join .= ' LEFT JOIN `'._DB_PREFIX_.'group_lang` gl ON (gl.`id_group` = hrtfpg.`id_group` AND gl.`id_lang` = '.(int) $this->context->language->id.')';
 
         $this->_select .= ' fpl.`feature_price_name` as ftr_price_name, CONCAT(pl.`name`, " (#", a.`id_product`, ")") as product_name, hbl.`hotel_name`, IF(a.impact_type='.(int) HotelRoomTypeFeaturePricing::IMPACT_TYPE_PERCENTAGE.', CONCAT(round(a.impact_value, 2), " ", "%"), a.impact_value) AS impact_value';
         $this->_select .= ' ,IF(a.impact_type='.(int) HotelRoomTypeFeaturePricing::IMPACT_TYPE_PERCENTAGE.', \''.$this->l('Percentage').'\', \''.$this->l('Fixed Amount').'\')
-        AS impact_type';
+        AS impact_type, count(hrtfpg.`id_feature_price`) AS group_access_count, group_concat(gl.`name` separator ", ") as group_names';
         $this->_select .= ', CASE
             WHEN a.`impact_way` = '.(int) HotelRoomTypeFeaturePricing::IMPACT_WAY_DECREASE.' THEN \''.$this->l('Decrease').'\'
             WHEN a.`impact_way` = '.(int) HotelRoomTypeFeaturePricing::IMPACT_WAY_INCREASE.' THEN \''.$this->l('Increase').'\'
             WHEN a.`impact_way` = '.(int) HotelRoomTypeFeaturePricing::IMPACT_WAY_FIX_PRICE.' THEN \''.$this->l('Fix').'\'
         END AS `impact_way`';
+
+        $this->_group = 'GROUP BY a.`id_feature_price`';
 
         $this->_where = ' AND a.`id_cart` = 0 AND a.`id_guest` = 0 AND a.`id_room` = 0';
 
@@ -100,6 +104,13 @@ class AdminHotelFeaturePricesSettingsController extends ModuleAdminController
                 'currency' => true,
                 'callback' => 'setOrderCurrency',
             ),
+            'group_access_count' => array(
+                'align' => 'center',
+                'title' => $this->l('Group Access'),
+                'type' => 'bool',
+                'callback' => 'setGroupAccessLabel',
+                'search' => false,
+            ),
             'date_from' => array(
                 'title' => $this->l('Date From'),
                 'align' => 'center',
@@ -149,10 +160,17 @@ class AdminHotelFeaturePricesSettingsController extends ModuleAdminController
     }
 
     //A callback function for setting currency sign with amount
-    public static function setOrderCurrency($echo, $tr)
+    public static function setOrderCurrency($echo, $row)
     {
         $currency_default = Configuration::get('PS_CURRENCY_DEFAULT');
         return Tools::displayPrice($echo, (int)$currency_default);
+    }
+
+    public function setGroupAccessLabel($echo, $row)
+    {
+        $this->context->smarty->assign('row' ,$row);
+        $tpl_path = 'hotelreservationsystem/views/templates/admin/hotel_feature_prices_settings/group_access_label.tpl';
+        return $this->context->smarty->fetch(_PS_MODULE_DIR_.$tpl_path);
     }
 
     public function initToolbar()
@@ -370,6 +388,9 @@ class AdminHotelFeaturePricesSettingsController extends ModuleAdminController
                 }
             }
 
+            if (!(bool)Tools::getValue('groupBox')) {
+                $this->errors[] = $this->l('Please select at least one group for the group access');
+            }
 
             if (!count($this->errors)) {
                 if ($idFeaturePrice) {
