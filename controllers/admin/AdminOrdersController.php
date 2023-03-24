@@ -181,6 +181,7 @@ class AdminOrdersControllerCore extends AdminController
             $this->access_where = ' WHERE hbd.id_hotel IN ('.implode(',', $acsHtls).')';
         }
 
+
         parent::__construct();
     }
 
@@ -1660,6 +1661,10 @@ class AdminOrdersControllerCore extends AdminController
             $bookingOrderRoomInfo['num_checkin_documents'] = HotelBookingDocument::getCountByIdHtlBooking($bookingOrderRoomInfo['id']);
         }
 
+        $objHotelBookingDetail = new HotelBookingDetail();
+        $htlBookingDetail = $objHotelBookingDetail->getOrderCurrentDataByOrderId($order->id);
+        $isCancelledRoom = in_array(HotelBookingDetail::ORDER_CANCELED, array_column($htlBookingDetail, 'is_cancelled'));
+
         // hotel booking statuses
         $htlOrderStatus = HotelBookingDetail::getAllHotelOrderStatus();
         $this->tpl_view_vars = array(
@@ -1753,6 +1758,8 @@ class AdminOrdersControllerCore extends AdminController
                 'products' => $products,
                 'customer' => $customer)
             ),
+            'orderCancelled' => HotelBookingDetail::ORDER_CANCELED,
+            'isCancelledRoom' => $isCancelledRoom,
         );
 
         return parent::renderView();

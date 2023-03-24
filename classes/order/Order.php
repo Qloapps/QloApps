@@ -2553,8 +2553,8 @@ class OrderCore extends ObjectModel
     // $refundFlag [ORDER_RETURN_STATE_FLAG_REFUNDED || ORDER_RETURN_STATE_FLAG_DENIED]
     public function hasCompletelyRefunded($refundFlag = 0)
     {
+        $objHotelBooking = new HotelBookingdetail();
         if ($refundBookings = OrderReturn::getOrdersReturnDetail($this->id)) {
-            $objHotelBooking = new HotelBookingdetail();
             if ($orderBookings = $objHotelBooking->getOrderCurrentDataByOrderId($this->id)) {
                 if (count($refundBookings) == count($orderBookings)) {
                     if ($refundFlag) {
@@ -2577,6 +2577,12 @@ class OrderCore extends ObjectModel
                     }
                     return true;
                 }
+            }
+        } elseif ($orderBookings = $objHotelBooking->getOrderCurrentDataByOrderId($this->id)) {
+            if (count(array_unique(array_column($orderBookings, 'is_cancelled'))) === 1
+                && array_unique(array_column($orderBookings, 'is_cancelled'))[0] != 0
+            ) {
+                return true;
             }
         }
 

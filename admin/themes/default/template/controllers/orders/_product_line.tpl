@@ -231,6 +231,15 @@
 			{/if}
 		</td>
 	{/if}
+	{if isset($isCancelledRoom) && $isCancelledRoom}
+		<td>
+			{if $data.is_refunded == $orderCancelled}
+				<span class="badge badge-danger">{l s='Cancelled'}</span>
+			{else}
+				<span class="badge badge-success">{l s='Allotted'}</span>
+			{/if}
+		</td>
+	{/if}
 	{if ($can_edit && !$order->hasBeenDelivered())}
 		<td class="product_invoice" style="display: none;">
 		{if sizeof($invoices_collection)}

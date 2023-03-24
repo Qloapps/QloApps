@@ -20,6 +20,9 @@
                         <th class="text-center"><span class="title_box">{l s='Refund State'}</span></th>
                         <th class="text-center"><span class="title_box">{l s='Refunded amount'}</span></th>
                     {/if}
+                    {if isset($isCancelledRoom) && $isCancelledRoom}
+                        <th class="text-center"><span class="title_box">{l s='Room Status'}</span></th>
+                    {/if}
                     {if ($can_edit && !$order->hasBeenDelivered())}
                     <th class="text-center"><span class="title_box">{l s='Edit Order'}</th>
                     {/if}

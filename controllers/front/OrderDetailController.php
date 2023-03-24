@@ -242,7 +242,17 @@ class OrderDetailControllerCore extends FrontController
                     } else {
                         $hasError = 1;
                     }
+                    $res = true;
                     if (!$hasError) {
+                        if ((int)$order->total_paid_real == 0){
+                            foreach ($bookingRefunds as $idHtlBooking) {
+                                $objHtlBooking = new HotelBookingDetail($idHtlBooking);
+                                $objHtlBooking->is_cancelled = HotelBookingDetail::ORDER_CANCELLED;
+                                $objHtlBooking->save();
+
+                            }
+                        }
+
                         $objOrderReturn = new OrderReturn();
                         $objOrderReturn->id_customer = $order->id_customer;
                         $objOrderReturn->id_order = $order->id;
@@ -401,6 +411,8 @@ class OrderDetailControllerCore extends FrontController
                                             $anyBackOrder = 1;
                                         }
                                     }
+
+                                    $cartHotelData[$type_key]['date_diff'][$date_join]['is_refunded'] = $data_v['is_refunded'];
 
                                     $cartHotelData[$type_key]['date_diff'][$date_join]['ids_htl_booking_detail'][] = $data_v['id'];
 
@@ -575,6 +587,11 @@ class OrderDetailControllerCore extends FrontController
 
                         $redirectTermsLink = $this->context->link->getCMSLink(new CMS(3, $this->context->language->id), null, $this->context->language->id);
                     }
+
+                    $objHotelBookingDetail = new HotelBookingDetail();
+                    $htlBookingDetail = $objHotelBookingDetail->getOrderCurrentDataByOrderId($order->id);
+                    $isCancelledRoom = in_array(HotelBookingDetail::ORDER_CANCELLED, array_column($htlBookingDetail, 'is_cancelled'));
+
                     $this->context->smarty->assign(
                         array(
                             'id_cms_refund_policy' => Configuration::get('WK_GLOBAL_REFUND_POLICY_CMS'),
@@ -590,6 +607,8 @@ class OrderDetailControllerCore extends FrontController
                             'cart_htl_data' => $cartHotelData,
                             'cart_service_products' => $cartServiceProducts,
                             'non_requested_rooms' => $nonRequestedRooms,
+                            'orderCancelled' => HotelBookingDetail::ORDER_CANCELLED,
+                            'isCancelledRoom' => $isCancelledRoom,
                         )
                     );
                 // }
@@ -599,16 +618,11 @@ class OrderDetailControllerCore extends FrontController
                 if ($refundReqBookings = $objOrderReturn->getOrderRefundRequestedBookings($order->id, 0, 1)) {
                     $refundedAmount = $objOrderReturn->getRefundedAmount($order->id);
                 }
-                $isRefundAllowed = (int)$order->isReturnable();
-                if ($isRefundAllowed) {
-                    $allowedOrderStatus = explode(',' ,Configuration::get('WK_ALLOW_ORDER_STATUS_TO_REFUND'));
-                    $isRefundAllowed = $isRefundAllowed && in_array($order->current_state, $allowedOrderStatus);
-                }
                 $this->context->smarty->assign(
                     array(
                         'hasOrderPaid' => $order->hasBeenPaid(),
                         // refund info
-                        'refund_allowed' => $isRefundAllowed,
+                        'refund_allowed' => (int) $order->isReturnable(),
                         'returns' => OrderReturn::getOrdersReturn($order->id_customer, $order->id),
                         'refundReqBookings' => $refundReqBookings,
                         'hasCompletelyRefunded' => $order->hasCompletelyRefunded(),

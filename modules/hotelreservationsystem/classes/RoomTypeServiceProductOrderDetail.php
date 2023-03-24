@@ -202,7 +202,9 @@ class RoomTypeServiceProductOrderDetail extends ObjectModel
         }
         $sql .= ' FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
             LEFT JOIN `'._DB_PREFIX_.'htl_room_type_service_product_order_detail` rsod ON(rsod.`id_htl_booking_detail` = hbd.`id`)';
+
         $sql .= ' LEFT JOIN `'._DB_PREFIX_.'order_detail` od ON(od.`product_id` = rsod.`id_product`)';
+
         $sql .= ' WHERE hbd.`id` = '.(int)$idHotelBookingDetail;
 
         if ($getTotalPrice) {

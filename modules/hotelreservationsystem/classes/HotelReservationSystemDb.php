@@ -174,6 +174,7 @@ class HotelReservationSystemDb
                 `children` smallint(6) NOT NULL DEFAULT '0',
                 `child_ages` text NOT NULL,
                 `is_refunded` tinyint(1) NOT NULL DEFAULT '0',
+                `is_cancelled` tinyint(1) NOT NULL DEFAULT '0',
                 -- `available_for_order` tinyint(1) NOT NULL DEFAULT '0',
                 `date_add` datetime NOT NULL,
                 `date_upd` datetime NOT NULL,

@@ -44,6 +44,7 @@ class HotelBookingDetail extends ObjectModel
     public $is_back_order;
     public $id_status;
     public $is_refunded;
+    public $is_cancelled;
     // public $available_for_order;
 
     // hotel information/location/contact
@@ -72,6 +73,8 @@ class HotelBookingDetail extends ObjectModel
     // booking allotment types
     const ALLOTMENT_AUTO = 1;
     const ALLOTMENT_MANUAL = 2;
+
+    const ORDER_CANCELLED = 1;
 
     // Search algorithm: Exact room types reults, All room types
     const SEARCH_EXACT_ROOM_TYPE_ALGO = 1;
@@ -107,6 +110,7 @@ class HotelBookingDetail extends ObjectModel
             'total_price_tax_incl' => array('type' => self::TYPE_FLOAT, 'validate' => 'isPrice', 'required' => true),
             'total_paid_amount' => array('type' => self::TYPE_FLOAT, 'validate' => 'isPrice', 'default' => 0, 'required' => true),
             'is_refunded' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
+            'is_cancelled' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
             // 'available_for_order' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
             'is_back_order' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
 
