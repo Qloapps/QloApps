@@ -1525,37 +1525,39 @@
 			extra_demand_price = formatCurrency(extra_demand_price, currency_format, currency_sign, currency_blank);
 			$(this).closest('.room_demand_block').find('.extra_demand_option_price').text(extra_demand_price);
 			var roomDemands = [];
-			// get the selected extra demands by customer
-			$(this).closest('.room_demand_detail').find('input:checkbox.id_room_type_demand:checked').each(function () {
-				roomDemands.push({
-					'id_global_demand':$(this).val(),
-					'id_option': $(this).closest('.room_demand_block').find('.id_option').val()
+			if ($(this).closest('.room_demand_block').find('input:checkbox.id_room_type_demand').is(':checked')) {
+				// get the selected extra demands by customer
+				$(this).closest('.room_demand_detail').find('input:checkbox.id_room_type_demand:checked').each(function () {
+					roomDemands.push({
+						'id_global_demand':$(this).val(),
+						'id_option': $(this).closest('.room_demand_block').find('.id_option').val()
+					});
 				});
-			});
-			var idBookingCart = $(this).closest('.room_demand_block').find('.id_room_type_demand').attr('id_cart_booking');
-			$.ajax({
-				type: 'POST',
-				dataType: 'JSON',
-				headers: {
-					"cache-control": "no-cache"
-				},
-				url: "{$link->getAdminLink('AdminCarts')|addslashes}",
-				dataType: 'JSON',
-				cache: false,
-				data: {
-					id_cart_booking: idBookingCart,
-					room_demands: JSON.stringify(roomDemands),
-					action: 'changeRoomDemands',
-					ajax: true
-				},
-				success: function(response) {
-					if (response.status) {
-						showSuccessMessage(txtExtraDemandSucc);
-					} else {
-						showErrorMessage(txtExtraDemandErr);
+				var idBookingCart = $(this).closest('.room_demand_block').find('.id_room_type_demand').attr('id_cart_booking');
+				$.ajax({
+					type: 'POST',
+					dataType: 'JSON',
+					headers: {
+						"cache-control": "no-cache"
+					},
+					url: "{$link->getAdminLink('AdminCarts')|addslashes}",
+					dataType: 'JSON',
+					cache: false,
+					data: {
+						id_cart_booking: idBookingCart,
+						room_demands: JSON.stringify(roomDemands),
+						action: 'changeRoomDemands',
+						ajax: true
+					},
+					success: function(response) {
+						if (response.status) {
+							showSuccessMessage(txtExtraDemandSucc);
+						} else {
+							showErrorMessage(txtExtraDemandErr);
+						}
 					}
-				}
-			});
+				});
+			}
 		});
 
 		$(document).on('click', '.change_room_type_service_product', function() {
