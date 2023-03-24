@@ -182,14 +182,14 @@
 	<td class="text-center">
 		<span class="extra_service_show">
 			{convertPriceWithCurrency price=($data['extra_demands_price_te'] + $data['additional_services_price_te'] + $data['convenience_fee_te'] + $data['additional_services_price_auto_add_te']) currency=$currency->id}
-			{if (isset($data['extra_demands']) && $data['extra_demands']) || (isset($data['additional_services']) && $data['additional_services'])}
-				<a href="#" data-toggle="modal" data-target="#rooms_type_extra_demands" date_from="{$data['date_from']}" date_to="{$data['date_to']}" id_product="{$data['id_product']}" id_room="{$data['id_room']}" id_order="{$order->id}" class="open_room_extra_services" id_htl_booking="{$data['id']}" edit_orde_line="0">
+			{if ($data['extra_demands_price_te'] + $data['additional_services_price_te'] + $data['convenience_fee_te'] + $data['additional_services_price_auto_add_te']) > 0}
+				<a href="#" data-toggle="modal" data-target="#rooms_type_extra_demands" date_from="{$data['date_from']}" date_to="{$data['date_to']}" id_product="{$data['id_product']}" id_room="{$data['id_room']}" id_order="{$order->id}" class="open_room_extra_services" id_htl_booking="{$data['id']}">
 					<i class="icon icon-lg icon-info-circle"></i>
 				</a>
 			{/if}
 		</span>
 		<span class="extra_service_edit" style="display: none;">
-			<a href="#" data-toggle="modal" data-target="#rooms_type_extra_demands" date_from="{$data['date_from']}" date_to="{$data['date_to']}" id_product="{$data['id_product']}" id_room="{$data['id_room']}" id_order="{$order->id}" class="open_room_extra_services" id_htl_booking="{$data['id']}" edit_orde_line="0">
+			<a href="#" data-toggle="modal" data-target="#rooms_type_extra_demands" date_from="{$data['date_from']}" date_to="{$data['date_to']}" id_product="{$data['id_product']}" id_room="{$data['id_room']}" id_order="{$order->id}" class="open_room_extra_services" id_htl_booking="{$data['id']}">
 				{convertPriceWithCurrency price=($data['extra_demands_price_te'] + $data['additional_services_price_te'] + $data['convenience_fee_te'] + $data['additional_services_price_auto_add_te']) currency=$currency->id}
 			</a>
 		</span>

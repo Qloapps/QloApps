@@ -422,7 +422,6 @@ $(document).ready(function()
 	});
 
 	$(document).on('change', '.demand_adv_option_block .id_option', function(e) {
-		debugger
         var option_selected = $(this).find('option:selected');
 		var extra_demand_price = option_selected.attr("optionPrice")
         extra_demand_price = parseFloat(extra_demand_price);

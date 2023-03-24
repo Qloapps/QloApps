@@ -31,7 +31,8 @@
 					<thead>
 						<tr>
 							<th>{l s='Name'}</th>
-							<th>{l s='Price'}</th>
+							<th>{l s='Unit price'}</th>
+							<th>{l s='Total price'}</th>
 							<th class="text-right">{l s='Action'}</th>
 						</tr>
 					</thead>
@@ -41,6 +42,12 @@
 							{foreach $roomDemand['extra_demands'] as $demand}
 								<tr>
 									<td>{$demand['name']}</td>
+									<td>
+										{displayPrice price=$demand['unit_price_tax_excl'] currency=$orderCurrency}
+										{if $demand['price_calc_method'] == HotelRoomTypeGlobalDemand::WK_PRICE_CALC_METHOD_EACH_DAY}
+											{l s='/ day'}
+										{/if}
+									</td>
 									<td>{displayPrice price=$demand['total_price_tax_excl'] currency=$orderCurrency}</td>
 									<td><a class="btn btn-danger pull-right del-order-room-demand" href="#" id_booking_demand="{$demand['id_booking_demand']}"><i class="icon-trash"></i></a></td>
 								</tr>
@@ -96,7 +103,12 @@
 										{/if}
 									</td>
 									<td class="text-right">
-										<span class="extra_demand_option_price">{if isset($selected_adv_option) && isset($demand['adv_option'][$selected_adv_option]['price'])}{convertPrice price = $demand['adv_option'][$selected_adv_option]['price']|escape:'html':'UTF-8'}{else}{convertPrice price = $demand['price']|escape:'html':'UTF-8'}{/if}</span>
+										<span class="extra_demand_option_price">
+											{if isset($selected_adv_option) && isset($demand['adv_option'][$selected_adv_option]['price'])}{convertPrice price = $demand['adv_option'][$selected_adv_option]['price']|escape:'html':'UTF-8'}{else}{convertPrice price = $demand['price']|escape:'html':'UTF-8'}{/if}
+										</span>
+										{if $demand['price_calc_method'] == HotelRoomTypeGlobalDemand::WK_PRICE_CALC_METHOD_EACH_DAY}
+											{l s='/ day'}
+										{/if}
 									</td>
 								</tr>
 							{/foreach}
@@ -115,14 +127,21 @@
 					<thead>
 						<tr>
 							<th>{l s='Name'}</th>
-							<th>{l s='Price'}</th>
+							<th>{l s='Unit price'}</th>
+							<th class="text-right">{l s='Total price'}</th>
 						</tr>
 					</thead>
 					<tbody>
 						{foreach $roomDemand['extra_demands'] as $demand}
 							<tr class="room_demand_block">
 								<td>{$demand['name']}</td>
-								<td>{displayPrice price=$demand['total_price_tax_excl'] currency=$orderCurrency}</td>
+								<td>
+									{displayPrice price=$demand['unit_price_tax_excl'] currency=$orderCurrency}
+									{if $demand['price_calc_method'] == HotelRoomTypeGlobalDemand::WK_PRICE_CALC_METHOD_EACH_DAY}
+										{l s='/ day'}
+									{/if}
+								</td>
+								<td class="text-right">{displayPrice price=$demand['total_price_tax_excl'] currency=$orderCurrency}</td>
 							</tr>
 						{/foreach}
 					</tbody>

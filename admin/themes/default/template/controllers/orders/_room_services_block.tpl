@@ -31,9 +31,9 @@
 				<thead>
 					<tr>
 						<th>{l s='Name'}</th>
-						<th>{l s='Quantity'}</th>
+						<th></th>
+						<th class="fixed-width-md">{l s='Quantity'}</th>
 						<th>{l s='Price'}</th>
-						<th class="text-center">{l s='Options'}</th>
 						<th class="text-right">{l s='Action'}</th>
 					</tr>
 				</thead>
@@ -44,22 +44,24 @@
 								<td>
 									<div>{$service['name']|escape:'html':'UTF-8'}</div>
 								</td>
+								<td class="text-center">
+									{if $service['product_auto_add'] && $service['product_price_addition_type'] == Product::PRICE_ADDITION_TYPE_WITH_ROOM}
+										<span class="badge badge-info label">{l s='Auto added'}</span><br>
+									{/if}
+									{if $service['product_auto_add'] && $service['product_price_addition_type'] == Product::PRICE_ADDITION_TYPE_INDEPENDENT}
+										<span class="badge badge-info label">{l s='Convenience fee'}</span>
+									{/if}
+								</td>
 								<td>
 									{if $service['allow_multiple_quantity']}
 										<div class="qty_container">
 											<input type="number" class="form-control qty" min="1" data-id_room_type_service_product_order_detail="{$service['id_room_type_service_product_order_detail']}" data-id_product="{$service['id_product']|escape:'html':'UTF-8'}" value="{$service['quantity']|escape:'html':'UTF-8'}">
 										</div>
+									{else}
+										--
 									{/if}
 								</td>
 								<td>{displayPrice price=$service['total_price_tax_excl']|escape:'html':'UTF-8' currency=$orderCurrency}</td>
-								<td class="text-center">
-									{if $service['product_auto_add'] && $service['product_price_addition_type'] == Product::PRICE_ADDITION_TYPE_INDEPENDENT}
-										<span class="badge badge-info label">{l s='Convenience fee'}</span>
-									{/if}
-									{if $service['product_auto_add'] && $service['product_price_addition_type'] == Product::PRICE_ADDITION_TYPE_WITH_ROOM}
-										<span class="badge badge-info label">{l s='Auto added'}</span>
-									{/if}
-								</td>
 								<td><a class="btn btn-danger pull-right del_room_additional_service" data-id_room_type_service_product_order_detail="{$service['id_room_type_service_product_order_detail']}" href="#"><i class="icon-trash"></i></a></td>
 							</tr>
 						{/foreach}
@@ -81,7 +83,8 @@
 							<tr>
 								<th></th>
 								<th>{l s='Name'}</th>
-								<th>{l s='Quantity'}</th>
+								<th></th>
+								<th class="fixed-width-md">{l s='Quantity'}</th>
 								<th class="text-right">{l s='Price'}</th>
 							</tr>
 						</thead>
@@ -93,6 +96,14 @@
 									</td>
 									<td>
 										{$product['name']|escape:'html':'UTF-8'}
+									</td>
+									<td class="text-center">
+										{if $product['auto_add_to_cart'] && $product['price_addition_type'] == Product::PRICE_ADDITION_TYPE_WITH_ROOM}
+											<span class="badge badge-info label">{l s='Auto added'}</span><br>
+										{/if}
+										{if $product['auto_add_to_cart'] && $product['price_addition_type'] == Product::PRICE_ADDITION_TYPE_INDEPENDENT}
+											<span class="badge badge-info label">{l s='Convenience fee'}</span>
+										{/if}
 									</td>
 									<td>
 										{if $product.allow_multiple_quantity}
@@ -124,8 +135,8 @@
 				<tr>
 					<th>{l s='ID'}</th>
 					<th>{l s='Name'}</th>
-					<th class="text-center">{l s='Options'}</th>
-					<th>{l s='Price'}</th>
+					<th></th>
+					<th class="text-right">{l s='Total Price'}</th>
 				</tr>
 			</thead>
 			</tbody>
@@ -143,7 +154,7 @@
 								<span class="badge badge-info label">{l s='Auto added'}</span>
 							{/if}
 						</td>
-						<td>
+						<td class="text-right">
 							{displayPrice price=$service['total_price_tax_excl'] currency=$orderCurrency}
 						</td>
 					</tr>

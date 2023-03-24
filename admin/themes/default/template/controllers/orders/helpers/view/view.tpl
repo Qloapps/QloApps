@@ -1754,7 +1754,7 @@
 			if (qty_wntd == '' || !$.isNumeric(qty_wntd) || qty_wntd < 1) {
 				$(this).val(1);
 			}
-			updateServiceProducts($(this));
+			updateAdditionalServices($(this));
 		});
 
 		$(document).on('focusout', '#rooms_type_extra_demands #add_room_services_form .qty', function(e) {
@@ -1764,7 +1764,7 @@
 			}
 		});
 
-		function updateServiceProducts(element)
+		function updateAdditionalServices(element)
 		{
 			var id_room_type_service_product_order_detail = $(element).data('id_room_type_service_product_order_detail');
 			var qty = $(element).val();
@@ -1785,6 +1785,9 @@
 					},
 					success: function(jsonData) {
 						if (!jsonData.hasError) {
+							if (jsonData.service_panel) {
+								$('#room_type_service_product_desc').replaceWith(jsonData.service_panel);
+							}
 							showSuccessMessage(txtExtraDemandSucc);
 						} else {
 							showErrorMessage(jsonData.errors);
@@ -1931,12 +1934,14 @@
 						},
 						success: function(jsonData) {
 							if (!jsonData.hasError) {
-							$('#room_type_service_product_desc').replaceWith(jsonData.service_panel);
-							showSuccessMessage(txtExtraDemandSucc);
-						} else {
-							showErrorMessage(jsonData.errors);
+								if (jsonData.service_panel) {
+									$('#room_type_service_product_desc').replaceWith(jsonData.service_panel);
+								}
+								showSuccessMessage(txtExtraDemandSucc);
+							} else {
+								showErrorMessage(jsonData.errors);
 
-						}
+							}
 						}
 					});
 				} else {
