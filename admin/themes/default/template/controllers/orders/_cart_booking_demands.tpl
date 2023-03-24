@@ -70,7 +70,7 @@
 																			<select class="id_option">
 																				{foreach $demand['adv_option'] as $idOption => $option}
 																					{assign var=demand_key value="`$idGlobalDemand`-`$idOption`"}
-																					<option optionPrice="{$option['price']|escape:'html':'UTF-8'}" value="{$idOption|escape:'html':'UTF-8'}" {if isset($roomDemand['extra_demands'][$demand_key])}selected{/if} key="{$demand_key}">{$option['name']}</option>
+																					<option optionPrice="{$option['price_tax_excl']|escape:'html':'UTF-8'}" value="{$idOption|escape:'html':'UTF-8'}" {if isset($roomDemand['extra_demands'][$demand_key])}selected{/if} key="{$demand_key}">{$option['name']}</option>
 																					{if isset($roomDemand['extra_demands'][$demand_key])}
 																						{assign var=selected_adv_option value="$idOption"}
 																					{/if}
@@ -85,10 +85,10 @@
 															<div class="col-xs-6">
 																<p class="pull-right">
 																	<span class="extra_demand_option_price">
-																		{if isset($selected_adv_option) && isset($demand['adv_option'][$selected_adv_option]['price'])}{convertPrice price = $demand['adv_option'][$selected_adv_option]['price']|escape:'html':'UTF-8'}{else}{convertPrice price = $demand['price']|escape:'html':'UTF-8'}{/if}
+																		{if isset($selected_adv_option) && isset($demand['adv_option'][$selected_adv_option]['price_tax_excl'])}{convertPrice price = $demand['adv_option'][$selected_adv_option]['price_tax_excl']|escape:'html':'UTF-8'}{else if isset($demand['adv_option']) && $demand['adv_option']}{convertPrice price = $demand['adv_option'][$demand['adv_option']|@key]['price_tax_excl']}{else}{convertPrice price = $demand['price_tax_excl']|escape:'html':'UTF-8'}{/if}
 																	</span>
 																	{if $demand['price_calc_method'] == HotelRoomTypeGlobalDemand::WK_PRICE_CALC_METHOD_EACH_DAY}
-																		{l s='/ day'}
+																		{l s='/ night'}
 																	{/if}
 																</p>
 															</div>
