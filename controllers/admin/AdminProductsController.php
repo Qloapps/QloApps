@@ -2778,8 +2778,6 @@ class AdminProductsControllerCore extends AdminController
                             'product' => $obj,
                             'htl_info' => $hotelInfo,
                             'rm_status' => $roomStatus,
-                            'datesMissing' => $this->l('Some dates are missing. Please select all the date ranges.'),
-                            'datesOverlapping' => $this->l('Some dates are conflicting with each other. Please check and reselect the date ranges.'),
                         )
                     );
                 } else {
@@ -2845,6 +2843,7 @@ class AdminProductsControllerCore extends AdminController
                     );
                     $serviceProduct['id_product'] = $product->id;
                     $serviceProduct['name'] = $product->name;
+                    $serviceProduct['auto_add_to_cart'] = $product->auto_add_to_cart;
                     $serviceProduct['category'] = $product->category;
                     $serviceProduct['default_price'] = $product->price;
                     $serviceProduct['id_tax_rules_group'] = $product->id_tax_rules_group;
@@ -2873,7 +2872,6 @@ class AdminProductsControllerCore extends AdminController
                         $serviceProduct['default_tax_rules_group_name'] = $objTaxRuleGroup->name;
                     }
                 }
-
                 $data->assign(array(
                     'product' => $obj,
                     'currency' => $this->context->currency,
@@ -3117,7 +3115,7 @@ class AdminProductsControllerCore extends AdminController
         }
     }
 
-    public function validateDisableDateRanges($disableDates, $index)
+    public function validateDisableDateRanges($disableDates, $index, $idRoom)
     {
         if (count($disableDates)) {
             foreach ($disableDates as $disable_key => $disableDate) {
@@ -3134,6 +3132,7 @@ class AdminProductsControllerCore extends AdminController
                         $index
                     );
                 } else {
+                    $objHotelBookingDetail = new HotelBookingDetail();
                     foreach ($disableDates as $key => $disDate) {
                         if ($key != $disable_key) {
                             if ((($disableDate['date_from'] < $disDate['date_from']) && ($disableDate['date_to'] <= $disDate['date_from'])) || (($disableDate['date_from'] > $disDate['date_from']) && ($disableDate['date_from'] >= $disDate['date_to']))) {
@@ -3145,6 +3144,13 @@ class AdminProductsControllerCore extends AdminController
                                 );
                             }
                         }
+						// check if room has booking for current date range
+						if ($objHotelBookingDetail->chechRoomBooked($idRoom, $disDate['date_from'], $disDate['date_to'])) {
+							$this->errors[] = sprintf(
+								Tools::displayError('The %s room already has bookings for selected disable dates. Please reselect disable dates.'),
+								$index
+							);
+						}
                     }
                 }
             }
@@ -3242,7 +3248,7 @@ class AdminProductsControllerCore extends AdminController
                 if ($roomInfo['id_status'] == HotelRoomInformation::STATUS_TEMPORARY_INACTIVE) {
                     $disableDates = json_decode($roomInfo['disable_dates_json'], true);
                     if ($roomInfo['disable_dates_json'] !== 0) {
-                        $this->validateDisableDateRanges($disableDates, $index);
+                        $this->validateDisableDateRanges($disableDates, $index, $roomInfo['id']);
                     }
                 }
             }
@@ -4629,6 +4635,79 @@ class AdminProductsControllerCore extends AdminController
             $response['id_hotel'] = (int)$roomTypeInfo['id_hotel'];
         }
         die(json_encode($response));
+    }
+
+    public function ajaxProcessValidateDisableDates()
+    {
+        $response = array('status' => false);
+
+        $idRoom = (int) Tools::getValue('id_room');
+        $disableDates = Tools::getValue('disable_dates');
+
+        $rowsToHighlight = array();
+        $bookedRows = array();
+        if (is_array($disableDates) && count($disableDates)) {
+            foreach ($disableDates as $key => $dateRange) {
+                if (!Validate::isDate($dateRange['date_from']) || !Validate::isDate($dateRange['date_to'])) {
+                    $this->errors[] = $this->l('Some dates are missing. Please select all the date ranges.');
+                    $rowsToHighlight[] = $key;
+                }
+            }
+
+            if (!count($this->errors)) {
+                foreach ($disableDates as $keyOuter => $dateRangeOuter) {
+                    foreach ($disableDates as $keyInner => $dateRangeInner) {
+                        if ($keyInner != $keyOuter) {
+                            if ((($dateRangeOuter['date_from'] >= $dateRangeInner['date_from']) && ($dateRangeOuter['date_from'] < $dateRangeInner['date_to']))
+                                || (($dateRangeInner['date_from'] >= $dateRangeOuter['date_from']) && ($dateRangeInner['date_from'] < $dateRangeOuter['date_to']))
+                            ) {
+                                $this->errors[] = $this->l('Some dates are conflicting with each other. Please check and reselect the date ranges.');
+                                $rowsToHighlight[] = $keyOuter;
+                                $rowsToHighlight[] = $keyInner;
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (!count($this->errors)) {
+                if ($idRoom) {
+                    $objHotelBookingDetail = new HotelBookingDetail();
+                    foreach ($disableDates as $key => $dateRange) {
+                        if ($bookingRow = $objHotelBookingDetail->chechRoomBooked($idRoom, $dateRange['date_from'], $dateRange['date_to'])) {
+                            $bookedRows[] = new HotelBookingDetail($bookingRow['id']);
+                            $rowsToHighlight[] = $key;
+                        }
+                    }
+                }
+            }
+        }
+
+        if (count($bookedRows)) {
+            $this->context->smarty->assign(array(
+                'link' => $this->context->link,
+                'booked_rows_list' => $bookedRows,
+            ));
+
+            $this->errors[] = $this->context->smarty->fetch('controllers/products/booked_room_date_ranges_list.tpl');
+        }
+
+        $this->errors = array_unique($this->errors);
+        $rowsToHighlight = array_values(array_unique($rowsToHighlight));
+
+        if (!count($this->errors)) {
+            $response['status'] = true;
+        } else {
+            $this->context->smarty->assign(array(
+                'errors' => $this->errors,
+            ));
+
+            $response['errors'] = $this->context->smarty->fetch('alerts.tpl');
+            $response['rows_to_highlight'] = $rowsToHighlight;
+            $response['status'] = false;
+        }
+
+        $this->ajaxDie(json_encode($response));
     }
 
     public function processImageLegends()

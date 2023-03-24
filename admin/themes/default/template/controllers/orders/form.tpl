@@ -925,24 +925,6 @@
 		}
 	}
 
-	// commented by webkul to enable button in case of ordering virtual product
-	function checkVirtualProduct(products, delivery_option_list) {
-		if (delivery_option_list.length == 0 && products.length > 0) {
-			var find = 1;
-			$.each(products, function () {
-				if (find == 1) {
-					this.is_virtual == 1 ? find = 1 : find = 0;
-				}
-			});
-			if (find == 1) {
-				$("button[name=\"submitAddOrder\"]").removeAttr("disabled");
-			}
-			else {
-				$("button[name=\"submitAddOrder\"]").attr("disabled", "disabled");
-			}
-		}
-	}
-
 	function searchProducts()
 	{
 		$('#products_part').show();
@@ -1157,7 +1139,6 @@
 		}
 
 		updateDeliveryOptionList(jsonSummary.delivery_option_list);
-		checkVirtualProduct(jsonSummary.summary.products,jsonSummary.delivery_option_list);
 
 		if (jsonSummary.cart.gift == 1) {
 			$('#order_gift').attr('checked', true);

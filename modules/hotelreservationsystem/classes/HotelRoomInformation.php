@@ -76,7 +76,7 @@ class HotelRoomInformation extends ObjectModel
     {
         if ($idRoom = $this->id) {
             // delete rooms from cart which are set inactive
-            if ($this->id_status == 2) {
+            if ($this->id_status == self::STATUS_INACTIVE) {
                 $objCartBookingData = new HotelCartBookingData();
                 if (!$objCartBookingData->deleteCartBookingData(0, 0, $idRoom)) {
                     return false;

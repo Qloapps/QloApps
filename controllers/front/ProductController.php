@@ -305,10 +305,6 @@ class ProductControllerCore extends FrontController
                     $htl_features = array();
                 $obj_hotel_room_type = new HotelRoomType();
                 $room_info_by_product_id = $obj_hotel_room_type->getRoomTypeInfoByIdProduct($this->product->id);
-                $productCapacity = array();
-                $productCapacity['adults'] = $room_info_by_product_id['adults'];
-                $productCapacity['children'] = $room_info_by_product_id['children'];
-                $this->product->capacity = $productCapacity;
                 if ($hotel_id = $room_info_by_product_id['id_hotel']) {
                     $obj_hotel_branch = new HotelBranchInformation();
                     $hotel_info_by_id = $obj_hotel_branch->hotelBranchesInfo(false, 2, 1, $hotel_id);

@@ -47,4 +47,17 @@ $(document).ready(function()
 		if (menu_cont.hasClass("menu_cont_left"))
 			menu_cont.removeClass("menu_cont_left").addClass("menu_cont_right");
 	});
+
+	$(document).on('click', function(e) {
+		const navigationMenu = $('#menu_cont');
+		if (navigationMenu.length) {
+			if (!($(e.target).closest('#menu_cont').length
+				|| $(e.target).closest('.header-top .header-top-menu .nav_toggle').length
+			)) {
+				if (navigationMenu.hasClass('menu_cont_left')) {
+					navigationMenu.removeClass('menu_cont_left').addClass('menu_cont_right');
+				}
+			}
+		}
+	});
 });

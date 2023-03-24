@@ -199,6 +199,13 @@
 								<label for="company">{l s='Company'}{if in_array($field_name, $required_fields)} <sup>*</sup>{/if}</label>
 								<input type="text" class="form-control" id="company" name="company" value="{if isset($smarty.post.company)}{$smarty.post.company}{/if}" />
 							</div>
+						{elseif $field_name eq "vat_number"}
+							<div id="vat_number" style="display:none;">
+								<div class="form-group">
+									<label for="vat-number">{l s='VAT number'}{if in_array($field_name, $required_fields)} <sup>*</sup>{/if}</label>
+									<input id="vat-number" type="text" class="form-control" name="vat_number" value="{if isset($smarty.post.vat_number)}{$smarty.post.vat_number}{/if}" />
+								</div>
+							</div>
 						{elseif $field_name eq "dni"}
 							{assign var='dniExist' value=true}
 							<div class="required dni form-group">
@@ -290,6 +297,13 @@
 							<label for="company_invoice">{l s='Company'}{if in_array($field_name, $required_fields)} <sup>*</sup>{/if}</label>
 							<input type="text" class="text form-control" id="company_invoice" name="company_invoice" value="{if isset($smarty.post.company_invoice) && $smarty.post.company_invoice}{$smarty.post.company_invoice}{/if}" />
 						</div>
+						{elseif $field_name eq "vat_number"}
+							<div id="vat_number_block_invoice" style="display:none;">
+								<div class="form-group">
+									<label for="vat_number_invoice">{l s='VAT number'}{if in_array($field_name, $required_fields)} <sup>*</sup>{/if}</label>
+									<input type="text" class="form-control" id="vat_number_invoice" name="vat_number_invoice" value="{if isset($smarty.post.vat_number_invoice) && $smarty.post.vat_number_invoice}{$smarty.post.vat_number_invoice}{/if}" />
+								</div>
+							</div>
 						{elseif $field_name eq "dni"}
 						{assign var=dniExist value=true}
 						<div class="required form-group dni_invoice">
@@ -544,6 +558,13 @@
 								<input type="text" class="form-control" id="company" name="company" value="{if isset($smarty.post.company)}{$smarty.post.company}{/if}" />
 							</p>
 						{/if}
+					{elseif $field_name eq "vat_number"}
+						<div id="vat_number" style="display:none;">
+							<p class="form-group">
+								<label for="vat_number">{l s='VAT number'}{if in_array($field_name, $required_fields)} <sup>*</sup>{/if}</label>
+								<input type="text" class="form-control" id="vat_number" name="vat_number" value="{if isset($smarty.post.vat_number)}{$smarty.post.vat_number}{/if}" />
+							</p>
+						</div>
 					{elseif $field_name eq "firstname"}
 						<p class="required form-group">
 							<label for="firstname">{l s='First name'} <sup>*</sup></label>

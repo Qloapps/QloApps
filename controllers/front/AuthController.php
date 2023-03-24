@@ -47,6 +47,7 @@ class AuthControllerCore extends FrontController
         $this->confirmations = array();
         $this->informations = array();
         $this->errors = array();
+        $this->ajaxExtraData = array();
 
         if (!Tools::getIsset('step') && $this->context->customer->isLogged() && !$this->ajax) {
             Tools::redirect('index.php?controller='.(($this->authRedirection !== false) ? urlencode($this->authRedirection) : 'my-account'));
