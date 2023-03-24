@@ -3785,7 +3785,20 @@ class CartCore extends ObjectModel
             }
         }
 
+        $discountedProducts = array();
         foreach ($cart_rules as $key => &$cart_rule) {
+            $product_rule_groups = $cart_rule['obj']->getProductRuleGroups();
+            foreach ($product_rule_groups as $id_product_rule_group => $product_rule_group) {
+                if (isset($product_rule_group['product_rules']) && $product_rule_group['product_rules']) {
+                    foreach($product_rule_group['product_rules'] as $rule_products) {
+                        if ($rule_products['type'] == 'products') {
+                            $discountedProducts = array_merge($discountedProducts, $rule_products['values']);
+                        }
+                    }
+
+                }
+            }
+
             if (((float)$cart_rule['value_real'] == 0 && (int)$cart_rule['free_shipping'] == 0)) {
                 unset($cart_rules[$key]);
             }
@@ -3825,6 +3838,7 @@ class CartCore extends ObjectModel
             'total_price' => $base_total_tax_inc,
             'total_tax' => $total_tax,
             'total_price_without_tax' => $base_total_tax_exc,
+            'discounted_products' => $discountedProducts,
             'is_multi_address_delivery' => $this->isMultiAddressDelivery() || ((int)Tools::getValue('multi-shipping') == 1),
             'free_ship' =>!$total_shipping && !count($this->getDeliveryAddressesWithoutCarriers(true, $errors)),
             'carrier' => new Carrier($this->id_carrier, $id_lang),

@@ -62,8 +62,6 @@ class ProductControllerCore extends FrontController
         $this->addCSS(_THEME_CSS_DIR_.'occupancy.css');
         $this->addJS(_THEME_JS_DIR_.'occupancy.js');
 
-        $this->addJqueryUI('ui.tooltip', 'base', true);
-
         if (Configuration::get('PS_DISPLAY_JQZOOM') == 1) {
             $this->addJqueryPlugin('jqzoom');
         }
