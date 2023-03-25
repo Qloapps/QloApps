@@ -151,7 +151,13 @@ class AdminOrderPreferencesControllerCore extends AdminController
                         'list' => $cms_tab,
                         'identifier' => 'id',
                         'cast' => 'intval'
-                    )
+                    ),
+                    'PS_AUTO_ADD_SERVICE_BREAKDOWN' => array(
+                        'title' => $this->l('Show room price breakdown'),
+                        'desc' => $this->l('Show a summary for prices of the auto added service add with room on shopping cart list.'),
+                        'cast' => 'intval',
+                        'type' => 'bool'
+                    ),
                 ),
                 'submit' => array('title' => $this->l('Save'))
             ),

@@ -150,7 +150,7 @@
 													<span>
 														{displayPrice price=($rm_v['amount'])}
 													</span>
-													{if (($rm_v['amount'] - $rm_v['amount_without_auto_add']) > 0) && in_array($data_v['id_product'], $discounted_products)}
+													{if (($rm_v['amount'] - $rm_v['amount_without_auto_add']) > 0) && (in_array($data_v['id_product'], $discounted_products) || $PS_AUTO_ADD_SERVICE_BREAKDOWN)}
 														<span class="room-price-detail">
 															<img src="{$img_dir}icon/icon-info.svg" />
 														</span>
