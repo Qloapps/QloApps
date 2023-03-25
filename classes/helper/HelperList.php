@@ -635,6 +635,17 @@ class HelperListCore extends Helper
                     if (isset($value[0]) && !Validate::isCleanHtml($value[0]) || isset($value[1]) && !Validate::isCleanHtml($value[1])) {
                         $value = '';
                     }
+                    if (!Validate::isDate($value[0])) {
+                        $value[0] = '';
+                    }
+                    if (!Validate::isDate($value[1])) {
+                        $value[1] = '';
+                    }
+                    if (isset($value[0]) && !empty($value[0]) && strtotime($value[0]) > strtotime($value[1])) {
+                        $value[1] = '';
+                    }
+
+
                     $name = $this->list_id.'Filter_'.(isset($params['filter_key']) ? $params['filter_key'] : $key);
                     $name_id = str_replace('!', '__', $name);
 
@@ -647,6 +658,16 @@ class HelperListCore extends Helper
                 case 'range':
                     if (is_string($value)) {
                         $value = json_decode($value, true);
+                    }
+
+                    if (isset($value[0]) && !Validate::isUnsignedInt($value[0])) {
+                        $value[0] = '';
+                    }
+                    if (isset($value[1]) && !Validate::isUnsignedInt($value[1])) {
+                        $value[1] = '';
+                    }
+                    if (isset($value[0]) && isset($value[1]) && $value[0] > $value[1]) {
+                        $value[1] = '';
                     }
                     break;
 

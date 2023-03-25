@@ -69,96 +69,98 @@
 
 {block name="tableFilter"}{/block}
 {block name="override_form_extra"}
-	<script>
-		$(function() {
-			if ($("#list_filters_panel .datepicker").length > 0) {
-				$("#list_filters_panel .datepicker").datepicker({
-					prevText: '',
-					nextText: '',
-					altFormat: 'yy-mm-dd'
-				});
-			}
-		});
-	</script>
-	<div class="list_action_wrapper">
-		<div class="row">
-			<div class="col-sm-2">
-				<div class="list_availibility_container">
-					<button type="button" class="btn btn-default btn-left btn-block dropdown-toggle" data-toggle="dropdown">
-						<span>{l s='Available Fields'}
-						<i class="icon-caret-down pull-right"></i>
-					</button>
-					<ul id="optional-list-toggle" class="dropdown-menu">
-						{foreach $fields_optional as $key => $field}
-							<li>
-								<label>
-									<input type="checkbox" name="list_fields_visibility" value="{$key}" {if isset($field['selected']) && $field['selected']}checked="checked"{/if}>
-									{$field['title']}
-								</label>
-							</li>
-						{/foreach}
-						{assign var="fields_optional" value=array()}
-					</ul>
+	{if !$simple_header && $show_filters}
+		<script>
+			$(function() {
+				if ($("#list_filters_panel .datepicker").length > 0) {
+					$("#list_filters_panel .datepicker").datepicker({
+						prevText: '',
+						nextText: '',
+						altFormat: 'yy-mm-dd'
+					});
+				}
+			});
+		</script>
+		<div class="list_action_wrapper">
+			<div class="row">
+				<div class="col-xs-4 col-sm-3 col-md-2">
+					<div class="list_availibility_container">
+						<button type="button" class="btn btn-default btn-left btn-block dropdown-toggle" data-toggle="dropdown">
+							<span>{l s='Available Fields'}
+							<i class="icon-caret-down pull-right"></i>
+						</button>
+						<ul id="optional-list-toggle" class="dropdown-menu">
+							{foreach $fields_optional as $key => $field}
+								<li>
+									<label>
+										<input type="checkbox" name="list_fields_visibility" value="{$key}" {if isset($field['selected']) && $field['selected']}checked="checked"{/if}>
+										{$field['title']}
+									</label>
+								</li>
+							{/foreach}
+							{assign var="fields_optional" value=array()}
+						</ul>
+					</div>
+				</div>
+				<div class="col-xs-3 col-xs-offset-5 col-sm-2 col-sm-offset-7 col-md-1 col-md-offset-9">
+					<div class="list_filter_container">
+						<button type="button" class="btn btn-default btn-block" data-toggle="collapse" data-target="#list_filters_panel">
+							<i class="icon-sliders"></i>
+							<span>{l s='Filters'}
+						</button>
+					</div>
 				</div>
 			</div>
-			<div class="col-sm-1 col-sm-offset-9">
-				<div class="list_filter_container">
-					<button type="button" class="btn btn-default btn-block" data-toggle="collapse" data-target="#list_filters_panel">
-						<i class="icon-sliders"></i>
-						<span>{l s='Filters'}
-					</button>
-				</div>
-			</div>
-			<div class="col-sm-12">
-				{if $filters_has_value}
-					<div id="selected_filter_container">
-						{l s='Filters: '}
-						<span class="selected_filters">
-							{foreach $fields_display AS $key => $params}
-								{if (!isset($params.search) || $params.search) && $params.value != ''}
-									{if ($params.type == 'date' || $params.type == 'datetime' || $params.type == 'range') && $params.value|is_array}
-										{assign var="filter_value" value=''}
-										{foreach $params.value as $value}
-											{if ($value|is_string && !empty($value))}
-												{if empty($filter_value)}
-													{assign var="filter_value" value=$value}
-												{else}
-													{assign var="filter_value" value="`$filter_value` - `$value`"}
+			<div class="row">
+				<div class="col-sm-12">
+					{if $filters_has_value}
+						<div id="selected_filter_container">
+							{l s='Filters: '}
+							<span class="selected_filters">
+								{foreach $fields_display AS $key => $params}
+									{if (!isset($params.search) || $params.search) && $params.value != ''}
+										{if ($params.type == 'date' || $params.type == 'datetime' || $params.type == 'range') && $params.value|is_array}
+											{assign var="filter_value" value=''}
+											{foreach $params.value as $value}
+												{if ($value|is_string && !empty($value))}
+													{if empty($filter_value)}
+														{assign var="filter_value" value=$value}
+													{else}
+														{assign var="filter_value" value="`$filter_value` - `$value`"}
+													{/if}
 												{/if}
+											{/foreach}
+											{if !empty($filter_value)}
+												<span data-filter_key="{if isset($params.name_date)}{$params.name_date}{else}{$key}{/if}" data-filter_type="{$params.type}">
+													{$params['title']|escape:'html':'UTF-8'}: <span class="filter_value">{$filter_value|escape:'html':'UTF-8'}</span>
+													<i class="icon-times"></i>
+												</span>
 											{/if}
-										{/foreach}
-										{if !empty($filter_value)}
-											<span data-filter_key="{if isset($params.name_date)}{$params.name_date}{else}{$key}{/if}" data-filter_type="{$params.type}">
-												{$params['title']|escape:'html':'UTF-8'}: <span class="filter_value">{$filter_value|escape:'html':'UTF-8'}</span>
+										{else if $params.type == 'select'}
+											<span data-filter_key="{if isset($params.filter_key)}{$params.filter_key}{else}{$key}{/if}" data-filter_type="{$params.type}">
+												{$params['title']|escape:'html':'UTF-8'}: <span class="filter_value">{$params['list'][$params['value']]|escape:'html':'UTF-8'}</span>
+												<i class="icon-times"></i>
+											</span>
+										{else}
+											<span data-filter_key="{if isset($params.filter_key)}{$params.filter_key}{else}{$key}{/if}" data-filter_type="{$params.type}">
+												{$params['title']|escape:'html':'UTF-8'}: <span class="filter_value">{$params['value']|escape:'html':'UTF-8'}</span>
 												<i class="icon-times"></i>
 											</span>
 										{/if}
-									{else if $params.type == 'select'}
-										<span data-filter_key="{if isset($params.filter_key)}{$params.filter_key}{else}{$key}{/if}" data-filter_type="{$params.type}">
-											{$params['title']|escape:'html':'UTF-8'}: <span class="filter_value">{$params['list'][$params['value']]|escape:'html':'UTF-8'}</span>
-											<i class="icon-times"></i>
-										</span>
-									{else}
-										<span data-filter_key="{if isset($params.filter_key)}{$params.filter_key}{else}{$key}{/if}" data-filter_type="{$params.type}">
-											{$params['title']|escape:'html':'UTF-8'}: <span class="filter_value">{$params['value']|escape:'html':'UTF-8'}</span>
-											<i class="icon-times"></i>
-										</span>
 									{/if}
-								{/if}
-							{/foreach}
-						</span>
-					</div>
-				{/if}
-				<div class="panel collapse" id="list_filters_panel">
-					{if !$simple_header && $show_filters}
+								{/foreach}
+							</span>
+						</div>
+					{/if}
+					<div class="panel collapse" id="list_filters_panel">
 						<div class="row">
 							<div class="col-sm-12">
 								<div class="list_filters">
 									{foreach $fields_display AS $key => $params}
 										{if !isset($params.search) || $params.search}
 											<div class="row">
-												<label class="col-sm-3" for="filter_input_{$key}">{$params['title']|escape:'html':'UTF-8'}</label>
-												<div class="col-sm-9">
+												<label class="col-xs-3" for="filter_input_{$key}">{$params['title']|escape:'html':'UTF-8'}</label>
+												<div class="col-xs-9">
 													{if $params.type == 'range'}
 														<div class="input_range">
 															<input type="text" class="filter form-control" name="{$list_id}Filter_{if isset($params.filter_key)}{$params.filter_key}{else}{$key}{/if}[0]" placeholder="{l s='From'}" value="{if isset($params.value.0)}{$params.value.0}{/if}">
@@ -198,6 +200,47 @@
 																	if (dateEnd !== null){
 																		$("#local_{$params.id_date}_1").datepicker("setDate", dateEnd);
 																	}
+
+																	$('#local_{$params.id_date}_0').datepicker('option', {
+																		prevText: '',
+																		nextText: '',
+																		dateFormat: 'yy-mm-dd',
+																		beforeShow: function() {
+																			let dateTo = $('#local_{$params.id_date}_1').val().trim();
+																			if (typeof dateTo != 'undefined' && dateTo != '') {
+																				let objDateToMax = $.datepicker.parseDate('yy-mm-dd', dateTo);
+																				objDateToMax.setDate(objDateToMax.getDate() - 1);
+																				$('#local_{$params.id_date}_0').datepicker('option', 'maxDate', objDateToMax);
+																			}
+																		},
+																		onClose: function() {
+																			let dateFrom = $('#local_{$params.id_date}_0').val().trim();
+																			let dateTo = $('#local_{$params.id_date}_1').val().trim();
+
+																			if (dateFrom >= dateTo) {
+																				let objDateToMin = $.datepicker.parseDate('yy-mm-dd', dateFrom);
+																				objDateToMin.setDate(objDateToMin.getDate() + 1);
+
+																				$('#local_{$params.id_date}_1').datepicker('option', 'minDate', objDateToMin);
+																			}
+																		},
+																	});
+
+																	$('#local_{$params.id_date}_1').datepicker('option', {
+																		prevText: '',
+																		nextText: '',
+																		dateFormat: 'yy-mm-dd',
+																		beforeShow: function() {
+																			let dateFrom = $('#local_{$params.id_date}_0').val().trim();
+
+																			if (typeof dateFrom != 'undefined' && dateFrom != '') {
+																				let objDateToMin = $.datepicker.parseDate('yy-mm-dd', dateFrom);
+																				objDateToMin.setDate(objDateToMin.getDate() + 1);
+
+																				$('#local_{$params.id_date}_1').datepicker('option', 'minDate', objDateToMin);
+																			}
+																		},
+																	});
 																});
 															</script>
 														</div>
@@ -239,97 +282,115 @@
 								</div>
 							</div>
 						</div>
-					{/if}
+					</div>
 				</div>
 			</div>
 		</div>
-	</div>
-	<script>
-		$(document).ready(function(){
-			$('#selected_filter_container .selected_filters span i').on('click', function() {
-				let form = $(this).closest('form');
-				let type = $(this).parent().data('filter_type');
+		<script>
+			$(document).ready(function(){
+				$('#selected_filter_container .selected_filters span i').on('click', function() {
+					let form = $(this).closest('form');
+					let type = $(this).parent().data('filter_type');
 					$(this).parent().remove();
-				if (type == 'date' || type == 'datetime') {
-					$('#list_filters_panel').find('[name*="'+$(this).parent().data('filter_key')+'"]').val('');
-				} else if (type == 'range') {
-					$('#list_filters_panel').find('[name*="orderFilter_'+$(this).parent().data('filter_key')+'"]').val('');
-				} else if (type == 'select') {
-					$('#list_filters_panel').find('select[name="orderFilter_'+$(this).parent().data('filter_key')+'"] option:selected').prop("selected", false);
-				} else {
-					$('#list_filters_panel').find('input[name="orderFilter_'+$(this).parent().data('filter_key')+'"]').val('');
-				}
-				form.submit();
+					if (type == 'date' || type == 'datetime') {
+						$('#list_filters_panel').find('[name*="'+$(this).parent().data('filter_key')+'"]').val('');
+					} else if (type == 'range') {
+						$('#list_filters_panel').find('[name*="orderFilter_'+$(this).parent().data('filter_key')+'"]').val('');
+					} else if (type == 'select') {
+						$('#list_filters_panel').find('select[name="orderFilter_'+$(this).parent().data('filter_key')+'"] option:selected').prop("selected", false);
+					} else {
+						$('#list_filters_panel').find('input[name="orderFilter_'+$(this).parent().data('filter_key')+'"]').val('');
+					}
+					form.submit();
+				});
 			});
-		});
-	</script>
-	<style>
-		.list_action_wrapper {
-			margin-bottom: 15px;
-		}
-		.list_availibility_container {
-			position: relative;}
-			.list_availibility_container .dropdown-menu {
-				right: 0;
-				padding: 8px 12px;}
-				.list_availibility_container .dropdown-menu label {
+		</script>
+		<style>
+			.list_action_wrapper {
+				margin-bottom: 15px;
+			}
+			.list_availibility_container {
+				position: relative;}
+				.list_availibility_container .dropdown-menu {
+					right: 0;
+					padding: 8px 12px;}
+					.list_availibility_container .dropdown-menu label {
+						font-weight: 400;}
+			#selected_filter_container {
+				background-color: #fff;
+				padding: 8px 20px;
+				border: solid 1px #d3d8db;
+				border-radius: 5px 5px 0 0;
+				font-size: 14px;
+				min-height: 52px;
+				margin-top: 15px;}
+				#selected_filter_container .selected_filters > span {
+					font-size: 12px;
+					padding: 6px 10px;
+					display: inline-block;
+					background: #F5F8F9;
+					border: 1px solid #A0D0EB;
+					border-radius: 3px;}
+					#selected_filter_container .selected_filters > span + span {
+						margin-left: 12px;}
+					#selected_filter_container .selected_filters > span .filter_value {
+						font-weight: 700;
+					}
+					#selected_filter_container .selected_filters > span i {
+						cursor: pointer;}
+
+			#content.bootstrap #list_filters_panel{
+				margin-top: 15px;
+				margin-bottom: 0;
+			}
+			#content.bootstrap  #selected_filter_container + #list_filters_panel {
+				margin-top: 0;
+			}
+			#content.bootstrap  #selected_filter_container + div.panel {
+				border-top: transparent;
+				border-radius: 0 0 5px 5px;
+			}
+
+			.list_filters {
+				padding: 0 30px;
+				display: grid;
+				grid-template-columns: repeat(3, 1fr);
+				gap: 8px 40px;}
+				.list_filters > .row {
+					display: flex;
+					align-items: center;}
+				.list_filters .date_range, .list_filters .input_range {
+					display: flex;
+					justify-content: space-between;
+					gap: 15px;}
+				.list_filters .date_range .input-group:first-child {
+					margin-bottom: 0;}
+				.list_filters label {
+					text-align: right;
 					font-weight: 400;}
-		#selected_filter_container {
-			background-color: #fff;
-			padding: 8px 20px;
-			border: solid 1px #d3d8db;
-			border-radius: 5px 5px 0 0;
-			font-size: 14px;
-			min-height: 52px;
-			margin-top: 15px;}
-			#selected_filter_container .selected_filters > span {
-				font-size: 12px;
-				padding: 6px 10px;
-				display: inline-block;
-				background: #F5F8F9;
-				border: 1px solid #A0D0EB;
-				border-radius: 3px;}
-				#selected_filter_container .selected_filters > span + span {
-					margin-left: 12px;}
-				#selected_filter_container .selected_filters > span .filter_value {
-					font-weight: 700;
-				}
-				#selected_filter_container .selected_filters > span i {
-					cursor: pointer;}
+				.list_filters .actions {
+					grid-column-start: 1;
+					grid-column-end: 4;}
+			@media (max-width: 992px) {
+				.list_filters {
+					grid-template-columns: repeat(2, 1fr);}
+					.list_filters .actions {
+					grid-column-start: 1;
+					grid-column-end: 3;}
+			}
+			@media (max-width: 768px) {
+				.list_filters {
+					grid-template-columns: repeat(1, 1fr);}
+					.list_filters .actions {
+					grid-column-start: 1;
+					grid-column-end: 2;}
+					.list_filters label {
+						text-align: left;
+					}
+			}
 
-		#content.bootstrap #list_filters_panel{
-			margin-top: 15px;
-			margin-bottom: 0;
-		}
-		#content.bootstrap  #selected_filter_container + #list_filters_panel {
-			margin-top: 0;
-		}
-		#content.bootstrap  #selected_filter_container + div.panel {
-			border-top: transparent;
-   			border-radius: 0 0 5px 5px;
-		}
-
-		.list_filters {
-			padding: 0 30px;
-			display: grid;
-			grid-template-columns: repeat(3, 1fr);
-			gap: 8px 40px;}
-			.list_filters > .row {
-				display: flex;
-				align-items: center;}
-			.list_filters .date_range, .list_filters .input_range {
-				display: flex;
-				justify-content: space-between;
-				gap: 15px;}
-			.list_filters .date_range .input-group:first-child {
-				margin-bottom: 0;}
-			.list_filters label {
-				text-align: right;
-				font-weight: 400;}
-			.list_filters .actions {
-				grid-column-start: 1;
-				grid-column-end: 4;}
-	</style>
+		</style>
+	{/if}
 {/block}
 
 

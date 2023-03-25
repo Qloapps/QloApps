@@ -712,13 +712,19 @@ class AdminControllerCore extends Controller
                         } elseif (isset($t['type']) && $t['type'] == 'range') {
                             $range = json_decode($val, true);
                             if (isset($range[0]) && !empty($range[0])) {
-                                $filter_value = $range[0];
-                                if (isset($range[1]) && !empty($range[1])) {
-                                    $filter_value .= ' - '.$range[1];
+                                if (Validate::isUnsignedInt($range[0])) {
+                                    $filter_value = $range[0];
+                                    if (isset($range[1]) && !empty($range[1])) {
+                                        if (Validate::isUnsignedInt($range[1]) && $range[0] < $range[1]) {
+                                            $filter_value .= ' - '.$range[1];
+                                        }
+                                    }
                                 }
                             } else {
                                 if (isset($range[1]) && !empty($range[1])) {
-                                    $filter_value = $range[1];
+                                    if (Validate::isUnsignedInt($range[1])) {
+                                        $filter_value = $range[1];
+                                    }
                                 }
                             }
                         } elseif (is_string($val)) {
@@ -861,6 +867,7 @@ class AdminControllerCore extends Controller
         foreach ($filters as $key => $value) {
             /* Extracting filters from $_POST on key filter_ */
             if ($value != null && !strncmp($key, $prefix.$this->list_id.'Filter_', 7 + Tools::strlen($prefix.$this->list_id))) {
+                $key_org = $key;
                 $key = Tools::substr($key, 7 + Tools::strlen($prefix.$this->list_id));
                 /* Table alias could be specified using a ! eg. alias!field */
                 $tmp_tab = explode('!', $key);
@@ -897,7 +904,13 @@ class AdminControllerCore extends Controller
                                 }
                             }
                             if (isset($value[1]) && !empty($value[1])) {
-                                $sql_filter .= ' AND '.pSQL($key).' <= '.pSQL($value[1]);
+                                if (!Validate::isUnsignedInt($value[1])) {
+                                    $this->errors[] = Tools::displayError('The \'From\' value is invalid');
+                                } elseif (isset($value[0]) && !empty($value[0]) && $value[0] > $value[1]) {
+                                    $this->errors[] = Tools::displayError('The \'To\' value cannot be less than from value');
+                                } else {
+                                    $sql_filter .= ' AND '.pSQL($key).' <= '.pSQL($value[1]);
+                                }
                             }
                         } else {
                             if (isset($value[0]) && !empty($value[0])) {
@@ -911,6 +924,8 @@ class AdminControllerCore extends Controller
                             if (isset($value[1]) && !empty($value[1])) {
                                 if (!Validate::isDate($value[1])) {
                                     $this->errors[] = Tools::displayError('The \'To\' date format is invalid (YYYY-MM-DD)');
+                                } elseif (isset($value[0]) && !empty($value[0]) && strtotime($value[0]) > strtotime($value[1])) {
+                                    $this->errors[] = Tools::displayError('The \'To\' date cannot be before than from date');
                                 } else {
                                     $sql_filter .= ' AND '.pSQL($key).' <= \''.pSQL(Tools::dateTo($value[1])).'\'';
                                 }

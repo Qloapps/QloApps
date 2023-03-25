@@ -43,6 +43,7 @@ class AdminOrdersControllerCore extends AdminController
     public $toolbar_title;
 
     protected $statuses_array = array();
+    protected $all_order_sources = array();
 
     public function __construct()
     {
@@ -69,7 +70,7 @@ class AdminOrdersControllerCore extends AdminController
             SUM(hbd.`adults`),
             \' '.$this->l('Adult(s)').' \',
             IF(SUM(hbd.`children`), CONCAT(SUM(hbd.`children`), \' '.$this->l('Children').'\'), \'\')
-        ) as `guest_text`,
+        ) as `total_guests`,
         SUM(DATEDIFF(hbd.`date_to`, hbd.`date_from`)) as los,
         GROUP_CONCAT(hbd.`date_from`) as `all_date_from`, GROUP_CONCAT(hbd.`date_to`) as `all_date_to`,
         GROUP_CONCAT(hbd.`room_type_name`) as `all_room_types`';
@@ -143,7 +144,7 @@ class AdminOrdersControllerCore extends AdminController
                 'type'=>'text',
                 'displayed' => false,
             ),
-            'guest_text' => array(
+            'total_guests' => array(
                 'title' => $this->l('Guests'),
                 'type' => 'range',
                 'filter_key' => 'total_guests',
@@ -178,7 +179,7 @@ class AdminOrdersControllerCore extends AdminController
 
         $this->fields_list = array_merge($this->fields_list, array(
             'total_paid_tax_incl' => array(
-                'title' => $this->l('Total'),
+                'title' => $this->l('Order Total'),
                 'align' => 'text-right',
                 'type' => 'price',
                 'currency' => true,
