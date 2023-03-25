@@ -326,28 +326,26 @@
 								</td>
 							</tr>
 						{/if}
-						{if isset($cart_htl_data)}
-							{if $priceDisplay && $use_tax}
-								<tr class="item">
-									<td colspan="3"></td>
-									<td colspan="3">
-										<strong>{l s='Total Convenience Fees (tax excl.)'}</strong>
-									</td>
-									<td colspan="2">
-										<span>{displayWtPriceWithCurrency price=($orderTotalInfo['total_convenience_fee_te']) currency=$currency}</span>
-									</td>
-								</tr>
-							{else}
-								<tr class="item">
-									<td colspan="3"></td>
-									<td colspan="3">
-										<strong>{l s='Total Convenience Fees'} {if $use_tax}{l s='(tax incl.)'}{/if} </strong>
-									</td>
-									<td colspan="2">
-										<span>{displayWtPriceWithCurrency price=($orderTotalInfo['total_convenience_fee_ti']) currency=$currency}</span>
-									</td>
-								</tr>
-							{/if}
+						{if $priceDisplay && $use_tax && $orderTotalInfo['total_convenience_fee_te']}
+							<tr class="item">
+								<td colspan="3"></td>
+								<td colspan="3">
+									<strong>{l s='Total Convenience Fees (tax excl.)'}</strong>
+								</td>
+								<td colspan="2">
+									<span>{displayWtPriceWithCurrency price=($orderTotalInfo['total_convenience_fee_te']) currency=$currency}</span>
+								</td>
+							</tr>
+						{else if $orderTotalInfo['total_convenience_fee_ti']}
+							<tr class="item">
+								<td colspan="3"></td>
+								<td colspan="3">
+									<strong>{l s='Total Convenience Fees'} {if $use_tax}{l s='(tax incl.)'}{/if} </strong>
+								</td>
+								<td colspan="2">
+									<span>{displayWtPriceWithCurrency price=($orderTotalInfo['total_convenience_fee_ti']) currency=$currency}</span>
+								</td>
+							</tr>
 						{/if}
 						<tr class="item">
 							<td colspan="3"></td>

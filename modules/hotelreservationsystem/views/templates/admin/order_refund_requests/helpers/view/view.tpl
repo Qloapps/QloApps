@@ -148,7 +148,7 @@
 																{displayPrice price=$booking['refunded_amount'] currency=$orderCurrency['id']}
 															{else}
 																<span class="input-group-addon">{$orderCurrency['sign']|escape:'html':'UTF-8'}</span>
-																<input placeholder="" type="text" name="refund_amounts[{$booking['id_order_return_detail']|escape:'html':'UTF-8'}]">
+																<input placeholder="" type="text" name="refund_amounts[{$booking['id_order_return_detail']|escape:'html':'UTF-8'}]" value="{$booking['total_paid_amount'] - $booking['cancelation_charge']}">
 																<span class="input-group-addon">{l s='tax incl.' mod='hotelreservationsystem'}</span>
 															{/if}
 														</div>

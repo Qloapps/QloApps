@@ -455,7 +455,6 @@ class OrderOpcControllerCore extends ParentOrderController
 
         $this->context->smarty->assign('checkout_process_steps', $this->checkoutProcess->getSteps());
 
-        // @todo shreesh get this checked with sumit sir
         // set room type demands
         // $objGlobalDemand = new HotelRoomTypeGlobalDemand();
         // $allDemands = $objGlobalDemand->getAllDemands();
@@ -669,6 +668,7 @@ class OrderOpcControllerCore extends ParentOrderController
             'invoice_company' => Tools::htmlentitiesUTF8($address_invoice->company),
             'invoice_lastname' => Tools::htmlentitiesUTF8($address_invoice->lastname),
             'invoice_firstname' => Tools::htmlentitiesUTF8($address_invoice->firstname),
+            'invoice_vat_number' => Tools::htmlentitiesUTF8($address_invoice->vat_number),
             'invoice_dni' => Tools::htmlentitiesUTF8($address_invoice->dni),
             'invoice_address' => $this->context->cart->id_address_invoice !== $this->context->cart->id_address_delivery,
             'invoice_address1' => Tools::htmlentitiesUTF8($address_invoice->address1),
@@ -988,31 +988,21 @@ class OrderOpcControllerCore extends ParentOrderController
                     }
                 }
                 $objRoomTypeServiceProductCartDetail = new RoomTypeServiceProductCartDetail();
-                if ($selectedRoomServiceProduct = $objRoomTypeServiceProductCartDetail->getServiceProductsInCart(
-                    $this->context->cart->id,
-                    0,
-                    0,
-                    $idProduct,
-                    $dateFrom,
-                    $dateTo,
-                    0,
-                    0,
-                    null,
-                    null
-                )) {
-                    $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
-                    $roomTypeServiceProducts = $objRoomTypeServiceProduct->getServiceProductsData($idProduct, 1, 0, true, 1);
-                    foreach ($selectedRoomServiceProduct as $key => $selectedProducts) {
-                        foreach ($selectedProducts['selected_products_info'] as $product) {
-                            $selectedRoomServiceProduct[$key]['selected_products'][] = $product['id_product'];
-                        }
-                    }
-                    $this->context->smarty->assign(array(
-                        'roomTypeServiceProducts' => $roomTypeServiceProducts,
-                        'selectedRoomServiceProduct' => $selectedRoomServiceProduct
-                    ));
+                $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
+                $roomTypeServiceProducts = $objRoomTypeServiceProduct->getServiceProductsData($idProduct, 1, 0, true, 1);
+                $cartRooms = $objCartBookingData->getHotelCartRoomsInfoByRoomType($this->context->cart->id, $idProduct,$dateFrom, $dateTo);
+                foreach($cartRooms as &$room) {
+                    $room['selected_service'] = $objRoomTypeServiceProductCartDetail->getRoomServiceProducts(
+                        $room['id'],
+                        0,
+                        null,
+                        null
+                    );
                 }
-
+                $this->context->smarty->assign(array(
+                    'roomTypeServiceProducts' => $roomTypeServiceProducts,
+                    'cartRooms' => $cartRooms
+                ));
             }
         }
         $response['extra_demands'] = $this->context->smarty->fetch(

@@ -1067,7 +1067,9 @@
 						<thead>
 							<tr>
 								<th class="text-left">{l s='Refund ID'}</th>
+								<th class="text-center">{l s='Total Rooms'}</th>
 								<th class="text-left">{l s='Status'}</th>
+								<th class="text-center">{l s='Requested Date'}</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -1075,6 +1077,9 @@
 							<tr>
 								<td class="text-left">
 									<a href="{$link->getAdminLink('AdminOrderRefundRequests')}&vieworder_return&id_order_return={$return_info.id_order_return}" target="_blank">#{$return_info.id_order_return}</a>
+								</td>
+								<td class="text-center">
+									{$return_info.total_rooms|escape:'html':'UTF-8'}
 								</td>
 								<td class="text-left">
 									{capture name=refund_status}
@@ -1110,12 +1115,39 @@
 										{$return_info.state_name}
 									{/if}
 								</td>
+								<td class="text-center">
+									{$return_info.date_add}
+								</td>
 							</tr>
 							{/foreach}
 						</tbody>
 					</table>
 				</div>
 			{/if}
+			<div class="panel">
+				<div class="panel-heading">
+					<i class="icon-list"></i> {l s='Cancellation Policies'}
+				</div>
+				{if is_array($applicable_refund_policies) && count($applicable_refund_policies)}
+					<ul>
+						{foreach from=$applicable_refund_policies item=$applicable_refund_policy}
+							<li>
+								<p>
+									<a href="{$link->getAdminLink('AdminOrderRefundRules')|escape:'html':'UTF-8'}&id_refund_rule={$applicable_refund_policy.id_refund_rule}&updatehtl_order_refund_rules" target="_blank">
+										{$applicable_refund_policy.name|escape:'html':'UTF-8'}
+										<i class="icon-external-link"></i>
+									</a>
+								</p>
+							</li>
+						{/foreach}
+					</ul>
+				{else}
+					<p>
+						<i class="icon-warning-sign list-empty-icon"></i>
+						{l s='No cancellation policies applicable.'}
+					</p>
+				{/if}
+			</div>
 			{hook h="displayAdminOrderRight" id_order=$order->id}
 		</div>
 	</div>
@@ -1719,15 +1751,22 @@
 			$('#room_extra_demand_content #back_to_service_btn').hide();
 		});
 
-		$(document).on('focusout', '#rooms_type_extra_demands .qty', function(e) {
+		$(document).on('focusout', '#rooms_type_extra_demands .room_ordered_services .qty', function(e) {
 			var qty_wntd = $(this).val();
-			if (qty_wntd == '' || !$.isNumeric(qty_wntd)) {
+			if (qty_wntd == '' || !$.isNumeric(qty_wntd) || qty_wntd < 1) {
 				$(this).val(1);
 			}
-			updateServiceProducts($(this));
+			updateAdditionalServices($(this));
 		});
 
-		function updateServiceProducts(element)
+		$(document).on('focusout', '#rooms_type_extra_demands #add_room_services_form .qty', function(e) {
+			var qty_wntd = $(this).val();
+			if (qty_wntd == '' || !$.isNumeric(qty_wntd) || qty_wntd < 1) {
+				$(this).val(1);
+			}
+		});
+
+		function updateAdditionalServices(element)
 		{
 			var id_room_type_service_product_order_detail = $(element).data('id_room_type_service_product_order_detail');
 			var qty = $(element).val();
@@ -1748,6 +1787,9 @@
 					},
 					success: function(jsonData) {
 						if (!jsonData.hasError) {
+							if (jsonData.service_panel) {
+								$('#room_type_service_product_desc').replaceWith(jsonData.service_panel);
+							}
 							showSuccessMessage(txtExtraDemandSucc);
 						} else {
 							showErrorMessage(jsonData.errors);
@@ -1894,12 +1936,14 @@
 						},
 						success: function(jsonData) {
 							if (!jsonData.hasError) {
-							$('#room_type_service_product_desc').replaceWith(jsonData.service_panel);
-							showSuccessMessage(txtExtraDemandSucc);
-						} else {
-							showErrorMessage(jsonData.errors);
+								if (jsonData.service_panel) {
+									$('#room_type_service_product_desc').replaceWith(jsonData.service_panel);
+								}
+								showSuccessMessage(txtExtraDemandSucc);
+							} else {
+								showErrorMessage(jsonData.errors);
 
-						}
+							}
 						}
 					});
 				} else {

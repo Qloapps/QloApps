@@ -113,7 +113,7 @@
 
 		<div class="form-group">
 			<label for="cancelation_days" class="required control-label col-lg-3">
-				<span title="" data-toggle="tooltip" class="label-tooltip" data-original-title='{l s="Enter number of days before check-in date for this rule to be applicable." mod="hotelreservationsyatem"}'>{l s='Days before cancellation' mod="hotelreservationsyatem"}</span>
+				<span title="" data-toggle="tooltip" class="label-tooltip" data-original-title='{l s="Enter number of days before check-in date for this rule to be applicable." mod="hotelreservationsyatem"}'>{l s='Days before check-in' mod="hotelreservationsyatem"}</span>
 			</label>
 			<div class="col-lg-2">
 				<input class="form-control" type="text" id="cancelation_days" name="cancelation_days" {if isset($edit)} {if isset($refund_rules_info['days'])}style = "display:block;" value="{$refund_rules_info['days']}" {/if}{/if}>

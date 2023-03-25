@@ -568,10 +568,6 @@ class CartCore extends ObjectModel
             $sql->where('cp.`id_product` = '.(int)$id_product);
         }
         $sql->where('p.`id_product` IS NOT NULL');
-        // hide invisible products
-        // if ($front) {
-        //     $sql->where('p.`is_invisible` = 0');
-        // }
 
         // Build ORDER BY
         $sql->orderBy('cp.`date_add`, cp.`id_product`, cp.`id_product_attribute` ASC');
@@ -792,8 +788,9 @@ class CartCore extends ObjectModel
                 }
             } else if  (Product::SERVICE_PRODUCT_WITH_ROOMTYPE == $row['service_product_type']) {
                 $objRoomTypeServiceProductCartDetail = new RoomTypeServiceProductCartDetail();
-                $totalPriceByProductTaxIncl = $objRoomTypeServiceProductCartDetail->getServiceProductsInCart($this->id, (int)$row['id_product'], 0, 0, 0, 0, 0, 1, true, null);
-                $totalPriceByProductTaxExcl = $objRoomTypeServiceProductCartDetail->getServiceProductsInCart($this->id, (int)$row['id_product'], 0, 0, 0, 0, 0, 1, false, null);
+                $totalPriceByProductTaxIncl = $objRoomTypeServiceProductCartDetail->getServiceProductsTotalInCart($this->id, (int)$row['id_product'], 0, 0, 0, 0, 0, true, null);
+                $totalPriceByProductTaxExcl = $objRoomTypeServiceProductCartDetail->getServiceProductsTotalInCart($this->id, (int)$row['id_product'], 0, 0, 0, 0, 0, false, null);
+
 
                 switch (Configuration::get('PS_ROUND_TYPE')) {
                     case Order::ROUND_TOTAL:
@@ -1795,7 +1792,7 @@ class CartCore extends ObjectModel
             } else if (!$product['booking_product'] && Product::SERVICE_PRODUCT_WITH_ROOMTYPE == $product['service_product_type']) {
 
                 $objRoomTypeServiceProductCartDetail = new RoomTypeServiceProductCartDetail();
-                $totalPriceByProduct = $objRoomTypeServiceProductCartDetail->getServiceProductsInCart(
+                $totalPriceByProduct = $objRoomTypeServiceProductCartDetail->getServiceProductsTotalInCart(
                     $this->id,
                     (int)$product['id_product'],
                     isset($product['id_hotel']) ? $product['id_hotel'] : 0,
@@ -1803,7 +1800,6 @@ class CartCore extends ObjectModel
                     0,
                     0,
                     0,
-                    1,
                     $with_taxes,
                     null
                 );
@@ -1991,7 +1987,9 @@ class CartCore extends ObjectModel
                     }
                 }
             }
-            $order_total_discount = min(Tools::ps_round($order_total_discount, 2), (float)$order_total_products) + (float)$order_shipping_discount;
+            if ($type != Cart::ADVANCE_PAYMENT) {
+                $order_total_discount = min(Tools::ps_round($order_total_discount, 2), (float)$order_total_products) + (float)$order_shipping_discount;
+            }
             if ($type == Cart::ADVANCE_PAYMENT) {
                 // get order total without discount
                 $total_without_discount = $this->getOrderTotal() + $order_total_discount;

@@ -150,28 +150,6 @@
 											</td>
 										</tr>
 										<tr>
-											<td colspan="9"  style="padding:7px 0">
-												<font size="2" face="Open-sans, sans-serif" color="#555454">
-													<table class="table table-recap" bgcolor="#ffffff" style="width:100%;border-collapse:collapse"><!-- Title -->
-														<tr>
-															<th bgcolor="#f8f8f8" style="border:1px solid #D6D4D4;background-color: #fbfbfb;color: #333;font-family: Arial;font-size: 13px;padding: 10px;">Image</th>
-															<th bgcolor="#f8f8f8" style="border:1px solid #D6D4D4;background-color: #fbfbfb;color: #333;font-family: Arial;font-size: 13px;padding: 10px;">Name</th>
-															<th bgcolor="#f8f8f8" style="border:1px solid #D6D4D4;background-color: #fbfbfb;color: #333;font-family: Arial;font-size: 13px;padding: 10px;">Unit Price</th>
-															<th bgcolor="#f8f8f8" style="border:1px solid #D6D4D4;background-color: #fbfbfb;color: #333;font-family: Arial;font-size: 13px;padding: 10px;" width="17%">Qty</th>
-															<th bgcolor="#f8f8f8" style="border:1px solid #D6D4D4;background-color: #fbfbfb;color: #333;font-family: Arial;font-size: 13px;padding: 10px;" width="17%">Total</th>
-														</tr>
-														<tbody>
-															<tr>
-																<td colspan="5" style="border:1px solid #D6D4D4;text-align:center;color:#777;padding:7px 0">
-																	&nbsp;&nbsp;{normal_products_data_html}
-																</td>
-															</tr>
-														</tbody>
-													</table>
-												</font>
-											</td>
-										</tr>
-										<tr>
 											<td colspan="9" style="border:1px solid #D6D4D4;text-align:center;color:#777;padding:7px 0">
 												&nbsp;&nbsp;{discounts}
 											</td>
@@ -196,35 +174,7 @@
 														<td width="10" style="color:#333;padding:0">&nbsp;</td>
 														<td align="right" style="color:#333;padding:0">
 															<font size="2" face="Open-sans, sans-serif" color="#555454">
-																{total_products}
-															</font>
-														</td>
-														<td width="10" style="color:#333;padding:0">&nbsp;</td>
-													</tr>
-												</table>
-											</td>
-										</tr>
-										<tr class="conf_body">
-											<td bgcolor="#f8f8f8" colspan="4" style="border:1px solid #D6D4D4;color:#333;padding:7px 0">
-												<table class="table" style="width:100%;border-collapse:collapse">
-													<tr>
-														<td width="10" style="color:#333;padding:0">&nbsp;</td>
-														<td align="right" style="color:#333;padding:0">
-															<font size="2" face="Open-sans, sans-serif" color="#555454">
-																<strong>Total Extra Services Cost</strong>
-															</font>
-														</td>
-														<td width="10" style="color:#333;padding:0">&nbsp;</td>
-													</tr>
-												</table>
-											</td>
-											<td bgcolor="#f8f8f8" align="right" colspan="5" style="border:1px solid #D6D4D4;color:#333;padding:7px 0">
-												<table class="table" style="width:100%;border-collapse:collapse">
-													<tr>
-														<td width="10" style="color:#333;padding:0">&nbsp;</td>
-														<td align="right" style="color:#333;padding:0">
-															<font size="2" face="Open-sans, sans-serif" color="#555454">
-																{total_extra_demands_te}
+																{room_price_tax_excl}
 															</font>
 														</td>
 														<td width="10" style="color:#333;padding:0">&nbsp;</td>
@@ -267,7 +217,7 @@
 														<td width="10" style="color:#333;padding:0">&nbsp;</td>
 														<td align="right" style="color:#333;padding:0">
 															<font size="2" face="Open-sans, sans-serif" color="#555454">
-																<strong>Total Rooms Tax</strong>
+																<strong>Total Convenience Fees</strong>
 															</font>
 														</td>
 														<td width="10" style="color:#333;padding:0">&nbsp;</td>
@@ -280,7 +230,7 @@
 														<td width="10" style="color:#333;padding:0">&nbsp;</td>
 														<td align="right" style="color:#333;padding:0">
 															<font size="2" face="Open-sans, sans-serif" color="#555454">
-																{total_tax_paid}
+																{total_convenience_fee_te}
 															</font>
 														</td>
 														<td width="10" style="color:#333;padding:0">&nbsp;</td>
@@ -295,7 +245,7 @@
 														<td width="10" style="color:#333;padding:0">&nbsp;</td>
 														<td align="right" style="color:#333;padding:0">
 															<font size="2" face="Open-sans, sans-serif" color="#555454">
-																<strong>Extra Services Tax</strong>
+																<strong>Total Tax</strong>
 															</font>
 														</td>
 														<td width="10" style="color:#333;padding:0">&nbsp;</td>
@@ -308,7 +258,7 @@
 														<td width="10" style="color:#333;padding:0">&nbsp;</td>
 														<td align="right" style="color:#333;padding:0">
 															<font size="2" face="Open-sans, sans-serif" color="#555454">
-																{extra_demands_tax}
+																{total_tax_paid}
 															</font>
 														</td>
 														<td width="10" style="color:#333;padding:0">&nbsp;</td>

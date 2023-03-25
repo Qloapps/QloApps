@@ -132,9 +132,9 @@
 									{displayPrice price=$data.amt_with_qty}</td> *}
 								<td class="cart_line_total_price">
 									{if (isset($data.extra_demands) && $data.extra_demands) || (isset($data.additional_service) && $data.additional_service)}
-										{displayPrice price=($data.feature_price_tax_excl + $data.additional_services_auto_add_price + $data.demand_price +  $data.additional_service_price)|escape:'html':'UTF-8'}
+										{displayPrice price=($data.amt_with_qty + $data.additional_services_auto_add_price + $data.demand_price +  $data.additional_service_price)|escape:'html':'UTF-8'}
 									{else}
-										{displayPrice price=$data.feature_price_tax_excl|escape:'html':'UTF-8'}
+										{displayPrice price=$data.amt_with_qty|escape:'html':'UTF-8'}
 									{/if}
 								</td>
 								<td>

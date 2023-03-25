@@ -236,4 +236,44 @@ class HotelOrderRefundRules extends ObjectModel
 
         return $totalCancelationCharges;
     }
+
+    public static function getApplicableRefundRules($idOrder)
+    {
+        $idLang = Context::getContext()->language->id;
+
+        $maxDate = Db::getInstance()->getValue(
+            'SELECT MAX(DATE(hbd.`date_from`))
+            FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+            WHERE hbd.`id_order` = '.(int) $idOrder
+        );
+
+        if ($maxDate) {
+            $dateToday = date('Y-m-d');
+
+            if (strtotime($maxDate) >= strtotime($dateToday)) {
+                $days = HotelBookingDetail::getDays($dateToday, $maxDate); // always returns positive
+
+                $sql = 'SELECT hbrr.`id_hotel_refund_rule`, hbrr.`id_refund_rule`, hbrr.`id_hotel`, hbrr.`position`,
+                horrl.`name`, horrl.`description`, horr.`payment_type`, horr.`deduction_value_full_pay`,
+                horr.`deduction_value_adv_pay`, horr.`days`
+                FROM `'._DB_PREFIX_.'htl_branch_refund_rules` hbrr
+                LEFT JOIN `'._DB_PREFIX_.'htl_order_refund_rules` horr
+                ON (horr.`id_refund_rule` = hbrr.`id_refund_rule`)
+                LEFT JOIN `'._DB_PREFIX_.'htl_order_refund_rules_lang` horrl
+                ON (horrl.`id_refund_rule` = horr.`id_refund_rule` AND horrl.`id_lang` = '.(int) $idLang.')
+                LEFT JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd
+                ON (hbd.`id_hotel` = hbrr.`id_hotel` AND hbd.`id_order` = '.(int) $idOrder.')
+                WHERE horr.`days` <= '.(int) $days.'
+                GROUP BY hbrr.`id_refund_rule`
+                ORDER BY hbrr.`position`';
+
+                if ($result = Db::getInstance()->executeS($sql)) {
+                    return $result;
+                }
+            }
+        }
+
+        return array();
+
+    }
 }
