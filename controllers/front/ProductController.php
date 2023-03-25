@@ -701,7 +701,14 @@ class ProductControllerCore extends FrontController
                     }
                     $product['name'] = $objServiceProduct->name;
                     $product['allow_multiple_quantity'] = $objServiceProduct->allow_multiple_quantity;
-                    $productPrice = $objRoomTypeServiceProductPrice->getProductPrice($product['id_product'], $idProduct, $product['quantity'], $useTax);
+                    $productPrice = $objRoomTypeServiceProductPrice->getServicePrice(
+                        $product['id_product'],
+                        $idProduct,
+                        $product['quantity'],
+                        $dateFrom,
+                        $dateTo,
+                        $useTax
+                    );
                     $product['price'] = $productPrice;
                     $serviceProductsPrice += $productPrice;
                 }

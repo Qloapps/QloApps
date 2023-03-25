@@ -33,7 +33,8 @@
 						<th>{l s='Name'}</th>
 						<th></th>
 						<th class="fixed-width-md">{l s='Quantity'}</th>
-						<th>{l s='Price'}</th>
+						<th>{l s='Unit Price'}</th>
+						<th>{l s='Total Price'}</th>
 						<th class="text-right">{l s='Action'}</th>
 					</tr>
 				</thead>
@@ -59,6 +60,12 @@
 										</div>
 									{else}
 										--
+									{/if}
+								</td>
+								<td>
+									{displayPrice price=$service['unit_price_tax_excl'] currency=$orderCurrency}
+									{if $service['product_price_calculation_method'] == Product::PRICE_CALCULATION_METHOD_PER_DAY}
+										{l s='/ night'}
 									{/if}
 								</td>
 								<td>{displayPrice price=$service['total_price_tax_excl']|escape:'html':'UTF-8' currency=$orderCurrency}</td>
@@ -106,7 +113,7 @@
 										{/if}
 									</td>
 									<td>
-										{if $product.allow_multiple_quantity}
+										{if $product['allow_multiple_quantity']}
 											<div class="qty_container">
 												<input type="number" class="form-control qty" min="1" id="qty_{$product['id_product']|escape:'html':'UTF-8'}" name="service_qty[{$product['id_product']|escape:'html':'UTF-8'}]" data-id-product="{$product.id_product|escape:'html':'UTF-8'}" value="1">
 											</div>
@@ -115,7 +122,10 @@
 										{/if}
 									</td>
 									<td class="text-right">
-										{convertPrice price=$product.price_tax_exc}
+										{convertPrice price=$product['price_tax_exc']}
+										{if $product['price_calculation_method'] == Product::PRICE_CALCULATION_METHOD_PER_DAY}
+											{l s='/ night'}
+										{/if}
 									</td>
 								</tr>
 							{/foreach}
@@ -136,6 +146,7 @@
 					<th>{l s='ID'}</th>
 					<th>{l s='Name'}</th>
 					<th></th>
+					<th>{l s='Unit Price'}</th>
 					<th class="text-right">{l s='Total Price'}</th>
 				</tr>
 			</thead>
@@ -152,6 +163,12 @@
 							{/if}
 							{if $service['product_auto_add'] && $service['product_price_addition_type'] == Product::PRICE_ADDITION_TYPE_WITH_ROOM}
 								<span class="badge badge-info label">{l s='Auto added'}</span>
+							{/if}
+						</td>
+						<td>
+							{displayPrice price=$service['unit_price_tax_excl'] currency=$orderCurrency}
+							{if $service['product_price_calculation_method'] == Product::PRICE_CALCULATION_METHOD_PER_DAY}
+								{l s='/ night'}
 							{/if}
 						</td>
 						<td class="text-right">
