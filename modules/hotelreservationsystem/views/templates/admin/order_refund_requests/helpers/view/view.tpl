@@ -229,7 +229,7 @@
 								<div class="col-sm-3">
 									<select id="id_refund_state" name="id_refund_state">
 										{foreach from=$refundStatuses item=state}
-											<option refunded="{$state['refunded']|escape:'html':'UTF-8'}" denied="{$state['denied']|escape:'html':'UTF-8'}" value="{$state['id_order_return_state']|intval}"{if isset($currentStateInfo) && $state['id_order_return_state'] == $currentStateInfo['id']} selected="selected" disabled="disabled"{/if}>{$state['name']|escape:'html':'UTF-8'}</option>
+											<option refunded="{$state['refunded']|escape:'html':'UTF-8'}" denied="{$state['denied']|escape:'html':'UTF-8'}" value="{$state['id_order_return_state']|intval}"{if isset($currentStateInfo) && $state['id_order_return_state'] == $currentStateInfo['id']} selected="selected"{/if}>{$state['name']|escape:'html':'UTF-8'}</option>
 										{/foreach}
 									</select>
 								</div>

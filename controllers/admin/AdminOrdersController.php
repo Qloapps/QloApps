@@ -1663,7 +1663,7 @@ class AdminOrdersControllerCore extends AdminController
 
         $objHotelBookingDetail = new HotelBookingDetail();
         $htlBookingDetail = $objHotelBookingDetail->getOrderCurrentDataByOrderId($order->id);
-        $isCancelledRoom = in_array(HotelBookingDetail::ORDER_CANCELED, array_column($htlBookingDetail, 'is_cancelled'));
+        $isCancelledRoom = in_array(HotelBookingDetail::ORDER_CANCELLED, array_column($htlBookingDetail, 'is_cancelled'));
 
         // hotel booking statuses
         $htlOrderStatus = HotelBookingDetail::getAllHotelOrderStatus();
@@ -1758,7 +1758,7 @@ class AdminOrdersControllerCore extends AdminController
                 'products' => $products,
                 'customer' => $customer)
             ),
-            'orderCancelled' => HotelBookingDetail::ORDER_CANCELED,
+            'orderCancelled' => HotelBookingDetail::ORDER_CANCELLED,
             'isCancelledRoom' => $isCancelledRoom,
         );
 

@@ -279,8 +279,7 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
                 if (Validate::isLoadedObject($objRefundState = new OrderReturnState($idRefundState))) {
                     if ($objRefundState->refunded) {
                         $refundedAmounts = Tools::getValue('refund_amounts');
-
-                        if ((float) $orderTotalPaid) {
+                        if ((float) $orderTotalPaid > 0) {
                             if ($idsReturnDetail && count($idsReturnDetail)) {
                                 if ($refundedAmounts) {
                                     foreach ($idsReturnDetail as $idRetDetail) {
@@ -336,17 +335,6 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
                         $idOrderDetail = 0;
                         if (Validate::isLoadedObject($objHtlBooking = new HotelBookingDetail($idHtlBooking))) {
                             $objHtlBooking->is_refunded = 1;
-
-                            // if (Tools::isSubmit('unavailable_for_order')) {
-                            //     $objHtlBooking->available_for_order = 0;
-                            // } else {
-                            //     $objHtlBooking->available_for_order = 1;
-                            // }
-
-                            $objHtlBooking->is_refunded = 1;
-
-                            $objHtlBooking->save();
-
                             $numDays = $objHtlBooking->getNumberOfDays(
                                 $objHtlBooking->date_from,
                                 $objHtlBooking->date_to
@@ -359,8 +347,27 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
                                 if ($objOrderDetail->product_quantity_refunded > $objOrderDetail->product_quantity) {
                                     $objOrderDetail->product_quantity_refunded = $objOrderDetail->product_quantity;
                                 }
+
+                                if ((float) $orderTotalPaid <= 0) {
+                                    $objOrderDetail->total_price_tax_incl -= $objHtlBooking->total_price_tax_incl;
+                                    $objOrderDetail->total_price_tax_excl -= $objHtlBooking->total_price_tax_excl;
+                                    if (Validate::isLoadedObject($objOrder = new Order($objHtlBooking->id_order))) {
+                                        $objOrder->total_paid -= $objHtlBooking->total_price_tax_incl;
+                                        $objOrder->total_paid_tax_excl -= $objHtlBooking->total_price_tax_excl;
+                                        $objOrder->total_paid_tax_incl -= $objHtlBooking->total_price_tax_incl;
+                                        $objOrder->total_products -= $objHtlBooking->total_price_tax_excl;
+                                        $objOrder->total_products_wt -= $objHtlBooking->total_price_tax_incl;
+                                        $objOrder->save();
+                                    }
+                                }
                                 $objOrderDetail->save();
                             }
+                            if ((float) $orderTotalPaid <= 0) {
+                                $objHtlBooking->is_cancelled = 1;
+                                $objHtlBooking->total_price_tax_excl = 0;
+                                $objHtlBooking->total_price_tax_incl = 0;
+                            }
+                            $objHtlBooking->save();
                         }
 
                         // save individual booking amount for every booking refund
@@ -387,7 +394,7 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
                     }
 
                     // if bookings are refunded then set the payment information
-                    if ($objRefundState->refunded) {
+                    if ($objRefundState->refunded && (float) $orderTotalPaid > 0) {
                         if (Tools::isSubmit('refundTransactionAmount')) {
                             $objOrderReturn->payment_mode = $paymentMode;
                             $objOrderReturn->id_transaction = $idTransaction;
