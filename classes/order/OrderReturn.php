@@ -198,22 +198,40 @@ class OrderReturnCore extends ObjectModel
 
             $objBookingDemands = new HotelBookingDemands();
             $objRoomTypeServiceProductOrderDetail = new RoomTypeServiceProductOrderDetail();
+            $objOrder = new Order($idOrder);
             foreach ($returnDetails as &$bookingRow) {
                 $bookingRow['extra_demand_service_total_paid_amount'] = 0;
-                $roomSelectedDemands = $objBookingDemands->getSelectedRoomDemandPaidAmount($bookingRow['id_htl_booking']);
-                if (count($roomSelectedDemands)) {
-                    foreach ($roomSelectedDemands as $demand) {
-                        $bookingRow['extra_demand_service_total_paid_amount'] += $demand['total_paid_amount'];
+                $bookingRow['room_paid_amount'] = 0;
+                if ($objOrder->total_paid_real > 0) {
+                    if ($bookingRow['total_price_tax_incl'] > 0) {
+                        $bookingRow['room_paid_amount'] = ($objOrder->total_paid_real*$bookingRow['total_price_tax_incl'])/$objOrder->total_paid_tax_incl;
+                    }
+                    $roomSelectedDemands = $objBookingDemands->getRoomTypeBookingExtraDemands(
+                        $idOrder,
+                        $bookingRow['id_product'],
+                        $bookingRow['id_room'],
+                        $bookingRow['date_from'],
+                        $bookingRow['date_to'],
+                        0
+                    );
+                    if (count($roomSelectedDemands)) {
+                        foreach ($roomSelectedDemands as $demand) {
+                            if ($demand['total_price_tax_incl'] > 0) {
+                                $bookingRow['extra_demand_service_total_paid_amount'] += ($objOrder->total_paid_real*$demand['total_price_tax_incl'])/$objOrder->total_paid_tax_incl;
+                            }
+                        }
+                    }
+
+                    if ($roomSelectedServices = $objRoomTypeServiceProductOrderDetail->getSelectedServicesForRoom($bookingRow['id_htl_booking'])) {
+                        if (count($roomSelectedServices['additional_services'])) {
+                            foreach ($roomSelectedServices['additional_services'] as $service) {
+                                if ($service['total_price_tax_incl'] > 0) {
+                                    $bookingRow['extra_demand_service_total_paid_amount'] += ($objOrder->total_paid_real*$service['total_price_tax_incl'])/$objOrder->total_paid_tax_incl;
+                                }
+                            }
+                        }
                     }
                 }
-
-                $roomSelectedServices = $objRoomTypeServiceProductOrderDetail->getSelectedServicesForRoom($bookingRow['id_htl_booking']);
-                if (count($roomSelectedServices['additional_services'])) {
-                    foreach ($roomSelectedServices['additional_services'] as $serviceProduct) {
-                        $bookingRow['extra_demand_service_total_paid_amount'] += $serviceProduct['total_paid_amount'];
-                    }
-                }
-
                 if ($customerView) {
                     $dateJoin = $bookingRow['id_product'].'_'.strtotime($bookingRow['date_from']).strtotime($bookingRow['date_to']);
                     if (isset($returnsCustView[$dateJoin]['num_rooms'])) {

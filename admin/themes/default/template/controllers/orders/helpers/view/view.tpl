@@ -281,7 +281,7 @@
 										</tr>
 										{if isset($htl_booking_order_data) && $htl_booking_order_data}
 											{foreach from=$htl_booking_order_data item=data}
-												{if $data.is_refunded != $orderCancelled}
+												{if !$data.is_refunded}
 													<tr>
 														<td>
 															{$data['room_num']}

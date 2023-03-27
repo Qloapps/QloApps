@@ -30,7 +30,6 @@ class RoomTypeServiceProductOrderDetail extends ObjectModel
     public $unit_price_tax_incl;
     public $total_price_tax_excl;
     public $total_price_tax_incl;
-    public $total_paid_amount;
     public $name;
     public $quantity;
     public $auto_added;
@@ -50,7 +49,6 @@ class RoomTypeServiceProductOrderDetail extends ObjectModel
             'unit_price_tax_incl' => array('type' => self::TYPE_FLOAT, 'validate' => 'isPrice', 'required' => true),
             'total_price_tax_excl' => array('type' => self::TYPE_FLOAT, 'validate' => 'isPrice', 'required' => true),
             'total_price_tax_incl' => array('type' => self::TYPE_FLOAT, 'validate' => 'isPrice', 'required' => true),
-            'total_paid_amount' => array('type' => self::TYPE_FLOAT, 'validate' => 'isPrice'),
             'name' => array('type' => self::TYPE_STRING, 'required' => true),
             'quantity' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedInt', 'required' => true),
             'auto_added' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedInt'),
@@ -201,9 +199,9 @@ class RoomTypeServiceProductOrderDetail extends ObjectModel
             $sql .= ', hbd.`id_product` as `room_type_id_product`, od.`product_allow_multiple_quantity`, hbd.`id_room`, od.`product_auto_add`, od.`product_price_addition_type`';
         }
         $sql .= ' FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
-            LEFT JOIN `'._DB_PREFIX_.'htl_room_type_service_product_order_detail` rsod ON(rsod.`id_htl_booking_detail` = hbd.`id`)';
+            INNER JOIN `'._DB_PREFIX_.'htl_room_type_service_product_order_detail` rsod ON(rsod.`id_htl_booking_detail` = hbd.`id`)';
 
-        $sql .= ' LEFT JOIN `'._DB_PREFIX_.'order_detail` od ON(od.`product_id` = rsod.`id_product`)';
+        $sql .= ' LEFT JOIN `'._DB_PREFIX_.'order_detail` od ON(od.`id_order_detail` = rsod.`id_order_detail`)';
 
         $sql .= ' WHERE hbd.`id` = '.(int)$idHotelBookingDetail;
 
@@ -234,7 +232,6 @@ class RoomTypeServiceProductOrderDetail extends ObjectModel
                             'product_price_addition_type' => $product['product_price_addition_type'],
                             'total_price_tax_excl' => $product['total_price_tax_excl'],
                             'total_price_tax_incl' => $product['total_price_tax_incl'],
-                            'total_paid_amount' => $product['total_paid_amount'],
                         );
                     } else {
                         $selectedAdditionalServices['id_order'] = $product['id_order'];
@@ -256,7 +253,6 @@ class RoomTypeServiceProductOrderDetail extends ObjectModel
                                 'product_price_addition_type' => $product['product_price_addition_type'],
                                 'total_price_tax_excl' => $product['total_price_tax_excl'],
                                 'total_price_tax_incl' => $product['total_price_tax_incl'],
-                                'total_paid_amount' => $product['total_paid_amount'],
                             ),
                         );
                     }

@@ -363,10 +363,10 @@
 							<th>{l s='Room Capacity'}</th>
 							<th>{l s='Check-in Date'}</th>
 							<th>{l s='Check-out Date'}</th>
-							<th>{l s='Extra Services'}</th>
 							{if isset($isCancelledRoom) && $isCancelledRoom}
 								<th class="text-center"><span class="title_box">{l s='Room Status'}</span></th>
 							{/if}
+							<th>{l s='Extra Services'}</th>
 							<th class="cart_total">{l s='Total'}</th>
 						</tr>
 					</thead>
@@ -380,7 +380,7 @@
 												{foreach $rm_v['ids_htl_booking_detail'] as $key => $id_htl_booking}
 													<div class="checkbox">
 														<label for="bookings_to_refund">
-															<input class="bookings_to_refund" type="checkbox" name="bookings_to_refund[]" value="{$id_htl_booking|escape:'html':'UTF-8'}" {if (isset($refundReqBookings) && ($id_htl_booking|in_array:$refundReqBookings)) || $rm_v['is_refunded'] == $orderCancelled}disabled{/if}/> &nbsp;{l s='Room'}-{$key+1}
+															<input class="bookings_to_refund" type="checkbox" name="bookings_to_refund[]" value="{$id_htl_booking|escape:'html':'UTF-8'}" {if (isset($refundReqBookings) && ($id_htl_booking|in_array:$refundReqBookings)) || $rm_v['is_refunded']}disabled{/if}/> &nbsp;{l s='Room'}-{$key+1}
 														</label>
 													</div>
 												{/foreach}
@@ -407,6 +407,13 @@
 									</td>
 									<td class="text-center">{$rm_v['data_form']|date_format:"%d-%m-%Y"}</td>
 									<td class="text-center">{$rm_v['data_to']|date_format:"%d-%m-%Y"}</td>
+									{if isset($isCancelledRoom) && $isCancelledRoom}
+										<td>
+											{if $rm_v['is_refunded']}
+												<span class="badge badge-danger">{l s='Cancelled'}</span>
+											{/if}
+										</td>
+									{/if}
 									<td>
 										{if (isset($rm_v['extra_demands']) && $rm_v['extra_demands']) || isset($rm_v['additional_services']) && $rm_v['additional_services']}
 												<a data-date_from="{$rm_v['data_form']}" data-date_to="{$rm_v['data_to']}" data-id_product="{$data_v['id_product']}" data-id_order="{$order->id}" data-action="{$link->getPageLink('order-detail')}" class="open_rooms_extra_services_panel" href="#rooms_type_extra_services_form">
@@ -420,15 +427,6 @@
 											</a>
 										{/if}
 									</td>
-									{if isset($isCancelledRoom) && $isCancelledRoom}
-										<td>
-											{if $rm_v['is_refunded'] == $orderCancelled}
-												<span class="badge badge-danger">{l s='Cancelled'}</span>
-											{else}
-												<span class="badge badge-success">{l s='Allotted'}</span>
-											{/if}
-										</td>
-									{/if}
 									<td class="cart_total text-left">
 										{if $group_use_tax}
 											{displayWtPriceWithCurrency price=($rm_v['amount_tax_incl'] + $rm_v['extra_demands_price_ti'] + $rm_v['additional_services_price_ti'] + $rm_v['additional_services_price_auto_add_ti']) currency=$currency}

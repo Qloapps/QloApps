@@ -853,7 +853,6 @@ class AdminOrdersControllerCore extends AdminController
                             $this->errors[] = Tools::displayError('An error occurred during payment.');
                         }
                     } else {
-                        $order->recalculateOrderSplitAmount();
                         Tools::redirectAdmin(self::$currentIndex.'&id_order='.$order->id.'&vieworder&conf=4&token='.$this->token);
                     }
                 }
@@ -1663,7 +1662,7 @@ class AdminOrdersControllerCore extends AdminController
 
         $objHotelBookingDetail = new HotelBookingDetail();
         $htlBookingDetail = $objHotelBookingDetail->getOrderCurrentDataByOrderId($order->id);
-        $isCancelledRoom = in_array(HotelBookingDetail::ORDER_CANCELLED, array_column($htlBookingDetail, 'is_cancelled'));
+        $isCancelledRoom = in_array(1, array_column($htlBookingDetail, 'is_cancelled'));
 
         // hotel booking statuses
         $htlOrderStatus = HotelBookingDetail::getAllHotelOrderStatus();
@@ -1762,7 +1761,6 @@ class AdminOrdersControllerCore extends AdminController
                 'products' => $products,
                 'customer' => $customer)
             ),
-            'orderCancelled' => HotelBookingDetail::ORDER_CANCELLED,
             'isCancelledRoom' => $isCancelledRoom,
         );
 
@@ -3101,7 +3099,6 @@ class AdminOrdersControllerCore extends AdminController
 
         // delete cart feature prices after room addition success
         HotelRoomTypeFeaturePricing::deleteByIdCart($cart->id);
-        $order->recalculateOrderSplitAmount();
         die(json_encode(array(
             'result' => true,
             //'view' => $this->createTemplate('_product_line.tpl')->fetch(),
@@ -3644,7 +3641,6 @@ class AdminOrdersControllerCore extends AdminController
         }
 
         $this->sendChangedNotification($order);
-        $order->recalculateOrderSplitAmount();
         die(json_encode(array(
             'result' => $res,
             'view' => $view,
@@ -4088,7 +4084,6 @@ class AdminOrdersControllerCore extends AdminController
         ));
 
         $this->sendChangedNotification($order);
-        $order->recalculateOrderSplitAmount();
         die(json_encode(array(
             'result' => $res,
             'order' => $order,

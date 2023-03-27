@@ -74,8 +74,6 @@ class HotelBookingDetail extends ObjectModel
     const ALLOTMENT_AUTO = 1;
     const ALLOTMENT_MANUAL = 2;
 
-    const ORDER_CANCELLED = 1;
-
     // Search algorithm: Exact room types reults, All room types
     const SEARCH_EXACT_ROOM_TYPE_ALGO = 1;
     const SEARCH_ALL_ROOM_TYPE_ALGO = 2;

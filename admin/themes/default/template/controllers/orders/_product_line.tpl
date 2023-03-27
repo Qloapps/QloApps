@@ -235,10 +235,10 @@
 	{/if}
 	{if isset($isCancelledRoom) && $isCancelledRoom}
 		<td>
-			{if $data.is_refunded == $orderCancelled}
+			{if $data.is_refunded}
 				<span class="badge badge-danger">{l s='Cancelled'}</span>
 			{else}
-				<span class="badge badge-success">{l s='Allotted'}</span>
+				<span>--</span>
 			{/if}
 		</td>
 	{/if}

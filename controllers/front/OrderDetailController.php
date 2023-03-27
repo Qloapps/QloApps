@@ -247,9 +247,7 @@ class OrderDetailControllerCore extends FrontController
                         if ((int)$order->total_paid_real == 0){
                             foreach ($bookingRefunds as $idHtlBooking) {
                                 $objHtlBooking = new HotelBookingDetail($idHtlBooking);
-                                $objHtlBooking->is_cancelled = HotelBookingDetail::ORDER_CANCELLED;
                                 $objHtlBooking->save();
-
                             }
                         }
 
@@ -590,7 +588,7 @@ class OrderDetailControllerCore extends FrontController
 
                     $objHotelBookingDetail = new HotelBookingDetail();
                     $htlBookingDetail = $objHotelBookingDetail->getOrderCurrentDataByOrderId($order->id);
-                    $isCancelledRoom = in_array(HotelBookingDetail::ORDER_CANCELLED, array_column($htlBookingDetail, 'is_cancelled'));
+                    $isCancelledRoom = in_array(true, array_column($htlBookingDetail, 'is_cancelled'));
 
                     $this->context->smarty->assign(
                         array(
@@ -607,7 +605,6 @@ class OrderDetailControllerCore extends FrontController
                             'cart_htl_data' => $cartHotelData,
                             'cart_service_products' => $cartServiceProducts,
                             'non_requested_rooms' => $nonRequestedRooms,
-                            'orderCancelled' => HotelBookingDetail::ORDER_CANCELLED,
                             'isCancelledRoom' => $isCancelledRoom,
                         )
                     );

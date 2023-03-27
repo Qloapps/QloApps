@@ -153,17 +153,10 @@ class HotelOrderRefundRules extends ObjectModel
                         1
                     );
 
-                    $totalServicesPrice = $objRoomTypeServiceProductOrderDetail->getroomTypeServiceProducts(
-                        $objHtlBooking->id_order,
-                        0,
-                        0,
-                        $objHtlBooking->id_product,
-                        $objHtlBooking->date_from,
-                        $objHtlBooking->date_to,
-                        $objHtlBooking->id_room,
+                    $totalServicesPrice = $objRoomTypeServiceProductOrderDetail->getSelectedServicesForRoom(
+                        $objHtlBooking->id,
                         1,
-                        1,
-                        null
+                        1
                     );
 
                     if ($refundRules = $objHtlRefundRules->getHotelRefundRules($objHtlBooking->id_hotel, 0, 1)) {
