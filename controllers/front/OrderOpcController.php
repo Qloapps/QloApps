@@ -466,6 +466,7 @@ class OrderOpcControllerCore extends ParentOrderController
                 // 'defaultcurrencySign' => $objCurrency->sign,
                 'THEME_DIR' => _THEME_DIR_,
                 'PS_CUSTOMER_ADDRESS_CREATION' => Configuration::get('PS_CUSTOMER_ADDRESS_CREATION'),
+                'PS_ROOM_PRICE_AUTO_ADD_BREAKDOWN' => Configuration::get('PS_ROOM_PRICE_AUTO_ADD_BREAKDOWN'),
                 'free_shipping' => $free_shipping,
                 'isGuest' => isset($this->context->cookie->is_guest) ? $this->context->cookie->is_guest : 0,
                 'countries' => $countries,
@@ -556,6 +557,7 @@ class OrderOpcControllerCore extends ParentOrderController
             if (!empty($cartProducts)) {
 
                 if ($cartBookingInfo = HotelCartBookingData::getHotelCartBookingData()) {
+                    // ddd($cartBookingInfo);
                     $this->context->smarty->assign('cart_htl_data', $cartBookingInfo);
                 }
                 $objHotelServiceProductCartDetail = new HotelServiceProductCartDetail();
