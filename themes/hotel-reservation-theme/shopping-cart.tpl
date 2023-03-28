@@ -150,6 +150,17 @@
 													<span>
 														{displayPrice price=($rm_v['amount'])}
 													</span>
+													{if (($rm_v['amount'] - $rm_v['amount_without_auto_add']) > 0) && (in_array($data_v['id_product'], $discounted_products) || $PS_ROOM_PRICE_AUTO_ADD_BREAKDOWN)}
+														<span class="room-price-detail">
+															<img src="{$img_dir}icon/icon-info.svg" />
+														</span>
+														<div class="room-price-detail-container" style="display: none;">
+                                                			<div class="room-price-detail-tooltip-cont">
+																<div><label>{l s='Room price'}</label> : {displayPrice price=($rm_v['amount_without_auto_add'])}</div>
+																<div><label>{l s='Additional charges'}</label> : {displayPrice price=($rm_v['amount'] - $rm_v['amount_without_auto_add'])}</div>
+															</div>
+														</div>
+													{/if}
 													{if (isset($data_v['extra_demands']) && $data_v['extra_demands']) || (isset($data_v['service_products']) && $data_v['service_products'])}
 														<span class="plus-sign pull-right">
 															+
