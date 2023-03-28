@@ -1218,6 +1218,9 @@ class ProductControllerCore extends FrontController
 
         $dateFrom = date('Y-m-d', strtotime($dateFrom));
         $dateTo = date('Y-m-d', strtotime($dateTo));
+        if ($occupancy == false) {
+            $occupancy = array();
+        }
         $this->assignServiceProductVars();
         if ($this->assignBookingFormVars(
             $idProduct,
