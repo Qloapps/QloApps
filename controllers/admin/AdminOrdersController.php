@@ -43,6 +43,7 @@ class AdminOrdersControllerCore extends AdminController
     public $toolbar_title;
 
     protected $statuses_array = array();
+    protected $all_order_sources = array();
 
     public function __construct()
     {
@@ -63,45 +64,107 @@ class AdminOrdersControllerCore extends AdminController
         CONCAT(c.`firstname`, \' \', c.`lastname`) AS `customer`,
         osl.`name` AS `osname`, os.`color`,
         IF((SELECT so.id_order FROM `'._DB_PREFIX_.'orders` so WHERE so.id_customer = a.id_customer AND so.id_order < a.id_order LIMIT 1) > 0, 0, 1) as new,
-        IF(a.valid, 1, 0) badge_success';
+        IF(a.valid, 1, 0) badge_success,
+        hbil.`hotel_name`,
+        (SELECT COUNT(hbd.`id`) FROM `'._DB_PREFIX_.'htl_booking_detail` hbd WHERE hbd.`id_order` = a.`id_order`) as num_rooms,
+        (SELECT SUM(hbd.`adults`) + SUM(hbd.`children`) FROM `'._DB_PREFIX_.'htl_booking_detail` hbd WHERE hbd.`id_order` = a.`id_order`) as total_guests_count,
+        (SELECT CONCAT(
+            SUM(hbd.`adults`),
+            \' '.$this->l('Adult(s)').' \',
+            IF(SUM(hbd.`children`), CONCAT(SUM(hbd.`children`), \' '.$this->l('Children').'\'), \'\')
+        ) FROM `'._DB_PREFIX_.'htl_booking_detail` hbd WHERE hbd.`id_order` = a.`id_order`) as total_guests,
+        (SELECT SUM(DATEDIFF(hbd.`date_to`, hbd.`date_from`)) FROM `'._DB_PREFIX_.'htl_booking_detail` hbd WHERE hbd.`id_order` = a.`id_order`) as los';
 
         $this->_join = '
         LEFT JOIN `'._DB_PREFIX_.'customer` c ON (c.`id_customer` = a.`id_customer`)
         LEFT JOIN `'._DB_PREFIX_.'order_state` os ON (os.`id_order_state` = a.`current_state`)
-        LEFT JOIN `'._DB_PREFIX_.'order_state_lang` osl ON (os.`id_order_state` = osl.`id_order_state` AND osl.`id_lang` = '.(int) $this->context->language->id.')';
+        LEFT JOIN `'._DB_PREFIX_.'order_state_lang` osl ON (os.`id_order_state` = osl.`id_order_state` AND osl.`id_lang` = '.(int) $this->context->language->id.')
+        LEFT JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd ON (hbd.`id_order` = a.`id_order`)
+        LEFT JOIN `'._DB_PREFIX_.'htl_branch_info_lang` hbil ON (hbil.`id` = hbd.`id_hotel`)';
+
         $this->_orderBy = 'id_order';
         $this->_orderWay = 'DESC';
         $this->_use_found_rows = true;
 
+        $this->_group = ' GROUP BY hbd.`id_order`';
+
         $statuses = OrderState::getOrderStates((int)$this->context->language->id);
         foreach ($statuses as $status) {
             $this->statuses_array[$status['id_order_state']] = $status['name'];
+        }
+        $all_order_sources = Db::getInstance()->executeS('SELECT DISTINCT(`source`) FROM  `'._DB_PREFIX_.'orders`');
+        foreach ($all_order_sources as $source) {
+            $this->all_order_sources[$source['source']] = $source['source'];
         }
 
         $this->fields_list = array(
             'id_order' => array(
                 'title' => $this->l('ID'),
                 'align' => 'text-center',
-                'class' => 'fixed-width-xs'
+                'class' => 'fixed-width-xs',
             ),
             'reference' => array(
                 'title' => $this->l('Reference')
             ),
-            'new' => array(
-                'title' => $this->l('New client'),
-                'align' => 'text-center',
-                'type' => 'bool',
-                'tmpTableFilter' => true,
-                'orderby' => false,
-                'callback' => 'printNewCustomer'
-            ),
             'customer' => array(
                 'title' => $this->l('Customer'),
                 'havingFilter' => true,
+                'optional' => true,
+                'visible_default' => true
             ),
             'order_source' => array(
                 'title' => $this->l('Order Source'),
+                'type' => 'select',
+                'filter_key' => 'a!source',
+                'list' => $this->all_order_sources,
+                'optional' => true,
+                'visible_default' => true
+            ),
+            'hotel_name' => array(
+                'title' => $this->l('Hotel'),
+                'filter_key' => 'hbil!hotel_name',
+                'optional' => true,
+                'visible_default' => true
+            ),
+            'date_from' => array(
+                'title' => $this->l('Check-in'),
+                'filter_key' => 'hbd!date_from',
+                'type'=>'date',
+                'displayed' => false,
+            ),
+            'date_to' => array(
+                'title' => $this->l('Check-out'),
+                'filter_key' => 'hbd!date_to',
+                'type'=>'date',
+                'displayed' => false,
+            ),
+            'room_type_name' => array(
+                'title' => $this->l('Room type'),
+                'filter_key' => 'hbd!room_type_name',
+                'type'=>'text',
+                'displayed' => false,
+            ),
+            'total_guests' => array(
+                'title' => $this->l('Guests'),
+                'type' => 'range',
+                'filter_key' => 'total_guests_count',
+                'optional' => true,
                 'havingFilter' => true,
+            ),
+            'num_rooms' => array(
+                'title' => $this->l('No. of rooms'),
+                'align' => 'text-center',
+                'type' => 'range',
+                'optional' => true,
+                'havingFilter' => true,
+                'visible_default' => true
+            ),
+            'los' => array(
+                'title' => $this->l('Stay period'),
+                'align' => 'text-center',
+                'type' => 'range',
+                'havingFilter' => true,
+                'optional' => true,
             ),
         );
 
@@ -116,9 +179,9 @@ class AdminOrdersControllerCore extends AdminController
 
         $this->fields_list = array_merge($this->fields_list, array(
             'total_paid_tax_incl' => array(
-                'title' => $this->l('Total'),
+                'title' => $this->l('Order Total'),
                 'align' => 'text-right',
-                'type' => 'price',
+                'type' => 'range',
                 'currency' => true,
                 'callback' => 'setOrderCurrency',
                 'badge_success' => true,
@@ -126,11 +189,13 @@ class AdminOrdersControllerCore extends AdminController
             'amount_due' => array(
                 'title' => $this->l('Due Amount'),
                 'align' => 'text-right',
-                'type' => 'price',
+                'type' => 'range',
                 'currency' => true,
                 'havingFilter' => true,
                 'callback' => 'setOrderCurrency',
                 'badge_success' => true,
+                'optional' => true,
+                'visible_default' => true
             ),
             'payment' => array(
                 'title' => $this->l('Payment')
@@ -142,13 +207,17 @@ class AdminOrdersControllerCore extends AdminController
                 'list' => $this->statuses_array,
                 'filter_key' => 'os!id_order_state',
                 'filter_type' => 'int',
-                'order_key' => 'osname'
+                'order_key' => 'osname',
+                'optional' => true,
+                'visible_default' => true
             ),
             'date_add' => array(
-                'title' => $this->l('Date'),
+                'title' => $this->l('Order date'),
                 'align' => 'text-right',
                 'type' => 'datetime',
-                'filter_key' => 'a!date_add'
+                'filter_key' => 'a!date_add',
+                'optional' => true,
+                'visible_default' => true
             ),
             'id_pdf' => array(
                 'title' => $this->l('PDF'),
@@ -156,7 +225,8 @@ class AdminOrdersControllerCore extends AdminController
                 'callback' => 'printPDFIcons',
                 'orderby' => false,
                 'search' => false,
-                'remove_onclick' => true
+                'remove_onclick' => true,
+                'optional' => true,
             )
         ));
 
@@ -1287,56 +1357,56 @@ class AdminOrdersControllerCore extends AdminController
         parent::postProcess();
     }
 
-    public function renderKpis()
-    {
-        $time = time();
-        $kpis = array();
+    // public function renderKpis()
+    // {
+    //     $time = time();
+    //     $kpis = array();
 
-        $helper = new HelperKpi();
-        $helper->id = 'box-conversion-rate';
-        $helper->icon = 'icon-sort-by-attributes-alt';
-        //$helper->chart = true;
-        $helper->color = 'color1';
-        $helper->title = $this->l('Conversion Rate', null, null, false);
-        $helper->subtitle = $this->l('30 days', null, null, false);
-        if (ConfigurationKPI::get('CONVERSION_RATE_CHART') !== false) {
-            $helper->data = ConfigurationKPI::get('CONVERSION_RATE_CHART');
-        }
-        $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=conversion_rate';
-        $kpis[] = $helper->generate();
+    //     $helper = new HelperKpi();
+    //     $helper->id = 'box-conversion-rate';
+    //     $helper->icon = 'icon-sort-by-attributes-alt';
+    //     //$helper->chart = true;
+    //     $helper->color = 'color1';
+    //     $helper->title = $this->l('Conversion Rate', null, null, false);
+    //     $helper->subtitle = $this->l('30 days', null, null, false);
+    //     if (ConfigurationKPI::get('CONVERSION_RATE_CHART') !== false) {
+    //         $helper->data = ConfigurationKPI::get('CONVERSION_RATE_CHART');
+    //     }
+    //     $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=conversion_rate';
+    //     $kpis[] = $helper->generate();
 
-        $helper = new HelperKpi();
-        $helper->id = 'box-carts';
-        $helper->icon = 'icon-shopping-cart';
-        $helper->color = 'color2';
-        $helper->title = $this->l('Abandoned Carts', null, null, false);
-        $helper->subtitle = $this->l('Today', null, null, false);
-        $helper->href = $this->context->link->getAdminLink('AdminCarts').'&action=filterOnlyAbandonedCarts';
-        $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=abandoned_cart';
-        $kpis[] = $helper->generate();
+    //     $helper = new HelperKpi();
+    //     $helper->id = 'box-carts';
+    //     $helper->icon = 'icon-shopping-cart';
+    //     $helper->color = 'color2';
+    //     $helper->title = $this->l('Abandoned Carts', null, null, false);
+    //     $helper->subtitle = $this->l('Today', null, null, false);
+    //     $helper->href = $this->context->link->getAdminLink('AdminCarts').'&action=filterOnlyAbandonedCarts';
+    //     $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=abandoned_cart';
+    //     $kpis[] = $helper->generate();
 
-        $helper = new HelperKpi();
-        $helper->id = 'box-average-order';
-        $helper->icon = 'icon-money';
-        $helper->color = 'color3';
-        $helper->title = $this->l('Average Order Value', null, null, false);
-        $helper->subtitle = $this->l('30 days', null, null, false);
-        $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=average_order_value';
-        $kpis[] = $helper->generate();
+    //     $helper = new HelperKpi();
+    //     $helper->id = 'box-average-order';
+    //     $helper->icon = 'icon-money';
+    //     $helper->color = 'color3';
+    //     $helper->title = $this->l('Average Order Value', null, null, false);
+    //     $helper->subtitle = $this->l('30 days', null, null, false);
+    //     $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=average_order_value';
+    //     $kpis[] = $helper->generate();
 
-        $helper = new HelperKpi();
-        $helper->id = 'box-net-profit-visit';
-        $helper->icon = 'icon-user';
-        $helper->color = 'color4';
-        $helper->title = $this->l('Net Profit per Visit', null, null, false);
-        $helper->subtitle = $this->l('30 days', null, null, false);
-        $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=netprofit_visit';
-        $kpis[] = $helper->generate();
+    //     $helper = new HelperKpi();
+    //     $helper->id = 'box-net-profit-visit';
+    //     $helper->icon = 'icon-user';
+    //     $helper->color = 'color4';
+    //     $helper->title = $this->l('Net Profit per Visit', null, null, false);
+    //     $helper->subtitle = $this->l('30 days', null, null, false);
+    //     $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=netprofit_visit';
+    //     $kpis[] = $helper->generate();
 
-        $helper = new HelperKpiRow();
-        $helper->kpis = $kpis;
-        return $helper->generate();
-    }
+    //     $helper = new HelperKpiRow();
+    //     $helper->kpis = $kpis;
+    //     return $helper->generate();
+    // }
 
     public function renderView()
     {
