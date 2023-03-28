@@ -57,7 +57,7 @@
 									<p class="rm_price_cont">
 										{if $room_v['feature_price_diff'] >= 0}
 											<span class="rm_price_val {if $room_v['feature_price_diff']>0}room_type_old_price{/if}">
-												{displayPrice price = $room_v['price_without_reduction']|round:2|floatVal}
+												{displayPrice price = $room_v['price_without_reduction_with_auto_add']|round:2|floatVal}
 											</span>
 										{/if}
 										{if $room_v['feature_price_diff']}

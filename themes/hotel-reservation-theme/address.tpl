@@ -54,6 +54,16 @@
 					<input class="form-control validate" data-validate="{$address_validation.$field_name.validate}" type="text" id="company" name="company" value="{if isset($smarty.post.company)}{$smarty.post.company}{else}{if isset($address->company)}{$address->company|escape:'html':'UTF-8'}{/if}{/if}" />
 				</div>
 			{/if}
+			{if $field_name eq 'vat_number'}
+				<div id="vat_area">
+					<div id="vat_number">
+						<div class="form-group">
+							<label for="vat-number">{l s='VAT number'}{if isset($required_fields) && in_array($field_name, $required_fields)} <sup>*</sup>{/if}</label>
+							<input type="text" class="form-control validate" data-validate="{$address_validation.$field_name.validate}" id="vat-number" name="vat_number" value="{if isset($smarty.post.vat_number)}{$smarty.post.vat_number}{else}{if isset($address->vat_number)}{$address->vat_number|escape:'html':'UTF-8'}{/if}{/if}" />
+						</div>
+					</div>
+				</div>
+			{/if}
 			{if $field_name eq 'dni'}
 			{assign var="dniExist" value=true}
 			<div class="required form-group dni">

@@ -1661,9 +1661,13 @@ class AdminOrdersControllerCore extends AdminController
 
         // hotel booking statuses
         $htlOrderStatus = HotelBookingDetail::getAllHotelOrderStatus();
+
+        // applicable refund policies
+        $applicableRefundPolicies = HotelOrderRefundRules::getApplicableRefundRules($order->id);
         $this->tpl_view_vars = array(
             // refund info
             'refund_allowed' => (int) $order->isReturnable(),
+            'applicable_refund_policies' => $applicableRefundPolicies,
             'returns' => OrderReturn::getOrdersReturn($order->id_customer, $order->id),
             'refundReqBookings' => $refundReqBookings,
             'hasCompletelyRefunded' => $order->hasCompletelyRefunded(),
@@ -4213,6 +4217,8 @@ class AdminOrdersControllerCore extends AdminController
         }
 
         $product_informations = Tools::getValue('edit_product');
+        $old_date_from = date('Y-m-d', strtotime(trim(Tools::getValue('date_from'))));
+        $old_date_to = date('Y-m-d', strtotime(trim(Tools::getValue('date_to'))));
         $new_date_from = trim(date('Y-m-d', strtotime($product_informations['date_from'])));
         $new_date_to = trim(date('Y-m-d', strtotime($product_informations['date_to'])));
         $obj_booking_detail = new HotelBookingDetail();
@@ -4628,6 +4634,7 @@ class AdminOrdersControllerCore extends AdminController
             $smartyVars = array();
             $objOrder = new Order($idOrder);
             $smartyVars['orderCurrency'] = $objOrder->id_currency;
+            $smartyVars['link'] = $this->context->link;
 
             $objBookingDemand = new HotelBookingDetail();
             $htlBookingDetail = $objBookingDemand->getRowByIdOrderIdProductInDateRange(
@@ -4685,7 +4692,7 @@ class AdminOrdersControllerCore extends AdminController
 
                 // get room type additional demands
                 $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
-                if ($roomTypeServiceProducts = $objRoomTypeServiceProduct->getServiceProductsData($idProduct)) {
+                if ($roomTypeServiceProducts = $objRoomTypeServiceProduct->getServiceProductsData($idProduct, 1, 0, false, 2, null)) {
                     foreach ($roomTypeServiceProducts as $key => $product) {
                         if (in_array($product['id_product'], array_column($additionalServices['additional_services'], 'id_product'))) {
                             unset($roomTypeServiceProducts[$key]);
@@ -4695,7 +4702,6 @@ class AdminOrdersControllerCore extends AdminController
                 }
             }
             $this->context->smarty->assign($smartyVars);
-
         }
 
         $extraDemandsTpl = $this->context->smarty->fetch(
@@ -4733,7 +4739,7 @@ class AdminOrdersControllerCore extends AdminController
 
             // get room type additional demands
             $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
-            if ($roomTypeServiceProducts = $objRoomTypeServiceProduct->getServiceProductsData($idProduct)) {
+            if ($roomTypeServiceProducts = $objRoomTypeServiceProduct->getServiceProductsData($idProduct, 1, 0, false, 2, null)) {
                 foreach ($roomTypeServiceProducts as $key => $product) {
                     if (in_array($product['id_product'], array_column($additionalServices['additional_services'], 'id_product'))) {
                         unset($roomTypeServiceProducts[$key]);
@@ -4742,13 +4748,13 @@ class AdminOrdersControllerCore extends AdminController
                 $smartyVars['roomTypeServiceProducts'] = $roomTypeServiceProducts;
             }
         }
+        $smartyVars['show_active'] = true;
         $this->context->smarty->assign($smartyVars);
 
         $servicesTpl = $this->context->smarty->fetch(
             _PS_ADMIN_DIR_.'/themes/default/template/controllers/orders/_room_services_block.tpl'
         );
         return $servicesTpl;
-
     }
 
     public function processRenderFacilitiesBlock($idOrder, $idProduct, $dateFrom, $dateTo, $idRoom, $orderEdit)
@@ -4851,6 +4857,15 @@ class AdminOrdersControllerCore extends AdminController
                 $response['hasError'] = true;
                 $response['errors'] = $this->l('cannot order multiple quanitity for this service');
             }
+            $objHotelBookingDetail = new HotelBookingDetail($objRoomTypeServiceProductOrderDetail->id_htl_booking_detail);
+            $response['service_panel']= $servicesBlock = $this->processRenderServicesPanel(
+                $objOrderDetail->id_order,
+                $objHotelBookingDetail->id_product,
+                $objHotelBookingDetail->date_from,
+                $objHotelBookingDetail->date_to,
+                $objHotelBookingDetail->id_room,
+                true
+            );
         } else {
             $response['hasError'] = true;
             $response['errors'] = $this->l('Additional service not found');

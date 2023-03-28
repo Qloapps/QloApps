@@ -82,7 +82,7 @@ class RoomTypeServiceProductOrderDetail extends ObjectModel
         $sql .= ' FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
             LEFT JOIN `'._DB_PREFIX_.'htl_room_type_service_product_order_detail` rsod ON(rsod.`id_htl_booking_detail` = hbd.`id`)';
 
-        $sql .= ' LEFT JOIN `'._DB_PREFIX_.'order_detail` od ON(od.`product_id` = rsod.`id_product` AND od.`id_order` = '.(int)$idOrder.')';
+        $sql .= ' LEFT JOIN `'._DB_PREFIX_.'order_detail` od ON(od.`id_order_detail` = rsod.`id_order_detail`)';
         $sql .= ' WHERE rsod.`id_order` = '.(int)$idOrder;
 
         if (!is_null($autoAddToCart)) {
@@ -204,7 +204,7 @@ class RoomTypeServiceProductOrderDetail extends ObjectModel
         }
         $sql .= ' FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
             LEFT JOIN `'._DB_PREFIX_.'htl_room_type_service_product_order_detail` rsod ON(rsod.`id_htl_booking_detail` = hbd.`id`)';
-        $sql .= ' LEFT JOIN `'._DB_PREFIX_.'order_detail` od ON(od.`product_id` = rsod.`id_product` AND od.`id_order` = '.(int)$idOrder.')';
+        $sql .= ' LEFT JOIN `'._DB_PREFIX_.'order_detail` od ON(od.`id_order_detail` = rsod.`id_order_detail`)';
         $sql .= ' WHERE rsod.`id_order` = '.(int)$idOrder.' AND hbd.`id_product`='.(int) $roomTypeIdProduct .' AND hbd.`date_from` = \''.pSQL($dateFrom).'\' AND hbd.`date_to` = \''.pSQL($dateTo).'\' AND hbd.`id_room`='.(int) $idRoom;
 
         if ($getTotalPrice) {

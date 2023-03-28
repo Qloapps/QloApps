@@ -22,12 +22,8 @@
 		<span aria-hidden="true">&times;</span>
 	</button>
 	<ul class="nav nav-tabs" role="tablist">
-		{if (isset($extraDemands) && $extraDemands) || (isset($roomTypeDemands) && $roomTypeDemands)}
-			<li role="presentation" class="active"><a href="#room_type_demands_desc" aria-controls="facilities" role="tab" data-toggle="tab">{l s='Facilities'}</a></li>
-		{/if}
-		{if (isset($additionalServices) && $additionalServices) || (isset($roomTypeServiceProducts) && $roomTypeServiceProducts)}
-			<li role="presentation" {if !(isset($extraDemands) && $extraDemands) && !(isset($roomTypeDemands) && $roomTypeDemands)}class="active"{/if}><a href="#room_type_service_product_desc" aria-controls="services" role="tab" data-toggle="tab">{l s='Services'}</a></li>
-		{/if}
+		<li role="presentation" class="active"><a href="#room_type_demands_desc" aria-controls="facilities" role="tab" data-toggle="tab">{l s='Facilities'}</a></li>
+		<li role="presentation"><a href="#room_type_service_product_desc" aria-controls="services" role="tab" data-toggle="tab">{l s='Services'}</a></li>
 	</ul>
 </div>
 <div class="modal-body" id="rooms_extra_demands">
@@ -36,11 +32,6 @@
 		{include file='controllers/orders/_room_services_block.tpl'}
 	</div>
 </div>
-<div class="modal-footer">
-	{* <button type="button" class="btn btn-secondary pull-left" data-dismiss="modal">{l s='Close'}</button> *}
-</div>
-
-
 
 {* Css for handling extra demands changes *}
 <style type="text/css">
@@ -49,10 +40,6 @@
 		padding-bottom: 0px;}
 	#rooms_type_extra_demands .modal-title {
 		margin: 0px;}
-	#rooms_type_extra_demands .demand_edit_badge {
-		font-size: 14px;}
-	#rooms_extra_demands .room_ordered_demands td, #rooms_extra_demands .room_demand_detail {
-		font-size: 14px;}
 	#rooms_extra_demands .demand_header {
 		padding: 10px;
 		color: #333;

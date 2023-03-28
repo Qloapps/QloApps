@@ -92,7 +92,7 @@
 						<p class="rooms_extra_demands_text">{l s='Add below services to the rooms for better hotel experience'}</p>
 					</div>
 					{assign var=roomCount value=1}
-					{foreach $selectedRoomServiceProduct as $key => $cartRoom}
+					{foreach $cartRooms as $key => $cartRoom}
 						<div class="card accordion">
 							<div class="row accordion-section">
 								<div class="col-sm-12 demand_header">
@@ -110,7 +110,7 @@
 														<div class="col-xs-2">
 															{if $product.available_for_order}
 																<p class="checkbox">
-																	<input data-id_cart_booking="{$cartRoom['htl_cart_booking_id']}" value="{$product['id_product']|escape:'html':'UTF-8'}" type="checkbox" class="change_room_type_service_product" {if  isset($cartRoom['selected_products']) && $cartRoom['selected_products'] && ($product['id_product']|in_array:$cartRoom['selected_products'])}checked{/if} />
+																	<input data-id_cart_booking="{$cartRoom['id']}" value="{$product['id_product']|escape:'html':'UTF-8'}" type="checkbox" class="change_room_type_service_product" {if  isset($cartRoom['selected_service']) && $cartRoom['selected_service'] && ($product['id_product']|array_key_exists:$cartRoom['selected_service'])}checked{/if} />
 																</p>
 															{/if}
 														</div>
@@ -118,7 +118,7 @@
 															<p>{$product['name']|escape:'html':'UTF-8'}</p>
 															{if $product.allow_multiple_quantity}
 																<div class="qty_container">
-																	<input type="text" class="form-control qty" id="qty_{$product.id_product}" name="service_product_qty_{$product.id_product}" data-id-product="{$product.id_product}" data-max_quantity="{$product.max_quantity}"  value="{if  isset($cartRoom['selected_products']) && $cartRoom['selected_products'] && ($product['id_product']|in_array:$cartRoom['selected_products'])}{$cartRoom['selected_products_info'][$product['id_product']]['quantity']}{else}1{/if}">
+																	<input type="text" class="form-control qty" id="qty_{$product.id_product}" name="service_product_qty_{$product.id_product}" data-id-product="{$product.id_product}" data-max_quantity="{$product.max_quantity}" value="{if  isset($cartRoom['selected_service']) && $cartRoom['selected_service'] && ($product['id_product']|array_key_exists:$cartRoom['selected_service'])}{$cartRoom['selected_service'][$product['id_product']]['quantity']}{else}1{/if}">
 																	<div class="qty_controls">
 																		<a href="#" class="qty_up"><span><i class="icon-plus"></i></span></a>
 																		<a href="#" class="qty_down"><span><i class="icon-minus"></i></span></a>

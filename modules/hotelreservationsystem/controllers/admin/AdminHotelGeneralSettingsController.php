@@ -35,6 +35,9 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
         if (!$hotelsInfo = $objHotelInfo->hotelBranchesInfo(false, 1)) {
             $hotelsInfo = array();
         }
+        foreach ($hotelsInfo as &$hotel) {
+            $hotel['name'] = $hotel['hotel_name'];
+        }
         $hotelNameDisable = (count($hotelsInfo) > 1 ? true : false);
         $locationDisable = ((count($hotelsInfo) < 2) && !Configuration::get('WK_HOTEL_NAME_ENABLE')) ? true : false;
         $this->fields_options = array(
@@ -141,6 +144,13 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
                         'title' => $this->l('Website Launch Year'),
                         'hint' => $this->l('The year when your hotel site was launched.'),
                         'type' => 'text',
+                    ),
+                    'WK_PRIMARY_HOTEL' => array(
+                        'title' => $this->l('Primary hotel'),
+                        'hint' => $this->l('Primary hotel is used to default address for your business. The hotel address will be considered as your registered business address.'),
+                        'type' => 'select',
+                        'identifier' => 'id',
+                        'list' => $hotelsInfo,
                     ),
                     'WK_HTL_CHAIN_NAME' => array(
                         'title' => $this->l('Hotel Name'),

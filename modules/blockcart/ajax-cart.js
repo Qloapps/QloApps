@@ -1287,6 +1287,7 @@ function getBookingOccupancyDetails(bookingform)
 {
     let occupancy;
     if (occupancy_required_for_booking) {
+        $('.booking_guest_occupancy_conatiner .dropdown').removeClass('open');
         let selected_occupancy = $(bookingform).find(".occupancy_info_block.selected")
         if (selected_occupancy.length) {
             occupancy = [];
@@ -1302,7 +1303,6 @@ function getBookingOccupancyDetails(bookingform)
                         if (child_ages.length != $(element).find('.num_children').val()) {
                             $(bookingform).find('.booking_occupancy_wrapper').parent().addClass('open')
                             occupancy = false;
-                            return false;
                         }
                     }
                     occupancy.push({
@@ -1313,7 +1313,6 @@ function getBookingOccupancyDetails(bookingform)
                 } else {
                     $(bookingform).find('.booking_occupancy_wrapper').parent().addClass('open')
                     occupancy = false;
-                    return false;
                 }
             });
         } else {

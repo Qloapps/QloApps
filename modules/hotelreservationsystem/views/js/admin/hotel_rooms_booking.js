@@ -279,6 +279,7 @@ $(document).ready(function() {
     {
         let occupancy;
         if (occupancy_required_for_booking) {
+            $('.booking_occupancy_wrapper').parent().removeClass('open');
             let selected_occupancy = $(bookingform).find(".occupancy_info_block.selected")
             if (selected_occupancy.length) {
                 occupancy = [];
@@ -305,7 +306,6 @@ $(document).ready(function() {
                     } else {
                         $(bookingform).find('.booking_occupancy_wrapper').parent().addClass('open');
                         occupancy = false;
-                        return false;
                     }
                 });
             } else {

@@ -42,32 +42,31 @@
                 {/if}
 
                 <div class="col-sm-12 service_product_action_block">
-                    {if ($product.show_price && !isset($restricted_country_mode)) || isset($groups)}
+                    {if !$PS_CATALOG_MODE && !$order_date_restrict && ($product.show_price && !isset($restricted_country_mode))}
                         <span class="service-product-price">
                             {if !$priceDisplay}{convertPrice price=$product.price_tax_incl}{else}{convertPrice price=$product.price_tax_exc}{/if}
                         </span>
                     {/if}
 
                     <div>
-                    {if ($product.show_price && !isset($restricted_country_mode)) || isset($groups)}
+                    {if ($product.show_price && !isset($restricted_country_mode))}
                         {if $product.available_for_order && !$PS_CATALOG_MODE && !$order_date_restrict && !((isset($restricted_country_mode) && $restricted_country_mode))}
                             <button class="btn btn-service-product{if isset($product.selected) && $product.selected} btn-danger remove_roomtype_product{else} btn-success add_roomtype_product{/if} pull-right" data-id-product="{$product.id_product}">{if isset($product.selected) && $product.selected}{l s='Remove'}{else}{l s='Select'}{/if}</button>
+                            {if $product.allow_multiple_quantity && $product.available_for_order}
+                                <div class="qty_container pull-right">
+                                    <input type="hidden" class="service_product_qty" id="service_product_qty_{$product.id_product}" name="service_product_qty_{$product.id_product}" data-id-product="{$product.id_product}" data-max_quantity="{$product.max_quantity}" value="{if isset($product.quantity_added) && $product.quantity_added}{$product.quantity_added|escape:'html':'UTF-8'}{else}1{/if}">
+                                    <div class="qty_count pull-left">
+                                        <span>{if isset($product.quantity_added) && $product.quantity_added}{$product.quantity_added|escape:'html':'UTF-8'}{else}1{/if}</span>
+                                    </div>
+                                    <div class="qty_direction pull-left">
+                                        <a href="#" class="btn btn-default quantity_up service_product_qty_up"><span><i class="icon-plus"></i></span></a>
+                                        <a href="#" class="btn btn-default quantity_down service_product_qty_down"><span><i class="icon-minus"></i></span></a>
+                                    </div>
+                                </div>
+                            {/if}
                         {/if}
                     {/if}
-                    {if $product.allow_multiple_quantity && $product.available_for_order}
-                        <div class="qty_container pull-right">
-                            <input type="hidden" class="service_product_qty" id="service_product_qty_{$product.id_product}" name="service_product_qty_{$product.id_product}" data-id-product="{$product.id_product}" data-max_quantity="{$product.max_quantity}" value="{if isset($product.quantity_added) && $product.quantity_added}{$product.quantity_added|escape:'html':'UTF-8'}{else}1{/if}">
-                            <div class="qty_count pull-left">
-                                <span>{if isset($product.quantity_added) && $product.quantity_added}{$product.quantity_added|escape:'html':'UTF-8'}{else}1{/if}</span>
-                            </div>
-                            <div class="qty_direction pull-left">
-                                <a href="#" class="btn btn-default quantity_up service_product_qty_up"><span><i class="icon-plus"></i></span></a>
-                                <a href="#" class="btn btn-default quantity_down service_product_qty_down"><span><i class="icon-minus"></i></span></a>
-                            </div>
-                        </div>
-                    {/if}
                 </div>
-
             </div>
         </div>
     </li>
