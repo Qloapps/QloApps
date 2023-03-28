@@ -7,5 +7,23 @@
   <entities>
     <category id="Root" id_parent="" active="1"/>
     <category id="Home" id_parent="Root" active="1" is_root_category="1" />
+    <category id="Locations" id_parent="Home" active="1"/>
+    <category id="Services" id_parent="Home" active="1"/>
   </entities>
+  <category id="Locations" id_shop="1">
+    <name>Locations</name>
+    <description/>
+    <link_rewrite>locations</link_rewrite>
+    <meta_title/>
+    <meta_keywords/>
+    <meta_description/>
+  </category>
+  <category id="Services" id_shop="1">
+    <name>Services</name>
+    <description/>
+    <link_rewrite>services</link_rewrite>
+    <meta_title/>
+    <meta_keywords/>
+    <meta_description/>
+  </category>
 </entity_category>

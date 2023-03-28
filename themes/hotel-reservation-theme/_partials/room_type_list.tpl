@@ -1,3 +1,22 @@
+{**
+* 2010-2023 Webkul.
+*
+* NOTICE OF LICENSE
+*
+* All right is reserved,
+* Please go through LICENSE.txt file inside our module
+*
+* DISCLAIMER
+*
+* Do not edit or add to this file if you wish to upgrade this module to newer
+* versions in the future. If you wish to customize this module for your
+* needs please refer to CustomizationPolicy.txt file inside our module for more information.
+*
+* @author Webkul IN
+* @copyright 2010-2023 Webkul IN
+* @license LICENSE.txt
+*}
+
 {if isset($booking_data['rm_data']) && $booking_data['rm_data']}
 	{foreach from=$booking_data['rm_data'] key=room_k item=room_v}
 		<div class="col-sm-12 room_cont" data-id-product="{$room_v['id_product']|escape:'htmlall':'UTF-8'}">
@@ -30,7 +49,7 @@
 								{/if}
 							</div>
 							<div class="col-sm-12 hidden-md hidden-lg">
-								<p class="capa_txt"><span>{l s='Max Capacity:'}</span><span class="capa_data"> {$room_v['max_adults']|escape:'htmlall':'UTF-8'} {l s='Adults'}, {$room_v['max_children']|escape:'htmlall':'UTF-8'} {l s='child'}</span></p>
+								<p class="capa_txt"><span>{$room_v['max_guests']|escape:'htmlall':'UTF-8'} {l s='Max guests:'}</span><span class="capa_data"> {$room_v['max_adults']|escape:'htmlall':'UTF-8'} {l s='Adults'}, {$room_v['max_children']|escape:'htmlall':'UTF-8'} {if $room_v['children'] > 1}{l s='Children'}{else}{l s='Child'}{/if}</span></p>
 							</div>
 							<div class="col-sm-12 col-md-7 col-lg-6">
 								{if !isset($restricted_country_mode) && !$PS_CATALOG_MODE && !$order_date_restrict}
@@ -38,7 +57,7 @@
 									<p class="rm_price_cont">
 										{if $room_v['feature_price_diff'] >= 0}
 											<span class="rm_price_val {if $room_v['feature_price_diff']>0}room_type_old_price{/if}">
-												{displayPrice price = $room_v['price_without_reduction']|round:2|floatVal}
+												{displayPrice price = $room_v['price_without_reduction_with_auto_add']|round:2|floatVal}
 											</span>
 										{/if}
 										{if $room_v['feature_price_diff']}
@@ -50,8 +69,10 @@
 									</p>
 								{/if}
 							</div>
-							<div class="col-md-4 col-lg-3 visible-md visible-lg">
-								<div class="capa_txt"><span>{l s='Max Capacity:'}</span><br><span class="capa_data"> {$room_v['max_adults']|escape:'htmlall':'UTF-8'} {l s='Adults'}, {$room_v['max_children']|escape:'htmlall':'UTF-8'} {l s='child'}</span></div>
+						</div>
+						<div class="row">
+							<div class="visible-md visible-lg">
+								<div class="capa_txt"><span>{$room_v['max_guests']|escape:'htmlall':'UTF-8'} {l s='Max guests:'}</span><br><span class="capa_data"> {$room_v['max_adults']|escape:'htmlall':'UTF-8'} {l s='Adults'}, {$room_v['max_children']|escape:'htmlall':'UTF-8'} {if $room_v['children'] > 1}{l s='Children'}{else}{l s='Child'}{/if}</span></div>
 							</div>
 							<div class="col-sm-12 col-md-8 col-lg-9">
 								<div class="booking_room_fields">

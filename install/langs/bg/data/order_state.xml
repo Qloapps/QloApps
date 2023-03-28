@@ -17,7 +17,7 @@
     <template>order_canceled</template>
   </order_state>
   <order_state id="Refund">
-    <name>Refund</name>
+    <name>Refunded</name>
     <template>refund</template>
   </order_state>
   <order_state id="Payment_error">

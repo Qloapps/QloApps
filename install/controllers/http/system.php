@@ -136,7 +136,6 @@ class InstallControllerHttpSystem extends InstallControllerHttp
                         'new_phpversion' => sprintf($this->l('You are using PHP %s version. Soon, the latest PHP version supported by QloApps will be PHP 5.6. To make sure you’re ready for the future, we recommend you to upgrade to PHP 5.6 now!'), phpversion()),
                         'register_globals' => $this->l('PHP register_globals option is enabled'),
                         'gz' => $this->l('GZIP compression is not activated'),
-                        'mcrypt' => $this->l('Mcrypt extension is not enabled'),
                         'mbstring' => $this->l('Mbstring extension is not enabled'),
                         'magicquotes' => $this->l('PHP magic quotes option is enabled'),
                         'dom' => $this->l('Dom extension is not loaded'),

@@ -23,11 +23,18 @@ $(document).ready(function(){
         e.preventDefault();
 
 		booking_occupancy_inner = $(this).closest('.booking_occupancy_inner');
-        $(this).closest('.occupancy_info_block').remove();
-		$(booking_occupancy_inner).find('.room_num_wrapper').each(function(key, val) {
-            $(this).text(room_txt + ' - '+ (key+1) );
+        var booking_occupancy_wrapper = $(this).closest('.booking_occupancy_wrapper');
+        $(this).closest('.occupancy_info_block').hide('fast', function(){
+            $(this).remove()
+            $(booking_occupancy_inner).find('.room_num_wrapper').each(function(key, val) {
+                $(this).text(room_txt + ' - '+ (key+1) );
+            });
+            var countRooms = parseInt($(booking_occupancy_wrapper).find('.occupancy_info_block').length);
+            if (countRooms < $(booking_occupancy_wrapper).find('.max_avail_type_qty').val()) {
+                $(booking_occupancy_wrapper).find('.add_new_occupancy_btn').show();
+            }
+            setRoomTypeGuestOccupancy($(booking_occupancy_inner).closest('.booking_occupancy_wrapper'));
         });
-        setRoomTypeGuestOccupancy($(booking_occupancy_inner).closest('.booking_occupancy_wrapper'));
     });
 
 	$(document).on('click', '.booking_occupancy_wrapper .occupancy_quantity_up', function(e) {
@@ -116,8 +123,12 @@ $(document).ready(function(){
     });
 
 	$(document).on('click', '.booking_guest_occupancy', function(e) {
-        $('.booking_guest_occupancy_conatiner .dropdown').removeClass('open');
-		$(this).parent().toggleClass('open');
+        if ($(this).parent().hasClass('open')) {
+            $('.booking_guest_occupancy_conatiner .dropdown').removeClass('open');
+        } else {
+            $('.booking_guest_occupancy_conatiner .dropdown').removeClass('open');
+            $(this).parent().toggleClass('open');
+        }
     });
 
 	$(document).on('click', function(e) {
@@ -125,7 +136,10 @@ $(document).ready(function(){
 			var occupancy_wrapper = $('.booking_occupancy_wrapper:visible');
 			$(occupancy_wrapper).find(".occupancy_info_block").addClass('selected');
 			setRoomTypeGuestOccupancy(occupancy_wrapper);
-            if (!($(e.target).closest(".booking_occupancy_wrapper").length || $(e.target).closest(".booking_guest_occupancy").length || $(e.target).closest(".ajax_add_to_cart_button").length || $(e.target).closest(".exclusive.book_now_submit").length)) {
+            if (!($(e.target).closest(".booking_occupancy_wrapper").length
+                || $(e.target).closest(".booking_guest_occupancy").length
+                || $(e.target).closest(".remove-room-link").length
+            )) {
 				let hasErrors = 0;
 
                 let adults = $(occupancy_wrapper).find(".num_adults").map(function(){return $(this).val();}).get();
@@ -162,9 +176,12 @@ $(document).ready(function(){
                     });
                 }
                 if (hasErrors == 0) {
-					$(occupancy_wrapper).parent().removeClass('open');
-					$(occupancy_wrapper).siblings(".booking_guest_occupancy").removeClass('error_border');
-
+                    if (!($(e.target).closest(".ajax_add_to_cart_button").length
+                        || $(e.target).closest(".exclusive.book_now_submit").length
+                    )) {
+                        $(occupancy_wrapper).parent().removeClass('open');
+                        $(occupancy_wrapper).siblings(".booking_guest_occupancy").removeClass('error_border');
+                    }
                     $(document).trigger( "QloApps:updateRoomOccupancy", [occupancy_wrapper]);
                 } else {
                     $(occupancy_wrapper).siblings(".booking_guest_occupancy").addClass('error_border');
@@ -187,7 +204,7 @@ $(document).ready(function(){
         if ($(booking_occupancy_wrapper).find('.max_avail_type_qty').val() > 0
 			&& countRooms <= $(booking_occupancy_wrapper).find('.max_avail_type_qty').val()
 		) {
-            occupancy_block += '<div class="occupancy_info_block" occ_block_index="'+roomBlockIndex+'">';
+            occupancy_block += '<div class="occupancy_info_block" occ_block_index="'+roomBlockIndex+'" style="display:none;">';
                 occupancy_block += '<div class="occupancy_info_head"><span class="room_num_wrapper">'+ room_txt + ' - ' + countRooms + '</span><a class="remove-room-link pull-right" href="#">' + remove_txt + '</a></div>';
                 occupancy_block += '<div class="row">';
                     occupancy_block += '<div class="form-group col-sm-5 col-xs-6 occupancy_count_block">';
@@ -239,13 +256,15 @@ $(document).ready(function(){
                 occupancy_block += '<hr class="occupancy-info-separator">';
             occupancy_block += '</div>';
 
-            $(booking_occupancy_wrapper).find('.booking_occupancy_inner').append(occupancy_block);
+            $(booking_occupancy_wrapper).find('.booking_occupancy_inner').append(occupancy_block).find('[occ_block_index="'+roomBlockIndex+'"]').show('fast');
 
             // scroll to the latest added room
             // var objDiv = document.getElementById("booking_occupancy_wrapper");
             // objDiv.scrollTop = objDiv.scrollHeight;
 			$(booking_occupancy_wrapper).animate({ scrollTop: $(booking_occupancy_wrapper).prop('scrollHeight') }, "slow");
-
+            if (countRooms >= $(booking_occupancy_wrapper).find('.max_avail_type_qty').val()) {
+                $(this).hide();
+            }
         }
 
         setRoomTypeGuestOccupancy(booking_occupancy_wrapper);

@@ -72,7 +72,7 @@ class AdminOrderPreferencesControllerCore extends AdminController
                     ),
                     'GLOBAL_PREPARATION_TIME' => array(
                         'title' => $this->l('Preparation time'),
-                        'hint' => $this->l('Number of days required to prepare a room for stay.'),
+                        'hint' => $this->l('Number of days required to prepare a room for a guest\'s stay. For example, if you set this value to 3 and someone is booking on 2nd of March he can only book rooms for dates from and after 3 days, i.e, 5th of March.'),
                         'desc' => $this->l('Set to 0 to disable this feature.'),
                         'type' => 'text',
                         'class' => 'fixed-width-xl',
@@ -151,7 +151,14 @@ class AdminOrderPreferencesControllerCore extends AdminController
                         'list' => $cms_tab,
                         'identifier' => 'id',
                         'cast' => 'intval'
-                    )
+                    ),
+                    'PS_ROOM_PRICE_AUTO_ADD_BREAKDOWN' => array(
+                        'title' => $this->l('Show room price breakdown'),
+                        'hint' => $this->l('Show a summary for prices of the auto added service add with room on shopping cart list.'),
+                        'desc' => $this->l('This breakdown is always visible on room that have cart rule applied for that specific room.'),
+                        'cast' => 'intval',
+                        'type' => 'bool'
+                    ),
                 ),
                 'submit' => array('title' => $this->l('Save'))
             ),

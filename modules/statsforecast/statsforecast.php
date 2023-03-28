@@ -240,7 +240,7 @@ class StatsForecast extends Module
 
             $this->html .= '
 			<tr>
-				<td class="fixed-width-sm">'.($this->context->cookie->stats_granularity == 42 ? (Tools::displayDate($row['fix_date']).' - '.Tools::displayDate($row['end_date'])) : Tools::displayDate($row['fix_date'])).'</td>
+				<td class="fixed-width-sm">'.($this->context->cookie->stats_granularity == 42 ? (Tools::displayDate($row['fix_date']).' - '.Tools::displayDate($row['end_date'])) : $row['fix_date']).'</td>
 				<td class="text-left">'.$visits_today.'</td>
 				<td class="text-left">'.(int)$row['registrations'].'</td>
 				<td class="text-left">'.(int)$row['countOrders'].'</td>

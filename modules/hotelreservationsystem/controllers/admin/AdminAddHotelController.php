@@ -128,7 +128,7 @@ class AdminAddHotelController extends ModuleAdminController
             $idHotel = Tools::getValue('id');
             $hotelBranchInfo = new HotelBranchInformation($idHotel);
 
-            $addressInfo = $hotelBranchInfo->getAddress($idHotel);
+            $addressInfo = HotelBranchInformation::getAddress($idHotel);
             $statesbycountry = State::getStatesByIdCountry($addressInfo['id_country']);
 
             $states = array();
@@ -422,6 +422,18 @@ class AdminAddHotelController extends ModuleAdminController
 
             if ($newIdHotel = $objHotelBranch->id) {
 
+                if ($primaryHotelId = Configuration::get('WK_PRIMARY_HOTEL')) {
+                    if ($primaryHotelId == $objHotelBranch->id && !$objHotelBranch->active) {
+                        $hotels = $objHotelBranch->hotelBranchesInfo(false, 1);
+                        if (!empty($hotel = array_shift($hotels))) {
+                            Configuration::updateValue('WK_PRIMARY_HOTEL', $objHotelBranch['id']);
+                        } else {
+                            $newPrimaryHotelId = Configuration::updateValue('WK_PRIMARY_HOTEL', 0);
+                        }
+                    }
+                } else if ($objHotelBranch->active) {
+                    Configuration::updateValue('WK_PRIMARY_HOTEL', $objHotelBranch->id);
+                }
                 // getHotel address
                 if ($idHotelAddress = $objHotelBranch->getHotelIdAddress()) {
                 $objAddress = new Address($idHotelAddress);
@@ -559,6 +571,29 @@ class AdminAddHotelController extends ModuleAdminController
             $this->display = 'add';
         }
     }
+    public function processStatus()
+    {
+        parent::processStatus();
+        if (empty($this->errors)) {
+            if (Validate::isLoadedObject($objHotelBranch = new HotelBranchInformation(Tools::getValue('id')))) {
+                if ($primaryHotelId = Configuration::get('WK_PRIMARY_HOTEL')) {
+                    if ($primaryHotelId == $objHotelBranch->id && !$objHotelBranch->active) {
+                        $hotels = $objHotelBranch->hotelBranchesInfo(false, 1);
+                        if (!empty($hotel = array_shift($hotels))) {
+                            Configuration::updateValue('WK_PRIMARY_HOTEL', $hotel['id']);
+                        } else {
+                            $newPrimaryHotelId = Configuration::updateValue('WK_PRIMARY_HOTEL', 0);
+                        }
+                    }
+                } else {
+                    $hotels = $objHotelBranch->hotelBranchesInfo(false, 1);
+                    if (!empty($hotel = array_shift($hotels))) {
+                        Configuration::updateValue('WK_PRIMARY_HOTEL', $hotel['id']);
+                    }
+                }
+            }
+        }
+    }
 
     public function ajaxProcessStateByCountryId()
     {
@@ -576,6 +611,7 @@ class AdminAddHotelController extends ModuleAdminController
 
     public function ajaxProcessUploadHotelImages()
     {
+        $response = array('success' => false);
         $idHotel = Tools::getValue('id_hotel');
         if ($idHotel) {
             $invalidImg = ImageManager::validateUpload(
@@ -584,27 +620,32 @@ class AdminAddHotelController extends ModuleAdminController
             );
             if (!$invalidImg) {
                 // Add Hotel images
-                $kwargs = [
-                    'id_hotel' => $idHotel,
-                    'hotel_image' => $_FILES['hotel_image'],
-                ];
                 $objHotelImage = new HotelImage();
                 $imageDetail = $objHotelImage->uploadHotelImages($_FILES['hotel_image'], $idHotel);
                 if ($imageDetail) {
-                    die(json_encode($imageDetail));
+                    $response['success'] = true;
+                    $imageDetail['image_link'] = $this->context->link->getMediaLink($objHotelImage->getImageLink($imageDetail['id'],ImageType::getFormatedName('large')));
+                    $imageDetail['image_link_small'] = $this->context->link->getMediaLink($objHotelImage->getImageLink($imageDetail['id'], ImageType::getFormatedName('small')));
+                    $response['data']['image_info'] = $imageDetail;
+                    // get image row
+                    $this->context->smarty->assign(array(
+                        'image' => $imageDetail,
+                        'hotel_info' => array('id' => $idHotel)
+                    ));
+                    $response['data']['image_row'] = $this->context->smarty->fetch(
+                        _PS_MODULE_DIR_.$this->module->name.
+                        '/views/templates/admin/add_hotel/_partials/htl-images-list-row.tpl'
+                    );
                 } else {
-                    die(json_encode(array('hasError' => true)));
+                    $response['errors'][] = $this->l('Unable to uploade image. Please try again');
                 }
             } else {
-                die(
-                    json_encode(
-                        array('hasError' => true, 'message' => $_FILES['hotel_image']['name'].': '.$invalidImg)
-                    )
-                );
+                $response['errors'][] = $_FILES['hotel_image']['name'].': '.$invalidImg;
             }
         } else {
-            die(json_encode(array('hasError' => true)));
+            $response['errors'][] = $this->l('Hotel info not found. Please try reloading the page');
         }
+        $this->ajaxDie(json_encode($response));
     }
 
     public function ajaxProcessChangeCoverImage()
@@ -686,6 +727,8 @@ class AdminAddHotelController extends ModuleAdminController
                 'filesizeError' => $this->l('File exceeds maximum size.'),
                 'maxSizeAllowed' => Tools::getMaxUploadSize(),
                 'sortRowsUrl' => $this->context->link->getAdminLink('AdminAddHotel'),
+                'primaryHotelId' => Configuration::get('WK_PRIMARY_HOTEL'),
+                'disableHotelMsg' => $this->l('Primary hotel for website will be updated to first available active hotel.'),
             )
         );
         // GOOGLE MAP

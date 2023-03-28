@@ -68,7 +68,8 @@
   <tab id="Preferences" name="Настройки"/>
   <tab id="Price_Rules" name="Ценовые правила"/>
   <tab id="Products_1" name="товары"/>
-  <tab id="Products" name="товары"/>
+  <tab id="Products" name="Управление сервисными продуктами"/>
+  <tab id="Room_Types" name="Управление типами комнат"/>
   <tab id="Profiles" name="Профили"/>
   <tab id="Quick_Access" name="Быстрый доступ"/>
   <tab id="Referrers" name="Реферы"/>

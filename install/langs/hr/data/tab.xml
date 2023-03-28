@@ -20,7 +20,8 @@
   <tab id="Administration" name="Administracija"/>
   <tab id="Stats" name="Statistike"/>
   <tab id="Stock" name="Zalika"/>
-  <tab id="Products" name="Proizvodi"/>
+  <tab id="Products" name="Upravljajte uslužnim proizvodima"/>
+  <tab id="Room_Types" name="Upravljanje vrstama soba"/>
   <tab id="Categories" name="Kategorije"/>
   <tab id="Monitoring" name="Nadzor"/>
   <tab id="Attributes_and_Values" name="Atributi proizvoda"/>

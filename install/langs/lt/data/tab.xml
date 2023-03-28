@@ -20,7 +20,8 @@
   <tab id="Administration" name="Administracija"/>
   <tab id="Stats" name="Statistika"/>
   <tab id="Stock" name="Likutis"/>
-  <tab id="Products" name="Prekės"/>
+  <tab id="Products" name="Tvarkykite paslaugų produktus"/>
+  <tab id="Room_Types" name="Tvarkyti kambarių tipus"/>
   <tab id="Categories" name="Kategorijos"/>
   <tab id="Monitoring" name="Kontrolė"/>
   <tab id="Attributes_and_Values" name="Prekės savybė"/>

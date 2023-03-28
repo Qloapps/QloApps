@@ -82,8 +82,8 @@ class HotelBookingDetail extends ObjectModel
     const SEARCH_TYPE_NORMAL = 2;
 
     //
-    const PS_FRONT_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY = 1;
-    const PS_FRONT_ROOM_UNIT_SELECTION_TYPE_QUANTITY = 2;
+    const PS_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY = 1;
+    const PS_ROOM_UNIT_SELECTION_TYPE_QUANTITY = 2;
 
     public static $definition = array(
         'table' => 'htl_booking_detail',
@@ -1254,7 +1254,7 @@ class HotelBookingDetail extends ObjectModel
     // This function algo is same as available rooms algo and it not similar to booked rooms algo.
     public function chechRoomBooked($id_room, $date_from, $date_to)
     {
-        $sql = 'SELECT `id_product`, `id_order`, `id_cart`, `id_room`, `id_hotel`, `id_customer`
+        $sql = 'SELECT `id`, `id_product`, `id_order`, `id_cart`, `id_room`, `id_hotel`, `id_customer`
         FROM `'._DB_PREFIX_.'htl_booking_detail` WHERE `id_room` = '.(int)$id_room.
         ' AND `is_back_order` = 0 AND `is_refunded` = 0 AND ((date_from <= \''.pSQL($date_from).'\' AND date_to > \''.
         pSQL($date_from).'\' AND date_to <= \''.pSQL($date_to).'\') OR (date_from > \''.pSQL($date_from).
@@ -1371,8 +1371,19 @@ class HotelBookingDetail extends ObjectModel
      * @param [date] $dateTo   [End date of the booking]
      *
      * @return [int] [Returns number of days between two dates]
+     * @deprecated use hotelBookingDetail::getDays() instead
      */
     public function getNumberOfDays($dateFrom, $dateTo)
+    {
+        return self::getDays($dateFrom, $dateTo);
+        // $startDate = new DateTime($dateFrom);
+        // $endDate = new DateTime($dateTo);
+        // $daysDifference = $startDate->diff($endDate)->days;
+
+        // return $daysDifference;
+    }
+
+    public static function getDays($dateFrom, $dateTo)
     {
         $startDate = new DateTime($dateFrom);
         $endDate = new DateTime($dateTo);
@@ -1397,6 +1408,13 @@ class HotelBookingDetail extends ObjectModel
     {
         return Db::getInstance()->executeS(
             'SELECT * FROM `'._DB_PREFIX_.'htl_booking_detail` WHERE `id_order`='.(int)$order_id
+        );
+    }
+
+    public static function getIdHotelByIdOrder($idOrder)
+    {
+        return Db::getInstance()->getValue(
+            'SELECT `id_hotel` FROM `'._DB_PREFIX_.'htl_booking_detail` WHERE `id_order` = '.(int) $idOrder
         );
     }
 
@@ -1523,6 +1541,7 @@ class HotelBookingDetail extends ObjectModel
                             $prod_price = Product::getPriceStatic($value['id_product'], self::useTax());
                             $productPriceWithoutReduction = $product->getPriceWithoutReduct(!self::useTax());
                             $productFeaturePrice = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay($value['id_product'], $date_from, $date_to, self::useTax());
+                            $productFeaturePriceWithoutAutoAdd = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay($value['id_product'], $date_from, $date_to, self::useTax(), 0, 0, 0, 0, 0);
 
                             if (empty($price) || ($price['from'] <= $prod_price && $price['to'] >= $prod_price)) {
                                 $cover_image_arr = $product->getCover($value['id_product']);
@@ -1542,9 +1561,11 @@ class HotelBookingDetail extends ObjectModel
                                 $bookingData['rm_data'][$key]['description'] = $product->description_short;
                                 $bookingData['rm_data'][$key]['feature'] = $product_feature;
                                 $bookingData['rm_data'][$key]['price'] = $prod_price;
-                                $bookingData['rm_data'][$key]['price_without_reduction'] = $productPriceWithoutReduction;
                                 $bookingData['rm_data'][$key]['feature_price'] = $productFeaturePrice;
-                                $bookingData['rm_data'][$key]['feature_price_diff'] = $productPriceWithoutReduction - $productFeaturePrice;
+                                $bookingData['rm_data'][$key]['feature_price_withoout_auto_add'] = $productFeaturePriceWithoutAutoAdd;
+                                $bookingData['rm_data'][$key]['price_without_reduction'] = $productPriceWithoutReduction;
+                                $bookingData['rm_data'][$key]['price_without_reduction_with_auto_add'] = $productPriceWithoutReduction + ($productFeaturePrice - $productFeaturePriceWithoutAutoAdd);
+                                $bookingData['rm_data'][$key]['feature_price_diff'] = $bookingData['rm_data'][$key]['price_without_reduction_with_auto_add'] - $productFeaturePrice;
 
                                 // if ($room_left <= (int)Configuration::get('WK_ROOM_LEFT_WARNING_NUMBER'))
                                 $bookingData['rm_data'][$key]['room_left'] = $room_left;
@@ -1564,6 +1585,9 @@ class HotelBookingDetail extends ObjectModel
                                 }
                                 if ($occupancy) {
                                     $urlData['occupancy'] = $occupancy;
+                                }
+                                if ($location = Tools::getValue('location')) {
+                                    $urlData['location'] = $location;
                                 }
 
                                 if (Configuration::get('PS_REWRITING_SETTINGS')) {

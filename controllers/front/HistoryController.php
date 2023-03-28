@@ -44,6 +44,7 @@ class HistoryControllerCore extends FrontController
         ));
         $this->addJqueryPlugin(array('fancybox')); //fancybox not found for some client theme
         $this->addJqueryPlugin(array('scrollTo', 'footable', 'footable-sort'));
+        $this->addJqueryUI('ui.tooltip', 'base', true);
     }
 
     /**

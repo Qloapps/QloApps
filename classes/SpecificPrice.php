@@ -145,8 +145,7 @@ class SpecificPriceCore extends ObjectModel
 			FROM `'._DB_PREFIX_.'specific_price`
 			WHERE 1 '.self::filterOutField('id_product', $id_product).
             ($id_product_attribute ? ' AND id_product_attribute = '.(int) $id_product_attribute : '').'
-			AND id_cart = '.(int) $id_cart.'
-            GROUP BY `id_specific_price_rule`'
+			AND id_cart = '.(int) $id_cart
         );
     }
 
@@ -335,7 +334,7 @@ class SpecificPriceCore extends ObjectModel
         }
     }
 
-    public static function getSpecificPrice($id_product, $id_shop, $id_currency, $id_country, $id_group, $quantity, $id_product_attribute = null, $id_customer = 0, $id_cart = 0, $real_quantity = 0)
+    public static function getSpecificPrice($id_product, $id_shop, $id_currency, $id_country, $id_group, $quantity, $id_product_attribute = null, $id_customer = 0, $id_cart = 0, $real_quantity = 0, $id_room = 0)
     {
         if (!SpecificPrice::isFeatureActive()) {
             return array();
@@ -359,7 +358,7 @@ class SpecificPriceCore extends ObjectModel
 				AND IF(`from_quantity` > 1, `from_quantity`, 0) <= ';
 
             $query .= (Configuration::get('PS_QTY_DISCOUNT_ON_COMBINATION') || !$id_cart || !$real_quantity) ? (int)$quantity : max(1, (int)$real_quantity);
-            $query .= ' ORDER BY `id_product_attribute` DESC, `from_quantity` DESC, `id_specific_price_rule` ASC, `score` DESC, `to` DESC, `from` DESC';
+            $query .= ' ORDER BY `id_product_attribute` DESC, `from_quantity` DESC, `score` DESC, `to` DESC, `from` DESC';
 
             SpecificPrice::$_specificPriceCache[$key] = Db::getInstance(_PS_USE_SQL_SLAVE_)->getRow($query);
         }

@@ -169,7 +169,7 @@ $(document).ready(function() {
             $('li:visible .fancybox, .fancybox.shown').fancybox({
                 'hideOnContentClick': true,
                 'openEffect': 'elastic',
-                'closeEffect': 'elastic'
+                'closeEffect': 'elastic',
             });
     } else if (typeof ajax_allowed != 'undefined' && !ajax_allowed)
         $('#buy_block').attr('target', '_top');
@@ -1027,18 +1027,11 @@ function checkUrl() {
 /*#####################################################################*/
 /*java script code by webkul on produt page.*/
 /*#####################################################################*/
+
 $(document).ready(function() {
-    if (!$('.max_avail_type_qty').length || $('.max_avail_type_qty').val() < 1) {
-        disableRoomTypeDemands(1);
-    } else {
-        disableRoomTypeDemands(0);
+    if (!PS_CATALOG_MODE) {
+        BookingForm.init();
     }
-
-    BookingForm.init();
-
-    // $(document).on('focusout', '#quantity_wanted', function(e) {
-    //     BookingForm.refresh();
-    // });
 
     $(document).on('QloApps:updateRoomOccupancy', function(e) {
         BookingForm.refresh();
@@ -1052,13 +1045,22 @@ $(document).ready(function() {
         BookingForm.refresh();
     });
 
+    $(document).on('click', '.remove_roomtype_demand', function(e) {
+        e.preventDefault();
+        let idGlobalDemand = $(this).data('id_global_demand');
+        $('.id_room_type_demand[data-id_global_demand="' + idGlobalDemand + '"]:checked').prop('checked', false).uniform();
+        BookingForm.refresh();
+    });
+
     $(document).on('change', '.room_demand_block .id_option', function(e) {
         var optionSelected = $(this).find('option:selected');
         var extraDemandPrice = optionSelected.attr("optionPrice")
         extraDemandPrice = parseFloat(extraDemandPrice);
         extraDemandPrice = formatCurrency(extraDemandPrice, currency_format, currency_sign, currency_blank);
         $(this).closest('.room_demand_block').find('.extra_demand_option_price').text(extraDemandPrice);
-        BookingForm.refresh();
+        if ($(this).closest('.room_demand_block').find('.id_room_type_demand:checked').val()) {
+            BookingForm.refresh();
+        }
     });
 
 
@@ -1091,6 +1093,191 @@ $(document).ready(function() {
     if (typeof google === 'object') {
         initMap();
     }
+
+    // normal product
+    $(document).on('click', '.add_roomtype_product', function(e){
+        e.preventDefault();
+        addProductToRoomType(this);
+    });
+
+    $(document).on('click', '.remove_roomtype_product', function(e){
+        e.preventDefault();
+        removeRoomtypeProduct(this);
+    });
+
+    $(document).on('click', '.service_product_qty_up', function(e) {
+        e.preventDefault();
+        qtyfield = $(this).closest('.qty_container').find('input.service_product_qty');
+        var newQuantity = parseInt(qtyfield.val()) + 1;
+        if (qtyfield.data('max_quantity') && qtyfield.data('max_quantity') < newQuantity) {
+            newQuantity = qtyfield.data('max_quantity');
+        }
+        $(this).closest('.qty_container').find('.qty_count span').text(newQuantity);
+        qtyfield.val(newQuantity);
+    });
+
+    // The button to decrement the product value
+    $(document).on('click', '.service_product_qty_down', function(e) {
+        e.preventDefault();
+        qtyfield = $(this).closest('.qty_container').find('input.service_product_qty');
+        var currentVal = parseInt(qtyfield.val());
+        if (!isNaN(currentVal) && currentVal > 1) {
+            $(this).closest('.qty_container').find('.qty_count span').text(currentVal - 1);
+            qtyfield.val(currentVal - 1);
+        } else {
+            $(this).closest('.qty_container').find('.qty_count span').text(1);
+            qtyfield.val(1);
+        }
+    });
+
+    var ajax_check_var = '';
+
+    $('#service_products_cont .get-service-products').on('click', function(e) {
+        var triggerElement = $(this);
+        var p = $(this).data('page');
+        var id_category = $(this).data('id_category');
+        abortRunningAjax();
+        ajax_check_var = $.ajax({
+            type: 'POST',
+            headers: {
+                "cache-control": "no-cache"
+            },
+            url: product_controller_url,
+            dataType: 'JSON',
+            cache: false,
+            data: {
+                id_category: id_category,
+                p: p,
+                id_product: $('#product_page_product_id').val(),
+                action: 'getServiceProducts',
+                ajax: true,
+                token: static_token
+            },
+            beforeSend: function() {
+                triggerElement.attr('disabled', 'disabled');
+            },
+            success: function(result) {
+                if (result.status) {
+                    if (result.service_products) {
+                        if (id_category) {
+                            $('#category_'+id_category+' .product-list').append(result.service_products);
+                            triggerElement.data('page', parseInt(triggerElement.data('page')) + 1);
+                            totalResults = triggerElement.data('num_total');
+                            if (totalResults <= $('#category_'+id_category+' .product-list .service-product-element').length) {
+                                triggerElement.hide();
+                            }
+                        } else {
+                            $('#service_products_cont .product-list').append(result.service_products);
+                            triggerElement.data('page', parseInt(triggerElement.data('page')) + 1);
+                            totalResults = triggerElement.data('num_total');
+                            if (totalResults <= $('#service_products_cont .product-list .service-product-element').length) {
+                                triggerElement.hide();
+                            }
+                        }
+                    } else {
+                        triggerElement.hide();
+                    }
+                } else {
+                    if (result.error) {
+                        showErrorMessage(result.error);
+                    }
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown)
+            {
+                if ((textStatus != 'error' || errorThrown != '') && textStatus != 'abort')
+                    showErrorMessage(textStatus + ': ' + errorThrown);
+            },
+            complete: function() {
+                triggerElement.attr('disabled', false);
+            }
+        });
+    });
+
+    function abortRunningAjax() {
+        if (ajax_check_var) {
+            ajax_check_var.abort();
+        }
+    }
+
+    function addProductToRoomType(that) {
+        var id_product = $(that).data('id-product');
+        var qty = $('input#service_product_qty_'+id_product).val();
+        if (typeof(qty) == 'undefined') {
+            qty = 1;
+        }
+        var added_service_product = [];
+        $('#additional_products input.service_product').each(function () {
+            added_service_product.push({
+                'id_product': $(this).data('id_product'),
+                'quantity':$(this).val(),
+            });
+        });
+        $.ajax({
+            type: 'POST',
+            headers: {
+                "cache-control": "no-cache"
+            },
+            url: product_controller_url,
+            dataType: 'JSON',
+            cache: false,
+            data: {
+                date_from: $('#room_check_in').val(),
+                date_to: $('#room_check_out').val(),
+                qty: qty,
+                id_product: $('#product_page_product_id').val(),
+                service_product: id_product,
+                added_service_product: added_service_product,
+                action: 'checkServiceProductWithRoomType',
+                ajax: true,
+                token: static_token
+            },
+            success: function(result) {
+                if (result.success) {
+                    if (result.add) {
+                        if ($('input#service_product_'+ id_product).length) {
+                            var prevQty = $('input#service_product_'+ id_product).val();
+                            if (parseInt(prevQty) > 0) {
+                                qty = parseInt(qty) + parseInt(prevQty);
+                            }
+                            $('input#service_product_'+ id_product).val(qty);
+                        } else {
+                            $('<input type="hidden">').attr({
+                                id: 'service_product_'+ id_product,
+                                name: 'service_product['+ id_product +'][]',
+                                class: 'service_product',
+                                'data-id_product': id_product,
+                                value: qty
+                            }).appendTo('#additional_products');
+                        }
+                    }
+                    // reset input
+                    $(that).closest('.service_product_action_block').find('input.service_product_qty').val(1);
+                    $(that).closest('.service_product_action_block').find('.qty_count span').text(1);
+                    if (result.msg) {
+                        showSuccessMessage(result.msg);
+                    }
+                    BookingForm.refresh();
+                } else {
+                    if (result.error) {
+                        showErrorMessage(result.error);
+                    }
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown)
+            {
+                if ((textStatus != 'error' || errorThrown != '') && textStatus != 'abort')
+                    showErrorMessage(textStatus + ': ' + errorThrown);
+            }
+        });
+    }
+
+    function removeRoomtypeProduct(that)
+    {
+        var id_product = $(that).data('id_product');
+        $(document).find('input#service_product_'+ id_product).remove();
+        BookingForm.refresh();
+    }
 });
 
 function initMap() {
@@ -1120,6 +1307,52 @@ var BookingForm = {
     init: function() {
         this.currentRequest = null;
         BookingForm.initDatepicker(max_order_date, preparation_time, $('#room_check_in').val(), $('#room_check_out').val());
+        // initialize tootltip for extra service
+        if ($('.price_desc_block .services-info').length) {
+            $('.price_desc_block .services-info img').tooltip({
+                content: $('.price_desc_block .services-info-container').html(),
+                items: "div",
+                trigger : 'hover',
+                position: { my: "left-15 top", at: "left bottom" },
+                tooltipClass: "services-tootip",
+                open: function(event, ui)
+                    {
+                        if (typeof(event.originalEvent) === 'undefined')
+                        {
+                            return false;
+                        }
+
+                        var $id = $(ui.tooltip).attr('id');
+
+                        // close any lingering tooltips
+                        if ($('div.ui-tooltip').not('#' + $id).length) {
+                            return false;
+                        }
+
+                        // ajax function to pull in data and add it to the tooltip goes here
+                    },
+                    close: function(event, ui)
+                    {
+                        ui.tooltip.hover(function()
+                        {
+                            $(this).stop(true).fadeTo(400, 1);
+                        },
+                        function()
+                        {
+                            $(this).fadeOut('400', function()
+                            {
+                                $(this).remove();
+                            });
+                        });
+                    }
+
+            });
+        }
+        if (!$('.max_avail_type_qty').length || $('.max_avail_type_qty').val() < 1) {
+            disableRoomTypeDemands(1);
+        } else {
+            disableRoomTypeDemands(0);
+        }
     },
     initDatepicker: function(max_order_date, preparation_time, dateFrom, dateTo) {
         let start_date = new Date();
@@ -1180,6 +1413,7 @@ var BookingForm = {
             date_to: $('#room_check_out').val(),
             // quantity: quantity,
             room_type_demands: JSON.stringify(getRoomsExtraDemands()),
+            room_service_products: JSON.stringify(getRoomsServiceProducts()),
         };
         if (occupancy = getBookingOccupancy()) {
             data.occupancy = occupancy;

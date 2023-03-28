@@ -85,7 +85,7 @@
             color: #333;
             border-radius: 4px;
             font-weight: 400;}
-            .qty_direction .occupancy_quantity_down, .qty_direction .rm_quantity_down {
+            .qty_direction .occupancy_quantity_down, .qty_direction .quantity_down {
               margin-top: 3px;}
 
     .booking_occupancy_wrapper .children_ages .col-xs-4 {

@@ -167,6 +167,8 @@ img/**
 !/override/classes/index.php
 !/override/classes/cache/
 !/override/classes/cache/index.php
+!/override/classes/checkoutProcess/
+!/override/classes/checkoutProcess/index.php
 !/override/classes/controller/
 !/override/classes/controller/index.php
 !/override/classes/db/

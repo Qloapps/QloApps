@@ -96,6 +96,7 @@ function showOrder(mode, var_content, file)
 				$('html, body').animate({
 					scrollTop: $('#block-order-detail').offset().top
 				}, 1200);
+				initPriceTooltip();
 			});
 		});
 	});
@@ -154,7 +155,47 @@ function sendOrderMessage()
 	});
 	return false;
 }
+function initPriceTooltip()
+{
+	if ($('.order-price-info').length) {
+		$('.order-price-info').each(function() {
+			$(this).tooltip({
+				content: $(this).closest('td').find('.price-info-container').html(),
+				items: "span",
+				trigger : 'hover',
+                tooltipClass: "price-tootip",
+				open: function(event, ui) {
+					if (typeof(event.originalEvent) === 'undefined')
+					{
+						return false;
+					}
 
+					var $id = $(ui.tooltip).attr('id');
+
+					// close any lingering tooltips
+					if ($('div.ui-tooltip').not('#' + $id).length) {
+						return false;
+					}
+
+					// ajax function to pull in data and add it to the tooltip goes here
+				},
+				close: function(event, ui) {
+					ui.tooltip.hover(function()
+					{
+						$(this).stop(true).fadeTo(400, 1);
+					},
+					function()
+					{
+						$(this).fadeOut('400', function()
+						{
+							$(this).remove();
+						});
+					});
+				}
+			});
+		});
+	}
+}
 $(document).ready(function(){
 	var page = $('html, body');
 	page.on('mousewheel', function () {
@@ -260,42 +301,6 @@ $(document).ready(function(){
 		}
 	});
 
-	// fancybox for extra bed requirement edit on checkout page
-	$('body').on('click', '.open_rooms_extra_demands', function() {
-		var idProduct = $(this).attr('id_product');
-		var idOrder = $(this).attr('id_order');
-		var dateFrom = $(this).attr('date_from');
-		var dateTo = $(this).attr('date_to');
-		$.fancybox({
-			href: "#rooms_extra_demands",
-		    autoSize : true,
-		    autoScale : true,
-			maxWidth : '100%',
-			'hideOnContentClick': false,
-			beforeLoad: function () {
-				$.ajax({
-					type: 'POST',
-					headers: {
-						"cache-control": "no-cache"
-					},
-					url: historyUrl,
-					dataType: 'html',
-					cache: false,
-					data: {
-						date_from: dateFrom,
-						date_to: dateTo,
-						id_product: idProduct,
-						id_order: idOrder,
-						method: 'getRoomTypeBookingDemands',
-						ajax: true
-					},
-					success: function(result) {
-						$('#rooms_type_extra_demands').find('#room_type_demands_desc').html('');
-						$('#rooms_type_extra_demands').find('#room_type_demands_desc').append(result);
-					},
-				});
-			},
-		});
-	});
+	initPriceTooltip();
 });
 
