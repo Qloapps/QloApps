@@ -31,8 +31,8 @@
 					<thead>
 						<tr>
 							<th>{l s='Name'}</th>
-							<th>{l s='Unit price'}</th>
-							<th>{l s='Total price'}</th>
+							<th>{l s='Unit Price'}</th>
+							<th>{l s='Total Price'}</th>
 							<th class="text-right">{l s='Action'}</th>
 						</tr>
 					</thead>
@@ -127,8 +127,8 @@
 					<thead>
 						<tr>
 							<th>{l s='Name'}</th>
-							<th>{l s='Unit price'}</th>
-							<th class="text-right">{l s='Total price'}</th>
+							<th>{l s='Unit Price'}</th>
+							<th class="text-right">{l s='Total Price'}</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -138,7 +138,7 @@
 								<td>
 									{displayPrice price=$demand['unit_price_tax_excl'] currency=$orderCurrency}
 									{if $demand['price_calc_method'] == HotelRoomTypeGlobalDemand::WK_PRICE_CALC_METHOD_EACH_DAY}
-										{l s='night'}
+										{l s='/ night'}
 									{/if}
 								</td>
 								<td class="text-right">{displayPrice price=$demand['total_price_tax_excl'] currency=$orderCurrency}</td>

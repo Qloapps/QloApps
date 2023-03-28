@@ -44,7 +44,7 @@
                 <div class="col-sm-12 service_product_action_block">
                     {if !$PS_CATALOG_MODE && !$order_date_restrict && ($product.show_price && !isset($restricted_country_mode))}
                         <span class="service-product-price">
-                            {if !$priceDisplay}{convertPrice price=$product.price_tax_incl}{else}{convertPrice price=$product.price_tax_exc}{/if}
+                            {if !$priceDisplay}{convertPrice price=$product.price_tax_incl}{else}{convertPrice price=$product.price_tax_exc}{/if}{if $product.price_calculation_method == Product::PRICE_CALCULATION_METHOD_PER_DAY}<span class="price-label">{l s='/Night'}</span>{/if}
                         </span>
                     {/if}
 

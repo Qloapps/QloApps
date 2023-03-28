@@ -107,6 +107,9 @@ class OrderDetailCore extends ObjectModel
     /** @var bool */
     public $product_allow_multiple_quantity;
 
+    /** @var int */
+    public $product_price_calculation_method;
+
     /** @var string */
     public $product_ean13;
 
@@ -198,6 +201,7 @@ class OrderDetailCore extends ObjectModel
             'product_auto_add' =>            array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
             'product_price_addition_type' =>    array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
             'product_allow_multiple_quantity' => array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
+            'product_price_calculation_method' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
             'product_ean13' =>                array('type' => self::TYPE_STRING, 'validate' => 'isEan13'),
             'product_upc' =>                array('type' => self::TYPE_STRING, 'validate' => 'isUpc'),
             'product_reference' =>            array('type' => self::TYPE_STRING, 'validate' => 'isReference'),
@@ -657,6 +661,7 @@ class OrderDetailCore extends ObjectModel
         $this->product_auto_add = $product['auto_add_to_cart'];
         $this->product_price_addition_type = $product['price_addition_type'];
         $this->product_allow_multiple_quantity = $product['allow_multiple_quantity'];
+        $this->product_price_calculation_method = $product['price_calculation_method'];
 
         $this->setVirtualProductInformation($product);
         $this->checkProductStock($product, $id_order_state);
