@@ -677,6 +677,7 @@ class InstallModelInstall extends InstallAbstractModel
                 'dashperformance',
                 'dashproducts',
                 'dashgoals',
+                'dashinsights',
                 'graphnvd3',
                 'statsdata',
                 'statsvisits',
@@ -699,6 +700,7 @@ class InstallModelInstall extends InstallAbstractModel
                 'statsequipment',
                 'blockcart',
                 'blockuserinfo',
+                'qlochannelmanagerconnector',
             );
         }
         return $modules;

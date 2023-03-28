@@ -45,10 +45,7 @@ class AdminCategoriesControllerCore extends AdminController
 
     public function __construct()
     {
-        // redirect to admin dashboard as no entry allowed in category controller. It will be managed solely from
-        // hotel creation , updation and deletion
         $this->context = Context::getContext();
-        // Tools::redirectAdmin($this->context->link->getAdminLink('AdminDashboard'));
 
         $this->bootstrap = true;
         $this->table = 'category';
@@ -84,17 +81,18 @@ class AdminCategoriesControllerCore extends AdminController
                 'title' => $this->l('Position'),
                 'filter_key' => 'sa!position',
                 'position' => 'position',
-                'align' => 'center'
-            ),
-            'active' => array(
-                'title' => $this->l('Displayed'),
-                'active' => 'status',
-                'type' => 'bool',
-                'class' => 'fixed-width-xs',
                 'align' => 'center',
-                'ajax' => true,
-                'orderby' => false
-            )
+                'class' => 'fixed-width-sm'
+            ),
+            // 'active' => array(
+            //     'title' => $this->l('Displayed'),
+            //     'active' => 'status',
+            //     'type' => 'bool',
+            //     'class' => 'fixed-width-xs',
+            //     'align' => 'center',
+            //     'ajax' => true,
+            //     'orderby' => false
+            // )
         );
 
         $this->bulk_actions = array(
@@ -116,13 +114,18 @@ class AdminCategoriesControllerCore extends AdminController
         // context->shop is set in the init() function, so we move the _category instanciation after that
         if (($id_category = Tools::getvalue('id_category')) && $this->action != 'select_delete') {
             $this->_category = new Category($id_category);
+            // check if this category lies in location, if true then set category to products category.
+            if (!$this->_category->hasParent(Configuration::get('PS_SERVICE_CATEGORY'))) {
+                $this->_category = new Category(Configuration::get('PS_SERVICE_CATEGORY'));
+            }
         } else {
             if (Shop::getContext() == Shop::CONTEXT_SHOP) {
-                $this->_category = new Category($this->context->shop->id_category);
+
+                $this->_category = new Category(Configuration::get('PS_SERVICE_CATEGORY'));
             } elseif (count(Category::getCategoriesWithoutParent()) > 1 && Configuration::get('PS_MULTISHOP_FEATURE_ACTIVE') && count(Shop::getShops(true, null, true)) != 1) {
                 $this->_category = Category::getTopCategory();
             } else {
-                $this->_category = new Category(Configuration::get('PS_HOME_CATEGORY'));
+                $this->_category = new Category(Configuration::get('PS_SERVICE_CATEGORY'));
             }
         }
 
@@ -141,7 +144,7 @@ class AdminCategoriesControllerCore extends AdminController
                 $id_parent = (int)Configuration::get('PS_ROOT_CATEGORY');
             }
         } else {
-            $id_parent = $this->context->shop->id_category;
+            $id_parent = Configuration::get('PS_SERVICE_CATEGORY');
         }
         $this->_select = 'sa.position position';
         $this->original_filter = $this->_filter .= ' AND `id_parent` = '.(int)$id_parent.' ';
@@ -172,8 +175,6 @@ class AdminCategoriesControllerCore extends AdminController
 
     public function initPageHeaderToolbar()
     {
-        parent::initPageHeaderToolbar();
-
         if ($this->display != 'edit' && $this->display != 'add') {
             if (Configuration::get('PS_MULTISHOP_FEATURE_ACTIVE')) {
                 $this->page_header_toolbar_btn['new-url'] = array(
@@ -189,6 +190,7 @@ class AdminCategoriesControllerCore extends AdminController
                 'icon' => 'process-icon-new'
             );
         }
+        parent::initPageHeaderToolbar();
     }
 
     public function initContent()
@@ -334,7 +336,7 @@ class AdminCategoriesControllerCore extends AdminController
             }
         }
         if (!$this->lite_display && isset($this->toolbar_btn['back']['href']) && $this->_category->level_depth > 1
-            && $this->_category->id_parent && $this->_category->id_parent != (int)Configuration::get('PS_ROOT_CATEGORY')) {
+            && $this->_category->id_parent && $this->_category->id_parent != (int)Configuration::get('PS_SERVICE_CATEGORY')) {
             $this->toolbar_btn['back']['href'] .= '&id_category='.(int)$this->_category->id_parent;
         }
     }
@@ -368,49 +370,49 @@ class AdminCategoriesControllerCore extends AdminController
         }
     }
 
-    public function renderKpis()
-    {
-        $time = time();
-        $kpis = array();
+    // public function renderKpis()
+    // {
+    //     $time = time();
+    //     $kpis = array();
 
-        $helper = new HelperKpi();
-        $helper->id = 'box-disabled-categories';
-        $helper->icon = 'icon-off';
-        $helper->color = 'color1';
-        $helper->title = $this->l('Disabled Categories', null, null, false);
-        $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=disabled_categories';
-        $kpis[] = $helper->generate();
+    //     $helper = new HelperKpi();
+    //     $helper->id = 'box-disabled-categories';
+    //     $helper->icon = 'icon-off';
+    //     $helper->color = 'color1';
+    //     $helper->title = $this->l('Disabled Categories', null, null, false);
+    //     $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=disabled_categories';
+    //     $kpis[] = $helper->generate();
 
-        $helper = new HelperKpi();
-        $helper->id = 'box-empty-categories';
-        $helper->icon = 'icon-bookmark-empty';
-        $helper->color = 'color2';
-        $helper->href = $this->context->link->getAdminLink('AdminTracking');
-        $helper->title = $this->l('Empty Categories', null, null, false);
-        $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=empty_categories';
-        $kpis[] = $helper->generate();
+    //     // $helper = new HelperKpi();
+    //     // $helper->id = 'box-empty-categories';
+    //     // $helper->icon = 'icon-bookmark-empty';
+    //     // $helper->color = 'color2';
+    //     // $helper->href = $this->context->link->getAdminLink('AdminTracking');
+    //     // $helper->title = $this->l('Empty Categories', null, null, false);
+    //     // $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=empty_categories';
+    //     // $kpis[] = $helper->generate();
 
-        $helper = new HelperKpi();
-        $helper->id = 'box-top-category';
-        $helper->icon = 'icon-money';
-        $helper->color = 'color3';
-        $helper->title = $this->l('Top Category', null, null, false);
-        $helper->subtitle = $this->l('30 days', null, null, false);
-        $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=top_category';
-        $kpis[] = $helper->generate();
+    //     $helper = new HelperKpi();
+    //     $helper->id = 'box-top-category';
+    //     $helper->icon = 'icon-money';
+    //     $helper->color = 'color3';
+    //     $helper->title = $this->l('Top Category', null, null, false);
+    //     $helper->subtitle = $this->l('30 days', null, null, false);
+    //     $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=top_category';
+    //     $kpis[] = $helper->generate();
 
-        $helper = new HelperKpi();
-        $helper->id = 'box-products-per-category';
-        $helper->icon = 'icon-search';
-        $helper->color = 'color4';
-        $helper->title = $this->l('Average number of products per category', null, null, false);
-        $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=products_per_category';
-        $kpis[] = $helper->generate();
+    //     $helper = new HelperKpi();
+    //     $helper->id = 'box-products-per-category';
+    //     $helper->icon = 'icon-search';
+    //     $helper->color = 'color4';
+    //     $helper->title = $this->l('Average number of products per category', null, null, false);
+    //     $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=products_per_category';
+    //     $kpis[] = $helper->generate();
 
-        $helper = new HelperKpiRow();
-        $helper->kpis = $kpis;
-        return $helper->generate();
-    }
+    //     $helper = new HelperKpiRow();
+    //     $helper->kpis = $kpis;
+    //     return $helper->generate();
+    // }
 
     public function renderForm()
     {
@@ -420,7 +422,7 @@ class AdminCategoriesControllerCore extends AdminController
         $obj = $this->loadObject(true);
         $context = Context::getContext();
         $id_shop = $context->shop->id;
-        $selected_categories = array((isset($obj->id_parent) && $obj->isParentCategoryAvailable($id_shop))? (int)$obj->id_parent : (int)Tools::getValue('id_parent', Category::getRootCategory()->id));
+        $selected_categories = array((isset($obj->id_parent) && $obj->isParentCategoryAvailable($id_shop))? (int)$obj->id_parent : (int)Tools::getValue('id_parent', Configuration::get('PS_SERVICE_CATEGORY')));
         $unidentified = new Group(Configuration::get('PS_UNIDENTIFIED_GROUP'));
         $guest = new Group(Configuration::get('PS_GUEST_GROUP'));
         $default = new Group(Configuration::get('PS_CUSTOMER_GROUP'));
@@ -478,25 +480,25 @@ class AdminCategoriesControllerCore extends AdminController
                     'class' => 'copy2friendlyUrl',
                     'hint' => $this->l('Invalid characters:').' <>;=#{}',
                 ),
-                array(
-                    'type' => 'switch',
-                    'label' => $this->l('Displayed'),
-                    'name' => 'active',
-                    'required' => false,
-                    'is_bool' => true,
-                    'values' => array(
-                        array(
-                            'id' => 'active_on',
-                            'value' => 1,
-                            'label' => $this->l('Enabled')
-                        ),
-                        array(
-                            'id' => 'active_off',
-                            'value' => 0,
-                            'label' => $this->l('Disabled')
-                        )
-                    )
-                ),
+                // array(
+                //     'type' => 'switch',
+                //     'label' => $this->l('Displayed'),
+                //     'name' => 'active',
+                //     'required' => false,
+                //     'is_bool' => true,
+                //     'values' => array(
+                //         array(
+                //             'id' => 'active_on',
+                //             'value' => 1,
+                //             'label' => $this->l('Enabled')
+                //         ),
+                //         array(
+                //             'id' => 'active_off',
+                //             'value' => 0,
+                //             'label' => $this->l('Disabled')
+                //         )
+                //     )
+                // ),
                 array(
                     'type'  => 'categories',
                     'label' => $this->l('Parent category'),
@@ -505,83 +507,83 @@ class AdminCategoriesControllerCore extends AdminController
                         'id'                  => 'categories-tree',
                         'selected_categories' => $selected_categories,
                         'disabled_categories' => (!Tools::isSubmit('add'.$this->table) && !Tools::isSubmit('submitAdd'.$this->table)) ? array($this->_category->id) : null,
-                        'root_category'       => $context->shop->getCategory()
+                        'root_category'       => Configuration::get('PS_SERVICE_CATEGORY')
                     )
                 ),
-                array(
-                    'type' => 'textarea',
-                    'label' => $this->l('Description'),
-                    'name' => 'description',
-                    'autoload_rte' => true,
-                    'lang' => true,
-                    'hint' => $this->l('Invalid characters:').' <>;=#{}'
-                ),
-                array(
-                    'type' => 'file',
-                    'label' => $this->l('Category Cover Image'),
-                    'name' => 'image',
-                    'display_image' => true,
-                    'image' => $image_url ? $image_url : false,
-                    'size' => $image_size,
-                    'delete_url' => self::$currentIndex.'&'.$this->identifier.'='.$this->_category->id.'&token='.$this->token.'&deleteImage=1',
-                   'hint' => $this->l('This is the main image for your category, displayed in the category page. The category description will overlap this image and appear in its top-left corner.'),
-                   'format' => $format['category']
-                ),
-                array(
-                   'type' => 'file',
-                   'label' => $this->l('Category thumbnail'),
-                   'name' => 'thumb',
-                   'display_image' => true,
-                   'image' => $thumb_url ? $thumb_url : false,
-                   'size' => $thumb_size,
-                   'format' => $format['medium']
-                ),
-                array(
-                    'type' => 'text',
-                    'label' => $this->l('Meta title'),
-                    'name' => 'meta_title',
-                    'maxchar' => 70,
-                    'lang' => true,
-                    'rows' => 5,
-                    'cols' => 100,
-                    'hint' => $this->l('Forbidden characters:').' <>;=#{}'
-                ),
-                array(
-                    'type' => 'textarea',
-                    'label' => $this->l('Meta description'),
-                    'name' => 'meta_description',
-                    'maxchar' => 160,
-                    'lang' => true,
-                    'rows' => 5,
-                    'cols' => 100,
-                    'hint' => $this->l('Forbidden characters:').' <>;=#{}'
-                ),
-                array(
-                    'type' => 'tags',
-                    'label' => $this->l('Meta keywords'),
-                    'name' => 'meta_keywords',
-                    'lang' => true,
-                    'hint' => $this->l('To add "tags," click in the field, write something, and then press "Enter."').'&nbsp;'.$this->l('Forbidden characters:').' <>;=#{}'
-                ),
-                array(
-                    'type' => 'text',
-                    'label' => $this->l('Friendly URL'),
-                    'name' => 'link_rewrite',
-                    'lang' => true,
-                    'required' => true,
-                    'hint' => $this->l('Only letters, numbers, underscore (_) and the minus (-) character are allowed.')
-                ),
-                array(
-                    'type' => 'group',
-                    'label' => $this->l('Group access'),
-                    'name' => 'groupBox',
-                    'values' => Group::getGroups(Context::getContext()->language->id),
-                    'info_introduction' => $this->l('You now have three default customer groups.'),
-                    'unidentified' => $unidentified_group_information,
-                    'guest' => $guest_group_information,
-                    'customer' => $default_group_information,
-                    'hint' => $this->l('Mark all of the customer groups which you would like to have access to this category.')
-                )
+                // array(
+                //     'type' => 'textarea',
+                //     'label' => $this->l('Description'),
+                //     'name' => 'description',
+                //     'autoload_rte' => true,
+                //     'lang' => true,
+                //     'hint' => $this->l('Invalid characters:').' <>;=#{}'
+                // ),
+                // array(
+                //     'type' => 'file',
+                //     'label' => $this->l('Category Cover Image'),
+                //     'name' => 'image',
+                //     'display_image' => true,
+                //     'image' => $image_url ? $image_url : false,
+                //     'size' => $image_size,
+                //     'delete_url' => self::$currentIndex.'&'.$this->identifier.'='.$this->_category->id.'&token='.$this->token.'&deleteImage=1',
+                //    'hint' => $this->l('This is the main image for your category, displayed in the category page. The category description will overlap this image and appear in its top-left corner.'),
+                //    'format' => $format['category']
+                // ),
+                // array(
+                //    'type' => 'file',
+                //    'label' => $this->l('Category thumbnail'),
+                //    'name' => 'thumb',
+                //    'display_image' => true,
+                //    'image' => $thumb_url ? $thumb_url : false,
+                //    'size' => $thumb_size,
+                //    'format' => $format['medium']
+                // ),
+                // array(
+                //     'type' => 'text',
+                //     'label' => $this->l('Meta title'),
+                //     'name' => 'meta_title',
+                //     'maxchar' => 70,
+                //     'lang' => true,
+                //     'rows' => 5,
+                //     'cols' => 100,
+                //     'hint' => $this->l('Forbidden characters:').' <>;=#{}'
+                // ),
+                // array(
+                //     'type' => 'textarea',
+                //     'label' => $this->l('Meta description'),
+                //     'name' => 'meta_description',
+                //     'maxchar' => 160,
+                //     'lang' => true,
+                //     'rows' => 5,
+                //     'cols' => 100,
+                //     'hint' => $this->l('Forbidden characters:').' <>;=#{}'
+                // ),
+                // array(
+                //     'type' => 'tags',
+                //     'label' => $this->l('Meta keywords'),
+                //     'name' => 'meta_keywords',
+                //     'lang' => true,
+                //     'hint' => $this->l('To add "tags," click in the field, write something, and then press "Enter."').'&nbsp;'.$this->l('Forbidden characters:').' <>;=#{}'
+                // ),
+                // array(
+                //     'type' => 'text',
+                //     'label' => $this->l('Friendly URL'),
+                //     'name' => 'link_rewrite',
+                //     'lang' => true,
+                //     'required' => true,
+                //     'hint' => $this->l('Only letters, numbers, underscore (_) and the minus (-) character are allowed.')
+                // ),
+                // array(
+                //     'type' => 'group',
+                //     'label' => $this->l('Group access'),
+                //     'name' => 'groupBox',
+                //     'values' => Group::getGroups(Context::getContext()->language->id),
+                //     'info_introduction' => $this->l('You now have three default customer groups.'),
+                //     'unidentified' => $unidentified_group_information,
+                //     'guest' => $guest_group_information,
+                //     'customer' => $default_group_information,
+                //     'hint' => $this->l('Mark all of the customer groups which you would like to have access to this category.')
+                // )
             ),
             'submit' => array(
                 'title' => $this->l('Save'),
@@ -735,6 +737,13 @@ class AdminCategoriesControllerCore extends AdminController
                 $this->errors[] = Tools::displayError('The category cannot be a parent of itself.');
             }
         }
+        // @todo remove this after adding link_rewrite form option
+        // currently have removed link_rewrite as it is currently not required
+        // so adding link_rewrite in $_POST
+        foreach (Language::getLanguages(true) as $lang) {
+            $_POST['link_rewrite_'.$lang['id_lang']] = Tools::link_rewrite(Tools::getValue('name_'.$lang['id_lang']));
+        }
+
         $object = parent::processAdd();
 
         //if we create a you root category you have to associate to a shop before to add sub categories in. So we redirect to AdminCategories listing
@@ -742,6 +751,22 @@ class AdminCategoriesControllerCore extends AdminController
             Tools::redirectAdmin(self::$currentIndex.'&id_category='.(int)Configuration::get('PS_ROOT_CATEGORY').'&token='.Tools::getAdminTokenLite('AdminCategories').'&conf=3');
         }
         return $object;
+    }
+
+    public function processUpdate()
+    {
+        // @todo remove this after adding link_rewrite form option
+        // currently have removed link_rewrite as it is currently not required
+        // so adding link_rewrite in $_POST
+        if (!Validate::isLoadedObject($this->object)) {
+            foreach (Language::getLanguages(true) as $lang) {
+                $_POST['link_rewrite_'.$lang['id_lang']] = Tools::link_rewrite(Tools::getValue('name_'.$lang['id_lang']));
+            }
+        } else {
+            foreach (Language::getLanguages(true) as $lang) {
+                $_POST['link_rewrite_'.$lang['id_lang']] = $this->object->link_rewrite[$lang['id_lang']];
+            }
+        }
     }
 
     protected function setDeleteMode()

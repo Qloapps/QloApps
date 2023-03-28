@@ -635,7 +635,8 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
         $id_group = 0,
         $id_cart = 0,
         $id_guest = 0,
-        $id_room = 0
+        $id_room = 0,
+        $with_auto_room_services = 1
     ) {
         $totalPrice = array();
         $totalPrice['total_price_tax_incl'] = 0;
@@ -718,6 +719,18 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
                 }
             }
         }
+        if ($with_auto_room_services) {
+            if ($servicesWithTax = RoomTypeServiceProduct::getAutoAddServices($id_product, Product::PRICE_ADDITION_TYPE_WITH_ROOM, true)) {
+                foreach($servicesWithTax as $service) {
+                    $totalPrice['total_price_tax_incl'] += $service['price'];
+                }
+            }
+            if ($servicesWithoutTax = RoomTypeServiceProduct::getAutoAddServices($id_product, Product::PRICE_ADDITION_TYPE_WITH_ROOM, false)) {
+                foreach($servicesWithoutTax as $service) {
+                    $totalPrice['total_price_tax_excl'] += $service['price'];
+                }
+            }
+         }
         return $totalPrice;
     }
 
@@ -736,7 +749,8 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
         $id_group = 0,
         $id_cart = 0,
         $id_guest = 0,
-        $id_room = 0
+        $id_room = 0,
+        $with_auto_room_services = 1
     ) {
         $dateFrom = date('Y-m-d', strtotime($date_from));
         $dateTo = date('Y-m-d', strtotime($date_to));
@@ -748,7 +762,8 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
             $id_group,
             $id_cart,
             $id_guest,
-            $id_room
+            $id_room,
+            $with_auto_room_services
         );
 
         $totalDurationPriceTI = $totalDurationPrice['total_price_tax_incl'];

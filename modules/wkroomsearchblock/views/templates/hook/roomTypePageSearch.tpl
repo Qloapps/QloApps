@@ -26,7 +26,9 @@
 					<div class="col-sm-9 form-group">
 						<div class="filter_header row">
 							<div class="col-sm-12">
-								<p>{l s='Searched results for' mod='wkroomsearchblock'}:</p>
+								<p>{l s='Searched results for' mod='wkroomsearchblock'}:
+								<button class="btn btn-default visible-xs modify_roomtype_search_btn pull-right"><i class="icon-pencil"></i></button>
+								</p>
 							</div>
 						</div>
 						<div class="row">
@@ -35,7 +37,7 @@
 							</div>
 						</div>
 					</div>
-					<div class="col-sm-3 form-group">
+					<div class="col-sm-3 form-group hidden-xs">
 						<button class="btn btn-default modify_roomtype_search_btn pull-right">{l s='Modify Search' mod='wkroomsearchblock'}</button>
 					</div>
 				</div>

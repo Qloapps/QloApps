@@ -146,8 +146,8 @@ class AdminPPreferencesControllerCore extends AdminController
                         'cast' => 'intval',
                         'type' => 'select',
                         'list' => array(
-                            array('id' => HotelBookingDetail::PS_FRONT_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY, 'name' => $this->l('Room Occupancy')),
-                            array('id' => HotelBookingDetail::PS_FRONT_ROOM_UNIT_SELECTION_TYPE_QUANTITY, 'name' => $this->l('Rooms Quantity (No. of rooms)'))
+                            array('id' => HotelBookingDetail::PS_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY, 'name' => $this->l('Room Occupancy')),
+                            array('id' => HotelBookingDetail::PS_ROOM_UNIT_SELECTION_TYPE_QUANTITY, 'name' => $this->l('Rooms Quantity (No. of rooms)'))
                         ),
                         'identifier' => 'id',
                     ),
@@ -181,8 +181,8 @@ class AdminPPreferencesControllerCore extends AdminController
                         'cast' => 'intval',
                         'type' => 'select',
                         'list' => array(
-                            array('id' => HotelBookingDetail::PS_FRONT_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY, 'name' => $this->l('Room Occupancy')),
-                            array('id' => HotelBookingDetail::PS_FRONT_ROOM_UNIT_SELECTION_TYPE_QUANTITY, 'name' => $this->l('Rooms Quantity (No. of rooms)'))
+                            array('id' => HotelBookingDetail::PS_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY, 'name' => $this->l('Room Occupancy')),
+                            array('id' => HotelBookingDetail::PS_ROOM_UNIT_SELECTION_TYPE_QUANTITY, 'name' => $this->l('Rooms Quantity (No. of rooms)'))
                         ),
                         'identifier' => 'id',
                     ),
@@ -298,6 +298,15 @@ class AdminPPreferencesControllerCore extends AdminController
                         'required' => false,
                         'type' => 'bool'
                     ),
+
+                    'PS_SERVICE_PRODUCT_CATEGORY_FILTER' => array(
+                        'title' => $this->l('Show category filter for service products'),
+                        'validation' => 'isBool',
+                        'cast' => 'intval',
+                        'required' => false,
+                        'type' => 'bool'
+                    ),
+
                     'PS_HOTEL_IMAGES_PER_PAGE' => array(
                         'title' => $this->l('Number of hotel images per page'),
                         'hint' => $this->l('Number of hotel images displayed per page. Default is 9.'),
@@ -433,11 +442,11 @@ class AdminPPreferencesControllerCore extends AdminController
         }
 
         if (Tools::getValue('PS_FRONT_SEARCH_TYPE') == HotelBookingDetail::SEARCH_TYPE_OWS) {
-            $_POST['PS_FRONT_ROOM_UNIT_SELECTION_TYPE'] = HotelBookingDetail::PS_FRONT_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY;
+            $_POST['PS_FRONT_ROOM_UNIT_SELECTION_TYPE'] = HotelBookingDetail::PS_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY;
         }
 
         if (Tools::getValue('PS_BACKOFFICE_SEARCH_TYPE') == HotelBookingDetail::SEARCH_TYPE_OWS) {
-            $_POST['PS_BACKOFFICE_ROOM_BOOKING_TYPE'] = HotelBookingDetail::PS_FRONT_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY;
+            $_POST['PS_BACKOFFICE_ROOM_BOOKING_TYPE'] = HotelBookingDetail::PS_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY;
         }
 
         if (Tools::getIsset('PS_CATALOG_MODE')) {

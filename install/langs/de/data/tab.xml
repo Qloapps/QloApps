@@ -66,7 +66,8 @@
   <tab id="Preferences" name="Voreinstellungen"/>
   <tab id="Price_Rules" name="Preisregeln"/>
   <tab id="Products_1" name="Produkte"/>
-  <tab id="Products" name="Produkte"/>
+  <tab id="Products" name="Serviceprodukte verwalten"/>
+  <tab id="Room_Types" name="Zimmertypen verwalten"/>
   <tab id="Profiles" name="Profile"/>
   <tab id="Quick_Access" name="Schnellzugriff"/>
   <tab id="Referrers" name="Referrer"/>

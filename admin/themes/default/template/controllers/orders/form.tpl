@@ -180,6 +180,42 @@
 				$(this).closest("tr").remove();
 			}
 		});
+
+		$('body').on('click', '.delete_service_product', function(){
+			if (confirm("{l s='Are you sure?'}"))
+        	{
+
+				$.ajax({
+					type:"POST",
+					url: "{$link->getAdminLink('AdminOrders')|addslashes}",
+					data : {
+						ajax: true,
+						action: "deleteProductProcess",
+						id_product: $(this).data('id_product'),
+						id_cart: $(this).data('id_cart'),
+						id_hotel: $(this).data('id_hotel'),
+					},
+					dataType:"json",
+					success : function(data)
+					{
+						if (data.status == 'deleted')
+						{
+							showSuccessMessage("{l s='Remove successful'}");
+							location.reload();
+							{* if (data.cart_rooms)
+								location.reload();
+							else
+								window.location.href = "{$link->getAdminLink('AdminHotelRoomsBooking',true)}"; *}
+						}
+						else
+						{
+							alert("l s='Some error occured.please try again.'}");
+						}
+					}
+				});
+				$(this).closest("tr").remove();
+			}
+		});
 		/*END*/
 
 		$('input:radio[name="free_shipping"]').on('change',function() {
@@ -613,7 +649,6 @@
 
 	function updateRoomOccupancy(params, cart_row)
 	{
-		debugger;
 		$.ajax({
 			type:"POST",
 			url: "{$link->getAdminLink('AdminCarts')|addslashes}",
@@ -640,10 +675,11 @@
 	}
 
 	function updateCartSummaryData(summaryData) {
-		$('#total_products').html(formatCurrency(parseFloat(summaryData.summary.total_products), currency_format, currency_sign, currency_blank));
-		$('#total_extra_demands').html(formatCurrency(parseFloat(summaryData.summary.total_extra_demands_tax_exc), currency_format, currency_sign, currency_blank));
+		$('#total_rooms').html(formatCurrency(parseFloat(jsonSummary.summary.total_rooms + jsonSummary.summary.total_extra_demands + jsonSummary.summary.total_additional_services + jsonSummary.summary.total_additional_services_auto_add), currency_format, currency_sign, currency_blank));
 		$('#total_vouchers').html(formatCurrency(parseFloat(summaryData.summary.total_discounts_tax_exc), currency_format, currency_sign, currency_blank));
-		$('#total_without_taxes').html(formatCurrency(parseFloat(summaryData.summary.total_price_without_tax), currency_format, currency_sign, currency_blank));
+		$('#total_convenience_fees').html(formatCurrency(parseFloat(jsonSummary.summary.convenience_fee), currency_format, currency_sign, currency_blank));
+		$('#total_without_taxes').html(formatCurrency(parseFloat(jsonSummary.summary.total_price_without_tax - jsonSummary.summary.convenience_fee), currency_format, currency_sign, currency_blank));
+		// $('#total_service_products').html(formatCurrency(parseFloat(jsonSummary.summary.total_service_products), currency_format, currency_sign, currency_blank));
 		$('#total_taxes').html(formatCurrency(parseFloat(summaryData.summary.total_tax), currency_format, currency_sign, currency_blank));
 		$('#total_with_taxes').html(formatCurrency(parseFloat(summaryData.summary.total_price), currency_format, currency_sign, currency_blank));
 	}
@@ -889,24 +925,6 @@
 		}
 	}
 
-	// commented by webkul to enable button in case of ordering virtual product
-	function checkVirtualProduct(products, delivery_option_list) {
-		if (delivery_option_list.length == 0 && products.length > 0) {
-			var find = 1;
-			$.each(products, function () {
-				if (find == 1) {
-					this.is_virtual == 1 ? find = 1 : find = 0;
-				}
-			});
-			if (find == 1) {
-				$("button[name=\"submitAddOrder\"]").removeAttr("disabled");
-			}
-			else {
-				$("button[name=\"submitAddOrder\"]").attr("disabled", "disabled");
-			}
-		}
-	}
-
 	function searchProducts()
 	{
 		$('#products_part').show();
@@ -1121,7 +1139,6 @@
 		}
 
 		updateDeliveryOptionList(jsonSummary.delivery_option_list);
-		checkVirtualProduct(jsonSummary.summary.products,jsonSummary.delivery_option_list);
 
 		if (jsonSummary.cart.gift == 1) {
 			$('#order_gift').attr('checked', true);
@@ -1148,12 +1165,13 @@
 		shipping_price_selected_carrier = jsonSummary.summary.total_shipping;
 
 		$('#total_vouchers').html(formatCurrency(parseFloat(jsonSummary.summary.total_discounts_tax_exc), currency_format, currency_sign, currency_blank));
-		$('#total_shipping').html(formatCurrency(parseFloat(jsonSummary.summary.total_shipping_tax_exc), currency_format, currency_sign, currency_blank));
 		$('#total_taxes').html(formatCurrency(parseFloat(jsonSummary.summary.total_tax), currency_format, currency_sign, currency_blank));
-		$('#total_without_taxes').html(formatCurrency(parseFloat(jsonSummary.summary.total_price_without_tax), currency_format, currency_sign, currency_blank));
+		$('#total_without_taxes').html(formatCurrency(parseFloat(jsonSummary.summary.total_price_without_tax - jsonSummary.summary.convenience_fee), currency_format, currency_sign, currency_blank));
 		$('#total_with_taxes').html(formatCurrency(parseFloat(jsonSummary.summary.total_price), currency_format, currency_sign, currency_blank));
-		$('#total_extra_demands').html(formatCurrency(parseFloat(jsonSummary.summary.total_extra_demands_tax_exc), currency_format, currency_sign, currency_blank));
-		$('#total_products').html(formatCurrency(parseFloat(jsonSummary.summary.total_products), currency_format, currency_sign, currency_blank));
+		$('#total_rooms').html(formatCurrency(parseFloat(jsonSummary.summary.total_rooms + jsonSummary.summary.total_extra_demands + jsonSummary.summary.total_additional_services + jsonSummary.summary.total_additional_services_auto_add), currency_format, currency_sign, currency_blank));
+		$('#total_convenience_fees').html(formatCurrency(parseFloat(jsonSummary.summary.convenience_fee), currency_format, currency_sign, currency_blank));
+		// $('#total_service_products').html(formatCurrency(parseFloat(jsonSummary.summary.total_service_products), currency_format, currency_sign, currency_blank));
+
 		id_currency = jsonSummary.cart.id_currency;
 		$('#id_currency option').removeAttr('selected');
 		$('#id_currency option[value="'+id_currency+'"]').attr('selected', true);
@@ -1450,8 +1468,9 @@
 				},
 				success: function(response) {
 					if (response.status) {
-						$('#rooms_type_extra_demands').find('#room_type_demands_desc').html('');
-						$('#rooms_type_extra_demands').find('#room_type_demands_desc').append(response.html_exta_demands);
+						$('#customer_cart_details').after(response.html_exta_demands);
+						// $('#rooms_type_extra_demands').find('#room_type_demands_desc').html('');
+						// $('#rooms_type_extra_demands').find('#room_type_demands_desc').append(response.html_exta_demands);
 						$('#rooms_type_extra_demands').modal('show');
 					}
 				},
@@ -1506,38 +1525,91 @@
 			extra_demand_price = formatCurrency(extra_demand_price, currency_format, currency_sign, currency_blank);
 			$(this).closest('.room_demand_block').find('.extra_demand_option_price').text(extra_demand_price);
 			var roomDemands = [];
-			// get the selected extra demands by customer
-			$(this).closest('.room_demand_detail').find('input:checkbox.id_room_type_demand:checked').each(function () {
-				roomDemands.push({
-					'id_global_demand':$(this).val(),
-					'id_option': $(this).closest('.room_demand_block').find('.id_option').val()
+			if ($(this).closest('.room_demand_block').find('input:checkbox.id_room_type_demand').is(':checked')) {
+				// get the selected extra demands by customer
+				$(this).closest('.room_demand_detail').find('input:checkbox.id_room_type_demand:checked').each(function () {
+					roomDemands.push({
+						'id_global_demand':$(this).val(),
+						'id_option': $(this).closest('.room_demand_block').find('.id_option').val()
+					});
 				});
-			});
-			var idBookingCart = $(this).closest('.room_demand_block').find('.id_room_type_demand').attr('id_cart_booking');
+				var idBookingCart = $(this).closest('.room_demand_block').find('.id_room_type_demand').attr('id_cart_booking');
+				$.ajax({
+					type: 'POST',
+					dataType: 'JSON',
+					headers: {
+						"cache-control": "no-cache"
+					},
+					url: "{$link->getAdminLink('AdminCarts')|addslashes}",
+					dataType: 'JSON',
+					cache: false,
+					data: {
+						id_cart_booking: idBookingCart,
+						room_demands: JSON.stringify(roomDemands),
+						action: 'changeRoomDemands',
+						ajax: true
+					},
+					success: function(response) {
+						if (response.status) {
+							showSuccessMessage(txtExtraDemandSucc);
+						} else {
+							showErrorMessage(txtExtraDemandErr);
+						}
+					}
+				});
+			}
+		});
+
+		$(document).on('click', '.change_room_type_service_product', function() {
+			updateServiceProducts(this);
+		});
+
+		$(document).on('focusout', '#rooms_type_extra_demands .qty', function(e) {
+			var qty_wntd = $(this).val();
+			if (qty_wntd == '' || !$.isNumeric(qty_wntd)) {
+				$(this).val(1);
+			}
+			if ($(this).closest('.room_demand_block').find('.change_room_type_service_product').is(':checked')) {
+				updateServiceProducts($(this).closest('.room_demand_block').find('.change_room_type_service_product'));
+			}
+		});
+
+		function updateServiceProducts(element)
+		{
+			var operator = $(element).is(':checked') ? 'up' : 'down';
+			var id_product = $(element).val();
+			var id_cart_booking = $(element).data('id_cart_booking');
+			var qty = $(element).closest('.room_demand_block').find('input.qty').val();
+			if (typeof(qty) == 'undefined') {
+				qty = 1;
+			}
 			$.ajax({
 				type: 'POST',
-				dataType: 'JSON',
 				headers: {
 					"cache-control": "no-cache"
 				},
-				url: "{$link->getAdminLink('AdminCarts')|addslashes}",
+				url: "{$link->getAdminLink('AdminOrders')|addslashes}",
 				dataType: 'JSON',
 				cache: false,
 				data: {
-					id_cart_booking: idBookingCart,
-					room_demands: JSON.stringify(roomDemands),
-					action: 'changeRoomDemands',
+					operator: operator,
+					id_product: id_product,
+					id_cart_booking: id_cart_booking,
+					qty: qty,
+					action: 'updateServiceProduct',
 					ajax: true
 				},
-				success: function(response) {
-					if (response.status) {
+				success: function(jsonData) {
+					if (!jsonData.hasError) {
 						showSuccessMessage(txtExtraDemandSucc);
 					} else {
-						showErrorMessage(txtExtraDemandErr);
+						showErrorMessage(jsonData.errors);
+
 					}
 				}
 			});
-		});
+
+		}
 	});
 </script>
 
@@ -1933,15 +2005,21 @@
 				<div class="col-lg-2">
 					<div class="data-focus">
 						<span>{l s='Total rooms (Tax excl.)'}</span><br/>
-						<span id="total_products" class="size_l text-success"></span>
+						<span id="total_rooms" class="size_l text-success"></span>
 					</div>
 				</div>
-				<div class="col-lg-2">
+				{* <div class="col-lg-2">
 					<div class="data-focus">
-						<span>{l s='Total additinal facilties (Tax excl.)'}</span><br/>
-						<span id="total_extra_demands" class="size_l text-success"></span>
+						<span>{l s='Total extra services (Tax excl.)'}</span><br/>
+						<span id="total_extra_services" class="size_l text-success"></span>
 					</div>
-				</div>
+				</div> *}
+				{* <div class="col-lg-2">
+					<div class="data-focus">
+						<span>{l s='Total Total service products (Tax excl.)'}</span><br/>
+						<span id="total_service_products" class="size_l text-success"></span>
+					</div>
+				</div> *}
 				<div class="col-lg-2">
 					<div class="data-focus">
 						<span>{l s='Total vouchers (Tax excl.)'}</span><br/>
@@ -1952,6 +2030,12 @@
 					<div class="data-focus">
 						<span>{l s='Total (Tax excl.)'}</span><br/>
 						<span id="total_without_taxes" class="size_l"></span>
+					</div>
+				</div>
+				<div class="col-lg-2">
+					<div class="data-focus">
+						<span>{l s='Convenience fees (Tax excl.)'}</span><br/>
+						<span id="total_convenience_fees" class="size_l"></span>
 					</div>
 				</div>
 				<div class="col-lg-2">

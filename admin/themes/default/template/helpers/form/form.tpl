@@ -763,6 +763,7 @@
 												id="{if isset($input.id)}{$input.id}{else}{$input.name}{/if}"
 												type="text"
 												data-hex="true"
+												{if isset($input.autocomplete) && !$input.autocomplete} autocomplete="off"{/if}
 												{if isset($input.class)} class="{$input.class}"
 												{else}class="datepicker"{/if}
 												name="{$input.name}"
@@ -779,6 +780,7 @@
 												id="{if isset($input.id)}{$input.id}{else}{$input.name}{/if}"
 												type="text"
 												data-hex="true"
+												{if isset($input.autocomplete) && !$input.autocomplete} autocomplete="off"{/if}
 												{if isset($input.class)} class="{$input.class}"
 												{else} class="datetimepicker"{/if}
 												name="{$input.name}"

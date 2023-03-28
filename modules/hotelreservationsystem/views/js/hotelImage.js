@@ -27,101 +27,72 @@ $(document).ready(function () {
     });
 
     $("#hotel_images").on("change", function(event) {
-        files = event.target.files;
-        for (var i = 0; i < files.length; i++) {
-            var formData = new FormData();
-            var file = files[i];
-
-            if (typeof file != 'undefined') {
-                if (file.size > maxSizeAllowed) {
-                    showErrorMessage(filesizeError + '[' + file.name +  ']');
-                } else {
-                    formData.append('hotel_image', file);
-                    uploadHotelImages(formData);
-                }
-            }
-        }
-        $('#hotel_images').val(null);
+        const files = Array.from(event.target.files);
+        uploadSelectedImages(files);
     });
 
-    function uploadHotelImages(formData) {
-        var idHotel = $("#id-hotel").val();
-        formData.append('id_hotel', idHotel);
-        formData.append('ajax', true);
-        formData.append('action', 'uploadHotelImages');
+    function uploadSelectedImages(files)
+    {
+        if (files.length == 0) return; // all done
+        let file = files[0];
+        files.splice(0, 1);
+        createImageUploadRequest(file).then((formData) => {
+            uploadHotelImages(formData).then(() => {
+                uploadSelectedImages(files)
+            });
+        })
+    }
 
-        $.ajax({
-            type:'POST',
-            url: adminHotelCtrlUrl,
-            data: formData,
-            cache:false,
-            contentType: false,
-            processData: false,
-            success:function(image){
-                image = JSON.parse(image);
-                if (!image.hasError) {
-                    $('.list-empty-tr').remove();
-                    var html = '';
-                    html += '<tr class="';
-                        if(image.cover) {
-                            html += 'cover-image-tr';
-                        }
-                    html += '">';
-                        html += '<td class="text-center">'+image.id_image+'</td>';
-                        html += '<td class="text-center">';
-                            html += '<a class="htl-img-preview" href="'+image.image_url+'">';
-                                html += '<img class="img-thumbnail" width="100" src="'+image.image_url+'"/>';
-                            html += '</a>';
-                        html += '</td>';
-                        html += '<td class="text-center ';
-                            if(image.cover) {
-                                html += 'cover-image-td';
-                            }
-                        html += '">';
-                            html += '<a href="#" class="';
-                                if(image.cover) {
-                                    html += 'text-success';
-                                } else {
-                                    html += 'text-danger';
-                                }
-                            html += ' changer-cover-image" data-id-hotel="'+idHotel+'" data-is-cover="';
-                                if(image.cover) {
-                                    html += '1';
-                                } else {
-                                    html += '0';
-                                }
-                            html += '" data-id-image="'+image.id_image+'">';
-                                if(image.cover) {
-                                    html += '<i class="icon-check"></i>';
-                                } else {
-                                    html += '<i class="icon-times"></i>';
-                                }
-                            html += '</a>';
-                        html += '</td>';
-                        html += '<td class="text-center">';
-                            html += '<button type="button" class="btn btn-default delete-hotel-image" data-id-hotel="'+idHotel+'" data-is-cover="';
-                                if(image.cover) {
-                                    html += '1';
-                                } else {
-                                    html += '0';
-                                }
-                            html += '" data-id-image="'+image.id_image+'"><i class="icon-trash"></i></button>';
-                        html += '</td>';
-                    html += '</tr>';
-                    $("#hotel-image-table tbody").append(html);
-
-                    showSuccessMessage(imgUploadSuccessMsg);
+    function createImageUploadRequest(file)
+    {
+        return new Promise((resolve, reject) => {
+            if (typeof file != 'undefined') {
+                if (file.size > maxSizeAllowed) {
+                    reject(filesizeError + '[' + file.name +  ']');
                 } else {
-                    if (typeof image.message != 'undefined') {
-                        showErrorMessage(image.message);
-                    } else {
-                        showErrorMessage(imgUploadErrorMsg);
-                    }
+                    var formData = new FormData();
+                    var idHotel = $("#id-hotel").val();
+                    formData.append('hotel_image', file);
+                    formData.append('id_hotel', idHotel);
+                    formData.append('ajax', true);
+                    formData.append('action', 'uploadHotelImages');
+                    resolve(formData);
                 }
-            },
-            error: function(data) {
-                showErrorMessage(imgUploadErrorMsg);
             }
+        });
+    }
+
+    function uploadHotelImages(formData) {
+        return new Promise((resolve, reject) => {
+            $.ajax({
+                type:'POST',
+                dataType:'JSON',
+                url: adminHotelCtrlUrl,
+                data: formData,
+                cache:false,
+                contentType: false,
+                processData: false,
+                success:function(response){
+                    if (response.success) {
+                        $('.list-empty-tr').remove();
+                        $("#hotel-image-table tbody").append(response.data.image_row);
+                        showSuccessMessage(imgUploadSuccessMsg);
+                        resolve(imgUploadSuccessMsg);
+                    } else {
+                        if (typeof response.errors != 'undefined') {
+                            showErrorMessage(response.errors);
+                            reject(response.errors);
+                        } else {
+                            showErrorMessage(imgUploadErrorMsg);
+                            reject(imgUploadErrorMsg);
+                        }
+                    }
+                },
+                error: function(data) {
+                    showErrorMessage(imgUploadErrorMsg);
+                    reject(imgUploadErrorMsg);
+                }
+            });
         });
     }
 

@@ -48,7 +48,7 @@
 							<td  class="text-center">
 								<font size="2" face="Open-sans, sans-serif" color="#555454">
 									<strong>
-										{$data_v['adult']} {l s='Adults'}, {$data_v['children']} {l s='Children'}
+										{$rm_v['adults']} {l s='Adults'}, {$rm_v['children']} {l s='Children'}
 									</strong>
 								</font>
 							</td>
@@ -62,7 +62,7 @@
 							<td width="10">&nbsp;</td>
 							<td align="right"  class="text-center">
 								<font size="2" face="Open-sans, sans-serif" color="#555454">
-									{convertPrice price=$data_v['unit_price']}
+									{convertPrice price=$rm_v['avg_paid_unit_price_tax_incl']}
 								</font>
 							</td>
 							<td width="10">&nbsp;</td>
@@ -114,7 +114,7 @@
 							<td width="10">&nbsp;</td>
 							<td align="right"  class="text-center">
 								<font size="2" face="Open-sans, sans-serif" color="#555454">
-									{convertPrice price=$rm_v['amount']}
+									{convertPrice price=$rm_v['amount_tax_incl']}
 								</font>
 							</td>
 							<td width="10">&nbsp;</td>

@@ -74,7 +74,7 @@
 			{else}
 				<h2>{l s='No order was created from this cart.'}</h2>
 				{if $customer->id}
-					<a class="btn btn-default" href="{$link->getAdminLink('AdminOrders')|escape:'html':'UTF-8'}&amp;id_cart={$cart->id|intval}&amp;addorder"><i class="icon-shopping-cart"></i> {l s='Create an order from this cart.'}</a>
+					<a class="btn btn-default" href="{$link->getAdminLink('AdminOrders')|escape:'html':'UTF-8'}&amp;cart_id={$cart->id|intval}&amp;addorder"><i class="icon-shopping-cart"></i> {l s='Create an order from this cart.'}</a>
 				{/if}
 			{/if}
 		</div>
@@ -87,52 +87,179 @@
 			<thead>
 				<tr>
 					<th class="fixed-width-xs"><span class="title_box">{l s='Image'}</span></th>
-					<th class="text-center"><span class="title_box">{l s='Room Type'}</span></th>
-					<th class="text-center"><span class="title_box">{l s='Unit Price'}</span></th>
+					<th><span class="title_box">{l s='Room Type'}</span></th>
+					<th><span class="title_box">{l s='Hotel'}</span></th>
+					<th><span class="title_box">{l s='Duration'}</span></th>
+					<th><span class="title_box">{l s='occupancy'}</span></th>
+					<th><span class="title_box">{l s='Room price'}</span></th>
+					<th><span class="title_box">{l s='Extra services'}</span></th>
 					<th class="text-right"><span class="title_box">{l s='Total'}</span></th>
 				</tr>
 			</thead>
 			<tbody>
-				{foreach from=$products item='product'}
+				{foreach from=$cart_htl_data item='room'}
 					<tr>
-						<td>{$product.image}</td>
-						<td class="text-center">
-							<a href="{$link->getAdminLink('AdminProducts')|escape:'html':'UTF-8'}&amp;id_product={$product.id_product}&amp;updateproduct">
-								<span class="productName">{$product.name}</span>{if isset($product.attributes)}<br />{$product.attributes}{/if}<br />
-								{if $product.reference}{l s='Ref:'} {$product.reference}{/if}
-								{if $product.reference && $product.supplier_reference} / {$product.supplier_reference}{/if}
+						<td><img src="{$room['image_link']}" class="img-responsive" /></td>
+						<td>
+							<a href="{$link->getAdminLink('AdminProducts')|escape:'html':'UTF-8'}&amp;id_product={$room['id_product']}&amp;updateproduct">
+								<span class="productName">{$room['room_type']}</span>
 							</a>
 						</td>
-						<td class="text-center">{displayWtPriceWithCurrency price=$product.product_price currency=$currency}</td>
-						<td class="text-right">{displayWtPriceWithCurrency price=$product.product_total currency=$currency}</td>
+						<td><a href="{$link->getAdminLink('AdminAddHotel')|escape:'html':'UTF-8'}&amp;id={$room['id_hotel']}&amp;updatehtl_branch_info">{$room['room_type_info'].hotel_name}</a></td>
+						<td>{dateFormat date=$room['date_from']} - {dateFormat date=$room['date_to']}</td>
+						<td>
+							<span>
+								{if $room['adults']}{$room['adults']}{/if} {if $room['adults'] > 1}{l s='Adults'}{else}{l s='Adult'}{/if}{if {$room['children']}}, {$room['children']} {if $room['children'] > 1}{l s='Children'}{else}{l s='Child'}{/if}{/if}
+							</span>
+						</td>
+						<td>{displayWtPriceWithCurrency price=$room['feature_price_tax_excl'] currency=$currency}</td>
+						<td>
+							{if (isset($room['extra_demands']) && $room['extra_demands']) || (isset($room['additional_service']) && $room['additional_service'])}
+								<a href="#" data-toggle="modal" data-target="#rooms_type_extra_demands_{$room['id']}">
+									{displayWtPriceWithCurrency price=($room['demand_price'] + $room['additional_service_price'] + $room['additional_services_auto_add_price'])|escape:'html':'UTF-8' currency=$currency}
+								</a>
+							{else}
+								{displayWtPriceWithCurrency price=0 currency=$currency}
+							{/if}
+						</td>
+						<td class="text-right">
+							{if (isset($room['extra_demands']) && $room['extra_demands']) || (isset($room['additional_service']) && $room['additional_service'])}
+								{displayWtPriceWithCurrency price=($room['amt_with_qty'] + $room['additional_services_auto_add_price'] + $room['demand_price'] +  $room['additional_service_price'])|escape:'html':'UTF-8' currency=$currency}
+							{else}
+								{displayWtPriceWithCurrency price=$room['amt_with_qty']|escape:'html':'UTF-8' currency=$currency}
+							{/if}
+						</td>
 					</tr>
+					<div class="modal" tabindex="-1" role="dialog" id="rooms_type_extra_demands_{$room['id']}">
+						<div class="modal-dialog" role="document">
+							<div class="modal-content">
+								<div class="modal-body" id="rooms_extra_demands">
+									<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+										<span aria-hidden="true">&times;</span>
+									</button>
+									<ul class="nav nav-tabs" role="tablist">
+										{if isset($room['selected_demands']) && $room['selected_demands']}
+											<li role="presentation" class="active"><a href="#room_type_demands_desc_{$room['id']}" aria-controls="facilities" role="tab" data-toggle="tab">{l s='Facilities'}</a></li>
+										{/if}
+										{if isset($room['selected_services']) && $room['selected_services']}
+											<li role="presentation" {if !isset($room['selected_demands']) || !$room['selected_demands']}class="active"{/if}><a href="#room_type_service_product_desc_{$room['id']}" aria-controls="services" role="tab" data-toggle="tab">{l s='Services'}</a></li>
+										{/if}
+									</ul>
+									<div class="tab-content panel">
+										{if isset($room['selected_demands']) && $room['selected_demands']}
+											<div id="room_type_demands_desc_{$room['id']}" class="tab-pane active">
+												<div id="room_type_demands_desc">
+													{if isset($room['selected_demands']) && $room['selected_demands']}
+														{assign var=roomCount value=1}
+														{foreach $room['selected_demands'] as $demand}
+															<div class="row room_demands_container">
+																<div class="col-sm-12 room_demand_detail">
+																	{if isset($room['selected_demands']) && $room['selected_demands']}
+																		{foreach $room['extra_demands'] as $idGlobalDemand => $roomDemand}
+																			{if $demand.id_global_demand == $idGlobalDemand}
+																				<div class="row room_demand_block">
+																					<div class="col-xs-6">
+																						<div class="row">
+																							<div class="col-xs-10 demand_adv_option_block">
+																								<p>
+																									{$roomDemand['name']|escape:'html':'UTF-8'}<br>
+																									{if isset($roomDemand['adv_option']) && $roomDemand['adv_option']}
+																										{$roomDemand['adv_option'][$demand['id_option']]['name']}
+																									{/if}
+																								</p>
+																							</div>
+																						</div>
+																					</div>
+																					<div class="col-xs-6">
+																						<p><span class="pull-right extra_demand_option_price">{if isset($roomDemand['adv_option']) && $roomDemand['adv_option']}{convertPrice price = $roomDemand['adv_option'][$idGlobalDemand]['price']|escape:'html':'UTF-8'}{else}{convertPrice price = $roomDemand['price']|escape:'html':'UTF-8'}{/if}</span></p>
+																					</div>
+																				</div>
+																			{/if}
+																		{/foreach}
+																	{/if}
+																</div>
+															</div>
+															{assign var=roomCount value=$roomCount+1}
+														{/foreach}
+													{/if}
+												</div>
+											</div>
+										{/if}
+										{if isset($room['selected_services']) && $room['selected_services']}
+											<div id="room_type_service_product_desc_{$room['id']}" class="tab-pane{if !isset($room['selected_demands']) || !$room['selected_demands']} active{/if}">
+												<div id="room_type_services_desc">
+													{assign var=roomCount value=1}
+													<div class="row room_demands_container">
+														<div class="col-sm-12 room_demand_detail">
+															{if isset($room['selected_services']) && $room['selected_services']}
+																{foreach $room['selected_services'] as $service}
+																	<div class="row room_demand_block">
+																			<div class="col-xs-5">
+																				<div class="row">
+																					<div class="col-xs-10">
+																						<p>{$service['name']|escape:'html':'UTF-8'}</p>
+																						{if $service.allow_multiple_quantity}
+																							<div class="qty_container">
+																							{l s='Quantity:'} {$service.quantity}
+																							</div>
+																						{/if}
+																					</div>
+																				</div>
+																			</div>
+																			<div class="col-xs-3">
+																				{if $service['auto_add_to_cart'] && $service['price_addition_type'] == Product::PRICE_ADDITION_TYPE_INDEPENDENT}
+																					<span class="badge badge-info label">{l s='Convenience fee'}</span>
+																				{/if}
+																				{if $service['auto_add_to_cart'] && $service['price_addition_type'] == Product::PRICE_ADDITION_TYPE_WITH_ROOM}
+																					<span class="badge badge-info label">{l s='Auto added'}</span>
+																				{/if}
+																			</div>
+																			<div class="col-xs-4">
+																				<span class="pull-right">{convertPrice price=$service.total_price}</span>
+																			</div>
+																		</div>
+																{/foreach}
+															{/if}
+														</div>
+													</div>
+												</div>
+											</div>
+										{/if}
+									</div>
+								</div>
+								<div class="modal-footer">
+									<button type="button" class="btn btn-secondary" data-dismiss="modal">{l s='Close'}</button>
+								</div>
+							</div>
+						</div>
+					</div>
 				{/foreach}
 			</tbody>
 			<tfoot>
 				<tr>
-					<td colspan="3">{l s='Total cost of room types:'}</td>
+					<td colspan="7">{l s='Total cost of room types:'}</td>
 					<td class="text-right">{displayWtPriceWithCurrency price=$total_products currency=$currency}</td>
 				</tr>
 				{if $total_discounts != 0}
 				<tr>
-					<td colspan="3">{l s='Total value of vouchers:'}</td>
+					<td colspan="7">{l s='Total value of vouchers:'}</td>
 					<td class="text-right">{displayWtPriceWithCurrency price=$total_discounts currency=$currency}</td>
 				</tr>
 				{/if}
 				{if $total_wrapping > 0}
 				<tr>
-					<td colspan="3">{l s='Total cost of gift wrapping:'}</td>
+					<td colspan="7">{l s='Total cost of gift wrapping:'}</td>
 					<td class="text-right">{displayWtPriceWithCurrency price=$total_wrapping currency=$currency}</td>
 				</tr>
 				{/if}
 				{if $cart->getOrderTotal(true, Cart::ONLY_SHIPPING) > 0}
 				<tr>
-					<td colspan="3">{l s='Total cost of shipping:'}</td>
+					<td colspan="7">{l s='Total cost of shipping:'}</td>
 					<td class="text-right">{displayWtPriceWithCurrency price=$total_shipping currency=$currency}</td>
 				</tr>
 				{/if}
 				<tr>
-					<td colspan="3" class=" success"><strong>{l s='Total:'}</strong></td>
+					<td colspan="7" class=" success"><strong>{l s='Total:'}</strong></td>
 					<td class="text-right success"><strong>{displayWtPriceWithCurrency price=$total_price currency=$currency}</strong></td>
 				</tr>
 			</tfoot>

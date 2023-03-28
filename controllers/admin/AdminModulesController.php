@@ -172,11 +172,11 @@ class AdminModulesControllerCore extends AdminController
     public function ajaxProcessRefreshModuleList($force_reload_cache = false)
     {
         // Refresh modules_list.xml every week
-        if (!$this->isFresh(Module::CACHE_FILE_MODULES_LIST, _TIME_1_DAY_) || $force_reload_cache) {
+        if (!Tools::isFresh(Module::CACHE_FILE_MODULES_LIST, _TIME_1_DAY_) || $force_reload_cache) {
             $xml_modules_list = _QLO_API_DOMAIN_.'/xml/'.str_replace('.', '', _QLOAPPS_VERSION_).'.xml';
-            if ($this->refresh(Module::CACHE_FILE_MODULES_LIST, 'https://'.$xml_modules_list)) {
+            if (Tools::refresh(Module::CACHE_FILE_MODULES_LIST, 'https://'.$xml_modules_list)) {
                 $this->status = 'refresh';
-            } elseif ($this->refresh(Module::CACHE_FILE_MODULES_LIST, 'http://'.$xml_modules_list)) {
+            } elseif (Tools::refresh(Module::CACHE_FILE_MODULES_LIST, 'http://'.$xml_modules_list)) {
                 $this->status = 'refresh';
             } else {
                 $this->status = 'error';
@@ -187,7 +187,7 @@ class AdminModulesControllerCore extends AdminController
 
         // If logged to Addons Webservices, refresh default country native modules list every day
         if ($this->status != 'error') {
-            if (!$this->isFresh(Module::CACHE_FILE_DEFAULT_COUNTRY_MODULES_LIST, _TIME_1_DAY_) || $force_reload_cache) {
+            if (!Tools::isFresh(Module::CACHE_FILE_DEFAULT_COUNTRY_MODULES_LIST, _TIME_1_DAY_) || $force_reload_cache) {
                 if (file_put_contents(_PS_ROOT_DIR_.Module::CACHE_FILE_DEFAULT_COUNTRY_MODULES_LIST, Tools::addonsRequest('native'))) {
                     $this->status = 'refresh';
                 } else {
@@ -197,18 +197,8 @@ class AdminModulesControllerCore extends AdminController
                 $this->status = 'cache';
             }
 
-            if (!$this->isFresh(Module::CACHE_FILE_ADDONS_MODULES_LIST, _TIME_1_DAY_) || $force_reload_cache) {
+            if (!Tools::isFresh(Module::CACHE_FILE_ADDONS_MODULES_LIST, _TIME_1_DAY_) || $force_reload_cache) {
                 if (file_put_contents(_PS_ROOT_DIR_.Module::CACHE_FILE_ADDONS_MODULES_LIST, Tools::addonsRequest('addons-modules'))) {
-                    $this->status = 'refresh';
-                } else {
-                    $this->status = 'error';
-                }
-            } else {
-                $this->status = 'cache';
-            }
-
-            if (!$this->isFresh(Module::CACHE_FILE_MUST_HAVE_MODULES_LIST, _TIME_1_DAY_) || $force_reload_cache) {
-                if (file_put_contents(_PS_ROOT_DIR_.Module::CACHE_FILE_MUST_HAVE_MODULES_LIST, Tools::addonsRequest('must-have'))) {
                     $this->status = 'refresh';
                 } else {
                     $this->status = 'error';
@@ -220,7 +210,7 @@ class AdminModulesControllerCore extends AdminController
 
         // If logged to Addons Webservices, refresh customer modules list every 5 minutes
         if ($this->logged_on_addons && $this->status != 'error') {
-            if (!$this->isFresh(Module::CACHE_FILE_CUSTOMER_MODULES_LIST, 300) || $force_reload_cache) {
+            if (!Tools::isFresh(Module::CACHE_FILE_CUSTOMER_MODULES_LIST, 300) || $force_reload_cache) {
                 if (file_put_contents(_PS_ROOT_DIR_.Module::CACHE_FILE_CUSTOMER_MODULES_LIST, Tools::addonsRequest('customer'))) {
                     $this->status = 'refresh';
                 } else {
@@ -230,7 +220,6 @@ class AdminModulesControllerCore extends AdminController
                 $this->status = 'cache';
             }
         }
-        Module::generateTrustedXml();
     }
 
     public function displayAjaxRefreshModuleList()
@@ -737,7 +726,10 @@ class AdminModulesControllerCore extends AdminController
                 return;
             }
 
-            if ($key == 'checkAndUpdate') {
+            if ($key == 'check') {
+                $this->ajaxProcessRefreshModuleList(true);
+            } elseif ($key == 'checkAndUpdate') {
+                $this->ajaxProcessRefreshModuleList(true);
                 $modules = array();
                 $modules_on_disk = Module::getModulesOnDisk(true, $this->logged_on_addons, $this->id_employee, true);
 

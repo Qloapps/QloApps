@@ -65,10 +65,16 @@
 				<tr class="{if !$label_printed}tr-border-top{/if}">
 					{if !$label_printed}
 						<td class="white" rowspan="{$bd|count}">
-							{if $label == 'product_tax'}
+							{if $label == 'additional_services_tax'}
+								{l s='Services' pdf='true'}
+							{elseif $label == 'room_tax'}
 								{l s='Rooms' pdf='true'}
 							{elseif $label == 'extra_demands_tax'}
-								{l s='Extra Demands' pdf='true'}
+								{l s='Facilities' pdf='true'}
+							{elseif $label == 'convenience_fee_tax'}
+								{l s='Convenience Fees' pdf='true'}
+							{elseif $label == 'service_products_tax'}
+								{l s='Service Products' pdf='true'}
 							{elseif $label == 'shipping_tax'}
 								{l s='Shipping' pdf='true'}
 							{elseif $label == 'ecotax_tax'}

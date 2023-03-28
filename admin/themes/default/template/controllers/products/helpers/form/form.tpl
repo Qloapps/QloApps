@@ -107,24 +107,35 @@
 
 			$(document).ready(function()
 			{
-				if (product_type == product_type_pack)
+				{* if (product_type == product_type_pack)
 				{
 					$('a[id*="VirtualProduct"]').hide();
 					$('a[id*="Combinations"]').hide();
 				}
 				else if (product_type == product_type_virtual)
 				{
+					$('a[id*="Quantities"]').hide();
+					$('a[id*="Configuration"]').show();
+					$('a[id*="Booking"]').show();
+					$('a[id*="Occupancy"]').show();
+					$('a[id*="ModuleHotelreservationsystem"]').show();
 					$('a[id*="Pack"]').hide();
 					$('a[id*="Shipping"]').hide();
 					$('a[id*="Combinations"]').hide();
 				}
 				else
 				{
+					$('a[id*="Quantities"]').show();
+					$('a[id*="Configuration"]').hide();
+					$('a[id*="Occupancy"]').hide();
+					$('a[id*="Booking"]').hide();
+					$('a[id*="ModuleHotelreservationsystem"]').hide();
 					$('a[id*="Pack"]').hide();
 					$('a[id*="VirtualProduct"]').hide();
-				}
+				} *}
+				{* updateTextInfo(product_type); *}
 
-				$('#desc-product-newCombination').hide();
+				{* $('#desc-product-newCombination').hide(); *}
 
 				{* submenu binding *}
 				$(".productTabs a").click(function(e){
@@ -140,12 +151,12 @@
 					var split_position = id.indexOf('-') + 1;
 					var btn_name = id.substr(split_position);
 
-					if ((btn_name == 'VirtualProduct' || btn_name == 'Pack') && $('#name_' + id_lang_default).val() == '')
+					{* if ((btn_name == 'VirtualProduct' || btn_name == 'Pack') && $('#name_' + id_lang_default).val() == '')
 					{
 						alert(missing_product_name);
 						$('#name_' + id_lang_default).focus();
 						return false;
-					}
+					} *}
 
 					$('#key_tab').val(btn_name);
 
@@ -166,7 +177,7 @@
 					});
 
 					var languages = new Array();
-					if (btn_name == "Combinations")
+					{* if (btn_name == "Combinations")
 					{
 						$('#desc-product-new').hide();
 						$('#desc-product-newCombination').show();
@@ -177,12 +188,12 @@
 						handleSaveButtons();
 					}
 					else
-					{
+					{ *}
 						$('#desc-product-newCombination').hide();
 						// if pack is enabled, save button are visible only if pack is valid
 						if ($("input[name='id_product']").val() != 0 || btn_name != 'Informations')
 							handleSaveButtons();
-					}
+					{* } *}
 
 					$('.label-tooltip').tooltip();
 				});
@@ -227,28 +238,28 @@
 				$('.productTabs').show();
 				$('#product-tab-content-wait').hide();
 
-				function checkIfProductTypeIsPack() {
+				{* function checkIfProductTypeIsPack() {
 					var typeIsPack = $('#pack_product').is(':checked');
 					if (typeIsPack && $('#inputPackItems').val()=='' ) {
 						$('.pack-empty-warning').removeClass('alert-warning').addClass('alert-danger');
 						$('#curPackItemName').select2('open');
 					}
 					return typeIsPack;
-				}
+				} *}
 				$("#product_form").validate({
 					ignore: '.updateCurrentText',
-					rules: {
+					{* rules: {
 						inputPackItems: {
 							required: {
 								depends: checkIfProductTypeIsPack
 							},
 						}
-					},
-					messages: {
+					}, *}
+					{* messages: {
 						inputPackItems: {
 							required: ""
 						}
-					},
+					}, *}
 					// override jquery validate plugin defaults for bootstrap 3
 					highlight: function(element) {
 						$(element).closest('.form-group').addClass('has-error');
@@ -287,10 +298,9 @@
 
 		<form id="product_form" class="form-horizontal col-lg-10 col-md-9" action="{$form_action|escape:'html':'UTF-8'}" method="post" enctype="multipart/form-data" name="product" novalidate>
 			<input type="hidden" name="id_product" value="{$id_product}" />
-			<!-- <input type="hidden" id="is_virtual" name="is_virtual" value="{$product->is_virtual|escape:'html':'UTF-8'}" /> -->
+			{* <input type="hidden" id="is_virtual" name="is_virtual" value="{$product->is_virtual|escape:'html':'UTF-8'}" /> *}
 			<!-- changed input field to make product virtual by default -->
 			<input type="hidden" id="is_virtual" name="is_virtual" value="1"/>
-
 
 			{if isset($smarty.request.page) && $smarty.request.page > 1}
 				<input type="hidden" id="page" name="page" value="{$smarty.request.page|intval}" />

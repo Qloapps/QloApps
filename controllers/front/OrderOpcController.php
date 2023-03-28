@@ -338,7 +338,7 @@ class OrderOpcControllerCore extends ParentOrderController
                             $this->ajaxDie();
                             break;
                         case 'getRoomTypeBookingDemands':
-                            $this->ajaxDie($this->getRoomTypeBookingDemands());
+                            $this->ajaxDie($this->getRoomTypeBookingServices());
                             exit;
                             break;
                         case 'changeRoomDemands':
@@ -389,6 +389,9 @@ class OrderOpcControllerCore extends ParentOrderController
      */
     public function initContent()
     {
+        // check all service products are available
+        RoomTypeServiceProductCartDetail::validateServiceProductsInCart();
+
         parent::initContent();
 
         // check ORDER RESTRICT condition before payment by the customer
@@ -453,19 +456,14 @@ class OrderOpcControllerCore extends ParentOrderController
         $this->context->smarty->assign('checkout_process_steps', $this->checkoutProcess->getSteps());
 
         // set room type demands
-        $objCartBookingData = new HotelCartBookingData();
-        $objGlobalDemand = new HotelRoomTypeGlobalDemand();
-        $allDemands = $objGlobalDemand->getAllDemands();
-        $objCurrency = new Currency(Configuration::get('PS_CURRENCY_DEFAULT'));
-        $totalFacilityCostTI = $objCartBookingData->getCartExtraDemands($this->context->cart->id, 0, 0, 0, 0, 1, 0, 1);
-        $totalFacilityCostTE = $objCartBookingData->getCartExtraDemands($this->context->cart->id, 0, 0, 0, 0, 1, 0, 0);
+        // $objGlobalDemand = new HotelRoomTypeGlobalDemand();
+        // $allDemands = $objGlobalDemand->getAllDemands();
+        // $objCurrency = new Currency(Configuration::get('PS_CURRENCY_DEFAULT'));
         $this->context->smarty->assign(
             array(
                 'orderRestrictErr' => $orderRestrictErr,
-                'additional_facilities_tax' => ($totalFacilityCostTI - $totalFacilityCostTE),
-                'totalFacilityCostTE' => $totalFacilityCostTE,
-                'allDemands' => $allDemands,
-                'defaultcurrencySign' => $objCurrency->sign,
+                // 'allDemands' => $allDemands,
+                // 'defaultcurrencySign' => $objCurrency->sign,
                 'THEME_DIR' => _THEME_DIR_,
                 'PS_CUSTOMER_ADDRESS_CREATION' => Configuration::get('PS_CUSTOMER_ADDRESS_CREATION'),
                 'free_shipping' => $free_shipping,
@@ -550,14 +548,19 @@ class OrderOpcControllerCore extends ParentOrderController
             $this->setTemplate(_PS_THEME_DIR_ . 'order-opc-advanced.tpl');
         } else {
             // set used objects in the below code
-            $objBookingDetail = new HotelBookingDetail();
-            $objHtlRoomType = new HotelRoomType();
+            // $objBookingDetail = new HotelBookingDetail();
+            // $objHtlRoomType = new HotelRoomType();
 
-            $roomTypeList = $this->context->cart->getProducts();
-            if (!empty($roomTypeList)) {
+            $cartProducts = $this->context->cart->getProducts();
+
+            if (!empty($cartProducts)) {
 
                 if ($cartBookingInfo = HotelCartBookingData::getHotelCartBookingData()) {
                     $this->context->smarty->assign('cart_htl_data', $cartBookingInfo);
+                }
+                $objHotelServiceProductCartDetail = new HotelServiceProductCartDetail();
+                if ($normalCartProduct = $objHotelServiceProductCartDetail->getHotelProducts($this->context->cart->id, 0, 0, 0, null, null, true)) {
+                    $this->context->smarty->assign('cart_normal_data', $normalCartProduct);
                 }
 
                 // For Advanced Payment work
@@ -665,6 +668,7 @@ class OrderOpcControllerCore extends ParentOrderController
             'invoice_company' => Tools::htmlentitiesUTF8($address_invoice->company),
             'invoice_lastname' => Tools::htmlentitiesUTF8($address_invoice->lastname),
             'invoice_firstname' => Tools::htmlentitiesUTF8($address_invoice->firstname),
+            'invoice_vat_number' => Tools::htmlentitiesUTF8($address_invoice->vat_number),
             'invoice_dni' => Tools::htmlentitiesUTF8($address_invoice->dni),
             'invoice_address' => $this->context->cart->id_address_invoice !== $this->context->cart->id_address_delivery,
             'invoice_address1' => Tools::htmlentitiesUTF8($address_invoice->address1),
@@ -944,9 +948,9 @@ class OrderOpcControllerCore extends ParentOrderController
         return $result;
     }
 
-    public function getRoomTypeBookingDemands()
+    public function getRoomTypeBookingServices()
     {
-        $extraDemandsTpl = '';
+        $response = array('reload' => true);
         if ($idProduct = Tools::getValue('id_product')) {
             if (($dateFrom = Tools::getValue('date_from'))
                 && ($dateTo = Tools::getValue('date_to'))
@@ -980,14 +984,32 @@ class OrderOpcControllerCore extends ParentOrderController
                         }
                         $this->context->smarty->assign('roomTypeDemands', $roomTypeDemands);
                         $this->context->smarty->assign('selectedRoomDemands', $selectedRoomDemands);
-                        $extraDemandsTpl .= $this->context->smarty->fetch(
-                            _PS_THEME_DIR_.'_partials/cart_booking_demands.tpl'
-                        );
+
                     }
                 }
+                $objRoomTypeServiceProductCartDetail = new RoomTypeServiceProductCartDetail();
+                $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
+                $roomTypeServiceProducts = $objRoomTypeServiceProduct->getServiceProductsData($idProduct, 1, 0, true, 1);
+                $cartRooms = $objCartBookingData->getHotelCartRoomsInfoByRoomType($this->context->cart->id, $idProduct,$dateFrom, $dateTo);
+                foreach($cartRooms as &$room) {
+                    $room['selected_service'] = $objRoomTypeServiceProductCartDetail->getRoomServiceProducts(
+                        $room['id'],
+                        0,
+                        null,
+                        null
+                    );
+                }
+                $this->context->smarty->assign(array(
+                    'roomTypeServiceProducts' => $roomTypeServiceProducts,
+                    'cartRooms' => $cartRooms
+                ));
             }
         }
-        return $extraDemandsTpl;
+        $response['extra_demands'] = $this->context->smarty->fetch(
+            _PS_THEME_DIR_.'_partials/cart_booking_demands.tpl'
+        );
+
+        return json_encode($response);
     }
 
     public function changeRoomDemands()

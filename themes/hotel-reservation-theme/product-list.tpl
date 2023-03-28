@@ -204,11 +204,11 @@
 				{if $page_name != 'index'}
 					<div class="functional-buttons clearfix">
 						{hook h='displayProductListFunctionalButtons' product=$product}
-						{if isset($comparator_max_item) && $comparator_max_item}
+						{* {if isset($comparator_max_item) && $comparator_max_item}
 							<div class="compare">
 								<a class="add_to_compare" href="{$product.link|escape:'html':'UTF-8'}" data-id-product="{$product.id_product}">{l s='Add to Compare'}</a>
 							</div>
-						{/if}
+						{/if} *}
 					</div>
 				{/if}
 			</div><!-- .product-container> -->

@@ -20,7 +20,8 @@
   <tab id="Administration" name="Administratie"/>
   <tab id="Stats" name="Statistieken"/>
   <tab id="Stock" name="Voorraad"/>
-  <tab id="Products" name="Producten"/>
+  <tab id="Products" name="Serviceproducten beheren"/>
+  <tab id="Room_Types" name="Beheer kamertypes"/>
   <tab id="Categories" name="Categorieën"/>
   <tab id="Monitoring" name="Monitoring"/>
   <tab id="Attributes_and_Values" name="Productattributen"/>

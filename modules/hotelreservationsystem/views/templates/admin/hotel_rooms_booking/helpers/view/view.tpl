@@ -7,6 +7,17 @@
 			<div class="panel-body">
 				<form method="post" action="">
 					<div class="row">
+						{* <div class="form-group col-sm-12">
+							<label for="booking_product" class="control-label col-sm-4 required">
+								<span title="" data-toggle="tooltip" class="label-tooltip">{l s='Product type' mod='hotelreservationsystem'}</span>
+							</label>
+							<div class="col-sm-8">
+								<select name="booking_product" class="form-control" id="booking_product">
+									<option value="1" {if isset($booking_product) && $booking_product == 1}selected{/if}>{l s='Rooms'}</option>
+									<option value="0" {if isset($booking_product) && $booking_product == 0}selected{/if}>{l s='Service Products'}</option>
+								</select>
+							</div>
+						</div> *}
 						<div class="form-group col-sm-12">
 							<label for="date_from" class="control-label col-sm-4 required">
 								<span title="" data-toggle="tooltip" class="label-tooltip">{l s='Check-In' mod='hotelreservationsystem'}</span>
@@ -51,7 +62,7 @@
 								</label>
 								<div class="col-sm-8">
 									<div class="dropdown">
-										<button class="booking_guest_occupancy btn btn-default btn-left btn-block input-occupancy" type="button">
+										<button class="booking_guest_occupancy btn btn-default btn-left btn-block input-occupancy" id="search_occupancy" type="button">
 											<span class="">{if (isset($occupancy_adults) && $occupancy_adults)}{$occupancy_adults} {if $occupancy_adults > 1}{l s='Adults'}{else}{l s='Adult'}{/if}, {if isset($occupancy_children) && $occupancy_children}{$occupancy_children} {if $occupancy_children > 1} {l s='Children'}{else}{l s='Child'}{/if}, {/if}{$occupancy|count} {if $occupancy|count > 1}{l s='Rooms'}{else}{l s='Room'}{/if}{else}{l s='1 Adult, 1 Room'}{/if}</span>
 										</button>
 										<input type="hidden" class="max_avail_type_qty" value="{if isset($total_available_rooms)}	{$total_available_rooms|escape:'html':'UTF-8'}{/if}">
@@ -70,7 +81,7 @@
 																		<input type="number" class="form-control num_occupancy num_adults" name="occupancy[{$key|escape:'htmlall':'UTF-8'}][adults]" value="{$room_occupancy['adults']|escape:'htmlall':'UTF-8'}" min="1">
 																	</div>
 																	<div class="form-group col-xs-6 occupancy_count_block">
-																		<label>{l s='Child'} <span class="label-desc-txt"></span></label>
+																		<label>{l s='Children'} <span class="label-desc-txt"></span></label>
 																		<input type="number" class="form-control num_occupancy num_children" name="occupancy[{$key|escape:'htmlall':'UTF-8'}][children]" value="{$room_occupancy['children']|escape:'htmlall':'UTF-8'}" min="0" {if $max_child_in_room}max="{$max_child_in_room}"{/if}>
 																		({l s='Below'}  {$max_child_age|escape:'htmlall':'UTF-8'} {l s='years'})
 																	</div>
@@ -112,7 +123,7 @@
 																	<input type="number" class="form-control num_occupancy num_adults" name="occupancy[0][adults]" value="1" min="1">
 																</div>
 																<div class="form-group col-xs-6 occupancy_count_block">
-																	<label>{l s='Child'} <span class="label-desc-txt"></span></label>
+																	<label>{l s='Children'} <span class="label-desc-txt"></span></label>
 																	<input type="number" class="form-control num_occupancy num_children" name="occupancy[0][children]" value="0" min="0" {if $max_child_in_room}max="{$max_child_in_room}"{/if}>
 																	({l s='Below'}  {$max_child_age|escape:'htmlall':'UTF-8'} {l s='years'})
 																</div>
@@ -166,22 +177,32 @@
 				</form>
 			</div>
 		</div>
-        <div class="panel">
-            {include file="./_partials/search-stats.tpl"}
-        </div>
+		{if !isset($booking_product) || (isset($booking_product) && $booking_product == 1)}
+			<div class="panel">
+				{include file="./_partials/search-stats.tpl"}
+			</div>
+		{/if}
 	</div>
 	<div class="col-sm-8">
         <div class="panel">
 			<div class="panel-heading">
-				<i class="icon-info"></i> {l s='Booking Calender' mod='hotelreservationsystem'}
-				<button type="button" class="btn btn-primary" id="cart_btn" data-toggle="modal" data-target="#cartModal"><i class="icon-shopping-cart"></i> {l s='Cart' mod='hotelreservationsystem'} <span class="badge" id="cart_record">{$rms_in_cart}</span></button>
+				<i class="icon-info"></i> {if !isset($booking_product) || (isset($booking_product) && $booking_product == 1)}{l s='Booking Calender' mod='hotelreservationsystem'}{else}{l s='Service Products' mod='hotelreservationsystem'}{/if }
+				<button type="button" class="btn btn-primary" id="cart_btn" data-toggle="modal" data-target="#cartModal"><i class="icon-shopping-cart"></i> {l s='Cart' mod='hotelreservationsystem'} <span class="badge" id="cart_record">{$total_products_in_cart}</span></button>
 			</div>
-            <div id='fullcalendar'></div>
+			{if !isset($booking_product) || (isset($booking_product) && $booking_product == 1)}
+				<div id='fullcalendar'></div>
+			{else}
+				<div class="panel-body">
+					{include file="./_partials/service-products.tpl"}
+				</div>
+			{/if}
 		</div>
 	</div>
-	{if isset($booking_data) && $booking_data}
-        {include file="./_partials/booking-rooms.tpl"}
-    {/if}
+    {if !isset($booking_product) || (isset($booking_product) && $booking_product == 1)}
+		{if isset($booking_data) && $booking_data}
+			{include file="./_partials/booking-rooms.tpl"}
+		{/if}
+	{/if}
 </div>
 
 <div class="modal fade" id="cartModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
@@ -197,7 +218,7 @@
 		 </ul>
 		<div class="tab-content panel active">
 			<div role="tabpanel" class="tab-pane active" id="reallocate_room_tab">
-				<form method="post" action="{$formAction|escape:'htmlall':'UTF-8'}">
+				<form method="post" action="">
 					<div class="modal-header">
 						<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
 						<h4 class="modal-title" id="realloc_myModalLabel">{l s='Reallocate Rooms'}</h4>

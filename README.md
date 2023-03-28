@@ -76,7 +76,11 @@ docker pull webkul/qloapps_docker
 
 ### License
 
-QloApps is a truly opensource Hotel-Commerce platform which is under the [Open Software License 3.0](https://github.com/webkul/hotelcommerce/blob/develop/LICENSE).
+QloApps Core is licensed under OSL-3.0 and Modules authored by Webkul have their applicable license, LICENSE.md, kept inside their root directories, while other modules are licensed under AFL-3.0.
+
+The online copy of OSL-3.0 can be found at [https://opensource.org/licenses/OSL-3.0](https://opensource.org/licenses/OSL-3.0).
+
+The online copy of AFL-3.0 can be found at [https://opensource.org/licenses/AFL-3.0](https://opensource.org/licenses/AFL-3.0).
 
 ### Security Vulnerabilities
 

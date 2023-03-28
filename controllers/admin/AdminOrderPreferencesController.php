@@ -72,7 +72,7 @@ class AdminOrderPreferencesControllerCore extends AdminController
                     ),
                     'GLOBAL_PREPARATION_TIME' => array(
                         'title' => $this->l('Preparation time'),
-                        'hint' => $this->l('Number of days required to prepare a room for stay.'),
+                        'hint' => $this->l('Number of days required to prepare a room for a guest\'s stay. For example, if you set this value to 3 and someone is booking on 2nd of March he can only book rooms for dates from and after 3 days, i.e, 5th of March.'),
                         'desc' => $this->l('Set to 0 to disable this feature.'),
                         'type' => 'text',
                         'class' => 'fixed-width-xl',

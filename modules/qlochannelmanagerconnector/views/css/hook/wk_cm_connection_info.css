@@ -1,0 +1,49 @@
+/**
+* 2010-2023 Webkul.
+*
+* NOTICE OF LICENSE
+*
+* All right is reserved,
+* Please go through this link for complete license : https://store.webkul.com/license.html
+*
+* DISCLAIMER
+*
+* Do not edit or add to this file if you wish to upgrade this module to newer
+* versions in the future. If you wish to customize this module for your
+* needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
+*
+*  @author    Webkul IN <support@webkul.com>
+*  @copyright 2010-2023 Webkul IN
+*  @license   https://store.webkul.com/license.html
+*/
+
+.adminqloappschannelmanagerconnector .channel_connection_info {
+    margin-bottom: 10px;
+    font-size: 12px;
+    color: #333;
+    text-align: right;
+}
+.adminqloappschannelmanagerconnector .qcm_booking_title {
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+.adminqloappschannelmanagerconnector .channel_info_type {
+    margin-left: 10px;
+    font-weight: bold;
+}
+.adminqloappschannelmanagerconnector .connection_criteria {
+    font-weight: normal;
+}
+.adminqloappschannelmanagerconnector .channel_connection_status {
+    color: #2FA368;
+    font-weight: bold;
+}
+.adminqloappschannelmanagerconnector .channel_info_type .icon-info-circle {
+    font-size: 16px;
+}
+
+@media (max-width: 767px) {
+    .adminqloappschannelmanagerconnector .channel_connection_info {
+        text-align: left;
+    }
+}
