@@ -3,35 +3,35 @@
 		<input type="hidden" name="submitted_tabs[]" value="ServiceProduct" />
 		<h3 class="tab"> <i class="icon-AdminAdmin"></i> {l s='Service Products'}</h3>
 
-        <div class="from-group table-responsive-row clearfix">
-			<table class="table tableDnD hotel-roomtype-link-table">
-				<thead>
-                    <tr class="nodrag nodrop">
-                        <th class="col-sm-1">
-                            <span>{l s='Id Product'}</span>
-                        </th>
-                        <th class="col-sm-3">
-							<span>{l s='name'}</span>
-						</th>
-                        <th class="">
-                            <span>{l s='Category'}</span>
-                        </th>
-                        <th>
-                            <span>{l s='Position'}</span>
-                        </th>
-						<th class="">
-							<span>{l s='Price'}</span>
-                        </th>
-                        <th class="">
-                            <span>{l s='Tax'}</span>
-                        </th>
-                        <th class="text-right">
-                            <span>{l s='Action'}</span>
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {if isset($service_products) && $service_products}
+        {if isset($service_products) && $service_products}
+            <div class="from-group table-responsive-row clearfix">
+                <table class="table tableDnD hotel-roomtype-link-table">
+                    <thead>
+                        <tr class="nodrag nodrop">
+                            <th class="col-sm-1">
+                                <span>{l s='Id Product'}</span>
+                            </th>
+                            <th class="col-sm-3">
+                                <span>{l s='name'}</span>
+                            </th>
+                            <th class="">
+                                <span>{l s='Category'}</span>
+                            </th>
+                            <th>
+                                <span>{l s='Position'}</span>
+                            </th>
+                            <th class="">
+                                <span>{l s='Price'}</span>
+                            </th>
+                            <th class="">
+                                <span>{l s='Tax'}</span>
+                            </th>
+                            <th class="text-right">
+                                <span>{l s='Action'}</span>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
 						{foreach from=$service_products key=key item=service_product}
                             <tr id='room_type_service_product_{$service_product.id_room_type_service_product|escape:'html':'UTF-8'}' position='{$service_product.position|escape:'html':'UTF-8'}' id_product='{$service_product.id_product|escape:'html':'UTF-8'}' id_element="{$product->id}" data-roomtype_url="{$link->getAdminLink('AdminProducts', true)|addslashes}">
                                 <td class="col-sm-1">{$service_product.id_product|escape:'html':'UTF-8'} <a target="blank" href="{$link->getAdminLink('AdminNormalProducts')|escape:'html':'UTF-8'}&amp;id_product={$service_product.id_product|escape:'html':'UTF-8'}&amp;updateproduct"><i class="icon-external-link-sign"></i></a></td>
@@ -77,9 +77,27 @@
                                 </td>
                             </tr>
                         {/foreach}
-                    {/if}
-                </tbody>
-            </table>
-        </div>
+                    </tbody>
+                </table>
+            </div>
+            <div class="panel-footer">
+                <a href="{$link->getAdminLink('AdminProducts')|escape:'html':'UTF-8'}{if isset($smarty.request.page) && $smarty.request.page > 1}&amp;submitFilterproduct={$smarty.request.page|intval}{/if}" class="btn btn-default">
+                    <i class="process-icon-cancel"></i>
+                    {l s='Cancel'}
+                </a>
+                <button type="submit" name="submitAddproduct" class="btn btn-default pull-right" disabled="disabled">
+                    <i class="process-icon-loading"></i>
+                    {l s='Save'}
+                </button>
+                <button type="submit" name="submitAddproductAndStay" class="btn btn-default pull-right"  disabled="disabled">
+                    <i class="process-icon-loading"></i>
+                        {l s='Save and stay'}
+                </button>
+            </div>
+        {else}
+            <div class="alert alert-info">
+                {l s='No services are attached with this room type'}
+            </div>
+        {/if}
     </div>
 {/if}

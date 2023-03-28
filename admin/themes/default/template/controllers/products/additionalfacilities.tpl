@@ -27,70 +27,105 @@
             {l s='To create new Additional facilities'} <a target="_blank" href="{$link->getAdminLink('AdminRoomTypeGlobalDemand')}">{l s='click here.'}</a>
         </div>
         {if isset($allDemands) && $allDemands}
-            <div class="panel-group">
-                {foreach $allDemands as $key => $demand}
-                    <div class="panel panel-sm">
-                        <input class="selected_demand" type="checkbox" name="selected_demand[]" value="{$demand['id_global_demand']|escape:'html':'UTF-8'}" {if isset($roomDemandPrices[$demand['id_global_demand']])}checked{/if} />
-                        <a href="#" onclick="$('#panel-demands-{$key|escape:'html':'UTF-8'}').slideToggle(250); return false;">
-                            {$demand['name']|escape:'html':'UTF-8'}
-                        </a>
-                        <div class="panel-body collapse" id="panel-demands-{$key|escape:'html':'UTF-8'}">
-                            {if isset($demand['adv_option']) && count($demand['adv_option'])}
-                                <input type="hidden" name="demand_price_{$demand['id_global_demand']|escape:'html':'UTF-8'}"
-                                value="{if isset($roomDemandPrices[$demand['id_global_demand']]['price'])}{$roomDemandPrices[$demand['id_global_demand']]['price']|escape:'html':'UTF-8'}{elseif isset($demand['price'])}{$demand['price']|escape:'html':'UTF-8'}{/if}"/>
-                            {else}
-                                <div class="form-group">
-                                    <label class="col-sm-3 control-label required" >
-                                        {l s='Price'}({l s='tax excl.'})
-                                    </label>
-                                    <div class="col-sm-3">
-                                        <div class="input-group">
-                                            <span class="input-group-addon">{$defaultcurrencySign|escape:'html':'UTF-8'}</span>
-                                            <input type="text" name="demand_price_{$demand['id_global_demand']|escape:'html':'UTF-8'}"
-                                            value="{if isset($roomDemandPrices[$demand['id_global_demand']]['price'])}{$roomDemandPrices[$demand['id_global_demand']]['price']|escape:'html':'UTF-8'}{elseif isset($demand['price'])}{$demand['price']|escape:'html':'UTF-8'}{/if}"/>
-                                        </div>
-                                    </div>
-                                </div>
-                            {/if}
+
+            <div class="from-group table-responsive-row clearfix">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>
+                                {l s='Name'}
+                            </th>
+                            <th>
+                                {l s='Option'}
+                            </th>
+                            <th>
+                                {l s='Price'}
+                            </th>
+                            <th>
+                                {l s='Tax rate'}
+                            </th>
+                            <th class="fixed-width-lg text-center">
+                                {l s='Per day price calculation'}
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {foreach $allDemands as $key => $demand}
+                            {assign var="rowcount" value=0}
                             {if isset($demand['adv_option']) && $demand['adv_option']}
-                                <div class="adv_options_dtl form-group">
-                                    <label class="col-sm-3 control-label">
-                                        {l s='Advance options'}
-                                    </label>
-                                    <div class="col-sm-9">
-                                        <div class="table-responsive-row clearfix">
-                                            <table class="table table-bordered adv_option_table">
-                                                <thead>
-                                                    <tr>
-                                                        <th>
-                                                            <span>{l s='Option Name'}</span>
-                                                        </th>
-                                                        <th>
-                                                            <span>{l s='Price'}</span>
-                                                        </th>
-                                                    </tr>
-                                                </thead>
-                                                {foreach from=$demand['adv_option'] key=key item=info}
-                                                    <tr>
-                                                        <td>
-                                                            {$info['name']|escape:'html':'UTF-8'}
-                                                        </td>
-                                                        <td>
-                                                            <div class="input-group">
-                                                                <span class="input-group-addon">{$defaultcurrencySign|escape:'html':'UTF-8'}</span>
-                                                                <input type="text" name="option_price_{$info['id']|escape:'html':'UTF-8'}" value="{if isset($roomDemandPrices[$demand['id_global_demand']]['adv_option'][$info['id']]['price'])}{$roomDemandPrices[$demand['id_global_demand']]['adv_option'][$info['id']]['price']|escape:'html':'UTF-8'}{else}{$info['price']|escape:'html':'UTF-8'}{/if}"/>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                {/foreach}
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
+                                {assign var="rowspan" value=$demand['adv_option']|count}
+                                {assign var="adv_option" value=$demand['adv_option']}
+                            {else}
+                                {assign var="rowspan" value=1}
+                                {assign var="adv_option" value=[]}
                             {/if}
-                        </div>
-                    </div>
-                {/foreach}
+                                {foreach $adv_option as $option}
+                                    {assign var="rowcount" value=$rowcount + 1}
+                                    <tr>
+                                        {if $rowcount <= 1}
+                                            <td rowspan="{$rowspan}">
+                                                <input class="selected_demand" type="checkbox" name="selected_demand[]" value="{$demand['id_global_demand']|escape:'html':'UTF-8'}" {if isset($roomDemandPrices[$demand['id_global_demand']])}checked{/if} />
+                                                <input type="hidden" name="demand_price_{$demand['id_global_demand']|escape:'html':'UTF-8'}" value="{if isset($roomDemandPrices[$demand['id_global_demand']]['price'])}{$roomDemandPrices[$demand['id_global_demand']]['price']|escape:'html':'UTF-8'}{elseif isset($demand['price'])}{$demand['price']|escape:'html':'UTF-8'}{/if}"/>
+                                            </td>
+                                            <td rowspan="{$rowspan}">
+                                                <a target="blank" href="{$link->getAdminLink('AdminRoomTypeGlobalDemand')|escape:'html':'UTF-8'}&amp;id_global_demand={$demand['id_global_demand']|escape:'html':'UTF-8'}&amp;updatehtl_room_type_global_demand"><i class="icon-external-link-sign"></i></a> {$demand['name']|escape:'html':'UTF-8'}
+                                            </td>
+                                        {/if}
+                                        <td>
+                                            {$option['name']|escape:'html':'UTF-8'}
+                                        </td>
+                                        <td>
+                                            <div class="input-group">
+                                                <span class="input-group-addon">{$defaultcurrencySign|escape:'html':'UTF-8'}</span>
+                                                <input type="text" name="option_price_{$option['id']|escape:'html':'UTF-8'}" value="{if isset($roomDemandPrices[$demand['id_global_demand']]['adv_option'][$option['id']]['price'])}{$roomDemandPrices[$demand['id_global_demand']]['adv_option'][$option['id']]['price']|escape:'html':'UTF-8'}{else}{$option['price']|escape:'html':'UTF-8'}{/if}"/>
+                                            </div>
+                                        </td>
+                                        {if $rowcount == 1}
+                                            <td rowspan="{$rowspan}">
+                                                {$demand['default_tax_rules_group_name']}
+                                            </td>
+                                            <td class="text-center" rowspan="{$rowspan}">
+                                                {if $demand['price_calc_method'] == 1}
+                                                    <span class="badge badge-success">{l s='Yes'}</span>
+                                                {else}
+                                                    <span>{l s='No'}</span>
+                                                {/if}
+                                            </td>
+                                        {/if}
+                                    </tr>
+                                {foreachelse}
+                                    <tr>
+                                        <td>
+                                            <input class="selected_demand" type="checkbox" name="selected_demand[]" value="{$demand['id_global_demand']|escape:'html':'UTF-8'}" {if isset($roomDemandPrices[$demand['id_global_demand']])}checked{/if} />
+                                        </td>
+                                        <td>
+                                            <a target="blank" href="{$link->getAdminLink('AdminRoomTypeGlobalDemand')|escape:'html':'UTF-8'}&amp;id_global_demand={$demand['id_global_demand']|escape:'html':'UTF-8'}&amp;updatehtl_room_type_global_demand"><i class="icon-external-link-sign"></i></a> {$demand['name']|escape:'html':'UTF-8'}
+                                        </td>
+
+                                        <td></td>
+                                        <td>
+                                            <div class="input-group">
+                                                <span class="input-group-addon">{$defaultcurrencySign|escape:'html':'UTF-8'}</span>
+                                                <input type="text" name="demand_price_{$demand['id_global_demand']|escape:'html':'UTF-8'}"
+                                                value="{if isset($roomDemandPrices[$demand['id_global_demand']]['price'])}{$roomDemandPrices[$demand['id_global_demand']]['price']|escape:'html':'UTF-8'}{elseif isset($demand['price'])}{$demand['price']|escape:'html':'UTF-8'}{/if}"/>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            {$demand['default_tax_rules_group_name']}
+                                        </td>
+                                        <td class="text-center">
+                                            {if $demand['price_calc_method'] == 1}
+                                                <span class="badge badge-success">{l s='Yes'}</span>
+                                            {else}
+                                                <span>{l s='No'}</span>
+                                            {/if}
+                                        </td>
+                                    </tr>
+                                {/foreach}
+                        {/foreach}
+                    </tbody>
+                </table>
             </div>
             <div class="panel-footer">
                 <a href="{$link->getAdminLink('AdminProducts')|escape:'html':'UTF-8'}{if isset($smarty.request.page) && $smarty.request.page > 1}&amp;submitFilterproduct={$smarty.request.page|intval}{/if}" class="btn btn-default">
