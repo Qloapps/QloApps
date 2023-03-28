@@ -49,6 +49,9 @@ class BankwireValidationModuleFrontController extends ModuleFrontController
 		if (!$authorized)
 			die($this->module->l('This payment method is not available.', 'validation'));
 
+		// check all service products are available
+		RoomTypeServiceProductCartDetail::validateServiceProductsInCart();
+
 		// Check Order restrict condition before Payment by the customer
 		if (Module::isInstalled('hotelreservationsystem') && Module::isEnabled('hotelreservationsystem')) {
             require_once _PS_MODULE_DIR_.'hotelreservationsystem/define.php';
@@ -77,7 +80,7 @@ class BankwireValidationModuleFrontController extends ModuleFrontController
 			'{bankwire_address}' => nl2br(Configuration::get('BANK_WIRE_ADDRESS'))
 		);
 
-		$this->module->validateOrder($cart->id, Configuration::get('PS_OS_BANKWIRE'), $total, $this->module->displayName, NULL, $mailVars, (int)$currency->id, false, $customer->secure_key);
+		$this->module->validateOrder($cart->id, Configuration::get('PS_OS_AWAITING_PAYMENT'), $total, $this->module->displayName, NULL, $mailVars, (int)$currency->id, false, $customer->secure_key);
 		Tools::redirect('index.php?controller=order-confirmation&id_cart='.$cart->id.'&id_module='.$this->module->id.'&id_order='.$this->module->currentOrder.'&key='.$customer->secure_key);
 	}
 }

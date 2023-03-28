@@ -24,7 +24,6 @@
 *  International Registered Trademark & Property of PrestaShop SA
 */
 
-include_once _PS_MODULE_DIR_.'hotelreservationsystem/define.php';
 class ProductControllerCore extends FrontController
 {
     public $php_self = 'product';
@@ -46,10 +45,10 @@ class ProductControllerCore extends FrontController
             $this->addCSS(_THEME_CSS_DIR_.'product.css');
             $this->addCSS(_THEME_CSS_DIR_.'print.css', 'print');
             $this->addJqueryPlugin(array('fancybox', 'idTabs', 'scrollTo', 'serialScroll', 'bxslider'));
-            $this->addCSS(_THEME_CSS_DIR_.'datepicker.css');
+
             $this->addJS(array(
                 _THEME_JS_DIR_.'tools.js',  // retro compat themes 1.5
-                _THEME_JS_DIR_.'product.js'
+                _THEME_JS_DIR_.'product.js',
             ));
         } else {
             $this->addJqueryPlugin(array('scrollTo', 'serialScroll'));
@@ -59,6 +58,9 @@ class ProductControllerCore extends FrontController
                 _THEME_MOBILE_JS_DIR_.'jquery.touch-gallery.js'
             ));
         }
+
+        $this->addCSS(_THEME_CSS_DIR_.'occupancy.css');
+        $this->addJS(_THEME_JS_DIR_.'occupancy.js');
 
         if (Configuration::get('PS_DISPLAY_JQZOOM') == 1) {
             $this->addJqueryPlugin('jqzoom');
@@ -92,11 +94,15 @@ class ProductControllerCore extends FrontController
         $dateFrom = Tools::getValue('date_from');
         $dateTo = Tools::getValue('date_to');
 
-        if ($dateFrom != '' && !Validate::isDate($dateFrom)) {
+        $currentTimestamp = strtotime(date('Y-m-d'));
+        $dateFromTimestamp = strtotime($dateFrom);
+        $dateToTimestamp = strtotime($dateTo);
+
+        if ($dateFrom != '' && ($dateFromTimestamp === false || ($dateFromTimestamp < $currentTimestamp))) {
             Tools::redirect($this->context->link->getPageLink('pagenotfound'));
         }
 
-        if ($dateTo != '' && !Validate::isDate($dateTo)) {
+        if ($dateTo != '' && ($dateToTimestamp === false || ($dateToTimestamp < $currentTimestamp))) {
             Tools::redirect($this->context->link->getPageLink('pagenotfound'));
         }
 
@@ -104,6 +110,10 @@ class ProductControllerCore extends FrontController
 
         if ($id_product = (int) Tools::getValue('id_product')) {
             $this->product = new Product($id_product, true, $this->context->language->id, $this->context->shop->id);
+        }
+
+        if (!$this->product->booking_product) {
+            Tools::redirect($this->context->link->getPageLink('pagenotfound'));
         }
 
         if (!Validate::isLoadedObject($this->product)) {
@@ -148,7 +158,10 @@ class ProductControllerCore extends FrontController
                         break;
                     }
                 }
-            } elseif (!$this->product->checkAccess(isset($this->context->customer->id) && $this->context->customer->id ? (int)$this->context->customer->id : 0)) {
+            } elseif (!$this->product->checkAccess(
+                isset($this->context->customer->id)
+                && $this->context->customer->id ? (int)$this->context->customer->id : 0)
+            ) {
                 header('HTTP/1.1 403 Forbidden');
                 header('Status: 403 Forbidden');
                 $this->errors[] = Tools::displayError('You do not have access to this Room Type.');
@@ -279,152 +292,160 @@ class ProductControllerCore extends FrontController
                 $customization_datas = $this->context->cart->getProductCustomization($this->product->id, null, true);
             }
 
-            #####################################################################
-            /*By webkul To send All needed Hotel Information on product.tpl*/
-            #####################################################################
-
-            $htl_features = array();
-            $obj_hotel_room_type = new HotelRoomType();
-            $room_info_by_product_id = $obj_hotel_room_type->getRoomTypeInfoByIdProduct($this->product->id);
-            $productCapacity = array();
-            $productCapacity['adult'] = $room_info_by_product_id['adult'];
-            $productCapacity['children'] = $room_info_by_product_id['children'];
-            $this->product->capacity = $productCapacity;
-            $hotel_id = $room_info_by_product_id['id_hotel'];
             $useTax = HotelBookingDetail::useTax();
-            if (isset($hotel_id) && $hotel_id) {
-                $obj_hotel_branch = new HotelBranchInformation();
-                $hotel_info_by_id = $obj_hotel_branch->hotelBranchesInfo(false, 2, 1, $hotel_id);
-                $hotel_policies = $hotel_info_by_id['policies'];
-                $hotel_name = $hotel_info_by_id['hotel_name'];
+            // Check if product is a booking product or a service product
+            // Virtual product is booking product
+            if ($this->product->booking_product) {
+                #####################################################################
+                /*By webkul To send All needed Hotel Information on product.tpl*/
+                #####################################################################
 
-                $addressInfo = $obj_hotel_branch->getAddress($room_info_by_product_id['id_hotel']);
-                $hotel_location = $addressInfo['city'].
+                    $htl_features = array();
+                $obj_hotel_room_type = new HotelRoomType();
+                $room_info_by_product_id = $obj_hotel_room_type->getRoomTypeInfoByIdProduct($this->product->id);
+                if ($hotel_id = $room_info_by_product_id['id_hotel']) {
+                    $obj_hotel_branch = new HotelBranchInformation();
+                    $hotel_info_by_id = $obj_hotel_branch->hotelBranchesInfo(false, 2, 1, $hotel_id);
+                    $hotel_policies = $hotel_info_by_id['policies'];
+                    $hotel_name = $hotel_info_by_id['hotel_name'];
+
+                    $addressInfo = HotelBranchInformation::getAddress($room_info_by_product_id['id_hotel']);
+                    $hotel_location = $addressInfo['city'].
                     ($addressInfo['id_state']?', '.$addressInfo['state']:'').', '.$addressInfo['country'];
 
-                $obj_hotel_feaures_ids = $obj_hotel_branch->getFeaturesOfHotelByHotelId($hotel_id);
+                    $obj_hotel_feaures_ids = $obj_hotel_branch->getFeaturesOfHotelByHotelId($hotel_id);
 
-                if (isset($obj_hotel_feaures_ids) && $obj_hotel_feaures_ids) {
-                    foreach ($obj_hotel_feaures_ids as $key => $value) {
-                        $obj_htl_ftr = new HotelFeatures();
-                        $htl_info = $obj_htl_ftr->getFeatureInfoById($value['feature_id']);
-                        $htl_features[] = $htl_info['name'];
+                    if (isset($obj_hotel_feaures_ids) && $obj_hotel_feaures_ids) {
+                        foreach ($obj_hotel_feaures_ids as $key => $value) {
+                            $obj_htl_ftr = new HotelFeatures();
+                            $htl_info = $obj_htl_ftr->getFeatureInfoById($value['feature_id']);
+                            $htl_features[] = $htl_info['name'];
+                        }
                     }
-                }
-                $date_from = Tools::getValue('date_from');
-                $date_to = Tools::getValue('date_to');
+                    $date_from = Tools::getValue('date_from');
+                    $date_to = Tools::getValue('date_to');
 
-                if (!($date_from = Tools::getValue('date_from'))) {
-                    $date_from = date('Y-m-d');
-                    $date_to = date('Y-m-d', strtotime('+1 day', strtotime($date_from)));
-                }
-                if (!($date_to = Tools::getValue('date_to'))) {
-                    $date_to = date('Y-m-d', strtotime('+1 day', strtotime($date_from)));
-                }
-
-                $hotel_branch_obj = new HotelBranchInformation($hotel_id);
-                /*Max date of ordering for order restrict*/
-                $order_date_restrict = false;
-                $max_order_date = HotelOrderRestrictDate::getMaxOrderDate($hotel_id);
-                if ($max_order_date) {
-                    $max_order_date = date('Y-m-d', strtotime($max_order_date));
-                    if (strtotime('-1 day', strtotime($max_order_date)) < strtotime($date_from)
-                        || strtotime($max_order_date) < strtotime($date_to)
-                    ) {
-                        $order_date_restrict = true;
+                    if (!($date_from = Tools::getValue('date_from'))) {
+                        $date_from = date('Y-m-d');
+                        $date_to = date('Y-m-d', strtotime('+1 day', strtotime($date_from)));
                     }
-                }
-                /*End*/
-                // booking preparation time
-                $preparationTime = (int) HotelOrderRestrictDate::getPreparationTime($hotel_id);
+                    if (!($date_to = Tools::getValue('date_to'))) {
+                        $date_to = date('Y-m-d', strtotime('+1 day', strtotime($date_from)));
+                    }
 
-                $hotelImageLink = null;
-                if ($coverImage = HotelImage::getCover($hotel_id)) {
-                    $hotelImagesBaseDir = _MODULE_DIR_.'hotelreservationsystem/views/img/hotel_img/';
-                    $hotelImageLink = $this->context->link->getMediaLink(
-                        $hotelImagesBaseDir.$coverImage['hotel_image_id'].'.jpg'
+                    $hotel_branch_obj = new HotelBranchInformation($hotel_id);
+                    /*Max date of ordering for order restrict*/
+                    $order_date_restrict = false;
+                    $max_order_date = HotelOrderRestrictDate::getMaxOrderDate($hotel_id);
+                    if ($max_order_date) {
+                        $max_order_date = date('Y-m-d', strtotime($max_order_date));
+                        if (strtotime('-1 day', strtotime($max_order_date)) < strtotime($date_from)
+                            || strtotime($max_order_date) < strtotime($date_to)
+                        ) {
+                            $order_date_restrict = true;
+                        }
+                    }
+                    /*End*/
+                    // booking preparation time
+                    $preparationTime = (int) HotelOrderRestrictDate::getPreparationTime($hotel_id);
+
+                    $objHotelImage = new HotelImage();
+                    $hotelImageLink = null;
+                    if ($coverImage = HotelImage::getCover($hotel_id)) {
+                        $hotelImagesBaseDir = _MODULE_DIR_.'hotelreservationsystem/views/img/hotel_img/';
+                        $hotelImageLink = $this->context->link->getMediaLink(
+                            $objHotelImage->getImageLink($coverImage['id'], ImageType::getFormatedName('large'))
+                        );
+                    }
+
+                    // get room type additional demands
+                    $objRoomDemands = new HotelRoomTypeDemand();
+                    if ($roomTypeDemands = $objRoomDemands->getRoomTypeDemands($this->product->id)) {
+                        foreach ($roomTypeDemands as &$demand) {
+                            // if demand has advance options then set demand price as first advance option price.
+                            if (isset($demand['adv_option']) && $demand['adv_option']) {
+                                $demand['price'] = current($demand['adv_option'])['price'];
+                            }
+                        }
+                    }
+
+                    Media::addJsDef(array(
+                        'hotel_loc' => array(
+                            'latitude' => $hotel_branch_obj->latitude,
+                            'longitude' => $hotel_branch_obj->longitude,
+                        )
+                    ));
+
+                    $this->context->smarty->assign(
+                        array(
+                            'id_hotel' => $hotel_id,
+                            'room_type_demands' => $roomTypeDemands,
+                            'room_type_info' => $room_info_by_product_id,
+                            'isHotelRefundable' => $hotel_branch_obj->isRefundable(),
+                            'max_order_date' => $max_order_date,
+                            'preparation_time' => $preparationTime,
+                            'warning_num' => Configuration::get('WK_ROOM_LEFT_WARNING_NUMBER'),
+                            'ratting_img_path' => _MODULE_DIR_.'hotelreservationsystem/views/img/Slices/icons-sprite.png',
+                            'product_controller_url' => $this->context->link->getPageLink('product'),
+                            'date_from' => $date_from,
+                            'date_to' => $date_to,
+                            'hotel_check_in' => date('h:i a', strtotime($hotel_branch_obj->check_in)),
+                            'hotel_check_out' => date('h:i a', strtotime($hotel_branch_obj->check_out)),
+                            'hotel_location' => $hotel_location,
+                            'hotel_latitude' => $hotel_branch_obj->latitude,
+                            'hotel_longitude' => $hotel_branch_obj->longitude,
+                            'hotel_map_input_text' => $hotel_branch_obj->map_input_text,
+                            'hotel_address1' => $addressInfo['address1'],
+                            'hotel_phone' => $addressInfo['phone'],
+                            'hotel_name' => $hotel_name,
+                            'hotel_policies' => $hotel_policies,
+                            'hotel_features' => $htl_features,
+                            'hotel_image_link' => $hotelImageLink,
+                            'hotel_has_images' => (bool) HotelImage::getCover($hotel_id),
+                            'ftr_img_src' => _PS_IMG_.'rf/',
+                            'order_date_restrict' => $order_date_restrict,
+                            'PS_SERVICE_PRODUCT_CATEGORY_FILTER' => Configuration::get('PS_SERVICE_PRODUCT_CATEGORY_FILTER'),
+                        )
                     );
-                }
 
-                Media::addJsDef(array(
-                    'hotel_loc' => array(
-                        'latitude' => $hotel_branch_obj->latitude,
-                        'longitude' => $hotel_branch_obj->longitude,
-                    )
-                ));
+                    $this->assignBookingFormVars($this->product->id, $date_from, $date_to);
+                    $this->assignServiceProductVars();
+
+                    // product price after imposing feature prices...
+                    if ($useTax) {
+                        $priceProduct = Product::getPriceStatic($this->product->id, true);
+                        $feature_price = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay($this->product->id, $date_from, $date_to, true);
+                    } else {
+                        $priceProduct = Product::getPriceStatic($this->product->id, false);
+                        $feature_price = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay($this->product->id, $date_from, $date_to, false);
+                    }
+                    $productPriceWithoutReduction = $this->product->getPriceWithoutReduct(!$useTax);
+                    $feature_price_diff = (float)($productPriceWithoutReduction - $feature_price);
+                    $this->context->smarty->assign('feature_price', $feature_price);
+                    $this->context->smarty->assign('feature_price_diff', $feature_price_diff);
+
+                    // send hotel refund rules
+                    if ($hotel_branch_obj->active_refund) {
+                        $objBranchRefundRules = new HotelBranchRefundRules();
+                        if ($hotelRefundRules = $objBranchRefundRules->getHotelRefundRules($hotel_id, 0, 1, 0, 1)) {
+                            $this->context->smarty->assign('hotelRefundRules', $hotelRefundRules);
+                        }
+                    }
+                } else {
+                    // when using service product we will not need any new paramaters, will update interface by checking is_virtual
+                }
 
                 if (Tools::getValue('error')) {
                     $this->context->smarty->assign('error', Tools::getValue('error'));
                 }
-
-                $this->context->smarty->assign(
-                    array(
-                        'isHotelRefundable' => $hotel_branch_obj->isRefundable(),
-                        'max_order_date' => $max_order_date,
-                        'preparation_time' => $preparationTime,
-                        'warning_num' => Configuration::get('WK_ROOM_LEFT_WARNING_NUMBER'),
-                        'product_controller_url' => $this->context->link->getPageLink('product'),
-                        'date_from' => $date_from,
-                        'date_to' => $date_to,
-                        'hotel_check_in' => date('h:i a', strtotime($hotel_branch_obj->check_in)),
-                        'hotel_check_out' => date('h:i a', strtotime($hotel_branch_obj->check_out)),
-                        'hotel_location' => $hotel_location,
-                        'hotel_latitude' => $hotel_branch_obj->latitude,
-                        'hotel_longitude' => $hotel_branch_obj->longitude,
-                        'hotel_map_input_text' => $hotel_branch_obj->map_input_text,
-                        'hotel_address1' => $addressInfo['address1'],
-                        'hotel_phone' => $addressInfo['phone'],
-                        'hotel_name' => $hotel_name,
-                        'hotel_policies' => $hotel_policies,
-                        'hotel_features' => $htl_features,
-                        'hotel_image_link' => $hotelImageLink,
-                        'hotel_has_images' => (bool) HotelImage::getCover($hotel_id),
-                        'ftr_img_src' => _PS_IMG_.'rf/',
-                        'order_date_restrict' => $order_date_restrict
-                    )
-                );
-
-                $this->assignBookingFormVars($this->product->id, $date_from, $date_to);
-
-                // product price after imposing feature prices...
-                if ($useTax) {
-                    $priceProduct = Product::getPriceStatic($this->product->id, true);
-                    $feature_price = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay($this->product->id, $date_from, $date_to, true);
-                } else {
-                    $priceProduct = Product::getPriceStatic($this->product->id, false);
-                    $feature_price = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay($this->product->id, $date_from, $date_to, false);
-                }
-                $productPriceWithoutReduction = $this->product->getPriceWithoutReduct(!$useTax);
-                $feature_price_diff = (float)($productPriceWithoutReduction - $feature_price);
-                $this->context->smarty->assign('feature_price', $feature_price);
-                $this->context->smarty->assign('feature_price_diff', $feature_price_diff);
-
-                // send hotel refund rules
-                if ($hotel_branch_obj->active_refund) {
-                    $objBranchRefundRules = new HotelBranchRefundRules();
-                    if ($hotelRefundRules = $objBranchRefundRules->getHotelRefundRules($hotel_id, 0, 1, 0, 1)) {
-                        $this->context->smarty->assign('hotelRefundRules', $hotelRefundRules);
-                    }
-                }
             }
 
-            // get room type additional demands
-            $objRoomDemands = new HotelRoomTypeDemand();
-            if ($roomTypeDemands = $objRoomDemands->getRoomTypeDemands($this->product->id)) {
-                foreach ($roomTypeDemands as &$demand) {
-                    // if demand has advance options then set demand price as first advance option price.
-                    if (isset($demand['adv_option']) && $demand['adv_option']) {
-                        $demand['price'] = current($demand['adv_option'])['price'];
-                    }
-                }
-            }
-
-
+            // send all the common variables for all type of products
             $this->context->smarty->assign(
                 array(
-                    'room_type_demands' => $roomTypeDemands,
+                    'product_controller_url' => $this->context->link->getPageLink('product'),
+                    'ratting_img_path' => _MODULE_DIR_.'hotelreservationsystem/views/img/Slices/icons-sprite.png',
                     'WK_PRICE_CALC_METHOD_EACH_DAY' => HotelRoomTypeGlobalDemand::WK_PRICE_CALC_METHOD_EACH_DAY,
-                    'product_id_hotel' => $hotel_id,
                     'stock_management' => Configuration::get('PS_STOCK_MANAGEMENT'),
                     'customizationFields' => $customization_fields,
                     'id_customization' => empty($customization_datas) ? null : $customization_datas[0]['id_customization'],
@@ -467,12 +488,58 @@ class ProductControllerCore extends FrontController
         $this->setTemplate(_PS_THEME_DIR_.'product.tpl');
     }
 
+    public function assignServiceProductVars()
+    {
+        // get service products for room type
+        $p = 1;
+        $n = RoomTypeServiceProduct::WK_NUM_RESULTS;
+        $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
+        $smartyVars = array();
+        if (Configuration::get('PS_SERVICE_PRODUCT_CATEGORY_FILTER')) {
+            $serviceProductsByCategory = $objRoomTypeServiceProduct->getServiceProductsGroupByCategory(
+                $this->product->id,
+                $p,
+                $n,
+                true
+            );
+            if ($serviceProductsByCategory) {
+                $smartyVars['service_products_exists'] = 1;
+            }
+            $smartyVars['service_products_by_category'] = $serviceProductsByCategory;
+        } else {
+            $roomTypeServiceProducts = $objRoomTypeServiceProduct->getServiceProductsData(
+                $this->product->id,
+                $p,
+                $n,
+                true
+            );
+            $numTotalServiceProducts = $this->product->getProductServiceProducts(
+                $this->context->language->id,
+                $p,
+                $n,
+                true,
+                2,
+                0,
+                true
+            );
+            if ($roomTypeServiceProducts) {
+                $smartyVars['service_products_exists'] = 1;
+            }
+            $smartyVars['service_products'] = $roomTypeServiceProducts;
+            $smartyVars['num_total_service_products'] = $numTotalServiceProducts;
+        }
+
+        $this->context->smarty->assign($smartyVars);
+    }
+
+
     public function assignBookingFormVars(
         $idProduct,
         $dateFrom,
         $dateTo,
-        $quantity = 1,
-        $jsonDemands = ''
+        $occupancy = array(),
+        $jsonDemands = '',
+        $roomServiceProducts = null
     ) {
         $objProduct = new Product($idProduct, true, $this->context->language->id, $this->context->shop->id);
         if (!Validate::isLoadedObject($objProduct)) {
@@ -509,23 +576,28 @@ class ProductControllerCore extends FrontController
         }
 
         $numDays = $objBookingDetail->getNumberOfDays($dateFrom, $dateTo);
-
-        $hotelRoomData = $objBookingDetail->DataForFrontSearch(
-            $dateFrom,
-            $dateTo,
-            $idHotel,
-            $idProduct,
-            1,
-            0,
-            0,
-            -1,
-            0,
-            0,
-            $idCart,
-            $idGuest
+        $bookingParams = array(
+            'date_from' => $dateFrom,
+            'date_to' => $dateTo,
+            'hotel_id' => $idHotel,
+            'id_room_type' => $idProduct,
+            'id_cart' => $idCart,
+            'id_guest' => $idGuest,
         );
+        if (Configuration::get('PS_FRONT_ROOM_UNIT_SELECTION_TYPE') == HotelBookingDetail::PS_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY) {
+            $bookingParams['occupancy'] = $occupancy;
+            $quantity = count($occupancy);
+        } else {
+            // when room selection is done using qty, occupancy parameter will contain the number of rooms.
+            $quantity = $occupancy;
+        }
 
-        if ($hotelRoomData) {
+        if ($quantity <= 0) {
+            $quantity = 1;
+        }
+
+        $totalAvailableRooms = 0;
+        if ($hotelRoomData = $objBookingDetail->DataForFrontSearch($bookingParams)) {
             $totalAvailableRooms = $hotelRoomData['stats']['num_avail'];
             $quantity = ($quantity > $totalAvailableRooms) ? $totalAvailableRooms : $quantity;
         }
@@ -561,13 +633,12 @@ class ProductControllerCore extends FrontController
         $featurePriceDiff = (float) ($productPriceWithoutReduction - $featurePrice);
 
         $totalRoomPrice = $roomTypeDateRangePrice * $quantity;
-
         // calculate demand price now
-        $demandsPrice = 0;
+        $demandsPricePerRoom = 0;
         $roomTypeDemands = $objHRTDemand->getRoomTypeDemands($idProduct);
         if ($jsonDemands !== '') {
             $cartDemands = json_decode($jsonDemands, true);
-            $demandsPrice = $objHRTDemandPrice->getRoomTypeDemandsTotalPrice(
+            $demandsPricePerRoom = $objHRTDemandPrice->getRoomTypeDemandsTotalPrice(
                 $idProduct,
                 $cartDemands,
                 $useTax,
@@ -575,11 +646,86 @@ class ProductControllerCore extends FrontController
                 $dateTo
             );
 
-            $demandsPrice *= $quantity;
+            // send demand info to booking form
+            foreach($cartDemands as &$demand) {
+                if (Validate::isLoadedObject(
+                    $objRoomTypeGlobalDemand = new HotelRoomTypeGlobalDemand($demand['id_global_demand'], $this->context->language->id)
+                )) {
+                    $demand['name'] = $objRoomTypeGlobalDemand->name;
+                    if ($demand['id_option']) {
+                        if (Validate::isLoadedObject($objDemandAdvanceOption = new HotelRoomTypeGlobalDemandAdvanceOption($demand['id_option'], $this->context->language->id))) {
+                            if ($objDemandAdvanceOption->id_global_demand != $objRoomTypeGlobalDemand->id) {
+                                unset($demand);
+                                continue;
+                            }
+                            $demand['advance_option'] = array(
+                                'id_option' => $objDemandAdvanceOption->id,
+                                'name' => $objDemandAdvanceOption->name
+                            );
+                        } else {
+                            unset($demand);
+                            continue;
+                        }
+                    }
+
+                    $demand['price'] = HotelRoomTypeDemand::getPriceStatic(
+                        $idProduct,
+                        $objRoomTypeGlobalDemand->id,
+                        $demand['id_option'],
+                        $useTax
+                    );
+                }
+            }
+            $smartyVars['selected_demands'] = $cartDemands;
         }
 
+        if ($roomServiceProducts) {
+            $serviceProductsPrice = 0;
+            if ($roomServiceProducts = json_decode($roomServiceProducts, true)) {
+                $objRoomTypeServiceProductPrice = new RoomTypeServiceProductPrice();
+                $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
+                foreach ($roomServiceProducts as &$product) {
+                    if (!$objRoomTypeServiceProduct->isRoomTypeLinkedWithProduct($idProduct, $product['id_product'])) {
+                        unset($product);
+                        continue;
+                    } else {
+                        $objServiceProduct = new ProductCore($product['id_product'], false, $this->context->language->id);
+                        if (!$objServiceProduct->allow_multiple_quantity && $product['quantity'] > 1) {
+                            $product['quantity'] = 1;
+                        } else if ($objServiceProduct->max_quantity && $objServiceProduct->max_quantity < $product['quantity'] ) {
+                            $product['quantity'] = $objServiceProduct->max_quantity;
+                        }
+
+                    }
+                    $product['name'] = $objServiceProduct->name;
+                    $product['allow_multiple_quantity'] = $objServiceProduct->allow_multiple_quantity;
+                    $productPrice = $objRoomTypeServiceProductPrice->getServicePrice(
+                        $product['id_product'],
+                        $idProduct,
+                        $product['quantity'],
+                        $dateFrom,
+                        $dateTo,
+                        $useTax
+                    );
+                    $product['price'] = $productPrice;
+                    $serviceProductsPrice += $productPrice;
+                }
+                $smartyVars['selected_service_product'] = $roomServiceProducts;
+            }
+            $demandsPricePerRoom += $serviceProductsPrice;
+            $totalPrice += $serviceProductsPrice;
+        }
+        // multiply price by number of room required
+        $demandsPrice = $demandsPricePerRoom * $quantity;
         // calculate total price
         $totalPrice = $totalRoomPrice + $demandsPrice;
+        // send occupancy information searched by the user
+        if ($this->ajax && $occupancy && is_array($occupancy)) {
+            $smartyVars['occupancies'] = $occupancy;
+            $smartyVars['occupancy_adults'] = array_sum(array_column($occupancy, 'adults'));
+            $smartyVars['occupancy_children'] = array_sum(array_column($occupancy, 'children'));
+            $smartyVars['occupancy_child_ages'] = array_sum(array_column($occupancy, 'child_ages'));
+        }
 
         $smartyVars['hotel_location'] = $hotelLocation;
         $smartyVars['order_date_restrict'] = $orderDateRestrict;
@@ -593,6 +739,7 @@ class ProductControllerCore extends FrontController
         $smartyVars['total_available_rooms'] = $totalAvailableRooms;
         $smartyVars['has_room_type_demands'] = $roomTypeDemands ? true : false; // whether to show price breakup
         $smartyVars['rooms_price'] = $totalRoomPrice;
+        $smartyVars['demands_price_per_room'] = $demandsPricePerRoom;
         $smartyVars['demands_price'] = $demandsPrice;
         $smartyVars['total_price'] = $totalPrice;
         $this->context->smarty->assign($smartyVars);
@@ -1070,18 +1217,23 @@ class ProductControllerCore extends FrontController
         $idProduct = (int) Tools::getValue('id_product');
         $dateFrom = Tools::getValue('date_from');
         $dateTo = Tools::getValue('date_to');
-        $quantity = (int) Tools::getValue('quantity');
+        $occupancy = Tools::getValue('occupancy');
         $roomTypeDemands = Tools::getValue('room_type_demands');
+        $roomServiceProducts = Tools::getValue('room_service_products');
 
         $dateFrom = date('Y-m-d', strtotime($dateFrom));
         $dateTo = date('Y-m-d', strtotime($dateTo));
-
+        if ($occupancy == false) {
+            $occupancy = array();
+        }
+        $this->assignServiceProductVars();
         if ($this->assignBookingFormVars(
             $idProduct,
             $dateFrom,
             $dateTo,
-            $quantity,
-            $roomTypeDemands
+            $occupancy,
+            $roomTypeDemands,
+            $roomServiceProducts
         )) {
             $html = $this->context->smarty->fetch('_partials/booking-form.tpl');
             $response['status'] = true;
@@ -1089,102 +1241,6 @@ class ProductControllerCore extends FrontController
         }
 
         $this->ajaxDie(json_encode($response));
-    }
-
-    public function displayAjaxCheckRoomAvailabilityAndRate()
-    {
-        $result = array();
-        if ($idProduct = Tools::getValue('id_product')) {
-            $objHotelRoomType = new HotelRoomType();
-            if ($roomTypeInfo = $objHotelRoomType->getRoomTypeInfoByIdProduct($idProduct)) {
-                $dateFrom = Tools::getValue('date_from');
-                $dateTo = Tools::getValue('date_to');
-                $quantity = Tools::getValue('qty');
-                if ($idHotel = $roomTypeInfo['id_hotel']) {
-                    $objBookingDetail = new HotelBookingDetail();
-                    if ($hotelRoomData = $objBookingDetail->DataForFrontSearch(
-                        $dateFrom,
-                        $dateTo,
-                        $idHotel,
-                        $idProduct,
-                        1,
-                        0,
-                        0,
-                        -1,
-                        0,
-                        0,
-                        $this->context->cart->id,
-                        $this->context->cart->id_guest
-                    )) {
-                        $totalAvailRooms = $hotelRoomData['stats']['num_avail'];
-                        if ($totalAvailRooms >= $quantity) {
-                            $totalPrice = 0;
-                            $useTax = HotelBookingDetail::useTax();
-                            $product = new Product($idProduct);
-                            $productPriceWithoutReduction = $product->getPriceWithoutReduct(!$useTax);
-                            $numDays = $objBookingDetail->getNumberOfDays($dateFrom, $dateTo);
-                            $roomTypeDateRangePrice = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
-                                $idProduct,
-                                $dateFrom,
-                                $dateTo
-                            );
-                            if ($useTax) {
-                                $priceProduct = Product::getPriceStatic($idProduct, true);
-                                $featurePrice = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay($idProduct, $dateFrom, $dateTo, true);
-                                $roomTypeDateRangePrice = $roomTypeDateRangePrice['total_price_tax_incl'];
-                            } else {
-                                $priceProduct = Product::getPriceStatic($idProduct, false);
-                                $featurePrice = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay($idProduct, $dateFrom, $dateTo, false);
-                                $roomTypeDateRangePrice = $roomTypeDateRangePrice['total_price_tax_excl'];
-                            }
-                            $featurePriceDiff = (float)($productPriceWithoutReduction - $featurePrice);
-
-                            //$price_tax_incl = Product::getPriceStatic($idProduct, $price_tax);
-                            $totalRoomPrice = $roomTypeDateRangePrice * $quantity;
-                            $totalPrice += $totalRoomPrice;
-                            $demandsPrice = 0;
-                            if ($roomDemand = Tools::getValue('room_demands')) {
-                                if ($roomDemand = json_decode($roomDemand, true)) {
-                                    $objRoomDemandPrice = new HotelRoomTypeDemandPrice();
-                                    $demandsPrice = $objRoomDemandPrice->getRoomTypeDemandsTotalPrice(
-                                        $idProduct,
-                                        $roomDemand,
-                                        $useTax,
-                                        $dateFrom,
-                                        $dateTo
-                                    );
-                                    $demandsPrice *= $quantity;
-                                    $totalPrice += $demandsPrice;
-                                }
-                            }
-                            $result['msg'] = 'success';
-                            $result['quantity'] = (int)$quantity;
-                            $result['total_price'] = $totalPrice;
-                            $result['total_room_price'] = $totalRoomPrice;
-                            $result['extra_demand_price'] = $demandsPrice;
-                            $result['num_days'] = $numDays;
-                            $result['avail_rooms'] = $totalAvailRooms;
-                            $result['original_product_price'] = $priceProduct;
-                            $result['feature_price'] = $featurePrice;
-                            $result['feature_price_diff'] = $featurePriceDiff;
-                        } else {
-                            $result['msg'] = 'unavailable_quantity';
-                            $result['avail_rooms'] = $totalAvailRooms;
-                        }
-                    } else {
-                        $result['msg'] = 'failed1';
-                        $result['avail_rooms'] = $totalAvailRooms;
-                    }
-                } else {
-                    $result['msg'] = 'failed2';
-                    $result['avail_rooms'] = $totalAvailRooms;
-                }
-            }
-        } else {
-            $result['msg'] = 'failed3';
-            $result['avail_rooms'] = 0;
-        }
-        die(json_encode($result));
     }
 
     public function displayAjaxGetHotelImages()
@@ -1204,7 +1260,8 @@ class ProductControllerCore extends FrontController
         $hotelImagesBaseDir = _MODULE_DIR_.'hotelreservationsystem/views/img/hotel_img/';
         foreach ($hotelImages as &$hotelImage) {
             $hotelImage['link'] = $this->context->link->getMediaLink(
-                $hotelImagesBaseDir.$hotelImage['hotel_image_id'].'.jpg'
+                $objHotelImage->getImageLink($hotelImage['id'],
+                ImageType::getFormatedName('large'))
             );
         }
 
@@ -1221,5 +1278,121 @@ class ProductControllerCore extends FrontController
         }
 
         die(json_encode($response));
+    }
+
+    public function displayAjaxGetServiceProducts()
+    {
+        $response = array(
+            'status' => false
+        );
+
+        $p = Tools::getValue('p');
+        $id_product = Tools::getValue('id_product');
+        $id_category = Tools::getValue('id_category');
+
+        if ($this->isTokenValid()) {
+            if ($p && $id_product) {
+                if (Validate::isLoadedObject($objProduct = new Product($id_product))) {
+                    $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
+                    $n = RoomTypeServiceProduct::WK_NUM_RESULTS;
+                    if (Configuration::get('PS_SERVICE_PRODUCT_CATEGORY_FILTER') && !$id_category) {
+                        $response['error'] = Tools::displayError('Invaild Request, please try again');
+                    }
+                    if (empty($response['error'])) {
+                        $response['status'] = true;
+                        if ($roomTypeServiceProducts = $objRoomTypeServiceProduct->getServiceProductsData(
+                            $objProduct->id,
+                            $p,
+                            $n,
+                            true,
+                            2,
+                            0,
+                            $id_category
+                        )) {
+                            $this->context->smarty->assign('service_products', $roomTypeServiceProducts);
+                            if (Configuration::get('PS_SERVICE_PRODUCT_CATEGORY_FILTER')) {
+                                $this->context->smarty->assign('group', $id_category);
+                            } else {
+                                $this->context->smarty->assign('group', 'all');
+                            }
+                            $response['service_products'] = $this->context->smarty->fetch(_PS_THEME_DIR_.'_partials/service-products-list.tpl');
+                        }
+                    }
+                } else {
+                    $response['error'] = Tools::displayError('Room Type not Found');
+                }
+            } else {
+                $response['error'] = Tools::displayError('Invaild Request, please try again');
+            }
+        } else {
+            $response['error'] = Tools::displayError('Unable to process request, please try again');
+        }
+
+
+        $this->ajaxDie(json_encode($response));
+    }
+
+    public function displayAjaxCheckServiceProductWithRoomType()
+    {
+        $response = array(
+            'success' => false
+        );
+
+        if ($this->isTokenValid()) {
+            $idProduct = Tools::getValue('id_product');
+            $idServiceProduct = Tools::getValue('service_product');
+            $addedServiceProduct = Tools::getValue('added_service_product');
+            $qty = Tools::getValue('qty');
+            if (Validate::isLoadedObject($objProduct = new Product($idProduct))) {
+                if (!Product::isBookingProduct($idProduct)) {
+                    $response['error'] = Tools::displayError('Room Type info not Found');
+                    $this->ajaxDie(json_encode($response));
+                }
+
+                $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
+                if (!$objRoomTypeServiceProduct->isRoomTypeLinkedWithProduct($idProduct, $idServiceProduct)) {
+                    $response['error'] = Tools::displayError('Selected product is not available with current room type');
+                } else {
+                    if (Validate::isLoadedObject($objServiceProduct = new Product($idServiceProduct))) {
+                        $response['success'] = true;
+                        if (!$objServiceProduct->allow_multiple_quantity) {
+                            if (!empty($addedServiceProduct)) {
+                                if (!in_array($idServiceProduct, array_column($addedServiceProduct, 'id_product'))) {
+                                    $response['add'] = true;
+                                    $response['msg'] = 'Service is added to cart.';
+                                } else {
+                                    $response['msg'] = 'Service already added.';
+                                }
+                            } else {
+                                $response['add'] = true;
+                                $response['msg'] = 'Service is added to cart.';
+                            }
+                        } else {
+                            $totalQty = $qty;
+                            if (!empty($addedServiceProduct)) {
+                                if (($key = array_search($idServiceProduct, array_column($addedServiceProduct, 'id_product')))!== false) {
+                                    $totalQty += $addedServiceProduct[$key]['quantity'];
+                                }
+                            }
+                            if ($objServiceProduct->max_quantity && $objServiceProduct->max_quantity < $totalQty ) {
+                                $response['msg'] = Tools::displayError(sprintf('Cannot add more than %d quantity.', $objServiceProduct->max_quantity));
+                            } else {
+                                $response['add'] = true;
+                                $response['msg'] = Tools::displayError('Service is added to cart.');
+                            }
+                        }
+                    } else {
+                        $response['error'] = Tools::displayError('Service not Found');
+                    }
+                }
+            } else {
+                $response['error'] = Tools::displayError('Room Type not Found');
+            }
+        } else {
+            $response['error'] = Tools::displayError('Unable to process request, please try again');
+        }
+
+
+        $this->ajaxDie(json_encode($response));
     }
 }

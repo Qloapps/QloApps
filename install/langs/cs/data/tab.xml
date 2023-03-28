@@ -20,7 +20,8 @@
   <tab id="Administration" name="Administrace"/>
   <tab id="Stats" name="Statistiky"/>
   <tab id="Stock" name="Zásoby"/>
-  <tab id="Products" name="Produkty"/>
+  <tab id="Products" name="Správa servisních produktů"/>
+  <tab id="Room_Types" name="Manage Room Types"/>
   <tab id="Categories" name="Kategorie"/>
   <tab id="Monitoring" name="Monitorování"/>
   <tab id="Attributes_and_Values" name="Atributy produktů"/>

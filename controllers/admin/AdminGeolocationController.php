@@ -139,9 +139,9 @@ class AdminGeolocationControllerCore extends AdminController
     {
         $this->display = 'options';
         if (!$this->isGeoLiteCityAvailable()) {
-            $this->displayWarning($this->l('In order to use Geolocation, please download').'
-				<a href="http://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz">'.$this->l('this file').'</a> '.
-                $this->l('and extract it (using Winrar or Gzip) into the /tools/geoip/ directory.'));
+            $this->displayWarning($this->l('In order to use Geolocation, please download the file').'
+				<a href="https://github.com/mbcc2006/GeoLiteCity-data/blob/master/GeoLiteCity.dat" target="_blank">GeoLiteCity.dat</a> '.
+                $this->l('from GitHub and copy into the /tools/geoip/ directory.'));
             Configuration::updateValue('PS_GEOLOCATION_ENABLED', 0);
         }
 

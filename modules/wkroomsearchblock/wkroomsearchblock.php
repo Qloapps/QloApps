@@ -51,9 +51,9 @@ class WkRoomSearchBlock extends Module
             || 'index' == $controller
             || 'product' == $controller
         ) {
+
             $this->context->controller->addCSS($this->_path.'/views/css/wk-global-search.css');
             $this->context->controller->addJS($this->_path.'/views/js/wk-room-search-block.js');
-            $this->context->controller->addCSS(_THEME_CSS_DIR_.'datepicker.css');
 
             Media::addJsDef(
                 array (
@@ -68,6 +68,19 @@ class WkRoomSearchBlock extends Module
                     'less_checkin_date' => $this->l('Check In date can not be before current date.'),
                     'more_checkout_date' => $this->l('Check Out date must be greater than Check In date.'),
                     'select_htl_txt' => $this->l('Select Hotel'),
+                    'select_age_txt' => $this->l('Select age'),
+                    'under_1_age' => $this->l('Under 1'),
+                    'room_txt' => $this->l('Room'),
+                    'rooms_txt' => $this->l('Rooms'),
+                    'remove_txt' => $this->l('Remove'),
+                    'adult_txt' => $this->l('Adult'),
+                    'adults_txt' => $this->l('Adults'),
+                    'child_txt' => $this->l('Child'),
+                    'children_txt' => $this->l('Children'),
+                    'below_txt' => $this->l('Below'),
+                    'years_txt' => $this->l('years'),
+                    'all_children_txt' => $this->l('All Children'),
+                    'invalid_occupancy_txt' => $this->l('Invalid occupancy(adults/children) found.'),
                 )
             );
         }
@@ -110,9 +123,14 @@ class WkRoomSearchBlock extends Module
     public function hookDisplayLeftColumn()
     {
         if ('category' == Tools::getValue('controller')) {
-            $objSearchHelper = new WkRoomSearchHelper();
-            $objSearchHelper->assignSearchPanelVariables();
-            return $this->display(__FILE__, 'categoryPageSearch.tpl');
+            $idCategory = Tools::getValue('id_category');
+            if (Validate::isLoadedObject($objCategory = new Category((int) $idCategory))) {
+                if ($objCategory->hasParent(Configuration::get('PS_LOCATIONS_CATEGORY'))) {
+                    $objSearchHelper = new WkRoomSearchHelper();
+                    $objSearchHelper->assignSearchPanelVariables();
+                    return $this->display(__FILE__, 'categoryPageSearch.tpl');
+                }
+            }
         }
     }
 
@@ -126,17 +144,39 @@ class WkRoomSearchBlock extends Module
 
     public function roomSearchProcess()
     {
+        $urlData = array();
         $hotelCategoryId = Tools::getValue('hotel_cat_id');
-        $checkIn = Tools::getValue('check_in_time');
-        $checkOut = Tools::getValue('check_out_time');
-
         // change dates format to acceptable format
-        $checkIn = date('Y-m-d', strtotime($checkIn));
-        $checkOut = date('Y-m-d', strtotime($checkOut));
+        if ($checkIn = Tools::getValue('check_in_time')) {
+            if (!Validate::isDateFormat($checkIn)) {
+                $checkIn = date('Y-m-d');
+            } else {
+                $checkIn = date('Y-m-d', strtotime($checkIn));
+            }
+            $urlData['date_from'] = $checkIn;
+        }
 
-        $currentDate = date('Y-m-d');
+        if ($checkOut = Tools::getValue('check_out_time')) {
+            if (!Validate::isDateFormat($checkOut)) {
+                $checkOut = date('Y-m-d', strtotime('+1 day', strtotime($checkIn)));
+            } else {
+                $checkOut = date('Y-m-d', strtotime($checkOut));
+            }
+            $urlData['date_to'] = $checkOut;
+        }
+
         $maxOrderDate = Tools::getValue('max_order_date');
         $maxOrderDate = date('Y-m-d', strtotime($maxOrderDate));
+
+        if (Configuration::get('PS_FRONT_ROOM_UNIT_SELECTION_TYPE') == HotelBookingDetail::PS_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY) {
+            if ($occupancy = Tools::getValue('occupancy')) {
+                $urlData['occupancy'] = $occupancy;
+            }
+        }
+
+        if ($locationCategoryId = Tools::getValue('location_category_id')) {
+            $urlData['location'] = $locationCategoryId;
+        }
 
         $objSearchHelper = new WkRoomSearchHelper();
         $this->context->controller->errors = array_merge(
@@ -145,10 +185,6 @@ class WkRoomSearchBlock extends Module
         );
         // id there is no validation error the proceed to redirect on search result page
         if (!count($this->context->controller->errors)) {
-            $urlData = array (
-                'date_from' => $checkIn,
-                'date_to' => $checkOut,
-            );
             if (Configuration::get('PS_REWRITING_SETTINGS')) {
                 $redirectLink = $this->context->link->getCategoryLink(
                     new Category($hotelCategoryId, $this->context->language->id),

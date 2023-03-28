@@ -25,6 +25,8 @@
 //global variables
 var responsiveflag = false;
 
+
+
 $(document).ready(function(){
 	highdpiInit();
 	responsiveResize();
@@ -103,13 +105,62 @@ $(document).ready(function(){
 			next     : '<a title="' + FancyboxI18nNext + '" class="fancybox-nav fancybox-next" href="javascript:;"><span></span></a>',
 			prev     : '<a title="' + FancyboxI18nPrev + '" class="fancybox-nav fancybox-prev" href="javascript:;"><span></span></a>'
 		});
+	// change default overlay for fancybox
+	$.extend(true, $.fancybox.helpers.overlay, {defaults : {css : {background: 'rgba(255, 255, 255, 0.95)'}}});
 
 	// Close Alert messages
 	$(".alert.alert-danger").on('click', this, function(e){
 		if (e.offsetX >= 16 && e.offsetX <= 39 && e.offsetY >= 16 && e.offsetY <= 34)
 			$(this).fadeOut();
 	});
+
+	$(document).on('click', '.open_rooms_extra_services_panel', function() {
+		console.log('dasdasd');
+		var idProduct = $(this).data('id_product');
+		var idOrder = $(this).data('id_order');
+		var dateFrom = $(this).data('date_from');
+		var dateTo = $(this).data('date_to');
+		var action = $(this).data('action');
+		$.ajax({
+			type: 'POST',
+			headers: {
+				"cache-control": "no-cache"
+			},
+			url: action,
+			dataType: 'json',
+			cache: false,
+			data: {
+				date_from: dateFrom,
+				date_to: dateTo,
+				id_product: idProduct,
+				id_order: idOrder,
+				method: 'getRoomTypeBookingDemands',
+				ajax: true,
+				token: static_token
+			},
+			success: function(result) {
+				if (result.extra_demands) {
+					$('#rooms_extra_services').html('');
+					$('#rooms_extra_services').append(result.extra_demands);
+				}
+				$.fancybox({
+					href: "#rooms_extra_services",
+					autoSize : true,
+					autoScale : true,
+					maxWidth : '100%',
+					'hideOnContentClick': false,
+					afterClose: function() {
+						if (result.reload) {
+							// reload so that changes prices will reflect everywhere
+							location.reload();
+						}
+					},
+				});
+			},
+		});
+	});
 });
+
 
 function highdpiInit()
 {

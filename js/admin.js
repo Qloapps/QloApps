@@ -604,6 +604,12 @@ function submitAddProductAndPreview()
 	$('#product_form').submit();
 }
 
+function submitAddProduct()
+{
+	$('#fakeSubmitAddProduct').attr('name','submitAddProduct');
+	$('#product_form').submit();
+}
+
 function submitAddcmsAndPreview()
 {
 	$('#previewSubmitAddcmsAndPreview').attr('name','submitAddcmsAndPreview');
@@ -1610,13 +1616,39 @@ function loadRecommendation()
 			token: token
 		},
 		success: function(res) {
-			$('#recommendation-wrapper-skeleton').fadeOut('slow').hide();
-			if (res.success) {
-				$('#recommendation-wrapper').html(res.content).fadeIn('slow');
+			if (res.success && res.content && res.content.trim()) {
+				$('#recommendation-wrapper-skeleton').fadeIn('slow');
+				$('#recommendation-wrapper').html(res.content);
+				let images = $('#recommendation-wrapper img');
+				let loaded = 0;
+				let total = $(images).length;
+				$(images).on('load', function() {
+					if (++loaded === total) {
+						$('#recommendation-wrapper-skeleton').fadeOut('slow').hide();
+						$('#recommendation-wrapper').fadeIn();
+					}
+				});
 			}
 		},
 		error: function(res) {
 			$('#recommendation-wrapper-skeleton').fadeOut('slow').hide();
+		}
+	});
+}
+
+function closeRecommendation()
+{
+	$('#recommendation-wrapper').fadeOut('slow');
+	$.ajax({
+		type: 'POST',
+		url: 'index.php',
+		async: true,
+		dataType: 'JSON',
+		data: {
+			action: 'recommendationClosed',
+			tab: help_class_name,
+			ajax: 1,
+			token: token
 		}
 	});
 }

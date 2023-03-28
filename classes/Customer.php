@@ -585,7 +585,7 @@ class CustomerCore extends ObjectModel
 		WHERE c.`id_customer` = '.(int)$this->id);
 
         $result['last_visit'] = $result2['last_visit'];
-        $result['age'] = ($result3['age'] != date('Y') ? $result3['age'] : '--');
+        $result['age'] = (isset($result3['age']) && $result3['age'] != date('Y') ? $result3['age'] : '--');
         return $result;
     }
 

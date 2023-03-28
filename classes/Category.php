@@ -592,9 +592,9 @@ class CategoryCore extends ObjectModel
 				SELECT c.*, cl.*
 				FROM `'._DB_PREFIX_.'category` c
 				'.($use_shop_restriction ? Shop::addSqlAssociation('category', 'c') : '').'
-				LEFT JOIN `'._DB_PREFIX_.'category_lang` cl ON c.`id_category` = cl.`id_category`'.Shop::addSqlRestrictionOnLang('cl').'
-				'.(isset($groups) && Group::isFeatureActive() ? 'LEFT JOIN `'._DB_PREFIX_.'category_group` cg ON c.`id_category` = cg.`id_category`' : '').'
-				'.(isset($root_category) ? 'RIGHT JOIN `'._DB_PREFIX_.'category` c2 ON c2.`id_category` = '.(int)$root_category.' AND c.`nleft` >= c2.`nleft` AND c.`nright` <= c2.`nright`' : '').'
+				LEFT JOIN `'._DB_PREFIX_.'category_lang` cl ON c.`id_category` = cl.`id_category`'.Shop::addSqlRestrictionOnLang('cl').''.(isset($groups) && Group::isFeatureActive() ? '
+                LEFT JOIN `'._DB_PREFIX_.'category_group` cg ON c.`id_category` = cg.`id_category`' : '').''.(isset($root_category) ? '
+                RIGHT JOIN `'._DB_PREFIX_.'category` c2 ON c2.`id_category` = '.(int)$root_category.' AND c.`nleft` >= c2.`nleft` AND c.`nright` <= c2.`nright`' : '').'
 				WHERE 1 '.$sql_filter.' '.($id_lang ? 'AND `id_lang` = '.(int)$id_lang : '').'
 				'.($active ? ' AND c.`active` = 1' : '').'
 				'.(isset($groups) && Group::isFeatureActive() ? ' AND cg.`id_group` IN ('.implode(',', $groups).')' : '').'
@@ -723,10 +723,9 @@ class CategoryCore extends ObjectModel
 					'.Shop::addSqlAssociation('product', 'p').'
 					LEFT JOIN `'._DB_PREFIX_.'category_product` cp ON p.`id_product` = cp.`id_product`
 					WHERE cp.`id_category` = '.(int)$this->id.
-                ($front ? ' AND product_shop.`visibility` IN ("both", "catalog")' : '').
+                ($front ? ' AND product_shop.`show_at_front` = 1' : '').
                 ($active ? ' AND product_shop.`active` = 1' : '').
                 ($id_supplier ? 'AND p.id_supplier = '.(int)$id_supplier : '');
-
             return (int)Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue($sql);
         }
 
@@ -788,7 +787,7 @@ class CategoryCore extends ObjectModel
 				WHERE product_shop.`id_shop` = '.(int)$context->shop->id.'
 					AND cp.`id_category` = '.(int)$this->id
                     .($active ? ' AND product_shop.`active` = 1' : '')
-                    .($front ? ' AND product_shop.`visibility` IN ("both", "catalog")' : '')
+                    .($front ? ' AND product_shop.`show_at_front` = 1' : '')
                     .($id_supplier ? ' AND p.id_supplier = '.(int)$id_supplier : '');
 
         if ($random === true) {
@@ -909,6 +908,22 @@ class CategoryCore extends ObjectModel
             return $result;
         }
         return Cache::retrieve($cache_id);
+    }
+
+    /**
+     * check if current category is nested in $id_parent category
+     */
+    public function hasParent($id_parent)
+    {
+        $id_category = $this->id;
+
+        $sql = 'SELECT c.`id_category`
+        FROM `'._DB_PREFIX_.'category` c
+        '.Shop::addSqlAssociation('category', 'c').'
+        WHERE c.`nleft` < ' .(int)$this->nleft. ' AND c.`nright` > ' .(int)$this->nright. '
+        AND c.`id_category` = '.(int)$id_parent;
+        $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue($sql);
+        return $result;
     }
 
     /**

@@ -1,0 +1,85 @@
+/**
+* 2010-2022 Webkul.
+*
+* NOTICE OF LICENSE
+*
+* All right is reserved,
+* Please go through this link for complete license : https://store.webkul.com/license.html
+*
+* DISCLAIMER
+*
+* Do not edit or add to this file if you wish to upgrade this module to newer
+* versions in the future. If you wish to customize this module for your
+* needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
+*
+*  @author    Webkul IN <support@webkul.com>
+*  @copyright 2010-2022 Webkul IN
+*  @license   https://store.webkul.com/license.html
+*/
+
+.date-picker-wrapper {
+    font-family: Verdana,Arial,sans-serif;
+    z-index: 111111;
+    border-radius: 5px;
+    background-color: #fff;
+    color: #777;
+    box-shadow: 0 4px 10px 0 rgb(0 0 0 / 26%);
+}
+.date-picker-wrapper.no-shortcuts {
+    margin-top: -4px;
+    padding: 10px;
+}
+.date-picker-wrapper .month-wrapper{
+    border: none;
+    background-color: transparent;
+    border-radius: 0px;
+    padding: 0;
+}
+
+.date-picker-wrapper .footer, .date-picker-wrapper .dp-clearfix, .date-picker-wrapper .time {
+    display: none;
+}
+.date-picker-wrapper .month-name {
+    font-size: 16px;
+    font-weight: 400;
+    color: #333;
+    text-transform: capitalize;
+}
+.date-picker-wrapper .month-wrapper table .week-name {
+    height: 40px;
+}
+.date-picker-wrapper .month-wrapper table .day.real-today {
+    background-color: unset;
+}
+.date-picker-wrapper .month-wrapper table tr td .day {
+    padding: 10px 11px;
+    line-height: 18px;
+    font-size: 14px;
+    margin: 0;
+    width: 38px;
+}
+.date-picker-wrapper table .caption .next, .date-picker-wrapper table .caption .prev {
+    font-size: 16px;
+    color: #000;
+    padding: 5px 10px;
+    background-color: #f0f0f0;
+    display: inline-block;
+    border: none;
+    border-radius: 50%;
+}
+.date-picker-wrapper table .caption .next i, .date-picker-wrapper table .caption .prev i {
+    width: 6px;
+}
+.date-picker-wrapper table .caption .next:hover, .date-picker-wrapper table .caption .prev:hover {
+    color: #000;
+    background: #dadada;
+}
+.date-picker-wrapper .month-wrapper table .day.checked {
+    background-color: #E6E6E6;
+}
+.date-picker-wrapper .month-wrapper table .day.toMonth.hovering {
+    background-color: #E6E6E6;
+}
+.date-picker-wrapper .first-date-selected, .date-picker-wrapper .last-date-selected {
+    background-color: #1292ff !important;
+}

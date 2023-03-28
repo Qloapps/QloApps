@@ -254,7 +254,7 @@ class AdminDashboardControllerCore extends AdminController
         $hotelOptions = array(array('id_hotel' => false, 'hotel_name' => $this->l('All Hotels')));
         foreach ($idsHotel as $idHotel) {
             $objHotelBranchInfo = new HotelBranchInformation($idHotel, $this->context->language->id);
-            $hotelAddressInfo = $objHotelBranchInfo->getAddress($idHotel);
+            $hotelAddressInfo = HotelBranchInformation::getAddress($idHotel);
             $hotelOptions[] = array(
                 'id_hotel' => (int) $idHotel,
                 'hotel_name' => $objHotelBranchInfo->hotel_name.', '.$hotelAddressInfo['city'],
@@ -398,8 +398,8 @@ class AdminDashboardControllerCore extends AdminController
     public function ajaxProcessGetBlogRss()
     {
         $return = array('has_errors' => false, 'rss' => array());
-        if (!$this->isFresh('/config/xml/blog-'.$this->context->language->iso_code.'.xml', _TIME_1_DAY_)) {
-            if (!$this->refresh('/config/xml/blog-'.$this->context->language->iso_code.'.xml', _PS_API_URL_.'/rss/blog/blog-'.$this->context->language->iso_code.'.xml')) {
+        if (!Tools::isFresh('/config/xml/blog-'.$this->context->language->iso_code.'.xml', _TIME_1_DAY_)) {
+            if (!Tools::refresh('/config/xml/blog-'.$this->context->language->iso_code.'.xml', _PS_API_URL_.'/rss/blog/blog-'.$this->context->language->iso_code.'.xml')) {
                 $return['has_errors'] = true;
             }
         }
@@ -494,19 +494,9 @@ class AdminDashboardControllerCore extends AdminController
         die(json_encode($return));
     }
 
-    public function ajaxProcessGetRecommendationContent()
-    {
-        $response = array('success' => false);
-        if ($content = $this->getRecommendationContent()) {
-            $response['success'] = true;
-            $response['content'] = $content;
-        }
-        $this->ajaxDie(json_encode($response));
-    }
-
     public function getRecommendationContent()
     {
-        if (!$this->isFresh(self::DASHBOARD_RECOMMENDATION_CONTENT, _TIME_1_DAY_)) {
+        if (!Tools::isFresh(self::DASHBOARD_RECOMMENDATION_CONTENT, _TIME_1_DAY_)) {
             @file_put_contents(_PS_ROOT_DIR_.self::DASHBOARD_RECOMMENDATION_CONTENT, Tools::addonsRequest('dashboard-recommendation'));
         }
         if (file_exists(_PS_ROOT_DIR_.self::DASHBOARD_RECOMMENDATION_CONTENT)) {

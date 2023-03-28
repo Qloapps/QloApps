@@ -195,8 +195,7 @@ class HotelHelper
     {
         //from setting tab
         $home_banner_default_title = 'Four Lessons Hotel Greshon Palace';
-        $home_banner_default_content = 'Tofu helvetica leggings tattooed. Skateboard blue bottle green juice,
-        brooklyn cardigan kitsch fap narwhal organic flexitarian.';
+        $home_banner_default_content = 'Tofu helvetica leggings tattooed. Skateboard blue bottle green juice, brooklyn cardigan kitsch fap narwhal organic flexitarian.';
 
         Configuration::updateValue('WK_HOTEL_LOCATION_ENABLE', 1);
         Configuration::updateValue('WK_HOTEL_NAME_ENABLE', 1);
@@ -216,6 +215,9 @@ class HotelHelper
         Configuration::updateValue('WK_ALLOW_ADVANCED_PAYMENT', 1);
         Configuration::updateValue('WK_ADVANCED_PAYMENT_GLOBAL_MIN_AMOUNT', 10);
         Configuration::updateValue('WK_ADVANCED_PAYMENT_INC_TAX', 1);
+
+        Configuration::updateValue('WK_GLOBAL_CHILD_MAX_AGE', 15);
+        Configuration::updateValue('WK_GLOBAL_MAX_CHILD_IN_ROOM', 3);
 
         Configuration::updateValue(
             'MAX_GLOBAL_BOOKING_DATE',
@@ -241,14 +243,20 @@ class HotelHelper
         $WK_HTL_SHORT_DESC = array();
         foreach ($languages as $lang) {
             $WK_HTL_CHAIN_NAME[$lang['id_lang']] = 'Hotel Dominic Parks';
-            $WK_HTL_TAG_LINE[$lang['id_lang']] = 'Tofu helvetica leggings tattooed. Skateboard blue
-            bottle green juice, brooklyn cardigan kitsch fap narwhal organic flexitarian.';
-            $WK_HTL_SHORT_DESC[$lang['id_lang']] = 'Tofu helvetica leggings tattooed. Skateboard blue bottle green
-            juice, brooklyn cardigan kitsch fap narwhal organic flexitarian.';
+            $WK_HTL_TAG_LINE[$lang['id_lang']] = 'Tofu helvetica leggings tattooed. Skateboard blue bottle green juice, brooklyn cardigan kitsch fap narwhal organic flexitarian.';
+            $WK_HTL_SHORT_DESC[$lang['id_lang']] = 'Tofu helvetica leggings tattooed. Skateboard blue bottle green juice, brooklyn cardigan kitsch fap narwhal organic flexitarian.';
         }
         Configuration::updateValue('WK_HTL_CHAIN_NAME', $WK_HTL_CHAIN_NAME);
         Configuration::updateValue('WK_HTL_TAG_LINE', $WK_HTL_TAG_LINE);
         Configuration::updateValue('WK_HTL_SHORT_DESC', $WK_HTL_SHORT_DESC);
+
+        // Search Fields
+        Configuration::updateValue('PS_FRONT_SEARCH_TYPE', HotelBookingDetail::SEARCH_TYPE_OWS);
+        Configuration::updateValue('PS_FRONT_OWS_SEARCH_ALGO_TYPE', HotelBookingDetail::SEARCH_EXACT_ROOM_TYPE_ALGO);
+        Configuration::updateValue('PS_FRONT_ROOM_UNIT_SELECTION_TYPE', HotelBookingDetail::PS_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY);
+        Configuration::updateValue('PS_BACKOFFICE_SEARCH_TYPE', HotelBookingDetail::SEARCH_TYPE_OWS);
+        Configuration::updateValue('PS_BACKOFFICE_OWS_SEARCH_ALGO_TYPE', HotelBookingDetail::SEARCH_ALL_ROOM_TYPE_ALGO);
+        Configuration::updateValue('PS_BACKOFFICE_ROOM_BOOKING_TYPE', HotelBookingDetail::PS_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY);
 
         return true;
     }
@@ -336,7 +344,7 @@ class HotelHelper
         $htl_id = $obj_hotel_info->id;
 
         // add hotel address info
-        $def_cont_id = Country::getDefaultCountryId();
+        $def_cont_id = Configuration::get('PS_COUNTRY_DEFAULT');
 
         if ($states = State::getStatesByIdCountry($def_cont_id)) {
             $state_id = $states[0]['id_state'];
@@ -390,6 +398,8 @@ class HotelHelper
             $obj_hotel_info->id_category = $cat_hotel;
             $obj_hotel_info->save();
         }
+        // save dummy hotel as primary hotel
+        Configuration::updateValue('WK_PRIMARY_HOTEL', $htl_id);
 
         return $htl_id;
     }
@@ -431,6 +441,7 @@ class HotelHelper
             $product->price = $prod_price_arr[$key];
             $product->active = 1;
             $product->quantity = 999999999;
+            $product->booking_product = true;
             $product->is_virtual = 1;
             $product->indexed = 1;
             $product->save();
@@ -513,8 +524,12 @@ class HotelHelper
             $htl_rm_type = new HotelRoomType();
             $htl_rm_type->id_product = $product_id;
             $htl_rm_type->id_hotel = $id_hotel;
-            $htl_rm_type->adult = 2;
+            $htl_rm_type->adults = 2;
             $htl_rm_type->children = 2;
+            $htl_rm_type->max_adults = 2;
+            $htl_rm_type->max_children = 2;
+            $htl_rm_type->max_guests = 4;
+
             $htl_rm_type->save();
 
             // Add features to the product
@@ -576,7 +591,7 @@ class HotelHelper
     public function addCategory($name, $parent_cat = false, $group_ids, $ishotel = false, $hotel_id = false)
     {
         if (!$parent_cat) {
-            $parent_cat = Category::getRootCategory()->id;
+            $parent_cat = Configuration::get('PS_LOCATIONS_CATEGORY');
         }
 
         if ($ishotel && $hotel_id) {
@@ -716,5 +731,32 @@ class HotelHelper
             }
         }
         return $randZipCode;
+    }
+
+    /**
+     * Get Super Admin Of Prestashop
+     * @return int Super Admin Employee ID
+     */
+    public static function getSupperAdmin()
+    {
+        if ($data = Db::getInstance()->executeS('SELECT * FROM `'._DB_PREFIX_.'employee` ORDER BY `id_employee`')) {
+            foreach ($data as $emp) {
+                $employee = new Employee($emp['id_employee']);
+                if ($employee->isSuperAdmin()) {
+                    return $emp['id_employee'];
+                }
+            }
+        }
+
+        return false;
+    }
+
+    public static function getNumberOfDays($dateFrom, $dateTo)
+    {
+        $startDate = new DateTime($dateFrom);
+        $endDate = new DateTime($dateTo);
+        $daysDifference = $startDate->diff($endDate)->days;
+
+        return $daysDifference;
     }
 }

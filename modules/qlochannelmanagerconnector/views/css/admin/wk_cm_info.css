@@ -1,0 +1,116 @@
+/**
+* 2010-2023 Webkul.
+*
+* NOTICE OF LICENSE
+*
+* All right is reserved,
+* Please go through this link for complete license : https://store.webkul.com/license.html
+*
+* DISCLAIMER
+*
+* Do not edit or add to this file if you wish to upgrade this module to newer
+* versions in the future. If you wish to customize this module for your
+* needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
+*
+*  @author    Webkul IN <support@webkul.com>
+*  @copyright 2010-2023 Webkul IN
+*  @license   https://store.webkul.com/license.html
+*/
+
+.qcm_content_wrapper {
+    font-size: 14px;
+    color: #333333;
+}
+.qcm_content_wrapper .channel_connection_info {
+    font-size: 12px;
+    text-align: right;
+}
+.qcm_content_wrapper .channel_info_type {
+    font-weight: bold;
+}
+.qcm_content_wrapper .margin-bottom-10 {
+    margin-bottom: 10px;
+}
+.qcm_content_wrapper .padding-left-10 {
+    padding-left: 10px;
+}
+.qcm_content_wrapper .padding-right-10 {
+    padding-right: 10px;
+}
+.qcm_content_wrapper .qcm_content_wrapper p {
+    margin-bottom: 10px;
+}
+.qcm_content_wrapper .qcm_block_wrapper {
+    margin-bottom: 20px;
+}
+.qcm_content_wrapper .qcm_info_block {
+    background: #ffffff;
+    border-radius: 5px;
+    padding: 30px;
+    width: 100%;
+}
+.qcm_content_wrapper .qcm_info_block ul {
+    padding-left: 30px;
+}
+.qcm_content_wrapper .qcm_info_block_head {
+    font-weight: 700;
+    font-size: 18px;
+    line-height: 25px;
+    color: #333333;
+    margin-bottom: 10px;
+}
+.qcm_content_wrapper .qcm_block_wrapper .qcm_info_wrapper {
+    padding-left: 20px;
+}
+.qcm_content_wrapper .flex-display {
+    display: flex;
+}
+.qcm_content_wrapper .qcm_info_img_container {
+    display: grid;
+    place-content: center;
+}
+.qcm_content_wrapper .qcm_info_block_content {
+    line-height: 24px;
+    color: #333333;
+}
+.qcm_content_wrapper .qcm_info_explore {
+    margin-top: 20px;
+    line-height: 24px;
+    color: #333333;
+}
+.qcm_content_wrapper a.qcm-link {
+    font-weight: 600;
+    color: #00aff0;
+    text-decoration: underline;
+}
+.qcm_content_wrapper .not_connect_txt {
+    font-weight: 600;
+    font-size: 16px;
+    line-height: 22px;
+    color: #ff404b;
+}
+.qcm_content_wrapper .connect_status_heading {
+    font-weight: 600;
+    font-size: 16px;
+    line-height: 22px;
+}
+
+@media (max-width: 767px) {
+    .qcm_content_wrapper .channel_connection_info {
+        text-align: left;
+    }
+}
+@media (max-width: 991px) {
+    .qcm_content_wrapper .qcm_info_img_container {
+        margin-bottom: 20px;
+    }
+    .qcm_content_wrapper .qcm_block_wrapper .qcm_info_wrapper {
+        padding-left: 5px;
+    }
+    .qcm_content_wrapper .flex-display {
+        display: inherit;
+    }
+    .qcm_content_wrapper .qcm_info_img_container {
+        place-content: normal;
+    }
+}

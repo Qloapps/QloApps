@@ -36,7 +36,7 @@
 		{assign var='productPriceWithoutReduction' value=$product->getPriceWithoutReduct(true, $smarty.const.NULL)}
 	{/if}
 <div class="product_wrapper" itemscope itemtype="http://schema.org/Product">
-	{if isset($product_id_hotel) && $product_id_hotel}
+	{if isset($product) && $product}
 		<meta itemprop="url" content="{$link->getProductLink($product)}">
 		<div class="primary_block row">
 			<!-- {if !$content_only}
@@ -68,7 +68,10 @@
 				<div class="room_type_img_containter card">
 					<div class="room_hotel_name_block">
 						<div class="hotel_name_block">
-							<span>{$product->name}&nbsp;-&nbsp;{$hotel_name}</span>
+							<span>{$product->name}
+								{* Block for booking products *}
+								{if isset($id_hotel) && $id_hotel}&nbsp;-&nbsp;{$hotel_name}{/if}
+							</span>
 						</div>
 						{hook h='displayRoomTypeDetailRoomTypeNameAfter' id_product=$product->id}
 					</div>
@@ -167,45 +170,56 @@
 					{/if}
 				</div>
 
-				<div class="room_type_info_containter">
+				<div id="service_products_cont">
+					{if isset($service_products_exists) && $service_products_exists}
+						{include file="{$tpl_dir}_partials/service-products.tpl"}
+					{/if}
+				</div>
+
+				<div class="product_info_containter">
 					<!-- tab hook is added here -->
 					<!--HOOK_PRODUCT_TAB -->
 					<section class="page-product-box">
 						<ul class="nav nav-tabs product_description_tabs">
-							<li class="active"><a href="#room_info_tab" class="idTabHrefShort" data-toggle="tab">{l s='Room Information'}</a></li>
-							<li><a href="#refund_policies_tab" class="idTabHrefShort" data-toggle="tab">{l s='Refund Policies'}</a></li>
+							<li class="active"><a href="#product_info_tab" class="idTabHrefShort" data-toggle="tab">{l s='Room Information'}</a></li>
+							{* Block for booking products *}
+							{if isset($id_hotel) && $id_hotel}
+								<li><a href="#refund_policies_tab" class="idTabHrefShort" data-toggle="tab">{l s='Refund Policies'}</a></li>
+							{/if}
 							{if $display_google_maps && ($hotel_latitude|floatval != 0 && $hotel_longitude|floatval != 0)}
 								<li><a href="#room_type_map_tab" class="idTabHrefShort" data-toggle="tab">{l s='View on Map'}</a></li>
 							{/if}
 							{$HOOK_PRODUCT_TAB}
 						</ul>
 						<div class="tab-content product_description_tabs_contents">
-							<div id="room_info_tab" class="tab-pane active card">
-								<div id="room_info_tab_information">
+							<div id="product_info_tab" class="tab-pane active card">
+								<div id="product_info_tab_information">
 									<div class="row info_margin_div room_description">
 										<div class="col-sm-12">
 											{$product->description}
 										</div>
 									</div>
-									{if isset($product->capacity['adult']) && isset($product->capacity['children']) }
+									{if isset($room_type_info['adults']) && isset($room_type_info['children']) }
 										<div class="info_margin_div">
 											<div class="room_info_heading">
 												<span>{l s='Max Capacity'}</span>
 											</div>
 											<div class="room_info_content">
-												<p> {$product->capacity['adult']} {l s='Adults'}, {$product->capacity['children']} {l s='child'}</p>
+												<p>{$room_type_info['adults']} {l s='Adults'}, {$room_type_info['children']} {if $room_type_info['children'] > 1}{l s='Children'}{else}{l s='Child'}{/if} ({l s='Max guests'}: {$room_type_info['max_guests']|escape:'htmlall':'UTF-8'})</p>
 											</div>
 										</div>
 									{/if}
-									<div class="info_margin_div">
-										<div class="room_info_heading">
-											<span>{l s='Check-in and check-out time'}</span>
+									{if isset($id_hotel) && $id_hotel}
+										<div class="info_margin_div">
+											<div class="room_info_heading">
+												<span>{l s='Check-in and check-out time'}</span>
+											</div>
+											<div class="room_info_content">
+												<p>{l s='Check-in: '}{$hotel_check_in|escape:'html':'UTF-8'}</p>
+												<p>{l s='Check-out: '}{$hotel_check_out|escape:'html':'UTF-8'}</p>
+											</div>
 										</div>
-										<div class="room_info_content">
-											<p>{l s='Check-in: '}{$hotel_check_in|escape:'html':'UTF-8'}</p>
-											<p>{l s='Check-out: '}{$hotel_check_out|escape:'html':'UTF-8'}</p>
-										</div>
-									</div>
+									{/if}
 									{if isset($features) && $features}
 										<div class="info_margin_div">
 											<div class="room_info_heading">
@@ -222,17 +236,20 @@
 											</div>
 										</div>
 									{/if}
-									{if isset($hotel_features) && $hotel_features}
-										<div class="info_margin_div">
-											<div class="room_info_heading">
-												<span>{l s='Hotel Features'}</span>
+									{* Block for booking products *}
+									{if isset($id_hotel) && $id_hotel}
+										{if isset($hotel_features) && $hotel_features}
+											<div class="info_margin_div">
+												<div class="room_info_heading">
+													<span>{l s='Hotel Features'}</span>
+												</div>
+												<div class="room_info_content row">
+													{foreach from=$hotel_features key=ftr_k item=ftr_v}
+														<div class="col-sm-4 col-xs-12"><i class="circle-small">o</i> {$ftr_v|escape:'html':'UTF-8'}</div>
+													{/foreach}
+												</div>
 											</div>
-											<div class="room_info_content row">
-												{foreach from=$hotel_features key=ftr_k item=ftr_v}
-													<div class="col-sm-4 col-xs-12"><i class="circle-small">o</i> {$ftr_v|escape:'html':'UTF-8'}</div>
-												{/foreach}
-											</div>
-										</div>
+										{/if}
 									{/if}
 									{if isset($hotel_has_images) && $hotel_has_images}
 										<div class="room_info_hotel_images_wrap">
@@ -280,23 +297,26 @@
 									{/if}
 								</div>
 							</div>
-							<div id="refund_policies_tab" class="tab-pane card">
-								{if isset($isHotelRefundable) && $isHotelRefundable}
-									{if isset($hotelRefundRules) && $hotelRefundRules}
-										{foreach $hotelRefundRules as $refundRule}
-											<div class="info_margin_div">
-												<div class="room_info_content">
-													<i class="circle-small">o</i> <span class="refund-rule-name">{$refundRule['name']|escape:'html':'UTF-8'} - </span> <span>{$refundRule['description']|escape:'html':'UTF-8'}</span>
+							{* Block for booking products *}
+							{if isset($id_hotel) && $id_hotel}
+								<div id="refund_policies_tab" class="tab-pane card">
+									{if isset($isHotelRefundable) && $isHotelRefundable}
+										{if isset($hotelRefundRules) && $hotelRefundRules}
+											{foreach $hotelRefundRules as $refundRule}
+												<div class="info_margin_div">
+													<div class="room_info_content">
+														<i class="circle-small">o</i> <span class="refund-rule-name">{$refundRule['name']|escape:'html':'UTF-8'} - </span> <span>{$refundRule['description']|escape:'html':'UTF-8'}</span>
+													</div>
 												</div>
-											</div>
-										{/foreach}
+											{/foreach}
+										{else}
+											{l s='N/A'}
+										{/if}
 									{else}
-										{l s='N/A'}
+										<span class="non_refundable_txt error_msg">{l s='Non Refundable'}</span>
 									{/if}
-								{else}
-									<span class="non_refundable_txt error_msg">{l s='Non Refundable'}</span>
-								{/if}
-							</div>
+								</div>
+							{/if}
 							{if $display_google_maps && ($hotel_latitude|floatval != 0 && $hotel_longitude|floatval != 0)}
 								<div id="room_type_map_tab" class="tab-pane card">
 									<div class="map-wrap"></div>
@@ -345,12 +365,12 @@
 									{if $product->show_price && !isset($restricted_country_mode) && !$PS_CATALOG_MODE}
 										<div class="col-xs-1">
 											<p class="checkbox">
-												<input value="{$idGlobalDemand|escape:'html':'UTF-8'}" type="checkbox" class="id_room_type_demand" />
+												<input value="{$idGlobalDemand|escape:'html':'UTF-8'}" type="checkbox" class="id_room_type_demand" data-id_global_demand="{$idGlobalDemand|escape:'html':'UTF-8'}" />
 											</p>
 										</div>
 									{/if}
 									<div class="col-xs-11 demand_adv_option_block">
-										<p>{$demand['name']|escape:'html':'UTF-8'} {if $product->show_price && !isset($restricted_country_mode) && !$PS_CATALOG_MODE}<span class="pull-right"><span class="extra_demand_option_price">{convertPrice price = $demand['price']}</span>{if $demand['price_calc_method'] == $WK_PRICE_CALC_METHOD_EACH_DAY}{l s='/night'}{/if}</span>{/if}</p>
+										<p>{$demand['name']|escape:'html':'UTF-8'} {if $product->show_price && !isset($restricted_country_mode) && !$PS_CATALOG_MODE}<span class="pull-right"><span class="extra_demand_option_price">{convertPrice price = $demand['price']}</span>{if $demand['price_calc_method'] == $WK_PRICE_CALC_METHOD_EACH_DAY}{l s='/Night'}{/if}</span>{/if}</p>
 										{if isset($demand['adv_option']) && $demand['adv_option']}
 											<select class="id_option">
 												{foreach $demand['adv_option'] as $idOption => $option}
@@ -373,7 +393,7 @@
 
 		</div> <!-- end primary_block -->
 		{if !$content_only}
-	{if (isset($quantity_discounts) && count($quantity_discounts) > 0)}
+			{if (isset($quantity_discounts) && count($quantity_discounts) > 0)}
 				<!-- quantity discount -->
 				<section class="page-product-box ">
 					<h3 class="page-product-heading">{l s='Volume discounts'}</h3>
@@ -633,15 +653,18 @@
 				{/if}
 			{/if}
 		{/if}
-		{strip}
-			{* By webkul variable needed in product.js *}
-			{addJsDef max_order_date = $max_order_date}
-			{addJsDef preparation_time = $preparation_time}
-			{addJsDef booking_date_to = $date_to}
-			{addJsDef booking_date_from = $date_from}
+		{* Block for booking products *}
+		{if isset($id_hotel) && $id_hotel}
+			{strip}
+				{addJsDef id_hotels = $id_hotel}
+				{addJsDef max_order_date = $max_order_date}
+				{addJsDef preparation_time = $preparation_time}
+				{addJsDef booking_date_to = $date_to}
+				{addJsDef booking_date_from = $date_from}
+			{/strip}
+		{/if}
 
-			{addJsDef product_controller_url=$product_controller_url}
-		{/strip}
+
 	{else}
 		<div class="bootstrap">
 			<div class="alert alert-warning">
@@ -657,6 +680,7 @@
 	{if isset($smarty.get.adtoken) && $smarty.get.adtoken}
 		{addJsDefL name=adtoken}{$smarty.get.adtoken|escape:'html':'UTF-8'}{/addJsDefL}
 	{/if}
+	{addJsDef product_controller_url=$product_controller_url}
 	{addJsDef allowBuyWhenOutOfStock=$allow_oosp|boolval}
 	{addJsDef availableNowValue=$product->available_now|escape:'quotes':'UTF-8'}
 	{addJsDef availableLaterValue=$product->available_later|escape:'quotes':'UTF-8'}
@@ -757,5 +781,9 @@
 	{addJsDefL name=unavail_qty_text}{l s='Required quantity of rooms are Not available.' js=1}{/addJsDefL}
 	{addJsDefL name=out_of_stock_cond}{l s='No room is available for this period.' js=1}{/addJsDefL}
 	{addJsDefL name=wrong_qty_cond}{l s='you are trying for a invalid quantity.' js=1}{/addJsDefL}
+	{addJsDefL name=select_txt}{l s='Select' js=1}{/addJsDefL}
+	{addJsDefL name=remove_txt}{l s='Remove' js=1}{/addJsDefL}
+    {addJsDefL name=cart_extra_service_add}{l s='Service is added to cart' js=1}{/addJsDefL}
+
 	{/strip}
 {/if}

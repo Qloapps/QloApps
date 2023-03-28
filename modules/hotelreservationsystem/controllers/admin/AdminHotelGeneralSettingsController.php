@@ -35,6 +35,9 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
         if (!$hotelsInfo = $objHotelInfo->hotelBranchesInfo(false, 1)) {
             $hotelsInfo = array();
         }
+        foreach ($hotelsInfo as &$hotel) {
+            $hotel['name'] = $hotel['hotel_name'];
+        }
         $hotelNameDisable = (count($hotelsInfo) > 1 ? true : false);
         $locationDisable = ((count($hotelsInfo) < 2) && !Configuration::get('WK_HOTEL_NAME_ENABLE')) ? true : false;
         $this->fields_options = array(
@@ -83,6 +86,31 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
                     'title' => $this->l('Save'),
                 ),
             ),
+            'occupancypanel' => array(
+                'icon' => 'icon-users',
+                'title' => $this->l('Occupancy Setting'),
+                'fields' => array(
+                    // max age of child
+                    'WK_GLOBAL_CHILD_MAX_AGE' => array(
+                        'title' => $this->l('Consider guest as child below age'),
+                        'type' => 'text',
+                        'required' => true,
+                        'validation' => 'isUnsignedInt',
+                        'hint' => $this->l('Enter the age of the guest,  which that guest will be considered as child.'),
+                    ),
+                    'WK_GLOBAL_MAX_CHILD_IN_ROOM' => array(
+                        'title' => $this->l('Maximum children allowed in a room'),
+                        'type' => 'text',
+                        'required' => true,
+                        'validation' => 'isUnsignedInt',
+                        'hint' => $this->l('Enter number of the child allowed in a room.'),
+                        'desc' => $this->l('Set as 0 if you do not want to limit children in a room.')
+                    ),
+                ),
+                'submit' => array(
+                    'title' => $this->l('Save'),
+                ),
+            ),
             'generalsetting' => array(
                 'title' => $this->l('Configuration'),
                 'fields' => array(
@@ -116,6 +144,13 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
                         'title' => $this->l('Website Launch Year'),
                         'hint' => $this->l('The year when your hotel site was launched.'),
                         'type' => 'text',
+                    ),
+                    'WK_PRIMARY_HOTEL' => array(
+                        'title' => $this->l('Primary hotel'),
+                        'hint' => $this->l('Primary hotel is used to default address for your business. The hotel address will be considered as your registered business address.'),
+                        'type' => 'select',
+                        'identifier' => 'id',
+                        'list' => $hotelsInfo,
                     ),
                     'WK_HTL_CHAIN_NAME' => array(
                         'title' => $this->l('Hotel Name'),
@@ -259,6 +294,13 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
             $defaultLangId = Configuration::get('PS_LANG_DEFAULT');
             $objDefaultLanguage = Language::getLanguage((int) $defaultLangId);
             $languages = Language::getLanguages(false);
+
+            // Validation for the occupancy settings
+            // max age of infant after which guest will considered as child // below 18
+            $globalChildMaxAge = Tools::getValue('WK_GLOBAL_CHILD_MAX_AGE');
+            $globalMaxChildInRoom = Tools::getValue('WK_GLOBAL_MAX_CHILD_IN_ROOM');
+
+            // End occupancy fields validation
 
             if (!trim(Tools::getValue('WK_HTL_CHAIN_NAME_'.$defaultLangId))) {
                 $this->errors[] = $this->l('Hotel chain name is required at least in ').$objDefaultLanguage['name'];

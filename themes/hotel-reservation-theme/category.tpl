@@ -46,14 +46,16 @@
         <div class="row margin-lr-0" id="category_data_cont">
             {include file="./_partials/room_type_list.tpl"}
         </div>
-
     </div>
 </div>
+
 {strip}
     {addJsDef product_controller_url=$link->getPageLink('product')}
-    {addJsDef feat_img_dir=$feat_img_dir}
-    {addJsDef ratting_img=$ratting_img}
+    {* {addJsDef feat_img_dir=$feat_img_dir} *}
+    {* {addJsDef ratting_img=$ratting_img} *}
     {addJsDef currency_prefix = $currency->prefix}
     {addJsDef currency_suffix = $currency->suffix}
-    {addJsDef max_order_date = $max_order_date}
+    {if isset($max_order_date)}
+        {addJsDef max_order_date = $max_order_date}
+    {/if}
 {/strip}

@@ -34,10 +34,13 @@ class AdminSlipControllerCore extends AdminController
         $this->bootstrap = true;
         $this->table = 'order_slip';
         $this->className = 'OrderSlip';
+        $this->list_no_link = true;
 
         $this->_select = ' o.`id_shop`';
         $this->_join .= ' LEFT JOIN '._DB_PREFIX_.'orders o ON (o.`id_order` = a.`id_order`)';
         $this->_group = ' GROUP BY a.`id_order_slip`';
+
+        $this->addRowAction('statusChange');
 
         $this->fields_list = array(
             'id_order_slip' => array(
@@ -63,7 +66,26 @@ class AdminSlipControllerCore extends AdminController
                 'callback' => 'printPDFIcons',
                 'orderby' => false,
                 'search' => false,
-                'remove_onclick' => true)
+                'remove_onclick' => true
+            ),
+            'redeem_status' => array(
+                'title' => $this->l('Status'),
+                'type' => 'select',
+                'list' => array(
+                    OrderSlip::REDEEM_STATUS_ACTIVE => $this->l('Active'),
+                    OrderSlip::REDEEM_STATUS_REDEEMED => $this->l('Redeemed'),
+                ),
+                'align' => 'center',
+                'filter_key' => 'a!redeem_status',
+                'callback' => 'displayRedeemStatus',
+                'class' => 'fixed-width-md',
+            ),
+            'id_cart_rule' => array(
+                'title' => $this->l('Voucher'),
+                'align' => 'center',
+                'callback' => 'displayVoucherLink',
+                'class' => 'fixed-width-lg',
+            ),
         );
 
         $this->_select = 'a.id_order_slip AS id_pdf';
@@ -162,6 +184,38 @@ class AdminSlipControllerCore extends AdminController
         }
     }
 
+    public function processStatusChange()
+    {
+        $idOrderSlip = Tools::getValue('id_order_slip');
+        $objOrderSlip = new OrderSlip($idOrderSlip);
+
+        if (!Validate::isLoadedObject($objOrderSlip)) {
+            $this->errors[] = $this->l('The credit slip can not be loaded.');
+        } elseif ($objOrderSlip->redeem_status != OrderSlip::REDEEM_STATUS_ACTIVE) {
+            $this->errors[] = $this->l('The status for this credit slip can not be changed.');
+        } else {
+            $objOrder = new Order($objOrderSlip->id_order);
+            $objCustomer = new Customer($objOrderSlip->id_customer);
+
+            if (!Validate::isLoadedObject($objOrder)) {
+                $this->errors[] = $this->l('The related order for this credit slip can not be loaded.');
+            }
+
+            if (!Validate::isLoadedObject($objCustomer)) {
+                $this->errors[] = $this->l('The related customer for this credit slip can not be loaded.');
+            }
+        }
+
+        if (!count($this->errors)) {
+            $objOrderSlip->redeem_status = OrderSlip::REDEEM_STATUS_REDEEMED;
+            if ($objOrderSlip->save()) {
+                Tools::redirectAdmin(self::$currentIndex.'&token='.$this->token.'&conf=4');
+            }
+
+            $this->errors[] = $this->l('Something went wrong while changing status.');
+        }
+    }
+
     public function initContent()
     {
         $this->initTabModuleList();
@@ -201,5 +255,44 @@ class AdminSlipControllerCore extends AdminController
         ));
 
         return $this->createTemplate('_print_pdf_icon.tpl')->fetch();
+    }
+
+    public function displayRedeemStatus($redeemStatus, $row)
+    {
+        $this->context->smarty->assign(array(
+            'redeem_status' => $redeemStatus,
+        ));
+
+        return $this->createTemplate('_redeem_status.tpl')->fetch();
+    }
+
+    public function displayVoucherLink($idCartRule, $row)
+    {
+        if ($row['redeem_status'] == OrderSlip::REDEEM_STATUS_REDEEMED && $idCartRule) {
+            $this->context->smarty->assign(array(
+                'id_cart_rule' => (int) $idCartRule,
+            ));
+
+            return $this->createTemplate('_display_voucher_link.tpl')->fetch();
+        }
+
+        return '--';
+    }
+
+    public function displayStatusChangeLink($token = null, $id)
+    {
+        $objOrderSlip = new OrderSlip($id);
+        if ($objOrderSlip->redeem_status != OrderSlip::REDEEM_STATUS_REDEEMED) {
+            $statusChangeLink = self::$currentIndex.'&'.$this->identifier.'='.$id.'&action=statusChange'.
+            '&token='.($token != null ? $token : $this->token);
+
+            $this->context->smarty->assign(array(
+                'status_change_link' => $statusChangeLink,
+            ));
+
+            return $this->createTemplate('_status_change_link.tpl')->fetch();
+        }
+
+        return '--';
     }
 }

@@ -66,12 +66,15 @@
     <tab id="Stock" id_parent="" active="1" hide_host_mode="0">
       <class_name>AdminStock</class_name>
     </tab>
-    <tab id="Products" id_parent="Catalog" active="1" hide_host_mode="0">
+    <tab id="Room_Types" id_parent="Catalog" active="1" hide_host_mode="0">
       <class_name>AdminProducts</class_name>
     </tab>
-    <!-- <tab id="Categories" id_parent="Catalog" active="1" hide_host_mode="0">
+    <tab id="Products" id_parent="Catalog" active="1" hide_host_mode="0">
+      <class_name>AdminNormalProducts</class_name>
+    </tab>
+    <tab id="Categories" id_parent="Catalog" active="1" hide_host_mode="0">
       <class_name>AdminCategories</class_name>
-    </tab> -->
+    </tab>
     <!-- <tab id="Monitoring" id_parent="Catalog" active="1" hide_host_mode="0">
       <class_name>AdminTracking</class_name>
     </tab> -->

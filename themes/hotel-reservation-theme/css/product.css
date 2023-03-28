@@ -1103,8 +1103,14 @@ Quick View Styles
   width: 100%;
   text-transform: uppercase;
   padding: 15px;}
-.booking_room_fields .hasDatepicker {
+.booking_room_fields #room_date_range {
+  display: grid;
   cursor: text;}
+  .booking_room_fields #room_date_range span {
+    align-self: center;}
+    .booking_room_fields #room_date_range span i {
+    color: #777;}
+
 .booking_room_fields .htl_location_block p {
   line-height: 25px;
   font-size: 18px;
@@ -1262,27 +1268,7 @@ Quick View Styles
       text-transform: uppercase;
       text-align: center;}
 
-
-#quantity_wanted_p .rm_qty_cont {
-  width: 100%;
-  margin-right: 15px;}
-#quantity_wanted_p .qty_sec_cont {
-  width: 100%;
-  margin: 0px;
-  float: left;}
-#quantity_wanted_p .qty_input_cont {
-  float: left;
-  width: 126px;}
-#quantity_wanted_p .qty_input_cont input {
-  border-radius: 4px 0px 0px 4px;}
-#quantity_wanted_p .qty_direction {
-    width: 22px;
-    float: left;}
-#quantity_wanted_p .qty_direction a {
-  padding: 2px 5px;
-  border-left: 0px;
-  border-color: #999;}
-.product_wrapper .circle-small {
+      .product_wrapper .circle-small {
   opacity: 0.5;
   font-size: 16px;
   font-weight: 700;
@@ -1290,18 +1276,15 @@ Quick View Styles
   background: #FFFFFF;}
 .room_info_content span.col-sm-4 {
   margin-bottom: 5px;}
-.product_wrapper .input-date {
-  background: transparent url(../img/icon/icon-calendar.svg) no-repeat scroll 92% 50%!important;
-  background-size: 16px!important;}
-.product_wrapper input {
+
+.product_wrapper .form-control {
   background-color: transparent!important;
   border: 1px solid #999999;
   box-shadow: 0 1px 0 0 rgba(0,0,0,0.13);
   height: 48px;
   border-radius: 4px;
   color: #333;
-  font-size: 14px;
-  padding: 0px 15px;}
+  font-size: 14px;}
 .product_wrapper textarea {
   background-color: transparent!important;
   border: 1px solid #999999;
@@ -1322,6 +1305,7 @@ Quick View Styles
   opacity: 0.5;
   margin-bottom: 10px;
   text-transform: uppercase;}
+
 .nav-tabs > li.active > a, .nav-tabs > li.active > a:hover, .nav-tabs > li.active > a:focus {
   background-color: transparent;
 }
@@ -1330,15 +1314,38 @@ Quick View Styles
     float: left!important;}
   .booking_room_fields .form-group {
     width: 100%;}}
-@media (min-width: 320px) and (max-width: 767px) {
-  .product_wrapper .input-date {
-      background-position: 97% 50%!important;}}
 @media (max-width: 450px) {
   .num_avail_rooms_alert {
     float: left!important;}
   .booking_room_fields .form-group {
     width: 100%;}}
 
+/* booking form loading */
+#booking_action_block {
+  position: relative;
+}
+@keyframes blink {
+  33%{background-size:calc(100%/3) 0%  ,calc(100%/3) 100%,calc(100%/3) 100%}
+  50%{background-size:calc(100%/3) 100%,calc(100%/3) 0%  ,calc(100%/3) 100%}
+  66%{background-size:calc(100%/3) 100%,calc(100%/3) 100%,calc(100%/3) 0%  }
+}
+#booking_action_loader {
+  margin: auto;
+  height: 16px;
+  width: 50px;
+  --_circle: no-repeat radial-gradient(circle closest-side,rgb(255, 255, 255) 80%,#0000);
+  background:
+    var(--_circle)  0%   50%,
+    var(--_circle)  50%  50%,
+    var(--_circle)  100% 50%;
+  background-size: calc(100%/3) 100%;
+  animation: blink 1.5s infinite linear;
+  display: none;
+}
+
+#booking_action_loader.active {
+  display: block;
+}
 /* room type extra demands container */
 .room_demands_container_overlay {
   display: none;
@@ -1379,7 +1386,7 @@ Quick View Styles
 .price_desc_block {
   font-size: 18px;
 }
-.price_desc_block .total_rooms_price_block {
+.price_desc_block .total_price_block {
   color: #333;
 }
 .price_desc_block .extra_demands_price_block {
@@ -1389,6 +1396,52 @@ Quick View Styles
   font-size: 24px;
   color: #505050;
 }
+
+/* service popup design */
+.price_desc_block .services-info {
+  cursor: pointer;
+}
+.ui-tooltip.services-tootip {
+  box-shadow: 0 2px 6px 0 rgb(0 0 0 / 20%);
+  background: #FFFFFF;
+  border: unset;
+  color: #333;
+  /* min-width: 300px; */
+  padding: 9px 15px;
+  max-height: 310px;
+  overflow-y: auto;
+}
+.services-info-tooltip-cont {
+  min-width: 240px;
+}
+.extra-service-panel + .extra-service-panel {
+  margin-top: 15px;
+}
+.extra-service-panel .panel_title {
+  font-size: 15px;
+  margin-bottom: 18px;
+  font-weight: 600;}
+  .extra-service-panel .panel_title span {
+    font-weight: 400;}
+.extra-service-panel .table td {
+  font-size: 13px;
+  border-top: unset;
+  padding: 9px 15px;
+}
+.extra-service-panel .services-list > div + div {
+  margin-top: 15px;
+}
+.extra-service-panel .services-list .services-list-row, .extra-service-panel .summary-row {
+  font-size: 13px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+.extra-service-panel .summary-row .service_price {
+  font-weight: 700;
+}
+/* end */
+
 
 /* extra demands Css */
 #rooms_extra_demands {
@@ -1436,6 +1489,144 @@ Quick View Styles
 	display:none;
 	border-top: 1px solid #eee;
 	padding-top: 15px;} */
+
+/* style for normal product listing on product page */
+
+ul.service-product-nav {
+  margin-top: 20px;
+}
+ul.service-product-nav > li {
+  margin-bottom: 15px;
+}
+ul.service-product-nav > li a {
+  text-align: center;
+}
+ul.service-product-nav > li.active a {
+  background: #379AEF;
+  border-radius: 4px;
+  font-weight: bold;
+  color: #FFFFFF;
+  /* padding: 8px 12px 8px 12px; */
+  /* width: max-content; */
+}
+ul.service-product-nav > li:hover {
+  border-bottom: 2px solid #fff;
+}
+@media (max-width: 991px){
+  ul.nav-stacked.service-product-nav > li {
+    float:left;
+    margin-bottom: 25px;
+  }
+}
+.service-product-element {
+  color: #333333;
+  position: relative;
+}
+.service-product-block {
+    margin-bottom: 10px;
+}
+.service_product_action_block {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    flex-wrap: wrap;
+}
+.service-product-element .service-product-img {
+  border-radius: 4px;
+}
+.service-product-element .service-product-name {
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 22px;
+}
+.service-product-element .service-product-short-desc {
+  font-size: 14px;
+  line-height: 22px;
+}
+.service-product-element .service-product-price {
+  font-weight: 600;
+  font-size: 22px;
+  line-height: 27.24px;
+}
+.service-product-element .service-product-price .price-label{
+  font-size: 14px;
+}
+
+.service-product-element .service-product-actions {
+  display: flex;
+  justify-content: space-between;
+}
+.service-product-element .service-product-actions > div {
+  flex-grow: 1;
+}
+
+.service-product-element .qty_container > * {
+  float: left;
+}
+.service-product-element .qty_container {
+    margin-right: 10px;
+}
+.service-product-element .service_product_qty {
+  border-radius: 4px 0px 0px 4px;
+  max-width: 70px;
+}
+.service-product-element .qty_controls a {
+  display: block;
+  color: #333;
+  border: 1px solid #999999;
+  border-left: none;
+  padding: 5px;
+  line-height: 11px;
+  font-size: 12px;
+}
+
+.service-product-element .qty_controls a:first-of-type {
+  border-radius: 0 4px 0 0;
+}
+.service-product-element .qty_controls a:last-of-type {
+  border-radius: 0 0 4px 0;
+  box-shadow: 0 1px 0 0 rgb(0 0 0 / 13%);
+}
+.service-product-element .btn-service-product {
+  border-radius: 4px;
+  font-size: 14px;
+  color: #ffffff;
+  font-weight: bold;
+  text-transform: uppercase;
+  padding: 12px 30px;
+  outline: none;
+}
+.service-product-element .btn-service-product.btn-success:hover, .service-product-element .btn-service-product.btn-success:focus, .service-product-element .btn-service-product.btn-success:active, .service-product-element .btn-service-product.btn-success.active {
+  color: #fff;
+  background-color: #1cb62e;
+  border-color: #1cb62e;
+}
+.service-product-element .btn-service-product.btn-success {
+  background-color: #36BA46;
+  border: 1px solid #36BA46;
+}
+#service_products_cont .bx-wrapper .bx-controls-direction a {
+  height: unset;
+  width: unset;
+}
+#service_products_cont .bx-wrapper .bx-prev {
+  left: 0px;
+}
+#service_products_cont .bx-wrapper .bx-prev:before {
+  content: "\f053";
+}
+#service_products_cont .bx-wrapper .bx-next {
+  right: 0px;
+}
+#service_products_cont .bx-wrapper .bx-next:before {
+  content: "\f054";
+}
+#service_products_cont .show_more_btn_container {
+  text-align: center;
+}
+#service_products_cont .get-service-products {
+  border-radius: 4px;
+}
 
 #room_type_map_tab .map-wrap {
   min-height: 500px;
@@ -1501,7 +1692,8 @@ Quick View Styles
   height: 200px;
   border-radius: 4px;
   object-fit: cover;
-  transition: all 0.2s; }
+  transition: all 0.2s;
+  box-shadow: #00000029 0px 0px 2px 1px; }
 
 #room_info_hotel_images .image-item img:hover {
   transform: scale(1.05); }

@@ -119,6 +119,7 @@ class StatsProduct extends ModuleGraph
             $sql .= ' INNER JOIN `'._DB_PREFIX_.'htl_room_type` hrt ON (hrt.`id_product` = p.`id_product` AND hrt.`id_hotel` = '.(int)Tools::getValue('id_hotel').')';
         }
         $sql .= ' LEFT JOIN `'._DB_PREFIX_.'product_lang` pl ON (p.`id_product` = pl.`id_product` AND pl.`id_lang`='.(int)$this->context->language->id.')
+        WHERE p.`booking_product` = 1
         ORDER BY pl.`name`';
 
         return Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);

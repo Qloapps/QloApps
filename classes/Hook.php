@@ -638,7 +638,7 @@ class HookCore extends ObjectModel
         $order = new Order((int)$id_order);
         $new_os = new OrderState((int)$new_order_status_id, $order->id_lang);
 
-        $return = ((int)$new_os->id == Configuration::get('PS_OS_PAYMENT')) ? Hook::exec('paymentConfirm', array('id_order' => (int)($order->id))) : true;
+        $return = ((int)$new_os->id == Configuration::get('PS_OS_PAYMENT_ACCEPTED')) ? Hook::exec('paymentConfirm', array('id_order' => (int)($order->id))) : true;
         $return = Hook::exec('updateOrderStatus', array('newOrderStatus' => $new_os, 'id_order' => (int)($order->id))) && $return;
         return $return;
     }

@@ -1,16 +1,16 @@
 <?xml version="1.0"?>
 <entity_order_state>
-  <order_state id="Awaiting_cheque_payment">
-    <name>Ожидание платежа по квитанции</name>
-    <template>cheque</template>
+  <order_state id="Awaiting_payment">
+    <name>Ожидание оплаты</name>
+    <template>awaiting_payment</template>
   </order_state>
   <order_state id="Payment_accepted">
     <name>Платеж принят</name>
-    <template>payment</template>
+    <template>payment_accepted</template>
   </order_state>
-  <order_state id="Preparation_in_progress">
+  <order_state id="Processing_in_progress">
     <name>В процессе подготовки</name>
-    <template>preparation</template>
+    <template>processing</template>
   </order_state>
   <order_state id="Canceled">
     <name>Отклонено</name>
@@ -24,36 +24,24 @@
     <name>Ошибка оплаты</name>
     <template>payment_error</template>
   </order_state>
-  <order_state id="On_backorder_paid">
-    <name>Данного товара нет на складе</name>
-    <template>outofstock</template>
-  </order_state>
-  <order_state id="On_backorder_unpaid">
-    <name>Данного товара нет на складе</name>
-    <template>outofstock</template>
-  </order_state>
-  <order_state id="Awaiting_bank_wire_payment">
-    <name>В ожидании оплаты банком</name>
-    <template>bankwire</template>
-  </order_state>
-  <order_state id="Awaiting_PayPal_payment">
-    <name>В ожидании оплаты PayPal</name>
-    <template/>
-  </order_state>
   <order_state id="Payment_remotely_accepted">
     <name>Платеж принят</name>
-    <template>payment</template>
+    <template>payment_accepted</template>
   </order_state>
   <order_state id="Awaiting_remote_payment">
     <name>Awaiting remote payment</name>
     <template/>
   </order_state>
-  <order_state id="Awaiting_partial_payment">
-    <name>Awaiting partial payment</name>
+  <order_state id="Overbooking_paid">
+    <name>Overbooking (paid)</name>
+    <template/>
+  </order_state>
+  <order_state id="Overbooking_unpaid">
+    <name>Overbooking (not paid)</name>
     <template/>
   </order_state>
   <order_state id="Partial_payment_accepted">
     <name>Partial payment accepted</name>
-    <template/>
+    <template>payment_accepted</template>
   </order_state>
 </entity_order_state>

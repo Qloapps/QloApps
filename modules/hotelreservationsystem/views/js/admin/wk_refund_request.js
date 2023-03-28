@@ -42,11 +42,41 @@ $(document).ready(function() {
         }
     });
 
-    $('#refundTransactionAmount, #generateDiscount').click(function() {
+    $('#generateCreditSlip, #generateDiscount').click(function() {
         if ($(this).is(':checked')) {
-            $('#refundTransactionAmount, #generateDiscount').prop('checked', false);
+            $('#generateCreditSlip, #generateDiscount').prop('checked', false);
 			$(this).prop('checked', true);
 		}
-        $('#refundTransactionAmount').change();
+        $('#generateCreditSlip').change();
 	});
+
+    $(document).on('keyup', '#order_return_form .table input[name^="refund_amounts"]', function() {
+        let refundAmountInputs = $('#order_return_form .table input[name^="refund_amounts"]');
+
+        let disableRefundOptions = false;
+        $(refundAmountInputs).each(function(index, element) {
+            let val = parseFloat($(element).val().trim());
+            if (isNaN(val)) { // if at least one amount input is empty
+                disableRefundOptions = true;
+                return;
+            }
+        });
+
+        if (!disableRefundOptions) {
+            let hasAllZero = true;
+            $(refundAmountInputs).each(function(index, element) {
+                let val = parseFloat($(element).val().trim());
+                if (val != 0) {
+                    hasAllZero = false;
+                    return;
+                }
+            });
+
+            if (hasAllZero) { // if all amount inputs are 0
+                disableRefundOptions = true;
+            }
+        }
+
+        $('#generateCreditSlip, #refundTransactionAmount, #generateDiscount').attr('disabled', disableRefundOptions);
+    });
 });

@@ -20,7 +20,8 @@
   <tab id="Administration" name="Administrare"/>
   <tab id="Stats" name="Statistici"/>
   <tab id="Stock" name="Stocuri"/>
-  <tab id="Products" name="Produse"/>
+  <tab id="Products" name="Gestionați produsele de service"/>
+  <tab id="Room_Types" name="Gestionați tipurile de camere"/>
   <tab id="Categories" name="Categorii"/>
   <tab id="Monitoring" name="Monitorizare"/>
   <tab id="Attributes_and_Values" name="Atribute de produs"/>

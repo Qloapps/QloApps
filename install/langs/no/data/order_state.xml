@@ -1,59 +1,47 @@
 <?xml version="1.0"?>
 <entity_order_state>
-  <order_state id="Awaiting_cheque_payment">
-    <name>Awaiting cheque payment</name>
-    <template>cheque</template>
+  <order_state id="Awaiting_payment">
+    <name>Awaiting payment</name>
+    <template>awaiting_payment</template>
   </order_state>
   <order_state id="Payment_accepted">
     <name>Payment accepted</name>
-    <template>payment</template>
+    <template>payment_accepted</template>
   </order_state>
-  <order_state id="Preparation_in_progress">
-    <name>Preparation in progress</name>
-    <template>preparation</template>
+  <order_state id="Processing_in_progress">
+    <name>Processing in progress</name>
+    <template>processing</template>
   </order_state>
   <order_state id="Canceled">
     <name>Canceled</name>
     <template>order_canceled</template>
   </order_state>
   <order_state id="Refund">
-    <name>Refund</name>
+    <name>Refunded</name>
     <template>refund</template>
   </order_state>
   <order_state id="Payment_error">
     <name>Payment error</name>
     <template>payment_error</template>
   </order_state>
-  <order_state id="On_backorder_paid">
-    <name>On backorder (paid)</name>
-    <template>outofstock</template>
-  </order_state>
-  <order_state id="On_backorder_unpaid">
-    <name>On backorder (not paid)</name>
-    <template>outofstock</template>
-  </order_state>
-  <order_state id="Awaiting_bank_wire_payment">
-    <name>Awaiting bank wire payment</name>
-    <template>bankwire</template>
-  </order_state>
-  <order_state id="Awaiting_PayPal_payment">
-    <name>Awaiting PayPal payment</name>
-    <template/>
-  </order_state>
   <order_state id="Payment_remotely_accepted">
-    <name>Payment remotely accepted</name>
-    <template>payment</template>
+    <name>Remote payment accepted</name>
+    <template>payment_accepted</template>
   </order_state>
   <order_state id="Awaiting_remote_payment">
     <name>Awaiting remote payment</name>
     <template/>
   </order_state>
-  <order_state id="Awaiting_partial_payment">
-    <name>Awaiting partial payment</name>
+  <order_state id="Overbooking_paid">
+    <name>Overbooking (paid)</name>
+    <template/>
+  </order_state>
+  <order_state id="Overbooking_unpaid">
+    <name>Overbooking (not paid)</name>
     <template/>
   </order_state>
   <order_state id="Partial_payment_accepted">
     <name>Partial payment accepted</name>
-    <template/>
+    <template>payment_accepted</template>
   </order_state>
 </entity_order_state>

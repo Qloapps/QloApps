@@ -126,7 +126,7 @@ class TranslateCore
      * @param string $source
      * @return string
      */
-    public static function getModuleTranslation($module, $string, $source, $sprintf = null, $js = false)
+    public static function getModuleTranslation($module, $string, $source, $sprintf = null, $js = false, $language = null)
     {
         global $_MODULES, $_MODULE, $_LANGADM;
 
@@ -135,11 +135,18 @@ class TranslateCore
         // $translations_merged is a cache of wether a specific module's translations have already been added to $_MODULES
         static $translations_merged = array();
 
+        // inialize $force_refresh as false and use only when $lang is provided to load new language translations
+        $force_refresh = false;
+
         $name = $module instanceof Module ? $module->name : $module;
 
-        $language = Context::getContext()->language;
+        if (!($language !== null && Validate::isLoadedObject($language))) {
+            $language = Context::getContext()->language;
+        } else {
+            $force_refresh = true;
+        }
 
-        if (!isset($translations_merged[$name]) && isset(Context::getContext()->language)) {
+        if ((!isset($translations_merged[$name]) && isset(Context::getContext()->language)) || $force_refresh) {
             $files_by_priority = array(
                 // Translations in theme
                 _PS_THEME_DIR_.'modules/'.$name.'/translations/'.$language->iso_code.'.php',
@@ -149,10 +156,14 @@ class TranslateCore
                 // PrestaShop 1.4 translations
                 _PS_MODULE_DIR_.$name.'/'.$language->iso_code.'.php'
             );
+            // if force_refresh is set reverse the list because array_merge will overrite the previous file with new file
+            if ($force_refresh) {
+                $files_by_priority = array_reverse($files_by_priority);
+            }
             foreach ($files_by_priority as $file) {
                 if (file_exists($file)) {
                     include_once($file);
-                    $_MODULES = !empty($_MODULES) ? $_MODULES + $_MODULE : $_MODULE; //we use "+" instead of array_merge() because array merge erase existing values.
+                    $_MODULES = !empty($_MODULES) ? ($force_refresh ? array_merge($_MODULES, $_MODULE) : $_MODULES + $_MODULE) : $_MODULE; //we use "+" instead of array_merge() when force_refresh is false because array merge erase existing values.
                     $translations_merged[$name] = true;
                 }
             }
@@ -220,11 +231,15 @@ class TranslateCore
      * @param string $string
      * @return string
      */
-    public static function getPdfTranslation($string, $sprintf = null)
+    public static function getPdfTranslation($string, $sprintf = null, $language = null)
     {
         global $_LANGPDF;
 
-        $iso = Context::getContext()->language->iso_code;
+        if (!($language !== null && Validate::isLoadedObject($language))) {
+            $iso = Context::getContext()->language->iso_code;
+        } else {
+            $iso = $language->iso_code;
+        }
 
         if (!Validate::isLangIsoCode($iso)) {
             Tools::displayError(sprintf('Invalid iso lang (%s)', Tools::safeOutput($iso)));

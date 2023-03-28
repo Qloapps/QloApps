@@ -242,7 +242,7 @@ class AdminModulesCatalogControllerCore extends AdminController
 
     public function getRecommendationContent()
     {
-        if (!$this->isFresh(self::CATALOG_RECOMMENDATION_CONTENT, _TIME_1_DAY_)) {
+        if (!Tools::isFresh(self::CATALOG_RECOMMENDATION_CONTENT, _TIME_1_DAY_)) {
             @file_put_contents(_PS_ROOT_DIR_.self::CATALOG_RECOMMENDATION_CONTENT, Tools::addonsRequest('catalog-recommendation'));
         }
         if (file_exists(_PS_ROOT_DIR_.self::CATALOG_RECOMMENDATION_CONTENT)) {
@@ -290,16 +290,6 @@ class AdminModulesCatalogControllerCore extends AdminController
     }
 
 
-    public function ajaxProcessGetRecommendationContent()
-    {
-        $response = array('success' => false);
-        if ($content = $this->getRecommendationContent()) {
-            $response['success'] = true;
-            $response['content'] = $content;
-        }
-        $this->ajaxDie(json_encode($response));
-    }
-
     public function ajaxProcessSetSorting()
     {
         $this->setSorting(Tools::getValue('module_sorting'), Tools::getValue('theme_sorting'));
@@ -311,11 +301,11 @@ class AdminModulesCatalogControllerCore extends AdminController
 
     protected function initSuggestedModulesList()
     {
-        if (!$this->isFresh(Module::CACHE_FILE_DEFAULT_COUNTRY_MODULES_LIST, _TIME_1_DAY_)) {
+        if (!Tools::isFresh(Module::CACHE_FILE_DEFAULT_COUNTRY_MODULES_LIST, _TIME_1_DAY_)) {
             file_put_contents(_PS_ROOT_DIR_.Module::CACHE_FILE_DEFAULT_COUNTRY_MODULES_LIST, Tools::addonsRequest('native'));
         }
 
-        if (!$this->isFresh(Module::CACHE_FILE_MUST_HAVE_MODULES_LIST, _TIME_1_DAY_)) {
+        if (!Tools::isFresh(Module::CACHE_FILE_MUST_HAVE_MODULES_LIST, _TIME_1_DAY_)) {
             @file_put_contents(_PS_ROOT_DIR_.Module::CACHE_FILE_MUST_HAVE_MODULES_LIST, Tools::addonsRequest('must-have'));
         }
     }

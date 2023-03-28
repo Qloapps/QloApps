@@ -40,15 +40,26 @@ function smartyTranslate($params, $smarty)
     $addslashes = (isset($params['slashes']) || isset($params['js']));
     $sprintf = isset($params['sprintf']) ? $params['sprintf'] : null;
 
+    if (!isset($params['lang'])) {
+        $params['lang'] = null;
+    } else {
+        if (!is_object($params['lang'])) {
+            $params['lang'] = new Language((int)$params['lang']);
+        }
+        if (!Validate::isLoadedObject($params['lang'])) {
+            $params['lang'] = null;
+        }
+    }
+
     if ($pdf) {
-        return Translate::smartyPostProcessTranslation(Translate::getPdfTranslation($params['s'], $sprintf), $params);
+        return Translate::smartyPostProcessTranslation(Translate::getPdfTranslation($params['s'], $sprintf, $params['lang']), $params);
     }
 
     $filename = ((!isset($smarty->compiler_object) || !is_object($smarty->compiler_object->template)) ? $smarty->template_resource : $smarty->compiler_object->template->getTemplateFilepath());
 
     // If the template is part of a module
     if (!empty($params['mod'])) {
-        return Translate::smartyPostProcessTranslation(Translate::getModuleTranslation($params['mod'], $params['s'], basename($filename, '.tpl'), $sprintf, isset($params['js'])), $params);
+        return Translate::smartyPostProcessTranslation(Translate::getModuleTranslation($params['mod'], $params['s'], basename($filename, '.tpl'), $sprintf, isset($params['js']), $params['lang']), $params);
     }
 
     // If the tpl is at the root of the template folder

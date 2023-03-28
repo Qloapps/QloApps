@@ -160,7 +160,7 @@
 					{if $refund_allowed && !$hasCompletelyRefunded}
 						<a id="desc-order-standard_refund" class="btn btn-default" href="#refundForm">
 							<i class="icon-exchange"></i>
-							{if $order->hasBeenPaid()}
+							{if $order->getTotalPaid()|floatval}
 								{l s='Initiate refund'}
 							{else}
 								{l s='Cancel bookings'}
@@ -275,8 +275,8 @@
 										<tr>
 											<th>{l s='Room No.'}</th>
 											<th>{l s='Hotel Name'}</th>
-											<th>{l s='Date From'}</th>
-											<th>{l s='Date To'}</th>
+											<th>{l s='Duration'}</th>
+											<th>{l s='Documents'}</th>
 											<th>{l s='Order Status'}</th>
 										</tr>
 										{if isset($htl_booking_order_data) && $htl_booking_order_data}
@@ -291,10 +291,13 @@
 														</a>
 													</td>
 													<td>
-														{dateFormat date=$data['date_from']}
+														{dateFormat date=$data['date_from']} - {dateFormat date=$data['date_to']}
 													</td>
 													<td>
-														{dateFormat date=$data['date_to']}
+														<a class="btn btn-default" onclick="BookingDocumentsModal.init({$data.id|intval}, this); return false;">
+															<i class="icon icon-file-text"></i>
+															{l s='Documents'} <span class="badge badge-info count-documents">{$data.num_checkin_documents}</span>
+														</a>
 													</td>
 													<td>
 														<form action="" method="post" class="form-horizontal row room_status_info_form">
@@ -470,7 +473,7 @@
 				</script>
 			</div>
 			<!-- Payments block -->
-			<div id="formAddPaymentPanel" class="panel">
+			<div id="form_add_payment_panel" class="panel">
 				<div class="panel-heading">
 					<i class="icon-money"></i>
 					{l s="Payment"} <span class="badge">{$order->getOrderPayments()|@count}</span>
@@ -495,13 +498,14 @@
 						{/foreach} *}
 					</p>
 				{/if}
-				<form id="formAddPayment"  method="post" action="{$current_index}&amp;vieworder&amp;id_order={$order->id}&amp;token={$smarty.get.token|escape:'html':'UTF-8'}">
+				<div class="form-group">
 					<div class="table-responsive">
 						<table class="table">
 							<thead>
 								<tr>
 									<th><span class="title_box ">{l s='Date'}</span></th>
 									<th><span class="title_box ">{l s='Payment method'}</span></th>
+									<th><span class="title_box ">{l s='Payment source'}</span></th>
 									<th><span class="title_box ">{l s='Transaction ID'}</span></th>
 									<th><span class="title_box ">{l s='Amount'}</span></th>
 									<th><span class="title_box ">{l s='Invoice'}</span></th>
@@ -513,14 +517,10 @@
 								<tr>
 									<td>{dateFormat date=$payment['date_add'] full=true}</td>
 									<td>{$payment['payment_method']|escape:'html':'UTF-8'}</td>
+									<td>{$payment_types[$payment['payment_type']]['name']|escape:'html':'UTF-8'}</td>
 									<td>{$payment['transaction_id']|escape:'html':'UTF-8'}</td>
 									<td>{displayPrice price=$payment['real_paid_amount'] currency=$payment['id_currency']}</td>
-									<td>
-									{if $payment['invoice_number']}
-										{$payment['invoice_number']}
-									{else}
-									{/if}
-									</td>
+									<td>{if isset($payment['invoice_number'])}{$payment['invoice_number']}{else}--{/if}</td>
 									<td class="actions">
 										<button class="btn btn-default open_payment_information">
 											<i class="icon-search"></i>
@@ -569,56 +569,90 @@
 									<td class="list-empty hidden-print" colspan="6">
 										<div class="list-empty-msg">
 											<i class="icon-warning-sign list-empty-icon"></i>
-											{l s='No payment methods are available'}
+											{l s='No payment records'}
 										</div>
 									</td>
 								</tr>
 								{/foreach}
-								<tr class="current-edit hidden-print">
-									<td>
-										<div class="input-group fixed-width-xl">
-											<input type="text" name="payment_date" class="datepicker" value="{date('Y-m-d')}" />
-											<div class="input-group-addon">
-												<i class="icon-calendar-o"></i>
-											</div>
-										</div>
-									</td>
-									<td>
-										<input name="payment_method" list="payment_method" class="payment_method">
-										<datalist id="payment_method">
-										{foreach from=$payment_methods item=payment_method}
-											<option value="{$payment_method}">
-										{/foreach}
-										</datalist>
-									</td>
-									<td>
-										<input type="text" name="payment_transaction_id" value="" class="form-control fixed-width-sm"/>
-									</td>
-									<td>
-										<input type="text" name="payment_amount" value="" class="form-control fixed-width-sm pull-left" />
-										<select name="payment_currency" class="payment_currency form-control fixed-width-xs pull-left">
-											{foreach from=$currencies item=current_currency}
-												<option value="{$current_currency['id_currency']}"{if $current_currency['id_currency'] == $currency->id} selected="selected"{/if}>{$current_currency['sign']}</option>
-											{/foreach}
-										</select>
-									</td>
-									<td>
-										{if count($invoices_collection) > 0}
-											<select name="payment_invoice" id="payment_invoice">
-											{foreach from=$invoices_collection item=invoice}
-												<option value="{$invoice->id}" selected="selected">{$invoice->getInvoiceNumberFormatted($current_id_lang, $order->id_shop)}</option>
-											{/foreach}
-											</select>
-										{/if}
-									</td>
-									<td class="actions">
-										<button class="btn btn-primary" type="submit" name="submitAddPayment">
-											{l s='Add'}
-										</button>
-									</td>
-								</tr>
+
 							</tbody>
 						</table>
+					</div>
+				</div>
+				<div class="form-group">
+					<button class="btn btn-primary add_new_payment" id="add_new_payment">
+						{l s='Add new payment'}
+					</button>
+				</div>
+				<form id="form_add_payment" class="well" method="post" action="{$current_index}&amp;vieworder&amp;id_order={$order->id}&amp;token={$smarty.get.token|escape:'html':'UTF-8'}" style="display:none">
+					<div class="form-horizontal">
+						<div class="form-group">
+							<label class="control-label col-sm-2">{l s='Date'}</label>
+							<div class="col-sm-10">
+								<div class="input-group fixed-width-xl">
+									<input type="text" name="payment_date" class="datepicker" value="{date('Y-m-d')}" />
+									<div class="input-group-addon">
+										<i class="icon-calendar-o"></i>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="control-label col-sm-2">{l s='Payment method'}</label>
+							<div class="col-sm-10">
+								<input name="payment_method" list="payment_method" class="form-control payment_method fixed-width-xl">
+								<datalist id="payment_method">
+								{foreach from=$payment_methods item=payment_method}
+									<option value="{$payment_method}">
+								{/foreach}
+								</datalist>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="control-label col-sm-2">{l s='Payment source'}</label>
+							<div class="col-sm-10">
+								<select name="payment_type" class="payment_type form-control fixed-width-xl">
+									{foreach from=$payment_types item=payment_type}
+										<option value="{$payment_type['value']}">{$payment_type['name']}</option>
+									{/foreach}
+								</select>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="control-label col-sm-2">{l s='Transaction ID'}</label>
+							<div class="col-sm-10">
+								<input type="text" name="payment_transaction_id" value="" class="form-control fixed-width-xl"/>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="control-label col-sm-2">{l s='Amount'}</label>
+							<div class="col-sm-10">
+								<input type="text" name="payment_amount" value="" class="form-control fixed-width-xl pull-left" />
+								<select name="payment_currency" class="payment_currency form-control fixed-width-xs pull-left">
+									{foreach from=$currencies item=current_currency}
+										<option value="{$current_currency['id_currency']}"{if $current_currency['id_currency'] == $currency->id} selected="selected"{/if}>{$current_currency['sign']}</option>
+									{/foreach}
+								</select>
+							</div>
+						</div>
+						<div class="form-group">
+							{if count($invoices_collection) > 0}
+								<label class="control-label col-sm-2">{l s='Invoice'}</label>
+								<div class="col-sm-10">
+									<select name="payment_invoice" id="payment_invoice">
+									{foreach from=$invoices_collection item=invoice}
+										<option value="{$invoice->id}" selected="selected">{$invoice->getInvoiceNumberFormatted($current_id_lang, $order->id_shop)}</option>
+									{/foreach}
+									</select>
+								</div>
+							{/if}
+						</div>
+						<button class="btn btn-primary pull-right" type="submit" name="submitAddPayment">
+							{l s='Add payment'}
+						</button>
+						<button class="btn btn-default" id="cancle_add_payment">
+							{l s='Cancel'}
+						</button>
 					</div>
 				</form>
 				{if (!$order->valid && sizeof($currencies) > 1)}
@@ -1022,6 +1056,96 @@
 					</form>
 				</div>
 			</div>
+			{if is_array($returns) && count($returns)}
+				<div class="panel">
+					<div class="panel-heading">
+						<i class="icon-undo"></i> {l s='Refunds'}
+					</div>
+					<table class="table table-striped">
+						<thead>
+							<tr>
+								<th class="text-left">{l s='Refund ID'}</th>
+								<th class="text-center">{l s='Total Rooms'}</th>
+								<th class="text-left">{l s='Status'}</th>
+								<th class="text-center">{l s='Requested Date'}</th>
+							</tr>
+						</thead>
+						<tbody>
+							{foreach from=$returns item=return_info}
+							<tr>
+								<td class="text-left">
+									<a href="{$link->getAdminLink('AdminOrderRefundRequests')}&vieworder_return&id_order_return={$return_info.id_order_return}" target="_blank">#{$return_info.id_order_return}</a>
+								</td>
+								<td class="text-center">
+									{$return_info.total_rooms|escape:'html':'UTF-8'}
+								</td>
+								<td class="text-left">
+									{capture name=refund_status}
+										{if isset($return_info.payment_mode) && $return_info.payment_mode != ''}{l s='Payment Mode: '}{$return_info.payment_mode}<br/>{/if}
+										{if isset($return_info.id_transaction) && $return_info.id_transaction != ''}{l s='Transaction ID: '}{$return_info.id_transaction}<br/>{/if}
+										{if isset($return_info.id_return_type) && isset($return_info.return_type) && $return_info.id_return_type && $return_info.return_type}
+											{if $return_info.return_type == OrderReturn::RETURN_TYPE_CART_RULE}
+												{l s='Voucher ID: '}
+												<a href="{$link->getAdminLink('AdminCartRules')}&updatecart_rule&id_cart_rule={$return_info.id_return_type}" target="_blank">
+													#{$return_info.id_return_type}
+												</a>
+											{elseif $return_info.return_type == OrderReturn::RETURN_TYPE_ORDER_SLIP}
+												{l s='Credit Slip ID: '}
+												#{$return_info.id_return_type}
+												<a href="{$link->getAdminLink('AdminPdf')}&submitAction=generateOrderSlipPDF&id_order_slip={$return_info.id_return_type}" title="#{Configuration::get('PS_CREDIT_SLIP_PREFIX', $current_id_lang)}{$return_info.id_return_type|string_format:'%06d'}">
+													{l s='Download' mod='hotelreservationsystem'}
+												</a>
+											{/if}
+											<br/>
+										{/if}
+										{if isset($return_info.id_cart_rule) && $return_info.id_cart_rule}
+											{l s='Voucher ID: '}
+											<a href="{$link->getAdminLink('AdminCartRules')}&updatecart_rule&id_cart_rule={$return_info.id_cart_rule}" target="_blank">
+												#{$return_info.id_cart_rule}
+											</a>
+											<br/>
+										{/if}
+									{/capture}
+
+									{if $smarty.capture.refund_status|trim != ''}
+										{$smarty.capture.refund_status}
+									{else}
+										{$return_info.state_name}
+									{/if}
+								</td>
+								<td class="text-center">
+									{$return_info.date_add}
+								</td>
+							</tr>
+							{/foreach}
+						</tbody>
+					</table>
+				</div>
+			{/if}
+			<div class="panel">
+				<div class="panel-heading">
+					<i class="icon-list"></i> {l s='Cancellation Policies'}
+				</div>
+				{if is_array($applicable_refund_policies) && count($applicable_refund_policies)}
+					<ul>
+						{foreach from=$applicable_refund_policies item=$applicable_refund_policy}
+							<li>
+								<p>
+									<a href="{$link->getAdminLink('AdminOrderRefundRules')|escape:'html':'UTF-8'}&id_refund_rule={$applicable_refund_policy.id_refund_rule}&updatehtl_order_refund_rules" target="_blank">
+										{$applicable_refund_policy.name|escape:'html':'UTF-8'}
+										<i class="icon-external-link"></i>
+									</a>
+								</p>
+							</li>
+						{/foreach}
+					</ul>
+				{else}
+					<p>
+						<i class="icon-warning-sign list-empty-icon"></i>
+						{l s='No cancellation policies applicable.'}
+					</p>
+				{/if}
+			</div>
 			{hook h="displayAdminOrderRight" id_order=$order->id}
 		</div>
 	</div>
@@ -1034,55 +1158,17 @@
 					<input type="hidden" value="{$order->getWarehouseList()|implode}" id="warehouse_list" />
 				</div>
 
-				<div class="panel">
+				<div class="panel" id="refundForm">
 					<div class="panel-heading">
 						<i class="icon-shopping-cart"></i>
-						{l s='Rooms In This Order'} <span class="badge">{$order_detail_data|@count}</span>
+						{l s='Order Detail'} <span class="badge">{$order_detail_data|@count}</span>
 						{* by webkul products changes as rooms *}
 					</div>
 					{* by webkul this code is added for showing rooms information on the order detail page *}
-					<div class="row">
-						<div class="col-lg-12">
-							<table class="table" id="customer_cart_details">
-								<thead>
-									<tr>
-										{if $refund_allowed}
-											<th class="standard_refund_fields" style="display:none"></th>
-										{/if}
-										<th class="text-center"><span class="title_box">{l s='Room No.'}</span></th>
-										<th class="text-center"><span class="title_box">{l s='Room Image'}</th>
-										<th class="text-center"><span class="title_box">{l s='Room Type'}</span></th>
-										<th class="text-center"><span class="title_box">{l s='Hotel Name'}</span></th>
-										<th class="text-center"><span class="title_box">{l s='Duration'}</span></th>
-										<th class="text-center"><span class="title_box">{l s='Unit Price (Tax excl.)'}</span></th>
-										<th class="text-center"><span class="title_box">{l s='Total Price (Tax incl.)'}</span></th>
-										{if isset($refundReqBookings) && $refundReqBookings}
-											<th class="text-center"><span class="title_box">{l s='Refund State'}</span></th>
-											<th class="text-center"><span class="title_box">{l s='Refunded amount'}</span></th>
-										{/if}
-										<th class="text-center fixed-width-xxl"><span class="title_box">{l s='Reallocate Room'}</span></th>
-										{if ($can_edit && !$order->hasBeenDelivered())}
-										<th class="text-center"><span class="title_box">{l s='Edit Order'}</th>
-										{/if}
-									</tr>
-								</thead>
-								<tbody>
-								{if $order_detail_data}
-									{foreach from=$order_detail_data item=data}
-										{* Include product line partial *}
-										{include file='controllers/orders/_product_line.tpl'}
-									{/foreach}
-								{else}
-									<tr>
-										<td>{l s='No Data Found.'}</td>
-									</tr>
-								{/if}
-								{* Include product line partial *}
-								{include file='controllers/orders/_new_product.tpl'}
-								</tbody>
-							</table>
-						</div>
-					</div>
+					{include file='controllers/orders/_rooms_informaion_table.tpl'}
+					<br>
+					{include file='controllers/orders/_service_products_table.tpl'}
+
 
 					{capture "TaxMethod"}
 						{if ($order->getTaxCalculationMethod() == $smarty.const.PS_TAX_EXC)}
@@ -1097,12 +1183,16 @@
 						<input type="hidden" name="TaxMethod" value="1">
 					{/if}
 					{if $can_edit}
-						<div class="row-margin-bottom row-margin-top order_action standard_refund_fields"  style="display: none;">
+						<div class="row-margin-bottom row-margin-top standard_refund_fields"  style="display: none;">
 							<textarea class="cancellation_reason" name="cancellation_reason" placeholder="{l s='Enter reason to cancel bookings'}"></textarea>
 						</div>
 						<div class="row-margin-bottom row-margin-top order_action">
 							{if !$order->hasBeenDelivered()}
-								<button type="button" id="add_product" class="btn btn-default">
+								{* <button type="button" id="add_product" class="btn btn-default">
+									<i class="icon-plus-sign"></i>
+									{l s='Add Product In Order'}
+								</button> *}
+								<button type="button" id="add_room" class="btn btn-default">
 									<i class="icon-plus-sign"></i>
 									{l s='Add Rooms In Order'}
 								</button>
@@ -1113,9 +1203,14 @@
 							</button>
 
 							{if $refund_allowed && !$hasCompletelyRefunded}
-								<button style="display: none;" type="submit" name="initiateRefund" class="btn btn-success standard_refund_fields pull-right" id="initiateRefund">
-									{if $order->hasBeenPaid()}<i class="icon-undo"></i> {l s='Initiate Refund'}{else}{l s='Cancel bookings'}{/if}
-								</button>
+								<div class="pull-right">
+									<button style="display: none;" type="button" class="btn btn-default standard_refund_fields" id="cancelRefund">
+										{l s='Cancel'}
+									</button>
+									<button style="display: none;" type="submit" name="initiateRefund" class="btn btn-success standard_refund_fields" id="initiateRefund">
+										{if $order->hasBeenPaid()}<i class="icon-undo"></i> {l s='Initiate Refund'}{else}{l s='Submit'}{/if}
+									</button>
+								</div>
 							{/if}
 						</div>
 					{/if}
@@ -1194,38 +1289,59 @@
 											{assign var=order_wrapping_price value=$order->total_wrapping_tax_incl}
 											{assign var=order_shipping_price value=$order->total_shipping_tax_incl}
 										{/if}
-										<tr id="total_products">
-											<td class="text-right"><strong>{l s='Total Rooms Cost (tax excl.)'}</strong></td>
-											<td class="amount text-right nowrap">
-												<strong>{displayPrice price=$totalRoomsCostTE currency=$currency->id}</strong>
-											</td>
-											<td class="partial_refund_fields current-edit" style="display:none;"></td>
-										</tr>
-										{if isset($totalDemandsPriceTE) && $totalDemandsPriceTE > 0}
+
+										{assign var=room_price_tax_excl value=$order->getTotalProductsWithoutTaxes(false, true)}
+										{assign var=room_price_tax_incl value=$order->getTotalProductsWithTaxes(false, true)}
+										{assign var=service_products_price_tax_excl value=$order->getTotalProductsWithoutTaxes(false, false, Product::SERVICE_PRODUCT_WITHOUT_ROOMTYPE)}
+										{assign var=service_products_price_tax_incl value=$order->getTotalProductsWithTaxes(false, false, Product::SERVICE_PRODUCT_WITHOUT_ROOMTYPE)}
+										{assign var=additional_service_price_tax_excl value=($order->getTotalProductsWithoutTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE) + $totalDemandsPriceTE)}
+										{assign var=additional_service_price_tax_incl value=($order->getTotalProductsWithTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE) + $totalDemandsPriceTI)}
+										{if $room_price_tax_excl}
 											<tr id="total_products">
-												<td class="text-right"><strong>{l s='Additional Facilities Cost (tax excl.)'}</strong></td>
+												<td class="text-right"><strong>{l s='Total Rooms Cost (tax excl.)'}</strong></td>
 												<td class="amount text-right nowrap">
-													<strong>{displayPrice price=$totalDemandsPriceTE currency=$currency->id}</strong>
+													<strong>{displayPrice price=$room_price_tax_excl currency=$currency->id}</strong>
 												</td>
 												<td class="partial_refund_fields current-edit" style="display:none;"></td>
 											</tr>
 										{/if}
-										<tr id="total_tax_order">
-											<td class="text-right"><strong>{l s='Total Rooms Tax'}</strong></td>
-											<td class="text-right nowrap">
-												<strong>{displayPrice price=$total_room_tax currency=$currency->id}</strong>
-											</td>
-											<td class="partial_refund_fields current-edit" style="display:none;"></td>
-										</tr>
-										{if isset($totalDemandsPriceTE) && $totalDemandsPriceTE > 0}
+										{if isset($additional_service_price_tax_excl) && $additional_service_price_tax_excl > 0}
+											<tr id="total_products">
+												<td class="text-right"><strong>{l s='Total Extra services (tax excl.)'}</strong></td>
+												<td class="amount text-right nowrap">
+													<strong>{displayPrice price=($additional_service_price_tax_excl - $totalConvenienceFeeTE) currency=$currency->id}</strong>
+												</td>
+												<td class="partial_refund_fields current-edit" style="display:none;"></td>
+											</tr>
+										{/if}
+										{* {if $room_price_tax_excl}
 											<tr id="total_tax_order">
-												<td class="text-right"><strong>{l s='Additional Facilities Tax'}</strong></td>
+												<td class="text-right"><strong>{l s='Total Rooms Tax'}</strong></td>
 												<td class="text-right nowrap">
-													<strong>{displayPrice price=($totalDemandsPriceTI - $totalDemandsPriceTE) currency=$currency->id}</strong>
+													<strong>{displayPrice price=($room_price_tax_incl - $room_price_tax_excl) currency=$currency->id}</strong>
 												</td>
 												<td class="partial_refund_fields current-edit" style="display:none;"></td>
 											</tr>
 										{/if}
+										{if isset($additional_service_price_tax_excl) && $additional_service_price_tax_excl > 0}
+											<tr id="total_tax_order">
+												<td class="text-right"><strong>{l s='Extra services Tax'}</strong></td>
+												<td class="text-right nowrap">
+													<strong>{displayPrice price=($additional_service_price_tax_incl - $additional_service_price_tax_excl) currency=$currency->id}</strong>
+												</td>
+												<td class="partial_refund_fields current-edit" style="display:none;"></td>
+											</tr>
+										{/if} *}
+										{if $service_products_price_tax_excl}
+											<tr id="total_products">
+												<td class="text-right"><strong>{l s='Total service products cost (tax excl.)'}</strong></td>
+												<td class="amount text-right nowrap">
+													<strong>{displayPrice price=$service_products_price_tax_excl currency=$currency->id}</strong>
+												</td>
+												<td class="partial_refund_fields current-edit" style="display:none;"></td>
+											</tr>
+										{/if}
+
 										<tr id="total_discounts" {if $order->total_discounts_tax_incl == 0}style="display: none;"{/if}>
 											<td class="text-right">{l s='Discounts'}</td>
 											<td class="amount text-right nowrap">
@@ -1240,13 +1356,22 @@
 											</td>
 											<td class="partial_refund_fields current-edit" style="display:none;"></td>
 										</tr>
-										{if ($order->getTaxCalculationMethod() == $smarty.const.PS_TAX_EXC)}
+										{if isset($totalConvenienceFeeTI) && $totalConvenienceFeeTI > 0}
+											<tr id="total_products">
+												<td class="text-right"><strong>{l s='Convenience Fee'}</strong></td>
+												<td class="amount text-right nowrap">
+													<strong>{displayPrice price=$totalConvenienceFeeTE currency=$currency->id}</strong>
+												</td>
+												<td class="partial_refund_fields current-edit" style="display:none;"></td>
+											</tr>
+										{/if}
+										{* {if ($order->getTaxCalculationMethod() == $smarty.const.PS_TAX_EXC)} *}
 											<tr id="total_taxes">
 												<td class="text-right"><strong>{l s='Total Taxes'}</strong></td>
 												<td class="amount text-right nowrap" ><strong>{displayPrice price=($order->total_paid_tax_incl - $order->total_paid_tax_excl) currency=$currency->id}</strong></td>
 												<td class="partial_refund_fields current-edit" style="display:none;"></td>
 											</tr>
-			 							{/if}
+			 							{* {/if} *}
 										<tr id="total_order">
 											<td class="text-right"><strong>{l s='Final Booking Total'}</strong></td>
 											<td class="amount text-right nowrap">
@@ -1485,6 +1610,21 @@
 	{addJsDefL name=txtSomeErr}{l s='Some error occurred. Please try again.' js=1}{/addJsDefL}
 	{addJsDefL name=txtDeleteSucc}{l s='Deleted successfully' js=1}{/addJsDefL}
 	{addJsDefL name=txtInvalidDemandVal}{l s='Invalid demand value found' js=1}{/addJsDefL}
+	{addJsDefL name='select_age_txt'}{l s='Select age' js=1}{/addJsDefL}
+	{addJsDefL name='under_1_age'}{l s='Under 1' js=1}{/addJsDefL}
+	{addJsDefL name='room_txt'}{l s='Room' js=1}{/addJsDefL}
+	{addJsDefL name='rooms_txt'}{l s='Rooms' js=1}{/addJsDefL}
+	{addJsDefL name='remove_txt'}{l s='Remove' js=1}{/addJsDefL}
+	{addJsDefL name='adult_txt'}{l s='Adult' js=1}{/addJsDefL}
+	{addJsDefL name='adults_txt'}{l s='Adults' js=1}{/addJsDefL}
+	{addJsDefL name='child_txt'}{l s='Child' js=1}{/addJsDefL}
+	{addJsDefL name='children_txt'}{l s='Children' js=1}{/addJsDefL}
+	{addJsDefL name='below_txt'}{l s='Below' js=1}{/addJsDefL}
+	{addJsDefL name='years_txt'}{l s='years' js=1}{/addJsDefL}
+	{addJsDefL name='all_children_txt'}{l s='All Children' js=1}{/addJsDefL}
+	{addJsDefL name='invalid_occupancy_txt'}{l s='Invalid occupancy(adults/children) found.' js=1}{/addJsDefL}
+	{addJsDef max_child_age=$max_child_age|escape:'quotes':'UTF-8'}
+	{addJsDef max_child_in_room=$max_child_in_room|escape:'quotes':'UTF-8'}
 {/strip}
 
 {* Apply javascript for the page *}
@@ -1527,7 +1667,7 @@
 		});
 
 		{* open fancybox for extra demands *}
-		$('.open_room_extra_demands').on('click', function(e) {
+		$('.open_room_extra_services').on('click', function(e) {
 			e.preventDefault();
 			var idProduct = $(this).attr('id_product');
 			var idOrder = $(this).attr('id_order');
@@ -1536,7 +1676,7 @@
 			var dateTo = $(this).attr('date_to');
 			var idHtlBooking = $(this).attr('id_htl_booking');
 			var orderEdit = 0;
-			if(  $(this).closest('.product-line-row').find(".submitProductChange").is(":visible") == true ) {
+			if($(this).closest('.product-line-row').find(".submitRoomChange").is(":visible") == true ) {
 				orderEdit = 1;
 			}
 
@@ -1569,25 +1709,129 @@
 			});
 		});
 
+		$('#rooms_type_extra_demands').on('hidden.bs.modal', function (e) {
+			if ($('.product-line-row').find(".submitRoomChange").is(":visible") == true ) {
+				location.reload();
+				return;
+			}
+		});
+
 		{* when choose to add new facilities while additional facilities edit *}
-		$(document).on('click', '#room_extra_demand_content #btn_new_room_facility', function() {
+		$(document).on('click', '#room_extra_demand_content #btn_new_room_demand', function() {
 			$('#rooms_extra_demands .room_demands_container').show();
-			$('#room_extra_demand_content #save_room_facilities').show();
-			$('#room_extra_demand_content #back_to_facilities_btn').show();
+			$('#room_extra_demand_content #save_room_demands').show();
+			$('#room_extra_demand_content #back_to_demands_btn').show();
 			$('#rooms_extra_demands .room_ordered_demands').hide();
-			$('#room_extra_demand_content #btn_new_room_facility').hide();
+			$('#room_extra_demand_content #btn_new_room_demand').hide();
 		});
 		{* click on back button on created facilities while additional facilities edit *}
-		$(document).on('click', '#room_extra_demand_content #back_to_facilities_btn', function() {
+		$(document).on('click', '#room_extra_demand_content #back_to_demands_btn', function() {
 			$('#rooms_extra_demands .room_ordered_demands').show();
-			$('#room_extra_demand_content #btn_new_room_facility').show();
+			$('#room_extra_demand_content #btn_new_room_demand').show();
 			$('#rooms_extra_demands .room_demands_container').hide();
-			$('#room_extra_demand_content #save_room_facilities').hide();
-			$('#room_extra_demand_content #back_to_facilities_btn').hide();
+			$('#room_extra_demand_content #save_room_demands').hide();
+			$('#room_extra_demand_content #back_to_demands_btn').hide();
+		});
+
+		$(document).on('click', '#room_extra_demand_content #btn_new_room_service', function() {
+			$('#rooms_extra_demands .room_services_container').show();
+			$('#room_extra_demand_content #save_service_service').show();
+			$('#room_extra_demand_content #back_to_service_btn').show();
+			$('#rooms_extra_demands .room_ordered_services').hide();
+			$('#room_extra_demand_content #btn_new_room_service').hide();
+		});
+		{* click on back button on created facilities while additional facilities edit *}
+		$(document).on('click', '#room_extra_demand_content #back_to_service_btn', function() {
+			$('#rooms_extra_demands .room_ordered_services').show();
+			$('#room_extra_demand_content #btn_new_room_service').show();
+			$('#rooms_extra_demands .room_services_container').hide();
+			$('#room_extra_demand_content #save_service_service').hide();
+			$('#room_extra_demand_content #back_to_service_btn').hide();
+		});
+
+		$(document).on('focusout', '#rooms_type_extra_demands .room_ordered_services .qty', function(e) {
+			var qty_wntd = $(this).val();
+			if (qty_wntd == '' || !$.isNumeric(qty_wntd) || qty_wntd < 1) {
+				$(this).val(1);
+			}
+			updateAdditionalServices($(this));
+		});
+
+		$(document).on('focusout', '#rooms_type_extra_demands #add_room_services_form .qty', function(e) {
+			var qty_wntd = $(this).val();
+			if (qty_wntd == '' || !$.isNumeric(qty_wntd) || qty_wntd < 1) {
+				$(this).val(1);
+			}
+		});
+
+		function updateAdditionalServices(element)
+		{
+			var id_room_type_service_product_order_detail = $(element).data('id_room_type_service_product_order_detail');
+			var qty = $(element).val();
+			if ($.isNumeric(qty)) {
+				$.ajax({
+					type: 'POST',
+					headers: {
+						"cache-control": "no-cache"
+					},
+					url: "{$link->getAdminLink('AdminOrders')|addslashes}",
+					dataType: 'JSON',
+					cache: false,
+					data: {
+						id_room_type_service_product_order_detail: id_room_type_service_product_order_detail,
+						qty: qty,
+						action: 'updateRoomAdditionalServices',
+						ajax: true
+					},
+					success: function(jsonData) {
+						if (!jsonData.hasError) {
+							if (jsonData.service_panel) {
+								$('#room_type_service_product_desc').replaceWith(jsonData.service_panel);
+							}
+							showSuccessMessage(txtExtraDemandSucc);
+						} else {
+							showErrorMessage(jsonData.errors);
+
+						}
+					}
+				});
+			}
+
+		}
+
+		$(document).on('submit', '#add_room_services_form', function(e) {
+			e.preventDefault();
+			var form_data = new FormData(this);
+			form_data.append('ajax', true);
+			form_data.append('action', 'addRoomAdditionalServices');
+
+			$.ajax({
+				type: 'POST',
+				headers: {
+					"cache-control": "no-cache"
+				},
+				url: "{$link->getAdminLink('AdminOrders')|addslashes}",
+				dataType: 'JSON',
+				cache: false,
+				data: form_data,
+				processData: false,
+				contentType: false,
+				success: function(jsonData) {
+					if (!jsonData.hasError) {
+						if (jsonData.service_panel) {
+							$('#room_type_service_product_desc').replaceWith(jsonData.service_panel);
+						}
+						showSuccessMessage(txtExtraDemandSucc);
+					} else {
+						showErrorMessage(jsonData.errors);
+
+					}
+				}
+			});
 		});
 
 		{* // save room extra demand to the order *}
-		$(document).on('click', '#save_room_facilities', function(e) {
+		$(document).on('click', '#save_room_demands', function(e) {
 			e.preventDefault();
 			var idHtlBooking = $(this).closest('#room_extra_demand_content').find('#id_htl_booking').val();
 			if (idHtlBooking) {
@@ -1615,10 +1859,12 @@
 							action: 'EditRoomExtraDemands',
 							ajax: true
 						},
-						success: function(result) {
-							if (result == 1) {
+						success: function(jsonData) {
+							if (jsonData.success) {
 								showSuccessMessage(txtExtraDemandSucc);
-								$('#rooms_type_extra_demands').modal('hide');
+								if (jsonData.facilities_panel) {
+									$('#room_type_demands_desc').replaceWith(jsonData.facilities_panel);
+								}
 							} else {
 								showErrorMessage(txtSomeErr);
 							}
@@ -1650,10 +1896,12 @@
 							action: 'DeleteRoomExtraDemand',
 							ajax: true
 						},
-						success: function(result) {
-							if (result == 1) {
-								$currentItem.closest('tr').remove();
+						success: function(jsonData) {
+							if (jsonData.success) {
 								showSuccessMessage(txtDeleteSucc);
+								if (jsonData.facilities_panel) {
+									$('#room_type_demands_desc').replaceWith(jsonData.facilities_panel);
+								}
 							} else {
 								showErrorMessage(txtSomeErr);
 							}
@@ -1663,6 +1911,44 @@
 					showErrorMessage(txtInvalidDemandVal);
 				}
 			}
+		});
+
+		$(document).on('click', '.del_room_additional_service', function(e){
+			e.preventDefault();
+			if (confirm(txt_confirm)) {
+				var idServiceProductOrderDetail = $(this).data('id_room_type_service_product_order_detail');
+				$currentItem = $(this);
+				if (idServiceProductOrderDetail) {
+					$.ajax({
+						type: 'POST',
+						headers: {
+							"cache-control": "no-cache"
+						},
+						url: "{$link->getAdminLink('AdminOrders')|addslashes}",
+						dataType: 'JSON',
+						cache: false,
+						data: {
+							id_room_type_service_product_order_detail: idServiceProductOrderDetail,
+							action: 'DeleteRoomAdditionalService',
+							ajax: true
+						},
+						success: function(jsonData) {
+							if (!jsonData.hasError) {
+								if (jsonData.service_panel) {
+									$('#room_type_service_product_desc').replaceWith(jsonData.service_panel);
+								}
+								showSuccessMessage(txtExtraDemandSucc);
+							} else {
+								showErrorMessage(jsonData.errors);
+
+							}
+						}
+					});
+				} else {
+					showErrorMessage(txtInvalidDemandVal);
+				}
+			}
+
 		});
 
 		// change advance option of extra demand

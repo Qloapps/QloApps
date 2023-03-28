@@ -182,9 +182,9 @@ class ParentOrderControllerCore extends FrontController
 
             // order status payment accepted if no amount is pending for the booking
             if ($dueAmount > 0) {
-                $orderStatus = Configuration::get('PS_OS_AWAITING_REMOTE_PAYMENT');
+                $orderStatus = Configuration::get('PS_OS_AWAITING_PAYMENT');
             } else {
-                $orderStatus = Configuration::get('PS_OS_PAYMENT');
+                $orderStatus = Configuration::get('PS_OS_PAYMENT_ACCEPTED');
             }
 
             $order->validateOrder($this->context->cart->id, $orderStatus, 0, Tools::displayError('Free order', false), null, array(), null, false, $this->context->cart->secure_key);
