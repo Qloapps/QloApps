@@ -29,7 +29,7 @@
         {if isset($allDemands) && $allDemands}
 
             <div class="from-group table-responsive-row clearfix">
-                <table class="table">
+                <table class="table" id="demands_table">
                     <thead>
                         <tr>
                             <th></th>
@@ -39,7 +39,7 @@
                             <th>
                                 {l s='Option'}
                             </th>
-                            <th>
+                            <th class="fixed-width-xl">
                                 {l s='Price'}
                             </th>
                             <th>
@@ -65,8 +65,8 @@
                                     <tr>
                                         {if $rowcount <= 1}
                                             <td rowspan="{$rowspan}">
-                                                <input class="selected_demand" type="checkbox" name="selected_demand[]" value="{$demand['id_global_demand']|escape:'html':'UTF-8'}" {if isset($roomDemandPrices[$demand['id_global_demand']])}checked{/if} />
-                                                <input type="hidden" name="demand_price_{$demand['id_global_demand']|escape:'html':'UTF-8'}" value="{if isset($roomDemandPrices[$demand['id_global_demand']]['price'])}{$roomDemandPrices[$demand['id_global_demand']]['price']|escape:'html':'UTF-8'}{elseif isset($demand['price'])}{$demand['price']|escape:'html':'UTF-8'}{/if}"/>
+                                                <input class="selected_demand" type="checkbox" name="selected_demand[]" value="{$demand['id_global_demand']|escape:'html':'UTF-8'}" {if isset($selectedDemands[$demand['id_global_demand']])}checked{/if} />
+                                                <input type="hidden" name="demand_price_{$demand['id_global_demand']|escape:'html':'UTF-8'}" value="{if isset($selectedDemands[$demand['id_global_demand']]['price'])}{$selectedDemands[$demand['id_global_demand']]['price']|escape:'html':'UTF-8'}{elseif isset($demand['price'])}{$demand['price']|escape:'html':'UTF-8'}{/if}"/>
                                             </td>
                                             <td rowspan="{$rowspan}">
                                                 <a target="blank" href="{$link->getAdminLink('AdminRoomTypeGlobalDemand')|escape:'html':'UTF-8'}&amp;id_global_demand={$demand['id_global_demand']|escape:'html':'UTF-8'}&amp;updatehtl_room_type_global_demand"><i class="icon-external-link-sign"></i></a> {$demand['name']|escape:'html':'UTF-8'}
@@ -75,11 +75,15 @@
                                         <td>
                                             {$option['name']|escape:'html':'UTF-8'}
                                         </td>
-                                        <td>
-                                            <div class="input-group">
+                                        <td class="demand_price_{$demand['id_global_demand']}">
+                                            <div class="input-group price_input" {if !isset($selectedDemands[$demand['id_global_demand']])}style="display:none"{/if}>
                                                 <span class="input-group-addon">{$defaultcurrencySign|escape:'html':'UTF-8'}</span>
-                                                <input type="text" name="option_price_{$option['id']|escape:'html':'UTF-8'}" value="{if isset($roomDemandPrices[$demand['id_global_demand']]['adv_option'][$option['id']]['price'])}{$roomDemandPrices[$demand['id_global_demand']]['adv_option'][$option['id']]['price']|escape:'html':'UTF-8'}{else}{$option['price']|escape:'html':'UTF-8'}{/if}"/>
+                                                <input type="text" name="option_price_{$option['id']|escape:'html':'UTF-8'}" value="{if isset($selectedDemands[$demand['id_global_demand']]['adv_option'][$option['id']]['price'])}{Tools::ps_round($selectedDemands[$demand['id_global_demand']]['adv_option'][$option['id']]['price'], 2)|escape:'html':'UTF-8'}{else}{Tools::ps_round($option['price'], 2)|escape:'html':'UTF-8'}{/if}"/>
                                             </div>
+                                            <div class="price_display" {if isset($selectedDemands[$demand['id_global_demand']])}style="display:none"{/if}>
+                                                {displayPrice price={$option['price']|escape:'html':'UTF-8'}  currency=$module->id_currency}
+                                            </div>
+
                                         </td>
                                         {if $rowcount == 1}
                                             <td rowspan="{$rowspan}">
@@ -97,18 +101,21 @@
                                 {foreachelse}
                                     <tr>
                                         <td>
-                                            <input class="selected_demand" type="checkbox" name="selected_demand[]" value="{$demand['id_global_demand']|escape:'html':'UTF-8'}" {if isset($roomDemandPrices[$demand['id_global_demand']])}checked{/if} />
+                                            <input class="selected_demand" type="checkbox" name="selected_demand[]" value="{$demand['id_global_demand']|escape:'html':'UTF-8'}" {if isset($selectedDemands[$demand['id_global_demand']])}checked{/if} />
                                         </td>
                                         <td>
                                             <a target="blank" href="{$link->getAdminLink('AdminRoomTypeGlobalDemand')|escape:'html':'UTF-8'}&amp;id_global_demand={$demand['id_global_demand']|escape:'html':'UTF-8'}&amp;updatehtl_room_type_global_demand"><i class="icon-external-link-sign"></i></a> {$demand['name']|escape:'html':'UTF-8'}
                                         </td>
 
                                         <td></td>
-                                        <td>
-                                            <div class="input-group">
+                                        <td class="demand_price_{$demand['id_global_demand']}">
+                                            <div class="input-group price_input" {if !isset($selectedDemands[$demand['id_global_demand']])}style="display:none"{/if}>
                                                 <span class="input-group-addon">{$defaultcurrencySign|escape:'html':'UTF-8'}</span>
                                                 <input type="text" name="demand_price_{$demand['id_global_demand']|escape:'html':'UTF-8'}"
-                                                value="{if isset($roomDemandPrices[$demand['id_global_demand']]['price'])}{$roomDemandPrices[$demand['id_global_demand']]['price']|escape:'html':'UTF-8'}{elseif isset($demand['price'])}{$demand['price']|escape:'html':'UTF-8'}{/if}"/>
+                                                value="{if isset($selectedDemands[$demand['id_global_demand']]['price'])}{Tools::ps_round($selectedDemands[$demand['id_global_demand']]['price'], 2)|escape:'html':'UTF-8'}{elseif isset($demand['price'])}{Tools::ps_round($demand['price'], 2)|escape:'html':'UTF-8'}{/if}"/>
+                                            </div>
+                                            <div class="price_display" {if isset($selectedDemands[$demand['id_global_demand']])}style="display:none"{/if}>
+                                                {displayPrice price={$demand['price']|escape:'html':'UTF-8'} currency=$module->id_currency}
                                             </div>
                                         </td>
                                         <td>

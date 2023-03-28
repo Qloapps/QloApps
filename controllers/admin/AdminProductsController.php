@@ -3291,11 +3291,11 @@ class AdminProductsControllerCore extends AdminController
 
             // get room type additional facilities
             $objRoomDemand = new HotelRoomTypeDemand();
-            $roomDemandPrices = $objRoomDemand->getRoomTypeDemands($obj->id, 0, 0);
+            $selectedDemands = $objRoomDemand->getRoomTypeDemands($obj->id, 0, 0);
 
             $data->assign(array(
                 'product' => $obj,
-                'roomDemandPrices' => $roomDemandPrices,
+                'selectedDemands' => $selectedDemands,
                 'allDemands' => $allDemands,
                 'defaultcurrencySign' => $objCurrency->sign,
             ));
