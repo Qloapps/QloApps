@@ -5073,28 +5073,36 @@ class AdminOrdersControllerCore extends AdminController
                         $totalPriceChangeTaxExcl = 0;
                         $totalPriceChangeTaxIncl = 0;
                         foreach ($productList as &$product) {
-                            $totalPriceChangeTaxExcl += $totalPriceTaxExcl = $objRoomTypeServiceProductPrice->getProductPrice(
+                            $totalPriceChangeTaxExcl += $totalPriceTaxExcl = $objRoomTypeServiceProductPrice->getServicePrice(
                                 (int)$product['id_product'],
                                 $roomInfo['id'],
                                 $product['cart_quantity'],
+                                $objHotelBookingDetail->date_from,
+                                $objHotelBookingDetail->date_to,
                                 false
                             );
-                            $totalPriceChangeTaxIncl += $totalPriceTaxIncl = $objRoomTypeServiceProductPrice->getProductPrice(
+                            $totalPriceChangeTaxIncl += $totalPriceTaxIncl = $objRoomTypeServiceProductPrice->getServicePrice(
                                 (int)$product['id_product'],
                                 $roomInfo['id'],
                                 $product['cart_quantity'],
+                                $objHotelBookingDetail->date_from,
+                                $objHotelBookingDetail->date_to,
                                 true
                             );
-                            $unitPriceTaxExcl = $objRoomTypeServiceProductPrice->getProductPrice(
+                            $unitPriceTaxExcl = $objRoomTypeServiceProductPrice->getServicePrice(
                                 (int)$product['id_product'],
                                 $roomInfo['id'],
                                 1,
+                                $objHotelBookingDetail->date_from,
+                                $objHotelBookingDetail->date_to,
                                 false
                             );
-                            $unitPriceTaxIncl = $objRoomTypeServiceProductPrice->getProductPrice(
+                            $unitPriceTaxIncl = $objRoomTypeServiceProductPrice->getServicePrice(
                                 (int)$product['id_product'],
                                 $roomInfo['id'],
                                 1,
+                                $objHotelBookingDetail->date_from,
+                                $objHotelBookingDetail->date_to,
                                 true
                             );
                             switch (Configuration::get('PS_ROUND_TYPE')) {

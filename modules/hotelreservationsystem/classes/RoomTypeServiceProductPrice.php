@@ -83,14 +83,14 @@ class RoomTypeServiceProductPrice extends ObjectModel
         );
     }
 
-    public function getProductPrice($idProduct, $idProductRoomType, $quantity, $useTax = null, $id_cart = false, $id_address = null, $test= false)
+    public function getServicePrice($idProduct, $idProductRoomType, $quantity, $dateFrom = null, $dateTo = null, $useTax = null, $id_cart = false, $id_address = null, $test= false)
     {
         if ($useTax === null)
             $useTax = Product::$_taxCalculationMethod == PS_TAX_EXC ? false : true;
 
         $id_address =  $id_address ? $id_address : Cart::getIdAddressForTaxCalculation($idProductRoomType);
 
-        $price = ProductCore::getPriceStatic(
+        $price = Product::getPriceStatic(
             (int)$idProduct,
             $useTax,
             null,
@@ -110,6 +110,12 @@ class RoomTypeServiceProductPrice extends ObjectModel
             true,
             (int)$idProductRoomType
         );
+
+        if (Product::getProductPriceCalculation($idProduct) == Product::PRICE_CALCULATION_METHOD_PER_DAY
+            && $dateFrom && $dateTo
+        ) {
+            $price = $price * HotelHelper::getNumberOfDays($dateFrom, $dateTo);
+        }
 
         return $price * (int)$quantity;
     }
