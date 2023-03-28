@@ -220,11 +220,12 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
             $objRefundRules = new HotelOrderRefundRules();
             if ($refundReqBookings = $objOrderReturn->getOrderRefundRequestedBookings($objOrderReturn->id_order, $objOrderReturn->id)){
                 foreach ($refundReqBookings as &$booking) {
-                    $booking['cancelation_charge'] = $objRefundRules->calculateDeductionAmountFromRefundRules(
+                    $bookingCharges = $objRefundRules->getBookingCancellationDetails(
                         $objOrderReturn->id_order,
                         $objOrderReturn->id,
                         $booking['id']
                     );
+                    $booking = array_merge($booking, array_shift($bookingCharges));
                 }
             }
 

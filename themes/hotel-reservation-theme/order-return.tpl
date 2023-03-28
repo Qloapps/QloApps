@@ -54,7 +54,7 @@
 				<th>{l s='Duration'}</th>
 				<th>{l s='Num rooms'}</th>
 				<th>{l s='Total rooms price (tax incl.)'}</th>
-				<th>{l s='Additional facilities price (tax incl.)'}</th>
+				<th>{l s='Extra services price (tax incl.)'}</th>
 				{if $isRefundCompleted}
 					<th>{l s='Refund amount'}</th>
 				{/if}
@@ -67,7 +67,7 @@
 					<td>{$booking['date_from']|date_format:"%d-%m-%Y"} {l s='To'} {$booking['date_to']|date_format:"%d-%m-%Y"}</td>
 					<td>{$booking['num_rooms']|escape:'htmlall':'UTF-8'}</td>
 					<td>{displayPrice price=$booking['total_price_tax_incl'] currency=$orderCurrency['id']}</td>
-					<td>{displayPrice price=$booking['extra_demand_service_total_paid_amount'] currency=$orderCurrency['id']}</td>
+					<td>{displayPrice price=$booking['extra_service_total_price_tax_incl'] currency=$orderCurrency['id']}</td>
 					{if $isRefundCompleted}
 						<td>
 							{displayPrice price=$booking['refunded_amount'] currency=$orderCurrency['id']}

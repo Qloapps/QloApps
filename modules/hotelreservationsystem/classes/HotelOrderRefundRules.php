@@ -126,17 +126,16 @@ class HotelOrderRefundRules extends ObjectModel
         return Db::getInstance()->getRow('SELECT * FROM `'._DB_PREFIX_.'htl_order_refund_rules` WHERE days='.$days);
     }
 
-    public function calculateDeductionAmountFromRefundRules($idOrder, $idOrderReturn = 0, $idHtlBooking = 0)
+    public function getBookingCancellationDetails($idOrder, $idOrderReturn = 0, $idHtlBooking = 0)
     {
-        $totalCancelationCharges = 0;
-
+        $bookingCancellations = array();
         $objHtlRefundRules = new HotelBranchRefundRules();
         $objHotelBookingDemands = new HotelBookingDemands();
         $objRoomTypeServiceProductOrderDetail = new RoomTypeServiceProductOrderDetail();
 
         if ($bookingsToRefund = OrderReturn::getOrdersReturnDetail($idOrder, $idOrderReturn, $idHtlBooking)) {
             foreach ($bookingsToRefund as $booking) {
-                $bookingCancellationCharge = 0;
+                $bookingCancellationDetail = array();
 
                 if (Validate::isLoadedObject($objHtlBooking = new HotelBookingDetail($booking['id_htl_booking']))) {
                     $objOrder = new Order($objHtlBooking->id_order);
@@ -182,31 +181,34 @@ class HotelOrderRefundRules extends ObjectModel
                                 } else {
                                     $refundValue = $refRule['deduction_value_full_pay'];
                                 }
+                                $bookingCancellationDetail['reduction_value'] = $refundValue;
 
                                 if ($refRule['payment_type'] == HotelOrderRefundRules::WK_REFUND_RULE_PAYMENT_TYPE_PERCENTAGE) {
-                                    $bookingCancellationCharge = $paidAmount * ($refundValue / 100);
+                                    $bookingCancellationDetail['reduction_type'] = HotelOrderRefundRules::WK_REFUND_RULE_PAYMENT_TYPE_PERCENTAGE;
+                                    $bookingCancellationDetail['cancelation_charge'] = $paidAmount * ($refundValue / 100);
 
                                     if ($defaultCurrency != $orderCurrency) {
-                                        $bookingCancellationCharge = Tools::convertPriceFull(
-                                            $bookingCancellationCharge,
+                                        $bookingCancellationDetail['cancelation_charge'] = Tools::convertPriceFull(
+                                            $bookingCancellationDetail['cancelation_charge'],
                                             $objDefaultCurrency,
                                             $objOrderCurrency
                                         );
                                     }
                                 } else {
+                                    $bookingCancellationDetail['reduction_type'] = HotelOrderRefundRules::WK_REFUND_RULE_PAYMENT_TYPE_FIXED;
                                     if ($defaultCurrency != $orderCurrency) {
-                                        $bookingCancellationCharge = Tools::convertPriceFull(
+                                        $bookingCancellationDetail['cancelation_charge'] = Tools::convertPriceFull(
                                             $refundValue,
                                             $objDefaultCurrency,
                                             $objOrderCurrency
                                         );
                                     } else {
-                                        $bookingCancellationCharge = $refundValue;
+                                        $bookingCancellationDetail['cancelation_charge'] = $refundValue;
                                     }
 
                                     // if deduction amount is more than the order total cost
-                                    if ($bookingCancellationCharge > $paidAmount) {
-                                        $bookingCancellationCharge = $paidAmount;
+                                    if ($bookingCancellationDetail['cancelation_charge'] > $paidAmount) {
+                                        $bookingCancellationDetail['cancelation_charge'] = $paidAmount;
                                     }
                                 }
 
@@ -216,18 +218,22 @@ class HotelOrderRefundRules extends ObjectModel
                         }
 
                         if (!$ruleApplied) {
-                            $bookingCancellationCharge = ($objHtlBooking->total_price_tax_incl + $totalDemandsPrice);
+                            $bookingCancellationDetail['cancelation_charge'] = ($objHtlBooking->total_price_tax_incl + $totalDemandsPrice);
+                            $bookingCancellationDetail['reduction_type'] = HotelOrderRefundRules::WK_REFUND_RULE_PAYMENT_TYPE_PERCENTAGE;
+                            $bookingCancellationDetail['reduction_value'] = 100;
                         }
                     } else {
-                        $bookingCancellationCharge = ($objHtlBooking->total_price_tax_incl + $totalDemandsPrice);
+                        $bookingCancellationDetail['cancelation_charge'] = ($objHtlBooking->total_price_tax_incl + $totalDemandsPrice);
+                        $bookingCancellationDetail['reduction_type'] = HotelOrderRefundRules::WK_REFUND_RULE_PAYMENT_TYPE_PERCENTAGE;
+                        $bookingCancellationDetail['reduction_value'] = 100;
                     }
                 }
 
-                $totalCancelationCharges += $bookingCancellationCharge;
+                $bookingCancellations[] = $bookingCancellationDetail;
             }
         }
 
-        return $totalCancelationCharges;
+        return $bookingCancellations;
     }
 
     public static function getApplicableRefundRules($idOrder)
