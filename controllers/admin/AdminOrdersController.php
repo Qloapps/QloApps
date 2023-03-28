@@ -65,15 +65,15 @@ class AdminOrdersControllerCore extends AdminController
         osl.`name` AS `osname`, os.`color`,
         IF((SELECT so.id_order FROM `'._DB_PREFIX_.'orders` so WHERE so.id_customer = a.id_customer AND so.id_order < a.id_order LIMIT 1) > 0, 0, 1) as new,
         IF(a.valid, 1, 0) badge_success,
-        hbil.`hotel_name`, COUNT(hbd.`id`) as `num_rooms`, SUM(hbd.`adults`) + SUM(hbd.`children`) as `total_guests`,
-        CONCAT(
+        hbil.`hotel_name`,
+        (SELECT COUNT(hbd.`id`) FROM `'._DB_PREFIX_.'htl_booking_detail` hbd WHERE hbd.`id_order` = a.`id_order`) as num_rooms,
+        (SELECT SUM(hbd.`adults`) + SUM(hbd.`children`) FROM `'._DB_PREFIX_.'htl_booking_detail` hbd WHERE hbd.`id_order` = a.`id_order`) as total_guests_count,
+        (SELECT CONCAT(
             SUM(hbd.`adults`),
             \' '.$this->l('Adult(s)').' \',
             IF(SUM(hbd.`children`), CONCAT(SUM(hbd.`children`), \' '.$this->l('Children').'\'), \'\')
-        ) as `total_guests`,
-        SUM(DATEDIFF(hbd.`date_to`, hbd.`date_from`)) as los,
-        GROUP_CONCAT(hbd.`date_from`) as `all_date_from`, GROUP_CONCAT(hbd.`date_to`) as `all_date_to`,
-        GROUP_CONCAT(hbd.`room_type_name`) as `all_room_types`';
+        ) FROM `'._DB_PREFIX_.'htl_booking_detail` hbd WHERE hbd.`id_order` = a.`id_order`) as total_guests,
+        (SELECT SUM(DATEDIFF(hbd.`date_to`, hbd.`date_from`)) FROM `'._DB_PREFIX_.'htl_booking_detail` hbd WHERE hbd.`id_order` = a.`id_order`) as los';
 
         $this->_join = '
         LEFT JOIN `'._DB_PREFIX_.'customer` c ON (c.`id_customer` = a.`id_customer`)
@@ -126,19 +126,19 @@ class AdminOrdersControllerCore extends AdminController
                 'optional' => true,
                 'visible_default' => true
             ),
-            'all_date_from' => array(
+            'date_from' => array(
                 'title' => $this->l('Check-in'),
                 'filter_key' => 'hbd!date_from',
                 'type'=>'date',
                 'displayed' => false,
             ),
-            'all_date_to' => array(
+            'date_to' => array(
                 'title' => $this->l('Check-out'),
                 'filter_key' => 'hbd!date_to',
                 'type'=>'date',
                 'displayed' => false,
             ),
-            'all_room_types' => array(
+            'room_type_name' => array(
                 'title' => $this->l('Room type'),
                 'filter_key' => 'hbd!room_type_name',
                 'type'=>'text',
@@ -147,7 +147,7 @@ class AdminOrdersControllerCore extends AdminController
             'total_guests' => array(
                 'title' => $this->l('Guests'),
                 'type' => 'range',
-                'filter_key' => 'total_guests',
+                'filter_key' => 'total_guests_count',
                 'optional' => true,
                 'havingFilter' => true,
             ),
@@ -181,7 +181,7 @@ class AdminOrdersControllerCore extends AdminController
             'total_paid_tax_incl' => array(
                 'title' => $this->l('Order Total'),
                 'align' => 'text-right',
-                'type' => 'price',
+                'type' => 'range',
                 'currency' => true,
                 'callback' => 'setOrderCurrency',
                 'badge_success' => true,
@@ -189,7 +189,7 @@ class AdminOrdersControllerCore extends AdminController
             'amount_due' => array(
                 'title' => $this->l('Due Amount'),
                 'align' => 'text-right',
-                'type' => 'price',
+                'type' => 'range',
                 'currency' => true,
                 'havingFilter' => true,
                 'callback' => 'setOrderCurrency',

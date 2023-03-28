@@ -635,10 +635,10 @@ class HelperListCore extends Helper
                     if (isset($value[0]) && !Validate::isCleanHtml($value[0]) || isset($value[1]) && !Validate::isCleanHtml($value[1])) {
                         $value = '';
                     }
-                    if (!Validate::isDate($value[0])) {
+                    if (isset($value[0]) && !Validate::isDate($value[0])) {
                         $value[0] = '';
                     }
-                    if (!Validate::isDate($value[1])) {
+                    if (isset($value[1]) && !Validate::isDate($value[1])) {
                         $value[1] = '';
                     }
                     if (isset($value[0]) && !empty($value[0]) && strtotime($value[0]) > strtotime($value[1])) {
