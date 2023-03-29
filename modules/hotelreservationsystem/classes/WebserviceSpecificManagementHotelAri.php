@@ -56,8 +56,8 @@ class WebserviceSpecificManagementHotelAri extends ObjectModel implements Webser
     );
 
     protected $webserviceParameters = array(
-        'objectsNodeName' => 'aris',
-        'objectNodeName' => 'ari',
+        'objectsNodeName' => 'hotel_aris',
+        'objectNodeName' => 'hotel_ari',
         'fields' => array(
             'id_hotel' => array(
                 'xlink_resource' => array(
