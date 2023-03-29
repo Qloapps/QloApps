@@ -1,3 +1,13 @@
+------------------------------
+# V1.5.2 to V1.5.3
+------------------------------
+
+## Improved/Changed Features:
+
+* [BO] : [#451] Improve statistics at back office
+* [CO] : [#402] Change module category for graphnvd3 and hotelreservationsystem modules
+
+
 -----------------------------
 # V1.5.1 to V1.5.2
 -----------------------------

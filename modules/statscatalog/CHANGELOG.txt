@@ -1,4 +1,14 @@
 ------------------------------
+# V1.4.1 to V1.4.2
+------------------------------
+
+## Improved/Changed Features:
+
+* [BO] : [#573] Change catalog evaluation module and fix stats issues
+* [BO] : [#562] Add note for statsdata module in Catalog evaluation at back office
+* [BO] : [#451] Improve statistics at back office
+
+------------------------------
 # V1.4.0 to V1.4.1
 ------------------------------
 

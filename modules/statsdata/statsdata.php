@@ -34,7 +34,7 @@ class StatsData extends Module
     {
         $this->name = 'statsdata';
         $this->tab = 'analytics_stats';
-        $this->version = '1.6.2';
+        $this->version = '1.6.3';
         $this->author = 'PrestaShop';
         $this->need_instance = 0;
 

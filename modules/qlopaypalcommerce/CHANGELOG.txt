@@ -1,3 +1,14 @@
+------------------------------
+# V1.0.2 to V1.0.3
+------------------------------
+
+## Improved/Changed Features:
+
+* [CO] : [#528] licenses updated
+* [CO] : [#430] Updated QloApps order statuses
+* [CO] : [#370] Added Autoupgrade and Paypal modules in QloApps 
+
+
 -----------------------------
 # V1.0.1 to V1.0.2
 -----------------------------

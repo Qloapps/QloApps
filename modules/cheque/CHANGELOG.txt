@@ -1,4 +1,16 @@
 ------------------------------
+# V2.6.5 to V2.6.6
+------------------------------
+
+## Improved/Changed Features:
+
+
+* [FO] : [#608] Fix: Unable to remove disabled services from cart
+* [CO] : [#430] Updated QloApps order statuses
+* [CO] : [#436] Text changes
+
+
+------------------------------
 # V2.6.4 to V2.6.5
 ------------------------------
 

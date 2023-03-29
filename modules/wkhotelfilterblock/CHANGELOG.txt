@@ -1,4 +1,20 @@
 ------------------------------
+# V1.0.4 to V1.0.5
+------------------------------
+
+## Improved/Changed Features:
+
+* [CO] : [#538] Added: Feature service products
+* [CO] : [#528] licenses updated
+* [CO] : [#475] Added Feature: Occupancy wise search and booking
+* [BO] : [#471] Move filter options to Preferences > Room Types page
+* [CO] : [#458] Replace module 'productcomments' with 'qlohotelreview'
+* [CO] : [#436] Text changes
+* [FO] : [#400] Refreshed booking form panel on room type detail page
+* [CO] : [#363] Text changes
+
+
+------------------------------
 # V1.0.3 to V1.0.4
 ------------------------------
 

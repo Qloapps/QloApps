@@ -1,3 +1,19 @@
+------------------------------
+# V1.1.5 to V1.1.6
+------------------------------
+
+## Improved/Changed Features:
+
+* [CO] : #528 licenses updated
+* [BO] : #456 Allow admin to add new links on Hotel Reservation System > Settings page and removed shortcut links of "Our Rooms" and "Testimonial" modules
+* [CO] : #468 Update image generation method for hotel and default modules
+* [CO] : #436 Text changes
+* [CO] : #425 Fix owl-carousel plugin loading issue for 'wktestimonialblock' module
+* [CO] : #363 Text changes
+* [CO] : #366 Updated core upgrade files and modules upgrade files
+* [CO] : #334 Remove install.sql files from modules
+
+------------------------------
 # V1.1.4 to V1.1.5
 ------------------------------
 

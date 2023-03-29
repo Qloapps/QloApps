@@ -1,3 +1,12 @@
+------------------------------
+# V1.4.2 to V1.4.3
+------------------------------
+
+## Improved/Changed Features:
+
+* [BO] : [#451] Improve statistics at back office
+
+
 2014-03-27 17:20:07 +0100	/ MO statsnewsletter : min ps_versions_compliancy modified (1.5.6.1 => 1.6)
 2014-03-24 15:22:48 +0100	/ MO statsnewsletter : ps_versions_compliancy added
 2014-03-20 14:37:07 +0100	Initial commit

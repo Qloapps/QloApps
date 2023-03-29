@@ -26,7 +26,7 @@ class QloAutoupgrade extends Module
         $this->name = 'qloautoupgrade';
         $this->tab = 'administration';
         $this->author = 'Webkul';
-        $this->version = '1.0.1';
+        $this->version = '1.0.2';
         $this->need_instance = 1;
 
         $this->bootstrap = true;

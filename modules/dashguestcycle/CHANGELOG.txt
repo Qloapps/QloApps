@@ -1,3 +1,17 @@
+------------------------------
+# V1.0.0 to V1.0.1
+------------------------------
+
+## Improved/Changed Features:
+
+* [BO] : [#587] Update guests count in Operations Today on dashboard
+* [BO] : [#560] Fixed: Guests count in "Operations Today" panel of Dashboard in Back-office.
+* [BO] : [#528] licenses updated
+* [BO] : [#463] Add 'Operations Today' section on admin dashboard
+* [BO] : [#412] Resolve dashboard design issues
+* [BO] : [#391] Updated dashboard structure | Fixed dashboard widget
+
+
 Changelog
 
 v1.0.0

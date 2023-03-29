@@ -1,3 +1,13 @@
+------------------------------
+# V1.0.0 to V1.0.1
+------------------------------
+
+## Improved/Changed Features:
+
+* [CO] : [#528] licenses updated
+* [FO] : [#387] Add nav bar and move language and currency selector at top at front office
+
+
 Changelog
 
 v1.0.0

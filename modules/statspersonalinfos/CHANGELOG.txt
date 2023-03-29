@@ -1,3 +1,13 @@
+------------------------------
+# V1.4.1 to V1.4.2
+------------------------------
+
+## Improved/Changed Features:
+
+* [BO] : [#566] Fix Unknown customer age on Stats > Stats page
+* [BO] : [#451] Improve statistics at back office
+
+
 2014-03-27 17:20:38 +0100	/ MO statspersonalinfos : min ps_versions_compliancy modified (1.5.6.1 => 1.6)
 2014-03-24 15:22:49 +0100	/ MO statspersonalinfos : ps_versions_compliancy added
 2014-03-20 14:37:13 +0100	Initial commit

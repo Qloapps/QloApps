@@ -1,4 +1,20 @@
 -----------------------------
+# V1.6.4 to V1.6.5
+-----------------------------
+
+## Improved/Changed Features:
+* [CO] : [#363] Text changes
+* [FO] : [#390] Resolve rooms left count issue on cart update on room type detail page
+* [FO] : [#400] Refreshed booking form panel on room type detail page
+* [CO] : [#436] Text changes
+* [FO] : [#474] Remove unwanted js and fix issues on room type detail page
+* [CO] : [#475] Added Feature: Occupancy wise search and booking
+* [FO] : [#505] Updated tax view in cart popup
+* [CO] : [#538] Added: Feature service products
+* [FO] : [#649] Fix: Occupancy panel does not close when clicking on add to cart button
+
+
+-----------------------------
 # V1.6.3 to V1.6.4
 -----------------------------
 

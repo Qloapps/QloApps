@@ -1,3 +1,12 @@
+------------------------------
+# V0.4.0 to V0.4.1
+------------------------------
+
+## Improved/Changed Features:
+
+* [FO] [#385] Improve front office header
+
+
 2014-04-22 18:57:59 +0200	// Changelog updated
 2014-03-24 11:43:29 +0100	/ MO blockuserinfo : ps_versions_compliancy modified (1.5.6.1 => 1.6)
 2014-03-24 11:04:51 +0100	/ MO blockuserinfo : ps_versions_compliancy added

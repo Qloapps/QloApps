@@ -1,4 +1,18 @@
 ------------------------------
+# V1.1.7 to V1.1.8
+------------------------------
+
+## Improved/Changed Features:
+
+* [CO] : [#528] licenses updated
+* [BO] : [#456] Allow admin to add new links on Hotel Reservation System > Settings page and removed shortcut links of "Our Rooms" and "Testimonial" modules
+* [CO] : [#468] Update image generation method for hotel and default modules
+* [BO] : [#444] Fix undefined variable issue at Hotel Interior Block settings page at back office
+* [CO] : [#366] Updated core upgrade files and modules upgrade files
+* [CO] : [#334] Remove install.sql files from modules
+
+
+------------------------------
 # V1.1.6 to V1.1.7
 ------------------------------
 
