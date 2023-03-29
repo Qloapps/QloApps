@@ -1749,15 +1749,22 @@
 			$('#room_extra_demand_content #back_to_service_btn').hide();
 		});
 
-		$(document).on('focusout', '#rooms_type_extra_demands .qty', function(e) {
+		$(document).on('focusout', '#rooms_type_extra_demands .room_ordered_services .qty', function(e) {
 			var qty_wntd = $(this).val();
-			if (qty_wntd == '' || !$.isNumeric(qty_wntd)) {
+			if (qty_wntd == '' || !$.isNumeric(qty_wntd) || qty_wntd < 1) {
 				$(this).val(1);
 			}
-			updateServiceProducts($(this));
+			updateAdditionalServices($(this));
 		});
 
-		function updateServiceProducts(element)
+		$(document).on('focusout', '#rooms_type_extra_demands #add_room_services_form .qty', function(e) {
+			var qty_wntd = $(this).val();
+			if (qty_wntd == '' || !$.isNumeric(qty_wntd) || qty_wntd < 1) {
+				$(this).val(1);
+			}
+		});
+
+		function updateAdditionalServices(element)
 		{
 			var id_room_type_service_product_order_detail = $(element).data('id_room_type_service_product_order_detail');
 			var qty = $(element).val();
@@ -1778,6 +1785,9 @@
 					},
 					success: function(jsonData) {
 						if (!jsonData.hasError) {
+							if (jsonData.service_panel) {
+								$('#room_type_service_product_desc').replaceWith(jsonData.service_panel);
+							}
 							showSuccessMessage(txtExtraDemandSucc);
 						} else {
 							showErrorMessage(jsonData.errors);
@@ -1924,12 +1934,14 @@
 						},
 						success: function(jsonData) {
 							if (!jsonData.hasError) {
-							$('#room_type_service_product_desc').replaceWith(jsonData.service_panel);
-							showSuccessMessage(txtExtraDemandSucc);
-						} else {
-							showErrorMessage(jsonData.errors);
+								if (jsonData.service_panel) {
+									$('#room_type_service_product_desc').replaceWith(jsonData.service_panel);
+								}
+								showSuccessMessage(txtExtraDemandSucc);
+							} else {
+								showErrorMessage(jsonData.errors);
 
-						}
+							}
 						}
 					});
 				} else {

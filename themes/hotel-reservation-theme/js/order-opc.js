@@ -33,6 +33,43 @@ $(document).ready(function()
 		$(this).closest('.card').find('.step-edit').addClass('hidden');
 	});
 
+	// room price details tooltip
+	if ($('.room_price_detail_block .room-price-detail').length) {
+		$('.room_price_detail_block .room-price-detail img').tooltip({
+			content: $('.room_price_detail_block .room-price-detail-container').html(),
+			items: "span",
+			trigger : 'hover',
+			tooltipClass: "room-price-detail-tooltip",
+			open: function(event, ui)
+			{
+				if (typeof(event.originalEvent) === 'undefined')
+				{
+					return false;
+				}
+
+				var $id = $(ui.tooltip).attr('id');
+
+				if ($('div.ui-tooltip').not('#' + $id).length) {
+					return false;
+				}
+			},
+			close: function(event, ui)
+			{
+				ui.tooltip.hover(function()
+				{
+					$(this).stop(true).fadeTo(400, 1);
+				},
+				function()
+				{
+					$(this).fadeOut('400', function()
+					{
+						$(this).remove();
+					});
+				});
+			}
+		});
+	}
+
 	// BY WEBKUL
 	// FOR ADVANCED PAYMENT
 	var payment_type = $(".payment_type:checked").val();
@@ -422,7 +459,6 @@ $(document).ready(function()
 	});
 
 	$(document).on('change', '.demand_adv_option_block .id_option', function(e) {
-		debugger
         var option_selected = $(this).find('option:selected');
 		var extra_demand_price = option_selected.attr("optionPrice")
         extra_demand_price = parseFloat(extra_demand_price);

@@ -82,7 +82,7 @@ class RoomTypeServiceProductOrderDetail extends ObjectModel
         $sql .= ' FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
             LEFT JOIN `'._DB_PREFIX_.'htl_room_type_service_product_order_detail` rsod ON(rsod.`id_htl_booking_detail` = hbd.`id`)';
 
-        $sql .= ' LEFT JOIN `'._DB_PREFIX_.'order_detail` od ON(od.`product_id` = rsod.`id_product` AND od.`id_order` = '.(int)$idOrder.')';
+        $sql .= ' LEFT JOIN `'._DB_PREFIX_.'order_detail` od ON(od.`id_order_detail` = rsod.`id_order_detail`)';
         $sql .= ' WHERE rsod.`id_order` = '.(int)$idOrder;
 
         if (!is_null($autoAddToCart)) {
@@ -200,11 +200,12 @@ class RoomTypeServiceProductOrderDetail extends ObjectModel
 
         $sql = 'SELECT rsod.*';
         if (!$getTotalPrice) {
-            $sql .= ', hbd.`id_product` as `room_type_id_product`, od.`product_allow_multiple_quantity`, hbd.`id_room`, od.`product_auto_add`, od.`product_price_addition_type`';
+            $sql .= ', hbd.`id_product` as `room_type_id_product`, hbd.`id_room`, od.`product_allow_multiple_quantity`,
+                od.`product_auto_add`, od.`product_price_calculation_method`, od.`product_price_addition_type`';
         }
         $sql .= ' FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
             LEFT JOIN `'._DB_PREFIX_.'htl_room_type_service_product_order_detail` rsod ON(rsod.`id_htl_booking_detail` = hbd.`id`)';
-        $sql .= ' LEFT JOIN `'._DB_PREFIX_.'order_detail` od ON(od.`product_id` = rsod.`id_product` AND od.`id_order` = '.(int)$idOrder.')';
+        $sql .= ' LEFT JOIN `'._DB_PREFIX_.'order_detail` od ON(od.`id_order_detail` = rsod.`id_order_detail`)';
         $sql .= ' WHERE rsod.`id_order` = '.(int)$idOrder.' AND hbd.`id_product`='.(int) $roomTypeIdProduct .' AND hbd.`date_from` = \''.pSQL($dateFrom).'\' AND hbd.`date_to` = \''.pSQL($dateTo).'\' AND hbd.`id_room`='.(int) $idRoom;
 
         if ($getTotalPrice) {
@@ -232,6 +233,9 @@ class RoomTypeServiceProductOrderDetail extends ObjectModel
                             'allow_multiple_quantity' => $product['product_allow_multiple_quantity'],
                             'product_auto_add' => $product['product_auto_add'],
                             'product_price_addition_type' => $product['product_price_addition_type'],
+                            'product_price_calculation_method' => $product['product_price_calculation_method'],
+                            'unit_price_tax_excl' => $product['unit_price_tax_excl'],
+                            'unit_price_tax_incl' => $product['unit_price_tax_incl'],
                             'total_price_tax_excl' => $product['total_price_tax_excl'],
                             'total_price_tax_incl' => $product['total_price_tax_incl'],
                         );
@@ -253,6 +257,9 @@ class RoomTypeServiceProductOrderDetail extends ObjectModel
                                 'allow_multiple_quantity' => $product['product_allow_multiple_quantity'],
                                 'product_auto_add' => $product['product_auto_add'],
                                 'product_price_addition_type' => $product['product_price_addition_type'],
+                                'product_price_calculation_method' => $product['product_price_calculation_method'],
+                                'unit_price_tax_excl' => $product['unit_price_tax_excl'],
+                                'unit_price_tax_incl' => $product['unit_price_tax_incl'],
                                 'total_price_tax_excl' => $product['total_price_tax_excl'],
                                 'total_price_tax_incl' => $product['total_price_tax_incl'],
                             ),

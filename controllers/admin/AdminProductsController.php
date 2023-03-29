@@ -3276,15 +3276,26 @@ class AdminProductsControllerCore extends AdminController
         if ($obj->id) {
             $objGlobalDemand = new HotelRoomTypeGlobalDemand();
             $allDemands = $objGlobalDemand->getAllDemands();
+            foreach($allDemands as &$demand) {
+                if ($demand['id_tax_rules_group'] == 0) {
+                    $demand['default_tax_rules_group_name'] = 'No tax';
+                } else {
+                    $objTaxRuleGroup = new TaxRulesGroup(
+                        $demand['id_tax_rules_group'],
+                        $this->context->language->id
+                    );
+                    $demand['default_tax_rules_group_name'] = $objTaxRuleGroup->name;
+                }
+            }
             $objCurrency = new Currency(Configuration::get('PS_CURRENCY_DEFAULT'));
 
             // get room type additional facilities
             $objRoomDemand = new HotelRoomTypeDemand();
-            $roomDemandPrices = $objRoomDemand->getRoomTypeDemands($obj->id, 0, 0);
+            $selectedDemands = $objRoomDemand->getRoomTypeDemands($obj->id, 0, 0);
 
             $data->assign(array(
                 'product' => $obj,
-                'roomDemandPrices' => $roomDemandPrices,
+                'selectedDemands' => $selectedDemands,
                 'allDemands' => $allDemands,
                 'defaultcurrencySign' => $objCurrency->sign,
             ));

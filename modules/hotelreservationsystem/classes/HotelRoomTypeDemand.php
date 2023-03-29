@@ -156,6 +156,17 @@ class HotelRoomTypeDemand extends ObjectModel
                     0,
                     $useTax
                 );
+                $roomTypeDemandInfo[$idGlobalDemand]['price_tax_excl'] = HotelRoomTypeDemand::getPriceStatic(
+                    $idProduct,
+                    $idGlobalDemand,
+                    0,
+                    false
+                );
+                $roomTypeDemandInfo[$idGlobalDemand]['price_tax_incl'] = HotelRoomTypeDemand::getPriceStatic(
+                    $idProduct,
+                    $idGlobalDemand,
+                    0
+                );
                 if ($advOptions = $objAdvOption->getGlobalDemandAdvanceOptions($idGlobalDemand, $idLang)) {
                     foreach ($advOptions as &$option) {
                         $idOption = $option['id'];
@@ -164,6 +175,17 @@ class HotelRoomTypeDemand extends ObjectModel
                             $idGlobalDemand,
                             $idOption,
                             $useTax
+                        );
+                        $roomTypeDemandInfo[$idGlobalDemand]['adv_option'][$idOption]['price_tax_excl'] = HotelRoomTypeDemand::getPriceStatic(
+                            $idProduct,
+                            $idGlobalDemand,
+                            $idOption,
+                            false
+                        );
+                        $roomTypeDemandInfo[$idGlobalDemand]['adv_option'][$idOption]['price_tax_incl'] = HotelRoomTypeDemand::getPriceStatic(
+                            $idProduct,
+                            $idGlobalDemand,
+                            $idOption
                         );
                         $roomTypeDemandInfo[$idGlobalDemand]['adv_option'][$idOption]['name'] = $option['name'];
                     }

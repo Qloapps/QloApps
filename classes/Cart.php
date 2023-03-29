@@ -532,7 +532,7 @@ class CartCore extends ObjectModel
         $sql = new DbQuery();
 
         // Build SELECT
-        $sql->select('cp.`id_product_attribute`, cp.`id_product`, cp.`quantity` AS cart_quantity, cp.id_shop, pl.`name`, p.`is_virtual`, p.`booking_product`, p.`service_product_type`,  p.`auto_add_to_cart`, p.`price_addition_type`, product_shop.`allow_multiple_quantity`,
+        $sql->select('cp.`id_product_attribute`, cp.`id_product`, cp.`quantity` AS cart_quantity, cp.id_shop, pl.`name`, p.`is_virtual`, p.`booking_product`, p.`service_product_type`,  p.`auto_add_to_cart`, p.`price_addition_type`, product_shop.`allow_multiple_quantity`, product_shop.`price_calculation_method`,
 						pl.`description_short`, pl.`available_now`, pl.`available_later`, product_shop.`id_category_default`, p.`id_supplier`,
 						p.`id_manufacturer`, product_shop.`on_sale`, product_shop.`ecotax`, product_shop.`additional_shipping_cost`,
 						product_shop.`available_for_order`, product_shop.`price`, product_shop.`active`, product_shop.`unity`, product_shop.`unit_price_ratio`,
@@ -3783,7 +3783,20 @@ class CartCore extends ObjectModel
             }
         }
 
+        $discountedProducts = array();
         foreach ($cart_rules as $key => &$cart_rule) {
+            $product_rule_groups = $cart_rule['obj']->getProductRuleGroups();
+            foreach ($product_rule_groups as $id_product_rule_group => $product_rule_group) {
+                if (isset($product_rule_group['product_rules']) && $product_rule_group['product_rules']) {
+                    foreach($product_rule_group['product_rules'] as $rule_products) {
+                        if ($rule_products['type'] == 'products') {
+                            $discountedProducts = array_merge($discountedProducts, $rule_products['values']);
+                        }
+                    }
+
+                }
+            }
+
             if (((float)$cart_rule['value_real'] == 0 && (int)$cart_rule['free_shipping'] == 0)) {
                 unset($cart_rules[$key]);
             }
@@ -3823,6 +3836,7 @@ class CartCore extends ObjectModel
             'total_price' => $base_total_tax_inc,
             'total_tax' => $total_tax,
             'total_price_without_tax' => $base_total_tax_exc,
+            'discounted_products' => $discountedProducts,
             'is_multi_address_delivery' => $this->isMultiAddressDelivery() || ((int)Tools::getValue('multi-shipping') == 1),
             'free_ship' =>!$total_shipping && !count($this->getDeliveryAddressesWithoutCarriers(true, $errors)),
             'carrier' => new Carrier($this->id_carrier, $id_lang),

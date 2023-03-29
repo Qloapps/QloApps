@@ -62,8 +62,6 @@ class ProductControllerCore extends FrontController
         $this->addCSS(_THEME_CSS_DIR_.'occupancy.css');
         $this->addJS(_THEME_JS_DIR_.'occupancy.js');
 
-        $this->addJqueryUI('ui.tooltip', 'base', true);
-
         if (Configuration::get('PS_DISPLAY_JQZOOM') == 1) {
             $this->addJqueryPlugin('jqzoom');
         }
@@ -701,7 +699,14 @@ class ProductControllerCore extends FrontController
                     }
                     $product['name'] = $objServiceProduct->name;
                     $product['allow_multiple_quantity'] = $objServiceProduct->allow_multiple_quantity;
-                    $productPrice = $objRoomTypeServiceProductPrice->getProductPrice($product['id_product'], $idProduct, $product['quantity'], $useTax);
+                    $productPrice = $objRoomTypeServiceProductPrice->getServicePrice(
+                        $product['id_product'],
+                        $idProduct,
+                        $product['quantity'],
+                        $dateFrom,
+                        $dateTo,
+                        $useTax
+                    );
                     $product['price'] = $productPrice;
                     $serviceProductsPrice += $productPrice;
                 }
@@ -1218,6 +1223,9 @@ class ProductControllerCore extends FrontController
 
         $dateFrom = date('Y-m-d', strtotime($dateFrom));
         $dateTo = date('Y-m-d', strtotime($dateTo));
+        if ($occupancy == false) {
+            $occupancy = array();
+        }
         $this->assignServiceProductVars();
         if ($this->assignBookingFormVars(
             $idProduct,

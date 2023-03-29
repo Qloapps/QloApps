@@ -115,7 +115,7 @@ class RoomTypeServiceProduct extends ObjectModel
         return Db::getInstance()->getValue($sql);
     }
 
-    public static function getAutoAddServices($idProduct, $priceAdditionType = null, $useTax = null)
+    public static function getAutoAddServices($idProduct, $dateFrom = null, $dateTo = null, $priceAdditionType = null, $useTax = null)
     {
         if (Product::isBookingProduct($idProduct)) {
             $sql = 'SELECT p.`id_product` FROM  `'._DB_PREFIX_.'htl_room_type_service_product` rsp
@@ -127,10 +127,12 @@ class RoomTypeServiceProduct extends ObjectModel
             if ($services = Db::getInstance()->executeS($sql)) {
                 $objRoomTypeServiceProductPrice = new RoomTypeServiceProductPrice();
                 foreach($services as &$service) {
-                    $service['price'] = $objRoomTypeServiceProductPrice->getProductPrice(
+                    $service['price'] = $objRoomTypeServiceProductPrice->getServicePrice(
                         (int)$service['id_product'],
                         (int)$idProduct,
                         1,
+                        $dateFrom,
+                        $dateTo,
                         $useTax
                     );
                 }
@@ -162,28 +164,34 @@ class RoomTypeServiceProduct extends ObjectModel
             $serviceProducts = Product::getProductsProperties($idLang, $serviceProducts);
             $objRoomTypeServiceProductPrice = new RoomTypeServiceProductPrice();
             foreach($serviceProducts as &$serviceProduct) {
-                $serviceProduct['price_tax_exc'] = $objRoomTypeServiceProductPrice->getProductPrice(
+                $serviceProduct['price_tax_exc'] = $objRoomTypeServiceProductPrice->getServicePrice(
                     (int)$serviceProduct['id_product'],
                     (int)$idProductRoomType,
                     1,
+                    null,
+                    null,
                     false
                 );
 
-                $serviceProduct['price_tax_incl'] = $objRoomTypeServiceProductPrice->getProductPrice(
+                $serviceProduct['price_tax_incl'] = $objRoomTypeServiceProductPrice->getServicePrice(
                     (int)$serviceProduct['id_product'],
                     (int)$idProductRoomType,
                     1,
+                    null,
+                    null,
                     true
                 );
                 $useTax = Product::$_taxCalculationMethod == PS_TAX_EXC ? false : true;
-                $serviceProduct['price_without_reduction'] = $objRoomTypeServiceProductPrice->getProductPrice(
+                $serviceProduct['price_without_reduction'] = $objRoomTypeServiceProductPrice->getServicePrice(
                     (int)$serviceProduct['id_product'],
                     (int)$idProductRoomType,
                     1,
+                    null,
+                    null,
                     $useTax
                 );
+                $serviceProduct['images'] = Image::getImages((int)Context::getContext()->language->id, $serviceProduct['id_product']);
             }
-            $serviceProduct['images'] = Image::getImages((int)Context::getContext()->language->id, $serviceProduct['id_product']);
         }
 
         return $serviceProducts;

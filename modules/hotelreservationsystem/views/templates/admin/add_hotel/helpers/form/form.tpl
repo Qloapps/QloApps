@@ -398,7 +398,7 @@
 												<th>{l s='Name' mod='hotelreservationsystem'}</th>
 												<th>{l s='Full payment charges' mod='hotelreservationsystem'}</th>
 												<th>{l s='Advance payment charges' mod='hotelreservationsystem'}</th>
-												<th>{l s='Days before cancelation' mod='hotelreservationsystem'}</th>
+												<th>{l s='Days before check-in' mod='hotelreservationsystem'}</th>
 											</tr>
 										</thead>
 										<tbody id="slides">
