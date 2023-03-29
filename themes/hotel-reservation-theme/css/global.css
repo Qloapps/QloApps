@@ -8505,6 +8505,14 @@ div.star.star_hover:after {
     content: "\f057";
     font-family: "FontAwesome"; }
 
+body .ui-tooltip {
+  box-shadow: 0 2px 6px 0 rgb(0 0 0 / 20%);
+  background: #FFFFFF;
+  border: unset;
+  color: #333;
+  padding: 10px 15px;
+}
+
 #facebook_block,
 #cmsinfo_block {
   overflow: hidden;

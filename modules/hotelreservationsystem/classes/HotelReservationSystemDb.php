@@ -394,12 +394,8 @@ class HotelReservationSystemDb
 
             "CREATE TABLE `"._DB_PREFIX_."htl_room_type_service_product_cart_detail` (
                 `id_room_type_service_product_cart_detail` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-                `id_room_type` int(11) UNSIGNED NOT NULL,
                 `id_product` int(11) UNSIGNED NOT NULL,
                 `quantity` int(11) UNSIGNED NOT NULL,
-                `date_from` datetime NOT NULL,
-                `date_to` datetime NOT NULL,
-                `id_guest` int(11) unsigned NOT NULL,
                 `id_cart` int(11) unsigned NOT NULL,
                 `htl_cart_booking_id` int(11) unsigned NOT NULL,
                 PRIMARY KEY (`id_room_type_service_product_cart_detail`),

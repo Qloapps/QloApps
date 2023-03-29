@@ -228,7 +228,6 @@ class GuestTrackingControllerCore extends FrontController
                     $total_demands_price_ti = 0;
                     $total_convenience_fee_te = 0;
                     $total_convenience_fee_ti = 0;
-                    // ddd($orderProducts);
                     foreach ($orderProducts as $type_key => $type_value) {
                         if (in_array($type_value['product_id'], $processedProducts)) {
                             continue;

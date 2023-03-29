@@ -80,6 +80,9 @@ class ProductCore extends ObjectModel
     /** @var bool max allowed quantities */
     public $max_quantity;
 
+    /** @var int price calculation method */
+    public $price_calculation_method;
+
     /** @var string available_now */
     public $available_now;
 
@@ -310,6 +313,7 @@ class ProductCore extends ObjectModel
             'minimal_quantity' =>            array('type' => self::TYPE_INT, 'shop' => true, 'validate' => 'isUnsignedInt'),
             'allow_multiple_quantity' =>     array('type' => self::TYPE_BOOL, 'shop' => true, 'validate' => 'isBool'),
             'max_quantity' =>                array('type' => self::TYPE_INT, 'shop' => true, 'validate' => 'isUnsignedInt'),
+            'price_calculation_method' =>    array('type' => self::TYPE_INT, 'shop' => true, 'validate' => 'isUnsignedId'),
             'price' =>                        array('type' => self::TYPE_FLOAT, 'shop' => true, 'validate' => 'isPrice', 'required' => true),
             'wholesale_price' =>            array('type' => self::TYPE_FLOAT, 'shop' => true, 'validate' => 'isPrice'),
             'unity' =>                        array('type' => self::TYPE_STRING, 'shop' => true, 'validate' => 'isString'),
@@ -507,6 +511,9 @@ class ProductCore extends ObjectModel
 
     const PRICE_ADDITION_TYPE_WITH_ROOM = 1;
     const PRICE_ADDITION_TYPE_INDEPENDENT = 2;
+
+    const PRICE_CALCULATION_METHOD_PER_BOOKING = 1;
+    const PRICE_CALCULATION_METHOD_PER_DAY = 2;
 
 
     public function __construct($id_product = null, $full = false, $id_lang = null, $id_shop = null, Context $context = null)
@@ -878,6 +885,14 @@ class ProductCore extends ObjectModel
         Db::getInstance()->update('product', array(
             'is_virtual' => (bool)$is_virtual,
         ), 'id_product = '.(int)$id_product);
+    }
+
+    public static function getProductPriceCalculation($id_product) {
+        return Db::getInstance()->getValue(
+            'SELECT product_shop.`price_calculation_method`
+            FROM `'._DB_PREFIX_.'product` p '.Shop::addSqlAssociation('product', 'p').'
+            WHERE p.`id_product` = '.(int)$id_product
+        );
     }
 
     /**
@@ -3040,17 +3055,30 @@ class ProductCore extends ObjectModel
         $id_state = 0;
         $zipcode = 0;
 
-        if ($id_address) {
-            $address_infos = Address::getCountryAndState($id_address);
-        } else {
-            // if ($id_roomtype) {
-            //     $address_infos = Address::getCountryAndState(Cart::getIdAddressForTaxCalculation($id_roomtype));
-            // } else {
-                $address_infos = Address::getCountryAndState(Cart::getIdAddressForTaxCalculation($id_product));
-            // }
+        if (!$id_address) {
+            if (!Product::isBookingProduct($id_product)) {
+                if ($id_roomtype) {
+                    // if room type is provided with product then we know that the service product price should be calculated accroding to roomt type
+                    $id_address = Cart::getIdAddressForTaxCalculation($id_roomtype);
+                }
+            } else {
+                $id_address = Cart::getIdAddressForTaxCalculation($id_product);
+            }
         }
 
-        if ($address_infos['id_country']) {
+        if (!$id_address) {
+            if ($primaryHotel = ConfigurationCore::get('WK_PRIMARY_HOTEL')) {
+                if ($address = HotelBranchInformation::getAddress($primaryHotel)) {
+                    $address_infos['id_country'] = $address['id_country'];
+                    $address_infos['id_state'] = $address['id_state'];
+                    $address_infos['postcode'] = $address['postcode'];
+                }
+            }
+        } elseif ($id_address) {
+            $address_infos = Address::getCountryAndState($id_address);
+        }
+
+        if (isset($address_infos['id_country'])) {
             $id_country = (int)$address_infos['id_country'];
             $id_state = (int)$address_infos['id_state'];
             $zipcode = $address_infos['postcode'];

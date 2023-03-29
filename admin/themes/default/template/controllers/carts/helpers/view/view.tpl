@@ -115,7 +115,7 @@
 						<td>{displayWtPriceWithCurrency price=$room['feature_price_tax_excl'] currency=$currency}</td>
 						<td>
 							{if (isset($room['extra_demands']) && $room['extra_demands']) || (isset($room['additional_service']) && $room['additional_service'])}
-								<a href="#" data-toggle="modal" data-target="#rooms_type_extra_demands_{$room['id']}" edit_orde_line="0">
+								<a href="#" data-toggle="modal" data-target="#rooms_type_extra_demands_{$room['id']}">
 									{displayWtPriceWithCurrency price=($room['demand_price'] + $room['additional_service_price'] + $room['additional_services_auto_add_price'])|escape:'html':'UTF-8' currency=$currency}
 								</a>
 							{else}

@@ -207,7 +207,7 @@
 					  {l s='Increase Price' mod='hotelreservationsystem'}
 					</option>
 					<option value="{HotelRoomTypeFeaturePricing::IMPACT_WAY_FIX_PRICE}" {if isset($objFeaturePrice->impact_way) && $objFeaturePrice->impact_way == HotelRoomTypeFeaturePricing::IMPACT_WAY_FIX_PRICE}selected = "selected"{/if}>
-						{l s='Fix Price' mod='hotelreservationsystem'}
+						{l s='Fixed Price' mod='hotelreservationsystem'}
 					</option>
 				</select>
 			</div>
@@ -223,10 +223,9 @@
 					  {l s='Percentage' mod='hotelreservationsystem'}
 					</option>
 					<option value="{HotelRoomTypeFeaturePricing::IMPACT_TYPE_FIXED_PRICE}" {if isset($objFeaturePrice->impact_type) && $objFeaturePrice->impact_type == HotelRoomTypeFeaturePricing::IMPACT_TYPE_FIXED_PRICE}selected = "selected"{/if}>
-					  {l s='Fixed Price' mod='hotelreservationsystem'}
+					  {l s='Amount' mod='hotelreservationsystem'}
 					</option>
 				</select>
-				<input type="hidden" id="price_impact_type_input" name="price_impact_type" value="{if isset($objFeaturePrice->impact_type)}{$objFeaturePrice->impact_type}{/if}">
 			</div>
 		</div>
 
@@ -262,8 +261,8 @@
 
 		{* select group accesses *}
 		<div class="form-group">
-			<label class="control-label col-lg-3">
-				<span class="label-tooltip" data-toggle="tooltip" data-html="true" data-original-title="{l s='Select all the groups that you would like to apply to this advanced price rule.' mod='hotelreservationsystem'}">{l s='Group access' mod='hotelreservationsystem'}</span>
+			<label class="control-label required col-lg-3">
+				<span class="label-tooltip required" data-toggle="tooltip" data-html="true" data-original-title="{l s='Select all the groups that you would like to apply to this advanced price rule.' mod='hotelreservationsystem'}">{l s='Group access' mod='hotelreservationsystem'}</span>
 			</label>
 			<div class="col-lg-6">
 				<div class="table-responsive">
@@ -279,7 +278,13 @@
 								{foreach $groups as $group}
 									<tr>
 										<td class="text-center">
-											<input type="checkbox" name="groupBox[]" value="{$group['id_group']|escape:'html':'UTF-8'}" {if isset($feature_price_groups) && $feature_price_groups && $group['id_group']|in_array:$feature_price_groups}checked{/if}/>
+											<input type="checkbox" name="groupBox[]" value="{$group['id_group']|escape:'html':'UTF-8'}"
+												{if isset($feature_price_groups) && $feature_price_groups && $group['id_group']|in_array:$feature_price_groups}
+													checked
+												{elseif empty($objFeaturePrice->id)}
+													checked
+												{/if}
+											/>
 										</td>
 										<td class="text-center">{$group['name']|escape:'html':'UTF-8'}</td>
 									</tr>

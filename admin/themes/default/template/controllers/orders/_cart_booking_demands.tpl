@@ -70,7 +70,7 @@
 																			<select class="id_option">
 																				{foreach $demand['adv_option'] as $idOption => $option}
 																					{assign var=demand_key value="`$idGlobalDemand`-`$idOption`"}
-																					<option optionPrice="{$option['price']|escape:'html':'UTF-8'}" value="{$idOption|escape:'html':'UTF-8'}" {if isset($roomDemand['extra_demands'][$demand_key])}selected{/if} key="{$demand_key}">{$option['name']}</option>
+																					<option optionPrice="{$option['price_tax_excl']|escape:'html':'UTF-8'}" value="{$idOption|escape:'html':'UTF-8'}" {if isset($roomDemand['extra_demands'][$demand_key])}selected{/if} key="{$demand_key}">{$option['name']}</option>
 																					{if isset($roomDemand['extra_demands'][$demand_key])}
 																						{assign var=selected_adv_option value="$idOption"}
 																					{/if}
@@ -83,7 +83,14 @@
 																</div>
 															</div>
 															<div class="col-xs-6">
-																<p><span class="pull-right extra_demand_option_price">{if isset($selected_adv_option) && isset($demand['adv_option'][$selected_adv_option]['price'])}{convertPrice price = $demand['adv_option'][$selected_adv_option]['price']|escape:'html':'UTF-8'}{else}{convertPrice price = $demand['price']|escape:'html':'UTF-8'}{/if}</span></p>
+																<p class="pull-right">
+																	<span class="extra_demand_option_price">
+																		{if isset($selected_adv_option) && isset($demand['adv_option'][$selected_adv_option]['price_tax_excl'])}{convertPrice price = $demand['adv_option'][$selected_adv_option]['price_tax_excl']|escape:'html':'UTF-8'}{else if isset($demand['adv_option']) && $demand['adv_option']}{convertPrice price = $demand['adv_option'][$demand['adv_option']|@key]['price_tax_excl']}{else}{convertPrice price = $demand['price_tax_excl']|escape:'html':'UTF-8'}{/if}
+																	</span>
+																	{if $demand['price_calc_method'] == HotelRoomTypeGlobalDemand::WK_PRICE_CALC_METHOD_EACH_DAY}
+																		{l s='/ night'}
+																	{/if}
+																</p>
 															</div>
 														</div>
 													{/foreach}
@@ -121,7 +128,7 @@
 														<div class="col-xs-5">
 															<div class="row">
 																<div class="col-xs-2">
-																	<input data-id_cart_booking="{$selectedRoomServiceProduct['htl_cart_booking_id']}" value="{$product['id_product']|escape:'html':'UTF-8'}" type="checkbox" class="change_room_type_service_product" {if  isset($selectedRoomServiceProduct['selected_service']) && $selectedRoomServiceProduct['selected_service'] && ($product['id_product']|array_key_exists:$selectedRoomServiceProduct['selected_service'])}checked{/if}/>
+																	<input data-id_cart_booking="{$selectedRoomServiceProduct['id']}" value="{$product['id_product']|escape:'html':'UTF-8'}" type="checkbox" class="change_room_type_service_product" {if  isset($selectedRoomServiceProduct['selected_service']) && $selectedRoomServiceProduct['selected_service'] && ($product['id_product']|array_key_exists:$selectedRoomServiceProduct['selected_service'])}checked{/if}/>
 																</div>
 																<div class="col-xs-10">
 																	<p>{$product['name']|escape:'html':'UTF-8'}</p>
