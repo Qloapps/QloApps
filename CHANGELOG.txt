@@ -31,6 +31,8 @@
   - #622: Added: Primary hotel in QloApps for tax calculation of service products
   - #643: Add module Dashboard Insights to admin dashboard
   - #645: Added: checkoutProcess directory in override/classes
+  - #650: Added: Feature per day price in extra services
+
 
 ## Improvements
 - Core
@@ -113,6 +115,8 @@
   - #632: Update disable dates selection for a room at back office
   - #633: Update hotel review view page at back office
   - #639: Update refund request view page at back office
+  - #653: Updated: Additional facilities panel in admin room type page
+  - #655: Updated: compiled admin theme css from sass
 
 - Front Office
   - #336: Remove order history link for guest account holders on order confirmation page
@@ -267,6 +271,9 @@
   - #626: Fixes: Unable to view or save customer address from front office
   - #638: Close occupancy dropdown on clicking book now button
   - #649: Fix: Occupancy panel does not close when clicking on add to cart button
+  - #651: Fix: imgaes index not defined for services on room type page in front office
+  - #652: Fix: Booking form does not get update when occupancy is not provided
+  - #654: Fix: Booking form refresh when occupancy dropdown is opened
 
 
 ####################################

@@ -89,6 +89,9 @@
 * [BO] : [#345] Improve room type duplication feature
 * [CO] : [#338] Replace booking type integer values with class constants
 * [CO] : [#334] Remove install.sql files from modules
+* [FO] : [#619] Show service cost separately from room cost on checkout page
+* [CO] : [#636] Resolved: refund request payment calculation
+* [BO] : [#653] Updated: Additional facilities panel in admin room type page
 
 
 -------------------------

@@ -6,6 +6,7 @@
 
 * [CO] : [#552] Resolved: guest order detail page issue
 * [BO] : [#451] Improve statistics at back office
+* [CO] : [#517] Resolved: Incorrect id_guest in cookie after login
 
 
 2014-03-27 17:19:09 +0100	/ MO statsdata : min ps_versions_compliancy modified (1.5.6.1 => 1.6)
