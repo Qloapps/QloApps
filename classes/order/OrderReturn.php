@@ -198,51 +198,43 @@ class OrderReturnCore extends ObjectModel
 
             $objBookingDemands = new HotelBookingDemands();
             $objRoomTypeServiceProductOrderDetail = new RoomTypeServiceProductOrderDetail();
+            $objOrder = new Order($idOrder);
             foreach ($returnDetails as &$bookingRow) {
-                $bookingRow['extra_demands_price_tax_incl'] = $objBookingDemands->getRoomTypeBookingExtraDemands(
-                    $bookingRow['id_order'],
-                    $bookingRow['id_product'],
-                    $bookingRow['id_room'],
-                    $bookingRow['date_from'],
-                    $bookingRow['date_to'],
-                    0,
-                    1
-                );
-                $bookingRow['extra_demands_price_tax_excl'] = $objBookingDemands->getRoomTypeBookingExtraDemands(
-                    $bookingRow['id_order'],
-                    $bookingRow['id_product'],
-                    $bookingRow['id_room'],
-                    $bookingRow['date_from'],
-                    $bookingRow['date_to'],
-                    0,
-                    1,
-                    0
-                );
-                $bookingRow['additional_services_tax_excl'] = $objRoomTypeServiceProductOrderDetail->getroomTypeServiceProducts(
-                    $bookingRow['id_order'],
-                    0,
-                    0,
-                    $bookingRow['id_product'],
-                    $bookingRow['date_from'],
-                    $bookingRow['date_to'],
-                    $bookingRow['id_room'],
-                    1,
-                    0,
-                    null
-                );
-                $bookingRow['additional_services_tax_incl'] = $objRoomTypeServiceProductOrderDetail->getroomTypeServiceProducts(
-                    $bookingRow['id_order'],
-                    0,
-                    0,
-                    $bookingRow['id_product'],
-                    $bookingRow['date_from'],
-                    $bookingRow['date_to'],
-                    $bookingRow['id_room'],
-                    1,
-                    1,
-                    null
-                );
+                $bookingRow['extra_service_total_paid_amount'] = 0;
+                $bookingRow['extra_service_total_price_tax_incl'] = 0;
+                $bookingRow['room_paid_amount'] = 0;
+                if ($objOrder->total_paid_real > 0) {
+                    if ($bookingRow['total_price_tax_incl'] > 0) {
+                        $bookingRow['room_paid_amount'] = ($objOrder->total_paid_real*$bookingRow['total_price_tax_incl'])/$objOrder->total_paid_tax_incl;
+                    }
+                    $roomSelectedDemands = $objBookingDemands->getRoomTypeBookingExtraDemands(
+                        $idOrder,
+                        $bookingRow['id_product'],
+                        $bookingRow['id_room'],
+                        $bookingRow['date_from'],
+                        $bookingRow['date_to'],
+                        0
+                    );
+                    if (count($roomSelectedDemands)) {
+                        foreach ($roomSelectedDemands as $demand) {
+                            if ($demand['total_price_tax_incl'] > 0) {
+                                $bookingRow['extra_service_total_paid_amount'] += ($objOrder->total_paid_real*$demand['total_price_tax_incl'])/$objOrder->total_paid_tax_incl;
+                                $bookingRow['extra_service_total_price_tax_incl'] += $demand['total_price_tax_incl'];
+                            }
+                        }
+                    }
 
+                    if ($roomSelectedServices = $objRoomTypeServiceProductOrderDetail->getSelectedServicesForRoom($bookingRow['id_htl_booking'])) {
+                        if (count($roomSelectedServices['additional_services'])) {
+                            foreach ($roomSelectedServices['additional_services'] as $service) {
+                                if ($service['total_price_tax_incl'] > 0) {
+                                    $bookingRow['extra_service_total_paid_amount'] += ($objOrder->total_paid_real*$service['total_price_tax_incl'])/$objOrder->total_paid_tax_incl;
+                                    $bookingRow['extra_service_total_price_tax_incl'] += $service['total_price_tax_incl'];
+                                }
+                            }
+                        }
+                    }
+                }
                 if ($customerView) {
                     $dateJoin = $bookingRow['id_product'].'_'.strtotime($bookingRow['date_from']).strtotime($bookingRow['date_to']);
                     if (isset($returnsCustView[$dateJoin]['num_rooms'])) {
@@ -250,10 +242,6 @@ class OrderReturnCore extends ObjectModel
                         $returnsCustView[$dateJoin]['refunded_amount'] += $bookingRow['refunded_amount'];
                         $returnsCustView[$dateJoin]['total_price_tax_incl'] += $bookingRow['total_price_tax_incl'];
                         $returnsCustView[$dateJoin]['total_paid_amount'] += $bookingRow['total_paid_amount'];
-                        $returnsCustView[$dateJoin]['extra_demands_price_tax_incl'] += $bookingRow['extra_demands_price_tax_incl'];
-                        $returnsCustView[$dateJoin]['extra_demands_price_tax_incl'] += $bookingRow['additional_services_tax_incl'];
-                        $returnsCustView[$dateJoin]['extra_demands_price_tax_excl'] += $bookingRow['extra_demands_price_tax_excl'];
-                        $returnsCustView[$dateJoin]['extra_demands_price_tax_excl'] += $bookingRow['additional_services_tax_excl'];
                     } else {
                         unset($bookingRow['id_room']);
                         unset($bookingRow['room_num']);
@@ -277,10 +265,12 @@ class OrderReturnCore extends ObjectModel
         }
         $sql = 'SELECT orr.`id_order`, orr.`state`, orr.`id_order_return`, orr.`payment_mode`, orr.`id_transaction`,
             orr.`id_return_type`, orr.`return_type`, ors.`id_cart_rule`, orr.`date_add`, orr.`date_upd`,
-            COUNT(ord.`id_order_return_detail`) AS total_rooms
+            hbd.`is_cancelled`, COUNT(ord.`id_order_return_detail`) AS total_rooms
             FROM `'._DB_PREFIX_.'order_return` orr
             LEFT JOIN `'._DB_PREFIX_.'order_return_detail` ord
             ON (ord.`id_order_return` = orr.`id_order_return`)
+            LEFT JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd
+            ON (hbd.`id` = ord.`id_htl_booking`)
             LEFT JOIN `'._DB_PREFIX_.'order_slip` ors
             ON (ors.`id_order_slip` = orr.`id_return_type` AND orr.`return_type` = '.(int) self::RETURN_TYPE_ORDER_SLIP.')
             WHERE orr.`id_customer` = '.(int)$customer_id.

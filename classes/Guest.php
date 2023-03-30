@@ -160,30 +160,35 @@ class GuestCore extends ObjectModel
         if (!Validate::isUnsignedId($id_customer)) {
             return false;
         }
-        $result = Db::getInstance()->getRow('
-		SELECT `id_guest`
-		FROM `'._DB_PREFIX_.'guest`
-		WHERE `id_customer` = '.(int)($id_customer));
-        return $result['id_guest'];
+
+        if ($result = Db::getInstance()->getRow(
+            'SELECT `id_guest` FROM `'._DB_PREFIX_.'guest` WHERE `id_customer` = '.(int)($id_customer)
+        )) {
+            return $result['id_guest'];
+        }
+
+        return false;
     }
 
-    public function mergeWithCustomer($id_guest, $id_customer)
+    public function mergeWithCustomer($idGuest, $idCustomer)
     {
         // Since the guests are merged, the guest id in the connections table must be changed too
-        Db::getInstance()->execute('
-		UPDATE `'._DB_PREFIX_.'connections` c
-		SET c.`id_guest` = '.(int)($id_guest).'
-		WHERE c.`id_guest` = '.(int)($this->id));
+        Db::getInstance()->update('connections', [
+            'id_guest' => (int) $idGuest,
+        ], 'id_guest = ' . (int) $this->id);
 
-        // The current guest is removed from the database
+        // Since the guests are merged, the guest id in the cart table must be changed too
+        Db::getInstance()->update('cart', [
+            'id_guest' => (int) $idGuest,
+        ], 'id_guest = ' . (int) $this->id);
+
+        // Since the guests are merged, the guest id in the htl_cart_booking_data table must be changed too
+        Db::getInstance()->update('htl_cart_booking_data', [
+            'id_guest' => (int) $idGuest,
+        ], 'id_guest = ' . (int) $this->id);
+
+        // The current guest is removed from the database because now we have old customer guest id
         $this->delete();
-
-        // $this is still filled with values, so it's id is changed for the old guest
-        $this->id = (int)($id_guest);
-        $this->id_customer = (int)($id_customer);
-
-        // $this is now the old guest but filled with the most up to date values
-        $this->update();
     }
 
     public static function setNewGuest($cookie)

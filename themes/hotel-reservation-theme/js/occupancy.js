@@ -181,8 +181,8 @@ $(document).ready(function(){
                     )) {
                         $(occupancy_wrapper).parent().removeClass('open');
                         $(occupancy_wrapper).siblings(".booking_guest_occupancy").removeClass('error_border');
+                        $(document).trigger( "QloApps:updateRoomOccupancy", [occupancy_wrapper]);
                     }
-                    $(document).trigger( "QloApps:updateRoomOccupancy", [occupancy_wrapper]);
                 } else {
                     $(occupancy_wrapper).siblings(".booking_guest_occupancy").addClass('error_border');
                 }
