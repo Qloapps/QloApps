@@ -221,10 +221,14 @@
 		</div>
 		{/if}
 	</td>
-	{if isset($refundReqBookings) && $refundReqBookings}
+	{if (isset($refundReqBookings) && $refundReqBookings) || (isset($isCancelledRoom) && $isCancelledRoom)}
 		<td class="text-center">
-			{if isset($data.refund_info) && $data.refund_info}
+			{if $data.is_cancelled}
+				<span class="badge badge-danger">{l s='Cancelled'}</span>
+			{elseif isset($data.refund_info) && $data.refund_info}
 				<span class="badge" style="background-color:{$data.refund_info.color|escape:'html':'UTF-8'}">{$data.refund_info.name|escape:'html':'UTF-8'}</span>
+			{else}
+				<span>--</span>
 			{/if}
 		</td>
 		<td class="text-center">

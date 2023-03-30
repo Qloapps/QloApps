@@ -16,12 +16,12 @@
                     <th class="text-center"><span class="title_box">{l s='Extra Services/Fee (Tax excl.)'}</span></th>
                     <th class="text-center"><span class="title_box">{l s='Total Tax'}</span></th>
                     <th class="text-center"><span class="title_box">{l s='Total Price (Tax incl.)'}</span></th>
-                    {if isset($refundReqBookings) && $refundReqBookings}
-                        <th class="text-center"><span class="title_box">{l s='Refund State'}</span></th>
+                    {if (isset($refundReqBookings) && $refundReqBookings) || (isset($isCancelledRoom) && $isCancelledRoom)}
+                        <th class="text-center"><span class="title_box">{l s='Refund/Cancellation Status'}</span></th>
                         <th class="text-center"><span class="title_box">{l s='Refunded amount'}</span></th>
                     {/if}
                     {if ($can_edit && !$order->hasBeenDelivered())}
-                    <th class="text-center"><span class="title_box">{l s='Edit Order'}</th>
+                    <th class="text-center fixed-width-lg"><span class="title_box">{l s='Edit Order'}</th>
                     {/if}
                 </tr>
             </thead>
