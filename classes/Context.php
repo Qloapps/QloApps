@@ -288,4 +288,85 @@ class ContextCore
     {
         return clone($this);
     }
+
+    public function updateCustomer(Customer $customer, $loginCustomer = 0)
+    {
+        $this->customer = $customer;
+        $this->cookie->id_customer = (int) $customer->id;
+        $this->cookie->customer_lastname = $customer->lastname;
+        $this->cookie->customer_firstname = $customer->firstname;
+        $this->cookie->passwd = $customer->passwd;
+        $this->cookie->logged = true;
+        $customer->logged = true;
+        $this->cookie->email = $customer->email;
+        $this->cookie->is_guest = $customer->isGuest();
+
+        $currentCookieGuest = $this->cookie->id_guest;
+
+        if (Configuration::get('PS_CART_FOLLOWING') && (empty($this->cookie->id_cart) || Cart::getNbProducts((int) $this->cookie->id_cart) == 0) && $idCart = (int) Cart::lastNoneOrderedCart($this->customer->id)) {
+            $this->cart = new Cart($idCart);
+            $this->cart->secure_key = $customer->secure_key;
+            if (!$loginCustomer) {
+                $this->cookie->id_guest = (int) $this->cart->id_guest;
+            }
+        } else {
+            if (!isset($this->cookie->id_guest)) {
+                Guest::setNewGuest($this->cookie);
+            }
+
+            if (Validate::isLoadedObject($this->cart)) {
+                $idCarrier = (int) $this->cart->id_carrier;
+                $this->cart->secure_key = $customer->secure_key;
+                $this->cart->id_guest = (int) $this->cookie->id_guest;
+                $this->cart->id_carrier = 0;
+                if (!empty($idCarrier)) {
+                    $deliveryOption = [$this->cart->id_address_delivery => $idCarrier . ','];
+                    $this->cart->setDeliveryOption($deliveryOption);
+                } else {
+                    $this->cart->setDeliveryOption(null);
+                }
+                $this->cart->id_customer = (int) $customer->id;
+                $this->cart->updateAddressId($this->cart->id_address_delivery, (int) Address::getFirstCustomerAddressId((int) ($customer->id)));
+                $this->cart->id_address_delivery = (int) Address::getFirstCustomerAddressId((int) ($customer->id));
+                $this->cart->id_address_invoice = (int) Address::getFirstCustomerAddressId((int) ($customer->id));
+
+                // update id guest in htl_cart_booking_data for bookings added to the cart as a visitor
+                $objCartBookingData = new HotelCartBookingData();
+                if ($hotelCartBookings = $objCartBookingData->getCartCurrentDataByCartId($this->cart->id)) {
+                    foreach ($hotelCartBookings as $cartBooking) {
+                        $objCartBookingData = new HotelCartBookingData($cartBooking['id']);
+                        $objCartBookingData->id_guest = (int) $this->cookie->id_guest;
+                        $objCartBookingData->id_customer = (int) $customer->id;
+                        $objCartBookingData->save();
+                    }
+                }
+            }
+        }
+        if (Validate::isLoadedObject($this->cart)) {
+            $this->cart->save();
+            $this->cart->autosetProductAddress();
+
+            $this->cookie->id_cart = (int) $this->cart->id;
+        }
+
+        // if customer is login to account
+        if ($loginCustomer) {
+            // Update or merge the guest with the customer id (login and account creation)
+            $objGuest = new Guest($currentCookieGuest);
+            if ($customerGuestId = Guest::getFromCustomer((int)$this->cookie->id_customer)) {
+                if ($objGuest->id != $customerGuestId) {
+                    // The new guest is merged with the old one when it's connecting to an account
+                    $objGuest->mergeWithCustomer($customerGuestId, $this->cookie->id_customer);
+
+                    // update the id_guest in the cookie
+                    $this->cookie->id_guest = $customerGuestId;
+                }
+            } else {
+                $objGuest->id_customer = (int)$this->cookie->id_customer;
+                $objGuest->update();
+            }
+        }
+
+        $this->cookie->write();
+    }
 }
