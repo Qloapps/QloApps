@@ -363,9 +363,6 @@
 							<th>{l s='Room Capacity'}</th>
 							<th>{l s='Check-in Date'}</th>
 							<th>{l s='Check-out Date'}</th>
-							{if isset($isCancelledRoom) && $isCancelledRoom}
-								<th class="text-center"><span class="title_box">{l s='Room Status'}</span></th>
-							{/if}
 							<th>{l s='Extra Services'}</th>
 							<th class="cart_total">{l s='Total'}</th>
 						</tr>
@@ -402,18 +399,19 @@
 									<td>{$data_v['hotel_name']|escape:'html':'UTF-8'}</td>
 									<td class="text-center">
 										<p>
-											{if $data_v['adults'] <= 9}0{$data_v['adults']}{else}{$data_v['adults']}{/if} {if $data_v['adults'] > 1}{l s='Adults'}{else}{l s='Adult'}{/if}{if $data_v['children']}, {if $data_v['children'] <= 9}0{$data_v['children']}{else} {$data_v['children']}{/if} {if $data_v['children'] > 1}{l s='Children'}{else}{l s='Child'}{/if}{/if}<br>{if $rm_v['num_rm'] <= 9}0{/if}{$rm_v['num_rm']} {if $rm_v['num_rm'] > 1}{l s='Rooms'}{else}{l s='Room'}{/if}
+											{if $rm_v['adults'] <= 9}0{$rm_v['adults']}{else}{$rm_v['adults']}{/if} {if $rm_v['adults'] > 1}{l s='Adults'}{else}{l s='Adult'}{/if}{if $rm_v['children']}, {if $rm_v['children'] <= 9}0{$rm_v['children']}{else} {$rm_v['children']}{/if} {if $rm_v['children'] > 1}{l s='Children'}{else}{l s='Child'}{/if}{/if}<br>{if $rm_v['num_rm'] <= 9}0{/if}{$rm_v['num_rm']} {if $rm_v['num_rm'] > 1}{l s='Rooms'}{else}{l s='Room'}{/if}
 										</p>
+										{if $rm_v['count_cancelled'] > 0}
+											<span class="badge badge-danger">{$rm_v['count_cancelled']} {l s='Room(s) Cancelled'}</span>
+											<br>
+										{/if}
+										{if $rm_v['count_refunded'] > 0}
+											<span class="badge badge-danger">{$rm_v['count_refunded']} {l s='Room(s) Refunded'}</span>
+										{/if}
 									</td>
 									<td class="text-center">{$rm_v['data_form']|date_format:"%d-%m-%Y"}</td>
 									<td class="text-center">{$rm_v['data_to']|date_format:"%d-%m-%Y"}</td>
-									{if isset($isCancelledRoom) && $isCancelledRoom}
-										<td>
-											{if $rm_v['is_refunded']}
-												<span class="badge badge-danger">{l s='Cancelled'}</span>
-											{/if}
-										</td>
-									{/if}
+
 									<td>
 										{if (isset($rm_v['extra_demands']) && $rm_v['extra_demands']) || isset($rm_v['additional_services']) && $rm_v['additional_services']}
 												<a data-date_from="{$rm_v['data_form']}" data-date_to="{$rm_v['data_to']}" data-id_product="{$data_v['id_product']}" data-id_order="{$order->id}" data-action="{$link->getPageLink('order-detail')}" class="open_rooms_extra_services_panel" href="#rooms_type_extra_services_form">

@@ -265,10 +265,12 @@ class OrderReturnCore extends ObjectModel
         }
         $sql = 'SELECT orr.`id_order`, orr.`state`, orr.`id_order_return`, orr.`payment_mode`, orr.`id_transaction`,
             orr.`id_return_type`, orr.`return_type`, ors.`id_cart_rule`, orr.`date_add`, orr.`date_upd`,
-            COUNT(ord.`id_order_return_detail`) AS total_rooms
+            hbd.`is_cancelled`, COUNT(ord.`id_order_return_detail`) AS total_rooms
             FROM `'._DB_PREFIX_.'order_return` orr
             LEFT JOIN `'._DB_PREFIX_.'order_return_detail` ord
             ON (ord.`id_order_return` = orr.`id_order_return`)
+            LEFT JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd
+            ON (hbd.`id` = ord.`id_htl_booking`)
             LEFT JOIN `'._DB_PREFIX_.'order_slip` ors
             ON (ors.`id_order_slip` = orr.`id_return_type` AND orr.`return_type` = '.(int) self::RETURN_TYPE_ORDER_SLIP.')
             WHERE orr.`id_customer` = '.(int)$customer_id.

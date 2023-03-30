@@ -389,6 +389,13 @@ class OrderDetailControllerCore extends FrontController
                                         if ($data_v['is_back_order']) {
                                             $anyBackOrder = 1;
                                         }
+                                        if ($data_v['is_refunded']) {
+                                            $cartHotelData[$type_key]['date_diff'][$date_join]['count_refunded'] += 1;
+                                        }
+                                        if ($data_v['is_cancelled']) {
+                                            $cartHotelData[$type_key]['date_diff'][$date_join]['count_cancelled'] += 1;
+                                            $cartHotelData[$type_key]['date_diff'][$date_join]['count_refunded'] -= 1;
+                                        }
                                     } else {
                                         $num_days = $objBookingDetail->getNumberOfDays($data_v['date_from'], $data_v['date_to']);
                                         $cartHotelData[$type_key]['date_diff'][$date_join]['num_rm'] = 1;
@@ -407,6 +414,15 @@ class OrderDetailControllerCore extends FrontController
                                         $cartHotelData[$type_key]['date_diff'][$date_join]['is_backorder'] = $data_v['is_back_order'];
                                         if ($data_v['is_back_order']) {
                                             $anyBackOrder = 1;
+                                        }
+                                        $cartHotelData[$type_key]['date_diff'][$date_join]['count_cancelled'] = 0;
+                                        $cartHotelData[$type_key]['date_diff'][$date_join]['count_refunded'] = 0;
+                                        if ($data_v['is_refunded']) {
+                                            $cartHotelData[$type_key]['date_diff'][$date_join]['count_refunded'] += 1;
+                                        }
+                                        if ($data_v['is_cancelled']) {
+                                            $cartHotelData[$type_key]['date_diff'][$date_join]['count_cancelled'] += 1;
+                                            $cartHotelData[$type_key]['date_diff'][$date_join]['count_refunded'] -= 1;
                                         }
                                     }
 
@@ -588,8 +604,6 @@ class OrderDetailControllerCore extends FrontController
 
                     $objHotelBookingDetail = new HotelBookingDetail();
                     $htlBookingDetail = $objHotelBookingDetail->getOrderCurrentDataByOrderId($order->id);
-                    $isCancelledRoom = in_array(true, array_column($htlBookingDetail, 'is_cancelled'));
-
                     $this->context->smarty->assign(
                         array(
                             'id_cms_refund_policy' => Configuration::get('WK_GLOBAL_REFUND_POLICY_CMS'),
@@ -605,7 +619,6 @@ class OrderDetailControllerCore extends FrontController
                             'cart_htl_data' => $cartHotelData,
                             'cart_service_products' => $cartServiceProducts,
                             'non_requested_rooms' => $nonRequestedRooms,
-                            'isCancelledRoom' => $isCancelledRoom,
                         )
                     );
                 // }
