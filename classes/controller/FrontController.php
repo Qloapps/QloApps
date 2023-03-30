@@ -1083,6 +1083,7 @@ class FrontControllerCore extends Controller
             $this->addjqueryPlugin('fancybox');
             $this->addJS(_PS_JS_DIR_.'hookLiveEdit.js');
         }
+        $this->addJqueryUI('ui.tooltip', 'base', true);
 
         if (Configuration::get('PS_QUICK_VIEW')) {
             $this->addjqueryPlugin('fancybox');
@@ -1528,6 +1529,7 @@ class FrontControllerCore extends Controller
                     $this->context->cookie->is_guest = $customer->isGuest();
                     $this->context->cookie->passwd = $customer->passwd;
                     $this->context->cookie->email = $customer->email;
+                    $this->context->cookie->id_guest = (int) $cart->id_guest;
                     return $id_cart;
                 }
             }

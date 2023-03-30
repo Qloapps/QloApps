@@ -32,6 +32,8 @@ class QcmcChannelManagerBooking extends ObjectModel
         ),
     );
 
+    const QCMC_CHANNEL_MANAGER_IP = '54.216.64.42';
+
     /**
      * Returns bookings created by api by channel manager
      * @param integer $idOrder : send id_order if you want booking of a particular order

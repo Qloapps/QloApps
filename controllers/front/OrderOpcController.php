@@ -149,7 +149,7 @@ class OrderOpcControllerCore extends ParentOrderController
                             if (!count($this->errors)) {
                                 $customer = new Customer($this->context->customer->id);
                                 if ($customer->transformToCustomer($this->context->language->id, $passwd)) {
-                                    $this->updateContext($customer);
+                                    $this->context->updateCustomer($customer);
                                 } else {
                                     $this->errors[] = Tools::displayError('An error occurred while transforming your account into a registered customer.');
                                 }
@@ -466,6 +466,7 @@ class OrderOpcControllerCore extends ParentOrderController
                 // 'defaultcurrencySign' => $objCurrency->sign,
                 'THEME_DIR' => _THEME_DIR_,
                 'PS_CUSTOMER_ADDRESS_CREATION' => Configuration::get('PS_CUSTOMER_ADDRESS_CREATION'),
+                'PS_ROOM_PRICE_AUTO_ADD_BREAKDOWN' => Configuration::get('PS_ROOM_PRICE_AUTO_ADD_BREAKDOWN'),
                 'free_shipping' => $free_shipping,
                 'isGuest' => isset($this->context->cookie->is_guest) ? $this->context->cookie->is_guest : 0,
                 'countries' => $countries,
@@ -556,6 +557,7 @@ class OrderOpcControllerCore extends ParentOrderController
             if (!empty($cartProducts)) {
 
                 if ($cartBookingInfo = HotelCartBookingData::getHotelCartBookingData()) {
+                    // ddd($cartBookingInfo);
                     $this->context->smarty->assign('cart_htl_data', $cartBookingInfo);
                 }
                 $objHotelServiceProductCartDetail = new HotelServiceProductCartDetail();
@@ -1070,21 +1072,5 @@ class OrderOpcControllerCore extends ParentOrderController
             }
         }
         $this->context->cart->save();
-    }
-
-    public function updateContext(Customer $customer)
-    {
-        $this->context->cookie->id_customer = (int)$customer->id;
-        $this->context->cookie->customer_lastname = $customer->lastname;
-        $this->context->cookie->customer_firstname = $customer->firstname;
-        $this->context->cookie->passwd = $customer->passwd;
-        $this->context->cookie->logged = 1;
-        $this->context->cookie->email = $customer->email;
-        $this->context->cookie->is_guest = 0;
-
-        $this->context->cart->secure_key = $customer->secure_key;
-
-        $customer->logged = 1;
-        $this->context->customer = $customer;
     }
 }

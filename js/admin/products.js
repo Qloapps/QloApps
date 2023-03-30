@@ -654,6 +654,21 @@ product_tabs['Features'] = new function(){
 		displayFlags(languages, id_language, allowEmployeeFormLang);
 	}
 }
+product_tabs['AdditionalFacilities'] = new function(){
+	this.onReady = function(){
+		$('#demands_table .selected_demand').on('click', function() {
+			let input_block = $('#demands_table').find('.demand_price_'+$(this).val());
+			if ($(this).is(':checked')) {
+				$(input_block).find('.price_input').show();
+				$(input_block).find('.price_display').hide();
+			} else {
+				$(input_block).find('.price_input');
+				$(input_block).find('.price_input').hide();
+				$(input_block).find('.price_display').show();
+			}
+		});
+	}
+}
 
 /**
  * Update the product image list position buttons

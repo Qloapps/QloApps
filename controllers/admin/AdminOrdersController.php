@@ -251,6 +251,7 @@ class AdminOrdersControllerCore extends AdminController
             $this->access_where = ' WHERE hbd.id_hotel IN ('.implode(',', $acsHtls).')';
         }
 
+
         parent::__construct();
     }
 
@@ -1729,6 +1730,10 @@ class AdminOrdersControllerCore extends AdminController
             $bookingOrderRoomInfo['num_checkin_documents'] = HotelBookingDocument::getCountByIdHtlBooking($bookingOrderRoomInfo['id']);
         }
 
+        $objHotelBookingDetail = new HotelBookingDetail();
+        $htlBookingDetail = $objHotelBookingDetail->getOrderCurrentDataByOrderId($order->id);
+        $isCancelledRoom = in_array(1, array_column($htlBookingDetail, 'is_cancelled'));
+
         // hotel booking statuses
         $htlOrderStatus = HotelBookingDetail::getAllHotelOrderStatus();
 
@@ -1826,6 +1831,7 @@ class AdminOrdersControllerCore extends AdminController
                 'products' => $products,
                 'customer' => $customer)
             ),
+            'isCancelledRoom' => $isCancelledRoom,
         );
 
         return parent::renderView();
@@ -3163,7 +3169,6 @@ class AdminOrdersControllerCore extends AdminController
 
         // delete cart feature prices after room addition success
         HotelRoomTypeFeaturePricing::deleteByIdCart($cart->id);
-
         die(json_encode(array(
             'result' => true,
             //'view' => $this->createTemplate('_product_line.tpl')->fetch(),
@@ -3706,7 +3711,6 @@ class AdminOrdersControllerCore extends AdminController
         }
 
         $this->sendChangedNotification($order);
-
         die(json_encode(array(
             'result' => $res,
             'view' => $view,
@@ -4007,31 +4011,19 @@ class AdminOrdersControllerCore extends AdminController
 
         $objRoomTypeServiceProductOrderDetail = new RoomTypeServiceProductOrderDetail();
         $additionlServicesTI = $objRoomTypeServiceProductOrderDetail->getSelectedServicesForRoom(
-            $id_order,
-            $id_product,
-            $date_from,
-            $date_to,
-            $id_room,
+            $idHotelBooking,
             1,
             1
         );
 
         $additionlServicesTE = $objRoomTypeServiceProductOrderDetail->getSelectedServicesForRoom(
-            $id_order,
-            $id_product,
-            $date_from,
-            $date_to,
-            $id_room,
+            $idHotelBooking,
             1,
             0
         );
 
         $selectedAdditonalServices = $objRoomTypeServiceProductOrderDetail->getSelectedServicesForRoom(
-            $id_order,
-            $id_product,
-            $date_from,
-            $date_to,
-            $id_room
+            $idHotelBooking
         );
 
 
@@ -4142,7 +4134,7 @@ class AdminOrdersControllerCore extends AdminController
         // delete the demands od this booking
         $objBookingDemand->deleteBookingDemands($idHotelBooking);
 
-        $objRoomTypeServiceProductOrderDetail->deleteRoomSevicesByIdHotelBookingDetail($idHotelBooking);
+        $objRoomTypeServiceProductOrderDetail->deleteRoomSevices($idHotelBooking);
 
         /*By webkul to delete cart and order entries from cart and order tables of hotelreservationsystem when delete booking form the order line in order detaoil page*/
         $obj_htl_cart_booking = new HotelCartBookingData();
@@ -4162,7 +4154,6 @@ class AdminOrdersControllerCore extends AdminController
         ));
 
         $this->sendChangedNotification($order);
-
         die(json_encode(array(
             'result' => $res,
             'order' => $order,
@@ -4748,11 +4739,7 @@ class AdminOrdersControllerCore extends AdminController
 
             $objRoomTypeServiceProductOrderDetail = new RoomTypeServiceProductOrderDetail();
             if ($additionalServices = $objRoomTypeServiceProductOrderDetail->getSelectedServicesForRoom(
-                $idOrder,
-                $idProduct,
-                $dateFrom,
-                $dateTo,
-                $idRoom
+                $htlBookingDetail['id']
             )) {
                 $smartyVars['additionalServices'] = $additionalServices;
             }
@@ -4795,11 +4782,7 @@ class AdminOrdersControllerCore extends AdminController
         $smartyVars['id_booking_detail'] = $htlBookingDetail['id'];
         $objRoomTypeServiceProductOrderDetail = new RoomTypeServiceProductOrderDetail();
         if ($additionalServices = $objRoomTypeServiceProductOrderDetail->getSelectedServicesForRoom(
-            $idOrder,
-            $idProduct,
-            $dateFrom,
-            $dateTo,
-            $idRoom
+            $htlBookingDetail['id']
         )) {
             $smartyVars['additionalServices'] = $additionalServices;
         }

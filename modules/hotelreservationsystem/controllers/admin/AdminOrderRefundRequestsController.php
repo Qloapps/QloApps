@@ -220,11 +220,12 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
             $objRefundRules = new HotelOrderRefundRules();
             if ($refundReqBookings = $objOrderReturn->getOrderRefundRequestedBookings($objOrderReturn->id_order, $objOrderReturn->id)){
                 foreach ($refundReqBookings as &$booking) {
-                    $booking['cancelation_charge'] = $objRefundRules->calculateDeductionAmountFromRefundRules(
+                    $bookingCharges = $objRefundRules->getBookingCancellationDetails(
                         $objOrderReturn->id_order,
                         $objOrderReturn->id,
                         $booking['id']
                     );
+                    $booking = array_merge($booking, array_shift($bookingCharges));
                 }
             }
 
@@ -279,8 +280,7 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
                 if (Validate::isLoadedObject($objRefundState = new OrderReturnState($idRefundState))) {
                     if ($objRefundState->refunded) {
                         $refundedAmounts = Tools::getValue('refund_amounts');
-
-                        if ((float) $orderTotalPaid) {
+                        if ((float) $orderTotalPaid > 0) {
                             if ($idsReturnDetail && count($idsReturnDetail)) {
                                 if ($refundedAmounts) {
                                     foreach ($idsReturnDetail as $idRetDetail) {
@@ -327,6 +327,8 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
                 $totalRefundedAmount = 0;
 
                 if ($objRefundState->refunded || $objRefundState->denied) {
+                    $objHotelBookingDemands = new HotelBookingDemands();
+                    $objRoomTypeServiceProductOrderDetail = new RoomTypeServiceProductOrderDetail();
                     foreach ($idsReturnDetail as $idRetDetail) {
                         $objOrderReturnDetail = new OrderReturnDetail($idRetDetail);
 
@@ -334,23 +336,74 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
                         $idHtlBooking = $objOrderReturnDetail->id_htl_booking;
                         $numDays = 1;
                         $idOrderDetail = 0;
+                        $reduction_amount = array(
+                            'total_price_tax_excl' => 0,
+                            'total_price_tax_incl' => 0,
+                            'total_products_tax_excl' => 0,
+                            'total_products_tax_incl' => 0,
+                        );
                         if (Validate::isLoadedObject($objHtlBooking = new HotelBookingDetail($idHtlBooking))) {
                             $objHtlBooking->is_refunded = 1;
-
-                            // if (Tools::isSubmit('unavailable_for_order')) {
-                            //     $objHtlBooking->available_for_order = 0;
-                            // } else {
-                            //     $objHtlBooking->available_for_order = 1;
-                            // }
-
-                            $objHtlBooking->is_refunded = 1;
-
-                            $objHtlBooking->save();
-
                             $numDays = $objHtlBooking->getNumberOfDays(
                                 $objHtlBooking->date_from,
                                 $objHtlBooking->date_to
                             );
+
+                            if ((float) $orderTotalPaid <= 0) {
+                                $reduction_amount['total_price_tax_excl'] = $objHtlBooking->total_price_tax_excl;
+                                $reduction_amount['total_products_tax_excl'] = $objHtlBooking->total_price_tax_excl;
+                                $reduction_amount['total_price_tax_incl'] = $objHtlBooking->total_price_tax_incl;
+                                $reduction_amount['total_products_tax_incl'] = $objHtlBooking->total_price_tax_incl;
+                                // reduce facilities amount from order and services_detail
+                                if ($roomDemands = $objHotelBookingDemands->getRoomTypeBookingExtraDemands(
+                                    $objHtlBooking->id_order,
+                                    $objHtlBooking->id_product,
+                                    $objHtlBooking->id_room,
+                                    $objHtlBooking->date_from,
+                                    $objHtlBooking->date_to,
+                                    0
+                                )) {
+                                    foreach ($roomDemands as $roomDemand) {
+                                        $objHotelBookingDemands = new HotelBookingDemands($roomDemand['id_booking_demand']);
+                                        $reduction_amount['total_price_tax_excl'] += $objHotelBookingDemands->total_price_tax_excl;
+                                        $reduction_amount['total_price_tax_incl'] += $objHotelBookingDemands->total_price_tax_incl;
+                                        $objHotelBookingDemands->total_price_tax_excl = 0;
+                                        $objHotelBookingDemands->total_price_tax_incl = 0;
+                                        $objHotelBookingDemands->save();
+                                    }
+                                }
+
+                                // reduce services amount from order and services_detail
+                                if ($roomServices = $objRoomTypeServiceProductOrderDetail->getSelectedServicesForRoom(
+                                    $objHtlBooking->id
+                                )) {
+                                    foreach ($roomServices['additional_services'] as $roomService) {
+                                        $objRoomTypeServiceProductOrderDetail = new RoomTypeServiceProductOrderDetail(
+                                            $roomService['id_room_type_service_product_order_detail']
+                                        );
+                                        $reduction_amount['total_price_tax_excl'] += $objRoomTypeServiceProductOrderDetail->total_price_tax_excl;
+                                        $reduction_amount['total_products_tax_excl'] += $objRoomTypeServiceProductOrderDetail->total_price_tax_excl;
+                                        $reduction_amount['total_price_tax_incl'] += $objRoomTypeServiceProductOrderDetail->total_price_tax_incl;
+                                        $reduction_amount['total_products_tax_incl'] += $objRoomTypeServiceProductOrderDetail->total_price_tax_incl;
+
+                                        if (Validate::isLoadedObject($objOrderDetail = new OrderDetail($objRoomTypeServiceProductOrderDetail->id_order_detail))) {
+                                            $objOrderDetail->product_quantity_refunded += $objRoomTypeServiceProductOrderDetail->quantity;
+                                            if ($objOrderDetail->product_quantity_refunded > $objOrderDetail->product_quantity) {
+                                                $objOrderDetail->product_quantity_refunded = $objOrderDetail->product_quantity;
+                                            }
+
+                                            $objOrderDetail->total_price_tax_excl -= $objRoomTypeServiceProductOrderDetail->total_price_tax_excl;
+                                            $objOrderDetail->total_price_tax_incl -= $objRoomTypeServiceProductOrderDetail->total_price_tax_incl;
+                                            $objOrderDetail->save();
+                                        }
+
+                                        $objRoomTypeServiceProductOrderDetail->total_price_tax_excl = 0;
+                                        $objRoomTypeServiceProductOrderDetail->total_price_tax_incl = 0;
+                                        $objRoomTypeServiceProductOrderDetail->save();
+                                    }
+                                }
+
+                            }
 
                             // enter refunded quantity in the order detail table
                             $idOrderDetail = $objHtlBooking->id_order_detail;
@@ -359,8 +412,29 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
                                 if ($objOrderDetail->product_quantity_refunded > $objOrderDetail->product_quantity) {
                                     $objOrderDetail->product_quantity_refunded = $objOrderDetail->product_quantity;
                                 }
+
+                                if ((float) $orderTotalPaid <= 0) {
+                                    // reduce room amount from order and order detail
+                                    $objOrderDetail->total_price_tax_incl -= $objHtlBooking->total_price_tax_incl;
+                                    $objOrderDetail->total_price_tax_excl -= $objHtlBooking->total_price_tax_excl;
+                                    if (Validate::isLoadedObject($objOrder = new Order($objHtlBooking->id_order))) {
+                                        $objOrder->total_paid -= $reduction_amount['total_price_tax_incl'];
+                                        $objOrder->total_paid_tax_excl -= $reduction_amount['total_price_tax_excl'];
+                                        $objOrder->total_paid_tax_incl -= $reduction_amount['total_price_tax_incl'];
+                                        $objOrder->total_products -= $reduction_amount['total_products_tax_excl'];
+                                        $objOrder->total_products_wt -= $reduction_amount['total_products_tax_incl'];
+                                        $objOrder->save();
+                                    }
+                                }
                                 $objOrderDetail->save();
                             }
+                            if ((float) $orderTotalPaid <= 0) {
+                                // reduce room amount from htl_booking_detail
+                                $objHtlBooking->is_cancelled = 1;
+                                $objHtlBooking->total_price_tax_excl = 0;
+                                $objHtlBooking->total_price_tax_incl = 0;
+                            }
+                            $objHtlBooking->save();
                         }
 
                         // save individual booking amount for every booking refund
@@ -387,7 +461,7 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
                     }
 
                     // if bookings are refunded then set the payment information
-                    if ($objRefundState->refunded) {
+                    if ($objRefundState->refunded && (float) $orderTotalPaid > 0) {
                         if (Tools::isSubmit('refundTransactionAmount')) {
                             $objOrderReturn->payment_mode = $paymentMode;
                             $objOrderReturn->id_transaction = $idTransaction;

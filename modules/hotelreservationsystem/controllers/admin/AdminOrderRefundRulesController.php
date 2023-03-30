@@ -52,7 +52,8 @@ class AdminOrderRefundRulesController extends ModuleAdminController
         );
 
         $paymentType = array(
-            HotelOrderRefundRules::WK_REFUND_RULE_PAYMENT_TYPE_PERCENTAGE => 'Percentage', HotelOrderRefundRules::WK_REFUND_RULE_PAYMENT_TYPE_FIXED => 'Fixed'
+            HotelOrderRefundRules::WK_REFUND_RULE_PAYMENT_TYPE_PERCENTAGE => 'Percentage',
+            HotelOrderRefundRules::WK_REFUND_RULE_PAYMENT_TYPE_FIXED => 'Fixed'
         );
 
         $this->fields_list = array(
