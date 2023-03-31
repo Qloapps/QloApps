@@ -54,7 +54,7 @@
 				<th>{l s='Duration'}</th>
 				<th>{l s='Num rooms'}</th>
 				<th>{l s='Total rooms price (tax incl.)'}</th>
-				<th>{l s='Additional facilities price (tax incl.)'}</th>
+				<th>{l s='Extra services price (tax incl.)'}</th>
 				{if $isRefundCompleted}
 					<th>{l s='Refund amount'}</th>
 				{/if}
@@ -67,7 +67,7 @@
 					<td>{$booking['date_from']|date_format:"%d-%m-%Y"} {l s='To'} {$booking['date_to']|date_format:"%d-%m-%Y"}</td>
 					<td>{$booking['num_rooms']|escape:'htmlall':'UTF-8'}</td>
 					<td>{displayPrice price=$booking['total_price_tax_incl'] currency=$orderCurrency['id']}</td>
-					<td>{displayPrice price=$booking['extra_demands_price_tax_incl'] currency=$orderCurrency['id']}</td>
+					<td>{displayPrice price=$booking['extra_service_total_price_tax_incl'] currency=$orderCurrency['id']}</td>
 					{if $isRefundCompleted}
 						<td>
 							{displayPrice price=$booking['refunded_amount'] currency=$orderCurrency['id']}
@@ -83,7 +83,13 @@
 			<strong>{l s='Current refund state'} </strong>
 		</div>
 		<div class="col-sm-9 col-md-10">
-			<span class="badge wk-badge" style="background-color:{$currentStateInfo['color']|escape:'html':'UTF-8'}">{$currentStateInfo['name']|escape:'html':'UTF-8'}</span>
+			<span class="badge wk-badge" style="background-color:{$currentStateInfo['color']|escape:'html':'UTF-8'}">
+				{if $isCanceled}
+					{l s='Cancelled'}
+				{else}
+					{$currentStateInfo['name']|escape:'html':'UTF-8'}
+				{/if}
+			</span>
 		</div>
 	</div>
 	<div class="form-group row">
@@ -120,22 +126,49 @@
 				{displayPrice price=$orderReturnInfo['refunded_amount'] currency=$orderInfo['id_currency']}
 			</div>
 		</div>
-		<div class="form-group row">
-			<div class="col-md-2 col-sm-3">
-				<strong>{l s='Payment mode' mod='hotelreservationsystem'}</strong>
+		{if $orderReturnInfo['payment_mode'] != '' && $orderReturnInfo['id_transaction'] != ''}
+			<div class="form-group row">
+				<div class="col-md-2 col-sm-3">
+					<strong>{l s='Payment mode' mod='hotelreservationsystem'}</strong>
+				</div>
+				<div class="col-sm-9 col-md-10">
+					{$orderReturnInfo['payment_mode']|escape:'html':'UTF-8'}
+				</div>
 			</div>
-			<div class="col-sm-9 col-md-10">
-				{$orderReturnInfo['payment_mode']|escape:'html':'UTF-8'}
+			<div class="form-group row">
+				<div class="col-md-2 col-sm-3">
+					<strong>{l s='Transaction ID' mod='hotelreservationsystem'}</strong>
+				</div>
+				<div class="col-sm-9 col-md-10">
+					{$orderReturnInfo['id_transaction']|escape:'html':'UTF-8'}
+				</div>
 			</div>
-		</div>
-		<div class="form-group row">
-			<div class="col-md-2 col-sm-3">
-				<strong>{l s='Transaction ID' mod='hotelreservationsystem'}</strong>
-			</div>
-			<div class="col-sm-9 col-md-10">
-				{$orderReturnInfo['id_transaction']|escape:'html':'UTF-8'}
-			</div>
-		</div>
+		{/if}
+		{if isset($orderReturnInfo['return_type'])}
+			{if $orderReturnInfo['return_type'] == OrderReturn::RETURN_TYPE_CART_RULE}
+				<div class="form-group row">
+					<div class="col-md-2 col-sm-3">
+						<strong>{l s='Voucher ID:' mod='hotelreservationsystem'}</strong>
+					</div>
+					<div class="col-sm-9 col-md-10">
+						<a class="btn btn-default btn-sm" href="{$link->getPageLink('discount')}" target="_blank">
+							{l s='View your vouchers'}
+						</a>
+					</div>
+				</div>
+			{elseif $orderReturnInfo['return_type'] == OrderReturn::RETURN_TYPE_ORDER_SLIP}
+				<div class="form-group row">
+					<div class="col-md-2 col-sm-3">
+						<strong>{l s='Credit Slip:' mod='hotelreservationsystem'}</strong>
+					</div>
+					<div class="col-sm-9 col-md-10">
+						<a class="btn btn-default btn-sm" href="{$link->getPageLink('order-slip')}">
+							{l s='View your creadit slips' mod='hotelreservationsystem'}
+						</a>
+					</div>
+				</div>
+			{/if}
+		{/if}
 	{/if}
 </div>
 

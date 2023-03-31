@@ -149,7 +149,7 @@ class OrderOpcControllerCore extends ParentOrderController
                             if (!count($this->errors)) {
                                 $customer = new Customer($this->context->customer->id);
                                 if ($customer->transformToCustomer($this->context->language->id, $passwd)) {
-                                    $this->updateContext($customer);
+                                    $this->context->updateCustomer($customer);
                                 } else {
                                     $this->errors[] = Tools::displayError('An error occurred while transforming your account into a registered customer.');
                                 }
@@ -1072,21 +1072,5 @@ class OrderOpcControllerCore extends ParentOrderController
             }
         }
         $this->context->cart->save();
-    }
-
-    public function updateContext(Customer $customer)
-    {
-        $this->context->cookie->id_customer = (int)$customer->id;
-        $this->context->cookie->customer_lastname = $customer->lastname;
-        $this->context->cookie->customer_firstname = $customer->firstname;
-        $this->context->cookie->passwd = $customer->passwd;
-        $this->context->cookie->logged = 1;
-        $this->context->cookie->email = $customer->email;
-        $this->context->cookie->is_guest = 0;
-
-        $this->context->cart->secure_key = $customer->secure_key;
-
-        $customer->logged = 1;
-        $this->context->customer = $customer;
     }
 }

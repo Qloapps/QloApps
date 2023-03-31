@@ -242,7 +242,15 @@ class OrderDetailControllerCore extends FrontController
                     } else {
                         $hasError = 1;
                     }
+                    $res = true;
                     if (!$hasError) {
+                        if ((int)$order->total_paid_real == 0){
+                            foreach ($bookingRefunds as $idHtlBooking) {
+                                $objHtlBooking = new HotelBookingDetail($idHtlBooking);
+                                $objHtlBooking->save();
+                            }
+                        }
+
                         $objOrderReturn = new OrderReturn();
                         $objOrderReturn->id_customer = $order->id_customer;
                         $objOrderReturn->id_order = $order->id;
@@ -381,6 +389,13 @@ class OrderDetailControllerCore extends FrontController
                                         if ($data_v['is_back_order']) {
                                             $anyBackOrder = 1;
                                         }
+                                        if ($data_v['is_refunded']) {
+                                            $cartHotelData[$type_key]['date_diff'][$date_join]['count_refunded'] += 1;
+                                        }
+                                        if ($data_v['is_cancelled']) {
+                                            $cartHotelData[$type_key]['date_diff'][$date_join]['count_cancelled'] += 1;
+                                            $cartHotelData[$type_key]['date_diff'][$date_join]['count_refunded'] -= 1;
+                                        }
                                     } else {
                                         $num_days = $objBookingDetail->getNumberOfDays($data_v['date_from'], $data_v['date_to']);
                                         $cartHotelData[$type_key]['date_diff'][$date_join]['num_rm'] = 1;
@@ -400,7 +415,18 @@ class OrderDetailControllerCore extends FrontController
                                         if ($data_v['is_back_order']) {
                                             $anyBackOrder = 1;
                                         }
+                                        $cartHotelData[$type_key]['date_diff'][$date_join]['count_cancelled'] = 0;
+                                        $cartHotelData[$type_key]['date_diff'][$date_join]['count_refunded'] = 0;
+                                        if ($data_v['is_refunded']) {
+                                            $cartHotelData[$type_key]['date_diff'][$date_join]['count_refunded'] += 1;
+                                        }
+                                        if ($data_v['is_cancelled']) {
+                                            $cartHotelData[$type_key]['date_diff'][$date_join]['count_cancelled'] += 1;
+                                            $cartHotelData[$type_key]['date_diff'][$date_join]['count_refunded'] -= 1;
+                                        }
                                     }
+
+                                    $cartHotelData[$type_key]['date_diff'][$date_join]['is_refunded'] = $data_v['is_refunded'];
 
                                     $cartHotelData[$type_key]['date_diff'][$date_join]['ids_htl_booking_detail'][] = $data_v['id'];
 
@@ -575,6 +601,9 @@ class OrderDetailControllerCore extends FrontController
 
                         $redirectTermsLink = $this->context->link->getCMSLink(new CMS(3, $this->context->language->id), null, $this->context->language->id);
                     }
+
+                    $objHotelBookingDetail = new HotelBookingDetail();
+                    $htlBookingDetail = $objHotelBookingDetail->getOrderCurrentDataByOrderId($order->id);
                     $this->context->smarty->assign(
                         array(
                             'id_cms_refund_policy' => Configuration::get('WK_GLOBAL_REFUND_POLICY_CMS'),
