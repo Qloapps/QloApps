@@ -24,7 +24,7 @@
  * International Registered Trademark & Property of PrestaShop SA
  */
 
-abstract class AbstractCheckoutStep implements CheckoutStepInterface
+abstract class AbstractCheckoutStepCore implements CheckoutStepInterface
 {
     public $step_is_reachable = 0;
     public $step_is_complete = 0;
