@@ -259,6 +259,8 @@ class OrderCore extends ObjectModel
         ),
     );
 
+    // This variable is created to hold the transaction id received from api order
+    public $transaction_id;
     protected $webserviceParameters = array(
         'objectMethods' => array('add' => 'addWs'),
         'objectNodeName' => 'order',
@@ -1634,7 +1636,9 @@ class OrderCore extends ObjectModel
         $customer = new Customer($this->id_customer);
 
         $extraVars = array();
-        $extraVars['transaction_id'] = $this->transaction_id;
+        if (isset($this->transaction_id)) {
+            $extraVars['transaction_id'] = $this->transaction_id;
+        }
 
         if ($this->total_paid_real > 0) {
             $orderStatus = Configuration::get('PS_OS_REMOTE_PAYMENT_ACCEPTED');

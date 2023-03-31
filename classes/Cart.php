@@ -4817,12 +4817,12 @@ class CartCore extends ObjectModel
                             );
                             if ($hotelRoomData = $objBookingDetail->dataForFrontSearch($bookingParams)) {
                                 // unset already added rooms to cart as per sepcific parametrs
-                                if (isset($hotelRoomData['rm_data'][0]['data']['available']) && $hotelRoomData['rm_data'][0]['data']['available']) {
-                                    foreach ($hotelRoomData['rm_data'][0]['data']['available'] as $keyRoom => $roomInfo) {
+                                if (isset($hotelRoomData['rm_data'][$idProduct]['data']['available']) && $hotelRoomData['rm_data'][$idProduct]['data']['available']) {
+                                    foreach ($hotelRoomData['rm_data'][$idProduct]['data']['available'] as $keyRoom => $roomInfo) {
                                         if (isset(
                                             $roomsAddedToCart[strtotime($dateFrom).'_'.strtotime($dateTo).'_'.$objCart->id.'_'.$roomInfo['id_product'].'_'.$roomInfo['id_room']]
                                         )) {
-                                            unset($hotelRoomData['rm_data'][0]['data']['available'][$keyRoom]);
+                                            unset($hotelRoomData['rm_data'][$idProduct]['data']['available'][$keyRoom]);
                                             $hotelRoomData['stats']['num_avail'] -= 1;
                                         }
                                     }
