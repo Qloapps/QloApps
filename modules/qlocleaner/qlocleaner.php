@@ -204,11 +204,19 @@ class QloCleaner extends Module
 
         switch ($case) {
             case 'catalog':
-                $id_home = Configuration::getMultiShopValues('PS_HOME_CATEGORY');
                 $id_root = Configuration::getMultiShopValues('PS_ROOT_CATEGORY');
-                $db->execute('DELETE FROM `'._DB_PREFIX_.'category` WHERE id_category NOT IN ('.implode(',', array_map('intval', $id_home)).', '.implode(',', array_map('intval', $id_root)).')');
-                $db->execute('DELETE FROM `'._DB_PREFIX_.'category_lang` WHERE id_category NOT IN ('.implode(',', array_map('intval', $id_home)).', '.implode(',', array_map('intval', $id_root)).')');
-                $db->execute('DELETE FROM `'._DB_PREFIX_.'category_shop` WHERE id_category NOT IN ('.implode(',', array_map('intval', $id_home)).', '.implode(',', array_map('intval', $id_root)).')');
+                $id_home = Configuration::getMultiShopValues('PS_HOME_CATEGORY');
+                $id_locations = Configuration::getMultiShopValues('PS_LOCATIONS_CATEGORY');
+                $id_services = Configuration::getMultiShopValues('PS_SERVICE_CATEGORY');
+
+                $not_in = implode(',', array_map('intval', $id_root)).','.
+                implode(',', array_map('intval', $id_home)).','.
+                implode(',', array_map('intval', $id_locations)).','.
+                implode(',', array_map('intval', $id_services));
+
+                $db->execute('DELETE FROM `'._DB_PREFIX_.'category` WHERE id_category NOT IN ('.$not_in.')');
+                $db->execute('DELETE FROM `'._DB_PREFIX_.'category_lang` WHERE id_category NOT IN ('.$not_in.')');
+                $db->execute('DELETE FROM `'._DB_PREFIX_.'category_shop` WHERE id_category NOT IN ('.$not_in.')');
                 foreach (scandir(_PS_CAT_IMG_DIR_) as $dir) {
                     if (preg_match('/^[0-9]+(\-(.*))?\.jpg$/', $dir)) {
                         unlink(_PS_CAT_IMG_DIR_.$dir);
