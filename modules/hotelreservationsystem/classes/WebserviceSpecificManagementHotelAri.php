@@ -25,11 +25,10 @@ class WebserviceSpecificManagementHotelAri extends ObjectModel implements Webser
     public $id_hotel;
     public $date_from;
     public $date_to;
-    public $skip_available_rooms;
-    public $skip_booked_rooms;
-    public $skip_partial_available_rooms;
-    public $skip_unavailable_rooms;
-    public $occupancy;
+    public $get_available_rooms;
+    public $get_booked_rooms;
+    public $get_partial_available_rooms;
+    public $get_unavailable_rooms;
 
 
     /** @var WebserviceOutputBuilder */
@@ -48,10 +47,10 @@ class WebserviceSpecificManagementHotelAri extends ObjectModel implements Webser
             'id_room_type' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedInt'),
             'date_from' => array('type' => self::TYPE_DATE, 'validate' => 'isDate', 'required' => true),
             'date_to' => array('type' => self::TYPE_DATE, 'validate' => 'isDate', 'required' => true),
-            'skip_available_rooms' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedInt'),
-            'skip_booked_rooms' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedInt'),
-            'skip_partial_available_rooms' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedInt'),
-            'skip_unavailable_rooms' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedInt'),
+            'get_available_rooms' => array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
+            'get_booked_rooms' => array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
+            'get_partial_available_rooms' => array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
+            'get_unavailable_rooms' => array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
         ),
     );
 
@@ -66,13 +65,13 @@ class WebserviceSpecificManagementHotelAri extends ObjectModel implements Webser
             ),
             'id_room_type' => array(
                 'xlink_resource' => array(
-                    'resourceName' => 'products',
+                    'resourceName' => 'room_types',
                 )
             ),
         ),
         'associations' => array(
-            'occupancies' => array(
-                'resource' => 'occupancy',
+            'room_occupancies' => array(
+                'resource' => 'room_occupancy',
                 'fields' => array(
                     'adults' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => true),
                     'children' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => true),
@@ -176,25 +175,53 @@ class WebserviceSpecificManagementHotelAri extends ObjectModel implements Webser
                         $bookingParams['hotel_id'] = $ariParams['id_hotel'];
 
                         if (isset($ariParams['id_room_type'])) {
-                            $bookingParams['room_type'] = $ariParams['id_room_type'];
+                            $bookingParams['id_room_type'] = $ariParams['id_room_type'];
                         }
-                        if (isset($ariParams['skip_available_rooms']) && $ariParams['skip_available_rooms']) {
-                            $bookingParams['search_available'] = 0;
-                        }
-                        if (isset($ariParams['skip_booked_rooms']) && $ariParams['skip_booked_rooms']) {
+
+                        if (isset($ariParams['get_available_rooms'])
+                            || isset($ariParams['get_booked_rooms'])
+                            || isset($ariParams['get_partial_available_rooms'])
+                            || isset($ariParams['get_unavailable_rooms'])
+                        ) {
+                            if (isset($ariParams['get_available_rooms']) && $ariParams['get_available_rooms']) {
+                                $bookingParams['search_available'] = 1;
+                            } else {
+                                $bookingParams['search_available'] = 0;
+                            }
+
+                            if (isset($ariParams['get_booked_rooms']) && $ariParams['get_booked_rooms']) {
+                                $bookingParams['search_booked'] = 1;
+                            } else {
+                                $bookingParams['search_booked'] = 0;
+                            }
+
+                            if (isset($ariParams['get_partial_available_rooms']) && $ariParams['get_partial_available_rooms']) {
+                                $bookingParams['search_partial'] = 1;
+                            } else {
+                                $bookingParams['search_partial'] = 0;
+                            }
+
+                            if (isset($ariParams['get_unavailable_rooms']) && $ariParams['get_unavailable_rooms']) {
+                                $bookingParams['search_unavai'] = 1;
+                            } else {
+                                $bookingParams['search_unavai'] = 0;
+                            }
+                        } else {
+                            // if no search type is provided then we will send available rooms
+                            $bookingParams['search_available'] = 1;
                             $bookingParams['search_booked'] = 0;
-                        }
-                        if (isset($ariParams['skip_partial_available_rooms']) && $ariParams['skip_partial_available_rooms']) {
                             $bookingParams['search_partial'] = 0;
-                        }
-                        if (isset($ariParams['skip_unavailable_rooms']) && $ariParams['skip_unavailable_rooms']) {
                             $bookingParams['search_unavai'] = 0;
                         }
-                        if (isset($ariParams['associations']['occupancies']['occupancy'])) {
-                            if (isset($ariParams['associations']['occupancies']['occupancy']['adults'])) {
-                                $ariParams['associations']['occupancies']['occupancy'] = array($ariParams['associations']['occupancies']['occupancy']);
+
+                        $totalRooms = 1;
+                        if (isset($ariParams['associations']['room_occupancies']['room_occupancy'])) {
+                            if (isset($ariParams['associations']['room_occupancies']['room_occupancy']['adults'])) {
+                                $ariParams['associations']['room_occupancies']['room_occupancy'] = array($ariParams['associations']['room_occupancies']['room_occupancy']);
                             }
-                            $bookingParams['occupancy'] = $ariParams['associations']['occupancies']['occupancy'];
+                            $bookingParams['room_occupancy'] = $ariParams['associations']['room_occupancies']['room_occupancy'];
+
+                            $totalRooms = count($bookingParams['room_occupancy']);
                         }
 
                         // now call the function
@@ -205,6 +232,7 @@ class WebserviceSpecificManagementHotelAri extends ObjectModel implements Webser
                         $ariInfo['id_hotel'] = $ariParams['id_hotel'];
                         $ariInfo['date_from'] = $bookingParams['date_from'];
                         $ariInfo['date_to'] = $bookingParams['date_to'];
+                        $ariInfo['num_rooms'] = $totalRooms;
 
                         // We have to create the json and xml response for request by ourself. So we need to check if data to be sent in xml or json
                         // We have no way to check the output format from parent classed. So we used below code
@@ -312,12 +340,12 @@ class WebserviceSpecificManagementHotelAri extends ObjectModel implements Webser
 
 
                     // validate all the information of sent rooms occupancies
-                    if (isset($ariParams['associations']['occupancies']['occupancy']) && $ariParams['associations']['occupancies']['occupancy']) {
-                        if (isset($ariParams['associations']['occupancies']['occupancy']['adults'])) {
-                            $ariParams['associations']['occupancies']['occupancy'] = array($ariParams['associations']['occupancies']['occupancy']);
+                    if (isset($ariParams['associations']['room_occupancies']['room_occupancy']) && $ariParams['associations']['room_occupancies']['room_occupancy']) {
+                        if (isset($ariParams['associations']['room_occupancies']['room_occupancy']['adults'])) {
+                            $ariParams['associations']['room_occupancies']['room_occupancy'] = array($ariParams['associations']['room_occupancies']['room_occupancy']);
                         }
 
-                        $occupancies = $ariParams['associations']['occupancies']['occupancy'];
+                        $occupancies = $ariParams['associations']['room_occupancies']['room_occupancy'];
                         foreach ($occupancies as $key => $occupancy) {
                             if (isset($occupancy['adults'])) {
                                 if (!$occupancy['adults'] || !Validate::isUnsignedInt($occupancy['adults'])) {
@@ -417,7 +445,14 @@ class WebserviceSpecificManagementHotelAri extends ObjectModel implements Webser
                 $field = array('sqlId' => 'id_room_type', 'value' => $roomTypeInfo['id_product'], 'xlink_resource' => 'room_types');
                 $this->output .= $this->objOutput->getObjectRender()->renderField($field);
 
-                $field = array('sqlId' => 'name', 'value' => $roomTypeInfo['name']);
+                // get feature price of room type
+                $roomTypePrice = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay(
+                    $roomTypeInfo['id_product'],
+                    $ariInfo['date_from'],
+                    $ariInfo['date_to'],
+                    0
+                );
+                $field = array('sqlId' => 'base_price', 'value' => $roomTypePrice);
                 $this->output .= $this->objOutput->getObjectRender()->renderField($field);
 
                 // get feature price of room type
@@ -427,8 +462,29 @@ class WebserviceSpecificManagementHotelAri extends ObjectModel implements Webser
                     $ariInfo['date_to'],
                     1
                 );
+                $field = array('sqlId' => 'base_price_with_tax', 'value' => $roomTypePrice);
+                $this->output .= $this->objOutput->getObjectRender()->renderField($field);
 
-                $field = array('sqlId' => 'price', 'value' => $roomTypePrice);
+                $totalBookingPrice = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
+                    $roomTypeInfo['id_product'],
+                    $ariInfo['date_from'],
+                    $ariInfo['date_to'],
+                    $ariInfo['num_rooms']
+                );
+                $field = array('sqlId' => 'total_price', 'value' => $totalBookingPrice['total_price_tax_excl']);
+                $this->output .= $this->objOutput->getObjectRender()->renderField($field);
+
+                $totalBookingPrice = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
+                    $roomTypeInfo['id_product'],
+                    $ariInfo['date_from'],
+                    $ariInfo['date_to'],
+                    $ariInfo['num_rooms']
+                );
+                $field = array('sqlId' => 'total_price_with_tax', 'value' => $totalBookingPrice['total_price_tax_incl']);
+                $this->output .= $this->objOutput->getObjectRender()->renderField($field);
+
+                $objRoomType = new Product($roomTypeInfo['id_product']);
+                $field = array('sqlId' => 'name', 'value' => $objRoomType->name, 'i18n' => true);
                 $this->output .= $this->objOutput->getObjectRender()->renderField($field);
 
                 // rooms info of the room type
@@ -513,18 +569,41 @@ class WebserviceSpecificManagementHotelAri extends ObjectModel implements Webser
 
             foreach ($ariInfo['rm_data'] as $roomTypeIndex => $roomTypeInfo) {
                 // get feature price of room type
-                $roomTypePrice = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay(
+                $roomTypePriceTE = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay(
+                    $roomTypeInfo['id_product'],
+                    $ariInfo['date_from'],
+                    $ariInfo['date_to'],
+                    0
+                );
+                $roomTypePriceTI = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay(
                     $roomTypeInfo['id_product'],
                     $ariInfo['date_from'],
                     $ariInfo['date_to'],
                     1
                 );
+                $totalBookingPrice = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
+                    $roomTypeInfo['id_product'],
+                    $ariInfo['date_from'],
+                    $ariInfo['date_to'],
+                    $ariInfo['num_rooms']
+                );
 
                 $ariFormatted['hotel_ari']['room_types'][$roomTypeIndex] = array(
                     'id_room_type' => $roomTypeInfo['id_product'],
-                    'name' => $roomTypeInfo['name'],
-                    'price' => $roomTypePrice,
+                    'base_price' => $roomTypePriceTE,
+                    'base_price_with_tax' => $roomTypePriceTI,
+                    'total_price' => $totalBookingPrice['total_price_tax_excl'],
+                    'total_price_with_tax' => $totalBookingPrice['total_price_tax_incl']
                 );
+
+                $objRoomType = new Product($roomTypeInfo['id_product']);
+                $ariFormatted['hotel_ari']['room_types'][$roomTypeIndex]['name'] = array();
+                foreach ($this->objOutput->getObjectRender()->languages as $idLang) {
+                    $ariFormatted['hotel_ari']['room_types'][$roomTypeIndex]['name'][] = array(
+                        'id' => $idLang,
+                        'value' => $objRoomType->name[$idLang]
+                    );
+                }
 
                 // rooms info of the room type
                 if (isset($roomTypeInfo['data']) && $roomTypeInfo['data']) {
@@ -547,9 +626,11 @@ class WebserviceSpecificManagementHotelAri extends ObjectModel implements Webser
                                 $roomsAriInfo[$roomIndex]['room_number'] = $roomInfo['room_num'];
                             }
                         }
-                        $ariFormatted['hotel_ari']['room_types'][$roomTypeIndex]['rooms'][$keyRoomAvailability] = $roomsAriInfo;
+                        $ariFormatted['hotel_ari']['room_types'][$roomTypeIndex]['rooms'][$keyRoomAvailability] = array_values($roomsAriInfo);
                     }
                 }
+
+                $ariFormatted['hotel_ari']['room_types'] = array_values($ariFormatted['hotel_ari']['room_types']);
             }
         }
 
