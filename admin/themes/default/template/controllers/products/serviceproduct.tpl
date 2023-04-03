@@ -15,7 +15,7 @@
                                 <span>{l s='name'}</span>
                             </th>
                             <th class="">
-                                <span>{l s='Category'}</span>
+                                <span>{l s='Auto add to cart'}</span>
                             </th>
                             <th>
                                 <span>{l s='Position'}</span>
@@ -45,14 +45,14 @@
                                     </div>
                                 </td>
                                 <td>
-                                    <span class="field-view service-product-price-text">{if isset($service_product.custom_price) && $service_product.custom_price}{displayPrice price=$service_product.custom_price currency=$id_currency}{else}{displayPrice price=$service_product.default_price currency=$id_currency}{/if}</span>
+                                    <span class="field-view service-product-price-text">{if isset($service_product.custom_price) && $service_product.custom_price}{displayPrice price=$service_product.custom_price currency=$currency->id}{else}{displayPrice price=$service_product.default_price currency=$currency->id}{/if}</span>
                                     <div class="field-edit" style="display:none">
                                         <div class="input-group">
                                             <input type="text" value="{if isset($service_product.custom_price) && $service_product.custom_price}{$service_product.custom_price|escape:'html':'UTF-8'}{else}{$service_product.default_price|escape:'html':'UTF-8'}{/if}" class="service-product-price" data-id_product="{$service_product.id_product|escape:'html':'UTF-8'}">
                                             <span class="input-group-addon">{$currency->prefix}{$currency->suffix}</span>
                                         </div>
                                     </div>
-                                    <div class="help-block">{l s='Default price: %s' sprintf={displayPrice price=$service_product.default_price currency=$id_currency}}
+                                    <div class="help-block">{l s='Default price: %s' sprintf={displayPrice price=$service_product.default_price currency=$currency->id}}
                                 </td>
                                 <td>
                                     <span class="field-view service_product_tax_text">{if isset($service_product.tax_rules_group_name) && $service_product.tax_rules_group_name}{$service_product.tax_rules_group_name}{else}{$service_product.default_tax_rules_group_name}{/if}</span>

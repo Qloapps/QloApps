@@ -4750,9 +4750,11 @@ class AdminOrdersControllerCore extends AdminController
                 // get room type additional demands
                 $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
                 if ($roomTypeServiceProducts = $objRoomTypeServiceProduct->getServiceProductsData($idProduct, 1, 0, false, 2, null)) {
-                    foreach ($roomTypeServiceProducts as $key => $product) {
-                        if (in_array($product['id_product'], array_column($additionalServices['additional_services'], 'id_product'))) {
-                            unset($roomTypeServiceProducts[$key]);
+                    if ($additionalServices) {
+                        foreach ($roomTypeServiceProducts as $key => $product) {
+                            if (in_array($product['id_product'], array_column($additionalServices['additional_services'], 'id_product'))) {
+                                unset($roomTypeServiceProducts[$key]);
+                            }
                         }
                     }
                     $smartyVars['roomTypeServiceProducts'] = $roomTypeServiceProducts;

@@ -3298,6 +3298,7 @@ class AdminProductsControllerCore extends AdminController
                 'selectedDemands' => $selectedDemands,
                 'allDemands' => $allDemands,
                 'defaultcurrencySign' => $objCurrency->sign,
+                'idDefaultcurrency' => $objCurrency->id,
             ));
         } else {
             $this->displayWarning($this->l('You must save this room type before managing additional facilities.'));
