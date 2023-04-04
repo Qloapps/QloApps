@@ -1123,7 +1123,6 @@ class AdminProductsControllerCore extends AdminController
             // process price update
             $idProduct = Tools::getValue('id_product');
             $idServiceProduct = Tools::getValue('service_product_id');
-            $idProductRoomtypePrice = Tools::getValue('id_room_type_service_product_price');
             $price = Tools::getValue('price');
             $id_tax_rules_group = Tools::getValue('id_tax_rules_group');
 

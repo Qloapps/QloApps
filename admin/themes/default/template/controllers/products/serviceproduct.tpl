@@ -57,7 +57,7 @@
                                 <td>
                                     <span class="field-view service_product_tax_text">{if isset($service_product.tax_rules_group_name) && $service_product.tax_rules_group_name}{$service_product.tax_rules_group_name}{else}{$service_product.default_tax_rules_group_name}{/if}</span>
                                     <div class="field-edit" style="display:none">
-                                        <select class="service_product_id_tax_rules_group"{if $tax_exclude_taxe_option}disabled="disabled"{/if}>
+                                        <select class="service_product_id_tax_rules_group">
                                             <option value="0">{l s='No Tax'}</option>
                                             {foreach from=$tax_rules_groups item=tax_rules_group}
                                                 <option value="{$tax_rules_group.id_tax_rules_group}" {if $service_product.id_tax_rules_group == $tax_rules_group.id_tax_rules_group}selected="selected"{/if} >
@@ -71,7 +71,7 @@
                                 <td class="text-right">
                                     <a href="#" class="btn btn-default button-edit-price field-view"><i class="icon-pencil"></i></a>
                                     <span class="field-edit" style="display:none">
-                                        <a href="#" class="btn btn-default btn-save" data-roomtype_url="{$link->getAdminLink('AdminProducts', true)|addslashes}" data-id_product="{$service_product.id_product|escape:'html':'UTF-8'}" data-id_room_type_service_product_price="{$service_product.id_room_type_service_product_price|escape:'html':'UTF-8'}"><i class="icon-save"></i> {l s='save'}</a>
+                                        <a href="#" class="btn btn-default btn-save" data-roomtype_url="{$link->getAdminLink('AdminProducts', true)|addslashes}" data-id_product="{$service_product.id_product|escape:'html':'UTF-8'}"><i class="icon-save"></i> {l s='save'}</a>
                                         <a href="#" class="btn btn-default btn-cancel"><i class="icon-times"></i></a>
                                     </span>
                                 </td>
