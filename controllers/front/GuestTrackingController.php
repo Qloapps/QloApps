@@ -115,6 +115,7 @@ class GuestTrackingControllerCore extends FrontController
 
         $method = Tools::getValue('method');
         if ($method == 'getRoomTypeBookingDemands') {
+            $response = array('reload' => false);
             $extraDemandsTpl = '';
             if (($idProduct = Tools::getValue('id_product'))
                 && ($idOrder = Tools::getValue('id_order'))
@@ -122,7 +123,6 @@ class GuestTrackingControllerCore extends FrontController
                 && ($dateTo = Tools::getValue('date_to'))
             ) {
                 $objBookingDemand = new HotelBookingDemands();
-                $order = new Order($idOrder);
                 $customer = new Customer((int)$order->id_customer);
                 $useTax = 0;
                 if (Group::getPriceDisplayMethod($customer->id_default_group) == PS_TAX_INC) {
@@ -144,10 +144,27 @@ class GuestTrackingControllerCore extends FrontController
                             'extraDemands' => $extraDemands,
                         )
                     );
-                    $extraDemandsTpl .= $this->context->smarty->fetch(_PS_THEME_DIR_.'_partials/order_booking_demands.tpl');
                 }
+                $objRoomTypeServiceProductOrderDetail = new RoomTypeServiceProductOrderDetail();
+                if ($additionalServices = $objRoomTypeServiceProductOrderDetail->getroomTypeServiceProducts(
+                    $idOrder,
+                    0,
+                    0,
+                    $idProduct,
+                    $dateFrom,
+                    $dateTo,
+                    0,
+                    0,
+                    $useTax
+                )) {
+                    $this->context->smarty->assign(array(
+                        'useTax' => $useTax,
+                        'additionalServices' => $additionalServices,
+                    ));
+                }
+                $response['extra_demands'] = $this->context->smarty->fetch(_PS_THEME_DIR_.'_partials/order_booking_demands.tpl');
             }
-            die($extraDemandsTpl);
+            $this->ajaxDie(json_encode($response));
         }
 
         /* Handle brute force attacks */
