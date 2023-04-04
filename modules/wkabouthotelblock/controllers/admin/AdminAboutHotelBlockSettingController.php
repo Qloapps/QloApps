@@ -397,7 +397,7 @@ class AdminAboutHotelBlockSettingController extends ModuleAdminController
         parent::setMedia();
         Media::addJsDef(
             array(
-                'filesizeError' => $this->l('File exceeds maximum size.'),
+                'filesizeError' => $this->l('File exceeds maximum size.', null, true),
                 'maxSizeAllowed' => Tools::getMaxUploadSize(),
             )
         );

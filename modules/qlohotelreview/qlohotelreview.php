@@ -171,7 +171,7 @@ class QloHotelReview extends Module
             'admin_approval_enabled' => (int) Configuration::get('QHR_ADMIN_APPROVAL_ENABLED'),
             'texts' => array(
                 'num_files' => sprintf(
-                    $this->l('You can upload a maximum of %d images.'),
+                    $this->l('You can upload a maximum of %d images.', false, true),
                     (int) Configuration::get('QHR_MAX_IMAGES_PER_REVIEW')
                 ),
             ),

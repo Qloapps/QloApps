@@ -126,7 +126,7 @@ class TranslateCore
      * @param string $source
      * @return string
      */
-    public static function getModuleTranslation($module, $string, $source, $sprintf = null, $js = false, $language = null)
+    public static function getModuleTranslation($module, $string, $source, $sprintf = null, $addslashes = false, $language = null)
     {
         global $_MODULES, $_MODULE, $_LANGADM;
 
@@ -210,10 +210,10 @@ class TranslateCore
                 $ret = Translate::checkAndReplaceArgs($ret, $sprintf);
             }
 
-            if ($js) {
+
+            $ret = htmlspecialchars($ret, ENT_COMPAT, 'UTF-8');
+            if ($addslashes) {
                 $ret = addslashes($ret);
-            } else {
-                $ret = htmlspecialchars($ret, ENT_COMPAT, 'UTF-8');
             }
 
             if ($sprintf === null) {
