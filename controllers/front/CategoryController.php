@@ -159,7 +159,9 @@ class CategoryControllerCore extends FrontController
 
         // get occupancy of the search
         $occupancy = Tools::getValue('occupancy');
-
+        if (!Validate::isOccupancies($occupancy)) {
+            $occupancy = array();
+        }
         $currency = new Currency($this->context->currency->id);
 
         if ($id_hotel = HotelBranchInformation::getHotelIdByIdCategory($id_category)) {
@@ -267,7 +269,9 @@ class CategoryControllerCore extends FrontController
 
         // occupancy of the search
         $occupancy = Tools::getValue('occupancy');
-
+        if (!Validate::isOccupancies($occupancy)) {
+            $occupancy = array();
+        }
         $sort_by = Tools::getValue('sort_by');
         $sort_value = Tools::getValue('sort_value');
         $filter_data = Tools::getValue('filter_data');

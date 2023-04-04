@@ -706,6 +706,51 @@ class ValidateCore
         return $id === null || Validate::isUnsignedId($id);
     }
 
+    public static function isOccupancies($occupancies)
+    {
+        if (is_array($occupancies)) {
+            if (count(array_filter(array_keys($occupancies), 'is_string'))) {
+                return Validate::isOccupancy($occupancies);
+            } else {
+                $response = true;
+                foreach ($occupancies as $key => $occupancy) {
+                    $response = $response && Validate::isOccupancy($occupancy);
+                }
+                return $response;
+            }
+        }
+        return false;
+    }
+
+    public static function isOccupancy($occupancy)
+    {
+        if (is_array($occupancy)) {
+            if (!isset($occupancy['adults']) || !$occupancy['adults'] || !Validate::isUnsignedInt($occupancy['adults'])) {
+                return false;
+            }
+            if (isset($occupancy['children'])) {
+                if (!Validate::isUnsignedInt($occupancy['children'])) {
+                    return false;
+                }
+                if ($occupancy['children'] > 0) {
+                    if (!isset($occupancy['child_ages']) || ($occupancy['children'] != count($occupancy['child_ages'])) || !is_array($occupancy['child_ages'])) {
+                        return false;
+                    } else {
+                        if (is_array($occupancy['child_ages'])) {
+                            foreach($occupancy['child_ages'] as $childAge) {
+                                if (!Validate::isUnsignedInt($childAge)) {
+                                    return false;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return true;
+        }
+        return false;
+    }
+
     /**
      * Check object validity
      *

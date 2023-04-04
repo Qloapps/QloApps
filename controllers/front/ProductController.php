@@ -1218,14 +1218,15 @@ class ProductControllerCore extends FrontController
         $dateFrom = Tools::getValue('date_from');
         $dateTo = Tools::getValue('date_to');
         $occupancy = Tools::getValue('occupancy');
+        if (!Validate::isOccupancies($occupancy)) {
+            $occupancy = array();
+        }
         $roomTypeDemands = Tools::getValue('room_type_demands');
         $roomServiceProducts = Tools::getValue('room_service_products');
 
         $dateFrom = date('Y-m-d', strtotime($dateFrom));
         $dateTo = date('Y-m-d', strtotime($dateTo));
-        if ($occupancy == false) {
-            $occupancy = array();
-        }
+
         $this->assignServiceProductVars();
         if ($this->assignBookingFormVars(
             $idProduct,
