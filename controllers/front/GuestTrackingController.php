@@ -285,6 +285,13 @@ class GuestTrackingControllerCore extends FrontController
                                     if ($data_v['is_back_order']) {
                                         $anyBackOrder = 1;
                                     }
+                                    if ($data_v['is_refunded']) {
+                                        $cartHotelData[$type_key]['date_diff'][$date_join]['count_refunded'] += 1;
+                                    }
+                                    if ($data_v['is_cancelled']) {
+                                        $cartHotelData[$type_key]['date_diff'][$date_join]['count_cancelled'] += 1;
+                                        $cartHotelData[$type_key]['date_diff'][$date_join]['count_refunded'] -= 1;
+                                    }
                                 } else {
                                     $num_days = $objBookingDetail->getNumberOfDays($data_v['date_from'], $data_v['date_to']);
                                     $cartHotelData[$type_key]['date_diff'][$date_join]['num_rm'] = 1;
@@ -304,7 +311,18 @@ class GuestTrackingControllerCore extends FrontController
                                     if ($data_v['is_back_order']) {
                                         $anyBackOrder = 1;
                                     }
+                                    $cartHotelData[$type_key]['date_diff'][$date_join]['count_cancelled'] = 0;
+                                    $cartHotelData[$type_key]['date_diff'][$date_join]['count_refunded'] = 0;
+                                    if ($data_v['is_refunded']) {
+                                        $cartHotelData[$type_key]['date_diff'][$date_join]['count_refunded'] += 1;
+                                    }
+                                    if ($data_v['is_cancelled']) {
+                                        $cartHotelData[$type_key]['date_diff'][$date_join]['count_cancelled'] += 1;
+                                        $cartHotelData[$type_key]['date_diff'][$date_join]['count_refunded'] -= 1;
+                                    }
                                 }
+
+                                $cartHotelData[$type_key]['date_diff'][$date_join]['is_refunded'] = $data_v['is_refunded'];
 
                                 $cartHotelData[$type_key]['date_diff'][$date_join]['ids_htl_booking_detail'][] = $data_v['id'];
 
@@ -389,6 +407,39 @@ class GuestTrackingControllerCore extends FrontController
                                     $data_v['id_room'],
                                     1,
                                     0
+                                );
+                                // get auto added price to be displayed with room price
+                                if (empty($cartHotelData[$type_key]['date_diff'][$date_join]['additional_services_price_auto_add_ti'])) {
+                                    $cartHotelData[$type_key]['date_diff'][$date_join]['additional_services_price_auto_add_ti'] = 0;
+                                }
+                                $cartHotelData[$type_key]['date_diff'][$date_join]['additional_services_price_auto_add_ti'] += $objRoomTypeServiceProductOrderDetail->getroomTypeServiceProducts(
+                                    $idOrder,
+                                    0,
+                                    0,
+                                    $type_value['product_id'],
+                                    $data_v['date_from'],
+                                    $data_v['date_to'],
+                                    $data_v['id_room'],
+                                    1,
+                                    1,
+                                    1,
+                                    Product::PRICE_ADDITION_TYPE_WITH_ROOM
+                                );
+                                if (empty($cartHotelData[$type_key]['date_diff'][$date_join]['additional_services_price_auto_add_te'])) {
+                                    $cartHotelData[$type_key]['date_diff'][$date_join]['additional_services_price_auto_add_te'] = 0;
+                                }
+                                $cartHotelData[$type_key]['date_diff'][$date_join]['additional_services_price_auto_add_te'] += $objRoomTypeServiceProductOrderDetail->getroomTypeServiceProducts(
+                                    $idOrder,
+                                    0,
+                                    0,
+                                    $type_value['product_id'],
+                                    $data_v['date_from'],
+                                    $data_v['date_to'],
+                                    $data_v['id_room'],
+                                    1,
+                                    0,
+                                    1,
+                                    Product::PRICE_ADDITION_TYPE_WITH_ROOM
                                 );
                             }
                             // get auto added price to be displayed with room price
