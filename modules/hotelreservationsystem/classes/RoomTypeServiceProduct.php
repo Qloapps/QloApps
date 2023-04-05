@@ -99,7 +99,7 @@ class RoomTypeServiceProduct extends ObjectModel
 
     public function getProductsForRoomType($idProductRoomType)
     {
-        $sql .= 'SELECT `id_room_type_service_product`, `id_product`, `position` FROM `'._DB_PREFIX_.'htl_room_type_service_product`
+        $sql = 'SELECT `id_room_type_service_product`, `id_product`, `position` FROM `'._DB_PREFIX_.'htl_room_type_service_product`
             WHERE `element_type` = '.self::WK_ELEMENT_TYPE_ROOM_TYPE.' AND `id_element` = '.(int)$idProductRoomType.'
             ORDER BY `position` ASC';
 

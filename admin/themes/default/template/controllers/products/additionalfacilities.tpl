@@ -81,7 +81,7 @@
                                                 <input type="text" name="option_price_{$option['id']|escape:'html':'UTF-8'}" value="{if isset($selectedDemands[$demand['id_global_demand']]['adv_option'][$option['id']]['price'])}{Tools::ps_round($selectedDemands[$demand['id_global_demand']]['adv_option'][$option['id']]['price'], 2)|escape:'html':'UTF-8'}{else}{Tools::ps_round($option['price'], 2)|escape:'html':'UTF-8'}{/if}"/>
                                             </div>
                                             <div class="price_display" {if isset($selectedDemands[$demand['id_global_demand']])}style="display:none"{/if}>
-                                                {displayPrice price={$option['price']|escape:'html':'UTF-8'}  currency=$module->id_currency}
+                                                {displayPrice price={$option['price']|escape:'html':'UTF-8'}  currency=$idDefaultcurrency}
                                             </div>
 
                                         </td>
@@ -115,7 +115,7 @@
                                                 value="{if isset($selectedDemands[$demand['id_global_demand']]['price'])}{Tools::ps_round($selectedDemands[$demand['id_global_demand']]['price'], 2)|escape:'html':'UTF-8'}{elseif isset($demand['price'])}{Tools::ps_round($demand['price'], 2)|escape:'html':'UTF-8'}{/if}"/>
                                             </div>
                                             <div class="price_display" {if isset($selectedDemands[$demand['id_global_demand']])}style="display:none"{/if}>
-                                                {displayPrice price={$demand['price']|escape:'html':'UTF-8'} currency=$module->id_currency}
+                                                {displayPrice price={$demand['price']|escape:'html':'UTF-8'} currency=$idDefaultcurrency}
                                             </div>
                                         </td>
                                         <td>
