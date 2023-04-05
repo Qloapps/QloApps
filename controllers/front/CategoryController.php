@@ -159,7 +159,7 @@ class CategoryControllerCore extends FrontController
 
         // get occupancy of the search
         $occupancy = Tools::getValue('occupancy');
-        if (!Validate::isOccupancies($occupancy)) {
+        if (!Validate::isOccupancy($occupancy)) {
             $occupancy = array();
         }
         $currency = new Currency($this->context->currency->id);
@@ -269,7 +269,7 @@ class CategoryControllerCore extends FrontController
 
         // occupancy of the search
         $occupancy = Tools::getValue('occupancy');
-        if (!Validate::isOccupancies($occupancy)) {
+        if (!Validate::isOccupancy($occupancy)) {
             $occupancy = array();
         }
         $sort_by = Tools::getValue('sort_by');

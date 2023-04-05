@@ -1218,7 +1218,7 @@ class ProductControllerCore extends FrontController
         $dateFrom = Tools::getValue('date_from');
         $dateTo = Tools::getValue('date_to');
         $occupancy = Tools::getValue('occupancy');
-        if (!Validate::isOccupancies($occupancy)) {
+        if (!Validate::isOccupancy($occupancy)) {
             $occupancy = array();
         }
         $roomTypeDemands = Tools::getValue('room_type_demands');

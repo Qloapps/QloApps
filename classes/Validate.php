@@ -706,47 +706,42 @@ class ValidateCore
         return $id === null || Validate::isUnsignedId($id);
     }
 
-    public static function isOccupancies($occupancies)
-    {
-        if (is_array($occupancies)) {
-            if (count(array_filter(array_keys($occupancies), 'is_string'))) {
-                return Validate::isOccupancy($occupancies);
-            } else {
-                $response = true;
-                foreach ($occupancies as $key => $occupancy) {
-                    $response = $response && Validate::isOccupancy($occupancy);
-                }
-                return $response;
-            }
-        }
-        return false;
-    }
-
     public static function isOccupancy($occupancy)
     {
         if (is_array($occupancy)) {
-            if (!isset($occupancy['adults']) || !$occupancy['adults'] || !Validate::isUnsignedInt($occupancy['adults'])) {
-                return false;
+            if (count(array_filter(array_keys($occupancy), 'is_string'))) {
+                $occupancy = array($occupancy);
             }
-            if (isset($occupancy['children'])) {
-                if (!Validate::isUnsignedInt($occupancy['children'])) {
-                    return false;
-                }
-                if ($occupancy['children'] > 0) {
-                    if (!isset($occupancy['child_ages']) || ($occupancy['children'] != count($occupancy['child_ages'])) || !is_array($occupancy['child_ages'])) {
-                        return false;
-                    } else {
-                        if (is_array($occupancy['child_ages'])) {
-                            foreach($occupancy['child_ages'] as $childAge) {
-                                if (!Validate::isUnsignedInt($childAge)) {
-                                    return false;
+            $response = true;
+            foreach ($occupancy as $key => $roomOccupancy) {
+                if (is_array($roomOccupancy)) {
+                    if (!isset($roomOccupancy['adults']) || !$roomOccupancy['adults'] || !Validate::isUnsignedInt($roomOccupancy['adults'])) {
+                        $response = $response && false;
+                    }
+                    if (isset($roomOccupancy['children'])) {
+                        if (!Validate::isUnsignedInt($roomOccupancy['children'])) {
+                            $response = $response && false;
+                        }
+                        if ($roomOccupancy['children'] > 0) {
+                            if (!isset($roomOccupancy['child_ages']) || ($roomOccupancy['children'] != count($roomOccupancy['child_ages'])) || !is_array($roomOccupancy['child_ages'])) {
+                                $response = $response && false;
+                            } else {
+                                if (is_array($roomOccupancy['child_ages'])) {
+                                    foreach($roomOccupancy['child_ages'] as $childAge) {
+                                        if (!Validate::isUnsignedInt($childAge)) {
+                                            $response = $response && false;
+                                        }
+                                    }
                                 }
                             }
                         }
                     }
+                    $response = $response && true;
+                } else {
+                    $response = $response && false;
                 }
             }
-            return true;
+            return $response;
         }
         return false;
     }

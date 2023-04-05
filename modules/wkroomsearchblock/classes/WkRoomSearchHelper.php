@@ -184,7 +184,7 @@ class WkRoomSearchHelper
                 if ($occupancyEnabled) {
                     // send occupancy information searched by the user
                     if ($occupancies = Tools::getvalue('occupancy')) {
-                        if (Validate::isOccupancies($occupancies)) {
+                        if (Validate::isOccupancy($occupancies)) {
                             if ($searchedData['occupancies'] = $occupancies) {
                                 $searchedData['occupancy_adults'] = array_sum(
                                     array_column($searchedData['occupancies'], 'adults')
