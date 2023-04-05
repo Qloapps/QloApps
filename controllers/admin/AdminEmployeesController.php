@@ -175,6 +175,8 @@ class AdminEmployeesControllerCore extends AdminController
 
     public function initPageHeaderToolbar()
     {
+        parent::initPageHeaderToolbar();
+
         if (empty($this->display)) {
             $this->page_header_toolbar_btn['new_employee'] = array(
                 'href' => self::$currentIndex.'&addemployee&token='.$this->token,
@@ -193,8 +195,6 @@ class AdminEmployeesControllerCore extends AdminController
                     $this->toolbar_title);
             }
         }
-
-        parent::initPageHeaderToolbar();
     }
 
     public function renderList()
