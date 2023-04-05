@@ -171,7 +171,7 @@ class TranslateCore
         $string = preg_replace("/\\\*'/", "\'", $string);
         $key = md5($string);
 
-        $cache_key = $name.'|'.$string.'|'.$source.'|'.(int)$js;
+        $cache_key = $name.'|'.$string.'|'.$source.'|'.(int)$addslashes;
 
         if (!isset($lang_cache[$cache_key])) {
             if ($_MODULES == null) {
