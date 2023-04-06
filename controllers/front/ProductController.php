@@ -408,7 +408,11 @@ class ProductControllerCore extends FrontController
                         )
                     );
 
-                    $this->assignBookingFormVars($this->product->id, $date_from, $date_to);
+                    $occupancy_value = array();
+                    if (Configuration::get('PS_FRONT_ROOM_UNIT_SELECTION_TYPE') == HotelBookingDetail::PS_ROOM_UNIT_SELECTION_TYPE_QUANTITY) {
+                        $occupancy_value = 1;
+                    }
+                    $this->assignBookingFormVars($this->product->id, $date_from, $date_to, $occupancy_value);
                     $this->assignServiceProductVars();
 
                     // product price after imposing feature prices...
