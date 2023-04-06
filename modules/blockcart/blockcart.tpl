@@ -124,7 +124,7 @@
 																			{$data_v['data_form']|date_format:"%d-%m-%Y"}&nbsp;-&nbsp;{$data_v['data_to']|date_format:"%d-%m-%Y"}
 																		</td>
 																		<td class="num_rooms_in_date">{$data_v['num_rm']}</td>
-																		<td>{convertPrice price=$data_v['amount']}</td>
+																		<td>{convertPrice price=($data_v['amount'] + $data_v['demand_price'])}</td>
 																		<td><a class="remove_rooms_from_cart_link" href="#" rm_price="{$data_v['amount']}" id_product="{$product.id_product|intval}" date_from="{$data_v['data_form']}" date_to="{$data_v['data_to']}" num_rooms="{$data_v['num_rm']}" title="{l s='remove this room from my cart' mod='blockcart'}"></a></td>
 																	</tr>
 																{/foreach}
@@ -222,10 +222,10 @@
 									<span>{l s='Tax' mod='blockcart'}</span>
 								</div>
 							{/if}
-							{if isset($total_extra_services)}
+							{if isset($total_convenience_fee)}
 								<div class="cart-prices-line">
-									<span class="price cart_block_additional_facilities_cost ajax_cart_extra_demands_cost">{convertPrice price=$total_extra_services}</span>
-									<span class="price">{l s='Extra Services Cost' mod='blockcart'}</strong>
+									<span class="price cart_block_convenience_fee ajax_cart_convenience_fee">{convertPrice price=$total_convenience_fee}</span>
+									<span class="price">{l s='Convenience Fees' mod='blockcart'}</strong>
 								</div>
 							{/if}
 							<div class="cart-prices-line last-line">
@@ -314,7 +314,7 @@
 							{/if}
 						{/if}
 					</strong>
-					<span class="ajax_block_products_total">
+					<span class="ajax_block_room_total pull-right">
 						{if $cart_qties > 0}
 							{convertPrice price=$cart->getOrderTotal(false, Cart::ONLY_PRODUCTS)}
 						{/if}
@@ -354,16 +354,16 @@
 						{/if}
 					</span>
 				</div> -->
-				{if isset($total_extra_services)}
+				{if isset($total_convenience_fee)}
 					<div class="layer_cart_row">
-						<strong class="dark">{l s='Total Extra Services Cost' mod='blockcart'}</strong>
-						<span class="price ajax_cart_extra_demands_cost">{convertPrice price=$total_extra_services}</span>
+						<strong class="dark">{l s='Convenience Fees' mod='blockcart'}</strong>
+						<span class="price ajax_cart_convenience_fee pull-right">{convertPrice price=$total_convenience_fee}</span>
 					</div>
 				{/if}
 				{if $show_tax && $use_tax}
 					<div class="layer_cart_row">
 						<strong class="dark">{l s='Tax' mod='blockcart'}</strong>
-						<span class="price cart_block_tax_cost ajax_cart_tax_cost">{$tax_cost}</span>
+						<span class="price cart_block_tax_cost ajax_cart_tax_cost pull-right">{$tax_cost}</span>
 					</div>
 				{/if}
 				<div class="layer_cart_row">
@@ -377,7 +377,7 @@
 							{/if}
 						{/if}
 					</strong>
-					<span class="ajax_block_cart_total">
+					<span class="ajax_block_cart_total pull-right">
 						{if $cart_qties > 0}
 							{if $priceDisplay == 1}
 								{convertPrice price=$cart->getOrderTotal(false)}

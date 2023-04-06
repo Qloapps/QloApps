@@ -912,7 +912,7 @@ var ajaxCart = {
                                 content += '<tr class="rooms_remove_container">';
                                 content += '<td>' + $.datepicker.formatDate(ajaxCart.dateFormat, new Date(date_diff_v.data_form)) + '&nbsp;-&nbsp;' + $.datepicker.formatDate(ajaxCart.dateFormat, new Date(date_diff_v.data_to)) + '</td>';
                                 content += '<td class="num_rooms_in_date">' + date_diff_v.num_rm + '</td>';
-                                content += '<td>' + formatCurrency(parseFloat(date_diff_v.amount), currency_format, currency_sign, currency_blank) + '</td>';
+                                content += '<td>' + formatCurrency(parseFloat(date_diff_v.amount) + parseFloat(date_diff_v.demand_price), currency_format, currency_sign, currency_blank) + '</td>';
                                 content += '<td>';
                                 content += '<a class="remove_rooms_from_cart_link" href="#" rm_price=' + date_diff_v.amount + ' id_product=' + productId + ' date_from=' + date_diff_v.data_form + ' date_to=' + date_diff_v.data_to + ' num_rooms=' + date_diff_v.num_rm + ' title="' + remove_rm_title + '"></a>';
                                 content += '</td>';
@@ -949,7 +949,7 @@ var ajaxCart = {
                                 booking_dates_content += '<tr class="rooms_remove_container">';
                                 booking_dates_content += '<td>' + $.datepicker.formatDate(ajaxCart.dateFormat, new Date(date_diff_v1.data_form)) + '&nbsp;-&nbsp;' + $.datepicker.formatDate(ajaxCart.dateFormat, new Date(date_diff_v1.data_to)) + '</td>';
                                 booking_dates_content += '<td class="num_rooms_in_date">' + date_diff_v1.num_rm + '</td>';
-                                booking_dates_content += '<td>' + formatCurrency(parseFloat(date_diff_v1.amount), currency_format, currency_sign, currency_blank) + '</td>';
+                                booking_dates_content += '<td>' + formatCurrency(parseFloat(date_diff_v1.amount) + parseFloat(date_diff_v1.demand_price), currency_format, currency_sign, currency_blank) + '</td>';
                                 booking_dates_content += '<td>';
                                 booking_dates_content += '<a class="remove_rooms_from_cart_link" href="#" rm_price=' + date_diff_v1.amount + ' id_product=' + productId + ' date_from=' + date_diff_v1.data_form + ' date_to=' + date_diff_v1.data_to + ' num_rooms=' + date_diff_v1.num_rm + ' title="' + remove_rm_title + '"></a>';
                                 booking_dates_content += '</td>';
@@ -1154,16 +1154,20 @@ var ajaxCart = {
         if (hasDeliveryAddress)
             $('.ajax_cart_shipping_cost').parent().find('.unvisible').show();
 
-        $('.ajax_cart_tax_cost').text(jsonData.taxCost);
+        $('.ajax_cart_tax_cost').text(jsonData.tax_cost);
         $('.cart_block_wrapping_cost').text(jsonData.wrapping_cost);
 
         $('.ajax_block_cart_total').text(jsonData.total);
         $('.ajax_block_cart_total').attr('total_cart_price', jsonData.totalToPay);
 
-        $('.ajax_block_products_total').text(jsonData.product_total);
-        $('.ajax_block_room_total').text(jsonData.roomTotal);
+        $('.ajax_block_room_total').text(jsonData.room_total);
         $('.ajax_block_nornal_products_total').text(jsonData.normalProductsTotal);
-        $('.ajax_cart_extra_demands_cost').text(jsonData.total_extra_services_format);
+        $('.ajax_cart_convenience_fee').text(jsonData.total_convenience_fee_format);
+        if (jsonData.total_convenience_fee) {
+            $('.ajax_cart_convenience_fee').parent().show();
+        } else {
+            $('.ajax_cart_convenience_fee').parent().hide();
+        }
         $('.ajax_total_price_wt').text(jsonData.total_price_wt);
 
         if (parseFloat(jsonData.free_shipping_float) > 0) {
