@@ -3132,7 +3132,8 @@ class AdminOrdersControllerCore extends AdminController
                     Group::getCurrent()->id,
                     $this->context->cart->id,
                     $this->context->cookie->id_guest,
-                    $objCartBookingData->id_room
+                    $objCartBookingData->id_room,
+                    0
                 );
                 $objBookingDetail->total_price_tax_excl = $total_price['total_price_tax_excl'];
                 $objBookingDetail->total_price_tax_incl = $total_price['total_price_tax_incl'];
