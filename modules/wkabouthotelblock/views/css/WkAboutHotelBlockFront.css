@@ -40,6 +40,8 @@
 }
 .interiorboxInner img {
    width: 100%;
+   height: 100%;
+   object-fit: cover;
 }
 .htlInterior-owlCarousel .owl-prev, .htlInterior-owlCarousel .owl-next{
     font-size: 40px;
