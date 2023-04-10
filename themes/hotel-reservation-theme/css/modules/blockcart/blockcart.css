@@ -226,7 +226,7 @@
 .cart_block .cart_block_tax_cost,
 .cart_block .cart_block_total,
 .cart_block .cart_block_wrapping_cost,
-.cart_block .cart_block_additional_facilities_cost {
+.cart_block .cart_block_convenience_fee {
   float: right; }
 
 .cart_block table.vouchers {

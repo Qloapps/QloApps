@@ -267,7 +267,10 @@ class Blockcart extends Module
             unset($this->context->cookie->currentAddedProduct);
         }
 
-        $totalAdditionalServicesPrice = $this->context->cart->getOrderTotal(false, Cart::ONLY_ROOM_SERVICES_WITHOUT_AUTO_ADD);
+        $totalAdditionalServicesWithoutAutoAddPrice = $params['cart']->getOrderTotal($useTax, Cart::ONLY_ROOM_SERVICES_WITHOUT_AUTO_ADD);
+        $totalAdditionalServicesWithAutoAddPrice = $params['cart']->getOrderTotal($useTax, Cart::ONLY_ROOM_SERVICES);
+        $totalConvenienceFee = $params['cart']->getOrderTotal($useTax, Cart::ONLY_CONVENIENCE_FEE);
+        $totalRoomsPrice = $params['cart']->getOrderTotal($useTax, Cart::ONLY_ROOMS);
 
         $response = array(
             'products' => $products,
@@ -285,11 +288,10 @@ class Blockcart extends Module
             'tax_cost' => $tax_cost,
             'wrapping_cost' => Tools::displayPrice($wrappingCost, $currency),
             'product_total' => Tools::displayPrice($params['cart']->getOrderTotal($useTax, Cart::ONLY_PRODUCTS), $currency),
-            'room_total' => Tools::displayPrice($params['cart']->getOrderTotal($useTax, Cart::ONLY_ROOMS), $currency),
-            // 'normal_products_total' => Tools::displayPrice($params['cart']->getOrderTotal($useTax, Cart::ONLY_NORMAL_PRODUCTS), $currency),
+            'room_total' => Tools::displayPrice($totalRoomsPrice + $totalDemandsPrice + $totalAdditionalServicesWithAutoAddPrice - $totalConvenienceFee),
             'totalToPay' => $totalToPay,
-            'total_extra_services' => $totalDemandsPrice + $totalAdditionalServicesPrice,
-            'total_extra_services_format' => Tools::displayPrice(($totalDemandsPrice + $totalAdditionalServicesPrice), $currency),
+            'total_convenience_fee' => $totalConvenienceFee,
+            'total_convenience_fee_format' => Tools::displayPrice(($totalConvenienceFee), $currency),
             'total' => Tools::displayPrice($totalToPay, $currency),
             'order_process' => $orderProcess,
             'ajax_allowed' => (int) (Configuration::get('PS_BLOCK_CART_AJAX')) == 1 ? true : false,
