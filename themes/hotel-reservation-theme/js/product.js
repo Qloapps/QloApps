@@ -1350,8 +1350,10 @@ var BookingForm = {
         }
         if (!$('.max_avail_type_qty').length || $('.max_avail_type_qty').val() < 1) {
             disableRoomTypeDemands(1);
+            disableRoomTypeServices(1);
         } else {
             disableRoomTypeDemands(0);
+            disableRoomTypeServices(0);
         }
     },
     initDatepicker: function(max_order_date, preparation_time, dateFrom, dateTo) {
