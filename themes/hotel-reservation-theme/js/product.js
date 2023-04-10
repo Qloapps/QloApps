@@ -1359,11 +1359,13 @@ var BookingForm = {
         if (preparation_time) {
             start_date.setDate(start_date.getDate() + parseInt(preparation_time));
             start_date.setHours(0, 0, 0, 0);
-            if (dateFrom && new Date(dateFrom) < start_date) {
+            if (dateFrom && new Date(dateFrom + ' 00:00:00') < start_date) {
                 dateFrom = $.datepicker.formatDate('yy-mm-dd', start_date);
-                dateTo = new Date(start_date);
-                dateTo.setDate(start_date.getDate() + 1);
-                dateTo = $.datepicker.formatDate('yy-mm-dd', dateTo);
+                if (new Date(dateTo + ' 00:00:00') <= start_date) {
+                    dateTo = new Date(start_date);
+                    dateTo.setDate(start_date.getDate() + 1);
+                    dateTo = $.datepicker.formatDate('yy-mm-dd', dateTo);
+                }
             }
         }
 
