@@ -847,8 +847,9 @@ class AdminCartsControllerCore extends AdminController
         $cart_detail_data_obj = new HotelCartBookingData();
         $cart_detail_data = $cart_detail_data_obj->getCartFormatedBookinInfoByIdCart((int) $id_cart);
         $is_backdate_order = false;
+        $currentDate = strtotime(date('Y-m-d'));
         foreach ($cart_detail_data as $cartRoom) {
-            if (strtotime($cartRoom['date_from']) < strtotime(date('Y-m-d'))) {
+            if (strtotime($cartRoom['date_from']) < $currentDate) {
                 $is_backdate_order = true;
             }
         }
