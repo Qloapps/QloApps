@@ -154,6 +154,9 @@ class StatsBestProducts extends ModuleGrid
         $date_between = $this->getDate();
         $date_from = date('Y-m-d', strtotime($this->_employee->stats_date_from));
         $date_to = date('Y-m-d', strtotime($this->_employee->stats_date_to));
+        if ($date_from == $date_to) {
+            $date_to = date('Y-m-d', strtotime('+1 day', strtotime($date_to)));
+        }
         $array_date_between = explode(' AND ', $date_between);
         $id_lang = $this->getLang();
 

@@ -152,6 +152,9 @@ class StatsBestCategories extends ModuleGrid
         $date_between = $this->getDate();
         $date_from = date('Y-m-d', strtotime($this->_employee->stats_date_from));
         $date_to = date('Y-m-d', strtotime($this->_employee->stats_date_to));
+        if ($date_from == $date_to) {
+            $date_to = date('Y-m-d', strtotime('+1 day', strtotime($date_to)));
+        }
         $id_lang = $this->getLang();
 
         //If column 'order_detail.original_wholesale_price' does not exist, create it
