@@ -20,7 +20,6 @@
 function line_chart_dashinsights(widget_name, chart_details) {
     nv.addGraph(function () {
         var chart = nv.models.lineChart()
-            .interpolate('basis')
             .useInteractiveGuideline(true)
             .x(function (d) { return (d !== undefined ? d[0] : 0); })
             .y(function (d) { return (d !== undefined ? d[1] : 0); })
@@ -88,12 +87,30 @@ function multibar_chart_los_dashinsights(widget_name, chart_details) {
 
         chart.yAxis.tickFormat(d3.format(chart_details['y_format']));
 
+        chart.dispatch.stateChange = function () {
+            setTimeout(function () {
+                positionXAxisLabel();
+            }, 10);
+        }
+
         d3.select('#dashinsights_length_of_stay svg')
             .datum(chart_details.data)
             .call(chart);
 
-        nv.utils.windowResize(chart.update);
+        positionXAxisLabel();
+
+        nv.utils.windowResize(function() {
+            chart.update();
+            positionXAxisLabel();
+        });
 
         return chart;
     });
+
+    function positionXAxisLabel() {
+        d3.select('#dashinsights_length_of_stay .nv-x .nv-axislabel').attr(
+            'transform',
+            d3.transform('rotate(-90) translate(-130, 40)').toString()
+        );
+    }
 }
