@@ -1638,7 +1638,8 @@ class AdminOrdersControllerCore extends AdminController
                     1,
                     0
                 );
-                $order_detail_data[$key]['total_room_price_ti'] += $totalConvenienceFeeTI += $order_detail_data[$key]['convenience_fee_ti'] = $objRoomTypeServiceProductOrderDetail->getroomTypeServiceProducts(
+
+                $order_detail_data[$key]['convenience_fee_ti'] = $objRoomTypeServiceProductOrderDetail->getroomTypeServiceProducts(
                     $order->id,
                     0,
                     0,
@@ -1651,7 +1652,10 @@ class AdminOrdersControllerCore extends AdminController
                     1,
                     Product::PRICE_ADDITION_TYPE_INDEPENDENT
                 );
-                $order_detail_data[$key]['total_room_price_te'] += $totalConvenienceFeeTE += $order_detail_data[$key]['convenience_fee_te'] = $objRoomTypeServiceProductOrderDetail->getroomTypeServiceProducts(
+                $order_detail_data[$key]['total_room_price_ti'] += $order_detail_data[$key]['convenience_fee_ti'];
+                $totalConvenienceFeeTI += $order_detail_data[$key]['convenience_fee_ti'];
+
+                $order_detail_data[$key]['convenience_fee_te'] = $objRoomTypeServiceProductOrderDetail->getroomTypeServiceProducts(
                     $order->id,
                     0,
                     0,
@@ -1664,7 +1668,11 @@ class AdminOrdersControllerCore extends AdminController
                     1,
                     Product::PRICE_ADDITION_TYPE_INDEPENDENT
                 );
-                $order_detail_data[$key]['total_room_price_ti'] += $order_detail_data[$key]['additional_services_price_auto_add_ti'] = $objRoomTypeServiceProductOrderDetail->getroomTypeServiceProducts(
+
+                $order_detail_data[$key]['total_room_price_te'] += $order_detail_data[$key]['convenience_fee_te'];
+                $totalConvenienceFeeTE += $order_detail_data[$key]['convenience_fee_te'];
+
+                $order_detail_data[$key]['additional_services_price_auto_add_ti'] = $objRoomTypeServiceProductOrderDetail->getroomTypeServiceProducts(
                     $order->id,
                     0,
                     0,
@@ -1677,7 +1685,9 @@ class AdminOrdersControllerCore extends AdminController
                     1,
                     Product::PRICE_ADDITION_TYPE_WITH_ROOM
                 );
-                $order_detail_data[$key]['total_room_price_te'] += $order_detail_data[$key]['additional_services_price_auto_add_te'] = $objRoomTypeServiceProductOrderDetail->getroomTypeServiceProducts(
+                $order_detail_data[$key]['total_room_price_ti'] += $order_detail_data[$key]['additional_services_price_auto_add_ti'];
+
+                $order_detail_data[$key]['additional_services_price_auto_add_te'] = $objRoomTypeServiceProductOrderDetail->getroomTypeServiceProducts(
                     $order->id,
                     0,
                     0,
@@ -1690,6 +1700,8 @@ class AdminOrdersControllerCore extends AdminController
                     1,
                     Product::PRICE_ADDITION_TYPE_WITH_ROOM
                 );
+                $order_detail_data[$key]['total_room_price_te'] += $order_detail_data[$key]['additional_services_price_auto_add_te'];
+
                 $cust_obj = new Customer($value['id_customer']);
                 if ($cust_obj->firstname) {
                     $order_detail_data[$key]['alloted_cust_name'] = $cust_obj->firstname.' '.$cust_obj->lastname;
@@ -3132,7 +3144,8 @@ class AdminOrdersControllerCore extends AdminController
                     Group::getCurrent()->id,
                     $this->context->cart->id,
                     $this->context->cookie->id_guest,
-                    $objCartBookingData->id_room
+                    $objCartBookingData->id_room,
+                    0
                 );
                 $objBookingDetail->total_price_tax_excl = $total_price['total_price_tax_excl'];
                 $objBookingDetail->total_price_tax_incl = $total_price['total_price_tax_incl'];
@@ -4093,7 +4106,7 @@ class AdminOrdersControllerCore extends AdminController
 
         // Update Order
         // values changes as values are calculated accoding to the quantity of the product by webkul
-        $order->total_paid -= ($diff_products_tax_incl + $roomExtraDemandTI);
+        $order->total_paid -= ($diff_products_tax_incl + $roomExtraDemandTI + $additionlServicesTI);
         $order->total_paid_tax_incl -= ($diff_products_tax_incl + $roomExtraDemandTI + $additionlServicesTI);
         $order->total_paid_tax_excl -= ($diff_products_tax_excl + $roomExtraDemandTE + $additionlServicesTE);
         $order->total_products -= ($diff_products_tax_excl + $additionlServicesTE);
@@ -4959,7 +4972,7 @@ class AdminOrdersControllerCore extends AdminController
 
                 $order->total_paid_tax_excl -= $priceTaxExcl;
                 $order->total_paid_tax_incl -= $priceTaxIncl;
-                $order->total_paid += $priceTaxIncl;
+                $order->total_paid -= $priceTaxIncl;
 
                 $res &= $order->update();
             }
