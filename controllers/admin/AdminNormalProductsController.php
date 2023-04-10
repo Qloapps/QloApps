@@ -1590,7 +1590,7 @@ class AdminNormalProductsControllerCore extends AdminController
         if ($res) {
             $this->jsonConfirmation($this->_conf[7]);
         } else {
-            $this->jsonError(Tools::displayError('An error occurred while attempting to delete the room type image.'));
+            $this->jsonError(Tools::displayError('An error occurred while attempting to delete the product image.'));
         }
     }
 
@@ -2154,11 +2154,11 @@ class AdminNormalProductsControllerCore extends AdminController
 
         // Categories
         if ($this->isProductFieldUpdated('id_category_default') && (!Tools::isSubmit('categoryBox') || !count(Tools::getValue('categoryBox')))) {
-            $this->errors[] = $this->l('This room type must be in at least one category.');
+            $this->errors[] = $this->l('This product must be in at least one category.');
         }
 
         if ($this->isProductFieldUpdated('id_category_default') && (!is_array(Tools::getValue('categoryBox')) || !in_array(Tools::getValue('id_category_default'), Tools::getValue('categoryBox')))) {
-            $this->errors[] = $this->l('This room type must be in the default category.');
+            $this->errors[] = $this->l('This product must be in the default category.');
         }
 
         // Tags
@@ -3472,7 +3472,7 @@ class AdminNormalProductsControllerCore extends AdminController
 
         if (!Validate::isLoadedObject($product)) {
             $files = array();
-            $files[0]['error'] = Tools::displayError('Cannot add image because room type creation failed.');
+            $files[0]['error'] = Tools::displayError('Cannot add image because product creation failed.');
         }
 
         $image_uploader = new HelperImageUploader('file');
@@ -3663,10 +3663,10 @@ class AdminNormalProductsControllerCore extends AdminController
                     $data->assign('imageType', ImageType::getFormatedName('small'));
                 }
             } else {
-                $this->displayWarning($this->l('You must save the room type in this shop before adding images.'));
+                $this->displayWarning($this->l('You must save the product in this shop before adding images.'));
             }
         } else {
-            $this->displayWarning($this->l('You must save this room type before adding images.'));
+            $this->displayWarning($this->l('You must save this product before adding images.'));
         }
 
         $this->tpl_form_vars['custom_form'] = $data->fetch();
@@ -3957,7 +3957,7 @@ class AdminNormalProductsControllerCore extends AdminController
                                 echo '{"hasError" : true, "errors" : "Can not update product '.(int)$id_product.' to position '.(int)$position.' "}';
                             }
                         } else {
-                            echo '{"hasError" : true, "errors" : "This room type ('.(int)$id_product.') can t be loaded"}';
+                            echo '{"hasError" : true, "errors" : "This product ('.(int)$id_product.') can t be loaded"}';
                         }
 
                         break;
