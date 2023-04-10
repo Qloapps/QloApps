@@ -122,9 +122,8 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
             $id_room_type = 0;
         }
 
-        if (Tools::getValue('occupancy')) {
-            $occupancy = Tools::getValue('occupancy');
-        } else {
+        $occupancy = Tools::getValue('occupancy');
+        if (!Validate::isOccupancy($occupancy)) {
             $occupancy = array();
         }
 
@@ -616,6 +615,9 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
         $date_from = Tools::getValue('date_from');
         $date_to = Tools::getValue('date_to');
         $occupancy = Tools::getValue('occupancy');
+        if (!Validate::isOccupancy($occupancy)) {
+            $occupancy = array();
+        }
 
         $date_from = date("Y-m-d", strtotime($date_from));
         $date_to = date("Y-m-d", strtotime($date_to));
