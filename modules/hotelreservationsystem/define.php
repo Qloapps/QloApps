@@ -59,3 +59,4 @@ require_once 'classes/HotelBookingDocument.php';
 
 // Web services classes
 require_once 'classes/WebserviceSpecificManagementQlo.php';
+require_once 'classes/WebserviceSpecificManagementHotelAri.php';

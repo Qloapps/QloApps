@@ -125,7 +125,10 @@ class WebserviceOutputXMLCore implements WebserviceOutputInterface
                 $ret .= ' read_only="true"';
             }
 
-            if ($field['value'] != '') {
+            // value is converted to string to be safe from strange php comparisions (string with integer)
+            // php-8 converts integer to string before comparison so we are also type casting value to string
+            // https://www.php.net/releases/8.0/en.php#saner-string-to-number-comparisons
+            if ((string)$field['value'] != '') {
                 $node_content .= '<![CDATA['.$field['value'].']]>';
             }
         }
