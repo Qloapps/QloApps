@@ -5,6 +5,7 @@
 ## Improved/Changed Features:
 
 * [BO] : [#451] Improve statistics at back office
+* [BO] : [#676] Fix 'Best hotels' and 'Best-selling room types' issues on Stats > Stats page
 
 
 ------------------------------

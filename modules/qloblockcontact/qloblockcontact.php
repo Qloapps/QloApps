@@ -28,7 +28,7 @@ class QloBlockContact extends Module
     {
         $this->name = 'qloblockcontact';
         $this->tab = 'front_office_features';
-        $this->version = '1.0.1';
+        $this->version = '1.0.0';
         $this->ps_versions_compliancy = array('min' => '1.6', 'max' => '1.6');
         $this->author = 'Webkul';
         $this->bootstrap = true;

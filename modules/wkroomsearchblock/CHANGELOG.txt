@@ -14,6 +14,9 @@
 * [CO] : [#436] Text changes
 * [CO] : [#426] Replace _PS_MODULE_DIR_ with $this->_path in 'wkroomsearchblock' module
 * [CO] : [#366] Updated core upgrade files and modules upgrade files
+* [FO] : [#658] Replaced: child with children in occupancy text front-office
+* [FO] : [#668] Fixed: Error on search result page when updating invalid occupancy in URL
+* [CO] : [#669] Updated: text translations call variable assigned to javascript
 
 
 ------------------------------

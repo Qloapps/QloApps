@@ -12,6 +12,8 @@
 * [FO] : [#505] Updated tax view in cart popup
 * [CO] : [#538] Added: Feature service products
 * [FO] : [#649] Fix: Occupancy panel does not close when clicking on add to cart button
+* [FO] : [#672] Updated: Disable option to add services when rooms are unavailable
+* [FO] : [#682] Updated: order summary in block cart popup and dropdown
 
 
 -----------------------------

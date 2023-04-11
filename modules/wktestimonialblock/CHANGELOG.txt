@@ -12,6 +12,7 @@
 * [CO] : #363 Text changes
 * [CO] : #366 Updated core upgrade files and modules upgrade files
 * [CO] : #334 Remove install.sql files from modules
+* [CO] : [#669] Updated: text translations call variable assigned to javascript
 
 ------------------------------
 # V1.1.4 to V1.1.5

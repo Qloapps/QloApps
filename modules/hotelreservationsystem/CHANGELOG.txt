@@ -5,7 +5,7 @@
 ## Improved/Changed Features:
 
 * [CO] : [#650] Added: Feature per day price in extra services
-* [FO] : [#651] Fix: imgaes index not defined for services on room type page in front office 
+* [FO] : [#651] Fix: imgaes index not defined for services on room type page in front office
 * [BO] : [#607] Updated: Service products pop-up modal in admin order view page
 * [FO] : [#649] Fix: Occupancy panel does not close when clicking on add to cart button
 * [CO] : [#622] Added: Primary hotel in QloApps for tax calculation of service products
@@ -66,7 +66,7 @@
 * [BO] : [#429] Add price modification for new orders at back office
 * [CO] : [#420] Remove unused code and data from module hotelreservationsystem
 * [FO] : [#419] Fix hero image cache issue
-* [CO] : [#418] Add hooks 'displayAdminAddHotelFormTab' and 'displayAdminAddHotelFormTabContent' in Manage Hotel tab of Back-office 
+* [CO] : [#418] Add hooks 'displayAdminAddHotelFormTab' and 'displayAdminAddHotelFormTabContent' in Manage Hotel tab of Back-office
 * [FO] : [#417] Resolved address issue on contact page for list and map
 * [CO] : [#415] Removed qlo_mod_list.xml
 * [BO] : [#412] Resolve dashboard design issues
@@ -92,6 +92,14 @@
 * [FO] : [#619] Show service cost separately from room cost on checkout page
 * [CO] : [#636] Resolved: refund request payment calculation
 * [BO] : [#653] Updated: Additional facilities panel in admin room type page
+* [CO] : [#490] Added "Hotel Availability and Rates search API"  to QloApps
+* [CO] : [#650] Added: Feature per day price in extra services
+* [FO] : [#651] Fix: imgaes index not defined for services on room type page in front office
+* [FO] : [#658] Replaced: child with children in occupancy text front-office
+* [FO] : [#668] Fixed: Error on search result page when updating invalid occupancy in URL
+* [CO] : [#669] Updated: text translations call variable assigned to javascript
+* [BO] : [#670] Updated: Admin room type services and facilities panel text issues and undefined index issue
+* [CO] : [#684] Fix PHP warning issue in catalog mode
 
 
 -------------------------

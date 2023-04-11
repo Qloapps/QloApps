@@ -70,7 +70,9 @@
   - #527: Fix CLI install issues
   - #528: Update licenses
   - #532: Change demo content for CMS page Legal Notice
-  - #342, #363, #436, #462, #470, #480, #543, #546, #561, #562, #569, #595, #618, #644: Text related changes throughout QloApps
+  - #657: Allow checkout process classes to be overridden
+  - #669: Updated: text translations call variable assigned to javascript
+  - #342, #363, #436, #462, #470, #480, #543, #546, #561, #562, #569, #595, #618, #644, #658, #673, #686: Text related changes throughout QloApps
 
 - Back Office
   - #337: Removed delivery column and added full name to customer column on order list page at back office
@@ -117,6 +119,8 @@
   - #639: Update refund request view page at back office
   - #653: Updated: Additional facilities panel in admin room type page
   - #655: Updated: compiled admin theme css from sass
+  - #674: Add label for Length of Stay graph on dashboard
+  - #678: Removed: "go to payment page" option from admin order create page when creating order for backdate
 
 - Front Office
   - #336: Remove order history link for guest account holders on order confirmation page
@@ -140,6 +144,9 @@
   - #631: Added: Missing vat number field in customer address form.
   - #634: Show room maximum occupancy on search and room type page
   - #635: Update: datepicker dates background color for dates between date-from and date-to
+  - #664: Improved occupancy dropdown on search result page
+  - #682: Updated: order summary in block cart popup and dropdown
+  - #687: Add default contact phone and email at front office nav bar
 
 
 ## Bugs Fixed
@@ -168,6 +175,10 @@
   - #614: Resolved: Specific price does not apply base on priority
   - #621: Resolved: Catalog discount is not visible when auto add service is attached to room type
   - #627: Fixed: Order summary in order confirmation page and order confirmation e-mail
+  - #659: Prevent required categories deletion by data cleaner module
+  - #660: Fix: cover image index not defined while generating invoice
+  - #665: Fix: Qlocleaner "fix integrity constraint" deletes valid additional facilites
+  - #684: Fix PHP warning issue in catalog mode
 
 - Back Office
   - #314: Resolve HelperList filter issue
@@ -241,6 +252,14 @@
   - #641: Fix ajax error on login page at front office
   - #642: Fix: Admin is able to add rooms in order without selecting occupancy
   - #647: Fix order creation without address at back office
+  - #662: Fix: Module update error when uploading zip without db changes
+  - #666: Fixed: backoffice header toolbar buttons not visible on some pages
+  - #667: Fix: Syntax issus on admin import page.
+  - #670: Updated: Admin room type services and facilities panel text issues and undefined index issue
+  - #671: Fix dashinsights comparison graphs issue
+  - #675: Fix Average Occupancy Rate issue on dashboard
+  - #676: Fix 'Best hotels' and 'Best-selling room types' issues on Stats > Stats page
+  - #681: Fixed: Incorrect price of room when admin adds room in order and room have auto add services
 
 - Front Office
   - #348: Resolve auto page scroll issue on order history page
@@ -274,6 +293,14 @@
   - #651: Fix: imgaes index not defined for services on room type page in front office
   - #652: Fix: Booking form does not get update when occupancy is not provided
   - #654: Fix: Booking form refresh when occupancy dropdown is opened
+  - #663: Fixed: Errors on guest tracking page
+  - #668: Fixed: Error on search result page when updating invalid occupancy in URL
+  - #672: Updated: Disable option to add services when rooms are unavailable
+  - #677: Fix image display issue on homepage
+  - #679: Resolved: Error on landing page when updating page view count using data mining module
+  - #680: Fixed: Datepicker not initializing on initial load of room type page with preperation time
+  - #683: Updated: Fixed chekcout page auto add service breakdown tooltip incorrect content
+  - #685: Update default number of rooms on room type detail page to 1
 
 
 ####################################
