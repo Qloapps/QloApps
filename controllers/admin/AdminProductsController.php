@@ -1123,7 +1123,6 @@ class AdminProductsControllerCore extends AdminController
             // process price update
             $idProduct = Tools::getValue('id_product');
             $idServiceProduct = Tools::getValue('service_product_id');
-            $idProductRoomtypePrice = Tools::getValue('id_room_type_service_product_price');
             $price = Tools::getValue('price');
             $id_tax_rules_group = Tools::getValue('id_tax_rules_group');
 
@@ -3298,6 +3297,7 @@ class AdminProductsControllerCore extends AdminController
                 'selectedDemands' => $selectedDemands,
                 'allDemands' => $allDemands,
                 'defaultcurrencySign' => $objCurrency->sign,
+                'idDefaultcurrency' => $objCurrency->id,
             ));
         } else {
             $this->displayWarning($this->l('You must save this room type before managing additional facilities.'));

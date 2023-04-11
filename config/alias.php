@@ -78,7 +78,7 @@ function displayFatalError()
         $error = error_get_last();
     }
     if ($error !== null && in_array($error['type'], array(E_ERROR, E_PARSE, E_COMPILE_ERROR ))) {
-        echo '[PrestaShop] Fatal error in module file :'.$error['file'].':<br />'.$error['message'];
+        echo '[QloApps] Fatal error in module file :'.$error['file'].':<br />'.$error['message'];
     }
 }
 

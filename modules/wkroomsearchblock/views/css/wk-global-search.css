@@ -172,7 +172,8 @@
 
 .header-rmsearch-wrapper .label-desc-txt {
   font-size: 12px;
-  color: #777777;}
+  color: #777777;
+  margin: 0;}
 .header-rmsearch-wrapper .btn {
   font-weight: 600;}
 .header-rmsearch-wrapper .btn-primary {

@@ -957,7 +957,7 @@ class ToolsCore
     * @param string $string Error message
     * @param bool $htmlentities By default at true for parsing error message with htmlentities
     */
-    public static function displayError($string = 'Fatal error', $htmlentities = true, Context $context = null)
+    public static function displayError($string = 'Fatal error', $htmlentities = true, Context $context = null, $addslashes = false)
     {
         global $_ERRORS;
 
@@ -975,6 +975,9 @@ class ToolsCore
         }
         $key = md5(str_replace('\'', '\\\'', $string));
         $str = (isset($_ERRORS) && is_array($_ERRORS) && array_key_exists($key, $_ERRORS)) ? $_ERRORS[$key] : $string;
+        if ($addslashes) {
+            $str = addslashes($str);
+        }
         return $htmlentities ? Tools::htmlentitiesUTF8(stripslashes($str)) : $str;
     }
 

@@ -358,7 +358,6 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
                         $rm_dtl = $obj_rm_type->getRoomTypeInfoByIdProduct($type_value['product_id']);
 
                         $cart_htl_data[$type_key]['id_product'] = $type_value['product_id'];
-                        $cart_htl_data[$type_key]['cover_img']    = $cover_img;
                         $cart_htl_data[$type_key]['hotel_name']    = $rm_dtl['hotel_name'];
                         $objBookingDemand = new HotelBookingDemands();
                         foreach ($order_bk_data as $data_k => $data_v) {
@@ -579,13 +578,14 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
                                 $totalDemandsPriceTE += $cart_htl_data[$type_key]['date_diff'][$date_join]['extra_demands_price_te'];
                                 $totalDemandsPriceTI += $cart_htl_data[$type_key]['date_diff'][$date_join]['extra_demands_price_ti'];
                             }
-                            if ($extraDemands = array_shift($objBookingDemand->getRoomTypeBookingExtraDemands(
+                            if ($extraDemands = $objBookingDemand->getRoomTypeBookingExtraDemands(
                                 $order_obj->id,
                                 $type_value['product_id'],
                                 $data_v['id_room'],
                                 $data_v['date_from'],
                                 $data_v['date_to']
-                            ))) {
+                            )) {
+                                $extraDemands = array_shift($extraDemands);
                                 $extraDemands['product_id'] = $type_value['product_id'];
                                 $extraDemands['room_type_name'] = $type_value['product_name'];
                                 $extraDemands['date_from'] = $data_v['date_from'];
@@ -593,7 +593,7 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
                                 $room_extra_demands[] = $extraDemands;
                             }
 
-                            if ($additionalServices = array_shift($objRoomTypeServiceProductOrderDetail->getroomTypeServiceProducts(
+                            if ($additionalServices = $objRoomTypeServiceProductOrderDetail->getroomTypeServiceProducts(
                                 $order_obj->id,
                                 0,
                                 0,
@@ -601,15 +601,14 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
                                 $data_v['date_from'],
                                 $data_v['date_to'],
                                 $data_v['id_room']
-                            ))) {
-
+                            )) {
+                                $additionalServices = array_shift($additionalServices);
                                 $additionalServices['product_id'] = $type_value['product_id'];
                                 $additionalServices['room_type_name'] = $type_value['product_name'];
                                 $additionalServices['date_from'] = $data_v['date_from'];
                                 $additionalServices['date_to'] = $data_v['date_to'];
                                 $room_additinal_services[] = $additionalServices;
                             }
-
 
                             // Set tax_code
                             if ($taxes = OrderDetail::getTaxListStatic($data_v['id_order_detail'])) {

@@ -724,11 +724,11 @@ class AdminAddHotelController extends ModuleAdminController
 
         Media::addJsDef(
             array(
-                'filesizeError' => $this->l('File exceeds maximum size.'),
+                'filesizeError' => $this->l('File exceeds maximum size.', null, true),
                 'maxSizeAllowed' => Tools::getMaxUploadSize(),
                 'sortRowsUrl' => $this->context->link->getAdminLink('AdminAddHotel'),
                 'primaryHotelId' => Configuration::get('WK_PRIMARY_HOTEL'),
-                'disableHotelMsg' => $this->l('Primary hotel for website will be updated to first available active hotel.'),
+                'disableHotelMsg' => $this->l('Primary hotel for website will be updated to first available active hotel.', null, true),
             )
         );
         // GOOGLE MAP

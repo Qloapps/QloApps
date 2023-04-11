@@ -223,7 +223,7 @@ class DashInsights extends Module
                     unset($idsHotel[$key]);
                 }
 
-                if (count($idsHotel) > 2) { // display average series only if other hotels are available
+                if (count($idsHotel) > 0) { // display average series only if other hotels are available
                     $averageRoomNightsData = AdminStatsController::getRoomNightsData($dateFrom, $dateTo, $idsHotel, true, true);
                     $averageSeriesInfo = array(
                         'data' => $averageRoomNightsData,
@@ -332,7 +332,7 @@ class DashInsights extends Module
                     unset($idsHotel[$key]);
                 }
 
-                if (count($idsHotel) > 1) { // display average series only if other hotels are available
+                if (count($idsHotel) > 0) { // display average series only if other hotels are available
                     $averageDaysOfTheWeekData = AdminStatsController::getOccupiedRoomsForDaysOfTheWeek($dateFrom, $dateTo, $idsHotel, true, true);
                     $averageSeriesInfo = array(
                         'data' => $averageDaysOfTheWeekData,
@@ -465,7 +465,7 @@ class DashInsights extends Module
                     unset($idsHotel[$key]);
                 }
 
-                if (count($idsHotel) > 1) { // display average series only if other hotels are available
+                if (count($idsHotel) > 0) { // display average series only if other hotels are available
                     $averageLengthOfStayData = AdminStatsController::getLengthOfStayPercentages($day, $dateFrom, $dateTo, $idsHotel, true, true);
                     $averageSeriesInfo = array(
                         'data' => $averageLengthOfStayData,

@@ -1179,7 +1179,12 @@
 		$('#id_lang option').removeAttr('selected');
 		$('#id_lang option[value="'+id_lang+'"]').attr('selected', true);
 		$('#send_email_to_customer').attr('rel', jsonSummary.link_order);
-		$('#go_order_process').attr('href', jsonSummary.link_order);
+		if (!jsonSummary.is_backdate_order) {
+			$('#go_order_process').show();
+			$('#go_order_process').attr('href', jsonSummary.link_order);
+		} else {
+			$('#go_order_process').hide();
+		}
 		$('#order_message').val(jsonSummary.order_message);
 		resetBind();
 	}

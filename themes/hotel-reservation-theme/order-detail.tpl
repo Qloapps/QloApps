@@ -414,7 +414,7 @@
 
 									<td>
 										{if (isset($rm_v['extra_demands']) && $rm_v['extra_demands']) || isset($rm_v['additional_services']) && $rm_v['additional_services']}
-												<a data-date_from="{$rm_v['data_form']}" data-date_to="{$rm_v['data_to']}" data-id_product="{$data_v['id_product']}" data-id_order="{$order->id}" data-action="{$link->getPageLink('order-detail')}" class="open_rooms_extra_services_panel" href="#rooms_type_extra_services_form">
+											<a data-date_from="{$rm_v['data_form']}" data-date_to="{$rm_v['data_to']}" data-id_product="{$data_v['id_product']}" data-id_order="{$order->id}" data-action="{$link->getPageLink({$page_name})}" class="open_rooms_extra_services_panel" href="#rooms_type_extra_services_form">
 										{/if}
 										{if $group_use_tax}
 											{displayWtPriceWithCurrency price=($rm_v['extra_demands_price_ti'] + $rm_v['additional_services_price_ti'])  currency=$currency}

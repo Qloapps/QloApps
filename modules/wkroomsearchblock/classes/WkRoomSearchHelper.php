@@ -183,16 +183,20 @@ class WkRoomSearchHelper
 
                 if ($occupancyEnabled) {
                     // send occupancy information searched by the user
-                    if ($searchedData['occupancies'] = Tools::getvalue('occupancy')) {
-                        $searchedData['occupancy_adults'] = array_sum(
-                            array_column($searchedData['occupancies'], 'adults')
-                        );
-                        $searchedData['occupancy_children'] = array_sum(
-                            array_column($searchedData['occupancies'], 'children')
-                        );
-                        $searchedData['occupancy_child_ages'] = array_sum(
-                            array_column($searchedData['occupancies'], 'child_ages')
-                        );
+                    if ($occupancies = Tools::getvalue('occupancy')) {
+                        if (Validate::isOccupancy($occupancies)) {
+                            if ($searchedData['occupancies'] = $occupancies) {
+                                $searchedData['occupancy_adults'] = array_sum(
+                                    array_column($searchedData['occupancies'], 'adults')
+                                );
+                                $searchedData['occupancy_children'] = array_sum(
+                                    array_column($searchedData['occupancies'], 'children')
+                                );
+                                $searchedData['occupancy_child_ages'] = array_sum(
+                                    array_column($searchedData['occupancies'], 'child_ages')
+                                );
+                            }
+                        }
                     }
                 }
                 $smartyVars['search_data'] = $searchedData;
