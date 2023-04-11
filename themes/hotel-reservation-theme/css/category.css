@@ -251,10 +251,10 @@ p.capa_txt {
 .booking_guest_occupancy_conatiner {
     display: flex;
 }
-.booking_guest_occupancy_conatiner .booking_occupancy_wrapper {
-    left: unset;
-}
 @media (min-width: 992px) {
+    .booking_guest_occupancy_conatiner .booking_occupancy_wrapper {
+        left: unset;
+    }
     .room_features_cont > div {
         display: flex;
         flex-wrap: wrap;

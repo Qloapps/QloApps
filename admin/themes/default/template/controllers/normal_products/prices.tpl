@@ -203,9 +203,9 @@ $(document).ready(function () {
 		{if isset($pack) && $pack->isPack($product->id)}<p class="col-lg-9 col-lg-offset-3 help-block">{l s='The sum of prices of the products in the pack is %s%s%s' sprintf=[$currency->prefix,{toolsConvertPrice price=$pack->noPackPrice($product->id)|string_format:$priceDisplayPrecisionFormat},$currency->suffix]}</p>{/if}
 	</div>
 	<div class="form-group">
-		<label class="control-label col-lg-3" for="service_product_type">
+		<label class="control-label col-lg-3" for="price_calculation_method">
 			<span class="label-tooltip" data-toggle="tooltip" title="{l s='Select whether price for this service will be added for each day of the booking or price will be added to the entire date range of the booking'}">
-				{l s='Per calculation method'}
+				{l s='Price calculation method'}
 			<span>
 		</label>
 		<div class="col-lg-4">

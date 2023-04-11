@@ -1350,8 +1350,10 @@ var BookingForm = {
         }
         if (!$('.max_avail_type_qty').length || $('.max_avail_type_qty').val() < 1) {
             disableRoomTypeDemands(1);
+            disableRoomTypeServices(1);
         } else {
             disableRoomTypeDemands(0);
+            disableRoomTypeServices(0);
         }
     },
     initDatepicker: function(max_order_date, preparation_time, dateFrom, dateTo) {
@@ -1359,6 +1361,14 @@ var BookingForm = {
         if (preparation_time) {
             start_date.setDate(start_date.getDate() + parseInt(preparation_time));
             start_date.setHours(0, 0, 0, 0);
+            if (dateFrom && new Date(dateFrom + ' 00:00:00') < start_date) {
+                dateFrom = $.datepicker.formatDate('yy-mm-dd', start_date);
+                if (new Date(dateTo + ' 00:00:00') <= start_date) {
+                    dateTo = new Date(start_date);
+                    dateTo.setDate(start_date.getDate() + 1);
+                    dateTo = $.datepicker.formatDate('yy-mm-dd', dateTo);
+                }
+            }
         }
 
         if (max_order_date) {
@@ -1382,7 +1392,6 @@ var BookingForm = {
             max_order_date = $.datepicker.formatDate('dd-mm-yy', max_order_date);
         }
         $('#room_date_range').dateRangePicker({
-            startDate: $.datepicker.formatDate('dd-mm-yy', new Date()),
             endDate: max_order_date,
             startDate: start_date,
         }).on('datepicker-change', function(event,obj){

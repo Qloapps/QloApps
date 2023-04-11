@@ -509,7 +509,6 @@ product_tabs['ServiceProduct'] = new function(){
 				data: {
 					id_product: id_product,
 					service_product_id : $(this).data('id_product'),
-					id_room_type_service_product_price : $(this).data('id_room_type_service_product_price'),
 					price: price,
 					id_tax_rules_group: id_tax_rules_group,
 					action: 'updatedServiceProductPrice',

@@ -122,9 +122,8 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
             $id_room_type = 0;
         }
 
-        if (Tools::getValue('occupancy')) {
-            $occupancy = Tools::getValue('occupancy');
-        } else {
+        $occupancy = Tools::getValue('occupancy');
+        if (!Validate::isOccupancy($occupancy)) {
             $occupancy = array();
         }
 
@@ -616,6 +615,9 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
         $date_from = Tools::getValue('date_from');
         $date_to = Tools::getValue('date_to');
         $occupancy = Tools::getValue('occupancy');
+        if (!Validate::isOccupancy($occupancy)) {
+            $occupancy = array();
+        }
 
         $date_from = date("Y-m-d", strtotime($date_from));
         $date_to = date("Y-m-d", strtotime($date_to));
@@ -807,33 +809,33 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
             'max_child_in_room' => Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM'),
             'occupancy_required_for_booking' => $occupancyRequiredForBooking,
             'rooms_booking_url' => $this->context->link->getAdminLink('AdminHotelRoomsBooking'),
-            'opt_select_all' => $this->l('All Types'),
-            'slt_another_htl' => $this->l('Select Another Hotel'),
-            'product_type_cond' => $this->l('Product type is required'),
-            'from_date_cond' => $this->l('From date is required'),
-            'to_date_cond' => $this->l('To date is required'),
-            'hotel_name_cond' => $this->l('Hotel Name is required'),
-            'num_rooms_cond' => $this->l('Number of Rooms is required'),
-            'add_to_cart' => $this->l('Add To Cart'),
-            'remove' => $this->l('Remove'),
-            'noRoomTypeAvlTxt' => $this->l('No room type available.'),
-            'no_rm_avail_txt' => $this->l('No rooms available.'),
-            'slct_rm_err' => $this->l('Please select a room first.'),
-            'product_added_cart_txt' => $this->l('Product added in cart'),
+            'opt_select_all' => $this->l('All Types', null, true),
+            'slt_another_htl' => $this->l('Select Another Hotel', null, true),
+            'product_type_cond' => $this->l('Product type is required', null, true),
+            'from_date_cond' => $this->l('From date is required', null, true),
+            'to_date_cond' => $this->l('To date is required', null, true),
+            'hotel_name_cond' => $this->l('Hotel Name is required', null, true),
+            'num_rooms_cond' => $this->l('Number of Rooms is required', null, true),
+            'add_to_cart' => $this->l('Add To Cart', null, true),
+            'remove' => $this->l('Remove', null, true),
+            'noRoomTypeAvlTxt' => $this->l('No room type available.', null, true),
+            'no_rm_avail_txt' => $this->l('No rooms available.', null, true),
+            'slct_rm_err' => $this->l('Please select a room first.', null, true),
+            'product_added_cart_txt' => $this->l('Product added in cart', null, true),
             'info_icon_path' => _MODULE_DIR_.$this->module->name.'/views/img/Slices/info-icon.svg',
-            'select_age_txt' => 'Select age',
-            'under_1_age' => 'Under 1',
-            'room_txt' => 'Room',
-            'rooms_txt' => 'Rooms',
-            'remove_txt' => 'Remove',
-            'adult_txt' => 'Adults',
-            'adults_txt' => 'Adults',
-            'child_txt' => 'Child',
-            'children_txt' => 'Children',
-            'below_txt' => 'Below',
-            'years_txt' => 'years',
-            'all_children_txt' => 'All Children',
-            'invalid_occupancy_txt' => 'Invalid occupancy(adults/children) found.',
+            'select_age_txt' => $this->l('Select age', null, true),
+            'under_1_age' => $this->l('Under 1', null, true),
+            'room_txt' => $this->l('Room', null, true),
+            'rooms_txt' => $this->l('Rooms', null, true),
+            'remove_txt' => $this->l('Remove', null, true),
+            'adult_txt' => $this->l('Adults', null, true),
+            'adults_txt' => $this->l('Adults', null, true),
+            'child_txt' => $this->l('Child', null, true),
+            'children_txt' => $this->l('Children', null, true),
+            'below_txt' => $this->l('Below', null, true),
+            'years_txt' => $this->l('years', null, true),
+            'all_children_txt' => $this->l('All Children', null, true),
+            'invalid_occupancy_txt' => $this->l('Invalid occupancy(adults/children) found.', null, true),
             // 'check_calender_var' => $check_calender_var,
         );
         if (Configuration::get('PS_BACKOFFICE_SEARCH_TYPE') == HotelBookingDetail::SEARCH_TYPE_OWS ) {

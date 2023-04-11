@@ -1836,7 +1836,9 @@ class AdminModulesControllerCore extends AdminController
                             $this->errors[] = $this->l('Module not found!');
                         }
                     } else {
-                        $this->errors[] = $this->l('There was some error while updating the module');
+                        $response['success'] = true;
+                        $response['msg'] = $this->l('Module files updated successfully');
+                        $response['data']['redirect'] = $this->context->link->getAdminLink('AdminModules').'&conf=29&anchor='.$module->name;
                     }
                 } else {
                     $this->errors[] = $this->l('Module not installed, install module before updating.');

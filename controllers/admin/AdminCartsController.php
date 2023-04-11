@@ -844,6 +844,15 @@ class AdminCartsControllerCore extends AdminController
             }
         }
 
+        $cart_detail_data_obj = new HotelCartBookingData();
+        $cart_detail_data = $cart_detail_data_obj->getCartFormatedBookinInfoByIdCart((int) $id_cart);
+        $is_backdate_order = false;
+        $currentDate = strtotime(date('Y-m-d'));
+        foreach ($cart_detail_data as $cartRoom) {
+            if (strtotime($cartRoom['date_from']) < $currentDate) {
+                $is_backdate_order = true;
+            }
+        }
         $addresses = $this->context->customer->getAddresses((int)$this->context->cart->id_lang);
 
         foreach ($addresses as &$data) {
@@ -853,6 +862,8 @@ class AdminCartsControllerCore extends AdminController
 
         return array(
             'summary' => $this->getCartSummary(),
+            'cart_detail_data' => $cart_detail_data,
+            'is_backdate_order' => $is_backdate_order,
             'delivery_option_list' => $this->getDeliveryOptionList(),
             'cart' => $this->context->cart,
             'currency' => new Currency($this->context->cart->id_currency),

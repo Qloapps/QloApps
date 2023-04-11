@@ -2124,13 +2124,13 @@ abstract class ModuleCore
      * @param bool|string $specific filename to use in translation key
      * @return string Translation
      */
-    public function l($string, $specific = false)
+    public function l($string, $specific = false, $addslashes = false)
     {
         if (self::$_generate_config_xml_mode) {
             return $string;
         }
 
-        return Translate::getModuleTranslation($this, $string, ($specific) ? $specific : $this->name);
+        return Translate::getModuleTranslation($this, $string, ($specific) ? $specific : $this->name, null, $addslashes);
     }
 
     /*
