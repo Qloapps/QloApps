@@ -18,7 +18,7 @@
 *  @license   https://store.webkul.com/license.html
 */
 
-class CheckoutCartSummaryStep extends AbstractCheckoutStep
+class CheckoutCartSummaryStepCore extends AbstractCheckoutStepCore
 {
     public function __construct()
     {

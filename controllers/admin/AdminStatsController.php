@@ -1107,7 +1107,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
         );
 
         if ($numAllOrders != 0) {
-            return $numCancelledOrders / $numAllOrders * 100;
+            return $numCancelledOrders / $numAllOrders;
         } else {
             return 0;
         }
@@ -1693,7 +1693,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
 
         $totalRevenue = (float) self::getRevenue($dateFrom, $dateTo, $idHotel);
 
-        return $totalRevenue ? ($directRevenue / $totalRevenue) * 100 : 0;
+        return $totalRevenue ? ($directRevenue / $totalRevenue) : 0;
     }
 
     public static function getOperatingExpensesForDiscreteDates($dateFrom, $dateTo = null, $idHotel = null, $useCache = true)

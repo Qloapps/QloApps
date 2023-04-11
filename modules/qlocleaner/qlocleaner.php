@@ -204,11 +204,19 @@ class QloCleaner extends Module
 
         switch ($case) {
             case 'catalog':
-                $id_home = Configuration::getMultiShopValues('PS_HOME_CATEGORY');
                 $id_root = Configuration::getMultiShopValues('PS_ROOT_CATEGORY');
-                $db->execute('DELETE FROM `'._DB_PREFIX_.'category` WHERE id_category NOT IN ('.implode(',', array_map('intval', $id_home)).', '.implode(',', array_map('intval', $id_root)).')');
-                $db->execute('DELETE FROM `'._DB_PREFIX_.'category_lang` WHERE id_category NOT IN ('.implode(',', array_map('intval', $id_home)).', '.implode(',', array_map('intval', $id_root)).')');
-                $db->execute('DELETE FROM `'._DB_PREFIX_.'category_shop` WHERE id_category NOT IN ('.implode(',', array_map('intval', $id_home)).', '.implode(',', array_map('intval', $id_root)).')');
+                $id_home = Configuration::getMultiShopValues('PS_HOME_CATEGORY');
+                $id_locations = Configuration::getMultiShopValues('PS_LOCATIONS_CATEGORY');
+                $id_services = Configuration::getMultiShopValues('PS_SERVICE_CATEGORY');
+
+                $not_in = implode(',', array_map('intval', $id_root)).','.
+                implode(',', array_map('intval', $id_home)).','.
+                implode(',', array_map('intval', $id_locations)).','.
+                implode(',', array_map('intval', $id_services));
+
+                $db->execute('DELETE FROM `'._DB_PREFIX_.'category` WHERE id_category NOT IN ('.$not_in.')');
+                $db->execute('DELETE FROM `'._DB_PREFIX_.'category_lang` WHERE id_category NOT IN ('.$not_in.')');
+                $db->execute('DELETE FROM `'._DB_PREFIX_.'category_shop` WHERE id_category NOT IN ('.$not_in.')');
                 foreach (scandir(_PS_CAT_IMG_DIR_) as $dir) {
                     if (preg_match('/^[0-9]+(\-(.*))?\.jpg$/', $dir)) {
                         unlink(_PS_CAT_IMG_DIR_.$dir);
@@ -646,18 +654,17 @@ class QloCleaner extends Module
                 array('htl_features_block_data_lang', 'id_features_block', 'htl_features_block_data', 'id_features_block'),
                 array('cart_rule', 'id_customer', 'customer', 'id_customer'),
                 array('htl_testimonials_block_data_lang', 'id_testimonial_block', 'htl_testimonials_block_data', 'id_testimonial_block'),
-                array('htl_room_type_global_demand', 'id_tax_rules_group', 'tax_rules_group', 'id_tax_rules_group'),
                 array('htl_room_type_global_demand_advance_option', 'id_global_demand', 'htl_room_type_global_demand', 'id_global_demand'),
+                array('htl_room_type_global_demand_advance_option_lang', 'id_lang', 'lang', 'id_lang'),
                 array('htl_room_type_global_demand_advance_option_lang', 'id_option', 'htl_room_type_global_demand_advance_option', 'id_option'),
                 array('htl_room_type_global_demand_lang', 'id_global_demand', 'htl_room_type_global_demand', 'id_global_demand'),
                 array('htl_branch_info_lang', 'id_lang', 'lang', 'id_lang'),
                 array('htl_branch_info_lang', 'id', 'htl_branch_info', 'id'),
                 array('htl_features_lang', 'id_lang', 'lang', 'id_lang'),
                 array('htl_features_lang', 'id', 'htl_features', 'id'),
+                array('htl_room_type_demand', 'id_global_demand', 'htl_room_type_global_demand', 'id_global_demand'),
                 array('htl_room_type_demand', 'id_product', 'product', 'id_product'),
                 array('htl_room_type_demand_price', 'id_product', 'product', 'id_product'),
-                array('htl_room_type_global_demand_advance_option_lang', 'id_lang', 'lang', 'id_lang'),
-                array('htl_room_type_global_demand_advance_option_lang', 'id_option', 'htl_room_type_global_demand_advance_option', 'id_option'),
                 array('htl_room_type_feature_pricing_group', 'id_group', 'group', 'id_group'),
                 array('htl_booking_demands_tax', 'id_tax', 'tax', 'id_tax'),
                 array('htl_booking_detail', 'id_product', 'product', 'id_product'),

@@ -41,8 +41,8 @@ class QloBlockContact extends Module
     public function install()
     {
         if (!parent::install()
-            || !Configuration::updateValue('QBC_PHONE', '')
-            || !Configuration::updateValue('QBC_EMAIL', '')
+            || !Configuration::updateValue('QBC_PHONE', Configuration::get('WK_HOTEL_GLOBAL_CONTACT_NUMBER'))
+            || !Configuration::updateValue('QBC_EMAIL', Configuration::get('WK_HOTEL_GLOBAL_CONTACT_EMAIL'))
             || !$this->registerHook('actionFrontControllerSetMedia')
             || !$this->registerHook('displayNav')
             || !$this->registerHook('displayExternalNavigationHook')

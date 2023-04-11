@@ -24,17 +24,17 @@ class HotelHelper
     {
         $objModule = new HotelreservationSystem();
         $jsVars = array(
-                'display_name' => $objModule->l('Display', 'HotelHelper'),
-                'records_name' => $objModule->l('records per page', 'HotelHelper'),
-                'no_product' => $objModule->l('No records found', 'HotelHelper'),
-                'show_page' => $objModule->l('Showing page', 'HotelHelper'),
-                'show_of' => $objModule->l('of', 'HotelHelper'),
-                'no_record' => $objModule->l('No records available', 'HotelHelper'),
-                'filter_from' => $objModule->l('filtered from', 'HotelHelper'),
-                't_record' => $objModule->l('total records', 'HotelHelper'),
-                'search_item' => $objModule->l('Search', 'HotelHelper'),
-                'p_page' => $objModule->l('Previous', 'HotelHelper'),
-                'n_page' => $objModule->l('Next', 'HotelHelper'),
+                'display_name' => $objModule->l('Display', 'HotelHelper', fasle, true),
+                'records_name' => $objModule->l('records per page', 'HotelHelper', fasle, true),
+                'no_product' => $objModule->l('No records found', 'HotelHelper', fasle, true),
+                'show_page' => $objModule->l('Showing page', 'HotelHelper', fasle, true),
+                'show_of' => $objModule->l('of', 'HotelHelper', fasle, true),
+                'no_record' => $objModule->l('No records available', 'HotelHelper', fasle, true),
+                'filter_from' => $objModule->l('filtered from', 'HotelHelper', fasle, true),
+                't_record' => $objModule->l('total records', 'HotelHelper', fasle, true),
+                'search_item' => $objModule->l('Search', 'HotelHelper', fasle, true),
+                'p_page' => $objModule->l('Previous', 'HotelHelper', fasle, true),
+                'n_page' => $objModule->l('Next', 'HotelHelper', fasle, true),
             );
 
         Media::addJsDef($jsVars);

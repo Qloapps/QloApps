@@ -35,38 +35,40 @@ $(document).ready(function()
 
 	// room price details tooltip
 	if ($('.room_price_detail_block .room-price-detail').length) {
-		$('.room_price_detail_block .room-price-detail img').tooltip({
-			content: $('.room_price_detail_block .room-price-detail-container').html(),
-			items: "span",
-			trigger : 'hover',
-			tooltipClass: "room-price-detail-tooltip",
-			open: function(event, ui)
-			{
-				if (typeof(event.originalEvent) === 'undefined')
+		$('.room_price_detail_block .room-price-detail').each(function (i, element) {
+			$(this).find('img').tooltip({
+				content: $(this).closest('.price_block').find('.room-price-detail-container').html(),
+				items: "span",
+				trigger : 'hover',
+				tooltipClass: "room-price-detail-tooltip",
+				open: function(event, ui)
 				{
-					return false;
-				}
-
-				var $id = $(ui.tooltip).attr('id');
-
-				if ($('div.ui-tooltip').not('#' + $id).length) {
-					return false;
-				}
-			},
-			close: function(event, ui)
-			{
-				ui.tooltip.hover(function()
-				{
-					$(this).stop(true).fadeTo(400, 1);
-				},
-				function()
-				{
-					$(this).fadeOut('400', function()
+					if (typeof(event.originalEvent) === 'undefined')
 					{
-						$(this).remove();
+						return false;
+					}
+
+					var $id = $(ui.tooltip).attr('id');
+
+					if ($('div.ui-tooltip').not('#' + $id).length) {
+						return false;
+					}
+				},
+				close: function(event, ui)
+				{
+					ui.tooltip.hover(function()
+					{
+						$(this).stop(true).fadeTo(400, 1);
+					},
+					function()
+					{
+						$(this).fadeOut('400', function()
+						{
+							$(this).remove();
+						});
 					});
-				});
-			}
+				}
+			});
 		});
 	}
 

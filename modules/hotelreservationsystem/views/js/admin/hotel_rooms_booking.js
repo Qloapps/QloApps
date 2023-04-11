@@ -714,7 +714,7 @@ $(document).ready(function() {
                         occupancy_block += '<input type="number" class="form-control num_occupancy num_adults" name="occupancy['+roomBlockIndex+'][adults]" value="1" min="1">';
                     occupancy_block += '</div>';
                     occupancy_block += '<div class="form-group col-xs-6 occupancy_count_block">';
-                        occupancy_block += '<label>' + child_txt + '<span class="label-desc-txt"></span></label>';
+                        occupancy_block += '<label>' + children_txt + '<span class="label-desc-txt"></span></label>';
                         occupancy_block += '<input type="number" class="form-control num_occupancy num_children" name="occupancy['+roomBlockIndex+'][children]" value="0" min="0" max="'+max_child_in_room+'">(' + below_txt + ' ' + max_child_age + ' ' + years_txt + ')';
                     occupancy_block += '</div>';
                 occupancy_block += '</div>';

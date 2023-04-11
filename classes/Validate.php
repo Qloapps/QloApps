@@ -706,6 +706,46 @@ class ValidateCore
         return $id === null || Validate::isUnsignedId($id);
     }
 
+    public static function isOccupancy($occupancy)
+    {
+        if (is_array($occupancy)) {
+            if (count(array_filter(array_keys($occupancy), 'is_string'))) {
+                $occupancy = array($occupancy);
+            }
+            $response = true;
+            foreach ($occupancy as $key => $roomOccupancy) {
+                if (is_array($roomOccupancy)) {
+                    if (!isset($roomOccupancy['adults']) || !$roomOccupancy['adults'] || !Validate::isUnsignedInt($roomOccupancy['adults'])) {
+                        $response = $response && false;
+                    }
+                    if (isset($roomOccupancy['children'])) {
+                        if (!Validate::isUnsignedInt($roomOccupancy['children'])) {
+                            $response = $response && false;
+                        }
+                        if ($roomOccupancy['children'] > 0) {
+                            if (!isset($roomOccupancy['child_ages']) || ($roomOccupancy['children'] != count($roomOccupancy['child_ages'])) || !is_array($roomOccupancy['child_ages'])) {
+                                $response = $response && false;
+                            } else {
+                                if (is_array($roomOccupancy['child_ages'])) {
+                                    foreach($roomOccupancy['child_ages'] as $childAge) {
+                                        if (!Validate::isUnsignedInt($childAge)) {
+                                            $response = $response && false;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    $response = $response && true;
+                } else {
+                    $response = $response && false;
+                }
+            }
+            return $response;
+        }
+        return false;
+    }
+
     /**
      * Check object validity
      *

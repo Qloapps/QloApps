@@ -88,7 +88,7 @@ class DashPerformance extends Module
                 $params['date_from'],
                 $params['date_to'],
                 $params['id_hotel']
-            )).'%';
+            ) * 100).'%';
             $data['dp_revenue_per_available_room'] = Tools::displayPrice(AdminStatsController::getRevenuePerAvailableRoom(
                 $params['date_from'],
                 $params['date_to'],
@@ -108,12 +108,12 @@ class DashPerformance extends Module
                 $params['date_from'],
                 $params['date_to'],
                 $params['id_hotel']
-            )).'%';
+            ) * 100).'%';
             $data['dp_cancellation_rate'] = sprintf('%0.2f', AdminStatsController::getCancellationRate(
                 $params['date_from'],
                 $params['date_to'],
                 $params['id_hotel']
-            )).'%';
+            ) * 100).'%';
         }
 
         return array('data_value' => $data);
