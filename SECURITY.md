@@ -1,13 +1,8 @@
 # Security Policy
 
-## Supported Versions
+QloApps values the contributions of the security research community, and we look forward to working with you to minimize risk to QloApps users.
 
-| Version | Supported          |
-| ------- | ------------------ |
-| 1.5.x   | :white_check_mark: |
-| 1.4.x   | :white_check_mark: |
-| < 1.4.0   | :x:                |
 
-## Reporting a Vulnerability
+## Reporting a Security Issue
 
-Please report (suspected) security vulnerabilities to support@qloapps.com. You will receive a response from us within 48 hours. If the issue is confirmed, we will release a patch as soon as possible depending on complexity.
+If you have found a security issue in QloApps, please do not use the issue tracker and don't publish it publicly. Instead, report the security issue to support@qloapps.com or contact QloApps Support. So that we can act on it immediately to avoid as much damage as we can.
