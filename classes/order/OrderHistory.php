@@ -315,7 +315,12 @@ class OrderHistoryCore extends ObjectModel
         if ($new_os->paid == 1) {
             $invoices = $order->getInvoicesCollection();
             if ($order->total_paid != 0) {
-                $payment_method = Module::getInstanceByName($order->module);
+                // if order is created by API then create a direct object instead of creating an object from module
+                if ($order->module == 'wsorder') {
+                    $payment_method = new WebserviceOrder();
+                } else {
+                    $payment_method = Module::getInstanceByName($order->module);
+                }
             }
 
             foreach ($invoices as $invoice) {

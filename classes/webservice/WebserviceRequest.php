@@ -1481,6 +1481,7 @@ class WebserviceRequestCore
             }
 
             if (!$this->hasErrors()) {
+                $object->webservice_validation = 1;
                 if ($i18n && ($retValidateFieldsLang = $object->validateFieldsLang(false, true)) !== true) {
                     $this->setError(400, 'Validation error: "'.$retValidateFieldsLang.'"', 84);
                     return false;
