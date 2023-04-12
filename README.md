@@ -25,7 +25,7 @@
 	- [License](#license)
 	- [Security Vulnerabilities](#security-vulnerabilities)
 	- [Documentation & Demo](#documentation--demo)
-		- [QloApps Documentation https://qloapps.com/qlo-reservation-system](#qloapps-documentation-httpsqloappscomqlo-reservation-system)
+		- [QloApps Documentation](#qloapps-documentation)
 		- [QloApps Demo](#qloapps-demo)
 	- [Contribute](#contribute)
 	- [Credits](#credits)
@@ -88,7 +88,8 @@ Please don't disclose security vulnerabilities publicly. If you find any securit
 
 ### Documentation & Demo
 
-#### QloApps Documentation [https://qloapps.com/qlo-reservation-system](https://qloapps.com/qlo-reservation-system)
+#### QloApps Documentation 
+[https://qloapps.com/qlo-reservation-system](https://qloapps.com/qlo-reservation-system)
 #### QloApps Demo
 **Link** : https://demo.qloapps.com </br>
 **username** : demo@demo.com </br>
