@@ -4762,6 +4762,10 @@ class CartCore extends ObjectModel
             $idCurrency = $objCart->id_currency;
 
             $extraDemands = null;
+
+            // We have to check the alreadt entered rooms for booking parameters with this variable as Also is sending all the rooms everytime
+            // because id_guest is not managed in the API call
+            $roomsAddedToCart = [];
             foreach ($bookingRows as $booking) {
                 $booking = json_decode(json_encode($booking, true), true);
                 if (isset($booking['extra_demands']['extra_demand'])) {
@@ -4812,6 +4816,18 @@ class CartCore extends ObjectModel
                                 'id_guest' => $idGuest,
                             );
                             if ($hotelRoomData = $objBookingDetail->dataForFrontSearch($bookingParams)) {
+                                // unset already added rooms to cart as per sepcific parametrs
+                                if (isset($hotelRoomData['rm_data'][$idProduct]['data']['available']) && $hotelRoomData['rm_data'][$idProduct]['data']['available']) {
+                                    foreach ($hotelRoomData['rm_data'][$idProduct]['data']['available'] as $keyRoom => $roomInfo) {
+                                        if (isset(
+                                            $roomsAddedToCart[strtotime($dateFrom).'_'.strtotime($dateTo).'_'.$objCart->id.'_'.$roomInfo['id_product'].'_'.$roomInfo['id_room']]
+                                        )) {
+                                            unset($hotelRoomData['rm_data'][$idProduct]['data']['available'][$keyRoom]);
+                                            $hotelRoomData['stats']['num_avail'] -= 1;
+                                        }
+                                    }
+                                }
+
                                 if (isset($hotelRoomData['stats']['num_avail'])) {
                                     $totalAvailRooms = $hotelRoomData['stats']['num_avail'];
                                     if ($totalAvailRooms < $reqRooms) {
@@ -4870,6 +4886,9 @@ class CartCore extends ObjectModel
                                 $objCartBooking->date_to = $dateTo;
                                 $objCartBooking->save();
                                 ++$chkQty;
+
+                                // Enter rooms which are added to cart already in the Array
+                                $roomsAddedToCart[strtotime($dateFrom).'_'.strtotime($dateTo).'_'.$objCart->id.'_'.$val_hotel_room_info['id_product'].'_'.$val_hotel_room_info['id_room']] = 1;
                             } else {
                                 break;
                             }
