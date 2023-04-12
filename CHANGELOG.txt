@@ -72,6 +72,10 @@
   - #532: Change demo content for CMS page Legal Notice
   - #657: Allow checkout process classes to be overridden
   - #669: Updated: text translations call variable assigned to javascript
+  - #688: Update CONTRIBUTING.md
+  - #689: Update SECURITY.md
+  - #690: Update README.md
+  - #691: Update README.md
   - #342, #363, #436, #462, #470, #480, #543, #546, #561, #562, #569, #595, #618, #644, #658, #673, #686: Text related changes throughout QloApps
 
 - Back Office
@@ -161,6 +165,7 @@
   - #452: Fixed: count() function use issue in WebserviceOutputJSON.php
   - #514: Resolve: Occupancy wise search feature issues
   - #520: Fix order confirmation email issue
+  - #529: Fixed: API issues in order creation from webservice request
   - #534: Fix installation issue of missing data
   - #557: Fix js minification issue for file 'js/daterangepicker/moment.min.js'
   - #559: Change link in credit slip email
