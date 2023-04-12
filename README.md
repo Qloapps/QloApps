@@ -12,7 +12,7 @@
 	<a href="https://forums.qloapps.com/"><img src="https://img.shields.io/badge/Forum-Help%2FSupport-green" alt="Forum"></a>
 	<a href="https://qloapps.com/addons/"><img src="https://img.shields.io/badge/Addons-Plugins-blueviolet" alt="Addons"></a>
 	<a href="https://qloapps.com/contact/"><img src="https://img.shields.io/badge/Contact-Get%20In%20Touch-blue" alt="Contact us"></a>
-	<a href="https://github.com/webkul/hotelcommerce/blob/develop/LICENSE"><img src="https://img.shields.io/badge/License-OSL%20V3-green" alt="License"></a>
+	<a href="/LICENSE.md"><img src="https://img.shields.io/badge/License-OSL%20V3-green" alt="License"></a>
 </p>
 
 ## Topics
@@ -48,7 +48,7 @@ The system compatibility will also be checked by the system with installation an
 
 * **Web server**: Apache 1.3, Apache 2.x, Nginx or Microsoft IIS
 * **PHP  version**: PHP 5.6+ to PHP 7.4
-* **MySQL version**:  5.0+ to 5.7 installed with a database created
+* **MySQL version**:  5.1+ to 5.7 installed with a database created
 * SSH or FTP access (ask your hosting service for your credentials)
 * In the PHP configuration ask your provider to set memory_limit to "128M", upload_max_filesize to "16M" ,    max_execution_time to "500" and allow_url_fopen "on"
 * SSL certificate if you plan to process payments internally (not using PayPal for instance)
@@ -60,7 +60,7 @@ The system compatibility will also be checked by the system with installation an
 * **A prepared package**: WampServer (for Windows), Xampp (for Windows and Mac) or EasyPHP (for Windows)
 * **Web server**: Apache 1.3, Apache 2.x, Nginx or Microsoft IIS
 * **PHP**: PHP 5.6+ to PHP 7.4
-* **MySQL** 5.0+ to 5.7 installed with a database created
+* **MySQL** 5.1+ to 5.7 installed with a database created
 * In the PHP configuration, set memory_limit to "128M", upload_max_filesize to "16M" and max_execution_time to "500"
 * **Required PHP extensions**: PDO_MySQL, cURL, OpenSSL, SOAP, GD, SimpleXML, DOM, Zip, Phar
 
@@ -76,7 +76,7 @@ docker pull webkul/qloapps_docker
 
 ### License
 
-QloApps Core is licensed under OSL-3.0 and Modules authored by Webkul have their applicable license, LICENSE.md, kept inside their root directories, while other modules are licensed under AFL-3.0.
+QloApps Core is licensed under OSL-3.0 and Modules authored by Webkul have their applicable license LICENSE.md, kept inside their root directories, while other modules are licensed under AFL-3.0.
 
 The online copy of OSL-3.0 can be found at [https://opensource.org/licenses/OSL-3.0](https://opensource.org/licenses/OSL-3.0).
 
@@ -96,7 +96,7 @@ Please don't disclose security vulnerabilities publicly. If you find any securit
 
 ### Contribute
 As a PHP developer who has command on PHP and MySQL and also knows how to use Git or GitHub efficiently, can contribute to code enhancements via pull requests.<br>
-For more information about the contribution process please visit **[Contribute to QloApps](https://qloapps.com/how-to-contribute-to-qloapps-project/)**
+For more information about the contribution process please check **[Contribute to QloApps](/CONTRIBUTING.md)**
 
 ### Credits
 Crafted with :heart: at [Webkul](https://webkul.com)
