@@ -754,6 +754,7 @@ class HotelBranchInformation extends ObjectModel
                 while ($idCategory
                     && !in_array($idCategory, $hotelCategories)
                     && $idCategory != Configuration::get('PS_HOME_CATEGORY')
+                    && $idCategory != Configuration::get('PS_LOCATIONS_CATEGORY')
                 ) {
                     if ($objCategory->delete()) {
                         // continue deleting the unused parent hotel categories

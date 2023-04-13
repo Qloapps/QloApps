@@ -445,9 +445,11 @@ class AdminAddHotelController extends ModuleAdminController
                 $objAddress->id_state = $state;
                 $objAddress->city = $city;
                 $objAddress->postcode = $zipcode;
-                $objAddress->alias = Tools::getValue('hotel_name_'.$defaultLangId);
-                $objAddress->lastname = Tools::getValue('hotel_name_'.$defaultLangId);
-                $objAddress->firstname = Tools::getValue('hotel_name_'.$defaultLangId);
+                $hotelName = $objHotelBranch->hotel_name[$defaultLangId];
+                $objAddress->alias = $hotelName;
+                $hotelName = preg_replace('/[0-9!<>,;?=+()@#"°{}_$%:]*$/u', '', $hotelName);
+                $objAddress->lastname = $hotelName;
+                $objAddress->firstname = $hotelName;
                 $objAddress->address1 = $address;
                 $objAddress->phone = $phone;
 
@@ -515,6 +517,7 @@ class AdminAddHotelController extends ModuleAdminController
                     foreach ($unusedCategs as $idCategory) {
                         if (!in_array($idCategory, $hotelCategories)
                             && $idCategory != Configuration::get('PS_HOME_CATEGORY')
+                            && $idCategory != Configuration::get('PS_LOCATIONS_CATEGORY')
                         ) {
                             $objCategory = new Category($idCategory);
                             $objCategory->delete();
