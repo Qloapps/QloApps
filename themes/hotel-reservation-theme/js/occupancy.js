@@ -64,7 +64,7 @@ $(document).ready(function(){
 
                 let roomBlockIndex = parseInt($(this).closest('.occupancy_info_block').attr('occ_block_index'));
 
-                let childAgeSelect = '<div class="col-xs-6 col-sm-12 col-md-6">';
+                let childAgeSelect = '<div>';
                     childAgeSelect += '<select class="guest_child_age room_occupancies" name="occupancy[' +roomBlockIndex+ '][child_ages][]">';
                         childAgeSelect += '<option value="-1">' + select_age_txt + '</option>';
                         childAgeSelect += '<option value="0">' + under_1_age + '</option>';
@@ -228,8 +228,8 @@ $(document).ready(function(){
                     occupancy_block += '</div>';
                     occupancy_block += '<div class="form-group col-sm-7 col-xs-6 occupancy_count_block">';
                         occupancy_block += '<div class="row">';
-                            occupancy_block += '<label class="col-sm-12">' + children_txt + '<span class="label-desc-txt">(' + below_txt + ' ' + max_child_age + ' ' + years_txt + ')</span></label>';
-                            occupancy_block += '<div class="col-sm-12">';
+                            occupancy_block += '<label class="col-sm-12">' + children_txt + '</label>';
+                            occupancy_block += '<div class="col-sm-12 clearfix">';
                                 occupancy_block += '<input type="hidden" class="num_occupancy num_children room_occupancies" name="occupancy['+roomBlockIndex+'][children]" value="0">';
                                 occupancy_block += '<div class="occupancy_count pull-left">';
                                     occupancy_block += '<span>0</span>';
@@ -243,13 +243,14 @@ $(document).ready(function(){
                                     occupancy_block += '</a>';
                                 occupancy_block += '</div>';
                             occupancy_block += '</div>';
+                            occupancy_block += '<div class="col-sm-12"><span class="label-desc-txt">(' + below_txt + ' ' + max_child_age + ' ' + years_txt + ')</span></div>';
                         occupancy_block += '</div>';
                     occupancy_block += '</div>';
                 occupancy_block += '</div>';
                 occupancy_block += '<div class="form-group row children_age_info_block">';
                     occupancy_block += '<label class="col-sm-12">' + all_children_txt + '</label>';
                     occupancy_block += '<div class="col-sm-12">';
-                        occupancy_block += '<div class="row children_ages">';
+                        occupancy_block += '<div class="children_ages">';
                         occupancy_block += '</div>';
                     occupancy_block += '</div>';
                 occupancy_block += '</div>';

@@ -63,7 +63,7 @@
                             </div>
                             <div class="form-group col-sm-7 col-xs-6 occupancy_count_block">
                                 <div class="row">
-                                    <label class="col-sm-12">{l s='Children'}<span class="label-desc-txt"> ({l s='Below'} {$max_child_age|escape:'htmlall':'UTF-8'} {l s='years'})</span></label>
+                                    <label class="col-sm-12 clearfix">{l s='Children'}</label>
                                     <div class="col-sm-12">
                                         <input type="hidden" class="num_occupancy num_children room_occupancies" name="occupancy[{$key|escape:'htmlall':'UTF-8'}][children]" max="{}" value="{$occupancy['children']|escape:'htmlall':'UTF-8'}">
                                         <div class="occupancy_count pull-left">
@@ -78,16 +78,19 @@
                                             </a>
                                         </div>
                                     </div>
+                                    <div class="col-sm-12">
+                                        <span class="label-desc-txt">({l s='Below'}  {$max_child_age|escape:'htmlall':'UTF-8'} {l s='years'})</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                         <div class="form-group row children_age_info_block" {if isset($occupancy['child_ages']) && $occupancy['child_ages']}style="display:block;"{/if}>
                             <label class="col-sm-12">{l s='All Children'}</label>
                             <div class="col-sm-12">
-                                <div class="row children_ages">
+                                <div class="children_ages">
                                     {if isset($occupancy['child_ages']) && $occupancy['child_ages']}
                                         {foreach $occupancy['child_ages'] as $childAge}
-                                            <div class="col-xs-4 col-sm-12 col-md-6 col-lg-4">
+                                            <div>
                                                 <select class="guest_child_age room_occupancies" name="occupancy[{$key|escape:'htmlall':'UTF-8'}][child_ages][]">
                                                     <option value="-1" {if $childAge == -1}selected{/if}>{l s='Select 1'}</option>
                                                     <option value="0" {if $childAge == 0}selected{/if}>{l s='Under 1'}</option>
@@ -134,8 +137,8 @@
                         </div>
                         <div class="form-group col-sm-7 col-xs-6 occupancy_count_block">
                             <div class="row">
-                                <label class="col-sm-12">{l s='Children'} <span class="label-desc-txt">({l s='Below'}  {$max_child_age|escape:'htmlall':'UTF-8'} {l s='years'})</span></label>
-                                <div class="col-sm-12">
+                                <label class="col-sm-12">{l s='Children'}</label>
+                                <div class="col-sm-12 clearfix">
                                     <input type="hidden" class="num_occupancy num_children" name="num_children[]" value="0">
                                     <div class="occupancy_count pull-left">
                                         <span>0</span>
@@ -153,13 +156,16 @@
                                         </a>
                                     </div>
                                 </div>
+                                <div class="col-sm-12">
+                                    <span class="label-desc-txt">({l s='Below'}  {$max_child_age|escape:'htmlall':'UTF-8'} {l s='years'})</span>
+                                </div>
                             </div>
                         </div>
                     </div>
                     <div class="form-group row children_age_info_block">
                         <label class="col-sm-12">{l s='All Children'}</label>
                         <div class="col-sm-12">
-                            <div class="row children_ages">
+                            <div class="children_ages">
                             </div>
                         </div>
                     </div>
