@@ -1622,12 +1622,17 @@ function loadRecommendation()
 				let images = $('#recommendation-wrapper img');
 				let loaded = 0;
 				let total = $(images).length;
-				$(images).on('load', function() {
-					if (++loaded === total) {
-						$('#recommendation-wrapper-skeleton').fadeOut('slow').hide();
-						$('#recommendation-wrapper').fadeIn();
-					}
-				});
+				if (images.length) {
+					$(images).on('load', function() {
+						if (++loaded === total) {
+							$('#recommendation-wrapper-skeleton').fadeOut('slow').hide();
+							$('#recommendation-wrapper').fadeIn();
+						}
+					});
+				} else {
+					$('#recommendation-wrapper-skeleton').fadeOut('slow').hide();
+					$('#recommendation-wrapper').fadeIn();
+				}
 			}
 		},
 		error: function(res) {

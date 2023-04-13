@@ -3320,9 +3320,9 @@ exit;
      * @param int $timeout
      * @return bool
      */
-    public static function isFresh($file, $timeout = _TIME_1_WEEK_)
+    public static function isFresh($file, $timeout = _TIME_1_WEEK_, $check_size = true)
     {
-        if (($time = @filemtime(_PS_ROOT_DIR_.$file)) && filesize(_PS_ROOT_DIR_.$file) > 0) {
+        if (($time = @filemtime(_PS_ROOT_DIR_.$file)) && ($check_size ? filesize(_PS_ROOT_DIR_.$file) > 0: true)) {
             return ((time() - $time) < $timeout);
         }
 

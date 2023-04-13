@@ -496,7 +496,7 @@ class AdminDashboardControllerCore extends AdminController
 
     public function getRecommendationContent()
     {
-        if (!Tools::isFresh(self::DASHBOARD_RECOMMENDATION_CONTENT, _TIME_1_DAY_)) {
+        if (!Tools::isFresh(self::DASHBOARD_RECOMMENDATION_CONTENT, _TIME_1_DAY_, false)) {
             @file_put_contents(_PS_ROOT_DIR_.self::DASHBOARD_RECOMMENDATION_CONTENT, Tools::addonsRequest('dashboard-recommendation'));
         }
         if (file_exists(_PS_ROOT_DIR_.self::DASHBOARD_RECOMMENDATION_CONTENT)) {
