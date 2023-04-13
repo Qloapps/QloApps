@@ -76,6 +76,7 @@
   - #689: Update SECURITY.md
   - #690: Update README.md
   - #691: Update README.md
+  - #692: Updated: Recomendation section update and render process
   - #342, #363, #436, #462, #470, #480, #543, #546, #561, #562, #569, #595, #618, #644, #658, #673, #686: Text related changes throughout QloApps
 
 - Back Office
