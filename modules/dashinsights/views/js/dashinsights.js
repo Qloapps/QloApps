@@ -18,6 +18,7 @@
  */
 
 function line_chart_dashinsights(widget_name, chart_details) {
+    $('#dashinsights_room_nights svg').html('');
     nv.addGraph(function () {
         var chart = nv.models.lineChart()
             .useInteractiveGuideline(true)
@@ -46,6 +47,7 @@ function line_chart_dashinsights(widget_name, chart_details) {
 }
 
 function multibar_chart_dotw_dashinsights(widget_name, chart_details) {
+    $('#dashinsights_days_of_the_week svg').html('');
     nv.addGraph(function() {
         var chart = nv.models.multiBarHorizontalChart()
             .showControls(false)
@@ -71,6 +73,7 @@ function multibar_chart_dotw_dashinsights(widget_name, chart_details) {
 }
 
 function multibar_chart_los_dashinsights(widget_name, chart_details) {
+    $('#dashinsights_length_of_stay svg').html('')
     nv.addGraph(function() {
         var chart = nv.models.multiBarHorizontalChart()
             .showControls(false)
