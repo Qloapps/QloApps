@@ -113,6 +113,8 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
                     1
                 );
                 $id_hotel = reset($htl_info)['id'];
+            } else {
+                $id_hotel = 0;
             }
         }
 
@@ -280,13 +282,15 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
             'id_guest' => $this->context->cookie->id_guest,
         );
         $this->initSearchFormData();
-        if ($this->booking_product) {
-            $this->assignRoomBookingForm();
-        } else {
-            $this->assignServiceProductsForm();
-        }
+        if (count($this->tpl_view_vars['hotel_list'])) {
+            if ($this->booking_product) {
+                $this->assignRoomBookingForm();
+            } else {
+                $this->assignServiceProductsForm();
+            }
 
-        $this->initCartData();
+            $this->initCartData();
+        }
 
         return parent::renderView();
     }

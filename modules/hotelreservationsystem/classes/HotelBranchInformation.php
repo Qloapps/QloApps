@@ -134,24 +134,21 @@ class HotelBranchInformation extends ObjectModel
             $context = Context::getContext();
         }
 
+        /* Query definition */
+        $query = 'REPLACE INTO `'._DB_PREFIX_.'htl_access` (`id_profile`, `id_hotel`, `access`)';
+        $query .= ' VALUES '.'(1, '.(int)$idHotel.', 1)';
         /* Profile selection */
         $profiles = Db::getInstance()->executeS('SELECT `id_profile` FROM '._DB_PREFIX_.'profile WHERE `id_profile` != 1');
         if (!$profiles || empty($profiles)) {
-            return true;
-        }
-        /* Query definition */
-        $query = 'REPLACE INTO `'._DB_PREFIX_.'htl_access` (`id_profile`, `id_hotel`, `access`)';
-        $query .= ' VALUES '.'(1, '.(int)$idHotel.', 1),';
+            foreach ($profiles as $profile) {
+                $access = 0;
+                if (isset($context->employee->id_profile)) {
+                    $access = ($profile['id_profile'] == $context->employee->id_profile) ? 1 : 0;
+                }
 
-        foreach ($profiles as $profile) {
-            $access = 0;
-            if (isset($context->employee->id_profile)) {
-                $access = ($profile['id_profile'] == $context->employee->id_profile) ? 1 : 0;
+                $query .= ', ('.(int)$profile['id_profile'].', '.(int)$idHotel.', '.(int)$access.')';
             }
-
-            $query .= ' ('.(int)$profile['id_profile'].', '.(int)$idHotel.', '.(int)$access.'),';
         }
-        $query = trim($query, ', ');
         return Db::getInstance()->execute($query);
     }
 
