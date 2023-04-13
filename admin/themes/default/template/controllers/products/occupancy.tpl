@@ -35,7 +35,7 @@
                 </span>
 			</label>
 			<div class="col-sm-3">
-				<input id="base_adults" type="text" name="base_adults" class="form-control" {if isset($roomTypeInfo)}value="{$roomTypeInfo['adults']|escape:'htmlall':'UTF-8'}"{/if}>
+				<input id="base_adults" type="text" name="base_adults" class="form-control" value="{if isset($roomTypeInfo)}{$roomTypeInfo['adults']|escape:'htmlall':'UTF-8'}{else}2{/if}">
 			</div>
 		</div>
 		<div class="form-group">
