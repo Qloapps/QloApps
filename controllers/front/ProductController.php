@@ -593,7 +593,11 @@ class ProductControllerCore extends FrontController
             $quantity = count($occupancy);
         } else {
             // when room selection is done using qty, occupancy parameter will contain the number of rooms.
-            $quantity = $occupancy;
+            if (is_array($occupancy)) {
+                $quantity = 1;
+            } else {
+                $quantity = $occupancy;
+            }
         }
 
         if ($quantity <= 0) {
@@ -1222,8 +1226,10 @@ class ProductControllerCore extends FrontController
         $dateFrom = Tools::getValue('date_from');
         $dateTo = Tools::getValue('date_to');
         $occupancy = Tools::getValue('occupancy');
-        if (!Validate::isOccupancy($occupancy)) {
-            $occupancy = array();
+        if (Configuration::get('PS_FRONT_ROOM_UNIT_SELECTION_TYPE') == HotelBookingDetail::PS_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY) {
+            if (!Validate::isOccupancy($occupancy)) {
+                $occupancy = array();
+            }
         }
         $roomTypeDemands = Tools::getValue('room_type_demands');
         $roomServiceProducts = Tools::getValue('room_service_products');
