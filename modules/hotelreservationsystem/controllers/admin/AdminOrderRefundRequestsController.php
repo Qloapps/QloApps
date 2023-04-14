@@ -164,7 +164,7 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
             }
             $this->fields_list = array(
                 'id_order_return' => array(
-                    'title' => $this->l('Refund ID'),
+                    'title' => $this->l('Request ID'),
                     'align' => 'center',
                     'class' => 'fixed-width-xs',
                 ),
