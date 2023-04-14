@@ -212,7 +212,7 @@
 #search_occupancy_wrapper {
   border: none;
   max-height: 400px;
-  min-width: 250px;
+  min-width: 280px;
   overflow: auto;
   box-shadow: 0 8px 25px -4px rgba(0,0,0,0.39);
   left: 0px;
@@ -249,15 +249,6 @@
         font-size: 12px;
         color: #FF4343;
         text-align: right;}
-      #search_occupancy_wrapper .occupancy_info_block {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr); }
-        #search_occupancy_wrapper .occupancy_info_block .occupancy_count_block{
-          display: grid;}
-          #search_occupancy_wrapper .occupancy_info_block .occupancy_count_block > div{
-            align-self: end;}
-        #search_occupancy_wrapper .occupancy_info_block .children_age_info_block {
-          grid-column: 1 / 3}
       #search_occupancy_wrapper .occupancy_info_block .occupancy_count {
         padding: 14px;
         border: 1px solid #E1E3E7;
@@ -286,7 +277,7 @@
   #search_occupancy_wrapper .children_ages {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    column-gap: 5px;
+    gap: 8px;
     justify-content: space-between;
   }
   #search_occupancy_wrapper .children_ages select {
