@@ -586,8 +586,12 @@ class OrderCore extends ObjectModel
         return self::$_historyCache[$this->id.'_'.$id_order_state.'_'.$filters];
     }
 
-    public function getProductsDetail($is_booking = null, $product_service_type = null)
-    {
+    public function getProductsDetail(
+        $is_booking = null,
+        $product_service_type = null,
+        $product_auto_add = null,
+        $product_price_addition_type = null
+    ) {
         $sql = 'SELECT *
             FROM `'._DB_PREFIX_.'order_detail` od
             LEFT JOIN `'._DB_PREFIX_.'product` p ON (p.id_product = od.product_id)
@@ -597,6 +601,12 @@ class OrderCore extends ObjectModel
             $sql .= ' AND od.`is_booking_product` = '. (int)$is_booking;
             if (!$is_booking && $product_service_type !== null) {
                 $sql .= ' AND od.`product_service_type` = '. (int)$product_service_type;
+            }
+            if (!$is_booking && $product_service_type == Product::SERVICE_PRODUCT_WITH_ROOMTYPE && $product_auto_add !== null) {
+                $sql .= ' AND od.`product_auto_add` = '. (int)$product_auto_add;
+            }
+            if (!$is_booking && $product_service_type == Product::SERVICE_PRODUCT_WITH_ROOMTYPE && $product_auto_add == 1 && $product_price_addition_type !== null) {
+                $sql .= ' AND od.`product_price_addition_type` = '. (int)$product_price_addition_type;
             }
         }
         return Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
@@ -1063,11 +1073,16 @@ class OrderCore extends ObjectModel
      *
      * @return Product total without taxes
      */
-    public function getTotalProductsWithoutTaxes($products = false, $bookingProducts = null, $product_service_type = null)
-    {
+    public function getTotalProductsWithoutTaxes(
+        $products = false,
+        $bookingProducts = null,
+        $product_service_type = null,
+        $product_auto_add = null,
+        $product_price_addition_type = null
+    ) {
         // update
         if (!$products) {
-            $products = $this->getProductsDetail($bookingProducts, $product_service_type);
+            $products = $this->getProductsDetail($bookingProducts, $product_service_type, $product_auto_add, $product_price_addition_type);
         }
 
         $return = 0;
@@ -1083,11 +1098,16 @@ class OrderCore extends ObjectModel
      *
      * @return Product total with taxes
      */
-    public function getTotalProductsWithTaxes($products = false, $bookingProducts = null, $product_service_type = null)
-    {
+    public function getTotalProductsWithTaxes(
+        $products = false,
+        $bookingProducts = null,
+        $product_service_type = null,
+        $product_auto_add = null,
+        $product_price_addition_type = null
+    ) {
         /* Retro-compatibility (now set directly on the validateOrder() method) */
         if (!$products) {
-            $products = $this->getProductsDetail($bookingProducts, $product_service_type);
+            $products = $this->getProductsDetail($bookingProducts, $product_service_type, $product_auto_add, $product_price_addition_type);
         }
 
         $return = 0;
