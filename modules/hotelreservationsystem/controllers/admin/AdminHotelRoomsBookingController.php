@@ -619,8 +619,10 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
         $date_from = Tools::getValue('date_from');
         $date_to = Tools::getValue('date_to');
         $occupancy = Tools::getValue('occupancy');
-        if (!Validate::isOccupancy($occupancy)) {
-            $occupancy = array();
+        if (Configuration::get('PS_BACKOFFICE_ROOM_BOOKING_TYPE') == HotelBookingDetail::PS_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY) {
+            if (!Validate::isOccupancy($occupancy)) {
+                $occupancy = array();
+            }
         }
 
         $date_from = date("Y-m-d", strtotime($date_from));
