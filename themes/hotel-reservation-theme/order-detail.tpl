@@ -658,7 +658,9 @@
 					<select name="id_product" class="form-control">
 						<option value="0">{l s='-- Choose --'}</option>
 						{foreach from=$products item=product name=products}
-							<option value="{$product.product_id}">{$product.product_name|escape:'html':'UTF-8'}</option>
+							{if $product.is_booking_product}
+								<option value="{$product.product_id}">{$product.product_name|escape:'html':'UTF-8'}</option>
+							{/if}
 						{/foreach}
 					</select>
 				</p>
