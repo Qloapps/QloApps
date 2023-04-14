@@ -623,6 +623,7 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
             if (!Validate::isOccupancy($occupancy)) {
                 $occupancy = array();
             }
+        }
 
         $date_from = date("Y-m-d", strtotime($date_from));
         $date_to = date("Y-m-d", strtotime($date_to));
