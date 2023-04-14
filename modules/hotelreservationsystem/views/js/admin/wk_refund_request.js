@@ -18,6 +18,46 @@
 */
 
 $(document).ready(function() {
+
+    // initialize tootip for room price
+    if ($('#rooms_refund_info .price_info').length) {
+        $('#rooms_refund_info .price_info').each(function (i, element) {
+			$(this).find('img').tooltip({
+				content: $(this).closest('td').find('.price_info_container').html(),
+				items: "span",
+				trigger : 'hover',
+				tooltipClass: "price_info-tooltip",
+				open: function(event, ui)
+				{
+					if (typeof(event.originalEvent) === 'undefined')
+					{
+						return false;
+					}
+
+					var $id = $(ui.tooltip).attr('id');
+
+					if ($('div.ui-tooltip').not('#' + $id).length) {
+						return false;
+					}
+				},
+				close: function(event, ui)
+				{
+					ui.tooltip.hover(function()
+					{
+						$(this).stop(true).fadeTo(400, 1);
+					},
+					function()
+					{
+						$(this).fadeOut('400', function()
+						{
+							$(this).remove();
+						});
+					});
+				}
+			});
+		});
+	}
+
     $(document).on('change', '#refundTransactionAmount', function() {
 		if ($(this).is(':checked')) {
 			$(".refund_transaction_fields").show(200);

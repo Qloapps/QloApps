@@ -509,8 +509,14 @@ $(document).ready(function()
         var newQuantity = parseInt(qtyfield.val()) + 1;
 		if (qtyfield.data('max_quantity') && qtyfield.data('max_quantity') < newQuantity) {
             newQuantity = qtyfield.data('max_quantity');
-        }
-        qtyfield.val(newQuantity).trigger('focusout');
+			if (qtyfield.val() != qtyfield.data('max_quantity')) {
+				qtyfield.trigger('focusout');
+			} else {
+				showErrorMessage(txtMaxQuantityAdded);
+			}
+        } else {
+			qtyfield.val(newQuantity).trigger('focusout');
+		}
     });
 
     $(document).on('click', '#rooms_extra_services .qty_down', function(e) {
@@ -520,7 +526,10 @@ $(document).ready(function()
         if (!isNaN(currentVal) && currentVal > 1) {
             qtyfield.val(currentVal - 1).trigger('focusout');
         } else {
-            qtyfield.val(1).trigger('focusout');
+            qtyfield.val(1);
+			if (currentVal != 1) {
+				qtyfield.trigger('focusout');
+			}
         }
     });
 

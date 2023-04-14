@@ -251,10 +251,13 @@ class AddressCore extends ObjectModel
         $errors = parent::validateController($htmlentities);
 
         // for customer address we need to check of customer address already exists.
-        if ($idCustomer = Tools::getValue('id_customer')) {
-            if ($id_address = Customer::getCustomerIdAddress($idCustomer)) {
+        // if we are editing an address we do not need to validate already created address.
+        if (!Validate::isLoadedObject($this)) {
+            if ($idCustomer = Tools::getValue('id_customer')) {
+                if ($id_address = Customer::getCustomerIdAddress($idCustomer)) {
 
-                $errors[] =  sprintf(Tools::displayError('Customer address already exists. Id address: #%d'), $id_address);
+                    $errors[] =  sprintf(Tools::displayError('Customer address already exists. Id address: #%d'), $id_address);
+                }
             }
         }
 

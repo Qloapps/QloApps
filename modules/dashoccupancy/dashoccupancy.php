@@ -88,26 +88,30 @@ class DashOccupancy extends Module
             'do_count_unavailable' => sprintf('%02d', $occupancyData['count_unavailable']),
         );
 
-        $dataPieChartBig = array(
-            array(
-                'label' => $this->l('Occupied'),
-                'value' => $occupancyData['count_total']
-                    ? ($occupancyData['count_occupied'] / $occupancyData['count_total']) * 100
-                    : 0,
-            ),
-            array(
-                'label' => $this->l('Available'),
-                'value' => $occupancyData['count_total']
-                    ? ($occupancyData['count_available'] / $occupancyData['count_total']) * 100
-                    : 0,
-            ),
-            array(
-                'label' => $this->l('Unavailable'),
-                'value' => $occupancyData['count_total']
-                    ? ($occupancyData['count_unavailable'] / $occupancyData['count_total']) * 100
-                    : 0,
-            ),
-        );
+        if ($occupancyData['count_total']) {
+            $dataPieChartBig = array(
+                array(
+                    'label' => $this->l('Occupied'),
+                    'value' => $occupancyData['count_total']
+                        ? ($occupancyData['count_occupied'] / $occupancyData['count_total']) * 100
+                        : 0,
+                ),
+                array(
+                    'label' => $this->l('Available'),
+                    'value' => $occupancyData['count_total']
+                        ? ($occupancyData['count_available'] / $occupancyData['count_total']) * 100
+                        : 0,
+                ),
+                array(
+                    'label' => $this->l('Unavailable'),
+                    'value' => $occupancyData['count_total']
+                        ? ($occupancyData['count_unavailable'] / $occupancyData['count_total']) * 100
+                        : 0,
+                ),
+            );
+        } else {
+            $dataPieChartBig = array();
+        }
 
         return array(
             'data_value' => $dataValue,

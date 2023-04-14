@@ -24,17 +24,17 @@ class HotelHelper
     {
         $objModule = new HotelreservationSystem();
         $jsVars = array(
-                'display_name' => $objModule->l('Display', 'HotelHelper', fasle, true),
-                'records_name' => $objModule->l('records per page', 'HotelHelper', fasle, true),
-                'no_product' => $objModule->l('No records found', 'HotelHelper', fasle, true),
-                'show_page' => $objModule->l('Showing page', 'HotelHelper', fasle, true),
-                'show_of' => $objModule->l('of', 'HotelHelper', fasle, true),
-                'no_record' => $objModule->l('No records available', 'HotelHelper', fasle, true),
-                'filter_from' => $objModule->l('filtered from', 'HotelHelper', fasle, true),
-                't_record' => $objModule->l('total records', 'HotelHelper', fasle, true),
-                'search_item' => $objModule->l('Search', 'HotelHelper', fasle, true),
-                'p_page' => $objModule->l('Previous', 'HotelHelper', fasle, true),
-                'n_page' => $objModule->l('Next', 'HotelHelper', fasle, true),
+                'display_name' => $objModule->l('Display', 'HotelHelper', false, true),
+                'records_name' => $objModule->l('records per page', 'HotelHelper', false, true),
+                'no_product' => $objModule->l('No records found', 'HotelHelper', false, true),
+                'show_page' => $objModule->l('Showing page', 'HotelHelper', false, true),
+                'show_of' => $objModule->l('of', 'HotelHelper', false, true),
+                'no_record' => $objModule->l('No records available', 'HotelHelper', false, true),
+                'filter_from' => $objModule->l('filtered from', 'HotelHelper', false, true),
+                't_record' => $objModule->l('total records', 'HotelHelper', false, true),
+                'search_item' => $objModule->l('Search', 'HotelHelper', false, true),
+                'p_page' => $objModule->l('Previous', 'HotelHelper', false, true),
+                'n_page' => $objModule->l('Next', 'HotelHelper', false, true),
             );
 
         Media::addJsDef($jsVars);
