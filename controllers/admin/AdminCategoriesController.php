@@ -72,11 +72,11 @@ class AdminCategoriesControllerCore extends AdminController
             'name' => array(
                 'title' => $this->l('Name')
             ),
-            'description' => array(
-                'title' => $this->l('Description'),
-                'callback' => 'getDescriptionClean',
-                'orderby' => false
-            ),
+            // 'description' => array(
+            //     'title' => $this->l('Description'),
+            //     'callback' => 'getDescriptionClean',
+            //     'orderby' => false
+            // ),
             'position' => array(
                 'title' => $this->l('Position'),
                 'filter_key' => 'sa!position',
