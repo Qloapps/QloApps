@@ -366,7 +366,12 @@ class AdminAddressesControllerCore extends AdminController
             $this->redirect_after = false;
         }
 
-        $address = new Address();
+        if ($idAddress = Tools::getValue('id_address')) {
+            $address = new Address($idAddress);
+        } else {
+            $address = new Address();
+        }
+
         $this->errors = $address->validateController();
 
         // Transform e-mail in id_customer for parent processing
