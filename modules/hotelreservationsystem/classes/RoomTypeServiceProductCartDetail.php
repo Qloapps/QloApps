@@ -63,19 +63,21 @@ class RoomTypeServiceProductCartDetail extends ObjectModel
             $objRoomTypeServiceProductCartDetail->id_cart = $idCart;
         }
 
-        $updateQty = $quantity - $objRoomTypeServiceProductCartDetail->quantity;
+        if ($updateQty = $quantity - $objRoomTypeServiceProductCartDetail->quantity) {
+            if (Product::getProductPriceCalculation($idProduct) == Product::PRICE_CALCULATION_METHOD_PER_DAY) {
+                $objHotelCartBookingData = new HotelCartBookingData($idHtlCartData);
+                $numdays = HotelHelper::getNumberOfDays($objHotelCartBookingData->date_from, $objHotelCartBookingData->date_to);
+                $updateQty *= $numdays;
 
-        if (Product::getProductPriceCalculation($idProduct) == Product::PRICE_CALCULATION_METHOD_PER_DAY) {
-            $objHotelCartBookingData = new HotelCartBookingData($idHtlCartData);
-            $numdays = HotelHelper::getNumberOfDays($objHotelCartBookingData->date_from, $objHotelCartBookingData->date_to);
-            $updateQty *= $numdays;
-
-        }
-        $way = $updateQty > 0 ? 'up' : 'down';
-        $objRoomTypeServiceProductCartDetail->quantity = $quantity;
-        if ($objRoomTypeServiceProductCartDetail->save()) {
-            $objCart = new Cart($idCart);
-            return $objCart->updateQty((int)abs($updateQty), $idProduct, null, false, $way);
+            }
+            $way = $updateQty > 0 ? 'up' : 'down';
+            $objRoomTypeServiceProductCartDetail->quantity = $quantity;
+            if ($objRoomTypeServiceProductCartDetail->save()) {
+                $objCart = new Cart($idCart);
+                return $objCart->updateQty((int)abs($updateQty), $idProduct, null, false, $way);
+            }
+        } else {
+            return true;
         }
 
         return false;
