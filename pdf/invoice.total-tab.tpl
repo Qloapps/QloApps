@@ -52,6 +52,16 @@
 			</td>
 		</tr>
 	{/if}
+	{if $footer.product_discounts_tax_excl > 0}
+		<tr>
+			<td class="grey" width="70%">
+				{l s='Total Discounts' pdf='true'}
+			</td>
+			<td class="white" width="30%">
+				- {displayPrice currency=$order->id_currency price=$footer.product_discounts_tax_excl}
+			</td>
+		</tr>
+	{/if}
 	{* {if isset($footer.product_taxes) && $footer.product_taxes}
 		<tr>
 			<td class="grey" width="70%">
@@ -92,6 +102,7 @@
 			</td>
 		</tr>
 	{/if} *}
+
 	<tr class="bold">
 		<td class="grey">
 			{l s='Total (Tax excl.)' pdf='true'}
@@ -110,16 +121,7 @@
 		</td>
 	</tr>
 	{/if}
-	{if $footer.product_discounts_tax_excl > 0}
-		<tr>
-			<td class="grey" width="70%">
-				{l s='Total Discounts' pdf='true'}
-			</td>
-			<td class="white" width="30%">
-				- {displayPrice currency=$order->id_currency price=$footer.product_discounts_tax_excl}
-			</td>
-		</tr>
-	{/if}
+
 
 	<tr class="bold big">
 		<td class="grey">
