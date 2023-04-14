@@ -75,56 +75,61 @@
                                 <div class="occupancy-room-block">
                                     <div class="occupancy_info_head"><span class="room_num_wrapper">{l s='Room' mod='wkroomsearchblock'} - {$countRoom|escape:'htmlall':'UTF-8'} </span>{if !$smarty.foreach.occupancyInfo.first}<a class="remove-room-link pull-right" href="#">{l s='Remove' mod='wkroomsearchblock'}</a>{/if}</div>
                                     <div class="occupancy_info_block" occ_block_index="{$key|escape:'htmlall':'UTF-8'}">
-                                        <div class="form-group occupancy_count_block">
-                                            <label>{l s='Adults' mod='wkroomsearchblock'}</label>
-                                            <div>
-                                                <input type="hidden" class="num_occupancy num_adults room_occupancies" name="occupancy[{$key|escape:'htmlall':'UTF-8'}][adults]" value="{$occupancy['adults']|escape:'htmlall':'UTF-8'}">
-                                                <div class="occupancy_count pull-left">
-                                                    <span>{$occupancy['adults']|escape:'htmlall':'UTF-8'}</span>
-                                                </div>
-                                                <div class="qty_direction pull-left">
-                                                    <a href="#" data-field-qty="qty" class="btn btn-default occupancy_quantity_up">
-                                                        <span><i class="icon-plus"></i></span>
-                                                    </a>
-                                                    <a href="#" data-field-qty="qty" class="btn btn-default occupancy_quantity_down">
-                                                        <span><i class="icon-minus"></i></span>
-                                                    </a>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="form-group occupancy_count_block">
-                                            <label>{l s='Children' mod='wkroomsearchblock'}<span class="label-desc-txt"> ({l s='Below' mod='wkroomsearchblock'} {$max_child_age|escape:'htmlall':'UTF-8'} {l s='years' mod='wkroomsearchblock'})</span></label>
-                                            <div>
-                                                <input type="hidden" class="num_occupancy num_children room_occupancies" name="occupancy[{$key|escape:'htmlall':'UTF-8'}][children]" value="{$occupancy['children']|escape:'htmlall':'UTF-8'}">
-                                                <div class="occupancy_count pull-left">
-                                                    <span>{$occupancy['children']|escape:'htmlall':'UTF-8'}</span>
-                                                </div>
-                                                <div class="qty_direction pull-left">
-                                                    <a href="#" data-field-qty="qty" class="btn btn-default occupancy_quantity_up">
-                                                        <span><i class="icon-plus"></i></span>
-                                                    </a>
-                                                    <a href="#" data-field-qty="qty" class="btn btn-default occupancy_quantity_down">
-                                                        <span><i class="icon-minus"></i></span>
-                                                    </a>
+                                        <div class="row">
+                                            <div class="form-group occupancy_count_block col-sm-5 col-xs-6">
+                                                <label>{l s='Adults' mod='wkroomsearchblock'}</label>
+                                                <div>
+                                                    <input type="hidden" class="num_occupancy num_adults room_occupancies" name="occupancy[{$key|escape:'htmlall':'UTF-8'}][adults]" value="{$occupancy['adults']|escape:'htmlall':'UTF-8'}">
+                                                    <div class="occupancy_count pull-left">
+                                                        <span>{$occupancy['adults']|escape:'htmlall':'UTF-8'}</span>
+                                                    </div>
+                                                    <div class="qty_direction pull-left">
+                                                        <a href="#" data-field-qty="qty" class="btn btn-default occupancy_quantity_up">
+                                                            <span><i class="icon-plus"></i></span>
+                                                        </a>
+                                                        <a href="#" data-field-qty="qty" class="btn btn-default occupancy_quantity_down">
+                                                            <span><i class="icon-minus"></i></span>
+                                                        </a>
+                                                    </div>
                                                 </div>
                                             </div>
+                                            <div class="form-group occupancy_count_block col-sm-7 col-xs-6">
+                                                <label>{l s='Children' mod='wkroomsearchblock'}</label>
+                                                <div class="clearfix">
+                                                    <input type="hidden" class="num_occupancy num_children room_occupancies" name="occupancy[{$key|escape:'htmlall':'UTF-8'}][children]" value="{$occupancy['children']|escape:'htmlall':'UTF-8'}">
+                                                    <div class="occupancy_count pull-left">
+                                                        <span>{$occupancy['children']|escape:'htmlall':'UTF-8'}</span>
+                                                    </div>
+                                                    <div class="qty_direction pull-left">
+                                                        <a href="#" data-field-qty="qty" class="btn btn-default occupancy_quantity_up">
+                                                            <span><i class="icon-plus"></i></span>
+                                                        </a>
+                                                        <a href="#" data-field-qty="qty" class="btn btn-default occupancy_quantity_down">
+                                                            <span><i class="icon-minus"></i></span>
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                                <p class="label-desc-txt">({l s='Below' mod='wkroomsearchblock'}  {$max_child_age|escape:'htmlall':'UTF-8'} {l s='years' mod='wkroomsearchblock'})</p>
+                                            </div>
                                         </div>
-                                        <div class="form-group children_age_info_block" {if isset($occupancy['child_ages']) && $occupancy['child_ages']}style="display:block;"{/if}>
-                                            <label>{l s='All Children' mod='wkroomsearchblock'}</label>
-                                            <div class="children_ages">
-                                                {if isset($occupancy['child_ages']) && $occupancy['child_ages']}
-                                                    {foreach $occupancy['child_ages'] as $childAge}
-                                                        <div>
-                                                            <select class="guest_child_age room_occupancies" name="occupancy[{$key|escape:'htmlall':'UTF-8'}][child_ages][]">
-                                                                <option value="-1" {if $childAge == -1}selected{/if}>{l s='Select 1' mod='wkroomsearchblock'}</option>
-                                                                <option value="0" {if $childAge == 0}selected{/if}>{l s='Under 1' mod='wkroomsearchblock'}</option>
-                                                                {for $age=1 to ($max_child_age-1)}
-                                                                    <option value="{$age|escape:'htmlall':'UTF-8'}" {if $childAge == $age}selected{/if}>{$age|escape:'htmlall':'UTF-8'}</option>
-                                                                {/for}
-                                                            </select>
-                                                        </div>
-                                                    {/foreach}
-                                                {/if}
+                                        <div class="row">
+                                            <div class="form-group children_age_info_block col-sm-12" {if isset($occupancy['child_ages']) && $occupancy['child_ages']}style="display:block;"{/if}>
+                                                <label>{l s='All Children' mod='wkroomsearchblock'}</label>
+                                                <div class="children_ages">
+                                                    {if isset($occupancy['child_ages']) && $occupancy['child_ages']}
+                                                        {foreach $occupancy['child_ages'] as $childAge}
+                                                            <div>
+                                                                <select class="guest_child_age room_occupancies" name="occupancy[{$key|escape:'htmlall':'UTF-8'}][child_ages][]">
+                                                                    <option value="-1" {if $childAge == -1}selected{/if}>{l s='Select 1' mod='wkroomsearchblock'}</option>
+                                                                    <option value="0" {if $childAge == 0}selected{/if}>{l s='Under 1' mod='wkroomsearchblock'}</option>
+                                                                    {for $age=1 to ($max_child_age-1)}
+                                                                        <option value="{$age|escape:'htmlall':'UTF-8'}" {if $childAge == $age}selected{/if}>{$age|escape:'htmlall':'UTF-8'}</option>
+                                                                    {/for}
+                                                                </select>
+                                                            </div>
+                                                        {/foreach}
+                                                    {/if}
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -136,51 +141,56 @@
                             <div class="occupancy-room-block">
                                 <div class="occupancy_info_head"><span class="room_num_wrapper">{l s='Room - 1' mod='wkroomsearchblock'}</span></div>
                                 <div class="occupancy_info_block" occ_block_index="0">
-                                    <div class="form-group occupancy_count_block">
-                                        <label>{l s='Adults' mod='wkroomsearchblock'}</label>
-                                        <div>
-                                            <input type="hidden" class="num_occupancy num_adults room_occupancies" name="occupancy[0][adults]" value="1">
-                                            <div class="occupancy_count pull-left">
-                                                <span>1</span>
-                                            </div>
-                                            <div class="qty_direction pull-left">
-                                                <a href="#" data-field-qty="qty" class="btn btn-default occupancy_quantity_up">
-                                                    <span>
-                                                        <i class="icon-plus"></i>
-                                                    </span>
-                                                </a>
-                                                <a href="#" data-field-qty="qty" class="btn btn-default occupancy_quantity_down">
-                                                    <span>
-                                                        <i class="icon-minus"></i>
-                                                    </span>
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="form-group occupancy_count_block">
-                                        <label>{l s='Children' mod='wkroomsearchblock'} <p class="label-desc-txt">({l s='Below' mod='wkroomsearchblock'}  {$max_child_age|escape:'htmlall':'UTF-8'} {l s='years' mod='wkroomsearchblock'})</p></label>
-                                        <div>
-                                            <input type="hidden" class="num_occupancy num_children room_occupancies" name="occupancy[0][children]" value="0">
-                                            <div class="occupancy_count pull-left">
-                                                <span>0</span>
-                                            </div>
-                                            <div class="qty_direction pull-left">
-                                                <a href="#" data-field-qty="qty" class="btn btn-default occupancy_quantity_up">
-                                                    <span>
-                                                        <i class="icon-plus"></i>
-                                                    </span>
-                                                </a>
-                                                <a href="#" data-field-qty="qty" class="btn btn-default occupancy_quantity_down">
-                                                    <span>
-                                                        <i class="icon-minus"></i>
-                                                    </span>
-                                                </a>
+                                    <div class="row">
+                                        <div class="form-group occupancy_count_block col-sm-5 col-xs-6">
+                                            <label>{l s='Adults' mod='wkroomsearchblock'}</label>
+                                            <div>
+                                                <input type="hidden" class="num_occupancy num_adults room_occupancies" name="occupancy[0][adults]" value="1">
+                                                <div class="occupancy_count pull-left">
+                                                    <span>1</span>
+                                                </div>
+                                                <div class="qty_direction pull-left">
+                                                    <a href="#" data-field-qty="qty" class="btn btn-default occupancy_quantity_up">
+                                                        <span>
+                                                            <i class="icon-plus"></i>
+                                                        </span>
+                                                    </a>
+                                                    <a href="#" data-field-qty="qty" class="btn btn-default occupancy_quantity_down">
+                                                        <span>
+                                                            <i class="icon-minus"></i>
+                                                        </span>
+                                                    </a>
+                                                </div>
                                             </div>
                                         </div>
+                                        <div class="form-group occupancy_count_block col-sm-7 col-xs-6">
+                                            <label>{l s='Children' mod='wkroomsearchblock'}</label>
+                                            <div class="clearfix">
+                                                <input type="hidden" class="num_occupancy num_children room_occupancies" name="occupancy[0][children]" value="0">
+                                                <div class="occupancy_count pull-left">
+                                                    <span>0</span>
+                                                </div>
+                                                <div class="qty_direction pull-left">
+                                                    <a href="#" data-field-qty="qty" class="btn btn-default occupancy_quantity_up">
+                                                        <span>
+                                                            <i class="icon-plus"></i>
+                                                        </span>
+                                                    </a>
+                                                    <a href="#" data-field-qty="qty" class="btn btn-default occupancy_quantity_down">
+                                                        <span>
+                                                            <i class="icon-minus"></i>
+                                                        </span>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                            <p class="label-desc-txt">({l s='Below' mod='wkroomsearchblock'}  {$max_child_age|escape:'htmlall':'UTF-8'} {l s='years' mod='wkroomsearchblock'})</p>
+                                        </div>
                                     </div>
-                                    <div class="form-group children_age_info_block">
-                                        <label>{l s='All Children' mod='wkroomsearchblock'}</label>
-                                        <div class="children_ages">
+                                    <div class="row">
+                                        <div class="form-group children_age_info_block col-sm-12">
+                                            <label>{l s='All Children' mod='wkroomsearchblock'}</label>
+                                            <div class="children_ages">
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

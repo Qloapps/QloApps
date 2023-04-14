@@ -35,6 +35,11 @@
     .booking_occupancy_wrapper .children_age_info_block label {
       font-size: 12px;
       color: #777777;}
+      .booking_occupancy_wrapper .children_age_info_block .children_ages{
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        justify-content: space-between;}
     .booking_occupancy_wrapper .label-desc-txt {
       font-size: 12px;
       color: #777777;}
@@ -97,7 +102,6 @@
       height: 37px;
       border-radius: 4px;
       padding: 3px 5px;
-      margin-bottom: 10px;
       font-size: 12px;
       color: #333;
       border: 1px solid #E1E3E7;

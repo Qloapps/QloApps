@@ -9145,3 +9145,10 @@ a.open_rooms_extra_services_panel {
   height: 10px;
 }
 /* skeleton loading animations - end */
+
+
+a.link {
+  font-weight: 700;
+  color: #0000ff;
+  text-decoration: none;
+}

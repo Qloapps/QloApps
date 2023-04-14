@@ -57,6 +57,10 @@ class OrderReturnControllerCore extends FrontController
                     ) {
                         $isCanceled = true;
                     }
+                    $voucher = '';
+                    if (Validate::isLoadedObject($objCartRule = new CartRule($objOrderReturn->id_return_type))) {
+                        $voucher = $objCartRule->name[$this->context->language->id];
+                    }
                     $this->context->smarty->assign(
                         array (
                             'orderReturnInfo' => (array)$objOrderReturn,
@@ -67,6 +71,7 @@ class OrderReturnControllerCore extends FrontController
                             'currentStateInfo' => (array) new OrderReturnState($objOrderReturn->state,
                             $this->context->language->id),
                             'isRefundCompleted' => $objOrderReturn->hasBeenCompleted(),
+                            'voucher' => $voucher,
                         )
                     );
 

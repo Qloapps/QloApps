@@ -1066,7 +1066,7 @@
 					<table class="table table-striped">
 						<thead>
 							<tr>
-								<th class="text-left">{l s='Refund ID'}</th>
+								<th class="text-left">{l s='Request ID'}</th>
 								<th class="text-center">{l s='Total Rooms'}</th>
 								<th class="text-left">{l s='Status'}</th>
 								<th class="text-center">{l s='Requested Date'}</th>
