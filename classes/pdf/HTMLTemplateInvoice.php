@@ -324,8 +324,6 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
                 $room_extra_demands = array();
                 $room_additinal_services = array();
 
-                $totalConvenienceFeeTE = 0;
-                $totalConvenienceFeeTI = 0;
                 $totalDemandsPriceTE = 0;
                 $totalDemandsPriceTI = 0;
                 foreach ($order_details as $type_key => $type_value) {
@@ -504,32 +502,7 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
                                     1,
                                     0
                                 );
-                                $totalConvenienceFeeTI += $cart_htl_data[$type_key]['date_diff'][$date_join]['convenience_fee_ti'] = $objRoomTypeServiceProductOrderDetail->getroomTypeServiceProducts(
-                                    $order_obj->id,
-                                    0,
-                                    0,
-                                    $data_v['id_product'],
-                                    $data_v['date_from'],
-                                    $data_v['date_to'],
-                                    $data_v['id_room'],
-                                    1,
-                                    1,
-                                    1,
-                                    Product::PRICE_ADDITION_TYPE_INDEPENDENT
-                                );
-                                $totalConvenienceFeeTE += $cart_htl_data[$type_key]['date_diff'][$date_join]['convenience_fee_te'] = $objRoomTypeServiceProductOrderDetail->getroomTypeServiceProducts(
-                                    $order_obj->id,
-                                    0,
-                                    0,
-                                    $data_v['id_product'],
-                                    $data_v['date_from'],
-                                    $data_v['date_to'],
-                                    $data_v['id_room'],
-                                    1,
-                                    0,
-                                    1,
-                                    Product::PRICE_ADDITION_TYPE_INDEPENDENT
-                                );
+
                                 $cart_htl_data[$type_key]['date_diff'][$date_join]['additional_services_price_auto_add_ti'] = $objRoomTypeServiceProductOrderDetail->getroomTypeServiceProducts(
                                     $order_obj->id,
                                     0,
@@ -636,16 +609,16 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
                 // enter extra demands price to the footer total details
                 $footer['total_extra_demands_ti'] = $totalDemandsPriceTI;
                 $footer['total_extra_demands_te'] = $totalDemandsPriceTE;
-                $footer['total_convenience_fee_ti'] = $totalConvenienceFeeTI;
-                $footer['total_convenience_fee_te'] = $totalConvenienceFeeTE;
             }
         }
-        $footer['room_price_tax_excl'] = $this->order->getTotalProductsWithoutTaxes(false, true);
-        $footer['room_price_tax_incl'] = $this->order->getTotalProductsWithTaxes(false, true);
-        $footer['service_products_price_tax_excl'] = $this->order->getTotalProductsWithoutTaxes(false, false, Product::SERVICE_PRODUCT_WITHOUT_ROOMTYPE);
-        $footer['service_products_price_tax_incl'] = $this->order->getTotalProductsWithTaxes(false, false, Product::SERVICE_PRODUCT_WITHOUT_ROOMTYPE);
-        $footer['additional_service_price_tax_excl'] = $this->order->getTotalProductsWithoutTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE) + $totalDemandsPriceTE;
-        $footer['additional_service_price_tax_incl'] = $this->order->getTotalProductsWithTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE) + $totalDemandsPriceTI;
+        $footer['room_price_tax_excl'] = $this->order->getTotalProductsWithoutTaxes(false, true) + $this->order->getTotalProductsWithoutTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE, 1, Product::PRICE_ADDITION_TYPE_WITH_ROOM);
+        $footer['room_price_tax_incl'] = $this->order->getTotalProductsWithTaxes(false, true) + $this->order->getTotalProductsWithoutTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE, 1, Product::PRICE_ADDITION_TYPE_WITH_ROOM);
+        // $footer['service_products_price_tax_excl'] = $this->order->getTotalProductsWithoutTaxes(false, false, Product::SERVICE_PRODUCT_WITHOUT_ROOMTYPE);
+        // $footer['service_products_price_tax_incl'] = $this->order->getTotalProductsWithTaxes(false, false, Product::SERVICE_PRODUCT_WITHOUT_ROOMTYPE);
+        $footer['additional_service_price_tax_excl'] = $this->order->getTotalProductsWithoutTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE, 0) + $totalDemandsPriceTE;
+        $footer['additional_service_price_tax_incl'] = $this->order->getTotalProductsWithTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE, 0) + $totalDemandsPriceTI;
+        $footer['total_convenience_fee_te'] = $this->order->getTotalProductsWithoutTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE, 1, Product::PRICE_ADDITION_TYPE_INDEPENDENT);
+        $footer['total_convenience_fee_ti'] = $this->order->getTotalProductsWithTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE, 1, Product::PRICE_ADDITION_TYPE_INDEPENDENT);
         $data = array(
             'cart_htl_data' => $cart_htl_data,
             'service_product_data' => $service_product_data,
