@@ -1255,7 +1255,6 @@ $(document).ready(function() {
                     $(that).closest('.service_product_action_block').find('input.service_product_qty').val(1);
                     $(that).closest('.service_product_action_block').find('.qty_count span').text(1);
                     if (result.msg) {
-                        debugger
                         if (result.add) {
                             showSuccessMessage(result.msg);
                         } else {
