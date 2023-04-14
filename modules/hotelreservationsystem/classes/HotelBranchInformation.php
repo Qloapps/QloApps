@@ -780,13 +780,17 @@ class HotelBranchInformation extends ObjectModel
         } else {
             $idsHotel = array($idsHotel);
         }
+        $restriction = ' AND ';
+        if (count($idsHotel)) {
+            if ($alias) {
+                $alias .= '.';
+            }
 
-        if ($alias) {
-            $alias .= '.';
+            $identifier = "`$identifier`";
+            $restriction .= $alias.$identifier.' IN ('.implode(', ', $idsHotel).') ';
+        } else {
+            $restriction .= 1;
         }
-
-        $identifier = "`$identifier`";
-        $restriction = ' AND '.$alias.$identifier.' IN ('.implode(', ', $idsHotel).') ';
 
         return $restriction;
     }

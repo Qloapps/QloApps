@@ -18,7 +18,8 @@
  */
 
 function pie_chart_occupancy(widget_name, chart_details) {
-    nv.addGraph(function() {
+    $('#availablePieChart svg').html('');
+    occupacygraph = nv.addGraph(function() {
         var chart = nv.models.pieChart()
             .x(function(d) { return d.label })
             .y(function(d) { return d.value })
