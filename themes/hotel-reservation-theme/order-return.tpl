@@ -148,22 +148,22 @@
 			{if $orderReturnInfo['return_type'] == OrderReturn::RETURN_TYPE_CART_RULE}
 				<div class="form-group row">
 					<div class="col-md-2 col-sm-3">
-						<strong>{l s='Voucher ID:' mod='hotelreservationsystem'}</strong>
+						<strong>{l s='Voucher' mod='hotelreservationsystem'}</strong>
 					</div>
 					<div class="col-sm-9 col-md-10">
-						<a class="btn btn-default btn-sm" href="{$link->getPageLink('discount')}" target="_blank">
-							{l s='View your vouchers'}
+						<a class="link" href="{$link->getPageLink('discount')}" target="_blank">
+							{$voucher|escape:'html':'UTF-8'}
 						</a>
 					</div>
 				</div>
 			{elseif $orderReturnInfo['return_type'] == OrderReturn::RETURN_TYPE_ORDER_SLIP}
 				<div class="form-group row">
 					<div class="col-md-2 col-sm-3">
-						<strong>{l s='Credit Slip:' mod='hotelreservationsystem'}</strong>
+						<strong>{l s='Credit Slip' mod='hotelreservationsystem'}</strong>
 					</div>
 					<div class="col-sm-9 col-md-10">
-						<a class="btn btn-default btn-sm" href="{$link->getPageLink('order-slip')}">
-							{l s='View your creadit slips' mod='hotelreservationsystem'}
+						<a class="link" href="{$link->getPageLink('order-slip')}" target="_blank">
+							#{Configuration::get('PS_CREDIT_SLIP_PREFIX', $lang_id)}{$orderReturnInfo['id_return_type']|string_format:"%06d"}
 						</a>
 					</div>
 				</div>
