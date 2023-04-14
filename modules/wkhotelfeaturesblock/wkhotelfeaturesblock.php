@@ -115,15 +115,24 @@ class WkHotelFeaturesBlock extends Module
     public function install()
     {
         $objHotelFeaturesBlockDb = new WkHotelFeaturesBlockDb();
-        $objFeaturesData = new WkHotelFeaturesData();
         if (!parent::install()
             || !$objHotelFeaturesBlockDb->createTables()
             || !$this->registerModuleHooks()
             || !$this->callInstallTab()
-            || !$objFeaturesData->insertModuleDemoData()
         ) {
             return false;
         }
+
+        // if module should create demo data during installation
+        if (isset($this->populateData) && $this->populateData) {
+            $objHotelFeaturesData = new WkHotelHotelFeaturesData();
+            if (!$objHotelFeaturesData->insertModuleDemoData()) {
+                return false;
+            }
+        } else {
+            Tools::deleteDirectory($this->local_path.'views/img/dummy_img');
+        }
+
         return true;
     }
 

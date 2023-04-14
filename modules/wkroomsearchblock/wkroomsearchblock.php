@@ -47,42 +47,42 @@ class WkRoomSearchBlock extends Module
     {
         $controller = Tools::getValue('controller');
         // apply assets globally for all pages of search panel
-        if ('category' == $controller
-            || 'index' == $controller
-            || 'product' == $controller
-        ) {
+        if ('category' == $controller || 'index' == $controller || 'product' == $controller ) {
+            $objHotelBranchInformation = new HotelBranchInformation();
+            $hotelBranchesInfo = $objHotelBranchInformation->hotelBranchesInfo(0, 1);
+            if (is_array($hotelBranchesInfo) && count($hotelBranchesInfo)) {
+                $this->context->controller->addCSS($this->_path.'/views/css/wk-global-search.css');
+                $this->context->controller->addJS($this->_path.'/views/js/wk-room-search-block.js');
 
-            $this->context->controller->addCSS($this->_path.'/views/css/wk-global-search.css');
-            $this->context->controller->addJS($this->_path.'/views/js/wk-room-search-block.js');
-
-            Media::addJsDef(
-                array (
-                    'autocomplete_search_url' => $this->context->link->getModuleLink(
-                        'wkroomsearchblock',
-                        'autocompletesearch'
-                    ),
-                    'no_results_found_cond' => $this->l('No results found for this search', false, true),
-                    'hotel_name_cond' => $this->l('Please select a hotel name', false, true),
-                    'check_in_time_cond' => $this->l('Please enter Check In time', false, true),
-                    'check_out_time_cond' => $this->l('Please enter Check Out time', false, true),
-                    'less_checkin_date' => $this->l('Check In date can not be before current date.', false, true),
-                    'more_checkout_date' => $this->l('Check Out date must be greater than Check In date.', false, true),
-                    'select_htl_txt' => $this->l('Select Hotel', false, true),
-                    'select_age_txt' => $this->l('Select age', false, true),
-                    'under_1_age' => $this->l('Under 1', false, true),
-                    'room_txt' => $this->l('Room', false, true),
-                    'rooms_txt' => $this->l('Rooms', false, true),
-                    'remove_txt' => $this->l('Remove', false, true),
-                    'adult_txt' => $this->l('Adult', false, true),
-                    'adults_txt' => $this->l('Adults', false, true),
-                    'child_txt' => $this->l('Child', false, true),
-                    'children_txt' => $this->l('Children', false, true),
-                    'below_txt' => $this->l('Below', false, true),
-                    'years_txt' => $this->l('years', false, true),
-                    'all_children_txt' => $this->l('All Children', false, true),
-                    'invalid_occupancy_txt' => $this->l('Invalid occupancy(adults/children) found.', false, true),
-                )
-            );
+                Media::addJsDef(
+                    array (
+                        'autocomplete_search_url' => $this->context->link->getModuleLink(
+                            'wkroomsearchblock',
+                            'autocompletesearch'
+                        ),
+                        'no_results_found_cond' => $this->l('No results found for this search', false, true),
+                        'hotel_name_cond' => $this->l('Please select a hotel name', false, true),
+                        'check_in_time_cond' => $this->l('Please enter Check In time', false, true),
+                        'check_out_time_cond' => $this->l('Please enter Check Out time', false, true),
+                        'less_checkin_date' => $this->l('Check In date can not be before current date.', false, true),
+                        'more_checkout_date' => $this->l('Check Out date must be greater than Check In date.', false, true),
+                        'select_htl_txt' => $this->l('Select Hotel', false, true),
+                        'select_age_txt' => $this->l('Select age', false, true),
+                        'under_1_age' => $this->l('Under 1', false, true),
+                        'room_txt' => $this->l('Room', false, true),
+                        'rooms_txt' => $this->l('Rooms', false, true),
+                        'remove_txt' => $this->l('Remove', false, true),
+                        'adult_txt' => $this->l('Adult', false, true),
+                        'adults_txt' => $this->l('Adults', false, true),
+                        'child_txt' => $this->l('Child', false, true),
+                        'children_txt' => $this->l('Children', false, true),
+                        'below_txt' => $this->l('Below', false, true),
+                        'years_txt' => $this->l('years', false, true),
+                        'all_children_txt' => $this->l('All Children', false, true),
+                        'invalid_occupancy_txt' => $this->l('Invalid occupancy(adults/children) found.', false, true),
+                    )
+                );
+            }
         }
 
         // apply assets as per pages
