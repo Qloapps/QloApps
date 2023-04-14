@@ -39,7 +39,7 @@ class HotelRoomType extends ObjectModel
         'fields' => array(
             'id_product' => array('type' => self::TYPE_INT, 'validate' => 'isInt'),
             'id_hotel' => array('type' => self::TYPE_INT, 'validate' => 'isInt'),
-            'adults' => array('type' => self::TYPE_INT, 'validate' => 'isInt'),
+            'adults' => array('type' => self::TYPE_INT, 'validate' => 'isInt', 'default' => 2),
             'children' => array('type' => self::TYPE_INT, 'validate' => 'isInt'),
             'max_adults' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedInt', 'default' => 2),
             'max_children' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedInt'),
