@@ -147,7 +147,7 @@ class WkCustomNavigationLink extends ObjectModel
         return (bool) Db::getInstance()->execute($sql);
     }
 
-    public function insertDemoData($qloInstallData = 0)
+    public function insertDemoData($populateData = null)
     {
         //insert home link to the list
         $languages = Language::getLanguages(false);
@@ -166,8 +166,8 @@ class WkCustomNavigationLink extends ObjectModel
 
         // enter modules links
         $modsElems = array();
-        if ($qloInstallData) {
-            // if module is installing or resetting
+        // if module is installing or resetting
+        if (is_null($populateData)) {
             if (Module::isEnabled('wkabouthotelblock')) {
                 $modsElems['Interior'] = 'hotelInteriorBlock';
             }
@@ -181,12 +181,15 @@ class WkCustomNavigationLink extends ObjectModel
                 $modsElems['Testimonials'] = 'hotelTestimonialBlock';
             }
         } else {
-            // if QloApps is installing then enter modules links directly
-            $modsElems['Interior'] = 'hotelInteriorBlock';
-            $modsElems['Amenities'] = 'hotelAmenitiesBlock';
-            $modsElems['Rooms'] = 'hotelRoomsBlock';
-            $modsElems['Testimonials'] = 'hotelTestimonialBlock';
+            // if QloApps is installing and $populateData = 1 then enter modules links directly
+            if ($populateData) {
+                $modsElems['Interior'] = 'hotelInteriorBlock';
+                $modsElems['Amenities'] = 'hotelAmenitiesBlock';
+                $modsElems['Rooms'] = 'hotelRoomsBlock';
+                $modsElems['Testimonials'] = 'hotelTestimonialBlock';
+            }
         }
+
         if ($modsElems) {
             $indexLink = Context::getContext()->shop->getBaseURI();
             foreach ($modsElems as $name => $modElm) {

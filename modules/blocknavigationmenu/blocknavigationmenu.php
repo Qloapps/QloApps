@@ -112,7 +112,7 @@ class blocknavigationmenu extends Module
             || !$this->callInstallTab()
             || !$this->registerModuleHooks()
             || !Configuration::updateValue('WK_SHOW_FOOTER_NAVIGATION_BLOCK', 1)
-            || !$objCustomNavigationLink->insertDemoData()
+            || !$objCustomNavigationLink->insertDemoData(isset($this->populateData) ? $this->populateData : null)
         ) {
             return false;
         }

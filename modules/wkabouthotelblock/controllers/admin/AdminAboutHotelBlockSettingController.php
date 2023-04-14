@@ -36,14 +36,6 @@ class AdminAboutHotelBlockSettingController extends ModuleAdminController
                 'title' =>  $this->l('Hotel Interior Description'),
                 'icon' =>   'icon-cogs',
                 'fields' => array(
-                    'HOTEL_INTERIOR_BLOCK_NAV_LINK' => array(
-                        'title' => $this->l('Show link at navigation'),
-                        'hint' => $this->l('Enable, if you want to display a link at navigation menu for the interior block at home page.'),
-                        'validation' => 'isBool',
-                        'cast' => 'intval',
-                        'type' => 'bool',
-                        'required' => true
-                    ),
                     'HOTEL_INTERIOR_HEADING' => array(
                         'title' => $this->l('Interior Block Title'),
                         'type' => 'textLang',

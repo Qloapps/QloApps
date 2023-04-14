@@ -145,7 +145,6 @@ class WkHotelInteriorImage extends ObjectModel
             $HOTEL_INTERIOR_HEADING[$lang['id_lang']] = 'Interior';
             $HOTEL_INTERIOR_DESCRIPTION[$lang['id_lang']] = 'Families travelling with kids will find Amboseli national park a safari destination matched to no other, with less tourist traffic, breathtaking open space.';
         }
-        Configuration::updateValue('HOTEL_INTERIOR_BLOCK_NAV_LINK', 1);
         // update global configuration values in multilang
         Configuration::updateValue('HOTEL_INTERIOR_HEADING', $HOTEL_INTERIOR_HEADING);
         Configuration::updateValue('HOTEL_INTERIOR_DESCRIPTION', $HOTEL_INTERIOR_DESCRIPTION);
