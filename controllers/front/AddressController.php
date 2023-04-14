@@ -209,7 +209,7 @@ class AddressControllerCore extends FrontController
                 $mod = Tools::getValue('mod');
                 Tools::redirect('index.php?controller='.$back.($mod ? '&back='.$mod : ''));
             } else {
-                Tools::redirect('index.php?controller=address');
+                Tools::redirect('index.php?controller=address&updated=1');
             }
         }
         $this->errors[] = Tools::displayError('An error occurred while updating your address.');

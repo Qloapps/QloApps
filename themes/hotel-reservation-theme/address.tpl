@@ -23,6 +23,11 @@
 *  International Registered Trademark & Property of PrestaShop SA
 *}
 {capture name=path}{l s='Your address'}{/capture}
+	{if isset($smarty.get.updated) && $smarty.get.updated}
+		<p class="alert alert-success">
+			{l s='Your address has been successfully updated.'}
+		</p>
+	{/if}
 <div class="box">
 	<h1 class="page-subheading">{l s='Your address'}</h1>
 	<p class="info-title">
