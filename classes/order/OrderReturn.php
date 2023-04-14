@@ -224,7 +224,9 @@ class OrderReturnCore extends ObjectModel
                         }
                     }
 
-                    if ($roomSelectedServices = $objRoomTypeServiceProductOrderDetail->getSelectedServicesForRoom($bookingRow['id_htl_booking'])) {
+                    if ($roomSelectedServices = $objRoomTypeServiceProductOrderDetail->getSelectedServicesForRoom(
+                        $bookingRow['id_htl_booking']
+                    )) {
                         if (count($roomSelectedServices['additional_services'])) {
                             foreach ($roomSelectedServices['additional_services'] as $service) {
                                 if ($service['total_price_tax_incl'] > 0) {

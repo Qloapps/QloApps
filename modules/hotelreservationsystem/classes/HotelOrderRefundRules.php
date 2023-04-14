@@ -157,6 +157,7 @@ class HotelOrderRefundRules extends ObjectModel
                         1,
                         1
                     );
+                    $paidAmount = $objHtlBooking->total_paid_amount + $totalDemandsPrice + $totalServicesPrice;
 
                     if ($refundRules = $objHtlRefundRules->getHotelRefundRules($objHtlBooking->id_hotel, 0, 1)) {
                         $orderCurrency = $objOrder->id_currency;
@@ -175,7 +176,6 @@ class HotelOrderRefundRules extends ObjectModel
                         $ruleApplied = false;
                         foreach ($refundRules as $refRule) {
                             if ($daysBeforeCancel >= $refRule['days']) {
-                                $paidAmount = $objHtlBooking->total_paid_amount + $totalDemandsPrice + $totalServicesPrice;
                                 if ($objOrder->is_advance_payment) {
                                     $refundValue = $refRule['deduction_value_adv_pay'];
                                 } else {
@@ -218,12 +218,12 @@ class HotelOrderRefundRules extends ObjectModel
                         }
 
                         if (!$ruleApplied) {
-                            $bookingCancellationDetail['cancelation_charge'] = ($objHtlBooking->total_price_tax_incl + $totalDemandsPrice);
+                            $bookingCancellationDetail['cancelation_charge'] = $paidAmount;
                             $bookingCancellationDetail['reduction_type'] = HotelOrderRefundRules::WK_REFUND_RULE_PAYMENT_TYPE_PERCENTAGE;
                             $bookingCancellationDetail['reduction_value'] = 100;
                         }
                     } else {
-                        $bookingCancellationDetail['cancelation_charge'] = ($objHtlBooking->total_price_tax_incl + $totalDemandsPrice);
+                        $bookingCancellationDetail['cancelation_charge'] = $paidAmount;
                         $bookingCancellationDetail['reduction_type'] = HotelOrderRefundRules::WK_REFUND_RULE_PAYMENT_TYPE_PERCENTAGE;
                         $bookingCancellationDetail['reduction_value'] = 100;
                     }
