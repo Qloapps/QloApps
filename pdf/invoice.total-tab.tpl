@@ -38,7 +38,7 @@
 				{l s='Extra Services Cost (tax excl.)' pdf='true'}
 			</td>
 			<td class="white" width="30%">
-				{displayPrice currency=$order->id_currency price=($footer.additional_service_price_tax_excl - $footer.total_convenience_fee_te)}
+				{displayPrice currency=$order->id_currency price=($footer.additional_service_price_tax_excl)}
 			</td>
 		</tr>
 	{/if}
