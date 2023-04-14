@@ -1098,11 +1098,16 @@ class OrderCore extends ObjectModel
      *
      * @return Product total with taxes
      */
-    public function getTotalProductsWithTaxes($products = false, $bookingProducts = null, $product_service_type = null)
-    {
+    public function getTotalProductsWithTaxes(
+        $products = false,
+        $bookingProducts = null,
+        $product_service_type = null,
+        $product_auto_add = null,
+        $product_price_addition_type = null
+    ) {
         /* Retro-compatibility (now set directly on the validateOrder() method) */
         if (!$products) {
-            $products = $this->getProductsDetail($bookingProducts, $product_service_type);
+            $products = $this->getProductsDetail($bookingProducts, $product_service_type, $product_auto_add, $product_price_addition_type);
         }
 
         $return = 0;
