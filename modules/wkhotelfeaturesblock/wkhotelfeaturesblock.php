@@ -125,7 +125,7 @@ class WkHotelFeaturesBlock extends Module
 
         // if module should create demo data during installation
         if (isset($this->populateData) && $this->populateData) {
-            $objHotelFeaturesData = new WkHotelHotelFeaturesData();
+            $objHotelFeaturesData = new WkHotelFeaturesData();
             if (!$objHotelFeaturesData->insertModuleDemoData()) {
                 return false;
             }
