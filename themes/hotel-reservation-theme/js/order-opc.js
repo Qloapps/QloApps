@@ -512,7 +512,7 @@ $(document).ready(function()
 			if (qtyfield.val() != qtyfield.data('max_quantity')) {
 				qtyfield.trigger('focusout');
 			} else {
-				showSuccessMessage(txtMaxQuantityAdded);
+				showErrorMessage(txtMaxQuantityAdded);
 			}
         } else {
 			qtyfield.val(newQuantity).trigger('focusout');
