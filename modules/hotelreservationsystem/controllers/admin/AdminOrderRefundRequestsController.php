@@ -254,7 +254,8 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
                     'refundStatuses' => $refundStatuses,
                     'isRefundCompleted' => $objOrderReturn->hasBeenCompleted(),
                     'paymentMethods' => $paymentMethods,
-                    'name_controller' => Tools::getValue('controller')
+                    'name_controller' => Tools::getValue('controller'),
+                    'info_icon_path' => $this->context->link->getMediaLink(_MODULE_DIR_.'hotelreservationsystem/views/img/Slices/icon-info.svg')
                 )
             );
 
@@ -627,6 +628,10 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
     public function setMedia()
     {
         parent::setMedia();
+
+        $this->addJqueryUI('ui.tooltip', 'base', true);
+
         $this->addJs(_MODULE_DIR_.$this->module->name.'/views/js/admin/wk_refund_request.js');
+        $this->addCSS(_MODULE_DIR_.$this->module->name.'/views/css/admin/wk_refund_request.css');
     }
 }
