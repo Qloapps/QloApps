@@ -1045,7 +1045,7 @@ abstract class PaymentModuleCore extends Module
 
                         // total room price
                         $room_price_tax_excl = $order->getTotalProductsWithoutTaxes(false, true) + $order->getTotalProductsWithoutTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE, 1, Product::PRICE_ADDITION_TYPE_WITH_ROOM);
-                        $room_price_tax_incl = $order->getTotalProductsWithTaxes(false, true) + $order->getTotalProductsWithoutTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE, 1, Product::PRICE_ADDITION_TYPE_WITH_ROOM);
+                        $room_price_tax_incl = $order->getTotalProductsWithTaxes(false, true) + $order->getTotalProductsWithTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE, 1, Product::PRICE_ADDITION_TYPE_WITH_ROOM);
                         $room_tax = ($room_price_tax_incl - $room_price_tax_excl);
 
                         // extra services
