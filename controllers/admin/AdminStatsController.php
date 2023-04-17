@@ -1686,8 +1686,8 @@ class AdminStatsControllerCore extends AdminStatsTabController
             WHERE o.`valid` = 1 AND hbi.`active` = 1 AND hbd.`is_refunded` = 0
             AND o.`invoice_date` BETWEEN "'.pSQL($dateFrom).' 00:00:00" AND "'.pSQL($dateTo).' 23:59:59"
             AND o.`source` = "'.pSQL(Configuration::get('PS_SHOP_DOMAIN')).'"'.
-            (!is_null($idHotel) ? HotelBranchInformation::addHotelRestriction($idHotel, 'hbd') : '').
-            'GROUP BY o.`id_order`
+            (!is_null($idHotel) ? HotelBranchInformation::addHotelRestriction($idHotel, 'hbd') : '').'
+            GROUP BY o.`id_order`
         ) AS t';
         $directRevenue = (float) Db::getInstance()->getValue($sql);
 

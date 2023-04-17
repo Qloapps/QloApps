@@ -138,8 +138,6 @@ class WkHotelFeaturesData extends ObjectModel
     // enter the default demo data of the module
     public function insertModuleDemoData()
     {
-        Configuration::updateValue('HOTEL_AMENITIES_BLOCK_NAV_LINK', 1);
-
         $languages = Language::getLanguages(false);
         $HOTEL_AMENITIES_HEADING = array();
         $HOTEL_AMENITIES_DESCRIPTION = array();

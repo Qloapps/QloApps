@@ -107,15 +107,24 @@ class WkTestimonialBlock extends Module
     public function install()
     {
         $objTestimonialBlockDb = new WkTestimonialBlockDb();
-        $objTestimonialData = new WkHotelTestimonialData();
         if (!parent::install()
             || !$objTestimonialBlockDb->createTables()
             || !$this->registerModuleHooks()
             || !$this->callInstallTab()
-            || !$objTestimonialData->insertModuleDemoData()
         ) {
             return false;
         }
+
+        // if module should create demo data during installation
+        if (isset($this->populateData) && $this->populateData) {
+            $objTestimonialData = new WkHotelTestimonialData();
+            if (!$objTestimonialData->insertModuleDemoData()) {
+                return false;
+            }
+        } else {
+            Tools::deleteDirectory($this->local_path.'views/img/dummy_img');
+        }
+
         return true;
     }
 

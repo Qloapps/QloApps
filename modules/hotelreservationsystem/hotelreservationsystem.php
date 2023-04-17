@@ -598,16 +598,15 @@ class HotelReservationSystem extends Module
             || !$this->registerModuleHooks()
             || !$this->callInstallTab()
             || !$objHtlHelper->insertDefaultHotelEntries()
+            || !$objHtlHelper->createHotelRoomDefaultFeatures()
+            || !$objHtlHelper->insertHotelCommonFeatures()
         ) {
             return false;
         }
 
         // if module should be populated while installation
         if (isset($this->populateData) && $this->populateData) {
-            if (!$objHtlHelper->createHotelRoomDefaultFeatures()
-                || !$objHtlHelper->insertHotelCommonFeatures()
-                || !$objHtlHelper->createDummyDataForProject()
-            ) {
+            if (!$objHtlHelper->createDummyDataForProject()) {
                 return false;
             }
         }

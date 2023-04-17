@@ -34,14 +34,6 @@ class AdminHotelRoomModuleSettingController extends ModuleAdminController
                 'title' =>    $this->l('Hotel Room Display Setting'),
                 'icon' =>   'icon-cogs',
                 'fields' =>    array(
-                    'HOTEL_ROOM_BLOCK_NAV_LINK' => array(
-                        'title' => $this->l('Show link at navigation'),
-                        'hint' => $this->l('Enable, if you want to display a link at navigation menu for the hotel rooms block at home page.'),
-                        'validation' => 'isBool',
-                        'cast' => 'intval',
-                        'type' => 'bool',
-                        'required' => true
-                    ),
                     'HOTEL_ROOM_DISPLAY_HEADING' => array(
                         'title' => $this->l('Hotel Room Block Title'),
                         'type' => 'textLang',
