@@ -348,32 +348,31 @@ class OrderConfirmationControllerCore extends FrontController
                                         1,
                                         Product::PRICE_ADDITION_TYPE_WITH_ROOM
                                     );
-                                }
-                            } else if ($product->service_product_type == Product::SERVICE_PRODUCT_WITH_ROOMTYPE) {
-                                if ($product->auto_add_to_cart && $product->price_addition_type == Product::PRICE_ADDITION_TYPE_INDEPENDENT) {
                                     $orderTotalInfo['total_convenience_fee_ti'] += $objRoomTypeServiceProductOrderDetail->getroomTypeServiceProducts(
                                         $idOrder,
+                                        0,
+                                        0,
                                         $type_value['product_id'],
-                                        0,
-                                        0,
-                                        0,
-                                        0,
-                                        0,
+                                        $data_v['date_from'],
+                                        $data_v['date_to'],
+                                        $data_v['id_room'],
                                         1,
                                         1,
-                                        1
+                                        1,
+                                        Product::PRICE_ADDITION_TYPE_INDEPENDENT
                                     );
                                     $orderTotalInfo['total_convenience_fee_te'] += $objRoomTypeServiceProductOrderDetail->getroomTypeServiceProducts(
                                         $idOrder,
+                                        0,
+                                        0,
                                         $type_value['product_id'],
-                                        0,
-                                        0,
-                                        0,
-                                        0,
-                                        0,
+                                        $data_v['date_from'],
+                                        $data_v['date_to'],
+                                        $data_v['id_room'],
                                         1,
                                         0,
-                                        1
+                                        1,
+                                        Product::PRICE_ADDITION_TYPE_INDEPENDENT
                                     );
                                 }
                             } else if ($product->service_product_type == Product::SERVICE_PRODUCT_WITHOUT_ROOMTYPE) {
