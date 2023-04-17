@@ -3226,7 +3226,6 @@ class AdminProductsControllerCore extends AdminController
 
         $roomsInfo = Tools::getValue('rooms_info'); // since $_POST['rooms_info'] has changed
         if (is_array($roomsInfo) && count($roomsInfo)) {
-            $formatter = new NumberFormatter($this->context->language->language_code, NumberFormatter::ORDINAL);
             foreach ($roomsInfo as $key => $roomInfo) {
                 $roomIndex = $key + 1;
 
