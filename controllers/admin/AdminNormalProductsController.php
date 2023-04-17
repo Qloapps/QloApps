@@ -2954,7 +2954,7 @@ class AdminNormalProductsControllerCore extends AdminController
 
         $address = new Address();
         // $address->id_country = (int)$this->context->country->id;
-        if (!$address_infos) {
+        if (!isset($address_infos) || !$address_infos) {
             $address->id_country = (int)$this->context->country->id;
         } else {
             $address->id_country = (int)$address_infos['id_country'];
