@@ -76,6 +76,9 @@
     - #678: Removed: "go to payment page" option from admin order create page when creating order for backdate
     - #535: Added : autocomplete parameter to date and datetime options in admin render form
     - #429: Price modification while new order creation at back office
+    - #696: Updated: Manage room type default configuration and advance payment form options
+    - #697: Removed: In the manage category page removed description column from list
+    - #704: Updated: Data in admin refund request, corrected data in rooms refund detail table.
 
   - Bugs Fixed:
     - #314: Resolve HelperList filter issue
@@ -157,6 +160,9 @@
     - #675: Fix Average Occupancy Rate issue on dashboard
     - #676: Fix 'Best hotels' and 'Best-selling room types' issues on Stats > Stats page
     - #681: Fixed: Incorrect price of room when admin adds room in order and room have auto add services
+    - #694: Resolve: errors while adding new hotel
+    - #695: Fixed: dashboard  graphs errors when data set is empty
+    - #701: Resolve: Address not updating on admin address and order page.
 
 
 - Front Office:
@@ -185,6 +191,10 @@
     - #664: Improved occupancy dropdown on search result page
     - #682: Updated: order summary in block cart popup and dropdown
     - #687: Add default contact phone and email at front office nav bar
+    - #698: Fixed: occupancy dropdown input not alligned with adjacent input
+    - #699: Fix: service product quantity getting updated incorrectly from order OPC page
+    - #705: Replaced: view voucher and credit slip button with voucher code and id credit slip
+    - #706: Added: address update success message
 
   - Bugs Fixed:
     - #348: Resolve auto page scroll issue on order history page
@@ -226,6 +236,8 @@
     - #680: Fixed: Datepicker not initializing on initial load of room type page with preperation time
     - #683: Updated: Fixed chekcout page auto add service breakdown tooltip incorrect content
     - #685: Update default number of rooms on room type detail page to 1
+    - #700: Fix: quantity does not change on room type page booking form
+    - #703: Resolved: booking details message block issue
 
 
 - Core
@@ -305,6 +317,8 @@
     - #665: Fix: Qlocleaner "fix integrity constraint" deletes valid additional facilites
     - #684: Fix PHP warning issue in catalog mode
     - #645: Added: checkoutProcess directory in override/classes
+    - #693: Fix: hotel not getting added in hotel profile access table
+    - #702: Update: Order invoice pdf, changed totals summary details.
 
 
 - Web Services:

@@ -100,6 +100,13 @@
 * [CO] : [#669] Updated: text translations call variable assigned to javascript
 * [BO] : [#670] Updated: Admin room type services and facilities panel text issues and undefined index issue
 * [CO] : [#684] Fix PHP warning issue in catalog mode
+* [CO] : [#693] Fix: hotel not getting added in hotel profile access table
+* [BO] : [#694] Resolve: errors while adding new hotel
+* [BO] : [#695] Fixed: dashboard  graphs errors when data set is empty
+* [BO] : [#696] Updated: Manage room type default configuration and advance payment form options
+* [FO] : [#699] Fix: service product quantity getting updated incorrectly from order OPC page
+* [FO] : [#700] Fix: quantity does not change on room type page booking form
+* [CO] : [#704] Updated: Data in admin refund request, corrected data in rooms refund detail table.
 
 
 -------------------------

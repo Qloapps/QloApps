@@ -17,6 +17,7 @@
 * [FO] : [#658] Replaced: child with children in occupancy text front-office
 * [FO] : [#668] Fixed: Error on search result page when updating invalid occupancy in URL
 * [CO] : [#669] Updated: text translations call variable assigned to javascript
+* [FO] : [#698] Fixed: occupancy dropdown input not alligned with adjacent input
 
 
 ------------------------------

@@ -9,6 +9,7 @@
 * [BO] : [#451] Improve statistics at back office
 * [BO] : [#413] Fix date formats at back office
 * [BO] : [#391] Updated dashboard structure | Fixed dashboard widget
+* [BO] : [#695] Fixed: dashboard  graphs errors when data set is empty
 
 
 Changelog
