@@ -137,13 +137,13 @@ class OrderConfirmationControllerCore extends FrontController
                 $hotelCartBookingData = new HotelCartBookingData();
                 $objBookingDemand = new HotelBookingDemands();
                 $objRoomTypeServiceProductOrderDetail = new RoomTypeServiceProductOrderDetail();
+                $cart_service_products = array();
+                $cart_htl_data = array();
                 foreach ($cartOrders as $cartOrder) {
                     $idOrder = $cartOrder['id_order'];
                     $objCartOrder = new Order($idOrder);
                     $orderProducts = $objCartOrder->getProducts();
 
-                    $cart_service_products = array();
-                    $cart_htl_data = array();
                     if (!empty($orderProducts)) {
                         foreach ($orderProducts as $type_key => $type_value) {
                             if (in_array($type_value['product_id'], $processed_product)) {
