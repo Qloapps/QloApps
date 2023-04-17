@@ -40,7 +40,7 @@ class StatsCatalog extends Module
     {
         $this->name = 'statscatalog';
         $this->tab = 'analytics_stats';
-        $this->version = '1.4.1';
+        $this->version = '1.4.2';
         $this->author = 'PrestaShop';
         $this->need_instance = 0;
 

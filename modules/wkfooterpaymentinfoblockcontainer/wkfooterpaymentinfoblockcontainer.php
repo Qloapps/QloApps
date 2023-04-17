@@ -28,7 +28,7 @@ class WkFooterPaymentInfoBlockContainer extends Module
     {
         $this->name = 'wkfooterpaymentinfoblockcontainer';
         $this->tab = 'front_office_features';
-        $this->version = '1.0.1';
+        $this->version = '1.0.2';
         $this->author = 'Webkul';
         $this->need_instance = 0;
 

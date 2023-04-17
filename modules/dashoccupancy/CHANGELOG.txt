@@ -1,3 +1,17 @@
+------------------------------
+# V1.0.0 to V1.0.1
+------------------------------
+
+## Improved/Changed Features:
+
+* [BO] : [#528] licenses updated
+* [BO] : [#486] Fix undefined variable issue on admin dashboard
+* [BO] : [#451] Improve statistics at back office
+* [BO] : [#413] Fix date formats at back office
+* [BO] : [#391] Updated dashboard structure | Fixed dashboard widget
+* [BO] : [#695] Fixed: dashboard  graphs errors when data set is empty
+
+
 Changelog
 
 v1.0.0

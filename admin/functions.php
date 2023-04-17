@@ -26,7 +26,7 @@
 if (!defined('_PS_ADMIN_DIR_')) {
     define('_PS_ADMIN_DIR_', getcwd());
 }
-require_once(_PS_ADMIN_DIR_.'/../images.inc.php');
+
 function bindDatepicker($id, $time)
 {
     if ($time) {

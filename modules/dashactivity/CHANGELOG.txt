@@ -1,4 +1,16 @@
 ------------------------------
+# V1.0.1 to V1.0.2
+------------------------------
+
+## Improved/Changed Features:
+
+* [CO] : [#458] Replace module 'productcomments' with 'qlohotelreview'
+* [BO] : [#451] Improve statistics at back office
+* [BO] : [#413] Fix date formats at back office
+* [BO] : [#391] Updated dashboard structure | Fixed dashboard widget
+
+
+------------------------------
 # V1.0.0 to V1.0.1
 ------------------------------
 

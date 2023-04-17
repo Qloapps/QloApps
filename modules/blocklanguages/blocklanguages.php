@@ -34,7 +34,7 @@ class BlockLanguages extends Module
     {
         $this->name = 'blocklanguages';
         $this->tab = 'front_office_features';
-        $this->version = '1.5.0';
+        $this->version = '1.6.0';
         $this->author = 'PrestaShop';
         $this->need_instance = 0;
 

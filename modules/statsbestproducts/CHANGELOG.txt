@@ -1,4 +1,15 @@
 ------------------------------
+# V1.5.2 to V1.5.3
+------------------------------
+
+## Improved/Changed Features:
+
+* [BO] : [#573] Change catalog evaluation module and fix stats issues
+* [BO] : [#551] Updated best selling rooms and most viewed rooms statistics
+* [BO] : [#451] Improve statistics at back office
+* [BO] : [#676] Fix 'Best hotels' and 'Best-selling room types' issues on Stats > Stats page
+
+------------------------------
 # V1.5.1 to V1.5.2
 ------------------------------
 

@@ -1,4 +1,18 @@
 -----------------------------
+# V1.1.1 to V1.1.2
+-----------------------------
+
+## Improved/Changed Features:
+
+* [FO] : [#630] Update navigation menu at front office
+* [CO] : [#528] licenses updated
+* [CO] : [#436] Text changes
+* [FO] : [#385] Improve front office header
+* [CO] : [#366] Updated core upgrade files and modules upgrade files
+* [BO] : [#357] Remove module config links from Hotel Reservation System > Settings page
+
+
+-----------------------------
 # V1.1.0 to V1.1.1
 -----------------------------
 

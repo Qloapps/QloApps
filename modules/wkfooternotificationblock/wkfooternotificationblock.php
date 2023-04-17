@@ -28,7 +28,7 @@ class WkFooterNotificationBlock extends Module
     {
         $this->name = 'wkfooternotificationblock';
         $this->tab = 'front_office_features';
-        $this->version = '1.0.1';
+        $this->version = '1.0.2';
         $this->author = 'Webkul';
         $this->need_instance = 0;
 

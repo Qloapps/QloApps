@@ -1,4 +1,15 @@
 ------------------------------
+# V1.5.2 to V1.5.3
+------------------------------
+
+## Improved/Changed Features:
+
+* [BO] : [#573] Change catalog evaluation module and fix stats issues
+* [BO] : [#475] Added Feature: Occupancy wise search and booking
+* [BO] : [#451] Improve statistics at back office
+
+
+------------------------------
 # V1.5.1 to V1.5.2
 ------------------------------
 

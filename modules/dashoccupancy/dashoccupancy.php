@@ -28,7 +28,7 @@ class DashOccupancy extends Module
     {
         $this->name = 'dashoccupancy';
         $this->tab = 'dashboard';
-        $this->version = '1.0.0';
+        $this->version = '1.0.1';
         $this->ps_versions_compliancy = array('min' => '1.6', 'max' => '1.6');
         $this->author = 'Webkul';
         $this->bootstrap = true;

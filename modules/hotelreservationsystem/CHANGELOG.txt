@@ -1,3 +1,114 @@
+------------------------------
+# V1.4.3 to V1.5.0
+------------------------------
+
+## Improved/Changed Features:
+
+* [CO] : [#650] Added: Feature per day price in extra services
+* [FO] : [#651] Fix: imgaes index not defined for services on room type page in front office
+* [BO] : [#607] Updated: Service products pop-up modal in admin order view page
+* [FO] : [#649] Fix: Occupancy panel does not close when clicking on add to cart button
+* [CO] : [#622] Added: Primary hotel in QloApps for tax calculation of service products
+* [BO] : [#542] Resolved: advance price rules validation issue
+* [BO] : [#644] Change refund rule text from 'Days before cancellation' to 'Days before check-in' at back office
+* [CO] : [#612] Resolved: hotel tagline and short description wrong format
+* [BO] : [#554] Resolved: room status update issue from active to inactive.
+* [CO] : [#621] Resolved: Catalog discount is not visible when auto add service is attached to room type
+* [BO] : [#611] Updated: added complete booking info in admin booking carts tab
+* [BO] : [#518] Fixed: User input in location field in search panel get replaced by hotel location
+* [BO] : [#589] Add cancellation policy section on admin order view page
+* [BO] : [#632] Update disable dates selection for a room at back office
+* [BO] : [#639] Update refund request view page at back office
+* [FO] : [#605] Resolved: Service producs all images not visible in front office
+* [CO] : [#584] Resolve: Inactive auto add service price still gets added to room price
+* [CO] : [#583] Resolved: Unable to add room in cart from front and backoffice
+* [BO] : [#582] Removed selected extra services list from current cart in backoffice book now summary
+* [BO] : [#579] Resolved: Exception on admin book now page after cleaning cart data
+* [CO] : [#574] Fix:  Services price not including in cancelation charges.
+* [BO] : [#544] Resolved: bad sql query issue when assigning features to the hotel
+* [BO] : [#625] Fixed: book now page calender does not show searched date month
+* [FO] : [#608] Fix: Unable to remove disabled services from cart
+* [FO] : [#615] Resolved: Order restrict error is displayed multiple time on checkout page
+* [CO] : [#616] Resolved: Mulitple hotel cover image created when uploading multiple images
+* [BO] : [#599] Fix js errors on admin book now page
+* [BO] : [#597] Fix filter issues on Assign Hotel Features page at back office
+* [CO] : [#595] Text changes
+* [BO] : [#571] Remove Order Restrict link from Hotel Reservation System > Settings page
+* [CO] : [#559] Change link in credit slip email
+* [CO] : [#549] Resolved: issue on free order and room reallocation
+* [CO] : [#546] Replaced: child with children in occupancy text
+* [CO] : [#538] Added: Feature service products
+* [CO] : [#526] Update refund option and orders state mangement
+* [CO] : [#527] Fix CLI install issues
+* [BO] : [#531] Allow admin to upload check-in documents
+* [CO] : [#528] licenses updated
+* [CO] : [#521] Updated occupancy dropdown
+* [BO] : [#522] Updated: Book now page calender view
+* [CO] : [#514] Resolve: Occupancy wise search feature issues
+* [CO] : [#475] Added Feature: Occupancy wise search and booking
+* [CO] : [#500] Improve order refund flow
+* [BO] : [#473] Fix database exception issue on Book Now page at back office when multiple QloApps installations are present on the same domain
+* [BO] : [#495] Added: missing re-allocation pop-up and improved design in book now page
+* [BO] : [#456] Allow admin to add new links on Hotel Reservation System > Settings page and removed shortcut links of "Our Rooms" and "Testimonial" modules
+* [BO] : [#464] Implement Additional Facilities tab in AdminProductsController instead of using hotelreservationsystem module hook
+* [CO] : [#476] Use object methods save() and delete() for classes HotelCartBookingData and HotelBookingDetail
+* [BO] : [#478] Update admin book now page design | added fullcalender
+* [CO] : [#468] Update image generation method for hotel and default modules
+* [CO] : [#479] New Feature: Preparation time for bookings
+* [CO] : [#458] Replace module 'productcomments' with 'qlohotelreview'
+* [BO] : [#451] Improve statistics at back office
+* [BO] : [#460] Remove characters limit of 128 for hotel fields 'map_formated_address' and 'map_input_text'
+* [BO] : [#455] Fix Book Now page at back office
+* [CO] : [#436] Text changes
+* [FO] : [#403] Add maps to search results and room type detail pages
+* [BO] : [#413] Fix date formats at back office
+* [CO] : [#435] Added feature: minimum and maximum length of stay restriction for room types
+* [BO] : [#429] Add price modification for new orders at back office
+* [CO] : [#420] Remove unused code and data from module hotelreservationsystem
+* [FO] : [#419] Fix hero image cache issue
+* [CO] : [#418] Add hooks 'displayAdminAddHotelFormTab' and 'displayAdminAddHotelFormTabContent' in Manage Hotel tab of Back-office
+* [FO] : [#417] Resolved address issue on contact page for list and map
+* [CO] : [#415] Removed qlo_mod_list.xml
+* [BO] : [#412] Resolve dashboard design issues
+* [CO] : [#402] Change module category for graphnvd3 and hotelreservationsystem modules
+* [CO] : [#401] Remove unused modules
+* [FO] : [#410] Add hotel images under room information on room type detail page
+* [BO] : [#409] Change Feature Price name to Advanced Price Rule
+* [CO] : [#416] Resolved wrong address while creating new booking
+* [CO] : [#394] Fix hotel city access method as introduced in tax flow changes
+* [BO] : [#391] Updated dashboard structure | Fixed dashboard widget
+* [CO] : [#371] Updated tax flow, Taxes are now calculated based on hotel address
+* [BO] : [#382] Resolve undefined index issue on Order Restrict update form
+* [CO] : [#381] Change demo city name from DefCity to Demo City
+* [BO] : [#376] Remove global price option when not needed from additional facilities…
+* [CO] : [#363] Text changes
+* [CO] : [#356] Moved hotelreservationsystem "actionvalidateorder" to core function "validateorder"
+* [CO] : [#366] Updated core upgrade files and modules upgrade files
+* [BO] : [#357] Remove module config links from Hotel Reservation System > Settings page
+* [BO] : [#351] Improve hotel address selection on map using marker at back office
+* [BO] : [#345] Improve room type duplication feature
+* [CO] : [#338] Replace booking type integer values with class constants
+* [CO] : [#334] Remove install.sql files from modules
+* [FO] : [#619] Show service cost separately from room cost on checkout page
+* [CO] : [#636] Resolved: refund request payment calculation
+* [BO] : [#653] Updated: Additional facilities panel in admin room type page
+* [CO] : [#490] Added "Hotel Availability and Rates search API"  to QloApps
+* [CO] : [#650] Added: Feature per day price in extra services
+* [FO] : [#651] Fix: imgaes index not defined for services on room type page in front office
+* [FO] : [#658] Replaced: child with children in occupancy text front-office
+* [FO] : [#668] Fixed: Error on search result page when updating invalid occupancy in URL
+* [CO] : [#669] Updated: text translations call variable assigned to javascript
+* [BO] : [#670] Updated: Admin room type services and facilities panel text issues and undefined index issue
+* [CO] : [#684] Fix PHP warning issue in catalog mode
+* [CO] : [#693] Fix: hotel not getting added in hotel profile access table
+* [BO] : [#694] Resolve: errors while adding new hotel
+* [BO] : [#695] Fixed: dashboard  graphs errors when data set is empty
+* [BO] : [#696] Updated: Manage room type default configuration and advance payment form options
+* [FO] : [#699] Fix: service product quantity getting updated incorrectly from order OPC page
+* [FO] : [#700] Fix: quantity does not change on room type page booking form
+* [CO] : [#704] Updated: Data in admin refund request, corrected data in rooms refund detail table.
+
+
 -------------------------
 # V1.4.2 to V1.4.3
 -------------------------

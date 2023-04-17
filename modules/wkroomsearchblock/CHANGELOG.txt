@@ -1,4 +1,26 @@
 ------------------------------
+# V1.1.2 to V1.1.3
+------------------------------
+
+## Improved/Changed Features:
+
+* [FO] : [#518] Fixed: User input in location field in search panel get replaced by hotel location
+* [CO] : [#583] Resolved: Unable to add room in cart from front and backoffice
+* [FO] : [#550] Updated qloapps search panel design
+* [CO] : [#538] Added: Feature service products
+* [CO] : [#528] licenses updated
+* [CO] : [#475] Added Feature: Occupancy wise search and booking
+* [CO] : [#479] New Feature: Preparation time for bookings
+* [CO] : [#436] Text changes
+* [CO] : [#426] Replace _PS_MODULE_DIR_ with $this->_path in 'wkroomsearchblock' module
+* [CO] : [#366] Updated core upgrade files and modules upgrade files
+* [FO] : [#658] Replaced: child with children in occupancy text front-office
+* [FO] : [#668] Fixed: Error on search result page when updating invalid occupancy in URL
+* [CO] : [#669] Updated: text translations call variable assigned to javascript
+* [FO] : [#698] Fixed: occupancy dropdown input not alligned with adjacent input
+
+
+------------------------------
 # V1.1.1 to V1.1.2
 ------------------------------
 

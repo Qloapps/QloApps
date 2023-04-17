@@ -1,4 +1,15 @@
 ------------------------------
+# V1.1.4 to V1.1.5
+------------------------------
+
+## Improved/Changed Features:
+
+* [CO] : [#430] Updated QloApps order statuses
+* [CO] : [#436] Text changes
+* [CO] : [#608] Fix: Unable to remove disabled services from cart
+
+
+------------------------------
 # V1.1.3 to V1.1.4
 ------------------------------
 

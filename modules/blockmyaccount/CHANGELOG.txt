@@ -1,3 +1,12 @@
+------------------------------
+# V1.4.1 to V1.4.2
+------------------------------
+
+## Improved/Changed Features:
+
+* [FO] : [#467] Removed option to create multiple address of customer
+
+
 2014-04-22 18:57:23 +0200	// Changelog updated
 2014-03-24 11:43:28 +0100	/ MO blockmyaccount : ps_versions_compliancy modified (1.5.6.1 => 1.6)
 2014-03-24 11:02:49 +0100	/ MO blockmyaccount : ps_versions_compliancy added

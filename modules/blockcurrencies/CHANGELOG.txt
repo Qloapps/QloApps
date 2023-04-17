@@ -1,3 +1,13 @@
+------------------------------
+# V0.4.0 to V1.1.0
+------------------------------
+
+## Improved/Changed Features:
+
+* [FO] : [#387] Add nav bar and move language and currency selector at top at front office
+* [FO] : [#436] Text changes
+
+
 2014-04-22 18:57:08 +0200	// Changelog updated
 2014-03-24 17:47:06 +0100	/ MO blockcurrencies : ps_versions_compliancy added
 2014-03-20 14:22:35 +0100	Initial commit
