@@ -319,6 +319,7 @@
     - #645: Added: checkoutProcess directory in override/classes
     - #693: Fix: hotel not getting added in hotel profile access table
     - #702: Update: Order invoice pdf, changed totals summary details.
+    - #715: Fix PHP warning on order checkout page at front office
 
 
 - Web Services:
