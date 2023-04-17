@@ -2911,8 +2911,9 @@ class CartCore extends ObjectModel
                 if (isset($carrier['instance'])) {
                     $name = $carrier['instance']->name;
                     $delay = $carrier['instance']->delay;
-                    $delay = isset($delay[Context::getContext()->language->id]) ?
-                        $delay[Context::getContext()->language->id] : $delay[(int)Configuration::get('PS_LANG_DEFAULT')];
+                    $delay = isset($delay[Context::getContext()->language->id]) ? $delay[Context::getContext()->language->id] :
+                        (isset($delay[(int)Configuration::get('PS_LANG_DEFAULT')]) ? $delay[(int)Configuration::get('PS_LANG_DEFAULT')] : '');
+
                 }
                 if (isset($carrier['logo'])) {
                     $img = $carrier['logo'];
