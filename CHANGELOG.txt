@@ -22,6 +22,7 @@
   - #454: Customer can now create booking for someone else.
   - #593: Guest transformation to customer during registration at front office
   - #490: Added "Hotel Availability and Rates search API" to QloApps
+  - #375: QloApps can now be installed without demo data
 
 
 - Back Office:
@@ -253,7 +254,6 @@
     - #365: "Update Readme - PHP, MySQL and Required PHP extenstions
     - #366: Updated core upgrade files and modules upgrade files
     - #371: "Updated tax flow, Taxes are now calculated based on hotel address
-    - #375: Improve installation options
     - #381: Change demo city name from DefCity to Demo City
     - #401: Remove unused modules
     - #402: Change module category for modules graphnvd3 and hotelreservationsystem
