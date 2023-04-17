@@ -2381,15 +2381,23 @@ class CartCore extends ObjectModel
                                 foreach($selectedServiceProducts as $selectedProduct) {
                                     if (isset($array[$selectedProduct['id_hotel']])) {
                                         $array[$selectedProduct['id_hotel']]['quantity'] += $selectedProduct['quantity'];
+                                        $array[$selectedProduct['id_hotel']]['total_price_tax_excl'] += $selectedProduct['total_price_tax_excl'];
+                                        $array[$selectedProduct['id_hotel']]['total_price_tax_incl'] += $selectedProduct['total_price_tax_incl'];
                                     } else {
                                         $array[$selectedProduct['id_hotel']] = array(
                                             'quantity' => $selectedProduct['quantity'],
-                                            'id_hotel' => $selectedProduct['id_hotel']
+                                            'id_hotel' => $selectedProduct['id_hotel'],
+                                            'unit_price_tax_incl' => $selectedProduct['unit_price_tax_incl'],
+                                            'total_price_tax_excl' => $selectedProduct['total_price_tax_excl'],
+                                            'total_price_tax_incl' => $selectedProduct['total_price_tax_incl'],
                                         );
                                     }
                                 }
                                 foreach($array as $selectedProduct) {
                                     $product['cart_quantity'] = $selectedProduct['quantity'];
+                                    $product['total'] = $selectedProduct['total_price_tax_excl'];
+                                    $product['total_wt'] = $selectedProduct['total_price_tax_incl'];
+                                    $product['price_wt'] = $selectedProduct['unit_price_tax_incl'];
                                     $product['id_hotel'] = $selectedProduct['id_hotel'];
                                     $orderPackage[$id_address][$selectedProduct['id_hotel']]['product_list'][] = $product;
                                     if (!isset($orderPackage[$id_address][$selectedProduct['id_hotel']]['id_hotel'])) {
