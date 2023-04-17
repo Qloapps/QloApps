@@ -1044,19 +1044,47 @@ abstract class PaymentModuleCore extends Module
                         $normal_products_data_txt = $this->getEmailTemplateContent('hotel-service-product-data-text.tpl', Mail::TYPE_TEXT, $orderServiceProducts);
 
                         // total room price
-                        $room_price_tax_excl = $order->getTotalProductsWithoutTaxes(false, true) + $order->getTotalProductsWithoutTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE, 1, Product::PRICE_ADDITION_TYPE_WITH_ROOM);
-                        $room_price_tax_incl = $order->getTotalProductsWithTaxes(false, true) + $order->getTotalProductsWithTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE, 1, Product::PRICE_ADDITION_TYPE_WITH_ROOM);
-                        $room_tax = ($room_price_tax_incl - $room_price_tax_excl);
+                        $room_price_tax_excl = $order->getTotalProductsWithoutTaxes(false, true);
+                        $room_price_tax_incl = $order->getTotalProductsWithTaxes(false, true);
+                        $room_tax = ($order->getTotalProductsWithTaxes(false, true) - $order->getTotalProductsWithoutTaxes(false, true));
 
                         // extra services
-                        $additional_service_price_tax_excl = ($order->getTotalProductsWithoutTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE, 0) + $cart_booking_data['total_extra_demands_te']);
-                        $additional_service_price_tax_incl = ($order->getTotalProductsWithTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE, 0) + $cart_booking_data['total_extra_demands_ti']);
+                        $additional_service_price_tax_excl = ($order->getTotalProductsWithoutTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE) + $cart_booking_data['total_extra_demands_te']);
+                        $additional_service_price_tax_incl = ($order->getTotalProductsWithTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE) + $cart_booking_data['total_extra_demands_ti']);
                         $additional_service_tax = (($order->getTotalProductsWithTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE) + $cart_booking_data['total_extra_demands_ti']) - ($order->getTotalProductsWithoutTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE) + $cart_booking_data['total_extra_demands_te']));
 
                         // convenience fee price
                         $objRoomTypeServiceProductOrderDetail = new RoomTypeServiceProductOrderDetail();
-                        $total_convenience_fee_ti = $order->getTotalProductsWithTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE, 1, Product::PRICE_ADDITION_TYPE_INDEPENDENT);
-                        $total_convenience_fee_te = $order->getTotalProductsWithoutTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE, 1, Product::PRICE_ADDITION_TYPE_INDEPENDENT);
+                        $total_convenience_fee_ti = $objRoomTypeServiceProductOrderDetail->getroomTypeServiceProducts(
+                            $order->id,
+                            0,
+                            0,
+                            0,
+                            0,
+                            0,
+                            0,
+                            1,
+                            1,
+                            1,
+                            Product::PRICE_ADDITION_TYPE_INDEPENDENT
+                        );
+                        $total_convenience_fee_te = $objRoomTypeServiceProductOrderDetail->getroomTypeServiceProducts(
+                            $order->id,
+                            0,
+                            0,
+                            0,
+                            0,
+                            0,
+                            0,
+                            1,
+                            0,
+                            1,
+                            Product::PRICE_ADDITION_TYPE_INDEPENDENT
+                        );
+                        $additional_service_price_tax_excl = $additional_service_price_tax_excl - $total_convenience_fee_te;
+                        $additional_service_price_tax_incl = $additional_service_price_tax_incl - $total_convenience_fee_ti;
+                        $room_price_tax_excl = $room_price_tax_excl + $additional_service_price_tax_excl;
+                        $room_price_tax_incl = $room_price_tax_incl + $additional_service_price_tax_incl;
 
                         // service products
                         // $service_products_price_tax_excl = $order->getTotalProductsWithoutTaxes(false, false, Product::SERVICE_PRODUCT_WITHOUT_ROOMTYPE);
@@ -1631,11 +1659,8 @@ abstract class PaymentModuleCore extends Module
                                 );
 
                                 $cart_htl_data[$type_key]['date_diff'][$date_join]['paid_unit_price_tax_incl'] = $data_v['total_price_tax_incl']/$num_days;
-                                $cart_htl_data[$type_key]['date_diff'][$date_join]['paid_unit_price_tax_excl'] = $data_v['total_price_tax_excl']/$num_days;
-                                $cart_htl_data[$type_key]['date_diff'][$date_join]['avg_paid_unit_price_tax_incl'] += ($cart_htl_data[$type_key]['date_diff'][$date_join]['paid_unit_price_tax_incl'] + $cart_htl_data[$type_key]['date_diff'][$date_join]['additional_services_price_auto_add_ti']);
-                                $cart_htl_data[$type_key]['date_diff'][$date_join]['avg_paid_unit_price_tax_excl'] += ($cart_htl_data[$type_key]['date_diff'][$date_join]['paid_unit_price_tax_excl'] + $cart_htl_data[$type_key]['date_diff'][$date_join]['additional_services_price_auto_add_te']);
+                                $cart_htl_data[$type_key]['date_diff'][$date_join]['avg_paid_unit_price_tax_incl'] += ($cart_htl_data[$type_key]['date_diff'][$date_join]['paid_unit_price_tax_incl'] + $cart_htl_data[$type_key]['date_diff'][$date_join]['additional_services_price_auto_add_te']);
                                 $cart_htl_data[$type_key]['date_diff'][$date_join]['amount_tax_incl'] += ($data_v['total_price_tax_incl'] + $cart_htl_data[$type_key]['date_diff'][$date_join]['additional_services_price_auto_add_te']);
-                                $cart_htl_data[$type_key]['date_diff'][$date_join]['amount_tax_excl'] += ($data_v['total_price_tax_excl'] + $cart_htl_data[$type_key]['date_diff'][$date_join]['additional_services_price_auto_add_te']);
                             } else {
                                 $num_days = $obj_htl_bk_dtl->getNumberOfDays($data_v['date_from'], $data_v['date_to']);
 
@@ -1737,11 +1762,8 @@ abstract class PaymentModuleCore extends Module
                                 );
 
                                 $cart_htl_data[$type_key]['date_diff'][$date_join]['paid_unit_price_tax_incl'] = $data_v['total_price_tax_incl']/$num_days;
-                                $cart_htl_data[$type_key]['date_diff'][$date_join]['paid_unit_price_tax_excl'] = $data_v['total_price_tax_excl']/$num_days;
-                                $cart_htl_data[$type_key]['date_diff'][$date_join]['avg_paid_unit_price_tax_incl'] = ($cart_htl_data[$type_key]['date_diff'][$date_join]['paid_unit_price_tax_incl'] + $cart_htl_data[$type_key]['date_diff'][$date_join]['additional_services_price_auto_add_ti']);
-                                $cart_htl_data[$type_key]['date_diff'][$date_join]['avg_paid_unit_price_tax_excl'] = ($cart_htl_data[$type_key]['date_diff'][$date_join]['paid_unit_price_tax_excl'] + $cart_htl_data[$type_key]['date_diff'][$date_join]['additional_services_price_auto_add_te']);
-                                $cart_htl_data[$type_key]['date_diff'][$date_join]['amount_tax_incl'] = ($data_v['total_price_tax_incl'] + $cart_htl_data[$type_key]['date_diff'][$date_join]['additional_services_price_auto_add_ti']);
-                                $cart_htl_data[$type_key]['date_diff'][$date_join]['amount_tax_excl'] = ($data_v['total_price_tax_excl'] + $cart_htl_data[$type_key]['date_diff'][$date_join]['additional_services_price_auto_add_te']);
+                                $cart_htl_data[$type_key]['date_diff'][$date_join]['avg_paid_unit_price_tax_incl'] = ($cart_htl_data[$type_key]['date_diff'][$date_join]['paid_unit_price_tax_incl'] + $cart_htl_data[$type_key]['date_diff'][$date_join]['additional_services_price_auto_add_te']);
+                                $cart_htl_data[$type_key]['date_diff'][$date_join]['amount_tax_incl'] = ($data_v['total_price_tax_incl'] + $cart_htl_data[$type_key]['date_diff'][$date_join]['additional_services_price_auto_add_te']);
 
                                 $result['total_extra_demands_te'] += $cart_htl_data[$type_key]['date_diff'][$date_join]['extra_demands_price_te'];
                                 $result['total_extra_demands_ti'] += $cart_htl_data[$type_key]['date_diff'][$date_join]['extra_demands_price_ti'];
@@ -1749,13 +1771,11 @@ abstract class PaymentModuleCore extends Module
                                 $result['total_additional_services_ti'] += $cart_htl_data[$type_key]['date_diff'][$date_join]['additional_services_price_ti'];
                             }
                         }
-                        // calculate averages now
-                        foreach ($cart_htl_data[$type_key]['date_diff'] as $key => &$value) {
-                            $value['avg_paid_unit_price_tax_incl'] = Tools::ps_round($value['avg_paid_unit_price_tax_incl'] / $value['num_rm'], 6);
-                            $value['avg_paid_unit_price_tax_excl'] = Tools::ps_round($value['avg_paid_unit_price_tax_excl'] / $value['num_rm'], 6);
-                        }
                     }
-
+                    // calculate averages now
+                    foreach ($cart_htl_data[$type_key]['date_diff'] as $key => &$value) {
+                        $value['avg_paid_unit_price_tax_incl'] = Tools::ps_round($value['avg_paid_unit_price_tax_incl'] / $value['num_rm'], 6);
+                    }
                 }
             }
             $result['cart_htl_data'] = $cart_htl_data;

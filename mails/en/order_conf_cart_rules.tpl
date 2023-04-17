@@ -1,6 +1,6 @@
 {foreach $list as $cart_rule}
 	<tr class="conf_body">
-		<td bgcolor="#f8f8f8" style="border:1px solid #D6D4D4;color:#333;padding:7px 0">
+		<td bgcolor="#f8f8f8" colspan="4" style="border:1px solid #D6D4D4;color:#333;padding:7px 0">
 			<table class="table" style="width:100%;border-collapse:collapse">
 				<tr>
 					<td width="10" style="color:#333;padding:0"></td>
@@ -13,7 +13,7 @@
 				</tr>
 			</table>
 		</td>
-		<td bgcolor="#f8f8f8" style="border:1px solid #D6D4D4;color:#333;padding:7px 0">
+		<td bgcolor="#f8f8f8" colspan="4" style="border:1px solid #D6D4D4;color:#333;padding:7px 0">
 			<table class="table" style="width:100%;border-collapse:collapse">
 				<tr>
 					<td width="10" style="color:#333;padding:0"></td>

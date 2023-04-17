@@ -241,7 +241,7 @@
 										<strong>{l s='Total Rooms Cost (tax excl.)'}</strong>
 									</td>
 									<td colspan="2">
-										<span>{displayWtPriceWithCurrency price=($orderTotalInfo['total_rooms_te'] + $orderTotalInfo['total_services_te'] - $orderTotalInfo['total_convenience_fee_te']) currency=$currency}</span>
+										<span>{displayWtPriceWithCurrency price=($orderTotalInfo['total_rooms_te'] + $orderTotalInfo['total_services_te'] + $orderTotalInfo['total_auto_add_services_te'] + $orderTotalInfo['total_demands_price_te']) currency=$currency}</span>
 									</td>
 								</tr>
 							{else}
@@ -251,7 +251,7 @@
 										<strong>{l s='Total Rooms Cost'} {if $use_tax}{l s='(tax incl.)'}{/if} </strong>
 									</td>
 									<td colspan="2">
-										<span>{displayWtPriceWithCurrency price=($orderTotalInfo['total_rooms_ti'] + $orderTotalInfo['total_services_ti'] - $orderTotalInfo['total_convenience_fee_ti']) currency=$currency}</span>
+										<span>{displayWtPriceWithCurrency price=($orderTotalInfo['total_rooms_ti'] + $orderTotalInfo['total_services_ti'] + $orderTotalInfo['total_auto_add_services_ti'] + $orderTotalInfo['total_demands_price_ti']) currency=$currency}</span>
 									</td>
 								</tr>
 							{/if}
