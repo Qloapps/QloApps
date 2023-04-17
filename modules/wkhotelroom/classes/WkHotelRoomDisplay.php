@@ -148,7 +148,7 @@ class WkHotelRoomDisplay extends ObjectModel
             $HOTEL_ROOM_DISPLAY_HEADING[$lang['id_lang']] = 'Our Rooms';
             $HOTEL_ROOM_DISPLAY_DESCRIPTION[$lang['id_lang']] = 'Families travelling with kids will find Amboseli national park a safari destination matched to no other, with less tourist traffic, breathtaking open space.';
         }
-        Configuration::updateValue('HOTEL_ROOM_BLOCK_NAV_LINK', 1);
+
         // update global configuration values in multilang
         Configuration::updateValue('HOTEL_ROOM_DISPLAY_HEADING', $HOTEL_ROOM_DISPLAY_HEADING);
         Configuration::updateValue('HOTEL_ROOM_DISPLAY_DESCRIPTION', $HOTEL_ROOM_DISPLAY_DESCRIPTION);

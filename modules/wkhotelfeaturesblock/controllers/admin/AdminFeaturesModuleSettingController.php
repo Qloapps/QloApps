@@ -42,14 +42,6 @@ class AdminFeaturesModuleSettingController extends ModuleAdminController
                 'title' =>    $this->l('Hotel Amenity Setting'),
                 'icon' =>   'icon-cogs',
                 'fields' =>    array(
-                    'HOTEL_AMENITIES_BLOCK_NAV_LINK' => array(
-                        'title' => $this->l('Show link at navigation'),
-                        'hint' => $this->l('Enable, if you want to display a link at navigation menu for the amenities block at home page.'),
-                        'validation' => 'isBool',
-                        'cast' => 'intval',
-                        'type' => 'bool',
-                        'required' => true
-                    ),
                     'HOTEL_AMENITIES_HEADING' => array(
                         'title' => $this->l('Amenity Block Title'),
                         'type' => 'textLang',

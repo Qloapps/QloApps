@@ -144,7 +144,7 @@ class WkHotelTestimonialData extends ObjectModel
             $HOTEL_TESIMONIAL_BLOCK_HEADING[$lang['id_lang']] = 'What our guests say?';
             $HOTEL_TESIMONIAL_BLOCK_CONTENT[$lang['id_lang']] = 'Fap put a bird on it next level, sustainable disrupt polaroid flannel Helvetica Kickstarter quinoa bicycle rights narwhal wolf Fap put a bird on it next level.';
         }
-        Configuration::updateValue('HOTEL_TESIMONIAL_BLOCK_NAV_LINK', 1);
+
         // update global configuration values in multilang
         Configuration::updateValue('HOTEL_TESIMONIAL_BLOCK_HEADING', $HOTEL_TESIMONIAL_BLOCK_HEADING);
         Configuration::updateValue('HOTEL_TESIMONIAL_BLOCK_CONTENT', $HOTEL_TESIMONIAL_BLOCK_CONTENT);
