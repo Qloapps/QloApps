@@ -605,7 +605,7 @@ class ProductControllerCore extends FrontController
         }
 
         $totalAvailableRooms = 0;
-        if ($hotelRoomData = $objBookingDetail->DataForFrontSearch($bookingParams)) {
+        if ($hotelRoomData = $objBookingDetail->dataForFrontSearch($bookingParams)) {
             $totalAvailableRooms = $hotelRoomData['stats']['num_avail'];
             $quantity = ($quantity > $totalAvailableRooms) ? $totalAvailableRooms : $quantity;
         }
