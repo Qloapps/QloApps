@@ -2703,4 +2703,13 @@ class HotelBookingDetail extends ObjectModel
             Configuration::get('PS_OS_ERROR'),
         ));
     }
+
+    public function getOrderOverbookedRooms($idOrder)
+    {
+        return Db::getInstance()->executeS(
+            'SELECT `id_room`
+            FROM `'._DB_PREFIX_.'htl_booking_detail`
+            WHERE `is_back_order` = 1 AND `id_order` = '.(int) $idOrder
+        );
+    }
 }

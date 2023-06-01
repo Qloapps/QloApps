@@ -810,7 +810,38 @@ abstract class PaymentModuleCore extends Module
                                 // For Back Order(Because of cart lock)
                                 if ($objCartBookingData->is_back_order) {
                                     $objBookingDetail->is_back_order = 1;
+                                } else {
+                                    // check if still room available for this booking or not
+                                    $isRoomStillAvailable = 0;
+                                    $bookingParams = array(
+                                        'date_from' => $objCartBookingData->date_from,
+                                        'date_to' => $objCartBookingData->date_to,
+                                        'hotel_id' => $objCartBookingData->id_hotel,
+                                        'id_room_type' => $idProduct,
+                                        'only_search_data' => 1
+                                    );
+
+                                    if ($searchRoomsInfo = $objBookingDetail->getBookingData($bookingParams)) {
+                                        if (isset($searchRoomsInfo['rm_data'][$idProduct]['data']['available'])
+                                            && $searchRoomsInfo['rm_data'][$idProduct]['data']['available']
+                                        ) {
+                                            $availableRoomsInfo = $searchRoomsInfo['rm_data'][$idProduct]['data']['available'];
+                                            if ($roomIdsAvailable = array_column($availableRoomsInfo, 'id_room')) {
+                                                if (in_array($objCartBookingData->id_room, $roomIdsAvailable)) {
+                                                    $isRoomStillAvailable = 1;
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    // if room is not available right now the set it to back order
+                                    if ($isRoomStillAvailable) {
+                                        $objBookingDetail->is_back_order = 0;
+                                    } else {
+                                        $objBookingDetail->is_back_order = 1;
+                                    }
                                 }
+
                                 $total_price = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
                                     $idProduct,
                                     $objCartBookingData->date_from,
@@ -1013,10 +1044,11 @@ abstract class PaymentModuleCore extends Module
                     $new_history->addWithemail(true, $extra_vars);
 
                     // Switch to back order if needed
-                    if (Configuration::get('PS_STOCK_MANAGEMENT') && ($order_detail->getStockState() || $order_detail->product_quantity_in_stock <= 0)) {
+                    $objHotelBookingDetail = new HotelBookingDetail();
+                    if ($objHotelBookingDetail->getOrderOverbookedRooms($order->id)) {
                         $history = new OrderHistory();
                         $history->id_order = (int)$order->id;
-                        $history->changeIdOrderState(Configuration::get($order->valid ? 'PS_OS_OUTOFSTOCK_PAID' : 'PS_OS_OUTOFSTOCK_UNPAID'), $order, true);
+                        $history->changeIdOrderState(Configuration::get($order->valid ? 'PS_OS_OVERBOOKING_PAID' : 'PS_OS_OVERBOOKING_UNPAID'), $order, true);
                         $history->addWithemail();
                     }
 
