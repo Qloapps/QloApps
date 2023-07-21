@@ -464,6 +464,11 @@ class AdminOrdersControllerCore extends AdminController
 
     public function processBulkUpdateOrderStatus()
     {
+        // if process to cancelled the redirect to the original order page
+        if (Tools::getIsset('cancel')) {
+            Tools::redirectAdmin(self::$currentIndex.'&token='.$this->token);
+        }
+
         if (Tools::isSubmit('submitUpdateOrderStatus')
             && ($id_order_state = (int)Tools::getValue('id_order_state'))) {
             if ($this->tabAccess['edit'] !== '1') {
