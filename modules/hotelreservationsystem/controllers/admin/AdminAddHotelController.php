@@ -124,22 +124,15 @@ class AdminAddHotelController extends ModuleAdminController
         $country = $this->context->country;
         $smartyVars['defaultCountry'] = $country->name[Configuration::get('PS_LANG_DEFAULT')];
 
+        $idCountry = null;
         if ($this->display == 'edit') {
             $idHotel = Tools::getValue('id');
             $hotelBranchInfo = new HotelBranchInformation($idHotel);
 
             $addressInfo = HotelBranchInformation::getAddress($idHotel);
-            $statesbycountry = State::getStatesByIdCountry($addressInfo['id_country']);
+            $idCountry = $addressInfo['id_country'];
 
-            $states = array();
-            if ($statesbycountry) {
-                foreach ($statesbycountry as $key => $value) {
-                    $states[$key]['id'] = $value['id_state'];
-                    $states[$key]['name'] = $value['name'];
-                }
-            }
             $smartyVars['edit'] =  1;
-            $smartyVars['state_var'] = $states;
             $smartyVars['address_info'] = $addressInfo;
             $smartyVars['hotel_info'] = (array) $hotelBranchInfo;
             //Hotel Images
@@ -175,6 +168,24 @@ class AdminAddHotelController extends ModuleAdminController
             $smartyVars['order_restrict_date_info'] = $restrictDateInfo;
         }
 
+        // manage state option
+        if ($this->display == 'add') {
+            $idCountry = Tools::getValue('hotel_country');
+        }
+
+        $stateOptions = null;
+        if ($idCountry) {
+            $statesByCountry = State::getStatesByIdCountry($idCountry);
+            if ($statesByCountry) {
+                $stateOptions = array();
+                foreach ($statesByCountry as $key => $value) {
+                    $stateOptions[$key]['id'] = $value['id_state'];
+                    $stateOptions[$key]['name'] = $value['name'];
+                }
+            }
+        }
+
+        $smartyVars['state_var'] = $stateOptions;
         $smartyVars['enabledDisplayMap'] =  Configuration::get('WK_GOOGLE_ACTIVE_MAP');
         $smartyVars['ps_img_dir'] = _PS_IMG_.'l/';
 
