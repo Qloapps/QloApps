@@ -244,14 +244,6 @@ class AdminOrderRefundRulesController extends ModuleAdminController
             $this->errors[] = $this->l('Enter number of days before check-in date for this rule to be applicable.');
         } else if (!Validate::isUnsignedInt($cancelationDays)) {
             $this->errors[] = $this->l('Enter valid number of days.');
-        } else if ($objRefundRule->checkIfRuleExistsByCancelationdays($cancelationDays)) {
-            if ($idRefundRule) {
-                if ($objRefundRule->days != $cancelationDays) {
-                    $this->errors[] = $this->l('Refund rule for ').$cancelationDays.$this->l(' days already exists.');
-                }
-            } else {
-                $this->errors[] = $this->l('Refund rule for ').$cancelationDays.$this->l(' days already exists.');
-            }
         }
 
         if (!count($this->errors)) {
