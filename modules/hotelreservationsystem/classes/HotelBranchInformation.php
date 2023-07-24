@@ -139,7 +139,7 @@ class HotelBranchInformation extends ObjectModel
         $query .= ' VALUES '.'(1, '.(int)$idHotel.', 1)';
         /* Profile selection */
         $profiles = Db::getInstance()->executeS('SELECT `id_profile` FROM '._DB_PREFIX_.'profile WHERE `id_profile` != 1');
-        if (!$profiles || empty($profiles)) {
+        if ($profiles) {
             foreach ($profiles as $profile) {
                 $access = 0;
                 if (isset($context->employee->id_profile)) {
