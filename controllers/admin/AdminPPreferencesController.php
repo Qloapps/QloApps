@@ -300,7 +300,7 @@ class AdminPPreferencesControllerCore extends AdminController
                     ),
 
                     'PS_SERVICE_PRODUCT_CATEGORY_FILTER' => array(
-                        'title' => $this->l('Show category filter for service products'),
+                        'title' => $this->l('Show service products category-wise'),
                         'validation' => 'isBool',
                         'cast' => 'intval',
                         'required' => false,
