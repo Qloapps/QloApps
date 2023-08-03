@@ -917,11 +917,19 @@ class FrontControllerCore extends Controller
             }
             $excluded_key = array('isolang', 'id_lang', 'controller', 'fc', 'id_product', 'id_category', 'id_manufacturer', 'id_supplier', 'id_cms');
             foreach ($_GET as $key => $value) {
-                if (!in_array($key, $excluded_key) && Validate::isUrl($key) && Validate::isUrl($value)) {
-                    $params[Tools::safeOutput($key)] = Tools::safeOutput($value);
+                if (!in_array($key, $excluded_key)) {
+                    if (is_string($value)) {
+                        if (Validate::isUrl($key) && Validate::isUrl($value)) {
+                            $params[Tools::safeOutput($key)] = Tools::safeOutput($value);
+                        }
+                    } else {
+                        $tempValue = http_build_query($value);
+                        if (Validate::isUrl($key) && Validate::isUrl($tempValue)) {
+                            $params[Tools::safeOutput($key)] = $value;
+                        }
+                    }
                 }
             }
-
             $str_params = http_build_query($params, '', '&');
             if (!empty($str_params)) {
                 $final_url = preg_replace('/^([^?]*)?.*$/', '$1', $canonical_url).'?'.$str_params;
