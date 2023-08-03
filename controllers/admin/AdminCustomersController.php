@@ -1085,7 +1085,7 @@ class AdminCustomersControllerCore extends AdminController
         foreach ($searches as $search) {
             if (!empty($search) && $results = Customer::searchByName($search, 50)) {
                 foreach ($results as $result) {
-                    if ($result['active']) {
+                    if ($result['active'] && !$result['deleted']) {
                         $customers[$result['id_customer']] = $result;
                     }
                 }
