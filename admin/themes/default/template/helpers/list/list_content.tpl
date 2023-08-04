@@ -99,6 +99,8 @@
 							{else}
 								<img src="../img/admin/{$tr[$key]['src']}" alt="{$tr[$key]['alt']}" title="{$tr[$key]['alt']}" />
 							{/if}
+						{else}
+							<img src="../img/admin/{$tr[$key]}" />
 						{/if}
 					{elseif isset($params.type) && $params.type == 'price'}
 						{if isset($tr.id_currency)}
