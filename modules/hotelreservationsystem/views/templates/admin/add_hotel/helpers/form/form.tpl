@@ -296,7 +296,7 @@
 								{l s='Upload images' mod='hotelreservationsystem'}&nbsp;:&nbsp;&nbsp;
 							</label>
 							<div class="col-sm-5">
-								<input class="form-control-static" type="file" id="hotel_images" name="hotel_images[]" multiple>
+								<input class="form-control-static" type="file" accept="image/gif, image/jpg, image/jpeg, image/pjpeg, image/png, image/x-png" id="hotel_images" name="hotel_images[]" multiple>
 							</div>
 						</div>
 						<hr>
