@@ -67,9 +67,16 @@ class OrderConfirmationControllerCore extends FrontController
         if (!Validate::isLoadedObject($order) || $order->id_customer != $this->context->customer->id || $this->secure_key != $order->secure_key) {
             Tools::redirect($redirectLink);
         }
-        $module = Module::getInstanceById((int)($this->id_module));
-        if ($order->module != $module->name) {
-            Tools::redirect($redirectLink);
+
+        if ($this->id_module == -1) {
+            if ($order->module != 'free_order') {
+                Tools::redirect($redirectLink);
+            }
+        } else {
+            $module = Module::getInstanceById((int)($this->id_module));
+            if ($order->module != $module->name) {
+                Tools::redirect($redirectLink);
+            }
         }
     }
 
@@ -83,6 +90,7 @@ class OrderConfirmationControllerCore extends FrontController
 
         $this->context->smarty->assign(array(
             'is_guest' => $this->context->customer->is_guest,
+            'is_free_order' => 1,
             'HOOK_ORDER_CONFIRMATION' => $this->displayOrderConfirmation(),
             'HOOK_PAYMENT_RETURN' => $this->displayPaymentReturn()
         ));
@@ -405,6 +413,7 @@ class OrderConfirmationControllerCore extends FrontController
         $this->context->smarty->assign(
             array(
                 'refund_allowed' => (int) $order->isReturnable(),
+                'is_free_order' => $this->id_module == -1 && $order->module == 'free_order',
                 'any_back_order' => $any_back_order,
                 'shw_bo_msg' => $shw_bo_msg,
                 'back_ord_msg' => $bo_msg,
