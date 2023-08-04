@@ -64,7 +64,9 @@ class wkhotelfilterblock extends Module
         if ($this->context->controller->php_self == 'category') {
 
             $htl_id_category = Tools::getValue('id_category');
-            if (Validate::isLoadedObject($objCategory = new Category((int) $htl_id_category))) {
+            if (Validate::isLoadedObject($objCategory = new Category((int) $htl_id_category))
+                && HotelBranchInformation::getHotelIdByIdCategory($htl_id_category)
+            ) {
                 if ($objCategory->hasParent(Configuration::get('PS_LOCATIONS_CATEGORY'))) {
                     Media::addJsDef(array('noRoomAvailTxt' => $this->l('No room available', false, true)));
 
