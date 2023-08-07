@@ -29,6 +29,7 @@ class SmartyDev extends Smarty
     public function __construct()
     {
         parent::__construct();
+        $this->debugging_ctrl = 'URL';
         $this->template_class = 'Smarty_Dev_Template';
     }
 
