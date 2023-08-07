@@ -26,7 +26,7 @@
                 format: 'DD-MM-YYYY',
                 showTopbar: false,
                 autoClose: true,
-                singleMonth: true,
+                singleMonth: false,
                 language: lang_iso,
                 minDays: 2,
                 startOfWeek: 'monday',
