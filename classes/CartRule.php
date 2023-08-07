@@ -421,7 +421,7 @@ class CartRuleCore extends ObjectModel
      * @param $name
      * @return bool
      */
-    public static function cartRuleExists($name)
+    public static function cartRuleExists($code, $id_customer = 0)
     {
         if (!CartRule::isFeatureActive()) {
             return false;
@@ -430,7 +430,8 @@ class CartRuleCore extends ObjectModel
         return (bool)Db::getInstance()->getValue('
 		SELECT `id_cart_rule`
 		FROM `'._DB_PREFIX_.'cart_rule`
-		WHERE `code` = \''.pSQL($name).'\'');
+		WHERE `code` = \''.pSQL($code).'\''.
+        ($id_customer ? 'AND `id_customer` = '.(int) $id_customer : ''));
     }
 
     /**

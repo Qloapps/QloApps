@@ -669,6 +669,13 @@ abstract class PaymentModuleCore extends Module
                                 $voucher->code = preg_replace('/'.$matches[0].'$/', '-'.(intval($matches[1]) + 1), $voucher->code);
                             }
 
+                            // If ABCDEFGH-2 already exists for customer use ABCDEFGH-3
+                            while (CartRule::cartRuleExists($voucher->code, $order->id_customer)) {
+                                if (preg_match('/\-([0-9]{1,2})$/', $voucher->code, $matches)) {
+                                    $voucher->code = preg_replace('/'.$matches[1].'$/', (intval($matches[1]) + 1), $voucher->code);
+                                }
+                            }
+
                             // Set the new voucher value
                             $voucher->reduction_amount = $remaining_amount;
                             if ($voucher->reduction_tax) {
