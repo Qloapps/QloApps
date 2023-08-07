@@ -237,10 +237,23 @@ class AdminProductsControllerCore extends AdminController
                 'filter_key' => 'shop!name',
             );
         } else {
+            $objHotelBranchInformation = new HotelBranchInformation();
+            $idsHotel = $objHotelBranchInformation->getProfileAccessedHotels($this->context->employee->id_profile, 1, 1);
+
+            $hotelList = array();
+            foreach ($idsHotel as $idHotel) {
+                $HotelBranchInformation = new HotelBranchInformation($idHotel, $this->context->language->id);
+                $hotelAddressInfo = HotelBranchInformation::getAddress($idHotel);
+                $hotelList[$idHotel] = $HotelBranchInformation->hotel_name.', '.$hotelAddressInfo['city'];
+            }
+
             $this->fields_list['hotel_name'] = array(
                 'title' => $this->l('Hotel'),
-                'filter_key' => 'hbl!hotel_name',
+                'align' => 'left',
+                'type' => 'select',
+                'filter_key' => 'hb!id',
                 'callback' => 'getHotelName',
+                'list' => $hotelList,
             );
         }
         $this->fields_list['adults'] = array(
