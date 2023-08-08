@@ -117,10 +117,29 @@ class OrderOpcControllerCore extends ParentOrderController
 
                             $_POST['lastname'] = $_POST['customer_lastname'];
                             $_POST['firstname'] = $_POST['customer_firstname'];
-                            $this->errors = array_merge($this->errors, $this->context->customer->validateController());
                             $this->context->customer->newsletter = (int)Tools::isSubmit('newsletter');
                             $this->context->customer->optin = (int)Tools::isSubmit('optin');
                             $this->context->customer->is_guest = (Tools::isSubmit('is_new_customer') ? !Tools::getValue('is_new_customer', 1) : 0);
+
+                            if ($idAddressDelivery = Tools::getValue('opc_id_address_delivery')) {
+                                $objAddress = new Address($idAddressDelivery);
+                                if (Validate::isLoadedObject($objAddress)) {
+                                    $phoneMobile = Tools::getValue('phone_mobile');
+
+                                    if (!Validate::isPhoneNumber($phoneMobile)) {
+                                        $this->errors[] = Tools::displayError('Please enter a valid Mobile phone number.', false);
+                                    }
+
+                                    if (!count($this->errors)) {
+                                        $objAddress->phone_mobile = $phoneMobile;
+                                        if (!$objAddress->save()) {
+                                            $this->errors[] = Tools::displayError('Something went wrong while saving phone number. Please try again.', false);
+                                        }
+                                    }
+                                }
+                            }
+
+                            $this->errors = array_merge($this->errors, $this->context->customer->validateController());
                             $return = array(
                                 'hasError' => !empty($this->errors),
                                 'errors' => $this->errors,
