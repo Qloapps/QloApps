@@ -31,13 +31,13 @@
 				<tr>
 					<th class="fixed-width-xs">
 						<span class="title_box">
-							<input type="checkbox" name="checkme" id="checkme" onclick="checkDelBoxes(this.form, 'groupBox[]', this.checked)" />
+							<input type="checkbox" name="checkme" id="checkme" onclick="checkDelBoxes(this.form, '{$input['name']}[]', this.checked)" />
 						</span>
 					</th>
 					<th class="fixed-width-xs"><span class="title_box">{l s='ID'}</span></th>
 					<th>
 						<span class="title_box">
-							{l s='Group name'}
+							{if isset($input['groups_title']) && $input['groups_title']}{$input['groups_title']}{else}{l s='Group name'}{/if}
 						</span>
 					</th>
 				</tr>
@@ -46,8 +46,8 @@
 			{foreach $groups as $key => $group}
 				<tr>
 					<td>
-						{assign var=id_checkbox value=groupBox|cat:'_'|cat:$group['id_group']}
-						<input type="checkbox" name="groupBox[]" class="groupBox" id="{$id_checkbox}" value="{$group['id_group']}" {if $fields_value[$id_checkbox]}checked="checked"{/if} />
+						{assign var=id_checkbox value=$input['name']|cat:'_'|cat:$group['id_group']}
+						<input type="checkbox" name="{$input['name']}[]" class="groupBox" id="{$id_checkbox}" value="{$group['id_group']}" {if $fields_value[$id_checkbox]}checked="checked"{/if} />
 					</td>
 					<td>{$group['id_group']}</td>
 					<td>
