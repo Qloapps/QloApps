@@ -544,6 +544,170 @@ class HotelHelper
         }
     }
 
+    public function saveDummyServiceProductsAndRelatedInfo()
+    {
+        $idCategoryServices = (int) Configuration::get('PS_SERVICE_CATEGORY');
+        $idsGroup = array_column(Group::getGroups(Context::getContext()->language->id), 'id_group');
+
+        // create service categories
+        $categories = array(
+            'meals' => array(
+                'name' => 'Meals',
+                'id_category' => 'to_be_set_below',
+            ),
+            'transfers' => array(
+                'name' => 'Transfers',
+                'id_category' => 'to_be_set_below',
+            )
+        );
+
+        foreach ($categories as &$category) {
+            $idCategory = $this->addCategory($category['name'], $idCategoryServices, $idsGroup);
+            $category['id_category'] = $idCategory;
+        }
+
+        // create service products
+        $serviceProducts = array(
+            array(
+                'name' => 'Room Maintenance Fees',
+                'id_category_default' => $idCategoryServices,
+                'description' => 'Ensure a comfortable stay with our room maintenance service, keeping your accommodation pristine and hassle-free throughout your visit.',
+                'price' => '250',
+                'auto_add_to_cart' => 1,
+                'show_at_front' => 0,
+                'price_addition_type' => Product::PRICE_ADDITION_TYPE_WITH_ROOM,
+            ),
+            array(
+                'name' => 'Internet Handling Charges',
+                'id_category_default' => $idCategoryServices,
+                'description' => 'Navigate our website effortlessly with seamless handling, ensuring reliable, high-speed access for an enjoyable browsing experience throughout your online journey.',
+                'price' => '250',
+                'auto_add_to_cart' => 1,
+                'show_at_front' => 0,
+                'price_addition_type' => Product::PRICE_ADDITION_TYPE_INDEPENDENT,
+            ),
+            array(
+                'name' => 'Airport Shuttle',
+                'id_category_default' => $categories['transfers']['id_category'],
+                'description' => 'Experience convenience from touchdown to check-in with our efficient airport shuttle service, whisking you to your accommodation with ease and comfort.',
+                'price' => '50',
+                'auto_add_to_cart' => 0,
+                'show_at_front' => 1,
+                'price_addition_type' => Product::PRICE_ADDITION_TYPE_WITH_ROOM,
+            ),
+            array(
+                'name' => 'Cab on Demand',
+                'id_category_default' => $categories['transfers']['id_category'],
+                'description' => 'Explore the city conveniently with our cab-on-demand service, giving you the freedom to travel and discover local attractions at your own pace.',
+                'price' => '200',
+                'auto_add_to_cart' => 0,
+                'show_at_front' => 1,
+            ),
+            array(
+                'name' => 'Breakfast',
+                'id_category_default' => $categories['meals']['id_category'],
+                'description' => 'Start your day right with a delicious and hearty breakfast, thoughtfully prepared to fuel your adventures and make your mornings exceptional.',
+                'price' => '350',
+                'auto_add_to_cart' => 0,
+                'show_at_front' => 1,
+            ),
+            array(
+                'name' => 'Dinner',
+                'id_category_default' => $categories['meals']['id_category'],
+                'description' => 'Wind down in the evening with a delectable dinner spread, offering a culinary journey that delights your taste buds and completes your day with satisfaction.',
+                'price' => '450',
+                'auto_add_to_cart' => 0,
+                'show_at_front' => 1,
+            ),
+        );
+
+        foreach ($serviceProducts as $serviceProduct) {
+            $objProduct = new Product();
+            $objProduct->name = array();
+            $objProduct->description = array();
+            $objProduct->description_short = array();
+            $objProduct->link_rewrite = array();
+
+            // copy lang values
+            foreach (Language::getLanguages(true) as $language) {
+                $objProduct->name[$language['id_lang']] = $serviceProduct['name'];
+                $objProduct->description[$language['id_lang']] = $serviceProduct['description'];
+                $objProduct->description_short[$language['id_lang']] = $serviceProduct['description'];
+                $objProduct->link_rewrite[$language['id_lang']] = Tools::link_rewrite($serviceProduct['name']);
+            }
+
+            $objProduct->id_shop_default = Context::getContext()->shop->id;
+            $objProduct->id_category_default = $serviceProduct['id_category_default'];
+            $objProduct->price = $serviceProduct['price'];
+            $objProduct->active = 1;
+            $objProduct->quantity = 999999999;
+            $objProduct->booking_product = 0;
+            $objProduct->service_product_type = Product::SERVICE_PRODUCT_WITH_ROOMTYPE;
+            $objProduct->auto_add_to_cart = $serviceProduct['auto_add_to_cart'];
+            $objProduct->show_at_front = $serviceProduct['show_at_front'];
+            $objProduct->available_for_order = 1;
+            if ($serviceProduct['auto_add_to_cart']) {
+                $objProduct->price_addition_type = $serviceProduct['price_addition_type'];
+            }
+            $objProduct->is_virtual = 1;
+            $objProduct->indexed = 1;
+            $objProduct->save();
+            $idProduct = $objProduct->id;
+
+            // add to applicable categories
+            $objCategory = new Category($serviceProduct['id_category_default']);
+            if ($categories = $objCategory->getParentsCategories()) {
+                $idsCategory = array();
+                foreach ($categories as $category) {
+                    $idsCategory[] = $category['id_category'];
+                }
+                $objProduct->addToCategories($idsCategory);
+            }
+
+            Search::indexation(Tools::link_rewrite($serviceProduct['name']), $idProduct);
+
+            StockAvailable::updateQuantity($idProduct, null, 999999999);
+
+            // save service product images
+            $imagesBasePath = _PS_MODULE_DIR_.'hotelreservationsystem/views/img/prod_imgs/'.$idProduct.'/';
+            $imagesTypes = ImageType::getImagesTypes('products');
+            if (is_dir($imagesBasePath) && $opendir = opendir($imagesBasePath)) {
+                while (($image = readdir($opendir)) !== false) {
+                    $sourceImagePath = $imagesBasePath.$image;
+
+                    if (ImageManager::isRealImage($sourceImagePath)
+                        && ImageManager::isCorrectImageFileExt($sourceImagePath)
+                    ) {
+                        $objImage = new Image();
+                        $objImage->id_product = $idProduct;
+                        $objImage->position = Image::getHighestPosition($idProduct) + 1;
+                        $objImage->cover = 1;
+                        $objImage->add();
+                        $destinationPath = $objImage->getPathForCreation();
+                        foreach ($imagesTypes as $imageType) {
+                            ImageManager::resize(
+                                $sourceImagePath,
+                                $destinationPath.'-'.$imageType['name'].'.jpg',
+                                $imageType['width'],
+                                $imageType['height']
+                            );
+                        }
+                        ImageManager::resize($sourceImagePath, $destinationPath.'.jpg');
+                    }
+                }
+                closedir($opendir);
+            }
+
+            // link to all demo room types
+            $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
+            $objRoomTypeServiceProduct->addRoomProductLink(
+                $idProduct,
+                array(1, 2, 3, 4),
+                RoomTypeServiceProduct::WK_ELEMENT_TYPE_ROOM_TYPE
+            );
+        }
+    }
+
     public function saveAdvancedPaymentInfo($id_product)
     {
         $obj_adv_pmt = new HotelAdvancedPayment();
@@ -584,6 +748,7 @@ class HotelHelper
         $this->saveDummyHotelImages($htl_id);
         $this->saveDummyHotelFeatures($htl_id);
         $this->saveDummyProductsAndRelatedInfo($htl_id);
+        $this->saveDummyServiceProductsAndRelatedInfo();
 
         return true;
     }
