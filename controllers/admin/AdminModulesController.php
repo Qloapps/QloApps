@@ -1700,6 +1700,9 @@ class AdminModulesControllerCore extends AdminController
                     'author' => $module->author,
                     'image' => $module->image ? $module->image : ''
                 );
+            } else {
+                $this->errors[] = $this->l('The uploaded file does not contain a valid module or zip file name is incorrect.');
+                $response['errors'] = $this->errors;
             }
         } else {
             $response['errors'] = $this->errors;
