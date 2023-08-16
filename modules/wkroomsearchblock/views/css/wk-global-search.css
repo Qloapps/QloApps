@@ -63,6 +63,15 @@
   column-gap: 5px;
   grid-template-columns: repeat(2, 1fr);
 }
+#date-range-picker-container {
+  position: absolute;
+}
+#date-range-picker-container.top {
+  bottom: 82px;
+}
+#date-range-picker-container.bottom {
+  top: 85px;
+}
 /* #search_hotel_block_form {
   display: grid;
   grid-template-columns: 0.8fr repeat(3, 1fr) 0.6fr;
@@ -169,6 +178,17 @@
       background-color: #379bf0;
       color: #FFFFFF;}
 
+.header-rmsearch-wrapper .location_search_results_ul.top {
+  top: unset;
+  bottom: 55px; }
+.header-rmsearch-wrapper .location_search_results_ul.bottom {
+  top: 100%; }
+.header-rmsearch-wrapper .hotel_dropdown_ul.top {
+  top: unset;
+  bottom: 100%; }
+.header-rmsearch-wrapper .hotel_dropdown_ul.bottom {
+  top: 100%; }
+
 
 .header-rmsearch-wrapper .label-desc-txt {
   font-size: 12px;
@@ -217,6 +237,11 @@
   box-shadow: 0 8px 25px -4px rgba(0,0,0,0.39);
   left: 0px;
   padding: 20px;}
+  #search_occupancy_wrapper.top {
+    top: unset;
+    bottom: 100%; }
+  #search_occupancy_wrapper.bottom {
+    top: 100%; }
   #search_occupancy_wrapper .occupancy-info-separator {
     margin-bottom: 15px;
     margin-top: 15px;

@@ -29,6 +29,9 @@
     margin-top: -4px;
     padding: 10px;
 }
+#index .date-picker-wrapper.no-shortcuts {
+    margin-top: 0;
+}
 .date-picker-wrapper .month-wrapper{
     border: none;
     background-color: transparent;
