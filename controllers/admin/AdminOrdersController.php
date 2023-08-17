@@ -950,48 +950,65 @@ class AdminOrdersControllerCore extends AdminController
             ($module_name = Tools::getValue('payment_module_name')) &&
             ($id_order_state = Tools::getValue('id_order_state')) && Validate::isModuleName($module_name)) {
             if ($this->tabAccess['edit'] === '1') {
-                if (!Configuration::get('PS_CATALOG_MODE')) {
-                    $payment_module = Module::getInstanceByName($module_name);
-                } else {
-                    $payment_module = new BoOrder();
+                $paymentAmount = Tools::getValue('payment_amount');
+                if ($paymentAmount && !Validate::isPrice($paymentAmount)) { // $paymentAmount = '' means no payment
+                    $this->errors[] = Tools::displayError('Payment amount is invalid. Please enter correct amount.');
                 }
 
-                $cart = new Cart((int)$id_cart);
-                Context::getContext()->currency = new Currency((int)$cart->id_currency);
-                Context::getContext()->customer = new Customer((int)$cart->id_customer);
-
-                $bad_delivery = false;
-                if (($bad_delivery = (bool)!Address::isCountryActiveById((int)$cart->id_address_delivery))
-                    || !Address::isCountryActiveById((int)$cart->id_address_invoice)) {
-                    if ($bad_delivery) {
-                        $this->errors[] = Tools::displayError('This booking address country is not active.');
+                if (!count($this->errors)) {
+                    if (!Configuration::get('PS_CATALOG_MODE')) {
+                        $payment_module = Module::getInstanceByName($module_name);
                     } else {
-                        $this->errors[] = Tools::displayError('This invoice address country is not active.');
-                    }
-                } else {
-                    $employee = new Employee((int)Context::getContext()->cookie->id_employee);
-                    $payment_module->validateOrder(
-                        (int)$cart->id,
-                        (int)$id_order_state,
-                        $cart->getOrderTotal(true, Cart::BOTH),
-                        $payment_module->displayName,
-                        $this->l('Manual order -- Employee:').' '.
-                        substr($employee->firstname, 0, 1).'. '.$employee->lastname,
-                        array(),
-                        null,
-                        false,
-                        $cart->secure_key
-                    );
-
-                    if (isset($this->context->cookie->id_cart)) {
-                        unset($this->context->cookie->id_cart);
-                    }
-                    if (isset($this->context->cookie->id_guest)) {
-                        unset($this->context->cookie->id_guest);
+                        $payment_module = new BoOrder();
                     }
 
-                    if ($payment_module->currentOrder) {
-                        Tools::redirectAdmin(self::$currentIndex.'&id_order='.$payment_module->currentOrder.'&vieworder'.'&token='.$this->token.'&conf=3');
+                    $cart = new Cart((int)$id_cart);
+                    Context::getContext()->currency = new Currency((int)$cart->id_currency);
+                    Context::getContext()->customer = new Customer((int)$cart->id_customer);
+
+                    $bad_delivery = false;
+                    if (($bad_delivery = (bool)!Address::isCountryActiveById((int)$cart->id_address_delivery))
+                        || !Address::isCountryActiveById((int)$cart->id_address_invoice)) {
+                        if ($bad_delivery) {
+                            $this->errors[] = Tools::displayError('This booking address country is not active.');
+                        } else {
+                            $this->errors[] = Tools::displayError('This invoice address country is not active.');
+                        }
+                    } else {
+                        $amountPaid = $cart->getOrderTotal(true, Cart::BOTH);
+                        if (((float) $paymentAmount != 0) && Validate::isPrice($paymentAmount)) { // $paymentAmount != {'', '0', '0.00'}
+                            $objOrderState = new OrderState($id_order_state);
+                            if (!$objOrderState->is_logable && !$objOrderState->paid) {
+                                $amountPaid = Tools::ps_round($paymentAmount, 6);
+                                $payment_module->hasPartialPayment = true;
+                                $payment_module->payment_type = OrderPayment::PAYMENT_TYPE_PAY_AT_HOTEL;
+                            }
+                        }
+
+                        $employee = new Employee((int)Context::getContext()->cookie->id_employee);
+                        $payment_module->validateOrder(
+                            (int)$cart->id,
+                            (int)$id_order_state,
+                            $amountPaid,
+                            $payment_module->displayName,
+                            $this->l('Manual order -- Employee:').' '.
+                            substr($employee->firstname, 0, 1).'. '.$employee->lastname,
+                            array(),
+                            null,
+                            false,
+                            $cart->secure_key
+                        );
+
+                        if (isset($this->context->cookie->id_cart)) {
+                            unset($this->context->cookie->id_cart);
+                        }
+                        if (isset($this->context->cookie->id_guest)) {
+                            unset($this->context->cookie->id_guest);
+                        }
+
+                        if ($payment_module->currentOrder) {
+                            Tools::redirectAdmin(self::$currentIndex.'&id_order='.$payment_module->currentOrder.'&vieworder'.'&token='.$this->token.'&conf=3');
+                        }
                     }
                 }
             } else {

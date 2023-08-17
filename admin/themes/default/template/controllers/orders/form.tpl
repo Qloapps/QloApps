@@ -1186,6 +1186,7 @@
 			$('#go_order_process').hide();
 		}
 		$('#order_message').val(jsonSummary.order_message);
+		$('#payment_amount').siblings('.input-group-addon').html(currency_sign);
 		resetBind();
 	}
 
@@ -2081,9 +2082,9 @@
 					{/if}
 				</div>
 				<div class="form-group">
-					<label class="control-label col-lg-3">{l s='Payment'}</label>
+					<label class="control-label col-lg-3">{l s='Payment method'}</label>
 					<div class="col-lg-9">
-						<select name="payment_module_name" id="payment_module_name">
+						<select class="fixed-width-xxl" name="payment_module_name" id="payment_module_name">
 							{if !$PS_CATALOG_MODE}
 							{foreach from=$payment_modules item='module'}
 								<option value="{$module->name}" {if isset($smarty.post.payment_module_name) && $module->name == $smarty.post.payment_module_name}selected="selected"{/if}>{$module->displayName}</option>
@@ -2095,9 +2096,19 @@
 					</div>
 				</div>
 				<div class="form-group">
+					<label class="control-label col-lg-3">{l s='Payment amount'}</label>
+					<div class="col-lg-9">
+						<div class="input-group fixed-width-xl">
+							<span class="input-group-addon">{$currency->sign}</span>
+							<input type="text" class="fixed-width-xl" name="payment_amount" id="payment_amount" value="{0|string_format:"%.`$smarty.const._PS_PRICE_DISPLAY_PRECISION_`f"}" />
+						</div>
+					</span>
+					</div>
+				</div>
+				<div class="form-group">
 					<label class="control-label col-lg-3">{l s='Order status'}</label>
 					<div class="col-lg-9">
-						<select name="id_order_state" id="id_order_state">
+						<select class="fixed-width-xxl" name="id_order_state" id="id_order_state">
 							{foreach from=$order_states item='order_state'}
 								<option value="{$order_state.id_order_state}" {if isset($smarty.post.id_order_state) && $order_state.id_order_state == $smarty.post.id_order_state}selected="selected"{/if}>{$order_state.name}</option>
 							{/foreach}

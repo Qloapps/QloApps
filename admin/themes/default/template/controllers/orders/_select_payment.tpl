@@ -22,7 +22,7 @@
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
-<select name="payment_module_name" id="payment_module_name">
+<select class="fixed-width-xxl" name="payment_module_name" id="payment_module_name">
   {if !$PS_CATALOG_MODE}
     {foreach from=$payment_modules item='module'}
       <option value="{$module->name}" {if isset($smarty.post.payment_module_name) && $module->name == $smarty.post.payment_module_name}selected="selected"{/if}>{$module->displayName}</option>

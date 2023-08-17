@@ -430,6 +430,7 @@ abstract class PaymentModuleCore extends Module
                     if ($order_status->logable
                         && number_format($cart_total_paid, _PS_PRICE_COMPUTE_PRECISION_) != number_format($amount_paid, _PS_PRICE_COMPUTE_PRECISION_)
                         && $this->name != 'wsorder'
+                        && !(isset($this->hasPartialPayment) && $this->hasPartialPayment)
                     ) {
                         // if customer is paying full payment amount
                         $id_order_state = Configuration::get('PS_OS_ERROR');
@@ -478,7 +479,7 @@ abstract class PaymentModuleCore extends Module
             }
 
             // Register Payment only if the order status validate the order
-            if ($order_status->logable) {
+            if ($order_status->logable || (isset($this->hasPartialPayment) && $this->hasPartialPayment && $amount_paid)) {
                 // $order is the last order loop in the foreach
                 // The method addOrderPayment of the class Order make a create a paymentOrder
                 // linked to the order reference and not to the order id
