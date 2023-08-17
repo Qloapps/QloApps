@@ -386,8 +386,28 @@ class AuthControllerCore extends FrontController
         if (Validate::isEmail($email = Tools::getValue('email')) && !empty($email)) {
             if (Customer::customerExists($email)) {
                 $this->errors[] = Tools::displayError('An account using this email address has already been registered.', false);
-            } elseif (Customer::customerExists($email, false, false)) {
-                $this->errors[] = Tools::displayError('You are already registered as a guest with this email address.').'&nbsp;<button type="submit" class="btn btn-link alert-link btn-transform" name="submitTransformAccount">'.Tools::displayError('Click here').'</button>'.Tools::displayError('').' to generate a password for your account.';
+            } elseif ($idCustomer = Customer::customerExists($email, true, false)) {
+                $return = array();
+                $objCustomer = new Customer($idCustomer);
+                if (!$objCustomer->active || $objCustomer->deleted) {
+                    $this->errors[] = Tools::displayError('You can not create a booking using this email.', false);
+                }
+
+                if (!count($this->errors)) {
+                    $this->context->updateCustomer($objCustomer, 1);
+                    $this->context->cart->update();
+
+                    $return['isSaved'] = true;
+                    $return['id_customer'] = (int)$this->context->cookie->id_customer;
+                    $return['id_address_delivery'] = $this->context->cart->id_address_delivery;
+                    $return['id_address_invoice'] = $this->context->cart->id_address_invoice;
+                    $return['token'] = Tools::getToken(false);
+                }
+
+                $return['hasError'] = !empty($this->errors);
+                $return['errors'] = $this->errors;
+
+                $this->ajaxDie(json_encode($return));
             }
         }
 
