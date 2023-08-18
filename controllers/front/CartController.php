@@ -361,7 +361,7 @@ class CartControllerCore extends FrontController
                                 $this->errors[] = Tools::displayError('You can\'t book room after date '.$maxOrdDate);
                             }
                         }
-                        if ($occupancyRequiredForBooking) {
+                        if ($occupancyRequiredForBooking && $operator == 'up' ) {
                             foreach($occupancy as $key => $roomOccupancy) {
                                 if ($roomOccupancy['adults'] > $roomTypeInfo['max_adults']) {
                                     $this->errors[] = sprintf(Tools::displayError('Room %s cannot have adults more than %s'), $key + 1, $roomTypeInfo['max_adults']);
