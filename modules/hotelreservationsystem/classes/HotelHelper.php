@@ -434,7 +434,7 @@ class HotelHelper
                 $product->description_short[$lang['id_lang']] = 'Fashion axe kogi yuccie, ramps shabby chic direct
                 trade before they sold out distillery bicycle rights. Slow-carb +1 quinoa VHS. +1 brunch trust fund,
                 meggings chartreuse sustainable everyday carry tumblr hoodie tacos tilde ramps post-ironic fixie.';
-                $product->link_rewrite[$lang['id_lang']] = Tools::link_rewrite('Super Delux Rooms');
+                $product->link_rewrite[$lang['id_lang']] = Tools::link_rewrite($value_prod);
             }
             $product->id_shop_default = Context::getContext()->shop->id;
             $product->id_category_default = 2;
