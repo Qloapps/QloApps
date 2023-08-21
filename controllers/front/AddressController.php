@@ -175,43 +175,47 @@ class AddressControllerCore extends FrontController
             }
         }
 
-        // Save address
-        if ($result = $address->save()) {
-            // Update id address of the current cart if necessary
-            if (isset($address_old) && $address_old->isUsed()) {
-                $this->context->cart->updateAddressId($address_old->id, $address->id);
-            } else { // Update cart address
-                $this->context->cart->autosetProductAddress();
-            }
-
-            if ((bool)Tools::getValue('select_address', false) == true || (Tools::getValue('type') == 'invoice' && Configuration::get('PS_ORDER_PROCESS_TYPE'))) {
-                $this->context->cart->id_address_invoice = (int)$address->id;
-            } elseif (Configuration::get('PS_ORDER_PROCESS_TYPE')) {
-                $this->context->cart->id_address_invoice = (int)$this->context->cart->id_address_delivery;
-            }
-            $this->context->cart->update();
-
-            if ($this->ajax) {
-                $return = array(
-                    'hasError' => (bool)$this->errors,
-                    'errors' => $this->errors,
-                    'id_address_delivery' => (int)$this->context->cart->id_address_delivery,
-                    'id_address_invoice' => (int)$this->context->cart->id_address_invoice
-                );
-                $this->ajaxDie(json_encode($return));
-            }
-
-            // Redirect to old page or current page
-            if ($back = Tools::getValue('back')) {
-                if ($back == Tools::secureReferrer(Tools::getValue('back'))) {
-                    Tools::redirect(html_entity_decode($back));
-                }
-                $mod = Tools::getValue('mod');
-                Tools::redirect('index.php?controller='.$back.($mod ? '&back='.$mod : ''));
-            } else {
-                Tools::redirect('index.php?controller=address&updated=1');
-            }
+        // Update address if customer already has address
+        if ($idAddress = Customer::getCustomerIdAddress($address->id_customer)) {
+            $address->id = $idAddress;
         }
+        $address->save();
+
+        // Update id address of the current cart if necessary
+        if (isset($address_old) && $address_old->isUsed()) {
+            $this->context->cart->updateAddressId($address_old->id, $address->id);
+        } else { // Update cart address
+            $this->context->cart->autosetProductAddress();
+        }
+
+        if ((bool)Tools::getValue('select_address', false) == true || (Tools::getValue('type') == 'invoice' && Configuration::get('PS_ORDER_PROCESS_TYPE'))) {
+            $this->context->cart->id_address_invoice = (int)$address->id;
+        } elseif (Configuration::get('PS_ORDER_PROCESS_TYPE')) {
+            $this->context->cart->id_address_invoice = (int)$this->context->cart->id_address_delivery;
+        }
+        $this->context->cart->update();
+
+        if ($this->ajax) {
+            $return = array(
+                'hasError' => (bool)$this->errors,
+                'errors' => $this->errors,
+                'id_address_delivery' => (int)$this->context->cart->id_address_delivery,
+                'id_address_invoice' => (int)$this->context->cart->id_address_invoice
+            );
+            $this->ajaxDie(json_encode($return));
+        }
+
+        // Redirect to old page or current page
+        if ($back = Tools::getValue('back')) {
+            if ($back == Tools::secureReferrer(Tools::getValue('back'))) {
+                Tools::redirect(html_entity_decode($back));
+            }
+            $mod = Tools::getValue('mod');
+            Tools::redirect('index.php?controller='.$back.($mod ? '&back='.$mod : ''));
+        } else {
+            Tools::redirect('index.php?controller=address&updated=1');
+        }
+
         $this->errors[] = Tools::displayError('An error occurred while updating your address.');
     }
 
