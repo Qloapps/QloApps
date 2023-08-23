@@ -64,8 +64,8 @@ class AdminOrderPreferencesControllerCore extends AdminController
                 'icon' => 'icon-cogs',
                 'fields' => array(
                     'MAX_GLOBAL_BOOKING_DATE' => array(
-                        'title' => $this->l('Maximum Global Date to book a room'),
-                        'hint' => $this->l('Maximum date by which rooms of your hotels can be booked.'),
+                        'title' => $this->l('Maximum Global Check-out Date to book a room'),
+                        'hint' => $this->l('Maximum date of check-out by which rooms of your hotels can be booked.'),
                         'type' => 'text',
                         'id' => 'max_global_book_date',
                         'class' => 'fixed-width-xxl readonly',
@@ -224,11 +224,11 @@ class AdminOrderPreferencesControllerCore extends AdminController
         $maxGlobalBookingDateFormatted = date('Y-m-d', strtotime($maxGlobalBookingDate));
 
         if ($maxGlobalBookingDate == '') {
-            $this->errors[] = Tools::displayError('Field \'Maximum Global Date to book a room\' can not be empty.');
+            $this->errors[] = Tools::displayError('Field \'Maximum Global Check-out Date to book a room\' can not be empty.');
         } elseif (!Validate::isDate($maxGlobalBookingDateFormatted)) {
-            $this->errors[] = Tools::displayError('Field \'Maximum Global Date to book a room\' is invalid.');
+            $this->errors[] = Tools::displayError('Field \'Maximum Global Check-out Date to book a room\' is invalid.');
         } elseif (strtotime($maxGlobalBookingDateFormatted) < strtotime(date('Y-m-d'))) {
-            $this->errors[] = Tools::displayError('Field \'Maximum Global Date to book a room\' can not be a past date. Please use a future date.');
+            $this->errors[] = Tools::displayError('Field \'Maximum Global Check-out Date to book a room\' can not be a past date. Please use a future date.');
         }
 
         if ($globalPreparationTime === '') {
