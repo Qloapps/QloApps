@@ -53,12 +53,14 @@ class IdentityControllerCore extends FrontController
 
             $email = trim(Tools::getValue('email'));
 
-            if (Tools::getValue('months') != '' && Tools::getValue('days') != '' && Tools::getValue('years') != '') {
-                $this->customer->birthday = (int)Tools::getValue('years').'-'.(int)Tools::getValue('months').'-'.(int)Tools::getValue('days');
-            } elseif (Tools::getValue('months') == '' && Tools::getValue('days') == '' && Tools::getValue('years') == '') {
-                $this->customer->birthday = null;
-            } else {
-                $this->errors[] = Tools::displayError('Invalid date of birth.');
+            if (Configuration::get('PS_CUSTOMER_BIRTHDATE')) {
+                if (Tools::getValue('months') != '' && Tools::getValue('days') != '' && Tools::getValue('years') != '') {
+                    $this->customer->birthday = (int)Tools::getValue('years').'-'.(int)Tools::getValue('months').'-'.(int)Tools::getValue('days');
+                } elseif (Tools::getValue('months') == '' && Tools::getValue('days') == '' && Tools::getValue('years') == '') {
+                    $this->customer->birthday = null;
+                } else {
+                    $this->errors[] = Tools::displayError('Invalid date of birth.');
+                }
             }
 
             if (Tools::getIsset('old_passwd')) {
@@ -152,6 +154,7 @@ class IdentityControllerCore extends FrontController
         ));
 
         $newsletter = Configuration::get('PS_CUSTOMER_NWSL') || (Module::isInstalled('blocknewsletter') && Module::getInstanceByName('blocknewsletter')->active);
+        $this->context->smarty->assign('birthday', (bool) Configuration::get('PS_CUSTOMER_BIRTHDATE'));
         $this->context->smarty->assign('newsletter', $newsletter);
         $this->context->smarty->assign('optin', (bool)Configuration::get('PS_CUSTOMER_OPTIN'));
 

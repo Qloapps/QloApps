@@ -99,6 +99,13 @@ class AdminCustomerPreferencesControllerCore extends AdminController
                         'cast' => 'intval',
                         'type' => 'bool'
                     ),
+                    'PS_CUSTOMER_BIRTHDATE' => array(
+                        'title' => $this->l('Ask for birth date'),
+                        'hint' => $this->l('Display or not the birth date field.'),
+                        'validation' => 'isBool',
+                        'cast' => 'intval',
+                        'type' => 'bool'
+                    ),
                     'PS_CUSTOMER_NWSL' => array(
                         'title' => $this->l('Enable newsletter registration'),
                         'hint' => $this->l('Display or not the newsletter registration tick box.'),
