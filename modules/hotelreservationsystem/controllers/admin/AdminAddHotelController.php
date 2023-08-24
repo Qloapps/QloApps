@@ -130,7 +130,7 @@ class AdminAddHotelController extends ModuleAdminController
             $hotelBranchInfo = new HotelBranchInformation($idHotel);
 
             $addressInfo = HotelBranchInformation::getAddress($idHotel);
-            $idCountry = $addressInfo['id_country'];
+            $idCountry = Tools::getValue('hotel_country', $addressInfo['id_country']);
 
             $smartyVars['edit'] =  1;
             $smartyVars['address_info'] = $addressInfo;
@@ -175,14 +175,7 @@ class AdminAddHotelController extends ModuleAdminController
 
         $stateOptions = null;
         if ($idCountry) {
-            $statesByCountry = State::getStatesByIdCountry($idCountry);
-            if ($statesByCountry) {
-                $stateOptions = array();
-                foreach ($statesByCountry as $key => $value) {
-                    $stateOptions[$key]['id'] = $value['id_state'];
-                    $stateOptions[$key]['name'] = $value['name'];
-                }
-            }
+            $stateOptions = State::getStatesByIdCountry($idCountry);
         }
 
         $smartyVars['state_var'] = $stateOptions;
@@ -611,16 +604,15 @@ class AdminAddHotelController extends ModuleAdminController
 
     public function ajaxProcessStateByCountryId()
     {
-        $states = array();
+        $response = array('status' => false, 'states' => array());
         if ($idCountry = Tools::getValue('id_country')) {
-            if ($statesbycountry = State::getStatesByIdCountry($idCountry)) {
-                foreach ($statesbycountry as $key => $value) {
-                    $states[$key]['id'] = $value['id_state'];
-                    $states[$key]['name'] = $value['name'];
-                }
+            if ($states = State::getStatesByIdCountry($idCountry)) {
+                $response['status'] = true;
+                $response['states'] = $states;
             }
         }
-        die(json_encode($states));
+
+        $this->ajaxDie(json_encode($response));
     }
 
     public function ajaxProcessUploadHotelImages()

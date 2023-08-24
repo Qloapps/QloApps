@@ -219,7 +219,7 @@
 									<option value="0" selected="selected">{l s='Choose your Country' mod='hotelreservationsystem'} </option>
 									{if $country_var}
 										{foreach $country_var as $countr}
-											<option value="{$countr['id_country']}" {if (isset($smarty.post.hotel_country) && $smarty.post.hotel_country == $countr['id_country']) || (isset($edit) && $address_info['id_country'] == $countr['id_country'])}selected{/if}>{$countr['name']}</option>
+											<option value="{$countr['id_country']}" {if isset($smarty.post.hotel_country) && $smarty.post.hotel_country}{if $smarty.post.hotel_country == $countr['id_country']}selected{/if}{elseif isset($edit) && $address_info['id_country'] == $countr['id_country']}selected{/if}>{$countr['name']}</option>
 										{/foreach}
 									{/if}
 								</select>
@@ -234,7 +234,7 @@
 								<select class="form-control" name="hotel_state" id="hotel_state">
 								{if is_array($state_var) && count($state_var)}
 									{foreach $state_var as $state}
-										<option value="{$state['id']}" {if (isset($smarty.post.hotel_state) && $smarty.post.hotel_state == $state['id']) || (isset($edit) && $address_info['id_state'] == $state['id'])}selected{/if}> {$state['name']}</option>
+										<option value="{$state['id_state']}" {if (isset($smarty.post.hotel_state) && $smarty.post.hotel_state == $state['id_state']) || (isset($edit) && $address_info['id_state'] == $state['id_state'])}selected{/if}> {$state['name']}</option>
 									{/foreach}
 								{/if}
 								</select>
