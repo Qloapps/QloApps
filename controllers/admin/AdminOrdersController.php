@@ -44,6 +44,8 @@ class AdminOrdersControllerCore extends AdminController
 
     protected $statuses_array = array();
     protected $all_order_sources = array();
+    protected $hotelsArray = array();
+    protected $roomTypesArray = array();
 
     public function __construct()
     {
@@ -97,6 +99,21 @@ class AdminOrdersControllerCore extends AdminController
             $this->all_order_sources[$source['source']] = $source['source'];
         }
 
+        $hotelsArray = HotelBranchInformation::getProfileAccessedHotels($this->context->employee->id_profile, 1);
+        foreach ($hotelsArray as $hotel) {
+            $addressInfo = HotelBranchInformation::getAddress($hotel['id_hotel']);
+            $this->hotelsArray[$hotel['id_hotel']] = $hotel['hotel_name'].', '.$addressInfo['city'];
+        }
+
+        $roomTypesArray = array();
+        $objHotelRoomType = new HotelRoomType();
+        foreach ($hotelsArray as $hotel) {
+            $hotelRoomTypes = $objHotelRoomType->getRoomTypeByHotelId($hotel['id_hotel'], $this->context->language->id);
+            foreach ($hotelRoomTypes as $room_type) {
+                $this->roomTypesArray[$room_type['id_product']] = $room_type['room_type'].', '.$hotel['hotel_name'];
+            }
+        }
+
         $this->fields_list = array(
             'id_order' => array(
                 'title' => $this->l('ID'),
@@ -122,8 +139,12 @@ class AdminOrdersControllerCore extends AdminController
             ),
             'hotel_name' => array(
                 'title' => $this->l('Hotel'),
-                'filter_key' => 'hbil!hotel_name',
+                'type' => 'select',
+                'filter_key' => 'hbd!id_hotel',
+                'list' => $this->hotelsArray,
                 'optional' => true,
+                'class' => 'chosen',
+                'remove_onchange' => true,
                 'visible_default' => true
             ),
             'date_from' => array(
@@ -140,9 +161,13 @@ class AdminOrdersControllerCore extends AdminController
             ),
             'room_type_name' => array(
                 'title' => $this->l('Room type'),
-                'filter_key' => 'hbd!room_type_name',
-                'type'=>'text',
-                'displayed' => false,
+                'type' => 'select',
+                'filter_key' => 'hbd!id_product',
+                'list' => $this->roomTypesArray,
+                'optional' => true,
+                'class' => 'chosen',
+                'remove_onchange' => true,
+                'visible_default' => true,
             ),
             'total_guests' => array(
                 'title' => $this->l('Guests'),
@@ -1863,6 +1888,27 @@ class AdminOrdersControllerCore extends AdminController
         );
 
         return $modal;
+    }
+
+    public function ajaxProcessGetHotelRoomTypes()
+    {
+        $response = array('status' => false);
+
+        $idHotel = (int) Tools::getValue('id_hotel');
+        $objHotelRoomType = new HotelRoomType();
+        $hotelRoomTypes = $objHotelRoomType->getRoomTypeByHotelId($idHotel, $this->context->language->id);
+        if (is_array($hotelRoomTypes) && count($hotelRoomTypes)) {
+            $objHotelBranchInformation = new HotelBranchInformation($idHotel, $this->context->language->id);
+            $this->context->smarty->assign(array(
+                'hotel_room_types' => $hotelRoomTypes,
+                'hotel_name' => $objHotelBranchInformation->hotel_name,
+            ));
+
+            $response['status'] = true;
+            $response['html_room_types'] = $this->context->smarty->fetch('controllers/orders/_filter_room_types.tpl');
+        }
+
+        $this->ajaxDie(json_encode($response));
     }
 
     public function ajaxProcessGetBookingDocuments()

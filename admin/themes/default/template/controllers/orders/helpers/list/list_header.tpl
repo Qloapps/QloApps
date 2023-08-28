@@ -152,7 +152,7 @@
 							</span>
 						</div>
 					{/if}
-					<div class="panel collapse" id="list_filters_panel">
+					<div class="panel" id="list_filters_panel">
 						<div class="row">
 							<div class="col-sm-12">
 								<div class="list_filters">
@@ -246,7 +246,7 @@
 														</div>
 													{elseif $params.type == 'select'}
 														{if isset($params.filter_key)}
-															<select id="filter_input_{$key}" class="filter{if isset($params.align) && $params.align == 'center'}center{/if}" onchange="$('#submitFilterButton{$list_id}').focus();$('#submitFilterButton{$list_id}').click();" name="{$list_id}Filter_{$params.filter_key}" {if isset($params.width)} style="width:{$params.width}px"{/if}>
+															<select id="filter_input_{$key}" class="filter{if isset($params.align) && $params.align == 'center'}center{/if} {if isset($params.class)}{$params.class}{/if}" {if !isset($params.remove_onchange) || !$params.remove_onchange}onchange="$('#submitFilterButton{$list_id}').focus();$('#submitFilterButton{$list_id}').click();"{/if} name="{$list_id}Filter_{$params.filter_key}" {if isset($params.width)} style="width:{$params.width}px"{/if}>
 																<option value="" {if $params.value == ''} selected="selected" {/if}>-</option>
 																{if isset($params.list) && is_array($params.list)}
 																	{foreach $params.list AS $option_value => $option_display}
@@ -256,7 +256,7 @@
 															</select>
 														{/if}
 													{else}
-														<input type="text" class="filter" name="{$list_id}Filter_{if isset($params.filter_key)}{$params.filter_key}{else}{$key}{/if}" value="{$params.value|escape:'html':'UTF-8'}" {if isset($params.width) && $params.width != 'auto'} style="width:{$params.width}px"{/if} />
+														<input type="text" id="filter_input_{$key}" class="filter" name="{$list_id}Filter_{if isset($params.filter_key)}{$params.filter_key}{else}{$key}{/if}" value="{$params.value|escape:'html':'UTF-8'}" {if isset($params.width) && $params.width != 'auto'} style="width:{$params.width}px"{/if} />
 													{/if}
 												</div>
 											</div>
@@ -302,6 +302,36 @@
 						$('#list_filters_panel').find('input[name="orderFilter_'+$(this).parent().data('filter_key')+'"]').val('');
 					}
 					form.submit();
+				});
+			});
+
+			// manage Hotel and Room type filter inputs
+			$(document).on('change', '#filter_input_hotel_name', function () {
+				let filterInputHotelName = $('#filter_input_hotel_name');
+				let filterInputRoomTypeName = $('#filter_input_room_type_name');
+
+				let idHotel = parseInt($(filterInputHotelName).val());
+				$.ajax({
+					url: currentIndex + '&token=' + token,
+					data: {
+						ajax: true,
+						action: 'GetHotelRoomTypes',
+						id_hotel: idHotel,
+					},
+					type: 'POST',
+					dataType: 'JSON',
+					success: function(response) {
+						if (response.status) {
+							$(filterInputRoomTypeName).html(response.html_room_types);
+
+							// destoy current chosen and re-initialize
+							$(filterInputRoomTypeName).chosen('destroy');
+							$(filterInputRoomTypeName).chosen({
+								disable_search_threshold: 10,
+								search_contains: true,
+							});
+						}
+					},
 				});
 			});
 		</script>
